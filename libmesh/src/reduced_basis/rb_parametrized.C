@@ -36,8 +36,8 @@ RBParametrized::RBParametrized()
   libmesh_experimental();
   
   parameters.clear();
-  parameters_min_vector.clear();
-  parameters_max_vector.clear();
+  parameters_min.clear();
+  parameters_max.clear();
 }
 
 RBParametrized::~RBParametrized()
@@ -48,28 +48,31 @@ RBParametrized::~RBParametrized()
 void RBParametrized::clear()
 {
   parameters.clear();
-  parameters_min_vector.clear();
-  parameters_max_vector.clear();
+  parameters_min.clear();
+  parameters_max.clear();
   parameters_initialized = false;
 }
 
-void RBParametrized::initialize_parameters(std::vector<Real> mu_min_in,
-                                           std::vector<Real> mu_max_in,
-                                           std::vector<Real> mu_in)
+void RBParametrized::initialize_parameters(const RBParameters& mu_min_in,
+                                           const RBParameters& mu_max_in,
+                                           const RBParameters& mu_in)
 {
   // Check that the min/max vectors are valid
   {
     const std::string err_string = "Error: Invalid mu_min/mu_max in RBParameters constructor.";
-    bool valid_min_max = (mu_min_in.size() == mu_max_in.size());
+    bool valid_min_max = (mu_min_in.n_parameters() == mu_max_in.n_parameters());
     if(!valid_min_max)
     {
       libMesh::err << err_string << std::endl;
     }
     else
     {
-      for(unsigned int i=0; i<mu_min_in.size(); i++)
+      RBParameters::const_iterator it     = mu_min_in.begin();
+      RBParameters::const_iterator it_end = mu_min_in.end();
+      for( ; it != it_end; ++it)
       {
-        if(mu_min_in[i] > mu_max_in[i])
+        std::string param_name = it->first;
+        if(mu_min_in.get_value(param_name) > mu_max_in.get_value(param_name))
         {
           libMesh::err << err_string << std::endl;
         }
@@ -77,19 +80,17 @@ void RBParametrized::initialize_parameters(std::vector<Real> mu_min_in,
     }
   }
   
-  parameters_min_vector = mu_min_in;
-  parameters_max_vector = mu_max_in;
-  // Need to resize so that error checking in set_current_parameters works properly
-  parameters.resize(parameters_min_vector.size());
+  parameters_min = mu_min_in;
+  parameters_max = mu_max_in;
 
   parameters_initialized = true;
   set_parameters(mu_in);
 }
 
-void RBParametrized::initialize_parameters(RBParametrized& rb_parametrized)
+void RBParametrized::initialize_parameters(const RBParametrized& rb_parametrized)
 {
-  initialize_parameters(rb_parametrized.get_parameters_min_vector(),
-                        rb_parametrized.get_parameters_max_vector(),
+  initialize_parameters(rb_parametrized.get_parameters_min(),
+                        rb_parametrized.get_parameters_max(),
                         rb_parametrized.get_parameters());
 }
 
@@ -98,19 +99,32 @@ void RBParametrized::initialize_parameters (const std::string& parameters_filena
   GetPot infile(parameters_filename);
 
   const unsigned int n_parameters = infile("n_parameters",1);
-  std::vector<Real> mu_min_in(n_parameters);
-  std::vector<Real> mu_max_in(n_parameters);
-  std::vector<Real> initial_mu_in(n_parameters);
+  RBParameters mu_min_in;
+  RBParameters mu_max_in;
+  RBParameters initial_mu_in;
   for(unsigned int i=0; i<n_parameters; i++)
   {
-    // Read vector-based mu_min values.
-    mu_min_in[i] = infile("mu_min", mu_min_in[i], i);
-
-    // Read vector-based mu_max values.
-    mu_max_in[i] = infile("mu_max", mu_max_in[i], i);
+    // Read in the parameter names
+    std::string param_name = infile("parameter_names", "NONE", i);
     
-    // read in parameters to initialize to (default to mu_min)
-    initial_mu_in[i] = infile("initial_parameters", mu_min_in[i], i);
+    for(unsigned int j=0; j<3; j++)
+    {
+      if(j==0)
+      {
+        Real min_val = infile(param_name, 0., j);
+        mu_min_in.add_parameter(param_name, min_val);
+      }
+      else if(j==1)
+      {
+        Real max_val = infile(param_name, 0., j);
+        mu_max_in.add_parameter(param_name, max_val);
+      }
+      else
+      {
+        Real init_val = infile(param_name, 0., j);
+        initial_mu_in.add_parameter(param_name, init_val);
+      }
+    }
   }
 
   // Initialize the parameter ranges and set the parameters to mu_min_vector
@@ -124,11 +138,13 @@ unsigned int RBParametrized::get_n_params() const
     libMesh::err << "Error: parameters not initialized in RBParametrized::get_n_params" << std::endl;
     libmesh_error();
   }
+  
+  libmesh_assert( parameters_min.n_parameters() == parameters_max.n_parameters() );
 
-  return parameters.size();
+  return parameters_min.n_parameters();
 }
 
-void RBParametrized::set_parameters(const std::vector<Real>& params)
+void RBParametrized::set_parameters(const RBParameters& params)
 {
   if(!parameters_initialized)
   {
@@ -138,11 +154,17 @@ void RBParametrized::set_parameters(const std::vector<Real>& params)
 
   if(!valid_params(params))
   {
-    libMesh::err << "Invalid input parameters in RBParametrized::set_current_parameters" << std::endl;
+    libMesh::err << "Invalid input parameters in RBParametrized::set_parameters" << std::endl;
 
-    for(unsigned int i=0; i<params.size(); i++)
+    RBParameters::const_iterator it     = params.begin();
+    RBParameters::const_iterator it_end = params.end();
+    for( ; it != it_end; ++it)
     {
-      libMesh::out << "params i = " << params[i] << ", min = " << get_parameter_min(i) << ", max = " << get_parameter_max(i) << std::endl;
+      std::string param_name = it->first;
+      Real param_value = it->second;
+      libMesh::out << "parameter: " << param_name << ", value = " << param_value << ", min = "
+                   << this->get_parameter_min(param_name) << ", max = "
+                   << this->get_parameter_max(param_name) << std::endl;
     }
 
     libmesh_error();
@@ -153,7 +175,7 @@ void RBParametrized::set_parameters(const std::vector<Real>& params)
   }
 }
 
-std::vector<Real> RBParametrized::get_parameters() const
+const RBParameters& RBParametrized::get_parameters() const
 {
   if(!parameters_initialized)
   {
@@ -164,29 +186,29 @@ std::vector<Real> RBParametrized::get_parameters() const
   return parameters;
 }
 
-std::vector<Real> RBParametrized::get_parameters_min_vector() const
+const RBParameters& RBParametrized::get_parameters_min() const
 {
   if(!parameters_initialized)
   {
-    libMesh::err << "Error: parameters not initialized in RBParametrized::get_parameter_min_vector" << std::endl;
+    libMesh::err << "Error: parameters not initialized in RBParametrized::get_parameters_min" << std::endl;
     libmesh_error();
   }
 
-  return parameters_min_vector;
+  return parameters_min;
 }
 
-std::vector<Real> RBParametrized::get_parameters_max_vector() const
+const RBParameters& RBParametrized::get_parameters_max() const
 {
   if(!parameters_initialized)
   {
-    libMesh::err << "Error: parameters not initialized in RBParametrized::get_parameter_max_vector" << std::endl;
+    libMesh::err << "Error: parameters not initialized in RBParametrized::get_parameters_max" << std::endl;
     libmesh_error();
   }
 
-  return parameters_max_vector;
+  return parameters_max;
 }
 
-Real RBParametrized::get_parameter_min(unsigned int i) const
+Real RBParametrized::get_parameter_min(const std::string& param_name) const
 {
   if(!parameters_initialized)
   {
@@ -194,16 +216,10 @@ Real RBParametrized::get_parameter_min(unsigned int i) const
     libmesh_error();
   }
 
-  if(i >= get_n_params())
-  {
-    libMesh::err << "Error: index too large in RBParametrized::get_parameter_min" << std::endl;
-    libmesh_error();
-  }
-
-  return parameters_min_vector[i];
+  return parameters_min.get_value(param_name);
 }
 
-Real RBParametrized::get_parameter_max(unsigned int i) const
+Real RBParametrized::get_parameter_max(const std::string& param_name) const
 {
   if(!parameters_initialized)
   {
@@ -211,48 +227,39 @@ Real RBParametrized::get_parameter_max(unsigned int i) const
     libmesh_error();
   }
 
-  if(i >= get_n_params())
-  {
-    libMesh::err << "Error: index too large in RBParametrized::get_parameter_min" << std::endl;
-    libmesh_error();
-  }
-
-  return parameters_max_vector[i];
+  return parameters_max.get_value(param_name);
 }
 
-void RBParametrized::print_parameters()
+void RBParametrized::print_parameters() const
 {
   if(!parameters_initialized)
   {
     libMesh::err << "Error: parameters not initialized in RBParametrized::print_current_parameters" << std::endl;
     libmesh_error();
   }
-
-  for(unsigned int j=0; j<parameters.size(); j++)
-  {
-    libMesh::out << "mu[" << j << "] = " << parameters[j] << std::endl;
-  }
-  libMesh::out << std::endl;
+  
+  get_parameters().print();
 }
 
-bool RBParametrized::valid_params(const std::vector<Real>& params)
+bool RBParametrized::valid_params(const RBParameters& params)
 {
-  bool valid = ( params.size() == get_n_params() );
-
-  if(!valid)
+  if(params.n_parameters() != get_n_params())
   {
    return false;
   }
   else
   {
-    for(unsigned int i=0; i<params.size(); i++)
+    bool valid = true;
+    RBParameters::const_iterator it     = params.begin();
+    RBParameters::const_iterator it_end = params.end();
+    for( ; it != it_end; ++it)
     {
-      valid = valid && ( (get_parameter_min(i) <= params[i]) &&
-                         (params[i] <= get_parameter_max(i)) );
+      std::string param_name = it->first;
+      valid = valid && ( (get_parameter_min(param_name) <= params.get_value(param_name)) &&
+                         (params.get_value(param_name) <= get_parameter_max(param_name)) );
     }
+    return valid;
   }
-
-  return valid;
 }
 
 } // namespace libMesh

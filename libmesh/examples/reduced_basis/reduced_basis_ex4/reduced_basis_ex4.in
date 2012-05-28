@@ -4,7 +4,9 @@ n_elem = 25
 store_basis_functions = true
 
 n_parameters = 2
-mu_min = '-1 -1'
-mu_max = '1 1'
-initial_parameters = '-0.6 0.7'
+parameter_names = 'center_x center_y'
+
+center_x = '-1 1 -0.6'
+center_y = '-1 1 0.7'
+
 online_N = 15

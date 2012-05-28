@@ -45,10 +45,10 @@ RBConstructionBase<Base>::RBConstructionBase (EquationSystems& es,
                                               const std::string& name,
                                               const unsigned int number)
   : Base(es, name, number),
-    training_parameters_initialized(false),
-    training_parameters_random_seed(-1), // by default, use std::time to seed RNG
     serial_training_set(false),
-    alternative_solver("unchanged")
+    alternative_solver("unchanged"),
+    training_parameters_initialized(false),
+    training_parameters_random_seed(-1) // by default, use std::time to seed RNG
 {
   training_parameters.clear();
 }
@@ -66,15 +66,19 @@ void RBConstructionBase<Base>::clear ()
   Base::clear();
   RBParametrized::clear();
 
-  for(unsigned int i=0; i<training_parameters.size(); i++)
+  std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters.begin();
+  std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters.end();
+
+  for( ; it != it_end; ++it)
   {
-    if(training_parameters[i])
+    NumericVector<Number>* training_vector = it->second;
+    if(training_vector)
     {
-      delete training_parameters[i];
-      training_parameters[i] = NULL;
+      delete training_vector;
+      training_vector = NULL;
     }
   }
-  training_parameters.resize(0);
+  training_parameters.clear();
 }
 
 template <class Base>
@@ -101,60 +105,94 @@ void RBConstructionBase<Base>::get_global_max_error_pair(std::pair<unsigned int,
 }
 
 template <class Base>
-std::vector<Real> RBConstructionBase<Base>::get_training_parameter(unsigned int index) const
+unsigned int RBConstructionBase<Base>::get_n_training_samples() const
+{
+  libmesh_assert(training_parameters_initialized);
+  return training_parameters.begin()->second->size();
+}
+
+template <class Base>
+unsigned int RBConstructionBase<Base>::get_local_n_training_samples() const
+{
+  libmesh_assert(training_parameters_initialized);
+  return training_parameters.begin()->second->local_size();
+}
+
+template <class Base>
+unsigned int RBConstructionBase<Base>::get_first_local_training_index() const
+{
+  libmesh_assert(training_parameters_initialized);
+  return training_parameters.begin()->second->first_local_index();
+}
+
+template <class Base>
+unsigned int RBConstructionBase<Base>::get_last_local_training_index() const
+{
+  libmesh_assert(training_parameters_initialized);
+  return training_parameters.begin()->second->last_local_index();
+}
+
+template <class Base>
+void RBConstructionBase<Base>::set_params_from_training_set(unsigned int index)
 {
   libmesh_assert(training_parameters_initialized);
 
   libmesh_assert( (this->get_first_local_training_index() <= index) &&
                   (index < this->get_last_local_training_index()) );
-
-  std::vector<Real> parameter(this->get_n_params());
-  for(unsigned int i=0; i<parameter.size(); i++)
-    parameter[i] = libmesh_real((*training_parameters[i])(index));
-
-  return parameter;
+  
+  RBParameters params;
+  std::map< std::string, NumericVector<Number>* >::const_iterator it     = training_parameters.begin();
+  std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters.end();
+  for( ; it != it_end; ++it)
+  {
+    std::string param_name = it->first;
+    Real param_value = libmesh_real( ( *(it->second) )(index) );
+    
+    params.add_parameter(param_name, param_value);
+  }
+  
+  set_parameters(params);
 }
 
 template <class Base>
-void RBConstructionBase<Base>::load_training_parameter_locally(unsigned int index)
-{
-  set_parameters( get_training_parameter(index) );
-}
-
-template <class Base>
-void RBConstructionBase<Base>::load_training_parameter_globally(unsigned int index)
+void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsigned int index)
 {
   libmesh_assert(training_parameters_initialized);
 
   unsigned int root_id = 0;
-  std::vector<Real> new_param(get_n_params());
   if( (this->get_first_local_training_index() <= index) &&
       (index < this->get_last_local_training_index()) )
   {
-    new_param = this->get_training_parameter(index);
-    root_id = libMesh::processor_id(); // Only non-zero on one processor
+    // Set parameters on only one processor
+    set_params_from_training_set(index);
+    
+    // set root_id, only non-zero on one processor
+    root_id = libMesh::processor_id();
   }
+  
+  // broad
   Parallel::sum(root_id);
-  Parallel::broadcast(new_param, root_id);
-
-  set_parameters(new_param);
+  broadcast_parameters(root_id);
 }
 
 template <class Base>
-void RBConstructionBase<Base>::initialize_training_parameters(const std::vector<Real>& mu_min_vector,
-                                                              const std::vector<Real>& mu_max_vector,
-                                                              const unsigned int n_training_samples,
-                                                              const std::vector<bool> log_param_scale,
-                                                              const bool deterministic)
+void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters& mu_min,
+                                                              const RBParameters& mu_max,
+                                                              unsigned int n_training_samples,
+                                                              std::map<std::string,bool> log_param_scale,
+                                                              bool deterministic)
 {
   // Print out some info about the training set initialization
   libMesh::out << "Initializing training parameters with "
                << (deterministic ? "deterministic " : "random " )
                << "training set..." << std::endl;
-  for(unsigned int i=0; i<get_n_params(); i++)
+  
+  std::map<std::string,bool>::iterator it           = log_param_scale.begin();
+  std::map<std::string,bool>::const_iterator it_end = log_param_scale.end();
+  for(; it != it_end; ++it)
   {
-    libMesh::out << "Parameter " << i
-                 << ": log scaling = " << log_param_scale[i] << std::endl;
+    libMesh::out << "Parameter " << it->first
+                 << ": log scaling = " << it->second << std::endl;
   }
   libMesh::out << std::endl;
 
@@ -163,8 +201,8 @@ void RBConstructionBase<Base>::initialize_training_parameters(const std::vector<
     generate_training_parameters_deterministic(log_param_scale,
                                                training_parameters,
                                                n_training_samples,
-                                               mu_min_vector,
-                                               mu_max_vector,
+                                               mu_min,
+                                               mu_max,
                                                serial_training_set);
   }
   else
@@ -172,17 +210,17 @@ void RBConstructionBase<Base>::initialize_training_parameters(const std::vector<
     generate_training_parameters_random(log_param_scale,
                                         training_parameters,
                                         n_training_samples,
-                                        mu_min_vector,
-                                        mu_max_vector,
-					this->training_parameters_random_seed,
-					serial_training_set);
+                                        mu_min,
+                                        mu_max,
+					                              this->training_parameters_random_seed,
+                                        serial_training_set);
   }
 
   training_parameters_initialized = true;
 }
 
 template <class Base>
-void RBConstructionBase<Base>::load_training_set(std::vector< std::vector<Number> >& new_training_set)
+void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vector<Number> >& new_training_set)
 {
   // First, make sure that an initial training set has already been
   // generated
@@ -202,159 +240,185 @@ void RBConstructionBase<Base>::load_training_set(std::vector< std::vector<Number
   }
 
   // Clear the training set
-  for(unsigned int i=0; i<training_parameters.size(); i++)
+  std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters.begin();
+  std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters.end();
+  for( ; it != it_end; ++it)
   {
-    if(training_parameters[i])
+    NumericVector<Number>* training_vector = it->second;
+    if(training_vector)
     {
-      delete training_parameters[i];
-      training_parameters[i] = NULL;
+      delete training_vector;
+      training_vector = NULL;
     }
   }
 
   // Get the number of local and global training parameters
-  unsigned int n_local_training_samples  = new_training_set[0].size();
+  unsigned int n_local_training_samples  = new_training_set.begin()->second.size();
   unsigned int n_global_training_samples = n_local_training_samples;
   Parallel::sum(n_global_training_samples);
 
-  for(unsigned int i=0; i<get_n_params(); i++)
+  it = training_parameters.begin();
+  for( ; it != it_end; ++it)
   {
-    training_parameters[i] = NumericVector<Number>::build().release();
-    training_parameters[i]->init(n_global_training_samples, n_local_training_samples, false, libMeshEnums::PARALLEL);
+    it->second = NumericVector<Number>::build().release();
+    it->second->init(n_global_training_samples, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 
-  for(unsigned int j=0; j<get_n_params(); j++)
+  it = training_parameters.begin();
+  for( ; it != it_end; ++it)
   {
-    unsigned int first_index = training_parameters[j]->first_local_index();
+    std::string param_name = it->first;
+    NumericVector<Number>* training_vector = it->second;
+    
+    unsigned int first_index = training_vector->first_local_index();
     for(unsigned int i=0; i<n_local_training_samples; i++)
     {
       unsigned int index = first_index + i;
-      training_parameters[j]->set(index, new_training_set[j][i]);
+      training_vector->set(index, new_training_set[param_name][i]);
     }
   }
 }
 
 
 template <class Base>
-void RBConstructionBase<Base>::generate_training_parameters_random(const std::vector<bool> log_param_scale,
-                                                                   std::vector< NumericVector<Number>* >& training_parameters_in,
-                                                                   const unsigned int n_training_samples_in,
-                                                                   const std::vector<Real>& min_parameters,
-                                                                   const std::vector<Real>& max_parameters,
-						                   int training_parameters_random_seed,
-						                   bool serial_training_set)
+void RBConstructionBase<Base>::generate_training_parameters_random(std::map<std::string, bool> log_param_scale,
+                                                                   std::map< std::string, NumericVector<Number>* >& training_parameters_in,
+                                                                   unsigned int n_training_samples_in,
+                                                                   const RBParameters& min_parameters,
+                                                                   const RBParameters& max_parameters,
+						                                                       int training_parameters_random_seed,
+                                                                   bool serial_training_set)
 {
-  libmesh_assert( min_parameters.size() == max_parameters.size() );
-  const unsigned int num_params = min_parameters.size();
+  libmesh_assert( min_parameters.n_parameters() == max_parameters.n_parameters() );
+  const unsigned int num_params = min_parameters.n_parameters();
 
   // Clear training_parameters_in
-  for(unsigned int i=0; i<training_parameters_in.size(); i++)
   {
-    if(training_parameters_in[i])
+    std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters_in.begin();
+    std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters_in.end();
+
+    for( ; it != it_end; ++it)
     {
-      delete training_parameters_in[i];
-      training_parameters_in[i] = NULL;
+      NumericVector<Number>* training_vector = it->second;
+      if(training_vector)
+      {
+        delete training_vector;
+        training_vector = NULL;
+      }
     }
+    training_parameters_in.clear();
   }
 
   if (num_params == 0)
     return;
 
   if (training_parameters_random_seed < 0)
-    {
-
-      if(!serial_training_set)
-      {
-        // seed the random number generator with the system time
-        // and the processor ID so that the seed is different
-        // on different processors
-        std::srand( static_cast<unsigned>( std::time(0)*(1+libMesh::processor_id()) ));
-      }
-      else
-      {
-        // seed the random number generator with the system time
-        // only so that the seed is the same on all processors
-        std::srand( static_cast<unsigned>( std::time(0) ));
-      }
-    }
-  else
-    {
-      if(!serial_training_set)
-      {
-        // seed the random number generator with the provided value
-        // and the processor ID so that the seed is different
-        // on different processors
-        std::srand( static_cast<unsigned>( training_parameters_random_seed*(1+libMesh::processor_id()) ));
-      }
-      else
-      {
-        // seed the random number generator with the provided value
-        // so that the seed is the same on all processors
-        std::srand( static_cast<unsigned>( training_parameters_random_seed ));
-      }
-    }
-
-
-  // Initialize num_params NumericVectors
-  training_parameters_in.resize(num_params);
-
-  for(unsigned int i=0; i<num_params; i++)
   {
-    training_parameters_in[i] = NumericVector<Number>::build().release();
     if(!serial_training_set)
     {
-      // Calculate the number of training parameters local to this processor
-      unsigned int n_local_training_samples;
-      unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
-      unsigned int remainder = n_training_samples_in%libMesh::n_processors();
-      if(libMesh::processor_id() < remainder)
-        n_local_training_samples = (quotient + 1);
-      else
-        n_local_training_samples = quotient;
-
-      training_parameters_in[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
+      // seed the random number generator with the system time
+      // and the processor ID so that the seed is different
+      // on different processors
+      std::srand( static_cast<unsigned>( std::time(0)*(1+libMesh::processor_id()) ));
     }
     else
     {
-      training_parameters_in[i]->init(n_training_samples_in, false, libMeshEnums::SERIAL);
+      // seed the random number generator with the system time
+      // only so that the seed is the same on all processors
+      std::srand( static_cast<unsigned>( std::time(0) ));
+    }
+  }
+  else
+  {
+    if(!serial_training_set)
+    {
+      // seed the random number generator with the provided value
+      // and the processor ID so that the seed is different
+      // on different processors
+      std::srand( static_cast<unsigned>( training_parameters_random_seed*(1+libMesh::processor_id()) ));
+    }
+    else
+    {
+      // seed the random number generator with the provided value
+      // so that the seed is the same on all processors
+      std::srand( static_cast<unsigned>( training_parameters_random_seed ));
     }
   }
 
-  for(unsigned int j=0; j<num_params; j++)
+  // initialize training_parameters_in
   {
-    unsigned int first_index = training_parameters_in[j]->first_local_index();
-    for(unsigned int i=0; i<training_parameters_in[j]->local_size(); i++)
+    RBParameters::const_iterator it     = min_parameters.begin();
+    RBParameters::const_iterator it_end = min_parameters.end();
+    for( ; it != it_end; ++it)
     {
-      unsigned int index = first_index + i;
-      Real random_number = ((double)std::rand())/RAND_MAX; // in range [0,1]
-
-      // Generate log10 scaled training parameters
-      if(log_param_scale[j])
+      std::string param_name = it->first;
+      training_parameters_in[param_name] = NumericVector<Number>::build().release();
+      
+      if(!serial_training_set)
       {
-        Real log_min   = log10(min_parameters[j]);
-        Real log_range = log10(max_parameters[j] / min_parameters[j]);
+        // Calculate the number of training parameters local to this processor
+        unsigned int n_local_training_samples;
+        unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
+        unsigned int remainder = n_training_samples_in%libMesh::n_processors();
+        if(libMesh::processor_id() < remainder)
+          n_local_training_samples = (quotient + 1);
+        else
+          n_local_training_samples = quotient;
 
-        training_parameters_in[j]->set(index, pow(10., log_min + random_number*log_range ) );
+        training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
       }
-      // Generate linearly scaled training parameters
       else
       {
-        training_parameters_in[j]->set(index, random_number*(max_parameters[j] - min_parameters[j])
-                                            + min_parameters[j]);
+        training_parameters_in[param_name]->init(n_training_samples_in, false, libMeshEnums::SERIAL);
+      }
+    }
+  }
+
+  // finally, set the values
+  {
+    std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters_in.begin();
+    std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters_in.end();
+
+    for( ; it != it_end; ++it)
+    {
+      std::string param_name = it->first;
+      NumericVector<Number>* training_vector = it->second;
+
+      unsigned int first_index = training_vector->first_local_index();
+      for(unsigned int i=0; i<training_vector->local_size(); i++)
+      {
+        unsigned int index = first_index + i;
+        Real random_number = ((double)std::rand())/RAND_MAX; // in range [0,1]
+
+        // Generate log10 scaled training parameters
+        if(log_param_scale[param_name])
+        {
+          Real log_min   = log10(min_parameters.get_value(param_name));
+          Real log_range = log10(max_parameters.get_value(param_name) / min_parameters.get_value(param_name));
+
+          training_vector->set(index, pow(10., log_min + random_number*log_range ) );
+        }
+        // Generate linearly scaled training parameters
+        else
+        {
+          training_vector->set(index, random_number*(max_parameters.get_value(param_name) - min_parameters.get_value(param_name))
+                                        + min_parameters.get_value(param_name));
+        }
       }
     }
   }
 }
 
 template <class Base>
-void RBConstructionBase<Base>::generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
-                                                                          std::vector< NumericVector<Number>* >& training_parameters_in,
-                                                                          const unsigned int n_training_samples_in,
-                                                                          const std::vector<Real>& min_parameters,
-                                                                          const std::vector<Real>& max_parameters,
+void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::map<std::string, bool> log_param_scale,
+                                                                          std::map< std::string, NumericVector<Number>* >& training_parameters_in,
+                                                                          unsigned int n_training_samples_in,
+                                                                          const RBParameters& min_parameters,
+                                                                          const RBParameters& max_parameters,
                                                                           bool serial_training_set)
 {
-  libmesh_assert( min_parameters.size() == max_parameters.size() );
-  const unsigned int num_params = min_parameters.size();
+  libmesh_assert( min_parameters.n_parameters() == max_parameters.n_parameters() );
+  const unsigned int num_params = min_parameters.n_parameters();
 
   if (num_params == 0)
     return;
@@ -367,72 +431,86 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
   }
 
   // Clear training_parameters_in
-  for(unsigned int i=0; i<training_parameters_in.size(); i++)
   {
-    if(training_parameters_in[i])
+    std::map< std::string, NumericVector<Number>* >::iterator it           = training_parameters_in.begin();
+    std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters_in.end();
+
+    for( ; it != it_end; ++it)
     {
-      delete training_parameters_in[i];
-      training_parameters_in[i] = NULL;
+      NumericVector<Number>* training_vector = it->second;
+      if(training_vector)
+      {
+        delete training_vector;
+        training_vector = NULL;
+      }
     }
   }
 
-  // Initialize num_params NumericVectors
-  training_parameters_in.resize(num_params);
-
-  for(unsigned int i=0; i<num_params; i++)
+  // Initialize training_parameters_in
   {
-    training_parameters_in[i] = NumericVector<Number>::build().release();
-    if(!serial_training_set)
+    RBParameters::const_iterator it     = min_parameters.begin();
+    RBParameters::const_iterator it_end = min_parameters.end();
+    for( ; it != it_end; ++it)
     {
-      // Calculate the number of training parameters local to this processor
-      unsigned int n_local_training_samples;
-      unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
-      unsigned int remainder = n_training_samples_in%libMesh::n_processors();
-      if(libMesh::processor_id() < remainder)
-        n_local_training_samples = (quotient + 1);
+      std::string param_name = it->first;
+      training_parameters_in[param_name] = NumericVector<Number>::build().release();
+      
+      if(!serial_training_set)
+      {
+        // Calculate the number of training parameters local to this processor
+        unsigned int n_local_training_samples;
+        unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
+        unsigned int remainder = n_training_samples_in%libMesh::n_processors();
+        if(libMesh::processor_id() < remainder)
+          n_local_training_samples = (quotient + 1);
+        else
+          n_local_training_samples = quotient;
+
+        training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
+      }
       else
-        n_local_training_samples = quotient;
-
-      training_parameters_in[i]->init(n_training_samples_in, n_local_training_samples, false, libMeshEnums::PARALLEL);
-    }
-    else
-    {
-      training_parameters_in[i]->init(n_training_samples_in, false, libMeshEnums::SERIAL);
+      {
+        training_parameters_in[param_name]->init(n_training_samples_in, false, libMeshEnums::SERIAL);
+      }
     }
   }
-
 
   if(num_params == 1)
   {
-    unsigned int first_index = training_parameters_in[0]->first_local_index();
-    for(unsigned int i=0; i<training_parameters_in[0]->local_size(); i++)
+    NumericVector<Number>* training_vector = training_parameters_in.begin()->second;
+    bool use_log_scaling = log_param_scale.begin()->second;
+    Real min_param = min_parameters.begin()->second;
+    Real max_param = max_parameters.begin()->second;
+    
+    unsigned int first_index = training_vector->first_local_index();
+    for(unsigned int i=0; i<training_vector->local_size(); i++)
     {
       unsigned int index = first_index+i;
-      if(log_param_scale[0])
+      if(use_log_scaling)
       {
         Real epsilon = 1.e-6; // Prevent rounding errors triggering asserts
-        Real log_min   = log10(min_parameters[0] + epsilon);
-        Real log_range = log10( (max_parameters[0]-epsilon) / (min_parameters[0]+epsilon) );
+        Real log_min   = log10(min_param + epsilon);
+        Real log_range = log10( (max_param-epsilon) / (min_param+epsilon) );
         Real step_size = log_range /
           std::max((unsigned int)1,(n_training_samples_in-1));
 
         if(index<(n_training_samples_in-1))
         {
-          training_parameters_in[0]->set(index, pow(10., log_min + index*step_size ));
+          training_vector->set(index, pow(10., log_min + index*step_size ));
         }
         else
         {
           // due to rounding error, the last parameter can be slightly
           // bigger than max_parameters, hence snap back to the max
-          training_parameters_in[0]->set(index, max_parameters[0]);
+          training_vector->set(index, max_param);
         }
       }
       else
       {
         // Generate linearly scaled training parameters
-        Real step_size = (max_parameters[0] - min_parameters[0]) /
+        Real step_size = (max_param - min_param) /
           std::max((unsigned int)1,(n_training_samples_in-1));
-        training_parameters_in[0]->set(index, index*step_size + min_parameters[0]);
+        training_vector->set(index, index*step_size + min_param);
       }
     }
   }
@@ -454,18 +532,25 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
     // make a matrix to store all the parameters, put them in vector form afterwards
     std::vector< std::vector<Real> > training_parameters_matrix(num_params);
 
-    for(unsigned int i=0; i<num_params; i++)
+    RBParameters::const_iterator it     = min_parameters.begin();
+    RBParameters::const_iterator it_end = min_parameters.end();
+    unsigned int i = 0;
+    for( ; it != it_end; ++it)
     {
+      bool use_log_scaling = log_param_scale.begin()->second;
+      Real min_param       = min_parameters.begin()->second;
+      Real max_param       = max_parameters.begin()->second;
+
       training_parameters_matrix[i].resize(n_training_parameters_per_var);
 
       for(unsigned int j=0; j<n_training_parameters_per_var; j++)
       {
           // Generate log10 scaled training parameters
-          if(log_param_scale[i])
+          if(use_log_scaling)
           {
             Real epsilon = 1.e-6; // Prevent rounding errors triggering asserts
-            Real log_min   = log10(min_parameters[i] + epsilon);
-            Real log_range = log10( (max_parameters[i]-epsilon) / (min_parameters[i]+epsilon) );
+            Real log_min   = log10(min_param + epsilon);
+            Real log_range = log10( (max_param-epsilon) / (min_param+epsilon) );
             Real step_size = log_range /
               std::max((unsigned int)1,(n_training_parameters_per_var-1));
 
@@ -477,32 +562,39 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
             {
               // due to rounding error, the last parameter can be slightly
               // bigger than max_parameters, hence snap back to the max
-              training_parameters_matrix[i][j] = max_parameters[i];
+              training_parameters_matrix[i][j] = max_param;
             }
           }
           else
           {
             // Generate linearly scaled training parameters
-            Real step_size = (max_parameters[i] - min_parameters[i]) /
+            Real step_size = (max_param - min_param) /
               std::max((unsigned int)1,(n_training_parameters_per_var-1));
-            training_parameters_matrix[i][j] = j*step_size + min_parameters[i];
+            training_parameters_matrix[i][j] = j*step_size + min_param;
           }
 
       }
+      i++;
     }
 
     // now load into training_samples_in:
+    std::map<std::string, NumericVector<Number>*>::iterator new_it = training_parameters_in.begin();
+    
+    NumericVector<Number>* training_vector_0 = new_it->second;
+    new_it++;
+    NumericVector<Number>* training_vector_1 = new_it->second;
+
     for(unsigned int index1=0; index1<n_training_parameters_per_var; index1++)
     {
       for(unsigned int index2=0; index2<n_training_parameters_per_var; index2++)
       {
         unsigned int index = index1*n_training_parameters_per_var + index2;
 
-        if( (training_parameters_in[0]->first_local_index() <= index) &&
-            (index < training_parameters_in[0]->last_local_index()) )
+        if( (training_vector_0->first_local_index() <= index) &&
+            (index < training_vector_0->last_local_index()) )
         {
-          training_parameters_in[0]->set(index, training_parameters_matrix[0][index1]);
-          training_parameters_in[1]->set(index, training_parameters_matrix[1][index2]);
+          training_vector_0->set(index, training_parameters_matrix[0][index1]);
+          training_vector_1->set(index, training_parameters_matrix[1][index2]);
         }
       }
     }
@@ -642,12 +734,42 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
 {
   libmesh_assert(proc_id < libMesh::n_processors());
 
-  std::vector<Real> current_parameters = get_parameters();
-  Parallel::broadcast(current_parameters, proc_id);
+  // create a copy of the current parameters
+  RBParameters current_parameters = get_parameters();
+  
+  // copy current_parameters to current_parameters_vector in order to broadcast
+  std::vector<Real> current_parameters_vector;
+  
+  RBParameters::const_iterator it           = current_parameters.begin();
+  RBParameters::const_iterator it_end = current_parameters.end();
+  
+  for( ; it != it_end; ++it)
+  {
+    current_parameters_vector.push_back(it->second);
+  }
+  
+  // do the broadcast
+  Parallel::broadcast(current_parameters_vector, proc_id);
+  
+  // update the copy of the RBParameters object
+  it = current_parameters.begin();
+  unsigned int count = 0;
+  for( ; it != it_end; ++it)
+  {
+    std::string param_name = it->first;
+    current_parameters.set_value(param_name, current_parameters_vector[count]);
+    count++;
+  }
+  
+  // set the parameters globally
   set_parameters(current_parameters);
 }
 
-
+template <class Base>
+void RBConstructionBase<Base>::set_training_random_seed(unsigned int seed)
+{
+  this->training_parameters_random_seed = seed;
+}
 
 // Template specializations
 

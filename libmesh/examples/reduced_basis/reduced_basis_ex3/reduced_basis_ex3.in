@@ -4,16 +4,16 @@ n_elem = 25                    # The number of elements in each dimension in the
 store_basis_functions = true   # Do we store the basis functions in the offline_data directory once Offline finishes?
 
 online_N = 20                  # If we're in online mode, the number of basis functions we use for the reduced basis solve
-initial_parameters = '1 0.79'  # Parameter vector for an Online solve
 
 # ========= RB system parameters =========
 
 Nmax = 20        # The maximum number of basis functions we can generate in the Offline stage
 
-n_parameters = 2 # The number of parameters in the problem
+n_parameters = 2                # The number of parameters in the problem
+parameter_names = 'x_vel y_vel' # The names of the parameters
 
-mu_min = '0 0'                 # The "lower corner" of the parameter domain
-mu_max = '2 2'                 # The "upper corner" of the parameter domain
+x_vel = '-2 2 1'               # the min, max and initial value of x_vel
+y_vel = '-2 2 1'               # the min, max and initial value of y_vel
 log_scaling = '0 0'            # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
 
 deterministic_training = true        # Are the training points generated randomly or deterministically

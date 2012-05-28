@@ -60,7 +60,7 @@ public:
    * in subclasses.
    */
   virtual Number eval_theta_q_m(unsigned int q,
-                                const std::vector<Real>& mu);
+                                const RBParameters& mu);
 
   /**
    * Get Q_m, the number of terms in the affine

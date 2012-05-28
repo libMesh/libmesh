@@ -32,7 +32,7 @@ TransientRBThetaExpansion::TransientRBThetaExpansion()
 }
 
 Number TransientRBThetaExpansion::eval_theta_q_m(unsigned int q,
-                                                 const std::vector<Real>& mu)
+                                                 const RBParameters& mu)
 {
   if(q >= get_Q_m())
   {

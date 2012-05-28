@@ -29,6 +29,8 @@
 namespace libMesh
 {
 
+class RBParameters;
+
 /**
  * This class provides functionality required to define an RBTheta
  * object that arises from an "Empirical Interpolation Method" (EIM)
@@ -51,7 +53,7 @@ public:
    * This entails solving the RB EIM approximation and picking
    * out the appropriate coefficient.
    */
-  virtual Number evaluate(const std::vector<Real>& mu);
+  virtual Number evaluate(const RBParameters& mu);
 
   /**
    * The RBEIMEvaluation object that this RBEIMTheta is based on.

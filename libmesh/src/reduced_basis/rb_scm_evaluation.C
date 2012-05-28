@@ -138,7 +138,7 @@ Real RBSCMEvaluation::get_SCM_UB_vector(unsigned int j, unsigned int q)
   return SCM_UB_vectors[j][q];
 }
 
-std::vector<Real> RBSCMEvaluation::get_C_J_entry(unsigned int j)
+const RBParameters& RBSCMEvaluation::get_C_J_entry(unsigned int j)
 {
   if(j >= C_J.size())
   {
@@ -457,9 +457,11 @@ void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_n
     C_J_out.precision(precision_level);
     for(unsigned int i=0; i<C_J.size(); i++)
     {
-      for(unsigned int j=0; j<get_n_params(); j++)
+      RBParameters::const_iterator it     = C_J[i].begin();
+      RBParameters::const_iterator it_end = C_J[i].end();
+      for( ; it != it_end; ++it)
       {
-        C_J_out << std::scientific << C_J[i][j] << " ";
+        C_J_out << std::scientific << it->second << " ";
       }
     }
     C_J_out << std::endl;
@@ -575,10 +577,14 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
   C_J.resize( C_J_stability_vector.size() );
   for(unsigned int i=0; i<C_J.size(); i++)
   {
-    C_J[i].resize(get_n_params());
-    for(unsigned int j=0; j<get_n_params(); j++)
+    RBParameters::const_iterator it     = get_parameters().begin();
+    RBParameters::const_iterator it_end = get_parameters().end();
+    for( ; it != it_end; ++it)
     {
-      C_J_in >> C_J[i][j];
+      std::string param_name = it->first;
+      Real param_value;
+      C_J_in >> param_value;
+      C_J[i].add_parameter(param_name, param_value);
     }
   }
   C_J_in.close();

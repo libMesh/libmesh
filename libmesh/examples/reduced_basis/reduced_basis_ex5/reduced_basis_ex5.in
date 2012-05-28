@@ -16,10 +16,13 @@ Nmax = 15                      # The maximum number of basis functions we can ge
 training_tolerance = 1.e-3
 
 n_parameters = 3               # The number of parameters in the problem
+parameter_names = 'y_scaling x_load y_load' # The names of the parameters
 
-mu_min = '0.5 -1. -1.'         # The "lower corner" of the parameter domain
-mu_max = '2    1.  1.'         # The "upper corner" of the parameter domain
-log_scaling = '1 0 0'          # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
+y_scaling = '0.5 2. 0.5'
+x_load = '-2. 2. 0.5'
+y_load = '-2. 2. -0.5'
+
+log_scaling = '0 0 0'          # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
 
 deterministic_training = false       # Are the training points generated randomly or deterministically
 use_relative_bound_in_greedy = true  # Do we use a relative or absolute error bound when training the RB space?

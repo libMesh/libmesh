@@ -214,7 +214,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
     libmesh_error();
   }
 
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
 
   // Resize (and clear) the solution vector
   RB_solution.resize(N);
@@ -302,7 +302,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
 {
   START_LOG("compute_residual_dual_norm()", "RBEvaluation");
 
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
 
   // Use the stored representor inner product values
   // to evaluate the residual norm
@@ -391,7 +391,7 @@ Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
   return alpha_LB;
 }
 
-Real RBEvaluation::eval_output_dual_norm(unsigned int n, const std::vector<Real>& mu)
+Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters& mu)
 {
   Number output_bound_sq = 0.;
   unsigned int q=0;
@@ -709,9 +709,11 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       }
       for(unsigned int i=0; i<greedy_param_list.size(); i++)
       {
-        for(unsigned int j=0; j<get_n_params(); j++)
+        RBParameters::const_iterator it     = greedy_param_list[i].begin();
+        RBParameters::const_iterator it_end = greedy_param_list[i].end();
+        for( ; it != it_end; ++it)
         {
-          greedy_params_out << greedy_param_list[i][j] << " ";
+          greedy_params_out << it->second << " ";
         }
         greedy_params_out << std::endl;
       }

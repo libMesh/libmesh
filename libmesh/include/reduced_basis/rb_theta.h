@@ -30,6 +30,8 @@
 namespace libMesh
 {
 
+class RBParameters;
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -60,7 +62,7 @@ public:
    * Default implementation is to return 1, overload
    * to provide problem dependent behavior.
    */
-  virtual Number evaluate(const std::vector<Real>& ) { return 1.; }
+  virtual Number evaluate(const RBParameters& ) { return 1.; }
 
 };
 
