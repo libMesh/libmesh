@@ -392,7 +392,7 @@ void TransientRBConstruction::assemble_mass_matrix(SparseMatrix<Number>* input_m
 
 void TransientRBConstruction::add_scaled_mass_matrix(Number scalar, SparseMatrix<Number>* input_matrix)
 {
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
@@ -425,7 +425,7 @@ void TransientRBConstruction::mass_matrix_scaled_matvec(Number scalar,
 
   dest.zero();
 
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
@@ -464,7 +464,7 @@ void TransientRBConstruction::truth_assembly()
   this->matrix->zero();
   this->rhs->zero();
 
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
@@ -762,7 +762,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 {
   START_LOG("truth_solve()", "TransientRBConstruction");
 
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
   const unsigned int n_time_steps = temporal_discretization.get_n_time_steps();
 
 //   // NumericVector for computing true L2 error

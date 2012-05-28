@@ -29,11 +29,11 @@ using libMesh::Real;
 using libMesh::RealGradient;
 
 // Functors for the parameter-dependent part of the affine decomposition of the PDE
-struct ThetaA0 : RBTheta { virtual Number evaluate(const std::vector<Real>& mu)   { return mu[0]; } };
-struct ThetaA1 : RBTheta { virtual Number evaluate(const std::vector<Real>& )     { return 1.; } };
-struct ThetaA2 : RBTheta { virtual Number evaluate(const std::vector<Real>& mu)   { return 1./mu[0]; } };
-struct ThetaF0 : RBTheta { virtual Number evaluate(const std::vector<Real>& mu)   { return mu[0] * mu[1]; } };
-struct ThetaF1 : RBTheta { virtual Number evaluate(const std::vector<Real>& mu)   { return mu[0] * mu[2]; } };
+struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("y_scaling"); } };
+struct ThetaA1 : RBTheta { virtual Number evaluate(const RBParameters& )     { return 1.; } };
+struct ThetaA2 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return 1./mu.get_value("y_scaling"); } };
+struct ThetaF0 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("y_scaling") * mu.get_value("x_load"); } };
+struct ThetaF1 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("y_scaling") * mu.get_value("y_load"); } };
 
 // Provide a simple subclass that just provides the elasticity tensor
 struct ElasticityAssembly : ElemAssembly

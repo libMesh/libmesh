@@ -90,63 +90,38 @@ public:
   /**
    * Get the total number of training samples.
    */
-  unsigned int get_n_training_samples() const
-    { libmesh_assert(training_parameters_initialized);
-       return training_parameters[0]->size(); }
+  unsigned int get_n_training_samples() const;
 
   /**
    * Get the total number of training samples local to this processor.
    */
-  unsigned int get_local_n_training_samples() const
-    { libmesh_assert(training_parameters_initialized);
-      return training_parameters[0]->local_size(); }
+  unsigned int get_local_n_training_samples() const;
 
   /**
    * Get the first local index of the training parameters.
    */
-  unsigned int get_first_local_training_index() const
-    { libmesh_assert(training_parameters_initialized);
-      return training_parameters[0]->first_local_index(); }
+  unsigned int get_first_local_training_index() const;
 
   /**
    * Get the last local index of the training parameters.
    */
-  unsigned int get_last_local_training_index() const
-    { libmesh_assert(training_parameters_initialized);
-      return training_parameters[0]->last_local_index(); }
-
-  /**
-   * return the specified training parameter.
-   */
-  std::vector<Real> get_training_parameter(unsigned int index) const;
-
-  /**
-   * Load the specified training parameter into current_params.
-   * Local to this processor.
-   */
-  virtual void load_training_parameter_locally(unsigned int index);
-
-  /**
-   * Load the specified training parameter into current_params.
-   * Loads the parameter on all processors.
-   */
-  virtual void load_training_parameter_globally(unsigned int index);
+  unsigned int get_last_local_training_index() const;
 
   /**
    * Initialize the parameter ranges and indicate whether deterministic
    * or random training parameters should be used and whether or
    * not we want the parameters to be scaled logarithmically.
    */
-  virtual void initialize_training_parameters(const std::vector<Real>& mu_min_vector,
-                                              const std::vector<Real>& mu_max_vector,
-                                              const unsigned int n_training_parameters,
-                                              const std::vector<bool> log_param_scale,
-                                              const bool deterministic=true);
+  virtual void initialize_training_parameters(const RBParameters& mu_min,
+                                              const RBParameters& mu_max,
+                                              unsigned int n_training_parameters,
+                                              std::map<std::string, bool> log_param_scale,
+                                              bool deterministic=true);
 
   /**
    * Overwrite the training parameters with new_training_set.
    */
-  virtual void load_training_set(std::vector< std::vector<Number> >& new_training_set);
+  virtual void load_training_set(std::map< std::string, std::vector<Number> >& new_training_set);
 
   /**
    * Changes the current PC (and iterative solver, if desired) in the
@@ -157,8 +132,7 @@ public:
    * The return strings are names of the original PC and KSP objects,
    * you can reset these using the reset_alternative_solver() function below.
    */
-  std::pair<std::string,std::string>
-  set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls);
+  std::pair<std::string,std::string> set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls);
 
   /**
    * Resets the PC (and iterative solver, if desired) in the passed-in
@@ -174,27 +148,11 @@ public:
    * to all processors.
    */
   void broadcast_parameters(unsigned int proc_id);
-
-  //----------- PUBLIC DATA MEMBERS -----------//
-
+  
   /**
-   * Boolean flag to indicate whether or not the
-   * parameter ranges have been initialized.
+   * Set the seed that is used to randomly generate training parameters.
    */
-  bool training_parameters_initialized;
-
-  /**
-   * The training samples.
-   */
-  std::vector< NumericVector<Number>* > training_parameters;
-
-  /**
-   * If < 0, use std::time() * processor_id() to seed the random
-   * number generator for the training parameters (default).  If
-   * >= 0, use the provided value * processor_id() as the random
-   * number generator seed.
-   */
-  int training_parameters_random_seed;
+  void set_training_random_seed(unsigned int seed);
 
 protected:
 
@@ -203,6 +161,16 @@ protected:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void init_data ();
+
+  /**
+   * set parameters to the specified training parameters.
+   */
+  void set_params_from_training_set(unsigned int index);
+
+  /**
+   * Load the specified training parameter and then broadcast to all processors.
+   */
+  virtual void set_params_from_training_set_and_broadcast(unsigned int index);
 
   /**
    * Static function to return the error pair (index,error)
@@ -214,11 +182,11 @@ protected:
   /**
    * Static helper function for generating a randomized set of parameters.
    */
-  static void generate_training_parameters_random(const std::vector<bool> log_param_scale,
-                                                  std::vector< NumericVector<Number>* >& training_parameters_in,
-                                                  const unsigned int n_training_samples_in,
-                                                  const std::vector<Real>& min_parameters,
-                                                  const std::vector<Real>& max_parameters,
+  static void generate_training_parameters_random(std::map<std::string, bool> log_param_scale,
+                                                  std::map< std::string, NumericVector<Number>* >& training_parameters_in,
+                                                  unsigned int n_training_samples_in,
+                                                  const RBParameters& min_parameters,
+                                                  const RBParameters& max_parameters,
                                                   int training_parameters_random_seed=-1,
                                                   bool serial_training_set=false);
 
@@ -226,11 +194,11 @@ protected:
    * Static helper function for generating a deterministic set of parameters. Only works with 1 or 2
    * parameters (as defined by the lengths of min/max parameters vectors), otherwise throws an error.
    */
-  static void generate_training_parameters_deterministic(const std::vector<bool> log_param_scale,
-                                                         std::vector< NumericVector<Number>* >& training_parameters_in,
-                                                         const unsigned int n_training_samples_in,
-                                                         const std::vector<Real>& min_parameters,
-                                                         const std::vector<Real>& max_parameters,
+  static void generate_training_parameters_deterministic(std::map<std::string, bool> log_param_scale,
+                                                         std::map< std::string, NumericVector<Number>* >& training_parameters_in,
+                                                         unsigned int n_training_samples_in,
+                                                         const RBParameters& min_parameters,
+                                                         const RBParameters& max_parameters,
                                                          bool serial_training_set=false);
 
 
@@ -264,6 +232,28 @@ protected:
    *        for RBSCMSystem-derived subclasses
    */
   std::string alternative_solver;
+
+
+private:
+
+  /**
+   * Boolean flag to indicate whether or not the
+   * parameter ranges have been initialized.
+   */
+  bool training_parameters_initialized;
+
+  /**
+   * The training samples.
+   */
+  std::map< std::string, NumericVector<Number>* > training_parameters;
+
+  /**
+   * If < 0, use std::time() * processor_id() to seed the random
+   * number generator for the training parameters (default).  If
+   * >= 0, use the provided value * processor_id() as the random
+   * number generator seed.
+   */
+  int training_parameters_random_seed;
 
 };
 

@@ -166,7 +166,7 @@ public:
    * Return the parameters chosen during the i^th step of
    * the Greedy algorithm.
    */
-  std::vector<Real> get_greedy_parameter(unsigned int i);
+  const RBParameters& get_greedy_parameter(unsigned int i);
 
   /**
    * Get/set the tolerance for the basis training.

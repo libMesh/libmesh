@@ -233,8 +233,10 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
   // value is -1, which means use std::time to seed the RNG.
-  training_parameters_random_seed = infile("training_parameters_random_seed",
-					   training_parameters_random_seed);
+  unsigned int training_parameters_random_seed_in = -1;
+  training_parameters_random_seed_in = infile("training_parameters_random_seed",
+					   training_parameters_random_seed_in);
+  set_training_random_seed(training_parameters_random_seed_in);
 
   // Set quiet mode
   const bool quiet_mode_in = infile("quiet_mode", quiet_mode);
@@ -251,16 +253,24 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   // Initialize the parameter ranges and the parameters themselves
   initialize_parameters(parameters_filename);
 
-  std::vector<bool> log_scaling(get_n_params());
-  for(unsigned int i=0; i<get_n_params(); i++)
+  std::map<std::string,bool> log_scaling;
+  const RBParameters& mu = get_parameters();
+  RBParameters::const_iterator it     = mu.begin();
+  RBParameters::const_iterator it_end = mu.end();
+  unsigned int i=0;
+  for( ; it != it_end; ++it)
   {
     // Read vector-based log scaling values.  Note the intermediate conversion to
     // int... this implies log_scaling = '1 1 1...' in the input file.
-    log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
+//    log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
+    
+    std::string param_name = it->first;
+    log_scaling[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
+    i++;
   }
 
-  initialize_training_parameters(this->get_parameters_min_vector(),
-                                 this->get_parameters_max_vector(),
+  initialize_training_parameters(this->get_parameters_min(),
+                                 this->get_parameters_max(),
                                  n_training_samples,
                                  log_scaling,
                                  deterministic_training);   // use deterministic parameters
@@ -288,12 +298,15 @@ void RBConstruction::print_info()
   {
     libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
   }
-  for(unsigned int i=0; i<get_n_params(); i++)
+  RBParameters::const_iterator it     = get_parameters().begin();
+  RBParameters::const_iterator it_end = get_parameters().end();
+  for( ; it != it_end; ++it)
   {
-    libMesh::out <<   "Parameter " << i
-                 << ": Min = " << get_parameter_min(i)
-                 << ", Max = " << get_parameter_max(i) 
-                 << ", value = " << get_parameters()[i] << std::endl;
+    std::string param_name = it->first;
+    libMesh::out <<   "Parameter " << param_name
+                 << ": Min = " << get_parameter_min(param_name)
+                 << ", Max = " << get_parameter_max(param_name) 
+                 << ", value = " << get_parameters().get_value(param_name) << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
@@ -661,7 +674,7 @@ void RBConstruction::truth_assembly()
 {
   START_LOG("truth_assembly()", "RBConstruction");
 
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
 
   this->matrix->zero();
   this->rhs->zero();
@@ -1095,7 +1108,7 @@ void RBConstruction::update_greedy_param_list()
   get_rb_evaluation().greedy_param_list.push_back( get_parameters() );
 }
 
-std::vector<Real> RBConstruction::get_greedy_parameter(unsigned int i)
+const RBParameters& RBConstruction::get_greedy_parameter(unsigned int i)
 {
   if( i >= get_rb_evaluation().greedy_param_list.size() )
   {
@@ -1117,7 +1130,7 @@ Real RBConstruction::truth_solve(int plot_solution)
   solution->zero();
   solve();
 
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
 
   // Make sure we didn't max out the number of iterations
   if( (this->n_linear_iterations() >=
@@ -1315,7 +1328,7 @@ Real RBConstruction::compute_max_error_bound()
   {
     // Load training parameter i, this is only loaded
     // locally since the RB solves are local.
-    set_parameters( get_training_parameter(first_index+i) );
+    set_params_from_training_set( first_index+i );
 
     training_error_bounds[i] = get_RB_error_bound();
 
@@ -1334,7 +1347,7 @@ Real RBConstruction::compute_max_error_bound()
   if( (get_first_local_training_index() <= error_pair.first) &&
       (error_pair.first < get_last_local_training_index()) )
   {
-    set_parameters( get_training_parameter(error_pair.first) );
+    set_params_from_training_set( error_pair.first );
     root_id = libMesh::processor_id();
   }
 
