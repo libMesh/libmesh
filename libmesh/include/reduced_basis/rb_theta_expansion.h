@@ -32,6 +32,7 @@ namespace libMesh
 {
 
 class RBTheta;
+class RBParameters;
 
 /**
  * This class stores the set of RBTheta functor objects that define
@@ -62,20 +63,20 @@ public:
    * in subclasses.
    */
   virtual Number eval_theta_q_a(unsigned int q,
-                                const std::vector<Real>& mu);
+                                const RBParameters& mu);
 
   /**
    * Evaluate theta_q_f at the current parameter.
    */
   virtual Number eval_theta_q_f(unsigned int q,
-                                const std::vector<Real>& mu);
+                                const RBParameters& mu);
 
   /**
    * Evaluate theta_q_l at the current parameter.
    */
   Number eval_theta_q_l(unsigned int output_index,
                         unsigned int q_l,
-                        const std::vector<Real>& mu);
+                        const RBParameters& mu);
 
   /**
    * Get Q_a, the number of terms in the affine

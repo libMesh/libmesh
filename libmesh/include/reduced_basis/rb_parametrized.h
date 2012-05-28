@@ -20,6 +20,9 @@
 #ifndef __rb_parametrized_h__
 #define __rb_parametrized_h__
 
+// rbOOmit includes
+#include "rb_parameters.h"
+
 // libMesh includes
 #include "reference_counted_object.h"
 
@@ -62,14 +65,14 @@ public:
   /**
    * Initialize the parameter ranges and set current_parameters.
    */
-  void initialize_parameters(std::vector<Real> mu_min_in,
-                             std::vector<Real> mu_max_in,
-                             std::vector<Real> mu_in);
+  void initialize_parameters(const RBParameters& mu_min_in,
+                             const RBParameters& mu_max_in,
+                             const RBParameters& mu_in);
 
   /**
    * Initialize the parameter ranges and set current_parameters.
    */
-  void initialize_parameters(RBParametrized& rb_parametrized);
+  void initialize_parameters(const RBParametrized& rb_parametrized);
   
   /**
    * Initialize the parameter ranges and set current_parameters by
@@ -85,46 +88,46 @@ public:
   /**
    * Get the current parameters.
    */
-  std::vector<Real> get_parameters() const;
+  const RBParameters& get_parameters() const;
 
   /**
    * Set the current parameters to \p params
    */
-  void set_parameters(const std::vector<Real>& params);
+  void set_parameters(const RBParameters& params);
 
   /**
-   * Get a vector that specifies the minimum allowable value
+   * Get an RBParameters object that specifies the minimum allowable value
    * for each parameter.
    */
-  std::vector<Real> get_parameters_min_vector() const;
+  const RBParameters& get_parameters_min() const;
 
   /**
-   * Get a vector that specifies the maximum allowable value
+   * Get an RBParameters object that specifies the maximum allowable value
    * for each parameter.
    */
-  std::vector<Real> get_parameters_max_vector() const;
+  const RBParameters& get_parameters_max() const;
 
   /**
-   * Get minimum allowable value of parameter \p i.
+   * Get minimum allowable value of parameter \p param_name.
    */
-  Real get_parameter_min(unsigned int i) const;
+  Real get_parameter_min(const std::string& param_name) const;
 
   /**
-   * Get maximum allowable value of parameter \p i.
+   * Get maximum allowable value of parameter \p param_name.
    */
-  Real get_parameter_max(unsigned int i) const;
+  Real get_parameter_max(const std::string& param_name) const;
 
   /**
    * Print the current parameters.
    */
-  void print_parameters();
+  void print_parameters() const;
 
 private:
 
   /**
    * Helper function to check that \p params is valid.
    */
-  bool valid_params(const std::vector<Real>& params);
+  bool valid_params(const RBParameters& params);
 
   //--------------- PRIVATE DATA MEMBERS ---------------//
 
@@ -136,13 +139,13 @@ private:
   /**
    * Vector storing the current parameters.
    */
-  std::vector<Real> parameters;
+  RBParameters parameters;
 
   /**
    * Vectors that define the ranges (min and max) for the parameters.
    */
-  std::vector<Real> parameters_min_vector;
-  std::vector<Real> parameters_max_vector;
+  RBParameters parameters_min;
+  RBParameters parameters_max;
 
 };
 

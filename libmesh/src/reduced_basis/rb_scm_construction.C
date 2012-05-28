@@ -96,45 +96,45 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
 {
   // First read in data from parameters_filename
   GetPot infile(parameters_filename);
-  const unsigned int n_parameters       = infile("n_parameters",1);
   const unsigned int n_training_samples = infile("n_training_samples",1);
   const bool deterministic_training     = infile("deterministic_training",false);
 
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
   // value is -1, which means use std::time to seed the RNG.
-  training_parameters_random_seed = infile("training_parameters_random_seed",
-					   training_parameters_random_seed);
+  unsigned int training_parameters_random_seed_in = -1;
+  training_parameters_random_seed_in = infile("training_parameters_random_seed",
+					   training_parameters_random_seed_in);
+  set_training_random_seed(training_parameters_random_seed_in);
 
   // SCM Greedy termination tolerance
   const Real SCM_training_tolerance_in = infile("SCM_training_tolerance", SCM_training_tolerance);
   set_SCM_training_tolerance(SCM_training_tolerance_in);
 
-  std::vector<Real> mu_min_vector(n_parameters);
-  std::vector<Real> mu_max_vector(n_parameters);
-  std::vector<bool> log_scaling(n_parameters);
-  for(unsigned int i=0; i<n_parameters; i++)
+  // Initialize the parameter ranges and the parameters themselves
+  initialize_parameters(parameters_filename);
+
+  std::map<std::string,bool> log_scaling;
+  const RBParameters& mu = get_parameters();
+  RBParameters::const_iterator it     = mu.begin();
+  RBParameters::const_iterator it_end = mu.end();
+  unsigned int i=0;
+  for( ; it != it_end; ++it)
   {
-    // Read vector-based mu_min values.
-    mu_min_vector[i] = infile("mu_min", mu_min_vector[i], i);
-
-    // Read vector-based mu_max values.
-    mu_max_vector[i] = infile("mu_max", mu_max_vector[i], i);
-
     // Read vector-based log scaling values.  Note the intermediate conversion to
     // int... this implies log_scaling = '1 1 1...' in the input file.
-    log_scaling[i] = static_cast<bool>(infile("SCM_log_scaling", static_cast<int>(log_scaling[i]), i));
+//    log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
+    
+    std::string param_name = it->first;
+    log_scaling[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
+    i++;
   }
 
-  // Initialize the parameter ranges and set the parameters to mu_min_vector
-  initialize_parameters(mu_min_vector, mu_max_vector, mu_min_vector);
-
-  // Make sure this generates training parameters properly!
-  initialize_training_parameters(mu_min_vector,
-                                 mu_max_vector,
+  initialize_training_parameters(this->get_parameters_min(),
+                                 this->get_parameters_max(),
                                  n_training_samples,
                                  log_scaling,
-                                 deterministic_training);
+                                 deterministic_training);   // use deterministic parameters
 }
 
 void RBSCMConstruction::print_info()
@@ -152,11 +152,15 @@ void RBSCMConstruction::print_info()
   {
     libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
   }
-  for(unsigned int i=0; i<get_n_params(); i++)
+  RBParameters::const_iterator it     = get_parameters().begin();
+  RBParameters::const_iterator it_end = get_parameters().end();
+  for( ; it != it_end; ++it)
   {
-    libMesh::out <<   "Parameter " << i
-                 << ": Min = " << get_parameter_min(i)
-                 << ", Max = " << get_parameter_max(i) << std::endl;
+    std::string param_name = it->first;
+    libMesh::out <<   "Parameter " << param_name
+                 << ": Min = " << get_parameter_min(param_name)
+                 << ", Max = " << get_parameter_max(param_name) 
+                 << ", value = " << get_parameters().get_value(param_name) << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
   libMesh::out << std::endl;
@@ -416,7 +420,7 @@ std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_s
   unsigned int first_index = get_first_local_training_index();
   for(unsigned int i=0; i<get_local_n_training_samples(); i++)
   {
-    load_training_parameter_locally(first_index+i);
+    set_params_from_training_set(first_index+i);
     rb_scm_eval->set_parameters( get_parameters() );
     Real LB = rb_scm_eval->get_SCM_LB();
     Real UB = rb_scm_eval->get_SCM_UB();
@@ -443,15 +447,20 @@ void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
 {
   START_LOG("enrich_C_J()", "RBSCMConstruction");
 
-  load_training_parameter_globally(new_C_J_index);
+  set_params_from_training_set_and_broadcast(new_C_J_index);
 
   rb_scm_eval->C_J.push_back(get_parameters());
 
   libMesh::out << std::endl << "SCM: Added mu = (";
-  for(unsigned int i=0; i<get_n_params(); i++)
+
+  RBParameters::const_iterator it     = get_parameters().begin();
+  RBParameters::const_iterator it_end = get_parameters().end();
+  for( ; it != it_end; ++it)
   {
-    libMesh::out << rb_scm_eval->C_J[rb_scm_eval->C_J.size()-1][i];
-    if(i < (get_n_params()-1)) libMesh::out << ",";
+    if(it != get_parameters().begin()) libMesh::out << ",";
+    std::string param_name = it->first;
+    RBParameters C_J_params = rb_scm_eval->C_J[rb_scm_eval->C_J.size()-1];
+    libMesh::out << C_J_params.get_value(param_name);
   }
   libMesh::out << ")" << std::endl;
 

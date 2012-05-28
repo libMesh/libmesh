@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "rb_eim_theta.h"
+#include "rb_parameters.h"
 
 namespace libMesh
 {
@@ -28,7 +29,7 @@ RBEIMTheta::RBEIMTheta(RBEIMEvaluation& rb_eim_eval_in, unsigned int index_in)
   index(index_in)
 {}
 
-Number RBEIMTheta::evaluate(const std::vector<Real>& mu)
+Number RBEIMTheta::evaluate(const RBParameters& mu)
 {
   rb_eim_eval.set_parameters(mu);
   rb_eim_eval.rb_solve(rb_eim_eval.get_n_basis_functions());

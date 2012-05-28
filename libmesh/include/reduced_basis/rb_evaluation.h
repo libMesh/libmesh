@@ -130,7 +130,7 @@ public:
    * Evaluate the dual norm of output \p n
    * for the current parameters.
    */
-  Real eval_output_dual_norm(unsigned int n, const std::vector<Real>& mu);
+  Real eval_output_dual_norm(unsigned int n, const RBParameters& mu);
 
   /**
    * Get a lower bound for the stability constant (e.g. coercivity constant or
@@ -202,7 +202,7 @@ public:
    * The list of parameters selected by the Greedy algorithm in generating
    * the Reduced Basis associated with this RBEvaluation object.
    */
-  std::vector< std::vector<Real> > greedy_param_list;
+  std::vector< RBParameters > greedy_param_list;
 
   /**
    * The inner product matrix. This should be close to the identity,

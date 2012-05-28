@@ -26,9 +26,9 @@
 // SCM classes.)
 //
 // We consider three parameters in this problem:
-//  mu_0: scale the mesh in the y-direction
-//  mu_1: the traction in the x-direction on the right boundary of the cantilever
-//  mu_2: the traction in the y-direction on the right boundary of the cantilever
+//  y_scaling: scale the mesh in the y-direction
+//  x_load: the traction in the x-direction on the right boundary of the cantilever
+//  y_load: the traction in the y-direction on the right boundary of the cantilever
 
 // C++ include files that we need
 #include <iostream>
@@ -55,7 +55,7 @@
 using namespace libMesh;
 
 // Define a function to scale the mesh according to the parameter.
-void scale_mesh_and_plot(EquationSystems& es, std::vector<Real>& mu, const std::string& filename);
+void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename);
 
 // The main program.
 int main (int argc, char** argv)
@@ -185,7 +185,7 @@ int main (int argc, char** argv)
       // Plot the solution
       rb_con.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-      std::vector<Real> rb_eval_params = rb_eval.get_parameters();
+      const RBParameters& rb_eval_params = rb_eval.get_parameters();
       scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_displacement.e");
 #endif
     }
@@ -194,7 +194,7 @@ int main (int argc, char** argv)
   return 0;
 }
 
-void scale_mesh_and_plot(EquationSystems& es, std::vector<Real>& mu, const std::string& filename)
+void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename)
 {
   // Loop over the mesh nodes and move them!
   MeshBase& mesh = es.get_mesh();
@@ -208,7 +208,7 @@ void scale_mesh_and_plot(EquationSystems& es, std::vector<Real>& mu, const std::
     
     Real y = (*node)(1);
 
-    (*node)(1) = y*mu[0];
+    (*node)(1) = y*mu.get_value("y_scaling");
   }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -216,12 +216,12 @@ void scale_mesh_and_plot(EquationSystems& es, std::vector<Real>& mu, const std::
 #endif
   
   // Loop over the mesh nodes and move them!
-  node_it  = mesh.nodes_begin();
+  node_it = mesh.nodes_begin();
   
   for( ; node_it != node_end; node_it++)
   {
     Node* node = *node_it;
 
-    (*node)(1) = 1./mu[0];
+    (*node)(1) = 1./mu.get_value("y_scaling");
   }
 }

@@ -4,14 +4,15 @@ Nmax = 20
 training_tolerance = 0.001
 
 n_parameters = 2
+parameter_names = 'center_x center_y'
 
-mu_min = '-1 -1'              # The "lower corner" of the parameter domain
-mu_max = '1 1'                # The "upper corner" of the parameter domain
-log_scaling = '0 0'           # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
+center_x = '-1 1 1'
+center_y = '-1 1 1'
+
+log_scaling = '0 0'
 
 deterministic_training = true # Are the training points generated randomly or deterministically
 
 n_training_samples = 25       # The number of parameters in training set (must be square for the 2-parameter deterministic case)
-initial_parameters = '1 1'    # The first parameter that we do a truth_solve at in the Offline basis training
 
 best_fit_type = eim           # Choose which algorithm to use in the EIM greedy (either "projection" or "eim")
