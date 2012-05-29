@@ -1945,7 +1945,7 @@ void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
   // we can do at least this good. note that hopefully in general
   // the user will already have reserved the full space, which will render
   // this redundant
-  conn.reserve (conn.size() + Elem::PackedElem::header_size + elem->n_nodes());
+  conn.reserve (conn.size() + elem->packed_size());
 
 #ifdef LIBMESH_ENABLE_AMR
   conn.push_back (static_cast<int>(elem->level()));
