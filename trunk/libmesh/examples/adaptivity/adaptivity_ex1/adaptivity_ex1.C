@@ -35,6 +35,7 @@
 #include "equation_systems.h"
 #include "linear_implicit_system.h"
 #include "fe.h"
+#include "getpot.h"
 #include "quadrature_gauss.h"
 #include "sparse_matrix.h"
 #include "dof_map.h"
@@ -67,10 +68,16 @@ int main(int argc, char** argv)
   // Create a new mesh
   Mesh mesh;
 
+  GetPot command_line (argc, argv);
+
+  int n = 4;
+  if ( command_line.search(1, "-n") )
+    n = command_line.next(n);
+
   // Build a 1D mesh with 4 elements from x=0 to x=1, using 
   // EDGE3 (i.e. quadratic) 1D elements. They are called EDGE3 elements
   // because a quadratic element contains 3 nodes.
-  MeshTools::Generation::build_line(mesh,4,0.,1.,EDGE3);
+  MeshTools::Generation::build_line(mesh,n,0.,1.,EDGE3);
 
   // Define the equation systems object and the system we are going
   // to solve. See Example 2 for more details.
