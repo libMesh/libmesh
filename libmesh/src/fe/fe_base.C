@@ -33,6 +33,7 @@
 #include "periodic_boundaries.h"
 #include "quadrature.h"
 #include "quadrature_gauss.h"
+#include "remote_elem.h"
 #include "threads.h"
 
 namespace libMesh
@@ -2268,7 +2269,8 @@ void FEBase::compute_node_constraints (NodeConstraints &constraints,
   // Look at the element faces.  Check to see if we need to
   // build constraints.
   for (unsigned int s=0; s<elem->n_sides(); s++)
-    if (elem->neighbor(s) != NULL)
+    if (elem->neighbor(s) != NULL &&
+	elem->neighbor(s) != remote_elem)
       if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
 	{                                                     // this element and ones coarser
 	                                                      // than this element.
