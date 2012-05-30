@@ -137,9 +137,12 @@ examples/introduction/introduction_ex3/out_0.vtu
 examples/miscellaneous/miscellaneous_ex4/out.pvtu
 examples/miscellaneous/miscellaneous_ex4/out_0.vtu
 examples/reduced_basis/reduced_basis_ex1/equation_systems.dat
+examples/reduced_basis/reduced_basis_ex1/equation_systems.dat.0000
 examples/reduced_basis/reduced_basis_ex4/equation_systems.dat
+examples/reduced_basis/reduced_basis_ex4/equation_systems.dat.0000
 examples/reduced_basis/reduced_basis_ex5/RB_displacement.e
 examples/reduced_basis/reduced_basis_ex5/equation_systems.dat
+examples/reduced_basis/reduced_basis_ex5/equation_systems.dat.0000
 examples/reduced_basis/reduced_basis_ex5/offline_data/
 examples/systems_of_equations/systems_of_equations_ex4/displacement.e
 examples/systems_of_equations/systems_of_equations_ex5/displacement.e
