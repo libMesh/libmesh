@@ -502,8 +502,8 @@ void FE<Dim,T>::init_edge_shape_functions(const std::vector<Point>& qp,
 
 
 
-void FEBase::compute_face_map(const std::vector<Real>& qw,
-			      const Elem* side)
+void FEAbstract::compute_face_map(const std::vector<Real>& qw,
+				  const Elem* side)
 {
   libmesh_assert (side  != NULL);
 
@@ -780,8 +780,8 @@ void FEBase::compute_face_map(const std::vector<Real>& qw,
 
 
 
-void FEBase::compute_edge_map(const std::vector<Real>& qw,
-			      const Elem* edge)
+void FEAbstract::compute_edge_map(const std::vector<Real>& qw,
+				  const Elem* edge)
 {
   libmesh_assert (edge != NULL);
 
@@ -790,7 +790,7 @@ void FEBase::compute_edge_map(const std::vector<Real>& qw,
       // A 2D finite element living in either 2D or 3D space.
       // The edges here are the sides of the element, so the
       // (misnamed) compute_face_map function does what we want
-      FEBase::compute_face_map(qw, edge);
+      FEAbstract::compute_face_map(qw, edge);
       return;
     }
 
