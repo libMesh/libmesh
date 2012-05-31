@@ -33,9 +33,9 @@ namespace libMesh
 
 
 
-void FEBase::compute_single_point_map(const std::vector<Real>& qw,
-                                      const Elem* elem,
-                                      unsigned int p)
+void FEAbstract::compute_single_point_map(const std::vector<Real>& qw,
+					  const Elem* elem,
+					  unsigned int p)
 {
   libmesh_assert (elem  != NULL);
 
@@ -388,7 +388,7 @@ void FEBase::compute_single_point_map(const std::vector<Real>& qw,
 }
 
 
-void FEBase::resize_map_vectors(unsigned int n_qp)
+void FEAbstract::resize_map_vectors(unsigned int n_qp)
 {
   // Resize the vectors to hold data at the quadrature points
   xyz.resize(n_qp);
@@ -426,8 +426,8 @@ void FEBase::resize_map_vectors(unsigned int n_qp)
   JxW.resize(n_qp);
 }
 
-void FEBase::compute_affine_map(const std::vector<Real>& qw,
-			        const Elem* elem)
+void FEAbstract::compute_affine_map(const std::vector<Real>& qw,
+				    const Elem* elem)
 {
    // Start logging the map computation.
   START_LOG("compute_affine_map()", "FE");
@@ -492,8 +492,8 @@ void FEBase::compute_affine_map(const std::vector<Real>& qw,
 
 
 
-void FEBase::compute_map(const std::vector<Real>& qw,
-			 const Elem* elem)
+void FEAbstract::compute_map(const std::vector<Real>& qw,
+			     const Elem* elem)
 {
   if (elem->has_affine_map())
     {
