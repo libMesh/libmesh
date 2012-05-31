@@ -105,29 +105,29 @@ int main (int argc, char** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
+  // We override RBConstruction with SimpleRBConstruction in order to
+  // specialize a few functions for this particular problem.
+  SimpleRBConstruction & rb_con =
+    equation_systems.add_system<SimpleRBConstruction> ("RBConvectionDiffusion");
+
+  // Initialize the data structures for the equation system.
+  equation_systems.init ();
+
+  // Print out some information about the "truth" discretization
+  equation_systems.print_info();
+  mesh.print_info();
+
   // Build a new RBEvaluation object which will be used to perform
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
   SimpleRBEvaluation rb_eval;
+  
+  // We need to give the RBConstruction object a pointer to
+  // our RBEvaluation object
+  rb_con.set_rb_evaluation(rb_eval);
 
   if(!online_mode) // Perform the Offline stage of the RB method
   {
-    // We override RBConstruction with SimpleRBConstruction in order to
-    // specialize a few functions for this particular problem.
-    SimpleRBConstruction & rb_con =
-      equation_systems.add_system<SimpleRBConstruction> ("RBConvectionDiffusion");
-
-    // Initialize the data structures for the equation system.
-    equation_systems.init ();
-
-    // Print out some information about the "truth" discretization
-    equation_systems.print_info();
-    mesh.print_info();
-  
-    // We need to give the RBConstruction object a pointer to
-    // our RBEvaluation object
-    rb_con.set_rb_evaluation(rb_eval);
-
     // Read in the data that defines this problem from the specified text file
     rb_con.process_parameters_file(parameters_filename);
 
@@ -150,11 +150,6 @@ int main (int argc, char** argv)
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
-      // If we want to be able to visualize the solution in the online stage,
-      // then we should also save the state of the equation_systems object
-      // so we can initialize it properly in the online stage
-      equation_systems.write("equation_systems.dat", WRITE);
-      
       // Write out the basis functions
       rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
     }
@@ -188,12 +183,6 @@ int main (int argc, char** argv)
 
     if(store_basis_functions)
     {
-      // initialize the EquationSystems object by reading in the state that
-      // was written out in the offline stage
-      equation_systems.read("equation_systems.dat", READ);
-      RBConstruction& rb_con = equation_systems.get_system<RBConstruction>("RBConvectionDiffusion");
-      rb_con.set_rb_evaluation(rb_eval);
-
       // Read in the basis functions
       rb_eval.read_in_basis_functions(rb_con);
       
