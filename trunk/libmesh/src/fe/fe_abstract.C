@@ -1,0 +1,851 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
+// Local includes
+#include "fe.h"
+#include "libmesh_logging.h"
+// For projection code:
+#include "boundary_info.h"
+#include "mesh_base.h"
+#include "dense_matrix.h"
+#include "dense_vector.h"
+#include "dof_map.h"
+#include "elem.h"
+#include "fe_interface.h"
+#include "numeric_vector.h"
+#include "periodic_boundaries.h"
+#include "quadrature.h"
+#include "quadrature_gauss.h"
+#include "remote_elem.h"
+#include "threads.h"
+
+namespace libMesh
+{
+
+void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nodes)
+{
+  switch(itemType)
+  {
+    case EDGE2:
+    {
+       nodes.resize(2);
+       nodes[0] = Point (-1.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       return;
+    }
+    case EDGE3:
+    {
+       nodes.resize(3);
+       nodes[0] = Point (-1.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       nodes[2] = Point (0.,0.,0.);
+       return;
+    }
+    case TRI3:
+    {
+       nodes.resize(3);
+       nodes[0] = Point (0.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       nodes[2] = Point (0.,1.,0.);
+       return;
+    }
+    case TRI6:
+    {
+       nodes.resize(6);
+       nodes[0] = Point (0.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       nodes[2] = Point (0.,1.,0.);
+       nodes[3] = Point (.5,0.,0.);
+       nodes[4] = Point (.5,.5,0.);
+       nodes[5] = Point (0.,.5,0.);
+       return;
+    }
+    case QUAD4:
+    {
+       nodes.resize(4);
+       nodes[0] = Point (-1.,-1.,0.);
+       nodes[1] = Point (1.,-1.,0.);
+       nodes[2] = Point (1.,1.,0.);
+       nodes[3] = Point (-1.,1.,0.);
+       return;
+    }
+    case QUAD8:
+    {
+       nodes.resize(8);
+       nodes[0] = Point (-1.,-1.,0.);
+       nodes[1] = Point (1.,-1.,0.);
+       nodes[2] = Point (1.,1.,0.);
+       nodes[3] = Point (-1.,1.,0.);
+       nodes[4] = Point (0.,-1.,0.);
+       nodes[5] = Point (1.,0.,0.);
+       nodes[6] = Point (0.,1.,0.);
+       nodes[7] = Point (-1.,0.,0.);
+       return;
+    }
+    case QUAD9:
+    {
+       nodes.resize(9);
+       nodes[0] = Point (-1.,-1.,0.);
+       nodes[1] = Point (1.,-1.,0.);
+       nodes[2] = Point (1.,1.,0.);
+       nodes[3] = Point (-1.,1.,0.);
+       nodes[4] = Point (0.,-1.,0.);
+       nodes[5] = Point (1.,0.,0.);
+       nodes[6] = Point (0.,1.,0.);
+       nodes[7] = Point (-1.,0.,0.);
+       nodes[8] = Point (0.,0.,0.);
+       return;
+    }
+    case TET4:
+    {
+       nodes.resize(4);
+       nodes[0] = Point (0.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       nodes[2] = Point (0.,1.,0.);
+       nodes[3] = Point (0.,0.,1.);
+       return;
+    }
+    case TET10:
+    {
+       nodes.resize(10);
+       nodes[0] = Point (0.,0.,0.);
+       nodes[1] = Point (1.,0.,0.);
+       nodes[2] = Point (0.,1.,0.);
+       nodes[3] = Point (0.,0.,1.);
+       nodes[4] = Point (.5,0.,0.);
+       nodes[5] = Point (.5,.5,0.);
+       nodes[6] = Point (0.,.5,0.);
+       nodes[7] = Point (0.,0.,.5);
+       nodes[8] = Point (.5,0.,.5);
+       nodes[9] = Point (0.,.5,.5);
+       return;
+    }
+    case HEX8:
+    {
+       nodes.resize(8);
+       nodes[0] = Point (-1.,-1.,-1.);
+       nodes[1] = Point (1.,-1.,-1.);
+       nodes[2] = Point (1.,1.,-1.);
+       nodes[3] = Point (-1.,1.,-1.);
+       nodes[4] = Point (-1.,-1.,1.);
+       nodes[5] = Point (1.,-1.,1.);
+       nodes[6] = Point (1.,1.,1.);
+       nodes[7] = Point (-1.,1.,1.);
+       return;
+    }
+    case HEX20:
+    {
+       nodes.resize(20);
+       nodes[0] = Point (-1.,-1.,-1.);
+       nodes[1] = Point (1.,-1.,-1.);
+       nodes[2] = Point (1.,1.,-1.);
+       nodes[3] = Point (-1.,1.,-1.);
+       nodes[4] = Point (-1.,-1.,1.);
+       nodes[5] = Point (1.,-1.,1.);
+       nodes[6] = Point (1.,1.,1.);
+       nodes[7] = Point (-1.,1.,1.);
+       nodes[8] = Point (0.,-1.,-1.);
+       nodes[9] = Point (1.,0.,-1.);
+       nodes[10] = Point (0.,1.,-1.);
+       nodes[11] = Point (-1.,0.,-1.);
+       nodes[12] = Point (-1.,-1.,0.);
+       nodes[13] = Point (1.,-1.,0.);
+       nodes[14] = Point (1.,1.,0.);
+       nodes[15] = Point (-1.,1.,0.);
+       nodes[16] = Point (0.,-1.,1.);
+       nodes[17] = Point (1.,0.,1.);
+       nodes[18] = Point (0.,1.,1.);
+       nodes[19] = Point (-1.,0.,1.);
+       return;
+    }
+    case HEX27:
+    {
+       nodes.resize(27);
+       nodes[0] = Point (-1.,-1.,-1.);
+       nodes[1] = Point (1.,-1.,-1.);
+       nodes[2] = Point (1.,1.,-1.);
+       nodes[3] = Point (-1.,1.,-1.);
+       nodes[4] = Point (-1.,-1.,1.);
+       nodes[5] = Point (1.,-1.,1.);
+       nodes[6] = Point (1.,1.,1.);
+       nodes[7] = Point (-1.,1.,1.);
+       nodes[8] = Point (0.,-1.,-1.);
+       nodes[9] = Point (1.,0.,-1.);
+       nodes[10] = Point (0.,1.,-1.);
+       nodes[11] = Point (-1.,0.,-1.);
+       nodes[12] = Point (-1.,-1.,0.);
+       nodes[13] = Point (1.,-1.,0.);
+       nodes[14] = Point (1.,1.,0.);
+       nodes[15] = Point (-1.,1.,0.);
+       nodes[16] = Point (0.,-1.,1.);
+       nodes[17] = Point (1.,0.,1.);
+       nodes[18] = Point (0.,1.,1.);
+       nodes[19] = Point (-1.,0.,1.);
+       nodes[20] = Point (0.,0.,-1.);
+       nodes[21] = Point (0.,-1.,0.);
+       nodes[22] = Point (1.,0.,0.);
+       nodes[23] = Point (0.,1.,0.);
+       nodes[24] = Point (-1.,0.,0.);
+       nodes[25] = Point (0.,0.,1.);
+       nodes[26] = Point (0.,0.,0.);
+       return;
+    }
+    case PRISM6:
+    {
+       nodes.resize(6);
+       nodes[0] = Point (0.,0.,-1.);
+       nodes[1] = Point (1.,0.,-1.);
+       nodes[2] = Point (0.,1.,-1.);
+       nodes[3] = Point (0.,0.,1.);
+       nodes[4] = Point (1.,0.,1.);
+       nodes[5] = Point (0.,1.,1.);
+       return;
+    }
+    case PRISM15:
+    {
+       nodes.resize(15);
+       nodes[0] = Point (0.,0.,-1.);
+       nodes[1] = Point (1.,0.,-1.);
+       nodes[2] = Point (0.,1.,-1.);
+       nodes[3] = Point (0.,0.,1.);
+       nodes[4] = Point (1.,0.,1.);
+       nodes[5] = Point (0.,1.,1.);
+       nodes[6] = Point (.5,0.,-1.);
+       nodes[7] = Point (.5,.5,-1.);
+       nodes[8] = Point (0.,.5,-1.);
+       nodes[9] = Point (0.,0.,0.);
+       nodes[10] = Point (1.,0.,0.);
+       nodes[11] = Point (0.,1.,0.);
+       nodes[12] = Point (.5,0.,1.);
+       nodes[13] = Point (.5,.5,1.);
+       nodes[14] = Point (0.,.5,1.);
+       return;
+    }
+    case PRISM18:
+    {
+       nodes.resize(18);
+       nodes[0] = Point (0.,0.,-1.);
+       nodes[1] = Point (1.,0.,-1.);
+       nodes[2] = Point (0.,1.,-1.);
+       nodes[3] = Point (0.,0.,1.);
+       nodes[4] = Point (1.,0.,1.);
+       nodes[5] = Point (0.,1.,1.);
+       nodes[6] = Point (.5,0.,-1.);
+       nodes[7] = Point (.5,.5,-1.);
+       nodes[8] = Point (0.,.5,-1.);
+       nodes[9] = Point (0.,0.,0.);
+       nodes[10] = Point (1.,0.,0.);
+       nodes[11] = Point (0.,1.,0.);
+       nodes[12] = Point (.5,0.,1.);
+       nodes[13] = Point (.5,.5,1.);
+       nodes[14] = Point (0.,.5,1.);
+       nodes[15] = Point (.5,0.,0.);
+       nodes[16] = Point (.5,.5,0.);
+       nodes[17] = Point (0.,.5,0.);
+       return;
+    }
+    case PYRAMID5:
+    {
+       nodes.resize(5);
+       nodes[0] = Point (-1.,-1.,0.);
+       nodes[1] = Point (1.,-1.,0.);
+       nodes[2] = Point (1.,1.,0.);
+       nodes[3] = Point (-1.,1.,0.);
+       nodes[4] = Point (-1.,-1.,1.);
+       return;
+    }
+    default:
+    {
+      libMesh::err << "ERROR: Unknown element type " << itemType << std::endl;
+      libmesh_error();
+    }
+  }
+  return;
+}
+
+bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Real eps)
+{
+  libmesh_assert (eps >= 0.);
+
+  const Real xi   = p(0);
+#if LIBMESH_DIM > 1
+  const Real eta  = p(1);
+#else
+  const Real eta  = 0.;
+#endif
+#if LIBMESH_DIM > 2
+  const Real zeta = p(2);
+#else
+  const Real zeta  = 0.;
+#endif
+
+  switch (t)
+    {
+    case NODEELEM:
+      {
+        return (!xi && !eta && !zeta);
+      }
+    case EDGE2:
+    case EDGE3:
+    case EDGE4:
+      {
+	// The reference 1D element is [-1,1].
+	if ((xi >= -1.-eps) &&
+	    (xi <=  1.+eps))
+	  return true;
+
+	return false;
+      }
+
+
+    case TRI3:
+    case TRI6:
+      {
+	// The reference triangle is isocoles
+	// and is bound by xi=0, eta=0, and xi+eta=1.
+	if ((xi  >= 0.-eps) &&
+	    (eta >= 0.-eps) &&
+	    ((xi + eta) <= 1.+eps))
+	  return true;
+
+	return false;
+      }
+
+
+    case QUAD4:
+    case QUAD8:
+    case QUAD9:
+      {
+	// The reference quadrilateral element is [-1,1]^2.
+	if ((xi  >= -1.-eps) &&
+	    (xi  <=  1.+eps) &&
+	    (eta >= -1.-eps) &&
+	    (eta <=  1.+eps))
+	  return true;
+
+	return false;
+      }
+
+
+    case TET4:
+    case TET10:
+      {
+	// The reference tetrahedral is isocoles
+	// and is bound by xi=0, eta=0, zeta=0,
+	// and xi+eta+zeta=1.
+	if ((xi   >= 0.-eps) &&
+	    (eta  >= 0.-eps) &&
+	    (zeta >= 0.-eps) &&
+	    ((xi + eta + zeta) <= 1.+eps))
+	  return true;
+
+	return false;
+      }
+
+
+    case HEX8:
+    case HEX20:
+    case HEX27:
+      {
+	/*
+	  if ((xi   >= -1.) &&
+	  (xi   <=  1.) &&
+	  (eta  >= -1.) &&
+	  (eta  <=  1.) &&
+	  (zeta >= -1.) &&
+	  (zeta <=  1.))
+	  return true;
+	*/
+
+	// The reference hexahedral element is [-1,1]^3.
+	if ((xi   >= -1.-eps) &&
+	    (xi   <=  1.+eps) &&
+	    (eta  >= -1.-eps) &&
+	    (eta  <=  1.+eps) &&
+	    (zeta >= -1.-eps) &&
+	    (zeta <=  1.+eps))
+	  {
+	    //	    libMesh::out << "Strange Point:\n";
+	    //	    p.print();
+	    return true;
+	  }
+
+	return false;
+      }
+
+    case PRISM6:
+    case PRISM15:
+    case PRISM18:
+      {
+	// Figure this one out...
+	// inside the reference triange with zeta in [-1,1]
+	if ((xi   >=  0.-eps) &&
+	    (eta  >=  0.-eps) &&
+	    (zeta >= -1.-eps) &&
+	    (zeta <=  1.+eps) &&
+	    ((xi + eta) <= 1.+eps))
+	  return true;
+
+	return false;
+      }
+
+
+    case PYRAMID5:
+      {
+	libMesh::err << "BEN: Implement this you lazy bastard!"
+		      << std::endl;
+	libmesh_error();
+
+	return false;
+      }
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+    case INFHEX8:
+      {
+	// The reference infhex8 is a [-1,1]^3.
+	if ((xi   >= -1.-eps) &&
+	    (xi   <=  1.+eps) &&
+	    (eta  >= -1.-eps) &&
+	    (eta  <=  1.+eps) &&
+	    (zeta >= -1.-eps) &&
+	    (zeta <=  1.+eps))
+	  {
+	    return true;
+	  }
+	return false;
+      }
+
+    case INFPRISM6:
+      {
+	// inside the reference triange with zeta in [-1,1]
+	if ((xi   >=  0.-eps) &&
+	    (eta  >=  0.-eps) &&
+	    (zeta >= -1.-eps) &&
+	    (zeta <=  1.+eps) &&
+	    ((xi + eta) <= 1.+eps))
+	  {
+	    return true;
+	  }
+
+	return false;
+      }
+#endif
+
+    default:
+      libMesh::err << "ERROR: Unknown element type " << t << std::endl;
+      libmesh_error();
+    }
+
+  // If we get here then the point is _not_ in the
+  // reference element.   Better return false.
+
+  return false;
+}
+
+
+
+
+void FEAbstract::print_JxW(std::ostream& os) const
+{
+  for (unsigned int i=0; i<JxW.size(); ++i)
+    os << " [" << i << "]: " <<  JxW[i] << std::endl;
+}
+
+
+
+void FEAbstract::print_xyz(std::ostream& os) const
+{
+  for (unsigned int i=0; i<xyz.size(); ++i)
+    os << " [" << i << "]: " << xyz[i];
+}
+
+
+void FEAbstract::print_info(std::ostream& os) const
+{
+  os << "phi[i][j]: Shape function i at quadrature pt. j" << std::endl;
+  this->print_phi(os);
+
+  os << "dphi[i][j]: Shape function i's gradient at quadrature pt. j" << std::endl;
+  this->print_dphi(os);
+
+  os << "XYZ locations of the quadrature pts." << std::endl;
+  this->print_xyz(os);
+
+  os << "Values of JxW at the quadrature pts." << std::endl;
+  this->print_JxW(os);
+}
+
+
+
+
+std::ostream& operator << (std::ostream& os, const FEAbstract& fe)
+{
+  fe.print_info(os);
+  return os;
+}
+
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
+					   const Elem* elem)
+{
+  libmesh_assert (elem != NULL);
+
+  const unsigned int Dim = elem->dim();
+
+  // Only constrain elements in 2,3D.
+  if (Dim == 1)
+    return;
+
+  // Only constrain active and ancestor elements
+  if (elem->subactive())
+    return;
+
+  // We currently always use LAGRANGE mappings for geometry
+  const FEType fe_type(elem->default_order(), LAGRANGE);
+
+  std::vector<const Node*> my_nodes, parent_nodes;
+
+  // Look at the element faces.  Check to see if we need to
+  // build constraints.
+  for (unsigned int s=0; s<elem->n_sides(); s++)
+    if (elem->neighbor(s) != NULL &&
+	elem->neighbor(s) != remote_elem)
+      if (elem->neighbor(s)->level() < elem->level()) // constrain dofs shared between
+	{                                                     // this element and ones coarser
+	                                                      // than this element.
+	  // Get pointers to the elements of interest and its parent.
+	  const Elem* parent = elem->parent();
+
+	  // This can't happen...  Only level-0 elements have NULL
+	  // parents, and no level-0 elements can be at a higher
+	  // level than their neighbors!
+	  libmesh_assert (parent != NULL);
+
+	  const AutoPtr<Elem> my_side     (elem->build_side(s));
+	  const AutoPtr<Elem> parent_side (parent->build_side(s));
+
+	  const unsigned int n_side_nodes = my_side->n_nodes();
+
+          my_nodes.clear();
+	  my_nodes.reserve (n_side_nodes);
+          parent_nodes.clear();
+	  parent_nodes.reserve (n_side_nodes);
+
+          for (unsigned int n=0; n != n_side_nodes; ++n)
+            my_nodes.push_back(my_side->get_node(n));
+
+          for (unsigned int n=0; n != n_side_nodes; ++n)
+            parent_nodes.push_back(parent_side->get_node(n));
+
+	  for (unsigned int my_side_n=0;
+	       my_side_n < n_side_nodes;
+	       my_side_n++)
+	    {
+	      libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+
+	      const Node* my_node = my_nodes[my_side_n];
+
+	      // The support point of the DOF
+	      const Point& support_point = *my_node;
+
+	      // Figure out where my node lies on their reference element.
+	      const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+								  parent_side.get(),
+								  support_point);
+
+	      // Compute the parent's side shape function values.
+	      for (unsigned int their_side_n=0;
+		   their_side_n < n_side_nodes;
+		   their_side_n++)
+		{
+	          libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
+
+	          const Node* their_node = parent_nodes[their_side_n];
+                  libmesh_assert(their_node);
+
+		  const Real their_value = FEInterface::shape(Dim-1,
+							      fe_type,
+							      parent_side->type(),
+							      their_side_n,
+							      mapped_point);
+
+                  const Real their_mag = std::abs(their_value);
+#ifdef DEBUG
+		  // Protect for the case u_i ~= u_j,
+		  // in which case i better equal j.
+		  if (their_mag > 0.999)
+                    {
+		      libmesh_assert (my_node == their_node);
+		      libmesh_assert (std::abs(their_value - 1.) < 0.001);
+                    }
+                  else
+#endif
+		  // To make nodal constraints useful for constructing
+		  // sparsity patterns faster, we need to get EVERY
+		  // POSSIBLE constraint coupling identified, even if
+		  // there is no coupling in the isoparametric
+		  // Lagrange case.
+                  if (their_mag < 1.e-5)
+                    {
+		      // since we may be running this method concurretly
+		      // on multiple threads we need to acquire a lock
+		      // before modifying the shared constraint_row object.
+		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+		      // A reference to the constraint row.
+		      NodeConstraintRow& constraint_row = constraints[my_node].first;
+
+		      constraint_row.insert(std::make_pair (their_node,
+							    0.));
+                    }
+		  // To get nodal coordinate constraints right, only
+		  // add non-zero and non-identity values for Lagrange
+		  // basis functions.
+		  else // (1.e-5 <= their_mag <= .999)
+		    {
+		      // since we may be running this method concurretly
+		      // on multiple threads we need to acquire a lock
+		      // before modifying the shared constraint_row object.
+		      Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+		      // A reference to the constraint row.
+		      NodeConstraintRow& constraint_row = constraints[my_node].first;
+
+		      constraint_row.insert(std::make_pair (their_node,
+							    their_value));
+		    }
+		}
+	    }
+	}
+}
+
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
+#endif // #ifdef LIBMESH_ENABLE_AMR
+
+
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints,
+						    const PeriodicBoundaries &boundaries,
+						    const MeshBase &mesh,
+						    const PointLocatorBase *point_locator,
+						    const Elem* elem)
+{
+  // Only bother if we truly have periodic boundaries
+  if (boundaries.empty())
+    return;
+
+  libmesh_assert (elem != NULL);
+
+  // Only constrain active elements with this method
+  if (!elem->active())
+    return;
+
+  const unsigned int Dim = elem->dim();
+
+  // We currently always use LAGRANGE mappings for geometry
+  const FEType fe_type(elem->default_order(), LAGRANGE);
+
+  std::vector<const Node*> my_nodes, neigh_nodes;
+
+  // Look at the element faces.  Check to see if we need to
+  // build constraints.
+  for (unsigned int s=0; s<elem->n_sides(); s++)
+    {
+      if (elem->neighbor(s))
+        continue;
+
+      const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids (elem, s);
+      for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
+        {
+          const boundary_id_type boundary_id = *id_it;
+          const PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
+          if (periodic)
+            {
+              libmesh_assert(point_locator);
+
+              // Get pointers to the element's neighbor.
+              const Elem* neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
+
+              // h refinement constraints:
+              // constrain dofs shared between
+              // this element and ones as coarse
+              // as or coarser than this element.
+              if (neigh->level() <= elem->level())
+                {
+	          unsigned int s_neigh =
+                    mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
+                  libmesh_assert(s_neigh != libMesh::invalid_uint);
+
+#ifdef LIBMESH_ENABLE_AMR
+                  libmesh_assert(neigh->active());
+#endif // #ifdef LIBMESH_ENABLE_AMR
+
+	          const AutoPtr<Elem> my_side    (elem->build_side(s));
+	          const AutoPtr<Elem> neigh_side (neigh->build_side(s_neigh));
+
+	          const unsigned int n_side_nodes = my_side->n_nodes();
+
+                  my_nodes.clear();
+	          my_nodes.reserve (n_side_nodes);
+                  neigh_nodes.clear();
+	          neigh_nodes.reserve (n_side_nodes);
+
+                  for (unsigned int n=0; n != n_side_nodes; ++n)
+                    my_nodes.push_back(my_side->get_node(n));
+
+                  for (unsigned int n=0; n != n_side_nodes; ++n)
+                    neigh_nodes.push_back(neigh_side->get_node(n));
+
+                  // Make sure we're not adding recursive constraints
+                  // due to the redundancy in the way we add periodic
+                  // boundary constraints, or adding constraints to
+                  // nodes that already have AMR constraints
+                  std::vector<bool> skip_constraint(n_side_nodes, false);
+
+	          for (unsigned int my_side_n=0;
+	               my_side_n < n_side_nodes;
+	               my_side_n++)
+	            {
+	              libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+
+	              const Node* my_node = my_nodes[my_side_n];
+
+	              // Figure out where my node lies on their reference element.
+                      const Point neigh_point = periodic->get_corresponding_pos(*my_node);
+
+	              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+								          neigh_side.get(),
+								          neigh_point);
+
+                      // If we've already got a constraint on this
+                      // node, then the periodic constraint is
+                      // redundant
+                      {
+			Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+                        if (constraints.count(my_node))
+                          {
+                            skip_constraint[my_side_n] = true;
+                            continue;
+                          }
+                      }
+
+	      	      // Compute the neighbors's side shape function values.
+	              for (unsigned int their_side_n=0;
+		           their_side_n < n_side_nodes;
+		           their_side_n++)
+		        {
+	                  libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+
+	                  const Node* their_node = neigh_nodes[their_side_n];
+
+                          // If there's a constraint on an opposing node,
+			  // we need to see if it's constrained by
+			  // *our side* making any periodic constraint
+			  // on us recursive
+                          {
+			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+                            if (!constraints.count(their_node))
+                              continue;
+
+                            const NodeConstraintRow& their_constraint_row =
+                              constraints[their_node].first;
+
+	                    for (unsigned int orig_side_n=0;
+	                         orig_side_n < n_side_nodes;
+	                         orig_side_n++)
+	                      {
+	                        libmesh_assert (orig_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+
+	                        const Node* orig_node = my_nodes[orig_side_n];
+
+                                if (their_constraint_row.count(orig_node))
+                                  skip_constraint[orig_side_n] = true;
+	                      }
+                          }
+                        }
+                    }
+	          for (unsigned int my_side_n=0;
+	               my_side_n < n_side_nodes;
+	               my_side_n++)
+	            {
+	              libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+
+                      if (skip_constraint[my_side_n])
+                        continue;
+
+	              const Node* my_node = my_nodes[my_side_n];
+
+	              // Figure out where my node lies on their reference element.
+                      const Point neigh_point = periodic->get_corresponding_pos(*my_node);
+
+	              // Figure out where my node lies on their reference element.
+	              const Point mapped_point = FEInterface::inverse_map(Dim-1, fe_type,
+								          neigh_side.get(),
+								          neigh_point);
+
+	              for (unsigned int their_side_n=0;
+		           their_side_n < n_side_nodes;
+		           their_side_n++)
+	                {
+	                  libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+
+	                  const Node* their_node = neigh_nodes[their_side_n];
+                          libmesh_assert(their_node);
+
+		          const Real their_value = FEInterface::shape(Dim-1,
+							              fe_type,
+							              neigh_side->type(),
+							              their_side_n,
+							              mapped_point);
+
+		          // since we may be running this method concurretly
+		          // on multiple threads we need to acquire a lock
+		          // before modifying the shared constraint_row object.
+		          {
+			    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+			    NodeConstraintRow& constraint_row =
+			      constraints[my_node].first;
+
+			    constraint_row.insert(std::make_pair(their_node,
+							         their_value));
+		          }
+		        }
+	            }
+	        }
+            }
+        }
+    }
+}
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
+#endif // LIBMESH_ENABLE_PERIODIC
+
+
+} // namespace libMesh

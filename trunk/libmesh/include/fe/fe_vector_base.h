@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fe_base_h__
-#define __fe_base_h__
+#ifndef __fe_vector_base_h__
+#define __fe_vector_base_h__
 
 // Local includes
 #include "reference_counted_object.h"
@@ -61,12 +61,6 @@ class PeriodicBoundaries;
 class PointLocatorBase;
 #endif
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-class InfFE;
-#endif
-
-
 
 /**
  * This class forms the foundation from which generic finite
@@ -94,7 +88,7 @@ class InfFE;
 
 // ------------------------------------------------------------
 // FEBase class definition
-class FEBase : public FEAbstract
+class FEVectorBase : public FEAbstract
 {
 protected:
 
@@ -103,35 +97,23 @@ protected:
    * structures.  Protected so that this base class
    * cannot be explicitly instantiated.
    */
-  FEBase (const unsigned int dim,
-	  const FEType& fet);
+  FEVectorBase (const unsigned int dim,
+		const FEType& fet);
 
 public:
 
   /**
    * Destructor.
    */
-  virtual ~FEBase();
+  virtual ~FEVectorBase();
 
   /**
-   * Builds a specific finite element type.  A \p AutoPtr<FEBase> is
+   * Builds a specific finite element type.  A \p AutoPtr<FEVectorBase> is
    * returned to prevent a memory leak. This way the user need not
    * remember to delete the object.
    */
-  static AutoPtr<FEBase> build (const unsigned int dim,
-				const FEType& type);
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-  /**
-   * Builds a specific infinite element type.  A \p AutoPtr<FEBase> is
-   * returned to prevent a memory leak. This way the user need not
-   * remember to delete the object.
-   */
-  static AutoPtr<FEBase> build_InfFE (const unsigned int dim,
+  static AutoPtr<FEVectorBase> build (const unsigned int dim,
 				      const FEType& type);
-
-#endif
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -181,7 +163,7 @@ public:
    * @returns the shape function values at the quadrature points
    * on the element.
    */
-  const std::vector<std::vector<Real> >& get_phi() const
+  const std::vector<std::vector<RealGradient> >& get_phi() const
   { libmesh_assert(!calculations_started || calculate_phi);
     calculate_phi = true; return phi; }
 
@@ -189,7 +171,7 @@ public:
    * @returns the shape function derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<RealGradient> >& get_dphi() const
+  const std::vector<std::vector<RealTensor> >& get_dphi() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphi; }
 
@@ -197,7 +179,7 @@ public:
    * @returns the shape function x-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidx() const
+  const std::vector<std::vector<RealGradient> >& get_dphidx() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidx; }
 
@@ -205,7 +187,7 @@ public:
    * @returns the shape function y-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidy() const
+  const std::vector<std::vector<RealGradient> >& get_dphidy() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidy; }
 
@@ -213,7 +195,7 @@ public:
    * @returns the shape function z-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidz() const
+  const std::vector<std::vector<RealGradient> >& get_dphidz() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidz; }
 
@@ -221,7 +203,7 @@ public:
    * @returns the shape function xi-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidxi() const
+  const std::vector<std::vector<RealGradient> >& get_dphidxi() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidxi; }
 
@@ -229,7 +211,7 @@ public:
    * @returns the shape function eta-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphideta() const
+  const std::vector<std::vector<RealGradient> >& get_dphideta() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphideta; }
 
@@ -237,7 +219,7 @@ public:
    * @returns the shape function zeta-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidzeta() const
+  const std::vector<std::vector<RealGradient> >& get_dphidzeta() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidzeta; }
 
@@ -247,15 +229,17 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<RealTensor> >& get_d2phi() const
+  /*
+  const std::vector<std::vector<RealType3Tensor> >& get_d2phi() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phi; }
+  */
 
   /**
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidx2() const
+  const std::vector<std::vector<RealTensor> >& get_d2phidx2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidx2; }
 
@@ -263,7 +247,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidxdy() const
+  const std::vector<std::vector<RealTensor> >& get_d2phidxdy() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidxdy; }
 
@@ -271,7 +255,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidxdz() const
+  const std::vector<std::vector<RealTensor> >& get_d2phidxdz() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidxdz; }
 
@@ -279,7 +263,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidy2() const
+  const std::vector<std::vector<RealTensor> >& get_d2phidy2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidy2; }
 
@@ -287,7 +271,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidydz() const
+  const std::vector<std::vector<RealTensor> >& get_d2phidydz() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidydz; }
 
@@ -295,53 +279,11 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidz2() const
+  const std::vector<std::vector<RealTensor> >& get_d2phidz2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidz2; }
 
 #endif
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-  /**
-   * @returns the global first derivative of the phase term
-   * which is used in infinite elements, evaluated at the
-   * quadrature points.
-   *
-   * In case of the general finite element class \p FE this
-   * field is initialized to all zero, so that the variational
-   * formulation for an @e infinite element returns correct element
-   * matrices for a mesh using both finite and infinite elements.
-   */
-  const std::vector<RealGradient>& get_dphase() const
-      { return dphase; }
-
-
-  /**
-   * @returns the multiplicative weight at each quadrature point.
-   * This weight is used for certain infinite element weak
-   * formulations, so that @e weighted Sobolev spaces are
-   * used for the trial function space.  This renders the
-   * variational form easily computable.
-   *
-   * In case of the general finite element class \p FE this
-   * field is initialized to all ones, so that the variational
-   * formulation for an @e infinite element returns correct element
-   * matrices for a mesh using both finite and infinite elements.
-   */
-  const std::vector<Real>& get_Sobolev_weight() const
-      { return weight; }
-
-  /**
-   * @returns the first global derivative of the multiplicative
-   * weight at each quadrature point. See \p get_Sobolev_weight()
-   * for details.  In case of \p FE initialized to all zero.
-   */
-  const std::vector<RealGradient>& get_Sobolev_dweight() const
-      { return dweight; }
-
-#endif
-
 
   /**
    * Prints the value of each shape function at each quadrature point.
@@ -360,26 +302,12 @@ public:
    * Prints the value of each shape function's second derivatives
    * at each quadrature point.
    */
-  void print_d2phi(std::ostream& os) const;
+  //void print_d2phi(std::ostream& os) const;
 
 #endif
 
 
 protected:
-
-
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-  /**
-   * Initialize the data fields for the base of an
-   * an infinite element.  Implement this in the derived
-   * class \p FE<Dim,T>.
-   */
-  virtual void init_base_shape_functions(const std::vector<Point>& qp,
-					 const Elem* e) = 0;
-
-#endif
 
   /**
    * After having updated the jacobian and the transformation
@@ -397,159 +325,114 @@ protected:
   /**
    * Shape function values.
    */
-  std::vector<std::vector<Real> >   phi;
+  std::vector<std::vector<RealGradient> >   phi;
 
   /**
    * Shape function derivative values.
    */
-  std::vector<std::vector<RealGradient> >  dphi;
+  std::vector<std::vector<RealTensor> >  dphi;
 
   /**
    * Shape function derivatives in the xi direction.
    */
-  std::vector<std::vector<Real> >   dphidxi;
+  std::vector<std::vector<RealGradient> >   dphidxi;
 
   /**
    * Shape function derivatives in the eta direction.
    */
-  std::vector<std::vector<Real> >   dphideta;
+  std::vector<std::vector<RealGradient> >   dphideta;
 
   /**
    * Shape function derivatives in the zeta direction.
    */
-  std::vector<std::vector<Real> >   dphidzeta;
+  std::vector<std::vector<RealGradient> >   dphidzeta;
 
   /**
    * Shape function derivatives in the x direction.
    */
-  std::vector<std::vector<Real> >   dphidx;
+  std::vector<std::vector<RealGradient> >   dphidx;
 
   /**
    * Shape function derivatives in the y direction.
    */
-  std::vector<std::vector<Real> >   dphidy;
+  std::vector<std::vector<RealGradient> >   dphidy;
 
   /**
    * Shape function derivatives in the z direction.
    */
-  std::vector<std::vector<Real> >   dphidz;
+  std::vector<std::vector<RealGradient> >   dphidz;
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
    * Shape function second derivative values.
+   * TODO: Need to implement 3rd order tensor object to handle
+   *       second derivatives of vector-valued elements
    */
-  std::vector<std::vector<RealTensor> >  d2phi;
+  //std::vector<std::vector<RealType3Tensor> >  d2phi;
 
   /**
    * Shape function second derivatives in the xi direction.
    */
-  std::vector<std::vector<Real> >   d2phidxi2;
+  std::vector<std::vector<RealTensor> >   d2phidxi2;
 
   /**
    * Shape function second derivatives in the xi-eta direction.
    */
-  std::vector<std::vector<Real> >   d2phidxideta;
+  std::vector<std::vector<RealTensor> >   d2phidxideta;
 
   /**
    * Shape function second derivatives in the xi-zeta direction.
    */
-  std::vector<std::vector<Real> >   d2phidxidzeta;
+  std::vector<std::vector<RealTensor> >   d2phidxidzeta;
 
   /**
    * Shape function second derivatives in the eta direction.
    */
-  std::vector<std::vector<Real> >   d2phideta2;
+  std::vector<std::vector<RealTensor> >   d2phideta2;
 
   /**
    * Shape function second derivatives in the eta-zeta direction.
    */
-  std::vector<std::vector<Real> >   d2phidetadzeta;
+  std::vector<std::vector<RealTensor> >   d2phidetadzeta;
 
   /**
    * Shape function second derivatives in the zeta direction.
    */
-  std::vector<std::vector<Real> >   d2phidzeta2;
+  std::vector<std::vector<RealTensor> >   d2phidzeta2;
 
   /**
    * Shape function second derivatives in the x direction.
    */
-  std::vector<std::vector<Real> >   d2phidx2;
+  std::vector<std::vector<RealTensor> >   d2phidx2;
 
   /**
    * Shape function second derivatives in the x-y direction.
    */
-  std::vector<std::vector<Real> >   d2phidxdy;
+  std::vector<std::vector<RealTensor> >   d2phidxdy;
 
   /**
    * Shape function second derivatives in the x-z direction.
    */
-  std::vector<std::vector<Real> >   d2phidxdz;
+  std::vector<std::vector<RealTensor> >   d2phidxdz;
 
   /**
    * Shape function second derivatives in the y direction.
    */
-  std::vector<std::vector<Real> >   d2phidy2;
+  std::vector<std::vector<RealTensor> >   d2phidy2;
 
   /**
    * Shape function second derivatives in the y-z direction.
    */
-  std::vector<std::vector<Real> >   d2phidydz;
+  std::vector<std::vector<RealTensor> >   d2phidydz;
 
   /**
    * Shape function second derivatives in the z direction.
    */
-  std::vector<std::vector<Real> >   d2phidz2;
+  std::vector<std::vector<RealTensor> >   d2phidz2;
 
 #endif
-
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-  //--------------------------------------------------------------
-  /* protected members for infinite elements, which are accessed
-   * from the outside through some inline functions
-   */
-
-
-  /**
-   * Used for certain @e infinite element families:
-   * the first derivatives of the phase term in global coordinates,
-   * over @e all quadrature points.
-   */
-  std::vector<RealGradient> dphase;
-
-  /**
-   * Used for certain @e infinite element families:
-   * the global derivative of the additional radial weight \f$ 1/{r^2} \f$,
-   * over @e all quadrature points.
-   */
-  std::vector<RealGradient> dweight;
-
-  /**
-   * Used for certain @e infinite element families:
-   * the additional radial weight \f$ 1/{r^2} \f$ in local coordinates,
-   * over @e all quadrature points.
-   */
-  std::vector<Real>  weight;
-
-#endif
-
-private:
-
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-  /**
-   * Make all \p InfFE<Dim,T_radial,T_map> classes friends
-   * so that they can safely used \p FE<Dim-1,T_base> through
-   * a \p FEBase* as base approximation.
-   */
-  template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
-  friend class InfFE;
-
-#endif
-
 
 };
 
@@ -557,9 +440,9 @@ private:
 
 
 // ------------------------------------------------------------
-// FEBase class inline members
+// FEVectorBase class inline members
 inline
-FEBase::FEBase(const unsigned int d,
+FEVectorBase::FEVectorBase(const unsigned int d,
 	       const FEType& fet) :
   FEAbstract(d,fet),
   phi(),
@@ -569,9 +452,9 @@ FEBase::FEBase(const unsigned int d,
   dphidzeta(),
   dphidx(),
   dphidy(),
-  dphidz()
+  dphidz(),
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  ,d2phi(),
+  d2phi(),
   d2phidxi2(),
   d2phidxideta(),
   d2phidxidzeta(),
@@ -583,12 +466,7 @@ FEBase::FEBase(const unsigned int d,
   d2phidxdz(),
   d2phidy2(),
   d2phidydz(),
-  d2phidz2()
-#endif
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  ,dphase(),
-  dweight(),
-  weight()
+  d2phidz2(),
 #endif
 {
 }
@@ -596,7 +474,7 @@ FEBase::FEBase(const unsigned int d,
 
 
 inline
-FEBase::~FEBase()
+FEVectorBase::~FEVectorBase()
 {
 }
 

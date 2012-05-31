@@ -718,7 +718,7 @@ protected:
 
   /**
    * After having updated the jacobian and the transformation
-   * from local to global coordinates in \p FEBase::compute_map(),
+   * from local to global coordinates in \p FEAbstract::compute_map(),
    * the first derivatives of the shape functions are
    * transformed to global coordinates, giving \p dphi,
    * \p dphidx, \p dphidy, and \p dphidz. This method
