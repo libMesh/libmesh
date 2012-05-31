@@ -1069,7 +1069,15 @@ void RBEvaluation::read_in_basis_functions(System& sys,
   file_name << directory_name << "/bf_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
                   read_binary_basis_functions ? DECODE : READ);
-  header_data.set_version(LIBMESH_VERSION(0,7,2));
+
+  // set the version number in header_data from io_version_string
+  // (same code as in EquationSystemsIO::_read_impl)
+  std::string::size_type lm_pos = io_version_string.find("libMesh");
+	std::istringstream iss(io_version_string.substr(lm_pos + 8));
+	int ver_major = 0, ver_minor = 0, ver_patch = 0;
+	char dot;
+	iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
+	header_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
   
   // We need to call sys.read_header (e.g. to set _written_var_indices properly),
   // but by setting the read_header argument to false, it doesn't reinitialize the system
