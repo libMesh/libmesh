@@ -293,6 +293,11 @@ private:
    */
   RBThetaExpansion* rb_theta_expansion;
 
+  /**
+   * Version string that we need to use for writing/reading basis functions.
+   */
+  std::string io_version_string;
+
 };
 
 }
