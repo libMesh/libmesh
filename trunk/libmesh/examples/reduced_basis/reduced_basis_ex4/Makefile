@@ -40,7 +40,7 @@ all:: $(target)
 
 # Useful rules.
 clean:
-	@rm -f $(objects) *.e *~
+	@rm -f $(objects) *.e *~ .depend
 
 clobber:
 	@$(MAKE) clean

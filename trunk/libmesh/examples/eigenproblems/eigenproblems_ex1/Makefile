@@ -44,7 +44,7 @@ echo:
 
 # Useful rules.
 clean:
-	@rm -f $(objects) *~
+	@rm -f $(objects) *~ .depend
 
 clobber:
 	@$(MAKE) clean
