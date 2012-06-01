@@ -104,6 +104,7 @@ clean:
 	@test ! -d contrib || $(MAKE) -C contrib clean
 	@test ! -d examples || $(MAKE) -C examples clean
 	@rm -f *~ include/*~ include/*/*~ src/*/*~ src/*/*.$(obj-suffix) doc/html/*~
+	@rm -f .depend
 
 #
 # Make clean, remove all binaries and generated files.  Leaves libraries in-tact
