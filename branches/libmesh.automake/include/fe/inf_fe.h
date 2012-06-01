@@ -549,13 +549,13 @@ protected:
    * Has to be called every time the geometric configuration
    * changes.  Afterwards, the fields are ready to be used
    * to compute global derivatives, the jacobian etc, see
-   * \p FEBase::compute_map().
+   * \p FEAbstract::compute_map().
    */
   void combine_base_radial(const Elem* inf_elem);
 
   /**
    * After having updated the jacobian and the transformation
-   * from local to global coordinates in FEBase::compute_map(),
+   * from local to global coordinates in FEAbstract::compute_map(),
    * the first derivatives of the shape functions are
    * transformed to global coordinates, giving \p dphi,
    * \p dphidx/y/z, \p dphasedx/y/z, \p dweight. This method
@@ -752,7 +752,7 @@ protected:
 
   /**
    * this vector contains the combined integration weights, so
-   * that \p FEBase::compute_map() can still be used
+   * that \p FEAbstract::compute_map() can still be used
    */
   std::vector<Real>  _total_qrule_weights;
 

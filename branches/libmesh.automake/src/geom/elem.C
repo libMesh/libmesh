@@ -1945,7 +1945,7 @@ void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
   // we can do at least this good. note that hopefully in general
   // the user will already have reserved the full space, which will render
   // this redundant
-  conn.reserve (conn.size() + Elem::PackedElem::header_size + elem->n_nodes());
+  conn.reserve (conn.size() + elem->packed_size());
 
 #ifdef LIBMESH_ENABLE_AMR
   conn.push_back (static_cast<int>(elem->level()));
@@ -1982,6 +1982,8 @@ void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     conn.push_back (elem->node(n));
+
+  elem->pack_indexing(std::back_inserter(conn));
 }
 
 
@@ -2018,6 +2020,8 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     elem->set_node(n) = mesh.node_ptr (this->node(n));
+
+  elem->unpack_indexing(this->indices());
 
   return elem;
 }

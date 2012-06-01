@@ -26,9 +26,9 @@
 // SCM classes.)
 //
 // We consider three parameters in this problem:
-//  mu_0: scale the mesh in the y-direction
-//  mu_1: the traction in the x-direction on the right boundary of the cantilever
-//  mu_2: the traction in the y-direction on the right boundary of the cantilever
+//  y_scaling: scale the mesh in the y-direction
+//  x_load: the traction in the x-direction on the right boundary of the cantilever
+//  y_load: the traction in the y-direction on the right boundary of the cantilever
 
 // C++ include files that we need
 #include <iostream>
@@ -55,7 +55,7 @@
 using namespace libMesh;
 
 // Define a function to scale the mesh according to the parameter.
-void scale_mesh_and_plot(EquationSystems& es, std::vector<Real>& mu, const std::string& filename);
+void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename);
 
 // The main program.
 int main (int argc, char** argv)
@@ -104,30 +104,30 @@ int main (int argc, char** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
+  
+  // We override RBConstruction with SimpleRBConstruction in order to
+  // specialize a few functions for this particular problem.
+  SimpleRBConstruction & rb_con =
+    equation_systems.add_system<SimpleRBConstruction> ("RBElasticity");
+
+  // Initialize the data structures for the equation system.
+  equation_systems.init ();
+
+  // Print out some information about the "truth" discretization
+  equation_systems.print_info();
+  mesh.print_info();
 
   // Build a new RBEvaluation object which will be used to perform
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
   SimpleRBEvaluation rb_eval;
 
+  // We need to give the RBConstruction object a pointer to
+  // our RBEvaluation object
+  rb_con.set_rb_evaluation(rb_eval);
+
   if(!online_mode) // Perform the Offline stage of the RB method
   {
-    // We override RBConstruction with SimpleRBConstruction in order to
-    // specialize a few functions for this particular problem.
-    SimpleRBConstruction & rb_con =
-      equation_systems.add_system<SimpleRBConstruction> ("RBElasticity");
-
-    // Initialize the data structures for the equation system.
-    equation_systems.init ();
-
-    // Print out some information about the "truth" discretization
-    equation_systems.print_info();
-    mesh.print_info();
-  
-    // We need to give the RBConstruction object a pointer to
-    // our RBEvaluation object
-    rb_con.set_rb_evaluation(rb_eval);
-
     // Read in the data that defines this problem from the specified text file
     rb_con.process_parameters_file(parameters_filename);
 
@@ -150,11 +150,6 @@ int main (int argc, char** argv)
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
-      // If we want to be able to visualize the solution in the online stage,
-      // then we should also save the state of the equation_systems object
-      // so we can initialize it properly in the online stage
-      equation_systems.write("equation_systems.dat", WRITE);
-      
       // Write out the basis functions
       rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
     }
@@ -173,19 +168,13 @@ int main (int argc, char** argv)
 
     if(store_basis_functions)
     {
-      // initialize the EquationSystems object by reading in the state that
-      // was written out in the offline stage
-      equation_systems.read("equation_systems.dat", READ);
-      RBConstruction& rb_con = equation_systems.get_system<RBConstruction>("RBElasticity");
-      rb_con.set_rb_evaluation(rb_eval);
-
       // Read in the basis functions
       rb_eval.read_in_basis_functions(rb_con);
       
       // Plot the solution
       rb_con.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
-      std::vector<Real> rb_eval_params = rb_eval.get_parameters();
+      const RBParameters& rb_eval_params = rb_eval.get_parameters();
       scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_displacement.e");
 #endif
     }
@@ -194,7 +183,7 @@ int main (int argc, char** argv)
   return 0;
 }
 
-void scale_mesh_and_plot(EquationSystems& es, std::vector<Real>& mu, const std::string& filename)
+void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename)
 {
   // Loop over the mesh nodes and move them!
   MeshBase& mesh = es.get_mesh();
@@ -208,7 +197,7 @@ void scale_mesh_and_plot(EquationSystems& es, std::vector<Real>& mu, const std::
     
     Real y = (*node)(1);
 
-    (*node)(1) = y*mu[0];
+    (*node)(1) = y*mu.get_value("y_scaling");
   }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -216,12 +205,12 @@ void scale_mesh_and_plot(EquationSystems& es, std::vector<Real>& mu, const std::
 #endif
   
   // Loop over the mesh nodes and move them!
-  node_it  = mesh.nodes_begin();
+  node_it = mesh.nodes_begin();
   
   for( ; node_it != node_end; node_it++)
   {
     Node* node = *node_it;
 
-    (*node)(1) = 1./mu[0];
+    (*node)(1) = 1./mu.get_value("y_scaling");
   }
 }

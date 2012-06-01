@@ -36,6 +36,7 @@ libmesh_sources = \
 	error_estimation/patch_recovery_error_estimator.C \
 	error_estimation/uniform_refinement_estimator.C \
 	fe/fe.C \
+        fe/fe_abstract.C \
 	fe/fe_base.C \
 	fe/fe_bernstein.C \
 	fe/fe_bernstein_shape_0D.C \
@@ -299,8 +300,7 @@ libmesh_sources = \
 	reduced_basis/rb_eim_evaluation.C \
 	reduced_basis/rb_eim_theta.C \
 	reduced_basis/rb_evaluation.C \
-	reduced_basis/rb_param_subdomain_node.C \
-	reduced_basis/rb_param_subdomain_tree.C \
+	reduced_basis/rb_parameters.C \
 	reduced_basis/rb_parametrized_object.C \
 	reduced_basis/rb_scm_construction.C \
 	reduced_basis/rb_scm_evaluation.C \
@@ -309,8 +309,6 @@ libmesh_sources = \
 	reduced_basis/transient_rb_assembly_expansion.C \
 	reduced_basis/transient_rb_construction.C \
 	reduced_basis/transient_rb_evaluation.C \
-	reduced_basis/transient_rb_param_subdomain_node.C \
-	reduced_basis/transient_rb_param_subdomain_tree.C \
 	reduced_basis/transient_rb_theta_expansion.C \
 	solvers/adaptive_time_solver.C \
 	solvers/diff_solver.C \

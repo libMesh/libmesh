@@ -19,15 +19,17 @@
 
 struct ShiftedGaussian : public ParametrizedFunction
 {
-  virtual Number evaluate(std::vector<Real> mu,
+  virtual Number evaluate(const RBParameters& mu,
                           const Point& p)
   {
-    return exp( -2.*(pow(mu[0]-p(0),2.) + pow(mu[1]-p(1),2.)) );
+    Real center_x = mu.get_value("center_x");
+    Real center_y = mu.get_value("center_y");
+    return exp( -2.*(pow(center_x-p(0),2.) + pow(center_y-p(1),2.)) );
   }
 };
 
 // Expansion of the PDE operator
-struct ThetaA0 : RBTheta { virtual Number evaluate(const std::vector<Real>& )   { return 0.05;  } };
+struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& )   { return 0.05;  } };
 
 struct A0 : ElemAssembly
 {

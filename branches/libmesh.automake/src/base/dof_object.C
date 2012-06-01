@@ -364,4 +364,35 @@ void DofObject::set_dof_number(const unsigned int s,
   libmesh_assert(this->dof_number(s, var, comp) == dn);
 }
 
+
+void DofObject::unpack_indexing(std::vector<int>::const_iterator begin)
+{
+  _idx_buf.clear();
+  const int size = *begin++;
+  _idx_buf.reserve(size);
+  std::copy(begin, begin+size, back_inserter(_idx_buf));
+
+  // Check as best we can for internal consistency now
+  libmesh_assert(_idx_buf.empty() ||
+                 (_idx_buf[0] <= _idx_buf.size()));
+#ifdef DEBUG
+  if (!_idx_buf.empty())
+    for (unsigned int i=1; i < _idx_buf[0]; ++i)
+      {
+        libmesh_assert(_idx_buf[i] >= _idx_buf[i-1]);
+        libmesh_assert((_idx_buf[i] - _idx_buf[i-1])%2 == 0);
+        libmesh_assert(_idx_buf[i] <= _idx_buf.size());
+      }
+#endif
+}
+
+
+void DofObject::pack_indexing(std::back_insert_iterator<std::vector<int> > target) const
+{
+  *target++ = _idx_buf.end() - _idx_buf.begin();
+  std::copy(_idx_buf.begin(), _idx_buf.end(), target);
+}
+
+
+
 } // namespace libMesh

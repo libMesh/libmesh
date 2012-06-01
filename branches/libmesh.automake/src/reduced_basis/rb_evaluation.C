@@ -17,19 +17,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// rbOOmit includes
 #include "rb_evaluation.h"
+
+// libMesh includes
 #include "system.h"
 #include "numeric_vector.h"
 #include "parallel.h"
 #include "libmesh_logging.h"
 #include "xdr_cxx.h"
+#include "mesh_tools.h"
+#include "o_string_stream.h"
 
-// For creating a directory
+// C/C++ includes
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-
-#include "o_string_stream.h"
 #include <fstream>
 #include <sstream>
 
@@ -42,6 +45,11 @@ RBEvaluation::RBEvaluation ()
   compute_RB_inner_product(false),
   rb_theta_expansion(NULL)
 {
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  io_version_string = "libMesh-0.7.2 with infinite elements";
+#else
+  io_version_string = "libMesh-0.7.2";
+#endif
 }
 
 RBEvaluation::~RBEvaluation()
@@ -214,7 +222,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
     libmesh_error();
   }
 
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
 
   // Resize (and clear) the solution vector
   RB_solution.resize(N);
@@ -302,7 +310,7 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
 {
   START_LOG("compute_residual_dual_norm()", "RBEvaluation");
 
-  const std::vector<Real> mu = get_parameters();
+  const RBParameters& mu = get_parameters();
 
   // Use the stored representor inner product values
   // to evaluate the residual norm
@@ -391,7 +399,7 @@ Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
   return alpha_LB;
 }
 
-Real RBEvaluation::eval_output_dual_norm(unsigned int n, const std::vector<Real>& mu)
+Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters& mu)
 {
   Number output_bound_sq = 0.;
   unsigned int q=0;
@@ -709,9 +717,11 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       }
       for(unsigned int i=0; i<greedy_param_list.size(); i++)
       {
-        for(unsigned int j=0; j<get_n_params(); j++)
+        RBParameters::const_iterator it     = greedy_param_list[i].begin();
+        RBParameters::const_iterator it_end = greedy_param_list[i].end();
+        for( ; it != it_end; ++it)
         {
-          greedy_params_out << greedy_param_list[i][j] << " ";
+          greedy_params_out << it->second << " ";
         }
         greedy_params_out << std::endl;
       }
@@ -1007,12 +1017,14 @@ void RBEvaluation::write_out_basis_functions(System& sys,
   std::ostringstream file_name;
   const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
 
-//  // Should we write the header or not?
-//  file_name << directory_name << "/bf_header" << basis_function_suffix;
-//  Xdr header_data(file_name.str(),
-//                  write_binary_basis_functions ? ENCODE : WRITE);
-//  const std::string io_version_string = "libMesh-0.7.2";
-//  sys.write_header(header_data, io_version_string, false);
+  file_name << directory_name << "/bf_header" << basis_function_suffix;
+  Xdr header_data(file_name.str(),
+                  write_binary_basis_functions ? ENCODE : WRITE);
+  sys.write_header(header_data, io_version_string, /*write_additional_data=*/false);
+
+  // Following EquationSystemsIO::write, we use a temporary numbering (node major)
+  // before writing out the data
+  MeshTools::Private::globally_renumber_nodes_and_elements(sys.get_mesh());
 
   // Use System::write_serialized_data to write out the basis functions
   // by copying them into this->solution one at a time.
@@ -1036,6 +1048,9 @@ void RBEvaluation::write_out_basis_functions(System& sys,
     // Swap back
     basis_functions[i]->swap(*sys.solution);
   }
+
+  // Undo the temporary renumbering
+  sys.get_mesh().fix_broken_node_and_element_numbering();
 }
 
 void RBEvaluation::read_in_basis_functions(System& sys,
@@ -1051,12 +1066,26 @@ void RBEvaluation::read_in_basis_functions(System& sys,
   const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
   struct stat stat_info;
 
-//  // Should we read the header or not?
-//  file_name << directory_name << "/bf_header" << basis_function_suffix;
-//  Xdr header_data(file_name.str(),
-//                  read_binary_basis_functions ? DECODE : READ);
-//  const std::string io_version_string = "libMesh-0.7.2";
-//  sys.read_header(header_data, io_version_string, false);
+  file_name << directory_name << "/bf_header" << basis_function_suffix;
+  Xdr header_data(file_name.str(),
+                  read_binary_basis_functions ? DECODE : READ);
+
+  // set the version number in header_data from io_version_string
+  // (same code as in EquationSystemsIO::_read_impl)
+  std::string::size_type lm_pos = io_version_string.find("libMesh");
+	std::istringstream iss(io_version_string.substr(lm_pos + 8));
+	int ver_major = 0, ver_minor = 0, ver_patch = 0;
+	char dot;
+	iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
+	header_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+  
+  // We need to call sys.read_header (e.g. to set _written_var_indices properly),
+  // but by setting the read_header argument to false, it doesn't reinitialize the system
+  sys.read_header(header_data, io_version_string, /*read_header=*/false, /*read_additional_data=*/false);
+
+  // Following EquationSystemsIO::read, we use a temporary numbering (node major)
+  // before writing out the data
+  MeshTools::Private::globally_renumber_nodes_and_elements(sys.get_mesh());
 
   // Use System::read_serialized_data to read in the basis functions
   // into this->solution and then swap with the appropriate
@@ -1090,6 +1119,9 @@ void RBEvaluation::read_in_basis_functions(System& sys,
     // *basis_functions[i] = *solution;
     basis_functions[i]->swap(*sys.solution);
   }
+
+  // Undo the temporary renumbering
+  sys.get_mesh().fix_broken_node_and_element_numbering();
 
   libMesh::out << "Finished reading in the basis functions..." << std::endl;
 }

@@ -775,7 +775,8 @@ public:
 			 JUST_REFINED,
 			 JUST_COARSENED,
                          INACTIVE,
-                         COARSEN_INACTIVE };
+                         COARSEN_INACTIVE,
+                         INVALID_REFINEMENTSTATE };
 
   /**
    * @returns a pointer to the \f$ i^{th} \f$ child for this element.
@@ -1096,6 +1097,7 @@ public:
    */
   class PackedElem;
 
+  unsigned int packed_size() const;
 
  protected:
 
@@ -2076,10 +2078,16 @@ public:
    */
   static const unsigned int header_size; /* = 10 with AMR, 4 without */
 
+  unsigned int packed_size() const
+  {
+    return this->header_size + this->n_nodes() + *this->indices() + 1;
+  }
+
   /**
    * For each element it is of the form
    * [ level p_level r_flag p_r_flag etype processor_id subdomain_id
-   *  self_ID parent_ID which_child node_0 node_1 ... node_n]
+   *  self_ID parent_ID which_child node_0 node_1 ... node_n
+   *  dof_object_buffer_1 ...]
    * We cannot use unsigned int because parent_ID can be negative
    */
   static void pack (std::vector<int> &conn, const Elem* elem);
@@ -2113,6 +2121,8 @@ public:
    */
   Elem::RefinementState refinement_flag () const
   {
+    libmesh_assert(*(_buf_begin+2) >= 0);
+    libmesh_assert(*(_buf_begin+2) < INVALID_REFINEMENTSTATE);
     return static_cast<Elem::RefinementState>(*(_buf_begin+2));
   }
 
@@ -2121,6 +2131,8 @@ public:
    */
   Elem::RefinementState p_refinement_flag () const
   {
+    libmesh_assert(*(_buf_begin+3) >= 0);
+    libmesh_assert(*(_buf_begin+3) < INVALID_REFINEMENTSTATE);
     return static_cast<Elem::RefinementState>(*(_buf_begin+3));
   }
 #endif // LIBMESH_ENABLE_AMR
@@ -2130,6 +2142,8 @@ public:
    */
   ElemType type () const
   {
+    libmesh_assert(*(_buf_begin+4) >= 0);
+    libmesh_assert(*(_buf_begin+4) < INVALID_ELEM);
     return static_cast<ElemType>(*(_buf_begin+4));
   }
 
@@ -2138,6 +2152,10 @@ public:
    */
   unsigned int processor_id () const
   {
+    libmesh_assert(*(_buf_begin+5) >= 0);
+    libmesh_assert(static_cast<unsigned int>(*(_buf_begin+5)) <
+                   libMesh::n_processors() ||
+                   *(_buf_begin+5) == DofObject::invalid_processor_id);
     return static_cast<unsigned int>(*(_buf_begin+5));
   }
 
@@ -2186,10 +2204,14 @@ public:
    */
   unsigned int node (const unsigned int n) const
   {
-    return static_cast<unsigned int>(*(_buf_begin+10+n));
+    return static_cast<unsigned int>(*(_buf_begin+header_size+n));
+  }
+
+  std::vector<int>::const_iterator indices() const
+  {
+    return _buf_begin+header_size+this->n_nodes();
   }
 }; // end class PackedElem
-
 
 /**
  * The definition of the protected nested SideIter class.
@@ -2343,6 +2365,14 @@ variant_filter_iterator<Elem::Predicate,
 			    Elem*>(d,e,p) {}
 };
 
+
+inline
+unsigned int
+Elem::packed_size() const
+{
+  return PackedElem::header_size + this->n_nodes() +
+         this->packed_indexing_size();
+}
 
 
 } // namespace libMesh

@@ -11,10 +11,13 @@ initial_parameters = '0.2 0.7 0.1' # Parameter vector for an Online solve
 Nmax = 10                  # The maximum number of basis functions we can generate in the Offline stage
 training_tolerance = 1.e-5 # The Reduced Basis training algorithm terminates when we satisfy this tolerance
 
-n_parameters = 3           # The number of parameters in the problem
+n_parameters = 3                   # The number of parameters in the problem
+parameter_names = 'mu_0 mu_1 mu_2' # The names of the parameters
 
-mu_min = '0.1 0.1 0.01'               # The "lower corner" of the parameter domain
-mu_max = '1 1 0.1'                  # The "upper corner" of the parameter domain
+mu_0 = '0.1 1 0.2'                 # the min, max and initial value of mu_0
+mu_1 = '0.1 1 0.7'                 # the min, max and initial value of mu_1
+mu_2 = '0.01 0.1 0.1'              # the min, max and initial value of mu_2
+
 log_scaling = '1 1 1'              # Generate a training set with uniform (0) or logarithmic (1) scaling in each parameter
 
 deterministic_training = false        # Are the training points generated randomly or deterministically

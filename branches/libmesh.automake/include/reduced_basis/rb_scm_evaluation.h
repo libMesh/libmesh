@@ -117,7 +117,7 @@ public:
   /**
    * Get entry of C_J.
    */
-  std::vector<Real> get_C_J_entry(unsigned int j);
+  const RBParameters& get_C_J_entry(unsigned int j);
 
   /**
    * Get entry of C_J_stability_vector.
@@ -177,7 +177,7 @@ public:
    * Vector storing the greedily selected parameters
    * during SCM training.
    */
-  std::vector< std::vector<Real> > C_J;
+  std::vector< RBParameters > C_J;
 
   /**
    * Vector storing the (truth) stability values
@@ -193,13 +193,13 @@ public:
    */
   std::vector< std::vector<Real> > SCM_UB_vectors;
 
+private:
+
   /**
    * Vector in which to save a parameter set. Useful
    * in get_SCM_LB, for example.
    */
-  std::vector<Real> saved_parameters;
-
-private:
+  RBParameters saved_parameters;
 
    /**
    * A pointer to to the object that stores the theta expansion.

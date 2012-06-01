@@ -80,11 +80,13 @@ nobase_include_HEADERS = \
 		error_estimation/patch_recovery_error_estimator.h \
 		error_estimation/uniform_refinement_estimator.h \
 		fe/fe.h \
+                fe/fe_abstract.h \
 		fe/fe_base.h \
 		fe/fe_compute_data.h \
 		fe/fe_interface.h \
 		fe/fe_macro.h \
 		fe/fe_type.h \
+                fe/fe_vector_base.h \
 		fe/inf_fe.h \
 		fe/inf_fe_instantiate_1D.h \
 		fe/inf_fe_instantiate_2D.h \
@@ -266,8 +268,6 @@ nobase_include_HEADERS = \
 		reduced_basis/rb_eim_evaluation.h \
 		reduced_basis/rb_eim_theta.h \
 		reduced_basis/rb_evaluation.h \
-		reduced_basis/rb_param_subdomain_node.h \
-		reduced_basis/rb_param_subdomain_tree.h \
 		reduced_basis/rb_parametrized.h \
 		reduced_basis/rb_scm_construction.h \
 		reduced_basis/rb_scm_evaluation.h \
@@ -276,8 +276,7 @@ nobase_include_HEADERS = \
 		reduced_basis/transient_rb_assembly_expansion.h \
 		reduced_basis/transient_rb_construction.h \
 		reduced_basis/transient_rb_evaluation.h \
-		reduced_basis/transient_rb_param_subdomain_node.h \
-		reduced_basis/transient_rb_param_subdomain_tree.h \
+                reduced_basis/rb_parameters.h \
 		reduced_basis/transient_rb_theta_expansion.h \
 		solvers/adaptive.h \
 		solvers/adaptive_time_solver.h \

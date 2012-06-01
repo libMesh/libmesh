@@ -17,8 +17,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// rbOOmit includes
 #include "rb_theta_expansion.h"
 #include "rb_theta.h"
+#include "rb_parameters.h"
 
 namespace libMesh
 {
@@ -107,7 +109,7 @@ void RBThetaExpansion::attach_output_theta(RBTheta* theta_q_l)
 }
 
 Number RBThetaExpansion::eval_theta_q_a(unsigned int q,
-                                        const std::vector<Real>& mu)
+                                        const RBParameters& mu)
 {
   if(q >= get_Q_a())
   {
@@ -121,7 +123,7 @@ Number RBThetaExpansion::eval_theta_q_a(unsigned int q,
 }
 
 Number RBThetaExpansion::eval_theta_q_f(unsigned int q,
-                                        const std::vector<Real>& mu)
+                                        const RBParameters& mu)
 {
   if(q >= get_Q_f())
   {
@@ -137,7 +139,7 @@ Number RBThetaExpansion::eval_theta_q_f(unsigned int q,
 
 Number RBThetaExpansion::eval_theta_q_l(unsigned int output_index,
                                         unsigned int q_l,
-                                        const std::vector<Real>& mu)
+                                        const RBParameters& mu)
 {
   if( (output_index >= get_n_outputs()) || (q_l >= get_Q_l(output_index)) )
   {

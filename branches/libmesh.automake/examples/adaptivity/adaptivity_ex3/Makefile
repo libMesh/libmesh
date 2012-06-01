@@ -44,7 +44,7 @@ $(target): $(objects)
 
 # Useful rules.
 clean:
-	@rm -f $(objects) *.gmv.* *~
+	@rm -f $(objects) *.gmv.* *~ .depend
 
 clobber:
 	@$(MAKE) clean

@@ -28,9 +28,9 @@ using libMesh::RealGradient;
 
 // Functors for the parameter-dependent part of the affine decomposition of the PDE
 // The RHS and outputs just require a constant value of 1, so use a default RBTheta object there
-struct ThetaA0 : RBTheta { virtual Number evaluate(const std::vector<Real>& )   { return 0.05;  } };
-struct ThetaA1 : RBTheta { virtual Number evaluate(const std::vector<Real>& mu) { return mu[0]; } };
-struct ThetaA2 : RBTheta { virtual Number evaluate(const std::vector<Real>& mu) { return mu[1]; } };
+struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& )   { return 0.05;  } };
+struct ThetaA1 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("x_vel"); } };
+struct ThetaA2 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("y_vel"); } };
 
 struct M0 : ElemAssembly
 {
