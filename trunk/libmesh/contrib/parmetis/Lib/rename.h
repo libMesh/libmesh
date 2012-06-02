@@ -1,290 +1,182 @@
-/* kmetis.c */
-#define	Moc_Global_Partition Moc_Global_Partition__
+#ifndef _LIBPARMETIS_RENAME_H_
+#define _LIBPARMETIS_RENAME_H_
 
-/* mmetis.c */
+#define KWayAdaptiveRefine libparmetis__KWayAdaptiveRefine
+#define Adaptive_Partition libparmetis__Adaptive_Partition
+#define BalanceMyLink libparmetis__BalanceMyLink
+#define CommChangedInterfaceData libparmetis__CommChangedInterfaceData
+#define CommInterfaceData libparmetis__CommInterfaceData
+#define CommSetup libparmetis__CommSetup
+#define CommUpdateNnbrs libparmetis__CommUpdateNnbrs
+#define GlobalSEMax libparmetis__GlobalSEMax
+#define GlobalSEMaxComm libparmetis__GlobalSEMaxComm
+#define GlobalSEMaxFloat libparmetis__GlobalSEMaxFloat
+#define GlobalSEMin libparmetis__GlobalSEMin
+#define GlobalSEMinComm libparmetis__GlobalSEMinComm
+#define GlobalSEMinFloat libparmetis__GlobalSEMinFloat
+#define GlobalSESum libparmetis__GlobalSESum
+#define GlobalSESumComm libparmetis__GlobalSESumComm
+#define GlobalSESumFloat libparmetis__GlobalSESumFloat
+#define CSR_Match_SHEM libparmetis__CSR_Match_SHEM
+#define FreeCtrl libparmetis__FreeCtrl
+#define SetupCtrl libparmetis__SetupCtrl
+#define SetupCtrl_invtvwgts libparmetis__SetupCtrl_invtvwgts
+#define PrintGraph libparmetis__PrintGraph
+#define PrintGraph2 libparmetis__PrintGraph2
+#define PrintPairs libparmetis__PrintPairs
+#define PrintSetUpInfo libparmetis__PrintSetUpInfo
+#define PrintTransferedGraphs libparmetis__PrintTransferedGraphs
+#define PrintVector libparmetis__PrintVector
+#define PrintVector2 libparmetis__PrintVector2
+#define WriteMetisGraph libparmetis__WriteMetisGraph
+#define ComputeLoad libparmetis__ComputeLoad
+#define ComputeTransferVector libparmetis__ComputeTransferVector
+#define ConjGrad2 libparmetis__ConjGrad2
+#define Mc_ComputeMoveStatistics libparmetis__Mc_ComputeMoveStatistics
+#define Mc_ComputeSerialTotalV libparmetis__Mc_ComputeSerialTotalV
+#define SetUpConnectGraph libparmetis__SetUpConnectGraph
+#define mvMult2 libparmetis__mvMult2
+#define gkMPI_Allgather libparmetis__gkMPI_Allgather
+#define gkMPI_Allgatherv libparmetis__gkMPI_Allgatherv
+#define gkMPI_Allreduce libparmetis__gkMPI_Allreduce
+#define gkMPI_Alltoall libparmetis__gkMPI_Alltoall
+#define gkMPI_Alltoallv libparmetis__gkMPI_Alltoallv
+#define gkMPI_Barrier libparmetis__gkMPI_Barrier
+#define gkMPI_Bcast libparmetis__gkMPI_Bcast
+#define gkMPI_Comm_free libparmetis__gkMPI_Comm_free
+#define gkMPI_Comm_rank libparmetis__gkMPI_Comm_rank
+#define gkMPI_Comm_size libparmetis__gkMPI_Comm_size
+#define gkMPI_Comm_split libparmetis__gkMPI_Comm_split
+#define gkMPI_Finalize libparmetis__gkMPI_Finalize
+#define gkMPI_Gatherv libparmetis__gkMPI_Gatherv
+#define gkMPI_Get_count libparmetis__gkMPI_Get_count
+#define gkMPI_Irecv libparmetis__gkMPI_Irecv
+#define gkMPI_Isend libparmetis__gkMPI_Isend
+#define gkMPI_Recv libparmetis__gkMPI_Recv
+#define gkMPI_Reduce libparmetis__gkMPI_Reduce
+#define gkMPI_Scan libparmetis__gkMPI_Scan
+#define gkMPI_Scatterv libparmetis__gkMPI_Scatterv
+#define gkMPI_Send libparmetis__gkMPI_Send
+#define gkMPI_Wait libparmetis__gkMPI_Wait
+#define gkMPI_Waitall libparmetis__gkMPI_Waitall
+#define CreateGraph libparmetis__CreateGraph
+#define FreeGraph libparmetis__FreeGraph
+#define FreeInitialGraphAndRemap libparmetis__FreeInitialGraphAndRemap
+#define FreeNonGraphFields libparmetis__FreeNonGraphFields
+#define FreeNonGraphNonSetupFields libparmetis__FreeNonGraphNonSetupFields
+#define InitGraph libparmetis__InitGraph
+#define SetupGraph libparmetis__SetupGraph
+#define SetupGraph_nvwgts libparmetis__SetupGraph_nvwgts
+#define AssembleAdaptiveGraph libparmetis__AssembleAdaptiveGraph
+#define Balance_Partition libparmetis__Balance_Partition
+#define AssembleMultisectedGraph libparmetis__AssembleMultisectedGraph
+#define InitMultisection libparmetis__InitMultisection
+#define InitPartition libparmetis__InitPartition
+#define KeepPart libparmetis__KeepPart
+#define Global_Partition libparmetis__Global_Partition
+#define ComputePartitionParams libparmetis__ComputePartitionParams
+#define KWayBalance libparmetis__KWayBalance
+#define KWayFM libparmetis__KWayFM
+#define ProjectPartition libparmetis__ProjectPartition
+#define CreateCoarseGraph_Global libparmetis__CreateCoarseGraph_Global
+#define CreateCoarseGraph_Local libparmetis__CreateCoarseGraph_Local
+#define Match_Global libparmetis__Match_Global
+#define Match_Local libparmetis__Match_Local
+#define ExtractGraph libparmetis__ExtractGraph
+#define Mc_Diffusion libparmetis__Mc_Diffusion
+#define CheckMGraph libparmetis__CheckMGraph
+#define FindVtxPerm libparmetis__FindVtxPerm
+#define MoveGraph libparmetis__MoveGraph
+#define ProjectInfoBack libparmetis__ProjectInfoBack
+#define CreateMesh libparmetis__CreateMesh
+#define InitMesh libparmetis__InitMesh
+#define SetUpMesh libparmetis__SetUpMesh
+#define AllocateNodePartitionParams libparmetis__AllocateNodePartitionParams
+#define ComputeNodePartitionParams libparmetis__ComputeNodePartitionParams
+#define KWayNodeRefine2Phase libparmetis__KWayNodeRefine2Phase
+#define KWayNodeRefineInterior libparmetis__KWayNodeRefineInterior
+#define KWayNodeRefine_Greedy libparmetis__KWayNodeRefine_Greedy
+#define PrintNodeBalanceInfo libparmetis__PrintNodeBalanceInfo
+#define UpdateNodePartitionParams libparmetis__UpdateNodePartitionParams
+#define CompactGraph libparmetis__CompactGraph
+#define LabelSeparators libparmetis__LabelSeparators
+#define LocalNDOrder libparmetis__LocalNDOrder
+#define MultilevelOrder libparmetis__MultilevelOrder
+#define Order_Partition libparmetis__Order_Partition
+#define Order_Partition_Multiple libparmetis__Order_Partition_Multiple
+#define AssembleEntireGraph libparmetis__AssembleEntireGraph
+#define RedoMyLink libparmetis__RedoMyLink
+#define ParallelReMapGraph libparmetis__ParallelReMapGraph
+#define ParallelTotalVReMap libparmetis__ParallelTotalVReMap
+#define SimilarTpwgts libparmetis__SimilarTpwgts
+#define ChangeNumbering libparmetis__ChangeNumbering
+#define ChangeNumberingMesh libparmetis__ChangeNumberingMesh
+#define Mc_DynamicSelectQueue libparmetis__Mc_DynamicSelectQueue
+#define Mc_HashVRank libparmetis__Mc_HashVRank
+#define Mc_HashVwgts libparmetis__Mc_HashVwgts
+#define AreAllHVwgtsBelow libparmetis__AreAllHVwgtsBelow
+#define ComputeHKWayLoadImbalance libparmetis__ComputeHKWayLoadImbalance
+#define ComputeSerialEdgeCut libparmetis__ComputeSerialEdgeCut
+#define ComputeSerialTotalV libparmetis__ComputeSerialTotalV
+#define Mc_ComputeSerialPartitionParams libparmetis__Mc_ComputeSerialPartitionParams
+#define Mc_SerialKWayAdaptRefine libparmetis__Mc_SerialKWayAdaptRefine
+#define Mc_Serial_Balance2Way libparmetis__Mc_Serial_Balance2Way
+#define Mc_Serial_Compute2WayPartitionParams libparmetis__Mc_Serial_Compute2WayPartitionParams
+#define Mc_Serial_FM_2WayRefine libparmetis__Mc_Serial_FM_2WayRefine
+#define Mc_Serial_Init2WayBalance libparmetis__Mc_Serial_Init2WayBalance
+#define SSMIncKeyCmp libparmetis__SSMIncKeyCmp
+#define SerialRemap libparmetis__SerialRemap
+#define Serial_AreAnyVwgtsBelow libparmetis__Serial_AreAnyVwgtsBelow
+#define Serial_BetterBalance libparmetis__Serial_BetterBalance
+#define Serial_Compute2WayHLoadImbalance libparmetis__Serial_Compute2WayHLoadImbalance
+#define Serial_SelectQueue libparmetis__Serial_SelectQueue
+#define Serial_SelectQueueOneWay libparmetis__Serial_SelectQueueOneWay
+#define ComputeMoveStatistics libparmetis__ComputeMoveStatistics
+#define ComputeParallelBalance libparmetis__ComputeParallelBalance
+#define ComputeSerialBalance libparmetis__ComputeSerialBalance
+#define Mc_PrintThrottleMatrix libparmetis__Mc_PrintThrottleMatrix
+#define PrintPostPartInfo libparmetis__PrintPostPartInfo
+#define InitTimers libparmetis__InitTimers
+#define PrintTimer libparmetis__PrintTimer
+#define PrintTimingInfo libparmetis__PrintTimingInfo
+#define BSearch libparmetis__BSearch
+#define BetterVBalance libparmetis__BetterVBalance
+#define FastRandomPermute libparmetis__FastRandomPermute
+#define GetThreeMax libparmetis__GetThreeMax
+#define IsHBalanceBetterFT libparmetis__IsHBalanceBetterFT
+#define IsHBalanceBetterTT libparmetis__IsHBalanceBetterTT
+#define RandomPermute libparmetis__RandomPermute
+#define ispow2 libparmetis__ispow2
+#define log2Int libparmetis__log2Int
+#define myprintf libparmetis__myprintf
+#define rargmax2 libparmetis__rargmax2
+#define rargmax_strd libparmetis__rargmax_strd
+#define rargmin_strd libparmetis__rargmin_strd
+#define ravg libparmetis__ravg
+#define rfavg libparmetis__rfavg
+#define rprintf libparmetis__rprintf
+#define WavefrontDiffusion libparmetis__WavefrontDiffusion
+#define CheckInputsAdaptiveRepart libparmetis__CheckInputsAdaptiveRepart
+#define CheckInputsNodeND libparmetis__CheckInputsNodeND
+#define CheckInputsPartGeom libparmetis__CheckInputsPartGeom
+#define CheckInputsPartGeomKway libparmetis__CheckInputsPartGeomKway
+#define CheckInputsPartKway libparmetis__CheckInputsPartKway
+#define CheckInputsPartMeshKway libparmetis__CheckInputsPartMeshKway
+#define PartitionSmallGraph libparmetis__PartitionSmallGraph
+#define AllocateRefinementWorkSpace libparmetis__AllocateRefinementWorkSpace
+#define AllocateWSpace libparmetis__AllocateWSpace
+#define FreeWSpace libparmetis__FreeWSpace
+#define cnbrpoolGetNext libparmetis__cnbrpoolGetNext
+#define cnbrpoolReset libparmetis__cnbrpoolReset
+#define ikvwspacemalloc libparmetis__ikvwspacemalloc
+#define iwspacemalloc libparmetis__iwspacemalloc
+#define rkvwspacemalloc libparmetis__rkvwspacemalloc
+#define rwspacemalloc libparmetis__rwspacemalloc
+#define wspacemalloc libparmetis__wspacemalloc
+#define Coordinate_Partition libparmetis__Coordinate_Partition
+#define IRBinCoordinates libparmetis__IRBinCoordinates
+#define PseudoSampleSort libparmetis__PseudoSampleSort
+#define RBBinCoordinates libparmetis__RBBinCoordinates
+#define SampleSort libparmetis__SampleSort
 
-/* gkmetis.c */
-
-/* match.c */
-#define	Moc_GlobalMatch_Balance Moc_GlobalMatch_Balance__
-
-/* coarsen.c */
-#define	Moc_Global_CreateCoarseGraph Moc_Global_CreateCoarseGraph__
-
-/* initpart.c */
-#define	Moc_InitPartition_RB Moc_InitPartition_RB__
-#define	Moc_KeepPart Moc_KeepPart__
-
-/* kwayrefine.c */
-#define	Moc_ProjectPartition Moc_ProjectPartition__
-#define	Moc_ComputePartitionParams Moc_ComputePartitionParams__
-
-/* kwayfm.c */
-#define	Moc_KWayFM Moc_KWayFM__
-
-/* kwaybalance.c */
-#define	Moc_KWayBalance Moc_KWayBalance__
-
-/* remap.c */
-#define	ParallelReMapGraph ParallelReMapGraph__
-#define	ParallelTotalVReMap ParallelTotalVReMap__
-#define	SimilarTpwgts SimilarTpwgts__
-
-/* move.c */
-#define	Moc_MoveGraph Moc_MoveGraph__
-#define	CheckMGraph CheckMGraph__
-#define	ProjectInfoBack ProjectInfoBack__
-#define	FindVtxPerm FindVtxPerm__
-
-/* memory.c */
-#define	PreAllocateMemory PreAllocateMemory__
-#define	FreeWSpace FreeWSpace__
-#define	FreeCtrl FreeCtrl__
-#define	CreateGraph CreateGraph__
-#define	InitGraph InitGraph__
-#define	FreeGraph FreeGraph__
-#define	FreeInitialGraphAndRemap FreeInitialGraphAndRemap__
-
-
-/************************/
-/* Adaptive subroutines */
-/************************/
-/* ametis.c */
-#define	Adaptive_Partition Adaptive_Partition__
-
-/* rmetis.c */
-
-/* lmatch.c */
-#define	Mc_LocalMatch_HEM Mc_LocalMatch_HEM__
-#define	Mc_Local_CreateCoarseGraph Mc_Local_CreateCoarseGraph__
-
-/* wave.c */
-#define	WavefrontDiffusion WavefrontDiffusion__
-
-/* balancemylink.c */
-#define	BalanceMyLink BalanceMyLink__
-
-/* redomylink.c */
-#define	RedoMyLink RedoMyLink__
-
-/* initbalance.c */
-#define	Balance_Partition Balance_Partition__
-#define	Moc_AssembleAdaptiveGraph Moc_AssembleAdaptiveGraph__
-
-/* mdiffusion.c */
-#define	Moc_Diffusion Moc_Diffusion__
-#define	ExtractGraph ExtractGraph__
-
-/* diffutil.c */
-#define	SetUpConnectGraph SetUpConnectGraph__
-#define	Mc_ComputeMoveStatistics Mc_ComputeMoveStatistics__
-#define	Mc_ComputeSerialTotalV Mc_ComputeSerialTotalV__
-#define	ComputeLoad ComputeLoad__
-#define	ConjGrad2 ConjGrad2__
-#define	mvMult2 mvMult2__
-#define	ComputeTransferVector ComputeTransferVector__
-#define	ComputeSerialEdgeCut ComputeSerialEdgeCut__
-#define	ComputeSerialTotalV ComputeSerialTotalV__
-
-/* akwayfm.c */
-#define	Moc_KWayAdaptiveRefine Moc_KWayAdaptiveRefine__
-
-/* selectq.c */
-#define	Moc_DynamicSelectQueue Moc_DynamicSelectQueue__
-#define	Moc_HashVwgts Moc_HashVwgts__
-#define	Moc_HashVRank Moc_HashVRank__
-
-/* csrmatch.c */
-#define	CSR_Match_SHEM CSR_Match_SHEM__
-
-/* serial.c */
-#define	Moc_SerialKWayAdaptRefine Moc_SerialKWayAdaptRefine__
-#define	Moc_ComputeSerialPartitionParams Moc_ComputeSerialPartitionParams__
-#define	AreAllHVwgtsBelow AreAllHVwgtsBelow__
-#define	ComputeHKWayLoadImbalance ComputeHKWayLoadImbalance__
-#define	SerialRemap SerialRemap__
-#define	SSMIncKeyCmp SSMIncKeyCmp__
-#define	Moc_Serial_FM_2WayRefine Moc_Serial_FM_2WayRefine__
-#define	Serial_SelectQueue Serial_SelectQueue__
-#define	Serial_BetterBalance Serial_BetterBalance__
-#define	Serial_Compute2WayHLoadImbalance Serial_Compute2WayHLoadImbalance__
-#define	Moc_Serial_Balance2Way Moc_Serial_Balance2Way__
-#define	Moc_Serial_Init2WayBalance Moc_Serial_Init2WayBalance__
-#define	Serial_SelectQueueOneWay Serial_SelectQueueOneWay__
-#define	Moc_Serial_Compute2WayPartitionParams Moc_Serial_Compute2WayPartitionParams__
-#define	Serial_AreAnyVwgtsBelow Serial_AreAnyVwgtsBelow__
-
-/* weird.c */
-#define	PartitionSmallGraph PartitionSmallGraph__
-#define	CheckInputs CheckInputs__
-
-
-/****************************/
-/* Mesh to Dual subroutines */
-/****************************/
-/* mesh.c */
-/* msetup.c */
-#define	SetUpMesh SetUpMesh__
-#define	CreateMesh CreateMesh__
-#define	InitMesh InitMesh__
-
-
-/************************/
-/* Ordering subroutines */
-/************************/
-/* ometis.c */
-/* pspases.c */
-#define	AssembleEntireGraph AssembleEntireGraph__
-
-/* node_refine.c */
-#define	ComputeNodePartitionParams0 ComputeNodePartitionParams0__
-#define	ComputeNodePartitionParams ComputeNodePartitionParams__
-#define	KWayNodeRefine0 KWayNodeRefine0__
-#define	KWayNodeRefine KWayNodeRefine__
-#define	KWayNodeRefine2 KWayNodeRefine2__
-#define	PrintNodeBalanceInfo PrintNodeBalanceInfo__
-
-/* initmsection.c */
-#define	InitMultisection InitMultisection__
-#define	AssembleMultisectedGraph AssembleMultisectedGraph__
-
-/* order.c */
-#define	MultilevelOrder MultilevelOrder__
-#define	LabelSeparators LabelSeparators__
-#define	CompactGraph CompactGraph__
-#define	LocalOrder LocalOrder__
-#define	LocalNDOrder LocalNDOrder__
-#define	Order_Partition Order_Partition__
-
-/* xyzpart.c */
-#define	Coordinate_Partition Coordinate_Partition__
-#define	PartSort PartSort__
-
-/***********************/
-/* Utility subroutines */
-/***********************/
-/* fpqueue.c */
-#define	FPQueueInit FPQueueInit__
-#define	FPQueueReset FPQueueReset__
-#define	FPQueueFree FPQueueFree__
-#define	FPQueueGetSize FPQueueGetSize__
-#define	FPQueueInsert FPQueueInsert__
-#define	FPQueueDelete FPQueueDelete__
-#define	FPQueueUpdate FPQueueUpdate__
-#define	FPQueueUpdateUp FPQueueUpdateUp__
-#define	FPQueueGetMax FPQueueGetMax__
-#define	FPQueueSeeMaxVtx FPQueueSeeMaxVtx__
-#define	FPQueueSeeMaxGain FPQueueSeeMaxGain__
-#define	FPQueueGetKey FPQueueGetKey__
-#define	FPQueueGetQSize FPQueueGetQSize__
-#define	CheckHeapFloat CheckHeapFloat__
-
-/* stat.c */
-#define	Moc_ComputeSerialBalance Moc_ComputeSerialBalance__
-#define	Moc_ComputeParallelBalance Moc_ComputeParallelBalance__
-#define	Moc_PrintThrottleMatrix Moc_PrintThrottleMatrix__
-#define	Moc_ComputeRefineStats Moc_ComputeRefineStats__
-
-/* debug.c */
-#define	PrintVector PrintVector__
-#define	PrintVector2 PrintVector2__
-#define	PrintPairs PrintPairs__
-#define	PrintGraph PrintGraph__
-#define	PrintGraph2 PrintGraph2__
-#define	PrintSetUpInfo PrintSetUpInfo__
-#define	PrintTransferedGraphs PrintTransferedGraphs__
-#define	WriteMetisGraph WriteMetisGraph__
-
-/* comm.c */
-#define	CommInterfaceData CommInterfaceData__
-#define	CommChangedInterfaceData CommChangedInterfaceData__
-#define	GlobalSEMax GlobalSEMax__
-#define	GlobalSEMaxDouble GlobalSEMaxDouble__
-#define	GlobalSEMin GlobalSEMin__
-#define	GlobalSESum GlobalSESum__
-#define	GlobalSEMaxFloat GlobalSEMaxFloat__
-#define	GlobalSEMinFloat GlobalSEMinFloat__
-#define	GlobalSESumFloat GlobalSESumFloat__
-
-/* util.c */
-#define	errexit errexit__
-#define	myprintf myprintf__
-#define	rprintf rprintf__
-#define	imalloc imalloc__
-#define	idxmalloc idxmalloc__
-#define	fmalloc fmalloc__
-#define	ismalloc ismalloc__
-#define	idxsmalloc idxsmalloc__
-#define	GKmalloc GKmalloc__
-#define	GKfree GKfree__
-#define	iset iset__
-#define	idxset idxset__
-#define	idxamax idxamax__
-#define	idxamin idxamin__
-#define	idxasum idxasum__
-#define	snorm2 snorm2__
-#define	sdot sdot__
-#define	saxpy saxpy__
-#define	ikeyvalsort_org ikeyvalsort_org__
-#define	IncKeyValueCmp IncKeyValueCmp__
-#define	dkeyvalsort dkeyvalsort__
-#define	DecKeyValueCmp DecKeyValueCmp__
-#define	BSearch BSearch__
-#define	RandomPermute RandomPermute__
-#define	FastRandomPermute FastRandomPermute__
-#define	ispow2 ispow2__
-#define	log2Int log2Int__
-#define	BucketSortKeysDec BucketSortKeysDec__
-#define	sset sset__
-#define	iamax iamax__
-#define	idxamax_strd idxamax_strd__
-#define	idxamin_strd idxamin_strd__
-#define	samax_strd samax_strd__
-#define	sfamax sfamax__
-#define	samin_strd samin_strd__
-#define	idxavg idxavg__
-#define	savg savg__
-#define	samax samax__
-#define	sfavg sfavg__
-#define	samax2 samax2__
-#define	samin samin__
-#define	idxsum idxsum__
-#define	idxsum_strd idxsum_strd__
-#define	idxadd idxadd__
-#define	ssum ssum__
-#define	ssum_strd ssum_strd__
-#define	sscale sscale__
-#define	saneg saneg__
-#define	BetterVBalance BetterVBalance__
-#define	IsHBalanceBetterTT IsHBalanceBetterTT__
-#define	IsHBalanceBetterFT IsHBalanceBetterFT__
-#define	myvalkeycompare myvalkeycompare__
-#define	imyvalkeycompare imyvalkeycompare__
-#define	fsmalloc fsmalloc__
-#define	saxpy2 saxpy2__
-#define	GetThreeMax GetThreeMax__
-
-/* qsort_special.c */
-#define	iidxsort iidxsort__
-#define	iintsort iintsort__
-#define	ikeysort ikeysort__
-#define	ikeyvalsort ikeyvalsort__
-
-/* grsetup.c */
-#define	Moc_SetUpGraph Moc_SetUpGraph__
-#define	SetUpCtrl SetUpCtrl__
-#define	ChangeNumbering ChangeNumbering__
-#define	ChangeNumberingMesh ChangeNumberingMesh__
-#define	GraphRandomPermute GraphRandomPermute__
-#define	ComputeMoveStatistics ComputeMoveStatistics__
-
-/* timer.c */
-#define	InitTimers InitTimers__
-#define	PrintTimingInfo PrintTimingInfo__
-#define	PrintTimer PrintTimer__
-
-/* setup.c */
-#define	SetUp SetUp__
-#define	Home_PE Home_PE__
-
-
+#endif

@@ -18,8 +18,8 @@ AC_DEFUN([CONFIGURE_METIS],
   dnl The METIS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enablemetis = yes); then
-     METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/Lib"
-     METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext)"
+     METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/include"
+     METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext) \$(EXTERNAL_LIBDIR)/libGK\$(libext)"
      AC_DEFINE(HAVE_METIS, 1, [Flag indicating whether the library will be compiled with Metis support])
      AC_MSG_RESULT(<<< Configuring library with Metis support >>>)
      libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"

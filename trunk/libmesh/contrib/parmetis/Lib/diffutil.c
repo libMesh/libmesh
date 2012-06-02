@@ -12,20 +12,20 @@
  *
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
 
 
 /*************************************************************************
 *  This function computes the load for each subdomain
 **************************************************************************/
-void SetUpConnectGraph(GraphType *graph, MatrixType *matrix, idxtype *workspace)
+void SetUpConnectGraph(graph_t *graph, matrix_t *matrix, idx_t *workspace)
 {
-  int i, ii, j, jj, k, l;
-  int nvtxs, nrows;
-  idxtype *xadj, *adjncy, *where;
-  idxtype *rowptr, *colind;
-  idxtype *pcounts, *perm, *marker;
-  float *values;
+  idx_t i, ii, j, jj, k, l;
+  idx_t nvtxs, nrows;
+  idx_t *xadj, *adjncy, *where;
+  idx_t *rowptr, *colind;
+  idx_t *pcounts, *perm, *marker;
+  real_t *values;
 
   nvtxs = graph->nvtxs;
   xadj = graph->xadj;
@@ -38,8 +38,8 @@ void SetUpConnectGraph(GraphType *graph, MatrixType *matrix, idxtype *workspace)
   values = matrix->values;
 
   perm = workspace;
-  marker = idxset(nrows, -1, workspace+nvtxs);
-  pcounts = idxset(nrows+1, 0, workspace+nvtxs+nrows);
+  marker = iset(nrows, -1, workspace+nvtxs);
+  pcounts = iset(nrows+1, 0, workspace+nvtxs+nrows);
 
   for (i=0; i<nvtxs; i++)
     pcounts[where[i]]++;
@@ -71,7 +71,7 @@ void SetUpConnectGraph(GraphType *graph, MatrixType *matrix, idxtype *workspace)
         }
       }
     }
-    values[rowptr[ii]] = (float)(k-rowptr[ii]-1);
+    values[rowptr[ii]] = (real_t)(k-rowptr[ii]-1);
     rowptr[ii+1] = k;
   }
   matrix->nnzs = rowptr[nrows];
@@ -84,26 +84,26 @@ void SetUpConnectGraph(GraphType *graph, MatrixType *matrix, idxtype *workspace)
 * This function computes movement statistics for adaptive refinement
 * schemes
 **************************************************************************/
-void Mc_ComputeMoveStatistics(CtrlType *ctrl, GraphType *graph, int *nmoved, int *maxin, int *maxout)
+void Mc_ComputeMoveStatistics(ctrl_t *ctrl, graph_t *graph, idx_t *nmoved, idx_t *maxin, idx_t *maxout)
 {
-  int i, nvtxs, nparts, myhome;
-  idxtype *vwgt, *where;
-  idxtype *lend, *gend, *lleft, *gleft, *lstart, *gstart;
+  idx_t i, nvtxs, nparts, myhome;
+  idx_t *vwgt, *where;
+  idx_t *lend, *gend, *lleft, *gleft, *lstart, *gstart;
 
   nvtxs = graph->nvtxs;
   vwgt = graph->vwgt;
   where = graph->where;
   nparts = ctrl->nparts;
 
-  lstart = idxsmalloc(nparts, 0, "ComputeMoveStatistics: lstart");
-  gstart = idxsmalloc(nparts, 0, "ComputeMoveStatistics: gstart");
-  lleft = idxsmalloc(nparts, 0, "ComputeMoveStatistics: lleft");
-  gleft = idxsmalloc(nparts, 0, "ComputeMoveStatistics: gleft");
-  lend = idxsmalloc(nparts, 0, "ComputeMoveStatistics: lend");
-  gend = idxsmalloc(nparts, 0, "ComputeMoveStatistics: gend");
+  lstart = ismalloc(nparts, 0, "ComputeMoveStatistics: lstart");
+  gstart = ismalloc(nparts, 0, "ComputeMoveStatistics: gstart");
+  lleft = ismalloc(nparts, 0, "ComputeMoveStatistics: lleft");
+  gleft = ismalloc(nparts, 0, "ComputeMoveStatistics: gleft");
+  lend = ismalloc(nparts, 0, "ComputeMoveStatistics: lend");
+  gend = ismalloc(nparts, 0, "ComputeMoveStatistics: gend");
 
   for (i=0; i<nvtxs; i++) {
-    myhome = (ctrl->ps_relation == COUPLED) ? ctrl->mype : graph->home[i];
+    myhome = (ctrl->ps_relation == PARMETIS_PSR_COUPLED) ? ctrl->mype : graph->home[i];
     lstart[myhome] += (graph->vsize == NULL) ? 1 : graph->vsize[i];
     lend[where[i]] += (graph->vsize == NULL) ? 1 : graph->vsize[i];
     if (where[i] != myhome)
@@ -112,26 +112,26 @@ void Mc_ComputeMoveStatistics(CtrlType *ctrl, GraphType *graph, int *nmoved, int
 
   /* PrintVector(ctrl, ctrl->npes, 0, lend, "Lend: "); */
 
-  MPI_Allreduce((void *)lstart, (void *)gstart, nparts, IDX_DATATYPE, MPI_SUM, ctrl->comm);
-  MPI_Allreduce((void *)lleft, (void *)gleft, nparts, IDX_DATATYPE, MPI_SUM, ctrl->comm);
-  MPI_Allreduce((void *)lend, (void *)gend, nparts, IDX_DATATYPE, MPI_SUM, ctrl->comm);
+  gkMPI_Allreduce((void *)lstart, (void *)gstart, nparts, IDX_T, MPI_SUM, ctrl->comm);
+  gkMPI_Allreduce((void *)lleft, (void *)gleft, nparts, IDX_T, MPI_SUM, ctrl->comm);
+  gkMPI_Allreduce((void *)lend, (void *)gend, nparts, IDX_T, MPI_SUM, ctrl->comm);
 
-  *nmoved = idxsum(nparts, gleft);
-  *maxout = gleft[idxamax(nparts, gleft)];
+  *nmoved = isum(nparts, gleft, 1);
+  *maxout = imax(nparts, gleft);
   for (i=0; i<nparts; i++)
     lstart[i] = gend[i]+gleft[i]-gstart[i];
-  *maxin = lstart[idxamax(nparts, lstart)];
+  *maxin = imax(nparts, lstart);
 
-  GKfree((void **)&lstart, (void **)&gstart, (void **)&lleft, (void **)&gleft, (void **)&lend, (void **)&gend, LTERM);
+  gk_free((void **)&lstart, (void **)&gstart, (void **)&lleft, (void **)&gleft, (void **)&lend, (void **)&gend, LTERM);
 }
 
 /*************************************************************************
 *  This function computes the TotalV of a serial graph.
 **************************************************************************/
-int Mc_ComputeSerialTotalV(GraphType *graph, idxtype *home)
+idx_t Mc_ComputeSerialTotalV(graph_t *graph, idx_t *home)
 {
-  int i;
-  int totalv = 0;
+  idx_t i;
+  idx_t totalv = 0;
 
   for (i=0; i<graph->nvtxs; i++) {
     if (graph->where[i] != home[i])
@@ -146,24 +146,24 @@ int Mc_ComputeSerialTotalV(GraphType *graph, idxtype *home)
 /*************************************************************************
 *  This function computes the load for each subdomain
 **************************************************************************/
-void ComputeLoad(GraphType *graph, int nparts, float *load, float *tpwgts, int index)
+void ComputeLoad(graph_t *graph, idx_t nparts, real_t *load, real_t *tpwgts, idx_t index)
 {
-  int i;
-  int nvtxs, ncon;
-  idxtype *where;
-  float *nvwgt;
+  idx_t i;
+  idx_t nvtxs, ncon;
+  idx_t *where;
+  real_t *nvwgt;
 
   nvtxs = graph->nvtxs;
   ncon = graph->ncon;
   where = graph->where;
   nvwgt = graph->nvwgt;
 
-  sset(nparts, 0.0, load);
+  rset(nparts, 0.0, load);
 
   for (i=0; i<nvtxs; i++)
     load[where[i]] += nvwgt[i*ncon+index];
 
-  ASSERTS(fabs(ssum(nparts, load)-1.0) < 0.001);
+  ASSERT(fabs(rsum(nparts, load, 1)-1.0) < 0.001);
 
   for (i=0; i<nparts; i++) {
     load[i] -= tpwgts[i*ncon+index];
@@ -176,13 +176,13 @@ void ComputeLoad(GraphType *graph, int nparts, float *load, float *tpwgts, int i
 /*************************************************************************
 * This function implements the CG solver used during the directed diffusion
 **************************************************************************/
-void ConjGrad2(MatrixType *A, float *b, float *x, float tol, float *workspace)
+void ConjGrad2(matrix_t *A, real_t *b, real_t *x, real_t tol, real_t *workspace)
 {
-  int i, k, n;
-  float *p, *r, *q, *z, *M;
-  float alpha, beta, rho, rho_1 = -1.0, error, bnrm2, tmp;
-  idxtype *rowptr, *colind;
-  float *values;
+  idx_t i, k, n;
+  real_t *p, *r, *q, *z, *M;
+  real_t alpha, beta, rho, rho_1 = -1.0, error, bnrm2, tmp;
+  idx_t *rowptr, *colind;
+  real_t *values;
 
   n = A->nrows;
   rowptr = A->rowptr;
@@ -209,9 +209,9 @@ void ConjGrad2(MatrixType *A, float *b, float *x, float tol, float *workspace)
   for (i=0; i<n; i++)
     r[i] = b[i]-r[i];
 
-  bnrm2 = snorm2(n, b);
+  bnrm2 = rnorm2(n, b, 1);
   if (bnrm2 > 0.0) {
-    error = snorm2(n, r) / bnrm2;
+    error = rnorm2(n, r, 1) / bnrm2;
 
     if (error > tol) {
       /* Begin Iterations */
@@ -219,10 +219,10 @@ void ConjGrad2(MatrixType *A, float *b, float *x, float tol, float *workspace)
         for (i=0; i<n; i++)
           z[i] = r[i]*M[i];
 
-        rho = sdot(n, r, z);
+        rho = rdot(n, r, 1, z, 1);
 
         if (k == 0)
-          scopy(n, z, p);
+          rcopy(n, z, p);
         else {
           if (rho_1 != 0.0)
             beta = rho/rho_1;
@@ -234,14 +234,14 @@ void ConjGrad2(MatrixType *A, float *b, float *x, float tol, float *workspace)
 
         mvMult2(A, p, q); /* q = A*p */
 
-        tmp = sdot(n, p, q);
+        tmp = rdot(n, p, 1, q, 1);
         if (tmp != 0.0)
           alpha = rho/tmp;
         else
           alpha = 0.0;
-        saxpy(n, alpha, p, x);    /* x = x + alpha*p */
-        saxpy(n, -alpha, q, r);   /* r = r - alpha*q */
-        error = snorm2(n, r) / bnrm2;
+        raxpy(n,  alpha, p, 1, x, 1);   /* x = x + alpha*p */
+        raxpy(n, -alpha, q, 1, r, 1);   /* r = r - alpha*q */
+        error = rnorm2(n, r, 1) / bnrm2;
         if (error < tol)
           break;
 
@@ -255,9 +255,9 @@ void ConjGrad2(MatrixType *A, float *b, float *x, float tol, float *workspace)
 /*************************************************************************
 * This function performs Matrix-Vector multiplication
 **************************************************************************/
-void mvMult2(MatrixType *A, float *v, float *w)
+void mvMult2(matrix_t *A, real_t *v, real_t *w)
 {
-  int i, j;
+  idx_t i, j;
 
   for (i = 0; i < A->nrows; i++)
     w[i] = 0.0;
@@ -273,12 +273,12 @@ void mvMult2(MatrixType *A, float *v, float *w)
 /*************************************************************************
 * This function sets up the transfer vectors
 **************************************************************************/
-void ComputeTransferVector(int ncon, MatrixType *matrix, float *solution,
-  float *transfer, int index)
+void ComputeTransferVector(idx_t ncon, matrix_t *matrix, real_t *solution,
+  real_t *transfer, idx_t index)
 {
-  int j, k;
-  int nrows;
-  idxtype *rowptr, *colind;
+  idx_t j, k;
+  idx_t nrows;
+  idx_t *rowptr, *colind;
 
   nrows = matrix->nrows;
   rowptr = matrix->rowptr;

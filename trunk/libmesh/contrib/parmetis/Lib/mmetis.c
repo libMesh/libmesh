@@ -12,7 +12,7 @@
  *
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
 
 
 /***********************************************************************************
@@ -20,76 +20,69 @@
 * This function assumes nothing about the mesh distribution.
 * It is the general case.
 ************************************************************************************/
-void ParMETIS_V3_PartMeshKway(idxtype *elmdist, idxtype *eptr, idxtype *eind, idxtype *elmwgt, 
-                 int *wgtflag, int *numflag, int *ncon, int *ncommonnodes, int *nparts, 
-		 float *tpwgts, float *ubvec, int *options, int *edgecut, idxtype *part, 
-		 MPI_Comm *comm)
+int ParMETIS_V3_PartMeshKway(idx_t *elmdist, idx_t *eptr, idx_t *eind, idx_t *elmwgt, 
+        idx_t *wgtflag, idx_t *numflag, idx_t *ncon, idx_t *ncommon, idx_t *nparts, 
+	real_t *tpwgts, real_t *ubvec, idx_t *options, idx_t *edgecut, idx_t *part, 
+	MPI_Comm *comm)
 {
-  int i, nvtxs, nedges, gnedges, npes, mype;
-  idxtype *xadj, *adjncy;
-  timer TotalTmr, Mesh2DualTmr, ParMETISTmr;
-  CtrlType ctrl;
+  idx_t i, status, nvtxs, nedges, gnedges, npes, mype;
+  idx_t *xadj, *adjncy;
+  ctrl_t *ctrl;
+  size_t curmem;
 
-  /********************************/
-  /* Try and take care bad inputs */
-  /********************************/
-  if (elmdist == NULL || eptr == NULL || eind == NULL || wgtflag == NULL || 
-      numflag == NULL || ncon == NULL || ncommonnodes == NULL || nparts == NULL ||
-      tpwgts == NULL || ubvec == NULL || options == NULL || edgecut == NULL || 
-      part == NULL || comm == NULL) {
-    printf("ERROR: One or more required parameters is NULL. Aborting.\n");
-    abort();
-  }
-  if (((*wgtflag)&2) && elmwgt == NULL) {
-    printf("ERROR: elmwgt == NULL when vertex weights were specified. Aborting.\n");
-    abort();
-  }
+  /* Check the input parameters and return if an error */
+  status = CheckInputsPartMeshKway(elmdist, eptr, eind, elmwgt, wgtflag, numflag,
+               ncon, ncommon, nparts, tpwgts, ubvec, options, edgecut, part, comm);
+  if (GlobalSEMinComm(*comm, status) == 0)
+    return METIS_ERROR;
 
-  
-  SetUpCtrl(&ctrl, *nparts, (options[0] == 1 ? options[PMV3_OPTION_DBGLVL] : 0), *comm);
-  npes = ctrl.npes;
-  mype = ctrl.mype;
+  status = METIS_OK;
+  gk_malloc_init();
+  curmem = gk_GetCurMemoryUsed();
 
-  cleartimer(TotalTmr);
-  cleartimer(Mesh2DualTmr);
-  cleartimer(ParMETISTmr);
+  /* Setup the ctrl */
+  ctrl = SetupCtrl(PARMETIS_OP_MKMETIS, NULL, 1, 1, NULL, NULL, *comm);
+  npes = ctrl->npes;
+  mype = ctrl->mype;
 
-  MPI_Barrier(ctrl.comm);
-  starttimer(TotalTmr);
-  starttimer(Mesh2DualTmr);
 
-  ParMETIS_V3_Mesh2Dual(elmdist, eptr, eind, numflag, ncommonnodes, &xadj, &adjncy, &(ctrl.comm));
+  /* Create the dual graph */
+  STARTTIMER(ctrl, ctrl->MoveTmr);
 
-  if (ctrl.dbglvl&DBG_INFO) {
+  ParMETIS_V3_Mesh2Dual(elmdist, eptr, eind, numflag, ncommon, &xadj, &adjncy, 
+      &(ctrl->comm));
+
+  if (ctrl->dbglvl&DBG_INFO) {
     nvtxs = elmdist[mype+1]-elmdist[mype];
     nedges = xadj[nvtxs] + (*numflag == 0 ? 0 : -1);
-    rprintf(&ctrl, "Completed Dual Graph -- Nvtxs: %d, Nedges: %d \n", 
-            elmdist[npes], GlobalSESum(&ctrl, nedges));
+    rprintf(ctrl, "Completed Dual Graph -- Nvtxs: %"PRIDX", Nedges: %"PRIDX" \n", 
+            elmdist[npes], GlobalSESum(ctrl, nedges));
   }
 
-  MPI_Barrier(ctrl.comm);
-  stoptimer(Mesh2DualTmr);
+  STOPTIMER(ctrl, ctrl->MoveTmr);
 
 
-  /***********************/
-  /* Partition the graph */
-  /***********************/
-  starttimer(ParMETISTmr);
+  /* Partition the dual graph */
+  STARTTIMER(ctrl, ctrl->TotalTmr);
 
-  ParMETIS_V3_PartKway(elmdist, xadj, adjncy, elmwgt, NULL, wgtflag, numflag, ncon, 
-                       nparts, tpwgts, ubvec, options, edgecut, part, &(ctrl.comm));
+  status = ParMETIS_V3_PartKway(elmdist, xadj, adjncy, elmwgt, NULL, wgtflag, 
+               numflag, ncon, nparts, tpwgts, ubvec, options, edgecut, part, 
+               &(ctrl->comm));
 
-  MPI_Barrier(ctrl.comm);
-  stoptimer(ParMETISTmr);
-  stoptimer(TotalTmr);
+  STOPTIMER(ctrl, ctrl->TotalTmr);
 
-  IFSET(ctrl.dbglvl, DBG_TIME, PrintTimer(&ctrl, Mesh2DualTmr,	"   Mesh2Dual"));
-  IFSET(ctrl.dbglvl, DBG_TIME, PrintTimer(&ctrl, ParMETISTmr,	"    ParMETIS"));
-  IFSET(ctrl.dbglvl, DBG_TIME, PrintTimer(&ctrl, TotalTmr,	"       Total"));
+  IFSET(ctrl->dbglvl, DBG_TIME, PrintTimer(ctrl, ctrl->MoveTmr,	 "   Mesh2Dual"));
+  IFSET(ctrl->dbglvl, DBG_TIME, PrintTimer(ctrl, ctrl->TotalTmr, "    ParMETIS"));
 
-  GKfree((void **)&xadj, (void **)&adjncy, LTERM);
+  METIS_Free(xadj);
+  METIS_Free(adjncy);
 
   FreeCtrl(&ctrl);
+  if (gk_GetCurMemoryUsed() - curmem > 0) {
+    printf("ParMETIS appears to have a memory leak of %zdbytes. Report this.\n",
+        (ssize_t)(gk_GetCurMemoryUsed() - curmem));
+  }
+  gk_malloc_cleanup(0);
 
-  return;
+  return (int)status;
 }

@@ -8,38 +8,50 @@
  * Started 8/19/97
  * George
  *
- * $Id$
- *
  */
 
-#include "metis.h"
+#include "metislib.h"
 
 
-/*************************************************************************
-* This function changes the numbering to start from 0 instead of 1
-**************************************************************************/
-void Change2CNumbering(int nvtxs, idxtype *xadj, idxtype *adjncy)
+/*************************************************************************/
+/*! This function changes the numbering to start from 0 instead of 1 */
+/*************************************************************************/
+void Change2CNumbering(idx_t nvtxs, idx_t *xadj, idx_t *adjncy)
 {
-  int i, nedges;
+  idx_t i;
 
   for (i=0; i<=nvtxs; i++)
     xadj[i]--;
 
-  nedges = xadj[nvtxs];
-  for (i=0; i<nedges; i++)
+  for (i=0; i<xadj[nvtxs]; i++)
     adjncy[i]--;
 }
 
-/*************************************************************************
-* This function changes the numbering to start from 1 instead of 0
-**************************************************************************/
-void Change2FNumbering(int nvtxs, idxtype *xadj, idxtype *adjncy, idxtype *vector)
+
+/*************************************************************************/
+/*! This function changes the numbering to start from 1 instead of 0 */
+/*************************************************************************/
+void Change2FNumbering(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, idx_t *vector)
 {
-  int i, nedges;
+  idx_t i;
 
   for (i=0; i<nvtxs; i++)
     vector[i]++;
 
+  for (i=0; i<xadj[nvtxs]; i++)
+    adjncy[i]++;
+
+  for (i=0; i<=nvtxs; i++)
+    xadj[i]++;
+}
+
+/*************************************************************************/
+/*! This function changes the numbering to start from 1 instead of 0 */
+/*************************************************************************/
+void Change2FNumbering2(idx_t nvtxs, idx_t *xadj, idx_t *adjncy)
+{
+  idx_t i, nedges;
+
   nedges = xadj[nvtxs];
   for (i=0; i<nedges; i++)
     adjncy[i]++;
@@ -48,29 +60,15 @@ void Change2FNumbering(int nvtxs, idxtype *xadj, idxtype *adjncy, idxtype *vecto
     xadj[i]++;
 }
 
-/*************************************************************************
-* This function changes the numbering to start from 1 instead of 0
-**************************************************************************/
-void Change2FNumbering2(int nvtxs, idxtype *xadj, idxtype *adjncy)
+
+
+/*************************************************************************/
+/*! This function changes the numbering to start from 1 instead of 0 */
+/*************************************************************************/
+void Change2FNumberingOrder(idx_t nvtxs, idx_t *xadj, idx_t *adjncy, 
+         idx_t *v1, idx_t *v2)
 {
-  int i, nedges;
-
-  nedges = xadj[nvtxs];
-  for (i=0; i<nedges; i++)
-    adjncy[i]++;
-
-  for (i=0; i<=nvtxs; i++)
-    xadj[i]++;
-}
-
-
-
-/*************************************************************************
-* This function changes the numbering to start from 1 instead of 0
-**************************************************************************/
-void Change2FNumberingOrder(int nvtxs, idxtype *xadj, idxtype *adjncy, idxtype *v1, idxtype *v2)
-{
-  int i, nedges;
+  idx_t i, nedges;
 
   for (i=0; i<nvtxs; i++) {
     v1[i]++;
@@ -88,54 +86,57 @@ void Change2FNumberingOrder(int nvtxs, idxtype *xadj, idxtype *adjncy, idxtype *
 
 
 
-/*************************************************************************
-* This function changes the numbering to start from 0 instead of 1
-**************************************************************************/
-void ChangeMesh2CNumbering(int n, idxtype *mesh)
+/*************************************************************************/
+/*! This function changes the numbering to start from 0 instead of 1 */
+/*************************************************************************/
+void ChangeMesh2CNumbering(idx_t n, idx_t *ptr, idx_t *ind)
 {
-  int i;
+  idx_t i;
 
-  for (i=0; i<n; i++)
-    mesh[i]--;
-
+  for (i=0; i<=n; i++)
+    ptr[i]--;
+  for (i=0; i<ptr[n]; i++)
+    ind[i]--;
 }
 
 
-/*************************************************************************
-* This function changes the numbering to start from 1 instead of 0
-**************************************************************************/
-void ChangeMesh2FNumbering(int n, idxtype *mesh, int nvtxs, idxtype *xadj, idxtype *adjncy)
+/*************************************************************************/
+/*! This function changes the numbering to start from 1 instead of 0 */
+/*************************************************************************/
+void ChangeMesh2FNumbering(idx_t n, idx_t *ptr, idx_t *ind, idx_t nvtxs, 
+         idx_t *xadj, idx_t *adjncy)
 {
-  int i, nedges;
+  idx_t i;
 
-  for (i=0; i<n; i++)
-    mesh[i]++;
+  for (i=0; i<ptr[n]; i++)
+    ind[i]++;
+  for (i=0; i<=n; i++)
+    ptr[i]++;
 
-  nedges = xadj[nvtxs];
-  for (i=0; i<nedges; i++)
+  for (i=0; i<xadj[nvtxs]; i++)
     adjncy[i]++;
-
   for (i=0; i<=nvtxs; i++)
     xadj[i]++;
-
 }
 
 
-/*************************************************************************
-* This function changes the numbering to start from 1 instead of 0
-**************************************************************************/
-void ChangeMesh2FNumbering2(int n, idxtype *mesh, int ne, int nn, idxtype *epart, idxtype *npart)
+/*************************************************************************/
+/*! This function changes the numbering to start from 1 instead of 0 */
+/*************************************************************************/
+void ChangeMesh2FNumbering2(idx_t ne, idx_t nn, idx_t *ptr, idx_t *ind, 
+         idx_t *epart, idx_t *npart)
 {
-  int i, nedges;
+  idx_t i;
 
-  for (i=0; i<n; i++)
-    mesh[i]++;
+  for (i=0; i<ptr[ne]; i++)
+    ind[i]++;
+  for (i=0; i<=ne; i++)
+    ptr[i]++;
 
   for (i=0; i<ne; i++)
     epart[i]++;
 
   for (i=0; i<nn; i++)
     npart[i]++;
-
 }
 

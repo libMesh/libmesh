@@ -12,48 +12,45 @@
  *
  */
 
-#include "parmetislib.h"
-
-
+#include <parmetislib.h>
 
 
 /*************************************************************************
 * This function finds a matching using the HEM heuristic
 **************************************************************************/
-void CSR_Match_SHEM(MatrixType *matrix, idxtype *match, idxtype *mlist,
-     idxtype *skip, int ncon)
+void CSR_Match_SHEM(matrix_t *matrix, idx_t *match, idx_t *mlist,
+          idx_t *skip, idx_t ncon)
 {
-  int h, i, ii, j;
-  int nrows, edge, maxidx, count;
-  float maxwgt;
-  idxtype *rowptr, *colind;
-  float *transfer;
-  KVType *links;
+  idx_t h, i, ii, j;
+  idx_t nrows, edge, maxidx, count;
+  real_t maxwgt;
+  idx_t *rowptr, *colind;
+  real_t *transfer;
+  rkv_t *links;
 
-  nrows = matrix->nrows;
-  rowptr = matrix->rowptr;
-  colind = matrix->colind;
+  nrows    = matrix->nrows;
+  rowptr   = matrix->rowptr;
+  colind   = matrix->colind;
   transfer = matrix->transfer;
 
-  idxset(nrows, UNMATCHED, match);
+  iset(nrows, UNMATCHED, match);
 
-  links = (KVType *)GKmalloc(sizeof(KVType)*nrows, "links");
-  for (i=0; i<nrows; i++) { 
-    links[i].key = i; 
-    links[i].val = 0.0;
+  links = rkvmalloc(nrows, "links");
+  for (i=0; i<nrows; i++) {
+    links[i].key = 0.0;
+    links[i].val = i;
+    for (j=rowptr[i]; j<rowptr[i+1]; j++) {
+      for (h=0; h<ncon; h++) {
+        if (links[i].key < fabs(transfer[j*ncon+h]))
+          links[i].key = fabs(transfer[j*ncon+h]);
+      }
+    }
   }
 
-  for (i=0; i<nrows; i++)
-    for (j=rowptr[i]; j<rowptr[i+1]; j++) 
-      for (h=0; h<ncon; h++)
-        if (links[i].val < fabs(transfer[j*ncon+h]))
-          links[i].val = fabs(transfer[j*ncon+h]);
+  rkvsortd(nrows, links);
 
-  qsort(links, nrows, sizeof(KVType), myvalkeycompare);
-
-  count = 0;
-  for (ii=0; ii<nrows; ii++) {
-    i = links[ii].key;
+  for (count=0, ii=0; ii<nrows; ii++) {
+    i = links[ii].val;
 
     if (match[i] == UNMATCHED) {
       maxidx = i;
@@ -77,12 +74,12 @@ void CSR_Match_SHEM(MatrixType *matrix, idxtype *match, idxtype *mlist,
       if (maxidx != i) {
         match[i] = maxidx;
         match[maxidx] = i;
-        mlist[count++] = amax(i, maxidx);
-        mlist[count++] = amin(i, maxidx);
+        mlist[count++] = gk_max(i, maxidx);
+        mlist[count++] = gk_min(i, maxidx);
       }
     }
   }
 
-  GKfree((void **)&links, LTERM);
+  gk_free((void **)&links, LTERM);
 }
 

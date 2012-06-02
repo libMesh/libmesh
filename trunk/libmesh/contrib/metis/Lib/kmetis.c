@@ -1,129 +1,243 @@
-/*
- * Copyright 1997, Regents of the University of Minnesota
- *
- * kmetis.c
- *
- * This file contains the top level routines for the multilevel k-way partitioning
- * algorithm KMETIS.
- *
- * Started 7/28/97
- * George
- *
- * $Id$
- *
- */
+/*!
+\file  
+\brief The top-level routines for  multilevel k-way partitioning that minimizes
+       the edge cut.
 
-#include "metis.h"
+\date   Started 7/28/1997
+\author George  
+\author Copyright 1997-2011, Regents of the University of Minnesota 
+\version\verbatim $Id$ \endverbatim
+*/
+
+#include "metislib.h"
 
 
-/*************************************************************************
-* This function is the entry point for KMETIS
-**************************************************************************/
-void METIS_PartGraphKway(int *nvtxs, idxtype *xadj, idxtype *adjncy, idxtype *vwgt, 
-                         idxtype *adjwgt, int *wgtflag, int *numflag, int *nparts, 
-                         int *options, int *edgecut, idxtype *part)
+/*************************************************************************/
+/*! This function is the entry point for MCKMETIS */
+/*************************************************************************/
+int METIS_PartGraphKway(idx_t *nvtxs, idx_t *ncon, idx_t *xadj, idx_t *adjncy, 
+          idx_t *vwgt, idx_t *vsize, idx_t *adjwgt, idx_t *nparts, 
+          real_t *tpwgts, real_t *ubvec, idx_t *options, idx_t *objval, 
+          idx_t *part)
 {
-  int i;
-  float *tpwgts;
+  int sigrval=0, renumber=0;
+  graph_t *graph;
+  ctrl_t *ctrl;
 
-  tpwgts = fmalloc(*nparts, "KMETIS: tpwgts");
-  for (i=0; i<*nparts; i++) 
-    tpwgts[i] = 1.0/(1.0*(*nparts));
+  /* set up malloc cleaning code and signal catchers */
+  if (!gk_malloc_init()) 
+    return METIS_ERROR_MEMORY;
 
-  METIS_WPartGraphKway(nvtxs, xadj, adjncy, vwgt, adjwgt, wgtflag, numflag, nparts, 
-                       tpwgts, options, edgecut, part);
+  gk_sigtrap();
 
-  free(tpwgts);
-}
+  if ((sigrval = gk_sigcatch()) != 0)
+    goto SIGTHROW;
 
 
-/*************************************************************************
-* This function is the entry point for KWMETIS
-**************************************************************************/
-void METIS_WPartGraphKway(int *nvtxs, idxtype *xadj, idxtype *adjncy, idxtype *vwgt, 
-                          idxtype *adjwgt, int *wgtflag, int *numflag, int *nparts, 
-                          float *tpwgts, int *options, int *edgecut, idxtype *part)
-{
-  int i, j;
-  GraphType graph;
-  CtrlType ctrl;
+  /* set up the run parameters */
+  ctrl = SetupCtrl(METIS_OP_KMETIS, options, *ncon, *nparts, tpwgts, ubvec);
+  if (!ctrl) {
+    gk_siguntrap();
+    return METIS_ERROR_INPUT;
+  }
 
-  if (*numflag == 1)
+  /* if required, change the numbering to 0 */
+  if (ctrl->numflag == 1) {
     Change2CNumbering(*nvtxs, xadj, adjncy);
-
-  SetUpGraph(&graph, OP_KMETIS, *nvtxs, 1, xadj, adjncy, vwgt, adjwgt, *wgtflag);
-
-  if (options[0] == 0) {  /* Use the default parameters */
-    ctrl.CType = KMETIS_CTYPE;
-    ctrl.IType = KMETIS_ITYPE;
-    ctrl.RType = KMETIS_RTYPE;
-    ctrl.dbglvl = KMETIS_DBGLVL;
+    renumber = 1;
   }
-  else {
-    ctrl.CType = options[OPTION_CTYPE];
-    ctrl.IType = options[OPTION_ITYPE];
-    ctrl.RType = options[OPTION_RTYPE];
-    ctrl.dbglvl = options[OPTION_DBGLVL];
-  }
-  ctrl.optype = OP_KMETIS;
-  ctrl.CoarsenTo = amax((*nvtxs)/(40*log2Int(*nparts)), 20*(*nparts));
-  ctrl.maxvwgt = 1.5*((graph.vwgt ? idxsum(*nvtxs, graph.vwgt) : (*nvtxs))/ctrl.CoarsenTo);
 
-  InitRandom(-1);
+  /* set up the graph */
+  graph = SetupGraph(ctrl, *nvtxs, *ncon, xadj, adjncy, vwgt, vsize, adjwgt);
 
-  AllocateWorkSpace(&ctrl, &graph, *nparts);
+  /* set up multipliers for making balance computations easier */
+  SetupKWayBalMultipliers(ctrl, graph);
 
-  IFSET(ctrl.dbglvl, DBG_TIME, InitTimers(&ctrl));
-  IFSET(ctrl.dbglvl, DBG_TIME, starttimer(ctrl.TotalTmr));
+  /* set various run parameters that depend on the graph */
+  ctrl->CoarsenTo = gk_max((*nvtxs)/(20*gk_log2(*nparts)), 30*(*nparts));
+  ctrl->nIparts   = (ctrl->CoarsenTo == 30*(*nparts) ? 4 : 5);
 
-  *edgecut = MlevelKWayPartitioning(&ctrl, &graph, *nparts, part, tpwgts, 1.03);
+  /* take care contiguity requests for disconnected graphs */
+  if (ctrl->contig && !IsConnected(graph, 0)) 
+    gk_errexit(SIGERR, "METIS Error: A contiguous partition is requested for a non-contiguous input graph.\n");
+    
+  /* allocate workspace memory */  
+  AllocateWorkSpace(ctrl, graph);
 
-  IFSET(ctrl.dbglvl, DBG_TIME, stoptimer(ctrl.TotalTmr));
-  IFSET(ctrl.dbglvl, DBG_TIME, PrintTimers(&ctrl));
+  /* start the partitioning */
+  IFSET(ctrl->dbglvl, METIS_DBG_TIME, InitTimers(ctrl));
+  IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_startcputimer(ctrl->TotalTmr));
 
-  FreeWorkSpace(&ctrl, &graph);
+  *objval = MlevelKWayPartitioning(ctrl, graph, part);
 
-  if (*numflag == 1)
+  IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_stopcputimer(ctrl->TotalTmr));
+  IFSET(ctrl->dbglvl, METIS_DBG_TIME, PrintTimers(ctrl));
+
+  /* clean up */
+  FreeCtrl(&ctrl);
+
+SIGTHROW:
+  /* if required, change the numbering back to 1 */
+  if (renumber)
     Change2FNumbering(*nvtxs, xadj, adjncy, part);
+
+  gk_siguntrap();
+  gk_malloc_cleanup(0);
+
+  return metis_rcode(sigrval);
 }
 
 
-/*************************************************************************
-* This function takes a graph and produces a bisection of it
-**************************************************************************/
-int MlevelKWayPartitioning(CtrlType *ctrl, GraphType *graph, int nparts, idxtype *part, float *tpwgts, float ubfactor)
+/*************************************************************************/
+/*! This function computes a k-way partitioning of a graph that minimizes
+    the specified objective function.
+
+    \param ctrl is the control structure
+    \param graph is the graph to be partitioned
+    \param part is the vector that on return will store the partitioning
+
+    \returns the objective value of the partitoning. The partitioning 
+             itself is stored in the part vector.
+*/
+/*************************************************************************/
+idx_t MlevelKWayPartitioning(ctrl_t *ctrl, graph_t *graph, idx_t *part)
 {
-  int i, j, nvtxs, tvwgt, tpwgts2[2];
-  GraphType *cgraph;
-  int wgtflag=3, numflag=0, options[10], edgecut;
+  idx_t i, j, objval=0, curobj=0, bestobj=0;
+  real_t curbal=0.0, bestbal=0.0;
+  graph_t *cgraph;
+  int status;
 
-  cgraph = Coarsen2Way(ctrl, graph);
 
-  IFSET(ctrl->dbglvl, DBG_TIME, starttimer(ctrl->InitPartTmr));
-  AllocateKWayPartitionMemory(ctrl, cgraph, nparts);
+  for (i=0; i<ctrl->ncuts; i++) {
+    cgraph = CoarsenGraph(ctrl, graph);
 
-  options[0] = 1; 
-  options[OPTION_CTYPE] = MATCH_SHEMKWAY;
-  options[OPTION_ITYPE] = IPART_GGPKL;
-  options[OPTION_RTYPE] = RTYPE_FM;
-  options[OPTION_DBGLVL] = 0;
+    IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_startcputimer(ctrl->InitPartTmr));
+    AllocateKWayPartitionMemory(ctrl, cgraph);
 
-  METIS_WPartGraphRecursive(&cgraph->nvtxs, cgraph->xadj, cgraph->adjncy, cgraph->vwgt, 
-                            cgraph->adjwgt, &wgtflag, &numflag, &nparts, tpwgts, options, 
-                            &edgecut, cgraph->where);
+    /* Release the work space */
+    FreeWorkSpace(ctrl);
 
-  IFSET(ctrl->dbglvl, DBG_TIME, stoptimer(ctrl->InitPartTmr));
-  IFSET(ctrl->dbglvl, DBG_IPART, printf("Initial %d-way partitioning cut: %d\n", nparts, edgecut));
+    /* Compute the initial partitioning */
+    InitKWayPartitioning(ctrl, cgraph);
 
-  IFSET(ctrl->dbglvl, DBG_KWAYPINFO, ComputePartitionInfo(cgraph, nparts, cgraph->where));
+    /* Re-allocate the work space */
+    AllocateWorkSpace(ctrl, graph);
+    AllocateRefinementWorkSpace(ctrl, 2*cgraph->nedges);
 
-  RefineKWay(ctrl, graph, cgraph, nparts, tpwgts, ubfactor);
+    IFSET(ctrl->dbglvl, METIS_DBG_TIME, gk_stopcputimer(ctrl->InitPartTmr));
+    IFSET(ctrl->dbglvl, METIS_DBG_IPART, 
+        printf("Initial %"PRIDX"-way partitioning cut: %"PRIDX"\n", ctrl->nparts, objval));
 
-  idxcopy(graph->nvtxs, graph->where, part);
+    RefineKWay(ctrl, graph, cgraph);
 
-  GKfree(&graph->gdata, &graph->rdata, LTERM);
+    switch (ctrl->objtype) {
+      case METIS_OBJTYPE_CUT:
+        curobj = graph->mincut;
+        break;
 
-  return graph->mincut;
+      case METIS_OBJTYPE_VOL:
+        curobj = graph->minvol;
+        break;
+
+      default:
+        gk_errexit(SIGERR, "Unknown objtype: %d\n", ctrl->objtype);
+    }
+
+    curbal = ComputeLoadImbalanceDiff(graph, ctrl->nparts, ctrl->pijbm, ctrl->ubfactors);
+
+    if (i == 0 
+        || (curbal <= 0.0005 && bestobj > curobj)
+        || (bestbal > 0.0005 && curbal < bestbal)) {
+      icopy(graph->nvtxs, graph->where, part);
+      bestobj = curobj;
+      bestbal = curbal;
+    }
+
+    FreeRData(graph);
+
+    if (bestobj == 0)
+      break;
+  }
+
+  FreeGraph(&graph);
+
+  return bestobj;
+}
+
+
+
+/*************************************************************************/
+/*! This function computes the initial k-way partitioning using PMETIS 
+*/
+/*************************************************************************/
+void InitKWayPartitioning(ctrl_t *ctrl, graph_t *graph)
+{
+  idx_t i, ntrials, options[METIS_NOPTIONS], curobj=0, bestobj=0;
+  idx_t *bestwhere=NULL;
+  real_t *ubvec=NULL;
+  int status;
+
+  METIS_SetDefaultOptions(options);
+  options[METIS_OPTION_NITER]   = 10;
+  options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;
+
+
+  ubvec = rmalloc(graph->ncon, "InitKWayPartitioning: ubvec");
+  for (i=0; i<graph->ncon; i++) 
+    ubvec[i] = (real_t)pow(ctrl->ubfactors[i], 1.0/log(ctrl->nparts));
+
+
+  switch (ctrl->objtype) {
+    case METIS_OBJTYPE_CUT:
+    case METIS_OBJTYPE_VOL:
+      options[METIS_OPTION_NCUTS] = ctrl->nIparts;
+      status = METIS_PartGraphRecursive(&graph->nvtxs, &graph->ncon, 
+                   graph->xadj, graph->adjncy, graph->vwgt, graph->vsize, 
+                   graph->adjwgt, &ctrl->nparts, ctrl->tpwgts, ubvec, 
+                   options, &curobj, graph->where);
+
+      if (status != METIS_OK)
+        gk_errexit(SIGERR, "Failed during initial partitioning\n");
+
+      break;
+
+#ifdef XXX /* This does not seem to help */
+    case METIS_OBJTYPE_VOL:
+      bestwhere = imalloc(graph->nvtxs, "InitKWayPartitioning: bestwhere");
+      options[METIS_OPTION_NCUTS] = 2;
+
+      ntrials = (ctrl->nIparts+1)/2;
+      for (i=0; i<ntrials; i++) {
+        status = METIS_PartGraphRecursive(&graph->nvtxs, &graph->ncon, 
+                     graph->xadj, graph->adjncy, graph->vwgt, graph->vsize, 
+                     graph->adjwgt, &ctrl->nparts, ctrl->tpwgts, ubvec, 
+                     options, &curobj, graph->where);
+        if (status != METIS_OK)
+          gk_errexit(SIGERR, "Failed during initial partitioning\n");
+
+        curobj = ComputeVolume(graph, graph->where);
+
+        if (i == 0 || bestobj > curobj) {
+          bestobj = curobj;
+          if (i < ntrials-1)
+            icopy(graph->nvtxs, graph->where, bestwhere);
+        }
+
+        if (bestobj == 0)
+          break;
+      }
+      if (bestobj != curobj)
+        icopy(graph->nvtxs, bestwhere, graph->where);
+
+      break;
+#endif
+
+    default:
+      gk_errexit(SIGERR, "Unknown objtype: %d\n", ctrl->objtype);
+  }
+
+  gk_free((void **)&ubvec, &bestwhere, LTERM);
 
 }
+
 
