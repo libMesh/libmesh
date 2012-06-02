@@ -11180,8 +11180,8 @@ fi
 
 
       if (test $enablemetis = yes); then
-     METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/Lib"
-     METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext)"
+     METIS_INCLUDE="-I\$(top_srcdir)/contrib/metis/include"
+     METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext) \$(EXTERNAL_LIBDIR)/libGK\$(libext)"
 
 $as_echo "#define HAVE_METIS 1" >>confdefs.h
 
@@ -11227,7 +11227,7 @@ fi
 
 
       if (test $enableparmetis = yes); then
-     PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/Lib"
+     PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
      PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
 
 $as_echo "#define HAVE_PARMETIS 1" >>confdefs.h
