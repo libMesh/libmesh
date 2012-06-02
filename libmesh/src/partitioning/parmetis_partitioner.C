@@ -241,7 +241,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
   // Initialize data structures for ParMETIS
   _vtxdist.resize (libMesh::n_processors()+1); std::fill (_vtxdist.begin(), _vtxdist.end(), 0);
   _tpwgts.resize  (_nparts);                   std::fill (_tpwgts.begin(),  _tpwgts.end(),  1./_nparts);
-  _ubvec.resize   (_ncon);                     std::fill (_ubvec.begin(),   _ubvec.end(),   1.);
+  _ubvec.resize   (_ncon);                     std::fill (_ubvec.begin(),   _ubvec.end(),   1.05);
   _part.resize    (n_active_local_elem);       std::fill (_part.begin(),    _part.end(), 0);
   _options.resize (5);
   _vwgt.resize    (n_active_local_elem);
