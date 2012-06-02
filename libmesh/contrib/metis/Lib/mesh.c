@@ -13,387 +13,369 @@
  *
  */
 
-#include "metis.h"
+#include "metislib.h"
 
-/*****************************************************************************
-* This function creates a graph corresponding to the dual of a finite element
-* mesh. At this point the supported elements are triangles, tetrahedrons, and
-* bricks.
-******************************************************************************/
-void METIS_MeshToDual(int *ne, int *nn, idxtype *elmnts, int *etype, int *numflag, 
-                      idxtype *dxadj, idxtype *dadjncy)
+
+/*****************************************************************************/
+/*! This function creates a graph corresponding to the dual of a finite element
+    mesh. 
+
+    \param ne is the number of elements in the mesh.
+    \param nn is the number of nodes in the mesh.
+    \param eptr is an array of size ne+1 used to mark the start and end 
+           locations in the nind array.
+    \param eind is an array that stores for each element the set of node IDs 
+           (indices) that it is made off. The length of this array is equal
+           to the total number of nodes over all the mesh elements.
+    \param ncommon is the minimum number of nodes that two elements must share
+           in order to be connected via an edge in the dual graph.
+    \param numflag is either 0 or 1 indicating if the numbering of the nodes
+           starts from 0 or 1, respectively. The same numbering is used for the
+           returned graph as well.
+    \param r_xadj indicates where the adjacency list of each vertex is stored 
+           in r_adjncy. The memory for this array is allocated by this routine. 
+           It can be freed by calling METIS_free().
+    \param r_adjncy stores the adjacency list of each vertex in the generated 
+           dual graph. The memory for this array is allocated by this routine. 
+           It can be freed by calling METIS_free().
+
+*/
+/*****************************************************************************/
+int METIS_MeshToDual(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind, 
+          idx_t *ncommon, idx_t *numflag,  idx_t **r_xadj, idx_t **r_adjncy)
 {
-  int esizes[] = {-1, 3, 4, 8, 4};
+  int sigrval=0, renumber=0;
 
-  if (*numflag == 1)
-    ChangeMesh2CNumbering((*ne)*esizes[*etype], elmnts);
+  /* set up malloc cleaning code and signal catchers */
+  if (!gk_malloc_init()) 
+    return METIS_ERROR_MEMORY;
 
-  GENDUALMETIS(*ne, *nn, *etype, elmnts, dxadj, dadjncy);
+  gk_sigtrap();
 
-  if (*numflag == 1)
-    ChangeMesh2FNumbering((*ne)*esizes[*etype], elmnts, *ne, dxadj, dadjncy);
-}
+  if ((sigrval = gk_sigcatch()) != 0) 
+    goto SIGTHROW;
 
 
-/*****************************************************************************
-* This function creates a graph corresponding to the finite element mesh. 
-* At this point the supported elements are triangles, tetrahedrons.
-******************************************************************************/
-void METIS_MeshToNodal(int *ne, int *nn, idxtype *elmnts, int *etype, int *numflag, 
-                       idxtype *dxadj, idxtype *dadjncy)
-{
-  int esizes[] = {-1, 3, 4, 8, 4};
-
-  if (*numflag == 1)
-    ChangeMesh2CNumbering((*ne)*esizes[*etype], elmnts);
-
-  switch (*etype) {
-    case 1:
-      TRINODALMETIS(*ne, *nn, elmnts, dxadj, dadjncy);
-      break;
-    case 2:
-      TETNODALMETIS(*ne, *nn, elmnts, dxadj, dadjncy);
-      break;
-    case 3:
-      HEXNODALMETIS(*ne, *nn, elmnts, dxadj, dadjncy);
-      break;
-    case 4:
-      QUADNODALMETIS(*ne, *nn, elmnts, dxadj, dadjncy);
-      break;
+  /* renumber the mesh */
+  if (*numflag == 1) {
+    ChangeMesh2CNumbering(*ne, eptr, eind);
+    renumber = 1;
   }
 
-  if (*numflag == 1)
-    ChangeMesh2FNumbering((*ne)*esizes[*etype], elmnts, *nn, dxadj, dadjncy);
+  /* create dual graph */
+  *r_xadj = *r_adjncy = NULL;
+  CreateGraphDual(*ne, *nn, eptr, eind, *ncommon, r_xadj, r_adjncy);
+
+
+SIGTHROW:
+  if (renumber)
+    ChangeMesh2FNumbering(*ne, eptr, eind, *ne, *r_xadj, *r_adjncy);
+
+  gk_siguntrap();
+  gk_malloc_cleanup(0);
+
+  if (sigrval != 0) {
+    if (*r_xadj != NULL)
+      free(*r_xadj);
+    if (*r_adjncy != NULL)
+      free(*r_adjncy);
+    *r_xadj = *r_adjncy = NULL;
+  }
+
+  return metis_rcode(sigrval);
 }
 
 
+/*****************************************************************************/
+/*! This function creates a graph corresponding to (almost) the nodal of a 
+    finite element mesh. In the nodal graph, each node is connected to the
+    nodes corresponding to the union of nodes present in all the elements
+    in which that node belongs. 
 
-/*****************************************************************************
-* This function creates the dual of a finite element mesh
-******************************************************************************/
-void GENDUALMETIS(int nelmnts, int nvtxs, int etype, idxtype *elmnts, idxtype *dxadj, 
-                  idxtype *dadjncy)
+    \param ne is the number of elements in the mesh.
+    \param nn is the number of nodes in the mesh.
+    \param eptr is an array of size ne+1 used to mark the start and end 
+           locations in the nind array.
+    \param eind is an array that stores for each element the set of node IDs 
+           (indices) that it is made off. The length of this array is equal
+           to the total number of nodes over all the mesh elements.
+    \param numflag is either 0 or 1 indicating if the numbering of the nodes
+           starts from 0 or 1, respectively. The same numbering is used for the
+           returned graph as well.
+    \param r_xadj indicates where the adjacency list of each vertex is stored 
+           in r_adjncy. The memory for this array is allocated by this routine. 
+           It can be freed by calling METIS_free().
+    \param r_adjncy stores the adjacency list of each vertex in the generated 
+           dual graph. The memory for this array is allocated by this routine. 
+           It can be freed by calling METIS_free().
+
+*/
+/*****************************************************************************/
+int METIS_MeshToNodal(idx_t *ne, idx_t *nn, idx_t *eptr, idx_t *eind, 
+          idx_t *numflag,  idx_t **r_xadj, idx_t **r_adjncy)
 {
-   int i, j, jj, k, kk, kkk, l, m, n, nedges, mask;
-   idxtype *nptr, *nind;
-   idxtype *mark, ind[200], wgt[200];
-   int esize, esizes[] = {-1, 3, 4, 8, 4},
-       mgcnum, mgcnums[] = {-1, 2, 3, 4, 2};
+  int sigrval=0, renumber=0;
 
-   mask = (1<<11)-1;
-   mark = idxsmalloc(mask+1, -1, "GENDUALMETIS: mark");
+  /* set up malloc cleaning code and signal catchers */
+  if (!gk_malloc_init()) 
+    return METIS_ERROR_MEMORY;
 
-   /* Get the element size and magic number for the particular element */
-   esize = esizes[etype];
-   mgcnum = mgcnums[etype];
+  gk_sigtrap();
 
-   /* Construct the node-element list first */
-   nptr = idxsmalloc(nvtxs+1, 0, "GENDUALMETIS: nptr");
-   for (j=esize*nelmnts, i=0; i<j; i++) 
-     nptr[elmnts[i]]++;
-   MAKECSR(i, nvtxs, nptr);
+  if ((sigrval = gk_sigcatch()) != 0) 
+    goto SIGTHROW;
 
-   nind = idxmalloc(nptr[nvtxs], "GENDUALMETIS: nind");
-   for (k=i=0; i<nelmnts; i++) {
-     for (j=0; j<esize; j++, k++) 
-       nind[nptr[elmnts[k]]++] = i;
-   }
-   for (i=nvtxs; i>0; i--)
-     nptr[i] = nptr[i-1];
-   nptr[0] = 0;
 
-   for (i=0; i<nelmnts; i++) 
-     dxadj[i] = esize*i;
+  /* renumber the mesh */
+  if (*numflag == 1) {
+    ChangeMesh2CNumbering(*ne, eptr, eind);
+    renumber = 1;
+  }
 
-   for (i=0; i<nelmnts; i++) {
-     for (m=j=0; j<esize; j++) {
-       n = elmnts[esize*i+j];
-       for (k=nptr[n+1]-1; k>=nptr[n]; k--) {
-         if ((kk = nind[k]) <= i)
-           break;
+  /* create nodal graph */
+  *r_xadj = *r_adjncy = NULL;
+  CreateGraphNodal(*ne, *nn, eptr, eind, r_xadj, r_adjncy);
 
-         kkk = kk&mask;
-         if ((l = mark[kkk]) == -1) {
-           ind[m] = kk;
-           wgt[m] = 1;
-           mark[kkk] = m++;
-         }
-         else if (ind[l] == kk) {
-           wgt[l]++;
-         }
-         else {
-           for (jj=0; jj<m; jj++) {
-             if (ind[jj] == kk) {
-               wgt[jj]++;
-               break;
-             }
-           }
-           if (jj == m) {
-             ind[m] = kk;
-             wgt[m++] = 1;
-           }
-         }
-       }
-     }
-     for (j=0; j<m; j++) {
-       if (wgt[j] == mgcnum) {
-         k = ind[j];
-         dadjncy[dxadj[i]++] = k;
-         dadjncy[dxadj[k]++] = i;
-       }
-       mark[ind[j]&mask] = -1;
-     }
-   }
 
-   /* Go and consolidate the dxadj and dadjncy */
-   for (j=i=0; i<nelmnts; i++) {
-     for (k=esize*i; k<dxadj[i]; k++, j++)
-       dadjncy[j] = dadjncy[k];
-     dxadj[i] = j;
-   }
-   for (i=nelmnts; i>0; i--)
-     dxadj[i] = dxadj[i-1];
-   dxadj[0] = 0;
+SIGTHROW:
+  if (renumber)
+    ChangeMesh2FNumbering(*ne, eptr, eind, *nn, *r_xadj, *r_adjncy);
 
-   free(mark);
-   free(nptr);
-   free(nind);
+  gk_siguntrap();
+  gk_malloc_cleanup(0);
 
+  if (sigrval != 0) {
+    if (*r_xadj != NULL)
+      free(*r_xadj);
+    if (*r_adjncy != NULL)
+      free(*r_adjncy);
+    *r_xadj = *r_adjncy = NULL;
+  }
+
+  return metis_rcode(sigrval);
 }
 
 
-
-
-/*****************************************************************************
-* This function creates the nodal graph of a finite element mesh
-******************************************************************************/
-void TRINODALMETIS(int nelmnts, int nvtxs, idxtype *elmnts, idxtype *dxadj, idxtype *dadjncy)
+/*****************************************************************************/
+/*! This function creates the dual of a finite element mesh */
+/*****************************************************************************/
+void CreateGraphDual(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind, idx_t ncommon, 
+          idx_t **r_xadj, idx_t **r_adjncy)
 {
-   int i, j, jj, k, kk, kkk, l, m, n, nedges;
-   idxtype *nptr, *nind;
-   idxtype *mark;
+  idx_t i, j, nnbrs;
+  idx_t *nptr, *nind;
+  idx_t *xadj, *adjncy;
+  idx_t *marker, *nbrs;
 
-   /* Construct the node-element list first */
-   nptr = idxsmalloc(nvtxs+1, 0, "TRINODALMETIS: nptr");
-   for (j=3*nelmnts, i=0; i<j; i++) 
-     nptr[elmnts[i]]++;
-   MAKECSR(i, nvtxs, nptr);
+  if (ncommon < 1) {
+    printf("  Increased ncommon to 1, as it was initially %"PRIDX"\n", ncommon);
+    ncommon = 1;
+  }
 
-   nind = idxmalloc(nptr[nvtxs], "TRINODALMETIS: nind");
-   for (k=i=0; i<nelmnts; i++) {
-     for (j=0; j<3; j++, k++) 
-       nind[nptr[elmnts[k]]++] = i;
-   }
-   for (i=nvtxs; i>0; i--)
-     nptr[i] = nptr[i-1];
-   nptr[0] = 0;
+  /* construct the node-element list first */
+  nptr = ismalloc(nn+1, 0, "CreateGraphDual: nptr");
+  nind = imalloc(eptr[ne], "CreateGraphDual: nind");
+
+  for (i=0; i<ne; i++) {
+    for (j=eptr[i]; j<eptr[i+1]; j++)
+      nptr[eind[j]]++;
+  }
+  MAKECSR(i, nn, nptr);
+
+  for (i=0; i<ne; i++) {
+    for (j=eptr[i]; j<eptr[i+1]; j++)
+      nind[nptr[eind[j]]++] = i;
+  }
+  SHIFTCSR(i, nn, nptr);
 
 
-   mark = idxsmalloc(nvtxs, -1, "TRINODALMETIS: mark");
+  /* Allocate memory for xadj, since you know its size.
+     These are done using standard malloc as they are returned
+     to the calling function */
+  if ((xadj = (idx_t *)malloc((ne+1)*sizeof(idx_t))) == NULL) 
+    gk_errexit(SIGMEM, "***Failed to allocate memory for xadj.\n");
+  *r_xadj = xadj;
+  iset(ne+1, 0, xadj);
 
-   nedges = dxadj[0] = 0;
-   for (i=0; i<nvtxs; i++) {
-     mark[i] = i;
-     for (j=nptr[i]; j<nptr[i+1]; j++) {
-       for (jj=3*nind[j], k=0; k<3; k++, jj++) {
-         kk = elmnts[jj];
-         if (mark[kk] != i) {
-           mark[kk] = i;
-           dadjncy[nedges++] = kk;
-         }
-       }
-     }
-     dxadj[i+1] = nedges;
-   }
+  /* allocate memory for working arrays used by FindCommonElements */
+  marker = ismalloc(ne, 0, "CreateGraphDual: marker");
+  nbrs   = imalloc(ne, "CreateGraphDual: nbrs");
 
-   free(mark);
-   free(nptr);
-   free(nind);
+  for (i=0; i<ne; i++) {
+    xadj[i] = FindCommonElements(i, eptr[i+1]-eptr[i], eind+eptr[i], nptr, 
+                  nind, eptr, ncommon, marker, nbrs);
+  }
+  MAKECSR(i, ne, xadj);
 
+  /* Allocate memory for adjncy, since you now know its size.
+     These are done using standard malloc as they are returned
+     to the calling function */
+  if ((adjncy = (idx_t *)malloc(xadj[ne]*sizeof(idx_t))) == NULL) {
+    free(xadj);
+    *r_xadj = NULL;
+    gk_errexit(SIGMEM, "***Failed to allocate memory for adjncy.\n");
+  }
+  *r_adjncy = adjncy;
+
+  for (i=0; i<ne; i++) {
+    nnbrs = FindCommonElements(i, eptr[i+1]-eptr[i], eind+eptr[i], nptr, 
+                nind, eptr, ncommon, marker, nbrs);
+    for (j=0; j<nnbrs; j++)
+      adjncy[xadj[i]++] = nbrs[j];
+  }
+  SHIFTCSR(i, ne, xadj);
+  
+  gk_free((void **)&nptr, &nind, &marker, &nbrs, LTERM);
 }
 
 
-/*****************************************************************************
-* This function creates the nodal graph of a finite element mesh
-******************************************************************************/
-void TETNODALMETIS(int nelmnts, int nvtxs, idxtype *elmnts, idxtype *dxadj, idxtype *dadjncy)
+/*****************************************************************************/
+/*! This function creates the (almost) nodal of a finite element mesh */
+/*****************************************************************************/
+void CreateGraphNodal(idx_t ne, idx_t nn, idx_t *eptr, idx_t *eind, 
+          idx_t **r_xadj, idx_t **r_adjncy)
 {
-   int i, j, jj, k, kk, kkk, l, m, n, nedges;
-   idxtype *nptr, *nind;
-   idxtype *mark;
-
-   /* Construct the node-element list first */
-   nptr = idxsmalloc(nvtxs+1, 0, "TETNODALMETIS: nptr");
-   for (j=4*nelmnts, i=0; i<j; i++) 
-     nptr[elmnts[i]]++;
-   MAKECSR(i, nvtxs, nptr);
-
-   nind = idxmalloc(nptr[nvtxs], "TETNODALMETIS: nind");
-   for (k=i=0; i<nelmnts; i++) {
-     for (j=0; j<4; j++, k++) 
-       nind[nptr[elmnts[k]]++] = i;
-   }
-   for (i=nvtxs; i>0; i--)
-     nptr[i] = nptr[i-1];
-   nptr[0] = 0;
+  idx_t i, j, nnbrs;
+  idx_t *nptr, *nind;
+  idx_t *xadj, *adjncy;
+  idx_t *marker, *nbrs;
 
 
-   mark = idxsmalloc(nvtxs, -1, "TETNODALMETIS: mark");
+  /* construct the node-element list first */
+  nptr = ismalloc(nn+1, 0, "CreateGraphNodal: nptr");
+  nind = imalloc(eptr[ne], "CreateGraphNodal: nind");
 
-   nedges = dxadj[0] = 0;
-   for (i=0; i<nvtxs; i++) {
-     mark[i] = i;
-     for (j=nptr[i]; j<nptr[i+1]; j++) {
-       for (jj=4*nind[j], k=0; k<4; k++, jj++) {
-         kk = elmnts[jj];
-         if (mark[kk] != i) {
-           mark[kk] = i;
-           dadjncy[nedges++] = kk;
-         }
-       }
-     }
-     dxadj[i+1] = nedges;
-   }
+  for (i=0; i<ne; i++) {
+    for (j=eptr[i]; j<eptr[i+1]; j++)
+      nptr[eind[j]]++;
+  }
+  MAKECSR(i, nn, nptr);
 
-   free(mark);
-   free(nptr);
-   free(nind);
+  for (i=0; i<ne; i++) {
+    for (j=eptr[i]; j<eptr[i+1]; j++)
+      nind[nptr[eind[j]]++] = i;
+  }
+  SHIFTCSR(i, nn, nptr);
 
+
+  /* Allocate memory for xadj, since you know its size.
+     These are done using standard malloc as they are returned
+     to the calling function */
+  if ((xadj = (idx_t *)malloc((nn+1)*sizeof(idx_t))) == NULL)
+    gk_errexit(SIGMEM, "***Failed to allocate memory for xadj.\n");
+  *r_xadj = xadj;
+  iset(nn+1, 0, xadj);
+
+  /* allocate memory for working arrays used by FindCommonElements */
+  marker = ismalloc(nn, 0, "CreateGraphNodal: marker");
+  nbrs   = imalloc(nn, "CreateGraphDual: nbrs");
+
+  for (i=0; i<nn; i++) {
+    xadj[i] = FindCommonElements(i, nptr[i+1]-nptr[i], nind+nptr[i], eptr, 
+                  eind, eptr, 1, marker, nbrs);
+  }
+  MAKECSR(i, nn, xadj);
+
+  /* Allocate memory for adjncy, since you now know its size.
+     These are done using standard malloc as they are returned
+     to the calling function */
+  if ((adjncy = (idx_t *)malloc(xadj[nn]*sizeof(idx_t))) == NULL) {
+    free(xadj);
+    *r_xadj = NULL;
+    gk_errexit(SIGMEM, "***Failed to allocate memory for adjncy.\n");
+  }
+  *r_adjncy = adjncy;
+
+  for (i=0; i<nn; i++) {
+    nnbrs = FindCommonElements(i, nptr[i+1]-nptr[i], nind+nptr[i], eptr, 
+                eind, eptr, 1, marker, nbrs);
+    for (j=0; j<nnbrs; j++)
+      adjncy[xadj[i]++] = nbrs[j];
+  }
+  SHIFTCSR(i, nn, xadj);
+  
+  gk_free((void **)&nptr, &nind, &marker, &nbrs, LTERM);
 }
 
 
-/*****************************************************************************
-* This function creates the nodal graph of a finite element mesh
-******************************************************************************/
-void HEXNODALMETIS(int nelmnts, int nvtxs, idxtype *elmnts, idxtype *dxadj, idxtype *dadjncy)
+/*****************************************************************************/
+/*! This function finds all elements that share at least ncommon nodes with 
+    the ``query'' element. 
+
+    Also it is used to find all nodes that are present in all the elements
+    with the ``query'' node (using ncommon = 1).
+*/
+/*****************************************************************************/
+idx_t FindCommonElements(idx_t qid, idx_t elen, idx_t *eind, idx_t *nptr, 
+          idx_t *nind, idx_t *eptr, idx_t ncommon, idx_t *marker, idx_t *nbrs)
 {
-   int i, j, jj, k, kk, kkk, l, m, n, nedges;
-   idxtype *nptr, *nind;
-   idxtype *mark;
-   int table[8][3] = {1, 3, 4,
-                      0, 2, 5,
-                      1, 3, 6,
-                      0, 2, 7,
-                      0, 5, 7,
-                      1, 4, 6,
-                      2, 5, 7,
-                      3, 4, 6};
+  int i, ii, j, jj, k, l, overlap;
 
-   /* Construct the node-element list first */
-   nptr = idxsmalloc(nvtxs+1, 0, "HEXNODALMETIS: nptr");
-   for (j=8*nelmnts, i=0; i<j; i++) 
-     nptr[elmnts[i]]++;
-   MAKECSR(i, nvtxs, nptr);
+  /* find all elements that share at least one node with qid */
+  for (k=0, i=0; i<elen; i++) {
+    j = eind[i];
+    for (ii=nptr[j]; ii<nptr[j+1]; ii++) {
+      jj = nind[ii];
 
-   nind = idxmalloc(nptr[nvtxs], "HEXNODALMETIS: nind");
-   for (k=i=0; i<nelmnts; i++) {
-     for (j=0; j<8; j++, k++) 
-       nind[nptr[elmnts[k]]++] = i;
-   }
-   for (i=nvtxs; i>0; i--)
-     nptr[i] = nptr[i-1];
-   nptr[0] = 0;
+      if (marker[jj] == 0) 
+        nbrs[k++] = jj;
+      marker[jj]++;
+    }
+  }
 
+  /* put qid into the neighbor list (in case it is not there) so that it
+     will be removed in the next step */
+  if (marker[qid] == 0)
+    nbrs[k++] = qid;
+  marker[qid] = 0;
 
-   mark = idxsmalloc(nvtxs, -1, "HEXNODALMETIS: mark");
+  /* compact the list to contain only those with at least ncommon nodes */
+  for (j=0, i=0; i<k; i++) {
+    overlap = marker[l = nbrs[i]];
+    if (overlap >= ncommon || 
+        overlap >= elen-1 || 
+        overlap >= eptr[l+1]-eptr[l]-1)
+      nbrs[j++] = l;
+    marker[l] = 0;
+  }
 
-   nedges = dxadj[0] = 0;
-   for (i=0; i<nvtxs; i++) {
-     mark[i] = i;
-     for (j=nptr[i]; j<nptr[i+1]; j++) {
-       jj=8*nind[j];
-       for (k=0; k<8; k++) {
-         if (elmnts[jj+k] == i)
-           break;
-       }
-       ASSERT(k != 8);
-
-       /* You found the index, now go and put the 3 neighbors */
-       kk = elmnts[jj+table[k][0]];
-       if (mark[kk] != i) {
-         mark[kk] = i;
-         dadjncy[nedges++] = kk;
-       }
-       kk = elmnts[jj+table[k][1]];
-       if (mark[kk] != i) {
-         mark[kk] = i;
-         dadjncy[nedges++] = kk;
-       }
-       kk = elmnts[jj+table[k][2]];
-       if (mark[kk] != i) {
-         mark[kk] = i;
-         dadjncy[nedges++] = kk;
-       }
-     }
-     dxadj[i+1] = nedges;
-   }
-
-   free(mark);
-   free(nptr);
-   free(nind);
-
+  return j;
 }
 
 
-/*****************************************************************************
-* This function creates the nodal graph of a finite element mesh
-******************************************************************************/
-void QUADNODALMETIS(int nelmnts, int nvtxs, idxtype *elmnts, idxtype *dxadj, idxtype *dadjncy)
+/*************************************************************************/
+/*! This function creates and initializes a mesh_t structure */
+/*************************************************************************/
+mesh_t *CreateMesh(void)
 {
-   int i, j, jj, k, kk, kkk, l, m, n, nedges;
-   idxtype *nptr, *nind;
-   idxtype *mark;
-   int table[4][2] = {1, 3, 
-                      0, 2,
-                      1, 3, 
-                      0, 2}; 
+  mesh_t *mesh;
 
-   /* Construct the node-element list first */
-   nptr = idxsmalloc(nvtxs+1, 0, "QUADNODALMETIS: nptr");
-   for (j=4*nelmnts, i=0; i<j; i++) 
-     nptr[elmnts[i]]++;
-   MAKECSR(i, nvtxs, nptr);
+  mesh = (mesh_t *)gk_malloc(sizeof(mesh_t), "CreateMesh: mesh");
 
-   nind = idxmalloc(nptr[nvtxs], "QUADNODALMETIS: nind");
-   for (k=i=0; i<nelmnts; i++) {
-     for (j=0; j<4; j++, k++) 
-       nind[nptr[elmnts[k]]++] = i;
-   }
-   for (i=nvtxs; i>0; i--)
-     nptr[i] = nptr[i-1];
-   nptr[0] = 0;
+  InitMesh(mesh);
 
-
-   mark = idxsmalloc(nvtxs, -1, "QUADNODALMETIS: mark");
-
-   nedges = dxadj[0] = 0;
-   for (i=0; i<nvtxs; i++) {
-     mark[i] = i;
-     for (j=nptr[i]; j<nptr[i+1]; j++) {
-       jj=4*nind[j];
-       for (k=0; k<4; k++) {
-         if (elmnts[jj+k] == i)
-           break;
-       }
-       ASSERT(k != 4);
-
-       /* You found the index, now go and put the 2 neighbors */
-       kk = elmnts[jj+table[k][0]];
-       if (mark[kk] != i) {
-         mark[kk] = i;
-         dadjncy[nedges++] = kk;
-       }
-       kk = elmnts[jj+table[k][1]];
-       if (mark[kk] != i) {
-         mark[kk] = i;
-         dadjncy[nedges++] = kk;
-       }
-     }
-     dxadj[i+1] = nedges;
-   }
-
-   free(mark);
-   free(nptr);
-   free(nind);
-
+  return mesh;
 }
+
+
+/*************************************************************************/
+/*! This function initializes a mesh_t data structure */
+/*************************************************************************/
+void InitMesh(mesh_t *mesh) 
+{
+  memset((void *)mesh, 0, sizeof(mesh_t));
+}
+
+
+/*************************************************************************/
+/*! This function deallocates any memory stored in a mesh */
+/*************************************************************************/
+void FreeMesh(mesh_t **r_mesh) 
+{
+  mesh_t *mesh = *r_mesh;
+  
+  gk_free((void **)&mesh->eptr, &mesh->eind, &mesh->ewgt, &mesh, LTERM);
+
+  *r_mesh = NULL;
+}
+

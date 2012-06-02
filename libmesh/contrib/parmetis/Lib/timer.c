@@ -12,7 +12,7 @@
  *
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
 
 
 
@@ -20,7 +20,7 @@
 /*************************************************************************
 * This function initializes the various timers
 **************************************************************************/
-void InitTimers(CtrlType *ctrl)
+void InitTimers(ctrl_t *ctrl)
 {
   cleartimer(ctrl->TotalTmr); 
   cleartimer(ctrl->InitPartTmr);
@@ -34,6 +34,7 @@ void InitTimers(CtrlType *ctrl)
   cleartimer(ctrl->KWayTmr);
   cleartimer(ctrl->MoveTmr);
   cleartimer(ctrl->RemapTmr);
+  cleartimer(ctrl->SerialTmr);
 
   cleartimer(ctrl->AuxTmr1); 
   cleartimer(ctrl->AuxTmr2); 
@@ -47,7 +48,7 @@ void InitTimers(CtrlType *ctrl)
 /*************************************************************************
 * This function prints timing information about KMETIS
 **************************************************************************/
-void PrintTimingInfo(CtrlType *ctrl)
+void PrintTimingInfo(ctrl_t *ctrl)
 {
 /*  PrintTimer(ctrl, ctrl->CoarsenTmr,  " Coarsening"); */
   PrintTimer(ctrl, ctrl->SetupTmr,    "      Setup");
@@ -58,6 +59,7 @@ void PrintTimingInfo(CtrlType *ctrl)
   PrintTimer(ctrl, ctrl->ProjectTmr,  "    Project");
   PrintTimer(ctrl, ctrl->KWayInitTmr, " Initialize");
   PrintTimer(ctrl, ctrl->KWayTmr,     "      K-way");
+  PrintTimer(ctrl, ctrl->SerialTmr,   "     Serial");
   PrintTimer(ctrl, ctrl->MoveTmr,     "       Move");
   PrintTimer(ctrl, ctrl->RemapTmr,    "      Remap");
   PrintTimer(ctrl, ctrl->TotalTmr,    "      Total");
@@ -73,18 +75,18 @@ void PrintTimingInfo(CtrlType *ctrl)
 /*************************************************************************
 * This function prints timer stat
 **************************************************************************/
-void PrintTimer(CtrlType *ctrl, timer tmr, char *msg)
+void PrintTimer(ctrl_t *ctrl, timer tmr, char *msg)
 {
   double sum, max, tsec;
 
   tsec = gettimer(tmr);
-  MPI_Reduce((void *)&tsec, (void *)&sum, 1, MPI_DOUBLE, MPI_SUM, 0, ctrl->comm);
+  gkMPI_Reduce((void *)&tsec, (void *)&sum, 1, MPI_DOUBLE, MPI_SUM, 0, ctrl->comm);
 
   tsec = gettimer(tmr);
-  MPI_Reduce((void *)&tsec, (void *)&max, 1, MPI_DOUBLE, MPI_MAX, 0, ctrl->comm);
+  gkMPI_Reduce((void *)&tsec, (void *)&max, 1, MPI_DOUBLE, MPI_MAX, 0, ctrl->comm);
 
   if (ctrl->mype == 0 && sum != 0.0)
-    printf("%s: Max: %7.3f, Sum: %7.3f, Balance: %7.3f\n", 
-            msg, (float)max, (float)sum, (float)(max*ctrl->npes/sum));
+    printf("%s: Max: %7.3"PRREAL", Sum: %7.3"PRREAL", Balance: %7.3"PRREAL"\n", 
+            msg, (real_t)max, (real_t)sum, (real_t)(max*ctrl->npes/sum));
 }
 

@@ -11,243 +11,195 @@
  * $Id$
  */
 
-#ifndef __parmetis_h__
-/* Undefine the following #define in order to use short int as the idxtype */
-#define IDXTYPE_INT
-
-/* Indexes are as long as integers for now */
-#ifdef IDXTYPE_INT
-typedef int idxtype;
-#else
-typedef short idxtype;
-#endif
-#endif
-
-#define MAXIDX	(1<<8*sizeof(idxtype)-2)
-
-
-/*************************************************************************
-* The following data structure stores key-value pair
-**************************************************************************/
-struct KeyValueType {
-  idxtype key;
-  idxtype val;
-};
-
-typedef struct KeyValueType KeyValueType;
-
-
-/*************************************************************************
-* The following data structure will hold a node of a doubly-linked list.
-**************************************************************************/
-struct ListNodeType {
-  int id;                       	/* The id value of the node */
-  struct ListNodeType *prev, *next;     /* It's a doubly-linked list */
-};
-
-typedef struct ListNodeType ListNodeType;
+#ifndef _LIBMETIS_STRUCT_H_
+#define _LIBMETIS_STRUCT_H_
 
 
 
-/*************************************************************************
-* The following data structure is used to store the buckets for the 
-* refinment algorithms
-**************************************************************************/
-struct PQueueType {
-  int type;                     /* The type of the representation used */
-  int nnodes;
-  int maxnodes;
-  int mustfree;
-
-  /* Linear array version of the data structures */
-  int pgainspan, ngainspan;     /* plus and negative gain span */
-  int maxgain;
-  ListNodeType *nodes;
-  ListNodeType **buckets;
-
-  /* Heap version of the data structure */
-  KeyValueType *heap;
-  idxtype *locator;
-};
-
-typedef struct PQueueType PQueueType;
+/*************************************************************************/
+/*! This data structure stores cut-based k-way refinement info about an
+    adjacent subdomain for a given vertex. */
+/*************************************************************************/
+typedef struct cnbr_t {
+  idx_t pid;            /*!< The partition ID */
+  idx_t ed;             /*!< The sum of the weights of the adjacent edges
+                             that are incident on pid */
+} cnbr_t;
 
 
-/*************************************************************************
-* The following data structure stores an edge
-**************************************************************************/
-struct edegreedef {
-  idxtype pid;
-  idxtype ed;
-};
-typedef struct edegreedef EDegreeType;
+/*************************************************************************/
+/*! The following data structure stores holds information on degrees for k-way
+    partition */
+/*************************************************************************/
+typedef struct ckrinfo_t {
+ idx_t id;              /*!< The internal degree of a vertex (sum of weights) */
+ idx_t ed;            	/*!< The total external degree of a vertex */
+ idx_t nnbrs;          	/*!< The number of neighboring subdomains */
+ idx_t inbr;            /*!< The index in the cnbr_t array where the nnbrs list 
+                             of neighbors is stored */
+} ckrinfo_t;
 
 
-/*************************************************************************
-* The following data structure stores an edge for vol
-**************************************************************************/
-struct vedegreedef {
-  idxtype pid;
-  idxtype ed, ned;
-  idxtype gv;
-};
-typedef struct vedegreedef VEDegreeType;
+/*************************************************************************/
+/*! This data structure stores volume-based k-way refinement info about an
+    adjacent subdomain for a given vertex. */
+/*************************************************************************/
+typedef struct vnbr_t {
+  idx_t pid;            /*!< The partition ID */
+  idx_t ned;            /*!< The number of the adjacent edges
+                             that are incident on pid */
+  idx_t gv;             /*!< The gain in volume achieved by moving the
+                             vertex to pid */
+} vnbr_t;
 
 
-/*************************************************************************
-* This data structure holds various working space data
-**************************************************************************/
-struct workspacedef {
-  idxtype *core;			/* Where pairs, indices, and degrees are coming from */
-  int maxcore, ccore;
-
-  EDegreeType *edegrees;
-  VEDegreeType *vedegrees;
-  int cdegree;
-
-  idxtype *auxcore;			/* This points to the memory of the edegrees */
-
-  idxtype *pmat;			/* An array of k^2 used for eliminating domain 
-                                           connectivity in k-way refinement */
-};
-
-typedef struct workspacedef WorkSpaceType;
+/*************************************************************************/
+/*! The following data structure holds information on degrees for k-way
+    vol-based partition */
+/*************************************************************************/
+typedef struct vkrinfo_t {
+ idx_t nid;             /*!< The internal degree of a vertex (count of edges) */
+ idx_t ned;            	/*!< The total external degree of a vertex (count of edges) */
+ idx_t gv;            	/*!< The volume gain of moving that vertex */
+ idx_t nnbrs;          	/*!< The number of neighboring subdomains */
+ idx_t inbr;            /*!< The index in the vnbr_t array where the nnbrs list 
+                             of neighbors is stored */
+} vkrinfo_t;
 
 
-/*************************************************************************
-* The following data structure holds information on degrees for k-way
-* partition
-**************************************************************************/
-struct rinfodef {
- int id, ed;            	/* ID/ED of nodes */
- int ndegrees;          	/* The number of different ext-degrees */
- EDegreeType *edegrees;     	/* List of edges */
-};
-
-typedef struct rinfodef RInfoType;
+/*************************************************************************/
+/*! The following data structure holds information on degrees for k-way
+    partition */
+/*************************************************************************/
+typedef struct nrinfo_t {
+ idx_t edegrees[2];  
+} nrinfo_t;
 
 
-/*************************************************************************
-* The following data structure holds information on degrees for k-way
-* vol-based partition
-**************************************************************************/
-struct vrinfodef {
- int id, ed, nid;            	/* ID/ED of nodes */
- int gv;            		/* IV/EV of nodes */
- int ndegrees;          	/* The number of different ext-degrees */
- VEDegreeType *edegrees;     	/* List of edges */
-};
+/*************************************************************************/
+/*! This data structure holds a graph */
+/*************************************************************************/
+typedef struct graph_t {
+  idx_t nvtxs, nedges;	/* The # of vertices and edges in the graph */
+  idx_t ncon;		/* The # of constrains */ 
+  idx_t *xadj;		/* Pointers to the locally stored vertices */
+  idx_t *vwgt;		/* Vertex weights */
+  idx_t *vsize;		/* Vertex sizes for min-volume formulation */
+  idx_t *adjncy;        /* Array that stores the adjacency lists of nvtxs */
+  idx_t *adjwgt;        /* Array that stores the weights of the adjacency lists */
 
-typedef struct vrinfodef VRInfoType;
-
-
-/*************************************************************************
-* The following data structure holds information on degrees for k-way
-* partition
-**************************************************************************/
-struct nrinfodef {
- idxtype edegrees[2];  
-};
-
-typedef struct nrinfodef NRInfoType;
+  idx_t *tvwgt;         /* The sum of the vertex weights in the graph */
+  real_t *invtvwgt;     /* The inverse of the sum of the vertex weights in the graph */
 
 
-/*************************************************************************
-* This data structure holds the input graph
-**************************************************************************/
-struct graphdef {
-  idxtype *gdata, *rdata;	/* Memory pools for graph and refinement data.
-                                   This is where memory is allocated and used
-                                   the rest of the fields in this structure */
+  /* These are to keep track control if the corresponding fields correspond to
+     application or library memory */
+  int free_xadj, free_vwgt, free_vsize, free_adjncy, free_adjwgt;
 
-  int nvtxs, nedges;		/* The # of vertices and edges in the graph */
-  idxtype *xadj;		/* Pointers to the locally stored vertices */
-  idxtype *vwgt;		/* Vertex weights */
-  idxtype *vsize;		/* Vertex sizes for min-volume formulation */
-  idxtype *adjncy;		/* Array that stores the adjacency lists of nvtxs */
-  idxtype *adjwgt;		/* Array that stores the weights of the adjacency lists */
+  idx_t *label;
 
-  idxtype *adjwgtsum;		/* The sum of the adjacency weight of each vertex */
-
-  idxtype *label;
-
-  idxtype *cmap;
+  idx_t *cmap;
 
   /* Partition parameters */
-  int mincut, minvol;
-  idxtype *where, *pwgts;
-  int nbnd;
-  idxtype *bndptr, *bndind;
+  idx_t mincut, minvol;
+  idx_t *where, *pwgts;
+  idx_t nbnd;
+  idx_t *bndptr, *bndind;
 
   /* Bisection refinement parameters */
-  idxtype *id, *ed;
+  idx_t *id, *ed;
 
   /* K-way refinement parameters */
-  RInfoType *rinfo;
-
-  /* K-way volume refinement parameters */
-  VRInfoType *vrinfo;
+  ckrinfo_t *ckrinfo;   /*!< The per-vertex cut-based refinement info */
+  vkrinfo_t *vkrinfo;   /*!< The per-vertex volume-based refinement info */
 
   /* Node refinement information */
-  NRInfoType *nrinfo;
+  nrinfo_t *nrinfo;
+
+  struct graph_t *coarser, *finer;
+} graph_t;
 
 
-  /* Additional info needed by the MOC routines */
-  int ncon;			/* The # of constrains */ 
-  float *nvwgt;			/* Normalized vertex weights */
-  float *npwgts;		/* The normalized partition weights */
+/*************************************************************************/
+/*! This data structure holds a mesh */
+/*************************************************************************/
+typedef struct mesh_t {
+  idx_t ne, nn;	        /*!< The # of elements and nodes in the mesh */
+  idx_t ncon;           /*!< The number of element balancing constraints (element weights) */
 
-  struct graphdef *coarser, *finer;
-};
-
-typedef struct graphdef GraphType;
-
-
-
-/*************************************************************************
-* The following data type implements a timer
-**************************************************************************/
-typedef double timer;
+  idx_t *eptr, *eind;   /*!< The CSR-structure storing the nodes in the elements */
+  idx_t *ewgt;          /*!< The weights of the elements */
+} mesh_t;
 
 
-/*************************************************************************
-* The following structure stores information used by Metis
-**************************************************************************/
-struct controldef {
-  int CoarsenTo;		/* The # of vertices in the coarsest graph */
-  int dbglvl;			/* Controls the debuging output of the program */
-  int CType;			/* The type of coarsening */
-  int IType;			/* The type of initial partitioning */
-  int RType;			/* The type of refinement */
-  int maxvwgt;			/* The maximum allowed weight for a vertex */
-  float nmaxvwgt;		/* The maximum allowed weight for a vertex for each constrain */
-  int optype;			/* Type of operation */
-  int pfactor;			/* .1*prunning factor */
-  int nseps;			/* The number of separators to be found during multiple bisections */
-  int oflags;
 
-  WorkSpaceType wspace;		/* Work Space Informations */
+/*************************************************************************/
+/*! The following structure stores information used by Metis */
+/*************************************************************************/
+typedef struct ctrl_t {
+  moptype_et  optype;	        /* Type of operation */
+  mobjtype_et objtype;          /* Type of refinement objective */
+  mdbglvl_et  dbglvl;		/* Controls the debuging output of the program */
+  mctype_et   ctype;		/* The type of coarsening */
+  miptype_et  iptype;		/* The type of initial partitioning */
+  mrtype_et   rtype;		/* The type of refinement */
+
+  idx_t CoarsenTo;		/* The # of vertices in the coarsest graph */
+  idx_t nIparts;                /* The number of initial partitions to compute */
+  idx_t minconn;                /* Indicates if the subdomain connectivity will be minimized */
+  idx_t contig;                 /* Indicates if contigous partitions are required */
+  idx_t nseps;			/* The number of separators to be found during multiple bisections */
+  idx_t ufactor;                /* The user-supplied load imbalance factor */
+  idx_t compress;               /* If the graph will be compressed prior to ordering */
+  idx_t ccorder;                /* If connected components will be ordered separately */
+  idx_t seed;                   /* The seed for the random number generator */
+  idx_t ncuts;                  /* The number of different partitionings to compute */
+  idx_t niter;                  /* The number of iterations during each refinement */
+  idx_t numflag;                /* The user-supplied numflag for the graph */
+  idx_t *maxvwgt;		/* The maximum allowed weight for a vertex */
+
+  idx_t ncon;                   /*!< The number of balancing constraints */
+  idx_t nparts;                 /*!< The number of partitions */
+
+  real_t pfactor;		/* .1*(user-supplied prunning factor) */
+
+  real_t *ubfactors;            /*!< The per-constraint ubfactors */
+  
+  real_t *tpwgts;               /*!< The target partition weights */
+  real_t *pijbm;                /*!< The nparts*ncon multiplies for the ith partition
+                                     and jth constraint for obtaining the balance */
+
+  real_t cfactor;               /*!< The achieved compression factor */
 
   /* Various Timers */
-  timer TotalTmr, InitPartTmr, MatchTmr, ContractTmr, CoarsenTmr, UncoarsenTmr, 
-        SepTmr, RefTmr, ProjectTmr, SplitTmr, AuxTmr1, AuxTmr2, AuxTmr3, AuxTmr4, AuxTmr5, AuxTmr6;
+  double TotalTmr, InitPartTmr, MatchTmr, ContractTmr, CoarsenTmr, UncoarsenTmr, 
+         RefTmr, ProjectTmr, SplitTmr, Aux1Tmr, Aux2Tmr, Aux3Tmr;
 
-};
+  /* Workspace information */
+  gk_mcore_t *mcore;    /*!< The persistent memory core for within function 
+                             mallocs/frees */
 
-typedef struct controldef CtrlType;
+  /* These are for use by the k-way refinement routines */
+  size_t nbrpoolsize;      /*!< The number of {c,v}nbr_t entries that have been allocated */
+  size_t nbrpoolcpos;      /*!< The position of the first free entry in the array */
+  size_t nbrpoolreallocs;  /*!< The number of times the pool was resized */
+
+  cnbr_t *cnbrpool;     /*!< The pool of cnbr_t entries to be used during refinement.
+                             The size and current position of the pool is controlled
+                             by nnbrs & cnbrs */
+  vnbr_t *vnbrpool;     /*!< The pool of vnbr_t entries to be used during refinement.
+                             The size and current position of the pool is controlled
+                             by nnbrs & cnbrs */
+
+  /* The subdomain graph, in sparse format  */ 
+  idx_t *maxnads;               /* The maximum allocated number of adjacent domains */
+  idx_t *nads;                  /* The number of adjacent domains */
+  idx_t **adids;                /* The IDs of the adjacent domains */
+  idx_t **adwgts;               /* The edge-weight to the adjacent domains */
+  idx_t *pvec1, *pvec2;         /* Auxiliar nparts-size vectors for efficiency */
+
+} ctrl_t;
 
 
-/*************************************************************************
-* The following data structure stores max-partition weight info for 
-* Vertical MOC k-way refinement
-**************************************************************************/
-struct vpwgtdef {
-  float max[2][MAXNCON];
-  int imax[2][MAXNCON];
-};
 
-typedef struct vpwgtdef VPInfoType;
-
-
-
-
+#endif

@@ -16,16 +16,17 @@
 #define DMALLOC			1
 */
 
-#include "./stdheaders.h"
-#include "./parmetis.h"
+#include <GKlib.h>
 
-#ifdef DMALLOC
-#include <dmalloc.h>
-#endif
+#include <parmetis.h>
 
-#include "./rename.h"
-#include "./defs.h"
-#include "./struct.h"
-#include "./macros.h"
-#include "./proto.h"
+#include "../../metis/Lib/gklib_defs.h"
+
+#include <mpi.h> 
+
+#include <rename.h>
+#include <defs.h>
+#include <struct.h>
+#include <macros.h>
+#include <proto.h>
 

@@ -11,24 +11,24 @@
  *
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
 
 /*************************************************************************
 * This function performs a k-way directed diffusion
 **************************************************************************/
-float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
+real_t WavefrontDiffusion(ctrl_t *ctrl, graph_t *graph, idx_t *home)
 {
-  int ii, i, j, k, l, nvtxs, nedges, nparts;
-  int from, to, edge, done, nswaps, noswaps, totalv, wsize;
-  int npasses, first, second, third, mind, maxd;
-  idxtype *xadj, *adjncy, *adjwgt, *where, *perm;
-  idxtype *rowptr, *colind, *ed, *psize;
-  float *transfer, *tmpvec;
-  float balance = -1.0, *load, *solution, *workspace;
-  float *nvwgt, *npwgts, flowFactor, cost, ubfactor;
-  MatrixType matrix;
-  KeyValueType *cand;
-  int ndirty, nclean, dptr, clean;
+  idx_t ii, i, j, k, l, nvtxs, nedges, nparts;
+  idx_t from, to, edge, done, nswaps, noswaps, totalv, wsize;
+  idx_t npasses, first, second, third, mind, maxd;
+  idx_t *xadj, *adjncy, *adjwgt, *where, *perm;
+  idx_t *rowptr, *colind, *ed, *psize;
+  real_t *transfer, *tmpvec;
+  real_t balance = -1.0, *load, *solution, *workspace;
+  real_t *nvwgt, *npwgts, flowFactor, cost, ubfactor;
+  matrix_t matrix;
+  ikv_t *cand;
+  idx_t ndirty, nclean, dptr, clean;
 
   nvtxs        = graph->nvtxs;
   nedges       = graph->nedges;
@@ -47,33 +47,34 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
   flowFactor = (ctrl->mype == 4) ? 1.00 : flowFactor;
 
   /* allocate memory */
-  solution                   = fmalloc(4*nparts+2*nedges, "WavefrontDiffusion: solution");
+  solution                   = rmalloc(4*nparts+2*nedges, "WavefrontDiffusion: solution");
   tmpvec                     = solution + nparts;
   npwgts                     = solution + 2*nparts;
   load                       = solution + 3*nparts;
   matrix.values              = solution + 4*nparts;
   transfer = matrix.transfer = solution + 4*nparts + nedges;
 
-  perm                   = idxmalloc(2*nvtxs+2*nparts+nedges+1, "WavefrontDiffusion: perm");
+  perm                   = imalloc(2*nvtxs+2*nparts+nedges+1, "WavefrontDiffusion: perm");
   ed                     = perm + nvtxs;
   psize                  = perm + 2*nvtxs;
   rowptr = matrix.rowptr = perm + 2*nvtxs + nparts;
   colind = matrix.colind = perm + 2*nvtxs + 2*nparts + 1;
 
-  wsize     = amax(sizeof(float)*nparts*6, sizeof(idxtype)*(nvtxs+nparts*2+1));
-  workspace = (float *)GKmalloc(wsize, "WavefrontDiffusion: workspace");
-  cand      = (KeyValueType *)GKmalloc(nvtxs*sizeof(KeyValueType), "WavefrontDiffusion: cand");
+  /*GKTODO - Potential problem with this malloc */
+  wsize     = gk_max(sizeof(real_t)*nparts*6, sizeof(idx_t)*(nvtxs+nparts*2+1));
+  workspace = (real_t *)gk_malloc(wsize, "WavefrontDiffusion: workspace");
+  cand      = ikvmalloc(nvtxs, "WavefrontDiffusion: cand");
 
 
   /*****************************/
   /* Populate empty subdomains */
   /*****************************/
-  idxset(nparts, 0, psize);
+  iset(nparts, 0, psize);
   for (i=0; i<nvtxs; i++) 
     psize[where[i]]++;
 
-  mind = idxamin(nparts, psize);
-  maxd = idxamax(nparts, psize);
+  mind = iargmin(nparts, psize);
+  maxd = iargmax(nparts, psize);
   if (psize[mind] == 0) {
     for (i=0; i<nvtxs; i++) {
       k = (RandomInRange(nvtxs)+i)%nvtxs; 
@@ -85,8 +86,9 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
       }
     }
   }
-  idxset(nvtxs, 0, ed);
-  sset(nparts, 0.0, npwgts);
+
+  iset(nvtxs, 0, ed);
+  rset(nparts, 0.0, npwgts);
   for (i=0; i<nvtxs; i++) {
     npwgts[where[i]] += nvwgt[i];
     for (j=xadj[i]; j<xadj[i+1]; j++)
@@ -96,7 +98,11 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
   ComputeLoad(graph, nparts, load, ctrl->tpwgts, 0);
   done = 0;
 
-  npasses = amin(nparts/2, NGD_PASSES);
+
+  /* zero out the tmpvec array */
+  rset(nparts, 0.0, tmpvec);
+
+  npasses = gk_min(nparts/2, NGD_PASSES);
   for (l=0; l<npasses; l++) {
     /* Set-up and solve the diffusion equation */
     nswaps = 0;
@@ -104,12 +110,12 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
     /************************/
     /* Solve flow equations */
     /************************/
-    SetUpConnectGraph(graph, &matrix, (idxtype *)workspace);
+    SetUpConnectGraph(graph, &matrix, (idx_t *)workspace);
 
     /* check for disconnected subdomains */
     for(i=0; i<matrix.nrows; i++) {
       if (matrix.rowptr[i]+1 == matrix.rowptr[i+1]) {
-        cost = (float)(ctrl->mype); 
+        cost = (real_t)(ctrl->mype); 
 	goto CleanUpAndExit;
       }
     }
@@ -127,18 +133,20 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
       /* move dirty vertices first */
       /*****************************/
       ndirty = 0;
-      for (i=0; i<nvtxs; i++)
+      for (i=0; i<nvtxs; i++) {
         if (where[i] != home[i])
           ndirty++;
+      }
 
       dptr = 0;
-      for (i=0; i<nvtxs; i++)
+      for (i=0; i<nvtxs; i++) {
         if (where[i] != home[i])
           perm[dptr++] = i;
         else
           perm[ndirty++] = i;
+      }
 
-      ASSERT(ctrl, ndirty == nvtxs);
+      PASSERT(ctrl, ndirty == nvtxs);
       ndirty = dptr;
       nclean = nvtxs-dptr;
       FastRandomPermute(ndirty, perm, 0);
@@ -157,8 +165,9 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
           cand[j].val = i;
         }
       }
-      ikeysort(k, cand);
+      ikvsorti(k, cand);
     }
+
 
     for (ii=0; ii<nvtxs/3; ii++) {
       i = (ctrl->mype == 0) ? cand[ii].val : perm[ii];
@@ -210,11 +219,11 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
         transfer[j] = tmpvec[colind[j]];
         tmpvec[colind[j]] = 0.0;
       }
-      ASSERTS(fabs(ssum(nparts, tmpvec)) < .0001)
+      ASSERT(fabs(rsum(nparts, tmpvec, 1)) < .0001)
     }
 
     if (l % 2 == 1) {
-      balance = npwgts[samax(nparts, npwgts)] * (float)nparts;
+      balance = rmax(nparts, npwgts)*nparts;
       if (balance < ubfactor + 0.035)
         done = 1;
 
@@ -230,11 +239,11 @@ float WavefrontDiffusion(CtrlType *ctrl, GraphType *graph, idxtype *home)
 
   graph->mincut = ComputeSerialEdgeCut(graph);
   totalv        = Mc_ComputeSerialTotalV(graph, home);
-  cost          = ctrl->ipc_factor * (float)graph->mincut + ctrl->redist_factor * (float)totalv;
+  cost          = ctrl->ipc_factor * (real_t)graph->mincut + ctrl->redist_factor * (real_t)totalv;
 
 
 CleanUpAndExit:
-  GKfree((void **)&solution, (void **)&perm, (void **)&workspace, (void **)&cand, LTERM);
+  gk_free((void **)&solution, (void **)&perm, (void **)&workspace, (void **)&cand, LTERM);
 
   return cost;
 }
