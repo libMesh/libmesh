@@ -27,6 +27,7 @@
 #
 #   Copyright (c) 2008 Thomas Porschberg <thomas@randspringer.de>
 #   Copyright (c) 2009 Peter Adolphs
+#   Copyright (c) 2012 Roy Stogner
 #
 #   Copying and distribution of this file, with or without modification, are
 #   permitted in any medium without royalty provided the copyright notice
@@ -117,13 +118,18 @@ if test "x$want_boost" = "xyes"; then
                 fi
         done
     elif test "$cross_compiling" != yes; then
-        for ac_boost_path_tmp in /usr /usr/local /opt /opt/local ; do
-            if test -d "$ac_boost_path_tmp/include/boost" && test -r "$ac_boost_path_tmp/include/boost"; then
+        for ac_boost_path_tmp in $BOOST_ROOT $BOOST_DIR /usr /usr/local /opt /opt/local ; do
+            if ls -d "$ac_boost_path_tmp"/include/boost*/boost/ >/dev/null 2>&1 ||
+               ls -d "$ac_boost_path_tmp"/include/boost/ >/dev/null 2>&1; then
                 for libsubdir in $libsubdirs ; do
                     if ls "$ac_boost_path_tmp/$libsubdir/libboost_"* >/dev/null 2>&1 ; then break; fi
                 done
                 BOOST_LDFLAGS="-L$ac_boost_path_tmp/$libsubdir"
-                BOOST_CPPFLAGS="-I$ac_boost_path_tmp/include"
+		dnl Matching end-of-line would work better, if I could ever
+                dnl figure out how to escape the $ properly
+                dnl ac_boost_include_dir_tmp=`ls -d "$ac_boost_path_tmp/include{/boost*,}/boost/" 2>/dev/null | sed 's#boost/`$'##'`
+                ac_boost_include_dir_tmp=`ls -d "$ac_boost_path_tmp"/include{/boost*,}/boost/shared_ptr.hpp 2>/dev/null | sed 's#boost/shared_ptr.hpp##'`
+                BOOST_CPPFLAGS="-I$ac_boost_include_dir_tmp"
                 break;
             fi
         done
