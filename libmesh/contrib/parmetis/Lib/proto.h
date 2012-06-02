@@ -12,341 +12,332 @@
  *
  */
 
+/* ctrl.c */
+ctrl_t *SetupCtrl(pmoptype_et optype, idx_t *options, idx_t ncon, idx_t nparts,
+            real_t *tpwgts, real_t *ubvec, MPI_Comm comm);
+void SetupCtrl_invtvwgts(ctrl_t *ctrl, graph_t *graph);
+void FreeCtrl(ctrl_t **r_ctrl);
+
+
+
 /* kmetis.c */
-void Moc_Global_Partition(CtrlType *, GraphType *, WorkSpaceType *);
+void Global_Partition(ctrl_t *, graph_t *);
 
 /* mmetis.c */
 
 /* gkmetis.c */
 
 /* match.c */
-void Moc_GlobalMatch_Balance(CtrlType *, GraphType *, WorkSpaceType *);
+void Match_Global(ctrl_t *, graph_t *);
+void Match_Local(ctrl_t *, graph_t *);
+void CreateCoarseGraph_Global(ctrl_t *, graph_t *, idx_t);
+void CreateCoarseGraph_Local(ctrl_t *, graph_t *, idx_t);
 
-/* coarsen.c */
-void Moc_Global_CreateCoarseGraph(CtrlType *, GraphType *, WorkSpaceType *, int);
 
 /* initpart.c */
-void Moc_InitPartition_RB(CtrlType *, GraphType *, WorkSpaceType *);
-void Moc_KeepPart(GraphType *, WorkSpaceType *, idxtype *, int);
+void InitPartition(ctrl_t *, graph_t *);
+void KeepPart(ctrl_t *, graph_t *, idx_t *, idx_t);
 
 /* kwayrefine.c */
-void Moc_ProjectPartition(CtrlType *, GraphType *, WorkSpaceType *);
-void Moc_ComputePartitionParams(CtrlType *, GraphType *, WorkSpaceType *);
+void ProjectPartition(ctrl_t *, graph_t *);
+void ComputePartitionParams(ctrl_t *, graph_t *);
+void KWayFM(ctrl_t *, graph_t *, idx_t);
+void KWayBalance(ctrl_t *, graph_t *, idx_t);
 
-/* kwayfm.c */
-void Moc_KWayFM(CtrlType *, GraphType *, WorkSpaceType *, int);
-
-/* kwaybalance.c */
-void Moc_KWayBalance(CtrlType *, GraphType *, WorkSpaceType *, int);
 
 /* remap.c */
-void ParallelReMapGraph(CtrlType *, GraphType *, WorkSpaceType *);
-void ParallelTotalVReMap(CtrlType *, idxtype *, idxtype *, WorkSpaceType *, int, int);
-int SimilarTpwgts(float *, int, int, int);
+void ParallelReMapGraph(ctrl_t *, graph_t *);
+void ParallelTotalVReMap(ctrl_t *, idx_t *, idx_t *, idx_t, idx_t);
+idx_t SimilarTpwgts(real_t *, idx_t, idx_t, idx_t);
 
 /* move.c */
-GraphType *Moc_MoveGraph(CtrlType *, GraphType *, WorkSpaceType *);
+graph_t *MoveGraph(ctrl_t *, graph_t *);
 /* move.c */
-void CheckMGraph(CtrlType *, GraphType *); 
-void ProjectInfoBack(CtrlType *, GraphType *, idxtype *, idxtype *, WorkSpaceType *);
-void FindVtxPerm(CtrlType *, GraphType *, idxtype *, WorkSpaceType *);
+void CheckMGraph(ctrl_t *, graph_t *); 
+void ProjectInfoBack(ctrl_t *, graph_t *, idx_t *, idx_t *);
+void FindVtxPerm(ctrl_t *, graph_t *, idx_t *);
 
-/* memory.c */
-void PreAllocateMemory(CtrlType *, GraphType *, WorkSpaceType *);
-void FreeWSpace(WorkSpaceType *);
-void FreeCtrl(CtrlType *);
-GraphType *CreateGraph(void);
-void InitGraph(GraphType *);
-void FreeGraph(GraphType *);
-void FreeInitialGraphAndRemap(GraphType *, int);
+/* wspace.c */
+void AllocateWSpace(ctrl_t *ctrl, size_t nwords);
+void AllocateRefinementWorkSpace(ctrl_t *ctrl, idx_t nbrpoolsize);
+void FreeWSpace(ctrl_t *);
+void *wspacemalloc(ctrl_t *ctrl, size_t nbytes);
+idx_t *iwspacemalloc(ctrl_t *ctrl, size_t n);
+real_t *rwspacemalloc(ctrl_t *ctrl, size_t n);
+ikv_t *ikvwspacemalloc(ctrl_t *ctrl, size_t n);
+rkv_t *rkvwspacemalloc(ctrl_t *ctrl, size_t n);
+void cnbrpoolReset(ctrl_t *ctrl);
+idx_t cnbrpoolGetNext(ctrl_t *ctrl, idx_t nnbrs);
 
 
 /* ametis.c */
-void Adaptive_Partition(CtrlType *, GraphType *, WorkSpaceType *);
+void Adaptive_Partition(ctrl_t *, graph_t *);
 
 /* rmetis.c */
 
 
-/* lmatch.c */
-void Mc_LocalMatch_HEM(CtrlType *, GraphType *, WorkSpaceType *);
-void Mc_Local_CreateCoarseGraph(CtrlType *, GraphType *, WorkSpaceType *, int);
-
 /* wave.c */
-float WavefrontDiffusion(CtrlType *, GraphType *, idxtype *);
+real_t WavefrontDiffusion(ctrl_t *, graph_t *, idx_t *);
 
 /* balancemylink.c */
-int BalanceMyLink(CtrlType *, GraphType *, idxtype *, int, int, float *, float, float *, float *, float);
+idx_t BalanceMyLink(ctrl_t *, graph_t *, idx_t *, idx_t, idx_t, real_t *, 
+          real_t, real_t *, real_t *, real_t);
 
 /* redomylink.c */
-void RedoMyLink(CtrlType *, GraphType *, idxtype *, int, int, float *, float *, float *);
+void RedoMyLink(ctrl_t *, graph_t *, idx_t *, idx_t, idx_t, real_t *, real_t *, real_t *);
 
 /* initbalance.c */
-void Balance_Partition(CtrlType *, GraphType *, WorkSpaceType *);
-GraphType *Moc_AssembleAdaptiveGraph(CtrlType *, GraphType *, WorkSpaceType *);
+void Balance_Partition(ctrl_t *, graph_t *);
+graph_t *AssembleAdaptiveGraph(ctrl_t *, graph_t *);
 
 /* mdiffusion.c */
-int Moc_Diffusion(CtrlType *, GraphType *, idxtype *, idxtype *, idxtype *, WorkSpaceType *, int);
-GraphType *ExtractGraph(CtrlType *, GraphType *, idxtype *, idxtype *, idxtype *);
+idx_t Mc_Diffusion(ctrl_t *, graph_t *, idx_t *, idx_t *, idx_t *, idx_t);
+graph_t *ExtractGraph(ctrl_t *, graph_t *, idx_t *, idx_t *, idx_t *);
 
 /* diffutil.c */
-void SetUpConnectGraph(GraphType *, MatrixType *, idxtype *);
-void Mc_ComputeMoveStatistics(CtrlType *, GraphType *, int *, int *, int *);
- int Mc_ComputeSerialTotalV(GraphType *, idxtype *);
-void ComputeLoad(GraphType *, int, float *, float *, int);
-void ConjGrad2(MatrixType *, float *, float *, float, float *);
-void mvMult2(MatrixType *, float *, float *);
-void ComputeTransferVector(int, MatrixType *, float *, float *, int);
-int ComputeSerialEdgeCut(GraphType *);
-int ComputeSerialTotalV(GraphType *, idxtype *);
+void SetUpConnectGraph(graph_t *, matrix_t *, idx_t *);
+void Mc_ComputeMoveStatistics(ctrl_t *, graph_t *, idx_t *, idx_t *, idx_t *);
+ idx_t Mc_ComputeSerialTotalV(graph_t *, idx_t *);
+void ComputeLoad(graph_t *, idx_t, real_t *, real_t *, idx_t);
+void ConjGrad2(matrix_t *, real_t *, real_t *, real_t, real_t *);
+void mvMult2(matrix_t *, real_t *, real_t *);
+void ComputeTransferVector(idx_t, matrix_t *, real_t *, real_t *, idx_t);
+idx_t ComputeSerialEdgeCut(graph_t *);
+idx_t ComputeSerialTotalV(graph_t *, idx_t *);
 
 /* akwayfm.c */
-void Moc_KWayAdaptiveRefine(CtrlType *, GraphType *, WorkSpaceType *, int);
+void KWayAdaptiveRefine(ctrl_t *, graph_t *, idx_t);
 
 /* selectq.c */
-void Moc_DynamicSelectQueue(int, int, int, int, idxtype *, float *, int *, int *, int, float, float);
-int Moc_HashVwgts(int, float *);
-int Moc_HashVRank(int, int *);
+void Mc_DynamicSelectQueue(ctrl_t *ctrl, idx_t nqueues, idx_t ncon, idx_t subdomain1,
+         idx_t subdomain2, idx_t *currentq, real_t *flows, idx_t *from, idx_t *qnum,
+         idx_t minval, real_t avgvwgt, real_t maxdiff);
+idx_t Mc_HashVwgts(ctrl_t *ctrl, idx_t ncon, real_t *nvwgt);
+idx_t Mc_HashVRank(idx_t ncon, idx_t *vwgt);
 
 
 /* csrmatch.c */
-void CSR_Match_SHEM(MatrixType *, idxtype *, idxtype *, idxtype *, int);
+void CSR_Match_SHEM(matrix_t *, idx_t *, idx_t *, idx_t *, idx_t);
 
 /* serial.c */
-void Moc_SerialKWayAdaptRefine(GraphType *, int, idxtype *, float *, int);
-void Moc_ComputeSerialPartitionParams(GraphType *, int, EdgeType *);
-int AreAllHVwgtsBelow(int, float, float *, float, float *, float *);
-void ComputeHKWayLoadImbalance(int, int, float *, float *);
-void SerialRemap(GraphType *, int, idxtype *, idxtype *, idxtype *, float *);
+void Mc_ComputeSerialPartitionParams(ctrl_t *ctrl, graph_t *, idx_t);
+void Mc_SerialKWayAdaptRefine(ctrl_t *ctrl, graph_t *, idx_t, idx_t *, real_t *, idx_t);
+idx_t AreAllHVwgtsBelow(idx_t, real_t, real_t *, real_t, real_t *, real_t *);
+void ComputeHKWayLoadImbalance(idx_t, idx_t, real_t *, real_t *);
+void SerialRemap(ctrl_t *ctrl, graph_t *, idx_t, idx_t *, idx_t *, idx_t *, real_t *);
 int SSMIncKeyCmp(const void *, const void *);
-void Moc_Serial_FM_2WayRefine(GraphType *, float *, int);
-void Serial_SelectQueue(int, float *, float *, int *, int *, FPQueueType [MAXNCON][2]);
-int Serial_BetterBalance(int, float *, float *, float *);
-float Serial_Compute2WayHLoadImbalance(int, float *, float *);
-void Moc_Serial_Balance2Way(GraphType *, float *, float);
-void Moc_Serial_Init2WayBalance(GraphType *, float *);
-int Serial_SelectQueueOneWay(int, float *, float *, int, FPQueueType [MAXNCON][2]);
-void Moc_Serial_Compute2WayPartitionParams(GraphType *);
-int Serial_AreAnyVwgtsBelow(int, float, float *, float, float *, float *);
+void Mc_Serial_FM_2WayRefine(ctrl_t *ctrl, graph_t *, real_t *, idx_t);
+void Serial_SelectQueue(idx_t, real_t *, real_t *, idx_t *, idx_t *, rpq_t **[2]);
+idx_t Serial_BetterBalance(idx_t, real_t *, real_t *, real_t *, real_t *);
+real_t Serial_Compute2WayHLoadImbalance(idx_t, real_t *, real_t *);
+void Mc_Serial_Balance2Way(ctrl_t *ctrl, graph_t *, real_t *, real_t);
+void Mc_Serial_Init2WayBalance(ctrl_t *ctrl, graph_t *, real_t *);
+idx_t Serial_SelectQueueOneWay(idx_t, real_t *, real_t *, idx_t, rpq_t **[2]);
+void Mc_Serial_Compute2WayPartitionParams(ctrl_t *ctrl, graph_t *);
+idx_t Serial_AreAnyVwgtsBelow(idx_t, real_t, real_t *, real_t, real_t *, real_t *);
 
 /* weird.c */
-void PartitionSmallGraph(CtrlType *, GraphType *, WorkSpaceType *);
-void CheckInputs(int partType, int npes, int dbglvl, int *wgtflag, int *iwgtflag,
-                 int *numflag, int *inumflag, int *ncon, int *incon, int *nparts, 
-		 int *inparts, float *tpwgts, float **itpwgts, float *ubvec, 
-		 float *iubvec, float *ipc2redist, float *iipc2redist, int *options, 
-		 int *ioptions, idxtype *part, MPI_Comm *comm);
+int CheckInputsPartKway(idx_t *vtxdist, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
+        idx_t *adjwgt, idx_t *wgtflag, idx_t *numflag, idx_t *ncon, idx_t *nparts,
+        real_t *tpwgts, real_t *ubvec, idx_t *options, idx_t *edgecut, idx_t *part,
+        MPI_Comm *comm);
+int CheckInputsPartGeomKway(idx_t *vtxdist, idx_t *xadj, idx_t *adjncy, idx_t *vwgt,
+        idx_t *adjwgt, idx_t *wgtflag, idx_t *numflag, idx_t *ndims, real_t *xyz, 
+        idx_t *ncon, idx_t *nparts, real_t *tpwgts, real_t *ubvec, idx_t *options, 
+        idx_t *edgecut, idx_t *part, MPI_Comm *comm);
+int CheckInputsPartGeom(idx_t *vtxdist, idx_t *ndims, real_t *xyz, 
+        idx_t *part, MPI_Comm *comm);
+int CheckInputsAdaptiveRepart(idx_t *vtxdist, idx_t *xadj, idx_t *adjncy,
+        idx_t *vwgt, idx_t *vsize, idx_t *adjwgt, idx_t *wgtflag, 
+        idx_t *numflag, idx_t *ncon, idx_t *nparts, real_t *tpwgts, 
+        real_t *ubvec, real_t *ipc2redist, idx_t *options, idx_t *edgecut, 
+        idx_t *part, MPI_Comm *comm);
+int CheckInputsNodeND(idx_t *vtxdist, idx_t *xadj, idx_t *adjncy, 
+        idx_t *numflag, idx_t *options, idx_t *order, idx_t *sizes,
+        MPI_Comm *comm);
+int CheckInputsPartMeshKway(idx_t *elmdist, idx_t *eptr, idx_t *eind, idx_t *elmwgt,
+        idx_t *wgtflag, idx_t *numflag, idx_t *ncon, idx_t *ncommon, idx_t *nparts,
+        real_t *tpwgts, real_t *ubvec, idx_t *options, idx_t *edgecut, idx_t *part,
+        MPI_Comm *comm);
+void PartitionSmallGraph(ctrl_t *, graph_t *);
+
 
 /* mesh.c */
 
-/* ometis.c */
-
 /* pspases.c */
-GraphType *AssembleEntireGraph(CtrlType *, idxtype *, idxtype *, idxtype *);
+graph_t *AssembleEntireGraph(ctrl_t *, idx_t *, idx_t *, idx_t *);
 
 /* node_refine.c */
-void ComputeNodePartitionParams0(CtrlType *, GraphType *, WorkSpaceType *);
-void ComputeNodePartitionParams(CtrlType *, GraphType *, WorkSpaceType *);
-void KWayNodeRefine0(CtrlType *, GraphType *, WorkSpaceType *, int, float);
-void KWayNodeRefine(CtrlType *, GraphType *, WorkSpaceType *, int, float);
-void KWayNodeRefine2(CtrlType *, GraphType *, WorkSpaceType *, int, float);
-void PrintNodeBalanceInfo(CtrlType *, int, idxtype *, idxtype *, idxtype *, int);
+void AllocateNodePartitionParams(ctrl_t *, graph_t *);
+void ComputeNodePartitionParams(ctrl_t *, graph_t *);
+void UpdateNodePartitionParams(ctrl_t *, graph_t *);
+void KWayNodeRefine_Greedy(ctrl_t *ctrl, graph_t *graph, idx_t npasses, real_t ubfrac);
+void KWayNodeRefine2Phase(ctrl_t *ctrl, graph_t *graph, idx_t npasses, real_t ubfrac);
+void KWayNodeRefineInterior(ctrl_t *ctrl, graph_t *graph, idx_t npasses, real_t ubfrac);
+void PrintNodeBalanceInfo(ctrl_t *, idx_t, idx_t *, idx_t *, char *);
+
 
 /* initmsection.c */
-void InitMultisection(CtrlType *, GraphType *, WorkSpaceType *);
-GraphType *AssembleMultisectedGraph(CtrlType *, GraphType *, WorkSpaceType *);
+void InitMultisection(ctrl_t *, graph_t *);
+graph_t *AssembleMultisectedGraph(ctrl_t *, graph_t *);
 
-/* order.c */
-void MultilevelOrder(CtrlType *, GraphType *, idxtype *, idxtype *, WorkSpaceType *);
-void LabelSeparators(CtrlType *, GraphType *, idxtype *, idxtype *, idxtype *, idxtype *, WorkSpaceType *);
-void CompactGraph(CtrlType *, GraphType *, idxtype *, WorkSpaceType *);
-void LocalOrder(CtrlType *, GraphType *, idxtype *, int, WorkSpaceType *);
-void LocalNDOrder(CtrlType *, GraphType *, idxtype *, int, WorkSpaceType *);
-void Order_Partition(CtrlType *, GraphType *, WorkSpaceType *);
+
+/* ometis.c */
+void MultilevelOrder(ctrl_t *ctrl, graph_t *graph, idx_t *order, idx_t *sizes);
+void Order_Partition_Multiple(ctrl_t *ctrl, graph_t *graph);
+void Order_Partition(ctrl_t *ctrl, graph_t *graph, idx_t *nlevels, idx_t clevel);
+void LabelSeparators(ctrl_t *, graph_t *, idx_t *, idx_t *, idx_t *, idx_t *);
+void CompactGraph(ctrl_t *, graph_t *, idx_t *);
+void LocalNDOrder(ctrl_t *, graph_t *, idx_t *, idx_t);
+
 
 /* xyzpart.c */
-void Coordinate_Partition(CtrlType *, GraphType *, int, float *, int, WorkSpaceType *);
-void PartSort(CtrlType *, GraphType *, KeyValueType *, WorkSpaceType *);
+void Coordinate_Partition(ctrl_t *, graph_t *, idx_t, real_t *, idx_t);
+void IRBinCoordinates(ctrl_t *ctrl, graph_t *graph, idx_t ndims, real_t *xyz, 
+         idx_t nbins, idx_t *bxyz);
+void RBBinCoordinates(ctrl_t *ctrl, graph_t *graph, idx_t ndims, real_t *xyz, 
+         idx_t nbins, idx_t *bxyz);
+void SampleSort(ctrl_t *, graph_t *, ikv_t *);
+void PseudoSampleSort(ctrl_t *, graph_t *, ikv_t *);
 
-
-/* fpqueue.c */
-void FPQueueInit(FPQueueType *, int);
-void FPQueueReset(FPQueueType *);
-void FPQueueFree(FPQueueType *);
-int FPQueueGetSize(FPQueueType *);
-int FPQueueInsert(FPQueueType *, int, float);
-int FPQueueDelete(FPQueueType *, int);
-int FPQueueUpdate(FPQueueType *, int, float, float);
-void FPQueueUpdateUp(FPQueueType *, int, float, float);
-int FPQueueGetMax(FPQueueType *);
-int FPQueueSeeMaxVtx(FPQueueType *);
-float FPQueueSeeMaxGain(FPQueueType *);
-float FPQueueGetKey(FPQueueType *);
-int FPQueueGetQSize(FPQueueType *);
-int CheckHeapFloat(FPQueueType *);
 
 /* stat.c */
-void Moc_ComputeSerialBalance(CtrlType *, GraphType *, idxtype *, float *);
-void Moc_ComputeParallelBalance(CtrlType *, GraphType *, idxtype *, float *);
-void Moc_PrintThrottleMatrix(CtrlType *, GraphType *, float *);
-void Moc_ComputeRefineStats(CtrlType *, GraphType *, float *);
+void ComputeSerialBalance(ctrl_t *, graph_t *, idx_t *, real_t *);
+void ComputeParallelBalance(ctrl_t *, graph_t *, idx_t *, real_t *);
+void Mc_PrintThrottleMatrix(ctrl_t *, graph_t *, real_t *);
+void PrintPostPartInfo(ctrl_t *ctrl, graph_t *graph, idx_t movestats);
+void ComputeMoveStatistics(ctrl_t *, graph_t *, idx_t *, idx_t *, idx_t *);
 
 /* debug.c */
-void PrintVector(CtrlType *, int, int, idxtype *, char *);
-void PrintVector2(CtrlType *, int, int, idxtype *, char *);
-void PrintPairs(CtrlType *, int, KeyValueType *, char *);
-void PrintGraph(CtrlType *, GraphType *);
-void PrintGraph2(CtrlType *, GraphType *);
-void PrintSetUpInfo(CtrlType *ctrl, GraphType *graph);
-void PrintTransferedGraphs(CtrlType *, int, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *);
-void WriteMetisGraph(int, idxtype *, idxtype *, idxtype *, idxtype *);
+void PrintVector(ctrl_t *, idx_t, idx_t, idx_t *, char *);
+void PrintVector2(ctrl_t *, idx_t, idx_t, idx_t *, char *);
+void PrintPairs(ctrl_t *, idx_t, ikv_t *, char *);
+void PrintGraph(ctrl_t *, graph_t *);
+void PrintGraph2(ctrl_t *, graph_t *);
+void PrintSetUpInfo(ctrl_t *ctrl, graph_t *graph);
+void PrintTransferedGraphs(ctrl_t *, idx_t, idx_t *, idx_t *, idx_t *, idx_t *, idx_t *);
+void WriteMetisGraph(idx_t, idx_t *, idx_t *, idx_t *, idx_t *);
+
 
 /* comm.c */
-void CommInterfaceData(CtrlType *, GraphType *, idxtype *, idxtype *, idxtype *);
-void CommChangedInterfaceData(CtrlType *, GraphType *, int, idxtype *, idxtype *, KeyValueType *, KeyValueType *, idxtype *);
-int GlobalSEMax(CtrlType *, int);
-double GlobalSEMaxDouble(CtrlType *, double);
-int GlobalSEMin(CtrlType *, int);
-int GlobalSESum(CtrlType *, int);
-float GlobalSEMaxFloat(CtrlType *, float);
-float GlobalSEMinFloat(CtrlType *, float);
-float GlobalSESumFloat(CtrlType *, float);
+void CommSetup(ctrl_t *, graph_t *);
+void CommUpdateNnbrs(ctrl_t *ctrl, idx_t nnbrs);
+void CommInterfaceData(ctrl_t *ctrl, graph_t *graph, idx_t *data, idx_t *recvvector);
+void CommChangedInterfaceData(ctrl_t *ctrl, graph_t *graph, idx_t nchanged,
+         idx_t *changed, idx_t *data, ikv_t *sendpairs, ikv_t *recvpairs);
+idx_t GlobalSEMax(ctrl_t *, idx_t);
+idx_t GlobalSEMaxComm(MPI_Comm comm, idx_t value);
+idx_t GlobalSEMin(ctrl_t *, idx_t);
+idx_t GlobalSEMinComm(MPI_Comm comm, idx_t value);
+idx_t GlobalSESum(ctrl_t *, idx_t);
+idx_t GlobalSESumComm(MPI_Comm comm, idx_t value);
+real_t GlobalSEMaxFloat(ctrl_t *, real_t);
+real_t GlobalSEMinFloat(ctrl_t *, real_t);
+real_t GlobalSESumFloat(ctrl_t *, real_t);
 
 /* util.c */
-void errexit(char *,...);
-void myprintf(CtrlType *, char *f_str,...);
-void rprintf(CtrlType *, char *f_str,...);
-#ifndef DMALLOC
-int *imalloc(int, char *);
-idxtype *idxmalloc(int, char *);
-float *fmalloc(int, char *);
-int *ismalloc(int, int, char *);
-idxtype *idxsmalloc(int, idxtype, char *);
-void *GKmalloc(int, char *);
-#endif
-/*void GKfree(void **,...); */
-int *iset(int n, int val, int *x);
-idxtype * idxset(int n, idxtype val, idxtype *x);
-int idxamax(int n, idxtype *x);
-int idxamin(int n, idxtype *x);
-int idxasum(int n, idxtype *x);
-float snorm2(int, float *);
-float sdot(int n, float *, float *);
-void saxpy(int, float, float *, float *);
-void ikeyvalsort_org(int, KeyValueType *);
-int IncKeyValueCmp(const void *, const void *);
-void dkeyvalsort(int, KeyValueType *);
-int DecKeyValueCmp(const void *, const void *);
-int BSearch(int, idxtype *, int);
-void RandomPermute(int, idxtype *, int);
-void FastRandomPermute(int, idxtype *, int);
-int ispow2(int);
-int log2Int(int);
-void BucketSortKeysDec(int, int, idxtype *, idxtype *);
-float *sset(int n, float val, float *x);
-int iamax(int, int *);
-int idxamax_strd(int, idxtype *, int);
-int idxamin_strd(int, idxtype *, int);
-int samax_strd(int, float *, int);
-int sfamax(int, float *);
-int samin_strd(int, float *, int);
-float idxavg(int, idxtype *);
-float savg(int, float *);
-int samax(int, float *);
-int sfavg(int n, float *x);
-int samax2(int, float *);
-int samin(int, float *);
-int idxsum(int, idxtype *);
-int idxsum_strd(int, idxtype *, int);
-void idxadd(int, idxtype *, idxtype *);
-float ssum(int, float *);
-float ssum_strd(int, float *, int);
-void sscale(int, float, float *);
-void saneg(int, float *);
-float BetterVBalance(int, float *, float *, float *);
-int IsHBalanceBetterTT(int, float *, float *, float *, float *);
-int IsHBalanceBetterFT(int, float *, float *, float *, float *);
-int myvalkeycompare(const void *, const void *);
-int imyvalkeycompare(const void *, const void *);
-float *fsmalloc(int, float, char *);
-void saxpy2(int, float, float *, int, float *, int);
-void GetThreeMax(int, float *, int *, int *, int *);
-
-/* qsort_special.c */
-void iidxsort(int, idxtype *);
-void iintsort(int, int *);
-void ikeysort(int, KeyValueType *);
-void ikeyvalsort(int, KeyValueType *);
+void myprintf(ctrl_t *ctrl, char *f_str,...);
+void rprintf(ctrl_t *ctrl, char *f_str,...);
+void mypridx_tf(ctrl_t *, char *f_str,...);
+void rpridx_tf(ctrl_t *, char *f_str,...);
+idx_t BSearch(idx_t, idx_t *, idx_t);
+void RandomPermute(idx_t, idx_t *, idx_t);
+void FastRandomPermute(idx_t, idx_t *, idx_t);
+idx_t ispow2(idx_t);
+idx_t log2Int(idx_t);
+void BucketSortKeysDec(idx_t, idx_t, idx_t *, idx_t *);
+real_t BetterVBalance(idx_t, real_t *, real_t *, real_t *);
+idx_t IsHBalanceBetterTT(idx_t, real_t *, real_t *, real_t *, real_t *);
+idx_t IsHBalanceBetterFT(idx_t, real_t *, real_t *, real_t *, real_t *);
+void GetThreeMax(idx_t, real_t *, idx_t *, idx_t *, idx_t *);
+size_t rargmax_strd(size_t n, real_t *x, size_t incx);
+size_t rargmin_strd(size_t n, real_t *x, size_t incx);
+size_t rargmax2(size_t n, real_t *x);
+real_t ravg(size_t n, real_t *x);
+real_t rfavg(size_t n, real_t *x);
 
 /* grsetup.c */
-GraphType *Moc_SetUpGraph(CtrlType *, int, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int *);
-void SetUpCtrl(CtrlType *ctrl, int, int, MPI_Comm);
-void ChangeNumbering(idxtype *, idxtype *, idxtype *, idxtype *, int, int, int);
-void ChangeNumberingMesh(idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int, int, int, int);
-void ChangeNumberingMesh2(idxtype *elmdist, idxtype *eptr, idxtype *eind,
-                          idxtype *xadj, idxtype *adjncy, idxtype *part,
-			  int npes, int mype, int from);
-void GraphRandomPermute(GraphType *);
-void ComputeMoveStatistics(CtrlType *, GraphType *, int *, int *, int *);
+graph_t *SetupGraph(ctrl_t *ctrl, idx_t ncon, idx_t *vtxdist, idx_t *xadj,
+             idx_t *vwgt, idx_t *vsize, idx_t *adjncy, idx_t *adjwgt, 
+             idx_t wgtflag);
+void SetupGraph_nvwgts(ctrl_t *ctrl, graph_t *graph);
+graph_t *CreateGraph(void);
+void InitGraph(graph_t *);
+void FreeGraph(graph_t *graph);
+void FreeNonGraphFields(graph_t *graph);
+void FreeNonGraphNonSetupFields(graph_t *graph);
+void FreeInitialGraphAndRemap(graph_t *graph);
+void ChangeNumbering(idx_t *, idx_t *, idx_t *, idx_t *, idx_t, idx_t, idx_t);
+void ChangeNumberingMesh(idx_t *elmdist, idx_t *eptr, idx_t *eind,
+                         idx_t *xadj, idx_t *adjncy, idx_t *part,
+			 idx_t npes, idx_t mype, idx_t from);
 
 /* timer.c */
-void InitTimers(CtrlType *);
-void PrintTimingInfo(CtrlType *);
-void PrintTimer(CtrlType *, timer, char *);
-
-/* setup.c */
-void SetUp(CtrlType *, GraphType *, WorkSpaceType *);
-int Home_PE(int, int, idxtype *, int);
+void InitTimers(ctrl_t *);
+void PrintTimingInfo(ctrl_t *);
+void PrintTimer(ctrl_t *, timer, char *);
 
 
-/*********************/
-/* METIS subroutines */
-/*********************/
-void METIS_WPartGraphKway2(int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, float *, int *, int *, idxtype *);
-void METIS_mCPartGraphRecursive2(int *, int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, float *, int *, int *, idxtype *);
-int MCMlevelRecursiveBisection2(CtrlType *, GraphType *, int, float *, idxtype *, float, int); 
-void METIS_PartGraphKway(int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, int *, int *, idxtype *);
-void METIS_mCPartGraphKway(int *, int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, int *, float *, int *, int *, idxtype *);
-void METIS_EdgeComputeSeparator(int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, idxtype *); 
-void METIS_NodeComputeSeparator(int *, idxtype *, idxtype *, idxtype *, idxtype *, int *, int *, idxtype *); 
-void METIS_NodeND(int *, idxtype *, idxtype *, int *, int *, idxtype *, idxtype *);
-void METIS_NodeNDP(int, idxtype *, idxtype *, int, int *, idxtype *, idxtype *, idxtype *);
-
-
-
-/***********************/
-/* TESTing subroutines */
-/***********************/
-
-/* pio.c */
-void ParallelReadGraph(GraphType *, char *, MPI_Comm);
-void Moc_ParallelWriteGraph(CtrlType *, GraphType *, char *, int, int);
-void ReadTestGraph(GraphType *, char *, MPI_Comm);
-float *ReadTestCoordinates(GraphType *, char *, int, MPI_Comm);
-void ReadMetisGraph(char *, int *, idxtype **, idxtype **);
-void Moc_SerialReadGraph(GraphType *, char *, int *, MPI_Comm);
-void Moc_SerialReadMetisGraph(char *, int *, int *, int *, int *, idxtype **, idxtype **, idxtype **, idxtype **, int *);
-
-/* adaptgraph */
-void AdaptGraph(GraphType *, int, MPI_Comm);
-void AdaptGraph2(GraphType *, int, MPI_Comm);
-void Mc_AdaptGraph(GraphType *, idxtype *, int, int, MPI_Comm);
-
-/* ptest.c */
-void TestParMetis(char *, MPI_Comm);
-
-/* NEW_ptest.c */
-void TestParMetis_V3(char *, MPI_Comm);
-int ComputeRealCut(idxtype *, idxtype *, char *, MPI_Comm);
-int ComputeRealCut2(idxtype *, idxtype *, idxtype *, idxtype *, char *, MPI_Comm);
-void TestMoveGraph(GraphType *, GraphType *, idxtype *, MPI_Comm);
-GraphType *SetUpGraph(CtrlType *, idxtype *, idxtype *, idxtype *, idxtype *, idxtype *, int);
-
-/* mienio.c */
-void mienIO(MeshType *, char *, int, int, MPI_Comm);
-
-/* meshio.c */
-void ParallelReadMesh(MeshType *, char *, MPI_Comm);
 
 /* parmetis.c */
-void ChangeToFortranNumbering(idxtype *, idxtype *, idxtype *, int, int);
+void ChangeToFortranNumbering(idx_t *, idx_t *, idx_t *, idx_t, idx_t);
+
+
+/* msetup.c */
+mesh_t *SetUpMesh(idx_t *etype, idx_t *ncon, idx_t *elmdist, idx_t *elements,
+      idx_t *elmwgt, idx_t *wgtflag, MPI_Comm *comm);
+mesh_t *CreateMesh(void);
+void InitMesh(mesh_t *mesh);
+
+
+/* gkmpi.c */
+int gkMPI_Comm_size(MPI_Comm comm, idx_t *size);
+int gkMPI_Comm_rank(MPI_Comm comm, idx_t *rank);
+int gkMPI_Get_count(MPI_Status *status, MPI_Datatype datatype,
+        idx_t *count);
+int gkMPI_Send(void *buf, idx_t count, MPI_Datatype datatype, idx_t dest,
+        idx_t tag, MPI_Comm comm);
+int gkMPI_Recv(void *buf, idx_t count, MPI_Datatype datatype,
+        idx_t source, idx_t tag, MPI_Comm comm, MPI_Status *status);
+int gkMPI_Isend(void *buf, idx_t count, MPI_Datatype datatype, idx_t dest,
+        idx_t tag, MPI_Comm comm, MPI_Request *request);
+int gkMPI_Irecv(void *buf, idx_t count, MPI_Datatype datatype,
+        idx_t source, idx_t tag, MPI_Comm comm, MPI_Request *request);
+int gkMPI_Wait(MPI_Request *request, MPI_Status *status);
+int gkMPI_Waitall(idx_t count, MPI_Request *array_of_requests, 
+        MPI_Status *array_of_statuses);
+int gkMPI_Barrier(MPI_Comm comm);
+int gkMPI_Bcast(void *buffer, idx_t count, MPI_Datatype datatype,
+        idx_t root, MPI_Comm comm);
+int gkMPI_Reduce(void *sendbuf, void *recvbuf, idx_t count,
+        MPI_Datatype datatype, MPI_Op op, idx_t root, MPI_Comm comm);
+int gkMPI_Allreduce(void *sendbuf, void *recvbuf, idx_t count,
+        MPI_Datatype datatype, MPI_Op op, MPI_Comm comm);
+int gkMPI_Scan(void *sendbuf, void *recvbuf, idx_t count,
+        MPI_Datatype datatype, MPI_Op op, MPI_Comm comm);
+int gkMPI_Allgather(void *sendbuf, idx_t sendcount,
+        MPI_Datatype sendtype, void *recvbuf, idx_t recvcount,
+        MPI_Datatype recvtype, MPI_Comm comm);
+int gkMPI_Alltoall(void *sendbuf, idx_t sendcount,
+        MPI_Datatype sendtype, void *recvbuf, idx_t recvcount,
+        MPI_Datatype recvtype, MPI_Comm comm);
+int gkMPI_Alltoallv(void *sendbuf, idx_t *sendcounts,
+        idx_t *sdispls, MPI_Datatype sendtype, void *recvbuf, 
+        idx_t *recvcounts, idx_t *rdispls, MPI_Datatype recvtype, 
+        MPI_Comm comm);
+int gkMPI_Allgatherv(void *sendbuf, idx_t sendcount, MPI_Datatype sendtype, 
+        void *recvbuf, idx_t *recvcounts, idx_t *rdispls, 
+        MPI_Datatype recvtype, MPI_Comm comm);
+int gkMPI_Scatterv(void *sendbuf, idx_t *sendcounts, idx_t *sdispls,
+        MPI_Datatype sendtype, void *recvbuf, idx_t recvcount,
+        MPI_Datatype recvtype, idx_t root, MPI_Comm comm);
+int gkMPI_Gatherv(void *sendbuf, idx_t sendcount, MPI_Datatype sendtype,
+        void *recvbuf, idx_t *recvcounts, idx_t *displs, MPI_Datatype recvtype,
+        idx_t root, MPI_Comm comm);
+int gkMPI_Comm_split(MPI_Comm comm, idx_t color, idx_t key,
+        MPI_Comm *newcomm);
+int gkMPI_Comm_free(MPI_Comm *comm);
+int gkMPI_Finalize();
+
+
 

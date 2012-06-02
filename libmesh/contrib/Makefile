@@ -22,6 +22,7 @@ all:
 	@$(MAKE) -C libHilbert $(MAKECMDGOALS)
 	@echo ""
 	@echo "--- Building Metis ---------------------------"
+	@$(MAKE) -C metis/GKlib    $(MAKECMDGOALS)
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@echo "--- Building Parmetis ------------------------"
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
@@ -55,6 +56,7 @@ clean:
 	@rm -f *~
 	@$(MAKE) -C fparser      $(MAKECMDGOALS)
 	@$(MAKE) -C laspack      $(MAKECMDGOALS)
+	@$(MAKE) -C metis/GKlib  $(MAKECMDGOALS)
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
@@ -74,6 +76,7 @@ clobber:
 	@$(MAKE) clean
 	@$(MAKE) -C fparser      $(MAKECMDGOALS)
 	@$(MAKE) -C laspack      $(MAKECMDGOALS)
+	@$(MAKE) -C metis/GKlib  $(MAKECMDGOALS)
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)
@@ -93,6 +96,7 @@ distclean:
 	@$(MAKE) clobber
 	@$(MAKE) -C fparser      $(MAKECMDGOALS)
 	@$(MAKE) -C laspack      $(MAKECMDGOALS)
+	@$(MAKE) -C metis/GKlib  $(MAKECMDGOALS)
 	@$(MAKE) -C metis/Lib    $(MAKECMDGOALS)
 	@$(MAKE) -C parmetis/Lib $(MAKECMDGOALS)
 	@$(MAKE) -C sfcurves     $(MAKECMDGOALS)

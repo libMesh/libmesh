@@ -11,53 +11,60 @@
  * $Id$
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
 #define	PE	0
 
 /*************************************************************************
 * This function performs an edge-based FM refinement
 **************************************************************************/
-int BalanceMyLink(CtrlType *ctrl, GraphType *graph, idxtype *home, int me,
-  int you, float *flows, float maxdiff, float *diff_cost, float *diff_lbavg,
-  float avgvwgt)
+idx_t BalanceMyLink(ctrl_t *ctrl, graph_t *graph, idx_t *home, idx_t me,
+          idx_t you, real_t *flows, real_t maxdiff, real_t *diff_cost, 
+          real_t *diff_lbavg, real_t avgvwgt)
 {
-  int h, i, ii, j, k;
-  int nvtxs, ncon;
-  int nqueues, minval, maxval, higain, vtx, edge, totalv;
-  int from, to, qnum, index, nchanges, cut, tmp;
-  int pass, nswaps, nmoves, multiplier;
-  idxtype *xadj, *vsize, *adjncy, *adjwgt, *where, *ed, *id;
-  idxtype *hval, *nvpq, *inq, *map, *rmap, *ptr, *myqueue, *changes;
-  float *nvwgt, lbvec[MAXNCON], pwgts[MAXNCON*2], tpwgts[MAXNCON*2], my_wgt[MAXNCON];
-  float newgain, oldgain = 0.0;
-  float lbavg, bestflow, mycost;
-  float ipc_factor, redist_factor, ftmp;
-  FPQueueType *queues;
-int mype;
-MPI_Comm_rank(MPI_COMM_WORLD, &mype);
+  idx_t h, i, ii, j, k, mype;
+  idx_t nvtxs, ncon;
+  idx_t nqueues, minval, maxval, higain, vtx, edge, totalv;
+  idx_t from, to, qnum, index, nchanges, cut, tmp;
+  idx_t pass, nswaps, nmoves, multiplier;
+  idx_t *xadj, *vsize, *adjncy, *adjwgt, *where, *ed, *id;
+  idx_t *hval, *nvpq, *inq, *map, *rmap, *ptr, *myqueue, *changes;
+  real_t *nvwgt, *lbvec, *pwgts, *tpwgts, *my_wgt;
+  real_t newgain;
+  real_t lbavg, bestflow, mycost;
+  real_t ipc_factor, redist_factor, ftmp;
+  rpq_t **queues;
 
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  xadj = graph->xadj;
-  nvwgt = graph->nvwgt;
-  vsize = graph->vsize;
+  WCOREPUSH;
+
+  gkMPI_Comm_rank(MPI_COMM_WORLD, &mype);
+
+  nvtxs  = graph->nvtxs;
+  ncon   = graph->ncon;
+  xadj   = graph->xadj;
+  nvwgt  = graph->nvwgt;
+  vsize  = graph->vsize;
   adjncy = graph->adjncy;
   adjwgt = graph->adjwgt;
-  where = graph->where;
-  ipc_factor = ctrl->ipc_factor;
+  where  = graph->where;
+
+  ipc_factor    = ctrl->ipc_factor;
   redist_factor = ctrl->redist_factor;
 
-  hval = idxmalloc(nvtxs*7, "hval");
-  id = hval + nvtxs;
-  ed = hval + nvtxs*2;
-  map = hval + nvtxs*3;
-  rmap = hval + nvtxs*4;
-  myqueue = hval + nvtxs*5;
-  changes = hval + nvtxs*6;
+  hval    = iwspacemalloc(ctrl, nvtxs);
+  id      = iwspacemalloc(ctrl, nvtxs);
+  ed      = iwspacemalloc(ctrl, nvtxs);
+  map     = iwspacemalloc(ctrl, nvtxs);
+  rmap    = iwspacemalloc(ctrl, nvtxs);
+  myqueue = iwspacemalloc(ctrl, nvtxs);
+  changes = iwspacemalloc(ctrl, nvtxs);
 
-  sset(ncon*2, 0.0, pwgts);
+  lbvec  = rwspacemalloc(ctrl, ncon);
+  pwgts  = rset(2*ncon, 0.0, rwspacemalloc(ctrl, 2*ncon));
+  tpwgts = rwspacemalloc(ctrl, 2*ncon);
+  my_wgt = rset(ncon, 0.0, rwspacemalloc(ctrl, ncon));
+
   for (h=0; h<ncon; h++) {
-    tpwgts[h] = -1.0 * flows[h];
+    tpwgts[h]      = -1.0*flows[h];
     tpwgts[ncon+h] = flows[h];
   }
 
@@ -65,14 +72,14 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     if (where[i] == me) {
       for (h=0; h<ncon; h++) {
         tpwgts[h] += nvwgt[i*ncon+h];
-        pwgts[h] += nvwgt[i*ncon+h];
+        pwgts[h]  += nvwgt[i*ncon+h];
       }
     }
     else {
-      ASSERTS(where[i] == you);
+      ASSERT(where[i] == you);
       for (h=0; h<ncon; h++) {
         tpwgts[ncon+h] += nvwgt[i*ncon+h];
-        pwgts[ncon+h] += nvwgt[i*ncon+h];
+        pwgts[ncon+h]  += nvwgt[i*ncon+h];
       }
     }
   }
@@ -102,19 +109,18 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
   }
 
   nqueues = maxval-minval+1;
-  nvpq = idxsmalloc(nqueues, 0, "nvpq");
-  ptr = idxmalloc(nqueues+1, "ptr");
-  inq = idxmalloc(nqueues*2, "inq");
-  queues = (FPQueueType *)(GKmalloc(sizeof(FPQueueType)*nqueues*2, "queues"));
+  nvpq    = iset(nqueues, 0, iwspacemalloc(ctrl, nqueues));
+  ptr     = iwspacemalloc(ctrl, nqueues+1);
+  inq     = iwspacemalloc(ctrl, 2*nqueues);
+  queues  = (rpq_t **)(wspacemalloc(ctrl, sizeof(rpq_t *)*2*nqueues));
 
   for (i=0; i<nvtxs; i++)
-    hval[i] = Moc_HashVwgts(ncon, nvwgt+i*ncon) - minval;
+    hval[i] = Mc_HashVwgts(ctrl, ncon, nvwgt+i*ncon) - minval;
 
   for (i=0; i<nvtxs; i++)
     nvpq[hval[i]]++;
 
-  ptr[0] = 0;
-  for (i=0; i<nqueues; i++)
+  for (ptr[0]=0, i=0; i<nqueues; i++)
     ptr[i+1] = ptr[i] + nvpq[i];
 
   for (i=0; i<nvtxs; i++) {
@@ -122,78 +128,83 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     rmap[ptr[hval[i]]++] = i;
   }
 
-  for (i=nqueues-1; i>0; i--)
-    ptr[i] = ptr[i-1];
-  ptr[0] = 0;
+  SHIFTCSR(i, nqueues, ptr);
+
 
   /* initialize queues */
   for (i=0; i<nqueues; i++)
     if (nvpq[i] > 0) {
-      FPQueueInit(queues+i, nvpq[i]);
-      FPQueueInit(queues+i+nqueues, nvpq[i]);
+      queues[i]         = rpqCreate(nvpq[i]);
+      queues[nqueues+i] = rpqCreate(nvpq[i]);
     }
 
   /* compute internal/external degrees */
-  idxset(nvtxs, 0, id);
-  idxset(nvtxs, 0, ed);
-  for (j=0; j<nvtxs; j++)
-    for (k=xadj[j]; k<xadj[j+1]; k++)
+  iset(nvtxs, 0, id);
+  iset(nvtxs, 0, ed);
+  for (j=0; j<nvtxs; j++) {
+    for (k=xadj[j]; k<xadj[j+1]; k++) {
       if (where[adjncy[k]] == where[j])
         id[j] += adjwgt[k];
       else 
         ed[j] += adjwgt[k];
+    }
+  }
 
   nswaps = 0;
   for (pass=0; pass<N_MOC_BAL_PASSES; pass++) {
-    idxset(nvtxs, -1, myqueue); 
-    idxset(nqueues*2, 0, inq);
+    iset(nvtxs, -1, myqueue); 
+    iset(nqueues*2, 0, inq);
 
     /* insert vertices into correct queues */
     for (j=0; j<nvtxs; j++) {
       index = (where[j] == me) ? 0 : nqueues;
 
-      newgain = ipc_factor*(float)(ed[j]-id[j]);
+      newgain = ipc_factor*(real_t)(ed[j]-id[j]);
       if (home[j] == me || home[j] == you) {
         if (where[j] == home[j])
-          newgain -= redist_factor*(float)vsize[j];
+          newgain -= redist_factor*(real_t)vsize[j];
         else
-          newgain += redist_factor*(float)vsize[j];
+          newgain += redist_factor*(real_t)vsize[j];
       }
 
-      FPQueueInsert(queues+hval[j]+index, map[j]-ptr[hval[j]], newgain);
+      rpqInsert(queues[hval[j]+index], map[j]-ptr[hval[j]], newgain);
       myqueue[j] = (where[j] == me) ? 0 : 1;
       inq[hval[j]+index]++;
     }
 
-/*    bestflow = sfavg(ncon, flows); */
-    for (j=0, h=0; h<ncon; h++)
-      if (fabs(flows[h]) > fabs(flows[j])) j = h;
-        bestflow = fabs(flows[j]);
+    /* bestflow = rfavg(ncon, flows); */
+    for (j=0, h=0; h<ncon; h++) {
+      if (fabs(flows[h]) > fabs(flows[j])) 
+        j = h;
+    }
+    bestflow = fabs(flows[j]);
 
     nchanges = nmoves = 0;
     for (ii=0; ii<nvtxs/2; ii++) {
       from = -1;
-      Moc_DynamicSelectQueue(nqueues, ncon, me, you, inq, flows, &from,
-      &qnum, minval, avgvwgt, maxdiff);
+      Mc_DynamicSelectQueue(ctrl, nqueues, ncon, me, you, inq, flows, 
+          &from, &qnum, minval, avgvwgt, maxdiff);
 
       /* can't find a vertex in one subdomain, try the other */
       if (from != -1 && qnum == -1) {
         from = (from == me) ? you : me;
 
         if (from == me) {
-          for (j=0; j<ncon; j++)
+          for (j=0; j<ncon; j++) {
             if (flows[j] > avgvwgt)
               break;
+          }
         }
         else {
-          for (j=0; j<ncon; j++)
+          for (j=0; j<ncon; j++) {
             if (flows[j] < -1.0*avgvwgt)
               break;
+          }
         }
 
         if (j != ncon)
-          Moc_DynamicSelectQueue(nqueues, ncon, me, you, inq, flows, &from,
-          &qnum, minval, avgvwgt, maxdiff);
+          Mc_DynamicSelectQueue(ctrl, nqueues, ncon, me, you, inq, flows, 
+              &from, &qnum, minval, avgvwgt, maxdiff);
       }
 
       if (qnum == -1)
@@ -201,9 +212,9 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
 
       to = (from == me) ? you : me;
       index = (from == me) ? 0 : nqueues;
-      higain = FPQueueGetMax(queues+qnum+index);
+      higain = rpqGetTop(queues[qnum+index]);
       inq[qnum+index]--;
-      ASSERTS(higain != -1);
+      ASSERT(higain != -1);
 
       /*****************/
       /* make the swap */
@@ -218,10 +229,12 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
       for (j=0; j<ncon; j++)
         flows[j] += (to == me) ? nvwgt[vtx*ncon+j] : -1.0*nvwgt[vtx*ncon+j];
  
-/*      ftmp = sfavg(ncon, flows); */
-      for (j=0, h=0; h<ncon; h++)
-        if (fabs(flows[h]) > fabs(flows[j])) j = h;
-          ftmp = fabs(flows[j]);
+      /* ftmp = rfavg(ncon, flows); */
+      for (j=0, h=0; h<ncon; h++) {
+        if (fabs(flows[h]) > fabs(flows[j])) 
+          j = h;
+      }
+      ftmp = fabs(flows[j]);
 
       if (ftmp < bestflow) {
         bestflow = ftmp;
@@ -231,36 +244,25 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
         changes[nchanges++] = vtx;
       }
 
-      SWAP(id[vtx], ed[vtx], tmp);
+      gk_SWAP(id[vtx], ed[vtx], tmp);
 
       for (j=xadj[vtx]; j<xadj[vtx+1]; j++) {
         edge = adjncy[j];
-
-        /* must compute oldgain before changing id/ed */
-        if (myqueue[edge] != -1) {
-          oldgain = ipc_factor*(float)(ed[edge]-id[edge]);
-          if (home[edge] == me || home[edge] == you) {
-            if (where[edge] == home[edge])
-              oldgain -= redist_factor*(float)vsize[edge];
-            else
-              oldgain += redist_factor*(float)vsize[edge];
-          }
-        }
 
         tmp = (to == where[edge] ? adjwgt[j] : -adjwgt[j]);
         INC_DEC(id[edge], ed[edge], tmp);
 
         if (myqueue[edge] != -1) {
-          newgain = ipc_factor*(float)(ed[edge]-id[edge]);
+          newgain = ipc_factor*(real_t)(ed[edge]-id[edge]);
           if (home[edge] == me || home[edge] == you) {
             if (where[edge] == home[edge])
-              newgain -= redist_factor*(float)vsize[edge];
+              newgain -= redist_factor*(real_t)vsize[edge];
             else
-              newgain += redist_factor*(float)vsize[edge];
+              newgain += redist_factor*(real_t)vsize[edge];
           }
 
-          FPQueueUpdate(queues+hval[edge]+(nqueues*myqueue[edge]),
-          map[edge]-ptr[hval[edge]], oldgain, newgain);
+          rpqUpdate(queues[hval[edge]+(nqueues*myqueue[edge])], 
+              map[edge]-ptr[hval[edge]], newgain);
         }
       }
     }
@@ -275,7 +277,7 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
       from = where[vtx];
       where[vtx] = to = (from == me) ? you : me;
 
-      SWAP(id[vtx], ed[vtx], tmp);
+     gk_SWAP(id[vtx], ed[vtx], tmp);
       for (j=xadj[vtx]; j<xadj[vtx+1]; j++) {
         edge = adjncy[j];
         tmp = (to == where[edge] ? adjwgt[j] : -adjwgt[j]);
@@ -285,8 +287,8 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
 
     for (i=0; i<nqueues; i++) {
       if (nvpq[i] > 0) {
-        FPQueueReset(queues+i);
-        FPQueueReset(queues+i+nqueues);
+        rpqReset(queues[i]);
+        rpqReset(queues[i+nqueues]);
       }
     }
 
@@ -297,11 +299,12 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
   /***************************/
   /* compute 2-way imbalance */
   /***************************/
-  sset(ncon, 0.0, my_wgt);
-  for (i=0; i<nvtxs; i++)
-    if (where[i] == me)
+  for (i=0; i<nvtxs; i++) {
+    if (where[i] == me) {
       for (h=0; h<ncon; h++)
         my_wgt[h] += nvwgt[i*ncon+h];
+    }
+  }
 
   for (i=0; i<ncon; i++) {
     ftmp =  (pwgts[i]+pwgts[ncon+i])/2.0;
@@ -310,7 +313,7 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     else
       lbvec[i] = 0.0;
   }
-  lbavg = savg(ncon, lbvec);
+  lbavg = ravg(ncon, lbvec);
   *diff_lbavg = lbavg;
 
   /****************/
@@ -321,22 +324,25 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     if (where[i] != home[i])
       totalv += vsize[i];
 
-      for (j=xadj[i]; j<xadj[i+1]; j++) 
+      for (j=xadj[i]; j<xadj[i+1]; j++) {
         if (where[adjncy[j]] != where[i])
           cut += adjwgt[j];
+      }
   }
   cut /= 2;
   mycost = cut*ipc_factor + totalv*redist_factor;
   *diff_cost = mycost;
 
   /* free memory */
-  for (i=0; i<nqueues; i++)
+  for (i=0; i<nqueues; i++) {
     if (nvpq[i] > 0) {
-      FPQueueFree(queues+i);
-      FPQueueFree(queues+i+nqueues);
+      rpqDestroy(queues[i]);
+      rpqDestroy(queues[i+nqueues]);
     }
+  }
 
-  GKfree((void **)&hval, (void **)&nvpq, (void **)&ptr, (void **)&inq, (void **)&queues, LTERM);
+  WCOREPOP;
+
   return nswaps;
 }
 

@@ -85,22 +85,22 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   const unsigned int n_active_elem = mesh.n_active_elem();
 
   // build the graph
-  std::vector<int> options(5);
+  // std::vector<int> options(5);
   std::vector<int> vwgt(n_active_elem);
   std::vector<int> part(n_active_elem);
 
   int
     n = static_cast<int>(n_active_elem),  // number of "nodes" (elements)
                                           //   in the graph
-    wgtflag = 2,                          // weights on vertices only,
-                                          //   none on edges
-    numflag = 0,                          // C-style 0-based numbering
+//    wgtflag = 2,                          // weights on vertices only,
+//                                          //   none on edges
+//    numflag = 0,                          // C-style 0-based numbering
     nparts  = static_cast<int>(n_pieces), // number of subdomains to create
     edgecut = 0;                          // the numbers of edges cut by the
                                           //   resulting partition
 
   // Set the options
-  options[0] = 0; // use default options
+  // options[0] = 0; // use default options
 
   // Metis will only consider the active elements.
   // We need to map the active element ids into a
@@ -259,18 +259,20 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
   if (adjncy.empty())
     adjncy.push_back(0);
 
+  int ncon = 1;
+
   // Select which type of partitioning to create
 
   // Use recursive if the number of partitions is less than or equal to 8
   if (n_pieces <= 8)
-    Metis::METIS_PartGraphRecursive(&n, &xadj[0], &adjncy[0], &vwgt[0], NULL,
-				    &wgtflag, &numflag, &nparts, &options[0],
+    Metis::METIS_PartGraphRecursive(&n, &ncon, &xadj[0], &adjncy[0], &vwgt[0], NULL,
+				    NULL, &nparts, NULL, NULL, NULL,
 				    &edgecut, &part[0]);
 
   // Otherwise  use kway
   else
-    Metis::METIS_PartGraphKway(&n, &xadj[0], &adjncy[0], &vwgt[0], NULL,
-			       &wgtflag, &numflag, &nparts, &options[0],
+    Metis::METIS_PartGraphKway(&n, &ncon, &xadj[0], &adjncy[0], &vwgt[0], NULL,
+			       NULL, &nparts, NULL, NULL, NULL,
 			       &edgecut, &part[0]);
 
 

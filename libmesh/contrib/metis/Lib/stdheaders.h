@@ -11,11 +11,11 @@
  * $Id$
  */
 
+#ifndef _LIBMETIS_STDHEADERS_H_
+#define _LIBMETIS_STDHEADERS_H_
 
 #include <stdio.h>
 #ifdef __STDC__
-#include <stdlib.h>
-#elif defined(__APPLE__)
 #include <stdlib.h>
 #else
 #include <malloc.h>
@@ -26,3 +26,4 @@
 #include <stdarg.h>
 #include <time.h>
 
+#endif

@@ -11,82 +11,93 @@
  * $Id$
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
 
-/*************************************************************************
-*  This stuff is hardcoded for up to four constraints
-**************************************************************************/
-void Moc_DynamicSelectQueue(int nqueues, int ncon, int subdomain1, int subdomain2,
-     idxtype *currentq, float *flows, int *from, int *qnum, int minval, float avgvwgt,
-     float maxdiff)
+/*************************************************************************/
+/*! This stuff is hardcoded for up to four constraints 
+*/
+/*************************************************************************/
+void Mc_DynamicSelectQueue(ctrl_t *ctrl, idx_t nqueues, idx_t ncon, idx_t subdomain1, 
+         idx_t subdomain2, idx_t *currentq, real_t *flows, idx_t *from, idx_t *qnum, 
+         idx_t minval, real_t avgvwgt, real_t maxdiff)
 {
-  int i, j;
-  int hash, index = -1, current;
-  int cand[MAXNCON], rank[MAXNCON], dont_cares[MAXNCON];
-  int nperms, perm[24][5];
-  float sign = 0.0;
-  KVType array[MAXNCON];
-int mype;
-MPI_Comm_rank(MPI_COMM_WORLD, &mype);
+  idx_t i, j;
+  idx_t hash, index = -1, current;
+  idx_t *cand, *rank, *dont_cares;
+  idx_t nperms, perm[24][5];
+  real_t sign = 0.0;
+  rkv_t *array;
+  idx_t mype;
+  gkMPI_Comm_rank(MPI_COMM_WORLD, &mype);
+
+  WCOREPUSH;
 
   *qnum = -1;
 
+  /* allocate memory */
+  cand       = iwspacemalloc(ctrl, ncon);
+  rank       = iwspacemalloc(ctrl, ncon);
+  dont_cares = iwspacemalloc(ctrl, ncon);
+  array      = rkvwspacemalloc(ctrl, ncon);
+
   if (*from == -1) {
     for (i=0; i<ncon; i++) {
-      array[i].key = i;
-      array[i].val = (fabs)(flows[i]);
+      array[i].key = fabs(flows[i]);
+      array[i].val = i;
     }
 
-    qsort(array, ncon, sizeof(KVType), myvalkeycompare);
-    ASSERTS(array[ncon-1].val - array[0].val <= maxdiff)
+    /* GKTODO - Need to check the correct direction of the sort */
+    rkvsorti(ncon, array);
 
-    if (flows[array[ncon-1].key]>avgvwgt*MOC_GD_GRANULARITY_FACTOR) {
+    /* GKTODO - The following assert was disabled as it was failing. Need
+                to check if it is a valid assert */
+    /*ASSERT(array[ncon-1].key - array[0].key <= maxdiff) */
+
+    if (flows[array[ncon-1].val] > avgvwgt*MOC_GD_GRANULARITY_FACTOR) {
       *from = subdomain1;
-      sign = 1.0;
+      sign  = 1.0;
       index = 0;
     }
 
-    if (flows[array[ncon-1].key]<-1.0*avgvwgt*MOC_GD_GRANULARITY_FACTOR) {
+    if (flows[array[ncon-1].val] < -1.0*avgvwgt*MOC_GD_GRANULARITY_FACTOR) {
       *from = subdomain2;
-      sign = -1.0;
+      sign  = -1.0;
       index = nqueues;
     }
 
-    if (*from == -1) {
-      return;
-    }
+    if (*from == -1) 
+      goto DONE;
   }
   else {
-    ASSERTS(*from == subdomain1 || *from == subdomain2);
+    ASSERT(*from == subdomain1 || *from == subdomain2);
 
     if (*from == subdomain1) {
-      sign = 1.0;
+      sign  = 1.0;
       index = 0;
     }
     else {
-      sign = -1.0;
+      sign  = -1.0;
       index = nqueues;
     }
   }
 
   for (i=0; i<ncon; i++) {
-    array[i].key = i;
-    array[i].val = flows[i] * sign;
+    array[i].key = flows[i] * sign;
+    array[i].val = i;
   }
 
-  qsort(array, ncon, sizeof(KVType), myvalkeycompare);
+  /* GKTODO Need to check the direction of those sorts */
+  rkvsorti(ncon, array);
 
   iset(ncon, 1, dont_cares);
-
-  current = 0;
-  for (i=0; i<ncon-1; i++) 
-    if (array[i+1].val - array[i].val < maxdiff * MC_FLOW_BALANCE_THRESHOLD && dont_cares[current] < ncon-1) {
+  for (current=0, i=0; i<ncon-1; i++) {
+    if (array[i+1].key - array[i].key < maxdiff * MC_FLOW_BALANCE_THRESHOLD && dont_cares[current] < ncon-1) {
       dont_cares[current]++;
       dont_cares[i+1] = 0;
     }
     else
       current = i+1;
-
+  }
 
   switch (ncon) {
     /***********************/
@@ -265,47 +276,52 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
       break;
     /***********************/
     default:
-      return;
+      goto DONE;
   }
 
   for (i=0; i<nperms; i++) {
     for (j=0; j<ncon; j++)
-      cand[j] = array[perm[i][j]].key;
+      cand[j] = array[perm[i][j]].val;
 
     for (j=0; j<ncon; j++)
       rank[cand[j]] = j;
 
-
-    hash = Moc_HashVRank(ncon, rank) - minval;
+    hash = Mc_HashVRank(ncon, rank) - minval;
     if (currentq[hash+index] > 0) {
       *qnum = hash;
-      return;
+      goto DONE;
     }
   }
 
-  return;
+DONE:
+  WCOREPOP;
 }
 
 
-/*************************************************************************
-*  This function sorts the nvwgts of a vertex and returns a hashed value
-**************************************************************************/
-int Moc_HashVwgts(int ncon, float *nvwgt)
+/*************************************************************************/
+/*! This function sorts the nvwgts of a vertex and returns a hashed value 
+*/
+/*************************************************************************/
+idx_t Mc_HashVwgts(ctrl_t *ctrl, idx_t ncon, real_t *nvwgt)
 {
-  int i;
-  int multiplier, retval;
-  int rank[MAXNCON];
-  KVType array[MAXNCON];
+  idx_t i;
+  idx_t multiplier, retval;
+  idx_t *rank;
+  rkv_t *array;
 
+  WCOREPUSH;
+
+  rank  = iwspacemalloc(ctrl, ncon);
+  array = rkvwspacemalloc(ctrl, ncon);
 
   for (i=0; i<ncon; i++) {
-    array[i].key = i;
-    array[i].val = nvwgt[i];
+    array[i].key = nvwgt[i];
+    array[i].val = i;
   }
 
-  qsort(array, ncon, sizeof(KVType), myvalkeycompare);
+  rkvsorti(ncon, array);
   for (i=0; i<ncon; i++)
-    rank[array[i].key] = i;
+    rank[array[i].val] = i;
 
   multiplier = 1;
 
@@ -315,16 +331,19 @@ int Moc_HashVwgts(int ncon, float *nvwgt)
     retval += rank[ncon-i-1] * multiplier;
   }
 
+  WCOREPOP;
+
   return retval;
 }
 
 
-/*************************************************************************
-*  This function sorts the vwgts of a vertex and returns a hashed value
-**************************************************************************/
-int Moc_HashVRank(int ncon, int *vwgt)
+/*************************************************************************/
+/*! This function sorts the vwgts of a vertex and returns a hashed value 
+*/
+/*************************************************************************/
+idx_t Mc_HashVRank(idx_t ncon, idx_t *vwgt)
 {
-  int i, multiplier, retval;
+  idx_t i, multiplier, retval;
 
   multiplier = 1;
 
