@@ -74,6 +74,61 @@ MPI_Datatype Node::PackedNode::create_mpi_datatype ()
 
   return packed_node_type;
 }
+
+
+void Node::PackedNode::pack (std::vector<int> &conn, const Node* node)
+{
+  libmesh_assert (node != NULL);
+
+  conn.reserve (conn.size() + node->packed_size());
+
+  conn.push_back (static_cast<int>(node->processor_id()));
+  conn.push_back (static_cast<int>(node->id()));
+
+  // use "(a+b-1)/b" trick to get a/b to round up
+  static const unsigned int ints_per_Real = 
+    (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
+
+  for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+    {
+      const int* Real_as_ints = reinterpret_cast<const int*>(&((*node)(i)));
+      for (unsigned int j=0; j != ints_per_Real; ++j)
+        {
+          conn.push_back(Real_as_ints[j]);
+        }
+    }
+
+  node->pack_indexing(std::back_inserter(conn));
+}
+
+
+void Node::PackedNode::unpack (std::vector<int>::const_iterator start, Node& node)
+{
+  unsigned int processor_id = static_cast<unsigned int>(*start++);
+  libmesh_assert(processor_id == DofObject::invalid_processor_id ||
+                 processor_id < libMesh::n_processors());
+
+  unsigned int id = static_cast<unsigned int>(*start++);
+
+  // use "(a+b-1)/b" trick to get a/b to round up
+  static const unsigned int ints_per_Real = 
+    (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
+
+  std::vector<Real> xyz(3,0.);
+
+  for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+    {
+      const Real* ints_as_Real = reinterpret_cast<const Real*>(&(*start));
+      node(i) = *ints_as_Real;
+      start += ints_per_Real;
+    }
+
+  node.set_id() = id;
+  node.processor_id() = processor_id;
+
+  node.unpack_indexing(start);
+}
+
 #endif // #ifdef LIBMESH_HAVE_MPI
 
 } // namespace libMesh
