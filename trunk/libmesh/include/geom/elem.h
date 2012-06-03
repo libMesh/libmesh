@@ -2084,7 +2084,7 @@ public:
   }
 
   /**
-   * For each element it is of the form
+   * For each element the serialization is of the form
    * [ level p_level r_flag p_r_flag etype processor_id subdomain_id
    *  self_ID parent_ID which_child node_0 node_1 ... node_n
    *  dof_object_buffer_1 ...]
