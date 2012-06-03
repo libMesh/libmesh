@@ -34,6 +34,7 @@ namespace libMesh
 
 // forward declarations
 class Node;
+class MeshBase;
 class MeshRefinement;
 
 
@@ -59,9 +60,10 @@ public:
    * Constructor.  By default sets all entries to 0.  Gives the point 0 in
    * \p LIBMESH_DIM dimensions with an \p id of \p Node::invalid_id
    */
-  Node  (const Real x,
-	 const Real y,
-	 const Real z,
+  explicit
+  Node  (const Real x=0,
+	 const Real y=0,
+	 const Real z=0,
 	 const unsigned int id = invalid_id);
 
   /**
@@ -133,6 +135,8 @@ public:
    */
   struct PackedNode
   {
+    static const unsigned int header_size = 2;
+
     unsigned int id;
     unsigned int pid;
     Real x;
@@ -179,7 +183,28 @@ public:
 
     static MPI_Datatype create_mpi_datatype ();
 
+    /**
+     * For each node the serialization is of the form
+     * [ processor_id self_ID x1 x2 y1 y2 z1 z2
+     *  dof_object_buffer_1 ...]
+     * There may be 1 or 3 or 4 ints per coordinate depending on
+     * machine architecture.
+     */
+    static void pack (std::vector<int> &conn, const Node* node);
+
+    static void unpack (std::vector<int>::const_iterator start, Node& node);
   };
+
+unsigned int packed_size() const
+{
+  // use "(a+b-1)/b" trick to get a/b to round up
+  static const unsigned int ints_per_Real = 
+    (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
+
+  return PackedNode::header_size + LIBMESH_DIM*ints_per_Real +
+         this->packed_indexing_size();
+}
+
 #endif // #ifdef LIBMESH_HAVE_MPI
 
 private:
