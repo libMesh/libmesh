@@ -522,40 +522,32 @@ void ParallelMesh::clear ()
 
 
 
-void ParallelMesh::partition (const unsigned int n_parts)
+void ParallelMesh::redistribute ()
 {
-  // FIXME: We still need to MeshCommunication::redistribute to handle
-  // dof indices before repartitioning won't break AMR
+  // If this is a truly parallel mesh, go through the redistribution/gather/delete remote steps
   if (!this->is_serial())
-  {
-    // Make sure our cached n_partitions() is correct
-    this->recalculate_n_partitions();
-    return;
-  }
+    {
+      // Construct a MeshCommunication object to actually redistribute the nodes
+      // and elements according to the partitioner, and then to re-gather the neighbors.
+      MeshCommunication mc;
+      mc.redistribute(*this);
+      mc.gather_neighboring_elements(*this);
 
-  if(!skip_partitioning())
-  {
-    // Call base class' partition() function.
-    MeshBase::partition(n_parts);
+      // Is this necessary?  If we are called from prepare_for_use(), this will be called
+      // anyway... but users can always call partition directly, in which case we do need
+      // to call delete_remote_elements()...
+      this->delete_remote_elements();
+    }
+}
 
-    // Partitioning changes our numbers of unpartitioned objects
-    this->update_parallel_id_counts();
 
-    // If this is a truly parallel mesh, go through the redistribution/gather/delete remote steps
-    if (!this->is_serial())
-      {
-	// Construct a MeshCommunication object to actually redistribute the nodes
-	// and elements according to the partitioner, and then to re-gather the neighbors.
-	MeshCommunication mc;
-	mc.redistribute(*this);
-	mc.gather_neighboring_elements(*this);
 
-	// Is this necessary?  If we are called from prepare_for_use(), this will be called
-	// anyway... but users can always call partition directly, in which case we do need
-	// to call delete_remote_elements()...
-	this->delete_remote_elements();
-      }
-  }
+void ParallelMesh::update_post_partitioning ()
+{
+  this->recalculate_n_partitions();
+
+  // Partitioning changes our numbers of unpartitioned objects
+  this->update_parallel_id_counts();
 }
 
 

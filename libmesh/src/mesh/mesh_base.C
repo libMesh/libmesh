@@ -35,6 +35,7 @@
 #include "point_locator_base.h"
 #include "threads.h"
 
+
 namespace libMesh
 {
 
@@ -264,7 +265,10 @@ std::ostream& operator << (std::ostream& os, const MeshBase& m)
 void MeshBase::partition (const unsigned int n_parts)
 {
   // NULL partitioner means don't partition
-  if(!skip_partitioning() && partitioner().get())
+  // Non-serial meshes aren't ready for partitioning yet.
+  if(!skip_partitioning() && 
+     partitioner().get() && 
+     this->is_serial())
   {
     partitioner()->partition (*this, n_parts);
   }
