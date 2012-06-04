@@ -12,82 +12,50 @@
  *
  */
 
+#ifndef _LIBMETIS_MACROS_H_
+#define _LIBMETIS_MACROS_H_
 
 /*************************************************************************
 * The following macro returns a random number in the specified range
 **************************************************************************/
-#define RandomInRange(u) ((int)(1.0*(u)*rand()/(RAND_MAX+1.0)))
-
-#define amax(a, b) ((a) >= (b) ? (a) : (b))
-#define amin(a, b) ((a) >= (b) ? (b) : (a))
-
 #define AND(a, b) ((a) < 0 ? ((-(a))&(b)) : ((a)&(b)))
 #define OR(a, b) ((a) < 0 ? -((-(a))|(b)) : ((a)|(b)))
 #define XOR(a, b) ((a) < 0 ? -((-(a))^(b)) : ((a)^(b)))
 
-#define SWAP(a, b, tmp)  \
-                 do {(tmp) = (a); (a) = (b); (b) = (tmp);} while(0) 
-
-#define INC_DEC(a, b, val) \
-                 do {(a) += (val); (b) -= (val);} while(0)
-
-
-#define scopy(n, a, b) (float *)memcpy((void *)(b), (void *)(a), sizeof(float)*(n))
-#define idxcopy(n, a, b) (idxtype *)memcpy((void *)(b), (void *)(a), sizeof(idxtype)*(n)) 
+//#define icopy(n, a, b) (idx_t *)memcpy((void *)(b), (void *)(a), sizeof(idx_t)*(n)) 
 
 #define HASHFCT(key, size) ((key)%(size))
+#define SWAP gk_SWAP
 
+/* gets the appropriate option value */
+#define GETOPTION(options, idx, defval) \
+            ((options) == NULL || (options)[idx] == -1 ? defval : (options)[idx]) 
 
-/*************************************************************************
-* Timer macros
-**************************************************************************/
-#define cleartimer(tmr) (tmr = 0.0)
-#define starttimer(tmr) (tmr -= seconds())
-#define stoptimer(tmr) (tmr += seconds())
-#define gettimer(tmr) (tmr)
+/* converts a user provided ufactor into a real ubfactor */
+#define I2RUBFACTOR(ufactor) (1.0+0.001*(ufactor))
 
-
-/*************************************************************************
-* This macro is used to handle dbglvl
-**************************************************************************/
-#define IFSET(a, flag, cmd) if ((a)&(flag)) (cmd);
-
-/*************************************************************************
-* These macros are used for debuging memory leaks
-**************************************************************************/
-#ifdef DMALLOC
-#define imalloc(n, msg) (malloc(sizeof(int)*(n)))
-#define fmalloc(n, msg) (malloc(sizeof(float)*(n)))
-#define idxmalloc(n, msg) (malloc(sizeof(idxtype)*(n)))
-#define ismalloc(n, val, msg) (iset((n), (val), malloc(sizeof(int)*(n))))
-#define idxsmalloc(n, val, msg) (idxset((n), (val), malloc(sizeof(idxtype)*(n))))
-#define GKmalloc(a, b) (malloc((a)))
-#endif
-
-#ifdef DMALLOC
-#   define MALLOC_CHECK(ptr);
-/*
-#   define MALLOC_CHECK(ptr)                                          \
-    if (malloc_verify((ptr)) == DMALLOC_VERIFY_ERROR) {  \
-        printf("***MALLOC_CHECK failed on line %d of file %s: " #ptr "\n", \
-              __LINE__, __FILE__);                               \
-        abort();                                                \
-    }
-*/
-#else
-#   define MALLOC_CHECK(ptr) ;
-#endif 
+/* set/reset the current workspace core */
+#define WCOREPUSH    wspacepush(ctrl)
+#define WCOREPOP     wspacepop(ctrl)
 
 
 
 /*************************************************************************
-* This macro converts a length array in a CSR one
+* These macros insert and remove nodes from a Direct Access list 
 **************************************************************************/
-#define MAKECSR(i, n, a) \
+#define ListInsert(n, lind, lptr, i) \
    do { \
-     for (i=1; i<n; i++) a[i] += a[i-1]; \
-     for (i=n; i>0; i--) a[i] = a[i-1]; \
-     a[0] = 0; \
+     ASSERT(lptr[i] == -1); \
+     lind[n] = i; \
+     lptr[i] = (n)++;\
+   } while(0) 
+
+#define ListDelete(n, lind, lptr, i) \
+   do { \
+     ASSERT(lptr[i] != -1); \
+     lind[lptr[i]] = lind[--(n)]; \
+     lptr[lind[n]] = lptr[i]; \
+     lptr[i] = -1; \
    } while(0) 
 
 
@@ -95,44 +63,196 @@
 * These macros insert and remove nodes from the boundary list
 **************************************************************************/
 #define BNDInsert(nbnd, bndind, bndptr, vtx) \
-   do { \
-     ASSERT(bndptr[vtx] == -1); \
-     bndind[nbnd] = vtx; \
-     bndptr[vtx] = nbnd++;\
-   } while(0) 
+  ListInsert(nbnd, bndind, bndptr, vtx)
 
 #define BNDDelete(nbnd, bndind, bndptr, vtx) \
-   do { \
-     ASSERT(bndptr[vtx] != -1); \
-     bndind[bndptr[vtx]] = bndind[--nbnd]; \
-     bndptr[bndind[nbnd]] = bndptr[vtx]; \
-     bndptr[vtx] = -1; \
-   } while(0) 
-
+  ListDelete(nbnd, bndind, bndptr, vtx)
 
 
 /*************************************************************************
-* These are debugging macros
+* These macros deal with id/ed updating during k-way refinement
 **************************************************************************/
-#ifdef DEBUG
-#   define ASSERT(expr)                                          \
-    if (!(expr)) {                                               \
-        printf("***ASSERTION failed on line %d of file %s: " #expr "\n", \
-              __LINE__, __FILE__);                               \
-        abort();                                                \
-    }
-#else
-#   define ASSERT(expr) ;
-#endif 
+#define UpdateMovedVertexInfoAndBND(i, from, k, to, myrinfo, mynbrs, where, \
+            nbnd, bndptr, bndind, bndtype) \
+   do { \
+     where[i] = to; \
+     myrinfo->ed += myrinfo->id-mynbrs[k].ed; \
+     SWAP(myrinfo->id, mynbrs[k].ed, j); \
+     if (mynbrs[k].ed == 0) \
+       mynbrs[k] = mynbrs[--myrinfo->nnbrs]; \
+     else \
+       mynbrs[k].pid = from; \
+     \
+     /* Update the boundary information. Both deletion and addition is \
+        allowed as this routine can be used for moving arbitrary nodes. */ \
+     if (bndtype == BNDTYPE_REFINE) { \
+       if (bndptr[i] != -1 && myrinfo->ed - myrinfo->id < 0) \
+         BNDDelete(nbnd, bndind, bndptr, i); \
+       if (bndptr[i] == -1 && myrinfo->ed - myrinfo->id >= 0) \
+         BNDInsert(nbnd, bndind, bndptr, i); \
+     } \
+     else { \
+       if (bndptr[i] != -1 && myrinfo->ed <= 0) \
+         BNDDelete(nbnd, bndind, bndptr, i); \
+       if (bndptr[i] == -1 && myrinfo->ed > 0) \
+         BNDInsert(nbnd, bndind, bndptr, i); \
+     } \
+   } while(0) 
 
-#ifdef DEBUG
-#   define ASSERTP(expr, msg)                                          \
-    if (!(expr)) {                                               \
-        printf("***ASSERTION failed on line %d of file %s: " #expr "\n", \
-              __LINE__, __FILE__);                               \
-        printf msg ; \
-        abort();                                                \
-    }
-#else
-#   define ASSERTP(expr, msg) ;
-#endif 
+
+#define UpdateAdjacentVertexInfoAndBND(ctrl, vid, adjlen, me, from, to, \
+            myrinfo, ewgt, nbnd, bndptr, bndind, bndtype) \
+   do { \
+     idx_t k; \
+     cnbr_t *mynbrs; \
+     \
+     if (myrinfo->inbr == -1) { \
+       myrinfo->inbr  = cnbrpoolGetNext(ctrl, adjlen+1); \
+       myrinfo->nnbrs = 0; \
+     } \
+     ASSERT(CheckRInfo(ctrl, myrinfo)); \
+     \
+     mynbrs = ctrl->cnbrpool + myrinfo->inbr; \
+     \
+     /* Update global ID/ED and boundary */ \
+     if (me == from) { \
+       INC_DEC(myrinfo->ed, myrinfo->id, (ewgt)); \
+       if (bndtype == BNDTYPE_REFINE) { \
+         if (myrinfo->ed-myrinfo->id >= 0 && bndptr[(vid)] == -1) \
+           BNDInsert(nbnd, bndind, bndptr, (vid)); \
+       } \
+       else { \
+         if (myrinfo->ed > 0 && bndptr[(vid)] == -1) \
+           BNDInsert(nbnd, bndind, bndptr, (vid)); \
+       } \
+     } \
+     else if (me == to) { \
+       INC_DEC(myrinfo->id, myrinfo->ed, (ewgt)); \
+       if (bndtype == BNDTYPE_REFINE) { \
+         if (myrinfo->ed-myrinfo->id < 0 && bndptr[(vid)] != -1) \
+           BNDDelete(nbnd, bndind, bndptr, (vid)); \
+       } \
+       else { \
+         if (myrinfo->ed <= 0 && bndptr[(vid)] != -1) \
+           BNDDelete(nbnd, bndind, bndptr, (vid)); \
+       } \
+     } \
+     \
+     /* Remove contribution from the .ed of 'from' */ \
+     if (me != from) { \
+       for (k=0; k<myrinfo->nnbrs; k++) { \
+         if (mynbrs[k].pid == from) { \
+           if (mynbrs[k].ed == (ewgt)) \
+             mynbrs[k] = mynbrs[--myrinfo->nnbrs]; \
+           else \
+             mynbrs[k].ed -= (ewgt); \
+           break; \
+         } \
+       } \
+     } \
+     \
+     /* Add contribution to the .ed of 'to' */ \
+     if (me != to) { \
+       for (k=0; k<myrinfo->nnbrs; k++) { \
+         if (mynbrs[k].pid == to) { \
+           mynbrs[k].ed += (ewgt); \
+           break; \
+         } \
+       } \
+       if (k == myrinfo->nnbrs) { \
+         mynbrs[k].pid  = to; \
+         mynbrs[k].ed   = (ewgt); \
+         myrinfo->nnbrs++; \
+       } \
+     } \
+     \
+     ASSERT(CheckRInfo(ctrl, myrinfo));\
+   } while(0) 
+
+
+#define UpdateQueueInfo(queue, vstatus, vid, me, from, to, myrinfo, oldnnbrs, \
+            nupd, updptr, updind, bndtype) \
+   do { \
+     real_t rgain; \
+     \
+     if (me == to || me == from || oldnnbrs != myrinfo->nnbrs) {  \
+       rgain = (myrinfo->nnbrs > 0 ?  \
+                1.0*myrinfo->ed/sqrt(myrinfo->nnbrs) : 0.0) - myrinfo->id; \
+   \
+       if (bndtype == BNDTYPE_REFINE) { \
+         if (vstatus[(vid)] == VPQSTATUS_PRESENT) { \
+           if (myrinfo->ed-myrinfo->id >= 0) \
+             rpqUpdate(queue, (vid), rgain); \
+           else { \
+             rpqDelete(queue, (vid)); \
+             vstatus[(vid)] = VPQSTATUS_NOTPRESENT; \
+             ListDelete(nupd, updind, updptr, (vid)); \
+           } \
+         } \
+         else if (vstatus[(vid)] == VPQSTATUS_NOTPRESENT && myrinfo->ed-myrinfo->id >= 0) { \
+           rpqInsert(queue, (vid), rgain); \
+           vstatus[(vid)] = VPQSTATUS_PRESENT; \
+           ListInsert(nupd, updind, updptr, (vid)); \
+         } \
+       } \
+       else { \
+         if (vstatus[(vid)] == VPQSTATUS_PRESENT) { \
+           if (myrinfo->ed > 0) \
+             rpqUpdate(queue, (vid), rgain); \
+           else { \
+             rpqDelete(queue, (vid)); \
+             vstatus[(vid)] = VPQSTATUS_NOTPRESENT; \
+             ListDelete(nupd, updind, updptr, (vid)); \
+           } \
+         } \
+         else if (vstatus[(vid)] == VPQSTATUS_NOTPRESENT && myrinfo->ed > 0) { \
+           rpqInsert(queue, (vid), rgain); \
+           vstatus[(vid)] = VPQSTATUS_PRESENT; \
+           ListInsert(nupd, updind, updptr, (vid)); \
+         } \
+       } \
+     } \
+   } while(0) 
+
+
+
+/*************************************************************************/
+/*! This macro determines the set of subdomains that a vertex can move to
+    without increasins the maxndoms. */
+/*************************************************************************/
+#define SelectSafeTargetSubdomains(myrinfo, mynbrs, nads, adids, maxndoms, safetos, vtmp) \
+  do { \
+    idx_t j, k, l, nadd, to; \
+    for (j=0; j<myrinfo->nnbrs; j++) { \
+      safetos[to = mynbrs[j].pid] = 0; \
+      \
+      /* uncompress the connectivity info for the 'to' subdomain */ \
+      for (k=0; k<nads[to]; k++) \
+        vtmp[adids[to][k]] = 1; \
+      \
+      for (nadd=0, k=0; k<myrinfo->nnbrs; k++) { \
+        if (k == j) \
+          continue; \
+        \
+        l = mynbrs[k].pid; \
+        if (vtmp[l] == 0) { \
+          if (nads[l] > maxndoms-1) { \
+            nadd = maxndoms; \
+            break; \
+          } \
+          nadd++; \
+        } \
+      } \
+      if (nads[to]+nadd <= maxndoms) \
+        safetos[to] = 1; \
+      if (nadd == 0) \
+        safetos[to] = 2; \
+      \
+      /* cleanup the connectivity info due to the 'to' subdomain */ \
+      for (k=0; k<nads[to]; k++) \
+        vtmp[adids[to][k]] = 0; \
+    } \
+  } while (0)
+
+
+#endif

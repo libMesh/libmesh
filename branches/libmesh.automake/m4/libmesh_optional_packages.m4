@@ -168,7 +168,7 @@ CONFIGURE_TECPLOT
 # Metis Partitioning -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_METIS
-AC_CONFIG_FILES([contrib/metis/Lib/Makefile])
+AC_CONFIG_FILES([contrib/metis/Makefile])
 # -------------------------------------------------------------
 
 
@@ -177,7 +177,7 @@ AC_CONFIG_FILES([contrib/metis/Lib/Makefile])
 # Parmetis Partitioning -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_PARMETIS
-AC_CONFIG_FILES([contrib/parmetis/Lib/Makefile])
+AC_CONFIG_FILES([contrib/parmetis/Makefile])
 # -------------------------------------------------------------
 
 

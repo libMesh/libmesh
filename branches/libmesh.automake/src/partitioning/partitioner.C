@@ -28,6 +28,9 @@
 #include "mesh_communication.h"
 #include "libmesh_logging.h"
 
+//FIXME
+#include "parallel_mesh.h"
+
 namespace libMesh
 {
 
@@ -71,6 +74,10 @@ void Partitioner::partition (MeshBase& mesh,
   // Call the partitioning function
   this->_do_partition(mesh,n_parts);
 
+  // Redistribute elements if necessary, before setting parent or node
+  // processor ids, to make sure those will be set consistently
+  mesh.redistribute();
+
   // Set the parent's processor ids
   Partitioner::set_parent_processor_ids(mesh);
 
@@ -84,6 +91,10 @@ void Partitioner::partition (MeshBase& mesh,
 
   MeshTools::libmesh_assert_valid_node_procids(mesh);
 #endif
+
+  // Give derived Mesh classes a chance to update any cached data to
+  // reflect the new partitioning
+  mesh.update_post_partitioning();
 }
 
 

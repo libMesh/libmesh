@@ -11,7 +11,7 @@
  * $Id$
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
 
 
 /*************************************************************************
@@ -19,81 +19,72 @@
 * This algorithm assembles the graph to all the processors and preceeds
 * with the balancing step.
 **************************************************************************/
-void Balance_Partition(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
+void Balance_Partition(ctrl_t *ctrl, graph_t *graph)
 {
-  int i, j, mype, npes, nvtxs, nedges, ncon;
-  idxtype *vtxdist, *xadj, *adjncy, *adjwgt, *vwgt, *vsize;
-  idxtype *part, *lwhere, *home;
-  GraphType *agraph, cgraph;
-  CtrlType myctrl;
-  int lnparts, fpart, fpe, lnpes, ngroups, srnpes, srmype; 
-  int twoparts=2, numflag = 0, wgtflag = 3, moptions[10], edgecut, max_cut;
-  int sr_pe, gd_pe, sr, gd, who_wins, *rcounts, *rdispls;
-  float my_cut, my_totalv, my_cost = -1.0, my_balance = -1.0, wsum;
-  float rating, max_rating, your_cost = -1.0, your_balance = -1.0;
-  float lbvec[MAXNCON], lbsum, min_lbsum, *mytpwgts, mytpwgts2[2], buffer[2];
+  idx_t i, j, nvtxs, nedges, ncon;
+  idx_t mype, npes, srnpes, srmype; 
+  idx_t *vtxdist, *xadj, *adjncy, *adjwgt, *vwgt, *vsize;
+  idx_t *part, *lwhere, *home;
+  idx_t lnparts, fpart, fpe, lnpes, ngroups;
+  idx_t *rcounts, *rdispls;
+  idx_t twoparts=2, moptions[METIS_NOPTIONS], edgecut, max_cut;
+  idx_t sr_pe, gd_pe, sr, gd, who_wins;
+  real_t my_cut, my_totalv, my_cost = -1.0, my_balance = -1.0, wsum;
+  real_t rating, max_rating, your_cost = -1.0, your_balance = -1.0;
+  real_t lbsum, min_lbsum, *lbvec, *tpwgts, *tpwgts2, buffer[2];
+  graph_t *agraph, cgraph;
+  ctrl_t *myctrl;
   MPI_Status status;
   MPI_Comm ipcomm, srcomm;
   struct {
-    float cost;
+    double cost;
     int rank;
   } lpecost, gpecost;
 
   IFSET(ctrl->dbglvl, DBG_TIME, starttimer(ctrl->InitPartTmr));
+  WCOREPUSH;
 
   vtxdist = graph->vtxdist;
-  agraph = Moc_AssembleAdaptiveGraph(ctrl, graph, wspace);
-  nvtxs = cgraph.nvtxs = agraph->nvtxs;
-  nedges = cgraph.nedges = agraph->nedges;
-  ncon = cgraph.ncon = agraph->ncon;
+  agraph  = AssembleAdaptiveGraph(ctrl, graph);
+  nvtxs   = cgraph.nvtxs  = agraph->nvtxs;
+  nedges  = cgraph.nedges = agraph->nedges;
+  ncon    = cgraph.ncon   = agraph->ncon;
+  xadj    = cgraph.xadj   = icopy(nvtxs+1, agraph->xadj, iwspacemalloc(ctrl, nvtxs+1));
+  vwgt    = cgraph.vwgt   = icopy(nvtxs*ncon, agraph->vwgt, iwspacemalloc(ctrl, nvtxs*ncon));
+  vsize   = cgraph.vsize  = icopy(nvtxs, agraph->vsize, iwspacemalloc(ctrl, nvtxs));
+  adjncy  = cgraph.adjncy = icopy(nedges, agraph->adjncy, iwspacemalloc(ctrl, nedges));
+  adjwgt  = cgraph.adjwgt = icopy(nedges, agraph->adjwgt, iwspacemalloc(ctrl, nedges));
+  part    = cgraph.where  = agraph->where = iwspacemalloc(ctrl, nvtxs);
 
-  xadj = cgraph.xadj = idxmalloc(nvtxs*(5+ncon)+1+nedges*2, "U_IP: xadj");
-  vwgt = cgraph.vwgt = xadj + nvtxs+1;
-  vsize = cgraph.vsize = xadj + nvtxs*(1+ncon)+1;
-  cgraph.where = agraph->where = part = xadj + nvtxs*(2+ncon)+1;
-  lwhere = xadj + nvtxs*(3+ncon)+1;
-  home = xadj + nvtxs*(4+ncon)+1;
-  adjncy = cgraph.adjncy = xadj + nvtxs*(5+ncon)+1;
-  adjwgt = cgraph.adjwgt = xadj + nvtxs*(5+ncon)+1 + nedges;
+  lwhere = iwspacemalloc(ctrl, nvtxs);
+  home   = iwspacemalloc(ctrl, nvtxs);
+  lbvec  = rwspacemalloc(ctrl, graph->ncon);
 
-  /* ADD: this assumes that tpwgts for all constraints is the same */
-  /* ADD: this is necessary because serial metis does not support the general case */
-  mytpwgts = fsmalloc(ctrl->nparts, 0.0, "mytpwgts");
-  for (i=0; i<ctrl->nparts; i++)
-    for (j=0; j<ncon; j++)
-      mytpwgts[i] += ctrl->tpwgts[i*ncon+j];
-  for (i=0; i<ctrl->nparts; i++)
-    mytpwgts[i] /= (float)ncon;
-
-  idxcopy(nvtxs+1, agraph->xadj, xadj);
-  idxcopy(nvtxs*ncon, agraph->vwgt, vwgt);
-  idxcopy(nvtxs, agraph->vsize, vsize);
-  idxcopy(nedges, agraph->adjncy, adjncy);
-  idxcopy(nedges, agraph->adjwgt, adjwgt);
 
   /****************************************/
   /****************************************/
-  if (ctrl->ps_relation == DISCOUPLED) {
-    rcounts = imalloc(ctrl->npes, "rcounts");
-    rdispls = imalloc(ctrl->npes+1, "rdispls");
+  if (ctrl->ps_relation == PARMETIS_PSR_UNCOUPLED) {
+    WCOREPUSH;
+    rcounts = iwspacemalloc(ctrl, ctrl->npes);
+    rdispls = iwspacemalloc(ctrl, ctrl->npes+1);
 
-    for (i=0; i<ctrl->npes; i++) {
+    for (i=0; i<ctrl->npes; i++) 
       rdispls[i] = rcounts[i] = vtxdist[i+1]-vtxdist[i];
-    }
     MAKECSR(i, ctrl->npes, rdispls);
 
-    MPI_Allgatherv((void *)graph->home, graph->nvtxs, IDX_DATATYPE,
-    (void *)part, rcounts, rdispls, IDX_DATATYPE, ctrl->comm);
+    gkMPI_Allgatherv((void *)graph->home, graph->nvtxs, IDX_T,
+        (void *)part, rcounts, rdispls, IDX_T, ctrl->comm);
 
     for (i=0; i<agraph->nvtxs; i++)
       home[i] = part[i];
 
-    GKfree((void **)&rcounts, (void **)&rdispls, LTERM);
+    WCOREPOP;  /* local frees */
   }
   else {
-    for (i=0; i<ctrl->npes; i++)
+    for (i=0; i<ctrl->npes; i++) {
       for (j=vtxdist[i]; j<vtxdist[i+1]; j++)
         part[j] = home[j] = i;
+    }
   }
 
   /* Ensure that the initial partitioning is legal */
@@ -106,10 +97,12 @@ void Balance_Partition(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
   /****************************************/
   /****************************************/
 
-  IFSET(ctrl->dbglvl, DBG_REFINEINFO, Moc_ComputeSerialBalance(ctrl, agraph, agraph->where, lbvec));
-  IFSET(ctrl->dbglvl, DBG_REFINEINFO, rprintf(ctrl, "input cut: %d, balance: ", ComputeSerialEdgeCut(agraph)));
+  IFSET(ctrl->dbglvl, DBG_REFINEINFO, 
+      ComputeSerialBalance(ctrl, agraph, agraph->where, lbvec));
+  IFSET(ctrl->dbglvl, DBG_REFINEINFO, 
+      rprintf(ctrl, "input cut: %"PRIDX", balance: ", ComputeSerialEdgeCut(agraph)));
   for (i=0; i<agraph->ncon; i++)
-    IFSET(ctrl->dbglvl, DBG_REFINEINFO, rprintf(ctrl, "%.3f ", lbvec[i]));
+    IFSET(ctrl->dbglvl, DBG_REFINEINFO, rprintf(ctrl, "%.3"PRREAL" ", lbvec[i]));
   IFSET(ctrl->dbglvl, DBG_REFINEINFO, rprintf(ctrl, "\n"));
 
   /****************************************/
@@ -126,202 +119,211 @@ void Balance_Partition(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
   sr_pe = 0;
   gd_pe = 1;
 
-  MPI_Comm_split(ctrl->gcomm, sr, 0, &ipcomm);
-  MPI_Comm_rank(ipcomm, &mype);
-  MPI_Comm_size(ipcomm, &npes);
+  gkMPI_Comm_split(ctrl->gcomm, sr, 0, &ipcomm);
+  gkMPI_Comm_rank(ipcomm, &mype);
+  gkMPI_Comm_size(ipcomm, &npes);
 
-  myctrl.dbglvl = 0;
-  myctrl.mype = mype;
-  myctrl.npes = npes;
-  myctrl.comm = ipcomm;
-  myctrl.sync = ctrl->sync;
-  myctrl.seed = ctrl->seed;
-  myctrl.nparts = ctrl->nparts;
-  myctrl.ipc_factor = ctrl->ipc_factor;
-  myctrl.redist_factor = ctrl->redist_base;
-  myctrl.partType = ADAPTIVE_PARTITION;
-  myctrl.ps_relation = DISCOUPLED;
-  myctrl.tpwgts = ctrl->tpwgts;
-  icopy(ncon, ctrl->tvwgts, myctrl.tvwgts);
-  icopy(ncon, ctrl->ubvec, myctrl.ubvec);
+  if (sr == 1) { /* Half of the processors do scratch-remap */
+    ngroups = gk_max(gk_min(RIP_SPLIT_FACTOR, npes), 1);
+    gkMPI_Comm_split(ipcomm, mype % ngroups, 0, &srcomm);
+    gkMPI_Comm_rank(srcomm, &srmype);
+    gkMPI_Comm_size(srcomm, &srnpes);
 
-  if (sr == 1) {
-    /*******************************************/
-    /* Half of the processors do scratch-remap */
-    /*******************************************/
-    ngroups = amax(amin(RIP_SPLIT_FACTOR, npes), 1);
-    MPI_Comm_split(ipcomm, mype % ngroups, 0, &srcomm);
-    MPI_Comm_rank(srcomm, &srmype);
-    MPI_Comm_size(srcomm, &srnpes);
+    METIS_SetDefaultOptions(moptions);
+    moptions[METIS_OPTION_SEED] = ctrl->sync + (mype % ngroups) + 1;
 
-    moptions[0] = 0;
-    moptions[7] = ctrl->sync + (mype % ngroups) + 1;
+    tpwgts  = ctrl->tpwgts;
+    tpwgts2 = rwspacemalloc(ctrl, 2*ncon);
 
-    idxset(nvtxs, 0, lwhere);
+    iset(nvtxs, 0, lwhere);
     lnparts = ctrl->nparts;
     fpart = fpe = 0;
     lnpes = srnpes;
     while (lnpes > 1 && lnparts > 1) {
-      ASSERT(ctrl, agraph->nvtxs > 1);
-      /* Determine the weights of the partitions */
-      mytpwgts2[0] = ssum(lnparts/2, mytpwgts+fpart);
-      mytpwgts2[1] = 1.0-mytpwgts2[0];
-
-
-      if (agraph->ncon == 1) {
-        METIS_WPartGraphKway2(&agraph->nvtxs, agraph->xadj, agraph->adjncy, agraph->vwgt, 
-	      agraph->adjwgt, &wgtflag, &numflag, &twoparts, mytpwgts2, moptions, &edgecut, 
-	      part);
-      }
-      else {
-        METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj, agraph->adjncy, 
-	      agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag, &twoparts, mytpwgts2, 
-	      moptions, &edgecut, part);
+      PASSERT(ctrl, agraph->nvtxs > 1);
+      /* determine the weights of the two partitions as a function of the 
+         weight of the target partition weights */
+      for (j=(lnparts>>1), i=0; i<ncon; i++) {
+        tpwgts2[i]      = rsum(j, tpwgts+fpart*ncon+i, ncon);
+        tpwgts2[ncon+i] = rsum(lnparts-j, tpwgts+(fpart+j)*ncon+i, ncon);
+        wsum            = 1.0/(tpwgts2[i] + tpwgts2[ncon+i]);
+        tpwgts2[i]      *= wsum;
+        tpwgts2[ncon+i] *= wsum;
       }
 
-      wsum = ssum(lnparts/2, mytpwgts+fpart);
-      sscale(lnparts/2, 1.0/wsum, mytpwgts+fpart);
-      sscale(lnparts-lnparts/2, 1.0/(1.0-wsum), mytpwgts+fpart+lnparts/2);
+      METIS_PartGraphRecursive(&agraph->nvtxs, &ncon, agraph->xadj, 
+            agraph->adjncy, agraph->vwgt, NULL, agraph->adjwgt, 
+            &twoparts, tpwgts2, NULL, moptions, &edgecut, part);
 
-      /* I'm picking the left branch */
+      /* pick one of the branches */
       if (srmype < fpe+lnpes/2) {
-        Moc_KeepPart(agraph, wspace, part, 0);
-        lnpes = lnpes/2;
+        KeepPart(ctrl, agraph, part, 0);
+        lnpes   = lnpes/2;
         lnparts = lnparts/2;
       }
       else {
-        Moc_KeepPart(agraph, wspace, part, 1);
-        fpart = fpart + lnparts/2;
-        fpe = fpe + lnpes/2;
-        lnpes = lnpes - lnpes/2;
+        KeepPart(ctrl, agraph, part, 1);
+        fpart   = fpart + lnparts/2;
+        fpe     = fpe + lnpes/2;
+        lnpes   = lnpes - lnpes/2;
         lnparts = lnparts - lnparts/2;
       }
     }
 
-    /* In case srnpes is greater than or equal to nparts */
-    if (lnparts == 1) {
+    if (lnparts == 1) { /* Case in which srnpes is greater or equal to nparts */
       /* Only the first process will assign labels (for the reduction to work) */
       if (srmype == fpe) {
         for (i=0; i<agraph->nvtxs; i++) 
           lwhere[agraph->label[i]] = fpart;
       }
     }
-    /* In case srnpes is smaller than nparts */
-    else {
-      if (ncon == 1)
-        METIS_WPartGraphKway2(&agraph->nvtxs, agraph->xadj, agraph->adjncy, agraph->vwgt, 
-	      agraph->adjwgt, &wgtflag, &numflag, &lnparts, mytpwgts+fpart, moptions, 
-	      &edgecut, part);
-      else
-        METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj, agraph->adjncy, 
-	      agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag, &lnparts, mytpwgts+fpart, 
-	      moptions, &edgecut, part);
+    else { /* Case in which srnpes is smaller than nparts */
+      /* create the normalized tpwgts for the lnparts from ctrl->tpwgts */
+      tpwgts = rwspacemalloc(ctrl, lnparts*ncon);
+      for (j=0; j<ncon; j++) {
+        for (wsum=0.0, i=0; i<lnparts; i++) {
+          tpwgts[i*ncon+j] = ctrl->tpwgts[(fpart+i)*ncon+j];
+          wsum += tpwgts[i*ncon+j];
+        }
+        for (wsum=1.0/wsum, i=0; i<lnparts; i++)
+          tpwgts[i*ncon+j] *= wsum;
+      }
+
+      METIS_PartGraphKway(&agraph->nvtxs, &ncon, agraph->xadj, agraph->adjncy, 
+	    agraph->vwgt, NULL, agraph->adjwgt, &lnparts, tpwgts, NULL, moptions, 
+            &edgecut, part);
 
       for (i=0; i<agraph->nvtxs; i++) 
         lwhere[agraph->label[i]] = fpart + part[i];
     }
 
-    MPI_Allreduce((void *)lwhere, (void *)part, nvtxs, IDX_DATATYPE, MPI_SUM, srcomm);
+    gkMPI_Allreduce((void *)lwhere, (void *)part, nvtxs, IDX_T, MPI_SUM, srcomm);
 
     edgecut = ComputeSerialEdgeCut(&cgraph);
-    Moc_ComputeSerialBalance(ctrl, &cgraph, part, lbvec);
-    lbsum = ssum(ncon, lbvec);
-    MPI_Allreduce((void *)&edgecut, (void *)&max_cut, 1, MPI_INT, MPI_MAX, ipcomm);
-    MPI_Allreduce((void *)&lbsum, (void *)&min_lbsum, 1, MPI_FLOAT, MPI_MIN, ipcomm);
+    ComputeSerialBalance(ctrl, &cgraph, part, lbvec);
+    lbsum = rsum(ncon, lbvec, 1);
+    gkMPI_Allreduce((void *)&edgecut, (void *)&max_cut, 1, IDX_T, MPI_MAX, ipcomm);
+    gkMPI_Allreduce((void *)&lbsum, (void *)&min_lbsum, 1, REAL_T, MPI_MIN, ipcomm);
     lpecost.rank = ctrl->mype;
     lpecost.cost = lbsum;
-    if (min_lbsum < UNBALANCE_FRACTION * (float)(ncon)) {
-      if (lbsum < UNBALANCE_FRACTION * (float)(ncon))
-        lpecost.cost = (float)edgecut;
+    if (min_lbsum < UNBALANCE_FRACTION * (real_t)(ncon)) {
+      if (lbsum < UNBALANCE_FRACTION * (real_t)(ncon))
+        lpecost.cost = (double)edgecut;
       else
-        lpecost.cost = (float)max_cut + lbsum;
+        lpecost.cost = (double)max_cut + lbsum;
     }
-    MPI_Allreduce((void *)&lpecost, (void *)&gpecost, 1, MPI_FLOAT_INT, MPI_MINLOC, ipcomm);
+    gkMPI_Allreduce((void *)&lpecost, (void *)&gpecost, 1, MPI_DOUBLE_INT,
+        MPI_MINLOC, ipcomm);
 
-    if (ctrl->mype == gpecost.rank && ctrl->mype != sr_pe) {
-      MPI_Send((void *)part, nvtxs, IDX_DATATYPE, sr_pe, 1, ctrl->comm);
-    }
+    if (ctrl->mype == gpecost.rank && ctrl->mype != sr_pe) 
+      gkMPI_Send((void *)part, nvtxs, IDX_T, sr_pe, 1, ctrl->comm);
 
-    if (ctrl->mype != gpecost.rank && ctrl->mype == sr_pe) {
-      MPI_Recv((void *)part, nvtxs, IDX_DATATYPE, gpecost.rank, 1, ctrl->comm, &status);
-    }
+    if (ctrl->mype != gpecost.rank && ctrl->mype == sr_pe) 
+      gkMPI_Recv((void *)part, nvtxs, IDX_T, gpecost.rank, 1, ctrl->comm, &status);
 
     if (ctrl->mype == sr_pe) {
-      idxcopy(nvtxs, part, lwhere);
-      SerialRemap(&cgraph, ctrl->nparts, home, lwhere, part, ctrl->tpwgts);
+      icopy(nvtxs, part, lwhere);
+      SerialRemap(ctrl, &cgraph, ctrl->nparts, home, lwhere, part, ctrl->tpwgts);
     }
 
-    MPI_Comm_free(&srcomm);
+    gkMPI_Comm_free(&srcomm);
   }
-  /**************************************/
-  /* The other half do global diffusion */
-  /**************************************/
-  else {
-    /******************************************************************/
-    /* The next stmt is required to balance out the sr MPI_Comm_split */
-    /******************************************************************/
-    MPI_Comm_split(ipcomm, MPI_UNDEFINED, 0, &srcomm);
+  else { /* The other half do global diffusion */
+    /* setup a ctrl for the diffusion */
+    myctrl = (ctrl_t *)gk_malloc(sizeof(ctrl_t), "myctrl");
+    memset(myctrl, 0, sizeof(ctrl_t));
+    myctrl->mype          = mype;
+    myctrl->npes          = npes;
+    myctrl->comm          = ipcomm;
+    myctrl->sync          = ctrl->sync;
+    myctrl->seed          = ctrl->seed;
+    myctrl->nparts        = ctrl->nparts;
+    myctrl->ncon          = ctrl->ncon;
+    myctrl->ipc_factor    = ctrl->ipc_factor;
+    myctrl->redist_factor = ctrl->redist_base;
+    myctrl->partType      = ADAPTIVE_PARTITION;
+    myctrl->ps_relation   = PARMETIS_PSR_UNCOUPLED;
+    myctrl->tpwgts        = rmalloc(myctrl->nparts*myctrl->ncon, "myctrl->tpwgts");
+    myctrl->ubvec         = rmalloc(myctrl->ncon, "myctrl->ubvec");
+    myctrl->invtvwgts     = rmalloc(myctrl->ncon, "myctrl->invtvwgts");
+
+    rcopy(myctrl->nparts*myctrl->ncon, ctrl->tpwgts, myctrl->tpwgts);
+    rcopy(myctrl->ncon, ctrl->ubvec, myctrl->ubvec);
+    rcopy(myctrl->ncon, ctrl->invtvwgts, myctrl->invtvwgts);
+
+    AllocateWSpace(myctrl, 10*agraph->nvtxs);
+    AllocateRefinementWorkSpace(myctrl, agraph->nvtxs);
+
+    /* This stmt is required to balance out the sr gkMPI_Comm_split */
+    gkMPI_Comm_split(ipcomm, MPI_UNDEFINED, 0, &srcomm);
 
     if (ncon == 1) {
-      rating = WavefrontDiffusion(&myctrl, agraph, home);
-      Moc_ComputeSerialBalance(ctrl, &cgraph, part, lbvec);
-      lbsum = ssum(ncon, lbvec);
+      rating = WavefrontDiffusion(myctrl, agraph, home);
+      ComputeSerialBalance(ctrl, &cgraph, part, lbvec);
+      lbsum = rsum(ncon, lbvec, 1);
 
       /* Determine which PE computed the best partitioning */
-      MPI_Allreduce((void *)&rating, (void *)&max_rating, 1, MPI_FLOAT, MPI_MAX, ipcomm);
-      MPI_Allreduce((void *)&lbsum, (void *)&min_lbsum, 1, MPI_FLOAT, MPI_MIN, ipcomm);
+      gkMPI_Allreduce((void *)&rating, (void *)&max_rating, 1, REAL_T, MPI_MAX, ipcomm);
+      gkMPI_Allreduce((void *)&lbsum, (void *)&min_lbsum, 1, REAL_T, MPI_MIN, ipcomm);
 
       lpecost.rank = ctrl->mype;
       lpecost.cost = lbsum;
-      if (min_lbsum < UNBALANCE_FRACTION * (float)(ncon)) {
-        if (lbsum < UNBALANCE_FRACTION * (float)(ncon))
+      if (min_lbsum < UNBALANCE_FRACTION * (real_t)(ncon)) {
+        if (lbsum < UNBALANCE_FRACTION * (real_t)(ncon))
           lpecost.cost = rating;
         else
           lpecost.cost = max_rating + lbsum;
       }
 
-      MPI_Allreduce((void *)&lpecost, (void *)&gpecost, 1, MPI_FLOAT_INT, MPI_MINLOC, ipcomm);
+      gkMPI_Allreduce((void *)&lpecost, (void *)&gpecost, 1, MPI_DOUBLE_INT, 
+          MPI_MINLOC, ipcomm);
 
       /* Now send this to the coordinating processor */
       if (ctrl->mype == gpecost.rank && ctrl->mype != gd_pe)
-        MPI_Send((void *)part, nvtxs, IDX_DATATYPE, gd_pe, 1, ctrl->comm);
+        gkMPI_Send((void *)part, nvtxs, IDX_T, gd_pe, 1, ctrl->comm);
 
       if (ctrl->mype != gpecost.rank && ctrl->mype == gd_pe)
-        MPI_Recv((void *)part, nvtxs, IDX_DATATYPE, gpecost.rank, 1, ctrl->comm, &status);
+        gkMPI_Recv((void *)part, nvtxs, IDX_T, gpecost.rank, 1, ctrl->comm, &status);
 
       if (ctrl->mype == gd_pe) {
-        idxcopy(nvtxs, part, lwhere);
-        SerialRemap(&cgraph, ctrl->nparts, home, lwhere, part, ctrl->tpwgts);
+        icopy(nvtxs, part, lwhere);
+        SerialRemap(ctrl, &cgraph, ctrl->nparts, home, lwhere, part, ctrl->tpwgts);
       }
     }
     else {
-      Moc_Diffusion(&myctrl, agraph, graph->vtxdist, agraph->where, home, wspace, N_MOC_GD_PASSES);
+      Mc_Diffusion(myctrl, agraph, graph->vtxdist, agraph->where, home, 
+          N_MOC_GD_PASSES);
     }
+
+    FreeCtrl(&myctrl);
   }
+
 
   if (graph->ncon <= MAX_NCON_FOR_DIFFUSION) {
     if (ctrl->mype == sr_pe  || ctrl->mype == gd_pe) {
       /********************************************************************/
       /* The coordinators from each group decide on the best partitioning */
       /********************************************************************/
-      my_cut = (float) ComputeSerialEdgeCut(&cgraph);
-      my_totalv = (float) Mc_ComputeSerialTotalV(&cgraph, home);
-      Moc_ComputeSerialBalance(ctrl, &cgraph, part, lbvec);
-      my_balance = ssum(cgraph.ncon, lbvec);
-      my_balance /= (float) cgraph.ncon;
+      my_cut = (real_t) ComputeSerialEdgeCut(&cgraph);
+      my_totalv = (real_t) Mc_ComputeSerialTotalV(&cgraph, home);
+      ComputeSerialBalance(ctrl, &cgraph, part, lbvec);
+      my_balance = rsum(cgraph.ncon, lbvec, 1);
+      my_balance /= (real_t) cgraph.ncon;
       my_cost = ctrl->ipc_factor * my_cut + REDIST_WGT * ctrl->redist_base * my_totalv;
 
-      IFSET(ctrl->dbglvl, DBG_REFINEINFO, printf("%s initial cut: %.1f, totalv: %.1f, balance: %.3f\n",
-      (ctrl->mype == sr_pe ? "scratch-remap" : "diffusion"), my_cut, my_totalv, my_balance));
+      IFSET(ctrl->dbglvl, DBG_REFINEINFO, 
+          printf("%s initial cut: %.1"PRREAL", totalv: %.1"PRREAL", balance: %.3"PRREAL"\n",
+                 (ctrl->mype == sr_pe ? "scratch-remap" : "diffusion"), 
+                 my_cut, my_totalv, my_balance));
 
       if (ctrl->mype == gd_pe) {
         buffer[0] = my_cost;
         buffer[1] = my_balance;
-        MPI_Send((void *)buffer, 2, MPI_FLOAT, sr_pe, 1, ctrl->comm);
+        gkMPI_Send((void *)buffer, 2, REAL_T, sr_pe, 1, ctrl->comm);
       }
       else {
-        MPI_Recv((void *)buffer, 2, MPI_FLOAT, gd_pe, 1, ctrl->comm, &status);
-        your_cost = buffer[0];
+        gkMPI_Recv((void *)buffer, 2, REAL_T, gd_pe, 1, ctrl->comm, &status);
+        your_cost    = buffer[0];
         your_balance = buffer[1];
       }
     }
@@ -335,43 +337,41 @@ void Balance_Partition(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
       }
     }
 
-    MPI_Bcast((void *)&who_wins, 1, MPI_INT, sr_pe, ctrl->comm);
+    gkMPI_Bcast((void *)&who_wins, 1, IDX_T, sr_pe, ctrl->comm);
   }
   else {
     who_wins = sr_pe;
   }
 
-  MPI_Bcast((void *)part, nvtxs, IDX_DATATYPE, who_wins, ctrl->comm);
-  idxcopy(graph->nvtxs, part+vtxdist[ctrl->mype], graph->where);
+  gkMPI_Bcast((void *)part, nvtxs, IDX_T, who_wins, ctrl->comm);
+  icopy(graph->nvtxs, part+vtxdist[ctrl->mype], graph->where);
 
-  MPI_Comm_free(&ipcomm);
-  GKfree((void **)&xadj, (void **)&mytpwgts, LTERM);
+  gkMPI_Comm_free(&ipcomm);
 
-/* For whatever reason, FreeGraph crashes here...so explicitly free the memory.
+  agraph->where = NULL;
   FreeGraph(agraph);
-*/
-  GKfree((void **)&agraph->xadj, (void **)&agraph->adjncy, (void **)&agraph->vwgt, (void **)&agraph->nvwgt, LTERM);
-  GKfree((void **)&agraph->vsize, (void **)&agraph->adjwgt, (void **)&agraph->label, LTERM);
-  GKfree((void **)&agraph, LTERM);
-
+          
+  WCOREPOP;
   IFSET(ctrl->dbglvl, DBG_TIME, stoptimer(ctrl->InitPartTmr));
 
 }
 
 
-/* NOTE: this subroutine should work for static, adaptive, single-, and multi-contraint */
-/*************************************************************************
-* This function assembles the graph into a single processor
-**************************************************************************/
-GraphType *Moc_AssembleAdaptiveGraph(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
+/*************************************************************************/
+/*! This function assembles the graph into a single processor. It should
+    work for static, adaptive, single-, and multi-contraint */
+/*************************************************************************/
+graph_t *AssembleAdaptiveGraph(ctrl_t *ctrl, graph_t *graph)
 {
-  int i, j, k, l, gnvtxs, nvtxs, ncon, gnedges, nedges, gsize;
-  idxtype *xadj, *vwgt, *vsize, *adjncy, *adjwgt, *vtxdist, *imap;
-  idxtype *axadj, *aadjncy, *aadjwgt, *avwgt, *avsize = NULL, *alabel;
-  idxtype *mygraph, *ggraph;
-  int *rcounts, *rdispls, mysize;
-  float *anvwgt;
-  GraphType *agraph;
+  idx_t i, j, k, l, gnvtxs, nvtxs, ncon, gnedges, nedges, gsize;
+  idx_t *xadj, *vwgt, *vsize, *adjncy, *adjwgt, *vtxdist, *imap;
+  idx_t *axadj, *aadjncy, *aadjwgt, *avwgt, *avsize = NULL, *alabel;
+  idx_t *mygraph, *ggraph;
+  idx_t *rcounts, *rdispls, mysize;
+  real_t *anvwgt;
+  graph_t *agraph;
+
+  WCOREPUSH;
 
   gnvtxs  = graph->gnvtxs;
   nvtxs   = graph->nvtxs;
@@ -386,9 +386,9 @@ GraphType *Moc_AssembleAdaptiveGraph(CtrlType *ctrl, GraphType *graph, WorkSpace
   imap    = graph->imap;
 
   /*************************************************************/
-  /* Determine the # of idxtype to receive from each processor */
+  /* Determine the # of idx_t to receive from each processor */
   /*************************************************************/
-  rcounts = imalloc(ctrl->npes, "AssembleGraph: rcounts");
+  rcounts = iwspacemalloc(ctrl, ctrl->npes);
   switch (ctrl->partType) {
     case STATIC_PARTITION:
       mysize = (1+ncon)*nvtxs + 2*nedges;
@@ -398,18 +398,23 @@ GraphType *Moc_AssembleAdaptiveGraph(CtrlType *ctrl, GraphType *graph, WorkSpace
       mysize = (2+ncon)*nvtxs + 2*nedges;
       break;
     default:
-      printf("WARNING: bad value for ctrl->partType %d\n", ctrl->partType);
+      printf("WARNING: bad value for ctrl->partType %"PRIDX"\n", ctrl->partType);
       break;
   }
-  MPI_Allgather((void *)(&mysize), 1, MPI_INT, (void *)rcounts, 1, MPI_INT, ctrl->comm);
+  gkMPI_Allgather((void *)(&mysize), 1, IDX_T, (void *)rcounts, 1, IDX_T, ctrl->comm);
 
-  rdispls = imalloc(ctrl->npes+1, "AssembleGraph: rdispls");
-  rdispls[0] = 0;
-  for (i=1; i<ctrl->npes+1; i++)
+  rdispls = iwspacemalloc(ctrl, ctrl->npes+1);
+  for (rdispls[0]=0, i=1; i<ctrl->npes+1; i++)
     rdispls[i] = rdispls[i-1] + rcounts[i-1];
 
+  /* allocate memory for the recv buffer of the assembled graph */
+  gsize   = rdispls[ctrl->npes];
+  ggraph  = iwspacemalloc(ctrl, gsize);
+
   /* Construct the one-array storage format of the assembled graph */
-  mygraph = (mysize <= wspace->maxcore ? wspace->core : idxmalloc(mysize, "AssembleGraph: mygraph"));
+  WCOREPUSH;  /* for freeing mygraph */
+  mygraph = iwspacemalloc(ctrl, mysize);
+
   for (k=i=0; i<nvtxs; i++) {
     mygraph[k++] = xadj[i+1]-xadj[i];
     for (j=0; j<ncon; j++)
@@ -421,21 +426,21 @@ GraphType *Moc_AssembleAdaptiveGraph(CtrlType *ctrl, GraphType *graph, WorkSpace
       mygraph[k++] = adjwgt[j];
     }
   }
-  ASSERT(ctrl, mysize == k);
+  PASSERT(ctrl, mysize == k);
 
   /**************************************/
   /* Assemble and send the entire graph */
   /**************************************/
-  gsize = rdispls[ctrl->npes];
-  ggraph = (gsize <= wspace->maxcore-mysize ? wspace->core+mysize : idxmalloc(gsize, "AssembleGraph: ggraph"));
-  MPI_Allgatherv((void *)mygraph, mysize, IDX_DATATYPE, (void *)ggraph, rcounts, rdispls, IDX_DATATYPE, ctrl->comm);
+  gkMPI_Allgatherv((void *)mygraph, mysize, IDX_T, (void *)ggraph, 
+      rcounts, rdispls, IDX_T, ctrl->comm);
 
-  GKfree((void **)&rcounts, (void **)&rdispls, LTERM);
-  if (mysize > wspace->maxcore)
-    free(mygraph);
+  WCOREPOP;  /* free mygraph */
+
 
   agraph = CreateGraph();
   agraph->nvtxs = gnvtxs;
+  agraph->ncon  = ncon;
+
   switch (ctrl->partType) {
     case STATIC_PARTITION:
       agraph->nedges = gnedges = (gsize-(1+ncon)*gnvtxs)/2;
@@ -445,24 +450,23 @@ GraphType *Moc_AssembleAdaptiveGraph(CtrlType *ctrl, GraphType *graph, WorkSpace
       agraph->nedges = gnedges = (gsize-(2+ncon)*gnvtxs)/2;
       break;
     default:
-      printf("WARNING: bad value for ctrl->partType %d\n", ctrl->partType);
+      printf("WARNING: bad value for ctrl->partType %"PRIDX"\n", ctrl->partType);
       agraph->nedges = gnedges = -1;
       break;
   }
 
-  agraph->ncon = ncon;
 
   /*******************************************/
   /* Allocate memory for the assembled graph */
   /*******************************************/
-  axadj = agraph->xadj = idxmalloc(gnvtxs+1, "AssembleGraph: axadj");
-  avwgt = agraph->vwgt = idxmalloc(gnvtxs*ncon, "AssembleGraph: avwgt");
-  anvwgt = agraph->nvwgt = fmalloc(gnvtxs*ncon, "AssembleGraph: anvwgt");
-  aadjncy = agraph->adjncy = idxmalloc(gnedges, "AssembleGraph: adjncy");
-  aadjwgt = agraph->adjwgt = idxmalloc(gnedges, "AssembleGraph: adjwgt");
-  alabel = agraph->label = idxmalloc(gnvtxs, "AssembleGraph: alabel");
+  axadj   = agraph->xadj   = imalloc(gnvtxs+1, "AssembleGraph: axadj");
+  avwgt   = agraph->vwgt   = imalloc(gnvtxs*ncon, "AssembleGraph: avwgt");
+  anvwgt  = agraph->nvwgt  = rmalloc(gnvtxs*ncon, "AssembleGraph: anvwgt");
+  aadjncy = agraph->adjncy = imalloc(gnedges, "AssembleGraph: adjncy");
+  aadjwgt = agraph->adjwgt = imalloc(gnedges, "AssembleGraph: adjwgt");
+  alabel  = agraph->label  = imalloc(gnvtxs, "AssembleGraph: alabel");
   if (ctrl->partType == ADAPTIVE_PARTITION || ctrl->partType == REFINE_PARTITION)
-    avsize = agraph->vsize = idxmalloc(gnvtxs, "AssembleGraph: avsize");
+    avsize = agraph->vsize = imalloc(gnvtxs, "AssembleGraph: avsize");
 
   for (k=j=i=0; i<gnvtxs; i++) {
     axadj[i] = ggraph[k++];
@@ -482,15 +486,14 @@ GraphType *Moc_AssembleAdaptiveGraph(CtrlType *ctrl, GraphType *graph, WorkSpace
   /*********************************/
   MAKECSR(i, gnvtxs, axadj);
 
-  for (i=0; i<gnvtxs; i++)
+  for (i=0; i<gnvtxs; i++) {
     for (j=0; j<ncon; j++)
-      anvwgt[i*ncon+j] = (float)(agraph->vwgt[i*ncon+j]) / (float)(ctrl->tvwgts[j]);
+      anvwgt[i*ncon+j] = ctrl->invtvwgts[j]*agraph->vwgt[i*ncon+j];
+  }
 
-  for (i=0; i<gnvtxs; i++)
-    alabel[i] = i;
+  iincset(gnvtxs, 0, alabel);
 
-  if (gsize > wspace->maxcore-mysize)
-    free(ggraph);
+  WCOREPOP;
 
   return agraph;
 }

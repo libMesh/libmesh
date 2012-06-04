@@ -188,8 +188,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   START_LOG("redistribute()","MeshCommunication");
 
   // register a derived datatype to use in shipping nodes
-  Parallel::DataType packed_node_datatype = Node::PackedNode::create_mpi_datatype();
-  packed_node_datatype.commit();
+  // Parallel::DataType packed_node_datatype = Node::PackedNode::create_mpi_datatype();
+  // packed_node_datatype.commit();
 
   // Get a few unique message tags to use in communications; we'll
   // default to some numbers around pi*1000
@@ -211,10 +211,11 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   //  send_n_nodes_and_elem_per_proc[5*pid+4] = element bc buffer size
   std::vector<unsigned int> send_n_nodes_and_elem_per_proc(5*libMesh::n_processors(), 0);
 
-  std::vector<std::vector<Node::PackedNode> >
-    nodes_sent(libMesh::n_processors());
+//  std::vector<std::vector<Node::PackedNode> >
+//    nodes_sent(libMesh::n_processors());
 
   std::vector<std::vector<int> >
+    nodes_sent(libMesh::n_processors()),
     elements_sent(libMesh::n_processors()),
     node_bcs_sent(libMesh::n_processors()),
     element_bcs_sent(libMesh::n_processors());
@@ -237,6 +238,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	// top_parent!!!
 	std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
 	std::set<const Node*> connected_nodes;
+	unsigned int node_buffer_size = 0,
+                     elem_buffer_size = 0;
 	{
 	  std::vector<const Elem*> family_tree;
 
@@ -260,10 +263,18 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		  for (unsigned int e=0; e<family_tree.size(); e++)
 		    {
 		      const Elem *elem = family_tree[e];
+		      elem_buffer_size += elem->packed_size();
 		      elements_to_send.insert (elem);
 
 		      for (unsigned int n=0; n<elem->n_nodes(); n++)
-			connected_nodes.insert (elem->get_node(n));
+		        {
+			  const Node *node = elem->get_node(n);
+			  if (!connected_nodes.count(node))
+		            {
+			      node_buffer_size += node->packed_size();
+			      connected_nodes.insert (node);
+		            }
+		        }
 		    }
 		}
 
@@ -285,10 +296,18 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 			  for (unsigned int e=0; e<family_tree.size(); e++)
 			    {
 			      const Elem *elem = family_tree[e];
+		              elem_buffer_size += elem->packed_size();
 			      elements_to_send.insert (elem);
 
 			      for (unsigned int n=0; n<elem->n_nodes(); n++)
-				connected_nodes.insert (elem->get_node(n));
+		                {
+			          const Node *node = elem->get_node(n);
+			          if (!connected_nodes.count(node))
+		                    {
+			              node_buffer_size += node->packed_size();
+			              connected_nodes.insert (node);
+		                    }
+		                }
 			    }
 			}
 		    }
@@ -305,14 +324,14 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	if (!connected_nodes.empty())
 	  {
 	    // the number of nodes we will ship to pid
-	    send_n_nodes_and_elem_per_proc[5*pid+0] = connected_nodes.size();
+	    send_n_nodes_and_elem_per_proc[5*pid+0] = node_buffer_size;
 
-	    nodes_sent[pid].reserve(connected_nodes.size());
+	    nodes_sent[pid].reserve(node_buffer_size);
 
 	    for (std::set<const Node*>::const_iterator node_it = connected_nodes.begin();
 		 node_it != connected_nodes.end(); ++node_it)
 	      {
-		nodes_sent[pid].push_back(Node::PackedNode(**node_it));
+		Node::PackedNode::pack(nodes_sent[pid], *node_it);
 
 		// add the node if it has BCs
                 std::vector<boundary_id_type> bcs = mesh.boundary_info->boundary_ids(*node_it);
@@ -326,6 +345,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 		  }
 	      }
 
+	    libmesh_assert(nodes_sent[pid].size() == node_buffer_size);
+
 	    // the size of the node bc buffer we will ship to pid
 	    send_n_nodes_and_elem_per_proc[5*pid+3] = node_bcs_sent[pid].size();
 
@@ -334,7 +355,6 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 
 	    Parallel::send (pid,
 			    nodes_sent[pid],
-			    packed_node_datatype,
 			    node_send_requests.back(),
 			    nodestag);
 
@@ -353,6 +373,9 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	  {
 	    // the number of elements we will send to this processor
 	    send_n_nodes_and_elem_per_proc[5*pid+1] = elements_to_send.size();
+
+	    // the packed connectivity size to send to this processor
+	    send_n_nodes_and_elem_per_proc[5*pid+2] = elem_buffer_size;
 
 	    for (std::set<const Elem*, CompareElemIdsByLevel>::const_iterator
 		   elem_it = elements_to_send.begin(); elem_it != elements_to_send.end(); ++elem_it)
@@ -379,8 +402,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
                       }
 	      }
 
-	    // the packed connectivity size to send to this processor
-	    send_n_nodes_and_elem_per_proc[5*pid+2] = elements_sent[pid].size();
+	    libmesh_assert(elements_sent[pid].size() == elem_buffer_size);
 
 	    // send the elements off to the destination processor
 	    element_send_requests.push_back(Parallel::request());
@@ -417,12 +439,12 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     recv_node_pair(libMesh::n_processors(),false), recv_elem_pair(libMesh::n_processors(),false);
 
   unsigned int
-    n_send_node_pairs=0,     n_send_elem_pairs=0,
-    n_send_node_bc_pairs=0,  n_send_elem_bc_pairs=0,
-    n_recv_node_pairs=0,     n_recv_elem_pairs=0,
-    n_recv_node_bc_pairs=0,  n_recv_elem_bc_pairs=0,
-    max_n_nodes_received=0,  max_conn_size_received=0,
-    max_node_bcs_received=0, max_elem_bcs_received=0;
+    n_send_node_pairs=0,      n_send_elem_pairs=0,
+    n_send_node_bc_pairs=0,   n_send_elem_bc_pairs=0,
+    n_recv_node_pairs=0,      n_recv_elem_pairs=0,
+    n_recv_node_bc_pairs=0,   n_recv_elem_bc_pairs=0,
+    max_node_data_received=0, max_conn_size_received=0,
+    max_node_bcs_received=0,  max_elem_bcs_received=0;
 
   for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
     {
@@ -448,8 +470,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	{
 	  recv_node_pair[pid] = true;
 	  n_recv_node_pairs++;
-	  max_n_nodes_received = std::max(max_n_nodes_received,
-					  recv_n_nodes_and_elem_per_proc[5*pid+0]);
+	  max_node_data_received = std::max(max_node_data_received,
+					    recv_n_nodes_and_elem_per_proc[5*pid+0]);
 
 	  if (recv_n_nodes_and_elem_per_proc[5*pid+3]) // and node bcs
 	    {
@@ -481,8 +503,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 
   // Receive nodes.  Size this array for the largest message.
   {
-    std::vector<Node::PackedNode> received_nodes; /**/
-    received_nodes.reserve(max_n_nodes_received);
+    std::vector<int> received_nodes; /**/
+    received_nodes.reserve(max_node_data_received);
 
     // We now know how many processors will be sending us nodes.
     for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_pairs; node_comm_step++)
@@ -494,18 +516,20 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	Parallel::Status status =
 	  Parallel::receive (Parallel::any_source,
 			     received_nodes,
-			     packed_node_datatype,
 			     nodestag);
 	const unsigned int source_pid = status.source();
-	const unsigned int n_nodes_received =
+	const unsigned int node_data_received =
 	  recv_n_nodes_and_elem_per_proc[5*source_pid+0];
-	libmesh_assert (n_nodes_received == received_nodes.size());
-	libmesh_assert (status.size() == n_nodes_received);
+	libmesh_assert (node_data_received == received_nodes.size());
+	libmesh_assert (status.size() == node_data_received);
 	libmesh_assert (recv_node_pair[source_pid]);
 
-	for (unsigned int n=0; n<n_nodes_received; n++)
+	std::vector<int>::const_iterator next_node_data = received_nodes.begin();
+	while (next_node_data < received_nodes.end())
 	  {
-	    Node *node = received_nodes[n].build_node().release();
+	    Node *node = new Node;
+	    Node::PackedNode::unpack(next_node_data, *node);
+	    next_node_data += node->packed_size();
 	    mesh.insert_node(node); // insert_node works even if the
 	  }                         // node already exists in the mesh,
       }                             // in which case it overwrites (x,y,z)
@@ -680,9 +704,6 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   Parallel::wait (node_bc_requests);
   Parallel::wait (element_send_requests);
   Parallel::wait (element_bc_requests);
-
-  // unregister MPI datatypes
-  packed_node_datatype.free();
 
   // Check on the redistribution consistency
 #ifdef DEBUG
@@ -1870,6 +1891,13 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
     global_n_nodes = n_nodes[0],
     global_n_elem  = n_elem[0];
 
+  const unsigned int
+    n_unpartitioned_nodes = mesh.n_unpartitioned_nodes(),
+    n_unpartitioned_elem  = mesh.n_unpartitioned_elem();
+
+  Parallel::verify(n_unpartitioned_nodes);
+  Parallel::verify(n_unpartitioned_elem);
+
   for (unsigned int p=1; p<libMesh::n_processors(); p++)
     {
       node_offsets[p] = node_offsets[p-1] + n_nodes[p-1];
@@ -1940,7 +1968,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	}
 
     // Check the result
-    libmesh_assert (global_n_nodes == mesh.n_nodes());
+    libmesh_assert (global_n_nodes + n_unpartitioned_nodes == mesh.n_nodes());
   }
 
   //----------------------------------------------------
@@ -2130,7 +2158,7 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 	  }
 
     // Check the result
-    libmesh_assert (global_n_elem == mesh.n_elem());
+    libmesh_assert (global_n_elem + n_unpartitioned_elem == mesh.n_elem());
   }
 
   // All done!

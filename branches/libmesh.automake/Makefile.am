@@ -535,13 +535,13 @@ if LIBMESH_ENABLE_LASPACK
 endif
 
 if LIBMESH_ENABLE_METIS
-  SUBDIRS += contrib/metis/Lib
-  libmesh_la_LIBADD += contrib/metis/Lib/libmetis.la
+  SUBDIRS += contrib/metis
+  libmesh_la_LIBADD += contrib/metis/libmetis.la
 endif
 
 if LIBMESH_ENABLE_PARMETIS
-  SUBDIRS += contrib/parmetis/Lib
-  libmesh_la_LIBADD += contrib/parmetis/Lib/libparmetis.la
+  SUBDIRS += contrib/parmetis
+  libmesh_la_LIBADD += contrib/parmetis/libparmetis.la
 endif
 
 if LIBMESH_ENABLE_SFC

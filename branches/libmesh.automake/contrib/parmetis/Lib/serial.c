@@ -10,51 +10,139 @@
  *
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
+
+
+/*************************************************************************
+* This function computes the initial id/ed
+**************************************************************************/
+void Mc_ComputeSerialPartitionParams(ctrl_t *ctrl, graph_t *graph, idx_t nparts)
+{
+  idx_t i, j, k;
+  idx_t nvtxs, nedges, ncon, mincut, me, other;
+  idx_t *xadj, *adjncy, *adjwgt, *where;
+  ckrinfo_t *myrinfo;
+  cnbr_t *mynbrs;
+  real_t *nvwgt, *npwgts;
+  idx_t mype;
+
+  gkMPI_Comm_rank(MPI_COMM_WORLD, &mype);
+
+  nvtxs  = graph->nvtxs;
+  ncon   = graph->ncon;
+  xadj   = graph->xadj;
+  nvwgt  = graph->nvwgt;
+  adjncy = graph->adjncy;
+  adjwgt = graph->adjwgt;
+  where  = graph->where;
+
+  npwgts = rset(ncon*nparts, 0.0, graph->gnpwgts);
+
+  PASSERT(ctrl, graph->ckrinfo != NULL);
+  PASSERT(ctrl, ctrl->cnbrpool != NULL);
+
+  memset(graph->ckrinfo, 0, sizeof(ckrinfo_t)*nvtxs);
+  cnbrpoolReset(ctrl);
+
+  /*------------------------------------------------------------
+  / Compute now the id/ed degrees
+  /------------------------------------------------------------*/
+  nedges = mincut = 0;
+  for (i=0; i<nvtxs; i++) {
+    me = where[i];
+    raxpy(ncon, 1.0, nvwgt+i*ncon, 1, npwgts+me*ncon, 1);
+
+    myrinfo = graph->ckrinfo+i;
+
+    for (j=xadj[i]; j<xadj[i+1]; j++) {
+      if (me == where[adjncy[j]]) {
+        myrinfo->id += adjwgt[j];
+      }
+      else {
+        myrinfo->ed += adjwgt[j];
+      }
+    }
+
+    mincut += myrinfo->ed;
+
+    /* Time to compute the particular external degrees */
+    if (myrinfo->ed > 0) {
+      myrinfo->inbr = cnbrpoolGetNext(ctrl, xadj[i+1]-xadj[i]+1);
+      mynbrs        = ctrl->cnbrpool + myrinfo->inbr;
+
+      for (j=xadj[i]; j<xadj[i+1]; j++) {
+        other = where[adjncy[j]];
+        if (me != other) {
+          for (k=0; k<myrinfo->nnbrs; k++) {
+            if (mynbrs[k].pid == other) {
+              mynbrs[k].ed += adjwgt[j];
+              break;
+            }
+          }
+          if (k == myrinfo->nnbrs) {
+            mynbrs[k].pid = other;
+            mynbrs[k].ed  = adjwgt[j];
+            myrinfo->nnbrs++;
+          }
+        }
+      }
+    }
+    else {
+      myrinfo->inbr = -1;
+    }
+  }
+
+  graph->mincut = mincut/2;
+
+  return;
+}
 
 
 /*************************************************************************
 * This function performs k-way refinement
 **************************************************************************/
-void Moc_SerialKWayAdaptRefine(GraphType *graph, int nparts, idxtype *home,
-     float *orgubvec, int npasses)
+void Mc_SerialKWayAdaptRefine(ctrl_t *ctrl, graph_t *graph, idx_t nparts, 
+          idx_t *home, real_t *orgubvec, idx_t npasses)
 {
-  int i, ii, iii, j, k;
-  int nvtxs, ncon, pass, nmoves, myndegrees;
-  int from, me, myhome, to, oldcut, gain, tmp;
-  idxtype *xadj, *adjncy, *adjwgt;
-  idxtype *where;
-  EdgeType *mydegrees;
-  RInfoType *rinfo, *myrinfo;
-  float *npwgts, *nvwgt, *minwgt, *maxwgt, ubvec[MAXNCON];
-  int gain_is_greater, gain_is_same, fit_in_to, fit_in_from, going_home;
-  int zero_gain, better_balance_ft, better_balance_tt;
-  KeyValueType *cand;
-int mype;
-MPI_Comm_rank(MPI_COMM_WORLD, &mype);
+  idx_t i, ii, iii, j, k;
+  idx_t nvtxs, ncon, pass, nmoves;
+  idx_t from, me, myhome, to, oldcut, gain, tmp;
+  idx_t *xadj, *adjncy, *adjwgt;
+  idx_t *where;
+  real_t *npwgts, *nvwgt, *minwgt, *maxwgt, *ubvec;
+  idx_t gain_is_greater, gain_is_same, fit_in_to, fit_in_from, going_home;
+  idx_t zero_gain, better_balance_ft, better_balance_tt;
+  ikv_t *cand;
+  idx_t mype;
+  ckrinfo_t *myrinfo;
+  cnbr_t *mynbrs;
 
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  xadj = graph->xadj;
+  WCOREPUSH;
+
+  gkMPI_Comm_rank(MPI_COMM_WORLD, &mype);
+
+  nvtxs  = graph->nvtxs;
+  ncon   = graph->ncon;
+  xadj   = graph->xadj;
   adjncy = graph->adjncy;
   adjwgt = graph->adjwgt;
-  where = graph->where;
-  rinfo = graph->rinfo;
+  where  = graph->where;
   npwgts = graph->gnpwgts;
   
   /* Setup the weight intervals of the various subdomains */
-  cand = (KeyValueType *)GKmalloc(nvtxs*sizeof(KeyValueType), "cand");
-  minwgt =  fmalloc(nparts*ncon, "minwgt");
-  maxwgt = fmalloc(nparts*ncon, "maxwgt");
+  cand   = ikvwspacemalloc(ctrl, nvtxs);
+  minwgt = rwspacemalloc(ctrl, nparts*ncon);
+  maxwgt = rwspacemalloc(ctrl, nparts*ncon);
+  ubvec  = rwspacemalloc(ctrl, ncon);
 
   ComputeHKWayLoadImbalance(ncon, nparts, npwgts, ubvec);
   for (i=0; i<ncon; i++)
-    ubvec[i] = amax(ubvec[i], orgubvec[i]);
+    ubvec[i] =gk_max(ubvec[i], orgubvec[i]);
 
   for (i=0; i<nparts; i++) {
     for (j=0; j<ncon; j++) {
-      maxwgt[i*ncon+j] = ubvec[j]/(float)nparts;
-      minwgt[i*ncon+j] = ubvec[j]*(float)nparts;
+      maxwgt[i*ncon+j] = ubvec[j]/(real_t)nparts;
+      minwgt[i*ncon+j] = ubvec[j]*(real_t)nparts;
     }
   }
 
@@ -62,32 +150,31 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     oldcut = graph->mincut;
 
     for (i=0; i<nvtxs; i++) {
-      cand[i].key = rinfo[i].id-rinfo[i].ed;
+      cand[i].key = graph->ckrinfo[i].ed-graph->ckrinfo[i].id;
       cand[i].val = i;
     }
-    ikeysort(nvtxs, cand);
+    ikvsortd(nvtxs, cand);
 
     nmoves = 0;
     for (iii=0; iii<nvtxs; iii++) {
       i = cand[iii].val;
 
-      myrinfo = rinfo+i;
+      myrinfo = graph->ckrinfo+i;
 
       if (myrinfo->ed >= myrinfo->id) {
-        from = where[i];
+        from   = where[i];
         myhome = home[i];
-        nvwgt = graph->nvwgt+i*ncon;
+        nvwgt  = graph->nvwgt+i*ncon;
 
         if (myrinfo->id > 0 &&
-        AreAllHVwgtsBelow(ncon, 1.0, npwgts+from*ncon, -1.0, nvwgt, minwgt+from*ncon)) 
+            AreAllHVwgtsBelow(ncon, 1.0, npwgts+from*ncon, -1.0, nvwgt, minwgt+from*ncon)) 
           continue;
 
-        mydegrees = myrinfo->degrees;
-        myndegrees = myrinfo->ndegrees;
+        mynbrs = ctrl->cnbrpool + myrinfo->inbr;
 
-        for (k=0; k<myndegrees; k++) {
-          to = mydegrees[k].edge;
-          gain = mydegrees[k].ewgt - myrinfo->id; 
+        for (k=myrinfo->nnbrs-1; k>=0; k--) {
+          to = mynbrs[k].pid;
+          gain = mynbrs[k].ed - myrinfo->id; 
           if (gain >= 0 && 
              (AreAllHVwgtsBelow(ncon, 1.0, npwgts+to*ncon, 1.0, nvwgt, maxwgt+to*ncon) ||
              IsHBalanceBetterFT(ncon,npwgts+from*ncon,npwgts+to*ncon,nvwgt,ubvec))) {
@@ -96,19 +183,20 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
         }
 
         /* break out if you did not find a candidate */
-        if (k == myndegrees)
+        if (k < 0)
           continue;
 
-        for (j=k+1; j<myndegrees; j++) {
-          to = mydegrees[j].edge;
-          going_home = (myhome == to);
-          gain_is_same = (mydegrees[j].ewgt == mydegrees[k].ewgt);
-          gain_is_greater = (mydegrees[j].ewgt > mydegrees[k].ewgt);
-          fit_in_to = AreAllHVwgtsBelow(ncon,1.0,npwgts+to*ncon,1.0,nvwgt,maxwgt+to*ncon);
-          better_balance_ft = IsHBalanceBetterFT(ncon,npwgts+from*ncon,
-                              npwgts+to*ncon,nvwgt,ubvec);
-          better_balance_tt = IsHBalanceBetterTT(ncon,npwgts+mydegrees[k].edge*ncon,
-                              npwgts+to*ncon,nvwgt,ubvec);
+        for (j=k-1; j>=0; j--) {
+          to = mynbrs[j].pid;
+          going_home        = (myhome == to);
+          gain_is_same      = (mynbrs[j].ed == mynbrs[k].ed);
+          gain_is_greater   = (mynbrs[j].ed > mynbrs[k].ed);
+          fit_in_to         = AreAllHVwgtsBelow(ncon, 1.0, npwgts+to*ncon, 1.0, nvwgt, 
+                                  maxwgt+to*ncon);
+          better_balance_ft = IsHBalanceBetterFT(ncon, npwgts+from*ncon,
+                                  npwgts+to*ncon, nvwgt, ubvec);
+          better_balance_tt = IsHBalanceBetterTT(ncon, npwgts+mynbrs[k].ed*ncon,
+                                  npwgts+to*ncon,nvwgt,ubvec);
 
           if (
                (gain_is_greater &&
@@ -129,14 +217,14 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
           }
         }
 
-        to = mydegrees[k].edge;
+        to = mynbrs[k].pid;
         going_home = (myhome == to);
-        zero_gain = (mydegrees[k].ewgt == myrinfo->id);
+        zero_gain  = (mynbrs[k].ed == myrinfo->id);
 
-        fit_in_from = AreAllHVwgtsBelow(ncon,1.0,npwgts+from*ncon,0.0,npwgts+from*ncon,
-                      maxwgt+from*ncon);
-        better_balance_ft = IsHBalanceBetterFT(ncon,npwgts+from*ncon,
-                            npwgts+to*ncon,nvwgt,ubvec);
+        fit_in_from       = AreAllHVwgtsBelow(ncon, 1.0, npwgts+from*ncon, 0.0, 
+                                npwgts+from*ncon, maxwgt+from*ncon);
+        better_balance_ft = IsHBalanceBetterFT(ncon, npwgts+from*ncon,
+                                npwgts+to*ncon, nvwgt, ubvec);
 
         if (zero_gain &&
             !going_home &&
@@ -147,30 +235,31 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
         /*=====================================================================
         * If we got here, we can now move the vertex from 'from' to 'to' 
         *======================================================================*/
-        graph->mincut -= mydegrees[k].ewgt-myrinfo->id;
+        graph->mincut -= mynbrs[k].ed-myrinfo->id;
 
         /* Update where, weight, and ID/ED information of the vertex you moved */
-        saxpy2(ncon, 1.0, nvwgt, 1, npwgts+to*ncon, 1);
-        saxpy2(ncon, -1.0, nvwgt, 1, npwgts+from*ncon, 1);
+        raxpy(ncon,  1.0, nvwgt, 1, npwgts+to*ncon,   1);
+        raxpy(ncon, -1.0, nvwgt, 1, npwgts+from*ncon, 1);
         where[i] = to;
-        myrinfo->ed += myrinfo->id-mydegrees[k].ewgt;
-        SWAP(myrinfo->id, mydegrees[k].ewgt, tmp);
+        myrinfo->ed += myrinfo->id-mynbrs[k].ed;
+        gk_SWAP(myrinfo->id, mynbrs[k].ed, tmp);
 
-        if (mydegrees[k].ewgt == 0) {
-          myrinfo->ndegrees--;
-          mydegrees[k].edge = mydegrees[myrinfo->ndegrees].edge;
-          mydegrees[k].ewgt = mydegrees[myrinfo->ndegrees].ewgt;
-        }
+        if (mynbrs[k].ed == 0) 
+          mynbrs[k] = mynbrs[--myrinfo->nnbrs];
         else
-          mydegrees[k].edge = from;
+          mynbrs[k].pid = from;
 
         /* Update the degrees of adjacent vertices */
         for (j=xadj[i]; j<xadj[i+1]; j++) {
           ii = adjncy[j];
           me = where[ii];
 
-          myrinfo = rinfo+ii;
-          mydegrees = myrinfo->degrees;
+          myrinfo = graph->ckrinfo+ii;
+          if (myrinfo->inbr == -1) {
+            myrinfo->inbr  = cnbrpoolGetNext(ctrl, xadj[ii+1]-xadj[ii]+1);
+            myrinfo->nnbrs = 0;
+          }
+          mynbrs = ctrl->cnbrpool + myrinfo->inbr;
 
           if (me == from) {
             INC_DEC(myrinfo->ed, myrinfo->id, adjwgt[j]);
@@ -183,15 +272,12 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
 
           /* Remove contribution of the ed from 'from' */
           if (me != from) {
-            for (k=0; k<myrinfo->ndegrees; k++) {
-              if (mydegrees[k].edge == from) {
-                if (mydegrees[k].ewgt == adjwgt[j]) {
-                  myrinfo->ndegrees--;
-                  mydegrees[k].edge = mydegrees[myrinfo->ndegrees].edge;
-                  mydegrees[k].ewgt = mydegrees[myrinfo->ndegrees].ewgt;
-                }
+            for (k=0; k<myrinfo->nnbrs; k++) {
+              if (mynbrs[k].pid == from) {
+                if (mynbrs[k].ed == adjwgt[j]) 
+                  mynbrs[k] = mynbrs[--myrinfo->nnbrs];
                 else
-                  mydegrees[k].ewgt -= adjwgt[j];
+                  mynbrs[k].ed -= adjwgt[j];
                 break;
               }
             }
@@ -199,18 +285,18 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
 
           /* Add contribution of the ed to 'to' */
           if (me != to) {
-            for (k=0; k<myrinfo->ndegrees; k++) {
-              if (mydegrees[k].edge == to) {
-                mydegrees[k].ewgt += adjwgt[j];
+            for (k=0; k<myrinfo->nnbrs; k++) {
+              if (mynbrs[k].pid == to) {
+                mynbrs[k].ed += adjwgt[j];
                 break;
               }
             }
-            if (k == myrinfo->ndegrees) {
-              mydegrees[myrinfo->ndegrees].edge = to;
-              mydegrees[myrinfo->ndegrees++].ewgt = adjwgt[j];
+            if (k == myrinfo->nnbrs) {
+              mynbrs[k].pid = to;
+              mynbrs[k].ed  = adjwgt[j];
+              myrinfo->nnbrs++;
             }
           }
-
         }
         nmoves++;
       }
@@ -220,98 +306,21 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
       break;
   }
 
-  GKfree((void **)&minwgt, (void **)&maxwgt, (void **)&cand, LTERM);
+  WCOREPOP;
 
   return;
 }
 
-
-/*************************************************************************
-* This function computes the initial id/ed
-**************************************************************************/
-void Moc_ComputeSerialPartitionParams(GraphType *graph, int nparts,
-     EdgeType *degrees)
-{
-  int i, j, k;
-  int nvtxs, nedges, ncon, mincut, me, other;
-  idxtype *xadj, *adjncy, *adjwgt, *where;
-  RInfoType *rinfo, *myrinfo;
-  EdgeType *mydegrees;
-  float *nvwgt, *npwgts;
-int mype;
-MPI_Comm_rank(MPI_COMM_WORLD, &mype);
-
-
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  xadj = graph->xadj;
-  nvwgt = graph->nvwgt;
-  adjncy = graph->adjncy;
-  adjwgt = graph->adjwgt;
-  where = graph->where;
-  rinfo = graph->rinfo;
-
-  npwgts = sset(ncon*nparts, 0.0, graph->gnpwgts);
-
-  /*------------------------------------------------------------
-  / Compute now the id/ed degrees
-  /------------------------------------------------------------*/
-  nedges = mincut = 0;
-  for (i=0; i<nvtxs; i++) {
-    me = where[i];
-    saxpy2(ncon, 1.0, nvwgt+i*ncon, 1, npwgts+me*ncon, 1);
-
-    myrinfo = rinfo+i;
-    myrinfo->id = myrinfo->ed = myrinfo->ndegrees = 0;
-    myrinfo->degrees = degrees + nedges;
-    nedges += xadj[i+1]-xadj[i];
-
-    for (j=xadj[i]; j<xadj[i+1]; j++) {
-      if (me == where[adjncy[j]]) {
-        myrinfo->id += adjwgt[j];
-      }
-      else {
-        myrinfo->ed += adjwgt[j];
-      }
-    }
-
-    mincut += myrinfo->ed;
-
-    /* Time to compute the particular external degrees */
-    if (myrinfo->ed > 0) {
-      mydegrees = myrinfo->degrees;
-
-      for (j=xadj[i]; j<xadj[i+1]; j++) {
-        other = where[adjncy[j]];
-        if (me != other) {
-          for (k=0; k<myrinfo->ndegrees; k++) {
-            if (mydegrees[k].edge == other) {
-              mydegrees[k].ewgt += adjwgt[j];
-              break;
-            }
-          }
-          if (k == myrinfo->ndegrees) {
-            mydegrees[myrinfo->ndegrees].edge = other;
-            mydegrees[myrinfo->ndegrees++].ewgt = adjwgt[j];
-          }
-        }
-      }
-    }
-  }
-
-  graph->mincut = mincut/2;
-
-  return;
-}
 
 
 /*************************************************************************
 * This function checks if the vertex weights of two vertices are below 
 * a given set of values
 **************************************************************************/
-int AreAllHVwgtsBelow(int ncon, float alpha, float *vwgt1, float beta, float *vwgt2, float *limit)
+idx_t AreAllHVwgtsBelow(idx_t ncon, real_t alpha, real_t *vwgt1, real_t beta, 
+          real_t *vwgt2, real_t *limit)
 {
-  int i;
+  idx_t i;
 
   for (i=0; i<ncon; i++)
     if (alpha*vwgt1[i] + beta*vwgt2[i] > limit[i])
@@ -325,10 +334,10 @@ int AreAllHVwgtsBelow(int ncon, float alpha, float *vwgt1, float beta, float *vw
 * This function computes the load imbalance over all the constrains
 * For now assume that we just want balanced partitionings
 **************************************************************************/ 
-void ComputeHKWayLoadImbalance(int ncon, int nparts, float *npwgts, float *lbvec)
+void ComputeHKWayLoadImbalance(idx_t ncon, idx_t nparts, real_t *npwgts, real_t *lbvec)
 {
-  int i, j;
-  float max;
+  idx_t i, j;
+  real_t max;
 
   for (i=0; i<ncon; i++) {
     max = 0.0;
@@ -345,24 +354,26 @@ void ComputeHKWayLoadImbalance(int ncon, int nparts, float *npwgts, float *lbvec
 /**************************************************************
 *  This subroutine remaps a partitioning on a single processor
 **************************************************************/
-void SerialRemap(GraphType *graph, int nparts, idxtype *base, idxtype *scratch,
-     idxtype *remap, float *tpwgts)
+void SerialRemap(ctrl_t *ctrl, graph_t *graph, idx_t nparts, 
+         idx_t *base, idx_t *scratch, idx_t *remap, real_t *tpwgts)
 {
-  int i, ii, j, k;
-  int nvtxs, nmapped, max_mult;
-  int from, to, current_from, smallcount, bigcount;
-  KeyValueType *flowto, *bestflow;
-  KeyKeyValueType *sortvtx;
-  idxtype *vsize, *htable, *map, *rowmap;
+  idx_t i, ii, j, k;
+  idx_t nvtxs, nmapped, max_mult;
+  idx_t from, to, current_from, smallcount, bigcount;
+  ikv_t *flowto, *bestflow;
+  i2kv_t *sortvtx;
+  idx_t *vsize, *htable, *map, *rowmap;
+
+  WCOREPUSH;
 
   nvtxs = graph->nvtxs;
   vsize = graph->vsize;
-  max_mult = amin(MAX_NPARTS_MULTIPLIER, nparts);
+  max_mult = gk_min(MAX_NPARTS_MULTIPLIER, nparts);
 
-  sortvtx = (KeyKeyValueType *)GKmalloc(nvtxs*sizeof(KeyKeyValueType), "sortvtx");
-  flowto = (KeyValueType *)GKmalloc((nparts*max_mult+nparts)*sizeof(KeyValueType), "flowto");
-  bestflow = flowto+nparts;
-  map = htable = idxsmalloc(nparts*2, -1, "htable");
+  sortvtx      = (i2kv_t *)wspacemalloc(ctrl, nvtxs*sizeof(i2kv_t));
+  flowto       = ikvwspacemalloc(ctrl, nparts);
+  bestflow     = ikvwspacemalloc(ctrl, nparts*max_mult);
+  map = htable = iset(2*nparts, -1, iwspacemalloc(ctrl, 2*nparts));
   rowmap = map+nparts;
 
   for (i=0; i<nvtxs; i++) {
@@ -371,7 +382,7 @@ void SerialRemap(GraphType *graph, int nparts, idxtype *base, idxtype *scratch,
     sortvtx[i].val = i;
   }
 
-  qsort((void *)sortvtx, (size_t)nvtxs, (size_t)sizeof(KeyKeyValueType), SSMIncKeyCmp);
+  qsort((void *)sortvtx, (size_t)nvtxs, (size_t)sizeof(i2kv_t), SSMIncKeyCmp);
 
   for (j=0; j<nparts; j++) {
     flowto[j].key = 0;
@@ -389,11 +400,11 @@ void SerialRemap(GraphType *graph, int nparts, idxtype *base, idxtype *scratch,
       /* reset the hash table */
       for (j=0; j<smallcount; j++)
         htable[flowto[j].val] = -1;
-      ASSERTS(idxsum(nparts, htable) == -nparts);
+      ASSERT(isum(nparts, htable, 1) == -nparts);
 
-      ikeysort(smallcount, flowto);
+      ikvsorti(smallcount, flowto);
 
-      for (j=0; j<amin(smallcount, max_mult); j++, bigcount++) {
+      for (j=0; j<gk_min(smallcount, max_mult); j++, bigcount++) {
         bestflow[bigcount].key = flowto[j].key;
         bestflow[bigcount].val = current_from*nparts+flowto[j].val;
       }
@@ -416,18 +427,18 @@ void SerialRemap(GraphType *graph, int nparts, idxtype *base, idxtype *scratch,
   /* reset the hash table */
   for (j=0; j<smallcount; j++)
     htable[flowto[j].val] = -1;
-  ASSERTS(idxsum(nparts, htable) == -nparts);
+  ASSERT(isum(nparts, htable, 1) == -nparts);
 
-  ikeysort(smallcount, flowto);
+  ikvsorti(smallcount, flowto);
 
-  for (j=0; j<amin(smallcount, max_mult); j++, bigcount++) {
+  for (j=0; j<gk_min(smallcount, max_mult); j++, bigcount++) {
     bestflow[bigcount].key = flowto[j].key;
     bestflow[bigcount].val = current_from*nparts+flowto[j].val;
   }
-  ikeysort(bigcount, bestflow);
+  ikvsorti(bigcount, bestflow);
 
-  ASSERTS(idxsum(nparts, map) == -nparts);
-  ASSERTS(idxsum(nparts, rowmap) == -nparts);
+  ASSERT(isum(nparts, map, 1) == -nparts);
+  ASSERT(isum(nparts, rowmap, 1) == -nparts);
   nmapped = 0;
 
   /* now make as many assignments as possible */
@@ -474,7 +485,7 @@ void SerialRemap(GraphType *graph, int nparts, idxtype *base, idxtype *scratch,
   for (i=0; i<nvtxs; i++)
     remap[i] = map[remap[i]];
 
-  GKfree((void **)&sortvtx, (void **)&flowto, (void **)&htable, LTERM);
+  WCOREPOP;
 }
 
 
@@ -483,10 +494,10 @@ void SerialRemap(GraphType *graph, int nparts, idxtype *base, idxtype *scratch,
 **************************************************************************/
 int SSMIncKeyCmp(const void *fptr, const void *sptr)
 {
-  KeyKeyValueType *first, *second;
+  i2kv_t *first, *second;
 
-  first = (KeyKeyValueType *)(fptr);
-  second = (KeyKeyValueType *)(sptr);
+  first = (i2kv_t *)(fptr);
+  second = (i2kv_t *)(sptr);
 
   if (first->key1 > second->key1)
     return 1;
@@ -507,47 +518,54 @@ int SSMIncKeyCmp(const void *fptr, const void *sptr)
 /*************************************************************************
 * This function performs an edge-based FM refinement
 **************************************************************************/
-void Moc_Serial_FM_2WayRefine(GraphType *graph, float *tpwgts, int npasses)
+void Mc_Serial_FM_2WayRefine(ctrl_t *ctrl, graph_t *graph, real_t *tpwgts, idx_t npasses)
 {
-  int i, ii, j, k;
-  int kwgt, nvtxs, ncon, nbnd, nswaps, from, to, pass, limit, tmp, cnum;
-  idxtype *xadj, *adjncy, *adjwgt, *where, *id, *ed, *bndptr, *bndind;
-  idxtype *moved, *swaps, *qnum;
-  float *nvwgt, *npwgts, mindiff[MAXNCON], origbal, minbal, newbal;
-  FPQueueType parts[MAXNCON][2];
-  int higain, oldgain, mincut, initcut, newcut, mincutorder;
-  float rtpwgts[MAXNCON*2];
-  KeyValueType *cand;
-int mype;
-MPI_Comm_rank(MPI_COMM_WORLD, &mype);
+  idx_t i, ii, j, k;
+  idx_t kwgt, nvtxs, ncon, nbnd, nswaps, from, to, pass, limit, tmp, cnum;
+  idx_t *xadj, *adjncy, *adjwgt, *where, *id, *ed, *bndptr, *bndind;
+  idx_t *moved, *swaps, *qnum;
+  real_t *nvwgt, *npwgts, *mindiff, *tmpdiff, origbal, minbal, newbal;
+  rpq_t **parts[2];
+  idx_t higain, mincut, initcut, newcut, mincutorder;
+  real_t *rtpwgts;
+  idx_t mype;
 
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  xadj = graph->xadj;
-  nvwgt = graph->nvwgt;
+  WCOREPUSH;
+
+  gkMPI_Comm_rank(MPI_COMM_WORLD, &mype);
+
+  nvtxs  = graph->nvtxs;
+  ncon   = graph->ncon;
+  xadj   = graph->xadj;
+  nvwgt  = graph->nvwgt;
   adjncy = graph->adjncy;
   adjwgt = graph->adjwgt;
-  where = graph->where;
-  id = graph->sendind;
-  ed = graph->recvind;
+  where  = graph->where;
+  id     = graph->sendind;
+  ed     = graph->recvind;
   npwgts = graph->gnpwgts;
   bndptr = graph->sendptr;
   bndind = graph->recvptr;
 
-  moved = idxmalloc(nvtxs, "moved");
-  swaps = idxmalloc(nvtxs, "swaps");
-  qnum = idxmalloc(nvtxs, "qnum");
-  cand = (KeyValueType *)GKmalloc(nvtxs*sizeof(KeyValueType), "cand");
+  mindiff  = rwspacemalloc(ctrl, ncon);
+  tmpdiff  = rwspacemalloc(ctrl, ncon);
+  rtpwgts  = rwspacemalloc(ctrl, 2*ncon);
+  parts[0] = (rpq_t **)wspacemalloc(ctrl, sizeof(rpq_t *)*ncon);
+  parts[1] = (rpq_t **)wspacemalloc(ctrl, sizeof(rpq_t *)*ncon);
 
-  limit = amin(amax(0.01*nvtxs, 25), 150);
+  moved   = iwspacemalloc(ctrl, nvtxs);
+  swaps   = iwspacemalloc(ctrl, nvtxs);
+  qnum    = iwspacemalloc(ctrl, nvtxs);
+
+  limit = gk_min(gk_max(0.01*nvtxs, 25), 150);
 
   /* Initialize the queues */
   for (i=0; i<ncon; i++) {
-    FPQueueInit(&parts[i][0], nvtxs);
-    FPQueueInit(&parts[i][1], nvtxs);
+    parts[0][i] = rpqCreate(nvtxs);
+    parts[1][i] = rpqCreate(nvtxs);
   }
   for (i=0; i<nvtxs; i++)
-    qnum[i] = samax(ncon, nvwgt+i*ncon);
+    qnum[i] = rargmax(ncon, nvwgt+i*ncon);
 
   origbal = Serial_Compute2WayHLoadImbalance(ncon, npwgts, tpwgts);
 
@@ -556,11 +574,11 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     rtpwgts[ncon+i] = origbal*tpwgts[ncon+i];
   }
 
-  idxset(nvtxs, -1, moved);
+  iset(nvtxs, -1, moved);
   for (pass=0; pass<npasses; pass++) { /* Do a number of passes */
     for (i=0; i<ncon; i++) {
-      FPQueueReset(&parts[i][0]);
-      FPQueueReset(&parts[i][1]);
+      rpqReset(parts[0][i]);
+      rpqReset(parts[1][i]);
     }
 
     mincutorder = -1;
@@ -571,34 +589,28 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
 
     /* Insert boundary nodes in the priority queues */
     nbnd = graph->gnvtxs;
-
-    for (i=0; i<nbnd; i++) {
-      cand[i].key = id[i]-ed[i];
-      cand[i].val = i;
-    }
-    ikeysort(nbnd, cand);
-
     for (ii=0; ii<nbnd; ii++) {
-      i = bndind[cand[ii].val];
-      FPQueueInsert(&parts[qnum[i]][where[i]], i, (float)(ed[i]-id[i]));
+      i = bndind[ii];
+      rpqInsert(parts[where[i]][qnum[i]], i, (real_t)(ed[i]-id[i]));
     }
 
     for (nswaps=0; nswaps<nvtxs; nswaps++) {
       Serial_SelectQueue(ncon, npwgts, rtpwgts, &from, &cnum, parts);
       to = (from+1)%2;
 
-      if (from == -1 || (higain = FPQueueGetMax(&parts[cnum][from])) == -1)
+      if (from == -1 || (higain = rpqGetTop(parts[from][cnum])) == -1)
         break;
 
-      saxpy2(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
-      saxpy2(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
+      raxpy(ncon,  1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon,   1);
+      raxpy(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
 
       newcut -= (ed[higain]-id[higain]);
       newbal = Serial_Compute2WayHLoadImbalance(ncon, npwgts, tpwgts);
 
       if ((newcut < mincut && newbal-origbal <= .00001) ||
           (newcut == mincut && (newbal < minbal ||
-                                (newbal == minbal && Serial_BetterBalance(ncon, npwgts, tpwgts, mindiff))))) {
+                                (newbal == minbal && 
+                                 Serial_BetterBalance(ncon, npwgts, tpwgts, mindiff, tmpdiff))))) {
         mincut = newcut;
         minbal = newbal;
         mincutorder = nswaps;
@@ -607,8 +619,8 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
       }
       else if (nswaps-mincutorder > limit) { /* We hit the limit, undo last move */
         newcut += (ed[higain]-id[higain]);
-        saxpy2(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
-        saxpy2(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
+        raxpy(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
+        raxpy(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
         break;
       }
 
@@ -619,13 +631,12 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
       /**************************************************************
       * Update the id[i]/ed[i] values of the affected nodes
       ***************************************************************/
-      SWAP(id[higain], ed[higain], tmp);
+      gk_SWAP(id[higain], ed[higain], tmp);
       if (ed[higain] == 0 && xadj[higain] < xadj[higain+1])
         BNDDelete(nbnd, bndind,  bndptr, higain);
 
       for (j=xadj[higain]; j<xadj[higain+1]; j++) {
         k = adjncy[j];
-        oldgain = ed[k]-id[k];
 
         kwgt = (to == where[k] ? adjwgt[j] : -adjwgt[j]);
         INC_DEC(id[k], ed[k], kwgt);
@@ -635,18 +646,18 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
           if (ed[k] == 0) { /* Not a boundary vertex any more */
             BNDDelete(nbnd, bndind, bndptr, k);
             if (moved[k] == -1)  /* Remove it if in the queues */
-              FPQueueDelete(&parts[qnum[k]][where[k]], k);
+              rpqDelete(parts[where[k]][qnum[k]], k);
           }
           else { /* If it has not been moved, update its position in the queue */
             if (moved[k] == -1)
-              FPQueueUpdate(&parts[qnum[k]][where[k]], k, (float)oldgain, (float)(ed[k]-id[k]));
+              rpqUpdate(parts[where[k]][qnum[k]], k, (real_t)(ed[k]-id[k]));
           }
         }
         else {
           if (ed[k] > 0) {  /* It will now become a boundary vertex */
             BNDInsert(nbnd, bndind, bndptr, k);
             if (moved[k] == -1)
-              FPQueueInsert(&parts[qnum[k]][where[k]], k, (float)(ed[k]-id[k]));
+              rpqInsert(parts[where[k]][qnum[k]], k, (real_t)(ed[k]-id[k]));
           }
         }
       }
@@ -661,14 +672,14 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
       higain = swaps[nswaps];
 
       to = where[higain] = (where[higain]+1)%2;
-      SWAP(id[higain], ed[higain], tmp);
+     gk_SWAP(id[higain], ed[higain], tmp);
       if (ed[higain] == 0 && bndptr[higain] != -1 && xadj[higain] < xadj[higain+1])
         BNDDelete(nbnd, bndind,  bndptr, higain);
       else if (ed[higain] > 0 && bndptr[higain] == -1)
         BNDInsert(nbnd, bndind,  bndptr, higain);
 
-      saxpy2(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
-      saxpy2(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+((to+1)%2)*ncon, 1);
+      raxpy(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
+      raxpy(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+((to+1)%2)*ncon, 1);
       for (j=xadj[higain]; j<xadj[higain+1]; j++) {
         k = adjncy[j];
 
@@ -690,26 +701,28 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
   }
 
   for (i=0; i<ncon; i++) {
-    FPQueueFree(&parts[i][0]);
-    FPQueueFree(&parts[i][1]);
+    rpqDestroy(parts[0][i]);
+    rpqDestroy(parts[1][i]);
   }
 
-  GKfree((void **)&cand, (void **)&qnum, (void **)&moved, (void **)&swaps, LTERM);
+  WCOREPOP;
+
   return;
 }
+
 
 /*************************************************************************
 * This function selects the partition number and the queue from which
 * we will move vertices out
 **************************************************************************/
-void Serial_SelectQueue(int ncon, float *npwgts, float *tpwgts, int *from, int *cnum,
-     FPQueueType queues[MAXNCON][2])
+void Serial_SelectQueue(idx_t ncon, real_t *npwgts, real_t *tpwgts, idx_t *from, 
+         idx_t *cnum, rpq_t **queues[2])
 {
-  int i, part;
-  float maxgain=0.0;
-  float max = -1.0, maxdiff=0.0;
-int mype;
-MPI_Comm_rank(MPI_COMM_WORLD, &mype);
+  idx_t i, part;
+  real_t maxgain=0.0;
+  real_t max = -1.0, maxdiff=0.0;
+  idx_t mype;
+  gkMPI_Comm_rank(MPI_COMM_WORLD, &mype);
 
   *from = -1;
   *cnum = -1;
@@ -725,10 +738,10 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     }
   }
 
-  if (*from != -1 && FPQueueGetQSize(&queues[*cnum][*from]) == 0) {
+  if (*from != -1 && rpqLength(queues[*from][*cnum]) == 0) {
     /* The desired queue is empty, select a node from that side anyway */
     for (i=0; i<ncon; i++) {
-      if (FPQueueGetQSize(&queues[i][*from]) > 0) {
+      if (rpqLength(queues[*from][i]) > 0) {
         max = npwgts[(*from)*ncon + i];
         *cnum = i;
         break;
@@ -736,7 +749,7 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     }
 
     for (i++; i<ncon; i++) {
-      if (npwgts[(*from)*ncon + i] > max && FPQueueGetQSize(&queues[i][*from]) > 0) {
+      if (npwgts[(*from)*ncon + i] > max && rpqLength(queues[*from][i]) > 0) {
         max = npwgts[(*from)*ncon + i];
         *cnum = i;
       }
@@ -750,9 +763,9 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
 
     for (part=0; part<2; part++) {
       for (i=0; i<ncon; i++) {
-        if (FPQueueGetQSize(&queues[i][part]) > 0 &&
-            FPQueueSeeMaxGain(&queues[i][part]) > maxgain) {
-          maxgain = FPQueueSeeMaxGain(&queues[i][part]);
+        if (rpqLength(queues[part][i]) > 0 &&
+            rpqSeeTopKey(queues[part][i]) > maxgain) {
+          maxgain = rpqSeeTopKey(queues[part][i]);
           *from = part;
           *cnum = i;
         }
@@ -763,30 +776,30 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
   return;
 }
 
+
 /*************************************************************************
 * This function checks if the balance achieved is better than the diff
 * For now, it uses a 2-norm measure
 **************************************************************************/
-int Serial_BetterBalance(int ncon, float *npwgts, float *tpwgts, float *diff)
+idx_t Serial_BetterBalance(idx_t ncon, real_t *npwgts, real_t *tpwgts, 
+          real_t *diff, real_t *tmpdiff)
 {
-  int i;
-  float ndiff[MAXNCON];
+  idx_t i;
 
   for (i=0; i<ncon; i++)
-    ndiff[i] = fabs(tpwgts[i]-npwgts[i]);
+    tmpdiff[i] = fabs(tpwgts[i]-npwgts[i]);
 
-  return snorm2(ncon, ndiff) < snorm2(ncon, diff);
+  return rnorm2(ncon, tmpdiff, 1) < rnorm2(ncon, diff, 1);
 }
-
 
 
 /*************************************************************************
 * This function computes the load imbalance over all the constrains
 **************************************************************************/
-float Serial_Compute2WayHLoadImbalance(int ncon, float *npwgts, float *tpwgts)
+real_t Serial_Compute2WayHLoadImbalance(idx_t ncon, real_t *npwgts, real_t *tpwgts)
 {
-  int i;
-  float max=0.0, temp;
+  idx_t i;
+  real_t max=0.0, temp;
 
   for (i=0; i<ncon; i++) {
     if (tpwgts[i] == 0.0)
@@ -803,47 +816,52 @@ float Serial_Compute2WayHLoadImbalance(int ncon, float *npwgts, float *tpwgts)
 /*************************************************************************
 * This function performs an edge-based FM refinement
 **************************************************************************/
-void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
+void Mc_Serial_Balance2Way(ctrl_t *ctrl, graph_t *graph, real_t *tpwgts, real_t lbfactor)
 {
-  int i, ii, j, k, kwgt, nvtxs, ncon, nbnd, nswaps, from, to, limit, tmp, cnum;
-  idxtype *xadj, *adjncy, *adjwgt, *where, *id, *ed, *bndptr, *bndind;
-  idxtype *moved, *swaps, *qnum;
-  float *nvwgt, *npwgts, mindiff[MAXNCON], origbal, minbal, newbal;
-  FPQueueType parts[MAXNCON][2];
-  int higain, oldgain, mincut, newcut, mincutorder;
-  int qsizes[MAXNCON][2];
-  KeyValueType *cand;
+  idx_t i, ii, j, k, kwgt, nvtxs, ncon, nbnd, nswaps, from, to, limit, tmp, cnum;
+  idx_t *xadj, *adjncy, *adjwgt, *where, *id, *ed, *bndptr, *bndind;
+  idx_t *moved, *swaps, *qnum;
+  real_t *nvwgt, *npwgts, *mindiff, *tmpdiff, origbal, minbal, newbal;
+  rpq_t **parts[2];
+  idx_t higain, mincut, newcut, mincutorder;
+  idx_t *qsizes[2];
 
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  xadj = graph->xadj;
-  nvwgt = graph->nvwgt;
+  WCOREPUSH;
+
+  nvtxs  = graph->nvtxs;
+  ncon   = graph->ncon;
+  xadj   = graph->xadj;
+  nvwgt  = graph->nvwgt;
   adjncy = graph->adjncy;
   adjwgt = graph->adjwgt;
-  where = graph->where;
-  id = graph->sendind;
-  ed = graph->recvind;
+  where  = graph->where;
+  id     = graph->sendind;
+  ed     = graph->recvind;
   npwgts = graph->gnpwgts;
   bndptr = graph->sendptr;
   bndind = graph->recvptr;
 
-  moved = idxmalloc(nvtxs, "moved");
-  swaps = idxmalloc(nvtxs, "swaps");
-  qnum = idxmalloc(nvtxs, "qnum");
-  cand = (KeyValueType *)GKmalloc(nvtxs*sizeof(KeyValueType), "cand");
+  mindiff   = rwspacemalloc(ctrl, ncon);
+  tmpdiff   = rwspacemalloc(ctrl, ncon);
+  parts[0]  = (rpq_t **)wspacemalloc(ctrl, sizeof(rpq_t *)*ncon);
+  parts[1]  = (rpq_t **)wspacemalloc(ctrl, sizeof(rpq_t *)*ncon);
+  qsizes[0] = iset(ncon, 0, iwspacemalloc(ctrl, ncon));
+  qsizes[1] = iset(ncon, 0, iwspacemalloc(ctrl, ncon));
 
+  moved = iwspacemalloc(ctrl, nvtxs);
+  swaps = iwspacemalloc(ctrl, nvtxs);
+  qnum  = iwspacemalloc(ctrl, nvtxs);
 
-  limit = amin(amax(0.01*nvtxs, 15), 100);
+  limit = gk_min(gk_max(0.01*nvtxs, 15), 100);
 
   /* Initialize the queues */
   for (i=0; i<ncon; i++) {
-    FPQueueInit(&parts[i][0], nvtxs);
-    FPQueueInit(&parts[i][1], nvtxs);
-    qsizes[i][0] = qsizes[i][1] = 0;
+    parts[0][i] = rpqCreate(nvtxs);
+    parts[1][i] = rpqCreate(nvtxs);
   }
 
   for (i=0; i<nvtxs; i++) {
-    qnum[i] = samax(ncon, nvwgt+i*ncon);
+    qnum[i] = rargmax(ncon, nvwgt+i*ncon);
     qsizes[qnum[i]][where[i]]++;
   }
 
@@ -854,7 +872,7 @@ void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
           if (where[i] != from)
             continue;
 
-          k = samax2(ncon, nvwgt+i*ncon);
+          k = rargmax2(ncon, nvwgt+i*ncon);
           if (k == j &&
                qsizes[qnum[i]][from] > qsizes[j][from] &&
                nvwgt[i*ncon+qnum[i]] < 1.3*nvwgt[i*ncon+j]) {
@@ -874,20 +892,12 @@ void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
   newcut = mincut = graph->mincut;
   mincutorder = -1;
 
-  idxset(nvtxs, -1, moved);
+  iset(nvtxs, -1, moved);
 
   /* Insert all nodes in the priority queues */
   nbnd = graph->gnvtxs;
-  for (i=0; i<nvtxs; i++) {
-    cand[i].key = id[i]-ed[i];
-    cand[i].val = i;
-  }
-  ikeysort(nvtxs, cand);
-
-  for (ii=0; ii<nvtxs; ii++) {
-    i = cand[ii].val;
-    FPQueueInsert(&parts[qnum[i]][where[i]], i, (float)(ed[i]-id[i]));
-  }
+  for (i=0; i<nvtxs; i++) 
+    rpqInsert(parts[where[i]][qnum[i]], i, (real_t)(ed[i]-id[i]));
 
   for (nswaps=0; nswaps<nvtxs; nswaps++) {
     if (minbal < lbfactor)
@@ -896,17 +906,17 @@ void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
     Serial_SelectQueue(ncon, npwgts, tpwgts, &from, &cnum, parts);
     to = (from+1)%2;
 
-    if (from == -1 || (higain = FPQueueGetMax(&parts[cnum][from])) == -1)
+    if (from == -1 || (higain = rpqGetTop(parts[from][cnum])) == -1)
       break;
 
-    saxpy2(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
-    saxpy2(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
+    raxpy(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
+    raxpy(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
     newcut -= (ed[higain]-id[higain]);
     newbal = Serial_Compute2WayHLoadImbalance(ncon, npwgts, tpwgts);
 
     if (newbal < minbal || (newbal == minbal &&
         (newcut < mincut || (newcut == mincut &&
-          Serial_BetterBalance(ncon, npwgts, tpwgts, mindiff))))) {
+          Serial_BetterBalance(ncon, npwgts, tpwgts, mindiff, tmpdiff))))) {
       mincut = newcut;
       minbal = newbal;
       mincutorder = nswaps;
@@ -915,8 +925,8 @@ void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
     }
     else if (nswaps-mincutorder > limit) { /* We hit the limit, undo last move */
       newcut += (ed[higain]-id[higain]);
-      saxpy2(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
-      saxpy2(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
+      raxpy(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
+      raxpy(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
       break;
     }
 
@@ -927,7 +937,7 @@ void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
     /**************************************************************
     * Update the id[i]/ed[i] values of the affected nodes
     ***************************************************************/
-    SWAP(id[higain], ed[higain], tmp);
+    gk_SWAP(id[higain], ed[higain], tmp);
     if (ed[higain] == 0 && bndptr[higain] != -1 && xadj[higain] < xadj[higain+1])
       BNDDelete(nbnd, bndind,  bndptr, higain);
     if (ed[higain] > 0 && bndptr[higain] == -1)
@@ -935,14 +945,13 @@ void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
 
     for (j=xadj[higain]; j<xadj[higain+1]; j++) {
       k = adjncy[j];
-      oldgain = ed[k]-id[k];
 
       kwgt = (to == where[k] ? adjwgt[j] : -adjwgt[j]);
       INC_DEC(id[k], ed[k], kwgt);
 
       /* Update the queue position */
       if (moved[k] == -1)
-        FPQueueUpdate(&parts[qnum[k]][where[k]], k, (float)(oldgain), (float)(ed[k]-id[k]));
+        rpqUpdate(parts[where[k]][qnum[k]], k, (real_t)(ed[k]-id[k]));
 
       /* Update its boundary information */
       if (ed[k] == 0 && bndptr[k] != -1)
@@ -960,14 +969,14 @@ void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
     higain = swaps[nswaps];
 
     to = where[higain] = (where[higain]+1)%2;
-    SWAP(id[higain], ed[higain], tmp);
+    gk_SWAP(id[higain], ed[higain], tmp);
     if (ed[higain] == 0 && bndptr[higain] != -1 && xadj[higain] < xadj[higain+1])
       BNDDelete(nbnd, bndind,  bndptr, higain);
     else if (ed[higain] > 0 && bndptr[higain] == -1)
       BNDInsert(nbnd, bndind,  bndptr, higain);
 
-    saxpy2(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
-    saxpy2(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+((to+1)%2)*ncon, 1);
+    raxpy(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
+    raxpy(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+((to+1)%2)*ncon, 1);
     for (j=xadj[higain]; j<xadj[higain+1]; j++) {
       k = adjncy[j];
 
@@ -986,13 +995,16 @@ void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
 
 
   for (i=0; i<ncon; i++) {
-    FPQueueFree(&parts[i][0]);
-    FPQueueFree(&parts[i][1]);
+    rpqDestroy(parts[0][i]);
+    rpqDestroy(parts[1][i]);
   }
 
-  GKfree((void **)&cand, (void **)&qnum, (void **)&moved, (void **)&swaps, LTERM);
+  WCOREPOP;
+
   return;
 }
+
+
 
 /*************************************************************************
 * This function balances two partitions by moving the highest gain
@@ -1002,65 +1014,61 @@ void Moc_Serial_Balance2Way(GraphType *graph, float *tpwgts, float lbfactor)
 * It moves vertices from the domain that is overweight to the one that
 * is underweight.
 **************************************************************************/
-void Moc_Serial_Init2WayBalance(GraphType *graph, float *tpwgts)
+void Mc_Serial_Init2WayBalance(ctrl_t *ctrl, graph_t *graph, real_t *tpwgts)
 {
-  int i, ii, j, k;
-  int kwgt, nvtxs, nbnd, ncon, nswaps, from, to, cnum, tmp;
-  idxtype *xadj, *adjncy, *adjwgt, *where, *id, *ed, *bndptr, *bndind;
-  idxtype *qnum;
-  float *nvwgt, *npwgts;
-  FPQueueType parts[MAXNCON][2];
-  int higain, oldgain, mincut;
-  KeyValueType *cand;
+  idx_t i, ii, j, k;
+  idx_t kwgt, nvtxs, nbnd, ncon, nswaps, from, to, cnum, tmp;
+  idx_t *xadj, *adjncy, *adjwgt, *where, *id, *ed, *bndptr, *bndind;
+  idx_t *qnum;
+  real_t *nvwgt, *npwgts;
+  rpq_t **parts[2];
+  idx_t higain, mincut;
 
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  xadj = graph->xadj;
+  WCOREPUSH;
+
+  nvtxs  = graph->nvtxs;
+  ncon   = graph->ncon;
+  xadj   = graph->xadj;
   adjncy = graph->adjncy;
-  nvwgt = graph->nvwgt;
+  nvwgt  = graph->nvwgt;
   adjwgt = graph->adjwgt;
-  where = graph->where;
-  id = graph->sendind;
-  ed = graph->recvind;
+  where  = graph->where;
+  id     = graph->sendind;
+  ed     = graph->recvind;
   npwgts = graph->gnpwgts;
   bndptr = graph->sendptr;
   bndind = graph->recvptr;
 
-  qnum = idxmalloc(nvtxs, "qnum");
-  cand = (KeyValueType *)GKmalloc(nvtxs*sizeof(KeyValueType), "cand");
+  parts[0] = (rpq_t **)wspacemalloc(ctrl, sizeof(rpq_t *)*ncon);
+  parts[1] = (rpq_t **)wspacemalloc(ctrl, sizeof(rpq_t *)*ncon);
+
+  qnum = iwspacemalloc(ctrl, nvtxs);
 
   /* This is called for initial partitioning so we know from where to pick nodes */
   from = 1;
   to = (from+1)%2;
 
   for (i=0; i<ncon; i++) {
-    FPQueueInit(&parts[i][0], nvtxs);
-    FPQueueInit(&parts[i][1], nvtxs);
+    parts[0][i] = rpqCreate(nvtxs);
+    parts[1][i] = rpqCreate(nvtxs);
   }
 
   /* Compute the queues in which each vertex will be assigned to */
   for (i=0; i<nvtxs; i++)
-    qnum[i] = samax(ncon, nvwgt+i*ncon);
-
-  for (i=0; i<nvtxs; i++) {
-    cand[i].key = id[i]-ed[i];
-    cand[i].val = i;
-  }
-  ikeysort(nvtxs, cand);
+    qnum[i] = rargmax(ncon, nvwgt+i*ncon);
 
   /* Insert the nodes of the proper partition in the appropriate priority queue */
-  for (ii=0; ii<nvtxs; ii++) {
-    i = cand[ii].val;
+  for (i=0; i<nvtxs; i++) {
     if (where[i] == from) {
       if (ed[i] > 0)
-        FPQueueInsert(&parts[qnum[i]][0], i, (float)(ed[i]-id[i]));
+        rpqInsert(parts[0][qnum[i]], i, (real_t)(ed[i]-id[i]));
       else
-        FPQueueInsert(&parts[qnum[i]][1], i, (float)(ed[i]-id[i]));
+        rpqInsert(parts[1][qnum[i]], i, (real_t)(ed[i]-id[i]));
     }
   }
 
   mincut = graph->mincut;
-  nbnd = graph->gnvtxs;
+  nbnd   = graph->gnvtxs;
   for (nswaps=0; nswaps<nvtxs; nswaps++) {
     if (Serial_AreAnyVwgtsBelow(ncon, 1.0, npwgts+from*ncon, 0.0, nvwgt, tpwgts+from*ncon))
       break;
@@ -1069,19 +1077,19 @@ void Moc_Serial_Init2WayBalance(GraphType *graph, float *tpwgts)
       break;
 
 
-    if ((higain = FPQueueGetMax(&parts[cnum][0])) == -1)
-      higain = FPQueueGetMax(&parts[cnum][1]);
+    if ((higain = rpqGetTop(parts[0][cnum])) == -1)
+      higain = rpqGetTop(parts[1][cnum]);
 
     mincut -= (ed[higain]-id[higain]);
-    saxpy2(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
-    saxpy2(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
+    raxpy(ncon, 1.0, nvwgt+higain*ncon, 1, npwgts+to*ncon, 1);
+    raxpy(ncon, -1.0, nvwgt+higain*ncon, 1, npwgts+from*ncon, 1);
 
     where[higain] = to;
 
     /**************************************************************
     * Update the id[i]/ed[i] values of the affected nodes
     ***************************************************************/
-    SWAP(id[higain], ed[higain], tmp);
+    gk_SWAP(id[higain], ed[higain], tmp);
     if (ed[higain] == 0 && bndptr[higain] != -1 && xadj[higain] < xadj[higain+1])
       BNDDelete(nbnd, bndind,  bndptr, higain);
     if (ed[higain] > 0 && bndptr[higain] == -1)
@@ -1089,7 +1097,6 @@ void Moc_Serial_Init2WayBalance(GraphType *graph, float *tpwgts)
 
     for (j=xadj[higain]; j<xadj[higain+1]; j++) {
       k = adjncy[j];
-      oldgain = ed[k]-id[k];
 
       kwgt = (to == where[k] ? adjwgt[j] : -adjwgt[j]);
       INC_DEC(id[k], ed[k], kwgt);
@@ -1097,11 +1104,11 @@ void Moc_Serial_Init2WayBalance(GraphType *graph, float *tpwgts)
       /* Update the queue position */
       if (where[k] == from) {
         if (ed[k] > 0 && bndptr[k] == -1) {  /* It moves in boundary */
-          FPQueueDelete(&parts[qnum[k]][1], k);
-          FPQueueInsert(&parts[qnum[k]][0], k, (float)(ed[k]-id[k]));
+          rpqDelete(parts[1][qnum[k]], k);
+          rpqInsert(parts[0][qnum[k]], k, (real_t)(ed[k]-id[k]));
         }
         else { /* It must be in the boundary already */
-          FPQueueUpdate(&parts[qnum[k]][0], k, (float)(oldgain), (float)(ed[k]-id[k]));
+          rpqUpdate(parts[0][qnum[k]], k, (real_t)(ed[k]-id[k]));
         }
       }
 
@@ -1117,11 +1124,11 @@ void Moc_Serial_Init2WayBalance(GraphType *graph, float *tpwgts)
   graph->gnvtxs = nbnd;
 
   for (i=0; i<ncon; i++) {
-    FPQueueFree(&parts[i][0]);
-    FPQueueFree(&parts[i][1]);
+    rpqDestroy(parts[0][i]);
+    rpqDestroy(parts[1][i]);
   }
 
-  GKfree((void **)&cand, (void **)&qnum, LTERM);
+  WCOREPOP;
 }
 
 
@@ -1129,15 +1136,15 @@ void Moc_Serial_Init2WayBalance(GraphType *graph, float *tpwgts)
 * This function selects the partition number and the queue from which
 * we will move vertices out
 **************************************************************************/
-int Serial_SelectQueueOneWay(int ncon, float *npwgts, float *tpwgts, int from,
-    FPQueueType queues[MAXNCON][2])
+idx_t Serial_SelectQueueOneWay(idx_t ncon, real_t *npwgts, real_t *tpwgts, 
+          idx_t from, rpq_t **queues[2])
 {
-  int i, cnum=-1;
-  float max=0.0;
+  idx_t i, cnum=-1;
+  real_t max=0.0;
 
   for (i=0; i<ncon; i++) {
     if (npwgts[from*ncon+i]-tpwgts[from*ncon+i] >= max &&
-        FPQueueGetQSize(&queues[i][0]) + FPQueueGetQSize(&queues[i][1]) > 0) {
+        rpqLength(queues[0][i]) + rpqLength(queues[1][i]) > 0) {
       max = npwgts[from*ncon+i]-tpwgts[i];
       cnum = i;
     }
@@ -1150,26 +1157,26 @@ int Serial_SelectQueueOneWay(int ncon, float *npwgts, float *tpwgts, int from,
 /*************************************************************************
 * This function computes the initial id/ed
 **************************************************************************/
-void Moc_Serial_Compute2WayPartitionParams(GraphType *graph)
+void Mc_Serial_Compute2WayPartitionParams(ctrl_t *ctrl, graph_t *graph)
 {
-  int i, j, me, nvtxs, ncon, nbnd, mincut;
-  idxtype *xadj, *adjncy, *adjwgt;
-  float *nvwgt, *npwgts;
-  idxtype *id, *ed, *where;
-  idxtype *bndptr, *bndind;
+  idx_t i, j, me, nvtxs, ncon, nbnd, mincut;
+  idx_t *xadj, *adjncy, *adjwgt;
+  real_t *nvwgt, *npwgts;
+  idx_t *id, *ed, *where;
+  idx_t *bndptr, *bndind;
 
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  xadj = graph->xadj;
-  nvwgt = graph->nvwgt;
+  nvtxs  = graph->nvtxs;
+  ncon   = graph->ncon;
+  xadj   = graph->xadj;
+  nvwgt  = graph->nvwgt;
   adjncy = graph->adjncy;
   adjwgt = graph->adjwgt;
-  where = graph->where;
+  where  = graph->where;
 
-  npwgts = sset(2*ncon, 0.0, graph->gnpwgts);
-  id = idxset(nvtxs, 0, graph->sendind);
-  ed = idxset(nvtxs, 0, graph->recvind);
-  bndptr = idxset(nvtxs, -1, graph->sendptr);
+  npwgts = rset(2*ncon, 0.0, graph->gnpwgts);
+  id     = iset(nvtxs, 0, graph->sendind);
+  ed     = iset(nvtxs, 0, graph->recvind);
+  bndptr = iset(nvtxs, -1, graph->sendptr);
   bndind = graph->recvptr;
 
   /*------------------------------------------------------------
@@ -1178,7 +1185,7 @@ void Moc_Serial_Compute2WayPartitionParams(GraphType *graph)
   nbnd = mincut = 0;
   for (i=0; i<nvtxs; i++) {
     me = where[i];
-    saxpy2(ncon, 1.0, nvwgt+i*ncon, 1, npwgts+me*ncon, 1);
+    raxpy(ncon, 1.0, nvwgt+i*ncon, 1, npwgts+me*ncon, 1);
 
     for (j=xadj[i]; j<xadj[i+1]; j++) {
       if (me == where[adjncy[j]])
@@ -1189,8 +1196,7 @@ void Moc_Serial_Compute2WayPartitionParams(GraphType *graph)
 
     if (ed[i] > 0 || xadj[i] == xadj[i+1]) {
       mincut += ed[i];
-      bndptr[i] = nbnd;
-      bndind[nbnd++] = i;
+      BNDInsert(nbnd, bndind, bndptr, i);
     }
   }
 
@@ -1199,13 +1205,14 @@ void Moc_Serial_Compute2WayPartitionParams(GraphType *graph)
 
 }
 
+
 /*************************************************************************
 * This function checks if the vertex weights of two vertices are below
 * a given set of values
 **************************************************************************/
-int Serial_AreAnyVwgtsBelow(int ncon, float alpha, float *vwgt1, float beta, float *vwgt2, float *limit)
+idx_t Serial_AreAnyVwgtsBelow(idx_t ncon, real_t alpha, real_t *vwgt1, real_t beta, real_t *vwgt2, real_t *limit)
 {
-  int i;
+  idx_t i;
 
   for (i=0; i<ncon; i++)
     if (alpha*vwgt1[i] + beta*vwgt2[i] < limit[i])
@@ -1218,10 +1225,10 @@ int Serial_AreAnyVwgtsBelow(int ncon, float alpha, float *vwgt1, float beta, flo
 /*************************************************************************
 *  This function computes the edge-cut of a serial graph.
 **************************************************************************/
-int ComputeSerialEdgeCut(GraphType *graph)
+idx_t ComputeSerialEdgeCut(graph_t *graph)
 {
-  int i, j;
-  int cut = 0;
+  idx_t i, j;
+  idx_t cut = 0;
 
   for (i=0; i<graph->nvtxs; i++) {
     for (j=graph->xadj[i]; j<graph->xadj[i+1]; j++)
@@ -1233,13 +1240,14 @@ int ComputeSerialEdgeCut(GraphType *graph)
   return graph->mincut;
 }
 
+
 /*************************************************************************
 *  This function computes the TotalV of a serial graph.
 **************************************************************************/
-int ComputeSerialTotalV(GraphType *graph, idxtype *home)
+idx_t ComputeSerialTotalV(graph_t *graph, idx_t *home)
 {
-  int i;
-  int totalv = 0;
+  idx_t i;
+  idx_t totalv = 0;
 
   for (i=0; i<graph->nvtxs; i++)
     if (graph->where[i] != home[i])

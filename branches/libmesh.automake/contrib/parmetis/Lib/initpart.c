@@ -12,7 +12,7 @@
  * $Id$
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
 
 
 #define DEBUG_IPART_
@@ -25,196 +25,197 @@
 * This algorithm assembles the graph to all the processors and preceeds
 * by parallelizing the recursive bisection step.
 **************************************************************************/
-void Moc_InitPartition_RB(CtrlType *ctrl, GraphType *graph, WorkSpaceType *wspace)
+void InitPartition(ctrl_t *ctrl, graph_t *graph)
 {
-  int i, j;
-  int ncon, mype, npes, gnvtxs, ngroups;
-  idxtype *xadj, *adjncy, *adjwgt, *vwgt;
-  idxtype *part, *gwhere0, *gwhere1;
-  idxtype *tmpwhere, *tmpvwgt, *tmpxadj, *tmpadjncy, *tmpadjwgt;
-  GraphType *agraph;
-  int lnparts, fpart, fpe, lnpes; 
-  int twoparts=2, numflag = 0, wgtflag = 3, moptions[10], edgecut, max_cut;
-  float *mytpwgts, mytpwgts2[2], lbvec[MAXNCON], lbsum, min_lbsum, wsum;
+  idx_t i, j, ncon, mype, npes, gnvtxs, ngroups;
+  idx_t *xadj, *adjncy, *adjwgt, *vwgt;
+  idx_t *part, *gwhere0, *gwhere1;
+  idx_t *tmpwhere, *tmpvwgt, *tmpxadj, *tmpadjncy, *tmpadjwgt;
+  graph_t *agraph;
+  idx_t lnparts, fpart, fpe, lnpes; 
+  idx_t twoparts=2, moptions[METIS_NOPTIONS], edgecut, max_cut;
+  real_t *tpwgts, *tpwgts2, *lbvec, lbsum, min_lbsum, wsum;
   MPI_Comm ipcomm;
   struct {
-    float sum;
+    double sum;
     int rank;
   } lpesum, gpesum;
 
-  ncon = graph->ncon;
-  ngroups = amax(amin(RIP_SPLIT_FACTOR, ctrl->npes), 1);
+  WCOREPUSH;
 
-  IFSET(ctrl->dbglvl, DBG_TIME, MPI_Barrier(ctrl->comm));
+  ncon = graph->ncon;
+
+  ngroups = gk_max(gk_min(RIP_SPLIT_FACTOR, ctrl->npes), 1);
+
+  IFSET(ctrl->dbglvl, DBG_TIME, gkMPI_Barrier(ctrl->comm));
   IFSET(ctrl->dbglvl, DBG_TIME, starttimer(ctrl->InitPartTmr));
 
-  agraph = Moc_AssembleAdaptiveGraph(ctrl, graph, wspace);
-  part = idxmalloc(agraph->nvtxs, "Moc_IP_RB: part");
-  xadj = idxmalloc(agraph->nvtxs+1, "Moc_IP_RB: xadj");
-  adjncy = idxmalloc(agraph->nedges, "Moc_IP_RB: adjncy");
-  adjwgt = idxmalloc(agraph->nedges, "Moc_IP_RB: adjwgt");
-  vwgt = idxmalloc(agraph->nvtxs*ncon, "Moc_IP_RB: vwgt");
+  lbvec = rwspacemalloc(ctrl, ncon);
 
-  idxcopy(agraph->nvtxs*ncon, agraph->vwgt, vwgt);
-  idxcopy(agraph->nvtxs+1, agraph->xadj, xadj);
-  idxcopy(agraph->nedges, agraph->adjncy, adjncy);
-  idxcopy(agraph->nedges, agraph->adjwgt, adjwgt);
-
-  MPI_Comm_split(ctrl->gcomm, ctrl->mype % ngroups, 0, &ipcomm);
-  MPI_Comm_rank(ipcomm, &mype);
-  MPI_Comm_size(ipcomm, &npes);
-
+  /* assemble the graph to all the processors */
+  agraph = AssembleAdaptiveGraph(ctrl, graph);
   gnvtxs = agraph->nvtxs;
 
-  gwhere0 = idxsmalloc(gnvtxs, 0, "Moc_IP_RB: gwhere0");
-  gwhere1 = idxmalloc(gnvtxs, "Moc_IP_RB: gwhere1");
+  /* make a copy of the graph's structure for later */
+  xadj   = icopy(gnvtxs+1, agraph->xadj, iwspacemalloc(ctrl, gnvtxs+1));
+  vwgt   = icopy(gnvtxs*ncon, agraph->vwgt, iwspacemalloc(ctrl, gnvtxs*ncon));
+  adjncy = icopy(agraph->nedges, agraph->adjncy, iwspacemalloc(ctrl, agraph->nedges));
+  adjwgt = icopy(agraph->nedges, agraph->adjwgt, iwspacemalloc(ctrl, agraph->nedges));
+  part   = iwspacemalloc(ctrl, gnvtxs);
 
-  /* ADD: this assumes that tpwgts for all constraints is the same */
-  /* ADD: this is necessary because serial metis does not support the general case */
-  mytpwgts = fsmalloc(ctrl->nparts, 0.0, "mytpwgts");
-  for (i=0; i<ctrl->nparts; i++)
-    for (j=0; j<ncon; j++)
-      mytpwgts[i] += ctrl->tpwgts[i*ncon+j];
-  for (i=0; i<ctrl->nparts; i++)
-    mytpwgts[i] /= (float)ncon;
+  /* create different processor groups */
+  gkMPI_Comm_split(ctrl->gcomm, ctrl->mype % ngroups, 0, &ipcomm);
+  gkMPI_Comm_rank(ipcomm, &mype);
+  gkMPI_Comm_size(ipcomm, &npes);
+
 
   /* Go into the recursive bisection */
-  /* ADD: consider changing this to breadth-first type bisection */
-  moptions[0] = 0;
-  moptions[7] = ctrl->sync + (ctrl->mype % ngroups) + 1;
+  METIS_SetDefaultOptions(moptions);
+  moptions[METIS_OPTION_SEED] = ctrl->sync + (ctrl->mype % ngroups) + 1;
+
+  tpwgts  = ctrl->tpwgts;
+  tpwgts2 = rwspacemalloc(ctrl, 2*ncon);
 
   lnparts = ctrl->nparts;
   fpart = fpe = 0;
   lnpes = npes;
   while (lnpes > 1 && lnparts > 1) {
-    /* Determine the weights of the partitions */
-    mytpwgts2[0] = ssum(lnparts/2, mytpwgts+fpart);
-    mytpwgts2[1] = 1.0-mytpwgts2[0];
-
-    if (ncon == 1)
-      METIS_WPartGraphKway2(&agraph->nvtxs, agraph->xadj, agraph->adjncy,
-        agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag, &twoparts, mytpwgts2,
-        moptions, &edgecut, part);
-    else {
-      METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj,
-        agraph->adjncy, agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag,
-        &twoparts, mytpwgts2, moptions, &edgecut, part);
+    /* determine the weights of the two partitions as a function of the 
+       weight of the target partition weights */
+    for (j=(lnparts>>1), i=0; i<ncon; i++) {
+      tpwgts2[i]      = rsum(j, tpwgts+fpart*ncon+i, ncon);
+      tpwgts2[ncon+i] = rsum(lnparts-j, tpwgts+(fpart+j)*ncon+i, ncon);
+      wsum            = 1.0/(tpwgts2[i] + tpwgts2[ncon+i]);
+      tpwgts2[i]      *= wsum;
+      tpwgts2[ncon+i] *= wsum;
     }
 
-    wsum = ssum(lnparts/2, mytpwgts+fpart);
-    sscale(lnparts/2, 1.0/wsum, mytpwgts+fpart);
-    sscale(lnparts-lnparts/2, 1.0/(1.0-wsum), mytpwgts+fpart+lnparts/2);
+    METIS_PartGraphRecursive(&agraph->nvtxs, &ncon, agraph->xadj, agraph->adjncy, 
+          agraph->vwgt, NULL, agraph->adjwgt, &twoparts, tpwgts2, NULL, moptions, 
+          &edgecut, part);
 
-    /* I'm picking the left branch */
+    /* pick one of the branches */
     if (mype < fpe+lnpes/2) {
-      Moc_KeepPart(agraph, wspace, part, 0);
-      lnpes = lnpes/2;
+      KeepPart(ctrl, agraph, part, 0);
+      lnpes   = lnpes/2;
       lnparts = lnparts/2;
     }
     else {
-      Moc_KeepPart(agraph, wspace, part, 1);
-      fpart = fpart + lnparts/2;
-      fpe = fpe + lnpes/2;
-      lnpes = lnpes - lnpes/2;
+      KeepPart(ctrl, agraph, part, 1);
+      fpart   = fpart + lnparts/2;
+      fpe     = fpe + lnpes/2;
+      lnpes   = lnpes - lnpes/2;
       lnparts = lnparts - lnparts/2;
     }
   }
 
-  /* In case npes is greater than or equal to nparts */
-  if (lnparts == 1) {
+  gwhere0 = iset(gnvtxs, 0, iwspacemalloc(ctrl, gnvtxs));
+  gwhere1 = iwspacemalloc(ctrl, gnvtxs);
+
+  if (lnparts == 1) { /* Case npes is greater than or equal to nparts */
     /* Only the first process will assign labels (for the reduction to work) */
     if (mype == fpe) {
       for (i=0; i<agraph->nvtxs; i++) 
         gwhere0[agraph->label[i]] = fpart;
     }
   }
-  /* In case npes is smaller than nparts */
-  else {
-    if (ncon == 1)
-      METIS_WPartGraphKway2(&agraph->nvtxs, agraph->xadj, agraph->adjncy,
-      agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag, &lnparts, mytpwgts+fpart,
-      moptions, &edgecut, part);
-    else
-      METIS_mCPartGraphRecursive2(&agraph->nvtxs, &ncon, agraph->xadj,
-      agraph->adjncy, agraph->vwgt, agraph->adjwgt, &wgtflag, &numflag,
-      &lnparts, mytpwgts+fpart, moptions, &edgecut, part);
+  else { /* Case in which npes is smaller than nparts */
+    /* create the normalized tpwgts for the lnparts from ctrl->tpwgts */
+    tpwgts = rwspacemalloc(ctrl, lnparts*ncon);
+    for (j=0; j<ncon; j++) {
+      for (wsum=0.0, i=0; i<lnparts; i++) {
+        tpwgts[i*ncon+j] = ctrl->tpwgts[(fpart+i)*ncon+j];
+        wsum += tpwgts[i*ncon+j];
+      }
+      for (wsum=1.0/wsum, i=0; i<lnparts; i++) 
+        tpwgts[i*ncon+j] *= wsum;
+    }
+
+    METIS_PartGraphKway(&agraph->nvtxs, &ncon, agraph->xadj, agraph->adjncy, 
+          agraph->vwgt, NULL, agraph->adjwgt, &lnparts, tpwgts, NULL, moptions, 
+          &edgecut, part);
 
     for (i=0; i<agraph->nvtxs; i++) 
       gwhere0[agraph->label[i]] = fpart + part[i];
   }
 
-  MPI_Allreduce((void *)gwhere0, (void *)gwhere1, gnvtxs, IDX_DATATYPE, MPI_SUM, ipcomm);
+  gkMPI_Allreduce((void *)gwhere0, (void *)gwhere1, gnvtxs, IDX_T, MPI_SUM, ipcomm);
 
   if (ngroups > 1) {
-    tmpxadj = agraph->xadj;
+    tmpxadj   = agraph->xadj;
     tmpadjncy = agraph->adjncy;
     tmpadjwgt = agraph->adjwgt;
-    tmpvwgt = agraph->vwgt;
-    tmpwhere = agraph->where;
-    agraph->xadj = xadj;
+    tmpvwgt   = agraph->vwgt;
+    tmpwhere  = agraph->where;
+
+    agraph->xadj   = xadj;
     agraph->adjncy = adjncy;
     agraph->adjwgt = adjwgt;
-    agraph->vwgt = vwgt;
-    agraph->where = gwhere1;
-    agraph->vwgt = vwgt;
-    agraph->nvtxs = gnvtxs;
-    Moc_ComputeSerialBalance(ctrl, agraph, gwhere1, lbvec);
-    lbsum = ssum(ncon, lbvec);
+    agraph->vwgt   = vwgt;
+    agraph->where  = gwhere1;
+    agraph->vwgt   = vwgt;
+    agraph->nvtxs  = gnvtxs;
 
     edgecut = ComputeSerialEdgeCut(agraph);
-    MPI_Allreduce((void *)&edgecut, (void *)&max_cut, 1, MPI_INT, MPI_MAX, ctrl->gcomm);
-    MPI_Allreduce((void *)&lbsum, (void *)&min_lbsum, 1, MPI_FLOAT, MPI_MIN, ctrl->gcomm);
+    ComputeSerialBalance(ctrl, agraph, gwhere1, lbvec);
+    lbsum = rsum(ncon, lbvec, 1);
+
+    gkMPI_Allreduce((void *)&edgecut, (void *)&max_cut,   1, IDX_T,  MPI_MAX, ctrl->gcomm);
+    gkMPI_Allreduce((void *)&lbsum,   (void *)&min_lbsum, 1, REAL_T, MPI_MIN, ctrl->gcomm);
 
     lpesum.sum = lbsum;
-    if (min_lbsum < UNBALANCE_FRACTION * (float)(ncon)) {
-      if (lbsum < UNBALANCE_FRACTION * (float)(ncon))
-        lpesum.sum = (float) (edgecut);
+    if (min_lbsum < UNBALANCE_FRACTION*ncon) {
+      if (lbsum < UNBALANCE_FRACTION*ncon)
+        lpesum.sum = edgecut;
       else
-        lpesum.sum = (float) (max_cut);
+        lpesum.sum = max_cut;
     } 
+    lpesum.rank = ctrl->mype;
     
-    MPI_Comm_rank(ctrl->gcomm, &(lpesum.rank));
-    MPI_Allreduce((void *)&lpesum, (void *)&gpesum, 1, MPI_FLOAT_INT, MPI_MINLOC, ctrl->gcomm);
-    MPI_Bcast((void *)gwhere1, gnvtxs, IDX_DATATYPE, gpesum.rank, ctrl->gcomm);
+    gkMPI_Allreduce((void *)&lpesum, (void *)&gpesum, 1, MPI_DOUBLE_INT,
+        MPI_MINLOC, ctrl->gcomm);
+    gkMPI_Bcast((void *)gwhere1, gnvtxs, IDX_T, gpesum.rank, ctrl->gcomm);
 
-    agraph->xadj = tmpxadj;
+    agraph->xadj   = tmpxadj;
     agraph->adjncy = tmpadjncy;
     agraph->adjwgt = tmpadjwgt;
-    agraph->vwgt = tmpvwgt;
-    agraph->where = tmpwhere;
+    agraph->vwgt   = tmpvwgt;
+    agraph->where  = tmpwhere;
   }
 
-  idxcopy(graph->nvtxs, gwhere1+graph->vtxdist[ctrl->mype], graph->where);
+  icopy(graph->nvtxs, gwhere1+graph->vtxdist[ctrl->mype], graph->where);
 
   FreeGraph(agraph);
-  MPI_Comm_free(&ipcomm);
-  GKfree((void **)&gwhere0, (void **)&gwhere1, (void **)&mytpwgts, (void **)&part, (void **)&xadj, (void **)&adjncy, (void **)&adjwgt, (void **)&vwgt, LTERM);
+  gkMPI_Comm_free(&ipcomm);
 
-  IFSET(ctrl->dbglvl, DBG_TIME, MPI_Barrier(ctrl->comm));
+  IFSET(ctrl->dbglvl, DBG_TIME, gkMPI_Barrier(ctrl->comm));
   IFSET(ctrl->dbglvl, DBG_TIME, stoptimer(ctrl->InitPartTmr));
 
+  WCOREPOP;
 }
 
 
 /*************************************************************************
 * This function keeps one parts
 **************************************************************************/
-void Moc_KeepPart(GraphType *graph, WorkSpaceType *wspace, idxtype *part, int mypart)
+void KeepPart(ctrl_t *ctrl, graph_t *graph, idx_t *part, idx_t mypart)
 {
-  int h, i, j, k;
-  int nvtxs, ncon, mynvtxs, mynedges;
-  idxtype *xadj, *vwgt, *adjncy, *adjwgt, *label;
-  idxtype *rename;
+  idx_t h, i, j, k;
+  idx_t nvtxs, ncon, mynvtxs, mynedges;
+  idx_t *xadj, *vwgt, *adjncy, *adjwgt, *label;
+  idx_t *rename;
 
-  nvtxs = graph->nvtxs;
-  ncon = graph->ncon;
-  xadj = graph->xadj;
-  vwgt = graph->vwgt;
+  WCOREPUSH;
+
+  nvtxs  = graph->nvtxs;
+  ncon   = graph->ncon;
+  xadj   = graph->xadj;
+  vwgt   = graph->vwgt;
   adjncy = graph->adjncy;
   adjwgt = graph->adjwgt;
-  label = graph->label;
+  label  = graph->label;
 
-  rename = idxmalloc(nvtxs, "Moc_KeepPart: rename");
+  rename = iwspacemalloc(ctrl, nvtxs);
  
   for (mynvtxs=0, i=0; i<nvtxs; i++) {
     if (part[i] == mypart)
@@ -234,19 +235,19 @@ void Moc_KeepPart(GraphType *graph, WorkSpaceType *wspace, idxtype *part, int my
 
       for (h=0; h<ncon; h++)
         vwgt[mynvtxs*ncon+h] = vwgt[i*ncon+h];
+
       label[mynvtxs] = label[i];
       xadj[++mynvtxs] = mynedges;
-
     }
     else {
       j = xadj[i+1];  /* Save xadj[i+1] for later use */
     }
   }
 
-  graph->nvtxs = mynvtxs;
+  graph->nvtxs  = mynvtxs;
   graph->nedges = mynedges;
 
-  free(rename);
+  WCOREPOP;
 }
 
 

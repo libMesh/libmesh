@@ -11,64 +11,69 @@
  * $Id$
  */
 
-#include "parmetislib.h"
+#include <parmetislib.h>
 #define	PE	0
 
 /*************************************************************************
 * This function performs an edge-based FM refinement
 **************************************************************************/
-void RedoMyLink(CtrlType *ctrl, GraphType *graph, idxtype *home, int me,
-  int you, float *flows, float *sr_cost, float *sr_lbavg)
+void RedoMyLink(ctrl_t *ctrl, graph_t *graph, idx_t *home, idx_t me,
+         idx_t you, real_t *flows, real_t *sr_cost, real_t *sr_lbavg)
 {
-  int h, i, r;
-  int nvtxs, nedges, ncon;
-  int  pass, lastseed, totalv;
-  idxtype *xadj, *adjncy, *adjwgt, *where, *vsize;
-  idxtype *costwhere, *lbwhere, *selectwhere;
-  idxtype *rdata, *ed, *id, *bndptr, *bndind, *perm;
-  float *nvwgt, mycost;
-  float lbavg, lbvec[MAXNCON];
-  float best_lbavg, other_lbavg = -1.0, bestcost, othercost = -1.0;
-  float npwgts[2*MAXNCON], pwgts[MAXNCON*2], tpwgts[MAXNCON*2];
-  float ipc_factor, redist_factor, ftmp;
-int mype;
-MPI_Comm_rank(MPI_COMM_WORLD, &mype);
+  idx_t h, i, r;
+  idx_t nvtxs, nedges, ncon;
+  idx_t  pass, lastseed, totalv;
+  idx_t *xadj, *adjncy, *adjwgt, *where, *vsize;
+  idx_t *costwhere, *lbwhere, *selectwhere;
+  idx_t *ed, *id, *bndptr, *bndind, *perm;
+  real_t *nvwgt, mycost;
+  real_t lbavg, *lbvec;
+  real_t best_lbavg, other_lbavg = -1.0, bestcost, othercost = -1.0;
+  real_t *npwgts, *pwgts, *tpwgts;
+  real_t ipc_factor, redist_factor, ftmp;
+  idx_t mype;
+  gkMPI_Comm_rank(MPI_COMM_WORLD, &mype);
 
-  nvtxs = graph->nvtxs;
+
+  WCOREPUSH;
+
+  nvtxs  = graph->nvtxs;
   nedges = graph->nedges;
-  ncon = graph->ncon;
-  xadj = graph->xadj;
-  nvwgt = graph->nvwgt;
-  vsize = graph->vsize;
+  ncon   = graph->ncon;
+  xadj   = graph->xadj;
+  nvwgt  = graph->nvwgt;
+  vsize  = graph->vsize;
   adjncy = graph->adjncy;
   adjwgt = graph->adjwgt;
-  where = graph->where;
-  ipc_factor = ctrl->ipc_factor;
+  where  = graph->where;
+
+  ipc_factor    = ctrl->ipc_factor;
   redist_factor = ctrl->redist_factor;
 
-  /**************************/
   /* set up data structures */
-  /**************************/
-  rdata = idxmalloc(7*nvtxs, "rdata");
-  id = graph->sendind = rdata;
-  ed = graph->recvind = rdata + nvtxs;
-  bndptr = graph->sendptr = rdata + 2*nvtxs;
-  bndind = graph->recvptr = rdata + 3*nvtxs;
-  costwhere = rdata + 4*nvtxs;
-  lbwhere = rdata + 5*nvtxs;
-  perm = rdata + 6*nvtxs;
+  id     = graph->sendind = iwspacemalloc(ctrl, nvtxs);
+  ed     = graph->recvind = iwspacemalloc(ctrl, nvtxs);
+  bndptr = graph->sendptr = iwspacemalloc(ctrl, nvtxs);
+  bndind = graph->recvptr = iwspacemalloc(ctrl, nvtxs);
+
+  costwhere = iwspacemalloc(ctrl, nvtxs);
+  lbwhere   = iwspacemalloc(ctrl, nvtxs);
+  perm      = iwspacemalloc(ctrl, nvtxs);
+
+  lbvec  = rwspacemalloc(ctrl, ncon);
+  pwgts  = rset(2*ncon, 0.0, rwspacemalloc(ctrl, 2*ncon));
+  npwgts = rwspacemalloc(ctrl, 2*ncon);
+  tpwgts = rwspacemalloc(ctrl, 2*ncon);
+
   graph->gnpwgts = npwgts;
 
   RandomPermute(nvtxs, perm, 1);
-  idxcopy(nvtxs, where, costwhere);
-  idxcopy(nvtxs, where, lbwhere);
+  icopy(nvtxs, where, costwhere);
+  icopy(nvtxs, where, lbwhere);
 
-  /*****************************/
-  /* compute target pwgts      */
-  /*****************************/
-  sset(ncon*2, 0.0, pwgts);
+  /* compute target pwgts */
   for (h=0; h<ncon; h++) {
-    tpwgts[h] = -1.0 * flows[h];
+    tpwgts[h]      = -1.0*flows[h];
     tpwgts[ncon+h] = flows[h];
   }
 
@@ -76,14 +81,14 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     if (where[i] == me) {
       for (h=0; h<ncon; h++) {
         tpwgts[h] += nvwgt[i*ncon+h];
-        pwgts[h] += nvwgt[i*ncon+h];
+        pwgts[h]  += nvwgt[i*ncon+h];
       }
     }
     else {
-      ASSERTS(where[i] == you);
+      ASSERT(where[i] == you);
       for (h=0; h<ncon; h++) {
         tpwgts[ncon+h] += nvwgt[i*ncon+h];
-        pwgts[ncon+h] += nvwgt[i*ncon+h];
+        pwgts[ncon+h]  += nvwgt[i*ncon+h];
       }
     }
   }
@@ -101,28 +106,26 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     }
   } 
 
-  /*****************************/
+
   /* now compute new bisection */
-  /*****************************/
-  bestcost = (float)idxsum(nedges, adjwgt)*ipc_factor + (float)idxsum(nvtxs, vsize)*redist_factor;
+  bestcost = (real_t)isum(nedges, adjwgt, 1)*ipc_factor + 
+             (real_t)isum(nvtxs, vsize, 1)*redist_factor;
   best_lbavg = 10.0;
 
   lastseed = 0;
-  for (pass = N_MOC_REDO_PASSES; pass>0; pass--) {
-    idxset(nvtxs, 1, where);
+  for (pass=N_MOC_REDO_PASSES; pass>0; pass--) {
+    iset(nvtxs, 1, where);
 
-    /***************************/
-    /* find seed vertices      */
-    /***************************/
+    /* find seed vertices */
     r = perm[lastseed] % nvtxs;
     lastseed = (lastseed+1) % nvtxs;
     where[r] = 0;
 
-    Moc_Serial_Compute2WayPartitionParams(graph);
-    Moc_Serial_Init2WayBalance(graph, tpwgts);
-    Moc_Serial_FM_2WayRefine(graph, tpwgts, 4);
-    Moc_Serial_Balance2Way(graph, tpwgts, 1.02);
-    Moc_Serial_FM_2WayRefine(graph, tpwgts, 4);
+    Mc_Serial_Compute2WayPartitionParams(ctrl, graph);
+    Mc_Serial_Init2WayBalance(ctrl, graph, tpwgts);
+    Mc_Serial_FM_2WayRefine(ctrl, graph, tpwgts, 4);
+    Mc_Serial_Balance2Way(ctrl, graph, tpwgts, 1.02);
+    Mc_Serial_FM_2WayRefine(ctrl, graph, tpwgts, 4);
 
     for (i=0; i<nvtxs; i++)
       where[i] = (where[i] == 0) ? me : you;
@@ -134,25 +137,25 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
       else
         lbvec[i] = 0.0;
     }
-    lbavg = savg(ncon, lbvec);
+    lbavg = ravg(ncon, lbvec);
 
     totalv = 0;
     for (i=0; i<nvtxs; i++)
       if (where[i] != home[i])
         totalv += vsize[i];
 
-    mycost = (float)(graph->mincut)*ipc_factor + (float)totalv*redist_factor;
+    mycost = (real_t)(graph->mincut)*ipc_factor + (real_t)totalv*redist_factor;
 
     if (bestcost >= mycost) {
       bestcost = mycost;
       other_lbavg = lbavg;
-      idxcopy(nvtxs, where, costwhere);
+      icopy(nvtxs, where, costwhere);
     }
 
     if (best_lbavg >= lbavg) {
       best_lbavg = lbavg;
       othercost = mycost;
-      idxcopy(nvtxs, where, lbwhere);
+      icopy(nvtxs, where, lbwhere);
     }
   }
 
@@ -167,9 +170,8 @@ MPI_Comm_rank(MPI_COMM_WORLD, &mype);
     *sr_lbavg = best_lbavg;
   }
 
-  idxcopy(nvtxs, selectwhere, where);
+  icopy(nvtxs, selectwhere, where);
 
-  GKfree((void **)&rdata, LTERM);
-  return;
+  WCOREPOP;
 }
 

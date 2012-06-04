@@ -446,6 +446,19 @@ public:
   virtual void partition (const unsigned int n_parts=libMesh::n_processors());
 
   /**
+   * Redistribute elements between processors.  This gets called
+   * automatically by the Partitioner, and is a no-op in the case of a
+   * SerialMesh or serialized ParallelMesh
+   */
+  virtual void redistribute () {}
+
+  /**
+   * Recalculate any cached data after elements and nodes have been
+   * repartitioned.
+   */
+  virtual void update_post_partitioning () {}
+
+  /**
    * If true is passed in then this mesh will no longer be (re)partitioned.
    * It would probably be a bad idea to call this on a Serial Mesh _before_
    * the first partitioning has happened... because no elements would get assigned

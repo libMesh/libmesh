@@ -22,7 +22,7 @@ AC_DEFUN([CONFIGURE_PARMETIS],
   dnl The PARMETIS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enableparmetis = yes); then
-     PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/Lib"
+     PARMETIS_INCLUDE="-I\$(top_srcdir)/contrib/parmetis/include"
      PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
      AC_DEFINE(HAVE_PARMETIS, 1, [Flag indicating whether the library will be compiled with Parmetis support])
      AC_MSG_RESULT(<<< Configuring library with Parmetis support >>>)
