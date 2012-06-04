@@ -406,8 +406,8 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
 {
   START_LOG("set_node_processor_ids()","Partitioner");
 
-ParallelMesh& pmesh = dynamic_cast<ParallelMesh&>(mesh);
-pmesh.libmesh_assert_valid_parallel_ids();
+  ParallelMesh *pmesh = dynamic_cast<ParallelMesh*>(&mesh);
+  if (pmesh) pmesh->libmesh_assert_valid_parallel_ids();
 
   // This function must be run on all processors at once
   parallel_only();
@@ -609,7 +609,7 @@ pmesh.libmesh_assert_valid_parallel_ids();
   MeshTools::libmesh_assert_valid_node_procids(mesh);
 #endif
 
-pmesh.libmesh_assert_valid_parallel_ids();
+  if (pmesh) pmesh->libmesh_assert_valid_parallel_ids();
 
   STOP_LOG("set_node_processor_ids()","Partitioner");
 }
