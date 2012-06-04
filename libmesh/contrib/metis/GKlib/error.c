@@ -15,21 +15,42 @@ This file contains functions dealing with error reporting and termination
 
 #include <GKlib.h>
 
+/**
+ * LIBMESH CHANGE: __thread is not portable across all platforms.  We detect
+ * this using configure and set the appropriate value in LIBMESH_TLS, which is
+ * defined in libmesh_config.h
+ */
+#include "libmesh_config.h"
+
 
 /* These are the jmp_buf for the graceful exit in case of severe errors.
    Multiple buffers are defined to allow for recursive invokation. */
 #define MAX_JBUFS 128
-__thread int gk_cur_jbufs=-1;
-__thread jmp_buf gk_jbufs[MAX_JBUFS];
-__thread jmp_buf gk_jbuf;
+
+#ifdef LIBMESH_TLS
+LIBMESH_TLS int gk_cur_jbufs=-1;
+LIBMESH_TLS jmp_buf gk_jbufs[MAX_JBUFS];
+LIBMESH_TLS jmp_buf gk_jbuf;
+#else
+int gk_cur_jbufs=-1;
+jmp_buf gk_jbufs[MAX_JBUFS];
+jmp_buf gk_jbuf;
+#endif
 
 typedef void (*gksighandler_t)(int);
 
 /* These are the holders of the old singal handlers for the trapped signals */
-static __thread gksighandler_t old_SIGMEM_handler;  /* Custom signal */
-static __thread gksighandler_t old_SIGERR_handler;  /* Custom signal */
-static __thread gksighandler_t old_SIGMEM_handlers[MAX_JBUFS];  /* Custom signal */
-static __thread gksighandler_t old_SIGERR_handlers[MAX_JBUFS];  /* Custom signal */
+#ifdef LIBMESH_TLS
+static LIBMESH_TLS gksighandler_t old_SIGMEM_handler;  /* Custom signal */
+static LIBMESH_TLS gksighandler_t old_SIGERR_handler;  /* Custom signal */
+static LIBMESH_TLS gksighandler_t old_SIGMEM_handlers[MAX_JBUFS];  /* Custom signal */
+static LIBMESH_TLS gksighandler_t old_SIGERR_handlers[MAX_JBUFS];  /* Custom signal */
+#else
+static gksighandler_t old_SIGMEM_handler;  /* Custom signal */
+static gksighandler_t old_SIGERR_handler;  /* Custom signal */
+static gksighandler_t old_SIGMEM_handlers[MAX_JBUFS];  /* Custom signal */
+static gksighandler_t old_SIGERR_handlers[MAX_JBUFS];  /* Custom signal */
+#endif
 
 /* The following is used to control if the gk_errexit() will actually abort or not.
    There is always a single copy of this variable */
@@ -178,7 +199,11 @@ char *gk_strerror(int errnum)
   return strerror(errnum);
 #else 
 #ifndef SUNOS
-  static __thread char buf[1024];
+#ifdef LIBMESH_TLS
+  static LIBMESH_TLS char buf[1024];
+#else
+  static char buf[1024];
+#endif
 
   strerror_r(errnum, buf, 1024);
 
