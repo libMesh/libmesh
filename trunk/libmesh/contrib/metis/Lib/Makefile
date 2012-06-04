@@ -1,3 +1,6 @@
+# The location of the mesh library
+LIBMESH_DIR ?= ../../..
+
 include ../../../Make.common
 
 SRC     := $(wildcard *.c)
