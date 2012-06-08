@@ -17,7 +17,7 @@
 
 
 
-// <h1>Miscellaneous Example 7 - Using the PetscDMNonlinearSolver. </h1>
+// <h1>Miscellaneous Example 7 - Can use the PetscDMNonlinearSolver (available in PETSc-3.3.0 or above) to solve a VI version of the problem.</h1>
 //
 // LibMesh interfaces directly with PETSc's variational inequality solver,
 // this example shows how to do it.
@@ -25,6 +25,7 @@
 
 // Example include files
 #include "biharmonic.h"
+
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
