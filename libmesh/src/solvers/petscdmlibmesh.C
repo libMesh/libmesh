@@ -1,9 +1,7 @@
 #include "petsc_macro.h"
-/*
-  This only works with a recent petsc-dev (post petsc-3.2).
-  Replace with a test for petsc-3.3 after it's released.
-*/
-#if defined(LIBMESH_HAVE_PETSC) && !PETSC_VERSION_LESS_THAN(3,2,0) && !PETSC_VERSION_RELEASE
+// This only works with petsc-3.3 and above.
+
+#if !PETSC_VERSION_LESS_THAN(3,3,0)
 
 // PETSc includes
 #include <petscdmlibmesh.h>
@@ -1087,4 +1085,4 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
 EXTERN_C_END
 
 
-#endif // #if defined(LIBMESH_HAVE_PETSC) && !PETSC_VERSION_LESS_THAN(3,2,0) && !PETSC_VERSION_RELEASE
+#endif // #if !PETSC_VERSION_LESS_THAN(3,3,0)
