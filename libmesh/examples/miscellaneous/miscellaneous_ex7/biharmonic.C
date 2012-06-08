@@ -45,7 +45,6 @@ void Biharmonic::viewParameters()
   libMesh::out << "growth                   = " << (int)_growth <<       "\n";
   libMesh::out << "degenerate               = " << (int)_degenerate <<   "\n";
   libMesh::out << "Cahn-Hillard             = " << (int)_cahn_hillard << "\n";
-  libMesh::out << "vi                       = " << (int)_vi <<           "\n";
   libMesh::out << "netforce                 = " << (int)_netforce <<     "\n";
   libMesh::out << "energy                   = " << _energy        <<     "\n";
   libMesh::out << "tol                      = " << _tol           <<     "\n";
@@ -175,7 +174,6 @@ Biharmonic::Biharmonic(Mesh* m) :
     _growth       = false; if(on_command_line("--growth"))       _growth = true;
     _degenerate   = false; if(on_command_line("--degenerate"))   _degenerate = true;
     _cahn_hillard = false; if(on_command_line("--cahn_hillard")) _cahn_hillard = true;
-    _vi           = false; if(on_command_line("--vi"))           _vi = true;
     _netforce     = false; if(on_command_line("--netforce"))     _netforce = true;
     _kappa = command_line_value("kappa", 1.0);
 
