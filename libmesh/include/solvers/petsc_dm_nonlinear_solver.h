@@ -27,22 +27,8 @@
 #if defined(LIBMESH_HAVE_PETSC) && !PETSC_VERSION_LESS_THAN(3,2,0) && !PETSC_VERSION_RELEASE
 
 // Petsc include files.
-EXTERN_C_BEGIN
 #include <petscsnes.h>
 #include <petsc-private/dmimpl.h>
-
-#define DMLIBMESH "libmesh"
-//typedef struct
-//{
-//  NonlinearImplicitSystem* sys;
-//} DM_libMesh;
-
-struct DM_libMesh
-{
-  NonlinearImplicitSystem* sys;
-};
-
-EXTERN_C_END
 
 
 
@@ -108,9 +94,6 @@ public:
 					       const unsigned int); // N. Iterations
 
 };
-
-
-
 
 } // namespace libMesh
 
