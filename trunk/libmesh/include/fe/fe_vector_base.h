@@ -452,10 +452,10 @@ FEVectorBase::FEVectorBase(const unsigned int d,
   dphidzeta(),
   dphidx(),
   dphidy(),
-  dphidz(),
+  dphidz()
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   //d2phi(),
-  d2phidxi2(),
+  , d2phidxi2(),
   d2phidxideta(),
   d2phidxidzeta(),
   d2phideta2(),
@@ -466,7 +466,7 @@ FEVectorBase::FEVectorBase(const unsigned int d,
   d2phidxdz(),
   d2phidy2(),
   d2phidydz(),
-  d2phidz2(),
+  d2phidz2()
 #endif
 {
 }
