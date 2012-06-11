@@ -6272,9 +6272,12 @@ $as_echo "#define BEST_UNORDERED_MULTIMAP std::unordered_multimap" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MULTIMAP <unordered_map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -6334,9 +6337,12 @@ $as_echo "#define BEST_UNORDERED_MULTIMAP std::tr1::unordered_multimap" >>confde
 
 $as_echo "#define INCLUDE_UNORDERED_MULTIMAP <tr1/unordered_map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -6399,7 +6405,10 @@ $as_echo "#define INCLUDE_UNORDERED_MULTIMAP <ext/hash_map>" >>confdefs.h
 
 $as_echo "#define DEFINE_HASH_STRING namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}" >>confdefs.h
 
-  ac_cv_cxx_hash_string=yes
+
+$as_echo "#define DEFINE_HASH_POINTERS namespace __gnu_cxx {template<typename T> struct hash<T*>{size_t operator()(const T* p)const{return hash<size_t>()(reinterpret_cast<size_t>(p));}};}" >>confdefs.h
+
+  ac_cv_cxx_hash_specializations=yes
 
 else
   false
@@ -6455,9 +6464,12 @@ $as_echo "#define BEST_UNORDERED_MULTIMAP std::hash_multimap" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MULTIMAP <hash_map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -6512,9 +6524,12 @@ $as_echo "#define BEST_UNORDERED_MULTIMAP std::multimap" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MULTIMAP <map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -6585,9 +6600,12 @@ $as_echo "#define BEST_UNORDERED_MAP std::unordered_map" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MAP <unordered_map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -6645,9 +6663,12 @@ $as_echo "#define BEST_UNORDERED_MAP std::tr1::unordered_map" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MAP <tr1/unordered_map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -6708,7 +6729,10 @@ $as_echo "#define INCLUDE_UNORDERED_MAP <ext/hash_map>" >>confdefs.h
 
 $as_echo "#define DEFINE_HASH_STRING namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}" >>confdefs.h
 
-  ac_cv_cxx_hash_string=yes
+
+$as_echo "#define DEFINE_HASH_POINTERS namespace __gnu_cxx {template<typename T> struct hash<T*>{size_t operator()(const T* p)const{return hash<size_t>()(reinterpret_cast<size_t>(p));}};}" >>confdefs.h
+
+  ac_cv_cxx_hash_specializations=yes
 
 else
   false
@@ -6764,9 +6788,12 @@ $as_echo "#define BEST_UNORDERED_MAP std::hash_map" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MAP <hash_map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -6821,9 +6848,12 @@ $as_echo "#define BEST_UNORDERED_MAP std::map" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MAP <map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -6894,9 +6924,12 @@ $as_echo "#define BEST_UNORDERED_SET std::unordered_set" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_SET <unordered_set>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -6954,9 +6987,12 @@ $as_echo "#define BEST_UNORDERED_SET std::tr1::unordered_set" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_SET <tr1/unordered_set>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -7017,7 +7053,10 @@ $as_echo "#define INCLUDE_UNORDERED_SET <ext/hash_set>" >>confdefs.h
 
 $as_echo "#define DEFINE_HASH_STRING namespace __gnu_cxx {template<> struct hash<std::string>{size_t operator()(const std::string& s)const{return hash<const char*>()(s.c_str());}};}" >>confdefs.h
 
-  ac_cv_cxx_hash_string=yes
+
+$as_echo "#define DEFINE_HASH_POINTERS namespace __gnu_cxx {template<typename T> struct hash<T*>{size_t operator()(const T* p)const{return hash<size_t>()(reinterpret_cast<size_t>(p));}};}" >>confdefs.h
+
+  ac_cv_cxx_hash_specializations=yes
 
 else
   false
@@ -7073,9 +7112,12 @@ $as_echo "#define BEST_UNORDERED_SET std::hash_set" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_SET <hash_set>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -7130,9 +7172,12 @@ $as_echo "#define BEST_UNORDERED_SET std::set" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_SET <set>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -7200,9 +7245,12 @@ $as_echo "#define BEST_UNORDERED_MAP std::map" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MAP <map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -7260,9 +7308,12 @@ $as_echo "#define BEST_UNORDERED_MULTIMAP std::multimap" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_MULTIMAP <map>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
@@ -7320,9 +7371,12 @@ $as_echo "#define BEST_UNORDERED_SET std::set" >>confdefs.h
 
 $as_echo "#define INCLUDE_UNORDERED_SET <set>" >>confdefs.h
 
-  if test "$ac_cv_cxx_hash_string" != yes; then
+  if test "$ac_cv_cxx_hash_specializations" != yes; then
 
 $as_echo "#define DEFINE_HASH_STRING /**/" >>confdefs.h
+
+
+$as_echo "#define DEFINE_HASH_POINTERS /**/" >>confdefs.h
 
   fi
 
