@@ -34,6 +34,9 @@
    floating-point calculations */
 #undef DEFAULT_TRIPLE_PRECISION
 
+/* workaround for potentially missing hash<T*> */
+#undef DEFINE_HASH_POINTERS
+
 /* workaround for potentially missing hash<string> */
 #undef DEFINE_HASH_STRING
 
