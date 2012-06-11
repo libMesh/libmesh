@@ -25,6 +25,7 @@
 #include "serial_mesh.h"
 
 #include LIBMESH_INCLUDE_UNORDERED_SET
+LIBMESH_DEFINE_HASH_POINTERS
 
 namespace libMesh
 {
