@@ -50,7 +50,8 @@ MeshBase::MeshBase (unsigned int d) :
   _is_prepared   (false),
   _point_locator (NULL),
   _partitioner   (NULL),
-  _skip_partitioning(false)
+  _skip_partitioning(false),
+  _skip_renumber_nodes_and_elements(false)
 {
   libmesh_assert (LIBMESH_DIM <= 3);
   libmesh_assert (LIBMESH_DIM >= _dim);
@@ -66,7 +67,8 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _is_prepared   (other_mesh._is_prepared),
   _point_locator (NULL),
   _partitioner   (other_mesh._partitioner->clone()),
-  _skip_partitioning(other_mesh._skip_partitioning)
+  _skip_partitioning(other_mesh._skip_partitioning),
+  _skip_renumber_nodes_and_elements(false)
 {
 }
 
@@ -94,6 +96,8 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
   // and elements include reading in e.g. an xda/r or gmv file. In
   // this case, the ordering of the nodes may depend on an accompanying
   // solution, and the node ordering cannot be changed.
+  _skip_renumber_nodes_and_elements = skip_renumber_nodes_and_elements;
+  
   if(!skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
 
