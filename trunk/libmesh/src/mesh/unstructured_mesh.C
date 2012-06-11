@@ -173,7 +173,7 @@ void UnstructuredMesh::copy_nodes_and_elements
   }
 
   //Finally prepare the Mesh for use
-  this->prepare_for_use(/*skip_renumber =*/false);
+  this->prepare_for_use(/*skip_renumber =*/true);
 }
 
 
