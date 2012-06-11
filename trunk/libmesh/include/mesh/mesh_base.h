@@ -815,6 +815,13 @@ protected:
   bool _skip_partitioning;
 
   /**
+   * If this is true then renumbering will be kept to a miniumum.
+   *
+   * This is set when prepare_for_use() is called.
+   */
+  bool _skip_renumber_nodes_and_elements;
+
+  /**
    * This structure maintains the mapping of named blocks
    * for file formats that support named blocks.  Currently
    * this is only implemented for ExodusII
