@@ -278,7 +278,23 @@ void ExodusII_IO::read (const std::string& fname)
 #endif
 }
 
+#ifndef LIBMESH_HAVE_EXODUS_API
 
+const std::vector<Real>& ExodusII_IO::get_time_steps()
+{
+  libMesh::err <<  "ERROR, ExodusII API is not defined.\n"
+	        << std::endl;
+  libmesh_error();
+}
+
+#else
+
+const std::vector<Real>& ExodusII_IO::get_time_steps()
+{
+  return exio_helper->get_time_steps();
+}
+
+#endif
 
 #ifndef LIBMESH_HAVE_EXODUS_API
 

@@ -87,6 +87,11 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   void verbose (bool set_verbosity);
 
   /**
+   * Returns an array containing the timesteps in the file
+   */
+  const std::vector<Real>& get_time_steps();
+
+  /**
    * If we read in a nodal solution while reading in a mesh, we can attempt
    * to copy that nodal solution into an EquationSystems object.
    */
