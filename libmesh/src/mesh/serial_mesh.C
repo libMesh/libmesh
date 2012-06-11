@@ -24,6 +24,8 @@
 #include "metis_partitioner.h"
 #include "serial_mesh.h"
 
+#include LIBMESH_INCLUDE_UNORDERED_SET
+
 namespace libMesh
 {
 
@@ -411,6 +413,9 @@ void SerialMesh::renumber_nodes_and_elements ()
   unsigned int next_free_elem = 0;
   unsigned int next_free_node = 0;
 
+  // Will hold the set of nodes that are currently connected to elements
+  LIBMESH_BEST_UNORDERED_SET<Node*> connected_nodes;
+
   // Loop over the elements.  Note that there may
   // be NULLs in the _elements vector from the coarsening
   // process.  Pack the elements in to a contiguous array
@@ -431,33 +436,42 @@ void SerialMesh::renumber_nodes_and_elements ()
 	  // Increment the element counter
 	  elem->set_id (next_free_elem++);
 
-	  // Loop over this element's nodes.  Number them,
-	  // if they have not been numbered already.  Also,
-	  // position them in the _nodes vector so that they
-	  // are packed contiguously from the beginning.
-	  for (unsigned int n=0; n<elem->n_nodes(); n++)
-	    if (elem->node(n) == next_free_node)     // don't need to process
-	      next_free_node++;                      // [(src == dst) below]
-
-	    else if (elem->node(n) > next_free_node) // need to process
+          if(_skip_renumber_nodes_and_elements)
+          {
+            // Add this elements nodes to the connected list
+            for (unsigned int n=0; n<elem->n_nodes(); n++)
+              connected_nodes.insert(elem->get_node(n));
+          }
+          else  // We DO want node renumbering
+          {
+            // Loop over this element's nodes.  Number them,
+            // if they have not been numbered already.  Also,
+            // position them in the _nodes vector so that they
+            // are packed contiguously from the beginning.
+            for (unsigned int n=0; n<elem->n_nodes(); n++)
+              if (elem->node(n) == next_free_node)     // don't need to process
+                next_free_node++;                      // [(src == dst) below]
+            
+              else if (elem->node(n) > next_free_node) // need to process
 	      {
 		// The source and destination indices
 		// for this node
 		const unsigned int src_idx = elem->node(n);
 		const unsigned int dst_idx = next_free_node++;
-
+                
 		// ensure we want to swap a valid nodes
 		libmesh_assert (_nodes[src_idx] != NULL);
-
+                
 		// Swap the source and destination nodes
                 std::swap(_nodes[src_idx],
                           _nodes[dst_idx] );
-
+                
 		// Set proper indices where that makes sense
 		if (_nodes[src_idx] != NULL)
 		  _nodes[src_idx]->set_id (src_idx);
 		_nodes[dst_idx]->set_id (dst_idx);
 	      }
+          }
 	}
 
     // Erase any additional storage. These elements have been
@@ -465,21 +479,63 @@ void SerialMesh::renumber_nodes_and_elements ()
     // thus repeated and unnecessary.
     _elements.erase (out, end);
   }
+  
 
-  // Any nodes in the vector >= _nodes[next_free_node]
-  // are not connected to any elements and may be deleted
-  // if desired.
-
-  // (This code block will erase the unused nodes)
-  // Now, delete the unused nodes
+  if(_skip_renumber_nodes_and_elements)
   {
-    std::vector<Node*>::iterator nd        = _nodes.begin();
+    // Loop over the nodes.  Note that there may
+    // be NULLs in the _nodes vector from the coarsening
+    // process.  Pack the nodes in to a contiguous array
+    // and then trim any excess.
+    
+    std::vector<Node*>::iterator in        = _nodes.begin();
+    std::vector<Node*>::iterator out       = _nodes.begin();
     const std::vector<Node*>::iterator end = _nodes.end();
 
-    std::advance (nd, next_free_node);
+    for (; in != end; ++in)
+      if (*in != NULL)
+      {
+        // This is a reference so that if we change the pointer it will change in the vector
+        Node* & node = *in;
+        
+        // If this node is still connected to an elem, put it in the list
+        if(connected_nodes.find(node) != connected_nodes.end())
+        {
+          *out = node;
+          ++out;
 
-    for (std::vector<Node*>::iterator it=nd;
-	 it != end; ++it)
+          // Increment the node counter
+          node->set_id (next_free_node++);
+        }
+        else // This node is orphaned, delete it!
+        {
+          this->boundary_info->remove (node);
+
+          // delete the node
+          delete node;
+          node = NULL;
+        }  
+      }
+
+    // Erase any additional storage.  Whatever was
+    _nodes.erase (out, end);
+  }
+  else // We really DO want node renumbering
+  {
+    // Any nodes in the vector >= _nodes[next_free_node]
+    // are not connected to any elements and may be deleted
+    // if desired.
+
+    // (This code block will erase the unused nodes)
+    // Now, delete the unused nodes
+    {
+      std::vector<Node*>::iterator nd        = _nodes.begin();
+      const std::vector<Node*>::iterator end = _nodes.end();
+
+      std::advance (nd, next_free_node);
+
+      for (std::vector<Node*>::iterator it=nd;
+           it != end; ++it)
       {
         // Mesh modification code might have already deleted some
         // nodes
@@ -495,9 +551,9 @@ void SerialMesh::renumber_nodes_and_elements ()
 	*it = NULL;
       }
 
-    _nodes.erase (nd, end);
+      _nodes.erase (nd, end);
+    }
   }
-
 
   libmesh_assert (next_free_elem == _elements.size());
   libmesh_assert (next_free_node == _nodes.size());
