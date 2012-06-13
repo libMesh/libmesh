@@ -103,7 +103,7 @@ private:
   unsigned int  _dim, _N;
   Real _kappa, _theta, _theta_c;
   Real _tol;
-  bool _growth, _degenerate, _cahn_hillard, _vi, _netforce;
+  bool _growth, _degenerate, _cahn_hillard, _netforce;
   FreeEnergyEnum  _energy;
   int _log_truncation;
   bool _verbose;

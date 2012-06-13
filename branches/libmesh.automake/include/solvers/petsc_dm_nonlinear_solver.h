@@ -22,27 +22,12 @@
 
 #include "petsc_macro.h"
 
-// This only works with a recent petsc-dev (post petsc-3.2).
-// Replace with a test for petsc-3.3 after it's released.
-#if defined(LIBMESH_HAVE_PETSC) && !PETSC_VERSION_LESS_THAN(3,2,0) && !PETSC_VERSION_RELEASE
+// This only works with petsc-3.3 and above.
+#if !PETSC_VERSION_LESS_THAN(3,3,0)
 
 // Petsc include files.
-EXTERN_C_BEGIN
 #include <petscsnes.h>
 #include <petsc-private/dmimpl.h>
-
-#define DMLIBMESH "libmesh"
-//typedef struct
-//{
-//  NonlinearImplicitSystem* sys;
-//} DM_libMesh;
-
-struct DM_libMesh
-{
-  NonlinearImplicitSystem* sys;
-};
-
-EXTERN_C_END
 
 
 
@@ -109,11 +94,8 @@ public:
 
 };
 
-
-
-
 } // namespace libMesh
 
 
-#endif // #if defined(LIBMESH_HAVE_PETSC) && !PETSC_VERSION_LESS_THAN(3,2,0) && !PETSC_VERSION_RELEASE
+#endif // #if !PETSC_VERSION_LESS_THAN(3,3,0)
 #endif // #ifdef __petsc_dm_nonlinear_solver_h__

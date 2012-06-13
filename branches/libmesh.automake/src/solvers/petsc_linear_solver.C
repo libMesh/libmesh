@@ -1754,7 +1754,12 @@ void PetscLinearSolver<T>::set_petsc_solver_type()
       ierr = KSPSetType (_ksp, (char*) KSPRICHARDSON); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 
     case CHEBYSHEV:
+#if defined(LIBMESH_HAVE_PETSC) && PETSC_VERSION_LESS_THAN(3,3,0)
       ierr = KSPSetType (_ksp, (char*) KSPCHEBYCHEV);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+#else
+      ierr = KSPSetType (_ksp, (char*) KSPCHEBYSHEV);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+#endif
+      
 
     default:
       libMesh::err << "ERROR:  Unsupported PETSC Solver: "

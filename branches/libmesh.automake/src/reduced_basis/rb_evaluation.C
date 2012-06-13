@@ -1009,7 +1009,7 @@ void RBEvaluation::write_out_basis_functions(System& sys,
                                              const std::string& directory_name,
                                              const bool write_binary_basis_functions)
 {
-  libMesh::out << "Writing out the basis functions..." << std::endl;
+  //libMesh::out << "Writing out the basis functions..." << std::endl;
 
   // Make sure processors are synced up before we begin
   Parallel::barrier();
@@ -1057,7 +1057,7 @@ void RBEvaluation::read_in_basis_functions(System& sys,
                                            const std::string& directory_name,
                                            const bool read_binary_basis_functions)
 {
-  libMesh::out << "Reading in the basis functions..." << std::endl;
+  //libMesh::out << "Reading in the basis functions..." << std::endl;
 
   // Make sure processors are synced up before we begin
   Parallel::barrier();
@@ -1123,7 +1123,7 @@ void RBEvaluation::read_in_basis_functions(System& sys,
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
 
-  libMesh::out << "Finished reading in the basis functions..." << std::endl;
+  //libMesh::out << "Finished reading in the basis functions..." << std::endl;
 }
 
 } // namespace libMesh

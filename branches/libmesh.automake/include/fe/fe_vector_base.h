@@ -444,30 +444,30 @@ protected:
 inline
 FEVectorBase::FEVectorBase(const unsigned int d,
 	       const FEType& fet) :
-  FEAbstract(d,fet)// ,
-//   phi(),
-//   dphi(),
-//   dphidxi(),
-//   dphideta(),
-//   dphidzeta(),
-//   dphidx(),
-//   dphidy(),
-//   dphidz(),
-// #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-//   d2phi(),
-//   d2phidxi2(),
-//   d2phidxideta(),
-//   d2phidxidzeta(),
-//   d2phideta2(),
-//   d2phidetadzeta(),
-//   d2phidzeta2(),
-//   d2phidx2(),
-//   d2phidxdy(),
-//   d2phidxdz(),
-//   d2phidy2(),
-//   d2phidydz(),
-//   d2phidz2(),
-// #endif
+  FEAbstract(d,fet),
+  phi(),
+  dphi(),
+  dphidxi(),
+  dphideta(),
+  dphidzeta(),
+  dphidx(),
+  dphidy(),
+  dphidz()
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  //d2phi(),
+  , d2phidxi2(),
+  d2phidxideta(),
+  d2phidxidzeta(),
+  d2phideta2(),
+  d2phidetadzeta(),
+  d2phidzeta2(),
+  d2phidx2(),
+  d2phidxdy(),
+  d2phidxdz(),
+  d2phidy2(),
+  d2phidydz(),
+  d2phidz2()
+#endif
 {
 }
 

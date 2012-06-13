@@ -94,9 +94,8 @@ Biharmonic::JR::JR(EquationSystems& eqSys,
   // Attache the R & J calculation object
   nonlinear_solver->residual_and_jacobian_object = this;
 
-  if (_biharmonic._vi)
-    // Attach the bounds calculation object
-    nonlinear_solver->bounds_object = this;
+  // Attach the bounds calculation object
+  nonlinear_solver->bounds_object = this;
 }
 
 
@@ -575,5 +574,5 @@ void Biharmonic::JR::bounds(NumericVector<Number> &XL, NumericVector<Number>& XU
       // the bounds are always -1.0 and 1.0.
       XL.insert(XLe, dof_indices);
       XU.insert(XUe, dof_indices);
-    } // for el
+    } 
 }

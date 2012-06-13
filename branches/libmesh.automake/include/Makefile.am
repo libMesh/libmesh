@@ -291,6 +291,7 @@ nobase_include_HEADERS = \
 		solvers/nonlinear.h \
 		solvers/nonlinear_solver.h \
 		solvers/petsc_diff_solver.h \
+		solvers/petscdmlibmesh.h \
 		solvers/petsc_dm_nonlinear_solver.h \
 		solvers/petsc_linear_solver.h \
 		solvers/petsc_nonlinear_solver.h \
