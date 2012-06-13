@@ -42,6 +42,16 @@ class InfFE;
 #endif
 
 
+/**
+ * Most finite element types in libMesh are scalar-valued
+ */
+template <FEFamily T>
+struct FEOutputType
+{
+  typedef Real type;
+};
+
+
 
 /**
  * A specific instatiation of the \p FEBase class. This
@@ -63,7 +73,7 @@ class InfFE;
 //-------------------------------------------------------------
 // FE class definition
 template <unsigned int Dim, FEFamily T>
-class FE : public FEBase
+class FE : public FEGenericBase<typename FEOutputType<T>::type>
 {
 public:
 
@@ -73,6 +83,10 @@ public:
   explicit
   FE(const FEType& fet);
 
+  typedef typename 
+    FEGenericBase<typename FEOutputType<T>::type>::OutputShape
+    OutputShape;
+
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p.  This method allows you to specify the imension,
@@ -81,10 +95,10 @@ public:
    *
    * On a p-refined element, \p o should be the total order of the element.
    */
-  static Real shape(const ElemType t,
-		    const Order o,
-		    const unsigned int i,
-		    const Point& p);
+  static OutputShape shape(const ElemType t,
+		           const Order o,
+		           const unsigned int i,
+		           const Point& p);
 
   /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
@@ -94,10 +108,10 @@ public:
    *
    * On a p-refined element, \p o should be the base order of the element.
    */
-  static Real shape(const Elem* elem,
-		    const Order o,
-		    const unsigned int i,
-		    const Point& p);
+  static OutputShape shape(const Elem* elem,
+		           const Order o,
+		           const unsigned int i,
+		           const Point& p);
 
   /**
    * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -106,11 +120,11 @@ public:
    *
    * On a p-refined element, \p o should be the total order of the element.
    */
-  static Real shape_deriv(const ElemType t,
-			  const Order o,
-			  const unsigned int i,
-			  const unsigned int j,
-			  const Point& p);
+  static OutputShape shape_deriv(const ElemType t,
+			         const Order o,
+			         const unsigned int i,
+			         const unsigned int j,
+			         const Point& p);
 
   /**
    * @returns the \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -118,11 +132,11 @@ public:
    *
    * On a p-refined element, \p o should be the base order of the element.
    */
-  static Real shape_deriv(const Elem* elem,
-			  const Order o,
-			  const unsigned int i,
-			  const unsigned int j,
-			  const Point& p);
+  static OutputShape shape_deriv(const Elem* elem,
+			         const Order o,
+			         const unsigned int i,
+			         const unsigned int j,
+			         const Point& p);
 
   /**
    * @returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -142,11 +156,11 @@ public:
    *
    * On a p-refined element, \p o should be the total order of the element.
    */
-  static Real shape_second_deriv(const ElemType t,
-				 const Order o,
-				 const unsigned int i,
-				 const unsigned int j,
-				 const Point& p);
+  static OutputShape shape_second_deriv(const ElemType t,
+				        const Order o,
+				        const unsigned int i,
+				        const unsigned int j,
+				        const Point& p);
 
   /**
    * @returns the second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
@@ -166,11 +180,11 @@ public:
    *
    * On a p-refined element, \p o should be the base order of the element.
    */
-  static Real shape_second_deriv(const Elem* elem,
-				 const Order o,
-				 const unsigned int i,
-				 const unsigned int j,
-				 const Point& p);
+  static OutputShape shape_second_deriv(const Elem* elem,
+				        const Order o,
+				        const unsigned int i,
+				        const unsigned int j,
+				        const Point& p);
 
   /**
    * Build the nodal soln from the element soln.
@@ -861,7 +875,7 @@ FE<Dim,T>::FE (const FEType& fet) :
   // Sanity check.  Make sure the
   // Family specified in the template instantiation
   // matches the one in the FEType object
-  libmesh_assert (T == fe_type.family);
+  libmesh_assert (T == this->get_family());
 }
 
 
