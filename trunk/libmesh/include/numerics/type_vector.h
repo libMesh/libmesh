@@ -26,14 +26,30 @@
 
 // C++ includes
 #include <cmath>
+#include <complex>
 
 namespace libMesh
 {
 
-// Forward declaration for friend class
-template <typename T>
-class TypeTensor;
+// Forward declarations
+template <typename T> class TypeTensor;
+template <typename T> class VectorValue;
+template <typename T> class TensorValue;
 
+// Any tensor-rank-independent code will need to include
+// type_vector.h, so we define a product/dot-product here, starting
+// with the generic case to apply to scalars.
+// Vector specializations will follow.
+// Diadic product (and higher?) specializations will go in the tensor
+// header(s).
+
+template <typename T, typename T2>
+inline
+typename boostcopy::enable_if_c<
+  ScalarTraits<T>::value && ScalarTraits<T2>::value,
+  typename CompareTypes<T, T2>::supertype>::type
+libmesh_dot(const T& a, const T2& b)
+{ return a * b; }
 
 /**
  * This class defines a vector in \p LIBMESH_DIM dimensional space of type T.
@@ -88,10 +104,14 @@ public:
    */
   const T & operator () (const unsigned int i) const;
 
+  const T & slice (const unsigned int i) const { return (*this)(i); }
+
   /**
    * Return a writeable reference to the \f$ i^{th} \f$ element of the vector.
    */
   T & operator () (const unsigned int i);
+
+  T & slice (const unsigned int i) { return (*this)(i); }
 
   /**
    * Add two vectors.
@@ -288,9 +308,64 @@ public:
 };
 
 
+// Any tensor-rank-independent code will need to include
+// type_vector.h, so we define rank-increasing and real-to-number type
+// conversion functions here, starting with the generic case to apply
+// to scalars.
+// Tensor(and higher?) specializations will go in the tensor
+// header(s).
+template <typename T>
+struct IncrementRank
+{
+  typedef VectorValue<T> type;
+};
+
+template <typename T>
+struct IncrementRank<VectorValue<T> >
+{
+  typedef TensorValue<T> type;
+};
+
+
+template <typename T>
+struct IncrementRank<TypeVector<T> >
+{
+  typedef TensorValue<T> type;
+};
+
+template <typename T>
+struct MakeNumber
+{
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  typedef std::complex<T> type;
+#else
+  typedef T type;
+#endif
+};
+
+template <typename T>
+struct MakeNumber<std::complex<T> >
+{
+  // Compile-time error: we shouldn't need to make numbers out of
+  // numbers
+  // typedef std::complex<T> type;
+};
+
+
+template <typename T>
+struct MakeNumber<TypeVector<T> >
+{
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  typedef TypeVector<std::complex<T> > type;
+#else
+  typedef TypeVector<T> type;
+#endif
+};
+
 
 //------------------------------------------------------
 // Inline functions
+
 template <typename T>
 inline
 TypeVector<T>::TypeVector (const T x,
@@ -813,6 +888,12 @@ bool TypeVector<Real>::operator != (const TypeVector<Real>& rhs) const
 {
   return (!(*this == rhs));
 }
+
+template <typename T, typename T2>
+inline
+typename CompareTypes<T, T2>::supertype
+libmesh_dot(const TypeVector<T>& a, const TypeVector<T2>& b)
+{ return a * b; }
 
 } // namespace libMesh
 

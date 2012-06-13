@@ -30,6 +30,10 @@
 namespace libMesh
 {
 
+// Forward declarations
+template <typename T> class TypeTensorColumn;
+template <typename T> class ConstTypeTensorColumn;
+template <unsigned int N, typename T> class TypeNTensor;
 
 
 
@@ -105,10 +109,20 @@ public:
   const T & operator () (const unsigned int i, const unsigned int j) const;
 
   /**
-   * Return a writeable reference to the \f$ i^{th} \f$ element of the
+   * Return a writeable reference to the \f$ i,j^{th} \f$ element of the
    * tensor.
    */
   T & operator () (const unsigned int i, const unsigned int j);
+
+  /**
+   * Return a proxy for the \f$ i^{th} \f$ column of the tensor.
+   */
+  ConstTypeTensorColumn<T> slice (const unsigned int i) const;
+
+  /**
+   * Return a writeable proxy for the \f$ i^{th} \f$ column of the tensor.
+   */
+  TypeTensorColumn<T> slice (const unsigned int i);
 
   /**
    * Return one row of the tensor as a TypeVector.
@@ -209,7 +223,8 @@ public:
   TypeTensor<T> operator * (const TypeTensor<T2> &) const;
 
   /**
-   * Multiply 2 tensors together, i.e. sum Aij*Bij.
+   * Multiply 2 tensors together, i.e. dyadic product
+   * sum_ij Aij*Bij.
    * The tensors may be of different types.
    */
   template <typename T2>
@@ -305,6 +320,88 @@ public:
 };
 
 
+template <typename T>
+class TypeTensorColumn
+{
+public:
+
+  TypeTensorColumn(TypeTensor<T> &tensor,
+                   unsigned int j) :
+     _tensor(&tensor), _j(j) {}
+
+  /**
+   * Return a writeable reference to the \f$ i,this \f$ element of the
+   * tensor.
+   */
+  T & operator () (const unsigned int i)
+    { return (*_tensor)(i,_j); }
+
+  T & slice (const unsigned int i)
+    { return (*_tensor)(i,_j); }
+
+  /**
+   * Assign values to this column of the tensor.
+   */
+  TypeTensorColumn<T>& operator = (const TypeVector<T>& rhs)
+    { 
+      for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+        (*this)(i) = rhs(i);
+      return *this;
+    }
+
+private:
+  TypeTensor<T> *_tensor;
+  const unsigned int _j;
+};
+
+
+template <typename T>
+class ConstTypeTensorColumn
+{
+public:
+
+  ConstTypeTensorColumn(const TypeTensor<T> &tensor,
+                        unsigned int j) :
+     _tensor(&tensor), _j(j) {}
+
+  /**
+   * Return the \f$ i,this \f$ element of the tensor.
+   */
+  const T & operator () (const unsigned int i) const
+    { return (*_tensor)(i,_j); }
+
+  const T & slice (const unsigned int i) const
+    { return (*_tensor)(i,_j); }
+
+private:
+  const TypeTensor<T> *_tensor;
+  const unsigned int _j;
+};
+
+
+template <typename T>
+struct IncrementRank<TypeTensor<T> >
+{
+  typedef TypeNTensor<3,T> type;
+};
+
+
+template <typename T>
+struct IncrementRank<TensorValue<T> >
+{
+  typedef TypeNTensor<3,T> type;
+};
+
+
+template <typename T>
+struct MakeNumber<TypeTensor<T> >
+{
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  typedef TypeTensor<std::complex<T> > type;
+#else
+  typedef TypeTensor<T> type;
+#endif
+};
 
 //------------------------------------------------------
 // Inline functions
@@ -454,7 +551,29 @@ T & TypeTensor<T>::operator () (const unsigned int i,
   return _coords[i*LIBMESH_DIM+j];
 }
 
+
 template <typename T>
+inline
+ConstTypeTensorColumn<T> 
+TypeTensor<T>::slice (const unsigned int i) const
+{
+  libmesh_assert (i < LIBMESH_DIM);
+  return ConstTypeTensorColumn<T>(*this, i);
+}
+
+
+template <typename T>
+inline
+TypeTensorColumn<T> 
+TypeTensor<T>::slice (const unsigned int i)
+{
+  libmesh_assert (i < LIBMESH_DIM);
+  return TypeTensorColumn<T>(*this, i);
+}
+
+
+template <typename T>
+inline
 TypeVector<T>
 TypeTensor<T>::row(const unsigned int r)
 {
@@ -937,6 +1056,14 @@ bool TypeTensor<T>::operator == (const TypeTensor<T>& rhs) const
 #endif
 
 }
+
+
+template <typename T, typename T2>
+inline
+typename CompareTypes<T, T2>::supertype
+libmesh_dot(const TypeTensor<T>& a, const TypeTensor<T2>& b)
+{ return a.contract(b); }
+
 
 } // namespace libMesh
 
