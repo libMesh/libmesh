@@ -33,7 +33,8 @@ namespace libMesh
 
 // Forward Declarations
 class Elem;
-class FEBase;
+template <typename T> class FEGenericBase;
+typedef FEGenericBase<Real> FEBase;
 class MeshFunction;
 class Point;
 class Parameters;
