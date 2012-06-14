@@ -42,8 +42,10 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // FEBase class members
-AutoPtr<FEBase> FEBase::build (const unsigned int dim,
-			       const FEType& fet)
+template <>
+AutoPtr<FEGenericBase<Real> >
+FEGenericBase<Real>::build (const unsigned int dim,
+			    const FEType& fet)
 {
   // The stupid AutoPtr<FEBase> ap(); return ap;
   // construct is required to satisfy IBM's xlC
@@ -379,6 +381,19 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 
 
 
+template <>
+AutoPtr<FEGenericBase<RealGradient> >
+FEGenericBase<RealGradient>::build (const unsigned int dim,
+			           const FEType& fet)
+{
+  // No vector types defined... YET.
+  libmesh_error();
+  AutoPtr<FEVectorBase> ap(NULL);
+  return ap;
+}
+
+
+
 
 
 
@@ -386,8 +401,10 @@ AutoPtr<FEBase> FEBase::build (const unsigned int dim,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
-AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
-				     const FEType& fet)
+template <>
+AutoPtr<FEGenericBase<Real> >
+FEGenericBase<Real>::build_InfFE (const unsigned int dim,
+				  const FEType& fet)
 {
   // The stupid AutoPtr<FEBase> ap(); return ap;
   // construct is required to satisfy IBM's xlC
@@ -666,11 +683,22 @@ AutoPtr<FEBase> FEBase::build_InfFE (const unsigned int dim,
 
 
 
+template <>
+AutoPtr<FEGenericBase<RealGradient> >
+FEGenericBase<RealGradient>::build_InfFE (const unsigned int dim,
+			                  const FEType& fet)
+{
+  // No vector types defined... YET.
+  libmesh_error();
+  AutoPtr<FEVectorBase> ap(NULL);
+  return ap;
+}
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
-void FEBase::compute_shape_functions (const Elem*)
+template <typename OutputType>
+void FEGenericBase<OutputType> ::compute_shape_functions (const Elem*)
 {
   //-------------------------------------------------------------------------
   // Compute the shape function values (and derivatives)
@@ -701,33 +729,14 @@ void FEBase::compute_shape_functions (const Elem*)
 	  for (unsigned int i=0; i<dphi.size(); i++)
 	    for (unsigned int p=0; p<dphi[i].size(); p++)
 	      {
-	        dphi[i][p](0) = 0.;
-
-#if LIBMESH_DIM>1
-	        dphi[i][p](1) = dphidy[i][p] = 0.;
-#endif
-#if LIBMESH_DIM>2
-	        dphi[i][p](2) = dphidz[i][p] = 0.;
-#endif
+	        dphi[i][p] = 0.;
 	      }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	if (calculate_d2phi)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
-	        d2phi[i][p](0,0) = d2phidx2[i][p] = 0.;
-#if LIBMESH_DIM>1
-	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
-		  d2phi[i][p](1,0) = 0.;
-	        d2phi[i][p](1,1) = d2phidy2[i][p] = 0.;
-#endif
-#if LIBMESH_DIM>2
-	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
-		  d2phi[i][p](2,0) = 0.;
-	        d2phi[i][p](1,2) = d2phidydz[i][p] =
-		  d2phi[i][p](2,1) = 0.;
-	        d2phi[i][p](2,2) = d2phidz2[i][p] = 0.;
-#endif
+	        d2phi[i][p] = 0.;
 	      }
 #endif
 
@@ -742,15 +751,15 @@ void FEBase::compute_shape_functions (const Elem*)
 	    for (unsigned int p=0; p<dphi[i].size(); p++)
 	      {
 	        // dphi/dx    = (dphi/dxi)*(dxi/dx)
-	        dphi[i][p](0) =
+	        dphi[i][p].slice(0) =
 		  dphidx[i][p] = dphidxi[i][p]*dxidx_map[p];
 
 #if LIBMESH_DIM>1
-	        dphi[i][p](1) =
+	        dphi[i][p].slice(1) =
                   dphidy[i][p] = dphidxi[i][p]*dxidy_map[p];
 #endif
 #if LIBMESH_DIM>2
-	        dphi[i][p](2) =
+	        dphi[i][p].slice(2) =
                   dphidz[i][p] = dphidxi[i][p]*dxidz_map[p];
 #endif
 	      }
@@ -759,23 +768,23 @@ void FEBase::compute_shape_functions (const Elem*)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
-	        d2phi[i][p](0,0) = d2phidx2[i][p] =
+	        d2phi[i][p].slice(0).slice(0) = d2phidx2[i][p] =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p];
 #if LIBMESH_DIM>1
-	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
-		  d2phi[i][p](1,0) =
+	        d2phi[i][p].slice(0).slice(1) = d2phidxdy[i][p] =
+		  d2phi[i][p].slice(1).slice(0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p];
-	        d2phi[i][p](1,1) = d2phidy2[i][p] =
+	        d2phi[i][p].slice(1).slice(1) = d2phidy2[i][p] =
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p];
 #endif
 #if LIBMESH_DIM>2
-	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
-		  d2phi[i][p](2,0) =
+	        d2phi[i][p].slice(0).slice(2) = d2phidxdz[i][p] =
+		  d2phi[i][p].slice(2).slice(0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p];
-	        d2phi[i][p](1,2) = d2phidydz[i][p] =
-		  d2phi[i][p](2,1) =
+	        d2phi[i][p].slice(1).slice(2) = d2phidydz[i][p] =
+		  d2phi[i][p].slice(2).slice(1) =
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p];
-	        d2phi[i][p](2,2) = d2phidz2[i][p] =
+	        d2phi[i][p].slice(2).slice(2) = d2phidz2[i][p] =
 		  d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p];
 #endif
 	      }
@@ -792,18 +801,18 @@ void FEBase::compute_shape_functions (const Elem*)
 	    for (unsigned int p=0; p<dphi[i].size(); p++)
 	      {
 	        // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx)
-	        dphi[i][p](0) =
+	        dphi[i][p].slice(0) =
 		  dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
 				  dphideta[i][p]*detadx_map[p]);
 
 	        // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy)
-	        dphi[i][p](1) =
+	        dphi[i][p].slice(1) =
 		  dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
 				  dphideta[i][p]*detady_map[p]);
 
 	        // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz)
 #if LIBMESH_DIM == 3
-	        dphi[i][p](2) = // can only assign to the Z component if LIBMESH_DIM==3
+	        dphi[i][p].slice(2) = // can only assign to the Z component if LIBMESH_DIM==3
 		dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				dphideta[i][p]*detadz_map[p]);
 #endif
@@ -814,34 +823,34 @@ void FEBase::compute_shape_functions (const Elem*)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
-	        d2phi[i][p](0,0) = d2phidx2[i][p] =
+	        d2phi[i][p].slice(0).slice(0) = d2phidx2[i][p] =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
 		  2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
 		  d2phideta2[i][p]*detadx_map[p]*detadx_map[p];
-	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
-		  d2phi[i][p](1,0) =
+	        d2phi[i][p].slice(0).slice(1) = d2phidxdy[i][p] =
+		  d2phi[i][p].slice(1).slice(0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
 		  d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
 		  d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
 		  d2phidxideta[i][p]*detadx_map[p]*dxidy_map[p];
-	        d2phi[i][p](1,1) = d2phidy2[i][p] =
+	        d2phi[i][p].slice(1).slice(1) = d2phidy2[i][p] =
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
 		  2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
 		  d2phideta2[i][p]*detady_map[p]*detady_map[p];
 #if LIBMESH_DIM == 3
-	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
-		  d2phi[i][p](2,0) =
+	        d2phi[i][p].slice(0).slice(2) = d2phidxdz[i][p] =
+		  d2phi[i][p].slice(2).slice(0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
 		  d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
 		  d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
 		  d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p];
-	        d2phi[i][p](1,2) = d2phidydz[i][p] =
-		  d2phi[i][p](2,1) =
+	        d2phi[i][p].slice(1).slice(2) = d2phidydz[i][p] =
+		  d2phi[i][p].slice(2).slice(1) =
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
 		  d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
 		  d2phideta2[i][p]*detady_map[p]*detadz_map[p] +
 		  d2phidxideta[i][p]*detady_map[p]*dxidz_map[p];
-	        d2phi[i][p](2,2) = d2phidz2[i][p] =
+	        d2phi[i][p].slice(2).slice(2) = d2phidz2[i][p] =
 		  d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
 		  2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
 		  d2phideta2[i][p]*detadz_map[p]*detadz_map[p];
@@ -860,19 +869,19 @@ void FEBase::compute_shape_functions (const Elem*)
 	    for (unsigned int p=0; p<dphi[i].size(); p++)
 	      {
 	        // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
-	        dphi[i][p](0) =
+	        dphi[i][p].slice(0) =
 		  dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
 				  dphideta[i][p]*detadx_map[p] +
 				  dphidzeta[i][p]*dzetadx_map[p]);
 
 	        // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
-	        dphi[i][p](1) =
+	        dphi[i][p].slice(1) =
 		  dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
 				  dphideta[i][p]*detady_map[p] +
 				  dphidzeta[i][p]*dzetady_map[p]);
 
 	        // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
-	        dphi[i][p](2) =
+	        dphi[i][p].slice(2) =
 		  dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 				  dphideta[i][p]*detadz_map[p] +
 				  dphidzeta[i][p]*dzetadz_map[p]);
@@ -883,15 +892,15 @@ void FEBase::compute_shape_functions (const Elem*)
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
-	        d2phi[i][p](0,0) = d2phidx2[i][p] =
+	        d2phi[i][p].slice(0).slice(0) = d2phidx2[i][p] =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
 		  2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
 		  2*d2phidxidzeta[i][p]*dxidx_map[p]*dzetadx_map[p] +
 		  2*d2phidetadzeta[i][p]*detadx_map[p]*dzetadx_map[p] +
 		  d2phideta2[i][p]*detadx_map[p]*detadx_map[p] +
 		  d2phidzeta2[i][p]*dzetadx_map[p]*dzetadx_map[p];
-	        d2phi[i][p](0,1) = d2phidxdy[i][p] =
-		  d2phi[i][p](1,0) =
+	        d2phi[i][p].slice(0).slice(1) = d2phidxdy[i][p] =
+		  d2phi[i][p].slice(1).slice(0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
 		  d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
 		  d2phidxidzeta[i][p]*dxidx_map[p]*dzetady_map[p] +
@@ -901,8 +910,8 @@ void FEBase::compute_shape_functions (const Elem*)
 		  d2phidzeta2[i][p]*dzetadx_map[p]*dzetady_map[p] +
 		  d2phidxidzeta[i][p]*dzetadx_map[p]*dxidy_map[p] +
 		  d2phidetadzeta[i][p]*dzetadx_map[p]*detady_map[p];
-	        d2phi[i][p](0,2) = d2phidxdz[i][p] =
-		  d2phi[i][p](2,0) =
+	        d2phi[i][p].slice(0).slice(2) = d2phidxdz[i][p] =
+		  d2phi[i][p].slice(2).slice(0) =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
 		  d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
 		  d2phidxidzeta[i][p]*dxidx_map[p]*dzetadz_map[p] +
@@ -912,15 +921,15 @@ void FEBase::compute_shape_functions (const Elem*)
 		  d2phidzeta2[i][p]*dzetadx_map[p]*dzetadz_map[p] +
 		  d2phidxidzeta[i][p]*dzetadx_map[p]*dxidz_map[p] +
 		  d2phidetadzeta[i][p]*dzetadx_map[p]*detadz_map[p];
-	        d2phi[i][p](1,1) = d2phidy2[i][p] =
+	        d2phi[i][p].slice(1).slice(1) = d2phidy2[i][p] =
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
 		  2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
 		  2*d2phidxidzeta[i][p]*dxidy_map[p]*dzetady_map[p] +
 		  2*d2phidetadzeta[i][p]*detady_map[p]*dzetady_map[p] +
 		  d2phideta2[i][p]*detady_map[p]*detady_map[p] +
 		  d2phidzeta2[i][p]*dzetady_map[p]*dzetady_map[p];
-	        d2phi[i][p](1,2) = d2phidydz[i][p] =
-		  d2phi[i][p](2,1) =
+	        d2phi[i][p].slice(1).slice(2) = d2phidydz[i][p] =
+		  d2phi[i][p].slice(2).slice(1) =
 		  d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
 		  d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
 		  d2phidxidzeta[i][p]*dxidy_map[p]*dzetadz_map[p] +
@@ -930,7 +939,7 @@ void FEBase::compute_shape_functions (const Elem*)
 		  d2phidzeta2[i][p]*dzetady_map[p]*dzetadz_map[p] +
 		  d2phidxidzeta[i][p]*dzetady_map[p]*dxidz_map[p] +
 		  d2phidetadzeta[i][p]*dzetady_map[p]*detadz_map[p];
-	        d2phi[i][p](2,2) = d2phidz2[i][p] =
+	        d2phi[i][p].slice(2).slice(2) = d2phidz2[i][p] =
 		  d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
 		  2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
 		  2*d2phidxidzeta[i][p]*dxidz_map[p]*dzetadz_map[p] +
@@ -954,7 +963,8 @@ void FEBase::compute_shape_functions (const Elem*)
 }
 
 
-void FEBase::print_phi(std::ostream& os) const
+template <typename OutputType>
+void FEGenericBase<OutputType>::print_phi(std::ostream& os) const
 {
   for (unsigned int i=0; i<phi.size(); ++i)
     for (unsigned int j=0; j<phi[i].size(); ++j)
@@ -964,7 +974,8 @@ void FEBase::print_phi(std::ostream& os) const
 
 
 
-void FEBase::print_dphi(std::ostream& os) const
+template <typename OutputType>
+void FEGenericBase<OutputType>::print_dphi(std::ostream& os) const
 {
   for (unsigned int i=0; i<dphi.size(); ++i)
     for (unsigned int j=0; j<dphi[i].size(); ++j)
@@ -976,7 +987,8 @@ void FEBase::print_dphi(std::ostream& os) const
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
-void FEBase::print_d2phi(std::ostream& os) const
+template <typename OutputType>
+void FEGenericBase<OutputType>::print_d2phi(std::ostream& os) const
 {
   for (unsigned int i=0; i<dphi.size(); ++i)
     for (unsigned int j=0; j<dphi[i].size(); ++j)
@@ -989,12 +1001,14 @@ void FEBase::print_d2phi(std::ostream& os) const
 
 #ifdef LIBMESH_ENABLE_AMR
 
-void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
-                                  const DofMap &dof_map,
-                                  const Elem *elem,
-                                  DenseVector<Number> &Ue,
-                                  const unsigned int var,
-                                  const bool use_old_dof_indices)
+template <typename OutputType>
+void
+FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old_vector,
+                                                const DofMap &dof_map,
+                                                const Elem *elem,
+                                                DenseVector<Number> &Ue,
+                                                const unsigned int var,
+                                                const bool use_old_dof_indices)
 {
   // Side/edge DOF indices
   std::vector<unsigned int> new_side_dofs, old_side_dofs;
@@ -1005,8 +1019,10 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
   // We use local FE objects for now
   // FIXME: we should use more, external objects instead for efficiency
   const FEType& base_fe_type = dof_map.variable_type(var);
-  AutoPtr<FEBase> fe (FEBase::build(dim, base_fe_type));
-  AutoPtr<FEBase> fe_coarse (FEBase::build(dim, base_fe_type));
+  AutoPtr<FEGenericBase<OutputShape> > fe
+    (FEGenericBase<OutputShape>::build(dim, base_fe_type));
+  AutoPtr<FEGenericBase<OutputShape> > fe_coarse
+    (FEGenericBase<OutputShape>::build(dim, base_fe_type));
 
   AutoPtr<QBase> qrule     (base_fe_type.default_quadrature_rule(dim));
   AutoPtr<QBase> qedgerule (base_fe_type.default_quadrature_rule(1));
@@ -1015,26 +1031,26 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
 
   // The values of the shape functions at the quadrature
   // points
-  const std::vector<std::vector<Real> >& phi_values =
+  const std::vector<std::vector<OutputShape> >& phi_values =
     fe->get_phi();
-  const std::vector<std::vector<Real> >& phi_coarse =
+  const std::vector<std::vector<OutputShape> >& phi_coarse =
     fe_coarse->get_phi();
 
   // The gradients of the shape functions at the quadrature
   // points on the child element.
-  const std::vector<std::vector<RealGradient> > *dphi_values =
+  const std::vector<std::vector<OutputGradient> > *dphi_values =
     NULL;
-  const std::vector<std::vector<RealGradient> > *dphi_coarse =
+  const std::vector<std::vector<OutputGradient> > *dphi_coarse =
     NULL;
 
   const FEContinuity cont = fe->get_continuity();
 
   if (cont == C_ONE)
     {
-      const std::vector<std::vector<RealGradient> >&
+      const std::vector<std::vector<OutputGradient> >&
         ref_dphi_values = fe->get_dphi();
       dphi_values = &ref_dphi_values;
-      const std::vector<std::vector<RealGradient> >&
+      const std::vector<std::vector<OutputGradient> >&
         ref_dphi_coarse = fe_coarse->get_dphi();
       dphi_coarse = &ref_dphi_coarse;
     }
@@ -1187,9 +1203,9 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
             for (unsigned int qp=0; qp<n_qp; qp++)
               {
                 // solution value at the quadrature point
-                Number fineval = libMesh::zero;
+                OutputNumber fineval = libMesh::zero;
                 // solution grad at the quadrature point
-                Gradient finegrad;
+                OutputGradient finegrad;
 
                 // Sum the solution values * the DOF
                 // values at the quadrature point to
@@ -1201,8 +1217,8 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                       (old_vector(child_dof_indices[i])*
                       phi_values[i][qp]);
                     if (cont == C_ONE)
-                      finegrad.add_scaled((*dphi_values)[i][qp],
-                                          old_vector(child_dof_indices[i]));
+                      finegrad += (*dphi_values)[i][qp] *
+                                   old_vector(child_dof_indices[i]);
                   }
 
                 // Form edge projection matrix
@@ -1222,35 +1238,35 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                           new_side_dofs[sidej];
                         if (dof_is_fixed[j])
                           Fe(freei) -=
-                            phi_coarse[i][qp] *
-                            phi_coarse[j][qp] * JxW[qp] *
-                            Ue(j);
+                            libmesh_dot(phi_coarse[i][qp],
+                                        phi_coarse[j][qp]) * 
+                            JxW[qp] * Ue(j);
                         else
                           Ke(freei,freej) +=
-                            phi_coarse[i][qp] *
-                            phi_coarse[j][qp] * JxW[qp];
+                            libmesh_dot(phi_coarse[i][qp],
+                                        phi_coarse[j][qp]) * 
+                            JxW[qp];
                         if (cont == C_ONE)
                           {
                             if (dof_is_fixed[j])
                               Fe(freei) -=
-                                ((*dphi_coarse)[i][qp] *
-                                 (*dphi_coarse)[j][qp]) *
-                                JxW[qp] *
-                                Ue(j);
+                                libmesh_dot((*dphi_coarse)[i][qp],
+					    (*dphi_coarse)[j][qp]) *
+                                JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) +=
-                                ((*dphi_coarse)[i][qp] *
-                                 (*dphi_coarse)[j][qp])
-                                * JxW[qp];
+                                libmesh_dot((*dphi_coarse)[i][qp],
+					    (*dphi_coarse)[j][qp]) *
+                                JxW[qp];
                           }
                         if (!dof_is_fixed[j])
                           freej++;
                       }
-                    Fe(freei) += phi_coarse[i][qp] *
-                                 fineval * JxW[qp];
+                    Fe(freei) += libmesh_dot(phi_coarse[i][qp],
+                                             fineval) * JxW[qp];
                     if (cont == C_ONE)
                       Fe(freei) +=
-                        (finegrad * (*dphi_coarse)[i][qp]) * JxW[qp];
+                        libmesh_dot(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
                     freei++;
                   }
               }
@@ -1329,9 +1345,9 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
             for (unsigned int qp=0; qp<n_qp; qp++)
               {
                 // solution value at the quadrature point
-                Number fineval = libMesh::zero;
+                OutputNumber fineval = libMesh::zero;
                 // solution grad at the quadrature point
-                Gradient finegrad;
+                OutputGradient finegrad;
 
                 // Sum the solution values * the DOF
                 // values at the quadrature point to
@@ -1340,11 +1356,11 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                      i++)
                   {
                     fineval +=
-                      (old_vector(child_dof_indices[i])*
-                      phi_values[i][qp]);
+                      old_vector(child_dof_indices[i]) *
+                      phi_values[i][qp];
                     if (cont == C_ONE)
-                      finegrad.add_scaled((*dphi_values)[i][qp],
-                                          old_vector(child_dof_indices[i]));
+                      finegrad += (*dphi_values)[i][qp] *
+                                  old_vector(child_dof_indices[i]);
                   }
 
                 // Form side projection matrix
@@ -1364,34 +1380,34 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                           new_side_dofs[sidej];
                         if (dof_is_fixed[j])
                           Fe(freei) -=
-                            phi_coarse[i][qp] *
-                            phi_coarse[j][qp] * JxW[qp] *
-                            Ue(j);
+                            libmesh_dot(phi_coarse[i][qp],
+					phi_coarse[j][qp]) * 
+                            JxW[qp] * Ue(j);
                         else
                           Ke(freei,freej) +=
-                            phi_coarse[i][qp] *
-                            phi_coarse[j][qp] * JxW[qp];
+                            libmesh_dot(phi_coarse[i][qp],
+                                        phi_coarse[j][qp]) *
+                            JxW[qp];
                         if (cont == C_ONE)
                           {
                             if (dof_is_fixed[j])
                               Fe(freei) -=
-                                ((*dphi_coarse)[i][qp] *
-                                 (*dphi_coarse)[j][qp]) *
-                                JxW[qp] *
-                                Ue(j);
+                                libmesh_dot((*dphi_coarse)[i][qp],
+                                            (*dphi_coarse)[j][qp]) *
+                                JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) +=
-                                ((*dphi_coarse)[i][qp] *
-                                 (*dphi_coarse)[j][qp])
-                                * JxW[qp];
+                                libmesh_dot((*dphi_coarse)[i][qp],
+                                            (*dphi_coarse)[j][qp]) *
+                                JxW[qp];
                           }
                         if (!dof_is_fixed[j])
                           freej++;
                       }
-                    Fe(freei) += (fineval * phi_coarse[i][qp]) * JxW[qp];
+                    Fe(freei) += libmesh_dot(fineval, phi_coarse[i][qp]) * JxW[qp];
                     if (cont == C_ONE)
                       Fe(freei) +=
-                        (finegrad * (*dphi_coarse)[i][qp]) * JxW[qp];
+                        libmesh_dot(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
                     freei++;
                   }
               }
@@ -1452,9 +1468,9 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
       for (unsigned int qp=0; qp<n_qp; qp++)
         {
           // solution value at the quadrature point
-          Number fineval = libMesh::zero;
+          OutputNumber fineval = libMesh::zero;
           // solution grad at the quadrature point
-          Gradient finegrad;
+          OutputGradient finegrad;
 
           // Sum the solution values * the DOF
           // values at the quadrature point to
@@ -1462,11 +1478,11 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
           for (unsigned int i=0; i<child_n_dofs; i++)
             {
               fineval +=
-                (old_vector(child_dof_indices[i])*
+                (old_vector(child_dof_indices[i]) *
                  phi_values[i][qp]);
               if (cont == C_ONE)
-                finegrad.add_scaled((*dphi_values)[i][qp],
-                                    old_vector(child_dof_indices[i]));
+                finegrad += (*dphi_values)[i][qp] *
+                            old_vector(child_dof_indices[i]);
             }
 
           // Form interior projection matrix
@@ -1481,32 +1497,34 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
                 {
                   if (dof_is_fixed[j])
                     Fe(freei) -=
-                      phi_coarse[i][qp] *
-                      phi_coarse[j][qp] * JxW[qp] *
-                      Ue(j);
+                      libmesh_dot(phi_coarse[i][qp],
+                                  phi_coarse[j][qp]) *
+                      JxW[qp] * Ue(j);
                   else
                     Ke(freei,freej) +=
-                      phi_coarse[i][qp] *
-                      phi_coarse[j][qp] * JxW[qp];
+                      libmesh_dot(phi_coarse[i][qp],
+                                  phi_coarse[j][qp]) *
+                      JxW[qp];
                   if (cont == C_ONE)
                     {
                       if (dof_is_fixed[j])
                         Fe(freei) -=
-                          ((*dphi_coarse)[i][qp] *
-                           (*dphi_coarse)[j][qp]) *
+                          libmesh_dot((*dphi_coarse)[i][qp],
+                                      (*dphi_coarse)[j][qp]) *
                           JxW[qp] * Ue(j);
                       else
                         Ke(freei,freej) +=
-                          ((*dphi_coarse)[i][qp] *
-                           (*dphi_coarse)[j][qp]) * JxW[qp];
+                          libmesh_dot((*dphi_coarse)[i][qp],
+                                      (*dphi_coarse)[j][qp]) *
+                          JxW[qp];
                     }
                   if (!dof_is_fixed[j])
                     freej++;
                 }
-              Fe(freei) += phi_coarse[i][qp] * fineval *
+	      Fe(freei) += libmesh_dot(phi_coarse[i][qp], fineval) *
                            JxW[qp];
               if (cont == C_ONE)
-                Fe(freei) += (finegrad * (*dphi_coarse)[i][qp]) * JxW[qp];
+                Fe(freei) += libmesh_dot(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
               freei++;
             }
         }
@@ -1530,10 +1548,12 @@ void FEBase::coarsened_dof_values(const NumericVector<Number> &old_vector,
 
 
 
-void FEBase::compute_proj_constraints (DofConstraints &constraints,
-				       DofMap &dof_map,
-				       const unsigned int variable_number,
-				       const Elem* elem)
+template <typename OutputType>
+void
+FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints,
+				                     DofMap &dof_map,
+				                     const unsigned int variable_number,
+				                     const Elem* elem)
 {
   libmesh_assert (elem != NULL);
 
@@ -1550,7 +1570,8 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
   const FEType& base_fe_type = dof_map.variable_type(variable_number);
 
   // Construct FE objects for this element and its neighbors.
-  AutoPtr<FEBase> my_fe (FEBase::build(Dim, base_fe_type));
+  AutoPtr<FEGenericBase<OutputShape> > my_fe
+    (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
   const FEContinuity cont = my_fe->get_continuity();
 
   // We don't need to constrain discontinuous elements
@@ -1558,7 +1579,8 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
     return;
   libmesh_assert (cont == C_ZERO || cont == C_ONE);
 
-  AutoPtr<FEBase> neigh_fe (FEBase::build(Dim, base_fe_type));
+  AutoPtr<FEGenericBase<OutputShape> > neigh_fe
+    (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
 
   QGauss my_qface(Dim-1, base_fe_type.default_quadrature_order());
   my_fe->attach_quadrature_rule (&my_qface);
@@ -1566,12 +1588,12 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 
   const std::vector<Real>& JxW = my_fe->get_JxW();
   const std::vector<Point>& q_point = my_fe->get_xyz();
-  const std::vector<std::vector<Real> >& phi = my_fe->get_phi();
-  const std::vector<std::vector<Real> >& neigh_phi =
+  const std::vector<std::vector<OutputShape> >& phi = my_fe->get_phi();
+  const std::vector<std::vector<OutputShape> >& neigh_phi =
 		  neigh_fe->get_phi();
   const std::vector<Point> *face_normals = NULL;
-  const std::vector<std::vector<RealGradient> > *dphi = NULL;
-  const std::vector<std::vector<RealGradient> > *neigh_dphi = NULL;
+  const std::vector<std::vector<OutputGradient> > *dphi = NULL;
+  const std::vector<std::vector<OutputGradient> > *neigh_dphi = NULL;
 
   std::vector<unsigned int> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
@@ -1581,10 +1603,10 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
       const std::vector<Point>& ref_face_normals =
         my_fe->get_normals();
       face_normals = &ref_face_normals;
-      const std::vector<std::vector<RealGradient> >& ref_dphi =
+      const std::vector<std::vector<OutputGradient> >& ref_dphi =
 	my_fe->get_dphi();
       dphi = &ref_dphi;
-      const std::vector<std::vector<RealGradient> >& ref_neigh_dphi =
+      const std::vector<std::vector<OutputGradient> >& ref_neigh_dphi =
 	neigh_fe->get_dphi();
       neigh_dphi = &ref_neigh_dphi;
     }
@@ -1680,12 +1702,13 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 	            const unsigned int j = my_side_dofs[js];
 		    for (unsigned int qp = 0; qp != n_qp; ++qp)
                       {
-		        Ke(is,js) += JxW[qp] * (phi[i][qp] * phi[j][qp]);
+		        Ke(is,js) += JxW[qp] * libmesh_dot(phi[i][qp], phi[j][qp]);
                         if (cont != C_ZERO)
-		          Ke(is,js) += JxW[qp] * (((*dphi)[i][qp] *
-					         (*face_normals)[qp]) *
-					        ((*dphi)[j][qp] *
-					         (*face_normals)[qp]));
+		          Ke(is,js) += JxW[qp] *
+                                       libmesh_dot((*dphi)[i][qp] *
+					           (*face_normals)[qp],
+					           (*dphi)[j][qp] *
+					           (*face_normals)[qp]);
                       }
 		  }
 	      }
@@ -1701,13 +1724,15 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 	            const unsigned int j = my_side_dofs[js];
 	            for (unsigned int qp = 0; qp != n_qp; ++qp)
                       {
-		        Fe(js) += JxW[qp] * (neigh_phi[i][qp] *
-					     phi[j][qp]);
+		        Fe(js) += JxW[qp] * 
+                                  libmesh_dot(neigh_phi[i][qp],
+					      phi[j][qp]);
                         if (cont != C_ZERO)
-		          Fe(js) += JxW[qp] * (((*neigh_dphi)[i][qp] *
-					        (*face_normals)[qp]) *
-					       ((*dphi)[j][qp] *
-					        (*face_normals)[qp]));
+		          Fe(js) += JxW[qp] * 
+                                    libmesh_dot((*neigh_dphi)[i][qp] *
+					        (*face_normals)[qp],
+					        (*dphi)[j][qp] *
+					        (*face_normals)[qp]);
                       }
 		  }
 	        Ke.cholesky_solve(Fe, Ue[is]);
@@ -1770,13 +1795,16 @@ void FEBase::compute_proj_constraints (DofConstraints &constraints,
 
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-void FEBase::compute_periodic_constraints (DofConstraints &constraints,
-                                           DofMap &dof_map,
-                                           const PeriodicBoundaries &boundaries,
-                                           const MeshBase &mesh,
-                                           const PointLocatorBase *point_locator,
-                                           const unsigned int variable_number,
-				           const Elem* elem)
+template <typename OutputType>
+void 
+FEGenericBase<OutputType>::
+compute_periodic_constraints (DofConstraints &constraints,
+                              DofMap &dof_map,
+                              const PeriodicBoundaries &boundaries,
+                              const MeshBase &mesh,
+                              const PointLocatorBase *point_locator,
+                              const unsigned int variable_number,
+			      const Elem* elem)
 {
   // Only bother if we truly have periodic boundaries
   if (boundaries.empty())
@@ -1793,7 +1821,8 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
   const FEType& base_fe_type = dof_map.variable_type(variable_number);
 
   // Construct FE objects for this element and its pseudo-neighbors.
-  AutoPtr<FEBase> my_fe (FEBase::build(Dim, base_fe_type));
+  AutoPtr<FEGenericBase<OutputShape> > my_fe
+    (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
   const FEContinuity cont = my_fe->get_continuity();
 
   // We don't need to constrain discontinuous elements
@@ -1801,7 +1830,8 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
     return;
   libmesh_assert (cont == C_ZERO || cont == C_ONE);
 
-  AutoPtr<FEBase> neigh_fe (FEBase::build(Dim, base_fe_type));
+  AutoPtr<FEGenericBase<OutputShape> > neigh_fe
+    (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
 
   QGauss my_qface(Dim-1, base_fe_type.default_quadrature_order());
   my_fe->attach_quadrature_rule (&my_qface);
@@ -1809,12 +1839,12 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 
   const std::vector<Real>& JxW = my_fe->get_JxW();
   const std::vector<Point>& q_point = my_fe->get_xyz();
-  const std::vector<std::vector<Real> >& phi = my_fe->get_phi();
-  const std::vector<std::vector<Real> >& neigh_phi =
+  const std::vector<std::vector<OutputShape> >& phi = my_fe->get_phi();
+  const std::vector<std::vector<OutputShape> >& neigh_phi =
 		  neigh_fe->get_phi();
   const std::vector<Point> *face_normals = NULL;
-  const std::vector<std::vector<RealGradient> > *dphi = NULL;
-  const std::vector<std::vector<RealGradient> > *neigh_dphi = NULL;
+  const std::vector<std::vector<OutputGradient> > *dphi = NULL;
+  const std::vector<std::vector<OutputGradient> > *neigh_dphi = NULL;
   std::vector<unsigned int> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
 
@@ -1823,10 +1853,10 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
       const std::vector<Point>& ref_face_normals =
         my_fe->get_normals();
       face_normals = &ref_face_normals;
-      const std::vector<std::vector<RealGradient> >& ref_dphi =
+      const std::vector<std::vector<OutputGradient> >& ref_dphi =
 	my_fe->get_dphi();
       dphi = &ref_dphi;
-      const std::vector<std::vector<RealGradient> >& ref_neigh_dphi =
+      const std::vector<std::vector<OutputGradient> >& ref_neigh_dphi =
 	neigh_fe->get_dphi();
       neigh_dphi = &ref_neigh_dphi;
     }
@@ -1935,12 +1965,15 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 	                  const unsigned int j = my_side_dofs[js];
 		          for (unsigned int qp = 0; qp != n_qp; ++qp)
                             {
-		              Ke(is,js) += JxW[qp] * (phi[i][qp] * phi[j][qp]);
+		              Ke(is,js) += JxW[qp] *
+					   libmesh_dot(phi[i][qp],
+                                                       phi[j][qp]);
                               if (cont != C_ZERO)
-		                Ke(is,js) += JxW[qp] * (((*dphi)[i][qp] *
-					               (*face_normals)[qp]) *
-					              ((*dphi)[j][qp] *
-					               (*face_normals)[qp]));
+		                Ke(is,js) += JxW[qp] * 
+                                             libmesh_dot((*dphi)[i][qp] *
+					                 (*face_normals)[qp],
+					                 (*dphi)[j][qp] *
+					                 (*face_normals)[qp]);
                             }
 		        }
 	            }
@@ -1956,13 +1989,15 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 	                  const unsigned int j = my_side_dofs[js];
 	                  for (unsigned int qp = 0; qp != n_qp; ++qp)
                             {
-		              Fe(js) += JxW[qp] * (neigh_phi[i][qp] *
-					           phi[j][qp]);
+		              Fe(js) += JxW[qp] * 
+                                        libmesh_dot(neigh_phi[i][qp],
+					            phi[j][qp]);
                               if (cont != C_ZERO)
-		                Fe(js) += JxW[qp] * (((*neigh_dphi)[i][qp] *
-					              (*face_normals)[qp]) *
-					             ((*dphi)[j][qp] *
-					              (*face_normals)[qp]));
+		                Fe(js) += JxW[qp] *
+                                          libmesh_dot((*neigh_dphi)[i][qp] *
+					              (*face_normals)[qp],
+					              (*dphi)[j][qp] *
+					              (*face_normals)[qp]);
                             }
 		        }
 	              Ke.cholesky_solve(Fe, Ue[is]);
@@ -2062,5 +2097,9 @@ void FEBase::compute_periodic_constraints (DofConstraints &constraints,
 
 #endif // LIBMESH_ENABLE_PERIODIC
 
+// ------------------------------------------------------------
+// Explicit instantiations
+template class FEGenericBase<Real>;
+template class FEGenericBase<RealGradient>;
 
 } // namespace libMesh

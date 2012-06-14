@@ -33,8 +33,10 @@
 #include <cstddef>
 #include <vector>
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "tensor_value.h"
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#include "type_n_tensor.h"
 #endif
 
 namespace libMesh
@@ -73,8 +75,11 @@ class InfFE;
  * elements may be derived.  In the current implementation the
  * templated derived class \p FE offers a wide variety of commonly
  * used finite element concepts.  Check there for details.
- * Use the \p FEBase::build() method to create an object of any of
- * the derived classes.
+ *
+ * Use the \p FEGenericBase<OutputType>::build() method to create an
+ * object of any of the derived classes which is compatible with
+ * OutputType.
+ *
  * Note that the amount of virtual members is kept to a minimum,
  * and the sophisticated template scheme of \p FE is quite
  * likely to offer acceptably fast code.
@@ -94,7 +99,8 @@ class InfFE;
 
 // ------------------------------------------------------------
 // FEBase class definition
-class FEBase : public FEAbstract
+template <typename OutputType>
+class FEGenericBase : public FEAbstract
 {
 protected:
 
@@ -103,33 +109,50 @@ protected:
    * structures.  Protected so that this base class
    * cannot be explicitly instantiated.
    */
-  FEBase (const unsigned int dim,
-	  const FEType& fet);
+  FEGenericBase (const unsigned int dim,
+	         const FEType& fet);
 
 public:
 
   /**
    * Destructor.
    */
-  virtual ~FEBase();
+  virtual ~FEGenericBase();
 
   /**
-   * Builds a specific finite element type.  A \p AutoPtr<FEBase> is
-   * returned to prevent a memory leak. This way the user need not
-   * remember to delete the object.
+   * Builds a specific finite element type.  A \p
+   * AutoPtr<FEGenericBase> is returned to prevent a memory leak. This
+   * way the user need not remember to delete the object.
+   *
+   * The build call will fail if the OutputType of this class is not
+   * compatible with the output required for the requested \p type
    */
-  static AutoPtr<FEBase> build (const unsigned int dim,
-				const FEType& type);
+  static AutoPtr<FEGenericBase> build (const unsigned int dim,
+				       const FEType& type);
+
+  /**
+   * Convenient typedefs for gradients of output, hessians of output,
+   * and potentially-complex-valued versions of same.
+   */
+  typedef OutputType                                         OutputShape;
+  typedef typename IncrementRank<OutputShape>::type          OutputGradient;
+  typedef typename IncrementRank<OutputGradient>::type       OutputTensor;
+  typedef typename MakeNumber<OutputShape>::type             OutputNumber;
+  typedef typename IncrementRank<OutputNumber>::type         OutputNumberGradient;
+  typedef typename IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
-   * Builds a specific infinite element type.  A \p AutoPtr<FEBase> is
-   * returned to prevent a memory leak. This way the user need not
-   * remember to delete the object.
+   * Builds a specific infinite element type.  A \p
+   * AutoPtr<FEGenericBase> is returned to prevent a memory leak. This
+   * way the user need not remember to delete the object.
+   *
+   * The build call will fail if the OutputShape of this class is not
+   * compatible with the output required for the requested \p type
    */
-  static AutoPtr<FEBase> build_InfFE (const unsigned int dim,
-				      const FEType& type);
+  static AutoPtr<FEGenericBase> build_InfFE (const unsigned int dim,
+				             const FEType& type);
 
 #endif
 
@@ -181,7 +204,7 @@ public:
    * @returns the shape function values at the quadrature points
    * on the element.
    */
-  const std::vector<std::vector<Real> >& get_phi() const
+  const std::vector<std::vector<OutputShape> >& get_phi() const
   { libmesh_assert(!calculations_started || calculate_phi);
     calculate_phi = true; return phi; }
 
@@ -189,7 +212,7 @@ public:
    * @returns the shape function derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<RealGradient> >& get_dphi() const
+  const std::vector<std::vector<OutputGradient> >& get_dphi() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphi; }
 
@@ -197,7 +220,7 @@ public:
    * @returns the shape function x-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidx() const
+  const std::vector<std::vector<OutputShape> >& get_dphidx() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidx; }
 
@@ -205,7 +228,7 @@ public:
    * @returns the shape function y-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidy() const
+  const std::vector<std::vector<OutputShape> >& get_dphidy() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidy; }
 
@@ -213,7 +236,7 @@ public:
    * @returns the shape function z-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidz() const
+  const std::vector<std::vector<OutputShape> >& get_dphidz() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidz; }
 
@@ -221,7 +244,7 @@ public:
    * @returns the shape function xi-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidxi() const
+  const std::vector<std::vector<OutputShape> >& get_dphidxi() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidxi; }
 
@@ -229,7 +252,7 @@ public:
    * @returns the shape function eta-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphideta() const
+  const std::vector<std::vector<OutputShape> >& get_dphideta() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphideta; }
 
@@ -237,7 +260,7 @@ public:
    * @returns the shape function zeta-derivative at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_dphidzeta() const
+  const std::vector<std::vector<OutputShape> >& get_dphidzeta() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = true; return dphidzeta; }
 
@@ -247,7 +270,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<RealTensor> >& get_d2phi() const
+  const std::vector<std::vector<OutputTensor> >& get_d2phi() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phi; }
 
@@ -255,7 +278,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidx2() const
+  const std::vector<std::vector<OutputShape> >& get_d2phidx2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidx2; }
 
@@ -263,7 +286,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidxdy() const
+  const std::vector<std::vector<OutputShape> >& get_d2phidxdy() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidxdy; }
 
@@ -271,7 +294,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidxdz() const
+  const std::vector<std::vector<OutputShape> >& get_d2phidxdz() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidxdz; }
 
@@ -279,7 +302,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidy2() const
+  const std::vector<std::vector<OutputShape> >& get_d2phidy2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidy2; }
 
@@ -287,7 +310,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidydz() const
+  const std::vector<std::vector<OutputShape> >& get_d2phidydz() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidydz; }
 
@@ -295,7 +318,7 @@ public:
    * @returns the shape function second derivatives at the quadrature
    * points.
    */
-  const std::vector<std::vector<Real> >& get_d2phidz2() const
+  const std::vector<std::vector<OutputShape> >& get_d2phidz2() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = true; return d2phidz2; }
 
@@ -313,7 +336,7 @@ public:
    * formulation for an @e infinite element returns correct element
    * matrices for a mesh using both finite and infinite elements.
    */
-  const std::vector<RealGradient>& get_dphase() const
+  const std::vector<OutputGradient>& get_dphase() const
       { return dphase; }
 
 
@@ -397,42 +420,42 @@ protected:
   /**
    * Shape function values.
    */
-  std::vector<std::vector<Real> >   phi;
+  std::vector<std::vector<OutputShape> >   phi;
 
   /**
    * Shape function derivative values.
    */
-  std::vector<std::vector<RealGradient> >  dphi;
+  std::vector<std::vector<OutputGradient> >  dphi;
 
   /**
    * Shape function derivatives in the xi direction.
    */
-  std::vector<std::vector<Real> >   dphidxi;
+  std::vector<std::vector<OutputShape> >   dphidxi;
 
   /**
    * Shape function derivatives in the eta direction.
    */
-  std::vector<std::vector<Real> >   dphideta;
+  std::vector<std::vector<OutputShape> >   dphideta;
 
   /**
    * Shape function derivatives in the zeta direction.
    */
-  std::vector<std::vector<Real> >   dphidzeta;
+  std::vector<std::vector<OutputShape> >   dphidzeta;
 
   /**
    * Shape function derivatives in the x direction.
    */
-  std::vector<std::vector<Real> >   dphidx;
+  std::vector<std::vector<OutputShape> >   dphidx;
 
   /**
    * Shape function derivatives in the y direction.
    */
-  std::vector<std::vector<Real> >   dphidy;
+  std::vector<std::vector<OutputShape> >   dphidy;
 
   /**
    * Shape function derivatives in the z direction.
    */
-  std::vector<std::vector<Real> >   dphidz;
+  std::vector<std::vector<OutputShape> >   dphidz;
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -440,67 +463,67 @@ protected:
   /**
    * Shape function second derivative values.
    */
-  std::vector<std::vector<RealTensor> >  d2phi;
+  std::vector<std::vector<OutputTensor> >  d2phi;
 
   /**
    * Shape function second derivatives in the xi direction.
    */
-  std::vector<std::vector<Real> >   d2phidxi2;
+  std::vector<std::vector<OutputShape> >   d2phidxi2;
 
   /**
    * Shape function second derivatives in the xi-eta direction.
    */
-  std::vector<std::vector<Real> >   d2phidxideta;
+  std::vector<std::vector<OutputShape> >   d2phidxideta;
 
   /**
    * Shape function second derivatives in the xi-zeta direction.
    */
-  std::vector<std::vector<Real> >   d2phidxidzeta;
+  std::vector<std::vector<OutputShape> >   d2phidxidzeta;
 
   /**
    * Shape function second derivatives in the eta direction.
    */
-  std::vector<std::vector<Real> >   d2phideta2;
+  std::vector<std::vector<OutputShape> >   d2phideta2;
 
   /**
    * Shape function second derivatives in the eta-zeta direction.
    */
-  std::vector<std::vector<Real> >   d2phidetadzeta;
+  std::vector<std::vector<OutputShape> >   d2phidetadzeta;
 
   /**
    * Shape function second derivatives in the zeta direction.
    */
-  std::vector<std::vector<Real> >   d2phidzeta2;
+  std::vector<std::vector<OutputShape> >   d2phidzeta2;
 
   /**
    * Shape function second derivatives in the x direction.
    */
-  std::vector<std::vector<Real> >   d2phidx2;
+  std::vector<std::vector<OutputShape> >   d2phidx2;
 
   /**
    * Shape function second derivatives in the x-y direction.
    */
-  std::vector<std::vector<Real> >   d2phidxdy;
+  std::vector<std::vector<OutputShape> >   d2phidxdy;
 
   /**
    * Shape function second derivatives in the x-z direction.
    */
-  std::vector<std::vector<Real> >   d2phidxdz;
+  std::vector<std::vector<OutputShape> >   d2phidxdz;
 
   /**
    * Shape function second derivatives in the y direction.
    */
-  std::vector<std::vector<Real> >   d2phidy2;
+  std::vector<std::vector<OutputShape> >   d2phidy2;
 
   /**
    * Shape function second derivatives in the y-z direction.
    */
-  std::vector<std::vector<Real> >   d2phidydz;
+  std::vector<std::vector<OutputShape> >   d2phidydz;
 
   /**
    * Shape function second derivatives in the z direction.
    */
-  std::vector<std::vector<Real> >   d2phidz2;
+  std::vector<std::vector<OutputShape> >   d2phidz2;
 
 #endif
 
@@ -518,7 +541,7 @@ protected:
    * the first derivatives of the phase term in global coordinates,
    * over @e all quadrature points.
    */
-  std::vector<RealGradient> dphase;
+  std::vector<OutputGradient> dphase;
 
   /**
    * Used for certain @e infinite element families:
@@ -543,7 +566,7 @@ private:
   /**
    * Make all \p InfFE<Dim,T_radial,T_map> classes friends
    * so that they can safely used \p FE<Dim-1,T_base> through
-   * a \p FEBase* as base approximation.
+   * a \p FEGenericBase* as base approximation.
    */
   template <unsigned int friend_Dim, FEFamily friend_T_radial, InfMapType friend_T_map>
   friend class InfFE;
@@ -554,13 +577,19 @@ private:
 };
 
 
+// Typedefs for convenience and backwards compatibility
+typedef FEGenericBase<Real> FEBase;
+typedef FEGenericBase<RealGradient> FEVectorBase;
+
+
 
 
 // ------------------------------------------------------------
-// FEBase class inline members
+// FEGenericBase class inline members
+template <typename OutputType>
 inline
-FEBase::FEBase(const unsigned int d,
-	       const FEType& fet) :
+FEGenericBase<OutputType>::FEGenericBase(const unsigned int d,
+	                                 const FEType& fet) :
   FEAbstract(d,fet),
   phi(),
   dphi(),
@@ -595,8 +624,9 @@ FEBase::FEBase(const unsigned int d,
 
 
 
+template <typename OutputType>
 inline
-FEBase::~FEBase()
+FEGenericBase<OutputType>::~FEGenericBase()
 {
 }
 
