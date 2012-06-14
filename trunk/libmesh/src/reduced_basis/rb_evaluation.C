@@ -111,7 +111,8 @@ bool RBEvaluation::is_rb_theta_expansion_initialized() const
   }
 }
 
-void RBEvaluation::resize_data_structures(const unsigned int Nmax)
+void RBEvaluation::resize_data_structures(const unsigned int Nmax,
+                                          bool resize_error_bound_data)
 {
   START_LOG("resize_data_structures()", "RBEvaluation");
 
@@ -143,31 +144,6 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax)
     RB_F_q_vector[q].resize(Nmax);
   }
 
-  // Initialize vectors for the norms of the Fq representors
-  unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
-  Fq_representor_norms.resize(Q_f_hat);
-
-  // Initialize vectors for the norms of the representors
-  Fq_Aq_representor_norms.resize(rb_theta_expansion->get_Q_f());
-  for(unsigned int i=0; i<rb_theta_expansion->get_Q_f(); i++)
-  {
-    Fq_Aq_representor_norms[i].resize(rb_theta_expansion->get_Q_a());
-    for(unsigned int j=0; j<rb_theta_expansion->get_Q_a(); j++)
-    {
-      Fq_Aq_representor_norms[i][j].resize(Nmax, 0.);
-    }
-  }
-
-  unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
-  Aq_Aq_representor_norms.resize(Q_a_hat);
-  for(unsigned int i=0; i<Q_a_hat; i++)
-  {
-    Aq_Aq_representor_norms[i].resize(Nmax);
-    for(unsigned int j=0; j<Nmax; j++)
-    {
-      Aq_Aq_representor_norms[i][j].resize(Nmax, 0.);
-    }
-  }
 
   // Initialize the RB output vectors
   RB_output_vectors.resize(rb_theta_expansion->get_n_outputs());
@@ -182,24 +158,56 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax)
 
   // Initialize vectors storing output data
   RB_outputs.resize(rb_theta_expansion->get_n_outputs(), 0.);
-  RB_output_error_bounds.resize(rb_theta_expansion->get_n_outputs(), 0.);
 
-  // Resize the output dual norm vectors
-  output_dual_norms.resize(rb_theta_expansion->get_n_outputs());
-  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+
+  if(resize_error_bound_data)
   {
-    unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
-    output_dual_norms[n].resize(Q_l_hat);
+    // Initialize vectors for the norms of the Fq representors
+    unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
+    Fq_representor_norms.resize(Q_f_hat);
+
+    // Initialize vectors for the norms of the representors
+    Fq_Aq_representor_norms.resize(rb_theta_expansion->get_Q_f());
+    for(unsigned int i=0; i<rb_theta_expansion->get_Q_f(); i++)
+    {
+      Fq_Aq_representor_norms[i].resize(rb_theta_expansion->get_Q_a());
+      for(unsigned int j=0; j<rb_theta_expansion->get_Q_a(); j++)
+      {
+        Fq_Aq_representor_norms[i][j].resize(Nmax, 0.);
+      }
+    }
+    
+    unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
+    Aq_Aq_representor_norms.resize(Q_a_hat);
+    for(unsigned int i=0; i<Q_a_hat; i++)
+    {
+      Aq_Aq_representor_norms[i].resize(Nmax);
+      for(unsigned int j=0; j<Nmax; j++)
+      {
+        Aq_Aq_representor_norms[i][j].resize(Nmax, 0.);
+      }
+    }
+    
+    RB_output_error_bounds.resize(rb_theta_expansion->get_n_outputs(), 0.);
+
+    // Resize the output dual norm vectors
+    output_dual_norms.resize(rb_theta_expansion->get_n_outputs());
+    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
+    {
+      unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
+      output_dual_norms[n].resize(Q_l_hat);
+    }
+    
+    // Clear and resize the vector of A_q_representors
+    clear_riesz_representors();
+
+    A_q_representor.resize(rb_theta_expansion->get_Q_a());
+    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+    {
+      A_q_representor[q_a].resize(Nmax);
+    }
   }
 
-  // Clear and resize the vector of A_q_representors
-  clear_riesz_representors();
-
-  A_q_representor.resize(rb_theta_expansion->get_Q_a());
-  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
-  {
-    A_q_representor[q_a].resize(Nmax);
-  }
 
   STOP_LOG("resize_data_structures()", "RBEvaluation");
 }
@@ -733,7 +741,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
   STOP_LOG("write_offline_data_to_files()", "RBEvaluation");
 }
 
-void RBEvaluation::read_offline_data_from_files(const std::string& directory_name)
+void RBEvaluation::read_offline_data_from_files(const std::string& directory_name, bool read_error_bound_data)
 {
   START_LOG("read_offline_data_from_files()", "RBEvaluation");
 
@@ -754,53 +762,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     n_bfs_in.close();
   }
 
-  resize_data_structures(n_bfs);
-
-  // Next read in F_q representor norm data
-  std::ifstream RB_Fq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Fq_norms.dat";
-    RB_Fq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Fq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Fq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
-  for(unsigned int i=0; i<Q_f_hat; i++)
-  {
-    RB_Fq_norms_in >> Fq_representor_norms[i];
-  }
-  RB_Fq_norms_in.close();
-
-
-  // Read in output data
-  for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-  {
-    std::ifstream output_dual_norms_in;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/output_";
-      OSSRealzeroright(file_name,3,0,n);
-      file_name << "_dual_norms.dat";
-      output_dual_norms_in.open(file_name.str().c_str());
-    }
-    if ( !output_dual_norms_in.good() )
-    {
-      libMesh::err << "Error opening input " << n << " dual norms file" << std::endl;
-      libmesh_error();
-    }
-
-    unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
-    for(unsigned int q=0; q<Q_l_hat; q++)
-    {
-      output_dual_norms_in >> output_dual_norms[n][q];
-    }
-    output_dual_norms_in.close();
-  }
-
+  resize_data_structures(n_bfs, read_error_bound_data);
 
   // Read in output data in multiple files
   for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
@@ -939,54 +901,102 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   }
 
 
-  // Next read in Fq_Aq representor norm data
-  std::ifstream RB_Fq_Aq_norms_in;
+  if(read_error_bound_data)
   {
-    OStringStream file_name;
-    file_name << directory_name << "/Fq_Aq_norms.dat";
-    RB_Fq_Aq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Fq_Aq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Fq_Aq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
-  {
-    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+    // Next read in F_q representor norm data
+    std::ifstream RB_Fq_norms_in;
     {
-      for(unsigned int i=0; i<n_bfs; i++)
-      {
-        RB_Fq_Aq_norms_in >> Fq_Aq_representor_norms[q_f][q_a][i];
-      }
+      OStringStream file_name;
+      file_name << directory_name << "/Fq_norms.dat";
+      RB_Fq_norms_in.open(file_name.str().c_str());
     }
-  }
-  RB_Fq_Aq_norms_in.close();
+    if ( !RB_Fq_norms_in.good() )
+    {
+      libMesh::err << "Error opening Fq_norms.dat" << std::endl;
+      libmesh_error();
+    }
+    unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
+    for(unsigned int i=0; i<Q_f_hat; i++)
+    {
+      RB_Fq_norms_in >> Fq_representor_norms[i];
+    }
+    RB_Fq_norms_in.close();
 
-  // Next read in Aq_Aq representor norm data
-  std::ifstream RB_Aq_Aq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Aq_Aq_norms.dat";
-    RB_Aq_Aq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Aq_Aq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Aq_Aq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
-  for(unsigned int i=0; i<Q_a_hat; i++)
-  {
-    for(unsigned int j=0; j<n_bfs; j++)
+    // Read in output data
+    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
-      for(unsigned int l=0; l<n_bfs; l++)
+      std::ifstream output_dual_norms_in;
       {
-        RB_Aq_Aq_norms_in >> Aq_Aq_representor_norms[i][j][l];
+        OStringStream file_name;
+        file_name << directory_name << "/output_";
+        OSSRealzeroright(file_name,3,0,n);
+        file_name << "_dual_norms.dat";
+        output_dual_norms_in.open(file_name.str().c_str());
+      }
+      if ( !output_dual_norms_in.good() )
+      {
+        libMesh::err << "Error opening input " << n << " dual norms file" << std::endl;
+        libmesh_error();
+      }
+
+      unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
+      for(unsigned int q=0; q<Q_l_hat; q++)
+      {
+        output_dual_norms_in >> output_dual_norms[n][q];
+      }
+      output_dual_norms_in.close();
+    }
+
+
+    // Next read in Fq_Aq representor norm data
+    std::ifstream RB_Fq_Aq_norms_in;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/Fq_Aq_norms.dat";
+      RB_Fq_Aq_norms_in.open(file_name.str().c_str());
+    }
+    if ( !RB_Fq_Aq_norms_in.good() )
+    {
+      libMesh::err << "Error opening Fq_Aq_norms.dat" << std::endl;
+      libmesh_error();
+    }
+    for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
+    {
+      for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+      {
+        for(unsigned int i=0; i<n_bfs; i++)
+        {
+          RB_Fq_Aq_norms_in >> Fq_Aq_representor_norms[q_f][q_a][i];
+        }
       }
     }
+    RB_Fq_Aq_norms_in.close();
+
+    // Next read in Aq_Aq representor norm data
+    std::ifstream RB_Aq_Aq_norms_in;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/Aq_Aq_norms.dat";
+      RB_Aq_Aq_norms_in.open(file_name.str().c_str());
+    }
+    if ( !RB_Aq_Aq_norms_in.good() )
+    {
+      libMesh::err << "Error opening Aq_Aq_norms.dat" << std::endl;
+      libmesh_error();
+    }
+    unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
+    for(unsigned int i=0; i<Q_a_hat; i++)
+    {
+      for(unsigned int j=0; j<n_bfs; j++)
+      {
+        for(unsigned int l=0; l<n_bfs; l++)
+        {
+          RB_Aq_Aq_norms_in >> Aq_Aq_representor_norms[i][j][l];
+        }
+      }
+    }
+    RB_Aq_Aq_norms_in.close();
   }
-  RB_Aq_Aq_norms_in.close();
 
   // Resize basis_functions even if we don't read them in so that
   // get_n_bfs() returns the correct value. Initialize the pointers
