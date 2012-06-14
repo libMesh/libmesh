@@ -95,7 +95,8 @@ public:
    * Resize the data structures for storing data associated
    * with this object.
    */
-  virtual void resize_data_structures(const unsigned int Nmax);
+  virtual void resize_data_structures(const unsigned int Nmax,
+                                      bool resize_error_bound_data=true);
 
   /**
    * Attach the parametrized function that we will approximate
@@ -149,7 +150,8 @@ public:
    * Read in the saved Offline reduced basis data
    * to initialize the system for Online solves.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
+  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
+                                            bool read_error_bound_data=true);
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
