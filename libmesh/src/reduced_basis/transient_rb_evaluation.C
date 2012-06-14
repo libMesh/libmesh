@@ -70,11 +70,12 @@ void TransientRBEvaluation::clear_riesz_representors()
   }
 }
 
-void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax)
+void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
+                                                   bool resize_error_bound_data)
 {
   START_LOG("resize_data_structures()", "TransientRBEvaluation");
 
-  Parent::resize_data_structures(Nmax);
+  Parent::resize_data_structures(Nmax, resize_error_bound_data);
 
   RB_L2_matrix.resize(Nmax,Nmax);
 
@@ -92,42 +93,6 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax)
     RB_M_q_vector[q].resize(Nmax,Nmax);
   }
 
-  // Initialize vectors for the norms of the representors
-  Fq_Mq_representor_norms.resize(Q_f);
-  for(unsigned int i=0; i<Q_f; i++)
-  {
-    Fq_Mq_representor_norms[i].resize(Q_m);
-    for(unsigned int j=0; j<Q_m; j++)
-    {
-      Fq_Mq_representor_norms[i][j].resize(Nmax, 0.);
-    }
-  }
-
-  unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
-  Mq_Mq_representor_norms.resize(Q_m_hat);
-  for(unsigned int i=0; i<Q_m_hat; i++)
-  {
-    Mq_Mq_representor_norms[i].resize(Nmax);
-    for(unsigned int j=0; j<Nmax; j++)
-    {
-      Mq_Mq_representor_norms[i][j].resize(Nmax, 0.);
-    }
-  }
-
-  Aq_Mq_representor_norms.resize(Q_a);
-  for(unsigned int i=0; i<Q_a; i++)
-  {
-    Aq_Mq_representor_norms[i].resize(Q_m);
-    for(unsigned int j=0; j<Q_m; j++)
-    {
-      Aq_Mq_representor_norms[i][j].resize(Nmax);
-      for(unsigned int k=0; k<Nmax; k++)
-      {
-        Aq_Mq_representor_norms[i][j][k].resize(Nmax, 0.);
-      }
-    }
-  }
-
   // Initialize the initial condition storage
   RB_initial_condition_all_N.resize(Nmax);
   for(unsigned int i=0; i<RB_initial_condition_all_N.size(); i++)
@@ -138,13 +103,53 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax)
 
   initial_L2_error_all_N.resize(Nmax, 0.);
 
-  // Resize M_q_representor
-  // This is cleared in the call to clear_riesz_representors
-  // in Parent::resize_RB_data, so just resize here
-  M_q_representor.resize(Q_m);
-  for(unsigned int q_m=0; q_m<Q_m; q_m++)
+
+  if(resize_error_bound_data)
   {
-    M_q_representor[q_m].resize(Nmax);
+    // Initialize vectors for the norms of the representors
+    Fq_Mq_representor_norms.resize(Q_f);
+    for(unsigned int i=0; i<Q_f; i++)
+    {
+      Fq_Mq_representor_norms[i].resize(Q_m);
+      for(unsigned int j=0; j<Q_m; j++)
+      {
+        Fq_Mq_representor_norms[i][j].resize(Nmax, 0.);
+      }
+    }
+
+    unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
+    Mq_Mq_representor_norms.resize(Q_m_hat);
+    for(unsigned int i=0; i<Q_m_hat; i++)
+    {
+      Mq_Mq_representor_norms[i].resize(Nmax);
+      for(unsigned int j=0; j<Nmax; j++)
+      {
+        Mq_Mq_representor_norms[i][j].resize(Nmax, 0.);
+      }
+    }
+
+    Aq_Mq_representor_norms.resize(Q_a);
+    for(unsigned int i=0; i<Q_a; i++)
+    {
+      Aq_Mq_representor_norms[i].resize(Q_m);
+      for(unsigned int j=0; j<Q_m; j++)
+      {
+        Aq_Mq_representor_norms[i][j].resize(Nmax);
+        for(unsigned int k=0; k<Nmax; k++)
+        {
+          Aq_Mq_representor_norms[i][j][k].resize(Nmax, 0.);
+        }
+      }
+    }
+
+    // Resize M_q_representor
+    // This is cleared in the call to clear_riesz_representors
+    // in Parent::resize_RB_data, so just resize here
+    M_q_representor.resize(Q_m);
+    for(unsigned int q_m=0; q_m<Q_m; q_m++)
+    {
+      M_q_representor[q_m].resize(Nmax);
+    }
   }
 
   STOP_LOG("resize_data_structures()", "TransientRBEvaluation");
@@ -898,7 +903,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
   STOP_LOG("write_offline_data_to_files()", "TransientRBEvaluation");
 }
 
-void TransientRBEvaluation::read_offline_data_from_files(const std::string& directory_name)
+void TransientRBEvaluation::read_offline_data_from_files(const std::string& directory_name, bool read_error_bound_data)
 {
   START_LOG("read_offline_data_from_files()", "TransientRBEvaluation");
 
@@ -990,81 +995,85 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   initial_conditions_in.close();
   initial_L2_error_in.close();
 
-  // Next read in the Fq_Mq representor norm data
-  std::ifstream RB_Fq_Mq_norms_in;
+
+  if(read_error_bound_data)
   {
-    OStringStream file_name;
-    file_name << directory_name << "/Fq_Mq_norms.dat";
-    RB_Fq_Mq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Fq_Mq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Fq_Mq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  for(unsigned int q_f=0; q_f<Q_f; q_f++)
-  {
-    for(unsigned int q_m=0; q_m<Q_m; q_m++)
+    // Next read in the Fq_Mq representor norm data
+    std::ifstream RB_Fq_Mq_norms_in;
     {
-      for(unsigned int i=0; i<n_bfs; i++)
+      OStringStream file_name;
+      file_name << directory_name << "/Fq_Mq_norms.dat";
+      RB_Fq_Mq_norms_in.open(file_name.str().c_str());
+    }
+    if ( !RB_Fq_Mq_norms_in.good() )
+    {
+      libMesh::err << "Error opening Fq_Mq_norms.dat" << std::endl;
+      libmesh_error();
+    }
+    for(unsigned int q_f=0; q_f<Q_f; q_f++)
+    {
+      for(unsigned int q_m=0; q_m<Q_m; q_m++)
       {
-        RB_Fq_Mq_norms_in >> Fq_Mq_representor_norms[q_f][q_m][i];
+        for(unsigned int i=0; i<n_bfs; i++)
+        {
+          RB_Fq_Mq_norms_in >> Fq_Mq_representor_norms[q_f][q_m][i];
+        }
       }
     }
-  }
-  RB_Fq_Mq_norms_in.close();
+    RB_Fq_Mq_norms_in.close();
 
-  // Next read in the Mq_Mq representor norm data
-  std::ifstream RB_Mq_Mq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Mq_Mq_norms.dat";
-    RB_Mq_Mq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Mq_Mq_norms_in.good() )
-  {
-    libMesh::err << "Error opening RB_Mq_Mq_norms_in.dat" << std::endl;
-    libmesh_error();
-  }
-  unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
-  for(unsigned int q=0; q<Q_m_hat; q++)
-  {
-    for(unsigned int i=0; i<n_bfs; i++)
+    // Next read in the Mq_Mq representor norm data
+    std::ifstream RB_Mq_Mq_norms_in;
     {
-      for(unsigned int j=0; j<n_bfs; j++)
-      {
-        RB_Mq_Mq_norms_in >> Mq_Mq_representor_norms[q][i][j];
-      }
+      OStringStream file_name;
+      file_name << directory_name << "/Mq_Mq_norms.dat";
+      RB_Mq_Mq_norms_in.open(file_name.str().c_str());
     }
-  }
-  RB_Mq_Mq_norms_in.close();
-
-  // Next read in the Aq_Mq representor norm data
-  std::ifstream RB_Aq_Mq_norms_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/Aq_Mq_norms.dat";
-    RB_Aq_Mq_norms_in.open(file_name.str().c_str());
-  }
-  if ( !RB_Aq_Mq_norms_in.good() )
-  {
-    libMesh::err << "Error opening Aq_Mq_norms.dat" << std::endl;
-    libmesh_error();
-  }
-  for(unsigned int q_a=0; q_a<Q_a; q_a++)
-  {
-    for(unsigned int q_m=0; q_m<Q_m; q_m++)
+    if ( !RB_Mq_Mq_norms_in.good() )
+    {
+      libMesh::err << "Error opening RB_Mq_Mq_norms_in.dat" << std::endl;
+      libmesh_error();
+    }
+    unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
+    for(unsigned int q=0; q<Q_m_hat; q++)
     {
       for(unsigned int i=0; i<n_bfs; i++)
       {
         for(unsigned int j=0; j<n_bfs; j++)
         {
-          RB_Aq_Mq_norms_in >> Aq_Mq_representor_norms[q_a][q_m][i][j];
+          RB_Mq_Mq_norms_in >> Mq_Mq_representor_norms[q][i][j];
         }
       }
     }
+    RB_Mq_Mq_norms_in.close();
+
+    // Next read in the Aq_Mq representor norm data
+    std::ifstream RB_Aq_Mq_norms_in;
+    {
+      OStringStream file_name;
+      file_name << directory_name << "/Aq_Mq_norms.dat";
+      RB_Aq_Mq_norms_in.open(file_name.str().c_str());
+    }
+    if ( !RB_Aq_Mq_norms_in.good() )
+    {
+      libMesh::err << "Error opening Aq_Mq_norms.dat" << std::endl;
+      libmesh_error();
+    }
+    for(unsigned int q_a=0; q_a<Q_a; q_a++)
+    {
+      for(unsigned int q_m=0; q_m<Q_m; q_m++)
+      {
+        for(unsigned int i=0; i<n_bfs; i++)
+        {
+          for(unsigned int j=0; j<n_bfs; j++)
+          {
+            RB_Aq_Mq_norms_in >> Aq_Mq_representor_norms[q_a][q_m][i][j];
+          }
+        }
+      }
+    }
+    RB_Aq_Mq_norms_in.close();
   }
-  RB_Aq_Mq_norms_in.close();
 
   STOP_LOG("read_offline_data_from_files()", "TransientRBEvaluation");
 

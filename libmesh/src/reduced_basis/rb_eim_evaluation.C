@@ -55,9 +55,10 @@ void RBEIMEvaluation::clear()
   rb_eim_theta_vector.clear();
 }
 
-void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax)
+void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax,
+                                             bool resize_error_bound_data)
 {
-  Parent::resize_data_structures(Nmax);
+  Parent::resize_data_structures(Nmax, resize_error_bound_data);
 
   // Resize the data structures relevant to the EIM system
   interpolation_points.clear();
@@ -328,11 +329,12 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
   STOP_LOG("write_offline_data_to_files()", "RBEIMEvaluation");
 }
 
-void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_name)
+void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_name,
+                                                   bool read_error_bound_data)
 {
   START_LOG("read_offline_data_from_files()", "RBEIMEvaluation");
 
-  Parent::read_offline_data_from_files(directory_name);
+  Parent::read_offline_data_from_files(directory_name, read_error_bound_data);
 
   // First, find out how many basis functions we had when Greedy terminated
   // This was set in RBSystem::read_offline_data_from_files

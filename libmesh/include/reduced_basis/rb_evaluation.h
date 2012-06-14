@@ -86,11 +86,13 @@ public:
 
   /**
    * Resize and clear the data vectors corresponding to the
-   * value of \p Nmax.
+   * value of \p Nmax. Optionally resize the data structures
+   * required for the error bound.
    * Overload to also clear and resize any extra
    * data in subclasses.
    */
-  virtual void resize_data_structures(const unsigned int Nmax);
+  virtual void resize_data_structures(const unsigned int Nmax,
+                                      bool resize_error_bound_data=true);
 
   /**
    * Get a reference to the i^th basis function.
@@ -166,7 +168,8 @@ public:
    * Read in the saved Offline reduced basis data
    * to initialize the system for Online solves.
    */
-  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data");
+  virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
+                                            bool read_error_bound_data=true);
 
   /**
    * Write out all the basis functions to file.
