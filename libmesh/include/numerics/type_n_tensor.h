@@ -73,7 +73,7 @@ public:
   /**
    * Return a writeable proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
-  TypeNTensor<N-1,T> slice (const unsigned int i)
+  TypeNTensor<N-1,T> slice (const unsigned int /*i*/)
     { return TypeNTensor<N-1,T>(); }
 
   /**
@@ -173,7 +173,7 @@ public:
   /**
    * Formatted print, by default to \p libMesh::out.
    */
-  void print(std::ostream& os = libMesh::out) const {}
+  void print(std::ostream& /*os = libMesh::out*/) const {}
 
   /**
    * Formatted print as above but allows you to do
