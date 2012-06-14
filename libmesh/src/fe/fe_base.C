@@ -383,8 +383,8 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
 template <>
 AutoPtr<FEGenericBase<RealGradient> >
-FEGenericBase<RealGradient>::build (const unsigned int dim,
-			           const FEType& fet)
+FEGenericBase<RealGradient>::build (const unsigned int /*dim*/,
+                                    const FEType& /*fet*/)
 {
   // No vector types defined... YET.
   libmesh_error();
