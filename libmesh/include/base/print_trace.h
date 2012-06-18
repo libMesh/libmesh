@@ -32,6 +32,11 @@ namespace libMesh
  */
 void print_trace(std::ostream &out = std::cerr);
 
+/*
+ * Mostly system independent demangler
+ */
+std::string demangle(const char *name);
+
 } // namespace libMesh
 
 #endif

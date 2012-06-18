@@ -39,16 +39,14 @@
 namespace libMesh
 {
 
-std::string abi_demangle(const char *name)
+std::string process_trace(const char *name)
 {
-  int status = 0;
-  char *d = 0;
   std::string fullname = name;
   std::string saved_begin, saved_end;
   size_t namestart, nameend;
 
   /**
-   * The Apple backtrace function return more information than the Linux version.
+   * The Apple backtrace function returns more information than the Linux version.
    * We need to pass only the function name to the demangler or it won't decode it for us.
    *
    * lineno: stackframeno                 address functionname + offset
@@ -61,6 +59,8 @@ std::string abi_demangle(const char *name)
     namestart = fullname.find(' ', namestart) + 1;
     saved_begin = fullname.substr(0, namestart);
   }
+  else
+    namestart = 0;
   nameend = fullname.find('+');
   if (nameend == std::string::npos ||
       nameend <= namestart)
@@ -82,18 +82,22 @@ std::string abi_demangle(const char *name)
     return fullname;
 #endif
 
-  std::string funcname = fullname.substr(namestart, nameend - namestart);
-  std::string goodname = funcname;
-  try { if ( (d = abi::__cxa_demangle(funcname.c_str(), 0, 0, &status)) ) goodname = d; }
-  catch(...) {  }
-  std::free(d);
-/*
-  std::string ret = fullname.substr(0, namestart);
-  ret.append(goodname);
-  ret.append(fullname.substr(nameend, fullname.length() - nameend));
-  return ret;
-*/
-  return saved_begin + goodname + saved_end;
+  std::string type_name = fullname.substr(namestart, nameend - namestart);
+
+  // Try to demangle now
+  return saved_begin + demangle(type_name.c_str()) + saved_end;
+}
+
+
+std::string demangle(const char *name)
+{
+    int status = 0;
+    char *d = 0;
+    std::string ret = name;
+    try { if ( (d = abi::__cxa_demangle(name, 0, 0, &status)) ) ret = d; }
+    catch(...) {  }
+    std::free(d);
+    return ret;
 }
 
 void print_trace(std::ostream &out)
@@ -105,11 +109,7 @@ void print_trace(std::ostream &out)
   strings = backtrace_symbols(addresses, size);
   out << "Stack frames: " << size << std::endl;
   for(int i = 0; i < size; i++)
-    {
-//      out << i << ": " << (int)addresses[i] << std::endl;
-//      out << abi_demangle(strings[i]) << std::endl;
-      out << i << ": " << abi_demangle(strings[i]) << std::endl;
-    }
+    out << i << ": " << process_trace(strings[i]) << std::endl;
   std::free(strings);
 }
 
@@ -117,56 +117,11 @@ void print_trace(std::ostream &out)
 
 #else
 
-void libMesh::print_trace(std::ostream &) {}
-
-#endif
-
-#if 0 // MAC OS X code??
-
-#include <dlfcn.h>
-#include <cxxabi.h>
-#include <iostream>
-#include <string>
-#include <cstdlib>
-#include <cstring>
-
 namespace libMesh
 {
+void libMesh::print_trace(std::ostream &) {}
 
-std::string abi_demangle(const char *name)
-{
-    int status = 0;
-    char *d = 0;
-    std::string ret = name;
-    try { if ( (d = abi::__cxa_demangle(name, 0, 0, &status)) ) ret = d; }
-    catch(...) {  }
-    std::free(d);
-    return ret;
+std::string demangle(const char *name) {}
 }
-
-void print_trace(void)
-{
-libMesh::err << "Trying print_trace()" << std::endl;
-    Dl_info info;
-    void **frame = static_cast<void **>(__builtin_frame_address(0));
-    void **bp = static_cast<void **>(*frame);
-    void *ip = frame[1];
-
-    while(bp && ip && dladdr(ip, &info))
-    {
-        libMesh::out << ip << ": " << abi_demangle(info.dli_sname) << " in " <<
-info.dli_fname << '\n';
-
-        if(info.dli_sname && !strcmp(info.dli_sname, "main")) break;
-
-        ip = bp[1];
-        bp = static_cast<void**>(bp[0]);
-    }
-    char *dlerr = dlerror();
-    if (dlerr)
-      libMesh::out << "dlerror() = " << dlerr << std::endl;
-}
-
-} // namespace libMesh
 
 #endif
