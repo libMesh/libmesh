@@ -27,6 +27,7 @@
 #include "libmesh_logging.h"
 #include "mesh_base.h"
 #include "numeric_vector.h"
+#include "o_string_stream.h"
 #include "parameter_vector.h"
 #include "point.h"              // For point_value
 #include "point_locator_base.h" // For point_value
