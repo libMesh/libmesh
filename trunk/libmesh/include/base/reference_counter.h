@@ -89,6 +89,7 @@ public:
 
 protected:
 
+#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
   /**
    * Increments the construction counter. Should be called in
@@ -103,9 +104,6 @@ protected:
    * reference counted.
    */
   void increment_destructor_count (const std::string& name);
-
-
-#if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
   /**
    * Data structure to log the information.  The log is
@@ -169,11 +167,6 @@ void ReferenceCounter::increment_constructor_count (const std::string& name)
 
   p.first++;
 }
-#else
-inline
-void ReferenceCounter::increment_constructor_count (const std::string&)
-{
-}
 #endif
 
 
@@ -186,11 +179,6 @@ void ReferenceCounter::increment_destructor_count (const std::string& name)
   std::pair<unsigned int, unsigned int>& p = _counts[name];
 
   p.second++;
-}
-#else
-inline
-void ReferenceCounter::increment_destructor_count (const std::string&)
-{
 }
 #endif
 
