@@ -70,8 +70,6 @@ int main (int argc, char** argv)
   // Read the input mesh.
   mesh.read (argv[3]);
   
-  mesh.find_neighbors();
-
   // Print information about the mesh to the screen.
   mesh.print_info();
   
