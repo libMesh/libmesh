@@ -50,9 +50,15 @@ class RemoteElem : public Elem
  public:
 
   /**
+   * A unique \p id to distinguish remote element links
+   */
+  static const unsigned int remote_elem_id = libMesh::invalid_uint-1;
+
+  /**
    * Constructor.
    */
-  RemoteElem () : Elem(0,0,NULL,_elemlinks_data,NULL) {}
+  RemoteElem () : Elem(0,0,NULL,_elemlinks_data,NULL) 
+  { this->set_id(remote_elem_id); }
 
   /**
    * Destructor.
