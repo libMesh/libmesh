@@ -30,6 +30,7 @@
 #include "libmesh_logging.h"
 #include "elem.h"
 #include "mesh_tools.h" // For n_levels
+#include "o_string_stream.h"
 #include "parallel.h"
 #include "remote_elem.h"
 

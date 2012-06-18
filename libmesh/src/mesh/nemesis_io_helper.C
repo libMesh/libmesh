@@ -17,7 +17,9 @@
 
 
 // C++ headers
+#include <iomanip>
 #include <set>
+#include <sstream>
 
 // Libmesh headers
 #include "nemesis_io_helper.h"

@@ -24,6 +24,7 @@
 #include "xdr_cxx.h"
 #include "libmesh_logging.h"
 #include "o_f_stream.h"
+#include "o_string_stream.h"
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h"
 #endif
