@@ -28,8 +28,24 @@
 #include <vector>
 
 // Local includes
+#include "o_string_stream.h"
 #include "perf_log.h"
 #include "timestamp.h"
+
+// Anonymous helper function
+
+namespace {
+
+void output_character_line(const unsigned int n,
+			   const char c,
+			   OStringStream& out)
+{
+  for (unsigned int i=0; i<n; ++i)
+    out << c;
+}
+
+}
+
 
 namespace libMesh
 {
@@ -172,7 +188,7 @@ std::string PerfLog::get_info_header() const
 	  max_length = v[i]->str().size();
 
       // Print dashed line
-      this->_character_line(max_length+2, '-', out);
+      output_character_line(max_length+2, '-', out);
       out << '\n';
 
       // Loop over all the strings and print them out with end-formatting
@@ -186,7 +202,7 @@ std::string PerfLog::get_info_header() const
 	}
 
       // Print dashed line
-      this->_character_line(max_length+2, '-', out);
+      output_character_line(max_length+2, '-', out);
       out << '\n';
     }
 
@@ -243,7 +259,7 @@ std::string PerfLog::get_perf_info() const
 
       // Print dashed line
       out << ' ';
-      this->_character_line(total_col_width, '-', out);
+      output_character_line(total_col_width, '-', out);
       out << '\n';
 
       {
@@ -272,7 +288,7 @@ std::string PerfLog::get_perf_info() const
 
       // Print dashed line
       out << ' ';
-      this->_character_line(total_col_width, '-', out);
+      output_character_line(total_col_width, '-', out);
       out << '\n';
 
 
@@ -297,9 +313,9 @@ std::string PerfLog::get_perf_info() const
       OSSStringleft(out,pct_active_incl_sub_col_width,"With S");
 
       out << "|\n|";
-      this->_character_line(total_col_width, '-', out);
+      output_character_line(total_col_width, '-', out);
       out << "|\n|";
-      this->_character_line(total_col_width, ' ', out);
+      output_character_line(total_col_width, ' ', out);
       out << "|\n";
 
       unsigned int summed_function_calls = 0;
@@ -341,7 +357,7 @@ std::string PerfLog::get_perf_info() const
 
 		      // print blank line
 		      out << "|";
-		      this->_character_line(total_col_width, ' ', out);
+		      output_character_line(total_col_width, ' ', out);
 		      out << "|\n";
 
 		      // print header name (account for additional space before
@@ -384,7 +400,7 @@ std::string PerfLog::get_perf_info() const
 	}
 
       out << ' ';
-      this->_character_line(total_col_width, '-', out);
+      output_character_line(total_col_width, '-', out);
       out << '\n';
       out << "| ";
       OSSStringleft(out,event_col_width,"Totals:");
@@ -425,7 +441,7 @@ std::string PerfLog::get_perf_info() const
       out << "";
 
       out << "|\n ";
-      this->_character_line(total_col_width, '-', out);
+      output_character_line(total_col_width, '-', out);
       out << '\n';
     }
 
@@ -505,14 +521,5 @@ void PerfLog::restart_event(const std::string &,
 }
 
 
-
-
-void PerfLog::_character_line(const unsigned int n,
-			      const char c,
-			      OStringStream& out) const
-{
-  for (unsigned int i=0; i<n; ++i)
-    out << c;
-}
 
 } // namespace libMesh

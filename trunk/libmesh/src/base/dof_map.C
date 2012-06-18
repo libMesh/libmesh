@@ -35,6 +35,7 @@
 #include "mesh_base.h"
 #include "mesh_tools.h"
 #include "numeric_vector.h"
+#include "o_string_stream.h"
 #include "parallel.h"
 #include "periodic_boundaries.h"
 #include "sparse_matrix.h"

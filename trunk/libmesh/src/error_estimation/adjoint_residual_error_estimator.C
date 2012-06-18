@@ -22,6 +22,7 @@
 // Local Includes
 #include "adjoint_residual_error_estimator.h"
 #include "error_vector.h"
+#include "o_string_stream.h"
 #include "patch_recovery_error_estimator.h"
 #include "libmesh_logging.h"
 #include "numeric_vector.h"

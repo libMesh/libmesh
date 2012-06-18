@@ -23,7 +23,6 @@
 
 // Local includes
 #include "libmesh_common.h"
-#include "o_string_stream.h"
 
 // C++ includes
 #include <cstddef>
@@ -34,10 +33,6 @@
 
 namespace libMesh
 {
-
-// Forward Declarations
-// class OStringStream;
-
 
 /**
  * The \p PerfData class simply contains the performance
@@ -273,14 +268,6 @@ class PerfLog
    * data the first time that print_log() is called.
    */
   static bool called;
-
-  /**
-   * Prints a line of 'n' repeated characters 'c'
-   * to the output string stream "out".
-   */
-  void _character_line(const unsigned int n,
-		       const char c,
-		       OStringStream& out) const;
 };
 
 
