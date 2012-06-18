@@ -20,9 +20,15 @@
 #ifndef __parameters_h__
 #define __parameters_h__
 
+// C++ includes
+#include <typeinfo>
+#include <string>
+#include <map>
+
 // Local includes
 #include "libmesh_common.h"
 #include "reference_counted_object.h"
+#include "print_trace.h"
 
 // C++ includes
 #include <cstddef>
@@ -279,7 +285,22 @@ template <typename T>
 inline
 std::string Parameters::Parameter<T>::type () const
 {
-  return typeid(T).name();
+  return demangle(typeid(T).name());
+
+/*
+  int status = 0;
+  char *d = 0;
+  std::string ret = typeid(T).name();;
+  d = abi::__cxa_demangle(ret.c_str(), 0, 0, &status);
+
+  if (d)
+  {
+    ret = d;
+    std::free(d);
+  }
+
+  return ret;
+*/
 }
 #endif
 
@@ -429,7 +450,7 @@ const T& Parameters::get (const std::string& name) const
     {
       libMesh::err << "ERROR: no"
 #ifdef LIBMESH_HAVE_RTTI
-		    << ' ' << typeid(T).name()
+                   << ' ' << demangle(typeid(T).name())
 #endif // LIBMESH_HAVE_RTTI
 		    << " parameter named \""
 		    << name << "\":" << std::endl
