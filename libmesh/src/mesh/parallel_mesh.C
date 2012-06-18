@@ -53,7 +53,12 @@ ParallelMesh::~ParallelMesh ()
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
 ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
-  UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial)
+  UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial),
+  _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
+  _next_free_local_node_id(libMesh::processor_id()),
+  _next_free_local_elem_id(libMesh::processor_id()),
+  _next_free_unpartitioned_node_id(libMesh::n_processors()),
+  _next_free_unpartitioned_elem_id(libMesh::n_processors())
 {
   this->copy_nodes_and_elements(other_mesh);
   _n_nodes = other_mesh.n_nodes();
@@ -72,7 +77,12 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
 
 
 ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
-  UnstructuredMesh (other_mesh)
+  UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
+  _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
+  _next_free_local_node_id(libMesh::processor_id()),
+  _next_free_local_elem_id(libMesh::processor_id()),
+  _next_free_unpartitioned_node_id(libMesh::n_processors()),
+  _next_free_unpartitioned_elem_id(libMesh::n_processors())
 {
   this->copy_nodes_and_elements(other_mesh);
   _n_nodes = other_mesh.n_nodes();
