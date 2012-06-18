@@ -2536,8 +2536,10 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   // vectors
   Parallel::verify(mesh.max_node_id());
   Parallel::verify(mesh.max_elem_id());
-  libmesh_assert(mesh.parallel_max_node_id() == mesh.max_node_id());
-  libmesh_assert(mesh.parallel_max_elem_id() == mesh.max_elem_id());
+  const unsigned int par_max_node_id = mesh.parallel_max_node_id();
+  const unsigned int par_max_elem_id = mesh.parallel_max_elem_id();
+  libmesh_assert(par_max_node_id == mesh.max_node_id());
+  libmesh_assert(par_max_elem_id == mesh.max_elem_id());
 #endif
 
   // FIXME - should these be "unsorted_set"s?  O(N) is O(N)...
