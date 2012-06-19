@@ -188,11 +188,15 @@ bool Hex::is_child_on_side(const unsigned int c,
   libmesh_assert (c < this->n_children());
   libmesh_assert (s < this->n_sides());
 
-#ifdef LIBMESH_ENABLE_AMR
+  // This array maps the Hex8 node numbering to the Hex8 child
+  // numbering.  I.e.
+  //   node 6 touches child 7, and
+  //   node 7 touches child 6, etc.
+  const unsigned int node_child_map[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
+
   for (unsigned int i = 0; i != 4; ++i)
-    if (Hex8::node_child_map[Hex8::side_nodes_map[s][i]] == c)
+    if (node_child_map[Hex8::side_nodes_map[s][i]] == c)
       return true;
-#endif
 
   return false;
 }
