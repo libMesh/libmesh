@@ -1717,6 +1717,211 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
 
 
+Point FEInterface::map(unsigned int dim,
+                       const FEType& fe_t,
+                       const Elem* elem,
+                       const Point& p)
+{
+  switch (dim)
+    {
+    case 0:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<0,CLOUGH>::map(elem, p);
+
+	  case HERMITE:
+	    return FE<0,HERMITE>::map(elem, p);
+
+	  case HIERARCHIC:
+	    return FE<0,HIERARCHIC>::map(elem, p);
+
+	  case L2_HIERARCHIC:
+	    return FE<0,L2_HIERARCHIC>::map(elem, p);
+
+	  case LAGRANGE:
+	    return FE<0,LAGRANGE>::map(elem, p);
+
+	  case L2_LAGRANGE:
+	    return FE<0,L2_LAGRANGE>::map(elem, p);
+
+	  case MONOMIAL:
+	    return FE<0,MONOMIAL>::map(elem, p);
+
+	  case SCALAR:
+	    return FE<0,SCALAR>::map(elem, p);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<0,BERNSTEIN>::map(elem, p);
+
+	  case SZABAB:
+	    return FE<0,SZABAB>::map(elem, p);
+
+#endif
+	  case XYZ:
+	    return FEXYZ<0>::map(elem, p);
+
+
+	  default:
+	    libmesh_error();
+	  }
+      } // case dim==0
+
+
+    case 1:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<1,CLOUGH>::map(elem, p);
+
+	  case HERMITE:
+	    return FE<1,HERMITE>::map(elem, p);
+
+	  case HIERARCHIC:
+	    return FE<1,HIERARCHIC>::map(elem, p);
+
+	  case L2_HIERARCHIC:
+	    return FE<1,L2_HIERARCHIC>::map(elem, p);
+
+	  case LAGRANGE:
+	    return FE<1,LAGRANGE>::map(elem, p);
+
+	  case L2_LAGRANGE:
+	    return FE<1,L2_LAGRANGE>::map(elem, p);
+
+	  case MONOMIAL:
+	    return FE<1,MONOMIAL>::map(elem, p);
+
+	  case SCALAR:
+	    return FE<1,SCALAR>::map(elem, p);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<1,BERNSTEIN>::map(elem, p);
+
+	  case SZABAB:
+	    return FE<1,SZABAB>::map(elem, p);
+
+#endif
+	  case XYZ:
+	    return FEXYZ<1>::map(elem, p);
+
+
+	  default:
+	    libmesh_error();
+	  }
+      } // case dim==1
+
+
+    case 2:
+      {
+	switch (fe_t.family)
+	  {
+	  case CLOUGH:
+	    return FE<2,CLOUGH>::map(elem, p);
+
+	  case HERMITE:
+	    return FE<2,HERMITE>::map(elem, p);
+
+	  case HIERARCHIC:
+	    return FE<2,HIERARCHIC>::map(elem, p);
+
+	  case L2_HIERARCHIC:
+	    return FE<2,L2_HIERARCHIC>::map(elem, p);
+
+	  case LAGRANGE:
+	    return FE<2,LAGRANGE>::map(elem, p);
+
+	  case L2_LAGRANGE:
+	    return FE<2,L2_LAGRANGE>::map(elem, p);
+
+	  case MONOMIAL:
+	    return FE<2,MONOMIAL>::map(elem, p);
+
+	  case SCALAR:
+	    return FE<2,SCALAR>::map(elem, p);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<2,BERNSTEIN>::map(elem, p);
+
+	  case SZABAB:
+	    return FE<2,SZABAB>::map(elem, p);
+
+#endif
+	  case XYZ:
+	    return FEXYZ<2>::map(elem, p);
+
+	  default:
+	    libmesh_error();
+	  }
+      } // case dim==2
+
+
+
+    case 3:
+      {
+	switch (fe_t.family)
+	  {
+	  case HERMITE:
+	    return FE<3,HERMITE>::map(elem, p);
+
+	  case HIERARCHIC:
+	    return FE<3,HIERARCHIC>::map(elem, p);
+
+	  case L2_HIERARCHIC:
+	    return FE<3,L2_HIERARCHIC>::map(elem, p);
+
+	  case LAGRANGE:
+	    return FE<3,LAGRANGE>::map(elem, p);
+
+	  case L2_LAGRANGE:
+	    return FE<3,L2_LAGRANGE>::map(elem, p);
+
+	  case MONOMIAL:
+	    return FE<3,MONOMIAL>::map(elem, p);
+
+	  case SCALAR:
+	    return FE<3,SCALAR>::map(elem, p);
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+
+	  case BERNSTEIN:
+	    return FE<3,BERNSTEIN>::map(elem, p);
+
+	  case SZABAB:
+	    return FE<3,SZABAB>::map(elem, p);
+
+#endif
+	  case XYZ:
+	    return FEXYZ<3>::map(elem, p);
+
+	  default:
+	    libmesh_error();
+	  }
+      } // case dim==3
+
+
+    default:
+      libmesh_error();
+    } // switch (dim)
+
+  // We shouldn't get here
+  libmesh_error();
+  Point pt;
+  return pt;
+}
+
+
+
+
+
 Point FEInterface::inverse_map (const unsigned int dim,
 				const FEType& fe_t,
 				const Elem* elem,
