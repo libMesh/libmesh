@@ -230,7 +230,11 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
 
 
 
-void Partitioner::set_parent_processor_ids(MeshBase& mesh)
+void Partitioner::set_parent_processor_ids(MeshBase&
+#ifdef LIBMESH_ENABLE_AMR
+mesh
+#endif
+)
 {
   START_LOG("set_parent_processor_ids()","Partitioner");
 
