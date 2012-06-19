@@ -32,20 +32,6 @@ void RBParameters::clear()
   _parameters.clear();
 }
 
-void RBParameters::add_parameter(const std::string& param_name, Real value)
-{
-  // First check if a parameter with name param_name has already been added
-  const_iterator it = _parameters.find(param_name);
-  if( it != _parameters.end() )
-  {
-    libMesh::err << "Error: parameter " << param_name << " has already been added to RBParameters object."
-                 << std::endl;
-    libmesh_error();
-  }
-  
-  _parameters[param_name] = value;
-}
-
 Real RBParameters::get_value(const std::string& param_name) const
 {
   // find the parameter value
@@ -64,15 +50,6 @@ Real RBParameters::get_value(const std::string& param_name) const
 
 void RBParameters::set_value(const std::string& param_name, Real value)
 {
-  // First check that the specified parameter exists
-  const_iterator it = _parameters.find(param_name);
-  if( it == _parameters.end() )
-  {
-    libMesh::err << "Error: parameter " << param_name << " does not exist in RBParameters object."
-                 << std::endl;
-    libmesh_error();
-  }
-  
   _parameters[param_name] = value;
 }
 

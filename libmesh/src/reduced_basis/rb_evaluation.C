@@ -45,11 +45,7 @@ RBEvaluation::RBEvaluation ()
   compute_RB_inner_product(false),
   rb_theta_expansion(NULL)
 {
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  io_version_string = "libMesh-0.7.2 with infinite elements";
-#else
-  io_version_string = "libMesh-0.7.2";
-#endif
+
 }
 
 RBEvaluation::~RBEvaluation()
@@ -1030,7 +1026,7 @@ void RBEvaluation::write_out_basis_functions(System& sys,
   file_name << directory_name << "/bf_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
                   write_binary_basis_functions ? ENCODE : WRITE);
-  sys.write_header(header_data, io_version_string, /*write_additional_data=*/false);
+  sys.write_header(header_data, get_io_version_string(), /*write_additional_data=*/false);
 
   // Following EquationSystemsIO::write, we use a temporary numbering (node major)
   // before writing out the data
@@ -1082,6 +1078,7 @@ void RBEvaluation::read_in_basis_functions(System& sys,
 
   // set the version number in header_data from io_version_string
   // (same code as in EquationSystemsIO::_read_impl)
+  std::string io_version_string = get_io_version_string();
   std::string::size_type lm_pos = io_version_string.find("libMesh");
 	std::istringstream iss(io_version_string.substr(lm_pos + 8));
 	int ver_major = 0, ver_minor = 0, ver_patch = 0;
@@ -1134,6 +1131,15 @@ void RBEvaluation::read_in_basis_functions(System& sys,
   sys.get_mesh().fix_broken_node_and_element_numbering();
 
   //libMesh::out << "Finished reading in the basis functions..." << std::endl;
+}
+
+std::string RBEvaluation::get_io_version_string()
+{
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+  return "libMesh-0.7.2 with infinite elements";
+#else
+  return "libMesh-0.7.2";
+#endif
 }
 
 } // namespace libMesh
