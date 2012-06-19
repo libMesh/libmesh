@@ -127,6 +127,12 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 }
 
 
+void Tet::select_diagonal (const Diagonal diag) const
+{
+  libmesh_assert (_diagonal_selection==INVALID_DIAG);
+  _diagonal_selection = diag;
+}
+
 
 
 
@@ -182,6 +188,31 @@ bool Tet::is_child_on_side_helper(const unsigned int /*c*/,
 }
 
 #endif //LIBMESH_ENABLE_AMR
+
+
+
+
+void Tet::choose_diagonal() const
+{
+  // Check for uninitialized diagonal selection
+  if (this->_diagonal_selection==INVALID_DIAG)
+    {
+      Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
+      Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
+      Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+
+      this->_diagonal_selection=DIAG_02_13;
+
+      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
+        {
+          if (diag_01_23 < diag_03_12)
+            this->_diagonal_selection=DIAG_01_23;
+
+          else
+            this->_diagonal_selection=DIAG_03_12;
+        }
+    }
+}
 
 
 
