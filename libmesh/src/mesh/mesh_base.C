@@ -278,8 +278,11 @@ void MeshBase::partition (const unsigned int n_parts)
   }
   else
   {
-    // Make sure our cached n_partitions() is correct
+    // Make sure locally cached partition count
     this->recalculate_n_partitions();
+
+    // Make sure any other locally cached data is correct
+    this->update_post_partitioning();
   }
 }
 

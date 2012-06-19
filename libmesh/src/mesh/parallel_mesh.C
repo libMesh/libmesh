@@ -554,7 +554,7 @@ void ParallelMesh::redistribute ()
 
 void ParallelMesh::update_post_partitioning ()
 {
-  this->recalculate_n_partitions();
+  // this->recalculate_n_partitions();
 
   // Partitioning changes our numbers of unpartitioned objects
   this->update_parallel_id_counts();
