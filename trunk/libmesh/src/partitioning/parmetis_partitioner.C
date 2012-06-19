@@ -47,6 +47,9 @@ namespace Parmetis {
 namespace libMesh
 {
 
+// Minimum elements on each processor required for us to choose
+// Parmetis over Metis.
+const unsigned int MIN_ELEM_PER_PROC = 4;
 
 
 // ------------------------------------------------------------
@@ -157,16 +160,19 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
   // Initialize the data structures required by ParMETIS
   this->initialize (mesh, n_sbdmns);
 
-  // Make sure all processors have some active local elements.
+  // Make sure all processors have enough active local elements.
+  // Parmetis tends to crash when it's given only a couple elements
+  // per partition.
   {
-    bool all_have_active_elements = true;
+    bool all_have_enough_elements = true;
     for (unsigned int pid=0; pid<_n_active_elem_on_proc.size(); pid++)
-      if (!_n_active_elem_on_proc[pid]) all_have_active_elements = false;
+      if (_n_active_elem_on_proc[pid] < MIN_ELEM_PER_PROC)
+	all_have_enough_elements = false;
 
     // Parmetis will not work unless each processor has some
     // elements. Specifically, it will abort when passed a NULL
     // partition array on *any* of the processors.
-    if (!all_have_active_elements)
+    if (!all_have_enough_elements)
       {
 	// FIXME: revert to METIS, although this requires a serial mesh
         MeshSerializer serialize(mesh);
