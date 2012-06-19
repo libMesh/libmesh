@@ -73,7 +73,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~FEInterface() {return;}
+  virtual ~FEInterface() {}
 
   /**
    * @returns the number of shape functions associated with this
@@ -162,6 +162,15 @@ public:
 			 const Elem* elem,
 			 const std::vector<Number>& elem_soln,
 			 std::vector<Number>& nodal_soln);
+
+  /**
+   * Returns the point in physical space of the reference point
+   * refpoint which is passed in.
+   */
+  static Point map(unsigned int dim,
+                   const FEType& fe_t,
+                   const Elem* elem,
+                   const Point& p);
 
   /**
    * @returns the location (on the reference element) of the
