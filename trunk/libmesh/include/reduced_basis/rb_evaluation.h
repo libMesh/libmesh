@@ -193,6 +193,11 @@ public:
                                        const std::string& directory_name = "offline_data",
                                        const bool read_binary_basis_functions = true);
 
+  /**
+   * Version string that we need to use for writing/reading basis functions.
+   */
+  static std::string get_io_version_string();
+
   //----------- PUBLIC DATA MEMBERS -----------//
 
   /**
@@ -295,11 +300,6 @@ private:
    * (Note: a shared_ptr would be a good option here.)
    */
   RBThetaExpansion* rb_theta_expansion;
-
-  /**
-   * Version string that we need to use for writing/reading basis functions.
-   */
-  std::string io_version_string;
 
 };
 

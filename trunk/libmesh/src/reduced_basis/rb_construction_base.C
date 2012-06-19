@@ -148,7 +148,7 @@ void RBConstructionBase<Base>::set_params_from_training_set(unsigned int index)
     std::string param_name = it->first;
     Real param_value = libmesh_real( ( *(it->second) )(index) );
     
-    params.add_parameter(param_name, param_value);
+    params.set_value(param_name, param_value);
   }
   
   set_parameters(params);
