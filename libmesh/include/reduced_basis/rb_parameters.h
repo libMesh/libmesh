@@ -55,11 +55,6 @@ public:
    * Clear this object.
    */
   void clear();
-
-  /**
-   * Add a parameter to this RBParameters object.
-   */
-  void add_parameter(const std::string& param_name, Real value=0.);
   
   /**
    * Get the value of the specific parameter.
@@ -67,7 +62,8 @@ public:
   Real get_value(const std::string& param_name) const;
   
   /**
-   * Set the value of the specified parameter.
+   * Set the value of the specified parameter. If param_name
+   * doesn't already exist, it is added to the RBParameters object.
    */
   void set_value(const std::string& param_name, Real value);
   

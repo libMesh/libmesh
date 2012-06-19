@@ -112,17 +112,17 @@ void RBParametrized::initialize_parameters (const std::string& parameters_filena
       if(j==0)
       {
         Real min_val = infile(param_name, 0., j);
-        mu_min_in.add_parameter(param_name, min_val);
+        mu_min_in.set_value(param_name, min_val);
       }
       else if(j==1)
       {
         Real max_val = infile(param_name, 0., j);
-        mu_max_in.add_parameter(param_name, max_val);
+        mu_max_in.set_value(param_name, max_val);
       }
       else
       {
         Real init_val = infile(param_name, 0., j);
-        initial_mu_in.add_parameter(param_name, init_val);
+        initial_mu_in.set_value(param_name, init_val);
       }
     }
   }
