@@ -71,13 +71,6 @@ public:
   unsigned int n_children() const { return 8; }
 
   /*
-   * @returns true iff the specified child is on the
-   * specified side
-   */
-  virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
-
-  /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
@@ -116,6 +109,14 @@ protected:
    * Data for links to parent/neighbor/interior_parent elements.
    */
   Elem* _elemlinks_data[5+(LIBMESH_DIM>3)];
+
+  /**
+   * Called by descendant classes with appropriate data to determine
+   * if child c is on side s.  Only works if LIBMESH_ENABLE_AMR.
+   */
+  bool is_child_on_side_helper(const unsigned int c,
+                               const unsigned int s,
+                               const unsigned int checked_nodes[][3] ) const;
 };
 
 

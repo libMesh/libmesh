@@ -115,6 +115,13 @@ public:
 			       const unsigned int e) const;
 
   /*
+   * @returns true iff the specified child is on the
+   * specified side
+   */
+  virtual bool is_child_on_side(const unsigned int c,
+			        const unsigned int s) const;
+
+  /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
    */
@@ -197,7 +204,6 @@ protected:
   float embedding_matrix (const unsigned int i,
 			  const unsigned int j,
 			  const unsigned int k) const;
-  //  { return _embedding_matrix[i][j][k]; }
 
   /**
    * Matrix that computes new nodal locations/solution values
