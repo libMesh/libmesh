@@ -78,6 +78,44 @@ bool Tet4::is_node_on_edge(const unsigned int n,
   return false;
 }
 
+
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+// This function only works if LIBMESH_ENABLE_AMR...
+bool Tet4::is_child_on_side(const unsigned int c,
+                            const unsigned int s) const
+{
+  // OK, for the Tet4, this is pretty obvious... it is sets of nodes
+  // not equal to the current node.  But if we want this algorithm to
+  // be generic and work for Tet10 also it helps to do it this way.
+  const unsigned int nodes_opposite[4][3] =
+    {
+      {1,2,3}, // nodes opposite node 0
+      {0,2,3}, // nodes opposite node 1
+      {0,1,3}, // nodes opposite node 2
+      {0,1,2}  // nodes opposite node 3
+    };
+
+  // Call the base class helper function
+  return Tet::is_child_on_side_helper(c, s, nodes_opposite);
+}
+
+#else
+
+bool Tet4::is_child_on_side(const unsigned int /*c*/,
+                            const unsigned int /*s*/) const
+{
+  libmesh_not_implemented();
+  return false;
+}
+
+#endif //LIBMESH_ENABLE_AMR
+
+
+
+
 bool Tet4::is_node_on_side(const unsigned int n,
 			   const unsigned int s) const
 {
@@ -359,10 +397,27 @@ float Tet4::embedding_matrix (const unsigned int i,
 
   if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
     {
-      // Permute j, k
-      if (jp!=3) jp=(jp+static_cast<unsigned int>(this->_diagonal_selection))%3;
-      if (kp!=3) kp=(kp+static_cast<unsigned int>(this->_diagonal_selection))%3;
+      // Just the enum value cast to an unsigned int...
+      const unsigned ds = static_cast<unsigned int>(this->_diagonal_selection);
+
+      // Permute j, k:
+      // ds==1      ds==2
+      // 0 -> 1     0 -> 2
+      // 1 -> 2     1 -> 0
+      // 2 -> 0     2 -> 1
+      if (jp != 3)
+        jp = (jp+ds)%3;
+
+      if (kp != 3)
+        kp = (kp+ds)%3;
     }
+
+  // Debugging
+  // libMesh::err << "Selected diagonal " << _diagonal_selection << std::endl;
+  // libMesh::err << "j=" << j << std::endl;
+  // libMesh::err << "k=" << k << std::endl;
+  // libMesh::err << "jp=" << jp << std::endl;
+  // libMesh::err << "kp=" << kp << std::endl;
 
   // Call embedding matrx with permuted indices
   return this->_embedding_matrix[i][jp][kp];

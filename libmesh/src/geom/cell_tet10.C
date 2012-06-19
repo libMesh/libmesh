@@ -94,6 +94,38 @@ bool Tet10::is_node_on_edge(const unsigned int n,
 }
 
 
+#ifdef LIBMESH_ENABLE_AMR
+
+// This function only works if LIBMESH_ENABLE_AMR...
+bool Tet10::is_child_on_side(const unsigned int c,
+                             const unsigned int s) const
+{
+  // Table of local IDs for the midege nodes on the side opposite a given node.
+  // See the ASCII art in the header file for this class to confirm this.
+  const unsigned int midedge_nodes_opposite[4][3] =
+    {
+      {5,8,9}, // midedge nodes opposite node 0
+      {6,7,9}, // midedge nodes opposite node 1
+      {4,7,8}, // midedge nodes opposite node 2
+      {4,5,6}  // midedge nodes opposite node 3
+    };
+
+  // Call the base class helper function
+  return Tet::is_child_on_side_helper(c, s, midedge_nodes_opposite);
+}
+
+#else
+
+bool Tet10::is_child_on_side(const unsigned int /*c*/,
+                             const unsigned int /*s*/) const
+{
+  libmesh_not_implemented();
+  return false;
+}
+
+#endif //LIBMESH_ENABLE_AMR
+
+
 
 bool Tet10::has_affine_map() const
 {
@@ -641,8 +673,8 @@ const float Tet10::_embedding_matrix[8][10][10] =
 
 
 float Tet10::embedding_matrix (const unsigned int i,
-			      const unsigned int j,
-			      const unsigned int k) const
+                               const unsigned int j,
+                               const unsigned int k) const
 {
   // Check for uninitialized diagonal selection
   if (this->_diagonal_selection==INVALID_DIAG)
@@ -670,12 +702,41 @@ float Tet10::embedding_matrix (const unsigned int i,
 
   if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
     {
-      // Permute j, k
-      if (jp<3) jp=(jp+static_cast<unsigned int>(this->_diagonal_selection))%3;
-      else if (jp>3) jp=(jp-1+static_cast<unsigned int>(this->_diagonal_selection))%3+1+3*((jp-1)/3);
-      if (kp<3) kp=(kp+static_cast<unsigned int>(this->_diagonal_selection))%3;
-      else if (kp>3) kp=(kp-1+static_cast<unsigned int>(this->_diagonal_selection))%3+1+3*((kp-1)/3);
+      // Just the enum value cast to an unsigned int...
+      const unsigned ds = static_cast<unsigned int>(this->_diagonal_selection); // == 1 or 2
+
+      // Instead of doing a lot of arithmetic, use these
+      // straightforward arrays for the permutations.  Note that 3 ->
+      // 3, and the first array consists of "forward" permutations of
+      // the sets {0,1,2}, {4,5,6}, and {7,8,9} while the second array
+      // consists of "reverse" permutations of the same sets.
+      const unsigned int perms[2][10] =
+        {
+          {1, 2, 0, 3, 5, 6, 4, 8, 9, 7},
+          {2, 0, 1, 3, 6, 4, 5, 9, 7, 8}
+        };
+
+      // Permute j
+      jp = perms[ds-1][j];
+      //      if (jp<3)
+      //        jp = (jp+ds)%3;
+      //      else if (jp>3)
+      //        jp = (jp-1+ds)%3 + 1 + 3*((jp-1)/3);
+
+      // Permute k
+      kp = perms[ds-1][k];
+      //      if (kp<3)
+      //        kp = (kp+ds)%3;
+      //      else if (kp>3)
+      //        kp = (kp-1+ds)%3 + 1 + 3*((kp-1)/3);
     }
+
+  // Debugging:
+  // libMesh::err << "Selected diagonal " << _diagonal_selection << std::endl;
+  // libMesh::err << "j=" << j << std::endl;
+  // libMesh::err << "k=" << k << std::endl;
+  // libMesh::err << "jp=" << jp << std::endl;
+  // libMesh::err << "kp=" << kp << std::endl;
 
   // Call embedding matrx with permuted indices
   return this->_embedding_matrix[i][jp][kp];
