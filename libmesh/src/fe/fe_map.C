@@ -1056,17 +1056,9 @@ void FE<Dim,T>::inverse_map (const Elem* elem,
 
 //--------------------------------------------------------------
 // Explicit instantiations using the macro from fe_macro.h
-INSTANTIATE_IMAP(0);
-INSTANTIATE_IMAP(1);
-INSTANTIATE_IMAP(2);
-INSTANTIATE_IMAP(3);
-
-// Note: This appears to be necessary even for GNU compilers (parallel build is unstable without it)
-//#if defined(__INTEL_COMPILER)
-INSTANTIATE_MAP(0);
-INSTANTIATE_MAP(1);
-INSTANTIATE_MAP(2);
-INSTANTIATE_MAP(3);
-//#endif
+INSTANTIATE_ALL_MAPS(0);
+INSTANTIATE_ALL_MAPS(1);
+INSTANTIATE_ALL_MAPS(2);
+INSTANTIATE_ALL_MAPS(3);
 
 } // namespace libMesh
