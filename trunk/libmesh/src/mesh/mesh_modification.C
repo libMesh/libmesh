@@ -623,6 +623,11 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * should be transfered to the second-order element.  The old
        * boundary conditions will be removed from the BoundaryInfo
        * data structure by insert_elem.
+       * 
+       * Also, prepare_for_use() will reconstruct most of our neighbor
+       * links, but if we have any remote_elem links in a distributed
+       * mesh, they need to be preserved.  We do that in the same loop
+       * here.
        */
       libmesh_assert (lo_elem->n_sides() == so_elem->n_sides());
 
@@ -632,6 +637,9 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	    this->boundary_info->raw_boundary_ids (lo_elem, s);
 
 	  this->boundary_info->add_side (so_elem, s, boundary_ids);
+
+	  if (lo_elem->neighbor(s) == remote_elem)
+            so_elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
 	}
 
       /*
@@ -992,6 +1000,93 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 
 	      } // end if (mesh_has_boundary_data)
 
+
+	    // On a distributed mesh, we need to preserve remote_elem
+	    // links, since prepare_for_use can't reconstruct them for
+	    // us.
+            for (unsigned int sn=0; sn<elem->n_sides(); ++sn)
+              {
+                if (elem->neighbor(sn) == remote_elem)
+                  {
+                    // Create a remote_elem link on one of the new
+                    // elements corresponding to the link from the old
+                    // element.
+                    if (!edge_swap)
+                      {
+                        switch (sn)
+                              {
+                              case 0:
+                                {
+                                  // New remote side is Tri 0, side 0
+                                  tri0->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
+                                  break;
+                                }
+                              case 1:
+                                {
+                                  // New remote side is Tri 0, side 1
+                                  tri0->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
+                                  break;
+                                }
+                              case 2:
+                                {
+                                  // New remote side is Tri 1, side 1
+                                  tri1->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
+                                  break;
+                                }
+                              case 3:
+                                {
+                                  // New remote side is Tri 1, side 2
+                                  tri1->set_neighbor(2, const_cast<RemoteElem*>(remote_elem));
+                                  break;
+                                }
+
+                              default:
+                                {
+                                  libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+                                  libmesh_error();
+                                }
+                              }
+                          }
+
+                        else // edge_swap==true
+                          {
+                            switch (sn)
+                              {
+                              case 0:
+                                {
+                                  // New remote side is Tri 0, side 0
+                                  tri0->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
+                                  break;
+                                }
+                              case 1:
+                                {
+                                  // New remote side is Tri 1, side 0
+                                  tri1->set_neighbor(0, const_cast<RemoteElem*>(remote_elem));
+                                  break;
+                                }
+                              case 2:
+                                {
+                                  // New remote side is Tri 1, side 1
+                                  tri1->set_neighbor(1, const_cast<RemoteElem*>(remote_elem));
+                                  break;
+                                }
+                              case 3:
+                                {
+                                  // New remote side is Tri 0, side 2
+                                  tri0->set_neighbor(2, const_cast<RemoteElem*>(remote_elem));
+                                  break;
+                                }
+
+                              default:
+                                {
+                                  libMesh::err << "Quad4/8/9 cannot have more than 4 sides." << std::endl;
+                                  libmesh_error();
+                                }
+                              }
+                          } // end edge_swap==true
+                      } // end if (elem->neighbor(sn) == remote_elem)
+              } // end for loop over sides
+
 	    // Determine new IDs for the split elements which will be
 	    // the same on all processors, therefore keeping the Mesh
 	    // in sync.  Note: we offset the new IDs by n_orig_elem to
@@ -1281,10 +1376,14 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 	// try to create one for you...
 	copy->set_id( elem->id() );
 
-	// This element could have boundary info as well.  We need
-	// to save the (elem, side, bc_id) triples
+	// This element could have boundary info or ParallelMesh
+	// remote_elem links as well.  We need to save the (elem,
+	// side, bc_id) triples and those links
 	for (unsigned int s=0; s<elem->n_sides(); s++)
 	  {
+            if (elem->neighbor(s) == remote_elem)
+              copy->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+
 	    const std::vector<boundary_id_type>& bc_ids = mesh.boundary_info->boundary_ids(elem,s);
 	    for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
 	      {
