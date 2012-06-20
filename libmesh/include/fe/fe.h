@@ -868,7 +868,7 @@ namespace FiniteElements
 template <unsigned int Dim, FEFamily T>
 inline
 FE<Dim,T>::FE (const FEType& fet) :
-  FEBase (Dim,fet),
+  FEGenericBase<typename FEOutputType<T>::type> (Dim,fet),
   last_side(INVALID_ELEM),
   last_edge(libMesh::invalid_uint)
 {
