@@ -69,7 +69,7 @@ FEInterface::FEInterface()
 	  } \
       } while (0)
 #else
-#define fe_family_switch(dim, func_and_args) \
+#define fe_family_switch(dim, func_and_args, prefix, suffix) \
       do { \
 	switch (fe_t.family) \
 	  { \
