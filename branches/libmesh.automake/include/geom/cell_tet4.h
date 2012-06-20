@@ -108,6 +108,13 @@ public:
 			       const unsigned int e) const;
 
   /*
+   * @returns true iff the specified child is on the
+   * specified side
+   */
+  virtual bool is_child_on_side(const unsigned int c,
+			        const unsigned int s) const;
+
+  /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
    */
@@ -186,7 +193,6 @@ protected:
   float embedding_matrix (const unsigned int i,
 			  const unsigned int j,
 			  const unsigned int k) const;
-  //  { return _embedding_matrix[i][j][k]; }
 
   /**
    * Matrix that computes new nodal locations/solution values
@@ -194,54 +200,26 @@ protected:
    */
   static const float _embedding_matrix[8][4][4];
 
- public:
-
-  /**
-   * This enumeration keeps track of which diagonal is selected during
-   * refinement.  In general there are three possible diagonals to
-   * choose when splitting the octahedron, and by choosing the shortest
-   * one we obtain the best element shape.
-   */
-  enum Diagonal
-    {DIAG_02_13=0,    // diagonal between edges (0,2) and (1,3)
-     DIAG_03_12=1,    // diagonal between edges (0,3) and (1,2)
-     DIAG_01_23=2,    // diagonal between edges (0,1) and (2,3)
-     INVALID_DIAG=99  // diagonal not yet selected
-    };
-
-  /**
-   * Returns the diagonal that has been selected during refinement.
-   */
-  Diagonal diagonal_selection (void) const { return _diagonal_selection; }
-
-  /**
-   * Allows the user to select the diagonal for the refinement.  This
-   * function may only be called before the element is ever refined.
-   */
-  void select_diagonal (const Diagonal diag) const;
-
-  /**
-   * Allows the user to reselect the diagonal after refinement.  This
-   * function may only be called directly after the element is refined
-   * for the first time (and before the \p EquationSystems::reinit()
-   * is called).  It will destroy and re-create the children if
-   * necessary.
-   */
-  void reselect_diagonal (const Diagonal diag);
-
-  /**
-   * Reselects the diagonal after refinement to be the optimal one.
-   * This makes sense if the user has moved some grid points, so that
-   * the former optimal choice is no longer optimal.  Also, the user
-   * may exclude one diagonal from this selection by giving it as
-   * argument.  In this case, the more optimal one of the remaining
-   * two diagonals is chosen.
-   */
-  void reselect_optimal_diagonal (const Diagonal exclude_this=INVALID_DIAG);
-
- protected:
-
-  mutable Diagonal _diagonal_selection;
+// public:
+//
+//  /**
+//   * Allows the user to reselect the diagonal after refinement.  This
+//   * function may only be called directly after the element is refined
+//   * for the first time (and before the \p EquationSystems::reinit()
+//   * is called).  It will destroy and re-create the children if
+//   * necessary.
+//   */
+//  void reselect_diagonal (const Diagonal diag);
+//
+//  /**
+//   * Reselects the diagonal after refinement to be the optimal one.
+//   * This makes sense if the user has moved some grid points, so that
+//   * the former optimal choice is no longer optimal.  Also, the user
+//   * may exclude one diagonal from this selection by giving it as
+//   * argument.  In this case, the more optimal one of the remaining
+//   * two diagonals is chosen.
+//   */
+//  void reselect_optimal_diagonal (const Diagonal exclude_this=INVALID_DIAG);
 
 #endif
 
@@ -254,9 +232,6 @@ protected:
 inline
 Tet4::Tet4(Elem* p) :
   Tet(Tet4::n_nodes(), p, _nodelinks_data)
-#ifdef LIBMESH_ENABLE_AMR
-  , _diagonal_selection(INVALID_DIAG)
-#endif
 {
 }
 

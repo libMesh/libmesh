@@ -992,7 +992,11 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase &mesh)
+void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase&
+#ifdef LIBMESH_ENABLE_AMR
+mesh
+#endif
+)
 {
   if (libMesh::n_processors() == 1)
     return;

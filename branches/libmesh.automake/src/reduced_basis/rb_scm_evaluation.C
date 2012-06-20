@@ -28,6 +28,7 @@
 
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
+#include "o_string_stream.h"
 #include "sparse_matrix.h"
 #include "equation_systems.h"
 #include "getpot.h"
@@ -584,7 +585,7 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
       std::string param_name = it->first;
       Real param_value;
       C_J_in >> param_value;
-      C_J[i].add_parameter(param_name, param_value);
+      C_J[i].set_value(param_name, param_value);
     }
   }
   C_J_in.close();

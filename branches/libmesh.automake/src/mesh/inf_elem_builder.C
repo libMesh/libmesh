@@ -314,7 +314,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
   Real max_r=0.;
 
   // The index of the farthest point in the mesh from the origin
-  unsigned int max_r_node;
+  int max_r_node = -1;
 
 #ifdef DEBUG
   if (be_verbose)
@@ -418,13 +418,14 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
   //  from faces to ofaces, nodes are collected in onodes.
   //  Here, the search is done iteratively, because, depending on
   //  the mesh, a very high level of recursion might be necessary.
-  onodes.insert(max_r_node);
+  if (max_r_node > 0)
+    onodes.insert(max_r_node);
 
 
   {
     std::set< std::pair<unsigned int,unsigned int> >::iterator face_it = faces.begin();
     unsigned int facesfound=0;
-    do {
+    while (face_it != faces.end()) {
 
       std::pair<unsigned int, unsigned int> p;
       p = *face_it;
@@ -467,7 +468,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 	  face_it    = faces.begin();
 	}
 
-    } while(face_it != faces.end());
+    }
   }
 
 

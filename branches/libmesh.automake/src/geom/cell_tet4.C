@@ -78,6 +78,44 @@ bool Tet4::is_node_on_edge(const unsigned int n,
   return false;
 }
 
+
+
+
+#ifdef LIBMESH_ENABLE_AMR
+
+// This function only works if LIBMESH_ENABLE_AMR...
+bool Tet4::is_child_on_side(const unsigned int c,
+                            const unsigned int s) const
+{
+  // OK, for the Tet4, this is pretty obvious... it is sets of nodes
+  // not equal to the current node.  But if we want this algorithm to
+  // be generic and work for Tet10 also it helps to do it this way.
+  const unsigned int nodes_opposite[4][3] =
+    {
+      {1,2,3}, // nodes opposite node 0
+      {0,2,3}, // nodes opposite node 1
+      {0,1,3}, // nodes opposite node 2
+      {0,1,2}  // nodes opposite node 3
+    };
+
+  // Call the base class helper function
+  return Tet::is_child_on_side_helper(c, s, nodes_opposite);
+}
+
+#else
+
+bool Tet4::is_child_on_side(const unsigned int /*c*/,
+                            const unsigned int /*s*/) const
+{
+  libmesh_not_implemented();
+  return false;
+}
+
+#endif //LIBMESH_ENABLE_AMR
+
+
+
+
 bool Tet4::is_node_on_side(const unsigned int n,
 			   const unsigned int s) const
 {
@@ -333,24 +371,8 @@ float Tet4::embedding_matrix (const unsigned int i,
 			      const unsigned int j,
 			      const unsigned int k) const
 {
-  // Check for uninitialized diagonal selection
-  if (this->_diagonal_selection==INVALID_DIAG)
-    {
-      Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
-      Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
-      Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
-
-      this->_diagonal_selection=DIAG_02_13;
-
-      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
-	{
-	  if (diag_01_23 < diag_03_12)
-	    this->_diagonal_selection=DIAG_01_23;
-
-	  else
-	    this->_diagonal_selection=DIAG_03_12;
-	}
-    }
+  // Choose an optimal diagonal, if one has not already been selected
+  this->choose_diagonal();
 
   // Permuted j and k indices
   unsigned int
@@ -359,10 +381,27 @@ float Tet4::embedding_matrix (const unsigned int i,
 
   if ((i>3) && (this->_diagonal_selection!=DIAG_02_13))
     {
-      // Permute j, k
-      if (jp!=3) jp=(jp+static_cast<unsigned int>(this->_diagonal_selection))%3;
-      if (kp!=3) kp=(kp+static_cast<unsigned int>(this->_diagonal_selection))%3;
+      // Just the enum value cast to an unsigned int...
+      const unsigned ds = static_cast<unsigned int>(this->_diagonal_selection);
+
+      // Permute j, k:
+      // ds==1      ds==2
+      // 0 -> 1     0 -> 2
+      // 1 -> 2     1 -> 0
+      // 2 -> 0     2 -> 1
+      if (jp != 3)
+        jp = (jp+ds)%3;
+
+      if (kp != 3)
+        kp = (kp+ds)%3;
     }
+
+  // Debugging
+  // libMesh::err << "Selected diagonal " << _diagonal_selection << std::endl;
+  // libMesh::err << "j=" << j << std::endl;
+  // libMesh::err << "k=" << k << std::endl;
+  // libMesh::err << "jp=" << jp << std::endl;
+  // libMesh::err << "kp=" << kp << std::endl;
 
   // Call embedding matrx with permuted indices
   return this->_embedding_matrix[i][jp][kp];
@@ -370,139 +409,134 @@ float Tet4::embedding_matrix (const unsigned int i,
 
 
 
-void Tet4::select_diagonal (const Diagonal diag) const
-{
-  libmesh_assert (_diagonal_selection==INVALID_DIAG);
-  _diagonal_selection = diag;
-}
 
 
 
-void Tet4::reselect_diagonal (const Diagonal diag)
-{
-  /* Make sure that the element has just been refined.  */
-  libmesh_assert (_children!=NULL);
-  libmesh_assert (n_children()==8);
-  libmesh_assert (_children[0]->refinement_flag()==JUST_REFINED);
-  libmesh_assert (_children[1]->refinement_flag()==JUST_REFINED);
-  libmesh_assert (_children[2]->refinement_flag()==JUST_REFINED);
-  libmesh_assert (_children[3]->refinement_flag()==JUST_REFINED);
-  libmesh_assert (_children[4]->refinement_flag()==JUST_REFINED);
-  libmesh_assert (_children[5]->refinement_flag()==JUST_REFINED);
-  libmesh_assert (_children[6]->refinement_flag()==JUST_REFINED);
-  libmesh_assert (_children[7]->refinement_flag()==JUST_REFINED);
+// void Tet4::reselect_diagonal (const Diagonal diag)
+// {
+//   /* Make sure that the element has just been refined.  */
+//   libmesh_assert (_children!=NULL);
+//   libmesh_assert (n_children()==8);
+//   libmesh_assert (_children[0]->refinement_flag()==JUST_REFINED);
+//   libmesh_assert (_children[1]->refinement_flag()==JUST_REFINED);
+//   libmesh_assert (_children[2]->refinement_flag()==JUST_REFINED);
+//   libmesh_assert (_children[3]->refinement_flag()==JUST_REFINED);
+//   libmesh_assert (_children[4]->refinement_flag()==JUST_REFINED);
+//   libmesh_assert (_children[5]->refinement_flag()==JUST_REFINED);
+//   libmesh_assert (_children[6]->refinement_flag()==JUST_REFINED);
+//   libmesh_assert (_children[7]->refinement_flag()==JUST_REFINED);
+//
+//   /* Check whether anything has to be changed.  */
+//   if (_diagonal_selection!=diag)
+//     {
+//       /* Set new diagonal selection.  */
+//       _diagonal_selection = diag;
+//
+//       /* The first four children do not have to be changed.  For the
+// 	 others, only the nodes have to be changed.  Note that we have
+// 	 to keep track of the nodes ourselves since there is no \p
+// 	 MeshRefinement object with a valid \p _new_nodes_map
+// 	 available.  */
+//       for (unsigned int c=4; c<this->n_children(); c++)
+// 	{
+// 	  Elem *child = this->child(c);
+// 	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
+// 	    {
+// 	      /* Unassign the current node.  */
+// 	      child->set_node(nc) = NULL;
+//
+// 	      /* We have to find the correct new node now.  We know
+// 		 that it exists somewhere.  We make use of the fact
+// 		 that the embedding matrix for these children consists
+// 		 of entries 0.0 and 0.5 only.  Also, we make use of
+// 		 the properties of the embedding matrix for the first
+// 		 (unchanged) four children, which allow us to use a
+// 		 simple mechanism to find the required node.  */
+//
+//
+// 	      unsigned int first_05_in_embedding_matrix = libMesh::invalid_uint;
+// 	      for (unsigned int n=0; n<this->n_nodes(); n++)
+// 		{
+// 		  if (this->embedding_matrix(c,nc,n) != 0.0)
+// 		    {
+// 		      /* It must be 0.5 then.  Check whether it's the
+// 			 first or second time that we get a 0.5
+// 			 value.  */
+// 		      if (first_05_in_embedding_matrix==libMesh::invalid_uint)
+// 			{
+// 			  /* First time, so just remeber this position.  */
+// 			  first_05_in_embedding_matrix = n;
+// 			}
+// 		      else
+// 			{
+// 			  /* Second time, so we know now which node to
+// 			     use.  */
+// 			  child->set_node(nc) = this->child(n)->get_node(first_05_in_embedding_matrix);
+// 			}
+//
+// 		    }
+// 		}
+//
+// 	      /* Make sure that a node has been found.  */
+// 	      libmesh_assert (child->get_node(nc)!=NULL);
+// 	    }
+// 	}
+//     }
+// }
 
-  /* Check whether anything has to be changed.  */
-  if (_diagonal_selection!=diag)
-    {
-      /* Set new diagonal selection.  */
-      _diagonal_selection = diag;
-
-      /* The first four children do not have to be changed.  For the
-	 others, only the nodes have to be changed.  Note that we have
-	 to keep track of the nodes ourselves since there is no \p
-	 MeshRefinement object with a valid \p _new_nodes_map
-	 available.  */
-      for (unsigned int c=4; c<this->n_children(); c++)
-	{
-	  Elem *child = this->child(c);
-	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
-	    {
-	      /* Unassign the current node.  */
-	      child->set_node(nc) = NULL;
-
-	      /* We have to find the correct new node now.  We know
-		 that it exists somewhere.  We make use of the fact
-		 that the embedding matrix for these children consists
-		 of entries 0.0 and 0.5 only.  Also, we make use of
-		 the properties of the embedding matrix for the first
-		 (unchanged) four children, which allow us to use a
-		 simple mechanism to find the required node.  */
 
 
-	      unsigned int first_05_in_embedding_matrix = libMesh::invalid_uint;
-	      for (unsigned int n=0; n<this->n_nodes(); n++)
-		{
-		  if (this->embedding_matrix(c,nc,n) != 0.0)
-		    {
-		      /* It must be 0.5 then.  Check whether it's the
-			 first or second time that we get a 0.5
-			 value.  */
-		      if (first_05_in_embedding_matrix==libMesh::invalid_uint)
-			{
-			  /* First time, so just remeber this position.  */
-			  first_05_in_embedding_matrix = n;
-			}
-		      else
-			{
-			  /* Second time, so we know now which node to
-			     use.  */
-			  child->set_node(nc) = this->child(n)->get_node(first_05_in_embedding_matrix);
-			}
-
-		    }
-		}
-
-	      /* Make sure that a node has been found.  */
-	      libmesh_assert (child->get_node(nc)!=NULL);
-	    }
-	}
-    }
-}
-
-
-
-void Tet4::reselect_optimal_diagonal (const Diagonal exclude_this)
-{
-  Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
-  Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
-  Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
-
-  Diagonal use_this = INVALID_DIAG;
-  switch (exclude_this)
-    {
-    case DIAG_01_23:
-      use_this = DIAG_02_13;
-      if (diag_03_12 < diag_02_13)
-	{
-	  use_this = DIAG_03_12;
-	}
-      break;
-
-    case DIAG_02_13:
-      use_this = DIAG_03_12;
-      if (diag_01_23 < diag_03_12)
-	{
-	  use_this = DIAG_01_23;
-	}
-      break;
-
-    case DIAG_03_12:
-      use_this = DIAG_02_13;
-      if (diag_01_23 < diag_02_13)
-	{
-	  use_this = DIAG_01_23;
-	}
-      break;
-
-    default:
-      use_this = DIAG_02_13;
-      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
-	{
-	  if (diag_01_23 < diag_03_12)
-	    {
-	      use_this = DIAG_01_23;
-	    }
-	  else
-	    {
-	      use_this = DIAG_03_12;
-	    }
-	}
-      break;
-    }
-
-  reselect_diagonal (use_this);
-}
+// void Tet4::reselect_optimal_diagonal (const Diagonal exclude_this)
+// {
+//   Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
+//   Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
+//   Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+//
+//   Diagonal use_this = INVALID_DIAG;
+//   switch (exclude_this)
+//     {
+//     case DIAG_01_23:
+//       use_this = DIAG_02_13;
+//       if (diag_03_12 < diag_02_13)
+// 	{
+// 	  use_this = DIAG_03_12;
+// 	}
+//       break;
+//
+//     case DIAG_02_13:
+//       use_this = DIAG_03_12;
+//       if (diag_01_23 < diag_03_12)
+// 	{
+// 	  use_this = DIAG_01_23;
+// 	}
+//       break;
+//
+//     case DIAG_03_12:
+//       use_this = DIAG_02_13;
+//       if (diag_01_23 < diag_02_13)
+// 	{
+// 	  use_this = DIAG_01_23;
+// 	}
+//       break;
+//
+//     default:
+//       use_this = DIAG_02_13;
+//       if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
+// 	{
+// 	  if (diag_01_23 < diag_03_12)
+// 	    {
+// 	      use_this = DIAG_01_23;
+// 	    }
+// 	  else
+// 	    {
+// 	      use_this = DIAG_03_12;
+// 	    }
+// 	}
+//       break;
+//     }
+//
+//   reselect_diagonal (use_this);
+// }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 } // namespace libMesh

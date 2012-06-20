@@ -71,13 +71,6 @@ public:
   unsigned int n_children() const { return 8; }
 
   /*
-   * @returns true iff the specified child is on the
-   * specified side
-   */
-  virtual bool is_child_on_side(const unsigned int c,
-			        const unsigned int s) const;
-
-  /*
    * @returns true iff the specified edge is on the specified side
    */
   virtual bool is_edge_on_side(const unsigned int e,
@@ -109,6 +102,30 @@ public:
    */
   std::pair<Real, Real> qual_bounds (const ElemQuality q) const;
 
+  /**
+   * This enumeration keeps track of which diagonal is selected during
+   * refinement.  In general there are three possible diagonals to
+   * choose when splitting the octahedron, and by choosing the shortest
+   * one we obtain the best element shape.
+   */
+  enum Diagonal
+    {
+      DIAG_02_13=0,    // diagonal between edges (0,2) and (1,3)
+      DIAG_03_12=1,    // diagonal between edges (0,3) and (1,2)
+      DIAG_01_23=2,    // diagonal between edges (0,1) and (2,3)
+      INVALID_DIAG=99  // diagonal not yet selected
+    };
+
+  /**
+   * Returns the diagonal that has been selected during refinement.
+   */
+  Diagonal diagonal_selection () const { return _diagonal_selection; }
+
+  /**
+   * Allows the user to select the diagonal for the refinement.  This
+   * function may only be called before the element is ever refined.
+   */
+  void select_diagonal (const Diagonal diag) const;
 
 protected:
 
@@ -116,6 +133,28 @@ protected:
    * Data for links to parent/neighbor/interior_parent elements.
    */
   Elem* _elemlinks_data[5+(LIBMESH_DIM>3)];
+
+  /**
+   * Called by descendant classes with appropriate data to determine
+   * if child c is on side s.  Only works if LIBMESH_ENABLE_AMR.
+   */
+  bool is_child_on_side_helper(const unsigned int c,
+                               const unsigned int s,
+                               const unsigned int checked_nodes[][3] ) const;
+
+  /**
+   * The currently-selected diagonal used during refinement.
+   * Initialized to INVALID_DIAG.
+   */
+  mutable Diagonal _diagonal_selection;
+
+  /**
+   * Derived classes use this function to select an initial
+   * diagonal during refinement. The optimal choice is the shortest
+   * of the three.
+   */
+  void choose_diagonal() const;
+
 };
 
 
@@ -125,6 +164,7 @@ protected:
 inline
 Tet::Tet(const unsigned int nn, Elem* p, Node** nodelinkdata) :
   Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata)
+  , _diagonal_selection(INVALID_DIAG)
 {
 }
 

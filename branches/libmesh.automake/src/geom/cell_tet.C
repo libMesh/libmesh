@@ -127,49 +127,91 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 }
 
 
-
-bool Tet::is_child_on_side(const unsigned int c,
-                           const unsigned int s) const
+void Tet::select_diagonal (const Diagonal diag) const
 {
-  libmesh_assert (c < this->n_children());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert (_diagonal_selection==INVALID_DIAG);
+  _diagonal_selection = diag;
+}
 
-  // For the 4 vertices, child c touches vertex c, so we can return
-  // true if that vertex is on side s
-  for (unsigned int i = 0; i != 3; ++i)
-    if (Tet4::side_nodes_map[s][i] == c)
-      return true;
 
-  // For the 4 non-vertex children, the child ordering depends on the
-  // diagonal selection.  We'll let the embedding matrix figure that
-  // out: if this child has three nodes that don't depend on the
-  // position of the node_facing_side[s], then we're on side s.
 
-  const unsigned int node_facing_side[4] = {3, 2, 0, 1};
-  const unsigned int n = node_facing_side[s];
 
-  unsigned int independent_nodes = 0;
-
-  for (unsigned int nc = 0; nc != 3; ++nc)
-    {
-      independent_nodes++;  // Hey, we're independent so far!
 
 #ifdef LIBMESH_ENABLE_AMR
-      if (this->embedding_matrix(c,nc,n) != 0.)
-        {
-          independent_nodes--;  // No, wait, we're not
-          continue;
-        }
+
+
+  bool Tet::is_child_on_side_helper(const unsigned int c,
+                                    const unsigned int s,
+                                    const unsigned int checked_nodes[][3]) const
+  {
+    libmesh_assert (c < this->n_children());
+    libmesh_assert (s < this->n_sides());
+
+    // For the 4 vertices, child c touches vertex c, so we can return
+    // true if that vertex is on side s
+    for (unsigned int i = 0; i != 3; ++i)
+      if (Tet4::side_nodes_map[s][i] == c)
+        return true;
+
+    // If we are a "vertex child" and we didn't already return true,
+    // we must not be on the side in question
+    if (c < 4)
+      return false;
+
+    // For the 4 non-vertex children, the child ordering depends on the
+    // diagonal selection.  We'll let the embedding matrix figure that
+    // out: if this child has three nodes that don't depend on the
+    // position of the node_facing_side[s], then we're on side s.  Which
+    // three nodes those are depends on the subclass, so their responsibility
+    // is to call this function with the proper check_nodes array
+    const unsigned int node_facing_side[4] = {3, 2, 0, 1};
+    const unsigned int n = node_facing_side[s];
+
+    // Add up the absolute values of the entries of the embedding matrix for the
+    // nodes opposite node n.  If it is equal to zero, then the child in question is
+    // on side s, so return true.
+    Real embedding_sum = 0.;
+    for (unsigned i=0; i<3; ++i)
+      embedding_sum += std::abs(this->embedding_matrix(c, checked_nodes[n][i], n));
+
+    return ( std::abs(embedding_sum) < 1.e-3 );
+  }
+
+#else
+
+bool Tet::is_child_on_side_helper(const unsigned int /*c*/,
+                                  const unsigned int /*s*/,
+                                  const unsigned int /*checked_nodes*/[][3]) const
+{
+  libmesh_not_implemented();
+  return false;
+}
+
 #endif //LIBMESH_ENABLE_AMR
+
+
+
+
+void Tet::choose_diagonal() const
+{
+  // Check for uninitialized diagonal selection
+  if (this->_diagonal_selection==INVALID_DIAG)
+    {
+      Real diag_01_23 = (this->point(0)+this->point(1)-this->point(2)-this->point(3)).size_sq();
+      Real diag_02_13 = (this->point(0)-this->point(1)+this->point(2)-this->point(3)).size_sq();
+      Real diag_03_12 = (this->point(0)-this->point(1)-this->point(2)+this->point(3)).size_sq();
+
+      this->_diagonal_selection=DIAG_02_13;
+
+      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
+        {
+          if (diag_01_23 < diag_03_12)
+            this->_diagonal_selection=DIAG_01_23;
+
+          else
+            this->_diagonal_selection=DIAG_03_12;
+        }
     }
-
-  // No subtet of an octahedron touches a side at all nodes
-  libmesh_assert(independent_nodes != 4);
-  // Every subtet of an octahedron touches each side at at least one
-  // node
-  libmesh_assert(independent_nodes != 0);
-
-  return (independent_nodes == 3);
 }
 
 

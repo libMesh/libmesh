@@ -23,10 +23,17 @@
 
 
 /**
- * This macro helps in instantiating specific versions
+ * These macros help in instantiating specific versions
  * of the \p FE class.  Simply include this file, and
- * instantiate at the end for the desired dimension.
+ * instantiate at the end for the desired dimension(s).
  */
+
+#define INSTANTIATE_MAPS(_dim,_type) \
+  template Point FE<_dim,_type>::map(const Elem*,const Point&);\
+  template Point FE<_dim,_type>::map_xi(const Elem*,const Point&);\
+  template Point FE<_dim,_type>::map_eta(const Elem*,const Point&);\
+  template Point FE<_dim,_type>::map_zeta(const Elem*,const Point&); \
+  template void  FE<_dim,_type>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool)
 
 #ifndef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
@@ -40,16 +47,16 @@
                                template class FE< (_dim), SCALAR>;   \
                                template class FE< (_dim), XYZ>
 
-#define INSTANTIATE_IMAP(_dim) \
-  template void FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
-  template void FE<_dim,HERMITE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
-  template void FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void FE<_dim,L2_HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void FE<_dim,L2_LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void FE<_dim,SCALAR>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool)
+#define INSTANTIATE_ALL_MAPS(_dim) \
+  INSTANTIATE_MAPS(_dim,CLOUGH); \
+  INSTANTIATE_MAPS(_dim,HERMITE); \
+  INSTANTIATE_MAPS(_dim,HIERARCHIC); \
+  INSTANTIATE_MAPS(_dim,L2_HIERARCHIC); \
+  INSTANTIATE_MAPS(_dim,LAGRANGE); \
+  INSTANTIATE_MAPS(_dim,L2_LAGRANGE); \
+  INSTANTIATE_MAPS(_dim,MONOMIAL); \
+  INSTANTIATE_MAPS(_dim,SCALAR); \
+  INSTANTIATE_MAPS(_dim,XYZ)
 
 #else //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
@@ -65,43 +72,19 @@
                                template class FE< (_dim), SZABAB>;     \
                                template class FE< (_dim), XYZ>
 
-#define INSTANTIATE_IMAP(_dim) \
-  template void  FE<_dim,CLOUGH>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
-  template void  FE<_dim,HERMITE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool); \
-  template void  FE<_dim,HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void  FE<_dim,L2_HIERARCHIC>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void  FE<_dim,LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void  FE<_dim,L2_LAGRANGE>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void  FE<_dim,MONOMIAL>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void  FE<_dim,SCALAR>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void  FE<_dim,BERNSTEIN>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void  FE<_dim,SZABAB>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool);\
-  template void  FE<_dim,XYZ>::inverse_map(const Elem*,const std::vector<Point>&,std::vector<Point>&,Real,bool)
+#define INSTANTIATE_ALL_MAPS(_dim) \
+  INSTANTIATE_MAPS(_dim,CLOUGH); \
+  INSTANTIATE_MAPS(_dim,HERMITE); \
+  INSTANTIATE_MAPS(_dim,HIERARCHIC); \
+  INSTANTIATE_MAPS(_dim,L2_HIERARCHIC); \
+  INSTANTIATE_MAPS(_dim,LAGRANGE); \
+  INSTANTIATE_MAPS(_dim,L2_LAGRANGE); \
+  INSTANTIATE_MAPS(_dim,MONOMIAL); \
+  INSTANTIATE_MAPS(_dim,SCALAR); \
+  INSTANTIATE_MAPS(_dim,BERNSTEIN); \
+  INSTANTIATE_MAPS(_dim,SZABAB); \
+  INSTANTIATE_MAPS(_dim,XYZ)
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-
-// Refactoring of the finite element functions makes this instantiation
-// macro no longer necessary.
-/*
-#define INSTANTIATE_MBRF(_dim,_t) \
-  template unsigned int FE<_dim,_t>::n_dofs_at_node(ElemType,Order,unsigned int); \
-  template unsigned int FE<_dim,_t>::n_dofs(ElemType,Order);\
-  template bool         FE<_dim,_t>::shapes_need_reinit() const;\
-  template FEContinuity FE<_dim,_t>::get_continuity() const;\
-  template bool         FE<_dim,_t>::is_hierarchic() const;\
-  template unsigned int FE<_dim,_t>::n_dofs_per_elem(ElemType,Order);\
-  template void         FE<_dim,_t>::nodal_soln(const Elem*,const Order,const std::vector<Number>&,std::vector<Number>&)
-*/
-
-// The Intel 7.1 compiler out at TACC required these, but they are used
-// inside the inverse_map function so it seems like they should be instantiated
-// by the INSTANTIATE_IMAP macro above?  Also for some reason it did not
-// complain about map_zeta.
-#define INSTANTIATE_MAP(_dim) \
-  template Point FE<_dim,LAGRANGE>::map(const Elem*,const Point&);\
-  template Point FE<_dim,LAGRANGE>::map_xi(const Elem*,const Point&);\
-  template Point FE<_dim,LAGRANGE>::map_eta(const Elem*,const Point&);\
-  template Point FE<_dim,LAGRANGE>::map_zeta(const Elem*,const Point&)
-
 
 #endif // __fe_macro_h__

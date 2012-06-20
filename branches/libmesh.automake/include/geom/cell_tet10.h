@@ -115,6 +115,13 @@ public:
 			       const unsigned int e) const;
 
   /*
+   * @returns true iff the specified child is on the
+   * specified side
+   */
+  virtual bool is_child_on_side(const unsigned int c,
+			        const unsigned int s) const;
+
+  /*
    * @returns true iff the element map is definitely affine within
    * numerical tolerances
    */
@@ -197,7 +204,6 @@ protected:
   float embedding_matrix (const unsigned int i,
 			  const unsigned int j,
 			  const unsigned int k) const;
-  //  { return _embedding_matrix[i][j][k]; }
 
   /**
    * Matrix that computes new nodal locations/solution values
@@ -205,20 +211,6 @@ protected:
    */
   static const float _embedding_matrix[8][10][10];
 
-  /**
-   * This enumeration keeps track of which diagonal is selected during
-   * refinement.  In general there are three possible diagonals to
-   * choose when splitting the octahedron, and by choosing the shortest
-   * one we obtain the best element shape.
-   */
-  enum Diagonal
-    {DIAG_02_13=0,    // diagonal between edges (0,2) and (1,3)
-     DIAG_03_12=1,    // diagonal between edges (0,3) and (1,2)
-     DIAG_01_23=2,    // diagonal between edges (0,1) and (2,3)
-     INVALID_DIAG=99  // diagonal not yet selected
-    };
-
-  mutable Diagonal _diagonal_selection;
 
 #endif
 
@@ -249,9 +241,6 @@ private:
 inline
 Tet10::Tet10(Elem* p) :
   Tet(Tet10::n_nodes(), p, _nodelinks_data)
-#ifdef LIBMESH_ENABLE_AMR
-  , _diagonal_selection(INVALID_DIAG)
-#endif
 {
 }
 

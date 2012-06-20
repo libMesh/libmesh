@@ -31,6 +31,7 @@
 #include "mesh_base.h"
 #include "mesh_refinement.h"
 #include "numeric_vector.h"
+#include "o_string_stream.h"
 #include "quadrature.h"
 #include "system.h"
 #include "uniform_refinement_estimator.h"

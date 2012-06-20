@@ -1595,6 +1595,34 @@ bool Elem::point_test(const Point& p, Real box_tol, Real map_tol) const
 						      0.1*map_tol, // <- this is |dx| tolerance, the Newton residual should be ~ |dx|^2
 						      /*secure=*/ false);
 
+  // Check that the refspace point maps back to p!  This is only necessary
+  // for 1D and 2D elements, 3D elements always live in 3D.
+  //
+  // TODO: The contains_point() function could most likely be implemented
+  // more efficiently in the element sub-classes themselves, at least for
+  // the linear element types.
+  if (this->dim() < 3)
+    {
+      Point xyz = FEInterface::map(this->dim(),
+                                   fe_type,
+                                   this,
+                                   mapped_point);
+
+      // Compute the distance between the original point and the re-mapped point.
+      // They should be in the same place.
+      Real dist = (xyz - p).size();
+
+
+      // If dist is larger than some fraction of the tolerance, then return false.
+      // This can happen when e.g. a 2D element is living in 3D, and
+      // FEInterface::inverse_map() maps p onto the projection of the element,
+      // effectively "tricking" FEInterface::on_reference_element().
+      if (dist > this->hmax() * map_tol)
+        return false;
+    }
+
+
+
   return FEInterface::on_reference_element(mapped_point, this->type(), map_tol);
 }
 
