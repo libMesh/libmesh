@@ -314,14 +314,19 @@ public:
   virtual const Node* node_ptr (const unsigned int i) const = 0;
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ node.
+   * Return a writeable pointer to the \f$ i^{th} \f$ node.
    */
   virtual Node* & node_ptr (const unsigned int i) = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ element.
    */
-  virtual Elem* elem (const unsigned int i) const = 0;
+  virtual const Elem* elem (const unsigned int i) const = 0;
+
+  /**
+   * Return a writeable pointer to the \f$ i^{th} \f$ element.
+   */
+  virtual Elem* elem (const unsigned int i) = 0;
 
   /**
    * Add a new \p Node at \p Point \p p to the end of the vertex array,

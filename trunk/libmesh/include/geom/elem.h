@@ -192,10 +192,21 @@ class Elem : public ReferenceCountedObject<Elem>,
    * boundary, it will return a corresponding element on the opposite
    * side.
    */
+  const Elem* topological_neighbor (const unsigned int i,
+                                    const MeshBase& mesh,
+                                    const PointLocatorBase& point_locator,
+                                    const PeriodicBoundaries* pb) const;
+
+  /**
+   * @returns a writeable pointer to the \f$ i^{th} \f$ neighbor of
+   * this element for interior elements.  If an element is on a
+   * periodic boundary, it will return a corresponding element on the
+   * opposite side.
+   */
   Elem* topological_neighbor (const unsigned int i,
-                              const MeshBase& mesh,
+                              MeshBase& mesh,
                               const PointLocatorBase& point_locator,
-                              PeriodicBoundaries* pb) const;
+                              const PeriodicBoundaries* pb);
 
   /**
    * @return \p true if the element \p elem in question is a neighbor or
