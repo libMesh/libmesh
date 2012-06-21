@@ -2,7 +2,7 @@
 #define __biharmonic_h__
 
 #include "equation_systems.h"
-#include "mesh.h"
+#include "serial_mesh.h"
 #include "exodusII_io.h"
 
 // libmesh_error() and libmesh_assert() macros with a message
@@ -74,7 +74,7 @@ public:
    * We recommend that this be used through the factory Create function, which allocates
    * the mesh. In that case don't forget to call Destroy at the end, to free the mesh up.
    */
-  Biharmonic(Mesh* m);
+  Biharmonic(UnstructuredMesh* m);
 
 
   /**
@@ -120,7 +120,7 @@ private:
   //
   friend class JR;
   class JR;       // forward
-  Mesh*                                   _mesh;
+  UnstructuredMesh*                       _mesh;
   MeshRefinement*                         _meshRefinement;
   JR*                                     _jr;
 };

@@ -35,7 +35,7 @@
 
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
-#include "mesh.h"
+#include "serial_mesh.h"
 #include "mesh_refinement.h"
 #include "gmv_io.h"
 #include "equation_systems.h"
@@ -117,11 +117,6 @@ int main (int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
-#ifdef LIBMESH_ENABLE_PARMESH
-  // We still need some work on automatic parallel restarts
-  libmesh_example_assert(false, "--disable-parmesh");
-#endif
-
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_assert(false, "--enable-amr");
 #else
@@ -200,7 +195,9 @@ int main (int argc, char** argv)
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
   // Create a new mesh.
-  Mesh mesh;
+  // We still need some work on automatic parallel restarts with
+  // ParallelMesh
+  SerialMesh mesh;
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
