@@ -1819,7 +1819,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 	  this->exodus_elem_num_to_libmesh.push_back(elem_id);
 	  this->libmesh_elem_num_to_exodus[elem_id] = this->exodus_elem_num_to_libmesh.size();
 
-	  Elem * elem = pmesh.elem(elem_id);
+	  const Elem * elem = pmesh.elem(elem_id);
 
           // Exodus/Nemesis want every block to have the same element type
           // libmesh_assert(elem->type() == conv.get_canonical_type());
@@ -2148,7 +2148,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
   for (unsigned i=0; i<elem_list.size(); ++i)
     {
       // Get pointer to current Elem
-      Elem* elem = mesh.elem(elem_list[i]);
+      const Elem* elem = mesh.elem(elem_list[i]);
 
       // If element is local, process it
       if (elem->processor_id() == libMesh::processor_id())

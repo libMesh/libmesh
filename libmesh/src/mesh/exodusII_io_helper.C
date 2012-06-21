@@ -971,7 +971,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
           elem_num_map.push_back(elem_id);
           libmesh_elem_num_to_exodus[elem_id] = elem_num_map.size();
 
-          Elem * elem = mesh.elem(elem_id);
+          const Elem* elem = mesh.elem(elem_id);
 
           // Exodus/Nemesis want every block to have the same element type
           // libmesh_assert(elem->type() == conv.get_canonical_type());

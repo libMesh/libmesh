@@ -721,13 +721,51 @@ void Elem::find_edge_neighbors(std::set<const Elem *> &neighbor_set) const
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 Elem* Elem::topological_neighbor (const unsigned int i,
-                                  const MeshBase & mesh,
+                                  MeshBase & mesh,
                                   const PointLocatorBase& point_locator,
-                                  PeriodicBoundaries * pb) const
+                                  const PeriodicBoundaries * pb)
 {
   libmesh_assert (i < this->n_neighbors());
 
   Elem * neighbor = this->neighbor(i);
+  if (neighbor != NULL)
+    return neighbor;
+
+  if (pb)
+  {
+    // Since the neighbor is NULL it must be on a boundary. We need
+    // see if this is a periodic boundary in which case it will have a
+    // topological neighbor
+
+    std::vector<boundary_id_type> boundary_ids = mesh.boundary_info->boundary_ids(this, i);
+    for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
+      if (pb->boundary(*j))
+      {
+        // Since the point locator inside of periodic boundaries
+        // returns a const pointer we will retrieve the proper
+        // pointer directly from the mesh object.  Also since coarse
+        // elements do not have more refined neighbors we need to make
+        // sure that we don't return one of these types of neighbors.
+        neighbor = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
+        if (level() < neighbor->level())
+          neighbor = neighbor->parent();
+        return neighbor;
+      }
+  }
+
+  return NULL;
+}
+
+
+
+const Elem* Elem::topological_neighbor (const unsigned int i,
+                                        const MeshBase & mesh,
+                                        const PointLocatorBase& point_locator,
+                                        const PeriodicBoundaries * pb) const
+{
+  libmesh_assert (i < this->n_neighbors());
+
+  const Elem * neighbor = this->neighbor(i);
   if (neighbor != NULL)
     return neighbor;
 
