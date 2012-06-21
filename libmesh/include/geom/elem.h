@@ -1567,10 +1567,14 @@ bool Elem::subactive() const
     return false;
   if (!this->has_children())
     return true;
-  return this->child(0)->subactive();
-#else
-  return false;
+  for (const Elem* parent = this->parent();
+       parent != NULL;
+       parent = parent->parent())
+    if (parent->active())
+      return true;
 #endif
+
+  return false;
 }
 
 
