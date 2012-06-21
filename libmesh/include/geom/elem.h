@@ -2082,11 +2082,6 @@ public:
    */
   static const unsigned int header_size; /* = 10 with AMR, 4 without */
 
-  unsigned int packed_size() const
-  {
-    return this->header_size + this->n_nodes() + *this->indices() + 1;
-  }
-
   /**
    * For each element the serialization is of the form
    * [ level p_level r_flag p_r_flag etype processor_id subdomain_id
@@ -2211,9 +2206,35 @@ public:
     return static_cast<unsigned int>(*(_buf_begin+header_size+n));
   }
 
+  /**
+   * \p return the number of neighbors of the packed element
+   */
+  unsigned int n_neighbors() const
+  {
+    return Elem::build(this->type())->n_neighbors();
+  }
+
+  /**
+   * \p return the global index of the packed element's nth neighbor 
+   */
+  unsigned int neighbor (const unsigned int n) const
+  {
+    return static_cast<unsigned int>
+      (*(_buf_begin + header_size + this->n_nodes() + n));
+  }
+
+
   std::vector<int>::const_iterator indices() const
   {
-    return _buf_begin+header_size+this->n_nodes();
+    return _buf_begin + header_size + this->n_nodes() +
+           this->n_neighbors();
+  }
+
+  unsigned int packed_size() const
+  {
+    return this->header_size + this->n_nodes() +
+           this->n_neighbors() +
+           *this->indices() + 1;
   }
 }; // end class PackedElem
 
@@ -2375,7 +2396,7 @@ unsigned int
 Elem::packed_size() const
 {
   return PackedElem::header_size + this->n_nodes() +
-         this->packed_indexing_size();
+         this->n_neighbors() + this->packed_indexing_size();
 }
 
 
