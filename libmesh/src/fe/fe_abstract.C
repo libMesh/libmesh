@@ -69,6 +69,12 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
 	      return ap;
 	    }
 
+	  case LAGRANGE_VEC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,LAGRANGE_VEC>(fet));
+	      return ap;
+	    }
+
 	  case L2_LAGRANGE:
 	    {
 	      AutoPtr<FEAbstract> ap(new FE<0,L2_LAGRANGE>(fet));
@@ -144,6 +150,12 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEAbstract> ap(new FE<1,LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case LAGRANGE_VEC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,LAGRANGE_VEC>(fet));
 	      return ap;
 	    }
 
@@ -227,6 +239,12 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
 	      return ap;
 	    }
 
+	  case LAGRANGE_VEC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,LAGRANGE_VEC>(fet));
+	      return ap;
+	    }
+
 	  case L2_LAGRANGE:
 	    {
 	      AutoPtr<FEAbstract> ap(new FE<2,L2_LAGRANGE>(fet));
@@ -305,6 +323,12 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
 	  case LAGRANGE:
 	    {
 	      AutoPtr<FEAbstract> ap(new FE<3,LAGRANGE>(fet));
+	      return ap;
+	    }
+	    
+	  case LAGRANGE_VEC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<3,LAGRANGE_VEC>(fet));
 	      return ap;
 	    }
 

@@ -23,6 +23,7 @@
 // Local includes
 #include "libmesh_common.h"
 #include "enum_elem_type.h"
+#include "vector_value.h"
 
 // C++ includes
 #include <map>
@@ -232,7 +233,7 @@ public:
 		    const unsigned int i,
 		    const Point& p);
 
-  /**
+ /**
    * @returns the value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
@@ -245,6 +246,38 @@ public:
 		    const Elem* elem,
 		    const unsigned int i,
 		    const Point& p);
+
+  /**
+   * @returns the value of the \f$ i^{th} \f$ shape function at
+   * point \p p. This method allows you to specify the dimension,
+   * element type, and order directly. Automatically passes the
+   * request to the appropriate *scalar* finite element class member.
+   *
+   * On a p-refined element, \p fe_t.order should be the total order of the element.
+   */
+  template< typename OutputType>
+  static void shape(const unsigned int dim,
+		    const FEType& fe_t,
+		    const ElemType t,
+		    const unsigned int i,
+		    const Point& p,
+		    OutputType& phi);
+
+/**
+   * @returns the value of the \f$ i^{th} \f$ shape function at
+   * point \p p. This method allows you to specify the dimension,
+   * element type, and order directly. Automatically passes the
+   * request to the appropriate *scalar* finite element class member.
+   *
+   * On a p-refined element, \p fe_t.order should be the total order of the element.
+   */
+  template< typename OutputType>
+  static void shape(const unsigned int dim,
+		    const FEType& fe_t,
+		    const Elem* elem,
+		    const unsigned int i,
+		    const Point& p,
+		    OutputType& phi);
 
   /**
    * Lets the appropriate child of \p FEBase compute the requested
@@ -299,6 +332,18 @@ public:
    * vertex DoFs and edge/face DoFs at a hanging node.
    */
   static bool extra_hanging_dofs (const FEType& fe_t);
+
+  /**
+   * Returns the number of components of a vector-valued element.
+   * Scalar-valued elements return 1. 
+   */
+  static bool is_vector_type( const FEType& fe_type );
+
+  /**
+   * Returns the number of components of a vector-valued element.
+   * Scalar-valued elements return 1. 
+   */
+  static unsigned int n_vec_dim( const MeshBase& mesh, const FEType& fe_type );
 
 private:
 

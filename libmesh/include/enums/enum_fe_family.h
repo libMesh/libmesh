@@ -58,7 +58,10 @@ namespace libMeshEnums {
                  // all other DOFs in the system
 		 SCALAR       = 31,
 
-		 INVALID_FE   = 42};
+		 // Vector-valued elements
+		 LAGRANGE_VEC = 41,
+
+		 INVALID_FE   = 99};
 
   /**
    * \enum libMeshEnums::FEContinuity defines an \p enum for finite element

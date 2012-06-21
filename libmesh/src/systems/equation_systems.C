@@ -473,16 +473,80 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
 {
   libmesh_assert (this->n_systems());
 
-  var_names.resize (this->n_vars());
-
   unsigned int var_num=0;
 
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();
 
+  // Need to size var_names by scalar variables plus all the
+  // vector components for all the vector variables
+  //Could this be replaced by a/some convenience methods?[PB]
+  {
+    unsigned int n_scalar_vars = 0;
+    unsigned int n_vector_vars = 0;
+
+    for (; pos != end; ++pos)
+      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+	{
+	  if( FEInterface::is_vector_type(pos->second->variable_type(vn)) )
+	    n_vector_vars++;
+	  else
+	    n_scalar_vars++;
+	}
+
+    unsigned int dim = this->get_mesh().mesh_dimension();
+    unsigned int n_vars = n_scalar_vars + dim*n_vector_vars;
+
+    // We'd better have at least the number of system variables
+    libmesh_assert( n_vars >= this->n_vars() );
+
+    // We'd better not have more than dim*n_vars (all vector variables)
+    libmesh_assert( n_vars <= dim*n_vars );
+
+    // Here, we're assuming the number of vector components is the same
+    // as the mesh dimension. Will break for mixed dimension meshes.
+    
+    var_names.resize( n_vars );
+  }
+
+  // reset
+  pos = _systems.begin();
+
   for (; pos != end; ++pos)
-    for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
-      var_names[var_num++] = pos->second->variable_name(vn);
+    {
+      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+	{
+	  std::string var_name = pos->second->variable_name(vn);
+	  FEType fe_type = pos->second->variable_type(vn);
+
+	  unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type);
+
+	  if( FEInterface::is_vector_type(fe_type) )
+	    {
+	      switch(n_vec_dim)
+		{
+		case 0:
+		case 1:
+		  var_names[var_num++] = var_name;
+		  break;
+		case 2:
+		  var_names[var_num++] = var_name+"_x";
+		  var_names[var_num++] = var_name+"_y";
+		  break;
+		case 3:
+		  var_names[var_num++] = var_name+"_x";
+		  var_names[var_num++] = var_name+"_y";
+		  var_names[var_num++] = var_name+"_z";
+		  break;
+		default:
+		  std::cerr << "Invalid dim in build_variable_names" << std::endl;
+		  libmesh_error();
+		}
+	    }
+	  else
+	    var_names[var_num++] = var_name;
+	}
+    }
 }
 
 
@@ -585,7 +649,6 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 
   const unsigned int dim = _mesh.mesh_dimension();
   const unsigned int nn  = _mesh.n_nodes();
-  const unsigned int nv  = this->n_vars();
   const unsigned short int one = 1;
 
   // We'd better have a contiguous node numbering
@@ -593,6 +656,32 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 
   // allocate storage to hold
   // (number_of_nodes)*(number_of_variables) entries.
+  // We have to differentiate between between scalar and vector
+  // variables. We intercept vector variables and treat each
+  // component as a scalar variable (consistently with build_solution_names).
+  
+  unsigned int nv = 0;
+
+  //Could this be replaced by a/some convenience methods?[PB]
+  {
+    unsigned int n_scalar_vars = 0;
+    unsigned int n_vector_vars = 0;
+    const_system_iterator       pos = _systems.begin();
+    const const_system_iterator end = _systems.end();
+    
+    for (; pos != end; ++pos)
+      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+	{
+	  if( FEInterface::is_vector_type(pos->second->variable_type(vn)) )
+	    n_vector_vars++;
+	  else
+	    n_scalar_vars++;
+	}
+    // Here, we're assuming the number of vector components is the same
+    // as the mesh dimension. Will break for mixed dimension meshes.
+    nv = n_scalar_vars + dim*n_vector_vars;
+  }
+
   soln.resize(nn*nv);
 
   // Zero out the soln vector
@@ -635,6 +724,21 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
       const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
 
+      //Could this be replaced by a/some convenience methods?[PB]
+      unsigned int n_scalar_vars = 0;
+      unsigned int n_vector_vars = 0;
+      for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
+	{
+	  if( FEInterface::is_vector_type(pos->second->variable_type(vn)) )
+	    n_vector_vars++;
+	  else
+	    n_scalar_vars++;
+	}
+
+      // Here, we're assuming the number of vector components is the same
+      // as the mesh dimension. Will break for mixed dimension meshes.
+      unsigned int nv_sys_split = n_scalar_vars + dim*n_vector_vars;
+
       system.update_global_solution (sys_soln);
 
       std::vector<Number>       elem_soln;   // The finite element solution
@@ -646,6 +750,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 	  const FEType& fe_type           = system.variable_type(var);
 	  const Variable &var_description = system.variable(var);
 	  const DofMap &dof_map           = system.get_dof_map();
+
+	  unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type );
 
 	  std::fill (repeat_count.begin(), repeat_count.end(), 0);
 
@@ -675,12 +781,17 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 		if (!elem->infinite())
 #endif
 		  {
-		    libmesh_assert (nodal_soln.size() == elem->n_nodes());
-
+		    libmesh_assert (nodal_soln.size() == n_vec_dim*elem->n_nodes());
+		    
 		    for (unsigned int n=0; n<elem->n_nodes(); n++)
 		      {
 			repeat_count[elem->node(n)]++;
-			soln[nv*(elem->node(n)) + (var + var_num)] += nodal_soln[n];
+			for( unsigned int d=0; d < n_vec_dim; d++ )
+			  {
+			    // For vector-valued elements, all components are in nodal_soln. For each
+			    // node, the components are stored in order, i.e. node_0 -> s0_x, s0_y, s0_z
+			    soln[nv*(elem->node(n)) + (var+d + var_num)] += nodal_soln[n_vec_dim*n+d];
+			  }
 		      }
 		  }
 	      } // end loop over elements
@@ -693,15 +804,15 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 
 	  else
 	    Parallel::sum (repeat_count);
-
-	  for (unsigned int n=0; n<nn; n++)
-	    soln[nv*n + (var + var_num)] /=
-	      static_cast<Real>(std::max (repeat_count[n], one));
-
+	    
+	    for (unsigned int n=0; n<nn; n++)
+	      for( unsigned int d=0; d < n_vec_dim; d++ )
+		soln[nv*n + (var+d + var_num)] /=
+		  static_cast<Real>(std::max (repeat_count[n], one));
 
 	} // end loop on variables in this system
 
-      var_num += nv_sys;
+      var_num += nv_sys_split;
     } // end loop over systems
 
   // Now each processor has computed contriburions to the
