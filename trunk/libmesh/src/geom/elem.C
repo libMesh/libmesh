@@ -2010,6 +2010,15 @@ void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     conn.push_back (elem->node(n));
 
+  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+    {
+      Elem *neigh = elem->neighbor(n);
+      if (neigh)
+        conn.push_back (neigh->id());
+      else
+        conn.push_back (-1);
+    }
+
   elem->pack_indexing(std::back_inserter(conn));
 }
 
@@ -2031,13 +2040,21 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
     }
 #endif
 
-  // Assign the IDs
+  // Assign the refinement flags and levels
 #ifdef LIBMESH_ENABLE_AMR
   elem->set_p_level(this->p_level());
   elem->set_refinement_flag(this->refinement_flag());
   elem->set_p_refinement_flag(this->p_refinement_flag());
   libmesh_assert (elem->level() == this->level());
 #endif
+
+  // If this element definitely should have children, assign
+  // remote_elem for now; later unpacked elements may overwrite that.
+  if (!elem->active())
+    for (unsigned int c=0; c != elem->n_children(); ++c)
+      elem->add_child(const_cast<RemoteElem*>(remote_elem), c);
+
+  // Assign the IDs
   elem->subdomain_id() = this->subdomain_id();
   elem->processor_id() = this->processor_id();
   elem->set_id()       = this->id();
@@ -2047,6 +2064,80 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     elem->set_node(n) = mesh.node_ptr (this->node(n));
+
+  // Assign the connectivity
+  libmesh_assert (elem->n_neighbors() == this->n_neighbors());
+
+  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+    {
+      unsigned int neighbor_id = this->neighbor(n);
+
+      // We should only be unpacking elements sent by their owners,
+      // and their owners should know all their neighbors
+      libmesh_assert (neighbor_id != remote_elem->id());
+
+      if (neighbor_id == DofObject::invalid_id)
+	continue;
+
+      Elem *neigh = mesh.elem(neighbor_id);
+      if (!neigh)
+        {
+          elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
+	  continue;
+	}
+
+      // We never have neighbors more refined than us
+      libmesh_assert(neigh->level() <= elem->level());
+
+      // We never have subactive neighbors of non subactive elements
+      libmesh_assert(!neigh->subactive() || elem->subactive());
+
+      // If we have a neighbor less refined than us then it must not
+      // have any more refined active descendants we could have
+      // pointed to instead.
+      libmesh_assert(neigh->level() == elem->level() ||
+                     neigh->active());
+     
+      elem->set_neighbor(n, neigh);
+
+      // If neigh is at elem's level, then its family might have
+      // remote_elem neighbor links which need to point to elem
+      // instead, but if not, then we're done.
+      if (neigh->level() != elem->level())
+	continue;
+      
+      // What side of neigh is elem on?  We can't use the usual Elem
+      // method because we haven't finished restoring topology
+      const AutoPtr<Elem> my_side = elem->side(n);
+      unsigned int nn = 0;
+      for (; nn != neigh->n_sides(); ++nn)
+	{
+          const AutoPtr<Elem> neigh_side = neigh->side(nn);
+          if (*my_side == *neigh_side)
+	    break;
+	}
+
+      // elem had better be on *some* side of neigh
+      libmesh_assert(nn < neigh->n_sides());
+
+      // Find any elements that ought to point to elem
+      std::vector<const Elem*> neigh_family;
+      if (!neigh->subactive())
+        neigh->family_tree_by_side(neigh_family, nn);
+
+      // And point them to elem
+      for (unsigned int i = 0; i != neigh_family.size(); ++i)
+        {
+          Elem* neigh_family_member = const_cast<Elem*>(neigh_family[i]);
+
+	  // The neighbor link ought to either be correct already or
+	  // ought to be to remote_elem
+          libmesh_assert(neigh_family_member->neighbor(nn) == elem ||
+                         neigh_family_member->neighbor(nn) == remote_elem);
+
+	  neigh_family_member->set_neighbor(nn, elem);
+        }
+    }
 
   elem->unpack_indexing(this->indices());
 
