@@ -68,6 +68,39 @@ FEInterface::FEInterface()
 	    libmesh_error(); \
 	  } \
       } while (0)
+
+#define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix) \
+      do { \
+	switch (fe_t.family) \
+	  { \
+	  case CLOUGH: \
+	    prefix FE<dim,CLOUGH>::func_and_args suffix \
+	  case HERMITE: \
+	    prefix FE<dim,HERMITE>::func_and_args suffix \
+	  case HIERARCHIC: \
+	    prefix FE<dim,HIERARCHIC>::func_and_args suffix \
+	  case L2_HIERARCHIC: \
+	    prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix \
+	  case LAGRANGE: \
+	    prefix FE<dim,LAGRANGE>::func_and_args suffix \
+	  case LAGRANGE_VEC: \
+	    prefix FE<dim,LAGRANGE_VEC>::func_and_args suffix \
+	  case L2_LAGRANGE: \
+	    prefix FE<dim,L2_LAGRANGE>::func_and_args suffix \
+	  case MONOMIAL: \
+	    prefix FE<dim,MONOMIAL>::func_and_args suffix \
+          case SCALAR: \
+            prefix FE<dim,SCALAR>::func_and_args suffix \
+	  case BERNSTEIN: \
+	    prefix FE<dim,BERNSTEIN>::func_and_args suffix \
+	  case SZABAB: \
+	    prefix FE<dim,SZABAB>::func_and_args suffix \
+	  case XYZ: \
+	    prefix FEXYZ<dim>::func_and_args suffix \
+	  default: \
+	    libmesh_error(); \
+	  } \
+      } while (0)
 #else
 #define fe_family_switch(dim, func_and_args, prefix, suffix) \
       do { \
@@ -83,6 +116,35 @@ FEInterface::FEInterface()
 	    prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix \
 	  case LAGRANGE: \
 	    prefix FE<dim,LAGRANGE>::func_and_args suffix \
+	  case L2_LAGRANGE: \
+	    prefix FE<dim,L2_LAGRANGE>::func_and_args suffix \
+	  case MONOMIAL: \
+	    prefix FE<dim,MONOMIAL>::func_and_args suffix \
+          case SCALAR: \
+            prefix FE<dim,SCALAR>::func_and_args suffix \
+	  case XYZ: \
+	    prefix FEXYZ<dim>::func_and_args suffix \
+	  default: \
+	    libmesh_error(); \
+	  } \
+      } while (0)
+
+#define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix) \
+      do { \
+	switch (fe_t.family) \
+	  { \
+	  case CLOUGH: \
+	    prefix FE<dim,CLOUGH>::func_and_args suffix \
+	  case HERMITE: \
+	    prefix FE<dim,HERMITE>::func_and_args suffix \
+	  case HIERARCHIC: \
+	    prefix FE<dim,HIERARCHIC>::func_and_args suffix \
+	  case L2_HIERARCHIC: \
+	    prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix \
+	  case LAGRANGE: \
+	    prefix FE<dim,LAGRANGE>::func_and_args suffix \
+	  case LAGRANGE_VEC: \
+	    prefix FE<dim,LAGRANGE_VEC>::func_and_args suffix \
 	  case L2_LAGRANGE: \
 	    prefix FE<dim,L2_LAGRANGE>::func_and_args suffix \
 	  case MONOMIAL: \
@@ -119,6 +181,27 @@ FEInterface::FEInterface()
       } \
   } while (0)
 
+#define fe_with_vec_switch(func_and_args) \
+  do { \
+    switch (dim) \
+      { \
+        /* 0D */ \
+      case 0: \
+        fe_family_with_vec_switch (0, func_and_args, return, ;); \
+        /* 1D */ \
+      case 1: \
+        fe_family_with_vec_switch (1, func_and_args, return, ;); \
+        /* 2D */ \
+      case 2: \
+        fe_family_with_vec_switch (2, func_and_args, return, ;); \
+        /* 3D */ \
+      case 3: \
+        fe_family_with_vec_switch (3, func_and_args, return, ;); \
+      default: \
+        libmesh_error(); \
+      } \
+  } while (0)
+
 
 #define void_fe_switch(func_and_args) \
   do { \
@@ -136,6 +219,27 @@ FEInterface::FEInterface()
         /* 3D */ \
       case 3: \
         fe_family_switch (3, func_and_args, ;, ; return;); \
+      default: \
+        libmesh_error(); \
+      } \
+  } while (0)
+
+#define void_fe_with_vec_switch(func_and_args) \
+  do { \
+    switch (dim) \
+      { \
+        /* 0D */ \
+      case 0: \
+        fe_family_with_vec_switch (0, func_and_args, ;, ; return;); \
+        /* 1D */ \
+      case 1: \
+        fe_family_with_vec_switch (1, func_and_args, ;, ; return;); \
+        /* 2D */ \
+      case 2: \
+        fe_family_with_vec_switch (2, func_and_args, ;, ; return;); \
+        /* 3D */ \
+      case 3: \
+        fe_family_with_vec_switch (3, func_and_args, ;, ; return;); \
       default: \
         libmesh_error(); \
       } \
@@ -162,7 +266,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
   const Order o = fe_t.order;
 
-  fe_switch(n_shape_functions(t, o));
+  fe_with_vec_switch(n_shape_functions(t, o));
 
   libmesh_error();
   return 0;
@@ -185,7 +289,7 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
   const Order o = fe_t.order;
 
-  fe_switch(n_dofs(t, o));
+  fe_with_vec_switch(n_dofs(t, o));
 
   libmesh_error();
   return 0;
@@ -208,7 +312,7 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
 
   const Order o = fe_t.order;
 
-  fe_switch(n_dofs_at_node(t, o, n));
+  fe_with_vec_switch(n_dofs_at_node(t, o, n));
 
   libmesh_error();
   return 0;
@@ -231,7 +335,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
   const Order o = fe_t.order;
 
-  fe_switch(n_dofs_per_elem(t, o));
+  fe_with_vec_switch(n_dofs_per_elem(t, o));
 
   libmesh_error();
   return 0;
@@ -263,7 +367,7 @@ void FEInterface::dofs_on_edge(const Elem* const elem,
 {
   const Order o = fe_t.order;
 
-  void_fe_switch(dofs_on_edge(elem, o, e, di));
+  void_fe_with_vec_switch(dofs_on_edge(elem, o, e, di));
 
   libmesh_error();
 }
@@ -289,7 +393,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
   const Order order = fe_t.order;
 
-  void_fe_switch(nodal_soln(elem, order, elem_soln, nodal_soln));
+  void_fe_with_vec_switch(nodal_soln(elem, order, elem_soln, nodal_soln));
 }
 
 
@@ -300,7 +404,7 @@ Point FEInterface::map(unsigned int dim,
                        const Elem* elem,
                        const Point& p)
 {
-  fe_switch(map(elem, p));
+  fe_with_vec_switch(map(elem, p));
 
   libmesh_error();
   return Point();
@@ -368,7 +472,7 @@ void FEInterface::inverse_map (const unsigned int dim,
 
 #endif
 
-  void_fe_switch(inverse_map(elem, physical_points, reference_points, tolerance, secure));
+  void_fe_with_vec_switch(inverse_map(elem, physical_points, reference_points, tolerance, secure));
 
   libmesh_error();
   return;
@@ -407,9 +511,6 @@ Real FEInterface::shape(const unsigned int dim,
   return 0.;
 }
 
-
-
-
 Real FEInterface::shape(const unsigned int dim,
 			const FEType& fe_t,
 			const Elem* elem,
@@ -431,8 +532,81 @@ Real FEInterface::shape(const unsigned int dim,
   return 0.;
 }
 
+template< typename OutputType>
+void FEInterface::shape(const unsigned int dim,
+			const FEType& fe_t,
+			const ElemType t,
+			const unsigned int i,
+			const Point& p,
+			OutputType& phi)
+{
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
+  if ( is_InfFE_elem(t) )
+    phi = ifem_shape(dim, fe_t, t, i, p);
 
+#endif
+
+  const Order o = fe_t.order;
+
+  switch (dim) 
+    { 
+    /* 0D */
+    case 0:
+      fe_family_switch (0, shape(t,o,i,p), phi =, ;);
+    /* 1D */
+    case 1:
+      fe_family_switch (1, shape(t,o,i,p), phi =, ;);
+    /* 2D */
+    case 2:
+      fe_family_switch (2, shape(t,o,i,p), phi =, ;);
+    /* 3D */
+    case 3:
+      fe_family_switch (3, shape(t,o,i,p), phi =, ;);
+    default:
+      libmesh_error();
+    }
+
+  return;
+}
+
+template< typename OutputType>
+void FEInterface::shape(const unsigned int dim,
+			const FEType& fe_t,
+			const Elem* elem,
+			const unsigned int i,
+			const Point& p,
+			OutputType& phi)
+{
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  if ( is_InfFE_elem(elem->type()) )
+    phi = ifem_shape(dim, fe_t, elem, i, p);
+
+#endif
+
+  const Order o = fe_t.order;
+
+  switch (dim) 
+    { 
+    /* 0D */
+    case 0:
+      fe_family_switch (0, shape(elem,o,i,p), phi =, ;);
+    /* 1D */
+    case 1:
+      fe_family_switch (1, shape(elem,o,i,p), phi =, ;);
+    /* 2D */
+    case 2:
+      fe_family_switch (2, shape(elem,o,i,p), phi =, ;);
+    /* 3D */
+    case 3:
+      fe_family_switch (3, shape(elem,o,i,p), phi =, ;);
+    default:
+      libmesh_error();
+    }
+
+  return;
+}
 
 void FEInterface::compute_data(const unsigned int dim,
 			       const FEType& fe_t,
@@ -519,10 +693,17 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 
 	  case L2_HIERARCHIC:
 	    FE<2,L2_HIERARCHIC>::compute_constraints (constraints,
-						   dof_map,
-						   variable_number,
-						   elem); return;
+						      dof_map,
+						      variable_number,
+						      elem); return;
 
+	  case LAGRANGE_VEC:
+	    FE<2,LAGRANGE_VEC>::compute_constraints (constraints,
+						     dof_map,
+						     variable_number,
+						     elem); return;
+
+	  
 	  default:
 	    return;
 	  }
@@ -553,9 +734,15 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 
 	  case L2_HIERARCHIC:
 	    FE<3,L2_HIERARCHIC>::compute_constraints (constraints,
-						   dof_map,
-						   variable_number,
-						   elem); return;
+						      dof_map,
+						      variable_number,
+						      elem); return;
+
+	  case LAGRANGE_VEC:
+	    FE<3,LAGRANGE_VEC>::compute_constraints (constraints,
+						     dof_map,
+						     variable_number,
+						     elem); return;
 	  default:
 	    return;
 	  }
@@ -612,6 +799,7 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
     {
       case LAGRANGE:
       case L2_LAGRANGE: // TODO: L2_LAGRANGE can have higher "max_order" than LAGRANGE
+      case LAGRANGE_VEC:
 	switch (el_t)
 	  {
 	    case EDGE2:
@@ -911,6 +1099,7 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
       case SZABAB:
 #endif
       case XYZ:
+      case LAGRANGE_VEC:
 	return false;
       case CLOUGH:
       case HERMITE:
@@ -919,5 +1108,59 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
 	return true;
     }
 }
+
+bool FEInterface::is_vector_type( const FEType& fe_type )
+{
+  switch (fe_type.family)
+    {
+    case LAGRANGE_VEC:
+      return true;
+    default:
+      return false;
+    }
+}
+
+unsigned int FEInterface::n_vec_dim( const MeshBase& mesh, const FEType& fe_type )
+{
+  switch (fe_type.family)
+    {
+      //FIXME: We currently assume that the number of vector components is tied
+      //       to the mesh dimension. This will break for mixed-dimension meshes.
+    case LAGRANGE_VEC:
+      return mesh.mesh_dimension();
+    default:
+      return 1;
+    }
+}
+
+
+  // Instantiate templated member functions
+  template void FEInterface::shape<Real>( const unsigned int,
+					  const FEType&,
+					  const ElemType,
+					  const unsigned int,
+					  const Point&,
+					  Real& );
+
+  template void FEInterface::shape<RealGradient>( const unsigned int,
+						  const FEType&,
+						  const ElemType,
+						  const unsigned int,
+						  const Point&,
+						  RealGradient& );
+
+  template void FEInterface::shape<Real>( const unsigned int,
+					  const FEType&,
+					  const Elem*,
+					  const unsigned int,
+					  const Point&,
+					  Real& );
+
+  template void FEInterface::shape<RealGradient>( const unsigned int,
+						  const FEType&,
+						  const Elem*,
+						  const unsigned int,
+						  const Point&,
+						  RealGradient& );
 
 } // namespace libMesh

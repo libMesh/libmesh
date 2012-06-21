@@ -1297,8 +1297,8 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
     bool all_discontinuous_dofs = true;
 
     for (unsigned int var=0; var<this->n_variables(); var++)
-      if (FEBase::build (mesh.mesh_dimension(),
-			 this->variable_type(var))->get_continuity() !=  DISCONTINUOUS)
+      if (FEAbstract::build (mesh.mesh_dimension(),
+			     this->variable_type(var))->get_continuity() !=  DISCONTINUOUS)
 	all_discontinuous_dofs = false;
 
     if (all_discontinuous_dofs)
