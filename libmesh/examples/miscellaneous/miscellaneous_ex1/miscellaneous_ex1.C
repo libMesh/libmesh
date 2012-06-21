@@ -40,7 +40,7 @@
 // Basic include file needed for the mesh functionality.
 #include "exodusII_io.h"
 #include "libmesh.h"
-#include "mesh.h"
+#include "serial_mesh.h"
 #include "mesh_generation.h"
 #include "linear_implicit_system.h"
 #include "equation_systems.h"
@@ -95,8 +95,11 @@ int main (int argc, char** argv)
   // Tell the user what we are doing.
   std::cout << "Running ex6 with dim = 3" << std::endl << std::endl;        
   
-  // Create a mesh
-  Mesh mesh;
+  // Create a serialized mesh.
+  // InfElemBuilder still requires some updates to be ParallelMesh
+  // compatible
+  
+  SerialMesh mesh;
 
   // Use the internal mesh generator to create elements
   // on the square [-1,1]^3, of type Hex8.

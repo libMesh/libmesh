@@ -1,6 +1,7 @@
 // Libmesh includes
-#include "numeric_vector.h"
 #include "mesh_generation.h"
+#include "numeric_vector.h"
+#include "serial_mesh.h"
 
 // Example includes
 #include "biharmonic.h"
@@ -8,7 +9,8 @@
 
 void Biharmonic::Create(Biharmonic** b)
 {
-  Mesh* mesh = new Mesh();
+  // ParallelMesh doesn't yet understand periodic BCs
+  SerialMesh* mesh = new SerialMesh();
   Biharmonic *biharmonic = new Biharmonic(mesh);
   *b = biharmonic;
 }
@@ -19,8 +21,8 @@ void Biharmonic::Create(Biharmonic** b)
 
 void Biharmonic::Destroy(Biharmonic** b)
 {
-  Biharmonic *biharmonic = *b;
-  Mesh* mesh = biharmonic->_mesh;
+  Biharmonic* biharmonic = *b;
+  UnstructuredMesh* mesh = biharmonic->_mesh;
   delete biharmonic;
   delete mesh;
   *b = NULL;
@@ -165,7 +167,7 @@ void Biharmonic::run()
 
 
 
-Biharmonic::Biharmonic(Mesh* m) :
+Biharmonic::Biharmonic(UnstructuredMesh* m) :
     EquationSystems(*m),
     _mesh(m)
   {

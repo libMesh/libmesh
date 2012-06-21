@@ -40,7 +40,7 @@
 
 // Basic include file needed for the mesh functionality.
 #include "libmesh.h"
-#include "mesh.h"
+#include "serial_mesh.h"
 #include "gmv_io.h"
 #include "vtk_io.h"
 #include "newmark_system.h"
@@ -104,14 +104,6 @@ int main (int argc, char** argv)
   // Initialize libraries, like in example 2.
   LibMeshInit init (argc, argv);
 
-#ifdef LIBMESH_ENABLE_PARMESH
-  std::cout << "ERROR: This example directly references\n"
-            << "all mesh nodes and is incompatible with"
-            << "ParallelMesh use."
-            << std::endl;
-  libmesh_example_assert(false, "--disable-parmesh");
-#else
-
   // Check for proper usage.
   if (argc < 2)
     {
@@ -165,7 +157,10 @@ int main (int argc, char** argv)
   libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
   
   // Create a mesh.
-  Mesh mesh;
+  // This example directly references all mesh nodes and is
+  // incompatible with ParallelMesh use.
+
+  SerialMesh mesh;
   MeshData mesh_data(mesh);
   
   // Read the meshfile specified in the command line or
@@ -340,7 +335,6 @@ int main (int argc, char** argv)
               << global_displacement[dof_no]
               << std::endl;
     }
-#endif
   
   // All done.  
   return 0;
