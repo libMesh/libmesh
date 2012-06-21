@@ -38,6 +38,341 @@
 namespace libMesh
 {
 
+AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
+				       const FEType& fet)
+{
+  // The stupid AutoPtr<FEAbstract> ap(); return ap;
+  // construct is required to satisfy IBM's xlC
+
+  switch (dim)
+    {
+      // 0D
+    case 0:
+      {
+	switch (fet.family)
+	  {
+	  case CLOUGH:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,CLOUGH>(fet));
+	      return ap;
+	    }
+
+	  case HERMITE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,HERMITE>(fet));
+	      return ap;
+	    }
+
+	  case LAGRANGE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case L2_LAGRANGE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,L2_LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case HIERARCHIC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,HIERARCHIC>(fet));
+	      return ap;
+	    }
+
+	  case L2_HIERARCHIC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,L2_HIERARCHIC>(fet));
+	      return ap;
+	    }
+
+	  case MONOMIAL:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,MONOMIAL>(fet));
+	      return ap;
+	    }
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,SZABAB>(fet));
+	      return ap;
+	    }
+
+	  case BERNSTEIN:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<0,BERNSTEIN>(fet));
+	      return ap;
+	    }
+#endif
+
+	  case XYZ:
+	    {
+	      AutoPtr<FEAbstract> ap(new FEXYZ<0>(fet));
+	      return ap;
+	    }
+
+          case SCALAR:
+          {
+	      AutoPtr<FEAbstract> ap(new FEScalar<0>(fet));
+	      return ap;
+          }
+
+	  default:
+	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    libmesh_error();
+	  }
+      }
+      // 1D
+    case 1:
+      {
+	switch (fet.family)
+	  {
+	  case CLOUGH:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,CLOUGH>(fet));
+	      return ap;
+	    }
+
+	  case HERMITE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,HERMITE>(fet));
+	      return ap;
+	    }
+
+	  case LAGRANGE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case L2_LAGRANGE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,L2_LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case HIERARCHIC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,HIERARCHIC>(fet));
+	      return ap;
+	    }
+
+	  case L2_HIERARCHIC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,L2_HIERARCHIC>(fet));
+	      return ap;
+	    }
+
+	  case MONOMIAL:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,MONOMIAL>(fet));
+	      return ap;
+	    }
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,SZABAB>(fet));
+	      return ap;
+	    }
+
+	  case BERNSTEIN:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<1,BERNSTEIN>(fet));
+	      return ap;
+	    }
+#endif
+
+	  case XYZ:
+	    {
+	      AutoPtr<FEAbstract> ap(new FEXYZ<1>(fet));
+	      return ap;
+	    }
+
+          case SCALAR:
+          {
+	      AutoPtr<FEAbstract> ap(new FEScalar<1>(fet));
+	      return ap;
+          }
+
+	  default:
+	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    libmesh_error();
+	  }
+      }
+
+
+      // 2D
+    case 2:
+      {
+	switch (fet.family)
+	  {
+	  case CLOUGH:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,CLOUGH>(fet));
+	      return ap;
+	    }
+
+	  case HERMITE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,HERMITE>(fet));
+	      return ap;
+	    }
+
+	  case LAGRANGE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case L2_LAGRANGE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,L2_LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case HIERARCHIC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,HIERARCHIC>(fet));
+	      return ap;
+	    }
+
+	  case L2_HIERARCHIC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,L2_HIERARCHIC>(fet));
+	      return ap;
+	    }
+
+	  case MONOMIAL:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,MONOMIAL>(fet));
+	      return ap;
+	    }
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,SZABAB>(fet));
+	      return ap;
+	    }
+
+	  case BERNSTEIN:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<2,BERNSTEIN>(fet));
+	      return ap;
+	    }
+#endif
+
+	  case XYZ:
+	    {
+	      AutoPtr<FEAbstract> ap(new FEXYZ<2>(fet));
+	      return ap;
+	    }
+
+          case SCALAR:
+          {
+	      AutoPtr<FEAbstract> ap(new FEScalar<2>(fet));
+	      return ap;
+          }
+
+	  default:
+	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    libmesh_error();
+	  }
+      }
+
+
+      // 3D
+    case 3:
+      {
+	switch (fet.family)
+	  {
+	  case CLOUGH:
+	    {
+	      libMesh::out << "ERROR: Clough-Tocher elements currently only support 1D and 2D"
+                            << std::endl;
+	      libmesh_error();
+	    }
+
+	  case HERMITE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<3,HERMITE>(fet));
+	      return ap;
+	    }
+
+	  case LAGRANGE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<3,LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case L2_LAGRANGE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<3,L2_LAGRANGE>(fet));
+	      return ap;
+	    }
+
+	  case HIERARCHIC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<3,HIERARCHIC>(fet));
+	      return ap;
+	    }
+
+	  case L2_HIERARCHIC:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<3,L2_HIERARCHIC>(fet));
+	      return ap;
+	    }
+
+	  case MONOMIAL:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<3,MONOMIAL>(fet));
+	      return ap;
+	    }
+
+#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
+	  case SZABAB:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<3,SZABAB>(fet));
+	      return ap;
+	    }
+
+	  case BERNSTEIN:
+	    {
+	      AutoPtr<FEAbstract> ap(new FE<3,BERNSTEIN>(fet));
+	      return ap;
+	    }
+#endif
+
+	  case XYZ:
+	    {
+	      AutoPtr<FEAbstract> ap(new FEXYZ<3>(fet));
+	      return ap;
+	    }
+
+          case SCALAR:
+          {
+	      AutoPtr<FEAbstract> ap(new FEScalar<3>(fet));
+	      return ap;
+          }
+
+	  default:
+	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	    libmesh_error();
+	  }
+      }
+
+    default:
+      libmesh_error();
+    }
+
+  libmesh_error();
+  AutoPtr<FEAbstract> ap(NULL);
+  return ap;
+}
+
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>& nodes)
 {
   switch(itemType)
