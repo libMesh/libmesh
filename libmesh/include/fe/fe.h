@@ -52,6 +52,15 @@ struct FEOutputType
 };
 
 
+/**
+ * Specialize for non-scalar-valued elements
+ */
+template<>
+struct FEOutputType<LAGRANGE_VEC>
+{
+  typedef RealGradient type;
+};
+
 
 /**
  * A specific instatiation of the \p FEBase class. This
@@ -750,6 +759,22 @@ protected:
                             const std::vector<Real>& weights);
 };
 
+//-------------------------------------------------------------
+// FELagrangeVec class definition
+template <unsigned int Dim>
+class FELagrangeVec : public FE<Dim,LAGRANGE_VEC>
+{
+public:
+
+  /**
+   * Constructor. Creates a vector Lagrange finite element
+   * to be used in dimension \p Dim.
+   */
+  explicit
+  FELagrangeVec(const FEType& fet);
+
+};
+
 
 
 
@@ -933,10 +958,17 @@ FELagrange<Dim>::FELagrange (const FEType& fet) :
 {
 }
 
-
+// ------------------------------------------------------------
+// FELagrangeVec class inline members
+template <unsigned int Dim>
+inline
+FELagrangeVec<Dim>::FELagrangeVec (const FEType& fet) :
+  FE<Dim,LAGRANGE_VEC> (fet)
+{
+}
 
 // ------------------------------------------------------------
-// FELagrange class inline members
+// FEL2Lagrange class inline members
 template <unsigned int Dim>
 inline
 FEL2Lagrange<Dim>::FEL2Lagrange (const FEType& fet) :

@@ -383,10 +383,85 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
 template <>
 AutoPtr<FEGenericBase<RealGradient> >
-FEGenericBase<RealGradient>::build (const unsigned int /*dim*/,
-                                    const FEType& /*fet*/)
+FEGenericBase<RealGradient>::build (const unsigned int dim,
+                                    const FEType& fet)
 {
-  // No vector types defined... YET.
+  // The stupid AutoPtr<FEBase> ap(); return ap;
+  // construct is required to satisfy IBM's xlC
+
+  switch (dim)
+    {
+      // 0D
+    case 0:
+      {
+	switch (fet.family)
+	  {
+	  case LAGRANGE_VEC:
+	    {
+	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<0>(fet) );
+	      return ap;
+	    }
+	  default:
+	    {
+	      libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	      libmesh_error();
+	    }
+	  }
+      }
+    case 1:
+      {
+	switch (fet.family)
+	  {
+	  case LAGRANGE_VEC:
+	    {
+	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<1>(fet) );
+	      return ap;
+	    }
+	  default:
+	    {
+	      libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	      libmesh_error();
+	    }
+	  }
+      }
+    case 2:
+      {
+	switch (fet.family)
+	  {
+	  case LAGRANGE_VEC:
+	    {
+	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<2>(fet) );
+	      return ap;
+	    }
+	  default:
+	    {
+	      libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	      libmesh_error();
+	    }
+	  }
+      }
+    case 3:
+      {
+	switch (fet.family)
+	  {
+	  case LAGRANGE_VEC:
+	    {
+	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<3>(fet) );
+	      return ap;
+	    }
+	  default:
+	    {
+	      libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
+	      libmesh_error();
+	    }
+	  }
+      }
+      
+    default:
+      libmesh_error();
+
+    } // switch(dim)
+
   libmesh_error();
   AutoPtr<FEVectorBase> ap(NULL);
   return ap;
@@ -685,8 +760,8 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 template <>
 AutoPtr<FEGenericBase<RealGradient> >
-FEGenericBase<RealGradient>::build_InfFE (const unsigned int dim,
-			                  const FEType& fet)
+FEGenericBase<RealGradient>::build_InfFE (const unsigned int,
+			                  const FEType& )
 {
   // No vector types defined... YET.
   libmesh_error();

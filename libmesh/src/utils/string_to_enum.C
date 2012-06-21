@@ -233,21 +233,22 @@ namespace {
   {
     if (fefamily_to_enum.empty())
       {
-	fefamily_to_enum["LAGRANGE"    ]=LAGRANGE;
-	fefamily_to_enum["L2_LAGRANGE"    ]=L2_LAGRANGE;
-	fefamily_to_enum["HIERARCHIC"  ]=HIERARCHIC;
-	fefamily_to_enum["L2_HIERARCHIC"  ]=L2_HIERARCHIC;
-	fefamily_to_enum["MONOMIAL"    ]=MONOMIAL;
-	fefamily_to_enum["SCALAR"      ]=SCALAR;
-	fefamily_to_enum["XYZ"         ]=XYZ;
-	fefamily_to_enum["BERNSTEIN"   ]=BERNSTEIN;
-	fefamily_to_enum["SZABAB"      ]=SZABAB;
-	fefamily_to_enum["INFINITE_MAP"]=INFINITE_MAP;
-	fefamily_to_enum["JACOBI_20_00"]=JACOBI_20_00;
-	fefamily_to_enum["JACOBI_30_00"]=JACOBI_30_00;
-	fefamily_to_enum["LEGENDRE"    ]=LEGENDRE;
-	fefamily_to_enum["CLOUGH"      ]=CLOUGH;
-	fefamily_to_enum["HERMITE"     ]=HERMITE;
+	fefamily_to_enum["LAGRANGE"     ]=LAGRANGE;
+	fefamily_to_enum["LAGRANGE_VEC" ]=LAGRANGE_VEC;
+	fefamily_to_enum["L2_LAGRANGE"  ]=L2_LAGRANGE;
+	fefamily_to_enum["HIERARCHIC"   ]=HIERARCHIC;
+	fefamily_to_enum["L2_HIERARCHIC"]=L2_HIERARCHIC;
+	fefamily_to_enum["MONOMIAL"     ]=MONOMIAL;
+	fefamily_to_enum["SCALAR"       ]=SCALAR;
+	fefamily_to_enum["XYZ"          ]=XYZ;
+	fefamily_to_enum["BERNSTEIN"    ]=BERNSTEIN;
+	fefamily_to_enum["SZABAB"       ]=SZABAB;
+	fefamily_to_enum["INFINITE_MAP" ]=INFINITE_MAP;
+	fefamily_to_enum["JACOBI_20_00" ]=JACOBI_20_00;
+	fefamily_to_enum["JACOBI_30_00" ]=JACOBI_30_00;
+	fefamily_to_enum["LEGENDRE"     ]=LEGENDRE;
+	fefamily_to_enum["CLOUGH"       ]=CLOUGH;
+	fefamily_to_enum["HERMITE"      ]=HERMITE;
       }
 
   }

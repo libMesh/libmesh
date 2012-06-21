@@ -42,6 +42,7 @@
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), L2_HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
+                               template class FE< (_dim), LAGRANGE_VEC>;   \
                                template class FE< (_dim), L2_LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), SCALAR>;   \
@@ -53,6 +54,7 @@
   INSTANTIATE_MAPS(_dim,HIERARCHIC); \
   INSTANTIATE_MAPS(_dim,L2_HIERARCHIC); \
   INSTANTIATE_MAPS(_dim,LAGRANGE); \
+  INSTANTIATE_MAPS(_dim,LAGRANGE_VEC); \
   INSTANTIATE_MAPS(_dim,L2_LAGRANGE); \
   INSTANTIATE_MAPS(_dim,MONOMIAL); \
   INSTANTIATE_MAPS(_dim,SCALAR); \
@@ -65,6 +67,7 @@
                                template class FE< (_dim), HIERARCHIC>;   \
                                template class FE< (_dim), L2_HIERARCHIC>;   \
                                template class FE< (_dim), LAGRANGE>;   \
+                               template class FE< (_dim), LAGRANGE_VEC>;   \
                                template class FE< (_dim), L2_LAGRANGE>;   \
                                template class FE< (_dim), MONOMIAL>;   \
                                template class FE< (_dim), SCALAR>;   \
@@ -78,6 +81,7 @@
   INSTANTIATE_MAPS(_dim,HIERARCHIC); \
   INSTANTIATE_MAPS(_dim,L2_HIERARCHIC); \
   INSTANTIATE_MAPS(_dim,LAGRANGE); \
+  INSTANTIATE_MAPS(_dim,LAGRANGE_VEC); \
   INSTANTIATE_MAPS(_dim,L2_LAGRANGE); \
   INSTANTIATE_MAPS(_dim,MONOMIAL); \
   INSTANTIATE_MAPS(_dim,SCALAR); \
