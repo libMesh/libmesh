@@ -145,7 +145,7 @@ int main (int argc, char** argv)
   equation_systems.get_system("Poisson").solve();
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-  ExodusII_IO(mesh).write_equation_systems( "out.exo", equation_systems);
+  ExodusII_IO(mesh).write_equation_systems( "out.e", equation_systems);
 #endif
 
 #ifdef LIBMESH_HAVE_GMV
