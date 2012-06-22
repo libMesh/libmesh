@@ -104,7 +104,7 @@ void UnstructuredMesh::copy_nodes_and_elements
 
     for (; it != end; ++it)
       {
-        Node *oldn = *it;
+        const Node *oldn = *it;
 
         // Add new nodes in old node Point locations
         /*Node *newn =*/ this->add_point(*oldn, oldn->id(), oldn->processor_id());
@@ -127,7 +127,7 @@ void UnstructuredMesh::copy_nodes_and_elements
     for (; it != end; ++it)
     {
       //Look at the old element
-      Elem *old = *it;
+      const Elem *old = *it;
       //Build a new element
       Elem *newparent = old->parent() ?
           this->elem(old->parent()->id()) : NULL;

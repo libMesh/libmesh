@@ -799,19 +799,19 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
                  k != context.dof_indices_var[_mesh_x_var].size(); ++k)
               if (context.dof_indices_var[_mesh_x_var][k] ==
                   context.dof_indices[j])
-                coord = &(context.elem->point(k)(0));
+                coord = &(const_cast<Elem*>(context.elem)->point(k)(0));
           if (_mesh_y_var != libMesh::invalid_uint)
             for (unsigned int k = 0;
                  k != context.dof_indices_var[_mesh_y_var].size(); ++k)
               if (context.dof_indices_var[_mesh_y_var][k] ==
                   context.dof_indices[j])
-                coord = &(context.elem->point(k)(1));
+                coord = &(const_cast<Elem*>(context.elem)->point(k)(1));
           if (_mesh_z_var != libMesh::invalid_uint)
             for (unsigned int k = 0;
                  k != context.dof_indices_var[_mesh_z_var].size(); ++k)
 	      if (context.dof_indices_var[_mesh_z_var][k] ==
                   context.dof_indices[j])
-                coord = &(context.elem->point(k)(2));
+                coord = &(const_cast<Elem*>(context.elem)->point(k)(2));
         }
       if (coord)
         {

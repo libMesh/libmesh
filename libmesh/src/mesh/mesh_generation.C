@@ -1952,7 +1952,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   const MeshBase::const_node_iterator nend = cross_section.nodes_end();
   for (; nd!=nend; ++nd)
     {
-      Node* node = *nd;
+      const Node* node = *nd;
 
       for (unsigned int k=0; k != order*nz+1; ++k)
         {
@@ -1978,7 +1978,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
   const MeshBase::const_element_iterator end = cross_section.elements_end();
   for (; el!=end; ++el)
     {
-      Elem* elem = *el;
+      const Elem* elem = *el;
       const ElemType etype = elem->type();
 
       // build_extrusion currently only works on coarse meshes

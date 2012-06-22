@@ -181,7 +181,7 @@ unsigned int RBEIMConstruction::get_n_affine_functions()
 }
 
 std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int bf_index,
-                                                               Elem& element,
+                                                               const Elem& element,
                                                                const std::vector<Point>& qpoints)
 {
   START_LOG("evaluate_current_basis_function()", "RBEIMConstruction");

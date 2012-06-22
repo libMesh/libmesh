@@ -141,7 +141,7 @@ void HPCoarsenTest::select_refinement (System &system)
   START_LOG("select_refinement()", "HPCoarsenTest");
 
   // The current mesh
-  const MeshBase& mesh = system.get_mesh();
+  MeshBase& mesh = system.get_mesh();
 
   // The dimensionality of the mesh
   const unsigned int dim = mesh.mesh_dimension();
@@ -507,9 +507,9 @@ void HPCoarsenTest::select_refinement (System &system)
   // Iterate over all the active elements in the mesh
   // that live on this processor.
 
-  MeshBase::const_element_iterator       elem_it  =
+  MeshBase::element_iterator       elem_it  =
 		  mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator elem_end =
+  const MeshBase::element_iterator elem_end =
 		  mesh.active_local_elements_end();
 
   for (; elem_it != elem_end; ++elem_it)

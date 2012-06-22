@@ -161,8 +161,8 @@ void Partitioner::single_partition (MeshBase& mesh)
 void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
 						    const unsigned int n_subdomains)
 {
-  MeshBase::const_element_iterator       it  = mesh.unpartitioned_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.unpartitioned_elements_end();
+  MeshBase::element_iterator       it  = mesh.unpartitioned_elements_begin();
+  const MeshBase::element_iterator end = mesh.unpartitioned_elements_end();
 
   const unsigned int n_unpartitioned_elements = MeshTools::n_elem (it, end);
 
