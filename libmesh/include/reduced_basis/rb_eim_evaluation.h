@@ -144,14 +144,16 @@ public:
    * Write out all the data to text files in order to segregate the
    * Offline stage from the Online stage.
    */
-  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data");
+  virtual void write_offline_data_to_files(const std::string& directory_name = "offline_data",
+                                           const bool write_binary_data=true);
 
   /**
    * Read in the saved Offline reduced basis data
    * to initialize the system for Online solves.
    */
   virtual void read_offline_data_from_files(const std::string& directory_name = "offline_data",
-                                            bool read_error_bound_data=true);
+                                            bool read_error_bound_data=true,
+                                            const bool read_binary_data=true);
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
