@@ -137,7 +137,7 @@ public:
    * @return a vector of values corresponding to qpoints.
    */
   std::vector<Number> evaluate_basis_function(unsigned int index,
-                                              Elem& element,
+                                              const Elem& element,
                                               const std::vector<Point>& qpoints);
 
   //----------- PUBLIC DATA MEMBERS -----------//

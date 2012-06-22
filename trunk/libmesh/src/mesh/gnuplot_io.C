@@ -119,7 +119,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
 
   for( ; it != end_it; ++it)
   {
-    Elem* el = *it;
+    const Elem* el = *it;
 
     // if el is the left edge of the mesh, print its left node position
     if(el->neighbor(0) == NULL)

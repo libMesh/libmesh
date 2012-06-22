@@ -235,7 +235,7 @@ void ErrorVector::plot_error(const std::string& filename,
 
   for ( ; el != end_el; ++el)
   {
-    Elem* elem = *el;
+    const Elem* elem = *el;
 
     error_dof_map.dof_indices(elem, dof_indices);
 

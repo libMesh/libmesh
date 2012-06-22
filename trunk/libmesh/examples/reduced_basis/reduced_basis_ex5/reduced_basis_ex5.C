@@ -188,8 +188,8 @@ void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std:
   // Loop over the mesh nodes and move them!
   MeshBase& mesh = es.get_mesh();
 
-  MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
-  const MeshBase::const_node_iterator node_end = mesh.nodes_end();
+  MeshBase::node_iterator       node_it  = mesh.nodes_begin();
+  const MeshBase::node_iterator node_end = mesh.nodes_end();
   
   for( ; node_it != node_end; node_it++)
   {
