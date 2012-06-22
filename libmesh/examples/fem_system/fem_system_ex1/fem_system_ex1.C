@@ -301,8 +301,11 @@ int main (int argc, char** argv)
           OSSRealzeroright(file_name,3,0, t_step + 1);
           file_name << ".e";
 
-          ExodusII_IO(mesh).write_equation_systems (file_name.str(),
-                                              equation_systems);
+          ExodusII_IO(mesh).write_timestep(file_name.str(),
+					   equation_systems, 
+					   1, /* This number indicates how many time steps 
+						 are being written to the file */
+					   system.time);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }
