@@ -24,8 +24,10 @@
 // if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
+// rbOOmit includes
 #include "rb_scm_evaluation.h"
 
+// libMesh includes
 #include "libmesh_logging.h"
 #include "numeric_vector.h"
 #include "o_string_stream.h"
@@ -34,6 +36,8 @@
 #include "getpot.h"
 #include "parallel.h"
 #include "dof_map.h"
+#include "xdr_cxx.h"
+
 // For creating a directory
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -367,11 +371,10 @@ void RBSCMEvaluation::reload_current_parameters()
   set_parameters(saved_parameters);
 }
 
-void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_name)
+void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_name,
+                                                  const bool write_binary_data)
 {
   START_LOG("write_offline_data_to_files()", "RBSCMEvaluation");
-
-  const unsigned int precision_level = 14;
 
   if(libMesh::processor_id() == 0)
   {
@@ -382,113 +385,93 @@ void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_n
                    << directory_name << " already exists, overwriting contents." << std::endl;
     }
 
+    // The writing mode: ENCODE for binary, WRITE for ASCII
+    XdrMODE mode = write_binary_data ? ENCODE : WRITE;
+    
+    // The suffix to use for all the files that are written out
+    const std::string suffix = write_binary_data ? ".xdr" : ".dat";
+
+    // Stream for building the file names
+    OStringStream file_name;
+
     // Write out the bounding box min values
-    std::ofstream B_min_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/B_min.dat";
-      B_min_out.open(file_name.str().c_str());
-    }
-    if ( !B_min_out.good() )
-    {
-      libMesh::err << "Error opening B_min.dat" << std::endl;
-      libmesh_error();
-    }
-    B_min_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/B_min" << suffix;
+    Xdr B_min_out(file_name.str(), mode);
+    
     for(unsigned int i=0; i<B_min.size(); i++)
     {
-      B_min_out << std::scientific << get_B_min(i) << " ";
+      Real B_min_i = get_B_min(i);
+      B_min_out << B_min_i;
     }
-    B_min_out << std::endl;
     B_min_out.close();
 
 
     // Write out the bounding box max values
-    std::ofstream B_max_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/B_max.dat";
-      B_max_out.open(file_name.str().c_str());
-    }
-    if ( !B_max_out.good() )
-    {
-      libMesh::err << "Error opening B_max.dat" << std::endl;
-      libmesh_error();
-    }
-    B_max_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/B_max" << suffix;
+    Xdr B_max_out(file_name.str(), mode);
+    
     for(unsigned int i=0; i<B_max.size(); i++)
     {
-      B_max_out << std::scientific << get_B_max(i) << " ";
+      Real B_max_i = get_B_max(i);
+      B_max_out << B_max_i;
     }
-    B_max_out << std::endl;
     B_max_out.close();
 
+    // Write out the length of the C_J data
+    file_name.str("");
+    file_name << directory_name << "/C_J_length" << suffix;
+    Xdr C_J_length_out(file_name.str(), mode);
+    
+    unsigned int C_J_length = C_J.size();
+    C_J_length_out << C_J_length;
+    C_J_length_out.close();
+
     // Write out C_J_stability_vector
-    std::ofstream C_J_stability_vector_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/C_J_stability_vector.dat";
-      C_J_stability_vector_out.open(file_name.str().c_str());
-    }
-    if ( !C_J_stability_vector_out.good() )
-    {
-      libMesh::err << "Error opening C_J_stability_vector.dat" << std::endl;
-      libmesh_error();
-    }
-    C_J_stability_vector_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/C_J_stability_vector" << suffix;
+    Xdr C_J_stability_vector_out(file_name.str(), mode);
+    
     for(unsigned int i=0; i<C_J_stability_vector.size(); i++)
     {
-      C_J_stability_vector_out << std::scientific << get_C_J_stability_constraint(i) << " ";
+      Real C_J_stability_constraint_i = get_C_J_stability_constraint(i);
+      C_J_stability_vector_out << C_J_stability_constraint_i;
     }
-    C_J_stability_vector_out << std::endl;
     C_J_stability_vector_out.close();
 
     // Write out C_J
-    std::ofstream C_J_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/C_J.dat";
-      C_J_out.open(file_name.str().c_str());
-    }
-    if ( !C_J_out.good() )
-    {
-      libMesh::err << "Error opening C_J_out.dat" << std::endl;
-      libmesh_error();
-    }
-    C_J_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/C_J" << suffix;
+    Xdr C_J_out(file_name.str(), mode);
+    
     for(unsigned int i=0; i<C_J.size(); i++)
     {
       RBParameters::const_iterator it     = C_J[i].begin();
       RBParameters::const_iterator it_end = C_J[i].end();
       for( ; it != it_end; ++it)
       {
-        C_J_out << std::scientific << it->second << " ";
+        // Need to make a copy of the value so that it's not const
+        // Xdr is not templated on const's
+        Real param_value = it->second;
+        C_J_out << param_value;
       }
     }
-    C_J_out << std::endl;
     C_J_out.close();
 
     // Write out SCM_UB_vectors get_SCM_UB_vector
-    std::ofstream SCM_UB_vectors_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/SCM_UB_vectors.dat";
-      SCM_UB_vectors_out.open(file_name.str().c_str());
-    }
-    if ( !SCM_UB_vectors_out.good() )
-    {
-      libMesh::err << "Error opening SCM_UB_vectors.dat" << std::endl;
-      libmesh_error();
-    }
-    SCM_UB_vectors_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/SCM_UB_vectors" << suffix;
+    Xdr SCM_UB_vectors_out(file_name.str(), mode);
+    
     for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
     {
       for(unsigned int j=0; j<rb_theta_expansion->get_Q_a(); j++)
       {
-        SCM_UB_vectors_out << std::scientific << get_SCM_UB_vector(i,j) << " ";
+        Real SCM_UB_vector_ij = get_SCM_UB_vector(i,j);
+        SCM_UB_vectors_out << SCM_UB_vector_ij;
       }
     }
-    SCM_UB_vectors_out << std::endl;
     SCM_UB_vectors_out.close();
   }
 
@@ -496,86 +479,80 @@ void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_n
 }
 
 
-void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_name)
+void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_name,
+                                                   const bool read_binary_data)
 {
   START_LOG("read_offline_data_from_files()", "RBSCMEvaluation");
 
+  // The reading mode: DECODE for binary, READ for ASCII
+  XdrMODE mode = read_binary_data ? DECODE : READ;
+  
+  // The suffix to use for all the files that are written out
+  const std::string suffix = read_binary_data ? ".xdr" : ".dat";
+
+  // The string stream we'll use to make the file names
+  OStringStream file_name;
+
   // Read in the bounding box min values
-  std::ifstream B_min_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/B_min.dat";
-    B_min_in.open(file_name.str().c_str());
-  }
-  if ( !B_min_in.good() )
-  {
-    libMesh::err << "Error opening B_min.dat" << std::endl;
-    libmesh_error();
-  }
+  // Note that there are Q_a values
+  file_name.str("");
+  file_name << directory_name << "/B_min" << suffix;
+  Xdr B_min_in(file_name.str(), mode);
+  
   B_min.clear();
-  Real B_min_val;
-  while( B_min_in >> B_min_val )
+  for(unsigned int i=0; i<rb_theta_expansion->get_Q_a(); i++)
   {
+    Real B_min_val;
+    B_min_in >> B_min_val;
     B_min.push_back(B_min_val);
   }
   B_min_in.close();
 
 
   // Read in the bounding box max values
-  std::ifstream B_max_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/B_max.dat";
-    B_max_in.open(file_name.str().c_str());
-  }
-  if ( !B_max_in.good() )
-  {
-    libMesh::err << "Error opening B_max.dat" << std::endl;
-    libmesh_error();
-  }
+  // Note that there are Q_a values
+  file_name.str("");
+  file_name << directory_name << "/B_max" << suffix;
+  Xdr B_max_in(file_name.str(), mode);
+  
   B_max.clear();
-  Real B_max_val;
-  while( B_max_in >> B_max_val )
+  for(unsigned int i=0; i<rb_theta_expansion->get_Q_a(); i++)
   {
+    Real B_max_val;
+    B_max_in >> B_max_val;
     B_max.push_back(B_max_val);
   }
-  B_max_in.close();
 
+  // Read in the length of the C_J data
+  file_name.str("");
+  file_name << directory_name << "/C_J_length" << suffix;
+  Xdr C_J_length_in(file_name.str(), mode);
+  
+  unsigned int C_J_length;
+  C_J_length_in >> C_J_length;
+  C_J_length_in.close();
 
   // Read in C_J_stability_vector
-  std::ifstream C_J_stability_vector_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/C_J_stability_vector.dat";
-    C_J_stability_vector_in.open(file_name.str().c_str());
-  }
-  if ( !C_J_stability_vector_in.good() )
-  {
-    libMesh::err << "Error opening C_J_stability_vector.dat" << std::endl;
-    libmesh_error();
-  }
+  file_name.str("");
+  file_name << directory_name << "/C_J_stability_vector" << suffix;
+  Xdr C_J_stability_vector_in(file_name.str(), mode);
+  
   C_J_stability_vector.clear();
-  Real C_J_stability_val;
-  while( C_J_stability_vector_in >> C_J_stability_val )
+  for(unsigned int i=0; i<C_J_length; i++)
   {
+    Real C_J_stability_val;
+    C_J_stability_vector_in >> C_J_stability_val;
     C_J_stability_vector.push_back(C_J_stability_val);
   }
   C_J_stability_vector_in.close();
 
   // Read in C_J
-  std::ifstream C_J_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/C_J.dat";
-    C_J_in.open(file_name.str().c_str());
-  }
-  if ( !C_J_in.good() )
-  {
-    libMesh::err << "Error opening C_J_in.dat" << std::endl;
-    libmesh_error();
-  }
+  file_name.str("");
+  file_name << directory_name << "/C_J" << suffix;
+  Xdr C_J_in(file_name.str(), mode);
+  
   // Resize C_J based on C_J_stability_vector and Q_a
-  C_J.resize( C_J_stability_vector.size() );
+  C_J.resize( C_J_length );
   for(unsigned int i=0; i<C_J.size(); i++)
   {
     RBParameters::const_iterator it     = get_parameters().begin();
@@ -592,17 +569,10 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
 
 
   // Read in SCM_UB_vectors get_SCM_UB_vector
-  std::ifstream SCM_UB_vectors_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/SCM_UB_vectors.dat";
-    SCM_UB_vectors_in.open(file_name.str().c_str());
-  }
-  if ( !SCM_UB_vectors_in.good() )
-  {
-    libMesh::err << "Error opening SCM_UB_vectors.dat" << std::endl;
-    libmesh_error();
-  }
+  file_name.str("");
+  file_name << directory_name << "/SCM_UB_vectors" << suffix;
+  Xdr SCM_UB_vectors_in(file_name.str(), mode);
+  
   // Resize SCM_UB_vectors based on C_J_stability_vector and Q_a
   SCM_UB_vectors.resize( C_J_stability_vector.size() );
   for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
