@@ -440,13 +440,19 @@ void RBEvaluation::clear_riesz_representors()
 
 }
 
-void RBEvaluation::write_offline_data_to_files(const std::string& directory_name)
+void RBEvaluation::write_offline_data_to_files(const std::string& directory_name,
+                                               const bool write_binary_data)
 {
   START_LOG("write_offline_data_to_files()", "RBEvaluation");
 
-  const unsigned int precision_level = 14;
-
-  const unsigned int n_bfs = get_n_basis_functions();
+  // Get the number of basis functions
+  unsigned int n_bfs = get_n_basis_functions();
+  
+  // The writing mode: ENCODE for binary, WRITE for ASCII
+  XdrMODE mode = write_binary_data ? ENCODE : WRITE;
+  
+  // The suffix to use for all the files that are written out
+  const std::string suffix = write_binary_data ? ".xdr" : ".dat";
 
   if(libMesh::processor_id() == 0)
   {
@@ -459,64 +465,38 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     }
 
     // First, write out how many basis functions we have generated
+    OStringStream file_name;
     {
-      std::ofstream n_bfs_out;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/n_bfs.dat";
-        n_bfs_out.open(file_name.str().c_str());
-      }
-      if ( !n_bfs_out.good() )
-      {
-        libMesh::err << "Error opening n_bfs.dat" << std::endl;
-        libmesh_error();
-      }
+      file_name << directory_name << "/n_bfs" << suffix;
+      Xdr n_bfs_out(file_name.str(), mode);
       n_bfs_out << n_bfs;
       n_bfs_out.close();
     }
 
     // Write out F_q representor norm data
-    std::ofstream RB_Fq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Fq_norms.dat";
-      RB_Fq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Fq_norms_out.good() )
-    {
-      libMesh::err << "Error opening Fq_norms.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Fq_norms_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/Fq_norms" << suffix;
+    Xdr RB_Fq_norms_out(file_name.str(), mode);
     unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
     for(unsigned int i=0; i<Q_f_hat; i++)
     {
-      RB_Fq_norms_out << std::scientific << Fq_representor_norms[i] << " ";
+      RB_Fq_norms_out << Fq_representor_norms[i];
     }
     RB_Fq_norms_out.close();
 
     // Write out output data
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
-      std::ofstream output_dual_norms_out;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/output_";
-        OSSRealzeroright(file_name,3,0,n);
-        file_name << "_dual_norms.dat";
-        output_dual_norms_out.open(file_name.str().c_str());
-      }
-      if ( !output_dual_norms_out.good() )
-      {
-        libMesh::err << "Error opening output " << n << " dual norms file" << std::endl;
-        libmesh_error();
-      }
-      output_dual_norms_out.precision(precision_level);
+      file_name.str("");
+      file_name << directory_name << "/output_";
+      OSSRealzeroright(file_name,3,0,n);
+      file_name << "_dual_norms" << suffix;
+      Xdr output_dual_norms_out(file_name.str(), mode);
 
       unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
       for(unsigned int q=0; q<Q_l_hat; q++)
       {
-        output_dual_norms_out << std::scientific << output_dual_norms[n][q] << " ";
+        output_dual_norms_out << output_dual_norms[n][q];
       }
       output_dual_norms_out.close();
     }
@@ -527,80 +507,33 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     {
       for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
       {
-        std::ofstream output_n_out;
-        {
-          OStringStream file_name;
-          file_name << directory_name << "/output_";
-          OSSRealzeroright(file_name,3,0,n);
-          file_name << "_";
-          OSSRealzeroright(file_name,3,0,q_l);
-          file_name << ".dat";
-          output_n_out.open(file_name.str().c_str());
-        }
-        if( !output_n_out.good() )
-        {
-          libMesh::err << "Error opening output file for output " << n << std::endl;
-          libmesh_error();
-        }
-        output_n_out.precision(precision_level);
+        file_name.str("");
+        file_name << directory_name << "/output_";
+        OSSRealzeroright(file_name,3,0,n);
+        file_name << "_";
+        OSSRealzeroright(file_name,3,0,q_l);
+        file_name << suffix;
+        Xdr output_n_out(file_name.str(), mode);
 
         for(unsigned int j=0; j<n_bfs; j++)
         {
-          output_n_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
+          output_n_out << RB_output_vectors[n][q_l](j);
         }
         output_n_out.close();
       }
     }
 
-//      // Write out output data to a single file
-//      // If we have a large number of outputs, then the IO is much faster
-//      // if we store the data in a single file.
-//      std::ofstream output_out;
-//      {
-//        OStringStream file_name;
-//        file_name << directory_name << "/outputs.dat";
-//        output_out.open(file_name.str().c_str());
-//      }
-//      if( !output_out.good() )
-//      {
-//        libMesh::err << "Error opening outputs.dat" << std::endl;
-//        libmesh_error();
-//      }
-//
-//      output_out.precision(precision_level);
-//      for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-//      {
-//        for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
-//        {
-//          for(unsigned int j=0; j<n_bfs; j++)
-//          {
-//            output_out << std::scientific << RB_output_vectors[n][q_l](j) << " ";
-//          }
-//        }
-//      }
-//      output_out.close();
-
     if(compute_RB_inner_product)
     {
       // Next write out the inner product matrix
-      std::ofstream RB_inner_product_matrix_out;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/RB_inner_product_matrix.dat";
-        RB_inner_product_matrix_out.open(file_name.str().c_str());
-      }
-      if ( !RB_inner_product_matrix_out.good() )
-      {
-        libMesh::err << "Error opening RB_inner_product_matrix.dat" << std::endl;
-        libmesh_error();
-      }
-      RB_inner_product_matrix_out.precision(precision_level);
+      file_name.str("");
+      file_name << directory_name << "/RB_inner_product_matrix" << suffix;
+      Xdr RB_inner_product_matrix_out(file_name.str(), mode);
       for(unsigned int i=0; i<n_bfs; i++)
       {
         for(unsigned int j=0; j<n_bfs; j++)
         {
-          RB_inner_product_matrix_out << std::scientific
-            << RB_inner_product_matrix(i,j) << " ";
+          RB_inner_product_matrix_out << RB_inner_product_matrix(i,j);
         }
       }
       RB_inner_product_matrix_out.close();
@@ -609,22 +542,15 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     // Next write out the F_q vectors
     for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
     {
-      OStringStream file_name;
+      file_name.str("");
       file_name << directory_name << "/RB_F_";
       OSSRealzeroright(file_name,3,0,q_f);
-      file_name << ".dat";
-      std::ofstream RB_F_q_f_out(file_name.str().c_str());
+      file_name << suffix;
+      Xdr RB_F_q_f_out(file_name.str(), mode);
 
-      if ( !RB_F_q_f_out.good() )
-      {
-        libMesh::err << "Error opening RB_F_" << q_f << ".dat" << std::endl;
-        libmesh_error();
-      }
-
-      RB_F_q_f_out.precision(precision_level);
       for(unsigned int i=0; i<n_bfs; i++)
       {
-        RB_F_q_f_out << std::scientific << RB_F_q_vector[q_f](i) << " ";
+        RB_F_q_f_out << RB_F_q_vector[q_f](i);
       }
       RB_F_q_f_out.close();
     }
@@ -632,67 +558,44 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     // Next write out the A_q matrices
     for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
     {
-      OStringStream file_name;
+      file_name.str("");
       file_name << directory_name << "/RB_A_";
       OSSRealzeroright(file_name,3,0,q_a);
-      file_name << ".dat";
-      std::ofstream RB_A_q_a_out(file_name.str().c_str());
+      file_name << suffix;
+      Xdr RB_A_q_a_out(file_name.str(), mode);
 
-      if ( !RB_A_q_a_out.good() )
-      {
-        libMesh::err << "Error opening RB_A_" << q_a << ".dat" << std::endl;
-        libmesh_error();
-      }
-
-      RB_A_q_a_out.precision(precision_level);
       for(unsigned int i=0; i<n_bfs; i++)
       {
         for(unsigned int j=0; j<n_bfs; j++)
         {
-          RB_A_q_a_out << std::scientific << RB_A_q_vector[q_a](i,j) << " ";
+          RB_A_q_a_out << RB_A_q_vector[q_a](i,j);
         }
       }
       RB_A_q_a_out.close();
     }
 
     // Next write out Fq_Aq representor norm data
-    std::ofstream RB_Fq_Aq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Fq_Aq_norms.dat";
-      RB_Fq_Aq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Fq_Aq_norms_out.good() )
-    {
-      libMesh::err << "Error opening Fq_Aq_norms.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Fq_Aq_norms_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/Fq_Aq_norms" << suffix;
+    Xdr RB_Fq_Aq_norms_out(file_name.str(), mode);
+    
     for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
     {
       for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
       {
         for(unsigned int i=0; i<n_bfs; i++)
         {
-          RB_Fq_Aq_norms_out << std::scientific << Fq_Aq_representor_norms[q_f][q_a][i] << " ";
+          RB_Fq_Aq_norms_out << Fq_Aq_representor_norms[q_f][q_a][i];
         }
       }
     }
     RB_Fq_Aq_norms_out.close();
 
     // Next write out Aq_Aq representor norm data
-    std::ofstream RB_Aq_Aq_norms_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Aq_Aq_norms.dat";
-      RB_Aq_Aq_norms_out.open(file_name.str().c_str());
-    }
-    if ( !RB_Aq_Aq_norms_out.good() )
-    {
-      libMesh::err << "Error opening Aq_Aq_norms.dat" << std::endl;
-      libmesh_error();
-    }
-    RB_Aq_Aq_norms_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/Aq_Aq_norms" << suffix;
+    Xdr RB_Aq_Aq_norms_out(file_name.str(), mode);
+    
     unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
     for(unsigned int i=0; i<Q_a_hat; i++)
     {
@@ -700,7 +603,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       {
         for(unsigned int l=0; l<n_bfs; l++)
         {
-          RB_Aq_Aq_norms_out << std::scientific << Aq_Aq_representor_norms[i][j][l] << " ";
+          RB_Aq_Aq_norms_out << Aq_Aq_representor_norms[i][j][l];
         }
       }
     }
@@ -708,26 +611,21 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
 
     // Also, write out the greedily selected parameters
     {
-      std::ofstream greedy_params_out;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/greedy_params.dat";
-        greedy_params_out.open(file_name.str().c_str());
-      }
-      if ( !greedy_params_out.good() )
-      {
-        libMesh::err << "Error opening greedy_params.dat" << std::endl;
-        libmesh_error();
-      }
+      file_name.str("");
+      file_name << directory_name << "/greedy_params" << suffix;
+      Xdr greedy_params_out(file_name.str(), mode);
+      
       for(unsigned int i=0; i<greedy_param_list.size(); i++)
       {
         RBParameters::const_iterator it     = greedy_param_list[i].begin();
         RBParameters::const_iterator it_end = greedy_param_list[i].end();
         for( ; it != it_end; ++it)
         {
-          greedy_params_out << it->second << " ";
+          // Need to make a copy of the value so that it's not const
+          // Xdr is not templated on const's
+          Real param_value = it->second;
+          greedy_params_out << param_value;
         }
-        greedy_params_out << std::endl;
       }
       greedy_params_out.close();
     }
@@ -737,22 +635,26 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
   STOP_LOG("write_offline_data_to_files()", "RBEvaluation");
 }
 
-void RBEvaluation::read_offline_data_from_files(const std::string& directory_name, bool read_error_bound_data)
+void RBEvaluation::read_offline_data_from_files(const std::string& directory_name,
+                                                bool read_error_bound_data,
+                                                const bool read_binary_data)
 {
   START_LOG("read_offline_data_from_files()", "RBEvaluation");
+
+  // The reading mode: DECODE for binary, READ for ASCII
+  XdrMODE mode = read_binary_data ? DECODE : READ;
+  
+  // The suffix to use for all the files that are written out
+  const std::string suffix = read_binary_data ? ".xdr" : ".dat";
+
+  // The string stream we'll use to make the file names
+  OStringStream file_name;
 
   // First, find out how many basis functions we had when Greedy terminated
   unsigned int n_bfs;
   {
-    OStringStream file_name;
-    file_name << directory_name << "/n_bfs.dat";
-    std::ifstream n_bfs_in(file_name.str().c_str());
-
-    if ( !n_bfs_in.good() )
-    {
-      libMesh::err << "Error opening n_bfs.dat" << std::endl;
-      libmesh_error();
-    }
+    file_name << directory_name << "/n_bfs" << suffix;
+    Xdr n_bfs_in(file_name.str(), mode);
 
     n_bfs_in >> n_bfs;
     n_bfs_in.close();
@@ -765,25 +667,17 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   {
     for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
     {
-      std::ifstream output_n_in;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/output_";
-        OSSRealzeroright(file_name,3,0,n);
-        file_name << "_";
-        OSSRealzeroright(file_name,3,0,q_l);
-        file_name << ".dat";
-        output_n_in.open(file_name.str().c_str());
-      }
-      if( !output_n_in.good() )
-      {
-        libMesh::err << "Error opening input file for output " << n << std::endl;
-        libmesh_error();
-      }
+      file_name.str("");
+      file_name << directory_name << "/output_";
+      OSSRealzeroright(file_name,3,0,n);
+      file_name << "_";
+      OSSRealzeroright(file_name,3,0,q_l);
+      file_name << suffix;
+      Xdr output_n_in(file_name.str(), mode);
 
       for(unsigned int j=0; j<n_bfs; j++)
       {
-        Number  value;
+        Number value;
         output_n_in >> value;
         RB_output_vectors[n][q_l](j) = value;
       }
@@ -791,48 +685,13 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     }
   }
 
-//    // If we have a large number of outputs, then the IO is much faster
-//    // if we store the data in a single file.
-//
-//    std::ifstream output_in;
-//    {
-//      OStringStream file_name;
-//      file_name << directory_name << "/outputs.dat";
-//      output_in.open(file_name.str().c_str());
-//    }
-//    if( !output_in.good() )
-//    {
-//      libMesh::err << "Error opening outputs.dat" << std::endl;
-//      libmesh_error();
-//    }
-//    for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
-//    {
-//      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
-//      {
-//        for(unsigned int j=0; j<n_bfs; j++)
-//        {
-//          Number value;
-//          output_in >> value;
-//          RB_output_vectors[n][q_l](j) = value;
-//        }
-//      }
-//    }
-//    output_in.close();
-
   if(compute_RB_inner_product)
   {
     // Next read in the inner product matrix
-    std::ifstream RB_inner_product_matrix_in;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/RB_inner_product_matrix.dat";
-      RB_inner_product_matrix_in.open(file_name.str().c_str());
-    }
-    if ( !RB_inner_product_matrix_in.good() )
-    {
-      libMesh::err << "Error opening RB_inner_product_matrix.dat" << std::endl;
-      libmesh_error();
-    }
+    file_name.str("");
+    file_name << directory_name << "/RB_inner_product_matrix" << suffix;
+    Xdr RB_inner_product_matrix_in(file_name.str(), mode);
+    
     for(unsigned int i=0; i<n_bfs; i++)
     {
       for(unsigned int j=0; j<n_bfs; j++)
@@ -848,21 +707,15 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   // Next read in the F_q vectors
   for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
   {
-    OStringStream file_name;
+    file_name.str("");
     file_name << directory_name << "/RB_F_";
     OSSRealzeroright(file_name,3,0,q_f);
-    file_name << ".dat";
-    std::ifstream RB_F_q_f_in(file_name.str().c_str());
-
-    if ( !RB_F_q_f_in.good() )
-    {
-      libMesh::err << "Error opening RB_F_" << q_f << ".dat" << std::endl;
-      libmesh_error();
-    }
+    file_name << suffix;
+    Xdr RB_F_q_f_in(file_name.str(), mode);
 
     for(unsigned int i=0; i<n_bfs; i++)
     {
-      Number  value;
+      Number value;
       RB_F_q_f_in >> value;
       RB_F_q_vector[q_f](i) = value;
     }
@@ -872,17 +725,11 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   // Next read in the A_q matrices
   for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
   {
-    OStringStream file_name;
+    file_name.str("");
     file_name << directory_name << "/RB_A_";
     OSSRealzeroright(file_name,3,0,q_a);
-    file_name << ".dat";
-    std::ifstream RB_A_q_a_in(file_name.str().c_str());
-
-    if ( !RB_A_q_a_in.good() )
-    {
-      libMesh::err << "Error opening RB_A_" << q_a << ".dat" << std::endl;
-      libmesh_error();
-    }
+    file_name << suffix;
+    Xdr RB_A_q_a_in(file_name.str(), mode);
 
     for(unsigned int i=0; i<n_bfs; i++)
     {
@@ -900,17 +747,10 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   if(read_error_bound_data)
   {
     // Next read in F_q representor norm data
-    std::ifstream RB_Fq_norms_in;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Fq_norms.dat";
-      RB_Fq_norms_in.open(file_name.str().c_str());
-    }
-    if ( !RB_Fq_norms_in.good() )
-    {
-      libMesh::err << "Error opening Fq_norms.dat" << std::endl;
-      libmesh_error();
-    }
+    file_name.str("");
+    file_name << directory_name << "/Fq_norms" << suffix;
+    Xdr RB_Fq_norms_in(file_name.str(), mode);
+    
     unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
     for(unsigned int i=0; i<Q_f_hat; i++)
     {
@@ -921,20 +761,12 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     // Read in output data
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
-      std::ifstream output_dual_norms_in;
-      {
-        OStringStream file_name;
-        file_name << directory_name << "/output_";
-        OSSRealzeroright(file_name,3,0,n);
-        file_name << "_dual_norms.dat";
-        output_dual_norms_in.open(file_name.str().c_str());
-      }
-      if ( !output_dual_norms_in.good() )
-      {
-        libMesh::err << "Error opening input " << n << " dual norms file" << std::endl;
-        libmesh_error();
-      }
-
+      file_name.str("");
+      file_name << directory_name << "/output_";
+      OSSRealzeroright(file_name,3,0,n);
+      file_name << "_dual_norms" << suffix;
+      Xdr output_dual_norms_in(file_name.str(), mode);
+      
       unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
       for(unsigned int q=0; q<Q_l_hat; q++)
       {
@@ -945,17 +777,10 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
 
 
     // Next read in Fq_Aq representor norm data
-    std::ifstream RB_Fq_Aq_norms_in;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Fq_Aq_norms.dat";
-      RB_Fq_Aq_norms_in.open(file_name.str().c_str());
-    }
-    if ( !RB_Fq_Aq_norms_in.good() )
-    {
-      libMesh::err << "Error opening Fq_Aq_norms.dat" << std::endl;
-      libmesh_error();
-    }
+    file_name.str("");
+    file_name << directory_name << "/Fq_Aq_norms" << suffix;
+    Xdr RB_Fq_Aq_norms_in(file_name.str(), mode);
+    
     for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
     {
       for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
@@ -969,17 +794,10 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     RB_Fq_Aq_norms_in.close();
 
     // Next read in Aq_Aq representor norm data
-    std::ifstream RB_Aq_Aq_norms_in;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/Aq_Aq_norms.dat";
-      RB_Aq_Aq_norms_in.open(file_name.str().c_str());
-    }
-    if ( !RB_Aq_Aq_norms_in.good() )
-    {
-      libMesh::err << "Error opening Aq_Aq_norms.dat" << std::endl;
-      libmesh_error();
-    }
+    file_name.str("");
+    file_name << directory_name << "/Aq_Aq_norms" << suffix;
+    Xdr RB_Aq_Aq_norms_in(file_name.str(), mode);
+    
     unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
     for(unsigned int i=0; i<Q_a_hat; i++)
     {
