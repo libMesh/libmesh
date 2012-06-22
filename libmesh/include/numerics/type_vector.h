@@ -355,11 +355,7 @@ struct MakeNumber<std::complex<T> >
 template <typename T>
 struct MakeNumber<TypeVector<T> >
 {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  typedef TypeVector<std::complex<T> > type;
-#else
-  typedef TypeVector<T> type;
-#endif
+  typedef TypeVector<typename MakeNumber<T>::type > type;
 };
 
 

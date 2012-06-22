@@ -29,6 +29,13 @@ namespace libMesh
 {
 
 
+template <typename T>
+struct MakeNumber<VectorValue<T> >
+{
+  typedef VectorValue<typename MakeNumber<T>::type > type;
+};
+
+
 
 
 /**
