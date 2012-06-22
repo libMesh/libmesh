@@ -1280,7 +1280,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                 // solution value at the quadrature point
                 OutputNumber fineval = libMesh::zero;
                 // solution grad at the quadrature point
-                OutputGradient finegrad;
+                OutputNumberGradient finegrad;
 
                 // Sum the solution values * the DOF
                 // values at the quadrature point to
@@ -1422,7 +1422,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                 // solution value at the quadrature point
                 OutputNumber fineval = libMesh::zero;
                 // solution grad at the quadrature point
-                OutputGradient finegrad;
+                OutputNumberGradient finegrad;
 
                 // Sum the solution values * the DOF
                 // values at the quadrature point to
@@ -1545,7 +1545,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
           // solution value at the quadrature point
           OutputNumber fineval = libMesh::zero;
           // solution grad at the quadrature point
-          OutputGradient finegrad;
+          OutputNumberGradient finegrad;
 
           // Sum the solution values * the DOF
           // values at the quadrature point to
