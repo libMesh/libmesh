@@ -24,6 +24,7 @@
 #include "libmesh_common.h"
 #include "enum_elem_type.h"
 #include "vector_value.h"
+#include "enum_fe_family.h"
 
 // C++ includes
 #include <map>
@@ -337,7 +338,7 @@ public:
    * Returns the number of components of a vector-valued element.
    * Scalar-valued elements return 1. 
    */
-  static bool is_vector_type( const FEType& fe_type );
+  static FEFieldType field_type( const FEType& fe_type );
 
   /**
    * Returns the number of components of a vector-valued element.

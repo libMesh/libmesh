@@ -488,7 +488,8 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
     for (; pos != end; ++pos)
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
 	{
-	  if( FEInterface::is_vector_type(pos->second->variable_type(vn)) )
+	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
+	      TYPE_VECTOR )
 	    n_vector_vars++;
 	  else
 	    n_scalar_vars++;
@@ -521,7 +522,7 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
 
 	  unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type);
 
-	  if( FEInterface::is_vector_type(fe_type) )
+	  if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
 	    {
 	      switch(n_vec_dim)
 		{
@@ -672,7 +673,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
     for (; pos != end; ++pos)
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
 	{
-	  if( FEInterface::is_vector_type(pos->second->variable_type(vn)) )
+	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
+	      TYPE_VECTOR )
 	    n_vector_vars++;
 	  else
 	    n_scalar_vars++;
@@ -729,7 +731,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
       unsigned int n_vector_vars = 0;
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
 	{
-	  if( FEInterface::is_vector_type(pos->second->variable_type(vn)) )
+	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
+	      TYPE_VECTOR )
 	    n_vector_vars++;
 	  else
 	    n_scalar_vars++;
