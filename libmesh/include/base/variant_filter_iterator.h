@@ -45,26 +45,6 @@
  *
  * @author John W. Peterson, 2004.
  */
-
-template <typename T>
-struct CompletelyConst
-{
-  typedef const T type;
-};
-
-template <typename T>
-struct CompletelyConst<T*>
-{
-  typedef typename CompletelyConst<T>::type const * type;
-};
-
-template <typename T>
-struct CompletelyConst<T&>
-{
-  typedef typename CompletelyConst<T>::type const & type;
-};
-
-
 template<class Predicate, class Type, class ReferenceType = Type&, class PointerType = Type*>
 class variant_filter_iterator :
 #if defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER)
@@ -98,14 +78,7 @@ public:
 
     // Similar to clone function above, but returns a pointer to a copy of a different type.
     // typedef typename variant_filter_iterator<Predicate, Type, const Type&, const Type*>::IterBase const_IterBase;
-    typedef typename
-      variant_filter_iterator
-        <Predicate,
-         typename CompletelyConst<Type>::type,
-         typename CompletelyConst<Type&>::type,
-         typename CompletelyConst<Type*>::type>::IterBase
-       const_IterBase;
-
+    typedef typename variant_filter_iterator<Predicate, Type const, Type const & , Type const*>::IterBase const_IterBase;
     virtual const_IterBase* const_clone() const = 0;
   };
 
@@ -126,14 +99,7 @@ public:
 
     // Similar to clone function above, but returns a pointer to a copy of a different type.
     // typedef typename variant_filter_iterator<Predicate, Type, const Type&, const Type*>::PredBase const_PredBase;
-    typedef typename
-      variant_filter_iterator
-        <Predicate,
-         typename CompletelyConst<Type>::type,
-         typename CompletelyConst<Type&>::type,
-         typename CompletelyConst<Type*>::type>::PredBase
-       const_PredBase;
-
+    typedef typename variant_filter_iterator<Predicate, Type const,  Type const &,  Type const *>::PredBase const_PredBase;
     virtual const_PredBase* const_clone() const = 0;
   };
 
@@ -200,14 +166,7 @@ public:
        * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
        */
       // typedef typename variant_filter_iterator<Predicate, Type, const Type&, const Type*>::template Iter<IterType> const_Iter;
-      typedef typename
-        variant_filter_iterator
-          <Predicate,
-           typename CompletelyConst<Type>::type,
-           typename CompletelyConst<Type&>::type,
-           typename CompletelyConst<Type*>::type>::template
-             Iter<IterType>
-         const_Iter;
+      typedef typename variant_filter_iterator<Predicate, Type const, Type const &,  Type const *>::template Iter<IterType> const_Iter;
 
       typename IterBase::const_IterBase* copy =
 	new const_Iter(iter_data);
@@ -306,14 +265,8 @@ public:
        * Important typedef for const_iterators.  Notice the weird syntax!  Does it compile everywhere?
        */
       //      typedef typename variant_filter_iterator<Predicate, Type, const Type&, const Type*>::template Pred<IterType, PredType> const_Pred;
-      typedef typename
-        variant_filter_iterator
-          <Predicate,
-           typename CompletelyConst<Type>::type,
-           typename CompletelyConst<Type&>::type,
-           typename CompletelyConst<Type*>::type>::template
-             Pred<IterType, PredType>
-         const_Pred;
+      typedef typename variant_filter_iterator<Predicate, Type const, Type const &,  Type const *>::template Pred<IterType, PredType> const_Pred;
+
 
       typename PredBase::const_PredBase* copy =
 	new const_Pred(pred_data);
