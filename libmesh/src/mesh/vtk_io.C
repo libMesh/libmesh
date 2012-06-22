@@ -118,7 +118,7 @@ vtkPoints* VTKIO::nodes_to_vtk(const MeshBase& mesh){
 			// write out nodal data
 			for (;nd!=nd_end;++nd)
 			{
-				Node* node = (*nd);
+				const Node* node = (*nd);
 				float pnt[LIBMESH_DIM];
 				for(unsigned int i=0;i<LIBMESH_DIM;++i){
 					pnt[i] = (*node)(i);
@@ -150,7 +150,7 @@ vtkCellArray* VTKIO::cells_to_vtk(const MeshBase& mesh, std::vector<int>& types)
                 int active_element_counter = 0;
 
 		for ( ; it != end; ++it, ++active_element_counter) {
-			Elem *elem  = *it;
+			const Elem *elem  = *it;
 
 			vtkIdType celltype = VTK_EMPTY_CELL; // initialize to something to avoid compiler warning
 
