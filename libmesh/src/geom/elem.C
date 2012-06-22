@@ -2084,13 +2084,13 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
   elem->set_refinement_flag(this->refinement_flag());
   elem->set_p_refinement_flag(this->p_refinement_flag());
   libmesh_assert (elem->level() == this->level());
-#endif
 
   // If this element definitely should have children, assign
   // remote_elem for now; later unpacked elements may overwrite that.
   if (!elem->active())
     for (unsigned int c=0; c != elem->n_children(); ++c)
       elem->add_child(const_cast<RemoteElem*>(remote_elem), c);
+#endif
 
   // Assign the IDs
   elem->subdomain_id() = this->subdomain_id();
@@ -2160,8 +2160,12 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 
       // Find any elements that ought to point to elem
       std::vector<const Elem*> neigh_family;
+#ifdef LIBMESH_ENABLE_AMR
       if (!neigh->subactive())
         neigh->family_tree_by_side(neigh_family, nn);
+#else
+        neigh_family.push_back(neigh);
+#endif
 
       // And point them to elem
       for (unsigned int i = 0; i != neigh_family.size(); ++i)
