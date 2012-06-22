@@ -272,8 +272,8 @@ void UnstructuredMesh::all_first_order ()
    * First make sure they _are_ indeed high-order, and then replace
    * them with an equivalent first-order element.
    */
-  const_element_iterator endit = elements_end();
-  for (const_element_iterator it = elements_begin();
+  element_iterator endit = elements_end();
+  for (element_iterator it = elements_begin();
        it != endit; ++it)
     {
       Elem* so_elem = *it;
@@ -497,7 +497,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        it != endit; ++it)
     {
       // the linear-order element
-      Elem* lo_elem = *it;
+      const Elem* lo_elem = *it;
 
       libmesh_assert (lo_elem != NULL);
 

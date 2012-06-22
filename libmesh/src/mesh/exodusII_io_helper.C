@@ -730,7 +730,7 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
 
   for(it = mesh.active_elements_begin(); it != end; ++it)
     {
-      Elem * elem = *it;
+      const Elem * elem = *it;
       subdomain_id_type cur_subdomain = elem->subdomain_id();
 
       subdomain_map[cur_subdomain].push_back(elem->id());
@@ -792,7 +792,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
   for (; it != end; ++it)
   {
-    Elem * elem = *it;
+    const Elem * elem = *it;
     subdomain_id_type cur_subdomain = elem->subdomain_id();
 
     subdomain_map[cur_subdomain].push_back(elem->id());
@@ -838,7 +838,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
     const MeshBase::const_node_iterator end = mesh.nodes_end();
     for ( ; it != end; ++it, ++i)
       {
-	Node* node = *it;
+	const Node* node = *it;
 
 	x[i] = (*node)(0);
 
@@ -920,7 +920,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   //loop through element and map between block and element vector
   for (; mesh_it != end; ++mesh_it)
   {
-    Elem * elem = *mesh_it;
+    const Elem * elem = *mesh_it;
 
     unsigned int cur_subdomain = elem->subdomain_id();
 
@@ -1026,7 +1026,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
   //loop through element and map between block and element vector
   for(; mesh_it != end; ++mesh_it)
     {
-      Elem * elem = *mesh_it;
+      const Elem * elem = *mesh_it;
 
       //Only write out the active elements
       if(elem->active())
@@ -1406,7 +1406,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
   //loop through element and map between block and element vector
   for( ; mesh_it != end; ++mesh_it)
     {
-      Elem * elem = *mesh_it;
+      const Elem * elem = *mesh_it;
 
       //Only write out the active elements
       if(elem->active())

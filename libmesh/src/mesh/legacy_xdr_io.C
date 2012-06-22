@@ -721,7 +721,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
     const MeshBase::const_element_iterator end_el = mesh.elements_end();
     for( ; el != end_el; ++el)
     {
-      Elem* elem = (*el);
+      const Elem* elem = (*el);
       if(!elem->subactive())
       {
         n_non_subactive++;

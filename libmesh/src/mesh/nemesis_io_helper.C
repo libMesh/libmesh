@@ -1724,7 +1724,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 
   for (; elem_it != elem_end; ++elem_it)
     {
-      Elem * elem = *elem_it;
+      const Elem * elem = *elem_it;
 
       // Grab the nodes while we're here.
       for (unsigned int n=0; n<elem->n_nodes(); ++n)

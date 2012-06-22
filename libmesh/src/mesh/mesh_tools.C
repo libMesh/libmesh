@@ -604,7 +604,7 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
   const MeshBase::const_element_iterator end_el = mesh.elements_end();
   for( ; el != end_el; ++el)
   {
-    Elem* elem = (*el);
+    const Elem* elem = (*el);
     if(!elem->subactive())
       for (unsigned int n=0; n<elem->n_nodes(); ++n)
         not_subactive_node_ids.insert(elem->node(n));
