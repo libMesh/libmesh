@@ -44,7 +44,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out*.gmv
+	@rm -f $(target) out*.gmv out*.e
 
 distclean:
 	@$(MAKE) clobber
