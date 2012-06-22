@@ -219,7 +219,7 @@ public:
   /**
    * Reinitializes local data vectors/matrices on the current geometric element
    */
-  virtual void pre_fe_reinit(const System&, Elem *e);
+  virtual void pre_fe_reinit(const System&, const Elem *e);
 
   /**
    * Reinitializes interior FE objects on the current geometric element
@@ -299,7 +299,7 @@ public:
   /**
    * Current element for element_* to examine
    */
-  Elem *elem;
+  const Elem *elem;
 
   /**
    * Current side for side_* to examine
