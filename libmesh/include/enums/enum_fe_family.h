@@ -70,6 +70,14 @@ namespace libMeshEnums {
   enum FEContinuity {DISCONTINUOUS,
                      C_ZERO,
 		     C_ONE};
+
+  /**
+   * \enum libMeshEnums::FEFieldType defines an \p enum for finite element
+   * field types - i.e. is it a scalar element, vector, tensor, etc.
+   */
+  enum FEFieldType {TYPE_SCALAR = 0,
+		    TYPE_VECTOR};
+  
 }
 
 using namespace libMeshEnums;
