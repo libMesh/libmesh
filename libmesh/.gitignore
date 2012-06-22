@@ -151,3 +151,4 @@ examples/miscellaneous/miscellaneous_ex7/bih.1.e
 examples/miscellaneous/miscellaneous_ex7/bih.2.e
 examples/miscellaneous/miscellaneous_ex7/bih.3.e
 contrib/fparser/fpoptimizer/grammar_data.cc
+examples/vector_fe/vector_fe_ex1/out.e
