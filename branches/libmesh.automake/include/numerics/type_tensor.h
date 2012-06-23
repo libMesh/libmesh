@@ -396,11 +396,7 @@ struct IncrementRank<TensorValue<T> >
 template <typename T>
 struct MakeNumber<TypeTensor<T> >
 {
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  typedef TypeTensor<std::complex<T> > type;
-#else
-  typedef TypeTensor<T> type;
-#endif
+  typedef TypeTensor<typename MakeNumber<T>::type> type;
 };
 
 //------------------------------------------------------

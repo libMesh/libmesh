@@ -172,8 +172,8 @@ int VariationalMeshSmoother::writegr(int, int, LPLPDOUBLE R, LPINT, int, LPLPINT
 
   //Adjust nodal coordinates to new positions
   {
-    MeshBase::const_node_iterator       it  = _mesh.nodes_begin();
-    const MeshBase::const_node_iterator end = _mesh.nodes_end();
+    MeshBase::node_iterator       it  = _mesh.nodes_begin();
+    const MeshBase::node_iterator end = _mesh.nodes_end();
 
     libmesh_assert(_dist_norm == 0.0);
     _dist_norm=0;

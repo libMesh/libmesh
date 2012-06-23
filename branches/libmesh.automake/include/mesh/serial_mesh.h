@@ -101,15 +101,13 @@ class SerialMesh : public UnstructuredMesh
   // SerialMesh has no caches to update
   virtual void update_parallel_id_counts () {}
 
-  /**
-   * For meshes that don't store points/elems, these functions may be an issue!
-   */
   virtual const Point& point (const unsigned int i) const ;
   virtual const Node&  node  (const unsigned int i) const ;
   virtual Node& node (const unsigned int i) ;
   virtual const Node* node_ptr (const unsigned int i) const ;
   virtual Node* & node_ptr (const unsigned int i) ;
-  virtual Elem* elem (const unsigned int i) const ;
+  virtual const Elem* elem (const unsigned int i) const ;
+  virtual Elem* elem (const unsigned int i) ;
 
   /**
    * functions for adding /deleting nodes elements.

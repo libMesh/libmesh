@@ -133,7 +133,19 @@ Node* & SerialMesh::node_ptr (const unsigned int i)
 
 
 
-Elem* SerialMesh::elem (const unsigned int i) const
+const Elem* SerialMesh::elem (const unsigned int i) const
+{
+  libmesh_assert (i < this->n_elem());
+  libmesh_assert (_elements[i] != NULL);
+  libmesh_assert (_elements[i]->id() == i); // This will change soon
+
+  return _elements[i];
+}
+
+
+
+
+Elem* SerialMesh::elem (const unsigned int i)
 {
   libmesh_assert (i < this->n_elem());
   libmesh_assert (_elements[i] != NULL);

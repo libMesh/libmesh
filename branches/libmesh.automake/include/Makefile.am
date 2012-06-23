@@ -86,7 +86,6 @@ nobase_include_HEADERS = \
 		fe/fe_interface.h \
 		fe/fe_macro.h \
 		fe/fe_type.h \
-                fe/fe_vector_base.h \
 		fe/inf_fe.h \
 		fe/inf_fe_instantiate_1D.h \
 		fe/inf_fe_instantiate_2D.h \

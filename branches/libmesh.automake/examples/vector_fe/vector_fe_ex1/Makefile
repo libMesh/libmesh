@@ -27,7 +27,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ./fem_system_ex1-$(METHOD)
+target 	   := ./vector_fe_ex1-$(METHOD)
 
 
 all:: $(target)
@@ -37,14 +37,13 @@ $(target): $(objects)
 	@echo "Linking "$@"..."
 	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(objects) -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS)
 
-
 # Useful rules.
 clean:
-	@rm -f $(objects) *.gmv.* *~ .depend
+	@rm -f $(objects) *~ .depend
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out*.gmv out*.e
+	@rm -f $(target) out.gmv out.exo
 
 distclean:
 	@$(MAKE) clobber
@@ -58,8 +57,9 @@ run: $(target)
 	@$(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(target)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
+
 
 # include the dependency list
 include .depend

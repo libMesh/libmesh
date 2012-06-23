@@ -721,13 +721,51 @@ void Elem::find_edge_neighbors(std::set<const Elem *> &neighbor_set) const
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 Elem* Elem::topological_neighbor (const unsigned int i,
-                                  const MeshBase & mesh,
+                                  MeshBase & mesh,
                                   const PointLocatorBase& point_locator,
-                                  PeriodicBoundaries * pb) const
+                                  const PeriodicBoundaries * pb)
 {
   libmesh_assert (i < this->n_neighbors());
 
   Elem * neighbor = this->neighbor(i);
+  if (neighbor != NULL)
+    return neighbor;
+
+  if (pb)
+  {
+    // Since the neighbor is NULL it must be on a boundary. We need
+    // see if this is a periodic boundary in which case it will have a
+    // topological neighbor
+
+    std::vector<boundary_id_type> boundary_ids = mesh.boundary_info->boundary_ids(this, i);
+    for (std::vector<boundary_id_type>::iterator j = boundary_ids.begin(); j != boundary_ids.end(); ++j)
+      if (pb->boundary(*j))
+      {
+        // Since the point locator inside of periodic boundaries
+        // returns a const pointer we will retrieve the proper
+        // pointer directly from the mesh object.  Also since coarse
+        // elements do not have more refined neighbors we need to make
+        // sure that we don't return one of these types of neighbors.
+        neighbor = mesh.elem(pb->neighbor(*j, point_locator, this, i)->id());
+        if (level() < neighbor->level())
+          neighbor = neighbor->parent();
+        return neighbor;
+      }
+  }
+
+  return NULL;
+}
+
+
+
+const Elem* Elem::topological_neighbor (const unsigned int i,
+                                        const MeshBase & mesh,
+                                        const PointLocatorBase& point_locator,
+                                        const PeriodicBoundaries * pb) const
+{
+  libmesh_assert (i < this->n_neighbors());
+
+  const Elem * neighbor = this->neighbor(i);
   if (neighbor != NULL)
     return neighbor;
 
@@ -1270,9 +1308,8 @@ void Elem::family_tree_by_side (std::vector<const Elem*>& family,
   // Do not clear the vector any more.
   if (!this->active())
     for (unsigned int c=0; c<this->n_children(); c++)
-      if (this->is_child_on_side(c, s))
+      if (!this->child(c)->is_remote() && this->is_child_on_side(c, s))
         this->child(c)->family_tree_by_side (family, s, false);
-
 }
 
 
@@ -2011,6 +2048,15 @@ void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     conn.push_back (elem->node(n));
 
+  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+    {
+      Elem *neigh = elem->neighbor(n);
+      if (neigh)
+        conn.push_back (neigh->id());
+      else
+        conn.push_back (-1);
+    }
+
   elem->pack_indexing(std::back_inserter(conn));
 }
 
@@ -2032,13 +2078,21 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
     }
 #endif
 
-  // Assign the IDs
+  // Assign the refinement flags and levels
 #ifdef LIBMESH_ENABLE_AMR
   elem->set_p_level(this->p_level());
   elem->set_refinement_flag(this->refinement_flag());
   elem->set_p_refinement_flag(this->p_refinement_flag());
   libmesh_assert (elem->level() == this->level());
+
+  // If this element definitely should have children, assign
+  // remote_elem for now; later unpacked elements may overwrite that.
+  if (!elem->active())
+    for (unsigned int c=0; c != elem->n_children(); ++c)
+      elem->add_child(const_cast<RemoteElem*>(remote_elem), c);
 #endif
+
+  // Assign the IDs
   elem->subdomain_id() = this->subdomain_id();
   elem->processor_id() = this->processor_id();
   elem->set_id()       = this->id();
@@ -2048,6 +2102,84 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     elem->set_node(n) = mesh.node_ptr (this->node(n));
+
+  // Assign the connectivity
+  libmesh_assert (elem->n_neighbors() == this->n_neighbors());
+
+  for (unsigned int n=0; n<elem->n_neighbors(); n++)
+    {
+      unsigned int neighbor_id = this->neighbor(n);
+
+      // We should only be unpacking elements sent by their owners,
+      // and their owners should know all their neighbors
+      libmesh_assert (neighbor_id != remote_elem->id());
+
+      if (neighbor_id == DofObject::invalid_id)
+	continue;
+
+      Elem *neigh = mesh.elem(neighbor_id);
+      if (!neigh)
+        {
+          elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
+	  continue;
+	}
+
+      // We never have neighbors more refined than us
+      libmesh_assert(neigh->level() <= elem->level());
+
+      // We never have subactive neighbors of non subactive elements
+      libmesh_assert(!neigh->subactive() || elem->subactive());
+
+      // If we have a neighbor less refined than us then it must not
+      // have any more refined active descendants we could have
+      // pointed to instead.
+      libmesh_assert(neigh->level() == elem->level() ||
+                     neigh->active());
+     
+      elem->set_neighbor(n, neigh);
+
+      // If neigh is at elem's level, then its family might have
+      // remote_elem neighbor links which need to point to elem
+      // instead, but if not, then we're done.
+      if (neigh->level() != elem->level())
+	continue;
+      
+      // What side of neigh is elem on?  We can't use the usual Elem
+      // method because we haven't finished restoring topology
+      const AutoPtr<Elem> my_side = elem->side(n);
+      unsigned int nn = 0;
+      for (; nn != neigh->n_sides(); ++nn)
+	{
+          const AutoPtr<Elem> neigh_side = neigh->side(nn);
+          if (*my_side == *neigh_side)
+	    break;
+	}
+
+      // elem had better be on *some* side of neigh
+      libmesh_assert(nn < neigh->n_sides());
+
+      // Find any elements that ought to point to elem
+      std::vector<const Elem*> neigh_family;
+#ifdef LIBMESH_ENABLE_AMR
+      if (!neigh->subactive())
+        neigh->family_tree_by_side(neigh_family, nn);
+#else
+        neigh_family.push_back(neigh);
+#endif
+
+      // And point them to elem
+      for (unsigned int i = 0; i != neigh_family.size(); ++i)
+        {
+          Elem* neigh_family_member = const_cast<Elem*>(neigh_family[i]);
+
+	  // The neighbor link ought to either be correct already or
+	  // ought to be to remote_elem
+          libmesh_assert(neigh_family_member->neighbor(nn) == elem ||
+                         neigh_family_member->neighbor(nn) == remote_elem);
+
+	  neigh_family_member->set_neighbor(nn, elem);
+        }
+    }
 
   elem->unpack_indexing(this->indices());
 

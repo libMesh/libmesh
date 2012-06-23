@@ -230,7 +230,18 @@ Node* & ParallelMesh::node_ptr (const unsigned int i)
 
 
 
-Elem* ParallelMesh::elem (const unsigned int i) const
+const Elem* ParallelMesh::elem (const unsigned int i) const
+{
+//  libmesh_assert (_elements[i] != NULL);
+  libmesh_assert (_elements[i] == NULL || _elements[i]->id() == i);
+
+  return _elements[i];
+}
+
+
+
+
+Elem* ParallelMesh::elem (const unsigned int i)
 {
 //  libmesh_assert (_elements[i] != NULL);
   libmesh_assert (_elements[i] == NULL || _elements[i]->id() == i);

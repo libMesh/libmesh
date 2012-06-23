@@ -158,6 +158,7 @@ libmesh_la_SOURCES = \
 		src/fe/fe_lagrange_shape_1D.C \
 		src/fe/fe_lagrange_shape_2D.C \
 		src/fe/fe_lagrange_shape_3D.C \
+		src/fe/fe_lagrange_vec.C \
 		src/fe/fe_map.C \
 		src/fe/fe_monomial.C \
 		src/fe/fe_monomial_shape_0D.C \

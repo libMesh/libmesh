@@ -192,10 +192,21 @@ class Elem : public ReferenceCountedObject<Elem>,
    * boundary, it will return a corresponding element on the opposite
    * side.
    */
+  const Elem* topological_neighbor (const unsigned int i,
+                                    const MeshBase& mesh,
+                                    const PointLocatorBase& point_locator,
+                                    const PeriodicBoundaries* pb) const;
+
+  /**
+   * @returns a writeable pointer to the \f$ i^{th} \f$ neighbor of
+   * this element for interior elements.  If an element is on a
+   * periodic boundary, it will return a corresponding element on the
+   * opposite side.
+   */
   Elem* topological_neighbor (const unsigned int i,
-                              const MeshBase& mesh,
+                              MeshBase& mesh,
                               const PointLocatorBase& point_locator,
-                              PeriodicBoundaries* pb) const;
+                              const PeriodicBoundaries* pb);
 
   /**
    * @return \p true if the element \p elem in question is a neighbor or
@@ -1567,10 +1578,14 @@ bool Elem::subactive() const
     return false;
   if (!this->has_children())
     return true;
-  return this->child(0)->subactive();
-#else
-  return false;
+  for (const Elem* parent = this->parent();
+       parent != NULL;
+       parent = parent->parent())
+    if (parent->active())
+      return true;
 #endif
+
+  return false;
 }
 
 
@@ -2078,11 +2093,6 @@ public:
    */
   static const unsigned int header_size; /* = 10 with AMR, 4 without */
 
-  unsigned int packed_size() const
-  {
-    return this->header_size + this->n_nodes() + *this->indices() + 1;
-  }
-
   /**
    * For each element the serialization is of the form
    * [ level p_level r_flag p_r_flag etype processor_id subdomain_id
@@ -2207,9 +2217,35 @@ public:
     return static_cast<unsigned int>(*(_buf_begin+header_size+n));
   }
 
+  /**
+   * \p return the number of neighbors of the packed element
+   */
+  unsigned int n_neighbors() const
+  {
+    return Elem::build(this->type())->n_neighbors();
+  }
+
+  /**
+   * \p return the global index of the packed element's nth neighbor 
+   */
+  unsigned int neighbor (const unsigned int n) const
+  {
+    return static_cast<unsigned int>
+      (*(_buf_begin + header_size + this->n_nodes() + n));
+  }
+
+
   std::vector<int>::const_iterator indices() const
   {
-    return _buf_begin+header_size+this->n_nodes();
+    return _buf_begin + header_size + this->n_nodes() +
+           this->n_neighbors();
+  }
+
+  unsigned int packed_size() const
+  {
+    return this->header_size + this->n_nodes() +
+           this->n_neighbors() +
+           *this->indices() + 1;
   }
 }; // end class PackedElem
 
@@ -2371,7 +2407,7 @@ unsigned int
 Elem::packed_size() const
 {
   return PackedElem::header_size + this->n_nodes() +
-         this->packed_indexing_size();
+         this->n_neighbors() + this->packed_indexing_size();
 }
 
 

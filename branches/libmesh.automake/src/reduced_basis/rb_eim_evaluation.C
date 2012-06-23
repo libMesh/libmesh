@@ -17,10 +17,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "o_string_stream.h"
+// rbOOmit includes
 #include "rb_eim_evaluation.h"
 #include "rb_eim_theta.h"
 
+// libMesh includes
+#include "o_string_stream.h"
+#include "xdr_cxx.h"
 #include "libmesh_logging.h"
 
 namespace libMesh
@@ -187,143 +190,99 @@ void RBEIMEvaluation::initialize_rb_theta_objects()
   }
 }
 
-void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_name)
+void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_name,
+                                                  const bool read_binary_data)
 {
   START_LOG("write_offline_data_to_files()", "RBEIMEvaluation");
 
   Parent::write_offline_data_to_files(directory_name);
 
-  const unsigned int n_bfs = get_n_basis_functions();
+  // Get the number of basis functions
+  unsigned int n_bfs = get_n_basis_functions();
 
-  const unsigned int precision_level = 14;
+  // The writing mode: ENCODE for binary, WRITE for ASCII
+  XdrMODE mode = read_binary_data ? ENCODE : WRITE;
+
+  // The suffix to use for all the files that are written out
+  const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
   if(libMesh::processor_id() == 0)
   {
+    OStringStream file_name;
+    
     // Next write out the interpolation_matrix
-    std::ofstream interpolation_matrix_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/interpolation_matrix.dat";
-      interpolation_matrix_out.open(file_name.str().c_str());
-    }
-    if ( !interpolation_matrix_out.good() )
-    {
-      libMesh::err << "Error opening interpolation_matrix.dat" << std::endl;
-      libmesh_error();
-    }
-    interpolation_matrix_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/interpolation_matrix" << suffix;
+    Xdr interpolation_matrix_out(file_name.str(), mode);
+    
     for(unsigned int i=0; i<n_bfs; i++)
     {
       for(unsigned int j=0; j<=i; j++)
       {
-        interpolation_matrix_out << std::scientific
-          << interpolation_matrix(i,j) << " ";
+        interpolation_matrix_out << interpolation_matrix(i,j);
       }
     }
 
     // Also, write out the "extra" row
-    std::ofstream extra_interpolation_matrix_row_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/extra_interpolation_matrix_row.dat";
-      extra_interpolation_matrix_row_out.open(file_name.str().c_str());
-    }
-    if ( !extra_interpolation_matrix_row_out.good() )
-    {
-      libMesh::err << "Error opening extra_interpolation_matrix_row.dat" << std::endl;
-      libmesh_error();
-    }
-    extra_interpolation_matrix_row_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/extra_interpolation_matrix_row" << suffix;
+    Xdr extra_interpolation_matrix_row_out(file_name.str(), mode);
+    
     for(unsigned int j=0; j<n_bfs; j++)
-      extra_interpolation_matrix_row_out << std::scientific
-          << extra_interpolation_matrix_row(j) << " ";
+    {
+      extra_interpolation_matrix_row_out << extra_interpolation_matrix_row(j);
+    }
     extra_interpolation_matrix_row_out.close();
 
     // Next write out interpolation_points
-    std::ofstream interpolation_points_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/interpolation_points.dat";
-      interpolation_points_out.open(file_name.str().c_str());
-    }
-    if ( !interpolation_points_out.good() )
-    {
-      libMesh::err << "Error opening interpolation_points.dat" << std::endl;
-      libmesh_error();
-    }
-    interpolation_points_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/interpolation_points" << suffix;
+    Xdr interpolation_points_out(file_name.str(), mode);
+    
     for(unsigned int i=0; i<n_bfs; i++)
     {
-      interpolation_points_out << std::scientific
-        << interpolation_points[i](0) << " ";
+      interpolation_points_out << interpolation_points[i](0);
 
       if(LIBMESH_DIM >= 2)
-        interpolation_points_out << std::scientific
-          << interpolation_points[i](1) << " ";
+        interpolation_points_out << interpolation_points[i](1);
 
       if(LIBMESH_DIM >= 3)
-        interpolation_points_out << std::scientific
-          << interpolation_points[i](2) << " ";
+        interpolation_points_out << interpolation_points[i](2);
     }
+    interpolation_points_out.close();
 
     // Also, write out the "extra" interpolation point
-    std::ofstream extra_interpolation_point_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/extra_interpolation_point.dat";
-      extra_interpolation_point_out.open(file_name.str().c_str());
-    }
-    if ( !extra_interpolation_point_out.good() )
-    {
-      libMesh::err << "Error opening extra_interpolation_point.dat" << std::endl;
-      libmesh_error();
-    }
-    extra_interpolation_point_out.precision(precision_level);
-    extra_interpolation_point_out << std::scientific
-      << extra_interpolation_point(0) << " ";
+    file_name.str("");
+    file_name << directory_name << "/extra_interpolation_point" << suffix;
+    Xdr extra_interpolation_point_out(file_name.str(), mode);
+    
+    extra_interpolation_point_out << extra_interpolation_point(0);
 
     if(LIBMESH_DIM >= 2)
-      extra_interpolation_point_out << std::scientific
-        << extra_interpolation_point(1) << " ";
+      extra_interpolation_point_out << extra_interpolation_point(1);
 
     if(LIBMESH_DIM >= 3)
-      extra_interpolation_point_out << std::scientific
-        << extra_interpolation_point(2) << " ";
+      extra_interpolation_point_out << extra_interpolation_point(2);
 
     extra_interpolation_point_out.close();
 
     // Next write out interpolation_points_var
-    std::ofstream interpolation_points_var_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/interpolation_points_var.dat";
-      interpolation_points_var_out.open(file_name.str().c_str());
-    }
-    if ( !interpolation_points_var_out.good() )
-    {
-      libMesh::err << "Error opening interpolation_points_var.dat" << std::endl;
-      libmesh_error();
-    }
-    interpolation_points_var_out.precision(precision_level);
+    file_name.str("");
+    file_name << directory_name << "/interpolation_points_var" << suffix;
+    Xdr interpolation_points_var_out(file_name.str(), mode);
+
     for(unsigned int i=0; i<n_bfs; i++)
-      interpolation_points_var_out << std::scientific
-          << interpolation_points_var[i] << " ";
+    {
+      interpolation_points_var_out << interpolation_points_var[i];
+    }
+    interpolation_points_var_out.close();
 
     // Also, write out the "extra" interpolation variable
-    std::ofstream extra_interpolation_point_var_out;
-    {
-      OStringStream file_name;
-      file_name << directory_name << "/extra_interpolation_point_var.dat";
-      extra_interpolation_point_var_out.open(file_name.str().c_str());
-    }
-    if ( !extra_interpolation_point_var_out.good() )
-    {
-      libMesh::err << "Error opening extra_interpolation_point_var.dat" << std::endl;
-      libmesh_error();
-    }
-    extra_interpolation_point_var_out.precision(precision_level);
-    extra_interpolation_point_var_out << std::scientific
-          << extra_interpolation_point_var << " ";
+    file_name.str("");
+    file_name << directory_name << "/extra_interpolation_point_var" << suffix;
+    Xdr extra_interpolation_point_var_out(file_name.str(), mode);
+    
+    extra_interpolation_point_var_out << extra_interpolation_point_var;
     extra_interpolation_point_var_out.close();
   }
 
@@ -331,7 +290,8 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
 }
 
 void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_name,
-                                                   bool read_error_bound_data)
+                                                   bool read_error_bound_data,
+                                                   const bool read_binary_data)
 {
   START_LOG("read_offline_data_from_files()", "RBEIMEvaluation");
 
@@ -341,18 +301,20 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   // This was set in RBSystem::read_offline_data_from_files
   unsigned int n_bfs = this->get_n_basis_functions();
 
+  // The writing mode: DECODE for binary, READ for ASCII
+  XdrMODE mode = read_binary_data ? DECODE : READ;
+
+  // The suffix to use for all the files that are written out
+  const std::string suffix = read_binary_data ? ".xdr" : ".dat";
+
+  // Stream for creating file names
+  OStringStream file_name;
+
   // Read in the interpolation matrix
-  std::ifstream interpolation_matrix_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/interpolation_matrix.dat";
-    interpolation_matrix_in.open(file_name.str().c_str());
-  }
-  if ( !interpolation_matrix_in.good() )
-  {
-    libMesh::err << "Error opening interpolation_matrix.dat" << std::endl;
-    libmesh_error();
-  }
+  file_name.str("");
+  file_name << directory_name << "/interpolation_matrix" << suffix;
+  Xdr interpolation_matrix_in(file_name.str(), mode);
+
   for(unsigned int i=0; i<n_bfs; i++)
   {
     for(unsigned int j=0; j<=i; j++)
@@ -362,19 +324,13 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
       interpolation_matrix(i,j) = value;
     }
   }
+  interpolation_matrix_in.close();
 
   // Also, read in the "extra" row
-  std::ifstream extra_interpolation_matrix_row_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/extra_interpolation_matrix_row.dat";
-    extra_interpolation_matrix_row_in.open(file_name.str().c_str());
-  }
-  if ( !extra_interpolation_matrix_row_in.good() )
-  {
-    libMesh::err << "Error opening extra_interpolation_matrix_row.dat" << std::endl;
-    libmesh_error();
-  }
+  file_name.str("");
+  file_name << directory_name << "/extra_interpolation_matrix_row" << suffix;
+  Xdr extra_interpolation_matrix_row_in(file_name.str(), mode);
+  
   for(unsigned int j=0; j<n_bfs; j++)
   {
     Number value;
@@ -384,17 +340,10 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   extra_interpolation_matrix_row_in.close();
 
   // Next read in interpolation_points
-  std::ifstream interpolation_points_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/interpolation_points.dat";
-    interpolation_points_in.open(file_name.str().c_str());
-  }
-  if ( !interpolation_points_in.good() )
-  {
-    libMesh::err << "Error opening interpolation_points.dat" << std::endl;
-    libmesh_error();
-  }
+  file_name.str("");
+  file_name << directory_name << "/interpolation_points" << suffix;
+  Xdr interpolation_points_in(file_name.str(), mode);
+  
   for(unsigned int i=0; i<n_bfs; i++)
   {
     Real x_val, y_val, z_val = 0.;
@@ -412,17 +361,10 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   interpolation_points_in.close();
 
   // Also, read in the extra interpolation point
-  std::ifstream extra_interpolation_point_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/extra_interpolation_point.dat";
-    extra_interpolation_point_in.open(file_name.str().c_str());
-  }
-  if ( !extra_interpolation_point_in.good() )
-  {
-    libMesh::err << "Error opening extra_interpolation_point.dat" << std::endl;
-    libmesh_error();
-  }
+  file_name.str("");
+  file_name << directory_name << "/extra_interpolation_point" << suffix;
+  Xdr extra_interpolation_point_in(file_name.str(), mode);
+  
   for(unsigned int i=0; i<n_bfs; i++)
   {
     Real x_val, y_val, z_val = 0.;
@@ -441,17 +383,10 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
 
 
   // Next read in interpolation_points_var
-  std::ifstream interpolation_points_var_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/interpolation_points_var.dat";
-    interpolation_points_var_in.open(file_name.str().c_str());
-  }
-  if ( !interpolation_points_var_in.good() )
-  {
-    libMesh::err << "Error opening interpolation_points_var.dat" << std::endl;
-    libmesh_error();
-  }
+  file_name.str("");
+  file_name << directory_name << "/interpolation_points_var" << suffix;
+  Xdr interpolation_points_var_in(file_name.str(), mode);
+  
   for(unsigned int i=0; i<=n_bfs; i++)
   {
     unsigned int var;
@@ -461,17 +396,10 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   interpolation_points_var_in.close();
 
   // Also, read in extra_interpolation_point_var
-  std::ifstream extra_interpolation_point_var_in;
-  {
-    OStringStream file_name;
-    file_name << directory_name << "/extra_interpolation_point_var.dat";
-    extra_interpolation_point_var_in.open(file_name.str().c_str());
-  }
-  if ( !extra_interpolation_point_var_in.good() )
-  {
-    libMesh::err << "Error opening extra_interpolation_point_var.dat" << std::endl;
-    libmesh_error();
-  }
+  file_name.str("");
+  file_name << directory_name << "/extra_interpolation_point_var" << suffix;
+  Xdr extra_interpolation_point_var_in(file_name.str(), mode);
+  
   for(unsigned int i=0; i<=n_bfs; i++)
   {
     unsigned int var;
