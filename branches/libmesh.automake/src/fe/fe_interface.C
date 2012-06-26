@@ -352,7 +352,7 @@ void FEInterface::dofs_on_side(const Elem* const elem,
 {
   const Order o = fe_t.order;
 
-  void_fe_switch(dofs_on_side(elem, o, s, di));
+  void_fe_with_vec_switch(dofs_on_side(elem, o, s, di));
 
   libmesh_error();
 }
@@ -428,7 +428,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 #endif
 
-  fe_switch(inverse_map(elem, p, tolerance, secure));
+  fe_with_vec_switch(inverse_map(elem, p, tolerance, secure));
 
   libmesh_error();
   return Point();
