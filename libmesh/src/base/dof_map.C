@@ -2249,7 +2249,10 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		  const unsigned int n_dofs_on_element_j =
 		    element_dofs_j.size();
 
-		  for (unsigned int i=0; i<n_dofs_on_element_i; i++)
+		  // there might be 0 dofs for the other variable on the same element (when subdomain variables do not overlap) and that's when we do not do anything
+		  if (n_dofs_on_element_j > 0)
+		  {
+		    for (unsigned int i=0; i<n_dofs_on_element_i; i++)
 		    {
 		      const unsigned int ig = element_dofs_i[i];
 
@@ -2365,6 +2368,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
      			      }
 			}
 		    }
+		  }
 		}
 	  }
     }
