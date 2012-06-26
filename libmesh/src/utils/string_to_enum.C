@@ -30,6 +30,7 @@
 #include "enum_inf_map_type.h"
 #include "enum_quadrature_type.h"
 #include "enum_preconditioner_type.h"
+#include "elem.h"
 
 namespace libMesh
 {
@@ -404,6 +405,46 @@ namespace {
 			   enum_to_preconditioner_type);
       }
   }
+
+
+
+  //---------------------------------------------------
+  std::map<std::string, Elem::RefinementState> refinementstate_type_to_enum;
+
+  // Initialize refinementstate_type_to_enum on first call
+  void init_refinementstate_type_to_enum ()
+  {
+    if (refinementstate_type_to_enum.empty())
+      {
+	refinementstate_type_to_enum["COARSEN"                ]=Elem::COARSEN;
+	refinementstate_type_to_enum["DO_NOTHING"             ]=Elem::DO_NOTHING;
+	refinementstate_type_to_enum["REFINE"                 ]=Elem::REFINE;
+	refinementstate_type_to_enum["JUST_REFINED"           ]=Elem::JUST_REFINED;
+	refinementstate_type_to_enum["JUST_COARSENED"         ]=Elem::JUST_COARSENED;
+	refinementstate_type_to_enum["INACTIVE"               ]=Elem::INACTIVE;
+	refinementstate_type_to_enum["COARSEN_INACTIVE"       ]=Elem::COARSEN_INACTIVE;
+	refinementstate_type_to_enum["INVALID_REFINEMENTSTATE"]=Elem::INVALID_REFINEMENTSTATE;
+      }
+  }
+
+
+  std::map<Elem::RefinementState, std::string> enum_to_refinementstate_type;
+
+  // Initialize the enum_to_refinementstate_type on first call
+  void init_enum_to_refinementstate_type ()
+  {
+    // Build reverse map
+    if (enum_to_refinementstate_type.empty())
+      {
+	// Initialize refinementstate_type_to_enum on first call
+	init_refinementstate_type_to_enum();
+
+	build_reverse_map (refinementstate_type_to_enum.begin(),
+			   refinementstate_type_to_enum.end(),
+			   enum_to_refinementstate_type);
+      }
+  }
+
 } // end anonymous namespace
 
 
@@ -598,6 +639,37 @@ namespace Utility {
 
     return enum_to_preconditioner_type[i];
   }
+
+
+  //------------------------------------------------------
+  // Elem::RefinementState specialization
+  template <>
+  Elem::RefinementState string_to_enum<Elem::RefinementState> (const std::string& s)
+  {
+    init_refinementstate_type_to_enum();
+
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+
+    if (!refinementstate_type_to_enum.count(upper))
+      libmesh_error();
+
+    return refinementstate_type_to_enum[upper];
+  }
+
+
+
+  template <>
+  std::string enum_to_string<Elem::RefinementState> (const Elem::RefinementState i)
+  {
+    init_enum_to_refinementstate_type();
+
+    if (!enum_to_refinementstate_type.count(i))
+      libmesh_error();
+
+    return enum_to_refinementstate_type[i];
+  }
+
 
 }
 
