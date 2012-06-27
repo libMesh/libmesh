@@ -121,11 +121,37 @@ const Node* SerialMesh::node_ptr (const unsigned int i) const
 
 
 
-Node* & SerialMesh::node_ptr (const unsigned int i)
+Node* SerialMesh::node_ptr (const unsigned int i)
 {
   libmesh_assert (i < this->n_nodes());
   libmesh_assert (_nodes[i] != NULL);
   libmesh_assert (_nodes[i]->id() == i); // This will change soon
+
+  return _nodes[i];
+}
+
+
+
+
+const Node* SerialMesh::query_node_ptr (const unsigned int i) const
+{
+  if (i >= this->n_nodes())
+    return NULL;
+  libmesh_assert (_nodes[i] == NULL ||
+                  _nodes[i]->id() == i); // This will change soon
+
+  return _nodes[i];
+}
+
+
+
+
+Node* SerialMesh::query_node_ptr (const unsigned int i)
+{
+  if (i >= this->n_nodes())
+    return NULL;
+  libmesh_assert (_nodes[i] == NULL ||
+                  _nodes[i]->id() == i); // This will change soon
 
   return _nodes[i];
 }
@@ -150,6 +176,32 @@ Elem* SerialMesh::elem (const unsigned int i)
   libmesh_assert (i < this->n_elem());
   libmesh_assert (_elements[i] != NULL);
   libmesh_assert (_elements[i]->id() == i); // This will change soon
+
+  return _elements[i];
+}
+
+
+
+
+const Elem* SerialMesh::query_elem (const unsigned int i) const
+{
+  if (i >= this->n_elem())
+    return NULL;
+  libmesh_assert (_elements[i] == NULL ||
+                  _elements[i]->id() == i); // This will change soon
+
+  return _elements[i];
+}
+
+
+
+
+Elem* SerialMesh::query_elem (const unsigned int i)
+{
+  if (i >= this->n_elem())
+    return NULL;
+  libmesh_assert (_elements[i] == NULL ||
+                  _elements[i]->id() == i); // This will change soon
 
   return _elements[i];
 }
