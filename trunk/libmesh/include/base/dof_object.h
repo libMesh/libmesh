@@ -274,7 +274,13 @@ public:
    * If we pack our indices into an buffer for communications, how
    * many ints do we need?
    */
-  unsigned int packed_indexing_size() const { return _idx_buf.size() + 1; }
+  unsigned int packed_indexing_size() const;
+
+  /**
+   * If we have indices packed into an buffer for communications, how
+   * much of that buffer applies to this dof object?
+   */
+  static unsigned int unpackable_indexing_size(std::vector<int>::const_iterator begin);
 
 protected:
   /**
