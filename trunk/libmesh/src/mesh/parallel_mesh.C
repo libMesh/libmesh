@@ -283,8 +283,10 @@ Elem* ParallelMesh::add_elem (Elem *e)
 
   _elements[e->id()] = e;
 
-  // Make the cached elem data more accurate
-  _n_elem++;
+  // Try to make the cached elem data more accurate
+  if (elem_procid == libMesh::processor_id() ||
+      elem_procid == DofObject::invalid_processor_id)
+    _n_elem++;
   _max_elem_id = std::max(_max_elem_id, e->id()+1);
 
 // Unpartitioned elems should be added on every processor
@@ -411,8 +413,10 @@ Node* ParallelMesh::add_node (Node *n)
 
   _nodes[n->id()] = n;
 
-  // Make the cached elem data more accurate
-  _n_nodes++;
+  // Try to make the cached node data more accurate
+  if (node_procid == libMesh::processor_id() ||
+      node_procid == DofObject::invalid_processor_id)
+    _n_nodes++;
   _max_node_id = std::max(_max_node_id, n->id()+1);
 
 // Unpartitioned nodes should be added on every processor
