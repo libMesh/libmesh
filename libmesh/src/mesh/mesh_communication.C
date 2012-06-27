@@ -2085,9 +2085,9 @@ void MeshCommunication::allgather_mesh (ParallelMesh& mesh) const
 
                 else
 #endif
-		if (packed_elem.level() < level ||     // we should already have
-		    (packed_elem.level() == level &&   // lower level and some
-                     mesh.elem(packed_elem.id())))     // ghost elements
+		if (packed_elem.level() < level ||       // we should already have
+		    (packed_elem.level() == level &&     // lower level and some
+                     mesh.query_elem(packed_elem.id()))) // ghost elements
 		  {
                     // No need to construct a dummy element of this type
 #ifndef NDEBUG
