@@ -2245,7 +2245,7 @@ public:
   {
     return this->header_size + this->n_nodes() +
            this->n_neighbors() +
-           *this->indices() + 1;
+           DofObject::unpackable_indexing_size(this->indices());
   }
 }; // end class PackedElem
 
