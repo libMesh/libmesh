@@ -365,9 +365,37 @@ void DofObject::set_dof_number(const unsigned int s,
 }
 
 
+unsigned int DofObject::packed_indexing_size() const
+{
+  return 2 + _idx_buf.size() +
+    ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size());
+}
+
+
+unsigned int DofObject::unpackable_indexing_size(std::vector<int>::const_iterator begin)
+{
+  const int has_old_dof_object = *begin++;
+
+  // Either we have an old_dof_object or we don't
+  libmesh_assert(has_old_dof_object == 1 || has_old_dof_object == 0);
+
+  const int this_indexing_size = *begin++;
+
+  return 2 + this_indexing_size +
+    (has_old_dof_object ?
+      unpackable_indexing_size(begin+this_indexing_size) : 0);
+}
+
+
 void DofObject::unpack_indexing(std::vector<int>::const_iterator begin)
 {
   _idx_buf.clear();
+  this->clear_old_dof_object();
+
+  const int has_old_dof_object = *begin++;
+  libmesh_assert(has_old_dof_object == 1 ||
+		 has_old_dof_object == 0);
+
   const int size = *begin++;
   _idx_buf.reserve(size);
   std::copy(begin, begin+size, back_inserter(_idx_buf));
@@ -384,13 +412,25 @@ void DofObject::unpack_indexing(std::vector<int>::const_iterator begin)
         libmesh_assert(_idx_buf[i] <= _idx_buf.size());
       }
 #endif
+
+  if (has_old_dof_object)
+    {
+      this->old_dof_object = new DofObject();
+      this->old_dof_object->unpack_indexing(begin+size);
+    }
 }
 
 
 void DofObject::pack_indexing(std::back_insert_iterator<std::vector<int> > target) const
 {
-  *target++ = _idx_buf.end() - _idx_buf.begin();
+  // We might need to pack old_dof_object too
+  *target++ = (old_dof_object == NULL) ? 0 : 1;
+
+  *target++ = _idx_buf.size();
   std::copy(_idx_buf.begin(), _idx_buf.end(), target);
+
+  if (old_dof_object)
+    old_dof_object->pack_indexing(target);
 }
 
 
