@@ -210,8 +210,8 @@ Node& ParallelMesh::node (const unsigned int i)
 
 const Node* ParallelMesh::node_ptr (const unsigned int i) const
 {
-//  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i] == NULL || _nodes[i]->id() == i);
+  libmesh_assert (_nodes[i] != NULL);
+  libmesh_assert (_nodes[i]->id() == i);
 
   return _nodes[i];
 }
@@ -219,12 +219,44 @@ const Node* ParallelMesh::node_ptr (const unsigned int i) const
 
 
 
-Node* & ParallelMesh::node_ptr (const unsigned int i)
+Node* ParallelMesh::node_ptr (const unsigned int i)
 {
-//  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i] == NULL || _nodes[i]->id() == i);
+  libmesh_assert (_nodes[i] != NULL);
+  libmesh_assert (_nodes[i]->id() == i);
 
   return _nodes[i];
+}
+
+
+
+
+const Node* ParallelMesh::query_node_ptr (const unsigned int i) const
+{
+  std::map<unsigned int, Node*>::const_iterator it = _nodes.find(i);
+  if (it != _nodes.end().it)
+    {
+      const Node* n = it->second;
+      libmesh_assert (n->id() == i);
+      return n;
+    }
+
+  return NULL;
+}
+
+
+
+
+Node* ParallelMesh::query_node_ptr (const unsigned int i)
+{
+  std::map<unsigned int, Node*>::const_iterator it = _nodes.find(i);
+  if (it != _nodes.end().it)
+    {
+      Node* n = it->second;
+      libmesh_assert (n->id() == i);
+      return n;
+    }
+
+  return NULL;
 }
 
 
@@ -232,8 +264,8 @@ Node* & ParallelMesh::node_ptr (const unsigned int i)
 
 const Elem* ParallelMesh::elem (const unsigned int i) const
 {
-//  libmesh_assert (_elements[i] != NULL);
-  libmesh_assert (_elements[i] == NULL || _elements[i]->id() == i);
+  libmesh_assert (_elements[i] != NULL);
+  libmesh_assert (_elements[i]->id() == i);
 
   return _elements[i];
 }
@@ -243,10 +275,42 @@ const Elem* ParallelMesh::elem (const unsigned int i) const
 
 Elem* ParallelMesh::elem (const unsigned int i)
 {
-//  libmesh_assert (_elements[i] != NULL);
-  libmesh_assert (_elements[i] == NULL || _elements[i]->id() == i);
+  libmesh_assert (_elements[i] != NULL);
+  libmesh_assert (_elements[i]->id() == i);
 
   return _elements[i];
+}
+
+
+
+
+const Elem* ParallelMesh::query_elem (const unsigned int i) const
+{
+  std::map<unsigned int, Elem*>::const_iterator it = _elements.find(i);
+  if (it != _elements.end().it)
+    {
+      const Elem* e = it->second;
+      libmesh_assert (e->id() == i);
+      return e;
+    }
+
+  return NULL;
+}
+
+
+
+
+Elem* ParallelMesh::query_elem (const unsigned int i)
+{
+  std::map<unsigned int, Elem*>::const_iterator it = _elements.find(i);
+  if (it != _elements.end().it)
+    {
+      Elem* e = _elements[i];
+      libmesh_assert (e->id() == i);
+      return e;
+    }
+
+  return NULL;
 }
 
 

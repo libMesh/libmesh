@@ -293,40 +293,73 @@ public:
 
   /**
    * Return a constant reference (for reading only) to the
-   * \f$ i^{th} \f$ point.
+   * \f$ i^{th} \f$ point, which should be present in this processor's
+   * subset of the mesh data structure.
    */
   virtual const Point& point (const unsigned int i) const = 0;
 
   /**
    * Return a constant reference (for reading only) to the
-   * \f$ i^{th} \f$ node.
+   * \f$ i^{th} \f$ node, which should be present in this processor's
+   * subset of the mesh data structure.
    */
   virtual const Node& node (const unsigned int i) const = 0;
 
   /**
-   * Return a reference to the \f$ i^{th} \f$ node.
+   * Return a reference to the \f$ i^{th} \f$ node, which should be
+   * present in this processor's subset of the mesh data structure.
    */
   virtual Node& node (const unsigned int i) = 0;
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ node.
+   * Return a pointer to the \f$ i^{th} \f$ node, which should be
+   * present in this processor's subset of the mesh data structure.
    */
   virtual const Node* node_ptr (const unsigned int i) const = 0;
 
   /**
-   * Return a writeable pointer to the \f$ i^{th} \f$ node.
+   * Return a writeable pointer to the \f$ i^{th} \f$ node, which
+   * should be present in this processor's subset of the mesh data
+   * structure.
    */
-  virtual Node* & node_ptr (const unsigned int i) = 0;
+  virtual Node* node_ptr (const unsigned int i) = 0;
 
   /**
-   * Return a pointer to the \f$ i^{th} \f$ element.
+   * Return a pointer to the \f$ i^{th} \f$ node, or NULL if no such
+   * node exists in this processor's mesh data structure.
+   */
+  virtual const Node* query_node_ptr (const unsigned int i) const = 0;
+
+  /**
+   * Return a writeable pointer to the \f$ i^{th} \f$ node, or NULL if
+   * no such node exists in this processor's mesh data structure.
+   */
+  virtual Node* query_node_ptr (const unsigned int i) = 0;
+
+  /**
+   * Return a pointer to the \f$ i^{th} \f$ element, which should be
+   * present in this processor's subset of the mesh data structure.
    */
   virtual const Elem* elem (const unsigned int i) const = 0;
 
   /**
-   * Return a writeable pointer to the \f$ i^{th} \f$ element.
+   * Return a writeable pointer to the \f$ i^{th} \f$ element, which
+   * should be present in this processor's subset of the mesh data
+   * structure.
    */
   virtual Elem* elem (const unsigned int i) = 0;
+
+  /**
+   * Return a pointer to the \f$ i^{th} \f$ element, or NULL if no
+   * such element exists in this processor's mesh data structure.
+   */
+  virtual const Elem* query_elem (const unsigned int i) const = 0;
+
+  /**
+   * Return a writeable pointer to the \f$ i^{th} \f$ element, or NULL
+   * if no such element exists in this processor's mesh data structure.
+   */
+  virtual Elem* query_elem (const unsigned int i) = 0;
 
   /**
    * Add a new \p Node at \p Point \p p to the end of the vertex array,
