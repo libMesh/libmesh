@@ -574,7 +574,7 @@ int main (int argc, char** argv)
         mesh_refinement.switch_h_to_p_refinement();
       if (refinement_type == "hp")
         mesh_refinement.add_p_to_h_refinement();
-      // Refine and coaarsen the flagged elements
+      // Refine and coarsen the flagged elements
       mesh_refinement.refine_and_coarsen_elements();
       equation_system.reinit();
     }
