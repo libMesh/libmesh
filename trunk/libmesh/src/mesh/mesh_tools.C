@@ -896,6 +896,40 @@ void MeshTools::correct_node_proc_ids
 
 
 #ifdef DEBUG
+void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
+{
+  MeshBase::const_element_iterator el =
+    mesh.elements_begin();
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+  if (el == el_end)
+    return;
+
+  const unsigned int n_sys = (*el)->n_systems();
+
+  for (; el != el_end; ++el)
+    {
+      const Elem *elem = *el;
+      libmesh_assert (elem->n_systems() == n_sys);
+    }
+
+  MeshBase::const_node_iterator node_it =
+    mesh.nodes_begin();
+  const MeshBase::const_node_iterator node_end =
+    mesh.nodes_end();
+
+  if (node_it == node_end)
+    return;
+
+  for (; node_it != node_end; ++node_it)
+    {
+      const Node *node = *node_it;
+      libmesh_assert (node->n_systems() == n_sys);
+    }
+}
+
+
+
 void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase &mesh)
 {
   const MeshBase::const_element_iterator el_end =
