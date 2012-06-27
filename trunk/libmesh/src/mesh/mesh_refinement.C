@@ -842,10 +842,8 @@ void gather_data (const std::vector<unsigned int>& ids,
   for (unsigned int i=0; i != ids.size(); ++i)
     {
       // Look for this element in the mesh
-      Elem *elem = mesh.elem(ids[i]);
-
       // We'd better find every element we're asked for
-      libmesh_assert (elem);
+      Elem *elem = mesh.elem(ids[i]);
 
       // Return the element's refinement flag
       flags[i] = (elem->*get_flag)();
@@ -858,8 +856,6 @@ void act_on_data (const std::vector<unsigned int>& ids,
   for (unsigned int i=0; i != ids.size(); ++i)
     {
       Elem *elem = mesh.elem(ids[i]);
-
-      libmesh_assert(elem);
 
       datum old_flag = (elem->*get_flag)();
       datum &new_flag = flags[i];
