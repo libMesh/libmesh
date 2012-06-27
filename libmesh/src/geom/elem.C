@@ -2117,7 +2117,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
       if (neighbor_id == DofObject::invalid_id)
 	continue;
 
-      Elem *neigh = mesh.elem(neighbor_id);
+      Elem *neigh = mesh.query_elem(neighbor_id);
       if (!neigh)
         {
           elem->set_neighbor(n, const_cast<RemoteElem*>(remote_elem));
