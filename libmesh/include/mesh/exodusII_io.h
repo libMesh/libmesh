@@ -92,10 +92,15 @@ class ExodusII_IO : public MeshInput<MeshBase>,
   const std::vector<Real>& get_time_steps();
 
   /**
+   * Backward compatibility version of function that takes a single variable name
+   */
+  void copy_nodal_solution(System& system, std::string var_name, unsigned int timestep=1);
+
+  /**
    * If we read in a nodal solution while reading in a mesh, we can attempt
    * to copy that nodal solution into an EquationSystems object.
    */
-  void copy_nodal_solution(System& es, std::string nodal_var_name, unsigned int timestep=1);
+  void copy_nodal_solution(System& es, std::string system_var_name, std::string exodus_var_name, unsigned int timestep=1);
 
   /**
    * Writes a exodusII file with discontinuous data
