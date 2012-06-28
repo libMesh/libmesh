@@ -71,10 +71,10 @@ fe_family = LAGRANGE
 fe_order = 2
 
 # Use analytic jacobians instead of numerical ones?
-analytic_jacobians = true
+analytic_jacobians = false 
 
 # Verify analytic jacobians against numerical ones?
-verify_analytic_jacobians = 1.e-4
+verify_analytic_jacobians = 0.0 
 
 # Detailed debugging options
 print_solution_norms = false
