@@ -620,8 +620,6 @@ protected:
    */
   std::vector<Point> xyz;
 
-
-
   /**
    * Vector of parital derivatives:
    * d(x)/d(xi), d(y)/d(xi), d(z)/d(xi)
@@ -699,8 +697,6 @@ protected:
   std::vector<Real>  dxidz_map;
 
 
-
-
   /**
    * Map for partial derivatives:
    * d(eta)/d(x). Needed for the Jacobian.
@@ -718,9 +714,6 @@ protected:
    * d(eta)/d(z). Needed for the Jacobian.
    */
   std::vector<Real>  detadz_map;
-
-
-
 
 
   /**
@@ -761,119 +754,6 @@ protected:
    * Should we calculate shape function hessians?
    */
   mutable bool calculate_d2phi;
-
-  /**
-   * Shape function values.
-   */
-  std::vector<std::vector<Real> >   phi;
-
-  /**
-   * Shape function derivative values.
-   */
-  std::vector<std::vector<RealGradient> >  dphi;
-
-  /**
-   * Shape function derivatives in the xi direction.
-   */
-  std::vector<std::vector<Real> >   dphidxi;
-
-  /**
-   * Shape function derivatives in the eta direction.
-   */
-  std::vector<std::vector<Real> >   dphideta;
-
-  /**
-   * Shape function derivatives in the zeta direction.
-   */
-  std::vector<std::vector<Real> >   dphidzeta;
-
-  /**
-   * Shape function derivatives in the x direction.
-   */
-  std::vector<std::vector<Real> >   dphidx;
-
-  /**
-   * Shape function derivatives in the y direction.
-   */
-  std::vector<std::vector<Real> >   dphidy;
-
-  /**
-   * Shape function derivatives in the z direction.
-   */
-  std::vector<std::vector<Real> >   dphidz;
-
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-  /**
-   * Shape function second derivative values.
-   */
-  std::vector<std::vector<RealTensor> >  d2phi;
-
-  /**
-   * Shape function second derivatives in the xi direction.
-   */
-  std::vector<std::vector<Real> >   d2phidxi2;
-
-  /**
-   * Shape function second derivatives in the xi-eta direction.
-   */
-  std::vector<std::vector<Real> >   d2phidxideta;
-
-  /**
-   * Shape function second derivatives in the xi-zeta direction.
-   */
-  std::vector<std::vector<Real> >   d2phidxidzeta;
-
-  /**
-   * Shape function second derivatives in the eta direction.
-   */
-  std::vector<std::vector<Real> >   d2phideta2;
-
-  /**
-   * Shape function second derivatives in the eta-zeta direction.
-   */
-  std::vector<std::vector<Real> >   d2phidetadzeta;
-
-  /**
-   * Shape function second derivatives in the zeta direction.
-   */
-  std::vector<std::vector<Real> >   d2phidzeta2;
-
-  /**
-   * Shape function second derivatives in the x direction.
-   */
-  std::vector<std::vector<Real> >   d2phidx2;
-
-  /**
-   * Shape function second derivatives in the x-y direction.
-   */
-  std::vector<std::vector<Real> >   d2phidxdy;
-
-  /**
-   * Shape function second derivatives in the x-z direction.
-   */
-  std::vector<std::vector<Real> >   d2phidxdz;
-
-  /**
-   * Shape function second derivatives in the y direction.
-   */
-  std::vector<std::vector<Real> >   d2phidy2;
-
-  /**
-   * Shape function second derivatives in the y-z direction.
-   */
-  std::vector<std::vector<Real> >   d2phidydz;
-
-  /**
-   * Shape function second derivatives in the z direction.
-   */
-  std::vector<std::vector<Real> >   d2phidz2;
-
-#endif
-
-
-
 
   /**
    * Map for the shape function phi.
