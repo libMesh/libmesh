@@ -32,10 +32,6 @@
 namespace libMesh
 {
 
-
-
-
-
 FEMContext::FEMContext (const System &sys)
   : DiffContext(sys),
     element_qrule(NULL), side_qrule(NULL),
@@ -77,31 +73,63 @@ FEMContext::FEMContext (const System &sys)
       (1, sys.extra_quadrature_order).release();
 
   // Next, create finite element objects
+  // Preserving backward compatibility here for now
+  // Should move to the protected/FEAbstract interface
   element_fe_var.resize(n_vars);
   side_fe_var.resize(n_vars);
   if (dim == 3)
     edge_fe_var.resize(n_vars);
 
+  _element_fe_var.resize(n_vars);
+  _side_fe_var.resize(n_vars);
+  if (dim == 3)
+    _edge_fe_var.resize(n_vars);
+
   for (unsigned int i=0; i != n_vars; ++i)
     {
       FEType fe_type = sys.variable_type(i);
-      if (element_fe[fe_type] == NULL)
-        {
-          element_fe[fe_type] = FEBase::build(dim, fe_type).release();
-          element_fe[fe_type]->attach_quadrature_rule(element_qrule);
-          side_fe[fe_type] = FEBase::build(dim, fe_type).release();
-          side_fe[fe_type]->attach_quadrature_rule(side_qrule);
 
-          if (dim == 3)
-            {
-              edge_fe[fe_type] = FEBase::build(dim, fe_type).release();
-              edge_fe[fe_type]->attach_quadrature_rule(edge_qrule);
-            }
-        }
-      element_fe_var[i] = element_fe[fe_type];
-      side_fe_var[i] = side_fe[fe_type];
+      // Preserving backward compatibility here for now
+      // Should move to the protected/FEAbstract interface
+      if( FEInterface::field_type( fe_type ) == TYPE_SCALAR )
+	{
+	  if( element_fe[fe_type] == NULL )
+	    {
+	      element_fe[fe_type] = FEBase::build(dim, fe_type).release();
+	      element_fe[fe_type]->attach_quadrature_rule(element_qrule);
+	      side_fe[fe_type] = FEBase::build(dim, fe_type).release();
+	      side_fe[fe_type]->attach_quadrature_rule(side_qrule);
+	      
+	      if (dim == 3)
+		{
+		  edge_fe[fe_type] = FEBase::build(dim, fe_type).release();
+		  edge_fe[fe_type]->attach_quadrature_rule(edge_qrule);
+		}
+	    }
+	  element_fe_var[i] = element_fe[fe_type];
+	  side_fe_var[i] = side_fe[fe_type];
+	  if (dim == 3)
+	    edge_fe_var[i] = edge_fe[fe_type];
+	}
+
+      if ( _element_fe[fe_type] == NULL )
+	{
+	  _element_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+	  _element_fe[fe_type]->attach_quadrature_rule(element_qrule);
+	  _side_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+	  _side_fe[fe_type]->attach_quadrature_rule(side_qrule);
+
+	  if (dim == 3)
+	    {
+	      _edge_fe[fe_type] = FEAbstract::build(dim, fe_type).release();
+	      _edge_fe[fe_type]->attach_quadrature_rule(edge_qrule);
+	    }
+	}
+      _element_fe_var[i] = _element_fe[fe_type];
+      _side_fe_var[i] = _side_fe[fe_type];
       if (dim == 3)
-        edge_fe_var[i] = edge_fe[fe_type];
+	_edge_fe_var[i] = _edge_fe[fe_type];
+      
     }
 }
 
@@ -110,6 +138,8 @@ FEMContext::~FEMContext()
 {
   // We don't want to store AutoPtrs in STL containers, but we don't
   // want to leak memory either
+  // Preserving backward compatibility here for now
+  // Should move to the protected/FEAbstract interface
   for (std::map<FEType, FEBase *>::iterator i = element_fe.begin();
        i != element_fe.end(); ++i)
     delete i->second;
@@ -124,6 +154,23 @@ FEMContext::~FEMContext()
        i != edge_fe.end(); ++i)
     delete i->second;
   edge_fe.clear();
+
+
+  for (std::map<FEType, FEAbstract *>::iterator i = _element_fe.begin();
+       i != _element_fe.end(); ++i)
+    delete i->second;
+  _element_fe.clear();
+  
+  for (std::map<FEType, FEAbstract *>::iterator i = _side_fe.begin();
+       i != _side_fe.end(); ++i)
+    delete i->second;
+  _side_fe.clear();
+
+  for (std::map<FEType, FEAbstract *>::iterator i = _edge_fe.begin();
+       i != _edge_fe.end(); ++i)
+    delete i->second;
+  _edge_fe.clear();
+
 
   delete element_qrule;
   element_qrule = NULL;
@@ -162,6 +209,34 @@ Number FEMContext::interior_value(unsigned int var, unsigned int qp) const
   return u;
 }
 
+template<typename OutputShape> 
+void FEMContext::interior_value(unsigned int var, unsigned int qp, OutputShape& u) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  // Get finite element object
+  FEGenericBase<OutputShape>* fe = NULL;
+  this->get_element_fe<OutputShape>( var, fe );
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<OutputShape> > &phi = fe->get_phi();
+
+  // Accumulate solution value
+  u = 0.;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    u += phi[l][qp] * coef(l);
+
+  return;
+}
+
 
 
 Gradient FEMContext::interior_gradient(unsigned int var, unsigned int qp) const
@@ -186,6 +261,35 @@ Gradient FEMContext::interior_gradient(unsigned int var, unsigned int qp) const
     du.add_scaled(dphi[l][qp], coef(l));
 
   return du;
+}
+
+template<typename OutputShape>
+void FEMContext::interior_gradient(unsigned int var, unsigned int qp,
+                                   typename FEGenericBase<OutputShape>::OutputGradient & du) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  // Get finite element object
+  FEGenericBase<OutputShape>* fe = NULL;
+  this->get_element_fe<OutputShape>( var, fe );
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = fe->get_dphi();
+
+  // Accumulate solution derivatives
+  du = 0.;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    du.add_scaled(dphi[l][qp], coef(l));
+
+  return;
 }
 
 
@@ -243,6 +347,35 @@ Number FEMContext::side_value(unsigned int var, unsigned int qp) const
 }
 
 
+template<typename OutputShape> 
+void FEMContext::side_value(unsigned int var, unsigned int qp, OutputShape& u) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  // Get finite element object
+  FEGenericBase<OutputShape>* side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, side_fe );
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<OutputShape> > &phi = side_fe->get_phi();
+
+  // Accumulate solution value
+  u = 0.;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    u += phi[l][qp] * coef(l);
+
+  return;
+}
+
+
 
 Gradient FEMContext::side_gradient(unsigned int var, unsigned int qp) const
 {
@@ -266,6 +399,35 @@ Gradient FEMContext::side_gradient(unsigned int var, unsigned int qp) const
     du.add_scaled(dphi[l][qp], coef(l));
 
   return du;
+}
+
+
+template<typename OutputShape, typename OutputGradient> 
+void FEMContext::side_gradient(unsigned int var, unsigned int qp, OutputGradient& du) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  // Get finite element object
+  FEGenericBase<OutputShape>* side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, side_fe );
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<OutputGradient> > &dphi = side_fe->get_dphi();
+
+  // Accumulate solution derivatives
+  du = 0.;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    du.add_scaled(dphi[l][qp], coef(l));
+
+  return;
 }
 
 
@@ -729,6 +891,14 @@ void FEMContext::elem_fe_reinit ()
     {
       i->second->reinit(elem);
     }
+
+
+  std::map<FEType, FEAbstract *>::iterator local_fe_end = _element_fe.end();
+  for (std::map<FEType, FEAbstract *>::iterator i = _element_fe.begin();
+       i != local_fe_end; ++i)
+    {
+      i->second->reinit(elem);
+    }
 }
 
 
@@ -739,6 +909,13 @@ void FEMContext::side_fe_reinit ()
   std::map<FEType, FEBase *>::iterator fe_end = side_fe.end();
   for (std::map<FEType, FEBase *>::iterator i = side_fe.begin();
        i != fe_end; ++i)
+    {
+      i->second->reinit(elem, side);
+    }
+
+  std::map<FEType, FEAbstract *>::iterator local_fe_end = _side_fe.end();
+  for (std::map<FEType, FEAbstract *>::iterator i = _side_fe.begin();
+       i != local_fe_end; ++i)
     {
       i->second->reinit(elem, side);
     }
@@ -755,6 +932,13 @@ void FEMContext::edge_fe_reinit ()
   std::map<FEType, FEBase *>::iterator fe_end = edge_fe.end();
   for (std::map<FEType, FEBase *>::iterator i = edge_fe.begin();
        i != fe_end; ++i)
+    {
+      i->second->edge_reinit(elem, edge);
+    }
+
+  std::map<FEType, FEAbstract *>::iterator local_fe_end = _edge_fe.end();
+  for (std::map<FEType, FEAbstract *>::iterator i = _edge_fe.begin();
+       i != local_fe_end; ++i)
     {
       i->second->edge_reinit(elem, edge);
     }
@@ -971,5 +1155,17 @@ void FEMContext::_update_time_from_system(Real theta)
   this->time = theta*(this->system_time + deltat) + (1.-theta)*this->system_time;
 }
 
+// Instantiate member function templates
+template void FEMContext::interior_value<Number>(unsigned int, unsigned int, Number&) const;
+template void FEMContext::interior_value<Gradient>(unsigned int, unsigned int, Gradient&) const;
+
+  template void FEMContext::interior_gradient<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputGradient&) const;
+template void FEMContext::interior_gradient<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputGradient&) const;
+
+template void FEMContext::side_value<Number>(unsigned int, unsigned int, Number&) const;
+template void FEMContext::side_value<Gradient>(unsigned int, unsigned int, Gradient&) const;
+
+template void FEMContext::side_gradient<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputGradient&) const;
+template void FEMContext::side_gradient<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputGradient&) const;
 
 } // namespace libMesh
