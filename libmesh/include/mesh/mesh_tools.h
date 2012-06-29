@@ -331,6 +331,13 @@ namespace MeshTools
   void libmesh_assert_equal_n_systems (const MeshBase &mesh);
 
   /**
+   * A function for testing that all non-recently-created DofObjects
+   * within a mesh have old_dof_object data.  This is not expected to
+   * be true at all points within a simulation code.
+   */
+  void libmesh_assert_old_dof_objects (const MeshBase &mesh);
+
+  /**
    * A function for walking across the mesh to try and ferret out
    * invalidated or misassigned pointers
    */

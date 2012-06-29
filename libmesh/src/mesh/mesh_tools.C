@@ -930,6 +930,37 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
 
 
 
+void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &mesh)
+{
+#ifdef LIBMESH_ENABLE_AMR
+  MeshBase::const_element_iterator el =
+    mesh.elements_begin();
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+
+  for (; el != el_end; ++el)
+    {
+      const Elem *elem = *el;
+
+      if (elem->refinement_flag() == Elem::JUST_REFINED ||
+	  elem->refinement_flag() == Elem::INACTIVE)
+        continue;
+
+      if (elem->has_dofs())
+        libmesh_assert (elem->old_dof_object != NULL);
+
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+	{
+          const Node *node = elem->get_node(n);
+	  if (node->has_dofs())
+            libmesh_assert (elem->get_node(n)->old_dof_object != NULL);
+	}
+    }
+#endif // LIBMESH_ENABLE_AMR
+}
+
+
+
 void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase &mesh)
 {
   const MeshBase::const_element_iterator el_end =
