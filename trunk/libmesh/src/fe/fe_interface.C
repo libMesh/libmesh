@@ -101,6 +101,67 @@ FEInterface::FEInterface()
 	    libmesh_error(); \
 	  } \
       } while (0)
+
+#define fe_shape_scalar_switch(dim, arg) \
+  do { \
+  switch (fe_t.family)  \
+    {  \
+    case CLOUGH: \
+      phi = FE<dim,CLOUGH>::shape(arg, o, i, p); \
+    case HERMITE: \
+      phi = FE<dim,HERMITE>::shape(arg, o, i, p); \
+    case HIERARCHIC: \
+      phi = FE<dim,HIERARCHIC>::shape(arg, o, i, p); \
+    case L2_HIERARCHIC: \
+      phi = FE<dim,L2_HIERARCHIC>::shape(arg, o, i, p);\
+    case LAGRANGE: \
+      phi = FE<dim,LAGRANGE>::shape(arg, o, i, p);\
+    case L2_LAGRANGE: \
+      phi = FE<dim,L2_LAGRANGE>::shape(arg, o, i, p);\
+    case MONOMIAL: \
+      phi = FE<dim,MONOMIAL>::shape(arg, o, i, p);\
+    case SCALAR: \
+      phi = FE<dim,SCALAR>::shape(arg, o, i, p);\
+    case BERNSTEIN: \
+      phi = FE<dim,BERNSTEIN>::shape(arg, o, i, p);\
+    case SZABAB: \
+      phi = FE<dim,SZABAB>::shape(arg, o, i, p);\
+    case XYZ: \
+      phi = FEXYZ<dim>::shape(arg, o, i, p); \
+    case LAGRANGE_VEC: \
+      libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::shape"\
+		   << std::endl;\
+      libmesh_error();\
+    default: \
+      libmesh_error(); \
+    }\
+    } while(0)
+
+
+#define fe_shape_vector_switch(dim,arg) \
+	do { \
+	switch (fe_t.family) \
+    { \
+    case LAGRANGE_VEC: \
+      phi = FE<dim,LAGRANGE_VEC>::shape(arg, o, i, p);\
+    case HERMITE: \
+    case HIERARCHIC: \
+    case L2_HIERARCHIC: \
+    case LAGRANGE: \
+    case L2_LAGRANGE: \
+    case MONOMIAL: \
+    case SCALAR: \
+    case BERNSTEIN: \
+    case SZABAB: \
+    case XYZ: \
+      libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::shape" \
+		   << std::endl; \
+      libmesh_error();\
+    default: \
+      libmesh_error(); \
+    } \
+    } while(0)
+
 #else
 #define fe_family_switch(dim, func_and_args, prefix, suffix) \
       do { \
@@ -157,6 +218,60 @@ FEInterface::FEInterface()
 	    libmesh_error(); \
 	  } \
       } while (0)
+
+#define fe_shape_scalar_switch(dim, arg)		\
+  do { \
+  switch (fe_t.family)  \
+    {  \
+    case CLOUGH: \
+      phi = FE<dim,CLOUGH>::shape(arg, o, i, p); \
+    case HERMITE: \
+      phi = FE<dim,HERMITE>::shape(arg, o, i, p); \
+    case HIERARCHIC: \
+      phi = FE<dim,HIERARCHIC>::shape(arg, o, i, p); \
+    case L2_HIERARCHIC: \
+      phi = FE<dim,L2_HIERARCHIC>::shape(arg, o, i, p);\
+    case LAGRANGE: \
+      phi = FE<dim,LAGRANGE>::shape(arg, o, i, p);\
+    case L2_LAGRANGE: \
+      phi = FE<dim,L2_LAGRANGE>::shape(arg, o, i, p);\
+    case MONOMIAL: \
+      phi = FE<dim,MONOMIAL>::shape(arg, o, i, p);\
+    case SCALAR: \
+      phi = FE<dim,SCALAR>::shape(arg, o, i, p);\
+    case XYZ: \
+      phi = FEXYZ<dim>::shape(arg, o, i, p);\
+    case LAGRANGE_VEC: \
+      libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::shape"\
+		   << std::endl;\
+      libmesh_error();\
+    default: \
+      libmesh_error(); \
+    }\
+    } while(0)
+
+
+#define fe_shape_vector_switch(dim,arg) \
+	do { \
+	switch (fe_t.family) \
+    { \
+    case LAGRANGE_VEC: \
+      phi = FE<dim,LAGRANGE_VEC>::shape(arg, o, i, p);\
+    case HERMITE: \
+    case HIERARCHIC: \
+    case L2_HIERARCHIC: \
+    case LAGRANGE: \
+    case L2_LAGRANGE: \
+    case MONOMIAL: \
+    case SCALAR: \
+    case XYZ: \
+      libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::shape" \
+		   << std::endl; \
+      libmesh_error();\
+    default: \
+      libmesh_error(); \
+    } \
+    } while(0)
 #endif
 
 
@@ -532,13 +647,13 @@ Real FEInterface::shape(const unsigned int dim,
   return 0.;
 }
 
-template< typename OutputType>
-void FEInterface::shape(const unsigned int dim,
-			const FEType& fe_t,
-			const ElemType t,
-			const unsigned int i,
-			const Point& p,
-			OutputType& phi)
+template<>
+void FEInterface::shape<Real>(const unsigned int dim,
+			      const FEType& fe_t,
+			      const ElemType t,
+			      const unsigned int i,
+			      const Point& p,
+			      Real& phi)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -549,34 +664,32 @@ void FEInterface::shape(const unsigned int dim,
 
   const Order o = fe_t.order;
 
-  switch (dim) 
-    { 
-    /* 0D */
+  switch(dim)
+    {
     case 0:
-      fe_family_switch (0, shape(t,o,i,p), phi =, ;);
-    /* 1D */
+      fe_shape_scalar_switch(0, t);
+      break;
     case 1:
-      fe_family_switch (1, shape(t,o,i,p), phi =, ;);
-    /* 2D */
+      fe_shape_scalar_switch(1, t);
+      break;
     case 2:
-      fe_family_switch (2, shape(t,o,i,p), phi =, ;);
-    /* 3D */
+      fe_shape_scalar_switch(2, t);
+      break;
     case 3:
-      fe_family_switch (3, shape(t,o,i,p), phi =, ;);
-    default:
-      libmesh_error();
+      fe_shape_scalar_switch(3, t);
+      break;
     }
 
   return;
 }
 
-template< typename OutputType>
-void FEInterface::shape(const unsigned int dim,
-			const FEType& fe_t,
-			const Elem* elem,
-			const unsigned int i,
-			const Point& p,
-			OutputType& phi)
+template<>
+void FEInterface::shape<Real>(const unsigned int dim,
+			      const FEType& fe_t,
+			      const Elem* elem,
+			      const unsigned int i,
+			      const Point& p,
+			      Real& phi)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -587,22 +700,78 @@ void FEInterface::shape(const unsigned int dim,
 
   const Order o = fe_t.order;
 
-  switch (dim) 
-    { 
-    /* 0D */
+  switch(dim)
+    {
     case 0:
-      fe_family_switch (0, shape(elem,o,i,p), phi =, ;);
-    /* 1D */
+      fe_shape_scalar_switch(0, elem);
+      break;
     case 1:
-      fe_family_switch (1, shape(elem,o,i,p), phi =, ;);
-    /* 2D */
+      fe_shape_scalar_switch(1, elem);
+      break;
     case 2:
-      fe_family_switch (2, shape(elem,o,i,p), phi =, ;);
-    /* 3D */
+      fe_shape_scalar_switch(2, elem);
+      break;
     case 3:
-      fe_family_switch (3, shape(elem,o,i,p), phi =, ;);
-    default:
-      libmesh_error();
+      fe_shape_scalar_switch(3, elem);
+      break;
+    }
+
+  return;
+}
+
+template<>
+void FEInterface::shape<RealGradient>(const unsigned int dim,
+				      const FEType& fe_t,
+				      const ElemType t,
+				      const unsigned int i,
+				      const Point& p,
+				      RealGradient& phi)
+{
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_shape_vector_switch(0, t);
+      break;
+    case 1:
+      fe_shape_vector_switch(1, t);
+      break;
+    case 2:
+      fe_shape_vector_switch(2, t);
+      break;
+    case 3:
+      fe_shape_vector_switch(3, t);
+      break;
+    }
+  
+  return;
+}
+
+template<>
+void FEInterface::shape<RealGradient>(const unsigned int dim,
+				      const FEType& fe_t,
+				      const Elem* elem,
+				      const unsigned int i,
+				      const Point& p,
+				      RealGradient& phi)
+{
+  const Order o = fe_t.order;
+
+  switch(dim)
+    {
+    case 0:
+      fe_shape_vector_switch(0, elem);
+      break;
+    case 1:
+      fe_shape_vector_switch(1, elem);
+      break;
+    case 2:
+      fe_shape_vector_switch(2, elem);
+      break;
+    case 3:
+      fe_shape_vector_switch(3, elem);
+      break;
     }
 
   return;
@@ -1132,35 +1301,5 @@ unsigned int FEInterface::n_vec_dim( const MeshBase& mesh, const FEType& fe_type
       return 1;
     }
 }
-
-
-  // Instantiate templated member functions
-  template void FEInterface::shape<Real>( const unsigned int,
-					  const FEType&,
-					  const ElemType,
-					  const unsigned int,
-					  const Point&,
-					  Real& );
-
-  template void FEInterface::shape<RealGradient>( const unsigned int,
-						  const FEType&,
-						  const ElemType,
-						  const unsigned int,
-						  const Point&,
-						  RealGradient& );
-
-  template void FEInterface::shape<Real>( const unsigned int,
-					  const FEType&,
-					  const Elem*,
-					  const unsigned int,
-					  const Point&,
-					  Real& );
-
-  template void FEInterface::shape<RealGradient>( const unsigned int,
-						  const FEType&,
-						  const Elem*,
-						  const unsigned int,
-						  const Point&,
-						  RealGradient& );
 
 } // namespace libMesh
