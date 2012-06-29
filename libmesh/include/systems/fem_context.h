@@ -1,4 +1,3 @@
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
@@ -25,6 +24,7 @@
 #include "diff_context.h"
 #include "vector_value.h"
 #include "fe_type.h"
+#include "fe_base.h"
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "tensor_value.h"
@@ -186,6 +186,27 @@ public:
    */
   Tensor fixed_point_hessian (unsigned int var, const Point &p) const;
 
+  template<typename OutputShape>
+  void get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
+
+  template<typename OutputShape>
+  void get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
+
+  template<typename OutputShape>
+  void get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
+
+  template<typename OutputShape> 
+  void interior_value(unsigned int var, unsigned int qp, OutputShape& u) const;
+
+  template<typename OutputShape>
+  void interior_gradient(unsigned int var, unsigned int qp, typename FEGenericBase<OutputShape>::OutputGradient & du) const;
+
+  template<typename OutputShape> 
+  void side_value(unsigned int var, unsigned int qp, OutputShape& u) const;
+
+  template<typename OutputShape, typename OutputGradient> 
+  void side_gradient(unsigned int var, unsigned int qp, OutputGradient& du) const;
+
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
@@ -316,6 +337,24 @@ public:
    */
   unsigned char dim;
 
+protected:
+  
+  /**
+   * Finite element objects for each variable's interior, sides and edges.
+   */
+  std::map<FEType, FEAbstract*> _element_fe;
+  std::map<FEType, FEAbstract*> _side_fe;
+  std::map<FEType, FEAbstract*> _edge_fe;
+  
+
+  /**
+   * Pointers to the same finite element objects, but indexed
+   * by variable number
+   */
+  std::vector<FEAbstract*> _element_fe_var;
+  std::vector<FEAbstract*> _side_fe_var;
+  std::vector<FEAbstract*> _edge_fe_var;
+
 private:
   /**
    * Uses the coordinate data specified by mesh_*_position configuration
@@ -340,8 +379,6 @@ private:
 // ------------------------------------------------------------
 // FEMContext inline methods
 
-
-
 inline
 void FEMContext::elem_position_set(Real theta)
 {
@@ -349,6 +386,31 @@ void FEMContext::elem_position_set(Real theta)
     this->_do_elem_position_set(theta);
 }
 
+template<typename OutputShape>
+inline
+void FEMContext::get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+{
+  libmesh_assert( var < _element_fe_var.size() );
+  fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _element_fe_var[var] );
+}
+
+template<typename OutputShape>
+inline
+void FEMContext::get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+{
+  libmesh_assert( var < _side_fe_var.size() );
+  fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _side_fe_var[var] );
+}
+
+template<typename OutputShape>
+inline
+void FEMContext::get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
+{ 
+  libmesh_assert( var < _edge_fe_var.size() );
+  fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _edge_fe_var[var] );
+}
+
+
 } // namespace libMesh
 
-#endif
+#endif //__fem_context_h__
