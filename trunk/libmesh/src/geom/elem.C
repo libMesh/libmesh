@@ -900,6 +900,97 @@ void Elem::libmesh_assert_valid_neighbors() const
 
 
 
+void Elem::make_links_to_me_local(unsigned int n)
+{
+  Elem *neigh = this->neighbor(n);
+
+  // Don't bother calling this function unless it's necessary
+  libmesh_assert(neigh);
+  libmesh_assert(!neigh->is_remote());
+
+  // We never have neighbors more refined than us
+  libmesh_assert(neigh->level() <= this->level());
+
+  // We never have subactive neighbors of non subactive elements
+  libmesh_assert(!neigh->subactive() || this->subactive());
+
+  // If we have a neighbor less refined than us then it must not
+  // have any more refined active descendants we could have
+  // pointed to instead.
+  libmesh_assert(neigh->level() == this->level() ||
+                 neigh->active());
+     
+  // If neigh is at our level, then its family might have
+  // remote_elem neighbor links which need to point to us
+  // instead, but if not, then we're done.
+  if (neigh->level() != this->level())
+    return;
+
+  // If neigh is subactive then we're not updating its neighbor links
+  // FIXME - this needs to change when we start using subactive
+  // elements for more than just the two-phase
+  // restriction/prolongation projections.
+  if (neigh->subactive())
+    return;
+      
+  // What side of neigh are we on?  We can't use the usual Elem
+  // method because we're in the middle of restoring topology
+  const AutoPtr<Elem> my_side = this->side(n);
+  unsigned int nn = 0;
+  for (; nn != neigh->n_sides(); ++nn)
+    {
+      const AutoPtr<Elem> neigh_side = neigh->side(nn);
+      if (*my_side == *neigh_side)
+        break;
+    }
+
+  // we had better be on *some* side of neigh
+  libmesh_assert(nn < neigh->n_sides());
+
+  // Find any elements that ought to point to elem
+  std::vector<const Elem*> neigh_family;
+#ifdef LIBMESH_ENABLE_AMR
+  if (this->active())
+    neigh->family_tree_by_side(neigh_family, nn);
+  else
+#endif
+    neigh_family.push_back(neigh);
+
+  // And point them to elem
+  for (unsigned int i = 0; i != neigh_family.size(); ++i)
+    {
+      Elem* neigh_family_member = const_cast<Elem*>(neigh_family[i]);
+
+      // Ideally, the neighbor link ought to either be correct
+      // already or ought to be to remote_elem.
+      //
+      // However, if we're redistributing a newly created elem,
+      // after an AMR step but before find_neighbors has fixed up
+      // neighbor links, we might have an out of date neighbor
+      // link to elem's parent instead.
+/*
+      libmesh_assert(neigh_family_member->neighbor(nn) == this ||
+                     neigh_family_member->neighbor(nn) == remote_elem ||
+                     ((this->refinement_flag() == JUST_REFINED) &&
+                      this->parent() != NULL &&
+                      neigh_family_member->neighbor(nn) == this->parent()));
+*/
+      if (!(neigh_family_member->neighbor(nn) == this ||
+                     neigh_family_member->neighbor(nn) == remote_elem ||
+                     ((this->refinement_flag() == JUST_REFINED) &&
+                      this->parent() != NULL &&
+                      neigh_family_member->neighbor(nn) == this->parent())))
+{
+  libMesh::out << "Failure neighbor: " << *neigh_family_member << std::endl;
+  libMesh::out << "Failure this: " << *this << std::endl;
+  libmesh_error();
+}
+
+      neigh_family_member->set_neighbor(nn, this);
+    }
+}
+
+
 void Elem::make_links_to_me_remote()
 {
   libmesh_assert (this != remote_elem);
