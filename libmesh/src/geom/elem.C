@@ -1814,8 +1814,8 @@ std::string Elem::get_info () const
       << "   level()=" << this->level()                            << '\n'
       << "   p_level()=" << this->p_level()                        << '\n'
 #ifdef LIBMESH_ENABLE_AMR
-      << "   refinement_flag()=" << this->refinement_flag()        << '\n'
-      << "   p_refinement_flag()=" << this->p_refinement_flag()    << '\n'
+      << "   refinement_flag()=" << Utility::enum_to_string(this->refinement_flag())        << '\n'
+      << "   p_refinement_flag()=" << Utility::enum_to_string(this->p_refinement_flag())    << '\n'
 #endif
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       << "   infinite()=" << this->infinite()    << '\n';
