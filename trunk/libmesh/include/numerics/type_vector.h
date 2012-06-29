@@ -207,6 +207,14 @@ public:
   operator * (const TypeVector<T2> &) const;
 
   /**
+   * Multiply 2 vectors together, i.e. dot-product.
+   * The vectors may be of different types.
+   */
+  template <typename T2>
+  typename CompareTypes<T, T2>::supertype
+  contract (const TypeVector<T2> &) const;
+
+  /**
    * Cross 2 vectors together, i.e. cross-product.
    */
   template <typename T2>
@@ -742,6 +750,15 @@ TypeVector<T>::operator * (const TypeVector<T2> &p) const
 	  _coords[1]*p(1) +
 	  _coords[2]*p(2));
 #endif
+}
+
+template <typename T>
+template <typename T2>
+inline
+typename CompareTypes<T, T2>::supertype
+TypeVector<T>::contract(const TypeVector<T2> &p) const
+{
+  return (*this)*(p);
 }
 
 

@@ -1,0 +1,64 @@
+/* The Next Great Finite Element Library. */
+/* Copyright (C) 2003  Benjamin S. Kirk */
+
+/* This library is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU Lesser General Public */
+/* License as published by the Free Software Foundation; either */
+/* version 2.1 of the License, or (at your option) any later version. */
+
+/* This library is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
+/* Lesser General Public License for more details. */
+
+/* You should have received a copy of the GNU Lesser General Public */
+/* License along with this library; if not, write to the Free Software */
+/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+
+#include "function_base.h"
+#include "laplace_exact_solution.h"
+
+using namespace libMesh;
+
+#ifndef __boundary_function_h__
+#define __boundary_function_h__
+
+class BoundaryFunction : public FunctionBase<Number>
+{
+public:
+
+  BoundaryFunction( const unsigned int u_var )
+  : _u_var(u_var) {}
+  ~BoundaryFunction( ){}
+
+  virtual Number operator() (const Point&, const Real = 0)
+    { libmesh_not_implemented(); }
+
+  virtual void operator() (const Point& p,
+                           const Real,
+                           DenseVector<Number>& output)
+  {
+    output.zero();
+    const Real x=p(0), y=p(1), z=p(2);
+    output(_u_var)   = soln( 0, x, y, z );
+    output(_u_var+1) = soln( 1, x, y, z );
+    output(_u_var+2) = soln( 1, x, y, z );
+  }
+
+  virtual Number component( unsigned int component, const Point& p,
+			    const Real )
+  {
+    const Real x=p(0), y=p(1), z=p(2);
+    return soln( component, x, y, z );
+  }
+
+  virtual AutoPtr<FunctionBase<Number> > clone() const
+  { return AutoPtr<FunctionBase<Number> > (new BoundaryFunction(_u_var)); }
+
+private:
+
+  const unsigned int _u_var;
+  LaplaceExactSolution soln;
+};
+
+#endif // __boundary_function_h__
