@@ -203,7 +203,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
   START_LOG("find_neighbors()", "Mesh");
 
-
   const element_iterator el_end = this->elements_end();
 
   //TODO:[BSK] This should be removed later?!
@@ -336,12 +335,11 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
       }
   }
 
-
-
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
-   * Here we look at all of the child elements.
+   * Here we look at all of the child elements which
+   * don't already have valid neighbors.
    *
    * If a child element has a NULL neighbor it is
    * either because it is on the boundary or because
@@ -351,9 +349,10 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
    *
    * If a child element has a remote_elem neighbor
    * on a boundary it shares with its parent, that
-   * info may be out of date - if the parent's
-   * neighbor is active then the child should share
-   * it.
+   * info may have become out-dated through coarsening
+   * of the neighbor's parent.  In this case, if the
+   * parent's neighbor is active then the child should
+   * share it.
    *
    * Furthermore, that neighbor better be active,
    * otherwise we missed a child somewhere.
@@ -367,80 +366,83 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
         {
           Elem* elem = *el;
           libmesh_assert(elem);
-          libmesh_assert(elem->parent());
+	  Elem* parent = elem->parent();
+          libmesh_assert(parent);
+	  const unsigned int my_child_num = parent->which_child_am_i(elem);
 
           for (unsigned int s=0; s < elem->n_neighbors(); s++)
-            if (elem->neighbor(s) == NULL)
-// This currently leads to an infinite loop in ex10?
-//            if (elem->neighbor(s) == NULL ||
-//		(elem->neighbor(s) == remote_elem &&
-//		 parent->is_child_on_side(parent->which_child_am_i(elem), s)))
             {
-              Elem *neigh = elem->parent()->neighbor(s);
-
-	      // If neigh was refined and had non-subactive children
-	      // made remote earlier, then a non-subactive elem should
-	      // actually have one of those remote children as a
-	      // neighbor
-              if (neigh && (neigh->ancestor()) && (!elem->subactive()))
+              if (elem->neighbor(s) == NULL ||
+		  (elem->neighbor(s) == remote_elem &&
+		   parent->is_child_on_side(my_child_num, s)))
                 {
-#ifdef DEBUG
-                  // Let's make sure that "had children made remote"
-	          // situation is actually the case
-		  libmesh_assert(neigh->has_children());
-		  bool neigh_has_remote_children = false;
-		  for (unsigned int c = 0; c != neigh->n_children(); ++c)
+                  Elem *neigh = parent->neighbor(s);
+
+	          // If neigh was refined and had non-subactive children
+	          // made remote earlier, then a non-subactive elem should
+	          // actually have one of those remote children as a
+	          // neighbor
+                  if (neigh && (neigh->ancestor()) && (!elem->subactive()))
                     {
-                      if (neigh->child(c) == remote_elem)
-                        neigh_has_remote_children = true;
-                    }
-                  libmesh_assert(neigh_has_remote_children);
-
-	          // And let's double-check that we don't have
-		  // a remote_elem neighboring a local element
-                  libmesh_assert(elem->processor_id() !=
-				 libMesh::processor_id());
-#endif // DEBUG
-                  neigh = const_cast<RemoteElem*>(remote_elem);
-                }
-
-              elem->set_neighbor(s, neigh);
 #ifdef DEBUG
-              if (neigh != NULL && neigh != remote_elem)
-                // We ignore subactive elements here because
-                // we don't care about neighbors of subactive element.
-                if ((!neigh->active()) && (!elem->subactive()))
-                {
-                  libMesh::err << "On processor " << libMesh::processor_id()
-                                << std::endl;
-                  libMesh::err << "Bad element ID = " << elem->id()
-                    << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
-                  libMesh::err << "Bad element proc_ID = " << elem->processor_id()
-                    << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
-                  libMesh::err << "Bad element size = " << elem->hmin()
-                    << ", Bad neighbor size = " << neigh->hmin() << std::endl;
-                  libMesh::err << "Bad element center = " << elem->centroid()
-                    << ", Bad neighbor center = " << neigh->centroid() << std::endl;
-                  libMesh::err << "ERROR: "
-                    << (elem->active()?"Active":"Ancestor")
-                    << " Element at level "
-                    << elem->level() << std::endl;
-                  libMesh::err << "with "
-                    << (elem->parent()->active()?"active":
-                        (elem->parent()->subactive()?"subactive":"ancestor"))
-                    << " parent share "
-                    << (neigh->subactive()?"subactive":"ancestor")
-                    << " neighbor at level " << neigh->level()
-                    << std::endl;
-                  GMVIO(*this).write ("bad_mesh.gmv");
-                  libmesh_error();
-                }
+                      // Let's make sure that "had children made remote"
+	              // situation is actually the case
+		      libmesh_assert(neigh->has_children());
+		      bool neigh_has_remote_children = false;
+		      for (unsigned int c = 0; c != neigh->n_children(); ++c)
+                        {
+                          if (neigh->child(c) == remote_elem)
+                            neigh_has_remote_children = true;
+                        }
+                      libmesh_assert(neigh_has_remote_children);
+
+	              // And let's double-check that we don't have
+		      // a remote_elem neighboring a local element
+                      libmesh_assert(elem->processor_id() !=
+				     libMesh::processor_id());
 #endif // DEBUG
+                      neigh = const_cast<RemoteElem*>(remote_elem);
+                    }
+
+                  elem->set_neighbor(s, neigh);
+#ifdef DEBUG
+                  if (neigh != NULL && neigh != remote_elem)
+                    // We ignore subactive elements here because
+                    // we don't care about neighbors of subactive element.
+                    if ((!neigh->active()) && (!elem->subactive()))
+                      {
+                        libMesh::err << "On processor " << libMesh::processor_id()
+                                      << std::endl;
+                        libMesh::err << "Bad element ID = " << elem->id()
+                          << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
+                        libMesh::err << "Bad element proc_ID = " << elem->processor_id()
+                          << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
+                        libMesh::err << "Bad element size = " << elem->hmin()
+                          << ", Bad neighbor size = " << neigh->hmin() << std::endl;
+                        libMesh::err << "Bad element center = " << elem->centroid()
+                          << ", Bad neighbor center = " << neigh->centroid() << std::endl;
+                        libMesh::err << "ERROR: "
+                          << (elem->active()?"Active":"Ancestor")
+                          << " Element at level "
+                          << elem->level() << std::endl;
+                        libMesh::err << "with "
+                          << (parent->active()?"active":
+                              (parent->subactive()?"subactive":"ancestor"))
+                          << " parent share "
+                          << (neigh->subactive()?"subactive":"ancestor")
+                          << " neighbor at level " << neigh->level()
+                          << std::endl;
+                        GMVIO(*this).write ("bad_mesh.gmv");
+                        libmesh_error();
+                      }
+#endif // DEBUG
+                }
             }
         }
     }
 
 #endif // AMR
+
 
 #ifdef DEBUG
 MeshTools::libmesh_assert_valid_neighbors(*this);

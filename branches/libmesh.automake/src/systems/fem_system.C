@@ -149,8 +149,11 @@ namespace {
 #ifndef DEBUG
 	      // Even if we're not in DEBUG mode, when we're verifying
 	      // analytic jacobians we'll want to verify each side's
-              // jacobian contribution separately
-              if (_sys.verify_analytic_jacobians != 0.0 && _get_jacobian)
+              // jacobian contribution separately.
+	      /* PB: We also need to account for the case when the user wants to
+		 use numerical Jacobians and not analytic Jacobians */
+              if ( (_sys.verify_analytic_jacobians != 0.0 && _get_jacobian) ||
+		   (!jacobian_computed && _get_jacobian) )
 #endif // ifndef DEBUG
                 {
                   old_jacobian = _femcontext.elem_jacobian;
@@ -171,14 +174,8 @@ namespace {
                   // Logging of numerical jacobians is done separately
                   _sys.numerical_side_jacobian(_femcontext);
 
-                  // If we're in DEBUG mode or if
-	          // verify_analytic_jacobians is on, we've moved
-                  // elem_jacobian's accumulated values into old_jacobian.
-                  // Now let's add them back.
-#ifndef DEBUG
-                  if (_sys.verify_analytic_jacobians != 0.0)
-#endif // ifndef DEBUG
-                    _femcontext.elem_jacobian += old_jacobian;
+		  // Add back in element interior numerical Jacobian
+		  _femcontext.elem_jacobian += old_jacobian;
                 }
 
               // Compute a numeric jacobian if we're asked to verify the

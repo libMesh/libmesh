@@ -218,7 +218,8 @@ void XdrIO::write (const std::string& name)
     {
       // Parallel xdr mesh files aren't implemented yet; until they
       // are we'll just warn the user and write a serial file.
-      std::cerr << "Warning!\n";
+      libMesh::out << "Warning!  Parallel xda/xdr is not yet implemented.\n";
+      libMesh::out << "Writing a serialized file instead." << std::endl;
 
       // write connectivity
       this->write_serialized_connectivity (io, n_elem);

@@ -325,6 +325,12 @@ namespace MeshTools
                                        const Elem *bad_elem);
 
   /**
+   * A function for testing that all DofObjects within a mesh
+   * have the same n_systems count
+   */
+  void libmesh_assert_equal_n_systems (const MeshBase &mesh);
+
+  /**
    * A function for walking across the mesh to try and ferret out
    * invalidated or misassigned pointers
    */

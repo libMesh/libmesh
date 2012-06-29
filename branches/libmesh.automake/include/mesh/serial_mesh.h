@@ -105,9 +105,13 @@ class SerialMesh : public UnstructuredMesh
   virtual const Node&  node  (const unsigned int i) const ;
   virtual Node& node (const unsigned int i) ;
   virtual const Node* node_ptr (const unsigned int i) const ;
-  virtual Node* & node_ptr (const unsigned int i) ;
+  virtual Node* node_ptr (const unsigned int i) ;
+  virtual const Node* query_node_ptr (const unsigned int i) const ;
+  virtual Node* query_node_ptr (const unsigned int i) ;
   virtual const Elem* elem (const unsigned int i) const ;
   virtual Elem* elem (const unsigned int i) ;
+  virtual const Elem* query_elem (const unsigned int i) const ;
+  virtual Elem* query_elem (const unsigned int i) ;
 
   /**
    * functions for adding /deleting nodes elements.

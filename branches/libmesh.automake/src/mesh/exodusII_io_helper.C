@@ -645,22 +645,26 @@ const std::vector<Real>& ExodusII_IO_Helper::get_nodal_var_values(std::string no
 
   this->get_nodal_var_names();
 
-  //See if we can find the variable we are looking for
+  // See if we can find the variable we are looking for
   unsigned int var_index = 0;
   bool found = false;
 
-  found = nodal_var_names[var_index] == nodal_var_name;
-
-  while(!found && var_index < nodal_var_names.size())
+  // Do a linear search for nodal_var_name in nodal_var_names
+  for (; var_index<nodal_var_names.size(); ++var_index)
     {
-      var_index++;
-      found = nodal_var_names[var_index] == nodal_var_name;
+      found = (nodal_var_names[var_index] == nodal_var_name);
+      if (found)
+        break;
     }
 
-  if(!found)
+  if (!found)
     {
       libMesh::err << "Unable to locate variable named: " << nodal_var_name << std::endl;
-      return nodal_var_values;
+      libMesh::err << "Available variables: " << std::endl;
+      for (unsigned int i=0; i<nodal_var_names.size(); ++i)
+        libMesh::err << nodal_var_names[i] << std::endl;
+
+      libmesh_error();
     }
 
   exII::ex_get_nodal_var(ex_id, time_step, var_index+1, num_nodes, &nodal_var_values[0]);
