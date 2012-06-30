@@ -416,6 +416,25 @@ public:
    */
   void edge_fe_reinit();
 
+  /**
+   * Accessor for element interior quadrature rule.
+   */
+  const QBase* get_element_qrule()
+  { return this->element_qrule; }
+
+  /**
+   * Accessor for element side quadrature rule.
+   */
+  const QBase* get_side_qrule()
+  { return this->side_qrule; }
+
+  /**
+   * Accessor for element edge quadrature rule.
+   */
+  const QBase* get_edge_qrule()
+  { return this->edge_qrule; }
+  
+
 // should be protected?:
   /**
    * Finite element objects for each variable's interior, sides and edges.
