@@ -51,7 +51,7 @@ struct A0 : ElemAssembly
     const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -81,7 +81,7 @@ struct A1 : ElemAssembly
     const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -110,7 +110,7 @@ struct A2 : ElemAssembly
     const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -136,7 +136,7 @@ struct F0 : ElemAssembly
     const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -170,7 +170,7 @@ struct OutputAssembly : ElemAssembly
     const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
     
     Real output_area = (max_x-min_x) * (max_y-min_y);
 

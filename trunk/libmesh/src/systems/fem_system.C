@@ -990,7 +990,7 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
   // This function only supports fully coupled mesh motion for now
   libmesh_assert(_mesh_sys == this);
 
-  unsigned int n_qpoints = context.element_qrule->n_points();
+  unsigned int n_qpoints = (context.get_element_qrule())->n_points();
 
   const unsigned int n_x_dofs = (_mesh_x_var == libMesh::invalid_uint) ?
                                 0 : context.dof_indices_var[_mesh_x_var].size();
@@ -1141,7 +1141,7 @@ bool FEMSystem::mass_residual (bool request_jacobian,
 {
   FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
 
-  unsigned int n_qpoints = context.element_qrule->n_points();
+  unsigned int n_qpoints = (context.get_element_qrule())->n_points();
 
   for (unsigned int var = 0; var != this->n_vars(); ++var)
     {

@@ -253,7 +253,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
   // calculated at each quadrature point by summing the
   // solution degree-of-freedom values by the appropriate
   // weight functions.
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
@@ -406,7 +406,7 @@ bool NavierSystem::element_constraint (bool request_jacobian,
   DenseSubVector<Number> &Fp = *c.elem_subresiduals[p_var];
 
   // Add the constraint given by the continuity equation
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       // Compute the velocity gradient at the old Newton iterate
@@ -524,7 +524,7 @@ bool NavierSystem::mass_residual (bool request_jacobian,
   // The number of local degrees of freedom in velocity
   const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
   for (unsigned int qp = 0; qp != n_qpoints; ++qp)
     {

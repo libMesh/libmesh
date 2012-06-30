@@ -27,7 +27,7 @@ void LaplaceSystem::element_qoi (DiffContext &context,
 
   const std::vector<Point> &xyz = c.element_fe_var[0]->get_xyz();
 
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
   
   Number dQoI_0 = 0.;
   
