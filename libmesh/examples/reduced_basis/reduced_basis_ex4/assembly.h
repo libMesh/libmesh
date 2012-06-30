@@ -50,7 +50,7 @@ struct A0 : ElemAssembly
     const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -76,7 +76,7 @@ struct EIM_IP_assembly : ElemAssembly
 
     const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -108,7 +108,7 @@ struct EIM_F : ElemAssembly
     const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
     std::vector<Number> eim_values =
       rb_eim_con.evaluate_basis_function(basis_function_index,

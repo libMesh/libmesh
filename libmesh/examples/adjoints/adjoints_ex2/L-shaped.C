@@ -80,7 +80,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   // calculated at each quadrature point by summing the
   // solution degree-of-freedom values by the appropriate
   // weight functions.
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {     	
@@ -128,7 +128,7 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
   DenseSubMatrix<Number> &K = *c.elem_subjacobians[0][0];
   DenseSubVector<Number> &F = *c.elem_subresiduals[0];
       
-  unsigned int n_qpoints = c.side_qrule->n_points();
+  unsigned int n_qpoints = (c.get_side_qrule())->n_points();
 
   const Real penalty = 1./(TOLERANCE*TOLERANCE);
 
