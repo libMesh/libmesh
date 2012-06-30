@@ -38,8 +38,14 @@
 
 namespace libMesh
 {
+  /**
+   * Helper functions for printing scalar and vector types.  Called from Parameters::Parameter<T>::print(...).
+   */
+  template<typename P>
+  void print_helper(std::ostream& os, const P* param);
 
-
+  template<typename P>
+  void print_helper(std::ostream& os, const std::vector<P>* param);
 
 /**
  * This class provides the ability to map between
@@ -227,7 +233,6 @@ public:
     virtual Value* clone () const;
 
   private:
-
     /**
      * Stored parameter value.
      */
@@ -273,8 +278,6 @@ protected:
 
 };
 
-
-
 // ------------------------------------------------------------
 // Parameters::Parameter<> class inline methods
 
@@ -286,34 +289,16 @@ inline
 std::string Parameters::Parameter<T>::type () const
 {
   return demangle(typeid(T).name());
-
-/*
-  int status = 0;
-  char *d = 0;
-  std::string ret = typeid(T).name();;
-  d = abi::__cxa_demangle(ret.c_str(), 0, 0, &status);
-
-  if (d)
-  {
-    ret = d;
-    std::free(d);
-  }
-
-  return ret;
-*/
 }
 #endif
-
-
 
 template <typename T>
 inline
 void Parameters::Parameter<T>::print (std::ostream& os) const
 {
-  os << _value;
+  // Call helper function overloaded for basic scalar and vector types
+  print_helper(os, static_cast<const T*>(&_value));
 }
-
-
 
 template <typename T>
 inline
@@ -546,6 +531,21 @@ inline
 Parameters::const_iterator Parameters::end() const
 {
   return _values.end();
+}
+
+//non-member scalar print function
+template<typename P>
+void print_helper(std::ostream& os, const P* param)
+{
+  os << *param;
+}
+
+//non-member vector print function
+template<typename P>
+void print_helper(std::ostream& os, const std::vector<P>* param)
+{
+  for (unsigned int i=0; i<param->size(); ++i)
+    os << (*param)[i] << " ";
 }
 
 } // namespace libMesh
