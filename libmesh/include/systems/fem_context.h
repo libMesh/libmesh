@@ -76,56 +76,65 @@ public:
 
   /**
    * Returns the value of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior
+   * point \p qp on the current element interior.
+   * This API currently present for backward compatibility.
    */
   Number interior_value(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature
-   * point \p qp on the current element side
+   * point \p qp on the current element side.
+   * This API currently present for backward compatibility.
    */
   Number side_value(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the value of the solution variable \p var at the physical
-   * point \p p on the current element
+   * point \p p on the current element.
+   * This API currently present for backward compatibility.
    */
   Number point_value(unsigned int var, const Point &p) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior
+   * point \p qp on the current element interior.
+   * This API currently present for backward compatibility.
    */
   Gradient interior_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the quadrature
-   * point \p qp on the current element side
+   * point \p qp on the current element side.
+   * This API currently present for backward compatibility.
    */
   Gradient side_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the physical
-   * point \p p on the current element
+   * point \p p on the current element.
+   * This API currently present for backward compatibility.
    */
   Gradient point_gradient(unsigned int var, const Point &p) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
-   * point \p qp on the current element interior
+   * point \p qp on the current element interior.
+   * This API currently present for backward compatibility.
    */
   Tensor interior_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
-   * point \p qp on the current element side
+   * point \p qp on the current element side.
+   * This API currently present for backward compatibility.
    */
   Tensor side_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the hessian of the solution variable \p var at the physical
-   * point \p p on the current element
+   * point \p p on the current element.
+   * This API currently present for backward compatibility.
    */
   Tensor point_hessian(unsigned int var, const Point &p) const;
 
@@ -133,79 +142,229 @@ public:
 
   /**
    * Returns the value of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior
+   * point \p qp on the current element interior.
+   * This API currently present for backward compatibility.
    */
   Number fixed_interior_value(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the value of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side
+   * point \p qp on the current element side.
+   * This API currently present for backward compatibility.
    */
   Number fixed_side_value(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the value of the fixed_solution variable \p var at the physical
-   * point \p p on the current element
+   * point \p p on the current element.
+   * This API currently present for backward compatibility.
    */
   Number fixed_point_value(unsigned int var, const Point &p) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior
+   * point \p qp on the current element interior.
+   * This API currently present for backward compatibility.
    */
   Gradient fixed_interior_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side
+   * point \p qp on the current element side.
+   * This API currently present for backward compatibility.
    */
   Gradient fixed_side_gradient(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the physical
-   * point \p p on the current element
+   * point \p p on the current element.
+   * This API currently present for backward compatibility.
    */
   Gradient fixed_point_gradient(unsigned int var, const Point &p) const;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element interior
+   * point \p qp on the current element interior.
+   * This API currently present for backward compatibility.
    */
   Tensor fixed_interior_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
-   * point \p qp on the current element side
+   * point \p qp on the current element side.
+   * This API currently present for backward compatibility.
    */
   Tensor fixed_side_hessian(unsigned int var, unsigned int qp) const;
 
   /**
    * Returns the hessian of the fixed_solution variable \p var at the physical
-   * point \p p on the current element
+   * point \p p on the current element.
+   * This API currently present for backward compatibility.
    */
   Tensor fixed_point_hessian (unsigned int var, const Point &p) const;
 
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+  /**
+   * Accessor for interior finite element object for variable var.
+   */
   template<typename OutputShape>
   void get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
 
+  /**
+   * Accessor for edge/face (2D/3D) finite element object for variable var.
+   */
   template<typename OutputShape>
   void get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
 
+  /**
+   * Accessor for edge (3D only!) finite element object for variable var.
+   */
   template<typename OutputShape>
   void get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const;
 
+  /**
+   * Returns the value of the solution variable \p var at the quadrature
+   * point \p qp on the current element interior. This is the preferred API.
+   */
   template<typename OutputShape> 
   void interior_value(unsigned int var, unsigned int qp, OutputShape& u) const;
 
-  template<typename OutputShape>
-  void interior_gradient(unsigned int var, unsigned int qp, typename FEGenericBase<OutputShape>::OutputGradient & du) const;
-
+  /**
+   * Returns the value of the solution variable \p var at the quadrature
+   * point \p qp on the current element side. This is the preferred API.
+   */
   template<typename OutputShape> 
   void side_value(unsigned int var, unsigned int qp, OutputShape& u) const;
 
-  template<typename OutputShape, typename OutputGradient> 
-  void side_gradient(unsigned int var, unsigned int qp, OutputGradient& du) const;
+  /**
+   * Returns the value of the solution variable \p var at the physical
+   * point \p p on the current element. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void point_value(unsigned int var, const Point &p, OutputShape& u) const;
+
+  /**
+   * Returns the gradient of the solution variable \p var at the quadrature
+   * point \p qp on the current element interior. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void interior_gradient(unsigned int var, unsigned int qp, 
+			 typename FEGenericBase<OutputShape>::OutputGradient& du) const;
+
+  /**
+   * Returns the gradient of the solution variable \p var at the quadrature
+   * point \p qp on the current element side. This is the preferred API.
+   */
+  template<typename OutputShape> 
+  void side_gradient(unsigned int var, unsigned int qp, 
+		     typename FEGenericBase<OutputShape>::OutputGradient& du) const;
+
+   /**
+   * Returns the gradient of the solution variable \p var at the physical
+   * point \p p on the current element. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void point_gradient(unsigned int var, const Point &p, 
+		      typename FEGenericBase<OutputShape>::OutputGradient& grad_u) const;
+  
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  /**
+   * Returns the hessian of the solution variable \p var at the quadrature
+   * point \p qp on the current element interior. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void interior_hessian(unsigned int var, unsigned int qp,
+			typename FEGenericBase<OutputShape>::OutputTensor& d2u) const;
+
+  /**
+   * Returns the hessian of the solution variable \p var at the quadrature
+   * point \p qp on the current element side. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void side_hessian(unsigned int var, unsigned int qp, 
+		    typename FEGenericBase<OutputShape>::OutputTensor& d2u) const;
+
+  /**
+   * Returns the hessian of the solution variable \p var at the physical
+   * point \p p on the current element. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void point_hessian(unsigned int var, const Point &p, 
+		      typename FEGenericBase<OutputShape>::OutputTensor& hess_u) const;
+
+#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+  /**
+   * Returns the value of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element interior. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void fixed_interior_value(unsigned int var, unsigned int qp, OutputShape& u) const;
+
+  /**
+   * Returns the value of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element side. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void fixed_side_value(unsigned int var, unsigned int qp, OutputShape& u) const;
+
+  /**
+   * Returns the value of the fixed_solution variable \p var at the physical
+   * point \p p on the current element. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void fixed_point_value(unsigned int var, const Point &p, OutputShape& u) const;
+
+  /**
+   * Returns the gradient of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element interior. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void fixed_interior_gradient(unsigned int var, unsigned int qp,
+			       typename FEGenericBase<OutputShape>::OutputGradient& grad_u) const;
+
+  /**
+   * Returns the gradient of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element side. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void fixed_side_gradient(unsigned int var, unsigned int qp,
+			   typename FEGenericBase<OutputShape>::OutputGradient& grad_u) const;
+
+  /**
+   * Returns the gradient of the fixed_solution variable \p var at the physical
+   * point \p p on the current element. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void fixed_point_gradient(unsigned int var, const Point &p,
+			    typename FEGenericBase<OutputShape>::OutputGradient& grad_u) const;
+  
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  /**
+   * Returns the hessian of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element interior. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void fixed_interior_hessian(unsigned int var, unsigned int qp,
+			      typename FEGenericBase<OutputShape>::OutputTensor& hess_u) const;
+  
+  /**
+   * Returns the hessian of the fixed_solution variable \p var at the quadrature
+   * point \p qp on the current element side. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void fixed_side_hessian(unsigned int var, unsigned int qp,
+			  typename FEGenericBase<OutputShape>::OutputTensor& hess_u) const;
+  
+  /**
+   * Returns the hessian of the fixed_solution variable \p var at the physical
+   * point \p p on the current element. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void fixed_point_hessian(unsigned int var, const Point &p,
+			   typename FEGenericBase<OutputShape>::OutputTensor& hess_u) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -338,7 +497,13 @@ public:
   unsigned char dim;
 
 protected:
-  
+
+  /**
+   * Helper function to reduce some code duplication in the *_point_* methods.
+   */
+  template<typename OutputShape>
+  AutoPtr<FEGenericBase<OutputShape> > build_new_fe( const FEGenericBase<OutputShape>* fe, const Point &p ) const;
+
   /**
    * Finite element objects for each variable's interior, sides and edges.
    */
