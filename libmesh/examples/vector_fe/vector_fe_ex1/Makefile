@@ -43,7 +43,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out.gmv out.exo
+	@rm -f $(target) out.gmv out.e
 
 distclean:
 	@$(MAKE) clobber
