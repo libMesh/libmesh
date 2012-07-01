@@ -321,6 +321,10 @@ Elem* ParallelMesh::add_elem (Elem *e)
   // Don't try to add NULLs!
   libmesh_assert(e);
 
+  // Trying to add an existing element is a no-op
+  if (e->valid_id() && _elements[e->id()] == e)
+    return e;
+
   const unsigned int elem_procid = e->processor_id();
 
   if (!e->valid_id())
@@ -450,6 +454,10 @@ Node* ParallelMesh::add_node (Node *n)
 {
   // Don't try to add NULLs!
   libmesh_assert(n);
+
+  // Trying to add an existing node is a no-op
+  if (n->valid_id() && _nodes[n->id()] == n)
+    return n;
 
   const unsigned int node_procid = n->processor_id();
 
