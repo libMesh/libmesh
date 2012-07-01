@@ -211,14 +211,26 @@ public:
   std::vector<boundary_id_type> boundary_ids (const Node* node) const;
 
   /**
+   * Returns the number of boundary ids associated with \p Node \p node.
+   */
+  unsigned int n_boundary_ids (const Node* node) const;
+
+  /**
    * Returns the boundary id associated with the \p side side of
    * element \p elem.  Note that only one id per side is allowed,
    * however multiple sides per element are allowed.  Returns \p invalid_id
    * if the \p side does not have an associated boundary id, hence
    * \p invalid_id can be used as the default boundary id.
    */
-  short int boundary_id (const Elem* const elem,
-			 const unsigned short int side) const;
+  boundary_id_type boundary_id (const Elem* const elem,
+			        const unsigned short int side) const;
+
+  /**
+   * Returns the number of boundary ids associated with the \p side
+   * side of element \p elem.
+   */
+  unsigned int n_boundary_ids (const Elem* const elem,
+                               const unsigned short int side) const;
 
   /**
    * Returns the list of boundary ids associated with the \p side side of
