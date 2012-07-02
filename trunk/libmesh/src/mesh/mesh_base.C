@@ -87,6 +87,19 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 {
   parallel_only();
 
+  // A distributed mesh may have processors with no elements (or
+  // processors with no elements of higher dimension, if we ever
+  // support mixed-dimension meshes), but we want consistent
+  // mesh_dimension anyways.
+  libmesh_assert(Parallel::verify(this->is_serial()));
+
+  if (!this->is_serial())
+    {
+      unsigned int dim = this->mesh_dimension();
+      Parallel::max(dim);
+      this->set_mesh_dimension(dim);
+    }
+
   // Renumber the nodes and elements so that they in contiguous
   // blocks.  By default, skip_renumber_nodes_and_elements is false,
   // however we may skip this step by passing
