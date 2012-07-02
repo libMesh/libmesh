@@ -73,12 +73,22 @@ friend class TypeTensor<T>;
 protected:
 
   /**
-   * Constructor.  By default sets all entries to 0.  Gives the vector 0 in
-   * \p LIBMESH_DIM dimensions.
+   * Empty constructor.  Gives the vector 0 in \p LIBMESH_DIM
+   * dimensions.
    */
-  TypeVector  (const T x=0.,
-	       const T y=0.,
-	       const T z=0.);
+  TypeVector  ();
+
+
+  /**
+   * Constructor-from-scalars.  By default sets higher dimensional
+   * entries to 0.
+   */
+  template <typename Scalar>
+  TypeVector (const Scalar x,
+	      const Scalar y=0,
+              typename
+                boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                                       const Scalar>::type z=0);
 
 public:
 
@@ -98,6 +108,16 @@ public:
    */
   template <typename T2>
   void assign (const TypeVector<T2> &);
+
+  /**
+   * Assignment-from-scalar operator.  Used only to zero out vectors.
+   */
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    TypeVector&>::type
+  operator = (const Scalar& p)
+  { libmesh_assert(p == Scalar(0)); this->zero(); return *this; }
 
   /**
    * Return the \f$ i^{th} \f$ element of the vector.
@@ -372,23 +392,43 @@ struct MakeNumber<TypeVector<T> >
 
 template <typename T>
 inline
-TypeVector<T>::TypeVector (const T x,
-			   const T y,
-			   const T z)
+TypeVector<T>::TypeVector ()
+{
+  _coords[0] = 0;
+
+#if LIBMESH_DIM > 1
+  _coords[1] = 0;
+#endif 
+
+#if LIBMESH_DIM > 2
+  _coords[2] = 0;
+#endif 
+}
+
+
+
+template <typename T>
+template <typename Scalar>
+inline
+TypeVector<T>::TypeVector (const Scalar x,
+	                   const Scalar y,
+                           typename
+                             boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                                                    const Scalar>::type z)
 {
   _coords[0] = x;
 
-  if (LIBMESH_DIM > 1)
-    {
-      _coords[1] = y;
+#if LIBMESH_DIM > 1
+  _coords[1] = y;
+#else
+  libmesh_assert(y == 0);
+#endif
 
-      if (LIBMESH_DIM == 3)
-	_coords[2] = z;
-      else
-        libmesh_assert(z == 0.);
-    }
-  else
-    libmesh_assert(y == 0.);
+#if LIBMESH_DIM > 2
+  _coords[2] = z;
+#else
+  libmesh_assert(z == 0);
+#endif
 }
 
 
