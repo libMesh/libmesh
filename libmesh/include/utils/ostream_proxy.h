@@ -120,29 +120,29 @@ namespace libMesh
    * Redirect any output to the target.
    */
   template<typename T>
-  streamT& operator<< (const T& in) {
-    return (*_target) << in;
+  BasicOStreamProxy& operator<< (const T& in) {
+    (*_target) << in; return *this;
   }
 
   /**
    * Redirect any ostream manipulators to the target.
    */
-  streamT& operator<< (streamT& (*in)(streamT&)) {
-    return (*_target) << in;
+  BasicOStreamProxy& operator<< (streamT& (*in)(streamT&)) {
+    (*_target) << in; return *this;
   }
 
   /**
    * Redirect any ios manipulators to the target.
    */
-  streamT& operator<< (std::basic_ios<charT,traits>& (*in)(std::basic_ios<charT,traits>&)) {
-    return (*_target) << in;
+  BasicOStreamProxy& operator<< (std::basic_ios<charT,traits>& (*in)(std::basic_ios<charT,traits>&)) {
+    (*_target) << in; return *this;
   }
 
   /**
    * Redirect any ios_base manipulators to the target.
    */
-  streamT& operator<< (std::ios_base& (*in)(std::ios_base&)) {
-    return (*_target) << in;
+  BasicOStreamProxy& operator<< (std::ios_base& (*in)(std::ios_base&)) {
+    (*_target) << in; return *this;
   }
 
   /**
@@ -158,7 +158,7 @@ namespace libMesh
   /**
    * Flush the associated stream buffer
    */
-  streamT& flush () { return _target->flush(); }
+  BasicOStreamProxy& flush () { _target->flush(); return *this; }
 
   /**
    * Get the associated format flags
