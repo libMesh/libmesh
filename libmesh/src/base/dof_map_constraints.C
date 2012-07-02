@@ -191,6 +191,13 @@ using namespace libMesh;
 			       const unsigned int var, const Variable&variable, 
 			       const FEType& fe_type ) const
     {
+      typedef OutputType                                         OutputShape;
+      typedef typename IncrementRank<OutputShape>::type          OutputGradient;
+      typedef typename IncrementRank<OutputGradient>::type       OutputTensor;
+      typedef typename MakeNumber<OutputShape>::type             OutputNumber;
+      typedef typename IncrementRank<OutputNumber>::type         OutputNumberGradient;
+      typedef typename IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
+
       // The dimensionality of the current mesh
       const unsigned int dim = mesh.mesh_dimension();
 
@@ -211,11 +218,11 @@ using namespace libMesh;
       
       // The values of the shape functions at the quadrature
       // points
-      const std::vector<std::vector<OutputType> >& phi = fe->get_phi();
+      const std::vector<std::vector<OutputShape> >& phi = fe->get_phi();
       
       // The gradients of the shape functions at the quadrature
       // points on the child element.
-      const std::vector<std::vector< typename libMesh::FEGenericBase<OutputType>::OutputGradient> > *dphi = NULL;
+      const std::vector<std::vector<OutputGradient> > *dphi = NULL;
       
       const FEContinuity cont = fe->get_continuity();
       
@@ -224,7 +231,7 @@ using namespace libMesh;
 	  // We'll need gradient data for a C1 projection
 	  libmesh_assert(g);
 	  
-	  const std::vector<std::vector<typename libMesh::FEGenericBase<OutputType>::OutputGradient> >&
+	  const std::vector<std::vector<OutputGradient> >&
 	    ref_dphi = fe->get_dphi();
 	  dphi = &ref_dphi;
 	}
@@ -503,15 +510,15 @@ using namespace libMesh;
 		for (unsigned int qp=0; qp<n_qp; qp++)
 		  {
 		    // solution at the quadrature point
-		    OutputType fineval;
-		    libMesh::RawAccessor<OutputType> f_accessor( fineval, dim );
+		    OutputNumber fineval;
+		    libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
 		    for( unsigned int c = 0; c < n_vec_dim; c++)
 		      f_accessor(c) = f->component(var_component+c, xyz_values[qp], time);
 
 		    // solution grad at the quadrature point
-		    typename FEGenericBase<OutputType>::OutputGradient finegrad;
-		    libMesh::RawAccessor< typename FEGenericBase<OutputType>::OutputGradient> g_accessor( finegrad, dim );
+		    OutputNumberGradient finegrad;
+		    libMesh::RawAccessor<OutputNumberGradient> g_accessor( finegrad, dim );
 
 		    unsigned int g_rank;
 		    switch( FEInterface::field_type( fe_type ) )
@@ -623,15 +630,15 @@ using namespace libMesh;
 		for (unsigned int qp=0; qp<n_qp; qp++)
 		  {
 		    // solution at the quadrature point
-		    OutputType fineval;
-		    libMesh::RawAccessor<OutputType> f_accessor( fineval, dim );
+		    OutputNumber fineval;
+		    libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
 		    for( unsigned int c = 0; c < n_vec_dim; c++)
 		      f_accessor(c) = f->component(var_component+c, xyz_values[qp], time);
 
 		    // solution grad at the quadrature point
-		    typename FEGenericBase<OutputType>::OutputGradient finegrad;
-		    libMesh::RawAccessor< typename FEGenericBase<OutputType>::OutputGradient> g_accessor( finegrad, dim );
+		    OutputNumberGradient finegrad;
+		    libMesh::RawAccessor<OutputNumberGradient> g_accessor( finegrad, dim );
 
 		    unsigned int g_rank;
 		    switch( FEInterface::field_type( fe_type ) )
