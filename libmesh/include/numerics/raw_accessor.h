@@ -20,10 +20,14 @@
 #ifndef __raw_accessor_h__
 #define __raw_accessor_h__
 
-namespace libMesh
-{
   // Local includes
 #include "libmesh_common.h"
+
+#include "tensor_value.h"
+#include "vector_value.h"
+
+namespace libMesh
+{
 
   /**
    * This class provides single index access to FieldType (i.e. Number, Gradient, Tensor, etc.).
