@@ -84,7 +84,7 @@ struct A0 : ElasticityAssembly
     const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
         
     DenseSubMatrix<Number>& Kuu = *c.elem_subjacobians[u_var][u_var];
     DenseSubMatrix<Number>& Kuv = *c.elem_subjacobians[u_var][v_var];
@@ -160,7 +160,7 @@ struct A1 : ElasticityAssembly
     const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
         
     DenseSubMatrix<Number>& Kuu = *c.elem_subjacobians[u_var][u_var];
     DenseSubMatrix<Number>& Kuv = *c.elem_subjacobians[u_var][v_var];
@@ -248,7 +248,7 @@ struct A2 : ElasticityAssembly
     const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
 
     // Now we will build the affine operator
-    unsigned int n_qpoints = c.element_qrule->n_points();
+    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
         
     DenseSubMatrix<Number>& Kuu = *c.elem_subjacobians[u_var][u_var];
     DenseSubMatrix<Number>& Kuv = *c.elem_subjacobians[u_var][v_var];
@@ -337,7 +337,7 @@ struct F0 : ElemAssembly
       const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
       // Now we will build the affine operator
-      unsigned int n_qpoints = c.side_qrule->n_points();
+      unsigned int n_qpoints = (c.get_side_qrule())->n_points();
 
       for (unsigned int qp=0; qp != n_qpoints; qp++)
         for (unsigned int i=0; i != n_u_dofs; i++)
@@ -368,7 +368,7 @@ struct F1 : ElemAssembly
       const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
 
       // Now we will build the affine operator
-      unsigned int n_qpoints = c.side_qrule->n_points();
+      unsigned int n_qpoints = (c.get_side_qrule())->n_points();
 
       for (unsigned int qp=0; qp != n_qpoints; qp++)
         for (unsigned int i=0; i != n_v_dofs; i++)

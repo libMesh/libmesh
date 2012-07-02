@@ -30,7 +30,7 @@ void LaplaceSystem::side_postprocess(DiffContext &context)
 
   const std::vector<Point> &face_normals = c.side_fe_var[0]->get_normals();
 
-  unsigned int n_qpoints = c.side_qrule->n_points();  
+  unsigned int n_qpoints = (c.get_side_qrule())->n_points();  
   
   Number dQoI_1 = 0. ;
 

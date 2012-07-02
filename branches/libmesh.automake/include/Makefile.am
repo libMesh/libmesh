@@ -214,6 +214,7 @@ nobase_include_HEADERS = \
 		numerics/petsc_preconditioner.h \
 		numerics/petsc_vector.h \
 		numerics/preconditioner.h \
+		numerics/raw_accessor.h \
 		numerics/refinement_selector.h \
 		numerics/shell_matrix.h \
 		numerics/sparse_matrix.h \

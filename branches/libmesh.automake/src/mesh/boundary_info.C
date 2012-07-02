@@ -18,7 +18,7 @@
 
 
 // C++ includes
-
+#include <iterator>  // std::distance
 
 // Local includes
 #include "libmesh_config.h"
@@ -707,13 +707,24 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids(const Node* node) const
   // A convenient typedef
   typedef std::multimap<const Node*, boundary_id_type>::const_iterator Iter;
 
-  // Don't add the same ID twice
   std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
 
   for (;pos.first != pos.second; ++pos.first)
     ids.push_back(pos.first->second);
 
   return ids;
+}
+
+
+
+unsigned int BoundaryInfo::n_boundary_ids(const Node* node) const
+{
+  // A convenient typedef
+  typedef std::multimap<const Node*, boundary_id_type>::const_iterator Iter;
+
+  std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
+
+  return (std::distance(pos.first, pos.second));
 }
 
 
@@ -826,7 +837,53 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem
   // Whether or not we found anything, return "ids".  If it's empty, it
   // means no valid bounary IDs were found for "side"
   return ids;
+}
 
+
+
+unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
+                                           const unsigned short int side) const
+{
+  libmesh_assert (elem != NULL);
+
+  // Only level-0 elements store BCs.  If this is not a level-0
+  // element get its level-0 parent and infer the BCs.
+  const Elem*  searched_elem = elem;
+  if (elem->level() != 0)
+  {
+    if (elem->neighbor(side) == NULL)
+      searched_elem = elem->top_parent ();
+#ifdef LIBMESH_ENABLE_AMR
+    else
+      while (searched_elem->parent() != NULL)
+	{
+	  const Elem * parent = searched_elem->parent();
+	  if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+	    return 0;
+	  searched_elem = parent;
+	}
+#endif
+  }
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+    e = _boundary_side_id.equal_range(searched_elem);
+
+  unsigned int n_ids = 0;
+
+  // elem is there, maybe multiple occurances
+  while (e.first != e.second)
+    {
+      // if this is true we found the requested side of the element
+      if (e.first->second.first == side)
+        n_ids++;
+
+      ++e.first;
+    }
+
+  return n_ids;
 }
 
 

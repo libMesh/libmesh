@@ -29,7 +29,7 @@ void LaplaceSystem::element_postprocess (DiffContext &context)
 
   // The number of local degrees of freedom in each variable
 
-  unsigned int n_qpoints = c.element_qrule->n_points();
+  unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
   // The function R = int_{omega} T dR 
   // omega is a subset of Omega (the whole domain), omega = [0.75, 1.0] x [0.0, 0.25]

@@ -36,7 +36,7 @@ void LaplaceSystem::side_qoi_derivative (DiffContext &context,
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_T_dofs = c.dof_indices_var[0].size();
-  unsigned int n_qpoints = c.side_qrule->n_points();  
+  unsigned int n_qpoints = (c.get_side_qrule())->n_points();  
 
   // Fill the QoI RHS corresponding to this QoI. Since this is QoI 1
   // we fill in the [1][i] subderivatives, i corresponding to the variable index.

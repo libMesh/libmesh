@@ -27,7 +27,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ./vector_fe_ex1-$(METHOD)
+target 	   := ./vector_fe_ex2-$(METHOD)
 
 
 all:: $(target)
@@ -43,7 +43,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out.gmv out.e
+	@rm -f $(target) out.e
 
 distclean:
 	@$(MAKE) clobber
