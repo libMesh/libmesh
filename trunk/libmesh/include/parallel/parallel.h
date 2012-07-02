@@ -515,10 +515,10 @@ namespace Parallel
       _datatype(type)
     {}
 
-    operator status * ()
+    status * get()
     { return &_status; }
 
-    operator status const * () const
+    status const * get() const
     { return &_status; }
 
 //     operator status & ()
@@ -586,6 +586,9 @@ namespace Parallel
   class Request
   {
   public:
+    // Forward declaration for nested class
+    struct PostWaitWork;
+
     Request () :
 #ifdef LIBMESH_HAVE_MPI
       _request(MPI_REQUEST_NULL)
@@ -604,13 +607,19 @@ namespace Parallel
     Request & operator = (const request &r)
     { _request = r; return *this; }
 
-    ~Request () {}
+    ~Request () {
+      for (std::vector<PostWaitWork*>::iterator i =
+	   post_wait_work.begin(); i != post_wait_work.end(); ++i)
+	delete *i;
+    }
 
+    /*
     operator const request & () const
     { return _request; }
 
     operator request & ()
     { return _request; }
+    */
 
     request* get()
     { return &_request; }
@@ -626,13 +635,17 @@ namespace Parallel
     const request* get() const
     { return &_request; }
 
-    status wait ()
+    Status wait ()
     {
-      status status;
+      Status stat;
 #ifdef LIBMESH_HAVE_MPI
-      MPI_Wait (&_request, &status);
+      MPI_Wait (&_request, stat.get());
 #endif
-      return status;
+      for (std::vector<PostWaitWork*>::iterator i =
+	   post_wait_work.begin(); i != post_wait_work.end(); ++i)
+	(*i)->run();
+
+      return stat;
     }
 
     bool test ()
@@ -673,6 +686,38 @@ namespace Parallel
     }
 #endif
 
+    // Nested class that can be subclassed to allow other code to
+    // perform work after a MPI_Wait succeeds with this request.
+    struct PostWaitWork {
+      virtual void run() {};
+    };
+
+   // PostWaitWork specialization for copying from temporary to output
+   // containers
+    template <typename Container, typename OutputIter>
+    struct PostWaitCopyBuffer : public PostWaitWork {
+      PostWaitCopyBuffer(const Container& buffer, const OutputIter out) 
+        : _buf(buffer), _out(out) {}
+
+      virtual void run() { std::copy(_buf.begin(), _buf.end(), _out); }
+
+      private:
+      const Container& _buf;
+      OutputIter _out;
+    };
+
+   // PostWaitWork specialization for freeing no-longer-needed buffers.
+    template <typename Container>
+    struct PostWaitDeleteBuffer : public PostWaitWork {
+      PostWaitDeleteBuffer(Container* buffer) : _buf(buffer) {}
+
+      virtual void run() { delete _buf; };
+
+      private:
+      Container* _buf;
+    };
+
+    std::vector <PostWaitWork* > post_wait_work;
 
   private:
 
@@ -1193,13 +1238,13 @@ namespace Parallel
   /**
    * Wait for a non-blocking send or receive to finish
    */
-  inline status wait (request &r);
+  inline Status wait (Request &r) { return r.wait(); }
 
   //-------------------------------------------------------------------
   /**
    * Wait for a non-blocking send or receive to finish
    */
-  inline void wait (std::vector<request> &r);
+  // inline void wait (std::vector<request> &r);
 
   //-------------------------------------------------------------------
   /**
@@ -2284,7 +2329,7 @@ namespace Parallel
 		src_processor_id,
 		tag.value(),
 		comm.get(),
-		status);
+		status.get());
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("receive()", "Parallel");
@@ -2350,9 +2395,17 @@ namespace Parallel
   {
     START_LOG("send()", "Parallel");
 
-    std::vector<T> vecbuf(buf.begin(), buf.end());
+    // Allocate temporary buffer on the heap so it lives until after
+    // the non-blocking send completes
+    std::vector<T> *vecbuf =
+      new std::vector<T>(buf.begin(), buf.end());
+
+    // Make the Request::wait() handle deleting the buffer
+    req.post_wait_work.push_back
+      (Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
+
     // Use Parallel::send() so we get its specialization(s)
-    Parallel::send(dest_processor_id, vecbuf, type, req, tag, comm);
+    Parallel::send(dest_processor_id, *vecbuf, type, req, tag, comm);
 
     STOP_LOG("send()", "Parallel");
   }
@@ -2391,17 +2444,33 @@ namespace Parallel
   {
     START_LOG("receive()", "Parallel");
 
-    std::vector<T> vecbuf;
-    // Use Parallel::receive() so we get its specialization(s)
-    Parallel::receive(src_processor_id, vecbuf, type, req, tag, comm);
+    // Allocate temporary buffer on the heap so it lives until after
+    // the non-blocking send completes
+    std::vector<T> *vecbuf =
+      new std::vector<T>(buf.begin(), buf.end());
+
+    // We can clear the set, but the Request::wait() will need to
+    // handle copying our temporary buffer to it
     buf.clear();
-    buf.insert(vecbuf.begin(), vecbuf.end());
+
+    req.post_wait_work.push_back
+      (Parallel::Request::PostWaitCopyBuffer<std::vector<T>,
+         std::back_insert_iterator<std::set<T> > >
+	   (vecbuf, std::back_inserter(buf)));
+
+    // Make the Request::wait() then handle deleting the buffer
+    req.post_wait_work.push_back
+      (Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
+
+    // Use Parallel::receive() so we get its specialization(s)
+    Parallel::receive(src_processor_id, *vecbuf, type, req, tag, comm);
 
     STOP_LOG("receive()", "Parallel");
   }
 
 
 
+  /*
   inline status wait (request &r)
   {
     START_LOG("wait()", "Parallel");
@@ -2425,6 +2494,7 @@ namespace Parallel
 
     STOP_LOG("wait()", "Parallel");
   }
+  */
 
 
 
@@ -3234,9 +3304,9 @@ namespace Parallel
 // 		                   Request &,
 // 		                   const int) {}
 
-  inline status wait (request &) { status status; return status; }
+//  inline status wait (request &) { status status; return status; }
 
-  inline void wait (std::vector<request> &) {}
+//  inline void wait (std::vector<request> &) {}
 
   template <typename T1, typename T2>
   inline void send_receive (const unsigned int send_tgt,
