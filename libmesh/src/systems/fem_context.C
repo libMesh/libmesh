@@ -189,13 +189,14 @@ Number FEMContext::interior_value(unsigned int var, unsigned int qp) const
 {
   Number u = 0.;
 
-  this->interior_value<Number>( var, qp, u );
+  this->interior_value<Real>( var, qp, u );
 
   return u;
 }
 
 template<typename OutputShape> 
-void FEMContext::interior_value(unsigned int var, unsigned int qp, OutputShape& u) const
+void FEMContext::interior_value(unsigned int var, unsigned int qp,
+				typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -228,14 +229,14 @@ Gradient FEMContext::interior_gradient(unsigned int var, unsigned int qp) const
 {
   Gradient du;
 
-  this->interior_gradient<Number>( var, qp, du );
+  this->interior_gradient<Real>( var, qp, du );
 
   return du;
 }
 
 template<typename OutputShape>
 void FEMContext::interior_gradient(unsigned int var, unsigned int qp,
-                                   typename FEGenericBase<OutputShape>::OutputGradient& du) const
+                                   typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -269,14 +270,14 @@ Tensor FEMContext::interior_hessian(unsigned int var, unsigned int qp) const
 {
   Tensor d2u;
 
-  this->interior_hessian<Number>( var, qp, d2u );
+  this->interior_hessian<Real>( var, qp, d2u );
 
   return d2u;
 }
 
 template<typename OutputShape>
 void FEMContext::interior_hessian(unsigned int var, unsigned int qp,
-				  typename FEGenericBase<OutputShape>::OutputTensor& d2u) const
+				  typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -310,14 +311,15 @@ Number FEMContext::side_value(unsigned int var, unsigned int qp) const
 {
   Number u = 0.;
 
-  this->side_value<Number>( var, qp, u );
+  this->side_value<Real>( var, qp, u );
 
   return u;
 }
 
 
 template<typename OutputShape> 
-void FEMContext::side_value(unsigned int var, unsigned int qp, OutputShape& u) const
+void FEMContext::side_value(unsigned int var, unsigned int qp,
+			    typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -350,7 +352,7 @@ Gradient FEMContext::side_gradient(unsigned int var, unsigned int qp) const
 {
   Gradient du;
 
-  this->side_gradient<Number>( var, qp, du );
+  this->side_gradient<Real>( var, qp, du );
 
   return du;
 }
@@ -358,7 +360,7 @@ Gradient FEMContext::side_gradient(unsigned int var, unsigned int qp) const
 
 template<typename OutputShape> 
 void FEMContext::side_gradient(unsigned int var, unsigned int qp, 
-			       typename FEGenericBase<OutputShape>::OutputGradient& du) const
+			       typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -392,14 +394,14 @@ Tensor FEMContext::side_hessian(unsigned int var, unsigned int qp) const
 {
   Tensor d2u;
 
-  this->side_hessian<Number>( var, qp, d2u );
+  this->side_hessian<Real>( var, qp, d2u );
 
   return d2u;
 }
 
 template<typename OutputShape>
 void FEMContext::side_hessian(unsigned int var, unsigned int qp, 
-			      typename FEGenericBase<OutputShape>::OutputTensor& d2u) const
+			      typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -433,13 +435,14 @@ Number FEMContext::point_value(unsigned int var, const Point &p) const
 {
   Number u = 0.;
 
-  this->point_value<Number>( var, p, u );
+  this->point_value<Real>( var, p, u );
 
   return u;
 }
 
 template<typename OutputShape>
-void FEMContext::point_value(unsigned int var, const Point &p, OutputShape& u) const
+void FEMContext::point_value(unsigned int var, const Point &p,
+			     typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -474,7 +477,7 @@ Gradient FEMContext::point_gradient(unsigned int var, const Point &p) const
 {
   Gradient grad_u;
 
-  this->point_gradient<Number>( var, p, grad_u );
+  this->point_gradient<Real>( var, p, grad_u );
 
   return grad_u;
 }
@@ -483,7 +486,7 @@ Gradient FEMContext::point_gradient(unsigned int var, const Point &p) const
 
 template<typename OutputShape>
 void FEMContext::point_gradient(unsigned int var, const Point &p,
-				typename FEGenericBase<OutputShape>::OutputGradient& grad_u) const
+				typename FEGenericBase<OutputShape>::OutputNumberGradient& grad_u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -521,7 +524,7 @@ Tensor FEMContext::point_hessian(unsigned int var, const Point &p) const
 {
   Tensor hess_u;
 
-  this->point_hessian<Number>( var, p, hess_u );
+  this->point_hessian<Real>( var, p, hess_u );
 
   return hess_u;
 }
@@ -529,7 +532,7 @@ Tensor FEMContext::point_hessian(unsigned int var, const Point &p) const
 
 template<typename OutputShape>
 void FEMContext::point_hessian(unsigned int var, const Point &p,
-			       typename FEGenericBase<OutputShape>::OutputTensor& hess_u) const
+			       typename FEGenericBase<OutputShape>::OutputNumberTensor& hess_u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -567,7 +570,7 @@ Number FEMContext::fixed_interior_value(unsigned int var, unsigned int qp) const
 {
   Number u = 0.;
 
-  this->fixed_interior_value<Number>( var, qp, u );
+  this->fixed_interior_value<Real>( var, qp, u );
 
   return u;
 }
@@ -575,7 +578,8 @@ Number FEMContext::fixed_interior_value(unsigned int var, unsigned int qp) const
 
 
 template<typename OutputShape>
-void FEMContext::fixed_interior_value(unsigned int var, unsigned int qp, OutputShape& u) const
+void FEMContext::fixed_interior_value(unsigned int var, unsigned int qp,
+			              typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -608,7 +612,7 @@ Gradient FEMContext::fixed_interior_gradient(unsigned int var, unsigned int qp) 
 {
   Gradient du;
 
-  this->fixed_interior_gradient<Number>( var, qp, du );
+  this->fixed_interior_gradient<Real>( var, qp, du );
 
   return du;
 }
@@ -616,7 +620,7 @@ Gradient FEMContext::fixed_interior_gradient(unsigned int var, unsigned int qp) 
 
 template<typename OutputShape>
 void FEMContext::FEMContext::fixed_interior_gradient(unsigned int var, unsigned int qp,
-						     typename FEGenericBase<OutputShape>::OutputGradient & du) const
+						     typename FEGenericBase<OutputShape>::OutputNumberGradient & du) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -650,7 +654,7 @@ Tensor FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp) con
 {
   Tensor d2u;
 
-  this->fixed_interior_hessian<Number>( var, qp, d2u );
+  this->fixed_interior_hessian<Real>( var, qp, d2u );
 
   return d2u;
 }
@@ -658,7 +662,7 @@ Tensor FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp) con
 
 template<typename OutputShape>
 void FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp,
-					typename FEGenericBase<OutputShape>::OutputTensor& d2u) const
+					typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -692,14 +696,15 @@ Number FEMContext::fixed_side_value(unsigned int var, unsigned int qp) const
 {
   Number u = 0.;
 
-  this->fixed_side_value<Number>( var, qp, u );
+  this->fixed_side_value<Real>( var, qp, u );
 
   return u;
 }
 
 
 template<typename OutputShape> 
-void FEMContext::fixed_side_value(unsigned int var, unsigned int qp, OutputShape& u) const
+void FEMContext::fixed_side_value(unsigned int var, unsigned int qp,
+			          typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -732,7 +737,7 @@ Gradient FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp) cons
 {
   Gradient du;
 
-  this->fixed_side_gradient<Number>( var, qp, du );
+  this->fixed_side_gradient<Real>( var, qp, du );
 
   return du;
 }
@@ -740,7 +745,7 @@ Gradient FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp) cons
 
 template<typename OutputShape> 
 void FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp, 
-				     typename FEGenericBase<OutputShape>::OutputGradient& du) const
+				     typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -774,14 +779,14 @@ Tensor FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp) const
 {
   Tensor d2u;
 
-  this->fixed_side_hessian<Number>( var, qp, d2u );
+  this->fixed_side_hessian<Real>( var, qp, d2u );
 
   return d2u;
 }
 
 template<typename OutputShape> 
 void FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp, 
-				    typename FEGenericBase<OutputShape>::OutputTensor& d2u) const
+				    typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -815,13 +820,14 @@ Number FEMContext::fixed_point_value(unsigned int var, const Point &p) const
 {
   Number u = 0.;
 
-  this->fixed_point_value<Number>( var, p, u );
+  this->fixed_point_value<Real>( var, p, u );
 
   return u;
 }
 
 template<typename OutputShape>
-void FEMContext::fixed_point_value(unsigned int var, const Point &p, OutputShape& u) const
+void FEMContext::fixed_point_value(unsigned int var, const Point &p,
+			           typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -856,7 +862,7 @@ Gradient FEMContext::fixed_point_gradient(unsigned int var, const Point &p) cons
 {
   Gradient grad_u;
 
-  this->fixed_point_gradient<Number>( var, p, grad_u );
+  this->fixed_point_gradient<Real>( var, p, grad_u );
 
   return grad_u;
 }
@@ -865,7 +871,7 @@ Gradient FEMContext::fixed_point_gradient(unsigned int var, const Point &p) cons
 
 template<typename OutputShape>
 void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
-				      typename FEGenericBase<OutputShape>::OutputGradient& grad_u) const
+				      typename FEGenericBase<OutputShape>::OutputNumberGradient& grad_u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -901,7 +907,7 @@ Tensor FEMContext::fixed_point_hessian(unsigned int var, const Point &p) const
 {
   Tensor hess_u;
 
-  this->fixed_point_hessian<Number>( var, p, hess_u );
+  this->fixed_point_hessian<Real>( var, p, hess_u );
 
   return hess_u;
 }
@@ -910,7 +916,7 @@ Tensor FEMContext::fixed_point_hessian(unsigned int var, const Point &p) const
 
 template<typename OutputShape>
 void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
-				     typename FEGenericBase<OutputShape>::OutputTensor& hess_u) const
+				     typename FEGenericBase<OutputShape>::OutputNumberTensor& hess_u) const
 {
   // Get local-to-global dof index lookup
   libmesh_assert (dof_indices.size() > var);
@@ -1295,69 +1301,69 @@ AutoPtr<FEGenericBase<OutputShape> > FEMContext::build_new_fe( const FEGenericBa
 
 
 // Instantiate member function templates
-template void FEMContext::interior_value<Number>(unsigned int, unsigned int, Number&) const;
-template void FEMContext::interior_value<Gradient>(unsigned int, unsigned int, Gradient&) const;
+template void FEMContext::interior_value<Real>(unsigned int, unsigned int, Number&) const;
+template void FEMContext::interior_value<RealGradient>(unsigned int, unsigned int, Gradient&) const;
 
-template void FEMContext::interior_gradient<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputGradient&) const;
-template void FEMContext::interior_gradient<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputGradient&) const;
+template void FEMContext::interior_gradient<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberGradient&) const;
+template void FEMContext::interior_gradient<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
-template void FEMContext::interior_hessian<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputTensor&) const;
+template void FEMContext::interior_hessian<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberTensor&) const;
 
-//FIXME: Not everything is implemented yet for second derivatives of Gradients
-//template void FEMContext::interior_hessian<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputTensor&) const;
+//FIXME: Not everything is implemented yet for second derivatives of RealGradients
+//template void FEMContext::interior_hessian<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberTensor&) const;
 
-template void FEMContext::side_value<Number>(unsigned int, unsigned int, Number&) const;
-template void FEMContext::side_value<Gradient>(unsigned int, unsigned int, Gradient&) const;
+template void FEMContext::side_value<Real>(unsigned int, unsigned int, Number&) const;
+template void FEMContext::side_value<RealGradient>(unsigned int, unsigned int, Gradient&) const;
 
-template void FEMContext::side_gradient<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputGradient&) const;
-template void FEMContext::side_gradient<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputGradient&) const;
+template void FEMContext::side_gradient<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberGradient&) const;
+template void FEMContext::side_gradient<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
-template void FEMContext::side_hessian<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputTensor&) const;
-//FIXME: Not everything is implemented yet for second derivatives of Gradients
-//template void FEMContext::side_hessian<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputTensor&) const;
+template void FEMContext::side_hessian<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberTensor&) const;
+//FIXME: Not everything is implemented yet for second derivatives of RealGradients
+//template void FEMContext::side_hessian<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberTensor&) const;
 
-template void FEMContext::point_value<Number>(unsigned int, const Point&, Number&) const;
-template void FEMContext::point_value<Gradient>(unsigned int, const Point&, Gradient&) const;
+template void FEMContext::point_value<Real>(unsigned int, const Point&, Number&) const;
+template void FEMContext::point_value<RealGradient>(unsigned int, const Point&, Gradient&) const;
 
-template void FEMContext::point_gradient<Number>(unsigned int, const Point&, FEGenericBase<Number>::OutputGradient&) const;
-template void FEMContext::point_gradient<Gradient>(unsigned int, const Point&, FEGenericBase<Gradient>::OutputGradient&) const;
+template void FEMContext::point_gradient<Real>(unsigned int, const Point&, FEGenericBase<Real>::OutputNumberGradient&) const;
+template void FEMContext::point_gradient<RealGradient>(unsigned int, const Point&, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
-template void FEMContext::point_hessian<Number>(unsigned int, const Point&, FEGenericBase<Number>::OutputTensor&) const;
-//FIXME: Not everything is implemented yet for second derivatives of Gradients
-//template void FEMContext::point_hessian<Gradient>(unsigned int, const Point&, FEGenericBase<Gradient>::OutputTensor&) const;
+template void FEMContext::point_hessian<Real>(unsigned int, const Point&, FEGenericBase<Real>::OutputNumberTensor&) const;
+//FIXME: Not everything is implemented yet for second derivatives of RealGradients
+//template void FEMContext::point_hessian<RealGradient>(unsigned int, const Point&, FEGenericBase<RealGradient>::OutputNumberTensor&) const;
 
-template void FEMContext::fixed_interior_value<Number>(unsigned int, unsigned int, Number&) const;
-template void FEMContext::fixed_interior_value<Gradient>(unsigned int, unsigned int, Gradient&) const;
+template void FEMContext::fixed_interior_value<Real>(unsigned int, unsigned int, Number&) const;
+template void FEMContext::fixed_interior_value<RealGradient>(unsigned int, unsigned int, Gradient&) const;
 
-template void FEMContext::fixed_interior_gradient<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputGradient&) const;
-template void FEMContext::fixed_interior_gradient<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputGradient&) const;
+template void FEMContext::fixed_interior_gradient<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberGradient&) const;
+template void FEMContext::fixed_interior_gradient<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
-template void FEMContext::fixed_interior_hessian<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputTensor&) const;
-//FIXME: Not everything is implemented yet for second derivatives of Gradients
-//template void FEMContext::fixed_interior_hessian<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputTensor&) const;
+template void FEMContext::fixed_interior_hessian<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberTensor&) const;
+//FIXME: Not everything is implemented yet for second derivatives of RealGradients
+//template void FEMContext::fixed_interior_hessian<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberTensor&) const;
 
-template void FEMContext::fixed_side_value<Number>(unsigned int, unsigned int, Number&) const;
-template void FEMContext::fixed_side_value<Gradient>(unsigned int, unsigned int, Gradient&) const;
+template void FEMContext::fixed_side_value<Real>(unsigned int, unsigned int, Number&) const;
+template void FEMContext::fixed_side_value<RealGradient>(unsigned int, unsigned int, Gradient&) const;
 
-template void FEMContext::fixed_side_gradient<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputGradient&) const;
-template void FEMContext::fixed_side_gradient<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputGradient&) const;
+template void FEMContext::fixed_side_gradient<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberGradient&) const;
+template void FEMContext::fixed_side_gradient<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
-template void FEMContext::fixed_side_hessian<Number>(unsigned int, unsigned int, FEGenericBase<Number>::OutputTensor&) const;
-//FIXME: Not everything is implemented yet for second derivatives of Gradients
-//template void FEMContext::fixed_side_hessian<Gradient>(unsigned int, unsigned int, FEGenericBase<Gradient>::OutputTensor&) const;
+template void FEMContext::fixed_side_hessian<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberTensor&) const;
+//FIXME: Not everything is implemented yet for second derivatives of RealGradients
+//template void FEMContext::fixed_side_hessian<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputRealTensor&) const;
 
-template void FEMContext::fixed_point_value<Number>(unsigned int, const Point&, Number&) const;
-template void FEMContext::fixed_point_value<Gradient>(unsigned int, const Point&, Gradient&) const;
+template void FEMContext::fixed_point_value<Real>(unsigned int, const Point&, Number&) const;
+template void FEMContext::fixed_point_value<RealGradient>(unsigned int, const Point&, Gradient&) const;
 
-template void FEMContext::fixed_point_gradient<Number>(unsigned int, const Point&, FEGenericBase<Number>::OutputGradient&) const;
-template void FEMContext::fixed_point_gradient<Gradient>(unsigned int, const Point&, FEGenericBase<Gradient>::OutputGradient&) const;
+template void FEMContext::fixed_point_gradient<Real>(unsigned int, const Point&, FEGenericBase<Real>::OutputNumberGradient&) const;
+template void FEMContext::fixed_point_gradient<RealGradient>(unsigned int, const Point&, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
-template void FEMContext::fixed_point_hessian<Number>(unsigned int, const Point&, FEGenericBase<Number>::OutputTensor&) const;
-//FIXME: Not everything is implemented yet for second derivatives of Gradients
-//template void FEMContext::fixed_point_hessian<Gradient>(unsigned int, const Point&, FEGenericBase<Gradient>::OutputTensor&) const;
+template void FEMContext::fixed_point_hessian<Real>(unsigned int, const Point&, FEGenericBase<Real>::OutputNumberTensor&) const;
+//FIXME: Not everything is implemented yet for second derivatives of RealGradients
+//template void FEMContext::fixed_point_hessian<RealGradient>(unsigned int, const Point&, FEGenericBase<RealGradient>::OutputRealTensor&) const;
 
-template AutoPtr<FEGenericBase<Number> > FEMContext::build_new_fe( const FEGenericBase<Number>*, const Point & ) const;
-template AutoPtr<FEGenericBase<Gradient> > FEMContext::build_new_fe( const FEGenericBase<Gradient>*, const Point & ) const;
+template AutoPtr<FEGenericBase<Real> > FEMContext::build_new_fe( const FEGenericBase<Real>*, const Point & ) const;
+template AutoPtr<FEGenericBase<RealGradient> > FEMContext::build_new_fe( const FEGenericBase<RealGradient>*, const Point & ) const;
 
 
 } // namespace libMesh
