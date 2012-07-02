@@ -84,6 +84,14 @@ namespace {
 }
 
 
+#ifdef LIBMESH_HAVE_MPI
+void libMesh_MPI_Handler (MPI_Comm *, int *, ...)
+{
+	  libmesh_error();
+}
+#endif
+
+
 namespace libMesh
 {
 
@@ -149,6 +157,8 @@ const Number       imaginary (0., 1.);
 // ------------------------------------------------------------
 // libMesh::libMeshPrivateData data initialization
 #ifdef LIBMESH_HAVE_MPI
+MPI_Errhandler libmesh_errhandler;
+
 int           libMesh::libMeshPrivateData::_n_processors = 1;
 int           libMesh::libMeshPrivateData::_processor_id = 0;
 #endif
@@ -269,6 +279,15 @@ void _init (int &argc, char** & argv,
 
       libMeshPrivateData::_processor_id = Parallel::Communicator_World.rank();
       libMeshPrivateData::_n_processors = Parallel::Communicator_World.size();
+
+      // Set up an MPI error handler if requested.  This helps us get
+      // into a debugger with a proper stack when an MPI error occurs.
+      if (libMesh::on_command_line ("--handle-mpi-errors"))
+        {
+	  MPI_Errhandler_create(libMesh_MPI_Handler, &libmesh_errhandler);
+	  MPI_Errhandler_set(libMesh::COMM_WORLD, libmesh_errhandler);
+	  MPI_Errhandler_set(MPI_COMM_WORLD, libmesh_errhandler);
+        }
     }
 
   // Could we have gotten bad values from the above calls?
