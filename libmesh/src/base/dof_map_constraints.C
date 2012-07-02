@@ -782,12 +782,12 @@ using namespace libMesh;
 	    {
 	    case TYPE_SCALAR:
 	      {
-		this->apply_dirichlet_impl<Number>( range, f, g, b, Ke, Fe, Ue, var, variable, fe_type );
+		this->apply_dirichlet_impl<Real>( range, f, g, b, Ke, Fe, Ue, var, variable, fe_type );
 		break;
 	      }
 	    case TYPE_VECTOR:
 	      {
-		this->apply_dirichlet_impl<Gradient>( range, f, g, b, Ke, Fe, Ue, var, variable, fe_type );
+		this->apply_dirichlet_impl<RealGradient>( range, f, g, b, Ke, Fe, Ue, var, variable, fe_type );
 		break;
 	      }
 	    default:
