@@ -55,20 +55,29 @@ friend class TypeTensor;
 protected:
 
   /**
-   * Constructor.  By default sets all entries to 0.  Gives the tensor 0 in
-   * \p LIBMESH_DIM dimensions.  This is a poor constructor for 2D tensors -
-   * if the default arguments are to be overridden it requires that
-   * the "z = 0." argument also be given explicitly.
+   * Empty constructor.  Gives the tensor 0 in \p LIBMESH_DIM
+   * dimensions.
    */
-  TypeTensor  (const T xx=0.,
-	       const T xy=0.,
-	       const T xz=0.,
-	       const T yx=0.,
-	       const T yy=0.,
-	       const T yz=0.,
-	       const T zx=0.,
-	       const T zy=0.,
-	       const T zz=0.);
+  TypeTensor  ();
+
+  /**
+   * Constructor.  By default sets higher dimensional entries to 0.
+   * This is a poor constructor for 2D tensors - if the default
+   * arguments are to be overridden it requires that the "xz = 0."
+   * etc. arguments also be given explicitly.
+   */
+  template <typename Scalar>
+  explicit TypeTensor  (const Scalar xx,
+	                const Scalar xy=0,
+	                const Scalar xz=0,
+	                const Scalar yx=0,
+	                const Scalar yy=0,
+	                const Scalar yz=0,
+	                const Scalar zx=0,
+	                const Scalar zy=0,
+                        typename
+                          boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                                                 const Scalar>::type zz=0);
 
   /**
    * Constructor.  Assigns each vector to a different row of the
@@ -102,6 +111,16 @@ public:
    */
   template<typename T2>
   void assign (const TypeTensor<T2> &);
+
+  /**
+   * Assignment-from-scalar operator.  Used only to zero out vectors.
+   */
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    TypeTensor&>::type
+  operator = (const Scalar& p)
+  { libmesh_assert(p == Scalar(0)); this->zero(); return *this; }
 
   /**
    * Return the \f$ i,j^{th} \f$ element of the tensor.
@@ -403,36 +422,61 @@ struct MakeNumber<TypeTensor<T> >
 // Inline functions
 template <typename T>
 inline
-TypeTensor<T>::TypeTensor (const T xx,
-	                   const T xy,
-	                   const T xz,
-	                   const T yx,
-	                   const T yy,
-	                   const T yz,
-	                   const T zx,
-	                   const T zy,
-	                   const T zz)
+TypeTensor<T>::TypeTensor ()
+{
+  _coords[0] = 0;
+
+#if LIBMESH_DIM > 1
+  _coords[1] = 0;
+  _coords[2] = 0;
+  _coords[3] = 0;
+#endif
+
+#if LIBMESH_DIM > j
+  _coords[4] = 0;
+  _coords[5] = 0;
+  _coords[6] = 0;
+  _coords[7] = 0;
+  _coords[8] = 0;
+#endif
+}
+
+
+
+template <typename T>
+template <typename Scalar>
+inline
+TypeTensor<T>::TypeTensor
+  (const Scalar xx,
+   const Scalar xy,
+   const Scalar xz,
+   const Scalar yx,
+   const Scalar yy,
+   const Scalar yz,
+   const Scalar zx,
+   const Scalar zy,
+   typename
+     boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                            const Scalar>::type zz)
 {
   _coords[0] = xx;
 
-  if (LIBMESH_DIM == 2)
-    {
-      _coords[1] = xy;
-      _coords[2] = yx;
-      _coords[3] = yy;
-    }
+#if LIBMESH_DIM == 2
+  _coords[1] = xy;
+  _coords[2] = yx;
+  _coords[3] = yy;
+#endif
 
-  if (LIBMESH_DIM == 3)
-    {
-      _coords[1] = xy;
-      _coords[2] = xz;
-      _coords[3] = yx;
-      _coords[4] = yy;
-      _coords[5] = yz;
-      _coords[6] = zx;
-      _coords[7] = zy;
-      _coords[8] = zz;
-    }
+#if LIBMESH_DIM == 3
+  _coords[1] = xy;
+  _coords[2] = xz;
+  _coords[3] = yx;
+  _coords[4] = yy;
+  _coords[5] = yz;
+  _coords[6] = zx;
+  _coords[7] = zy;
+  _coords[8] = zz;
+#endif
 }
 
 

@@ -50,18 +50,28 @@ class TensorValue : public TypeTensor<T>
 {
 public:
 
-  /**
-   * Constructor.  By default sets all entries to 0.
+ /**
+   * Empty constructor.
+   * Gives the tensor 0 in \p LIBMESH_DIM dimensional T space.
    */
-  TensorValue  (const T xx=0.,
-		const T xy=0.,
-		const T xz=0.,
-		const T yx=0.,
-		const T yy=0.,
-		const T yz=0.,
-		const T zx=0.,
-		const T zy=0.,
-		const T zz=0.);
+  TensorValue  ();
+
+  /**
+   * Constructor-from-scalars.  By default sets higher dimensional
+   * entries to 0.
+   */
+  template <typename Scalar>
+  explicit TensorValue  (const Scalar xx,
+		         const Scalar xy=0,
+		         const Scalar xz=0,
+		         const Scalar yx=0,
+		         const Scalar yy=0,
+		         const Scalar yz=0,
+		         const Scalar zx=0,
+		         const Scalar zy=0,
+                         typename
+                           boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                                                  const Scalar>::type zz=0);
 
   /**
    * Constructor.  Takes 1 row vector for LIBMESH_DIM=1
@@ -106,6 +116,17 @@ public:
 #endif
 
 
+  /**
+   * Assignment-from-scalar operator.  Used only to zero out tensors.
+   */
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    TensorValue&>::type
+  operator = (const Scalar& p)
+  { libmesh_assert(p == Scalar(0)); this->zero(); return *this; }
+
+
 private:
 
 
@@ -128,15 +149,28 @@ typedef NumberTensorValue   Tensor;
 // Inline functions
 template <typename T>
 inline
-TensorValue<T>::TensorValue (const T xx,
-			     const T xy,
-			     const T xz,
-			     const T yx,
-			     const T yy,
-			     const T yz,
-			     const T zx,
-			     const T zy,
-			     const T zz) :
+TensorValue<T>::TensorValue () :
+  TypeTensor<T> ()
+{
+}
+
+
+
+template <typename T>
+template <typename Scalar>
+inline
+TensorValue<T>::TensorValue
+  (const Scalar xx,
+   const Scalar xy,
+   const Scalar xz,
+   const Scalar yx,
+   const Scalar yy,
+   const Scalar yz,
+   const Scalar zx,
+   const Scalar zy,
+   typename
+     boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                            const Scalar>::type zz) :
   TypeTensor<T> (xx,xy,xz,yx,yy,yz,zx,zy,zz)
 {
 }
