@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <cstddef>
+#include <iterator>
 #include <map>
 #include <set>
 #include <string>
@@ -2446,8 +2447,7 @@ namespace Parallel
 
     // Allocate temporary buffer on the heap so it lives until after
     // the non-blocking send completes
-    std::vector<T> *vecbuf =
-      new std::vector<T>(buf.begin(), buf.end());
+    std::vector<T> *vecbuf = new std::vector<T>();
 
     // We can clear the set, but the Request::wait() will need to
     // handle copying our temporary buffer to it
