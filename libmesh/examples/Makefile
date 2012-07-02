@@ -5,7 +5,7 @@ LIBMESH_DIR ?= ..
 # us access to the $(METHOD) variable for building the examples.
 include $(LIBMESH_DIR)/Make.common
 
-makefilelist := $(wildcard */*ex?/Makefile */*ex??/Makefile)
+makefilelist := $(sort $(wildcard */*ex?/Makefile */*ex??/Makefile))
 dirlist := $(patsubst %/Makefile, %/, $(makefilelist))
 exec_names := $(patsubst %/, %-$(METHOD), $(dirlist))
 
