@@ -2809,7 +2809,7 @@ namespace Parallel
       sendlengths  (comm.size(), 0),
       displacements(comm.size(), 0);
 
-    const int mysize = r.size();
+    const int mysize = static_cast<int>(r.size());
     Parallel::allgather(mysize, sendlengths, comm);
 
     START_LOG("gather()", "Parallel");
@@ -2945,7 +2945,7 @@ namespace Parallel
       sendlengths  (comm.size(), 0),
       displacements(comm.size(), 0);
 
-    const int mysize = r.size();
+    const int mysize = static_cast<int>(r.size());
     Parallel::allgather(mysize, sendlengths, comm);
 
     // Find the total size of the final array and
