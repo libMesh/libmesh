@@ -142,7 +142,7 @@ struct EimTestRBThetaExpansion : RBThetaExpansion
    */
   EimTestRBThetaExpansion()
   {
-    attach_theta_q_a(&theta_a_0);
+    attach_A_theta(&theta_a_0);
   }
 
   // The RBTheta member variables
@@ -158,7 +158,7 @@ struct EimTestRBAssemblyExpansion : RBAssemblyExpansion
    */
   EimTestRBAssemblyExpansion()
   {
-    attach_A_q_assembly(&A0_assembly);
+    attach_A_assembly(&A0_assembly);
   }
 
   // A0 assembly object

@@ -55,31 +55,31 @@ public:
   typedef RBThetaExpansion Parent;
 
   /**
-   * Evaluate theta_q_m at the current parameter. Overload
+   * Evaluate theta at the current parameter. Overload
    * if the theta functions need to be treated differently
    * in subclasses.
    */
-  virtual Number eval_theta_q_m(unsigned int q,
-                                const RBParameters& mu);
+  virtual Number eval_M_theta(unsigned int q,
+                              const RBParameters& mu);
 
   /**
    * Get Q_m, the number of terms in the affine
    * expansion for the mass operator.
    */
-  virtual unsigned int get_Q_m() { return theta_q_m_vector.size(); }
+  virtual unsigned int get_n_M_terms() { return _M_theta_vector.size(); }
 
   /**
    * Attach a pointer to a functor object that defines one
    * of the theta_q_m terms.
    */
-  virtual void attach_theta_q_m(RBTheta* theta_q_m);
+  virtual void attach_M_theta(RBTheta* theta_q_m);
 
-  // -------- Data members --------
+private:
 
   /**
    * Vector storing the pointers to the RBTheta functors.
    */
-  std::vector<RBTheta*> theta_q_m_vector;
+  std::vector<RBTheta*> _M_theta_vector;
 
 };
 

@@ -389,11 +389,11 @@ struct ElasticityThetaExpansion : RBThetaExpansion
   ElasticityThetaExpansion()
   {
     // set up the RBThetaExpansion object
-    attach_theta_q_a(&theta_a_0);
-    attach_theta_q_a(&theta_a_1);
-    attach_theta_q_a(&theta_a_2);
-    attach_theta_q_f(&theta_f_0);
-    attach_theta_q_f(&theta_f_1);
+    attach_A_theta(&theta_a_0);
+    attach_A_theta(&theta_a_1);
+    attach_A_theta(&theta_a_2);
+    attach_F_theta(&theta_f_0);
+    attach_F_theta(&theta_f_1);
   }
 
   // The RBTheta member variables
@@ -414,11 +414,11 @@ struct ElasticityAssemblyExpansion : RBAssemblyExpansion
   ElasticityAssemblyExpansion()
   {
     // And set up the RBAssemblyExpansion object
-    attach_A_q_assembly(&A0_assembly);
-    attach_A_q_assembly(&A1_assembly);
-    attach_A_q_assembly(&A2_assembly);
-    attach_F_q_assembly(&F0_assembly);
-    attach_F_q_assembly(&F1_assembly);
+    attach_A_assembly(&A0_assembly);
+    attach_A_assembly(&A1_assembly);
+    attach_A_assembly(&A2_assembly);
+    attach_F_assembly(&F0_assembly);
+    attach_F_assembly(&F1_assembly);
   }
 
   // The ElemAssembly objects

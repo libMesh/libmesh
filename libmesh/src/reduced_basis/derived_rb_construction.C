@@ -35,7 +35,7 @@ DerivedRBConstruction<Base>::DerivedRBConstruction (EquationSystems& es,
   // We do not want to compute the output dual norms in
   // a derived system, we just copy them over from the
   // primary system
-  Base::output_dual_norms_computed = true;
+  Base::output_dual_innerprods_computed = true;
 }
 
 template <class Base>

@@ -155,7 +155,7 @@ protected:
    * to determine the dual norm of the residual. Overloaded
    * here for the two-stage RB method.
    */
-  virtual void compute_Fq_representor_norms(bool compute_inner_products=true);
+  virtual void compute_Fq_representor_innerprods(bool compute_inner_products=true);
 
   /**
    * Compute the terms that are combined `online'

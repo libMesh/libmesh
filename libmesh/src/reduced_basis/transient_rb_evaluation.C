@@ -85,9 +85,9 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
-  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
-  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
+  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
+  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
+  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
 
   // Allocate dense matrices for RB solves
   RB_M_q_vector.resize(Q_m);
@@ -111,37 +111,37 @@ void TransientRBEvaluation::resize_data_structures(const unsigned int Nmax,
   if(resize_error_bound_data)
   {
     // Initialize vectors for the norms of the representors
-    Fq_Mq_representor_norms.resize(Q_f);
+    Fq_Mq_representor_innerprods.resize(Q_f);
     for(unsigned int i=0; i<Q_f; i++)
     {
-      Fq_Mq_representor_norms[i].resize(Q_m);
+      Fq_Mq_representor_innerprods[i].resize(Q_m);
       for(unsigned int j=0; j<Q_m; j++)
       {
-        Fq_Mq_representor_norms[i][j].resize(Nmax, 0.);
+        Fq_Mq_representor_innerprods[i][j].resize(Nmax, 0.);
       }
     }
 
     unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
-    Mq_Mq_representor_norms.resize(Q_m_hat);
+    Mq_Mq_representor_innerprods.resize(Q_m_hat);
     for(unsigned int i=0; i<Q_m_hat; i++)
     {
-      Mq_Mq_representor_norms[i].resize(Nmax);
+      Mq_Mq_representor_innerprods[i].resize(Nmax);
       for(unsigned int j=0; j<Nmax; j++)
       {
-        Mq_Mq_representor_norms[i][j].resize(Nmax, 0.);
+        Mq_Mq_representor_innerprods[i][j].resize(Nmax, 0.);
       }
     }
 
-    Aq_Mq_representor_norms.resize(Q_a);
+    Aq_Mq_representor_innerprods.resize(Q_a);
     for(unsigned int i=0; i<Q_a; i++)
     {
-      Aq_Mq_representor_norms[i].resize(Q_m);
+      Aq_Mq_representor_innerprods[i].resize(Q_m);
       for(unsigned int j=0; j<Q_m; j++)
       {
-        Aq_Mq_representor_norms[i][j].resize(Nmax);
+        Aq_Mq_representor_innerprods[i][j].resize(Nmax);
         for(unsigned int k=0; k<Nmax; k++)
         {
-          Aq_Mq_representor_norms[i][j][k].resize(Nmax, 0.);
+          Aq_Mq_representor_innerprods[i][j][k].resize(Nmax, 0.);
         }
       }
     }
@@ -191,9 +191,9 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
-  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
-  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
+  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
+  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
+  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
 
   const unsigned int n_time_steps = temporal_discretization.get_n_time_steps();
   const Real dt                   = temporal_discretization.get_delta_t();
@@ -216,7 +216,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
   for(unsigned int q_m=0; q_m<Q_m; q_m++)
   {
     RB_M_q_vector[q_m].get_principal_submatrix(N, RB_M_q_m);
-    RB_mass_matrix_N.add(trans_theta_expansion.eval_theta_q_m(q_m, mu), RB_M_q_m);
+    RB_mass_matrix_N.add(trans_theta_expansion.eval_M_theta(q_m, mu), RB_M_q_m);
   }
 
   DenseMatrix<Number> RB_LHS_matrix(N,N);
@@ -228,13 +228,13 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
   RB_LHS_matrix.add(1./dt, RB_mass_matrix_N);
   RB_RHS_matrix.add(1./dt, RB_mass_matrix_N);
 
-  DenseMatrix<Number> RB_A_q_a;
+  DenseMatrix<Number> RB_Aq_a;
   for(unsigned int q_a=0; q_a<Q_a; q_a++)
   {
-    RB_A_q_vector[q_a].get_principal_submatrix(N, RB_A_q_a);
+    RB_Aq_vector[q_a].get_principal_submatrix(N, RB_Aq_a);
 
-    RB_LHS_matrix.add(       euler_theta*trans_theta_expansion.eval_theta_q_a(q_a,mu), RB_A_q_a);
-    RB_RHS_matrix.add( -(1.-euler_theta)*trans_theta_expansion.eval_theta_q_a(q_a,mu), RB_A_q_a);
+    RB_LHS_matrix.add(       euler_theta*trans_theta_expansion.eval_A_theta(q_a,mu), RB_Aq_a);
+    RB_RHS_matrix.add( -(1.-euler_theta)*trans_theta_expansion.eval_A_theta(q_a,mu), RB_Aq_a);
   }
 
   // Set system time level to 0
@@ -270,10 +270,10 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
   for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
   {
     RB_outputs_all_k[n][0] = 0.;
-    for(unsigned int q_l=0; q_l<trans_theta_expansion.get_Q_l(n); q_l++)
+    for(unsigned int q_l=0; q_l<trans_theta_expansion.get_n_output_terms(n); q_l++)
     {
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-      RB_outputs_all_k[n][0] += trans_theta_expansion.eval_theta_q_l(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
+      RB_outputs_all_k[n][0] += trans_theta_expansion.eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
     }
   }
 
@@ -295,10 +295,10 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
     for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
     {
       RB_outputs_all_k[n][0] = 0.;
-      for(unsigned int q_l=0; q_l<trans_theta_expansion.get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<trans_theta_expansion.get_n_output_terms(n); q_l++)
       {
         RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-        RB_outputs_all_k[n][0] += trans_theta_expansion.eval_theta_q_l(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
+        RB_outputs_all_k[n][0] += trans_theta_expansion.eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
       }
 
       RB_output_error_bounds_all_k[n][0] = error_bound_all_k[0] * eval_output_dual_norm(n,mu);
@@ -319,11 +319,11 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
     RB_RHS_matrix.vector_mult(RB_rhs, old_RB_solution);
 
     // Add forcing terms
-    DenseVector<Number> RB_F_q_f;
+    DenseVector<Number> RB_Fq_f;
     for(unsigned int q_f=0; q_f<Q_f; q_f++)
     {
-      RB_F_q_vector[q_f].get_principal_subvector(N, RB_F_q_f);
-      RB_rhs.add(trans_theta_expansion.eval_theta_q_f(q_f,mu), RB_F_q_f);
+      RB_Fq_vector[q_f].get_principal_subvector(N, RB_Fq_f);
+      RB_rhs.add(trans_theta_expansion.eval_F_theta(q_f,mu), RB_Fq_f);
     }
 
     if(N > 0)
@@ -339,10 +339,10 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
     for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
     {
       RB_outputs_all_k[n][time_level] = 0.;
-      for(unsigned int q_l=0; q_l<trans_theta_expansion.get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<trans_theta_expansion.get_n_output_terms(n); q_l++)
       {
         RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-        RB_outputs_all_k[n][time_level] += trans_theta_expansion.eval_theta_q_l(n,q_l,mu)*
+        RB_outputs_all_k[n][time_level] += trans_theta_expansion.eval_output_theta(n,q_l,mu)*
                                            RB_output_vector_N.dot(RB_solution);
       }
     }
@@ -409,20 +409,20 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
-  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
-  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
+  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
+  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
+  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
 
   cached_Fq_term = 0.;
   unsigned int q=0;
   for(unsigned int q_f1=0; q_f1<Q_f; q_f1++)
   {
-    Number cached_theta_q_f1 = trans_theta_expansion.eval_theta_q_f(q_f1,mu);
+    Number cached_theta_q_f1 = trans_theta_expansion.eval_F_theta(q_f1,mu);
     for(unsigned int q_f2=q_f1; q_f2<Q_f; q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
-      cached_Fq_term += delta*cached_theta_q_f1*trans_theta_expansion.eval_theta_q_f(q_f2,mu) *
-                        Fq_representor_norms[q];
+      cached_Fq_term += delta*cached_theta_q_f1*trans_theta_expansion.eval_F_theta(q_f2,mu) *
+                        Fq_representor_innerprods[q];
 
       q++;
     }
@@ -431,14 +431,14 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   cached_Fq_Aq_vector.resize(N);
   for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
-    Number cached_theta_q_f = trans_theta_expansion.eval_theta_q_f(q_f,mu);
+    Number cached_theta_q_f = trans_theta_expansion.eval_F_theta(q_f,mu);
     for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
-      Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a,mu);
+      Number cached_theta_q_a = trans_theta_expansion.eval_A_theta(q_a,mu);
       for(unsigned int i=0; i<N; i++)
       {
         cached_Fq_Aq_vector(i) += 2.*cached_theta_q_f*cached_theta_q_a*
-                                  Fq_Aq_representor_norms[q_f][q_a][i];
+                                  Fq_Aq_representor_innerprods[q_f][q_a][i];
       }
     }
   }
@@ -447,10 +447,10 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   q=0;
   for(unsigned int q_a1=0; q_a1<Q_a; q_a1++)
   {
-    Number cached_theta_q_a1 = trans_theta_expansion.eval_theta_q_a(q_a1,mu);
+    Number cached_theta_q_a1 = trans_theta_expansion.eval_A_theta(q_a1,mu);
     for(unsigned int q_a2=q_a1; q_a2<Q_a; q_a2++)
     {
-      Number cached_theta_q_a2 = trans_theta_expansion.eval_theta_q_a(q_a2,mu);
+      Number cached_theta_q_a2 = trans_theta_expansion.eval_A_theta(q_a2,mu);
       Real delta = (q_a1==q_a2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -459,7 +459,7 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
         {
           cached_Aq_Aq_matrix(i,j) += delta*
                                       cached_theta_q_a1*cached_theta_q_a2*
-                                      Aq_Aq_representor_norms[q][i][j];
+                                      Aq_Aq_representor_innerprods[q][i][j];
         }
       }
       q++;
@@ -469,13 +469,13 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   cached_Fq_Mq_vector.resize(N);
   for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
-    Number cached_theta_q_f = trans_theta_expansion.eval_theta_q_f(q_f,mu);
+    Number cached_theta_q_f = trans_theta_expansion.eval_F_theta(q_f,mu);
     for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
-      Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m,mu);
+      Number cached_theta_q_m = trans_theta_expansion.eval_M_theta(q_m,mu);
       for(unsigned int i=0; i<N; i++)
       {
-        cached_Fq_Mq_vector(i) += 2.*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_norms[q_f][q_m][i];
+        cached_Fq_Mq_vector(i) += 2.*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_innerprods[q_f][q_m][i];
       }
     }
   }
@@ -483,17 +483,17 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   cached_Aq_Mq_matrix.resize(N,N);
   for(unsigned int q_a=0; q_a<Q_a; q_a++)
   {
-    Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a,mu);
+    Number cached_theta_q_a = trans_theta_expansion.eval_A_theta(q_a,mu);
 
     for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
-      Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m,mu);
+      Number cached_theta_q_m = trans_theta_expansion.eval_M_theta(q_m,mu);
 
       for(unsigned int i=0; i<N; i++)
       {
         for(unsigned int j=0; j<N; j++)
         {
-          cached_Aq_Mq_matrix(i,j) += 2.*cached_theta_q_a*cached_theta_q_m*Aq_Mq_representor_norms[q_a][q_m][i][j];
+          cached_Aq_Mq_matrix(i,j) += 2.*cached_theta_q_a*cached_theta_q_m*Aq_Mq_representor_innerprods[q_a][q_m][i][j];
         }
       }
     }
@@ -503,10 +503,10 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
   q=0;
   for(unsigned int q_m1=0; q_m1<Q_m; q_m1++)
   {
-    Number cached_theta_q_m1 = trans_theta_expansion.eval_theta_q_m(q_m1,mu);
+    Number cached_theta_q_m1 = trans_theta_expansion.eval_M_theta(q_m1,mu);
     for(unsigned int q_m2=q_m1; q_m2<Q_m; q_m2++)
     {
-      Number cached_theta_q_m2 = trans_theta_expansion.eval_theta_q_m(q_m2,mu);
+      Number cached_theta_q_m2 = trans_theta_expansion.eval_M_theta(q_m2,mu);
       Real delta = (q_m1==q_m2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -515,7 +515,7 @@ void TransientRBEvaluation::cache_online_residual_terms(const unsigned int N)
         {
           cached_Mq_Mq_matrix(i,j) += delta*
                                       cached_theta_q_m1*cached_theta_q_m2*
-                                      Mq_Mq_representor_norms[q][i][j];
+                                      Mq_Mq_representor_innerprods[q][i][j];
         }
       }
       q++;
@@ -586,9 +586,9 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
-  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
-  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
+  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
+  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
+  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
 
   const Real dt          = temporal_discretization.get_delta_t();
   const Real euler_theta = temporal_discretization.get_euler_theta();
@@ -607,11 +607,11 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   unsigned int q=0;
   for(unsigned int q_f1=0; q_f1<Q_f; q_f1++)
   {
-    Number cached_theta_q_f1 = trans_theta_expansion.eval_theta_q_f(q_f1,mu);
+    Number cached_theta_q_f1 = trans_theta_expansion.eval_F_theta(q_f1,mu);
     for(unsigned int q_f2=q_f1; q_f2<Q_f; q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
-      residual_norm_sq += delta*cached_theta_q_f1*trans_theta_expansion.eval_theta_q_f(q_f2,mu) * Fq_representor_norms[q];
+      residual_norm_sq += delta*cached_theta_q_f1*trans_theta_expansion.eval_F_theta(q_f2,mu) * Fq_representor_innerprods[q];
 
       q++;
     }
@@ -619,14 +619,14 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
 
   for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
-    Number cached_theta_q_f = trans_theta_expansion.eval_theta_q_f(q_f,mu);
+    Number cached_theta_q_f = trans_theta_expansion.eval_F_theta(q_f,mu);
     for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
-      Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a,mu);
+      Number cached_theta_q_a = trans_theta_expansion.eval_A_theta(q_a,mu);
       for(unsigned int i=0; i<N; i++)
       {
         residual_norm_sq += 2.*RB_u_euler_theta[i]*cached_theta_q_f*cached_theta_q_a*
-                               Fq_Aq_representor_norms[q_f][q_a][i];
+                               Fq_Aq_representor_innerprods[q_f][q_a][i];
       }
     }
   }
@@ -634,10 +634,10 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   q=0;
   for(unsigned int q_a1=0; q_a1<Q_a; q_a1++)
   {
-    Number cached_theta_q_a1 = trans_theta_expansion.eval_theta_q_a(q_a1,mu);
+    Number cached_theta_q_a1 = trans_theta_expansion.eval_A_theta(q_a1,mu);
     for(unsigned int q_a2=q_a1; q_a2<Q_a; q_a2++)
     {
-      Number cached_theta_q_a2 = trans_theta_expansion.eval_theta_q_a(q_a2,mu);
+      Number cached_theta_q_a2 = trans_theta_expansion.eval_A_theta(q_a2,mu);
       Real delta = (q_a1==q_a2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -646,7 +646,7 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
         {
           residual_norm_sq += delta*RB_u_euler_theta[i]*RB_u_euler_theta[j]*
                               cached_theta_q_a1*cached_theta_q_a2*
-                              Aq_Aq_representor_norms[q][i][j];
+                              Aq_Aq_representor_innerprods[q][i][j];
         }
       }
       q++;
@@ -657,10 +657,10 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
   q=0;
   for(unsigned int q_m1=0; q_m1<Q_m; q_m1++)
   {
-    Number cached_theta_q_m1 = trans_theta_expansion.eval_theta_q_m(q_m1,mu);
+    Number cached_theta_q_m1 = trans_theta_expansion.eval_M_theta(q_m1,mu);
     for(unsigned int q_m2=q_m1; q_m2<Q_m; q_m2++)
     {
-      Number cached_theta_q_m2 = trans_theta_expansion.eval_theta_q_m(q_m2,mu);
+      Number cached_theta_q_m2 = trans_theta_expansion.eval_M_theta(q_m2,mu);
       Real delta = (q_m1==q_m2) ? 1. : 2.;
 
       for(unsigned int i=0; i<N; i++)
@@ -669,7 +669,7 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
         {
           residual_norm_sq += delta*mass_coeffs[i]*mass_coeffs[j]*
                               cached_theta_q_m1*cached_theta_q_m2*
-                              Mq_Mq_representor_norms[q][i][j];
+                              Mq_Mq_representor_innerprods[q][i][j];
         }
       }
       q++;
@@ -678,24 +678,24 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
 
   for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
-    Number cached_theta_q_f = trans_theta_expansion.eval_theta_q_f(q_f,mu);
+    Number cached_theta_q_f = trans_theta_expansion.eval_F_theta(q_f,mu);
     for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
-      Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m,mu);
+      Number cached_theta_q_m = trans_theta_expansion.eval_M_theta(q_m,mu);
       for(unsigned int i=0; i<N; i++)
       {
-        residual_norm_sq += 2.*mass_coeffs[i]*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_norms[q_f][q_m][i];
+        residual_norm_sq += 2.*mass_coeffs[i]*cached_theta_q_f * cached_theta_q_m * Fq_Mq_representor_innerprods[q_f][q_m][i];
       }
     }
   }
 
   for(unsigned int q_a=0; q_a<Q_a; q_a++)
   {
-    Number cached_theta_q_a = trans_theta_expansion.eval_theta_q_a(q_a,mu);
+    Number cached_theta_q_a = trans_theta_expansion.eval_A_theta(q_a,mu);
 
     for(unsigned int q_m=0; q_m<Q_m; q_m++)
     {
-      Number cached_theta_q_m = trans_theta_expansion.eval_theta_q_m(q_m,mu);
+      Number cached_theta_q_m = trans_theta_expansion.eval_M_theta(q_m,mu);
 
       for(unsigned int i=0; i<N; i++)
       {
@@ -703,7 +703,7 @@ Real TransientRBEvaluation::uncached_compute_residual_dual_norm(const unsigned i
         {
           residual_norm_sq += 2.*RB_u_euler_theta[i]*mass_coeffs[j]*
                                          cached_theta_q_a*cached_theta_q_m*
-                                         Aq_Mq_representor_norms[q_a][q_m][i][j];
+                                         Aq_Mq_representor_innerprods[q_a][q_m][i][j];
         }
       }
     }
@@ -738,9 +738,9 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
-  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
-  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
+  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
+  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
+  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
 
   const unsigned int n_bfs = get_n_basis_functions();
 
@@ -809,8 +809,8 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
 
     // Next write out the Fq_Mq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Fq_Mq_norms" << suffix;
-    Xdr RB_Fq_Mq_norms_out(file_name.str(), mode);
+    file_name << directory_name << "/Fq_Mq_terms" << suffix;
+    Xdr RB_Fq_Mq_terms_out(file_name.str(), mode);
     
     for(unsigned int q_f=0; q_f<Q_f; q_f++)
     {
@@ -818,16 +818,16 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
       {
         for(unsigned int i=0; i<n_bfs; i++)
         {
-          RB_Fq_Mq_norms_out << Fq_Mq_representor_norms[q_f][q_m][i];
+          RB_Fq_Mq_terms_out << Fq_Mq_representor_innerprods[q_f][q_m][i];
         }
       }
     }
-    RB_Fq_Mq_norms_out.close();
+    RB_Fq_Mq_terms_out.close();
 
     // Next write out the Mq_Mq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Mq_Mq_norms" << suffix;
-    Xdr RB_Mq_Mq_norms_out(file_name.str(), mode);
+    file_name << directory_name << "/Mq_Mq_terms" << suffix;
+    Xdr RB_Mq_Mq_terms_out(file_name.str(), mode);
       
     unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
     for(unsigned int q=0; q<Q_m_hat; q++)
@@ -836,16 +836,16 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
       {
         for(unsigned int j=0; j<n_bfs; j++)
         {
-          RB_Mq_Mq_norms_out << Mq_Mq_representor_norms[q][i][j];
+          RB_Mq_Mq_terms_out << Mq_Mq_representor_innerprods[q][i][j];
         }
       }
     }
-    RB_Mq_Mq_norms_out.close();
+    RB_Mq_Mq_terms_out.close();
 
     // Next write out the Aq_Mq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Aq_Mq_norms" << suffix;
-    Xdr RB_Aq_Mq_norms_out(file_name.str(), mode);
+    file_name << directory_name << "/Aq_Mq_terms" << suffix;
+    Xdr RB_Aq_Mq_terms_out(file_name.str(), mode);
     
     for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
@@ -855,12 +855,12 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
         {
           for(unsigned int j=0; j<n_bfs; j++)
           {
-            RB_Aq_Mq_norms_out << Aq_Mq_representor_norms[q_a][q_m][i][j];
+            RB_Aq_Mq_terms_out << Aq_Mq_representor_innerprods[q_a][q_m][i][j];
           }
         }
       }
     }
-    RB_Aq_Mq_norms_out.close();
+    RB_Aq_Mq_terms_out.close();
   }
 
   STOP_LOG("write_offline_data_to_files()", "TransientRBEvaluation");
@@ -876,9 +876,9 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
 
   TransientRBThetaExpansion& trans_theta_expansion =
     libmesh_cast_ref<TransientRBThetaExpansion&>(get_rb_theta_expansion());
-  const unsigned int Q_m = trans_theta_expansion.get_Q_m();
-  const unsigned int Q_a = trans_theta_expansion.get_Q_a();
-  const unsigned int Q_f = trans_theta_expansion.get_Q_f();
+  const unsigned int Q_m = trans_theta_expansion.get_n_M_terms();
+  const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
+  const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
 
   // First, find out how many basis functions we had when Greedy terminated
   // This was set in RBSystem::read_offline_data_from_files
@@ -956,8 +956,8 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   {
     // Next read in the Fq_Mq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Fq_Mq_norms" << suffix;
-    Xdr RB_Fq_Mq_norms_in(file_name.str(), mode);
+    file_name << directory_name << "/Fq_Mq_terms" << suffix;
+    Xdr RB_Fq_Mq_terms_in(file_name.str(), mode);
     
     for(unsigned int q_f=0; q_f<Q_f; q_f++)
     {
@@ -965,16 +965,16 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
       {
         for(unsigned int i=0; i<n_bfs; i++)
         {
-          RB_Fq_Mq_norms_in >> Fq_Mq_representor_norms[q_f][q_m][i];
+          RB_Fq_Mq_terms_in >> Fq_Mq_representor_innerprods[q_f][q_m][i];
         }
       }
     }
-    RB_Fq_Mq_norms_in.close();
+    RB_Fq_Mq_terms_in.close();
 
     // Next read in the Mq_Mq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Mq_Mq_norms" << suffix;
-    Xdr RB_Mq_Mq_norms_in(file_name.str(), mode);
+    file_name << directory_name << "/Mq_Mq_terms" << suffix;
+    Xdr RB_Mq_Mq_terms_in(file_name.str(), mode);
     
     unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
     for(unsigned int q=0; q<Q_m_hat; q++)
@@ -983,16 +983,16 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
       {
         for(unsigned int j=0; j<n_bfs; j++)
         {
-          RB_Mq_Mq_norms_in >> Mq_Mq_representor_norms[q][i][j];
+          RB_Mq_Mq_terms_in >> Mq_Mq_representor_innerprods[q][i][j];
         }
       }
     }
-    RB_Mq_Mq_norms_in.close();
+    RB_Mq_Mq_terms_in.close();
 
     // Next read in the Aq_Mq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Aq_Mq_norms" << suffix;
-    Xdr RB_Aq_Mq_norms_in(file_name.str(), mode);
+    file_name << directory_name << "/Aq_Mq_terms" << suffix;
+    Xdr RB_Aq_Mq_terms_in(file_name.str(), mode);
     
     for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
@@ -1002,12 +1002,12 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
         {
           for(unsigned int j=0; j<n_bfs; j++)
           {
-            RB_Aq_Mq_norms_in >> Aq_Mq_representor_norms[q_a][q_m][i][j];
+            RB_Aq_Mq_terms_in >> Aq_Mq_representor_innerprods[q_a][q_m][i][j];
           }
         }
       }
     }
-    RB_Aq_Mq_norms_in.close();
+    RB_Aq_Mq_terms_in.close();
   }
 
   STOP_LOG("read_offline_data_from_files()", "TransientRBEvaluation");
