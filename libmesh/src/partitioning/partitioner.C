@@ -81,14 +81,16 @@ void Partitioner::partition (MeshBase& mesh,
   // Set the parent's processor ids
   Partitioner::set_parent_processor_ids(mesh);
 
-  // Set the node's processor ids
-  Partitioner::set_node_processor_ids(mesh);
-
 #ifdef DEBUG
   // Messed up elem processor_id()s can leave us without the child
   // elements we need to restrict vectors on a distributed mesh
   MeshTools::libmesh_assert_valid_elem_procids(mesh);
+#endif
 
+  // Set the node's processor ids
+  Partitioner::set_node_processor_ids(mesh);
+
+#ifdef DEBUG
   MeshTools::libmesh_assert_valid_node_procids(mesh);
 #endif
 
