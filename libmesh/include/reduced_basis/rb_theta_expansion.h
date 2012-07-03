@@ -62,33 +62,33 @@ public:
    * if the theta functions need to be treated differently
    * in subclasses.
    */
-  virtual Number eval_theta_q_a(unsigned int q,
-                                const RBParameters& mu);
+  Number eval_A_theta(unsigned int q,
+                      const RBParameters& mu);
 
   /**
    * Evaluate theta_q_f at the current parameter.
    */
-  virtual Number eval_theta_q_f(unsigned int q,
-                                const RBParameters& mu);
+  Number eval_F_theta(unsigned int q,
+                      const RBParameters& mu);
 
   /**
    * Evaluate theta_q_l at the current parameter.
    */
-  Number eval_theta_q_l(unsigned int output_index,
-                        unsigned int q_l,
-                        const RBParameters& mu);
+  Number eval_output_theta(unsigned int output_index,
+                           unsigned int q_l,
+                           const RBParameters& mu);
 
   /**
    * Get Q_a, the number of terms in the affine
    * expansion for the bilinear form.
    */
-  virtual unsigned int get_Q_a();
+  unsigned int get_n_A_terms() const;
 
   /**
    * Get Q_f, the number of terms in the affine
    * expansion for the right-hand side.
    */
-  unsigned int get_Q_f() const;
+  unsigned int get_n_F_terms() const;
 
   /**
    * Get n_outputs, the number output functionals.
@@ -98,31 +98,31 @@ public:
   /**
    * Get the number of affine terms associated with the specified output.
    */
-  unsigned int get_Q_l(unsigned int output_index) const;
+  unsigned int get_n_output_terms(unsigned int output_index) const;
 
   /**
    * Attach a pointer to a functor object that defines one
    * of the theta_q_a terms.
    */
-  virtual void attach_theta_q_a(RBTheta* theta_q_a);
+  virtual void attach_A_theta(RBTheta* theta_q_a);
 
   /**
    * Attach a vector of pointers to functor objects that each define one
    * of the theta_q_a terms.
    */
-  virtual void attach_multiple_theta_q_a(std::vector<RBTheta*> theta_q_a);
+  virtual void attach_multiple_A_theta(std::vector<RBTheta*> theta_q_a);
 
   /**
    * Attach a pointer to a functor object that defines one
    * of the theta_q_a terms.
    */
-  virtual void attach_theta_q_f(RBTheta* theta_q_f);
+  virtual void attach_F_theta(RBTheta* theta_q_f);
 
   /**
    * Attach a vector of pointers to functor objects that each define one
    * of the theta_q_f terms.
    */
-  virtual void attach_multiple_theta_q_f(std::vector<RBTheta*> theta_q_f);
+  virtual void attach_multiple_F_theta(std::vector<RBTheta*> theta_q_f);
 
   /**
    * Attach a vector of pointers to functor objects that define one
@@ -137,23 +137,22 @@ public:
   virtual void attach_output_theta(RBTheta* theta_q_l);
 
 
-  // -------- Data members --------
-
-
-  /**
-   * Vector storing the pointers to the RBTheta functors.
-   */
-  std::vector<RBTheta*> theta_q_a_vector;
+private:
 
   /**
-   * Vector storing the RBTheta functors for the theta_q_f (affine expansion of the rhs).
+   * Vector storing the pointers to the RBTheta functors for A.
    */
-  std::vector<RBTheta*> theta_q_f_vector;
+  std::vector<RBTheta*> _A_theta_vector;
 
   /**
-   * Vector storing the RBTheta functors for the theta_q_l (affine expansion of the outputs).
+   * Vector storing the RBTheta functors for the affine expansion of the rhs.
    */
-  std::vector< std::vector<RBTheta*> > theta_q_l_vector;
+  std::vector<RBTheta*> _F_theta_vector;
+
+  /**
+   * Vector storing the RBTheta functors for the affine expansion of the outputs.
+   */
+  std::vector< std::vector<RBTheta*> > _output_theta_vector;
 
 };
 

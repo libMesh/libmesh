@@ -71,8 +71,8 @@ RBConstruction::RBConstruction (EquationSystems& es,
     Nmax(0),
     delta_N(1),
     quiet_mode(true),
-    output_dual_norms_computed(false),
-    Fq_representor_norms_computed(false),
+    output_dual_innerprods_computed(false),
+    Fq_representor_innerprods_computed(false),
     rb_eval(NULL),
     inner_product_assembly(NULL),
     constraint_assembly(NULL),
@@ -96,41 +96,41 @@ void RBConstruction::clear()
 
   Parent::clear();
 
-  for(unsigned int q=0; q<A_q_vector.size(); q++)
+  for(unsigned int q=0; q<Aq_vector.size(); q++)
   {
-    if(A_q_vector[q])
+    if(Aq_vector[q])
     {
-      delete A_q_vector[q];
-      A_q_vector[q] = NULL;
+      delete Aq_vector[q];
+      Aq_vector[q] = NULL;
     }
   }
 
-  for(unsigned int q=0; q<F_q_vector.size(); q++)
+  for(unsigned int q=0; q<Fq_vector.size(); q++)
   {
-    if(F_q_vector[q])
+    if(Fq_vector[q])
     {
-      delete F_q_vector[q];
-      F_q_vector[q] = NULL;
+      delete Fq_vector[q];
+      Fq_vector[q] = NULL;
     }
   }
 
   if(store_non_dirichlet_operators)
   {
-    for(unsigned int q=0; q<non_dirichlet_A_q_vector.size(); q++)
+    for(unsigned int q=0; q<non_dirichlet_Aq_vector.size(); q++)
     {
-      if(non_dirichlet_A_q_vector[q])
+      if(non_dirichlet_Aq_vector[q])
       {
-        delete non_dirichlet_A_q_vector[q];
-        non_dirichlet_A_q_vector[q] = NULL;
+        delete non_dirichlet_Aq_vector[q];
+        non_dirichlet_Aq_vector[q] = NULL;
       }
     }
 
-    for(unsigned int q=0; q<non_dirichlet_F_q_vector.size(); q++)
+    for(unsigned int q=0; q<non_dirichlet_Fq_vector.size(); q++)
     {
-      if(non_dirichlet_F_q_vector[q])
+      if(non_dirichlet_Fq_vector[q])
       {
-        delete non_dirichlet_F_q_vector[q];
-        non_dirichlet_F_q_vector[q] = NULL;
+        delete non_dirichlet_Fq_vector[q];
+        non_dirichlet_Fq_vector[q] = NULL;
       }
     }
   }
@@ -144,17 +144,17 @@ void RBConstruction::clear()
       }
 
   // Also delete the Fq representors
-  for(unsigned int q_f=0; q_f<F_q_representor.size(); q_f++)
+  for(unsigned int q_f=0; q_f<Fq_representor.size(); q_f++)
   {
-    if(F_q_representor[q_f])
+    if(Fq_representor[q_f])
     {
-      delete F_q_representor[q_f];
-      F_q_representor[q_f] = NULL;
+      delete Fq_representor[q_f];
+      Fq_representor[q_f] = NULL;
     }
   }
-  // Set Fq_representor_norms_computed flag to false now
-  // that we've cleared the F_q representors
-  Fq_representor_norms_computed = false;
+  // Set Fq_representor_innerprods_computed flag to false now
+  // that we've cleared the Fq representors
+  Fq_representor_innerprods_computed = false;
 
   STOP_LOG("clear()", "RBConstruction");
 }
@@ -287,11 +287,11 @@ void RBConstruction::print_info()
     libMesh::out << "Basis training error tolerance: " << get_training_tolerance() << std::endl;
   if( is_rb_eval_initialized() )
   {
-    libMesh::out << "A_q operators attached: " << get_rb_theta_expansion().get_Q_a() << std::endl;
-    libMesh::out << "F_q functions attached: " << get_rb_theta_expansion().get_Q_f() << std::endl;
+    libMesh::out << "Aq operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
+    libMesh::out << "Fq functions attached: " << get_rb_theta_expansion().get_n_F_terms() << std::endl;
     libMesh::out << "n_outputs: " << get_rb_theta_expansion().get_n_outputs() << std::endl;
     for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
-      libMesh::out << "output " << n << ", Q_l = " << get_rb_theta_expansion().get_Q_l(n) << std::endl;
+      libMesh::out << "output " << n << ", Q_l = " << get_rb_theta_expansion().get_n_output_terms(n) << std::endl;
     libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
   }
   else
@@ -381,13 +381,13 @@ void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number>& vect
 void RBConstruction::initialize_rb_construction()
 {
   // Check that the theta and assembly objects are consistently sized
-  libmesh_assert(get_rb_theta_expansion().get_Q_a() == get_rb_assembly_expansion().A_q_assembly_vector.size());
-  libmesh_assert(get_rb_theta_expansion().get_Q_f() == get_rb_assembly_expansion().F_q_assembly_vector.size());
-  libmesh_assert(get_rb_theta_expansion().get_n_outputs() == get_rb_assembly_expansion().output_assembly_vector.size());
+  libmesh_assert(get_rb_theta_expansion().get_n_A_terms() == get_rb_assembly_expansion().get_n_A_terms());
+  libmesh_assert(get_rb_theta_expansion().get_n_F_terms() == get_rb_assembly_expansion().get_n_F_terms());
+  libmesh_assert(get_rb_theta_expansion().get_n_outputs() == get_rb_assembly_expansion().get_n_outputs());
   for(unsigned int i=0; i<get_rb_theta_expansion().get_n_outputs(); i++)
   {
-    libmesh_assert(get_rb_theta_expansion().get_Q_l(i) ==
-                   get_rb_assembly_expansion().output_assembly_vector[i].size());
+    libmesh_assert(get_rb_theta_expansion().get_n_output_terms(i) ==
+                   get_rb_assembly_expansion().get_n_output_terms(i));
   }
 
 
@@ -413,30 +413,30 @@ void RBConstruction::assemble_affine_expansion()
 void RBConstruction::allocate_data_structures()
 {
   // Resize vectors for storing mesh-dependent data
-  A_q_vector.resize(get_rb_theta_expansion().get_Q_a());
-  F_q_vector.resize(get_rb_theta_expansion().get_Q_f());
+  Aq_vector.resize(get_rb_theta_expansion().get_n_A_terms());
+  Fq_vector.resize(get_rb_theta_expansion().get_n_F_terms());
 
-  // Resize the F_q_representors and initialize each to NULL
+  // Resize the Fq_representors and initialize each to NULL
   // These are basis independent and hence stored here, whereas
-  // the A_q_representors are stored in RBEvaluation
-  F_q_representor.resize(get_rb_theta_expansion().get_Q_f());
+  // the Aq_representors are stored in RBEvaluation
+  Fq_representor.resize(get_rb_theta_expansion().get_n_F_terms());
 
-  // Initialize vectors for the norms of the Fq representors
+  // Initialize vectors for the inner products of the Fq representors
   // These are basis independent and therefore stored here.
-  unsigned int Q_f_hat = get_rb_theta_expansion().get_Q_f()*(get_rb_theta_expansion().get_Q_f()+1)/2;
-  Fq_representor_norms.resize(Q_f_hat);
+  unsigned int Q_f_hat = get_rb_theta_expansion().get_n_F_terms()*(get_rb_theta_expansion().get_n_F_terms()+1)/2;
+  Fq_representor_innerprods.resize(Q_f_hat);
 
   // Resize the output vectors
   outputs_vector.resize(get_rb_theta_expansion().get_n_outputs());
   for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
-    outputs_vector[n].resize( get_rb_theta_expansion().get_Q_l(n) );
+    outputs_vector[n].resize( get_rb_theta_expansion().get_n_output_terms(n) );
 
   // Resize the output dual norm vectors
-  output_dual_norms.resize(get_rb_theta_expansion().get_n_outputs());
+  output_dual_innerprods.resize(get_rb_theta_expansion().get_n_outputs());
   for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
   {
-    unsigned int Q_l_hat = get_rb_theta_expansion().get_Q_l(n)*(get_rb_theta_expansion().get_Q_l(n)+1)/2;
-    output_dual_norms[n].resize(Q_l_hat);
+    unsigned int Q_l_hat = get_rb_theta_expansion().get_n_output_terms(n)*(get_rb_theta_expansion().get_n_output_terms(n)+1)/2;
+    output_dual_innerprods[n].resize(Q_l_hat);
   }
 
   // Only initialize matrices if we're not in single-matrix mode
@@ -455,13 +455,13 @@ void RBConstruction::allocate_data_structures()
       constraint_matrix->zero();
     }
 
-    for(unsigned int q=0; q<get_rb_theta_expansion().get_Q_a(); q++)
+    for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
     {
       // Initialize the memory for the matrices
-      A_q_vector[q] = SparseMatrix<Number>::build().release();
-      dof_map.attach_matrix(*A_q_vector[q]);
-      A_q_vector[q]->init();
-      A_q_vector[q]->zero();
+      Aq_vector[q] = SparseMatrix<Number>::build().release();
+      dof_map.attach_matrix(*Aq_vector[q]);
+      Aq_vector[q]->init();
+      Aq_vector[q]->zero();
     }
 
     // We also need to initialize a second set of non-Dirichlet operators
@@ -471,40 +471,40 @@ void RBConstruction::allocate_data_structures()
       non_dirichlet_inner_product_matrix->init();
       non_dirichlet_inner_product_matrix->zero();
 
-      non_dirichlet_A_q_vector.resize(get_rb_theta_expansion().get_Q_a());
-      for(unsigned int q=0; q<get_rb_theta_expansion().get_Q_a(); q++)
+      non_dirichlet_Aq_vector.resize(get_rb_theta_expansion().get_n_A_terms());
+      for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
       {
         // Initialize the memory for the matrices
-        non_dirichlet_A_q_vector[q] = SparseMatrix<Number>::build().release();
-        dof_map.attach_matrix(*non_dirichlet_A_q_vector[q]);
-        non_dirichlet_A_q_vector[q]->init();
-        non_dirichlet_A_q_vector[q]->zero();
+        non_dirichlet_Aq_vector[q] = SparseMatrix<Number>::build().release();
+        dof_map.attach_matrix(*non_dirichlet_Aq_vector[q]);
+        non_dirichlet_Aq_vector[q]->init();
+        non_dirichlet_Aq_vector[q]->zero();
       }
     }
   }
 
   // Initialize the vectors
-  for(unsigned int q=0; q<get_rb_theta_expansion().get_Q_f(); q++)
+  for(unsigned int q=0; q<get_rb_theta_expansion().get_n_F_terms(); q++)
   {
     // Initialize the memory for the vectors
-    F_q_vector[q] = NumericVector<Number>::build().release();
-    F_q_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    Fq_vector[q] = NumericVector<Number>::build().release();
+    Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   }
 
   // We also need to initialize a second set of non-Dirichlet operators
   if(store_non_dirichlet_operators)
   {
-    non_dirichlet_F_q_vector.resize(get_rb_theta_expansion().get_Q_f());
-    for(unsigned int q=0; q<get_rb_theta_expansion().get_Q_f(); q++)
+    non_dirichlet_Fq_vector.resize(get_rb_theta_expansion().get_n_F_terms());
+    for(unsigned int q=0; q<get_rb_theta_expansion().get_n_F_terms(); q++)
     {
       // Initialize the memory for the vectors
-      non_dirichlet_F_q_vector[q] = NumericVector<Number>::build().release();
-      non_dirichlet_F_q_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      non_dirichlet_Fq_vector[q] = NumericVector<Number>::build().release();
+      non_dirichlet_Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     }
   }
 
   for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
-    for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_Q_l(n); q_l++)
+    for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
     {
       // Initialize the memory for the truth output vectors
       outputs_vector[n][q_l] = (NumericVector<Number>::build().release());
@@ -688,17 +688,17 @@ void RBConstruction::truth_assembly()
     // and vectors in the affine expansion, so
     // just use them
 
-    for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
+    for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
     {
-      matrix->add(get_rb_theta_expansion().eval_theta_q_a(q_a, mu), *get_A_q(q_a));
+      matrix->add(get_rb_theta_expansion().eval_A_theta(q_a, mu), *get_Aq(q_a));
     }
 
     AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build();
     temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-    for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
+    for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
     {
-      *temp_vec = *get_F_q(q_f);
-      temp_vec->scale( get_rb_theta_expansion().eval_theta_q_f(q_f, mu) );
+      *temp_vec = *get_Fq(q_f);
+      temp_vec->scale( get_rb_theta_expansion().eval_F_theta(q_f, mu) );
       rhs->add(*temp_vec);
     }
 
@@ -716,14 +716,14 @@ void RBConstruction::truth_assembly()
 
     const MeshBase& mesh = this->get_mesh();
 
-    std::vector<FEMContext*> Aq_context(get_rb_theta_expansion().get_Q_a());
+    std::vector<FEMContext*> Aq_context(get_rb_theta_expansion().get_n_A_terms());
     for(unsigned int q_a=0; q_a<Aq_context.size(); q_a++)
     {
       Aq_context[q_a] = this->build_context().release();
       this->init_context(*Aq_context[q_a]);
     }
 
-    std::vector<FEMContext*> Fq_context(get_rb_theta_expansion().get_Q_f());
+    std::vector<FEMContext*> Fq_context(get_rb_theta_expansion().get_n_F_terms());
     for(unsigned int q_f=0; q_f<Fq_context.size(); q_f++)
     {
       Fq_context[q_f] = this->build_context().release();
@@ -735,18 +735,18 @@ void RBConstruction::truth_assembly()
 
     for ( ; el != end_el; ++el)
     {
-      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
+      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
       {
         Aq_context[q_a]->pre_fe_reinit(*this, *el);
         Aq_context[q_a]->elem_fe_reinit();
-        rb_assembly_expansion->A_q_assembly_vector[q_a]->interior_assembly(*Aq_context[q_a]);
+        rb_assembly_expansion->perform_A_interior_assembly(q_a, *Aq_context[q_a]);
       }
 
-      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
+      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
       {
         Fq_context[q_f]->pre_fe_reinit(*this, *el);
         Fq_context[q_f]->elem_fe_reinit();
-        rb_assembly_expansion->F_q_assembly_vector[q_f]->interior_assembly(*Fq_context[q_f]);
+        rb_assembly_expansion->perform_F_interior_assembly(q_f, *Fq_context[q_f]);
       }
 
       for (Aq_context[0]->side = 0;
@@ -758,52 +758,52 @@ void RBConstruction::truth_assembly()
           continue;
 
         // Update the side information for all contexts
-        for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
+        for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
         {
           // Update the side information for all contexts
           Aq_context[q_a]->side = Aq_context[0]->side;
 
           Aq_context[q_a]->side_fe_reinit();
-          rb_assembly_expansion->A_q_assembly_vector[q_a]->boundary_assembly(*Aq_context[q_a]);
+          rb_assembly_expansion->perform_A_boundary_assembly(q_a, *Aq_context[q_a]);
         }
 
         // Impose boundary terms, e.g. Neuman BCs
-        for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
+        for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
         {
           // Update the side information for all contexts
           Fq_context[q_f]->side = Aq_context[0]->side;
 
           Fq_context[q_f]->side_fe_reinit();
-          rb_assembly_expansion->F_q_assembly_vector[q_f]->boundary_assembly(*Fq_context[q_f]);
+          rb_assembly_expansion->perform_F_boundary_assembly(q_f, *Fq_context[q_f]);
         }
       }
 
       // Constrain the dofs to impose Dirichlet BCs, hanging node or periodic constraints
-      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
+      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
       {
         this->get_dof_map().constrain_element_matrix
           (Aq_context[q_a]->elem_jacobian, Aq_context[q_a]->dof_indices);
       }
 
-      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
+      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
       {
         this->get_dof_map().constrain_element_vector
           (Fq_context[q_f]->elem_residual, Fq_context[q_f]->dof_indices);
       }
 
       // Finally add local matrices/vectors to global system
-      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
+      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
       {
         // Scale by theta_q_a
-        Aq_context[q_a]->elem_jacobian *= get_rb_theta_expansion().eval_theta_q_a(q_a, mu);
+        Aq_context[q_a]->elem_jacobian *= get_rb_theta_expansion().eval_A_theta(q_a, mu);
         this->matrix->add_matrix (Aq_context[q_a]->elem_jacobian,
                                   Aq_context[q_a]->dof_indices);
       }
 
-      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
+      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
       {
         // Scale by theta_q_f
-        Fq_context[q_f]->elem_residual *= get_rb_theta_expansion().eval_theta_q_f(q_f, mu);
+        Fq_context[q_f]->elem_residual *= get_rb_theta_expansion().eval_F_theta(q_f, mu);
         this->rhs->add_vector (Fq_context[q_f]->elem_residual,
                               Fq_context[q_f]->dof_indices);
       }
@@ -858,7 +858,7 @@ void RBConstruction::assemble_and_add_constraint_matrix(SparseMatrix<Number>* in
 
 void RBConstruction::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* input_matrix, bool apply_dof_constraints)
 {
-  if(q >= get_rb_theta_expansion().get_Q_a())
+  if(q >= get_rb_theta_expansion().get_n_A_terms())
   {
     libMesh::err << "Error: We must have q < Q_a in assemble_Aq_matrix."
                  << std::endl;
@@ -868,7 +868,7 @@ void RBConstruction::assemble_Aq_matrix(unsigned int q, SparseMatrix<Number>* in
   input_matrix->zero();
 
   add_scaled_matrix_and_vector(1.,
-                               rb_assembly_expansion->A_q_assembly_vector[q],
+                               &rb_assembly_expansion->get_A_assembly(q),
                                input_matrix,
                                NULL,
                                false, /* symmetrize */
@@ -879,7 +879,7 @@ void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix
 {
   START_LOG("add_scaled_Aq()", "RBConstruction");
 
-  if(q_a >= get_rb_theta_expansion().get_Q_a())
+  if(q_a >= get_rb_theta_expansion().get_n_A_terms())
   {
     libMesh::err << "Error: We must have q < Q_a in add_scaled_Aq."
                  << std::endl;
@@ -888,13 +888,13 @@ void RBConstruction::add_scaled_Aq(Number scalar, unsigned int q_a, SparseMatrix
 
   if(!single_matrix_mode && !symmetrize)
   {
-    input_matrix->add(scalar, *get_A_q(q_a));
+    input_matrix->add(scalar, *get_Aq(q_a));
     input_matrix->close();
   }
   else
   {
     add_scaled_matrix_and_vector(scalar,
-                                 rb_assembly_expansion->A_q_assembly_vector[q_a],
+                                 &rb_assembly_expansion->get_A_assembly(q_a),
                                  input_matrix,
                                  NULL,
                                  symmetrize);
@@ -932,25 +932,25 @@ void RBConstruction::assemble_all_affine_operators()
     libmesh_error();
   }
 
-  for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
-    assemble_Aq_matrix(q_a, get_A_q(q_a));
+  for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
+    assemble_Aq_matrix(q_a, get_Aq(q_a));
 
   if(store_non_dirichlet_operators)
   {
-    for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
-      assemble_Aq_matrix(q_a, get_non_dirichlet_A_q(q_a), false);
+    for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
+      assemble_Aq_matrix(q_a, get_non_dirichlet_Aq(q_a), false);
   }
 }
 
 void RBConstruction::assemble_all_affine_vectors()
 {
-  for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
-    assemble_Fq_vector(q_f, get_F_q(q_f));
+  for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
+    assemble_Fq_vector(q_f, get_Fq(q_f));
 
   if(store_non_dirichlet_operators)
   {
-    for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
-      assemble_Fq_vector(q_f, get_non_dirichlet_F_q(q_f), false);
+    for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
+      assemble_Fq_vector(q_f, get_non_dirichlet_Fq(q_f), false);
   }
 
 }
@@ -959,7 +959,7 @@ void RBConstruction::assemble_Fq_vector(unsigned int q,
                                         NumericVector<Number>* input_vector,
                                         bool apply_dof_constraints)
 {
-  if(q >= get_rb_theta_expansion().get_Q_f())
+  if(q >= get_rb_theta_expansion().get_n_F_terms())
   {
     libMesh::err << "Error: We must have q < Q_f in assemble_Fq_vector."
                  << std::endl;
@@ -969,7 +969,7 @@ void RBConstruction::assemble_Fq_vector(unsigned int q,
   input_vector->zero();
 
   add_scaled_matrix_and_vector(1.,
-                               rb_assembly_expansion->F_q_assembly_vector[q],
+                               &rb_assembly_expansion->get_F_assembly(q),
                                NULL,
                                input_vector,
                                false,             /* symmetrize */
@@ -979,10 +979,10 @@ void RBConstruction::assemble_Fq_vector(unsigned int q,
 void RBConstruction::assemble_all_output_vectors()
 {
   for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
-    for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_Q_l(n); q_l++)
+    for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
     {
       get_output_vector(n, q_l)->zero();
-      add_scaled_matrix_and_vector(1., rb_assembly_expansion->output_assembly_vector[n][q_l],
+      add_scaled_matrix_and_vector(1., &rb_assembly_expansion->get_output_assembly(n,q_l),
                                        NULL,
                                        get_output_vector(n,q_l));
     }
@@ -1026,10 +1026,10 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
 
 
   // Compute the dual norms of the outputs if we haven't already done so
-  compute_output_dual_norms();
+  compute_output_dual_innerprods();
 
   // Compute the Fq Riesz representor dual norms if we haven't already done so
-  compute_Fq_representor_norms();
+  compute_Fq_representor_innerprods();
 
   libMesh::out << std::endl << "---- Performing Greedy basis enrichment ----" << std::endl;
   while(true)
@@ -1147,8 +1147,8 @@ Real RBConstruction::truth_solve(int plot_solution)
   for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
   {
     truth_outputs[n] = 0.;
-    for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_Q_l(n); q_l++)
-      truth_outputs[n] += libmesh_conj(get_rb_theta_expansion().eval_theta_q_l(n, q_l, mu))*
+    for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
+      truth_outputs[n] += libmesh_conj(get_rb_theta_expansion().eval_output_theta(n, q_l, mu))*
                           get_output_vector(n,q_l)->dot(*solution);
   }
 
@@ -1298,8 +1298,8 @@ void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
     this->set_alternative_solver(this->linear_solver);
 
   // Compute the basis independent terms
-  Fq_representor_norms_computed = false;
-  compute_Fq_representor_norms(compute_inner_products);
+  Fq_representor_innerprods_computed = false;
+  compute_Fq_representor_innerprods(compute_inner_products);
 
   // and all the basis dependent terms
   unsigned int saved_delta_N = delta_N;
@@ -1368,18 +1368,18 @@ void RBConstruction::update_RB_system_matrices()
   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
   temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
-  for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
   {
     for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
     {
-      get_rb_evaluation().RB_F_q_vector[q_f](i) = get_F_q(q_f)->dot(get_rb_evaluation().get_basis_function(i));
+      get_rb_evaluation().RB_Fq_vector[q_f](i) = get_Fq(q_f)->dot(get_rb_evaluation().get_basis_function(i));
     }
   }
 
   for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
   {
     for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
-      for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
         get_rb_evaluation().RB_output_vectors[n][q_l](i) = get_output_vector(n,q_l)->dot(get_rb_evaluation().get_basis_function(i));
       }
@@ -1412,13 +1412,13 @@ void RBConstruction::update_RB_system_matrices()
         }
       }
 
-      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
+      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
       {
-        // Compute reduced A_q matrix
+        // Compute reduced Aq matrix
         temp->zero();
         if(!single_matrix_mode)
         {
-          get_A_q(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
+          get_Aq(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(j));
         }
         else
         {
@@ -1427,14 +1427,14 @@ void RBConstruction::update_RB_system_matrices()
         }
 
         value = (*temp).dot(get_rb_evaluation().get_basis_function(i));
-        get_rb_evaluation().RB_A_q_vector[q_a](i,j) = value;
+        get_rb_evaluation().RB_Aq_vector[q_a](i,j) = value;
 
         if(i!=j)
         {
           temp->zero();
           if(!single_matrix_mode)
           {
-            get_A_q(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(i));
+            get_Aq(q_a)->vector_mult(*temp, get_rb_evaluation().get_basis_function(i));
           }
           else
           {
@@ -1443,7 +1443,7 @@ void RBConstruction::update_RB_system_matrices()
           }
 
           value = (*temp).dot(get_rb_evaluation().get_basis_function(j));
-          get_rb_evaluation().RB_A_q_vector[q_a](j,i) = value;
+          get_rb_evaluation().RB_Aq_vector[q_a](j,i) = value;
         }
       }
     }
@@ -1480,29 +1480,29 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
     linear_solver->reuse_preconditioner(false);
   }
 
-  for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
+  for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
   {
     for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
     {
       // Initialize the vector in which we'll store the representor
-      if(!get_rb_evaluation().A_q_representor[q_a][i])
+      if(!get_rb_evaluation().Aq_representor[q_a][i])
       {
-        get_rb_evaluation().A_q_representor[q_a][i] = (NumericVector<Number>::build().release());
-        get_rb_evaluation().A_q_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        get_rb_evaluation().Aq_representor[q_a][i] = (NumericVector<Number>::build().release());
+        get_rb_evaluation().Aq_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
 
-      libmesh_assert(get_rb_evaluation().A_q_representor[q_a][i]->size()       == this->n_dofs()       &&
-                     get_rb_evaluation().A_q_representor[q_a][i]->local_size() == this->n_local_dofs() );
+      libmesh_assert(get_rb_evaluation().Aq_representor[q_a][i]->size()       == this->n_dofs()       &&
+                     get_rb_evaluation().Aq_representor[q_a][i]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
       if(!single_matrix_mode)
       {
-        get_A_q(q_a)->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
+        get_Aq(q_a)->vector_mult(*rhs, get_rb_evaluation().get_basis_function(i));
       }
       else
       {
         assemble_scaled_matvec(1.,
-                               rb_assembly_expansion->A_q_assembly_vector[q_a],
+                               &rb_assembly_expansion->get_A_assembly(q_a),
                                *rhs,
                                get_rb_evaluation().get_basis_function(i));
       }
@@ -1539,7 +1539,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
       }
 
       // Store the representor
-      *get_rb_evaluation().A_q_representor[q_a][i] = *solution;
+      *get_rb_evaluation().Aq_representor[q_a][i] = *solution;
 
 
       if(reuse_preconditioner)
@@ -1561,31 +1561,31 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
       if(single_matrix_mode && constrained_problem)
 	assemble_inner_product_matrix(matrix);
 
-      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
+      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
 	{
 	  if(!single_matrix_mode)
 	    {
-	      inner_product_matrix->vector_mult(*inner_product_storage_vector,*F_q_representor[q_f]);
+	      inner_product_matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
 	    }
 	  else
 	    {
-	      matrix->vector_mult(*inner_product_storage_vector,*F_q_representor[q_f]);
+	      matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
 	    }
 
-	  for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_Q_a(); q_a++)
+	  for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
 	    {
 	      for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
 		{
-		  get_rb_evaluation().Fq_Aq_representor_norms[q_f][q_a][i] =
-		    inner_product_storage_vector->dot(*get_rb_evaluation().A_q_representor[q_a][i]);
+		  get_rb_evaluation().Fq_Aq_representor_innerprods[q_f][q_a][i] =
+		    inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a][i]);
 		}
 	    }
 	}
 
       unsigned int q=0;
-      for(unsigned int q_a1=0; q_a1<get_rb_theta_expansion().get_Q_a(); q_a1++)
+      for(unsigned int q_a1=0; q_a1<get_rb_theta_expansion().get_n_A_terms(); q_a1++)
 	{
-	  for(unsigned int q_a2=q_a1; q_a2<get_rb_theta_expansion().get_Q_a(); q_a2++)
+	  for(unsigned int q_a2=q_a1; q_a2<get_rb_theta_expansion().get_n_A_terms(); q_a2++)
 	    {
 	      for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
 		{
@@ -1593,25 +1593,25 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 		    {
 		      if(!single_matrix_mode)
 			{
-			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().A_q_representor[q_a2][j]);
+			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
 			}
 		      else
 			{
-			  matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().A_q_representor[q_a2][j]);
+			  matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
 			}
-		      get_rb_evaluation().Aq_Aq_representor_norms[q][i][j] = inner_product_storage_vector->dot(*get_rb_evaluation().A_q_representor[q_a1][i]);
+		      get_rb_evaluation().Aq_Aq_representor_innerprods[q][i][j] = inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][i]);
 
 		      if(i != j)
 			{
 			  if(!single_matrix_mode)
 			    {
-			      inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().A_q_representor[q_a2][i]);
+			      inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
 			    }
 			  else
 			    {
-			      matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().A_q_representor[q_a2][i]);
+			      matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
 			    }
-			  get_rb_evaluation().Aq_Aq_representor_norms[q][j][i] = inner_product_storage_vector->dot(*get_rb_evaluation().A_q_representor[q_a1][j]);
+			  get_rb_evaluation().Aq_Aq_representor_innerprods[q][j][i] = inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][j]);
 			}
 		    }
 		}
@@ -1639,20 +1639,20 @@ void RBConstruction::assemble_matrix_for_output_dual_solves()
   }
 }
 
-void RBConstruction::compute_output_dual_norms()
+void RBConstruction::compute_output_dual_innerprods()
 {
   // Skip calculations if we've already computed the output dual norms
-  if(!output_dual_norms_computed)
+  if(!output_dual_innerprods_computed)
   {
     // Short circuit if we don't have any outputs
     if( get_rb_theta_expansion().get_n_outputs() == 0 )
     {
-      output_dual_norms_computed = true;
+      output_dual_innerprods_computed = true;
       return;
     }
 
     // Only log if we get to here
-    START_LOG("compute_output_dual_norms()", "RBConstruction");
+    START_LOG("compute_output_dual_innerprods()", "RBConstruction");
 
     libMesh::out << "Compute output dual norms" << std::endl;
 
@@ -1665,7 +1665,7 @@ void RBConstruction::compute_output_dual_norms()
     // Find out the largest value of Q_l
     unsigned int max_Q_l = 0;
     for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
-      max_Q_l = (get_rb_theta_expansion().get_Q_l(n) > max_Q_l) ? get_rb_theta_expansion().get_Q_l(n) : max_Q_l;
+      max_Q_l = (get_rb_theta_expansion().get_n_output_terms(n) > max_Q_l) ? get_rb_theta_expansion().get_n_output_terms(n) : max_Q_l;
 
     std::vector< NumericVector<Number>* > L_q_representor(max_Q_l);
     for(unsigned int q=0; q<max_Q_l; q++)
@@ -1700,7 +1700,7 @@ void RBConstruction::compute_output_dual_norms()
         }
       }
 
-      for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
         rhs->zero();
         rhs->add(1., *get_output_vector(n,q_l));
@@ -1710,7 +1710,7 @@ void RBConstruction::compute_output_dual_norms()
 
         if (!is_quiet())
           libMesh::out << "Starting solve n=" << n << ", q_l=" << q_l
-                 << " in RBConstruction::compute_output_dual_norms() at "
+                 << " in RBConstruction::compute_output_dual_innerprods() at "
                  << Utility::get_timestamp() << std::endl;
 
         solve();
@@ -1718,7 +1718,7 @@ void RBConstruction::compute_output_dual_norms()
         if (!is_quiet())
           {
             libMesh::out << "Finished solve n=" << n << ", q_l=" << q_l
-                         << " in RBConstruction::compute_output_dual_norms() at "
+                         << " in RBConstruction::compute_output_dual_innerprods() at "
                          << Utility::get_timestamp() << std::endl;
 
             libMesh::out << this->n_linear_iterations()
@@ -1753,14 +1753,14 @@ void RBConstruction::compute_output_dual_norms()
         assemble_matrix_for_output_dual_solves();
 
       unsigned int q=0;
-      for(unsigned int q_l1=0; q_l1<get_rb_theta_expansion().get_Q_l(n); q_l1++)
+      for(unsigned int q_l1=0; q_l1<get_rb_theta_expansion().get_n_output_terms(n); q_l1++)
       {
         matrix->vector_mult(*inner_product_storage_vector, *L_q_representor[q_l1]);
 
-        for(unsigned int q_l2=q_l1; q_l2<get_rb_theta_expansion().get_Q_l(n); q_l2++)
+        for(unsigned int q_l2=q_l1; q_l2<get_rb_theta_expansion().get_n_output_terms(n); q_l2++)
         {
-          output_dual_norms[n][q] = L_q_representor[q_l2]->dot(*inner_product_storage_vector);
-          libMesh::out << "output_dual_norms[" << n << "][" << q << "] = " << output_dual_norms[n][q] << std::endl;
+          output_dual_innerprods[n][q] = L_q_representor[q_l2]->dot(*inner_product_storage_vector);
+          libMesh::out << "output_dual_innerprods[" << n << "][" << q << "] = " << output_dual_innerprods[n][q] << std::endl;
 
           q++;
         }
@@ -1783,27 +1783,27 @@ void RBConstruction::compute_output_dual_norms()
       }
     }
 
-    output_dual_norms_computed = true;
+    output_dual_innerprods_computed = true;
 
     // Change the preconditioner, Krylov solver back to their original
     // value.  Note: does nothing if RBBase::alternative_solver ==
     // "unchanged".
     this->reset_alternative_solver(this->linear_solver, orig_solver);
 
-    STOP_LOG("compute_output_dual_norms()", "RBConstruction");
+    STOP_LOG("compute_output_dual_innerprods()", "RBConstruction");
 
   }
 
-  get_rb_evaluation().output_dual_norms = output_dual_norms;
+  get_rb_evaluation().output_dual_innerprods = output_dual_innerprods;
 }
 
-void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
+void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_products)
 {
   // Skip calculations if we've already computed the Fq_representors
-  if(!Fq_representor_norms_computed)
+  if(!Fq_representor_innerprods_computed)
   {
     // Only log if we get to here
-    START_LOG("compute_Fq_representor_norms()", "RBConstruction");
+    START_LOG("compute_Fq_representor_innerprods()", "RBConstruction");
 
     if(!single_matrix_mode)
     {
@@ -1827,19 +1827,19 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
       linear_solver->reuse_preconditioner(false);
     }
 
-    for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_Q_f(); q_f++)
+    for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
     {
-      if(!F_q_representor[q_f])
+      if(!Fq_representor[q_f])
       {
-        F_q_representor[q_f] = (NumericVector<Number>::build().release());
-        F_q_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+        Fq_representor[q_f] = (NumericVector<Number>::build().release());
+        Fq_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
 
-      libmesh_assert(F_q_representor[q_f]->size()       == this->n_dofs()       &&
-                     F_q_representor[q_f]->local_size() == this->n_local_dofs() );
+      libmesh_assert(Fq_representor[q_f]->size()       == this->n_dofs()       &&
+                     Fq_representor[q_f]->local_size() == this->n_local_dofs() );
 
       rhs->zero();
-      rhs->add(1., *get_F_q(q_f));
+      rhs->add(1., *get_Fq(q_f));
 //      zero_dirichlet_dofs_on_rhs();
 
       solution->zero();
@@ -1874,7 +1874,7 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
 //      libmesh_error();
 
       }
-      *F_q_representor[q_f] = *solution;
+      *Fq_representor[q_f] = *solution;
 
       if(reuse_preconditioner)
       {
@@ -1896,32 +1896,32 @@ void RBConstruction::compute_Fq_representor_norms(bool compute_inner_products)
       if(single_matrix_mode && constrained_problem)
         assemble_inner_product_matrix(matrix);
 
-      for(unsigned int q_f1=0; q_f1<get_rb_theta_expansion().get_Q_f(); q_f1++)
+      for(unsigned int q_f1=0; q_f1<get_rb_theta_expansion().get_n_F_terms(); q_f1++)
       {
         if(!single_matrix_mode)
         {
-          inner_product_matrix->vector_mult(*inner_product_storage_vector, *F_q_representor[q_f1]);
+          inner_product_matrix->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f1]);
         }
         else
         {
-          matrix->vector_mult(*inner_product_storage_vector, *F_q_representor[q_f1]);
+          matrix->vector_mult(*inner_product_storage_vector, *Fq_representor[q_f1]);
         }
 
-        for(unsigned int q_f2=q_f1; q_f2<get_rb_theta_expansion().get_Q_f(); q_f2++)
+        for(unsigned int q_f2=q_f1; q_f2<get_rb_theta_expansion().get_n_F_terms(); q_f2++)
         {
-          Fq_representor_norms[q] = inner_product_storage_vector->dot(*F_q_representor[q_f2]);
+          Fq_representor_innerprods[q] = inner_product_storage_vector->dot(*Fq_representor[q_f2]);
 
           q++;
         }
       }
     } // end if (compute_inner_products)
 
-    Fq_representor_norms_computed = true;
+    Fq_representor_innerprods_computed = true;
 
-    STOP_LOG("compute_Fq_representor_norms()", "RBConstruction");
+    STOP_LOG("compute_Fq_representor_innerprods()", "RBConstruction");
   }
 
-  get_rb_evaluation().Fq_representor_norms = Fq_representor_norms;
+  get_rb_evaluation().Fq_representor_innerprods = Fq_representor_innerprods;
 }
 
 void RBConstruction::load_rb_solution()
@@ -2038,7 +2038,7 @@ SparseMatrix<Number>* RBConstruction::get_non_dirichlet_inner_product_matrix()
   return non_dirichlet_inner_product_matrix.get();
 }
 
-SparseMatrix<Number>* RBConstruction::get_A_q(unsigned int q)
+SparseMatrix<Number>* RBConstruction::get_Aq(unsigned int q)
 {
   if(single_matrix_mode)
   {
@@ -2046,21 +2046,21 @@ SparseMatrix<Number>* RBConstruction::get_A_q(unsigned int q)
     libmesh_error();
   }
 
-  if(q >= get_rb_theta_expansion().get_Q_a())
+  if(q >= get_rb_theta_expansion().get_n_A_terms())
   {
-    libMesh::err << "Error: We must have q < Q_a in get_A_q."
+    libMesh::err << "Error: We must have q < Q_a in get_Aq."
                  << std::endl;
     libmesh_error();
   }
 
-  return A_q_vector[q];
+  return Aq_vector[q];
 }
 
-SparseMatrix<Number>* RBConstruction::get_non_dirichlet_A_q(unsigned int q)
+SparseMatrix<Number>* RBConstruction::get_non_dirichlet_Aq(unsigned int q)
 {
   if(!store_non_dirichlet_operators)
   {
-    libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_A_q." << std::endl;
+    libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Aq." << std::endl;
     libmesh_error();
   }
 
@@ -2070,52 +2070,52 @@ SparseMatrix<Number>* RBConstruction::get_non_dirichlet_A_q(unsigned int q)
     libmesh_error();
   }
 
-  if(q >= get_rb_theta_expansion().get_Q_a())
+  if(q >= get_rb_theta_expansion().get_n_A_terms())
   {
-    libMesh::err << "Error: We must have q < Q_a in get_A_q."
+    libMesh::err << "Error: We must have q < Q_a in get_Aq."
                  << std::endl;
     libmesh_error();
   }
 
-  return non_dirichlet_A_q_vector[q];
+  return non_dirichlet_Aq_vector[q];
 }
 
-NumericVector<Number>* RBConstruction::get_F_q(unsigned int q)
+NumericVector<Number>* RBConstruction::get_Fq(unsigned int q)
 {
-  if(q >= get_rb_theta_expansion().get_Q_f())
+  if(q >= get_rb_theta_expansion().get_n_F_terms())
   {
-    libMesh::err << "Error: We must have q < Q_f in get_F_q."
+    libMesh::err << "Error: We must have q < Q_f in get_Fq."
                  << std::endl;
     libmesh_error();
   }
 
-  return F_q_vector[q];
+  return Fq_vector[q];
 }
 
-NumericVector<Number>* RBConstruction::get_non_dirichlet_F_q(unsigned int q)
+NumericVector<Number>* RBConstruction::get_non_dirichlet_Fq(unsigned int q)
 {
   if(!store_non_dirichlet_operators)
   {
-    libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_F_q." << std::endl;
+    libMesh::err << "Error: Must have store_non_dirichlet_operators==true to access non_dirichlet_Fq." << std::endl;
     libmesh_error();
   }
 
-  if(q >= get_rb_theta_expansion().get_Q_f())
+  if(q >= get_rb_theta_expansion().get_n_F_terms())
   {
-    libMesh::err << "Error: We must have q < Q_f in get_F_q."
+    libMesh::err << "Error: We must have q < Q_f in get_Fq."
                  << std::endl;
     libmesh_error();
   }
 
-  return non_dirichlet_F_q_vector[q];
+  return non_dirichlet_Fq_vector[q];
 }
 
 NumericVector<Number>* RBConstruction::get_output_vector(unsigned int n, unsigned int q_l)
 {
-  if( (n >= get_rb_theta_expansion().get_n_outputs()) || (q_l >= get_rb_theta_expansion().get_Q_l(n)) )
+  if( (n >= get_rb_theta_expansion().get_n_outputs()) || (q_l >= get_rb_theta_expansion().get_n_output_terms(n)) )
   {
     libMesh::err << "Error: We must have n < n_outputs and "
-                 << "q_l < get_rb_theta_expansion().get_Q_l(n) in get_output_vector."
+                 << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_output_vector."
                  << std::endl;
     libmesh_error();
   }
@@ -2142,8 +2142,8 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
   // Write out Riesz representors. These are useful to have when restarting,
   // so you don't have to recompute them all over again.
 
-  // First we write out the F_q representors, these are independent of an RBEvaluation object.
-  libMesh::out << "Writing out the F_q_representors..." << std::endl;
+  // First we write out the Fq representors, these are independent of an RBEvaluation object.
+  libMesh::out << "Writing out the Fq_representors..." << std::endl;
 
   std::ostringstream file_name;
   const std::string riesz_representor_suffix = (write_binary_residual_representors ? ".xdr" : ".dat");
@@ -2154,12 +2154,12 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
     if ( mkdir(riesz_representors_dir.c_str(), 0755) != 0)
       libMesh::out << "Skipping creating residual_representors directory: " << strerror(errno) << std::endl;
 
-  for (unsigned int i=0; i<F_q_representor.size(); ++i)
+  for (unsigned int i=0; i<Fq_representor.size(); ++i)
   {
-    if (F_q_representor[i] != NULL)
+    if (Fq_representor[i] != NULL)
     {
       file_name.str(""); // reset filename
-      file_name << riesz_representors_dir << "/F_q_representor" << i << riesz_representor_suffix;
+      file_name << riesz_representors_dir << "/Fq_representor" << i << riesz_representor_suffix;
 
       // Check to see if file exists, if so, don't overwrite it, we assume it was
       // there from a previous call to this function.  Note: if stat returns zero
@@ -2179,10 +2179,10 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
 	   (stat_info.st_size == 0)) // file exists, but has zero length (can happen if another proc already opened it!)
 	{
 	  // No need to copy!
-	  // *solution = *(F_q_representor[i]);
+	  // *solution = *(Fq_representor[i]);
 	  // std::swap doesn't work on pointers
-	  //std::swap(solution.get(), F_q_representor[i]);
-	  F_q_representor[i]->swap(*solution);
+	  //std::swap(solution.get(), Fq_representor[i]);
+	  Fq_representor[i]->swap(*solution);
 
 	  Xdr fqr_data(file_name.str(),
 		       write_binary_residual_representors ? ENCODE : WRITE);
@@ -2193,7 +2193,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
 	  Parallel::barrier();
 
 	  // Swap back.
-	  F_q_representor[i]->swap(*solution);
+	  Fq_representor[i]->swap(*solution);
 
 	  // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
 	  // for the system call, be sure to do it only on one processor, etc.
@@ -2202,25 +2202,25 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
   }
 
 
-  // Next, write out the A_q representors associated with rb_eval.
-  libMesh::out << "Writing out the A_q_representors..." << std::endl;
+  // Next, write out the Aq representors associated with rb_eval.
+  libMesh::out << "Writing out the Aq_representors..." << std::endl;
 
   const unsigned int jstop  = get_rb_evaluation().get_n_basis_functions();
   const unsigned int jstart = jstop-get_delta_N();
-  for (unsigned int i=0; i<get_rb_evaluation().A_q_representor.size(); ++i)
+  for (unsigned int i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
     for (unsigned int j=jstart; j<jstop; ++j)
     {
-      libMesh::out << "Writing out A_q_representor[" << i << "][" << j << "]..." << std::endl;
-      libmesh_assert(get_rb_evaluation().A_q_representor[i][j] != NULL);
+      libMesh::out << "Writing out Aq_representor[" << i << "][" << j << "]..." << std::endl;
+      libmesh_assert(get_rb_evaluation().Aq_representor[i][j] != NULL);
 
       file_name.str(""); // reset filename
       file_name << riesz_representors_dir
-                << "/A_q_representor" << i << "_" << j << riesz_representor_suffix;
+                << "/Aq_representor" << i << "_" << j << riesz_representor_suffix;
 
       {
         // No need to copy! Use swap instead.
-        // *solution = *(A_q_representor[i][j]);
-        get_rb_evaluation().A_q_representor[i][j]->swap(*solution);
+        // *solution = *(Aq_representor[i][j]);
+        get_rb_evaluation().Aq_representor[i][j]->swap(*solution);
 
         Xdr aqr_data(file_name.str(),
                      write_binary_residual_representors ? ENCODE : WRITE);
@@ -2231,7 +2231,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
         Parallel::barrier();
 
         // Swap back.
-        get_rb_evaluation().A_q_representor[i][j]->swap(*solution);
+        get_rb_evaluation().Aq_representor[i][j]->swap(*solution);
 
         // TODO: bzip the resulting file?  See $LIBMESH_DIR/src/mesh/unstructured_mesh.C
         // for the system call, be sure to do it only on one processor, etc.
@@ -2248,29 +2248,29 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
 {
   START_LOG("read_riesz_representors_from_files()", "RBConstruction");
 
-  libMesh::out << "Reading in the F_q_representors..." << std::endl;
+  libMesh::out << "Reading in the Fq_representors..." << std::endl;
 
   const std::string riesz_representor_suffix = (read_binary_residual_representors ? ".xdr" : ".dat");
   std::ostringstream file_name;
   struct stat stat_info;
 
-  // Read in the F_q_representors.  There should be Q_f of these.  FIXME:
+  // Read in the Fq_representors.  There should be Q_f of these.  FIXME:
   // should we be worried about leaks here?
-  for (unsigned int i=0; i<F_q_representor.size(); ++i)
+  for (unsigned int i=0; i<Fq_representor.size(); ++i)
   {
-    if (F_q_representor[i] != NULL)
+    if (Fq_representor[i] != NULL)
     {
-      libMesh::out << "Error, must delete existing F_q_representor before reading in from file."
+      libMesh::out << "Error, must delete existing Fq_representor before reading in from file."
                    << std::endl;
       libmesh_error();
     }
   }
 
-  for (unsigned int i=0; i<F_q_representor.size(); i++)
+  for (unsigned int i=0; i<Fq_representor.size(); i++)
   {
     file_name.str(""); // reset filename
     file_name << riesz_representors_dir
-              << "/F_q_representor" << i << riesz_representor_suffix;
+              << "/Fq_representor" << i << riesz_representor_suffix;
 
     // On processor zero check to be sure the file exists
     if (libMesh::processor_id() == 0)
@@ -2289,42 +2289,42 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
 
     read_serialized_data(fqr_data, false);
 
-    F_q_representor[i] = NumericVector<Number>::build().release();
-    F_q_representor[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+    Fq_representor[i] = NumericVector<Number>::build().release();
+    Fq_representor[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
     // No need to copy, just swap
-    // *F_q_representor[i] = *solution;
-    F_q_representor[i]->swap(*solution);
+    // *Fq_representor[i] = *solution;
+    Fq_representor[i]->swap(*solution);
   }
 
   // Alert the update_residual_terms() function that we don't need to recompute
-  // the F_q_representors as we have already read them in from file!
-  Fq_representor_norms_computed = true;
+  // the Fq_representors as we have already read them in from file!
+  Fq_representor_innerprods_computed = true;
 
 
-  libMesh::out << "Reading in the A_q_representors..." << std::endl;
+  libMesh::out << "Reading in the Aq_representors..." << std::endl;
 
-  // Read in the A_q representors.  The class makes room for [Q_a][Nmax] of these.  We are going to
+  // Read in the Aq representors.  The class makes room for [Q_a][Nmax] of these.  We are going to
   // read in [Q_a][get_rb_evaluation().get_n_basis_functions()].  FIXME:
   // should we be worried about leaks in the locations where we're about to fill entries?
-  for (unsigned int i=0; i<get_rb_evaluation().A_q_representor.size(); ++i)
-    for (unsigned int j=0; j<get_rb_evaluation().A_q_representor[i].size(); ++j)
+  for (unsigned int i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
+    for (unsigned int j=0; j<get_rb_evaluation().Aq_representor[i].size(); ++j)
     {
-      if (get_rb_evaluation().A_q_representor[i][j] != NULL)
+      if (get_rb_evaluation().Aq_representor[i][j] != NULL)
       {
-        libMesh::out << "Error, must delete existing A_q_representor before reading in from file."
+        libMesh::out << "Error, must delete existing Aq_representor before reading in from file."
                      << std::endl;
         libmesh_error();
       }
     }
 
   // Now ready to read them in from file!
-  for (unsigned int i=0; i<get_rb_evaluation().A_q_representor.size(); ++i)
+  for (unsigned int i=0; i<get_rb_evaluation().Aq_representor.size(); ++i)
     for (unsigned int j=0; j<get_rb_evaluation().get_n_basis_functions(); ++j)
     {
       file_name.str(""); // reset filename
       file_name << riesz_representors_dir
-                << "/A_q_representor" << i << "_" << j << riesz_representor_suffix;
+                << "/Aq_representor" << i << "_" << j << riesz_representor_suffix;
 
       // On processor zero check to be sure the file exists
       if (libMesh::processor_id() == 0)
@@ -2342,13 +2342,13 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
 
       read_serialized_data(aqr_data, false);
 
-      get_rb_evaluation().A_q_representor[i][j] = NumericVector<Number>::build().release();
-      get_rb_evaluation().A_q_representor[i][j]->init (n_dofs(), n_local_dofs(),
+      get_rb_evaluation().Aq_representor[i][j] = NumericVector<Number>::build().release();
+      get_rb_evaluation().Aq_representor[i][j]->init (n_dofs(), n_local_dofs(),
                                             false, libMeshEnums::PARALLEL);
 
       // No need to copy, just swap
-      //*A_q_representor[i][j] = *solution;
-      get_rb_evaluation().A_q_representor[i][j]->swap(*solution);
+      //*Aq_representor[i][j] = *solution;
+      get_rb_evaluation().Aq_representor[i][j]->swap(*solution);
     }
 
   STOP_LOG("read_riesz_representors_from_files()", "RBConstruction");

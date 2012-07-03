@@ -216,9 +216,9 @@ Real RBSCMEvaluation::get_SCM_LB()
   // the variables y_1,...y_Q_a.
   // These are the same for each \mu in the SCM
   // training set, hence can do this up front.
-  glp_add_cols(lp,rb_theta_expansion->get_Q_a());
+  glp_add_cols(lp,rb_theta_expansion->get_n_A_terms());
 
-  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
     {
       if(B_max[q] < B_min[q]) // Invalid bound, set as free variable
       {
@@ -245,7 +245,7 @@ Real RBSCMEvaluation::get_SCM_LB()
   // Now put current_parameters in saved_parameters
   save_current_parameters();
 
-  unsigned int matrix_size = n_rows*rb_theta_expansion->get_Q_a();
+  unsigned int matrix_size = n_rows*rb_theta_expansion->get_n_A_terms();
   std::vector<int> ia(matrix_size+1);
   std::vector<int> ja(matrix_size+1);
   std::vector<double> ar(matrix_size+1);
@@ -261,7 +261,7 @@ Real RBSCMEvaluation::get_SCM_LB()
     // Now define the matrix that relates the y's
     // to the auxiliary variables at the current
     // value of mu.
-    for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
+    for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
       {
         count++;
 
@@ -269,7 +269,7 @@ Real RBSCMEvaluation::get_SCM_LB()
         ja[count] = q+1;
 
         // This can only handle Reals right now
-        ar[count] = libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_parameters()) );
+        ar[count] = libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) );
       }
   }
 
@@ -279,9 +279,9 @@ Real RBSCMEvaluation::get_SCM_LB()
 
   glp_load_matrix(lp, matrix_size, &ia[0], &ja[0], &ar[0]);
 
-  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
     {
-      glp_set_obj_coef(lp,q+1, libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_parameters()) ) );
+      glp_set_obj_coef(lp,q+1, libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) ) );
     }
 
   // Use this command to initialize the basis for the LP
@@ -340,9 +340,9 @@ Real RBSCMEvaluation::get_SCM_UB()
     const std::vector<Real> UB_vector = SCM_UB_vectors[m];
 
     Real J_obj = 0.;
-    for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
+    for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
       {
-        J_obj += libmesh_real( rb_theta_expansion->eval_theta_q_a(q,get_parameters()) )*UB_vector[q];
+        J_obj += libmesh_real( rb_theta_expansion->eval_A_theta(q,get_parameters()) )*UB_vector[q];
       }
 
     if( (m==0) || (J_obj < min_J_obj) )
@@ -466,7 +466,7 @@ void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_n
     
     for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
     {
-      for(unsigned int j=0; j<rb_theta_expansion->get_Q_a(); j++)
+      for(unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
       {
         Real SCM_UB_vector_ij = get_SCM_UB_vector(i,j);
         SCM_UB_vectors_out << SCM_UB_vector_ij;
@@ -500,7 +500,7 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
   Xdr B_min_in(file_name.str(), mode);
   
   B_min.clear();
-  for(unsigned int i=0; i<rb_theta_expansion->get_Q_a(); i++)
+  for(unsigned int i=0; i<rb_theta_expansion->get_n_A_terms(); i++)
   {
     Real B_min_val;
     B_min_in >> B_min_val;
@@ -516,7 +516,7 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
   Xdr B_max_in(file_name.str(), mode);
   
   B_max.clear();
-  for(unsigned int i=0; i<rb_theta_expansion->get_Q_a(); i++)
+  for(unsigned int i=0; i<rb_theta_expansion->get_n_A_terms(); i++)
   {
     Real B_max_val;
     B_max_in >> B_max_val;
@@ -577,8 +577,8 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
   SCM_UB_vectors.resize( C_J_stability_vector.size() );
   for(unsigned int i=0; i<SCM_UB_vectors.size(); i++)
   {
-    SCM_UB_vectors[i].resize( rb_theta_expansion->get_Q_a() );
-    for(unsigned int j=0; j<rb_theta_expansion->get_Q_a(); j++)
+    SCM_UB_vectors[i].resize( rb_theta_expansion->get_n_A_terms() );
+    for(unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
     {
       SCM_UB_vectors_in >> SCM_UB_vectors[i][j];
     }

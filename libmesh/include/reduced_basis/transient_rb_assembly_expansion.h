@@ -49,19 +49,42 @@ public:
   TransientRBAssemblyExpansion();
 
   /**
+   * Perform the specified M interior assembly.
+   */
+  void perform_M_interior_assembly(unsigned int q,
+                                   FEMContext& context);
+
+  /**
+   * Perform the specified M boundary assembly.
+   */
+  void perform_M_boundary_assembly(unsigned int q,
+                                   FEMContext& context);
+
+  /**
+   * Get Q_m, the number of terms in the affine
+   * expansion for the bilinear form.
+   */
+  unsigned int get_n_M_terms() const;
+
+  /**
    * Attach ElemAssembly object for the time-derivative
    * (both interior and boundary assembly).
    */
-  void attach_M_q_assembly(ElemAssembly* A_q_assembly);
+  void attach_M_assembly(ElemAssembly* A_q_assembly);
 
-  // -------- Data members --------
+  /**
+   * Return a reference to the specified M_assembly object.
+   */
+  ElemAssembly& get_M_assembly(unsigned int q);
+
+private:
 
   /**
    * Vectors storing the function pointers to the assembly
    * routines for the time-derivative operators, both interior and boundary
    * assembly.
    */
-  std::vector<ElemAssembly*> M_q_assembly_vector;
+  std::vector<ElemAssembly*> _M_assembly_vector;
 
 };
 

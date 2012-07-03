@@ -145,7 +145,7 @@ void RBSCMConstruction::print_info()
   libMesh::out << "SCM Greedy tolerance: " << get_SCM_training_tolerance() << std::endl;
   if(rb_scm_eval)
   {
-    libMesh::out << "A_q operators attached: " << get_rb_theta_expansion().get_Q_a() << std::endl;
+    libMesh::out << "A_q operators attached: " << get_rb_theta_expansion().get_n_A_terms() << std::endl;
     libMesh::out << "Number of parameters: "   << get_n_params() << std::endl;
   }
   else
@@ -178,8 +178,8 @@ void RBSCMConstruction::resize_SCM_vectors()
   rb_scm_eval->SCM_UB_vectors.clear();
 
   // Resize the bounding box vectors
-  rb_scm_eval->B_min.resize(get_rb_theta_expansion().get_Q_a());
-  rb_scm_eval->B_max.resize(get_rb_theta_expansion().get_Q_a());
+  rb_scm_eval->B_min.resize(get_rb_theta_expansion().get_n_A_terms());
+  rb_scm_eval->B_max.resize(get_rb_theta_expansion().get_n_A_terms());
 }
 
 void RBSCMConstruction::add_scaled_symm_Aq(unsigned int q_a, Number scalar)
@@ -271,10 +271,10 @@ void RBSCMConstruction::compute_SCM_bounding_box()
   START_LOG("compute_SCM_bounding_box()", "RBSCMConstruction");
 
   // Resize the bounding box vectors
-  rb_scm_eval->B_min.resize(get_rb_theta_expansion().get_Q_a());
-  rb_scm_eval->B_max.resize(get_rb_theta_expansion().get_Q_a());
+  rb_scm_eval->B_min.resize(get_rb_theta_expansion().get_n_A_terms());
+  rb_scm_eval->B_max.resize(get_rb_theta_expansion().get_n_A_terms());
 
-  for(unsigned int q=0; q<get_rb_theta_expansion().get_Q_a(); q++)
+  for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
   {
     matrix_A->zero();
     add_scaled_symm_Aq(q, 1.);
@@ -342,9 +342,9 @@ void RBSCMConstruction::evaluate_stability_constant()
 
   // Set matrix A corresponding to mu_star
   matrix_A->zero();
-  for(unsigned int q=0; q<get_rb_theta_expansion().get_Q_a(); q++)
+  for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
   {
-    add_scaled_symm_Aq(q, get_rb_theta_expansion().eval_theta_q_a(q,get_parameters()));
+    add_scaled_symm_Aq(q, get_rb_theta_expansion().eval_A_theta(q,get_parameters()));
   }
 
   set_eigensolver_properties(-1);
@@ -367,7 +367,7 @@ void RBSCMConstruction::evaluate_stability_constant()
     // We use this later to compute the SCM upper bounds.
     Real norm_B2 = libmesh_real( B_inner_product(*solution, *solution) );
 
-    for(unsigned int q=0; q<get_rb_theta_expansion().get_Q_a(); q++)
+    for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
     {
       Real norm_Aq2 = libmesh_real( Aq_inner_product(q, *solution, *solution) );
 
@@ -395,7 +395,7 @@ Number RBSCMConstruction::Aq_inner_product(unsigned int q,
                                     const NumericVector<Number>& v,
                                     const NumericVector<Number>& w)
 {
-  if(q >= get_rb_theta_expansion().get_Q_a())
+  if(q >= get_rb_theta_expansion().get_n_A_terms())
   {
     libMesh::err << "Error: We must have q < Q_a in Aq_inner_product."
                  << std::endl;
@@ -467,7 +467,7 @@ void RBSCMConstruction::enrich_C_J(unsigned int new_C_J_index)
   // Finally, resize C_J_stability_vector and SCM_UB_vectors
   rb_scm_eval->C_J_stability_vector.push_back(0.);
 
-  std::vector<Real> zero_vector(get_rb_theta_expansion().get_Q_a());
+  std::vector<Real> zero_vector(get_rb_theta_expansion().get_n_A_terms());
   rb_scm_eval->SCM_UB_vectors.push_back(zero_vector);
 
   STOP_LOG("enrich_C_J()", "RBSCMConstruction");

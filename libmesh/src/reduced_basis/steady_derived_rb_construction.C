@@ -128,16 +128,16 @@ void DerivedRBConstruction<RBConstruction>::update_RB_system_matrices()
   unsigned int derived_RB_size = get_rb_evaluation().get_n_basis_functions();
   unsigned int uber_RB_size    = uber_system.get_rb_evaluation().get_n_basis_functions();
 
-  const unsigned int Q_a = get_rb_theta_expansion().get_Q_a();
-  const unsigned int Q_f = get_rb_theta_expansion().get_Q_f();
+  const unsigned int Q_a = get_rb_theta_expansion().get_n_A_terms();
+  const unsigned int Q_f = get_rb_theta_expansion().get_n_F_terms();
 
   DenseVector<Number> temp_vector;
   for(unsigned int q_f=0; q_f<Q_f; q_f++)
   {
     for(unsigned int i=(derived_RB_size-delta_N); i<derived_RB_size; i++)
     {
-      uber_system.get_rb_evaluation().RB_F_q_vector[q_f].get_principal_subvector(uber_RB_size, temp_vector);
-      get_rb_evaluation().RB_F_q_vector[q_f](i) = temp_vector.dot(der_rb_eval.derived_basis_functions[i]);
+      uber_system.get_rb_evaluation().RB_Fq_vector[q_f].get_principal_subvector(uber_RB_size, temp_vector);
+      get_rb_evaluation().RB_Fq_vector[q_f](i) = temp_vector.dot(der_rb_eval.derived_basis_functions[i]);
     }
   }
 
@@ -145,7 +145,7 @@ void DerivedRBConstruction<RBConstruction>::update_RB_system_matrices()
   for(unsigned int i=(derived_RB_size-delta_N); i<derived_RB_size; i++)
   {
     for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
-      for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
         uber_system.get_rb_evaluation().RB_output_vectors[n][q_l].get_principal_subvector(uber_RB_size, temp_vector);
         get_rb_evaluation().RB_output_vectors[n][q_l](i) = temp_vector.dot(der_rb_eval.derived_basis_functions[i]);
@@ -155,16 +155,16 @@ void DerivedRBConstruction<RBConstruction>::update_RB_system_matrices()
     {
       for(unsigned int q_a=0; q_a<Q_a; q_a++)
       {
-        // Compute reduced A_q matrix
-        uber_system.get_rb_evaluation().RB_A_q_vector[q_a].get_principal_submatrix(uber_RB_size, temp_matrix);
+        // Compute reduced Aq matrix
+        uber_system.get_rb_evaluation().RB_Aq_vector[q_a].get_principal_submatrix(uber_RB_size, temp_matrix);
         temp_matrix.vector_mult(temp_vector, der_rb_eval.derived_basis_functions[j]);
-        get_rb_evaluation().RB_A_q_vector[q_a](i,j) = der_rb_eval.derived_basis_functions[i].dot(temp_vector);
+        get_rb_evaluation().RB_Aq_vector[q_a](i,j) = der_rb_eval.derived_basis_functions[i].dot(temp_vector);
 
         if(i!=j)
         {
           temp_vector.zero();
           temp_matrix.vector_mult(temp_vector, der_rb_eval.derived_basis_functions[i]);
-          get_rb_evaluation().RB_A_q_vector[q_a](j,i) = (der_rb_eval.derived_basis_functions[j]).dot(temp_vector);
+          get_rb_evaluation().RB_Aq_vector[q_a](j,i) = (der_rb_eval.derived_basis_functions[j]).dot(temp_vector);
         }
       }
     }
@@ -192,11 +192,11 @@ void DerivedRBConstruction<RBConstruction>::generate_residual_terms_wrt_truth()
 }
 
 template <>
-void DerivedRBConstruction<RBConstruction>::compute_Fq_representor_norms(bool compute_inner_products)
+void DerivedRBConstruction<RBConstruction>::compute_Fq_representor_innerprods(bool compute_inner_products)
 {
-  START_LOG("compute_Fq_representor_norms()", "DerivedRBConstruction");
+  START_LOG("compute_Fq_representor_innerprods()", "DerivedRBConstruction");
 
-  // We don't short-circuit here even if Fq_representor_norms_computed = true because
+  // We don't short-circuit here even if Fq_representor_innerprods_computed = true because
   // the residual mode may have changed (this function is very cheap so not much
   // incentive to make sure we do not call it extra times)
 
@@ -205,7 +205,7 @@ void DerivedRBConstruction<RBConstruction>::compute_Fq_representor_norms(bool co
 
   SteadyDerivedRBEvaluation& drb_eval = libmesh_cast_ref< SteadyDerivedRBEvaluation& >(get_rb_evaluation());
 
-  const unsigned int Q_f = get_rb_theta_expansion().get_Q_f();
+  const unsigned int Q_f = get_rb_theta_expansion().get_n_F_terms();
 
   switch(drb_eval.residual_type_flag)
   {
@@ -223,9 +223,9 @@ void DerivedRBConstruction<RBConstruction>::compute_Fq_representor_norms(bool co
         {
           for(unsigned int q_f2=q_f1; q_f2<Q_f; q_f2++)
           {
-            uber_system.get_rb_evaluation().RB_F_q_vector[q_f2].get_principal_subvector(uber_RB_size, temp_vector1);
-            uber_system.get_rb_evaluation().RB_F_q_vector[q_f1].get_principal_subvector(uber_RB_size, temp_vector2);
-            Fq_representor_norms[q] = temp_vector1.dot( temp_vector2 );
+            uber_system.get_rb_evaluation().RB_Fq_vector[q_f2].get_principal_subvector(uber_RB_size, temp_vector1);
+            uber_system.get_rb_evaluation().RB_Fq_vector[q_f1].get_principal_subvector(uber_RB_size, temp_vector2);
+            Fq_representor_innerprods[q] = temp_vector1.dot( temp_vector2 );
             q++;
           }
         }
@@ -239,32 +239,32 @@ void DerivedRBConstruction<RBConstruction>::compute_Fq_representor_norms(bool co
       // Copy the output terms over from uber_system
       for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
       {
-        output_dual_norms[n] = uber_system.output_dual_norms[n];
+        output_dual_innerprods[n] = uber_system.output_dual_innerprods[n];
       }
 
       // Copy the Fq terms over from uber_system
-      Fq_representor_norms = uber_system.Fq_representor_norms;
+      Fq_representor_innerprods = uber_system.Fq_representor_innerprods;
 
       break;
     }
 
     default:
     {
-      libMesh::out << "Invalid RESIDUAL_TYPE in compute_Fq_representor_norms" << std::endl;
+      libMesh::out << "Invalid RESIDUAL_TYPE in compute_Fq_representor_innerprods" << std::endl;
       break;
     }
   }
 
-  Fq_representor_norms_computed = true;
+  Fq_representor_innerprods_computed = true;
 
-  // Copy the Fq_representor_norms and output_dual_norms to the rb_eval,
+  // Copy the Fq_representor_innerprods and output_dual_innerprods to the rb_eval,
   // where they are actually needed
   // (we store them in DerivedRBConstruction as well in order to cache
   // the data and possibly save work)
-  get_rb_evaluation().Fq_representor_norms = Fq_representor_norms;
-  get_rb_evaluation().output_dual_norms = output_dual_norms;
+  get_rb_evaluation().Fq_representor_innerprods = Fq_representor_innerprods;
+  get_rb_evaluation().output_dual_innerprods = output_dual_innerprods;
 
-  STOP_LOG("compute_Fq_representor_norms()", "DerivedRBConstruction");
+  STOP_LOG("compute_Fq_representor_innerprods()", "DerivedRBConstruction");
 }
 
 template <>
@@ -278,8 +278,8 @@ void DerivedRBConstruction<RBConstruction>::update_residual_terms(bool compute_i
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& uber_system = es.get_system<RBConstruction>(uber_system_name);
 
-  const unsigned int Q_a = get_rb_theta_expansion().get_Q_a();
-  const unsigned int Q_f = get_rb_theta_expansion().get_Q_f();
+  const unsigned int Q_a = get_rb_theta_expansion().get_n_A_terms();
+  const unsigned int Q_f = get_rb_theta_expansion().get_n_F_terms();
 
   switch(der_rb_eval.residual_type_flag)
   {
@@ -300,10 +300,10 @@ void DerivedRBConstruction<RBConstruction>::update_residual_terms(bool compute_i
 	      {
 	        for(unsigned int i=(derived_RB_size-delta_N); i<derived_RB_size; i++)
 		  {
-                    uber_system.get_rb_evaluation().RB_A_q_vector[q_a].get_principal_submatrix(uber_RB_size, temp_matrix);
+                    uber_system.get_rb_evaluation().RB_Aq_vector[q_a].get_principal_submatrix(uber_RB_size, temp_matrix);
                     temp_matrix.vector_mult(temp_vector1, der_rb_eval.derived_basis_functions[i]);
-                    uber_system.get_rb_evaluation().RB_F_q_vector[q_f].get_principal_subvector(uber_RB_size, temp_vector2);
-		    get_rb_evaluation().Fq_Aq_representor_norms[q_f][q_a][i] = -temp_vector1.dot(temp_vector2);
+                    uber_system.get_rb_evaluation().RB_Fq_vector[q_f].get_principal_subvector(uber_RB_size, temp_vector2);
+		    get_rb_evaluation().Fq_Aq_representor_innerprods[q_f][q_a][i] = -temp_vector1.dot(temp_vector2);
 		  }
 	      }
 	  }
@@ -317,19 +317,19 @@ void DerivedRBConstruction<RBConstruction>::update_residual_terms(bool compute_i
 		  {
 		    for(unsigned int j=0; j<derived_RB_size; j++)
 		      {
-                        uber_system.get_rb_evaluation().RB_A_q_vector[q_a1].get_principal_submatrix(uber_RB_size, temp_matrix);
+                        uber_system.get_rb_evaluation().RB_Aq_vector[q_a1].get_principal_submatrix(uber_RB_size, temp_matrix);
                         temp_matrix.vector_mult(temp_vector1, der_rb_eval.derived_basis_functions[i]);
-                        uber_system.get_rb_evaluation().RB_A_q_vector[q_a2].get_principal_submatrix(uber_RB_size, temp_matrix);
+                        uber_system.get_rb_evaluation().RB_Aq_vector[q_a2].get_principal_submatrix(uber_RB_size, temp_matrix);
                         temp_matrix.vector_mult(temp_vector2, der_rb_eval.derived_basis_functions[j]);
-		        get_rb_evaluation().Aq_Aq_representor_norms[q][i][j] = temp_vector1.dot(temp_vector2);
+		        get_rb_evaluation().Aq_Aq_representor_innerprods[q][i][j] = temp_vector1.dot(temp_vector2);
 
 		        if(i != j)
 			  {
-                            uber_system.get_rb_evaluation().RB_A_q_vector[q_a1].get_principal_submatrix(uber_RB_size, temp_matrix);
+                            uber_system.get_rb_evaluation().RB_Aq_vector[q_a1].get_principal_submatrix(uber_RB_size, temp_matrix);
                             temp_matrix.vector_mult(temp_vector1, der_rb_eval.derived_basis_functions[j]);
-                            uber_system.get_rb_evaluation().RB_A_q_vector[q_a2].get_principal_submatrix(uber_RB_size, temp_matrix);
+                            uber_system.get_rb_evaluation().RB_Aq_vector[q_a2].get_principal_submatrix(uber_RB_size, temp_matrix);
                             temp_matrix.vector_mult(temp_vector2, der_rb_eval.derived_basis_functions[i]);
-			    get_rb_evaluation().Aq_Aq_representor_norms[q][j][i] = temp_vector1.dot(temp_vector2);
+			    get_rb_evaluation().Aq_Aq_representor_innerprods[q][j][i] = temp_vector1.dot(temp_vector2);
 			  }
 		      }
 		  }
@@ -351,11 +351,11 @@ void DerivedRBConstruction<RBConstruction>::update_residual_terms(bool compute_i
         {
           for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
           {
-            get_rb_evaluation().Fq_Aq_representor_norms[q_f][q_a][i] = 0.;
+            get_rb_evaluation().Fq_Aq_representor_innerprods[q_f][q_a][i] = 0.;
             for(unsigned int j=0; j<uber_system.get_rb_evaluation().get_n_basis_functions(); j++) // Evaluate the dot product
             {
-              get_rb_evaluation().Fq_Aq_representor_norms[q_f][q_a][i] +=
-	        uber_system.get_rb_evaluation().Fq_Aq_representor_norms[q_f][q_a][j] *
+              get_rb_evaluation().Fq_Aq_representor_innerprods[q_f][q_a][i] +=
+	        uber_system.get_rb_evaluation().Fq_Aq_representor_innerprods[q_f][q_a][j] *
 	        der_rb_eval.derived_basis_functions[i](j);
             }
           }
@@ -372,22 +372,22 @@ void DerivedRBConstruction<RBConstruction>::update_residual_terms(bool compute_i
             for(unsigned int j=0; j<RB_size; j++)
 	    {
 
-              get_rb_evaluation().Aq_Aq_representor_norms[q][i][j] = 0.;
+              get_rb_evaluation().Aq_Aq_representor_innerprods[q][i][j] = 0.;
               if(i != j)
-                get_rb_evaluation().Aq_Aq_representor_norms[q][j][i] = 0.;
+                get_rb_evaluation().Aq_Aq_representor_innerprods[q][j][i] = 0.;
 
               for(unsigned int k=0; k<uber_system.get_rb_evaluation().get_n_basis_functions(); k++)
                 for(unsigned int k_prime=0; k_prime<uber_system.get_rb_evaluation().get_n_basis_functions(); k_prime++)
                 {
-                  get_rb_evaluation().Aq_Aq_representor_norms[q][i][j] +=
+                  get_rb_evaluation().Aq_Aq_representor_innerprods[q][i][j] +=
                     der_rb_eval.derived_basis_functions[i](k)*der_rb_eval.derived_basis_functions[j](k_prime)*
-                    uber_system.get_rb_evaluation().Aq_Aq_representor_norms[q][k][k_prime];
+                    uber_system.get_rb_evaluation().Aq_Aq_representor_innerprods[q][k][k_prime];
 
                   if(i != j)
                   {
-                    get_rb_evaluation().Aq_Aq_representor_norms[q][j][i] +=
+                    get_rb_evaluation().Aq_Aq_representor_innerprods[q][j][i] +=
                       der_rb_eval.derived_basis_functions[j](k)*der_rb_eval.derived_basis_functions[i](k_prime)*
-                      uber_system.get_rb_evaluation().Aq_Aq_representor_norms[q][k][k_prime];
+                      uber_system.get_rb_evaluation().Aq_Aq_representor_innerprods[q][k][k_prime];
                   }
                 }
             }
