@@ -787,9 +787,7 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
                       objects_on_proc);
 
 #ifndef NDEBUG
-  unsigned int global_unpartitioned_objects = unpartitioned_objects;
-  Parallel::max(global_unpartitioned_objects);
-  libmesh_assert(global_unpartitioned_objects == unpartitioned_objects);
+  libmesh_assert(Parallel::verify(unpartitioned_objects));
   for (unsigned int p=0; p != libMesh::n_processors(); ++p)
     libmesh_assert(ghost_objects_from_proc[p] <= objects_on_proc[p]);
 #endif
