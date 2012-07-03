@@ -124,20 +124,20 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
     RB_inner_product_matrix.resize(Nmax,Nmax);
 
   // Allocate dense matrices for RB solves
-  RB_A_q_vector.resize(rb_theta_expansion->get_Q_a());
+  RB_Aq_vector.resize(rb_theta_expansion->get_n_A_terms());
 
-  for(unsigned int q=0; q<rb_theta_expansion->get_Q_a(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_n_A_terms(); q++)
   {
     // Initialize the memory for the RB matrices
-    RB_A_q_vector[q].resize(Nmax,Nmax);
+    RB_Aq_vector[q].resize(Nmax,Nmax);
   }
 
-  RB_F_q_vector.resize(rb_theta_expansion->get_Q_f());
+  RB_Fq_vector.resize(rb_theta_expansion->get_n_F_terms());
 
-  for(unsigned int q=0; q<rb_theta_expansion->get_Q_f(); q++)
+  for(unsigned int q=0; q<rb_theta_expansion->get_n_F_terms(); q++)
   {
     // Initialize the memory for the RB vectors
-    RB_F_q_vector[q].resize(Nmax);
+    RB_Fq_vector[q].resize(Nmax);
   }
 
 
@@ -145,8 +145,8 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
   RB_output_vectors.resize(rb_theta_expansion->get_n_outputs());
   for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
   {
-    RB_output_vectors[n].resize(rb_theta_expansion->get_Q_l(n));
-    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
+    RB_output_vectors[n].resize(rb_theta_expansion->get_n_output_terms(n));
+    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
     {
       RB_output_vectors[n][q_l].resize(Nmax);
     }
@@ -159,48 +159,48 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
   if(resize_error_bound_data)
   {
     // Initialize vectors for the norms of the Fq representors
-    unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
-    Fq_representor_norms.resize(Q_f_hat);
+    unsigned int Q_f_hat = rb_theta_expansion->get_n_F_terms()*(rb_theta_expansion->get_n_F_terms()+1)/2;
+    Fq_representor_innerprods.resize(Q_f_hat);
 
     // Initialize vectors for the norms of the representors
-    Fq_Aq_representor_norms.resize(rb_theta_expansion->get_Q_f());
-    for(unsigned int i=0; i<rb_theta_expansion->get_Q_f(); i++)
+    Fq_Aq_representor_innerprods.resize(rb_theta_expansion->get_n_F_terms());
+    for(unsigned int i=0; i<rb_theta_expansion->get_n_F_terms(); i++)
     {
-      Fq_Aq_representor_norms[i].resize(rb_theta_expansion->get_Q_a());
-      for(unsigned int j=0; j<rb_theta_expansion->get_Q_a(); j++)
+      Fq_Aq_representor_innerprods[i].resize(rb_theta_expansion->get_n_A_terms());
+      for(unsigned int j=0; j<rb_theta_expansion->get_n_A_terms(); j++)
       {
-        Fq_Aq_representor_norms[i][j].resize(Nmax, 0.);
+        Fq_Aq_representor_innerprods[i][j].resize(Nmax, 0.);
       }
     }
     
-    unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
-    Aq_Aq_representor_norms.resize(Q_a_hat);
+    unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
+    Aq_Aq_representor_innerprods.resize(Q_a_hat);
     for(unsigned int i=0; i<Q_a_hat; i++)
     {
-      Aq_Aq_representor_norms[i].resize(Nmax);
+      Aq_Aq_representor_innerprods[i].resize(Nmax);
       for(unsigned int j=0; j<Nmax; j++)
       {
-        Aq_Aq_representor_norms[i][j].resize(Nmax, 0.);
+        Aq_Aq_representor_innerprods[i][j].resize(Nmax, 0.);
       }
     }
     
     RB_output_error_bounds.resize(rb_theta_expansion->get_n_outputs(), 0.);
 
     // Resize the output dual norm vectors
-    output_dual_norms.resize(rb_theta_expansion->get_n_outputs());
+    output_dual_innerprods.resize(rb_theta_expansion->get_n_outputs());
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
-      unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
-      output_dual_norms[n].resize(Q_l_hat);
+      unsigned int Q_l_hat = rb_theta_expansion->get_n_output_terms(n)*(rb_theta_expansion->get_n_output_terms(n)+1)/2;
+      output_dual_innerprods[n].resize(Q_l_hat);
     }
     
-    // Clear and resize the vector of A_q_representors
+    // Clear and resize the vector of Aq_representors
     clear_riesz_representors();
 
-    A_q_representor.resize(rb_theta_expansion->get_Q_a());
-    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+    Aq_representor.resize(rb_theta_expansion->get_n_A_terms());
+    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
     {
-      A_q_representor[q_a].resize(Nmax);
+      Aq_representor[q_a].resize(Nmax);
     }
   }
 
@@ -235,24 +235,24 @@ Real RBEvaluation::rb_solve(unsigned int N)
   DenseMatrix<Number> RB_system_matrix(N,N);
   RB_system_matrix.zero();
 
-  DenseMatrix<Number> RB_A_q_a;
-  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+  DenseMatrix<Number> RB_Aq_a;
+  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
   {
-    RB_A_q_vector[q_a].get_principal_submatrix(N, RB_A_q_a);
+    RB_Aq_vector[q_a].get_principal_submatrix(N, RB_Aq_a);
 
-    RB_system_matrix.add(rb_theta_expansion->eval_theta_q_a(q_a, mu), RB_A_q_a);
+    RB_system_matrix.add(rb_theta_expansion->eval_A_theta(q_a, mu), RB_Aq_a);
   }
 
   // Assemble the RB rhs
   DenseVector<Number> RB_rhs(N);
   RB_rhs.zero();
 
-  DenseVector<Number> RB_F_q_f;
-  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
+  DenseVector<Number> RB_Fq_f;
+  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
   {
-    RB_F_q_vector[q_f].get_principal_subvector(N, RB_F_q_f);
+    RB_Fq_vector[q_f].get_principal_subvector(N, RB_Fq_f);
 
-    RB_rhs.add(rb_theta_expansion->eval_theta_q_f(q_f, mu), RB_F_q_f);
+    RB_rhs.add(rb_theta_expansion->eval_F_theta(q_f, mu), RB_Fq_f);
   }
 
   // Solve the linear system
@@ -266,10 +266,10 @@ Real RBEvaluation::rb_solve(unsigned int N)
   for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
   {
     RB_outputs[n] = 0.;
-    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
+    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
     {
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-      RB_outputs[n] += libmesh_conj(rb_theta_expansion->eval_theta_q_l(n,q_l,mu))*RB_output_vector_N.dot(RB_solution);
+      RB_outputs[n] += libmesh_conj(rb_theta_expansion->eval_output_theta(n,q_l,mu))*RB_output_vector_N.dot(RB_solution);
     }
   }
 
@@ -321,38 +321,38 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
   Number residual_norm_sq = 0.;
 
   unsigned int q=0;
-  for(unsigned int q_f1=0; q_f1<rb_theta_expansion->get_Q_f(); q_f1++)
+  for(unsigned int q_f1=0; q_f1<rb_theta_expansion->get_n_F_terms(); q_f1++)
   {
-    for(unsigned int q_f2=q_f1; q_f2<rb_theta_expansion->get_Q_f(); q_f2++)
+    for(unsigned int q_f2=q_f1; q_f2<rb_theta_expansion->get_n_F_terms(); q_f2++)
     {
       Real delta = (q_f1==q_f2) ? 1. : 2.;
       residual_norm_sq += delta * libmesh_real(
-         rb_theta_expansion->eval_theta_q_f(q_f1, mu)
-       * libmesh_conj(rb_theta_expansion->eval_theta_q_f(q_f2, mu)) * Fq_representor_norms[q] );
+         rb_theta_expansion->eval_F_theta(q_f1, mu)
+       * libmesh_conj(rb_theta_expansion->eval_F_theta(q_f2, mu)) * Fq_representor_innerprods[q] );
 
       q++;
     }
   }
 
-  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
+  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
   {
-    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
     {
       for(unsigned int i=0; i<N; i++)
       {
         Real delta = 2.;
         residual_norm_sq +=
-          delta * libmesh_real( rb_theta_expansion->eval_theta_q_f(q_f, mu) *
-          libmesh_conj(rb_theta_expansion->eval_theta_q_a(q_a, mu)) *
-          libmesh_conj(RB_solution(i)) * Fq_Aq_representor_norms[q_f][q_a][i] );
+          delta * libmesh_real( rb_theta_expansion->eval_F_theta(q_f, mu) *
+          libmesh_conj(rb_theta_expansion->eval_A_theta(q_a, mu)) *
+          libmesh_conj(RB_solution(i)) * Fq_Aq_representor_innerprods[q_f][q_a][i] );
       }
     }
   }
 
   q=0;
-  for(unsigned int q_a1=0; q_a1<rb_theta_expansion->get_Q_a(); q_a1++)
+  for(unsigned int q_a1=0; q_a1<rb_theta_expansion->get_n_A_terms(); q_a1++)
   {
-    for(unsigned int q_a2=q_a1; q_a2<rb_theta_expansion->get_Q_a(); q_a2++)
+    for(unsigned int q_a2=q_a1; q_a2<rb_theta_expansion->get_n_A_terms(); q_a2++)
     {
       Real delta = (q_a1==q_a2) ? 1. : 2.;
 
@@ -361,9 +361,9 @@ Real RBEvaluation::compute_residual_dual_norm(const unsigned int N)
         for(unsigned int j=0; j<N; j++)
         {
           residual_norm_sq +=
-            delta * libmesh_real( libmesh_conj(rb_theta_expansion->eval_theta_q_a(q_a1, mu)) *
-            rb_theta_expansion->eval_theta_q_a(q_a2, mu) *
-            libmesh_conj(RB_solution(i)) * RB_solution(j) * Aq_Aq_representor_norms[q][i][j] );
+            delta * libmesh_real( libmesh_conj(rb_theta_expansion->eval_A_theta(q_a1, mu)) *
+            rb_theta_expansion->eval_A_theta(q_a2, mu) *
+            libmesh_conj(RB_solution(i)) * RB_solution(j) * Aq_Aq_representor_innerprods[q][i][j] );
         }
       }
 
@@ -407,14 +407,14 @@ Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters& mu)
 {
   Number output_bound_sq = 0.;
   unsigned int q=0;
-  for(unsigned int q_l1=0; q_l1<rb_theta_expansion->get_Q_l(n); q_l1++)
+  for(unsigned int q_l1=0; q_l1<rb_theta_expansion->get_n_output_terms(n); q_l1++)
   {
-    for(unsigned int q_l2=q_l1; q_l2<rb_theta_expansion->get_Q_l(n); q_l2++)
+    for(unsigned int q_l2=q_l1; q_l2<rb_theta_expansion->get_n_output_terms(n); q_l2++)
     {
       Real delta = (q_l1==q_l2) ? 1. : 2.;
       output_bound_sq += delta * libmesh_real(
-        libmesh_conj(rb_theta_expansion->eval_theta_q_l(n,q_l1,mu))*
-        rb_theta_expansion->eval_theta_q_l(n,q_l2,mu) * output_dual_norms[n][q] );
+        libmesh_conj(rb_theta_expansion->eval_output_theta(n,q_l1,mu))*
+        rb_theta_expansion->eval_output_theta(n,q_l2,mu) * output_dual_innerprods[n][q] );
       q++;
     }
   }
@@ -425,15 +425,15 @@ Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters& mu)
 void RBEvaluation::clear_riesz_representors()
 {
 
-  // Clear the A_q_representors
-  for(unsigned int q_a=0; q_a<A_q_representor.size(); q_a++)
+  // Clear the Aq_representors
+  for(unsigned int q_a=0; q_a<Aq_representor.size(); q_a++)
   {
-    for(unsigned int i=0; i<A_q_representor[q_a].size(); i++)
+    for(unsigned int i=0; i<Aq_representor[q_a].size(); i++)
     {
-      if(A_q_representor[q_a][i])
+      if(Aq_representor[q_a][i])
       {
-        delete A_q_representor[q_a][i];
-        A_q_representor[q_a][i] = NULL;
+        delete Aq_representor[q_a][i];
+        Aq_representor[q_a][i] = NULL;
       }
     }
   }
@@ -473,16 +473,16 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       n_bfs_out.close();
     }
 
-    // Write out F_q representor norm data
+    // Write out Fq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Fq_norms" << suffix;
-    Xdr RB_Fq_norms_out(file_name.str(), mode);
-    unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
+    file_name << directory_name << "/Fq_innerprods" << suffix;
+    Xdr RB_Fq_innerprods_out(file_name.str(), mode);
+    unsigned int Q_f_hat = rb_theta_expansion->get_n_F_terms()*(rb_theta_expansion->get_n_F_terms()+1)/2;
     for(unsigned int i=0; i<Q_f_hat; i++)
     {
-      RB_Fq_norms_out << Fq_representor_norms[i];
+      RB_Fq_innerprods_out << Fq_representor_innerprods[i];
     }
-    RB_Fq_norms_out.close();
+    RB_Fq_innerprods_out.close();
 
     // Write out output data
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
@@ -490,22 +490,22 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       file_name.str("");
       file_name << directory_name << "/output_";
       OSSRealzeroright(file_name,3,0,n);
-      file_name << "_dual_norms" << suffix;
-      Xdr output_dual_norms_out(file_name.str(), mode);
+      file_name << "_dual_innerprods" << suffix;
+      Xdr output_dual_innerprods_out(file_name.str(), mode);
 
-      unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
+      unsigned int Q_l_hat = rb_theta_expansion->get_n_output_terms(n)*(rb_theta_expansion->get_n_output_terms(n)+1)/2;
       for(unsigned int q=0; q<Q_l_hat; q++)
       {
-        output_dual_norms_out << output_dual_norms[n][q];
+        output_dual_innerprods_out << output_dual_innerprods[n][q];
       }
-      output_dual_norms_out.close();
+      output_dual_innerprods_out.close();
     }
 
 
     // Write out output data to multiple files
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
-      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
+      for(unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
       {
         file_name.str("");
         file_name << directory_name << "/output_";
@@ -539,75 +539,75 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       RB_inner_product_matrix_out.close();
     }
 
-    // Next write out the F_q vectors
-    for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
+    // Next write out the Fq vectors
+    for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
     {
       file_name.str("");
       file_name << directory_name << "/RB_F_";
       OSSRealzeroright(file_name,3,0,q_f);
       file_name << suffix;
-      Xdr RB_F_q_f_out(file_name.str(), mode);
+      Xdr RB_Fq_f_out(file_name.str(), mode);
 
       for(unsigned int i=0; i<n_bfs; i++)
       {
-        RB_F_q_f_out << RB_F_q_vector[q_f](i);
+        RB_Fq_f_out << RB_Fq_vector[q_f](i);
       }
-      RB_F_q_f_out.close();
+      RB_Fq_f_out.close();
     }
 
-    // Next write out the A_q matrices
-    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+    // Next write out the Aq matrices
+    for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
     {
       file_name.str("");
       file_name << directory_name << "/RB_A_";
       OSSRealzeroright(file_name,3,0,q_a);
       file_name << suffix;
-      Xdr RB_A_q_a_out(file_name.str(), mode);
+      Xdr RB_Aq_a_out(file_name.str(), mode);
 
       for(unsigned int i=0; i<n_bfs; i++)
       {
         for(unsigned int j=0; j<n_bfs; j++)
         {
-          RB_A_q_a_out << RB_A_q_vector[q_a](i,j);
+          RB_Aq_a_out << RB_Aq_vector[q_a](i,j);
         }
       }
-      RB_A_q_a_out.close();
+      RB_Aq_a_out.close();
     }
 
     // Next write out Fq_Aq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Fq_Aq_norms" << suffix;
-    Xdr RB_Fq_Aq_norms_out(file_name.str(), mode);
+    file_name << directory_name << "/Fq_Aq_innerprods" << suffix;
+    Xdr RB_Fq_Aq_innerprods_out(file_name.str(), mode);
     
-    for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
+    for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
     {
-      for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+      for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
       {
         for(unsigned int i=0; i<n_bfs; i++)
         {
-          RB_Fq_Aq_norms_out << Fq_Aq_representor_norms[q_f][q_a][i];
+          RB_Fq_Aq_innerprods_out << Fq_Aq_representor_innerprods[q_f][q_a][i];
         }
       }
     }
-    RB_Fq_Aq_norms_out.close();
+    RB_Fq_Aq_innerprods_out.close();
 
     // Next write out Aq_Aq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Aq_Aq_norms" << suffix;
-    Xdr RB_Aq_Aq_norms_out(file_name.str(), mode);
+    file_name << directory_name << "/Aq_Aq_innerprods" << suffix;
+    Xdr RB_Aq_Aq_innerprods_out(file_name.str(), mode);
     
-    unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
+    unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
     for(unsigned int i=0; i<Q_a_hat; i++)
     {
       for(unsigned int j=0; j<n_bfs; j++)
       {
         for(unsigned int l=0; l<n_bfs; l++)
         {
-          RB_Aq_Aq_norms_out << Aq_Aq_representor_norms[i][j][l];
+          RB_Aq_Aq_innerprods_out << Aq_Aq_representor_innerprods[i][j][l];
         }
       }
     }
-    RB_Aq_Aq_norms_out.close();
+    RB_Aq_Aq_innerprods_out.close();
 
     // Also, write out the greedily selected parameters
     {
@@ -665,7 +665,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   // Read in output data in multiple files
   for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
   {
-    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_Q_l(n); q_l++)
+    for(unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
     {
       file_name.str("");
       file_name << directory_name << "/output_";
@@ -704,59 +704,59 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     RB_inner_product_matrix_in.close();
   }
 
-  // Next read in the F_q vectors
-  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
+  // Next read in the Fq vectors
+  for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
   {
     file_name.str("");
     file_name << directory_name << "/RB_F_";
     OSSRealzeroright(file_name,3,0,q_f);
     file_name << suffix;
-    Xdr RB_F_q_f_in(file_name.str(), mode);
+    Xdr RB_Fq_f_in(file_name.str(), mode);
 
     for(unsigned int i=0; i<n_bfs; i++)
     {
       Number value;
-      RB_F_q_f_in >> value;
-      RB_F_q_vector[q_f](i) = value;
+      RB_Fq_f_in >> value;
+      RB_Fq_vector[q_f](i) = value;
     }
-    RB_F_q_f_in.close();
+    RB_Fq_f_in.close();
   }
 
-  // Next read in the A_q matrices
-  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+  // Next read in the Aq matrices
+  for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
   {
     file_name.str("");
     file_name << directory_name << "/RB_A_";
     OSSRealzeroright(file_name,3,0,q_a);
     file_name << suffix;
-    Xdr RB_A_q_a_in(file_name.str(), mode);
+    Xdr RB_Aq_a_in(file_name.str(), mode);
 
     for(unsigned int i=0; i<n_bfs; i++)
     {
       for(unsigned int j=0; j<n_bfs; j++)
       {
         Number  value;
-        RB_A_q_a_in >> value;
-        RB_A_q_vector[q_a](i,j) = value;
+        RB_Aq_a_in >> value;
+        RB_Aq_vector[q_a](i,j) = value;
       }
     }
-    RB_A_q_a_in.close();
+    RB_Aq_a_in.close();
   }
 
 
   if(read_error_bound_data)
   {
-    // Next read in F_q representor norm data
+    // Next read in Fq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Fq_norms" << suffix;
-    Xdr RB_Fq_norms_in(file_name.str(), mode);
+    file_name << directory_name << "/Fq_innerprods" << suffix;
+    Xdr RB_Fq_innerprods_in(file_name.str(), mode);
     
-    unsigned int Q_f_hat = rb_theta_expansion->get_Q_f()*(rb_theta_expansion->get_Q_f()+1)/2;
+    unsigned int Q_f_hat = rb_theta_expansion->get_n_F_terms()*(rb_theta_expansion->get_n_F_terms()+1)/2;
     for(unsigned int i=0; i<Q_f_hat; i++)
     {
-      RB_Fq_norms_in >> Fq_representor_norms[i];
+      RB_Fq_innerprods_in >> Fq_representor_innerprods[i];
     }
-    RB_Fq_norms_in.close();
+    RB_Fq_innerprods_in.close();
 
     // Read in output data
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
@@ -764,52 +764,52 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
       file_name.str("");
       file_name << directory_name << "/output_";
       OSSRealzeroright(file_name,3,0,n);
-      file_name << "_dual_norms" << suffix;
-      Xdr output_dual_norms_in(file_name.str(), mode);
+      file_name << "_dual_innerprods" << suffix;
+      Xdr output_dual_innerprods_in(file_name.str(), mode);
       
-      unsigned int Q_l_hat = rb_theta_expansion->get_Q_l(n)*(rb_theta_expansion->get_Q_l(n)+1)/2;
+      unsigned int Q_l_hat = rb_theta_expansion->get_n_output_terms(n)*(rb_theta_expansion->get_n_output_terms(n)+1)/2;
       for(unsigned int q=0; q<Q_l_hat; q++)
       {
-        output_dual_norms_in >> output_dual_norms[n][q];
+        output_dual_innerprods_in >> output_dual_innerprods[n][q];
       }
-      output_dual_norms_in.close();
+      output_dual_innerprods_in.close();
     }
 
 
     // Next read in Fq_Aq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Fq_Aq_norms" << suffix;
-    Xdr RB_Fq_Aq_norms_in(file_name.str(), mode);
+    file_name << directory_name << "/Fq_Aq_innerprods" << suffix;
+    Xdr RB_Fq_Aq_innerprods_in(file_name.str(), mode);
     
-    for(unsigned int q_f=0; q_f<rb_theta_expansion->get_Q_f(); q_f++)
+    for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
     {
-      for(unsigned int q_a=0; q_a<rb_theta_expansion->get_Q_a(); q_a++)
+      for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
       {
         for(unsigned int i=0; i<n_bfs; i++)
         {
-          RB_Fq_Aq_norms_in >> Fq_Aq_representor_norms[q_f][q_a][i];
+          RB_Fq_Aq_innerprods_in >> Fq_Aq_representor_innerprods[q_f][q_a][i];
         }
       }
     }
-    RB_Fq_Aq_norms_in.close();
+    RB_Fq_Aq_innerprods_in.close();
 
     // Next read in Aq_Aq representor norm data
     file_name.str("");
-    file_name << directory_name << "/Aq_Aq_norms" << suffix;
-    Xdr RB_Aq_Aq_norms_in(file_name.str(), mode);
+    file_name << directory_name << "/Aq_Aq_innerprods" << suffix;
+    Xdr RB_Aq_Aq_innerprods_in(file_name.str(), mode);
     
-    unsigned int Q_a_hat = rb_theta_expansion->get_Q_a()*(rb_theta_expansion->get_Q_a()+1)/2;
+    unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
     for(unsigned int i=0; i<Q_a_hat; i++)
     {
       for(unsigned int j=0; j<n_bfs; j++)
       {
         for(unsigned int l=0; l<n_bfs; l++)
         {
-          RB_Aq_Aq_norms_in >> Aq_Aq_representor_norms[i][j][l];
+          RB_Aq_Aq_innerprods_in >> Aq_Aq_representor_innerprods[i][j][l];
         }
       }
     }
-    RB_Aq_Aq_norms_in.close();
+    RB_Aq_Aq_innerprods_in.close();
   }
 
   // Resize basis_functions even if we don't read them in so that

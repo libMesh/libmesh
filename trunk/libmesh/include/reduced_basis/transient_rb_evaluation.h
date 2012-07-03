@@ -286,9 +286,9 @@ public:
    * Vectors storing the residual representor inner products
    * to be used in computing the residuals online.
    */
-  std::vector< std::vector< std::vector<Number> > > Fq_Mq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Mq_Mq_representor_norms;
-  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_Mq_representor_norms;
+  std::vector< std::vector< std::vector<Number> > > Fq_Mq_representor_innerprods;
+  std::vector< std::vector< std::vector<Number> > > Mq_Mq_representor_innerprods;
+  std::vector< std::vector< std::vector< std::vector<Number> > > > Aq_Mq_representor_innerprods;
 
 
   /**

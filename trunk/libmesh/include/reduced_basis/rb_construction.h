@@ -227,14 +227,14 @@ public:
   SparseMatrix<Number>* get_non_dirichlet_inner_product_matrix();
 
   /**
-   * Get a pointer to A_q.
+   * Get a pointer to Aq.
    */
-  SparseMatrix<Number>* get_A_q(unsigned int q);
+  SparseMatrix<Number>* get_Aq(unsigned int q);
 
   /**
-   * Get a pointer to non_dirichlet_A_q.
+   * Get a pointer to non_dirichlet_Aq.
    */
-  SparseMatrix<Number>* get_non_dirichlet_A_q(unsigned int q);
+  SparseMatrix<Number>* get_non_dirichlet_Aq(unsigned int q);
 
   /**
    * Allocate all the data structures necessary for the construction
@@ -244,14 +244,14 @@ public:
   virtual void initialize_rb_construction();
 
   /**
-   * Get a pointer to F_q.
+   * Get a pointer to Fq.
    */
-  NumericVector<Number>* get_F_q(unsigned int q);
+  NumericVector<Number>* get_Fq(unsigned int q);
 
   /**
-   * Get a pointer to non-Dirichlet F_q.
+   * Get a pointer to non-Dirichlet Fq.
    */
-  NumericVector<Number>* get_non_dirichlet_F_q(unsigned int q);
+  NumericVector<Number>* get_non_dirichlet_Fq(unsigned int q);
 
   /**
    * Get a pointer to the n^th output.
@@ -408,15 +408,15 @@ public:
    * The vector storing the dual norm inner product terms
    * for each output.
    */
-  std::vector< std::vector< Number > > output_dual_norms;
+  std::vector< std::vector< Number > > output_dual_innerprods;
 
   /**
    * Vector storing the residual representors associated with the
    * right-hand side.
    * These are basis independent and hence stored here, whereas
-   * the A_q_representors are stored in RBEvaluation
+   * the Aq_representors are stored in RBEvaluation
    */
-  std::vector< NumericVector<Number>* > F_q_representor;
+  std::vector< NumericVector<Number>* > Fq_representor;
 
   /**
    * Vectors storing the residual representor inner products
@@ -425,7 +425,7 @@ public:
    * of a reduced basis space. The basis dependent representors
    * are stored in RBEvaluation.
    */
-  std::vector<Number> Fq_representor_norms;
+  std::vector<Number> Fq_representor_innerprods;
 
   /**
    * Boolean flag to indicate whether this is a constrained problem
@@ -609,7 +609,7 @@ protected:
   /**
    * Compute and store the dual norm of each output functional.
    */
-  virtual void compute_output_dual_norms();
+  virtual void compute_output_dual_innerprods();
 
   /**
    * Compute the terms that are combined `online'
@@ -623,7 +623,7 @@ protected:
    * this feature off e.g. if you are already reading in that
    * data from files.
    */
-  virtual void compute_Fq_representor_norms(bool compute_inner_products=true);
+  virtual void compute_Fq_representor_innerprods(bool compute_inner_products=true);
 
   /**
    * Add a new basis function to the RB space. This is called
@@ -690,14 +690,14 @@ protected:
    * have already been computed --- used to make sure that we don't
    * recompute them unnecessarily.
    */
-  bool output_dual_norms_computed;
+  bool output_dual_innerprods_computed;
 
   /**
    * A boolean flag to indicate whether or not the Fq representor norms
    * have already been computed --- used to make sure that we don't
    * recompute them unnecessarily.
    */
-  bool Fq_representor_norms_computed;
+  bool Fq_representor_innerprods_computed;
 
 private:
 
@@ -730,21 +730,21 @@ private:
   /**
    * Vector storing the Q_a matrices from the affine expansion
    */
-  std::vector< SparseMatrix<Number>* > A_q_vector;
+  std::vector< SparseMatrix<Number>* > Aq_vector;
 
   /**
    * Vector storing the Q_f vectors in the affine decomposition
    * of the right-hand side.
    */
-  std::vector< NumericVector<Number>* > F_q_vector;
+  std::vector< NumericVector<Number>* > Fq_vector;
 
   /**
    * We sometimes also need a second set of matrices/vectors
    * that do not have the Dirichlet boundary conditions
    * enforced.
    */
-  std::vector< SparseMatrix<Number>* > non_dirichlet_A_q_vector;
-  std::vector< NumericVector<Number>* > non_dirichlet_F_q_vector;
+  std::vector< SparseMatrix<Number>* > non_dirichlet_Aq_vector;
+  std::vector< NumericVector<Number>* > non_dirichlet_Fq_vector;
 
   /**
    * The libMesh vectors that define the output functionals.
