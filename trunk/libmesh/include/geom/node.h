@@ -27,6 +27,8 @@
 #include "auto_ptr.h"
 
 // C++ includes
+#include <iostream>
+#include <vector>
 
 namespace libMesh
 {
@@ -123,6 +125,15 @@ public:
    */
   bool operator ==(const Node& rhs) const;
 
+  /**
+   * Prints relevant information about the node
+   */
+  void print_info (std::ostream& os=libMesh::out) const;
+
+  /**
+   * Prints relevant information about the node to a string.
+   */
+  std::string get_info () const;
 
 #ifdef LIBMESH_HAVE_MPI
   /**
@@ -216,6 +227,18 @@ private:
   friend class MeshRefinement;
   friend class Elem;
 };
+
+
+
+// ------------------------------------------------------------
+// global Node functions
+
+inline
+std::ostream& operator << (std::ostream& os, const Node& n)
+{
+  n.print_info(os);
+  return os;
+}
 
 
 
