@@ -2408,7 +2408,7 @@ namespace Parallel
 
     // Make the Request::wait() handle deleting the buffer
     req.post_wait_work.push_back
-      (Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
+      (new Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
 
     // Use Parallel::send() so we get its specialization(s)
     Parallel::send(dest_processor_id, *vecbuf, type, req, tag, comm);
@@ -2459,13 +2459,13 @@ namespace Parallel
     buf.clear();
 
     req.post_wait_work.push_back
-      (Parallel::Request::PostWaitCopyBuffer<std::vector<T>,
+      (new Parallel::Request::PostWaitCopyBuffer<std::vector<T>,
          std::back_insert_iterator<std::set<T> > >
 	   (vecbuf, std::back_inserter(buf)));
 
     // Make the Request::wait() then handle deleting the buffer
     req.post_wait_work.push_back
-      (Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
+      (new Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
 
     // Use Parallel::receive() so we get its specialization(s)
     Parallel::receive(src_processor_id, *vecbuf, type, req, tag, comm);
