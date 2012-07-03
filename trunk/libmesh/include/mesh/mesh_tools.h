@@ -356,17 +356,15 @@ namespace MeshTools
   void libmesh_assert_valid_elem_ids (const MeshBase &mesh);
 
   /**
-   * A function for verifying that processor assignment of nodes
-   * is correct (each node part of an active element on its processor)
+   * A function for verifying that processor assignment is
+   * self-consistent on nodes (each node part of an active element on
+   * its processor) or elements (each parent has the processor id of
+   * one of its children), and verifying that assignment is consistent
+   * (every processor agrees on the processor id of each dof object it
+   * can see)
    */
-  void libmesh_assert_valid_node_procids (const MeshBase &mesh);
-
-  /**
-   * A function for verifying that processor assignment of elements
-   * is correct (each parent has the processor id of one of its
-   * children)
-   */
-  void libmesh_assert_valid_elem_procids (const MeshBase &mesh);
+  template <typename DofObjectSubclass>
+  void libmesh_assert_valid_procids (const MeshBase &mesh);
 
   /**
    * A function for verifying that refinement flags on elements

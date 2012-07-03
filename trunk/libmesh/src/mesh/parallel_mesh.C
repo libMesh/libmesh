@@ -782,6 +782,10 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
         }
     }
 
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_procids<T>(*this);
+#endif
+
   std::vector<unsigned int> objects_on_proc(libMesh::n_processors(), 0);
   Parallel::allgather(ghost_objects_from_proc[libMesh::processor_id()],
                       objects_on_proc);

@@ -1561,7 +1561,7 @@ bool MeshRefinement::_coarsen_elements ()
       this->clear();
 
 #ifdef DEBUG
-      MeshTools::libmesh_assert_valid_node_procids(_mesh);
+      MeshTools::libmesh_assert_valid_procids<Node>(_mesh);
 #endif
     }
 
