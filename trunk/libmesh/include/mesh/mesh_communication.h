@@ -183,27 +183,6 @@ public:
    */
   void make_nodes_parallel_consistent (MeshBase &,
                                        LocationMap<Node> &);
-
-private:
-
-  void broadcast_mesh (MeshBase &) const;
-  void broadcast_bcs  (const MeshBase &, BoundaryInfo &) const;
-
-  void allgather_mesh (ParallelMesh &) const;
-  void allgather_bcs  (const ParallelMesh &, BoundaryInfo &) const;
-
-//   /**
-//    * Packs the element \p elem at the end of vector \p conn.
-//    * This includes all the information needed to rebuild the element
-//    * on a remote processor, including refinement state.
-//    */
-//   void pack_element (std::vector<int> &conn, const Elem* elem) const;
-
-//   /**
-//    * The processors who neighbor the current
-//    * processor
-//    */
-//   std::vector<unsigned short int> _neighboring_processors;
 };
 
 
