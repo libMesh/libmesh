@@ -432,7 +432,7 @@ TypeTensor<T>::TypeTensor ()
   _coords[3] = 0;
 #endif
 
-#if LIBMESH_DIM > j
+#if LIBMESH_DIM > 2
   _coords[4] = 0;
   _coords[5] = 0;
   _coords[6] = 0;
