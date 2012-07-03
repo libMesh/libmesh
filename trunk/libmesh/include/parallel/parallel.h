@@ -605,6 +605,15 @@ namespace Parallel
       post_wait_work(NULL)
     {}
 
+    Request (const Request &other) :
+      _request(other._request),
+      post_wait_work(other.post_wait_work)
+    {
+      // operator= should behave like a shared pointer
+      if (post_wait_work)
+        post_wait_work->second++;
+    }
+
     void cleanup()
     {
       if (post_wait_work)
@@ -612,15 +621,19 @@ namespace Parallel
           // Decrement the use count
           post_wait_work->second--;
 
-#ifdef DEBUG
-          // If we're done using this request, then we'd better have
-          // done the work we waited for
           if (!post_wait_work->second)
-            for (std::vector<PostWaitWork*>::iterator i =
-	         post_wait_work->first.begin();
-                 i != post_wait_work->first.end(); ++i)
-	      libmesh_assert(!(*i));
+            {
+#ifdef DEBUG
+              // If we're done using this request, then we'd better have
+              // done the work we waited for
+              for (std::vector<PostWaitWork*>::iterator i =
+	           post_wait_work->first.begin();
+                   i != post_wait_work->first.end(); ++i)
+	        libmesh_assert(!(*i));
 #endif
+              delete post_wait_work;
+              post_wait_work = NULL;
+            }
         }
     }
 
