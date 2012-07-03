@@ -846,29 +846,43 @@ unsigned int DofMap::n_local_constrained_dofs() const
 
 void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 {
+  parallel_only();
+
   START_LOG("create_dof_constraints()", "DofMap");
 
   libmesh_assert (mesh.is_prepared());
 
   const unsigned int dim = mesh.mesh_dimension();
 
-  // Hanging node constraints never occur in 1D, and none of our
-  // existing elements have p-adaptivity constraints in 1D, but we
-  // might have boundary conditions in 1D that will generate
-  // constraint equations
-  if (dim == 1 
+  // We might get constraint equations from AMR hanging nodes in 2D/3D
+  // or from boundary conditions in any dimension
+  const bool possible_local_constraints = false
+#ifdef LIBMESH_ENABLE_AMR
+    || dim > 1 
+#endif
 #ifdef LIBMESH_ENABLE_PERIODIC
-      && _periodic_boundaries->empty()
+    || !_periodic_boundaries->empty()
 #endif
 #ifdef LIBMESH_ENABLE_DIRICHLET
-      && _dirichlet_boundaries->empty()
+    || !_dirichlet_boundaries->empty()
 #endif
-     )
-  {
-    // make sure we stop logging though
-    STOP_LOG("create_dof_constraints()", "DofMap");
-    return;
-  }
+  ;
+
+  // Even if we don't have constraints, another processor might.
+  bool possible_global_constraints = possible_local_constraints;
+#if defined(LIBMESH_ENABLE_PERIODIC) || defined(LIBMESH_ENABLE_DIRICHLET) || defined(LIBMESH_ENABLE_AMR)
+  libmesh_assert(Parallel::verify(mesh.is_serial()));
+
+  if (!mesh.is_serial())
+    Parallel::max(possible_global_constraints);
+#endif
+
+  if (!possible_global_constraints)
+    {
+      // make sure we stop logging though
+      STOP_LOG("create_dof_constraints()", "DofMap");
+      return;
+    }
 
   // Here we build the hanging node constraints.  This is done
   // by enforcing the condition u_a = u_b along hanging sides.
@@ -877,30 +891,33 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 
   // define the range of elements of interest
   ConstElemRange range;
-  {
-    // With SerialMesh or a serial ParallelMesh, every processor
-    // computes every constraint
-    MeshBase::const_element_iterator
-      elem_begin = mesh.elements_begin(),
-      elem_end   = mesh.elements_end();
+  if (possible_local_constraints)
+    {
+      // With SerialMesh or a serial ParallelMesh, every processor
+      // computes every constraint
+      MeshBase::const_element_iterator
+        elem_begin = mesh.elements_begin(),
+        elem_end   = mesh.elements_end();
 
-    // With a parallel ParallelMesh, processors compute only
-    // their local constraints
-    if (!mesh.is_serial())
-      {
-	elem_begin = mesh.local_elements_begin();
-	elem_end   = mesh.local_elements_end();
-      }
+      // With a parallel ParallelMesh, processors compute only
+      // their local constraints
+      if (!mesh.is_serial())
+        {
+	  elem_begin = mesh.local_elements_begin();
+	  elem_end   = mesh.local_elements_end();
+        }
 
-    // set the range to contain the specified elements
-    range.reset (elem_begin, elem_end);
-  }
+      // set the range to contain the specified elements
+      range.reset (elem_begin, elem_end);
+    }
+  else
+    range.reset (mesh.elements_end(), mesh.elements_end());
 
   // compute_periodic_constraints requires a point_locator() from our
   // Mesh, that point_locator() construction is threaded.  Rather than
   // nest threads within threads we'll make sure it's preconstructed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (!_periodic_boundaries->empty())
+  if (!_periodic_boundaries->empty() && !range.empty())
     mesh.sub_point_locator();
 #endif
 
@@ -949,7 +966,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   // With a parallelized Mesh, we've computed our local constraints,
   // but they may depend on non-local constraints that we'll need to
   // take into account.
-  if (!mesh.is_serial())
+  if (possible_global_constraints)
     this->allgather_recursive_constraints(mesh);
 
   STOP_LOG("create_dof_constraints()", "DofMap");
