@@ -1265,6 +1265,8 @@ namespace Parallel
                            T1 &send,
 			   const unsigned int source_processor_id,
                            T2 &recv,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -1280,6 +1282,8 @@ namespace Parallel
 			   const unsigned int source_processor_id,
                            T2 &recv,
 			   const DataType &type2,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -2500,7 +2504,7 @@ namespace Parallel
 
 
   // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
+  // function template, so we have to re-specify the default arguments
   template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
 			   std::vector<T1> &send,
@@ -2508,6 +2512,8 @@ namespace Parallel
 			   const unsigned int source_processor_id,
 			   std::vector<T2> &recv,
 			   const DataType &type2,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
@@ -2526,13 +2532,13 @@ namespace Parallel
 				send,
 				type1,
 				request,
-				MessageTag(321),
+				send_tag,
                                 comm);
 
     Parallel::receive (source_processor_id,
 		       recv,
 		       type2,
-		       MessageTag(321),
+		       recv_tag,
                        comm);
 
     Parallel::wait (request);
@@ -2547,6 +2553,8 @@ namespace Parallel
 			   T1 &send,
 			   const unsigned int source_processor_id,
 			   T2 &recv,
+			   const MessageTag &send_tag,
+			   const MessageTag &recv_tag,
                            const Communicator &comm)
   {
     START_LOG("send_receive()", "Parallel");
@@ -2560,9 +2568,9 @@ namespace Parallel
       }
 
     MPI_Sendrecv(&send, 1, StandardType<T1>(&send),
-		 dest_processor_id, 0,
+		 dest_processor_id, send_tag.value(),
 		 &recv, 1, StandardType<T2>(&recv),
-		 source_processor_id, 0,
+		 source_processor_id, recv_tag.value(),
 		 comm.get(),
 		 MPI_STATUS_IGNORE);
 
@@ -2578,6 +2586,8 @@ namespace Parallel
 			   std::vector<T1> &send,
 			   const unsigned int source_processor_id,
 			   std::vector<T2> &recv,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World)
   {
     // Call the user-defined type version with automatic
@@ -2588,6 +2598,8 @@ namespace Parallel
 		  source_processor_id,
 		  recv,
 		  StandardType<T2>(recv.empty() ? NULL : &recv[0]),
+		  send_tag,
+		  recv_tag,
                   comm);
   }
 
@@ -2600,6 +2612,8 @@ namespace Parallel
 			   std::vector<std::vector<T1> > &send,
 			   const unsigned int source_processor_id,
 			   std::vector<std::vector<T2> > &recv,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
@@ -2675,19 +2689,17 @@ namespace Parallel
 
     Parallel::Request request;
 
-    Parallel::MessageTag tag = comm.get_unique_tag(123);
-
     Parallel::nonblocking_send (dest_processor_id,
 				sendbuf,
 				MPI_PACKED,
 				request,
-				tag,
+				send_tag,
                                 comm);
 
     Parallel::receive (source_processor_id,
 		       recvbuf,
 		       MPI_PACKED,
-		       tag,
+		       recv_tag,
                        comm);
 
     // Unpack the received buffer
@@ -3314,6 +3326,8 @@ namespace Parallel
 			    T1 &send,
 			    const unsigned int recv_source,
 			    T2 &recv,
+			    const MessageTag &,
+			    const MessageTag &,
                             const Communicator&)
   {
     libmesh_assert (send_tgt == recv_source);
