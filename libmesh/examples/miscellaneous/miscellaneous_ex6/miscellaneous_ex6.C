@@ -24,14 +24,15 @@
  // (respectively).
 
 // Local header files
-#include "mesh.h"
-#include "mesh_triangle_interface.h"
-#include "mesh_generation.h"
 #include "elem.h"
-#include "mesh_tetgen_interface.h"
-#include "node.h"
 #include "face_tri3.h"
+#include "mesh.h"
+#include "mesh_generation.h"
+#include "mesh_tetgen_interface.h"
 #include "mesh_triangle_holes.h"
+#include "mesh_triangle_interface.h"
+#include "node.h"
+#include "serial_mesh.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -170,7 +171,7 @@ void tetrahedralize_domain()
   // 5.) The domain is tetrahedralized, the mesh is written out, etc.
   
   // The mesh we will eventually generate
-  Mesh mesh(3);
+  SerialMesh mesh(3);
 
   // Lower and Upper bounding box limits for a rectangular hole within the unit cube.
   Point hole_lower_limit(0.2, 0.2, 0.4);
