@@ -593,26 +593,60 @@ namespace Parallel
 
     Request () :
 #ifdef LIBMESH_HAVE_MPI
-      _request(MPI_REQUEST_NULL)
+      _request(MPI_REQUEST_NULL),
 #else
-      _request()
+      _request(),
 #endif
+      post_wait_work(NULL)
     {}
 
     Request (const request &r) :
-      _request(r)
+      _request(r),
+      post_wait_work(NULL)
     {}
 
+    void cleanup()
+    {
+      if (post_wait_work)
+        {
+          // Decrement the use count
+          post_wait_work->second--;
+
+#ifdef DEBUG
+          // If we're done using this request, then we'd better have
+          // done the work we waited for
+          if (!post_wait_work->second)
+            for (std::vector<PostWaitWork*>::iterator i =
+	         post_wait_work->first.begin();
+                 i != post_wait_work->first.end(); ++i)
+	      libmesh_assert(!(*i));
+#endif
+        }
+    }
+
     Request & operator = (const Request &other)
-    { _request = other._request; return *this; }
+    {
+      this->cleanup();
+      _request = other._request;
+      post_wait_work = other.post_wait_work;
+
+      // operator= should behave like a shared pointer
+      if (post_wait_work)
+        post_wait_work->second++;
+
+      return *this;
+    }
 
     Request & operator = (const request &r)
-    { _request = r; return *this; }
+    {
+      this->cleanup();
+      _request = r;
+      post_wait_work = NULL;
+      return *this;
+    }
 
     ~Request () {
-      for (std::vector<PostWaitWork*>::iterator i =
-	   post_wait_work.begin(); i != post_wait_work.end(); ++i)
-	delete *i;
+      this->cleanup();
     }
 
     /*
@@ -626,6 +660,7 @@ namespace Parallel
     request* get()
     { return &_request; }
 
+    /*
     void free (void)
     {
 #ifdef LIBMESH_HAVE_MPI
@@ -633,6 +668,7 @@ namespace Parallel
 	MPI_Request_free (&_request);
 #endif
     }
+    */
 
     const request* get() const
     { return &_request; }
@@ -643,9 +679,18 @@ namespace Parallel
 #ifdef LIBMESH_HAVE_MPI
       MPI_Wait (&_request, stat.get());
 #endif
-      for (std::vector<PostWaitWork*>::iterator i =
-	   post_wait_work.begin(); i != post_wait_work.end(); ++i)
-	(*i)->run();
+      if (post_wait_work)
+        for (std::vector<PostWaitWork*>::iterator i =
+	     post_wait_work->first.begin();
+             i != post_wait_work->first.end(); ++i)
+          {
+            // The user should never try to give us NULL work or try
+            // to wait() twice.
+            libmesh_assert (*i);
+	    (*i)->run();
+            delete (*i);
+            *i = NULL;
+          }
 
       return stat;
     }
@@ -719,11 +764,24 @@ namespace Parallel
       Container* _buf;
     };
 
-    std::vector <PostWaitWork* > post_wait_work;
+    void add_post_wait_work(PostWaitWork* work)
+    {
+      if (!post_wait_work)
+        post_wait_work = new
+          std::pair<std::vector <PostWaitWork* >, unsigned int>
+            (std::vector <PostWaitWork* >(), 1);
+      post_wait_work->first.push_back(work);
+    }
 
   private:
 
     request _request;
+
+    // post_wait_work->first is a vector of work to do after a wait
+    // finishes; post_wait_work->second is a reference count so that
+    // Request objects will behave roughly like a shared_ptr and be
+    // usable in STL containers
+    std::pair<std::vector <PostWaitWork* >, unsigned int>* post_wait_work;
   };
 
 
@@ -2407,7 +2465,7 @@ namespace Parallel
       new std::vector<T>(buf.begin(), buf.end());
 
     // Make the Request::wait() handle deleting the buffer
-    req.post_wait_work.push_back
+    req.add_post_wait_work
       (new Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
 
     // Use Parallel::send() so we get its specialization(s)
@@ -2458,13 +2516,13 @@ namespace Parallel
     // handle copying our temporary buffer to it
     buf.clear();
 
-    req.post_wait_work.push_back
+    req.add_post_wait_work
       (new Parallel::Request::PostWaitCopyBuffer<std::vector<T>,
          std::back_insert_iterator<std::set<T> > >
 	   (vecbuf, std::back_inserter(buf)));
 
     // Make the Request::wait() then handle deleting the buffer
-    req.post_wait_work.push_back
+    req.add_post_wait_work
       (new Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
 
     // Use Parallel::receive() so we get its specialization(s)
