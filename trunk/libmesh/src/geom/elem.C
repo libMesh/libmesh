@@ -968,23 +968,11 @@ void Elem::make_links_to_me_local(unsigned int n)
       // after an AMR step but before find_neighbors has fixed up
       // neighbor links, we might have an out of date neighbor
       // link to elem's parent instead.
-/*
       libmesh_assert(neigh_family_member->neighbor(nn) == this ||
                      neigh_family_member->neighbor(nn) == remote_elem ||
                      ((this->refinement_flag() == JUST_REFINED) &&
                       this->parent() != NULL &&
                       neigh_family_member->neighbor(nn) == this->parent()));
-*/
-      if (!(neigh_family_member->neighbor(nn) == this ||
-                     neigh_family_member->neighbor(nn) == remote_elem ||
-                     ((this->refinement_flag() == JUST_REFINED) &&
-                      this->parent() != NULL &&
-                      neigh_family_member->neighbor(nn) == this->parent())))
-{
-  libMesh::out << "Failure neighbor: " << *neigh_family_member << std::endl;
-  libMesh::out << "Failure this: " << *this << std::endl;
-  libmesh_error();
-}
 
       neigh_family_member->set_neighbor(nn, this);
     }
