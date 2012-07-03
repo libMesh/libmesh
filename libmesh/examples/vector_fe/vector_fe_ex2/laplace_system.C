@@ -141,7 +141,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
-      RealTensor grad_u;
+      Tensor grad_u;
       
       c.interior_gradient<RealGradient>( u_var, qp, grad_u );
 
