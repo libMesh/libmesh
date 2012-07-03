@@ -122,7 +122,8 @@ namespace Parallel
   /**
    * Accept from any source
    */
-  const int any_source=MPI_ANY_SOURCE;
+  const unsigned int any_source =
+    static_cast<unsigned int>(MPI_ANY_SOURCE);
 
 
 #else
@@ -135,7 +136,7 @@ namespace Parallel
   struct status       { /* unsigned int s; */ };
   struct communicator { /* unsigned int s; */ };
 
-  const int any_source=0;
+  const unsigned int any_source=0;
 #endif // LIBMESH_HAVE_MPI
 
 
@@ -900,7 +901,7 @@ namespace Parallel
    * Blocking message probe.  Allows information about a message to be
    * examined before the message is actually received.
    */
-  inline status probe (const int src_processor_id,
+  inline status probe (const unsigned int src_processor_id,
 		       const MessageTag &tag=any_tag,
                        const Communicator &comm = Communicator_World);
 
@@ -1074,7 +1075,7 @@ namespace Parallel
    * Blocking-receive vector from one processor with user-defined type.
    */
   template <typename T>
-  inline Status receive (const int src_processor_id,
+  inline Status receive (const unsigned int src_processor_id,
 		         std::vector<T> &buf,
 		         const DataType &type,
 		         const MessageTag &tag=any_tag,
@@ -1085,7 +1086,7 @@ namespace Parallel
    * Nonblocking-receive vector from one processor with user-defined type.
    */
   template <typename T>
-  inline void receive (const int src_processor_id,
+  inline void receive (const unsigned int src_processor_id,
 		       std::vector<T> &buf,
 		       const DataType &type,
 		       Request &req,
@@ -1098,7 +1099,7 @@ namespace Parallel
    * is inferred from the template argument.
    */
   template <typename T>
-  inline Status receive (const int src_processor_id,
+  inline Status receive (const unsigned int src_processor_id,
 		         std::vector<T> &buf,
 		         const MessageTag &tag=any_tag,
                          const Communicator &comm = Communicator_World)
@@ -1117,7 +1118,7 @@ namespace Parallel
    * is inferred from the template argument.
    */
   template <typename T>
-  inline void receive (const int src_processor_id,
+  inline void receive (const unsigned int src_processor_id,
 		       std::vector<T> &buf,
 		       Request &req,
 		       const MessageTag &tag=any_tag,
@@ -1137,7 +1138,7 @@ namespace Parallel
    * Blocking-receive set from one processor with user-defined type.
    */
   template <typename T>
-  inline Status receive (const int src_processor_id,
+  inline Status receive (const unsigned int src_processor_id,
 		         std::set<T> &buf,
 		         const DataType &type,
 		         const MessageTag &tag=any_tag,
@@ -1148,7 +1149,7 @@ namespace Parallel
    * Nonblocking-receive set from one processor with user-defined type.
    */
   template <typename T>
-  inline void receive (const int src_processor_id,
+  inline void receive (const unsigned int src_processor_id,
 		       std::set<T> &buf,
 		       const DataType &type,
 		       Request &req,
@@ -1161,7 +1162,7 @@ namespace Parallel
    * is inferred from the template argument.
    */
   template <typename T>
-  inline Status receive (const int src_processor_id,
+  inline Status receive (const unsigned int src_processor_id,
 		         std::set<T> &buf,
 		         const MessageTag &tag=any_tag,
                          const Communicator &comm = Communicator_World)
@@ -1180,7 +1181,7 @@ namespace Parallel
    * is inferred from the template argument.
    */
   template <typename T>
-  inline void receive (const int src_processor_id,
+  inline void receive (const unsigned int src_processor_id,
 		       std::set<T> &buf,
 		       Request &req,
 		       const MessageTag &tag=any_tag,
@@ -1200,7 +1201,7 @@ namespace Parallel
    * Nonblocking-receive vector from one processor with user-defined type
    */
   template <typename T>
-  inline void nonblocking_receive (const int src_processor_id,
+  inline void nonblocking_receive (const unsigned int src_processor_id,
 		                   std::vector<T> &buf,
 				   const DataType &type,
 		                   Request &r,
@@ -1220,7 +1221,7 @@ namespace Parallel
    * Nonblocking-receive vector from one processor.
    */
   template <typename T>
-  inline void nonblocking_receive (const int src_processor_id,
+  inline void nonblocking_receive (const unsigned int src_processor_id,
 		                   std::vector<T> &buf,
 		                   Request &r,
 		                   const MessageTag &tag=any_tag,
@@ -2232,7 +2233,7 @@ namespace Parallel
 
 
 
-  inline status probe (const int src_processor_id,
+  inline status probe (const unsigned int src_processor_id,
 		       const MessageTag &tag,
                        const Communicator &comm)
   {
@@ -2306,7 +2307,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline Status receive (const int src_processor_id,
+  inline Status receive (const unsigned int src_processor_id,
 		         std::vector<T> &buf,
 		         const DataType &type,
 		         const MessageTag &tag,
@@ -2341,7 +2342,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline void receive (const int src_processor_id,
+  inline void receive (const unsigned int src_processor_id,
 		       std::vector<T> &buf,
 		       const DataType &type,
 		       Request &req,
@@ -2414,7 +2415,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline Status receive (const int src_processor_id,
+  inline Status receive (const unsigned int src_processor_id,
 		         std::set<T> &buf,
 		         const DataType &type,
 		         const MessageTag &tag,
@@ -2436,7 +2437,7 @@ namespace Parallel
 
 
   template <typename T>
-  inline void receive (const int src_processor_id,
+  inline void receive (const unsigned int src_processor_id,
 		       std::set<T> &buf,
 		       const DataType &type,
 		       Request &req,
@@ -3209,7 +3210,7 @@ namespace Parallel
    *
    * we do not currently support this operation on one processor without MPI.
    */
-  inline status probe (const int,
+  inline status probe (const unsigned int,
 		       const MessageTag&,
                        const Communicator&)
   { libmesh_error(); status status; return status; }
@@ -3250,7 +3251,7 @@ namespace Parallel
    * we do not currently support this operation on one processor without MPI.
    */
   template <typename T>
-  inline Status receive (const int,
+  inline Status receive (const unsigned int,
 		         std::vector<T> &,
 		         const DataType &,
 		         const MessageTag &,
@@ -3264,7 +3265,7 @@ namespace Parallel
    * we do not currently support this operation on one processor without MPI.
    */
   template <typename T>
-  inline void receive (const int,
+  inline void receive (const unsigned int,
 		       std::vector<T> &,
 		       const DataType &,
 		       Request &,
