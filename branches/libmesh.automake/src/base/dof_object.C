@@ -367,8 +367,11 @@ void DofObject::set_dof_number(const unsigned int s,
 
 unsigned int DofObject::packed_indexing_size() const
 {
-  return 2 + _idx_buf.size() +
-    ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size());
+  return 
+#ifdef LIBMESH_ENABLE_AMR
+    ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size()) +
+#endif
+    2 + _idx_buf.size();
 }
 
 
@@ -390,11 +393,13 @@ unsigned int DofObject::unpackable_indexing_size(std::vector<int>::const_iterato
 void DofObject::unpack_indexing(std::vector<int>::const_iterator begin)
 {
   _idx_buf.clear();
-  this->clear_old_dof_object();
 
+#ifdef LIBMESH_ENABLE_AMR
+  this->clear_old_dof_object();
   const int has_old_dof_object = *begin++;
   libmesh_assert(has_old_dof_object == 1 ||
 		 has_old_dof_object == 0);
+#endif
 
   const int size = *begin++;
   _idx_buf.reserve(size);
@@ -413,24 +418,30 @@ void DofObject::unpack_indexing(std::vector<int>::const_iterator begin)
       }
 #endif
 
+#ifdef LIBMESH_ENABLE_AMR
   if (has_old_dof_object)
     {
       this->old_dof_object = new DofObject();
       this->old_dof_object->unpack_indexing(begin+size);
     }
+#endif
 }
 
 
 void DofObject::pack_indexing(std::back_insert_iterator<std::vector<int> > target) const
 {
+#ifdef LIBMESH_ENABLE_AMR
   // We might need to pack old_dof_object too
   *target++ = (old_dof_object == NULL) ? 0 : 1;
+#endif
 
   *target++ = _idx_buf.size();
   std::copy(_idx_buf.begin(), _idx_buf.end(), target);
 
+#ifdef LIBMESH_ENABLE_AMR
   if (old_dof_object)
     old_dof_object->pack_indexing(target);
+#endif
 }
 
 

@@ -38,6 +38,7 @@
 // C++ includes
 #include <algorithm>
 #include <cstddef>
+#include <iostream>
 #include <limits.h> // CHAR_BIT
 #include <set>
 #include <vector>

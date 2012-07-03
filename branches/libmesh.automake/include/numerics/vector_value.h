@@ -52,12 +52,21 @@ class VectorValue : public TypeVector<T>
 public:
 
   /**
-   * Constructor.  By default sets all entries to 0.
-   * Gives the vector  0 in \p LIBMESH_DIM dimensional T space.
+   * Empty constructor.
+   * Gives the vector 0 in \p LIBMESH_DIM dimensional T space.
    */
-  VectorValue  (const T x=0.,
-		const T y=0.,
-		const T z=0.);
+  VectorValue ();
+
+  /**
+   * Constructor-from-scalars.  By default sets higher dimensional
+   * entries to 0.
+   */
+  template <typename Scalar>
+  VectorValue (const Scalar x,
+	       const Scalar y=0,
+               typename
+                 boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                                        const Scalar>::type z=0);
 
   /**
    * Copy-constructor.
@@ -71,16 +80,25 @@ public:
   template <typename T2>
   VectorValue (const TypeVector<T2>& p);
 
-
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   /**
-   * Constructor that takes two \p TypeVecor<Real>
+   * Constructor that takes two \p TypeVector<Real>
    * representing the real and imaginary part as
    * arguments.
    */
   VectorValue (const TypeVector<Real>& p_re,
 	       const TypeVector<Real>& p_im);
 #endif
+
+  /**
+   * Assignment-from-scalar operator.  Used only to zero out vectors.
+   */
+  template <typename Scalar>
+  typename boostcopy::enable_if_c<
+    ScalarTraits<Scalar>::value,
+    VectorValue&>::type
+  operator = (const Scalar& p)
+  { libmesh_assert(p == Scalar(0)); this->zero(); return *this; }
 
 
 private:
@@ -103,11 +121,23 @@ typedef NumberVectorValue   Gradient;
 
 //------------------------------------------------------
 // Inline functions
+
 template <typename T>
 inline
-VectorValue<T>::VectorValue (const T x,
-			     const T y,
-			     const T z) :
+VectorValue<T>::VectorValue () :
+  TypeVector<T> ()
+{
+}
+
+
+template <typename T>
+template <typename Scalar>
+inline
+VectorValue<T>::VectorValue (const Scalar x,
+	                     const Scalar y,
+                             typename
+                              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                                                     const Scalar>::type z) :
   TypeVector<T> (x,y,z)
 {
 }
@@ -144,7 +174,6 @@ VectorValue<T>::VectorValue (const TypeVector<Real>& p_re,
 {
 }
 #endif
-
 
 } // namespace libMesh
 

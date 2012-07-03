@@ -48,6 +48,35 @@ bool Node::operator==(const Node& rhs) const
 
 
 
+void Node::print_info (std::ostream& os) const
+{
+  os << this->get_info()
+     << std::endl;
+}
+
+
+
+std::string Node::get_info () const
+{
+  std::ostringstream out;
+
+  out << "  Node Information"                                      << '\n'
+      << "   id()=";
+
+  if (this->valid_id())
+    out << this->id();
+  else
+    out << "invalid";
+
+  out << ", processor_id()=" << this->processor_id()               << '\n';
+
+  out << "    Point=" << *static_cast<const Point*>(this)              << '\n';
+
+  return out.str();
+}
+
+
+
 #ifdef LIBMESH_HAVE_MPI
 MPI_Datatype Node::PackedNode::create_mpi_datatype ()
 {

@@ -1057,16 +1057,44 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase&
-#ifdef LIBMESH_ENABLE_AMR
-mesh
-#endif
-)
+void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase& mesh)
 {
   if (libMesh::n_processors() == 1)
     return;
 
+  parallel_only();
+
+  // Check processor ids for consistency between processors
+
+  const unsigned int max_elem_id = mesh.max_elem_id();
+  libmesh_assert(Parallel::verify(max_elem_id));
+
+  for (unsigned int i=0; i != max_elem_id; ++i)
+    {
+      const Elem *elem = mesh.query_elem(i);
+
+      unsigned int min_id =
+        elem ? elem->processor_id() :
+               std::numeric_limits<unsigned int>::max();
+      Parallel::min(min_id);
+
+      unsigned int max_id =
+        elem ? elem->processor_id() :
+               std::numeric_limits<unsigned int>::min();
+      Parallel::max(max_id);
+
+      if (elem)
+        {
+          libmesh_assert(min_id == elem->processor_id());
+          libmesh_assert(max_id == elem->processor_id());
+        }
+
+      if (min_id == libMesh::processor_id())
+	libmesh_assert(elem);
+    }
+
   // If we're adaptively refining, check processor ids for consistency
+  // between parents and children.
 #ifdef LIBMESH_ENABLE_AMR
 
   // Ancestor elements we won't worry about, but subactive and active

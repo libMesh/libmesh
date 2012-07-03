@@ -268,7 +268,7 @@ int main (int argc, char** argv)
   if(dim == 1)
   {        
     GnuPlotIO plot(mesh,"Example 4, 1D",GnuPlotIO::GRID_ON);
-    plot.write_equation_systems("out_1",equation_systems);
+    plot.write_equation_systems("gnuplot_script",equation_systems);
   }
   else
   {

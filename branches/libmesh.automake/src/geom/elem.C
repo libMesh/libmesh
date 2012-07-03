@@ -968,23 +968,11 @@ void Elem::make_links_to_me_local(unsigned int n)
       // after an AMR step but before find_neighbors has fixed up
       // neighbor links, we might have an out of date neighbor
       // link to elem's parent instead.
-/*
       libmesh_assert(neigh_family_member->neighbor(nn) == this ||
                      neigh_family_member->neighbor(nn) == remote_elem ||
                      ((this->refinement_flag() == JUST_REFINED) &&
                       this->parent() != NULL &&
                       neigh_family_member->neighbor(nn) == this->parent()));
-*/
-      if (!(neigh_family_member->neighbor(nn) == this ||
-                     neigh_family_member->neighbor(nn) == remote_elem ||
-                     ((this->refinement_flag() == JUST_REFINED) &&
-                      this->parent() != NULL &&
-                      neigh_family_member->neighbor(nn) == this->parent())))
-{
-  libMesh::out << "Failure neighbor: " << *neigh_family_member << std::endl;
-  libMesh::out << "Failure this: " << *this << std::endl;
-  libmesh_error();
-}
 
       neigh_family_member->set_neighbor(nn, this);
     }
@@ -1773,19 +1761,19 @@ std::string Elem::get_info () const
       << "   id()=";
 
   if (this->valid_id())
-    out << this->id() << '\n';
+    out << this->id();
   else
-    out << "invalid\n";
+    out << "invalid";
+
+  out << ", processor_id()=" << this->processor_id()               << '\n';
 
   out << "   type()="    << Utility::enum_to_string(this->type())  << '\n'
       << "   dim()="     << this->dim()                            << '\n'
       << "   n_nodes()=" << this->n_nodes()                        << '\n';
 
   for (unsigned int n=0; n != this->n_nodes(); ++n)
-    {
-      out << "    node(" << n << ")=" << this->node(n)             << '\n'
-          << "    point(" << n << ")=" << this->point(n)           << '\n';
-    }
+    out << "    node(" << n << ")=" << this->node(n)
+        << ", " << this->point(n)           << '\n';
 
   out << "   n_sides()=" << this->n_sides()                        << '\n';
 
@@ -1798,21 +1786,20 @@ std::string Elem::get_info () const
         out << "NULL\n";
     }
 
-  out << "   hmin()=" << this->hmin()                              << '\n'
-      << "   hmax()=" << this->hmax()                              << '\n'
+  out << "   hmin()=" << this->hmin()
+      << ", hmax()=" << this->hmax()                               << '\n'
       << "   volume()=" << this->volume()                          << '\n'
-      << "   active()=" << this->active()                          << '\n'
-      << "   ancestor()=" << this->ancestor()                      << '\n'
-      << "   subactive()=" << this->subactive()                    << '\n'
-      << "   has_children()=" << this->has_children()              << '\n'
+      << "   active()=" << this->active()
+      << ", ancestor()=" << this->ancestor()
+      << ", subactive()=" << this->subactive()
+      << ", has_children()=" << this->has_children()               << '\n'
       << "   parent()=";
   if (this->parent())
     out << this->parent()->id() << '\n';
   else
     out << "NULL\n";
-  out << "   has_children()=" << this->has_children()              << '\n'
-      << "   level()=" << this->level()                            << '\n'
-      << "   p_level()=" << this->p_level()                        << '\n'
+  out << "   level()=" << this->level()
+      << ", p_level()=" << this->p_level()                         << '\n'
 #ifdef LIBMESH_ENABLE_AMR
       << "   refinement_flag()=" << Utility::enum_to_string(this->refinement_flag())        << '\n'
       << "   p_refinement_flag()=" << Utility::enum_to_string(this->p_refinement_flag())    << '\n'

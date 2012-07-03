@@ -30,6 +30,50 @@ namespace libMesh
 {
 
   /**
+   * What underlying data type would we need to access in each field?
+   */
+  template <typename FieldType>
+  struct RawFieldType {};
+
+  template <>
+  struct RawFieldType<Number>
+  {
+    typedef Number type;
+  };
+
+  template <>
+  struct RawFieldType<Gradient>
+  {
+    typedef Number type;
+  };
+
+  template <>
+  struct RawFieldType<Tensor>
+  {
+    typedef Number type;
+  };
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  template <>
+  struct RawFieldType<Real>
+  {
+    typedef Real type;
+  };
+
+  template <>
+  struct RawFieldType<RealGradient>
+  {
+    typedef Real type;
+  };
+
+  template <>
+  struct RawFieldType<RealTensor>
+  {
+    typedef Real type;
+  };
+#endif
+
+  /**
    * This class provides single index access to FieldType (i.e. Number, Gradient, Tensor, etc.).
    */
   template <typename FieldType>
@@ -44,8 +88,8 @@ namespace libMesh
 
     ~RawAccessor(){};
 
-    Number& operator()( unsigned int i );
-    const Number& operator()( unsigned int i ) const;
+    typename RawFieldType<FieldType>::type& operator()( unsigned int i );
+    const typename RawFieldType<FieldType>::type& operator()( unsigned int i ) const;
 
   private:
     RawAccessor();
@@ -54,34 +98,70 @@ namespace libMesh
     const unsigned int _dim;
   };
 
-  // Specialize for specific cases
-  template<>
-  Number& RawAccessor<Number>::operator()( unsigned int i )
-  {
-    libmesh_assert(i == 0);
-    return this->_data;
-  }
+// Specialize for specific cases
+template<>
+inline
+Number& RawAccessor<Number>::operator()( unsigned int i )
+{
+  libmesh_assert(i == 0);
+  return this->_data;
+}
 
-  template<>
-  Number& RawAccessor<Gradient>::operator()( unsigned int i )
-  {
-    libmesh_assert(i < this->_dim);
-    return this->_data(i);
-  }
+template<>
+inline
+Number& RawAccessor<Gradient>::operator()( unsigned int i )
+{
+  libmesh_assert(i < this->_dim);
+  return this->_data(i);
+}
 
-  template<>
-  Number& RawAccessor<Tensor>::operator()( unsigned int k )
-  {
-    libmesh_assert(k < this->_dim*this->_dim);
+template<>
+inline
+Number& RawAccessor<Tensor>::operator()( unsigned int k )
+{
+  libmesh_assert(k < this->_dim*this->_dim);
 
-    // For tensors, each row is filled first, i.e. for 2-D
-    // [ 0 1; 2 3]
-    // Thus, k(i,j) = i + j*dim
-    unsigned int jj = k/_dim;
-    unsigned int ii = k - jj*_dim;
+  // For tensors, each row is filled first, i.e. for 2-D
+  // [ 0 1; 2 3]
+  // Thus, k(i,j) = i + j*dim
+  unsigned int jj = k/_dim;
+  unsigned int ii = k - jj*_dim;
 
-    return this->_data(ii,jj);
-  }
+  return this->_data(ii,jj);
+}
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+template<>
+inline
+Real& RawAccessor<Real>::operator()( unsigned int i )
+{
+  libmesh_assert(i == 0);
+  return this->_data;
+}
+
+template<>
+inline
+Real& RawAccessor<RealGradient>::operator()( unsigned int i )
+{
+  libmesh_assert(i < this->_dim);
+  return this->_data(i);
+}
+
+template<>
+inline
+Real& RawAccessor<RealTensor>::operator()( unsigned int k )
+{
+  libmesh_assert(k < this->_dim*this->_dim);
+
+  // For tensors, each row is filled first, i.e. for 2-D
+  // [ 0 1; 2 3]
+  // Thus, k(i,j) = i + j*dim
+  unsigned int jj = k/_dim;
+  unsigned int ii = k - jj*_dim;
+
+  return this->_data(ii,jj);
+}
+#endif
 
 }
 #endif //__raw_accessor_h__

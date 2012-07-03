@@ -290,6 +290,7 @@ const Elem* ParallelMesh::query_elem (const unsigned int i) const
   if (it != _elements.end().it)
     {
       const Elem* e = it->second;
+      libmesh_assert (e);
       libmesh_assert (e->id() == i);
       return e;
     }
@@ -306,6 +307,7 @@ Elem* ParallelMesh::query_elem (const unsigned int i)
   if (it != _elements.end().it)
     {
       Elem* e = _elements[i];
+      libmesh_assert (e);
       libmesh_assert (e->id() == i);
       return e;
     }
