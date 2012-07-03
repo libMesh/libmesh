@@ -1057,7 +1057,8 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase& mesh)
+template <>
+void MeshTools::libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
 {
   if (libMesh::n_processors() == 1)
     return;
@@ -1139,7 +1140,8 @@ void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase& mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
+template <>
+void MeshTools::libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
 {
   parallel_only();
   if (libMesh::n_processors() == 1)

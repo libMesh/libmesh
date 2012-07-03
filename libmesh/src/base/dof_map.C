@@ -942,7 +942,7 @@ void DofMap::distribute_local_dofs_node_major(unsigned int &next_free_dof,
 #ifdef DEBUG
   {
     // Make sure we didn't miss any nodes
-    MeshTools::libmesh_assert_valid_node_procids(mesh);
+    MeshTools::libmesh_assert_valid_procids<Node>(mesh);
 
     MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
     const MeshBase::node_iterator node_end = mesh.local_nodes_end();
@@ -1094,7 +1094,7 @@ void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
 #ifdef DEBUG
   {
     // Make sure we didn't miss any nodes
-    MeshTools::libmesh_assert_valid_node_procids(mesh);
+    MeshTools::libmesh_assert_valid_procids<Node>(mesh);
 
     MeshBase::node_iterator       node_it  = mesh.local_nodes_begin();
     const MeshBase::node_iterator node_end = mesh.local_nodes_end();
