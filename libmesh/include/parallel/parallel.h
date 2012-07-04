@@ -3845,9 +3845,9 @@ namespace Parallel
   inline void receive_packed_range (const unsigned int,
 		                    Context*,
 		                    OutputIter,
-		                    Request &req,
-		                    const MessageTag &tag=any_tag,
-                                    const Communicator &comm = Communicator_World);
+		                    Request&,
+		                    const MessageTag &,
+                                    const Communicator &)
   { libmesh_error(); }
 
 //  inline status wait (request &) { status status; return status; }
