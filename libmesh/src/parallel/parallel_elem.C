@@ -32,6 +32,8 @@
 namespace
 {
   static const unsigned int header_size = 10;
+
+  static const int elem_magic_header = 987654321;
 }
 
 
@@ -54,6 +56,10 @@ void pack (const Elem* elem,
   // the user will already have reserved the full space, which will render
   // this redundant
   data.reserve (data.size() + elem->packed_size());
+
+#ifndef NDEBUG
+  data.push_back (elem_magic_header);
+#endif
 
 #ifdef LIBMESH_ENABLE_AMR
   data.push_back (static_cast<int>(elem->level()));
@@ -136,6 +142,9 @@ void unpack(std::vector<int>::const_iterator in,
 {
 #ifndef NDEBUG
   const std::vector<int>::const_iterator original_in = in;
+
+  const int incoming_header = *in++;
+  libmesh_assert (incoming_header == elem_magic_header);
 #endif
 
   // int 0: level
@@ -203,8 +212,9 @@ void unpack(std::vector<int>::const_iterator in,
   in += 2;
 #endif // LIBMESH_ENABLE_AMR
 
-  // Make sure we don't miscount above
-  libmesh_assert(in - original_in == header_size);
+  // Make sure we don't miscount above when adding the "magic" header
+  // plus the real data header
+  libmesh_assert(in - original_in == header_size + 1);
 
   Elem *elem = mesh->query_elem(id);
 
@@ -441,7 +451,11 @@ unsigned int packed_size (const Elem* elem, const MeshBase* mesh)
         total_packed_bcs += mesh->boundary_info->n_boundary_ids(elem,s);
     }
 
-  return header_size + elem->n_nodes() +
+  return
+#ifndef NDEBUG
+         1 + // add an int for the magic header when testing
+#endif
+	 header_size + elem->n_nodes() +
          elem->n_neighbors() +
          elem->packed_indexing_size() + total_packed_bcs;
 }
