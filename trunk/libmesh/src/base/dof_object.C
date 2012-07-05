@@ -377,10 +377,14 @@ unsigned int DofObject::packed_indexing_size() const
 
 unsigned int DofObject::unpackable_indexing_size(std::vector<int>::const_iterator begin)
 {
+#ifdef LIBMESH_ENABLE_AMR
   const int has_old_dof_object = *begin++;
 
   // Either we have an old_dof_object or we don't
   libmesh_assert(has_old_dof_object == 1 || has_old_dof_object == 0);
+#else
+  static const bool has_old_dof_object = false;
+#endif
 
   const int this_indexing_size = *begin++;
 
