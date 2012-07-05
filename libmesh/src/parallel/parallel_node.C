@@ -35,6 +35,8 @@ namespace
   // use "(a+b-1)/b" trick to get a/b to round up
   static const unsigned int ints_per_Real = 
     (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
+
+  static const int node_magic_header = 1234567890;
 }
 
 
@@ -54,6 +56,10 @@ void pack (const Node* node,
   libmesh_assert (node != NULL);
 
   data.reserve (data.size() + node->packed_size());
+
+#ifndef NDEBUG
+  data.push_back (node_magic_header);
+#endif
 
   data.push_back (static_cast<int>(node->processor_id()));
   data.push_back (static_cast<int>(node->id()));
@@ -101,6 +107,11 @@ void unpack (std::vector<int>::const_iterator in,
              Node** out,
              MeshBase* mesh)
 {
+#ifndef NDEBUG
+  const int incoming_header = *in++;
+  libmesh_assert (incoming_header == node_magic_header);
+#endif
+
   const unsigned int processor_id = static_cast<unsigned int>(*in++);
   libmesh_assert(processor_id == DofObject::invalid_processor_id ||
                  processor_id < libMesh::n_processors());
@@ -125,24 +136,30 @@ void unpack (std::vector<int>::const_iterator in,
         }
 #endif // !NDEBUG
 
+      // FIXME: We should add some debug mode tests to ensure that the
+      // encoded indexing and boundary conditions are consistent.
+      if (!node->has_dofs())
+	node->unpack_indexing(in);
+
       *out = node;
-      return;
     }
-
-  // If we don't already have it, we need to allocate it
-  node = new Node();
-
-  for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+  else
     {
-      const Real* ints_as_Real = reinterpret_cast<const Real*>(&(*in));
-      (*node)(i) = *ints_as_Real;
-      in += ints_per_Real;
+      // If we don't already have it, we need to allocate it
+      node = new Node();
+
+      for (unsigned int i=0; i != LIBMESH_DIM; ++i)
+        {
+          const Real* ints_as_Real = reinterpret_cast<const Real*>(&(*in));
+          (*node)(i) = *ints_as_Real;
+          in += ints_per_Real;
+        }
+
+      node->set_id() = id;
+      node->processor_id() = processor_id;
+
+      node->unpack_indexing(in);
     }
-
-  node->set_id() = id;
-  node->processor_id() = processor_id;
-
-  node->unpack_indexing(in);
 
   in += node->packed_indexing_size();
 
@@ -171,7 +188,11 @@ void unpack (std::vector<int>::const_iterator in,
 template <>
 unsigned int packed_size (const Node* node, const MeshBase* mesh)
 {
-  return header_size + LIBMESH_DIM*ints_per_Real +
+  return
+#ifndef NDEBUG
+         1 + // add an int for the magic header when testing
+#endif
+	 header_size + LIBMESH_DIM*ints_per_Real +
          node->packed_indexing_size() +
          1 + mesh->boundary_info->n_boundary_ids(node);
 }
