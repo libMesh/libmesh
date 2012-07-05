@@ -408,6 +408,7 @@ namespace {
 
 
 
+#ifdef LIBMESH_ENABLE_AMR
   //---------------------------------------------------
   std::map<std::string, Elem::RefinementState> refinementstate_type_to_enum;
 
@@ -444,6 +445,7 @@ namespace {
 			   enum_to_refinementstate_type);
       }
   }
+#endif // LIBMESH_ENABLE_AMR
 
 } // end anonymous namespace
 
@@ -641,6 +643,7 @@ namespace Utility {
   }
 
 
+#ifdef LIBMESH_ENABLE_AMR
   //------------------------------------------------------
   // Elem::RefinementState specialization
   template <>
@@ -669,9 +672,10 @@ namespace Utility {
 
     return enum_to_refinementstate_type[i];
   }
+#endif // LIBMESH_ENABLE_AMR
 
 
-}
+} // namespace Utility
 
 } // namespace libMesh
 
