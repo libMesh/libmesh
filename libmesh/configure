@@ -904,7 +904,7 @@ with_glpk_lib
 enable_netcdf
 enable_exodus
 enable_nemesis
-enable_libhilbert
+enable_libHilbert
 enable_fparser
 enable_fparser_optimizer
 '
@@ -12197,12 +12197,12 @@ fi
 
 
 
-  # Check whether --enable-libhilbert was given.
-if test "${enable_libhilbert+set}" = set; then :
-  enableval=$enable_libhilbert; case "${enableval}" in
+  # Check whether --enable-libHilbert was given.
+if test "${enable_libHilbert+set}" = set; then :
+  enableval=$enable_libHilbert; case "${enableval}" in
 		  yes)  enablelibhilbert=yes ;;
 		   no)  enablelibhilbert=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-libhilbert" "$LINENO" 5 ;;
+ 		    *)  as_fn_error $? "bad value ${enableval} for --enable-libHilbert" "$LINENO" 5 ;;
 		 esac
 else
   enablelibhilbert=$enableoptional

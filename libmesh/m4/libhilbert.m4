@@ -3,13 +3,13 @@ dnl libHilbert
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_LIBHILBERT], 
 [
-  AC_ARG_ENABLE(libhilbert,
+  AC_ARG_ENABLE(libHilbert,
                 AC_HELP_STRING([--enable-libHilbert],
                                [build with libHilbert, from Chris Hamilton]),
 		[case "${enableval}" in
 		  yes)  enablelibhilbert=yes ;;
 		   no)  enablelibhilbert=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-libhilbert) ;;
+ 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-libHilbert) ;;
 		 esac],
 		 [enablelibhilbert=$enableoptional])
 
