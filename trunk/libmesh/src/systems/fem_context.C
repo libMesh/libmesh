@@ -1307,10 +1307,11 @@ template void FEMContext::interior_value<RealGradient>(unsigned int, unsigned in
 template void FEMContext::interior_gradient<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberGradient&) const;
 template void FEMContext::interior_gradient<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template void FEMContext::interior_hessian<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberTensor&) const;
-
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::interior_hessian<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberTensor&) const;
+#endif
 
 template void FEMContext::side_value<Real>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::side_value<RealGradient>(unsigned int, unsigned int, Gradient&) const;
@@ -1318,9 +1319,11 @@ template void FEMContext::side_value<RealGradient>(unsigned int, unsigned int, G
 template void FEMContext::side_gradient<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberGradient&) const;
 template void FEMContext::side_gradient<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template void FEMContext::side_hessian<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberTensor&) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::side_hessian<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberTensor&) const;
+#endif
 
 template void FEMContext::point_value<Real>(unsigned int, const Point&, Number&) const;
 template void FEMContext::point_value<RealGradient>(unsigned int, const Point&, Gradient&) const;
@@ -1328,9 +1331,11 @@ template void FEMContext::point_value<RealGradient>(unsigned int, const Point&, 
 template void FEMContext::point_gradient<Real>(unsigned int, const Point&, FEGenericBase<Real>::OutputNumberGradient&) const;
 template void FEMContext::point_gradient<RealGradient>(unsigned int, const Point&, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template void FEMContext::point_hessian<Real>(unsigned int, const Point&, FEGenericBase<Real>::OutputNumberTensor&) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::point_hessian<RealGradient>(unsigned int, const Point&, FEGenericBase<RealGradient>::OutputNumberTensor&) const;
+#endif
 
 template void FEMContext::fixed_interior_value<Real>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::fixed_interior_value<RealGradient>(unsigned int, unsigned int, Gradient&) const;
@@ -1338,9 +1343,11 @@ template void FEMContext::fixed_interior_value<RealGradient>(unsigned int, unsig
 template void FEMContext::fixed_interior_gradient<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberGradient&) const;
 template void FEMContext::fixed_interior_gradient<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template void FEMContext::fixed_interior_hessian<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberTensor&) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::fixed_interior_hessian<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberTensor&) const;
+#endif
 
 template void FEMContext::fixed_side_value<Real>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::fixed_side_value<RealGradient>(unsigned int, unsigned int, Gradient&) const;
@@ -1348,9 +1355,11 @@ template void FEMContext::fixed_side_value<RealGradient>(unsigned int, unsigned 
 template void FEMContext::fixed_side_gradient<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberGradient&) const;
 template void FEMContext::fixed_side_gradient<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template void FEMContext::fixed_side_hessian<Real>(unsigned int, unsigned int, FEGenericBase<Real>::OutputNumberTensor&) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::fixed_side_hessian<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputRealTensor&) const;
+#endif
 
 template void FEMContext::fixed_point_value<Real>(unsigned int, const Point&, Number&) const;
 template void FEMContext::fixed_point_value<RealGradient>(unsigned int, const Point&, Gradient&) const;
@@ -1358,9 +1367,11 @@ template void FEMContext::fixed_point_value<RealGradient>(unsigned int, const Po
 template void FEMContext::fixed_point_gradient<Real>(unsigned int, const Point&, FEGenericBase<Real>::OutputNumberGradient&) const;
 template void FEMContext::fixed_point_gradient<RealGradient>(unsigned int, const Point&, FEGenericBase<RealGradient>::OutputNumberGradient&) const;
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 template void FEMContext::fixed_point_hessian<Real>(unsigned int, const Point&, FEGenericBase<Real>::OutputNumberTensor&) const;
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::fixed_point_hessian<RealGradient>(unsigned int, const Point&, FEGenericBase<RealGradient>::OutputRealTensor&) const;
+#endif
 
 template AutoPtr<FEGenericBase<Real> > FEMContext::build_new_fe( const FEGenericBase<Real>*, const Point & ) const;
 template AutoPtr<FEGenericBase<RealGradient> > FEMContext::build_new_fe( const FEGenericBase<RealGradient>*, const Point & ) const;
