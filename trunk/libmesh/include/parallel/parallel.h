@@ -3948,7 +3948,14 @@ namespace Parallel
 
     // Pack the objects into the buffer
     for (; range_begin != range_end; ++range_begin)
-      Parallel::pack(*range_begin, buffer, context);
+      {
+#ifndef NDEBUG
+        size_t old_size = buffer.size();
+#endif
+        Parallel::pack(*range_begin, buffer, context);
+	libmesh_assert(buffer.size() == old_size +
+		       Parallel::packed_size(*range_begin, context));
+      }
   }
 
 
