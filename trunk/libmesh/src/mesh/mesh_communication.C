@@ -1079,6 +1079,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
 
   // FIXME - should these be "unsorted_set"s?  O(N) is O(N)...
   std::vector<bool> local_nodes(mesh.max_node_id(), false);
+  std::vector<bool> semilocal_nodes(mesh.max_node_id(), false);
   std::vector<bool> semilocal_elems(mesh.max_elem_id(), false);
 
   // We don't want to delete any element that shares a node
@@ -1099,6 +1100,9 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
           unsigned int elemid = elem->id();
           libmesh_assert(elemid < semilocal_elems.size());
           semilocal_elems[elemid] = true;
+
+	  for (unsigned int n=0; n != elem->n_nodes(); ++n)
+	    semilocal_nodes[elem->node(n)] = true;
 
           const Elem *parent = elem->parent();
 	  // Don't proceed from a boundary mesh to an interior mesh
@@ -1124,6 +1128,9 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
         {
           semilocal_elems[elem->id()] = true;
 
+	  for (unsigned int n=0; n != elem->n_nodes(); ++n)
+	    semilocal_nodes[elem->node(n)] = true;
+
           const Elem *parent = elem->parent();
 	  // Don't proceed from a boundary mesh to an interior mesh
           if (parent && parent->dim() != elem->dim())
@@ -1147,6 +1154,9 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
               {
                 semilocal_elems[elem->id()] = true;
 
+	        for (unsigned int n=0; n != elem->n_nodes(); ++n)
+	          semilocal_nodes[elem->node(n)] = true;
+
                 const Elem *parent = elem->parent();
 	        // Don't proceed from a boundary mesh to an interior mesh
                 if (parent && parent->dim() != elem->dim())
@@ -1162,7 +1172,12 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   for(std::set<Elem *>::iterator it = extra_ghost_elem_ids.begin();
       it != extra_ghost_elem_ids.end();
       ++it)
-    semilocal_elems[(*it)->id()] = true;
+    {
+      const Elem *elem = *it;
+      semilocal_elems[elem->id()] = true;
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+	semilocal_nodes[elem->node(n)] = true;
+    }
 
   // Delete all the elements we have no reason to save,
   // starting with the most refined so that the mesh
@@ -1193,15 +1208,22 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
         }
     }
 
+  // Delete all the nodes we have no reason to save
+  MeshBase::node_iterator node_it  = mesh.nodes_begin(),
+                          node_end = mesh.nodes_end();
+  for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
+    {
+      Node *node = *node_it;
+      libmesh_assert(node);
+      if (!semilocal_nodes[node->id()])
+        mesh.delete_node(node);
+    }
+
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
 #endif
 
   STOP_LOG("delete_remote_elements()", "MeshCommunication");
-
-  // Now make sure the containers actually shrink - strip
-  // any newly-created NULL voids out of the element array
-  mesh.renumber_nodes_and_elements();
 }
 
 } // namespace libMesh
