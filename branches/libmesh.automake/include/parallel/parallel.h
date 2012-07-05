@@ -580,6 +580,15 @@ namespace Parallel
   };
 
 
+  //-------------------------------------------------------------------
+  /**
+   * A class that can be subclassed to allow other code to
+   * perform work after a MPI_Wait succeeds
+   */
+  struct PostWaitWork {
+    virtual void run() {};
+  };
+
 
   //-------------------------------------------------------------------
   /**
@@ -588,31 +597,75 @@ namespace Parallel
   class Request
   {
   public:
-    // Forward declaration for nested class
-    struct PostWaitWork;
-
     Request () :
 #ifdef LIBMESH_HAVE_MPI
-      _request(MPI_REQUEST_NULL)
+      _request(MPI_REQUEST_NULL),
 #else
-      _request()
+      _request(),
 #endif
+      post_wait_work(NULL)
     {}
 
     Request (const request &r) :
-      _request(r)
+      _request(r),
+      post_wait_work(NULL)
     {}
 
+    Request (const Request &other) :
+      _request(other._request),
+      post_wait_work(other.post_wait_work)
+    {
+      // operator= should behave like a shared pointer
+      if (post_wait_work)
+        post_wait_work->second++;
+    }
+
+    void cleanup()
+    {
+      if (post_wait_work)
+        {
+          // Decrement the use count
+          post_wait_work->second--;
+
+          if (!post_wait_work->second)
+            {
+#ifdef DEBUG
+              // If we're done using this request, then we'd better have
+              // done the work we waited for
+              for (std::vector<PostWaitWork*>::iterator i =
+	           post_wait_work->first.begin();
+                   i != post_wait_work->first.end(); ++i)
+	        libmesh_assert(!(*i));
+#endif
+              delete post_wait_work;
+              post_wait_work = NULL;
+            }
+        }
+    }
+
     Request & operator = (const Request &other)
-    { _request = other._request; return *this; }
+    {
+      this->cleanup();
+      _request = other._request;
+      post_wait_work = other.post_wait_work;
+
+      // operator= should behave like a shared pointer
+      if (post_wait_work)
+        post_wait_work->second++;
+
+      return *this;
+    }
 
     Request & operator = (const request &r)
-    { _request = r; return *this; }
+    {
+      this->cleanup();
+      _request = r;
+      post_wait_work = NULL;
+      return *this;
+    }
 
     ~Request () {
-      for (std::vector<PostWaitWork*>::iterator i =
-	   post_wait_work.begin(); i != post_wait_work.end(); ++i)
-	delete *i;
+      this->cleanup();
     }
 
     /*
@@ -626,6 +679,7 @@ namespace Parallel
     request* get()
     { return &_request; }
 
+    /*
     void free (void)
     {
 #ifdef LIBMESH_HAVE_MPI
@@ -633,20 +687,33 @@ namespace Parallel
 	MPI_Request_free (&_request);
 #endif
     }
+    */
 
     const request* get() const
     { return &_request; }
 
     Status wait ()
     {
+      START_LOG("wait()", "Parallel::Request");
+
       Status stat;
 #ifdef LIBMESH_HAVE_MPI
       MPI_Wait (&_request, stat.get());
 #endif
-      for (std::vector<PostWaitWork*>::iterator i =
-	   post_wait_work.begin(); i != post_wait_work.end(); ++i)
-	(*i)->run();
+      if (post_wait_work)
+        for (std::vector<PostWaitWork*>::iterator i =
+	     post_wait_work->first.begin();
+             i != post_wait_work->first.end(); ++i)
+          {
+            // The user should never try to give us NULL work or try
+            // to wait() twice.
+            libmesh_assert (*i);
+	    (*i)->run();
+            delete (*i);
+            *i = NULL;
+          }
 
+      STOP_LOG("wait()", "Parallel::Request");
       return stat;
     }
 
@@ -688,42 +755,24 @@ namespace Parallel
     }
 #endif
 
-    // Nested class that can be subclassed to allow other code to
-    // perform work after a MPI_Wait succeeds with this request.
-    struct PostWaitWork {
-      virtual void run() {};
-    };
-
-   // PostWaitWork specialization for copying from temporary to output
-   // containers
-    template <typename Container, typename OutputIter>
-    struct PostWaitCopyBuffer : public PostWaitWork {
-      PostWaitCopyBuffer(const Container& buffer, const OutputIter out) 
-        : _buf(buffer), _out(out) {}
-
-      virtual void run() { std::copy(_buf.begin(), _buf.end(), _out); }
-
-      private:
-      const Container& _buf;
-      OutputIter _out;
-    };
-
-   // PostWaitWork specialization for freeing no-longer-needed buffers.
-    template <typename Container>
-    struct PostWaitDeleteBuffer : public PostWaitWork {
-      PostWaitDeleteBuffer(Container* buffer) : _buf(buffer) {}
-
-      virtual void run() { delete _buf; };
-
-      private:
-      Container* _buf;
-    };
-
-    std::vector <PostWaitWork* > post_wait_work;
+    void add_post_wait_work(PostWaitWork* work)
+    {
+      if (!post_wait_work)
+        post_wait_work = new
+          std::pair<std::vector <PostWaitWork* >, unsigned int>
+            (std::vector <PostWaitWork* >(), 1);
+      post_wait_work->first.push_back(work);
+    }
 
   private:
 
     request _request;
+
+    // post_wait_work->first is a vector of work to do after a wait
+    // finishes; post_wait_work->second is a reference count so that
+    // Request objects will behave roughly like a shared_ptr and be
+    // usable in STL containers
+    std::pair<std::vector <PostWaitWork* >, unsigned int>* post_wait_work;
   };
 
 
@@ -966,6 +1015,107 @@ namespace Parallel
           comm);
   }
 
+  //-------------------------------------------------------------------
+  /**
+   * Encode a potentially-variable-size object at the end of a data
+   * array.
+   *
+   * Parallel::pack() has no default implementation, and must be
+   * specialized for each class which is to be communicated via packed
+   * ranges.
+   */
+  template <typename T, typename Context>
+  void pack(const T*, std::vector<int>& data, const Context*);
+
+  //-------------------------------------------------------------------
+  /**
+   * Output the number of integers required to encode a
+   * potentially-variable-size object into a data array.
+   *
+   * Parallel::packed_size() has no default implementation, and must
+   * be specialized for each class which is to be communicated via
+   * packed ranges.
+   */
+  template <typename T, typename Context>
+  unsigned int packed_size(const T*, const Context*);
+
+  //-------------------------------------------------------------------
+  /**
+   * Decode a potentially-variable-size object from a subsequence of a
+   * data array.
+   *
+   * Parallel::unpack() has no default implementation, and must be
+   * specialized for each class which is to be communicated via packed
+   * ranges.
+   */
+  template <typename T, typename Context>
+  void unpack(std::vector<int>::const_iterator in, T** out, Context*);
+
+  //-------------------------------------------------------------------
+  /**
+   * Decode a range of potentially-variable-size objects from a data
+   * array.
+   */
+  template <typename Context, typename OutputIter>
+  inline void unpack_range (const std::vector<int>& buffer,
+		            Context *context,
+		            OutputIter out);
+
+  //-------------------------------------------------------------------
+  /**
+   * Encode a range of potentially-variable-size objects to a data
+   * array.
+   */
+  template <typename Context, typename Iter>
+  inline void pack_range (const Context *context,
+		          Iter range_begin,
+		          const Iter range_end,
+                          std::vector<int>& buffer);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-send range-of-pointers to one processor.  This
+   * function does not send the raw pointers, but rather constructs
+   * new objects at the other end whose contents match the objects
+   * pointed to by the sender.
+   *
+   * void Parallel::pack(const T*, vector<int>& data, const Context*)
+   * is used to serialize type T onto the end of a data vector.
+   *
+   * unsigned int Parallel::packed_size(const T*, const Context*) is
+   * used to allow data vectors to reserve memory, and for additional
+   * error checking
+   */
+  template <typename Context, typename Iter>
+  inline void send_packed_range (const unsigned int dest_processor_id,
+		                 const Context *context,
+		                 Iter range_begin,
+		                 const Iter range_end,
+		                 const MessageTag &tag=no_tag,
+                                 const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send range-of-pointers to one processor.  This
+   * function does not send the raw pointers, but rather constructs
+   * new objects at the other end whose contents match the objects
+   * pointed to by the sender.
+   *
+   * void Parallel::pack(const T*, vector<int>& data, const Context*)
+   * is used to serialize type T onto the end of a data vector.
+   *
+   * unsigned int Parallel::packed_size(const T*, const Context*) is
+   * used to allow data vectors to reserve memory, and for additional
+   * error checking
+   */
+  template <typename Context, typename Iter>
+  inline void send_packed_range (const unsigned int dest_processor_id,
+		                 const Context *context,
+		                 Iter range_begin,
+		                 const Iter range_end,
+		                 Request &req,
+		                 const MessageTag &tag=no_tag,
+                                 const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -1132,6 +1282,74 @@ namespace Parallel
              comm);
   }
 
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive range-of-pointers from one processor.  This
+   * function does not receive raw pointers, but rather constructs new
+   * objects whose contents match the objects pointed to by the
+   * sender.
+   *
+   * The objects will be of type 
+   * T = iterator_traits<OutputIter>::value_type.
+   *
+   * Using std::back_inserter as the output iterator allows receive to
+   * fill any container type.  Using libMesh::null_output_iterator
+   * allows the receive to be dealt with solely by Parallel::unpack(),
+   * for objects whose unpack() is written so as to not leak memory
+   * when used in this fashion.
+   *
+   * A future version of this method should be created to preallocate
+   * memory when receiving vectors...
+   *
+   * void Parallel::unpack(vector<int>::iterator in, T** out, Context*)
+   * is used to unserialize type T, typically into a new
+   * heap-allocated object whose pointer is returned as *out.
+   *
+   * unsigned int Parallel::packed_size(const T*, const Context*) is
+   * used to advance to the beginning of the next object's data.
+   */
+  template <typename Context, typename OutputIter>
+  inline void receive_packed_range (const unsigned int dest_processor_id,
+		                    Context *context,
+		                    OutputIter out,
+		                    const MessageTag &tag=any_tag,
+                                    const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive range-of-pointers from one processor.  This
+   * function does not receive raw pointers, but rather constructs new
+   * objects whose contents match the objects pointed to by the
+   * sender.
+   *
+   * The objects will be of type 
+   * T = iterator_traits<OutputIter>::value_type.
+   *
+   * Using std::back_inserter as the output iterator allows receive to
+   * fill any container type.  Using libMesh::null_output_iterator
+   * allows the receive to be dealt with solely by Parallel::unpack(),
+   * for objects whose unpack() is written so as to not leak memory
+   * when used in this fashion.
+   *
+   * A future version of this method should be created to preallocate
+   * memory when receiving vectors...
+   *
+   * void Parallel::unpack(vector<int>::iterator in, T** out, Context*)
+   * is used to unserialize type T, typically into a new
+   * heap-allocated object whose pointer is returned as *out.
+   *
+   * unsigned int Parallel::packed_size(const T*, const Context*) is
+   * used to advance to the beginning of the next object's data.
+   */
+  template <typename Context, typename OutputIter>
+  inline void receive_packed_range (const unsigned int dest_processor_id,
+		                    Context *context,
+		                    OutputIter out,
+		                    Request &req,
+		                    const MessageTag &tag=any_tag,
+                                    const Communicator &comm = Communicator_World);
+
+
 
   //-------------------------------------------------------------------
   /**
@@ -1257,20 +1475,70 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
-   * Send vector \p send to one processor while simultaneously receiving
-   * another vector \p recv from a (potentially different) processor.
+   * Send data \p send to one processor while simultaneously receiving
+   * other data \p recv from a (potentially different) processor.
    */
   template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
                            T1 &send,
 			   const unsigned int source_processor_id,
                            T2 &recv,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
-   * Send vector \p send to one processor while simultaneously receiving
-   * another vector \p recv from a (potentially different) processor using
+   * Send a range-of-pointers to one processor while simultaneously receiving
+   * another range from a (potentially different) processor.  This
+   * function does not send or receive raw pointers, but rather constructs
+   * new objects at each receiver whose contents match the objects
+   * pointed to by the sender.
+   *
+   * The objects being sent will be of type 
+   * T1 = iterator_traits<RangeIter>::value_type, and the objects
+   * being received will be of type
+   * T2 = iterator_traits<OutputIter>::value_type
+   *
+   * void Parallel::pack(const T1*, vector<int>& data, const Context1*) 
+   * is used to serialize type T1 onto the end of a data vector.
+   *
+   * Using std::back_inserter as the output iterator allows
+   * send_receive to fill any container type.  Using
+   * libMesh::null_output_iterator allows the receive to be dealt with
+   * solely by Parallel::unpack(), for objects whose unpack() is
+   * written so as to not leak memory when used in this fashion.
+   *
+   * A future version of this method should be created to preallocate
+   * memory when receiving vectors...
+   *
+   * void Parallel::unpack(vector<int>::iterator in, T2** out, Context*)
+   * is used to unserialize type T2, typically into a new
+   * heap-allocated object whose pointer is returned as *out.
+   *
+   * unsigned int Parallel::packed_size(const T1*, const Context1*) is
+   * used to allow data vectors to reserve memory, and for additional
+   * error checking.
+   *
+   * unsigned int Parallel::packed_size(const T2*, const Context2*) is
+   * used to advance to the beginning of the next object's data.
+   */
+  template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
+  inline void send_receive_packed_range(const unsigned int dest_processor_id,
+                                        const Context1* context1,
+                                        RangeIter send_begin,
+                                        const RangeIter send_end,
+			                const unsigned int source_processor_id,
+                                        Context2* context2,
+                                        OutputIter out,
+		                        const MessageTag &send_tag = no_tag,
+		                        const MessageTag &recv_tag = any_tag,
+                                        const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Send data \p send to one processor while simultaneously receiving
+   * other data \p recv from a (potentially different) processor, using
    * a user-specified MPI Dataype.
    */
   template <typename T1, typename T2>
@@ -1280,6 +1548,8 @@ namespace Parallel
 			   const unsigned int source_processor_id,
                            T2 &recv,
 			   const DataType &type2,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
@@ -1327,7 +1597,18 @@ namespace Parallel
 			const bool identical_buffer_sizes = false,
                         const Communicator &comm = Communicator_World);
 
+  //-------------------------------------------------------------------
+  /**
+   * Take a range of local variables, combine it with ranges from all
+   * processors, and write the output to the output iterator.
+   */
 
+  template <typename Context, typename Iter, typename OutputIter>
+  inline void allgather_packed_range (Context *context,
+		                      Iter range_begin,
+		                      const Iter range_end,
+		                      OutputIter out,
+                                      const Communicator &comm = Communicator_World);
 
   //-------------------------------------------------------------------
   /**
@@ -1374,6 +1655,70 @@ namespace Parallel
   template <typename T>
   inline void broadcast(std::set<T> &data, const unsigned int root_id=0,
                         const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-broadcast range-of-pointers to one processor.  This
+   * function does not send the raw pointers, but rather constructs
+   * new objects at the other end whose contents match the objects
+   * pointed to by the sender.
+   *
+   * void Parallel::pack(const T*, vector<int>& data, const Context*)
+   * is used to serialize type T onto the end of a data vector.
+   *
+   * unsigned int Parallel::packed_size(const T*, const Context*) is
+   * used to allow data vectors to reserve memory, and for additional
+   * error checking
+   */
+  template <typename Context, typename OutputContext, typename Iter, typename OutputIter>
+  inline void broadcast_packed_range (const Context *context1,
+		                      Iter range_begin,
+		                      const Iter range_end,
+		                      OutputContext *context2,
+		                      OutputIter out,
+                                      const unsigned int root_id = 0,
+                                      const Communicator &comm = Communicator_World);
+
+  // PostWaitWork specialization for copying from temporary to
+  // output containers
+  template <typename Container, typename OutputIter>
+  struct PostWaitCopyBuffer : public PostWaitWork {
+    PostWaitCopyBuffer(const Container& buffer, const OutputIter out) 
+      : _buf(buffer), _out(out) {}
+
+    virtual void run() { std::copy(_buf.begin(), _buf.end(), _out); }
+
+    private:
+    const Container& _buf;
+    OutputIter _out;
+  };
+
+  // PostWaitWork specialization for unpacking received buffers.
+  template <typename Container, typename Context, typename OutputIter>
+  struct PostWaitUnpackBuffer : public PostWaitWork {
+    PostWaitUnpackBuffer(const Container& buffer, Context *context, OutputIter out) :
+      _buf(buffer), _context(context), _out(out) {}
+
+    virtual void run() { Parallel::unpack_range(_buf, _context, _out); };
+
+    private:
+    const Container& _buf;
+    Context *_context;
+    OutputIter _out;
+  };
+
+
+  // PostWaitWork specialization for freeing no-longer-needed buffers.
+  template <typename Container>
+  struct PostWaitDeleteBuffer : public PostWaitWork {
+    PostWaitDeleteBuffer(Container* buffer) : _buf(buffer) {}
+
+    virtual void run() { delete _buf; };
+
+    private:
+    Container* _buf;
+  };
+
 
 
   //-----------------------------------------------------------------------
@@ -2306,6 +2651,49 @@ namespace Parallel
   }
 
 
+  template <typename Context, typename Iter>
+  inline void send_packed_range (const unsigned int dest_processor_id,
+		                 const Context *context,
+		                 Iter range_begin,
+		                 const Iter range_end,
+		                 const MessageTag &tag,
+                                 const Communicator &comm)
+  {
+    // We will serialize variable size objects from *range_begin to
+    // *range_end as a sequence of ints in this buffer
+    std::vector<int> buffer;
+
+    Parallel::pack_range(context, range_begin, range_end, buffer);
+
+    // Blocking send of the buffer
+    Parallel::send(dest_processor_id, buffer, tag, comm);
+  }
+
+
+  template <typename Context, typename Iter>
+  inline void send_packed_range (const unsigned int dest_processor_id,
+		                 const Context *context,
+		                 Iter range_begin,
+		                 const Iter range_end,
+		                 Request &req,
+		                 const MessageTag &tag,
+                                 const Communicator &comm)
+  {
+    // Allocate a buffer on the heap so we don't have to free it until
+    // after the Request::wait()
+    std::vector<int> *buffer = new std::vector<int>();
+
+    Parallel::pack_range(context, range_begin, range_end, *buffer);
+
+    // Make the Request::wait() handle deleting the buffer
+    req.add_post_wait_work
+      (new Parallel::PostWaitDeleteBuffer<std::vector<int> >(buffer));
+
+    // Non-blocking send of the buffer
+    Parallel::send(dest_processor_id, *buffer, req, tag, comm);
+  }
+
+
   template <typename T>
   inline Status receive (const unsigned int src_processor_id,
 		         std::vector<T> &buf,
@@ -2368,6 +2756,46 @@ namespace Parallel
   }
 
 
+  template <typename Context, typename OutputIter>
+  inline void receive_packed_range (const unsigned int src_processor_id,
+		                    Context *context,
+		                    OutputIter out,
+		                    const MessageTag &tag,
+                                    const Communicator &comm)
+  {
+    // Receive serialized variable size objects as a sequence of ints
+    std::vector<int> buffer;
+    Parallel::receive(src_processor_id, buffer, tag, comm);
+    Parallel::unpack_range(buffer, context, out);
+  }
+
+
+
+  template <typename Context, typename OutputIter>
+  inline void receive_packed_range (const unsigned int src_processor_id,
+		                    Context *context,
+		                    OutputIter out,
+		                    Request &req,
+		                    const MessageTag &tag,
+                                    const Communicator &comm)
+  {
+    // Receive serialized variable size objects as a sequence of ints.
+    // Allocate a buffer on the heap so we don't have to free it until
+    // after the Request::wait()
+    std::vector<int> *buffer = new std::vector<int>();
+    Parallel::receive(src_processor_id, *buffer, req, tag, comm);
+
+    // Make the Request::wait() handle unpacking the buffer
+    req.add_post_wait_work
+      (new Parallel::PostWaitUnpackBuffer<std::vector<int>, Context, OutputIter>
+        (buffer, context, out));
+
+    // Make the Request::wait() then handle deleting the buffer
+    req.add_post_wait_work
+      (new Parallel::PostWaitDeleteBuffer<std::vector<int> >(buffer));
+  }
+
+
 
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
@@ -2403,8 +2831,8 @@ namespace Parallel
       new std::vector<T>(buf.begin(), buf.end());
 
     // Make the Request::wait() handle deleting the buffer
-    req.post_wait_work.push_back
-      (Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
+    req.add_post_wait_work
+      (new Parallel::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
 
     // Use Parallel::send() so we get its specialization(s)
     Parallel::send(dest_processor_id, *vecbuf, type, req, tag, comm);
@@ -2454,14 +2882,14 @@ namespace Parallel
     // handle copying our temporary buffer to it
     buf.clear();
 
-    req.post_wait_work.push_back
-      (Parallel::Request::PostWaitCopyBuffer<std::vector<T>,
+    req.add_post_wait_work
+      (new Parallel::PostWaitCopyBuffer<std::vector<T>,
          std::back_insert_iterator<std::set<T> > >
 	   (vecbuf, std::back_inserter(buf)));
 
     // Make the Request::wait() then handle deleting the buffer
-    req.post_wait_work.push_back
-      (Parallel::Request::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
+    req.add_post_wait_work
+      (new Parallel::PostWaitDeleteBuffer<std::vector<T> >(vecbuf));
 
     // Use Parallel::receive() so we get its specialization(s)
     Parallel::receive(src_processor_id, *vecbuf, type, req, tag, comm);
@@ -2474,15 +2902,7 @@ namespace Parallel
   /*
   inline status wait (request &r)
   {
-    START_LOG("wait()", "Parallel");
-
-    status status;
-
-    MPI_Wait (&r, &status);
-
-    STOP_LOG("wait()", "Parallel");
-
-    return status;
+    return r.wait();
   }
 
 
@@ -2500,7 +2920,7 @@ namespace Parallel
 
 
   // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
+  // function template, so we have to re-specify the default arguments
   template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
 			   std::vector<T1> &send,
@@ -2508,6 +2928,8 @@ namespace Parallel
 			   const unsigned int source_processor_id,
 			   std::vector<T2> &recv,
 			   const DataType &type2,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
@@ -2526,13 +2948,13 @@ namespace Parallel
 				send,
 				type1,
 				request,
-				MessageTag(321),
+				send_tag,
                                 comm);
 
     Parallel::receive (source_processor_id,
 		       recv,
 		       type2,
-		       MessageTag(321),
+		       recv_tag,
                        comm);
 
     Parallel::wait (request);
@@ -2547,6 +2969,8 @@ namespace Parallel
 			   T1 &send,
 			   const unsigned int source_processor_id,
 			   T2 &recv,
+			   const MessageTag &send_tag,
+			   const MessageTag &recv_tag,
                            const Communicator &comm)
   {
     START_LOG("send_receive()", "Parallel");
@@ -2560,9 +2984,9 @@ namespace Parallel
       }
 
     MPI_Sendrecv(&send, 1, StandardType<T1>(&send),
-		 dest_processor_id, 0,
+		 dest_processor_id, send_tag.value(),
 		 &recv, 1, StandardType<T2>(&recv),
-		 source_processor_id, 0,
+		 source_processor_id, recv_tag.value(),
 		 comm.get(),
 		 MPI_STATUS_IGNORE);
 
@@ -2572,12 +2996,14 @@ namespace Parallel
 
 
   // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
+  // function template, so we have to re-specify the default arguments
   template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
 			   std::vector<T1> &send,
 			   const unsigned int source_processor_id,
 			   std::vector<T2> &recv,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World)
   {
     // Call the user-defined type version with automatic
@@ -2588,18 +3014,22 @@ namespace Parallel
 		  source_processor_id,
 		  recv,
 		  StandardType<T2>(recv.empty() ? NULL : &recv[0]),
+		  send_tag,
+		  recv_tag,
                   comm);
   }
 
 
 
   // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default argument
+  // function template, so we have to re-specify the default arguments
   template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
 			   std::vector<std::vector<T1> > &send,
 			   const unsigned int source_processor_id,
 			   std::vector<std::vector<T2> > &recv,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
                            const Communicator &comm = Communicator_World)
   {
     START_LOG("send_receive()", "Parallel");
@@ -2675,19 +3105,17 @@ namespace Parallel
 
     Parallel::Request request;
 
-    Parallel::MessageTag tag = comm.get_unique_tag(123);
-
     Parallel::nonblocking_send (dest_processor_id,
 				sendbuf,
 				MPI_PACKED,
 				request,
-				tag,
+				send_tag,
                                 comm);
 
     Parallel::receive (source_processor_id,
 		       recvbuf,
 		       MPI_PACKED,
-		       tag,
+		       recv_tag,
                        comm);
 
     // Unpack the received buffer
@@ -2721,6 +3149,45 @@ namespace Parallel
 
     STOP_LOG("send_receive()", "Parallel");
   }
+
+
+
+  template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
+  inline void send_receive_packed_range (const unsigned int dest_processor_id,
+                           const Context1* context1,
+                           RangeIter send_begin,
+                           const RangeIter send_end,
+			   const unsigned int source_processor_id,
+                           Context2* context2,
+                           OutputIter out,
+		           const MessageTag &send_tag,
+		           const MessageTag &recv_tag,
+                           const Communicator &comm)
+  {
+    START_LOG("send_receive()", "Parallel");
+
+    Parallel::Request request;
+
+    Parallel::send_packed_range (dest_processor_id,
+                                 context1,
+                                 send_begin,
+                                 send_end,
+                                 request,
+                                 send_tag,
+                                 comm);
+
+    Parallel::receive_packed_range (source_processor_id,
+		                    context2,
+		                    out,
+		                    recv_tag,
+                                    comm);
+
+    Parallel::wait (request);
+
+    STOP_LOG("send_receive()", "Parallel");
+
+  }
+
 
 
   template <typename T>
@@ -2797,7 +3264,7 @@ namespace Parallel
       sendlengths  (comm.size(), 0),
       displacements(comm.size(), 0);
 
-    const int mysize = r.size();
+    const int mysize = static_cast<int>(r.size());
     Parallel::allgather(mysize, sendlengths, comm);
 
     START_LOG("gather()", "Parallel");
@@ -2933,7 +3400,7 @@ namespace Parallel
       sendlengths  (comm.size(), 0),
       displacements(comm.size(), 0);
 
-    const int mysize = r.size();
+    const int mysize = static_cast<int>(r.size());
     Parallel::allgather(mysize, sendlengths, comm);
 
     // Find the total size of the final array and
@@ -2971,6 +3438,25 @@ namespace Parallel
     libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("allgather()", "Parallel");
+  }
+
+
+  template <typename Context, typename Iter, typename OutputIter>
+  inline void allgather_packed_range (Context *context,
+		                      Iter range_begin,
+		                      const Iter range_end,
+		                      OutputIter out,
+                                      const Communicator &comm)
+  {
+    // We will serialize variable size objects from *range_begin to
+    // *range_end as a sequence of ints in this buffer
+    std::vector<int> buffer;
+
+    Parallel::pack_range(context, range_begin, range_end, buffer);
+
+    Parallel::allgather(buffer, false, comm);
+
+    Parallel::unpack_range(buffer, context, out);
   }
 
 
@@ -3154,6 +3640,37 @@ namespace Parallel
     STOP_LOG("broadcast()", "Parallel");
   }
 
+
+  template <typename Context, typename OutputContext, typename Iter, typename OutputIter>
+  inline void broadcast_packed_range (const Context *context1,
+		                      Iter range_begin,
+		                      const Iter range_end,
+				      OutputContext *context2,
+		                      OutputIter out,
+                                      const unsigned int root_id,
+                                      const Communicator &comm)
+  {
+    // We will serialize variable size objects from *range_begin to
+    // *range_end as a sequence of ints in this buffer
+    std::vector<int> buffer;
+
+    if (comm.rank() == root_id)
+      Parallel::pack_range(context1, range_begin, range_end, buffer);
+
+    // Parallel::broadcast(vector) requires the receiving vectors to
+    // already be the appropriate size
+    unsigned int buffer_size = buffer.size();
+    Parallel::broadcast (buffer_size);
+    buffer.resize(buffer_size);
+
+    // Broadcast the packed data
+    Parallel::broadcast (buffer, root_id, comm);
+
+    if (comm.rank() != root_id)
+      Parallel::unpack_range(buffer, context2, out);
+  }
+
+
 #else // LIBMESH_HAVE_MPI
 
   template <typename T>
@@ -3246,6 +3763,37 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Blocking-send range-of-pointers to one processor.
+   *
+   * we do not currently support this operation on one processor without MPI.
+   */
+  template <typename Context, typename Iter>
+  inline void send_packed_range (const unsigned int,
+		                 const Context*,
+		                 Iter,
+		                 const Iter,
+		                 const MessageTag&,
+                                 const Communicator&)
+  { libmesh_error(); }
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send range-of-pointers to one processor.
+   *
+   * we do not currently support this operation on one processor without MPI.
+   */
+  template <typename Context, typename Iter>
+  inline void send_packed_range (const unsigned int,
+		                 const Context*,
+		                 Iter,
+		                 const Iter,
+		                 Request&,
+		                 const MessageTag&,
+                                 const Communicator&)
+  { libmesh_error(); }
+
+  //-------------------------------------------------------------------
+  /**
    * Blocking-receive vector from one processor with user-defined type.
    *
    * we do not currently support this operation on one processor without MPI.
@@ -3273,52 +3821,71 @@ namespace Parallel
                        const Communicator&)
   { libmesh_error(); }
 
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive range-of-pointers from one processor.
+   *
+   * we do not currently support this operation on one processor without MPI.
+   */
+  template <typename Context, typename OutputIter>
+  inline void receive_packed_range (const unsigned int,
+		                    Context*,
+		                    OutputIter,
+		                    const MessageTag&,
+                                    const Communicator&)
+  { libmesh_error(); }
 
-//   // on one processor a blocking probe can only be used to
-//   // test a nonblocking send, which we don't really support
-//   inline status probe (const int,
-// 		       const int)
-//   { libmesh_error(); status status; return status; }
-
-
-//   // Blocking sends don't make sense on one processor
-//   template <typename T>
-//   inline void send (const unsigned int,
-// 		    std::vector<T> &,
-// 		    const unsigned int) { libmesh_error(); }
-
-//   template <typename T>
-//   inline void nonblocking_send (const unsigned int,
-// 		                std::vector<T> &,
-// 		                Request &,
-// 		                const int) {}
-
-//   // Blocking receives don't make sense on one processor
-//   template <typename T>
-//   inline Status receive (const int,
-// 		         std::vector<T> &,
-// 		         const int) { libmesh_error(); return Status(); }
-
-//   template <typename T>
-//   inline void nonblocking_receive (const int,
-// 		                   std::vector<T> &,
-// 		                   Request &,
-// 		                   const int) {}
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive range-of-pointers from one processor.
+   *
+   * we do not currently support this operation on one processor without MPI.
+   */
+  template <typename Context, typename OutputIter>
+  inline void receive_packed_range (const unsigned int,
+		                    Context*,
+		                    OutputIter,
+		                    Request&,
+		                    const MessageTag &,
+                                    const Communicator &)
+  { libmesh_error(); }
 
 //  inline status wait (request &) { status status; return status; }
 
 //  inline void wait (std::vector<request> &) {}
 
+  /**
+   * Send-receive data from one processor.
+   */
   template <typename T1, typename T2>
   inline void send_receive (const unsigned int send_tgt,
 			    T1 &send,
 			    const unsigned int recv_source,
 			    T2 &recv,
+			    const MessageTag &,
+			    const MessageTag &,
                             const Communicator&)
   {
     libmesh_assert (send_tgt == recv_source);
     recv = send;
   }
+
+  /**
+   * Send-receive range-of-pointers from one processor.
+   *
+   * we do not currently support this operation on one processor without MPI.
+   */
+  template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
+  inline void send_receive_packed_range(const unsigned int dest_processor_id,
+                                        const Context1*,
+                                        RangeIter send_begin,
+                                        const RangeIter send_end,
+			                const unsigned int source_processor_id,
+                                        Context2*,
+                                        OutputIter out,
+		                        const MessageTag &,
+                                        const Communicator&)
+  { libmesh_error(); }
 
   template <typename T>
   inline void gather(const unsigned int root_id,
@@ -3363,7 +3930,56 @@ namespace Parallel
 #endif // LIBMESH_HAVE_MPI
 
 
-}
+  template <typename Context, typename Iter>
+  inline void pack_range (const Context *context,
+		          Iter range_begin,
+		          const Iter range_end,
+                          std::vector<int>& buffer)
+  {
+    // Count the total size of and preallocate buffer for efficiency
+    unsigned int buffer_size = 0;
+    for (Iter range_count = range_begin;
+         range_count != range_end;
+         ++range_count)
+      {
+        buffer_size += Parallel::packed_size(*range_count, context);
+      }
+    buffer.reserve(buffer.size() + buffer_size);
+
+    // Pack the objects into the buffer
+    for (; range_begin != range_end; ++range_begin)
+      Parallel::pack(*range_begin, buffer, context);
+  }
+
+
+
+  template <typename Context, typename OutputIter>
+  inline void unpack_range (const std::vector<int>& buffer,
+		            Context *context,
+		            OutputIter out)
+  {
+    // Our objects should be of the correct type to be assigned to the
+    // output iterator
+    typedef typename std::iterator_traits<OutputIter>::value_type T;
+
+    // Loop through the buffer and unpack each object, returning the
+    // object pointer via the output iterator
+    std::vector<int>::const_iterator next_object_start = buffer.begin();
+
+    while (next_object_start < buffer.end())
+      {
+        T* obj;
+        Parallel::unpack(next_object_start, &obj, context);
+        libmesh_assert(obj != NULL);
+        next_object_start += Parallel::packed_size(obj, context);
+        *out++ = obj;
+      }
+
+    // We should have used up the exact amount of data in the buffer
+    libmesh_assert (next_object_start == buffer.end());
+  }
+
+} // namespace Parallel
 
 } // namespace libMesh
 

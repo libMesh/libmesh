@@ -196,11 +196,11 @@ struct CDRBThetaExpansion : RBThetaExpansion
   CDRBThetaExpansion()
   {
     // set up the RBThetaExpansion object
-    attach_theta_q_a(&theta_a_0);   // Attach the lhs theta
-    attach_theta_q_a(&theta_a_1);
-    attach_theta_q_a(&theta_a_2);
+    attach_A_theta(&theta_a_0);   // Attach the lhs theta
+    attach_A_theta(&theta_a_1);
+    attach_A_theta(&theta_a_2);
 
-    attach_theta_q_f(&rb_theta);    // Attach the rhs theta
+    attach_F_theta(&rb_theta);    // Attach the rhs theta
 
     attach_output_theta(&rb_theta); // Attach output 0 theta
     attach_output_theta(&rb_theta); // Attach output 1 theta
@@ -230,11 +230,11 @@ struct CDRBAssemblyExpansion : RBAssemblyExpansion
     L3(0.7,0.8,0.2,0.3)
   {
     // And set up the RBAssemblyExpansion object
-    attach_A_q_assembly(&A0_assembly); // Attach the lhs assembly
-    attach_A_q_assembly(&A1_assembly);
-    attach_A_q_assembly(&A2_assembly);
+    attach_A_assembly(&A0_assembly); // Attach the lhs assembly
+    attach_A_assembly(&A1_assembly);
+    attach_A_assembly(&A2_assembly);
     
-    attach_F_q_assembly(&F0_assembly); // Attach the rhs assembly
+    attach_F_assembly(&F0_assembly); // Attach the rhs assembly
     
     attach_output_assembly(&L0);       // Attach output 0 assembly
     attach_output_assembly(&L1);       // Attach output 1 assembly

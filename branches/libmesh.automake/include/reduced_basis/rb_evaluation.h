@@ -225,12 +225,12 @@ public:
   /**
    * Dense matrices for the RB computations.
    */
-  std::vector< DenseMatrix<Number> > RB_A_q_vector;
+  std::vector< DenseMatrix<Number> > RB_Aq_vector;
 
   /**
    * Dense vector for the RHS.
    */
-  std::vector< DenseVector<Number> > RB_F_q_vector;
+  std::vector< DenseVector<Number> > RB_Fq_vector;
 
   /**
    * The RB solution vector.
@@ -255,17 +255,17 @@ public:
    * These values are independent of a basis, hence they can
    * be copied over directly from an RBSystem.
    */
-  std::vector<Number> Fq_representor_norms;
+  std::vector<Number> Fq_representor_innerprods;
 
   /**
    * Vectors storing the residual representor inner products
    * to be used in computing the residuals online.
-   * We store the Aq-dependent representor norms because they depend
+   * We store the Aq-dependent representor inner products because they depend
    * on a reduced basis space. The basis independent representors
    * are stored in RBSystem.
    */
-  std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_norms;
-  std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_norms;
+  std::vector< std::vector< std::vector<Number> > > Fq_Aq_representor_innerprods;
+  std::vector< std::vector< std::vector<Number> > > Aq_Aq_representor_innerprods;
 
   /**
    * The vector storing the dual norm inner product terms
@@ -273,15 +273,15 @@ public:
    * These values are independent of a basis, hence they can
    * be copied over directly from an RBSystem.
    */
-  std::vector< std::vector< Number > > output_dual_norms;
+  std::vector< std::vector< Number > > output_dual_innerprods;
 
   /**
    * Vector storing the residual representors associated with the
    * left-hand side.
    * These are basis dependent and hence stored here, whereas
-   * the F_q_representors are stored in RBSystem.
+   * the Fq_representors are stored in RBSystem.
    */
-  std::vector< std::vector< NumericVector<Number>* > > A_q_representor;
+  std::vector< std::vector< NumericVector<Number>* > > Aq_representor;
 
   /**
    * Boolean to indicate whether we evaluate a posteriori error bounds

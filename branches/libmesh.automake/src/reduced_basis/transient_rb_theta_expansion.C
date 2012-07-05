@@ -28,29 +28,28 @@ namespace libMesh
 
 TransientRBThetaExpansion::TransientRBThetaExpansion()
 {
-  theta_q_m_vector.clear();
 }
 
-Number TransientRBThetaExpansion::eval_theta_q_m(unsigned int q,
-                                                 const RBParameters& mu)
+Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
+                                               const RBParameters& mu)
 {
-  if(q >= get_Q_m())
+  if(q >= get_n_M_terms())
   {
-    libMesh::err << "Error: We must have q < Q_m in eval_theta_q_m."
+    libMesh::err << "Error: We must have q < get_n_M_terms in eval_M_theta."
                  << std::endl;
     libmesh_error();
   }
 
-  libmesh_assert(theta_q_m_vector[q] != NULL);
+  libmesh_assert(_M_theta_vector[q] != NULL);
 
-  return theta_q_m_vector[q]->evaluate( mu );
+  return _M_theta_vector[q]->evaluate( mu );
 }
 
-void TransientRBThetaExpansion::attach_theta_q_m(RBTheta* theta_q_m)
+void TransientRBThetaExpansion::attach_M_theta(RBTheta* theta_q_m)
 {
   libmesh_assert(theta_q_m != NULL);
 
-  theta_q_m_vector.push_back(theta_q_m);
+  _M_theta_vector.push_back(theta_q_m);
 }
 
 

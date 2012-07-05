@@ -1057,19 +1057,24 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase& mesh)
+namespace MeshTools {
+
+template <>
+void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
 {
   if (libMesh::n_processors() == 1)
     return;
 
   parallel_only();
 
+  // We want this test to be valid even when called even after nodes
+  // have been added asynchonously but before they're renumbered
+  unsigned int parallel_max_elem_id = mesh.max_elem_id();
+  Parallel::max(parallel_max_elem_id);
+
   // Check processor ids for consistency between processors
 
-  const unsigned int max_elem_id = mesh.max_elem_id();
-  libmesh_assert(Parallel::verify(max_elem_id));
-
-  for (unsigned int i=0; i != max_elem_id; ++i)
+  for (unsigned int i=0; i != parallel_max_elem_id; ++i)
     {
       const Elem *elem = mesh.query_elem(i);
 
@@ -1139,16 +1144,44 @@ void MeshTools::libmesh_assert_valid_elem_procids(const MeshBase& mesh)
 
 
 
-void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
+template <>
+void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
 {
-  parallel_only();
   if (libMesh::n_processors() == 1)
     return;
+
+  parallel_only();
 
   // We want this test to be valid even when called even after nodes
   // have been added asynchonously but before they're renumbered
   unsigned int parallel_max_node_id = mesh.max_node_id();
   Parallel::max(parallel_max_node_id);
+
+  // Check processor ids for consistency between processors
+
+  for (unsigned int i=0; i != parallel_max_node_id; ++i)
+    {
+      const Node *node = mesh.query_node_ptr(i);
+
+      unsigned int min_id =
+        node ? node->processor_id() :
+               std::numeric_limits<unsigned int>::max();
+      Parallel::min(min_id);
+
+      unsigned int max_id =
+        node ? node->processor_id() :
+               std::numeric_limits<unsigned int>::min();
+      Parallel::max(max_id);
+
+      if (node)
+        {
+          libmesh_assert(min_id == node->processor_id());
+          libmesh_assert(max_id == node->processor_id());
+        }
+
+      if (min_id == libMesh::processor_id())
+	libmesh_assert(node);
+    }
 
   std::vector<bool> node_touched_by_me(parallel_max_node_id, false);
 
@@ -1182,6 +1215,8 @@ void MeshTools::libmesh_assert_valid_node_procids(const MeshBase &mesh)
                      node_touched_by_me[nodeid]);
     }
 }
+
+} // namespace MeshTools
 
 
 

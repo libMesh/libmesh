@@ -28,14 +28,58 @@ namespace libMesh
 
 TransientRBAssemblyExpansion::TransientRBAssemblyExpansion()
 {
-  // Clear the assembly vector so that we can push_back
-  M_q_assembly_vector.clear();
 }
 
-void TransientRBAssemblyExpansion::attach_M_q_assembly(ElemAssembly* M_q_assembly)
+void TransientRBAssemblyExpansion::perform_M_interior_assembly(unsigned int q,
+                                                               FEMContext& context)
 {
-  M_q_assembly_vector.push_back(M_q_assembly);
+  if(q >= get_n_M_terms())
+  {
+    libMesh::err << "Error: We must have q < get_n_M_terms in perform_M_interior_assembly."
+                 << std::endl;
+    libmesh_error();
+  }
+
+  libmesh_assert(_M_assembly_vector[q] != NULL);
+
+  return _M_assembly_vector[q]->interior_assembly( context );
 }
 
+void TransientRBAssemblyExpansion::perform_M_boundary_assembly(unsigned int q,
+                                                               FEMContext& context)
+{
+  if(q >= get_n_M_terms())
+  {
+    libMesh::err << "Error: We must have q < get_n_M_terms in perform_M_boundary_assembly."
+                 << std::endl;
+    libmesh_error();
+  }
+
+  libmesh_assert(_M_assembly_vector[q] != NULL);
+
+  return _M_assembly_vector[q]->boundary_assembly( context );
+}
+
+unsigned int TransientRBAssemblyExpansion::get_n_M_terms() const
+{
+  return _M_assembly_vector.size();
+}
+
+void TransientRBAssemblyExpansion::attach_M_assembly(ElemAssembly* M_q_assembly)
+{
+  _M_assembly_vector.push_back(M_q_assembly);
+}
+
+ElemAssembly& TransientRBAssemblyExpansion::get_M_assembly(unsigned int q)
+{
+  if(q >= get_n_M_terms())
+  {
+    libMesh::err << "Error: We must have q < get_n_M_terms in get_M_assembly."
+                 << std::endl;
+    libmesh_error();
+  }
+  
+  return *_M_assembly_vector[q];
+}
 
 }

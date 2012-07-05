@@ -328,7 +328,9 @@ libmesh_la_SOURCES = \
 		src/numerics/type_tensor.C \
 		src/numerics/type_vector.C \
 		src/parallel/parallel_bin_sorter.C \
+	 	src/parallel/parallel_elem.C \
 		src/parallel/parallel_histogram.C \
+		src/parallel/parallel_node.C \
 		src/parallel/parallel_sort.C \
 		src/parallel/threads.C \
 		src/partitioning/centroid_partitioner.C \

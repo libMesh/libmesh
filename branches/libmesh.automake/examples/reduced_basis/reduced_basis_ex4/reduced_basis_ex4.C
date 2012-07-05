@@ -125,11 +125,11 @@ int main (int argc, char** argv)
 
     // attach the EIM theta objects to the RBConstruction and RBEvaluation objects
     eim_rb_eval.initialize_rb_theta_objects();
-    rb_eval.get_rb_theta_expansion().attach_multiple_theta_q_f(eim_rb_eval.rb_eim_theta_vector);
+    rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.rb_eim_theta_vector);
     
     // attach the EIM assembly objects to the RBConstruction object
     eim_construction.initialize_EIM_F_objects();
-    rb_construction.get_rb_assembly_expansion().attach_multiple_F_q_assembly(eim_construction.rb_eim_f_vector);
+    rb_construction.get_rb_assembly_expansion().attach_multiple_F_assembly(eim_construction.rb_eim_f_vector);
 
     // Print out the state of rb_construction now that the EIM objects have been attached
     rb_construction.print_info();
@@ -154,7 +154,7 @@ int main (int argc, char** argv)
 
     // attach the EIM theta objects to rb_eval objects
     eim_rb_eval.initialize_rb_theta_objects();
-    rb_eval.get_rb_theta_expansion().attach_multiple_theta_q_f(eim_rb_eval.rb_eim_theta_vector);
+    rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.rb_eim_theta_vector);
     
     // Read in the offline data for rb_eval
     rb_eval.read_offline_data_from_files("rb_data");

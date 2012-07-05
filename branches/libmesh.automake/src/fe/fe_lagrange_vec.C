@@ -589,7 +589,7 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
  
       default:
 	libmesh_error();
@@ -610,7 +610,7 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
  
       default:
 	libmesh_error();
@@ -631,7 +631,7 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
  
       default:
 	libmesh_error();
@@ -654,10 +654,10 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
 	
       case 2:
-	return libMesh::RealGradient( 0.0, 0.0, value );
+	return libMesh::RealGradient( Real(0), Real(0), value );
  
       default:
 	libmesh_error();
@@ -678,10 +678,10 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
 	
       case 2:
-	return libMesh::RealGradient( 0.0, 0.0, value );
+	return libMesh::RealGradient( Real(0), Real(0), value );
  
       default:
 	libmesh_error();
@@ -702,10 +702,10 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
 	
       case 2:
-	return libMesh::RealGradient( 0.0, 0.0, value );
+	return libMesh::RealGradient( Real(0), Real(0), value );
  
       default:
 	libmesh_error();
@@ -773,7 +773,7 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
  
       default:
 	libmesh_error();
@@ -794,7 +794,7 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
  
       default:
 	libmesh_error();
@@ -815,7 +815,7 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
  
       default:
 	libmesh_error();
@@ -837,10 +837,10 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
 	
       case 2:
-	return libMesh::RealGradient( 0.0, 0.0, value );
+	return libMesh::RealGradient( Real(0), Real(0), value );
  
       default:
 	libmesh_error();
@@ -861,10 +861,10 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
 	
       case 2:
-	return libMesh::RealGradient( 0.0, 0.0, value );
+	return libMesh::RealGradient( Real(0), Real(0), value );
  
       default:
 	libmesh_error();
@@ -885,10 +885,10 @@ namespace libMesh
 	return libMesh::RealGradient( value );
 
       case 1:
-	return libMesh::RealGradient( 0.0, value );
+	return libMesh::RealGradient( Real(0), value );
 	
       case 2:
-	return libMesh::RealGradient( 0.0, 0.0, value );
+	return libMesh::RealGradient( Real(0), Real(0), value );
  
       default:
 	libmesh_error();

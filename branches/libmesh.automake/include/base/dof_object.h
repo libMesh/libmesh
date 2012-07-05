@@ -282,7 +282,6 @@ public:
    */
   static unsigned int unpackable_indexing_size(std::vector<int>::const_iterator begin);
 
-protected:
   /**
    * A method for creating our index buffer from packed data -
    * basically with our current implementation we investigate the size

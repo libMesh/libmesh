@@ -164,6 +164,7 @@ nobase_include_HEADERS = \
 		mesh/mesh_function.h \
 		mesh/mesh_generation.h \
 		mesh/mesh_input.h \
+		mesh/mesh_inserter_iterator.h \
 		mesh/mesh_modification.h \
 		mesh/mesh_output.h \
 		mesh/mesh_refinement.h \
@@ -337,6 +338,7 @@ nobase_include_HEADERS = \
 		utils/libmesh_version.h \
 		utils/location_maps.h \
 		utils/mapvector.h \
+		utils/null_output_iterator.h \
 		utils/number_lookups.h \
 		utils/o_f_stream.h \
 		utils/o_string_stream.h \
