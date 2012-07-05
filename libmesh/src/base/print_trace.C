@@ -102,10 +102,10 @@ std::string demangle(const char *name)
 
 void print_trace(std::ostream &out)
 {
-  void *addresses[10];
+  void *addresses[40];
   char **strings;
 
-  int size = backtrace(addresses, 10);
+  int size = backtrace(addresses, 40);
   strings = backtrace_symbols(addresses, size);
   out << "Stack frames: " << size << std::endl;
   for(int i = 0; i < size; i++)
