@@ -35,8 +35,8 @@ template <typename T>
 struct null_output_iterator
   : std::iterator<std::output_iterator_tag, T>
 {
-  template <typename T>
-  void operator=(const T&) {}
+  template <typename T2>
+  void operator=(const T2&) {}
 
   null_output_iterator& operator++() { 
     return *this; 
