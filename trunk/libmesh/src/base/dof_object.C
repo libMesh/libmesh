@@ -369,9 +369,11 @@ unsigned int DofObject::packed_indexing_size() const
 {
   return 
 #ifdef LIBMESH_ENABLE_AMR
-    ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size()) +
+    ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size()) + 2 +
+#else
+    1 +
 #endif
-    2 + _idx_buf.size();
+    _idx_buf.size();
 }
 
 
@@ -382,13 +384,15 @@ unsigned int DofObject::unpackable_indexing_size(std::vector<int>::const_iterato
 
   // Either we have an old_dof_object or we don't
   libmesh_assert(has_old_dof_object == 1 || has_old_dof_object == 0);
+  static const int dof_header_size = 2;
 #else
   static const bool has_old_dof_object = false;
+  static const int dof_header_size = 1;
 #endif
 
   const int this_indexing_size = *begin++;
 
-  return 2 + this_indexing_size +
+  return dof_header_size + this_indexing_size +
     (has_old_dof_object ?
       unpackable_indexing_size(begin+this_indexing_size) : 0);
 }
