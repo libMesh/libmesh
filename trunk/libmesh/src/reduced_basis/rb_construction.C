@@ -61,6 +61,7 @@ RBConstruction::RBConstruction (EquationSystems& es,
     single_matrix_mode(false),
     reuse_preconditioner(true),
     use_relative_bound_in_greedy(false),
+    exit_on_repeated_greedy_parameters(true),
     write_data_during_training(false),
     impose_internal_dirichlet_BCs(false),
     impose_internal_fluxes(false),
@@ -1099,6 +1100,21 @@ bool RBConstruction::greedy_termination_test(Real training_greedy_error, int)
                  << get_Nmax() << std::endl;
     return true;
   }
+  
+  if(exit_on_repeated_greedy_parameters)
+  {
+    // only do this check if greedy_param_list isn't empty
+    if(!get_rb_evaluation().greedy_param_list.empty())
+    {
+      RBParameters& previous_parameters = get_rb_evaluation().greedy_param_list.back();
+      if(previous_parameters == get_parameters())
+      {
+        libMesh::out << "Exiting greedy because the same parameters were selected twice in a row"
+                     << std::endl;
+        return true;
+      }
+    }
+  }
 
   return false;
 }
@@ -1557,68 +1573,70 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
 
   // Now compute and store the inner products (if requested)
   if (compute_inner_products)
+  {
+    if(single_matrix_mode && constrained_problem)
+      assemble_inner_product_matrix(matrix);
+
+    for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
     {
-      if(single_matrix_mode && constrained_problem)
-	assemble_inner_product_matrix(matrix);
+      if(!single_matrix_mode)
+      {
+        inner_product_matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
+      }
+      else
+      {
+        matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
+      }
 
-      for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
-	{
-	  if(!single_matrix_mode)
-	    {
-	      inner_product_matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
-	    }
-	  else
-	    {
-	      matrix->vector_mult(*inner_product_storage_vector,*Fq_representor[q_f]);
-	    }
+      for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
+      {
+        for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
+        {
+          get_rb_evaluation().Fq_Aq_representor_innerprods[q_f][q_a][i] =
+            inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a][i]);
+        }
+      }
+    }
 
-	  for(unsigned int q_a=0; q_a<get_rb_theta_expansion().get_n_A_terms(); q_a++)
-	    {
-	      for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
-		{
-		  get_rb_evaluation().Fq_Aq_representor_innerprods[q_f][q_a][i] =
-		    inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a][i]);
-		}
-	    }
-	}
+    unsigned int q=0;
+    for(unsigned int q_a1=0; q_a1<get_rb_theta_expansion().get_n_A_terms(); q_a1++)
+    {
+      for(unsigned int q_a2=q_a1; q_a2<get_rb_theta_expansion().get_n_A_terms(); q_a2++)
+      {
+        for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
+        {
+          for(unsigned int j=0; j<RB_size; j++)
+            {
+              if(!single_matrix_mode)
+              {
+                inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
+              }
+              else
+              {
+                matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
+              }
+              get_rb_evaluation().Aq_Aq_representor_innerprods[q][i][j] =
+                inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][i]);
 
-      unsigned int q=0;
-      for(unsigned int q_a1=0; q_a1<get_rb_theta_expansion().get_n_A_terms(); q_a1++)
-	{
-	  for(unsigned int q_a2=q_a1; q_a2<get_rb_theta_expansion().get_n_A_terms(); q_a2++)
-	    {
-	      for(unsigned int i=(RB_size-delta_N); i<RB_size; i++)
-		{
-		  for(unsigned int j=0; j<RB_size; j++)
-		    {
-		      if(!single_matrix_mode)
-			{
-			  inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
-			}
-		      else
-			{
-			  matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][j]);
-			}
-		      get_rb_evaluation().Aq_Aq_representor_innerprods[q][i][j] = inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][i]);
-
-		      if(i != j)
-			{
-			  if(!single_matrix_mode)
-			    {
-			      inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
-			    }
-			  else
-			    {
-			      matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
-			    }
-			  get_rb_evaluation().Aq_Aq_representor_innerprods[q][j][i] = inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][j]);
-			}
-		    }
-		}
-	      q++;
-	    }
-	}
-    } // end if (compute_inner_products)
+              if(i != j)
+              {
+                if(!single_matrix_mode)
+                {
+                  inner_product_matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
+                }
+                else
+                {
+                  matrix->vector_mult(*inner_product_storage_vector, *get_rb_evaluation().Aq_representor[q_a2][i]);
+                }
+                get_rb_evaluation().Aq_Aq_representor_innerprods[q][j][i] =
+                  inner_product_storage_vector->dot(*get_rb_evaluation().Aq_representor[q_a1][j]);
+              }
+            }
+        }
+        q++;
+      }
+    }
+  } // end if (compute_inner_products)
 
   STOP_LOG("update_residual_terms()", "RBConstruction");
 }

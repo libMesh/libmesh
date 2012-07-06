@@ -452,6 +452,14 @@ public:
    * a Reduced Basis.
    */
   bool use_relative_bound_in_greedy;
+  
+  /**
+   * Boolean flag to indicate whether we exit the greedy if
+   * we select the same parameters twice in a row. In some
+   * problems this indicates that the greedy has "saturated"
+   * typically due to numerical rounding effects.
+   */
+  bool exit_on_repeated_greedy_parameters;
 
   /**
    * Boolean flag to indicate whether train_reduced_basis writes
