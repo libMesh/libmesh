@@ -56,8 +56,8 @@ namespace libMesh
 {
 
 TransientRBConstruction::TransientRBConstruction (EquationSystems& es,
-		                                  const std::string& name,
-		                                  const unsigned int number)
+                                                  const std::string& name,
+                                                  const unsigned int number)
   : Parent(es, name, number),
     L2_matrix(SparseMatrix<Number>::build()),
     non_dirichlet_L2_matrix(SparseMatrix<Number>::build()),
@@ -73,6 +73,10 @@ TransientRBConstruction::TransientRBConstruction (EquationSystems& es,
   compute_RB_inner_product = true;
 
   temporal_data.resize(0);
+  
+  // We should not necessarily exit the greedy due to repeated parameters in
+  // the transient case
+  exit_on_repeated_greedy_parameters = false;
 }
 
 
