@@ -547,8 +547,14 @@ void ParallelMesh::delete_node(Node* n)
   // Delete the node from the BoundaryInfo object
   this->boundary_info->remove(n);
 
-  // And from the container
-  _nodes.erase(n->id());
+  // But not yet from the container; we might invalidate
+  // an iterator that way!
+
+  //_nodes.erase(n->id());
+
+  // Instead, we set it to NULL for now
+
+  _nodes[n->id()] = NULL;
 
   // delete the node
   delete n;
@@ -631,6 +637,8 @@ void ParallelMesh::redistribute ()
       MeshCommunication mc;
       mc.redistribute(*this);
       mc.gather_neighboring_elements(*this);
+
+      this->update_parallel_id_counts();
 
       // Is this necessary?  If we are called from prepare_for_use(), this will be called
       // anyway... but users can always call partition directly, in which case we do need
@@ -1100,6 +1108,25 @@ void ParallelMesh::delete_remote_elements()
   _is_serial = false;
   MeshCommunication().delete_remote_elements(*this, _extra_ghost_elems);
 
+  // Now make sure the containers actually shrink - strip
+  // any newly-created NULL voids out of the element array
+  mapvector<Elem*>::veclike_iterator e_it        = _elements.begin();
+  const mapvector<Elem*>::veclike_iterator e_end = _elements.end();
+  for (; e_it != e_end;)
+    if (!*e_it)
+      _elements.erase(e_it++);
+    else
+      ++e_it;
+
+  mapvector<Node*>::veclike_iterator n_it        = _nodes.begin();
+  const mapvector<Node*>::veclike_iterator n_end = _nodes.end();
+  for (; n_it != n_end;)
+    if (!*n_it)
+      _nodes.erase(n_it++);
+    else
+      ++n_it;
+
+
 #ifdef DEBUG
 // Make sure our caches are up to date and our
 // DofObjects are well packed
@@ -1119,9 +1146,6 @@ void ParallelMesh::delete_remote_elements()
 // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
-
-// And make sure our numbering is still monotonic
-  MeshTools::libmesh_assert_valid_elem_ids(*this);
 #endif
 }
 
