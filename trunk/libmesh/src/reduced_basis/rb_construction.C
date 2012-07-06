@@ -1103,13 +1103,12 @@ bool RBConstruction::greedy_termination_test(Real training_greedy_error, int)
   
   if(exit_on_repeated_greedy_parameters)
   {
-    // only do this check if greedy_param_list isn't empty
-    if(!get_rb_evaluation().greedy_param_list.empty())
+    for(unsigned int i=0; i<get_rb_evaluation().greedy_param_list.size(); i++)
     {
-      RBParameters& previous_parameters = get_rb_evaluation().greedy_param_list.back();
+      RBParameters& previous_parameters = get_rb_evaluation().greedy_param_list[i];
       if(previous_parameters == get_parameters())
       {
-        libMesh::out << "Exiting greedy because the same parameters were selected twice in a row"
+        libMesh::out << "Exiting greedy because the same parameters were selected twice"
                      << std::endl;
         return true;
       }
