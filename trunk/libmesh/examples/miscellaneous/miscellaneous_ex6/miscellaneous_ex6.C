@@ -229,7 +229,7 @@ void tetrahedralize_domain()
 void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper_limit)
 {
 #ifdef LIBMESH_HAVE_TETGEN
-  Mesh cube_mesh(3);
+  SerialMesh cube_mesh(3);
 
   unsigned n_elem = 1;
 
