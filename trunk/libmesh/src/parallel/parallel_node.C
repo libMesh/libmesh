@@ -49,6 +49,28 @@ namespace Parallel
 {
 
 template <>
+unsigned int packed_size (const Node* node, const MeshBase* mesh)
+{
+  return
+#ifndef NDEBUG
+         1 + // add an int for the magic header when testing
+#endif
+	 header_size + LIBMESH_DIM*ints_per_Real +
+         node->packed_indexing_size() +
+         1 + mesh->boundary_info->n_boundary_ids(node);
+}
+
+
+
+template <>
+unsigned int packed_size (const Node* node, const ParallelMesh* mesh)
+{
+  return packed_size(node, static_cast<const MeshBase*>(mesh));
+}
+
+
+
+template <>
 void pack (const Node* node,
            std::vector<int>& data,
            const MeshBase* mesh)
@@ -58,6 +80,7 @@ void pack (const Node* node,
   data.reserve (data.size() + node->packed_size());
 
 #ifndef NDEBUG
+  const int start = data.size();
   data.push_back (node_magic_header);
 #endif
 
@@ -77,8 +100,18 @@ void pack (const Node* node,
         }
     }
 
+#ifndef NDEBUG
+  const int start_indices = data.size();
+#endif
   // Add any DofObject indices
   node->pack_indexing(std::back_inserter(data));
+
+  libmesh_assert(node->packed_indexing_size() == 
+		 DofObject::unpackable_indexing_size(data.begin() +
+						     start_indices));
+
+  libmesh_assert(node->packed_indexing_size() ==
+		 data.size() - start_indices);
 
   // Add any nodal boundary condition ids
   std::vector<boundary_id_type> bcs =
@@ -88,6 +121,9 @@ void pack (const Node* node,
 
   for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
     data.push_back(bcs[bc_it]);
+
+  libmesh_assert(data.size() - start ==
+		 Parallel::packed_size(node, mesh));
 }
 
 
@@ -108,6 +144,7 @@ void unpack (std::vector<int>::const_iterator in,
              MeshBase* mesh)
 {
 #ifndef NDEBUG
+  const std::vector<int>::const_iterator original_in = in;
   const int incoming_header = *in++;
   libmesh_assert (incoming_header == node_magic_header);
 #endif
@@ -136,10 +173,19 @@ void unpack (std::vector<int>::const_iterator in,
         }
 #endif // !NDEBUG
 
-      // FIXME: We should add some debug mode tests to ensure that the
-      // encoded indexing and boundary conditions are consistent.
       if (!node->has_dofs())
-	node->unpack_indexing(in);
+        {
+	  node->unpack_indexing(in);
+	  libmesh_assert (DofObject::unpackable_indexing_size(in) ==
+			  node->packed_indexing_size());
+          in += node->packed_indexing_size();
+	}
+      else
+        {
+	  // FIXME: We should add some debug mode tests to ensure that
+	  // the encoded indexing is consistent
+          in += DofObject::unpackable_indexing_size(in);
+	}
 
       *out = node;
     }
@@ -159,9 +205,13 @@ void unpack (std::vector<int>::const_iterator in,
       node->processor_id() = processor_id;
 
       node->unpack_indexing(in);
+      libmesh_assert (DofObject::unpackable_indexing_size(in) ==
+		      node->packed_indexing_size());
+      in += node->packed_indexing_size();
     }
 
-  in += node->packed_indexing_size();
+  // FIXME: We should add some debug mode tests to ensure that the
+  // encoded boundary conditions are consistent
 
   // Add any nodal boundary condition ids
   const int num_bcs = *in++;
@@ -171,6 +221,16 @@ void unpack (std::vector<int>::const_iterator in,
     mesh->boundary_info->add_node (node, *in++);
 
   *out = node;
+
+  libmesh_assert (in - original_in ==
+		  Parallel::packed_size(node, mesh));
+
+#ifndef NDEBUG
+  std::vector<int> test_repack;
+  Parallel::pack(node, test_repack, mesh);
+  libmesh_assert (in - original_in ==
+		  static_cast<int>(test_repack.size()));
+#endif
 }
 
 
@@ -181,28 +241,6 @@ void unpack (std::vector<int>::const_iterator in,
              ParallelMesh* mesh)
 {
   unpack(in, out, static_cast<MeshBase*>(mesh));
-}
-
-
-
-template <>
-unsigned int packed_size (const Node* node, const MeshBase* mesh)
-{
-  return
-#ifndef NDEBUG
-         1 + // add an int for the magic header when testing
-#endif
-	 header_size + LIBMESH_DIM*ints_per_Real +
-         node->packed_indexing_size() +
-         1 + mesh->boundary_info->n_boundary_ids(node);
-}
-
-
-
-template <>
-unsigned int packed_size (const Node* node, const ParallelMesh* mesh)
-{
-  return packed_size(node, static_cast<const MeshBase*>(mesh));
 }
   
 } // namespace Parallel
