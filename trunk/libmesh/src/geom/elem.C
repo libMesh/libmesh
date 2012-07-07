@@ -109,6 +109,46 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     1,  // NODEELEM
   };
 
+const unsigned int Elem::type_to_n_sides_map [] =
+  {
+    2,  // EDGE2
+    2,  // EDGE3
+    2,  // EDGE4
+
+    3,  // TRI3
+    3,  // TRI6
+
+    4,  // QUAD4
+    4,  // QUAD8
+    4,  // QUAD9
+
+    4,  // TET4
+    4,  // TET10
+
+    6,  // HEX8
+    6,  // HEX20
+    6,  // HEX27
+
+    5,  // PRISM6
+    5,  // PRISM15
+    5,  // PRISM18
+
+    5,  // PYRAMID5
+
+    2,  // INFEDGE2
+
+    3,  // INFQUAD4
+    3,  // INFQUAD6
+
+    5,  // INFHEX8
+    5,  // INFHEX16
+    5,  // INFHEX18
+
+    4,  // INFPRISM6
+    4,  // INFPRISM12
+
+    0,  // NODEELEM
+  };
 
 
 // ------------------------------------------------------------
