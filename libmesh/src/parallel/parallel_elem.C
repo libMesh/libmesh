@@ -46,16 +46,98 @@ namespace Parallel
 {
 
 template <>
+unsigned int packed_size (const Elem*,
+			  std::vector<int>::const_iterator in)
+{
+#ifndef NDEBUG
+  const int packed_header = *in++;
+  libmesh_assert (packed_header == elem_magic_header);
+#endif
+
+  // int 0: level
+  const unsigned int level =
+    static_cast<unsigned int>(*in);
+
+  // int 4: element type
+  const int typeint = *(in+4);
+  libmesh_assert(typeint >= 0);
+  libmesh_assert(typeint < INVALID_ELEM);
+  const ElemType type =
+    static_cast<ElemType>(typeint);
+
+  const unsigned int n_nodes = 
+    Elem::type_to_n_nodes_map[type];
+
+  const unsigned int n_sides = 
+    Elem::type_to_n_sides_map[type];
+
+  const unsigned int pre_indexing_size = 
+    header_size + n_nodes + n_sides;
+
+  const unsigned int indexing_size = 
+    DofObject::unpackable_indexing_size(in+pre_indexing_size);
+
+  unsigned int total_packed_bc_data = 0;
+  if (level == 0)
+    {
+      for (unsigned int s = 0; s != n_sides; ++s)
+        {
+	  const int n_bcs = 
+	    *(in + pre_indexing_size + indexing_size +
+	      total_packed_bc_data++);
+	  libmesh_assert (n_bcs >= 0);
+          total_packed_bc_data += n_bcs;
+        }
+    }
+
+  return 
+#ifndef NDEBUG
+    1 + // Account for magic header
+#endif
+    pre_indexing_size + indexing_size + total_packed_bc_data;
+}
+
+
+
+template <>
+unsigned int packable_size (const Elem* elem, const MeshBase* mesh)
+{
+  unsigned int total_packed_bcs = 0;
+  if (elem->level() == 0)
+    {
+      total_packed_bcs += elem->n_sides();
+      for (unsigned int s = 0; s != elem->n_sides(); ++s)
+        total_packed_bcs += mesh->boundary_info->n_boundary_ids(elem,s);
+    }
+
+  return
+#ifndef NDEBUG
+         1 + // add an int for the magic header when testing
+#endif
+	 header_size + elem->n_nodes() +
+         elem->n_neighbors() +
+         elem->packed_indexing_size() + total_packed_bcs;
+}
+
+
+
+template <>
+unsigned int packable_size (const Elem* elem, const ParallelMesh* mesh)
+{
+  return packable_size(elem, static_cast<const MeshBase*>(mesh));
+}
+
+
+
+template <>
 void pack (const Elem* elem,
            std::vector<int>& data,
            const MeshBase* mesh)
 {
   libmesh_assert (elem != NULL);
 
-  // we can do at least this good. note that hopefully in general
-  // the user will already have reserved the full space, which will render
-  // this redundant
-  data.reserve (data.size() + elem->packed_size());
+  // This should be redundant when used with Parallel::pack_range()
+  // data.reserve (data.size() + Parallel::packable_size(elem, mesh));
 
 #ifndef NDEBUG
   data.push_back (elem_magic_header);
@@ -106,7 +188,19 @@ void pack (const Elem* elem,
         data.push_back (-1);
     }
 
+#ifndef NDEBUG
+  const int start_indices = data.size();
+#endif
+  // Add any DofObject indices
   elem->pack_indexing(std::back_inserter(data));
+
+  libmesh_assert(elem->packed_indexing_size() == 
+		 DofObject::unpackable_indexing_size(data.begin() +
+						     start_indices));
+
+  libmesh_assert(elem->packed_indexing_size() ==
+		 data.size() - start_indices);
+
 
   // If this is a coarse element,
   // Add any element side boundary condition ids
@@ -437,38 +531,6 @@ void unpack(std::vector<int>::const_iterator in,
 {
   unpack(in, out, static_cast<MeshBase*>(mesh));
 }
-
-
-
-template <>
-unsigned int packed_size (const Elem* elem, const MeshBase* mesh)
-{
-  unsigned int total_packed_bcs = 0;
-  if (elem->level() == 0)
-    {
-      total_packed_bcs += elem->n_sides();
-      for (unsigned int s = 0; s != elem->n_sides(); ++s)
-        total_packed_bcs += mesh->boundary_info->n_boundary_ids(elem,s);
-    }
-
-  return
-#ifndef NDEBUG
-         1 + // add an int for the magic header when testing
-#endif
-	 header_size + elem->n_nodes() +
-         elem->n_neighbors() +
-         elem->packed_indexing_size() + total_packed_bcs;
-}
-
-
-
-template <>
-unsigned int packed_size (const Elem* elem, const ParallelMesh* mesh)
-{
-  return packed_size(elem, static_cast<const MeshBase*>(mesh));
-}
-
-
 
 } // namespace Parallel
 
