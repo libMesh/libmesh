@@ -366,20 +366,26 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual ElemType type () const = 0;
 
   /**
+   * @returns the dimensionality of the object.
+   */
+  virtual unsigned int dim () const = 0;
+
+  /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of nodes in the element.
    */
   static const unsigned int type_to_n_nodes_map[INVALID_ELEM];
 
   /**
-   * @returns the dimensionality of the object.
-   */
-  virtual unsigned int dim () const = 0;
-
-  /**
    * @returns the number of nodes this element contains.
    */
   virtual unsigned int n_nodes () const = 0;
+
+  /**
+   * This array maps the integer representation of the \p ElemType enum
+   * to the number of sides on the element.
+   */
+  static const unsigned int type_to_n_sides_map[INVALID_ELEM];
 
   /**
    * @returns the number of sides the element that has been derived
@@ -2231,7 +2237,7 @@ public:
    */
   unsigned int n_neighbors() const
   {
-    return Elem::build(this->type())->n_neighbors();
+    return Elem::type_to_n_sides_map[this->type()];
   }
 
   /**
