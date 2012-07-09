@@ -737,6 +737,19 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
   {
     OStringStream file_name;
     
+    // Write out the temporal discretization data
+    file_name.str("");
+    file_name << directory_name << "/temporal_discretization_data" << suffix;
+    Xdr temporal_discretization_data_out(file_name.str(), mode);
+    
+    Real real_value; unsigned int int_value;
+    real_value = get_delta_t(); temporal_discretization_data_out << real_value;
+    real_value = get_euler_theta(); temporal_discretization_data_out << real_value;
+    int_value = get_n_time_steps(); temporal_discretization_data_out << int_value;
+    int_value = get_time_step(); temporal_discretization_data_out << int_value;
+    temporal_discretization_data_out.close();
+    
+    
     // Write out the L2 matrix
     file_name.str("");
     file_name << directory_name << "/RB_L2_matrix" << suffix;
@@ -875,6 +888,18 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
 
   // The string stream we'll use to make the file names
   OStringStream file_name;
+  
+  // Write out the temporal discretization data
+  file_name.str("");
+  file_name << directory_name << "/temporal_discretization_data" << suffix;
+  Xdr temporal_discretization_data_in(file_name.str(), mode);
+  
+  Real real_value; unsigned int int_value;
+  temporal_discretization_data_in >> real_value; set_delta_t(real_value);
+  temporal_discretization_data_in >> real_value; set_euler_theta(real_value);
+  temporal_discretization_data_in >> int_value; set_n_time_steps(int_value);
+  temporal_discretization_data_in >> int_value; set_time_step(int_value);
+  temporal_discretization_data_in.close();
   
   file_name.str("");
   file_name << directory_name << "/RB_L2_matrix" << suffix;

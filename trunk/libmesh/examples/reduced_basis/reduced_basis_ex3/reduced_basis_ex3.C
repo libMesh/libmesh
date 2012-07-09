@@ -148,8 +148,12 @@ int main (int argc, char** argv)
     
     // Read in online_N and initialize online parameters
     unsigned int online_N = infile("online_N",1);
-    rb_eval.initialize_parameters(parameters_filename);
-    rb_eval.process_temporal_parameters_file(parameters_filename);
+    Real online_x_vel = infile("online_x_vel", 0.);
+    Real online_y_vel = infile("online_y_vel", 0.);
+    RBParameters online_mu;
+    online_mu.set_value("x_vel", online_x_vel);
+    online_mu.set_value("y_vel", online_y_vel);
+    rb_eval.set_parameters(online_mu);
     rb_eval.print_parameters();
 
     // Now do the Online solve using the precomputed reduced basis
