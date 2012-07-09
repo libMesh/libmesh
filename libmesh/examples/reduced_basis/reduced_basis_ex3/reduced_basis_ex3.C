@@ -117,7 +117,6 @@ int main (int argc, char** argv)
   {
     // Read in the data that defines this problem from the specified text file
     rb_con.process_parameters_file(parameters_filename);
-    rb_eval.temporal_discretization = rb_con.temporal_discretization;
 
     // Print out info that describes the current setup of rb_con
     rb_con.print_info();
@@ -165,8 +164,8 @@ int main (int argc, char** argv)
       rb_eval.read_in_basis_functions(rb_con);
       
       // Plot the solution at the final time level
-      rb_con.temporal_discretization = rb_eval.temporal_discretization;
-      rb_con.temporal_discretization.set_time_step(rb_con.temporal_discretization.get_n_time_steps());
+      rb_con.pull_temporal_discretization_data( rb_eval );
+      rb_con.set_time_step(rb_con.get_n_time_steps());
       rb_con.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);

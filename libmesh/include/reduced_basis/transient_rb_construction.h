@@ -23,6 +23,7 @@
 // rbOOmit includes
 #include "rb_construction.h"
 #include "transient_rb_evaluation.h"
+#include "rb_temporal_discretization.h"
 
 // libMesh includes
 #include "transient_system.h"
@@ -44,7 +45,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // TransientRBConstruction class definition
 
-class TransientRBConstruction : public TransientSystem<RBConstruction>
+class TransientRBConstruction : public TransientSystem<RBConstruction>, public RBTemporalDiscretization
 {
 public:
 
@@ -244,12 +245,6 @@ public:
 
 
   //----------- PUBLIC DATA MEMBERS -----------//
-
-  /**
-   * The object that defines the properties of the
-   * temporal discretization that we employ.
-   */
-  TemporalDiscretization temporal_discretization;
 
   /**
    * The L2 matrix.
