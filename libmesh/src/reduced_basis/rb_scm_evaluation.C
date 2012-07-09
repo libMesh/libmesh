@@ -393,6 +393,11 @@ void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_n
 
     // Stream for building the file names
     OStringStream file_name;
+    
+    // Write out the parameter ranges
+    file_name.str("");
+    file_name << directory_name << "/parameter_ranges" << suffix;
+    write_parameter_ranges_to_file(file_name.str(), write_binary_data);  
 
     // Write out the bounding box min values
     file_name.str("");
@@ -492,6 +497,11 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
 
   // The string stream we'll use to make the file names
   OStringStream file_name;
+  
+  // Read in the parameter ranges
+  file_name.str("");
+  file_name << directory_name << "/parameter_ranges" << suffix;
+  read_parameter_ranges_from_file(file_name.str(), read_binary_data);
 
   // Read in the bounding box min values
   // Note that there are Q_a values

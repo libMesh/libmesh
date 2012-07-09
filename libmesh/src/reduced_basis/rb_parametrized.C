@@ -19,9 +19,13 @@
 
 // libMesh includes
 #include "getpot.h"
+#include "xdr_cxx.h"
 
 // rbOOmit includes
 #include "rb_parametrized.h"
+
+// C++ includes
+#include <sstream>
 
 namespace libMesh
 {
@@ -239,6 +243,77 @@ void RBParametrized::print_parameters() const
   }
   
   get_parameters().print();
+}
+
+void RBParametrized::write_parameter_ranges_to_file(const std::string& file_name,
+                                                    const bool write_binary_data)
+{
+  // The writing mode: ENCODE for binary, WRITE for ASCII
+  XdrMODE mode = write_binary_data ? ENCODE : WRITE;
+  
+  // Write out the parameter ranges
+  Xdr parameter_ranges_out(file_name, mode);
+  unsigned int n_params = get_n_params();
+  parameter_ranges_out << n_params;
+  
+  RBParameters::const_iterator it;
+  RBParameters::const_iterator it_end;
+  it = get_parameters_min().begin();
+  it_end = get_parameters_min().end();
+  for( ; it != it_end; ++it)
+  {
+    std::string param_name = it->first;
+    Real param_value = it->second;
+    
+    parameter_ranges_out << param_name << param_value;
+  }
+  it     = get_parameters_max().begin();
+  it_end = get_parameters_max().end();
+  for( ; it != it_end; ++it)
+  {
+    std::string param_name = it->first;
+    Real param_value = it->second;
+    
+    parameter_ranges_out << param_name << param_value;
+  }
+  parameter_ranges_out.close();
+}
+
+void RBParametrized::read_parameter_ranges_from_file(const std::string& file_name,
+                                                     const bool read_binary_data)
+{
+  // The reading mode: DECODE for binary, READ for ASCII
+  XdrMODE mode = read_binary_data ? DECODE : READ;
+  
+  // Read in the parameter ranges
+  Xdr parameter_ranges_in(file_name, mode);
+  unsigned int n_params;
+  parameter_ranges_in >> n_params;
+  RBParameters param_min;
+  for(unsigned int i=0; i<n_params; i++)
+  {
+    std::string param_name;
+    Real param_value;
+    
+    parameter_ranges_in >> param_name;
+    parameter_ranges_in >> param_value;
+    
+    param_min.set_value(param_name, param_value);
+  }
+  RBParameters param_max;
+  for(unsigned int i=0; i<n_params; i++)
+  {
+    std::string param_name;
+    Real param_value;
+    
+    parameter_ranges_in >> param_name;
+    parameter_ranges_in >> param_value;
+    
+    param_max.set_value(param_name, param_value);
+  }
+  parameter_ranges_in.close();
+  
+  initialize_parameters(param_min, param_max, param_min);
 }
 
 bool RBParametrized::valid_params(const RBParameters& params)

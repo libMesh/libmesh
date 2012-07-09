@@ -121,6 +121,19 @@ public:
    * Print the current parameters.
    */
   void print_parameters() const;
+  
+  /**
+   * Write out the parameter ranges to file.
+   */
+  void write_parameter_ranges_to_file(const std::string& file_name,
+                                      const bool write_binary);
+  
+  /**
+   * Read in the parameter ranges from file. Initialize parameters
+   * to the "minimum" parameter values.
+   */
+  void read_parameter_ranges_from_file(const std::string& file_name,
+                                       const bool read_binary);
 
 private:
 
