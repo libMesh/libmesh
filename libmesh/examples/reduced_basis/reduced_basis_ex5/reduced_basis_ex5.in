@@ -8,7 +8,9 @@ n_elem_y = 10
 
 store_basis_functions = true   # Do we store the basis functions in the offline_data directory once Offline finishes?
 
-initial_parameters = '0.5 0.5 -0.5'     # Parameter vector for an Online solve
+online_y_scaling = 0.5
+online_x_load = 0.5
+online_y_load = -0.5
 
 # ========= RB system parameters =========
 
