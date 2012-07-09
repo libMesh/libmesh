@@ -236,7 +236,7 @@ const Node* ParallelMesh::query_node_ptr (const unsigned int i) const
   if (it != _nodes.end().it)
     {
       const Node* n = it->second;
-      libmesh_assert (n->id() == i);
+      libmesh_assert (!n || n->id() == i);
       return n;
     }
 
@@ -252,7 +252,7 @@ Node* ParallelMesh::query_node_ptr (const unsigned int i)
   if (it != _nodes.end().it)
     {
       Node* n = it->second;
-      libmesh_assert (n->id() == i);
+      libmesh_assert (!n || n->id() == i);
       return n;
     }
 
@@ -290,8 +290,7 @@ const Elem* ParallelMesh::query_elem (const unsigned int i) const
   if (it != _elements.end().it)
     {
       const Elem* e = it->second;
-      libmesh_assert (e);
-      libmesh_assert (e->id() == i);
+      libmesh_assert (!e || e->id() == i);
       return e;
     }
 
@@ -307,8 +306,7 @@ Elem* ParallelMesh::query_elem (const unsigned int i)
   if (it != _elements.end().it)
     {
       Elem* e = _elements[i];
-      libmesh_assert (e);
-      libmesh_assert (e->id() == i);
+      libmesh_assert (!e || e->id() == i);
       return e;
     }
 
@@ -790,10 +788,6 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
         }
     }
 
-#ifdef DEBUG
-  MeshTools::libmesh_assert_valid_procids<T>(*this);
-#endif
-
   std::vector<unsigned int> objects_on_proc(libMesh::n_processors(), 0);
   Parallel::allgather(ghost_objects_from_proc[libMesh::processor_id()],
                       objects_on_proc);
@@ -968,7 +962,8 @@ void ParallelMesh::renumber_nodes_and_elements ()
       }
   }
 
-  // Nodes not connected to any local elements are deleted
+  // Nodes not connected to any local elements, and NULL node entries
+  // in our container, are deleted
   {
     node_iterator_imp  it = _nodes.begin();
     node_iterator_imp end = _nodes.end();
@@ -976,7 +971,9 @@ void ParallelMesh::renumber_nodes_and_elements ()
     for (; it != end;)
       {
 	Node *node = *it;
-        if (!used_nodes.count(node->id()))
+        if (!node)
+          _nodes.erase(it++);
+        else if (!used_nodes.count(node->id()))
           {
 	    // remove any boundary information associated with
 	    // this node
@@ -1103,6 +1100,8 @@ void ParallelMesh::delete_remote_elements()
 
 // And our child/parent links, and our flags
   MeshTools::libmesh_assert_valid_refinement_tree(*this);
+
+  libmesh_assert(this->n_elem() == this->parallel_n_elem());
 #endif
 
   _is_serial = false;

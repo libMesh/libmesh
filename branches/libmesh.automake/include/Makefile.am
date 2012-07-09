@@ -270,15 +270,16 @@ nobase_include_HEADERS = \
 		reduced_basis/rb_eim_evaluation.h \
 		reduced_basis/rb_eim_theta.h \
 		reduced_basis/rb_evaluation.h \
+                reduced_basis/rb_parameters.h \
 		reduced_basis/rb_parametrized.h \
 		reduced_basis/rb_scm_construction.h \
 		reduced_basis/rb_scm_evaluation.h \
+		reduced_basis/rb_temporal_discretization.h \
 		reduced_basis/rb_theta.h \
 		reduced_basis/rb_theta_expansion.h \
 		reduced_basis/transient_rb_assembly_expansion.h \
 		reduced_basis/transient_rb_construction.h \
 		reduced_basis/transient_rb_evaluation.h \
-                reduced_basis/rb_parameters.h \
 		reduced_basis/transient_rb_theta_expansion.h \
 		solvers/adaptive.h \
 		solvers/adaptive_time_solver.h \

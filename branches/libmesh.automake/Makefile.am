@@ -388,6 +388,7 @@ libmesh_la_SOURCES = \
 		src/reduced_basis/rb_parametrized.C \
 		src/reduced_basis/rb_scm_construction.C \
 		src/reduced_basis/rb_scm_evaluation.C \
+		src/reduced_basis/rb_temporal_discretization.C \
 		src/reduced_basis/rb_theta_expansion.C \
 		src/reduced_basis/steady_derived_rb_construction.C \
 		src/reduced_basis/transient_rb_assembly_expansion.C \

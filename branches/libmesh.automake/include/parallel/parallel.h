@@ -1025,19 +1025,38 @@ namespace Parallel
    * ranges.
    */
   template <typename T, typename Context>
-  void pack(const T*, std::vector<int>& data, const Context*);
+  void pack(const T* object,
+	    std::vector<int>& data,
+	    const Context* context);
 
   //-------------------------------------------------------------------
   /**
    * Output the number of integers required to encode a
    * potentially-variable-size object into a data array.
    *
-   * Parallel::packed_size() has no default implementation, and must
+   * Parallel::packable_size() has no default implementation, and must
    * be specialized for each class which is to be communicated via
    * packed ranges.
    */
   template <typename T, typename Context>
-  unsigned int packed_size(const T*, const Context*);
+  unsigned int packable_size(const T*, const Context*);
+
+  //-------------------------------------------------------------------
+  /**
+   * Output the number of integers that were used to encode the next
+   * variable-size object in the data array.
+   *
+   * Parallel::packed_size() has no default implementation, and must
+   * be specialized for each class which is to be communicated via
+   * packed ranges.
+   *
+   * The output of this method should be based *only* on the data
+   * array; the T* argument is solely for function specialization.
+   */
+  template <typename T>
+  unsigned int packed_size(const T*,
+			   const std::vector<int>::const_iterator);
+
 
   //-------------------------------------------------------------------
   /**
@@ -1082,7 +1101,7 @@ namespace Parallel
    * void Parallel::pack(const T*, vector<int>& data, const Context*)
    * is used to serialize type T onto the end of a data vector.
    *
-   * unsigned int Parallel::packed_size(const T*, const Context*) is
+   * unsigned int Parallel::packable_size(const T*, const Context*) is
    * used to allow data vectors to reserve memory, and for additional
    * error checking
    */
@@ -1104,7 +1123,7 @@ namespace Parallel
    * void Parallel::pack(const T*, vector<int>& data, const Context*)
    * is used to serialize type T onto the end of a data vector.
    *
-   * unsigned int Parallel::packed_size(const T*, const Context*) is
+   * unsigned int Parallel::packable_size(const T*, const Context*) is
    * used to allow data vectors to reserve memory, and for additional
    * error checking
    */
@@ -1305,8 +1324,9 @@ namespace Parallel
    * is used to unserialize type T, typically into a new
    * heap-allocated object whose pointer is returned as *out.
    *
-   * unsigned int Parallel::packed_size(const T*, const Context*) is
-   * used to advance to the beginning of the next object's data.
+   * unsigned int Parallel::packed_size(const T*,
+   *                                    vector<int>::const_iterator)
+   * is used to advance to the beginning of the next object's data.
    */
   template <typename Context, typename OutputIter>
   inline void receive_packed_range (const unsigned int dest_processor_id,
@@ -1338,8 +1358,9 @@ namespace Parallel
    * is used to unserialize type T, typically into a new
    * heap-allocated object whose pointer is returned as *out.
    *
-   * unsigned int Parallel::packed_size(const T*, const Context*) is
-   * used to advance to the beginning of the next object's data.
+   * unsigned int Parallel::packed_size(const T*,
+   *                                    vector<int>::const_iterator)
+   * is used to advance to the beginning of the next object's data.
    */
   template <typename Context, typename OutputIter>
   inline void receive_packed_range (const unsigned int dest_processor_id,
@@ -1516,12 +1537,13 @@ namespace Parallel
    * is used to unserialize type T2, typically into a new
    * heap-allocated object whose pointer is returned as *out.
    *
-   * unsigned int Parallel::packed_size(const T1*, const Context1*) is
-   * used to allow data vectors to reserve memory, and for additional
-   * error checking.
+   * unsigned int Parallel::packable_size(const T1*, const Context1*)
+   * is used to allow data vectors to reserve memory, and for
+   * additional error checking.
    *
-   * unsigned int Parallel::packed_size(const T2*, const Context2*) is
-   * used to advance to the beginning of the next object's data.
+   * unsigned int Parallel::packed_size(const T2*,
+   *                                    vector<int>::const_iterator)
+   * is used to advance to the beginning of the next object's data.
    */
   template <typename Context1, typename RangeIter, typename Context2, typename OutputIter>
   inline void send_receive_packed_range(const unsigned int dest_processor_id,
@@ -1666,9 +1688,13 @@ namespace Parallel
    * void Parallel::pack(const T*, vector<int>& data, const Context*)
    * is used to serialize type T onto the end of a data vector.
    *
-   * unsigned int Parallel::packed_size(const T*, const Context*) is
+   * unsigned int Parallel::packable_size(const T*, const Context*) is
    * used to allow data vectors to reserve memory, and for additional
    * error checking
+   *
+   * unsigned int Parallel::packed_size(const T*,
+   *                                    vector<int>::const_iterator)
+   * is used to advance to the beginning of the next object's data.
    */
   template <typename Context, typename OutputContext, typename Iter, typename OutputIter>
   inline void broadcast_packed_range (const Context *context1,
@@ -3942,7 +3968,7 @@ namespace Parallel
          range_count != range_end;
          ++range_count)
       {
-        buffer_size += Parallel::packed_size(*range_count, context);
+        buffer_size += Parallel::packable_size(*range_count, context);
       }
     buffer.reserve(buffer.size() + buffer_size);
 
@@ -3950,11 +3976,20 @@ namespace Parallel
     for (; range_begin != range_end; ++range_begin)
       {
 #ifndef NDEBUG
-        size_t old_size = buffer.size();
+        unsigned int old_size = buffer.size();
 #endif
+
         Parallel::pack(*range_begin, buffer, context);
-	libmesh_assert(buffer.size() == old_size +
-		       Parallel::packed_size(*range_begin, context));
+
+#ifndef NDEBUG
+	unsigned int my_packable_size = 
+	  Parallel::packable_size(*range_begin, context);
+	unsigned int my_packed_size = 
+	  Parallel::packed_size (*range_begin, buffer.begin() +
+				 old_size);
+	libmesh_assert(my_packable_size == my_packed_size);
+	libmesh_assert(buffer.size() == old_size + my_packable_size);
+#endif
       }
   }
 
@@ -3978,7 +4013,8 @@ namespace Parallel
         T* obj;
         Parallel::unpack(next_object_start, &obj, context);
         libmesh_assert(obj != NULL);
-        next_object_start += Parallel::packed_size(obj, context);
+	next_object_start += Parallel::packed_size(obj,
+						   next_object_start);
         *out++ = obj;
       }
 

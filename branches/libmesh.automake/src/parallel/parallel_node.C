@@ -49,7 +49,7 @@ namespace Parallel
 {
 
 template <>
-unsigned int packed_size (const Node* node, const MeshBase* mesh)
+unsigned int packable_size (const Node* node, const MeshBase* mesh)
 {
   return
 #ifndef NDEBUG
@@ -63,9 +63,31 @@ unsigned int packed_size (const Node* node, const MeshBase* mesh)
 
 
 template <>
-unsigned int packed_size (const Node* node, const ParallelMesh* mesh)
+unsigned int packed_size (const Node*,
+			  std::vector<int>::const_iterator in)
 {
-  return packed_size(node, static_cast<const MeshBase*>(mesh));
+  const unsigned int pre_indexing_size = 
+#ifndef NDEBUG
+    1 + // add an int for the magic header when testing
+#endif
+    header_size + LIBMESH_DIM*ints_per_Real;
+
+  const unsigned int indexing_size = 
+    DofObject::unpackable_indexing_size(in+pre_indexing_size);
+
+  const int n_bcs =
+    *(in + pre_indexing_size + indexing_size);
+  libmesh_assert (n_bcs >= 0);
+
+  return pre_indexing_size + indexing_size + 1 + n_bcs;
+}
+
+
+
+template <>
+unsigned int packable_size (const Node* node, const ParallelMesh* mesh)
+{
+  return packable_size(node, static_cast<const MeshBase*>(mesh));
 }
 
 
@@ -77,10 +99,10 @@ void pack (const Node* node,
 {
   libmesh_assert (node != NULL);
 
-  data.reserve (data.size() + node->packed_size());
+  // This should be redundant when used with Parallel::pack_range()
+  // data.reserve (data.size() + Parallel::packable_size(node, mesh));
 
 #ifndef NDEBUG
-  const int start = data.size();
   data.push_back (node_magic_header);
 #endif
 
@@ -121,9 +143,6 @@ void pack (const Node* node,
 
   for(unsigned int bc_it=0; bc_it < bcs.size(); bc_it++)
     data.push_back(bcs[bc_it]);
-
-  libmesh_assert(data.size() - start ==
-		 Parallel::packed_size(node, mesh));
 }
 
 
@@ -222,14 +241,9 @@ void unpack (std::vector<int>::const_iterator in,
 
   *out = node;
 
-  libmesh_assert (in - original_in ==
-		  Parallel::packed_size(node, mesh));
-
 #ifndef NDEBUG
-  std::vector<int> test_repack;
-  Parallel::pack(node, test_repack, mesh);
-  libmesh_assert (in - original_in ==
-		  static_cast<int>(test_repack.size()));
+  libmesh_assert (in - original_in == 
+		  Parallel::packed_size(node, original_in));
 #endif
 }
 
