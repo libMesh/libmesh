@@ -149,17 +149,10 @@ void TransientRBConstruction::process_parameters_file (const std::string& parame
   // Read in data from parameters_filename
   GetPot infile(parameters_filename);
 
-  // Read in parameters related to temporal discretization
-  unsigned int n_time_steps_in = infile("n_time_steps", temporal_discretization.get_n_time_steps());
-  const Real delta_t_in        = infile("delta_t", temporal_discretization.get_delta_t());
-  const Real euler_theta_in    = infile("euler_theta", temporal_discretization.get_euler_theta());
+  // Read in the generic temporal discretization data
+  process_temporal_parameters_file(parameters_filename);
 
-  // and set it's member variables
-  temporal_discretization.set_n_time_steps(n_time_steps_in);
-  temporal_discretization.set_delta_t(delta_t_in);
-  temporal_discretization.set_euler_theta(euler_theta_in);
-  temporal_discretization.set_time_step(0);
-
+  // Read in the data specific to Construction
   nonzero_initialization = infile("nonzero_initialization",nonzero_initialization);
   init_filename = infile("init_filename",init_filename);
 
@@ -170,6 +163,10 @@ void TransientRBConstruction::process_parameters_file (const std::string& parame
   set_POD_tol(POD_tol_in);
   set_max_truth_solves(max_truth_solves_in);
   set_delta_N(delta_N_in);
+  
+  // Pass the temporal discretization data to the RBEvaluation
+  TransientRBEvaluation& trans_rb_eval = libmesh_cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
+  trans_rb_eval.pull_temporal_discretization_data( *this );
 }
 
 void TransientRBConstruction::print_info()
@@ -189,9 +186,9 @@ void TransientRBConstruction::print_info()
   {
     libMesh::out << "RBThetaExpansion member is not set yet" << std::endl;
   }
-  libMesh::out << "Number of time-steps: " << temporal_discretization.get_n_time_steps() << std::endl;
-  libMesh::out << "dt: " << temporal_discretization.get_delta_t() << std::endl;
-  libMesh::out << "euler_theta (time discretization parameter): " << temporal_discretization.get_euler_theta() << std::endl;
+  libMesh::out << "Number of time-steps: " << get_n_time_steps() << std::endl;
+  libMesh::out << "dt: " << get_delta_t() << std::endl;
+  libMesh::out << "euler_theta (time discretization parameter): " << get_euler_theta() << std::endl;
   if(get_POD_tol() > 0.)
     libMesh::out << "POD_tol: " << get_POD_tol() << std::endl;
   if(max_truth_solves > 0)
@@ -218,7 +215,7 @@ void TransientRBConstruction::allocate_data_structures()
   const unsigned int n_outputs = trans_theta_expansion.get_n_outputs();
 
   // Resize and allocate vectors for storing mesh-dependent data
-  const unsigned int n_time_levels = temporal_discretization.get_n_time_steps()+1;
+  const unsigned int n_time_levels = get_n_time_steps()+1;
   temporal_data.resize(n_time_levels);
 
   // Resize vectors for storing mesh-dependent data but only
@@ -480,8 +477,8 @@ void TransientRBConstruction::truth_assembly()
   const unsigned int Q_a = trans_theta_expansion.get_n_A_terms();
   const unsigned int Q_f = trans_theta_expansion.get_n_F_terms();
 
-  const Real dt          = temporal_discretization.get_delta_t();
-  const Real euler_theta = temporal_discretization.get_euler_theta();
+  const Real dt          = get_delta_t();
+  const Real euler_theta = get_euler_theta();
 
   if(!single_matrix_mode)
   {
@@ -767,7 +764,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
   START_LOG("truth_solve()", "TransientRBConstruction");
 
   const RBParameters& mu = get_parameters();
-  const unsigned int n_time_steps = temporal_discretization.get_n_time_steps();
+  const unsigned int n_time_steps = get_n_time_steps();
 
 //   // NumericVector for computing true L2 error
 //   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
@@ -775,7 +772,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 
   // Apply initial condition again.
   initialize_truth();
-  temporal_discretization.set_time_step(0);
+  set_time_step(0);
 
   // Now compute the truth outputs
   for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
@@ -800,7 +797,7 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 
   for(unsigned int time_level=1; time_level<=n_time_steps; time_level++)
   {
-    temporal_discretization.set_time_step(time_level);
+    set_time_step(time_level);
 
     *old_local_solution = *current_local_solution;
 
@@ -900,7 +897,7 @@ Number TransientRBConstruction::set_error_temporal_data()
   // first compute the projection of solution onto the current
   // RB space
 
-  const unsigned int time_step = temporal_discretization.get_time_step();
+  const unsigned int time_step = get_time_step();
 
   if(get_rb_evaluation().get_n_basis_functions() == 0)
   {
@@ -984,7 +981,7 @@ const NumericVector<Number>& TransientRBConstruction::get_error_temporal_data()
 {
   START_LOG("get_error_temporal_data()", "TransientRBConstruction");
 
-  const unsigned int time_step = temporal_discretization.get_time_step();
+  const unsigned int time_step = get_time_step();
 
   return *temporal_data[time_step];
 
@@ -1088,7 +1085,7 @@ void TransientRBConstruction::enrich_RB_space()
        // Scale the inner products by the number of time-steps to normalize the
        // POD energy norm appropriately
       Number inner_prod = (temporal_data[j]->dot(*inner_product_storage_vector)) /
-                          (Real)(temporal_discretization.get_n_time_steps()+1);
+                          (Real)(get_n_time_steps()+1);
 
       // Fill upper triangular part of correlation_matrix
       correlation_matrix[j*eigen_size+i] = inner_prod;
@@ -1276,7 +1273,7 @@ void TransientRBConstruction::load_rb_solution()
 
   solution->zero();
 
-  const unsigned int time_step = temporal_discretization.get_time_step();
+  const unsigned int time_step = get_time_step();
 
   TransientRBEvaluation& trans_rb_eval = libmesh_cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
   DenseVector<Number> RB_solution_vector_k = trans_rb_eval.RB_temporal_solution_data[time_step];
