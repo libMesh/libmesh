@@ -57,6 +57,20 @@ public:
   TensorValue  ();
 
   /**
+   * Constructor-from-T.  By default sets higher dimensional
+   * entries to 0.
+   */
+  explicit TensorValue  (const T xx,
+		         const T xy=0,
+		         const T xz=0,
+		         const T yx=0,
+		         const T yy=0,
+		         const T yz=0,
+		         const T zx=0,
+		         const T zy=0,
+		         const T zz=0);
+
+  /**
    * Constructor-from-scalars.  By default sets higher dimensional
    * entries to 0.
    */
@@ -154,6 +168,23 @@ TensorValue<T>::TensorValue () :
 {
 }
 
+
+
+template <typename T>
+inline
+TensorValue<T>::TensorValue
+  (const T xx,
+   const T xy,
+   const T xz,
+   const T yx,
+   const T yy,
+   const T yz,
+   const T zx,
+   const T zy,
+   const T zz) :
+  TypeTensor<T> (xx,xy,xz,yx,yy,yz,zx,zy,zz)
+{
+}
 
 
 template <typename T>

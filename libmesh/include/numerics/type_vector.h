@@ -80,6 +80,15 @@ protected:
 
 
   /**
+   * Constructor-from-T.  By default sets higher dimensional
+   * entries to 0.
+   */
+  TypeVector (const T x,
+	      const T y=0,
+              const T z=0);
+
+
+  /**
    * Constructor-from-scalars.  By default sets higher dimensional
    * entries to 0.
    */
@@ -405,6 +414,28 @@ TypeVector<T>::TypeVector ()
 #endif 
 }
 
+
+
+template <typename T>
+inline
+TypeVector<T>::TypeVector (const T x,
+	                   const T y,
+	                   const T z)
+{
+  _coords[0] = x;
+
+#if LIBMESH_DIM > 1
+  _coords[1] = y;
+#else
+  libmesh_assert(y == 0);
+#endif
+
+#if LIBMESH_DIM > 2
+  _coords[2] = z;
+#else
+  libmesh_assert(z == 0);
+#endif
+}
 
 
 template <typename T>
