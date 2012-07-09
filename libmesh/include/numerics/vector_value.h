@@ -58,6 +58,14 @@ public:
   VectorValue ();
 
   /**
+   * Constructor-from-T.  By default sets higher dimensional
+   * entries to 0.
+   */
+  VectorValue (const T x,
+	       const T y=0,
+	       const T z=0);
+
+  /**
    * Constructor-from-scalars.  By default sets higher dimensional
    * entries to 0.
    */
@@ -128,6 +136,17 @@ VectorValue<T>::VectorValue () :
   TypeVector<T> ()
 {
 }
+
+
+template <typename T>
+inline
+VectorValue<T>::VectorValue (const T x,
+	                     const T y,
+	                     const T z) :
+  TypeVector<T> (x,y,z)
+{
+}
+
 
 
 template <typename T>
