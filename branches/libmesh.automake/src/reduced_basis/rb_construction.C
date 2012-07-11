@@ -315,6 +315,7 @@ void RBConstruction::print_info()
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
   libMesh::out << "write out data during basis training? " << write_data_during_training << std::endl;
   libMesh::out << "quiet mode? " << is_quiet() << std::endl;
+  libMesh::out << std::endl;
 }
 
 void RBConstruction::set_rb_assembly_expansion(RBAssemblyExpansion& rb_assembly_expansion_in)

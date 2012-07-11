@@ -5,6 +5,10 @@ store_basis_functions = true   # Do we store the basis functions in the offline_
 
 online_N = 20                  # If we're in online mode, the number of basis functions we use for the reduced basis solve
 
+online_x_vel = 1.
+online_y_vel = 1.
+
+
 # ========= RB system parameters =========
 
 Nmax = 20        # The maximum number of basis functions we can generate in the Offline stage

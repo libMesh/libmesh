@@ -472,6 +472,11 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       n_bfs_out << n_bfs;
       n_bfs_out.close();
     }
+    
+    // Write out the parameter ranges
+    file_name.str("");
+    file_name << directory_name << "/parameter_ranges" << suffix;
+    write_parameter_ranges_to_file(file_name.str(), write_binary_data);
 
     // Write out Fq representor norm data
     file_name.str("");
@@ -661,6 +666,11 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   }
 
   resize_data_structures(n_bfs, read_error_bound_data);
+  
+  // Read in the parameter ranges
+  file_name.str("");
+  file_name << directory_name << "/parameter_ranges" << suffix;
+  read_parameter_ranges_from_file(file_name.str(), read_binary_data);
 
   // Read in output data in multiple files
   for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)

@@ -160,7 +160,14 @@ int main (int argc, char** argv)
     rb_eval.read_offline_data_from_files();
     
     // Iinitialize online parameters
-    rb_eval.initialize_parameters(parameters_filename);
+    Real online_y_scaling = infile("online_y_scaling", 0.);
+    Real online_x_load = infile("online_x_load", 0.);
+    Real online_y_load = infile("online_y_load", 0.);
+    RBParameters online_mu;
+    online_mu.set_value("y_scaling", online_y_scaling);
+    online_mu.set_value("x_load", online_x_load);
+    online_mu.set_value("y_load", online_y_load);
+    rb_eval.set_parameters(online_mu);
     rb_eval.print_parameters();
 
     // Now do the Online solve using the precomputed reduced basis

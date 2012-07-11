@@ -161,8 +161,12 @@ int main (int argc, char** argv)
 
     // Get the parameters at which we will do a reduced basis solve
     unsigned int online_N = infile("online_N",1);
-    rb_eval.initialize_parameters(main_parameters);
-    eim_rb_eval.initialize_parameters(rb_eval);
+    Real online_center_x = infile("online_center_x", 0.);
+    Real online_center_y = infile("online_center_y", 0.);
+    RBParameters online_mu;
+    online_mu.set_value("center_x", online_center_x);
+    online_mu.set_value("center_y", online_center_y);
+    rb_eval.set_parameters(online_mu);
     rb_eval.print_parameters();
     rb_eval.rb_solve(online_N);
 

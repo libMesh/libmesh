@@ -51,7 +51,7 @@ namespace {
   //   read/writes by reducing the number of MPI messages at the expense of memory.
   // - If the library exhausts memory during IO you might reduce this parameter.
 
-  const unsigned int io_blksize = 256000;
+  const unsigned int io_blksize = 256000*10*5;
 
 
   /**

@@ -61,10 +61,24 @@ protected:
   TypeTensor  ();
 
   /**
-   * Constructor.  By default sets higher dimensional entries to 0.
-   * This is a poor constructor for 2D tensors - if the default
+   * Constructor-from-T.  By default sets higher dimensional entries
+   * to 0.  This is a poor constructor for 2D tensors - if the default
    * arguments are to be overridden it requires that the "xz = 0."
    * etc. arguments also be given explicitly.
+   */
+  explicit TypeTensor  (const T xx,
+	                const T xy=0,
+	                const T xz=0,
+	                const T yx=0,
+	                const T yy=0,
+	                const T yz=0,
+	                const T zx=0,
+	                const T zy=0,
+	                const T zz=0);
+
+
+  /**
+   * Constructor-from-Scalar.
    */
   template <typename Scalar>
   explicit TypeTensor  (const Scalar xx,
@@ -441,6 +455,40 @@ TypeTensor<T>::TypeTensor ()
 #endif
 }
 
+
+
+template <typename T>
+inline
+TypeTensor<T>::TypeTensor
+  (const T xx,
+   const T xy,
+   const T xz,
+   const T yx,
+   const T yy,
+   const T yz,
+   const T zx,
+   const T zy,
+   const T zz)
+{
+  _coords[0] = xx;
+
+#if LIBMESH_DIM == 2
+  _coords[1] = xy;
+  _coords[2] = yx;
+  _coords[3] = yy;
+#endif
+
+#if LIBMESH_DIM == 3
+  _coords[1] = xy;
+  _coords[2] = xz;
+  _coords[3] = yx;
+  _coords[4] = yy;
+  _coords[5] = yz;
+  _coords[6] = zx;
+  _coords[7] = zy;
+  _coords[8] = zz;
+#endif
+}
 
 
 template <typename T>

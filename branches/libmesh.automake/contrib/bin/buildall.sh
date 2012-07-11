@@ -10,7 +10,7 @@ fi
 top_dir=`pwd`
 install_dir=/lustre/work/benkirk/codes/install/$AEROLAB_SYSTEM_CLASS
 
-rm -rf $install_dir
+#rm -rf $install_dir
 
 for METHOD in opt devel dbg ; do
 
@@ -19,10 +19,10 @@ for METHOD in opt devel dbg ; do
     rm -rf $builddir && mkdir $builddir && cd $builddir
 
     echo " "
-    echo " Configuring METHOD=$METHOD via ../configure --with-cxx=`which mpicxx` --with-cc=`which mpicc` --with-f77=`which mpif77` --with-fc=`which mpif90` --prefix=$install_dir $@"
+    echo " Configuring METHOD=$METHOD via ../configure --with-cxx=`which mpicxx` --with-cc=`which mpicc` --with-f77=`which mpif77` --with-fc=`which mpif90` --prefix=$install_dir --disable-dependency-tracking $@"
     echo " "
 
-    ../configure --with-cxx=`which mpicxx` --with-cc=`which mpicc` --with-f77=`which mpif77` --with-fc=`which mpif90` --prefix=$install_dir $@
+    ../configure --with-cxx=`which mpicxx` --with-cc=`which mpicc` --with-f77=`which mpif77` --with-fc=`which mpif90` --prefix=$install_dir --disable-dependency-tracking $@
     make -j 8 install
 done
     

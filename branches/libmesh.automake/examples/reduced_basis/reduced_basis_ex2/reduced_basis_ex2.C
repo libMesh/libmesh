@@ -181,28 +181,34 @@ int main (int argc, char** argv)
     rb_con.train_reduced_basis();
     
     // Write out the data that will subsequently be required for the Evaluation stage
-    rb_con.get_rb_evaluation().write_offline_data_to_files();
-    rb_scm_con.get_rb_scm_evaluation().write_offline_data_to_files();
+    rb_con.get_rb_evaluation().write_offline_data_to_files("rb_data");
+    rb_scm_con.get_rb_scm_evaluation().write_offline_data_to_files("scm_data");
     
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
       // Write out the basis functions
-      rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
+      rb_con.get_rb_evaluation().write_out_basis_functions(rb_con,"rb_data");
     }
   }
   else // Perform the Online stage of the RB method
   {
 
+    // Read in the reduced basis data
+    rb_eval.read_offline_data_from_files("rb_data");
+    rb_scm_eval.read_offline_data_from_files("scm_data");
+
     // Read in online_N and initialize online parameters
     unsigned int online_N = infile("online_N",1);
-    rb_eval.initialize_parameters(parameters_filename);
-    rb_scm_eval.initialize_parameters(rb_eval);
+    Real online_mu_0 = infile("online_mu_0", 0.);
+    Real online_mu_1 = infile("online_mu_1", 0.);
+    Real online_mu_2 = infile("online_mu_2", 0.);
+    RBParameters online_mu;
+    online_mu.set_value("mu_0", online_mu_0);
+    online_mu.set_value("mu_1", online_mu_1);
+    online_mu.set_value("mu_2", online_mu_2);
+    rb_eval.set_parameters(online_mu);
     rb_eval.print_parameters();
-    
-    // Read in the reduced basis data
-    rb_eval.read_offline_data_from_files();
-    rb_scm_eval.read_offline_data_from_files();   
  
     // Now do the Online solve using the precomputed reduced basis
     rb_eval.rb_solve(online_N);
@@ -224,7 +230,7 @@ int main (int argc, char** argv)
     if(store_basis_functions)
     {
       // Read in the basis functions
-      rb_eval.read_in_basis_functions(rb_con);
+      rb_eval.read_in_basis_functions(rb_con,"rb_data");
       
       // Plot the solution
       rb_con.load_rb_solution();
