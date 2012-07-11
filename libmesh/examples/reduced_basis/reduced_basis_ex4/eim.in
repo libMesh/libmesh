@@ -15,4 +15,4 @@ deterministic_training = true # Are the training points generated randomly or de
 
 n_training_samples = 25       # The number of parameters in training set (must be square for the 2-parameter deterministic case)
 
-best_fit_type = projection           # Choose which algorithm to use in the EIM greedy (either "projection" or "eim")
+best_fit_type = projection # Choose which algorithm to use in the EIM greedy (either "projection" or "eim")

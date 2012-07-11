@@ -76,6 +76,11 @@ public:
   typedef RBConstruction Parent;
 
   /**
+   * Clear this object.
+   */
+  virtual void clear();
+
+  /**
    * Read parameters in from file and set up this system
    * accordingly.
    */
@@ -125,13 +130,6 @@ public:
   Number evaluate_parametrized_function(unsigned int index, const Point& p);
 
   /**
-   * @return the number of affine terms defined by the current EIM
-   * approximation. Each term is typically used in an associated
-   * reduced basis approximation.
-   */
-  virtual unsigned int get_n_affine_terms();
-
-  /**
    * Evaluate the basis function \p index at the points \p qpoints
    * on element \p element. Also, \p var_number specifies which variable
    * to evaluate.
@@ -148,6 +146,27 @@ public:
    */
   Real evaluate_mesh_function(unsigned int var_number,
                               Point p);
+
+  /**
+   * Build a vector of ElemAssembly objects that accesses the basis
+   * functions stored in this RBEIMConstruction object. This is useful
+   * for performing the Offline stage of the Reduced Basis method where
+   * we want to use assembly functions based on this EIM approximation.
+   */
+  void initialize_eim_assembly_objects();
+  
+  /**
+   * @return the vector of assembly objects that point to this RBEIMConstruction.
+   */
+  std::vector<ElemAssembly*> get_eim_assembly_objects();
+  
+  /**
+   * Build an element assembly object that will access basis function
+   * \p bf_index.
+   * This is pure virtual, override in subclasses to specify the appropriate
+   * ElemAssembly object.
+   */
+  virtual AutoPtr<ElemAssembly> build_eim_assembly(unsigned int bf_index) = 0;
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -195,14 +214,6 @@ protected:
    */
   virtual bool greedy_termination_test(Real training_greedy_error, int count);
 
-  /**
-   * Helper function to load a GHOSTED version of the basis function specified
-   * by \p basis_function_index_in into the vector current_ghosted_bf so that
-   * we can efficiently interpolate this basis function.
-   * If basis_function_index_in == current_bf_index, then this function does nothing.
-   */
-  void set_current_basis_function(unsigned int basis_function_index_in);
-
 private:
 
   /**
@@ -244,6 +255,12 @@ private:
    * because this isn't used at all in the EIM.
    */
   RBAssemblyExpansion _empty_rb_assembly_expansion;
+  
+  /**
+   * The vector of assembly objects that are created to point to
+   * this RBEIMConstruction.
+   */
+  std::vector<ElemAssembly*> _rb_eim_assembly_objects;
 
 };
 

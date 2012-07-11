@@ -118,7 +118,12 @@ public:
    * of the RB_solution member variable of this RBEvaluation.
    * Store these objects in the member vector rb_theta_objects.
    */
-  void initialize_rb_theta_objects();
+  void initialize_eim_theta_objects();
+  
+  /**
+   * @return the vector of theta objects that point to this RBEIMEvaluation.
+   */
+  std::vector<RBTheta*> get_eim_theta_objects();
 
   /**
    * Write out all the data to text files in order to segregate the
@@ -168,12 +173,6 @@ public:
    * "extra" row of the interpolation matrix.
    */
   DenseVector<Number> extra_interpolation_matrix_row;
-  
-  /**
-   * The vector of RBTheta objects that are created to point to
-   * this RBEIMEvaluation.
-   */
-  std::vector<RBTheta*> rb_eim_theta_vector;
 
 private:
 
@@ -182,6 +181,12 @@ private:
    * that will be approximated in this EIM system.
    */
   std::vector<RBParametrizedFunction*> _parametrized_functions;
+
+  /**
+   * The vector of RBTheta objects that are created to point to
+   * this RBEIMEvaluation.
+   */
+  std::vector<RBTheta*> _rb_eim_theta_objects;
 
   /**
    * We initialize RBEIMEvaluation so that it has an "empty" RBThetaExpansion, because

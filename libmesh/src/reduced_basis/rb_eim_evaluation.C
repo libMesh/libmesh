@@ -56,11 +56,11 @@ void RBEIMEvaluation::clear()
   interpolation_points_var.clear();
 
   // Delete any RBTheta objects that were created
-  for(unsigned int i=0; i<rb_eim_theta_vector.size(); i++)
+  for(unsigned int i=0; i<_rb_eim_theta_objects.size(); i++)
   {
-    delete rb_eim_theta_vector[i];
+    delete _rb_eim_theta_objects[i];
   }
-  rb_eim_theta_vector.clear();
+  _rb_eim_theta_objects.clear();
 }
 
 void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax,
@@ -207,14 +207,19 @@ void RBEIMEvaluation::rb_solve(DenseVector<Number>& EIM_rhs)
   STOP_LOG("rb_solve()", "RBEIMEvaluation");
 }
 
-void RBEIMEvaluation::initialize_rb_theta_objects()
+void RBEIMEvaluation::initialize_eim_theta_objects()
 {
   // Initialize the rb_theta objects that access the solution from this rb_eim_evaluation
-  rb_eim_theta_vector.clear();
+  _rb_eim_theta_objects.clear();
   for(unsigned int i=0; i<get_n_basis_functions(); i++)
   {
-    rb_eim_theta_vector.push_back(new RBEIMTheta(*this, i));
+    _rb_eim_theta_objects.push_back(new RBEIMTheta(*this, i));
   }
+}
+
+std::vector<RBTheta*> RBEIMEvaluation::get_eim_theta_objects()
+{
+  return _rb_eim_theta_objects;
 }
 
 void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_name,
