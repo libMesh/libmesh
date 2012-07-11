@@ -73,8 +73,23 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
 
 RBEIMConstruction::~RBEIMConstruction ()
 {
+  this->clear();
+}
+
+void RBEIMConstruction::clear()
+{
+  Parent::clear();
+  
+  // clear the mesh function
   delete _mesh_function;
   _mesh_function = NULL;
+
+  // clear the eim assembly vector
+  for(unsigned int i=0; i<_rb_eim_assembly_objects.size(); i++)
+  {
+    delete _rb_eim_assembly_objects[i];
+  }
+  _rb_eim_assembly_objects.clear();
 }
 
 void RBEIMConstruction::process_parameters_file (const std::string& parameters_filename)
@@ -175,11 +190,6 @@ Number RBEIMConstruction::evaluate_parametrized_function(unsigned int index, con
   return eim_eval.evaluate_parametrized_function(index, p);
 }
 
-unsigned int RBEIMConstruction::get_n_affine_terms()
-{
-  return n_vars() * get_rb_evaluation().get_n_basis_functions();
-}
-
 std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int var_number,
                                                                unsigned int bf_index,
                                                                const Elem& element,
@@ -188,7 +198,23 @@ std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int var_
   START_LOG("evaluate_current_basis_function()", "RBEIMConstruction");
 
   // Load up basis function bf_index (does nothing if bf_index is already loaded)
-  set_current_basis_function(bf_index);
+  if(bf_index >= get_rb_evaluation().get_n_basis_functions())
+  {
+    libMesh::out << "Error: index cannot be larger than the number of basis functions evaluate_basis_function"
+                 << std::endl;
+    libmesh_error();
+  }
+
+  // Possibly update _current_ghosted_bf
+  if(bf_index != _current_bf_index)
+  {
+    // Set member variable _current_bf_index
+    _current_bf_index = bf_index;
+
+    // and create a ghosted version of the appropriate basis function
+    get_rb_evaluation().get_basis_function(_current_bf_index).localize
+      (*_current_ghosted_bf, this->get_dof_map().get_send_list());
+  }
 
   // Get local coordinates to feed these into compute_data().
   // Note that the fe_type can safely be used from the 0-variable,
@@ -232,29 +258,18 @@ Real RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
   return values(var_number);
 }
 
-void RBEIMConstruction::set_current_basis_function(unsigned int basis_function_index_in)
+void RBEIMConstruction::initialize_eim_assembly_objects()
 {
-  START_LOG("set_current_basis_function()", "RBEIMConstruction");
-
-  if(basis_function_index_in >= get_n_affine_terms())
+  _rb_eim_assembly_objects.clear();
+  for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
   {
-    libMesh::out << "Error: index cannot be larger than the number of affine functions in set_current_basis_function"
-                 << std::endl;
-    libmesh_error();
+    _rb_eim_assembly_objects.push_back( build_eim_assembly(i).release() );
   }
+}
 
-  // Possibly update _current_ghosted_bf
-  if(basis_function_index_in != _current_bf_index)
-  {
-    // Set member variable _current_bf_index
-    _current_bf_index = basis_function_index_in;
-
-    // and create a ghosted version of the appropriate basis function
-    get_rb_evaluation().get_basis_function(_current_bf_index).localize
-      (*_current_ghosted_bf, this->get_dof_map().get_send_list());
-  }
-
-  STOP_LOG("set_current_basis_function()", "RBEIMConstruction");
+std::vector<ElemAssembly*> RBEIMConstruction::get_eim_assembly_objects()
+{
+  return _rb_eim_assembly_objects;
 }
 
 void RBEIMConstruction::enrich_RB_space()
