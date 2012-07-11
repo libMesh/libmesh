@@ -40,21 +40,17 @@ public:
   }
   
   /**
-   * Destructor.
-   */
-  ~SimpleEIMConstruction()
-  {
-    for(unsigned int i=0; i<rb_eim_f_vector.size(); i++)
-    {
-      delete rb_eim_f_vector[i];
-    }
-    rb_eim_f_vector.clear();
-  }
-  
-  /**
    * The type of the parent.
    */
   typedef RBEIMConstruction Parent;
+  
+  /**
+   * Provide an implementation of build_eim_assembly
+   */
+  virtual AutoPtr<ElemAssembly> build_eim_assembly(unsigned int index)
+  {
+    return AutoPtr<ElemAssembly>(new EIM_F(*this, index));
+  }
   
   /**
    * Initialize data structures.
@@ -69,20 +65,6 @@ public:
   }
 
   /**
-   * Build and store a vector of EIM_F objects,
-   * one for each EIM basis function.
-   */
-  void initialize_EIM_F_objects()
-  {
-    // Initialize the EIM_F objects
-    rb_eim_f_vector.clear();
-    for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
-    {
-      rb_eim_f_vector.push_back(new EIM_F(*this, i));
-    }
-  }
-
-  /**
    * Variable number for u.
    */
   unsigned int u_var;
@@ -91,12 +73,6 @@ public:
    * Inner product assembly object
    */
   EIM_IP_assembly ip;
-  
-  /**
-   * The vector of EIM_F objects that are created to point to
-   * this RBEIMConstruction.
-   */
-  std::vector<ElemAssembly*> rb_eim_f_vector;
   
 };
 
