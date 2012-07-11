@@ -50,9 +50,9 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
 		                      const unsigned int number)
   : Parent(es, name, number),
     best_fit_type_flag(PROJECTION_BEST_FIT),
-    mesh_function(NULL),
-    performing_extra_greedy_step(false),
-    current_bf_index(0)
+    _mesh_function(NULL),
+    _performing_extra_greedy_step(false),
+    _current_bf_index(0)
 {
   // We cannot do rb_solve with an empty
   // "rb space" with EIM
@@ -68,13 +68,13 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
   serial_training_set = true;
 
   // attach empty RBAssemblyExpansion object
-  set_rb_assembly_expansion(empty_rb_assembly_expansion);
+  set_rb_assembly_expansion(_empty_rb_assembly_expansion);
 }
 
 RBEIMConstruction::~RBEIMConstruction ()
 {
-  delete mesh_function;
-  mesh_function = NULL;
+  delete _mesh_function;
+  _mesh_function = NULL;
 }
 
 void RBEIMConstruction::process_parameters_file (const std::string& parameters_filename)
@@ -124,24 +124,24 @@ void RBEIMConstruction::initialize_rb_construction()
   Parent::initialize_rb_construction();
 
   // initialize a serial vector that we will use for MeshFunction evaluations
-  serialized_vector = NumericVector<Number>::build();
-  serialized_vector->init (this->n_dofs(), false, SERIAL);
+  _serialized_vector = NumericVector<Number>::build();
+  _serialized_vector->init (this->n_dofs(), false, SERIAL);
 
   // Initialize the MeshFunction for interpolating the
   // solution vector at quadrature points
   std::vector<unsigned int> vars(n_vars());
   Utility::iota(vars.begin(), vars.end(), 0); // By default use all variables
-  mesh_function = new MeshFunction(get_equation_systems(), *serialized_vector, get_dof_map(), vars);
-  mesh_function->init();
+  _mesh_function = new MeshFunction(get_equation_systems(), *_serialized_vector, get_dof_map(), vars);
+  _mesh_function->init();
 
   // initialize the vector that stores the _current_ basis function,
   // i.e. the vector that is used in evaluate_basis_function
-  current_ghosted_bf = NumericVector<Number>::build();
+  _current_ghosted_bf = NumericVector<Number>::build();
 #ifdef LIBMESH_ENABLE_GHOSTED
-  current_ghosted_bf->init (this->n_dofs(), this->n_local_dofs(),
+  _current_ghosted_bf->init (this->n_dofs(), this->n_local_dofs(),
                             get_dof_map().get_send_list(), false, GHOSTED);
 #else
-  current_ghosted_bf->init (this->n_dofs(), false, SERIAL);
+  _current_ghosted_bf->init (this->n_dofs(), false, SERIAL);
 #endif
 
   // Load up the inner product matrix
@@ -175,12 +175,13 @@ Number RBEIMConstruction::evaluate_parametrized_function(unsigned int index, con
   return eim_eval.evaluate_parametrized_function(index, p);
 }
 
-unsigned int RBEIMConstruction::get_n_affine_functions()
+unsigned int RBEIMConstruction::get_n_affine_terms()
 {
   return n_vars() * get_rb_evaluation().get_n_basis_functions();
 }
 
-std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int bf_index,
+std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int var_number,
+                                                               unsigned int bf_index,
                                                                const Elem& element,
                                                                const std::vector<Point>& qpoints)
 {
@@ -199,11 +200,10 @@ std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int bf_i
                             qpoints,
                             mapped_qpoints);
 
-  const unsigned int current_variable_number = current_bf_index % n_vars();
-  const FEType& fe_type = get_dof_map().variable_type(current_variable_number);
+  const FEType& fe_type = get_dof_map().variable_type(var_number);
 
   std::vector<unsigned int> dof_indices_var;
-  get_dof_map().dof_indices (&element, dof_indices_var, current_variable_number);
+  get_dof_map().dof_indices (&element, dof_indices_var, var_number);
 
   std::vector<Number> values(dof_indices_var.size());
 
@@ -214,7 +214,7 @@ std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int bf_i
 
     values[qp] = 0.;
     for (unsigned int i=0; i<dof_indices_var.size(); i++)
-      values[qp] += (*current_ghosted_bf)(dof_indices_var[i]) * data.shape[i];
+      values[qp] += (*_current_ghosted_bf)(dof_indices_var[i]) * data.shape[i];
   }
 
   STOP_LOG("evaluate_current_basis_function()", "RBEIMConstruction");
@@ -222,28 +222,36 @@ std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int bf_i
   return values;
 }
 
+Real RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
+                                               Point p)
+{
+  DenseVector<Number> values;
+  (*_mesh_function)(p,
+                    /*time*/ 0.,
+                    values);
+  return values(var_number);
+}
+
 void RBEIMConstruction::set_current_basis_function(unsigned int basis_function_index_in)
 {
   START_LOG("set_current_basis_function()", "RBEIMConstruction");
 
-  if(basis_function_index_in > get_n_affine_functions())
+  if(basis_function_index_in >= get_n_affine_terms())
   {
-    libMesh::out << "Error: index cannot be larger than the number of affine functions in evaluate_affine_function"
+    libMesh::out << "Error: index cannot be larger than the number of affine functions in set_current_basis_function"
                  << std::endl;
     libmesh_error();
   }
 
-  if(basis_function_index_in != current_bf_index)
+  // Possibly update _current_ghosted_bf
+  if(basis_function_index_in != _current_bf_index)
   {
-    // Set member variable current_bf_index
-    current_bf_index = basis_function_index_in;
-
-    // First determine the basis function index implied by function_index
-    unsigned int basis_function_id = current_bf_index/n_vars();
+    // Set member variable _current_bf_index
+    _current_bf_index = basis_function_index_in;
 
     // and create a ghosted version of the appropriate basis function
-    get_rb_evaluation().get_basis_function(basis_function_id).localize
-      (*current_ghosted_bf, this->get_dof_map().get_send_list());
+    get_rb_evaluation().get_basis_function(_current_bf_index).localize
+      (*_current_ghosted_bf, this->get_dof_map().get_send_list());
   }
 
   STOP_LOG("set_current_basis_function()", "RBEIMConstruction");
@@ -256,7 +264,7 @@ void RBEIMConstruction::enrich_RB_space()
   RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
 
   // If we have at least one basis function we need to use
-  // rb_solve, otherwise just use new_bf as is
+  // rb_solve to find the EIM interpolation error, otherwise just use solution as is
   if(get_rb_evaluation().get_n_basis_functions() > 0)
   {
     // get the right-hand side vector for the EIM approximation
@@ -266,7 +274,8 @@ void RBEIMConstruction::enrich_RB_space()
     DenseVector<Number> EIM_rhs(RB_size);
     for(unsigned int i=0; i<RB_size; i++)
     {
-      EIM_rhs(i) = (*mesh_function)(eim_eval.interpolation_points[i]);
+      EIM_rhs(i) = evaluate_mesh_function( eim_eval.interpolation_points_var[i],
+                                           eim_eval.interpolation_points[i] );
     }
 
     eim_eval.set_parameters( get_parameters() );
@@ -340,7 +349,7 @@ void RBEIMConstruction::enrich_RB_space()
   solution->scale(1./optimal_value);
 
   // Store optimal point in interpolation_points
-  if(!performing_extra_greedy_step)
+  if(!_performing_extra_greedy_step)
   {
     eim_eval.interpolation_points.push_back(optimal_point);
     eim_eval.interpolation_points_var.push_back(optimal_var);
@@ -370,6 +379,7 @@ Real RBEIMConstruction::compute_best_fit_error()
 
   switch(best_fit_type_flag)
   {
+    // Perform an L2 projection in order to find an approximation to solution (from truth_solve above)
     case(PROJECTION_BEST_FIT):
     {
       // compute the rhs by performing inner products
@@ -395,9 +405,10 @@ Real RBEIMConstruction::compute_best_fit_error()
       RB_inner_product_matrix_N.lu_solve(best_fit_rhs, get_rb_evaluation().RB_solution);
       break;
     }
+    // Perform EIM solve in order to find an approximation to solution (from truth_solve above)
     case(EIM_BEST_FIT):
     {
-      // Turn off error estimation here, we use the linfty norm instead
+      // Turn off error estimation for this rb_solve, we use the linfty norm instead
       get_rb_evaluation().evaluate_RB_error_bound = false;
       get_rb_evaluation().set_parameters( get_parameters() );
       get_rb_evaluation().rb_solve(RB_size);
@@ -489,7 +500,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   // of the function to be approximated
   solve();
   update(); // put the solution into current_local_solution as well in case we want to plot it
-  solution->localize(*serialized_vector);
+  solution->localize(*_serialized_vector);
 
   if(reuse_preconditioner)
   {
@@ -550,17 +561,19 @@ void RBEIMConstruction::update_RB_system_matrices()
   {
     // Sample the basis functions at the
     // new interpolation point
-    get_rb_evaluation().get_basis_function(j).localize(*serialized_vector);
+    get_rb_evaluation().get_basis_function(j).localize(*_serialized_vector);
 
-    if(!performing_extra_greedy_step)
+    if(!_performing_extra_greedy_step)
     {
       eim_eval.interpolation_matrix(RB_size-1,j) =
-        (*mesh_function)(eim_eval.interpolation_points[RB_size-1]);
+        evaluate_mesh_function( eim_eval.interpolation_points_var[RB_size-1],
+                                eim_eval.interpolation_points[RB_size-1] );
     }
     else
     {
       eim_eval.extra_interpolation_matrix_row(j) =
-        (*mesh_function)(eim_eval.extra_interpolation_point);
+        evaluate_mesh_function( eim_eval.extra_interpolation_point_var,
+                                eim_eval.extra_interpolation_point );
     }
   }
 
@@ -575,20 +588,20 @@ void RBEIMConstruction::update_system()
 
 bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
 {
-  if(performing_extra_greedy_step)
+  if(_performing_extra_greedy_step)
   {
     libMesh::out << "Extra Greedy iteration finished." << std::endl;
-    performing_extra_greedy_step = false;
+    _performing_extra_greedy_step = false;
     return true;
   }
 
-  performing_extra_greedy_step = false;
+  _performing_extra_greedy_step = false;
 
   if(training_greedy_error < get_training_tolerance())
   {
     libMesh::out << "Specified error tolerance reached." << std::endl
                  << "Perform one more Greedy iteration for error bounds." << std::endl;
-    performing_extra_greedy_step = true;
+    _performing_extra_greedy_step = true;
     return false;
   }
 
@@ -597,7 +610,7 @@ bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
     libMesh::out << "Maximum number of basis functions reached: Nmax = "
               << get_Nmax() << "." << std::endl
               << "Perform one more Greedy iteration for error bounds." << std::endl;
-    performing_extra_greedy_step = true;
+    _performing_extra_greedy_step = true;
     return false;
   }
 
