@@ -206,6 +206,26 @@ public:
    */
   std::vector<ParametrizedFunction*> parametrized_functions;
 
+private:
+
+  /**
+   * Store the parameters at which the previous solve was performed (so we can avoid
+   * an unnecessary repeat solve).
+   */
+  RBParameters _previous_parameters;
+  
+  /**
+   * Store the number of basis functions used for the previous solve (so we can avoid
+   * an unnecessary repeat solve).
+   */
+  unsigned int _previous_N;
+  
+  /**
+   * Store the previous error bound returned by rb_solve (so we can return it if we
+   * are avoiding an unnecessary repeat solve).
+   */
+  Real _previous_error_bound;
+
 };
 
 }

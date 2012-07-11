@@ -30,6 +30,9 @@ namespace libMesh
 {
 
 RBEIMEvaluation::RBEIMEvaluation()
+  :
+  _previous_N(0),
+  _previous_error_bound(-1)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case
@@ -87,6 +90,17 @@ Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int index, const
 
 Real RBEIMEvaluation::rb_solve(unsigned int N)
 {
+  // Short-circuit if we are using the same parameters and value of N
+  if( (_previous_parameters == get_parameters()) && 
+      (_previous_N == N) )
+  {
+    return _previous_error_bound;
+  }
+  
+  // Otherwise, update _previous parameters, _previous_N
+  _previous_parameters = get_parameters();
+  _previous_N = N;
+  
   START_LOG("rb_solve()", "RBEIMEvaluation");
 
   if(N > get_n_basis_functions())
@@ -145,11 +159,13 @@ Real RBEIMEvaluation::rb_solve(unsigned int N)
 
     STOP_LOG("rb_solve()", "RBEIMEvaluation");
 
+    _previous_error_bound = error_estimate;
     return error_estimate;
   }
   else // Don't evaluate an error bound
   {
     STOP_LOG("rb_solve()", "RBEIMEvaluation");
+    _previous_error_bound = -1.;
     return -1.;
   }
 
