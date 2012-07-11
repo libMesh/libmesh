@@ -20,6 +20,7 @@
 // rbOOmit includes
 #include "rb_eim_evaluation.h"
 #include "rb_eim_theta.h"
+#include "rb_parametrized_function.h"
 
 // libMesh includes
 #include "o_string_stream.h"
@@ -39,7 +40,7 @@ RBEIMEvaluation::RBEIMEvaluation()
   compute_RB_inner_product = true;
 
   // initialize to the empty RBThetaExpansion object
-  set_rb_theta_expansion(empty_rb_theta_expansion);
+  set_rb_theta_expansion(_empty_rb_theta_expansion);
 }
 
 RBEIMEvaluation::~RBEIMEvaluation()
@@ -76,16 +77,26 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax,
   extra_interpolation_matrix_row.resize(Nmax);
 }
 
-Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int index, const Point& p)
+void RBEIMEvaluation::attach_paramerized_function(RBParametrizedFunction* pf)
 {
-  if(index >= get_n_parametrized_functions())
+  _parametrized_functions.push_back(pf);
+}
+
+unsigned int RBEIMEvaluation::get_n_parametrized_functions() const
+{
+  return _parametrized_functions.size();
+}
+
+Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index, const Point& p)
+{
+  if(var_index >= get_n_parametrized_functions())
   {
-    libMesh::err << "Error: We must have index < get_n_parametrized_functions() in evaluate_parametrized_function."
+    libMesh::err << "Error: We must have var_index < get_n_parametrized_functions() in evaluate_parametrized_function."
                  << std::endl;
     libmesh_error();
   }
 
-  return parametrized_functions[index]->evaluate(get_parameters(), p);
+  return _parametrized_functions[var_index]->evaluate(get_parameters(), p);
 }
 
 Real RBEIMEvaluation::rb_solve(unsigned int N)
