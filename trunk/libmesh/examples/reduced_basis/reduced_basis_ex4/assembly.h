@@ -16,8 +16,9 @@
 // rbOOmit includes
 #include "rb_assembly_expansion.h"
 #include "rb_eim_theta.h"
+#include "rb_parametrized_function.h"
 
-struct ShiftedGaussian : public ParametrizedFunction
+struct ShiftedGaussian : public RBParametrizedFunction
 {
   virtual Number evaluate(const RBParameters& mu,
                           const Point& p)
@@ -96,7 +97,11 @@ struct EIM_F : ElemAssembly
 
   virtual void interior_assembly(FEMContext &c)
   {
+    // PDE variable number
     const unsigned int u_var = 0;
+    
+    // EIM variable number
+    const unsigned int eim_var = 0;
 
     const std::vector<Real> &JxW =
       c.element_fe_var[u_var]->get_JxW();
@@ -109,11 +114,15 @@ struct EIM_F : ElemAssembly
 
     // Now we will build the affine operator
     unsigned int n_qpoints = (c.get_element_qrule())->n_points();
+    
+    // Get the quadrature point locations
+    const std::vector<Point>& qpoints = c.element_fe_var[u_var]->get_xyz();
 
     std::vector<Number> eim_values =
-      rb_eim_con.evaluate_basis_function(basis_function_index,
+      rb_eim_con.evaluate_basis_function(eim_var,
+                                         basis_function_index,
                                          *c.elem,
-                                         c.element_fe_var[u_var]->get_xyz());
+                                         qpoints);
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)

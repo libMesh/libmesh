@@ -31,6 +31,7 @@ namespace libMesh
 {
   
 class RBParameters;
+class RBParametrizedFunction;
 
 /**
  * This class is part of the rbOOmit framework.
@@ -42,27 +43,6 @@ class RBParameters;
  *
  * @author David J. Knezevic, 2011
  */
-
-/**
- * Functor class in which we can define function to be approximated.
- */
-class ParametrizedFunction
-{
-public:
-
-  /**
-   * Virtual evaluate() gives us a vtable, so there's no cost in adding a
-   * virtual destructor for safety's sake.
-   */
-  virtual ~ParametrizedFunction() {}
-
-  /**
-   * Evaluate this parametrized function for the parameter value
-   * \p mu at the point \p p.
-   */
-  virtual Number evaluate(const RBParameters& , const Point& ) { return 0.; }
-
-};
 
 // ------------------------------------------------------------
 // RBEIMEvaluation class definition
@@ -102,21 +82,21 @@ public:
    * Attach the parametrized function that we will approximate
    * using the Empirical Interpolation Method.
    */
-  void attach_paramerized_function(ParametrizedFunction* pf)
-    { parametrized_functions.push_back(pf); }
+  void attach_paramerized_function(RBParametrizedFunction* pf);
+
 
   /**
    * Get the number of parametrized functions that have
    * been attached to this system.
    */
-  unsigned int get_n_parametrized_functions() const
-    { return parametrized_functions.size(); }
+  unsigned int get_n_parametrized_functions() const;
 
   /**
-   * @return the value of the parametrized function that is
-   * being approximated.
+   * @return the value of the parametrized function that is being
+   * approximated at the point \p p. \p var_index specifies the
+   * variable (i.e. the parametrized function index) to be evaluated.
    */
-  Number evaluate_parametrized_function(unsigned int index, const Point& p);
+  Number evaluate_parametrized_function(unsigned int var_index, const Point& p);
 
   /**
    * Calculate the EIM approximation to parametrized_function
@@ -195,18 +175,19 @@ public:
    */
   std::vector<RBTheta*> rb_eim_theta_vector;
 
-  /**
-   * We initialize RBEIMEvaluation so that it has an "empty" RBAssemblyExpansion.
-   */
-  RBThetaExpansion empty_rb_theta_expansion;
+private:
 
   /**
    * This vector stores the parametrized functions
    * that will be approximated in this EIM system.
    */
-  std::vector<ParametrizedFunction*> parametrized_functions;
+  std::vector<RBParametrizedFunction*> _parametrized_functions;
 
-private:
+  /**
+   * We initialize RBEIMEvaluation so that it has an "empty" RBThetaExpansion, because
+   * this isn't used at all in the EIM.
+   */
+  RBThetaExpansion _empty_rb_theta_expansion;
 
   /**
    * Store the parameters at which the previous solve was performed (so we can avoid

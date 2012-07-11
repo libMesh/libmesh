@@ -126,19 +126,28 @@ public:
 
   /**
    * @return the number of affine terms defined by the current EIM
-   * approximation. Each function is typically used in an associated
+   * approximation. Each term is typically used in an associated
    * reduced basis approximation.
    */
-  virtual unsigned int get_n_affine_functions();
+  virtual unsigned int get_n_affine_terms();
 
   /**
    * Evaluate the basis function \p index at the points \p qpoints
-   * on element \p element.
+   * on element \p element. Also, \p var_number specifies which variable
+   * to evaluate.
    * @return a vector of values corresponding to qpoints.
    */
-  std::vector<Number> evaluate_basis_function(unsigned int index,
+  std::vector<Number> evaluate_basis_function(unsigned int var_number,
+                                              unsigned int index,
                                               const Elem& element,
                                               const std::vector<Point>& qpoints);
+
+
+  /**
+   * Evaluate the mesh function at the specified point and for the specified variable.
+   */
+  Real evaluate_mesh_function(unsigned int var_number,
+                              Point p);
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -199,7 +208,7 @@ private:
   /**
    * A mesh function to interpolate on the mesh.
    */
-  MeshFunction* mesh_function;
+  MeshFunction* _mesh_function;
 
   /**
    * This flag allows us to perform one extra Greedy step
@@ -207,38 +216,34 @@ private:
    * a posteriori error bound in the case that we use
    * all of our basis functions.
    */
-  bool performing_extra_greedy_step;
+  bool _performing_extra_greedy_step;
 
   /**
    * The current basis function that we sample to evaluate the
    * empirical interpolation approximation. This will be a GHOSTED
    * vector to facilitate interpolation in the case of multiple processors.
    */
-  AutoPtr< NumericVector<Number> > current_ghosted_bf;
+  AutoPtr< NumericVector<Number> > _current_ghosted_bf;
 
   /**
    * We also need to store a basis function index to identify which basis function
    * is currently stored in current_ghosted_bf. This allows us to cache the basis
    * function and avoid unnecessarily reloading it all the time.
    */
-  unsigned int current_bf_index;
+  unsigned int _current_bf_index;
 
   /**
    * We also need an extra vector in which we can store a serialized
    * copy of the solution vector so that we can use MeshFunction
    * in parallel.
    */
-  AutoPtr< NumericVector<Number> > serialized_vector;
+  AutoPtr< NumericVector<Number> > _serialized_vector;
 
   /**
-   * We initialize RBEIMConstruction so that it has an "empty" RBThetaExpansion.
+   * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion,
+   * because this isn't used at all in the EIM.
    */
-  RBThetaExpansion empty_rb_theta_expansion;
-
-  /**
-   * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion.
-   */
-  RBAssemblyExpansion empty_rb_assembly_expansion;
+  RBAssemblyExpansion _empty_rb_assembly_expansion;
 
 };
 
