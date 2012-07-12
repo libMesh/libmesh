@@ -163,7 +163,12 @@ protected:
   virtual void init_data ();
 
   /**
-   * set parameters to the specified training parameters.
+   * Return the RBParameters in index \p index of training set.
+   */
+  RBParameters get_params_from_training_set(unsigned int index);
+
+  /**
+   * Set parameters to the RBParameters stored in index \p index of the training set.
    */
   void set_params_from_training_set(unsigned int index);
 

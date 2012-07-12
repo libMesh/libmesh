@@ -23,6 +23,7 @@
 // rbOOmit includes
 #include "rb_construction.h"
 #include "rb_assembly_expansion.h"
+#include "rb_eim_assembly.h"
 
 // libMesh includes
 #include "mesh_function.h"
@@ -98,6 +99,12 @@ public:
   virtual void initialize_rb_construction();
 
   /**
+   * Override train_reduced_basis to first initialize _parametrized_functions_in_training_set.
+   */
+  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
+                                   const bool resize_rb_eval_data=true);
+
+  /**
    * Load the truth representation of the parametrized function
    * at the current parameters into the solution vector.
    * The truth representation is the projection of
@@ -122,24 +129,6 @@ public:
    * load_calN_parametrized_function.
    */
   virtual void init_context(FEMContext &c);
-
-  /**
-   * @return the value of the parametrized function that is
-   * being approximated.
-   */
-  Number evaluate_parametrized_function(unsigned int index, const Point& p);
-
-  /**
-   * Evaluate the basis function \p index at the points \p qpoints
-   * on element \p element. Also, \p var_number specifies which variable
-   * to evaluate.
-   * @return a vector of values corresponding to qpoints.
-   */
-  std::vector<Number> evaluate_basis_function(unsigned int var_number,
-                                              unsigned int index,
-                                              const Elem& element,
-                                              const std::vector<Point>& qpoints);
-
 
   /**
    * Evaluate the mesh function at the specified point and for the specified variable.
@@ -206,13 +195,31 @@ protected:
    * Overload to return the best fit error. This function is used in
    * the Greedy algorithm to select the next parameter.
    */
-  virtual Real get_RB_error_bound() { return compute_best_fit_error(); }
+  virtual Real get_RB_error_bound();
 
   /**
    * Function that indicates when to terminate the Greedy
    * basis training. Overload in subclasses to specialize.
    */
   virtual bool greedy_termination_test(Real training_greedy_error, int count);
+  
+  /**
+   * Loop over the training set and compute the parametrized function for each
+   * training index.
+   */
+  void initialize_parametrized_functions_in_training_set();
+  
+  /**
+   * Boolean flag to indicate whether or not we have called
+   * compute_parametrized_functions_in_training_set() yet.
+   */
+  bool _parametrized_functions_in_training_set_initialized;
+  
+  /**
+   * The libMesh vectors storing the finite element coefficients
+   * of the RB basis functions.
+   */
+  std::vector< NumericVector<Number>* > _parametrized_functions_in_training_set;
 
 private:
 
@@ -228,20 +235,6 @@ private:
    * all of our basis functions.
    */
   bool _performing_extra_greedy_step;
-
-  /**
-   * The current basis function that we sample to evaluate the
-   * empirical interpolation approximation. This will be a GHOSTED
-   * vector to facilitate interpolation in the case of multiple processors.
-   */
-  AutoPtr< NumericVector<Number> > _current_ghosted_bf;
-
-  /**
-   * We also need to store a basis function index to identify which basis function
-   * is currently stored in current_ghosted_bf. This allows us to cache the basis
-   * function and avoid unnecessarily reloading it all the time.
-   */
-  int _current_bf_index;
 
   /**
    * We also need an extra vector in which we can store a serialized

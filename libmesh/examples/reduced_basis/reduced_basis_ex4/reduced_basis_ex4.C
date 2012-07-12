@@ -160,7 +160,6 @@ int main (int argc, char** argv)
     rb_eval.read_offline_data_from_files("rb_data");
 
     // Get the parameters at which we will do a reduced basis solve
-    unsigned int online_N = infile("online_N",1);
     Real online_center_x = infile("online_center_x", 0.);
     Real online_center_y = infile("online_center_y", 0.);
     RBParameters online_mu;
@@ -168,7 +167,7 @@ int main (int argc, char** argv)
     online_mu.set_value("center_y", online_center_y);
     rb_eval.set_parameters(online_mu);
     rb_eval.print_parameters();
-    rb_eval.rb_solve(online_N);
+    rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
 
     // plot the solution, if requested
     if(store_basis_functions)
