@@ -1,5 +1,5 @@
 # The location of the mesh library
-#LIBMESH_DIR ?= ../../..
+LIBMESH_DIR ?= ../../..
 
 # include the library options determined by configure.  This will
 # set the variables INCLUDE and LIBS that we will need to build and
