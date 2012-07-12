@@ -1,0 +1,19 @@
+# ========= EIM system parameters =========
+
+Nmax = 20
+training_tolerance = 0.001
+
+n_parameters = 1
+parameter_names = 'curvature'
+
+curvature = '0.25 3.14159 1.'
+
+log_scaling = '0'
+
+deterministic_training = true # Are the training points generated randomly or deterministically
+
+n_training_samples = 25
+use_relative_bound_in_greedy = true
+
+best_fit_type = projection    # Choose which algorithm to use in the EIM greedy (either "projection" or "eim")
+
