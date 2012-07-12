@@ -392,17 +392,6 @@ public:
 				   const Elem* elem);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-  /**
-   * Initialize the data fields for the base of an
-   * an infinite element.
-   */
-  void init_base_shape_functions(const std::vector<Point>& qp,
-				 const Elem* e);
-
-#endif
-
   /**
    * @returns \p true when the shape functions (for
    * this \p FEFamily) depend on the particular
@@ -410,30 +399,6 @@ public:
    * for each new element.  \p false otherwise.
    */
   virtual bool shapes_need_reinit() const;
-
-  /**
-   * Update the various member data fields \p phi,
-   * \p dphidxi, \p dphideta, \p dphidzeta, etc.
-   * for the current element.  These data will be computed
-   * at the points \p qp, which are generally (but need not be)
-   * the quadrature points.
-   */
-  virtual void init_shape_functions(const std::vector<Point>& qp,
-				    const Elem* e);
-
-  /**
-   * Same as before, but for a side. This is used for boundary
-   * integration.
-   */
-  void init_face_shape_functions(const std::vector<Point>& qp,
-				 const Elem* side);
-
-  /**
-   * Same as before, but for an edge. This is used for some projection
-   * operators.
-   */
-  void init_edge_shape_functions(const std::vector<Point>& qp,
-				 const Elem* edge);
 
   /**
    * @returns the location (in physical space) of the point
@@ -473,6 +438,42 @@ public:
 #endif
 
 protected:
+
+  /**
+   * Update the various member data fields \p phi,
+   * \p dphidxi, \p dphideta, \p dphidzeta, etc.
+   * for the current element.  These data will be computed
+   * at the points \p qp, which are generally (but need not be)
+   * the quadrature points.
+   */
+  virtual void init_shape_functions(const std::vector<Point>& qp,
+				    const Elem* e);
+
+  /**
+   * Same as before, but for a side. This is used for boundary
+   * integration.
+   */
+  void init_face_shape_functions(const std::vector<Point>& qp,
+				 const Elem* side);
+
+  /**
+   * Same as before, but for an edge. This is used for some projection
+   * operators.
+   */
+  void init_edge_shape_functions(const std::vector<Point>& qp,
+				 const Elem* edge);
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+  /**
+   * Initialize the data fields for the base of an
+   * an infinite element.
+   */
+  virtual void init_base_shape_functions(const std::vector<Point>& qp,
+					 const Elem* e);
+
+#endif
+
   /**
    * An array of the node locations on the last
    * element we computed on
