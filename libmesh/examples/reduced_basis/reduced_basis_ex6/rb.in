@@ -1,0 +1,16 @@
+# ========= RB system parameters =========
+
+Nmax = 15
+training_tolerance = 0.001
+
+n_parameters = 1
+parameter_names = 'curvature'
+
+curvature = '0.25 3.14159 1.'
+
+log_scaling = '0'
+
+deterministic_training = true   # Are the training points generated randomly or deterministically
+use_relative_bound_in_greedy = true
+
+n_training_samples = 100        # The number of parameters in training set (must be square for the 2-parameter deterministic case)

@@ -1,0 +1,8 @@
+# ========= Main function parameters =========
+
+n_elem_xy = 10
+n_elem_z  = 50
+
+store_basis_functions = true
+online_N = 20
+online_curvature = 3.14159
