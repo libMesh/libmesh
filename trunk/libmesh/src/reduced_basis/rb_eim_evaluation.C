@@ -77,7 +77,7 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax,
   extra_interpolation_matrix_row.resize(Nmax);
 }
 
-void RBEIMEvaluation::attach_paramerized_function(RBParametrizedFunction* pf)
+void RBEIMEvaluation::attach_parametrized_function(RBParametrizedFunction* pf)
 {
   _parametrized_functions.push_back(pf);
 }
