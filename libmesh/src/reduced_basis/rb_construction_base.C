@@ -135,6 +135,12 @@ unsigned int RBConstructionBase<Base>::get_last_local_training_index() const
 template <class Base>
 void RBConstructionBase<Base>::set_params_from_training_set(unsigned int index)
 {
+  set_parameters(get_params_from_training_set(index));
+}
+
+template <class Base>
+RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int index)
+{
   libmesh_assert(training_parameters_initialized);
 
   libmesh_assert( (this->get_first_local_training_index() <= index) &&
@@ -151,7 +157,7 @@ void RBConstructionBase<Base>::set_params_from_training_set(unsigned int index)
     params.set_value(param_name, param_value);
   }
   
-  set_parameters(params);
+  return params;
 }
 
 template <class Base>
