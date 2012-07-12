@@ -241,7 +241,7 @@ private:
    * is currently stored in current_ghosted_bf. This allows us to cache the basis
    * function and avoid unnecessarily reloading it all the time.
    */
-  unsigned int _current_bf_index;
+  int _current_bf_index;
 
   /**
    * We also need an extra vector in which we can store a serialized

@@ -82,7 +82,7 @@ public:
    * Attach the parametrized function that we will approximate
    * using the Empirical Interpolation Method.
    */
-  void attach_paramerized_function(RBParametrizedFunction* pf);
+  void attach_parametrized_function(RBParametrizedFunction* pf);
 
 
   /**

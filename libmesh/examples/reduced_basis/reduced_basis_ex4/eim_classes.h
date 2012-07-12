@@ -14,7 +14,7 @@ public:
 
   SimpleEIMEvaluation()
   {
-    attach_paramerized_function(&sg);
+    attach_parametrized_function(&sg);
   }
 
   /** 

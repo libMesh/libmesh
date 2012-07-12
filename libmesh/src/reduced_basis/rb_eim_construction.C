@@ -52,7 +52,7 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _mesh_function(NULL),
     _performing_extra_greedy_step(false),
-    _current_bf_index(0)
+    _current_bf_index(-1)
 {
   // We cannot do rb_solve with an empty
   // "rb space" with EIM
@@ -206,15 +206,32 @@ std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int var_
   }
 
   // Possibly update _current_ghosted_bf
-  if(bf_index != _current_bf_index)
+  bool update_current_ghosted_bf = false;
+  if(_current_bf_index < 0) // definitely update if _current_bf_index < 0
   {
-    // Set member variable _current_bf_index
-    _current_bf_index = bf_index;
-
-    // and create a ghosted version of the appropriate basis function
-    get_rb_evaluation().get_basis_function(_current_bf_index).localize
-      (*_current_ghosted_bf, this->get_dof_map().get_send_list());
+    update_current_ghosted_bf = true;
   }
+  else
+  {
+    // _current_bf_index > 0, so safe to cast to unsigned int
+    unsigned int unsigned_current_bf_index = static_cast<unsigned int>(_current_bf_index);
+    update_current_ghosted_bf = (bf_index != unsigned_current_bf_index);
+  }
+  
+  if( update_current_ghosted_bf ) 
+  {
+    unsigned int unsigned_current_bf_index = static_cast<unsigned int>(_current_bf_index);
+    if(bf_index != unsigned_current_bf_index)
+    {
+      // Set member variable _current_bf_index
+      _current_bf_index = bf_index;
+
+      // and create a ghosted version of the appropriate basis function
+      get_rb_evaluation().get_basis_function(_current_bf_index).localize
+        (*_current_ghosted_bf, this->get_dof_map().get_send_list());
+    }
+  }
+
 
   // Get local coordinates to feed these into compute_data().
   // Note that the fe_type can safely be used from the 0-variable,
@@ -231,7 +248,7 @@ std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int var_
   std::vector<unsigned int> dof_indices_var;
   get_dof_map().dof_indices (&element, dof_indices_var, var_number);
 
-  std::vector<Number> values(dof_indices_var.size());
+  std::vector<Number> values(mapped_qpoints.size());
 
   for(unsigned int qp=0; qp<mapped_qpoints.size(); qp++)
   {
