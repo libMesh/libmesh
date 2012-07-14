@@ -32,6 +32,7 @@ namespace
 {
   static unsigned int old_elem_id = libMesh::invalid_uint;
   static libMesh::Point centroid;
+  static libMesh::Point max_distance;
 }
 
 
@@ -62,7 +63,6 @@ Real FE<3,XYZ>::shape(const Elem* elem,
 		      const Point& p)
 {
 #if LIBMESH_DIM == 3
-
   libmesh_assert (elem != NULL);
 
   // Only recompute the centroid if the element
@@ -73,6 +73,13 @@ Real FE<3,XYZ>::shape(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
+      max_distance = Point(0.,0.,0.);
+      for (unsigned int p = 0; p < elem->n_nodes(); p++)
+        for (unsigned int d = 0; d < 3; d++)
+        {
+           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+           max_distance(d) = std::max(distance, max_distance(d));
+        }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -85,9 +92,12 @@ Real FE<3,XYZ>::shape(const Elem* elem,
   const Real xc = centroid(0);
   const Real yc = centroid(1);
   const Real zc = centroid(2);
-  const Real dx = x - xc;
-  const Real dy = y - yc;
-  const Real dz = z - zc;
+  const Real distx = max_distance(0);
+  const Real disty = max_distance(1);
+  const Real distz = max_distance(2);
+  const Real dx = (x - xc)/distx;
+  const Real dy = (y - yc)/disty;
+  const Real dz = (z - zc)/distz;
 
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
@@ -96,7 +106,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
 #endif
   libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
-              (static_cast<unsigned int>(totalorder)+2)/6);
+              (static_cast<unsigned int>(totalorder)+3)/6);
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -274,6 +284,13 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
+      max_distance = Point(0.,0.,0.);
+      for (unsigned int p = 0; p < elem->n_nodes(); p++)
+        for (unsigned int d = 0; d < 3; d++)
+        {
+           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+           max_distance(d) = std::max(distance, max_distance(d));
+        }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -286,9 +303,12 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   const Real xc = centroid(0);
   const Real yc = centroid(1);
   const Real zc = centroid(2);
-  const Real dx = x - xc;
-  const Real dy = y - yc;
-  const Real dz = z - zc;
+  const Real distx = max_distance(0);
+  const Real disty = max_distance(1);
+  const Real distz = max_distance(2);
+  const Real dx = (x - xc)/distx;
+  const Real dy = (y - yc)/disty;
+  const Real dz = (z - zc)/distz;
 
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
@@ -297,7 +317,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 #endif
   libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
-              (static_cast<unsigned int>(totalorder)+2)/6);
+              (static_cast<unsigned int>(totalorder)+3)/6);
 
   switch (j)
     {
@@ -312,7 +332,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
   	  // linear
   	case 1:
-  	  return 1.;
+  	  return 1./distx;
 
   	case 2:
   	  return 0.;
@@ -322,16 +342,16 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
   	  // quadratic
   	case 4:
-  	  return 2.*dx;
+  	  return 2.*dx/distx;
 
   	case 5:
-  	  return dy;
+  	  return dy/distx;
 
   	case 6:
   	  return 0.;
 
   	case 7:
-  	  return dz;
+  	  return dz/distx;
 
   	case 8:
   	  return 0.;
@@ -341,28 +361,28 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
   	  // cubic
   	case 10:
-  	  return 3.*dx*dx;
+  	  return 3.*dx*dx/distx;
 
   	case 11:
-  	  return 2.*dx*dy;
+  	  return 2.*dx*dy/distx;
 
   	case 12:
-  	  return dy*dy;
+  	  return dy*dy/distx;
 
   	case 13:
   	  return 0.;
 
   	case 14:
-  	  return 2.*dx*dz;
+  	  return 2.*dx*dz/distx;
 
   	case 15:
-  	  return dy*dz;
+  	  return dy*dz/distx;
 
   	case 16:
   	  return 0.;
 
   	case 17:
-  	  return dz*dz;
+  	  return dz*dz/distx;
 
   	case 18:
   	  return 0.;
@@ -372,43 +392,43 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
   	  // quartics
   	case 20:
-  	  return 4.*dx*dx*dx;
+  	  return 4.*dx*dx*dx/distx;
 
   	case 21:
-  	  return 3.*dx*dx*dy;
+  	  return 3.*dx*dx*dy/distx;
 
   	case 22:
-  	  return 2.*dx*dy*dy;
+  	  return 2.*dx*dy*dy/distx;
 
   	case 23:
-  	  return dy*dy*dy;
+  	  return dy*dy*dy/distx;
 
   	case 24:
   	  return 0.;
 
   	case 25:
-  	  return 3.*dx*dx*dz;
+  	  return 3.*dx*dx*dz/distx;
 
   	case 26:
-  	  return 2.*dx*dy*dz;
+  	  return 2.*dx*dy*dz/distx;
 
   	case 27:
-  	  return dy*dy*dz;
+  	  return dy*dy*dz/distx;
 
   	case 28:
   	  return 0.;
 
   	case 29:
-  	  return 2.*dx*dz*dz;
+  	  return 2.*dx*dz*dz/distx;
 
   	case 30:
-  	  return dy*dz*dz;
+  	  return dy*dz*dz/distx;
 
   	case 31:
   	  return 0.;
 
   	case 32:
-  	  return dz*dz*dz;
+  	  return dz*dz*dz/distx;
 
   	case 33:
   	  return 0.;
@@ -431,7 +451,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
             val *= dy;
           for (unsigned int index=0; index != nz; index++)
             val *= dz;
-          return val;
+          return val/distx;
   	}
       }
 
@@ -450,7 +470,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  return 0.;
 
   	case 2:
-  	  return 1.;
+  	  return 1./disty;
 
   	case 3:
   	  return 0.;
@@ -460,16 +480,16 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  return 0.;
 
   	case 5:
-  	  return dx;
+  	  return dx/disty;
 
   	case 6:
-  	  return 2.*dy;
+  	  return 2.*dy/disty;
 
   	case 7:
   	  return 0.;
 
   	case 8:
-  	  return dz;
+  	  return dz/disty;
 
   	case 9:
   	  return 0.;
@@ -479,28 +499,28 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  return 0.;
 
   	case 11:
-  	  return dx*dx;
+  	  return dx*dx/disty;
 
   	case 12:
-  	  return 2.*dx*dy;
+  	  return 2.*dx*dy/disty;
 
   	case 13:
-  	  return 3.*dy*dy;
+  	  return 3.*dy*dy/disty;
 
   	case 14:
   	  return 0.;
 
   	case 15:
-  	  return dx*dz;
+  	  return dx*dz/disty;
 
   	case 16:
-  	  return 2.*dy*dz;
+  	  return 2.*dy*dz/disty;
 
   	case 17:
   	  return 0.;
 
   	case 18:
-  	  return dz*dz;
+  	  return dz*dz/disty;
 
   	case 19:
   	  return 0.;
@@ -510,43 +530,43 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  return 0.;
 
   	case 21:
-  	  return dx*dx*dx;
+  	  return dx*dx*dx/disty;
 
   	case 22:
-  	  return 2.*dx*dx*dy;
+  	  return 2.*dx*dx*dy/disty;
 
   	case 23:
-  	  return 3.*dx*dy*dy;
+  	  return 3.*dx*dy*dy/disty;
 
   	case 24:
-  	  return 4.*dy*dy*dy;
+  	  return 4.*dy*dy*dy/disty;
 
   	case 25:
   	  return 0.;
 
   	case 26:
-  	  return dx*dx*dz;
+  	  return dx*dx*dz/disty;
 
   	case 27:
-  	  return 2.*dx*dy*dz;
+  	  return 2.*dx*dy*dz/disty;
 
   	case 28:
-  	  return 3.*dy*dy*dz;
+  	  return 3.*dy*dy*dz/disty;
 
   	case 29:
   	  return 0.;
 
   	case 30:
-  	  return dx*dz*dz;
+  	  return dx*dz*dz/disty;
 
   	case 31:
-  	  return 2.*dy*dz*dz;
+  	  return 2.*dy*dz*dz/disty;
 
   	case 32:
   	  return 0.;
 
   	case 33:
-  	  return dz*dz*dz;
+  	  return dz*dz*dz/disty;
 
   	case 34:
   	  return 0.;
@@ -566,7 +586,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
             val *= dy;
           for (unsigned int index=0; index != nz; index++)
             val *= dz;
-          return val;
+          return val/disty;
   	}
       }
 
@@ -588,7 +608,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  return 0.;
 
   	case 3:
-  	  return 1.;
+  	  return 1./distz;
 
   	  // quadratic
   	case 4:
@@ -601,13 +621,13 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  return 0.;
 
   	case 7:
-  	  return dx;
+  	  return dx/distz;
 
   	case 8:
-  	  return dy;
+  	  return dy/distz;
 
   	case 9:
-  	  return 2.*dz;
+  	  return 2.*dz/distz;
 
   	  // cubic
   	case 10:
@@ -623,22 +643,22 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  return 0.;
 
   	case 14:
-  	  return dx*dx;
+  	  return dx*dx/distz;
 
   	case 15:
-  	  return dx*dy;
+  	  return dx*dy/distz;
 
   	case 16:
-  	  return dy*dy;
+  	  return dy*dy/distz;
 
   	case 17:
-  	  return 2.*dx*dz;
+  	  return 2.*dx*dz/distz;
 
   	case 18:
-  	  return 2.*dy*dz;
+  	  return 2.*dy*dz/distz;
 
   	case 19:
-  	  return 3.*dz*dz;
+  	  return 3.*dz*dz/distz;
 
   	  // quartics
   	case 20:
@@ -657,34 +677,34 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   	  return 0.;
 
   	case 25:
-  	  return dx*dx*dx;
+  	  return dx*dx*dx/distz;
 
   	case 26:
-  	  return dx*dx*dy;
+  	  return dx*dx*dy/distz;
 
   	case 27:
-  	  return dx*dy*dy;
+  	  return dx*dy*dy/distz;
 
   	case 28:
-  	  return dy*dy*dy;
+  	  return dy*dy*dy/distz;
 
   	case 29:
-  	  return 2.*dx*dx*dz;
+  	  return 2.*dx*dx*dz/distz;
 
   	case 30:
-  	  return 2.*dx*dy*dz;
+  	  return 2.*dx*dy*dz/distz;
 
   	case 31:
-  	  return 2.*dy*dy*dz;
+  	  return 2.*dy*dy*dz/distz;
 
   	case 32:
-  	  return 3.*dx*dz*dz;
+  	  return 3.*dx*dz*dz/distz;
 
   	case 33:
-  	  return 3.*dy*dz*dz;
+  	  return 3.*dy*dz*dz/distz;
 
   	case 34:
-  	  return 4.*dz*dz*dz;
+  	  return 4.*dz*dz*dz/distz;
 
   	default:
           unsigned int o = 0;
@@ -701,7 +721,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
             val *= dy;
           for (unsigned int index=1; index < nz; index++)
             val *= dz;
-          return val;
+          return val/distz;
   	}
       }
 
@@ -745,7 +765,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 #if LIBMESH_DIM == 3
 
   libmesh_assert (elem != NULL);
-  libmesh_assert (j<3);
+  libmesh_assert (j<6);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -755,6 +775,13 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
+      max_distance = Point(0.,0.,0.);
+      for (unsigned int p = 0; p < elem->n_nodes(); p++)
+        for (unsigned int d = 0; d < 3; d++)
+        {
+           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+           max_distance(d) = std::max(distance, max_distance(d));
+        }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -767,9 +794,18 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   const Real xc = centroid(0);
   const Real yc = centroid(1);
   const Real zc = centroid(2);
-  const Real dx = x - xc;
-  const Real dy = y - yc;
-  const Real dz = z - zc;
+  const Real distx = max_distance(0);
+  const Real disty = max_distance(1);
+  const Real distz = max_distance(2);
+  const Real dx = (x - xc)/distx;
+  const Real dy = (y - yc)/disty;
+  const Real dz = (z - zc)/distz;
+  const Real dist2x = pow(distx,2.);
+  const Real dist2y = pow(disty,2.);
+  const Real dist2z = pow(distz,2.);
+  const Real distxy = distx * disty;
+  const Real distxz = distx * distz;
+  const Real distyz = disty * distz;
 
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
@@ -778,7 +814,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 #endif
   libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
-              (static_cast<unsigned int>(totalorder)+2)/6);
+              (static_cast<unsigned int>(totalorder)+3)/6);
 
     // monomials. since they are hierarchic we only need one case block.
   switch (j)
@@ -799,7 +835,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
   	  // quadratic
   	case 4:
-  	  return 2.;
+  	  return 2./dist2x;
 
   	case 5:
   	case 6:
@@ -810,17 +846,17 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
   	  // cubic
   	case 10:
-  	  return 6.*dx;
+  	  return 6.*dx/dist2x;
 
   	case 11:
-  	  return 2.*dy;
+  	  return 2.*dy/dist2x;
 
   	case 12:
   	case 13:
   	  return 0.;
 
   	case 14:
-  	  return 2.*dz;
+  	  return 2.*dz/dist2x;
 
   	case 15:
   	case 16:
@@ -831,30 +867,30 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
   	  // quartics
   	case 20:
-  	  return 12.*dx*dx;
+  	  return 12.*dx*dx/dist2x;
 
   	case 21:
-  	  return 6.*dx*dy;
+  	  return 6.*dx*dy/dist2x;
 
   	case 22:
-  	  return 2.*dy*dy;
+  	  return 2.*dy*dy/dist2x;
 
   	case 23:
   	case 24:
   	  return 0.;
 
   	case 25:
-  	  return 6.*dx*dz;
+  	  return 6.*dx*dz/dist2x;
 
   	case 26:
-  	  return 2.*dy*dz;
+  	  return 2.*dy*dz/dist2x;
 
   	case 27:
   	case 28:
   	  return 0.;
 
   	case 29:
-  	  return 2.*dz*dz;
+  	  return 2.*dz*dz/dist2x;
 
   	case 30:
   	case 31:
@@ -878,7 +914,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             val *= dy;
           for (unsigned int index=0; index != nz; index++)
             val *= dz;
-          return val;
+          return val/dist2x;
   	}
       }
 
@@ -902,7 +938,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 5:
-  	  return 1.;
+  	  return 1./distxy;
 
   	case 6:
   	case 7:
@@ -915,17 +951,17 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 11:
-  	  return 2.*dx;
+  	  return 2.*dx/distxy;
 
   	case 12:
-  	  return 2.*dy;
+  	  return 2.*dy/distxy;
 
   	case 13:
   	case 14:
   	  return 0.;
 
   	case 15:
-  	  return dz;
+  	  return dz/distxy;
 
   	case 16:
   	case 17:
@@ -938,30 +974,30 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 21:
-  	  return 3.*dx*dx;
+  	  return 3.*dx*dx/distxy;
 
   	case 22:
-  	  return 4.*dx*dy;
+  	  return 4.*dx*dy/distxy;
 
   	case 23:
-  	  return 3.*dy*dy;
+  	  return 3.*dy*dy/distxy;
 
   	case 24:
   	case 25:
   	  return 0.;
 
   	case 26:
-  	  return 2.*dx*dz;
+  	  return 2.*dx*dz/distxy;
 
   	case 27:
-  	  return 2.*dy*dz;
+  	  return 2.*dy*dz/distxy;
 
   	case 28:
   	case 29:
   	  return 0.;
 
   	case 30:
-  	  return dz*dz;
+  	  return dz*dz/distxy;
 
   	case 31:
   	case 32:
@@ -984,7 +1020,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             val *= dy;
           for (unsigned int index=0; index != nz; index++)
             val *= dz;
-          return val;
+          return val/distxy;
   	}
       }
 
@@ -1009,7 +1045,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 6:
-  	  return 2.;
+  	  return 2./dist2y;
 
   	case 7:
   	case 8:
@@ -1022,16 +1058,16 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 12:
-  	  return 2.*dx;
+  	  return 2.*dx/dist2y;
   	case 13:
-  	  return 6.*dy;
+  	  return 6.*dy/dist2y;
 
   	case 14:
   	case 15:
   	  return 0.;
 
   	case 16:
-  	  return 2.*dz;
+  	  return 2.*dz/dist2y;
 
   	case 17:
   	case 18:
@@ -1044,30 +1080,30 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 22:
-  	  return 2.*dx*dx;
+  	  return 2.*dx*dx/dist2y;
 
   	case 23:
-  	  return 6.*dx*dy;
+  	  return 6.*dx*dy/dist2y;
 
   	case 24:
-  	  return 12.*dy*dy;
+  	  return 12.*dy*dy/dist2y;
 
   	case 25:
   	case 26:
   	  return 0.;
 
   	case 27:
-  	  return 2.*dx*dz;
+  	  return 2.*dx*dz/dist2y;
 
   	case 28:
-  	  return 6.*dy*dz;
+  	  return 6.*dy*dz/dist2y;
 
   	case 29:
   	case 30:
   	  return 0.;
 
   	case 31:
-  	  return 2.*dz*dz;
+  	  return 2.*dz*dz/dist2y;
 
   	case 32:
   	case 33:
@@ -1089,7 +1125,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             val *= dy;
           for (unsigned int index=0; index != nz; index++)
             val *= dz;
-          return val;
+          return val/dist2y;
   	}
       }
 
@@ -1115,7 +1151,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 7:
-  	  return 1.;
+  	  return 1./distxz;
 
   	case 8:
   	case 9:
@@ -1129,16 +1165,16 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 14:
-  	  return 2.*dx;
+  	  return 2.*dx/distxz;
 
   	case 15:
-  	  return dy;
+  	  return dy/distxz;
 
   	case 16:
   	  return 0.;
 
   	case 17:
-  	  return 2.*dz;
+  	  return 2.*dz/distxz;
 
   	case 18:
   	case 19:
@@ -1153,28 +1189,28 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 25:
-  	  return 3.*dx*dx;
+  	  return 3.*dx*dx/distxz;
 
   	case 26:
-  	  return 2.*dx*dy;
+  	  return 2.*dx*dy/distxz;
 
   	case 27:
-  	  return dy*dy;
+  	  return dy*dy/distxz;
 
   	case 28:
   	  return 0.;
 
   	case 29:
-  	  return 4.*dx*dz;
+  	  return 4.*dx*dz/distxz;
 
   	case 30:
-  	  return 2.*dy*dz;
+  	  return 2.*dy*dz/distxz;
 
   	case 31:
   	  return 0.;
 
   	case 32:
-  	  return 3.*dz*dz;
+  	  return 3.*dz*dz/distxz;
 
   	case 33:
   	case 34:
@@ -1195,7 +1231,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             val *= dy;
           for (unsigned int index=1; index < nz; index++)
             val *= dz;
-          return val;
+          return val/distxz;
   	}
       }
 
@@ -1221,7 +1257,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 8:
-  	  return 1.;
+  	  return 1./distyz;
 
   	case 9:
   	  return 0.;
@@ -1235,16 +1271,16 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 15:
-  	  return dx;
+  	  return dx/distyz;
 
   	case 16:
-  	  return 2.*dy;
+  	  return 2.*dy/distyz;
 
   	case 17:
   	  return 0.;
 
   	case 18:
-  	  return 2.*dz;
+  	  return 2.*dz/distyz;
 
   	case 19:
   	  return 0.;
@@ -1259,28 +1295,28 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 26:
-  	  return dx*dx;
+  	  return dx*dx/distyz;
 
   	case 27:
-  	  return 2.*dx*dy;
+  	  return 2.*dx*dy/distyz;
 
   	case 28:
-  	  return 3.*dy*dy;
+  	  return 3.*dy*dy/distyz;
 
   	case 29:
   	  return 0.;
 
   	case 30:
-  	  return 2.*dx*dz;
+  	  return 2.*dx*dz/distyz;
 
   	case 31:
-  	  return 4.*dy*dz;
+  	  return 4.*dy*dz/distyz;
 
   	case 32:
   	  return 0.;
 
   	case 33:
-  	  return 3.*dz*dz;
+  	  return 3.*dz*dz/distyz;
 
   	case 34:
   	  return 0.;
@@ -1300,7 +1336,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             val *= dy;
           for (unsigned int index=1; index < nz; index++)
             val *= dz;
-          return val;
+          return val/distyz;
   	}
       }
 
@@ -1328,7 +1364,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 9:
-  	  return 2.;
+  	  return 2./dist2z;
 
   	  // cubic
   	case 10:
@@ -1341,13 +1377,13 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 17:
-  	  return 2.*dx;
+  	  return 2.*dx/dist2z;
 
   	case 18:
-  	  return 2.*dy;
+  	  return 2.*dy/dist2z;
 
   	case 19:
-  	  return 6.*dz;
+  	  return 6.*dz/dist2z;
 
   	  // quartics
   	case 20:
@@ -1362,22 +1398,22 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   	  return 0.;
 
   	case 29:
-  	  return 2.*dx*dx;
+  	  return 2.*dx*dx/dist2z;
 
   	case 30:
-  	  return 2.*dx*dy;
+  	  return 2.*dx*dy/dist2z;
 
   	case 31:
-  	  return 2.*dy*dy;
+  	  return 2.*dy*dy/dist2z;
 
   	case 32:
-  	  return 6.*dx*dz;
+  	  return 6.*dx*dz/dist2z;
 
   	case 33:
-  	  return 6.*dy*dz;
+  	  return 6.*dy*dz/dist2z;
 
   	case 34:
-  	  return 12.*dz*dz;
+  	  return 12.*dz*dz/dist2z;
 
   	default:
           unsigned int o = 0;
@@ -1394,7 +1430,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
             val *= dy;
           for (unsigned int index=2; index < nz; index++)
             val *= dz;
-          return val;
+          return val/dist2z;
   	}
       }
 

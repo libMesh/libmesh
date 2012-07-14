@@ -89,9 +89,21 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
       // time
       this->shapes_on_quadrature = false;
 
+      // Set the element type
+      this->elem_type = elem->type();
+
       // Initialize the face shape functions
       this->init_face_shape_functions (*pts,  side.get());
-
+      if (weights != NULL)
+        {
+          this->compute_face_values (elem, side.get(), *weights);
+        }
+      else
+        {
+          std::vector<Real> dummy_weights (pts->size(), 1.);
+	  // Compute data on the face for integration
+          this->compute_face_values (elem, side.get(), dummy_weights);
+        }
     }
   else
     {
@@ -105,11 +117,12 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
           // Initialize the face shape functions
           this->init_face_shape_functions (this->qrule->get_points(),  side.get());
         }
+      // We can't get away without recomputing shape functions next
+      // time
+      this->shapes_on_quadrature = false;
+      // Compute data on the face for integration
+      this->compute_face_values (elem, side.get(), this->qrule->get_weights());
     }
-
-  // Compute data on the face for integration
-  this->compute_face_values (elem, side.get(),
-    weights ? *weights : this->qrule->get_weights());
 }
 
 
