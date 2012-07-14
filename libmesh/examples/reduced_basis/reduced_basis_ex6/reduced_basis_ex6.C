@@ -16,37 +16,49 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-// <h1>Reduced Basis: Example 6 - Poisson equation on a curved domain in 3D</h1>
+// <h1>Reduced Basis: Example 6 - Heat transfer on a curved domain in 3D</h1>
 
-// In this example we consider the Poisson equation -\Laplacian u = 1 with
-// zero Dirichlet boundary conditions on a domain with parametrized curvature.
-// We consider a reference domain [0,0.2] x [0,0.2] x [0,1], and apply the parametrized
-// transformation:
-//  F_0(x_hat,y_hat,z_hat;mu) = -1/mu + (1/mu+x_hat)*cos(mu*z_hat)
-//  F_1(x_hat,y_hat,z_hat;mu) = y_hat
-//  F_2(x_hat,y_hat,z_hat;mu) = (1/mu+x_hat)*sin(mu*z_hat)
-// to obtain the "physical domain" on which we solve the PDE. Here, x = F(x_hat),
-// and the "hat" denotes reference domain.
+// In this example we consider heat transfer modeled by a Poisson equation with
+// Robin boundary condition:
+//  -kappa \Laplacian u = 1, on \Omega
+//  -kappa du\dn = kappa Bi u, on \partial\Omega_Biot,
+//  u = 0 on \partial\Omega_Dirichlet,
+//
+// We consider a reference domain \Omega_hat = [0,0.4]x[0,0.4]x[0,3], and the
+// physical domain is then obtain via the parametrized mapping:
+//  x = -1/mu + (1/mu+x_hat)*cos(mu*z_hat)
+//  y = y_hat
+//  z = (1/mu+x_hat)*sin(mu*z_hat)
+// for (x_hat,y_hat,z_hat) \in \Omega_hat. (Here "hats" denotes reference domain.)
+// Also, the "reference Dirichlet boundaries" are [0,0.4]x[0,0.4]x{0} and
+// [0,0.4]x[0,0.4]x{3}, and the remaining boundaries are the "Biot" boundaries.
 
-// This geometric mapping yields a "non-affine" parametric PDE, hence (as in
+// Then, after putting the PDE into weak form and mapping it to the reference domain,
+// we obtain:
+//  \kappa \int_\Omega_hat [ (1+mu*x_hat) v_x w_x + v_y w_y + 1/(1+mu*x_hat) v_z w_z ]
+//    + \kappa Bi \int_\partial\Omega_hat_Biot1 u v
+//    + \kappa Bi \int_\partial\Omega_hat_Biot2 (1+mu x_hat) u v
+//    + \kappa Bi \int_\partial\Omega_hat_Biot3 (1+0.4mu) u v
+//    = \int_\Omega_hat (1+mu x_hat) v
+// where
+//  \partial\Omega_hat_Biot1 = [0] x [0,0.4] x [0,3]
+//  \partial\Omega_hat_Biot2 = [0,0.4] x {0} x [0,3] \UNION [0,0.4] x {0.4} x [0,3]
+//  \partial\Omega_hat_Biot3 = [0.4] x [0,0.4] x [0,3]
+
+// The term
+//  \kappa \int_\Omega_hat 1/(1+mu*x_hat) v_z w_z 
+// is "non-affine" (in the Reduced Basis sense), since we can't express it
+// in the form \sum theta_q(kappa,mu) a(v,w). As a result, (as in
 // reduced_basis_ex4) we must employ the Empirical Interpolation Method (EIM)
-// in order to apply the Reduced Basis method.
+// in order to apply the Reduced Basis method here.
 
-// Note that it turns out that det(J_F) = 1 + mu * x_hat, hence the right-hand
-// side functional is given by:
-//  f(v;mu) = \int_\hat\Omega v + mu \int_\hat\Omega \hat x v
-// which is in fact "affine" (in the RB sense). As a result, we only require EIM
-// to construct the approximation of the left-hand side operator.
+// The approach we use is to construct an EIM approximation, G_EIM, to the vector-valued function
+//  G(x_hat,y_hat;mu) = (1 + mu*x_hat, 1, 1/(1+mu*x_hat))
+// and then we express the "volumetric integral part" of the left-hand side operator as
+//  a(v,w;mu) = \int_\hat\Omega G_EIM(x_hat,y_hat;mu) \dot (v_x w_x, v_y w_y, v_z w_z).
+// (We actually only need EIM for the third component of G_EIM, but it's helpful to
+// demonstrate "vector-valued" EIM here.)
 
-// For the left-hand side operator, we have:
-//  a(v,w;mu) = \int_\hat\Omega [ (1+mu*x_hat) v_x w_x + v_y w_y + 1/(1+mu*x_hat) v_z w_z ]
-// which is non-affine due to the 1/(1+mu*x_hat) term. The approach we use is to
-// construct an EIM approximation, G_EIM, to the vector-valued function
-//  G(x_hat,y_hat;mu) = (1 + mu*x_hat, 1/(1+mu*x_hat))
-// and then
-//  a(v,w;mu) = \int_\hat\Omega G_EIM(x_hat,y_hat;mu) \dot (v_x w_x, v_z w_z) + \int_\hat\Omega v_y w_y
-// (We could use EIM to only approximate the second component of G, but we want to demonstrate
-// a "vector-valued EIM" case in this example.)
 
 // C++ include files that we need
 #include <iostream>
@@ -116,9 +128,9 @@ int main (int argc, char** argv)
   Mesh mesh;
   MeshTools::Generation::build_cube (mesh,
                                      n_elem_xy, n_elem_xy, n_elem_z,
-                                     0., 0.2,
-                                     0., 0.2,
-                                     0., 1.,
+                                     0., 0.4,
+                                     0., 0.4,
+                                     0., 3.,
                                      HEX8);
 
   // Create an equation systems object.
@@ -199,8 +211,12 @@ int main (int argc, char** argv)
 
     // Get the parameters at which we will do a reduced basis solve
     Real online_curvature = infile("online_curvature", 0.);
+    Real online_Bi        = infile("online_Bi", 0.);
+    Real online_kappa     = infile("online_kappa", 0.);
     RBParameters online_mu;
     online_mu.set_value("curvature", online_curvature);
+    online_mu.set_value("Bi", online_Bi);
+    online_mu.set_value("kappa", online_kappa);
     rb_eval.set_parameters(online_mu);
     rb_eval.print_parameters();
     rb_eval.rb_solve( rb_eval.get_n_basis_functions() );

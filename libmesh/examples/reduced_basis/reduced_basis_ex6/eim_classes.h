@@ -15,15 +15,25 @@ public:
 
   SimpleEIMEvaluation()
   {
-    attach_parametrized_function(&g_0);
-    attach_parametrized_function(&g_1);
+    attach_parametrized_function(&g_x);
+    attach_parametrized_function(&g_y);
+    attach_parametrized_function(&g_z);
+  }
+  
+  /**
+   * Build a ThetaEIM rather than an RBEIMTheta.
+   */
+  virtual AutoPtr<RBTheta> build_eim_theta(unsigned int index)
+  {
+    return AutoPtr<RBTheta>(new ThetaEIM(*this, index));
   }
 
   /** 
    * Parametrized functions that we approximate with EIM
    */
-  G_0 g_0;
-  G_1 g_1;
+  Gx g_x;
+  Gy g_y;
+  Gz g_z;
 
 };
 
@@ -52,7 +62,7 @@ public:
    */
   virtual AutoPtr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return AutoPtr<ElemAssembly>(new EIM_A(*this, index));
+    return AutoPtr<ElemAssembly>(new AssemblyEIM(*this, index));
   }
   
   /**
@@ -60,8 +70,9 @@ public:
    */
   virtual void init_data()
   {
-    g0_var = this->add_variable ("G_0", FIRST);
-    g1_var = this->add_variable ("G_1", FIRST);
+    Gx_var = this->add_variable ("x_comp_of_G", FIRST);
+    Gy_var = this->add_variable ("y_comp_of_G", FIRST);
+    Gz_var = this->add_variable ("z_comp_of_G", FIRST);
 
     Parent::init_data();
 
@@ -71,8 +82,9 @@ public:
   /**
    * Variable numbers.
    */
-  unsigned int g0_var;
-  unsigned int g1_var;
+  unsigned int Gx_var;
+  unsigned int Gy_var;
+  unsigned int Gz_var;
 
   /**
    * Inner product assembly object
