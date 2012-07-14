@@ -173,11 +173,11 @@ int main (int argc, char** argv)
     // Read data from input file and print state
     rb_construction.process_parameters_file(rb_parameters);
 
-    // attach the EIM theta objects to the RBConstruction and RBEvaluation objects
+    // attach the EIM theta objects to the RBEvaluation
     eim_rb_eval.initialize_eim_theta_objects();
     rb_eval.get_rb_theta_expansion().attach_multiple_A_theta(eim_rb_eval.get_eim_theta_objects());
     
-    // attach the EIM assembly objects to the RBConstruction object
+    // attach the EIM assembly objects to the RBConstruction
     eim_construction.initialize_eim_assembly_objects();
     rb_construction.get_rb_assembly_expansion().attach_multiple_A_assembly(eim_construction.get_eim_assembly_objects());
 
