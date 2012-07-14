@@ -350,7 +350,7 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   
   _parametrized_functions_in_training_set_initialized = true;
   
-  libMesh::out << "Parametrized functions in training set initialize" << std::endl << std::endl;
+  libMesh::out << "Parametrized functions in training set initialized" << std::endl << std::endl;
 }
 
 
