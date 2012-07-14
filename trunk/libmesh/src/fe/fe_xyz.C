@@ -694,7 +694,8 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 	    this->d2phi[i].resize       (n_qp);
 	    this->d2phidx2[i].resize    (n_qp);
 	    this->d2phidxdy[i].resize   (n_qp);
-	    this->d2phidy2[i].resize    (n_qp);
+	    this->d2phidxdz[i].resize   (n_qp);
+            this->d2phidy2[i].resize    (n_qp);
 	    this->d2phidydz[i].resize   (n_qp);
 	    this->d2phidz2[i].resize    (n_qp);
           }
@@ -1034,7 +1035,7 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem)
 
     case 3:
       {
-        if (this->calculate_dphi)
+        if (this->calculate_phi)
 	  for (unsigned int i=0; i<this->phi.size(); i++)
 	    for (unsigned int p=0; p<this->phi[i].size(); p++)
 	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz_qp[p]);
@@ -1165,10 +1166,10 @@ void FEXYZ<Dim>::compute_shape_functions (const Elem* elem)
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
   // Full specialization of shapes_need_reinit() function for every dimension.
-  template <> bool FE<0,XYZ>::shapes_need_reinit() const { return false; }
-  template <> bool FE<1,XYZ>::shapes_need_reinit() const { return false; }
-  template <> bool FE<2,XYZ>::shapes_need_reinit() const { return false; }
-  template <> bool FE<3,XYZ>::shapes_need_reinit() const { return false; }
+  template <> bool FE<0,XYZ>::shapes_need_reinit() const { return true; }
+  template <> bool FE<1,XYZ>::shapes_need_reinit() const { return true; }
+  template <> bool FE<2,XYZ>::shapes_need_reinit() const { return true; }
+  template <> bool FE<3,XYZ>::shapes_need_reinit() const { return true; }
 
 
   // Explicit instantiations for non-static FEXYZ member functions.

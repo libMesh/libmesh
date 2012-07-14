@@ -32,6 +32,7 @@ namespace
 {
   static unsigned int old_elem_id = libMesh::invalid_uint;
   static libMesh::Point centroid;
+  static libMesh::Point max_distance;
 }
 
 
@@ -73,6 +74,13 @@ Real FE<2,XYZ>::shape(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
+      max_distance = Point(0.,0.,0.);
+      for (unsigned int p = 0; p < elem->n_nodes(); p++)
+        for (unsigned int d = 0; d < 2; d++)
+        {
+           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+           max_distance(d) = std::max(distance, max_distance(d));
+        }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -83,8 +91,10 @@ Real FE<2,XYZ>::shape(const Elem* elem,
   const Real y  = p(1);
   const Real xc = centroid(0);
   const Real yc = centroid(1);
-  const Real dx = x - xc;
-  const Real dy = y - yc;
+  const Real distx = max_distance(0);
+  const Real disty = max_distance(1);
+  const Real dx = (x - xc)/distx;
+  const Real dy = (y - yc)/disty;
 
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
@@ -205,6 +215,13 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
+      max_distance = Point(0.,0.,0.);
+      for (unsigned int p = 0; p < elem->n_nodes(); p++)
+        for (unsigned int d = 0; d < 2; d++)
+        {
+           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+           max_distance(d) = std::max(distance, max_distance(d));
+        }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -215,8 +232,10 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
   const Real y  = p(1);
   const Real xc = centroid(0);
   const Real yc = centroid(1);
-  const Real dx = x - xc;
-  const Real dy = y - yc;
+  const Real distx = max_distance(0);
+  const Real disty = max_distance(1);
+  const Real dx = (x - xc)/distx;
+  const Real dy = (y - yc)/disty;
 
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
@@ -240,46 +259,46 @@ switch (j)
 
 	  // linears
 	case 1:
-	  return 1.;
+	  return 1./distx;
 
 	case 2:
 	  return 0.;
 
 	  // quadratics
 	case 3:
-	  return 2.*dx;
+	  return 2.*dx/distx;
 
 	case 4:
-	  return dy;
+	  return dy/distx;
 
 	case 5:
 	  return 0.;
 
 	  // cubics
 	case 6:
-	  return 3.*dx*dx;
+	  return 3.*dx*dx/distx;
 
 	case 7:
-	  return 2.*dx*dy;
+	  return 2.*dx*dy/distx;
 
 	case 8:
-	  return dy*dy;
+	  return dy*dy/distx;
 
 	case 9:
 	  return 0.;
 
 	  // quartics
 	case 10:
-	  return 4.*dx*dx*dx;
+	  return 4.*dx*dx*dx/distx;
 
 	case 11:
-	  return 3.*dx*dx*dy;
+	  return 3.*dx*dx*dy/distx;
 
 	case 12:
-	  return 2.*dx*dy*dy;
+	  return 2.*dx*dy*dy/distx;
 
 	case 13:
-	  return dy*dy*dy;
+	  return dy*dy*dy/distx;
 
 	case 14:
 	  return 0.;
@@ -293,7 +312,7 @@ switch (j)
             val *= dx;
           for (unsigned int index=0; index != i2; index++)
             val *= dy;
-          return val;
+          return val/distx;
 	}
     }
 
@@ -312,46 +331,46 @@ switch (j)
 	  return 0.;
 
 	case 2:
-	  return 1.;
+	  return 1./disty;
 
 	  // quadratics
 	case 3:
 	  return 0.;
 
 	case 4:
-	  return dx;
+	  return dx/disty;
 
 	case 5:
-	  return 2.*dy;
+	  return 2.*dy/disty;
 
 	  // cubics
 	case 6:
 	  return 0.;
 
 	case 7:
-	  return dx*dx;
+	  return dx*dx/disty;
 
 	case 8:
-	  return 2.*dx*dy;
+	  return 2.*dx*dy/disty;
 
 	case 9:
-	  return 3.*dy*dy;
+	  return 3.*dy*dy/disty;
 
 	  // quartics
 	case 10:
 	  return 0.;
 
 	case 11:
-	  return dx*dx*dx;
+	  return dx*dx*dx/disty;
 
 	case 12:
-	  return 2.*dx*dx*dy;
+	  return 2.*dx*dx*dy/disty;
 
 	case 13:
-	  return 3.*dx*dy*dy;
+	  return 3.*dx*dy*dy/disty;
 
 	case 14:
-	  return 4.*dy*dy*dy;
+	  return 4.*dy*dy*dy/disty;
 
         default:
           unsigned int o = 0;
@@ -362,7 +381,7 @@ switch (j)
             val *= dx;
           for (unsigned int index=1; index <= i2; index++)
             val *= dy;
-          return val;
+          return val/disty;
 	}
     }
 
@@ -416,6 +435,13 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
+      max_distance = Point(0.,0.,0.);
+      for (unsigned int p = 0; p < elem->n_nodes(); p++)
+        for (unsigned int d = 0; d < 2; d++)
+        {
+           const Real distance = std::abs(centroid(d) - elem->point(p)(d));
+           max_distance(d) = std::max(distance, max_distance(d));
+        }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -426,8 +452,13 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
   const Real y  = p(1);
   const Real xc = centroid(0);
   const Real yc = centroid(1);
-  const Real dx = x - xc;
-  const Real dy = y - yc;
+  const Real distx = max_distance(0);
+  const Real disty = max_distance(1);
+  const Real dx = (x - xc)/distx;
+  const Real dy = (y - yc)/disty;
+  const Real dist2x = pow(distx,2.);
+  const Real dist2y = pow(disty,2.);
+  const Real distxy = distx * disty;
 
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
@@ -454,7 +485,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 
 	    // quadratics
 	  case 3:
-	    return 2.;
+	    return 2./dist2x;
 
 	  case 4:
 	  case 5:
@@ -462,10 +493,10 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 
 	    // cubics
 	  case 6:
-	    return 6.*dx;
+	    return 6.*dx/dist2x;
 
 	  case 7:
-	    return 2.*dy;
+	    return 2.*dy/dist2x;
 
 	  case 8:
 	  case 9:
@@ -473,13 +504,13 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 
 	    // quartics
 	  case 10:
-	    return 12.*dx*dx;
+	    return 12.*dx*dx/dist2x;
 
 	  case 11:
-	    return 6.*dx*dy;
+	    return 6.*dx*dy/dist2x;
 
 	  case 12:
-	    return 2.*dy*dy;
+	    return 2.*dy*dy/dist2x;
 
 	  case 13:
 	  case 14:
@@ -494,7 +525,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
               val *= dx;
             for (unsigned int index=0; index != i2; index++)
               val *= dy;
-            return val;
+            return val/dist2x;
 	  }
       }
 
@@ -516,7 +547,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 	    return 0.;
 
 	  case 4:
-	    return 1.;
+	    return 1./distxy;
 
 	  case 5:
 	    return 0.;
@@ -525,10 +556,10 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 	  case 6:
 	    return 0.;
 	  case 7:
-	    return 2.*dx;
+	    return 2.*dx/distxy;
 
 	  case 8:
-	    return 2.*dy;
+	    return 2.*dy/distxy;
 
 	  case 9:
 	    return 0.;
@@ -538,13 +569,13 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 	    return 0.;
 
 	  case 11:
-	    return 3.*dx*dx;
+	    return 3.*dx*dx/distxy;
 
 	  case 12:
-	    return 4.*dx*dy;
+	    return 4.*dx*dy/distxy;
 
 	  case 13:
-	    return 3.*dy*dy;
+	    return 3.*dy*dy/distxy;
 
 	  case 14:
 	    return 0.;
@@ -558,7 +589,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
               val *= dx;
             for (unsigned int index=1; index < i2; index++)
               val *= dy;
-            return val;
+            return val/distxy;
 	  }
       }
 
@@ -581,7 +612,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 	    return 0.;
 
 	  case 5:
-	    return 2.;
+	    return 2./dist2y;
 
 	    // cubics
 	  case 6:
@@ -591,10 +622,10 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 	    return 0.;
 
 	  case 8:
-	    return 2.*dx;
+	    return 2.*dx/dist2y;
 
 	  case 9:
-	    return 6.*dy;
+	    return 6.*dy/dist2y;
 
 	    // quartics
 	  case 10:
@@ -602,13 +633,13 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 	    return 0.;
 
 	  case 12:
-	    return 2.*dx*dx;
+	    return 2.*dx*dx/dist2y;
 
 	  case 13:
-	    return 6.*dx*dy;
+	    return 6.*dx*dy/dist2y;
 
 	  case 14:
-	    return 12.*dy*dy;
+	    return 12.*dy*dy/dist2y;
 
           default:
             unsigned int o = 0;
@@ -619,7 +650,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
               val *= dx;
             for (unsigned int index=2; index < i2; index++)
               val *= dy;
-            return val;
+            return val/dist2y;
 	  }
       }
     }
