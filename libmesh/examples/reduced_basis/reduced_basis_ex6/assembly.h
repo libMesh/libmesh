@@ -113,8 +113,7 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
   virtual void boundary_assembly(FEMContext &c)
   {
     short int bc_id = rb_con->get_mesh().boundary_info->boundary_id (c.elem,c.side);
-    if( bc_id == 2 || bc_id == 4 )
-    //if( bc_id == 1 || bc_id == 3 ) MAKE SURE THE BC_IDs ARE CORRECT HERE!
+    if( bc_id == 1 || bc_id == 3 )
     {
       const unsigned int u_var = 0;
 
@@ -156,7 +155,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
   virtual void boundary_assembly(FEMContext &c)
   {
     short int bc_id = rb_con->get_mesh().boundary_info->boundary_id (c.elem,c.side);
-    if( bc_id == 3 ) // MAKE SURE THE BC_IDs ARE CORRECT HERE!
+    if( bc_id == 2 )
     {
       const unsigned int u_var = 0;
 
@@ -173,9 +172,11 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
       unsigned int n_sidepoints = c.side_qrule->n_points();
 
       for (unsigned int qp=0; qp != n_sidepoints; qp++)
+      {        
         for (unsigned int i=0; i != n_u_dofs; i++)
           for (unsigned int j=0; j != n_u_dofs; j++)
             c.elem_jacobian(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+      }
     }
   }
 };
