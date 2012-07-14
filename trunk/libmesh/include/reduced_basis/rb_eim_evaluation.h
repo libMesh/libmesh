@@ -126,6 +126,13 @@ public:
   std::vector<RBTheta*> get_eim_theta_objects();
 
   /**
+   * Build a theta object corresponding to EIM index \p index.
+   * The default implementation builds an RBEIMTheta object, possibly
+   * override in subclasses if we need more specialized behavior.
+   */
+  virtual AutoPtr<RBTheta> build_eim_theta(unsigned int index);
+
+  /**
    * Write out all the data to text files in order to segregate the
    * Offline stage from the Online stage.
    */

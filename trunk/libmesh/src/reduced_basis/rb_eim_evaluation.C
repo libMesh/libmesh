@@ -213,13 +213,18 @@ void RBEIMEvaluation::initialize_eim_theta_objects()
   _rb_eim_theta_objects.clear();
   for(unsigned int i=0; i<get_n_basis_functions(); i++)
   {
-    _rb_eim_theta_objects.push_back(new RBEIMTheta(*this, i));
+    _rb_eim_theta_objects.push_back( build_eim_theta(i).release() );
   }
 }
 
 std::vector<RBTheta*> RBEIMEvaluation::get_eim_theta_objects()
 {
   return _rb_eim_theta_objects;
+}
+
+AutoPtr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
+{
+  return AutoPtr<RBTheta>( new RBEIMTheta(*this, index) );
 }
 
 void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_name,

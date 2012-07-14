@@ -26,6 +26,7 @@
 // C++ includes
 #include <string>
 #include <map>
+#include <set>
 
 namespace libMesh
 {
@@ -71,6 +72,11 @@ public:
    * Get the number of parameters that have been added.
    */
   unsigned int n_parameters() const;
+  
+  /**
+   * Fill \p param_names with the names of the parameters.
+   */
+  void get_parameter_names(std::set<std::string>& param_names) const;
   
   /**
    * Get a constant iterator to beginning of this RBParameters object.

@@ -65,6 +65,7 @@ public:
    * from rb_eim_eval to provide the value of the evaluation.
    */
   unsigned int index;
+
 };
 
 }
