@@ -175,6 +175,7 @@ void RBParametrized::set_parameters(const RBParameters& params)
   }
   else
   {
+    // Make a copy of params (default assignment operator just does memberwise copy, which is sufficient here)
     this->parameters = params;
   }
 }
