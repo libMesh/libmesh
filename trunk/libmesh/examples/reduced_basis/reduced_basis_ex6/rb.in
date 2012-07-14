@@ -3,14 +3,16 @@
 Nmax = 15
 training_tolerance = 0.001
 
-n_parameters = 1
-parameter_names = 'curvature'
+n_parameters = 3
+parameter_names = 'curvature Bi kappa'
 
-curvature = '0.25 3.14159 1.'
+curvature = '0.1 1.0472 0.5'
+Bi = '0.001 0.01 0.005'
+kappa = '0.5 2. 1.'
 
-log_scaling = '0'
+log_scaling = '0 1 1'
 
-deterministic_training = true   # Are the training points generated randomly or deterministically
+deterministic_training = false
 use_relative_bound_in_greedy = true
 
-n_training_samples = 100        # The number of parameters in training set (must be square for the 2-parameter deterministic case)
+n_training_samples = 1000

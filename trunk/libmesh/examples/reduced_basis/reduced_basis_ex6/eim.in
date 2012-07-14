@@ -6,7 +6,7 @@ training_tolerance = 0.001
 n_parameters = 1
 parameter_names = 'curvature'
 
-curvature = '0.25 3.14159 1.'
+curvature = '0.1 1.0472 0.5'
 
 log_scaling = '0'
 

@@ -5,4 +5,7 @@ n_elem_z  = 50
 
 store_basis_functions = true
 online_N = 20
-online_curvature = 3.14159
+
+online_curvature = 1.0472 # pi/3
+online_Bi = 0.005
+online_kappa = 1.3
