@@ -43,7 +43,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out*.gmv
+	@rm -f $(target) lshaped_dg.e
 
 distclean:
 	@$(MAKE) clobber
@@ -51,13 +51,23 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) --element_type MONOMIAL $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) --element_type MONOMIAL $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) --element_type MONOMIAL $(LIBMESH_OPTIONS)
+	@echo "***************************************************************"
+	@echo " "
+	@echo "***************************************************************"
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) --element_type XYZ $(LIBMESH_OPTIONS)
+	@echo "***************************************************************"
+	@echo " "
+	@$(LIBMESH_RUN) $(target) --element_type XYZ $(LIBMESH_OPTIONS)                                                                                                                                                               
+	@echo " "
+	@echo "***************************************************************"
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) --element_type XYZ $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 
 # include the dependency list

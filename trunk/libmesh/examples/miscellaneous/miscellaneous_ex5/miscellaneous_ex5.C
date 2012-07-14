@@ -50,6 +50,7 @@
 #include "error_vector.h"
 #include "kelly_error_estimator.h"
 #include "discontinuity_measure.h"
+#include "string_to_enum.h"
 
 #include "exact_solution.h"
 //#define QORDER TWENTYSIXTH 
@@ -515,7 +516,18 @@ int main (int argc, char** argv)
   LinearImplicitSystem& ellipticdg_system = equation_system.add_system<LinearImplicitSystem> ("EllipticDG");
  
   // Add a variable "u" to "ellipticdg" using the p_order specified in the config file
-  ellipticdg_system.add_variable ("u", p_order, MONOMIAL);
+  if( on_command_line( "element_type" ) )
+    {
+      std::string fe_str = command_line_value( "element_type", "MONOMIAL" );
+      if( fe_str != "MONOMIAL" || fe_str != "XYZ" )
+	{
+	  std::cerr << "Error: This example must be run with MONOMIAL or XYZ element types." << std::endl;
+	  libmesh_error();
+	}
+      ellipticdg_system.add_variable ("u", p_order, Utility::string_to_enum<FEFamily>(fe_str) );
+     } 
+  else
+    ellipticdg_system.add_variable ("u", p_order, MONOMIAL);
   
   // Give the system a pointer to the matrix assembly function 
   ellipticdg_system.attach_assemble_function (assemble_ellipticdg);
