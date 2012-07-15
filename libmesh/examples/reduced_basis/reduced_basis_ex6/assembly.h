@@ -49,10 +49,11 @@ struct Gx : public RBParametrizedFunction
 // The "y component" of the function we're approximating with EIM
 struct Gy : public RBParametrizedFunction
 {
-  virtual Number evaluate(const RBParameters& ,
-                          const Point& )
+  virtual Number evaluate(const RBParameters& mu,
+                          const Point& p)
   {
-    return 1.;
+    Real curvature = mu.get_value("curvature");
+    return 1. + curvature*p(0);
   }
 };
 
