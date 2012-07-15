@@ -35,7 +35,7 @@
 
 // Then, after putting the PDE into weak form and mapping it to the reference domain,
 // we obtain:
-//  \kappa \int_\Omega_hat [ (1+mu*x_hat) v_x w_x + v_y w_y + 1/(1+mu*x_hat) v_z w_z ]
+//  \kappa \int_\Omega_hat [ (1+mu*x_hat) v_x w_x + (1+mu*x_hat) v_y w_y + 1/(1+mu*x_hat) v_z w_z ]
 //    + \kappa Bi \int_\partial\Omega_hat_Biot1 u v
 //    + \kappa Bi \int_\partial\Omega_hat_Biot2 (1+mu x_hat) u v
 //    + \kappa Bi \int_\partial\Omega_hat_Biot3 (1+0.4mu) u v
