@@ -114,7 +114,7 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
   virtual void boundary_assembly(FEMContext &c)
   {
     short int bc_id = rb_con->get_mesh().boundary_info->boundary_id (c.elem,c.side);
-    if( bc_id == 1 || bc_id == 3 ) // y == 0, y == 0.4
+    if( bc_id == 1 || bc_id == 3 ) // y == -0.2, y == 0.2
     {
       const unsigned int u_var = 0;
 
@@ -148,7 +148,7 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
 struct ThetaA2 : RBTheta {
 virtual Number evaluate(const RBParameters& mu)
 {
-  return 0.4*mu.get_value("kappa") * mu.get_value("Bi") * mu.get_value("curvature");
+  return 0.2*mu.get_value("kappa") * mu.get_value("Bi") * mu.get_value("curvature");
 }
 };
 struct AssemblyA2 : ElemAssemblyWithConstruction
@@ -156,7 +156,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
   virtual void boundary_assembly(FEMContext &c)
   {
     short int bc_id = rb_con->get_mesh().boundary_info->boundary_id (c.elem,c.side);
-    if( bc_id == 2 ) // x == 0.4
+    if( bc_id == 2 || bc_id == 4) // x == 0.2, x == -0.2
     {
       const unsigned int u_var = 0;
 
@@ -172,12 +172,26 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
       // Now we will build the affine operator
       unsigned int n_sidepoints = c.side_qrule->n_points();
 
-      for (unsigned int qp=0; qp != n_sidepoints; qp++)
+      if(bc_id==2)
       {
-        for (unsigned int i=0; i != n_u_dofs; i++)
-          for (unsigned int j=0; j != n_u_dofs; j++)
-            c.elem_jacobian(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+        for (unsigned int qp=0; qp != n_sidepoints; qp++)
+        {
+          for (unsigned int i=0; i != n_u_dofs; i++)
+            for (unsigned int j=0; j != n_u_dofs; j++)
+              c.elem_jacobian(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+        }
       }
+      
+      if(bc_id==4)
+      {
+        for (unsigned int qp=0; qp != n_sidepoints; qp++)
+        {
+          for (unsigned int i=0; i != n_u_dofs; i++)
+            for (unsigned int j=0; j != n_u_dofs; j++)
+              c.elem_jacobian(i,j) -= JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+        }
+      }
+
     }
   }
 };
