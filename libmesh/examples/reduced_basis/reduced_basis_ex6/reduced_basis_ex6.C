@@ -24,26 +24,26 @@
 //  -kappa du\dn = kappa Bi u, on \partial\Omega_Biot,
 //  u = 0 on \partial\Omega_Dirichlet,
 //
-// We consider a reference domain \Omega_hat = [0,0.4]x[0,0.4]x[0,3], and the
+// We consider a reference domain \Omega_hat = [-0.2,0.2]x[-0.2,0.2]x[0,3], and the
 // physical domain is then obtain via the parametrized mapping:
 //  x = -1/mu + (1/mu+x_hat)*cos(mu*z_hat)
 //  y = y_hat
 //  z = (1/mu+x_hat)*sin(mu*z_hat)
 // for (x_hat,y_hat,z_hat) \in \Omega_hat. (Here "hats" denotes reference domain.)
-// Also, the "reference Dirichlet boundaries" are [0,0.4]x[0,0.4]x{0} and
-// [0,0.4]x[0,0.4]x{3}, and the remaining boundaries are the "Biot" boundaries.
+// Also, the "reference Dirichlet boundaries" are [-0.2,0.2]x[-0.2,0.2]x{0} and
+// [-0.2,0.2]x[-0.2,0.2]x{3}, and the remaining boundaries are the "Biot" boundaries.
 
 // Then, after putting the PDE into weak form and mapping it to the reference domain,
 // we obtain:
 //  \kappa \int_\Omega_hat [ (1+mu*x_hat) v_x w_x + (1+mu*x_hat) v_y w_y + 1/(1+mu*x_hat) v_z w_z ]
-//    + \kappa Bi \int_\partial\Omega_hat_Biot1 u v
+//    + \kappa Bi \int_\partial\Omega_hat_Biot1 (1-0.2mu) u v
 //    + \kappa Bi \int_\partial\Omega_hat_Biot2 (1+mu x_hat) u v
-//    + \kappa Bi \int_\partial\Omega_hat_Biot3 (1+0.4mu) u v
+//    + \kappa Bi \int_\partial\Omega_hat_Biot3 (1+0.2mu) u v
 //    = \int_\Omega_hat (1+mu x_hat) v
 // where
-//  \partial\Omega_hat_Biot1 = [0] x [0,0.4] x [0,3]
-//  \partial\Omega_hat_Biot2 = [0,0.4] x {0} x [0,3] \UNION [0,0.4] x {0.4} x [0,3]
-//  \partial\Omega_hat_Biot3 = [0.4] x [0,0.4] x [0,3]
+//  \partial\Omega_hat_Biot1 = [-0.2] x [-0.2,0.2] x [0,3]
+//  \partial\Omega_hat_Biot2 = [-0.2,0.2] x {-0.2} x [0,3] \UNION [-0.2,0.2] x {0.2} x [0,3]
+//  \partial\Omega_hat_Biot3 = [0.2] x [-0.2,0.2] x [0,3]
 
 // The term
 //  \kappa \int_\Omega_hat 1/(1+mu*x_hat) v_z w_z 
@@ -53,7 +53,7 @@
 // in order to apply the Reduced Basis method here.
 
 // The approach we use is to construct an EIM approximation, G_EIM, to the vector-valued function
-//  G(x_hat,y_hat;mu) = (1 + mu*x_hat, 1, 1/(1+mu*x_hat))
+//  G(x_hat,y_hat;mu) = (1 + mu*x_hat, 1 + mu*x_hat, 1/(1+mu*x_hat))
 // and then we express the "volumetric integral part" of the left-hand side operator as
 //  a(v,w;mu) = \int_\hat\Omega G_EIM(x_hat,y_hat;mu) \dot (v_x w_x, v_y w_y, v_z w_z).
 // (We actually only need EIM for the third component of G_EIM, but it's helpful to
@@ -128,8 +128,8 @@ int main (int argc, char** argv)
   Mesh mesh;
   MeshTools::Generation::build_cube (mesh,
                                      n_elem_xy, n_elem_xy, n_elem_z,
-                                     0., 0.4,
-                                     0., 0.4,
+                                     -0.2, 0.2,
+                                     -0.2, 0.2,
                                      0., 3.,
                                      HEX8);
 
