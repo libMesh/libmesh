@@ -462,6 +462,8 @@ void TransientRBConstruction::truth_assembly()
 {
   START_LOG("truth_assembly()", "TransientRBConstruction");
 
+  this->matrix->close();
+
   this->matrix->zero();
   this->rhs->zero();
 
@@ -769,8 +771,6 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 //   // NumericVector for computing true L2 error
 //   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
 //   temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
-
-  matrix->close();
 
   // Apply initial condition again.
   initialize_truth();
