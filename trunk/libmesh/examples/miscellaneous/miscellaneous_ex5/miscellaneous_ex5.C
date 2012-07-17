@@ -518,7 +518,8 @@ int main (int argc, char** argv)
   // Add a variable "u" to "ellipticdg" using the p_order specified in the config file
   if( on_command_line( "element_type" ) )
     {
-      std::string fe_str = command_line_value( "element_type", "MONOMIAL" );
+      std::string fe_str = command_line_value( std::string("element_type"),
+					       std::string("MONOMIAL") );
       if( fe_str != "MONOMIAL" || fe_str != "XYZ" )
 	{
 	  std::cerr << "Error: This example must be run with MONOMIAL or XYZ element types." << std::endl;
