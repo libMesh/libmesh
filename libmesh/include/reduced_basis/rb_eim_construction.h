@@ -133,8 +133,8 @@ public:
   /**
    * Evaluate the mesh function at the specified point and for the specified variable.
    */
-  Real evaluate_mesh_function(unsigned int var_number,
-                              Point p);
+  Number evaluate_mesh_function(unsigned int var_number,
+                                Point p);
 
   /**
    * Build a vector of ElemAssembly objects that accesses the basis
