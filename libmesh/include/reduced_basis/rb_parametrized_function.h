@@ -20,9 +20,17 @@
 #ifndef __rb_parametrized_function_h__
 #define __rb_parametrized_function_h__
 
+
+
+#include "libmesh_common.h"
+
+
 namespace libMesh
 {
 
+  class RBParameters;
+  class Point;
+  
 /**
  * A simple functor class that provides a RBParameter-dependent function.
  */
