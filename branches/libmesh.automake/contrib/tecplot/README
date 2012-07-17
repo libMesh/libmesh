@@ -1,3 +1,20 @@
+**********************************************************************
+As of r????, http://download.tecplot.com/tecio/2009, the source files
+distributed by Tecplot(R) are bundled and build directly into libMesh
+
+--benkirk, Tue Jul 17 08:36:32 CDT 2012
+*********************************************************************
+
+
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~ The following notes refer to the headers and binary files ~~~~~~~
+~~~~~~~~~~~~~~~~~~~ distributed in ./include and ./lib ~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 These libraries are copyright AMTEC Engineering.
 http://www.amtec.com
 
