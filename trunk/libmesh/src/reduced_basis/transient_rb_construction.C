@@ -770,6 +770,8 @@ Real TransientRBConstruction::truth_solve(int write_interval)
 //   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
 //   temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
+  matrix->close();
+
   // Apply initial condition again.
   initialize_truth();
   set_time_step(0);
