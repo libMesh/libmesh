@@ -23,6 +23,7 @@
 // rbOOmit includes
 #include "rb_construction.h"
 #include "rb_assembly_expansion.h"
+#include "rb_eim_assembly.h"
 
 // libMesh includes
 #include "mesh_function.h"
@@ -76,6 +77,11 @@ public:
   typedef RBConstruction Parent;
 
   /**
+   * Clear this object.
+   */
+  virtual void clear();
+
+  /**
    * Read parameters in from file and set up this system
    * accordingly.
    */
@@ -91,6 +97,12 @@ public:
    * the Construction stage of the RB method.
    */
   virtual void initialize_rb_construction();
+
+  /**
+   * Override train_reduced_basis to first initialize _parametrized_functions_in_training_set.
+   */
+  virtual Real train_reduced_basis(const std::string& directory_name = "offline_data",
+                                   const bool resize_rb_eval_data=true);
 
   /**
    * Load the truth representation of the parametrized function
@@ -119,26 +131,31 @@ public:
   virtual void init_context(FEMContext &c);
 
   /**
-   * @return the value of the parametrized function that is
-   * being approximated.
+   * Evaluate the mesh function at the specified point and for the specified variable.
    */
-  Number evaluate_parametrized_function(unsigned int index, const Point& p);
+  Number evaluate_mesh_function(unsigned int var_number,
+                                Point p);
 
   /**
-   * @return the number of affine terms defined by the current EIM
-   * approximation. Each function is typically used in an associated
-   * reduced basis approximation.
+   * Build a vector of ElemAssembly objects that accesses the basis
+   * functions stored in this RBEIMConstruction object. This is useful
+   * for performing the Offline stage of the Reduced Basis method where
+   * we want to use assembly functions based on this EIM approximation.
    */
-  virtual unsigned int get_n_affine_functions();
-
+  void initialize_eim_assembly_objects();
+  
   /**
-   * Evaluate the basis function \p index at the points \p qpoints
-   * on element \p element.
-   * @return a vector of values corresponding to qpoints.
+   * @return the vector of assembly objects that point to this RBEIMConstruction.
    */
-  std::vector<Number> evaluate_basis_function(unsigned int index,
-                                              const Elem& element,
-                                              const std::vector<Point>& qpoints);
+  std::vector<ElemAssembly*> get_eim_assembly_objects();
+  
+  /**
+   * Build an element assembly object that will access basis function
+   * \p bf_index.
+   * This is pure virtual, override in subclasses to specify the appropriate
+   * ElemAssembly object.
+   */
+  virtual AutoPtr<ElemAssembly> build_eim_assembly(unsigned int bf_index) = 0;
 
   //----------- PUBLIC DATA MEMBERS -----------//
 
@@ -178,28 +195,38 @@ protected:
    * Overload to return the best fit error. This function is used in
    * the Greedy algorithm to select the next parameter.
    */
-  virtual Real get_RB_error_bound() { return compute_best_fit_error(); }
+  virtual Real get_RB_error_bound();
 
   /**
    * Function that indicates when to terminate the Greedy
    * basis training. Overload in subclasses to specialize.
    */
   virtual bool greedy_termination_test(Real training_greedy_error, int count);
-
+  
   /**
-   * Helper function to load a GHOSTED version of the basis function specified
-   * by \p basis_function_index_in into the vector current_ghosted_bf so that
-   * we can efficiently interpolate this basis function.
-   * If basis_function_index_in == current_bf_index, then this function does nothing.
+   * Loop over the training set and compute the parametrized function for each
+   * training index.
    */
-  void set_current_basis_function(unsigned int basis_function_index_in);
+  void initialize_parametrized_functions_in_training_set();
+  
+  /**
+   * Boolean flag to indicate whether or not we have called
+   * compute_parametrized_functions_in_training_set() yet.
+   */
+  bool _parametrized_functions_in_training_set_initialized;
+  
+  /**
+   * The libMesh vectors storing the finite element coefficients
+   * of the RB basis functions.
+   */
+  std::vector< NumericVector<Number>* > _parametrized_functions_in_training_set;
 
 private:
 
   /**
    * A mesh function to interpolate on the mesh.
    */
-  MeshFunction* mesh_function;
+  MeshFunction* _mesh_function;
 
   /**
    * This flag allows us to perform one extra Greedy step
@@ -207,38 +234,26 @@ private:
    * a posteriori error bound in the case that we use
    * all of our basis functions.
    */
-  bool performing_extra_greedy_step;
-
-  /**
-   * The current basis function that we sample to evaluate the
-   * empirical interpolation approximation. This will be a GHOSTED
-   * vector to facilitate interpolation in the case of multiple processors.
-   */
-  AutoPtr< NumericVector<Number> > current_ghosted_bf;
-
-  /**
-   * We also need to store a basis function index to identify which basis function
-   * is currently stored in current_ghosted_bf. This allows us to cache the basis
-   * function and avoid unnecessarily reloading it all the time.
-   */
-  unsigned int current_bf_index;
+  bool _performing_extra_greedy_step;
 
   /**
    * We also need an extra vector in which we can store a serialized
    * copy of the solution vector so that we can use MeshFunction
    * in parallel.
    */
-  AutoPtr< NumericVector<Number> > serialized_vector;
+  AutoPtr< NumericVector<Number> > _serialized_vector;
 
   /**
-   * We initialize RBEIMConstruction so that it has an "empty" RBThetaExpansion.
+   * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion,
+   * because this isn't used at all in the EIM.
    */
-  RBThetaExpansion empty_rb_theta_expansion;
-
+  RBAssemblyExpansion _empty_rb_assembly_expansion;
+  
   /**
-   * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion.
+   * The vector of assembly objects that are created to point to
+   * this RBEIMConstruction.
    */
-  RBAssemblyExpansion empty_rb_assembly_expansion;
+  std::vector<ElemAssembly*> _rb_eim_assembly_objects;
 
 };
 

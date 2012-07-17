@@ -5,7 +5,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 [
   AC_ARG_ENABLE(tecplot,
                 AC_HELP_STRING([--enable-tecplot],
-                               [build with Tecplot binary file I/O support]),
+                               [build with Tecplot binary file I/O support (using distributed libraries)]),
 		[case "${enableval}" in
 		  yes)  enabletecplot=yes ;;
 		   no)  enabletecplot=no ;;
@@ -13,7 +13,12 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 		 esac],
 		 [enabletecplot=$enableoptional])
 
-
+  # Can't support both vendor-provided libraries and building from source, and we prefer the latter
+  if (test $enabletecplot = yes -a $enabletecio = yes); then
+     AC_MSG_RESULT([>>> Not using vendor provided tecio libraries, deferring to source build <<<])
+     enabletecplot=no
+  fi
+		 
 
   # The Tecplot API is distributed with libmesh, but we want to support external installations
   # on platforms we may not have the binaries for...
@@ -65,7 +70,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
                      AC_SUBST(TECPLOT_LIBRARY)
                      AC_SUBST(TECPLOT_INCLUDE)
                      AC_DEFINE(HAVE_TECPLOT_API, 1,
-                               [Flag indicating whether the library shall be compiled to use the Tecplot interface])
+                               [Flag indicating whether the library will be compiled with Tecplot TecIO API support])
                      AC_MSG_RESULT(<<< Configuring library with Tecplot API support >>>)
 		     libmesh_contrib_INCLUDES="$TECPLOT_INCLUDE $libmesh_contrib_INCLUDES"
                   ],

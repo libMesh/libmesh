@@ -6,7 +6,6 @@ LIBMESH_DIR ?= ../../..
 # link with the library.
 include $(LIBMESH_DIR)/Make.common
 
-
 ###############################################################################
 # File management.  This is where the source, header, and object files are
 # defined
@@ -27,14 +26,16 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target  := ./miscellaneous_ex5-$(METHOD)
+target 	   :=  ./reduced_basis_ex6-$(METHOD)
+
 
 all:: $(target)
 
 # Production rules:  how to make the target - depends on library configuration
-$(target): $(objects)
-	@echo "Linking "$(target)"..."
+%-$(METHOD): $(objects)
+	@echo "Linking "$@"..."
 	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(objects) -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS)
+
 
 
 # Useful rules.
@@ -43,7 +44,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) lshaped_dg.e
+	@rm -f $(target) out*.gmv
 
 distclean:
 	@$(MAKE) clobber
@@ -51,24 +52,16 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESH_RUN) $(target) --element_type MONOMIAL $(LIBMESH_OPTIONS)
+	@echo "* Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) --element_type MONOMIAL $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) -online_mode 0 $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) -online_mode 1 $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) --element_type MONOMIAL $(LIBMESH_OPTIONS)
+	@echo "* Done Running " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESH_RUN) $(target) --element_type XYZ $(LIBMESH_OPTIONS)
-	@echo "***************************************************************"
-	@echo " "
-	@$(LIBMESH_RUN) $(target) --element_type XYZ $(LIBMESH_OPTIONS)                                                                                                                                                               
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) --element_type XYZ $(LIBMESH_OPTIONS)
-	@echo "***************************************************************"
+
 
 # include the dependency list
 include .depend
@@ -79,5 +72,6 @@ include .depend
 #
 .depend: $(srcfiles) $(LIBMESH_DIR)/include/*/*.h
 	@$(perl) $(LIBMESH_DIR)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(wildcard $(LIBMESH_DIR)/include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
+	@echo "Updated .depend"
 
 ###############################################################################

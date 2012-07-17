@@ -380,6 +380,7 @@ libmesh_la_SOURCES = \
 		src/reduced_basis/rb_assembly_expansion.C \
 		src/reduced_basis/rb_construction.C \
 		src/reduced_basis/rb_construction_base.C \
+		src/reduced_basis/rb_eim_assembly.C \
 		src/reduced_basis/rb_eim_construction.C \
 		src/reduced_basis/rb_eim_evaluation.C \
 		src/reduced_basis/rb_eim_theta.C \
@@ -513,6 +514,11 @@ endif
 if LIBMESH_ENABLE_NEMESIS
   SUBDIRS += contrib/nemesis/Lib
   libmesh_la_LIBADD += contrib/nemesis/Lib/libnemesis.la
+endif
+
+if LIBMESH_ENABLE_TECIO
+  SUBDIRS += contrib/tecplot/tecio
+  libmesh_la_LIBADD += contrib/tecplot/tecio/libtecio.la
 endif
 
 if LIBMESH_ENABLE_TECPLOT

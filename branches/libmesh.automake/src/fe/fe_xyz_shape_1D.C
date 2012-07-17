@@ -32,6 +32,7 @@ namespace
 {
   static unsigned int old_elem_id = libMesh::invalid_uint;
   static libMesh::Point centroid;
+  static Real max_distance;
 }
 
 
@@ -72,6 +73,12 @@ Real FE<1,XYZ>::shape(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
+      max_distance = 0.;
+      for (unsigned int p = 0; p < elem->n_nodes(); p++)
+      {
+        const Real distance = std::abs(centroid(0) - elem->point(p)(0));
+        max_distance = std::max(distance, max_distance);
+      }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -80,7 +87,7 @@ Real FE<1,XYZ>::shape(const Elem* elem,
 
   const Real x  = p(0);
   const Real xc = centroid(0);
-  const Real dx = x - xc;
+  const Real dx = (x - xc)/max_distance;
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -153,6 +160,12 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
+      max_distance = 0.;
+      for (unsigned int p = 0; p < elem->n_nodes(); p++)
+      {
+        const Real distance = std::abs(centroid(0) - elem->point(p)(0));
+        max_distance = std::max(distance, max_distance);
+      }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -161,7 +174,7 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
 
   const Real x  = p(0);
   const Real xc = centroid(0);
-  const Real dx = x - xc;
+  const Real dx = (x - xc)/max_distance;
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -173,19 +186,19 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
       return 1.;
 
     case 2:
-      return 2.*dx;
+      return 2.*dx/max_distance;
 
     case 3:
-      return 3.*dx*dx;
+      return 3.*dx*dx/max_distance;
 
     case 4:
-      return 4.*dx*dx*dx;
+      return 4.*dx*dx*dx/max_distance;
 
     default:
       Real val = i;
       for (unsigned int index = 1; index != i; ++index)
         val *= dx;
-      return val;
+      return val/max_distance;
     }
 
   libmesh_error();
@@ -233,6 +246,12 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
     {
       centroid = elem->centroid();
       old_elem_id = elem->id();
+      max_distance = 0.;
+      for (unsigned int p = 0; p < elem->n_nodes(); p++)
+      {
+        const Real distance = std::abs(centroid(0) - elem->point(p)(0));
+        max_distance = std::max(distance, max_distance);
+      }
     }
 
   // Using static globals for old_elem_id, etc. will fail
@@ -241,7 +260,8 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
 
   const Real x  = p(0);
   const Real xc = centroid(0);
-  const Real dx = x - xc;
+  const Real dx = (x - xc)/max_distance;
+  const Real dist2 = pow(max_distance,2.);
 
   // monomials. since they are hierarchic we only need one case block.
   switch (i)
@@ -251,19 +271,19 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
       return 0.;
 
     case 2:
-      return 2.;
+      return 2./dist2;
 
     case 3:
-      return 6.*dx;
+      return 6.*dx/dist2;
 
     case 4:
-      return 12.*dx*dx;
+      return 12.*dx*dx/dist2;
 
     default:
       Real val = 2.;
       for (unsigned int index = 2; index != i; ++index)
         val *= (index+1) * dx;
-      return val;
+      return val/dist2;
     }
 
   libmesh_error();

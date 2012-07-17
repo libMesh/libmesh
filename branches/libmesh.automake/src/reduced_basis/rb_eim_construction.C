@@ -50,9 +50,9 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
 		                      const unsigned int number)
   : Parent(es, name, number),
     best_fit_type_flag(PROJECTION_BEST_FIT),
-    mesh_function(NULL),
-    performing_extra_greedy_step(false),
-    current_bf_index(0)
+    _parametrized_functions_in_training_set_initialized(false),
+    _mesh_function(NULL),
+    _performing_extra_greedy_step(false)
 {
   // We cannot do rb_solve with an empty
   // "rb space" with EIM
@@ -68,13 +68,40 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems& es,
   serial_training_set = true;
 
   // attach empty RBAssemblyExpansion object
-  set_rb_assembly_expansion(empty_rb_assembly_expansion);
+  set_rb_assembly_expansion(_empty_rb_assembly_expansion);
 }
 
 RBEIMConstruction::~RBEIMConstruction ()
 {
-  delete mesh_function;
-  mesh_function = NULL;
+  this->clear();
+}
+
+void RBEIMConstruction::clear()
+{
+  Parent::clear();
+  
+  // clear the mesh function
+  delete _mesh_function;
+  _mesh_function = NULL;
+
+  // clear the eim assembly vector
+  for(unsigned int i=0; i<_rb_eim_assembly_objects.size(); i++)
+  {
+    delete _rb_eim_assembly_objects[i];
+  }
+  _rb_eim_assembly_objects.clear();
+
+  // clear the parametrized functions from the training set
+  for(unsigned int i=0; i<_parametrized_functions_in_training_set.size(); i++)
+  {
+    if (_parametrized_functions_in_training_set[i])
+    {
+      _parametrized_functions_in_training_set[i]->clear();
+      delete _parametrized_functions_in_training_set[i];
+      _parametrized_functions_in_training_set[i] = NULL;
+    }
+  }
+  _parametrized_functions_in_training_set_initialized = false;
 }
 
 void RBEIMConstruction::process_parameters_file (const std::string& parameters_filename)
@@ -124,25 +151,15 @@ void RBEIMConstruction::initialize_rb_construction()
   Parent::initialize_rb_construction();
 
   // initialize a serial vector that we will use for MeshFunction evaluations
-  serialized_vector = NumericVector<Number>::build();
-  serialized_vector->init (this->n_dofs(), false, SERIAL);
+  _serialized_vector = NumericVector<Number>::build();
+  _serialized_vector->init (this->n_dofs(), false, SERIAL);
 
   // Initialize the MeshFunction for interpolating the
   // solution vector at quadrature points
   std::vector<unsigned int> vars(n_vars());
   Utility::iota(vars.begin(), vars.end(), 0); // By default use all variables
-  mesh_function = new MeshFunction(get_equation_systems(), *serialized_vector, get_dof_map(), vars);
-  mesh_function->init();
-
-  // initialize the vector that stores the _current_ basis function,
-  // i.e. the vector that is used in evaluate_basis_function
-  current_ghosted_bf = NumericVector<Number>::build();
-#ifdef LIBMESH_ENABLE_GHOSTED
-  current_ghosted_bf->init (this->n_dofs(), this->n_local_dofs(),
-                            get_dof_map().get_send_list(), false, GHOSTED);
-#else
-  current_ghosted_bf->init (this->n_dofs(), false, SERIAL);
-#endif
+  _mesh_function = new MeshFunction(get_equation_systems(), *_serialized_vector, get_dof_map(), vars);
+  _mesh_function->init();
 
   // Load up the inner product matrix
   // We only need one matrix in this class, so we
@@ -160,103 +177,51 @@ void RBEIMConstruction::initialize_rb_construction()
 
 }
 
-Number RBEIMConstruction::evaluate_parametrized_function(unsigned int index, const Point& p)
+Real RBEIMConstruction::train_reduced_basis(const std::string& directory_name,
+                                            const bool resize_rb_eval_data)
 {
-  RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
-  eim_eval.set_parameters( get_parameters() );
+  // precompute all the parametrized functions that we'll use in the greedy
+  initialize_parametrized_functions_in_training_set();
   
-  if(index >= eim_eval.get_n_parametrized_functions())
-  {
-    libMesh::err << "Error: We must have index < get_n_parametrized_functions() in evaluate_parametrized_function."
-                 << std::endl;
-    libmesh_error();
-  }
-
-  return eim_eval.evaluate_parametrized_function(index, p);
+  return Parent::train_reduced_basis(directory_name, resize_rb_eval_data);
 }
 
-unsigned int RBEIMConstruction::get_n_affine_functions()
+Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
+                                                 Point p)
 {
-  return n_vars() * get_rb_evaluation().get_n_basis_functions();
+  DenseVector<Number> values;
+  (*_mesh_function)(p,
+                    /*time*/ 0.,
+                    values);
+  return values(var_number);
 }
 
-std::vector<Number> RBEIMConstruction::evaluate_basis_function(unsigned int bf_index,
-                                                               const Elem& element,
-                                                               const std::vector<Point>& qpoints)
+void RBEIMConstruction::initialize_eim_assembly_objects()
 {
-  START_LOG("evaluate_current_basis_function()", "RBEIMConstruction");
-
-  // Load up basis function bf_index (does nothing if bf_index is already loaded)
-  set_current_basis_function(bf_index);
-
-  // Get local coordinates to feed these into compute_data().
-  // Note that the fe_type can safely be used from the 0-variable,
-  // since the inverse mapping is the same for all FEFamilies
-  std::vector<Point> mapped_qpoints;
-  FEInterface::inverse_map (get_mesh().mesh_dimension(),
-   		            get_dof_map().variable_type(0),
-                            &element,
-                            qpoints,
-                            mapped_qpoints);
-
-  const unsigned int current_variable_number = current_bf_index % n_vars();
-  const FEType& fe_type = get_dof_map().variable_type(current_variable_number);
-
-  std::vector<unsigned int> dof_indices_var;
-  get_dof_map().dof_indices (&element, dof_indices_var, current_variable_number);
-
-  std::vector<Number> values(dof_indices_var.size());
-
-  for(unsigned int qp=0; qp<mapped_qpoints.size(); qp++)
+  _rb_eim_assembly_objects.clear();
+  for(unsigned int i=0; i<get_rb_evaluation().get_n_basis_functions(); i++)
   {
-    FEComputeData data (get_equation_systems(), mapped_qpoints[qp]);
-    FEInterface::compute_data (get_mesh().mesh_dimension(), fe_type, &element, data);
-
-    values[qp] = 0.;
-    for (unsigned int i=0; i<dof_indices_var.size(); i++)
-      values[qp] += (*current_ghosted_bf)(dof_indices_var[i]) * data.shape[i];
+    _rb_eim_assembly_objects.push_back( build_eim_assembly(i).release() );
   }
-
-  STOP_LOG("evaluate_current_basis_function()", "RBEIMConstruction");
-
-  return values;
 }
 
-void RBEIMConstruction::set_current_basis_function(unsigned int basis_function_index_in)
+std::vector<ElemAssembly*> RBEIMConstruction::get_eim_assembly_objects()
 {
-  START_LOG("set_current_basis_function()", "RBEIMConstruction");
-
-  if(basis_function_index_in > get_n_affine_functions())
-  {
-    libMesh::out << "Error: index cannot be larger than the number of affine functions in evaluate_affine_function"
-                 << std::endl;
-    libmesh_error();
-  }
-
-  if(basis_function_index_in != current_bf_index)
-  {
-    // Set member variable current_bf_index
-    current_bf_index = basis_function_index_in;
-
-    // First determine the basis function index implied by function_index
-    unsigned int basis_function_id = current_bf_index/n_vars();
-
-    // and create a ghosted version of the appropriate basis function
-    get_rb_evaluation().get_basis_function(basis_function_id).localize
-      (*current_ghosted_bf, this->get_dof_map().get_send_list());
-  }
-
-  STOP_LOG("set_current_basis_function()", "RBEIMConstruction");
+  return _rb_eim_assembly_objects;
 }
 
 void RBEIMConstruction::enrich_RB_space()
 {
   START_LOG("enrich_RB_space()", "RBEIMConstruction");
 
+  // put solution in _serialized_vector so we can access it from the mesh function
+  // this allows us to compute EIM_rhs appropriately
+  solution->localize(*_serialized_vector);
+
   RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
 
   // If we have at least one basis function we need to use
-  // rb_solve, otherwise just use new_bf as is
+  // rb_solve to find the EIM interpolation error, otherwise just use solution as is
   if(get_rb_evaluation().get_n_basis_functions() > 0)
   {
     // get the right-hand side vector for the EIM approximation
@@ -266,7 +231,8 @@ void RBEIMConstruction::enrich_RB_space()
     DenseVector<Number> EIM_rhs(RB_size);
     for(unsigned int i=0; i<RB_size; i++)
     {
-      EIM_rhs(i) = (*mesh_function)(eim_eval.interpolation_points[i]);
+      EIM_rhs(i) = evaluate_mesh_function( eim_eval.interpolation_points_var[i],
+                                           eim_eval.interpolation_points[i] );
     }
 
     eim_eval.set_parameters( get_parameters() );
@@ -340,7 +306,7 @@ void RBEIMConstruction::enrich_RB_space()
   solution->scale(1./optimal_value);
 
   // Store optimal point in interpolation_points
-  if(!performing_extra_greedy_step)
+  if(!_performing_extra_greedy_step)
   {
     eim_eval.interpolation_points.push_back(optimal_point);
     eim_eval.interpolation_points_var.push_back(optimal_var);
@@ -359,17 +325,47 @@ void RBEIMConstruction::enrich_RB_space()
   STOP_LOG("enrich_RB_space()", "RBEIMConstruction");
 }
 
+void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
+{
+  if(!serial_training_set)
+  {
+    libMesh::err << "Error: We must have serial_training_set==true in "
+                 << "RBEIMConstruction::initialize_parametrized_functions_in_training_set"
+                 << std::endl;
+    libmesh_error();
+  }
+
+  libMesh::out << "Initializing parametrized functions in training set..." << std::endl;
+  // initialize rb_eval's parameters
+  get_rb_evaluation().initialize_parameters(*this);
+
+  _parametrized_functions_in_training_set.resize( get_n_training_samples() );
+  for(unsigned int i=0; i<get_n_training_samples(); i++)
+  {
+    set_params_from_training_set(i);
+    truth_solve(-1);
+    
+    _parametrized_functions_in_training_set[i] = solution->clone().release();
+  }
+  
+  _parametrized_functions_in_training_set_initialized = true;
+  
+  libMesh::out << "Parametrized functions in training set initialized" << std::endl << std::endl;
+}
+
+
 Real RBEIMConstruction::compute_best_fit_error()
 {
   START_LOG("compute_best_fit_error()", "RBEIMConstruction");
 
   const unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
-
-  // load the parametrized function into the solution vector
+  
+  // load up the parametrized function for the current parameters
   truth_solve(-1);
 
   switch(best_fit_type_flag)
   {
+    // Perform an L2 projection in order to find an approximation to solution (from truth_solve above)
     case(PROJECTION_BEST_FIT):
     {
       // compute the rhs by performing inner products
@@ -395,9 +391,11 @@ Real RBEIMConstruction::compute_best_fit_error()
       RB_inner_product_matrix_N.lu_solve(best_fit_rhs, get_rb_evaluation().RB_solution);
       break;
     }
+    // Perform EIM solve in order to find the approximation to solution
+    // (rb_solve provides the EIM basis function coefficients used below)
     case(EIM_BEST_FIT):
     {
-      // Turn off error estimation here, we use the linfty norm instead
+      // Turn off error estimation for this rb_solve, we use the linfty norm instead
       get_rb_evaluation().evaluate_RB_error_bound = false;
       get_rb_evaluation().set_parameters( get_parameters() );
       get_rb_evaluation().rb_solve(RB_size);
@@ -439,75 +437,102 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
 //    assemble_inner_product_matrix(matrix);
 //  }
 
-  // Compute truth representation via projection
-  const MeshBase& mesh = this->get_mesh();
-
-  AutoPtr<FEMContext> c = this->build_context();
-  FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
-
-  this->init_context(context);
-
-  rhs->zero();
-
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-
-  for ( ; el != end_el; ++el)
+  int training_parameters_found_index = -1;
+  if( _parametrized_functions_in_training_set_initialized )
   {
-    context.pre_fe_reinit(*this, *el);
-    context.elem_fe_reinit();
-
-    for(unsigned int var=0; var<n_vars(); var++)
+    // Check if parameters are in the training set. If so, we can just load the
+    // solution from _parametrized_functions_in_training_set
+    
+    for(unsigned int i=0; i<get_n_training_samples(); i++)
     {
-      const std::vector<Real> &JxW =
-        context.element_fe_var[var]->get_JxW();
+      if(get_parameters() == get_params_from_training_set(i))
+      {
+        training_parameters_found_index = i;
+        break;
+      }
+    }
+  }
+  
+  // If the parameters are in the training set, just copy the solution vector
+  if(training_parameters_found_index >= 0)
+  {
+    *solution = *_parametrized_functions_in_training_set[training_parameters_found_index];
+    update(); // put the solution into current_local_solution as well
+  }
+  // Otherwise, we have to compute the projection
+  else
+  {
+    RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
+    eim_eval.set_parameters( get_parameters() );
+    
+    // Compute truth representation via projection
+    const MeshBase& mesh = this->get_mesh();
 
-      const std::vector<std::vector<Real> >& phi =
-        context.element_fe_var[var]->get_phi();
+    AutoPtr<FEMContext> c = this->build_context();
+    FEMContext &context  = libmesh_cast_ref<FEMContext&>(*c);
 
-      const std::vector<Point> &xyz =
-        context.element_fe_var[var]->get_xyz();
+    this->init_context(context);
 
-      unsigned int n_qpoints = context.element_qrule->n_points();
-      unsigned int n_var_dofs = context.dof_indices_var[var].size();
+    rhs->zero();
 
-      DenseSubVector<Number>& subresidual_var = *context.elem_subresiduals[var];
+    MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+    const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
-      for(unsigned int qp=0; qp<n_qpoints; qp++)
-        for(unsigned int i=0; i != n_var_dofs; i++)
-          subresidual_var(i) += JxW[qp] * evaluate_parametrized_function(var, xyz[qp]) * phi[i][qp];
+    for ( ; el != end_el; ++el)
+    {
+      context.pre_fe_reinit(*this, *el);
+      context.elem_fe_reinit();
+
+      for(unsigned int var=0; var<n_vars(); var++)
+      {
+        const std::vector<Real> &JxW =
+          context.element_fe_var[var]->get_JxW();
+
+        const std::vector<std::vector<Real> >& phi =
+          context.element_fe_var[var]->get_phi();
+
+        const std::vector<Point> &xyz =
+          context.element_fe_var[var]->get_xyz();
+
+        unsigned int n_qpoints = context.element_qrule->n_points();
+        unsigned int n_var_dofs = context.dof_indices_var[var].size();
+
+        DenseSubVector<Number>& subresidual_var = *context.elem_subresiduals[var];
+
+        for(unsigned int qp=0; qp<n_qpoints; qp++)
+          for(unsigned int i=0; i != n_var_dofs; i++)
+            subresidual_var(i) += JxW[qp] * eim_eval.evaluate_parametrized_function(var, xyz[qp]) * phi[i][qp];
+      }
+
+      // Apply constraints, e.g. periodic constraints
+      this->get_dof_map().constrain_element_vector(context.elem_residual, context.dof_indices);
+
+      // Add element vector to global vector
+      rhs->add_vector(context.elem_residual, context.dof_indices);
     }
 
-    // Apply constraints, e.g. periodic constraints
-    this->get_dof_map().constrain_element_vector(context.elem_residual, context.dof_indices);
+    // Solve to find the best fit, then solution stores the truth representation
+    // of the function to be approximated
+    solve();
+    
+    // Make sure we didn't max out the number of iterations
+    if( (this->n_linear_iterations() >=
+         this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
+        (this->final_linear_residual() >
+         this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
+    {
+        libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
+                     << this->final_linear_residual() << ", number of iterations = "
+                     << this->n_linear_iterations() << std::endl << std::endl;
+  //     libmesh_error();
+    }
 
-    // Add element vector to global vector
-    rhs->add_vector(context.elem_residual, context.dof_indices);
-  }
-
-  // Solve to find the best fit, then solution stores the truth representation
-  // of the function to be approximated
-  solve();
-  update(); // put the solution into current_local_solution as well in case we want to plot it
-  solution->localize(*serialized_vector);
-
-  if(reuse_preconditioner)
-  {
-    // After we've done a solve we can now reuse the preconditioner
-    // because the matrix is not changing
-    linear_solver->reuse_preconditioner(true);
-  }
-
-  // Make sure we didn't max out the number of iterations
-  if( (this->n_linear_iterations() >=
-       this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
-      (this->final_linear_residual() >
-       this->get_equation_systems().parameters.get<Real>("linear solver tolerance")) )
-  {
-      libMesh::out << "Warning: Linear solver may not have converged! Final linear residual = "
-                   << this->final_linear_residual() << ", number of iterations = "
-                   << this->n_linear_iterations() << std::endl << std::endl;
-//     libmesh_error();
+    if(reuse_preconditioner)
+    {
+      // After we've done a solve we can now reuse the preconditioner
+      // because the matrix is not changing
+      linear_solver->reuse_preconditioner(true);
+    }
   }
 
   if(plot_solution > 0)
@@ -550,21 +575,28 @@ void RBEIMConstruction::update_RB_system_matrices()
   {
     // Sample the basis functions at the
     // new interpolation point
-    get_rb_evaluation().get_basis_function(j).localize(*serialized_vector);
+    get_rb_evaluation().get_basis_function(j).localize(*_serialized_vector);
 
-    if(!performing_extra_greedy_step)
+    if(!_performing_extra_greedy_step)
     {
       eim_eval.interpolation_matrix(RB_size-1,j) =
-        (*mesh_function)(eim_eval.interpolation_points[RB_size-1]);
+        evaluate_mesh_function( eim_eval.interpolation_points_var[RB_size-1],
+                                eim_eval.interpolation_points[RB_size-1] );
     }
     else
     {
       eim_eval.extra_interpolation_matrix_row(j) =
-        (*mesh_function)(eim_eval.extra_interpolation_point);
+        evaluate_mesh_function( eim_eval.extra_interpolation_point_var,
+                                eim_eval.extra_interpolation_point );
     }
   }
 
   STOP_LOG("update_RB_system_matrices()", "RBEIMConstruction");
+}
+
+Real RBEIMConstruction::get_RB_error_bound()
+{
+  return compute_best_fit_error();
 }
 
 void RBEIMConstruction::update_system()
@@ -575,20 +607,20 @@ void RBEIMConstruction::update_system()
 
 bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
 {
-  if(performing_extra_greedy_step)
+  if(_performing_extra_greedy_step)
   {
     libMesh::out << "Extra Greedy iteration finished." << std::endl;
-    performing_extra_greedy_step = false;
+    _performing_extra_greedy_step = false;
     return true;
   }
 
-  performing_extra_greedy_step = false;
+  _performing_extra_greedy_step = false;
 
   if(training_greedy_error < get_training_tolerance())
   {
     libMesh::out << "Specified error tolerance reached." << std::endl
                  << "Perform one more Greedy iteration for error bounds." << std::endl;
-    performing_extra_greedy_step = true;
+    _performing_extra_greedy_step = true;
     return false;
   }
 
@@ -597,7 +629,7 @@ bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
     libMesh::out << "Maximum number of basis functions reached: Nmax = "
               << get_Nmax() << "." << std::endl
               << "Perform one more Greedy iteration for error bounds." << std::endl;
-    performing_extra_greedy_step = true;
+    _performing_extra_greedy_step = true;
     return false;
   }
 

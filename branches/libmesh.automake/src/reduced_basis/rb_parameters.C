@@ -58,6 +58,18 @@ unsigned int RBParameters::n_parameters() const
   return _parameters.size();
 }
 
+void RBParameters::get_parameter_names(std::set<std::string>& param_names) const
+{
+  param_names.clear();
+  
+  const_iterator it     = _parameters.begin();
+  const_iterator it_end = _parameters.end();
+  for( ; it != it_end; ++it)
+  {
+    param_names.insert( it->first );
+  }
+}
+
 RBParameters::const_iterator RBParameters::begin() const
 {
   return _parameters.begin();

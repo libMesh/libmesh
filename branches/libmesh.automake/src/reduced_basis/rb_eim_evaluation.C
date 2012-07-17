@@ -20,6 +20,7 @@
 // rbOOmit includes
 #include "rb_eim_evaluation.h"
 #include "rb_eim_theta.h"
+#include "rb_parametrized_function.h"
 
 // libMesh includes
 #include "o_string_stream.h"
@@ -39,7 +40,7 @@ RBEIMEvaluation::RBEIMEvaluation()
   compute_RB_inner_product = true;
 
   // initialize to the empty RBThetaExpansion object
-  set_rb_theta_expansion(empty_rb_theta_expansion);
+  set_rb_theta_expansion(_empty_rb_theta_expansion);
 }
 
 RBEIMEvaluation::~RBEIMEvaluation()
@@ -55,11 +56,11 @@ void RBEIMEvaluation::clear()
   interpolation_points_var.clear();
 
   // Delete any RBTheta objects that were created
-  for(unsigned int i=0; i<rb_eim_theta_vector.size(); i++)
+  for(unsigned int i=0; i<_rb_eim_theta_objects.size(); i++)
   {
-    delete rb_eim_theta_vector[i];
+    delete _rb_eim_theta_objects[i];
   }
-  rb_eim_theta_vector.clear();
+  _rb_eim_theta_objects.clear();
 }
 
 void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax,
@@ -76,16 +77,26 @@ void RBEIMEvaluation::resize_data_structures(const unsigned int Nmax,
   extra_interpolation_matrix_row.resize(Nmax);
 }
 
-Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int index, const Point& p)
+void RBEIMEvaluation::attach_parametrized_function(RBParametrizedFunction* pf)
 {
-  if(index >= get_n_parametrized_functions())
+  _parametrized_functions.push_back(pf);
+}
+
+unsigned int RBEIMEvaluation::get_n_parametrized_functions() const
+{
+  return _parametrized_functions.size();
+}
+
+Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index, const Point& p)
+{
+  if(var_index >= get_n_parametrized_functions())
   {
-    libMesh::err << "Error: We must have index < get_n_parametrized_functions() in evaluate_parametrized_function."
+    libMesh::err << "Error: We must have var_index < get_n_parametrized_functions() in evaluate_parametrized_function."
                  << std::endl;
     libmesh_error();
   }
 
-  return parametrized_functions[index]->evaluate(get_parameters(), p);
+  return _parametrized_functions[var_index]->evaluate(get_parameters(), p);
 }
 
 Real RBEIMEvaluation::rb_solve(unsigned int N)
@@ -196,14 +207,24 @@ void RBEIMEvaluation::rb_solve(DenseVector<Number>& EIM_rhs)
   STOP_LOG("rb_solve()", "RBEIMEvaluation");
 }
 
-void RBEIMEvaluation::initialize_rb_theta_objects()
+void RBEIMEvaluation::initialize_eim_theta_objects()
 {
   // Initialize the rb_theta objects that access the solution from this rb_eim_evaluation
-  rb_eim_theta_vector.clear();
+  _rb_eim_theta_objects.clear();
   for(unsigned int i=0; i<get_n_basis_functions(); i++)
   {
-    rb_eim_theta_vector.push_back(new RBEIMTheta(*this, i));
+    _rb_eim_theta_objects.push_back( build_eim_theta(i).release() );
   }
+}
+
+std::vector<RBTheta*> RBEIMEvaluation::get_eim_theta_objects()
+{
+  return _rb_eim_theta_objects;
+}
+
+AutoPtr<RBTheta> RBEIMEvaluation::build_eim_theta(unsigned int index)
+{
+  return AutoPtr<RBTheta>( new RBEIMTheta(*this, index) );
 }
 
 void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_name,

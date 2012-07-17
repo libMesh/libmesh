@@ -462,6 +462,8 @@ void TransientRBConstruction::truth_assembly()
 {
   START_LOG("truth_assembly()", "TransientRBConstruction");
 
+  this->matrix->close();
+
   this->matrix->zero();
   this->rhs->zero();
 

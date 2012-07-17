@@ -266,12 +266,14 @@ nobase_include_HEADERS = \
 		reduced_basis/rb_assembly_expansion.h \
 		reduced_basis/rb_construction.h \
 		reduced_basis/rb_construction_base.h \
+		reduced_basis/rb_eim_assembly.h \
 		reduced_basis/rb_eim_construction.h \
 		reduced_basis/rb_eim_evaluation.h \
 		reduced_basis/rb_eim_theta.h \
 		reduced_basis/rb_evaluation.h \
                 reduced_basis/rb_parameters.h \
 		reduced_basis/rb_parametrized.h \
+		reduced_basis/rb_parametrized_function.h \
 		reduced_basis/rb_scm_construction.h \
 		reduced_basis/rb_scm_evaluation.h \
 		reduced_basis/rb_temporal_discretization.h \

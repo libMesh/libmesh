@@ -3,6 +3,7 @@
 
 // local includes
 #include "rb_eim_construction.h"
+#include "rb_eim_evaluation.h"
 #include "assembly.h"
 
 // A simple subclass of RBEIMEvaluation. Overload
@@ -14,13 +15,25 @@ public:
 
   SimpleEIMEvaluation()
   {
-    attach_parametrized_function(&sg);
+    attach_parametrized_function(&g_x);
+    attach_parametrized_function(&g_y);
+    attach_parametrized_function(&g_z);
+  }
+  
+  /**
+   * Build a ThetaEIM rather than an RBEIMTheta.
+   */
+  virtual AutoPtr<RBTheta> build_eim_theta(unsigned int index)
+  {
+    return AutoPtr<RBTheta>(new ThetaEIM(*this, index));
   }
 
   /** 
-   * Parametrized function that we approximate with EIM
+   * Parametrized functions that we approximate with EIM
    */
-  ShiftedGaussian sg;
+  Gx g_x;
+  Gy g_y;
+  Gz g_z;
 
 };
 
@@ -43,13 +56,13 @@ public:
    * The type of the parent.
    */
   typedef RBEIMConstruction Parent;
-  
+
   /**
    * Provide an implementation of build_eim_assembly
    */
   virtual AutoPtr<ElemAssembly> build_eim_assembly(unsigned int index)
   {
-    return AutoPtr<ElemAssembly>(new EIM_F(*this, index));
+    return AutoPtr<ElemAssembly>(new AssemblyEIM(*this, index));
   }
   
   /**
@@ -57,22 +70,26 @@ public:
    */
   virtual void init_data()
   {
-    u_var = this->add_variable ("f_EIM", FIRST);
+    Gx_var = this->add_variable ("x_comp_of_G", FIRST);
+    Gy_var = this->add_variable ("y_comp_of_G", FIRST);
+    Gz_var = this->add_variable ("z_comp_of_G", FIRST);
 
     Parent::init_data();
 
-    set_inner_product_assembly(ip);
+    set_inner_product_assembly(eim_ip);
   }
 
   /**
-   * Variable number for u.
+   * Variable numbers.
    */
-  unsigned int u_var;
+  unsigned int Gx_var;
+  unsigned int Gy_var;
+  unsigned int Gz_var;
 
   /**
    * Inner product assembly object
    */
-  EIM_IP_assembly ip;
+  Ex6EIMInnerProduct eim_ip;
   
 };
 

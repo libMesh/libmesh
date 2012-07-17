@@ -1358,17 +1358,26 @@ Real RBConstruction::compute_max_error_bound()
   std::pair<unsigned int,Real> error_pair(first_index+max_err_index, max_err);
   get_global_max_error_pair(error_pair);
 
-  // Now broadcast the parameter that produced the maximum error
-  unsigned int root_id=0;
-  if( (get_first_local_training_index() <= error_pair.first) &&
-      (error_pair.first < get_last_local_training_index()) )
+  // If we have a serial training set (i.e. a training set that is the same on all processors)
+  // just set the parameters on all processors
+  if(serial_training_set)
   {
     set_params_from_training_set( error_pair.first );
-    root_id = libMesh::processor_id();
   }
+  // otherwise, broadcast the parameter that produced the maximum error
+  else
+  {
+    unsigned int root_id=0;
+    if( (get_first_local_training_index() <= error_pair.first) &&
+        (error_pair.first < get_last_local_training_index()) )
+    {
+      set_params_from_training_set( error_pair.first );
+      root_id = libMesh::processor_id();
+    }
 
-  Parallel::sum(root_id); // root_id is only non-zero on one processor
-  broadcast_parameters(root_id);
+    Parallel::sum(root_id); // root_id is only non-zero on one processor
+    broadcast_parameters(root_id);
+  }
 
   STOP_LOG("compute_max_error_bound()", "RBConstruction");
 
