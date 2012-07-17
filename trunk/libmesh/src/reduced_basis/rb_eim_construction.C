@@ -186,8 +186,8 @@ Real RBEIMConstruction::train_reduced_basis(const std::string& directory_name,
   return Parent::train_reduced_basis(directory_name, resize_rb_eval_data);
 }
 
-Real RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
-                                               Point p)
+Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
+                                                 Point p)
 {
   DenseVector<Number> values;
   (*_mesh_function)(p,
