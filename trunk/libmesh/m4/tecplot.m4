@@ -52,7 +52,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       AC_LINK_IFELSE(
                   [
                      AC_LANG_PROGRAM([#include <TECIO.h>], 
-                                     [int ierr = TECEND ();])
+                                     [int ierr = TECEND112 ();])
                   ],
                   [
                      TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
@@ -61,13 +61,33 @@ AC_DEFUN([CONFIGURE_TECPLOT],
                      AC_SUBST(TECPLOT_INCLUDE)
                      AC_DEFINE(HAVE_TECPLOT_API, 1,
                                [Flag indicating whether the library shall be compiled to use the Tecplot interface])
-                     AC_MSG_RESULT(<<< Configuring library with Tecplot API support >>>)
+                     AC_DEFINE(HAVE_TECPLOT_API_112, 1,
+                               [Flag indicating tecplot API understands newer features])
+                     AC_MSG_RESULT(<<< Configuring library with Tecplot API support (v11.2) >>>)
 		     libmesh_contrib_INCLUDES="$TECPLOT_INCLUDE $libmesh_contrib_INCLUDES"
                   ],
-                  [
-                     AC_MSG_RESULT( [WARNING: Found $TECPLOT_LIBRARY_PATH/tecio.a but cannot link with it!] )
-		     enabletecplot=no
-                  ] )
+		  [		  
+                     AC_LINK_IFELSE(
+                                 [
+                                    AC_LANG_PROGRAM([#include <TECIO.h>], 
+                                                    [int ierr = TECEND ();])
+                                 ],
+                                 [
+                                    TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
+                                    TECPLOT_INCLUDE=-I$TECPLOT_INCLUDE_PATH
+                                    AC_SUBST(TECPLOT_LIBRARY)
+                                    AC_SUBST(TECPLOT_INCLUDE)
+                                    AC_DEFINE(HAVE_TECPLOT_API, 1,
+                                              [Flag indicating whether the library shall be compiled to use the Tecplot interface])
+                                    AC_MSG_RESULT(<<< Configuring library with legacy Tecplot API support >>>)
+               		            libmesh_contrib_INCLUDES="$TECPLOT_INCLUDE $libmesh_contrib_INCLUDES"
+                                 ],
+                                 [
+                                    AC_MSG_RESULT( [WARNING: Found $TECPLOT_LIBRARY_PATH/tecio.a but cannot link with it!] )
+               		            enabletecplot=no
+                                 ] )
+	          ] )
+				 
       LIBS=$save_LIBS
       CPPFLAGS=$save_CPPFLAGS
     else
