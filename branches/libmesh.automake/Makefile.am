@@ -19,6 +19,9 @@ LIBS             = $(libmesh_LIBS)
 # additional files which must be included in 'make dist'
 EXTRA_DIST = license \
              reference_elements \
+	     contrib/tecplot/include \
+             contrib/tecplot/lib \
+             contrib/tecplot/README \
 	     contrib/bin/strip_dup_incl_paths.pl \
 	     contrib/bin/strip_dup_libs.pl
 

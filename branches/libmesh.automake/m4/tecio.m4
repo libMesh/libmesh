@@ -42,6 +42,7 @@ AC_DEFUN([CONFIGURE_TECIO],
   
      TECIO_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/tecio/include"
      AC_DEFINE(HAVE_TECPLOT_API, 1, [Flag indicating whether the library will be compiled with Tecplot TecIO API support])
+     AC_DEFINE(HAVE_TECPLOT_API_112, 1, [Flag indicating tecplot API understands newer features])
      AC_MSG_RESULT(<<< Configuring library with Tecplot TecIO support >>>)
      libmesh_contrib_INCLUDES="$TECIO_INCLUDE $libmesh_contrib_INCLUDES"
      have_tecio=yes
