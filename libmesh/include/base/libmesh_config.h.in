@@ -283,6 +283,9 @@
    interface */
 #undef HAVE_TECPLOT_API
 
+/* Flag indicating tecplot API understands newer features */
+#undef HAVE_TECPLOT_API_112
+
 /* Flag indicating whether the library will be compiled with Tetgen support */
 #undef HAVE_TETGEN
 
