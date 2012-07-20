@@ -458,11 +458,12 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
   {
 
     // Make a directory to store all the data files
-    if( mkdir(directory_name.c_str(), 0777) == -1)
-    {
-      libMesh::out << "In RBEvaluation::write_offline_data_to_files, directory "
-                   << directory_name << " already exists, overwriting contents." << std::endl;
-    }
+    mkdir(directory_name.c_str(), 0777);
+//    if( mkdir(directory_name.c_str(), 0777) == -1)
+//    {
+//      libMesh::out << "In RBEvaluation::write_offline_data_to_files, directory "
+//                   << directory_name << " already exists, overwriting contents." << std::endl;
+//    }
 
     // First, write out how many basis functions we have generated
     OStringStream file_name;
@@ -844,6 +845,12 @@ void RBEvaluation::write_out_basis_functions(System& sys,
                                              const bool write_binary_basis_functions)
 {
   //libMesh::out << "Writing out the basis functions..." << std::endl;
+
+  if(libMesh::processor_id() == 0)
+  {
+    // Make a directory to store all the data files
+    mkdir(directory_name.c_str(), 0777);
+  }
 
   // Make sure processors are synced up before we begin
   Parallel::barrier();
