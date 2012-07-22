@@ -1,382 +1,150 @@
 #ifndef __assembly_h__
 #define __assembly_h__
 
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_submatrix.h"
-#include "dense_vector.h"
-#include "dense_subvector.h"
-#include "fe.h"
-#include "fe_interface.h"
-#include "fe_base.h"
-#include "elem_assembly.h"
-#include "quadrature_gauss.h"
-
 // rbOOmit includes
+#include "rb_parameters.h"
 #include "rb_theta.h"
+#include "rb_theta_expansion.h"
 #include "rb_assembly_expansion.h"
 
-// Bring in bits from the libMesh namespace.
-// Just the bits we're using, since this is a header.
-using libMesh::ElemAssembly;
-using libMesh::FEInterface;
-using libMesh::FEMContext;
-using libMesh::Number;
-using libMesh::Point;
-using libMesh::RBTheta;
-using libMesh::Real;
-using libMesh::RealGradient;
+// boundary IDs
+#define BOUNDARY_ID_MIN_Z 0
+#define BOUNDARY_ID_MIN_Y 1
+#define BOUNDARY_ID_MAX_X 2
+#define BOUNDARY_ID_MAX_Y 3
+#define BOUNDARY_ID_MIN_X 4
+#define BOUNDARY_ID_MAX_Z 5
 
-// Functors for the parameter-dependent part of the affine decomposition of the PDE
-struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("y_scaling"); } };
-struct ThetaA1 : RBTheta { virtual Number evaluate(const RBParameters& )     { return 1.; } };
-struct ThetaA2 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return 1./mu.get_value("y_scaling"); } };
-struct ThetaF0 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("y_scaling") * mu.get_value("x_load"); } };
-struct ThetaF1 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("y_scaling") * mu.get_value("y_load"); } };
+class ElasticityRBConstruction;
 
-// Provide a simple subclass that just provides the elasticity tensor
 struct ElasticityAssembly : ElemAssembly
 {
 
-  Real eval_elasticity_tensor(unsigned int i,
-                              unsigned int j,
-                              unsigned int k,
-                              unsigned int l)
-  {
-    // Define the Poisson ratio
-    const Real nu = 0.3;
+	ElasticityAssembly(ElasticityRBConstruction& rb_sys_in)
+	: 
+  rb_sys(rb_sys_in)
+  {}
   
-    // Define the Lame constants (lambda_1 and lambda_2) based on Poisson ratio
-    const Real lambda_1 = nu / ( (1. + nu) * (1. - 2.*nu) );
-    const Real lambda_2 = 0.5 / (1 + nu);
+	// Kronecker delta function
+	inline Real kronecker_delta(unsigned int i,
+                              unsigned int j)
+	{
+		return i == j ? 1. : 0.;
+	}
+	
+	Real elasticity_tensor(unsigned int i,
+                         unsigned int j,
+                         unsigned int k,
+                         unsigned int l)
+  {
+		// Define the Poisson ratio and Young's modulus
+		const Real nu = 0.3;
+		const Real E  = 1.;
 
-    // Define the Kronecker delta functions that we need here
-    Real delta_ij = (i == j) ? 1. : 0.;
-    Real delta_il = (i == l) ? 1. : 0.;
-    Real delta_ik = (i == k) ? 1. : 0.;
-    Real delta_jl = (j == l) ? 1. : 0.;
-    Real delta_jk = (j == k) ? 1. : 0.;
-    Real delta_kl = (k == l) ? 1. : 0.;
+		// Define the Lame constants (lambda_1 and lambda_2) based on nu and E
+		const Real lambda_1 = E * nu / ( (1. + nu) * (1. - 2.*nu) );
+		const Real lambda_2 = 0.5 * E / (1. + nu);
+
+		return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l)
+		     + lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
+	}
+	
+	/**
+	 * The ElasticityRBConstruction object that will use this assembly.
+	 */
+	ElasticityRBConstruction& rb_sys;
+};
+
+struct ThetaA0 : RBTheta { virtual Number evaluate(const RBParameters& ) { return 1.; } };
+struct AssemblyA0 : ElasticityAssembly
+{
+
+  AssemblyA0(ElasticityRBConstruction& rb_sys_in)
+  :
+  ElasticityAssembly(rb_sys_in)
+  {}
   
-    return lambda_1 * delta_ij * delta_kl + lambda_2 * (delta_ik * delta_jl + delta_il * delta_jk);
-  }
+  // The interior assembly operator
+	virtual void interior_assembly(FEMContext &c);
 
 };
 
-struct A0 : ElasticityAssembly
+struct ThetaA1 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("x_scaling"); } };
+struct AssemblyA1 : ElasticityAssembly
 {
-  virtual void interior_assembly(FEMContext &c)
-  {
-    const unsigned int u_var = 0;
-    const unsigned int v_var = 1;
 
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
-
-    // The velocity shape function gradients at interior
-    // quadrature points.
-    const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[u_var]->get_dphi();
-
-    // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-    const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
-
-    // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
-        
-    DenseSubMatrix<Number>& Kuu = *c.elem_subjacobians[u_var][u_var];
-    DenseSubMatrix<Number>& Kuv = *c.elem_subjacobians[u_var][v_var];
-    DenseSubMatrix<Number>& Kvu = *c.elem_subjacobians[v_var][u_var];
-    DenseSubMatrix<Number>& Kvv = *c.elem_subjacobians[v_var][v_var];
-
-      for (unsigned int qp=0; qp<n_qpoints; qp++)
-      {
-          for (unsigned int i=0; i<n_u_dofs; i++)
-            for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=0, C_k=0;
-
-              C_j=0, C_l=0;
-              Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-
-          for (unsigned int i=0; i<n_u_dofs; i++)
-            for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=0, C_k=1;
-
-              C_j=0, C_l=0;
-              Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-
-          for (unsigned int i=0; i<n_v_dofs; i++)
-            for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=1, C_k=0;
-
-              C_j=0, C_l=0;
-              Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-
-          for (unsigned int i=0; i<n_v_dofs; i++)
-            for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=1, C_k=1;
-
-              C_j=0, C_l=0;
-              Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-      }
-  }
-};
-
-struct A1 : ElasticityAssembly
-{
-  virtual void interior_assembly(FEMContext &c)
-  {
-    const unsigned int u_var = 0;
-    const unsigned int v_var = 1;
-
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
-
-    // The velocity shape function gradients at interior
-    // quadrature points.
-    const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[u_var]->get_dphi();
-
-    // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-    const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
-
-    // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
-        
-    DenseSubMatrix<Number>& Kuu = *c.elem_subjacobians[u_var][u_var];
-    DenseSubMatrix<Number>& Kuv = *c.elem_subjacobians[u_var][v_var];
-    DenseSubMatrix<Number>& Kvu = *c.elem_subjacobians[v_var][u_var];
-    DenseSubMatrix<Number>& Kvv = *c.elem_subjacobians[v_var][v_var];
-
-      for (unsigned int qp=0; qp<n_qpoints; qp++)
-      {
-          for (unsigned int i=0; i<n_u_dofs; i++)
-            for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=0, C_k=0;
-              
-              C_j=1, C_l=0;
-              Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-
-              C_j=0, C_l=1;
-              Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-
-          for (unsigned int i=0; i<n_u_dofs; i++)
-            for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=0, C_k=1;
-              
-              C_j=1, C_l=0;
-              Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-
-              C_j=0, C_l=1;
-              Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-
-          for (unsigned int i=0; i<n_v_dofs; i++)
-            for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=1, C_k=0;
-              
-              C_j=1, C_l=0;
-              Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-
-              C_j=0, C_l=1;
-              Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-
-          for (unsigned int i=0; i<n_v_dofs; i++)
-            for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=1, C_k=1;
-              
-              C_j=1, C_l=0;
-              Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-
-              C_j=0, C_l=1;
-              Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-      }
-  }
-};
-
-struct A2 : ElasticityAssembly
-{
-  virtual void interior_assembly(FEMContext &c)
-  {
-    const unsigned int u_var = 0;
-    const unsigned int v_var = 1;
-
-    const std::vector<Real> &JxW =
-      c.element_fe_var[u_var]->get_JxW();
-
-    // The velocity shape function gradients at interior
-    // quadrature points.
-    const std::vector<std::vector<RealGradient> >& dphi =
-      c.element_fe_var[u_var]->get_dphi();
-
-    // The number of local degrees of freedom in each variable
-    const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-    const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
-
-    // Now we will build the affine operator
-    unsigned int n_qpoints = (c.get_element_qrule())->n_points();
-        
-    DenseSubMatrix<Number>& Kuu = *c.elem_subjacobians[u_var][u_var];
-    DenseSubMatrix<Number>& Kuv = *c.elem_subjacobians[u_var][v_var];
-    DenseSubMatrix<Number>& Kvu = *c.elem_subjacobians[v_var][u_var];
-    DenseSubMatrix<Number>& Kvv = *c.elem_subjacobians[v_var][v_var];
-
-      for (unsigned int qp=0; qp<n_qpoints; qp++)
-      {
-          for (unsigned int i=0; i<n_u_dofs; i++)
-            for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=0, C_k=0;
-
-              C_j=1, C_l=1;
-              Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-
-          for (unsigned int i=0; i<n_u_dofs; i++)
-            for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=0, C_k=1;
-
-              C_j=1, C_l=1;
-              Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-
-          for (unsigned int i=0; i<n_v_dofs; i++)
-            for (unsigned int j=0; j<n_u_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=1, C_k=0;
-
-              C_j=1, C_l=1;
-              Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-
-          for (unsigned int i=0; i<n_v_dofs; i++)
-            for (unsigned int j=0; j<n_v_dofs; j++)
-            {
-              // Tensor indices
-              unsigned int C_i, C_j, C_k, C_l;
-              C_i=1, C_k=1;
-
-              C_j=1, C_l=1;
-              Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-            }
-      }
-  }
-};
-
-struct InnerProductAssembly : ElemAssembly
-{
-  virtual void interior_assembly(FEMContext &c)
-  {
-    A0_assembly.interior_assembly(c);
-    A1_assembly.interior_assembly(c);
-    A2_assembly.interior_assembly(c);
-  }
+  AssemblyA1(ElasticityRBConstruction& rb_sys_in)
+  :
+  ElasticityAssembly(rb_sys_in)
+  {}
   
-  A0 A0_assembly;
-  A1 A1_assembly;
-  A2 A2_assembly;
+  // The interior assembly operator
+	virtual void interior_assembly(FEMContext &c);
+
 };
 
-struct F0 : ElemAssembly
+struct ThetaA2 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return 1./mu.get_value("x_scaling"); } };
+struct AssemblyA2 : ElasticityAssembly
 {
+
+  AssemblyA2(ElasticityRBConstruction& rb_sys_in)
+  :
+  ElasticityAssembly(rb_sys_in)
+  {}
+  
+  // The interior assembly operator
+	virtual void interior_assembly(FEMContext &c);
+
+};
+
+struct ThetaF0 : RBTheta { virtual Number evaluate(const RBParameters& mu) { return mu.get_value("load_Fx"); } };
+struct AssemblyF0 : ElasticityAssembly
+{
+  AssemblyF0(ElasticityRBConstruction& rb_sys_in)
+  :
+  ElasticityAssembly(rb_sys_in)
+  {}
+
   // Apply a traction 
-  virtual void boundary_assembly(FEMContext &c)
-  {
-    if(c.side == 1)
-    {
-      const unsigned int u_var = 0;
+  virtual void boundary_assembly(FEMContext &c);
 
-      const std::vector<Real> &JxW_side =
-        c.side_fe_var[u_var]->get_JxW();
-
-      const std::vector<std::vector<Real> >& phi_side =
-        c.side_fe_var[u_var]->get_phi();
-
-      // The number of local degrees of freedom in each variable
-      const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-      // Now we will build the affine operator
-      unsigned int n_qpoints = (c.get_side_qrule())->n_points();
-
-      for (unsigned int qp=0; qp != n_qpoints; qp++)
-        for (unsigned int i=0; i != n_u_dofs; i++)
-        {
-          (*c.elem_subresiduals[u_var])(i) += JxW_side[qp] * ( 1. * phi_side[i][qp] );
-        }
-    }
-  }
 };
 
-struct F1 : ElemAssembly
+struct ThetaF1 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("load_Fy"); } };
+struct AssemblyF1 : ElasticityAssembly
 {
+  AssemblyF1(ElasticityRBConstruction& rb_sys_in)
+  :
+  ElasticityAssembly(rb_sys_in)
+  {}
+  
   // Apply a traction 
-  virtual void boundary_assembly(FEMContext &c)
-  {
-    if(c.side == 1)
-    {
-      const unsigned int u_var = 0;
-      const unsigned int v_var = 1;
+  virtual void boundary_assembly(FEMContext &c);
+};
 
-      const std::vector<Real> &JxW_side =
-        c.side_fe_var[u_var]->get_JxW();
+struct ThetaF2 : RBTheta { virtual Number evaluate(const RBParameters& mu)   { return mu.get_value("load_Fz"); } };
+struct AssemblyF2 : ElasticityAssembly
+{
+  AssemblyF2(ElasticityRBConstruction& rb_sys_in)
+  :
+  ElasticityAssembly(rb_sys_in)
+  {}
+  
+  // Apply a traction 
+  virtual void boundary_assembly(FEMContext &c);
+};
 
-      const std::vector<std::vector<Real> >& phi_side =
-        c.side_fe_var[u_var]->get_phi();
+struct InnerProductAssembly : ElasticityAssembly
+{
 
-      // The number of local degrees of freedom in each variable
-      const unsigned int n_v_dofs = c.dof_indices_var[v_var].size();
+  InnerProductAssembly(ElasticityRBConstruction& rb_sys_in)
+  :
+  ElasticityAssembly(rb_sys_in)
+  {}
+  
+  // The interior assembly operator
+	virtual void interior_assembly(FEMContext &c);
 
-      // Now we will build the affine operator
-      unsigned int n_qpoints = (c.get_side_qrule())->n_points();
-
-      for (unsigned int qp=0; qp != n_qpoints; qp++)
-        for (unsigned int i=0; i != n_v_dofs; i++)
-        {
-          (*c.elem_subresiduals[v_var])(i) += JxW_side[qp] * ( 1. * phi_side[i][qp] );
-        }
-    }
-  }
 };
 
 // Define an RBThetaExpansion class for this PDE
@@ -394,6 +162,7 @@ struct ElasticityThetaExpansion : RBThetaExpansion
     attach_A_theta(&theta_a_2);
     attach_F_theta(&theta_f_0);
     attach_F_theta(&theta_f_1);
+    attach_F_theta(&theta_f_2);
   }
 
   // The RBTheta member variables
@@ -402,6 +171,7 @@ struct ElasticityThetaExpansion : RBThetaExpansion
   ThetaA2 theta_a_2;
   ThetaF0 theta_f_0;
   ThetaF1 theta_f_1;
+  ThetaF2 theta_f_2;
 };
 
 // Define an RBAssemblyExpansion class for this PDE
@@ -411,7 +181,14 @@ struct ElasticityAssemblyExpansion : RBAssemblyExpansion
   /**
    * Constructor.
    */
-  ElasticityAssemblyExpansion()
+  ElasticityAssemblyExpansion(ElasticityRBConstruction& rb_sys_in)
+  :
+  A0_assembly(rb_sys_in),
+  A1_assembly(rb_sys_in),
+  A2_assembly(rb_sys_in),
+  F0_assembly(rb_sys_in),
+  F1_assembly(rb_sys_in),
+  F2_assembly(rb_sys_in)
   {
     // And set up the RBAssemblyExpansion object
     attach_A_assembly(&A0_assembly);
@@ -419,16 +196,16 @@ struct ElasticityAssemblyExpansion : RBAssemblyExpansion
     attach_A_assembly(&A2_assembly);
     attach_F_assembly(&F0_assembly);
     attach_F_assembly(&F1_assembly);
+    attach_F_assembly(&F2_assembly);
   }
 
   // The ElemAssembly objects
-  A0 A0_assembly;
-  A1 A1_assembly;
-  A2 A2_assembly;
-  F0 F0_assembly;
-  F1 F1_assembly;
+  AssemblyA0 A0_assembly;
+  AssemblyA1 A1_assembly;
+  AssemblyA2 A2_assembly;
+  AssemblyF0 F0_assembly;
+  AssemblyF1 F1_assembly;
+  AssemblyF2 F2_assembly;
 };
 
 #endif
-
-

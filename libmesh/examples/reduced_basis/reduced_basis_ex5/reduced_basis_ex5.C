@@ -17,18 +17,14 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 // <h1>Reduced Basis: Example 5 - Reduced Basis Cantilever</h1>
-// Reduced Basis version of systems_of_equations_ex4: 2D cantilever
-
-// In this example we consider the same problem as systems_of_equations_ex4,
-// but we introduce one parameter, which is the thickness of the cantilever.
-// (Note that for simplicity we do not consider a rigorous lower bound for
-// the coercivity constant --- to compute this bound one can use the rbOOmit
-// SCM classes.)
+// 3D cantilever beam using the Reduced Basis Method
+// David Knezevic, Kyung Hoon Lee
 //
-// We consider three parameters in this problem:
-//  y_scaling: scale the mesh in the y-direction
-//  x_load: the traction in the x-direction on the right boundary of the cantilever
-//  y_load: the traction in the y-direction on the right boundary of the cantilever
+// We consider four parameters in this problem:
+//  x_scaling: scales the length of the cantilever
+//  load_Fx: the traction in the x-direction on the right boundary of the cantilever
+//  load_Fy: the traction in the y-direction on the right boundary of the cantilever
+//  load_Fz: the traction in the z-direction on the right boundary of the cantilever
 
 // C++ include files that we need
 #include <iostream>
@@ -44,7 +40,6 @@
 #include "equation_systems.h"
 #include "dof_map.h"
 #include "getpot.h"
-#include "o_string_stream.h"
 #include "elem.h"
 
 // local includes
@@ -58,12 +53,9 @@ using namespace libMesh;
 void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename);
 
 // The main program.
-int main (int argc, char** argv)
-{
-  // Initialize libMesh.
-  LibMeshInit init (argc, argv);
-
-  const unsigned int dim = 2;
+int main(int argc, char** argv) {
+	// Initialize libMesh.
+	LibMeshInit init (argc, argv);
 
 #if !defined(LIBMESH_HAVE_XDR)
   // We need XDR support to write out reduced bases
@@ -72,152 +64,156 @@ int main (int argc, char** argv)
   // XDR binary support requires double precision
   libmesh_example_assert(false, "--disable-singleprecision");
 #endif
-  // FIXME: This example currently segfaults with Trilinos?
-  libmesh_example_assert(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
-  // Skip this 2D example if libMesh was compiled as 1D-only.
-  libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
+  // This example only works if libMesh was compiled for 3D
+  const unsigned int dim = 3;
+  libmesh_example_assert(dim == LIBMESH_DIM, "3D support");
 
-  std::string parameters_filename = "reduced_basis_ex5.in";
-  GetPot infile(parameters_filename);
+	std::string parameters_filename = "reduced_basis_ex5.in";
+	GetPot infile(parameters_filename);
 
-  unsigned int n_elem_x = infile("n_elem_x", 1);
-  unsigned int n_elem_y = infile("n_elem_y", 1);
-  Real x_size           = infile("x_size", 1.);
-  Real y_size           = infile("y_size", 1.);
+  unsigned int n_elem_x  = infile("n_elem_x",0);
+  unsigned int n_elem_y  = infile("n_elem_y",0);
+  unsigned int n_elem_z  = infile("n_elem_z",0);
+  Real x_size            = infile("x_size", 0.);
+  Real y_size            = infile("y_size", 0.);
+  Real z_size            = infile("z_size", 0.);
 
-  bool store_basis_functions = infile("store_basis_functions", true); // Do we write the RB basis functions to disk?
+	bool store_basis_functions = infile("store_basis_functions", true);
 
-  // Read the "online_mode" flag from the command line
-  GetPot command_line (argc, argv);
-  int online_mode = 0;
-  if ( command_line.search(1, "-online_mode") )
-    online_mode = command_line.next(online_mode);
+	// Read the "online_mode" flag from the command line
+	GetPot command_line(argc, argv);
+	int online_mode = 0;
+	if ( command_line.search(1, "-online_mode") ) {
+		online_mode = command_line.next(online_mode);		
+	}
 
-  // Build a mesh.
+
   Mesh mesh (dim);
-  MeshTools::Generation::build_square (mesh,
-                                       n_elem_x, n_elem_y,
-                                       0., x_size,
-                                       0., y_size,
-                                       QUAD9);
+  MeshTools::Generation::build_cube (mesh,
+                                     n_elem_x,
+                                     n_elem_y,
+                                     n_elem_z,
+                                     0., x_size,
+                                     0., y_size,
+                                     0., z_size,
+                                     HEX8);
+	 mesh.print_info();
 
-  // Create an equation systems object.
-  EquationSystems equation_systems (mesh);
-  
-  // We override RBConstruction with SimpleRBConstruction in order to
-  // specialize a few functions for this particular problem.
-  SimpleRBConstruction & rb_con =
-    equation_systems.add_system<SimpleRBConstruction> ("RBElasticity");
+	// Create an equation systems object.
+	EquationSystems equation_systems(mesh);
 
-  // Initialize the data structures for the equation system.
-  equation_systems.init ();
+	// We override RBConstruction with ElasticityRBConstruction in order to
+	// specialize a few functions for this particular problem.
+	ElasticityRBConstruction& rb_con =
+		equation_systems.add_system<ElasticityRBConstruction>("RBElasticity");
 
-  // Print out some information about the "truth" discretization
+	// Initialize the data structures for the equation system.
+	equation_systems.init ();
   equation_systems.print_info();
-  mesh.print_info();
 
-  // Build a new RBEvaluation object which will be used to perform
-  // Reduced Basis calculations. This is required in both the
-  // "Offline" and "Online" stages.
-  SimpleRBEvaluation rb_eval;
+	// Build a new RBEvaluation object which will be used to perform
+	// Reduced Basis calculations. This is required in both the
+	// "Offline" and "Online" stages.
+	ElasticityRBEvaluation rb_eval;
 
-  // We need to give the RBConstruction object a pointer to
-  // our RBEvaluation object
-  rb_con.set_rb_evaluation(rb_eval);
+	// We need to give the RBConstruction object a pointer to
+	// our RBEvaluation object
+	rb_con.set_rb_evaluation(rb_eval);
 
-  if(!online_mode) // Perform the Offline stage of the RB method
-  {
-    // Read in the data that defines this problem from the specified text file
-    rb_con.process_parameters_file(parameters_filename);
+	if(!online_mode) // Perform the Offline stage of the RB method
+	{
+		// Read in the data that defines this problem from the specified text file
+		rb_con.process_parameters_file(parameters_filename);
 
-    // Print out info that describes the current setup of rb_con
-    rb_con.print_info();
+		// Print out info that describes the current setup of rb_con
+		rb_con.print_info();
 
-    // Prepare rb_con for the Construction stage of the RB method.
-    // This sets up the necessary data structures and performs
-    // initial assembly of the "truth" affine expansion of the PDE.
-    rb_con.initialize_rb_construction();
+		// Prepare rb_con for the Construction stage of the RB method.
+		// This sets up the necessary data structures and performs
+		// initial assembly of the "truth" affine expansion of the PDE.
+		rb_con.initialize_rb_construction();
 
-    // Compute the reduced basis space by computing "snapshots", i.e.
-    // "truth" solves, at well-chosen parameter values and employing
-    // these snapshots as basis functions.
-    rb_con.train_reduced_basis();
-    
-    // Write out the data that will subsequently be required for the Evaluation stage
-    rb_con.get_rb_evaluation().write_offline_data_to_files();
-    
-    // If requested, write out the RB basis functions for visualization purposes
-    if(store_basis_functions)
-    {
-      // Write out the basis functions
-      rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
-    }
-  }
-  else // Perform the Online stage of the RB method
-  {
-    // Read in the reduced basis data
-    rb_eval.read_offline_data_from_files();
-    
-    // Iinitialize online parameters
-    Real online_y_scaling = infile("online_y_scaling", 0.);
-    Real online_x_load = infile("online_x_load", 0.);
-    Real online_y_load = infile("online_y_load", 0.);
-    RBParameters online_mu;
-    online_mu.set_value("y_scaling", online_y_scaling);
-    online_mu.set_value("x_load", online_x_load);
-    online_mu.set_value("y_load", online_y_load);
-    rb_eval.set_parameters(online_mu);
-    rb_eval.print_parameters();
+		// Compute the reduced basis space by computing "snapshots", i.e.
+		// "truth" solves, at well-chosen parameter values and employing
+		// these snapshots as basis functions.
+		rb_con.train_reduced_basis();
 
-    // Now do the Online solve using the precomputed reduced basis
-    rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
+		// Write out the data that will subsequently be required for the Evaluation stage
+		rb_con.get_rb_evaluation().write_offline_data_to_files();
+		
+		// If requested, write out the RB basis functions for visualization purposes
+		if(store_basis_functions)
+		{
+			// Write out the basis functions
+			rb_con.get_rb_evaluation().write_out_basis_functions(rb_con);
+		}
+	}
+	else // Perform the Online stage of the RB method
+	{
+		// Read in the reduced basis data
+		rb_eval.read_offline_data_from_files();
 
-    if(store_basis_functions)
-    {
-      // Read in the basis functions
-      rb_eval.read_in_basis_functions(rb_con);
-      
-      // Plot the solution
-      rb_con.load_rb_solution();
-#ifdef LIBMESH_HAVE_EXODUS_API
-      const RBParameters& rb_eval_params = rb_eval.get_parameters();
-      scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_displacement.e");
-#endif
-    }
-  }
+		// Iinitialize online parameters
+		Real online_x_scaling = infile("online_x_scaling", 0.);
+		Real online_load_Fx   = infile("online_load_Fx",   0.);
+		Real online_load_Fy   = infile("online_load_Fy",   0.);
+		Real online_load_Fz   = infile("online_load_Fz",   0.);
+		RBParameters online_mu;
+		online_mu.set_value("x_scaling", online_x_scaling);
+		online_mu.set_value("load_Fx",   online_load_Fx);
+		online_mu.set_value("load_Fy",   online_load_Fy);
+		online_mu.set_value("load_Fz",   online_load_Fz);
+		rb_eval.set_parameters(online_mu);
+		rb_eval.print_parameters();
+		
+		// Now do the Online solve using the precomputed reduced basis
+		rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
 
-  return 0;
+		if(store_basis_functions)
+		{
+			// Read in the basis functions
+			rb_eval.read_in_basis_functions(rb_con);
+
+			// Plot the solution
+			rb_con.load_rb_solution();
+
+			const RBParameters& rb_eval_params = rb_eval.get_parameters();
+			scale_mesh_and_plot(equation_systems, rb_eval_params, "RB_sol.e");
+		}		
+	}
+
+	return 0;
 }
 
 void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename)
 {
+  const Real x_scaling = mu.get_value("x_scaling");
+  
   // Loop over the mesh nodes and move them!
   MeshBase& mesh = es.get_mesh();
 
   MeshBase::node_iterator       node_it  = mesh.nodes_begin();
   const MeshBase::node_iterator node_end = mesh.nodes_end();
-  
+
   for( ; node_it != node_end; node_it++)
   {
     Node* node = *node_it;
-    
-    Real y = (*node)(1);
 
-    (*node)(1) = y*mu.get_value("y_scaling");
+    (*node)(0) *= mu.get_value("x_scaling");
   }
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   ExodusII_IO (mesh).write_equation_systems (filename, es);
 #endif
-  
+
   // Loop over the mesh nodes and move them!
   node_it = mesh.nodes_begin();
-  
+
   for( ; node_it != node_end; node_it++)
   {
     Node* node = *node_it;
 
-    (*node)(1) = 1./mu.get_value("y_scaling");
+    (*node)(0) /= mu.get_value("x_scaling");
   }
 }
