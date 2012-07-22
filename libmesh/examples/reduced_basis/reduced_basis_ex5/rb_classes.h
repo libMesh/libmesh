@@ -1,50 +1,27 @@
-// rbOOmit: An implementation of the Certified Reduced Basis method.
-// Copyright (C) 2009, 2010 David J. Knezevic
-//
-//     This file is part of rbOOmit.
-
-// rbOOmit is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-  
-// rbOOmit is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-  
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
 #ifndef __rb_classes_h__
 #define __rb_classes_h__
 
-#include "rb_construction.h"
-#include "fe_base.h"
-
-// local include
+// local includes
 #include "assembly.h"
 
-// Bring in bits from the libMesh namespace.
-// Just the bits we're using, since this is a header.
-using libMesh::EquationSystems;
-using libMesh::FEMContext;
-using libMesh::RBConstruction;
-using libMesh::RBEvaluation;
-using libMesh::Real;
+// rbOOmit includes
+#include "rb_construction.h"
+
+// libMesh includes
+#include "fe_base.h"
+#include "dof_map.h"
+
+using namespace libMesh;
 
 
-// A simple subclass of RBEvaluation where we attach
-// the RBThetaExpansion object
-class SimpleRBEvaluation : public RBEvaluation
+class ElasticityRBEvaluation : public RBEvaluation
 {
 public:
 
   /**
    * Constructor. Just set the theta expansion.
    */
-  SimpleRBEvaluation()
+  ElasticityRBEvaluation()
   {
     set_rb_theta_expansion(elasticity_theta_expansion);
   }
@@ -58,31 +35,32 @@ public:
   /**
    * The object that stores the "theta" expansion of the parameter dependent PDE,
    * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
-   */
+   */ 
   ElasticityThetaExpansion elasticity_theta_expansion;
-
 };
 
 
-class SimpleRBConstruction : public RBConstruction
+class ElasticityRBConstruction : public RBConstruction
 {
 public:
 
-  SimpleRBConstruction (EquationSystems& es,
-                        const std::string& name,
-                        const unsigned int number)
-  : Parent(es, name, number)
+  ElasticityRBConstruction (EquationSystems& es,
+                            const std::string& name,
+                            const unsigned int number)
+  : Parent(es, name, number),
+    elasticity_assembly_expansion(*this),
+    ip_assembly(*this)
   {}
 
   /**
    * Destructor.
    */
-  virtual ~SimpleRBConstruction () {}
+  virtual ~ElasticityRBConstruction () {}
 
   /**
    * The type of system.
    */
-  typedef SimpleRBConstruction sys_type;
+  typedef ElasticityRBConstruction sys_type;
 
   /**
    * The type of the parent.
@@ -94,17 +72,18 @@ public:
    */
   virtual void init_data()
   {
-    u_var = this->add_variable ("u", SECOND);
-    v_var = this->add_variable ("v", SECOND);
-
+    u_var = this->add_variable("u", FIRST);
+    v_var = this->add_variable("v", FIRST);
+    w_var = this->add_variable("w", FIRST);
+    
     // Generate a DirichletBoundary object
     dirichlet_bc = build_zero_dirichlet_boundary_object();
-    
-    // Set the Dirichet boundary IDs
-    // and the Dirichlet boundary variable numbers
-    dirichlet_bc->b.insert(3);
+
+    // Set the Dirichet boundary condition
+    dirichlet_bc->b.insert(BOUNDARY_ID_MIN_X); // Dirichlet boundary at x=0
     dirichlet_bc->variables.push_back(u_var);
     dirichlet_bc->variables.push_back(v_var);
+    dirichlet_bc->variables.push_back(w_var);
     
     // Attach dirichlet_bc (must do this _before_ Parent::init_data)
     get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
@@ -136,29 +115,22 @@ public:
    */
   unsigned int u_var;
   unsigned int v_var;
+  unsigned int w_var;
 
   /**
-   * The object that stores the "theta" expansion of the parameter dependent PDE,
-   * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
-   */
-  ElasticityThetaExpansion elasticity_theta_expansion;
-  
-  /**
-   * The object that stores the "assembly" expansion of the parameter dependent PDE,
-   * i.e. the objects that define how to assemble the set of parameter-independent
-   * operators in the affine expansion of the PDE.
+   * The object that stores the "assembly" expansion of the parameter dependent PDE.
    */
   ElasticityAssemblyExpansion elasticity_assembly_expansion;
+
+  /**
+   * Object to assemble the inner product matrix
+   */
+  InnerProductAssembly ip_assembly;
 
   /**
    * The object that defines which degrees of freedom are on a Dirichlet boundary.
    */
   AutoPtr<DirichletBoundary> dirichlet_bc;
-  
-  /**
-   * Object to assemble the inner product matrix
-   */
-  InnerProductAssembly ip_assembly;
 
 };
 
