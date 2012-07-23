@@ -9,6 +9,8 @@ usage ()
   echo "usage: $0 --cppflags --cxxflags --include --ldflags"
   echo "       $0 --cxx"
   echo "       $0 --cc"
+  echo "       $0 --fc"
+  echo "       $0 --fflags"
   exit
 }
 
@@ -36,6 +38,10 @@ while [ "x$1" != "x" ]; do
 	    echo_list="echo_cc $echo_list"
 	    ;;
 
+	"--fc")
+	    echo_list="echo_fc $echo_list"
+	    ;;
+
 	"--cppflags")
 	    echo_list="echo_cppflags $echo_list"
 	    ;;
@@ -46,6 +52,10 @@ while [ "x$1" != "x" ]; do
 	
 	"--cflags")
 	    echo_list="echo_cflags $echo_list"
+	    ;;
+	
+	"--fflags")
+	    echo_list="echo_fflags $echo_list"
 	    ;;
 	
 	"--include")
