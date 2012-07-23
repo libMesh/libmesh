@@ -441,7 +441,6 @@ const T& Parameters::get (const std::string& name) const
 		    << name << "\":" << std::endl
 		    << *this;
 
-      print_trace();
       libmesh_error();
     }
 
