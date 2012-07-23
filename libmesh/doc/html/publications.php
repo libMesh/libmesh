@@ -541,8 +541,8 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 <td class="bibtexitem">
 R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
  Finite element simulation of dense wire packings.
- <em>European Journal of Mechanics - A/Solids</em>, 37:160-–171,
-  January 2013.
+ <em>European Journal of Mechanics - A/Solids</em>, 37:160-171, January
+  2013.
  <a href="http://dx.doi.org/10.1016/j.euromechsol.2012.06.007">http://dx.doi.org/10.1016/j.euromechsol.2012.06.007</a>,
   <a href="http://arxiv.org/abs/1111.5128v2">http://arxiv.org/abs/1111.5128v2</a>.
 <a name="Vetter_2013"></a><pre>
@@ -553,7 +553,7 @@ R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
   year = 2013,
   volume = 37,
   month = jan,
-  pages = {160-–171},
+  pages = {160--171},
   note = {\url{http://dx.doi.org/10.1016/j.euromechsol.2012.06.007}, \url{http://arxiv.org/abs/1111.5128v2}}
 }
 </pre>
