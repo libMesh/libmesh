@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #if defined EXTERN
 #undef EXTERN
 #endif
@@ -34,18 +11,19 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
 */
 
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
 namespace tecplot
 {
-namespace io
-{
 class File;
-}
 }
 
 EXTERN void OutOfMemoryMsg(void);
@@ -64,22 +42,23 @@ EXTERN void OutOfMemoryMsg(void);
 struct _FieldData_a
 {
     void               *Data; /* ...placed first in the structure for fastest access */
-# if defined TECPLOTKERNEL
+    #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
-# else
+    #else
     void *GetValueCallback[1]; /* ...this field is for TecIO only */
     void *SetValueCallback[1]; /* ...this field is for TecIO only */
-# endif
+    #endif
 
     /* PRIVATE */
     FieldDataType_e     Type;
     ValueLocation_e     ValueLocation;
-    LgIndex_t           RefCount;
-    LgIndex_t           VarShareRefCount;
-    LgIndex_t           NumValues;
-# if defined TECPLOTKERNEL /* TecIO doesn't require these features yet. */
+    #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet. */
 /* CORE SOURCE CODE REMOVED */
-# endif
+    #endif
+    LgIndex_t           NumValues;
+    #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet. */
+/* CORE SOURCE CODE REMOVED */
+    #endif
 };
 
 
@@ -296,6 +275,8 @@ EXTERN void SwapBytesInUnalignedTypedValueArray(FieldDataType_e  ValueType,
 /*
  * Copies values from "src" to "dst".  "src" or "dst" may
  * be differing types.  Either or both may be V3D data pointers.
+ *
+ * NOTE: We allow src_end to be one less than src_start and is treated as a noop.
  */
 EXTERN void CopyFieldDataRange(FieldData_pa dst,
                                LgIndex_t    dst_start,
@@ -317,6 +298,9 @@ EXTERN void CopyFieldValue(FieldData_pa dst,
                            FieldData_pa src,
                            LgIndex_t    srcindex);
 
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */

@@ -1,27 +1,4 @@
 /*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
-/*
 *****************************************************************
 *****************************************************************
 *******                                                  ********
@@ -66,7 +43,7 @@ END CODELOG
 #if defined ADDON
 #include "TECADDON.h"
 #include "GUIDEFS.h"
-#include "GUI.h"
+#include "TECGUI.h"
 #define READTEC                TecUtilReadBinaryData
 #define SHOWINFO(S)            TecGUITextAppendString(Output_T_D1,S);
 #define ERRMSG(S)              TecUtilDialogErrMsg(S)
@@ -75,6 +52,12 @@ END CODELOG
 #define STRINGLISTGETSTRING(S,N)  TecUtilStringListGetString(S,N)
 #define STRINGLISTGETCOUNT(S)     TecUtilStringListGetCount(S)
 #define STRINGLISTDEALLOC(S)      TecUtilStringListDealloc(S)
+
+#define AUXDATADEALLOC(S)         TecUtilAuxDataDealloc(S)
+#define AUXDATAGETNUMITEMS(S)     TecUtilAuxDataGetNumItems(S)
+#define AUXDATAGETITEMBYINDEX(S,Index,Name,Value,Type,Retain) \
+    TecUtilAuxDataGetItemByIndex(S,(Index),Name,Value,Type,Retain)
+
 #else
 #include "MASTER.h"
 #include "GLOBAL.h"
@@ -83,14 +66,8 @@ END CODELOG
 #define FREE_ARRAY(N,S)           TecFree((void *)N)
 #include "ARRLIST.h"
 #include "STRLIST.h"
+#include "AUXDATA.h"
 #include "DATAUTIL.h"
-
-/*
-#include "TECADDON.h"
-#include "TECXXX.h"
-#include "DATAUTIL.h"
-#include "STRLIST.h"
-*/
 
 #define READTEC                   ReadTec
 #define SHOWINFO(S)               printf("%s",S);
@@ -98,7 +75,12 @@ END CODELOG
 #define STRINGLISTGETSTRING(S,N)  StringListGetString(S,(N)-1)
 #define STRINGLISTGETCOUNT(S)     StringListCount(S)
 #define STRINGLISTDEALLOC(S)      StringListDealloc(S)
-#define MaxCharsUserRec 500
+
+#define AUXDATADEALLOC(S)         AuxDataDealloc(S)
+#define AUXDATAGETNUMITEMS(S)     AuxDataGetNumItems(S)
+#define AUXDATAGETITEMBYINDEX(S,Index,Name,Value,Type,Retain) \
+    AuxDataGetItemByIndex(S,(Index)-1,Name,Value,Type,Retain)
+
 #endif
 
 
@@ -144,7 +126,8 @@ static void DeallocHeaderInfo(char         **DataSetTitle,
                               LgIndex_t    **NumPtsJ,
                               LgIndex_t    **NumPtsK,
                               ZoneType_e   **ZoneType,
-                              StringList_pa *UserRec)
+                              StringList_pa *UserRec,
+                              AuxData_pa    *DatasetAuxData)
 {
     if (*DataSetTitle)
         FREE_ARRAY(*DataSetTitle, "data set title");
@@ -162,6 +145,8 @@ static void DeallocHeaderInfo(char         **DataSetTitle,
         FREE_ARRAY(*ZoneType, "ZoneType Array");
     if (*UserRec)
         STRINGLISTDEALLOC(UserRec);
+    if (*DatasetAuxData)
+        AUXDATADEALLOC(DatasetAuxData);
 
     *DataSetTitle  = NULL;
     *VarNames      = NULL;
@@ -173,9 +158,55 @@ static void DeallocHeaderInfo(char         **DataSetTitle,
     *UserRec       = NULL;
 }
 
-
-
 #define MAXCHARSINFOLINE 5000
+
+void ShowDatasetAuxData(AuxData_pa DatasetAuxData, char* InfoLine) 
+{
+    REQUIRE(VALID_REF(InfoLine));
+    if (DatasetAuxData != NULL)
+    {
+        SHOWINFO("Dataset Auxiliary Data:\n");
+        SHOWINFO("-----------------------\n");
+        LgIndex_t NumItems = AUXDATAGETNUMITEMS(DatasetAuxData);
+        for (LgIndex_t ii = 0; ii < NumItems; ++ii)
+        {
+#if defined ADDON
+            char* Name;
+#else
+            const char* Name;
+#endif
+            ArbParam_t Value;
+            AuxDataType_e Type;
+            Boolean_t Retain;
+            AUXDATAGETITEMBYINDEX(DatasetAuxData,
+                ii+1,
+                &Name,
+                &Value,
+                &Type,
+                &Retain);
+            sprintf(InfoLine, "  Name: %s\n", Name);
+            SHOWINFO(InfoLine);
+#if defined ADDON
+            // The TecUtil layer returns copies which must be deallocated
+            TecUtilStringDealloc(&Name);
+#endif
+            if (Type == AuxDataType_String)
+            {
+                char* ValueString = reinterpret_cast<char*>(Value);
+                sprintf(InfoLine, "    Value : %s\n", ValueString);
+                SHOWINFO(InfoLine);
+                SHOWINFO("    Type  : String\n");
+#if defined ADDON
+                // The TecUtil layer returns copies which must be deallocated
+                TecUtilStringDealloc(&ValueString);
+#endif
+            }
+            sprintf(InfoLine, "    Retain: %s\n", Retain ? "True" : "False");
+            SHOWINFO(InfoLine);
+        }
+        SHOWINFO("\n");
+    }
+}
 
 
 void ReportFileInfo(char     *FName,
@@ -185,14 +216,15 @@ void ReportFileInfo(char     *FName,
     short          IVersion;
     EntIndex_t     NumZones;
     EntIndex_t     NumVars;
-    char          *DataSetTitle = NULL;
-    StringList_pa  VarNames     = NULL;
-    StringList_pa  ZoneNames    = NULL;
-    LgIndex_t     *NumPtsI      = NULL;
-    LgIndex_t     *NumPtsJ      = NULL;
-    LgIndex_t     *NumPtsK      = NULL;
-    ZoneType_e    *ZoneType     = NULL;
-    StringList_pa  UserRec      = NULL;
+    char          *DataSetTitle   = NULL;
+    StringList_pa  VarNames       = NULL;
+    StringList_pa  ZoneNames      = NULL;
+    LgIndex_t     *NumPtsI        = NULL;
+    LgIndex_t     *NumPtsJ        = NULL;
+    LgIndex_t     *NumPtsK        = NULL;
+    ZoneType_e    *ZoneType       = NULL;
+    StringList_pa  UserRec        = NULL;
+    AuxData_pa     DatasetAuxData = NULL;
     int            CZ, CV;
     char           InfoLine[MAXCHARSINFOLINE+1];
     double       **VDataBase    = NULL;
@@ -215,6 +247,7 @@ void ReportFileInfo(char     *FName,
                  &NumPtsK,
                  &ZoneType,
                  &UserRec,
+                 &DatasetAuxData,
                  FALSE,
                  (NodeMap_t ***)NULL,
                  (double ***)NULL))
@@ -272,7 +305,8 @@ void ReportFileInfo(char     *FName,
                               &NumPtsJ,
                               &NumPtsK,
                               &ZoneType,
-                              &UserRec);
+                              &UserRec,
+                              &DatasetAuxData);
 
             /*
              * Reread the datafile.  This time load in the header AND the raw data
@@ -292,6 +326,7 @@ void ReportFileInfo(char     *FName,
                          &NumPtsK,
                          &ZoneType,
                          &UserRec,
+                         &DatasetAuxData,
                          AllocateRawDataSpaceLocally,
                          &NodeMap,
                          &VDataBase))
@@ -368,6 +403,9 @@ void ReportFileInfo(char     *FName,
 
         sprintf(InfoLine, "DataSetTitle: %s\n", DataSetTitle ? DataSetTitle : " ");
         SHOWINFO(InfoLine);
+
+        ShowDatasetAuxData(DatasetAuxData, InfoLine);
+
         sprintf(InfoLine, "NumZones    : %d\n", (int)NumZones);
         SHOWINFO(InfoLine);
         sprintf(InfoLine, "NumVars     : %d\n", (int)NumVars);
@@ -534,7 +572,8 @@ void ReportFileInfo(char     *FName,
                           &NumPtsJ,
                           &NumPtsK,
                           &ZoneType,
-                          &UserRec);
+                          &UserRec,
+                          &DatasetAuxData);
     }
 }
 

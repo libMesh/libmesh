@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #if defined EXTERN
 #undef EXTERN
 #endif
@@ -37,11 +14,14 @@
 *****************************************************************
 *****************************************************************
 *******                                                  ********
-****** Copyright (C) 1988-2008 Tecplot, Inc.              *******
+****** Copyright (C) 1988-2010 Tecplot, Inc.              *******
 *******                                                  ********
 *****************************************************************
 *****************************************************************
 */
+
+#include <vector>
+#include <algorithm>
 
 #define PadOut(X,Y)           ((int)(((X)-1)/(Y)+1)*(Y))
 #define SetBitSize            (8*sizeof(SetData_t))
@@ -279,5 +259,77 @@ EXTERN void ShiftSet(Set_pa     Set,
             for (Member = GetLastSetMember((Set)); \
                  Member != BAD_SET_VALUE; \
                  Member = GetPrevMember((Set), (Member)))
+
+namespace tecplot
+{
+
+/**
+ * Converts a set into a vector of set offsets.
+ * @templateparam T
+ *     Type item in the set.
+ * @param itemSet
+ *     Set of items to convert into a vector of set offsets.
+ * @return
+ *     Vector of set offsets.
+ * @throws std::bad_alloc if insufficient resources are available to made the copy
+ */
+template <typename T>
+std::vector<T> toVector(Set_pa itemSet)
+{
+    REQUIRE(VALID_REF(itemSet) || itemSet == 0);
+
+    std::vector<T> result;
+    size_t const count = MemberCount(itemSet);
+    if (count != 0)
+    {
+        result.reserve(count);
+        SetIndex_t item;
+        ForAllMembersInSet(item,itemSet)
+            result.push_back(static_cast<T>(item));
+    }
+
+    return result;
+}
+
+/**
+ * Converts a vector into a set offsets.
+ * @templateparam T
+ *     Type item in the set.
+ * @param items
+ *     Vector of elements of type T to convert to the set of offsets.
+ * @return
+ *     Allocated Set of items with the elements converted from the vector.
+ * @throws std::bad_alloc if insufficient resources are available to made the copy
+ */
+template <typename T>
+Set_pa toSet(std::vector<T> const& items)
+{
+    Set_pa result = AllocSet(FALSE);
+    if (result == NULL)
+        throw std::bad_alloc();
+
+    if (!items.empty())
+    {
+        // locate the largest element, O(n)
+        typename std::vector<T>::const_iterator largest = std::max_element(items.begin(), items.end());
+
+        if (!ExpandSet(result, *largest + 1, FALSE))
+        {
+            DeallocSet(&result);
+            throw std::bad_alloc();
+        }
+
+        for (typename std::vector<T>::const_iterator item = items.begin();item != items.end();++item)
+        {
+            if (!AddToSet(result,static_cast<SetIndex_t>(*item),FALSE))
+                throw std::bad_alloc();
+        }
+    }
+
+    ENSURE(VALID_REF(result));
+    return result;
+}
+
+}
 
 #endif // _SET_H_INCLUDED

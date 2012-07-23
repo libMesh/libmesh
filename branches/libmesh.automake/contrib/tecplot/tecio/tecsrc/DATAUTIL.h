@@ -1,27 +1,4 @@
 /*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
-/*
  * DATAUTIL.h : COPYRIGHT (C)1987-2002 Tecplot, Inc.
  *                 ALL RIGHTS RESERVED
  *
@@ -76,6 +53,10 @@ extern void InitInputSpecs(void);
  * @param UserRec
  *  Allocates space for and returns the user records.
  *
+ * @param DatasetAuxData
+ *  Allocates space for and returns Dataset Auxiliary Data.  This must be
+ *  deallocated with AuxDataDealloc.
+ *
  * @param RawDataspaceAllocated
  *  Only used if GetHeaderInfoOnly is FALSE. TRUE = calling program has alloced space for
  *  the raw data. FALSE= let ReadTec allocate space for the raw data.
@@ -104,6 +85,7 @@ LIBFUNCTION Boolean_t STDCALL ReadTec(Boolean_t       GetHeaderInfoOnly,
                                       LgIndex_t     **NumPtsK,
                                       ZoneType_e    **ZoneType,
                                       StringList_pa  *UserRec,
+                                      AuxData_pa     *DatasetAuxData,
                                       Boolean_t       RawDataspaceAllocated,
                                       NodeMap_t    ***NodeMap,
                                       double       ***VDataBase);

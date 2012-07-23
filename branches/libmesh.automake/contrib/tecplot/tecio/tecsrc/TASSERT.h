@@ -1,31 +1,8 @@
 /*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
-/*
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -125,8 +102,12 @@
 #if !defined TECPLOTKERNEL
 /* For add-ons, there is a problem with VALID_REF, so just test for non-NULL */
 /* ENDREMOVEFROMADDON */
-#  define VALID_REF(p)      ( (p)  != NULL )
-#  define VALID_FN_REF(fp)  ( (fp) != NULL )
+#  if !defined VALID_REF
+#    define VALID_REF(p)      ( (p)  != NULL )
+#  endif
+#  if !defined VALID_FN_REF
+#    define VALID_FN_REF(fp)  ( (fp) != NULL )
+#  endif
 /* BEGINREMOVEFROMADDON */
 #endif /* !defined TECPLOTKERNAL */
 /* ENDREMOVEFROMADDON */
@@ -147,11 +128,19 @@
 
 #if defined NO_ASSERTS
 /* release build in TecUtil layer uses these for TUASSERT */
-#  define VALID_REF(p)      ((p)  != NULL)
-#  define VALID_FN_REF(pf)  ((pf) != NULL)
+#  if !defined VALID_REF
+#    define VALID_REF(p)      ((p)  != NULL)
+#  endif
+#  if !defined VALID_FN_REF
+#    define VALID_FN_REF(pf)  ((pf) != NULL)
+#  endif
 #else
-#  define VALID_REF(p)      ((p)  != NULL && !IsBadReadPtr((const void *)(p), 1))
-#  define VALID_FN_REF(pf)  ((pf) != NULL && !IsBadReadPtr((const void *)(pf),(UINT_PTR)sizeof(const void*)))
+#  if !defined VALID_REF
+#    define VALID_REF(p)      ((p)  != NULL && !IsBadReadPtr((const void *)(p), 1))
+#  endif
+#  if !defined VALID_FN_REF
+#    define VALID_FN_REF(pf)  ((pf) != NULL && !IsBadReadPtr((const void *)(pf),(UINT_PTR)sizeof(const void*)))
+#  endif
 #endif
 
 /* BEGINREMOVEFROMADDON */
@@ -178,13 +167,21 @@
 
 /* ENDREMOVEFROMADDON */
 /* other useful validity checks */
-#define VALID_BOOLEAN(b)           ((b) == TRUE || (b) == FALSE)
-#define VALID_ENUM(value, type)    (0 <= (value) && \
-                                         (value) < END_##type)
+#if !defined VALID_BOOLEAN
+#  define VALID_BOOLEAN(b)           ((b) == TRUE || (b) == FALSE)
+#endif
+#if !defined VALID_ENUM
+#  define VALID_ENUM(value, type)    (0 <= (int)(value) && \
+                                           (int)(value) < END_##type)
+#endif
 
 /* Test a parameter than can be NULL or a valid pointer */
-#define VALID_REF_OR_NULL(ptr) IMPLICATION((ptr) != NULL, VALID_REF(ptr))
-#define VALID_FN_REF_OR_NULL(ptr) IMPLICATION((ptr) != NULL, VALID_FN_REF(ptr))
+#if !defined VALID_REF_OR_NULL
+#  define VALID_REF_OR_NULL(ptr) IMPLICATION((ptr) != NULL, VALID_REF(ptr))
+#endif
+#if !defined VALID_FN_REF_OR_NULL
+#  define VALID_FN_REF_OR_NULL(ptr) IMPLICATION((ptr) != NULL, VALID_FN_REF(ptr))
+#endif
 
 /* BEGINREMOVEFROMADDON */
 #define VALID_TRANSLATED_STRING(ts) (!(ts).isNull())
@@ -267,23 +264,29 @@
 /* ENDREMOVEFROMADDON */
 
 /* Check for a non-zero length string */
-#if defined MSWIN
-#  if defined NO_ASSERTS
-#    define VALID_NON_ZERO_LEN_STR(str) (VALID_REF(str) && !ISEMPTYSTRING(str))
+#if !defined VALID_NON_ZERO_LEN_STR
+#  if defined MSWIN
+#    if defined NO_ASSERTS
+#      define VALID_NON_ZERO_LEN_STR(str) (VALID_REF(str) && !ISEMPTYSTRING(str))
+#    else
+#      define VALID_NON_ZERO_LEN_STR(str) \
+           (VALID_REF(str)                                                            && \
+           !IsBadReadPtr((const void*)(str),(UINT_PTR)(1+strlen((const char*)(str)))) && \
+           !ISEMPTYSTRING(str))
+#    endif
 #  else
-#    define VALID_NON_ZERO_LEN_STR(str) \
-         (VALID_REF(str)                                                            && \
-         !IsBadReadPtr((const void*)(str),(UINT_PTR)(1+strlen((const char*)(str)))) && \
-         !ISEMPTYSTRING(str))
+#    define VALID_NON_ZERO_LEN_STR(str) (VALID_REF(str) && !ISEMPTYSTRING(str))
 #  endif
-#else
-#  define VALID_NON_ZERO_LEN_STR(str) (VALID_REF(str) && !ISEMPTYSTRING(str))
 #endif
 
-#define VALID_SET_INDEX(setIndex) (((SetIndex_t)setIndex)>=(SetIndex_t)1)
+#if !defined VALID_SET_INDEX
+#  define VALID_SET_INDEX(setIndex) (((SetIndex_t)setIndex)>=(SetIndex_t)1)
+#endif
 
 /* Check for valid stdio file handle */
-#define VALID_FILE_HANDLE(stream) ((stream) != NULL)
+#if !defined VALID_FILE_HANDLE
+#  define VALID_FILE_HANDLE(stream) ((stream) != NULL)
+#endif
 
 /* To check colors and pen numbers */
 /* BEGINREMOVEFROMADDON */
@@ -333,7 +336,7 @@
 #define VALID_NAME(Name, MaxLength) \
           (VALID_REF(Name) && \
            (ISEMPTYSTRING(Name) || \
-            (!isspace((Name)[0]) && !isspace((Name)[strlen(Name)-1]))) && \
+            (!tecplot::isspace((Name)[0]) && !tecplot::isspace((Name)[strlen(Name)-1]))) && \
            strlen(Name) <= (MaxLength))
 #define VALID_ZONE_NAME(Name) VALID_NAME((Name), MaxChrsZnTitle)
 #define VALID_VAR_NAME(Name)  VALID_NAME((Name), MaxChrsVarName)
@@ -366,41 +369,76 @@ extern TAssertFailureNotifyFunc InstallTAssertFailureNotify(
 /* BEGINREMOVEFROMADDON */
 #   define TASSERT(EXPR)
 /* ENDREMOVEFROMADDON */
-#   define INVARIANT(EXPR)
-#   define REQUIRE(EXPR)
-#   define ENSURE(EXPR)
-#   define CHECK(EXPR)
+#   if !defined INVARIANT
+#     define INVARIANT(EXPR)
+#   endif
+#   if !defined REQUIRE
+#     define REQUIRE(EXPR)
+#   endif
+#   if !defined ENSURE
+#     define ENSURE(EXPR)
+#   endif
+#   if !defined CHECK
+#     define CHECK(EXPR)
+#   endif
 #   ifdef VERIFY
 #     undef VERIFY
 #   endif
 #   define VERIFY(EXPR)    ((void)(EXPR))
+
+/*
+ * If a project is compiled with "warnings treated as errors" we need a way to
+ * to remove parameters that are only used for assertions if assertions are
+ * turned off.
+ *
+ * This macro is used in the implementation as follows:
+ *
+ *     void someFunction(int const ASSERT_ONLY_PARAM(paramOnlyUsedInAssertions))
+ *     {
+ *        ...
+ *     }
+ */
+#   if !defined ASSERT_ONLY_PARAM
+#     define ASSERT_ONLY_PARAM(PARAMETER)
+#   endif
+
 /*
  * Only define IGNORENOTIMPLEMENTED if building a "test" release build
  * that you are fully aware may contain unimplemented features.
  */
-#   if defined IGNORENOTIMPLEMENTED
-#     define NOT_IMPLEMENTED() CHECK(FALSE)
-#   else
-#     if defined MSWIN
+#   if !defined NOT_IMPLEMENTED
+#     if defined IGNORENOTIMPLEMENTED
+#       define NOT_IMPLEMENTED() CHECK(FALSE)
+#     else
+#       if defined MSWIN
 /*
  * NOT_IMPLEMENTED is defined using a parameter, but should be called with none,
  * this will then throw a warning and not break the compile. Unix doesn't pick
  * up this warning, so break the compile under Unix
  */
-#       define NOT_IMPLEMENTED(x)  TAssert("Not Implemented", __FILE__, __LINE__)
-#     endif
-#     if defined UNIXX
-#       define NOT_IMPLEMENTED()  not implemented /* intentionally break the compile */
+#         define NOT_IMPLEMENTED(x)  TAssert("Not Implemented", __FILE__, __LINE__)
+#       endif
+#       if defined UNIXX
+#         define NOT_IMPLEMENTED()  not implemented /* intentionally break the compile */
+#       endif
 #     endif
 #   endif
 #elif defined STD_ASSERTS
 /* BEGINREMOVEFROMADDON */
 #   define TASSERT(EXPR)         assert(EXPR)
 /* ENDREMOVEFROMADDON */
-#   define INVARIANT(EXPR)       assert(EXPR)
-#   define REQUIRE(EXPR)         assert(EXPR)
-#   define ENSURE(EXPR)          assert(EXPR)
-#   define CHECK(EXPR)           assert(EXPR)
+#   if !defined INVARIANT
+#     define INVARIANT(EXPR)       assert(EXPR)
+#   endif
+#   if !defined REQUIRE
+#     define REQUIRE(EXPR)         assert(EXPR)
+#   endif
+#   if !defined ENSURE
+#     define ENSURE(EXPR)          assert(EXPR)
+#   endif
+#   if !defined CHECK
+#     define CHECK(EXPR)           assert(EXPR)
+#   endif
 #   ifdef VERIFY
 #     undef VERIFY
 #   endif
@@ -411,7 +449,15 @@ extern TAssertFailureNotifyFunc InstallTAssertFailureNotify(
 #       define VERIFY(EXPR) assert(EXPR)
 #     endif
 #   endif /* VERIFY */
-#   define NOT_IMPLEMENTED()     assert(!("Not Implemented"))
+#   if !defined NOT_IMPLEMENTED
+#     define NOT_IMPLEMENTED()     assert(!("Not Implemented"))
+#   endif
+    /*
+     * See note above for this macro.
+     */
+#   if !defined ASSERT_ONLY_PARAM
+#     define ASSERT_ONLY_PARAM(PARAMETER) PARAMETER
+#   endif
 #else
 /* BEGINREMOVEFROMADDON */
 #if defined (MSWIN)
@@ -487,6 +533,10 @@ Works in both release & debug builds */
 #   else
 #     define NOT_IMPLEMENTED() TASSERT(!("Not Implemented"))
 #   endif
+    /*
+     * See note above for this macro.
+     */
+#   define ASSERT_ONLY_PARAM(PARAMETER) PARAMETER
 /* ENDREMOVEFROMADDON */
 #endif
 /* BEGINREMOVEFROMADDON */
@@ -500,8 +550,12 @@ extern void NiceNotImplemented(void);
 /* ENDREMOVEFROMADDON */
 
 /* convenience macros for implication, P -> Q, and equivalence, P <-> Q. */
-#define IMPLICATION(P,Q) (!(P) || (Q))
-#define EQUIVALENCE(P,Q) ((P) == (Q))
+#if !defined IMPLICATION
+#  define IMPLICATION(P,Q) (!(P) || (Q))
+#endif
+#if !defined EQUIVALENCE
+#  define EQUIVALENCE(P,Q) ((P) == (Q))
+#endif
 
 /* BEGINREMOVEFROMADDON */
 #if defined RLM

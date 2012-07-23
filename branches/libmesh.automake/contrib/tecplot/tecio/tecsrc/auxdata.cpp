@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -29,7 +6,7 @@
  *****************************************************************
  *****************************************************************
  *******                                                  ********
- ****** Copyright (C) 1988-2008 Tecplot, Inc.             ********
+ ****** Copyright (C) 1988-2010 Tecplot, Inc.             ********
  *******       All Rights Reserved.                       ********
  *******                                                  ********
  *****************************************************************
@@ -41,6 +18,7 @@
 #include "TASSERT.h"
 #include "Q_UNICODE.h"
 #include "ALLOC.h"
+#include "CHARTYPE.h"
 #include "STRUTIL.h"
 #include "ARRLIST.h"
 #include "DATASET.h"
@@ -90,11 +68,11 @@ Boolean_t AuxDataIsValidNameChar(char      Char,
     REQUIRE(VALID_BOOLEAN(IsLeadChar));
 
     IsValidNameChar = (Char == '_' ||
-                       isalpha(Char));
+                       tecplot::isalpha(Char));
     if (!IsLeadChar)
         IsValidNameChar = (IsValidNameChar ||
                            Char == '.'     ||
-                           isdigit(Char));
+                           tecplot::isdigit(Char));
 
     ENSURE(VALID_BOOLEAN(IsValidNameChar));
     return IsValidNameChar;
@@ -240,6 +218,7 @@ static Boolean_t AuxDataItemListItemDestructor(void       *ItemRef,
 
     REQUIRE(VALID_REF(AuxDataItemRef));
     REQUIRE(VALID_REF(*AuxDataItemRef) || *AuxDataItemRef == NULL);
+    UNUSED(ClientData);
 
     if (*AuxDataItemRef != NULL)
         AuxDataItemDealloc(AuxDataItemRef);
@@ -267,6 +246,7 @@ Boolean_t AuxDataItemDestructor(void       *ItemRef,
 
     REQUIRE(VALID_REF(AuxDataRef));
     REQUIRE(VALID_REF(*AuxDataRef) || *AuxDataRef == NULL);
+    UNUSED(ClientData);
 
     if (*AuxDataRef != NULL)
         AuxDataDealloc(AuxDataRef);
@@ -331,7 +311,7 @@ static Boolean_t AuxDataItemDuplicator(void       *TargetItemRef,
  * param AuxData
  *     Reference to an auxiliary data handle or reference to NULL.
  */
-void AuxDataDealloc(AuxData_pa *AuxData)
+void LIBCALL AuxDataDealloc(AuxData_pa *AuxData)
 {
     REQUIRE(VALID_REF(AuxData));
     REQUIRE(VALID_REF(*AuxData) || *AuxData == NULL);
@@ -441,7 +421,7 @@ AuxData_pa AuxDataCopy(AuxData_pa AuxData,
  * return
  *     Number of items maintained by the auxiliary data.
  */
-LgIndex_t AuxDataGetNumItems(AuxData_pa AuxData)
+LgIndex_t LIBCALL AuxDataGetNumItems(AuxData_pa AuxData)
 {
     LgIndex_t NumItems;
 
@@ -560,12 +540,12 @@ Boolean_t AuxDataGetItemIndex(AuxData_pa  AuxData,
  * param Retain
  *     Address to hold the auxiliary data item retain flag.
  */
-void AuxDataGetItemByIndex(AuxData_pa    AuxData,
-                           LgIndex_t     Index,
-                           const char    **Name,
-                           ArbParam_t    *Value,
-                           AuxDataType_e *Type,
-                           Boolean_t     *Retain)
+void LIBCALL AuxDataGetItemByIndex(AuxData_pa    AuxData,
+		                           LgIndex_t     Index,
+		                           const char    **Name,
+		                           ArbParam_t    *Value,
+		                           AuxDataType_e *Type,
+		                           Boolean_t     *Retain)
 {
     AuxDataItem_s *AuxDataItem;
 

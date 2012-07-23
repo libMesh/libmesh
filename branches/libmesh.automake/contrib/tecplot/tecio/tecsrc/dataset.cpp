@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -29,16 +6,22 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
 */
 
 #define DATASETMODULE
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
 #include "GLOBAL.h"
 #include "TASSERT.h"
 #include "Q_UNICODE.h"
+#include "CHARTYPE.h"
 #include "STRUTIL.h"
 #include "AUXDATA.h"
 #include "ARRLIST.h"
@@ -122,6 +105,7 @@ Boolean_t ZoneSpecItemDestructor(void       *ItemRef,
 
     REQUIRE(VALID_REF(ZoneSpecRef));
     REQUIRE(VALID_REF(*ZoneSpecRef) || *ZoneSpecRef == NULL);
+    UNUSED(ClientData);
 
     if (*ZoneSpecRef != NULL)
         ZoneSpecDealloc(ZoneSpecRef);
@@ -243,6 +227,7 @@ LgIndex_t ZoneOrVarListAdjustCapacityRequest(ArrayList_pa ZoneOrVarArrayList,
     REQUIRE((RequestedCapacity == 0 && CurrentCapacity == 0) ||
             RequestedCapacity > CurrentCapacity);
     REQUIRE(CurrentCapacity <= MaxNumZonesOrVars);
+    UNUSED(ClientData);
 
     if (RequestedCapacity <= MaxNumZonesOrVars)
     {

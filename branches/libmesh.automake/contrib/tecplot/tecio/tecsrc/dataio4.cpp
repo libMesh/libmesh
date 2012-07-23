@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -29,7 +6,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -57,6 +34,7 @@
 #include "DATAIO4.h"
 #include "DATASET0.h"
 
+#include "CHARTYPE.h"
 #include "STRUTIL.h"
 #include "ARRLIST.h"
 #include "STRLIST.h"
@@ -406,11 +384,6 @@ Boolean_t ReadInString(FileStream_s  *FileStream,
             CharValue = GetIoFileInt(FileStream, IVersion, 0, 255, &IsOk);
             if (IsOk && ProcessData)
             {
-                /* massage the character if necessary */
-                if ((CharValue < 32 && CharValue != '\0' && CharValue != '\n') ||
-                    (CharValue >= 128 && CharValue < 160))
-                    CharValue = ' ';
-
                 /*
                  * if the limit is not exceded, stuff the
                  * character into the buffer
@@ -1016,7 +989,7 @@ static void ConvertCommonTimeToSolutionTime(ZoneSpec_s *ZoneSpec)
         if (EndPtr != (char *)Value)
         {
             /* we only allow white space to trail a value */
-            while (isspace(*EndPtr))
+            while (tecplot::isspace(*EndPtr))
                 EndPtr++;
         }
         if (EndPtr != (char *)Value && *EndPtr == '\0')
@@ -1888,9 +1861,21 @@ Boolean_t ReadInText(FileStream_s *FileStream,
         Text->AnchorPos.Generic.V3 = 0.0; /* default value for pre 101 versions */
 
     if (IVersion > 40)
-        Text->TextShape.Font = (Font_e)GetIoFileInt(FileStream, IVersion, 0, (LgIndex_t)Font_CourierBold, &IsOk);
+    {
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+            Text->TextShape.Font = (Font_e)GetIoFileInt(FileStream, IVersion, 0, (LgIndex_t)Font_CourierBold, &IsOk);
+        #endif
+    }
     else
-        Text->TextShape.Font = Font_Helvetica;
+    {
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+            Text->TextShape.Font = Font_Helvetica;
+        #endif
+    }
     if (IVersion < 43)
         GetNextValue(FileStream, FFT, -LARGEDOUBLE, LARGEDOUBLE, &IsOk);
     if (IVersion < 70)
@@ -2110,7 +2095,7 @@ static short GetNewInputVersion(FileStream_s *FileStream)
         return (0);
 
     I = 1;
-    while ((I < 4) && isdigit(Buf[I]))
+    while ((I < 4) && tecplot::isdigit(Buf[I]))
         IVersion = IVersion * 10 + Buf[I++] - '0';
 
     if (IVersion < 70)
@@ -2590,58 +2575,45 @@ Boolean_t WriteBinaryFieldDataBlock(FileStream_s *FileStream,
 }
 
 
-static Boolean_t WriteASCIIFieldDataValue(FileStream_s *FileStream,
+static Boolean_t WriteASCIIFieldDataValue(FileStream_s* FileStream,
                                           FieldData_pa  FieldData,
                                           LgIndex_t     Offset,
                                           SmInteger_t   AsciiPrecision)
 {
-    Boolean_t IsOk = FALSE; /* ...quiet compiler */
-
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
 
-    double V = 0.0;
+    double V = GetFieldValue(FieldData, Offset);
+
     char buffer[100*MAX_SIZEOFUTF8CHAR];
-    char *AsciiValue = buffer;
-
-#ifdef TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-
-    V = GetFieldValue(FieldData, Offset);
-
     switch (GetFieldDataType(FieldData))
     {
         case FieldDataType_Float :
         case FieldDataType_Double :
-            /*IsOk = FPRINTFOK(fprintf(FileStream->File," %.*E",(int)AsciiPrecision,V)); */
             sprintf(buffer, " %.*E", (int)AsciiPrecision, V);
             break;
         case FieldDataType_Int32 :
-            /* IsOk = FPRINTFOK(fprintf(FileStream->File," %*d",(int)AsciiPrecision,ROUNDL(V))); */
             sprintf(buffer, " %*d", (int)AsciiPrecision, ROUNDL(V));
             break;
         case FieldDataType_Int16 :
-            /* IsOk = FPRINTFOK(fprintf(FileStream->File," %6d",ROUND2(V))); */
             sprintf(buffer, " %6d", ROUND2(V));
             break;
         case FieldDataType_Byte :
-            /* IsOk = FPRINTFOK(fprintf(FileStream->File," %3d",ROUNDS(V))); */
             sprintf(buffer, " %3d", ROUNDS(V));
             break;
         case FieldDataType_Bit :
-            /* IsOk = FPRINTFOK(fprintf(FileStream->File," %c",((V == 0) ? '0' : '1'))); */
             sprintf(buffer, " %c", ((V == 0) ? '0' : '1'));
             break;
         default: CHECK(FALSE); break;
     }
-    IsOk = FPRINTFOK(fprintf(FileStream->File, buffer));
+
+    Boolean_t IsOk = FPRINTFOK(fprintf(FileStream->File, "%s", buffer));
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
     ENSURE(VALID_BOOLEAN(IsOk));
-    return (IsOk);
+    return IsOk;
 }
 
 
@@ -3154,7 +3126,13 @@ bool DumpText(FileStream_s* FileStream,
         WriteBinaryReal(FileStream, Text->AnchorPos.Generic.V1, FieldDataType_Double);
         WriteBinaryReal(FileStream, Text->AnchorPos.Generic.V2, FieldDataType_Double);
         WriteBinaryReal(FileStream, Text->AnchorPos.Generic.V3, FieldDataType_Double);
-        WriteBinaryInt32(FileStream, (LgIndex_t)Text->TextShape.Font);
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+        {
+            WriteBinaryInt32(FileStream, static_cast<LgIndex_t>(Text->TextShape.Font));
+        }
+        #endif
         WriteBinaryInt32(FileStream, (LgIndex_t)Text->TextShape.SizeUnits);
         WriteBinaryReal(FileStream, Text->TextShape.Height, FieldDataType_Double);
         WriteBinaryInt32(FileStream, (LgIndex_t)Text->Box.BoxType);
@@ -3229,7 +3207,16 @@ bool DumpText(FileStream_s* FileStream,
         fprintf(FileStream->File, "BXF="); WriteAsciiColor(FileStream->File, Text->Box.FillBColor);
 
         fprintf(FileStream->File, "\nF=");
-        switch (Text->TextShape.Font)
+
+        Font_e font;
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+        {
+            font = Text->TextShape.Font;
+        }
+        #endif
+        switch (font)
         {
             case Font_Helvetica     :   fprintf(FileStream->File, "HELV");         break;
             case Font_HelveticaBold :   fprintf(FileStream->File, "HELV-BOLD");    break;
@@ -3345,13 +3332,9 @@ bool writeBinaryVersionNumber(FileStream_s& fileStream,
 #endif
 #if !defined NO_ASSERTS
 #endif
-#if defined ALLOW_USERDEF_NO_NEIGHBORING_ELEMENT
-#else
-#endif
+            #if defined ALLOW_USERDEF_NO_NEIGHBORING_ELEMENT
+            #else
+            #endif
 #if 0 /* not used yet */
-#endif
-#if defined TECPLOTKERNEL
-#endif
-#if defined TECPLOTKERNEL
 #endif
 #endif

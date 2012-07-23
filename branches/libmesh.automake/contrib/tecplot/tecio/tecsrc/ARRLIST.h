@@ -1,31 +1,10 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
+#include "stdafx.h"
+#include "MASTER.h"
 /*
 *****************************************************************
 *****************************************************************
 *******                                                  ********
-****** Copyright (C) 1988-2008 Tecplot, Inc.              *******
+****** Copyright (C) 1988-2010 Tecplot, Inc.              *******
 *******                                                  ********
 *****************************************************************
 *****************************************************************
@@ -40,6 +19,10 @@
 #  define EXTERN
 #else
 #  define EXTERN extern
+#endif
+
+#if !defined TECPLOTKERNEL
+typedef struct _ArrayList_s* ArrayList_pa;
 #endif
 
 typedef enum
@@ -85,52 +68,45 @@ typedef enum
 
 typedef union
 {
-    unsigned char  UnsignedChar;
-    unsigned short UnsignedShort;
-    unsigned int   UnsignedInt;
-    unsigned long  UnsignedLong;
-    Int64_t        Int64;
-    char           Char;
-    short          Short;
-    int            Int;
-    long           Long;
-    float          Float;
-    double         Double;
-    LgIndex_t      LgIndex;
-    EntIndex_t     EntIndex;
-    SmInteger_t    SmInteger;
-    Boolean_t      BBoolean;  /* X-Windows uses Boolean */
-    ArbParam_t     ArbParam;
-    unsigned char  *UnsignedCharPtr;
-    unsigned short *UnsignedShortPtr;
-    unsigned int   *UnsignedIntPtr;
-    unsigned long  *UnsignedLongPtr;
-    Int64_t        *Int64Ptr;
-    char           *CharPtr;
-    short          *ShortPtr;
-    int            *IntPtr;
-    long           *LongPtr;
-    float          *FloatPtr;
-    double         *DoublePtr;
-    LgIndex_t      *LgIndexPtr;
-    EntIndex_t     *EntIndexPtr;
-    SmInteger_t    *SmIntegerPtr;
-    Boolean_t      *BooleanPtr;
-    ArbParam_t     *ArbParamPtr;
-    void           *VoidPtr;
+    unsigned char   UnsignedChar;
+    unsigned short  UnsignedShort;
+    unsigned int    UnsignedInt;
+    unsigned long   UnsignedLong;
+    Int64_t         Int64;
+    char            Char;
+    short           Short;
+    int             Int;
+    long            Long;
+    float           Float;
+    double          Double;
+    LgIndex_t       LgIndex;
+    EntIndex_t      EntIndex;
+    SmInteger_t     SmInteger;
+    Boolean_t       BBoolean;  /* X-Windows uses Boolean */
+    ArbParam_t      ArbParam;
+    unsigned char*  UnsignedCharPtr;
+    unsigned short* UnsignedShortPtr;
+    unsigned int*   UnsignedIntPtr;
+    unsigned long*  UnsignedLongPtr;
+    Int64_t*        Int64Ptr;
+    char*           CharPtr;
+    short*          ShortPtr;
+    int*            IntPtr;
+    long*           LongPtr;
+    float*          FloatPtr;
+    double*         DoublePtr;
+    LgIndex_t*      LgIndexPtr;
+    EntIndex_t*     EntIndexPtr;
+    SmInteger_t*    SmIntegerPtr;
+    Boolean_t*      BooleanPtr;
+    ArbParam_t*     ArbParamPtr;
+    void*           VoidPtr;
     void (*FunctionPtr)(void);
 } ArrayListItem_u;
 
-/**
- * NULL array list item for added convenience of inserting a NULL item without
- * having to declare and assign one. Can be used as follows:
- *
- *     IsOk = ArrayListInsertItem(SomeArrayList, SomeIndex, ArrayListNumItem);
- *
- * NOTE: This value must be set to zero before Tecplot uses array lists.
- *           memset(&ArrayListNullItem, 0, sizeof(ArrayListType_Any));
- */
-EXTERN ArrayListItem_u ArrayListNullItem;
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 /**
  * Visitor for traversing an array list. An iterator may not perform any
@@ -147,7 +123,7 @@ EXTERN ArrayListItem_u ArrayListNullItem;
  *     TRUE to continue visiting items, otherwise
  *     FALSE to discontinue visiting
  */
-typedef Boolean_t (*ArrayListItemVisitor_pf)(void       *ItemRef,
+typedef Boolean_t (*ArrayListItemVisitor_pf)(void*      ItemRef,
                                              ArbParam_t ClientData);
 #if 0 /* use this stub as a starting place */
 {
@@ -155,7 +131,7 @@ typedef Boolean_t (*ArrayListItemVisitor_pf)(void       *ItemRef,
     REQUIRE(VALID_REF(*TypeRef) || *TypeRef == NULL);
 
     Boolean_t DoContinue = TRUE;
-    <type> *TypeRef = (<type> *)ItemRef;
+    <type>* TypeRef = static_cast<<type>*>(ItemRef);
 
     ENSURE(VALID_BOOLEAN(DoContinue));
     return DoContinue;
@@ -200,8 +176,8 @@ typedef ArrayListItemVisitor_pf ArrayListItemDestructor_pf;
  *     is the client's responsibility to cleanup any
  *     partial duplication
  */
-typedef Boolean_t (*ArrayListItemDuplicator_pf)(void       *TargetItemRef,
-                                                void       *SourceItemRef,
+typedef Boolean_t (*ArrayListItemDuplicator_pf)(void*      TargetItemRef,
+                                                void*      SourceItemRef,
                                                 ArbParam_t ClientData);
 #if 0 /* use this stub as a starting place */
 {
@@ -210,8 +186,8 @@ typedef Boolean_t (*ArrayListItemDuplicator_pf)(void       *TargetItemRef,
     REQUIRE(VALID_REF(*SourceTypeRef) || *SourceTypeRef == NULL);
 
     Boolean_t IsOk = TRUE;
-    <type> *TargetTypeRef = (<type> *)TargetItemRef;
-    <type> *SourceTypeRef = (<type> *)SourceItemRef;
+    <type>* TargetTypeRef = static_cast<<type>*>(TargetItemRef);
+    <type>* SourceTypeRef = static_cast<<type>*>(SourceItemRef);
 
     ENSURE(VALID_BOOLEAN(IsOk));
     return IsOk;
@@ -260,7 +236,7 @@ typedef LgIndex_t (*ArrayListCapacityRequestAdjuster_pf)(ArrayList_pa ArrayList,
 /* private ArrayList structure: only exposed so STRUTIL can use it */
 typedef struct _ArrayList_s
 {
-    char            *Array;           /* byte array for holding the items */
+    char*            Array;           /* byte array for holding the items */
     ArrayListType_e  Type;            /* type of array items */
     SmInteger_t      ItemSize;        /* byte size of an individual item */
     LgIndex_t        Count;           /* number of items in the array */
@@ -297,23 +273,24 @@ EXTERN Boolean_t ArrayListEnlargeCapacity(ArrayList_pa ArrayList,
                                           LgIndex_t    RequestedCapacity);
 EXTERN ArrayList_pa ArrayListAlloc(LgIndex_t                           EstimatedCapacity,
                                    ArrayListType_e                     Type,
-                                   ArrayListCapacityRequestAdjuster_pf CapacityRequestAdjuster,
-                                   ArbParam_t                          CapacityRequestAdjusterClientData);
-EXTERN void ArrayListDealloc(ArrayList_pa               *ArrayList,
-                             ArrayListItemDestructor_pf ItemDestructor,
-                             ArbParam_t                 ClientData);
+                                   ArrayListCapacityRequestAdjuster_pf CapacityRequestAdjuster = 0,
+                                   ArbParam_t                          CapacityRequestAdjusterClientData = 0);
+EXTERN void ArrayListDealloc(ArrayList_pa*              ArrayList,
+                             ArrayListItemDestructor_pf ItemDestructor = 0,
+                             ArbParam_t                 ClientData = 0);
+EXTERN void ArrayListClear(ArrayList_pa ArrayList);
 EXTERN void ArrayListDeleteAllItems(ArrayList_pa               ArrayList,
-                                    ArrayListItemDestructor_pf ItemDestructor,
-                                    ArbParam_t                 ClientData);
+                                    ArrayListItemDestructor_pf ItemDestructor = 0,
+                                    ArbParam_t                 ClientData = 0);
 EXTERN void ArrayListDeleteItems(ArrayList_pa               ArrayList,
                                  LgIndex_t                  ItemOffset,
                                  LgIndex_t                  Count,
-                                 ArrayListItemDestructor_pf ItemDestructor,
-                                 ArbParam_t                 ClientData);
+                                 ArrayListItemDestructor_pf ItemDestructor = 0,
+                                 ArbParam_t                 ClientData = 0);
 EXTERN void ArrayListDeleteItem(ArrayList_pa               ArrayList,
                                 LgIndex_t                  ItemOffset,
-                                ArrayListItemDestructor_pf ItemDestructor,
-                                ArbParam_t                 ClientData);
+                                ArrayListItemDestructor_pf ItemDestructor = 0,
+                                ArbParam_t                 ClientData = 0);
 EXTERN ArrayList_pa ArrayListRemoveItems(ArrayList_pa ArrayList,
                                          LgIndex_t    ItemOffset,
                                          LgIndex_t    Count);
@@ -338,35 +315,32 @@ EXTERN ArrayListItem_u ArrayListGetItem(ArrayList_pa ArrayList,
 EXTERN Boolean_t ArrayListSetItem(ArrayList_pa               ArrayList,
                                   LgIndex_t                  ItemOffset,
                                   ArrayListItem_u            Item,
-                                  ArrayListItemDestructor_pf ItemDestructor,
-                                  ArbParam_t                 ClientData);
+                                  ArrayListItemDestructor_pf ItemDestructor = 0,
+                                  ArbParam_t                 ClientData = 0);
 EXTERN Boolean_t ArrayListAppendItem(ArrayList_pa    ArrayList,
                                      ArrayListItem_u Item);
 EXTERN Boolean_t ArrayListAppend(ArrayList_pa Target,
                                  ArrayList_pa Source);
 EXTERN ArrayList_pa ArrayListCopy(ArrayList_pa               ArrayList,
-                                  ArrayListItemDuplicator_pf ItemDuplicator,
-                                  ArbParam_t                 ClientData);
-EXTERN void *ArrayListToArray(ArrayList_pa               ArrayList,
+                                  ArrayListItemDuplicator_pf ItemDuplicator = 0,
+                                  ArbParam_t                 ClientData = 0);
+EXTERN void* ArrayListToArray(ArrayList_pa               ArrayList,
                               ArrayListItemDuplicator_pf ItemDuplicator,
                               ArbParam_t                 ClientData);
-EXTERN ArrayList_pa ArrayListFromArray(void                       *Source,
+EXTERN ArrayList_pa ArrayListFromArray(void*                      Source,
                                        LgIndex_t                  Count,
                                        ArrayListType_e            Type,
-                                       ArrayListItemDuplicator_pf ItemDuplicator,
-                                       ArbParam_t                 ClientData);
+                                       ArrayListItemDuplicator_pf ItemDuplicator = 0,
+                                       ArbParam_t                 ClientData = 0);
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
-EXTERN void ArrayListQSort(ArrayList_pa               ArrayList,
-                           ArrayListItemComparator_pf Comparator,
-                           ArbParam_t                 ClientData);
-EXTERN Boolean_t ArrayListBSearch(ArrayList_pa                ArrayList,
-                                  ArrayListItem_u             Item,
-                                  ArrayListItemComparator_pf  Comparator,
-                                  ArbParam_t                  ClientData,
-                                  LgIndex_t                  *ItemIndex);
+EXTERN Boolean_t ArrayListBSearch(ArrayList_pa               ArrayList,
+                                  ArrayListItem_u            Item,
+                                  ArrayListItemComparator_pf Comparator,
+                                  ArbParam_t                 ClientData,
+                                  LgIndex_t*                 ItemIndex = 0);
 
 #if defined USE_MACROS_FOR_FUNCTIONS
 /**
@@ -429,76 +403,76 @@ EXTERN Boolean_t ArrayListBSearch(ArrayList_pa                ArrayList,
 #  define ArrayListGetSmInteger(ArrayList, ItemOffset)        ArrayListGetTypedItem(ArrayList, ItemOffset, SmInteger_t)
 #  define ArrayListGetBoolean(ArrayList, ItemOffset)          ArrayListGetTypedItem(ArrayList, ItemOffset, Boolean_t)
 #  define ArrayListGetArbParam(ArrayList, ItemOffset)         ArrayListGetTypedItem(ArrayList, ItemOffset, ArbParam_t)
-#  define ArrayListGetUnsignedCharPtr(ArrayList, ItemOffset)  ArrayListGetTypedItem(ArrayList, ItemOffset, unsigned char *)
-#  define ArrayListGetUnsignedShortPtr(ArrayList, ItemOffset) ArrayListGetTypedItem(ArrayList, ItemOffset, unsigned short *)
-#  define ArrayListGetUnsignedIntPtr(ArrayList, ItemOffset)   ArrayListGetTypedItem(ArrayList, ItemOffset, unsigned int *)
-#  define ArrayListGetUnsignedLongPtr(ArrayList, ItemOffset)  ArrayListGetTypedItem(ArrayList, ItemOffset, unsigned long *)
-#  define ArrayListGetInt64Ptr(ArrayList, ItemOffset)         ArrayListGetTypedItem(ArrayList, ItemOffset, Int64_t *)
-#  define ArrayListGetCharPtr(ArrayList, ItemOffset)          ArrayListGetTypedItem(ArrayList, ItemOffset, char *)
-#  define ArrayListGetShortPtr(ArrayList, ItemOffset)         ArrayListGetTypedItem(ArrayList, ItemOffset, short *)
-#  define ArrayListGetIntPtr(ArrayList, ItemOffset)           ArrayListGetTypedItem(ArrayList, ItemOffset, int *)
-#  define ArrayListGetLongPtr(ArrayList, ItemOffset)          ArrayListGetTypedItem(ArrayList, ItemOffset, long *)
-#  define ArrayListGetFloatPtr(ArrayList, ItemOffset)         ArrayListGetTypedItem(ArrayList, ItemOffset, float *)
-#  define ArrayListGetDoublePtr(ArrayList, ItemOffset)        ArrayListGetTypedItem(ArrayList, ItemOffset, double *)
-#  define ArrayListGetLgIndexPtr(ArrayList, ItemOffset)       ArrayListGetTypedItem(ArrayList, ItemOffset, LgIndex_t *)
-#  define ArrayListGetEntIndexPtr(ArrayList, ItemOffset)      ArrayListGetTypedItem(ArrayList, ItemOffset, EntIndex_t *)
-#  define ArrayListGetSmIntegerPtr(ArrayList, ItemOffset)     ArrayListGetTypedItem(ArrayList, ItemOffset, SmInteger_t *)
-#  define ArrayListGetBooleanPtr(ArrayList, ItemOffset)       ArrayListGetTypedItem(ArrayList, ItemOffset, Boolean_t *)
-#  define ArrayListGetArbParamPtr(ArrayList, ItemOffset)      ArrayListGetTypedItem(ArrayList, ItemOffset, ArbParam_t *)
-#  define ArrayListGetVoidPtr(ArrayList, ItemOffset)          ArrayListGetTypedItem(ArrayList, ItemOffset, void *)
+#  define ArrayListGetUnsignedCharPtr(ArrayList, ItemOffset)  ArrayListGetTypedItem(ArrayList, ItemOffset, unsigned char*)
+#  define ArrayListGetUnsignedShortPtr(ArrayList, ItemOffset) ArrayListGetTypedItem(ArrayList, ItemOffset, unsigned short*)
+#  define ArrayListGetUnsignedIntPtr(ArrayList, ItemOffset)   ArrayListGetTypedItem(ArrayList, ItemOffset, unsigned int*)
+#  define ArrayListGetUnsignedLongPtr(ArrayList, ItemOffset)  ArrayListGetTypedItem(ArrayList, ItemOffset, unsigned long*)
+#  define ArrayListGetInt64Ptr(ArrayList, ItemOffset)         ArrayListGetTypedItem(ArrayList, ItemOffset, Int64_t*)
+#  define ArrayListGetCharPtr(ArrayList, ItemOffset)          ArrayListGetTypedItem(ArrayList, ItemOffset, char*)
+#  define ArrayListGetShortPtr(ArrayList, ItemOffset)         ArrayListGetTypedItem(ArrayList, ItemOffset, short*)
+#  define ArrayListGetIntPtr(ArrayList, ItemOffset)           ArrayListGetTypedItem(ArrayList, ItemOffset, int*)
+#  define ArrayListGetLongPtr(ArrayList, ItemOffset)          ArrayListGetTypedItem(ArrayList, ItemOffset, long*)
+#  define ArrayListGetFloatPtr(ArrayList, ItemOffset)         ArrayListGetTypedItem(ArrayList, ItemOffset, float*)
+#  define ArrayListGetDoublePtr(ArrayList, ItemOffset)        ArrayListGetTypedItem(ArrayList, ItemOffset, double*)
+#  define ArrayListGetLgIndexPtr(ArrayList, ItemOffset)       ArrayListGetTypedItem(ArrayList, ItemOffset, LgIndex_t*)
+#  define ArrayListGetEntIndexPtr(ArrayList, ItemOffset)      ArrayListGetTypedItem(ArrayList, ItemOffset, EntIndex_t*)
+#  define ArrayListGetSmIntegerPtr(ArrayList, ItemOffset)     ArrayListGetTypedItem(ArrayList, ItemOffset, SmInteger_t*)
+#  define ArrayListGetBooleanPtr(ArrayList, ItemOffset)       ArrayListGetTypedItem(ArrayList, ItemOffset, Boolean_t*)
+#  define ArrayListGetArbParamPtr(ArrayList, ItemOffset)      ArrayListGetTypedItem(ArrayList, ItemOffset, ArbParam_t*)
+#  define ArrayListGetVoidPtr(ArrayList, ItemOffset)          ArrayListGetTypedItem(ArrayList, ItemOffset, void*)
 #  define ArrayListGetFunctionPtr(ArrayList, ItemOffset)      ArrayListGetTypedItem(ArrayList, ItemOffset, (**)(void))
 #else
 #  define ArrayListGetInternalRef     ArrayListGetInternalRef_FUNC
 #  define ArrayListGetItemInternalRef ArrayListGetItemInternalRef_FUNC
 #  define ArrayListGetCount           ArrayListGetCount_FUNC
 
-#  define ArrayListGetUnsignedChar(ArrayList, ItemOffset)        (*((unsigned char *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetUnsignedShort(ArrayList, ItemOffset)      (*((unsigned short *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetUnsignedInt(ArrayList, ItemOffset)          (*((unsigned int *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetUnsignedLong(ArrayList, ItemOffset)        (*((unsigned long *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetInt64(ArrayList, ItemOffset)                     (*((Int64_t *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetChar(ArrayList, ItemOffset)                         (*((char *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetShort(ArrayList, ItemOffset)                       (*((short *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetInt(ArrayList, ItemOffset)                           (*((int *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetLong(ArrayList, ItemOffset)                         (*((long *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetFloat(ArrayList, ItemOffset)                       (*((float *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetDouble(ArrayList, ItemOffset)                     (*((double *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetLgIndex(ArrayList, ItemOffset)                 (*((LgIndex_t *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetEntIndex(ArrayList, ItemOffset)               (*((EntIndex_t *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetSmInteger(ArrayList, ItemOffset)             (*((SmInteger_t *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetBoolean(ArrayList, ItemOffset)                 (*((Boolean_t *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetArbParam(ArrayList, ItemOffset)               (*((ArbParam_t *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetUnsignedCharPtr(ArrayList, ItemOffset)   (*((unsigned char * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetUnsignedShortPtr(ArrayList, ItemOffset) (*((unsigned short * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetUnsignedIntPtr(ArrayList, ItemOffset)     (*((unsigned int * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetUnsignedLongPtr(ArrayList, ItemOffset)   (*((unsigned long * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetInt64Ptr(ArrayList, ItemOffset)                (*((Int64_t * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetCharPtr(ArrayList, ItemOffset)                    (*((char * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetShortPtr(ArrayList, ItemOffset)                  (*((short * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetIntPtr(ArrayList, ItemOffset)                      (*((int * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetLongPtr(ArrayList, ItemOffset)                    (*((long * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetFloatPtr(ArrayList, ItemOffset)                  (*((float * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetDoublePtr(ArrayList, ItemOffset)                (*((double * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetLgIndexPtr(ArrayList, ItemOffset)            (*((LgIndex_t * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetEntIndexPtr(ArrayList, ItemOffset)          (*((EntIndex_t * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetSmIntegerPtr(ArrayList, ItemOffset)        (*((SmInteger_t * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetBooleanPtr(ArrayList, ItemOffset)            (*((Boolean_t * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetArbParamPtr(ArrayList, ItemOffset)          (*((ArbParam_t * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetVoidPtr(ArrayList, ItemOffset)                    (*((void * *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
-#  define ArrayListGetFunctionPtr(ArrayList, ItemOffset)            (*(((**)(void) *)ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))
+#  define ArrayListGetUnsignedChar(ArrayList, ItemOffset)       (*(static_cast<unsigned char*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetUnsignedShort(ArrayList, ItemOffset)     (*(static_cast<unsigned short*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetUnsignedInt(ArrayList, ItemOffset)         (*(static_cast<unsigned int*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetUnsignedLong(ArrayList, ItemOffset)       (*(static_cast<unsigned long*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetInt64(ArrayList, ItemOffset)                    (*(static_cast<Int64_t*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetChar(ArrayList, ItemOffset)                        (*(static_cast<char*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetShort(ArrayList, ItemOffset)                      (*(static_cast<short*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetInt(ArrayList, ItemOffset)                          (*(static_cast<int*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetLong(ArrayList, ItemOffset)                        (*(static_cast<long*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetFloat(ArrayList, ItemOffset)                      (*(static_cast<float*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetDouble(ArrayList, ItemOffset)                    (*(static_cast<double*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetLgIndex(ArrayList, ItemOffset)                (*(static_cast<LgIndex_t*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetEntIndex(ArrayList, ItemOffset)              (*(static_cast<EntIndex_t*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetSmInteger(ArrayList, ItemOffset)            (*(static_cast<SmInteger_t*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetBoolean(ArrayList, ItemOffset)                (*(static_cast<Boolean_t*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetArbParam(ArrayList, ItemOffset)              (*(static_cast<ArbParam_t*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetUnsignedCharPtr(ArrayList, ItemOffset)   (*(static_cast<unsigned char**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetUnsignedShortPtr(ArrayList, ItemOffset) (*(static_cast<unsigned short**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetUnsignedIntPtr(ArrayList, ItemOffset)     (*(static_cast<unsigned int**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetUnsignedLongPtr(ArrayList, ItemOffset)   (*(static_cast<unsigned long**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetInt64Ptr(ArrayList, ItemOffset)                (*(static_cast<Int64_t**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetCharPtr(ArrayList, ItemOffset)                    (*(static_cast<char**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetShortPtr(ArrayList, ItemOffset)                  (*(static_cast<short**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetIntPtr(ArrayList, ItemOffset)                      (*(static_cast<int**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetLongPtr(ArrayList, ItemOffset)                    (*(static_cast<long**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetFloatPtr(ArrayList, ItemOffset)                  (*(static_cast<float**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetDoublePtr(ArrayList, ItemOffset)                (*(static_cast<double**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetLgIndexPtr(ArrayList, ItemOffset)            (*(static_cast<LgIndex_t**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetEntIndexPtr(ArrayList, ItemOffset)          (*(static_cast<EntIndex_t**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetSmIntegerPtr(ArrayList, ItemOffset)        (*(static_cast<SmInteger_t**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetBooleanPtr(ArrayList, ItemOffset)            (*(static_cast<Boolean_t**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetArbParamPtr(ArrayList, ItemOffset)          (*(static_cast<ArbParam_t**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetVoidPtr(ArrayList, ItemOffset)                    (*(static_cast<void**>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
+#  define ArrayListGetFunctionPtr(ArrayList, ItemOffset)             (*(static_cast<**(void)*>(const_cast<void*>(ArrayListGetItemInternalRef_FUNC(ArrayList, ItemOffset)))))
 #endif
 
 #if !defined USE_MACROS_FOR_FUNCTIONS
-EXTERN const void *ArrayListGetInternalRef_FUNC(ArrayList_pa ArrayList);
-EXTERN const void *ArrayListGetItemInternalRef_FUNC(ArrayList_pa ArrayList,
+EXTERN void const* ArrayListGetInternalRef_FUNC(ArrayList_pa ArrayList);
+EXTERN void const* ArrayListGetItemInternalRef_FUNC(ArrayList_pa ArrayList,
                                                     LgIndex_t    ItemOffset);
 EXTERN LgIndex_t ArrayListGetCount_FUNC(ArrayList_pa ArrayList);
 #endif
 
-#define ArrayListGetInternalRef_MACRO(ArrayList)                 ((const void *)((ArrayList)->Array))
-#define ArrayListGetItemInternalRef_MACRO(ArrayList, ItemOffset) ((const void *)&((ArrayList)->Array[(ItemOffset)*(ArrayList)->ItemSize]))
+#define ArrayListGetInternalRef_MACRO(ArrayList)                 static_cast<void const*>((ArrayList)->Array)
+#define ArrayListGetItemInternalRef_MACRO(ArrayList, ItemOffset) static_cast<void const*>(&((ArrayList)->Array[(ItemOffset)*(ArrayList)->ItemSize]))
 #define ArrayListGetCount_MACRO(ArrayList)                       ((ArrayList)->Count)
-#define ArrayListGetTypedArrayRef(ArrayList, NativeType)         ((NativeType *)((ArrayList)->Array))
+#define ArrayListGetTypedArrayRef(ArrayList, NativeType)         reinterpret_cast<NativeType*>((ArrayList)->Array)
 #define ArrayListGetTypedItem(ArrayList, ItemOffset, NativeType) (ArrayListGetTypedArrayRef(ArrayList,NativeType)[ItemOffset])
 
 /**
@@ -542,10 +516,37 @@ EXTERN LgIndex_t ArrayListGetCount_FUNC(ArrayList_pa ArrayList);
 #define ArrayListSetTypedItem(ArrayList, ItemOffset, Item, NativeType) \
     ((ArrayListOffsetWithinCapacity((ArrayList), (ItemOffset)) || \
       ArrayListEnlargeCapacity((ArrayList), (ItemOffset)+1)) \
-          ? (((((NativeType *)((ArrayList)->Array))[(ItemOffset)]) = (Item)), \
+          ? ((void)((ArrayListGetTypedArrayRef((ArrayList),NativeType)[(ItemOffset)]) = (Item)), \
              (((ItemOffset)+1 > (ArrayList)->Count) \
                   ? (((ArrayList)->Count = (ItemOffset)+1), TRUE) \
                   : (TRUE))) \
+          : (FALSE))
+
+/**
+ * Appends the item to the end of the list. This is similar to ArrayListSetTypedItem however it
+ * needs not perform a bounds check which is always one beyond the end. This macro was added
+ * primarily to remove compiler warnings caused by a comparison of the array list ArrayList->Count+1
+ * always returning true when tested if larger than ArrayList->Count which occurs if you use the
+ * ArrayListSetTypedItem as ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, NativeType).
+ *
+ * This is the workhorse of the append convenience macros that follow.
+ *
+ * param ArrayList
+ *     Array list target in which to set the item.
+ * param Item
+ *     Item to append to the end of the array. Its native type must
+ *     match 'NativeType'
+ * param NativeType
+ *     Native type of 'Item'.
+ *
+ * return
+ *     TRUE if sufficient memory permitted the operation, otherwise FALSE.
+ */
+#define ArrayListAppendTypedItem(ArrayList, Item, NativeType) \
+    ((ArrayListOffsetWithinCapacity((ArrayList), (ArrayList)->Count) || \
+      ArrayListEnlargeCapacity((ArrayList), (ArrayList)->Count+1)) \
+          ? ((void)((ArrayListGetTypedArrayRef((ArrayList),NativeType)[(ArrayList)->Count]) = (Item)), \
+             (((ArrayList)->Count = (ArrayList)->Count+1), TRUE)) \
           : (FALSE))
 
 /**
@@ -553,74 +554,74 @@ EXTERN LgIndex_t ArrayListGetCount_FUNC(ArrayList_pa ArrayList);
  * array list of a known type. The only additional overhead incurred versus just
  * using a simple array is the cost of testing the array list capacity.
  */
-#define ArrayListSetUnsignedChar(ArrayList, ItemOffset, Item)     ArrayListSetTypedItem(ArrayList, ItemOffset, Item, unsigned char)
-#define ArrayListSetUnsignedShort(ArrayList, ItemOffset, Item)    ArrayListSetTypedItem(ArrayList, ItemOffset, Item, unsigned short)
-#define ArrayListSetUnsignedInt(ArrayList, ItemOffset, Item)      ArrayListSetTypedItem(ArrayList, ItemOffset, Item, unsigned int)
-#define ArrayListSetUnsignedLong(ArrayList, ItemOffset, Item)     ArrayListSetTypedItem(ArrayList, ItemOffset, Item, unsigned long)
-#define ArrayListSetInt64(ArrayList, ItemOffset, Item)            ArrayListSetTypedItem(ArrayList, ItemOffset, Item, Int64_t)
-#define ArrayListSetChar(ArrayList, ItemOffset, Item)             ArrayListSetTypedItem(ArrayList, ItemOffset, Item, char)
-#define ArrayListSetShort(ArrayList, ItemOffset, Item)            ArrayListSetTypedItem(ArrayList, ItemOffset, Item, short)
-#define ArrayListSetInt(ArrayList, ItemOffset, Item)              ArrayListSetTypedItem(ArrayList, ItemOffset, Item, int)
-#define ArrayListSetLong(ArrayList, ItemOffset, Item)             ArrayListSetTypedItem(ArrayList, ItemOffset, Item, long)
-#define ArrayListSetFloat(ArrayList, ItemOffset, Item)            ArrayListSetTypedItem(ArrayList, ItemOffset, Item, float)
-#define ArrayListSetDouble(ArrayList, ItemOffset, Item)           ArrayListSetTypedItem(ArrayList, ItemOffset, Item, double)
-#define ArrayListSetLgIndex(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem(ArrayList, ItemOffset, Item, LgIndex_t)
-#define ArrayListSetEntIndex(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem(ArrayList, ItemOffset, Item, EntIndex_t)
-#define ArrayListSetSmInteger(ArrayList, ItemOffset, Item)        ArrayListSetTypedItem(ArrayList, ItemOffset, Item, SmInteger_t)
-#define ArrayListSetBoolean(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem(ArrayList, ItemOffset, Item, Boolean_t)
-#define ArrayListSetArbParam(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem(ArrayList, ItemOffset, Item, ArbParam_t)
-#define ArrayListSetUnsignedCharPtr(ArrayList, ItemOffset, Item)  ArrayListSetTypedItem(ArrayList, ItemOffset, Item, unsigned char *)
-#define ArrayListSetUnsignedShortPtr(ArrayList, ItemOffset, Item) ArrayListSetTypedItem(ArrayList, ItemOffset, Item, unsigned short *)
-#define ArrayListSetUnsignedIntPtr(ArrayList, ItemOffset, Item)   ArrayListSetTypedItem(ArrayList, ItemOffset, Item, unsigned int *)
-#define ArrayListSetUnsignedLongPtr(ArrayList, ItemOffset, Item)  ArrayListSetTypedItem(ArrayList, ItemOffset, Item, unsigned long *)
-#define ArrayListSetInt64Ptr(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem(ArrayList, ItemOffset, Item, Int64_t *)
-#define ArrayListSetCharPtr(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem(ArrayList, ItemOffset, Item, char *)
-#define ArrayListSetShortPtr(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem(ArrayList, ItemOffset, Item, short *)
-#define ArrayListSetIntPtr(ArrayList, ItemOffset, Item)           ArrayListSetTypedItem(ArrayList, ItemOffset, Item, int *)
-#define ArrayListSetLongPtr(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem(ArrayList, ItemOffset, Item, long *)
-#define ArrayListSetFloatPtr(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem(ArrayList, ItemOffset, Item, float *)
-#define ArrayListSetDoublePtr(ArrayList, ItemOffset, Item)        ArrayListSetTypedItem(ArrayList, ItemOffset, Item, double *)
-#define ArrayListSetLgIndexPtr(ArrayList, ItemOffset, Item)       ArrayListSetTypedItem(ArrayList, ItemOffset, Item, LgIndex_t *)
-#define ArrayListSetEntIndexPtr(ArrayList, ItemOffset, Item)      ArrayListSetTypedItem(ArrayList, ItemOffset, Item, EntIndex_t *)
-#define ArrayListSetSmIntegerPtr(ArrayList, ItemOffset, Item)     ArrayListSetTypedItem(ArrayList, ItemOffset, Item, SmInteger_t *)
-#define ArrayListSetBooleanPtr(ArrayList, ItemOffset, Item)       ArrayListSetTypedItem(ArrayList, ItemOffset, Item, Boolean_t *)
-#define ArrayListSetArbParamPtr(ArrayList, ItemOffset, Item)      ArrayListSetTypedItem(ArrayList, ItemOffset, Item, ArbParam_t *)
-#define ArrayListSetVoidPtr(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem(ArrayList, ItemOffset, Item, void *)
-#define ArrayListSetFunctionPtr(ArrayList, ItemOffset, Item)      ArrayListSetTypedItem(ArrayList, ItemOffset, Item, (**)(void))
+#define ArrayListSetUnsignedChar(ArrayList, ItemOffset, Item)     ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),unsigned char)
+#define ArrayListSetUnsignedShort(ArrayList, ItemOffset, Item)    ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),unsigned short)
+#define ArrayListSetUnsignedInt(ArrayList, ItemOffset, Item)      ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),unsigned int)
+#define ArrayListSetUnsignedLong(ArrayList, ItemOffset, Item)     ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),unsigned long)
+#define ArrayListSetInt64(ArrayList, ItemOffset, Item)            ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),Int64_t)
+#define ArrayListSetChar(ArrayList, ItemOffset, Item)             ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),char)
+#define ArrayListSetShort(ArrayList, ItemOffset, Item)            ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),short)
+#define ArrayListSetInt(ArrayList, ItemOffset, Item)              ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),int)
+#define ArrayListSetLong(ArrayList, ItemOffset, Item)             ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),long)
+#define ArrayListSetFloat(ArrayList, ItemOffset, Item)            ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),float)
+#define ArrayListSetDouble(ArrayList, ItemOffset, Item)           ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),double)
+#define ArrayListSetLgIndex(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),LgIndex_t)
+#define ArrayListSetEntIndex(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),EntIndex_t)
+#define ArrayListSetSmInteger(ArrayList, ItemOffset, Item)        ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),SmInteger_t)
+#define ArrayListSetBoolean(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),Boolean_t)
+#define ArrayListSetArbParam(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),ArbParam_t)
+#define ArrayListSetUnsignedCharPtr(ArrayList, ItemOffset, Item)  ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),unsigned char*)
+#define ArrayListSetUnsignedShortPtr(ArrayList, ItemOffset, Item) ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),unsigned short*)
+#define ArrayListSetUnsignedIntPtr(ArrayList, ItemOffset, Item)   ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),unsigned int*)
+#define ArrayListSetUnsignedLongPtr(ArrayList, ItemOffset, Item)  ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),unsigned long*)
+#define ArrayListSetInt64Ptr(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),Int64_t*)
+#define ArrayListSetCharPtr(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),char*)
+#define ArrayListSetShortPtr(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),short*)
+#define ArrayListSetIntPtr(ArrayList, ItemOffset, Item)           ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),int*)
+#define ArrayListSetLongPtr(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),long*)
+#define ArrayListSetFloatPtr(ArrayList, ItemOffset, Item)         ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),float*)
+#define ArrayListSetDoublePtr(ArrayList, ItemOffset, Item)        ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),double*)
+#define ArrayListSetLgIndexPtr(ArrayList, ItemOffset, Item)       ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),LgIndex_t*)
+#define ArrayListSetEntIndexPtr(ArrayList, ItemOffset, Item)      ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),EntIndex_t*)
+#define ArrayListSetSmIntegerPtr(ArrayList, ItemOffset, Item)     ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),SmInteger_t*)
+#define ArrayListSetBooleanPtr(ArrayList, ItemOffset, Item)       ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),Boolean_t*)
+#define ArrayListSetArbParamPtr(ArrayList, ItemOffset, Item)      ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),ArbParam_t*)
+#define ArrayListSetVoidPtr(ArrayList, ItemOffset, Item)          ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),void*)
+#define ArrayListSetFunctionPtr(ArrayList, ItemOffset, Item)      ArrayListSetTypedItem((ArrayList),(ItemOffset),(Item),(**)(void))
 
-#define ArrayListAppendUnsignedChar(ArrayList, Item)     ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, unsigned char)
-#define ArrayListAppendUnsignedShort(ArrayList, Item)    ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, unsigned short)
-#define ArrayListAppendUnsignedInt(ArrayList, Item)      ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, unsigned int)
-#define ArrayListAppendUnsignedLong(ArrayList, Item)     ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, unsigned long)
-#define ArrayListAppendInt64(ArrayList, Item)            ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, Int64_t)
-#define ArrayListAppendChar(ArrayList, Item)             ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, char)
-#define ArrayListAppendShort(ArrayList, Item)            ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, short)
-#define ArrayListAppendInt(ArrayList, Item)              ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, int)
-#define ArrayListAppendLong(ArrayList, Item)             ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, long)
-#define ArrayListAppendFloat(ArrayList, Item)            ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, float)
-#define ArrayListAppendDouble(ArrayList, Item)           ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, double)
-#define ArrayListAppendLgIndex(ArrayList, Item)          ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, LgIndex_t)
-#define ArrayListAppendEntIndex(ArrayList, Item)         ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, EntIndex_t)
-#define ArrayListAppendSmInteger(ArrayList, Item)        ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, SmInteger_t)
-#define ArrayListAppendBoolean(ArrayList, Item)          ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, Boolean_t)
-#define ArrayListAppendArbParam(ArrayList, Item)         ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, ArbParam_t)
-#define ArrayListAppendUnsignedCharPtr(ArrayList, Item)  ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, unsigned char *)
-#define ArrayListAppendUnsignedShortPtr(ArrayList, Item) ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, unsigned short *)
-#define ArrayListAppendUnsignedIntPtr(ArrayList, Item)   ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, unsigned int *)
-#define ArrayListAppendUnsignedLongPtr(ArrayList, Item)  ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, unsigned long *)
-#define ArrayListAppendInt64Ptr(ArrayList, Item)         ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, Int64_t *)
-#define ArrayListAppendCharPtr(ArrayList, Item)          ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, char *)
-#define ArrayListAppendShortPtr(ArrayList, Item)         ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, short *)
-#define ArrayListAppendIntPtr(ArrayList, Item)           ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, int *)
-#define ArrayListAppendLongPtr(ArrayList, Item)          ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, long *)
-#define ArrayListAppendFloatPtr(ArrayList, Item)         ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, float *)
-#define ArrayListAppendDoublePtr(ArrayList, Item)        ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, double *)
-#define ArrayListAppendLgIndexPtr(ArrayList, Item)       ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, LgIndex_t *)
-#define ArrayListAppendEntIndexPtr(ArrayList, Item)      ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, EntIndex_t *)
-#define ArrayListAppendSmIntegerPtr(ArrayList, Item)     ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, SmInteger_t *)
-#define ArrayListAppendBooleanPtr(ArrayList, Item)       ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, Boolean_t *)
-#define ArrayListAppendArbParamPtr(ArrayList, Item)      ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, ArbParam_t *)
-#define ArrayListAppendVoidPtr(ArrayList, Item)          ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, void *)
-#define ArrayListAppendFunctionPtr(ArrayList, Item)      ArrayListSetTypedItem(ArrayList, (ArrayList)->Count, Item, (**)(void))
+#define ArrayListAppendUnsignedChar(ArrayList, Item)     ArrayListAppendTypedItem((ArrayList),(Item),unsigned char)
+#define ArrayListAppendUnsignedShort(ArrayList, Item)    ArrayListAppendTypedItem((ArrayList),(Item),unsigned short)
+#define ArrayListAppendUnsignedInt(ArrayList, Item)      ArrayListAppendTypedItem((ArrayList),(Item),unsigned int)
+#define ArrayListAppendUnsignedLong(ArrayList, Item)     ArrayListAppendTypedItem((ArrayList),(Item),unsigned long)
+#define ArrayListAppendInt64(ArrayList, Item)            ArrayListAppendTypedItem((ArrayList),(Item),Int64_t)
+#define ArrayListAppendChar(ArrayList, Item)             ArrayListAppendTypedItem((ArrayList),(Item),char)
+#define ArrayListAppendShort(ArrayList, Item)            ArrayListAppendTypedItem((ArrayList),(Item),short)
+#define ArrayListAppendInt(ArrayList, Item)              ArrayListAppendTypedItem((ArrayList),(Item),int)
+#define ArrayListAppendLong(ArrayList, Item)             ArrayListAppendTypedItem((ArrayList),(Item),long)
+#define ArrayListAppendFloat(ArrayList, Item)            ArrayListAppendTypedItem((ArrayList),(Item),float)
+#define ArrayListAppendDouble(ArrayList, Item)           ArrayListAppendTypedItem((ArrayList),(Item),double)
+#define ArrayListAppendLgIndex(ArrayList, Item)          ArrayListAppendTypedItem((ArrayList),(Item),LgIndex_t)
+#define ArrayListAppendEntIndex(ArrayList, Item)         ArrayListAppendTypedItem((ArrayList),(Item),EntIndex_t)
+#define ArrayListAppendSmInteger(ArrayList, Item)        ArrayListAppendTypedItem((ArrayList),(Item),SmInteger_t)
+#define ArrayListAppendBoolean(ArrayList, Item)          ArrayListAppendTypedItem((ArrayList),(Item),Boolean_t)
+#define ArrayListAppendArbParam(ArrayList, Item)         ArrayListAppendTypedItem((ArrayList),(Item),ArbParam_t)
+#define ArrayListAppendUnsignedCharPtr(ArrayList, Item)  ArrayListAppendTypedItem((ArrayList),(Item),unsigned char*)
+#define ArrayListAppendUnsignedShortPtr(ArrayList, Item) ArrayListAppendTypedItem((ArrayList),(Item),unsigned short*)
+#define ArrayListAppendUnsignedIntPtr(ArrayList, Item)   ArrayListAppendTypedItem((ArrayList),(Item),unsigned int*)
+#define ArrayListAppendUnsignedLongPtr(ArrayList, Item)  ArrayListAppendTypedItem((ArrayList),(Item),unsigned long*)
+#define ArrayListAppendInt64Ptr(ArrayList, Item)         ArrayListAppendTypedItem((ArrayList),(Item),Int64_t*)
+#define ArrayListAppendCharPtr(ArrayList, Item)          ArrayListAppendTypedItem((ArrayList),(Item),char*)
+#define ArrayListAppendShortPtr(ArrayList, Item)         ArrayListAppendTypedItem((ArrayList),(Item),short*)
+#define ArrayListAppendIntPtr(ArrayList, Item)           ArrayListAppendTypedItem((ArrayList),(Item),int*)
+#define ArrayListAppendLongPtr(ArrayList, Item)          ArrayListAppendTypedItem((ArrayList),(Item),long*)
+#define ArrayListAppendFloatPtr(ArrayList, Item)         ArrayListAppendTypedItem((ArrayList),(Item),float*)
+#define ArrayListAppendDoublePtr(ArrayList, Item)        ArrayListAppendTypedItem((ArrayList),(Item),double*)
+#define ArrayListAppendLgIndexPtr(ArrayList, Item)       ArrayListAppendTypedItem((ArrayList),(Item),LgIndex_t*)
+#define ArrayListAppendEntIndexPtr(ArrayList, Item)      ArrayListAppendTypedItem((ArrayList),(Item),EntIndex_t*)
+#define ArrayListAppendSmIntegerPtr(ArrayList, Item)     ArrayListAppendTypedItem((ArrayList),(Item),SmInteger_t*)
+#define ArrayListAppendBooleanPtr(ArrayList, Item)       ArrayListAppendTypedItem((ArrayList),(Item),Boolean_t*)
+#define ArrayListAppendArbParamPtr(ArrayList, Item)      ArrayListAppendTypedItem((ArrayList),(Item),ArbParam_t*)
+#define ArrayListAppendVoidPtr(ArrayList, Item)          ArrayListAppendTypedItem((ArrayList),(Item),void*)
+#define ArrayListAppendFunctionPtr(ArrayList, Item)      ArrayListAppendTypedItem((ArrayList),(Item),(**)(void))
 
 #endif /* ARRLIST_h */

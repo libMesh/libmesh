@@ -1,31 +1,8 @@
 /*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
-/*
  *****************************************************************
  *****************************************************************
  *******                                                  ********
- ****** Copyright (C) 1988-2008 Tecplot, Inc.              *******
+ ****** Copyright (C) 1988-2010 Tecplot, Inc.              *******
  *******                                                  ********
  *****************************************************************
  *****************************************************************
@@ -42,6 +19,27 @@
 #  define EXTERN extern
 #endif
 
+/*
+ * For building pltview.exe under Windows, we use
+ * tecio.dll (which is linked to pltview).
+ * Since pltview.exe uses a few of the
+ * functions here, they need to be exported into
+ * the tecio.dll, thus "TECXXX.h" is included for the
+ * LIBFUNCTION & LIBCALL keywords. They are not
+ * documented with the other TECXXX() functions,
+ * however.
+ *
+ * If pltview requires other AuxData functions
+ * in the future, they can be added to the dll
+ * by adding LIBFUNCTION & LIBCALL as in
+ * AuxDataDealloc(), etc. below.
+ *
+ * When building the tecplot kernel, LIBFUNCTION
+ * and LIBCALL are nop's.
+ *
+ */
+#include "TECXXX.h"
+
 /**
  */
 EXTERN Boolean_t AuxDataIsValidNameChar(char      Char,
@@ -56,7 +54,7 @@ EXTERN AuxData_pa AuxDataAlloc(void);
 
 /**
  */
-EXTERN void AuxDataDealloc(AuxData_pa *AuxData);
+LIBFUNCTION void LIBCALL AuxDataDealloc(AuxData_pa *AuxData);
 
 /**
  */
@@ -69,7 +67,7 @@ EXTERN AuxData_pa AuxDataCopy(AuxData_pa AuxData,
 
 /**
  */
-EXTERN LgIndex_t AuxDataGetNumItems(AuxData_pa AuxData);
+LIBFUNCTION LgIndex_t LIBCALL AuxDataGetNumItems(AuxData_pa AuxData);
 
 /**
  */
@@ -78,12 +76,12 @@ EXTERN Boolean_t AuxDataGetItemIndex(AuxData_pa AuxData,
                                      LgIndex_t  *ItemIndex);
 /**
  */
-EXTERN void AuxDataGetItemByIndex(AuxData_pa    AuxData,
-                                  LgIndex_t     Index,
-                                  const char    **Name,
-                                  ArbParam_t    *Value,
-                                  AuxDataType_e *Type,
-                                  Boolean_t     *Retain);
+LIBFUNCTION void LIBCALL AuxDataGetItemByIndex(AuxData_pa    AuxData,
+			                                   LgIndex_t     Index,
+			                                   const char    **Name,
+			                                   ArbParam_t    *Value,
+			                                   AuxDataType_e *Type,
+			                                   Boolean_t     *Retain);
 
 /**
  */

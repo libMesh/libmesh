@@ -1,4 +1,3 @@
-#!/bin/sh
 
 MAKEWHAT=
 EXTRAFLAGS=
@@ -15,7 +14,7 @@ if test $# -ge 1 ; then
     elif test "$1" = "-skipcompile" ; then
       skipcompile=y
     elif test "$1" = "-tecio" ; then
-      MAKEWHAT=tecio.a
+      MAKEWHAT=libtecio.a
     else
       EXTRAFLAGS="$EXTRAFLAGS $1"
     fi
@@ -25,7 +24,7 @@ else
   echo "Choose platform:"
   echo " "
   echo "  macux.104"
-  echo "  macix64.105"
+  echo "  macix64.106"
   echo "  sgix.62"
   echo "  sgix3.62"
   echo "  sgix.65"
@@ -45,23 +44,25 @@ else
   echo "  hp7xx64.11"
   echo "  hpi64.11"
   echo "  linux.24"
-  echo "  linuxi64.24"
+  echo "  linux64.26"
+  echo "  linux.64-gcc4.2.4.26 (Special option for Synopsys - must run Runmake directly on satsop)"
   echo "  linux.22"
   echo "  linuxa.22"
-  echo "  linuxg248x64.26"
-  echo "  linuxg27x64.26"
+  echo "  linux32-centos4.8"
+  echo "  linux64-sled10.4"
+  echo "  linuxg29x64.26"
   echo "  crayc90"
   echo "->\c"
   read Platname
 
   echo "Choose:"
-  echo "  1.  Make tecio.a only"
-  echo "  2.  Make tecio.a and pltview"
+  echo "  1.  Make libtecio.a only"
+  echo "  2.  Make libtecio.a and pltview"
 
   read choice
 
   if test $choice -eq 1 ;then 
-    MAKEWHAT=tecio.a
+    MAKEWHAT=libtecio.a
   fi
 fi
 
@@ -72,18 +73,32 @@ AR=ar
 ARFLAGS=qv
 DISTSUBDIR2=
 
+#
+# The blah-64 platforms are 64-bit builds of tecio, typically on 32-bit
+# platforms.
+#
 case $Platname in
-   mac*)       CCOMP=g++
-               FINALCFLAGS="-arch ppc -arch i386 -arch ppc64 -arch x86_64 -DDARWIN -DLONGIS64 -I/usr/X11R6/include"
+   macix64*)   CCOMP=g++
+               FINALCFLAGS="-arch x86_64 -DDARWIN -DMAC64 -I/usr/X11R6/include"
                STRIPFLAG=-Wl,-x
-               LINKFLAGS="-arch ppc -arch i386 -arch ppc64 -arch x86_64"
+               LINKFLAGS="-arch x86_64"
+               ;;
+   macux*-64)  CCOMP=g++
+               FINALCFLAGS="-arch ppc64 -arch x86_64 -DDARWIN -DMAC64 -I/usr/X11R6/include"
+               STRIPFLAG=-Wl,-x
+               LINKFLAGS="-arch ppc64 -arch x86_64"
+               ;;
+   macux*)     CCOMP=g++
+               FINALCFLAGS="-arch ppc -arch i386 -DDARWIN -I/usr/X11R6/include"
+               STRIPFLAG=-Wl,-x
+               LINKFLAGS="-arch ppc -arch i386"
                ;;
    sgix.65-64) CCOMP=CC
-               FINALCFLAGS="-DIRISX -DLONGIS64 -mips4 -64"
+               FINALCFLAGS="-DIRISX -mips4 -64"
                LINKFLAGS="-mips4 -64"
                ;;
    sgix64.65)  CCOMP=CC
-               FINALCFLAGS="-DIRISX -DLONGIS64 -mips4 -64"
+               FINALCFLAGS="-DIRISX -mips4 -64"
                LINKFLAGS="-mips4 -64"
                ;;
    sgix.65)    CCOMP=CC
@@ -95,7 +110,7 @@ case $Platname in
                LINKFLAGS="-o32"
                ;;
    sgix.62-64) CCOMP=CC
-               FINALCFLAGS="-DIRISX -DIRIX62 -DLONGIS64 -mips4 -64"
+               FINALCFLAGS="-DIRISX -DIRIX62 -mips4 -64"
                LINKFLAGS="-mips4 -64"
                ;;
    sgix.62)    CCOMP=CC
@@ -114,7 +129,7 @@ case $Platname in
                FINALCFLAGS=-DIBMRS6000X
                ;;
    ibmx64.*)   CCOMP=xlC
-               FINALCFLAGS="-DIBMRS6000X -DLONGIS64 -q64"
+               FINALCFLAGS="-DIBMRS6000X -q64"
                ARFLAGS="-X64 qv"
                ;;
    compaq.51)  CCOMP=cxx
@@ -124,15 +139,15 @@ case $Platname in
                FINALCFLAGS="-DDECALPHAX -I/usr/include -ieee_with_inexact" 
                ;;
    hp7xx.*-64) CCOMP=aCC
-               FINALCFLAGS="+DD64 +DS2.0 -AA -DHPX -DLONGIS64 -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
+               FINALCFLAGS="+DD64 +DS2.0 -AA -DHPX -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
                LINKFLAGS="+DA2.0W +DD64 +DS2.0W"
                ;;
    hp7xx64.11) CCOMP=aCC
-               FINALCFLAGS="+DA2.0W +DD64 +DS2.0W -AA -DHPX -DLONGIS64 -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
+               FINALCFLAGS="+DA2.0W +DD64 +DS2.0W -AA -DHPX -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
                LINKFLAGS="+DA2.0W +DD64 +DS2.0W"
                ;;
      hpi64.11) CCOMP=aCC
-               FINALCFLAGS="+DD64 -AA -DHPX -DLONGIS64 -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
+               FINALCFLAGS="+DD64 -AA -DHPX -I/usr/include/X11R6 -I/usr/include/Motif2.1" 
                LINKFLAGS="+DD64"
                ;;
    hp7xx.11)   CCOMP=aCC
@@ -142,10 +157,13 @@ case $Platname in
    crayc90)    CCOMP=cc
                FINALCFLAGS="-DCRAY -DUNIXX" 
                ;;
-   linux*i64.*)CCOMP=g++
-               FINALCFLAGS="-fPIC -DLINUX -DLINUXI64" 
-               ;;
-   linux*64.*) CCOMP=g++
+linux.64-gcc4.2.4.26) #
+                      # Special custom build for synopsys.  Run Runmake directly on satsop.
+                      #
+                      CCOMP=/usr/local/gcc-4.2.2/bin/g++
+                      FINALCFLAGS="-fPIC -DLINUX -DLINUX64" 
+                      ;;
+   linux*64*)  CCOMP=g++
                FINALCFLAGS="-fPIC -DLINUX -DLINUX64" 
                ;;
    linux*)     CCOMP=g++
@@ -173,21 +191,21 @@ case $Platname in
                ARFLAGS="-xar -o"
                ;;
    sun4.57-64) CCOMP=/opt/SUNWspro/bin/CC
-               FINALCFLAGS="-DSUNSOLARISX -DLONGIS64 -KPIC -xarch=v9 -I/usr/openwin/include -I/usr/dt/include -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg -xO1"
+               FINALCFLAGS="-DSUNSOLARISX -KPIC -xarch=v9 -I/usr/openwin/include -I/usr/dt/include -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg -xO1"
                LINKFLAGS="-KPIC -xarch=v9 -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg"
                MAKECMD=/usr/ccs/bin/make
                AR=/opt/SUNWspro/bin/CC
                ARFLAGS="-xar -o"
                ;;
     sun464.57) CCOMP=/opt/SUNWspro/bin/CC
-               FINALCFLAGS="-DSUNSOLARISX -DLONGIS64 -KPIC -xarch=v9 -I/usr/openwin/include -I/usr/dt/include -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg -xO1"
+               FINALCFLAGS="-DSUNSOLARISX -KPIC -xarch=v9 -I/usr/openwin/include -I/usr/dt/include -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg -xO1"
                LINKFLAGS="-KPIC -xarch=v9 -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg"
                MAKECMD=/usr/ccs/bin/make
                AR=/opt/SUNWspro/bin/CC
                ARFLAGS="-xar -o"
                ;;
     sun464.59)  CCOMP=/opt/SUNWspro/bin/CC
-               FINALCFLAGS="-DSUNSOLARISX -DLONGIS64 -KPIC -m64 -xarch=generic -I/usr/openwin/include -I/usr/dt/include -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg -xO1"
+               FINALCFLAGS="-DSUNSOLARISX -KPIC -m64 -xarch=generic -I/usr/openwin/include -I/usr/dt/include -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg -xO1"
                LINKFLAGS="-KPIC -m64 -xarch=generic -library=libC -library=Cstd -library=no%rwtools7 -library=no%rwtools7_dbg"
                MAKECMD=/usr/ccs/bin/make
                AR=/opt/SUNWspro/bin/CC
@@ -260,18 +278,18 @@ cd ..
 pwd
 
 
-echo "$AR $ARFLAGS tecio.a $OBJLIST"
-$AR $ARFLAGS tecio.a $OBJLIST
+echo "$AR $ARFLAGS libtecio.a $OBJLIST"
+$AR $ARFLAGS libtecio.a $OBJLIST
 if test  -f /bin/ranlib ; then 
-    /bin/ranlib tecio.a; 
+    /bin/ranlib libtecio.a; 
 elif test -f /usr/bin/ranlib ; then 
-    /usr/bin/ranlib tecio.a; 
+    /usr/bin/ranlib libtecio.a; 
 elif test -f /usr/ucb/ranlib ; then 
-    /usr/ucb/ranlib tecio.a; 
+    /usr/ucb/ranlib libtecio.a; 
 fi
 
 echo "$CCOMP -I./tecsrc -DMAKEARCHIVE $FINALCFLAGS -c pltview.cpp"
 $CCOMP -I./tecsrc -DMAKEARCHIVE $FINALCFLAGS -c pltview.cpp
 
-echo "$CCOMP $FINALCFLAGS pltview.o tecio.a $LINKFLAGS $LINKLIBS $STRIPFLAG -lm -o pltview"
-$CCOMP $FINALCFLAGS pltview.o tecio.a $LINKFLAGS $LINKLIBS $STRIPFLAG -lm -o pltview
+echo "$CCOMP $FINALCFLAGS pltview.o libtecio.a $LINKFLAGS $LINKLIBS $STRIPFLAG -lm -o pltview"
+$CCOMP $FINALCFLAGS pltview.o libtecio.a $LINKFLAGS $LINKLIBS $STRIPFLAG -lm -o pltview

@@ -7,12 +7,13 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 AUTOMAKE_OPTIONS = subdir-objects 
 
 
-noinst_LTLIBRARIES     = libtecio.la
+noinst_LTLIBRARIES = libtecio.la
 
 libtecio_la_SOURCES = \
 	tecsrc/ALLOC.h \
 	tecsrc/ARRLIST.h \
 	tecsrc/AUXDATA.h \
+	tecsrc/CHARTYPE.h \
 	tecsrc/DATAIO.h \
 	tecsrc/DATAIO4.h \
 	tecsrc/DATASET.h \

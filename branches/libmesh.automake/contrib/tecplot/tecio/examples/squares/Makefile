@@ -1,6 +1,6 @@
 # Set to appropriate C++ compiler
 CPP=g++
-CPPFLAGS=-I../../tecsrc ../../tecio.a
+CPPFLAGS=-I../../tecsrc ../../libtecio.a
 EXECUTABLE=squares
 FILES=$(EXECUTABLE).cpp
 

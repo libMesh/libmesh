@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 
@@ -30,12 +7,12 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
 */
-/* Source file revision $Revision: 7627 $ */
+/* Source file revision $Revision: 24291 $ */
 
 #include "GLOBAL.h"
 #include "TASSERT.h"
@@ -45,6 +22,7 @@
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
+#include "CHARTYPE.h"
 #include "DATAIO4.h"
 #include "DATASET0.h"
 #include "TECXXX.h"
@@ -149,12 +127,13 @@ static vector<Boolean_t>    IsSharedVar[MaxNumFiles];  /* vector dimensioned by 
 static vector<Boolean_t>    IsPassiveVar[MaxNumFiles]; /* vector dimensioned by num vars */
 static INTEGER4             CurZone[MaxNumFiles]; /* zero based zone numbers */
 static INTEGER4             CurVar[MaxNumFiles];  /* zero based var numbers */
-static INTEGER4             FieldDataType;
+static INTEGER4             FieldDataType[MaxNumFiles];
 static INTEGER4             CurFile = -1;
 static vector<Boolean_t>    IsCellCentered[MaxNumFiles]; /* vector dimensioned by num vars */
 static Boolean_t            HasFECONNECT[MaxNumFiles];
 static INTEGER4             FileTypes[MaxNumFiles];
 static vector<INTEGER4>     NumConnectivityNodes[MaxNumFiles]; /* vector dimensioned by num zones */
+static vector<INTEGER4>     NumConnectivityNodesWritten[MaxNumFiles]; /* vector dimensioned by num zones */
 static vector<Boolean_t>    ConnectivityWritten[MaxNumFiles]; /* vector dimensioned by num zones */
 
 /*
@@ -197,7 +176,13 @@ static char const* ZoneTypes[] =
 static void WriteErr(const char *routine_name)
 {
     #if defined MAKEARCHIVE
-    PRINT2("Err: (%s) Write failure on file %d.\n", routine_name, CurFile + 1);
+    {
+        PRINT2("Err: (%s) Write failure on file %d.\n", routine_name, CurFile + 1);
+    }
+    #else
+    {
+        UNUSED(routine_name);
+    }
     #endif
     NumErrs[CurFile]++;
 }
@@ -224,7 +209,7 @@ Boolean_t ParseDupList(LgIndex_t **ShareVarFromZone,
         if (*DupList && !strncmp(DupList, "FECONNECT", 9))
             *ShareConnectivityFromZone = TecXXXZoneNum;
 
-        else if (*DupList && !isdigit(*DupList))
+        else if (*DupList && !tecplot::isdigit(*DupList))
             IsOk = FALSE; /* syntax error */
 
         else if (*DupList)
@@ -372,7 +357,13 @@ INTEGER4 LIBCALL TECINI112(char     *Title,
         CurFile = 0;
 
     #if defined MAKEARCHIVE
-    DebugLevel[NewFile] = *Debug;
+    {
+       DebugLevel[NewFile] = *Debug;
+    }
+    #else
+    {
+        UNUSED(Debug);
+    }
     #endif
     /* check sizes for array sized by number of variables */
     CHECK(VarMinValue[NewFile].empty());
@@ -388,6 +379,7 @@ INTEGER4 LIBCALL TECINI112(char     *Title,
     CHECK(NumFaceConnections[NewFile].empty());
     CHECK(FaceNeighborsOrMapWritten[NewFile].empty());
     CHECK(NumConnectivityNodes[NewFile].empty());
+    CHECK(NumConnectivityNodesWritten[NewFile].empty());
     CHECK(ConnectivityWritten[NewFile].empty());
 
     CurZone[NewFile] = -1;
@@ -636,9 +628,9 @@ INTEGER4 LIBCALL TECINI112(char     *Title,
     IsOpen[NewFile] = 1;
 
     if (*VIsDouble)
-        FieldDataType = FieldDataType_Double;
+        FieldDataType[NewFile] = FieldDataType_Double;
     else
-        FieldDataType = FieldDataType_Float;
+        FieldDataType[NewFile] = FieldDataType_Float;
 
     return (0);
 }
@@ -787,9 +779,15 @@ static int CheckData(const char *routine_name)
     if (NumDataValuesToWrite[CurFile] != NumDataValuesWritten[CurFile])
     {
         #if defined MAKEARCHIVE
-        PRINT2("Err: (%s) Wrong number of data values in file %d:\n", routine_name, CurFile + 1);
-        PRINT2("     %d data values for Zone %d were processed,\n", NumDataValuesWritten[CurFile], CurZone[CurFile] + 1);
-        PRINT1("     %d data values were expected.\n", NumDataValuesToWrite[CurFile]);
+        {
+            PRINT2("Err: (%s) Wrong number of data values in file %d:\n", routine_name, CurFile + 1);
+            PRINT2("     %d data values for Zone %d were processed,\n", NumDataValuesWritten[CurFile], CurZone[CurFile] + 1);
+            PRINT1("     %d data values were expected.\n", NumDataValuesToWrite[CurFile]);
+        }
+        #else
+        {
+            UNUSED(routine_name);
+        }
         #endif
         NumErrs[CurFile]++;
         return (-1);
@@ -802,8 +800,14 @@ static int CheckFile(const char *routine_name)
     if ((CurFile == -1) || (!IsOpen[CurFile]))
     {
         #if defined MAKEARCHIVE
-        PRINT2("Err: (%s) Attempt to use invalid file (%d).\n",
-               routine_name, CurFile + 1);
+        {
+            PRINT2("Err: (%s) Attempt to use invalid file (%d).\n",
+                   routine_name, CurFile + 1);
+        }
+        #else
+        {
+            UNUSED(routine_name);
+        }
         #endif
         return (-1);
     }
@@ -929,6 +933,7 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
         NumFaceConnections[CurFile].resize(CurZone[CurFile] + 1);
         FaceNeighborsOrMapWritten[CurFile].resize(CurZone[CurFile] + 1);
         NumConnectivityNodes[CurFile].resize(CurZone[CurFile] + 1);
+        NumConnectivityNodesWritten[CurFile].resize(CurZone[CurFile] + 1);
         ConnectivityWritten[CurFile].resize(CurZone[CurFile] + 1);
     }
     catch (std::bad_alloc const&)
@@ -949,6 +954,7 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
     KCellMax[CurFile] = *KCellMx;
     /* Set the flags that connectivity, face neighbors or face map hasn't been written for the zone yet. */
     FaceNeighborsOrMapWritten[CurFile][CurZone[CurFile]] = FALSE;
+    NumConnectivityNodesWritten[CurFile][CurZone[CurFile]] = 0;
     ConnectivityWritten[CurFile][CurZone[CurFile]] = FALSE;
 
     if (ZoneType[CurFile] == ZoneType_FEPolygon ||
@@ -1052,7 +1058,6 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
     {
         for (I = 0; I < NumVars[CurFile]; I++)
         {
-            int        VIndex;
             LgIndex_t  NumNodes;
             LgIndex_t  NumCells;
 
@@ -1069,24 +1074,19 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
                 NumCells = JMax[CurFile];
             }
 
-            if (IsSharedVar[CurFile][I])
-                VIndex = ShareVarFromZone[I] - 1;
-            else
-                VIndex = I;
-
-            if (VIndex == 0)
+            if (I == 0)
                 NumRunningVarValues[CurFile][I] = 0;
             else
-                NumRunningVarValues[CurFile][VIndex] = NumRunningVarValues[CurFile][VIndex-1];
+                NumRunningVarValues[CurFile][I] = NumRunningVarValues[CurFile][I-1];
 
-            IsCellCentered[CurFile][VIndex] = (ValueLocation[I] == ValueLocation_CellCentered);
+            IsCellCentered[CurFile][I] = (ValueLocation[I] == ValueLocation_CellCentered);
             if (ValueLocation[I] == ValueLocation_CellCentered)
             {
                 WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)1);
                 if (!IsSharedVar[CurFile][I] && !IsPassiveVar[CurFile][I])
                 {
-                    NumDataValuesToWrite[CurFile]        += NumCells;
-                    NumRunningVarValues[CurFile][VIndex] += NumCells;
+                    NumDataValuesToWrite[CurFile]   += NumCells;
+                    NumRunningVarValues[CurFile][I] += NumCells;
                 }
             }
             else if (ValueLocation[I] == ValueLocation_Nodal)
@@ -1094,8 +1094,8 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
                 WriteBinaryInt32(HeadFile[CurFile], (LgIndex_t)0);
                 if (!IsSharedVar[CurFile][I] && !IsPassiveVar[CurFile][I])
                 {
-                    NumDataValuesToWrite[CurFile]        += NumNodes;
-                    NumRunningVarValues[CurFile][VIndex] += NumNodes;
+                    NumDataValuesToWrite[CurFile]   += NumNodes;
+                    NumRunningVarValues[CurFile][I] += NumNodes;
                 }
             }
             else
@@ -1122,22 +1122,16 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
 
         for (I = 0; I < NumVars[CurFile]; I++)
         {
-            int VIndex;
-            if (IsSharedVar[CurFile][I])
-                VIndex = ShareVarFromZone[I] - 1;
-            else
-                VIndex = I;
-
-            if (VIndex == 0)
+            if (I == 0)
                 NumRunningVarValues[CurFile][I] = 0;
             else
-                NumRunningVarValues[CurFile][VIndex] = NumRunningVarValues[CurFile][VIndex-1];
+                NumRunningVarValues[CurFile][I] = NumRunningVarValues[CurFile][I-1];
 
-            IsCellCentered[CurFile][VIndex] = FALSE;
+            IsCellCentered[CurFile][I] = FALSE;
             if (!IsSharedVar[CurFile][I] && !IsPassiveVar[CurFile][I])
             {
-                NumDataValuesToWrite[CurFile]        += NumNodes;
-                NumRunningVarValues[CurFile][VIndex] += NumNodes;
+                NumDataValuesToWrite[CurFile]   += NumNodes;
+                NumRunningVarValues[CurFile][I] += NumNodes;
             }
         }
     }
@@ -1226,7 +1220,7 @@ INTEGER4 LIBCALL TECZNE112(char     *ZnTitle,
     for (I = 0; I < NumVars[CurFile]; I++)
     {
         if (!WriteFieldDataType(BlckFile[CurFile],
-                                (FieldDataType_e)FieldDataType,
+                                (FieldDataType_e)FieldDataType[CurFile],
                                 TRUE))
         {
             WriteErr("TECZNE112");
@@ -1809,7 +1803,7 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
         if (Value > VarMaxValue[CurFile][CurVar[CurFile]])
             VarMaxValue[CurFile][CurVar[CurFile]] = Value;
 
-        if (!WriteBinaryReal(BlckFile[CurFile], Value, (FieldDataType_e)FieldDataType))
+        if (!WriteBinaryReal(BlckFile[CurFile], Value, (FieldDataType_e)FieldDataType[CurFile]))
         {
             WriteErr("TECDAT112");
             return (-1);
@@ -1845,7 +1839,7 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
             if (IIndex + 1 == FinalIMax && FinalIMax < IMax[CurFile] - IMaxAdjust)
             {
                 NumOrderedCCDataValuesWritten[CurFile]++;
-                if (!WriteBinaryReal(BlckFile[CurFile], 0.0, (FieldDataType_e)FieldDataType))
+                if (!WriteBinaryReal(BlckFile[CurFile], 0.0, (FieldDataType_e)FieldDataType[CurFile]))
                 {
                     WriteErr("TECDAT112");
                     return (-1);
@@ -1858,7 +1852,7 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
                 for (II = 1; II <= IMax[CurFile] - IMaxAdjust; II++)
                 {
                     NumOrderedCCDataValuesWritten[CurFile]++;
-                    if (!WriteBinaryReal(BlckFile[CurFile], 0.0, (FieldDataType_e)FieldDataType))
+                    if (!WriteBinaryReal(BlckFile[CurFile], 0.0, (FieldDataType_e)FieldDataType[CurFile]))
                     {
                         WriteErr("TECDAT112");
                         return (-1);
@@ -1874,7 +1868,7 @@ INTEGER4 LIBCALL TECDAT112(INTEGER4 *N,
                     for (II = 1; II <= IMax[CurFile] - IMaxAdjust; II++)
                     {
                         NumOrderedCCDataValuesWritten[CurFile]++;
-                        if (!WriteBinaryReal(BlckFile[CurFile], 0.0, (FieldDataType_e)FieldDataType))
+                        if (!WriteBinaryReal(BlckFile[CurFile], 0.0, (FieldDataType_e)FieldDataType[CurFile]))
                         {
                             WriteErr("TECDAT112");
                             return (-1);
@@ -2147,6 +2141,113 @@ LIBFUNCTION INTEGER4 LIBCALL tecnod_(INTEGER4 *NData)
 #endif
 
 /**
+ * TECNODEXXX
+ */
+INTEGER4 LIBCALL TECNODE112(
+    INTEGER4 *N,
+    INTEGER4 *NData)
+{
+    LgIndex_t I;
+
+
+    if (CheckFile("TECNODE112") < 0)
+        return (-1);
+
+    if (ZoneType[CurFile] == FEPOLYGON ||
+        ZoneType[CurFile] == FEPOLYHEDRON)
+    {
+        /* Wrong way to specify connectivity for polygons and polyhedrons */
+        #if defined MAKEARCHIVE
+        PRINT0("Err: (TECNODE112) Cannot call TECNODE112 for polygonal or polyhedral zones.\n");
+        #endif
+        NumErrs[CurFile]++;
+        return (-1);
+    }
+
+    if (HasFECONNECT[CurFile])
+    {
+        /*
+         * The connectivity list is duplicated,
+         * so we shouldn't be calling TECNODE112()
+         */
+        return (-1);
+    }
+
+    if (FileTypes[CurFile] == SOLUTIONFILE)
+    {
+        #if defined MAKEARCHIVE
+        PRINT0("Err: (TECNODE112) Cannot call TECNODE112 if file type is SOLUTIONFILE.\n");
+        #endif
+        NumErrs[CurFile]++;
+        return (-1);
+    }
+
+    if (ZoneType[CurFile] == ORDERED)
+    {
+        #if defined MAKEARCHIVE
+        PRINT0("Err: (TECNODE112) Cannot call TECNODE112 if zone type is ORDERED.\n");
+        #endif
+        NumErrs[CurFile]++;
+        return (-1);
+    }
+
+    if (CheckData("TECNODE112") < 0)
+        return (-1);
+
+    if (NumConnectivityNodesWritten[CurFile][CurZone[CurFile]] + *N > NumConnectivityNodes[CurFile][CurZone[CurFile]])
+    {
+        #if defined MAKEARCHIVE
+        PRINT0("Err: (TECNODE112) Connectivity Nodes chunk exceeds the total number of  Connectivity Nodes:\n");
+        PRINT2("     Nodes written = %d, Current chunk size = %d, ", NumConnectivityNodesWritten[CurFile][CurZone[CurFile]], *N);
+        PRINT1("total connectivity nodes = %d.\n", NumConnectivityNodes[CurFile][CurZone[CurFile]]);
+        #endif
+        NumErrs[CurFile]++;
+        return (-1);
+    }
+
+    for (I = 0; I < *N; I++)
+    {
+        if ((NData[I] > IMax[CurFile]) ||
+            (NData[I] < 1))
+        {
+            #if defined MAKEARCHIVE
+            PRINT1("Err: (TECNODE112) Invalid node map value at position %d:\n", I);
+            PRINT2("     node map value = %d, max value = %d.\n", NData[I], IMax[CurFile]);
+            #endif
+            NumErrs[CurFile]++;
+            return (-1);
+        }
+        /*
+         * As of version 103 Tecplot assumes that node maps are zero based
+         * instead of ones based. Since we have to maintain the contract we
+         * subtract 1 for the caller.
+         */
+        if (!WriteBinaryInt32(BlckFile[CurFile], NData[I] - 1)) /* zero based */
+        {
+            WriteErr("TECNODE112");
+            return (-1);
+        }
+
+        NumConnectivityNodesWritten[CurFile][CurZone[CurFile]]++;
+    }
+
+    if (NumConnectivityNodesWritten[CurFile][CurZone[CurFile]] == NumConnectivityNodes[CurFile][CurZone[CurFile]])
+    {
+        ConnectivityWritten[CurFile][CurZone[CurFile]] = TRUE;
+    }
+
+    return (0);
+}
+
+#if defined MAKEARCHIVE && !defined _WIN32 /* every platform but Windows Intel */
+LIBFUNCTION INTEGER4 LIBCALL tecnode112_(INTEGER4 *N,
+                                         INTEGER4 *NData)
+{
+    return TECNODE112(N, NData);
+}
+#endif
+
+/**
  * TECENDXXX
  */
 INTEGER4 LIBCALL TECEND112(void)
@@ -2167,7 +2268,10 @@ INTEGER4 LIBCALL TECEND112(void)
             {
                 #if defined MAKEARCHIVE
                 PRINT1("Err: (TECEND112) File %d is being closed without writing connectivity data.\n", CurFile + 1);
-                PRINT1("     Zone %d was defined with a Classic FE zone type but TECNOD112() was not called.\n", ZoneIndex + 1);
+                if (NumConnectivityNodesWritten[CurFile][ZoneIndex] == 0)
+                    PRINT1("     Zone %d was defined with a Classic FE zone type but TECNOD112() was not called.\n", ZoneIndex + 1);
+                else
+                    PRINT1("     Zone %d was defined with a Classic FE zone type but TECNODE112() was not called for all node chunks.\n", ZoneIndex + 1);
                 #endif
                 NumErrs[CurFile]++;
                 RetVal = -1;
@@ -2294,6 +2398,7 @@ INTEGER4 LIBCALL TECEND112(void)
     NumFaceConnections[CurFile].clear();
     FaceNeighborsOrMapWritten[CurFile].clear();
     NumConnectivityNodes[CurFile].clear();
+    NumConnectivityNodesWritten[CurFile].clear();
     ConnectivityWritten[CurFile].clear();
 
     CurFile = 0;
@@ -3297,25 +3402,29 @@ INTEGER4 LIBCALL TECTXT112(double    *XOrThetaPos,
     Text.AnchorPos.Generic.V3 = (*ZOrUnusedPos) * Fract;
     Text.AttachToZone         = *AttachToZone != 0;
     Text.Zone                 = *Zone - 1;
-    Text.BColor               = (ColorIndex_t) * TextColor;
-    Text.TextShape.Font       = (Font_e) * BFont;
-    Text.TextShape.SizeUnits  = (Units_e) * FontHeightUnits;
+    Text.BColor               = static_cast<ColorIndex_t>(*TextColor);
+    #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+    #else
+        Text.TextShape.Font       = static_cast<Font_e>(*BFont);
+    #endif
+    Text.TextShape.SizeUnits  = static_cast<Units_e>(*FontHeightUnits);
     if (Text.TextShape.SizeUnits == Units_Frame)
         Text.TextShape.Height   = (*FontHeight) / 100.0;
     else
         Text.TextShape.Height   = *FontHeight;
-    Text.Box.BoxType          = (TextBox_e) * BoxType;
+    Text.Box.BoxType          = static_cast<TextBox_e>(*BoxType);
     Text.Box.Margin           = *BoxMargin / 100.0;
     Text.Box.LineThickness    = *BoxLineThickness / 100.0;
-    Text.Box.BColor           = (ColorIndex_t) * BoxColor;
-    Text.Box.FillBColor       = (ColorIndex_t) * BoxFillColor;
-    Text.Anchor               = (TextAnchor_e) * Anchor;
+    Text.Box.BColor           = static_cast<ColorIndex_t>(*BoxColor);
+    Text.Box.FillBColor       = static_cast<ColorIndex_t>(*BoxFillColor);
+    Text.Anchor               = static_cast<TextAnchor_e>(*Anchor);
     Text.LineSpacing          = *LineSpacing;
     Text.Angle                = *Angle / DEGPERRADIANS;
-    Text.Scope                = (Scope_e) * Scope;
+    Text.Scope                = static_cast<Scope_e>(*Scope);
     Text.Text                 = String;
     Text.MacroFunctionCommand = mfc;
-    Text.Clipping             = (Clipping_e) * Clipping;
+    Text.Clipping             = static_cast<Clipping_e>(*Clipping);
 
     #if defined MAKEARCHIVE
     if (DebugLevel[CurFile])
@@ -3917,11 +4026,11 @@ static Boolean_t AuxDataIsValidNameChar(char      Char,
     REQUIRE(VALID_BOOLEAN(IsLeadChar));
 
     IsValidNameChar = (Char == '_' ||
-                       isalpha(Char));
+                       tecplot::isalpha(Char));
     if (!IsLeadChar)
         IsValidNameChar = (IsValidNameChar ||
                            Char == '.'     ||
-                           isdigit(Char));
+                           tecplot::isdigit(Char));
 
     ENSURE(VALID_BOOLEAN(IsValidNameChar));
     return IsValidNameChar;

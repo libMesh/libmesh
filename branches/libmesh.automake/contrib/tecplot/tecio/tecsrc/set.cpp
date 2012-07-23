@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -30,7 +7,7 @@
 *****************************************************************
 *****************************************************************
 *******                                                  ********
-****** Copyright (C) 1988-2008 Tecplot, Inc.              *******
+****** Copyright (C) 1988-2010 Tecplot, Inc.              *******
 *******                                                  ********
 *****************************************************************
 *****************************************************************
@@ -44,7 +21,6 @@
 #include "Q_UNICODE.h"
 #include "ALLOC.h"
 #include "SET.h"
-
 
 /* * SET FUNCTIONS * */
 
@@ -61,7 +37,7 @@
 #define SetExpansionFactor   2
 #endif
 
-using namespace tecplot::strutil;
+using tecplot::strutil::translate;
 
 /*
  */
@@ -114,6 +90,7 @@ Boolean_t SetItemDestructor(void       *ItemRef,
 
     REQUIRE(VALID_REF(SetRef));
     REQUIRE(VALID_REF(*SetRef) || *SetRef == NULL);
+    UNUSED(ClientData);
 
     if (*SetRef != NULL)
         DeallocSet(SetRef);
@@ -130,7 +107,7 @@ Boolean_t ExpandSet(Set_pa     Set,
                     Boolean_t  show_error_msg)
 {
     SetData_t  *data;
-    long        new_size;
+    SetIndex_t  new_size;
 
     REQUIRE(max_val >= 0);
 
@@ -222,7 +199,7 @@ Boolean_t AppendSet(Set_pa dst,
         SetIndex_t member;
         ForAllMembersInSet(member, src)
         {
-            if (!AddToSet(dst, member, TRUE))
+            if (!AddToSet(dst, member, show_error_msg))
                 return FALSE;
         }
         return TRUE;
@@ -441,7 +418,7 @@ SetIndex_t GetNextMember(Set_pa     Set,
         else if (start_at + 1 < Set->size)
         {
             word = (start_at + 1) / SetBitSize;
-            bit = (start_at + 1) % SetBitSize;
+            bit = static_cast<int>((start_at + 1) % SetBitSize);
             if (word < set_size_in_words)
                 word_val = Set->data[word] >> bit;
         }
@@ -492,7 +469,7 @@ SetIndex_t GetPrevMember(Set_pa     Set,
         else if (start_at > 0)
         {
             word = (start_at - 1) / SetBitSize;
-            bit = (start_at - 1) % SetBitSize;
+            bit = static_cast<int>((start_at - 1) % SetBitSize);
             if (word >= 0)
                 word_val = Set->data[word] << (SetBitSize - bit - 1);
         }
@@ -503,7 +480,7 @@ SetIndex_t GetPrevMember(Set_pa     Set,
         while ((word >= 0) && (word_val == 0))
         {
             word--;
-            bit = SetBitSize - 1;
+            bit = static_cast<int>(SetBitSize - 1);
             if (word >= 0)
                 word_val = Set->data[word] << (SetBitSize - bit - 1);
         }
@@ -691,6 +668,3 @@ void ShiftSet(Set_pa     Set,
     CopySet(Set, NewSet, TRUE);
     DeallocSet(&NewSet);
 }
-
-
-

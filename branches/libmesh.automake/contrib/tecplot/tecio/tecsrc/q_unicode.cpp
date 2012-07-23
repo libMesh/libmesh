@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 
@@ -30,7 +7,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -299,6 +276,14 @@ Boolean_t IsValidUtf8Byte(Byte_t uch)
     return Result;
 }
 
+/**
+ */
+Boolean_t IsPrintable8BitAsciiChar(wchar_t wChar)
+{
+    return ((wChar >= static_cast<wchar_t>(33)  && wChar <= static_cast<wchar_t>(126)) ||
+            (wChar >= static_cast<wchar_t>(160) && wChar <= static_cast<wchar_t>(255)));
+}
+
 
 Boolean_t ShouldConvertWideStringToUtf8String(const wchar_t *str)
 {
@@ -306,7 +291,9 @@ Boolean_t ShouldConvertWideStringToUtf8String(const wchar_t *str)
 
 #if defined MSWIN && defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
-#endif /* MSWIN and TECPLOTKERNEL */
+#else
+    UNUSED(str);
+#endif
 
     ENSURE(VALID_BOOLEAN(Result));
     return Result;
@@ -412,6 +399,38 @@ Boolean_t IsNullOrZeroLengthString(TranslatedString TS)
     return TS.isNullOrZeroLength();
 }
 
+/**
+ * Convert an ASCII character, 0..255, to a UTF-8 encoded string. This function
+ * was copied from http://www.daniweb.com/forums/thread151622.html
+ */
+std::string AsciiToUtf8String(unsigned char asciiChar)
+{
+    std::string result;
+
+	if (asciiChar < 128)
+	{
+        /*
+         * if the character is less than 128 then leave it as it is since
+         * anything less than 128 is represented in binary as 0xxxxxxx
+         */
+		result += asciiChar;
+	}
+	else
+	{
+        /*
+         * If the character is 128 or above, then it is represented as
+         * 110xxxxx 10xxxxxx (2 bytes). So for getting the first byte we
+         * right shift the character 6 times  and or it with 0xC0 (11000000)
+         * i.e. asciiChar >> 6 = 000xxx, then 000xxxxx OR 11000000 = 110xxxxx.
+         * For the second byte we need the lower 6 bits, so just block the
+         * first 2 bits, i.e. (00111111 AND xxxxxxxx) OR 10000000 = 10xxxxxx
+         */
+		result += (char)((asciiChar & 0x3F) | 0x80);
+		result += (char)((asciiChar >> 6) | 0xC0);
+	}
+	
+	return result;
+}
 
 }
 }
@@ -441,7 +460,5 @@ void MSWinTrace(const char *Format, ...)
 
     delete [] buffer;
 }
-
-
 
 #endif

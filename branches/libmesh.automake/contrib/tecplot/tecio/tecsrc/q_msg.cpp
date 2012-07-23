@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 
@@ -30,7 +7,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -190,19 +167,19 @@ static void SendWarningToFile(FILE *F,
 
 
 /**
- * Show the warning message. Note that the Format string can be the only
+ * Show the warning message. Note that the format string can be the only
  * argument, in which case it is essentially the warning message itself.
  *
- * param Format
- *     C Format string or a simple message.
+ * param format
+ *     C format string or a simple message.
  * param ...
  *     Zero or more variable arguments. The number of arguments must correspond
  *     to the placeholders in the format string.
  */
-void Warning(TranslatedString Format,
+void Warning(TranslatedString format,
              ...) /* zero or more arguments */
 {
-    REQUIRE(!Format.isNull());
+    REQUIRE(!format.isNull());
 
     static Boolean_t InWarning = FALSE; /* ...used to prevent recursive deadlock */
     if (!InWarning)
@@ -222,14 +199,14 @@ void Warning(TranslatedString Format,
             Boolean_t cleanUp = TRUE;
 
             va_list  Arguments;
-            va_start(Arguments, Format);
-            char* message = vFormatString(Format.c_str(), Arguments);
+            va_start(Arguments, format);
+            char* message = vFormatString(format.c_str(), Arguments);
             va_end(Arguments);
 
             if (message == NULL)
             {
                 cleanUp = FALSE; // ...this boolean allows us to "carefully" cast away the const'ness
-                message = (char*)Format.c_str();
+                message = (char*)format.c_str();
             }
 
 #if defined TECPLOTKERNEL
@@ -261,13 +238,13 @@ void Warning(TranslatedString Format,
 static void SendErrToFile(FILE       *File,
                           const char *Msg)
 {
-    char *FormattedMsg;
+    char *formattedMsg;
     REQUIRE(VALID_REF(File));
     REQUIRE(VALID_REF(Msg));
-    if (WrapString(Msg, &FormattedMsg))
+    if (WrapString(Msg, &formattedMsg))
     {
-        fprintf(File, "Err: %s\n", FormattedMsg);
-        FREE_ARRAY(FormattedMsg, "temp error string");
+        fprintf(File, "Err: %s\n", formattedMsg);
+        FREE_ARRAY(formattedMsg, "temp error string");
     }
     else
         fprintf(File, "Err: %s\n", Msg);
@@ -290,10 +267,10 @@ static void DefaultErrMsg(const char *Msg)
 #endif
 }
 
-static void PostErrorMessage(TranslatedString Format,
+static void PostErrorMessage(TranslatedString format,
                              va_list          Arguments)
 {
-    REQUIRE(!Format.isNull());
+    REQUIRE(!format.isNull());
 
     /*
      * Attempt to format the string. Failing that simply use the original format
@@ -302,11 +279,11 @@ static void PostErrorMessage(TranslatedString Format,
      * previous operation anyway.
      */
     Boolean_t cleanUp = TRUE;
-    char* messageString = vFormatString(Format.c_str(), Arguments);
+    char* messageString = vFormatString(format.c_str(), Arguments);
     if (messageString == NULL)
     {
         cleanUp = FALSE; // ...this boolean allows us to "carefully" cast away the const'ness
-        messageString = (char*)Format.c_str();
+        messageString = (char*)format.c_str();
     }
 
 #if defined TECPLOTKERNEL
@@ -335,10 +312,10 @@ static void PostErrorMessage(TranslatedString Format,
  *   queued for display on idle. In batch mode all messages are sent to the
  *   batch log file.
  */
-void vErrMsg(TranslatedString Format,
+void vErrMsg(TranslatedString format,
              va_list          Arguments)
 {
-    REQUIRE(!Format.isNull());
+    REQUIRE(!format.isNull());
 
     static Boolean_t InErrMsg = FALSE; /* ...used to prevent recursive deadlock */
     if (!InErrMsg)
@@ -349,7 +326,7 @@ void vErrMsg(TranslatedString Format,
 
         InErrMsg = TRUE;
         {
-            PostErrorMessage(Format, Arguments);
+            PostErrorMessage(format, Arguments);
         }
         InErrMsg = FALSE;
 
@@ -360,26 +337,26 @@ void vErrMsg(TranslatedString Format,
 }
 
 /**
- * Show the error message. Note that the Format string can be the only
+ * Show the error message. Note that the format string can be the only
  * argument, in which case it is essentially the error message itself.
  *
- * @param Format
- *   C Format string or a simple message.
+ * @param format
+ *   C format string or a simple message.
  * @param ...
  *   Zero or more variable arguments. The number of arguments must correspond
  *   to the placeholders in the format string.
  */
-void ErrMsg(TranslatedString Format,
+void ErrMsg(TranslatedString format,
             ...) /* zero or more arguments */
 {
-    REQUIRE(!Format.isNull());
+    REQUIRE(!format.isNull());
 
     va_list Arguments;
-    va_start(Arguments, Format);
+    va_start(Arguments, format);
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #else
-    PostErrorMessage(Format, Arguments);
+    PostErrorMessage(format, Arguments);
 #endif
     va_end(Arguments);
 }

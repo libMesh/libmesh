@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -29,7 +6,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -44,6 +21,7 @@
 #endif
 #include "ARRLIST.h"
 #include "STRLIST.h"
+#include "CHARTYPE.h"
 #include "STRUTIL.h"
 #include "ALLOC.h"
 
@@ -57,8 +35,13 @@
 /* CORE SOURCE CODE REMOVED */
 #endif
 
-using namespace std;
-using namespace tecplot::strutil;
+using std::string;
+using tecplot::strutil::translate;
+using tecplot::strutil::dontTranslate;
+using tecplot::strutil::TranslatedString;
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 #ifdef MSWIN
 # pragma warning (disable : 4786) /* STL warning about trucated identifiers */
@@ -77,9 +60,9 @@ static int        FormatStringBufferSize = INITIAL_FORMAT_BUFFER_SIZE;
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
-#if defined MSWIN
-#else
-#endif /* !MSWIN */
+    #if defined MSWIN
+    #else
+    #endif /* !MSWIN */
 #endif
 
 #if defined TECPLOTKERNEL
@@ -299,7 +282,7 @@ char *StringFlushLeft(char *String)
 
     /* move the substring beginning at the first non-whitespace */
     /* character to the head of the string                      */
-    while (isspace(*Start))
+    while (tecplot::isspace(*Start))
         Start++;
     if (Start != String)
         memmove(String, Start, strlen(Start) + 1);
@@ -320,7 +303,7 @@ static char *StringFlushRight(char *String)
 
     REQUIRE(VALID_REF(String));
 
-    for (End = EndOfString(String); End != String && isspace(End[-1]); End--)
+    for (End = EndOfString(String); End != String && tecplot::isspace(End[-1]); End--)
         End[-1] = '\0';
 
     ENSURE(VALID_REF(Result) && Result == String);
@@ -393,11 +376,21 @@ char *StringTrimAndTruncate(char      *String,
     REQUIRE(VALID_REF(String));
     REQUIRE(MaxLength >= 0);
 
-    TrimLeadAndTrailSpaces(String);
-    StringTruncate(String, MaxLength);
+    /*
+     * Note that we are careful to truncate the string after trimming
+     * whitespace from the left side but then trim whitespace from the end
+     * after truncating to make sure we don't return a string that has
+     * whitespace simply because it truncated on a word break.
+     */
+    StringFlushLeft(String);
+    StringTruncate(String,MaxLength);
+    StringFlushRight(String);
 
     ENSURE(VALID_REF(String));
     ENSURE((LgIndex_t)strlen(String) <= MaxLength);
+    ENSURE(IMPLICATION(strlen(String) != 0,
+                       (!tecplot::isspace(String[0]) &&
+                        !tecplot::isspace(String[strlen(String)-1]))));
     return String;
 }
 
@@ -491,7 +484,6 @@ StringList_pa LineBreakString(const char *String,
 }
 #endif
 
-
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif /* TECPLOTKERNEL */
@@ -520,7 +512,6 @@ int ustrncmp(const  char *s1,
 {
     REQUIRE((s1 == NULL) || VALID_REF(s1));
     REQUIRE((s2 == NULL) || VALID_REF(s2));
-    REQUIRE(Len >= 0);
 
     char *t1;
     char *t2;
@@ -578,7 +569,9 @@ int ustrcmp(const char *s1,
     return (ustrncmp(s1, s2, INT_MAX));
 }
 
-
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */

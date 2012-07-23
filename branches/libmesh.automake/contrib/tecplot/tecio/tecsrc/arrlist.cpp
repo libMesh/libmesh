@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 #include "stdafx.h"
 #include "MASTER.h"
 #define TECPLOTENGINEMODULE
@@ -29,7 +6,7 @@
  *****************************************************************
  *****************************************************************
  *******                                                  ********
- ****** Copyright (C) 1988-2008 Tecplot, Inc.               ********
+ ****** Copyright (C) 1988-2010 Tecplot, Inc.               ********
  *******       All Rights Reserved.                       ********
  *******                                                  ********
  *****************************************************************
@@ -40,11 +17,7 @@
 #include "GLOBAL.h"
 #include "TASSERT.h"
 #include "ALLOC.h"
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
 #include "ARRLIST.h"
-
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
@@ -93,12 +66,12 @@
  * param ItemSize
  *     Item size in bytes.
  */
-static void CopyArrayItems(char        *TargetArray,
-                           LgIndex_t    TargetOffset,
-                           char        *SourceArray,
-                           LgIndex_t    SourceOffset,
-                           LgIndex_t    Count,
-                           SmInteger_t  ItemSize)
+static void CopyArrayItems(char*       TargetArray,
+                           LgIndex_t   TargetOffset,
+                           char*       SourceArray,
+                           LgIndex_t   SourceOffset,
+                           LgIndex_t   Count,
+                           SmInteger_t ItemSize)
 {
     REQUIRE(VALID_REF(TargetArray));
     REQUIRE(TargetOffset >= 0);
@@ -106,11 +79,11 @@ static void CopyArrayItems(char        *TargetArray,
     REQUIRE(SourceOffset >= 0);
     REQUIRE(&TargetArray[TargetOffset] != &SourceArray[SourceOffset]);
     REQUIRE(Count >= 1);
-    REQUIRE(1 <= ItemSize && ItemSize <= (SmInteger_t)sizeof(ArrayListItem_u));
+    REQUIRE(1 <= ItemSize && ItemSize <= static_cast<SmInteger_t>(sizeof(ArrayListItem_u)));
 
     void* TargetPtr = &TargetArray[TargetOffset * ItemSize];
     void* SourcePtr = &SourceArray[SourceOffset * ItemSize];
-    memmove(TargetPtr, SourcePtr, ((size_t)Count) * ItemSize);
+    memmove(TargetPtr, SourcePtr, static_cast<size_t>(Count) * ItemSize);
 }
 
 
@@ -134,17 +107,17 @@ static void CopyArrayItems(char        *TargetArray,
  *     Adjusted capacity that is at least as large as the request or zero if
  *     unable to satisfy the requested capacity.
  */
-static LgIndex_t AdjustCapacityRequest(ArrayList_pa ArrayList,
+static LgIndex_t AdjustCapacityRequest(ArrayList_pa ASSERT_ONLY_PARAM(ArrayList),
                                        LgIndex_t    CurrentCapacity,
                                        LgIndex_t    RequestedCapacity,
                                        ArbParam_t   ClientData)
 {
-    LgIndex_t Result;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE((RequestedCapacity == 0 && CurrentCapacity == 0) ||
             RequestedCapacity > CurrentCapacity);
+    UNUSED(ClientData);
 
+    LgIndex_t Result;
     if (RequestedCapacity != 0 && CurrentCapacity == 0)
     {
         /* first allocation; assume the request is the desired capacityy */
@@ -152,7 +125,7 @@ static LgIndex_t AdjustCapacityRequest(ArrayList_pa ArrayList,
     }
     else
     {
-        const LgIndex_t DEFAULT_CAPACITY = 32;
+        LgIndex_t const DEFAULT_CAPACITY = 32;
         LgIndex_t       BlockSize = MAX(DEFAULT_CAPACITY, CurrentCapacity / 2);
         if (RequestedCapacity == 0)
             Result = DEFAULT_CAPACITY;
@@ -176,118 +149,117 @@ static LgIndex_t AdjustCapacityRequest(ArrayList_pa ArrayList,
  */
 static SmInteger_t GetElementSize(ArrayListType_e Type)
 {
-    SmInteger_t Result;
-
     REQUIRE(VALID_ENUM(Type, ArrayListType_e));
 
+    SmInteger_t Result;
     switch (Type)
     {
         case ArrayListType_UnsignedChar:
-            Result = (SmInteger_t)sizeof(unsigned char);
+            Result = static_cast<SmInteger_t>(sizeof(unsigned char));
             break;
         case ArrayListType_UnsignedShort:
-            Result = (SmInteger_t)sizeof(unsigned short);
+            Result = static_cast<SmInteger_t>(sizeof(unsigned short));
             break;
         case ArrayListType_UnsignedInt:
-            Result = (SmInteger_t)sizeof(unsigned int);
+            Result = static_cast<SmInteger_t>(sizeof(unsigned int));
             break;
         case ArrayListType_UnsignedLong:
-            Result = (SmInteger_t)sizeof(unsigned long);
+            Result = static_cast<SmInteger_t>(sizeof(unsigned long));
             break;
         case ArrayListType_Int64:
-            Result = (SmInteger_t)sizeof(Int64_t);
+            Result = static_cast<SmInteger_t>(sizeof(Int64_t));
             break;
         case ArrayListType_Char:
-            Result = (SmInteger_t)sizeof(char);
+            Result = static_cast<SmInteger_t>(sizeof(char));
             break;
         case ArrayListType_Short:
-            Result = (SmInteger_t)sizeof(short);
+            Result = static_cast<SmInteger_t>(sizeof(short));
             break;
         case ArrayListType_Int:
-            Result = (SmInteger_t)sizeof(int);
+            Result = static_cast<SmInteger_t>(sizeof(int));
             break;
         case ArrayListType_Long:
-            Result = (SmInteger_t)sizeof(long);
+            Result = static_cast<SmInteger_t>(sizeof(long));
             break;
         case ArrayListType_Float:
-            Result = (SmInteger_t)sizeof(float);
+            Result = static_cast<SmInteger_t>(sizeof(float));
             break;
         case ArrayListType_Double:
-            Result = (SmInteger_t)sizeof(double);
+            Result = static_cast<SmInteger_t>(sizeof(double));
             break;
         case ArrayListType_LgIndex:
-            Result = (SmInteger_t)sizeof(LgIndex_t);
+            Result = static_cast<SmInteger_t>(sizeof(LgIndex_t));
             break;
         case ArrayListType_EntIndex:
-            Result = (SmInteger_t)sizeof(EntIndex_t);
+            Result = static_cast<SmInteger_t>(sizeof(EntIndex_t));
             break;
         case ArrayListType_SmInteger:
-            Result = (SmInteger_t)sizeof(SmInteger_t);
+            Result = static_cast<SmInteger_t>(sizeof(SmInteger_t));
             break;
         case ArrayListType_Boolean:
-            Result = (SmInteger_t)sizeof(Boolean_t);
+            Result = static_cast<SmInteger_t>(sizeof(Boolean_t));
             break;
         case ArrayListType_ArbParam:
-            Result = (SmInteger_t)sizeof(ArbParam_t);
+            Result = static_cast<SmInteger_t>(sizeof(ArbParam_t));
             break;
 
         case ArrayListType_UnsignedCharPtr:
-            Result = (SmInteger_t)sizeof(unsigned char *);
+            Result = static_cast<SmInteger_t>(sizeof(unsigned char*));
             break;
         case ArrayListType_UnsignedShortPtr:
-            Result = (SmInteger_t)sizeof(unsigned short *);
+            Result = static_cast<SmInteger_t>(sizeof(unsigned short*));
             break;
         case ArrayListType_UnsignedIntPtr:
-            Result = (SmInteger_t)sizeof(unsigned int *);
+            Result = static_cast<SmInteger_t>(sizeof(unsigned int*));
             break;
         case ArrayListType_UnsignedLongPtr:
-            Result = (SmInteger_t)sizeof(unsigned long *);
+            Result = static_cast<SmInteger_t>(sizeof(unsigned long*));
             break;
         case ArrayListType_Int64Ptr:
-            Result = (SmInteger_t)sizeof(Int64_t *);
+            Result = static_cast<SmInteger_t>(sizeof(Int64_t*));
             break;
         case ArrayListType_CharPtr:
-            Result = (SmInteger_t)sizeof(char *);
+            Result = static_cast<SmInteger_t>(sizeof(char*));
             break;
         case ArrayListType_ShortPtr:
-            Result = (SmInteger_t)sizeof(short *);
+            Result = static_cast<SmInteger_t>(sizeof(short*));
             break;
         case ArrayListType_IntPtr:
-            Result = (SmInteger_t)sizeof(int *);
+            Result = static_cast<SmInteger_t>(sizeof(int*));
             break;
         case ArrayListType_LongPtr:
-            Result = (SmInteger_t)sizeof(long *);
+            Result = static_cast<SmInteger_t>(sizeof(long*));
             break;
         case ArrayListType_FloatPtr:
-            Result = (SmInteger_t)sizeof(float *);
+            Result = static_cast<SmInteger_t>(sizeof(float*));
             break;
         case ArrayListType_DoublePtr:
-            Result = (SmInteger_t)sizeof(double *);
+            Result = static_cast<SmInteger_t>(sizeof(double*));
             break;
         case ArrayListType_LgIndexPtr:
-            Result = (SmInteger_t)sizeof(LgIndex_t *);
+            Result = static_cast<SmInteger_t>(sizeof(LgIndex_t*));
             break;
         case ArrayListType_EntIndexPtr:
-            Result = (SmInteger_t)sizeof(EntIndex_t *);
+            Result = static_cast<SmInteger_t>(sizeof(EntIndex_t*));
             break;
         case ArrayListType_SmIntegerPtr:
-            Result = (SmInteger_t)sizeof(SmInteger_t *);
+            Result = static_cast<SmInteger_t>(sizeof(SmInteger_t*));
             break;
         case ArrayListType_BooleanPtr:
-            Result = (SmInteger_t)sizeof(Boolean_t *);
+            Result = static_cast<SmInteger_t>(sizeof(Boolean_t*));
             break;
         case ArrayListType_ArbParamPtr:
-            Result = (SmInteger_t)sizeof(ArbParam_t *);
+            Result = static_cast<SmInteger_t>(sizeof(ArbParam_t*));
             break;
 
         case ArrayListType_VoidPtr:
-            Result = (SmInteger_t)sizeof(void *);
+            Result = static_cast<SmInteger_t>(sizeof(void*));
             break;
         case ArrayListType_FunctionPtr:
-            Result = (SmInteger_t)sizeof(void (*)());
+            Result = static_cast<SmInteger_t>(sizeof(void (*)()));
             break;
         case ArrayListType_Any: /* allows a mixed bag of items */
-            Result = (SmInteger_t)sizeof(ArrayListItem_u);
+            Result = static_cast<SmInteger_t>(sizeof(ArrayListItem_u));
             break;
 
         default:
@@ -296,7 +268,7 @@ static SmInteger_t GetElementSize(ArrayListType_e Type)
             break;
     }
 
-    ENSURE(1 <= Result && Result <= (SmInteger_t)sizeof(ArrayListItem_u));
+    ENSURE(1 <= Result && Result <= static_cast<SmInteger_t>(sizeof(ArrayListItem_u)));
     return Result;
 }
 
@@ -324,24 +296,19 @@ static void DestroyItems(ArrayList_pa               ArrayList,
                          ArrayListItemDestructor_pf ItemDestructor,
                          ArbParam_t                 ClientData)
 {
-    LgIndex_t Index;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(0 <= ItemOffset && ItemOffset <= ArrayList->Count - 1);
     REQUIRE(1 <= Count && ItemOffset + Count <= ArrayList->Count);
     REQUIRE(VALID_FN_REF(ItemDestructor));
 
-    for (Index = 0;
+    for (LgIndex_t Index = 0;
          Index < Count;
          Index++)
     {
         LgIndex_t ItemIndex = (Index + ItemOffset) * ItemSize;
-#if !defined NO_ASSERTS
-        Boolean_t DoContinue = ItemDestructor((void *) & ArrayList->Array[ItemIndex], ClientData);
-        CHECK(DoContinue); /* this is a requirement of ArrayListItemDestructor_pf */
-#else
-        ItemDestructor((void *)&ArrayList->Array[ItemIndex], ClientData);
-#endif
+        Boolean_t CHECK_DoContinue;
+        CHECK_DoContinue = ItemDestructor(static_cast<void*>(&ArrayList->Array[ItemIndex]), ClientData);
+        CHECK(CHECK_DoContinue); /* this is a requirement of ArrayListItemDestructor_pf */
     }
 }
 
@@ -370,18 +337,15 @@ static void DestroyItems(ArrayList_pa               ArrayList,
  *     TRUE if the duplication was a success
  *     FALSE otherwise
  */
-static Boolean_t DuplicateItems(char                       *TargetArray,
-                                LgIndex_t                   TargetItemOffset,
-                                char                       *SourceArray,
-                                LgIndex_t                   SourceItemOffset,
-                                SmInteger_t                 ItemSize,
-                                LgIndex_t                   Count,
-                                ArrayListItemDuplicator_pf  ItemDuplicator,
-                                ArbParam_t                  ClientData)
+static Boolean_t DuplicateItems(char*                      TargetArray,
+                                LgIndex_t                  TargetItemOffset,
+                                char*                      SourceArray,
+                                LgIndex_t                  SourceItemOffset,
+                                SmInteger_t                ItemSize,
+                                LgIndex_t                  Count,
+                                ArrayListItemDuplicator_pf ItemDuplicator,
+                                ArbParam_t                 ClientData)
 {
-    Boolean_t IsOk = TRUE;
-    LgIndex_t Index;
-
     REQUIRE(VALID_REF(TargetArray));
     REQUIRE(TargetItemOffset >= 0);
     REQUIRE(VALID_REF(SourceArray));
@@ -391,14 +355,15 @@ static Boolean_t DuplicateItems(char                       *TargetArray,
     REQUIRE(Count >= 1);
     REQUIRE(VALID_FN_REF(ItemDuplicator));
 
-    for (Index = 0;
+    Boolean_t IsOk = TRUE;
+    for (LgIndex_t Index = 0;
          Index < Count && IsOk;
          Index++)
     {
         LgIndex_t TargetItemIndex = (Index + TargetItemOffset) * ItemSize;
         LgIndex_t SourceItemIndex = (Index + SourceItemOffset) * ItemSize;
-        IsOk = ItemDuplicator((void *) & TargetArray[TargetItemIndex],
-                              (void *) & SourceArray[SourceItemIndex],
+        IsOk = ItemDuplicator(static_cast<void*>(&TargetArray[TargetItemIndex]),
+                              static_cast<void*>(&SourceArray[SourceItemIndex]),
                               ClientData);
     }
 
@@ -418,17 +383,16 @@ static Boolean_t DuplicateItems(char                       *TargetArray,
  */
 Boolean_t ArrayListIsValid(ArrayList_pa ArrayList)
 {
-    Boolean_t IsValid;
+    #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+    #endif
 
-    /* this just makes sure that the NULL item global was initialized */
-    INVARIANT(ArrayListNullItem.Double == 0.0);
-
-    IsValid = (VALID_REF(ArrayList) &&
-               VALID_ENUM(ArrayList->Type, ArrayListType_e) &&
-               (1 <= ArrayList->ItemSize &&
-                ArrayList->ItemSize <= (SmInteger_t)sizeof(ArrayListItem_u)) &&
-               (0 <= ArrayList->Count &&
-                ArrayList->Count <= ArrayList->Capacity));
+    Boolean_t IsValid = (VALID_REF(ArrayList) &&
+                         VALID_ENUM(ArrayList->Type, ArrayListType_e) &&
+                         (1 <= ArrayList->ItemSize &&
+                          ArrayList->ItemSize <= static_cast<SmInteger_t>(sizeof(ArrayListItem_u))) &&
+                         (0 <= ArrayList->Count &&
+                          ArrayList->Count <= ArrayList->Capacity));
 
     ENSURE(VALID_BOOLEAN(IsValid));
     return IsValid;
@@ -446,11 +410,9 @@ Boolean_t ArrayListIsValid(ArrayList_pa ArrayList)
  */
 ArrayListType_e ArrayListGetType(ArrayList_pa ArrayList)
 {
-    ArrayListType_e Result;
-
     REQUIRE(ArrayListIsValid(ArrayList));
 
-    Result = ArrayList->Type;
+    ArrayListType_e Result = ArrayList->Type;
 
     ENSURE(VALID_ENUM(Result, ArrayListType_e));
     return Result;
@@ -465,9 +427,9 @@ ArrayListType_e ArrayListGetType(ArrayList_pa ArrayList)
  * the RequestedCapacity.
  *
  * param ArrayList
- *     Current capacity used as a helpful hint for the adjustment algorythm.
+ *     Current capacity used as a helpful hint for the adjustment algorithm.
  * param RequestedCapacity
- *     Capacity (number ot items) request or zero for default size.
+ *     Capacity (number of items) request or zero for default size.
  *
  * return
  *     TRUE if the list could be enlarged (or was large enough),
@@ -476,17 +438,14 @@ ArrayListType_e ArrayListGetType(ArrayList_pa ArrayList)
 Boolean_t ArrayListEnlargeCapacity(ArrayList_pa ArrayList,
                                    LgIndex_t    RequestedCapacity)
 {
-    Boolean_t IsOk;
-    LgIndex_t AdjustedCapacity;
-    char      *EnlargedArray;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(IMPLICATION(RequestedCapacity == 0, ArrayList->Capacity == 0));
 
+    Boolean_t IsOk;
     if (RequestedCapacity == 0 ||
         RequestedCapacity > ArrayList->Capacity)
     {
-        AdjustedCapacity =
+        LgIndex_t AdjustedCapacity =
             ArrayList->CapacityRequestAdjuster(ArrayList,
                                                ArrayList->Capacity,
                                                RequestedCapacity,
@@ -494,6 +453,7 @@ Boolean_t ArrayListEnlargeCapacity(ArrayList_pa ArrayList,
         CHECK(AdjustedCapacity == 0 ||
               AdjustedCapacity >= RequestedCapacity);
 
+        char* EnlargedArray = NULL; /* ...quiet compiler */
         IsOk = (AdjustedCapacity != 0); /* ...were we able to meet the request? */
         if (IsOk)
         {
@@ -571,12 +531,10 @@ ArrayList_pa ArrayListAlloc(LgIndex_t                           EstimatedCapacit
                             ArrayListCapacityRequestAdjuster_pf CapacityRequestAdjuster,
                             ArbParam_t                          CapacityRequestAdjusterClientData)
 {
-    ArrayList_pa Result;
-
     REQUIRE(EstimatedCapacity >= 0);
     REQUIRE(VALID_ENUM(Type, ArrayListType_e));
 
-    Result = ALLOC_ITEM(ArrayList_s, "ArrayList structure");
+    ArrayList_pa Result = ALLOC_ITEM(ArrayList_s, "ArrayList structure");
     if (Result != NULL)
     {
         Result->Array           = NULL;
@@ -620,9 +578,9 @@ ArrayList_pa ArrayListAlloc(LgIndex_t                           EstimatedCapacit
  * param ClientData
  *     Any client data needed for cleanup.
  */
-void ArrayListDealloc(ArrayList_pa               *ArrayList,
-                      ArrayListItemDestructor_pf  ItemDestructor,
-                      ArbParam_t                  ClientData)
+void ArrayListDealloc(ArrayList_pa*              ArrayList,
+                      ArrayListItemDestructor_pf ItemDestructor,
+                      ArbParam_t                 ClientData)
 {
     REQUIRE(VALID_REF(ArrayList));
     REQUIRE(ArrayListIsValid(*ArrayList) || *ArrayList == NULL);
@@ -660,11 +618,9 @@ void ArrayListDealloc(ArrayList_pa               *ArrayList,
  */
 LgIndex_t ArrayListGetCount_FUNC(ArrayList_pa ArrayList)
 {
-    LgIndex_t Result;
-
     REQUIRE(ArrayListIsValid(ArrayList));
 
-    Result = ArrayListGetCount_MACRO(ArrayList);
+    LgIndex_t Result = ArrayListGetCount_MACRO(ArrayList);
 
     ENSURE(Result >= 0);
     return Result;
@@ -845,14 +801,13 @@ ArrayList_pa ArrayListRemoveItems(ArrayList_pa ArrayList,
 ArrayListItem_u ArrayListRemoveItem(ArrayList_pa ArrayList,
                                     LgIndex_t    ItemOffset)
 {
-    ArrayListItem_u Result;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(0 <= ItemOffset && ItemOffset <= ArrayList->Count - 1);
     REQUIRE(!ArrayList->IsVisitingItems);
 
     /* record the original item */
-    CopyArrayItems((char *)&Result, 0,
+    ArrayListItem_u Result;
+    CopyArrayItems(static_cast<char*>(&Result.Char), 0,
                    ArrayList->Array, ItemOffset,
                    1, ArrayList->ItemSize);
 
@@ -883,14 +838,14 @@ Boolean_t ArrayListInsert(ArrayList_pa Target,
                           LgIndex_t    ItemOffset,
                           ArrayList_pa Source)
 {
-    Boolean_t IsOk = TRUE;
-
     REQUIRE(ArrayListIsValid(Target));
     REQUIRE(ItemOffset >= 0);
     REQUIRE(ArrayListIsValid(Source));
     REQUIRE(Target != Source);
     REQUIRE(Target->Type == Source->Type);
     REQUIRE(!Target->IsVisitingItems);
+
+    Boolean_t IsOk = TRUE;
 
     if (Source->Count != 0)
     {
@@ -960,14 +915,14 @@ Boolean_t ArrayListInsertItem(ArrayList_pa    ArrayList,
                               LgIndex_t       ItemOffset,
                               ArrayListItem_u Item)
 {
-    Boolean_t IsOk = TRUE;
-    LgIndex_t NeededCapacity;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(ItemOffset >= 0);
     REQUIRE(!ArrayList->IsVisitingItems);
 
+    Boolean_t IsOk = TRUE;
+
     /* if necessary enlarge the list to accommodate the request */
+    LgIndex_t NeededCapacity;
     if (ItemOffset > ArrayList->Count)
         NeededCapacity = ItemOffset + 1;
     else
@@ -998,7 +953,7 @@ Boolean_t ArrayListInsertItem(ArrayList_pa    ArrayList,
 
         /* insert the item */
         CopyArrayItems(ArrayList->Array, ItemOffset,
-                       (char *)&Item, 0,
+                       static_cast<char*>(&Item.Char), 0,
                        1, ArrayList->ItemSize);
     }
 
@@ -1032,23 +987,21 @@ Boolean_t ArrayListVisitItems(ArrayList_pa            ArrayList,
                               ArrayListItemVisitor_pf ItemVisitor,
                               ArbParam_t              ClientData)
 {
-    Boolean_t   DoContinue = TRUE;
-    Boolean_t   IsVisitingItems;
-    SmInteger_t ItemSize;
-    LgIndex_t   Index;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(VALID_FN_REF(ItemVisitor));
 
-    IsVisitingItems = ArrayList->IsVisitingItems;
+    Boolean_t IsVisitingItems = ArrayList->IsVisitingItems;
     ArrayList->IsVisitingItems = TRUE; /* guards against structure changes */
 
+    LgIndex_t   Index;
+    SmInteger_t ItemSize;
+    Boolean_t   DoContinue = TRUE;
     for (Index = 0, ItemSize = ArrayList->ItemSize;
          Index < Count && DoContinue;
          Index++)
     {
         LgIndex_t ItemIndex = (Index + ItemOffset) * ItemSize;
-        DoContinue = ItemVisitor((void *) & ArrayList->Array[ItemIndex], ClientData);
+        DoContinue = ItemVisitor(static_cast<void*>(&ArrayList->Array[ItemIndex]), ClientData);
     }
 
     ArrayList->IsVisitingItems = IsVisitingItems;
@@ -1079,15 +1032,13 @@ ArrayList_pa ArrayListGetItems(ArrayList_pa ArrayList,
                                LgIndex_t    ItemOffset,
                                LgIndex_t    Count)
 {
-    ArrayList_pa Result;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(0 <= ItemOffset && ItemOffset <= ArrayList->Count - 1);
     REQUIRE(1 <= Count && ItemOffset + Count <= ArrayList->Count);
 
-    Result = ArrayListAlloc(Count, ArrayList->Type,
-                            ArrayList->CapacityRequestAdjuster,
-                            ArrayList->CapacityRequestAdjusterClientData);
+    ArrayList_pa Result = ArrayListAlloc(Count, ArrayList->Type,
+                                         ArrayList->CapacityRequestAdjuster,
+                                         ArrayList->CapacityRequestAdjusterClientData);
     if (Result != NULL)
     {
         /* copy the original items into the result */
@@ -1117,12 +1068,11 @@ ArrayList_pa ArrayListGetItems(ArrayList_pa ArrayList,
 ArrayListItem_u ArrayListGetItem(ArrayList_pa ArrayList,
                                  LgIndex_t    ItemOffset)
 {
-    ArrayListItem_u Result;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(0 <= ItemOffset && ItemOffset <= ArrayList->Count - 1);
 
-    CopyArrayItems((char *)&Result, 0,
+    ArrayListItem_u Result;
+    CopyArrayItems(static_cast<char*>(&Result.Char), 0,
                    ArrayList->Array, ItemOffset,
                    1, ArrayList->ItemSize);
 
@@ -1150,13 +1100,13 @@ ArrayListItem_u ArrayListGetItem(ArrayList_pa ArrayList,
  * return
  *     The internal reference to the requested item.
  */
-const void *ArrayListGetItemInternalRef_FUNC(ArrayList_pa ArrayList,
+void const* ArrayListGetItemInternalRef_FUNC(ArrayList_pa ArrayList,
                                              LgIndex_t    ItemOffset)
 {
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(0 <= ItemOffset && ItemOffset <= ArrayList->Count - 1);
 
-    const void *Result = ArrayListGetItemInternalRef_MACRO(ArrayList, ItemOffset);
+    void const* Result = ArrayListGetItemInternalRef_MACRO(ArrayList, ItemOffset);
     ENSURE(Result == NULL || VALID_REF(Result));
     return Result;
 }
@@ -1190,13 +1140,13 @@ Boolean_t ArrayListSetItem(ArrayList_pa               ArrayList,
                            ArrayListItemDestructor_pf ItemDestructor,
                            ArbParam_t                 ClientData)
 {
-    Boolean_t IsOk = TRUE;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(ItemOffset >= 0);
     REQUIRE(VALID_FN_REF(ItemDestructor) || ItemDestructor == NULL);
     REQUIRE(IMPLICATION(ItemOffset + 1 > ArrayList->Count,
                         !ArrayList->IsVisitingItems));
+
+    Boolean_t IsOk = TRUE;
 
     /* release the item if a destructor is installed */
     if (ItemDestructor != NULL && ItemOffset < ArrayList->Count)
@@ -1212,7 +1162,7 @@ Boolean_t ArrayListSetItem(ArrayList_pa               ArrayList,
         if (ItemOffset + 1 > ArrayList->Count)
             ArrayList->Count = ItemOffset + 1;
         CopyArrayItems(ArrayList->Array, ItemOffset,
-                       (char *)&Item, 0,
+                       static_cast<char*>(&Item.Char), 0,
                        1, ArrayList->ItemSize);
     }
 
@@ -1237,12 +1187,10 @@ Boolean_t ArrayListSetItem(ArrayList_pa               ArrayList,
 Boolean_t ArrayListAppendItem(ArrayList_pa    ArrayList,
                               ArrayListItem_u Item)
 {
-    Boolean_t IsOk;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(!ArrayList->IsVisitingItems);
 
-    IsOk = ArrayListInsertItem(ArrayList, ArrayList->Count, Item);
+    Boolean_t IsOk = ArrayListInsertItem(ArrayList, ArrayList->Count, Item);
 
     ENSURE(ArrayListIsValid(ArrayList));
     ENSURE(VALID_BOOLEAN(IsOk));
@@ -1265,15 +1213,13 @@ Boolean_t ArrayListAppendItem(ArrayList_pa    ArrayList,
 Boolean_t ArrayListAppend(ArrayList_pa Target,
                           ArrayList_pa Source)
 {
-    Boolean_t IsOk;
-
     REQUIRE(ArrayListIsValid(Target));
     REQUIRE(ArrayListIsValid(Source));
     REQUIRE(Target != Source);
     REQUIRE(Target->Type == Source->Type);
     REQUIRE(!Target->IsVisitingItems);
 
-    IsOk = ArrayListInsert(Target, Target->Count, Source);
+    Boolean_t IsOk = ArrayListInsert(Target, Target->Count, Source);
 
     ENSURE(ArrayListIsValid(Target));
     ENSURE(VALID_BOOLEAN(IsOk));
@@ -1301,14 +1247,12 @@ ArrayList_pa ArrayListCopy(ArrayList_pa               ArrayList,
                            ArrayListItemDuplicator_pf ItemDuplicator,
                            ArbParam_t                 ClientData)
 {
-    ArrayList_pa Result;
-
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(VALID_FN_REF(ItemDuplicator) || ItemDuplicator == NULL);
 
-    Result = ArrayListAlloc(ArrayList->Count, ArrayList->Type,
-                            ArrayList->CapacityRequestAdjuster,
-                            ArrayList->CapacityRequestAdjusterClientData);
+    ArrayList_pa Result = ArrayListAlloc(ArrayList->Count, ArrayList->Type,
+                                         ArrayList->CapacityRequestAdjuster,
+                                         ArrayList->CapacityRequestAdjusterClientData);
     if (Result != NULL && ArrayList->Count != 0)
     {
         Boolean_t IsOk = TRUE;
@@ -1356,18 +1300,17 @@ ArrayList_pa ArrayListCopy(ArrayList_pa               ArrayList,
  *     array (but not the individual members unless a item duplication function
  *     was supplied) when it is no longer needed.
  */
-void *ArrayListToArray(ArrayList_pa               Source,
+void* ArrayListToArray(ArrayList_pa               Source,
                        ArrayListItemDuplicator_pf ItemDuplicator,
                        ArbParam_t                 ClientData)
 {
-    void *Result;
-
     REQUIRE(ArrayListIsValid(Source));
     REQUIRE(VALID_FN_REF(ItemDuplicator) || ItemDuplicator == NULL);
 
+    void* Result;
     if (Source->Count != 0)
-        Result = (void *)ALLOC_ARRAY(Source->Count * Source->ItemSize,
-                                     char, "native array");
+        Result = static_cast<void*>(ALLOC_ARRAY(Source->Count * Source->ItemSize,
+                                                char, "native array"));
     else
         Result = NULL;
 
@@ -1382,14 +1325,14 @@ void *ArrayListToArray(ArrayList_pa               Source,
                                   ItemDuplicator, ClientData);
         else
             /* copy the original items into the result */
-            CopyArrayItems((char *)Result, 0,
+            CopyArrayItems(static_cast<char*>(Result), 0,
                            Source->Array, 0,
                            Source->Count,
                            Source->ItemSize);
         if (!IsOk)
         {
             /* Hack to remove delete warning... */
-            char *Tmp = (char *)Result;
+            char* Tmp = static_cast<char*>(Result);
             FREE_ARRAY(Tmp, "native array");
         }
     }
@@ -1421,20 +1364,18 @@ void *ArrayListToArray(ArrayList_pa               Source,
  *     native 'C' array if sufficient memory was available, otherwise
  *     a handle to NULL.
  */
-ArrayList_pa ArrayListFromArray(void                       *Source,
-                                LgIndex_t                   Count,
-                                ArrayListType_e             Type,
-                                ArrayListItemDuplicator_pf  ItemDuplicator,
-                                ArbParam_t                  ClientData)
+ArrayList_pa ArrayListFromArray(void*                      Source,
+                                LgIndex_t                  Count,
+                                ArrayListType_e            Type,
+                                ArrayListItemDuplicator_pf ItemDuplicator,
+                                ArbParam_t                 ClientData)
 {
-    ArrayList_pa Result;
-
     REQUIRE(VALID_REF(Source));
     REQUIRE(Count >= 0);
     REQUIRE(VALID_ENUM(Type, ArrayListType_e));
     REQUIRE(VALID_FN_REF(ItemDuplicator) || ItemDuplicator == NULL);
 
-    Result = ArrayListAlloc(Count, Type, NULL, 0);
+    ArrayList_pa Result = ArrayListAlloc(Count, Type, NULL, 0);
     if (Result != NULL && Count != 0)
     {
         Boolean_t IsOk = TRUE;
@@ -1447,7 +1388,7 @@ ArrayList_pa ArrayListFromArray(void                       *Source,
         else
             /* copy the original items into the result */
             CopyArrayItems(Result->Array, 0,
-                           (char *)Source, 0,
+                           static_cast<char*>(Source), 0,
                            Count, Result->ItemSize);
         if (IsOk)
             Result->Count = Count;
@@ -1459,122 +1400,10 @@ ArrayList_pa ArrayListFromArray(void                       *Source,
     return Result;
 }
 
-
-/**
- * Holds the comparator function pointer for sorting.
- */
-static ArrayListItemComparator_pf ComparatorFunction = NULL;
-
-
-/**
- * Holds the context for comparisons. This information is forwarded to
- * the item comparator function for sorting.
- */
-static ArbParam_t ComparatorClientData = 0;
-
-
-/**
- * Holds the item size of the individual array components for sorting.
- */
-static SmInteger_t ComparatorItemSize = 0;
-
-
-/**
- * Forwards the comparison test to the 'Comparator' supplied to the
- * 'ArrayListQSort' function.
- *
- * param Item1Ref
- *     Reference to base address of Item1.
- * param Item2Ref
- *     Reference to base address of Item2.
- *
- * return
- *     - A value less than zero if Item1 is less than Item2.
- *     - A value of zero if Item1 is equal to Item2.
- *     - A value greater than zero if Item1 is greater than Item2.
- */
-static int QSortCompareItemsAdapter(const void *Item1Ref,
-                                    const void *Item2Ref)
-{
-    int Result;
-    ArrayListItem_u Item1;
-    ArrayListItem_u Item2;
-
-    REQUIRE(Item1Ref != NULL);
-    REQUIRE(Item2Ref != NULL);
-
-    /* collect up the items */
-    CopyArrayItems((char *)&Item1, 0,
-                   (char *)Item1Ref, 0,
-                   1, ComparatorItemSize);
-    CopyArrayItems((char *)&Item2, 0,
-                   (char *)Item2Ref, 0,
-                   1, ComparatorItemSize);
-
-    /* forward the call */
-    Result = ComparatorFunction(Item1, Item2, ComparatorClientData);
-
-    ENSURE(Result == -1 || Result == 0 || Result == 1);
-    return Result;
-}
-
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
 
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-
-/**
- * Sorts the array list using the qsort algorithm.
- *
- * param ArrayList
- *     Array list to sort.
- * param Comparator
- *     Function called to compare two array list elements.
- * param ClientData
- *     Contextual information that is passed along to the comparator function.
- */
-void ArrayListQSort(ArrayList_pa                ArrayList,
-                    ArrayListItemComparator_pf  Comparator,
-                    ArbParam_t                  ClientData)
-{
-    ArrayListItemComparator_pf CurComparatorFunction;
-    ArbParam_t                 CurComparatorClientData;
-    SmInteger_t                CurComparatorItemSize;
-
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-    REQUIRE(ArrayListIsValid(ArrayList));
-    REQUIRE(VALID_FN_REF(Comparator));
-
-    /* to support sort recursion we need to save off the current values */
-    CurComparatorFunction   = ComparatorFunction;
-    CurComparatorClientData = ComparatorClientData;
-    CurComparatorItemSize   = ComparatorItemSize;
-
-    /* set up for comparison proxy */
-    ComparatorFunction   = Comparator;
-    ComparatorClientData = ClientData;
-    ComparatorItemSize   = ArrayList->ItemSize;
-
-    /* sort the array */
-    qsort(ArrayList->Array, ArrayList->Count,
-          ArrayList->ItemSize, QSortCompareItemsAdapter);
-
-    /* cleanup */
-    ComparatorFunction   = CurComparatorFunction;
-    ComparatorClientData = CurComparatorClientData;
-    ComparatorItemSize   = CurComparatorItemSize;
-
-    ENSURE(ArrayListIsValid(ArrayList));
-}
 
 /**
  * Binary searches a sorted array looking for a match using the supplied
@@ -1598,11 +1427,11 @@ void ArrayListQSort(ArrayList_pa                ArrayList,
  * result
  *     TRUE if the item was found in the list, FALSE otherwise.
  */
-Boolean_t ArrayListBSearch(ArrayList_pa                ArrayList,
-                           ArrayListItem_u             Item,
-                           ArrayListItemComparator_pf  Comparator,
-                           ArbParam_t                  ClientData,
-                           LgIndex_t                  *ItemIndex)
+Boolean_t ArrayListBSearch(ArrayList_pa               ArrayList,
+                           ArrayListItem_u            Item,
+                           ArrayListItemComparator_pf Comparator,
+                           ArbParam_t                 ClientData,
+                           LgIndex_t*                 ItemIndex)
 {
     REQUIRE(ArrayListIsValid(ArrayList));
     REQUIRE(VALID_FN_REF(Comparator));
@@ -1660,11 +1489,11 @@ Boolean_t ArrayListBSearch(ArrayList_pa                ArrayList,
  * return
  *     Reference to the array list's internal buffer.
  */
-const void *ArrayListGetInternalRef_FUNC(ArrayList_pa ArrayList)
+void const* ArrayListGetInternalRef_FUNC(ArrayList_pa ArrayList)
 {
     REQUIRE(ArrayListIsValid(ArrayList));
 
-    const void *Result = ArrayListGetInternalRef_MACRO(ArrayList);
+    void const* Result = ArrayListGetInternalRef_MACRO(ArrayList);
     ENSURE(Result == NULL || VALID_REF(Result));
     return Result;
 }

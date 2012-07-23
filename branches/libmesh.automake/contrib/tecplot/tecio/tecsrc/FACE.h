@@ -1,31 +1,8 @@
 /*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
-/*
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -112,7 +89,8 @@ EXTERN FaceObscuration_e GetFaceObscuration(CZInfo_s const* CZInfo,
                                             LgIndex_t       FOffset,
                                             Boolean_t       ConsiderValueBlanking,
                                             Boolean_t       ConsiderIJKBlanking,
-                                            Boolean_t       ConsiderDepthBlanking);
+                                            Boolean_t       ConsiderDepthBlanking,
+                                            Boolean_t       ConsiderClipBlanking);
 
 EXTERN EntIndex_t GetNodesPerElementFace(ZoneType_e ZoneType);
 
@@ -121,6 +99,20 @@ EXTERN EntIndex_t GetFacesPerElement(ZoneType_e ZoneType,
                                      LgIndex_t  JMax,
                                      LgIndex_t  KMax);
 
+/**
+ * @param Points must have MAX_NODES_PER_FACE elements.
+ * @param UniquePoints must have MAX_NODES_PER_FACE elements.  
+ *   This array is populated with the unique points
+ *   from the input Points array.  Values beyond NumUniquePoints-1 may
+ *   be uninitialized and should not be accessed.
+ * @param NumUniquePoints - This value is populated the number of unique 
+ *   points that were placed in the UniquePoints array.
+ * @param Is3D is used to help determine if two points are coincident.
+ */
+EXTERN void GetUniquePoints(XYZ_s const Points[],
+                            XYZ_s UniquePoints[],
+                            SmInteger_t& NumUniquePoints,
+                            Boolean_t Is3D);
 EXTERN CollapsedStatus_e GetSurfaceCellCollapsedStatus(CZInfo_s const*                                 CZInfo,
                                                        CZData_s const*                                 CZData,
                                                        tecplot::kernel::SubElemValueProducerInterface* SubElemValueProducer);

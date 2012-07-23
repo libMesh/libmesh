@@ -1,35 +1,16 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 #include "stdafx.h"
 #include "MASTER.h"
+
 #define TECPLOTENGINEMODULE
 
 /*
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -43,12 +24,11 @@
 #include "ARRLIST.h"
 #include "DATASET.h"
 #include "SET.h"
-#include "DATASHR.h"
 #include "FILESTREAM.h"
+#include "Q_MSG.h"
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #endif
-#include "Q_MSG.h"
 #include "DATASET0.h"
 
 using namespace tecplot::strutil;
@@ -72,7 +52,7 @@ void OutOfMemoryMsg(void)
 
 /**
  */
-FieldData_pa FieldDataAlloc(void)
+FieldData_pa FieldDataAlloc(Boolean_t doTrackVarSharing)
 {
     FieldData_pa Result;
 
@@ -81,25 +61,26 @@ FieldData_pa FieldDataAlloc(void)
     {
         Result->Data = NULL;
 
-#     if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
+        #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
 /* CORE SOURCE CODE REMOVED */
-#     else /* ...for TecIO only */
+        #else /* ...for TecIO only */
         Result->GetValueCallback[0] = NULL;
         Result->SetValueCallback[0] = NULL;
-#     endif
+        #endif
 
-#     if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
+        #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
 /* CORE SOURCE CODE REMOVED */
-#     endif
+        #endif
 
         Result->Type             = FieldDataType_Invalid;
         Result->ValueLocation    = ValueLocation_Invalid;
-        Result->RefCount         = 1; /* self */
-        Result->VarShareRefCount = 1; /* self */
-        Result->NumValues        = 0;
-#     if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
+        #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
 /* CORE SOURCE CODE REMOVED */
-#     endif
+        #endif
+        Result->NumValues        = 0;
+        #if defined TECPLOTKERNEL /* TecIO doesn't require these features yet */
+/* CORE SOURCE CODE REMOVED */
+        #endif
     }
 
     ENSURE(VALID_REF(Result) || Result == NULL);
@@ -185,18 +166,6 @@ void FieldDataDeallocData(FieldData_pa FieldData)
 /* CORE SOURCE CODE REMOVED */
 #endif
 
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#endif
-
 /**
  */
 void FieldDataCleanup(FieldData_pa FieldData)
@@ -217,26 +186,21 @@ void FieldDataDealloc(FieldData_pa *FieldData,
 {
     REQUIRE(VALID_REF(FieldData));
     REQUIRE(VALID_REF(*FieldData) || *FieldData == NULL);
-    REQUIRE(IMPLICATION(*FieldData != NULL,
-                        IsStructureReferenced(*FieldData)));
-    REQUIRE(IMPLICATION(*FieldData != NULL && DoTrackVarSharing,
-                        IsVarStructureReferenced(*FieldData)));
-    REQUIRE(VALID_BOOLEAN(DoTrackVarSharing));
-    REQUIRE(IMPLICATION(*FieldData != NULL,
-                        (*FieldData)->RefCount >= (*FieldData)->VarShareRefCount));
+    #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+    #endif
 
     if (*FieldData != NULL)
     {
-        if (DoTrackVarSharing)
-            DecVarStructureReference(*FieldData);
-        DecStructureReference(*FieldData);
-        if (!IsStructureReferenced(*FieldData))
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #endif
         {
             FieldDataCleanup(*FieldData);
 
-#if defined TECPLOTKERNEL
+            #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
-#endif
+            #endif
 
             FREE_ITEM(*FieldData, "field data");
         }
@@ -248,14 +212,6 @@ void FieldDataDealloc(FieldData_pa *FieldData,
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
-#if !defined NDEBUG || defined CHECKED_BUILD
-#endif
-#endif
-
-#if defined TECPLOTKERNEL
-/* CORE SOURCE CODE REMOVED */
-#if !defined NDEBUG || defined CHECKED_BUILD
-#endif
 #endif
 
 #if defined TECPLOTKERNEL
@@ -269,11 +225,21 @@ static void copyTypedValueArray(void*     DstArray,
                                 LgIndex_t SrcStart,
                                 LgIndex_t SrcEnd)
 {
-    T* SrcPtr    = ((T*)SrcArray) + SrcStart;
-    T* DstPtr    = ((T*)DstArray) + DstStart;
-    size_t numBytes = sizeof(T) * (SrcEnd - SrcStart + 1);
-    memcpy(DstPtr, SrcPtr, numBytes);
+    REQUIRE(VALID_REF(DstArray));
+    REQUIRE(DstStart >= 0);
+    REQUIRE(VALID_REF(SrcArray));
+    REQUIRE(0 <= SrcStart && SrcStart <= SrcEnd+1);
+    REQUIRE(DstArray != SrcArray);
+
+    size_t const numBytes = sizeof(T) * (SrcEnd - SrcStart + 1);
+    if (numBytes != 0)
+    {
+        T const* SrcPtr = ((T const*)SrcArray) + SrcStart;
+        T* DstPtr       = ((T*)DstArray) + DstStart;
+        memcpy(DstPtr, SrcPtr, numBytes);
+    }
 }
+
 /**
  * DstArray and SrcArray are aligned on proper word boundaries.
  */
@@ -289,7 +255,7 @@ void CopyTypedValueArray(FieldDataType_e  ValueType,
     REQUIRE(VALID_REF(DstArray));
     REQUIRE(DstStart >= 0);
     REQUIRE(VALID_REF(SrcArray));
-    REQUIRE(0 <= SrcStart && SrcStart <= SrcEnd);
+    REQUIRE(0 <= SrcStart && SrcStart <= SrcEnd+1);
     REQUIRE(DstArray != SrcArray);
 
     switch (ValueType)
@@ -496,6 +462,14 @@ void SwapBytesInUnalignedTypedValueArray(FieldDataType_e  ValueType,
 /* CORE SOURCE CODE REMOVED */
 #endif
 
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
@@ -969,9 +943,9 @@ Int64_t FieldDataGetBytesNeeded(LgIndex_t       NumValues,
 }
 
 /**
- * On the SGI, HP, and Sun machines 64 bit objects such as doubles must be 8
- * byte aligned while on all other machines 32 bit alignment suffices. Some
- * allow 1 byte alignment but we won't bother with that.
+ * On the SGI, HP, Sun and Itanium Linux machines 64 bit objects such as
+ * doubles must be 8 byte aligned while on all other machines 32 bit alignment
+ * suffices. Some allow 1 byte alignment but we won't bother with that.
  */
 #if defined IRISX || defined HPUX || defined SUNX
 # define SIZEOF_LARGEST_OBJECT_TO_ALIGN sizeof(Int64_t)
@@ -1056,6 +1030,10 @@ void FieldDataDefineData(FieldData_pa    FieldData,
     ENSURE(FieldData->Data == NULL);
 }
 
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
 /**
  */
 Boolean_t FieldDataAllocData(FieldData_pa FieldData,
@@ -1100,7 +1078,7 @@ Boolean_t FieldDataAllocData(FieldData_pa FieldData,
              * byte. By zeroing the unused bits at the end of the array we
              * produce consistent data files when written to disk.
              */
-            if (FieldData->Type == FieldDataType_Bit)
+            if (FieldData->Type == FieldDataType_Bit && FieldData->Data != NULL)
                 ((char*)FieldData->Data)[BytesToAllocate-1] = '\0';
         }
         IsOk = (FieldData->NumValues == 0 ||
@@ -1179,7 +1157,7 @@ FieldData_pa AllocScratchNodalFieldDataPtr(LgIndex_t       NumValues,
     REQUIRE(VALID_FIELD_DATA_TYPE(Type));
     REQUIRE(VALID_BOOLEAN(ShowErrMsg));
 
-    FieldData_pa Result = FieldDataAlloc();
+    FieldData_pa Result = FieldDataAlloc(FALSE);
     if (Result != NULL)
     {
         FieldDataDefineData(Result, NumValues, Type, ValueLocation_Nodal);
@@ -1478,7 +1456,43 @@ void *GetFieldDataVoidPtr_FUNC(FieldData_pa fd)
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
 #endif /* TECPLOTKERNEL */
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#endif
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
@@ -1577,6 +1591,12 @@ void CopyFieldValue(FieldData_pa  dst,
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
+#if defined TECPLOTKERNEL
+#endif /* TECPLOTKERNEL */
+#endif
+
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
 #endif
 
 #if defined TECPLOTKERNEL
@@ -1651,8 +1671,12 @@ void SetFieldDataPtrToAllZeros(FieldData_pa fd)
 
     if (NumBytesToMemSet > 0)
     {
-        void *fd_data = GetFieldDataVoidPtr(fd);
-        memset(fd_data, 0, NumBytesToMemSet);
+        char* fd_data = (char*)GetFieldDataVoidPtr(fd);
+        #if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+        #else
+            memset(fd_data, 0, NumBytesToMemSet);
+        #endif
     }
     else
     {

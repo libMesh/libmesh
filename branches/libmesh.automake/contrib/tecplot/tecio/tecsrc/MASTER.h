@@ -1,30 +1,7 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 /*****************************************************************
  *****************************************************************
  *******                                                  ********
- ****** Copyright (C) 1988-2008 Tecplot, Inc.              *******
+ ****** Copyright (C) 1988-2010 Tecplot, Inc.              *******
  *******                                                  ********
  *****************************************************************
  *****************************************************************/
@@ -220,8 +197,8 @@
 
 #include "stdafx.h"
 
-#if defined MSWIN
-#include "W__BASE.h"
+#if defined MSWIN && defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
 #endif
 
 #include <string>
@@ -271,8 +248,8 @@
 #if defined NO_ASSERTS
 #undef NO_ASSERTS
 #endif
-#if defined NDEBUG
-#undef NDEBUG
+#if !defined NDEBUG
+#define NDEBUG
 #endif
 #else /* RELEASE */
 #if !defined NDEBUG
@@ -505,6 +482,10 @@
 /* OPENGL currently a must have */
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
+#if 0 /* including GLEW header file is currently defining GLAPI to "extern" which causes problems with a kludged Mesa header GLwDrawA.h external glwMDrawingAreaWidgetClass */
+    #if defined USE_VBOs
+    #endif
+#endif
 #  if !defined ENGINE
 #    if defined UNIXX
 #    endif
@@ -654,12 +635,14 @@ typedef Widget GridWidget_t;
  * also be a release build (NDEBUG)
  */
 #if defined MSWIN && defined CHECKED_BUILD && !defined NDEBUG
-#  error "CHECKED_BUILDS must also be release builds"
+#  error "CHECKED_BUILDS must also be release builds! NDEBUG should be defined but isn't."
 #endif
 
 
 #if defined NO_ASSERTS
-#  define USE_MACROS_FOR_FUNCTIONS
+#  if !defined USE_MACROS_FOR_FUNCTIONS
+#    define USE_MACROS_FOR_FUNCTIONS
+#  endif
 #endif
 /* ENDREMOVEFROMADDON */
 
@@ -679,6 +662,21 @@ typedef Widget GridWidget_t;
 #define DISALLOW_OFFSCREEN_EXPORT_IN_BATCH
 #endif
 
+/* indentify the platforms capable of using FFMPEG for encoding video formats */
+#if defined MSWIN || defined LINUX || defined DARWIN
+    #define HAVE_FFMPEG
+#endif
 /* ENDREMOVEFROMADDON */
+
+/* In windows min and max are being redefined in windef.h.
+ * As we want to use the ones provided by the STL we undefined them
+ */
+#if defined MSWIN && defined max
+# undef max
+#endif
+
+#if defined MSWIN && defined min
+# undef min
+#endif
 
 #endif /* _MASTER_H_ */

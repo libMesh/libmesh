@@ -1,26 +1,3 @@
-/*
- * NOTICE and LICENSE for Tecplot Input/Output Library (TecIO) - OpenFOAM
- *
- * Copyright (C) 1988-2009 Tecplot, Inc.  All rights reserved worldwide.
- *
- * Tecplot hereby grants OpenCFD limited authority to distribute without
- * alteration the source code to the Tecplot Input/Output library, known 
- * as TecIO, as part of its distribution of OpenFOAM and the 
- * OpenFOAM_to_Tecplot converter.  Users of this converter are also hereby
- * granted access to the TecIO source code, and may redistribute it for the
- * purpose of maintaining the converter.  However, no authority is granted
- * to alter the TecIO source code in any form or manner.
- *
- * This limited grant of distribution does not supersede Tecplot, Inc.'s 
- * copyright in TecIO.  Contact Tecplot, Inc. for further information.
- * 
- * Tecplot, Inc.
- * 3535 Factoria Blvd, Ste. 550
- * Bellevue, WA 98006, USA
- * Phone: +1 425 653 1200
- * http://www.tecplot.com/
- *
- */
 /* BEGINREMOVEFROMADDON */
 /* NOTE: All code contained between comments that look like
  *             BEGINREMOVEFROMADDON
@@ -33,7 +10,7 @@
 ******************************************************************
 ******************************************************************
 *******                                                   ********
-******  (C) 1988-2008 Tecplot, Inc.                        *******
+******  (C) 1988-2010 Tecplot, Inc.                        *******
 *******                                                   ********
 ******************************************************************
 ******************************************************************
@@ -645,9 +622,11 @@
 
 #if defined DECALPHA   || \
     defined LINUXALPHA || \
-    defined LINUXI64   || \
     defined LINUX64    || \
     defined MAC64      || \
+    defined IBMRS6000  || \
+    defined SUN        || \
+    defined HP         || \
     defined COMPAQALPHA
 #define LONGIS64
 #endif
@@ -671,9 +650,9 @@
 /* BEGINREMOVEFROMADDON */
 #define LARGEUINT64              18446744073709551614ULL
 /* ENDREMOVEFROMADDON */
-#define LARGEUINT32              4294967294
-#define LARGEUINT16              65534
-#define LARGEUINT8               254
+#define LARGEUINT32              4294967294U
+#define LARGEUINT16              65534U
+#define LARGEUINT8               254U
 
 #ifdef INDEX_16_BIT
 #define MAXINDEX               ((LgIndex_t)LARGEINT16)
@@ -743,6 +722,8 @@
 */
 #define MAX_ALLOWABLE_CLIPPASSES 1
 #define MAX_ALLOWABLE_CLIPPLANES 6
+#define INVALID_CLIP_PLANE -1
+#define VALID_CLIP_PLANE(clipPlane) (0 <= clipPlane && clipPlane < MAX_ALLOWABLE_CLIPPLANES)
 
 /* BEGINREMOVEFROMADDON */
 #if defined TECPLOTKERNEL
@@ -773,31 +754,22 @@
  *      new versions. For a trivial example of this, see FileTypeWriterInterface and its
  *      associated factory and concrete classes.
  */
-#define TecplotBinaryFileVersion    112
-#define TecplotInterfaceVersion     120
-#define TecplotInterfaceVersionStr  "120" /* stay in lockstep with TecplotInterfaceVersion */
-#if defined FLEXLM
-#define TecplotLicenseVersion       119   /* may vary from TecplotInterfaceVersion */
-#define TecplotLicenseVersionStr   "11.9"  /* stay in lockstep with TecplotLicenseVersion */
-#else /* FLEXLM */
-#define TecplotLicenseVersion       120   /* may vary from TecplotInterfaceVersion */
-#define TecplotLicenseVersionStr   "12.0"  /* stay in lockstep with TecplotLicenseVersion */
-#endif /* FLEXLM */
-/* Also change the macro version number in COMMAND.MASTER.h */
+#define TecplotBinaryFileVersion    112 /* NOTE: only change this when we change the binary file format */
 
-#define    MaxNumZonesOrVars         MAXZONEMAP
-#define    MaxXAxes                  5
-#define    MaxYAxes                  5
-#define    MaxGeoSegments            50
-#define    MaxPtsCircleOrEllipse     720
-#define    MaxFrames                 2048
-#define    MaxCustomLabelSets        10
-#define    MaxFontMoves              20000
-#define    MaxColorMapOverrides      16
-#define    MaxValueBlankConstraints  8
-#define    MaxContourGroups          8
-#define    MaxIsoSurfaceGroups       8
-#define    MaxSliceGroups            8
+#define    MaxNumZonesOrVars           MAXZONEMAP
+#define    MaxXAxes                    5
+#define    MaxYAxes                    5
+#define    MaxGeoSegments              50
+#define    MaxPtsCircleOrEllipse       720
+#define    MaxFrames                   2048
+#define    MaxCustomLabelSets          10
+#define    MaxFontMoves                20000
+#define    MaxColorMapOverrides        16
+#define    MaxValueBlankConstraints    8
+#define    MaxContourGroups            8
+#define    MaxIsoSurfaceGroups         8
+#define    MaxIsoSurfaceSpecificLevels 3
+#define    MaxSliceGroups              8
 
 #define    MaxColorMapGroups         8
 #define    DefaultNumContLevels      15
@@ -811,6 +783,7 @@
 #define VALID_SLICE_GROUP(Group)      (((((SmInteger_t)Group) >= 0) && (((SmInteger_t)Group) < MaxSliceGroups)))
 #define VALID_COLORMAP_GROUP(Group)   (((((SmInteger_t)Group) >= 0) && (((SmInteger_t)Group) < MaxColorMapGroups)))
 
+#define    MAX_AUTO_COLOR_SEQUENCE_VALUES  6
 
 
 /*
@@ -1098,13 +1071,14 @@
 #define    AxisPen          Custom8_C+1
 #define    MajGridPen       Custom8_C+2
 #define    MinGridPen       Custom8_C+3
-#define    StreamlinePen    Custom8_C+4
-#define    ColoredLinePen   Custom8_C+5
-#define    BoundaryPen      Custom8_C+6
-#define    LabelPen         Custom8_C+7
-#define    NumPlotterPens   Custom8_C+8
+#define    MarkerGridPen    Custom8_C+4
+#define    StreamlinePen    Custom8_C+5
+#define    ColoredLinePen   Custom8_C+6
+#define    BoundaryPen      Custom8_C+7
+#define    LabelPen         Custom8_C+8
+#define    NumPlotterPens   Custom8_C+9
 /* AutoSelectPen will select the correct pen from Black_C thru Custom8_C or ColoredLinePen */
-#define    AutoSelectPen    Custom8_C+9
+#define    AutoSelectPen    Custom8_C+10
 #define    InvalidPen       Custom8_C+99
 
 #define    FirstObjectPen   AxisPen
@@ -1152,22 +1126,34 @@
 /* ENDREMOVEFROMADDON */
 
 /* BEGINREMOVEFROMADDON */
-#if defined MSWIN
-#define TP_FWRITE   fwrite
-#define TP_FFLUSH   fflush
-#define TP_FCLOSE   fclose
-
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
 #else
+/* ENDREMOVEFROMADDON */
+    #define TP_FREAD  fread
+    #define TP_FWRITE fwrite
+/* BEGINREMOVEFROMADDON */
+#endif
+/* ENDREMOVEFROMADDON */
+
+#if defined MSWIN
+#define TP_FFLUSH   fflush
+#define TP_FCLOSE   fclose
+
+/* BEGINREMOVEFROMADDON */
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#else
+/* ENDREMOVEFROMADDON */
 #define TP_UNLINK   remove
 #define TP_RMDIR    _rmdir
-#define TP_FREAD    ::fread
 #define TP_FOPEN    ::fopen
 #define TP_FREOPEN  ::freopen
 #define TP_STAT     ::_stat
 #define TP_GETENV   ::getenv
+/* BEGINREMOVEFROMADDON */
 #endif /* TECPLOTKERNEL */
+/* ENDREMOVEFROMADDON */
 
 #if defined _WIN64
 #define TP_FSEEK(stream,offset,whence) _fseeki64((stream),(__int64)(offset),(whence))
@@ -1183,16 +1169,13 @@
 #define TP_FOPEN    fopen
 #define TP_FREOPEN  freopen
 #define TP_FCLOSE   fclose
-#define TP_FREAD    fread
-#define TP_FWRITE   fwrite
 #define TP_FFLUSH   fflush
 #define TP_FSEEK    fseeko
 #define TP_FTELL    ftello
 #define TP_STAT     stat
-#define _stat       stat // ...make the UNIXX and MSWIN platforms have the same syntax to use "struct _stat"
+#define _stat       stat /* ...make the UNIXX and MSWIN platforms have the same syntax to use "struct _stat" */
 #define TP_GETENV   getenv
 #endif
-/* ENDREMOVEFROMADDON */
 
 /****************************************************************
  *                                                              *
@@ -1257,7 +1240,7 @@ typedef long HgIndex_t;
 #elif defined LONGIS64
 typedef long ArbParam_t;
 typedef long HgIndex_t;
-#elif defined MSWIN && (defined _M_IA64 || defined _M_AMD64)
+#elif defined MSWIN
 typedef INT_PTR ArbParam_t;
 typedef INT_PTR HgIndex_t;
 #else
@@ -1281,7 +1264,15 @@ typedef UInt64_t MemMapOffset_t;
 
 typedef    unsigned char    Byte_t;
 typedef    short            SmInteger_t;
+
+/**
+ * A number of color index constants are \#defined. These include Black_C, Red_C,
+ * Green_C, Blue_C, Cyan_C, Yellow_C, Purple_C, White_C, Custom1_C through
+ * Custom56_C, MultiColor_C, NoColor_C, MulitiColor2_C through MulitiColor8_C,
+ * RGBColor_C, and InvalidColor_C.  
+ */ 
 typedef    SmInteger_t      ColorIndex_t;
+
 #ifdef INDEX_16_BIT
 typedef  Int16_t          EntIndex_t;
 #else
@@ -1300,7 +1291,7 @@ typedef    LgIndex_t        SegPtsArray_t[MaxGeoSegments];
 typedef    double           BasicSize_t[MaxBasicSizes];
 typedef    double          *VarList_t;
 
-typedef    long             SetIndex_t;
+typedef    HgIndex_t        SetIndex_t;
 
 typedef    unsigned long    SetData_t;
 typedef    SetData_t       *SetData_pt;
@@ -1891,6 +1882,10 @@ typedef enum
     Dialog_ThreeDEdge,
     Dialog_TimeDetails,
     Dialog_Performance,
+    Dialog_HelpTecplotLicensing,
+    Dialog_GeomDetails,
+    Dialog_BasicColorLegend,
+    Dialog_FourierTransform,
     END_Dialog_e,
     Dialog_Invalid = BadEnumValue,
     /* deprecated values */
@@ -2230,7 +2225,7 @@ typedef enum
 
 /*
  * View_SetMagnification added 02/24/03 so all plot types
- * can behave the same way "do a 'centered' magnifacation change".
+ * can behave the same way "do a 'centered' magnification change".
  * Line plots will still accept View_Scale option and zoom towards
  * the corner so old macros/addons still work.
  */
@@ -2411,6 +2406,7 @@ typedef enum
     PickObjects_IsoSurfaceCOB,
     PickObjects_RGBLegend,
     PickObjects_LineMapping,
+    PickObjects_BasicColorLegend,
     END_PickObjects_e,
     PickObjects_Invalid = BadEnumValue,
     /* deprecated values */
@@ -2501,7 +2497,7 @@ typedef enum
     MouseButtonDrag_ZoomData,
     MouseButtonDrag_TranslateData,
     MouseButtonDrag_RlrBallRtatData,
-    MouseButtonDrag_SpherRtatData,
+    MouseButtonDrag_SpherZRtatData,     /* Was SpherRtatData*/
     MouseButtonDrag_XRotateData,
     MouseButtonDrag_YRotateData,
     MouseButtonDrag_ZRotateData,
@@ -2509,13 +2505,20 @@ typedef enum
     MouseButtonDrag_ZoomViewer,
     MouseButtonDrag_TranslateViewer,
     MouseButtonDrag_RlrBallRtatVwr,
-    MouseButtonDrag_SpherRotateVwr,
+    MouseButtonDrag_SpherZRotateVwr,    /* Was SpherRotateVwr*/
     MouseButtonDrag_XRotateViewer,
     MouseButtonDrag_YRotateViewer,
     MouseButtonDrag_ZRotateViewer,
     MouseButtonDrag_TwistRotateViewer,
+    MouseButtonDrag_SpherXRtatData,
+    MouseButtonDrag_SpherYRtatData,
+    MouseButtonDrag_SpherXRotateVwr,
+    MouseButtonDrag_SpherYRotateVwr,
     END_MouseButtonDrag_e,
-    MouseButtonDrag_Invalid = BadEnumValue
+    MouseButtonDrag_Invalid = BadEnumValue,
+    /* deprecated values */
+    MouseButtonDrag_SpherRtatData  = MouseButtonDrag_SpherZRtatData,
+    MouseButtonDrag_SpherRotateVwr = MouseButtonDrag_SpherZRotateVwr
 } MouseButtonDrag_e;
 
 
@@ -2567,7 +2570,7 @@ typedef enum
     MouseButtonMode_GeomEllipse,
     MouseButtonMode_GeomSpline,
     MouseButtonMode_CreateFrame,
-    MouseButtonMode_RotateSpherical,
+    MouseButtonMode_RotateSphericalZ,   /* Was MouseButtonMode_RotateSpherical */
     MouseButtonMode_RotateRollerBall,
     MouseButtonMode_RotateTwist,
     MouseButtonMode_RotateXAxis,
@@ -2588,9 +2591,13 @@ typedef enum
     MouseButtonMode_User2,
     MouseButtonMode_User3,
     MouseButtonMode_User4,
+    MouseButtonMode_RotateSphericalX,
+    MouseButtonMode_RotateSphericalY,
+    MouseButtonMode_AdvancedAdjust,
     END_MouseButtonMode_e,
     MouseButtonMode_Invalid = BadEnumValue,
     /* deprecated values */
+    MouseButtonMode_RotateSpherical = MouseButtonMode_RotateSphericalZ,
     Mouse_NoMode                = MouseButtonMode_NoMode,                /* deprecated */
     Mouse_Select                = MouseButtonMode_Select,                /* deprecated */
     Mouse_Adjust                = MouseButtonMode_Adjust,                /* deprecated */
@@ -2605,7 +2612,7 @@ typedef enum
     Mouse_GeomEllipse           = MouseButtonMode_GeomEllipse,           /* deprecated */
     Mouse_GeomSpline            = MouseButtonMode_GeomSpline,            /* deprecated */
     Mouse_CreateFrame           = MouseButtonMode_CreateFrame,           /* deprecated */
-    Mouse_RotateSpherical       = MouseButtonMode_RotateSpherical,       /* deprecated */
+    Mouse_RotateSpherical       = MouseButtonMode_RotateSphericalZ,      /* deprecated */
     Mouse_RotateRollerBall      = MouseButtonMode_RotateRollerBall,      /* deprecated */
     Mouse_RotateTwist           = MouseButtonMode_RotateTwist,           /* deprecated */
     Mouse_RotateXAxis           = MouseButtonMode_RotateXAxis,           /* deprecated */
@@ -3303,6 +3310,9 @@ typedef enum
     ExportFormat_Flash,
     ExportFormat_X3D,
     ExportFormat_TecplotViewer,
+    ExportFormat_FLV,
+    ExportFormat_MPEG4,
+    ExportFormat_WMV,
     END_ExportFormat_e,
     ExportFormat_Invalid = BadEnumValue
 } ExportFormat_e;
@@ -3322,6 +3332,9 @@ typedef enum
     AnimationDest_AVI,
     AnimationDest_RM,
     AnimationDest_Flash,
+    AnimationDest_FLV,
+    AnimationDest_MPEG4,
+    AnimationDest_WMV,
     END_AnimationDest_e,
     AnimationDest_Invalid = BadEnumValue
 } AnimationDest_e;
@@ -3386,14 +3399,22 @@ typedef enum
 
 typedef enum
 {
-    Paper_Letter,
-    Paper_Double,
-    Paper_A4,
-    Paper_A3,
-    Paper_Custom1,
-    Paper_Custom2,
+    PaperSize_Letter,
+    PaperSize_Double,
+    PaperSize_A4,
+    PaperSize_A3,
+    PaperSize_Custom1,
+    PaperSize_Custom2,
     END_PaperSize_e,
-    Paper_Invalid = BadEnumValue
+    PaperSize_Invalid = BadEnumValue,
+    /* deprecated values */
+    Paper_Letter  = PaperSize_Letter,  /* deprecated */
+    Paper_Double  = PaperSize_Double,  /* deprecated */
+    Paper_A4      = PaperSize_A4,      /* deprecated */
+    Paper_A3      = PaperSize_A3,      /* deprecated */
+    Paper_Custom1 = PaperSize_Custom1, /* deprecated */
+    Paper_Custom2 = PaperSize_Custom2, /* deprecated */
+    Paper_Invalid = PaperSize_Invalid  /* deprecated */
 } PaperSize_e;
 
 
@@ -3474,6 +3495,7 @@ typedef enum
     CoordSys_Screen,
     CoordSys_Hardcopy,
     CoordSys_Grid3D,
+    CoordSys_Workspace,
     END_CoordSys_e,
     CoordSys_Invalid = BadEnumValue
 } CoordSys_e;
@@ -3611,9 +3633,20 @@ typedef enum
     Font_TimesItalicBold,
     Font_Courier,
     Font_CourierBold,
+    Font_Extended,
     END_Font_e,
     Font_Invalid = BadEnumValue
 } Font_e;
+
+typedef enum
+{
+    FontStyle_Regular,
+    FontStyle_Italic,
+    FontStyle_Bold,
+    FontStyle_BoldItalic,
+    END_FontStyle_e,
+    FontStyle_Invalid = BadEnumValue
+} FontStyle_e;
 
 typedef enum
 {
@@ -3658,6 +3691,16 @@ typedef enum
     END_StreamDir_e,
     StreamDir_Invalid = BadEnumValue
 } StreamDir_e;
+
+typedef enum
+{
+    DistributionRegion_Point,
+    DistributionRegion_Rake,
+    DistributionRegion_SurfacesOfActiveZones,
+    DistributionRegion_SurfacesOfSelectedObjects,
+    END_DistributionRegion_e,
+    DistributionRegion_Invalid = BadEnumValue
+} DistributionRegion_e;
 
 typedef enum
 {
@@ -4021,18 +4064,55 @@ typedef enum
     ContourColorMap_UserDef,
     ContourColorMap_TwoColor,
     ContourColorMap_RawUserDef,
+    ContourColorMap_DivBuRd,
+    ContourColorMap_DivBuYlRd,
+    ContourColorMap_DivBrBG,
+    ContourColorMap_DivOrPu,
+    ContourColorMap_DivPiYG,
+    ContourColorMap_DivPRGn,
+    ContourColorMap_Doppler,
+    ContourColorMap_ElevAboveGrnd,
+    ContourColorMap_ElevAbsolute,
+    ContourColorMap_HotMetal,
+    ContourColorMap_Magma,
+    ContourColorMap_DkRainbow,
+    ContourColorMap_MdRainbow,
+    ContourColorMap_QualAccent,
+    ContourColorMap_QualDark1,
+    ContourColorMap_QualDark2,
+    ContourColorMap_QualPaired,
+    ContourColorMap_QualPastel1,
+    ContourColorMap_QualPastel2,
+    ContourColorMap_QualPastel3,
+    ContourColorMap_SeqBlue,
+    ContourColorMap_SeqBuGn,
+    ContourColorMap_SeqBuPu,
+    ContourColorMap_SeqGreen,
+    ContourColorMap_SeqGnBu,
+    ContourColorMap_SeqOrange,
+    ContourColorMap_SeqOrRd,
+    ContourColorMap_SeqPiPu,
+    ContourColorMap_SeqPurple,
+    ContourColorMap_SeqPuBu,
+    ContourColorMap_SeqPuBuGn,
+    ContourColorMap_SeqPuRd,
+    ContourColorMap_SeqRed,
+    ContourColorMap_SeqYlGn,
+    ContourColorMap_SeqYlGnBu,
+    ContourColorMap_SeqYlOrBr,
+    ContourColorMap_SeqYlOrRd,
     END_ContourColorMap_e,
     ContourColorMap_Invalid = BadEnumValue,
     /* deprecated values */
-    ColorMap_SmRainbow  = ContourColorMap_SmRainbow,  /* deprecated */
-    ColorMap_LgRainbow  = ContourColorMap_LgRainbow,  /* deprecated */
-    ColorMap_Modern     = ContourColorMap_Modern,     /* deprecated */
-    ColorMap_GrayScale  = ContourColorMap_GrayScale,  /* deprecated */
-    ColorMap_Wild       = ContourColorMap_Wild,       /* deprecated */
-    ColorMap_UserDef    = ContourColorMap_UserDef,    /* deprecated */
-    ColorMap_TwoColor   = ContourColorMap_TwoColor,   /* deprecated */
-    ColorMap_RawUserDef = ContourColorMap_RawUserDef, /* deprecated */
-    ColorMap_Invalid    = ContourColorMap_Invalid     /* deprecated */
+    ColorMap_SmRainbow    = ContourColorMap_SmRainbow,    /* deprecated */
+    ColorMap_LgRainbow    = ContourColorMap_LgRainbow,    /* deprecated */
+    ColorMap_Modern       = ContourColorMap_Modern,       /* deprecated */
+    ColorMap_GrayScale    = ContourColorMap_GrayScale,    /* deprecated */
+    ColorMap_Wild         = ContourColorMap_Wild,         /* deprecated */
+    ColorMap_UserDef      = ContourColorMap_UserDef,      /* deprecated */
+    ColorMap_TwoColor     = ContourColorMap_TwoColor,     /* deprecated */
+    ColorMap_RawUserDef   = ContourColorMap_RawUserDef,   /* deprecated */
+    ColorMap_Invalid      = ContourColorMap_Invalid       /* deprecated */
 } ContourColorMap_e;
 
 
@@ -4253,6 +4333,16 @@ typedef enum
     END_Transform_e,
     Transform_Invalid = BadEnumValue
 } Transform_e;
+
+typedef enum
+{
+    WindowFunction_Rectangular,
+    WindowFunction_Triangular,
+    WindowFunction_Hann,
+    WindowFunction_Hamming,
+    END_WindowFunction_e,
+    WindowFunction_Invalid = BadEnumValue
+} WindowFunction_e;
 
 typedef enum
 {
@@ -4575,6 +4665,42 @@ typedef enum
     ConditionAwakeReason_Invalid = BadEnumValue
 } ConditionAwakeReason_e;
 
+typedef enum
+{
+    ProbeStatus_Normal,
+    ProbeStatus_Terminated,
+    ProbeStatus_Exited,
+    END_ProbeStatus_e,
+    ProbeStatus_Invalid = BadEnumValue
+} ProbeStatus_e;
+
+typedef enum
+{
+    FrameSizePosUnits_Paper,
+    FrameSizePosUnits_Workspace,
+    END_FrameSizePosUnits_e,
+    FrameSizePosUnits_Invalid = BadEnumValue
+} FrameSizePosUnits_e;
+
+typedef enum
+{
+    Gridline_Major,
+    Gridline_Minor,
+    Gridline_Marker,
+    END_Gridline_e,
+    Gridline_Invalid = BadEnumValue
+} Gridline_e;
+
+/* Used by MarkerGridlineDetail */
+typedef enum
+{
+    PositionMarkerBy_SolutionTime,
+    PositionMarkerBy_Constant,
+    END_PositionMarkerBy_e,
+    PositionMarkerBy_Invalid = BadEnumValue
+} PositionMarkerBy_e;
+
+
 /****************************************************************
  *                                                              *
  *                     STRUCTURE TYPEDEFS                       *
@@ -4585,6 +4711,8 @@ typedef enum
  * These are defined to work with pthreads, more work for WINAPI needed
  */
 typedef struct _Mutex_a* Mutex_pa;
+
+typedef struct _SpinLock_a* SpinLock_pa; /* NOTE: some platforms may not have spin locks; see use of HAVE_SPINLOCKS define */
 
 typedef void*(STDCALL *ThreadFunction_pf)(ArbParam_t ThreadData);
 
@@ -4607,6 +4735,7 @@ typedef struct _Menu_s       *Menu_pa;
 /* BEGINREMOVEFROMADDON */
 typedef struct _ArrayList_s  *ArrayList_pa;
 /* ENDREMOVEFROMADDON */
+typedef struct _LineSegmentProbeResult_s *LineSegProbeResult_pa;
 
 typedef enum
 {
@@ -4659,6 +4788,18 @@ typedef struct
 
 /* BEGINREMOVEFROMADDON */
 
+typedef struct  
+{
+    double Psi;
+    double Theta;
+    double Alpha;
+} PTA_s;
+
+namespace tecplot
+{
+    class Typeface;
+}
+
 typedef struct _Generic3Var_s
 {
     double V1;
@@ -4673,7 +4814,7 @@ typedef struct _ThetaR_s
 } ThetaR_s;
 
 /*
- * This union is designed to allow different plottypes
+ * This union is designed to allow different plot types
  * to access the same values by different names.  In
  * C++ we could use member access functions, or we
  * could have used macros, but instead we use this
@@ -4951,21 +5092,25 @@ typedef struct _IndexRange_s
 
 typedef struct _TextShape_s
 {
-    Font_e       Font;
-    double       Height;
-    Units_e      SizeUnits;
+#if defined TECPLOTKERNEL
+/* CORE SOURCE CODE REMOVED */
+#else
+    Font_e                    Font;
+#endif
+    double                    Height;
+    Units_e                   SizeUnits;
 } TextShape_s;
 
-#define AsciiShapeFontIsGreek(S)       (((S)->UseBaseFont == FALSE) && ((S)->FontOverride == Font_Greek))
-#define AsciiShapeFontIsMath(S)        (((S)->UseBaseFont == FALSE) && ((S)->FontOverride == Font_Math))
-#define AsciiShapeFontIsUserDefined(S) (((S)->UseBaseFont == FALSE) && ((S)->FontOverride == Font_UserDefined))
+#define AsciiShapeFontIsGreek(S)       (((S)->useBaseFont == FALSE) && (FontLibrary::instance().font((S)->typefaceOverride) == Font_Greek))
+#define AsciiShapeFontIsMath(S)        (((S)->useBaseFont == FALSE) && (FontLibrary::instance().font((S)->typefaceOverride) == Font_Math))
+#define AsciiShapeFontIsUserDefined(S) (((S)->useBaseFont == FALSE) && (FontLibrary::instance().font((S)->typefaceOverride) == Font_UserDefined))
 
 
 typedef struct
 {
-    Boolean_t    UseBaseFont; /*     (Default = TRUE)     */
-    Font_e       FontOverride;/*     (Default = Font_Math)*/
-    SymbolChar_t Char;
+    Boolean_t                useBaseFont;
+    tecplot::Typeface const* typefaceOverride;
+    SymbolChar_t             Char;
 } AsciiShape_s;
 
 typedef struct _SymbolShape_s
@@ -5236,12 +5381,12 @@ typedef struct _ZoneSpec_s
     EntIndex_t         ParentZone;
     Strand_t           StrandID;
     double             SolutionTime;
-    LgIndex_t          NumPtsI;  // ...NumDataPts
-    LgIndex_t          NumPtsJ;  // ...NumElements
-    LgIndex_t          NumPtsK;  // ...NumPtsPerElem or NumFaces
-    LgIndex_t          ICellDim; // ...currently not used
-    LgIndex_t          JCellDim; // ...currently not used
-    LgIndex_t          KCellDim; // ...currently not used
+    LgIndex_t          NumPtsI;  /* ...NumDataPts */
+    LgIndex_t          NumPtsJ;  /* ...NumElements */
+    LgIndex_t          NumPtsK;  /* ...NumPtsPerElem or NumFaces */
+    LgIndex_t          ICellDim; /* ...currently not used */
+    LgIndex_t          JCellDim; /* ...currently not used */
+    LgIndex_t          KCellDim; /* ...currently not used */
     ZoneType_e         Type;
     ZoneLoadInfo_s     ZoneLoadInfo;
     AuxData_pa         AuxData;
@@ -5249,7 +5394,7 @@ typedef struct _ZoneSpec_s
 
     /* classic data only */
     FaceNeighborMode_e FNMode;
-    Boolean_t          FNAreCellFaceNbrsSupplied; // ...meaning we don't need to update them
+    Boolean_t          FNAreCellFaceNbrsSupplied; /* ...meaning we don't need to update them */
 
     /* polytope data only */
     LgIndex_t          NumFaceNodes;
@@ -5377,6 +5522,8 @@ typedef struct _Geom_s  *Geom_pa;
 
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
+    #if defined USE_VBOs
+    #endif
 #if defined USE_OOSTYLE
 #endif
 #if defined USE_OOSTYLE
@@ -6185,7 +6332,7 @@ typedef void (STDCALL *FieldValueSetFunction_pf)(FieldData_pa FD,
  * @param FieldData
  *   Field data handle of the variable load.
  *
- * @result
+ * @return
  *   TRUE if the variable was loaded, FALSE if unable to do so.
  *
  * @code
@@ -6274,7 +6421,7 @@ typedef Boolean_t (STDCALL *LoadOnDemandVarLoad_pf)(FieldData_pa FieldData);
  *   }
  * @endcode
  *
- * @result
+ * @return
  *   TRUE if the variable can be unloaded, FALSE otherwise. The add-on should
  *   if at all possible honor the request to unload the variable. Most add-ons
  *   should return TRUE.
@@ -6339,7 +6486,7 @@ typedef void (STDCALL *LoadOnDemandVarCleanup_pf)(FieldData_pa FieldData);
  * @param NodeMap
  *   Handle of the node mapping.
  *
- * @result
+ * @return
  *   TRUE if the node mapping was loaded, FALSE if unable to do so.
  *
  * @code
@@ -6418,7 +6565,7 @@ typedef Boolean_t (STDCALL *LoadOnDemandNodeMapLoad_pf)(NodeMap_pa NodeMap);
  *   }
  * @endcode
  *
- * @result
+ * @return
  *   TRUE if the node mapping can be unloaded, FALSE otherwise. The add-on should
  *   if at all possible honor the request to unload the node mapping. Most add-ons
  *   should return TRUE.
@@ -6482,7 +6629,7 @@ typedef void (STDCALL *LoadOnDemandNodeMapCleanup_pf)(NodeMap_pa NodeMap);
  * @param FaceNeighbor
  *   Handle of the face neighbors.
  *
- * @result
+ * @return
  *   TRUE if the face neighbors was loaded, FALSE if unable to do so.
  *
  * @code
@@ -6561,7 +6708,7 @@ typedef Boolean_t (STDCALL *LoadOnDemandFaceNeighborLoad_pf)(FaceNeighbor_pa Fac
  *   }
  * @endcode
  *
- * @result
+ * @return
  *   TRUE if the face neighbors can be unloaded, FALSE otherwise. The add-on
  *   should if at all possible honor the request to unload the face neighbors.
  *   Most add-ons should return TRUE.
@@ -6625,7 +6772,7 @@ typedef void (STDCALL *LoadOnDemandFaceNeighborCleanup_pf)(FaceNeighbor_pa FaceN
  * @param FaceMap
  *   Handle of the face mapping.
  *
- * @result
+ * @return
  *   TRUE if the face mapping was loaded, FALSE if unable to do so.
  *
  * @code
@@ -6704,7 +6851,7 @@ typedef Boolean_t (STDCALL *LoadOnDemandFaceMapLoad_pf)(FaceMap_pa FaceMap);
  *   }
  * @endcode
  *
- * @result
+ * @return
  *   TRUE if the face mapping can be unloaded, FALSE otherwise. The add-on should
  *   if at all possible honor the request to unload the face mapping. Most add-ons
  *   should return TRUE.
@@ -7240,6 +7387,52 @@ typedef void (STDCALL *OnIdleCallback_pf)(ArbParam_t ClientData);
 typedef Boolean_t (STDCALL *ScriptExecCallback_pf)(const char *ScriptFileName,
                                                    ArbParam_t  ClientData);
 
+/**
+ * This callback is called by TecUtilLineSegProbe() each time a cell face
+ * is about to be passed through in the course of a probe.
+ *
+ * @return
+ *   Return FALSE if you want to stop the probe at the current face.
+ *   Return TRUE if you want the probe to progress through the face toward
+ *   the specified end point.
+ *
+ * @param WhichEndingPosition
+ *   Which ending position of the call to TecUtilLineSegProbe() is currently
+ *   being probed. It will be between 1 and NumEndingPositions, inclusive, where
+ *   NumEndingPositions is the number of ending positions passed into
+ *   TecUtilLineSegProbe().
+ *
+ * @param Zone
+ *   The zone that the probe is currently passing through.
+ *
+ * @param Cell
+ *   The number of the cell that the probe is currently passing through.
+ *
+ * @param Face
+ *   The face number of the face that the probe is about to pass through.
+ *   For ordered and classic finite-element zones, this will be between
+ *   1 and the number of faces per cell, inclusive. For polygonal and
+ *   polyhedral zones, this is the overall zone face number, and will be
+ *   between 1 and the total number of faces in the zone, inclusive.
+ *
+ * @param Position
+ *   An array contining the X, Y, Z location of the point at which the
+ *   probe trajectory has intercepted the face. In 2-D, it contains X and Y.
+ *
+ * @param ClientData
+ *   The client data that was passed into TecUtilLineSegProbe().
+ *
+ * <FortranSyntax>
+ * INTEGER*4 FUNCTION LineSegProbeCallback()
+ * </FortranSyntax>
+ */
+typedef Boolean_t (STDCALL * LineSegProbeCallback_pf)(LgIndex_t         WhichEndingPosition,
+                                                      EntIndex_t        Zone,
+                                                      LgIndex_t         Cell,
+                                                      LgIndex_t         Face,
+                                                      TP_GIVES double * Position,
+                                                      ArbParam_t        ClientData);
+
 /* BEGINREMOVEFROMADDON */
 #if defined TECPLOTKERNEL
 /* CORE SOURCE CODE REMOVED */
@@ -7267,5 +7460,7 @@ typedef Boolean_t (STDCALL *ScriptExecCallback_pf)(const char *ScriptFileName,
 struct _ViewState_a;
 typedef struct _ViewState_a *SavedView_pa, *ViewState_pa;
 
+/* define Tecplot support email address in one place */
+static char const* const tecplotSupportEmailAddress = "support@tecplot.com";
 
 #endif /* _GLOBAL_H */
