@@ -18,7 +18,7 @@
 
 // <h1>Reduced Basis: Example 5 - Reduced Basis Cantilever</h1>
 // 3D cantilever beam using the Reduced Basis Method
-// David Knezevic, Kyung Hoon Lee
+// David Knezevic, Kyunghoon "K" Lee
 //
 // We consider four parameters in this problem:
 //  x_scaling: scales the length of the cantilever
