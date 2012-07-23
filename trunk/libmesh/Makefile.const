@@ -124,6 +124,12 @@ echo_cc:
 	@echo  " " $(libmesh_CC) " "
 
 #
+# Print the name of the C compiler, padded with whitespace
+#
+echo_fc:
+	@echo  " " $(libmesh_F90) " "
+
+#
 # Print the flags used for the C preprocessor, padded with whitespace
 #
 echo_cppflags:
@@ -140,6 +146,12 @@ echo_cxxflags:
 #
 echo_cflags:
 	@echo " " $(libmesh_CFLAGS) " "
+
+#
+# Print the flags used for Fortran, padded with whitespace
+#
+echo_fflags:
+	@echo " " $(libmesh_FFLAGS) " "
 
 #
 # Print C++ compiler include path, padded with whitespace
