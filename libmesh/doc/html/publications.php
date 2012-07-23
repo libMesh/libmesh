@@ -172,14 +172,14 @@ R.&nbsp;H. Stogner.
   Non-Newtonian Flow Problems</em>.
  PhD thesis, Institute for Computational Engineering and Sciences
   (ICES), The University of Texas at Austin, August 2008.
- <a href="http://www.cfdlab.ae.utexas.edu/~roystgnr/dissertation/dissertation-stogner.pdf">http://www.cfdlab.ae.utexas.edu/~roystgnr/dissertation/dissertation-stogner.pdf</a>.
+ 
+  <a href="http://users.ices.utexas.edu/~roystgnr/dissertation/dissertation-stogner.pdf">http://users.ices.utexas.edu/~roystgnr/dissertation/dissertation-stogner.pdf</a>.
 <a name="Stogner_Dissertation"></a><pre>
 @phdthesis{Stogner_Dissertation,
   author = {R.~H.~Stogner},
   school = {Institute for Computational Engineering and Sciences (ICES), The University of Texas at Austin},
   title = {{Parallel Adaptive C1 Macro-Elements for Nonlinear Thin Film and Non-Newtonian Flow Problems}},
-  note = {\url{http://www.cfdlab.ae.utexas.edu/~roystgnr/
-  dissertation/dissertation-stogner.pdf}},
+  note = {\url{http://users.ices.utexas.edu/~roystgnr/dissertation/dissertation-stogner.pdf}},
   month = aug,
   year = {2008}
 }
@@ -336,7 +336,89 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Sopeju_2011">1</a>]
+[<a name="Curtis_2012">1</a>]
+</td>
+<td class="bibtexitem">
+F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
+ A note on the implementation of an interior-point algorithm for
+  nonlinear optimization with inexact step computations.
+ <em>Mathematical Programming, Ser. B</em>, April 2012.
+ <a href="http://dx.doi.org/10.1007/s10107-012-0557-4">http://dx.doi.org/10.1007/s10107-012-0557-4</a>.
+<a name="Curtis_2012"></a><pre>
+@article{Curtis_2012,
+  author = {F.~E.~Curtis and J.~Huber and O.~Schenk and A.~W\"{a}chter},
+  title = {{A note on the implementation of an interior-point algorithm for nonlinear
+              optimization with inexact step computations}},
+  month = apr,
+  year = 2012,
+  note = {\url{http://dx.doi.org/10.1007/s10107-012-0557-4}},
+  journal = {Mathematical Programming, Ser.\ B}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Hales_2012">2</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston, and M.&nbsp;R. Tonks.
+ Solving nonlinear solid mechanics problems with the Jacobian-free
+  Newton Krylov Method.
+ <em>Computer Modeling in Engineering &amp; Sciences</em>, 84(2):123-152,
+  2012.
+ <a href="http://dx.doi.org/10.3970/cmes.2012.084.123.pdf">http://dx.doi.org/10.3970/cmes.2012.084.123.pdf</a>.
+<a name="Hales_2012"></a><pre>
+@article{Hales_2012,
+  author = {J.~D.~Hales and S.~R.~Novascone and R.~L.~Williamson and D.~R.~Gaston and M.~R.~Tonks},
+  title = {{Solving nonlinear solid mechanics problems with the Jacobian-free Newton Krylov Method}},
+  journal = {Computer Modeling in Engineering \& Sciences},
+  year = 2012,
+  volume = 84,
+  number = 2,
+  pages = {123--152},
+  note = {\url{http://dx.doi.org/10.3970/cmes.2012.084.123.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Griffith_2012">3</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;E. Griffith and X.&nbsp;Luo.
+ Hybrid finite difference/finite element version of the immersed
+  boundary method.
+ <em>PREPRINT, Submitted to Elsevier Science Jan. 17</em>, 2012.
+ 
+  <a href="http://www.cims.nyu.edu/~griffith/docs/griffith_luo_ibfem_rev1.pdf">http://www.cims.nyu.edu/~griffith/docs/griffith_luo_ibfem_rev1.pdf</a>.
+<a name="Griffith_2012"></a><pre>
+@article{Griffith_2012,
+  author = {B.~E.~Griffith and X.~Luo},
+  title = {{Hybrid finite difference/finite element version of the immersed boundary method}},
+  journal = {PREPRINT, Submitted to Elsevier Science Jan.\ 17},
+  year = 2012,
+  note = {\url{http://www.cims.nyu.edu/~griffith/docs/griffith_luo_ibfem_rev1.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Sopeju_2011">4</a>]
 </td>
 <td class="bibtexitem">
 O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
@@ -367,58 +449,7 @@ O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hussan_2011">2</a>]
-</td>
-<td class="bibtexitem">
-J.&nbsp;R. Hussan, P.&nbsp;J. Hunter, and M.&nbsp;L. Trew.
- A clustering method for calculating membrane currents in cardiac
-  electrical models.
- <em>Cardiovascular Engineering and Technology</em>, pages 1-14, 2011.
- <a href="http://dx.doi.org/10.1007/s13239-011-0070-6">http://dx.doi.org/10.1007/s13239-011-0070-6</a>.
-<a name="Hussan_2011"></a><pre>
-@article{Hussan_2011,
-  author = {J.~R.~Hussan and P.~J.~Hunter and M.~L.~Trew},
-  title = {{A clustering method for calculating membrane currents in cardiac electrical models}},
-  journal = {Cardiovascular Engineering and Technology},
-  year = 2011,
-  volume = <a href="#online">online</a>,
-  pages = {1--14},
-  note = {\url{http://dx.doi.org/10.1007/s13239-011-0070-6}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Bova_2011">3</a>]
-</td>
-<td class="bibtexitem">
-S.&nbsp;W. Bova and B.&nbsp;S. Kirk.
- On the preservation of total enthalpy in SUPG methods.
- <em>PREPRINT, AIAA Journal</em>, 2011.
- <a href="http://dx.doi.org">http://dx.doi.org</a>.
-<a name="Bova_2011"></a><pre>
-@article{Bova_2011,
-  author = {S.~W.~Bova and B.~S.~Kirk},
-  title = {{On the preservation of total enthalpy in SUPG methods}},
-  journal = {PREPRINT, AIAA Journal},
-  year = 2011,
-  note = {\url{http://dx.doi.org}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Huynh_2011">4</a>]
+[<a name="Huynh_2011">5</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -445,7 +476,7 @@ approximation and a posteriori error estimation}},
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Oliveira_2011">5</a>]
+[<a name="Oliveira_2011">6</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
@@ -471,61 +502,7 @@ S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Camata_2011">6</a>]
-</td>
-<td class="bibtexitem">
-J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
-  A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
- Reordering and incomplete preconditioning in serial and parallel
-  AMR/C flow solutions.
- <em>PREPRINT, International Journal for Numerical Methods in
-  Fluids</em>, pages xx-xx, 2011.
- <a href="http://dx.doi.org/10.1002/fld.2614">http://dx.doi.org/10.1002/fld.2614</a>,
-  <a href="http://onlinelibrary.wiley.com/doi/10.1002/fld.2614/abstract">http://onlinelibrary.wiley.com/doi/10.1002/fld.2614/abstract</a>.
-<a name="Camata_2011"></a><pre>
-@article{Camata_2011,
-  author = {J.~J.~Camata and A.~L.~Rossa and A.~M.~P.~Valli and L.~Catabriga and G.~F.~Carey and A.~L.~G.~A.~Coutinho},
-  title = {{Reordering and incomplete preconditioning in serial and parallel AMR/C flow solutions}},
-  journal = {PREPRINT, International Journal for Numerical Methods in Fluids},
-  year = 2011,
-  pages = {xx--xx},
-  note = {\url{http://dx.doi.org/10.1002/fld.2614}, \url{http://onlinelibrary.wiley.com/doi/10.1002/fld.2614/abstract}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Eftang_2010b">7</a>]
-</td>
-<td class="bibtexitem">
-J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
- A two-step certified reduced basis method.
- <em>PREPRINT, Journal of Scientific Computing</em>, October 2010.
- <a href="http://dx.doi.org/10.1007/s10915-011-9494-2">http://dx.doi.org/10.1007/s10915-011-9494-2</a>.
-<a name="Eftang_2010b"></a><pre>
-@article{Eftang_2010b,
-  author = {J.~L.~Eftang and D.~B.~P.~Huynh and D.~J.~Knezevic and A.~T.~Patera},
-  title = {{A two-step certified reduced basis method}},
-  journal = {PREPRINT, Journal of Scientific Computing},
-  year = 2010,
-  month = oct,
-  note = {\url{http://dx.doi.org/10.1007/s10915-011-9494-2}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Griffith_2010">8</a>]
+[<a name="Griffith_2010">7</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -546,65 +523,45 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 </td>
 </tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Knezevic_2010b">9</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
- Reduced basis approximation and a posteriori error estimation for
-  the parametrized unsteady Boussinesq equations.
- <em>PREPRINT, Accepted in Mathematical Models and Methods in Applied
-  Sciences</em>, August 2010.
- <a href="http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Sep2010.pdf">http://augustine.mit.edu/methodology/papers/atp_M3AS_preprint_Sep2010.pdf</a>.
-<a name="Knezevic_2010b"></a><pre>
-@article{Knezevic_2010b,
-  author = {D.~J.~Knezevic and N.~C.~Nguyen and A.~T.~Patera},
-  title = {{Reduced basis approximation and a posteriori 
-              error estimation for the parametrized unsteady 
-              Boussinesq equations}},
-  journal = {PREPRINT, Accepted in Mathematical Models and Methods in Applied Sciences},
-  month = aug,
-  year = 2010,
-  note = {\url{http://augustine.mit.edu/methodology/
-     papers/atp_M3AS_preprint_Sep2010.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Eftang_2010a">10</a>]
-</td>
-<td class="bibtexitem">
-J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
- An <em>hp</em> Certified Reduced Basis Method for Parameterized Parabolic
-  Partial Differential Equations.
- <em>PREPRINT, Mathematical and Computer Modelling of Dynamical
-  Systems</em>, revised July 2010.
- <a href="http://augustine.mit.edu/methodology/papers/atp_MCMDS_revised_Jul2010.pdf">http://augustine.mit.edu/methodology/papers/atp_MCMDS_revised_Jul2010.pdf</a>.
-<a name="Eftang_2010a"></a><pre>
-@article{Eftang_2010a,
-  author = {J.~L.~Eftang and D.~J.~Knezevic and A.~T.~Patera},
-  title = {{An $hp$ Certified Reduced Basis Method for Parameterized Parabolic Partial Differential Equations}},
-  journal = {PREPRINT, Mathematical and Computer Modelling of Dynamical Systems},
-  year = {revised July 2010},
-  note = {\url{http://augustine.mit.edu/methodology/
-     papers/atp_MCMDS_revised_Jul2010.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
 </table><a name="Articles"></a>
-<h2>2012</h2>
+<h2>2013</h2>
+
+<!-- This document was automatically generated with bibtex2html 1.96
+     (see http://www.lri.fr/~filliatr/bibtex2html/),
+     with the following command:
+     bibtex2html -d -r --nodoc --single -nofooter thirteen.bib  -->
+
+
+<table>
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Vetter_2013">1</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
+ Finite element simulation of dense wire packings.
+ <em>European Journal of Mechanics - A/Solids</em>, 37:160-–171,
+  January 2013.
+ <a href="http://dx.doi.org/10.1016/j.euromechsol.2012.06.007">http://dx.doi.org/10.1016/j.euromechsol.2012.06.007</a>,
+  <a href="http://arxiv.org/abs/1111.5128v2">http://arxiv.org/abs/1111.5128v2</a>.
+<a name="Vetter_2013"></a><pre>
+@article{Vetter_2013,
+  author = {R.~Vetter and F.~K.~Wittel and N.~Stoop and H.~J.~Herrmann},
+  title = {{Finite element simulation of dense wire packings}},
+  journal = {European Journal of Mechanics - A/Solids},
+  year = 2013,
+  volume = 37,
+  month = jan,
+  pages = {160-–171},
+  note = {\url{http://dx.doi.org/10.1016/j.euromechsol.2012.06.007}, \url{http://arxiv.org/abs/1111.5128v2}}
+}
+</pre>
+
+
+</td>
+</tr>
+</table><h2>2012</h2>
 
 <!-- This document was automatically generated with bibtex2html 1.96
      (see http://www.lri.fr/~filliatr/bibtex2html/),
@@ -616,7 +573,163 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Akkoyun_2012">1</a>]
+[<a name="Amaziane_2012">1</a>]
+</td>
+<td class="bibtexitem">
+B.&nbsp;Amaziane, M.&nbsp;Jurak, and A.&nbsp;Keko.
+ Numerical simulations of water-gas flow in heterogeneous porous
+  media with discontinuous capillary pressures by the concept of the global
+  pressure.
+ <em>Journal of Computational and Applied Mathematics</em>,
+  236(17):4227-4244, November 2012.
+ <a href="http://dx.doi.org/10.1016/j.cam.2012.05.013">http://dx.doi.org/10.1016/j.cam.2012.05.013</a>.
+<a name="Amaziane_2012"></a><pre>
+@article{Amaziane_2012,
+  author = {B.~Amaziane and M.~Jurak and A.~Keko},
+  title = {{Numerical simulations of water-gas flow in heterogeneous 
+              porous media with discontinuous capillary pressures by 
+              the concept of the global pressure}},
+  journal = {Journal of Computational and Applied Mathematics},
+  year = 2012,
+  month = nov,
+  volume = 236,
+  number = 17,
+  pages = {4227--4244},
+  note = {\url{http://dx.doi.org/10.1016/j.cam.2012.05.013}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gaston_2012">2</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Gaston, L.&nbsp;Guo, G.&nbsp;Hansen, H.&nbsp;Huang, R.&nbsp;Johnson, D.&nbsp;Knoll, C.&nbsp;Newman, H.&nbsp;K.
+  Park, R.&nbsp;Podgorney, M.&nbsp;Tonks, and R.&nbsp;Williamson.
+ Parallel algorithms and software for nuclear, energy, and
+  environmental applications. Part II: Multiphysics software.
+ <em>Communications in Computational Physics</em>, 12(3):834-865,
+  September 2012.
+ <a href="http://www.global-sci.com/galley/ESCO2010-13.pdf">http://www.global-sci.com/galley/ESCO2010-13.pdf</a>.
+<a name="Gaston_2012"></a><pre>
+@article{Gaston_2012,
+  author = {D.~Gaston and L.~Guo and G.~Hansen and H.~Huang and R.~Johnson and D.~Knoll and 
+             C.~Newman and H.~K.~Park and R.~Podgorney and M.~Tonks and R.~Williamson},
+  title = {{Parallel algorithms and software for nuclear, energy, and environmental applications.
+              Part II: Multiphysics software}},
+  journal = {Communications in Computational Physics},
+  year = 2012,
+  month = sep,
+  volume = 12,
+  number = 3,
+  pages = {834--865},
+  note = {\url{http://www.global-sci.com/galley/ESCO2010-13.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Camata_2012">3</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
+  A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
+ Reordering and incomplete preconditioning in serial and parallel
+  adaptive mesh refinement and coarsening flow solutions.
+ <em>International Journal for Numerical Methods in Fluids</em>,
+  69(4):802-823, June 2012.
+ <a href="http://dx.doi.org/10.1002/fld.2614">http://dx.doi.org/10.1002/fld.2614</a>.
+<a name="Camata_2012"></a><pre>
+@article{Camata_2012,
+  author = {J.~J.~Camata and A.~L.~Rossa and A.~M.~P.~Valli and L.~Catabriga and G.~F.~Carey and A.~L.~G.~A.~Coutinho},
+  title = {{Reordering and incomplete preconditioning in serial and parallel adaptive mesh refinement and coarsening flow solutions}},
+  journal = {International Journal for Numerical Methods in Fluids},
+  year = 2012,
+  volume = 69,
+  pages = {802--823},
+  number = 4,
+  month = jun,
+  note = {\url{http://dx.doi.org/10.1002/fld.2614}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Corsini_2012">4</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.&nbsp;G. Sheard.
+ Predicting blade leading edge erosion in an axial induced draft
+  fan.
+ <em>Journal of Engineering for Gas Turbines and Power</em>, 134:042601
+  (9pp), April 2012.
+ <a href="http://dx.doi.org/10.1115/1.4004724">http://dx.doi.org/10.1115/1.4004724</a>.
+<a name="Corsini_2012"></a><pre>
+@article{Corsini_2012,
+  author = {A.~Corsini and A.~Marchegiani and F.~Rispoli and P.~Venturini and A.~G.~Sheard},
+  title = {{Predicting blade leading edge erosion in an axial induced draft fan}},
+  journal = {Journal of Engineering for Gas Turbines and Power},
+  year = 2012,
+  month = apr,
+  volume = 134,
+  pages = {042601 (9pp)},
+  note = {\url{http://dx.doi.org/10.1115/1.4004724}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Zhu_2012">5</a>]
+</td>
+<td class="bibtexitem">
+Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
+ Three-dimensional buckling of thick-walled elastic tubes under
+  pressure.
+ In X.&nbsp;Luo, W.&nbsp;Li, and N.&nbsp;Hill, editors, <em>Workshop on Soft Tissue
+  Modelling</em>, page&nbsp;40. University of Glasgow, Glasgow, UK, March&nbsp;14-16 2012.
+ <a href="http://www.maths.gla.ac.uk/~xl/Program.pdf">http://www.maths.gla.ac.uk/~xl/Program.pdf</a>.
+<a name="Zhu_2012"></a><pre>
+@inproceedings{Zhu_2012,
+  author = {Y.~F.~Zhu and H.~M.~Wang and R.~W.~Ogden and C.~Berry},
+  title = {{Three-dimensional buckling of thick-walled elastic tubes under pressure}},
+  booktitle = {{Workshop on Soft Tissue Modelling}},
+  editor = {X.~Luo and W.~Li and N.~Hill},
+  pages = {40},
+  publisher = {University of Glasgow, Glasgow, UK},
+  year = {2012},
+  month = mar # {~14--16},
+  note = {\url{http://www.maths.gla.ac.uk/~xl/Program.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Akkoyun_2012">6</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Akkoyun et&nbsp;al.
@@ -645,7 +758,7 @@ S.&nbsp;Akkoyun et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2012">2</a>]
+[<a name="Mahadevan_2012">7</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
@@ -673,7 +786,209 @@ V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2012">3</a>]
+[<a name="Podgorney_2012">8</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
+ Thermo-hydro-mechanical modeling of working fluid injection and
+  thermal energy extraction in EGS fractures and rock matrix.
+ In <em>Proceedings of Thirty-Seventh Workshop on Geothermal
+  Reservoir Engineering, Stanford University, Stanford California</em>, January 30
+  - February 1, 2012.
+ 
+  <a href="http://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2012/Podgorney.pdf">http://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2012/Podgorney.pdf</a>.
+<a name="Podgorney_2012"></a><pre>
+@inproceedings{Podgorney_2012,
+  author = {R.~Podgorney and C.~Lu and H.~Huang},
+  title = {{Thermo-hydro-mechanical modeling of working fluid injection and thermal
+                 energy extraction in EGS fractures and rock matrix}},
+  booktitle = {{Proceedings of Thirty-Seventh Workshop on Geothermal Reservoir Engineering, Stanford University, Stanford California}},
+  month = {January 30 -- February 1, },
+  year = {2012},
+  note = {\url{http://pangea.stanford.edu/ERE/db/GeoConf/papers/SGW/2012/Podgorney.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bassi_2012">9</a>]
+</td>
+<td class="bibtexitem">
+F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.&nbsp;Tesini.
+ On the flexibility of agglomeration based physical space
+  discontinuous Galerkin discretizations.
+ <em>J. Computational Physics</em>, 231(1):45-65, January 2012.
+ <a href="http://dx.doi.org/10.1016/j.jcp.2011.08.018">http://dx.doi.org/10.1016/j.jcp.2011.08.018</a>.
+<a name="Bassi_2012"></a><pre>
+@article{Bassi_2012,
+  author = {F.~Bassi and L.~Botti and A.~Colombo and D.~A.~Di Pietro and P.~Tesini},
+  title = {{On the flexibility of agglomeration based physical space discontinuous Galerkin discretizations}},
+  journal = {J. Computational Physics},
+  year = 2012,
+  volume = 231,
+  number = 1,
+  month = jan,
+  pages = {45--65},
+  note = {\url{http://dx.doi.org/10.1016/j.jcp.2011.08.018}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Andrijauskas_2012">10</a>]
+</td>
+<td class="bibtexitem">
+T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
+ Thomas-Fermi and Poisson modeling of gate electrostatics in graphene
+  nanoribbon.
+ <em>Lithuanian Journal of Physics</em>, 52(1):63-69, 2012.
+ <a href="http://www.itpa.lt/~lfd/Lfz/521/04/Ljp52104.pdf">http://www.itpa.lt/~lfd/Lfz/521/04/Ljp52104.pdf</a>.
+<a name="Andrijauskas_2012"></a><pre>
+@article{Andrijauskas_2012,
+  author = {T.~Andrijauskas and A.~A.~Shylau and I.~V.~Zozoulenko},
+  title = {{Thomas-Fermi and Poisson modeling of gate electrostatics in graphene nanoribbon}},
+  journal = {Lithuanian Journal of Physics},
+  year = 2012,
+  volume = 52,
+  number = 1,
+  pages = {63--69},
+  note = {\url{http://www.itpa.lt/~lfd/Lfz/521/04/Ljp52104.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Williamson_2012">11</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks, D.&nbsp;R. Gaston,
+  C.&nbsp;J. Permann, D.&nbsp;Andrs, and R.&nbsp;C. Martineau.
+ Multidimensional multiphysics simulation of nuclear fuel behavior.
+ <em>Journal of Nuclear Materials</em>, 423(1-3):149-163, 2012.
+ <a href="http://dx.doi.org/10.1016/j.jnucmat.2012.01.012">http://dx.doi.org/10.1016/j.jnucmat.2012.01.012</a>.
+<a name="Williamson_2012"></a><pre>
+@article{Williamson_2012,
+  author = {R.~L.~Williamson and J.~D.~Hales and S.~R.~Novascone and M.~R.~Tonks and D.~R.~Gaston and C.~J.~Permann and D.~Andrs and R.~C.~Martineau},
+  title = {{Multidimensional multiphysics simulation of nuclear fuel behavior}},
+  journal = {Journal of Nuclear Materials},
+  year = 2012,
+  volume = 423,
+  number = {1--3},
+  pages = {149--163},
+  note = {\url{http://dx.doi.org/10.1016/j.jnucmat.2012.01.012}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Eftang_2012">12</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
+ A two-step certified reduced basis method.
+ <em>Journal of Scientific Computing</em>, 51(1):28-58, 2012.
+ <a href="http://dx.doi.org/10.1007/s10915-011-9494-2">http://dx.doi.org/10.1007/s10915-011-9494-2</a>.
+<a name="Eftang_2012"></a><pre>
+@article{Eftang_2012,
+  author = {J.~L.~Eftang and D.~B.~P.~Huynh and D.~J.~Knezevic and A.~T.~Patera},
+  title = {{A two-step certified reduced basis method}},
+  journal = {Journal of Scientific Computing},
+  volume = 51,
+  number = 1,
+  pages = {28--58},
+  year = 2012,
+  note = {\url{http://dx.doi.org/10.1007/s10915-011-9494-2}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gerner_2012">13</a>]
+</td>
+<td class="bibtexitem">
+A.-L. Gerner and K.&nbsp;Veroy.
+ Reduced basis a posteriori error bounds for the instationary Stokes
+  equations: a penalty approach.
+ Technical Report AICES-2012/01-1, Aachen Institute for Advanced Study
+  in Computational Engineering Science, January 2012.
+ <a href="http://www.aices.rwth-aachen.de:8080/aices/preprint/documents/AICES-2012-01-01.pdf">http://www.aices.rwth-aachen.de:8080/aices/preprint/documents/AICES-2012-01-01.pdf</a>.
+<a name="Gerner_2012"></a><pre>
+@techreport{Gerner_2012,
+  author = {A.-L.~Gerner and K.~Veroy},
+  title = {{Reduced basis a posteriori error bounds for 
+                  the instationary Stokes equations: a penalty approach}},
+  institution = {Aachen Institute for Advanced Study in Computational Engineering Science},
+  day = {14},
+  month = jan,
+  year = {2012},
+  number = {AICES-2012/01-1},
+  note = {\url{http://www.aices.rwth-aachen.de:8080/aices/
+                      preprint/documents/AICES-2012-01-01.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Brummelen_2012">14</a>]
+</td>
+<td class="bibtexitem">
+E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
+ Flux evaluation in primal and dual boundary-coupled problems.
+ <em>Journal of Applied Mechanics</em>, 79(1):010904&nbsp;(1-8), January
+  2012.
+ <a href="http://dx.doi.org/10.1115/1.4005187">http://dx.doi.org/10.1115/1.4005187</a>.
+<a name="Brummelen_2012"></a><pre>
+@article{Brummelen_2012,
+  author = {E.~H.~van~Brummelen and K.~G.~van~der~Zee and V.~V.~Garg and S.~Prudhomme},
+  title = {{Flux evaluation in primal and dual boundary-coupled problems}},
+  journal = {Journal of Applied Mechanics},
+  year = 2012,
+  volume = 79,
+  month = jan,
+  number = 1,
+  pages = {010904~(1--8)},
+  note = {\url{http://dx.doi.org/10.1115/1.4005187}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Huynh_2012">15</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -710,31 +1025,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vetter_2011">1</a>]
-</td>
-<td class="bibtexitem">
-R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
- Packing model for elastic wires in ellipsoidal cavities.
- November&nbsp;22, 2011.
- <a href="http://arxiv.org/abs/1111.5128v1">http://arxiv.org/abs/1111.5128v1</a>.
-<a name="Vetter_2011"></a><pre>
-@article{Vetter_2011,
-  author = {R.~Vetter and F.~K.~Wittel and N.~Stoop and H.~J.~Herrmann},
-  title = {{Packing model for elastic wires in ellipsoidal cavities}},
-  month = nov # {~22,},
-  year = {2011},
-  note = {\url{http://arxiv.org/abs/1111.5128v1}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Gerner_2011">2</a>]
+[<a name="Gerner_2011">1</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner and K.&nbsp;Veroy.
@@ -764,7 +1055,7 @@ A.-L. Gerner and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bordas_2011">3</a>]
+[<a name="Bordas_2011">2</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Bordas, K.&nbsp;Gillow, Q.&nbsp;Lou, I.&nbsp;R. Efimov, D.&nbsp;Gavaghan, P.&nbsp;Kohl, V.&nbsp;Grau, and
@@ -785,6 +1076,34 @@ R.&nbsp;Bordas, K.&nbsp;Gillow, Q.&nbsp;Lou, I.&nbsp;R. Efimov, D.&nbsp;Gavaghan
   month = oct,
   pages = {90--100},
   note = {\url{http://dx.doi.org/10.1016/j.pbiomolbio.2011.05.002}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Garg_2011">3</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;V. Garg, S.&nbsp;Prudhomme, K.&nbsp;G. van&nbsp;der Zee, and G.&nbsp;F. Carey.
+ Adjoint consistent formulations of slip models for coupled
+  electroosmotic flow systems.
+ Technical Report 11-30, Institute for Computational Engineering and
+  Sciences (ICES), The University of Texas at Austin, October 2011.
+ <a href="http://django.ices.utexas.edu/media/reports/2011/1130.pdf">http://django.ices.utexas.edu/media/reports/2011/1130.pdf</a>.
+<a name="Garg_2011"></a><pre>
+@techreport{Garg_2011,
+  author = {V.~V.~Garg and S.~Prudhomme and K.~G.~van~der~Zee and G.~F.~Carey},
+  title = {{Adjoint consistent formulations of slip models for coupled electroosmotic flow systems}},
+  institution = {Institute for Computational Engineering and Sciences (ICES), The University of Texas at Austin},
+  month = oct,
+  year = 2011,
+  number = {11-30},
+  note = {\url{http://django.ices.utexas.edu/media/reports/2011/1130.pdf}}
 }
 </pre>
 
@@ -1027,7 +1346,33 @@ A.&nbsp;Arbree, B.&nbsp;Walter, and K.&nbsp;Bala.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vazquez_2011">12</a>]
+[<a name="Bova_2011">12</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;W. Bova and B.&nbsp;S. Kirk.
+ On the preservation of total enthalpy in SUPG methods.
+ In <em>20th AIAA Computational Fluid Dynamics Conference, Honolulu,
+  Hawaii</em>, June&nbsp;27-30, 2011.
+ Paper AIAA-2011-3841.
+<a name="Bova_2011"></a><pre>
+@inproceedings{Bova_2011,
+  author = {S.~W.~Bova and B.~S.~Kirk},
+  title = {{On the preservation of total enthalpy in SUPG methods}},
+  booktitle = {{20th AIAA Computational Fluid Dynamics Conference, Honolulu, Hawaii}},
+  month = jun # {~27--30, },
+  year = {2011},
+  note = {Paper AIAA-2011-3841}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Vazquez_2011">13</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;A. Vazquez and A.&nbsp;Castellanos.
@@ -1055,7 +1400,34 @@ P.&nbsp;A. Vazquez and A.&nbsp;Castellanos.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gunther_2011">13</a>]
+[<a name="Guillen_2011">14</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;P. Guillen, D.&nbsp;Gaston, and J.&nbsp;Tester.
+ Multiphase flow modeling of biofuel production processes.
+ Technical Report INL/CON-11-21680, Idaho National Laboratory, June
+  2011.
+ <a href="http://www.inl.gov/technicalpublications/Documents/5148644.pdf">http://www.inl.gov/technicalpublications/Documents/5148644.pdf</a>.
+<a name="Guillen_2011"></a><pre>
+@techreport{Guillen_2011,
+  author = {D.~P.~Guillen and D.~Gaston and J.~Tester},
+  title = {{Multiphase flow modeling of biofuel production processes}},
+  institution = {Idaho National Laboratory},
+  month = jun,
+  year = 2011,
+  number = {INL/CON-11-21680},
+  note = {\url{http://www.inl.gov/technicalpublications/Documents/5148644.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gunther_2011">15</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
@@ -1084,7 +1456,7 @@ A.&nbsp;G&uuml;nther, H.&nbsp;Lamecker, and M.&nbsp;Weiser.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_2010b">14</a>]
+[<a name="Peterson_2010b">16</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
@@ -1115,7 +1487,7 @@ J.&nbsp;W. Peterson and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Feng_2011">15</a>]
+[<a name="Feng_2011">17</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Feng and D.&nbsp;Fuentes.
@@ -1144,7 +1516,7 @@ Y.&nbsp;Feng and D.&nbsp;Fuentes.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="AufDerMaur_2011">16</a>]
+[<a name="AufDerMaur_2011">18</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Auf&nbsp;der Maur, G.&nbsp;Penazzi, G.&nbsp;Romano, F.&nbsp;Sacconi, A.&nbsp;Pecchia, and
@@ -1174,7 +1546,7 @@ M.&nbsp;Auf&nbsp;der Maur, G.&nbsp;Penazzi, G.&nbsp;Romano, F.&nbsp;Sacconi, A.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Curtis_2011a">17</a>]
+[<a name="Curtis_2011a">19</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
@@ -1182,7 +1554,7 @@ F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
   optimization with inexact step computations.
  Technical Report RC25143 (W1104-052), IBM Research Division, April
   2011.
- <a href="https://domino.research.ibm.com/library/cyberdig.nsf/papers/B817B35E8652877A85257873005A6F38/\$File/rc25143.pdf">https://domino.research.ibm.com/library/cyberdig.nsf/papers/B817B35E8652877A85257873005A6F38/\$File/rc25143.pdf</a>.
+ <a href="http://lehigh.edu/ise/documents/11t_005.pdf">http://lehigh.edu/ise/documents/11t_005.pdf</a>.
 <a name="Curtis_2011a"></a><pre>
 @techreport{Curtis_2011a,
   author = {F.~E.~Curtis and J.~Huber and O.~Schenk and A.~W\"{a}chter},
@@ -1193,8 +1565,7 @@ F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
   month = apr,
   year = 2011,
   number = {RC25143 (W1104-052)},
-  note = {\url{https://domino.research.ibm.com/library/cyberdig.nsf/
-papers/B817B35E8652877A85257873005A6F38/\$File/rc25143.pdf}}
+  note = {\url{http://lehigh.edu/ise/documents/11t_005.pdf}}
 }
 </pre>
 
@@ -1205,7 +1576,7 @@ papers/B817B35E8652877A85257873005A6F38/\$File/rc25143.pdf}}
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2010">18</a>]
+[<a name="Huynh_2010">20</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, J.&nbsp;W. Peterson, and A.&nbsp;T. Patera.
@@ -1239,7 +1610,7 @@ DOI:~\url{http://dx.doi.org/10.1016/j.compfluid.2010.07.007}    }
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2011">19</a>]
+[<a name="Knezevic_2011">21</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
@@ -1269,7 +1640,7 @@ D.&nbsp;J. Knezevic and J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Botti_2011">20</a>]
+[<a name="Botti_2011">22</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
@@ -1300,7 +1671,63 @@ L.&nbsp;Botti and D.&nbsp;A.&nbsp;Di Pietro.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_2011b">21</a>]
+[<a name="Grote_2011">23</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;J. Grote, J.&nbsp;Huber, and O.&nbsp;Schenk.
+ Interior point methods for the inverse medium problem on massively
+  parallel architectures.
+ <em>Procedia Computer Science</em>, 4:1466-1474, 2011.
+ Proceedings of the International Conference on Computational Science
+  (ICCS 2011), <a href="http://dx.doi.org/10.1016/j.procs.2011.04.159">http://dx.doi.org/10.1016/j.procs.2011.04.159</a>.
+<a name="Grote_2011"></a><pre>
+@article{Grote_2011,
+  author = {M.~J.~Grote and J.~Huber and O.~Schenk},
+  title = {{Interior point methods for the inverse medium problem on massively parallel architectures}},
+  journal = {Procedia Computer Science},
+  year = 2011,
+  volume = 4,
+  pages = {1466--1474},
+  note = {Proceedings of the International Conference on Computational Science (ICCS 2011), \url{http://dx.doi.org/10.1016/j.procs.2011.04.159}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Hussan_2011">24</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;R. Hussan, P.&nbsp;J. Hunter, and M.&nbsp;L. Trew.
+ A clustering method for calculating membrane currents in cardiac
+  electrical models.
+ <em>Cardiovascular Engineering and Technology</em>, 3(1):3-16, 2011.
+ <a href="http://dx.doi.org/10.1007/s13239-011-0070-6">http://dx.doi.org/10.1007/s13239-011-0070-6</a>.
+<a name="Hussan_2011"></a><pre>
+@article{Hussan_2011,
+  author = {J.~R.~Hussan and P.~J.~Hunter and M.~L.~Trew},
+  title = {{A clustering method for calculating membrane currents in cardiac electrical models}},
+  journal = {Cardiovascular Engineering and Technology},
+  year = 2011,
+  volume = 3,
+  number = 1,
+  pages = {3--16},
+  note = {\url{http://dx.doi.org/10.1007/s13239-011-0070-6}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Knezevic_2011b">25</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
@@ -1331,7 +1758,7 @@ D.&nbsp;J. Knezevic, N.&nbsp;C. Nguyen, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kroger_2011">22</a>]
+[<a name="Kroger_2011">26</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;Kr&ouml;ger.
@@ -1361,7 +1788,7 @@ T.&nbsp;Kr&ouml;ger.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2011">23</a>]
+[<a name="Eftang_2011">27</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -1391,7 +1818,7 @@ J.&nbsp;L. Eftang, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Steiger_2011">24</a>]
+[<a name="Steiger_2011">28</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Steiger, M.&nbsp;Povolotskyi, H.-H. Park, T.&nbsp;Kubis, and G.&nbsp;Klimeck.
@@ -1418,7 +1845,7 @@ S.&nbsp;Steiger, M.&nbsp;Povolotskyi, H.-H. Park, T.&nbsp;Kubis, and G.&nbsp;Kli
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2011">25</a>]
+[<a name="Fuentes_2011">29</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, C.&nbsp;Walker, A.&nbsp;Elliott, A.&nbsp;Shetty, J.&nbsp;D. Hazle, and R.&nbsp;J. Stafford.
@@ -1448,7 +1875,7 @@ D.&nbsp;Fuentes, C.&nbsp;Walker, A.&nbsp;Elliott, A.&nbsp;Shetty, J.&nbsp;D. Haz
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="widmer_2011">26</a>]
+[<a name="widmer_2011">30</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
@@ -1477,40 +1904,7 @@ R.&nbsp;P. Widmer and S.&nbsp;J. Ferguson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hilscher_2011">27</a>]
-</td>
-<td class="bibtexitem">
-P.&nbsp;P. Hilscher, K.&nbsp;Imadera, J.&nbsp;Li, and Y.&nbsp;Kishimoto.
- Towards gyrokinetic simulations of multi-scale micro-turbulence in
-  tokamaks.
- In Takeshi Yao, editor, <em>Zero-Carbon Energy Kyoto 2010</em>, Green
-  Energy and Technology, pages 239-244. Springer Japan, 2011.
- <a href="http://dx.doi.org/10.1007/978-4-431-53910-0_31">http://dx.doi.org/10.1007/978-4-431-53910-0_31</a>.
-<a name="Hilscher_2011"></a><pre>
-@incollection{Hilscher_2011,
-  author = {P.~P. Hilscher and K.~Imadera and J.~Li and Y.~Kishimoto},
-  affiliation = {Department of Fundamental Energy Science, 
-                  Graduate School of Energy Science, Kyoto University, 
-                  Gokasho, Uji, Kyoto, 611-0011 Japan},
-  title = {Towards Gyrokinetic Simulations of Multi-Scale Micro-Turbulence in Tokamaks},
-  booktitle = {Zero-Carbon Energy Kyoto 2010},
-  series = {Green Energy and Technology},
-  editor = {Yao, Takeshi},
-  publisher = {Springer Japan},
-  pages = {239--244},
-  note = {\url{http://dx.doi.org/10.1007/978-4-431-53910-0_31}},
-  year = {2011}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Corsini_2011">28</a>]
+[<a name="Corsini_2011">31</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, F.&nbsp;Rispoli, and T.&nbsp;E. Tezduyar.
