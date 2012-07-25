@@ -820,13 +820,12 @@ public:
    */
   CouplingMatrix* _dof_coupling;
 
-
-private:
-
   /**
    * @returns the number of the system we are responsible for.
    */
   unsigned int sys_number() const;
+
+private:
 
   /**
    * Invalidates all active DofObject dofs for this system
