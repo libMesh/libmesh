@@ -102,34 +102,34 @@ FEInterface::FEInterface()
 	  } \
       } while (0)
 
-#define fe_shape_scalar_switch(dim, arg) \
+#define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix) \
   do { \
   switch (fe_t.family)  \
     {  \
     case CLOUGH: \
-      phi = FE<dim,CLOUGH>::shape(arg, o, i, p); \
+      prefix FE<dim,CLOUGH>::func_and_args suffix \
     case HERMITE: \
-      phi = FE<dim,HERMITE>::shape(arg, o, i, p); \
+      prefix FE<dim,HERMITE>::func_and_args suffix \
     case HIERARCHIC: \
-      phi = FE<dim,HIERARCHIC>::shape(arg, o, i, p); \
+      prefix FE<dim,HIERARCHIC>::func_and_args suffix \
     case L2_HIERARCHIC: \
-      phi = FE<dim,L2_HIERARCHIC>::shape(arg, o, i, p);\
+      prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix\
     case LAGRANGE: \
-      phi = FE<dim,LAGRANGE>::shape(arg, o, i, p);\
+      prefix FE<dim,LAGRANGE>::func_and_args suffix\
     case L2_LAGRANGE: \
-      phi = FE<dim,L2_LAGRANGE>::shape(arg, o, i, p);\
+      prefix FE<dim,L2_LAGRANGE>::func_and_args suffix\
     case MONOMIAL: \
-      phi = FE<dim,MONOMIAL>::shape(arg, o, i, p);\
+      prefix FE<dim,MONOMIAL>::func_and_args suffix\
     case SCALAR: \
-      phi = FE<dim,SCALAR>::shape(arg, o, i, p);\
+      prefix FE<dim,SCALAR>::func_and_args suffix\
     case BERNSTEIN: \
-      phi = FE<dim,BERNSTEIN>::shape(arg, o, i, p);\
+      prefix FE<dim,BERNSTEIN>::func_and_args suffix\
     case SZABAB: \
-      phi = FE<dim,SZABAB>::shape(arg, o, i, p);\
+      prefix FE<dim,SZABAB>::func_and_args suffix\
     case XYZ: \
-      phi = FEXYZ<dim>::shape(arg, o, i, p); \
+      prefix FEXYZ<dim>::func_and_args suffix \
     case LAGRANGE_VEC: \
-      libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::shape"\
+      libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args"\
 		   << std::endl;\
       libmesh_error();\
     default: \
@@ -138,12 +138,12 @@ FEInterface::FEInterface()
     } while(0)
 
 
-#define fe_shape_vector_switch(dim,arg) \
+#define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
 	do { \
 	switch (fe_t.family) \
     { \
     case LAGRANGE_VEC: \
-      phi = FE<dim,LAGRANGE_VEC>::shape(arg, o, i, p);\
+      prefix FE<dim,LAGRANGE_VEC>::func_and_args suffix \
     case HERMITE: \
     case HIERARCHIC: \
     case L2_HIERARCHIC: \
@@ -219,30 +219,30 @@ FEInterface::FEInterface()
 	  } \
       } while (0)
 
-#define fe_shape_scalar_switch(dim, arg)		\
+#define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix) \
   do { \
   switch (fe_t.family)  \
     {  \
     case CLOUGH: \
-      phi = FE<dim,CLOUGH>::shape(arg, o, i, p); \
+      prefix  FE<dim,CLOUGH>::func_and_args suffix \
     case HERMITE: \
-      phi = FE<dim,HERMITE>::shape(arg, o, i, p); \
+      prefix  FE<dim,HERMITE>::func_and_args suffix \
     case HIERARCHIC: \
-      phi = FE<dim,HIERARCHIC>::shape(arg, o, i, p); \
+      prefix  FE<dim,HIERARCHIC>::func_and_args suffix \
     case L2_HIERARCHIC: \
-      phi = FE<dim,L2_HIERARCHIC>::shape(arg, o, i, p);\
+      prefix  FE<dim,L2_HIERARCHIC>::func_and_args suffix\
     case LAGRANGE: \
-      phi = FE<dim,LAGRANGE>::shape(arg, o, i, p);\
+      prefix  FE<dim,LAGRANGE>::func_and_args suffix\
     case L2_LAGRANGE: \
-      phi = FE<dim,L2_LAGRANGE>::shape(arg, o, i, p);\
+      prefix  FE<dim,L2_LAGRANGE>::func_and_args suffix\
     case MONOMIAL: \
-      phi = FE<dim,MONOMIAL>::shape(arg, o, i, p);\
+      prefix  FE<dim,MONOMIAL>::func_and_args suffix\
     case SCALAR: \
-      phi = FE<dim,SCALAR>::shape(arg, o, i, p);\
+      prefix  FE<dim,SCALAR>::func_and_args suffix\
     case XYZ: \
-      phi = FEXYZ<dim>::shape(arg, o, i, p);\
+      prefix  FEXYZ<dim>::func_and_args suffix\
     case LAGRANGE_VEC: \
-      libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::shape"\
+      libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args"\
 		   << std::endl;\
       libmesh_error();\
     default: \
@@ -251,12 +251,12 @@ FEInterface::FEInterface()
     } while(0)
 
 
-#define fe_shape_vector_switch(dim,arg) \
+#define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
 	do { \
 	switch (fe_t.family) \
     { \
     case LAGRANGE_VEC: \
-      phi = FE<dim,LAGRANGE_VEC>::shape(arg, o, i, p);\
+      prefix FE<dim,LAGRANGE_VEC>::func_and_args suffix\
     case HERMITE: \
     case HIERARCHIC: \
     case L2_HIERARCHIC: \
@@ -265,7 +265,7 @@ FEInterface::FEInterface()
     case MONOMIAL: \
     case SCALAR: \
     case XYZ: \
-      libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::shape" \
+      libMesh::err << "Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args" \
 		   << std::endl; \
       libmesh_error();\
     default: \
@@ -667,16 +667,16 @@ void FEInterface::shape<Real>(const unsigned int dim,
   switch(dim)
     {
     case 0:
-      fe_shape_scalar_switch(0, t);
+      fe_scalar_vec_error_switch(0, shape(t,o,i,p), phi = , ; break;);
       break;
     case 1:
-      fe_shape_scalar_switch(1, t);
+      fe_scalar_vec_error_switch(1, shape(t,o,i,p), phi = , ; break;);
       break;
     case 2:
-      fe_shape_scalar_switch(2, t);
+      fe_scalar_vec_error_switch(2, shape(t,o,i,p), phi = , ; break;);
       break;
     case 3:
-      fe_shape_scalar_switch(3, t);
+      fe_scalar_vec_error_switch(3, shape(t,o,i,p), phi = , ; break;);
       break;
     }
 
@@ -703,16 +703,16 @@ void FEInterface::shape<Real>(const unsigned int dim,
   switch(dim)
     {
     case 0:
-      fe_shape_scalar_switch(0, elem);
+      fe_scalar_vec_error_switch(0, shape(elem,o,i,p), phi = , ; break;);
       break;
     case 1:
-      fe_shape_scalar_switch(1, elem);
+      fe_scalar_vec_error_switch(1, shape(elem,o,i,p), phi = , ; break;);
       break;
     case 2:
-      fe_shape_scalar_switch(2, elem);
+      fe_scalar_vec_error_switch(2, shape(elem,o,i,p), phi = , ; break;);
       break;
     case 3:
-      fe_shape_scalar_switch(3, elem);
+      fe_scalar_vec_error_switch(3, shape(elem,o,i,p), phi = , ; break;);
       break;
     }
 
@@ -732,16 +732,16 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
   switch(dim)
     {
     case 0:
-      fe_shape_vector_switch(0, t);
+      fe_vector_scalar_error_switch(0, shape(t,o,i,p), phi = , ; break;);
       break;
     case 1:
-      fe_shape_vector_switch(1, t);
+      fe_vector_scalar_error_switch(1, shape(t,o,i,p), phi = , ; break;);
       break;
     case 2:
-      fe_shape_vector_switch(2, t);
+      fe_vector_scalar_error_switch(2, shape(t,o,i,p), phi = , ; break;);
       break;
     case 3:
-      fe_shape_vector_switch(3, t);
+      fe_vector_scalar_error_switch(3, shape(t,o,i,p), phi = , ; break;);
       break;
     }
   
@@ -761,16 +761,16 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
   switch(dim)
     {
     case 0:
-      fe_shape_vector_switch(0, elem);
+      fe_vector_scalar_error_switch(0, shape(elem,o,i,p), phi = , ; break;);
       break;
     case 1:
-      fe_shape_vector_switch(1, elem);
+      fe_vector_scalar_error_switch(1, shape(elem,o,i,p), phi = , ; break;);
       break;
     case 2:
-      fe_shape_vector_switch(2, elem);
+      fe_vector_scalar_error_switch(2, shape(elem,o,i,p), phi = , ; break;);
       break;
     case 3:
-      fe_shape_vector_switch(3, elem);
+      fe_vector_scalar_error_switch(3, shape(elem,o,i,p), phi = , ; break;);
       break;
     }
 
