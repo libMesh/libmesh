@@ -370,6 +370,25 @@ struct IncrementRank<TypeVector<T> >
   typedef TensorValue<T> type;
 };
 
+// Also need rank-decreasing case
+template <typename T>
+struct DecrementRank
+{
+  typedef VectorValue<T> type;
+};
+
+template <typename T>
+struct DecrementRank<VectorValue<T> >
+{
+  typedef Real type;
+};
+
+template <typename T>
+struct DecrementRank<TypeVector<T> >
+{
+  typedef Real type;
+};
+
 template <typename T>
 struct MakeNumber
 {
