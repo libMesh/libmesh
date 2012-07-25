@@ -137,6 +137,7 @@ public:
   typedef OutputType                                         OutputShape;
   typedef typename IncrementRank<OutputShape>::type          OutputGradient;
   typedef typename IncrementRank<OutputGradient>::type       OutputTensor;
+  typedef typename DecrementRank<OutputShape>::type          OutputDivergence;
   typedef typename MakeNumber<OutputShape>::type             OutputNumber;
   typedef typename IncrementRank<OutputNumber>::type         OutputNumberGradient;
   typedef typename IncrementRank<OutputNumberGradient>::type OutputNumberTensor;

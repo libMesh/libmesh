@@ -425,6 +425,17 @@ struct IncrementRank<TensorValue<T> >
   typedef TypeNTensor<3,T> type;
 };
 
+template <typename T>
+struct DecrementRank<TensorValue<T> >
+{
+  typedef VectorValue<T> type;
+};
+
+template <typename T>
+struct DecrementRank<TypeTensor<T> >
+{
+  typedef VectorValue<T> type;
+};
 
 template <typename T>
 struct MakeNumber<TypeTensor<T> >
