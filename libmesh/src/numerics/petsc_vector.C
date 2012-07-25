@@ -164,6 +164,18 @@ void PetscVector<T>::set (const unsigned int i, const T value)
 
 
 template <typename T>
+void PetscVector<T>::reciprocal()
+{
+  int ierr = 0;
+
+  // VecReciprocal has been in PETSc since at least 2.3.3 days
+  ierr = VecReciprocal(_vec);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+}
+
+
+
+template <typename T>
 void PetscVector<T>::add (const unsigned int i, const T value)
 {
   this->_restore_array();
