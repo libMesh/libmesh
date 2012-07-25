@@ -16,6 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
+#include <limits>
 
 // Local Includes
 #include "trilinos_epetra_vector.h"
