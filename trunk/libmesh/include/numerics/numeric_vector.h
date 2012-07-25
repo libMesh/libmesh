@@ -355,6 +355,11 @@ public:
   NumericVector<T> & operator /= (const T a) { this->scale(1./a); return *this; }
 
   /**
+   * Replace each entry v_i of this vector by its reciprocal, 1/v_i.
+   */
+  virtual void reciprocal() = 0;
+
+  /**
    * v(i) = value
    */
   virtual void set (const unsigned int i, const T value) = 0;

@@ -106,6 +106,29 @@ NumericVector<T>& LaspackVector<T>::operator -= (const NumericVector<T>& v)
 
 
 template <typename T>
+void LaspackVector<T>::reciprocal()
+{
+  const unsigned int n = this->size();
+
+  for (unsigned int i=0; i<n; i++)
+    {
+      Real v = (*this)(i);
+
+      // Don't divide by zero (maybe only check this in debug mode?)
+      if (std::abs(v) < std::numeric_limits<T>::min())
+        {
+          libMesh::err << "Error, divide by zero in DistributedVector<T>::reciprocal()!" << std::endl;
+          libmesh_error();
+        }
+
+      this->set(i, 1. / v);
+    }
+}
+
+
+
+
+template <typename T>
 void LaspackVector<T>::add (const T v)
 {
   const unsigned int n = this->size();

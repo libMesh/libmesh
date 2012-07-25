@@ -263,6 +263,11 @@ public:
   NumericVector<T> & operator -= (const NumericVector<T> &V);
 
   /**
+   * Replace each entry v_i of this vector by its reciprocal, 1/v_i.
+   */
+  virtual void reciprocal();
+
+  /**
    * v(i) = value
    */
   void set (const unsigned int i, const T value);
