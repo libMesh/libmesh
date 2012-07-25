@@ -21,6 +21,7 @@
 
 // C++ includes
 #include <cmath> // for std::abs
+#include <limits> // std::numeric_limits<T>::min()
 
 // Local Includes
 #include "distributed_vector.h"
@@ -200,6 +201,26 @@ void DistributedVector<T>::add_vector (const DenseVector<T>& V,
   for (unsigned int i=0; i<V.size(); i++)
     add (dof_indices[i], V(i));
 }
+
+
+
+
+template <typename T>
+void DistributedVector<T>::reciprocal()
+{
+  for (unsigned int i=0; i<local_size(); i++)
+    {
+      // Don't divide by zero (maybe only check this in debug mode?)
+      if (std::abs(_values[i]) < std::numeric_limits<T>::min())
+        {
+          libMesh::err << "Error, divide by zero in DistributedVector<T>::reciprocal()!" << std::endl;
+          libmesh_error();
+        }
+
+      _values[i] = 1. / _values[i];
+    }
+}
+
 
 
 

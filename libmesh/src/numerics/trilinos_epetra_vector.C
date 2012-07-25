@@ -139,6 +139,37 @@ void EpetraVector<T>::set (const unsigned int i_in, const T value_in)
 
 
 template <typename T>
+void EpetraVector<T>::reciprocal()
+{
+  // The Epetra::reciprocal() function takes a constant reference to *another* vector,
+  // and fills _vec with its reciprocal.  Does that mean we can't pass *_vec as the
+  // argument?
+  // _vec->reciprocal( *_vec );
+
+  // Alternatively, compute the reciprocal by hand... see also the add(T) member that does this...
+  const unsigned int nl = _vec->MyLength();
+
+  T* values = _vec->Values();
+
+  for (unsigned int i=0; i<nl; i++)
+    {
+      // Don't divide by zero (maybe only check this in debug mode?)
+      if (std::abs(values[i]) < std::numeric_limits<T>::min())
+        {
+          libMesh::err << "Error, divide by zero in DistributedVector<T>::reciprocal()!" << std::endl;
+          libmesh_error();
+        }
+
+      values[i] = 1. / values[i];
+    }
+
+  // Leave the vector in a closed state...
+  this->close();
+}
+
+
+
+template <typename T>
 void EpetraVector<T>::add (const unsigned int i_in, const T value_in)
 {
   int i = static_cast<int> (i_in);
