@@ -39,13 +39,13 @@
 #include "dirichlet_boundaries.h"
 #include "zero_function.h"
 
-// For creating a directory
+// C++ includes
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
-
 #include <fstream>
 #include <sstream>
+#include <limits>
 
 namespace libMesh
 {
@@ -1332,6 +1332,26 @@ void RBConstruction::recompute_all_residual_terms(bool compute_inner_products)
 Real RBConstruction::compute_max_error_bound()
 {
   START_LOG("compute_max_error_bound()", "RBConstruction");
+
+  // Treat the case with no parameters in a special way
+  if(get_n_params() == 0)
+  {
+    Real max_val;
+    if(std::numeric_limits<Real>::has_infinity)
+    {
+      max_val = std::numeric_limits<Real>::infinity();
+    }
+    else
+    {
+      max_val = std::numeric_limits<Real>::max();
+    }
+    
+    STOP_LOG("compute_max_error_bound()", "RBConstruction");
+
+    // Make sure we do at least one solve, but otherwise return a zero error bound
+    // when we have no parameters
+    return (get_rb_evaluation().get_n_basis_functions() == 0) ? max_val : 0.;
+  }
 
   training_error_bounds.resize(this->get_local_n_training_samples());
 
