@@ -684,6 +684,33 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
 
 
 
+void Elem::find_edge_neighbors(const Point& p1,
+                               const Point& p2,
+			       std::set<const Elem *> &neighbor_set) const
+{
+  // Simple but perhaps suboptimal code: find elements containing the
+  // first point, then winnow this set down by removing elements which
+  // don't also contain the second point
+
+  libmesh_assert(this->contains_point(p2));
+  this->find_point_neighbors(p1, neighbor_set);
+
+  std::set<const Elem*>::iterator        it = neighbor_set.begin();
+  const std::set<const Elem*>::iterator end = neighbor_set.end();
+
+  while(it != end) {
+    std::set<const Elem*>::iterator current = it++;
+
+    const Elem* elem = *current;
+    // This won't invalidate iterator it, because it is already
+    // pointing to the next element
+    if (!elem->contains_point(p2))
+      neighbor_set.erase(current);
+  }
+}
+
+
+
 void Elem::find_edge_neighbors(std::set<const Elem *> &neighbor_set) const
 {
   neighbor_set.clear();
