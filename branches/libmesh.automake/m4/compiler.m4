@@ -687,8 +687,31 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
         # Specific flags for specific versions
         case "$GXX_VERSION" in
 
-          # Intel ICC >= v10.1
-          intel_icc_v10.1 | intel_icc_v11.x | intel_icc_v12.x)
+          # Intel ICC >= v11.x
+ 	  intel_icc_v11.x | intel_icc_v12.x)
+              # Disable some warning messages:
+              # #175: 'subscript out of range'
+              #       FIN-S application code causes many false
+              #       positives with this
+              # #266: 'function declared implicitly'
+              #       Metis function "GKfree" caused this error
+              #       in almost every file.
+              # #1476: 'field uses tail padding of a base class'
+              # #1505: 'size of class is affected by tail padding'
+              #        simply warns of a possible incompatibility with
+              #        the g++ ABI for this case
+              # #1572: 'floating-point equality and inequality comparisons are unreliable'
+              #        Well, duh, when the tested value is computed...  OK when it
+              #        was from an assignment.
+              PROFILING_FLAGS="-p"
+              CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz -par-report0 -openmp-report0"
+              CXXFLAGS_DVL="$CXXFLAGS_DVL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
+              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572"
+              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz -par-report0 -openmp-report0"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
+          intel_icc_v10.1)
               # Disable some warning messages:
               # #175: 'subscript out of range'
               #       FIN-S application code causes many false
@@ -711,6 +734,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
+	      
           # Intel ICC >= 10.0	          
           intel_icc_v10.0)		
               # Disable some warning messages:
