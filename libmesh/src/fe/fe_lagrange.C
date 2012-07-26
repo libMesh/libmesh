@@ -694,6 +694,45 @@ namespace libMesh
 		  // My global dof index.
 		  const unsigned int my_dof_g = my_dof_indices[my_dof];
 
+                  // Hunt for "constraining against myself" cases before
+                  // we bother creating a constraint row
+                  bool self_constraint = false;
+		  for (unsigned int their_dof=0;
+		       their_dof<FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
+		       their_dof++)
+		    {
+		      libmesh_assert (their_dof < parent_side->n_nodes());
+
+		      // Their global dof index.
+		      const unsigned int their_dof_g =
+			parent_dof_indices[their_dof];
+
+		      if (their_dof_g == my_dof_g)
+		        {
+		          self_constraint = true;
+		          break;
+                        }
+                    }
+
+                  if (self_constraint)
+                    continue;
+
+		  DofConstraintRow* constraint_row;
+
+		  // we may be running constraint methods concurretly
+                  // on multiple threads, so we need a lock to
+                  // ensure that this constraint is "ours"
+		  {
+		    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+                    if (dof_map.is_constrained_dof(my_dof_g))
+                      continue;
+
+		    constraint_row = &(constraints[my_dof_g].first);
+                    libmesh_assert(constraint_row->empty());
+		    constraints[my_dof_g].second = 0;
+                  }
+
 		  // The support point of the DOF
 		  const Point& support_point = my_side->point(my_dof);
 
@@ -724,16 +763,8 @@ namespace libMesh
 		      if ((std::abs(their_dof_value) > 1.e-5) &&
 			  (std::abs(their_dof_value) < .999))
 			{
-			  // since we may be running this method concurretly
-			  // on multiple threads we need to acquire a lock
-			  // before modifying the shared constraint_row object.
-			  Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-
-			  // A reference to the constraint row.
-			  DofConstraintRow& constraint_row = constraints[my_dof_g].first;
-
-			  constraint_row.insert(std::make_pair (their_dof_g,
-								their_dof_value));
+			  constraint_row->insert(std::make_pair (their_dof_g,
+								 their_dof_value));
 			}
 #ifdef DEBUG
 		      // Protect for the case u_i = 0.999 u_j,
