@@ -59,6 +59,17 @@ void FE<_dim,_type>::_func(const Elem*,        \
   libmesh_error();                                     \
 }
 
+#define FACE_EDGE_SHAPE_ERROR(_dim, _func)       \
+template <>                                    \
+ void FEMap::_func<_dim>(const std::vector<Point>&,	\
+                           const Elem* )        \
+{                                              \
+  libMesh::err << "ERROR: This method makes no sense for low-D elements!" \
+	        << std::endl;                      \
+  libmesh_error();                                     \
+}
+
+
 REINIT_ERROR(0, CLOUGH, reinit)
 REINIT_ERROR(0, CLOUGH, edge_reinit)
 SIDEMAP_ERROR(0, CLOUGH, side_map)
@@ -145,17 +156,17 @@ void FE<Dim,T>::reinit(const Elem* elem,
       this->shapes_on_quadrature = false;
 
       // Initialize the face shape functions
-      this->init_face_shape_functions (*pts, side.get());
+      this->_fe_map->template init_face_shape_functions<Dim>(*pts, side.get());
 
       // Compute the Jacobian*Weight on the face for integration
       if (weights != NULL)
         {
-          this->compute_face_map (*weights, side.get());
+          this->_fe_map->compute_face_map (Dim, *weights, side.get());
         }
       else
         {
           std::vector<Real> dummy_weights (pts->size(), 1.);
-          this->compute_face_map (dummy_weights, side.get());
+          this->_fe_map->compute_face_map (Dim, dummy_weights, side.get());
         }
     }
   // If there are no user specified points, we use the
@@ -187,18 +198,18 @@ void FE<Dim,T>::reinit(const Elem* elem,
           this->_p_level = side_p_level;
 
           // Initialize the face shape functions
-          this->init_face_shape_functions (this->qrule->get_points(),  side.get());
+          this->_fe_map->template init_face_shape_functions<Dim>(this->qrule->get_points(),  side.get());
         }
 
       // Compute the Jacobian*Weight on the face for integration
-      this->compute_face_map (this->qrule->get_weights(), side.get());
+      this->_fe_map->compute_face_map (Dim, this->qrule->get_weights(), side.get());
 
       // The shape functions correspond to the qrule
       this->shapes_on_quadrature = true;
     }
 
   // make a copy of the Jacobian for integration
-  const std::vector<Real> JxW_int(this->JxW);
+  const std::vector<Real> JxW_int(this->_fe_map->get_JxW());
 
   // make a copy of shape on quadrature info
   bool shapes_on_quadrature_side = this->shapes_on_quadrature;
@@ -221,7 +232,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   this->shapes_on_quadrature = shapes_on_quadrature_side;
 
   // copy back old data
-  this->JxW = JxW_int;
+  this->_fe_map->get_JxW() = JxW_int;
 }
 
 
@@ -249,17 +260,17 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
       this->shapes_on_quadrature = false;
 
       // Initialize the edge shape functions
-      this->init_edge_shape_functions (*pts, edge.get());
+      this->_fe_map->template init_edge_shape_functions<Dim> (*pts, edge.get());
 
       // Compute the Jacobian*Weight on the face for integration
       if (weights != NULL)
         {
-          this->compute_edge_map (*weights, edge.get());
+          this->_fe_map->compute_edge_map (Dim, *weights, edge.get());
         }
       else
         {
           std::vector<Real> dummy_weights (pts->size(), 1.);
-          this->compute_edge_map (dummy_weights, edge.get());
+          this->_fe_map->compute_edge_map (Dim, dummy_weights, edge.get());
         }
     }
   // If there are no user specified points, we use the
@@ -285,29 +296,30 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
           last_edge = edge->type();
 
           // Initialize the edge shape functions
-          this->init_edge_shape_functions (this->qrule->get_points(), edge.get());
+          this->_fe_map->template init_edge_shape_functions<Dim> (this->qrule->get_points(), edge.get());
         }
 
       // Compute the Jacobian*Weight on the face for integration
-      this->compute_edge_map (this->qrule->get_weights(), edge.get());
+      this->_fe_map->compute_edge_map (Dim, this->qrule->get_weights(), edge.get());
 
       // The shape functions correspond to the qrule
       this->shapes_on_quadrature = true;
     }
 
   // make a copy of the Jacobian for integration
-  const std::vector<Real> JxW_int(this->JxW);
+  const std::vector<Real> JxW_int(this->_fe_map->get_JxW());
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp; this->inverse_map (elem, this->xyz, qp, tolerance);
+  std::vector<Point> qp; 
+  this->inverse_map (elem, this->_fe_map->get_xyz(), qp, tolerance);
 
   // compute the shape function and derivative values
   // at the points qp
   this->reinit  (elem, &qp);
 
   // copy back old data
-  this->JxW = JxW_int;
+  this->_fe_map->get_JxW() = JxW_int;
 }
 
 template <unsigned int Dim, FEFamily T>
@@ -333,7 +345,7 @@ void FE<Dim,T>::side_map (const Elem* elem,
       last_side = side->type();
 
       // Initialize the face shape functions
-      this->init_face_shape_functions(reference_side_points, side);
+      this->_fe_map->template init_face_shape_functions<Dim>(reference_side_points, side);
     }
 
   const unsigned int n_points = reference_side_points.size();
@@ -350,25 +362,26 @@ void FE<Dim,T>::side_map (const Elem* elem,
   std::vector<Point> refspace_nodes;
   this->get_refspace_nodes(elem->type(), refspace_nodes);
 
-  for (unsigned int i=0; i<this->psi_map.size(); i++) // sum over the nodes
+  const std::vector<std::vector<Real> >& psi_map = this->_fe_map->get_psi();
+
+  for (unsigned int i=0; i<psi_map.size(); i++) // sum over the nodes
   {
     const Point& side_node = refspace_nodes[elem_nodes_map[i]];
     for (unsigned int p=0; p<n_points; p++)
-      reference_points[p].add_scaled (side_node, this->psi_map[i][p]);
+      reference_points[p].add_scaled (side_node, psi_map[i][p]);
   }
 }
 
-
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
-					  const Elem* side)
+template<unsigned int Dim>
+void FEMap::init_face_shape_functions(const std::vector<Point>& qp,
+				      const Elem* side)
 {
   libmesh_assert (side  != NULL);
 
   /**
    * Start logging the shape function initialization
    */
-  START_LOG("init_face_shape_functions()", "FE");
+  START_LOG("init_face_shape_functions()", "FEMap");
 
   // The element type and order to use in
   // the map
@@ -445,21 +458,19 @@ void FE<Dim,T>::init_face_shape_functions(const std::vector<Point>& qp,
   /**
    * Stop logging the shape function initialization
    */
-  STOP_LOG("init_face_shape_functions()", "FE");
+  STOP_LOG("init_face_shape_functions()", "FEMap");
 }
 
-
-
-template <unsigned int Dim, FEFamily T>
-void FE<Dim,T>::init_edge_shape_functions(const std::vector<Point>& qp,
-					  const Elem* edge)
+template<unsigned int Dim>
+void FEMap::init_edge_shape_functions(const std::vector<Point>& qp,
+				      const Elem* edge)
 {
   libmesh_assert (edge != NULL);
 
   /**
    * Start logging the shape function initialization
    */
-  START_LOG("init_edge_shape_functions()", "FE");
+  START_LOG("init_edge_shape_functions()", "FEMap");
 
   // The element type and order to use in
   // the map
@@ -501,17 +512,17 @@ void FE<Dim,T>::init_edge_shape_functions(const std::vector<Point>& qp,
   /**
    * Stop logging the shape function initialization
    */
-  STOP_LOG("init_edge_shape_functions()", "FE");
+  STOP_LOG("init_edge_shape_functions()", "FEMap");
 }
 
 
 
-void FEAbstract::compute_face_map(const std::vector<Real>& qw,
-				  const Elem* side)
+void FEMap::compute_face_map(int dim, const std::vector<Real>& qw,
+			     const Elem* side)
 {
   libmesh_assert (side  != NULL);
 
-  START_LOG("compute_face_map()", "FE");
+  START_LOG("compute_face_map()", "FEMap");
 
   // The number of quadrature points.
   const unsigned int n_qp = qw.size();
@@ -778,14 +789,15 @@ void FEAbstract::compute_face_map(const std::vector<Real>& qw,
       libmesh_error();
 
     }
-  STOP_LOG("compute_face_map()", "FE");
+  STOP_LOG("compute_face_map()", "FEMap");
 }
 
 
 
 
-void FEAbstract::compute_edge_map(const std::vector<Real>& qw,
-				  const Elem* edge)
+void FEMap::compute_edge_map(int dim,
+			     const std::vector<Real>& qw,
+			     const Elem* edge)
 {
   libmesh_assert (edge != NULL);
 
@@ -794,13 +806,13 @@ void FEAbstract::compute_edge_map(const std::vector<Real>& qw,
       // A 2D finite element living in either 2D or 3D space.
       // The edges here are the sides of the element, so the
       // (misnamed) compute_face_map function does what we want
-      FEAbstract::compute_face_map(qw, edge);
+      this->compute_face_map(dim, qw, edge);
       return;
     }
 
   libmesh_assert (dim == 3);  // 1D is unnecessary and currently unsupported
 
-  START_LOG("compute_edge_map()", "FE");
+  START_LOG("compute_edge_map()", "FEMap");
 
   // The number of quadrature points.
   const unsigned int n_qp = qw.size();
@@ -860,14 +872,23 @@ void FEAbstract::compute_edge_map(const std::vector<Real>& qw,
       this->JxW[p] = jac*qw[p];
     }
 
-  STOP_LOG("compute_edge_map()", "FE");
+  STOP_LOG("compute_edge_map()", "FEMap");
 }
 
 
+// Explicit FEMap Instantiations
+FACE_EDGE_SHAPE_ERROR(0,init_face_shape_functions)
+template void FEMap::init_face_shape_functions<1>(const std::vector<Point>&,const Elem*);
+template void FEMap::init_face_shape_functions<2>(const std::vector<Point>&,const Elem*);
+template void FEMap::init_face_shape_functions<3>(const std::vector<Point>&,const Elem*);
 
+FACE_EDGE_SHAPE_ERROR(0,init_edge_shape_functions)
+template void FEMap::init_edge_shape_functions<1>(const std::vector<Point>&, const Elem*);
+template void FEMap::init_edge_shape_functions<2>(const std::vector<Point>&, const Elem*);
+template void FEMap::init_edge_shape_functions<3>(const std::vector<Point>&, const Elem*);
 
 //--------------------------------------------------------------
-// Explicit instantiations
+// Explicit FE instantiations
 template void FE<1,LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<1,LAGRANGE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<1,LAGRANGE_VEC>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
@@ -935,7 +956,7 @@ template void FE<2,XYZ>::side_map(Elem const*, Elem const*, const unsigned int, 
 template void FE<2,XYZ>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 
 // Intel 9.1 complained it needed this in devel mode.
-template void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
+//template void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
 
 template void FE<3,LAGRANGE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<3,LAGRANGE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
@@ -977,6 +998,6 @@ template void FE<3,XYZ>::side_map(Elem const*, Elem const*, const unsigned int, 
 template void FE<3,XYZ>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 
 // Intel 9.1 complained it needed this in devel mode.
-template void FE<3,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
+//template void FE<3,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
 
 } // namespace libMesh

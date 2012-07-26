@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <cmath> // for std::abs
+#include <limits>
 
 // Local Includes
 #include "numeric_vector.h"

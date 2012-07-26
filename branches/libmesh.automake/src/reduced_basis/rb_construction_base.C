@@ -108,6 +108,10 @@ template <class Base>
 unsigned int RBConstructionBase<Base>::get_n_training_samples() const
 {
   libmesh_assert(training_parameters_initialized);
+  
+  if(training_parameters.empty())
+    return 0;
+  
   return training_parameters.begin()->second->size();
 }
 

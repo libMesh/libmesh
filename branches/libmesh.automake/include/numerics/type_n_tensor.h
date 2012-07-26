@@ -195,6 +195,12 @@ struct IncrementRank<TypeNTensor<N,T> >
 };
 
 template <unsigned int N, typename T>
+struct DecrementRank<TypeNTensor<N,T> >
+{
+  typedef TypeNTensor<N-1,T> type;
+};
+
+template <unsigned int N, typename T>
 struct MakeNumber<TypeNTensor<N,T> >
 {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS

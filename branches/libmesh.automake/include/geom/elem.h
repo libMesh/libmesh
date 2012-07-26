@@ -286,8 +286,8 @@ class Elem : public ReferenceCountedObject<Elem>,
 
   /**
    * This function finds all elements (including this one) which
-   * touch the current element at the specified point, which should be
-   * a point in the current element.
+   * touch the current active element at the specified point, which
+   * should be a point in the current element.
    */
   void find_point_neighbors(const Point &p,
                             std::set<const Elem *> &neighbor_set) const;
@@ -299,8 +299,18 @@ class Elem : public ReferenceCountedObject<Elem>,
   void find_point_neighbors(std::set<const Elem *> &neighbor_set) const;
 
   /**
-   * This function finds all elements which touch the current element
-   * at any edge (more precisely, at at least two points).
+   * This function finds all active elements which touch the current
+   * active element along the specified edge defined by the two points
+   * \p p1 and \p p2
+   */
+  void find_edge_neighbors(const Point& p1, 
+                           const Point& p2, 
+			   std::set<const Elem *> &neighbor_set) const;
+
+  /**
+   * This function finds all active elements which touch the current
+   * active element along any edge (more precisely, at at least two
+   * points).
    */
   void find_edge_neighbors(std::set<const Elem *> &neighbor_set) const;
 

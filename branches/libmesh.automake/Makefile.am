@@ -183,6 +183,7 @@ libmesh_la_SOURCES = \
 		src/fe/fe_type.C \
 		src/fe/fe_xyz.C \
 		src/fe/fe_xyz_boundary.C \
+		src/fe/fe_xyz_map.C \
 		src/fe/fe_xyz_shape_0D.C \
 		src/fe/fe_xyz_shape_1D.C \
 		src/fe/fe_xyz_shape_2D.C \

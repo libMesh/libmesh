@@ -232,7 +232,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
       // each and every new element), throw radial and base part together
       this->combine_base_radial (inf_elem);
 
-      this->compute_map (_total_qrule_weights, inf_elem);
+      this->_fe_map->compute_map (this->dim,_total_qrule_weights, inf_elem);
 
       // Compute the shape functions and the derivatives
       // at all quadrature points.
@@ -270,12 +270,12 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
       // weights
       if (weights != NULL)
         {
-          this->compute_map (*weights, inf_elem);
+          this->_fe_map->compute_map (this->dim, *weights, inf_elem);
         }
       else
         {
           std::vector<Real> dummy_weights (pts->size(), 1.);
-          this->compute_map (dummy_weights, inf_elem);
+          this->_fe_map->compute_map (this->dim, dummy_weights, inf_elem);
         }
 
       // finally compute the ifem shapes
@@ -566,19 +566,29 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       dphidzeta.resize     (n_total_approx_shape_functions);
 
 
+    
+    std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
+    std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
+
     phi_map.resize         (n_total_mapping_shape_functions);
     dphidxi_map.resize     (n_total_mapping_shape_functions);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+    std::vector<std::vector<Real> >& d2phidxi2_map = this->_fe_map->get_d2phidxi2_map();
     d2phidxi2_map.resize   (n_total_mapping_shape_functions);
 
     if (Dim > 1)
       {
+	std::vector<std::vector<Real> >& d2phidxideta_map = this->_fe_map->get_d2phidxideta_map();
+	std::vector<std::vector<Real> >& d2phideta2_map = this->_fe_map->get_d2phideta2_map();
         d2phidxideta_map.resize   (n_total_mapping_shape_functions);
         d2phideta2_map.resize     (n_total_mapping_shape_functions);
       }
 
     if (Dim == 3)
       {
+	std::vector<std::vector<Real> >& d2phidxidzeta_map = this->_fe_map->get_d2phidxidzeta_map();
+	std::vector<std::vector<Real> >& d2phidetadzeta_map = this->_fe_map->get_d2phidetadzeta_map();
+	std::vector<std::vector<Real> >& d2phidzeta2_map = this->_fe_map->get_d2phidzeta2_map();
         d2phidxidzeta_map.resize  (n_total_mapping_shape_functions);
         d2phidetadzeta_map.resize (n_total_mapping_shape_functions);
         d2phidzeta2_map.resize    (n_total_mapping_shape_functions);
@@ -586,10 +596,16 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
     if (Dim > 1)
-      dphideta_map.resize  (n_total_mapping_shape_functions);
+      {
+	std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
+	dphideta_map.resize  (n_total_mapping_shape_functions);
+      }
 
     if (Dim == 3)
-      dphidzeta_map.resize (n_total_mapping_shape_functions);
+      {
+	std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
+	dphidzeta_map.resize (n_total_mapping_shape_functions);
+      }
   }
 
 
@@ -639,18 +655,26 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 
     for (unsigned int i=0; i<n_total_mapping_shape_functions; i++)
       {
+	std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
+	std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
 	phi_map[i].resize         (n_total_qp);
 	dphidxi_map[i].resize     (n_total_qp);
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+	std::vector<std::vector<Real> >& d2phidxi2_map = this->_fe_map->get_d2phidxi2_map();
 	d2phidxi2_map[i].resize   (n_total_qp);
 	if (Dim > 1)
 	  {
+	    std::vector<std::vector<Real> >& d2phidxideta_map = this->_fe_map->get_d2phidxideta_map();
+	std::vector<std::vector<Real> >& d2phideta2_map = this->_fe_map->get_d2phideta2_map();
 	    d2phidxideta_map[i].resize   (n_total_qp);
 	    d2phideta2_map[i].resize     (n_total_qp);
 	  }
 
 	if (Dim > 2)
 	  {
+	    std::vector<std::vector<Real> >& d2phidxidzeta_map = this->_fe_map->get_d2phidxidzeta_map();
+	std::vector<std::vector<Real> >& d2phidetadzeta_map = this->_fe_map->get_d2phidetadzeta_map();
+	std::vector<std::vector<Real> >& d2phidzeta2_map = this->_fe_map->get_d2phidzeta2_map();
 	    d2phidxidzeta_map[i].resize  (n_total_qp);
 	    d2phidetadzeta_map[i].resize (n_total_qp);
 	    d2phidzeta2_map[i].resize    (n_total_qp);
@@ -658,10 +682,16 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 	if (Dim > 1)
-	  dphideta_map[i].resize  (n_total_qp);
+	  {
+	    std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
+	    dphideta_map[i].resize  (n_total_qp);
+	  }
 
 	if (Dim == 3)
-	  dphidzeta_map[i].resize (n_total_qp);
+	  {
+	    std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
+	    dphidzeta_map[i].resize (n_total_qp);
+	  }
       }
   }
 
@@ -763,9 +793,9 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 	const std::vector<std::vector<Real> >& S  = base_fe->phi;
 	const std::vector<std::vector<Real> >& Ss = base_fe->dphidxi;
 	const std::vector<std::vector<Real> >& St = base_fe->dphideta;
-	const std::vector<std::vector<Real> >& S_map  = base_fe->phi_map;
-	const std::vector<std::vector<Real> >& Ss_map = base_fe->dphidxi_map;
-	const std::vector<std::vector<Real> >& St_map = base_fe->dphideta_map;
+	const std::vector<std::vector<Real> >& S_map  = (base_fe->get_fe_map()).get_phi_map();
+	const std::vector<std::vector<Real> >& Ss_map = (base_fe->get_fe_map()).get_dphidxi_map();
+	const std::vector<std::vector<Real> >& St_map = (base_fe->get_fe_map()).get_dphideta_map();
 
 	const unsigned int n_radial_qp         = radial_qrule->n_points();
 	const unsigned int n_base_qp           = base_qrule->  n_points();
@@ -795,9 +825,6 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 
 	}
 
-
-
-
 	libmesh_assert (phi.size()       == n_total_approx_sf);
 	libmesh_assert (dphidxi.size()   == n_total_approx_sf);
 	libmesh_assert (dphideta.size()  == n_total_approx_sf);
@@ -820,6 +847,10 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 		    * (dmodedv[ri][rp] * som[rp] + mode[ri][rp] * dsomdv[rp]);
 	      }
 
+	std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
+	std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
+	std::vector<std::vector<Real> >& dphideta_map = this->_fe_map->get_dphideta_map();
+	std::vector<std::vector<Real> >& dphidzeta_map = this->_fe_map->get_dphidzeta_map();
 
 	libmesh_assert (phi_map.size()       == n_total_mapping_sf);
 	libmesh_assert (dphidxi_map.size()   == n_total_mapping_sf);
@@ -901,6 +932,18 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
 
     case 3:
       {
+	const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
+	const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
+	const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
+	
+	const std::vector<Real>& detadx_map = this->_fe_map->get_detadx();
+	const std::vector<Real>& detady_map = this->_fe_map->get_detady();
+	const std::vector<Real>& detadz_map = this->_fe_map->get_detadz();
+	
+	const std::vector<Real>& dzetadx_map = this->_fe_map->get_dzetadx();
+	const std::vector<Real>& dzetady_map = this->_fe_map->get_dzetady();
+	const std::vector<Real>& dzetadz_map = this->_fe_map->get_dzetadz();
+
 	// These are _all_ shape functions of this infinite element
 	for (unsigned int i=0; i<phi.size(); i++)
 	  for (unsigned int p=0; p<n_total_qp; p++)

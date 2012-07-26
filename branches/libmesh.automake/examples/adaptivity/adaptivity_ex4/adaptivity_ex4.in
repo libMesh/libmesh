@@ -1,5 +1,5 @@
 # Maximum number of refinement steps
-max_r_steps = 4
+max_r_steps = 8
 
 # Maximum refinement level for an element.
 max_r_level = 8
@@ -13,7 +13,7 @@ coarsen_percentage = 0.0
 # Option to uniformly or adaptively refine.
 # If set equal to 1, uniform refinement is done.
 # If set equal to 0, adaptive refinement is done.
-uniform_refine = 1
+uniform_refine = 0
 
 # Polynomial approximation type (SECOND, CLOUGH, or HERMITE)
 approx_type = HERMITE

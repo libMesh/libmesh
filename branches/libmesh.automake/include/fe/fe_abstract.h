@@ -27,6 +27,7 @@
 #include "enum_elem_type.h"
 #include "fe_type.h"
 #include "auto_ptr.h"
+#include "fe_map.h"
 
 // C++ includes
 #include <cstddef>
@@ -224,47 +225,47 @@ public:
    * points on the element.
    */
   const std::vector<Point>& get_xyz() const
-  { return xyz; }
+  { return this->_fe_map->get_xyz(); }
 
   /**
    * @returns the element Jacobian times the quadrature weight for
    * each quadrature point.
    */
   const std::vector<Real>& get_JxW() const
-  { return JxW; }
+  { return this->_fe_map->get_JxW(); }
 
   /**
    * @returns the element tangents in xi-direction at the quadrature
    * points.
    */
   const std::vector<RealGradient>& get_dxyzdxi() const
-  { return dxyzdxi_map; }
+  { return this->_fe_map->get_dxyzdxi(); }
 
   /**
    * @returns the element tangents in eta-direction at the quadrature
    * points.
    */
   const std::vector<RealGradient>& get_dxyzdeta() const
-  { return dxyzdeta_map; }
+  { return this->_fe_map->get_dxyzdeta(); }
 
   /**
    * @returns the element tangents in zeta-direction at the quadrature
    * points.
    */
   const std::vector<RealGradient>& get_dxyzdzeta() const
-  { return dxyzdzeta_map; }
+  { return _fe_map->get_dxyzdzeta(); }
 
   /**
    * @returns the second partial derivatives in xi.
    */
   const std::vector<RealGradient>& get_d2xyzdxi2() const
-  { return d2xyzdxi2_map; }
+  { return this->_fe_map->get_d2xyzdxi2(); }
 
   /**
    * @returns the second partial derivatives in eta.
    */
   const std::vector<RealGradient>& get_d2xyzdeta2() const
-  { return d2xyzdeta2_map; }
+  { return this->_fe_map->get_d2xyzdeta2(); }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -272,7 +273,7 @@ public:
    * @returns the second partial derivatives in zeta.
    */
   const std::vector<RealGradient>& get_d2xyzdzeta2() const
-  { return d2xyzdzeta2_map; }
+  { return this->_fe_map->get_d2xyzdzeta2(); }
 
 #endif
 
@@ -280,7 +281,7 @@ public:
    * @returns the second partial derivatives in xi-eta.
    */
   const std::vector<RealGradient>& get_d2xyzdxideta() const
-  { return d2xyzdxideta_map; }
+  { return this->_fe_map->get_d2xyzdxideta(); }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -288,13 +289,13 @@ public:
    * @returns the second partial derivatives in xi-zeta.
    */
   const std::vector<RealGradient>& get_d2xyzdxidzeta() const
-  { return d2xyzdxidzeta_map; }
+  { return this->_fe_map->get_d2xyzdxidzeta(); }
 
   /**
    * @returns the second partial derivatives in eta-zeta.
    */
   const std::vector<RealGradient>& get_d2xyzdetadzeta() const
-  { return d2xyzdetadzeta_map; }
+  { return this->_fe_map->get_d2xyzdetadzeta(); }
 
 #endif
 
@@ -303,81 +304,81 @@ public:
    * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dxidx() const
-  { return dxidx_map; }
+  { return this->_fe_map->get_dxidx(); }
 
   /**
    * @returns the dxi/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dxidy() const
-  { return dxidy_map; }
+  { return this->_fe_map->get_dxidy(); }
 
   /**
    * @returns the dxi/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dxidz() const
-  { return dxidz_map; }
+  { return this->_fe_map->get_dxidz(); }
 
   /**
    * @returns the deta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_detadx() const
-  { return detadx_map; }
+  { return this->_fe_map->get_detadx(); }
 
   /**
    * @returns the deta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_detady() const
-  { return detady_map; }
+  { return this->_fe_map->get_detady(); }
 
   /**
    * @returns the deta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_detadz() const
-  { return detadz_map; }
+  { return this->_fe_map->get_detadz(); }
 
   /**
    * @returns the dzeta/dx entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dzetadx() const
-  { return dzetadx_map; }
+  { return this->_fe_map->get_dzetadx(); }
 
   /**
    * @returns the dzeta/dy entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dzetady() const
-  { return dzetady_map; }
+  { return this->_fe_map->get_dzetady(); }
 
   /**
    * @returns the dzeta/dz entry in the transformation
    * matrix from physical to local coordinates.
    */
   const std::vector<Real>& get_dzetadz() const
-  { return dzetadz_map; }
+  { return this->_fe_map->get_dzetadz(); }
 
   /**
    * @returns the tangent vectors for face integration.
    */
   const std::vector<std::vector<Point> >& get_tangents() const
-  { return tangents; }
+  { return this->_fe_map->get_tangents(); }
 
   /**
    * @returns the normal vectors for face integration.
    */
   const std::vector<Point>& get_normals() const
-  { return normals; }
+  { return this->_fe_map->get_normals(); }
 
   /**
    * @returns the curvatures for use in face integration.
    */
   const std::vector<Real>& get_curvatures() const
-  { return curvatures;}
+  { return this->_fe_map->get_curvatures();}
 
   /**
    * Provides the class with the quadrature rule.  Implement
@@ -438,6 +439,11 @@ public:
   FEFamily get_family()  const { return fe_type.family; }
 
   /**
+   * @returns the mapping object
+   */
+  const FEMap& get_fe_map() const { return *_fe_map.get(); }
+
+  /**
    * Prints the Jacobian times the weight for each quadrature point.
    */
   void print_JxW(std::ostream& os) const;
@@ -486,52 +492,9 @@ public:
 
 protected:
 
-
-  /**
-   * Compute the jacobian and some other additional
-   * data fields. Takes the integration weights
-   * as input, along with a pointer to the element.
-   */
-  virtual void compute_map(const std::vector<Real>& qw,
-			   const Elem* e);
-
-  /**
-   * Compute the jacobian and some other additional
-   * data fields. Takes the integration weights
-   * as input, along with a pointer to the element.
-   * The element is assumed to have a constant Jacobian
-   */
-  virtual void compute_affine_map(const std::vector<Real>& qw,
-				  const Elem* e);
-
-  /**
-   * Compute the jacobian and some other additional
-   * data fields at the single point with index p.
-   */
-  void compute_single_point_map(const std::vector<Real>& qw,
-		                const Elem* e,
-				unsigned int p);
-  
-  /**
-   * A utility function for use by compute_*_map
-   */
-  void resize_map_vectors(unsigned int n_qp);
-
-  /**
-   * Same as compute_map, but for a side.  Useful for boundary integration.
-   */
-  void compute_face_map(const std::vector<Real>& qw,
-			const Elem* side);
-
-  /**
-   * Same as before, but for an edge.  Useful for some projections.
-   */
-  void compute_edge_map(const std::vector<Real>& qw,
-			const Elem* side);
-
   /**
    * After having updated the jacobian and the transformation
-   * from local to global coordinates in \p FEAbstract::compute_map(),
+   * from local to global coordinates in \p FEMap::compute_map(),
    * the first derivatives of the shape functions are
    * transformed to global coordinates, giving \p dphi,
    * \p dphidx, \p dphidy, and \p dphidz. This method
@@ -542,197 +505,14 @@ protected:
    * the shape functions are vector-valued or not.
    */
   virtual void compute_shape_functions(const Elem*) =0;
-
-  /**
-   * Used in \p FEAbstract::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the x value of the pth entry of the dxzydxi_map.
-   */
-  Real dxdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](0); }
-
-  /**
-   * Used in \p FEAbstract::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the y value of the pth entry of the dxzydxi_map.
-   */
-  Real dydxi_map(const unsigned int p) const   { return dxyzdxi_map[p](1); }
-
-  /**
-   * Used in \p FEAbstract::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the z value of the pth entry of the dxzydxi_map.
-   */
-  Real dzdxi_map(const unsigned int p) const   { return dxyzdxi_map[p](2); }
-
-  /**
-   * Used in \p FEAbstract::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the x value of the pth entry of the dxzydeta_map.
-   */
-  Real dxdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](0); }
-
-  /**
-   * Used in \p FEAbstract::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the y value of the pth entry of the dxzydeta_map.
-   */
-  Real dydeta_map(const unsigned int p) const  { return dxyzdeta_map[p](1); }
-
-  /**
-   * Used in \p FEAbstract::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the z value of the pth entry of the dxzydeta_map.
-   */
-  Real dzdeta_map(const unsigned int p) const  { return dxyzdeta_map[p](2); }
-
-  /**
-   * Used in \p FEAbstract::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the x value of the pth entry of the dxzydzeta_map.
-   */
-  Real dxdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](0); }
-
-  /**
-   * Used in \p FEAbstract::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the y value of the pth entry of the dxzydzeta_map.
-   */
-  Real dydzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](1); }
-
-  /**
-   * Used in \p FEAbstract::compute_map(), which should be
-   * be usable in derived classes, and therefore protected.
-   * Returns the z value of the pth entry of the dxzydzeta_map.
-   */
-  Real dzdzeta_map(const unsigned int p) const { return dxyzdzeta_map[p](2); }
-
-
-
+  
+  AutoPtr<FEMap> _fe_map;
 
 
   /**
    * The dimensionality of the object
    */
   const unsigned int dim;
-
-  /**
-   * The spatial locations of the quadrature points
-   */
-  std::vector<Point> xyz;
-
-  /**
-   * Vector of parital derivatives:
-   * d(x)/d(xi), d(y)/d(xi), d(z)/d(xi)
-   */
-  std::vector<RealGradient> dxyzdxi_map;
-
-  /**
-   * Vector of parital derivatives:
-   * d(x)/d(eta), d(y)/d(eta), d(z)/d(eta)
-   */
-  std::vector<RealGradient> dxyzdeta_map;
-
-  /**
-   * Vector of parital derivatives:
-   * d(x)/d(zeta), d(y)/d(zeta), d(z)/d(zeta)
-   */
-  std::vector<RealGradient> dxyzdzeta_map;
-
-  /**
-   * Vector of second partial derivatives in xi:
-   * d^2(x)/d(xi)^2, d^2(y)/d(xi)^2, d^2(z)/d(xi)^2
-   */
-  std::vector<RealGradient> d2xyzdxi2_map;
-
-  /**
-   * Vector of mixed second partial derivatives in xi-eta:
-   * d^2(x)/d(xi)d(eta) d^2(y)/d(xi)d(eta) d^2(z)/d(xi)d(eta)
-   */
-  std::vector<RealGradient> d2xyzdxideta_map;
-
-  /**
-   * Vector of second partial derivatives in eta:
-   * d^2(x)/d(eta)^2
-   */
-  std::vector<RealGradient> d2xyzdeta2_map;
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-  /**
-   * Vector of second partial derivatives in xi-zeta:
-   * d^2(x)/d(xi)d(zeta), d^2(y)/d(xi)d(zeta), d^2(z)/d(xi)d(zeta)
-   */
-  std::vector<RealGradient> d2xyzdxidzeta_map;
-
-  /**
-   * Vector of mixed second partial derivatives in eta-zeta:
-   * d^2(x)/d(eta)d(zeta) d^2(y)/d(eta)d(zeta) d^2(z)/d(eta)d(zeta)
-   */
-  std::vector<RealGradient> d2xyzdetadzeta_map;
-
-  /**
-   * Vector of second partial derivatives in zeta:
-   * d^2(x)/d(zeta)^2
-   */
-  std::vector<RealGradient> d2xyzdzeta2_map;
-
-#endif
-
-  /**
-   * Map for partial derivatives:
-   * d(xi)/d(x). Needed for the Jacobian.
-   */
-  std::vector<Real>  dxidx_map;
-
-  /**
-   * Map for partial derivatives:
-   * d(xi)/d(y). Needed for the Jacobian.
-   */
-  std::vector<Real>  dxidy_map;
-
-  /**
-   * Map for partial derivatives:
-   * d(xi)/d(z). Needed for the Jacobian.
-   */
-  std::vector<Real>  dxidz_map;
-
-
-  /**
-   * Map for partial derivatives:
-   * d(eta)/d(x). Needed for the Jacobian.
-   */
-  std::vector<Real>  detadx_map;
-
-  /**
-   * Map for partial derivatives:
-   * d(eta)/d(y). Needed for the Jacobian.
-   */
-  std::vector<Real>  detady_map;
-
-  /**
-   * Map for partial derivatives:
-   * d(eta)/d(z). Needed for the Jacobian.
-   */
-  std::vector<Real>  detadz_map;
-
-
-  /**
-   * Map for partial derivatives:
-   * d(zeta)/d(x). Needed for the Jacobian.
-   */
-  std::vector<Real>  dzetadx_map;
-
-  /**
-   * Map for partial derivatives:
-   * d(zeta)/d(y). Needed for the Jacobian.
-   */
-  std::vector<Real>  dzetady_map;
-
-  /**
-   * Map for partial derivatives:
-   * d(zeta)/d(z). Needed for the Jacobian.
-   */
-  std::vector<Real>  dzetadz_map;
 
   /**
    * Have calculations with this object already been started?
@@ -754,120 +534,6 @@ protected:
    * Should we calculate shape function hessians?
    */
   mutable bool calculate_d2phi;
-
-  /**
-   * Map for the shape function phi.
-   */
-  std::vector<std::vector<Real> >   phi_map;
-
-  /**
-   * Map for the derivative, d(phi)/d(xi).
-   */
-  std::vector<std::vector<Real> >   dphidxi_map;
-
-  /**
-   * Map for the derivative, d(phi)/d(eta).
-   */
-  std::vector<std::vector<Real> >   dphideta_map;
-
-  /**
-   * Map for the derivative, d(phi)/d(zeta).
-   */
-  std::vector<std::vector<Real> >   dphidzeta_map;
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-  /**
-   * Map for the second derivative, d^2(phi)/d(xi)^2.
-   */
-  std::vector<std::vector<Real> >   d2phidxi2_map;
-
-  /**
-   * Map for the second derivative, d^2(phi)/d(xi)d(eta).
-   */
-  std::vector<std::vector<Real> >   d2phidxideta_map;
-
-  /**
-   * Map for the second derivative, d^2(phi)/d(xi)d(zeta).
-   */
-  std::vector<std::vector<Real> >   d2phidxidzeta_map;
-
-  /**
-   * Map for the second derivative, d^2(phi)/d(eta)^2.
-   */
-  std::vector<std::vector<Real> >   d2phideta2_map;
-
-  /**
-   * Map for the second derivative, d^2(phi)/d(eta)d(zeta).
-   */
-  std::vector<std::vector<Real> >   d2phidetadzeta_map;
-
-  /**
-   * Map for the second derivative, d^2(phi)/d(zeta)^2.
-   */
-  std::vector<std::vector<Real> >   d2phidzeta2_map;
-
-#endif
-
-  /**
-   * Map for the side shape functions, psi.
-   */
-  std::vector<std::vector<Real> >   psi_map;
-
-  /**
-   * Map for the derivative of the side functions,
-   * d(psi)/d(xi).
-   */
-  std::vector<std::vector<Real> >   dpsidxi_map;
-
-  /**
-   * Map for the derivative of the side function,
-   * d(psi)/d(eta).
-   */
-  std::vector<std::vector<Real> >   dpsideta_map;
-
-  /**
-   * Map for the second derivatives (in xi) of the
-   * side shape functions.  Useful for computing
-   * the curvature at the quadrature points.
-   */
-  std::vector<std::vector<Real> > d2psidxi2_map;
-
-  /**
-   * Map for the second (cross) derivatives in xi, eta
-   * of the side shape functions.  Useful for
-   * computing the curvature at the quadrature points.
-   */
-  std::vector<std::vector<Real> > d2psidxideta_map;
-
-  /**
-   * Map for the second derivatives (in eta) of the
-   * side shape functions.  Useful for computing the
-   * curvature at the quadrature points.
-   */
-  std::vector<std::vector<Real> > d2psideta2_map;
-
-  /**
-   * Tangent vectors on boundary at quadrature points.
-   */
-  std::vector<std::vector<Point> >  tangents;
-
-  /**
-   * Normal vectors on boundary at quadrature points
-   */
-  std::vector<Point>                normals;
-
-  /**
-   * The mean curvature (= one half the sum of the principal
-   * curvatures) on the boundary at the quadrature points.
-   * The mean curvature is a scalar value.
-   */
-  std::vector<Real>                 curvatures;
-
-  /**
-   * Jacobian*Weight values at quadrature points
-   */
-  std::vector<Real>                 JxW;
 
   /**
    * The finite element type for this object.  Note that this
@@ -916,54 +582,12 @@ protected:
 inline
 FEAbstract::FEAbstract(const unsigned int d,
 		       const FEType& fet) :
+  _fe_map( FEMap::build(fet) ),
   dim(d),
-  xyz(),
-  dxyzdxi_map(),
-  dxyzdeta_map(),
-  dxyzdzeta_map(),
-  d2xyzdxi2_map(),
-  d2xyzdxideta_map(),
-  d2xyzdeta2_map(),
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  d2xyzdxidzeta_map(),
-  d2xyzdetadzeta_map(),
-  d2xyzdzeta2_map(),
-#endif
-  dxidx_map(),
-  dxidy_map(),
-  dxidz_map(),
-  detadx_map(),
-  detady_map(),
-  detadz_map(),
-  dzetadx_map(),
-  dzetady_map(),
-  dzetadz_map(),
   calculations_started(false),
   calculate_phi(false),
   calculate_dphi(false),
   calculate_d2phi(false),
-  phi_map(),
-  dphidxi_map(),
-  dphideta_map(),
-  dphidzeta_map(),
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  d2phidxi2_map(),
-  d2phidxideta_map(),
-  d2phidxidzeta_map(),
-  d2phideta2_map(),
-  d2phidetadzeta_map(),
-  d2phidzeta2_map(),
-#endif
-  psi_map(),
-  dpsidxi_map(),
-  dpsideta_map(),
-  d2psidxi2_map(),
-  d2psidxideta_map(),
-  d2psideta2_map(),
-  tangents(),
-  normals(),
-  curvatures(),
-  JxW(),
   fe_type(fet),
   elem_type(INVALID_ELEM),
   _p_level(0),
