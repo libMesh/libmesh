@@ -449,20 +449,6 @@ protected:
   virtual void init_shape_functions(const std::vector<Point>& qp,
 				    const Elem* e);
 
-  /**
-   * Same as before, but for a side. This is used for boundary
-   * integration.
-   */
-  void init_face_shape_functions(const std::vector<Point>& qp,
-				 const Elem* side);
-
-  /**
-   * Same as before, but for an edge. This is used for some projection
-   * operators.
-   */
-  void init_edge_shape_functions(const std::vector<Point>& qp,
-				 const Elem* edge);
-
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**
