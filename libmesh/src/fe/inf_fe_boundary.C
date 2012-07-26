@@ -90,21 +90,22 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
 
 
   // compute the face map
-  this->compute_face_map (_total_qrule_weights, side.get());
+  this->_fe_map->compute_face_map(this->dim, _total_qrule_weights, side.get());
 
   // make a copy of the Jacobian for integration
-  const std::vector<Real> JxW_int(JxW);
+  const std::vector<Real> JxW_int(this->_fe_map->get_JxW());
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp; this->inverse_map (inf_elem, xyz, qp, tolerance);
+  std::vector<Point> qp; this->inverse_map (inf_elem, this->_fe_map->get_xyz(), 
+					    qp, tolerance);
 
   // compute the shape function and derivative values
   // at the points qp
   this->reinit  (inf_elem, &qp);
 
   // copy back old data
-  JxW = JxW_int;
+  this->_fe_map->get_JxW() = JxW_int;
 
 }
 
@@ -219,12 +220,18 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
     // rezise map data fields
     {
+      std::vector<std::vector<Real> >& psi_map = this->_fe_map->get_psi();
+      std::vector<std::vector<Real> >& dpsidxi_map = this->_fe_map->get_dpsidxi();
+      std::vector<std::vector<Real> >& d2psidxi2_map = this->_fe_map->get_d2psidxi2();
       psi_map.resize          (n_total_mapping_shape_functions);
       dpsidxi_map.resize      (n_total_mapping_shape_functions);
       d2psidxi2_map.resize    (n_total_mapping_shape_functions);
 
       //  if (Dim == 3)
       {
+	std::vector<std::vector<Real> >& dpsideta_map = this->_fe_map->get_dpsideta();
+	std::vector<std::vector<Real> >& d2psidxideta_map = this->_fe_map->get_d2psidxideta();
+	std::vector<std::vector<Real> >& d2psideta2_map = this->_fe_map->get_d2psideta2();
 	dpsideta_map.resize     (n_total_mapping_shape_functions);
 	d2psidxideta_map.resize (n_total_mapping_shape_functions);
 	d2psideta2_map.resize   (n_total_mapping_shape_functions);
@@ -238,6 +245,9 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
 	  // if (Dim == 3)
 	  {
+	    std::vector<std::vector<Real> >& dpsideta_map = this->_fe_map->get_dpsideta();
+	    std::vector<std::vector<Real> >& d2psidxideta_map = this->_fe_map->get_d2psidxideta();
+	    std::vector<std::vector<Real> >& d2psideta2_map = this->_fe_map->get_d2psideta2();
 	    dpsideta_map[i].resize     (n_total_qp);
 	    d2psidxideta_map[i].resize (n_total_qp);
 	    d2psideta2_map[i].resize   (n_total_qp);
@@ -248,8 +258,12 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 
     // compute shape maps
     {
-      const std::vector<std::vector<Real> >& S_map  = base_fe->phi_map;
-      const std::vector<std::vector<Real> >& Ss_map = base_fe->dphidxi_map;
+      const std::vector<std::vector<Real> >& S_map  = (base_fe->get_fe_map()).get_phi_map();
+      const std::vector<std::vector<Real> >& Ss_map = (base_fe->get_fe_map()).get_dphidxi_map();
+
+      std::vector<std::vector<Real> >& psi_map = this->_fe_map->get_psi();
+      std::vector<std::vector<Real> >& dpsidxi_map = this->_fe_map->get_dpsidxi();
+      std::vector<std::vector<Real> >& dpsideta_map = this->_fe_map->get_dpsideta();
 
       for (unsigned int rp=0; rp<n_radial_qp; rp++)  // over radial qp's
 	for (unsigned int bp=0; bp<n_base_qp; bp++)  // over base qp's

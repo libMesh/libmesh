@@ -822,16 +822,14 @@ bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Re
 
 void FEAbstract::print_JxW(std::ostream& os) const
 {
-  for (unsigned int i=0; i<JxW.size(); ++i)
-    os << " [" << i << "]: " <<  JxW[i] << std::endl;
+  this->_fe_map->print_JxW(os);
 }
 
 
 
 void FEAbstract::print_xyz(std::ostream& os) const
 {
-  for (unsigned int i=0; i<xyz.size(); ++i)
-    os << " [" << i << "]: " << xyz[i];
+  this->_fe_map->print_xyz(os);
 }
 
 
@@ -849,8 +847,6 @@ void FEAbstract::print_info(std::ostream& os) const
   os << "Values of JxW at the quadrature pts." << std::endl;
   this->print_JxW(os);
 }
-
-
 
 
 std::ostream& operator << (std::ostream& os, const FEAbstract& fe)
