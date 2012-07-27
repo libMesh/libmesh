@@ -999,8 +999,8 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem*)
 		    d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p];
 #endif
 		}
-#endif
 	  }
+#endif
 	// All done
 	break;
       }
@@ -1086,8 +1086,8 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem*)
 		    d2phideta2[i][p]*detadz_map[p]*detadz_map[p];
 #endif
 		}
-#endif
 	  }
+#endif
 	// All done
 	break;
       }
@@ -1204,8 +1204,8 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem*)
 		    d2phideta2[i][p]*detadz_map[p]*detadz_map[p] +
 		    d2phidzeta2[i][p]*dzetadz_map[p]*dzetadz_map[p];
 		}
-#endif
 	  }
+#endif
 
 	// All done
 	break;
