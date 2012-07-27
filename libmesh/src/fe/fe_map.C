@@ -759,7 +759,7 @@ void FEMap::compute_affine_map( const unsigned int dim,
 #endif
             }
         }
-      jac[p] = JxW[0];
+      jac[p] = jac[0];
       JxW[p] = JxW[0] / qw[0] * qw[p];
     }
 
