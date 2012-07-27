@@ -966,7 +966,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   // With a parallelized Mesh, we've computed our local constraints,
   // but they may depend on non-local constraints that we'll need to
   // take into account.
-  if (possible_global_constraints)
+  if (!mesh.is_serial())
     this->allgather_recursive_constraints(mesh);
 
   STOP_LOG("create_dof_constraints()", "DofMap");
