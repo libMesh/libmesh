@@ -112,14 +112,10 @@ void LaspackVector<T>::reciprocal()
 
   for (unsigned int i=0; i<n; i++)
     {
-      Real v = (*this)(i);
+      T v = (*this)(i);
 
-      // Don't divide by zero (maybe only check this in debug mode?)
-      if (std::abs(v) < std::numeric_limits<T>::min())
-        {
-          libMesh::err << "Error, divide by zero in DistributedVector<T>::reciprocal()!" << std::endl;
-          libmesh_error();
-        }
+      // Don't divide by zero!
+      libmesh_assert (v != T(0));
 
       this->set(i, 1. / v);
     }

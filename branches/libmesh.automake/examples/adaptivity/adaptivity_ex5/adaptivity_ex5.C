@@ -249,13 +249,8 @@ int main (int argc, char** argv)
       // will be approximated using first-order approximation.
       system.add_variable ("u", FIRST);
 
-      // Give the system a pointer to the matrix assembly
-      // and initialization functions.
-      system.attach_assemble_function (assemble_cd);
+      // Give the system a pointer to the initialization function.
       system.attach_init_function (init_cd);
-
-      // Initialize the data structures for the equation system.
-      equation_systems.init ();
     }
   // Otherwise we read in the solution and mesh
   else 
@@ -268,26 +263,53 @@ int main (int argc, char** argv)
 
       // Read in the solution stored in "saved_solution.xda"
       equation_systems.read("saved_solution.xdr", libMeshEnums::DECODE);
-
-      // Get a reference to the system so that we can call update() on it
-      TransientLinearImplicitSystem & system = 
-        equation_systems.get_system<TransientLinearImplicitSystem> 
-        ("Convection-Diffusion");
-
-      // We need to call update to put system in a consistent state
-      // with the solution that was read in
-      system.update();
-
-      // Attach the same matrix assembly function as above. Note, we do not
-      // have to attach an init() function since we are initializing the
-      // system by reading in "saved_solution.xda"
-      system.attach_assemble_function (assemble_cd);
-
-      // Print out the H1 norm of the saved solution, for verification purposes:
-      Real H1norm = system.calculate_norm(*system.solution, SystemNorm(H1));
-
-      std::cout << "Initial H1 norm = " << H1norm << std::endl << std::endl;
     }
+
+  // Get a reference to the system so that we can attach things to it
+  TransientLinearImplicitSystem & system = 
+    equation_systems.get_system<TransientLinearImplicitSystem> 
+    ("Convection-Diffusion");
+
+  // Give the system a pointer to the assembly function.
+  system.attach_assemble_function (assemble_cd);
+
+  // Creating and attaching Periodic Boundaries
+  DofMap & dof_map = system.get_dof_map();
+  
+  // Create a boundary periodic with one displaced 2.0 in the x
+  // direction
+  PeriodicBoundary horz(RealVectorValue(2.0, 0., 0.));
+
+  // Connect boundary ids 3 and 1 with it
+  horz.myboundary = 3;
+  horz.pairedboundary = 1;
+
+  // Add it to the PeriodicBoundaries
+  dof_map.add_periodic_boundary(horz);
+
+  
+  // Create a boundary periodic with one displaced 2.0 in the y
+  // direction
+  PeriodicBoundary vert(RealVectorValue(0., 2.0, 0.));
+
+  // Connect boundary ids 0 and 2 with it
+  vert.myboundary = 0;
+  vert.pairedboundary = 2;
+
+  // Add it to the PeriodicBoundaries
+  dof_map.add_periodic_boundary(vert);
+
+  // Initialize the data structures for the equation system.
+  if(!read_solution)
+    equation_systems.init ();
+  else
+    equation_systems.reinit ();
+ 
+  // Print out the H1 norm of the initialized or saved solution, for
+  // verification purposes:
+  Real H1norm = system.calculate_norm(*system.solution, SystemNorm(H1));
+
+  std::cout << "Initial H1 norm = " << H1norm << std::endl << std::endl;
 
   // Prints information about the system to the screen.
   equation_systems.print_info();
@@ -339,40 +361,9 @@ int main (int argc, char** argv)
   // \p solve() member at each time step.  This will assemble the
   // system and call the linear solver.
 
-  TransientLinearImplicitSystem& system =
-	equation_systems.get_system<TransientLinearImplicitSystem>
-          ("Convection-Diffusion");
-
   const Real dt = 0.025;
   system.time   = init_timestep*dt;
-
-  // Creating and attaching Periodic Boundaries
-  DofMap & dof_map = system.get_dof_map();
-
-  
-  // Create a boundary periodic with one displaced 2.0 in the x
-  // direction
-  PeriodicBoundary horz(RealVectorValue(2.0, 0., 0.));
-
-  // Connect boundary ids 3 and 1 with it
-  horz.myboundary = 3;
-  horz.pairedboundary = 1;
-
-  // Add it to the PeriodicBoundaries
-  dof_map.add_periodic_boundary(horz);
-
-  
-  // Create a boundary periodic with one displaced 2.0 in the y
-  // direction
-  PeriodicBoundary vert(RealVectorValue(0., 2.0, 0.));
-
-  // Connect boundary ids 0 and 2 with it
-  vert.myboundary = 0;
-  vert.pairedboundary = 2;
-
-  // Add it to the PeriodicBoundaries
-  dof_map.add_periodic_boundary(vert);
-  
+ 
   
   // Tell the MeshRefinement object about the periodic boundaries so
   // that it can get heuristics like level-one conformity and
@@ -745,48 +736,6 @@ void assemble_cd (EquationSystems& es,
             } 
         } 
 
-      // At this point the interior element integration has
-      // been completed.  However, we have not yet addressed
-      // boundary conditions.  For this example we will only
-      // consider simple Dirichlet boundary conditions imposed
-      // via the penalty method. 
-      //        
-      // The following loops over the sides of the element.
-      // If the element has no neighbor on a side then that
-      // side MUST live on a boundary of the domain.
-      {
-        // The penalty value.  
-        const Real penalty = 1.e10;
-
-        // The following loops over the sides of the element.
-        // If the element has no neighbor on a side then that
-        // side MUST live on a boundary of the domain.
-        for (unsigned int s=0; s<elem->n_sides(); s++)
-          if (elem->neighbor(s) == NULL)
-            {
-              fe_face->reinit(elem,s);
-              
-              for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                {
-                  const Number value = 
-                    parsed_solution ?
-                      (*parsed_solution)(qface_points[qp], time) :
-                      exact_solution (qface_points[qp](0),
-                                      qface_points[qp](1), time);
-                                                       
-                  // RHS contribution
-                  for (unsigned int i=0; i<psi.size(); i++)
-                    Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
-
-                  // Matrix contribution
-                  for (unsigned int i=0; i<psi.size(); i++)
-                    for (unsigned int j=0; j<psi.size(); j++)
-                      Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
-                }
-            } 
-      } 
-
-      
       // We have now built the element matrix and RHS vector in terms
       // of the element degrees of freedom.  However, it is possible
       // that some of the element DOFs are constrained to enforce

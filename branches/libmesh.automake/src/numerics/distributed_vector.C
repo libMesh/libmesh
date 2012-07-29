@@ -210,12 +210,8 @@ void DistributedVector<T>::reciprocal()
 {
   for (unsigned int i=0; i<local_size(); i++)
     {
-      // Don't divide by zero (maybe only check this in debug mode?)
-      if (std::abs(_values[i]) < std::numeric_limits<T>::min())
-        {
-          libMesh::err << "Error, divide by zero in DistributedVector<T>::reciprocal()!" << std::endl;
-          libmesh_error();
-        }
+      // Don't divide by zero
+      libmesh_assert(_values[i] != T(0));
 
       _values[i] = 1. / _values[i];
     }
