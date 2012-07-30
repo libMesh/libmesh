@@ -9,3 +9,9 @@ dimension = 2
 
 # Nonlinear solver tolerance
 relative_step_tolerance = 1e-6
+
+initial_linear_tolerance = 1.0e-14
+
+relative_residual_tolerance = 1.0e-12
+
+max_linear_iterations = 5000
