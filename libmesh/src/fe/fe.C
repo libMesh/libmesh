@@ -23,7 +23,7 @@
 #include "libmesh_logging.h"
 #include "fe_macro.h"
 #include "quadrature.h"
-
+#include "fe_interface.h"
 
 namespace libMesh
 {
@@ -206,15 +206,6 @@ void FE<Dim,T>::reinit(const Elem* elem,
 
   // Compute the map for this element.  In the future we can specify
   // different types of maps
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (this->calculate_d2phi && !elem->has_affine_map())
-    {
-      libmesh_do_once(
-        libMesh::err << "WARNING: Second derivatives are not currently "
-                      << "correctly calculated on non-affine elements!"
-                      << std::endl;);
-    }
-#endif
   if (pts != NULL)
     {
       if (weights != NULL)
@@ -235,7 +226,12 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // Compute the shape functions and the derivatives at all of the
   // quadrature points.
   if (!cached_nodes_still_fit)
-    this->compute_shape_functions (elem);
+    {
+      if (pts != NULL)
+	  this->compute_shape_functions (elem,*pts);
+      else
+	this->compute_shape_functions(elem,this->qrule->get_points());
+    }
 }
 
 
@@ -250,11 +246,26 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   // If the user forgot to request anything, we'll be safe and
   // calculate everything:
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi)
-    this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = true;
+  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi 
+      && !this->calculate_curl_phi && !this->calculate_div_phi)
+    {
+      this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = this->calculate_dphiref = true;
+      if( FEInterface::field_type(T) == TYPE_VECTOR )
+	{
+	  this->calculate_curl_phi = true;
+	  this->calculate_div_phi  = true;
+	}
+    }
 #else
-  if (!this->calculate_phi && !this->calculate_dphi)
-    this->calculate_phi = this->calculate_dphi = true;
+  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_curl_phi && !this->calculate_div_phi)
+    {
+      this->calculate_phi = this->calculate_dphi = this->calculate_dphiref = true;
+      if( FEInterface::field_type(T) == TYPE_VECTOR )
+	{
+	  this->calculate_curl_phi = true;
+	  this->calculate_div_phi  = true;
+	}
+    }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   // Start logging the shape function initialization
@@ -282,7 +293,10 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       this->dphidx.resize  (n_approx_shape_functions);
       this->dphidy.resize  (n_approx_shape_functions);
       this->dphidz.resize  (n_approx_shape_functions);
+    }
 
+  if(this->calculate_dphiref)
+    {
       if (Dim > 0)
         this->dphidxi.resize (n_approx_shape_functions);
 
@@ -292,6 +306,13 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       if (Dim > 2)
         this->dphidzeta.resize     (n_approx_shape_functions);
     }
+  
+  if( this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
+    this->curl_phi.resize(n_approx_shape_functions);
+
+  if( this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
+    this->div_phi.resize(n_approx_shape_functions);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   if (this->calculate_d2phi)
     {
@@ -330,15 +351,26 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
           this->dphidx[i].resize      (n_qp);
           this->dphidy[i].resize      (n_qp);
           this->dphidz[i].resize      (n_qp);
-          if (Dim > 0)
-          this->dphidxi[i].resize     (n_qp);
+        }
+      
+      if(this->calculate_dphiref)
+	{
+	  if (Dim > 0)
+	    this->dphidxi[i].resize(n_qp);
 
           if (Dim > 1)
-            this->dphideta[i].resize  (n_qp);
+            this->dphideta[i].resize(n_qp);
 
           if (Dim > 2)
-            this->dphidzeta[i].resize (n_qp);
-        }
+            this->dphidzeta[i].resize(n_qp);
+	}
+
+      if(this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
+	this->curl_phi[i].resize(n_qp);
+
+      if(this->calculate_div_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
+	this->div_phi[i].resize(n_qp);
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       if (this->calculate_d2phi)
         {
@@ -396,27 +428,15 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       // 0D
     case 0:
       {
-	// Compute the value of the approximation shape function i at quadrature point p
-	if (this->calculate_phi)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
-	      this->phi[i][p]      = FE<Dim,T>::shape       (elem, this->fe_type.order, i,    qp[p]);
-	
-        break;
+	break;
       }
-
-
 
       //------------------------------------------------------------
       // 1D
     case 1:
       {
 	// Compute the value of the approximation shape function i at quadrature point p
-	if (this->calculate_phi)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
-	      this->phi[i][p]      = FE<Dim,T>::shape       (elem, this->fe_type.order, i,    qp[p]);
-	if (this->calculate_dphi)
+	if (this->calculate_dphiref)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
 	      this->dphidxi[i][p]  = FE<Dim,T>::shape_deriv (elem, this->fe_type.order, i, 0, qp[p]);
@@ -437,11 +457,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
     case 2:
       {
 	// Compute the value of the approximation shape function i at quadrature point p
-	if (this->calculate_phi)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
-	      this->phi[i][p]      = FE<Dim,T>::shape       (elem, this->fe_type.order, i,    qp[p]);
-	if (this->calculate_dphi)
+	if (this->calculate_dphiref)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
 	      {
@@ -470,11 +486,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
     case 3:
       {
 	// Compute the value of the approximation shape function i at quadrature point p
-	if (this->calculate_phi)
-	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
-	      this->phi[i][p]       = FE<Dim,T>::shape       (elem, this->fe_type.order, i,    qp[p]);
-	if (this->calculate_dphi)
+	if (this->calculate_dphiref)
 	  for (unsigned int i=0; i<n_approx_shape_functions; i++)
 	    for (unsigned int p=0; p<n_qp; p++)
 	      {
