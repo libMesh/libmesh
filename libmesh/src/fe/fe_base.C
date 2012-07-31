@@ -2016,10 +2016,13 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 		      {
 #ifndef NDEBUG
 		        const Real their_dof_value = Ue[is](js);
-		        libmesh_assert(std::abs(their_dof_value-1.) < 1.e-5);
+		        libmesh_assert(std::abs(their_dof_value-1.) <
+                                       10*TOLERANCE);
 
 		        for (unsigned int k = 0; k != n_side_dofs; ++k)
-		          libmesh_assert(k == is || std::abs(Ue[k](js)) < 1.e-5);
+		          libmesh_assert(k == is ||
+                                         std::abs(Ue[k](js)) <
+                                         10*TOLERANCE);
 #endif
 
                         self_constraint = true;
@@ -2055,7 +2058,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 
 		    const Real their_dof_value = Ue[is](js);
 
-		    if (std::abs(their_dof_value) < 1.e-5)
+		    if (std::abs(their_dof_value) < 10*TOLERANCE)
 		      continue;
 
 		    constraint_row->insert(std::make_pair(their_dof_g,
@@ -2550,7 +2553,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
 		          const Real their_dof_value = Ue[is](js);
 
-		          if (std::abs(their_dof_value) < 1.e-5)
+		          if (std::abs(their_dof_value) < 10*TOLERANCE)
 		            continue;
 
 			  constraint_row->insert(std::make_pair(their_dof_g,
