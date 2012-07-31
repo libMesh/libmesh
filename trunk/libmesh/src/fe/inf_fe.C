@@ -236,7 +236,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
 
       // Compute the shape functions and the derivatives
       // at all quadrature points.
-      this->compute_shape_functions (inf_elem);
+      this->compute_shape_functions (inf_elem,base_fe->qrule->get_points());
     }
 
   else // if pts != NULL
@@ -279,7 +279,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem* inf_elem,
         }
 
       // finally compute the ifem shapes
-      this->compute_shape_functions (inf_elem);
+      this->compute_shape_functions (inf_elem,*pts);
     }
 
 }
@@ -896,7 +896,7 @@ void InfFE<Dim,T_radial,T_map>::combine_base_radial(const Elem* inf_elem)
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*)
+void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*, const std::vector<Point>&)
 {
   libmesh_assert (radial_qrule != NULL);
 

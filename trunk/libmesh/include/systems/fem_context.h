@@ -375,6 +375,22 @@ public:
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
   /**
+   * Returns the curl of the solution variable \p var at the physical
+   * point \p p on the current element.
+   */
+  template<typename OutputShape>
+  void interior_curl(unsigned int var, unsigned int qp,
+		     typename FEGenericBase<OutputShape>::OutputNumber& curl_u) const;
+
+  /**
+   * Returns the divergence of the solution variable \p var at the physical
+   * point \p p on the current element.
+   */
+  template<typename OutputShape>
+  void interior_div(unsigned int var, unsigned int qp,
+		    typename FEGenericBase<OutputShape>::OutputNumberDivergence& div_u) const;
+
+  /**
    * Reinitialize all my FEM context data on a given
    * element for the given system
    */
