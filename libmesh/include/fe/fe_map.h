@@ -112,7 +112,7 @@ class Elem;
     /**
      * @returns the element Jacobian for each quadrature point.
      */
-    const std::vector<Real>& get_Jacobian() const
+    const std::vector<Real>& get_jacobian() const
     { return jac; }
     
     /**

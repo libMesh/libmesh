@@ -403,11 +403,10 @@ FEGenericBase<Real>::build (const unsigned int dim,
 	    }
 
           case SCALAR:
-          {
+	    {
 	      AutoPtr<FEBase> ap(new FEScalar<2>(fet));
 	      return ap;
-          }
-
+	    }
 	  default:
 	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    libmesh_error();
@@ -898,7 +897,8 @@ FEGenericBase<RealGradient>::build_InfFE (const unsigned int,
 
 
 template <typename OutputType>
-void FEGenericBase<OutputType> ::compute_shape_functions (const Elem*)
+void FEGenericBase<OutputType> ::compute_shape_functions (const Elem* elem,
+							  const std::vector<Point>& qp)
 {
   //-------------------------------------------------------------------------
   // Compute the shape function values (and derivatives)
@@ -913,309 +913,51 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem*)
   // If the user forgot to request anything, we'll be safe and
   // calculate everything:
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!calculate_phi && !calculate_dphi && !calculate_d2phi)
-    calculate_phi = calculate_dphi = calculate_d2phi = true;
+  if (!calculate_phi && !calculate_dphi && !calculate_d2phi && !calculate_curl_phi && !calculate_div_phi)
+    {
+      calculate_phi = calculate_dphi = calculate_d2phi = true;
+      // Only compute curl, div for vector-valued elements
+      if( TypesEqual<OutputType,RealGradient>::value )
+	{
+	  calculate_curl_phi = true;
+	  calculate_div_phi  = true;
+	}
+    }
 #else
-  if (!calculate_phi && !calculate_dphi)
-    calculate_phi = calculate_dphi = true;
+  if (!calculate_phi && !calculate_dphi && !calculate_curl_phi && !calculate_div_phi)
+    {
+      calculate_phi = calculate_dphi = true;
+      // Only compute curl for vector-valued elements
+      if( TypesEqual<OutputType,RealGradient>::value )
+	{
+	  calculate_curl_phi = true;
+	  calculate_div_phi  = true;
+	}
+    }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-  // Compute the value of the derivative shape function i at quadrature point p
-  switch (dim)
-    {
+  
+  if( calculate_phi )
+    this->_fe_trans->map_phi( this->dim, elem, qp, (*this), this->phi );
 
-    case 0: // No derivatives in 0D
-	if (calculate_dphi)
-	  for (unsigned int i=0; i<dphi.size(); i++)
-	    for (unsigned int p=0; p<dphi[i].size(); p++)
-	      {
-	        dphi[i][p] = 0.;
-	      }
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	if (calculate_d2phi)
-	  for (unsigned int i=0; i<d2phi.size(); i++)
-	    for (unsigned int p=0; p<d2phi[i].size(); p++)
-	      {
-	        d2phi[i][p] = 0.;
-	      }
-#endif
-
-	// All done
-
-      break;
-
-    case 1:
-      {
-	if (calculate_dphi)
-	  {
-	    const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
-	    const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
-	    const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
-
-	    for (unsigned int i=0; i<dphi.size(); i++)
-	      for (unsigned int p=0; p<dphi[i].size(); p++)
-		{
-		  // dphi/dx    = (dphi/dxi)*(dxi/dx)
-		  dphi[i][p].slice(0) =
-		    dphidx[i][p] = dphidxi[i][p]*dxidx_map[p];
-		  
-#if LIBMESH_DIM>1
-		  dphi[i][p].slice(1) =
-		    dphidy[i][p] = dphidxi[i][p]*dxidy_map[p];
-#endif
-#if LIBMESH_DIM>2
-		  dphi[i][p].slice(2) =
-		    dphidz[i][p] = dphidxi[i][p]*dxidz_map[p];
-#endif
-		}
-	  }
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	if (calculate_d2phi)
-	  {
-	    const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
-	    const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
-	    const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
-
-	    for (unsigned int i=0; i<d2phi.size(); i++)
-	      for (unsigned int p=0; p<d2phi[i].size(); p++)
-		{
-		  d2phi[i][p].slice(0).slice(0) = d2phidx2[i][p] =
-		    d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p];
-#if LIBMESH_DIM>1
-		  d2phi[i][p].slice(0).slice(1) = d2phidxdy[i][p] =
-		    d2phi[i][p].slice(1).slice(0) =
-		    d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p];
-		  d2phi[i][p].slice(1).slice(1) = d2phidy2[i][p] =
-		    d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p];
-#endif
-#if LIBMESH_DIM>2
-		  d2phi[i][p].slice(0).slice(2) = d2phidxdz[i][p] =
-		    d2phi[i][p].slice(2).slice(0) =
-		    d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p];
-		  d2phi[i][p].slice(1).slice(2) = d2phidydz[i][p] =
-		    d2phi[i][p].slice(2).slice(1) =
-		    d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p];
-		  d2phi[i][p].slice(2).slice(2) = d2phidz2[i][p] =
-		    d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p];
-#endif
-		}
-	  }
-#endif
-	// All done
-	break;
-      }
-
-    case 2:
-      {
-	if (calculate_dphi)
-	  {
-	    const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
-	    const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
-	    const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
-
-	    const std::vector<Real>& detadx_map = this->_fe_map->get_detadx();
-	    const std::vector<Real>& detady_map = this->_fe_map->get_detady();
-	    const std::vector<Real>& detadz_map = this->_fe_map->get_detadz();
-	    
-	    for (unsigned int i=0; i<dphi.size(); i++)
-	      for (unsigned int p=0; p<dphi[i].size(); p++)
-		{
-		  // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx)
-		  dphi[i][p].slice(0) =
-		    dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
-				    dphideta[i][p]*detadx_map[p]);
-		  
-		  // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy)
-		  dphi[i][p].slice(1) =
-		    dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
-				    dphideta[i][p]*detady_map[p]);
-		  
-		  // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz)
-#if LIBMESH_DIM == 3
-		  dphi[i][p].slice(2) = // can only assign to the Z component if LIBMESH_DIM==3
-		    dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
-				    dphideta[i][p]*detadz_map[p]);
-#endif
-		}
-	  }
+  if( calculate_dphi )
+    this->_fe_trans->map_dphi( this->dim, elem, qp, (*this), this->dphi, 
+			       this->dphidx, this->dphidy, this->dphidz );
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	if (calculate_d2phi)
-	  {
-	    const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
-	    const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
-	    const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
+  if( calculate_d2phi )
+    this->_fe_trans->map_d2phi( this->dim, elem, qp, (*this), this->d2phi,
+				this->d2phidx2, this->d2phidxdy, this->d2phidxdz,
+				this->d2phidy2, this->d2phidydz, this->d2phidz2 );
+#endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	    const std::vector<Real>& detadx_map = this->_fe_map->get_detadx();
-	    const std::vector<Real>& detady_map = this->_fe_map->get_detady();
-	    const std::vector<Real>& detadz_map = this->_fe_map->get_detadz();
+  // Only compute curl for vector-valued elements
+  if( calculate_curl_phi && TypesEqual<OutputType,RealGradient>::value )
+    this->_fe_trans->map_curl( this->dim, elem, qp, (*this), this->curl_phi );
 
-	    for (unsigned int i=0; i<d2phi.size(); i++)
-	      for (unsigned int p=0; p<d2phi[i].size(); p++)
-		{
-		  d2phi[i][p].slice(0).slice(0) = d2phidx2[i][p] =
-		    d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
-		    2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
-		    d2phideta2[i][p]*detadx_map[p]*detadx_map[p];
-		  d2phi[i][p].slice(0).slice(1) = d2phidxdy[i][p] =
-		    d2phi[i][p].slice(1).slice(0) =
-		    d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
-		    d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
-		    d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
-		    d2phidxideta[i][p]*detadx_map[p]*dxidy_map[p];
-		  d2phi[i][p].slice(1).slice(1) = d2phidy2[i][p] =
-		    d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
-		    2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
-		    d2phideta2[i][p]*detady_map[p]*detady_map[p];
-#if LIBMESH_DIM == 3
-		  d2phi[i][p].slice(0).slice(2) = d2phidxdz[i][p] =
-		    d2phi[i][p].slice(2).slice(0) =
-		    d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
-		    d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
-		    d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
-		    d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p];
-		  d2phi[i][p].slice(1).slice(2) = d2phidydz[i][p] =
-		    d2phi[i][p].slice(2).slice(1) =
-		    d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
-		    d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
-		    d2phideta2[i][p]*detady_map[p]*detadz_map[p] +
-		    d2phidxideta[i][p]*detady_map[p]*dxidz_map[p];
-		  d2phi[i][p].slice(2).slice(2) = d2phidz2[i][p] =
-		    d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
-		    2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
-		    d2phideta2[i][p]*detadz_map[p]*detadz_map[p];
-#endif
-		}
-	  }
-#endif
-	// All done
-	break;
-      }
-
-    case 3:
-      {
-	if (calculate_dphi)
-	  {
-	    const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
-	    const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
-	    const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
-
-	    const std::vector<Real>& detadx_map = this->_fe_map->get_detadx();
-	    const std::vector<Real>& detady_map = this->_fe_map->get_detady();
-	    const std::vector<Real>& detadz_map = this->_fe_map->get_detadz();
-
-	    const std::vector<Real>& dzetadx_map = this->_fe_map->get_dzetadx();
-	    const std::vector<Real>& dzetady_map = this->_fe_map->get_dzetady();
-	    const std::vector<Real>& dzetadz_map = this->_fe_map->get_dzetadz();
-
-	    for (unsigned int i=0; i<dphi.size(); i++)
-	      for (unsigned int p=0; p<dphi[i].size(); p++)
-		{
-		  // dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx) + (dphi/dzeta)*(dzeta/dx);
-		  dphi[i][p].slice(0) =
-		    dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
-				    dphideta[i][p]*detadx_map[p] +
-				    dphidzeta[i][p]*dzetadx_map[p]);
-		  
-		  // dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
-		  dphi[i][p].slice(1) =
-		    dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
-				    dphideta[i][p]*detady_map[p] +
-				  dphidzeta[i][p]*dzetady_map[p]);
-		  
-		  // dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
-		  dphi[i][p].slice(2) =
-		    dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
-				    dphideta[i][p]*detadz_map[p] +
-				    dphidzeta[i][p]*dzetadz_map[p]);
-		}
-	  }
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	if (calculate_d2phi)
-	  {
-	    const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
-	    const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
-	    const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
-
-	    const std::vector<Real>& detadx_map = this->_fe_map->get_detadx();
-	    const std::vector<Real>& detady_map = this->_fe_map->get_detady();
-	    const std::vector<Real>& detadz_map = this->_fe_map->get_detadz();
-
-	    const std::vector<Real>& dzetadx_map = this->_fe_map->get_dzetadx();
-	    const std::vector<Real>& dzetady_map = this->_fe_map->get_dzetady();
-	    const std::vector<Real>& dzetadz_map = this->_fe_map->get_dzetadz();
-
-	    for (unsigned int i=0; i<d2phi.size(); i++)
-	      for (unsigned int p=0; p<d2phi[i].size(); p++)
-		{
-		  d2phi[i][p].slice(0).slice(0) = d2phidx2[i][p] =
-		    d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p] +
-		    2*d2phidxideta[i][p]*dxidx_map[p]*detadx_map[p] +
-		    2*d2phidxidzeta[i][p]*dxidx_map[p]*dzetadx_map[p] +
-		    2*d2phidetadzeta[i][p]*detadx_map[p]*dzetadx_map[p] +
-		    d2phideta2[i][p]*detadx_map[p]*detadx_map[p] +
-		    d2phidzeta2[i][p]*dzetadx_map[p]*dzetadx_map[p];
-		  d2phi[i][p].slice(0).slice(1) = d2phidxdy[i][p] =
-		    d2phi[i][p].slice(1).slice(0) =
-		    d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p] +
-		    d2phidxideta[i][p]*dxidx_map[p]*detady_map[p] +
-		    d2phidxidzeta[i][p]*dxidx_map[p]*dzetady_map[p] +
-		    d2phideta2[i][p]*detadx_map[p]*detady_map[p] +
-		    d2phidxideta[i][p]*detadx_map[p]*dxidy_map[p] +
-		    d2phidetadzeta[i][p]*detadx_map[p]*dzetady_map[p] +
-		    d2phidzeta2[i][p]*dzetadx_map[p]*dzetady_map[p] +
-		    d2phidxidzeta[i][p]*dzetadx_map[p]*dxidy_map[p] +
-		    d2phidetadzeta[i][p]*dzetadx_map[p]*detady_map[p];
-		  d2phi[i][p].slice(0).slice(2) = d2phidxdz[i][p] =
-		    d2phi[i][p].slice(2).slice(0) =
-		    d2phidxi2[i][p]*dxidx_map[p]*dxidz_map[p] +
-		    d2phidxideta[i][p]*dxidx_map[p]*detadz_map[p] +
-		    d2phidxidzeta[i][p]*dxidx_map[p]*dzetadz_map[p] +
-		    d2phideta2[i][p]*detadx_map[p]*detadz_map[p] +
-		    d2phidxideta[i][p]*detadx_map[p]*dxidz_map[p] +
-		    d2phidetadzeta[i][p]*detadx_map[p]*dzetadz_map[p] +
-		    d2phidzeta2[i][p]*dzetadx_map[p]*dzetadz_map[p] +
-		    d2phidxidzeta[i][p]*dzetadx_map[p]*dxidz_map[p] +
-		    d2phidetadzeta[i][p]*dzetadx_map[p]*detadz_map[p];
-		  d2phi[i][p].slice(1).slice(1) = d2phidy2[i][p] =
-		    d2phidxi2[i][p]*dxidy_map[p]*dxidy_map[p] +
-		    2*d2phidxideta[i][p]*dxidy_map[p]*detady_map[p] +
-		    2*d2phidxidzeta[i][p]*dxidy_map[p]*dzetady_map[p] +
-		    2*d2phidetadzeta[i][p]*detady_map[p]*dzetady_map[p] +
-		    d2phideta2[i][p]*detady_map[p]*detady_map[p] +
-		    d2phidzeta2[i][p]*dzetady_map[p]*dzetady_map[p];
-		  d2phi[i][p].slice(1).slice(2) = d2phidydz[i][p] =
-		    d2phi[i][p].slice(2).slice(1) =
-		    d2phidxi2[i][p]*dxidy_map[p]*dxidz_map[p] +
-		    d2phidxideta[i][p]*dxidy_map[p]*detadz_map[p] +
-		    d2phidxidzeta[i][p]*dxidy_map[p]*dzetadz_map[p] +
-		    d2phideta2[i][p]*detady_map[p]*detadz_map[p] +
-		    d2phidxideta[i][p]*detady_map[p]*dxidz_map[p] +
-		    d2phidetadzeta[i][p]*detady_map[p]*dzetadz_map[p] +
-		    d2phidzeta2[i][p]*dzetady_map[p]*dzetadz_map[p] +
-		    d2phidxidzeta[i][p]*dzetady_map[p]*dxidz_map[p] +
-		    d2phidetadzeta[i][p]*dzetady_map[p]*detadz_map[p];
-		  d2phi[i][p].slice(2).slice(2) = d2phidz2[i][p] =
-		    d2phidxi2[i][p]*dxidz_map[p]*dxidz_map[p] +
-		    2*d2phidxideta[i][p]*dxidz_map[p]*detadz_map[p] +
-		    2*d2phidxidzeta[i][p]*dxidz_map[p]*dzetadz_map[p] +
-		    2*d2phidetadzeta[i][p]*detadz_map[p]*dzetadz_map[p] +
-		    d2phideta2[i][p]*detadz_map[p]*detadz_map[p] +
-		    d2phidzeta2[i][p]*dzetadz_map[p]*dzetadz_map[p];
-		}
-	  }
-#endif
-
-	// All done
-	break;
-      }
-
-    default:
-      {
-	libmesh_error();
-      }
-    }
+  // Only compute div for vector-valued elements
+  if( calculate_div_phi && TypesEqual<OutputType,RealGradient>::value )
+    this->_fe_trans->map_div( this->dim, elem, qp, (*this), this->div_phi );
 
   // Stop logging the shape function computation
   STOP_LOG("compute_shape_functions()", "FE");

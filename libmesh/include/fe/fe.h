@@ -736,7 +736,7 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  virtual void compute_shape_functions(const Elem*);
+  virtual void compute_shape_functions(const Elem*, const std::vector<Point>& qp);
 
   /**
    * Compute the map & shape functions for this face.

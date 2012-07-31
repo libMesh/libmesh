@@ -1280,7 +1280,12 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
 
 FEFieldType FEInterface::field_type( const FEType& fe_type )
 {
-  switch (fe_type.family)
+  return FEInterface::field_type( fe_type.family );
+}
+
+FEFieldType FEInterface::field_type( const FEFamily& fe_family )
+{
+  switch (fe_family)
     {
     case LAGRANGE_VEC:
       return TYPE_VECTOR;

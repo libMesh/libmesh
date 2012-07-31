@@ -380,13 +380,13 @@ struct DecrementRank
 template <typename T>
 struct DecrementRank<VectorValue<T> >
 {
-  typedef Real type;
+  typedef T type;
 };
 
 template <typename T>
 struct DecrementRank<TypeVector<T> >
 {
-  typedef Real type;
+  typedef T type;
 };
 
 template <typename T>

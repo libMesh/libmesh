@@ -504,7 +504,7 @@ protected:
    * derived class since this function depends on whether
    * the shape functions are vector-valued or not.
    */
-  virtual void compute_shape_functions(const Elem*) =0;
+  virtual void compute_shape_functions(const Elem*, const std::vector<Point>& ) =0;
   
   AutoPtr<FEMap> _fe_map;
 
@@ -534,6 +534,22 @@ protected:
    * Should we calculate shape function hessians?
    */
   mutable bool calculate_d2phi;
+
+  /**
+   * Should we calculate shape function curls?
+   */
+  mutable bool calculate_curl_phi;
+
+  /**
+   * Should we calculate shape function divergences?
+   */
+  mutable bool calculate_div_phi;
+
+  /**
+   * Should we calculate reference shape function gradients?
+   */
+  mutable bool calculate_dphiref;
+  
 
   /**
    * The finite element type for this object.  Note that this
@@ -588,6 +604,9 @@ FEAbstract::FEAbstract(const unsigned int d,
   calculate_phi(false),
   calculate_dphi(false),
   calculate_d2phi(false),
+  calculate_curl_phi(false),
+  calculate_div_phi(false),
+  calculate_dphiref(false),
   fe_type(fet),
   elem_type(INVALID_ELEM),
   _p_level(0),
