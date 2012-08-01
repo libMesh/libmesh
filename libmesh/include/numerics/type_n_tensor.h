@@ -88,7 +88,7 @@ public:
    * Add to this tensor.
    */
   template<typename T2>
-  const TypeNTensor<N,T> & operator += (const TypeNTensor<N,T2> &rhs)
+  const TypeNTensor<N,T> & operator += (const TypeNTensor<N,T2> &/*rhs*/)
     { return *this; }
 
   /**
