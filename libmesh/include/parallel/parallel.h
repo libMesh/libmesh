@@ -586,6 +586,8 @@ namespace Parallel
    * perform work after a MPI_Wait succeeds
    */
   struct PostWaitWork {
+    virtual ~PostWaitWork() {};
+
     virtual void run() {};
   };
 
