@@ -124,9 +124,9 @@ Number& RawAccessor<Tensor>::operator()( unsigned int k )
 
   // For tensors, each row is filled first, i.e. for 2-D
   // [ 0 1; 2 3]
-  // Thus, k(i,j) = i + j*dim
-  unsigned int jj = k/_dim;
-  unsigned int ii = k - jj*_dim;
+  // Thus, k(i,j) = j + i*dim
+  unsigned int ii = k/_dim;
+  unsigned int jj = k - ii*_dim;
 
   return this->_data(ii,jj);
 }
