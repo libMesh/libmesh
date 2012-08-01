@@ -71,7 +71,7 @@ void LaplaceSystem::init_dirichlet_bcs()
   std::vector<unsigned int> vars;
   vars.push_back( u_var );
 
-  BoundaryFunction func( u_var );
+  SolutionFunction func( u_var );
 
   this->get_dof_map().add_dirichlet_boundary( libMesh::DirichletBoundary( boundary_ids, vars, &func ) );
   return;
