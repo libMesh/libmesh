@@ -21,7 +21,7 @@
 #include "tensor_value.h"
 #include "dirichlet_boundaries.h"
 
-#include "boundary_function.h"
+#include "solution_function.h"
 
 using namespace libMesh;
 

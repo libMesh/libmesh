@@ -1,5 +1,5 @@
 # The coarse grid size from which to start adaptivity
-grid_size = 10
+grid_size = 5 
 
 # Turn this off to see the NewtonSolver chatter
 solver_quiet = false 
@@ -15,3 +15,5 @@ initial_linear_tolerance = 1.0e-14
 relative_residual_tolerance = 1.0e-12
 
 max_linear_iterations = 5000
+
+extra_error_quadrature = 4;

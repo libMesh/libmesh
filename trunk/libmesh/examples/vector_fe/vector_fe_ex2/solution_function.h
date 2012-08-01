@@ -20,16 +20,16 @@
 
 using namespace libMesh;
 
-#ifndef __boundary_function_h__
-#define __boundary_function_h__
+#ifndef __solution_function_h__
+#define __solution_function_h__
 
-class BoundaryFunction : public FunctionBase<Number>
+class SolutionFunction : public FunctionBase<Number>
 {
 public:
 
-  BoundaryFunction( const unsigned int u_var )
+  SolutionFunction( const unsigned int u_var )
   : _u_var(u_var) {}
-  ~BoundaryFunction( ){}
+  ~SolutionFunction( ){}
 
   virtual Number operator() (const Point&, const Real = 0)
     { libmesh_not_implemented(); }
@@ -42,7 +42,7 @@ public:
     const Real x=p(0), y=p(1), z=p(2);
     output(_u_var)   = soln( 0, x, y, z );
     output(_u_var+1) = soln( 1, x, y, z );
-    output(_u_var+2) = soln( 1, x, y, z );
+    output(_u_var+2) = soln( 2, x, y, z );
   }
 
   virtual Number component( unsigned int component, const Point& p,
@@ -53,7 +53,7 @@ public:
   }
 
   virtual AutoPtr<FunctionBase<Number> > clone() const
-  { return AutoPtr<FunctionBase<Number> > (new BoundaryFunction(_u_var)); }
+  { return AutoPtr<FunctionBase<Number> > (new SolutionFunction(_u_var)); }
 
 private:
 
@@ -61,4 +61,44 @@ private:
   LaplaceExactSolution soln;
 };
 
-#endif // __boundary_function_h__
+//FIXME: PB: We ought to be able to merge the above class with this one
+//           through templating, but I'm being lazy.
+class SolutionGradient : public FunctionBase<Gradient>
+{
+public:
+
+  SolutionGradient( const unsigned int u_var )
+  : _u_var(u_var) {}
+  ~SolutionGradient( ){}
+
+  virtual Gradient operator() (const Point&, const Real = 0)
+    { libmesh_not_implemented(); }
+
+  virtual void operator() (const Point& p,
+                           const Real,
+                           DenseVector<Gradient>& output)
+  {
+    output.zero();
+    const Real x=p(0), y=p(1), z=p(2);
+    output(_u_var)   = soln( 0, x, y, z );
+    output(_u_var+1) = soln( 1, x, y, z );
+    output(_u_var+2) = soln( 2, x, y, z );
+  }
+
+  virtual Gradient component( unsigned int component, const Point& p,
+			    const Real )
+  {
+    const Real x=p(0), y=p(1), z=p(2);
+    return soln( component, x, y, z );
+  }
+
+  virtual AutoPtr<FunctionBase<Gradient> > clone() const
+  { return AutoPtr<FunctionBase<Gradient> > (new SolutionGradient(_u_var)); }
+
+private:
+
+  const unsigned int _u_var;
+  LaplaceExactGradient soln;
+};
+
+#endif // __solution_function_h__
