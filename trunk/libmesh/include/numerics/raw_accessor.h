@@ -25,6 +25,7 @@
 
 #include "tensor_value.h"
 #include "vector_value.h"
+#include "type_n_tensor.h"
 
 namespace libMesh
 {
@@ -130,6 +131,38 @@ Number& RawAccessor<Tensor>::operator()( unsigned int k )
   return this->_data(ii,jj);
 }
 
+/**
+ * Stub implementations for stub TypeNTensor object
+ */
+template <unsigned int N, typename ScalarType>
+class RawAccessor<TypeNTensor<N, ScalarType> >
+{
+public:
+
+  typedef TypeNTensor<N, ScalarType> FieldType;
+  
+  RawAccessor( FieldType& data, const unsigned int dim )
+    : _data(data),
+      _dim(dim)
+  {}
+
+  ~RawAccessor(){};
+
+  typename RawFieldType<FieldType>::type& operator()( unsigned int i )
+  { return dummy; }
+
+  const typename RawFieldType<FieldType>::type& operator()( unsigned int i ) const
+  { return dummy; }
+
+private:
+  RawAccessor();
+
+  static ScalarType dummy;
+
+  FieldType& _data;
+  const unsigned int _dim;
+};
+
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template<>
 inline
@@ -161,6 +194,7 @@ Real& RawAccessor<RealTensor>::operator()( unsigned int k )
 
   return this->_data(ii,jj);
 }
+
 #endif
 
 }
