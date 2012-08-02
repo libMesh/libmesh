@@ -601,7 +601,7 @@ void Elem::find_point_neighbors(const Point &p,
                 }
             }
         }
-      untested_set = next_untested_set;
+      untested_set.swap(next_untested_set);
       next_untested_set.clear();
     }
 }
@@ -677,7 +677,7 @@ void Elem::find_point_neighbors(std::set<const Elem *> &neighbor_set) const
                 }
             }
         }
-      untested_set = next_untested_set;
+      untested_set.swap(next_untested_set);
       next_untested_set.clear();
     }
 }
@@ -780,7 +780,7 @@ void Elem::find_edge_neighbors(std::set<const Elem *> &neighbor_set) const
                 }
             }
         }
-      untested_set = next_untested_set;
+      untested_set.swap(next_untested_set);
       next_untested_set.clear();
     }
 }
