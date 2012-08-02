@@ -413,10 +413,12 @@ int main (int argc, char** argv)
       *system.old_local_solution = *system.current_local_solution;
       
       // The number of refinement steps per time step.
-      const unsigned int max_r_steps = 2;
+      unsigned int max_r_steps = 1;
+      if(command_line.search("-max_r_steps"))
+        max_r_steps = command_line.next(0);
       
       // A refinement loop.
-      for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
+      for (unsigned int r_step=0; r_step<max_r_steps+1; r_step++)
         {
           // Assemble & solve the linear system
           system.solve();
@@ -427,7 +429,7 @@ int main (int argc, char** argv)
           std::cout << "H1 norm = " << H1norm << std::endl;
           
           // Possibly refine the mesh
-          if (r_step+1 != max_r_steps)
+          if (r_step+1 <= max_r_steps)
             {
               std::cout << "  Refining the mesh..." << std::endl;
 
