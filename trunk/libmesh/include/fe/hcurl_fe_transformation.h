@@ -64,7 +64,8 @@ namespace libMesh
 			   std::vector<std::vector<OutputShape> >& /*dphidx*/,
 			   std::vector<std::vector<OutputShape> >& /*dphidy*/, 
 			   std::vector<std::vector<OutputShape> >& /*dphidz*/) const
-    { libmesh_not_implemented(); }
+    { libmesh_do_once( libMesh::err << "WARNING: Shape function gradients for HCurl elements are not currently "
+		       << "being computed!" << std::endl; ); return; }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES    
     /**
@@ -82,7 +83,8 @@ namespace libMesh
 			    std::vector<std::vector<OutputShape> >& /*d2phidy2*/,
 			    std::vector<std::vector<OutputShape> >& /*d2phidydz*/, 
 			    std::vector<std::vector<OutputShape> >& /*d2phidz2*/  ) const
-    { libmesh_not_implemented(); }
+    { libmesh_do_once( libMesh::err << "WARNING: Shape function Hessians for HCurl elements are not currently "
+		       << "being computed!" << std::endl; ); return; }
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
     /**
@@ -107,7 +109,8 @@ namespace libMesh
 			  const std::vector<Point>& /*qp*/,
 			  const FEGenericBase<OutputShape>& /*fe*/,
 			  std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >& /*div_phi*/ ) const
-    { libmesh_not_implemented(); };
+    { libmesh_do_once( libMesh::err << "WARNING: Shape function divergences for HCurl elements are not currently "
+		       << "being computed!" << std::endl; ); return; };
 
   }; // class HCurlFETransformation
 
