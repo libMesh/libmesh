@@ -40,6 +40,8 @@ public:
   {
     output.zero();
     const Real x=p(0), y=p(1), z=p(2);
+    // libMesh assumes each component of the vector-valued variable is stored
+    // contiguously.
     output(_u_var)   = soln( 0, x, y, z );
     output(_u_var+1) = soln( 1, x, y, z );
     output(_u_var+2) = soln( 2, x, y, z );

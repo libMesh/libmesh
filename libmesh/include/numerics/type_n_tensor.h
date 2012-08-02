@@ -152,6 +152,12 @@ public:
   contract (const TypeNTensor<N,T2> &) const { return 0; }
 
   /**
+   * Returns the Frobenius norm of the tensor squared, i.e.  sum of the
+   * element magnitudes squared.
+   */
+  Real size_sq() const { return 0.;}
+
+  /**
    * @returns \p true if two tensors are equal valued.
    */
   bool operator == (const TypeNTensor<N,T>&) const { return true; }

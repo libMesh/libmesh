@@ -54,6 +54,12 @@ namespace libMesh
     typedef Number type;
   };
 
+  template<>
+  struct RawFieldType<TypeNTensor<3, Number> >
+  {
+    typedef Number type;
+  };
+
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   template <>
   struct RawFieldType<Real>
@@ -69,6 +75,12 @@ namespace libMesh
 
   template <>
   struct RawFieldType<RealTensor>
+  {
+    typedef Real type;
+  };
+
+  template<>
+  struct RawFieldType<TypeNTensor<3, Real> >
   {
     typedef Real type;
   };
@@ -140,7 +152,7 @@ class RawAccessor<TypeNTensor<N, ScalarType> >
 public:
 
   typedef TypeNTensor<N, ScalarType> FieldType;
-  
+
   RawAccessor( FieldType& data, const unsigned int dim )
     : _data(data),
       _dim(dim)
@@ -148,16 +160,16 @@ public:
 
   ~RawAccessor(){};
 
-  typename RawFieldType<FieldType>::type& operator()( unsigned int i )
+  typename RawFieldType<FieldType>::type& operator()( unsigned int /*i*/ )
   { return dummy; }
 
-  const typename RawFieldType<FieldType>::type& operator()( unsigned int i ) const
+  const typename RawFieldType<FieldType>::type& operator()( unsigned int /*i*/ ) const
   { return dummy; }
 
 private:
   RawAccessor();
 
-  static ScalarType dummy;
+  ScalarType dummy;
 
   FieldType& _data;
   const unsigned int _dim;

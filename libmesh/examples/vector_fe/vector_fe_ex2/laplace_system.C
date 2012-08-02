@@ -71,6 +71,8 @@ void LaplaceSystem::init_dirichlet_bcs()
   std::vector<unsigned int> vars;
   vars.push_back( u_var );
 
+  // Note that for vector-valued variables, it is assumed each component is stored contiguously.
+  // For 2-D elements in 3-D space, only two components should be returned.
   SolutionFunction func( u_var );
 
   this->get_dof_map().add_dirichlet_boundary( libMesh::DirichletBoundary( boundary_ids, vars, &func ) );
