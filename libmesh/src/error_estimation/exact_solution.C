@@ -33,6 +33,9 @@
 #include "tensor_value.h"
 #include "vector_value.h"
 #include "wrapped_function.h"
+#include "fe_interface.h"
+#include "raw_accessor.h"
+#include "type_vector.h"
 
 namespace libMesh
 {
@@ -303,9 +306,32 @@ void ExactSolution::compute_error(const std::string& sys_name,
   // to the proper location to store the error
   std::vector<Real>& error_vals = this->_check_inputs(sys_name,
                                                       unknown_name);
-  this->_compute_error(sys_name,
-		       unknown_name,
-		       error_vals);
+
+  libmesh_assert( _equation_systems.has_system(sys_name) );
+  const System& sys = _equation_systems.get_system<System>( sys_name );
+  
+  libmesh_assert( sys.has_variable( unknown_name ) );
+  switch( FEInterface::field_type(sys.variable_type( unknown_name )) )
+    {
+    case TYPE_SCALAR:
+      {
+	this->_compute_error<Real>(sys_name,
+				   unknown_name,
+				   error_vals);
+	break;
+      }
+    case TYPE_VECTOR:
+      {
+	this->_compute_error<RealGradient>(sys_name,
+					   unknown_name,
+					   error_vals);
+	break;
+      }
+    default:
+      libmesh_error();
+    }
+
+  return;
 }
 
 
@@ -453,7 +479,7 @@ Real ExactSolution::h2_error(const std::string& sys_name,
 
 
 
-
+template< typename OutputShape>
 void ExactSolution::_compute_error(const std::string& sys_name,
 				   const std::string& unknown_name,
 				   std::vector<Real>& error_vals)
@@ -517,19 +543,33 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
   const MeshBase& _mesh = computed_system.get_mesh();
 
+  const unsigned int dim = _mesh.mesh_dimension();
+
   // Zero the error before summation
   error_vals = std::vector<Real>(5, 0.);
 
   // Construct Quadrature rule based on default quadrature order
   const FEType& fe_type  = computed_dof_map.variable_type(var);
 
+  unsigned int n_vec_dim = FEInterface::n_vec_dim( _mesh, fe_type );
+
+  // FIXME: MeshFunction needs to be updated to support vector-valued
+  //        elements before we can use a reference solution.
+  if( (n_vec_dim > 1) && _equation_systems_fine )
+    {
+      libMesh::err << "Error calculation using reference solution not yet\n"
+		   << "supported for vector-valued elements."
+		   << std::endl;
+      libmesh_not_implemented();
+    }
+
   AutoPtr<QBase> qrule =
-    fe_type.default_quadrature_rule (_mesh.mesh_dimension(),
+    fe_type.default_quadrature_rule (dim,
                                      _extra_order);
 
   // Construct finite element object
 
-  AutoPtr<FEBase> fe(FEBase::build(_mesh.mesh_dimension(), fe_type));
+  AutoPtr<FEGenericBase<OutputShape> > fe(FEGenericBase<OutputShape>::build(dim, fe_type));
 
   // Attach quadrature rule to FE object
   fe->attach_quadrature_rule (qrule.get());
@@ -539,14 +579,16 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
   // The value of the shape functions at the quadrature points
   // i.e. phi(i) = phi_values[i][qp]
-  const std::vector<std::vector<Real> >&  phi_values         = fe->get_phi();
+  const std::vector<std::vector<OutputShape> >&  phi_values         = fe->get_phi();
 
   // The value of the shape function gradients at the quadrature points
-  const std::vector<std::vector<RealGradient> >& dphi_values = fe->get_dphi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >& 
+		    dphi_values = fe->get_dphi();
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   // The value of the shape function second derivatives at the quadrature points
-  const std::vector<std::vector<RealTensor> >& d2phi_values = fe->get_d2phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >& 
+		    d2phi_values = fe->get_d2phi(); 
 #endif
 
   // The XYZ locations (in physical space) of the quadrature points
@@ -593,11 +635,11 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  // Real u_h = 0.;
 	  // RealGradient grad_u_h;
 
-	  Number u_h = 0.;
+	  typename FEGenericBase<OutputShape>::OutputNumber u_h = 0.;
 
-	  Gradient grad_u_h;
+	  typename FEGenericBase<OutputShape>::OutputNumberGradient grad_u_h;
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	  Tensor grad2_u_h;
+	  typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_u_h;
 #endif
 
 
@@ -616,50 +658,82 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	    }
 
 	  // Compute the value of the error at this quadrature point
-	  Number exact_val = 0.0;
+	  typename FEGenericBase<OutputShape>::OutputNumber exact_val;
+	  RawAccessor<typename FEGenericBase<OutputShape>::OutputNumber> exact_val_accessor( exact_val, dim );
           if (_exact_values.size() > sys_num && _exact_values[sys_num])
-	    exact_val =
-              _exact_values[sys_num]->
-		component(var_component, q_point[qp], time);
+	    {
+	      for( unsigned int c = 0; c < n_vec_dim; c++)
+		exact_val_accessor(c) =
+		  _exact_values[sys_num]->
+		  component(var_component+c, q_point[qp], time);
+	    }
 	  else if (_equation_systems_fine)
-	    exact_val = (*coarse_values)(q_point[qp]);
-
-	  const Number val_error = u_h - exact_val;
+	    {
+	      // FIXME: Needs to be updated for vector-valued elements
+	      exact_val = (*coarse_values)(q_point[qp]);
+	    }
+	  const typename FEGenericBase<OutputShape>::OutputNumber val_error = u_h - exact_val;
 
 	  // Add the squares of the error to each contribution
-	  error_vals[0] += JxW[qp]*libmesh_norm(val_error);
-	  Real norm = sqrt(libmesh_norm(val_error));
+	  Real error_sq = libmesh_norm(val_error);
+	  error_vals[0] += JxW[qp]*error_sq;
+
+	  Real norm = sqrt(error_sq);
 	  error_vals[3] += JxW[qp]*norm;
+
 	  if(error_vals[4]<norm) { error_vals[4] = norm; }
 
 	  // Compute the value of the error in the gradient at this
 	  // quadrature point
-          Gradient exact_grad;
+	  typename FEGenericBase<OutputShape>::OutputNumberGradient exact_grad;
+	  RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberGradient> exact_grad_accessor( exact_grad, dim );
 	  if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
-	    exact_grad =
-               _exact_derivs[sys_num]->
-                 component(var_component, q_point[qp], time);
+	    {
+	      for( unsigned int c = 0; c < n_vec_dim; c++)
+		for( unsigned int d = 0; d < dim; d++ )
+		  exact_grad_accessor(d + c*dim ) =
+		    _exact_derivs[sys_num]->
+		    component(var_component+c, q_point[qp], time)(d);
+	    }
 	  else if (_equation_systems_fine)
-	    exact_grad = coarse_values->gradient(q_point[qp]);
+	    {
+	      // FIXME: Needs to be updated for vector-valued elements
+	      exact_grad = coarse_values->gradient(q_point[qp]);
+	    }
 
-	  const Gradient grad_error = grad_u_h - exact_grad;
-
+	  const typename FEGenericBase<OutputShape>::OutputNumberGradient grad_error = grad_u_h - exact_grad;
+	  
 	  error_vals[1] += JxW[qp]*grad_error.size_sq();
-
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  // Compute the value of the error in the hessian at this
 	  // quadrature point
-          Tensor exact_hess;
+	  typename FEGenericBase<OutputShape>::OutputNumberTensor exact_hess;
+	  RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberTensor> exact_hess_accessor( exact_hess, dim );
 	  if (_exact_hessians.size() > sys_num && _exact_hessians[sys_num])
-	    exact_hess =
-              _exact_hessians[sys_num]->
-                component(var_component, q_point[qp], time);
+	    {
+	      //FIXME: This needs to be implemented to support rank 3 tensors 
+	      //       which can't happen until type_n_tensor is fully implemented
+	      //       and a RawAccessor<TypeNTensor> is fully implemented
+	      if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+		libmesh_not_implemented();
+
+	      for( unsigned int c = 0; c < n_vec_dim; c++)
+		for( unsigned int d = 0; d < dim; d++ )
+		  for( unsigned int e =0; e < dim; e++ )
+		    exact_hess_accessor(d + e*dim + c*dim*dim) =
+		      _exact_hessians[sys_num]->
+		      component(var_component+c, q_point[qp], time)(d,e);
+	    }
 	  else if (_equation_systems_fine)
-	    exact_hess = coarse_values->hessian(q_point[qp]);
-
-	  const Tensor grad2_error = grad2_u_h - exact_hess;
-
+	    {
+	      // FIXME: Needs to be updated for vector-valued elements
+	      exact_hess = coarse_values->hessian(q_point[qp]);
+	    }
+	  
+	  const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
+	  
+	  // FIXME: PB: Is this what we want for rank 3 tensors?
 	  error_vals[2] += JxW[qp]*grad2_error.size_sq();
 #endif
 
@@ -673,5 +747,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   Parallel::sum(error_vals);
   error_vals[4] = l_infty_norm;
 }
+
+  // Explicit instantiations of templated member functions
+  template void ExactSolution::_compute_error<Real>(const std::string&, const std::string&, std::vector<Real>&);
+  template void ExactSolution::_compute_error<RealGradient>(const std::string&, const std::string&, std::vector<Real>&);
 
 } // namespace libMesh

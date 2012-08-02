@@ -48,7 +48,13 @@ class Point;
  * required input of each derived class thwarts the effective
  * use of the commonly used \p build() member.  But afterwards
  * the virtual members allow the convenient and libMesh-common
- * usage through a \p FunctionBase*.
+ * usage through a \p FunctionBase*. Note that for functor objects
+ * for vector-valued variables, it is assumed each component is indexed
+ * contiguously; i.e. if u_var is index 3, then libMesh expects
+ * the x-component of u_var is index 3, the y-component is index 4,
+ * and the z-component is index 5. Note that for 2-D elements in 3
+ * spatial dimensions, libMesh is expecting 2 components (i.e.
+ * mesh_dimension() number of components).
  *
  * @author Daniel Dreyer, 2003
  */

@@ -998,6 +998,11 @@ typename CompareTypes<T, T2>::supertype
 libmesh_dot(const TypeVector<T>& a, const TypeVector<T2>& b)
 { return a * b; }
 
+template <typename T>
+inline
+Real libmesh_norm(const TypeVector<T>& a)
+{return a.size_sq();}
+
 } // namespace libMesh
 
 #endif // #define __type_vector_h__
