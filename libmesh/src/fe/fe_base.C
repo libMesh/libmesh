@@ -88,10 +88,7 @@ namespace
             }
 
           if (vertex_on_periodic_side)
-            {
-              primary = pt_neighbor;
-              break;
-            }
+            primary = pt_neighbor;
         }
 
       return primary;
@@ -149,10 +146,7 @@ namespace
             }
 
           if (vertex_on_periodic_side)
-            {
-              primary = e_neighbor;
-              break;
-            }
+            primary = e_neighbor;
         }
 
       return primary;
