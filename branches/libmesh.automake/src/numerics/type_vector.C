@@ -119,6 +119,20 @@ bool TypeVector<T>::operator < (const TypeVector<T>& rhs) const
 }
 
 
+template <typename T>
+bool TypeVector<T>::operator <= (const TypeVector<T>& rhs) const
+{
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    {
+      if ((*this)(i) < rhs(i))
+        return true;
+      if ((*this)(i) > rhs(i))
+        return false;
+    }
+  return true;
+}
+
+
 
 template <typename T>
 bool TypeVector<T>::operator > (const TypeVector<T>& rhs) const
@@ -133,6 +147,19 @@ bool TypeVector<T>::operator > (const TypeVector<T>& rhs) const
   return false;
 }
 
+
+template <typename T>
+bool TypeVector<T>::operator >= (const TypeVector<T>& rhs) const
+{
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    {
+      if ((*this)(i) > rhs(i))
+        return true;
+      if ((*this)(i) < rhs(i))
+        return false;
+    }
+  return true;
+}
 
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS

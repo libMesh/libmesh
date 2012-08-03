@@ -181,7 +181,6 @@ VectorValue<T>::VectorValue (const TypeVector<T2>& p) :
 {
 }
 
-
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <typename T>
 inline
@@ -193,6 +192,12 @@ VectorValue<T>::VectorValue (const TypeVector<Real>& p_re,
 {
 }
 #endif
+
+template <typename T>
+inline
+Real libmesh_norm(const VectorValue<T>& a)
+{return a.size_sq();}
+
 
 } // namespace libMesh
 

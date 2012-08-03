@@ -306,12 +306,28 @@ public:
   bool operator < (const TypeVector<T>& rhs) const;
 
   /**
+   * @returns \p true if this vector is "less"
+   * than or equal to another.  Useful for sorting.
+   * Also used for choosing some arbitrary constraint
+   * equation directions
+   */
+  bool operator <= (const TypeVector<T>& rhs) const;
+
+  /**
    * @returns \p true if this vector is "greater"
    * than another.  Useful for sorting.
    * Also used for choosing some arbitrary basis function
    * orientations
    */
   bool operator > (const TypeVector<T>& rhs) const;
+
+  /**
+   * @returns \p true if this vector is "greater"
+   * than or equal to another.  Useful for sorting.
+   * Also used for choosing some arbitrary constraint
+   * equation directions
+   */
+  bool operator >= (const TypeVector<T>& rhs) const;
 
   /**
    * Formatted print, by default to \p libMesh::out.
@@ -380,13 +396,13 @@ struct DecrementRank
 template <typename T>
 struct DecrementRank<VectorValue<T> >
 {
-  typedef Real type;
+  typedef T type;
 };
 
 template <typename T>
 struct DecrementRank<TypeVector<T> >
 {
-  typedef Real type;
+  typedef T type;
 };
 
 template <typename T>
@@ -997,6 +1013,11 @@ inline
 typename CompareTypes<T, T2>::supertype
 libmesh_dot(const TypeVector<T>& a, const TypeVector<T2>& b)
 { return a * b; }
+
+template <typename T>
+inline
+Real libmesh_norm(const TypeVector<T>& a)
+{return a.size_sq();}
 
 } // namespace libMesh
 

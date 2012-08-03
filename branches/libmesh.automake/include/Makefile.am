@@ -86,8 +86,11 @@ nobase_include_HEADERS = \
 		fe/fe_interface.h \
 		fe/fe_macro.h \
 		fe/fe_map.h \
+                fe/fe_transformation_base.h \
 		fe/fe_type.h \
 		fe/fe_xyz_map.h \
+                fe/h1_fe_transformation.h \
+                fe/hcurl_fe_transformation.h \
 		fe/inf_fe.h \
 		fe/inf_fe_instantiate_1D.h \
 		fe/inf_fe_instantiate_2D.h \

@@ -25,6 +25,7 @@
 
 #include "tensor_value.h"
 #include "vector_value.h"
+#include "type_n_tensor.h"
 
 namespace libMesh
 {
@@ -53,6 +54,12 @@ namespace libMesh
     typedef Number type;
   };
 
+  template<>
+  struct RawFieldType<TypeNTensor<3, Number> >
+  {
+    typedef Number type;
+  };
+
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   template <>
   struct RawFieldType<Real>
@@ -68,6 +75,12 @@ namespace libMesh
 
   template <>
   struct RawFieldType<RealTensor>
+  {
+    typedef Real type;
+  };
+
+  template<>
+  struct RawFieldType<TypeNTensor<3, Real> >
   {
     typedef Real type;
   };
@@ -123,12 +136,44 @@ Number& RawAccessor<Tensor>::operator()( unsigned int k )
 
   // For tensors, each row is filled first, i.e. for 2-D
   // [ 0 1; 2 3]
-  // Thus, k(i,j) = i + j*dim
-  unsigned int jj = k/_dim;
-  unsigned int ii = k - jj*_dim;
+  // Thus, k(i,j) = j + i*dim
+  unsigned int ii = k/_dim;
+  unsigned int jj = k - ii*_dim;
 
   return this->_data(ii,jj);
 }
+
+/**
+ * Stub implementations for stub TypeNTensor object
+ */
+template <unsigned int N, typename ScalarType>
+class RawAccessor<TypeNTensor<N, ScalarType> >
+{
+public:
+
+  typedef TypeNTensor<N, ScalarType> FieldType;
+
+  RawAccessor( FieldType& data, const unsigned int dim )
+    : _data(data),
+      _dim(dim)
+  {}
+
+  ~RawAccessor(){};
+
+  typename RawFieldType<FieldType>::type& operator()( unsigned int /*i*/ )
+  { return dummy; }
+
+  const typename RawFieldType<FieldType>::type& operator()( unsigned int /*i*/ ) const
+  { return dummy; }
+
+private:
+  RawAccessor();
+
+  ScalarType dummy;
+
+  FieldType& _data;
+  const unsigned int _dim;
+};
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template<>
@@ -161,6 +206,7 @@ Real& RawAccessor<RealTensor>::operator()( unsigned int k )
 
   return this->_data(ii,jj);
 }
+
 #endif
 
 }

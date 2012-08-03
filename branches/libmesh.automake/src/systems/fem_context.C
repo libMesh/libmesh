@@ -306,6 +306,65 @@ void FEMContext::interior_hessian(unsigned int var, unsigned int qp,
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
+template<typename OutputShape>
+void FEMContext::interior_curl(unsigned int var, unsigned int qp,
+			       typename FEGenericBase<OutputShape>::OutputNumber& curl_u) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  // Get finite element object
+  FEGenericBase<OutputShape>* fe = NULL;
+  this->get_element_fe<OutputShape>( var, fe );
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> > &curl_phi = fe->get_curl_phi();
+
+  // Accumulate solution curl
+  curl_u = 0.;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    curl_u.add_scaled(curl_phi[l][qp], coef(l));
+
+  return;
+}
+
+
+template<typename OutputShape>
+void FEMContext::interior_div(unsigned int var, unsigned int qp,
+			      typename FEGenericBase<OutputShape>::OutputNumberDivergence& div_u) const
+{
+  // Get local-to-global dof index lookup
+  libmesh_assert (dof_indices.size() > var);
+  const unsigned int n_dofs = dof_indices_var[var].size();
+
+  // Get current local coefficients
+  libmesh_assert (elem_subsolutions.size() > var);
+  libmesh_assert (elem_subsolutions[var] != NULL);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  // Get finite element object
+  FEGenericBase<OutputShape>* fe = NULL;
+  this->get_element_fe<OutputShape>( var, fe );
+
+  // Get shape function values at quadrature point
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> > &div_phi = fe->get_div_phi();
+
+  // Accumulate solution curl
+  div_u = 0.;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    div_u += div_phi[l][qp] * coef(l);
+
+  return;
+}
+
 
 Number FEMContext::side_value(unsigned int var, unsigned int qp) const
 {
@@ -1312,6 +1371,10 @@ template void FEMContext::interior_hessian<Real>(unsigned int, unsigned int, FEG
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::interior_hessian<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberTensor&) const;
 #endif
+
+template void FEMContext::interior_curl<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumber&) const;
+
+template void FEMContext::interior_div<RealGradient>(unsigned int, unsigned int, FEGenericBase<RealGradient>::OutputNumberDivergence&) const;
 
 template void FEMContext::side_value<Real>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::side_value<RealGradient>(unsigned int, unsigned int, Gradient&) const;

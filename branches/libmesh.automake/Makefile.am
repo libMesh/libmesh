@@ -180,6 +180,7 @@ libmesh_la_SOURCES = \
 		src/fe/fe_szabab_shape_1D.C \
 		src/fe/fe_szabab_shape_2D.C \
 		src/fe/fe_szabab_shape_3D.C \
+                src/fe/fe_transformation_base.C \
 		src/fe/fe_type.C \
 		src/fe/fe_xyz.C \
 		src/fe/fe_xyz_boundary.C \
@@ -188,6 +189,8 @@ libmesh_la_SOURCES = \
 		src/fe/fe_xyz_shape_1D.C \
 		src/fe/fe_xyz_shape_2D.C \
 		src/fe/fe_xyz_shape_3D.C \
+                src/fe/h1_fe_transformation.C \
+                src/fe/hcurl_fe_transformation.C \
 		src/fe/inf_fe.C \
 		src/fe/inf_fe_base_radial.C \
 		src/fe/inf_fe_boundary.C \

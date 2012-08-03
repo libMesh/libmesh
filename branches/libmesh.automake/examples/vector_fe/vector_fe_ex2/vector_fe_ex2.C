@@ -28,6 +28,7 @@
 #include "exodusII_io.h"
 #include "mesh.h"
 #include "mesh_generation.h"
+#include "exact_solution.h"
 
 // The systems and solvers we may use
 #include "laplace_system.h"
@@ -110,13 +111,39 @@ int main (int argc, char** argv)
 
   system.solve();
 
-#ifdef LIBMESH_HAVE_EXODUS_API
+  ExactSolution exact_sol( equation_systems );
+  
+  std::vector<FunctionBase<Number>* > sols;
+  std::vector<FunctionBase<Gradient>* > grads;
 
+  sols.push_back( new SolutionFunction(system.variable_number("u")) );
+  grads.push_back( new SolutionGradient(system.variable_number("u")) );
+
+  exact_sol.attach_exact_values(sols);
+  exact_sol.attach_exact_derivs(grads);
+  
+  // Use higher quadrature order for more accurate error results
+  int extra_error_quadrature = infile("extra_error_quadrature",2);
+  exact_sol.extra_quadrature_order(extra_error_quadrature);
+
+  // Compute the error.
+  exact_sol.compute_error("Laplace", "u");
+  
+  // Print out the error values
+  std::cout << "L2-Error is: "
+	    << exact_sol.l2_error("Laplace", "u")
+	    << std::endl;
+  std::cout << "H1-Error is: "
+	    << exact_sol.h1_error("Laplace", "u")
+	    << std::endl;
+  
+#ifdef LIBMESH_HAVE_EXODUS_API
+  
   // We write the file in the ExodusII format.
   ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
-
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API
   
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
+
   // All done.  
   return 0;
 }

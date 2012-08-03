@@ -564,7 +564,7 @@ protected:
    * it protected.
    * Overloaded method from the \p FEBase version.
    */
-  virtual void compute_shape_functions(const Elem*);
+  virtual void compute_shape_functions(const Elem*, const std::vector<Point>&);
 
 
 
