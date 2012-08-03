@@ -306,12 +306,28 @@ public:
   bool operator < (const TypeVector<T>& rhs) const;
 
   /**
+   * @returns \p true if this vector is "less"
+   * than or equal to another.  Useful for sorting.
+   * Also used for choosing some arbitrary constraint
+   * equation directions
+   */
+  bool operator <= (const TypeVector<T>& rhs) const;
+
+  /**
    * @returns \p true if this vector is "greater"
    * than another.  Useful for sorting.
    * Also used for choosing some arbitrary basis function
    * orientations
    */
   bool operator > (const TypeVector<T>& rhs) const;
+
+  /**
+   * @returns \p true if this vector is "greater"
+   * than or equal to another.  Useful for sorting.
+   * Also used for choosing some arbitrary constraint
+   * equation directions
+   */
+  bool operator >= (const TypeVector<T>& rhs) const;
 
   /**
    * Formatted print, by default to \p libMesh::out.
