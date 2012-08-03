@@ -2129,8 +2129,12 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                           // On a one-element-thick mesh, we compare
                           // points to see what side gets constrained
+                          //
+                          // Use >= in this test to make sure that,
+                          // for angular constraints, no node gets
+                          // constrained to itself.
                               (primary_neigh == elem && 
-                               (neigh_pt > *my_node)))
+                               (neigh_pt >= *my_node)))
                             continue;
                         }
                       else if (elem->is_edge(n))
@@ -2186,6 +2190,10 @@ compute_periodic_constraints (DofConstraints &constraints,
                           // If we have a one-element thick mesh,
                           // we'll need to sort our points to get a
                           // consistent ordering rule
+                          //
+                          // Use >= in this test to make sure that,
+                          // for angular constraints, no node gets
+                          // constrained to itself.
                           if (primary_neigh == elem)
                             {
                               if (*e1 > *e2)
@@ -2193,7 +2201,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                               if (neigh_pt1 > neigh_pt2)
                                 std::swap(neigh_pt1, neigh_pt2);
 
-                              if (neigh_pt2 > *e2)
+                              if (neigh_pt2 >= *e2)
                                 continue;
                             }
 
