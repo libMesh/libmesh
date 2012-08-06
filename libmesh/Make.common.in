@@ -475,10 +475,12 @@ ifeq ($(enable-optional),yes)
       include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/slepcconf
     else
 	  ifeq ($(petsc-major),3)  # 3.0.x & newer style
-	    ifeq ($(petsc-major-minor),3.2.x)  # 3.2.x & newer style
-	      include ${SLEPC_DIR}/conf/slepc_variables
-	    else
+	    ifeq ($(petsc-major-minor),3.0.x)
 	      include ${SLEPC_DIR}/conf/slepc_common_variables
+	    else ifeq ($(petsc-major-minor),3.1.x)
+	      include ${SLEPC_DIR}/conf/slepc_common_variables
+	    else   # 3.2.x & newer style
+	      include ${SLEPC_DIR}/conf/slepc_variables
 	    endif
 	  else
 	    include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
