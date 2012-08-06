@@ -183,6 +183,25 @@ bool TypeVector<Complex>::operator < (const TypeVector<Complex>& rhs) const
 
 
 template <>
+bool TypeVector<Complex>::operator <= (const TypeVector<Complex>& rhs) const
+{
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    {
+      if ((*this)(i).real() < rhs(i).real())
+        return true;
+      if ((*this)(i).real() > rhs(i).real())
+        return false;
+      if ((*this)(i).imag() < rhs(i).imag())
+        return true;
+      if ((*this)(i).imag() > rhs(i).imag())
+        return false;
+    }
+  return true;
+}
+
+
+
+template <>
 bool TypeVector<Complex>::operator > (const TypeVector<Complex>& rhs) const
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
@@ -198,6 +217,26 @@ bool TypeVector<Complex>::operator > (const TypeVector<Complex>& rhs) const
     }
   return false;
 }
+
+
+
+template <>
+bool TypeVector<Complex>::operator >= (const TypeVector<Complex>& rhs) const
+{
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    {
+      if ((*this)(i).real() > rhs(i).real())
+        return true;
+      if ((*this)(i).real() < rhs(i).real())
+        return false;
+      if ((*this)(i).imag() > rhs(i).imag())
+        return true;
+      if ((*this)(i).imag() < rhs(i).imag())
+        return false;
+    }
+  return true;
+}
+
 #endif
 
 
