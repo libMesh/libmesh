@@ -35,8 +35,11 @@ n_timesteps   := 25
 # Specify the amount of initial uniform refinement to do
 n_refinements := 5
 
+# Specify the amount of adaptive refinement to do at each time step
+max_r_steps := 1
+
 # Specify how often to write output files
-output_freq   := 10
+output_freq := 10
 
 all:: $(target)
 
@@ -63,24 +66,28 @@ run: $(target)
 	@echo "* Running Example " $(LIBMESH_RUN) $(target) \[-read_solution\] -n_timesteps $(n_timesteps) -n_refinements $(n_refinements) -init_timestep \[0\|$(n_timesteps)\] $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) -n_timesteps $(n_timesteps) -n_refinements $(n_refinements) \
+	@$(LIBMESH_RUN) $(target) -n_timesteps $(n_timesteps) \
+		   -n_refinements $(n_refinements) -max_r_steps $(max_r_steps) \
                    -output_freq $(output_freq) -init_timestep 0 $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***** Finished first" $(n_timesteps) "steps, now read in" \
 	       "saved solution and continue *****"
 	@echo " "
 	@$(LIBMESH_RUN) $(target) -read_solution -n_timesteps $(n_timesteps) \
+		   -max_r_steps $(max_r_steps) \
                    -output_freq $(output_freq) -init_timestep $(n_timesteps) $(LIBMESH_OPTIONS)
 	@echo " "
-	@$(LIBMESH_RUN) $(target) -n_timesteps $(n_timesteps) -n_refinements $(n_refinements) \
+	@$(LIBMESH_RUN) $(target) -n_timesteps $(n_timesteps) \
+		   -n_refinements $(n_refinements) -max_r_steps $(max_r_steps) \
                    -output_freq $(output_freq) -init_timestep 0 \
-                   -exact_solution '10*exp(-(pow(x-0.8*t-0.2,2) + pow(y-0.8*t-0.2,2))/(0.01*(4*t+1)))/(4*t+1)' \
+                   -exact_solution '100+10*sin(pi*x)*cos(pi*y)' \
                    $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***** Finished first" $(n_timesteps) "steps, now read in" \
 	       "saved solution and continue *****"
 	@echo " "
 	@$(LIBMESH_RUN) $(target) -read_solution -n_timesteps $(n_timesteps) \
+		   -max_r_steps $(max_r_steps) \
                    -output_freq $(output_freq) -init_timestep $(n_timesteps) \
                    $(LIBMESH_OPTIONS)
 	@echo " "
