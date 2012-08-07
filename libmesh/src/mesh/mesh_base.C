@@ -66,10 +66,14 @@ MeshBase::MeshBase (const MeshBase& other_mesh) :
   _dim           (other_mesh._dim),
   _is_prepared   (other_mesh._is_prepared),
   _point_locator (NULL),
-  _partitioner   (other_mesh._partitioner->clone()),
+  _partitioner   (NULL),
   _skip_partitioning(other_mesh._skip_partitioning),
   _skip_renumber_nodes_and_elements(false)
 {
+  if(other_mesh._partitioner.get())
+  {
+    _partitioner = other_mesh._partitioner->clone();
+  }
 }
 
 
