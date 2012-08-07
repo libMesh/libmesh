@@ -90,15 +90,22 @@ bool RBParameters::operator!=(const RBParameters& rhs) const
   return !(*this == rhs);
 }
 
-void RBParameters::print() const
+std::string RBParameters::get_string() const
 {
+  std::stringstream param_stringstream;
+  
   const_iterator it     = _parameters.begin();
   const_iterator it_end = _parameters.end();
   for( ; it != it_end; ++it)
   {
-    libMesh::out << it->first << ": " << it->second << std::endl;
+    param_stringstream << it->first << ": " << it->second << std::endl;
   }
-  libMesh::out << std::endl;
+  return param_stringstream.str();
+}
+
+void RBParameters::print() const
+{
+  libMesh::out << get_string() << std::endl;
 }
 
 }
