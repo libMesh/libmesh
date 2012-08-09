@@ -33,4 +33,4 @@ log_scaling = '0 0 0 0'                     # Generate a training set with unifo
 deterministic_training = false              # Are the training points generated randomly or deterministically
 use_relative_bound_in_greedy = true         # Do we use a relative or absolute error bound when training the RB space?
 
-n_training_samples = 1000                   # The number of parameters in training set
+n_training_samples = 1000                  # The number of parameters in training set
