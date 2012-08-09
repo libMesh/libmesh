@@ -694,8 +694,8 @@ namespace libMesh
     return;
   }
 
-} //namespace libMesh
-
 // Explicit Instantations
 template class H1FETransformation<Real>;
 template class H1FETransformation<RealGradient>;
+
+} //namespace libMesh
