@@ -42,6 +42,7 @@
 #include "getpot.h"
 #include "elem.h"
 #include "quadrature_gauss.h"
+#include "libmesh_logging.h"
 
 // local includes
 #include "rb_classes.h"
@@ -241,6 +242,8 @@ void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std:
 
 void compute_stresses(EquationSystems& es)
 {
+  START_LOG("compute_stresses()", "main");
+
   const MeshBase& mesh = es.get_mesh();
 
   const unsigned int dim = mesh.mesh_dimension();
@@ -363,4 +366,6 @@ void compute_stresses(EquationSystems& es)
   // Should call close and update when we set vector entries directly
   stress_system.solution->close();
   stress_system.update();
+
+  STOP_LOG("compute_stresses()", "main");
 }
