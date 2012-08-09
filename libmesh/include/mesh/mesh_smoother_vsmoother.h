@@ -75,8 +75,8 @@ public:
   /**
    * Simple constructor to use for smoothing purposes
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh, const double& theta=0.5, const uint& miniter=2,
-			  const uint& maxiter=5, const uint& miniterBC=5)
+  VariationalMeshSmoother(UnstructuredMesh& mesh, const double theta=0.5, const uint miniter=2,
+			  const uint maxiter=5, const uint miniterBC=5)
     :MeshSmoother(mesh),
      _percent_to_move(1),
      _adapt_data(NULL),
@@ -96,9 +96,9 @@ public:
   /**
    * Slightly more complicated constructor for mesh redistribution based on adapt_data
    */
-  VariationalMeshSmoother(UnstructuredMesh& mesh, std::vector<float>* adapt_data, const double& theta=0.5,
-			  const uint& miniter=2, const uint& maxiter=5, const uint& miniterBC=5,
-			  const double& percent_to_move=1)
+  VariationalMeshSmoother(UnstructuredMesh& mesh, std::vector<float>* adapt_data, const double theta=0.5,
+			  const uint miniter=2, const uint maxiter=5, const uint miniterBC=5,
+			  const double percent_to_move=1)
     :MeshSmoother(mesh),
      _percent_to_move(percent_to_move),
      _adapt_data(adapt_data),
@@ -120,8 +120,8 @@ public:
    * area of interest
    */
   VariationalMeshSmoother(UnstructuredMesh& mesh, const UnstructuredMesh* area_of_interest, std::vector<float>* adapt_data,
-			  const double& theta=0.5, const uint& miniter=2, const uint& maxiter=5,
-			  const uint& miniterBC=5, const double& percent_to_move=1)
+			  const double theta=0.5, const uint miniter=2, const uint maxiter=5,
+			  const uint miniterBC=5, const double percent_to_move=1)
     :MeshSmoother(mesh),
      _percent_to_move(percent_to_move),
      _adapt_data(adapt_data),
@@ -209,11 +209,11 @@ private:
   /**
    * Smoother control variables
    */
-  const uint& _dim,_miniter,_maxiter,_miniterBC;
-  const metric_type& _metric;
-  const adapt_type& _adaptive_func;
-  const double& _theta;
-  const bool& _generate_data;
+  const uint _dim,_miniter,_maxiter,_miniterBC;
+  const metric_type _metric;
+  const adapt_type _adaptive_func;
+  const double _theta;
+  const bool _generate_data;
 
   /**
    * Area of Interest Mesh
