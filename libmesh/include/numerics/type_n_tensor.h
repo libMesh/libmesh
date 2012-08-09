@@ -67,7 +67,7 @@ public:
   /**
    * Return a proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
-  const TypeNTensor<N-1,T> slice (const unsigned int i) const
+  const TypeNTensor<N-1,T> slice (const unsigned int /*i*/) const
     { return TypeNTensor<N-1,T>(); }
 
   /**
@@ -160,20 +160,21 @@ public:
   /**
    * @returns \p true if two tensors are equal valued.
    */
-  bool operator == (const TypeNTensor<N,T>&) const { return true; }
+  bool operator == (const TypeNTensor<N,T>& /*rhs*/) const
+    { return true; }
 
   /**
    * @returns \p true if this tensor is "less"
    * than another.  Useful for sorting.
    */
-  bool operator < (const TypeNTensor<N,T>& rhs) const
+  bool operator < (const TypeNTensor<N,T>& /*rhs*/) const
     { return false; }
 
   /**
    * @returns \p true if this tensor is "greater"
    * than another.
    */
-  bool operator > (const TypeNTensor<N,T>& rhs) const
+  bool operator > (const TypeNTensor<N,T>& /*rhs*/) const
     { return false; }
 
   /**

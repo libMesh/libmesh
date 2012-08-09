@@ -1035,14 +1035,16 @@ void Elem::make_links_to_me_local(unsigned int n)
       // after an AMR step but before find_neighbors has fixed up
       // neighbor links, we might have an out of date neighbor
       // link to elem's parent instead.
+#ifdef LIBMESH_ENABLE_AMR
       libmesh_assert((neigh_family_member->neighbor(nn) == this) ||
                      (neigh_family_member->neighbor(nn) == remote_elem)
-#ifdef LIBMESH_ENABLE_AMR
 		     || ((this->refinement_flag() == JUST_REFINED) &&
                       (this->parent() != NULL) &&
-                      (neigh_family_member->neighbor(nn) == this->parent()))
+                      (neigh_family_member->neighbor(nn) == this->parent())));
+#else
+      libmesh_assert((neigh_family_member->neighbor(nn) == this) ||
+                     (neigh_family_member->neighbor(nn) == remote_elem));
 #endif
-		     );
 
       neigh_family_member->set_neighbor(nn, this);
     }
