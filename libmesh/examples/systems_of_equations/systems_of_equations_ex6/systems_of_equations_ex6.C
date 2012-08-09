@@ -164,6 +164,7 @@ int main (int argc, char** argv)
   stress_system.add_variable("sigma_20", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_21", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
+  stress_system.add_variable("vonMises", CONSTANT, MONOMIAL);
   
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -469,6 +470,7 @@ void compute_stresses(EquationSystems& es)
   sigma_vars[2][0] = stress_system.variable_number ("sigma_20");
   sigma_vars[2][1] = stress_system.variable_number ("sigma_21");
   sigma_vars[2][2] = stress_system.variable_number ("sigma_22");
+  unsigned int vonMises_var = stress_system.variable_number ("vonMises");
 
   // Storage for the stress dof indices on each element
   std::vector< std::vector<unsigned int> > dof_indices_var(system.n_vars());
@@ -536,6 +538,21 @@ void compute_stresses(EquationSystems& es)
         }
 
       }
+    
+    // Also, the von Mises stress
+    Real vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) + 
+                                           pow(elem_sigma(1,1) - elem_sigma(2,2),2.) + 
+                                           pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
+                                           6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
+                                         ) );
+    stress_dof_map.dof_indices (elem, stress_dof_indices_var, vonMises_var);
+    unsigned int dof_index = stress_dof_indices_var[0];
+    if( (stress_system.solution->first_local_index() <= dof_index) &&
+        (dof_index < stress_system.solution->last_local_index()) )
+    {
+      stress_system.solution->set(dof_index, vonMises_value);
+    }
+    
   }
 
   // Should call close and update when we set vector entries directly
