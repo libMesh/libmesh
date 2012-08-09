@@ -99,6 +99,11 @@ public:
   bool operator!= (const RBParameters& node) const;
   
   /**
+   * Get a string that specifies the contents of this RBParameters object.
+   */
+  std::string get_string() const;
+  
+  /**
    * Print the parameters.
    */
   void print() const;

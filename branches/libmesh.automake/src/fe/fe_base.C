@@ -2087,6 +2087,10 @@ compute_periodic_constraints (DofConstraints &constraints,
                   // vertex dofs to constrain via lexicographic
                   // ordering on point locations
 
+                  // FIXME: This code doesn't yet properly handle
+                  // cases where multiple different periodic BCs
+                  // intersect.
+                  /*
                   std::set<unsigned int> my_constrained_dofs;
 
 		  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
@@ -2259,15 +2263,54 @@ compute_periodic_constraints (DofConstraints &constraints,
                           (my_node->dof_number
                              (sys_number, variable_number, i));
                     }
+                  */
+
+                  // FIXME: old code for disambiguating periodic BCs:
+                  // this is not threadsafe nor safe to run on a
+                  // non-serialized mesh.
+                  std::vector<bool> recursive_constraint(n_side_dofs, false);
+ 
+	          for (unsigned int is = 0; is != n_side_dofs; ++is)
+	            {
+	              const unsigned int i = neigh_side_dofs[is];
+	              const unsigned int their_dof_g = neigh_dof_indices[i];
+                      libmesh_assert(their_dof_g != DofObject::invalid_id);
+ 
+		      {
+			Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
+
+                        if (!dof_map.is_constrained_dof(their_dof_g))
+                          continue;
+                      }
+ 
+                      DofConstraintRow& their_constraint_row =
+                        constraints[their_dof_g].first;
+ 
+	              for (unsigned int js = 0; js != n_side_dofs; ++js)
+	                {
+	                  const unsigned int j = my_side_dofs[js];
+	                  const unsigned int my_dof_g = my_dof_indices[j];
+                          libmesh_assert(my_dof_g != DofObject::invalid_id);
+ 
+                          if (their_constraint_row.count(my_dof_g))
+                            recursive_constraint[js] = true;
+	                }
+                    }
+
 
 	          for (unsigned int js = 0; js != n_side_dofs; ++js)
 	            {
+                      // FIXME: old code path
+                      if (recursive_constraint[js])
+                        continue;
+
 	              const unsigned int j = my_side_dofs[js];
 	              const unsigned int my_dof_g = my_dof_indices[j];
                       libmesh_assert(my_dof_g != DofObject::invalid_id);
 
-                      if (!my_constrained_dofs.count(my_dof_g))
-                        continue;
+                      // FIXME: new code path
+                      // if (!my_constrained_dofs.count(my_dof_g))
+                      //  continue;
 
 		      DofConstraintRow* constraint_row;
 
@@ -2293,9 +2336,17 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                           // Periodic constraints should never be
                           // self-constraints
-		          libmesh_assert(their_dof_g != my_dof_g);
+		          // libmesh_assert(their_dof_g != my_dof_g);
 
 		          const Real their_dof_value = Ue[is](js);
+
+		          if (their_dof_g == my_dof_g)
+		            {
+		              libmesh_assert(std::abs(their_dof_value-1.) < 1.e-5);
+		              for (unsigned int k = 0; k != n_side_dofs; ++k)
+		                libmesh_assert(k == is || std::abs(Ue[k](js)) < 1.e-5);
+		              continue;
+		            }
 
 		          if (std::abs(their_dof_value) < 10*TOLERANCE)
 		            continue;

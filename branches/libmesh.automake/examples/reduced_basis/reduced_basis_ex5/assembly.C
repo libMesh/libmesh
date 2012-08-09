@@ -27,6 +27,29 @@ using libMesh::RBTheta;
 using libMesh::Real;
 using libMesh::RealGradient;
 
+// Kronecker delta function
+inline Real kronecker_delta(unsigned int i,
+                            unsigned int j)
+{
+  return i == j ? 1. : 0.;
+}
+
+Real elasticity_tensor(unsigned int i,
+                       unsigned int j,
+                       unsigned int k,
+                       unsigned int l)
+{
+  // Define the Poisson ratio and Young's modulus
+  const Real nu = 0.3;
+  const Real E  = 1.;
+
+  // Define the Lame constants (lambda_1 and lambda_2) based on nu and E
+  const Real lambda_1 = E * nu / ( (1. + nu) * (1. - 2.*nu) );
+  const Real lambda_2 = 0.5 * E / (1. + nu);
+
+  return lambda_1 * kronecker_delta(i,j) * kronecker_delta(k,l)
+       + lambda_2 * (kronecker_delta(i,k) * kronecker_delta(j,l) + kronecker_delta(i,l) * kronecker_delta(j,k));
+}
 
 void AssemblyA0::interior_assembly(FEMContext &c)
 {
