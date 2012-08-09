@@ -20,7 +20,8 @@
  // <h1> Systems Example 6 - 3D Linear Elastic Cantilever </h1>
  //      By David Knezevic
  //
- // This is a 3D version of systems_of_equations_ex4
+ // This is a 3D version of systems_of_equations_ex4.
+ // In this case we also compute and plot stresses.
 
 
 // C++ include files that we need
@@ -72,6 +73,9 @@ using namespace libMesh;
 // Matrix and right-hand side assembly
 void assemble_elasticity(EquationSystems& es,
                          const std::string& system_name);
+                         
+// Post-process the solution to compute stresses
+void compute_stresses(EquationSystems& es);
 
 // The Kronecker delta function, used in eval_elasticity_tensor
 Real kronecker_delta(unsigned int i,
@@ -147,6 +151,20 @@ int main (int argc, char** argv)
   // we call equation_systems.init()
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
   
+  // Also, initialize an ExplicitSystem to store stresses
+  ExplicitSystem& stress_system =
+    equation_systems.add_system<ExplicitSystem> ("StressSystem");
+  
+  stress_system.add_variable("sigma_00", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_01", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_02", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_10", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_11", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_12", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_20", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_21", CONSTANT, MONOMIAL);
+  stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
+  
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
@@ -155,6 +173,9 @@ int main (int argc, char** argv)
 
   // Solve the system
   system.solve();
+  
+  // Post-process the solution to compute the stresses
+  compute_stresses(equation_systems);
 
   // Plot the solution
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -410,6 +431,116 @@ void assemble_elasticity(EquationSystems& es,
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
+}
+
+void compute_stresses(EquationSystems& es)
+{
+  const MeshBase& mesh = es.get_mesh();
+
+  const unsigned int dim = mesh.mesh_dimension();
+
+  LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Elasticity");
+
+  unsigned int displacement_vars[3];
+  displacement_vars[0] = system.variable_number ("u");
+  displacement_vars[1] = system.variable_number ("v");
+  displacement_vars[2] = system.variable_number ("w");
+  const unsigned int u_var = system.variable_number ("u");
+
+  const DofMap& dof_map = system.get_dof_map();
+  FEType fe_type = dof_map.variable_type(u_var);
+  AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
+  QGauss qrule (dim, fe_type.default_quadrature_order());
+  fe->attach_quadrature_rule (&qrule);
+  
+  const std::vector<Real>& JxW = fe->get_JxW();
+  const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+  
+  // Also, get a reference to the ExplicitSystem
+  ExplicitSystem& stress_system = es.get_system<ExplicitSystem>("StressSystem");
+  const DofMap& stress_dof_map = stress_system.get_dof_map();
+  unsigned int sigma_vars[3][3];
+  sigma_vars[0][0] = stress_system.variable_number ("sigma_00");
+  sigma_vars[0][1] = stress_system.variable_number ("sigma_01");
+  sigma_vars[0][2] = stress_system.variable_number ("sigma_02");
+  sigma_vars[1][0] = stress_system.variable_number ("sigma_10");
+  sigma_vars[1][1] = stress_system.variable_number ("sigma_11");
+  sigma_vars[1][2] = stress_system.variable_number ("sigma_12");
+  sigma_vars[2][0] = stress_system.variable_number ("sigma_20");
+  sigma_vars[2][1] = stress_system.variable_number ("sigma_21");
+  sigma_vars[2][2] = stress_system.variable_number ("sigma_22");
+
+  // Storage for the stress dof indices on each element
+  std::vector< std::vector<unsigned int> > dof_indices_var(system.n_vars());
+  std::vector<unsigned int> stress_dof_indices_var;
+
+  // To store the stress tensor on each element
+  DenseMatrix<Real> elem_sigma;
+
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+  for ( ; el != end_el; ++el)
+  {
+    const Elem* elem = *el;
+
+    for(unsigned int var=0; var<3; var++)
+    {
+      dof_map.dof_indices (elem, dof_indices_var[var], displacement_vars[var]);
+    }
+
+    fe->reinit (elem);
+
+    elem_sigma.resize(3,3);
+    
+    for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+    {
+      for(unsigned int C_i=0; C_i<3; C_i++)
+        for(unsigned int C_j=0; C_j<3; C_j++)
+          for(unsigned int C_k=0; C_k<3; C_k++)
+          {
+            const unsigned int n_var_dofs = dof_indices_var[C_k].size();
+
+            // Get the gradient at this quadrature point
+            Gradient displacement_gradient;
+            for(unsigned int l=0; l<n_var_dofs; l++)
+            {
+              displacement_gradient.add_scaled(dphi[l][qp], system.current_solution(dof_indices_var[C_k][l]));
+            }
+
+            for(unsigned int C_l=0; C_l<3; C_l++)
+            {
+              elem_sigma(C_i,C_j) += JxW[qp]*( eval_elasticity_tensor(C_i,C_j,C_k,C_l) * displacement_gradient(C_l) );
+            }
+
+          }
+    }
+    
+    // Get the average stresses by dividing by the element volume
+    elem_sigma.scale(1./elem->volume());
+
+    // load elem_sigma data into stress_system
+    for(unsigned int i=0; i<3; i++)
+      for(unsigned int j=0; j<3; j++)
+      {
+        stress_dof_map.dof_indices (elem, stress_dof_indices_var, sigma_vars[i][j]);
+
+        // We are using CONSTANT MONOMIAL basis functions, hence we only need to get
+        // one dof index per variable
+        unsigned int dof_index = stress_dof_indices_var[0];
+        
+        if( (stress_system.solution->first_local_index() <= dof_index) &&
+            (dof_index < stress_system.solution->last_local_index()) )
+        {
+          stress_system.solution->set(dof_index, elem_sigma(i,j));
+        }
+
+      }
+  }
+
+  // Should call close and update when we set vector entries directly
+  stress_system.solution->close();
+  stress_system.update();
 }
 
 Real kronecker_delta(unsigned int i,
