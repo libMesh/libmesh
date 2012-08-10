@@ -123,7 +123,7 @@ void print_help(int, char** argv)
 	       << "               theta=<theta_value> theta_c=<theta_c_value>                                                                        \n"
 	       << "               initial_state=<ball|rod|strip> initial_center='x [y [z]]' initial_width=<width>                                    \n"
 	       << "               min_time=<initial_time> max_time=<final_time> dt=<timestep_size> crank_nicholson_weight=<between_0_and_1>          \n"
-	       << "               output_base=<base_filename> output_dt=<output_timestep_size> [--use-petsc-dm --vi]                                 \n"
+	       << "               output_base=<base_filename> output_dt=<output_timestep_size> [--use-petsc-dm -snes_type virs]                      \n"
 	       << "\n"
 	       << argv[0] << " --verbose \n"
 	       << "is a pretty good start.\n"
@@ -139,7 +139,7 @@ void print_help(int, char** argv)
 	       << "A 3D system with an initial ball in the center\n"
 	       << argv[0] << " --verbose dim=3 N=32   initial_state=ball initial_center='0.5 0.5 0.5' initial_width=0.1 dt=1e-10 max_time=1e-6 \n"
 	       << "\n"
-	       << "Add --use-petsc-dm --vi to run the variational inequality version that ensures the solution is between -1.0 and 1.0 at all times.\n\n"
+	       << "Add --use-petsc-dm -snes_type virs to run the variational inequality version that ensures the solution is between -1.0 and 1.0 at all times.\n\n"
 	       << std::endl;
 }
 
