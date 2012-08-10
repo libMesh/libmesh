@@ -136,6 +136,9 @@
 /* define if the compiler supports __gnu_cxx::hash_set */
 #undef HAVE_EXT_HASH_SET
 
+/* Define to 1 if you have the <fenv.h> header file. */
+#undef HAVE_FENV_H
+
 /* Flag indicating whether the library will be compiled with FPARSER support
    */
 #undef HAVE_FPARSER
@@ -314,6 +317,9 @@
 
 /* Flag indicating headers and libraries for XDR IO are available */
 #undef HAVE_XDR
+
+/* Define to 1 if you have the <xmmintrin.h> header file. */
+#undef HAVE_XMMINTRIN_H
 
 /* Flag indicating xz is available for handling compressed .xz files */
 #undef HAVE_XZ

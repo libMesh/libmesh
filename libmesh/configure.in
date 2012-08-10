@@ -347,6 +347,8 @@ dnl --------------------------------------------------------------
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(csignal)
 AC_CHECK_HEADERS(sys/resource.h)
+AC_CHECK_HEADERS(fenv.h)
+AC_CHECK_HEADERS(xmmintrin.h)
 AC_CXX_HAVE_LOCALE
 AC_CXX_HAVE_SSTREAM
 

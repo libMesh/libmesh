@@ -35,6 +35,19 @@
 #include "threads.h"
 
 
+// floating-point exceptions
+// prefer fenv on linux
+#undef __linux_fpe__
+#undef __APPLE_fpe__
+#ifdef LIBMESH_HAVE_FENV_H
+#  include <fenv.h>
+#  define __linux_fpe__
+// or fall back to sse fpe
+#elif defined(LIBMESH_HAVE_XMMINTRIN_H)
+#  include <xmmintrin.h>
+#  define __APPLE_fpe__
+#endif
+
 
 #if defined(LIBMESH_HAVE_MPI)
 # include "ignore_warnings.h"
@@ -58,7 +71,7 @@ EXTERN_C_FOR_PETSC_END
 
 
 // --------------------------------------------------------
-// Local anonymous namespace to hold miscelaneous variables
+// Local anonymous namespace to hold miscelaneous bits
 namespace {
 
   using libMesh::AutoPtr;
@@ -81,7 +94,80 @@ namespace {
 #if defined(LIBMESH_HAVE_SLEPC)
   bool libmesh_initialized_slepc = false;
 #endif
-}
+
+
+  /**
+   * Floating point exception handler -- courtesy of Cody Permann & MOOSE team
+   */
+  void libmesh_handleFPE(int /*signo*/, siginfo_t *info, void * /*context*/)
+  {
+    std::cout << std::endl;
+    std::cout << "Floating point exception signaled (";
+    switch (info->si_code)
+      {
+      case FPE_INTDIV: std::cerr << "integer divide by zero"; break;
+      case FPE_INTOVF: std::cerr << "integer overflow"; break;
+      case FPE_FLTDIV: std::cerr << "floating point divide by zero"; break;
+      case FPE_FLTOVF: std::cerr << "floating point overflow"; break;
+      case FPE_FLTUND: std::cerr << "floating point underflow"; break;
+      case FPE_FLTRES: std::cerr << "floating point inexact result"; break;
+      case FPE_FLTINV: std::cerr << "invalid floating point operation"; break;
+      case FPE_FLTSUB: std::cerr << "subscript out of range"; break;
+      }
+    std::cout << ")!" << std::endl;
+    
+    std::cout << std::endl;
+    std::cout << "To track this down, compile debug version, start debugger, set breakpoint for 'libmesh_handleFPE' and run" << std::endl;
+    std::cout << "In gdb do:" << std::endl;
+    std::cout << "  break libmesh_handleFPE" << std::endl;
+    std::cout << "  run ..." << std::endl;
+    std::cout << "  bt" << std::endl;
+    
+    exit(-2);             // MAGIC NUMBER!
+  }
+  
+  
+  /**
+   * Toggle floating point exceptions -- courtesy of Cody Permann & MOOSE team
+   */
+  void enableFPE(bool on)
+  {
+    static int flags = 0;
+    
+    if (on)
+      {
+	struct sigaction new_action, old_action;
+	
+#ifdef __APPLE_fpe__
+	flags = _MM_GET_EXCEPTION_MASK();           // store the flags
+	_MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
+#elif defined(__linux_fpe__)
+	feenableexcept(FE_DIVBYZERO | FE_INVALID);
+#endif
+	
+
+	// Set up the structure to specify the new action.
+	new_action.sa_sigaction = libmesh_handleFPE;
+	sigemptyset (&new_action.sa_mask);
+	new_action.sa_flags = SA_SIGINFO;
+	
+	sigaction (SIGFPE, NULL, &old_action);
+	if (old_action.sa_handler != SIG_IGN)
+	  sigaction (SIGFPE, &new_action, NULL);
+      }
+    else
+      {
+#ifdef __APPLE_fpe__
+	_MM_SET_EXCEPTION_MASK(flags);
+#elif defined(__linux_fpe__)
+	fedisableexcept(FE_DIVBYZERO | FE_INVALID);
+#endif
+	signal(SIGFPE, 0);
+      }
+  }
+  
+} 
+
 
 
 #ifdef LIBMESH_HAVE_MPI
@@ -410,6 +496,10 @@ void _init (int &argc, char** & argv,
   old_terminate_handler = std::set_terminate(libmesh_terminate_handler);
 #endif
 
+
+  if (libMesh::on_command_line("--enable-fpe"))
+    enableFPE(true);
+  
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
 
@@ -552,6 +642,11 @@ int _close ()
   // keep doing C++ stuff after closing libMesh stuff.
   std::set_terminate(old_terminate_handler);
 #endif
+
+
+  if (libMesh::on_command_line("--enable-fpe"))
+    enableFPE(false);
+  
 
   // Return the number of outstanding objects.
   // This is equivalent to return 0 if all of
