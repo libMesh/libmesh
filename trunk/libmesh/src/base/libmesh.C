@@ -37,15 +37,11 @@
 
 // floating-point exceptions
 // prefer fenv on linux
-#undef __linux_fpe__
-#undef __APPLE_fpe__
 #ifdef LIBMESH_HAVE_FENV_H
 #  include <fenv.h>
-#  define __linux_fpe__
-// or fall back to sse fpe
-#elif defined(LIBMESH_HAVE_XMMINTRIN_H)
+#endif
+#ifdef LIBMESH_HAVE_XMMINTRIN_H
 #  include <xmmintrin.h>
-#  define __APPLE_fpe__
 #endif
 
 
@@ -135,38 +131,40 @@ namespace {
   void enableFPE(bool on)
   {
     return;
-//     static int flags = 0;
+    static int flags = 0;
     
-//     if (on)
-//       {
-// 	struct sigaction new_action, old_action;
+    if (on)
+      {
+	struct sigaction new_action, old_action;
 	
-// #ifdef __APPLE_fpe__
-// 	flags = _MM_GET_EXCEPTION_MASK();           // store the flags
-// 	_MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
-// #elif defined(__linux_fpe__)
-// 	feenableexcept(FE_DIVBYZERO | FE_INVALID);
-// #endif
+#ifdef __APPLE__
+	flags = _MM_GET_EXCEPTION_MASK();           // store the flags
+	_MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
+#endif
+#ifdef __linux__
+	feenableexcept(FE_DIVBYZERO | FE_INVALID);
+#endif
 	
 
-// 	// Set up the structure to specify the new action.
-// 	new_action.sa_sigaction = libmesh_handleFPE;
-// 	sigemptyset (&new_action.sa_mask);
-// 	new_action.sa_flags = SA_SIGINFO;
+	// Set up the structure to specify the new action.
+	new_action.sa_sigaction = libmesh_handleFPE;
+	sigemptyset (&new_action.sa_mask);
+	new_action.sa_flags = SA_SIGINFO;
 	
-// 	sigaction (SIGFPE, NULL, &old_action);
-// 	if (old_action.sa_handler != SIG_IGN)
-// 	  sigaction (SIGFPE, &new_action, NULL);
-//       }
-//     else
-//       {
-// #ifdef __APPLE_fpe__
-// 	_MM_SET_EXCEPTION_MASK(flags);
-// #elif defined(__linux_fpe__)
-// 	fedisableexcept(FE_DIVBYZERO | FE_INVALID);
-// #endif
-// 	signal(SIGFPE, 0);
-//       }
+	sigaction (SIGFPE, NULL, &old_action);
+	if (old_action.sa_handler != SIG_IGN)
+	  sigaction (SIGFPE, &new_action, NULL);
+      }
+    else
+      {
+#ifdef __APPLE__
+	_MM_SET_EXCEPTION_MASK(flags);
+#endif
+#ifdef __linux__
+	fedisableexcept(FE_DIVBYZERO | FE_INVALID);
+#endif
+	signal(SIGFPE, 0);
+      }
   }
   
 } 
