@@ -95,6 +95,7 @@ namespace {
   bool libmesh_initialized_slepc = false;
 #endif
 
+  
 
   /**
    * Floating point exception handler -- courtesy of Cody Permann & MOOSE team
@@ -123,9 +124,10 @@ namespace {
     std::cout << "  run ..." << std::endl;
     std::cout << "  bt" << std::endl;
     
-    exit(-2);             // MAGIC NUMBER!
+    libmesh_error();
   }
   
+
   
   /**
    * Toggle floating point exceptions -- courtesy of Cody Permann & MOOSE team
