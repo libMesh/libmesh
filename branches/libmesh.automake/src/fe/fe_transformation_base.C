@@ -67,7 +67,7 @@ namespace libMesh
     return ap;
   }
 
-} // namespace libMesh
-
 template class FETransformationBase<Real>;
 template class FETransformationBase<RealGradient>;
+
+} // namespace libMesh
