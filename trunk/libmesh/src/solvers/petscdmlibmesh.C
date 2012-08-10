@@ -204,7 +204,7 @@ PetscErrorCode DMLibMeshGetSystem(DM dm, NonlinearImplicitSystem*& sys)
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
   PetscBool islibmesh;
-  ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);
+  ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh); CHKERRQ(ierr);
   if(!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM oftype %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
   DM_libMesh *dlm = (DM_libMesh *)(dm->data);
   sys = dlm->sys;
@@ -585,7 +585,6 @@ static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, cons
 	 Add an appropriate token to the list.
 	 A token separator ',' produces no token. 
       */
-      struct token *st = PETSC_NULL, *br = PETSC_NULL;
       if(*ss == ';') {
 	/* Create a break token: a token with a null string. */
 	ierr = PetscNew(struct token, &br); CHKERRQ(ierr);
@@ -838,7 +837,7 @@ static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
 {
   PetscErrorCode ierr;
   NonlinearImplicitSystem* _sys;
-  ierr = DMLibMeshGetSystem(dm, _sys);
+  ierr = DMLibMeshGetSystem(dm, _sys); CHKERRQ(ierr);
   NonlinearImplicitSystem& sys = *_sys;
   PetscVector<Number> XL(xl);
   PetscVector<Number> XU(xu);
