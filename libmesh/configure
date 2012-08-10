@@ -6035,6 +6035,30 @@ fi
 
 done
 
+for ac_header in fenv.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "fenv.h" "ac_cv_header_fenv_h" "$ac_includes_default"
+if test "x$ac_cv_header_fenv_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_FENV_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in xmmintrin.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "xmmintrin.h" "ac_cv_header_xmmintrin_h" "$ac_includes_default"
+if test "x$ac_cv_header_xmmintrin_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_XMMINTRIN_H 1
+_ACEOF
+
+fi
+
+done
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether the compiler implements namespaces" >&5
 $as_echo_n "checking whether the compiler implements namespaces... " >&6; }
 if ${ac_cv_cxx_namespaces+:} false; then :
