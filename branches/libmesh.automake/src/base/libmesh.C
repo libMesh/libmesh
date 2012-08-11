@@ -37,15 +37,11 @@
 
 // floating-point exceptions
 // prefer fenv on linux
-#undef __linux_fpe__
-#undef __APPLE_fpe__
 #ifdef LIBMESH_HAVE_FENV_H
 #  include <fenv.h>
-#  define __linux_fpe__
-// or fall back to sse fpe
-#elif defined(LIBMESH_HAVE_XMMINTRIN_H)
+#endif
+#ifdef LIBMESH_HAVE_XMMINTRIN_H
 #  include <xmmintrin.h>
-#  define __APPLE_fpe__
 #endif
 
 
@@ -134,16 +130,18 @@ namespace {
    */
   void enableFPE(bool on)
   {
+    return;
     static int flags = 0;
     
     if (on)
       {
 	struct sigaction new_action, old_action;
 	
-#ifdef __APPLE_fpe__
+#ifdef __APPLE__
 	flags = _MM_GET_EXCEPTION_MASK();           // store the flags
 	_MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
-#elif defined(__linux_fpe__)
+#endif
+#ifdef __linux__
 	feenableexcept(FE_DIVBYZERO | FE_INVALID);
 #endif
 	
@@ -159,9 +157,10 @@ namespace {
       }
     else
       {
-#ifdef __APPLE_fpe__
+#ifdef __APPLE__
 	_MM_SET_EXCEPTION_MASK(flags);
-#elif defined(__linux_fpe__)
+#endif
+#ifdef __linux__
 	fedisableexcept(FE_DIVBYZERO | FE_INVALID);
 #endif
 	signal(SIGFPE, 0);
