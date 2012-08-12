@@ -700,7 +700,20 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
   return *buf;
 }
 
+void System::remove_vector (const std::string& vec_name)
+{
+  //Return if the vector does not exist
+  if ( !(this->have_vector(vec_name)) )
+    return;
 
+  _vectors[vec_name]->clear();
+  delete _vectors[vec_name];
+  _vectors[vec_name] = NULL;
+
+  _vectors.erase(vec_name);
+  _vector_projections.erase(vec_name);
+  _vector_types.erase(vec_name);
+}
 
 const NumericVector<Number> * System::request_vector (const std::string& vec_name) const
 {
