@@ -697,18 +697,22 @@ public:
   const_vectors_iterator vectors_end () const;
 
   /**
-   * Adds the additional vector \p vec_name to this system.  Only
-   * allowed @e prior to \p init().  All the additional vectors
-   * are similarly distributed, like the \p solution,
-   * and inititialized to zero.
+   * Adds the additional vector \p vec_name to this system.  All the
+   * additional vectors are similarly distributed, like the \p
+   * solution, and inititialized to zero.
    *
    * By default vectors added by add_vector are projected to changed grids by
    * reinit().  To zero them instead (more efficient), pass "false" as the
    * second argument
    */
   NumericVector<Number> & add_vector (const std::string& vec_name,
-				                              const bool projections=true,
-				                              const ParallelType type = PARALLEL);
+                                      const bool projections=true,
+                                      const ParallelType type = PARALLEL);
+
+  /**
+   * Removes the additional vector \p vec_name from this system
+   */
+  void remove_vector(const std::string& vec_name);
 
   /**
    * Tells the System whether or not to project the solution vector onto new
@@ -907,14 +911,14 @@ public:
    * vectors, by default the one corresponding to the first parameter.
    */
   const NumericVector<Number> & get_sensitivity_rhs(unsigned int i=0) const;
-
+  
   /**
    * @returns the number of vectors (in addition to the solution)
    * handled by this system
    * This is the size of the \p _vectors map
    */
   unsigned int n_vectors () const;
-  
+
   /**
    * @returns the number of matrices
    * handled by this system.
@@ -1669,7 +1673,8 @@ private:
   bool _basic_system_only;
 
   /**
-   * \p true when additional vectors may still be added, \p false otherwise.
+   * \p true when additional vectors do not require immediate
+   * initialization, \p false otherwise.
    */
   bool _can_add_vectors;
 
