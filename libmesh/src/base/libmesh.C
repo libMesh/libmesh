@@ -137,7 +137,7 @@ namespace {
       {
 	struct sigaction new_action, old_action;
 	
-#ifdef __APPLE__
+#ifdef LIBMESH_HAVE_XMMINTRIN_H
 	flags = _MM_GET_EXCEPTION_MASK();           // store the flags
 	_MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
 #endif
@@ -157,7 +157,7 @@ namespace {
       }
     else
       {
-#ifdef __APPLE__
+#ifdef LIBMESH_HAVE_XMMINTRIN_H
 	_MM_SET_EXCEPTION_MASK(flags);
 #endif
 #ifdef __linux__
