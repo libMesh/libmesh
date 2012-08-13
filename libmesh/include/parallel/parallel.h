@@ -306,12 +306,9 @@ namespace Parallel
     Communicator () :
 #ifdef LIBMESH_HAVE_MPI
       _communicator(MPI_COMM_NULL),
-      _rank(0),
-      _size(0),
-#else
+#endif
       _rank(0),
       _size(1),
-#endif
       used_tag_values(),
       _I_duped_it(false) {}
 
@@ -321,12 +318,9 @@ namespace Parallel
     explicit Communicator (const communicator &comm) :
 #ifdef LIBMESH_HAVE_MPI
       _communicator(MPI_COMM_NULL),
-      _rank(0),
-      _size(0),
-#else
+#endif
       _rank(0),
       _size(1),
-#endif
       used_tag_values(),
       _I_duped_it(false)
     {
@@ -430,12 +424,9 @@ namespace Parallel
     explicit Communicator (const Communicator &) :
 #ifdef LIBMESH_HAVE_MPI
       _communicator(MPI_COMM_NULL),
-      _rank(0),
-      _size(0),
-#else
+#endif
       _rank(0),
       _size(1),
-#endif
       used_tag_values(),
       _I_duped_it(false)
     {
@@ -459,7 +450,7 @@ namespace Parallel
       else
         {
           _rank = 0;
-          _size = 0;
+          _size = 1;
         }
 #endif
     }
@@ -3024,6 +3015,45 @@ namespace Parallel
 
 
   // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default
+  // arguments.
+  //
+  // We specialize on the T1==T2 case so that we can handle
+  // send_receive-to-self with a plain copy rather than going through
+  // MPI.
+  template <typename T>
+  inline void send_receive(const unsigned int dest_processor_id,
+			   std::vector<T> &send,
+			   const unsigned int source_processor_id,
+			   std::vector<T> &recv,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
+                           const Communicator &comm = Communicator_World)
+  {
+    if (dest_processor_id   == comm.rank() &&
+	source_processor_id == comm.rank())
+      {
+        START_LOG("send_receive()", "Parallel");
+	recv = send;
+	STOP_LOG("send_receive()", "Parallel");
+	return;
+      }
+
+    // Call the user-defined type version with automatic
+    // type conversion based on template argument:
+    send_receive (dest_processor_id,
+		  send,
+		  StandardType<T>(send.empty() ? NULL : &send[0]),
+		  source_processor_id,
+		  recv,
+		  StandardType<T>(recv.empty() ? NULL : &recv[0]),
+		  send_tag,
+		  recv_tag,
+                  comm);
+  }
+
+
+  // This is both a declaration and definition for a new overloaded
   // function template, so we have to re-specify the default arguments
   template <typename T1, typename T2>
   inline void send_receive(const unsigned int dest_processor_id,
@@ -3049,16 +3079,17 @@ namespace Parallel
 
 
 
-  // This is both a declaration and definition for a new overloaded
-  // function template, so we have to re-specify the default arguments
+  // We use a helper function here to avoid ambiguity when calling
+  // send_receive of (vector<vector<T>>,vector<vector<T>>)
   template <typename T1, typename T2>
-  inline void send_receive(const unsigned int dest_processor_id,
-			   std::vector<std::vector<T1> > &send,
-			   const unsigned int source_processor_id,
-			   std::vector<std::vector<T2> > &recv,
-			   const MessageTag &send_tag = no_tag,
-			   const MessageTag &recv_tag = any_tag,
-                           const Communicator &comm = Communicator_World)
+  inline void send_receive_vec_of_vec
+    (const unsigned int dest_processor_id,
+     std::vector<std::vector<T1> > &send,
+     const unsigned int source_processor_id,
+     std::vector<std::vector<T2> > &recv,
+     const MessageTag &send_tag,
+     const MessageTag &recv_tag,
+     const Communicator &comm)
   {
     START_LOG("send_receive()", "Parallel");
 
@@ -3177,6 +3208,43 @@ namespace Parallel
 
     STOP_LOG("send_receive()", "Parallel");
   }
+
+
+
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default arguments
+  template <typename T1, typename T2>
+  inline void send_receive(const unsigned int dest_processor_id,
+			   std::vector<std::vector<T1> > &send,
+			   const unsigned int source_processor_id,
+			   std::vector<std::vector<T2> > &recv,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
+                           const Communicator &comm = Communicator_World)
+  {
+    send_receive_vec_of_vec
+      (dest_processor_id, send, source_processor_id, recv,
+       no_tag, any_tag, Communicator_World);
+  }
+
+
+
+  // This is both a declaration and definition for a new overloaded
+  // function template, so we have to re-specify the default arguments
+  template <typename T>
+  inline void send_receive(const unsigned int dest_processor_id,
+			   std::vector<std::vector<T> > &send,
+			   const unsigned int source_processor_id,
+			   std::vector<std::vector<T> > &recv,
+			   const MessageTag &send_tag = no_tag,
+			   const MessageTag &recv_tag = any_tag,
+                           const Communicator &comm = Communicator_World)
+  {
+    send_receive_vec_of_vec
+      (dest_processor_id, send, source_processor_id, recv,
+       no_tag, any_tag, Communicator_World);
+  }
+
 
 
 
