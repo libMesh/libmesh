@@ -87,6 +87,15 @@ namespace libMesh {
     public:
       DynamicCastFailure() : std::runtime_error( "Failed dynamic cast!" ) {}
     };
+
+  /**
+   * A class representing a floating point exception.
+   */
+  class FloatingPointException: public std::runtime_error
+  {
+  public:
+    FloatingPointException() : std::runtime_error( "libmesh FPE!" ) {}
+  };
 }
 
 #define LIBMESH_THROW(e) do { throw e; } while (0)
