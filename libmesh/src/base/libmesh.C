@@ -130,7 +130,6 @@ namespace {
    */
   void enableFPE(bool on)
   {
-    return;
     static int flags = 0;
     
     if (on)
