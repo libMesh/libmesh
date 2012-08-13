@@ -791,13 +791,23 @@ SolverPackage default_solver_package ()
 
 #ifdef LIBMESH_HAVE_LASPACK
       if (libMesh::on_command_line ("--use-laspack"  ) ||
+#if defined(LIBMESH_HAVE_MPI)
+	  // If the user bypassed MPI, we disable PETSc and Trilinos
+	  // too
+          libMesh::on_command_line ("--disable-mpi") ||
+#endif
 	  libMesh::on_command_line ("--disable-petsc"))
 	libMeshPrivateData::_solver_package = LASPACK_SOLVERS;
 #endif
 
       if (libMesh::on_command_line ("--disable-laspack") &&
 	  libMesh::on_command_line ("--disable-trilinos") &&
-	  libMesh::on_command_line ("--disable-petsc"))
+          (
+#if defined(LIBMESH_HAVE_MPI)
+           // If the user bypassed MPI, we disable PETSc too
+           libMesh::on_command_line ("--disable-mpi") ||
+#endif
+	   libMesh::on_command_line ("--disable-petsc")))
 	libMeshPrivateData::_solver_package = INVALID_SOLVER_PACKAGE;
     }
 
