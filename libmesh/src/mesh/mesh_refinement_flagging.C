@@ -279,6 +279,9 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // On a ParallelMesh, we need to communicate to know which remote ids
   // correspond to active elements.
+  //
+  // We also need to build local vectors of errors so that we can do
+  // Parallel quantile queries
   {
     std::vector<bool> is_active(n_elem, false);
 
@@ -288,6 +291,9 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
       {
         const unsigned int eid = (*elem_it)->id();
         is_active[eid] = true;
+        libmesh_assert(eid < error_per_cell.size());
+        sorted_error.push_back
+          (std::make_pair(error_per_cell[eid], eid));
       }
     Parallel::max(is_active);
 
@@ -452,15 +458,6 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 {
   parallel_only();
 
-  // FIXME - this won't work on a non-serialized mesh yet
-  if (!_mesh.is_serial())
-    {
-      if (libMesh::processor_id() == 0)
-        libMesh::err << "flag_elements_by_elem_fraction does not yet "
-                      << "work on a parallel mesh." << std::endl;
-      libmesh_error();
-    }
-
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
@@ -509,11 +506,13 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 
   // Loop over the active elements and create the entry
   // in the sorted_error vector
-  MeshBase::element_iterator       elem_it  = _mesh.active_elements_begin();
-  const MeshBase::element_iterator elem_end = _mesh.active_elements_end();
+  MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
+  const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
 
   for (; elem_it != elem_end; ++elem_it)
     sorted_error.push_back (error_per_cell[(*elem_it)->id()]);
+
+  Parallel::allgather(sorted_error);
 
   // Now sort the sorted_error vector
   std::sort (sorted_error.begin(), sorted_error.end());
@@ -594,15 +593,6 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 						   const Real coarsen_frac,
 						   const unsigned int max_l)
 {
-  // FIXME - this won't work on a non-serialized mesh yet
-  if (!_mesh.is_serial())
-    {
-      if (libMesh::processor_id() == 0)
-        libMesh::err << "flag_elements_by_mean_stddev does not yet "
-                      << "work on a parallel mesh." << std::endl;
-      libmesh_error();
-    }
-
   // The function arguments are currently just there for
   // backwards_compatibility
   if (!_use_member_parameters)
