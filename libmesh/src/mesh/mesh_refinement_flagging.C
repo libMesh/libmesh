@@ -279,9 +279,6 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // On a ParallelMesh, we need to communicate to know which remote ids
   // correspond to active elements.
-  //
-  // We also need to build local vectors of errors so that we can do
-  // Parallel quantile queries
   {
     std::vector<bool> is_active(n_elem, false);
 
@@ -295,16 +292,10 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
         sorted_error.push_back
           (std::make_pair(error_per_cell[eid], eid));
       }
+
     Parallel::max(is_active);
 
-    for (unsigned int eid=0; eid != n_elem; ++eid)
-      {
-        if (!is_active[eid])
-          continue;
-        libmesh_assert(eid < error_per_cell.size());
-        sorted_error.push_back
-          (std::make_pair(error_per_cell[eid], eid));
-      }
+    Parallel::allgather(sorted_error);
   }
 
   // Default sort works since pairs are sorted lexicographically
