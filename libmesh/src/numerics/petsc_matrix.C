@@ -107,8 +107,8 @@ void PetscMatrix<T>::init (const unsigned int m,
   this->_is_initialized = true;
 
   // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
-  libmesh_assert (n_nz.size() == n_l);
-  libmesh_assert (n_oz.size() == n_l);
+  libmesh_assert (n_nz.size() == m_l);
+  libmesh_assert (n_oz.size() == m_l);
 
   int ierr     = 0;
   int m_global = static_cast<int>(m);
@@ -160,8 +160,8 @@ void PetscMatrix<T>::init ()
   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
-  libmesh_assert (n_nz.size() == n_l);
-  libmesh_assert (n_oz.size() == n_l);
+  libmesh_assert (n_nz.size() == m_l);
+  libmesh_assert (n_oz.size() == m_l);
 
   // We allow 0x0 matrices now
   //if (m==0)
