@@ -78,8 +78,14 @@ void Sort<KeyType>::sort()
     }
   else
     {
-      this->binsort();
-      this->communicate_bins();
+      if (libMesh::n_processors() > 1)
+        {
+          this->binsort();
+          this->communicate_bins();
+        }
+      else
+        _my_bin = _data;
+
       this->sort_local_bin();
     }
 
