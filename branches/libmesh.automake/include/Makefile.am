@@ -288,7 +288,6 @@ nobase_include_HEADERS = \
 		reduced_basis/transient_rb_construction.h \
 		reduced_basis/transient_rb_evaluation.h \
 		reduced_basis/transient_rb_theta_expansion.h \
-		solvers/adaptive.h \
 		solvers/adaptive_time_solver.h \
 		solvers/diff_solver.h \
 		solvers/eigen_solver.h \
@@ -298,7 +297,6 @@ nobase_include_HEADERS = \
 		solvers/linear.h \
 		solvers/linear_solver.h \
 		solvers/newton_solver.h \
-		solvers/nonlinear.h \
 		solvers/nonlinear_solver.h \
 		solvers/petsc_diff_solver.h \
 		solvers/petscdmlibmesh.h \
@@ -310,7 +308,6 @@ nobase_include_HEADERS = \
 		solvers/solver.h \
 		solvers/steady_solver.h \
 		solvers/time_solver.h \
-		solvers/transient.h \
 		solvers/trilinos_aztec_linear_solver.h \
 		solvers/trilinos_nox_nonlinear_solver.h \
 		solvers/twostep_time_solver.h \
