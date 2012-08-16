@@ -138,7 +138,9 @@ namespace {
 	struct sigaction new_action, old_action;
 	
 #ifdef LIBMESH_HAVE_FENV_H
+#ifdef LIBMESH_HAVE_FEENABLEEXCEPT
 	feenableexcept(FE_DIVBYZERO | FE_INVALID);
+#endif
 #elif defined(LIBMESH_HAVE_XMMINTRIN_H)
 	flags = _MM_GET_EXCEPTION_MASK();           // store the flags
 	_MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
@@ -157,7 +159,9 @@ namespace {
     else
       {
 #ifdef LIBMESH_HAVE_FENV_H
+#ifdef LIBMESH_HAVE_FEDISABLEEXCEPT
 	fedisableexcept(FE_DIVBYZERO | FE_INVALID);
+#endif
 #elif defined(LIBMESH_HAVE_XMMINTRIN_H)
 	_MM_SET_EXCEPTION_MASK(flags);
 #endif
