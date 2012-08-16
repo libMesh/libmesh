@@ -136,6 +136,12 @@
 /* define if the compiler supports __gnu_cxx::hash_set */
 #undef HAVE_EXT_HASH_SET
 
+/* define if the compiler supports fedisableexcept */
+#undef HAVE_FEDISABLEEXCEPT
+
+/* define if the compiler supports feenableexcept */
+#undef HAVE_FEENABLEEXCEPT
+
 /* Define to 1 if you have the <fenv.h> header file. */
 #undef HAVE_FENV_H
 
