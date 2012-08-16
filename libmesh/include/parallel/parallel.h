@@ -3218,9 +3218,9 @@ namespace Parallel
 			   std::vector<std::vector<T1> > &send,
 			   const unsigned int source_processor_id,
 			   std::vector<std::vector<T2> > &recv,
-			   const MessageTag &send_tag = no_tag,
-			   const MessageTag &recv_tag = any_tag,
-                           const Communicator &comm = Communicator_World)
+			   const MessageTag & /* send_tag */ = no_tag,
+			   const MessageTag & /* recv_tag */ = any_tag,
+                           const Communicator & /* comm */ = Communicator_World)
   {
     send_receive_vec_of_vec
       (dest_processor_id, send, source_processor_id, recv,
@@ -3236,9 +3236,9 @@ namespace Parallel
 			   std::vector<std::vector<T> > &send,
 			   const unsigned int source_processor_id,
 			   std::vector<std::vector<T> > &recv,
-			   const MessageTag &send_tag = no_tag,
-			   const MessageTag &recv_tag = any_tag,
-                           const Communicator &comm = Communicator_World)
+			   const MessageTag & /* send_tag */ = no_tag,
+			   const MessageTag & /* recv_tag */ = any_tag,
+                           const Communicator & /* comm */ = Communicator_World)
   {
     send_receive_vec_of_vec
       (dest_processor_id, send, source_processor_id, recv,
