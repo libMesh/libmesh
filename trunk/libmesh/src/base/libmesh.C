@@ -39,8 +39,7 @@
 // prefer fenv on linux
 #ifdef LIBMESH_HAVE_FENV_H
 #  include <fenv.h>
-#endif
-#ifdef LIBMESH_HAVE_XMMINTRIN_H
+#elif LIBMESH_HAVE_XMMINTRIN_H
 #  include <xmmintrin.h>
 #endif
 
@@ -130,18 +129,19 @@ namespace {
    */
   void enableFPE(bool on)
   {
+#ifdef LIBMESH_HAVE_XMMINTRIN_H
     static int flags = 0;
+#endif
     
     if (on)
       {
 	struct sigaction new_action, old_action;
 	
-#ifdef LIBMESH_HAVE_XMMINTRIN_H
+#ifdef LIBMESH_HAVE_FENV_H
+	feenableexcept(FE_DIVBYZERO | FE_INVALID);
+#elif defined(LIBMESH_HAVE_XMMINTRIN_H)
 	flags = _MM_GET_EXCEPTION_MASK();           // store the flags
 	_MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
-#endif
-#ifdef __linux__
-	feenableexcept(FE_DIVBYZERO | FE_INVALID);
 #endif
 	
 
@@ -156,11 +156,10 @@ namespace {
       }
     else
       {
-#ifdef LIBMESH_HAVE_XMMINTRIN_H
-	_MM_SET_EXCEPTION_MASK(flags);
-#endif
-#ifdef __linux__
+#ifdef LIBMESH_HAVE_FENV_H
 	fedisableexcept(FE_DIVBYZERO | FE_INVALID);
+#elif defined(LIBMESH_HAVE_XMMINTRIN_H)
+	_MM_SET_EXCEPTION_MASK(flags);
 #endif
 	signal(SIGFPE, 0);
       }
