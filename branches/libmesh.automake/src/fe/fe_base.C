@@ -1849,7 +1849,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
   // We need sys_number and variable_number for DofObject methods
   // later
-  const unsigned int sys_number = dof_map.sys_number();
+  // const unsigned int sys_number = dof_map.sys_number();
 
   const FEType& base_fe_type = dof_map.variable_type(variable_number);
 
@@ -1916,6 +1916,12 @@ compute_periodic_constraints (DofConstraints &constraints,
 
               // Get pointers to the element's neighbor.
               const Elem* neigh = boundaries.neighbor(boundary_id, *point_locator, elem, s);
+
+              if (neigh == NULL)
+                {
+                  libMesh::err << "PeriodicBoundaries point locator object returned NULL!" << std::endl;
+                  libmesh_error();
+                }
 
               // periodic (and possibly h refinement) constraints:
               // constrain dofs shared between
