@@ -41,17 +41,22 @@ namespace {
 
   // Comments:
   // ---------
-  // - The io_blksize governs how many nodes or elements will be treated as a single block
-  //   when performing parallel IO.
-  // - This parameter only loosely affects the size of the actual IO buffer as this depends
-  //   on the number of components a given variable has for the nodes/elements in the block.
-  // - When reading/writing each processor uses an ID map which is 3*io_blksize*sizeof(unsigned int) bytes
-  //   long, so if io_blksize=256000 we would expect that buffer alone to be ~3Mb.
-  // - In general, an increase in io_blksize should increase the efficiency of the parallel
-  //   read/writes by reducing the number of MPI messages at the expense of memory.
-  // - If the library exhausts memory during IO you might reduce this parameter.
+  // - The max_io_blksize governs how many nodes or elements will be
+  // treated as a single block when performing parallel IO on large
+  // systems.
+  // - This parameter only loosely affects the size of the actual IO
+  // buffer as this depends on the number of components a given
+  // variable has for the nodes/elements in the block.
+  // - When reading/writing each processor uses an ID map which is
+  // 3*io_blksize*sizeof(unsigned int) bytes long, so if
+  // io_blksize=256000 we would expect that buffer alone to be ~3Mb.
+  // - In general, an increase in max_io_blksize should increase the
+  // efficiency of large parallel read/writes by reducing the number
+  // of MPI messages at the expense of memory.
+  // - If the library exhausts memory during IO you might reduce this
+  // parameter.
 
-  const unsigned int io_blksize = 256000;
+  const unsigned int max_io_blksize = 256000;
 
 
   /**
@@ -701,6 +706,8 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int var
 {
   const unsigned int sys_num = this->number();
 
+  const unsigned int io_blksize = std::min(max_io_blksize, n_objects);
+
   std::vector<Number> input_buffer;        // buffer to hold the input block read from io.
   std::vector<Number> local_values;
   std::vector<std::vector<unsigned int> >  // The IDs from each processor which map to the objects
@@ -899,9 +906,6 @@ void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
       libmesh_assert (vec.type() == PARALLEL ||
 		      vec.type() == GHOSTED);
     }
-
-  // If this is not the same on all processors we're in trouble!
-  Parallel::verify(io_blksize);
 #endif
 
   libmesh_assert (io.reading());
@@ -1640,8 +1644,9 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 							   const iterator_type end,
 							   Xdr &io) const
 {
-
   const unsigned int sys_num = this->number();
+
+  const unsigned int io_blksize = std::min(max_io_blksize, n_objects);
 
   unsigned int written_length=0;                       // The numer of values written.  This will be returned
   std::vector<unsigned int> xfer_ids;                  // The global IDs and # of components for the local objects in the current block
@@ -1853,8 +1858,6 @@ void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec)
 {
   parallel_only();
 
-  // If this is not the same on all processors we're in trouble!
-  libmesh_assert (Parallel::verify(io_blksize));
   libmesh_assert (io.writing());
 
   unsigned int vec_length = vec.size();
