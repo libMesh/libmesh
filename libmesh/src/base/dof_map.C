@@ -44,11 +44,84 @@
 #include "threads.h"
 
 
+
 namespace libMesh
 {
 
 // ------------------------------------------------------------
 // DofMap member functions
+AutoPtr<SparsityPattern::Build> DofMap::build_sparsity
+  (const MeshBase& mesh) const
+{
+  libmesh_assert (mesh.is_prepared());
+  libmesh_assert (this->n_variables());
+
+  START_LOG("build_sparsity()", "DofMap");
+
+  // Compute the sparsity structure of the global matrix.  This can be
+  // fed into a PetscMatrix to allocate exacly the number of nonzeros
+  // necessary to store the matrix.  This algorithm should be linear
+  // in the (# of elements)*(# nodes per element)
+
+  // We can be more efficient in the threaded sparsity pattern assembly
+  // if we don't need the exact pattern.  For some sparse matrix formats
+  // a good upper bound will suffice.
+
+  // See if we need to include sparsity pattern entries for coupling
+  // between neighbor dofs
+  bool implicit_neighbor_dofs = this->use_coupled_neighbor_dofs(mesh);
+
+  // We can compute the sparsity pattern in parallel on multiple
+  // threads.  The goal is for each thread to compute the full sparsity
+  // pattern for a subset of elements.  These sparsity patterns can
+  // be efficiently merged in the SparsityPattern::Build::join()
+  // method, especially if there is not too much overlap between them.
+  // Even better, if the full sparsity pattern is not needed then
+  // the number of nonzeros per row can be estimated from the
+  // sparsity patterns created on each thread.
+  AutoPtr<SparsityPattern::Build> sp
+    (new SparsityPattern::Build (mesh,
+			         *this,
+			         this->_dof_coupling,
+			         implicit_neighbor_dofs,
+			         need_full_sparsity_pattern));
+
+  Threads::parallel_reduce (ConstElemRange (mesh.active_elements_begin(),
+					    mesh.active_elements_end()), *sp);
+
+#ifndef NDEBUG
+  // Avoid declaring these variables unless asserts are enabled.
+  const unsigned int proc_id        = mesh.processor_id();
+  const unsigned int n_dofs_on_proc = this->n_dofs_on_processor(proc_id);
+#endif
+  libmesh_assert (sp->sparsity_pattern.size() == n_dofs_on_proc);
+
+  STOP_LOG("build_sparsity()", "DofMap");
+
+  // Check to see if we have any extra stuff to add to the sparsity_pattern
+  if (_extra_sparsity_function)
+    {
+      if (_augment_sparsity_pattern)
+	{
+	  libmesh_here();
+	  libMesh::out << "WARNING:  You have specified both an extra sparsity function and object.\n"
+		       << "          Are you sure this is what you meant to do??"
+		       << std::endl;
+	}
+
+      _extra_sparsity_function
+        (sp->sparsity_pattern, sp->n_nz,
+         sp->n_oz, _extra_sparsity_context);
+    }
+
+  if (_augment_sparsity_pattern)
+    _augment_sparsity_pattern->augment_sparsity_pattern
+      (sp->sparsity_pattern, sp->n_nz, sp->n_oz);
+
+  return sp;
+}
+
+
 
 DofMap::DofMap(const unsigned int number) :
   _dof_coupling(NULL),
@@ -65,8 +138,9 @@ DofMap::DofMap(const unsigned int number) :
   _augment_send_list(NULL),
   _extra_send_list_function(NULL),
   _extra_send_list_context(NULL),
-  _n_nz(),
-  _n_oz(),
+  need_full_sparsity_pattern(false),
+  _n_nz(NULL),
+  _n_oz(NULL),
   _n_dfs(0),
   _n_SCALAR_dofs(0)
 #ifdef LIBMESH_ENABLE_AMR
@@ -152,9 +226,31 @@ const FEType& DofMap::variable_type (const unsigned int c) const
 
 void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 {
+  // We shouldn't be trying to re-attach the same matrices repeatedly
+  libmesh_assert (std::find(_matrices.begin(), _matrices.end(),
+                            &matrix) == _matrices.end());
+
   _matrices.push_back(&matrix);
 
   matrix.attach_dof_map (*this);
+
+  // If we've already computed sparsity, then it's too late
+  // to wait for "compute_sparsity" to help with sparse matrix
+  // initialization, and we need to handle this matrix individually
+  if ((_n_nz && !_n_nz->empty()) ||
+      (_n_oz && !_n_oz->empty()))
+    if (matrix.need_full_sparsity_pattern())
+      {
+	// We'd better have already computed the full sparsity pattern
+        // if we need it here
+        libmesh_assert(need_full_sparsity_pattern);
+        libmesh_assert(_sp.get());
+
+        matrix.update_sparsity_pattern (_sp->sparsity_pattern);
+      }
+      
+  if (matrix.need_full_sparsity_pattern())
+    need_full_sparsity_pattern = true;
 }
 
 
@@ -692,9 +788,8 @@ void DofMap::clear()
   _end_df.clear();
   _var_first_local_df.clear();
   _send_list.clear();
-  _n_nz.clear();
-  _n_oz.clear();
-
+  this->clear_sparsity();
+  need_full_sparsity_pattern = false;
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -1312,89 +1407,58 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase& mesh) const
 
 void DofMap::compute_sparsity(const MeshBase& mesh)
 {
-  libmesh_assert (mesh.is_prepared());
-  libmesh_assert (this->n_variables());
+  _sp = this->build_sparsity(mesh);
 
-  START_LOG("compute_sparsity()", "DofMap");
-
-  // Compute the sparsity structure of the global matrix.  This can be
-  // fed into a PetscMatrix to allocate exacly the number of nonzeros
-  // necessary to store the matrix.  This algorithm should be linear
-  // in the (# of elements)*(# nodes per element)
-
-  // We can be more efficient in the threaded sparsity pattern assembly
-  // if we don't need the exact pattern.  For some sparse matrix formats
-  // a good upper bound will suffice.
-  bool need_full_sparsity_pattern=false;
+  // It is possible that some \p SparseMatrix implementations want to
+  // see it.  Let them see it before we throw it away.
   std::vector<SparseMatrix<Number>* >::const_iterator
     pos = _matrices.begin(),
     end = _matrices.end();
 
-  for (; pos != end; ++pos)
-    if ((*pos)->need_full_sparsity_pattern())
-      need_full_sparsity_pattern = true;
-
-  // See if we need to include sparsity pattern entries for coupling
-  // between neighbor dofs
-  bool implicit_neighbor_dofs = this->use_coupled_neighbor_dofs(mesh);
-
-  // We can compute the sparsity pattern in parallel on multiple
-  // threads.  The goal is for each thread to compute the full sparsity
-  // pattern for a subset of elements.  These sparsity patterns can
-  // be efficiently merged in the SparsityPattern::Build::join()
-  // method, especially if there is not too much overlap between them.
-  // Even better, if the full sparsity pattern is not needed then
-  // the number of nonzeros per row can be estimated from the
-  // sparsity patterns created on each thread.
-  SparsityPattern::Build sp (mesh,
-			     *this,
-			     _dof_coupling,
-			     implicit_neighbor_dofs,
-			     need_full_sparsity_pattern);
-
-  Threads::parallel_reduce (ConstElemRange (mesh.active_elements_begin(),
-					    mesh.active_elements_end()), sp);
-
-#ifndef NDEBUG
-  // Avoid declaring these variables unless asserts are enabled.
-  const unsigned int proc_id        = mesh.processor_id();
-  const unsigned int n_dofs_on_proc = this->n_dofs_on_processor(proc_id);
-#endif
-  libmesh_assert (sp.sparsity_pattern.size() == n_dofs_on_proc);
-
-  // steal the n_nz and n_oz arrays from sp -- it won't need them any more,
-  // and this is more efficient than copying them.
-  _n_nz.swap(sp.n_nz);
-  _n_oz.swap(sp.n_oz);
-
-  STOP_LOG("compute_sparsity()", "DofMap");
-
-  // Check to see if we have any extra stuff to add to the sparsity_pattern
-  if (_extra_sparsity_function)
+  // If we need the full sparsity pattern, then we share a view of its
+  // arrays, and we pass it in to the matrices.
+  if (need_full_sparsity_pattern)
     {
-      if (_augment_sparsity_pattern)
-	{
-	  libmesh_here();
-	  libMesh::out << "WARNING:  You have specified both an extra sparsity function and object.\n"
-		       << "          Are you sure this is what you meant to do??"
-		       << std::endl;
-	}
+      _n_nz = &_sp->n_nz;
+      _n_oz = &_sp->n_oz;
 
-      _extra_sparsity_function(sp.sparsity_pattern, _n_nz, _n_oz, _extra_sparsity_context);
+      for (; pos != end; ++pos)
+        (*pos)->update_sparsity_pattern (_sp->sparsity_pattern);
     }
+  // If we don't need the full sparsity pattern anymore, steal the
+  // arrays we do need and free the rest of the memory
+  else
+    {
+      if (!_n_nz)
+        _n_nz = new std::vector<unsigned int>();
+      _n_nz->swap(_sp->n_nz);
+      if (!_n_oz)
+        _n_oz = new std::vector<unsigned int>();
+      _n_oz->swap(_sp->n_oz);
 
-  if (_augment_sparsity_pattern)
-    _augment_sparsity_pattern->augment_sparsity_pattern (sp.sparsity_pattern, _n_nz, _n_oz);
+      _sp.reset();
+    }
+}
 
-  // We are done with the sparsity_pattern.  However, quite a
-  // lot has gone into computing it.  It is possible that some
-  // \p SparseMatrix implementations want to see it.  Let them
-  // see it before we throw it away.
-  pos = _matrices.begin();
-  end = _matrices.end();
 
-  for (; pos != end; ++pos)
-    (*pos)->update_sparsity_pattern (sp.sparsity_pattern);
+
+void DofMap::clear_sparsity()
+{
+  if (need_full_sparsity_pattern)
+    {
+      libmesh_assert(_sp.get());
+      libmesh_assert(!_n_nz || _n_nz == &_sp->n_nz);
+      libmesh_assert(!_n_oz || _n_oz == &_sp->n_oz);
+      _sp.reset();
+    }
+  else
+    {
+      libmesh_assert(!_sp.get());
+      delete _n_nz;
+      delete _n_oz;
+    }
+  _n_nz = NULL;
+  _n_oz = NULL;
 }
 
 
@@ -2486,19 +2550,24 @@ std::string DofMap::get_info() const
   long double avg_n_nz = 0., avg_n_oz = 0;
   const std::size_t one=1;
 
-  for (unsigned int i = 0; i != _n_nz.size(); ++i)
+  if (_n_nz)
     {
-      max_n_nz = std::max(max_n_nz, _n_nz[i]);
-      avg_n_nz += _n_nz[i];
-    }
-  avg_n_nz /= std::max(_n_nz.size(),one);
+      for (unsigned int i = 0; i != _n_nz->size(); ++i)
+        {
+          max_n_nz = std::max(max_n_nz, (*_n_nz)[i]);
+          avg_n_nz += (*_n_nz)[i];
+        }
+      avg_n_nz /= std::max(_n_nz->size(),one);
 
-  for (unsigned int i = 0; i != _n_oz.size(); ++i)
-    {
-      max_n_oz = std::max(max_n_oz, _n_oz[i]);
-      avg_n_oz += _n_oz[i];
+      libmesh_assert(_n_oz);
+
+      for (unsigned int i = 0; i != (*_n_oz).size(); ++i)
+        {
+          max_n_oz = std::max(max_n_oz, (*_n_oz)[i]);
+          avg_n_oz += (*_n_oz)[i];
+        }
+      avg_n_oz /= std::max(_n_oz->size(),one);
     }
-  avg_n_oz /= std::max(_n_oz.size(),one);
 
   os << "    DofMap Sparsity\n      Average  On-Processor Bandwidth"
      << may_equal << avg_n_nz << '\n';

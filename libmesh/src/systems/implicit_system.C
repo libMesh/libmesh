@@ -149,13 +149,34 @@ void ImplicitSystem::reinit ()
   // initialize parent data
   Parent::reinit();
 
+  // Get a reference to the DofMap
+  DofMap& dof_map = this->get_dof_map();
+
   // Clear the matrices
   for (matrices_iterator pos = _matrices.begin();
        pos != _matrices.end(); ++pos)
-    pos->second->clear();
+    {
+      pos->second->clear();
+      pos->second->attach_dof_map (dof_map);
+    }
 
-  // Re-initialize the matrices
-  this->init_matrices ();
+  // Clear the sparsity pattern
+  this->get_dof_map().clear_sparsity();
+
+  // Compute the sparsity pattern for the current
+  // mesh and DOF distribution.  This also updates
+  // additional matrices, \p DofMap now knows them
+  dof_map.compute_sparsity (this->get_mesh());
+
+  // Initialize matrices
+  for (matrices_iterator pos = _matrices.begin();
+       pos != _matrices.end(); ++pos)
+    pos->second->init ();
+
+  // Set the additional matrices to 0.
+  for (matrices_iterator pos = _matrices.begin();
+       pos != _matrices.end(); ++pos)
+    pos->second->zero ();
 }
 
 

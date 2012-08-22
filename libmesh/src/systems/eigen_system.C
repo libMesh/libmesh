@@ -116,7 +116,6 @@ void EigenSystem::set_eigenproblem_type (EigenProblemType ept)
 
 void EigenSystem::init_data ()
 {
-
   // initialize parent data
   Parent::init_data();
 
@@ -127,8 +126,13 @@ void EigenSystem::init_data ()
   // build the system matrix
   matrix_A = SparseMatrix<Number>::build().release();
 
-  // add matrix to the _dof_map
-  // and compute the sparsity
+  this->init_matrices();
+}
+
+
+
+void EigenSystem::init_matrices ()
+{
   DofMap& dof_map = this->get_dof_map();
 
   dof_map.attach_matrix(*matrix_A);
@@ -153,7 +157,6 @@ void EigenSystem::init_data ()
       matrix_B->init();
       matrix_B->zero();
     }
-
 }
 
 
@@ -163,6 +166,30 @@ void EigenSystem::reinit ()
   // initialize parent data
   Parent::reinit();
 
+  // Clear the matrices
+  matrix_A->clear();
+
+  if (_is_generalized_eigenproblem)
+    matrix_B->clear();
+
+  DofMap& dof_map = this->get_dof_map();
+
+  // Clear the sparsity pattern
+  dof_map.clear_sparsity();
+
+  // Compute the sparsity pattern for the current
+  // mesh and DOF distribution.  This also updates
+  // both matrices, \p DofMap now knows them
+  dof_map.compute_sparsity(this->get_mesh());
+
+  matrix_A->init();
+  matrix_A->zero();
+
+  if (_is_generalized_eigenproblem)
+    {
+      matrix_B->init();
+      matrix_B->zero();
+    }
 }
 
 
