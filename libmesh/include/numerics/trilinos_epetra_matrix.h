@@ -27,6 +27,7 @@
 // Trilinos includes
 #include <Epetra_FECrsMatrix.h>
 #include <Epetra_Map.h>
+#include <EpetraExt_MatrixMatrix.h>
 #include <Epetra_MpiComm.h>
 
 // Local includes
@@ -308,6 +309,8 @@ public:
    */
   Epetra_FECrsMatrix * mat () { libmesh_assert (_mat != NULL); return _mat; }
 
+  const Epetra_FECrsMatrix * mat () const { libmesh_assert (_mat != NULL); return _mat; }
+
 
 protected:
 
@@ -495,7 +498,7 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 template <typename T>
 inline
-void EpetraMatrix<T>::add (const T, SparseMatrix<T> &X_in)
+void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 {
   libmesh_assert (this->initialized());
 
@@ -504,31 +507,9 @@ void EpetraMatrix<T>::add (const T, SparseMatrix<T> &X_in)
   libmesh_assert (this->m() == X_in.m());
   libmesh_assert (this->n() == X_in.n());
 
-  libmesh_not_implemented();
+  EpetraMatrix<T>* X = libmesh_cast_ptr<EpetraMatrix<T>*> (&X_in);
 
-//   PetscScalar     a = static_cast<PetscScalar>      (a_in);
-//   EpetraMatrix<T>* X = libmesh_cast_ptr<EpetraMatrix<T>*> (&X_in);
-
-//   libmesh_assert (X != NULL);
-
-//   int ierr=0;
-
-//   // the matrix from which we copy the values has to be assembled/closed
-//   X->close ();
-
-// // 2.2.x & earlier style
-// #if PETSC_VERSION_LESS_THAN(2,3,0)
-
-//   ierr = MatAXPY(&a,  X->_mat, _mat, SAME_NONZERO_PATTERN);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// // 2.3.x & newer
-// #else
-
-//   ierr = MatAXPY(_mat, a, X->_mat, DIFFERENT_NONZERO_PATTERN);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// #endif
+  EpetraExt::MatrixMatrix::Add 	(*X->_mat, false, a_in, *_mat, 1.);
 }
 
 
