@@ -27,6 +27,7 @@
 
 // libMesh includes
 #include "mesh_function.h"
+#include "coupling_matrix.h"
 
 // C++ includes
 
@@ -169,8 +170,21 @@ public:
    * norm induced by inner_product_matrix.
    */
   BEST_FIT_TYPE best_fit_type_flag;
+  
+  
+  /**
+   * The matrix associated with this system should be block diagonal
+   * hence we use a CouplingMatrix to "decouple" all variables to
+   * save memory. That is, _coupling_matrix is diagonal.
+   */
+  CouplingMatrix _coupling_matrix;
 
 protected:
+
+  /**
+   * Override to initialize the coupling matrix to decouple variables in this system.
+   */
+  virtual void init_data();
 
   /**
    * Add a new basis function to the RB space. Overload
