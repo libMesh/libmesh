@@ -9152,7 +9152,11 @@ fi
 	fi
 
 	# look for MPI_Init in libmpich.(a/so)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+        # try adding libmpl if we see it there; some MPICH2 versions
+        # require it.
+	if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
+		LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -9190,17 +9194,72 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-		       MPI_LIBS="-lmpich $MPI_LIBS"
-		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-	               MPI_IMPL="mpich"
-                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
+			       MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
+			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+		               MPI_IMPL="mpich"
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
+$as_echo "Found valid MPICH installation with libmpl..." >&6; }
+
+else
+
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+$as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
+
+fi
+
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+$as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
+if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpich  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char MPI_Init ();
+int
+main ()
+{
+return MPI_Init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_mpich_MPI_Init=yes
+else
+  ac_cv_lib_mpich_MPI_Init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mpich_MPI_Init" >&5
+$as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
+if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
+
+			       MPI_LIBS="-lmpich $MPI_LIBS"
+			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+		               MPI_IMPL="mpich"
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
 $as_echo "Found valid MPICH installation..." >&6; }
 
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
+
 fi
 
+	fi
 
 	ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -9580,7 +9639,11 @@ fi
 	fi
 
 	# look for MPI_Init in libmpich.(a/so)
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+        # try adding libmpl if we see it there; some MPICH2 versions
+        # require it.
+	if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
+		LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
 $as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
 if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -9618,17 +9681,72 @@ fi
 $as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
 if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
 
-		       MPI_LIBS="-lmpich $MPI_LIBS"
-		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-	               MPI_IMPL="mpich"
-                       { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
+			       MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
+			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+		               MPI_IMPL="mpich"
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation with libmpl..." >&5
+$as_echo "Found valid MPICH installation with libmpl..." >&6; }
+
+else
+
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+$as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
+
+fi
+
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MPI_Init in -lmpich" >&5
+$as_echo_n "checking for MPI_Init in -lmpich... " >&6; }
+if ${ac_cv_lib_mpich_MPI_Init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lmpich  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char MPI_Init ();
+int
+main ()
+{
+return MPI_Init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_mpich_MPI_Init=yes
+else
+  ac_cv_lib_mpich_MPI_Init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_mpich_MPI_Init" >&5
+$as_echo "$ac_cv_lib_mpich_MPI_Init" >&6; }
+if test "x$ac_cv_lib_mpich_MPI_Init" = xyes; then :
+
+			       MPI_LIBS="-lmpich $MPI_LIBS"
+			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+		               MPI_IMPL="mpich"
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Found valid MPICH installation..." >&5
 $as_echo "Found valid MPICH installation..." >&6; }
 
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
+
+       	                { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not link in the MPI library..." >&5
 $as_echo "Could not link in the MPI library..." >&6; }; enablempi=no
+
 fi
 
+	fi
 
 	ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
