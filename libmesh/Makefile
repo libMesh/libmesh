@@ -24,7 +24,11 @@ target := $(mesh_library)
 
 library: $(mesh_library)
 
-all:: $(target) $(appbinfiles)
+bin/$(hosttype)_$(METHOD)/libmesh-config: contrib/bin/libmesh-config
+	mkdir -p bin/$(hosttype)_$(METHOD)
+	ln -sf ../../contrib/bin/libmesh-config bin/$(hosttype)_$(METHOD)/
+	
+all:: $(target) $(appbinfiles) bin/$(hosttype)_$(METHOD)/libmesh-config
 
 ###############################################################################
 
