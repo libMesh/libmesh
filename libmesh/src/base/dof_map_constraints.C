@@ -1866,7 +1866,7 @@ void DofMap::build_constraint_matrix_and_vector
       // Now we can build the constraint matrix and vector.
       // Note that resize also zeros for a DenseMatrix and DenseVector
       C.resize (elem_dofs.size(), new_elem_dofs.size());
-      H.resize (new_elem_dofs.size());
+      H.resize (elem_dofs.size());
 
       // Create the C constraint matrix.
       for (unsigned int i=0; i<elem_dofs.size(); i++)
