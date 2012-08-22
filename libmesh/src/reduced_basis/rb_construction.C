@@ -38,6 +38,7 @@
 #include "fem_context.h"
 #include "dirichlet_boundaries.h"
 #include "zero_function.h"
+#include "coupling_matrix.h"
 
 // C++ includes
 #include <sys/types.h>
@@ -588,8 +589,41 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
     context.elem_residual *= scalar;
 
     if(assemble_matrix)
-      input_matrix->add_matrix (context.elem_jacobian,
-                                context.dof_indices);
+    {
+      
+      CouplingMatrix* coupling_matrix = get_dof_map()._dof_coupling;
+      if(!coupling_matrix)
+      {
+        // If we haven't defined a _dof_coupling matrix then just add
+        // the whole matrix
+        input_matrix->add_matrix (context.elem_jacobian,
+                                  context.dof_indices);        
+      }
+      else
+      {
+        // Otherwise we should only add the relevant submatrices
+        for(unsigned int var1=0; var1<n_vars(); var1++)
+          for(unsigned int var2=0; var2<n_vars(); var2++)
+          {
+            if( coupling_matrix->operator()(var1,var2) )
+            {
+              unsigned int sub_m = context.elem_subjacobians[var1][var2]->m();
+              unsigned int sub_n = context.elem_subjacobians[var1][var2]->n();
+              DenseMatrix<Number> sub_jac(sub_m, sub_n);
+              for(unsigned int row=0; row<sub_m; row++)
+                for(unsigned int col=0; col<sub_n; col++)
+                {
+                  sub_jac(row,col) = context.elem_subjacobians[var1][var2]->el(row,col);
+                }
+              input_matrix->add_matrix (sub_jac,
+                                        context.dof_indices_var[var1],
+                                        context.dof_indices_var[var2]);
+            }
+          }
+      }
+
+    }
+    
     if(assemble_vector)
       input_vector->add_vector (context.elem_residual,
                                 context.dof_indices);
