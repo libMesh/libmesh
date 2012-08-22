@@ -1,37 +1,30 @@
 dnl Process this file with autoconf to produce a configure script.
 
 
+
 dnl switch off caching, since that leads to insurmountable trouble if
 dnl you call ./configure subsequently on different systems without
 dnl clearing the cache 
 define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 
-dnl Copy revision stamp revision-info into the configure script, with any
-dnl dollar signs or double-quotes removed. This macro lets you put a
-dnl revision stamp from `configure.ac' into configure without RCS or cvs
-dnl changing it when you check in configure. That way, you can determine
-dnl easily which revision of `configure.ac' a particular configure
-dnl corresponds to.
-dnl
-dnl For example, this line in `configure.ac':
-dnl
-dnl AC_REVISION($Revision$)
-dnl produces this in configure:
-dnl 
-dnl #! /bin/sh
-dnl # From configure.ac Revision: 1.30
-dnl
-dnl AC_REVISION($Revision$)
+
+AC_INIT([libmesh], [0.8.0], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
+AC_PREREQ([2.61]) # require autoconf 2.61 - I havent tried anything older
 
 
-AC_INIT
+VERSION=0.8.0
+AC_SUBST(VERSION)
+AC_REVISION($Revision$)
+
+
 AC_CONFIG_FILES(Make.common)
 AC_CONFIG_FILES(doc/Doxyfile)
 AC_CONFIG_FILES(contrib/bin/libmesh-config,         [chmod +x contrib/bin/libmesh-config])
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                [chmod +x contrib/bin/xda2mgf])
 AC_CONFIG_FILES(contrib/bin/create_libmesh_release, [chmod +x contrib/bin/create_libmesh_release])
 AC_CONFIG_FILES(doc/dot,                            [chmod +x doc/dot])
+AC_CONFIG_FILES(include/utils/libmesh_version.h)
 dnl Create a temporary file with e.g. HAVE_MPI
 AC_CONFIG_HEADER(include/base/libmesh_config.h.tmp:include/base/libmesh_config.h.in)
 dnl Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
@@ -40,6 +33,18 @@ AX_PREFIX_CONFIG_H(include/base/libmesh_config.h,LIBMESH,include/base/libmesh_co
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(----------- Configuring libMesh -------------)
 AC_MSG_RESULT(---------------------------------------------)
+
+
+dnl Release versioning
+AX_SPLIT_VERSION
+
+GENERIC_MAJOR_VERSION=$AX_MAJOR_VERSION
+GENERIC_MINOR_VERSION=$AX_MINOR_VERSION
+GENERIC_MICRO_VERSION=$AX_POINT_VERSION
+
+AC_SUBST(GENERIC_MAJOR_VERSION)
+AC_SUBST(GENERIC_MINOR_VERSION)
+AC_SUBST(GENERIC_MICRO_VERSION)
 
 
 dnl --------------------------------------------------------------
@@ -1121,6 +1126,9 @@ dnl -------------------------------------------------------------
 AC_PATH_PROG(PERL, perl)
 AC_SUBST(PERL)
 dnl -------------------------------------------------------------
+
+
+AX_SUMMARIZE_ENV
 
 
 AC_OUTPUT
