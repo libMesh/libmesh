@@ -178,7 +178,7 @@ void MeshRefinement::create_parent_error_vector
   // Use a reference to std::vector to avoid confusing
   // Parallel::verify
   std::vector<ErrorVectorReal> &epc = error_per_parent;
-  Parallel::verify(epc);
+  libmesh_assert(Parallel::verify(epc));
 #endif // #ifdef DEBUG
 
   // error values on uncoarsenable elements will be left at -1
@@ -309,7 +309,11 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
   AutoPtr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (_periodic_boundaries && !_periodic_boundaries->empty())
+  bool has_periodic_boundaries =
+    _periodic_boundaries && !_periodic_boundaries->empty();
+  libmesh_assert(Parallel::verify(has_periodic_boundaries));
+
+  if (has_periodic_boundaries)
     point_locator = _mesh.sub_point_locator();
 #endif
 
@@ -923,7 +927,11 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   AutoPtr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (_periodic_boundaries && !_periodic_boundaries->empty())
+  bool has_periodic_boundaries =
+    _periodic_boundaries && !_periodic_boundaries->empty();
+  libmesh_assert(Parallel::verify(has_periodic_boundaries));
+
+  if (has_periodic_boundaries)
     point_locator = _mesh.sub_point_locator();
 #endif
 
@@ -1267,7 +1275,11 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
   AutoPtr<PointLocatorBase> point_locator;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (_periodic_boundaries && !_periodic_boundaries->empty())
+  bool has_periodic_boundaries =
+    _periodic_boundaries && !_periodic_boundaries->empty();
+  libmesh_assert(Parallel::verify(has_periodic_boundaries));
+
+  if (has_periodic_boundaries)
     point_locator = _mesh.sub_point_locator();
 #endif
 
