@@ -14,12 +14,13 @@
 ###############################################################################
 
 #############################################################################
-# Certain PETSc's define DESTDIR - which is very, very bad for us.  Of course
-# we are asking for it by including their Makefile variables here.
-# Guard against that.
+# Certain PETSc's define DESTDIR or SHELL - which can be very, very
+# bad for us.  Of course we are asking for it by including their
+# Makefile variables here.  Guard against that.
 libmesh_save_DESTDIR := $(DESTDIR)
+libmesh_save_SHELL := $(SHELL)
 
-
+#############################################################################
 # top-level source dir.  This is set by automake for internal builds, otherwise
 # it gets set to the installation prefix
 top_srcdir ?= @prefix@
@@ -160,8 +161,9 @@ endif # End of disable-optional test
 
 
 
-# Restore our DESTDIR.  Really, FIXME: Don't include strangers Makefiles!
+# Restore our variables.  Really, FIXME: Don't include strangers Makefiles!
 DESTDIR=$(libmesh_save_DESTDIR)
+SHELL=$(libmesh_save_SHELL)
 
 
 
