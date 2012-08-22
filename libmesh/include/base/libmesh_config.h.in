@@ -12,6 +12,24 @@
 /* This compiler is known not to support some iostream functionality */
 #undef BROKEN_IOSTREAM
 
+/* Architecture of the build host */
+#undef BUILD_ARCH
+
+/* Build date */
+#undef BUILD_DATE
+
+/* Dev/Release build */
+#undef BUILD_DEVSTATUS
+
+/* Build host name */
+#undef BUILD_HOST
+
+/* The fine user who built the package */
+#undef BUILD_USER
+
+/* SVN revision */
+#undef BUILD_VERSION
+
 /* Configuration information. */
 #undef CONFIGURE_INFO
 
