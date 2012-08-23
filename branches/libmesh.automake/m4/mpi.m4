@@ -115,15 +115,34 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
 	fi
 
 	# look for MPI_Init in libmpich.(a/so)
-	AC_CHECK_LIB([mpich],
-		     [MPI_Init],
-		     [
-		       MPI_LIBS="-lmpich $MPI_LIBS"
-		       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
-	               MPI_IMPL="mpich"
-                       AC_MSG_RESULT([Found valid MPICH installation...])
-                     ],
-		     [AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no] )
+        # try adding libmpl if we see it there; some MPICH2 versions
+        # require it.
+	if (test -e $MPI_LIBS_PATH/libmpl.a || test -e $MPI_LIBS_PATH/libmpl.so) ; then
+		LIBS="-L$MPI_LIBS_PATH -lmpl $tmpLIBS"
+		AC_CHECK_LIB([mpich],
+			     [MPI_Init],
+			     [
+			       MPI_LIBS="-lmpich -lmpl $MPI_LIBS"
+			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+		               MPI_IMPL="mpich"
+       	                AC_MSG_RESULT([Found valid MPICH installation with libmpl...])
+		             ],
+			     [
+       	                AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no
+		             ] )
+	else
+		AC_CHECK_LIB([mpich],
+			     [MPI_Init],
+			     [
+			       MPI_LIBS="-lmpich $MPI_LIBS"
+			       MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
+		               MPI_IMPL="mpich"
+       	                AC_MSG_RESULT([Found valid MPICH installation...])
+		             ],
+			     [
+       	                AC_MSG_RESULT([Could not link in the MPI library...]); enablempi=no
+		             ] )
+	fi
 
 	AC_LANG_RESTORE
 	LIBS=$tmpLIBS

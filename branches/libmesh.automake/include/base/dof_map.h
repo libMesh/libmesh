@@ -22,6 +22,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh_common.h"
+#include "auto_ptr.h"
 #include "enum_order.h"
 #include "reference_counted_object.h"
 #include "libmesh.h" // libMesh::invalid_uint
@@ -201,11 +202,16 @@ public:
   void distribute_dofs (MeshBase&);
 
   /**
-   * Computes the sparsity pattern for the matrix corresponding
-   * to \p proc_id.  Produces data that can be fed to Petsc for
+   * Computes the sparsity pattern for the matrices corresponding to
+   * \p proc_id and sends that data to Linear Algebra packages for
    * preallocation of sparse matrices.
    */
   void compute_sparsity (const MeshBase&);
+
+  /**
+   * Clears the sparsity pattern
+   */
+  void clear_sparsity();
 
   /**
    * Attach an object to use to populate the
@@ -281,7 +287,10 @@ public:
    * row of the global matrix that the current processor owns.  This
    * information can be used to preallocate space for a parallel sparse matrix.
    */
-  const std::vector<unsigned int>& get_n_nz() const { return _n_nz; }
+  const std::vector<unsigned int>& get_n_nz() const {
+    libmesh_assert(_n_nz);
+    return *_n_nz;
+  }
 
   /**
    * Returns a constant reference to the \p _n_oz list for this processor.
@@ -289,7 +298,10 @@ public:
    * row of the global matrix that the current processor owns.  This
    * information can be used to preallocate space for a parallel sparse matrix.
    */
-  const std::vector<unsigned int>& get_n_oz() const { return _n_oz; }
+  const std::vector<unsigned int>& get_n_oz() const {
+    libmesh_assert(_n_oz);
+    return *_n_oz;
+  }
 
   /**
    * Add an unknown of order \p order and finite element type
@@ -828,6 +840,11 @@ public:
 private:
 
   /**
+   * Builds a sparsity pattern
+   */
+  AutoPtr<SparsityPattern::Build> build_sparsity(const MeshBase& mesh) const;
+
+  /**
    * Invalidates all active DofObject dofs for this system
    */
   void invalidate_dofs(MeshBase& mesh) const;
@@ -1013,16 +1030,30 @@ private:
   void * _extra_send_list_context;
 
   /**
-   * The number of on-processor nonzeros in my portion of the
-   * global matrix.
+   * Default false; set to true if any attached matrix requires a full
+   * sparsity pattern.
    */
-  std::vector<unsigned int> _n_nz;
+  bool need_full_sparsity_pattern;
+
+  /**
+   * The sparsity pattern of the global matrix, kept around if it
+   * might be needed by future additions of the same type of matrix.
+   */
+  AutoPtr<SparsityPattern::Build> _sp;
+
+  /**
+   * The number of on-processor nonzeros in my portion of the
+   * global matrix.  If need_full_sparsity_pattern is true, this will
+   * just be a pointer into the corresponding sparsity pattern vector.
+   * Otherwise we have to new/delete it ourselves.
+   */
+  std::vector<unsigned int>* _n_nz;
 
   /**
    * The number of off-processor nonzeros in my portion of the
-   * global matrix.
+   * global matrix; allocated similar to _n_nz.
    */
-  std::vector<unsigned int> _n_oz;
+  std::vector<unsigned int>* _n_oz;
 
   /**
    * Total number of degrees of freedom.

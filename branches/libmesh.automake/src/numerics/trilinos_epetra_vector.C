@@ -26,6 +26,7 @@
 #include "dense_subvector.h"
 #include "dense_vector.h"
 #include "parallel.h"
+#include "trilinos_epetra_matrix.h"
 #include "utility.h"
 
 // Trilinos Includes
@@ -212,22 +213,17 @@ void EpetraVector<T>::add_vector (const NumericVector<T>& V,
 
 // TODO: fill this in after creating an EpetraMatrix
 template <typename T>
-void EpetraVector<T>::add_vector (const NumericVector<T>& /* V_in */,
-				  const SparseMatrix<T>& /* A_in */)
+void EpetraVector<T>::add_vector (const NumericVector<T>& V_in,
+				  const SparseMatrix<T>& A_in)
 {
-  libmesh_not_implemented();
+  const EpetraVector<T>* V = libmesh_cast_ptr<const EpetraVector<T>*>(&V_in);
+  const EpetraMatrix<T>* A = libmesh_cast_ptr<const EpetraMatrix<T>*>(&A_in);
 
-//   const EpetraVector<T>* V = libmesh_cast_ptr<const EpetraVector<T>*>(&V_in);
-//   const EpetraMatrix<T>* A = libmesh_cast_ptr<const EpetraMatrix<T>*>(&A_in);
-
-//   int ierr=0;
-
-//   A->close();
-
-//   // The const_cast<> is not elegant, but it is required since Epetra
-//   // is not const-correct.
-//   ierr = MatMultAdd(const_cast<EpetraMatrix<T>*>(A)->mat(), V->_vec, _vec, _vec);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  // FIXME - does Trilinos let us do this *without* memory allocation?
+  AutoPtr<NumericVector<T> > temp = V->zero_clone();
+  EpetraVector<T>* tempV = libmesh_cast_ptr<EpetraVector<T>*>(temp.get());
+  A->mat()->Multiply(false, *V->_vec, *tempV->_vec);
+  *this += *temp;
 }
 
 

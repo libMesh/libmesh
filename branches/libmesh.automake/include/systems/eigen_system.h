@@ -174,6 +174,11 @@ protected:
   virtual void init_data ();
 
   /**
+   * Initializes the matrices associated with the system
+   */
+  virtual void init_matrices ();
+
+  /**
    * Set the _n_converged_eigenpairs member, useful for
    * subclasses of EigenSystem.
    */

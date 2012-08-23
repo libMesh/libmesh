@@ -146,6 +146,22 @@ void RBEIMConstruction::print_info()
   libMesh::out << std::endl;
 }
 
+void RBEIMConstruction::init_data()
+{
+  // set the coupling matrix to be diagonal
+  _coupling_matrix.resize(n_vars());
+  for(unsigned int var1=0; var1<n_vars(); var1++)
+    for(unsigned int var2=0; var2<n_vars(); var2++)
+    {
+      unsigned char value = (var1==var2) ? 1 : 0;
+      _coupling_matrix(var1,var2) = value;
+    }
+    
+  this->get_dof_map()._dof_coupling = &_coupling_matrix;
+  
+  Parent::init_data();
+}
+
 void RBEIMConstruction::initialize_rb_construction()
 {
   Parent::initialize_rb_construction();
