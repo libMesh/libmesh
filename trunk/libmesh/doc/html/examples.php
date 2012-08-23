@@ -48,6 +48,8 @@ library features they demonstrate.
 
 <li><L1><a href="systems_of_equations_ex5.php">Linear Elastic Cantilever with Constraint</a></L1></li>
 
+<li><L1><a href="systems_of_equations_ex6.php">3D Linear Elastic Cantilever</a></L1></li>
+
 </ol> </li>
 
 
@@ -114,6 +116,8 @@ library features they demonstrate.
 
 <li><L1><a href="reduced_basis_ex5.php">Reduced Cantilever Problem</a></L1></li>
 
+<li><L1><a href="reduced_basis_ex6.php">Heat Transfer on a Curved Domain in 3D</a></L1></li>
+
 </ol> </li>
 
 
@@ -122,6 +126,15 @@ library features they demonstrate.
 <li><L1><a href="adaptivity_ex1.php">Adjoint-based Goal Oriented Refinement</a></L1></li>
 
 <li><L1><a href="adaptivity_ex2.php">Adjoint-based Parameter Sensitivities</a></L1></li>
+
+</ol> </li>
+
+
+<li> Vector-Valued Finite Elements <ol>
+
+<li><L1><a href="vector_fe_ex1.php">Uncoupled Poisson Problem</a></L1></li>
+
+<li><L1><a href="vector_fe_ex2.php">Unsteady Navier-Stokes with FEMSystem</a></L1></li>
 
 </ol> </li>
 
@@ -139,6 +152,8 @@ library features they demonstrate.
 <li><L1><a href="miscellaneous_ex5.php">Interior Penalty Discontinuous Galerkin</a></L1></li>
 
 <li><L1><a href="miscellaneous_ex6.php">Meshing with Triangle and Tetgen</a></L1></li>
+
+<li><L1><a href="miscellaneous_ex7.php">Variational Inequalities and PetscDMNonlinearSolver</a></L1></li>
 
 </ol> </li>
 
