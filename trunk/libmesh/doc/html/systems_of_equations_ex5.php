@@ -958,24 +958,22 @@ Define the Kronecker delta functions that we need here
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Updated .depend
-Compiling C++ (in optimized mode) systems_of_equations_ex5.C...
 Linking systems_of_equations_ex5-opt...
 ***************************************************************
-* Running  ./systems_of_equations_ex5-opt
+* Running  mpirun -np 6 ./systems_of_equations_ex5-opt -ksp_type cg
 ***************************************************************
  
  Mesh Information:
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=2121
-    n_local_nodes()=2121
+    n_local_nodes()=371
   n_elem()=500
-    n_local_elem()=500
+    n_local_elem()=83
     n_active_elem()=500
   n_subdomains()=1
-  n_partitions()=1
-  n_processors()=1
+  n_partitions()=6
+  n_processors()=6
   n_threads()=1
   processor_id()=0
 
@@ -988,16 +986,16 @@ Linking systems_of_equations_ex5-opt...
     Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
     Approximation Orders="SECOND", "THIRD" "SECOND", "THIRD" "FIRST", "THIRD" 
     n_dofs()=4243
-    n_local_dofs()=4243
-    n_constrained_dofs()=42
-    n_local_constrained_dofs()=42
+    n_local_dofs()=742
+    n_constrained_dofs()=43
+    n_local_constrained_dofs()=0
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 32.6206
-      Average Off-Processor Bandwidth <= 0
-      Maximum  On-Processor Bandwidth <= 4243
-      Maximum Off-Processor Bandwidth <= 0
+      Average  On-Processor Bandwidth <= 29.504
+      Average Off-Processor Bandwidth <= 1.91644
+      Maximum  On-Processor Bandwidth <= 50
+      Maximum Off-Processor Bandwidth <= 29
     DofMap Constraints
       Number of DoF Constraints = 42
       Average DoF Constraint Length= 0
@@ -1005,77 +1003,104 @@ Linking systems_of_equations_ex5-opt...
 
 
 -------------------------------------------------------------------
-| Time:           Sat Apr  7 16:04:38 2012                         |
+| Processor id:   0                                                |
+| Num Processors: 6                                                |
+| Time:           Fri Aug 24 15:27:45 2012                         |
 | OS:             Linux                                            |
-| HostName:       lkirk-home                                       |
-| OS Release:     3.0.0-17-generic                                 |
-| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| HostName:       daedalus                                         |
+| OS Release:     2.6.32-34-generic                                |
+| OS Version:     #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011      |
 | Machine:        x86_64                                           |
-| Username:       benkirk                                          |
-| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+| Username:       roystgnr                                         |
+| Configuration:  ./configure run on Wed Aug 22 12:44:06 CDT 2012  |
 -------------------------------------------------------------------
- ------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.632592, Active time=0.55693                                              |
- ------------------------------------------------------------------------------------------------------------
-| Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|------------------------------------------------------------------------------------------------------------|
-|                                                                                                            |
-|                                                                                                            |
-| DofMap                                                                                                     |
-|   SCALAR_dof_indices()         2000      0.0011      0.000001    0.0011      0.000001    0.20     0.20     |
-|   add_neighbors_to_send_list() 1         0.0005      0.000543    0.0005      0.000543    0.10     0.10     |
-|   build_constraint_matrix()    500       0.0006      0.000001    0.0006      0.000001    0.10     0.10     |
-|   cnstrn_elem_mat_vec()        500       0.0006      0.000001    0.0006      0.000001    0.12     0.12     |
-|   compute_sparsity()           1         0.0178      0.017760    0.0231      0.023144    3.19     4.16     |
-|   create_dof_constraints()     1         0.0043      0.004271    0.0071      0.007072    0.77     1.27     |
-|   distribute_dofs()            1         0.0017      0.001740    0.0055      0.005466    0.31     0.98     |
-|   dof_indices()                5000      0.0102      0.000002    0.0117      0.000002    1.83     2.11     |
-|   prepare_send_list()          1         0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
-|   reinit()                     1         0.0037      0.003724    0.0037      0.003724    0.67     0.67     |
-|                                                                                                            |
-| EquationSystems                                                                                            |
-|   build_solution_vector()      1         0.0021      0.002065    0.0038      0.003774    0.37     0.68     |
-|                                                                                                            |
-| ExodusII_IO                                                                                                |
-|   write_nodal_data()           1         0.0027      0.002655    0.0027      0.002655    0.48     0.48     |
-|                                                                                                            |
-| FE                                                                                                         |
-|   compute_affine_map()         640       0.0011      0.000002    0.0011      0.000002    0.19     0.19     |
-|   compute_face_map()           140       0.0010      0.000007    0.0024      0.000017    0.17     0.43     |
-|   compute_shape_functions()    640       0.0006      0.000001    0.0006      0.000001    0.11     0.11     |
-|   init_face_shape_functions()  21        0.0001      0.000003    0.0001      0.000003    0.01     0.01     |
-|   init_shape_functions()       141       0.0011      0.000008    0.0011      0.000008    0.20     0.20     |
-|   inverse_map()                420       0.0014      0.000003    0.0014      0.000003    0.24     0.24     |
-|                                                                                                            |
-| Mesh                                                                                                       |
-|   find_neighbors()             1         0.0016      0.001648    0.0016      0.001648    0.30     0.30     |
-|   renumber_nodes_and_elem()    2         0.0003      0.000133    0.0003      0.000133    0.05     0.05     |
-|                                                                                                            |
-| MeshOutput                                                                                                 |
-|   write_equation_systems()     1         0.0000      0.000041    0.0065      0.006471    0.01     1.16     |
-|                                                                                                            |
-| MeshTools::Generation                                                                                      |
-|   build_cube()                 1         0.0022      0.002193    0.0022      0.002193    0.39     0.39     |
-|                                                                                                            |
-| Parallel                                                                                                   |
-|   allgather()                  1         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
-|                                                                                                            |
-| Partitioner                                                                                                |
-|   single_partition()           1         0.0002      0.000187    0.0002      0.000187    0.03     0.03     |
-|                                                                                                            |
-| PetscLinearSolver                                                                                          |
-|   solve()                      1         0.3988      0.398750    0.3988      0.398750    71.60    71.60    |
-|                                                                                                            |
-| System                                                                                                     |
-|   assemble()                   1         0.1034      0.103379    0.1131      0.113113    18.56    20.31    |
- ------------------------------------------------------------------------------------------------------------
-| Totals:                        10019     0.5569                                          100.00            |
- ------------------------------------------------------------------------------------------------------------
+ ----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=0.246352, Active time=0.078685                                                 |
+ ----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                |
+|                                                                                                                |
+| DofMap                                                                                                         |
+|   SCALAR_dof_indices()             771       0.0002      0.000000    0.0002      0.000000    0.26     0.26     |
+|   add_neighbors_to_send_list()     1         0.0001      0.000080    0.0001      0.000121    0.10     0.15     |
+|   build_constraint_matrix()        83        0.0000      0.000000    0.0000      0.000000    0.05     0.05     |
+|   build_sparsity()                 1         0.0018      0.001760    0.0025      0.002533    2.24     3.22     |
+|   cnstrn_elem_mat_vec()            83        0.0000      0.000000    0.0000      0.000000    0.02     0.02     |
+|   create_dof_constraints()         1         0.0014      0.001403    0.0022      0.002193    1.78     2.79     |
+|   distribute_dofs()                1         0.0005      0.000523    0.0066      0.006635    0.66     8.43     |
+|   dof_indices()                    2103      0.0014      0.000001    0.0016      0.000001    1.75     2.07     |
+|   prepare_send_list()              1         0.0000      0.000009    0.0000      0.000009    0.01     0.01     |
+|   reinit()                         1         0.0010      0.001001    0.0010      0.001001    1.27     1.27     |
+|                                                                                                                |
+| EquationSystems                                                                                                |
+|   build_solution_vector()          1         0.0005      0.000486    0.0018      0.001767    0.62     2.25     |
+|                                                                                                                |
+| ExodusII_IO                                                                                                    |
+|   write_nodal_data()               1         0.0018      0.001841    0.0018      0.001841    2.34     2.34     |
+|                                                                                                                |
+| FE                                                                                                             |
+|   compute_shape_functions()        130       0.0002      0.000001    0.0002      0.000001    0.24     0.24     |
+|   init_shape_functions()           48        0.0000      0.000001    0.0000      0.000001    0.05     0.05     |
+|   inverse_map()                    141       0.0002      0.000002    0.0002      0.000002    0.29     0.29     |
+|                                                                                                                |
+| FEMap                                                                                                          |
+|   compute_affine_map()             130       0.0001      0.000001    0.0001      0.000001    0.18     0.18     |
+|   compute_face_map()               47        0.0002      0.000004    0.0004      0.000009    0.24     0.55     |
+|   init_face_shape_functions()      21        0.0000      0.000001    0.0000      0.000001    0.03     0.03     |
+|   init_reference_to_physical_map() 48        0.0002      0.000004    0.0002      0.000004    0.26     0.26     |
+|                                                                                                                |
+| Mesh                                                                                                           |
+|   find_neighbors()                 1         0.0004      0.000375    0.0004      0.000408    0.48     0.52     |
+|   renumber_nodes_and_elem()        2         0.0001      0.000048    0.0001      0.000048    0.12     0.12     |
+|                                                                                                                |
+| MeshCommunication                                                                                              |
+|   compute_hilbert_indices()        2         0.0028      0.001405    0.0028      0.001405    3.57     3.57     |
+|   find_global_indices()            2         0.0002      0.000111    0.0067      0.003355    0.28     8.53     |
+|   parallel_sort()                  2         0.0012      0.000592    0.0023      0.001138    1.50     2.89     |
+|                                                                                                                |
+| MeshOutput                                                                                                     |
+|   write_equation_systems()         1         0.0000      0.000031    0.0036      0.003639    0.04     4.62     |
+|                                                                                                                |
+| MeshTools::Generation                                                                                          |
+|   build_cube()                     1         0.0017      0.001721    0.0017      0.001721    2.19     2.19     |
+|                                                                                                                |
+| MetisPartitioner                                                                                               |
+|   partition()                      1         0.0012      0.001198    0.0042      0.004242    1.52     5.39     |
+|                                                                                                                |
+| Parallel                                                                                                       |
+|   allgather()                      8         0.0020      0.000245    0.0020      0.000245    2.49     2.49     |
+|   broadcast()                      1         0.0000      0.000010    0.0000      0.000010    0.01     0.01     |
+|   gather()                         1         0.0001      0.000068    0.0001      0.000068    0.09     0.09     |
+|   max(scalar)                      2         0.0000      0.000019    0.0000      0.000019    0.05     0.05     |
+|   max(vector)                      2         0.0002      0.000121    0.0002      0.000121    0.31     0.31     |
+|   min(vector)                      2         0.0000      0.000006    0.0000      0.000006    0.02     0.02     |
+|   probe()                          50        0.0054      0.000108    0.0054      0.000108    6.86     6.86     |
+|   receive()                        50        0.0001      0.000002    0.0055      0.000110    0.14     7.01     |
+|   send()                           50        0.0001      0.000001    0.0001      0.000001    0.09     0.09     |
+|   send_receive()                   54        0.0003      0.000005    0.0059      0.000109    0.33     7.49     |
+|   sum()                            10        0.0024      0.000245    0.0024      0.000245    3.11     3.11     |
+|                                                                                                                |
+| Parallel::Request                                                                                              |
+|   wait()                           50        0.0000      0.000001    0.0000      0.000001    0.04     0.04     |
+|                                                                                                                |
+| Partitioner                                                                                                    |
+|   set_node_processor_ids()         1         0.0001      0.000147    0.0015      0.001485    0.19     1.89     |
+|   set_parent_processor_ids()       1         0.0000      0.000032    0.0000      0.000032    0.04     0.04     |
+|                                                                                                                |
+| PetscLinearSolver                                                                                              |
+|   solve()                          1         0.0414      0.041416    0.0414      0.041416    52.64    52.64    |
+|                                                                                                                |
+| System                                                                                                         |
+|   assemble()                       1         0.0090      0.009043    0.0101      0.010141    11.49    12.89    |
+ ----------------------------------------------------------------------------------------------------------------
+| Totals:                            3909      0.0787                                          100.00            |
+ ----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
-* Done Running  ./systems_of_equations_ex5-opt
+* Done Running  mpirun -np 6 ./systems_of_equations_ex5-opt -ksp_type cg
 ***************************************************************
 </pre>
 </div>

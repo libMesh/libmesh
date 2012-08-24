@@ -301,7 +301,7 @@ int main (int argc, char** argv)
   // to a GMV-formatted plot file.
   if(dim == 1)
   {        
-    GnuPlotIO plot(mesh,"Example 4, 1D",GnuPlotIO::GRID_ON);
+    GnuPlotIO plot(mesh,"Introduction Example 4, 1D",GnuPlotIO::GRID_ON);
     plot.write_equation_systems("gnuplot_script",equation_systems);
   }
 #ifdef LIBMESH_HAVE_EXODUS_API

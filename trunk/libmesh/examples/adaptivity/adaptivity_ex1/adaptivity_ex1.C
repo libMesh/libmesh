@@ -80,7 +80,7 @@ int main(int argc, char** argv)
   MeshTools::Generation::build_line(mesh,n,0.,1.,EDGE3);
 
   // Define the equation systems object and the system we are going
-  // to solve. See Example 2 for more details.
+  // to solve. See Introduction Example 2 for more details.
   EquationSystems equation_systems(mesh);
   LinearImplicitSystem& system = equation_systems.add_system
     <LinearImplicitSystem>("1D");
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
       // going to solve the equation system for that refined mesh.
       if(r_step != max_r_steps)
         {
-          // Objects for error estimation, see Example 10 for more details.
+          // Error estimation objects, see Adaptivity Example 2 for details
           ErrorVector error;
           KellyErrorEstimator error_estimator;
 
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
   // Construct gnuplot plotting object, pass in mesh, title of plot
   // and boolean to indicate use of grid in plot. The grid is used to
   // show the edges of each element in the mesh.
-  GnuPlotIO plot(mesh,"Example 0", GnuPlotIO::GRID_ON);
+  GnuPlotIO plot(mesh,"Adaptivity Example 1", GnuPlotIO::GRID_ON);
 
   // Write out script to be called from within gnuplot:
   // Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
@@ -296,7 +296,7 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
     }
 
     // This is a function call that is necessary when using adaptive
-    // mesh refinement. See Example 10 for more details.
+    // mesh refinement. See Adaptivity Example 2 for more details.
     dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
 
     // Add Ke and Fe to the global matrix and right-hand-side.
