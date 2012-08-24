@@ -439,13 +439,13 @@ ifeq ($(enable-optional),yes)
   # AztecOO linear solvers and requisite Epetra
   # data structures
   ifeq ($(enable-aztecoo),yes)
-      include @AZTECOO_MAKEFILE_EXPORT@
+      -include @AZTECOO_MAKEFILE_EXPORT@
       libmesh_LIBS    += $(AZTECOO_LIBS)
       libmesh_INCLUDE += $(AZTECOO_INCLUDES)
 
       # Nox, an additional option if AztecOO is present
       ifeq ($(enable-nox),yes)
-          include @NOX_MAKEFILE_EXPORT@
+          -include @NOX_MAKEFILE_EXPORT@
           libmesh_LIBS    += $(NOX_LIBS)
           libmesh_INCLUDE += $(NOX_INCLUDES)
           libmesh_CPPFLAGS     += -DHAVE_CONFIG_H
@@ -453,14 +453,14 @@ ifeq ($(enable-optional),yes)
       
       # ML, an additional option if AztecOO is present
       ifeq ($(enable-ml),yes)
-          include @ML_MAKEFILE_EXPORT@
+          -include @ML_MAKEFILE_EXPORT@
           libmesh_LIBS    += $(ML_LIBS)
           libmesh_INCLUDE += $(ML_INCLUDES)
       endif
   endif	
 
   ifeq ($(enable-trilinos-10),yes)
-      include @TRILINOS_MAKEFILE_EXPORT@
+      -include @TRILINOS_MAKEFILE_EXPORT@
       libmesh_LIBS    += $(Trilinos_LIBRARIES) $(Trilinos_LIBRARY_DIRS) $(Trilinos_TPL_LIBRARIES) $(Trilinos_TPL_LIBRARY_DIRS)
       libmesh_INCLUDE += $(Trilinos_INCLUDE_DIRS) $(Trilinos_TPL_INCLUDE_DIRS)      	
   endif	
@@ -472,18 +472,18 @@ ifeq ($(enable-optional),yes)
     # versions of PETSc and SLEPc can be used. Hence,
     # petsc-major-minor is also used to identify the SLEPc version 
     ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x style
-      include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/slepcconf
+      -include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/slepcconf
     else
 	  ifeq ($(petsc-major),3)  # 3.0.x & newer style
 	    ifeq ($(petsc-major-minor),3.0.x)
-	      include ${SLEPC_DIR}/conf/slepc_common_variables
+	      -include ${SLEPC_DIR}/conf/slepc_common_variables
 	    else ifeq ($(petsc-major-minor),3.1.x)
-	      include ${SLEPC_DIR}/conf/slepc_common_variables
+	      -include ${SLEPC_DIR}/conf/slepc_common_variables
 	    else   # 3.2.x & newer style
-	      include ${SLEPC_DIR}/conf/slepc_variables
+	      -include ${SLEPC_DIR}/conf/slepc_variables
 	    endif
 	  else
-	    include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
+	    -include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
 	  endif
     endif	
 
@@ -519,13 +519,13 @@ ifeq ($(enable-optional),yes)
     endif
     # Depending on petsc version, we include different files
     ifeq ($(petsc-version),2.1.0)
-      include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
+      -include $(PETSC_DIR)/bmake/$(PETSC_ARCH)/base.site # 2.1.0 style
     else
       C_CLINKER_SLFLAG = $(libmesh_RPATHFLAG)# necessary for PETSc >= 2.1.6
       ifeq ($(petsc-major),3)  # 3.0.x & newer style
-        include $(PETSC_DIR)/conf/variables
+        -include $(PETSC_DIR)/conf/variables
       else
-        include $(PETSC_DIR)/bmake/common/variables  # 2.1.1 or later style
+        -include $(PETSC_DIR)/bmake/common/variables  # 2.1.1 or later style
       endif      
     endif
 
@@ -564,7 +564,7 @@ ifeq ($(enable-optional),yes)
   # e.g. ARPACK this needs to be included after PETSc.
   ifeq ($(enable-slepc),yes)
     ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x & newer style
-      include $(SLEPC_DIR)/bmake/slepc_common_variables
+      -include $(SLEPC_DIR)/bmake/slepc_common_variables
     endif
   endif
 
