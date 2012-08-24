@@ -19,8 +19,8 @@
  //
  // By Lorenzo Botti
  //
- // This example is based on example 14, but uses an Interior Penalty
- // Discontinuous Galerkin formulation.
+ // This example is based on Adaptivity Example 3, but uses an
+ // Interior Penalty Discontinuous Galerkin formulation.
 
 #include <iostream>
 

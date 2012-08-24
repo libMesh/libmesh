@@ -143,7 +143,7 @@ int main (int argc, char** argv)
   equation_systems.print_info();
 
   // Create a performance-logging object for this example
-  PerfLog perf_log("Example 13");
+  PerfLog perf_log("Systems Example 2");
   
   // Get a reference to the Stokes system to use later.
   TransientLinearImplicitSystem&  navier_stokes_system =

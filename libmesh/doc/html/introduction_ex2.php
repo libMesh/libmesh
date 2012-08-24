@@ -27,11 +27,11 @@ by passing argc and argv to PETSc you may specify
 command line arguments to PETSc.  For example, you might
 try running this example as:
 
-<br><br>./ex2 -log_info
+<br><br>./introduction_ex2 -log_info
 
 <br><br>to see what PETSc is doing behind the scenes or
 
-<br><br>./ex2 -log_summary
+<br><br>./introduction_ex2 -log_summary
 
 <br><br>to get a summary of what PETSc did.
 Among other things, libMesh::init() initializes the MPI
@@ -442,25 +442,24 @@ checks for leaked memory.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in optimized mode) introduction_ex2.C...
 Linking introduction_ex2-opt...
 ***************************************************************
-* Running Example  ./introduction_ex2-opt
+* Running Example  mpirun -np 6 ./introduction_ex2-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
  
-Running ./introduction_ex2-opt
+Running ./introduction_ex2-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 
  Mesh Information:
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=36
-    n_local_nodes()=36
+    n_local_nodes()=9
   n_elem()=25
-    n_local_elem()=25
+    n_local_elem()=4
     n_active_elem()=25
   n_subdomains()=1
-  n_partitions()=1
-  n_processors()=1
+  n_partitions()=6
+  n_processors()=6
   n_threads()=1
   processor_id()=0
 
@@ -473,7 +472,7 @@ Running ./introduction_ex2-opt
     Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" "FIRST", "THIRD" "SECOND", "THIRD" 
     n_dofs()=222
-    n_local_dofs()=222
+    n_local_dofs()=42
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=1
@@ -493,33 +492,131 @@ Running ./introduction_ex2-opt
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" 
     n_dofs()=36
-    n_local_dofs()=36
+    n_local_dofs()=9
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=3
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 7.11111
-      Average Off-Processor Bandwidth <= 0
+      Average  On-Processor Bandwidth <= 5.44444
+      Average Off-Processor Bandwidth <= 1.66667
       Maximum  On-Processor Bandwidth <= 9
-      Maximum Off-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 5
     DofMap Constraints
       Number of DoF Constraints = 0
       Number of Node Constraints = 0
 
+************************************************************************************************************************
+***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
+************************************************************************************************************************
+
+---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
+
+./introduction_ex2-opt on a intel-11. named daedalus with 6 processors, by roystgnr Fri Aug 24 15:21:31 2012
+Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
+
+                         Max       Max/Min        Avg      Total 
+Time (sec):           2.009e-02      1.02662   1.973e-02
+Objects:              3.300e+01      1.00000   3.300e+01
+Flops:                0.000e+00      0.00000   0.000e+00  0.000e+00
+Flops/sec:            0.000e+00      0.00000   0.000e+00  0.000e+00
+MPI Messages:         4.000e+01      1.42857   3.333e+01  2.000e+02
+MPI Message Lengths:  7.020e+02      2.04070   1.484e+01  2.968e+03
+MPI Reductions:       4.400e+01      1.00000
+
+Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
+                            e.g., VecAXPY() for real vectors of length N --> 2N flops
+                            and VecAXPY() for complex vectors of length N --> 8N flops
+
+Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
+                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
+ 0:      Main Stage: 1.9684e-02  99.8%  0.0000e+00   0.0%  2.000e+02 100.0%  1.484e+01      100.0%  2.400e+01  54.5% 
+
+------------------------------------------------------------------------------------------------------------------------
+See the 'Profiling' chapter of the users' manual for details on interpreting output.
+Phase summary info:
+   Count: number of times phase was executed
+   Time and Flops: Max - maximum over all processors
+                   Ratio - ratio of maximum to minimum over all processors
+   Mess: number of messages sent
+   Avg. len: average message length
+   Reduct: number of global reductions
+   Global: entire computation
+   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
+      %T - percent time in this phase         %F - percent flops in this phase
+      %M - percent messages in this phase     %L - percent message lengths in this phase
+      %R - percent reductions in this phase
+   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
+------------------------------------------------------------------------------------------------------------------------
+Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+------------------------------------------------------------------------------------------------------------------------
+
+--- Event Stage 0: Main Stage
+
+VecSet                10 1.0 8.8215e-06 2.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatZeroEntries         2 1.0 8.1062e-06 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+------------------------------------------------------------------------------------------------------------------------
+
+Memory usage is given in bytes:
+
+Object Type          Creations   Destructions     Memory  Descendants' Mem.
+Reports information only for process 0.
+
+--- Event Stage 0: Main Stage
+
+                 Vec    14             14        20592     0
+         Vec Scatter     4              4         3472     0
+           Index Set     8              8         4388     0
+   IS L to G Mapping     4              4         2152     0
+              Matrix     3              3         7520     0
+========================================================================================================================
+Average time to get PetscTime(): 0
+Average time for MPI_Barrier(): 4.57764e-05
+Average time for zero size MPI_Send(): 6.05186e-05
+#PETSc Option Table entries:
+-ksp_right_pc
+-log_summary
+-pc_type bjacobi
+-sub_pc_factor_levels 4
+-sub_pc_factor_zeropivot 0
+-sub_pc_type ilu
+#End of PETSc Option Table entries
+Compiled without FORTRAN kernels
+Compiled with full precision matrices (default)
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8
+Configure run at: Sat May 19 03:47:23 2012
+Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared=1 --with-shared-libraries=1 --with-mpi-dir=/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid --with-mumps=true --download-mumps=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_intel_lp64.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_sequential.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_core.so]" --with-lapack-lib=/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_solver_lp64_sequential.a
+-----------------------------------------
+Libraries compiled on Sat May 19 03:47:23 CDT 2012 on daedalus 
+Machine characteristics: Linux daedalus 2.6.32-34-generic #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011 x86_64 GNU/Linux 
+Using PETSc directory: /org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5
+Using PETSc arch: intel-11.1-lucid-mpich2-1.4.1-cxx-opt
+-----------------------------------------
+Using C compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3   -fPIC   
+Using Fortran compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3    
+-----------------------------------------
+Using include paths: -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/include  
+------------------------------------------
+Using C linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3 
+Using Fortran linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3  
+Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lpetsc       -lX11 -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lblacs -lsuperlu_dist_2.4 -lparmetis -lmetis -lsuperlu_4.0 -Wl,-rpath,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -L/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -lmkl_solver_lp64_sequential -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -ldl -Wl,-rpath,/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -L/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -lmpich -lopa -lmpl -lrt -lpthread -Wl,-rpath,/opt/intel/Compiler/11.1/073/lib/intel64 -L/opt/intel/Compiler/11.1/073/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -lstdc++ -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -ldl  
+------------------------------------------
 
 -------------------------------------------------------------------
-| Time:           Sat Apr  7 15:59:04 2012                         |
+| Processor id:   0                                                |
+| Num Processors: 6                                                |
+| Time:           Fri Aug 24 15:21:32 2012                         |
 | OS:             Linux                                            |
-| HostName:       lkirk-home                                       |
-| OS Release:     3.0.0-17-generic                                 |
-| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| HostName:       daedalus                                         |
+| OS Release:     2.6.32-34-generic                                |
+| OS Version:     #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011      |
 | Machine:        x86_64                                           |
-| Username:       benkirk                                          |
-| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+| Username:       roystgnr                                         |
+| Configuration:  ./configure run on Wed Aug 22 12:44:06 CDT 2012  |
 -------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.067965, Active time=0.001492                                             |
+| libMesh Performance: Alive time=0.148926, Active time=0.009114                                             |
  ------------------------------------------------------------------------------------------------------------
 | Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -527,44 +624,66 @@ Running ./introduction_ex2-opt
 |                                                                                                            |
 |                                                                                                            |
 | DofMap                                                                                                     |
-|   add_neighbors_to_send_list() 2         0.0001      0.000035    0.0001      0.000035    4.69     4.69     |
-|   compute_sparsity()           1         0.0003      0.000263    0.0003      0.000295    17.63    19.77    |
-|   create_dof_constraints()     2         0.0001      0.000042    0.0001      0.000042    5.70     5.70     |
-|   distribute_dofs()            2         0.0002      0.000101    0.0006      0.000279    13.54    37.47    |
-|   dof_indices()                25        0.0000      0.000001    0.0000      0.000001    2.01     2.01     |
-|   prepare_send_list()          2         0.0000      0.000002    0.0000      0.000002    0.20     0.20     |
-|   reinit()                     2         0.0004      0.000177    0.0004      0.000177    23.79    23.79    |
+|   add_neighbors_to_send_list() 2         0.0000      0.000016    0.0000      0.000023    0.36     0.52     |
+|   build_sparsity()             1         0.0001      0.000088    0.0001      0.000096    0.97     1.05     |
+|   create_dof_constraints()     2         0.0000      0.000016    0.0000      0.000016    0.34     0.34     |
+|   distribute_dofs()            2         0.0001      0.000065    0.0017      0.000861    1.44     18.89    |
+|   dof_indices()                43        0.0000      0.000000    0.0000      0.000000    0.21     0.21     |
+|   prepare_send_list()          2         0.0000      0.000002    0.0000      0.000002    0.04     0.04     |
+|   reinit()                     2         0.0001      0.000049    0.0001      0.000049    1.09     1.09     |
 |                                                                                                            |
 | Mesh                                                                                                       |
-|   find_neighbors()             1         0.0003      0.000275    0.0003      0.000275    18.43    18.43    |
-|   renumber_nodes_and_elem()    2         0.0000      0.000005    0.0000      0.000005    0.74     0.74     |
+|   find_neighbors()             1         0.0001      0.000053    0.0008      0.000824    0.58     9.04     |
+|   renumber_nodes_and_elem()    2         0.0000      0.000003    0.0000      0.000003    0.07     0.07     |
+|                                                                                                            |
+| MeshCommunication                                                                                          |
+|   compute_hilbert_indices()    2         0.0002      0.000090    0.0002      0.000090    1.96     1.96     |
+|   find_global_indices()        2         0.0003      0.000153    0.0036      0.001813    3.35     39.78    |
+|   parallel_sort()              2         0.0017      0.000846    0.0021      0.001037    18.56    22.77    |
 |                                                                                                            |
 | MeshTools::Generation                                                                                      |
-|   build_cube()                 1         0.0002      0.000173    0.0002      0.000173    11.60    11.60    |
+|   build_cube()                 1         0.0001      0.000067    0.0001      0.000067    0.74     0.74     |
+|                                                                                                            |
+| MetisPartitioner                                                                                           |
+|   partition()                  1         0.0005      0.000460    0.0021      0.002098    5.05     23.02    |
 |                                                                                                            |
 | Parallel                                                                                                   |
-|   allgather()                  2         0.0000      0.000000    0.0000      0.000000    0.07     0.07     |
+|   allgather()                  11        0.0013      0.000117    0.0013      0.000117    14.07    14.07    |
+|   broadcast()                  1         0.0000      0.000011    0.0000      0.000011    0.12     0.12     |
+|   gather()                     1         0.0000      0.000038    0.0000      0.000038    0.42     0.42     |
+|   max(scalar)                  3         0.0010      0.000340    0.0010      0.000340    11.18    11.18    |
+|   max(vector)                  2         0.0002      0.000082    0.0002      0.000082    1.81     1.81     |
+|   min(vector)                  2         0.0002      0.000116    0.0002      0.000116    2.55     2.55     |
+|   probe()                      70        0.0020      0.000029    0.0020      0.000029    22.25    22.25    |
+|   receive()                    70        0.0001      0.000001    0.0021      0.000030    0.99     23.28    |
+|   send()                       70        0.0001      0.000001    0.0001      0.000001    0.56     0.56     |
+|   send_receive()               74        0.0001      0.000002    0.0024      0.000032    1.49     25.89    |
+|   sum()                        8         0.0008      0.000103    0.0008      0.000103    9.06     9.06     |
+|                                                                                                            |
+| Parallel::Request                                                                                          |
+|   wait()                       70        0.0000      0.000001    0.0000      0.000001    0.41     0.41     |
 |                                                                                                            |
 | Partitioner                                                                                                |
-|   single_partition()           1         0.0000      0.000024    0.0000      0.000024    1.61     1.61     |
+|   set_node_processor_ids()     1         0.0000      0.000026    0.0009      0.000870    0.29     9.55     |
+|   set_parent_processor_ids()   1         0.0000      0.000006    0.0000      0.000006    0.07     0.07     |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                        43        0.0015                                          100.00            |
+| Totals:                        449       0.0091                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
 
  
-Running ./introduction_ex2-opt eqn_sys.dat
+Running ./introduction_ex2-opt eqn_sys.dat -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 
  Mesh Information:
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=36
-    n_local_nodes()=36
+    n_local_nodes()=9
   n_elem()=25
-    n_local_elem()=25
+    n_local_elem()=4
     n_active_elem()=25
   n_subdomains()=1
-  n_partitions()=1
-  n_processors()=1
+  n_partitions()=6
+  n_processors()=6
   n_threads()=1
   processor_id()=0
 
@@ -577,7 +696,7 @@ Running ./introduction_ex2-opt eqn_sys.dat
     Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" "FIRST", "THIRD" "SECOND", "THIRD" 
     n_dofs()=222
-    n_local_dofs()=222
+    n_local_dofs()=42
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=1
@@ -597,16 +716,16 @@ Running ./introduction_ex2-opt eqn_sys.dat
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" 
     n_dofs()=36
-    n_local_dofs()=36
+    n_local_dofs()=9
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=3
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 7.11111
-      Average Off-Processor Bandwidth <= 0
+      Average  On-Processor Bandwidth <= 5.44444
+      Average Off-Processor Bandwidth <= 1.66667
       Maximum  On-Processor Bandwidth <= 9
-      Maximum Off-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 5
     DofMap Constraints
       Number of DoF Constraints = 0
       Number of Node Constraints = 0
@@ -623,7 +742,7 @@ Running ./introduction_ex2-opt eqn_sys.dat
     Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" "FIRST", "THIRD" "SECOND", "THIRD" 
     n_dofs()=222
-    n_local_dofs()=222
+    n_local_dofs()=42
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=1
@@ -643,33 +762,136 @@ Running ./introduction_ex2-opt eqn_sys.dat
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="FIRST", "THIRD" 
     n_dofs()=36
-    n_local_dofs()=36
+    n_local_dofs()=9
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=3
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 7.11111
-      Average Off-Processor Bandwidth <= 0
+      Average  On-Processor Bandwidth <= 5.44444
+      Average Off-Processor Bandwidth <= 1.66667
       Maximum  On-Processor Bandwidth <= 9
-      Maximum Off-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 5
     DofMap Constraints
       Number of DoF Constraints = 0
       Number of Node Constraints = 0
 
+************************************************************************************************************************
+***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
+************************************************************************************************************************
+
+---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
+
+./introduction_ex2-opt on a intel-11. named daedalus with 6 processors, by roystgnr Fri Aug 24 15:21:32 2012
+Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
+
+                         Max       Max/Min        Avg      Total 
+Time (sec):           3.993e-02      1.03435   3.917e-02
+Objects:              6.600e+01      1.00000   6.600e+01
+Flops:                0.000e+00      0.00000   0.000e+00  0.000e+00
+Flops/sec:            0.000e+00      0.00000   0.000e+00  0.000e+00
+MPI Messages:         9.000e+01      1.42857   7.500e+01  4.500e+02
+MPI Message Lengths:  2.352e+03      2.10000   2.183e+01  9.824e+03
+MPI Reductions:       1.000e+02      1.00000
+
+Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
+                            e.g., VecAXPY() for real vectors of length N --> 2N flops
+                            and VecAXPY() for complex vectors of length N --> 8N flops
+
+Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
+                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
+ 0:      Main Stage: 3.9131e-02  99.9%  0.0000e+00   0.0%  4.500e+02 100.0%  2.183e+01      100.0%  6.000e+01  60.0% 
+
+------------------------------------------------------------------------------------------------------------------------
+See the 'Profiling' chapter of the users' manual for details on interpreting output.
+Phase summary info:
+   Count: number of times phase was executed
+   Time and Flops: Max - maximum over all processors
+                   Ratio - ratio of maximum to minimum over all processors
+   Mess: number of messages sent
+   Avg. len: average message length
+   Reduct: number of global reductions
+   Global: entire computation
+   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
+      %T - percent time in this phase         %F - percent flops in this phase
+      %M - percent messages in this phase     %L - percent message lengths in this phase
+      %R - percent reductions in this phase
+   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
+------------------------------------------------------------------------------------------------------------------------
+Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+------------------------------------------------------------------------------------------------------------------------
+
+--- Event Stage 0: Main Stage
+
+VecCopy                2 1.0 5.4121e-0525.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecSet                20 1.0 1.9550e-05 2.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecAssemblyBegin       4 1.0 4.3221e-03 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 1.2e+01 11  0  0  0 12  11  0  0  0 20     0
+VecAssemblyEnd         4 1.0 2.1935e-05 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecScatterBegin        2 1.0 1.2493e-04 4.8 0.00e+00 0.0 5.0e+01 7.8e+01 0.0e+00  0  0 11 40  0   0  0 11 40  0     0
+VecScatterEnd          2 1.0 1.7166e-0410.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatZeroEntries         4 1.0 1.1921e-05 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+------------------------------------------------------------------------------------------------------------------------
+
+Memory usage is given in bytes:
+
+Object Type          Creations   Destructions     Memory  Descendants' Mem.
+Reports information only for process 0.
+
+--- Event Stage 0: Main Stage
+
+                 Vec    28             28        41184     0
+         Vec Scatter     8              8         6944     0
+           Index Set    16             16         8776     0
+   IS L to G Mapping     8              8         4304     0
+              Matrix     6              6        15040     0
+========================================================================================================================
+Average time to get PetscTime(): 9.53674e-08
+Average time for MPI_Barrier(): 4.4775e-05
+Average time for zero size MPI_Send(): 3.71933e-05
+#PETSc Option Table entries:
+-ksp_right_pc
+-log_summary
+-pc_type bjacobi
+-sub_pc_factor_levels 4
+-sub_pc_factor_zeropivot 0
+-sub_pc_type ilu
+#End of PETSc Option Table entries
+Compiled without FORTRAN kernels
+Compiled with full precision matrices (default)
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8
+Configure run at: Sat May 19 03:47:23 2012
+Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared=1 --with-shared-libraries=1 --with-mpi-dir=/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid --with-mumps=true --download-mumps=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_intel_lp64.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_sequential.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_core.so]" --with-lapack-lib=/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_solver_lp64_sequential.a
+-----------------------------------------
+Libraries compiled on Sat May 19 03:47:23 CDT 2012 on daedalus 
+Machine characteristics: Linux daedalus 2.6.32-34-generic #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011 x86_64 GNU/Linux 
+Using PETSc directory: /org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5
+Using PETSc arch: intel-11.1-lucid-mpich2-1.4.1-cxx-opt
+-----------------------------------------
+Using C compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3   -fPIC   
+Using Fortran compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3    
+-----------------------------------------
+Using include paths: -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/include  
+------------------------------------------
+Using C linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3 
+Using Fortran linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3  
+Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lpetsc       -lX11 -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lblacs -lsuperlu_dist_2.4 -lparmetis -lmetis -lsuperlu_4.0 -Wl,-rpath,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -L/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -lmkl_solver_lp64_sequential -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -ldl -Wl,-rpath,/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -L/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -lmpich -lopa -lmpl -lrt -lpthread -Wl,-rpath,/opt/intel/Compiler/11.1/073/lib/intel64 -L/opt/intel/Compiler/11.1/073/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -lstdc++ -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -ldl  
+------------------------------------------
 
 -------------------------------------------------------------------
-| Time:           Sat Apr  7 15:59:04 2012                         |
+| Processor id:   0                                                |
+| Num Processors: 6                                                |
+| Time:           Fri Aug 24 15:21:32 2012                         |
 | OS:             Linux                                            |
-| HostName:       lkirk-home                                       |
-| OS Release:     3.0.0-17-generic                                 |
-| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| HostName:       daedalus                                         |
+| OS Release:     2.6.32-34-generic                                |
+| OS Version:     #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011      |
 | Machine:        x86_64                                           |
-| Username:       benkirk                                          |
-| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+| Username:       roystgnr                                         |
+| Configuration:  ./configure run on Wed Aug 22 12:44:06 CDT 2012  |
 -------------------------------------------------------------------
  ------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.143054, Active time=0.06691                                              |
+| libMesh Performance: Alive time=0.273908, Active time=0.02708                                              |
  ------------------------------------------------------------------------------------------------------------
 | Event                          nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                          w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -677,44 +899,61 @@ Running ./introduction_ex2-opt eqn_sys.dat
 |                                                                                                            |
 |                                                                                                            |
 | DofMap                                                                                                     |
-|   add_neighbors_to_send_list() 4         0.0001      0.000027    0.0001      0.000027    0.16     0.16     |
-|   compute_sparsity()           2         0.0004      0.000199    0.0005      0.000226    0.59     0.68     |
-|   create_dof_constraints()     4         0.0001      0.000034    0.0001      0.000034    0.20     0.20     |
-|   distribute_dofs()            4         0.0004      0.000097    0.0009      0.000237    0.58     1.42     |
-|   dof_indices()                50        0.0000      0.000001    0.0000      0.000001    0.07     0.07     |
-|   prepare_send_list()          4         0.0000      0.000001    0.0000      0.000001    0.01     0.01     |
-|   reinit()                     4         0.0006      0.000139    0.0006      0.000139    0.83     0.83     |
+|   add_neighbors_to_send_list() 4         0.0001      0.000014    0.0001      0.000020    0.21     0.29     |
+|   build_sparsity()             2         0.0001      0.000057    0.0001      0.000064    0.42     0.48     |
+|   create_dof_constraints()     4         0.0000      0.000010    0.0000      0.000010    0.14     0.14     |
+|   distribute_dofs()            4         0.0002      0.000054    0.0039      0.000966    0.81     14.27    |
+|   dof_indices()                86        0.0000      0.000000    0.0000      0.000000    0.11     0.11     |
+|   prepare_send_list()          4         0.0000      0.000002    0.0000      0.000002    0.03     0.03     |
+|   reinit()                     4         0.0002      0.000043    0.0002      0.000043    0.64     0.64     |
 |                                                                                                            |
 | EquationSystems                                                                                            |
-|   read()                       1         0.0260      0.025951    0.0271      0.027124    38.78    40.54    |
-|   update()                     1         0.0001      0.000084    0.0001      0.000084    0.13     0.13     |
-|   write()                      1         0.0356      0.035637    0.0361      0.036054    53.26    53.88    |
+|   read()                       1         0.0027      0.002653    0.0080      0.008041    9.80     29.69    |
+|   update()                     1         0.0039      0.003915    0.0039      0.003915    14.46    14.46    |
+|   write()                      1         0.0006      0.000622    0.0011      0.001063    2.30     3.93     |
 |                                                                                                            |
 | Mesh                                                                                                       |
-|   find_neighbors()             1         0.0003      0.000279    0.0003      0.000279    0.42     0.42     |
-|   renumber_nodes_and_elem()    2         0.0000      0.000005    0.0000      0.000005    0.01     0.01     |
+|   find_neighbors()             1         0.0001      0.000052    0.0001      0.000084    0.19     0.31     |
+|   renumber_nodes_and_elem()    2         0.0000      0.000003    0.0000      0.000003    0.02     0.02     |
 |                                                                                                            |
 | MeshCommunication                                                                                          |
-|   assign_global_indices()      2         0.0027      0.001329    0.0027      0.001337    3.97     4.00     |
+|   assign_global_indices()      2         0.0035      0.001753    0.0059      0.002932    12.94    21.65    |
+|   compute_hilbert_indices()    2         0.0002      0.000089    0.0002      0.000089    0.66     0.66     |
+|   find_global_indices()        2         0.0001      0.000066    0.0050      0.002518    0.49     18.60    |
+|   parallel_sort()              2         0.0028      0.001417    0.0035      0.001729    10.47    12.77    |
 |                                                                                                            |
 | MeshTools::Generation                                                                                      |
-|   build_cube()                 1         0.0002      0.000200    0.0002      0.000200    0.30     0.30     |
+|   build_cube()                 1         0.0001      0.000065    0.0001      0.000065    0.24     0.24     |
+|                                                                                                            |
+| MetisPartitioner                                                                                           |
+|   partition()                  1         0.0003      0.000343    0.0023      0.002254    1.27     8.32     |
 |                                                                                                            |
 | Parallel                                                                                                   |
-|   allgather()                  20        0.0000      0.000001    0.0000      0.000001    0.02     0.02     |
-|   receive()                    16        0.0000      0.000003    0.0000      0.000003    0.07     0.07     |
-|   send()                       16        0.0004      0.000022    0.0004      0.000022    0.54     0.54     |
-|   send_receive()               8         0.0000      0.000001    0.0000      0.000001    0.01     0.01     |
+|   allgather()                  35        0.0036      0.000102    0.0036      0.000102    13.23    13.23    |
+|   broadcast()                  123       0.0009      0.000007    0.0009      0.000007    3.25     3.15     |
+|   gather()                     17        0.0004      0.000021    0.0004      0.000021    1.31     1.31     |
+|   max(scalar)                  5         0.0003      0.000068    0.0003      0.000068    1.26     1.26     |
+|   max(vector)                  4         0.0002      0.000039    0.0002      0.000039    0.58     0.58     |
+|   min(vector)                  4         0.0001      0.000036    0.0001      0.000036    0.53     0.53     |
+|   probe()                      150       0.0046      0.000031    0.0046      0.000031    17.00    17.00    |
+|   receive()                    246       0.0002      0.000001    0.0049      0.000020    0.88     17.93    |
+|   send()                       166       0.0001      0.000001    0.0001      0.000001    0.45     0.45     |
+|   send_receive()               162       0.0002      0.000001    0.0053      0.000032    0.89     19.39    |
+|   sum()                        22        0.0013      0.000059    0.0013      0.000059    4.83     4.83     |
+|                                                                                                            |
+| Parallel::Request                                                                                          |
+|   wait()                       246       0.0001      0.000001    0.0001      0.000001    0.49     0.49     |
 |                                                                                                            |
 | Partitioner                                                                                                |
-|   single_partition()           1         0.0000      0.000024    0.0000      0.000024    0.04     0.04     |
+|   set_node_processor_ids()     1         0.0000      0.000026    0.0017      0.001671    0.10     6.17     |
+|   set_parent_processor_ids()   1         0.0000      0.000006    0.0000      0.000006    0.02     0.02     |
  ------------------------------------------------------------------------------------------------------------
-| Totals:                        142       0.0669                                          100.00            |
+| Totals:                        1306      0.0271                                          100.00            |
  ------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
-* Done Running Example  ./introduction_ex2-opt
+* Done Running Example  mpirun -np 6 ./introduction_ex2-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
 </pre>
 </div>
