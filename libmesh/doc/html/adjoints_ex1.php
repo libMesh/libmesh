@@ -1363,16 +1363,9 @@ All done.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in optimized mode) adjoints_ex1.C...
-Compiling C++ (in optimized mode) element_postprocess.C...
-Compiling C++ (in optimized mode) element_qoi_derivative.C...
-Compiling C++ (in optimized mode) femparameters.C...
-Compiling C++ (in optimized mode) L-shaped.C...
-Compiling C++ (in optimized mode) side_postprocess.C...
-Compiling C++ (in optimized mode) side_qoi_derivative.C...
 Linking ./adjoints_ex1-opt...
 ***************************************************************
-* Running Example  ./adjoints_ex1-opt
+* Running Example  mpirun -np 6 ./adjoints_ex1-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
  
 Started ./adjoints_ex1-opt
@@ -1383,13 +1376,13 @@ Initializing systems
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=833
-    n_local_nodes()=833
+    n_local_nodes()=157
   n_elem()=255
-    n_local_elem()=255
+    n_local_elem()=47
     n_active_elem()=192
   n_subdomains()=1
-  n_partitions()=1
-  n_processors()=1
+  n_partitions()=6
+  n_processors()=6
   n_threads()=1
   processor_id()=0
 
@@ -1402,92 +1395,224 @@ Initializing systems
     Infinite Element Mapping="CARTESIAN" 
     Approximation Orders="SECOND", "THIRD" 
     n_dofs()=833
-    n_local_dofs()=833
+    n_local_dofs()=157
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 15.06
-      Average Off-Processor Bandwidth <= 0
+      Average  On-Processor Bandwidth <= 13.8662
+      Average Off-Processor Bandwidth <= 1.47771
       Maximum  On-Processor Bandwidth <= 25
-      Maximum Off-Processor Bandwidth <= 0
+      Maximum Off-Processor Bandwidth <= 16
     DofMap Constraints
       Number of DoF Constraints = 0
       Number of Node Constraints = 0
 
-  Nonlinear solver converged, step 0, residual reduction 1.18018e-13 < 1e-09
+  Nonlinear solver converged, step 0, residual reduction 1.15136e-10 < 1e-09
 Adaptive step 0, we have 192 active elements and 833 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 0.00012462746034657153
-The relative error in QoI 1 is 0.00014255871210532757
+The relative error in QoI 0 is 0.14234911607641976
+The relative error in QoI 1 is 0.98348528412694303
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
-Refined mesh to 222 active elements and 945 active dofs.
-  Nonlinear solver converged, step 0, residual reduction 1.4866235111362822e-10 < 1.0000000000000001e-09
-Adaptive step 1, we have 222 active elements and 945 active dofs.
+Refined mesh to 222 active elements and 947 active dofs.
+  Nonlinear solver converged, step 0, residual reduction 1.6305903156994762e-10 < 1.0000000000000001e-09
+Adaptive step 1, we have 222 active elements and 947 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 4.9657720064985281e-05
-The relative error in QoI 1 is 6.2108600831051721e-06
+The relative error in QoI 0 is 0.00012462669490553746
+The relative error in QoI 1 is 0.00046196442781129093
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
 Refined mesh to 261 active elements and 1093 active dofs.
-  Nonlinear solver converged, step 0, residual reduction 1.8274703051752381e-10 < 1.0000000000000001e-09
+  Nonlinear solver converged, step 0, residual reduction 1.3174657984753172e-10 < 1.0000000000000001e-09
 Adaptive step 2, we have 261 active elements and 1093 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 3.2489141757316423e-05
-The relative error in QoI 1 is 9.1543505429770195e-05
+The relative error in QoI 0 is 4.9670131857561074e-05
+The relative error in QoI 1 is 0.00016668532338717413
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
-Refined mesh to 309 active elements and 1279 active dofs.
-  Nonlinear solver reached maximum step 1, latest evaluated residual 3.0789956885790906e-05
+Refined mesh to 306 active elements and 1263 active dofs.
+  Nonlinear solver reached maximum step 1, latest evaluated residual 2.6230784173692172e-05
   Continuing...
-Adaptive step 3, we have 309 active elements and 1279 active dofs.
+Adaptive step 3, we have 306 active elements and 1263 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 1.3068055374124031e-05
-The relative error in QoI 1 is 2.7384569859752794e-05
+The relative error in QoI 0 is 1.9669096546832528e-05
+The relative error in QoI 1 is 4.9332563810953052e-05
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
-Refined mesh to 375 active elements and 1511 active dofs.
-  Nonlinear solver reached maximum step 1, latest evaluated residual 3.0464562981439094e-05
+Refined mesh to 363 active elements and 1483 active dofs.
+  Nonlinear solver reached maximum step 1, latest evaluated residual 2.7399079204252697e-05
   Continuing...
-Adaptive step 4, we have 375 active elements and 1511 active dofs.
+Adaptive step 4, we have 363 active elements and 1483 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 5.1850614729802354e-06
-The relative error in QoI 1 is 5.8552194126613999e-07
+The relative error in QoI 0 is 7.4555278313393077e-06
+The relative error in QoI 1 is 9.1515160708215165e-06
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
-Refined mesh to 438 active elements and 1737 active dofs.
-  Nonlinear solver reached maximum step 1, latest evaluated residual 3.0412835297461065e-05
+Refined mesh to 420 active elements and 1699 active dofs.
+  Nonlinear solver reached maximum step 1, latest evaluated residual 2.6439943160941771e-05
   Continuing...
-Adaptive step 5, we have 438 active elements and 1737 active dofs.
+Adaptive step 5, we have 420 active elements and 1699 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 1.5909681422576661e-06
-The relative error in QoI 1 is 1.0292566220613908e-05
+The relative error in QoI 0 is 2.3940981441682107e-06
+The relative error in QoI 1 is 4.551750882066717e-07
 
 Using Adjoint Residual Error Estimator with Patch Recovery Weights
-Refined mesh to 516 active elements and 2045 active dofs.
-  Nonlinear solver reached maximum step 1, latest evaluated residual 2.6206318508493051e-05
+Refined mesh to 489 active elements and 1959 active dofs.
+  Nonlinear solver reached maximum step 1, latest evaluated residual 2.3047247913461771e-05
   Continuing...
-Adaptive step 6, we have 516 active elements and 2045 active dofs.
+Adaptive step 6, we have 489 active elements and 1959 active dofs.
 Postprocessing: 
-The relative error in QoI 0 is 3.7224084878748516e-07
-The relative error in QoI 1 is 7.9879129741668715e-06
+The relative error in QoI 0 is 4.882440585551116e-07
+The relative error in QoI 1 is 4.1466631098190821e-06
 
 [0] Completing output.
+[1] Completing output.
+[2] Completing output.
+[[45] Completing output.
+] Completing output.
+************************************************************************************************************************
+[3***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
+************************************************************************************************************************
+
+---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
+
+] Completing output.
+./adjoints_ex1-opt on a intel-11. named daedalus with 6 processors, by roystgnr Fri Aug 24 15:20:50 2012
+Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
+
+                         Max       Max/Min        Avg      Total 
+Time (sec):           1.153e+00      1.00114   1.152e+00
+Objects:              1.104e+03      1.01099   1.098e+03
+Flops:                7.259e+07      1.53020   5.701e+07  3.420e+08
+Flops/sec:            6.294e+07      1.52845   4.947e+07  2.968e+08
+MPI Messages:         3.604e+03      1.25274   3.285e+03  1.971e+04
+MPI Message Lengths:  1.386e+06      1.13237   3.875e+02  7.638e+06
+MPI Reductions:       3.056e+03      1.00394
+
+Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
+                            e.g., VecAXPY() for real vectors of length N --> 2N flops
+                            and VecAXPY() for complex vectors of length N --> 8N flops
+
+Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
+                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
+ 0:      Main Stage: 1.1522e+00 100.0%  3.4204e+08 100.0%  1.971e+04 100.0%  3.875e+02      100.0%  2.744e+03  89.9% 
+
+------------------------------------------------------------------------------------------------------------------------
+See the 'Profiling' chapter of the users' manual for details on interpreting output.
+Phase summary info:
+   Count: number of times phase was executed
+   Time and Flops: Max - maximum over all processors
+                   Ratio - ratio of maximum to minimum over all processors
+   Mess: number of messages sent
+   Avg. len: average message length
+   Reduct: number of global reductions
+   Global: entire computation
+   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
+      %T - percent time in this phase         %F - percent flops in this phase
+      %M - percent messages in this phase     %L - percent message lengths in this phase
+      %R - percent reductions in this phase
+   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
+------------------------------------------------------------------------------------------------------------------------
+Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+------------------------------------------------------------------------------------------------------------------------
+
+--- Event Stage 0: Main Stage
+
+KSPGMRESOrthog       598 1.0 8.7401e-02 2.2 8.26e+06 1.1 0.0e+00 0.0e+00 6.0e+02  5 14  0  0 20   5 14  0  0 22   535
+KSPSetup              35 1.0 2.5916e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPSolve               7 1.0 1.1453e-01 1.1 2.66e+07 1.6 3.1e+03 1.9e+02 3.8e+02 10 35 16  8 13  10 35 16  8 14  1055
+PCSetUp               28 1.0 8.6037e-02 2.4 2.47e+07 2.4 0.0e+00 0.0e+00 6.0e+01  5 28  0  0  2   5 28  0  0  2  1102
+PCSetUpOnBlocks        7 1.0 3.8123e-02 2.2 1.24e+07 2.4 0.0e+00 0.0e+00 3.0e+01  2 14  0  0  1   2 14  0  0  1  1243
+PCApply              627 1.0 7.1848e-02 2.0 4.68e+07 1.6 0.0e+00 0.0e+00 3.0e+01  4 63  0  0  1   4 63  0  0  1  2990
+VecMDot              598 1.0 8.4777e-02 2.2 4.12e+06 1.1 0.0e+00 0.0e+00 6.0e+02  5  7  0  0 20   5  7  0  0 22   275
+VecNorm              676 1.0 1.1350e-01 1.8 3.48e+05 1.2 0.0e+00 0.0e+00 6.8e+02  7  1  0  0 22   7  1  0  0 25    17
+VecScale             627 1.0 5.3525e-04 1.8 1.62e+05 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  1706
+VecCopy              190 1.0 1.2493e-04 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecSet              1721 1.0 5.7030e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecAXPY               65 1.0 2.7966e-04 3.5 3.29e+04 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0   664
+VecMAXPY             627 1.0 2.3136e-03 1.5 4.44e+06 1.1 0.0e+00 0.0e+00 0.0e+00  0  7  0  0  0   0  7  0  0  0 10862
+VecAssemblyBegin     343 1.0 1.4335e-01 1.4 0.00e+00 0.0 8.4e+02 1.2e+02 7.8e+02 11  0  4  1 25  11  0  4  1 28     0
+VecAssemblyEnd       343 1.0 2.9635e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecScatterBegin      778 1.0 2.4669e-03 1.3 0.00e+00 0.0 1.4e+04 3.9e+02 0.0e+00  0  0 72 73  0   0  0 72 73  0     0
+VecScatterEnd        778 1.0 1.3107e-01 2.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  8  0  0  0  0   8  0  0  0  0     0
+VecNormalize         627 1.0 6.4216e-02 1.7 4.85e+05 1.2 0.0e+00 0.0e+00 6.3e+02  5  1  0  0 21   5  1  0  0 23    43
+MatMult              176 1.0 4.8775e-02 3.0 1.48e+06 1.2 3.1e+03 1.9e+02 0.0e+00  3  2 16  8  0   3  2 16  8  0   165
+MatMultTranspose     451 1.0 5.1440e-02 1.7 3.69e+06 1.2 7.8e+03 1.8e+02 0.0e+00  4  6 40 19  0   4  6 40 19  0   393
+MatSolve             176 1.0 5.9547e-03 1.6 1.03e+07 1.5 0.0e+00 0.0e+00 0.0e+00  0 15  0  0  0   0 15  0  0  0  8407
+MatSolveTranspos     451 1.0 1.7994e-02 1.4 2.41e+07 1.5 0.0e+00 0.0e+00 0.0e+00  1 34  0  0  0   1 34  0  0  0  6523
+MatLUFactorNum        14 1.0 2.7293e-02 3.0 2.47e+07 2.4 0.0e+00 0.0e+00 0.0e+00  1 28  0  0  0   1 28  0  0  0  3472
+MatILUFactorSym       14 1.0 5.7404e-02 2.3 0.00e+00 0.0 0.0e+00 0.0e+00 1.4e+01  3  0  0  0  0   3  0  0  0  1     0
+MatAssemblyBegin      42 1.0 2.5030e-02 2.1 0.00e+00 0.0 4.0e+02 9.0e+02 8.4e+01  2  0  2  5  3   2  0  2  5  3     0
+MatAssemblyEnd        42 1.0 5.2366e-03 1.1 0.00e+00 0.0 2.4e+02 4.8e+01 8.4e+01  0  0  1  0  3   0  0  1  0  3     0
+MatGetRowIJ           14 1.0 1.3113e-05 2.0 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatGetOrdering        14 1.0 2.9516e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 4.6e+01  0  0  0  0  2   0  0  0  0  2     0
+MatZeroEntries        28 1.0 7.9393e-05 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+------------------------------------------------------------------------------------------------------------------------
+
+Memory usage is given in bytes:
+
+Object Type          Creations   Destructions     Memory  Descendants' Mem.
+Reports information only for process 0.
+
+--- Event Stage 0: Main Stage
+
+       Krylov Solver    28             28       264320     0
+      Preconditioner    28             28        19712     0
+                 Vec   718            718      3101544     0
+         Vec Scatter    92             92        79856     0
+           Index Set   180            180       157208     0
+   IS L to G Mapping    19             19        19908     0
+              Matrix    35             35      3936340     0
+========================================================================================================================
+Average time to get PetscTime(): 0
+Average time for MPI_Barrier(): 4.35829e-05
+Average time for zero size MPI_Send(): 5.8651e-05
+#PETSc Option Table entries:
+-ksp_right_pc
+-log_summary
+-pc_type bjacobi
+-sub_pc_factor_levels 4
+-sub_pc_factor_zeropivot 0
+-sub_pc_type ilu
+#End of PETSc Option Table entries
+Compiled without FORTRAN kernels
+Compiled with full precision matrices (default)
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8
+Configure run at: Sat May 19 03:47:23 2012
+Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared=1 --with-shared-libraries=1 --with-mpi-dir=/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid --with-mumps=true --download-mumps=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_intel_lp64.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_sequential.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_core.so]" --with-lapack-lib=/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_solver_lp64_sequential.a
+-----------------------------------------
+Libraries compiled on Sat May 19 03:47:23 CDT 2012 on daedalus 
+Machine characteristics: Linux daedalus 2.6.32-34-generic #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011 x86_64 GNU/Linux 
+Using PETSc directory: /org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5
+Using PETSc arch: intel-11.1-lucid-mpich2-1.4.1-cxx-opt
+-----------------------------------------
+Using C compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3   -fPIC   
+Using Fortran compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3    
+-----------------------------------------
+Using include paths: -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/include  
+------------------------------------------
+Using C linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3 
+Using Fortran linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3  
+Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lpetsc       -lX11 -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lblacs -lsuperlu_dist_2.4 -lparmetis -lmetis -lsuperlu_4.0 -Wl,-rpath,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -L/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -lmkl_solver_lp64_sequential -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -ldl -Wl,-rpath,/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -L/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -lmpich -lopa -lmpl -lrt -lpthread -Wl,-rpath,/opt/intel/Compiler/11.1/073/lib/intel64 -L/opt/intel/Compiler/11.1/073/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -lstdc++ -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -ldl  
+------------------------------------------
 
 -------------------------------------------------------------------
-| Time:           Sat Apr  7 15:56:41 2012                         |
+| Processor id:   0                                                |
+| Num Processors: 6                                                |
+| Time:           Fri Aug 24 15:20:50 2012                         |
 | OS:             Linux                                            |
-| HostName:       lkirk-home                                       |
-| OS Release:     3.0.0-17-generic                                 |
-| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| HostName:       daedalus                                         |
+| OS Release:     2.6.32-34-generic                                |
+| OS Version:     #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011      |
 | Machine:        x86_64                                           |
-| Username:       benkirk                                          |
-| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+| Username:       roystgnr                                         |
+| Configuration:  ./configure run on Wed Aug 22 12:44:06 CDT 2012  |
 -------------------------------------------------------------------
  ---------------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=1.8108, Active time=1.67587                                                         |
+| libMesh Performance: Alive time=1.29811, Active time=1.11673                                                        |
  ---------------------------------------------------------------------------------------------------------------------
 | Event                                   nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                                   w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -1495,99 +1620,127 @@ The relative error in QoI 1 is 7.9879129741668715e-06
 |                                                                                                                     |
 |                                                                                                                     |
 | AdjointResidualErrorEstimator                                                                                       |
-|   estimate_error()                      6         0.0862      0.014366    0.3720      0.062002    5.14     22.20    |
+|   estimate_error()                      6         0.0715      0.011917    0.3085      0.051408    6.40     27.62    |
 |                                                                                                                     |
 | DofMap                                                                                                              |
-|   add_neighbors_to_send_list()          19        0.0029      0.000153    0.0029      0.000153    0.17     0.17     |
-|   build_constraint_matrix()             10605     0.0278      0.000003    0.0278      0.000003    1.66     1.66     |
-|   cnstrn_elem_mat_vec()                 2121      0.0128      0.000006    0.0128      0.000006    0.76     0.76     |
-|   compute_sparsity()                    7         0.0179      0.002559    0.0204      0.002909    1.07     1.21     |
-|   constrain_elem_matrix()               2121      0.0051      0.000002    0.0051      0.000002    0.31     0.31     |
-|   constrain_elem_vector()               6363      0.0236      0.000004    0.0236      0.000004    1.41     1.41     |
-|   create_dof_constraints()              19        0.0267      0.001403    0.0348      0.001832    1.59     2.08     |
-|   distribute_dofs()                     19        0.0051      0.000268    0.0185      0.000973    0.30     1.10     |
-|   dof_indices()                         65096     0.0703      0.000001    0.0703      0.000001    4.20     4.20     |
-|   enforce_constraints_exactly()         48        0.0054      0.000112    0.0054      0.000112    0.32     0.32     |
-|   old_dof_indices()                     12726     0.0110      0.000001    0.0110      0.000001    0.65     0.65     |
-|   prepare_send_list()                   19        0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
-|   reinit()                              19        0.0134      0.000704    0.0134      0.000704    0.80     0.80     |
+|   add_neighbors_to_send_list()          19        0.0011      0.000060    0.0014      0.000074    0.10     0.13     |
+|   build_constraint_matrix()             1705      0.0020      0.000001    0.0020      0.000001    0.18     0.18     |
+|   build_sparsity()                      7         0.0052      0.000742    0.0062      0.000884    0.47     0.55     |
+|   cnstrn_elem_mat_vec()                 341       0.0008      0.000002    0.0008      0.000002    0.08     0.08     |
+|   constrain_elem_matrix()               341       0.0005      0.000002    0.0005      0.000002    0.05     0.05     |
+|   constrain_elem_vector()               1023      0.0004      0.000000    0.0004      0.000000    0.04     0.04     |
+|   create_dof_constraints()              19        0.0101      0.000531    0.0129      0.000682    0.90     1.16     |
+|   distribute_dofs()                     19        0.0036      0.000188    0.0352      0.001854    0.32     3.15     |
+|   dof_indices()                         17117     0.0067      0.000000    0.0067      0.000000    0.60     0.60     |
+|   enforce_constraints_exactly()         48        0.0222      0.000462    0.0222      0.000462    1.99     1.99     |
+|   old_dof_indices()                     2046      0.0009      0.000000    0.0009      0.000000    0.08     0.08     |
+|   prepare_send_list()                   19        0.0001      0.000003    0.0001      0.000003    0.01     0.01     |
+|   reinit()                              19        0.0062      0.000328    0.0062      0.000328    0.56     0.56     |
 |                                                                                                                     |
 | EquationSystems                                                                                                     |
-|   build_discontinuous_solution_vector() 12        0.0038      0.000317    0.0059      0.000495    0.23     0.35     |
-|   build_solution_vector()               21        0.0119      0.000566    0.0188      0.000895    0.71     1.12     |
+|   build_discontinuous_solution_vector() 12        0.0113      0.000944    0.0125      0.001042    1.01     1.12     |
+|   build_solution_vector()               21        0.0021      0.000099    0.0123      0.000585    0.19     1.10     |
 |                                                                                                                     |
 | FE                                                                                                                  |
-|   compute_affine_map()                  32136     0.0541      0.000002    0.0541      0.000002    3.23     3.23     |
-|   compute_face_map()                    3360      0.0208      0.000006    0.0482      0.000014    1.24     2.88     |
-|   compute_shape_functions()             32136     0.0329      0.000001    0.0329      0.000001    1.96     1.96     |
-|   init_face_shape_functions()           35        0.0001      0.000003    0.0001      0.000003    0.01     0.01     |
-|   init_shape_functions()                3857      0.0453      0.000012    0.0453      0.000012    2.70     2.70     |
-|   inverse_map()                         24030     0.0430      0.000002    0.0430      0.000002    2.57     2.57     |
+|   compute_shape_functions()             7684      0.0331      0.000004    0.0331      0.000004    2.97     2.97     |
+|   init_shape_functions()                1522      0.0070      0.000005    0.0070      0.000005    0.63     0.63     |
+|   inverse_map()                         10831     0.0097      0.000001    0.0097      0.000001    0.87     0.87     |
 |                                                                                                                     |
 | FEMSystem                                                                                                           |
-|   assemble_qoi_derivative()             7         0.0351      0.005012    0.0904      0.012917    2.09     5.40     |
-|   assembly()                            7         0.0581      0.008304    0.1770      0.025279    3.47     10.56    |
-|   assembly(get_jacobian)                7         0.0645      0.009209    0.1627      0.023239    3.85     9.71     |
-|   assembly(get_residual)                7         0.0282      0.004035    0.0818      0.011682    1.69     4.88     |
-|   numerical_elem_jacobian()             4626      0.0767      0.000017    0.0767      0.000017    4.58     4.58     |
-|   numerical_side_jacobian()             1344      0.0343      0.000025    0.0343      0.000025    2.04     2.04     |
-|   postprocess()                         7         0.0144      0.002053    0.0426      0.006092    0.86     2.54     |
+|   assemble_qoi_derivative()             7         0.0342      0.004893    0.0474      0.006767    3.07     4.24     |
+|   assembly()                            7         0.0074      0.001056    0.0306      0.004373    0.66     2.74     |
+|   assembly(get_jacobian)                7         0.0066      0.000946    0.0292      0.004173    0.59     2.62     |
+|   assembly(get_residual)                7         0.0052      0.000748    0.0176      0.002515    0.47     1.58     |
+|   numerical_elem_jacobian()             746       0.0099      0.000013    0.0099      0.000013    0.89     0.89     |
+|   numerical_side_jacobian()             276       0.0057      0.000021    0.0057      0.000021    0.51     0.51     |
+|   postprocess()                         7         0.0062      0.000892    0.0178      0.002546    0.56     1.60     |
+|                                                                                                                     |
+| FEMap                                                                                                               |
+|   compute_affine_map()                  7684      0.0089      0.000001    0.0089      0.000001    0.79     0.79     |
+|   compute_face_map()                    1380      0.0054      0.000004    0.0121      0.000009    0.48     1.09     |
+|   init_face_shape_functions()           70        0.0001      0.000001    0.0001      0.000001    0.01     0.01     |
+|   init_reference_to_physical_map()      1522      0.0069      0.000005    0.0069      0.000005    0.62     0.62     |
 |                                                                                                                     |
 | GMVIO                                                                                                               |
-|   write_nodal_data()                    21        0.1749      0.008329    0.1749      0.008329    10.44    10.44    |
+|   write_nodal_data()                    21        0.0880      0.004190    0.0880      0.004190    7.88     7.88     |
 |                                                                                                                     |
 | ImplicitSystem                                                                                                      |
-|   adjoint_solve()                       7         0.0006      0.000089    0.4786      0.068372    0.04     28.56    |
+|   adjoint_solve()                       7         0.0033      0.000473    0.2815      0.040213    0.30     25.21    |
 |                                                                                                                     |
 | LocationMap                                                                                                         |
-|   find()                                3420      0.0051      0.000001    0.0051      0.000001    0.30     0.30     |
-|   init()                                15        0.0045      0.000302    0.0045      0.000302    0.27     0.27     |
+|   find()                                3240      0.0017      0.000001    0.0017      0.000001    0.15     0.15     |
+|   init()                                15        0.0019      0.000125    0.0019      0.000125    0.17     0.17     |
 |                                                                                                                     |
 | Mesh                                                                                                                |
-|   all_first_order()                     12        0.0037      0.000307    0.0037      0.000307    0.22     0.22     |
-|   all_second_order()                    1         0.0001      0.000103    0.0001      0.000103    0.01     0.01     |
-|   contract()                            6         0.0002      0.000033    0.0006      0.000101    0.01     0.04     |
-|   find_neighbors()                      33        0.0301      0.000911    0.0301      0.000911    1.79     1.79     |
-|   renumber_nodes_and_elem()             70        0.0031      0.000044    0.0031      0.000044    0.18     0.18     |
+|   all_first_order()                     12        0.0018      0.000152    0.0018      0.000152    0.16     0.16     |
+|   all_second_order()                    1         0.0000      0.000039    0.0000      0.000039    0.00     0.00     |
+|   contract()                            6         0.0001      0.000013    0.0004      0.000061    0.01     0.03     |
+|   find_neighbors()                      33        0.0135      0.000408    0.0228      0.000691    1.21     2.04     |
+|   renumber_nodes_and_elem()             46        0.0016      0.000035    0.0016      0.000035    0.15     0.15     |
+|                                                                                                                     |
+| MeshCommunication                                                                                                   |
+|   broadcast()                           1         0.0001      0.000076    0.0003      0.000322    0.01     0.03     |
+|   compute_hilbert_indices()             34        0.0149      0.000439    0.0149      0.000439    1.34     1.34     |
+|   find_global_indices()                 34        0.0021      0.000063    0.0698      0.002052    0.19     6.25     |
+|   parallel_sort()                       34        0.0111      0.000325    0.0284      0.000837    0.99     2.55     |
 |                                                                                                                     |
 | MeshOutput                                                                                                          |
-|   write_equation_systems()              21        0.0002      0.000011    0.1939      0.009235    0.01     11.57    |
+|   write_equation_systems()              21        0.0001      0.000007    0.1004      0.004782    0.01     8.99     |
 |                                                                                                                     |
 | MeshRefinement                                                                                                      |
-|   _coarsen_elements()                   12        0.0002      0.000018    0.0002      0.000018    0.01     0.01     |
-|   _refine_elements()                    15        0.0076      0.000505    0.0203      0.001352    0.45     1.21     |
-|   add_point()                           3420      0.0061      0.000002    0.0119      0.000003    0.36     0.71     |
-|   make_coarsening_compatible()          17        0.0060      0.000352    0.0060      0.000352    0.36     0.36     |
-|   make_refinement_compatible()          17        0.0004      0.000024    0.0004      0.000024    0.02     0.02     |
+|   _coarsen_elements()                   12        0.0001      0.000008    0.0006      0.000047    0.01     0.05     |
+|   _refine_elements()                    15        0.0036      0.000242    0.0179      0.001195    0.33     1.61     |
+|   add_point()                           3240      0.0028      0.000001    0.0048      0.000001    0.25     0.43     |
+|   make_coarsening_compatible()          16        0.0026      0.000165    0.0026      0.000165    0.24     0.24     |
+|   make_refinement_compatible()          16        0.0002      0.000011    0.0013      0.000083    0.02     0.12     |
+|                                                                                                                     |
+| MetisPartitioner                                                                                                    |
+|   partition()                           33        0.0260      0.000787    0.1102      0.003338    2.32     9.86     |
 |                                                                                                                     |
 | NewtonSolver                                                                                                        |
-|   solve()                               7         0.0019      0.000279    0.4559      0.065135    0.12     27.21    |
+|   solve()                               7         0.0621      0.008869    0.2402      0.034317    5.56     21.51    |
 |                                                                                                                     |
 | Parallel                                                                                                            |
-|   allgather()                           19        0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   allgather()                           138       0.0156      0.000113    0.0135      0.000098    1.40     1.21     |
+|   broadcast()                           10        0.0001      0.000008    0.0001      0.000005    0.01     0.00     |
+|   gather()                              1         0.0000      0.000011    0.0000      0.000011    0.00     0.00     |
+|   max(bool)                             50        0.0112      0.000225    0.0112      0.000225    1.01     1.01     |
+|   max(scalar)                           53        0.0182      0.000343    0.0182      0.000343    1.63     1.63     |
+|   max(vector)                           34        0.0012      0.000037    0.0012      0.000037    0.11     0.11     |
+|   max(vector<bool>)                     12        0.0004      0.000033    0.0004      0.000033    0.04     0.04     |
+|   min(bool)                             32        0.0049      0.000153    0.0049      0.000153    0.44     0.44     |
+|   min(vector)                           40        0.0155      0.000387    0.0155      0.000387    1.39     1.39     |
+|   probe()                               1170      0.0636      0.000054    0.0636      0.000054    5.70     5.70     |
+|   receive()                             1170      0.0015      0.000001    0.0653      0.000056    0.14     5.84     |
+|   send()                                1170      0.0007      0.000001    0.0007      0.000001    0.06     0.06     |
+|   send_receive()                        1238      0.0024      0.000002    0.0690      0.000056    0.22     6.18     |
+|   sum()                                 270       0.0823      0.000305    0.0823      0.000305    7.37     7.37     |
+|                                                                                                                     |
+| Parallel::Request                                                                                                   |
+|   wait()                                1170      0.0004      0.000000    0.0004      0.000000    0.03     0.03     |
 |                                                                                                                     |
 | Partitioner                                                                                                         |
-|   set_node_processor_ids()              12        0.0017      0.000144    0.0017      0.000144    0.10     0.10     |
-|   single_partition()                    33        0.0016      0.000049    0.0016      0.000049    0.10     0.10     |
+|   set_node_processor_ids()              45        0.0042      0.000093    0.0358      0.000795    0.38     3.20     |
+|   set_parent_processor_ids()            33        0.0012      0.000037    0.0012      0.000037    0.11     0.11     |
 |                                                                                                                     |
 | PatchRecoveryErrorEstimator                                                                                         |
-|   estimate_error()                      18        0.1469      0.008159    0.2291      0.012728    8.76     13.67    |
+|   estimate_error()                      18        0.0246      0.001369    0.0677      0.003759    2.21     6.06     |
 |                                                                                                                     |
 | PetscLinearSolver                                                                                                   |
-|   solve()                               21        0.4166      0.019839    0.4166      0.019839    24.86    24.86    |
+|   solve()                               21        0.3159      0.015041    0.3159      0.015041    28.29    28.29    |
 |                                                                                                                     |
 | ProjectVector                                                                                                       |
-|   operator()                            18        0.0222      0.001231    0.0481      0.002671    1.32     2.87     |
+|   operator()                            18        0.0028      0.000156    0.0053      0.000292    0.25     0.47     |
 |                                                                                                                     |
 | System                                                                                                              |
-|   project_vector()                      18        0.0108      0.000599    0.0681      0.003782    0.64     4.06     |
+|   project_vector()                      18        0.0209      0.001163    0.0355      0.001971    1.87     3.18     |
  ---------------------------------------------------------------------------------------------------------------------
-| Totals:                                 208013    1.6759                                          100.00            |
+| Totals:                                 68067     1.1167                                          100.00            |
  ---------------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
-* Done Running Example  ./adjoints_ex1-opt
+* Done Running Example  mpirun -np 6 ./adjoints_ex1-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
 </pre>
 </div>

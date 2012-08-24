@@ -24,14 +24,15 @@ Delaunay triangulations and tetrahedralizations in two and three dimensions
 
 <div class ="fragment">
 <pre>
-        #include "mesh.h"
-        #include "mesh_triangle_interface.h"
-        #include "mesh_generation.h"
         #include "elem.h"
-        #include "mesh_tetgen_interface.h"
-        #include "node.h"
         #include "face_tri3.h"
+        #include "mesh.h"
+        #include "mesh_generation.h"
+        #include "mesh_tetgen_interface.h"
         #include "mesh_triangle_holes.h"
+        #include "mesh_triangle_interface.h"
+        #include "node.h"
+        #include "serial_mesh.h"
         
 </pre>
 </div>
@@ -326,7 +327,7 @@ The algorithm is broken up into several steps:
 
 <div class ="fragment">
 <pre>
-          Mesh mesh(3);
+          SerialMesh mesh(3);
         
 </pre>
 </div>
@@ -455,7 +456,7 @@ Finally, write out the result
         void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper_limit)
         {
         #ifdef LIBMESH_HAVE_TETGEN
-          Mesh cube_mesh(3);
+          SerialMesh cube_mesh(3);
         
           unsigned n_elem = 1;
         
@@ -661,14 +662,15 @@ Node pointer assigned from input mesh
 <br><br><br> <h1> The program without comments: </h1> 
 <pre> 
   
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_triangle_interface.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_tetgen_interface.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;node.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;face_tri3.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_tetgen_interface.h&quot;</FONT></B>
   #include <B><FONT COLOR="#BC8F8F">&quot;mesh_triangle_holes.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_triangle_interface.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;node.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;serial_mesh.h&quot;</FONT></B>
   
   using namespace libMesh;
   
@@ -769,7 +771,7 @@ Node pointer assigned from input mesh
   {
   #ifdef LIBMESH_HAVE_TETGEN
     
-    Mesh mesh(3);
+    SerialMesh mesh(3);
   
     Point hole_lower_limit(0.2, 0.2, 0.4);
     Point hole_upper_limit(0.8, 0.8, 0.6);
@@ -814,7 +816,7 @@ Node pointer assigned from input mesh
   <B><FONT COLOR="#228B22">void</FONT></B> add_cube_convex_hull_to_mesh(MeshBase&amp; mesh, Point lower_limit, Point upper_limit)
   {
   #ifdef LIBMESH_HAVE_TETGEN
-    Mesh cube_mesh(3);
+    SerialMesh cube_mesh(3);
   
     <B><FONT COLOR="#228B22">unsigned</FONT></B> n_elem = 1;
   
@@ -896,27 +898,117 @@ Node pointer assigned from input mesh
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Compiling C++ (in optimized mode) miscellaneous_ex6.C...
 Linking miscellaneous_ex6-opt...
 ***************************************************************
-* Running Example  ./miscellaneous_ex6-opt
+* Running Example  mpirun -np 6 ./miscellaneous_ex6-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
  
 Triangulating an L-shaped domain with holes
 Tetrahedralizing a prismatic domain with a hole
+************************************************************************************************************************
+***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
+************************************************************************************************************************
+
+---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
+
+./miscellaneous_ex6-opt on a intel-11. named daedalus with 6 processors, by roystgnr Fri Aug 24 15:21:58 2012
+Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
+
+                         Max       Max/Min        Avg      Total 
+Time (sec):           7.606e-02      1.00758   7.573e-02
+Objects:              0.000e+00      0.00000   0.000e+00
+Flops:                0.000e+00      0.00000   0.000e+00  0.000e+00
+Flops/sec:            0.000e+00      0.00000   0.000e+00  0.000e+00
+MPI Messages:         0.000e+00      0.00000   0.000e+00  0.000e+00
+MPI Message Lengths:  0.000e+00      0.00000   0.000e+00  0.000e+00
+MPI Reductions:       0.000e+00      0.00000
+
+Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
+                            e.g., VecAXPY() for real vectors of length N --> 2N flops
+                            and VecAXPY() for complex vectors of length N --> 8N flops
+
+Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
+                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
+ 0:      Main Stage: 7.5660e-02  99.9%  0.0000e+00   0.0%  0.000e+00   0.0%  0.000e+00        0.0%  0.000e+00   0.0% 
+
+------------------------------------------------------------------------------------------------------------------------
+See the 'Profiling' chapter of the users' manual for details on interpreting output.
+Phase summary info:
+   Count: number of times phase was executed
+   Time and Flops: Max - maximum over all processors
+                   Ratio - ratio of maximum to minimum over all processors
+   Mess: number of messages sent
+   Avg. len: average message length
+   Reduct: number of global reductions
+   Global: entire computation
+   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
+      %T - percent time in this phase         %F - percent flops in this phase
+      %M - percent messages in this phase     %L - percent message lengths in this phase
+      %R - percent reductions in this phase
+   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
+------------------------------------------------------------------------------------------------------------------------
+Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+------------------------------------------------------------------------------------------------------------------------
+
+--- Event Stage 0: Main Stage
+
+------------------------------------------------------------------------------------------------------------------------
+
+Memory usage is given in bytes:
+
+Object Type          Creations   Destructions     Memory  Descendants' Mem.
+Reports information only for process 0.
+
+--- Event Stage 0: Main Stage
+
+========================================================================================================================
+Average time to get PetscTime(): 0
+Average time for MPI_Barrier(): 4.16279e-05
+Average time for zero size MPI_Send(): 3.34978e-05
+#PETSc Option Table entries:
+-ksp_right_pc
+-log_summary
+-pc_type bjacobi
+-sub_pc_factor_levels 4
+-sub_pc_factor_zeropivot 0
+-sub_pc_type ilu
+#End of PETSc Option Table entries
+Compiled without FORTRAN kernels
+Compiled with full precision matrices (default)
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8
+Configure run at: Sat May 19 03:47:23 2012
+Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared=1 --with-shared-libraries=1 --with-mpi-dir=/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid --with-mumps=true --download-mumps=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_intel_lp64.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_sequential.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_core.so]" --with-lapack-lib=/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_solver_lp64_sequential.a
+-----------------------------------------
+Libraries compiled on Sat May 19 03:47:23 CDT 2012 on daedalus 
+Machine characteristics: Linux daedalus 2.6.32-34-generic #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011 x86_64 GNU/Linux 
+Using PETSc directory: /org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5
+Using PETSc arch: intel-11.1-lucid-mpich2-1.4.1-cxx-opt
+-----------------------------------------
+Using C compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3   -fPIC   
+Using Fortran compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3    
+-----------------------------------------
+Using include paths: -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/include  
+------------------------------------------
+Using C linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3 
+Using Fortran linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3  
+Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lpetsc       -lX11 -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lblacs -lsuperlu_dist_2.4 -lparmetis -lmetis -lsuperlu_4.0 -Wl,-rpath,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -L/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -lmkl_solver_lp64_sequential -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -ldl -Wl,-rpath,/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -L/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -lmpich -lopa -lmpl -lrt -lpthread -Wl,-rpath,/opt/intel/Compiler/11.1/073/lib/intel64 -L/opt/intel/Compiler/11.1/073/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -lstdc++ -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -ldl  
+------------------------------------------
 
 -------------------------------------------------------------------
-| Time:           Sat Apr  7 16:00:41 2012                         |
+| Processor id:   0                                                |
+| Num Processors: 6                                                |
+| Time:           Fri Aug 24 15:21:58 2012                         |
 | OS:             Linux                                            |
-| HostName:       lkirk-home                                       |
-| OS Release:     3.0.0-17-generic                                 |
-| OS Version:     #30-Ubuntu SMP Thu Mar 8 20:45:39 UTC 2012       |
+| HostName:       daedalus                                         |
+| OS Release:     2.6.32-34-generic                                |
+| OS Version:     #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011      |
 | Machine:        x86_64                                           |
-| Username:       benkirk                                          |
-| Configuration:  ./configure run on Sat Apr  7 15:49:27 CDT 2012  |
+| Username:       roystgnr                                         |
+| Configuration:  ./configure run on Wed Aug 22 12:44:06 CDT 2012  |
 -------------------------------------------------------------------
  -----------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.162801, Active time=0.009924                                            |
+| libMesh Performance: Alive time=0.100584, Active time=0.059173                                            |
  -----------------------------------------------------------------------------------------------------------
 | Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -924,22 +1016,47 @@ Tetrahedralizing a prismatic domain with a hole
 |                                                                                                           |
 |                                                                                                           |
 | Mesh                                                                                                      |
-|   find_neighbors()            5         0.0063      0.001254    0.0063      0.001254    63.16    63.16    |
-|   renumber_nodes_and_elem()   4         0.0000      0.000001    0.0000      0.000001    0.04     0.04     |
-|   write()                     2         0.0035      0.001736    0.0035      0.001736    34.99    34.99    |
+|   find_neighbors()            5         0.0026      0.000519    0.0131      0.002610    4.38     22.06    |
+|   renumber_nodes_and_elem()   4         0.0000      0.000002    0.0000      0.000002    0.01     0.01     |
+|   write()                     2         0.0144      0.007193    0.0144      0.007199    24.31    24.33    |
+|                                                                                                           |
+| MeshCommunication                                                                                         |
+|   compute_hilbert_indices()   2         0.0065      0.003233    0.0065      0.003233    10.93    10.93    |
+|   find_global_indices()       2         0.0006      0.000295    0.0159      0.007949    1.00     26.87    |
+|   parallel_sort()             2         0.0011      0.000575    0.0079      0.003962    1.94     13.39    |
 |                                                                                                           |
 | MeshTools::Generation                                                                                     |
-|   build_cube()                2         0.0001      0.000051    0.0001      0.000051    1.02     1.02     |
+|   build_cube()                2         0.0001      0.000027    0.0001      0.000027    0.09     0.09     |
+|                                                                                                           |
+| MetisPartitioner                                                                                          |
+|   partition()                 1         0.0034      0.003426    0.0112      0.011208    5.79     18.94    |
+|                                                                                                           |
+| Parallel                                                                                                  |
+|   allgather()                 6         0.0005      0.000090    0.0007      0.000125    0.91     1.26     |
+|   broadcast()                 2         0.0000      0.000006    0.0000      0.000006    0.02     0.02     |
+|   max(scalar)                 5         0.0105      0.002092    0.0105      0.002092    17.68    17.68    |
+|   max(vector)                 2         0.0001      0.000033    0.0001      0.000033    0.11     0.11     |
+|   min(vector)                 2         0.0071      0.003528    0.0071      0.003528    11.92    11.92    |
+|   probe()                     50        0.0050      0.000101    0.0050      0.000101    8.52     8.52     |
+|   receive()                   50        0.0001      0.000002    0.0051      0.000102    0.13     8.66     |
+|   send()                      50        0.0001      0.000001    0.0001      0.000001    0.09     0.09     |
+|   send_receive()              54        0.0001      0.000002    0.0053      0.000099    0.16     9.01     |
+|   sum()                       6         0.0068      0.001129    0.0068      0.001129    11.45    11.45    |
+|                                                                                                           |
+| Parallel::Request                                                                                         |
+|   wait()                      50        0.0001      0.000001    0.0001      0.000001    0.09     0.09     |
 |                                                                                                           |
 | Partitioner                                                                                               |
-|   single_partition()          3         0.0001      0.000026    0.0001      0.000026    0.80     0.80     |
+|   set_node_processor_ids()    1         0.0002      0.000163    0.0039      0.003893    0.28     6.58     |
+|   set_parent_processor_ids()  1         0.0001      0.000106    0.0001      0.000106    0.18     0.18     |
+|   single_partition()          2         0.0000      0.000005    0.0000      0.000005    0.02     0.02     |
  -----------------------------------------------------------------------------------------------------------
-| Totals:                       16        0.0099                                          100.00            |
+| Totals:                       301       0.0592                                          100.00            |
  -----------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
-* Done Running Example  ./miscellaneous_ex6-opt
+* Done Running Example  mpirun -np 6 ./miscellaneous_ex6-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
 </pre>
 </div>
