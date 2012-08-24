@@ -123,9 +123,9 @@ library features they demonstrate.
 
 <li> Adjoints <ol>
 
-<li><L1><a href="adaptivity_ex1.php">Adjoint-based Goal Oriented Refinement</a></L1></li>
+<li><L1><a href="adjoints_ex1.php">Adjoint-based Goal Oriented Refinement</a></L1></li>
 
-<li><L1><a href="adaptivity_ex2.php">Adjoint-based Parameter Sensitivities</a></L1></li>
+<li><L1><a href="adjoints_ex2.php">Adjoint-based Parameter Sensitivities</a></L1></li>
 
 </ol> </li>
 
