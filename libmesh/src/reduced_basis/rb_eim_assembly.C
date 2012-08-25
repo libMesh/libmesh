@@ -88,4 +88,9 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
 
 }
 
+RBEIMConstruction& RBEIMAssembly::get_rb_eim_construction()
+{
+  return _rb_eim_con;
+}
+
 }
