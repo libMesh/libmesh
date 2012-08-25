@@ -62,6 +62,11 @@ public:
                                const std::vector<Point>& qpoints,
                                std::vector<Number>& values);
 
+  /**
+   * Get a reference to the RBEIMConstruction object.
+   */
+  RBEIMConstruction& get_rb_eim_construction();
+
 private:
 
   /**
