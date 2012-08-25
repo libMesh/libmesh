@@ -143,7 +143,7 @@ public:
    * for performing the Offline stage of the Reduced Basis method where
    * we want to use assembly functions based on this EIM approximation.
    */
-  void initialize_eim_assembly_objects();
+  virtual void initialize_eim_assembly_objects();
   
   /**
    * @return the vector of assembly objects that point to this RBEIMConstruction.
