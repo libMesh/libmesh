@@ -22,11 +22,12 @@
  // solution is u(r,\theta) = r^{2/3} * \sin ( (2/3) * \theta). The kelly and 
  // adjoint residual error estimators are used to develop error indicators and 
  // guide mesh adaptation. Since we use the adjoint capabilities of libMesh in 
- // this example, we use the DiffSystem framework. This file (main.C) contains 
- // the declaration of mesh and equation system objects, L-shaped.C contains the 
- // assembly of the system, element_qoi_derivative.C and side_qoi_derivative.C
- // contain the RHS for the adjoint systems. Postprocessing to compute the 
- // the QoIs is done in element_postprocess.C and side_postprocess.C
+ // this example, we use the DiffSystem framework. This file (adjoints_ex1.C)
+ // contains the declaration of mesh and equation system objects, L-shaped.C
+ // contains the assembly of the system, element_qoi_derivative.C and 
+ // side_qoi_derivative.C contain the RHS for the adjoint systems. 
+ // Postprocessing to compute the QoIs is done in element_postprocess.C and 
+ // side_postprocess.C.
 
  // The initial mesh contains three QUAD9 elements which represent the
  // standard quadrants I, II, and III of the domain [-1,1]x[-1,1],
@@ -35,7 +36,7 @@
  // Element 1: [ 0,1]x[ 0,1]
  // Element 2: [-1,0]x[-1,0]
  // The mesh is provided in the standard libMesh ASCII format file
- // named "lshaped.xda".  In addition, an input file named "ex26.in"
+ // named "lshaped.xda".  In addition, an input file named "general.in"
  // is provided which allows the user to set several parameters for
  // the solution so that the problem can be re-run without a
  // re-compile.  The solution technique employed is to have a
