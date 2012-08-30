@@ -22,6 +22,7 @@
 
 // Local Includes -----------------------------------
 #include "unstructured_mesh.h"
+#include "boundary_info.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>
@@ -136,6 +137,21 @@ class SerialMesh : public UnstructuredMesh
      * \p mesh.node(n)->id() == n.
      */
   virtual void fix_broken_node_and_element_numbering ();
+
+  /**
+   * Stitch \p other_mesh to this mesh so that this mesh is the union of the two meshes.
+   * \p this_mesh_boundary and \p other_mesh_boundary are used to specify a dim-1 dimensional
+   * surface on which we seek to merge any "overlapping" nodes, where we use the parameter
+   * \p tol to determine whether or not nodes are overlapping.
+   * If \p clear_stitched_boundary_ids==true, this function clears boundary_info IDs in this
+   * mesh associated \p this_mesh_boundary and \p other_mesh_boundary.
+   */
+  void stitch_meshes (SerialMesh& other_mesh,
+                      boundary_id_type this_mesh_boundary,
+                      boundary_id_type other_mesh_boundary,
+                      Real tol=TOLERANCE,
+                      bool clear_stitched_boundary_ids=false,
+                      bool verbose=true);
 
 public:
   /**
