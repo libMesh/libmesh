@@ -642,6 +642,265 @@ void SerialMesh::fix_broken_node_and_element_numbering ()
 }
 
 
+void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
+                                boundary_id_type this_mesh_boundary_id,
+                                boundary_id_type other_mesh_boundary_id,
+                                Real tol,
+                                bool clear_stitched_boundary_ids,
+                                bool verbose)
+{
+  std::map<unsigned int, unsigned int> node_to_node_map;
+  std::map<unsigned int, std::vector<unsigned int> > node_to_elems_map;
+  
+  if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
+      (other_mesh_boundary_id != BoundaryInfo::invalid_id) )
+  {
+    std::set<unsigned int> this_boundary_node_ids;
+    MeshBase::element_iterator elem_it  = this->elements_begin();
+    MeshBase::element_iterator elem_end = this->elements_end();
+    for ( ; elem_it != elem_end; ++elem_it)
+    {
+      Elem *elem = *elem_it;
+      
+      // Now check whether elem has a face on the specified boundary
+      for (unsigned int side_id=0; side_id<elem->n_sides(); side_id++)
+        if (elem->neighbor(side_id) == NULL)
+        {
+          boundary_id_type bc_id = this->boundary_info->boundary_id (elem, side_id);
+          
+          if(bc_id == this_mesh_boundary_id)
+          {
+            AutoPtr<Elem> side (elem->build_side(side_id));
+            for (unsigned int node_id=0; node_id<side->n_nodes(); node_id++)
+            {
+              this_boundary_node_ids.insert( side->node(node_id) );
+            }
+          }
+        }
+    }
+
+    std::set<unsigned int> other_boundary_node_ids;
+    elem_it  = other_mesh.elements_begin();
+    elem_end = other_mesh.elements_end();
+    for ( ; elem_it != elem_end; ++elem_it)
+    {
+      Elem *elem = *elem_it;
+      
+      // Now check whether elem has a face on the specified boundary
+      for (unsigned int side_id=0; side_id<elem->n_sides(); side_id++)
+        if (elem->neighbor(side_id) == NULL)
+        {
+          boundary_id_type bc_id = other_mesh.boundary_info->boundary_id (elem, side_id);
+          
+          if(bc_id == other_mesh_boundary_id)
+          {
+            AutoPtr<Elem> side (elem->build_side(side_id));
+            for (unsigned int node_id=0; node_id<side->n_nodes(); node_id++)
+            {
+              other_boundary_node_ids.insert( side->node(node_id) );
+            }
+          }
+        }
+    }
+    
+    std::set<unsigned int>::iterator set_it     = this_boundary_node_ids.begin();
+    std::set<unsigned int>::iterator set_it_end = this_boundary_node_ids.end();
+    for( ; set_it != set_it_end; ++set_it)
+    {
+      unsigned int this_node_id = *set_it;
+      Node& this_node = this->node(this_node_id);
+      
+      std::set<unsigned int>::iterator other_set_it     = other_boundary_node_ids.begin();
+      std::set<unsigned int>::iterator other_set_it_end = other_boundary_node_ids.end();
+      for( ; other_set_it != other_set_it_end; ++other_set_it)
+      {
+        unsigned int other_node_id = *other_set_it;
+        Node& other_node = other_mesh.node(other_node_id);
+        
+        Real node_distance = (this_node - other_node).size();
+        
+        if(node_distance < tol)
+        {
+          node_to_node_map[this_node_id] = other_node_id;
+          
+          // Build a vector of all the elements in other_mesh that contain other_node
+          std::vector<unsigned int> other_elem_ids;
+          MeshBase::element_iterator elem_it  = other_mesh.elements_begin();
+          MeshBase::element_iterator elem_end = other_mesh.elements_end();
+          for (; elem_it != elem_end; ++elem_it)
+          {
+            Elem *elem = *elem_it;
+            
+            if(elem->contains_point(other_node))
+            {
+              other_elem_ids.push_back(elem->id());
+            }
+          }
+          
+          node_to_elems_map[this_node_id] = other_elem_ids;
+          break;
+        }
+      }
+    }
+    
+    if(verbose)
+    {
+      libMesh::out << "In SerialMesh::stitch_meshes:" << std::endl
+                   << "This mesh has " << this_boundary_node_ids.size() << " nodes on specified boundary" << std::endl 
+                   << "Other mesh has " << other_boundary_node_ids.size() << " nodes on specified boundary" << std::endl
+                   << "Found " << node_to_node_map.size() << " matching nodes." << std::endl << std::endl;
+    }
+  }
+  else
+  {
+    if(verbose)
+    {
+      libMesh::out << "Skip node merging in SerialMesh::stitch_meshes:" << std::endl;
+    }
+  }
+  
+
+  
+  unsigned int node_delta = this->n_nodes();
+  unsigned int elem_delta = this->n_elem();
+  
+  // need to increment node and element IDs of other_mesh before copying to this mesh
+  MeshBase::node_iterator node_it  = other_mesh.nodes_begin();
+  MeshBase::node_iterator node_end = other_mesh.nodes_end();
+  for (; node_it != node_end; ++node_it)
+  {
+    Node *node = *node_it;
+    unsigned int new_id = node->id() + node_delta;
+    node->set_id(new_id);
+  }
+  
+  MeshBase::element_iterator elem_it  = other_mesh.elements_begin();
+  MeshBase::element_iterator elem_end = other_mesh.elements_end();
+  for (; elem_it != elem_end; ++elem_it)
+  {
+    Elem *elem = *elem_it;
+    unsigned int new_id = elem->id() + elem_delta;
+    elem->set_id(new_id);
+  }
+  
+  // Also, increment the node_to_node_map and node_to_elems_map
+  std::map<unsigned int, unsigned int>::iterator node_map_it     = node_to_node_map.begin();
+  std::map<unsigned int, unsigned int>::iterator node_map_it_end = node_to_node_map.end();
+  for( ; node_map_it != node_map_it_end; ++node_map_it)
+  {
+    node_map_it->second += node_delta;
+  }
+  std::map<unsigned int, std::vector<unsigned int> >::iterator elem_map_it     = node_to_elems_map.begin();
+  std::map<unsigned int, std::vector<unsigned int> >::iterator elem_map_it_end = node_to_elems_map.end();
+  for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+  {
+    unsigned int n_elems = elem_map_it->second.size();
+    for(unsigned int i=0; i<n_elems; i++)
+    {
+      (elem_map_it->second)[i] += elem_delta;
+    }
+  }
+  
+  // Copy mesh data
+  this->copy_nodes_and_elements(other_mesh);
+  
+  // then decrement node and element IDs of mesh_i to return to original state
+  node_it  = other_mesh.nodes_begin();
+  node_end = other_mesh.nodes_end();
+  for (; node_it != node_end; ++node_it)
+  {
+    Node *node = *node_it;
+    unsigned int new_id = node->id() - node_delta;
+    node->set_id(new_id);
+  }
+  
+  elem_it  = other_mesh.elements_begin();
+  elem_end = other_mesh.elements_end();
+  for (; elem_it != elem_end; ++elem_it)
+  {
+    Elem *elem = *elem_it;
+    
+    // First copy boundary info to the stitched mesh
+    for (unsigned int side_id=0; side_id<elem->n_sides(); side_id++)
+      if (elem->neighbor(side_id) == NULL)
+      {
+        boundary_id_type bc_id = other_mesh.boundary_info->boundary_id (elem, side_id);
+        
+        if(bc_id != BoundaryInfo::invalid_id)
+        {
+          this->boundary_info->add_side(elem->id(), side_id, bc_id);
+        }
+      }
+    
+    // Then decrement
+    unsigned int new_id = elem->id() - elem_delta;
+    elem->set_id(new_id);
+  }
+  
+  // Finally, we need to "merge" the overlapping nodes
+  // We do this by iterating over node_to_elems_map and updating
+  // the elements so that they "point" to the nodes that came
+  // from this mesh, rather than from other_mesh.
+  // Then we iterate over node_to_node_map and delete the
+  // duplicate nodes that came from other_mesh.
+  elem_map_it     = node_to_elems_map.begin();
+  elem_map_it_end = node_to_elems_map.end();
+  for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
+  {
+    unsigned int target_node_id = elem_map_it->first;
+    unsigned int other_node_id = node_to_node_map[target_node_id];
+    Node& target_node = this->node(target_node_id);
+    
+    unsigned int n_elems = elem_map_it->second.size();
+    for(unsigned int i=0; i<n_elems; i++)
+    {
+      unsigned int elem_id = elem_map_it->second[i];
+      Elem* elem = this->elem(elem_id);
+      
+      // find the local node index that we want to update
+      unsigned int local_node_index = elem->local_node(other_node_id);
+      
+      elem->set_node(local_node_index) = &target_node;
+    }
+  }
+  
+  node_map_it     = node_to_node_map.begin();
+  node_map_it_end = node_to_node_map.end();
+  for( ; node_map_it != node_map_it_end; ++node_map_it)
+  {
+    unsigned int node_id = node_map_it->second;
+    this->delete_node( this->node_ptr(node_id) );
+  }
+  
+  this->prepare_for_use( /*skip_renumber_nodes_and_elements= */ false);
+
+  // After the stitching, we may want to clear boundary IDs from element
+  // faces that are now internal to the mesh
+  if(clear_stitched_boundary_ids)
+  {
+    elem_it  = this->elements_begin();
+    elem_end = this->elements_end();
+    for (; elem_it != elem_end; ++elem_it)
+    {
+      Elem *elem = *elem_it;
+      
+      // First copy boundary info to the stitched mesh
+      for (unsigned int side_id=0; side_id<elem->n_sides(); side_id++)
+        if (elem->neighbor(side_id) != NULL)
+        {
+          boundary_id_type bc_id = this->boundary_info->boundary_id (elem, side_id);
+          
+          if( (bc_id == this_mesh_boundary_id)  ||
+              (bc_id == other_mesh_boundary_id) )
+          {
+            this->boundary_info->remove_side(elem, side_id);
+          }
+        }
+    }
+  }
+
+}
+
 
 unsigned int SerialMesh::n_active_elem () const
 {
