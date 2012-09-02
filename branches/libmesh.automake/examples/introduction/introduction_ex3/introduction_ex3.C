@@ -137,12 +137,12 @@ int main (int argc, char** argv)
   // controlled from the command line.  For example,
   // you can invoke conjugate gradient with:
   //
-  // ./ex3 -ksp_type cg
+  // ./introduction_ex3 -ksp_type cg
   //
   // You can also get a nice X-window that monitors the solver
   // convergence with:
   //
-  // ./ex3 -ksp_xmonitor
+  // ./introduction-ex3 -ksp_xmonitor
   //
   // if you linked against the appropriate X libraries when you
   // built PETSc.
@@ -198,7 +198,7 @@ void assemble_poisson(EquationSystems& es,
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
   // store the object as an AutoPtr<FEBase>.  This can be thought
-  // of as a pointer that will clean up after itself.  Example 4
+  // of as a pointer that will clean up after itself.  Introduction Example 4
   // describes some advantages of  AutoPtr's in the context of
   // quadrature rules.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));

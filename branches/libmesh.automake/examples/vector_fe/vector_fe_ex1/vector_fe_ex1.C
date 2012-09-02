@@ -133,12 +133,12 @@ int main (int argc, char** argv)
   // controlled from the command line.  For example,
   // you can invoke conjugate gradient with:
   //
-  // ./ex3 -ksp_type cg
+  // ./vector_fe_ex1 -ksp_type cg
   //
   // You can also get a nice X-window that monitors the solver
   // convergence with:
   //
-  // ./ex3 -ksp_xmonitor
+  // ./vector_fe_ex1 -ksp_xmonitor
   //
   // if you linked against the appropriate X libraries when you
   // built PETSc.

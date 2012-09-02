@@ -123,20 +123,20 @@ ifeq ($(enable-optional),yes)
     # versions of PETSc and SLEPc can be used. Hence,
     # petsc-major-minor is also used to identify the SLEPc version 
     ifeq ($(petsc-major-minor),2.3.x)  # 2.3.x style
-      include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/slepcconf
+      -include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/slepcconf
     else
-	  ifeq ($(petsc-major),3)  # 3.0.x & newer style
-	    ifeq ($(petsc-major-minor),3.0.x)
-	      include ${SLEPC_DIR}/conf/slepc_common_variables
-	    else ifeq ($(petsc-major-minor),3.1.x)
-	      include ${SLEPC_DIR}/conf/slepc_common_variables
-	    else   # 3.2.x & newer style
-	      include ${SLEPC_DIR}/conf/slepc_variables
-	    endif
-	  else
-	    include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
-	  endif
-    endif	
+          ifeq ($(petsc-major),3)  # 3.0.x & newer style
+            ifeq ($(petsc-major-minor),3.0.x)
+              -include ${SLEPC_DIR}/conf/slepc_common_variables
+            else ifeq ($(petsc-major-minor),3.1.x)
+              -include ${SLEPC_DIR}/conf/slepc_common_variables
+            else   # 3.2.x & newer style
+              -include ${SLEPC_DIR}/conf/slepc_variables
+            endif
+          else
+            -include $(SLEPC_DIR)/bmake/$(PETSC_ARCH)/packages
+          endif
+    endif       
 
     libmesh_INCLUDE += -I$(SLEPC_DIR)/include -I$(SLEPC_DIR)/$(PETSC_ARCH)/include
 

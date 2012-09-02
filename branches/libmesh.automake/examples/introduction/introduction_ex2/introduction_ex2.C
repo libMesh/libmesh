@@ -30,11 +30,11 @@
  // command line arguments to PETSc.  For example, you might
  // try running this example as:
  //
- // ./ex2 -log_info
+ // ./introduction_ex2 -log_info
  //
  // to see what PETSc is doing behind the scenes or
  //
- // ./ex2 -log_summary
+ // ./introduction_ex2 -log_summary
  // 
  // to get a summary of what PETSc did.
  // Among other things, libMesh::init() initializes the MPI
