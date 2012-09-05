@@ -38,6 +38,7 @@
 #include "numeric_vector.h"
 #include "tensor_value.h"
 #include "threads.h"
+#include "tensor_tools.h"
 
 namespace libMesh
 {
@@ -842,23 +843,23 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 		    for (unsigned int i=0; i != 6; ++i)
 		      element_error = std::max(element_error, std::abs(temperr[i]));
 		  else if (error_estimator.error_norm.type(var) == L2)
-		    element_error += JxW[sp]*libmesh_norm(temperr[0]);
+		    element_error += JxW[sp]*TensorTools::norm_sq(temperr[0]);
 		  else if (error_estimator.error_norm.type(var) == H1_SEMINORM)
 		    for (unsigned int i=0; i != LIBMESH_DIM; ++i)
-		      element_error += JxW[sp]*libmesh_norm(temperr[i]);
+		      element_error += JxW[sp]*TensorTools::norm_sq(temperr[i]);
 		  else if (error_estimator.error_norm.type(var) == H1_X_SEMINORM)
-		    element_error += JxW[sp]*libmesh_norm(temperr[0]);
+		    element_error += JxW[sp]*TensorTools::norm_sq(temperr[0]);
 		  else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
-		    element_error += JxW[sp]*libmesh_norm(temperr[1]);
+		    element_error += JxW[sp]*TensorTools::norm_sq(temperr[1]);
 		  else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
-		    element_error += JxW[sp]*libmesh_norm(temperr[2]);
+		    element_error += JxW[sp]*TensorTools::norm_sq(temperr[2]);
 		  else if (error_estimator.error_norm.type(var) == H2_SEMINORM)
 		    {
 		      for (unsigned int i=0; i != LIBMESH_DIM; ++i)
-			element_error += JxW[sp]*libmesh_norm(temperr[i]);
+			element_error += JxW[sp]*TensorTools::norm_sq(temperr[i]);
 		      // Off diagonal terms enter into the Hessian norm twice
 		      for (unsigned int i=3; i != 6; ++i)
-			element_error += JxW[sp]*2*libmesh_norm(temperr[i]);
+			element_error += JxW[sp]*2*TensorTools::norm_sq(temperr[i]);
 		    }
 
 		} // End loop over sample points

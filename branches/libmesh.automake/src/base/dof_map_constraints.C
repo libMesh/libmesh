@@ -40,7 +40,7 @@
 #include "point_locator_base.h"
 #include "threads.h"
 #include "raw_accessor.h"
-
+#include "tensor_tools.h"
 
 // Anonymous namespace to hold helper classes
 namespace {
@@ -191,12 +191,12 @@ using namespace libMesh;
 			       const unsigned int var, const Variable&variable, 
 			       const FEType& fe_type ) const
     {
-      typedef OutputType                                         OutputShape;
-      typedef typename IncrementRank<OutputShape>::type          OutputGradient;
-      typedef typename IncrementRank<OutputGradient>::type       OutputTensor;
-      typedef typename MakeNumber<OutputShape>::type             OutputNumber;
-      typedef typename IncrementRank<OutputNumber>::type         OutputNumberGradient;
-      typedef typename IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
+      typedef OutputType                                                      OutputShape;
+      typedef typename TensorTools::IncrementRank<OutputShape>::type          OutputGradient;
+      typedef typename TensorTools::IncrementRank<OutputGradient>::type       OutputTensor;
+      typedef typename TensorTools::MakeNumber<OutputShape>::type             OutputNumber;
+      typedef typename TensorTools::IncrementRank<OutputNumber>::type         OutputNumberGradient;
+      typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
 
       // The dimensionality of the current mesh
       const unsigned int dim = mesh.mesh_dimension();

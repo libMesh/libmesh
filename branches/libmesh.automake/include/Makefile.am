@@ -227,12 +227,13 @@ nobase_include_HEADERS = \
 		numerics/sparse_shell_matrix.h \
 		numerics/sum_shell_matrix.h \
 		numerics/tensor_shell_matrix.h \
+		numerics/tensor_tools.h \
 		numerics/tensor_value.h \
 		numerics/trilinos_epetra_matrix.h \
 		numerics/trilinos_epetra_vector.h \
 		numerics/trilinos_preconditioner.h \
-		numerics/type_tensor.h \
                 numerics/type_n_tensor.h \
+		numerics/type_tensor.h \
 		numerics/type_vector.h \
 		numerics/vector_value.h \
 		numerics/wrapped_function.h \

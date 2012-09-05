@@ -28,16 +28,6 @@
 namespace libMesh
 {
 
-
-template <typename T>
-struct MakeNumber<VectorValue<T> >
-{
-  typedef VectorValue<typename MakeNumber<T>::type > type;
-};
-
-
-
-
 /**
  * This class defines a vector in LIBMESH_DIM dimensional Real or Complex
  * space.  The typedef RealVectorValue always defines a real-valued vector,
@@ -192,11 +182,6 @@ VectorValue<T>::VectorValue (const TypeVector<Real>& p_re,
 {
 }
 #endif
-
-template <typename T>
-inline
-Real libmesh_norm(const VectorValue<T>& a)
-{return a.size_sq();}
 
 
 } // namespace libMesh

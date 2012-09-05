@@ -1233,35 +1233,35 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                           new_side_dofs[sidej];
                         if (dof_is_fixed[j])
                           Fe(freei) -=
-                            libmesh_dot(phi_coarse[i][qp],
-                                        phi_coarse[j][qp]) * 
+                            TensorTools::inner_product(phi_coarse[i][qp],
+						       phi_coarse[j][qp]) * 
                             JxW[qp] * Ue(j);
                         else
                           Ke(freei,freej) +=
-                            libmesh_dot(phi_coarse[i][qp],
-                                        phi_coarse[j][qp]) * 
+                            TensorTools::inner_product(phi_coarse[i][qp],
+						       phi_coarse[j][qp]) * 
                             JxW[qp];
                         if (cont == C_ONE)
                           {
                             if (dof_is_fixed[j])
                               Fe(freei) -=
-                                libmesh_dot((*dphi_coarse)[i][qp],
-					    (*dphi_coarse)[j][qp]) *
+                                TensorTools::inner_product((*dphi_coarse)[i][qp],
+							   (*dphi_coarse)[j][qp]) *
                                 JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) +=
-                                libmesh_dot((*dphi_coarse)[i][qp],
-					    (*dphi_coarse)[j][qp]) *
+                                TensorTools::inner_product((*dphi_coarse)[i][qp],
+							   (*dphi_coarse)[j][qp]) *
                                 JxW[qp];
                           }
                         if (!dof_is_fixed[j])
                           freej++;
                       }
-                    Fe(freei) += libmesh_dot(phi_coarse[i][qp],
-                                             fineval) * JxW[qp];
+                    Fe(freei) += TensorTools::inner_product(phi_coarse[i][qp],
+							    fineval) * JxW[qp];
                     if (cont == C_ONE)
                       Fe(freei) +=
-                        libmesh_dot(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
+                        TensorTools::inner_product(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
                     freei++;
                   }
               }
@@ -1375,34 +1375,34 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                           new_side_dofs[sidej];
                         if (dof_is_fixed[j])
                           Fe(freei) -=
-                            libmesh_dot(phi_coarse[i][qp],
-					phi_coarse[j][qp]) * 
+                            TensorTools::inner_product(phi_coarse[i][qp],
+						       phi_coarse[j][qp]) * 
                             JxW[qp] * Ue(j);
                         else
                           Ke(freei,freej) +=
-                            libmesh_dot(phi_coarse[i][qp],
-                                        phi_coarse[j][qp]) *
+                            TensorTools::inner_product(phi_coarse[i][qp],
+						       phi_coarse[j][qp]) *
                             JxW[qp];
                         if (cont == C_ONE)
                           {
                             if (dof_is_fixed[j])
                               Fe(freei) -=
-                                libmesh_dot((*dphi_coarse)[i][qp],
-                                            (*dphi_coarse)[j][qp]) *
+                                TensorTools::inner_product((*dphi_coarse)[i][qp],
+							   (*dphi_coarse)[j][qp]) *
                                 JxW[qp] * Ue(j);
                             else
                               Ke(freei,freej) +=
-                                libmesh_dot((*dphi_coarse)[i][qp],
-                                            (*dphi_coarse)[j][qp]) *
+                                TensorTools::inner_product((*dphi_coarse)[i][qp],
+							   (*dphi_coarse)[j][qp]) *
                                 JxW[qp];
                           }
                         if (!dof_is_fixed[j])
                           freej++;
                       }
-                    Fe(freei) += libmesh_dot(fineval, phi_coarse[i][qp]) * JxW[qp];
+                    Fe(freei) += TensorTools::inner_product(fineval, phi_coarse[i][qp]) * JxW[qp];
                     if (cont == C_ONE)
                       Fe(freei) +=
-                        libmesh_dot(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
+                        TensorTools::inner_product(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
                     freei++;
                   }
               }
@@ -1492,34 +1492,34 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                 {
                   if (dof_is_fixed[j])
                     Fe(freei) -=
-                      libmesh_dot(phi_coarse[i][qp],
-                                  phi_coarse[j][qp]) *
+                      TensorTools::inner_product(phi_coarse[i][qp],
+						 phi_coarse[j][qp]) *
                       JxW[qp] * Ue(j);
                   else
                     Ke(freei,freej) +=
-                      libmesh_dot(phi_coarse[i][qp],
-                                  phi_coarse[j][qp]) *
+                      TensorTools::inner_product(phi_coarse[i][qp],
+						 phi_coarse[j][qp]) *
                       JxW[qp];
                   if (cont == C_ONE)
                     {
                       if (dof_is_fixed[j])
                         Fe(freei) -=
-                          libmesh_dot((*dphi_coarse)[i][qp],
-                                      (*dphi_coarse)[j][qp]) *
+                          TensorTools::inner_product((*dphi_coarse)[i][qp],
+						     (*dphi_coarse)[j][qp]) *
                           JxW[qp] * Ue(j);
                       else
                         Ke(freei,freej) +=
-                          libmesh_dot((*dphi_coarse)[i][qp],
-                                      (*dphi_coarse)[j][qp]) *
+                          TensorTools::inner_product((*dphi_coarse)[i][qp],
+						     (*dphi_coarse)[j][qp]) *
                           JxW[qp];
                     }
                   if (!dof_is_fixed[j])
                     freej++;
                 }
-	      Fe(freei) += libmesh_dot(phi_coarse[i][qp], fineval) *
+	      Fe(freei) += TensorTools::inner_product(phi_coarse[i][qp], fineval) *
                            JxW[qp];
               if (cont == C_ONE)
-                Fe(freei) += libmesh_dot(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
+                Fe(freei) += TensorTools::inner_product(finegrad, (*dphi_coarse)[i][qp]) * JxW[qp];
               freei++;
             }
         }
@@ -1697,13 +1697,13 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 	            const unsigned int j = my_side_dofs[js];
 		    for (unsigned int qp = 0; qp != n_qp; ++qp)
                       {
-		        Ke(is,js) += JxW[qp] * libmesh_dot(phi[i][qp], phi[j][qp]);
+		        Ke(is,js) += JxW[qp] * TensorTools::inner_product(phi[i][qp], phi[j][qp]);
                         if (cont != C_ZERO)
 		          Ke(is,js) += JxW[qp] *
-                                       libmesh_dot((*dphi)[i][qp] *
-					           (*face_normals)[qp],
-					           (*dphi)[j][qp] *
-					           (*face_normals)[qp]);
+                                       TensorTools::inner_product((*dphi)[i][qp] *
+								  (*face_normals)[qp],
+								  (*dphi)[j][qp] *
+								  (*face_normals)[qp]);
                       }
 		  }
 	      }
@@ -1720,14 +1720,14 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 	            for (unsigned int qp = 0; qp != n_qp; ++qp)
                       {
 		        Fe(js) += JxW[qp] * 
-                                  libmesh_dot(neigh_phi[i][qp],
-					      phi[j][qp]);
+                                  TensorTools::inner_product(neigh_phi[i][qp],
+							     phi[j][qp]);
                         if (cont != C_ZERO)
 		          Fe(js) += JxW[qp] * 
-                                    libmesh_dot((*neigh_dphi)[i][qp] *
-					        (*face_normals)[qp],
-					        (*dphi)[j][qp] *
-					        (*face_normals)[qp]);
+                                    TensorTools::inner_product((*neigh_dphi)[i][qp] *
+							       (*face_normals)[qp],
+							       (*dphi)[j][qp] *
+							       (*face_normals)[qp]);
                       }
 		  }
 	        Ke.cholesky_solve(Fe, Ue[is]);
@@ -2011,14 +2011,14 @@ compute_periodic_constraints (DofConstraints &constraints,
 		          for (unsigned int qp = 0; qp != n_qp; ++qp)
                             {
 		              Ke(is,js) += JxW[qp] *
-					   libmesh_dot(phi[i][qp],
-                                                       phi[j][qp]);
+					   TensorTools::inner_product(phi[i][qp],
+								      phi[j][qp]);
                               if (cont != C_ZERO)
 		                Ke(is,js) += JxW[qp] * 
-                                             libmesh_dot((*dphi)[i][qp] *
-					                 (*face_normals)[qp],
-					                 (*dphi)[j][qp] *
-					                 (*face_normals)[qp]);
+                                             TensorTools::inner_product((*dphi)[i][qp] *
+									(*face_normals)[qp],
+									(*dphi)[j][qp] *
+									(*face_normals)[qp]);
                             }
 		        }
 	            }
@@ -2035,14 +2035,14 @@ compute_periodic_constraints (DofConstraints &constraints,
 	                  for (unsigned int qp = 0; qp != n_qp; ++qp)
                             {
 		              Fe(js) += JxW[qp] * 
-                                        libmesh_dot(neigh_phi[i][qp],
-					            phi[j][qp]);
+                                        TensorTools::inner_product(neigh_phi[i][qp],
+								   phi[j][qp]);
                               if (cont != C_ZERO)
 		                Fe(js) += JxW[qp] *
-                                          libmesh_dot((*neigh_dphi)[i][qp] *
-					              (*face_normals)[qp],
-					              (*dphi)[j][qp] *
-					              (*face_normals)[qp]);
+                                          TensorTools::inner_product((*neigh_dphi)[i][qp] *
+								     (*face_normals)[qp],
+								     (*dphi)[j][qp] *
+								     (*face_normals)[qp]);
                             }
 		        }
 	              Ke.cholesky_solve(Fe, Ue[is]);
