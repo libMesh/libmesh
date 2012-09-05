@@ -35,6 +35,7 @@
 #include "system.h"
 
 #include "dense_vector.h"
+#include "tensor_tools.h"
 
 
 namespace libMesh
@@ -95,7 +96,7 @@ LaplacianErrorEstimator::internal_side_integration ()
       // Find the jump in the Laplacian
       // at this quadrature point
       const Number jump = laplacian_fine - laplacian_coarse;
-      const Real jump2 = libmesh_norm(jump);
+      const Real jump2 = TensorTools::norm_sq(jump);
 
       // Accumulate the jump integral
       error += JxW_face[qp] * jump2;

@@ -36,6 +36,7 @@
 #include "system.h"
 #include "uniform_refinement_estimator.h"
 #include "partitioner.h"
+#include "tensor_tools.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -569,7 +570,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                       system_i_norm.type(var) == H2)
                     {
 		      L2normsq += JxW[qp] * system_i_norm.weight_sq(var) *
-                                  libmesh_norm(val_error);
+                                  TensorTools::norm_sq(val_error);
                       libmesh_assert (L2normsq     >= 0.);
                     }
 

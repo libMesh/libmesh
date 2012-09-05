@@ -28,6 +28,7 @@
 #include "dense_vector.h"
 #include "dense_subvector.h"
 #include "parallel.h"
+#include "tensor_tools.h"
 
 namespace libMesh
 {
@@ -93,7 +94,7 @@ Real DistributedVector<T>::l2_norm () const
   double local_l2 = 0.;
 
   for (unsigned int i=0; i<local_size(); i++)
-    local_l2 += libmesh_norm(_values[i]);
+    local_l2 += TensorTools::norm_sq(_values[i]);
 
   Parallel::sum(local_l2);
 

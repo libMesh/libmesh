@@ -195,35 +195,6 @@ public:
 };
 
 
-template <unsigned int N, typename T>
-struct IncrementRank<TypeNTensor<N,T> >
-{
-  typedef TypeNTensor<N+1,T> type;
-};
-
-template <unsigned int N, typename T>
-struct DecrementRank<TypeNTensor<N,T> >
-{
-  typedef TypeNTensor<N-1,T> type;
-};
-
-template <unsigned int N, typename T>
-struct MakeNumber<TypeNTensor<N,T> >
-{
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-  typedef TypeNTensor<N,std::complex<T> > type;
-#else
-  typedef TypeNTensor<N,T> type;
-#endif
-};
-
-template <unsigned int N, typename T, typename T2>
-inline
-typename CompareTypes<T, T2>::supertype
-libmesh_dot(const TypeNTensor<N,T>& a, const TypeNTensor<N,T2>& b)
-{ return a.contract(b); }
-
-
 } // namespace libMesh
 
 #endif // #define __type_n_tensor_h__

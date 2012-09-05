@@ -45,6 +45,7 @@
 #include "quadrature.h"
 #include "tensor_value.h"
 #include "vector_value.h"
+#include "tensor_tools.h"
 
 namespace libMesh
 {
@@ -1405,7 +1406,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                   for (unsigned int i=0; i != n_sf; ++i)
                     u_h += (*phi)[i][qp] * (*local_v)(dof_indices[i]);
 	          v_norm += norm_weight_sq *
-                            JxW[qp] * libmesh_norm(u_h);
+                            JxW[qp] * TensorTools::norm_sq(u_h);
                 }
 
               if (norm_type == H1 ||

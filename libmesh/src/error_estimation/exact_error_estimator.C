@@ -35,6 +35,7 @@
 #include "numeric_vector.h"
 #include "quadrature.h"
 #include "system.h"
+#include "tensor_tools.h"
 
 namespace libMesh
 {
@@ -496,7 +497,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 	    val_error -= (*fine_values)(q_point[qp]);
 
           // Add the squares of the error to each contribution
-          error_val += JxW[qp]*libmesh_norm(val_error);
+          error_val += JxW[qp]*TensorTools::norm_sq(val_error);
         }
 
       // Compute the value of the error in the gradient at this
