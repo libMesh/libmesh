@@ -31,7 +31,7 @@
 #include "system.h"
 
 #include "dense_vector.h"
-
+#include "tensor_tools.h"
 
 
 namespace libMesh
@@ -78,7 +78,7 @@ DiscontinuityMeasure::internal_side_integration ()
       // Find the jump in the value
       // at this quadrature point
       const Number jump = u_fine - u_coarse;
-      const Real jump2 = libmesh_norm(jump);
+      const Real jump2 = TensorTools::norm_sq(jump);
       // Accumulate the jump integral
       error += JxW_face[qp] * jump2;
     }
@@ -138,8 +138,8 @@ DiscontinuityMeasure::boundary_side_integration ()
           const Number jump = essential_bc.second - u_fine;
 
           // The flux jump squared.  If using complex numbers,
-          // libmesh_norm(z) returns |z|^2, where |z| is the modulus of z.
-          const Real jump2 = libmesh_norm(jump);
+          // norm_sq(z) returns |z|^2, where |z| is the modulus of z.
+          const Real jump2 = TensorTools::norm_sq(jump);
 
           // Integrate the error on the face.  The error is
           // scaled by an additional power of h, where h is

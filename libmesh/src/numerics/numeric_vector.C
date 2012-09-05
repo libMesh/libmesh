@@ -28,6 +28,7 @@
 #include "petsc_vector.h"
 #include "trilinos_epetra_vector.h"
 #include "shell_matrix.h"
+#include "tensor_tools.h"
 
 namespace libMesh
 {
@@ -321,7 +322,7 @@ Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices) c
   Real norm = 0;
 
   for(; it!=it_end; ++it)
-    norm += libmesh_norm(v(*it));
+    norm += TensorTools::norm_sq(v(*it));
 
   Parallel::sum(norm);
 

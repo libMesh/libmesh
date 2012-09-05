@@ -29,16 +29,13 @@
 #include "fe_type.h"
 #include "auto_ptr.h"
 #include "fe_transformation_base.h"
+#include "tensor_tools.h"
+#include "type_n_tensor.h"
 
 // C++ includes
 #include <cstddef>
 #include <vector>
 
-#include "tensor_value.h"
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-#include "type_n_tensor.h"
-#endif
 
 namespace libMesh
 {
@@ -148,14 +145,14 @@ public:
    * Convenient typedefs for gradients of output, hessians of output,
    * and potentially-complex-valued versions of same.
    */
-  typedef OutputType                                         OutputShape;
-  typedef typename IncrementRank<OutputShape>::type          OutputGradient;
-  typedef typename IncrementRank<OutputGradient>::type       OutputTensor;
-  typedef typename DecrementRank<OutputShape>::type          OutputDivergence;
-  typedef typename MakeNumber<OutputShape>::type             OutputNumber;
-  typedef typename IncrementRank<OutputNumber>::type         OutputNumberGradient;
-  typedef typename IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
-  typedef typename DecrementRank<OutputNumber>::type         OutputNumberDivergence;
+  typedef OutputType                                                      OutputShape;
+  typedef typename TensorTools::IncrementRank<OutputShape>::type          OutputGradient;
+  typedef typename TensorTools::IncrementRank<OutputGradient>::type       OutputTensor;
+  typedef typename TensorTools::DecrementRank<OutputShape>::type          OutputDivergence;
+  typedef typename TensorTools::MakeNumber<OutputShape>::type             OutputNumber;
+  typedef typename TensorTools::IncrementRank<OutputNumber>::type         OutputNumberGradient;
+  typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
+  typedef typename TensorTools::DecrementRank<OutputNumber>::type         OutputNumberDivergence;
 
   
 

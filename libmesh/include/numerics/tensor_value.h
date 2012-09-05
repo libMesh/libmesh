@@ -28,15 +28,6 @@
 namespace libMesh
 {
 
-
-
-template <typename T>
-struct MakeNumber<TensorValue<T> >
-{
-  typedef TypeTensor<typename MakeNumber<T>::type> type;
-};
-
-
 /**
  * This class defines a tensor in LIBMESH_DIM dimensional Real or Complex
  * space.  The typedef RealTensorValue always defines a real-valued tensor,

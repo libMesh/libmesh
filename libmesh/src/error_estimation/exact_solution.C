@@ -30,12 +30,10 @@
 #include "numeric_vector.h"
 #include "parallel.h"
 #include "quadrature.h"
-#include "tensor_value.h"
-#include "vector_value.h"
 #include "wrapped_function.h"
 #include "fe_interface.h"
 #include "raw_accessor.h"
-#include "type_vector.h"
+#include "tensor_tools.h"
 
 namespace libMesh
 {
@@ -675,7 +673,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  const typename FEGenericBase<OutputShape>::OutputNumber val_error = u_h - exact_val;
 
 	  // Add the squares of the error to each contribution
-	  Real error_sq = libmesh_norm(val_error);
+	  Real error_sq = TensorTools::norm_sq(val_error);
 	  error_vals[0] += JxW[qp]*error_sq;
 
 	  Real norm = sqrt(error_sq);
