@@ -420,7 +420,7 @@ void HPCoarsenTest::select_refinement (System &system)
                 }
 
 	      p_error_per_cell[e_id] += component_scale[var] *
-		(*JxW)[qp] * libmesh_norm(value_error);
+		(*JxW)[qp] * TensorTools::norm_sq(value_error);
               if (cont == C_ZERO || cont == C_ONE)
 	        p_error_per_cell[e_id] += component_scale[var] *
 		  (*JxW)[qp] * grad_error.size_sq();
@@ -488,7 +488,7 @@ void HPCoarsenTest::select_refinement (System &system)
                     }
 
 	          h_error_per_cell[e_id] += component_scale[var] *
-		    (*JxW)[qp] * libmesh_norm(value_error);
+		    (*JxW)[qp] * TensorTools::norm_sq(value_error);
                   if (cont == C_ZERO || cont == C_ONE)
 	            h_error_per_cell[e_id] += component_scale[var] *
 		      (*JxW)[qp] * grad_error.size_sq();

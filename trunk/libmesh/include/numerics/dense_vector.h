@@ -24,6 +24,7 @@
 #include "libmesh_common.h"
 #include "compare_types.h"
 #include "dense_vector_base.h"
+#include "tensor_tools.h"
 
 // C++ includes
 #include <vector>
@@ -515,7 +516,7 @@ Real DenseVector<T>::l2_norm () const
   Real my_norm = 0.;
   for (unsigned int i=0; i!=this->size(); i++)
     {
-      my_norm += libmesh_norm((*this)(i));
+      my_norm += TensorTools::norm_sq((*this)(i));
     }
   return sqrt(my_norm);
 }
@@ -528,11 +529,11 @@ Real DenseVector<T>::linfty_norm () const
 {
   if (!this->size())
     return 0.;
-  Real my_norm = libmesh_norm((*this)(0));
+  Real my_norm = TensorTools::norm_sq((*this)(0));
 
   for (unsigned int i=1; i!=this->size(); i++)
     {
-      Real current = libmesh_norm((*this)(i));
+      Real current = TensorTools::norm_sq((*this)(i));
       my_norm = (my_norm > current? my_norm : current);
     }
   return sqrt(my_norm);

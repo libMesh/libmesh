@@ -411,38 +411,6 @@ private:
   const unsigned int _j;
 };
 
-
-template <typename T>
-struct IncrementRank<TypeTensor<T> >
-{
-  typedef TypeNTensor<3,T> type;
-};
-
-
-template <typename T>
-struct IncrementRank<TensorValue<T> >
-{
-  typedef TypeNTensor<3,T> type;
-};
-
-template <typename T>
-struct DecrementRank<TensorValue<T> >
-{
-  typedef VectorValue<T> type;
-};
-
-template <typename T>
-struct DecrementRank<TypeTensor<T> >
-{
-  typedef VectorValue<T> type;
-};
-
-template <typename T>
-struct MakeNumber<TypeTensor<T> >
-{
-  typedef TypeTensor<typename MakeNumber<T>::type> type;
-};
-
 //------------------------------------------------------
 // Inline functions
 template <typename T>
@@ -1118,7 +1086,7 @@ Real TypeTensor<T>::size_sq () const
 {
   Real sum = 0.;
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
-    sum += libmesh_norm(_coords[i]);
+    sum += TensorTools::norm_sq(_coords[i]);
   return sum;
 }
 
@@ -1155,14 +1123,6 @@ bool TypeTensor<T>::operator == (const TypeTensor<T>& rhs) const
 #endif
 
 }
-
-
-template <typename T, typename T2>
-inline
-typename CompareTypes<T, T2>::supertype
-libmesh_dot(const TypeTensor<T>& a, const TypeTensor<T2>& b)
-{ return a.contract(b); }
-
 
 } // namespace libMesh
 

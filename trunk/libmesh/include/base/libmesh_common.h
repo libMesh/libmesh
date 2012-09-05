@@ -160,14 +160,10 @@ typedef std::complex<Real> COMPLEX;
 // Helper functions for complex/real numbers
 // to clean up #ifdef LIBMESH_USE_COMPLEX_NUMBERS elsewhere
 template<typename T> inline T libmesh_real(T a) { return a; }
-template<typename T> inline T libmesh_norm(T a) { return a*a; }
 template<typename T> inline T libmesh_conj(T a) { return a; }
 
 template<typename T>
 inline T libmesh_real(std::complex<T> a) { return std::real(a); }
-
-template<typename T>
-inline T libmesh_norm(std::complex<T> a) { return std::norm(a); }
 
 template<typename T>
 inline std::complex<T> libmesh_conj(std::complex<T> a) { return std::conj(a); }

@@ -359,7 +359,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
                       system_i_norm.type(var) == H2)
                     {
 		      L2normsq += JxW[qp] * system_i_norm.weight_sq(var) *
-                                  libmesh_norm(val_error);
+                                  norm_sq(val_error);
                       libmesh_assert (L2normsq     >= 0.);
                     }
 
