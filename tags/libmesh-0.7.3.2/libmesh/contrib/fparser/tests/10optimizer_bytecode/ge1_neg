@@ -1,0 +1,11 @@
+T=d f ld
+V=x
+R=-1,1,0.25
+F=(sin(x) >= 1) + \
+  2*(1 <= sin(x)) + \
+  4*(sin(x) <= 1) + \
+  8*(1 >= sin(x))
+C=fp_greaterOrEq(fp_sin(x), 1) + \
+  2*fp_lessOrEq(1, fp_sin(x)) + \
+  4*fp_lessOrEq(fp_sin(x), 1) + \
+  8*fp_greaterOrEq(1, fp_sin(x))

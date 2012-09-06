@@ -1,0 +1,5 @@
+T=d f ld mf li gi
+V=x,y
+R=-100,100,1
+F=(!(x != y) & !x) + !(!(!(!y)))
+C=fp_and(fp_not<Value_t>(x != y), fp_not(x)) + fp_truth(y)

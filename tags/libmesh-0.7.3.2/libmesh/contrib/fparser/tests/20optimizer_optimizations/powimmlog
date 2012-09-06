@@ -1,0 +1,7 @@
+T=d ld f mf cd cf cld
+V=x
+R=0.25, 2, 0.25
+F=pow(3, log(x)) + pow(5, log(x)*sin(x))
+C=fp_pow(3, fp_log(x)) + fp_pow(5, fp_log(x)*fp_sin(x))
+
+# Expected result: pow(x, log(3)) + pow(x, log(3)*sin(x))

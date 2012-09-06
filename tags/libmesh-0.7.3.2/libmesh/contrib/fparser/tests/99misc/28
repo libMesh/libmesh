@@ -1,0 +1,6 @@
+T=d f ld mf
+V=x,y
+R=.1, .9, .025
+F=exp(x)+floor(x)+int(x)+log(x)+log10(x)+max(x,y)+min(x,y)+sec(x)+sin(x)+sinh(x)+sqrt(x)+tan(x)+tanh(x)+ceil(y)+trunc(y)
+C=fp_exp(x)+fp_floor(x)+fp_int(x)+fp_log(x)+fp_log10(x)+fp_max(x,y)+fp_min(x,y)+ \
+  1/fp_cos(x)+fp_sin(x)+fp_sinh(x)+fp_sqrt(x)+fp_tan(x)+fp_tanh(x)+fp_ceil(y)+fp_trunc(y)

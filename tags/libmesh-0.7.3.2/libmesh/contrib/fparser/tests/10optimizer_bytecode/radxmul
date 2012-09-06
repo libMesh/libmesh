@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-2,2,0.8
+F=cos((x*pi/180)*4)
+C=fp_cos(d2r(x+x+x+x))

@@ -1,0 +1,7 @@
+T=d ld f mf li gi cd cf cld
+V=x,y,z
+R=0,1,1
+F=!x & !y & z
+C=fp_and(fp_and(fp_not(x),fp_not(y)),z)
+
+# Expected result: z & !(x | y)   hence NOR
