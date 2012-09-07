@@ -331,6 +331,7 @@ libmesh_la_SOURCES = \
 		src/numerics/sparse_shell_matrix.C \
 		src/numerics/sum_shell_matrix.C \
 		src/numerics/tensor_shell_matrix.C \
+		src/numerics/tensor_tools.C \
 		src/numerics/trilinos_epetra_matrix.C \
 		src/numerics/trilinos_epetra_vector.C \
 		src/numerics/trilinos_preconditioner.C \
