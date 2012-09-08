@@ -20,6 +20,7 @@
 // Local includes
 #include "fe.h"
 #include "libmesh_logging.h"
+
 // For projection code:
 #include "boundary_info.h"
 #include "mesh_base.h"
@@ -33,6 +34,7 @@
 #include "quadrature.h"
 #include "quadrature_gauss.h"
 #include "remote_elem.h"
+#include "tensor_value.h"
 #include "threads.h"
 
 namespace libMesh
