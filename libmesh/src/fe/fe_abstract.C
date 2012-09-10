@@ -297,6 +297,12 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
 	      return ap;
           }
 
+	  case NEDELEC_ONE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FENedelecOne<2>(fet));
+	      return ap;
+	    }
+
 	  default:
 	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    libmesh_error();
@@ -383,6 +389,12 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
 	      AutoPtr<FEAbstract> ap(new FEScalar<3>(fet));
 	      return ap;
           }
+
+	  case NEDELEC_ONE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FENedelecOne<3>(fet));
+	      return ap;
+	    }
 
 	  default:
 	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;

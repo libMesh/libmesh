@@ -84,7 +84,7 @@ FEInterface::FEInterface()
 	  case LAGRANGE: \
 	    prefix FE<dim,LAGRANGE>::func_and_args suffix \
 	  case LAGRANGE_VEC: \
-	    prefix FE<dim,LAGRANGE_VEC>::func_and_args suffix \
+	    prefix FELagrangeVec<dim>::func_and_args suffix \
 	  case L2_LAGRANGE: \
 	    prefix FE<dim,L2_LAGRANGE>::func_and_args suffix \
 	  case MONOMIAL: \
@@ -97,6 +97,8 @@ FEInterface::FEInterface()
 	    prefix FE<dim,SZABAB>::func_and_args suffix \
 	  case XYZ: \
 	    prefix FEXYZ<dim>::func_and_args suffix \
+	  case NEDELEC_ONE: \
+            prefix FENedelecOne<dim>::func_and_args suffix \
 	  default: \
 	    libmesh_error(); \
 	  } \
@@ -129,6 +131,7 @@ FEInterface::FEInterface()
     case XYZ: \
       prefix FEXYZ<dim>::func_and_args suffix \
     case LAGRANGE_VEC: \
+    case NEDELEC_ONE: \
       libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args"\
 		   << std::endl;\
       libmesh_error();\
@@ -143,7 +146,9 @@ FEInterface::FEInterface()
 	switch (fe_t.family) \
     { \
     case LAGRANGE_VEC: \
-      prefix FE<dim,LAGRANGE_VEC>::func_and_args suffix \
+      prefix FELagrangeVec<dim>::func_and_args suffix \
+    case NEDELEC_ONE:					    \
+      prefix FENedelecOne<dim>::func_and_args suffix  \
     case HERMITE: \
     case HIERARCHIC: \
     case L2_HIERARCHIC: \
@@ -205,7 +210,7 @@ FEInterface::FEInterface()
 	  case LAGRANGE: \
 	    prefix FE<dim,LAGRANGE>::func_and_args suffix \
 	  case LAGRANGE_VEC: \
-	    prefix FE<dim,LAGRANGE_VEC>::func_and_args suffix \
+	    prefix FELagrangeVec<dim>::func_and_args suffix \
 	  case L2_LAGRANGE: \
 	    prefix FE<dim,L2_LAGRANGE>::func_and_args suffix \
 	  case MONOMIAL: \
@@ -214,6 +219,8 @@ FEInterface::FEInterface()
             prefix FE<dim,SCALAR>::func_and_args suffix \
 	  case XYZ: \
 	    prefix FEXYZ<dim>::func_and_args suffix \
+	  case NEDELEC_ONE: \
+            prefix FENedelecOne<dim>::func_and_args suffix \
 	  default: \
 	    libmesh_error(); \
 	  } \
@@ -238,10 +245,11 @@ FEInterface::FEInterface()
     case MONOMIAL: \
       prefix  FE<dim,MONOMIAL>::func_and_args suffix\
     case SCALAR: \
-      prefix  FE<dim,SCALAR>::func_and_args suffix\
+      prefix  FE<dim,SCALAR>::func_and_args suffix \
     case XYZ: \
-      prefix  FEXYZ<dim>::func_and_args suffix\
+      prefix  FEXYZ<dim>::func_and_args suffix \
     case LAGRANGE_VEC: \
+    case NEDELEC_ONE: \
       libMesh::err << "Error: Can only request scalar valued elements for Real FEInterface::func_and_args"\
 		   << std::endl;\
       libmesh_error();\
@@ -256,7 +264,9 @@ FEInterface::FEInterface()
 	switch (fe_t.family) \
     { \
     case LAGRANGE_VEC: \
-      prefix FE<dim,LAGRANGE_VEC>::func_and_args suffix\
+      prefix FELagrangeVec<dim>::func_and_args suffix \
+    case NEDELEC_ONE:				      \
+      prefix FENedelecOne<dim>::func_and_args suffix \
     case HERMITE: \
     case HIERARCHIC: \
     case L2_HIERARCHIC: \
@@ -1247,6 +1257,17 @@ unsigned int FEInterface::max_order(const FEType& fe_t,
 	      return unknown;
 	  }
 	break;
+    case NEDELEC_ONE:
+      switch (el_t)
+	{
+	case TRI6:
+	case QUAD8:
+	case QUAD9:
+	  return 1;
+	default:
+	  return 0;
+	}
+      break;
       default:
 	return 0;
 	break;
@@ -1259,22 +1280,23 @@ bool FEInterface::extra_hanging_dofs(const FEType& fe_t)
 {
   switch (fe_t.family)
     {
-      case LAGRANGE:
-      case L2_LAGRANGE:
-      case MONOMIAL:
-      case L2_HIERARCHIC:
+    case LAGRANGE:
+    case L2_LAGRANGE:
+    case MONOMIAL:
+    case L2_HIERARCHIC:
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-      case BERNSTEIN:
-      case SZABAB:
+    case BERNSTEIN:
+    case SZABAB:
 #endif
-      case XYZ:
-      case LAGRANGE_VEC:
-	return false;
-      case CLOUGH:
-      case HERMITE:
-      case HIERARCHIC:
-      default:
-	return true;
+    case XYZ:
+    case LAGRANGE_VEC:
+    case NEDELEC_ONE:
+      return false;
+    case CLOUGH:
+    case HERMITE:
+    case HIERARCHIC:
+    default:
+      return true;
     }
 }
 
@@ -1288,6 +1310,7 @@ FEFieldType FEInterface::field_type( const FEFamily& fe_family )
   switch (fe_family)
     {
     case LAGRANGE_VEC:
+    case NEDELEC_ONE:
       return TYPE_VECTOR;
     default:
       return TYPE_SCALAR;
@@ -1301,6 +1324,7 @@ unsigned int FEInterface::n_vec_dim( const MeshBase& mesh, const FEType& fe_type
       //FIXME: We currently assume that the number of vector components is tied
       //       to the mesh dimension. This will break for mixed-dimension meshes.
     case LAGRANGE_VEC:
+    case NEDELEC_ONE:
       return mesh.mesh_dimension();
     default:
       return 1;
