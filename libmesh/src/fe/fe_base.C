@@ -552,6 +552,11 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
 	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<2>(fet) );
 	      return ap;
 	    }
+	  case NEDELEC_ONE:
+	    {
+	      AutoPtr<FEVectorBase> ap( new FENedelecOne<2>(fet) );
+	      return ap;
+	    }
 	  default:
 	    {
 	      libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
@@ -566,6 +571,11 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
 	  case LAGRANGE_VEC:
 	    {
 	      AutoPtr<FEVectorBase> ap( new FELagrangeVec<3>(fet) );
+	      return ap;
+	    }
+	  case NEDELEC_ONE:
+	    {
+	      AutoPtr<FEVectorBase> ap( new FENedelecOne<3>(fet) );
 	      return ap;
 	    }
 	  default:

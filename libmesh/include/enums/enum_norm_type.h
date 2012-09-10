@@ -32,6 +32,8 @@ namespace libMeshEnums {
   enum FEMNormType {L2              = 0,
 		    H1              = 1,
 		    H2              = 2,
+		    HCURL           = 3,
+		    HDIV            = 4,
 
 		    L1              = 5,
                     L_INF           = 6,
@@ -39,6 +41,10 @@ namespace libMeshEnums {
 		    H1_SEMINORM     = 10,
 
 		    H2_SEMINORM     = 11,
+
+		    HCURL_SEMINORM  = 12,
+		    
+		    HDIV_SEMINORM   = 13,
 
                     W1_INF_SEMINORM = 15,
                     W2_INF_SEMINORM = 16,

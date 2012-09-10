@@ -100,6 +100,9 @@ SIDEMAP_ERROR(0, SCALAR, side_map)
 REINIT_ERROR(0, XYZ, reinit)
 REINIT_ERROR(0, XYZ, edge_reinit)
 SIDEMAP_ERROR(0, XYZ, side_map)
+REINIT_ERROR(0, NEDELEC_ONE, reinit)
+REINIT_ERROR(0, NEDELEC_ONE, edge_reinit)
+SIDEMAP_ERROR(0, NEDELEC_ONE, side_map)
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 REINIT_ERROR(0, BERNSTEIN, reinit)
 REINIT_ERROR(0, BERNSTEIN, edge_reinit)
@@ -119,6 +122,9 @@ REINIT_ERROR(1, L2_LAGRANGE, edge_reinit)
 REINIT_ERROR(1, XYZ, edge_reinit)
 REINIT_ERROR(1, MONOMIAL, edge_reinit)
 REINIT_ERROR(1, SCALAR, edge_reinit)
+REINIT_ERROR(1, NEDELEC_ONE, reinit)
+REINIT_ERROR(1, NEDELEC_ONE, edge_reinit)
+SIDEMAP_ERROR(1, NEDELEC_ONE, side_map)
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 REINIT_ERROR(1, BERNSTEIN, edge_reinit)
 REINIT_ERROR(1, SZABAB, edge_reinit)
@@ -954,6 +960,9 @@ template void FE<2,SZABAB>::edge_reinit(Elem const*, unsigned int, Real, const s
 template void FE<2,XYZ>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<2,XYZ>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<2,XYZ>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,NEDELEC_ONE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<2,NEDELEC_ONE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
+template void FE<2,NEDELEC_ONE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 
 // Intel 9.1 complained it needed this in devel mode.
 //template void FE<2,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);
@@ -996,6 +1005,9 @@ template void FE<3,SZABAB>::edge_reinit(Elem const*, unsigned int, Real, const s
 template void FE<3,XYZ>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 template void FE<3,XYZ>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
 template void FE<3,XYZ>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,NEDELEC_ONE>::reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
+template void FE<3,NEDELEC_ONE>::side_map(Elem const*, Elem const*, const unsigned int, const std::vector<Point>&, std::vector<Point>&);
+template void FE<3,NEDELEC_ONE>::edge_reinit(Elem const*, unsigned int, Real, const std::vector<Point>* const, const std::vector<Real>* const);
 
 // Intel 9.1 complained it needed this in devel mode.
 //template void FE<3,XYZ>::init_face_shape_functions(const std::vector<Point>&, const Elem*);

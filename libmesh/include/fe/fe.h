@@ -61,6 +61,12 @@ struct FEOutputType<LAGRANGE_VEC>
   typedef RealGradient type;
 };
 
+template<>
+struct FEOutputType<NEDELEC_ONE>
+{
+  typedef RealGradient type;
+};
+
 
 /**
  * A specific instatiation of the \p FEBase class. This
@@ -736,7 +742,7 @@ protected:
    * still should be usable for children. Therefore, keep
    * it protected.
    */
-  virtual void compute_shape_functions(const Elem*, const std::vector<Point>& qp);
+  virtual void compute_shape_functions(const Elem* elem, const std::vector<Point>& qp);
 
   /**
    * Compute the map & shape functions for this face.
@@ -759,6 +765,22 @@ public:
    */
   explicit
   FELagrangeVec(const FEType& fet);
+
+};
+
+//-------------------------------------------------------------
+// FENedelecOne class definition
+template <unsigned int Dim>
+class FENedelecOne : public FE<Dim,NEDELEC_ONE>
+{
+public:
+
+  /**
+   * Constructor. Creates a vector Lagrange finite element
+   * to be used in dimension \p Dim.
+   */
+  explicit
+  FENedelecOne(const FEType& fet);
 
 };
 
@@ -992,6 +1014,15 @@ template <unsigned int Dim>
 inline
 FEScalar<Dim>::FEScalar (const FEType& fet) :
   FE<Dim,SCALAR> (fet)
+{
+}
+
+// ------------------------------------------------------------
+// FENedelecOne class inline members
+template <unsigned int Dim>
+inline
+FENedelecOne<Dim>::FENedelecOne (const FEType& fet) :
+  FE<Dim,NEDELEC_ONE> (fet)
 {
 }
 
