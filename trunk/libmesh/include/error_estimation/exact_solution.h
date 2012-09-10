@@ -206,6 +206,26 @@ public:
                 const std::string& unknown_name);
 
   /**
+   * This function computes and returns the HCurl error for the system
+   * sys_name for the unknown unknown_name.  Note that no error computations
+   * are actually performed, you must call compute_error() for that. This
+   * is only valid for vector-valued element. An error is thrown if requested
+   * for scalar-valued elements.
+   */
+  Real hcurl_error(const std::string& sys_name,
+		   const std::string& unknown_name);
+
+  /**
+   * This function computes and returns the HDiv error for the system
+   * sys_name for the unknown unknown_name.  Note that no error computations
+   * are actually performed, you must call compute_error() for that. This
+   * is only valid for vector-valued element. An error is thrown if requested
+   * for scalar-valued elements.
+   */
+  Real hdiv_error(const std::string& sys_name,
+		  const std::string& unknown_name);
+
+  /**
    * This function computes and returns the H2 error for the system
    * sys_name for the unknown unknown_name.  Note that no error computations
    * are actually performed, you must call compute_error() for that.
