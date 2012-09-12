@@ -226,6 +226,8 @@ const FEType& DofMap::variable_type (const unsigned int c) const
 
 void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 {
+  parallel_only();
+
   // We shouldn't be trying to re-attach the same matrices repeatedly
   libmesh_assert (std::find(_matrices.begin(), _matrices.end(),
                             &matrix) == _matrices.end());
@@ -237,17 +239,20 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
   // If we've already computed sparsity, then it's too late
   // to wait for "compute_sparsity" to help with sparse matrix
   // initialization, and we need to handle this matrix individually
-  if ((_n_nz && !_n_nz->empty()) ||
-      (_n_oz && !_n_oz->empty()))
-    if (matrix.need_full_sparsity_pattern())
-      {
-	// We'd better have already computed the full sparsity pattern
-        // if we need it here
-        libmesh_assert(need_full_sparsity_pattern);
-        libmesh_assert(_sp.get());
+  bool computed_sparsity_already =
+    ((_n_nz && !_n_nz->empty()) ||
+     (_n_oz && !_n_oz->empty()));
+  Parallel::max(computed_sparsity_already);
+  if (computed_sparsity_already &&
+      matrix.need_full_sparsity_pattern())
+    {
+      // We'd better have already computed the full sparsity pattern
+      // if we need it here
+      libmesh_assert(need_full_sparsity_pattern);
+      libmesh_assert(_sp.get());
 
-        matrix.update_sparsity_pattern (_sp->sparsity_pattern);
-      }
+      matrix.update_sparsity_pattern (_sp->sparsity_pattern);
+    }
       
   if (matrix.need_full_sparsity_pattern())
     need_full_sparsity_pattern = true;
@@ -2548,7 +2553,6 @@ std::string DofMap::get_info() const
 
   unsigned int max_n_nz = 0, max_n_oz = 0;
   long double avg_n_nz = 0., avg_n_oz = 0;
-  const std::size_t one=1;
 
   if (_n_nz)
     {
@@ -2557,7 +2561,14 @@ std::string DofMap::get_info() const
           max_n_nz = std::max(max_n_nz, (*_n_nz)[i]);
           avg_n_nz += (*_n_nz)[i];
         }
-      avg_n_nz /= std::max(_n_nz->size(),one);
+
+      int n_nz_size = _n_nz->size();
+
+      Parallel::max(max_n_nz);
+      Parallel::sum(avg_n_nz);
+      Parallel::sum(n_nz_size);
+
+      avg_n_nz /= std::max(n_nz_size,1);
 
       libmesh_assert(_n_oz);
 
@@ -2566,7 +2577,14 @@ std::string DofMap::get_info() const
           max_n_oz = std::max(max_n_oz, (*_n_oz)[i]);
           avg_n_oz += (*_n_oz)[i];
         }
-      avg_n_oz /= std::max(_n_oz->size(),one);
+
+      int n_oz_size = _n_oz->size();
+
+      Parallel::max(max_n_oz);
+      Parallel::sum(avg_n_oz);
+      Parallel::sum(n_oz_size);
+
+      avg_n_oz /= std::max(n_oz_size,1);
     }
 
   os << "    DofMap Sparsity\n      Average  On-Processor Bandwidth"
