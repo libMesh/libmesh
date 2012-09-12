@@ -33,13 +33,13 @@
 
 PeriodicBoundaries::~PeriodicBoundaries()
 {
-  for (std::map<unsigned, PeriodicBoundary *>::iterator it = begin(); it != end(); ++it)
+  for (std::map<unsigned, PeriodicBoundaryBase*>::iterator it = begin(); it != end(); ++it)
     delete it->second;
 }
 
 
 
-PeriodicBoundary* PeriodicBoundaries::boundary(unsigned int id)
+PeriodicBoundaryBase* PeriodicBoundaries::boundary(unsigned int id)
 {
   iterator i = this->find(id);
   if (i == this->end())
@@ -49,7 +49,7 @@ PeriodicBoundary* PeriodicBoundaries::boundary(unsigned int id)
 
 
 
-const PeriodicBoundary* PeriodicBoundaries::boundary(unsigned int id) const
+const PeriodicBoundaryBase* PeriodicBoundaries::boundary(unsigned int id) const
 {
   const_iterator i = this->find(id);
   if (i == this->end())
@@ -62,14 +62,14 @@ const PeriodicBoundary* PeriodicBoundaries::boundary(unsigned int id) const
 
 const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
 					 const PointLocatorBase& point_locator,
-                                         const Elem *e,
+                                         const Elem* e,
                                          unsigned int side) const
 {
   // Find a point on that side (and only that side)
 
   Point p = e->build_side(side)->centroid();
 
-  const PeriodicBoundary *b = this->boundary(boundary_id);
+  const PeriodicBoundaryBase *b = this->boundary(boundary_id);
   libmesh_assert (b);
   p = b->get_corresponding_pos(p);
 

@@ -35,7 +35,7 @@
 #include "quadrature_gauss.h"
 #include "tensor_value.h"
 #include "threads.h"
-#include "periodic_boundary.h"
+#include "periodic_boundary_base.h"
 
 // Anonymous namespace, for a helper function for periodic boundary
 // constraint calculations
@@ -1935,7 +1935,7 @@ compute_periodic_constraints (DofConstraints &constraints,
       for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
-          const PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
+          const PeriodicBoundaryBase* periodic = boundaries.boundary(boundary_id);
           if (periodic && periodic->is_my_variable(variable_number))
             {
               libmesh_assert(point_locator);
@@ -2150,7 +2150,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 			           new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
                                   const boundary_id_type new_boundary_id = *new_id_it;
-                                  const PeriodicBoundary *new_periodic = boundaries.boundary(new_boundary_id);
+                                  const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
                                   if (new_periodic && new_periodic->is_my_variable(variable_number))
                                     {
 				      point_bcids.insert(new_boundary_id);
@@ -2170,7 +2170,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 		               point_bcids.begin(); i != point_bcids.end(); ++i)
 			    {
                               const boundary_id_type new_boundary_id = *i;
-                              const PeriodicBoundary *new_periodic = boundaries.boundary(new_boundary_id);
+                              const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
                               point_pairedids.insert(new_periodic->pairedboundary);
 			    }
 
@@ -2185,7 +2185,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                               // Find the corresponding periodic point and
                               // its primary neighbor
                               const boundary_id_type new_boundary_id = *i;
-                              const PeriodicBoundary *new_periodic = boundaries.boundary(new_boundary_id);
+                              const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
 
                               const Point neigh_pt =
                                 new_periodic->get_corresponding_pos(*my_node);
@@ -2280,7 +2280,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 			           new_id_it=new_bc_ids.begin(); new_id_it!=new_bc_ids.end(); ++new_id_it)
                                 {
                                   const boundary_id_type new_boundary_id = *new_id_it;
-                                  const PeriodicBoundary *new_periodic = boundaries.boundary(new_boundary_id);
+                                  const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
                                   if (new_periodic && new_periodic->is_my_variable(variable_number))
                                     {
 				      edge_bcids.insert(new_boundary_id);
@@ -2300,7 +2300,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 		               edge_bcids.begin(); i != edge_bcids.end(); ++i)
 			    {
                               const boundary_id_type new_boundary_id = *i;
-                              const PeriodicBoundary *new_periodic = boundaries.boundary(new_boundary_id);
+                              const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
                               edge_pairedids.insert(new_periodic->pairedboundary);
 			    }
 
@@ -2316,7 +2316,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                               // Find the corresponding periodic edge and
                               // its primary neighbor
                               const boundary_id_type new_boundary_id = *i;
-                              const PeriodicBoundary *new_periodic = boundaries.boundary(new_boundary_id);
+                              const PeriodicBoundaryBase *new_periodic = boundaries.boundary(new_boundary_id);
 
                               Point neigh_pt1 = new_periodic->get_corresponding_pos(*e1),
                                     neigh_pt2 = new_periodic->get_corresponding_pos(*e2);

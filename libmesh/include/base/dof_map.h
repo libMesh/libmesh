@@ -53,7 +53,7 @@ class Elem;
 class FEType;
 class MeshBase;
 class Mesh;
-class PeriodicBoundary;
+class PeriodicBoundaryBase;
 class PeriodicBoundaries;
 namespace SparsityPattern { class Build; }
 class System;
@@ -708,7 +708,7 @@ public:
   /**
    * Adds a copy of the specified periodic boundary to the system.
    */
-  void add_periodic_boundary (const PeriodicBoundary& periodic_boundary);
+  void add_periodic_boundary (const PeriodicBoundaryBase& periodic_boundary);
 
   /**
    * Add a periodic boundary pair
@@ -716,7 +716,7 @@ public:
    * @param boundary - primary boundary
    * @param inverse_boundary - inverse boundary
    */
-  void add_periodic_boundary (PeriodicBoundary * boundary, PeriodicBoundary * inverse_boundary);
+  void add_periodic_boundary (const PeriodicBoundaryBase& boundary, const PeriodicBoundaryBase& inverse_boundary);
 
   /**
    * @returns true if the boundary given by \p boundaryid is periodic,

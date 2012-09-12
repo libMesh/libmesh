@@ -41,6 +41,7 @@
 #include "threads.h"
 #include "raw_accessor.h"
 #include "tensor_tools.h"
+#include "periodic_boundary_base.h"
 #include "periodic_boundary.h"
 
 
@@ -2635,40 +2636,58 @@ DirichletBoundaries::~DirichletBoundaries()
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-void DofMap::add_periodic_boundary (const PeriodicBoundary& periodic_boundary)
+void DofMap::add_periodic_boundary (const PeriodicBoundaryBase& periodic_boundary)
 {
-  if (_periodic_boundaries->boundary(periodic_boundary.myboundary) == NULL)
+  // See if we already have a periodic boundary associated myboundary...
+  PeriodicBoundaryBase* boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
+
+  if ( boundary == NULL )
   {
-    PeriodicBoundary *boundary = new PeriodicBoundary(periodic_boundary);
-    PeriodicBoundary *inverse_boundary = new PeriodicBoundary(periodic_boundary, true);
+    // ...if not, clone the input (and its inverse) and add them to the PeriodicBoundaries object
+    PeriodicBoundaryBase* boundary = periodic_boundary.clone().release();
+    PeriodicBoundaryBase* inverse_boundary = periodic_boundary.clone(PeriodicBoundaryBase::INVERSE).release();
 
-    std::pair<unsigned int, PeriodicBoundary *> bp
-      (boundary->myboundary, boundary);
-    std::pair<unsigned int, PeriodicBoundary *> ibp
-      (boundary->pairedboundary, inverse_boundary);
-
-    _periodic_boundaries->insert(bp);
-    _periodic_boundaries->insert(ibp);
+    // _periodic_boundaries takes ownership of the pointers
+    _periodic_boundaries->insert(std::make_pair(boundary->myboundary, boundary));
+    _periodic_boundaries->insert(std::make_pair(inverse_boundary->myboundary, inverse_boundary));
   }
   else
   {
-    PeriodicBoundary *boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
+    // ...otherwise, merge this object's variable IDs with the existing boundary object's.
     boundary->merge(periodic_boundary);
-    PeriodicBoundary *inverse_boundary = _periodic_boundaries->boundary(periodic_boundary.pairedboundary);
+    
+    // Do the same merging process for the inverse boundary.  Note: the inverse better already exist!
+    PeriodicBoundaryBase* inverse_boundary = _periodic_boundaries->boundary(periodic_boundary.pairedboundary);
+    libmesh_assert(inverse_boundary);
     inverse_boundary->merge(periodic_boundary);
   }
 }
 
-void DofMap::add_periodic_boundary (PeriodicBoundary * boundary, PeriodicBoundary * inverse_boundary)
+
+
+
+void DofMap::add_periodic_boundary (const PeriodicBoundaryBase& boundary, const PeriodicBoundaryBase& inverse_boundary)
 {
-  libmesh_assert(boundary->myboundary == inverse_boundary->pairedboundary);
-  libmesh_assert(boundary->pairedboundary == inverse_boundary->myboundary);
+  libmesh_assert(boundary.myboundary == inverse_boundary.pairedboundary);
+  libmesh_assert(boundary.pairedboundary == inverse_boundary.myboundary);
 
-  std::pair<unsigned int, PeriodicBoundary *> bp(boundary->myboundary, boundary);
-  std::pair<unsigned int, PeriodicBoundary *> ibp(inverse_boundary->myboundary, inverse_boundary);
+  // Allocate copies on the heap.  The _periodic_boundaries object will manage this memory.
+  // Note: this also means that the copy constructor for the PeriodicBoundary (or user class
+  // derived therefrom) must be implemented!
+  // PeriodicBoundary* p_boundary = new PeriodicBoundary(boundary);
+  // PeriodicBoundary* p_inverse_boundary = new PeriodicBoundary(inverse_boundary);
 
-  _periodic_boundaries->insert(bp);
-  _periodic_boundaries->insert(ibp);
+  // We can't use normal copy construction since this leads to slicing with derived classes.
+  // Use clone() "virtual constructor" instead.  But, this *requires* user to override the clone()
+  // method.  Note also that clone() allocates memory.  In this case, the _periodic_boundaries object
+  // takes responsibility for cleanup.
+  PeriodicBoundaryBase* p_boundary = boundary.clone().release();
+  PeriodicBoundaryBase* p_inverse_boundary = inverse_boundary.clone().release();
+
+  // Add the periodic boundary and its inverse to the PeriodicBoundaries data structure.  The 
+  // PeriodicBoundaries data structure takes ownership of the pointers.
+  _periodic_boundaries->insert(std::make_pair(p_boundary->myboundary, p_boundary));
+  _periodic_boundaries->insert(std::make_pair(p_inverse_boundary->myboundary, p_inverse_boundary));
 }
 
 
