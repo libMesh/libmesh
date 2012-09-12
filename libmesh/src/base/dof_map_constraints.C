@@ -513,7 +513,7 @@ using namespace libMesh;
 		for (unsigned int qp=0; qp<n_qp; qp++)
 		  {
 		    // solution at the quadrature point
-		    OutputNumber fineval;
+		    OutputNumber fineval = 0;
 		    libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
 		    for( unsigned int c = 0; c < n_vec_dim; c++)
@@ -633,7 +633,7 @@ using namespace libMesh;
 		for (unsigned int qp=0; qp<n_qp; qp++)
 		  {
 		    // solution at the quadrature point
-		    OutputNumber fineval;
+		    OutputNumber fineval = 0;
 		    libMesh::RawAccessor<OutputNumber> f_accessor( fineval, dim );
 
 		    for( unsigned int c = 0; c < n_vec_dim; c++)
