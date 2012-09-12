@@ -8,6 +8,7 @@
 #include "dof_map.h"
 #include "numeric_vector.h"
 #include "periodic_boundaries.h"
+#include "periodic_boundary.h"
 
 // Example includes
 #include "biharmonic_jr.h"
