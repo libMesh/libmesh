@@ -44,13 +44,13 @@ namespace libMesh
     }
 
     // Needed for ExactSolution to compile. Will implement when needed.
-    TensorValue<Number> curl_from_grad( const TypeNTensor<3,Number>& grad )
+    TensorValue<Number> curl_from_grad( const TypeNTensor<3,Number>& /* grad */ )
     {
       libmesh_not_implemented();
     }
 
     // Needed for ExactSolution to compile
-    Number div_from_grad( const VectorValue<Number>& grad )
+    Number div_from_grad( const VectorValue<Number>& /* grad */ )
     {
       libMesh::err << "Operation not defined for scalar quantities." << std::endl;
       libmesh_error();
@@ -66,7 +66,7 @@ namespace libMesh
     }
 
     // Needed for ExactSolution to compile. Will implement when needed.
-    VectorValue<Number> div_from_grad( const TypeNTensor<3,Number>& grad )
+    VectorValue<Number> div_from_grad( const TypeNTensor<3,Number>& /* grad */ )
     {
       libmesh_not_implemented();
     }
