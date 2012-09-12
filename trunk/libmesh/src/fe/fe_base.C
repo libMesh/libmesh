@@ -35,6 +35,7 @@
 #include "quadrature_gauss.h"
 #include "tensor_value.h"
 #include "threads.h"
+#include "periodic_boundary.h"
 
 // Anonymous namespace, for a helper function for periodic boundary
 // constraint calculations

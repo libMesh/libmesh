@@ -45,6 +45,7 @@
 #include "dense_vector.h"
 
 #include "periodic_boundaries.h"
+#include "periodic_boundary.h"
 #include "mesh_generation.h"
 #include "parsed_function.h"
 
