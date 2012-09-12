@@ -21,52 +21,47 @@
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 #include "libmesh.h" // libMesh::invalid_uint
-#include "periodic_boundary.h"
+#include "periodic_boundary_base.h"
 
 // ------------------------------------------------------------
-// PeriodicBoundary member functions
+// PeriodicBoundaryBase member functions
 
 
-PeriodicBoundary::PeriodicBoundary() :
-  PeriodicBoundaryBase(),
-  translation_vector()
+PeriodicBoundaryBase::PeriodicBoundaryBase() :
+  myboundary(libMesh::invalid_uint),
+  pairedboundary(libMesh::invalid_uint)
 {
 }
 
 
 
-
-PeriodicBoundary::PeriodicBoundary(const PeriodicBoundary& o, TransformationType t) :
-  PeriodicBoundaryBase(o),
-  translation_vector(o.translation_vector)
-{
-  if (t == INVERSE)
-    {
-      std::swap(myboundary, pairedboundary);
-      translation_vector *= -1.0;
-    }
-}
-
-
-
-PeriodicBoundary::PeriodicBoundary(const RealVectorValue& vector) :
-  PeriodicBoundaryBase(),
-  translation_vector(vector)
+PeriodicBoundaryBase::PeriodicBoundaryBase(const PeriodicBoundaryBase& o) :
+  myboundary(o.myboundary),
+  pairedboundary(o.pairedboundary),
+  variables(o.variables)
 {
 }
 
 
 
-Point PeriodicBoundary::get_corresponding_pos(const Point& pt) const
+void PeriodicBoundaryBase::set_variable(unsigned int var)
 {
-  return pt + translation_vector;
+  variables.insert(var);
 }
 
 
 
-AutoPtr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType t) const
+void PeriodicBoundaryBase::merge(const PeriodicBoundaryBase & pb)
 {
-  return AutoPtr<PeriodicBoundaryBase>(new PeriodicBoundary(*this, t));
+  variables.insert(pb.variables.begin(), pb.variables.end());
+}
+
+
+
+bool PeriodicBoundaryBase::is_my_variable(unsigned int var_num) const
+{
+  bool a = variables.empty() || (!variables.empty() && variables.find(var_num) != variables.end());
+  return a;
 }
 
 

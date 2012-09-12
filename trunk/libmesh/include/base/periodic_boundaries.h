@@ -37,7 +37,7 @@ namespace libMesh {
 
   // Forward Declarations
   class Elem;
-  class PeriodicBoundary;
+  class PeriodicBoundaryBase;
   class PointLocatorBase;
 
   /**
@@ -45,12 +45,12 @@ namespace libMesh {
    * declarations and future flexibility.  Note that std::map has no
    * virtual destructor, so downcasting here would be dangerous.
    */
-  class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundary *>
+  class PeriodicBoundaries : public std::map<unsigned int, PeriodicBoundaryBase*>
   {
   public:
-    PeriodicBoundary *boundary(unsigned int id);
+    PeriodicBoundaryBase* boundary(unsigned int id);
 
-    const PeriodicBoundary *boundary(unsigned int id) const;
+    const PeriodicBoundaryBase* boundary(unsigned int id) const;
 
     PeriodicBoundaries() {}
 
@@ -58,9 +58,9 @@ namespace libMesh {
 
     // The periodic neighbor of \p e in direction \p side, if it
     // exists.  NULL otherwise
-    const Elem *neighbor(unsigned int boundary_id,
-                         const PointLocatorBase &point_locator,
-                         const Elem *e,
+    const Elem* neighbor(unsigned int boundary_id,
+                         const PointLocatorBase& point_locator,
+                         const Elem* e,
                          unsigned int side) const;
   };
 
