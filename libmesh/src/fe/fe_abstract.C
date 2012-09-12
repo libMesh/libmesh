@@ -31,6 +31,7 @@
 #include "fe_interface.h"
 #include "numeric_vector.h"
 #include "periodic_boundaries.h"
+#include "periodic_boundary.h"
 #include "quadrature.h"
 #include "quadrature_gauss.h"
 #include "remote_elem.h"
@@ -1051,7 +1052,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
       for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
-          const PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
+          const PeriodicBoundaryBase *periodic = boundaries.boundary(boundary_id);
           if (periodic)
             {
               libmesh_assert(point_locator);
