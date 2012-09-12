@@ -376,6 +376,20 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
 
   std::vector<Number> soln;
   std::vector<std::string> names;
+
+  // If _output_variables is populated we need to filter the monomials we output
+  if (_output_variables.size())
+  {
+    std::vector<std::string> monomials;
+    const FEType type(CONSTANT, MONOMIAL);
+    es.build_variable_names(monomials, &type);
+
+    for (std::vector<std::string>::iterator it = monomials.begin(); it != monomials.end(); ++it)
+      if (std::find(_output_variables.begin(), _output_variables.end(), *it) != _output_variables.end())
+        names.push_back(*it);
+  }
+
+  // If we pass in a list of names to "get_solution" it'll filter the variables comming back
   es.get_solution( soln, names );
 
   // The data must ultimately be written block by block.  This means that this data
@@ -503,14 +517,11 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
     {
-      unsigned variable_name_position = 0;
-      for(; variable_name_position < output_names.size(); variable_name_position++)
-        if(output_names[variable_name_position] == names[c])
-          break;
-
-      // This means we didn't find it
-      if(variable_name_position >= output_names.size())
+      std::vector<std::string>::iterator pos = std::find(output_names.begin(), output_names.end(), names[c]);
+      if (pos == output_names.end())
         continue;
+
+      unsigned variable_name_position = pos - output_names.begin();
 
       std::vector<Number> cur_soln(num_nodes);
 

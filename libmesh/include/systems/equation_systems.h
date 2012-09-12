@@ -254,9 +254,10 @@ public:
 
   /**
    * Fill the input vector \p var_names with the names
-   * of the variables for each system.
+   * of the variables for each system. If \p type is passed,
+   * only variables of the specified type will be populated.
    */
-  void build_variable_names (std::vector<std::string>& var_names) const;
+  void build_variable_names (std::vector<std::string>& var_names, const FEType *type=NULL) const;
 
   /**
    * Fill the input vector \p soln with the solution values for the
@@ -276,7 +277,9 @@ public:
   void build_solution_vector (std::vector<Number>& soln) const;
 
   /**
-   * Retrieve the solution data for CONSTANT MONOMIALs.
+   * Retrieve the solution data for CONSTANT MONOMIALs.  If \p names
+   * is populated, only the variables corresponding to those names will
+   * be retrieved.  This can be used to filter which variables are retrieved.
    */
   void get_solution( std::vector<Number> & soln,
                      std::vector<std::string> & names) const;

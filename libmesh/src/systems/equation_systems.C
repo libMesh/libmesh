@@ -469,7 +469,7 @@ void EquationSystems::adjoint_solve (const QoISet& qoi_indices)
 
 
 
-void EquationSystems::build_variable_names (std::vector<std::string>& var_names) const
+void EquationSystems::build_variable_names (std::vector<std::string>& var_names, const FEType *type) const
 {
   libmesh_assert (this->n_systems());
 
@@ -506,6 +506,9 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
     // We'd better not have more than dim*n_vars (all vector variables)
     libmesh_assert( n_vars <= dim*n_vars );
 
+    // Here, we're assuming the number of vector components is the same
+    // as the mesh dimension. Will break for mixed dimension meshes.
+
     var_names.resize( n_vars );
   }
 
@@ -521,32 +524,38 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names)
 
 	  unsigned int n_vec_dim = FEInterface::n_vec_dim( pos->second->get_mesh(), fe_type);
 
-	  if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
-	    {
-	      switch(n_vec_dim)
-		{
-		case 0:
-		case 1:
-		  var_names[var_num++] = var_name;
-		  break;
-		case 2:
-		  var_names[var_num++] = var_name+"_x";
-		  var_names[var_num++] = var_name+"_y";
-		  break;
-		case 3:
-		  var_names[var_num++] = var_name+"_x";
-		  var_names[var_num++] = var_name+"_y";
-		  var_names[var_num++] = var_name+"_z";
-		  break;
-		default:
-		  std::cerr << "Invalid dim in build_variable_names" << std::endl;
-		  libmesh_error();
-		}
-	    }
-	  else
-	    var_names[var_num++] = var_name;
+          // Filter on the type if requested
+          if (type == NULL || (type && *type == fe_type))
+            {
+            if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+	      {
+	        switch(n_vec_dim)
+		  {
+		  case 0:
+		  case 1:
+		    var_names[var_num++] = var_name;
+		    break;
+		  case 2:
+		    var_names[var_num++] = var_name+"_x";
+		    var_names[var_num++] = var_name+"_y";
+		    break;
+		  case 3:
+		    var_names[var_num++] = var_name+"_x";
+		    var_names[var_num++] = var_name+"_y";
+		    var_names[var_num++] = var_name+"_z";
+		    break;
+		  default:
+		    std::cerr << "Invalid dim in build_variable_names" << std::endl;
+		    libmesh_error();
+		  }
+	      }
+	    else
+	      var_names[var_num++] = var_name;
+            }
 	}
     }
+  // Now resize again in case we filtered any names
+  var_names.resize(var_num);
 }
 
 
@@ -659,7 +668,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   // We have to differentiate between between scalar and vector
   // variables. We intercept vector variables and treat each
   // component as a scalar variable (consistently with build_solution_names).
-  
+
   unsigned int nv = 0;
 
   //Could this be replaced by a/some convenience methods?[PB]
@@ -668,7 +677,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
     unsigned int n_vector_vars = 0;
     const_system_iterator       pos = _systems.begin();
     const const_system_iterator end = _systems.end();
-    
+
     for (; pos != end; ++pos)
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
 	{
@@ -784,7 +793,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 #endif
 		  {
 		    libmesh_assert (nodal_soln.size() == n_vec_dim*elem->n_nodes());
-		    
+
 		    for (unsigned int n=0; n<elem->n_nodes(); n++)
 		      {
 			repeat_count[elem->node(n)]++;
@@ -806,7 +815,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 
 	  else
 	    Parallel::sum (repeat_count);
-	    
+
 	    for (unsigned int n=0; n<nn; n++)
 	      for( unsigned int d=0; d < n_vec_dim; d++ )
 		soln[nv*n + (var+d + var_num)] /=
@@ -837,6 +846,12 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
   libmesh_assert (ne == _mesh.max_elem_id());
 
+  // If the names vector has entries, we will only populate the soln vector
+  // with names included in that list.  Note: The names vector may be
+  // reordered upon exiting this function
+  std::vector<std::string> filter_names = names;
+  bool is_filter_names = ! filter_names.empty();
+
   soln.clear();
   names.clear();
 
@@ -863,10 +878,9 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
       // Loop over the variable names and load them in order
       for (unsigned int var=0; var < nv_sys; ++var)
       {
-        if ( system.variable_type( var ) != type )
-        {
+        if ( system.variable_type( var ) != type ||
+             ( is_filter_names && std::find(filter_names.begin(), filter_names.end(), system.variable_name( var )) == filter_names.end()) )
           continue;
-        }
 
         names.push_back( system.variable_name( var ) );
 
