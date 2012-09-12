@@ -104,6 +104,11 @@ public:
     return a;
   }
 
+  const RealVectorValue get_translation_vector() const
+  {
+    return translation_vector;
+  }
+
 protected:
   // One of these days we'll support rotated boundaries
   // RealTensor rotation_matrix;
