@@ -279,8 +279,8 @@ extern OStreamProxy err;
 // The libmesh_file_error(const std::string& filename) macro prints a message
 // and throws a FileError exception
 //
-// The libmesh_convergence_failure() macro prints a message
-// and throws a ConvergenceFailure exception
+// The libmesh_convergence_failure() macro 
+// throws a ConvergenceFailure exception
 //
 // These macros no longer write traceout files themselves, but if the
 // exceptions they throw are uncaught then the
@@ -288,7 +288,7 @@ extern OStreamProxy err;
 #define libmesh_error()    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); LIBMESH_THROW(libMesh::LogicError()); } while(0)
 #define libmesh_not_implemented()    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
 #define libmesh_file_error(filename)    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); LIBMESH_THROW(libMesh::FileError(filename)); } while(0)
-#define libmesh_convergence_failure()    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); LIBMESH_THROW(libMesh::ConvergenceFailure()); } while(0)
+#define libmesh_convergence_failure()    do { LIBMESH_THROW(libMesh::ConvergenceFailure()); } while(0)
 
 // The libmesh_example_assert() macro prints a message and calls
 // "return 0;" if the assertion specified by the macro is not true.  This

@@ -60,6 +60,7 @@ namespace libMeshEnums {
 
 		 // Vector-valued elements
 		 LAGRANGE_VEC = 41,
+		 NEDELEC_ONE  = 42,
 
 		 INVALID_FE   = 99};
 
@@ -69,7 +70,8 @@ namespace libMeshEnums {
    */
   enum FEContinuity {DISCONTINUOUS,
                      C_ZERO,
-		     C_ONE};
+		     C_ONE,
+		     H_CURL};
 
   /**
    * \enum libMeshEnums::FEFieldType defines an \p enum for finite element

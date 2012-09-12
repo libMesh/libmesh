@@ -42,6 +42,8 @@ nobase_include_HEADERS = \
 		base/libmesh_logging.h \
 		base/multi_predicates.h \
 		base/periodic_boundaries.h \
+		base/periodic_boundary.h \
+		base/periodic_boundary_base.h \
 		base/print_trace.h \
 		base/reference_counted_object.h \
 		base/reference_counter.h \

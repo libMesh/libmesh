@@ -294,9 +294,6 @@ std::vector<Real>& ExactSolution::_check_inputs(const std::string& sys_name,
 
 
 
-
-
-
 void ExactSolution::compute_error(const std::string& sys_name,
 				  const std::string& unknown_name)
 {
@@ -345,6 +342,10 @@ Real ExactSolution::error_norm(const std::string& sys_name,
   std::vector<Real>& error_vals = this->_check_inputs(sys_name,
                                                       unknown_name);
 
+  libmesh_assert(_equation_systems.has_system(sys_name));
+  libmesh_assert(_equation_systems.get_system(sys_name).has_variable( unknown_name ));
+  const FEType& fe_type = _equation_systems.get_system(sys_name).variable_type(unknown_name);
+
   switch (norm)
     {
     case L2:
@@ -353,14 +354,55 @@ Real ExactSolution::error_norm(const std::string& sys_name,
       return std::sqrt(error_vals[0] + error_vals[1]);
     case H2:
       return std::sqrt(error_vals[0] + error_vals[1] + error_vals[2]);
+    case HCURL:
+      {
+	if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
+	  {
+	    libMesh::err << "Cannot compute HCurl error norm of scalar-valued variables!" << std::endl;
+	    libmesh_error();
+	  }
+	else
+	  return std::sqrt(error_vals[0] + error_vals[5]);
+      }
+    case HDIV:
+      {
+	if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
+	  {
+	    libMesh::err << "Cannot compute HDiv error norm of scalar-valued variables!" << std::endl;
+	    libmesh_error();
+	  }
+	else
+	  return std::sqrt(error_vals[0] + error_vals[6]);
+      }
     case H1_SEMINORM:
       return std::sqrt(error_vals[1]);
     case H2_SEMINORM:
       return std::sqrt(error_vals[2]);
+    case HCURL_SEMINORM:
+      {
+	if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
+	  {
+	    libMesh::err << "Cannot compute HCurl error seminorm of scalar-valued variables!" << std::endl;
+	    libmesh_error();
+	  }
+	else
+	  return std::sqrt(error_vals[5]);
+      }
+    case HDIV_SEMINORM:
+      {
+	if(FEInterface::field_type(fe_type) == TYPE_SCALAR)
+	  {
+	    libMesh::err << "Cannot compute HDiv error seminorm of scalar-valued variables!" << std::endl;
+	    libmesh_error();
+	  }
+	else
+	  return std::sqrt(error_vals[6]);
+      }
     case L1:
       return error_vals[3];
     case L_INF:
       return error_vals[4];
+    
     // Currently only Sobolev norms/seminorms are supported
     default:
       libmesh_error();
@@ -450,8 +492,18 @@ Real ExactSolution::h1_error(const std::string& sys_name,
 }
 
 
+Real ExactSolution::hcurl_error(const std::string& sys_name,
+				const std::string& unknown_name)
+{
+  return this->error_norm(sys_name,unknown_name,HCURL);
+}
 
 
+Real ExactSolution::hdiv_error(const std::string& sys_name,
+			       const std::string& unknown_name)
+{
+  return this->error_norm(sys_name,unknown_name,HDIV);
+}
 
 
 
@@ -544,7 +596,14 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   const unsigned int dim = _mesh.mesh_dimension();
 
   // Zero the error before summation
-  error_vals = std::vector<Real>(5, 0.);
+  // 0 - sum of square of function error (L2)
+  // 1 - sum of square of gradient error (H1 semi)
+  // 2 - sum of square of Hessian error (H2 semi)
+  // 3 - sum of sqrt(square of function error) (L1)
+  // 4 - max of sqrt(square of function error) (Linfty)
+  // 5 - sum of square of curl error (HCurl semi)
+  // 6 - sum of square of div error (HDiv semi)
+  error_vals = std::vector<Real>(7, 0.);
 
   // Construct Quadrature rule based on default quadrature order
   const FEType& fe_type  = computed_dof_map.variable_type(var);
@@ -582,6 +641,20 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // The value of the shape function gradients at the quadrature points
   const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >& 
 		    dphi_values = fe->get_dphi();
+
+  // The value of the shape function curls at the quadrature points
+  // Only computed for vector-valued elements
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> >* curl_values = NULL;
+
+  // The value of the shape function divergences at the quadrature points
+  // Only computed for vector-valued elements
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >* div_values = NULL;
+
+  if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+    {
+      curl_values = &fe->get_curl_phi();
+      div_values = &fe->get_div_phi();
+    }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   // The value of the shape function second derivatives at the quadrature points
@@ -639,7 +712,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_u_h;
 #endif
-
+	  typename FEGenericBase<OutputShape>::OutputNumber curl_u_h = 0.0;
+	  typename FEGenericBase<OutputShape>::OutputNumberDivergence div_u_h = 0.0;
 
 	  // Compute solution values at the current
 	  // quadrature point.  This reqiures a sum
@@ -653,6 +727,11 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	      grad2_u_h += d2phi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
 #endif
+	      if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+		{
+		  curl_u_h += (*curl_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
+		  div_u_h += (*div_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
+		}
 	    }
 
 	  // Compute the value of the error at this quadrature point
@@ -684,12 +763,12 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  // Compute the value of the error in the gradient at this
 	  // quadrature point
 	  typename FEGenericBase<OutputShape>::OutputNumberGradient exact_grad;
-	  RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberGradient> exact_grad_accessor( exact_grad, dim );
+	  RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberGradient> exact_grad_accessor( exact_grad, _mesh.spatial_dimension() );
 	  if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
 	    {
 	      for( unsigned int c = 0; c < n_vec_dim; c++)
-		for( unsigned int d = 0; d < dim; d++ )
-		  exact_grad_accessor(d + c*dim ) =
+		for( unsigned int d = 0; d < _mesh.spatial_dimension(); d++ )
+		  exact_grad_accessor(d + c*_mesh.spatial_dimension() ) =
 		    _exact_derivs[sys_num]->
 		    component(var_component+c, q_point[qp], time)(d);
 	    }
@@ -702,6 +781,44 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  const typename FEGenericBase<OutputShape>::OutputNumberGradient grad_error = grad_u_h - exact_grad;
 	  
 	  error_vals[1] += JxW[qp]*grad_error.size_sq();
+
+
+	  if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
+	    {
+	      // Compute the value of the error in the curl at this
+	      // quadrature point
+	      typename FEGenericBase<OutputShape>::OutputNumber exact_curl = 0.0;
+	      if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
+		{
+		  exact_curl = TensorTools::curl_from_grad( exact_grad );
+		}
+	      else if (_equation_systems_fine)
+		{
+		  // FIXME: Need to implement curl for MeshFunction and support reference
+		  //        solution for vector-valued elements
+		}
+
+	      const typename FEGenericBase<OutputShape>::OutputNumber curl_error = curl_u_h - exact_curl;
+	      
+	      error_vals[5] += JxW[qp]*TensorTools::norm_sq(curl_error);
+
+	      // Compute the value of the error in the divergence at this
+	      // quadrature point
+	      typename FEGenericBase<OutputShape>::OutputNumberDivergence exact_div = 0.0;
+	      if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
+		{
+		  exact_div = TensorTools::div_from_grad( exact_grad );
+		}
+	      else if (_equation_systems_fine)
+		{
+		  // FIXME: Need to implement div for MeshFunction and support reference
+		  //        solution for vector-valued elements
+		}
+	      
+	      const typename FEGenericBase<OutputShape>::OutputNumberDivergence div_error = div_u_h - exact_div;
+	      
+	      error_vals[6] += JxW[qp]*TensorTools::norm_sq(div_error);
+	    }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	  // Compute the value of the error in the hessian at this

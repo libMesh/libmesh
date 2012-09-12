@@ -46,6 +46,12 @@ namespace libMesh
 	  return ap;
 	}
 	/* HCurl Conforming Elements */
+      case NEDELEC_ONE:
+	{
+	  AutoPtr<FETransformationBase<OutputShape> > ap( new HCurlFETransformation<OutputShape> );
+	  return ap;
+	}
+
 	/* HDiv Conforming Elements */
 	/* L2 Conforming Elements */
 

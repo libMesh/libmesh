@@ -104,6 +104,9 @@ libmesh_la_SOURCES = \
 		src/base/dof_object.C \
 		src/base/libmesh.C \
 		src/base/libmesh_isnan.c \
+		src/base/periodic_boundaries.C \
+		src/base/periodic_boundary.C \
+		src/base/periodic_boundary_base.C \
 		src/base/print_trace.C \
 		src/base/reference_counted_object.C \
 		src/base/reference_counter.C \
@@ -170,6 +173,9 @@ libmesh_la_SOURCES = \
 		src/fe/fe_monomial_shape_1D.C \
 		src/fe/fe_monomial_shape_2D.C \
 		src/fe/fe_monomial_shape_3D.C \
+		src/fe/fe_nedelec_one.C \
+		src/fe/fe_nedelec_one_shape_2D.C \
+		src/fe/fe_nedelec_one_shape_3D.C \
 		src/fe/fe_scalar.C \
 		src/fe/fe_scalar_shape_0D.C \
 		src/fe/fe_scalar_shape_1D.C \
@@ -417,10 +423,10 @@ libmesh_la_SOURCES = \
 		src/solvers/newton_solver.C \
 		src/solvers/nonlinear_solver.C \
 		src/solvers/petsc_diff_solver.C \
-		src/solvers/petscdmlibmesh.C \
 		src/solvers/petsc_dm_nonlinear_solver.C \
 		src/solvers/petsc_linear_solver.C \
 		src/solvers/petsc_nonlinear_solver.C \
+		src/solvers/petscdmlibmesh.C \
 		src/solvers/slepc_eigen_solver.C \
 		src/solvers/steady_solver.C \
 		src/solvers/time_solver.C \

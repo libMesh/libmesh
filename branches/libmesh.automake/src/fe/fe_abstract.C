@@ -31,6 +31,7 @@
 #include "fe_interface.h"
 #include "numeric_vector.h"
 #include "periodic_boundaries.h"
+#include "periodic_boundary.h"
 #include "quadrature.h"
 #include "quadrature_gauss.h"
 #include "remote_elem.h"
@@ -297,6 +298,12 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
 	      return ap;
           }
 
+	  case NEDELEC_ONE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FENedelecOne<2>(fet));
+	      return ap;
+	    }
+
 	  default:
 	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
 	    libmesh_error();
@@ -383,6 +390,12 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
 	      AutoPtr<FEAbstract> ap(new FEScalar<3>(fet));
 	      return ap;
           }
+
+	  case NEDELEC_ONE:
+	    {
+	      AutoPtr<FEAbstract> ap(new FENedelecOne<3>(fet));
+	      return ap;
+	    }
 
 	  default:
 	    libMesh::out << "ERROR: Bad FEType.family= " << fet.family << std::endl;
@@ -1039,7 +1052,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
       for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
-          const PeriodicBoundary *periodic = boundaries.boundary(boundary_id);
+          const PeriodicBoundaryBase *periodic = boundaries.boundary(boundary_id);
           if (periodic)
             {
               libmesh_assert(point_locator);

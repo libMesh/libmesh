@@ -31,6 +31,7 @@
 #include "libmesh.h" // libMesh::invalid_uint
 #include "location_maps.h"
 #include "elem.h"
+#include "point_locator_base.h"
 
 // C++ Includes   -----------------------------------
 #include <vector>
