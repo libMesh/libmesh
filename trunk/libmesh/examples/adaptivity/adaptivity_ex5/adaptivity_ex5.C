@@ -50,11 +50,6 @@
 
 #include "getpot.h"
 
-// Some (older) compilers do not offer full stream 
-// functionality, \p OStringStream works around this.
-// Check example 9 for details.
-#include "o_string_stream.h"
-
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
 #include "transient_system.h"
@@ -109,6 +104,12 @@ Number exact_value (const Point& p,
 // With --enable-fparser, the user can also optionally set their own
 // exact solution equations.
 FunctionBase<Number>* parsed_solution = NULL;
+
+
+// Returns a string with 'number' formatted and placed directly
+// into the string in some way
+std::string exodus_filename(unsigned number);
+
 
 // Begin the main program.  Note that the first
 // statement in the program throws an error if
@@ -327,8 +328,8 @@ int main (int argc, char** argv)
                                         equation_systems);
 #endif
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO(mesh).write_equation_systems ("out.e.000",
-                                        equation_systems);
+    ExodusII_IO(mesh).write_equation_systems (exodus_filename(0),
+                                              equation_systems);
 #endif
   }
   else
@@ -386,17 +387,22 @@ int main (int argc, char** argv)
       // A pretty update message
       std::cout << " Solving time step ";
       
-      // As already seen in example 9, use a work-around
-      // for missing stream functionality (of older compilers).
-      // Add a set of scope braces to enforce data locality.
       {
-        OStringStream out;
+        // Save flags to avoid polluting cout with custom precision values, etc.
+        std::ios_base::fmtflags os_flags = std::cout.flags();
 
-        OSSInt(out,2,t_step);
-        out << ", time=";
-        OSSRealzeroleft(out,6,3,system.time);
-        out <<  "...";
-        std::cout << out.str() << std::endl;
+        std::cout << t_step
+                  << ", time="
+                  << std::setw(6)
+                  << std::setprecision(3)
+                  << std::setfill('0')
+                  << std::left
+                  << system.time
+                  << "..."
+                  << std::endl;
+
+        // Restore flags
+        std::cout.flags(os_flags);
       }
       
       // At this point we need to update the old
@@ -484,20 +490,22 @@ int main (int argc, char** argv)
       // Output every 10 timesteps to file.
       if ( (t_step+1)%output_freq == 0)
         {
-          OStringStream file_name, exodus_file_name;
+          // OStringStream file_name;
 
 #ifdef LIBMESH_HAVE_GMV
-          file_name << "out.gmv.";
-          OSSRealzeroright(file_name,3,0,t_step+1);
-
-          GMVIO(mesh).write_equation_systems (file_name.str(),
-                                              equation_systems);
+//          file_name << "out.gmv.";
+//          OSSRealzeroright(file_name,3,0,t_step+1);
+//
+//          GMVIO(mesh).write_equation_systems (file_name.str(),
+//                                              equation_systems);
 #endif
 #ifdef LIBMESH_HAVE_EXODUS_API
-          exodus_file_name << "out.e.";
-          OSSRealzeroright(exodus_file_name,3,0,t_step+1);
-          ExodusII_IO(mesh).write_equation_systems (exodus_file_name.str(),
-                                              equation_systems);
+          // So... if paraview is told to open a file called out.e.{N}, it automatically tries to
+          // open out.e.{N-1}, out.e.{N-2}, etc.  If we name the file something else, we can work
+          // around that issue, but the right thing to do (for adaptive meshes) is to write a filename
+          // with the adaptation step into a separate file.
+          ExodusII_IO(mesh).write_equation_systems (exodus_filename(t_step+1),
+                                                    equation_systems);
 #endif
         }
     }
@@ -603,19 +611,14 @@ void assemble_cd (EquationSystems& es,
   // will be used to assemble the linear system.  We will start
   // with the element Jacobian * quadrature weight at each integration point.
   const std::vector<Real>& JxW      = fe->get_JxW();
-  const std::vector<Real>& JxW_face = fe_face->get_JxW();
   
   // The element shape functions evaluated at the quadrature points.
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
 
   // The element shape function gradients evaluated at the quadrature
   // points.
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
 
-  // The XY locations of the quadrature points used for face integration
-  const std::vector<Point>& qface_points = fe_face->get_xyz();
-    
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
@@ -643,7 +646,6 @@ void assemble_cd (EquationSystems& es,
     es.parameters.get<Real> ("diffusivity");
 
   const Real dt = es.parameters.get<Real>   ("dt");
-  const Real time = es.parameters.get<Real> ("time");
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
@@ -758,4 +760,18 @@ void assemble_cd (EquationSystems& es,
     }
   // Finished computing the sytem matrix and right-hand side.
 #endif // #ifdef LIBMESH_ENABLE_AMR
+}
+
+
+
+
+std::string exodus_filename(unsigned number)
+{
+  std::ostringstream oss;
+
+  oss << "out_";
+  oss << std::setw(3) << std::setfill('0') << number;
+  oss << ".e";
+
+  return oss.str();
 }
