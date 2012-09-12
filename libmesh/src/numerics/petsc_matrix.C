@@ -127,12 +127,12 @@ void PetscMatrix<T>::init (const unsigned int m,
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatSetFromOptions(_mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  if (!n_nz.empty()) {
-    ierr = MatSeqAIJSetPreallocation(_mat, 0, (int*)&n_nz[0]);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    ierr = MatMPIAIJSetPreallocation(_mat, 0, (int*)&n_nz[0], 0, (int*)&n_oz[0]);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  }
+
+  ierr = MatSeqAIJSetPreallocation(_mat, 0, (int*)(n_nz.empty()?NULL:&n_nz[0]));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatMPIAIJSetPreallocation(_mat, 0, (int*)(n_nz.empty()?NULL:&n_nz[0]),
+                                         0, (int*)(n_oz.empty()?NULL:&n_oz[0]));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   this->zero();
 }
@@ -184,12 +184,12 @@ void PetscMatrix<T>::init ()
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatSetFromOptions(_mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  if (!n_nz.empty()) {
-    ierr = MatSeqAIJSetPreallocation(_mat, 0, (int*)&n_nz[0]);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    ierr = MatMPIAIJSetPreallocation(_mat, 0, (int*)&n_nz[0], 0, (int*)&n_oz[0]);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  }
+  
+  ierr = MatSeqAIJSetPreallocation(_mat, 0, (int*)(n_nz.empty()?NULL:&n_nz[0]));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatMPIAIJSetPreallocation(_mat, 0, (int*)(n_nz.empty()?NULL:&n_nz[0]),
+                                         0, (int*)(n_oz.empty()?NULL:&n_oz[0]));
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   this->zero();
 }
@@ -205,8 +205,16 @@ void PetscMatrix<T>::zero ()
 
   int ierr=0;
 
-  ierr = MatZeroEntries(_mat);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  int m_l, n_l;
+
+  ierr = MatGetLocalSize(_mat,&m_l,&n_l);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  if (n_l)
+    {
+      ierr = MatZeroEntries(_mat);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    }
 }
 
 template <typename T>
