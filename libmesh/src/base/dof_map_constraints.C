@@ -41,6 +41,8 @@
 #include "threads.h"
 #include "raw_accessor.h"
 #include "tensor_tools.h"
+#include "periodic_boundary.h"
+
 
 // Anonymous namespace to hold helper classes
 namespace {
@@ -2669,30 +2671,6 @@ void DofMap::add_periodic_boundary (PeriodicBoundary * boundary, PeriodicBoundar
   _periodic_boundaries->insert(ibp);
 }
 
-// ------------------------------------------------------------
-// PeriodicBoundaries member functions
-
-PeriodicBoundaries::~PeriodicBoundaries()
-{
-  for (std::map<unsigned, PeriodicBoundary *>::iterator it = begin(); it != end(); ++it)
-    delete it->second;
-}
-
-const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
-					 const PointLocatorBase &point_locator,
-                                         const Elem *e,
-                                         unsigned int side) const
-{
-  // Find a point on that side (and only that side)
-
-  Point p = e->build_side(side)->centroid();
-
-  const PeriodicBoundary *b = this->boundary(boundary_id);
-  libmesh_assert (b);
-  p = b->get_corresponding_pos(p);
-
-  return point_locator.operator()(p);
-}
 
 #endif
 

@@ -1,0 +1,85 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+// Local Includes -----------------------------------
+#include "libmesh_config.h"
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+
+#include "periodic_boundaries.h"
+#include "point_locator_base.h"
+#include "elem.h"
+#include "periodic_boundary.h"
+
+// ------------------------------------------------------------
+// PeriodicBoundaries member functions
+
+
+
+
+PeriodicBoundaries::~PeriodicBoundaries()
+{
+  for (std::map<unsigned, PeriodicBoundary *>::iterator it = begin(); it != end(); ++it)
+    delete it->second;
+}
+
+
+
+PeriodicBoundary* PeriodicBoundaries::boundary(unsigned int id)
+{
+  iterator i = this->find(id);
+  if (i == this->end())
+    return NULL;
+  return i->second;
+}
+
+
+
+const PeriodicBoundary* PeriodicBoundaries::boundary(unsigned int id) const
+{
+  const_iterator i = this->find(id);
+  if (i == this->end())
+    return NULL;
+  return i->second;
+}
+
+
+
+
+const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
+					 const PointLocatorBase& point_locator,
+                                         const Elem *e,
+                                         unsigned int side) const
+{
+  // Find a point on that side (and only that side)
+
+  Point p = e->build_side(side)->centroid();
+
+  const PeriodicBoundary *b = this->boundary(boundary_id);
+  libmesh_assert (b);
+  p = b->get_corresponding_pos(p);
+
+  return point_locator.operator()(p);
+}
+
+
+
+
+
+
+
+#endif // LIBMESH_ENABLE_PERIODIC
