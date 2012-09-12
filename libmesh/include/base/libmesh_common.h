@@ -258,8 +258,20 @@ extern OStreamProxy err;
 // libmesh_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG
 #define libmesh_assert(asserted)  ((void) 0)
+#define libmesh_assert_equal_to(expr1,expr2)  ((void) 0)
+#define libmesh_assert_not_equal_to(expr1,expr2)  ((void) 0)
+#define libmesh_assert_less(expr1,expr2)  ((void) 0)
+#define libmesh_assert_greater(expr1,expr2)  ((void) 0)
+#define libmesh_assert_less_equal(expr1,expr2)  ((void) 0)
+#define libmesh_assert_greater_equal(expr1,expr2)  ((void) 0)
 #else
 #define libmesh_assert(asserted)  do { if (!(asserted)) { libMesh::err << "Assertion `" #asserted "' failed." << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_equal_to(expr1,expr2)  do { if (!(expr1 == expr2)) { libMesh::err << "Assertion `" #expr1 " == " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_not_equal_to(expr1,expr2)  do { if (!(expr1 != expr2)) { libMesh::err << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_less(expr1,expr2)  do { if (!(expr1 < expr2)) { libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_greater(expr1,expr2)  do { if (!(expr1 > expr2)) { libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_less_equal(expr1,expr2)  do { if (!(expr1 <= expr2)) { libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_greater_equal(expr1,expr2)  do { if (!(expr1 >= expr2)) { libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
 #endif
 
 // The libmesh_write_traceout() macro writes stack trace files, if
