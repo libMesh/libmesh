@@ -30,18 +30,18 @@
 #include "elem.h"
 #include "fe_interface.h"
 #include "numeric_vector.h"
+#include "periodic_boundary_base.h"
 #include "periodic_boundaries.h"
 #include "quadrature.h"
 #include "quadrature_gauss.h"
 #include "tensor_value.h"
 #include "threads.h"
-#include "periodic_boundary_base.h"
 
 // Anonymous namespace, for a helper function for periodic boundary
 // constraint calculations
-namespace 
+namespace
 {
-  // Find the "primary" element around a boundary point: 
+  // Find the "primary" element around a boundary point:
   const Elem* primary_boundary_point_neighbor
     (const Elem* elem,
      const Point& p,
@@ -71,7 +71,7 @@ namespace
 
           // Otherwise, we will defer to the point neighbor, but only if
 	  // one of its sides is on a relevant boundary and that side
-	  // contains this vertex 
+	  // contains this vertex
           bool vertex_on_periodic_side = false;
           for (unsigned int ns = 0;
                ns != pt_neighbor->n_sides(); ++ns)
@@ -102,8 +102,8 @@ namespace
 
       return primary;
     }
-  
-  // Find the "primary" element around a boundary edge: 
+
+  // Find the "primary" element around a boundary edge:
   const Elem* primary_boundary_edge_neighbor
     (const Elem* elem,
      const Point& p1,
@@ -600,7 +600,7 @@ FEGenericBase<RealGradient>::build (const unsigned int dim,
 	    }
 	  }
       }
-      
+
     default:
       libmesh_error();
 
@@ -645,7 +645,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case JACOBI_20_00:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -661,7 +661,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case JACOBI_30_00:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -677,7 +677,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case LEGENDRE:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -693,7 +693,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case LAGRANGE:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -733,7 +733,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case JACOBI_20_00:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -749,7 +749,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case JACOBI_30_00:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -765,7 +765,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case LEGENDRE:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -781,7 +781,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case LAGRANGE:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -821,7 +821,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case JACOBI_20_00:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -837,7 +837,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case JACOBI_30_00:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -853,7 +853,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case LEGENDRE:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -869,7 +869,7 @@ FEGenericBase<Real>::build_InfFE (const unsigned int dim,
 
 	  case LAGRANGE:
 	    {
-  	      switch (fet.inf_map)
+	      switch (fet.inf_map)
 	        {
 		  case CARTESIAN:
 		    {
@@ -956,12 +956,12 @@ void FEGenericBase<OutputType> ::compute_shape_functions (const Elem* elem,
     }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-  
+
   if( calculate_phi )
     this->_fe_trans->map_phi( this->dim, elem, qp, (*this), this->phi );
 
   if( calculate_dphi )
-    this->_fe_trans->map_dphi( this->dim, elem, qp, (*this), this->dphi, 
+    this->_fe_trans->map_dphi( this->dim, elem, qp, (*this), this->dphi,
 			       this->dphidx, this->dphidy, this->dphidz );
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -1260,12 +1260,12 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                         if (dof_is_fixed[j])
                           Fe(freei) -=
                             TensorTools::inner_product(phi_coarse[i][qp],
-						       phi_coarse[j][qp]) * 
+						       phi_coarse[j][qp]) *
                             JxW[qp] * Ue(j);
                         else
                           Ke(freei,freej) +=
                             TensorTools::inner_product(phi_coarse[i][qp],
-						       phi_coarse[j][qp]) * 
+						       phi_coarse[j][qp]) *
                             JxW[qp];
                         if (cont == C_ONE)
                           {
@@ -1402,7 +1402,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                         if (dof_is_fixed[j])
                           Fe(freei) -=
                             TensorTools::inner_product(phi_coarse[i][qp],
-						       phi_coarse[j][qp]) * 
+						       phi_coarse[j][qp]) *
                             JxW[qp] * Ue(j);
                         else
                           Ke(freei,freej) +=
@@ -1745,11 +1745,11 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 	            const unsigned int j = my_side_dofs[js];
 	            for (unsigned int qp = 0; qp != n_qp; ++qp)
                       {
-		        Fe(js) += JxW[qp] * 
+		        Fe(js) += JxW[qp] *
                                   TensorTools::inner_product(neigh_phi[i][qp],
 							     phi[j][qp]);
                         if (cont != C_ZERO)
-		          Fe(js) += JxW[qp] * 
+		          Fe(js) += JxW[qp] *
                                     TensorTools::inner_product((*neigh_dphi)[i][qp] *
 							       (*face_normals)[qp],
 							       (*dphi)[j][qp] *
@@ -1805,7 +1805,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 
                   if (dof_map.is_constrained_dof(my_dof_g))
                     continue;
-                  
+
 		  constraint_row = &(constraints[my_dof_g].first);
                   libmesh_assert(constraint_row->empty());
 		  constraints[my_dof_g].second = 0;
@@ -1851,7 +1851,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 template <typename OutputType>
-void 
+void
 FEGenericBase<OutputType>::
 compute_periodic_constraints (DofConstraints &constraints,
                               DofMap &dof_map,
@@ -1888,6 +1888,9 @@ compute_periodic_constraints (DofConstraints &constraints,
   if (cont == DISCONTINUOUS)
     return;
   libmesh_assert (cont == C_ZERO || cont == C_ONE);
+
+  // We'll use element size to generate relative tolerances later
+  const Real primary_hmin = elem->hmin();
 
   AutoPtr<FEGenericBase<OutputShape> > neigh_fe
     (FEGenericBase<OutputShape>::build(Dim, base_fe_type));
@@ -1935,7 +1938,7 @@ compute_periodic_constraints (DofConstraints &constraints,
       for (std::vector<boundary_id_type>::const_iterator id_it=bc_ids.begin(); id_it!=bc_ids.end(); ++id_it)
         {
           const boundary_id_type boundary_id = *id_it;
-          const PeriodicBoundaryBase* periodic = boundaries.boundary(boundary_id);
+          const PeriodicBoundaryBase *periodic = boundaries.boundary(boundary_id);
           if (periodic && periodic->is_my_variable(variable_number))
             {
               libmesh_assert(point_locator);
@@ -2040,7 +2043,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 					   TensorTools::inner_product(phi[i][qp],
 								      phi[j][qp]);
                               if (cont != C_ZERO)
-		                Ke(is,js) += JxW[qp] * 
+		                Ke(is,js) += JxW[qp] *
                                              TensorTools::inner_product((*dphi)[i][qp] *
 									(*face_normals)[qp],
 									(*dphi)[j][qp] *
@@ -2060,7 +2063,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 	                  const unsigned int j = my_side_dofs[js];
 	                  for (unsigned int qp = 0; qp != n_qp; ++qp)
                             {
-		              Fe(js) += JxW[qp] * 
+		              Fe(js) += JxW[qp] *
                                         TensorTools::inner_product(neigh_phi[i][qp],
 								   phi[j][qp]);
                               if (cont != C_ZERO)
@@ -2137,7 +2140,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 			  // point and have periodic boundary
 			  // conditions for this variable
 			  std::set<boundary_id_type> point_bcids;
-			  
+
 			  for (unsigned int new_s = 0; new_s !=
 			       elem->n_sides(); ++new_s)
 			    {
@@ -2175,9 +2178,10 @@ compute_periodic_constraints (DofConstraints &constraints,
 			    }
 
 			  // What do we want to constrain against?
-			  const Elem* primary_elem = elem;
+			  const Elem* primary_elem = NULL;
 			  const Elem* main_neigh = NULL;
-			  Point primary_pt = *my_node;
+			  Point main_pt = *my_node,
+			        primary_pt = *my_node;
 
 	                  for (std::set<boundary_id_type>::const_iterator i =
 		               point_bcids.begin(); i != point_bcids.end(); ++i)
@@ -2190,6 +2194,18 @@ compute_periodic_constraints (DofConstraints &constraints,
                               const Point neigh_pt =
                                 new_periodic->get_corresponding_pos(*my_node);
 
+			      // If the point is getting constrained
+			      // to itself by this PBC then we don't
+			      // generate any constraints
+			      if (neigh_pt.absolute_fuzzy_equals
+				   (*my_node, primary_hmin*TOLERANCE))
+				continue;
+
+			      // Otherwise we'll have a constraint in
+			      // one direction or another
+			      if (!primary_elem)
+				primary_elem = elem;
+
                               const Elem *primary_neigh = primary_boundary_point_neighbor
                                 (neigh, neigh_pt, *mesh.boundary_info,
                                  point_pairedids);
@@ -2197,7 +2213,10 @@ compute_periodic_constraints (DofConstraints &constraints,
                               libmesh_assert(primary_neigh);
 
 			      if (new_boundary_id == boundary_id)
-			        main_neigh = primary_neigh;
+				{
+			          main_neigh = primary_neigh;
+			          main_pt = neigh_pt;
+				}
 
                               // Finer elements will get constrained in
 			      // terms of coarser neighbors, not the
@@ -2212,11 +2231,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                               // On a one-element-thick mesh, we compare
                               // points to see what side gets constrained
-                              //
-                              // Use > in this test to make sure that,
-                              // for angular constraints, no node gets
-                              // constrained to itself.
-                                  (primary_neigh == primary_elem && 
+                                  (primary_neigh == primary_elem &&
                                    (neigh_pt > primary_pt)))
 				continue;
 
@@ -2224,9 +2239,9 @@ compute_periodic_constraints (DofConstraints &constraints,
                               primary_pt = neigh_pt;
                             }
 
-		          libmesh_assert(main_neigh);
-
-		          if (primary_elem != main_neigh)
+		          if (!primary_elem ||
+			      primary_elem != main_neigh ||
+			      primary_pt != main_pt)
 			    continue;
                         }
                       else if (elem->is_edge(n))
@@ -2267,7 +2282,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 			  // edge and have periodic boundary
 			  // conditions for this variable
 			  std::set<boundary_id_type> edge_bcids;
-			  			  
+
 			  for (unsigned int new_s = 0; new_s !=
 			       elem->n_sides(); ++new_s)
 			    {
@@ -2305,10 +2320,12 @@ compute_periodic_constraints (DofConstraints &constraints,
 			    }
 
 			  // What do we want to constrain against?
-			  const Elem* primary_elem = elem;
+			  const Elem* primary_elem = NULL;
 			  const Elem* main_neigh = NULL;
-			  Point primary_pt1 = *e1;
-			  Point primary_pt2 = *e2;
+			  Point main_pt1 = *e1,
+			        main_pt2 = *e2,
+			        primary_pt1 = *e1,
+			        primary_pt2 = *e2;
 
 	                  for (std::set<boundary_id_type>::const_iterator i =
 		               edge_bcids.begin(); i != edge_bcids.end(); ++i)
@@ -2320,6 +2337,21 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                               Point neigh_pt1 = new_periodic->get_corresponding_pos(*e1),
                                     neigh_pt2 = new_periodic->get_corresponding_pos(*e2);
+
+			      // If the edge is getting constrained
+			      // to itself by this PBC then we don't
+			      // generate any constraints
+			      if (neigh_pt1.absolute_fuzzy_equals
+				   (*e1, primary_hmin*TOLERANCE) &&
+			          neigh_pt2.absolute_fuzzy_equals
+				   (*e2, primary_hmin*TOLERANCE))
+				continue;
+
+			      // Otherwise we'll have a constraint in
+			      // one direction or another
+			      if (!primary_elem)
+				primary_elem = elem;
+
                               const Elem *primary_neigh = primary_boundary_edge_neighbor
                                 (neigh, neigh_pt1, neigh_pt2, *mesh.boundary_info,
                                  edge_pairedids);
@@ -2327,7 +2359,11 @@ compute_periodic_constraints (DofConstraints &constraints,
                               libmesh_assert(primary_neigh);
 
 			      if (new_boundary_id == boundary_id)
-			        main_neigh = primary_neigh;
+				{
+			          main_neigh = primary_neigh;
+			          main_pt1 = neigh_pt1;
+			          main_pt2 = neigh_pt2;
+				}
 
                               // If we have a one-element thick mesh,
                               // we'll need to sort our points to get a
@@ -2365,9 +2401,10 @@ compute_periodic_constraints (DofConstraints &constraints,
                               primary_pt2 = neigh_pt2;
                             }
 
-		          libmesh_assert(main_neigh);
-
-		          if (primary_elem != main_neigh)
+		          if (!primary_elem ||
+			      primary_elem != main_neigh ||
+			      primary_pt1 != main_pt1 ||
+			      primary_pt2 != main_pt2)
 			    continue;
                         }
                       else if (elem->is_face(n))
@@ -2416,29 +2453,29 @@ compute_periodic_constraints (DofConstraints &constraints,
                   // non-serialized mesh.
 		  /*
                   std::vector<bool> recursive_constraint(n_side_dofs, false);
- 
+
 	          for (unsigned int is = 0; is != n_side_dofs; ++is)
 	            {
 	              const unsigned int i = neigh_side_dofs[is];
 	              const unsigned int their_dof_g = neigh_dof_indices[i];
                       libmesh_assert(their_dof_g != DofObject::invalid_id);
- 
+
 		      {
 			Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
 
                         if (!dof_map.is_constrained_dof(their_dof_g))
                           continue;
                       }
- 
+
                       DofConstraintRow& their_constraint_row =
                         constraints[their_dof_g].first;
- 
+
 	              for (unsigned int js = 0; js != n_side_dofs; ++js)
 	                {
 	                  const unsigned int j = my_side_dofs[js];
 	                  const unsigned int my_dof_g = my_dof_indices[j];
                           libmesh_assert(my_dof_g != DofObject::invalid_id);
- 
+
                           if (their_constraint_row.count(my_dof_g))
                             recursive_constraint[js] = true;
 	                }
@@ -2469,7 +2506,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
                         if (dof_map.is_constrained_dof(my_dof_g))
                           continue;
-                     
+
 		        constraint_row = &(constraints[my_dof_g].first);
                         libmesh_assert(constraint_row->empty());
 		        constraints[my_dof_g].second = 0;
