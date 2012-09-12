@@ -25,74 +25,63 @@
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 // Local Includes -----------------------------------
-#include "point.h"
+#include "periodic_boundary_base.h"
 #include "vector_value.h" // RealVectorValue
-
-// C++ Includes   -----------------------------------
-#include <set>
 
 namespace libMesh {
 
-// Forward Declarations
-class Elem;
-class MeshBase;
-
-/**
- * The definition of a periodic boundary.
- */
-class PeriodicBoundary
-{
-public:
-  /**
-   * The boundary ID of this boundary and its counterpart
-   */
-  unsigned int myboundary,
-    pairedboundary;
+  // Forward Declarations
+  class Elem;
+  class MeshBase;
 
   /**
-   * Constructor
+   * The definition of a periodic boundary.
    */
-  PeriodicBoundary();
+  class PeriodicBoundary : public PeriodicBoundaryBase
+  {
+  public:
+    /**
+     * Constructor
+     */
+    PeriodicBoundary();
 
-  /**
-   * Destructor
-   */
-  virtual ~PeriodicBoundary() {}
+    /**
+     * Destructor
+     */
+    virtual ~PeriodicBoundary() {}
 
-  /**
-   * Copy constructor
-   */
-  PeriodicBoundary(const PeriodicBoundary & o, bool inverse = false);
+    /**
+     * Copy constructor, with option for the copy to represent an inverse transformation.
+     */
+    PeriodicBoundary(const PeriodicBoundary& o, TransformationType t = FORWARD);
 
-  /**
-   * Constructor taking a reference to the translation vector.
-   */
-  PeriodicBoundary(const RealVectorValue & vector);
+    /**
+     * Constructor taking a reference to the translation vector.
+     */
+    PeriodicBoundary(const RealVectorValue& vector);
 
-  /**
-   * This function should be overloaded by derived classes to 
-   * define how one finds corresponding nodes on the periodic 
-   * boundary pair.
-   */
-  virtual Point get_corresponding_pos(const Point & pt) const;
+    /**
+     * This function should be overloaded by derived classes to 
+     * define how one finds corresponding nodes on the periodic 
+     * boundary pair.
+     */
+    virtual Point get_corresponding_pos(const Point& pt) const;
 
-  void set_variable(unsigned int var);
+    /**
+     * If we want the DofMap to be able to make copies of references and
+     * store them in the underlying map, this class must be clone'able,
+     * i.e. have a kind of virtual construction mechanism.
+     */
+    virtual AutoPtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const;
 
-  void merge(const PeriodicBoundary & pb);
+  protected:
+    // One of these days we'll support rotated boundaries
+    // RealTensor rotation_matrix;
 
-  bool is_my_variable(unsigned int var_num) const;
-
-protected:
-  // One of these days we'll support rotated boundaries
-  // RealTensor rotation_matrix;
-
-  // The vector which is added to points in myboundary
-  // to produce corresponding points in pairedboundary
-  RealVectorValue translation_vector;
-
-  // Set of variables for this periodic boundary, empty means all varaibles possible
-  std::set<unsigned int> variables;
-};
+    // The vector which is added to points in myboundary
+    // to produce corresponding points in pairedboundary
+    RealVectorValue translation_vector;
+  };
 
 } // namespace libmesh
 
