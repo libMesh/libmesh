@@ -190,9 +190,6 @@ void HPCoarsenTest::select_refinement (System &system)
       // The type of finite element to use for this variable
       const FEType& fe_type = dof_map.variable_type (var);
 
-      FEType low_p_fe_type = fe_type;
-      FEType high_p_fe_type = fe_type;
-
       // Finite element objects for a fine (and probably a coarse)
       // element will be needed
       fe = FEBase::build (dim, fe_type);
