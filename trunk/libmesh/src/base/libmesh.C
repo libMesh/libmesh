@@ -129,7 +129,7 @@ namespace {
    */
   void enableFPE(bool on)
   {
-#ifdef LIBMESH_HAVE_XMMINTRIN_H
+#if !defined(LIBMESH_HAVE_XMMINTRIN_H) && defined(LIBMESH_HAVE_XMMINTRIN_H)
     static int flags = 0;
 #endif
     
