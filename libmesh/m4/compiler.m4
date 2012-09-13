@@ -561,10 +561,10 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
               dnl        was from an assignment.
               PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
               CXXFLAGS_DVL="$CXXFLAGS_DVL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
           dnl Intel ICC >= 10.0	          
@@ -587,15 +587,43 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
 
               PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 $INTEL_AX_FLAG -unroll -w0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -g -inline_debug_info -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CFLAGS_OPT="$CFLAGS_OPT -O2 $INTEL_AX_FLAG -unroll -w0"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
           
+          dnl Intel ICC >= 9.0	
+          intel_icc_v9.0 | intel_icc_v9.1 | intel_icc_v10.0)	
+              dnl Disable some warning messages:
+              dnl #266: 'function declared implicitly'
+              dnl       Metis function "GKfree" caused this error
+              dnl       in almost every file.
+              dnl #1572: 'floating-point equality and inequality comparisons are unreliable'
+              dnl        Well, duh, when the tested value is computed...  OK when it
+              dnl        was from an assignment.
+              dnl Note: In Version 9.x and newer, -whatever_report[<n>]
+              dnl was changed to -whatever-report[<n>], but we can just
+              dnl drop this option anyway because it now defaults to
+              dnl the quiet behavior we were requesting with n=0
+
+              dnl CPU-specific flags: -axK is for ia32, -xW is for x86_64
+              INTEL_AX_FLAG="-tpp6 -axK"
+              if test $target_cpu = "x86_64" ; then
+                INTEL_AX_FLAG="-xW"
+              fi
+
+              CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0"
+              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -inline_debug_info -wd266 -wd1572"
+              CFLAGS_OPT="$CFLAGS_OPT -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
+ 
           dnl Intel ICC >= 8.1	
-          intel_icc_v8.1 | intel_icc_v9.0 | intel_icc_v9.1 | intel_icc_v10.0)	
+          intel_icc_v8.1)
               dnl Disable some warning messages:
               dnl #266: 'function declared implicitly'
               dnl       Metis function "GKfree" caused this error

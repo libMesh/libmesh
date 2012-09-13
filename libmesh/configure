@@ -5081,10 +5081,10 @@ fi
                     intel_icc_v10.1 | intel_icc_v11.x | intel_icc_v12.x)
                                                                                                                                                                                                                   PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
               CXXFLAGS_DVL="$CXXFLAGS_DVL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
+              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
                     intel_icc_v10.0)
@@ -5096,14 +5096,29 @@ fi
 
               PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 $INTEL_AX_FLAG -unroll -w0"
               CXXFLAGS_DVL="$CXXFLAGS_DBG"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -g -inline_debug_info -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
+              CFLAGS_OPT="$CFLAGS_OPT -O2 $INTEL_AX_FLAG -unroll -w0"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
 
-                    intel_icc_v8.1 | intel_icc_v9.0 | intel_icc_v9.1 | intel_icc_v10.0)
+                    intel_icc_v9.0 | intel_icc_v9.1 | intel_icc_v10.0)
+
+                            INTEL_AX_FLAG="-tpp6 -axK"
+              if test $target_cpu = "x86_64" ; then
+                INTEL_AX_FLAG="-xW"
+              fi
+
+              CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0"
+              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CFLAGS_DBG="$CFLAGS_DBG -w1 -g -inline_debug_info -wd266 -wd1572"
+              CFLAGS_OPT="$CFLAGS_OPT -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0"
+              CFLAGS_DVL="$CFLAGS_DBG"
+              ;;
+
+                    intel_icc_v8.1)
 
                             INTEL_AX_FLAG="-tpp6 -axK"
               if test $target_cpu = "x86_64" ; then
