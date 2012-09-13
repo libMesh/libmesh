@@ -17,18 +17,18 @@
 
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 // C++ includes
 #include <cmath> // for std::abs
 #include <limits> // std::numeric_limits<T>::min()
 
 // Local Includes
-#include "distributed_vector.h"
-#include "dense_vector.h"
-#include "dense_subvector.h"
-#include "parallel.h"
-#include "tensor_tools.h"
+#include "libmesh/distributed_vector.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/dense_subvector.h"
+#include "libmesh/parallel.h"
+#include "libmesh/tensor_tools.h"
 
 namespace libMesh
 {

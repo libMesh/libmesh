@@ -21,16 +21,16 @@
 #define __fe_base_h__
 
 // Local includes
-#include "reference_counted_object.h"
-#include "fe_abstract.h"
-#include "point.h"
-#include "vector_value.h"
-#include "enum_elem_type.h"
-#include "fe_type.h"
-#include "auto_ptr.h"
-#include "fe_transformation_base.h"
-#include "tensor_tools.h"
-#include "type_n_tensor.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/fe_abstract.h"
+#include "libmesh/point.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/fe_transformation_base.h"
+#include "libmesh/tensor_tools.h"
+#include "libmesh/type_n_tensor.h"
 
 // C++ includes
 #include <cstddef>

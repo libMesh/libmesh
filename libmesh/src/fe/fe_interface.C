@@ -18,11 +18,11 @@
 
 
 // Local includes
-#include "fe_interface.h"
-#include "elem.h"
-#include "fe.h"
-#include "fe_compute_data.h"
-#include "dof_map.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe.h"
+#include "libmesh/fe_compute_data.h"
+#include "libmesh/dof_map.h"
 
 namespace libMesh
 {

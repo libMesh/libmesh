@@ -21,8 +21,8 @@
 #define __sphere_h__
 
 // Local includes
-#include "surface.h"
-#include "libmesh.h"
+#include "libmesh/surface.h"
+#include "libmesh/libmesh.h"
 
 // C++ includes
 #include <cmath>

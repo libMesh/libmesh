@@ -19,9 +19,9 @@
 #define __xdr_mhead_h__
 
 // Local includes
-#include "xdr_head.h" // for base class
-#include "xdr_mesh.h" // for friend
-#include "enum_elem_type.h" // for ElemType
+#include "libmesh/xdr_head.h" // for base class
+#include "libmesh/xdr_mesh.h" // for friend
+#include "libmesh/enum_elem_type.h" // for ElemType
 
 // C++ includes
 #include <vector>

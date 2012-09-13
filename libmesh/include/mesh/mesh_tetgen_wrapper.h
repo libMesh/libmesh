@@ -18,7 +18,7 @@
 #ifndef __mesh_tetgen_wrapper_h__
 #define __mesh_tetgen_wrapper_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_TETGEN
 
 // Local includes

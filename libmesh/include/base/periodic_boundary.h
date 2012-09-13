@@ -20,13 +20,13 @@
 #define __periodic_boundary_h__
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 // Local Includes -----------------------------------
-#include "periodic_boundary_base.h"
-#include "vector_value.h" // RealVectorValue
+#include "libmesh/periodic_boundary_base.h"
+#include "libmesh/vector_value.h" // RealVectorValue
 
 namespace libMesh {
 

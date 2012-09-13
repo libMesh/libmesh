@@ -21,7 +21,7 @@
 #define __point_h__
 
 // Local includes
-#include "type_vector.h"
+#include "libmesh/type_vector.h"
 
 // C++ includes
 

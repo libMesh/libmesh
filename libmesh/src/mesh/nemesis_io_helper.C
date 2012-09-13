@@ -22,11 +22,11 @@
 #include <sstream>
 
 // Libmesh headers
-#include "nemesis_io_helper.h"
-#include "node.h"
-#include "elem.h"
-#include "boundary_info.h"
-#include "parallel.h"
+#include "libmesh/nemesis_io_helper.h"
+#include "libmesh/node.h"
+#include "libmesh/elem.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/parallel.h"
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 

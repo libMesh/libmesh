@@ -26,13 +26,13 @@
 #endif
 
 // Local includes
-#include "libmesh.h"
-#include "auto_ptr.h"
-#include "getpot.h"
-#include "parallel.h"
-#include "reference_counter.h"
-#include "remote_elem.h"
-#include "threads.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/getpot.h"
+#include "libmesh/parallel.h"
+#include "libmesh/reference_counter.h"
+#include "libmesh/remote_elem.h"
+#include "libmesh/threads.h"
 
 
 // floating-point exceptions

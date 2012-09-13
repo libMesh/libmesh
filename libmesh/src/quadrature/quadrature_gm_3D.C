@@ -18,7 +18,7 @@
 
 
 // Local includes
-#include "quadrature_gm.h"
+#include "libmesh/quadrature_gm.h"
 
 namespace libMesh
 {

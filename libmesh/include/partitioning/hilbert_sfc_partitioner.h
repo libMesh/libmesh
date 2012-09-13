@@ -21,7 +21,7 @@
 #define __hilbert_sfc_partitioner_h__
 
 // Local Includes -----------------------------------
-#include "sfc_partitioner.h"
+#include "libmesh/sfc_partitioner.h"
 
 // C++ Includes   -----------------------------------
 

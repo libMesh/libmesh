@@ -20,14 +20,14 @@
 #ifndef __petsc_matrix_h__
 #define __petsc_matrix_h__
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
 // Local includes
-#include "sparse_matrix.h"
-#include "petsc_macro.h"
-#include "parallel.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/petsc_macro.h"
+#include "libmesh/parallel.h"
 
 // C++ includes
 #include <algorithm>

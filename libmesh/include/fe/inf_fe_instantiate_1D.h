@@ -32,7 +32,7 @@
 
 
 // Local includes
-#include "inf_fe_macro.h"
+#include "libmesh/inf_fe_macro.h"
 
 namespace libMesh
 {

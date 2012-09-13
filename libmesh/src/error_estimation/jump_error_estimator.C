@@ -22,20 +22,20 @@
 
 
 // Local Includes
-#include "libmesh_common.h"
-#include "jump_error_estimator.h"
-#include "dof_map.h"
-#include "error_vector.h"
-#include "fe_base.h"
-#include "fe_interface.h"
-#include "quadrature_gauss.h"
-#include "libmesh_logging.h"
-#include "elem.h"
-#include "mesh_base.h"
-#include "system.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/jump_error_estimator.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/system.h"
 
-#include "dense_vector.h"
-#include "numeric_vector.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {

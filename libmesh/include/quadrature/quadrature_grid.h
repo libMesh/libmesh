@@ -21,7 +21,7 @@
 #define __quadrature_grid_h__
 
 // Local includes
-#include "quadrature.h"
+#include "libmesh/quadrature.h"
 
 // C++ includes
 

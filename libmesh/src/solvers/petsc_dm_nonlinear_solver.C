@@ -16,20 +16,20 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "petsc_macro.h"
+#include "libmesh/petsc_macro.h"
 
 // This only works with petsc-3.3 and above.
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
 
 // Local Includes
-#include "libmesh_common.h"
-#include "nonlinear_implicit_system.h"
-#include "petsc_dm_nonlinear_solver.h"
-#include "petsc_linear_solver.h"
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
-#include "dof_map.h"
-#include "preconditioner.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/nonlinear_implicit_system.h"
+#include "libmesh/petsc_dm_nonlinear_solver.h"
+#include "libmesh/petsc_linear_solver.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/preconditioner.h"
 
 // PETSc extern definition
 EXTERN_C_BEGIN

@@ -19,7 +19,7 @@
 #define __petsc_macro_h__
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 

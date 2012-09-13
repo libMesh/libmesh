@@ -21,7 +21,7 @@
 #define __continuation_system_h__
 
 // Local Includes
-#include "fem_system.h"
+#include "libmesh/fem_system.h"
 
 // C++ includes
 

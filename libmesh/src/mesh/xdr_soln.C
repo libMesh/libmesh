@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "xdr_soln.h"
-#include "xdr_shead.h"
+#include "libmesh/xdr_soln.h"
+#include "libmesh/xdr_shead.h"
 
 // System includes
 #include <string.h>

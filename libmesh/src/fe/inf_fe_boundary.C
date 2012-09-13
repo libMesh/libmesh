@@ -21,12 +21,12 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-#include "inf_fe.h"
-#include "inf_fe_macro.h"
-#include "quadrature.h"
-#include "elem.h"
+#include "libmesh/inf_fe.h"
+#include "libmesh/inf_fe_macro.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {
@@ -309,9 +309,9 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
 //--------------------------------------------------------------
 // Explicit instantiations - doesn't make sense in 1D, but as
 // long as we only return errors, we are fine... ;-)
-//#include "inf_fe_instantiate_1D.h"
-//#include "inf_fe_instantiate_2D.h"
-//#include "inf_fe_instantiate_3D.h"
+//#include "libmesh/inf_fe_instantiate_1D.h"
+//#include "libmesh/inf_fe_instantiate_2D.h"
+//#include "libmesh/inf_fe_instantiate_3D.h"
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real, const std::vector<Point>* const, const std::vector<Real>* const));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real, const std::vector<Point>* const, const std::vector<Real>* const));
 INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,reinit(const Elem*,const unsigned int, const Real, const std::vector<Point>* const, const std::vector<Real>* const));

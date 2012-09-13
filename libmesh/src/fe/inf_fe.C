@@ -18,12 +18,12 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-#include "inf_fe.h"
-#include "quadrature_gauss.h"
-#include "elem.h"
-#include "libmesh_logging.h"
+#include "libmesh/inf_fe.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/elem.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {
@@ -1025,9 +1025,9 @@ bool InfFE<Dim,T_radial,T_map>::shapes_need_reinit() const
 
 //--------------------------------------------------------------
 // Explicit instantiations
-#include "inf_fe_instantiate_1D.h"
-#include "inf_fe_instantiate_2D.h"
-#include "inf_fe_instantiate_3D.h"
+#include "libmesh/inf_fe_instantiate_1D.h"
+#include "libmesh/inf_fe_instantiate_2D.h"
+#include "libmesh/inf_fe_instantiate_3D.h"
 
 
 

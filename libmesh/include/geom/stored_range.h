@@ -21,7 +21,7 @@
 #define __stored_range_h__
 
 // Local includes
-#include "threads.h"
+#include "libmesh/threads.h"
 
 // C++ includes
 #include <vector>

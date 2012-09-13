@@ -21,8 +21,8 @@
 #define __derived_rb_evaluation_h__
 
 // Local includes
-#include "dense_vector.h"
-#include "rb_evaluation.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/rb_evaluation.h"
 
 // C++ includes
 

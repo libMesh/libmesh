@@ -19,9 +19,9 @@
 // C++ includes
 
 // Local includes
-#include "cell_tet.h"
-#include "cell_tet4.h"
-#include "face_tri3.h"
+#include "libmesh/cell_tet.h"
+#include "libmesh/cell_tet4.h"
+#include "libmesh/face_tri3.h"
 
 namespace libMesh
 {

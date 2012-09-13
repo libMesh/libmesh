@@ -20,11 +20,11 @@
 #include <fstream>
 
 // Local includes
-#include "diva_io.h"
-#include "boundary_mesh.h"
-#include "mesh_tools.h"
-#include "elem.h"
-#include "boundary_info.h"
+#include "libmesh/diva_io.h"
+#include "libmesh/boundary_mesh.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/elem.h"
+#include "libmesh/boundary_info.h"
 
 namespace libMesh
 {

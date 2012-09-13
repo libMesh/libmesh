@@ -18,16 +18,16 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // only compile these functions if the user requests AMR support
 #ifdef LIBMESH_ENABLE_AMR
 
-#include "elem.h"
-#include "mesh_base.h"
-#include "mesh_refinement.h"
-#include "parallel.h"
-#include "remote_elem.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/parallel.h"
+#include "libmesh/remote_elem.h"
 
 namespace libMesh
 {

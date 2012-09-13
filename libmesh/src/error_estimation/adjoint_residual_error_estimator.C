@@ -20,15 +20,15 @@
 #include <iostream>
 
 // Local Includes
-#include "adjoint_residual_error_estimator.h"
-#include "error_vector.h"
-#include "o_string_stream.h"
-#include "patch_recovery_error_estimator.h"
-#include "libmesh_logging.h"
-#include "numeric_vector.h"
-#include "system.h"
-#include "system_norm.h"
-#include "qoi_set.h"
+#include "libmesh/adjoint_residual_error_estimator.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/patch_recovery_error_estimator.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/system.h"
+#include "libmesh/system_norm.h"
+#include "libmesh/qoi_set.h"
 
 
 namespace libMesh

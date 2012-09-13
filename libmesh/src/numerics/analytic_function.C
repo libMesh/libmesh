@@ -21,7 +21,7 @@
 
 
 // Local Includes
-#include "analytic_function.h"
+#include "libmesh/analytic_function.h"
 
 namespace libMesh
 {

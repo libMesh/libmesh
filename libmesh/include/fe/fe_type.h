@@ -21,11 +21,11 @@
 #define __fe_type_h__
 
 // Local includes
-#include "auto_ptr.h"
-#include "libmesh_config.h"
-#include "enum_order.h"
-#include "enum_fe_family.h"
-#include "enum_inf_map_type.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/enum_fe_family.h"
+#include "libmesh/enum_inf_map_type.h"
 
 // C++ includes
 

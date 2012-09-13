@@ -23,12 +23,12 @@
 // Periodic boundary conditions information
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 // Local Includes -----------------------------------
-#include "vector_value.h" // RealVectorValue
+#include "libmesh/vector_value.h" // RealVectorValue
 
 // C++ Includes   -----------------------------------
 #include <map>

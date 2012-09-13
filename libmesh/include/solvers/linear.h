@@ -21,8 +21,8 @@
 #define __linear_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "solver.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/solver.h"
 
 // C++ includes
 

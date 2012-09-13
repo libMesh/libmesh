@@ -1,23 +1,23 @@
 #ifndef __assembly_h__
 #define __assembly_h__
 
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "fe.h"
-#include "fe_interface.h"
-#include "fe_base.h"
-#include "elem_assembly.h"
-#include "quadrature_gauss.h"
-#include "boundary_info.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/elem_assembly.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/boundary_info.h"
 
 // rbOOmit includes
-#include "rb_theta.h"
-#include "rb_assembly_expansion.h"
-#include "rb_parametrized_function.h"
-#include "rb_eim_construction.h"
-#include "rb_eim_theta.h"
+#include "libmesh/rb_theta.h"
+#include "libmesh/rb_assembly_expansion.h"
+#include "libmesh/rb_parametrized_function.h"
+#include "libmesh/rb_eim_construction.h"
+#include "libmesh/rb_eim_theta.h"
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.

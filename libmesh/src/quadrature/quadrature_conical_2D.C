@@ -17,7 +17,7 @@
 
 
 // Local includes
-#include "quadrature_conical.h"
+#include "libmesh/quadrature_conical.h"
 
 namespace libMesh
 {

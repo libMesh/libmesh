@@ -20,8 +20,8 @@
 #define __sparsity_pattern_h__
 
 // Local Includes
-#include "elem_range.h"
-#include "threads_allocators.h"
+#include "libmesh/elem_range.h"
+#include "libmesh/threads_allocators.h"
 
 // C++ includes
 #include <vector>

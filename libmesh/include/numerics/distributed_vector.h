@@ -17,7 +17,7 @@
 
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 
 
@@ -25,8 +25,8 @@
 #define __distributed_vector_h__
 
 // Local includes
-#include "numeric_vector.h"
-#include "parallel.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/parallel.h"
 
 // C++ includes
 #include <vector>

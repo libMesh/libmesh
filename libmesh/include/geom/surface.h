@@ -21,7 +21,7 @@
 #define __surface_h__
 
 // Local includes
-#include "point.h"
+#include "libmesh/point.h"
 
 // C++ includes
 

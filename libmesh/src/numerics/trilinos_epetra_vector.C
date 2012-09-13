@@ -19,15 +19,15 @@
 #include <limits>
 
 // Local Includes
-#include "trilinos_epetra_vector.h"
+#include "libmesh/trilinos_epetra_vector.h"
 
 #ifdef LIBMESH_HAVE_TRILINOS
 
-#include "dense_subvector.h"
-#include "dense_vector.h"
-#include "parallel.h"
-#include "trilinos_epetra_matrix.h"
-#include "utility.h"
+#include "libmesh/dense_subvector.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/parallel.h"
+#include "libmesh/trilinos_epetra_matrix.h"
+#include "libmesh/utility.h"
 
 // Trilinos Includes
 #include <Epetra_LocalMap.h>

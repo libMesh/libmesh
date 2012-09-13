@@ -21,7 +21,7 @@
 #define __exact_error_estimator_h__
 
 // Local Includes
-#include "error_estimator.h"
+#include "libmesh/error_estimator.h"
 
 // C++ includes
 #include <cstddef>

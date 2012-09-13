@@ -19,9 +19,9 @@
 // C++ inlcludes
 
 // Local includes
-#include "fe.h"
-#include "elem.h"
-#include "utility.h"
+#include "libmesh/fe.h"
+#include "libmesh/elem.h"
+#include "libmesh/utility.h"
 
 
 namespace libMesh

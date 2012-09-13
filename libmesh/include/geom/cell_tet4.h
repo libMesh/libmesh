@@ -21,7 +21,7 @@
 #define __cell_tet4_h__
 
 // Local includes
-#include "cell_tet.h"
+#include "libmesh/cell_tet.h"
 
 // C++ includes
 #include <cstddef>

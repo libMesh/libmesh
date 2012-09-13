@@ -20,12 +20,12 @@
 #include <algorithm>  // std::lower_bound
 
 // Local includes
-#include "parallel_histogram.h"
+#include "libmesh/parallel_histogram.h"
 #ifdef LIBMESH_HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif
-#include "parallel.h"
-#include "parallel_conversion_utils.h"
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_conversion_utils.h"
 
 namespace libMesh
 {

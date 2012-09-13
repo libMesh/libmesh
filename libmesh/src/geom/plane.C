@@ -20,7 +20,7 @@
 // C++ includes
 
 // Local includes
-#include "plane.h"
+#include "libmesh/plane.h"
 
 namespace libMesh
 {

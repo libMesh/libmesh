@@ -15,8 +15,8 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-#include "libmesh_common.h"
-#include "vector_value.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/vector_value.h"
 
 #ifndef __curl_curl_exact_solution_h__
 #define __curl_curl_exact_solution_h__

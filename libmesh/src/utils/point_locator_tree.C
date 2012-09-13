@@ -20,12 +20,12 @@
 // C++ includes
 
 // Local Includes
-#include "elem.h"
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "mesh_tools.h"
-#include "point_locator_tree.h"
-#include "tree.h"
+#include "libmesh/elem.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/point_locator_tree.h"
+#include "libmesh/tree.h"
 
 namespace libMesh
 {

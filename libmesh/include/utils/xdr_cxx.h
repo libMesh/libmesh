@@ -21,10 +21,10 @@
 #define __xdr_cxx_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "libmesh.h"
-#include "enum_xdr_mode.h"
-#include "auto_ptr.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/enum_xdr_mode.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #ifdef LIBMESH_HAVE_XDR

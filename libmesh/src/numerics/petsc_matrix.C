@@ -19,15 +19,15 @@
 // C++ includes
 #include <unistd.h> // mkstemp
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
 // Local includes
-#include "petsc_matrix.h"
-#include "dof_map.h"
-#include "dense_matrix.h"
-#include "petsc_vector.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/petsc_vector.h"
 
 namespace libMesh
 {

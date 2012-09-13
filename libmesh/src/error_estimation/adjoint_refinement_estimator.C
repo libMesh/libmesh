@@ -28,19 +28,19 @@ namespace libMesh
 
 
 // Local Includes
-#include "dof_map.h"
-#include "elem.h"
-#include "equation_systems.h"
-#include "error_vector.h"
-#include "fe.h"
-#include "fe_interface.h"
-#include "libmesh_common.h"
-#include "libmesh_logging.h"
-#include "mesh_refinement.h"
-#include "numeric_vector.h"
-#include "quadrature.h"
-#include "system.h"
-#include "adjoint_refinement_estimator.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/system.h"
+#include "libmesh/adjoint_refinement_estimator.h"
 
 //-----------------------------------------------------------------
 // ErrorEstimator implementations

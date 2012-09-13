@@ -23,8 +23,8 @@
 
 
 // Local Includes -----------------------------------
-#include "libmesh_common.h"
-#include "mesh_tools.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/mesh_tools.h"
 
 // C++ Includes   -----------------------------------
 

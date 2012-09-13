@@ -21,7 +21,7 @@
 #include <math.h>
 
 // Mesh library includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

@@ -20,11 +20,11 @@
 // C++ includes
 
 // Local Includes
-#include "nonlinear_solver.h"
-#include "petsc_nonlinear_solver.h"
-#include "petsc_dm_nonlinear_solver.h"
-#include "trilinos_nox_nonlinear_solver.h"
-#include "auto_ptr.h"
+#include "libmesh/nonlinear_solver.h"
+#include "libmesh/petsc_nonlinear_solver.h"
+#include "libmesh/petsc_dm_nonlinear_solver.h"
+#include "libmesh/trilinos_nox_nonlinear_solver.h"
+#include "libmesh/auto_ptr.h"
 
 namespace libMesh
 {

@@ -21,9 +21,9 @@
 #define __reference_counter_h__
 
 // Local includes
-#include "libmesh_config.h"
-#include "threads.h"
-#include "libmesh.h" // libMesh::on_command_line
+#include "libmesh/libmesh_config.h"
+#include "libmesh/threads.h"
+#include "libmesh/libmesh.h" // libMesh::on_command_line
 
 // C++ includes
 #include <iostream>

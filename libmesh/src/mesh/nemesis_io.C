@@ -20,17 +20,17 @@
 #include <numeric> // std::accumulate
 
 // LibMesh includes
-#include "elem.h"
-#include "exodusII_io.h"
-#include "libmesh_logging.h"
-#include "nemesis_io.h"
-#include "nemesis_io_helper.h"
-#include "node.h"
-#include "parallel_mesh.h"
-#include "parallel.h"
-#include "utility.h" // is_sorted, deallocate
-#include "boundary_info.h"
-#include "mesh_communication.h"
+#include "libmesh/elem.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/nemesis_io.h"
+#include "libmesh/nemesis_io_helper.h"
+#include "libmesh/node.h"
+#include "libmesh/parallel_mesh.h"
+#include "libmesh/parallel.h"
+#include "libmesh/utility.h" // is_sorted, deallocate
+#include "libmesh/boundary_info.h"
+#include "libmesh/mesh_communication.h"
 
 namespace libMesh
 {

@@ -21,22 +21,22 @@
 #include <vector>
 
 // Local includes
-#include "boundary_info.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "dirichlet_boundaries.h"
-#include "dof_map.h"
-#include "elem.h"
-#include "equation_systems.h"
-#include "fe_base.h"
-#include "fe_interface.h"
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "numeric_vector.h"
-#include "quadrature_gauss.h"
-#include "system.h"
-#include "threads.h"
-#include "wrapped_function.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/system.h"
+#include "libmesh/threads.h"
+#include "libmesh/wrapped_function.h"
 
 namespace libMesh
 {

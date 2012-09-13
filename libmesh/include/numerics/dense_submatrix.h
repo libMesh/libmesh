@@ -21,9 +21,9 @@
 #define __dense_submatrix_h__
 
 // Local Includes
-#include "libmesh_common.h"
-#include "dense_matrix.h"
-#include "dense_subvector.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_subvector.h"
 
 // C++ includes
 

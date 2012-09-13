@@ -18,7 +18,7 @@
 
 
 // Local includes
-#include "sparse_shell_matrix.h"
+#include "libmesh/sparse_shell_matrix.h"
 
 namespace libMesh
 {

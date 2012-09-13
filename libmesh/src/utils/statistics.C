@@ -22,8 +22,8 @@
 #include <numeric> // std::accumulate
 
 // Local includes
-#include "statistics.h"
-#include "libmesh_logging.h"
+#include "libmesh/statistics.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {

@@ -17,9 +17,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "fe_type.h"
-#include "quadrature_clough.h"
-#include "quadrature_gauss.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/quadrature_clough.h"
+#include "libmesh/quadrature_gauss.h"
 
 namespace libMesh
 {

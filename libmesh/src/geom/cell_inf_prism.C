@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
@@ -24,10 +24,10 @@
 // include <algorithm>
 
 // Local includes cont'd
-#include "cell_inf_prism.h"
-#include "cell_inf_prism6.h"
-#include "face_tri3.h"
-#include "face_inf_quad4.h"
+#include "libmesh/cell_inf_prism.h"
+#include "libmesh/cell_inf_prism6.h"
+#include "libmesh/face_tri3.h"
+#include "libmesh/face_inf_quad4.h"
 
 namespace libMesh
 {

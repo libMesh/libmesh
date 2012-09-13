@@ -25,7 +25,7 @@
 
 
 // C++ includes
-#include "libmesh_common.h" // for libmesh_assert()
+#include "libmesh/libmesh_common.h" // for libmesh_assert()
 
 // Local includes
 #include <vector>

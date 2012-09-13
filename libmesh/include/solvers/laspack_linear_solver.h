@@ -20,7 +20,7 @@
 #ifndef __laspack_linear_solver_h__
 #define __laspack_linear_solver_h__
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #if defined(LIBMESH_HAVE_LASPACK)
 //#if defined(LIBMESH_HAVE_LASPACK) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
@@ -31,9 +31,9 @@
 #include <errhandl.h>
 
 // Local includes
-#include "linear_solver.h"
-#include "laspack_vector.h"
-#include "laspack_matrix.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/laspack_vector.h"
+#include "libmesh/laspack_matrix.h"
 
 // C++ includes
 

@@ -21,7 +21,7 @@
 #define __boundary_mesh_h__
 
 // Local Includes -----------------------------------
-#include "mesh.h"
+#include "libmesh/mesh.h"
 
 // C++ Includes   -----------------------------------
 

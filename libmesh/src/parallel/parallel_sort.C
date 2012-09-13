@@ -21,11 +21,11 @@
 #include <iostream>
 
 // Local Includes
-#include "libmesh_common.h"
-#include "parallel.h"
-#include "parallel_hilbert.h"
-#include "parallel_sort.h"
-#include "parallel_bin_sorter.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_hilbert.h"
+#include "libmesh/parallel_sort.h"
+#include "libmesh/parallel_bin_sorter.h"
 #ifdef LIBMESH_HAVE_LIBHILBERT
 #  include "hilbert.h"
 #endif

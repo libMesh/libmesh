@@ -20,7 +20,7 @@
 #include <fstream>
 
 // Local includes
-#include "plt_loader.h"
+#include "libmesh/plt_loader.h"
 
 namespace libMesh
 {

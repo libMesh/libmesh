@@ -18,24 +18,24 @@
 
 
 // Local includes
-#include "fe.h"
-#include "inf_fe.h"
-#include "libmesh_logging.h"
+#include "libmesh/fe.h"
+#include "libmesh/inf_fe.h"
+#include "libmesh/libmesh_logging.h"
 // For projection code:
-#include "boundary_info.h"
-#include "mesh_base.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "dof_map.h"
-#include "elem.h"
-#include "fe_interface.h"
-#include "numeric_vector.h"
-#include "periodic_boundary_base.h"
-#include "periodic_boundaries.h"
-#include "quadrature.h"
-#include "quadrature_gauss.h"
-#include "tensor_value.h"
-#include "threads.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/periodic_boundary_base.h"
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/threads.h"
 
 // Anonymous namespace, for a helper function for periodic boundary
 // constraint calculations

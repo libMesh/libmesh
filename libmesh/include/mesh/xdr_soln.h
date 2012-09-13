@@ -19,7 +19,7 @@
 #define __xdr_soln_h__
 
 // Local includes
-#include "xdr_mgf.h"
+#include "libmesh/xdr_mgf.h"
 
 // C++ includes
 

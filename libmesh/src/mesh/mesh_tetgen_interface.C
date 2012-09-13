@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_TETGEN
 
 
@@ -23,12 +23,12 @@
 #include <sstream>
 
 // Local includes
-#include "cell_tet4.h"
-#include "face_tri3.h"
-#include "unstructured_mesh.h"
-#include "mesh_tetgen_interface.h"
-#include "utility.h" // binary_find
-#include "mesh_tetgen_wrapper.h"
+#include "libmesh/cell_tet4.h"
+#include "libmesh/face_tri3.h"
+#include "libmesh/unstructured_mesh.h"
+#include "libmesh/mesh_tetgen_interface.h"
+#include "libmesh/utility.h" // binary_find
+#include "libmesh/mesh_tetgen_wrapper.h"
 
 namespace libMesh
 {

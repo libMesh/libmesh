@@ -1,7 +1,7 @@
 // Libmesh includes
-#include "mesh_generation.h"
-#include "numeric_vector.h"
-#include "serial_mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/serial_mesh.h"
 
 // Example includes
 #include "biharmonic.h"

@@ -21,7 +21,7 @@
 #define __cell_pyramid5_h__
 
 // Local includes
-#include "cell_pyramid.h"
+#include "libmesh/cell_pyramid.h"
 
 // C++ includes
 #include <cstddef>

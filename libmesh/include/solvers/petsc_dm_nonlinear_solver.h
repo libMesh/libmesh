@@ -20,7 +20,7 @@
 #ifndef __petsc_dm_nonlinear_solver_h__
 #define __petsc_dm_nonlinear_solver_h__
 
-#include "petsc_macro.h"
+#include "libmesh/petsc_macro.h"
 
 // This only works with petsc-3.3 and above.
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
@@ -32,7 +32,7 @@
 
 
 // Local includes
-#include "petsc_nonlinear_solver.h"
+#include "libmesh/petsc_nonlinear_solver.h"
 
 namespace libMesh
 {

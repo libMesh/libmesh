@@ -21,9 +21,9 @@
 #define __elem_range_h__
 
 // Local includes
-#include "elem.h"
-#include "mesh_base.h"
-#include "stored_range.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/stored_range.h"
 
 namespace libMesh
 {

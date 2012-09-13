@@ -21,7 +21,7 @@
 #define __discontinuity_measure_h__
 
 // Local Includes
-#include "jump_error_estimator.h"
+#include "libmesh/jump_error_estimator.h"
 
 // C++ includes
 #include <cstddef>

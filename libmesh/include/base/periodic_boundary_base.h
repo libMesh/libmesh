@@ -20,13 +20,13 @@
 #define __periodic_boundary_base_h__
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
 // Local Includes -----------------------------------
-#include "point.h"
-#include "auto_ptr.h"
+#include "libmesh/point.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ Includes   -----------------------------------
 #include <set>

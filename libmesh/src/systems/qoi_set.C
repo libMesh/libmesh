@@ -21,8 +21,8 @@
 #include <vector>
 
 // Local Includes -----------------------------------
-#include "qoi_set.h"
-#include "system.h"
+#include "libmesh/qoi_set.h"
+#include "libmesh/system.h"
 
 namespace libMesh
 {

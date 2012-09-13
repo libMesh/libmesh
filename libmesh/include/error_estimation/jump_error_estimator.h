@@ -21,10 +21,10 @@
 #define __jump_error_estimator_h__
 
 // Local Includes
-#include "auto_ptr.h"
-#include "dense_vector.h"
-#include "error_estimator.h"
-#include "fe_base.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/error_estimator.h"
+#include "libmesh/fe_base.h"
 
 // C++ includes
 #include <cstddef>

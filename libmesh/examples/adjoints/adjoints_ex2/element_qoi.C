@@ -1,10 +1,10 @@
 // General libMesh includes
-#include "libmesh_common.h"
-#include "elem.h"
-#include "fe_base.h"
-#include "fem_context.h"
-#include "point.h"
-#include "quadrature.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fem_context.h"
+#include "libmesh/point.h"
+#include "libmesh/quadrature.h"
 
 // Local includes
 #include "L-shaped.h"

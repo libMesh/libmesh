@@ -17,7 +17,7 @@
 
 
 // library configuration
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // System includes
 #include <sys/time.h>
@@ -26,9 +26,9 @@
 #include <sys/utsname.h>
 
 // Local includes
-#include "o_string_stream.h"
-#include "utility.h"
-#include "timestamp.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/utility.h"
+#include "libmesh/timestamp.h"
 
 namespace libMesh
 {

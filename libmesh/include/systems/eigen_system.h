@@ -19,15 +19,15 @@
 #ifndef __eigen_system_h__
 #define __eigen_system_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Currently, the EigenSystem should only be available
 // if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC)
 
 // Local Includes
-#include "system.h"
-#include "eigen_solver.h"
+#include "libmesh/system.h"
+#include "libmesh/eigen_solver.h"
 
 // C++ includes
 

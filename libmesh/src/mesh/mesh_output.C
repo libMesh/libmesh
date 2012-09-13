@@ -17,11 +17,11 @@
 
 
 // Local includes
-#include "equation_systems.h"
-#include "mesh_output.h"
-#include "parallel.h"
-#include "parallel_mesh.h"
-#include "unstructured_mesh.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/mesh_output.h"
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_mesh.h"
+#include "libmesh/unstructured_mesh.h"
 
 namespace libMesh
 {

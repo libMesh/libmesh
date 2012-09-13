@@ -21,9 +21,9 @@
 #include <iostream>
 
 // Local includes
-#include "postscript_io.h"
-#include "mesh_tools.h"
-#include "elem.h"
+#include "libmesh/postscript_io.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

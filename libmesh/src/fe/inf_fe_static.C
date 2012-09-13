@@ -17,14 +17,14 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-#include "inf_fe.h"
-#include "inf_fe_macro.h"
-#include "fe.h"
-#include "fe_interface.h"
-#include "fe_compute_data.h"
-#include "elem.h"
+#include "libmesh/inf_fe.h"
+#include "libmesh/inf_fe_macro.h"
+#include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_compute_data.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {
@@ -959,9 +959,9 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
 
 //--------------------------------------------------------------
 // Explicit instantiations
-//#include "inf_fe_instantiate_1D.h"
-//#include "inf_fe_instantiate_2D.h"
-//#include "inf_fe_instantiate_3D.h"
+//#include "libmesh/inf_fe_instantiate_1D.h"
+//#include "libmesh/inf_fe_instantiate_2D.h"
+//#include "libmesh/inf_fe_instantiate_3D.h"
 
 INSTANTIATE_INF_FE_MBRF(1,CARTESIAN,unsigned int,n_dofs(const FEType&,const ElemType));
 INSTANTIATE_INF_FE_MBRF(2,CARTESIAN,unsigned int,n_dofs(const FEType&,const ElemType));

@@ -21,7 +21,7 @@
 #define __quadrature_rules_h__
 
 // Local includes
-#include "enum_quadrature_type.h"
+#include "libmesh/enum_quadrature_type.h"
 
 // C++ includes
 #include <string>

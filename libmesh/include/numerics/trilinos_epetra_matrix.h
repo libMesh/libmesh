@@ -20,7 +20,7 @@
 #ifndef __trilinos_epetra_matrix_h__
 #define __trilinos_epetra_matrix_h__
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_TRILINOS
 
@@ -31,7 +31,7 @@
 #include <Epetra_MpiComm.h>
 
 // Local includes
-#include "sparse_matrix.h"
+#include "libmesh/sparse_matrix.h"
 
 // C++ includes
 #include <algorithm>

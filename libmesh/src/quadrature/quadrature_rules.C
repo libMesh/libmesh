@@ -20,8 +20,8 @@
 #include <iostream>
 
 // Local includes
-#include "libmesh_common.h"
-#include "quadrature_rules.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/quadrature_rules.h"
 
 namespace libMesh
 {

@@ -17,12 +17,12 @@
 
 
 // Local Includes
-#include "dense_matrix.h"
-#include "dense_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
 
 
 #if (LIBMESH_HAVE_PETSC && LIBMESH_USE_REAL_NUMBERS)
-#include "petsc_macro.h"
+#include "libmesh/petsc_macro.h"
 
 EXTERN_C_FOR_PETSC_BEGIN
 #include <petscblaslapack.h>

@@ -18,16 +18,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // rbOOmit includes
-#include "transient_rb_evaluation.h"
-#include "transient_rb_theta_expansion.h"
+#include "libmesh/transient_rb_evaluation.h"
+#include "libmesh/transient_rb_theta_expansion.h"
 
 // libMesh includes
-#include "numeric_vector.h"
-#include "libmesh_logging.h"
-#include "xdr_cxx.h"
-#include "parallel.h"
-#include "getpot.h"
-#include "o_string_stream.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/xdr_cxx.h"
+#include "libmesh/parallel.h"
+#include "libmesh/getpot.h"
+#include "libmesh/o_string_stream.h"
 
 // C++ includes
 #include <fstream>

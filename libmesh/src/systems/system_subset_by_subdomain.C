@@ -21,10 +21,10 @@
 
 
 // Local includes
-#include "system_subset_by_subdomain.h"
-#include "system.h"
-#include "dof_map.h"
-#include "parallel.h"
+#include "libmesh/system_subset_by_subdomain.h"
+#include "libmesh/system.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/parallel.h"
 
 namespace libMesh
 {

@@ -23,11 +23,11 @@
 
 
 // Local Includes -----------------------------------
-#include "libmesh.h"
-#include "enum_elem_type.h"
-#include "id_types.h"
-#include "mesh_base.h"
-#include "point.h" // some compilers want the full definition - I think so they can do
+#include "libmesh/libmesh.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/id_types.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/point.h" // some compilers want the full definition - I think so they can do
                    // return-value-optimization for BoundingBox'es - BSK
 
 // C++ Includes   -----------------------------------

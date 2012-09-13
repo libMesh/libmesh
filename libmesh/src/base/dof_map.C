@@ -22,26 +22,26 @@
 #include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
 
 // Local Includes -----------------------------------
-#include "coupling_matrix.h"
-#include "dense_matrix.h"
-#include "dense_vector_base.h"
-#include "dirichlet_boundaries.h"
-#include "dof_map.h"
-#include "elem.h"
-#include "fe_interface.h"
-#include "fe_type.h"
-#include "fe_base.h" // FEBase::build() for continuity test
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "mesh_tools.h"
-#include "numeric_vector.h"
-#include "o_string_stream.h"
-#include "parallel.h"
-#include "periodic_boundaries.h"
-#include "sparse_matrix.h"
-#include "sparsity_pattern.h"
-#include "string_to_enum.h"
-#include "threads.h"
+#include "libmesh/coupling_matrix.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector_base.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/fe_base.h" // FEBase::build() for continuity test
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/parallel.h"
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/sparsity_pattern.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/threads.h"
 
 
 

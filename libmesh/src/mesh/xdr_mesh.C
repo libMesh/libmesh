@@ -16,9 +16,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "xdr_mesh.h"
-#include "xdr_mhead.h"
-#include "enum_elem_type.h" // for ElemType
+#include "libmesh/xdr_mesh.h"
+#include "libmesh/xdr_mhead.h"
+#include "libmesh/enum_elem_type.h" // for ElemType
 
 namespace libMesh
 {

@@ -20,10 +20,10 @@
 #define __ensight_io_h__
 
 // libMesh includes
-#include "libmesh.h"
-#include "enum_elem_type.h"
-#include "mesh_base.h"
-#include "mesh_output.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_output.h"
 
 // C++ includes
 #include <map>

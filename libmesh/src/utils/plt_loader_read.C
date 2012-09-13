@@ -21,8 +21,8 @@
 #include <cstring>
 
 // Local includes
-#include "utility.h"
-#include "plt_loader.h"
+#include "libmesh/utility.h"
+#include "libmesh/plt_loader.h"
 
 namespace libMesh
 {

@@ -21,8 +21,8 @@
 #define __hp_singular_h__
 
 // Local Includes
-#include "libmesh_common.h"
-#include "point.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/point.h"
 
 // C++ includes
 #include <list>

@@ -22,11 +22,11 @@
 #include <fstream>
 
 // Local includes
-#include "libmesh_config.h"
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "medit_io.h"
-#include "elem.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/medit_io.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

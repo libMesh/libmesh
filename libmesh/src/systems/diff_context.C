@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "diff_context.h"
-#include "diff_system.h"
+#include "libmesh/diff_context.h"
+#include "libmesh/diff_system.h"
 
 namespace libMesh
 {

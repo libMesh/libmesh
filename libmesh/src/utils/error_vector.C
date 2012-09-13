@@ -20,17 +20,17 @@
 #include <limits>
 
 // Local includes
-#include "elem.h"
-#include "error_vector.h"
-#include "libmesh_logging.h"
+#include "libmesh/elem.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/libmesh_logging.h"
 
-#include "dof_map.h"
-#include "equation_systems.h"
-#include "explicit_system.h"
-#include "mesh_base.h"
-#include "numeric_vector.h"
-#include "gmv_io.h"
-#include "tecplot_io.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/explicit_system.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/gmv_io.h"
+#include "libmesh/tecplot_io.h"
 
 namespace libMesh
 {

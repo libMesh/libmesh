@@ -22,13 +22,13 @@
 #include <limits>
 
 // Local Includes
-#include "numeric_vector.h"
-#include "distributed_vector.h"
-#include "laspack_vector.h"
-#include "petsc_vector.h"
-#include "trilinos_epetra_vector.h"
-#include "shell_matrix.h"
-#include "tensor_tools.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/distributed_vector.h"
+#include "libmesh/laspack_vector.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/trilinos_epetra_vector.h"
+#include "libmesh/shell_matrix.h"
+#include "libmesh/tensor_tools.h"
 
 namespace libMesh
 {

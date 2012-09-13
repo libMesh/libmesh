@@ -22,12 +22,12 @@
 
 
 // Local includes
-#include "libmesh_common.h"
-#include "enum_solver_package.h"
-#include "enum_solver_type.h"
-#include "enum_preconditioner_type.h"
-#include "reference_counted_object.h"
-#include "libmesh.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_solver_type.h"
+#include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/libmesh.h"
 
 // C++ includes
 #include <cstddef>

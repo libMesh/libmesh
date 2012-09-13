@@ -16,22 +16,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh_common.h"
-#include "libmesh_logging.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_logging.h"
 
 
 // C++ Includes
 #include <cstdio> // for std::sprintf
 
 // Local Includes
-#include "equation_systems.h"
-#include "mesh_base.h"
-#include "mesh_tools.h"
-#include "parallel_mesh.h"
-#include "parallel.h"
-#include "serial_mesh.h"
-#include "xdr_cxx.h"
-#include "mesh_refinement.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/parallel_mesh.h"
+#include "libmesh/parallel.h"
+#include "libmesh/serial_mesh.h"
+#include "libmesh/xdr_cxx.h"
+#include "libmesh/mesh_refinement.h"
 
 namespace libMesh
 {

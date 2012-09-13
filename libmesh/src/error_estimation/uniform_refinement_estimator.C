@@ -21,22 +21,22 @@
 
 
 // Local Includes
-#include "dof_map.h"
-#include "elem.h"
-#include "equation_systems.h"
-#include "error_vector.h"
-#include "fe.h"
-#include "libmesh_common.h"
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "mesh_refinement.h"
-#include "numeric_vector.h"
-#include "o_string_stream.h"
-#include "quadrature.h"
-#include "system.h"
-#include "uniform_refinement_estimator.h"
-#include "partitioner.h"
-#include "tensor_tools.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/fe.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/system.h"
+#include "libmesh/uniform_refinement_estimator.h"
+#include "libmesh/partitioner.h"
+#include "libmesh/tensor_tools.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 

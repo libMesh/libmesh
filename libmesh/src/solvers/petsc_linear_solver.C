@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
@@ -24,12 +24,12 @@
 #include <string.h>
 
 // Local Includes
-#include "libmesh_logging.h"
-#include "petsc_linear_solver.h"
-#include "shell_matrix.h"
-#include "petsc_matrix.h"
-#include "petsc_preconditioner.h"
-#include "petsc_vector.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/petsc_linear_solver.h"
+#include "libmesh/shell_matrix.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_preconditioner.h"
+#include "libmesh/petsc_vector.h"
 
 namespace libMesh
 {

@@ -21,12 +21,12 @@
 #define __wrapped_function_h__
 
 // Local Includes
-#include "dense_vector.h"
-#include "equation_systems.h"
-#include "function_base.h"
-#include "libmesh_common.h"
-#include "point.h"
-#include "system.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/function_base.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/point.h"
+#include "libmesh/system.h"
 
 // C++ includes
 #include <cstddef>

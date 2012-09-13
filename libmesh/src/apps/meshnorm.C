@@ -1,10 +1,10 @@
 // Open the mesh and solution file named on standard input, find all
 // variables therein, and output their norms and seminorms.
 
-#include "libmesh.h"
+#include "libmesh/libmesh.h"
 
-#include "mesh.h"
-#include "equation_systems.h"
+#include "libmesh/mesh.h"
+#include "libmesh/equation_systems.h"
 
 void output_norms(const System &sys, const NumericVector<Number>&vec, const std::string& vecname)
 {
