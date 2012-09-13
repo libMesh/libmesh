@@ -17,7 +17,7 @@
 
 
 // Local Includes
-#include "dense_vector.h"
+#include "libmesh/dense_vector.h"
 
 namespace libMesh
 {

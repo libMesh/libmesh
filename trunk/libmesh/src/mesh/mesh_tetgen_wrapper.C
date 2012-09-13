@@ -15,15 +15,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_TETGEN
 
 // C++ includes
 #include <iostream>
 
 // Local includes
-#include "libmesh_common.h"
-#include "mesh_tetgen_wrapper.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/mesh_tetgen_wrapper.h"
 
 namespace libMesh
 {

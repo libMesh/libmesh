@@ -44,25 +44,25 @@
 #include <cmath>
 
 // Various include files needed for the mesh & solver functionality.
-#include "libmesh.h"
-#include "mesh.h"
-#include "mesh_refinement.h"
-#include "exodusII_io.h"
-#include "equation_systems.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
-#include "dof_map.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "elem.h"
-#include "string_to_enum.h"
-#include "getpot.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/elem.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/getpot.h"
 
 // The nonlinear solver and system we will be using
-#include "nonlinear_solver.h"
-#include "nonlinear_implicit_system.h"
+#include "libmesh/nonlinear_solver.h"
+#include "libmesh/nonlinear_implicit_system.h"
 
 // Necessary for programmatically setting petsc options
 #ifdef LIBMESH_HAVE_PETSC

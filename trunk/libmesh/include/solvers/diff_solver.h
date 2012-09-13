@@ -21,9 +21,9 @@
 #define __diff_solver_h__
 
 // Local includes
-#include "auto_ptr.h"
-#include "libmesh_common.h"
-#include "reference_counted_object.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/reference_counted_object.h"
 
 // C++ includes
 #include <vector>

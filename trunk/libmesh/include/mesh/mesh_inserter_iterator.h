@@ -22,9 +22,9 @@
 #define __mesh_inserter_iterator_h__
 
 // Local includes
-#include "elem.h"
-#include "mesh_base.h"
-#include "node.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/node.h"
 
 // C++ includes
 #include <iterator>

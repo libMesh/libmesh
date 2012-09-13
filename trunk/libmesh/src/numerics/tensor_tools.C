@@ -15,10 +15,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "tensor_tools.h"
-#include "vector_value.h"
-#include "tensor_value.h"
-#include "type_n_tensor.h"
+#include "libmesh/tensor_tools.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/type_n_tensor.h"
 
 namespace libMesh
 {

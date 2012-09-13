@@ -18,7 +18,7 @@
 #ifndef __pool_allocator_h__
 #define __pool_allocator_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_BOOST
 #  include <boost/pool/pool.hpp>

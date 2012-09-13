@@ -18,29 +18,29 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // LibMesh includes
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "dof_map.h"
-#include "libmesh_logging.h"
-#include "equation_systems.h"
-#include "parallel.h"
-#include "parallel_algebra.h"
-#include "fe.h"
-#include "quadrature.h"
-#include "utility.h"
-#include "fe_interface.h"
-#include "fe_compute_data.h"
-#include "getpot.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_algebra.h"
+#include "libmesh/fe.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/utility.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_compute_data.h"
+#include "libmesh/getpot.h"
 #include <fstream>
 #include <sstream>
-#include "o_string_stream.h"
-#include "exodusII_io.h"
-#include "fem_context.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/fem_context.h"
 
-#include "rb_eim_construction.h"
-#include "rb_eim_evaluation.h"
+#include "libmesh/rb_eim_construction.h"
+#include "libmesh/rb_eim_evaluation.h"
 
 namespace libMesh
 {

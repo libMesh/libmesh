@@ -21,8 +21,8 @@
 #define __rb_theta_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "reference_counted_object.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/reference_counted_object.h"
 
 // C++ includes
 #include <vector>

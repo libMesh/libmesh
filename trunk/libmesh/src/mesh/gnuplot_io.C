@@ -21,10 +21,10 @@
 #include <map>
 
 // Local includes
-#include "elem.h"
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "gnuplot_io.h"
+#include "libmesh/elem.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/gnuplot_io.h"
 
 namespace libMesh
 {

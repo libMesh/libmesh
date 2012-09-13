@@ -21,7 +21,7 @@
 #define __transient_rb_theta_expansion_h__
 
 // rbOOmit includes
-#include "rb_theta_expansion.h"
+#include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
 

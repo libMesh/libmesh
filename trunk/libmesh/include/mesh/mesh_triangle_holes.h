@@ -18,13 +18,13 @@
 #ifndef __mesh_triangle_holes_h__
 #define __mesh_triangle_holes_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
 // Local includes
-#include "mesh_triangle_interface.h"
-#include "point.h"
+#include "libmesh/mesh_triangle_interface.h"
+#include "libmesh/point.h"
 
 // C++ includes
 

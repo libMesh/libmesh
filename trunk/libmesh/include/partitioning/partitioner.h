@@ -21,8 +21,8 @@
 #define __partitioner_h__
 
 // Local Includes -----------------------------------
-#include "libmesh.h"
-#include "auto_ptr.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>

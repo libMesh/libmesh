@@ -20,13 +20,13 @@
 #ifndef __frequency_system_h__
 #define __frequency_system_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Frequency domain solutions only possible with complex arithmetic
 #if defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
 // Local Includes
-#include "linear_implicit_system.h"
+#include "libmesh/linear_implicit_system.h"
 
 // C++ includes
 #include <string>

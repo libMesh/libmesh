@@ -21,7 +21,7 @@
 #define __euler2_solver_h__
 
 // Local includes
-#include "unsteady_solver.h"
+#include "libmesh/unsteady_solver.h"
 
 // C++ includes
 

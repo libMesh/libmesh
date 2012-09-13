@@ -21,10 +21,10 @@
 #define __node_h__
 
 // Local includes
-#include "point.h"
-#include "dof_object.h"
-#include "reference_counted_object.h"
-#include "auto_ptr.h"
+#include "libmesh/point.h"
+#include "libmesh/dof_object.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <iostream>

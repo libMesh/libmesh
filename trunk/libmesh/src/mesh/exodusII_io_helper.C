@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "exodusII_io_helper.h"
+#include "libmesh/exodusII_io_helper.h"
 
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -24,14 +24,14 @@
 #include <algorithm>
 #include <functional>
 
-#include "boundary_info.h"
-#include "enum_elem_type.h"
-#include "elem.h"
-#include "system.h"
-#include "numeric_vector.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/elem.h"
+#include "libmesh/system.h"
+#include "libmesh/numeric_vector.h"
 
 #ifdef DEBUG
-#include "mesh_tools.h"  // for elem_types warning
+#include "libmesh/mesh_tools.h"  // for elem_types warning
 #endif
 
 // This macro returns the length of the array a.  Don't

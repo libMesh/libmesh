@@ -21,7 +21,7 @@
 #define __parmetis_partitioner_h__
 
 // Local Includes -----------------------------------
-#include "partitioner.h"
+#include "libmesh/partitioner.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>

@@ -18,9 +18,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // rbOOmit includes
-#include "rb_theta_expansion.h"
-#include "rb_theta.h"
-#include "rb_parameters.h"
+#include "libmesh/rb_theta_expansion.h"
+#include "libmesh/rb_theta.h"
+#include "libmesh/rb_parameters.h"
 
 namespace libMesh
 {

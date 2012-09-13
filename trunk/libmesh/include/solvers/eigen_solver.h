@@ -21,15 +21,15 @@
 #define __eigen_solver_h__
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_SLEPC
 
 // Local includes
-#include "libmesh_common.h"
-#include "enum_solver_package.h"
-#include "enum_eigen_solver_type.h"
-#include "reference_counted_object.h"
-#include "libmesh.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_eigen_solver_type.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/libmesh.h"
 
 // C++ includes
 

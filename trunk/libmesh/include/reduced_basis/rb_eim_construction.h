@@ -21,13 +21,13 @@
 #define __rb_eim_construction_h__
 
 // rbOOmit includes
-#include "rb_construction.h"
-#include "rb_assembly_expansion.h"
-#include "rb_eim_assembly.h"
+#include "libmesh/rb_construction.h"
+#include "libmesh/rb_assembly_expansion.h"
+#include "libmesh/rb_eim_assembly.h"
 
 // libMesh includes
-#include "mesh_function.h"
-#include "coupling_matrix.h"
+#include "libmesh/mesh_function.h"
+#include "libmesh/coupling_matrix.h"
 
 // C++ includes
 

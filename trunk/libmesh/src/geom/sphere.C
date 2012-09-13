@@ -22,8 +22,8 @@
 
 
 // Local includes
-#include "tensor_value.h"
-#include "sphere.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/sphere.h"
 
 namespace libMesh
 {

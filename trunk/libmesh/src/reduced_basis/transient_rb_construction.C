@@ -18,26 +18,26 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // rbOOmit includes
-#include "transient_rb_construction.h"
-#include "transient_rb_evaluation.h"
-#include "transient_rb_theta_expansion.h"
-#include "transient_rb_assembly_expansion.h"
+#include "libmesh/transient_rb_construction.h"
+#include "libmesh/transient_rb_evaluation.h"
+#include "libmesh/transient_rb_theta_expansion.h"
+#include "libmesh/transient_rb_assembly_expansion.h"
 
 // LibMesh includes
-#include "numeric_vector.h"
-#include "sparse_matrix.h"
-#include "dof_map.h"
-#include "libmesh_logging.h"
-#include "linear_solver.h"
-#include "o_string_stream.h"
-#include "equation_systems.h"
-#include "exodusII_io.h"
-#include "getpot.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "xdr_cxx.h"
-#include "timestamp.h"
-#include "parallel.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/getpot.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/xdr_cxx.h"
+#include "libmesh/timestamp.h"
+#include "libmesh/parallel.h"
 
 // For checking for the existence of files
 #include <sys/stat.h>

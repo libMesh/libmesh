@@ -30,40 +30,40 @@
 #include <cmath>
 
 // Basic include file needed for the mesh functionality.
-#include "libmesh.h"
-#include "serial_mesh.h"
-#include "mesh_refinement.h"
-#include "gmv_io.h"
-#include "exodusII_io.h"
-#include "equation_systems.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
-#include "dof_map.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/serial_mesh.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/gmv_io.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
 
-#include "periodic_boundaries.h"
-#include "periodic_boundary.h"
-#include "mesh_generation.h"
-#include "parsed_function.h"
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/parsed_function.h"
 
-#include "getpot.h"
+#include "libmesh/getpot.h"
 
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
-#include "transient_system.h"
-#include "linear_implicit_system.h"
-#include "vector_value.h"
+#include "libmesh/transient_system.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/vector_value.h"
 
 // To refine the mesh we need an \p ErrorEstimator
 // object to figure out which elements to refine.
-#include "error_vector.h"
-#include "kelly_error_estimator.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/kelly_error_estimator.h"
 
 // The definition of a geometric element
-#include "elem.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

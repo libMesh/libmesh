@@ -18,11 +18,11 @@
 
 
 // Local includes
-#include "boundary_info.h"
-#include "elem.h"
-#include "libmesh_logging.h"
-#include "metis_partitioner.h"
-#include "serial_mesh.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/elem.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/metis_partitioner.h"
+#include "libmesh/serial_mesh.h"
 
 #include LIBMESH_INCLUDE_UNORDERED_SET
 LIBMESH_DEFINE_HASH_POINTERS

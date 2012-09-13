@@ -18,7 +18,7 @@
 
 
 // Local includes
-#include "remote_elem.h"
+#include "libmesh/remote_elem.h"
 
 namespace libMesh
 {

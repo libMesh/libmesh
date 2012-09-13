@@ -16,7 +16,7 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 // DiffSystem framework files
-#include "fem_system.h"
+#include "libmesh/fem_system.h"
 
 using namespace libMesh;
 

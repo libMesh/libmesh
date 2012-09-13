@@ -18,12 +18,12 @@
 #ifndef __nemesis_io_helper_h__
 #define __nemesis_io_helper_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
 
 // Local headers
-#include "exodusII_io_helper.h"
+#include "libmesh/exodusII_io_helper.h"
 
 // C++ headers
 #include <set>

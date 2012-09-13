@@ -21,7 +21,7 @@
 #define __system_subset_h__
 
 // Local Includes
-#include "reference_counted_object.h"
+#include "libmesh/reference_counted_object.h"
 
 // C++ includes
 #include <vector>

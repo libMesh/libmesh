@@ -19,8 +19,8 @@
 #define __xdr_shead_h__
 
 // Local includes
-#include "xdr_head.h" // for base class
-#include "xdr_soln.h" // for friend
+#include "libmesh/xdr_head.h" // for base class
+#include "libmesh/xdr_soln.h" // for friend
 
 // C++ includes
 

@@ -21,7 +21,7 @@
 #define __node_elem_h__
 
 // Local includes
-#include "elem.h"
+#include "libmesh/elem.h"
 
 // C++ includes
 #include <cstddef>

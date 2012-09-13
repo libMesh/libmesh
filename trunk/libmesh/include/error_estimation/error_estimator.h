@@ -21,8 +21,8 @@
 #define __error_estimator_h__
 
 // Local Includes
-#include "libmesh_common.h"
-#include "system_norm.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/system_norm.h"
 
 // C++ includes
 #include <cstddef>

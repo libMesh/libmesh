@@ -20,12 +20,12 @@
 #include <cstdlib> // std::strtol
 
 // Local includes
-#include "abaqus_io.h"
-#include "point.h"
-#include "elem.h"
-#include "string_to_enum.h"
-#include "boundary_info.h"
-#include "utility.h"
+#include "libmesh/abaqus_io.h"
+#include "libmesh/point.h"
+#include "libmesh/elem.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/utility.h"
 
 // Anonymous namespace to hold mapping Data for Abaqus/libMesh element types
 namespace

@@ -20,11 +20,11 @@
 #include <fstream>
 
 // Local includes
-#include "tetgen_io.h"
-#include "mesh_base.h"
-#include "cell_tet4.h"
-#include "cell_tet10.h"
-#include "mesh_data.h"
+#include "libmesh/tetgen_io.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/cell_tet4.h"
+#include "libmesh/cell_tet10.h"
+#include "libmesh/mesh_data.h"
 
 namespace libMesh
 {

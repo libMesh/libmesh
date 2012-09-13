@@ -21,10 +21,10 @@
 #define __dense_vector_h__
 
 // Local Includes
-#include "libmesh_common.h"
-#include "compare_types.h"
-#include "dense_vector_base.h"
-#include "tensor_tools.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/compare_types.h"
+#include "libmesh/dense_vector_base.h"
+#include "libmesh/tensor_tools.h"
 
 // C++ includes
 #include <vector>

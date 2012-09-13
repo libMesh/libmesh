@@ -18,27 +18,27 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // rbOOmit includes
-#include "rb_construction.h"
-#include "rb_assembly_expansion.h"
+#include "libmesh/rb_construction.h"
+#include "libmesh/rb_assembly_expansion.h"
 
 // LibMesh includes
-#include "numeric_vector.h"
-#include "sparse_matrix.h"
-#include "dof_map.h"
-#include "libmesh_logging.h"
-#include "equation_systems.h"
-#include "exodusII_io.h"
-#include "linear_solver.h"
-#include "getpot.h"
-#include "mesh_base.h"
-#include "parallel.h"
-#include "xdr_cxx.h"
-#include "timestamp.h"
-#include "petsc_linear_solver.h"
-#include "fem_context.h"
-#include "dirichlet_boundaries.h"
-#include "zero_function.h"
-#include "coupling_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/getpot.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/parallel.h"
+#include "libmesh/xdr_cxx.h"
+#include "libmesh/timestamp.h"
+#include "libmesh/petsc_linear_solver.h"
+#include "libmesh/fem_context.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/zero_function.h"
+#include "libmesh/coupling_matrix.h"
 
 // C++ includes
 #include <sys/types.h>

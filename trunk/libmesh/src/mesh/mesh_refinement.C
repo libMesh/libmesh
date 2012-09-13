@@ -21,29 +21,29 @@
 #include <limits>
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // only compile these functions if the user requests AMR support
 #ifdef LIBMESH_ENABLE_AMR
 
-#include "boundary_info.h"
-#include "error_vector.h"
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "mesh_communication.h"
-#include "mesh_refinement.h"
-#include "parallel.h"
-#include "parallel_ghost_sync.h"
-#include "remote_elem.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_ghost_sync.h"
+#include "libmesh/remote_elem.h"
 
 #ifdef DEBUG
 // Some extra validation for ParallelMesh
-#include "mesh_tools.h"
-#include "parallel_mesh.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/parallel_mesh.h"
 #endif // DEBUG
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-#include "periodic_boundaries.h"
+#include "libmesh/periodic_boundaries.h"
 #endif
 
 namespace libMesh

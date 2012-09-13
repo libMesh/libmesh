@@ -20,18 +20,18 @@
 #ifndef __petsc_preconditioner_h__
 #define __petsc_preconditioner_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
 // Local includes
-#include "preconditioner.h"
-#include "libmesh_common.h"
-#include "enum_solver_package.h"
-#include "enum_preconditioner_type.h"
-#include "reference_counted_object.h"
-#include "libmesh.h"
-#include "petsc_macro.h"
+#include "libmesh/preconditioner.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/petsc_macro.h"
 
 // Petsc includes
 EXTERN_C_FOR_PETSC_BEGIN

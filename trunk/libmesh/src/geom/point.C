@@ -21,7 +21,7 @@
 // C++ includes
 
 // Local includes
-// #include "point.h"
+// #include "libmesh/point.h"
 
 
 

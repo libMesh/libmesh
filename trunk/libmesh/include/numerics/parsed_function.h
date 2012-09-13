@@ -2,14 +2,14 @@
 #ifndef __parsed_function_h__
 #define __parsed_function_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_FPARSER
 
 // Local includes
-#include "dense_vector.h"
-#include "function_base.h"
-#include "point.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/function_base.h"
+#include "libmesh/point.h"
 
 // FParser includes
 #include "fparser.hh"

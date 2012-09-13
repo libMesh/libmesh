@@ -18,7 +18,7 @@
 // C++ includes
 
 // Local includes
-#include "xdr_mgf.h"
+#include "libmesh/xdr_mgf.h"
 
 namespace libMesh
 {

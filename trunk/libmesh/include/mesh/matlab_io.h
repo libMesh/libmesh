@@ -20,8 +20,8 @@
 #define __matlab_io_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "mesh_input.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/mesh_input.h"
 
 // C++ includes
 

@@ -21,8 +21,8 @@
 #define __dense_subvector_h__
 
 // Local Includes
-#include "libmesh_common.h"
-#include "dense_vector.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/dense_vector.h"
 
 // C++ includes
 

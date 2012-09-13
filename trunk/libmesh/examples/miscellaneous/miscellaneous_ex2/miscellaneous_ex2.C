@@ -43,44 +43,44 @@
 #include <stdio.h>
 
 // Basic include files needed for overall functionality.
-#include "libmesh.h"
-#include "libmesh_logging.h"
-#include "mesh.h"
-#include "mesh_generation.h"
-#include "exodusII_io.h"
-#include "equation_systems.h"
-#include "elem.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/elem.h"
 
 // Include FrequencySystem.  Compared to GeneralSystem,
 // this class offers added functionality for the solution of 
 // frequency-dependent systems.
-#include "frequency_system.h"
+#include "libmesh/frequency_system.h"
 
 // Define the Finite Element object.
-#include "fe.h"
+#include "libmesh/fe.h"
 
 // Define Gauss quadrature rules.
-#include "quadrature_gauss.h"
+#include "libmesh/quadrature_gauss.h"
 
 // Define useful datatypes for finite element
 // matrix and vector components.
-#include "dense_matrix.h"
-#include "dense_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
 
 // Define matrix and vector data types for the global 
 // equation system.  These are base classes,
 // from which specific implementations, like
 // the PETSc or LASPACK implementations, are derived.
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
 
 // Define the DofMap, which handles degree of freedom
 // indexing.
-#include "dof_map.h"
+#include "libmesh/dof_map.h"
 
 // Defines the MeshData class, which allows you to store
 // data about the mesh when reading in files, etc.
-#include "mesh_data.h"
+#include "libmesh/mesh_data.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

@@ -20,13 +20,13 @@
 // C++ includes
 
 // Local includes
-#include "linear_implicit_system.h"
-#include "linear_solver.h"
-#include "equation_systems.h"
-#include "numeric_vector.h" // for parameter sensitivity calcs
-//#include "parameter_vector.h"
-#include "sparse_matrix.h" // for get_transpose
-#include "system_subset.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/numeric_vector.h" // for parameter sensitivity calcs
+//#include "libmesh/parameter_vector.h"
+#include "libmesh/sparse_matrix.h" // for get_transpose
+#include "libmesh/system_subset.h"
 
 namespace libMesh
 {

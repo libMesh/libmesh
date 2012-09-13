@@ -19,7 +19,7 @@
 
 // C++ includes
 #include <math.h>
-#include "libmesh_C_isnan.h"
+#include "libmesh/libmesh_C_isnan.h"
 
 #ifdef isnan
 int libmesh_C_isnan_float(float a) { return isnan(a); }

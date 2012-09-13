@@ -21,7 +21,7 @@
 #define __unstructured_mesh_h__
 
 // Local Includes -----------------------------------
-#include "mesh_base.h"
+#include "libmesh/mesh_base.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>

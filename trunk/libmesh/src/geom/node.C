@@ -19,7 +19,7 @@
 
 
 // Local includes
-#include "node.h"
+#include "libmesh/node.h"
 
 namespace libMesh
 {

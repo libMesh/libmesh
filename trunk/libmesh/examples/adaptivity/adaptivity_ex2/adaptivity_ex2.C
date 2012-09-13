@@ -34,39 +34,39 @@
 #include <cmath>
 
 // Basic include file needed for the mesh functionality.
-#include "libmesh.h"
-#include "serial_mesh.h"
-#include "mesh_refinement.h"
-#include "gmv_io.h"
-#include "equation_systems.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
-#include "dof_map.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/serial_mesh.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/gmv_io.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
 
-#include "getpot.h"
+#include "libmesh/getpot.h"
 
 // Some (older) compilers do not offer full stream 
 // functionality, \p OStringStream works around this.
 // Check example 9 for details.
-#include "o_string_stream.h"
+#include "libmesh/o_string_stream.h"
 
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
-#include "transient_system.h"
-#include "linear_implicit_system.h"
-#include "vector_value.h"
+#include "libmesh/transient_system.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/vector_value.h"
 
 // To refine the mesh we need an \p ErrorEstimator
 // object to figure out which elements to refine.
-#include "error_vector.h"
-#include "kelly_error_estimator.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/kelly_error_estimator.h"
 
 // The definition of a geometric element
-#include "elem.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

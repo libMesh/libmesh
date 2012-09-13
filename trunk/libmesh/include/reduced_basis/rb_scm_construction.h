@@ -21,18 +21,18 @@
 #define __rb_scm_construction_h__
 
 // Configuration data
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Currently, the RBSCMConstruction is only usable
 // if SLEPc is enabled.
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
 // rbOOmit includes
-#include "rb_construction_base.h"
-#include "rb_scm_evaluation.h"
+#include "libmesh/rb_construction_base.h"
+#include "libmesh/rb_scm_evaluation.h"
 
 // libMesh includes
-#include "condensed_eigen_system.h"
+#include "libmesh/condensed_eigen_system.h"
 
 // C++ includes
 

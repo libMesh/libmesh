@@ -18,22 +18,22 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Configuration data
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Currently, the RBSCMConstruction should only be available
 // if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
-#include "rb_scm_construction.h"
-#include "rb_construction.h"
+#include "libmesh/rb_scm_construction.h"
+#include "libmesh/rb_construction.h"
 
-#include "libmesh_logging.h"
-#include "numeric_vector.h"
-#include "sparse_matrix.h"
-#include "equation_systems.h"
-#include "getpot.h"
-#include "parallel.h"
-#include "dof_map.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/getpot.h"
+#include "libmesh/parallel.h"
+#include "libmesh/dof_map.h"
 // For creating a directory
 #include <sys/types.h>
 #include <sys/stat.h>

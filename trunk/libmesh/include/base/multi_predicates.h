@@ -19,8 +19,8 @@
 #define __multi_predicates_h__
 
 // Local includes
-#include "libmesh_base.h" // for libMesh::processor_id()
-#include "single_predicates.h"
+#include "libmesh/libmesh_base.h" // for libMesh::processor_id()
+#include "libmesh/single_predicates.h"
 
 // C++ includes
 #include <vector>

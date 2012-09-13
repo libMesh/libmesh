@@ -21,9 +21,9 @@
 #define __adjoint_refinement_estimator_h__
 
 // Local Includes
-#include "error_estimator.h"
-#include "libmesh.h"
-#include "qoi_set.h"
+#include "libmesh/error_estimator.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/qoi_set.h"
 
 // C++ includes
 #include <cstddef>

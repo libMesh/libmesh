@@ -23,7 +23,7 @@
 #include <iomanip> // for std::setw, std::setiosflags
 
 // Local includes
-#include "type_vector.h"
+#include "libmesh/type_vector.h"
 
 namespace libMesh
 {

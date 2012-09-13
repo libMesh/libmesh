@@ -22,7 +22,7 @@
 #define __steady_solver_h__
 
 // Local includes
-#include "time_solver.h"
+#include "libmesh/time_solver.h"
 
 // C++ includes
 

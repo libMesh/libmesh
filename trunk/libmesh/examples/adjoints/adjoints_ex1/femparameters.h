@@ -4,8 +4,8 @@
 #include <limits>
 #include <string>
 
-#include "libmesh_common.h"
-#include "getpot.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/getpot.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

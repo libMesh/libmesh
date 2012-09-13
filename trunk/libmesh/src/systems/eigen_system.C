@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Currently, the EigenSystem should only be available
 // if SLEPc support is enabled.
@@ -25,12 +25,12 @@
 // C++ includes
 
 // Local includes
-#include "eigen_system.h"
-#include "equation_systems.h"
-#include "sparse_matrix.h"
-#include "eigen_solver.h"
-#include "dof_map.h"
-#include "mesh_base.h"
+#include "libmesh/eigen_system.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/eigen_solver.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/mesh_base.h"
 
 namespace libMesh
 {

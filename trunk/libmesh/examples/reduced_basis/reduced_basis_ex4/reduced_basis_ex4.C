@@ -30,12 +30,12 @@
 // boundary conditions.
 
 // Basic include file needed for the mesh functionality.
-#include "libmesh.h"
-#include "mesh.h"
-#include "mesh_generation.h"
-#include "equation_systems.h"
-#include "exodusII_io.h"
-#include "getpot.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/getpot.h"
 
 #include "eim_classes.h"
 #include "rb_classes.h"

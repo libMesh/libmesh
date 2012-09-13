@@ -50,20 +50,20 @@
 #include <fstream>
 
 // libMesh include files.
-#include "libmesh.h"
-#include "mesh.h"
-#include "mesh_generation.h"
-#include "exodusII_io.h"
-#include "condensed_eigen_system.h"
-#include "equation_systems.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
-#include "dense_matrix.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dof_map.h"
-#include "fe_interface.h"
-#include "getpot.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/condensed_eigen_system.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/getpot.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

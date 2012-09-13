@@ -22,11 +22,11 @@
 
 
 // Local includes
-#include "libmesh_common.h"
-#include "reference_counted_object.h"
-#include "libmesh.h"
-#include "shell_matrix.h"
-#include "sparse_matrix.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/shell_matrix.h"
+#include "libmesh/sparse_matrix.h"
 
 namespace libMesh
 {

@@ -20,8 +20,8 @@
 #define __parallel_sort_h__
 
 // Local Includes
-#include "parallel.h"
-#include "libmesh_common.h"
+#include "libmesh/parallel.h"
+#include "libmesh/libmesh_common.h"
 
 // C++ Includes
 #include <vector>

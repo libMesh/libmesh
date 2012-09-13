@@ -21,12 +21,12 @@
 #define __rb_eim_assembly_h__
 
 // rbOOmit includes
-#include "elem_assembly.h"
+#include "libmesh/elem_assembly.h"
 
 // libMesh includes
-#include "auto_ptr.h"
-#include "numeric_vector.h"
-#include "point.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/point.h"
 
 namespace libMesh
 {

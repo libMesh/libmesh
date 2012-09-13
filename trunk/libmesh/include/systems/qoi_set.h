@@ -22,7 +22,7 @@
 
 
 // Local Includes -----------------------------------
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 // C++ Includes   -----------------------------------
 #include <vector>

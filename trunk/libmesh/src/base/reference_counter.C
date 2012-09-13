@@ -22,7 +22,7 @@
 #include <sstream>
 
 // Local includes
-#include "reference_counter.h"
+#include "libmesh/reference_counter.h"
 
 namespace libMesh
 {

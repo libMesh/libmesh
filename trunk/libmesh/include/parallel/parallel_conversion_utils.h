@@ -21,7 +21,7 @@
 #define __parallel_conversion_utils_h__
 
 // Local includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_LIBHILBERT
 #include "hilbert.h"

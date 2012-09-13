@@ -20,10 +20,10 @@
 // C++ includes
 
 // Local Includes
-#include "auto_ptr.h"
-#include "preconditioner.h"
-#include "petsc_preconditioner.h"
-#include "trilinos_preconditioner.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/preconditioner.h"
+#include "libmesh/petsc_preconditioner.h"
+#include "libmesh/trilinos_preconditioner.h"
 
 namespace libMesh
 {

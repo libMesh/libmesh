@@ -17,7 +17,7 @@
 
 
 // Local Includes
-#include "dense_subvector.h"
+#include "libmesh/dense_subvector.h"
 
 namespace libMesh
 {

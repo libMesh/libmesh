@@ -21,14 +21,14 @@
 #define __hp_coarsentest_h__
 
 // Local Includes
-#include "auto_ptr.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "hp_selector.h"
-#include "libmesh_common.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/hp_selector.h"
+#include "libmesh/libmesh_common.h"
 
-#include "fe.h"         // MipsPro requires fe.h and quadrature.h in order to
-#include "quadrature.h" //  delete AutoPtrs<> upon destruction
+#include "libmesh/fe.h"         // MipsPro requires fe.h and quadrature.h in order to
+#include "libmesh/quadrature.h" //  delete AutoPtrs<> upon destruction
 
 // C++ includes
 #include <vector>

@@ -21,7 +21,7 @@
 
 
 // Local Includes
-#include "function_base.h"
+#include "libmesh/function_base.h"
 
 namespace libMesh
 {

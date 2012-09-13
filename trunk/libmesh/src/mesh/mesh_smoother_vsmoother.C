@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_VSMOOTHER
 
 // C++ includes
@@ -26,11 +26,11 @@
 #include <time.h> // for clock_t, clock()
 
 // Local includes
-#include "mesh_smoother_vsmoother.h"
-#include "mesh_tools.h"
-#include "elem.h"
-#include "unstructured_mesh.h"
-#include "utility.h"
+#include "libmesh/mesh_smoother_vsmoother.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/elem.h"
+#include "libmesh/unstructured_mesh.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {

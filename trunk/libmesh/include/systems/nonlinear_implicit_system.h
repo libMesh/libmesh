@@ -21,7 +21,7 @@
 #define __nonlinear_implicit_system_h__
 
 // Local Includes
-#include "implicit_system.h"
+#include "libmesh/implicit_system.h"
 
 // C++ includes
 

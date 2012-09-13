@@ -25,18 +25,18 @@
 #include <string>
 
 // Local includes
-#include "xdr_io.h"
-#include "legacy_xdr_io.h"
-#include "xdr_cxx.h"
-#include "enum_xdr_mode.h"
-#include "mesh_base.h"
-#include "node.h"
-#include "elem.h"
-#include "boundary_info.h"
-#include "parallel.h"
-#include "mesh_tools.h"
-#include "partitioner.h"
-#include "libmesh_logging.h"
+#include "libmesh/xdr_io.h"
+#include "libmesh/legacy_xdr_io.h"
+#include "libmesh/xdr_cxx.h"
+#include "libmesh/enum_xdr_mode.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/node.h"
+#include "libmesh/elem.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/parallel.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/partitioner.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {

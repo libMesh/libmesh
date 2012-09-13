@@ -19,14 +19,14 @@
 #ifndef __mesh_tetgen_interface_h__
 #define __mesh_tetgen_interface_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_TETGEN
 
 
 // Local includes
-#include "elem.h"
-#include "mesh_serializer.h"
-#include "point.h" // used for specifying holes
+#include "libmesh/elem.h"
+#include "libmesh/mesh_serializer.h"
+#include "libmesh/point.h" // used for specifying holes
 
 // C++ includes
 #include <cstddef>

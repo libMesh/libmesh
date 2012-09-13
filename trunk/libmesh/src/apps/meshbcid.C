@@ -23,15 +23,15 @@
 #include <limits>
 #include <string>
 
-#include "libmesh.h"
+#include "libmesh/libmesh.h"
 
-#include "boundary_info.h"
-#include "elem.h"
-#include "fe.h"
-#include "getpot.h"
-#include "mesh.h"
-#include "point.h"
-#include "quadrature_gauss.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe.h"
+#include "libmesh/getpot.h"
+#include "libmesh/mesh.h"
+#include "libmesh/point.h"
+#include "libmesh/quadrature_gauss.h"
 
 void usage_error(const char *progname)
 {

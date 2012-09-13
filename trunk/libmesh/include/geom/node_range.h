@@ -21,9 +21,9 @@
 #define __node_range_h__
 
 // Local includes
-#include "mesh_base.h"
-#include "node.h"
-#include "stored_range.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/node.h"
+#include "libmesh/stored_range.h"
 
 // C++ includes
 

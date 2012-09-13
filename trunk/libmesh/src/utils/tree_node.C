@@ -21,10 +21,10 @@
 #include <set>
 
 // Local includes
-#include "libmesh_config.h"
-#include "tree_node.h"
-#include "mesh_base.h"
-#include "elem.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/tree_node.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

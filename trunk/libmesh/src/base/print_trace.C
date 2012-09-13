@@ -25,8 +25,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 
-#include "libmesh_config.h"
-#include "print_trace.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/print_trace.h"
 
 #if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE) && defined(LIBMESH_HAVE_GLIBC_BACKTRACE)
 

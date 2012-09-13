@@ -27,8 +27,8 @@
 #include <vector>
 
 // Local Includes -----------------------------------
-#include "libmesh.h" // libMesh::out/err
-#include "mesh_smoother.h"
+#include "libmesh/libmesh.h" // libMesh::out/err
+#include "libmesh/mesh_smoother.h"
 
 namespace libMesh
 {

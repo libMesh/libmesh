@@ -21,8 +21,8 @@
 #define __elem_quality_h__
 
 // Local includes
-#include "enum_elem_type.h"
-#include "enum_elem_quality.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_elem_quality.h"
 
 // C++ includes
 #include <vector>

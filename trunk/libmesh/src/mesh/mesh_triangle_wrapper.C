@@ -16,16 +16,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
 // Local includes
-#include "mesh_triangle_wrapper.h"
-#include "unstructured_mesh.h"
-#include "point.h"
-#include "face_tri3.h"
-#include "face_tri6.h"
+#include "libmesh/mesh_triangle_wrapper.h"
+#include "libmesh/unstructured_mesh.h"
+#include "libmesh/point.h"
+#include "libmesh/face_tri3.h"
+#include "libmesh/face_tri6.h"
 
 namespace libMesh
 {

@@ -20,8 +20,8 @@
 #define __threads_h__
 
 // Local includes
-#include "libmesh_config.h"
-#include "libmesh_common.h"  // for libmesh_assert
+#include "libmesh/libmesh_config.h"
+#include "libmesh/libmesh_common.h"  // for libmesh_assert
 
 // Threading building blocks includes
 #ifdef LIBMESH_HAVE_TBB_API

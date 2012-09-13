@@ -18,11 +18,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // libMesh includes
-#include "getpot.h"
-#include "xdr_cxx.h"
+#include "libmesh/getpot.h"
+#include "libmesh/xdr_cxx.h"
 
 // rbOOmit includes
-#include "rb_parametrized.h"
+#include "libmesh/rb_parametrized.h"
 
 // C++ includes
 #include <sstream>

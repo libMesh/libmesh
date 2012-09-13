@@ -20,8 +20,8 @@
 #include <sstream>
 
 // Local includes
-#include "libmesh_common.h"
-#include "elem_quality.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/elem_quality.h"
 
 namespace libMesh
 {

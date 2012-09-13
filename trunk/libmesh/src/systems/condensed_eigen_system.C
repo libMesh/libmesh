@@ -15,18 +15,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Currently, the EigenSystem should only be available
 // if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC)
 
-#include "condensed_eigen_system.h"
-#include "libmesh_logging.h"
-#include "numeric_vector.h"
-#include "equation_systems.h"
-#include "dof_map.h"
-#include "parallel.h"
+#include "libmesh/condensed_eigen_system.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/parallel.h"
 
 namespace libMesh
 {

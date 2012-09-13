@@ -21,12 +21,12 @@
 
 
 // Local includes
-#include "quadrature_clough.h"
-#include "quadrature_gauss.h"
-#include "quadrature_jacobi.h"
-#include "quadrature_simpson.h"
-#include "quadrature_trap.h"
-#include "string_to_enum.h"
+#include "libmesh/quadrature_clough.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_jacobi.h"
+#include "libmesh/quadrature_simpson.h"
+#include "libmesh/quadrature_trap.h"
+#include "libmesh/string_to_enum.h"
 
 namespace libMesh
 {

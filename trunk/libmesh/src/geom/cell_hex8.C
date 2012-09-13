@@ -19,10 +19,10 @@
 // C++ includes
 
 // Local includes
-#include "side.h"
-#include "cell_hex8.h"
-#include "edge_edge2.h"
-#include "face_quad4.h"
+#include "libmesh/side.h"
+#include "libmesh/cell_hex8.h"
+#include "libmesh/edge_edge2.h"
+#include "libmesh/face_quad4.h"
 
 namespace libMesh
 {

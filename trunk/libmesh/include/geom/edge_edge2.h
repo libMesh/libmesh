@@ -21,8 +21,8 @@
 #define __edge2_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "edge.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/edge.h"
 
 // C++ includes
 #include <cstddef>

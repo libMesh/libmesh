@@ -20,7 +20,7 @@
 // C++ includes
 
 // Local includes
-#include "dof_object.h"
+#include "libmesh/dof_object.h"
 
 
 namespace libMesh

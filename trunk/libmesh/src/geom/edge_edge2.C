@@ -18,7 +18,7 @@
 
 
 // Local includes
-#include "edge_edge2.h"
+#include "libmesh/edge_edge2.h"
 
 namespace libMesh
 {

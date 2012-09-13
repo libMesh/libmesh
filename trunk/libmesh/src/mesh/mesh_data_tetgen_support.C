@@ -21,7 +21,7 @@
 #include <fstream>
 
 // Local includes
-#include "mesh_data.h"
+#include "libmesh/mesh_data.h"
 
 namespace libMesh
 {

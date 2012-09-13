@@ -21,7 +21,7 @@
 #define __gnuplot_io_h__
 
 // Local includes
-#include "mesh_output.h"
+#include "libmesh/mesh_output.h"
 
 // C++ includes
 #include <cstddef>

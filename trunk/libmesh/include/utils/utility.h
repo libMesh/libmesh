@@ -20,7 +20,7 @@
 #define __utility_h__
 
 // Local includes
-#include "libmesh_common.h" // for Real
+#include "libmesh/libmesh_common.h" // for Real
 
 // System includes
 #include <string>

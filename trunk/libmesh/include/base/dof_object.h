@@ -21,10 +21,10 @@
 #define __dof_object_h__
 
 // Local includes
-#include "libmesh_config.h"
-#include "libmesh_common.h"
-#include "libmesh.h" // libMesh::invalid_uint
-#include "reference_counted_object.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh.h" // libMesh::invalid_uint
+#include "libmesh/reference_counted_object.h"
 
 // C++ includes
 #include <cstddef>

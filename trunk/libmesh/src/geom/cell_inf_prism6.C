@@ -16,21 +16,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // C++ includes
 
 // Local includes cont'd
-#include "cell_inf_prism6.h"
-#include "edge_edge2.h"
-#include "edge_inf_edge2.h"
-#include "fe_interface.h"
-#include "fe_type.h"
-#include "side.h"
-#include "face_inf_quad4.h"
-#include "face_tri3.h"
+#include "libmesh/cell_inf_prism6.h"
+#include "libmesh/edge_edge2.h"
+#include "libmesh/edge_inf_edge2.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/side.h"
+#include "libmesh/face_inf_quad4.h"
+#include "libmesh/face_tri3.h"
 
 namespace libMesh
 {

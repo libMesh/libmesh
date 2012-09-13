@@ -19,8 +19,8 @@
 #define __variable_h__
 
 // Local Includes
-#include "fe_type.h"
-#include "id_types.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/id_types.h"
 
 // C++ includes
 #include <set>

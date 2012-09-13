@@ -21,7 +21,7 @@
 #define __plane_h__
 
 // Local includes
-#include "surface.h"
+#include "libmesh/surface.h"
 
 // C++ includes
 

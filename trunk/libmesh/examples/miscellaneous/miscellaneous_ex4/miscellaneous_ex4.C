@@ -39,39 +39,39 @@
 #include <cmath>
 
 // Basic include file needed for the mesh functionality.
-#include "libmesh.h"
-#include "mesh.h"
-#include "mesh_refinement.h"
-#include "vtk_io.h"
-#include "equation_systems.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
-#include "dof_map.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "mesh_generation.h"
-#include "sum_shell_matrix.h"
-#include "tensor_shell_matrix.h"
-#include "sparse_shell_matrix.h"
-#include "mesh_refinement.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/vtk_io.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/sum_shell_matrix.h"
+#include "libmesh/tensor_shell_matrix.h"
+#include "libmesh/sparse_shell_matrix.h"
+#include "libmesh/mesh_refinement.h"
 
-#include "getpot.h"
+#include "libmesh/getpot.h"
 
 // Some (older) compilers do not offer full stream 
 // functionality, \p OStringStream works around this.
 // Check example 9 for details.
-#include "o_string_stream.h"
+#include "libmesh/o_string_stream.h"
 
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
-#include "transient_system.h"
-#include "linear_implicit_system.h"
-#include "vector_value.h"
+#include "libmesh/transient_system.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/vector_value.h"
 
 // The definition of a geometric element
-#include "elem.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

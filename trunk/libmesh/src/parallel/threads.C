@@ -19,7 +19,7 @@
 // System Includes
 
 // Local Includes
-#include "threads.h"
+#include "libmesh/threads.h"
 
 namespace libMesh
 {

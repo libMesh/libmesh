@@ -18,9 +18,9 @@
 
 
 // Local includes
-#include "elem.h"
-#include "fe.h"
-#include "fe_interface.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
 
 
 namespace libMesh

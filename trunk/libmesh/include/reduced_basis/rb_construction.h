@@ -21,16 +21,16 @@
 #define __rb_construction_h__
 
 // rbOOmit includes
-#include "rb_construction_base.h"
-#include "rb_evaluation.h"
+#include "libmesh/rb_construction_base.h"
+#include "libmesh/rb_evaluation.h"
 
 // libMesh includes
-#include "linear_implicit_system.h"
-#include "dense_vector.h"
-#include "dense_matrix.h"
-#include "fem_context.h"
-#include "elem_assembly.h"
-#include "dirichlet_boundaries.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/fem_context.h"
+#include "libmesh/elem_assembly.h"
+#include "libmesh/dirichlet_boundaries.h"
 
 // C++ includes
 

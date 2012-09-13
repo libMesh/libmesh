@@ -21,11 +21,11 @@
 #define __derived_rb_construction_h__
 
 // Local includes
-#include "dense_vector.h"
-#include "dense_matrix.h"
-#include "fem_context.h"
-#include "linear_implicit_system.h"
-#include "rb_construction.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/fem_context.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/rb_construction.h"
 
 // C++ includes
 

@@ -20,8 +20,8 @@
 #define __centroid_partitioner_h__
 
 // Local includes
-#include "partitioner.h"
-#include "point.h"
+#include "libmesh/partitioner.h"
+#include "libmesh/point.h"
 
 // C++ includes
 #include <utility> // pair

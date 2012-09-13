@@ -15,27 +15,27 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // C++ includes
 
 // Local includes
-#include "inf_elem_builder.h"
-#include "libmesh_logging.h"
-#include "mesh_tools.h"
-#include "face_inf_quad4.h"
-#include "face_inf_quad6.h"
-#include "cell_inf_prism6.h"
-#include "cell_inf_prism12.h"
-#include "cell_inf_hex8.h"
-#include "cell_inf_hex16.h"
-#include "cell_inf_hex18.h"
-#include "mesh_base.h"
+#include "libmesh/inf_elem_builder.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/face_inf_quad4.h"
+#include "libmesh/face_inf_quad6.h"
+#include "libmesh/cell_inf_prism6.h"
+#include "libmesh/cell_inf_prism12.h"
+#include "libmesh/cell_inf_hex8.h"
+#include "libmesh/cell_inf_hex16.h"
+#include "libmesh/cell_inf_hex18.h"
+#include "libmesh/mesh_base.h"
 
 #ifdef DEBUG
-#include "parallel_mesh.h"
+#include "libmesh/parallel_mesh.h"
 #endif
 
 namespace libMesh

@@ -19,21 +19,21 @@
 
 
 // Local includes
-#include "dof_map.h"
-#include "elem.h"
-#include "exact_solution.h"
-#include "equation_systems.h"
-#include "fe_base.h"
-#include "function_base.h"
-#include "mesh_base.h"
-#include "mesh_function.h"
-#include "numeric_vector.h"
-#include "parallel.h"
-#include "quadrature.h"
-#include "wrapped_function.h"
-#include "fe_interface.h"
-#include "raw_accessor.h"
-#include "tensor_tools.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/exact_solution.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/function_base.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_function.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/parallel.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/wrapped_function.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/raw_accessor.h"
+#include "libmesh/tensor_tools.h"
 
 namespace libMesh
 {

@@ -19,13 +19,13 @@
 #define __inf_elem_builder_h__
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // Local includes
-#include "point.h"
+#include "libmesh/point.h"
 
 // C++ includes
 #include <cstddef>

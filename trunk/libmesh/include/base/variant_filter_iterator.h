@@ -30,7 +30,7 @@
 #endif
 
 // Local includes
-#include "libmesh_common.h" // for libmesh_cast_ptr()
+#include "libmesh/libmesh_common.h" // for libmesh_cast_ptr()
 
 /**
  * Original Authors: Corwin Joy          * Michael Gradman

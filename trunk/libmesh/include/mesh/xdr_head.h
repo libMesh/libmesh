@@ -19,7 +19,7 @@
 #define __xdr_head_h__
 
 // Local includes
-#include "xdr_mgf.h"
+#include "libmesh/xdr_mgf.h"
 
 namespace libMesh
 {

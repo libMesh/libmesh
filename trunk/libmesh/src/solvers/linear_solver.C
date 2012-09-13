@@ -20,14 +20,14 @@
 // C++ includes
 
 // Local Includes
-#include "libmesh_logging.h"
-#include "auto_ptr.h"
-#include "linear_solver.h"
-#include "laspack_linear_solver.h"
-#include "petsc_linear_solver.h"
-#include "trilinos_aztec_linear_solver.h"
-#include "preconditioner.h"
-#include "sparse_matrix.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/laspack_linear_solver.h"
+#include "libmesh/petsc_linear_solver.h"
+#include "libmesh/trilinos_aztec_linear_solver.h"
+#include "libmesh/preconditioner.h"
+#include "libmesh/sparse_matrix.h"
 
 namespace libMesh
 {

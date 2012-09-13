@@ -20,16 +20,16 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "elem.h"
-#include "mesh_base.h"
-#include "parallel.h"
-#include "partitioner.h"
-#include "mesh_tools.h"
-#include "mesh_communication.h"
-#include "libmesh_logging.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/parallel.h"
+#include "libmesh/partitioner.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/libmesh_logging.h"
 
 //FIXME
-#include "parallel_mesh.h"
+#include "libmesh/parallel_mesh.h"
 
 namespace libMesh
 {

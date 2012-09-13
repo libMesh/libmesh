@@ -21,16 +21,16 @@
 #include <cstring>
 
 // Local includes
-#include "exodusII_io.h"
-#include "boundary_info.h"
-#include "mesh_base.h"
-#include "enum_elem_type.h"
-#include "elem.h"
-#include "equation_systems.h"
-#include "libmesh_logging.h"
-#include "system.h"
-#include "numeric_vector.h"
-#include "exodusII_io_helper.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/system.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/exodusII_io_helper.h"
 
 namespace libMesh
 {

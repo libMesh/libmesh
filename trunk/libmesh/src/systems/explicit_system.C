@@ -20,8 +20,8 @@
 // C++ includes
 
 // Local includes
-#include "explicit_system.h"
-#include "numeric_vector.h"
+#include "libmesh/explicit_system.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {

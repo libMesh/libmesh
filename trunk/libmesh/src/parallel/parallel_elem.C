@@ -20,12 +20,12 @@
 // C++ includes
 
 // Local includes
-#include "boundary_info.h"
-#include "elem.h"
-#include "mesh_base.h"
-#include "parallel.h"
-#include "parallel_mesh.h"
-#include "remote_elem.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_mesh.h"
+#include "libmesh/remote_elem.h"
 
 // Helper functions in anonymous namespace
 

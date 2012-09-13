@@ -1,4 +1,4 @@
-#include "petsc_macro.h"
+#include "libmesh/petsc_macro.h"
 // This only works with petsc-3.3 and above.
 
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
@@ -8,14 +8,14 @@
 #include <petsc-private/dmimpl.h>
 
 // Local Includes
-#include "libmesh_common.h"
-#include "nonlinear_implicit_system.h"
-#include "petsc_dm_nonlinear_solver.h"
-#include "petsc_linear_solver.h"
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
-#include "dof_map.h"
-#include "preconditioner.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/nonlinear_implicit_system.h"
+#include "libmesh/petsc_dm_nonlinear_solver.h"
+#include "libmesh/petsc_linear_solver.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/preconditioner.h"
 
 #define DMLIBMESH_NO_DECOMPOSITION     0
 #define DMLIBMESH_FIELD_DECOMPOSITION  1

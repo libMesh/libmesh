@@ -21,7 +21,7 @@
 #define __point_locator_list_h__
 
 // Local Includes
-#include "point_locator_base.h"
+#include "libmesh/point_locator_base.h"
 
 // C++ includes
 #include <cstddef>

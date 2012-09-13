@@ -20,12 +20,12 @@
 #ifndef __edge_inf_edge2_h__
 #define __edge_inf_edge2_h__
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // Local includes
-#include "edge.h"
+#include "libmesh/edge.h"
 
 // C++ includes
 #include <cstddef>

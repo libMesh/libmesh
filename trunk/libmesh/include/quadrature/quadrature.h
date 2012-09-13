@@ -21,13 +21,13 @@
 #define __quadrature_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "reference_counted_object.h"
-#include "point.h"
-#include "enum_elem_type.h"
-#include "enum_order.h"
-#include "enum_quadrature_type.h"
-#include "auto_ptr.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/point.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/enum_quadrature_type.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <vector>

@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "diff_qoi.h"
+#include "libmesh/diff_qoi.h"
 
 namespace libMesh
 {

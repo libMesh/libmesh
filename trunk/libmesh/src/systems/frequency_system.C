@@ -18,7 +18,7 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 /*
  * Require complex arithmetic
@@ -30,11 +30,11 @@
 #include <cstdio>          // for sprintf
 
 // Local includes
-#include "frequency_system.h"
-#include "equation_systems.h"
-#include "libmesh_logging.h"
-#include "linear_solver.h"
-#include "numeric_vector.h"
+#include "libmesh/frequency_system.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {

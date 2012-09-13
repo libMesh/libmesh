@@ -22,9 +22,9 @@
 
 
 // Local includes
-#include "libmesh_common.h"
-#include "libmesh_base.h"
-#include "enum_solver_package.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_base.h"
+#include "libmesh/enum_solver_package.h"
 
 // C++ includes
 #include <string>

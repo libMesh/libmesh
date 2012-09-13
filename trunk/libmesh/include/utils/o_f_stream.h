@@ -21,7 +21,7 @@
 #define __o_f_stream_h__
 
 // Local Includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 // C++ includes
 #include <fstream>

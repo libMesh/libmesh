@@ -20,10 +20,10 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "mesh_base.h"
-#include "linear_partitioner.h"
-#include "libmesh_logging.h"
-#include "elem.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/linear_partitioner.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

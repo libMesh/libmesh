@@ -23,15 +23,15 @@
 #include <map>
 #include <string>
 
-#include "libmesh.h"
+#include "libmesh/libmesh.h"
 
-#include "dof_map.h"
-#include "equation_systems.h"
-#include "getpot.h"
-#include "mesh.h"
-#include "mesh_function.h"
-#include "numeric_vector.h"
-#include "point.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/getpot.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_function.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/point.h"
 
 
 // If there's a missing input argument, then print a help message

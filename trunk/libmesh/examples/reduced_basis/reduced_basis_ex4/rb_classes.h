@@ -20,7 +20,7 @@
 #ifndef __rb_classes_h__
 #define __rb_classes_h__
 
-#include "rb_construction.h"
+#include "libmesh/rb_construction.h"
 #include "assembly.h"
 
 // A simple subclass of RBEvaluation.

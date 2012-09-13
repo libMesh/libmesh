@@ -19,13 +19,13 @@
 #ifndef __mesh_triangle_wrapper_h__
 #define __mesh_triangle_wrapper_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
 // Local Includes
-#include "libmesh_common.h" // Real
-#include "enum_elem_type.h" // For ElemType declaration below
+#include "libmesh/libmesh_common.h" // Real
+#include "libmesh/enum_elem_type.h" // For ElemType declaration below
 
 // C++ includes
 #include <cstddef>

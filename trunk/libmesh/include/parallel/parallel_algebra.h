@@ -25,13 +25,13 @@
 
 
 // Local Includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
-#include "auto_ptr.h"
-#include "parallel.h"
-#include "point.h"
-#include "tensor_value.h"
-#include "vector_value.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/parallel.h"
+#include "libmesh/point.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/vector_value.h"
 
 // C++ includes
 #include <cstddef>
