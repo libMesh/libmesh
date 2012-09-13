@@ -20,9 +20,9 @@
 #include <algorithm> // for std::min, std::max
 
 // Local includes
-#include "cell_hex.h"
-#include "cell_hex8.h"
-#include "face_quad4.h"
+#include "libmesh/cell_hex.h"
+#include "libmesh/cell_hex8.h"
+#include "libmesh/face_quad4.h"
 
 namespace libMesh
 {

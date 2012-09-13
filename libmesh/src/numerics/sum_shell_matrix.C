@@ -18,8 +18,8 @@
 
 
 // Local includes
-#include "sum_shell_matrix.h"
-#include "numeric_vector.h"
+#include "libmesh/sum_shell_matrix.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {

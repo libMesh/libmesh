@@ -18,9 +18,9 @@
 // C++ includes
 
 // Local includes
-#include "side.h"
-#include "edge_edge2.h"
-#include "face_tri3.h"
+#include "libmesh/side.h"
+#include "libmesh/edge_edge2.h"
+#include "libmesh/face_tri3.h"
 
 namespace libMesh
 {

@@ -22,11 +22,11 @@
 
 
 // Local includes
-#include "libmesh_common.h"
-#include "fe.h"
-#include "quadrature.h"
-#include "elem.h"
-#include "libmesh_logging.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/fe.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/elem.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {

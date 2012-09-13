@@ -20,13 +20,13 @@
 // C++ includes
 
 // Local Includes
-#include "dof_map.h"
-#include "laspack_matrix.h"
-#include "parallel.h"
-#include "petsc_matrix.h"
-#include "sparse_matrix.h"
-#include "trilinos_epetra_matrix.h"
-#include "numeric_vector.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/laspack_matrix.h"
+#include "libmesh/parallel.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/trilinos_epetra_matrix.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {

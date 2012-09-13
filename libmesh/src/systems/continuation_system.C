@@ -16,11 +16,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // LibMesh includes
-#include "continuation_system.h"
-#include "linear_solver.h"
-#include "time_solver.h"
-#include "newton_solver.h"
-#include "sparse_matrix.h"
+#include "libmesh/continuation_system.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/time_solver.h"
+#include "libmesh/newton_solver.h"
+#include "libmesh/sparse_matrix.h"
 
 namespace libMesh
 {

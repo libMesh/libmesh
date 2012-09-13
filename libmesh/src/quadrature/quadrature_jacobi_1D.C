@@ -18,7 +18,7 @@
 
 
 // Local includes
-#include "quadrature_jacobi.h"
+#include "libmesh/quadrature_jacobi.h"
 
 namespace libMesh
 {

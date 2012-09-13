@@ -21,11 +21,11 @@
 #define __raw_accessor_h__
 
   // Local includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
-#include "tensor_value.h"
-#include "vector_value.h"
-#include "type_n_tensor.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/type_n_tensor.h"
 
 namespace libMesh
 {

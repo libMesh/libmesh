@@ -25,22 +25,22 @@
 #include <string>
 
 // Local includes
-#include "legacy_xdr_io.h"
-#include "mesh_base.h"
-#include "mesh_data.h"
-#include "mesh_tools.h" // MeshTools::n_levels(mesh)
-#include "parallel.h"   // - which makes write parallel-only
-#include "cell_hex27.h" // Needed for MGF-style Hex27 meshes
-#include "boundary_info.h"
-#include "libmesh_logging.h"
-#include "xdr_mgf.h"
-#include "xdr_mesh.h"
-#include "xdr_mhead.h"
-#include "xdr_soln.h"
-#include "xdr_shead.h"
+#include "libmesh/legacy_xdr_io.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_data.h"
+#include "libmesh/mesh_tools.h" // MeshTools::n_levels(mesh)
+#include "libmesh/parallel.h"   // - which makes write parallel-only
+#include "libmesh/cell_hex27.h" // Needed for MGF-style Hex27 meshes
+#include "libmesh/boundary_info.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/xdr_mgf.h"
+#include "libmesh/xdr_mesh.h"
+#include "libmesh/xdr_mhead.h"
+#include "libmesh/xdr_soln.h"
+#include "libmesh/xdr_shead.h"
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-#include "utility.h"
+#include "libmesh/utility.h"
 #endif
 
 

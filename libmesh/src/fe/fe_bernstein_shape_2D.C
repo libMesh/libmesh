@@ -17,13 +17,13 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
-#include "fe.h"
-#include "elem.h"
-#include "number_lookups.h"
-#include "utility.h"
+#include "libmesh/fe.h"
+#include "libmesh/elem.h"
+#include "libmesh/number_lookups.h"
+#include "libmesh/utility.h"
 
 
 namespace libMesh

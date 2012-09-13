@@ -21,7 +21,7 @@
 #define __cell_prism15_h__
 
 // Local includes
-#include "cell_prism.h"
+#include "libmesh/cell_prism.h"
 
 // C++ includes
 #include <cstddef>

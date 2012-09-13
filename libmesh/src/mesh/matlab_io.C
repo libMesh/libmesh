@@ -20,9 +20,9 @@
 #include <fstream>
 
 // Local includes
-#include "matlab_io.h"
-#include "mesh_base.h"
-#include "face_tri3.h"
+#include "libmesh/matlab_io.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/face_tri3.h"
 
 namespace libMesh
 {

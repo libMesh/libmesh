@@ -19,7 +19,7 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // only compile these functions if the user requests AMR support
 #ifdef LIBMESH_ENABLE_AMR
@@ -28,12 +28,12 @@
 #include <algorithm> // for std::sort
 
 // Local includes
-#include "elem.h"
-#include "error_vector.h"
-#include "mesh_refinement.h"
-#include "mesh_base.h"
-#include "parallel.h"
-#include "remote_elem.h"
+#include "libmesh/elem.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/parallel.h"
+#include "libmesh/remote_elem.h"
 
 namespace libMesh
 {

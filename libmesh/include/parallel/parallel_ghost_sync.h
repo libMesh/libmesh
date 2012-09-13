@@ -22,11 +22,11 @@
 #define __parallel_ghost_sync_h__
 
 // Local Includes -----------------------------------
-#include "auto_ptr.h"
-#include "elem.h"
-#include "location_maps.h"
-#include "mesh_base.h"
-#include "parallel.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/elem.h"
+#include "libmesh/location_maps.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/parallel.h"
 
 // C++ Includes   -----------------------------------
 

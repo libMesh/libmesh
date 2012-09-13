@@ -21,8 +21,8 @@
 #define __fe_h__
 
 // Local includes
-#include "fe_base.h"
-#include "libmesh.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/libmesh.h"
 
 // C++ includes
 #include <cstddef>

@@ -17,7 +17,7 @@
 
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #if defined(LIBMESH_HAVE_LASPACK)
 
@@ -25,8 +25,8 @@
 // C++ includes
 
 // Local Includes
-#include "laspack_linear_solver.h"
-#include "libmesh_logging.h"
+#include "libmesh/laspack_linear_solver.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {

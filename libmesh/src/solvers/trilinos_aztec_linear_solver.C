@@ -17,7 +17,7 @@
 
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_AZTECOO
 
@@ -25,10 +25,10 @@
 // C++ includes
 
 // Local Includes
-#include "libmesh_logging.h"
-#include "trilinos_aztec_linear_solver.h"
-#include "trilinos_epetra_matrix.h"
-#include "trilinos_epetra_vector.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/trilinos_aztec_linear_solver.h"
+#include "libmesh/trilinos_epetra_matrix.h"
+#include "libmesh/trilinos_epetra_vector.h"
 
 namespace libMesh
 {

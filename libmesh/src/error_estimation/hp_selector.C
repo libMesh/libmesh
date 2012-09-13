@@ -19,7 +19,7 @@
 // C++ includes
 
 // Local Includes
-#include "hp_selector.h"
+#include "libmesh/hp_selector.h"
 
 //-----------------------------------------------------------------
 // No implementations necessary for abstract class HPSelector

@@ -44,16 +44,16 @@
 // C++ include files that we need
 #include <iostream>
 //Basic include file needed for the mesh functionality.
-#include "libmesh.h"
-#include "mesh.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh.h"
 // Include file that defines various mesh generation utilities
-#include "mesh_generation.h"
+#include "libmesh/mesh_generation.h"
 // Include file that defines (possibly multiple) systems of equations.
-#include "equation_systems.h"
+#include "libmesh/equation_systems.h"
 // Include files that define a simple steady system
-#include "linear_implicit_system.h"
-#include "transient_system.h"
-#include "explicit_system.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/transient_system.h"
+#include "libmesh/explicit_system.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

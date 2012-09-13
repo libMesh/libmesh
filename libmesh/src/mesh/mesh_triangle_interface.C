@@ -16,19 +16,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
-#include "mesh_triangle_interface.h"
-#include "unstructured_mesh.h"
-#include "face_tri3.h"
-#include "face_tri6.h"
-#include "mesh_generation.h"
-#include "mesh_smoother_laplace.h"
-#include "boundary_info.h"
-#include "mesh_triangle_holes.h"
-#include "mesh_triangle_wrapper.h"
+#include "libmesh/mesh_triangle_interface.h"
+#include "libmesh/unstructured_mesh.h"
+#include "libmesh/face_tri3.h"
+#include "libmesh/face_tri6.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/mesh_smoother_laplace.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/mesh_triangle_holes.h"
+#include "libmesh/mesh_triangle_wrapper.h"
 
 namespace libMesh
 {

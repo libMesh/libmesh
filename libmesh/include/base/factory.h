@@ -22,8 +22,8 @@
 
 
 // Local includes
-#include "libmesh_common.h"
-#include "auto_ptr.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <cstddef>

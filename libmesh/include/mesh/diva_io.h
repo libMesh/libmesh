@@ -20,8 +20,8 @@
 #define __diva_io_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "mesh_output.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/mesh_output.h"
 
 // C++ Includes   -----------------------------------
 

@@ -16,11 +16,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "diff_solver.h"
-#include "diff_system.h"
-#include "dof_map.h"
-#include "numeric_vector.h"
-#include "unsteady_solver.h"
+#include "libmesh/diff_solver.h"
+#include "libmesh/diff_system.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/unsteady_solver.h"
 
 namespace libMesh
 {

@@ -20,9 +20,9 @@
 // C++ includes
 
 // Local includes
-// #include "mesh_base.h"
-#include "serial_mesh.h"
-#include "elem.h"
+// #include "libmesh/mesh_base.h"
+#include "libmesh/serial_mesh.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

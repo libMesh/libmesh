@@ -21,10 +21,10 @@
 #define __equation_systems_h__
 
 // Local Includes
-#include "libmesh_common.h"
-#include "parameters.h"
-#include "system.h"
-#include "enum_xdr_mode.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/parameters.h"
+#include "libmesh/system.h"
+#include "libmesh/enum_xdr_mode.h"
 
 // HP aCC needs these for some reason
 #ifdef __HP_aCC

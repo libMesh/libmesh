@@ -17,7 +17,7 @@
 
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_PETSC)
 
@@ -25,11 +25,11 @@
 // C++ includes
 
 // Local Includes
-#include "libmesh_logging.h"
-#include "petsc_matrix.h"
-#include "petsc_vector.h"
-#include "slepc_eigen_solver.h"
-#include "shell_matrix.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/slepc_eigen_solver.h"
+#include "libmesh/shell_matrix.h"
 
 namespace libMesh
 {

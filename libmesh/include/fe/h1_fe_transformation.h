@@ -18,9 +18,9 @@
 #ifndef __h1_fe_transformation_h__
 #define __h1_fe_transformation_h__
 
-#include "fe_transformation_base.h"
-#include "compare_types.h"
-#include "elem.h"
+#include "libmesh/fe_transformation_base.h"
+#include "libmesh/compare_types.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

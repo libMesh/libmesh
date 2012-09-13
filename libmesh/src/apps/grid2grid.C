@@ -23,15 +23,15 @@
 
 
 // Local Includes
-#include "elem.h"
-#include "fe.h"
-#include "libmesh.h"
-#include "mesh.h"
-#include "perf_log.h"
-#include "quadrature_gauss.h"
-#include "tecplot_io.h"
-#include "tree.h"
-#include "legacy_xdr_io.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh.h"
+#include "libmesh/perf_log.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/tecplot_io.h"
+#include "libmesh/tree.h"
+#include "libmesh/legacy_xdr_io.h"
 
 
 using namespace libMesh;

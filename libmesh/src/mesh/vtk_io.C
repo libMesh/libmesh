@@ -20,49 +20,49 @@
 #include <fstream>
 
 // Local includes
-#include "vtk_io.h"
-#include "mesh_base.h"
-#include "equation_systems.h"
-#include "cell_tet4.h"
-#include "cell_tet10.h"
-#include "cell_prism6.h"
-#include "cell_pyramid5.h"
-#include "cell_hex8.h"
-#include "cell_hex20.h"
-#include "numeric_vector.h"
-#include "system.h"
-//#include "cell_inf.h"
-//#include "cell_inf_prism12.h"
-//#include "cell_prism6.h"
-//#include "cell_tet4.h"
+#include "libmesh/vtk_io.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/cell_tet4.h"
+#include "libmesh/cell_tet10.h"
+#include "libmesh/cell_prism6.h"
+#include "libmesh/cell_pyramid5.h"
+#include "libmesh/cell_hex8.h"
+#include "libmesh/cell_hex20.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/system.h"
+//#include "libmesh/cell_inf.h"
+//#include "libmesh/cell_inf_prism12.h"
+//#include "libmesh/cell_prism6.h"
+//#include "libmesh/cell_tet4.h"
 
-//#include "cell_inf_hex16.h"
-//#include "cell_inf_prism6.h"
-//#include "cell_prism.h"
-//#include "cell_tet.h"
+//#include "libmesh/cell_inf_hex16.h"
+//#include "libmesh/cell_inf_prism6.h"
+//#include "libmesh/cell_prism.h"
+//#include "libmesh/cell_tet.h"
 
-//#include "cell_hex27.h"
-//#include "cell_inf_hex18.h"
-//#include "cell_inf_prism.h"
-//#include "cell_pyramid5.h"
+//#include "libmesh/cell_hex27.h"
+//#include "libmesh/cell_inf_hex18.h"
+//#include "libmesh/cell_inf_prism.h"
+//#include "libmesh/cell_pyramid5.h"
 
-//#include "cell_hex8.h"
-//#include "cell_inf_hex8.h"
-//#include "cell_prism15.h"
-//#include "cell_pyramid.h"
+//#include "libmesh/cell_hex8.h"
+//#include "libmesh/cell_inf_hex8.h"
+//#include "libmesh/cell_prism15.h"
+//#include "libmesh/cell_pyramid.h"
 
-//#include "cell_hex.h"
-//#include "cell_inf_hex.h"
-//#include "cell_prism18.h"
-//#include "cell_tet10.h"
+//#include "libmesh/cell_hex.h"
+//#include "libmesh/cell_inf_hex.h"
+//#include "libmesh/cell_prism18.h"
+//#include "libmesh/cell_tet10.h"
 
 
 
-#include "mesh_data.h"
+#include "libmesh/mesh_data.h"
 
 #ifdef LIBMESH_HAVE_VTK
 
-#include "ignore_warnings.h"
+#include "libmesh/ignore_warnings.h"
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
@@ -88,7 +88,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
-#include "restore_warnings.h"
+#include "libmesh/restore_warnings.h"
 #endif //LIBMESH_HAVE_VTK
 
 namespace libMesh

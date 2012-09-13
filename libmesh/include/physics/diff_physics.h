@@ -22,8 +22,8 @@
 #define __diff_physics_h__
 
 // Local Includes
-#include "auto_ptr.h"
-#include "diff_context.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/diff_context.h"
 
 // C++ includes
 #include <vector>

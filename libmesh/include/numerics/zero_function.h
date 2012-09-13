@@ -3,7 +3,7 @@
 #define __zero_function_h__
 
 // Local includes
-#include "const_function.h"
+#include "libmesh/const_function.h"
 
 // C++ includes
 

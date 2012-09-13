@@ -19,13 +19,13 @@
 #define __trilinos_epetra_vector_h__
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 
 #ifdef LIBMESH_HAVE_TRILINOS
 
 // Local includes
-#include "numeric_vector.h"
+#include "libmesh/numeric_vector.h"
 
 // Trilinos includes
 #include <Epetra_CombineMode.h>

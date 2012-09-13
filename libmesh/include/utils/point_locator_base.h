@@ -21,10 +21,10 @@
 #define __point_locator_base_h__
 
 // Local Includes
-#include "reference_counted_object.h"
-#include "libmesh_common.h"
-#include "auto_ptr.h"
-#include "enum_point_locator_type.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/enum_point_locator_type.h"
 
 // C++ includes
 #include <cstddef>

@@ -20,9 +20,9 @@
 #ifndef __fe_xyz_map_h__
 #define __fe_xyz_map_h__
 
-#include "fe_map.h"
-#include "libmesh_logging.h"
-#include "elem.h"
+#include "libmesh/fe_map.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

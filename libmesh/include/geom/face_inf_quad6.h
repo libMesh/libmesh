@@ -21,12 +21,12 @@
 #define __inf_quad6_h__
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // Local includes
-#include "face_inf_quad.h"
+#include "libmesh/face_inf_quad.h"
 
 // C++ includes
 #include <cstddef>

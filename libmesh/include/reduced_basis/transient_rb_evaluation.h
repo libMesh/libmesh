@@ -21,8 +21,8 @@
 #define __transient_rb_evaluation_h__
 
 // rbOOmit includes
-#include "rb_evaluation.h"
-#include "rb_temporal_discretization.h"
+#include "libmesh/rb_evaluation.h"
+#include "libmesh/rb_temporal_discretization.h"
 
 // libMesh includes
 

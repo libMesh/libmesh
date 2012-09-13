@@ -21,7 +21,7 @@
 #define __rb_parameters_h__
 
 // libMesh includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 // C++ includes
 #include <string>

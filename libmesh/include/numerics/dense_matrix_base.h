@@ -21,8 +21,8 @@
 #define __dense_matrix_base_h__
 
 // Local Includes
-#include "libmesh_common.h"
-#include "compare_types.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/compare_types.h"
 
 // C++ includes
 

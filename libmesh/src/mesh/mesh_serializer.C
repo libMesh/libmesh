@@ -17,9 +17,9 @@
 
 
 // Local includes
-#include "mesh_serializer.h"
-#include "mesh_base.h"
-#include "parallel.h" // parallel_only() macro
+#include "libmesh/mesh_serializer.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/parallel.h" // parallel_only() macro
 
 namespace libMesh
 {

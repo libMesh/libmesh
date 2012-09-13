@@ -57,34 +57,34 @@
 #include <iostream>
 
 // General libMesh includes
-#include "equation_systems.h"
-#include "error_vector.h"
-#include "mesh.h"
-#include "mesh_refinement.h"
-#include "newton_solver.h"
-#include "numeric_vector.h"
-#include "steady_solver.h"
-#include "system_norm.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/newton_solver.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/steady_solver.h"
+#include "libmesh/system_norm.h"
 
 // Sensitivity Calculation related includes
-#include "parameter_vector.h"
-#include "sensitivity_data.h"
+#include "libmesh/parameter_vector.h"
+#include "libmesh/sensitivity_data.h"
 
 // Error Estimator includes
-#include "kelly_error_estimator.h"
-#include "patch_recovery_error_estimator.h"
+#include "libmesh/kelly_error_estimator.h"
+#include "libmesh/patch_recovery_error_estimator.h"
 
 // Adjoint Related includes
-#include "adjoint_residual_error_estimator.h"
-#include "qoi_set.h"
+#include "libmesh/adjoint_residual_error_estimator.h"
+#include "libmesh/qoi_set.h"
 
 // libMesh I/O includes
-#include "getpot.h"
-#include "gmv_io.h"
+#include "libmesh/getpot.h"
+#include "libmesh/gmv_io.h"
 
 // Some (older) compilers do not offer full stream
 // functionality, OStringStream works around this.
-#include "o_string_stream.h"
+#include "libmesh/o_string_stream.h"
 
 // Local includes
 #include "femparameters.h"

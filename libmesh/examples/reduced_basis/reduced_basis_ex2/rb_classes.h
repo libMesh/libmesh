@@ -22,9 +22,9 @@
 
 #if defined(LIBMESH_HAVE_SLEPC) && defined(LIBMESH_HAVE_GLPK)
 
-#include "rb_construction.h"
-#include "rb_scm_construction.h"
-#include "fe_base.h"
+#include "libmesh/rb_construction.h"
+#include "libmesh/rb_scm_construction.h"
+#include "libmesh/fe_base.h"
 
 // local include
 #include "assembly.h"

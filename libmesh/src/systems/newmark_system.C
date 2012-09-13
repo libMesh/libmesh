@@ -20,11 +20,11 @@
 // C++ includes
 
 // Local includes
-#include "newmark_system.h"
-#include "equation_systems.h"
-#include "sparse_matrix.h"
-#include "libmesh_logging.h"
-#include "numeric_vector.h"
+#include "libmesh/newmark_system.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {

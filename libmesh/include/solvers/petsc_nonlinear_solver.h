@@ -20,14 +20,14 @@
 #ifndef __petsc_nonlinear_solver_h__
 #define __petsc_nonlinear_solver_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Petsc include files.
 #ifdef LIBMESH_HAVE_PETSC
 
 // Local includes
-#include "nonlinear_solver.h"
-#include "petsc_macro.h"
+#include "libmesh/nonlinear_solver.h"
+#include "libmesh/petsc_macro.h"
 
 // PETSc includes
 EXTERN_C_FOR_PETSC_BEGIN

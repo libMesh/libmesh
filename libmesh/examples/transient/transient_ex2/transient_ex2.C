@@ -39,43 +39,43 @@
 #include <math.h>
 
 // Basic include file needed for the mesh functionality.
-#include "libmesh.h"
-#include "serial_mesh.h"
-#include "gmv_io.h"
-#include "vtk_io.h"
-#include "newmark_system.h"
-#include "equation_systems.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/serial_mesh.h"
+#include "libmesh/gmv_io.h"
+#include "libmesh/vtk_io.h"
+#include "libmesh/newmark_system.h"
+#include "libmesh/equation_systems.h"
 
 // Define the Finite Element object.
-#include "fe.h"
+#include "libmesh/fe.h"
 
 // Define Gauss quadrature rules.
-#include "quadrature_gauss.h"
+#include "libmesh/quadrature_gauss.h"
 
 // Define useful datatypes for finite element
-#include "dense_matrix.h"
-#include "dense_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
 
 // Define matrix and vector data types for the global 
 // equation system.  These are base classes,
 // from which specific implementations, like
 // the PETSc or LASPACK implementations, are derived.
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
 
 // Define the DofMap, which handles degree of freedom
 // indexing.
-#include "dof_map.h"
+#include "libmesh/dof_map.h"
 
 // The definition of a vertex associated with a Mesh.
-#include "node.h"
+#include "libmesh/node.h"
 
 // The definition of a geometric element
-#include "elem.h"
+#include "libmesh/elem.h"
 
 // Defines the MeshData class, which allows you to store
 // data about the mesh when reading in files, etc.
-#include "mesh_data.h"
+#include "libmesh/mesh_data.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

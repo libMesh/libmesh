@@ -21,13 +21,13 @@
 #define __fem_context_h__
 
 // Local Includes
-#include "diff_context.h"
-#include "vector_value.h"
-#include "fe_type.h"
-#include "fe_base.h"
+#include "libmesh/diff_context.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/fe_base.h"
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-#include "tensor_value.h"
+#include "libmesh/tensor_value.h"
 #endif
 
 // C++ includes

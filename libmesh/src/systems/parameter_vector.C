@@ -20,7 +20,7 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "parameter_vector.h"
+#include "libmesh/parameter_vector.h"
 
 namespace libMesh
 {

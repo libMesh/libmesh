@@ -15,17 +15,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_TRILINOS
 
 // C++ includes
 
 // Local Includes
-#include "trilinos_preconditioner.h"
-#include "trilinos_epetra_matrix.h"
-#include "trilinos_epetra_vector.h"
-#include "libmesh_common.h"
+#include "libmesh/trilinos_preconditioner.h"
+#include "libmesh/trilinos_epetra_matrix.h"
+#include "libmesh/trilinos_epetra_vector.h"
+#include "libmesh/libmesh_common.h"
 
 #include "Ifpack.h"
 #include "Ifpack_DiagPreconditioner.h"

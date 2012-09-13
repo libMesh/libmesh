@@ -23,7 +23,7 @@
 #include <iomanip> // for std::setw, std::setiosflags
 
 // Local includes
-#include "type_tensor.h"
+#include "libmesh/type_tensor.h"
 
 namespace libMesh
 {

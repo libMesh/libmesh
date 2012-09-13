@@ -22,18 +22,18 @@
 #include <set>
 
 // Local includes
-#include "elem.h"
-#include "elem_range.h"
-#include "location_maps.h"
-#include "mesh_base.h"
-#include "mesh_communication.h"
-#include "mesh_tools.h"
-#include "node_range.h"
-#include "parallel.h"
-#include "parallel_mesh.h"
-#include "serial_mesh.h"
-#include "sphere.h"
-#include "threads.h"
+#include "libmesh/elem.h"
+#include "libmesh/elem_range.h"
+#include "libmesh/location_maps.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/node_range.h"
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_mesh.h"
+#include "libmesh/serial_mesh.h"
+#include "libmesh/sphere.h"
+#include "libmesh/threads.h"
 
 #ifdef DEBUG
 #  include "remote_elem.h"

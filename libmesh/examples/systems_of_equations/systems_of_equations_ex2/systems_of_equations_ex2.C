@@ -37,37 +37,37 @@
 #include <math.h>
 
 // Basic include file needed for the mesh functionality.
-#include "libmesh.h"
-#include "mesh.h"
-#include "mesh_generation.h"
-#include "exodusII_io.h"
-#include "equation_systems.h"
-#include "fe.h"
-#include "quadrature_gauss.h"
-#include "dof_map.h"
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "linear_implicit_system.h"
-#include "transient_system.h"
-#include "perf_log.h"
-#include "boundary_info.h"
-#include "utility.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/transient_system.h"
+#include "libmesh/perf_log.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/utility.h"
 
 // Some (older) compilers do not offer full stream 
 // functionality, OStringStream works around this.
-#include "o_string_stream.h"
+#include "libmesh/o_string_stream.h"
 
 // For systems of equations the \p DenseSubMatrix
 // and \p DenseSubVector provide convenient ways for
 // assembling the element matrix and vector on a
 // component-by-component basis.
-#include "dense_submatrix.h"
-#include "dense_subvector.h"
+#include "libmesh/dense_submatrix.h"
+#include "libmesh/dense_subvector.h"
 
 // The definition of a geometric element
-#include "elem.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

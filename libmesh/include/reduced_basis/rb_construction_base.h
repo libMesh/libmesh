@@ -21,15 +21,15 @@
 #define __rb_construction_base_h__
 
 // rbOOmit includes
-#include "rb_parametrized.h"
-#include "rb_theta_expansion.h"
-#include "rb_theta.h"
+#include "libmesh/rb_parametrized.h"
+#include "libmesh/rb_theta_expansion.h"
+#include "libmesh/rb_theta.h"
 
 // libMesh includes
-#include "system.h"
-#include "numeric_vector.h"
-#include "linear_solver.h"
-#include "perf_log.h"
+#include "libmesh/system.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/perf_log.h"
 
 // C++ includes
 #include <set>

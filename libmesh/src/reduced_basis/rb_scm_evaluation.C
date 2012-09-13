@@ -18,25 +18,25 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Configuration data
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Currently, the RBSCMEvaluation should only be available
 // if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC) && (LIBMESH_HAVE_GLPK)
 
 // rbOOmit includes
-#include "rb_scm_evaluation.h"
+#include "libmesh/rb_scm_evaluation.h"
 
 // libMesh includes
-#include "libmesh_logging.h"
-#include "numeric_vector.h"
-#include "o_string_stream.h"
-#include "sparse_matrix.h"
-#include "equation_systems.h"
-#include "getpot.h"
-#include "parallel.h"
-#include "dof_map.h"
-#include "xdr_cxx.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/getpot.h"
+#include "libmesh/parallel.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/xdr_cxx.h"
 
 // For creating a directory
 #include <sys/types.h>

@@ -21,11 +21,11 @@
 #define __mesh_generation_h__
 
 // Local Includes -----------------------------------
-// #include "libmesh_common.h" // needed for Real
-#include "libmesh.h"
-#include "enum_elem_type.h"
-#include "mesh_triangle_interface.h"
-#include "vector_value.h"
+// #include "libmesh/libmesh_common.h" // needed for Real
+#include "libmesh/libmesh.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/mesh_triangle_interface.h"
+#include "libmesh/vector_value.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>

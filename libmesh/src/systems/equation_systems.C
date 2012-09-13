@@ -20,26 +20,26 @@
 #include <sstream>
 
 // Local Includes
-#include "explicit_system.h"
-#include "fe_interface.h"
-#include "frequency_system.h"
-#include "linear_implicit_system.h"
-#include "mesh_refinement.h"
-#include "newmark_system.h"
-#include "nonlinear_implicit_system.h"
-#include "rb_construction.h"
-#include "transient_rb_construction.h"
-#include "eigen_system.h"
-#include "parallel.h"
-#include "transient_system.h"
-#include "dof_map.h"
-#include "mesh_base.h"
-#include "elem.h"
-#include "libmesh_logging.h"
+#include "libmesh/explicit_system.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/frequency_system.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/newmark_system.h"
+#include "libmesh/nonlinear_implicit_system.h"
+#include "libmesh/rb_construction.h"
+#include "libmesh/transient_rb_construction.h"
+#include "libmesh/eigen_system.h"
+#include "libmesh/parallel.h"
+#include "libmesh/transient_system.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/elem.h"
+#include "libmesh/libmesh_logging.h"
 
 // Include the systems before this one to avoid
 // overlapping forward declarations.
-#include "equation_systems.h"
+#include "libmesh/equation_systems.h"
 
 namespace libMesh
 {

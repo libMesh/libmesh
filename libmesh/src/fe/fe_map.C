@@ -22,12 +22,12 @@
 
 
 // Local includes
-#include "fe.h"
-#include "elem.h"
-#include "libmesh_logging.h"
-#include "fe_macro.h"
-#include "fe_map.h"
-#include "fe_xyz_map.h"
+#include "libmesh/fe.h"
+#include "libmesh/elem.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/fe_macro.h"
+#include "libmesh/fe_map.h"
+#include "libmesh/fe_xyz_map.h"
 
 namespace libMesh
 {

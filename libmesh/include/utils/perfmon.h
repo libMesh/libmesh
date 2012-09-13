@@ -22,7 +22,7 @@
 
 
 // Local includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef HAVE_PAPI_H
 namespace Papi {

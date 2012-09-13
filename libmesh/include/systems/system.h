@@ -21,18 +21,18 @@
 #define __system_h__
 
 // Local Includes
-#include "auto_ptr.h"
-#include "elem_range.h"
-#include "enum_norm_type.h"
-#include "enum_xdr_mode.h"
-#include "enum_subset_solve_mode.h"
-#include "enum_parallel_type.h"
-#include "fe_type.h"
-#include "libmesh_common.h"
-#include "tensor_value.h" // For point_hessian
-#include "qoi_set.h"
-#include "reference_counted_object.h"
-#include "variable.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/elem_range.h"
+#include "libmesh/enum_norm_type.h"
+#include "libmesh/enum_xdr_mode.h"
+#include "libmesh/enum_subset_solve_mode.h"
+#include "libmesh/enum_parallel_type.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/tensor_value.h" // For point_hessian
+#include "libmesh/qoi_set.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/variable.h"
 
 // C++ includes
 #include <cstddef>

@@ -18,8 +18,8 @@
 // C++ includes
 
 // Local includes
-#include "face_quad.h"
-#include "edge_edge2.h"
+#include "libmesh/face_quad.h"
+#include "libmesh/edge_edge2.h"
 
 namespace libMesh
 {

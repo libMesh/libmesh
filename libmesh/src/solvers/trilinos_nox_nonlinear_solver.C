@@ -17,7 +17,7 @@
 
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_NOX
 
@@ -25,14 +25,14 @@
 // C++ includes
 
 // Local Includes
-#include "libmesh_logging.h"
-#include "dof_map.h"
-#include "nonlinear_implicit_system.h"
-#include "trilinos_nox_nonlinear_solver.h"
-#include "system.h"
-#include "trilinos_epetra_vector.h"
-#include "trilinos_epetra_matrix.h"
-#include "trilinos_preconditioner.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/nonlinear_implicit_system.h"
+#include "libmesh/trilinos_nox_nonlinear_solver.h"
+#include "libmesh/system.h"
+#include "libmesh/trilinos_epetra_vector.h"
+#include "libmesh/trilinos_epetra_matrix.h"
+#include "libmesh/trilinos_preconditioner.h"
 
 // ---------- Standard Includes ----------
 #include <iostream>

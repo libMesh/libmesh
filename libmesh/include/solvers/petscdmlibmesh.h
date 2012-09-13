@@ -1,7 +1,7 @@
 #ifndef _petscdmlibmesh
 #define _petscdmlibmesh
 
-#include "petsc_macro.h"
+#include "libmesh/petsc_macro.h"
 // This only works with petsc-3.3 and above.
 
 #if !PETSC_VERSION_LESS_THAN(3,3,0)

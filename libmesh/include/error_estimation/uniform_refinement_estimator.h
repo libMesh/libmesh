@@ -21,8 +21,8 @@
 #define __uniform_refinement_estimator_h__
 
 // Local Includes
-#include "error_estimator.h"
-#include "libmesh.h"
+#include "libmesh/error_estimator.h"
+#include "libmesh/libmesh.h"
 
 // C++ includes
 #include <cstddef>

@@ -19,15 +19,15 @@
 #ifndef __condensed_eigen_system_h__
 #define __condensed_eigen_system_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Currently, the EigenSystem should only be available
 // if SLEPc support is enabled.
 #if defined(LIBMESH_HAVE_SLEPC)
 
 // Local Includes
-#include "eigen_system.h"
-#include "sparse_matrix.h"
+#include "libmesh/eigen_system.h"
+#include "libmesh/sparse_matrix.h"
 
 // C++ includes
 

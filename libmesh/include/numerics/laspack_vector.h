@@ -23,12 +23,12 @@
 
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_LASPACK
 
 // Local includes
-#include "numeric_vector.h"
+#include "libmesh/numeric_vector.h"
 
 // C++ includes
 #include <cstdio> // for std::sprintf

@@ -21,11 +21,11 @@
 #define __nonlinear_solver_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "enum_solver_package.h"
-#include "reference_counted_object.h"
-#include "nonlinear_implicit_system.h"
-#include "libmesh.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/enum_solver_package.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/nonlinear_implicit_system.h"
+#include "libmesh/libmesh.h"
 
 // C++ includes
 #include <cstddef>

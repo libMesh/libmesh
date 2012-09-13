@@ -21,11 +21,11 @@
 #define __time_solver_h__
 
 // Local includes
-#include "auto_ptr.h"
-#include "libmesh_common.h"
-#include "linear_solver.h"
-#include "numeric_vector.h"
-#include "reference_counted_object.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/reference_counted_object.h"
 
 // C++ includes
 

@@ -19,9 +19,9 @@
 #include <algorithm> // for std::sort
 
 // Local includes
-#include "centroid_partitioner.h"
-#include "mesh_base.h"
-#include "elem.h"
+#include "libmesh/centroid_partitioner.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

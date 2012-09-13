@@ -24,15 +24,15 @@
  // (respectively).
 
 // Local header files
-#include "elem.h"
-#include "face_tri3.h"
-#include "mesh.h"
-#include "mesh_generation.h"
-#include "mesh_tetgen_interface.h"
-#include "mesh_triangle_holes.h"
-#include "mesh_triangle_interface.h"
-#include "node.h"
-#include "serial_mesh.h"
+#include "libmesh/elem.h"
+#include "libmesh/face_tri3.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/mesh_tetgen_interface.h"
+#include "libmesh/mesh_triangle_holes.h"
+#include "libmesh/mesh_triangle_interface.h"
+#include "libmesh/node.h"
+#include "libmesh/serial_mesh.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

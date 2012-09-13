@@ -22,15 +22,15 @@
 #include <map>
 
 // Local includes
-#include "libmesh_common.h"
-#include "string_to_enum.h"
-#include "enum_elem_type.h"
-#include "enum_order.h"
-#include "enum_fe_family.h"
-#include "enum_inf_map_type.h"
-#include "enum_quadrature_type.h"
-#include "enum_preconditioner_type.h"
-#include "elem.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/enum_fe_family.h"
+#include "libmesh/enum_inf_map_type.h"
+#include "libmesh/enum_quadrature_type.h"
+#include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

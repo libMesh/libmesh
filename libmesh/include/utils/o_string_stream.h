@@ -23,7 +23,7 @@
 
 
 // Mesh configuration options
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 
 
@@ -33,7 +33,7 @@
 #include <sstream>
 
 // Local Includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 
 // Forward Declarations

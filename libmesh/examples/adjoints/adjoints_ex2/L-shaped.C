@@ -1,12 +1,12 @@
 /* This is where we define the assembly of the Laplace system */
 
 // General libMesh includes
-#include "getpot.h"
-#include "fe_base.h"
-#include "quadrature.h"
-#include "string_to_enum.h"
-#include "parallel.h"
-#include "fem_context.h"
+#include "libmesh/getpot.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/parallel.h"
+#include "libmesh/fem_context.h"
 
 // Local includes
 #include "L-shaped.h"

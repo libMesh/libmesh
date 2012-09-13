@@ -21,11 +21,11 @@
 #ifndef __location_maps_h__
 #define __location_maps_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Local Includes -----------------------------------
-#include "libmesh_common.h"
-#include "point.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/point.h"
 
 // C++ Includes   -----------------------------------
 #include LIBMESH_INCLUDE_UNORDERED_MAP

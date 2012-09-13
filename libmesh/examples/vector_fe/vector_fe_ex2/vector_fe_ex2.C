@@ -23,17 +23,17 @@
  // DifferentiableSystem class framework
 
 // Basic include files
-#include "equation_systems.h"
-#include "getpot.h"
-#include "exodusII_io.h"
-#include "mesh.h"
-#include "mesh_generation.h"
-#include "exact_solution.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/getpot.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/exact_solution.h"
 
 // The systems and solvers we may use
 #include "laplace_system.h"
-#include "diff_solver.h"
-#include "steady_solver.h"
+#include "libmesh/diff_solver.h"
+#include "libmesh/steady_solver.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

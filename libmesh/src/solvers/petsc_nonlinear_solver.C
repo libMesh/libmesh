@@ -17,7 +17,7 @@
 
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
@@ -25,13 +25,13 @@
 // C++ includes
 
 // Local Includes
-#include "nonlinear_implicit_system.h"
-#include "petsc_nonlinear_solver.h"
-#include "petsc_linear_solver.h"
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
-#include "dof_map.h"
-#include "preconditioner.h"
+#include "libmesh/nonlinear_implicit_system.h"
+#include "libmesh/petsc_nonlinear_solver.h"
+#include "libmesh/petsc_linear_solver.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/preconditioner.h"
 
 namespace libMesh
 {

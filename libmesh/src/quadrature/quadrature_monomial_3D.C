@@ -18,8 +18,8 @@
 
 
 // Local includes
-#include "quadrature_monomial.h"
-#include "quadrature_gauss.h"
+#include "libmesh/quadrature_monomial.h"
+#include "libmesh/quadrature_gauss.h"
 
 namespace libMesh
 {

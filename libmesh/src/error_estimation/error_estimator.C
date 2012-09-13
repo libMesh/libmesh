@@ -17,11 +17,11 @@
 
 
 // Local include files
-#include "libmesh_common.h"
-#include "error_estimator.h"
-#include "error_vector.h"
-#include "equation_systems.h"
-#include "parallel.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/error_estimator.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/parallel.h"
 
 
 

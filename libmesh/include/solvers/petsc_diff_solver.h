@@ -20,13 +20,13 @@
 #ifndef __petsc_diff_solver_h__
 #define __petsc_diff_solver_h__
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
 // Local includes
-#include "diff_solver.h"
-#include "petsc_macro.h"
+#include "libmesh/diff_solver.h"
+#include "libmesh/petsc_macro.h"
 
 // PETSc includes
 EXTERN_C_FOR_PETSC_BEGIN

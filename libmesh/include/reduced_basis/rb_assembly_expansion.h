@@ -21,8 +21,8 @@
 #define __rb_assembly_expansion_h__
 
 // libMesh includes
-#include "elem_assembly.h"
-#include "reference_counted_object.h"
+#include "libmesh/elem_assembly.h"
+#include "libmesh/reference_counted_object.h"
 
 // C++ includes
 #include <vector>

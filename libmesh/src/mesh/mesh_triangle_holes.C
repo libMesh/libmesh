@@ -16,12 +16,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
 // Local includes
-#include "mesh_triangle_holes.h"
+#include "libmesh/mesh_triangle_holes.h"
 
 namespace libMesh
 {

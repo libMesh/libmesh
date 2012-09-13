@@ -19,7 +19,7 @@
 #include <iostream>
 
 // Local includes
-#include "elem_type.h"
+#include "libmesh/elem_type.h"
 
 namespace libMesh
 {

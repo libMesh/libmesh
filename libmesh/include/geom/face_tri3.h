@@ -22,8 +22,8 @@
 
 
 // Local includes
-#include "libmesh_common.h"
-#include "face_tri.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/face_tri.h"
 
 // C++ includes
 #include <cstddef>

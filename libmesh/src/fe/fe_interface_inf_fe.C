@@ -18,12 +18,12 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-#include "fe_interface.h"
-#include "inf_fe.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/inf_fe.h"
 
 namespace libMesh
 {

@@ -18,7 +18,7 @@
 
 
 // Local includes
-#include "number_lookups.h"
+#include "libmesh/number_lookups.h"
 
 namespace libMesh
 {

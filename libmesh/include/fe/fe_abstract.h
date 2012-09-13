@@ -21,20 +21,20 @@
 #define __fe_abstract_h__
 
 // Local includes
-#include "reference_counted_object.h"
-#include "point.h"
-#include "vector_value.h"
-#include "enum_elem_type.h"
-#include "fe_type.h"
-#include "auto_ptr.h"
-#include "fe_map.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/point.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/fe_map.h"
 
 // C++ includes
 #include <cstddef>
 #include <vector>
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-#include "tensor_value.h"
+#include "libmesh/tensor_value.h"
 #endif
 
 namespace libMesh

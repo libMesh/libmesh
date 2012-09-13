@@ -21,19 +21,19 @@
 #define __elem_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "dof_object.h"
-#include "id_types.h"
-#include "reference_counted_object.h"
-#include "node.h"
-#include "enum_elem_type.h"
-#include "enum_elem_quality.h"
-#include "enum_order.h"
-#include "enum_io_package.h"
-#include "auto_ptr.h"
-#include "multi_predicates.h"
-#include "variant_filter_iterator.h"
-#include "hashword.h" // Used in compute_key() functions
+#include "libmesh/libmesh_common.h"
+#include "libmesh/dof_object.h"
+#include "libmesh/id_types.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/node.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_elem_quality.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/enum_io_package.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/multi_predicates.h"
+#include "libmesh/variant_filter_iterator.h"
+#include "libmesh/hashword.h" // Used in compute_key() functions
 
 // C++ includes
 #include <algorithm>

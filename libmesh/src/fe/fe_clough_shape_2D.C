@@ -19,8 +19,8 @@
 // C++ inlcludes
 
 // Local includes
-#include "fe.h"
-#include "elem.h"
+#include "libmesh/fe.h"
+#include "libmesh/elem.h"
 
 
 // Anonymous namespace for persistant variables.

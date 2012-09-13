@@ -22,16 +22,16 @@
 
 
 // Local Includes
-#include "libmesh_common.h"
-#include "kelly_error_estimator.h"
-#include "error_vector.h"
-#include "fe_base.h"
-#include "libmesh_logging.h"
-#include "elem.h"
-#include "system.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/kelly_error_estimator.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/elem.h"
+#include "libmesh/system.h"
 
-#include "dense_vector.h"
-#include "tensor_tools.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/tensor_tools.h"
 
 namespace libMesh
 {

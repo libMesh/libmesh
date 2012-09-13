@@ -21,8 +21,8 @@
 #define __elem_type_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "enum_elem_type.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/enum_elem_type.h"
 
 // C++ includes
 #include <string>

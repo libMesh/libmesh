@@ -16,15 +16,15 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_SLEPC
 
 // C++ includes
 
 // Local Includes
-#include "eigen_solver.h"
-#include "slepc_eigen_solver.h"
-#include "auto_ptr.h"
+#include "libmesh/eigen_solver.h"
+#include "libmesh/slepc_eigen_solver.h"
+#include "libmesh/auto_ptr.h"
 
 namespace libMesh
 {

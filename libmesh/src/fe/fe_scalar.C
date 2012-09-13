@@ -18,9 +18,9 @@
 
 
 // Local includes
-#include "dof_map.h"
-#include "fe.h"
-#include "elem.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/fe.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

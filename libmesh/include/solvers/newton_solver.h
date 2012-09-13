@@ -21,10 +21,10 @@
 #define __newton_solver_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "linear_solver.h"
-#include "reference_counted_object.h"
-#include "diff_solver.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/diff_solver.h"
 
 // C++ includes
 

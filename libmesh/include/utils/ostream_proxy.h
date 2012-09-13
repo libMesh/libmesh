@@ -27,7 +27,7 @@
 
 // Local Includes
 // We don't use anything libMesh-specific here (yet)
-// #include "libmesh_common.h"
+// #include "libmesh/libmesh_common.h"
 
 
 namespace libMesh

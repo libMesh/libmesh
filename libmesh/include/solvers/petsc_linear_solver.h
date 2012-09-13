@@ -20,11 +20,11 @@
 #ifndef __petsc_linear_solver_h__
 #define __petsc_linear_solver_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
-#include "petsc_macro.h"
+#include "libmesh/petsc_macro.h"
 
 /**
  * Petsc include files.
@@ -39,7 +39,7 @@ EXTERN_C_FOR_PETSC_BEGIN
 EXTERN_C_FOR_PETSC_END
 
 // Local includes
-#include "linear_solver.h"
+#include "libmesh/linear_solver.h"
 
 // C++ includes
 #include <cstddef>

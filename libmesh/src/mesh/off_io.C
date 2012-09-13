@@ -19,9 +19,9 @@
 #include <fstream>
 
 // Local includes
-#include "off_io.h"
-#include "mesh_base.h"
-#include "face_tri3.h"
+#include "libmesh/off_io.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/face_tri3.h"
 
 namespace libMesh
 {

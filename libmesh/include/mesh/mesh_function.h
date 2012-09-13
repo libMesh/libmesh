@@ -21,11 +21,11 @@
 #define __mesh_function_h__
 
 // Local Includes
-#include "function_base.h"
-#include "dense_vector.h"
-#include "vector_value.h"
-#include "tensor_value.h"
-#include "tree_base.h"
+#include "libmesh/function_base.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/tree_base.h"
 
 // C++ includes
 #include <cstddef>

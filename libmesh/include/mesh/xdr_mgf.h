@@ -19,9 +19,9 @@
 #define __xdr_mgf_h__
 
 // Local includes
-#include "legacy_xdr_io.h"          // for LegacyXdrIO::FileFormat
-#include "libmesh_config.h"  // for LIBMESH_HAVE_XDR
-#include "o_f_stream.h"      // for OFStream
+#include "libmesh/legacy_xdr_io.h"          // for LegacyXdrIO::FileFormat
+#include "libmesh/libmesh_config.h"  // for LIBMESH_HAVE_XDR
+#include "libmesh/o_f_stream.h"      // for OFStream
 
 // C++ includes
 #include <cstdio>  // for std::FILE

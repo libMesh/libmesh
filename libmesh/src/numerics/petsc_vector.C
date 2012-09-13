@@ -20,16 +20,16 @@
 // C++ includes
 
 // Local Includes
-#include "petsc_vector.h"
-#include "petsc_matrix.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/petsc_matrix.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
-#include "dense_subvector.h"
-#include "dense_vector.h"
-#include "parallel.h"
-#include "petsc_macro.h"
-#include "utility.h"
+#include "libmesh/dense_subvector.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/parallel.h"
+#include "libmesh/petsc_macro.h"
+#include "libmesh/utility.h"
 
 namespace libMesh
 {

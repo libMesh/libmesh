@@ -20,14 +20,14 @@
 // C++ includes
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_LASPACK
 
-#include "laspack_matrix.h"
-#include "dense_matrix.h"
-#include "dof_map.h"
-#include "sparsity_pattern.h"
+#include "libmesh/laspack_matrix.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/sparsity_pattern.h"
 
 namespace libMesh
 {

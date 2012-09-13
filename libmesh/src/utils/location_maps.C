@@ -22,11 +22,11 @@
 #include <utility>
 
 // Local Includes -----------------------------------
-#include "elem.h"
-#include "location_maps.h"
-#include "mesh_base.h"
-#include "node.h"
-#include "parallel.h"
+#include "libmesh/elem.h"
+#include "libmesh/location_maps.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/node.h"
+#include "libmesh/parallel.h"
 
 
 

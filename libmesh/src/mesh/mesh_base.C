@@ -18,7 +18,7 @@
 
 
 // library configuration
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // C++ includes
 #include <algorithm> // for std::min
@@ -27,13 +27,13 @@
 
 
 // Local includes
-#include "boundary_info.h"
-#include "elem.h"
-#include "mesh_base.h"
-#include "parallel.h"
-#include "partitioner.h"
-#include "point_locator_base.h"
-#include "threads.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/parallel.h"
+#include "libmesh/partitioner.h"
+#include "libmesh/point_locator_base.h"
+#include "libmesh/threads.h"
 
 
 namespace libMesh

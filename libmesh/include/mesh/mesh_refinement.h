@@ -22,16 +22,16 @@
 
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 
 // Local Includes -----------------------------------
-#include "libmesh_common.h"
-#include "libmesh.h" // libMesh::invalid_uint
-#include "location_maps.h"
-#include "elem.h"
-#include "point_locator_base.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh.h" // libMesh::invalid_uint
+#include "libmesh/location_maps.h"
+#include "libmesh/elem.h"
+#include "libmesh/point_locator_base.h"
 
 // C++ Includes   -----------------------------------
 #include <vector>

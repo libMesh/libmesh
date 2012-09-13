@@ -18,8 +18,8 @@
 #ifndef __fe_transformation_base_h__
 #define __fe_transformation_base_h__
 
-#include "fe_base.h"
-#include "fe_type.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_type.h"
 
 namespace libMesh
 {

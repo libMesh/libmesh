@@ -21,7 +21,7 @@
 
 
 // Local includes
-#include "system_subset.h"
+#include "libmesh/system_subset.h"
 
 namespace libMesh
 {

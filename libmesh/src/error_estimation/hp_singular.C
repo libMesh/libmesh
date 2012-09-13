@@ -18,11 +18,11 @@
 // C++ includes
 
 // Local Includes
-#include "elem.h"
-#include "hp_singular.h"
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "system.h"
+#include "libmesh/elem.h"
+#include "libmesh/hp_singular.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/system.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 

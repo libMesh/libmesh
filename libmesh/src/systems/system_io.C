@@ -16,21 +16,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh_common.h"
-#include "parallel.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/parallel.h"
 
 // C++ Includes
 #include <cstdio> // for std::sprintf
 #include <set>
 
 // Local Includes
-#include "system.h"
-#include "mesh_base.h"
-//#include "mesh_tools.h"
-#include "elem.h"
-#include "xdr_cxx.h"
-#include "numeric_vector.h"
-#include "dof_map.h"
+#include "libmesh/system.h"
+#include "libmesh/mesh_base.h"
+//#include "libmesh/mesh_tools.h"
+#include "libmesh/elem.h"
+#include "libmesh/xdr_cxx.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dof_map.h"
 
 
 

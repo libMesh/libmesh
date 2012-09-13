@@ -22,11 +22,11 @@
 #include <iomanip>
 
 // Local includes
-#include "libmesh_config.h"
-#include "libmesh_logging.h"
-#include "tecplot_io.h"
-#include "mesh_base.h"
-#include "elem.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/tecplot_io.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/elem.h"
 
 #ifdef LIBMESH_HAVE_TECPLOT_API
 extern "C" {

@@ -21,13 +21,13 @@
 #include <map>
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
-#include "mesh_base.h"
-#include "metis_partitioner.h"
-#include "libmesh_logging.h"
-#include "elem.h"
-#include "mesh_communication.h"
-#include "error_vector.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/metis_partitioner.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/error_vector.h"
 
 #ifdef LIBMESH_HAVE_METIS
 // MIPSPro 7.4.2 gets confused about these nested namespaces

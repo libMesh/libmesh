@@ -21,7 +21,7 @@
 #define __statistics_h__
 
 // Local includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 // C++ includes
 #include <vector>

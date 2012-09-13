@@ -21,7 +21,7 @@
 #define __cell_hex20_h__
 
 // Local includes
-#include "cell_hex.h"
+#include "libmesh/cell_hex.h"
 
 // C++ includes
 #include <cstddef>

@@ -2,10 +2,10 @@
 #define __assembly_h__
 
 // rbOOmit includes
-#include "rb_parameters.h"
-#include "rb_theta.h"
-#include "rb_theta_expansion.h"
-#include "rb_assembly_expansion.h"
+#include "libmesh/rb_parameters.h"
+#include "libmesh/rb_theta.h"
+#include "libmesh/rb_theta_expansion.h"
+#include "libmesh/rb_assembly_expansion.h"
 
 // boundary IDs
 #define BOUNDARY_ID_MIN_Z 0

@@ -21,7 +21,7 @@
 #define __analytic_function_h__
 
 // Local Includes
-#include "function_base.h"
+#include "libmesh/function_base.h"
 
 // C++ includes
 #include <cstddef>

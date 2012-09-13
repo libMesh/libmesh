@@ -1,9 +1,9 @@
 #ifndef __biharmonic_h__
 #define __biharmonic_h__
 
-#include "equation_systems.h"
-#include "serial_mesh.h"
-#include "exodusII_io.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/serial_mesh.h"
+#include "libmesh/exodusII_io.h"
 
 // libmesh_error() and libmesh_assert() macros with a message
 #define ERROR(message)                                                                                         \

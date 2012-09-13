@@ -29,13 +29,13 @@
 #include <vector>
 
 // Local includes
-#include "libmesh_config.h"
-#include "libmesh_logging.h"
-#include "gmv_io.h"
-#include "mesh_base.h"
-#include "elem.h"
-#include "equation_systems.h"
-#include "numeric_vector.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/gmv_io.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/numeric_vector.h"
 
 // Wrap everything in a GMV namespace and
 // use extern "C" to avoid name mangling.

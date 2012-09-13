@@ -21,7 +21,7 @@
 #define __explicit_system_h__
 
 // Local Includes
-#include "system.h"
+#include "libmesh/system.h"
 
 // C++ includes
 

@@ -20,12 +20,12 @@
 #ifndef __cell_inf_hex18_h__
 #define __cell_inf_hex18_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // Local includes
-#include "cell_inf_hex.h"
+#include "libmesh/cell_inf_hex.h"
 
 // C++ includes
 #include <cstddef>

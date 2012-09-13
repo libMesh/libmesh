@@ -23,7 +23,7 @@
 #include <limits>
 #include <stdint.h>
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 namespace libMesh
 {

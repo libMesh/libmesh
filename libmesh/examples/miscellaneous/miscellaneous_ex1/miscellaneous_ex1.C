@@ -38,37 +38,37 @@
 #include <math.h>
 
 // Basic include file needed for the mesh functionality.
-#include "exodusII_io.h"
-#include "libmesh.h"
-#include "serial_mesh.h"
-#include "mesh_generation.h"
-#include "linear_implicit_system.h"
-#include "equation_systems.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/serial_mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/equation_systems.h"
 
 // Define the Finite and Infinite Element object.
-#include "fe.h"
-#include "inf_fe.h"
-#include "inf_elem_builder.h"
+#include "libmesh/fe.h"
+#include "libmesh/inf_fe.h"
+#include "libmesh/inf_elem_builder.h"
 
 // Define Gauss quadrature rules.
-#include "quadrature_gauss.h"
+#include "libmesh/quadrature_gauss.h"
 
 // Define useful datatypes for finite element
 // matrix and vector components.
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
 
 // Define the DofMap, which handles degree of freedom
 // indexing.
-#include "dof_map.h"
+#include "libmesh/dof_map.h"
 
 // The definition of a vertex associated with a Mesh.
-#include "node.h"
+#include "libmesh/node.h"
 
 // The definition of a geometric element
-#include "elem.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

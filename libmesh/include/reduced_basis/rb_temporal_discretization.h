@@ -21,7 +21,7 @@
 #define __rb_temporal_discretization_h__
 
 // libMesh includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 namespace libMesh
 {

@@ -15,9 +15,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "adaptive_time_solver.h"
-#include "diff_system.h"
-#include "numeric_vector.h"
+#include "libmesh/adaptive_time_solver.h"
+#include "libmesh/diff_system.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {

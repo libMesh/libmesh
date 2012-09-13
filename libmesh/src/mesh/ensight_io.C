@@ -23,13 +23,13 @@
 #include <cstring>
 #include <stdio.h>
 
-#include "dof_map.h"
-#include "ensight_io.h"
-#include "equation_systems.h"
-#include "fe_interface.h"
-#include "libmesh.h"
-#include "o_string_stream.h"
-#include "system.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/ensight_io.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/system.h"
 
 
 namespace libMesh

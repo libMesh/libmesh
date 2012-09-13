@@ -20,7 +20,7 @@
 // C++ includes
 
 // Local includes
-#include "quadrature_grid.h"
+#include "libmesh/quadrature_grid.h"
 
 namespace libMesh
 {

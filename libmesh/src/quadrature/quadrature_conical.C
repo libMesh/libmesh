@@ -16,9 +16,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "quadrature_conical.h"
-#include "quadrature_gauss.h"
-#include "quadrature_jacobi.h"
+#include "libmesh/quadrature_conical.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_jacobi.h"
 
 namespace libMesh
 {
