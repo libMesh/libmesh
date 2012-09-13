@@ -735,7 +735,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	    }
 
 	  // Compute the value of the error at this quadrature point
-	  typename FEGenericBase<OutputShape>::OutputNumber exact_val;
+	  typename FEGenericBase<OutputShape>::OutputNumber exact_val = 0;
 	  RawAccessor<typename FEGenericBase<OutputShape>::OutputNumber> exact_val_accessor( exact_val, dim );
           if (_exact_values.size() > sys_num && _exact_values[sys_num])
 	    {
