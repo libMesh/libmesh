@@ -5,6 +5,15 @@
 #include "libmesh/serial_mesh.h"
 #include "libmesh/exodusII_io.h"
 
+// Bring in bits from the libMesh namespace.
+// Just the bits we're using, since this is a header.
+using libMesh::EquationSystems;
+using libMesh::ExodusII_IO;
+using libMesh::MeshRefinement;
+using libMesh::Point;
+using libMesh::Real;
+using libMesh::UnstructuredMesh;
+
 // libmesh_error() and libmesh_assert() macros with a message
 #define ERROR(message)                                                                                         \
   do {                                                                                                         \

@@ -17,6 +17,8 @@
 
 #include "libmesh/libmesh_common.h"
 
+using namespace libMesh;
+
 #ifndef __laplace_exact_solution_h__
 #define __laplace_exact_solution_h__
 
