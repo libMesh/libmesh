@@ -4,7 +4,6 @@
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
 
 // PETSc includes
-#include <petscdmlibmesh.h>
 #include <petsc-private/dmimpl.h>
 
 // Local Includes
@@ -14,6 +13,7 @@
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/petsc_matrix.h"
+#include <libmesh/petscdmlibmesh.h>
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
 
