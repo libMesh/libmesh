@@ -56,6 +56,7 @@ echo '  'stack trace files................ : $enabletracefiles
 echo '  'subdomain id size................ : $subdomain_bytes bytes
 echo '  'variational smoother............. : $enablevsmoother
 echo '  'xdr binary I/O................... : $enablexdr
+echo '  'legacy include paths............. : $enablelegacyincludepaths
 
 
 		   

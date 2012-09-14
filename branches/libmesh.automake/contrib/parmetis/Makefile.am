@@ -12,6 +12,8 @@ INCLUDES = -I$(top_srcdir)/contrib/metis/GKlib \
            -I$(srcdir)/include \
            -I$(srcdir)/Lib 
 
+INCLUDES += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
+
 noinst_LTLIBRARIES     = libparmetis.la
 
 libparmetis_la_SOURCES = \
