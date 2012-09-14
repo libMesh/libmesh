@@ -25,10 +25,10 @@
 #include "libmesh/elem.h"
 #include "libmesh/periodic_boundary.h"
 
+namespace libMesh {
+
 // ------------------------------------------------------------
 // PeriodicBoundaries member functions
-
-
 
 
 PeriodicBoundaries::~PeriodicBoundaries()
@@ -76,7 +76,7 @@ const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
   return point_locator.operator()(p);
 }
 
-
+} // namespace libMesh
 
 
 

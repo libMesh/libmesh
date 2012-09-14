@@ -23,6 +23,8 @@
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/periodic_boundary.h"
 
+namespace libMesh {
+
 // ------------------------------------------------------------
 // PeriodicBoundary member functions
 
@@ -68,6 +70,9 @@ AutoPtr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType t) cons
 {
   return AutoPtr<PeriodicBoundaryBase>(new PeriodicBoundary(*this, t));
 }
+
+
+} // namespace libMesh
 
 
 #endif // LIBMESH_ENABLE_PERIODIC

@@ -17,6 +17,8 @@
 
 #include "libmesh/fe_xyz_map.h"
 
+namespace libMesh {
+
 void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem* side)
 {
   libmesh_assert (side != NULL);
@@ -214,3 +216,5 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
 
   return;
 }
+
+} // namespace libMesh

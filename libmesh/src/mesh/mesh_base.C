@@ -359,8 +359,6 @@ void MeshBase::clear_point_locator ()
   _point_locator.reset(NULL);
 }
 
-} // namespace libMesh
-
 
 
 std::string& MeshBase::subdomain_name(subdomain_id_type id)
@@ -392,4 +390,7 @@ subdomain_id_type MeshBase::get_id_by_name(const std::string& name) const
   std::cerr << "Block name does not exist in mesh";
   libmesh_error();
 }
+
+
+} // namespace libMesh
 

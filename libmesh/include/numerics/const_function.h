@@ -10,6 +10,8 @@
 // C++ includes
 #include <string>
 
+namespace libMesh {
+
 template <typename Output=Number>
 class ConstFunction : public FunctionBase<Output>
 {
@@ -39,5 +41,6 @@ private:
   Output _c;
 };
 
+} // namespace libMesh
 
 #endif // __const_function_h__
