@@ -21,12 +21,22 @@
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
+using libMesh::DenseSubMatrix;
 using libMesh::ElemAssembly;
 using libMesh::FEInterface;
 using libMesh::FEMContext;
 using libMesh::Number;
 using libMesh::Point;
+using libMesh::RBAssemblyExpansion;
+using libMesh::RBConstruction;
+using libMesh::RBParameters;
+using libMesh::RBParametrizedFunction;
 using libMesh::RBTheta;
+using libMesh::RBThetaExpansion;
+using libMesh::RBEIMAssembly;
+using libMesh::RBEIMConstruction;
+using libMesh::RBEIMEvaluation;
+using libMesh::RBEIMTheta;
 using libMesh::Real;
 using libMesh::RealGradient;
 

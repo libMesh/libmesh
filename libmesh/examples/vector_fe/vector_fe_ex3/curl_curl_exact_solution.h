@@ -18,6 +18,8 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/vector_value.h"
 
+using namespace libMesh;
+
 #ifndef __curl_curl_exact_solution_h__
 #define __curl_curl_exact_solution_h__
 

@@ -17,14 +17,19 @@
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
+using libMesh::AutoPtr;
+using libMesh::DirichletBoundary;
 using libMesh::ElemAssembly;
 using libMesh::FEInterface;
 using libMesh::FEMContext;
 using libMesh::Number;
 using libMesh::Point;
+using libMesh::RBParameters;
 using libMesh::RBTheta;
 using libMesh::Real;
 using libMesh::RealGradient;
+using libMesh::TransientRBThetaExpansion;
+using libMesh::TransientRBAssemblyExpansion;
 
 // Functors for the parameter-dependent part of the affine decomposition of the PDE
 // The RHS and outputs just require a constant value of 1, so use a default RBTheta object there

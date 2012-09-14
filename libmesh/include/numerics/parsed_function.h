@@ -20,6 +20,8 @@
 #include <cstddef>
 #include <string>
 
+namespace libMesh {
+
 template <typename Output=Number>
 class ParsedFunction : public FunctionBase<Output>
 {
@@ -207,7 +209,15 @@ private:
   std::vector<Output> _initial_vals;
 };
 
-#else
+
+} // namespace libMesh
+
+
+#else // LIBMESH_HAVE_FPARSER
+
+
+namespace libMesh {
+
 
 template <typename Output>
 class ParsedFunction : public FunctionBase<Output>
@@ -236,6 +246,10 @@ public:
 private:
   Output _dummy;
 };
+
+
+} // namespace libMesh
+
 
 #endif // LIBMESH_HAVE_FPARSER
 
