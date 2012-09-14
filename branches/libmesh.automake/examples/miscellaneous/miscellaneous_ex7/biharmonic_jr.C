@@ -13,7 +13,7 @@
 // Example includes
 #include "biharmonic_jr.h"
 
-
+using namespace libMesh;
 
 Biharmonic::JR::JR(EquationSystems& eqSys,
 		   const std::string& name,

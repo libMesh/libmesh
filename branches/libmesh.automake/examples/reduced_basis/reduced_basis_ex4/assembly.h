@@ -18,6 +18,22 @@
 #include "libmesh/rb_eim_theta.h"
 #include "libmesh/rb_parametrized_function.h"
 
+// Bring in bits from the libMesh namespace.
+// Just the bits we're using, since this is a header.
+using libMesh::ElemAssembly;
+using libMesh::FEMContext;
+using libMesh::Number;
+using libMesh::Point;
+using libMesh::RBAssemblyExpansion;
+using libMesh::RBEIMAssembly;
+using libMesh::RBEIMConstruction;
+using libMesh::RBParametrizedFunction;
+using libMesh::RBParameters;
+using libMesh::RBTheta;
+using libMesh::RBThetaExpansion;
+using libMesh::Real;
+using libMesh::RealGradient;
+
 struct ShiftedGaussian : public RBParametrizedFunction
 {
   virtual Number evaluate(const RBParameters& mu,

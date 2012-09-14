@@ -5,6 +5,12 @@
 #include "libmesh/rb_eim_construction.h"
 #include "assembly.h"
 
+// Bring in bits from the libMesh namespace.
+// Just the bits we're using, since this is a header.
+using libMesh::AutoPtr;
+using libMesh::EquationSystems;
+using libMesh::RBEIMEvaluation;
+
 // A simple subclass of RBEIMEvaluation. Overload
 // evaluate_parametrized_function to define the
 // function that we "empirically" interpolate.

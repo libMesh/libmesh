@@ -22,7 +22,10 @@ using libMesh::FEInterface;
 using libMesh::FEMContext;
 using libMesh::Number;
 using libMesh::Point;
+using libMesh::RBAssemblyExpansion;
+using libMesh::RBParameters;
 using libMesh::RBTheta;
+using libMesh::RBThetaExpansion;
 using libMesh::Real;
 using libMesh::RealGradient;
 

@@ -40,6 +40,8 @@
 #include "eim_classes.h"
 #include "rb_classes.h"
 
+using namespace libMesh;
+
 
 int main (int argc, char** argv)
 {

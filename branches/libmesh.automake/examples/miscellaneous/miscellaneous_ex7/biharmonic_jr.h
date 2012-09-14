@@ -9,6 +9,19 @@
 // Example includes
 #include "biharmonic.h"
 
+// Bring in bits from the libMesh namespace.
+// Just the bits we're using, since this is a header.
+using libMesh::EquationSystems;
+using libMesh::Gradient;
+using libMesh::NonlinearImplicitSystem;
+using libMesh::Number;
+using libMesh::NumericVector;
+using libMesh::Parameters;
+using libMesh::Point;
+using libMesh::SparseMatrix;
+using libMesh::System;
+using libMesh::TransientNonlinearImplicitSystem;
+
 
 /**
  * Biharmonic's friend class definition
