@@ -28,10 +28,10 @@
 
 // HP aCC needs these for some reason
 #ifdef __HP_aCC
-# include "frequency_system.h"
-# include "transient_system.h"
-# include "newmark_system.h"
-# include "steady_system.h"
+# include "libmesh/frequency_system.h"
+# include "libmesh/transient_system.h"
+# include "libmesh/newmark_system.h"
+# include "libmesh/steady_system.h"
 #endif
 
 // C++ includes

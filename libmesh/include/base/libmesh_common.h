@@ -26,9 +26,9 @@
 
 // Include the MPI definition
 #ifdef LIBMESH_HAVE_MPI
-# include "ignore_warnings.h"
+# include "libmesh/ignore_warnings.h"
 # include <mpi.h>
-# include "restore_warnings.h"
+# include "libmesh/restore_warnings.h"
 #endif
 
 // C/C++ includes everyone should know about
@@ -54,7 +54,7 @@ extern "C" {
 // Proxy class for libMesh::out/err output
 #include "libmesh/ostream_proxy.h"
 
-# include "print_trace.h"
+# include "libmesh/print_trace.h"
 
 // For some reason the real std::max, std::min
 // don't handle mixed compatible types

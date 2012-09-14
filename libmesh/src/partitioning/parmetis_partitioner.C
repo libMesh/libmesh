@@ -36,9 +36,9 @@
 // Include the ParMETIS header files
 namespace Parmetis {
   extern "C" {
-#     include "ignore_warnings.h"
+#     include "libmesh/ignore_warnings.h"
 #     include "parmetis.h"
-#     include "restore_warnings.h"
+#     include "libmesh/restore_warnings.h"
   }
 }
 

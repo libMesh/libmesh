@@ -33,7 +33,7 @@
     }
   }
 #else
-#  include "linear_partitioner.h"
+#  include "libmesh/linear_partitioner.h"
 #endif
 
 namespace libMesh

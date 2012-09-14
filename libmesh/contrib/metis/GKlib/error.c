@@ -20,7 +20,7 @@ This file contains functions dealing with error reporting and termination
  * this using configure and set the appropriate value in LIBMESH_TLS, which is
  * defined in libmesh_config.h
  */
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 
 /* These are the jmp_buf for the graceful exit in case of severe errors.
