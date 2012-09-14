@@ -22,30 +22,30 @@
 
 
 // Local includes
-#include "dof_map.h"
-#include "equation_systems.h"
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "numeric_vector.h"
-#include "o_string_stream.h"
-#include "parameter_vector.h"
-#include "point.h"              // For point_value
-#include "point_locator_base.h" // For point_value
-#include "qoi_set.h"
-#include "string_to_enum.h"
-#include "system.h"
-#include "system_norm.h"
-#include "utility.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/parameter_vector.h"
+#include "libmesh/point.h"              // For point_value
+#include "libmesh/point_locator_base.h" // For point_value
+#include "libmesh/qoi_set.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/system.h"
+#include "libmesh/system_norm.h"
+#include "libmesh/utility.h"
 
 // includes for calculate_norm, point_*
-#include "fe_base.h"
-#include "fe_interface.h"
-#include "parallel.h"
-#include "parallel_algebra.h"
-#include "quadrature.h"
-#include "tensor_value.h"
-#include "vector_value.h"
-#include "tensor_tools.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_algebra.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/tensor_tools.h"
 
 namespace libMesh
 {

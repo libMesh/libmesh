@@ -21,9 +21,9 @@
 #define __rb_eim_evaluation_h__
 
 // libMesh includes
-#include "auto_ptr.h"
-#include "point.h"
-#include "rb_evaluation.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/point.h"
+#include "libmesh/rb_evaluation.h"
 
 // C++ includes
 

@@ -20,13 +20,13 @@
 #ifndef __slepc_eigen_solver_h__
 #define __slepc_eigen_solver_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_SLEPC
 
 // Local includes
-#include "eigen_solver.h"
-#include "slepc_macro.h"
+#include "libmesh/eigen_solver.h"
+#include "libmesh/slepc_macro.h"
 
 /**
  * SLEPc include files.

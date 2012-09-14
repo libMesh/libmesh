@@ -22,7 +22,7 @@
 
 
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 
 namespace libMesh

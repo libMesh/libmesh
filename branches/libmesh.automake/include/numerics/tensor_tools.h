@@ -21,8 +21,8 @@
 #define __tensor_tools_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "compare_types.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/compare_types.h"
 
 namespace libMesh
 {

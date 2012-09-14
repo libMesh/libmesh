@@ -21,9 +21,9 @@
 
 
 // Local Includes
-#include "point_locator_base.h"
-#include "point_locator_tree.h"
-#include "point_locator_list.h"
+#include "libmesh/point_locator_base.h"
+#include "libmesh/point_locator_tree.h"
+#include "libmesh/point_locator_list.h"
 
 namespace libMesh
 {

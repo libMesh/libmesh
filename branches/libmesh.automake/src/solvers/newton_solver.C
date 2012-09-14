@@ -16,13 +16,13 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "diff_system.h"
-#include "dof_map.h"
-#include "libmesh_logging.h"
-#include "linear_solver.h"
-#include "newton_solver.h"
-#include "numeric_vector.h"
-#include "sparse_matrix.h"
+#include "libmesh/diff_system.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/newton_solver.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/sparse_matrix.h"
 
 namespace libMesh
 {

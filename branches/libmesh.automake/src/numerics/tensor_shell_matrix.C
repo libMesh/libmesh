@@ -18,7 +18,7 @@
 
 
 // Local includes
-#include "tensor_shell_matrix.h"
+#include "libmesh/tensor_shell_matrix.h"
 
 namespace libMesh
 {

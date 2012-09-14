@@ -20,14 +20,14 @@
 #define __mesh_triangle_interface_h__
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
 // Local Includes
-#include "enum_elem_type.h"
-#include "libmesh.h"
-#include "mesh_serializer.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh_serializer.h"
 
 // C++ includes
 #include <cstddef>

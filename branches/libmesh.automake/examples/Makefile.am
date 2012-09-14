@@ -7,7 +7,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-INCLUDES    = $(libmesh_INCLUDE)
+INCLUDES    = $(libmesh_INCLUDE) -I$(top_builddir)/include
 LIBS        = $(libmesh_LIBS)
 
 if LIBMESH_ENABLE_FPARSER

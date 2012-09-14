@@ -21,7 +21,7 @@
 #define __twostep_time_solver_h__
 
 // Local includes
-#include "adaptive_time_solver.h"
+#include "libmesh/adaptive_time_solver.h"
 
 // C++ includes
 

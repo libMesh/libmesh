@@ -22,7 +22,7 @@
 #define __fem_system_h__
 
 // Local Includes
-#include "diff_system.h"
+#include "libmesh/diff_system.h"
 
 // C++ includes
 #include <cstddef>

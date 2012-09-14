@@ -21,17 +21,17 @@
 
 
 // Local Includes
-#include "mesh_function.h"
-#include "dense_vector.h"
-#include "equation_systems.h"
-#include "numeric_vector.h"
-#include "dof_map.h"
-#include "point_locator_tree.h"
-#include "fe_base.h"
-#include "fe_interface.h"
-#include "fe_compute_data.h"
-#include "mesh_base.h"
-#include "point.h"
+#include "libmesh/mesh_function.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/point_locator_tree.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_compute_data.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/point.h"
 
 namespace libMesh
 {

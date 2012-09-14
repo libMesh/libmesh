@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // C++ includes
 #include <iostream>
@@ -32,11 +32,11 @@
 #include <fstream>
 
 // Local Includes
-#include "libmesh.h"
-#include "equation_systems.h"
-#include "mesh.h"
-#include "perfmon.h"
-#include "enum_xdr_mode.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/mesh.h"
+#include "libmesh/perfmon.h"
+#include "libmesh/enum_xdr_mode.h"
 
 
 using namespace libMesh;

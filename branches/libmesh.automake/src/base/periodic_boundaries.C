@@ -16,19 +16,19 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-#include "periodic_boundaries.h"
-#include "point_locator_base.h"
-#include "elem.h"
-#include "periodic_boundary.h"
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/point_locator_base.h"
+#include "libmesh/elem.h"
+#include "libmesh/periodic_boundary.h"
+
+namespace libMesh {
 
 // ------------------------------------------------------------
 // PeriodicBoundaries member functions
-
-
 
 
 PeriodicBoundaries::~PeriodicBoundaries()
@@ -76,7 +76,7 @@ const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
   return point_locator.operator()(p);
 }
 
-
+} // namespace libMesh
 
 
 

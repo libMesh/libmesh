@@ -21,16 +21,16 @@
 #define __dof_map_h__
 
 // Local Includes -----------------------------------
-#include "libmesh_common.h"
-#include "auto_ptr.h"
-#include "enum_order.h"
-#include "reference_counted_object.h"
-#include "libmesh.h" // libMesh::invalid_uint
-#include "variable.h"
-#include "threads.h"
-#include "threads_allocators.h"
-#include "elem_range.h"
-#include "sparsity_pattern.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/libmesh.h" // libMesh::invalid_uint
+#include "libmesh/variable.h"
+#include "libmesh/threads.h"
+#include "libmesh/threads_allocators.h"
+#include "libmesh/elem_range.h"
+#include "libmesh/sparsity_pattern.h"
 
 // C++ Includes   -----------------------------------
 #include <algorithm>

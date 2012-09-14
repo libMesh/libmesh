@@ -17,13 +17,13 @@
 
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_SLEPC
 
-#include "diff_system.h"
-#include "eigen_time_solver.h"
-#include "eigen_solver.h"
-#include "sparse_matrix.h"
+#include "libmesh/diff_system.h"
+#include "libmesh/eigen_time_solver.h"
+#include "libmesh/eigen_solver.h"
+#include "libmesh/sparse_matrix.h"
 
 namespace libMesh
 {

@@ -11,7 +11,7 @@ noinst_LTLIBRARIES   = libnetcdf.la
 # is present. since we've implicitly guaranteed this for ~10 years
 # no need to break that trust now.  Since exodusII.h includes netcdf.h,
 # here we are...
-includedir      = $(prefix)/include/contrib
+includedir      = $(prefix)/include/libmesh
 include_HEADERS = netcdf.h
 
 # the files required to actually build libnetcdf.la

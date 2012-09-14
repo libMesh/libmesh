@@ -21,7 +21,7 @@
 
 
 // Local Includes
-#include "o_f_stream.h"
+#include "libmesh/o_f_stream.h"
 
 /*
  * This class is only alive when iostream is broken

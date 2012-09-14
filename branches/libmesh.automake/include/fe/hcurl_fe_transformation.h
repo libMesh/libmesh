@@ -18,7 +18,7 @@
 #ifndef __hcurl_fe_transformation_h__
 #define __hcurl_fe_transformation_h__
 
-#include "fe_transformation_base.h"
+#include "libmesh/fe_transformation_base.h"
 
 namespace libMesh
 {

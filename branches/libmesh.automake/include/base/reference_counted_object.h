@@ -21,7 +21,7 @@
 #define __reference_counted_object_h__
 
 // Local includes
-#include "reference_counter.h"
+#include "libmesh/reference_counter.h"
 
 // C++ includes
 #include <typeinfo>

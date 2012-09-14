@@ -23,8 +23,8 @@
 
 
 // Local includes
-#include "libmesh_common.h"
-#include "linear_solver.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/linear_solver.h"
 
 /**
  * Trilinos include files.

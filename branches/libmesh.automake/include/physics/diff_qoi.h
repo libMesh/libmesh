@@ -22,8 +22,8 @@
 #define __diff_qoi_h__
 
 // Local Includes
-#include "diff_context.h"
-#include "qoi_set.h"
+#include "libmesh/diff_context.h"
+#include "libmesh/qoi_set.h"
 
 // C++ includes
 

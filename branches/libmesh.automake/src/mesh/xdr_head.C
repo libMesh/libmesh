@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "xdr_head.h"
+#include "libmesh/xdr_head.h"
 
 namespace libMesh
 {

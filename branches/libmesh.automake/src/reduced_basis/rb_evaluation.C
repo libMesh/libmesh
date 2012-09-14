@@ -18,16 +18,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // rbOOmit includes
-#include "rb_evaluation.h"
+#include "libmesh/rb_evaluation.h"
 
 // libMesh includes
-#include "system.h"
-#include "numeric_vector.h"
-#include "parallel.h"
-#include "libmesh_logging.h"
-#include "xdr_cxx.h"
-#include "mesh_tools.h"
-#include "o_string_stream.h"
+#include "libmesh/system.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/parallel.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/xdr_cxx.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/o_string_stream.h"
 
 // C/C++ includes
 #include <sys/types.h>

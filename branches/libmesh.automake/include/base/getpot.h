@@ -54,7 +54,7 @@ extern "C" {
 
 #ifdef USE_LIBMESH
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 // We need a mutex to keep const operations thread-safe in the
 // presence of mutable containers.  Right now GetPot supports a
@@ -62,7 +62,7 @@ extern "C" {
 // users aren't doing any threaded GetPot usage when TBB threads are
 // disabled.
 #if !defined(GETPOT_DISABLE_MUTEX)
-  #include "threads.h"
+  #include "libmesh/threads.h"
   #define SCOPED_MUTEX  libMesh::Threads::spin_mutex::scoped_lock lock(_getpot_mtx)
 #else
   #define SCOPED_MUTEX

@@ -20,18 +20,18 @@
 // C++ includes
 
 // Local includes
-#include "dof_map.h"
-#include "equation_systems.h"
-#include "implicit_system.h"
-#include "libmesh_logging.h"
-#include "linear_solver.h"
-#include "mesh_base.h"
-#include "numeric_vector.h"
-#include "parameters.h"
-#include "parameter_vector.h"
-#include "qoi_set.h"
-#include "sensitivity_data.h"
-#include "sparse_matrix.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/implicit_system.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/parameters.h"
+#include "libmesh/parameter_vector.h"
+#include "libmesh/qoi_set.h"
+#include "libmesh/sensitivity_data.h"
+#include "libmesh/sparse_matrix.h"
 
 namespace libMesh
 {

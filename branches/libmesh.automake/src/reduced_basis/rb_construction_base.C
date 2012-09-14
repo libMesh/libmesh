@@ -18,17 +18,17 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // rbOOmit includes
-#include "rb_construction_base.h"
+#include "libmesh/rb_construction_base.h"
 
 // libMesh includes
-#include "libmesh_logging.h"
-#include "numeric_vector.h"
-#include "equation_systems.h"
-#include "parallel.h"
-#include "petsc_linear_solver.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/parallel.h"
+#include "libmesh/petsc_linear_solver.h"
 // Includes for template instantiation
-#include "condensed_eigen_system.h"
-#include "linear_implicit_system.h"
+#include "libmesh/condensed_eigen_system.h"
+#include "libmesh/linear_implicit_system.h"
 
 // C++ includes
 #include <ctime>

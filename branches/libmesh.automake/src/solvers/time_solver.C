@@ -16,10 +16,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "diff_solver.h"
-#include "diff_system.h"
-#include "linear_solver.h"
-#include "time_solver.h"
+#include "libmesh/diff_solver.h"
+#include "libmesh/diff_system.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/time_solver.h"
 
 namespace libMesh
 {

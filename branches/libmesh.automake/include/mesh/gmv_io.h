@@ -21,10 +21,10 @@
 #define __gmv_io_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "mesh_output.h"
-#include "mesh_input.h"
-#include "enum_elem_type.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/mesh_output.h"
+#include "libmesh/mesh_input.h"
+#include "libmesh/enum_elem_type.h"
 
 // C++ includes
 #include <cstddef>

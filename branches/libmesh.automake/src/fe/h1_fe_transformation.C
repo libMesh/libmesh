@@ -15,9 +15,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "fe_interface.h"
-#include "h1_fe_transformation.h"
-#include "tensor_value.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/h1_fe_transformation.h"
+#include "libmesh/tensor_value.h"
 
 namespace libMesh
 {

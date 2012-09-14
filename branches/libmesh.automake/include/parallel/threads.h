@@ -20,12 +20,12 @@
 #define __threads_h__
 
 // Local includes
-#include "libmesh_config.h"
-#include "libmesh_common.h"  // for libmesh_assert
+#include "libmesh/libmesh_config.h"
+#include "libmesh/libmesh_common.h"  // for libmesh_assert
 
 // Threading building blocks includes
 #ifdef LIBMESH_HAVE_TBB_API
-#  include "libmesh_logging.h" // only mess with the perflog if we are really multithreaded
+#  include "libmesh/libmesh_logging.h" // only mess with the perflog if we are really multithreaded
 #  include "tbb/tbb_stddef.h"
 #  include "tbb/blocked_range.h"
 #  include "tbb/parallel_for.h"

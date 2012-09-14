@@ -18,17 +18,17 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
 // Local includes cont'd
-#include "face_inf_quad4.h"
-#include "fe_interface.h"
-#include "fe_type.h"
-#include "side.h"
-#include "edge_edge2.h"
-#include "edge_inf_edge2.h"
+#include "libmesh/face_inf_quad4.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/side.h"
+#include "libmesh/edge_edge2.h"
+#include "libmesh/edge_inf_edge2.h"
 
 namespace libMesh
 {

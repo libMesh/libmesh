@@ -20,14 +20,14 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
-#include "centroid_partitioner.h"
-#include "metis_partitioner.h"
-#include "parmetis_partitioner.h"
-#include "linear_partitioner.h"
-#include "hilbert_sfc_partitioner.h"
-#include "morton_sfc_partitioner.h"
-#include "factory.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/centroid_partitioner.h"
+#include "libmesh/metis_partitioner.h"
+#include "libmesh/parmetis_partitioner.h"
+#include "libmesh/linear_partitioner.h"
+#include "libmesh/hilbert_sfc_partitioner.h"
+#include "libmesh/morton_sfc_partitioner.h"
+#include "libmesh/factory.h"
 
 namespace libMesh
 {

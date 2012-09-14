@@ -20,7 +20,7 @@
 // C++ includes
 
 // Local includes
-#include "boundary_mesh.h"
+#include "libmesh/boundary_mesh.h"
 
 namespace libMesh
 {

@@ -46,7 +46,7 @@ for header_to_test in $HEADERS_TO_TEST ; do
     object_file=$app_file.o
     errlog=$app_file.log
     
-    echo "#include \"$header_name\"" >> $source_file
+    echo "#include \"libmesh/$header_name\"" >> $source_file
     echo "int foo () { return 0; }" >> $source_file
 
     #echo $CXX $installed_CXXFLAGS $source_file -o $app_file

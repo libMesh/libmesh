@@ -23,7 +23,7 @@
 #ifdef LIBMESH_HAVE_NOX
 
 // Local includes
-#include "nonlinear_solver.h"
+#include "libmesh/nonlinear_solver.h"
 
 //trilinos includes
 #include "Epetra_Vector.h"

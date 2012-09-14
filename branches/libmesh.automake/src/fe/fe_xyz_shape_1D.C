@@ -19,8 +19,8 @@
 // C++ inlcludes
 
 // Local includes
-#include "fe.h"
-#include "elem.h"
+#include "libmesh/fe.h"
+#include "libmesh/elem.h"
 
 
 
@@ -30,6 +30,8 @@
 // to be recalculated.
 namespace
 {
+  using namespace libMesh;
+
   static unsigned int old_elem_id = libMesh::invalid_uint;
   static libMesh::Point centroid;
   static Real max_distance;

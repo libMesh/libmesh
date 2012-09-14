@@ -20,8 +20,8 @@
 
 
 // Local Includes
-#include "libmesh_common.h" // for Number
-#include "enum_norm_type.h"
+#include "libmesh/libmesh_common.h" // for Number
+#include "libmesh/enum_norm_type.h"
 
 // C++ includes
 #include <map>

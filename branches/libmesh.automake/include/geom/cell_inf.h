@@ -20,12 +20,12 @@
 #ifndef __cell_inf_h__
 #define __cell_inf_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // Local includes
-#include "elem.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

@@ -20,29 +20,29 @@
 #include <algorithm> // for std::count, std::fill
 
 // Local Includes -----------------------------------
-#include "boundary_info.h" // needed for dirichlet constraints
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "dirichlet_boundaries.h"
-#include "dof_map.h"
-#include "elem.h"
-#include "elem_range.h"
-#include "fe_base.h"
-#include "fe_interface.h"
-#include "fe_type.h"
-#include "libmesh_logging.h"
-#include "system.h" // needed by enforce_constraints_exactly()
-#include "mesh_base.h"
-#include "numeric_vector.h" // for enforce_constraints_exactly()
-#include "quadrature.h" // for dirichlet constraints
-#include "parallel.h"
-#include "periodic_boundaries.h"
-#include "point_locator_base.h"
-#include "threads.h"
-#include "raw_accessor.h"
-#include "tensor_tools.h"
-#include "periodic_boundary_base.h"
-#include "periodic_boundary.h"
+#include "libmesh/boundary_info.h" // needed for dirichlet constraints
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/elem_range.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_type.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/system.h" // needed by enforce_constraints_exactly()
+#include "libmesh/mesh_base.h"
+#include "libmesh/numeric_vector.h" // for enforce_constraints_exactly()
+#include "libmesh/quadrature.h" // for dirichlet constraints
+#include "libmesh/parallel.h"
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/point_locator_base.h"
+#include "libmesh/threads.h"
+#include "libmesh/raw_accessor.h"
+#include "libmesh/tensor_tools.h"
+#include "libmesh/periodic_boundary_base.h"
+#include "libmesh/periodic_boundary.h"
 
 
 // Anonymous namespace to hold helper classes

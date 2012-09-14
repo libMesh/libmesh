@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
@@ -26,16 +26,16 @@
 
 
 // Local Includes
-#include "libmesh_common.h"
-#include "fourth_error_estimators.h"
-#include "error_vector.h"
-#include "fe_base.h"
-#include "libmesh_logging.h"
-#include "elem.h"
-#include "system.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/fourth_error_estimators.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/elem.h"
+#include "libmesh/system.h"
 
-#include "dense_vector.h"
-#include "tensor_tools.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/tensor_tools.h"
 
 
 namespace libMesh
@@ -113,7 +113,7 @@ LaplacianErrorEstimator::internal_side_integration ()
 
 #else // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)
 
-#include "fourth_error_estimators.h"
+#include "libmesh/fourth_error_estimators.h"
 
 namespace libMesh
 {

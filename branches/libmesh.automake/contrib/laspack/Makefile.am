@@ -3,6 +3,7 @@ include $(top_builddir)/Make.common.@METHOD@
 AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
+INCLUDES    = -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
 
 noinst_LTLIBRARIES = liblaspack.la
 

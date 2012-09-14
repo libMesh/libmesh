@@ -22,13 +22,13 @@
 
 
 // The library configuration options
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // Include the MPI definition
 #ifdef LIBMESH_HAVE_MPI
-# include "ignore_warnings.h"
+# include "libmesh/ignore_warnings.h"
 # include <mpi.h>
-# include "restore_warnings.h"
+# include "libmesh/restore_warnings.h"
 #endif
 
 // C/C++ includes everyone should know about
@@ -45,16 +45,16 @@
 #include <typeinfo> // std::bad_cast
 
 // _basic_ library functionality
-#include "libmesh_base.h"
-#include "libmesh_exceptions.h"
+#include "libmesh/libmesh_base.h"
+#include "libmesh/libmesh_exceptions.h"
 extern "C" {
-#include "libmesh_C_isnan.h"
+#include "libmesh/libmesh_C_isnan.h"
 }
 
 // Proxy class for libMesh::out/err output
-#include "ostream_proxy.h"
+#include "libmesh/ostream_proxy.h"
 
-# include "print_trace.h"
+# include "libmesh/print_trace.h"
 
 // For some reason the real std::max, std::min
 // don't handle mixed compatible types
@@ -258,8 +258,20 @@ extern OStreamProxy err;
 // libmesh_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG
 #define libmesh_assert(asserted)  ((void) 0)
+#define libmesh_assert_equal_to(expr1,expr2)  ((void) 0)
+#define libmesh_assert_not_equal_to(expr1,expr2)  ((void) 0)
+#define libmesh_assert_less(expr1,expr2)  ((void) 0)
+#define libmesh_assert_greater(expr1,expr2)  ((void) 0)
+#define libmesh_assert_less_equal(expr1,expr2)  ((void) 0)
+#define libmesh_assert_greater_equal(expr1,expr2)  ((void) 0)
 #else
 #define libmesh_assert(asserted)  do { if (!(asserted)) { libMesh::err << "Assertion `" #asserted "' failed." << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_equal_to(expr1,expr2)  do { if (!(expr1 == expr2)) { libMesh::err << "Assertion `" #expr1 " == " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_not_equal_to(expr1,expr2)  do { if (!(expr1 != expr2)) { libMesh::err << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_less(expr1,expr2)  do { if (!(expr1 < expr2)) { libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_greater(expr1,expr2)  do { if (!(expr1 > expr2)) { libMesh::err << "Assertion `" #expr1 " > " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_less_equal(expr1,expr2)  do { if (!(expr1 <= expr2)) { libMesh::err << "Assertion `" #expr1 " <= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_greater_equal(expr1,expr2)  do { if (!(expr1 >= expr2)) { libMesh::err << "Assertion `" #expr1 " >= " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
 #endif
 
 // The libmesh_write_traceout() macro writes stack trace files, if

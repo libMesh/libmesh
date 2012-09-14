@@ -23,12 +23,12 @@
 #include <cstring> // std::memcpy, std::strncmp
 
 // Local includes
-#include "libmesh_config.h"
-#include "libmesh_logging.h"
-#include "gmsh_io.h"
-#include "elem.h"
-#include "mesh_base.h"
-#include "boundary_info.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/gmsh_io.h"
+#include "libmesh/elem.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/boundary_info.h"
 
 
 // anonymous namespace to hold local data

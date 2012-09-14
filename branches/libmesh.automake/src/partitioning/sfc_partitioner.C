@@ -20,11 +20,11 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
-#include "mesh_base.h"
-#include "sfc_partitioner.h"
-#include "libmesh_logging.h"
-#include "elem.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/sfc_partitioner.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/elem.h"
 
 #ifdef LIBMESH_HAVE_SFCURVES
   namespace Sfc {
@@ -33,7 +33,7 @@
     }
   }
 #else
-#  include "linear_partitioner.h"
+#  include "libmesh/linear_partitioner.h"
 #endif
 
 namespace libMesh

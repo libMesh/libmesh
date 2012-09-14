@@ -20,25 +20,25 @@
 // C++ Includes   -----------------------------------
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
-#include "mesh_base.h"
-#include "parallel.h"    // also includes mpi.h
-#include "mesh_serializer.h"
-#include "mesh_tools.h"
-#include "mesh_communication.h"
-#include "parmetis_partitioner.h"
-#include "metis_partitioner.h"
-#include "libmesh_logging.h"
-#include "elem.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/parallel.h"    // also includes mpi.h
+#include "libmesh/mesh_serializer.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/parmetis_partitioner.h"
+#include "libmesh/metis_partitioner.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/elem.h"
 
 #ifdef LIBMESH_HAVE_PARMETIS
 
 // Include the ParMETIS header files
 namespace Parmetis {
   extern "C" {
-#     include "ignore_warnings.h"
+#     include "libmesh/ignore_warnings.h"
 #     include "parmetis.h"
-#     include "restore_warnings.h"
+#     include "libmesh/restore_warnings.h"
   }
 }
 

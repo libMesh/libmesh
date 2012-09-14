@@ -18,12 +18,12 @@
 #ifndef __exodusII_io_helper_h__
 #define __exodusII_io_helper_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
 // Local includes
-#include "mesh_base.h"
+#include "libmesh/mesh_base.h"
 
 // C++ includes
 #include <iostream>

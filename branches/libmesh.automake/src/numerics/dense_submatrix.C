@@ -17,7 +17,7 @@
 
 
 // Local Includes
-#include "dense_submatrix.h"
+#include "libmesh/dense_submatrix.h"
 
 namespace libMesh
 {

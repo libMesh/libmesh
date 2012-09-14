@@ -33,41 +33,41 @@
 #include <math.h>
 
 // Basic include file needed for the mesh functionality.
-#include "libmesh.h"
-#include "mesh.h"
-#include "mesh_generation.h"
-#include "exodusII_io.h"
-#include "linear_implicit_system.h"
-#include "equation_systems.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/equation_systems.h"
 
 // Define the Finite Element object.
-#include "fe.h"
+#include "libmesh/fe.h"
 
 // Define the base quadrature class, with which
 // specialized quadrature rules will be built.
-#include "quadrature.h"
+#include "libmesh/quadrature.h"
 
 // Include the namespace \p QuadratureRules for
 // some handy descriptions.
-#include "quadrature_rules.h"
+#include "libmesh/quadrature_rules.h"
 
 // Define useful datatypes for finite element
 // matrix and vector components.
-#include "sparse_matrix.h"
-#include "numeric_vector.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
 
 // Define the DofMap, which handles degree of freedom
 // indexing.
-#include "dof_map.h"
+#include "libmesh/dof_map.h"
 
 // To impose Dirichlet boundary conditions
-#include "dirichlet_boundaries.h"
-#include "analytic_function.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/analytic_function.h"
 
 // The definition of a geometric element
-#include "elem.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

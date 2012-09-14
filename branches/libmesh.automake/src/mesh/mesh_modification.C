@@ -23,18 +23,18 @@
 #include <map>
 
 // Local includes
-#include "boundary_info.h"
-#include "face_tri3.h"
-#include "face_tri6.h"
-#include "libmesh_logging.h"
-#include "location_maps.h"
-#include "mesh_communication.h"
-#include "mesh_modification.h"
-#include "mesh_tools.h"
-#include "parallel.h"
-#include "remote_elem.h"
-#include "string_to_enum.h"
-#include "unstructured_mesh.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/face_tri3.h"
+#include "libmesh/face_tri6.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/location_maps.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_modification.h"
+#include "libmesh/mesh_tools.h"
+#include "libmesh/parallel.h"
+#include "libmesh/remote_elem.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/unstructured_mesh.h"
 
 namespace libMesh
 {

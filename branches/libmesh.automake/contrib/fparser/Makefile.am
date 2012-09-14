@@ -148,7 +148,7 @@ EXTRA_DIST += fpoptimizer/treerules.dat
 # generally we do not install contributed headers, but for fparser.hh we
 # must because it can optionally be included directly by our
 # parsed_function.h
-includedir = $(prefix)/include/contrib
+includedir = $(prefix)/include/libmesh
 
 include_HEADERS       =  fparser.hh
 

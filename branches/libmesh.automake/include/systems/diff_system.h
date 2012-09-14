@@ -22,11 +22,11 @@
 #define __diff_system_h__
 
 // Local Includes
-#include "auto_ptr.h"
-#include "diff_context.h"
-#include "diff_physics.h"
-#include "diff_qoi.h"
-#include "implicit_system.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/diff_context.h"
+#include "libmesh/diff_physics.h"
+#include "libmesh/diff_qoi.h"
+#include "libmesh/implicit_system.h"
 
 // C++ includes
 

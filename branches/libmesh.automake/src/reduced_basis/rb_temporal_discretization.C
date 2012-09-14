@@ -18,10 +18,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // rbOOmit includes
-#include "rb_temporal_discretization.h"
+#include "libmesh/rb_temporal_discretization.h"
 
 // libMesh includes
-#include "getpot.h"
+#include "libmesh/getpot.h"
 
 namespace libMesh
 {

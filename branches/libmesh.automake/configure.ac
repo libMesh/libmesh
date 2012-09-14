@@ -35,7 +35,8 @@ AC_CANONICAL_TARGET
 
 AC_CONFIG_FILES([Makefile
 		 include/Makefile
-                 include/utils/libmesh_version.h
+		 include/libmesh/Makefile
+                 include/libmesh/libmesh_version.h
 	         contrib/utils/Make.common
 		 examples/Makefile
 		 doc/Doxyfile
@@ -51,9 +52,9 @@ AC_CONFIG_FILES(contrib/bin/create_libmesh_release,  [chmod +x contrib/bin/creat
 AC_CONFIG_FILES(doc/dot,                             [chmod +x doc/dot])
 
 # Create a temporary file with e.g. HAVE_MPI
-AC_CONFIG_HEADER(include/base/libmesh_config.h.tmp:include/base/libmesh_config.h.in)
+AC_CONFIG_HEADER(include/libmesh/libmesh_config.h.tmp:include/libmesh/libmesh_config.h.in)
 # Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
-AX_PREFIX_CONFIG_H(include/base/libmesh_config.h,LIBMESH,include/base/libmesh_config.h.tmp)
+AX_PREFIX_CONFIG_H(include/libmesh/libmesh_config.h,LIBMESH,include/libmesh/libmesh_config.h.tmp)
 
 AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar 1.10]) # require automake 1.10 - I havent tried anything older
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)]) # use silent rules where available - automake 1.11
@@ -217,7 +218,11 @@ LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
 AX_SUMMARIZE_ENV
 
 
+
+# Create output files
 AC_OUTPUT
+
+
 
 # Final summary
 AX_SUMMARIZE_CONFIG
@@ -227,4 +232,4 @@ AX_SUMMARIZE_CONFIG
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(--------- Done Configuring libMesh ----------)
 AC_MSG_RESULT(---------------------------------------------)
-# rm -f -r conftest* config.cache include/base/libmesh_config.h.tmp
+# rm -f -r conftest* config.cache include/libmesh/libmesh_config.h.tmp

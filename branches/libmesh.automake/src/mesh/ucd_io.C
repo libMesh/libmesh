@@ -21,14 +21,14 @@
 
 
 // Local includes
-#include "libmesh_config.h"
-#include "ucd_io.h"
-#include "mesh_base.h"
-#include "face_quad4.h"
-#include "face_tri3.h"
-#include "cell_tet4.h"
-#include "cell_hex8.h"
-#include "cell_prism6.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/ucd_io.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/face_quad4.h"
+#include "libmesh/face_tri3.h"
+#include "libmesh/cell_tet4.h"
+#include "libmesh/cell_hex8.h"
+#include "libmesh/cell_prism6.h"
 
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams

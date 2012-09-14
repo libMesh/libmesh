@@ -22,10 +22,10 @@
 #include <limits>
 
 // Local Includes
-#include "dense_subvector.h"
-#include "dense_vector.h"
-#include "laspack_vector.h"
-#include "laspack_matrix.h"
+#include "libmesh/dense_subvector.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/laspack_vector.h"
+#include "libmesh/laspack_matrix.h"
 
 
 #ifdef LIBMESH_HAVE_LASPACK

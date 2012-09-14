@@ -7,7 +7,7 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 # generally we do not install contributed headers, but for tetgen we
 # must because it can optionally be included directly by our
 # mesh_triangle_interface.h
-includedir = $(prefix)/include/contrib
+includedir = $(prefix)/include/libmesh
 
 noinst_LTLIBRARIES   = libtetgen.la
 include_HEADERS      = tetgen.h

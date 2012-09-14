@@ -1,14 +1,5 @@
+SUBDIRS = libmesh
 
-# special handholding for prefix_config.m4 generated files
-# so that 'make clean ; make' works as does 'make distcheck'
-# libmesh_config.h is made by ./configure, so it should get 
-# cleaned by 'make distclean'
-DISTCLEANFILES = base/libmesh_config.h
-
-#
-# special things to do when running 'make dist'
-dist-hook:
-	rm -rf $(distdir)/base/libmesh_config.h
 
 # These are headers we need to compile the libMesh library but should
 # not be installed.  These header files may have implementation
@@ -24,8 +15,13 @@ noinst_HEADERS = \
 
 # These are the headers we actually want to install and make available
 # to a user.  Consider these the public interface of libMesh.
-nobase_include_HEADERS = \
-		base/auto_ptr.h \
+# will get installed into '$(prefix)/include/libmesh'
+
+includedir=$(prefix)/include/libmesh
+
+# run ./rebuild_include_HEADERS.sh to regenerate this list.
+include_HEADERS = \
+                base/auto_ptr.h \
 	        base/dirichlet_boundaries.h \
 		base/dof_map.h \
 		base/dof_object.h \
@@ -36,7 +32,6 @@ nobase_include_HEADERS = \
 		base/libmesh_C_isnan.h \
 		base/libmesh_base.h \
 		base/libmesh_common.h \
-	        base/libmesh_config.h \
 		base/libmesh_documentation.h \
 		base/libmesh_exceptions.h \
 		base/libmesh_logging.h \
@@ -150,6 +145,8 @@ nobase_include_HEADERS = \
 		geom/sphere.h \
 		geom/stored_range.h \
 		geom/surface.h \
+	        libmesh/libmesh_config.h \
+		libmesh/libmesh_version.h \
 		mesh/abaqus_io.h \
 		mesh/boundary_info.h \
 		mesh/boundary_mesh.h \
@@ -302,10 +299,10 @@ nobase_include_HEADERS = \
 		solvers/newton_solver.h \
 		solvers/nonlinear_solver.h \
 		solvers/petsc_diff_solver.h \
-		solvers/petscdmlibmesh.h \
 		solvers/petsc_dm_nonlinear_solver.h \
 		solvers/petsc_linear_solver.h \
 		solvers/petsc_nonlinear_solver.h \
+		solvers/petscdmlibmesh.h \
 		solvers/slepc_eigen_solver.h \
 		solvers/slepc_macro.h \
 		solvers/solver.h \
@@ -343,7 +340,6 @@ nobase_include_HEADERS = \
 		utils/error_vector.h \
 		utils/hashword.h \
 		utils/ignore_warnings.h \
-		utils/libmesh_version.h \
 		utils/location_maps.h \
 		utils/mapvector.h \
 		utils/null_output_iterator.h \
@@ -388,7 +384,7 @@ libdir=$(exec_prefix)/lib/@host@_@METHOD@
 pkgconfigdir=$(libdir)/pkgconfig
 
 # the actual header files we want to test for self-sufficiency
-headers_to_test = $(nobase_include_HEADERS)
+headers_to_test = $(include_HEADERS)
 if LIBMESH_ENABLE_EXODUS
   headers_to_test += contrib/exodusII.h
 endif

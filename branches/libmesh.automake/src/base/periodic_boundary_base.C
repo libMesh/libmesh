@@ -16,12 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-#include "libmesh.h" // libMesh::invalid_uint
-#include "periodic_boundary_base.h"
+#include "libmesh/libmesh.h" // libMesh::invalid_uint
+#include "libmesh/periodic_boundary_base.h"
+
+namespace libMesh {
 
 // ------------------------------------------------------------
 // PeriodicBoundaryBase member functions
@@ -64,5 +66,7 @@ bool PeriodicBoundaryBase::is_my_variable(unsigned int var_num) const
   return a;
 }
 
+
+} // namespace libMesh
 
 #endif // LIBMESH_ENABLE_PERIODIC

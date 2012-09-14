@@ -23,13 +23,13 @@
  * which is typedef'd to SteadyDerivedRBConstruction
  */
 
-#include "derived_rb_construction.h"
-#include "derived_rb_evaluation.h"
+#include "libmesh/derived_rb_construction.h"
+#include "libmesh/derived_rb_evaluation.h"
 
-#include "libmesh_logging.h"
-#include "equation_systems.h"
-#include "mesh_base.h"
-#include "exodusII_io.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/exodusII_io.h"
 
 namespace libMesh
 {

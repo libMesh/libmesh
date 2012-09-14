@@ -21,7 +21,7 @@
 #define __cell_h__
 
 // Local includes
-#include "elem.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

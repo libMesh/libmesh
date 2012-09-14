@@ -20,7 +20,7 @@
 #define __quadrature_conical_h__
 
 // Local includes
-#include "quadrature.h"
+#include "libmesh/quadrature.h"
 
 // C++ includes
 

@@ -21,19 +21,19 @@
 
 
 // Local Includes
-#include "hp_coarsentest.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "dof_map.h"
-#include "fe_base.h"
-#include "fe_interface.h"
-#include "libmesh_logging.h"
-#include "elem.h"
-#include "error_vector.h"
-#include "mesh_base.h"
-#include "quadrature.h"
-#include "system.h"
-#include "tensor_value.h"
+#include "libmesh/hp_coarsentest.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/elem.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/system.h"
+#include "libmesh/tensor_value.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 

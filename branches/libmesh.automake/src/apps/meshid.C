@@ -25,13 +25,13 @@
 #include <time.h> // time
 #include <stdlib.h> // random, srandom
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
 #include "exodusII.h"
 #include "exodusII_int.h"
-#include "getpot.h"
+#include "libmesh/getpot.h"
 
 #define EXODUS_DIM 0x8
 #define BLOCKS     0x4

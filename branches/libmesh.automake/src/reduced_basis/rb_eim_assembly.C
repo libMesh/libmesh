@@ -18,16 +18,16 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // rbOOmit includes
-#include "rb_eim_assembly.h"
-#include "rb_eim_construction.h"
+#include "libmesh/rb_eim_assembly.h"
+#include "libmesh/rb_eim_construction.h"
 
 // libMesh includes
-#include "fem_context.h"
-#include "quadrature.h"
-#include "libmesh_logging.h"
-#include "dof_map.h"
-#include "fe_interface.h"
-#include "fe_compute_data.h"
+#include "libmesh/fem_context.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_compute_data.h"
 
 namespace libMesh
 {

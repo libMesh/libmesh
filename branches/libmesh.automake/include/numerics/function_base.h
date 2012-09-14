@@ -21,9 +21,9 @@
 #define __function_base_h__
 
 // Local Includes
-#include "libmesh_common.h"
-#include "dense_vector.h" // required to instantiate a DenseVector<> below
-#include "auto_ptr.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/dense_vector.h" // required to instantiate a DenseVector<> below
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 #include <cstddef>

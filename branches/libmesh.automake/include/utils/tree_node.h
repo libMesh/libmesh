@@ -21,8 +21,8 @@
 #define __tree_node_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "point.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/point.h"
 
 // C++ includes
 #include <cstddef>

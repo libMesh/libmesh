@@ -26,13 +26,13 @@
 #endif
 
 // Local includes
-#include "libmesh.h"
-#include "auto_ptr.h"
-#include "getpot.h"
-#include "parallel.h"
-#include "reference_counter.h"
-#include "remote_elem.h"
-#include "threads.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/getpot.h"
+#include "libmesh/parallel.h"
+#include "libmesh/reference_counter.h"
+#include "libmesh/remote_elem.h"
+#include "libmesh/threads.h"
 
 
 // floating-point exceptions
@@ -45,19 +45,19 @@
 
 
 #if defined(LIBMESH_HAVE_MPI)
-# include "ignore_warnings.h"
+# include "libmesh/ignore_warnings.h"
 # include <mpi.h>
-# include "restore_warnings.h"
+# include "libmesh/restore_warnings.h"
 #endif // #if defined(LIBMESH_HAVE_MPI)
 
 #if defined(LIBMESH_HAVE_PETSC)
-# include "petsc_macro.h"
+# include "libmesh/petsc_macro.h"
 EXTERN_C_FOR_PETSC_BEGIN
 # include <petsc.h>
 # include <petscerror.h>
 EXTERN_C_FOR_PETSC_END
 # if defined(LIBMESH_HAVE_SLEPC)
-#  include "slepc_macro.h"
+#  include "libmesh/slepc_macro.h"
 EXTERN_C_FOR_PETSC_BEGIN
 #  include <slepc.h>
 EXTERN_C_FOR_PETSC_END

@@ -21,11 +21,11 @@
 #define __patch_recovery_error_estimator_h__
 
 // Local Includes
-#include "error_estimator.h"
-#include "enum_order.h"
-#include "patch.h"
-#include "point.h"
-#include "elem_range.h"
+#include "libmesh/error_estimator.h"
+#include "libmesh/enum_order.h"
+#include "libmesh/patch.h"
+#include "libmesh/point.h"
+#include "libmesh/elem_range.h"
 
 // C++ includes
 #include <cstddef>

@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // C++ includes
 #include <algorithm>
@@ -36,21 +36,21 @@
 #include <vector>
 
 // Local Includes
-#include "boundary_info.h"
-#include "boundary_mesh.h"
-#include "dof_map.h"
-#include "elem.h"
-#include "elem_quality.h"
-#include "gmv_io.h"
-#include "inf_elem_builder.h"
-#include "legacy_xdr_io.h"
-#include "libmesh.h"
-#include "mesh.h"
-#include "mesh_data.h"
-#include "mesh_modification.h"
-#include "mesh_refinement.h"
-#include "perfmon.h"
-#include "statistics.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/boundary_mesh.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/elem_quality.h"
+#include "libmesh/gmv_io.h"
+#include "libmesh/inf_elem_builder.h"
+#include "libmesh/legacy_xdr_io.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_data.h"
+#include "libmesh/mesh_modification.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/perfmon.h"
+#include "libmesh/statistics.h"
 
 
 using namespace libMesh;

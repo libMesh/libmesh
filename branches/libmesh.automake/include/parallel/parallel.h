@@ -20,8 +20,8 @@
 #define __parallel_h__
 
 // Local includes
-#include "libmesh_common.h" // for libmesh_assert
-#include "libmesh_logging.h"
+#include "libmesh/libmesh_common.h" // for libmesh_assert
+#include "libmesh/libmesh_logging.h"
 
 // C++ includes
 #include <cstddef>

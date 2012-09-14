@@ -21,8 +21,8 @@
 #define __rb_eim_theta_h__
 
 // rbOOmit includes
-#include "rb_theta.h"
-#include "rb_eim_evaluation.h"
+#include "libmesh/rb_theta.h"
+#include "libmesh/rb_eim_evaluation.h"
 
 // C++ includes
 

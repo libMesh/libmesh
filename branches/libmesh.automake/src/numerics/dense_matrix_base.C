@@ -19,8 +19,8 @@
 #include <iomanip> // for std::setw()
 
 // Local Includes
-#include "dense_matrix_base.h"
-#include "dense_vector_base.h"
+#include "libmesh/dense_matrix_base.h"
+#include "libmesh/dense_vector_base.h"
 
 namespace libMesh
 {

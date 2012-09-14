@@ -19,7 +19,7 @@
 #define __xdr_mesh_h__
 
 // Local Includes
-#include "xdr_mgf.h"
+#include "libmesh/xdr_mgf.h"
 
 // C++ includes
 

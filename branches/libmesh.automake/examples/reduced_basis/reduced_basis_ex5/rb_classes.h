@@ -5,11 +5,11 @@
 #include "assembly.h"
 
 // rbOOmit includes
-#include "rb_construction.h"
+#include "libmesh/rb_construction.h"
 
 // libMesh includes
-#include "fe_base.h"
-#include "dof_map.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/dof_map.h"
 
 using namespace libMesh;
 

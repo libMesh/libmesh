@@ -21,10 +21,10 @@
 #define __diff_context_h__
 
 // Local Includes
-#include "dense_matrix.h"
-#include "dense_submatrix.h"
-#include "dense_subvector.h"
-#include "dense_vector.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_submatrix.h"
+#include "libmesh/dense_subvector.h"
+#include "libmesh/dense_vector.h"
 
 // C++ includes
 #include <cstddef>

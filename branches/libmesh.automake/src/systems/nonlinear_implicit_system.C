@@ -20,12 +20,12 @@
 // C++ includes
 
 // Local includes
-#include "nonlinear_implicit_system.h"
-#include "diff_solver.h"
-#include "equation_systems.h"
-#include "libmesh_logging.h"
-#include "nonlinear_solver.h"
-#include "sparse_matrix.h"
+#include "libmesh/nonlinear_implicit_system.h"
+#include "libmesh/diff_solver.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/nonlinear_solver.h"
+#include "libmesh/sparse_matrix.h"
 
 namespace libMesh
 {

@@ -20,14 +20,14 @@
 #ifndef __dirichlet_boundaries_h__
 #define __dirichlet_boundaries_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
 // Local Includes -----------------------------------
-#include "function_base.h"
-#include "id_types.h"
-#include "vector_value.h"
+#include "libmesh/function_base.h"
+#include "libmesh/id_types.h"
+#include "libmesh/vector_value.h"
 
 // C++ Includes   -----------------------------------
 #include <algorithm>

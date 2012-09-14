@@ -16,12 +16,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "diff_system.h"
-#include "dof_map.h"
-#include "libmesh_logging.h"
-#include "petsc_diff_solver.h"
-#include "petsc_matrix.h"
-#include "petsc_vector.h"
+#include "libmesh/diff_system.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/petsc_diff_solver.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_vector.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 

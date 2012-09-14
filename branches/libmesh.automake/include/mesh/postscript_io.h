@@ -21,10 +21,10 @@
 #define __postscript_io_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "mesh_output.h"
-//#include "dense_matrix.h"
-#include "point.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/mesh_output.h"
+//#include "libmesh/dense_matrix.h"
+#include "libmesh/point.h"
 
 // C++ includes
 #include <vector>

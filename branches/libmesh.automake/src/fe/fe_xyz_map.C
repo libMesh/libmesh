@@ -15,7 +15,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "fe_xyz_map.h"
+#include "libmesh/fe_xyz_map.h"
+
+namespace libMesh {
 
 void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem* side)
 {
@@ -214,3 +216,5 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
 
   return;
 }
+
+} // namespace libMesh

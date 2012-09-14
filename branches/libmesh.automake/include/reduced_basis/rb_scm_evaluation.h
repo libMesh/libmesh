@@ -22,8 +22,8 @@
 #define __rb_scm_evaluation_h__
 
 // rbOOmit includes
-#include "rb_parametrized.h"
-#include "rb_theta_expansion.h"
+#include "libmesh/rb_parametrized.h"
+#include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
 

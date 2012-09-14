@@ -22,9 +22,9 @@
 #include <fstream>
 
 // Local includes
-#include "libmesh_config.h"
-#include "mesh_data.h"
-#include "auto_ptr.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/mesh_data.h"
+#include "libmesh/auto_ptr.h"
 
 #ifdef  LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h" // For reading/writing compressed streams

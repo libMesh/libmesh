@@ -21,8 +21,8 @@
 #define __mesh_data_h__
 
 // Local Includes
-#include "libmesh.h"
-#include "enum_xdr_mode.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/enum_xdr_mode.h"
 
 // C++ includes
 #include <cstddef>

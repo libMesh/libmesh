@@ -21,8 +21,8 @@
 #define __parallel_mesh_h__
 
 // Local Includes -----------------------------------
-#include "mapvector.h"
-#include "unstructured_mesh.h"
+#include "libmesh/mapvector.h"
+#include "libmesh/unstructured_mesh.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>

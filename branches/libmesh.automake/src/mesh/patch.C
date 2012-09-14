@@ -23,9 +23,9 @@
 
 
 // Local Includes
-#include "libmesh_common.h"
-#include "patch.h"
-#include "elem.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/patch.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

@@ -20,8 +20,8 @@
 #ifndef __rb_classes_h__
 #define __rb_classes_h__
 
-#include "transient_rb_construction.h"
-#include "fe_base.h"
+#include "libmesh/transient_rb_construction.h"
+#include "libmesh/fe_base.h"
 
 // local include
 #include "assembly.h"

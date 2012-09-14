@@ -21,8 +21,8 @@
 #define __serial_mesh_h__
 
 // Local Includes -----------------------------------
-#include "unstructured_mesh.h"
-#include "boundary_info.h"
+#include "libmesh/unstructured_mesh.h"
+#include "libmesh/boundary_info.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>

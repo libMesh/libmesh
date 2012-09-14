@@ -21,9 +21,9 @@
 #define __system_norm_h__
 
 // Local includes
-#include "libmesh_common.h" // for Real
-#include "enum_norm_type.h"
-#include "system.h"
+#include "libmesh/libmesh_common.h" // for Real
+#include "libmesh/enum_norm_type.h"
+#include "libmesh/system.h"
 
 // C++ includes
 #include <vector>

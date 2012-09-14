@@ -20,7 +20,7 @@
 #ifndef __libmesh_exceptions_h__
 #define __libmesh_exceptions_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 #include <stdexcept>

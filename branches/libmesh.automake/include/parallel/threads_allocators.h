@@ -20,8 +20,8 @@
 #define __threads_allocators_h__
 
 // Local includes
-#include "libmesh_config.h"
-#include "threads.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/threads.h"
 
 // Threading building blocks includes
 #ifdef LIBMESH_HAVE_TBB_API

@@ -2,8 +2,8 @@
 #define __eim_classes_h__
 
 // local includes
-#include "rb_eim_construction.h"
-#include "rb_eim_evaluation.h"
+#include "libmesh/rb_eim_construction.h"
+#include "libmesh/rb_eim_evaluation.h"
 #include "assembly.h"
 
 // A simple subclass of RBEIMEvaluation. Overload

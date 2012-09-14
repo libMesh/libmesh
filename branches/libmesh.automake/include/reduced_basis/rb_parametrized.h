@@ -21,10 +21,10 @@
 #define __rb_parametrized_h__
 
 // rbOOmit includes
-#include "rb_parameters.h"
+#include "libmesh/rb_parameters.h"
 
 // libMesh includes
-#include "reference_counted_object.h"
+#include "libmesh/reference_counted_object.h"
 
 // C++ includes
 #include <vector>

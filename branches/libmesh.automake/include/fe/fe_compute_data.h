@@ -20,7 +20,7 @@
 #define __fe_compute_data_h__
 
 // Local includes
-#include "libmesh.h"
+#include "libmesh/libmesh.h"
 
 // C++ includes
 #include <vector>

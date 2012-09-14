@@ -22,14 +22,14 @@
 #define __petsc_vector_h__
 
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
 // Local includes
-#include "numeric_vector.h"
-#include "o_string_stream.h"
-#include "petsc_macro.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/petsc_macro.h"
 
 /**
  * Petsc include files.

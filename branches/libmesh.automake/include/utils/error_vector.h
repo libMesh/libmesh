@@ -21,7 +21,7 @@
 #define __error_vector_h__
 
 // Local Includes
-#include "statistics.h"
+#include "libmesh/statistics.h"
 
 // C++ includes
 #include <cstddef>

@@ -22,9 +22,9 @@
 
 
 // The library configuration options
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
-#include "perf_log.h"
+#include "libmesh/perf_log.h"
 
 namespace libMesh
 {
@@ -32,7 +32,7 @@ namespace libMesh
 
 // Forward declaration, required when included
 // in perf_log.{C,h} because the preceeding
-// #include "perf_log.h" is ineffective.
+// #include "libmesh/perf_log.h" is ineffective.
 // Multiple inclusion avoidance problem...
 // __perf_log_h__ already #define'd, but the
 // class has not been declared yet!.
@@ -56,7 +56,7 @@ class PerfLog;
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
 
 // Note the log is in libMesh, so we need to include it.
-#  include "libmesh.h"
+#  include "libmesh/libmesh.h"
 #  define START_LOG(a,b)   { libMesh::perflog.push(a,b); }
 #  define STOP_LOG(a,b)    { libMesh::perflog.pop(a,b); }
 #  define PALIBMESH_USE_LOG(a,b)   { libmesh_deprecated(); }

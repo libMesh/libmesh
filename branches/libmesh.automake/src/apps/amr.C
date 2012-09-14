@@ -15,21 +15,21 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "coupling_matrix.h"
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "dof_map.h"
-#include "elem.h"
-#include "equation_systems.h"
-#include "fe.h"
-#include "gmv_io.h"
-#include "libmesh.h"
-#include "linear_implicit_system.h"
-#include "mesh.h"
-#include "mesh_refinement.h"
-#include "numeric_vector.h"
-#include "quadrature_gauss.h"
-#include "sparse_matrix.h"
+#include "libmesh/coupling_matrix.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/elem.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/fe.h"
+#include "libmesh/gmv_io.h"
+#include "libmesh/libmesh.h"
+#include "libmesh/linear_implicit_system.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/sparse_matrix.h"
 
 
 using namespace libMesh;

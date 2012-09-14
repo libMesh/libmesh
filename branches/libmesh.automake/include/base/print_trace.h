@@ -19,7 +19,7 @@
 #define __print_trace_h__
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // C++ includes
 #include <iostream>

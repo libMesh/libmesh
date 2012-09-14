@@ -3,9 +3,11 @@
 #define __zero_function_h__
 
 // Local includes
-#include "const_function.h"
+#include "libmesh/const_function.h"
 
 // C++ includes
+
+namespace libMesh {
 
 template <typename Output=Number>
 class ZeroFunction : public ConstFunction<Output>
@@ -19,5 +21,6 @@ public:
   }
 };
 
+} // namespace libMesh
 
 #endif // __zero_function_h__

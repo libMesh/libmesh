@@ -21,7 +21,7 @@
 #define __steady_system_h__
 
 // Local Includes
-#include "linear_implicit_system.h"
+#include "libmesh/linear_implicit_system.h"
 
 // C++ includes
 

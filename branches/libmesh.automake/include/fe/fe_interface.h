@@ -21,10 +21,10 @@
 #define __fe_interface_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "enum_elem_type.h"
-#include "vector_value.h"
-#include "enum_fe_family.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/enum_fe_family.h"
 
 // C++ includes
 #include <map>

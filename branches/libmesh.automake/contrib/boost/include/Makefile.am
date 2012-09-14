@@ -1,7 +1,7 @@
 # generally we do not install contributed headers, but for triangle we
 # must because it can optionally be included directly by our
 # mesh_triangle_interface.h
-includedir = $(prefix)/include/contrib
+includedir = $(prefix)/include/libmesh
 
 
 # These are the headers we actually want to install and make available

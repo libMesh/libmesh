@@ -21,7 +21,7 @@
 #define __cell_pyramid_h__
 
 // Local includes
-#include "cell.h"
+#include "libmesh/cell.h"
 
 namespace libMesh
 {

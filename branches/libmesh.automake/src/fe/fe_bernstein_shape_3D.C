@@ -20,11 +20,11 @@
 
 
 // Local includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
-#include "fe.h"
-#include "elem.h"
+#include "libmesh/fe.h"
+#include "libmesh/elem.h"
 
 
 namespace libMesh

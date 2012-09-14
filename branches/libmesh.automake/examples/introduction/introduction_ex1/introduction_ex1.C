@@ -25,9 +25,9 @@
  // C++ include files that we need
 #include <iostream>
 // Functions to initialize the library.
-#include "libmesh.h"
+#include "libmesh/libmesh.h"
 // Basic include files needed for the mesh functionality.
-#include "mesh.h"
+#include "libmesh/mesh.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

@@ -19,8 +19,8 @@
 #define __off_io_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "mesh_input.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/mesh_input.h"
 
 // C++ headers
 

@@ -21,7 +21,7 @@
 #define __transient_rb_assembly_expansion_h__
 
 // libMesh includes
-#include "rb_assembly_expansion.h"
+#include "libmesh/rb_assembly_expansion.h"
 
 // C++ includes
 

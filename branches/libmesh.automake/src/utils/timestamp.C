@@ -15,7 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 // C++ includes
 #include <ctime>
@@ -25,7 +25,7 @@
 #endif
 
 // Local includes
-#include "timestamp.h"
+#include "libmesh/timestamp.h"
 
 namespace libMesh
 {

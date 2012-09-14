@@ -18,7 +18,7 @@
 
 
 // Local includes
-#include "quadrature_trap.h"
+#include "libmesh/quadrature_trap.h"
 
 namespace libMesh
 {

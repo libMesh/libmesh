@@ -16,10 +16,10 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 // DiffSystem framework files
-#include "fem_system.h"
-#include "vector_value.h"
-#include "tensor_value.h"
-#include "dirichlet_boundaries.h"
+#include "libmesh/fem_system.h"
+#include "libmesh/vector_value.h"
+#include "libmesh/tensor_value.h"
+#include "libmesh/dirichlet_boundaries.h"
 
 #include "curl_curl_exact_solution.h"
 

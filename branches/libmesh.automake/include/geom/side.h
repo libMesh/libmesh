@@ -21,8 +21,8 @@
 #define __side_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "elem.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/elem.h"
 
 // C++ includes
 #include <cstddef>

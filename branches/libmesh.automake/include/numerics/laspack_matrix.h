@@ -20,12 +20,12 @@
 #ifndef __laspack_matrix_h__
 #define __laspack_matrix_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_LASPACK
 
 // Local includes
-#include "sparse_matrix.h"
+#include "libmesh/sparse_matrix.h"
 
 // Laspack includes
 #include <qmatrix.h>

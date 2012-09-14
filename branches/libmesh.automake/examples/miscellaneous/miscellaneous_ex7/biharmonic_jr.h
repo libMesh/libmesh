@@ -2,8 +2,8 @@
 #define __biharmonic_jr_h__
 
 // LibMesh includes
-#include "transient_system.h"
-#include "nonlinear_solver.h"
+#include "libmesh/transient_system.h"
+#include "libmesh/nonlinear_solver.h"
 
 
 // Example includes

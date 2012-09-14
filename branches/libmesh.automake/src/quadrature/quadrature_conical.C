@@ -16,9 +16,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "quadrature_conical.h"
-#include "quadrature_gauss.h"
-#include "quadrature_jacobi.h"
+#include "libmesh/quadrature_conical.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_jacobi.h"
 
 namespace libMesh
 {
@@ -73,8 +73,10 @@ void QConical::conical_product_tri(unsigned int p)
   const unsigned int n_points = gauss1D.n_points();
 
   // Both rules should be between x=0 and x=1
-  libmesh_assert(gauss1D.qp(0)(0) >= 0.0); libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
-  libmesh_assert(jac1D.qp(0)(0)   >= 0.0); libmesh_assert(jac1D.qp(n_points-1)(0) <= 1.0);
+  libmesh_assert(gauss1D.qp(0)(0) >= 0.0);
+  libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
+  libmesh_assert(jac1D.qp(0)(0)   >= 0.0);
+  libmesh_assert(jac1D.qp(n_points-1)(0) <= 1.0);
 
   // Resize the points and weights vectors
   _points.resize(n_points * n_points);
@@ -124,9 +126,12 @@ void QConical::conical_product_tet(unsigned int p)
   const unsigned int n_points = gauss1D.n_points();
 
   // All rules should be between x=0 and x=1
-  libmesh_assert(gauss1D.qp(0)(0) >= 0.0); libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
-  libmesh_assert(jacA1D.qp(0)(0)  >= 0.0); libmesh_assert(jacA1D.qp(n_points-1)(0)  <= 1.0);
-  libmesh_assert(jacB1D.qp(0)(0)  >= 0.0); libmesh_assert(jacB1D.qp(n_points-1)(0)  <= 1.0);
+  libmesh_assert(gauss1D.qp(0)(0) >= 0.0);
+  libmesh_assert(gauss1D.qp(n_points-1)(0) <= 1.0);
+  libmesh_assert(jacA1D.qp(0)(0)  >= 0.0);
+  libmesh_assert(jacA1D.qp(n_points-1)(0)  <= 1.0);
+  libmesh_assert(jacB1D.qp(0)(0)  >= 0.0);
+  libmesh_assert(jacB1D.qp(n_points-1)(0)  <= 1.0);
 
   // Resize the points and weights vectors
   _points.resize(n_points * n_points * n_points);

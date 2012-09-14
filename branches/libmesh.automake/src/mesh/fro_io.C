@@ -25,11 +25,11 @@
 #include <map>
 
 // Local includes
-#include "libmesh_config.h"
-#include "fro_io.h"
-#include "mesh_base.h"
-#include "boundary_info.h"
-#include "elem.h"
+#include "libmesh/libmesh_config.h"
+#include "libmesh/fro_io.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

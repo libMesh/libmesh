@@ -16,10 +16,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#include "twostep_time_solver.h"
-#include "diff_system.h"
-#include "euler_solver.h"
-#include "numeric_vector.h"
+#include "libmesh/twostep_time_solver.h"
+#include "libmesh/diff_system.h"
+#include "libmesh/euler_solver.h"
+#include "libmesh/numeric_vector.h"
 
 namespace libMesh
 {

@@ -19,7 +19,7 @@
 #define __elem_assembly_h__
 
 // Local includes
-#include "reference_counted_object.h"
+#include "libmesh/reference_counted_object.h"
 
 // C++ includes
 

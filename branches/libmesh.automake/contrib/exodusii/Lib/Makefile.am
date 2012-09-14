@@ -14,7 +14,7 @@ noinst_LTLIBRARIES     = libexodusII.la
 # some client apps expect exodusII.h to be there when libMesh
 # is present. since we've implicitly guaranteed this for ~10 years
 # no need to break that trust now.
-includedir      = $(prefix)/include/contrib
+includedir      = $(prefix)/include/libmesh
 include_HEADERS = include/exodusII.h include/exodusII_ext.h
 
 # the files required to actually build libexodusII.la

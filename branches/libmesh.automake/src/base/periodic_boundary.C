@@ -16,12 +16,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local Includes -----------------------------------
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-#include "libmesh.h" // libMesh::invalid_uint
-#include "periodic_boundary.h"
+#include "libmesh/libmesh.h" // libMesh::invalid_uint
+#include "libmesh/periodic_boundary.h"
+
+namespace libMesh {
 
 // ------------------------------------------------------------
 // PeriodicBoundary member functions
@@ -68,6 +70,9 @@ AutoPtr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType t) cons
 {
   return AutoPtr<PeriodicBoundaryBase>(new PeriodicBoundary(*this, t));
 }
+
+
+} // namespace libMesh
 
 
 #endif // LIBMESH_ENABLE_PERIODIC

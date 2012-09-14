@@ -21,8 +21,8 @@
 #define __dense_matrix_h__
 
 // Local Includes
-#include "libmesh_common.h"
-#include "dense_matrix_base.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/dense_matrix_base.h"
 
 // C++ includes
 #include <vector>

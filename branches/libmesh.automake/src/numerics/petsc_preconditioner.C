@@ -15,18 +15,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
 // C++ includes
 
 // Local Includes
-#include "petsc_preconditioner.h"
-#include "petsc_macro.h"
-#include "petsc_matrix.h"
-#include "petsc_vector.h"
-#include "libmesh_common.h"
+#include "libmesh/petsc_preconditioner.h"
+#include "libmesh/petsc_macro.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/libmesh_common.h"
 
 // PCBJacobiGetSubKSP was defined in petscksp.h in PETSc 2.3.3, 3.1.0
 #if PETSC_VERSION_LESS_THAN(3,1,0)

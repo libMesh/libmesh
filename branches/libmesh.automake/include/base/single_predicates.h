@@ -20,8 +20,8 @@
 
 // Local includes
 #include <cstddef>         // for NULL with gcc 4.6.2 - I'm serious!
-#include "enum_elem_type.h"
-#include "id_types.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/id_types.h"
 
 // C++ includes
 #include <cstddef>

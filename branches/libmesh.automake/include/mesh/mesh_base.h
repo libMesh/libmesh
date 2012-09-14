@@ -23,14 +23,14 @@
 
 
 // Local Includes -----------------------------------
-#include "auto_ptr.h"
-#include "dof_object.h" // for invalid_processor_id
-#include "enum_elem_type.h"
-#include "libmesh_common.h"
-#include "multi_predicates.h"
-#include "partitioner.h" // AutoPtr needs a real declaration
-#include "point_locator_base.h"
-#include "variant_filter_iterator.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/dof_object.h" // for invalid_processor_id
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/multi_predicates.h"
+#include "libmesh/partitioner.h" // AutoPtr needs a real declaration
+#include "libmesh/point_locator_base.h"
+#include "libmesh/variant_filter_iterator.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>

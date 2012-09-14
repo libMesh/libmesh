@@ -19,15 +19,15 @@
 #ifndef __mesh_h__
 #define __mesh_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_ENABLE_PARMESH
-#include "parallel_mesh.h"
+#include "libmesh/parallel_mesh.h"
 namespace libMesh {
   typedef ParallelMesh DefaultMesh;
 }
 #else
-#include "serial_mesh.h"
+#include "libmesh/serial_mesh.h"
 namespace libMesh {
   typedef SerialMesh DefaultMesh;
 }

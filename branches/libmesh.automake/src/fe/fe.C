@@ -18,13 +18,13 @@
 
 
 // Local includes
-#include "elem.h"
-#include "fe.h"
-#include "fe_interface.h"
-#include "fe_macro.h"
-#include "libmesh_logging.h"
-#include "quadrature.h"
-#include "tensor_value.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fe_macro.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/tensor_value.h"
 
 namespace libMesh
 {

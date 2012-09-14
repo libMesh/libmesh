@@ -18,8 +18,8 @@
 
 
 // Local includes
-#include "quadrature_gauss.h"
-#include "quadrature_conical.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_conical.h"
 
 namespace libMesh
 {

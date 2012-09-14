@@ -21,12 +21,12 @@
 #define __transient_rb_construction_h__
 
 // rbOOmit includes
-#include "rb_construction.h"
-#include "transient_rb_evaluation.h"
-#include "rb_temporal_discretization.h"
+#include "libmesh/rb_construction.h"
+#include "libmesh/transient_rb_evaluation.h"
+#include "libmesh/rb_temporal_discretization.h"
 
 // libMesh includes
-#include "transient_system.h"
+#include "libmesh/transient_system.h"
 
 // C++ includes
 

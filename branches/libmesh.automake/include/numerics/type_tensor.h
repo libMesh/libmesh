@@ -21,8 +21,8 @@
 #define __type_tensor_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "type_vector.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/type_vector.h"
 
 // C++ includes
 #include <cmath>

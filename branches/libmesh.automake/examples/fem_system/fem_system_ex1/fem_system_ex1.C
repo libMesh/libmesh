@@ -23,25 +23,25 @@
  // DifferentiableSystem class framework
 
 // Basic include files
-#include "equation_systems.h"
-#include "error_vector.h"
-#include "getpot.h"
-#include "exodusII_io.h"
-#include "kelly_error_estimator.h"
-#include "mesh.h"
-#include "mesh_generation.h"
-#include "mesh_refinement.h"
-#include "uniform_refinement_estimator.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/getpot.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/kelly_error_estimator.h"
+#include "libmesh/mesh.h"
+#include "libmesh/mesh_generation.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/uniform_refinement_estimator.h"
 
 // Some (older) compilers do not offer full stream
 // functionality, OStringStream works around this.
-#include "o_string_stream.h"
+#include "libmesh/o_string_stream.h"
 
 // The systems and solvers we may use
 #include "naviersystem.h"
-#include "diff_solver.h"
-#include "euler_solver.h"
-#include "steady_solver.h"
+#include "libmesh/diff_solver.h"
+#include "libmesh/euler_solver.h"
+#include "libmesh/steady_solver.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

@@ -21,10 +21,10 @@
 #include <fstream>
 
 // Local includes
-#include "mesh_data.h"
-#include "mesh_base.h"
-#include "xdr_cxx.h"
-#include "elem.h"
+#include "libmesh/mesh_data.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/xdr_cxx.h"
+#include "libmesh/elem.h"
 
 namespace libMesh
 {

@@ -20,12 +20,12 @@
 #ifndef __mesh_smoother_vsmoother_h__
 #define __mesh_smoother_vsmoother_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_VSMOOTHER
 
 // Local Includes -----------------------------------
-#include "mesh_smoother.h"
-#include "unstructured_mesh.h"
+#include "libmesh/mesh_smoother.h"
+#include "libmesh/unstructured_mesh.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>

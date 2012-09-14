@@ -3,12 +3,14 @@
 #define __const_function_h__
 
 // Local includes
-#include "dense_vector.h"
-#include "function_base.h"
-#include "point.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/function_base.h"
+#include "libmesh/point.h"
 
 // C++ includes
 #include <string>
+
+namespace libMesh {
 
 template <typename Output=Number>
 class ConstFunction : public FunctionBase<Output>
@@ -39,5 +41,6 @@ private:
   Output _c;
 };
 
+} // namespace libMesh
 
 #endif // __const_function_h__

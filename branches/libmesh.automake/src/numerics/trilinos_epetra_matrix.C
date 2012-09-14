@@ -17,17 +17,17 @@
 
 
 // C++ includes
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #ifdef LIBMESH_HAVE_TRILINOS
 
 // Local includes
-#include "trilinos_epetra_matrix.h"
-#include "trilinos_epetra_vector.h"
-#include "dof_map.h"
-#include "dense_matrix.h"
-#include "parallel.h"
-#include "sparsity_pattern.h"
+#include "libmesh/trilinos_epetra_matrix.h"
+#include "libmesh/trilinos_epetra_vector.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/parallel.h"
+#include "libmesh/sparsity_pattern.h"
 
 namespace libMesh
 {

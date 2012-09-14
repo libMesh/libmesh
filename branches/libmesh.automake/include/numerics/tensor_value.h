@@ -21,7 +21,7 @@
 #define __tensor_value_h__
 
 // Local includes
-#include "type_tensor.h"
+#include "libmesh/type_tensor.h"
 
 // C++ includes
 

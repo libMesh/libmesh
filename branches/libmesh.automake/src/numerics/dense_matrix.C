@@ -20,9 +20,9 @@
 #include <cmath> // for sqrt
 
 // Local Includes
-#include "dense_matrix.h"
-#include "dense_vector.h"
-#include "libmesh.h"
+#include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
+#include "libmesh/libmesh.h"
 
 namespace libMesh
 {

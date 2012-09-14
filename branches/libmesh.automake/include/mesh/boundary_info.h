@@ -21,8 +21,8 @@
 #define __boundary_info_h__
 
 // Local includes
-#include "libmesh_common.h"
-#include "id_types.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/id_types.h"
 
 // C++ includes
 #include <cstddef>

@@ -21,8 +21,8 @@
 #define __system_subset_by_subdomain_h__
 
 // Local Includes
-#include "system_subset.h"
-#include "id_types.h"
+#include "libmesh/system_subset.h"
+#include "libmesh/id_types.h"
 
 // C++ includes
 #include <cstddef>

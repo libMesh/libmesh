@@ -22,10 +22,10 @@
 
 
 // Local includes
-#include "libmesh_common.h"
-#include "auto_ptr.h"
-#include "reference_counted_object.h"
-#include "libmesh.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/reference_counted_object.h"
+#include "libmesh/libmesh.h"
 
 // C++ includes
 #include <cstddef>

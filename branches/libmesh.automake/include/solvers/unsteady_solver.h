@@ -21,10 +21,10 @@
 #define __unsteady_solver_h__
 
 // Local includes
-#include "auto_ptr.h"
-#include "libmesh_common.h"
-#include "numeric_vector.h"
-#include "time_solver.h"
+#include "libmesh/auto_ptr.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/time_solver.h"
 
 // C++ includes
 

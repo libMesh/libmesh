@@ -15,18 +15,18 @@
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
-#include "getpot.h"
+#include "libmesh/getpot.h"
 
 #include "laplace_system.h"
 
-#include "boundary_info.h"
-#include "dof_map.h"
-#include "fe_base.h"
-#include "fe_interface.h"
-#include "fem_context.h"
-#include "mesh.h"
-#include "quadrature.h"
-#include "string_to_enum.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fem_context.h"
+#include "libmesh/mesh.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/string_to_enum.h"
 
 
 // Bring in everything from the libMesh namespace

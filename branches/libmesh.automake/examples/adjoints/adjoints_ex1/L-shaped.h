@@ -1,7 +1,7 @@
-#include "enum_fe_family.h"
-#include "fem_system.h"
-#include "qoi_set.h"
-#include "system.h"
+#include "libmesh/enum_fe_family.h"
+#include "libmesh/fem_system.h"
+#include "libmesh/qoi_set.h"
+#include "libmesh/system.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;

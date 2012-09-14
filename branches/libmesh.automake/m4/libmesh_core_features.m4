@@ -7,6 +7,22 @@ AC_MSG_RESULT(----- Configuring core library features -----)
 AC_MSG_RESULT(---------------------------------------------)
 
 
+# --------------------------------------------------------------
+# legacy include paths - disabled by default
+# --------------------------------------------------------------
+AC_ARG_ENABLE(legacy-include-paths,
+              [AC_HELP_STRING([--enable-legacy-include-paths],[allow for e.g. #include "header.h" instead of #include "libmesh/header.h"])],
+              enablelegacyincludepaths=$enableval,
+              enablelegacyincludepaths=no)
+                
+AC_SUBST(enablelegacyincludepaths)
+if test "$enablelegacyincludepaths" != no ; then
+  AC_MSG_RESULT(<<< Configuring library to enable old-style include paths >>>)  
+fi
+# --------------------------------------------------------------
+
+
+
 # -------------------------------------------------------------
 # size of subdomain_id -- default 2
 # -------------------------------------------------------------

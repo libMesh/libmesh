@@ -20,11 +20,11 @@
 #ifndef __eigen_time_solver_h__
 #define __eigen_time_solver_h__
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_SLEPC
 
 // Local includes
-#include "time_solver.h"
+#include "libmesh/time_solver.h"
 
 // C++ includes
 

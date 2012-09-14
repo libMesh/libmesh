@@ -20,16 +20,18 @@
 // C++ includes
 
 // Local includes
-#include "boundary_info.h"
-#include "mesh_base.h"
-#include "node.h"
-#include "parallel.h"
-#include "parallel_mesh.h"
+#include "libmesh/boundary_info.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/node.h"
+#include "libmesh/parallel.h"
+#include "libmesh/parallel_mesh.h"
 
 // Helper functions in anonymous namespace
 
 namespace 
 {
+  using namespace libMesh;
+
   static const unsigned int header_size = 2;
 
   // use "(a+b-1)/b" trick to get a/b to round up

@@ -6,7 +6,8 @@ AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DLIBMESH_IS_COMPILING_METIS
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
-INCLUDES = -I$(srcdir)/include  -I$(srcdir)/GKlib -I$(srcdir)/Lib
+INCLUDES  = -I$(srcdir)/include  -I$(srcdir)/GKlib -I$(srcdir)/Lib
+INCLUDES += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
 
 noinst_LTLIBRARIES    = libmetis.la
 libmetis_la_SOURCES = \

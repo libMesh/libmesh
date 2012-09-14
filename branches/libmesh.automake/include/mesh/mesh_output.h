@@ -22,10 +22,10 @@
 
 
 // Local includes
-#include "libmesh_common.h"
-#include "libmesh_logging.h"
-#include "mesh_base.h"
-#include "mesh_serializer.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/mesh_serializer.h"
 
 // C++ includes
 #include <cstddef>

@@ -20,11 +20,11 @@
 // variables they have in common, and output the Hilbert norms of the
 // differences between them.
 
-#include "libmesh.h"
+#include "libmesh/libmesh.h"
 
-#include "mesh.h"
-#include "equation_systems.h"
-#include "exact_solution.h"
+#include "libmesh/mesh.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/exact_solution.h"
 
 using namespace libMesh;
 

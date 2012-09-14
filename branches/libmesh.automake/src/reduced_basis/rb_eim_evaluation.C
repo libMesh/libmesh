@@ -18,14 +18,14 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // rbOOmit includes
-#include "rb_eim_evaluation.h"
-#include "rb_eim_theta.h"
-#include "rb_parametrized_function.h"
+#include "libmesh/rb_eim_evaluation.h"
+#include "libmesh/rb_eim_theta.h"
+#include "libmesh/rb_parametrized_function.h"
 
 // libMesh includes
-#include "o_string_stream.h"
-#include "xdr_cxx.h"
-#include "libmesh_logging.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/xdr_cxx.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {

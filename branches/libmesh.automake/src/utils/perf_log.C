@@ -28,9 +28,9 @@
 #include <vector>
 
 // Local includes
-#include "o_string_stream.h"
-#include "perf_log.h"
-#include "timestamp.h"
+#include "libmesh/o_string_stream.h"
+#include "libmesh/perf_log.h"
+#include "libmesh/timestamp.h"
 
 // Anonymous helper function
 
