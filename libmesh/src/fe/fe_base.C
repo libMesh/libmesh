@@ -41,6 +41,8 @@
 // constraint calculations
 namespace
 {
+  using namespace libMesh;
+
   // Find the "primary" element around a boundary point:
   const Elem* primary_boundary_point_neighbor
     (const Elem* elem,

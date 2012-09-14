@@ -34,6 +34,8 @@
 
 
 namespace {
+  using namespace libMesh;
+
   // give this guy some scope since there
   // is underlying vector allocation upon
   // creation/deletion

@@ -6,6 +6,8 @@
 #include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
 
+using namespace libMesh;
+
 void output_norms(const System &sys, const NumericVector<Number>&vec, const std::string& vecname)
 {
   for (unsigned int k = 0; k != sys.n_vars(); ++k)

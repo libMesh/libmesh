@@ -30,6 +30,8 @@
 
 namespace 
 {
+  using namespace libMesh;
+
   static const unsigned int header_size = 2;
 
   // use "(a+b-1)/b" trick to get a/b to round up

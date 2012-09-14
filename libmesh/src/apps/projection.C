@@ -34,6 +34,9 @@
 #include "libmesh/point.h"
 
 
+using namespace libMesh;
+
+
 // If there's a missing input argument, then print a help message
 void usage_error(const char *progname)
 {

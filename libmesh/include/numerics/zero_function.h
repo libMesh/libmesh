@@ -7,6 +7,8 @@
 
 // C++ includes
 
+namespace libMesh {
+
 template <typename Output=Number>
 class ZeroFunction : public ConstFunction<Output>
 {
@@ -19,5 +21,6 @@ public:
   }
 };
 
+} // namespace libMesh
 
 #endif // __zero_function_h__
