@@ -798,6 +798,7 @@ CXXFLAGS_DBG
 CXXFLAGS_OPT
 GXX_VERSION
 enableshared
+enablelegacyincludepaths
 ac_ct_F77
 FFLAGS
 F77
@@ -880,6 +881,7 @@ with_f77
 enable_singleprecision
 enable_tripleprecision
 enable_quadrupleprecision
+enable_legacy_include_paths
 enable_getpwuid
 enable_shared
 enable_exceptions
@@ -1590,6 +1592,9 @@ Optional Features:
                           Use triple-precision scalars
   --enable-quadrupleprecision
                           Use quadruple-precision scalars
+  --enable-legacy-include-paths
+                          allow for e.g. #include "header.h" instead of
+                          #include "libmesh/header.h"
   --enable-getpwuid       allow calls to getpwuid
   --enable-shared         build shared libraries
   --enable-exceptions     throw exceptions on unexpected errors
@@ -4854,6 +4859,21 @@ _ACEOF
  ;;
  esac
 
+
+
+# Check whether --enable-legacy-include-paths was given.
+if test "${enable_legacy_include_paths+set}" = set; then :
+  enableval=$enable_legacy_include_paths; enablelegacyincludepaths=$enableval
+else
+  enablelegacyincludepaths=no
+fi
+
+
+
+if test "$enablelegacyincludepaths" != no ; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library to enable old-style include paths >>>" >&5
+$as_echo "<<< Configuring library to enable old-style include paths >>>" >&6; }
+fi
 
 
 # Check whether --enable-getpwuid was given.

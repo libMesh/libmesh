@@ -223,7 +223,7 @@
 /* #endif */ /* not SINGLE */
 
 /* Use libMesh-defined precision */
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 typedef LIBMESH_DEFAULT_SCALAR_TYPE REAL;
 
 /* If yours is not a Unix system, define the NO_TIMER compiler switch to     */

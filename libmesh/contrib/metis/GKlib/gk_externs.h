@@ -15,7 +15,7 @@
  * this using configure and set the appropriate value in LIBMESH_TLS, which is
  * defined in libmesh_config.h
  */
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 /*************************************************************************
 * Extern variable definition. Hopefully, the __thread makes them thread-safe.

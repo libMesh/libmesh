@@ -16,7 +16,7 @@
 #ifndef LASPACK_CONFIG_H
 #define LASPACK_CONFIG_H
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 #if defined(LIBMESH_USE_REAL_NUMBERS)
 #  undef _LP_LIBMESH_USE_COMPLEX_NUMBERS

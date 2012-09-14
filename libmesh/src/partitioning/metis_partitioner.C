@@ -36,13 +36,13 @@
 # endif
   namespace Metis {
     extern "C" {
-#     include "ignore_warnings.h"
+#     include "libmesh/ignore_warnings.h"
 #     include "metis.h"
-#     include "restore_warnings.h"
+#     include "libmesh/restore_warnings.h"
     }
   }
 #else
-#  include "sfc_partitioner.h"
+#  include "libmesh/sfc_partitioner.h"
 #endif
 
 
