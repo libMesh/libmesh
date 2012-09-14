@@ -20,7 +20,7 @@ can be used to define other memory allocation routines.
  * this using configure and set the appropriate value in LIBMESH_TLS, which is
  * defined in libmesh_config.h
  */
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 
 /* This is for the global mcore that tracks all heap allocations */
 #ifdef LIBMESH_TLS

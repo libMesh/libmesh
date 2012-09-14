@@ -110,7 +110,6 @@ enable-sfcurves	     = @enablesfc@
 enable-tetgen        = @enabletetgen@
 enable-triangle      = @enabletriangle@
 enable-vtk           = @enablevtk@
-
 #
 # Set the current directory.
 libmesh_dir := @PWD@
@@ -286,22 +285,25 @@ libmesh_LIBS += $(mesh_library)
 
 #
 # The include directories for libMesh
-libmesh_INCLUDE += -I$(libmesh_dir)/include \
-                   -I$(libmesh_dir)/include/base \
-                   -I$(libmesh_dir)/include/enums \
-                   -I$(libmesh_dir)/include/error_estimation \
-                   -I$(libmesh_dir)/include/fe \
-                   -I$(libmesh_dir)/include/geom \
-                   -I$(libmesh_dir)/include/mesh \
-                   -I$(libmesh_dir)/include/numerics \
-                   -I$(libmesh_dir)/include/parallel \
-                   -I$(libmesh_dir)/include/partitioning \
-                   -I$(libmesh_dir)/include/physics \
-                   -I$(libmesh_dir)/include/quadrature \
-                   -I$(libmesh_dir)/include/reduced_basis \
-                   -I$(libmesh_dir)/include/solvers \
-                   -I$(libmesh_dir)/include/systems \
-                   -I$(libmesh_dir)/include/utils
+libmesh_INCLUDE += -I$(libmesh_dir)/include
+
+ifeq (@enablelegacyincludepaths@,yes)
+  libmesh_INCLUDE += -I$(libmesh_dir)/include/base \
+                     -I$(libmesh_dir)/include/enums \
+                     -I$(libmesh_dir)/include/error_estimation \
+                     -I$(libmesh_dir)/include/fe \
+                     -I$(libmesh_dir)/include/geom \
+                     -I$(libmesh_dir)/include/mesh \
+                     -I$(libmesh_dir)/include/numerics \
+                     -I$(libmesh_dir)/include/parallel \
+                     -I$(libmesh_dir)/include/partitioning \
+                     -I$(libmesh_dir)/include/physics \
+                     -I$(libmesh_dir)/include/quadrature \
+                     -I$(libmesh_dir)/include/reduced_basis \
+                     -I$(libmesh_dir)/include/solvers \
+                     -I$(libmesh_dir)/include/systems \
+                     -I$(libmesh_dir)/include/utils
+endif
 
 
 

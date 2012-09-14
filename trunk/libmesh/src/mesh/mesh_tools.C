@@ -36,7 +36,7 @@
 #include "libmesh/threads.h"
 
 #ifdef DEBUG
-#  include "remote_elem.h"
+#  include "libmesh/remote_elem.h"
 #endif
 
 

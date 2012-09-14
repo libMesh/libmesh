@@ -45,19 +45,19 @@
 
 
 #if defined(LIBMESH_HAVE_MPI)
-# include "ignore_warnings.h"
+# include "libmesh/ignore_warnings.h"
 # include <mpi.h>
-# include "restore_warnings.h"
+# include "libmesh/restore_warnings.h"
 #endif // #if defined(LIBMESH_HAVE_MPI)
 
 #if defined(LIBMESH_HAVE_PETSC)
-# include "petsc_macro.h"
+# include "libmesh/petsc_macro.h"
 EXTERN_C_FOR_PETSC_BEGIN
 # include <petsc.h>
 # include <petscerror.h>
 EXTERN_C_FOR_PETSC_END
 # if defined(LIBMESH_HAVE_SLEPC)
-#  include "slepc_macro.h"
+#  include "libmesh/slepc_macro.h"
 EXTERN_C_FOR_PETSC_BEGIN
 #  include <slepc.h>
 EXTERN_C_FOR_PETSC_END

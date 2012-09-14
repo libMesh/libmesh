@@ -25,7 +25,7 @@
 
 // Threading building blocks includes
 #ifdef LIBMESH_HAVE_TBB_API
-#  include "libmesh_logging.h" // only mess with the perflog if we are really multithreaded
+#  include "libmesh/libmesh_logging.h" // only mess with the perflog if we are really multithreaded
 #  include "tbb/tbb_stddef.h"
 #  include "tbb/blocked_range.h"
 #  include "tbb/parallel_for.h"
