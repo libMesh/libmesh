@@ -33,6 +33,8 @@
 #include "libmesh/point.h"
 #include "libmesh/quadrature_gauss.h"
 
+using namespace libMesh;
+
 void usage_error(const char *progname)
 {
   std::cout << "Usage: " << progname

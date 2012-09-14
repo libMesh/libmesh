@@ -23,6 +23,8 @@
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
 #include "libmesh/periodic_boundary_base.h"
 
+namespace libMesh {
+
 // ------------------------------------------------------------
 // PeriodicBoundaryBase member functions
 
@@ -64,5 +66,7 @@ bool PeriodicBoundaryBase::is_my_variable(unsigned int var_num) const
   return a;
 }
 
+
+} // namespace libMesh
 
 #endif // LIBMESH_ENABLE_PERIODIC
