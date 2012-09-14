@@ -36,7 +36,8 @@ EXTERN_C_BEGIN
 PetscErrorCode DMCreate_libMesh(DM);
 EXTERN_C_END
 
-#include <petscdmlibmesh.h>
+#include <libmesh/petscdmlibmesh.h>
+
 namespace libMesh {
   PetscBool PetscDMRegistered = PETSC_FALSE;
   void PetscDMRegister()
