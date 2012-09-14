@@ -7,6 +7,8 @@
 #include "biharmonic.h"
 #include "biharmonic_jr.h"
 
+using namespace libMesh;
+
 void Biharmonic::Create(Biharmonic** b)
 {
   // ParallelMesh doesn't yet understand periodic BCs

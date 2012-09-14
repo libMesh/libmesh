@@ -23,6 +23,12 @@
 #include "libmesh/rb_construction.h"
 #include "assembly.h"
 
+// Bring in bits from the libMesh namespace.
+// Just the bits we're using, since this is a header.
+using libMesh::DirichletBoundary;
+using libMesh::RBConstruction;
+using libMesh::RBEvaluation;
+
 // A simple subclass of RBEvaluation.
 class SimpleRBEvaluation : public RBEvaluation
 {

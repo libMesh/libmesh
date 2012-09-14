@@ -33,6 +33,8 @@ using libMesh::FEMContext;
 using libMesh::RBConstruction;
 using libMesh::RBEvaluation;
 using libMesh::Real;
+using libMesh::TransientRBEvaluation;
+using libMesh::TransientRBConstruction;
 
 
 // A simple subclass of RBEvaluation, which just needs to specify

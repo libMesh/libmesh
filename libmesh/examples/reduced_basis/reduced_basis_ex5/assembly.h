@@ -7,6 +7,17 @@
 #include "libmesh/rb_theta_expansion.h"
 #include "libmesh/rb_assembly_expansion.h"
 
+// Bring in bits from the libMesh namespace.
+// Just the bits we're using, since this is a header.
+using libMesh::ElemAssembly;
+using libMesh::FEMContext;
+using libMesh::Number;
+using libMesh::Real;
+using libMesh::RBAssemblyExpansion;
+using libMesh::RBParameters;
+using libMesh::RBTheta;
+using libMesh::RBThetaExpansion;
+
 // boundary IDs
 #define BOUNDARY_ID_MIN_Z 0
 #define BOUNDARY_ID_MIN_Y 1
