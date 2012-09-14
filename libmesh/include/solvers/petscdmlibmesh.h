@@ -6,7 +6,7 @@
 
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
 // libMesh include
-#include <nonlinear_implicit_system.h>
+#include <libmesh/nonlinear_implicit_system.h>
 
 #include <petscdm.h>
 #define DMLIBMESH "libmesh"
