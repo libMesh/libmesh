@@ -56,7 +56,12 @@ echo '  'stack trace files................ : $enabletracefiles
 echo '  'subdomain id size................ : $subdomain_bytes bytes
 echo '  'variational smoother............. : $enablevsmoother
 echo '  'xdr binary I/O................... : $enablexdr
-echo '  'legacy include paths............. : $enablelegacyincludepaths
+if (test "x$enablelegacyincludepaths" = "xyes"); then
+echo '  'non-prefixed include paths....... : $enablelegacyincludepaths ***LEGACY FEATURE***
+fi
+if (test "x$enablelegacyusingnamespace" = "xyes"); then
+echo '  'adding using namespace libMesh... : $enablelegacyusingnamespace ***LEGACY FEATURE***
+fi
 
 
 		   

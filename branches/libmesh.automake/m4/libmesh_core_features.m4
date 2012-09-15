@@ -17,7 +17,29 @@ AC_ARG_ENABLE(legacy-include-paths,
                 
 AC_SUBST(enablelegacyincludepaths)
 if test "$enablelegacyincludepaths" != no ; then
-  AC_MSG_RESULT(<<< Configuring library to enable old-style include paths >>>)  
+  AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
+  AC_MSG_RESULT([>>> Configuring library to dump old header paths into include args <<<])
+else
+  AC_MSG_RESULT([<<< Configuring library to require ``include "libmesh/etc.h"'' style >>>])
+fi
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
+# legacy "using namespace libMesh" - enabled by default
+# --------------------------------------------------------------
+AC_ARG_ENABLE(legacy-using-namespace,
+              [AC_HELP_STRING([--enable-legacy-using-namespace],[add "using namespace libMesh" to libMesh headers])],
+              enablelegacyusingnamespace=$enableval,
+              enablelegacyusingnamespace=no)
+                
+if test "$enablelegacyusingnamespace" != no ; then
+  AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
+  AC_MSG_RESULT([>>> Configuring library to dump names into global namespace <<<])
+else
+  AC_MSG_RESULT([<<< Configuring library to keep names in libMesh namespace >>>])
+  AC_DEFINE(REQUIRE_SEPARATE_NAMESPACE, 1,
+           [Flag indicating if the library should keep names in libMesh namespace])
 fi
 # --------------------------------------------------------------
 

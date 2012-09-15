@@ -8,6 +8,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@/@host@_@METHOD@
 includedir=@includedir@
+legacyinclude=@enablelegacyincludepaths@
 
 #
 # Define the usage() function
@@ -71,8 +72,11 @@ while [ "x$1" != "x" ]; do
 	    ;;
 	
 	"--include")
+	    # handle legacy include paths when needed.
+	    if (test "x$legacyinclude" = "xyes"); then
+		return_val="-I${includedir}/libmesh $return_val"
+	    fi
 	    return_val="-I${includedir}
-                        -I${includedir}/contrib
  	                @libmesh_optional_INCLUDES@
                         $return_val"
 	    ;;
