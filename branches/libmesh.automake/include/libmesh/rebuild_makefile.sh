@@ -1,6 +1,6 @@
 #!/bin/sh
 
-headers=`find ../ -name "*.h" -type f | sort`
+headers=`find .. -name "*.h" -type f | sort`
 #echo $headers
 
 built_sources=""
@@ -30,11 +30,8 @@ dist-hook:
 # include the magic script!
 EXTRA_DIST = rebuild_makefile.sh
 
-# Build Makefile.am from ./rebuild_makefile.sh
-Makefile.am: rebuild_makefile.sh
-	\$(AM_V_GEN)./rebuild_makefile.sh
-
 BUILT_SOURCES = $built_sources
+
 CLEANFILES = \$(BUILT_SOURCES)
 
 EOF
@@ -45,7 +42,7 @@ for header_with_path in $headers ; do
     source=`echo $header_with_path | sed 's/../$(top_srcdir)\/include/' -`
     #echo $source
     cat <<EOF >> Makefile.am
-$header: $header_with_path
+$header: $source
 	\$(AM_V_GEN)\$(LN_S) $source $header
 
 EOF
