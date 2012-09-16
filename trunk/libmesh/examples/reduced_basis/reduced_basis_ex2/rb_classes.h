@@ -26,9 +26,6 @@
 #include "libmesh/rb_scm_construction.h"
 #include "libmesh/fe_base.h"
 
-// local include
-#include "assembly.h"
-
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
 using libMesh::EquationSystems;
@@ -37,7 +34,15 @@ using libMesh::RBConstruction;
 using libMesh::RBSCMConstruction;
 using libMesh::RBEvaluation;
 using libMesh::RBSCMEvaluation;
+using libMesh::RBParameters;
+using libMesh::RBThetaExpansion;
+using libMesh::RBAssemblyExpansion;
+using libMesh::AutoPtr;
+using libMesh::DirichletBoundary;
 using libMesh::Real;
+
+// local include
+#include "assembly.h"
 
 // A simple subclass of RBEvaluation. We also store the theta expansion object
 // for the affine expansion of the PDE as a member variable.
