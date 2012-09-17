@@ -40,7 +40,7 @@ namespace libMesh
 // InfHex class member functions
 unsigned int InfHex::key (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   switch (s)
     {
@@ -95,7 +95,7 @@ unsigned int InfHex::key (const unsigned int s) const
 
 AutoPtr<Elem> InfHex::side (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   /*
    *Think of a unit cube: (-1,1) x (-1,1)x (-1,1),
@@ -203,8 +203,8 @@ AutoPtr<Elem> InfHex::side (const unsigned int i) const
 bool InfHex::is_child_on_side(const unsigned int c,
                               const unsigned int s) const
 {
-  libmesh_assert (c < this->n_children());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (c, this->n_children());
+  libmesh_assert_less (s, this->n_sides());
 
   return (s == 0 || c+1 == s || c == s%4);
 }
@@ -214,8 +214,8 @@ bool InfHex::is_child_on_side(const unsigned int c,
 bool InfHex::is_edge_on_side (const unsigned int e,
                               const unsigned int s) const
 {
-  libmesh_assert (e < this->n_edges());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (e, this->n_edges());
+  libmesh_assert_less (s, this->n_sides());
 
   return (is_node_on_side(InfHex8::edge_nodes_map[e][0],s) &&
           is_node_on_side(InfHex8::edge_nodes_map[e][1],s));
@@ -250,7 +250,7 @@ Real InfHex::quality (const ElemQuality q) const
 	const Real min = std::min(d02, d13);
 	const Real max = std::max(d02, d13);
 
-	libmesh_assert (max != 0.0);
+	libmesh_assert_not_equal_to (max, 0.0);
 
 	return min / max;
 
@@ -308,7 +308,7 @@ Real InfHex::quality (const ElemQuality q) const
 	const Real d13 = this->length(1,3);
 	const Real max_diag = std::max(d02, d13);
 
-	libmesh_assert ( max_diag != 0.0 );
+	libmesh_assert_not_equal_to ( max_diag, 0.0 );
 
 	/**
 	 * Compute the minimum edge length in the base.

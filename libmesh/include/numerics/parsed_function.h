@@ -143,7 +143,7 @@ public:
 
       unsigned int size = output.size();
 
-      libmesh_assert(size == parsers.size());
+      libmesh_assert_equal_to (size, parsers.size());
 
       // The remaining locations in _spacetime are currently fixed at construction
       // but could potentially be made dynamic
@@ -168,7 +168,7 @@ public:
 #endif
       _spacetime[LIBMESH_DIM] = time;
 
-      libmesh_assert(i < parsers.size());
+      libmesh_assert_less (i, parsers.size());
 
       // The remaining locations in _spacetime are currently fixed at construction
       // but could potentially be made dynamic

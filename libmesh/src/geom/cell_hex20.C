@@ -85,7 +85,7 @@ bool Hex20::is_face(const unsigned int) const
 bool Hex20::is_node_on_side(const unsigned int n,
 			    const unsigned int s) const
 {
-  libmesh_assert(s < n_sides());
+  libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 8; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -95,7 +95,7 @@ bool Hex20::is_node_on_side(const unsigned int n,
 bool Hex20::is_node_on_edge(const unsigned int n,
 			    const unsigned int e) const
 {
-  libmesh_assert(e < n_edges());
+  libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 3; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
@@ -145,7 +145,7 @@ bool Hex20::has_affine_map() const
 AutoPtr<Elem> Hex20::build_side (const unsigned int i,
 				 bool proxy ) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
@@ -255,7 +255,7 @@ AutoPtr<Elem> Hex20::build_side (const unsigned int i,
 
 AutoPtr<Elem> Hex20::build_edge (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_edges());
+  libmesh_assert_less (i, this->n_edges());
 
   AutoPtr<Elem> ap(new SideEdge<Edge3,Hex20>(this,i));
   return ap;
@@ -267,9 +267,9 @@ void Hex20::connectivity(const unsigned int sc,
 			 const IOPackage iop,
 			 std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (_nodes != NULL);
-  libmesh_assert (sc < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert(_nodes);
+  libmesh_assert_less (sc, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
 
   switch (iop)
@@ -342,9 +342,9 @@ void Hex20::connectivity(const unsigned int sc,
 unsigned short int Hex20::second_order_adjacent_vertex (const unsigned int n,
 							const unsigned int v) const
 {
-  libmesh_assert (n >= this->n_vertices());
-  libmesh_assert (n <  this->n_nodes());
-  libmesh_assert (v < 2);
+  libmesh_assert_greater_equal (n, this->n_vertices());
+  libmesh_assert_less (n, this->n_nodes());
+  libmesh_assert_less (v, 2);
   /*
    * the _second_order_adjacent_vertices matrix is
    * stored in cell_hex.C, since this matrix is identical
@@ -358,8 +358,8 @@ unsigned short int Hex20::second_order_adjacent_vertex (const unsigned int n,
 std::pair<unsigned short int, unsigned short int>
 Hex20::second_order_child_vertex (const unsigned int n) const
 {
-  libmesh_assert (n >= this->n_vertices());
-  libmesh_assert (n < this->n_nodes());
+  libmesh_assert_greater_equal (n, this->n_vertices());
+  libmesh_assert_less (n, this->n_nodes());
   /*
    * the _second_order_vertex_child_* vectors are
    * stored in cell_hex.C, since they are identical

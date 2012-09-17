@@ -79,7 +79,7 @@ unsigned int packed_size (const Node*,
 
   const int n_bcs =
     *(in + pre_indexing_size + indexing_size);
-  libmesh_assert (n_bcs >= 0);
+  libmesh_assert_greater_equal (n_bcs, 0);
 
   return pre_indexing_size + indexing_size + 1 + n_bcs;
 }
@@ -99,7 +99,7 @@ void pack (const Node* node,
            std::vector<int>& data,
            const MeshBase* mesh)
 {
-  libmesh_assert (node != NULL);
+  libmesh_assert(node);
 
   // This should be redundant when used with Parallel::pack_range()
   // data.reserve (data.size() + Parallel::packable_size(node, mesh));
@@ -134,8 +134,8 @@ void pack (const Node* node,
 		 DofObject::unpackable_indexing_size(data.begin() +
 						     start_indices));
 
-  libmesh_assert(node->packed_indexing_size() ==
-		 data.size() - start_indices);
+  libmesh_assert_equal_to (node->packed_indexing_size(),
+		          data.size() - start_indices);
 
   // Add any nodal boundary condition ids
   std::vector<boundary_id_type> bcs =
@@ -167,7 +167,7 @@ void unpack (std::vector<int>::const_iterator in,
 #ifndef NDEBUG
   const std::vector<int>::const_iterator original_in = in;
   const int incoming_header = *in++;
-  libmesh_assert (incoming_header == node_magic_header);
+  libmesh_assert_equal_to (incoming_header, node_magic_header);
 #endif
 
   const unsigned int processor_id = static_cast<unsigned int>(*in++);
@@ -180,7 +180,7 @@ void unpack (std::vector<int>::const_iterator in,
 
   if (node)
     {
-      libmesh_assert(node->processor_id() == processor_id);
+      libmesh_assert_equal_to (node->processor_id(), processor_id);
 
       // We currently don't communicate mesh motion via packed Nodes,
       // so it should be safe to assume (and assert) that Node
@@ -189,7 +189,7 @@ void unpack (std::vector<int>::const_iterator in,
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
           const Real* ints_as_Real = reinterpret_cast<const Real*>(&(*in));
-          libmesh_assert((*node)(i) == *ints_as_Real);
+          libmesh_assert_equal_to ((*node)(i), *ints_as_Real);
           in += ints_per_Real;
         }
 #endif // !NDEBUG
@@ -197,8 +197,8 @@ void unpack (std::vector<int>::const_iterator in,
       if (!node->has_dofs())
         {
 	  node->unpack_indexing(in);
-	  libmesh_assert (DofObject::unpackable_indexing_size(in) ==
-			  node->packed_indexing_size());
+	  libmesh_assert_equal_to (DofObject::unpackable_indexing_size(in),
+			           node->packed_indexing_size());
           in += node->packed_indexing_size();
 	}
       else
@@ -226,8 +226,8 @@ void unpack (std::vector<int>::const_iterator in,
       node->processor_id() = processor_id;
 
       node->unpack_indexing(in);
-      libmesh_assert (DofObject::unpackable_indexing_size(in) ==
-		      node->packed_indexing_size());
+      libmesh_assert_equal_to (DofObject::unpackable_indexing_size(in),
+		               node->packed_indexing_size());
       in += node->packed_indexing_size();
     }
 
@@ -236,7 +236,7 @@ void unpack (std::vector<int>::const_iterator in,
 
   // Add any nodal boundary condition ids
   const int num_bcs = *in++;
-  libmesh_assert(num_bcs >= 0);
+  libmesh_assert_greater_equal (num_bcs, 0);
 
   for(int bc_it=0; bc_it < num_bcs; bc_it++)
     mesh->boundary_info->add_node (node, *in++);

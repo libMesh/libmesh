@@ -97,7 +97,7 @@ DiffContext::~DiffContext ()
 
   Real DiffContext::get_deltat_value()
   {
-    libmesh_assert(_deltat != NULL);
+    libmesh_assert(_deltat);
 
     return *_deltat;
   }

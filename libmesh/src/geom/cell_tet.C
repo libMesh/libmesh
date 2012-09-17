@@ -32,7 +32,7 @@ namespace libMesh
 // Tet class member functions
 unsigned int Tet::key (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   switch (s)
     {
@@ -70,7 +70,7 @@ unsigned int Tet::key (const unsigned int s) const
 
 AutoPtr<Elem> Tet::side (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
 
 
@@ -129,7 +129,7 @@ AutoPtr<Elem> Tet::side (const unsigned int i) const
 
 void Tet::select_diagonal (const Diagonal diag) const
 {
-  libmesh_assert (_diagonal_selection==INVALID_DIAG);
+  libmesh_assert_equal_to (_diagonal_selection, INVALID_DIAG);
   _diagonal_selection = diag;
 }
 
@@ -144,8 +144,8 @@ void Tet::select_diagonal (const Diagonal diag) const
                                     const unsigned int s,
                                     const unsigned int checked_nodes[][3]) const
   {
-    libmesh_assert (c < this->n_children());
-    libmesh_assert (s < this->n_sides());
+    libmesh_assert_less (c, this->n_children());
+    libmesh_assert_less (s, this->n_sides());
 
     // For the 4 vertices, child c touches vertex c, so we can return
     // true if that vertex is on side s
@@ -219,8 +219,8 @@ void Tet::choose_diagonal() const
 bool Tet::is_edge_on_side(const unsigned int e,
                           const unsigned int s) const
 {
-  libmesh_assert (e < this->n_edges());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (e, this->n_edges());
+  libmesh_assert_less (s, this->n_sides());
 
   return (is_node_on_side(Tet4::edge_nodes_map[e][0],s) &&
           is_node_on_side(Tet4::edge_nodes_map[e][1],s));

@@ -112,7 +112,7 @@ public:
     ScalarTraits<Scalar>::value,
     TypeVector&>::type
   operator = (const Scalar& p)
-  { libmesh_assert(p == Scalar(0)); this->zero(); return *this; }
+  { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
 
   /**
    * Return the \f$ i^{th} \f$ element of the vector.
@@ -381,13 +381,13 @@ TypeVector<T>::TypeVector (const T x,
 #if LIBMESH_DIM > 1
   _coords[1] = y;
 #else
-  libmesh_assert(y == 0);
+  libmesh_assert_equal_to (y, 0);
 #endif
 
 #if LIBMESH_DIM > 2
   _coords[2] = z;
 #else
-  libmesh_assert(z == 0);
+  libmesh_assert_equal_to (z, 0);
 #endif
 }
 
@@ -406,13 +406,13 @@ TypeVector<T>::TypeVector (const Scalar x,
 #if LIBMESH_DIM > 1
   _coords[1] = y;
 #else
-  libmesh_assert(y == 0);
+  libmesh_assert_equal_to (y, 0);
 #endif
 
 #if LIBMESH_DIM > 2
   _coords[2] = z;
 #else
-  libmesh_assert(z == 0);
+  libmesh_assert_equal_to (z, 0);
 #endif
 }
 
@@ -453,7 +453,7 @@ template <typename T>
 inline
 const T & TypeVector<T>::operator () (const unsigned int i) const
 {
-  libmesh_assert (i<LIBMESH_DIM);
+  libmesh_assert_less (i, LIBMESH_DIM);
 
   return _coords[i];
 }
@@ -464,7 +464,7 @@ template <typename T>
 inline
 T & TypeVector<T>::operator () (const unsigned int i)
 {
-  libmesh_assert (i<LIBMESH_DIM);
+  libmesh_assert_less (i, LIBMESH_DIM);
 
   return _coords[i];
 }
@@ -715,7 +715,7 @@ typename boostcopy::enable_if_c<
   TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
 TypeVector<T>::operator / (const Scalar factor) const
 {
-  libmesh_assert (factor != static_cast<T>(0.));
+  libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
 
   typedef typename CompareTypes<T, Scalar>::supertype TS;
 
@@ -744,7 +744,7 @@ inline
 const TypeVector<T> &
 TypeVector<T>::operator /= (const T factor)
 {
-  libmesh_assert (factor != static_cast<T>(0.));
+  libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
 
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
     _coords[i] /= factor;
@@ -794,7 +794,7 @@ TypeVector<typename CompareTypes<T, T2>::supertype>
 TypeVector<T>::cross(const TypeVector<T2>& p) const
 {
   typedef typename CompareTypes<T, T2>::supertype TS;
-  libmesh_assert (LIBMESH_DIM == 3);
+  libmesh_assert_equal_to (LIBMESH_DIM, 3);
 
   // |     i          j          k    |
   // |(*this)(0) (*this)(1) (*this)(2)|

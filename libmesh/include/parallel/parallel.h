@@ -394,7 +394,7 @@ namespace Parallel
 #ifdef LIBMESH_HAVE_MPI
       if (_I_duped_it)
         {
-          libmesh_assert(_communicator != MPI_COMM_NULL);
+          libmesh_assert_not_equal_to (_communicator, MPI_COMM_NULL);
           MPI_Comm_free(&_communicator);
           _communicator = MPI_COMM_NULL;
         }
@@ -440,11 +440,11 @@ namespace Parallel
         {
           int i;
           MPI_Comm_size(_communicator, &i);
-          libmesh_assert (i >= 0);
+          libmesh_assert_greater_equal (i, 0);
           _size = static_cast<unsigned int>(i);
 
           MPI_Comm_rank(_communicator, &i);
-          libmesh_assert (i >= 0);
+          libmesh_assert_greater_equal (i, 0);
           _rank = static_cast<unsigned int>(i);
         }
       else
@@ -550,7 +550,7 @@ namespace Parallel
     {
       int msg_size;
       MPI_Get_count (const_cast<MPI_Status*>(&_status), type, &msg_size);
-      libmesh_assert (msg_size >= 0);
+      libmesh_assert_greater_equal (msg_size, 0);
       return msg_size;
     }
 #else
@@ -720,8 +720,8 @@ namespace Parallel
 		MPI_STATUS_IGNORE);
       if (val)
 	{
-	  libmesh_assert (_request == MPI_REQUEST_NULL);
-	  libmesh_assert (val == 1);
+	  libmesh_assert_equal_to (_request, MPI_REQUEST_NULL);
+	  libmesh_assert_equal_to (val, 1);
 	}
 
       return val;
@@ -1777,7 +1777,7 @@ namespace Parallel
     // everyone got the same value
     int maxval = tagvalue;
     Parallel::max(maxval);
-    libmesh_assert(tagvalue == maxval);
+    libmesh_assert_equal_to (tagvalue, maxval);
 #endif
 
     return MessageTag(tagvalue, this);
@@ -1837,7 +1837,7 @@ namespace Parallel
     unsigned int data_bits = 8*sizeof(T);
     // We need the output vector to already be properly sized
     unsigned int out_size = out.size();
-    libmesh_assert(out_size/data_bits + (out_size%data_bits?1:0) == in.size());
+    libmesh_assert_equal_to (out_size/data_bits + (out_size%data_bits?1:0), in.size());
 
     for (unsigned int i=0; i != out_size; ++i)
       {
@@ -2637,7 +2637,7 @@ namespace Parallel
 		tag.value(),
 		comm.get());
 
-    libmesh_assert (ierr == MPI_SUCCESS);
+    libmesh_assert_equal_to (ierr, MPI_SUCCESS);
 
     STOP_LOG("send()", "Parallel");
   }
@@ -2664,7 +2664,7 @@ namespace Parallel
 		 tag.value(),
 		 comm.get(),
 		 req.get());
-    libmesh_assert (ierr == MPI_SUCCESS);
+    libmesh_assert_equal_to (ierr, MPI_SUCCESS);
 
     STOP_LOG("send()", "Parallel");
   }
@@ -2739,7 +2739,7 @@ namespace Parallel
 		tag.value(),
 		comm.get(),
 		status.get());
-    libmesh_assert (ierr == MPI_SUCCESS);
+    libmesh_assert_equal_to (ierr, MPI_SUCCESS);
 
     STOP_LOG("receive()", "Parallel");
 
@@ -2769,7 +2769,7 @@ namespace Parallel
 		 tag.value(),
 		 comm.get(),
 		 req.get());
-    libmesh_assert (ierr == MPI_SUCCESS);
+    libmesh_assert_equal_to (ierr, MPI_SUCCESS);
 
     STOP_LOG("receive()", "Parallel");
   }
@@ -3160,7 +3160,7 @@ namespace Parallel
 		    comm.get());
       }
 
-    libmesh_assert (static_cast<unsigned int>(pos) == sendbuf.size());
+    libmesh_assert_equal_to (static_cast<unsigned int>(pos), sendbuf.size());
 
     Parallel::Request request;
 
@@ -3292,7 +3292,7 @@ namespace Parallel
 		     std::vector<T> &recv,
                      const Communicator &comm)
   {
-    libmesh_assert(root_id < comm.size());
+    libmesh_assert_less (root_id, comm.size());
 
     if (comm.rank() == root_id)
       recv.resize(comm.size());
@@ -3354,7 +3354,7 @@ namespace Parallel
 	return;
       }
 
-    libmesh_assert(root_id < comm.size());
+    libmesh_assert_less (root_id, comm.size());
 
     std::vector<int>
       sendlengths  (comm.size(), 0),
@@ -3400,7 +3400,7 @@ namespace Parallel
 		   root_id,
 		   comm.get());
 
-    libmesh_assert (ierr == MPI_SUCCESS);
+    libmesh_assert_equal_to (ierr, MPI_SUCCESS);
 
     STOP_LOG("gather()", "Parallel");
   }
@@ -3531,7 +3531,7 @@ namespace Parallel
 		      &r[0], &sendlengths[0],
 		      &displacements[0], send_type, comm.get());
 
-    libmesh_assert (ierr == MPI_SUCCESS);
+    libmesh_assert_equal_to (ierr, MPI_SUCCESS);
 
     STOP_LOG("allgather()", "Parallel");
   }
@@ -3577,7 +3577,7 @@ namespace Parallel
     const unsigned int size_per_proc =
       buf.size()/comm.size();
 
-    libmesh_assert (buf.size()%comm.size() == 0);
+    libmesh_assert_equal_to (buf.size()%comm.size(), 0);
 
     libmesh_assert(verify(size_per_proc, comm));
 
@@ -3596,7 +3596,7 @@ namespace Parallel
 		    size_per_proc,
 		    send_type,
 		    comm.get());
-    libmesh_assert (ierr == MPI_SUCCESS);
+    libmesh_assert_equal_to (ierr, MPI_SUCCESS);
 
     STOP_LOG("alltoall()", "Parallel");
   }
@@ -3614,7 +3614,7 @@ namespace Parallel
 	return;
       }
 
-    libmesh_assert(root_id < comm.size());
+    libmesh_assert_less (root_id, comm.size());
 
     START_LOG("broadcast()", "Parallel");
 
@@ -3625,7 +3625,7 @@ namespace Parallel
 #endif
       MPI_Bcast (&data, 1, StandardType<T>(&data), root_id, comm.get());
 
-    libmesh_assert (ierr == MPI_SUCCESS);
+    libmesh_assert_equal_to (ierr, MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
   }
@@ -3642,7 +3642,7 @@ namespace Parallel
 	return;
       }
 
-    libmesh_assert(root_id < comm.size());
+    libmesh_assert_less (root_id, comm.size());
 
     START_LOG("broadcast()", "Parallel");
 
@@ -3663,7 +3663,7 @@ namespace Parallel
       data.push_back(data_c[i]);
 
     if (comm.rank() == root_id)
-      libmesh_assert(data == orig);
+      libmesh_assert_equal_to (data, orig);
 
     STOP_LOG("broadcast()", "Parallel");
   }
@@ -3681,7 +3681,7 @@ namespace Parallel
 	return;
       }
 
-    libmesh_assert(root_id < comm.size());
+    libmesh_assert_less (root_id, comm.size());
 
     START_LOG("broadcast()", "Parallel");
 
@@ -3696,7 +3696,7 @@ namespace Parallel
       MPI_Bcast (data_ptr, data.size(), StandardType<T>(data_ptr),
 		 root_id, comm.get());
 
-    libmesh_assert (ierr == MPI_SUCCESS);
+    libmesh_assert_equal_to (ierr, MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
   }
@@ -3713,7 +3713,7 @@ namespace Parallel
 	return;
       }
 
-    libmesh_assert(root_id < comm.size());
+    libmesh_assert_less (root_id, comm.size());
 
     START_LOG("broadcast()", "Parallel");
 
@@ -3962,7 +3962,7 @@ namespace Parallel
 			    const MessageTag &,
                             const Communicator&)
   {
-    libmesh_assert (send_tgt == recv_source);
+    libmesh_assert_equal_to (send_tgt, recv_source);
     recv = send;
   }
 
@@ -4057,8 +4057,8 @@ namespace Parallel
 	unsigned int my_packed_size = 
 	  Parallel::packed_size (*range_begin, buffer.begin() +
 				 old_size);
-	libmesh_assert(my_packable_size == my_packed_size);
-	libmesh_assert(buffer.size() == old_size + my_packable_size);
+	libmesh_assert_equal_to (my_packable_size, my_packed_size);
+	libmesh_assert_equal_to (buffer.size(), old_size + my_packable_size);
 #endif
       }
   }
@@ -4082,7 +4082,7 @@ namespace Parallel
       {
         T* obj;
         Parallel::unpack(next_object_start, &obj, context);
-        libmesh_assert(obj != NULL);
+        libmesh_assert(obj);
 	next_object_start += Parallel::packed_size(obj,
 						   next_object_start);
         *out++ = obj;

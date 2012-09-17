@@ -82,7 +82,7 @@ void HPCoarsenTest::add_projection(const System &system,
       Uc.resize(phi_coarse->size());
       Uc.zero();
     }
-  libmesh_assert(Uc.size() == phi_coarse->size());
+  libmesh_assert_equal_to (Uc.size(), phi_coarse->size());
 
   // Loop over the quadrature points
   for (unsigned int qp=0; qp<qrule->n_points(); qp++)

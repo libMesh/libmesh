@@ -638,9 +638,9 @@ inline
 T DenseMatrix<T>::operator () (const unsigned int i,
 			       const unsigned int j) const
 {
-  libmesh_assert (i*j<_val.size());
-  libmesh_assert (i < this->_m);
-  libmesh_assert (j < this->_n);
+  libmesh_assert_less (i*j, _val.size());
+  libmesh_assert_less (i, this->_m);
+  libmesh_assert_less (j, this->_n);
 
 
   //  return _val[(i) + (this->_m)*(j)]; // col-major
@@ -654,9 +654,9 @@ inline
 T & DenseMatrix<T>::operator () (const unsigned int i,
 				 const unsigned int j)
 {
-  libmesh_assert (i*j<_val.size());
-  libmesh_assert (i < this->_m);
-  libmesh_assert (j < this->_n);
+  libmesh_assert_less (i*j, _val.size());
+  libmesh_assert_less (i, this->_m);
+  libmesh_assert_less (j, this->_n);
 
   //return _val[(i) + (this->_m)*(j)]; // col-major
   return _val[(i)*(this->_n) + (j)]; // row-major
@@ -862,8 +862,8 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 // 			      const T val,
 // 			      DenseVector<T>& rhs)
 // {
-//   libmesh_assert (this->_m == rhs.size());
-//   libmesh_assert (iv == jv);
+//   libmesh_assert_equal_to (this->_m, rhs.size());
+//   libmesh_assert_equal_to (iv, jv);
 
 
 //   // move the known value into the RHS

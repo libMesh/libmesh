@@ -79,7 +79,7 @@ void PostscriptIO::write (const std::string& fname)
       const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
       // Only works in 2D
-      libmesh_assert(mesh.mesh_dimension() == 2);
+      libmesh_assert_equal_to (mesh.mesh_dimension(), 2);
 
       // Create output file stream.
       // _out is now a private member of the class.
@@ -96,8 +96,8 @@ void PostscriptIO::write (const std::string& fname)
       // Add a little extra padding to the "true" bounding box so
       // that we can still see the boundary
       const Real percent_padding = 0.01;
-      const Real dx=bbox.second(0)-bbox.first(0); libmesh_assert(dx > 0.0);
-      const Real dy=bbox.second(1)-bbox.first(1); libmesh_assert(dy > 0.0);
+      const Real dx=bbox.second(0)-bbox.first(0); libmesh_assert_greater (dx, 0.0);
+      const Real dy=bbox.second(1)-bbox.first(1); libmesh_assert_greater (dy, 0.0);
 
       const Real x_min = bbox.first(0)  - percent_padding*dx;
       const Real y_min = bbox.first(1)  - percent_padding*dy;
@@ -244,7 +244,7 @@ void PostscriptIO::plot_quadratic_elem(const Elem* elem)
 
       // Be sure it's quadratic (Edge2).  Eventually we could
       // handle cubic elements as well...
-      libmesh_assert( side->type() == EDGE3 );
+      libmesh_assert_equal_to ( side->type(), EDGE3 );
 
       _out << "0 sg ";
 
@@ -270,7 +270,7 @@ void PostscriptIO::plot_quadratic_elem(const Elem* elem)
 void PostscriptIO::_compute_edge_bezier_coeffs(const Elem* elem)
 {
   // I only know how to do this for an Edge3!
-  libmesh_assert (elem->type() == EDGE3);
+  libmesh_assert_equal_to (elem->type(), EDGE3);
 
   // Get x-coordinates into an array, transform them,
   // and repeat for y.

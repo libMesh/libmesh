@@ -545,7 +545,7 @@ void assemble_biharmonic(EquationSystems& es,
 
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert (system_name == "Biharmonic");
+  libmesh_assert_equal_to (system_name, "Biharmonic");
 
   // Declare a performance log.  Give it a descriptive
   // string to identify what part of the code we are

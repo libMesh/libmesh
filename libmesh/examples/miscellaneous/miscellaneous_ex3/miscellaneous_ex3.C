@@ -222,7 +222,7 @@ void compute_residual (const NumericVector<Number>& soln,
 
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
-  libmesh_assert (dim == 2);
+  libmesh_assert_equal_to (dim, 2);
 
   // Get a reference to the NonlinearImplicitSystem we are solving
   NonlinearImplicitSystem& system = 

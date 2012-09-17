@@ -315,11 +315,11 @@ int main (int argc, char** argv)
 	// We can't adapt to both a tolerance and a
 	// target mesh size
 	if (param.global_tolerance != 0.)
-	  libmesh_assert (param.nelem_target == 0);
+	  libmesh_assert_equal_to (param.nelem_target, 0);
 	// If we aren't adapting to a tolerance we need a
 	// target mesh size
             else
-              libmesh_assert (param.nelem_target > 0);
+              libmesh_assert_greater (param.nelem_target, 0);
     	
 	linear_solver->reuse_preconditioner(false);
 

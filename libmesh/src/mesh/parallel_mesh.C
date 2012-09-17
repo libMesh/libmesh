@@ -176,8 +176,8 @@ unsigned int ParallelMesh::parallel_max_node_id() const
 
 const Point& ParallelMesh::point (const unsigned int i) const
 {
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i);
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i);
 
   return (*_nodes[i]);
 }
@@ -188,8 +188,8 @@ const Point& ParallelMesh::point (const unsigned int i) const
 
 const Node& ParallelMesh::node (const unsigned int i) const
 {
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i);
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i);
 
   return (*_nodes[i]);
 }
@@ -200,8 +200,8 @@ const Node& ParallelMesh::node (const unsigned int i) const
 
 Node& ParallelMesh::node (const unsigned int i)
 {
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i);
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i);
 
   return (*_nodes[i]);
 }
@@ -210,8 +210,8 @@ Node& ParallelMesh::node (const unsigned int i)
 
 const Node* ParallelMesh::node_ptr (const unsigned int i) const
 {
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i);
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i);
 
   return _nodes[i];
 }
@@ -221,8 +221,8 @@ const Node* ParallelMesh::node_ptr (const unsigned int i) const
 
 Node* ParallelMesh::node_ptr (const unsigned int i)
 {
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i);
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i);
 
   return _nodes[i];
 }
@@ -264,8 +264,8 @@ Node* ParallelMesh::query_node_ptr (const unsigned int i)
 
 const Elem* ParallelMesh::elem (const unsigned int i) const
 {
-  libmesh_assert (_elements[i] != NULL);
-  libmesh_assert (_elements[i]->id() == i);
+  libmesh_assert(_elements[i]);
+  libmesh_assert_equal_to (_elements[i]->id(), i);
 
   return _elements[i];
 }
@@ -275,8 +275,8 @@ const Elem* ParallelMesh::elem (const unsigned int i) const
 
 Elem* ParallelMesh::elem (const unsigned int i)
 {
-  libmesh_assert (_elements[i] != NULL);
-  libmesh_assert (_elements[i]->id() == i);
+  libmesh_assert(_elements[i]);
+  libmesh_assert_equal_to (_elements[i]->id(), i);
 
   return _elements[i];
 }
@@ -367,7 +367,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
     {
       unsigned int elem_id = e->id();
       Parallel::max(elem_id);
-      libmesh_assert(elem_id == e->id());
+      libmesh_assert_equal_to (elem_id, e->id());
     }
 #endif
 #endif
@@ -416,7 +416,7 @@ void ParallelMesh::renumber_elem(const unsigned int old_id,
 {
   Elem *elem = _elements[old_id];
   libmesh_assert (elem);
-  libmesh_assert (elem->id() == old_id);
+  libmesh_assert_equal_to (elem->id(), old_id);
 
   elem->set_id(new_id);
   libmesh_assert (!_elements[new_id]);
@@ -434,7 +434,7 @@ Node* ParallelMesh::add_point (const Point& p,
     {
       Node *n = _nodes[id];
       libmesh_assert (n);
-      libmesh_assert (n->id() == id);
+      libmesh_assert_equal_to (n->id(), id);
 
       *n = p;
       n->processor_id() = proc_id;
@@ -501,7 +501,7 @@ Node* ParallelMesh::add_node (Node *n)
     {
       unsigned int node_id = n->id();
       Parallel::max(node_id);
-      libmesh_assert(node_id == n->id());
+      libmesh_assert_equal_to (node_id, n->id());
     }
 #endif
 #endif
@@ -539,8 +539,8 @@ Node* ParallelMesh::insert_node (Node* n)
 
 void ParallelMesh::delete_node(Node* n)
 {
-  libmesh_assert (n != NULL);
-  libmesh_assert (_nodes[n->id()] != NULL);
+  libmesh_assert(n);
+  libmesh_assert(_nodes[n->id()]);
 
   // Delete the node from the BoundaryInfo object
   this->boundary_info->remove(n);
@@ -565,7 +565,7 @@ void ParallelMesh::renumber_node(const unsigned int old_id,
 {
   Node *node = _nodes[old_id];
   libmesh_assert (node);
-  libmesh_assert (node->id() == old_id);
+  libmesh_assert_equal_to (node->id(), old_id);
 
   node->set_id(new_id);
   libmesh_assert (!_nodes[new_id]);
@@ -795,7 +795,7 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 #ifndef NDEBUG
   libmesh_assert(Parallel::verify(unpartitioned_objects));
   for (unsigned int p=0; p != libMesh::n_processors(); ++p)
-    libmesh_assert(ghost_objects_from_proc[p] <= objects_on_proc[p]);
+    libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
 #endif
 
   // We'll renumber objects in blocks by processor id
@@ -853,11 +853,11 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
             {
               T *obj = objects[request_to_fill[i]];
               libmesh_assert(obj);
-              libmesh_assert(obj->processor_id() == libMesh::processor_id());
+              libmesh_assert_equal_to (obj->processor_id(), libMesh::processor_id());
               new_ids[i] = obj->id();
-              libmesh_assert(new_ids[i] >=
+              libmesh_assert_greater_equal (new_ids[i],
                      first_object_on_proc[libMesh::processor_id()]);
-              libmesh_assert(new_ids[i] <
+              libmesh_assert_less (new_ids[i],
                      first_object_on_proc[libMesh::processor_id()] +
                      objects_on_proc[libMesh::processor_id()]);
             }
@@ -872,10 +872,10 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
             {
               T *obj = objects[requested_ids[procup][i]];
               libmesh_assert (obj);
-              libmesh_assert (obj->processor_id() == procup);
-              libmesh_assert(filled_request[i] >=
+              libmesh_assert_equal_to (obj->processor_id(), procup);
+              libmesh_assert_greater_equal (filled_request[i],
                      first_object_on_proc[procup]);
-              libmesh_assert(filled_request[i] <
+              libmesh_assert_less (filled_request[i],
                      first_object_on_proc[procup] +
                      objects_on_proc[procup]);
               obj->set_id(filled_request[i]);
@@ -916,7 +916,7 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
                 {
                   // We shouldn't be trying to give two objects the
                   // same id
-                  libmesh_assert (next->id() != obj->id());
+                  libmesh_assert_not_equal_to (next->id(), obj->id());
                   objects[obj->id()] = obj;
                   obj = next;
                   next = objects[obj->id()];
@@ -1019,12 +1019,12 @@ void ParallelMesh::renumber_nodes_and_elements ()
 // Make sure our caches are up to date and our
 // DofObjects are well packed
 #ifdef DEBUG
-  libmesh_assert(this->n_nodes() == this->parallel_n_nodes());
-  libmesh_assert(this->n_elem() == this->parallel_n_elem());
-  libmesh_assert(this->max_node_id() == this->parallel_max_node_id());
-  libmesh_assert(this->max_elem_id() == this->parallel_max_elem_id());
-  libmesh_assert(this->n_nodes() == this->max_node_id());
-  libmesh_assert(this->n_elem() == this->max_elem_id());
+  libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
+  libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
+  libmesh_assert_equal_to (this->max_node_id(), this->parallel_max_node_id());
+  libmesh_assert_equal_to (this->max_elem_id(), this->parallel_max_elem_id());
+  libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
+  libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
 
   // Make sure our ids and flags are consistent
   this->libmesh_assert_valid_parallel_ids();
@@ -1101,7 +1101,7 @@ void ParallelMesh::delete_remote_elements()
 // And our child/parent links, and our flags
   MeshTools::libmesh_assert_valid_refinement_tree(*this);
 
-  libmesh_assert(this->n_elem() == this->parallel_n_elem());
+  libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
 #endif
 
   _is_serial = false;
@@ -1129,12 +1129,12 @@ void ParallelMesh::delete_remote_elements()
 #ifdef DEBUG
 // Make sure our caches are up to date and our
 // DofObjects are well packed
-  libmesh_assert(this->n_nodes() == this->parallel_n_nodes());
-  libmesh_assert(this->n_elem() == this->parallel_n_elem());
-  libmesh_assert(this->max_node_id() == this->parallel_max_node_id());
-  libmesh_assert(this->max_elem_id() == this->parallel_max_elem_id());
-  libmesh_assert(this->n_nodes() == this->max_node_id());
-  libmesh_assert(this->n_elem() == this->max_elem_id());
+  libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
+  libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
+  libmesh_assert_equal_to (this->max_node_id(), this->parallel_max_node_id());
+  libmesh_assert_equal_to (this->max_elem_id(), this->parallel_max_elem_id());
+  libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
+  libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
 
 // Make sure our neighbor links are all fine
   MeshTools::libmesh_assert_valid_neighbors(*this);
@@ -1170,12 +1170,12 @@ void ParallelMesh::allgather()
 // Make sure our caches are up to date and our
 // DofObjects are well packed
 #ifdef DEBUG
-  libmesh_assert(this->n_nodes() == this->parallel_n_nodes());
-  libmesh_assert(this->n_elem() == this->parallel_n_elem());
-  libmesh_assert(this->max_node_id() == this->parallel_max_node_id());
-  libmesh_assert(this->max_elem_id() == this->parallel_max_elem_id());
-  libmesh_assert(this->n_nodes() == this->max_node_id());
-  libmesh_assert(this->n_elem() == this->max_elem_id());
+  libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
+  libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
+  libmesh_assert_equal_to (this->max_node_id(), this->parallel_max_node_id());
+  libmesh_assert_equal_to (this->max_elem_id(), this->parallel_max_elem_id());
+  libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
+  libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
 
 // Make sure our neighbor links are all fine
   MeshTools::libmesh_assert_valid_neighbors(*this);

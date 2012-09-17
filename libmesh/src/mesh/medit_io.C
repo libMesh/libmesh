@@ -69,7 +69,7 @@ void MEDITIO::write_ascii (const std::string& fname,
   //  (iv)  no vector output, just first scalar as output
 
   // libmesh_assert three dimensions (should be extended later)
-  libmesh_assert (MeshOutput<MeshBase>::mesh().mesh_dimension() == 3);
+  libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().mesh_dimension(), 3);
 
   // Open the output file stream
   std::ofstream out (fname.c_str());

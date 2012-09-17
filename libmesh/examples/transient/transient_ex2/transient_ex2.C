@@ -347,7 +347,7 @@ void assemble_wave(EquationSystems& es,
 {  
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert (system_name == "Wave");
+  libmesh_assert_equal_to (system_name, "Wave");
 
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
@@ -597,7 +597,7 @@ void fill_dirichlet_bc(EquationSystems& es,
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert (system_name == "Wave");
+  libmesh_assert_equal_to (system_name, "Wave");
 
   // Get a reference to our system, as before.
   NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);

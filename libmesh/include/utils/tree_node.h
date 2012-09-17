@@ -102,7 +102,7 @@ public:
    * false otherwise.
    */
   bool bounds_node (const Node* nd) const
-  { libmesh_assert (nd != NULL); return bounds_point(*nd); }
+  { libmesh_assert(nd); return bounds_point(*nd); }
 
   /**
    * @returns true if this TreeNode (or its children) contain point p,

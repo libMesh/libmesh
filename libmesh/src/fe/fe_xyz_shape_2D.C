@@ -64,7 +64,7 @@ Real FE<2,XYZ>::shape(const Elem* elem,
 {
 #if LIBMESH_DIM > 1
 
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -85,7 +85,7 @@ Real FE<2,XYZ>::shape(const Elem* elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = p(0);
   const Real y  = p(1);
@@ -101,7 +101,7 @@ Real FE<2,XYZ>::shape(const Elem* elem,
   // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = order + elem->p_level();
 #endif
-  libmesh_assert (i < (totalorder+1)*(totalorder+2)/2);
+  libmesh_assert_less (i, (totalorder+1)*(totalorder+2)/2);
 
 
   // monomials. since they are hierarchic we only need one case block.
@@ -204,8 +204,8 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
 #if LIBMESH_DIM > 1
 
 
-  libmesh_assert (j<2);
-  libmesh_assert (elem != NULL);
+  libmesh_assert_less (j, 2);
+  libmesh_assert(elem);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -226,7 +226,7 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = p(0);
   const Real y  = p(1);
@@ -242,7 +242,7 @@ Real FE<2,XYZ>::shape_deriv(const Elem* elem,
   // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = order + elem->p_level();
 #endif
-  libmesh_assert (i < (totalorder+1)*(totalorder+2)/2);
+  libmesh_assert_less (i, (totalorder+1)*(totalorder+2)/2);
 
   // monomials. since they are hierarchic we only need one case block.
 
@@ -424,8 +424,8 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 {
 #if LIBMESH_DIM > 1
 
-  libmesh_assert (j<=2);
-  libmesh_assert (elem != NULL);
+  libmesh_assert_less_equal (j, 2);
+  libmesh_assert(elem);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -446,7 +446,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = p(0);
   const Real y  = p(1);
@@ -465,7 +465,7 @@ Real FE<2,XYZ>::shape_second_deriv(const Elem* elem,
   // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = order + elem->p_level();
 #endif
-  libmesh_assert (i < (totalorder+1)*(totalorder+2)/2);
+  libmesh_assert_less (i, (totalorder+1)*(totalorder+2)/2);
 
   // monomials. since they are hierarchic we only need one case block.
 

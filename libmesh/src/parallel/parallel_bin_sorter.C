@@ -56,7 +56,7 @@ void BinSorter<KeyType>::binsort (const unsigned int nbins,
 				  KeyType max,
 				  KeyType min)
 {
-  libmesh_assert (min < max);
+  libmesh_assert_less (min, max);
 
   // Build a histogram in parallel from our data.
   // Use this to create quasi-uniform bins.

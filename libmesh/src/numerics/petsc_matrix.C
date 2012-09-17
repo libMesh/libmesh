@@ -107,8 +107,8 @@ void PetscMatrix<T>::init (const unsigned int m,
   this->_is_initialized = true;
 
   // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
-  libmesh_assert (n_nz.size() == m_l);
-  libmesh_assert (n_oz.size() == m_l);
+  libmesh_assert_equal_to (n_nz.size(), m_l);
+  libmesh_assert_equal_to (n_oz.size(), m_l);
 
   int ierr     = 0;
   int m_global = static_cast<int>(m);
@@ -141,7 +141,7 @@ void PetscMatrix<T>::init (const unsigned int m,
 template <typename T>
 void PetscMatrix<T>::init ()
 {
-  libmesh_assert (this->_dof_map != NULL);
+  libmesh_assert(this->_dof_map);
 
   // Clear initialized matrices
   if (this->initialized())
@@ -160,8 +160,8 @@ void PetscMatrix<T>::init ()
   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
-  libmesh_assert (n_nz.size() == m_l);
-  libmesh_assert (n_oz.size() == m_l);
+  libmesh_assert_equal_to (n_nz.size(), m_l);
+  libmesh_assert_equal_to (n_oz.size(), m_l);
 
   // We allow 0x0 matrices now
   //if (m==0)
@@ -482,8 +482,8 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
   const unsigned int m = dm.m();
   const unsigned int n = dm.n();
 
-  libmesh_assert (rows.size() == m);
-  libmesh_assert (cols.size() == n);
+  libmesh_assert_equal_to (rows.size(), m);
+  libmesh_assert_equal_to (cols.size(), n);
 
   int ierr=0;
 

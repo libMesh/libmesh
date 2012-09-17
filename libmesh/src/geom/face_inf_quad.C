@@ -35,7 +35,7 @@ namespace libMesh
 // InfQuad class member functions
 unsigned int InfQuad::key (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
 
   switch (s)
@@ -68,7 +68,7 @@ unsigned int InfQuad::key (const unsigned int s) const
 
 AutoPtr<Elem> InfQuad::side (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
 
   switch (i)
@@ -123,8 +123,8 @@ AutoPtr<Elem> InfQuad::side (const unsigned int i) const
 bool InfQuad::is_child_on_side(const unsigned int c,
                                const unsigned int s) const
 {
-  libmesh_assert (c < this->n_children());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (c, this->n_children());
+  libmesh_assert_less (s, this->n_sides());
 
   return (s == 0 || s == c+1);
 }

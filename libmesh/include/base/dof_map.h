@@ -352,20 +352,20 @@ public:
    * Returns the number of degrees of freedom on subdomain \p proc.
    */
   unsigned int n_dofs_on_processor(const unsigned int proc) const
-  { libmesh_assert(proc < _first_df.size()); return (_end_df[proc] - _first_df[proc]); }
+  { libmesh_assert_less (proc, _first_df.size()); return (_end_df[proc] - _first_df[proc]); }
 
   /**
    * Returns the first dof index that is local to subdomain \p proc.
    */
   unsigned int first_dof(const unsigned int proc = libMesh::processor_id()) const
-  { libmesh_assert(proc < _first_df.size()); return _first_df[proc]; }
+  { libmesh_assert_less (proc, _first_df.size()); return _first_df[proc]; }
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Returns the first old dof index that is local to subdomain \p proc.
    */
   unsigned int first_old_dof(const unsigned int proc = libMesh::processor_id()) const
-  { libmesh_assert(proc < _first_old_df.size()); return _first_old_df[proc]; }
+  { libmesh_assert_less (proc, _first_old_df.size()); return _first_old_df[proc]; }
 #endif //LIBMESH_ENABLE_AMR
 
   /**
@@ -374,14 +374,14 @@ public:
    * case where \p proc has no local dof indices.  Use end_dof() instead.
    */
   unsigned int last_dof(const unsigned int proc = libMesh::processor_id()) const
-  { libmesh_deprecated(); libmesh_assert(proc < _end_df.size()); return (_end_df[proc] - 1); }
+  { libmesh_deprecated(); libmesh_assert_less (proc, _end_df.size()); return (_end_df[proc] - 1); }
 
   /**
    * Returns the first dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
    */
   unsigned int end_dof(const unsigned int proc = libMesh::processor_id()) const
-  { libmesh_assert(proc < _end_df.size()); return _end_df[proc]; }
+  { libmesh_assert_less (proc, _end_df.size()); return _end_df[proc]; }
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
@@ -389,7 +389,7 @@ public:
    * Analogous to the end() member function of STL containers.
    */
   unsigned int end_old_dof(const unsigned int proc = libMesh::processor_id()) const
-  { libmesh_assert(proc < _end_old_df.size()); return _end_old_df[proc]; }
+  { libmesh_assert_less (proc, _end_old_df.size()); return _end_old_df[proc]; }
 #endif //LIBMESH_ENABLE_AMR
 
   /**
@@ -397,8 +397,8 @@ public:
    */
   unsigned int variable_first_local_dof (const unsigned int var) const
   {
-    libmesh_assert ((var+1) < _var_first_local_df.size());
-    libmesh_assert (_var_first_local_df[var] != DofObject::invalid_id);
+    libmesh_assert_less ((var+1), _var_first_local_df.size());
+    libmesh_assert_not_equal_to (_var_first_local_df[var], DofObject::invalid_id);
     return _var_first_local_df[var];
   }
 
@@ -408,8 +408,8 @@ public:
    */
   unsigned int variable_last_local_dof (const unsigned int var) const
   {
-    libmesh_assert ((var+1) < _var_first_local_df.size());
-    libmesh_assert (_var_first_local_df[var+1] != DofObject::invalid_id);
+    libmesh_assert_less ((var+1), _var_first_local_df.size());
+    libmesh_assert_not_equal_to (_var_first_local_df[var+1], DofObject::invalid_id);
     return _var_first_local_df[var+1];
   }
 

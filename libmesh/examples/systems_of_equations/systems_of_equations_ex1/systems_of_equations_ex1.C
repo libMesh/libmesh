@@ -134,7 +134,7 @@ void assemble_stokes (EquationSystems& es,
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert (system_name == "Stokes");
+  libmesh_assert_equal_to (system_name, "Stokes");
   
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();

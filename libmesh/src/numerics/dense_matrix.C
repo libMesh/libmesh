@@ -101,9 +101,9 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 
 	  this->resize (A.n(), B.n());
 
-	  libmesh_assert (A.m() == B.m());
-	  libmesh_assert (this->m() == A.n());
-	  libmesh_assert (this->n() == B.n());
+	  libmesh_assert_equal_to (A.m(), B.m());
+	  libmesh_assert_equal_to (this->m(), A.n());
+	  libmesh_assert_equal_to (this->n(), B.n());
 
 	  const unsigned int m_s = A.n();
 	  const unsigned int p_s = A.m();
@@ -195,9 +195,9 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 
 	  this->resize (A.m(), B.m());
 
-	  libmesh_assert (A.n() == B.n());
-	  libmesh_assert (this->m() == A.m());
-	  libmesh_assert (this->n() == B.m());
+	  libmesh_assert_equal_to (A.n(), B.n());
+	  libmesh_assert_equal_to (this->m(), A.m());
+	  libmesh_assert_equal_to (this->n(), B.m());
 
 	  const unsigned int m_s = A.m();
 	  const unsigned int p_s = A.n();
@@ -222,7 +222,7 @@ void DenseMatrix<T>::vector_mult (DenseVector<T>& dest,
                                   const DenseVector<T>& arg) const
 {
   // Make sure the input sizes are compatible
-  libmesh_assert(this->n() == arg.size());
+  libmesh_assert_equal_to (this->n(), arg.size());
 
   // Resize and clear dest.
   // Note: DenseVector::resize() also zeros the vector.
@@ -253,7 +253,7 @@ void DenseMatrix<T>::vector_mult_transpose (DenseVector<T>& dest,
                                             const DenseVector<T>& arg) const
 {
   // Make sure the input sizes are compatible
-  libmesh_assert(this->m() == arg.size());
+  libmesh_assert_equal_to (this->m(), arg.size());
 
   // Resize and clear dest.
   // Note: DenseVector::resize() also zeros the vector.
@@ -361,7 +361,7 @@ void DenseMatrix<T>::lu_solve (const DenseVector<T>& b,
   // solutions.
   //
   // We don't want to deal with either of these ambiguous cases here...
-  libmesh_assert (this->m() == this->n());
+  libmesh_assert_equal_to (this->m(), this->n());
 
   switch(this->_decomposition_type)
     {
@@ -415,8 +415,8 @@ void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T>& b,
   const unsigned int
     n = this->n();
 
-  libmesh_assert (this->m() == n);
-  libmesh_assert (this->m() == b.size());
+  libmesh_assert_equal_to (this->m(), n);
+  libmesh_assert_equal_to (this->m(), b.size());
 
   x.resize (n);
 
@@ -464,7 +464,7 @@ void DenseMatrix<T>::_lu_decompose ()
 {
   // If this function was called, there better not be any
   // previous decomposition of the matrix.
-  libmesh_assert(this->_decomposition_type == NONE);
+  libmesh_assert_equal_to (this->_decomposition_type, NONE);
 
   // Get the matrix size and make sure it is square
   const unsigned int
@@ -665,7 +665,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
 {
   // If we called this function, there better not be any
   // previous decomposition of the matrix.
-  libmesh_assert(this->_decomposition_type == NONE);
+  libmesh_assert_equal_to (this->_decomposition_type, NONE);
 
   // Shorthand notation for number of rows and columns.
   const unsigned int
@@ -673,7 +673,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
     n = this->n();
 
   // Just to be really sure...
-  libmesh_assert(m==n);
+  libmesh_assert_equal_to (m, n);
 
   // A convenient reference to *this
   DenseMatrix<T>& A = *this;
@@ -721,7 +721,7 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
     n = this->n();
 
   // Just to be really sure...
-  libmesh_assert(m==n);
+  libmesh_assert_equal_to (m, n);
 
   // A convenient reference to *this
   const DenseMatrix<T>& A = *this;

@@ -216,7 +216,7 @@ void DenseMatrix<T>::_lu_decompose_lapack ()
 {
   // If this function was called, there better not be any
   // previous decomposition of the matrix.
-  libmesh_assert(this->_decomposition_type == NONE);
+  libmesh_assert_equal_to (this->_decomposition_type, NONE);
 
   // The calling sequence for dgetrf is:
   // dgetrf(M, N, A, lda, ipiv, info)

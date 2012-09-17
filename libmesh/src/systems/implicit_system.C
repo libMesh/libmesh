@@ -104,7 +104,7 @@ void ImplicitSystem::init_data ()
 
 void ImplicitSystem::init_matrices ()
 {
-  libmesh_assert (matrix != NULL);
+  libmesh_assert(matrix);
 
   // Check for quick return in case the system matrix
   // (and by extension all the matrices) has already
@@ -183,9 +183,9 @@ void ImplicitSystem::reinit ()
 
 void ImplicitSystem::assemble ()
 {
-  libmesh_assert (matrix != NULL);
+  libmesh_assert(matrix);
   libmesh_assert (matrix->initialized());
-  libmesh_assert (rhs    != NULL);
+  libmesh_assert(rhs);
   libmesh_assert (rhs->initialized());
 
   // The user assembly gets to expect to accumulate on an initially
@@ -300,7 +300,7 @@ void ImplicitSystem::add_system_matrix ()
   if (matrix == NULL)
     matrix = &(this->add_matrix ("System Matrix"));
 
-  libmesh_assert (matrix != NULL);
+  libmesh_assert(matrix);
 }
 
 

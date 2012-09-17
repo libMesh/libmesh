@@ -539,7 +539,7 @@ void DistributedVector<T>::init (const unsigned int n,
   // This function must be run on all processors at once
   parallel_only();
 
-  libmesh_assert (n_local <= n);
+  libmesh_assert_less_equal (n_local, n);
 
   if (type == AUTOMATIC)
     {
@@ -587,7 +587,7 @@ void DistributedVector<T>::init (const unsigned int n,
   for (unsigned int p=0; p!=libMesh::n_processors(); p++)
     sum += local_sizes[p];
 
-  libmesh_assert (sum == static_cast<int>(n));
+  libmesh_assert_equal_to (sum, static_cast<int>(n));
 
 #  endif
 
@@ -683,8 +683,8 @@ inline
 void DistributedVector<T>::zero ()
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
   std::fill (_values.begin(),
 	     _values.end(),
@@ -726,8 +726,8 @@ inline
 unsigned int DistributedVector<T>::size () const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
   return _global_size;
 }
@@ -739,8 +739,8 @@ inline
 unsigned int DistributedVector<T>::local_size () const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
   return _local_size;
 }
@@ -752,8 +752,8 @@ inline
 unsigned int DistributedVector<T>::first_local_index () const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
   return _first_local_index;
 }
@@ -765,8 +765,8 @@ inline
 unsigned int DistributedVector<T>::last_local_index () const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
   return _last_local_index;
 }
@@ -778,8 +778,8 @@ inline
 T DistributedVector<T>::operator() (const unsigned int i) const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
   libmesh_assert ( ((i >= first_local_index()) &&
 	    (i <  last_local_index())) );
 
@@ -793,10 +793,10 @@ inline
 void DistributedVector<T>::set (const unsigned int i, const T value)
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
-  libmesh_assert (i<size());
-  libmesh_assert (i-first_local_index() < local_size());
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
+  libmesh_assert_less (i, size());
+  libmesh_assert_less (i-first_local_index(), local_size());
 
   _values[i - _first_local_index] = value;
 }
@@ -808,10 +808,10 @@ inline
 void DistributedVector<T>::add (const unsigned int i, const T value)
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
-  libmesh_assert (i<size());
-  libmesh_assert (i-first_local_index() < local_size());
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
+  libmesh_assert_less (i, size());
+  libmesh_assert_less (i-first_local_index(), local_size());
 
   _values[i - _first_local_index] += value;
 }
@@ -826,8 +826,8 @@ Real DistributedVector<T>::min () const
   parallel_only();
 
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
   Real local_min = _values.size() ?
     libmesh_real(_values[0]) : std::numeric_limits<Real>::max();
@@ -849,8 +849,8 @@ Real DistributedVector<T>::max() const
   parallel_only();
 
   libmesh_assert (this->initialized());
-  libmesh_assert (_values.size() == _local_size);
-  libmesh_assert ((_last_local_index - _first_local_index) == _local_size);
+  libmesh_assert_equal_to (_values.size(), _local_size);
+  libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
   Real local_max = _values.size() ?
     libmesh_real(_values[0]) : -std::numeric_limits<Real>::max();

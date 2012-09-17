@@ -65,7 +65,7 @@ namespace libMesh
 
 //   // Open the FORTRAN unformatted file
 //   {
-//     libmesh_assert (gname.size() == qname.size());
+//     libmesh_assert_equal_to (gname.size(), qname.size());
 //     int len = gname.size();
 
 //     open_ (&gunit, gname.c_str(), &len);
@@ -90,7 +90,7 @@ namespace libMesh
 //     int one = 1;
 //     int len = ints.size();
 
-//     libmesh_assert (static_cast<unsigned int>(len) == 3*this->n_zones());
+//     libmesh_assert_equal_to (static_cast<unsigned int>(len), 3*this->n_zones());
 
 //     idata_ (&gunit, &nb, &one);
 //     idata_ (&gunit, &ints[0], &len);
@@ -152,8 +152,8 @@ namespace libMesh
 //       // The user wants a subset of the variables
 //       else
 // 	{
-// 	  libmesh_assert (n_write_vars >= 1);
-// 	  libmesh_assert (n_write_vars < static_cast<int>(this->n_vars()));
+// 	  libmesh_assert_greater_equal (n_write_vars, 1);
+// 	  libmesh_assert_less (n_write_vars, static_cast<int>(this->n_vars()));
 
 // 	  libMesh::out << "Select the " << n_write_vars << " variables to write to the Plot3D file: "
 // 		    << std::endl;
@@ -164,7 +164,7 @@ namespace libMesh
 
 // 	      std::cin >> num;
 
-// 	      libmesh_assert (num < static_cast<int>(this->n_vars()));
+// 	      libmesh_assert_less (num, static_cast<int>(this->n_vars()));
 
 // 	      write_vars.push_back (num);
 // 	    }
@@ -192,7 +192,7 @@ namespace libMesh
 // 	      for (unsigned int j=0; j<this->jmax(zn); j++)
 // 		for (unsigned int i=0; i<this->imax(zn); i++)
 // 		  {
-// 		    libmesh_assert (l < _data[zn][v].size());
+// 		    libmesh_assert_less (l, _data[zn][v].size());
 // 		    coords.push_back (_data[zn][v][l++]);
 // 		  }
 // 	  }
@@ -200,7 +200,7 @@ namespace libMesh
 // 	// Write to the grid file
 // 	{
 // 	  int len = coords.size();
-// 	  libmesh_assert (static_cast<unsigned int>(len) ==
+// 	  libmesh_assert_equal_to (static_cast<unsigned int>(len),
 // 		  3*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
 
 // 	  fdata_ (&gunit, &coords[0], &len);
@@ -225,7 +225,7 @@ namespace libMesh
 // 	      // Number of the variable to write
 // 	      const unsigned int v = write_vars[i];
 
-// 	      libmesh_assert (v < this->n_vars());
+// 	      libmesh_assert_less (v, this->n_vars());
 
 // 	      // Tell the user what variable we are writing, but only
 // 	      // once per file.
@@ -238,7 +238,7 @@ namespace libMesh
 // 		for (unsigned int j=0; j<this->jmax(zn); j++)
 // 		  for (unsigned int i=0; i<this->imax(zn); i++)
 // 		    {
-// 		      libmesh_assert (l < _data[zn][v].size());
+// 		      libmesh_assert_less (l, _data[zn][v].size());
 // 		      data.push_back ((v < this->n_vars()) ?
 // 				      _data[zn][v][l++] : 0.);
 // 		    }
@@ -257,7 +257,7 @@ namespace libMesh
 // 	  // Write to the solution file
 // 	  {
 // 	    int len = data.size();
-// 	    libmesh_assert (static_cast<unsigned int>(len) ==
+// 	    libmesh_assert_equal_to (static_cast<unsigned int>(len),
 // 		    write_vars.size()*this->imax(zn)*this->jmax(zn)*this->kmax(zn));
 
 // 	    fdata_ (&qunit, &data[0], &len);
@@ -327,7 +327,7 @@ namespace libMesh
 
 //     for (unsigned int zone=0; zone<this->n_zones(); zone++)
 //       {
-// 	libmesh_assert (this->elem_type(zone) == TRI);
+// 	libmesh_assert_equal_to (this->elem_type(zone), TRI);
 // 	n_nodes += this->n_nodes(zone);
 // 	n_tri   += this->n_elem(zone);
 //       }
@@ -380,7 +380,7 @@ namespace libMesh
 //       }
 
 //     int len = conn.size();
-//     libmesh_assert (static_cast<unsigned int>(len) == 3*n_tri);
+//     libmesh_assert_equal_to (static_cast<unsigned int>(len), 3*n_tri);
 //     idata_ (&gunit, &conn[0], &len);
 //   }
 
@@ -394,7 +394,7 @@ namespace libMesh
 //       comp.insert (comp.end(), this->n_elem(zone), zone+1);
 
 //     int len = comp.size();
-//     libmesh_assert (static_cast<unsigned int>(len) == n_tri);
+//     libmesh_assert_equal_to (static_cast<unsigned int>(len), n_tri);
 //     idata_ (&gunit, &comp[0], &len);
 //   }
 
@@ -424,7 +424,7 @@ namespace libMesh
 // 	      data.push_back (_data[zone][v][n]);
 
 // 	int len = data.size();
-// 	libmesh_assert (static_cast<unsigned int>(len) ==
+// 	libmesh_assert_equal_to (static_cast<unsigned int>(len),
 // 		n_nodes*(this->n_vars()-3));
 // 	fdata_ (&gunit, &data[0], &len);
 //       }

@@ -40,7 +40,7 @@ void RBAssemblyExpansion::perform_A_interior_assembly(unsigned int q,
     libmesh_error();
   }
 
-  libmesh_assert(_A_assembly_vector[q] != NULL);
+  libmesh_assert(_A_assembly_vector[q]);
 
   return _A_assembly_vector[q]->interior_assembly( context );
 }
@@ -55,7 +55,7 @@ void RBAssemblyExpansion::perform_A_boundary_assembly(unsigned int q,
     libmesh_error();
   }
 
-  libmesh_assert(_A_assembly_vector[q] != NULL);
+  libmesh_assert(_A_assembly_vector[q]);
 
   return _A_assembly_vector[q]->boundary_assembly( context );
 }
@@ -70,7 +70,7 @@ void RBAssemblyExpansion::perform_F_interior_assembly(unsigned int q,
     libmesh_error();
   }
 
-  libmesh_assert(_A_assembly_vector[q] != NULL);
+  libmesh_assert(_A_assembly_vector[q]);
 
   return _F_assembly_vector[q]->interior_assembly( context );
 }
@@ -85,7 +85,7 @@ void RBAssemblyExpansion::perform_F_boundary_assembly(unsigned int q,
     libmesh_error();
   }
 
-  libmesh_assert(_A_assembly_vector[q] != NULL);
+  libmesh_assert(_A_assembly_vector[q]);
 
   return _F_assembly_vector[q]->boundary_assembly( context );
 }
@@ -102,7 +102,7 @@ void RBAssemblyExpansion::perform_output_interior_assembly(unsigned int output_i
     libmesh_error();
   }
 
-  libmesh_assert(_output_assembly_vector[output_index][q_l] != NULL);
+  libmesh_assert(_output_assembly_vector[output_index][q_l]);
   
   return _output_assembly_vector[output_index][q_l]->interior_assembly(context);
 }
@@ -119,7 +119,7 @@ void RBAssemblyExpansion::perform_output_boundary_assembly(unsigned int output_i
     libmesh_error();
   }
 
-  libmesh_assert(_output_assembly_vector[output_index][q_l] != NULL);
+  libmesh_assert(_output_assembly_vector[output_index][q_l]);
   
   return _output_assembly_vector[output_index][q_l]->boundary_assembly(context);
 }

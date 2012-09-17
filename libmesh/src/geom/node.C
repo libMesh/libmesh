@@ -107,7 +107,7 @@ MPI_Datatype Node::PackedNode::create_mpi_datatype ()
 
 void Node::PackedNode::pack (std::vector<int> &conn, const Node* node)
 {
-  libmesh_assert (node != NULL);
+  libmesh_assert(node);
 
   conn.reserve (conn.size() + node->packed_size());
 

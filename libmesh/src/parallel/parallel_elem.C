@@ -51,7 +51,7 @@ unsigned int packed_size (const Elem*,
 {
 #ifndef NDEBUG
   const int packed_header = *in++;
-  libmesh_assert (packed_header == elem_magic_header);
+  libmesh_assert_equal_to (packed_header, elem_magic_header);
 #endif
 
   // int 0: level
@@ -60,8 +60,8 @@ unsigned int packed_size (const Elem*,
 
   // int 4: element type
   const int typeint = *(in+4);
-  libmesh_assert(typeint >= 0);
-  libmesh_assert(typeint < INVALID_ELEM);
+  libmesh_assert_greater_equal (typeint, 0);
+  libmesh_assert_less (typeint, INVALID_ELEM);
   const ElemType type =
     static_cast<ElemType>(typeint);
 
@@ -85,7 +85,7 @@ unsigned int packed_size (const Elem*,
 	  const int n_bcs = 
 	    *(in + pre_indexing_size + indexing_size +
 	      total_packed_bc_data++);
-	  libmesh_assert (n_bcs >= 0);
+	  libmesh_assert_greater_equal (n_bcs, 0);
           total_packed_bc_data += n_bcs;
         }
     }
@@ -134,7 +134,7 @@ void pack (const Elem* elem,
            std::vector<int>& data,
            const MeshBase* mesh)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // This should be redundant when used with Parallel::pack_range()
   // data.reserve (data.size() + Parallel::packable_size(elem, mesh));
@@ -198,8 +198,8 @@ void pack (const Elem* elem,
 		 DofObject::unpackable_indexing_size(data.begin() +
 						     start_indices));
 
-  libmesh_assert(elem->packed_indexing_size() ==
-		 data.size() - start_indices);
+  libmesh_assert_equal_to (elem->packed_indexing_size(),
+		          data.size() - start_indices);
 
 
   // If this is a coarse element,
@@ -238,7 +238,7 @@ void unpack(std::vector<int>::const_iterator in,
   const std::vector<int>::const_iterator original_in = in;
 
   const int incoming_header = *in++;
-  libmesh_assert (incoming_header == elem_magic_header);
+  libmesh_assert_equal_to (incoming_header, elem_magic_header);
 #endif
 
   // int 0: level
@@ -252,15 +252,15 @@ void unpack(std::vector<int>::const_iterator in,
 
   // int 2: refinement flag
   const int rflag = *in++;
-  libmesh_assert(rflag >= 0);
-  libmesh_assert(rflag < Elem::INVALID_REFINEMENTSTATE);
+  libmesh_assert_greater_equal (rflag, 0);
+  libmesh_assert_less (rflag, Elem::INVALID_REFINEMENTSTATE);
   const Elem::RefinementState refinement_flag =
     static_cast<Elem::RefinementState>(rflag);
 
   // int 3: p refinement flag
   const int pflag = *in++;
-  libmesh_assert(pflag >= 0);
-  libmesh_assert(pflag < Elem::INVALID_REFINEMENTSTATE);
+  libmesh_assert_greater_equal (pflag, 0);
+  libmesh_assert_less (pflag, Elem::INVALID_REFINEMENTSTATE);
   const Elem::RefinementState p_refinement_flag =
     static_cast<Elem::RefinementState>(pflag);
 #else
@@ -269,8 +269,8 @@ void unpack(std::vector<int>::const_iterator in,
 
   // int 4: element type
   const int typeint = *in++;
-  libmesh_assert(typeint >= 0);
-  libmesh_assert(typeint < INVALID_ELEM);
+  libmesh_assert_greater_equal (typeint, 0);
+  libmesh_assert_less (typeint, INVALID_ELEM);
   const ElemType type =
     static_cast<ElemType>(typeint);
 
@@ -290,7 +290,7 @@ void unpack(std::vector<int>::const_iterator in,
   // int 7: dof object id
   const unsigned int id = 
     static_cast<unsigned int>(*in++);
-  libmesh_assert (id != DofObject::invalid_id);
+  libmesh_assert_not_equal_to (id, DofObject::invalid_id);
 
 #ifdef LIBMESH_ENABLE_AMR
   // int 8: parent dof object id
@@ -308,7 +308,7 @@ void unpack(std::vector<int>::const_iterator in,
 
   // Make sure we don't miscount above when adding the "magic" header
   // plus the real data header
-  libmesh_assert(in - original_in == header_size + 1);
+  libmesh_assert_equal_to (in - original_in, header_size + 1);
 
   Elem *elem = mesh->query_elem(id);
 
@@ -317,12 +317,12 @@ void unpack(std::vector<int>::const_iterator in,
   // links, but then go on
   if (elem) 
     {
-      libmesh_assert (elem->level()             == level);
-      libmesh_assert (elem->id()                == id);
-      libmesh_assert (elem->processor_id()      == processor_id);
-      libmesh_assert (elem->subdomain_id()      == subdomain_id);
-      libmesh_assert (elem->type()              == type);
-      libmesh_assert (elem->n_nodes()           == n_nodes);
+      libmesh_assert_equal_to (elem->level(), level);
+      libmesh_assert_equal_to (elem->id(), id);
+      libmesh_assert_equal_to (elem->processor_id(), processor_id);
+      libmesh_assert_equal_to (elem->subdomain_id(), subdomain_id);
+      libmesh_assert_equal_to (elem->type(), type);
+      libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
 
 #ifndef NDEBUG
       // All our nodes should be correct
@@ -334,9 +334,9 @@ void unpack(std::vector<int>::const_iterator in,
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
-      libmesh_assert (elem->p_level()           == p_level);
-      libmesh_assert (elem->refinement_flag()   == refinement_flag);
-      libmesh_assert (elem->p_refinement_flag() == p_refinement_flag);
+      libmesh_assert_equal_to (elem->p_level(), p_level);
+      libmesh_assert_equal_to (elem->refinement_flag(), refinement_flag);
+      libmesh_assert_equal_to (elem->p_refinement_flag(), p_refinement_flag);
 
       libmesh_assert (!level || elem->parent() != NULL);
       libmesh_assert (!level || elem->parent()->id() == parent_id);
@@ -354,7 +354,7 @@ void unpack(std::vector<int>::const_iterator in,
 	  // we'd better agree.
           if (neighbor_id == DofObject::invalid_id)
             {
-              libmesh_assert(elem->neighbor(n) == NULL);
+              libmesh_assert (!(elem->neighbor(n)));
               continue;
             }
 
@@ -363,7 +363,7 @@ void unpack(std::vector<int>::const_iterator in,
 	  // boundary.
           if (neighbor_id == remote_elem->id())
             {
-              libmesh_assert(elem->neighbor(n) != NULL);
+              libmesh_assert(elem->neighbor(n));
               continue;
             }
 
@@ -374,7 +374,7 @@ void unpack(std::vector<int>::const_iterator in,
           // have a remote_elem signifying that fact.
           if (!neigh)
             {
-              libmesh_assert(elem->neighbor(n) == remote_elem);
+              libmesh_assert_equal_to (elem->neighbor(n), remote_elem);
               continue;
             }
 
@@ -418,10 +418,10 @@ void unpack(std::vector<int>::const_iterator in,
         }
       // Or assert that the sending processor sees no parent
       else
-        libmesh_assert (parent_id == static_cast<unsigned int>(-1));
+        libmesh_assert_equal_to (parent_id, static_cast<unsigned int>(-1));
 #else
       // No non-level-0 elements without AMR
-      libmesh_assert (level == 0);
+      libmesh_assert_equal_to (level, 0);
 #endif
 
       elem = Elem::build(type,parent).release();
@@ -432,7 +432,7 @@ void unpack(std::vector<int>::const_iterator in,
         {
           // Since this is a newly created element, the parent must
           // have previously thought of this child as a remote element.
-          libmesh_assert (parent->child(which_child_am_i) == remote_elem);
+          libmesh_assert_equal_to (parent->child(which_child_am_i), remote_elem);
 
           parent->add_child(elem, which_child_am_i);
         }
@@ -441,7 +441,7 @@ void unpack(std::vector<int>::const_iterator in,
       elem->set_p_level(p_level);
       elem->set_refinement_flag(refinement_flag);
       elem->set_p_refinement_flag(p_refinement_flag);
-      libmesh_assert (elem->level() == level);
+      libmesh_assert_equal_to (elem->level(), level);
 
       // If this element definitely should have children, assign
       // remote_elem to all of them for now, for consistency.  Later
@@ -458,7 +458,7 @@ void unpack(std::vector<int>::const_iterator in,
       elem->set_id()       = id;
 
       // Assign the connectivity
-      libmesh_assert (elem->n_nodes() == n_nodes);
+      libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
 
       for (unsigned int n=0; n != n_nodes; n++)
         elem->set_node(n) =
@@ -512,7 +512,7 @@ void unpack(std::vector<int>::const_iterator in,
     for (unsigned int s = 0; s != elem->n_sides(); ++s)
       {
         const int num_bcs = *in++;
-        libmesh_assert (num_bcs >= 0);
+        libmesh_assert_greater_equal (num_bcs, 0);
 
         for(int bc_it=0; bc_it < num_bcs; bc_it++)
           mesh->boundary_info->add_side (elem, s, *in++);

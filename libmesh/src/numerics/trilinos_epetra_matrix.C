@@ -44,7 +44,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
   this->clear ();
 
   // big trouble if this fails!
-  libmesh_assert (this->_dof_map != NULL);
+  libmesh_assert(this->_dof_map);
 
   const unsigned int n_rows = sparsity_pattern.size();
 
@@ -56,8 +56,8 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
   // error checking
 #ifndef NDEBUG
   {
-    libmesh_assert (n == m);
-    libmesh_assert (n_l == m_l);
+    libmesh_assert_equal_to (n, m);
+    libmesh_assert_equal_to (n_l, m_l);
 
     unsigned int
       summed_m_l = m_l,
@@ -66,8 +66,8 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
     Parallel::sum (summed_m_l);
     Parallel::sum (summed_n_l);
 
-    libmesh_assert (m == summed_m_l);
-    libmesh_assert (n == summed_n_l);
+    libmesh_assert_equal_to (m, summed_m_l);
+    libmesh_assert_equal_to (n, summed_n_l);
   }
 #endif
 
@@ -77,15 +77,15 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
 
-  libmesh_assert (static_cast<unsigned int>(_map->NumGlobalPoints()) == m);
-  libmesh_assert (static_cast<unsigned int>(_map->MaxAllGID()+1) == m);
+  libmesh_assert_equal_to (static_cast<unsigned int>(_map->NumGlobalPoints()), m);
+  libmesh_assert_equal_to (static_cast<unsigned int>(_map->MaxAllGID()+1), m);
 
   const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
   const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
 
    // Make sure the sparsity pattern isn't empty
-  libmesh_assert (n_nz.size() == n_l);
-  libmesh_assert (n_oz.size() == n_l);
+  libmesh_assert_equal_to (n_nz.size(), n_l);
+  libmesh_assert_equal_to (n_oz.size(), n_l);
 
   // Epetra wants the total number of nonzeros, both local and remote.
   std::vector<int> n_nz_tot; /**/ n_nz_tot.reserve(n_nz.size());
@@ -131,8 +131,8 @@ void EpetraMatrix<T>::init (const unsigned int m,
     if (this->initialized())
       this->clear();
 
-    libmesh_assert (this->_mat == NULL);
-    libmesh_assert (this->_map == NULL);
+    libmesh_assert_equal_to (this->_mat, NULL);
+    libmesh_assert_equal_to (this->_map, NULL);
 
     this->_is_initialized = true;
   }
@@ -140,8 +140,8 @@ void EpetraMatrix<T>::init (const unsigned int m,
   // error checking
 #ifndef NDEBUG
   {
-    libmesh_assert (n == m);
-    libmesh_assert (n_l == m_l);
+    libmesh_assert_equal_to (n, m);
+    libmesh_assert_equal_to (n_l, m_l);
 
     unsigned int
       summed_m_l = m_l,
@@ -150,8 +150,8 @@ void EpetraMatrix<T>::init (const unsigned int m,
     Parallel::sum (summed_m_l);
     Parallel::sum (summed_n_l);
 
-    libmesh_assert (m == summed_m_l);
-    libmesh_assert (n == summed_n_l);
+    libmesh_assert_equal_to (m, summed_m_l);
+    libmesh_assert_equal_to (n, summed_n_l);
   }
 #endif
 
@@ -161,8 +161,8 @@ void EpetraMatrix<T>::init (const unsigned int m,
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
 
-  libmesh_assert (static_cast<unsigned int>(_map->NumGlobalPoints()) == m);
-  libmesh_assert (static_cast<unsigned int>(_map->MaxAllGID()+1) == m);
+  libmesh_assert_equal_to (static_cast<unsigned int>(_map->NumGlobalPoints()), m);
+  libmesh_assert_equal_to (static_cast<unsigned int>(_map->MaxAllGID()+1), m);
 
   _mat = new Epetra_FECrsMatrix (Copy, *_map, nnz + noz);
 }
@@ -173,7 +173,7 @@ void EpetraMatrix<T>::init (const unsigned int m,
 template <typename T>
 void EpetraMatrix<T>::init ()
 {
-  libmesh_assert (this->_dof_map != NULL);
+  libmesh_assert(this->_dof_map);
 
   {
     // Clear initialized matrices
@@ -217,7 +217,7 @@ Real EpetraMatrix<T>::l1_norm () const
 {
   libmesh_assert (this->initialized());
 
-  libmesh_assert (_mat != NULL);
+  libmesh_assert(_mat);
 
   return static_cast<Real>(_mat->NormOne());
 }
@@ -230,7 +230,7 @@ Real EpetraMatrix<T>::linfty_norm () const
   libmesh_assert (this->initialized());
 
 
-  libmesh_assert (_mat != NULL);
+  libmesh_assert(_mat);
 
   return static_cast<Real>(_mat->NormInf());
 }
@@ -309,8 +309,8 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
   const unsigned int m = dm.m();
   const unsigned int n = dm.n();
 
-  libmesh_assert (rows.size() == m);
-  libmesh_assert (cols.size() == n);
+  libmesh_assert_equal_to (rows.size(), m);
+  libmesh_assert_equal_to (cols.size(), n);
 
   _mat->SumIntoGlobalValues(m, (int *)&rows[0], n, (int *)&cols[0], &dm.get_values()[0]);
 }

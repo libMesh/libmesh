@@ -139,7 +139,7 @@ void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType& /* fet */,
    * not use this result.
    */
   nodal_soln.clear();
-  libmesh_assert (nodal_soln.begin() == nodal_soln.end());
+  libmesh_assert (nodal_soln.empty());
   return;
 }
 
@@ -156,7 +156,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 				      const unsigned int i,
 				      const Point& p)
 {
-  libmesh_assert (Dim != 0);
+  libmesh_assert_not_equal_to (Dim, 0);
 
 #ifdef DEBUG
   // this makes only sense when used for mapping
@@ -198,8 +198,8 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType& fet,
 				      const unsigned int i,
 				      const Point& p)
 {
-  libmesh_assert (inf_elem != NULL);
-  libmesh_assert (Dim != 0);
+  libmesh_assert(inf_elem);
+  libmesh_assert_not_equal_to (Dim, 0);
 
 #ifdef DEBUG
   // this makes only sense when used for mapping
@@ -240,8 +240,8 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
 					     const Elem* inf_elem,
 					     FEComputeData& data)
 {
-  libmesh_assert (inf_elem != NULL);
-  libmesh_assert (Dim != 0);
+  libmesh_assert(inf_elem);
+  libmesh_assert_not_equal_to (Dim, 0);
 
   const Order        o_radial             (fet.radial_order);
   const Order        radial_mapping_order (Radial::mapping_order());
@@ -260,7 +260,7 @@ void InfFE<Dim,T_radial,T_map>::compute_data(const FEType& fet,
     {
     case 1:
       {
-        libmesh_assert (inf_elem->type() == INFEDGE2);
+        libmesh_assert_equal_to (inf_elem->type(), INFEDGE2);
 	interpolated_dist =  Point(inf_elem->point(0) - inf_elem->point(1)).size();
 	break;
       }
@@ -398,7 +398,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
     {
     case INFEDGE2:
       {
-	libmesh_assert (outer_node_index < 2);
+	libmesh_assert_less (outer_node_index, 2);
 	base_node   = 0;
 	radial_node = outer_node_index;
 	return;
@@ -408,7 +408,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
     // linear base approximation, easy to determine
     case INFQUAD4:
       {
-	libmesh_assert (outer_node_index < 4);
+	libmesh_assert_less (outer_node_index, 4);
 	base_node   = outer_node_index % 2;
 	radial_node = outer_node_index / 2;
 	return;
@@ -416,7 +416,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
 
     case INFPRISM6:
       {
-	libmesh_assert (outer_node_index < 6);
+	libmesh_assert_less (outer_node_index, 6);
 	base_node   = outer_node_index % 3;
 	radial_node = outer_node_index / 3;
 	return;
@@ -424,7 +424,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
 
     case INFHEX8:
       {
-	libmesh_assert (outer_node_index < 8);
+	libmesh_assert_less (outer_node_index, 8);
 	base_node   = outer_node_index % 4;
 	radial_node = outer_node_index / 4;
 	return;
@@ -522,7 +522,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
 
 	  case 16:
 	    {
-	      libmesh_assert (inf_elem_type == INFHEX18);
+	      libmesh_assert_equal_to (inf_elem_type, INFHEX18);
 	      radial_node = 0;
 	      base_node   = 8;
 	      return;
@@ -530,7 +530,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices (const ElemType inf_elem_ty
 
 	  case 17:
 	    {
-	      libmesh_assert (inf_elem_type == INFHEX18);
+	      libmesh_assert_equal_to (inf_elem_type, INFHEX18);
 	      radial_node = 1;
 	      base_node   = 8;
 	      return;
@@ -615,7 +615,7 @@ void InfFE<Dim,T_radial,T_map>::compute_node_indices_fast (const ElemType inf_el
 							   unsigned int& base_node,
 							   unsigned int& radial_node)
 {
-  libmesh_assert (inf_elem_type != INVALID_ELEM);
+  libmesh_assert_not_equal_to (inf_elem_type, INVALID_ELEM);
 
   static std::vector<unsigned int> _static_base_node_index;
   static std::vector<unsigned int> _static_radial_node_index;
@@ -941,7 +941,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType& fet,
 
     else                                                                         // range of i: 134..169
       {
-	libmesh_assert (i < n_dofs(fet, inf_elem_type));
+	libmesh_assert_less (i, n_dofs(fet, inf_elem_type));
 	// belongs to the outer shell and is an element associated shape
 	const unsigned int i_offset = i - (n_dof_at_all_vertices
 					   + n_dof_at_all_sides

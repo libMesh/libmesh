@@ -282,7 +282,7 @@ public:
      */
     virtual bool operator() (const IterBase* in) const
     {
-      libmesh_assert (in != NULL);
+      libmesh_assert(in);
 
       // Attempt downcast
 #if defined(__SUNPRO_CC) || (defined(__GNUC__) && (__GNUC__ < 3)  && !defined(__INTEL_COMPILER))

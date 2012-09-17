@@ -96,7 +96,7 @@ public:
     ScalarTraits<Scalar>::value,
     VectorValue&>::type
   operator = (const Scalar& p)
-  { libmesh_assert(p == Scalar(0)); this->zero(); return *this; }
+  { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
 
 
 private:

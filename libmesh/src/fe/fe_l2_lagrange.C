@@ -56,8 +56,8 @@ namespace libMesh
 	      {
 	      case EDGE3:
 		{
-		  libmesh_assert (elem_soln.size()  == 2);
-		  libmesh_assert (nodal_soln.size() == 3);
+		  libmesh_assert_equal_to (elem_soln.size(), 2);
+		  libmesh_assert_equal_to (nodal_soln.size(), 3);
 
 		  nodal_soln[0] = elem_soln[0];
 		  nodal_soln[1] = elem_soln[1];
@@ -68,8 +68,8 @@ namespace libMesh
 
 	      case EDGE4:
 		{
-		  libmesh_assert(elem_soln.size() == 2);
-		  libmesh_assert(nodal_soln.size() == 4);
+		  libmesh_assert_equal_to (elem_soln.size(), 2);
+		  libmesh_assert_equal_to (nodal_soln.size(), 4);
 
 		  nodal_soln[0] = elem_soln[0];
 		  nodal_soln[1] = elem_soln[1];
@@ -82,8 +82,8 @@ namespace libMesh
 
 	      case TRI6:
 		{
-		  libmesh_assert (elem_soln.size()  == 3);
-		  libmesh_assert (nodal_soln.size() == 6);
+		  libmesh_assert_equal_to (elem_soln.size(), 3);
+		  libmesh_assert_equal_to (nodal_soln.size(), 6);
 
 		  nodal_soln[0] = elem_soln[0];
 		  nodal_soln[1] = elem_soln[1];
@@ -99,12 +99,12 @@ namespace libMesh
 	      case QUAD8:
 	      case QUAD9:
 		{
-		  libmesh_assert (elem_soln.size()  == 4);
+		  libmesh_assert_equal_to (elem_soln.size(), 4);
 
 		  if (type == QUAD8)
-		    libmesh_assert (nodal_soln.size() == 8);
+		    libmesh_assert_equal_to (nodal_soln.size(), 8);
 		  else
-		    libmesh_assert (nodal_soln.size() == 9);
+		    libmesh_assert_equal_to (nodal_soln.size(), 9);
 
 
 		  nodal_soln[0] = elem_soln[0];
@@ -125,8 +125,8 @@ namespace libMesh
 
 	      case TET10:
 		{
-		  libmesh_assert (elem_soln.size()  == 4);
-		  libmesh_assert (nodal_soln.size() == 10);
+		  libmesh_assert_equal_to (elem_soln.size(), 4);
+		  libmesh_assert_equal_to (nodal_soln.size(), 10);
 
 		  nodal_soln[0] = elem_soln[0];
 		  nodal_soln[1] = elem_soln[1];
@@ -146,12 +146,12 @@ namespace libMesh
 	      case HEX20:
 	      case HEX27:
 		{
-		  libmesh_assert (elem_soln.size()  == 8);
+		  libmesh_assert_equal_to (elem_soln.size(), 8);
 
 		  if (type == HEX20)
-		    libmesh_assert (nodal_soln.size() == 20);
+		    libmesh_assert_equal_to (nodal_soln.size(), 20);
 		  else
-		    libmesh_assert (nodal_soln.size() == 27);
+		    libmesh_assert_equal_to (nodal_soln.size(), 27);
 
 		  nodal_soln[0]  = elem_soln[0];
 		  nodal_soln[1]  = elem_soln[1];
@@ -194,12 +194,12 @@ namespace libMesh
 	      case PRISM15:
 	      case PRISM18:
 		{
-		  libmesh_assert (elem_soln.size()  == 6);
+		  libmesh_assert_equal_to (elem_soln.size(), 6);
 
 		  if (type == PRISM15)
-		    libmesh_assert (nodal_soln.size() == 15);
+		    libmesh_assert_equal_to (nodal_soln.size(), 15);
 		  else
-		    libmesh_assert (nodal_soln.size() == 18);
+		    libmesh_assert_equal_to (nodal_soln.size(), 18);
 
 		  nodal_soln[0]  = elem_soln[0];
 		  nodal_soln[1]  = elem_soln[1];
@@ -246,8 +246,8 @@ namespace libMesh
 	      {
 	      case EDGE4:
 		{
-		  libmesh_assert(elem_soln.size()  == 3);
-		  libmesh_assert(nodal_soln.size() == 4);
+		  libmesh_assert_equal_to (elem_soln.size(), 3);
+		  libmesh_assert_equal_to (nodal_soln.size(), 4);
 
 		  // Project quadratic solution onto cubic element nodes
 		  nodal_soln[0] = elem_soln[0];

@@ -54,11 +54,11 @@ namespace libMesh
 
       std::vector<Point> refspace_nodes;
       FEBase::get_refspace_nodes(elem_type,refspace_nodes);
-      libmesh_assert (refspace_nodes.size() == n_nodes);
+      libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
 
       for (unsigned int n=0; n<n_nodes; n++)
 	{
-	  libmesh_assert (elem_soln.size() == n_sf);
+	  libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
 	  // Zero before summation
 	  nodal_soln[n] = 0;
@@ -75,26 +75,26 @@ namespace libMesh
 
     unsigned int hermite_n_dofs(const ElemType t, const Order o)
     {
-      libmesh_assert (o > 2);
+      libmesh_assert_greater (o, 2);
       // Piecewise (bi/tri)cubic C1 Hermite splines
       switch (t)
 	{
 	case NODEELEM:
 	  return 1;
 	case EDGE2:
-	  libmesh_assert (o < 4);
+	  libmesh_assert_less (o, 4);
 	case EDGE3:
 	  return (o+1);
 
 	case QUAD4:
 	case QUAD8:
-	  libmesh_assert (o < 4);
+	  libmesh_assert_less (o, 4);
 	case QUAD9:
 	  return ((o+1)*(o+1));
 
 	case HEX8:
 	case HEX20:
-	  libmesh_assert (o < 4);
+	  libmesh_assert_less (o, 4);
 	case HEX27:
 	  return ((o+1)*(o+1)*(o+1));
 
@@ -120,7 +120,7 @@ namespace libMesh
 					const Order o,
 					const unsigned int n)
     {
-      libmesh_assert (o > 2);
+      libmesh_assert_greater (o, 2);
       // Piecewise (bi/tri)cubic C1 Hermite splines
       switch (t)
 	{
@@ -145,7 +145,7 @@ namespace libMesh
 	  }
 
 	case QUAD4:
-	  libmesh_assert (o < 4);
+	  libmesh_assert_less (o, 4);
 	case QUAD8:
 	case QUAD9:
 	  {
@@ -175,7 +175,7 @@ namespace libMesh
 
 	case HEX8:
 	case HEX20:
-	  libmesh_assert (o < 4);
+	  libmesh_assert_less (o, 4);
 	case HEX27:
 	  {
 	    switch (n)
@@ -244,7 +244,7 @@ namespace libMesh
     unsigned int hermite_n_dofs_per_elem(const ElemType t,
 					 const Order o)
     {
-      libmesh_assert (o > 2);
+      libmesh_assert_greater (o, 2);
 
       switch (t)
 	{
@@ -254,12 +254,12 @@ namespace libMesh
 	case EDGE3:
 	  return (o-3);
 	case QUAD4:
-	  libmesh_assert (o < 4);
+	  libmesh_assert_less (o, 4);
 	case QUAD8:
 	case QUAD9:
 	  return ((o-3)*(o-3));
 	case HEX8:
-	  libmesh_assert (o < 4);
+	  libmesh_assert_less (o, 4);
 	case HEX20:
 	case HEX27:
 	  return ((o-3)*(o-3)*(o-3));

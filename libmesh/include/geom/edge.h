@@ -148,7 +148,7 @@ class Edge : public Elem
    * The \p Elem::build_edge() member makes no sense for edges.
    */
   AutoPtr<Elem> build_edge (const unsigned int) const
-  //{ libmesh_assert(i < n_nodes()); AutoPtr<DofObject> ap(new Node(*get_node(i))); return ap; }
+  //{ libmesh_assert_less (i, n_nodes()); AutoPtr<DofObject> ap(new Node(*get_node(i))); return ap; }
   { libmesh_error(); AutoPtr<Elem> ap(NULL); return ap; }
 
 

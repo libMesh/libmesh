@@ -97,7 +97,7 @@ bool InfQuad4::is_face(const unsigned int) const
 bool InfQuad4::is_node_on_side(const unsigned int n,
 			       const unsigned int s) const
 {
-  libmesh_assert(s < n_sides());
+  libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 2; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -166,7 +166,7 @@ bool InfQuad4::contains_point (const Point& p, Real tol) const
 AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
 				    bool proxy) const
 {
-  // libmesh_assert (i < this->n_sides());
+  // libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
@@ -207,8 +207,8 @@ void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (sf < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert_less (sf, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
   conn.resize(4);
 

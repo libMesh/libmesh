@@ -85,7 +85,7 @@ bool InfHex8::is_face(const unsigned int) const
 bool InfHex8::is_node_on_side(const unsigned int n,
 			      const unsigned int s) const
 {
-  libmesh_assert(s < n_sides());
+  libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 4; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -95,7 +95,7 @@ bool InfHex8::is_node_on_side(const unsigned int n,
 bool InfHex8::is_node_on_edge(const unsigned int n,
 			      const unsigned int e) const
 {
-  libmesh_assert(e < n_edges());
+  libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 2; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
@@ -105,7 +105,7 @@ bool InfHex8::is_node_on_edge(const unsigned int n,
 AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
 				   bool proxy) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
@@ -146,7 +146,7 @@ AutoPtr<Elem> InfHex8::build_side (const unsigned int i,
 
 AutoPtr<Elem> InfHex8::build_edge (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_edges());
+  libmesh_assert_less (i, this->n_edges());
 
   if (i < 4) // base edges
     return AutoPtr<Elem>(new SideEdge<Edge2,InfHex8>(this,i));
@@ -220,9 +220,9 @@ void InfHex8::connectivity(const unsigned int libmesh_dbg_var(sc),
 			   const IOPackage iop,
 			   std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (_nodes != NULL);
-  libmesh_assert (sc < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert(_nodes);
+  libmesh_assert_less (sc, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
   switch (iop)
     {

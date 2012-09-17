@@ -765,7 +765,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 	  //     mesh, we can just copy coefficients directly
 	  if (elem->refinement_flag() == Elem::JUST_REFINED)
 	    {
-	      libmesh_assert (parent != NULL);
+	      libmesh_assert(parent);
               old_parent_level = parent->p_level();
 
               // We may have done p refinement or coarsening as well;
@@ -773,7 +773,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
               // so we can get the right DoFs from it
               if (elem->p_refinement_flag() == Elem::JUST_REFINED)
                 {
-                  libmesh_assert(elem->p_level() > 0);
+                  libmesh_assert_greater (elem->p_level(), 0);
                   (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() - 1);
                 }
               else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
@@ -788,7 +788,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 	      dof_map.old_dof_indices (elem, old_dof_indices, var);
 
               if (elem->p_refinement_flag() == Elem::DO_NOTHING)
-	        libmesh_assert (old_dof_indices.size() == new_n_dofs);
+	        libmesh_assert_equal_to (old_dof_indices.size(), new_n_dofs);
               if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
 	        libmesh_assert (elem->has_children());
 	    }
@@ -874,7 +874,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
                 // the DofMap interface... - RHS
                 if (elem->p_refinement_flag() == Elem::JUST_REFINED)
                   {
-                    libmesh_assert (elem->p_level() > 0);
+                    libmesh_assert_greater (elem->p_level(), 0);
                     // P refinement of non-hierarchic bases will
                     // require a whole separate code path
                     libmesh_assert (fe->is_hierarchic());
@@ -1079,7 +1079,7 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
 
       if (elem->refinement_flag() == Elem::JUST_REFINED)
 	{
-	  libmesh_assert (parent != NULL);
+	  libmesh_assert(parent);
 	  unsigned int old_parent_level = parent->p_level();
 
 	  if (elem->p_refinement_flag() == Elem::JUST_REFINED)
@@ -1087,7 +1087,7 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
 	      // We may have done p refinement or coarsening as well;
 	      // if so then we need to reset the parent's p level
 	      // so we can get the right DoFs from it
-	      libmesh_assert(elem->p_level() > 0);
+	      libmesh_assert_greater (elem->p_level(), 0);
 	      (const_cast<Elem *>(parent))->hack_p_level(elem->p_level() - 1);
 	    }
 	  else if (elem->p_refinement_flag() == Elem::JUST_COARSENED)
@@ -1269,13 +1269,13 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
                 }
               if (cont == DISCONTINUOUS)
                 {
-                  libmesh_assert(nc == 0);
+                  libmesh_assert_equal_to (nc, 0);
                 }
               // Assume that C_ZERO elements have a single nodal
               // value shape function
               else if (cont == C_ZERO)
                 {
-                  libmesh_assert(nc == 1);
+                  libmesh_assert_equal_to (nc, 1);
 		  Ue(current_dof) = f->component(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
@@ -1367,7 +1367,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
               // shape functions
               else if (cont == C_ONE)
                 {
-                  libmesh_assert(nc == 1 + dim);
+                  libmesh_assert_equal_to (nc, 1 + dim);
 		  Ue(current_dof) = f->component(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
@@ -1842,13 +1842,13 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                 }
               if (cont == DISCONTINUOUS)
                 {
-                  libmesh_assert(nc == 0);
+                  libmesh_assert_equal_to (nc, 0);
                 }
               // Assume that C_ZERO elements have a single nodal
               // value shape function
               else if (cont == C_ZERO)
                 {
-                  libmesh_assert(nc == 1);
+                  libmesh_assert_equal_to (nc, 1);
 		  Ue(current_dof) = f->component(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;
@@ -1940,7 +1940,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
               // shape functions
               else if (cont == C_ONE)
                 {
-                  libmesh_assert(nc == 1 + dim);
+                  libmesh_assert_equal_to (nc, 1 + dim);
 		  Ue(current_dof) = f->component(var_component,elem->point(n));
                   dof_is_fixed[current_dof] = true;
                   current_dof++;

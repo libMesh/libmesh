@@ -73,10 +73,10 @@ void FEXYZ<Dim>::reinit(const Elem* elem,
                         const std::vector<Point>* const pts,
                         const std::vector<Real>* const weights)
 {
-  libmesh_assert (elem  != NULL);
+  libmesh_assert(elem);
   libmesh_assert (this->qrule != NULL || pts != NULL);
   // We don't do this for 1D elements!
-  libmesh_assert (Dim != 1);
+  libmesh_assert_not_equal_to (Dim, 1);
 
   // Build the side of interest
   const AutoPtr<Elem> side(elem->build_side(s));
@@ -132,8 +132,8 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
 				     const Elem* side,
                                      const std::vector<Real>& qw)
 {
-  libmesh_assert (elem != NULL);
-  libmesh_assert (side != NULL);
+  libmesh_assert(elem);
+  libmesh_assert(side);
 
   START_LOG("compute_face_values()", "FEXYZ");
 

@@ -149,7 +149,7 @@ template <typename T>
 void PetscVector<T>::set (const unsigned int i, const T value)
 {
   this->_restore_array();
-  libmesh_assert(i<size());
+  libmesh_assert_less (i, size());
 
   int ierr=0;
   int i_val = static_cast<int>(i);
@@ -179,7 +179,7 @@ template <typename T>
 void PetscVector<T>::add (const unsigned int i, const T value)
 {
   this->_restore_array();
-  libmesh_assert(i<size());
+  libmesh_assert_less (i, size());
 
   int ierr=0;
   int i_val = static_cast<int>(i);
@@ -198,7 +198,7 @@ void PetscVector<T>::add_vector (const std::vector<T>& v,
 				 const std::vector<unsigned int>& dof_indices)
 {
   this->_restore_array();
-  libmesh_assert (v.size() == dof_indices.size());
+  libmesh_assert_equal_to (v.size(), dof_indices.size());
 
   for (unsigned int i=0; i<v.size(); i++)
     this->add (dof_indices[i], v[i]);
@@ -210,7 +210,7 @@ template <typename T>
 void PetscVector<T>::add_vector (const NumericVector<T>& V,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
@@ -243,7 +243,7 @@ template <typename T>
 void PetscVector<T>::add_vector (const DenseVector<T>& V,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
@@ -355,7 +355,7 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T>& v_in)
   const PetscVector<T>* v = libmesh_cast_ptr<const PetscVector<T>*>(&v_in);
   v->_restore_array();
 
-  libmesh_assert(this->size() == v->size());
+  libmesh_assert_equal_to (this->size(), v->size());
 
   if(this->type() != GHOSTED)
     {
@@ -401,7 +401,7 @@ template <typename T>
 void PetscVector<T>::insert (const std::vector<T>& v,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (v.size() == dof_indices.size());
+  libmesh_assert_equal_to (v.size(), dof_indices.size());
 
   for (unsigned int i=0; i<v.size(); i++)
     this->set (dof_indices[i], v[i]);
@@ -413,7 +413,7 @@ template <typename T>
 void PetscVector<T>::insert (const NumericVector<T>& V,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
@@ -425,7 +425,7 @@ template <typename T>
 void PetscVector<T>::insert (const DenseVector<T>& V,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
@@ -437,7 +437,7 @@ template <typename T>
 void PetscVector<T>::insert (const DenseSubVector<T>& V,
 			     const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
@@ -607,8 +607,8 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
   this->_restore_array();
   v._restore_array();
 
-  libmesh_assert (this->size() == v.size());
-  libmesh_assert (this->local_size() == v.local_size());
+  libmesh_assert_equal_to (this->size(), v.size());
+  libmesh_assert_equal_to (this->local_size(), v.local_size());
   libmesh_assert (v.closed());
 
   int ierr = 0;
@@ -628,7 +628,7 @@ PetscVector<T>::operator = (const PetscVector<T>& v)
   {
     /* In all other cases, we assert that both vectors are of equal
        type.  */
-    libmesh_assert (this->_type == v._type);
+    libmesh_assert_equal_to (this->_type, v._type);
     libmesh_assert (this->_global_to_local_map == v._global_to_local_map);
 
     if (v.size() != 0)
@@ -698,7 +698,7 @@ PetscVector<T>::operator = (const std::vector<T>& v)
    */
   else
     {
-      libmesh_assert (this->local_size() == v.size());
+      libmesh_assert_equal_to (this->local_size(), v.size());
 
       ierr = VecGetArray (_vec, &values);
 	     CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -727,8 +727,8 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   // Make sure the NumericVector passed in is really a PetscVector
   PetscVector<T>* v_local = libmesh_cast_ptr<PetscVector<T>*>(&v_local_in);
 
-  libmesh_assert (v_local != NULL);
-  libmesh_assert (v_local->size() == this->size());
+  libmesh_assert(v_local);
+  libmesh_assert_equal_to (v_local->size(), this->size());
 
   int ierr = 0;
   const int n = this->size();
@@ -804,9 +804,9 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
   // Make sure the NumericVector passed in is really a PetscVector
   PetscVector<T>* v_local = libmesh_cast_ptr<PetscVector<T>*>(&v_local_in);
 
-  libmesh_assert (v_local != NULL);
-  libmesh_assert (v_local->size() == this->size());
-  libmesh_assert (send_list.size()     <= v_local->size());
+  libmesh_assert(v_local);
+  libmesh_assert_equal_to (v_local->size(), this->size());
+  libmesh_assert_less_equal (send_list.size(), v_local->size());
 
   int ierr=0;
   const unsigned int n_sl = send_list.size();
@@ -881,8 +881,8 @@ void PetscVector<T>::localize (const unsigned int first_local_idx,
 {
   this->_restore_array();
 
-  libmesh_assert (send_list.size() <= this->size());
-  libmesh_assert (last_local_idx+1 <= this->size());
+  libmesh_assert_less_equal (send_list.size(), this->size());
+  libmesh_assert_less_equal (last_local_idx+1, this->size());
 
   const unsigned int size       = this->size();
   const unsigned int local_size = (last_local_idx - first_local_idx + 1);

@@ -39,7 +39,7 @@ TypeVector<T> TypeVector<T>::unit() const
 
   const Real length = size();
 
-  libmesh_assert (length != static_cast<Real>(0.));
+  libmesh_assert_not_equal_to (length, static_cast<Real>(0.));
 
 #if LIBMESH_DIM == 1
   return TypeVector<T>(_coords[0]/length);

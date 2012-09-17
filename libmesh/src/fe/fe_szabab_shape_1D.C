@@ -43,7 +43,7 @@ Real FE<1,SZABAB>::shape(const ElemType,
 
   // Use this libmesh_assert rather than a switch with a single entry...
   // It will go away in optimized mode, essentially has the same effect.
-  libmesh_assert (order <= SEVENTH);
+  libmesh_assert_less_equal (order, SEVENTH);
 
 //   switch (order)
 //     {
@@ -92,7 +92,7 @@ Real FE<1,SZABAB>::shape(const Elem* elem,
 			 const unsigned int i,
 			 const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   return FE<1,SZABAB>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
@@ -107,14 +107,14 @@ Real FE<1,SZABAB>::shape_deriv(const ElemType,
 			       const Point& p)
 {
   // only d()/dxi in 1D!
-  libmesh_assert (j == 0);
+  libmesh_assert_equal_to (j, 0);
 
   const Real xi  = p(0);
   const Real xi2 = xi*xi;
 
   // Use this libmesh_assert rather than a switch with a single entry...
   // It will go away in optimized mode, essentially has the same effect.
-  libmesh_assert (order <= SEVENTH);
+  libmesh_assert_less_equal (order, SEVENTH);
 
 //   switch (order)
 //     {
@@ -163,7 +163,7 @@ Real FE<1,SZABAB>::shape_deriv(const Elem* elem,
 			       const unsigned int j,
 			       const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   return FE<1,SZABAB>::shape_deriv(elem->type(),
 				       static_cast<Order>(order + elem->p_level()), i, j, p);

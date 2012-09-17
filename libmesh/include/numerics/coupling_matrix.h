@@ -120,8 +120,8 @@ inline
 unsigned char CouplingMatrix::operator() (const unsigned int i,
 					  const unsigned int j) const
 {
-  libmesh_assert (i < _size);
-  libmesh_assert (j < _size);
+  libmesh_assert_less (i, _size);
+  libmesh_assert_less (j, _size);
 
   return _values[i*_size + j];
 }
@@ -132,8 +132,8 @@ inline
 unsigned char & CouplingMatrix::operator() (const unsigned int i,
 					    const unsigned int j)
 {
-  libmesh_assert (i < _size);
-  libmesh_assert (j < _size);
+  libmesh_assert_less (i, _size);
+  libmesh_assert_less (j, _size);
 
   return _values[i*_size + j];
 }

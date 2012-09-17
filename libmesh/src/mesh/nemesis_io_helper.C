@@ -990,7 +990,7 @@ void Nemesis_IO_Helper::compute_elem_communication_maps()
 	 ++it)
       {
 	// Make sure the current elem_cmap_id matches the index in our map of node intersections
-	libmesh_assert( static_cast<unsigned>(this->elem_cmap_ids[cnt]) == (*it).first );
+	libmesh_assert_equal_to ( static_cast<unsigned>(this->elem_cmap_ids[cnt]), (*it).first );
 
 	// Get reference to the set of IDs to be packed into the vector
 	std::set<std::pair<unsigned,unsigned> >& elem_set = (*it).second;
@@ -1072,7 +1072,7 @@ void Nemesis_IO_Helper::compute_node_communication_maps()
 	 ++it)
       {
 	// Make sure the current node_cmap_id matches the index in our map of node intersections
-	libmesh_assert( static_cast<unsigned>(this->node_cmap_ids[cnt]) == (*it).first );
+	libmesh_assert_equal_to ( static_cast<unsigned>(this->node_cmap_ids[cnt]), (*it).first );
 
 	// Get reference to the set of IDs to be packed into the vector.
 	std::set<unsigned>& node_set = (*it).second;
@@ -1822,11 +1822,11 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 	  const Elem * elem = pmesh.elem(elem_id);
 
           // Exodus/Nemesis want every block to have the same element type
-          // libmesh_assert(elem->type() == conv.get_canonical_type());
+          // libmesh_assert_equal_to (elem->type(), conv.get_canonical_type());
 
 	  // But we can get away with writing e.g. HEX8 and INFHEX8 in
 	  // the same block...
-          libmesh_assert(elem->n_nodes() == Elem::build(conv.get_canonical_type(), NULL)->n_nodes());
+          libmesh_assert_equal_to (elem->n_nodes(), Elem::build(conv.get_canonical_type(), NULL)->n_nodes());
 
 	  for (unsigned int j=0; j < static_cast<unsigned int>(this->num_nodes_per_elem); j++)
 	    {
@@ -1887,13 +1887,13 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase& pmesh)
     // we share nodes, not -1.
     if (this->num_node_cmaps == -1)
       {
-        libmesh_assert(pmesh.active_elements_begin() == pmesh.active_elements_end());
+        libmesh_assert (pmesh.active_elements_begin() == pmesh.active_elements_end());
         this->num_node_cmaps = 0;
       }
 
     // We can't be connecting to more processors than exist outside
     // ourselves
-    libmesh_assert(static_cast<unsigned>(this->num_node_cmaps) < libMesh::n_processors());
+    libmesh_assert_less (static_cast<unsigned>(this->num_node_cmaps), libMesh::n_processors());
 
     if (_verbose)
       {
@@ -2242,7 +2242,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 	  local_elem_boundary_id_lists_iterator it_sides =
 	    local_elem_boundary_id_side_lists.find(this->global_sideset_ids[i]);
 
-	  libmesh_assert(it_sides != local_elem_boundary_id_side_lists.end());
+	  libmesh_assert (it_sides != local_elem_boundary_id_side_lists.end());
 
 	  // Get reference to the vector of elem IDs
 	  std::vector<int>& current_sideset_elem_ids = (*it).second;

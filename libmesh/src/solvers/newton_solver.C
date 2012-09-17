@@ -359,7 +359,7 @@ unsigned int NewtonSolver::solve()
 #endif
 
       const unsigned int linear_steps = rval.first;
-      libmesh_assert(linear_steps <= max_linear_iterations);
+      libmesh_assert_less_equal (linear_steps, max_linear_iterations);
       _inner_iterations += linear_steps;
 
       const bool linear_solve_finished =

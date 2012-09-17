@@ -110,7 +110,7 @@ void PltLoader::read_header (std::istream& in)
 
 	    // Make sure one reversed is one
 	    Utility::ReverseBytes rb(this->is_foreign());
-	    libmesh_assert (rb(one) == 1);
+	    libmesh_assert_equal_to (rb(one), 1);
 	  }
       }
 
@@ -317,7 +317,7 @@ void PltLoader::read_header (std::istream& in)
 
 	    // Make sure one reversed is one
 	    Utility::ReverseBytes rb(this->is_foreign());
-	    libmesh_assert (rb(one) == 1);
+	    libmesh_assert_equal_to (rb(one), 1);
 	  }
       }
 
@@ -477,7 +477,7 @@ void PltLoader::read_header (std::istream& in)
 			in.read (buf, LIBMESH_SIZEOF_INT);
 			std::memcpy  (&vl, buf, LIBMESH_SIZEOF_INT);
 			rb(vl);
-			libmesh_assert (vl == 0); // Only know about node-based data
+			libmesh_assert_equal_to (vl, 0); // Only know about node-based data
 			                  // right now
 		      }
 
@@ -823,7 +823,7 @@ void PltLoader::read_data (std::istream& in)
 	    std::memcpy  (&sc, buf, LIBMESH_SIZEOF_INT);
 	    rb(sc);
 
-	    libmesh_assert (sc == -1);
+	    libmesh_assert_equal_to (sc, -1);
 	  }
 
 
@@ -1075,8 +1075,8 @@ void PltLoader::read_feblock_data (std::istream& in, const unsigned int zone)
     // Read the connectivity
     else
       {
-	libmesh_assert (zone < _conn.size());
-	libmesh_assert (this->kmax(zone) < 4);
+	libmesh_assert_less (zone, _conn.size());
+	libmesh_assert_less (this->kmax(zone), 4);
 
 	_conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 
@@ -1159,8 +1159,8 @@ void PltLoader::read_fepoint_data (std::istream& in, const unsigned int zone)
     // Read the connectivity
     else
       {
-	libmesh_assert (zone < _conn.size());
-	libmesh_assert (this->kmax(zone) < 4);
+	libmesh_assert_less (zone, _conn.size());
+	libmesh_assert_less (this->kmax(zone), 4);
 
 	_conn[zone].resize (this->jmax(zone)*NNodes[this->kmax(zone)]);
 
