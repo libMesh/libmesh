@@ -153,7 +153,7 @@ int main (int argc, char** argv)
 void assemble_elasticity(EquationSystems& es,
                          const std::string& system_name)
 {
-  libmesh_assert (system_name == "Elasticity");
+  libmesh_assert_equal_to (system_name, "Elasticity");
   
   const MeshBase& mesh = es.get_mesh();
 

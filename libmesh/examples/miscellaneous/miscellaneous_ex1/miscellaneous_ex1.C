@@ -216,7 +216,7 @@ void assemble_wave(EquationSystems& es,
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert (system_name == "Wave");
+  libmesh_assert_equal_to (system_name, "Wave");
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -491,7 +491,7 @@ void assemble_wave(EquationSystems& es,
 #else
 
   // dummy assert 
-  libmesh_assert(es.get_mesh().mesh_dimension() != 1);
+  libmesh_assert_not_equal_to (es.get_mesh().mesh_dimension(), 1);
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   

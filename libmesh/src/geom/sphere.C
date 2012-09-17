@@ -42,7 +42,7 @@ Sphere::Sphere () :
 Sphere::Sphere (const Point& c,
 		const Real   r)
 {
-  libmesh_assert (r > 0.);
+  libmesh_assert_greater (r, 0.);
 
   this->create_from_center_radius (c, r);
 }
@@ -72,7 +72,7 @@ Sphere::Sphere(const Point& pa,
   Real D = T.det();
 
   // The points had better not be coplanar
-  libmesh_assert (std::abs(D) > 1e-12);
+  libmesh_assert_greater (std::abs(D), 1e-12);
 
   Real e = 0.5*(pa.size_sq() - pd.size_sq());
   Real f = 0.5*(pb.size_sq() - pd.size_sq());
@@ -112,15 +112,15 @@ void Sphere::create_from_center_radius (const Point& c, const Real r)
   this->center() = c;
   this->radius() = r;
 
-  libmesh_assert (this->radius() > 0.);
+  libmesh_assert_greater (this->radius(), 0.);
 }
 
 
 
 bool Sphere::intersects (const Sphere& other_sphere) const
 {
-  libmesh_assert ( this->radius() > 0. );
-  libmesh_assert ( other_sphere.radius() > 0. );
+  libmesh_assert_greater ( this->radius(), 0. );
+  libmesh_assert_greater ( other_sphere.radius(), 0. );
 
   const Real distance = (this->center() - other_sphere.center()).size();
 
@@ -134,7 +134,7 @@ bool Sphere::intersects (const Sphere& other_sphere) const
 
 bool Sphere::above_surface (const Point& p) const
 {
-  libmesh_assert (this->radius() > 0.);
+  libmesh_assert_greater (this->radius(), 0.);
 
   // create a vector from the center to the point.
   const Point w = p - this->center();
@@ -149,7 +149,7 @@ bool Sphere::above_surface (const Point& p) const
 
 bool Sphere::below_surface (const Point& p) const
 {
-  libmesh_assert (this->radius() > 0.);
+  libmesh_assert_greater (this->radius(), 0.);
 
   return ( !this->above_surface (p) );
 }
@@ -158,7 +158,7 @@ bool Sphere::below_surface (const Point& p) const
 
 bool Sphere::on_surface (const Point& p) const
 {
-  libmesh_assert (this->radius() > 0.);
+  libmesh_assert_greater (this->radius(), 0.);
 
   // Create a vector from the center to the point.
   const Point w = p - this->center();
@@ -175,7 +175,7 @@ bool Sphere::on_surface (const Point& p) const
 
 Point Sphere::closest_point (const Point& p) const
 {
-  libmesh_assert (this->radius() > 0.);
+  libmesh_assert_greater (this->radius(), 0.);
 
   // get the normal from the surface in the direction
   // of p
@@ -192,9 +192,9 @@ Point Sphere::closest_point (const Point& p) const
 
 Point Sphere::unit_normal (const Point& p) const
 {
-  libmesh_assert (this->radius() > 0.);
+  libmesh_assert_greater (this->radius(), 0.);
 
-  libmesh_assert ( !(p == this->center()) );
+  libmesh_assert_not_equal_to (p, this->center());
 
   // Create a vector from the center to the point
   Point n = p - this->center();

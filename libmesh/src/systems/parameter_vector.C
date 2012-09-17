@@ -55,7 +55,7 @@ void ParameterVector::shallow_copy(ParameterVector &target) const
 void ParameterVector::value_copy(const ParameterVector &target) const
 {
   const unsigned int Np = this->_params.size();
-  libmesh_assert(target._params.size() == Np);
+  libmesh_assert_equal_to (target._params.size(), Np);
 
   for (unsigned int i=0; i != Np; ++i)
     *(this->_params[i]) = *(target._params[i]);
@@ -86,7 +86,7 @@ ParameterVector& ParameterVector::operator *= (const Number a)
 const ParameterVector& ParameterVector::operator += (const ParameterVector& a) const
 {
   const unsigned int Np = this->_params.size();
-  libmesh_assert(a._params.size() == Np);
+  libmesh_assert_equal_to (a._params.size(), Np);
   for (unsigned int i=0; i != Np; ++i)
     *(this->_params[i]) += *(a._params[i]);
   return *this;

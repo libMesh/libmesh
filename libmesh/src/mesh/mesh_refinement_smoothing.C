@@ -67,7 +67,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 	  {
 	    const unsigned int node_number = elem->node(n);
 
-	    libmesh_assert (node_number < max_level_at_node.size());
+	    libmesh_assert_less (node_number, max_level_at_node.size());
 
 	    max_level_at_node[node_number] =
 	      std::max (max_level_at_node[node_number], elem_level);
@@ -309,7 +309,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
         my_p_adjustment = 1;
       else if (elem->p_refinement_flag() == Elem::COARSEN)
         {
-          libmesh_assert(elem->p_level() > 0);
+          libmesh_assert_greater (elem->p_level(), 0);
           my_p_adjustment = -1;
         }
       const unsigned int my_new_p_level = elem->p_level() +
@@ -365,7 +365,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
                     p_adjustment = 1;
                   else if (neighbor->p_refinement_flag() == Elem::COARSEN)
                     {
-                      libmesh_assert(neighbor->p_level() > 0);
+                      libmesh_assert_greater (neighbor->p_level(), 0);
                       p_adjustment = -1;
                     }
                   if (my_new_p_level >= neighbor->p_level() + p_adjustment)
@@ -398,8 +398,8 @@ bool MeshRefinement::eliminate_unrefined_patches ()
             {
               for (unsigned int c=0; c<elem->n_children(); c++)
                 {
-                  libmesh_assert(elem->child(c)->refinement_flag() ==
-                         Elem::COARSEN);
+                  libmesh_assert_equal_to (elem->child(c)->refinement_flag(),
+                                          Elem::COARSEN);
                   elem->child(c)->set_refinement_flag(Elem::DO_NOTHING);
                 }
               elem->set_refinement_flag(Elem::INACTIVE);

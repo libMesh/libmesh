@@ -702,8 +702,8 @@ static PetscErrorCode DMFunction_libMesh(DM dm, Vec x, Vec r)
 {
   PetscErrorCode ierr;
   PetscFunctionBegin;
-  libmesh_assert (x != NULL);
-  libmesh_assert (r != NULL);
+  libmesh_assert(x);
+  libmesh_assert(r);
 
   NonlinearImplicitSystem* _sys;
   ierr = DMLibMeshGetSystem(dm, _sys); CHKERRQ(ierr);

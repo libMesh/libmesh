@@ -227,7 +227,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
   // The number of local degrees of freedom in each variable
   const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
   const unsigned int n_u_dofs = c.dof_indices_var[u_var].size(); 
-  libmesh_assert (n_u_dofs == c.dof_indices_var[v_var].size()); 
+  libmesh_assert_equal_to (n_u_dofs, c.dof_indices_var[v_var].size()); 
 
   // The subvectors and submatrices we need to fill:
   const unsigned int dim = this->get_mesh().mesh_dimension();
@@ -319,7 +319,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
 
           if (request_jacobian && c.elem_solution_derivative)
             {
-              libmesh_assert (c.elem_solution_derivative == 1.0);
+              libmesh_assert_equal_to (c.elem_solution_derivative, 1.0);
 
               // Matrix contributions for the uu and vv couplings.
               for (unsigned int j=0; j != n_u_dofs; j++)
@@ -426,7 +426,7 @@ bool NavierSystem::element_constraint (bool request_jacobian,
 
           if (request_jacobian && c.elem_solution_derivative)
             {
-              libmesh_assert (c.elem_solution_derivative == 1.0);
+              libmesh_assert_equal_to (c.elem_solution_derivative, 1.0);
 
               for (unsigned int j=0; j != n_u_dofs; j++)
                 {
@@ -479,7 +479,7 @@ bool NavierSystem::side_constraint (bool request_jacobian,
           Fp(i) += penalty * (p - p_value) * point_phi[i];
           if (request_jacobian && c.elem_solution_derivative)
             {
-              libmesh_assert (c.elem_solution_derivative == 1.0);
+              libmesh_assert_equal_to (c.elem_solution_derivative, 1.0);
 
               for (unsigned int j=0; j != n_p_dofs; j++)
 		Kpp(i,j) += penalty * point_phi[i] * point_phi[j];
@@ -547,7 +547,7 @@ bool NavierSystem::mass_residual (bool request_jacobian,
 
           if (request_jacobian && c.elem_solution_derivative)
             {
-              libmesh_assert (c.elem_solution_derivative == 1.0);
+              libmesh_assert_equal_to (c.elem_solution_derivative, 1.0);
 
               Number JxWxRexPhiI = JxWxRe * phi[i][qp];
               Number JxWxRexPhiII = JxWxRexPhiI * phi[i][qp];
@@ -640,7 +640,7 @@ Point NavierSystem::forcing(const Point& p)
     case 2:
       {
 	// This problem doesn't make sense in 1D...
-	libmesh_assert(1 != this->get_mesh().mesh_dimension());
+	libmesh_assert_not_equal_to (1, this->get_mesh().mesh_dimension());
 	const Real x=p(0), y=p(1), z=p(2);
 	const Real
 	  u=(Reynolds+1)*(y*y + z*z),

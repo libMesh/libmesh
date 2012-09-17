@@ -372,7 +372,7 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 
 			data->SetName(it->first.c_str());
 
-			libmesh_assert(it->second.size()==es.get_mesh().n_nodes());
+			libmesh_assert_equal_to (it->second.size(), es.get_mesh().n_nodes());
 
 			data->SetNumberOfValues(it->second.size());
 
@@ -452,7 +452,7 @@ void VTKIO::read (const std::string& name)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert(libMesh::processor_id() == 0);
+  libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   // Keep track of what kinds of elements this file contains
   elems_of_dimension.clear();
@@ -609,7 +609,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
   if (libMesh::processor_id() == 0){
 
 	  // check if the filename extension is pvtu
-	  libmesh_assert(fname.substr(fname.rfind("."),fname.size())==".pvtu");
+	  libmesh_assert_equal_to (fname.substr(fname.rfind("."),fname.size()), ".pvtu");
 
 	  /*
 		* we only use Unstructured grids
@@ -632,7 +632,7 @@ void VTKIO::write_equation_systems(const std::string& fname, const EquationSyste
 	  //   const MeshData& md = es.get_mesh_data();
 	  //   if(es.has_mesh_data())
 	  //      meshdata_to_vtk(md,_vtk_grid);
-	  //   libmesh_assert (soln.size() ==mesh.n_nodes()*names.size());
+	  //   libmesh_assert_equal_to (soln.size(), mesh.n_nodes()*names.size());
 //	  libMesh::out<<"write solution"<<std::endl;
 
           // call solution_to_vtk on all processors to allow localization of the solution in it

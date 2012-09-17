@@ -81,9 +81,9 @@ extern "C"
 
     int ierr=0;
 
-    libmesh_assert (x   != NULL);
-    libmesh_assert (r   != NULL);
-    libmesh_assert (ctx != NULL);
+    libmesh_assert(x);
+    libmesh_assert(r);
+    libmesh_assert(ctx);
 
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);
@@ -159,7 +159,7 @@ extern "C"
 
     int ierr=0;
 
-    libmesh_assert (ctx != NULL);
+    libmesh_assert(ctx);
 
     PetscNonlinearSolver<Number>* solver =
       static_cast<PetscNonlinearSolver<Number>*> (ctx);

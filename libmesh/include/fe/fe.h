@@ -909,7 +909,7 @@ FE<Dim,T>::FE (const FEType& fet) :
   // Sanity check.  Make sure the
   // Family specified in the template instantiation
   // matches the one in the FEType object
-  libmesh_assert (T == this->get_family());
+  libmesh_assert_equal_to (T, this->get_family());
 }
 
 

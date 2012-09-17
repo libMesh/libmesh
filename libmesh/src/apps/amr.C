@@ -131,7 +131,7 @@ int main (int, char**)
 void assemble(EquationSystems& es,
 	      const std::string& libmesh_dbg_var(system_name))
 {
-  libmesh_assert (system_name == "primary");
+  libmesh_assert_equal_to (system_name, "primary");
 
   const MeshBase& mesh   = es.get_mesh();
   const unsigned int dim = mesh.mesh_dimension();

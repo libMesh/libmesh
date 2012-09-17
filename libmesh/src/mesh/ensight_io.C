@@ -405,7 +405,7 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
 
     FEInterface::nodal_soln (dim,fe_type, elem, elem_soln, nodal_soln);
 
-    libmesh_assert (nodal_soln.size() == elem->n_nodes());
+    libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
     libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;
@@ -503,8 +503,8 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
     if(dim == 3) FEInterface::nodal_soln (dim,fe_type,elem,elem_soln_w,nodal_soln_w);
 
 
-    libmesh_assert (nodal_soln_u.size() == elem->n_nodes());
-    libmesh_assert (nodal_soln_v.size() == elem->n_nodes());
+    libmesh_assert_equal_to (nodal_soln_u.size(), elem->n_nodes());
+    libmesh_assert_equal_to (nodal_soln_v.size(), elem->n_nodes());
 
 #ifdef LIBMESH_ENABLE_COMPLEX
     libMesh::err << "Complex-valued Ensight output not yet supported" << std::endl;

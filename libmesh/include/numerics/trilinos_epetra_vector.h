@@ -487,7 +487,7 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling LibMeshVecDestroy()!
    */
-  Epetra_Vector * vec () { libmesh_assert (_vec != NULL); return _vec; }
+  Epetra_Vector * vec () { libmesh_assert(_vec); return _vec; }
 
 private:
 

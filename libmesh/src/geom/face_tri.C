@@ -32,7 +32,7 @@ namespace libMesh
 // Tri class member functions
 unsigned int Tri::key (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   switch (s)
     {
@@ -61,7 +61,7 @@ unsigned int Tri::key (const unsigned int s) const
 
 AutoPtr<Elem> Tri::side (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   Elem* edge = new Edge2;
 
@@ -109,8 +109,8 @@ AutoPtr<Elem> Tri::side (const unsigned int i) const
 bool Tri::is_child_on_side(const unsigned int c,
                            const unsigned int s) const
 {
-  libmesh_assert (c < this->n_children());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (c, this->n_children());
+  libmesh_assert_less (s, this->n_sides());
 
   return (c == s || c == (s+1)%3);
 }

@@ -40,7 +40,7 @@ Real FE<3,MONOMIAL>::shape(const ElemType,
   const Real eta  = p(1);
   const Real zeta = p(2);
 
-  libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
+  libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
               (static_cast<unsigned int>(order)+2)*
               (static_cast<unsigned int>(order)+3)/6);
 
@@ -189,7 +189,7 @@ Real FE<3,MONOMIAL>::shape(const Elem* elem,
 			   const unsigned int i,
 			   const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // call the orientation-independent shape functions
   return FE<3,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
@@ -206,9 +206,9 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
 {
 #if LIBMESH_DIM == 3
 
-  libmesh_assert (j<3);
+  libmesh_assert_less (j, 3);
 
-  libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
+  libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
               (static_cast<unsigned int>(order)+2)*
               (static_cast<unsigned int>(order)+3)/6);
 
@@ -640,7 +640,7 @@ Real FE<3,MONOMIAL>::shape_deriv(const Elem* elem,
 				 const unsigned int j,
 				 const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // call the orientation-independent shape function derivatives
   return FE<3,MONOMIAL>::shape_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);
@@ -657,9 +657,9 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
 {
 #if LIBMESH_DIM == 3
 
-  libmesh_assert (j<6);
+  libmesh_assert_less (j, 6);
 
-  libmesh_assert (i < (static_cast<unsigned int>(order)+1)*
+  libmesh_assert_less (i, (static_cast<unsigned int>(order)+1)*
               (static_cast<unsigned int>(order)+2)*
               (static_cast<unsigned int>(order)+3)/6);
 
@@ -1305,7 +1305,7 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const Elem* elem,
 				        const unsigned int j,
 				        const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // call the orientation-independent shape function derivatives
   return FE<3,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);

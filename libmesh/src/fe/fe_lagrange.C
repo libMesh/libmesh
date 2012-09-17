@@ -56,8 +56,8 @@ namespace libMesh
 	      {
 	      case EDGE3:
 		{
-		  libmesh_assert (elem_soln.size()  == 2);
-		  libmesh_assert (nodal_soln.size() == 3);
+		  libmesh_assert_equal_to (elem_soln.size(), 2);
+		  libmesh_assert_equal_to (nodal_soln.size(), 3);
 
 		  nodal_soln[0] = elem_soln[0];
 		  nodal_soln[1] = elem_soln[1];
@@ -68,8 +68,8 @@ namespace libMesh
 
 	      case EDGE4:
 		{
-		  libmesh_assert(elem_soln.size() == 2);
-		  libmesh_assert(nodal_soln.size() == 4);
+		  libmesh_assert_equal_to (elem_soln.size(), 2);
+		  libmesh_assert_equal_to (nodal_soln.size(), 4);
 
 		  nodal_soln[0] = elem_soln[0];
 		  nodal_soln[1] = elem_soln[1];
@@ -82,8 +82,8 @@ namespace libMesh
 
 	      case TRI6:
 		{
-		  libmesh_assert (elem_soln.size()  == 3);
-		  libmesh_assert (nodal_soln.size() == 6);
+		  libmesh_assert_equal_to (elem_soln.size(), 3);
+		  libmesh_assert_equal_to (nodal_soln.size(), 6);
 
 		  nodal_soln[0] = elem_soln[0];
 		  nodal_soln[1] = elem_soln[1];
@@ -99,12 +99,12 @@ namespace libMesh
 	      case QUAD8:
 	      case QUAD9:
 		{
-		  libmesh_assert (elem_soln.size()  == 4);
+		  libmesh_assert_equal_to (elem_soln.size(), 4);
 
 		  if (type == QUAD8)
-		    libmesh_assert (nodal_soln.size() == 8);
+		    libmesh_assert_equal_to (nodal_soln.size(), 8);
 		  else
-		    libmesh_assert (nodal_soln.size() == 9);
+		    libmesh_assert_equal_to (nodal_soln.size(), 9);
 
 
 		  nodal_soln[0] = elem_soln[0];
@@ -125,8 +125,8 @@ namespace libMesh
 
 	      case TET10:
 		{
-		  libmesh_assert (elem_soln.size()  == 4);
-		  libmesh_assert (nodal_soln.size() == 10);
+		  libmesh_assert_equal_to (elem_soln.size(), 4);
+		  libmesh_assert_equal_to (nodal_soln.size(), 10);
 
 		  nodal_soln[0] = elem_soln[0];
 		  nodal_soln[1] = elem_soln[1];
@@ -146,12 +146,12 @@ namespace libMesh
 	      case HEX20:
 	      case HEX27:
 		{
-		  libmesh_assert (elem_soln.size()  == 8);
+		  libmesh_assert_equal_to (elem_soln.size(), 8);
 
 		  if (type == HEX20)
-		    libmesh_assert (nodal_soln.size() == 20);
+		    libmesh_assert_equal_to (nodal_soln.size(), 20);
 		  else
-		    libmesh_assert (nodal_soln.size() == 27);
+		    libmesh_assert_equal_to (nodal_soln.size(), 27);
 
 		  nodal_soln[0]  = elem_soln[0];
 		  nodal_soln[1]  = elem_soln[1];
@@ -194,12 +194,12 @@ namespace libMesh
 	      case PRISM15:
 	      case PRISM18:
 		{
-		  libmesh_assert (elem_soln.size()  == 6);
+		  libmesh_assert_equal_to (elem_soln.size(), 6);
 
 		  if (type == PRISM15)
-		    libmesh_assert (nodal_soln.size() == 15);
+		    libmesh_assert_equal_to (nodal_soln.size(), 15);
 		  else
-		    libmesh_assert (nodal_soln.size() == 18);
+		    libmesh_assert_equal_to (nodal_soln.size(), 18);
 
 		  nodal_soln[0]  = elem_soln[0];
 		  nodal_soln[1]  = elem_soln[1];
@@ -246,8 +246,8 @@ namespace libMesh
 	      {
 	      case EDGE4:
 		{
-		  libmesh_assert(elem_soln.size()  == 3);
-		  libmesh_assert(nodal_soln.size() == 4);
+		  libmesh_assert_equal_to (elem_soln.size(), 3);
+		  libmesh_assert_equal_to (nodal_soln.size(), 4);
 
 		  // Project quadratic solution onto cubic element nodes
 		  nodal_soln[0] = elem_soln[0];
@@ -644,7 +644,7 @@ namespace libMesh
       if (Dim == 1)
 	return;
 
-      libmesh_assert (elem != NULL);
+      libmesh_assert(elem);
 
       // Only constrain active and ancestor elements
       if (elem->subactive())
@@ -668,7 +668,7 @@ namespace libMesh
 	      // This can't happen...  Only level-0 elements have NULL
 	      // parents, and no level-0 elements can be at a higher
 	      // level than their neighbors!
-	      libmesh_assert (parent != NULL);
+	      libmesh_assert(parent);
 
 	      const AutoPtr<Elem> my_side     (elem->build_side(s));
 	      const AutoPtr<Elem> parent_side (parent->build_side(s));
@@ -689,7 +689,7 @@ namespace libMesh
 		   my_dof<FEInterface::n_dofs(Dim-1, fe_type, my_side->type());
 		   my_dof++)
 		{
-		  libmesh_assert (my_dof < my_side->n_nodes());
+		  libmesh_assert_less (my_dof, my_side->n_nodes());
 
 		  // My global dof index.
 		  const unsigned int my_dof_g = my_dof_indices[my_dof];
@@ -701,7 +701,7 @@ namespace libMesh
 		       their_dof<FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
 		       their_dof++)
 		    {
-		      libmesh_assert (their_dof < parent_side->n_nodes());
+		      libmesh_assert_less (their_dof, parent_side->n_nodes());
 
 		      // Their global dof index.
 		      const unsigned int their_dof_g =
@@ -746,7 +746,7 @@ namespace libMesh
 		       their_dof<FEInterface::n_dofs(Dim-1, fe_type, parent_side->type());
 		       their_dof++)
 		    {
-		      libmesh_assert (their_dof < parent_side->n_nodes());
+		      libmesh_assert_less (their_dof, parent_side->n_nodes());
 
 		      // Their global dof index.
 		      const unsigned int their_dof_g =
@@ -770,7 +770,7 @@ namespace libMesh
 		      // Protect for the case u_i = 0.999 u_j,
 		      // in which case i better equal j.
 		      else if (their_dof_value >= .999)
-			libmesh_assert (my_dof_g == their_dof_g);
+			libmesh_assert_equal_to (my_dof_g, their_dof_g);
 #endif
 		    }
 		}

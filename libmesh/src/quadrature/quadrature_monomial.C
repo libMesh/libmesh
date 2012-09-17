@@ -127,7 +127,7 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 	  }
 	case 3: // Fully-symmetric (x,0)
 	  {
-	    libmesh_assert(y==0.0);
+	    libmesh_assert_equal_to (y, 0.0);
 
 	    _points[c]    = Point( x,0.);
 	    _weights[c++] = w;
@@ -161,7 +161,7 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 	  }
 	case 5: // Partial symmetry (Wissman's rules)
 	  {
-	    libmesh_assert (x != 0.0);
+	    libmesh_assert_not_equal_to (x, 0.0);
 
 	    _points[c]    = Point( x, y);
 	    _weights[c++] = w;
@@ -189,8 +189,8 @@ void QMonomial::stroud_rule(const Real rule_data[][3],
 	  }
 	case 7: // Central symmetry
 	  {
-	    libmesh_assert (x == 0.0);
-	    libmesh_assert (y != 0.0);
+	    libmesh_assert_equal_to (x, 0.0);
+	    libmesh_assert_not_equal_to (y, 0.0);
 
 	    _points[c]    = Point(0., y);
 	    _weights[c++] = w;

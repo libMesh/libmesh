@@ -86,7 +86,7 @@ bool InfHex18::is_face(const unsigned int i) const
 bool InfHex18::is_node_on_side(const unsigned int n,
 			       const unsigned int s) const
 {
-  libmesh_assert(s < n_sides());
+  libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 9; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -96,7 +96,7 @@ bool InfHex18::is_node_on_side(const unsigned int n,
 bool InfHex18::is_node_on_edge(const unsigned int n,
 			       const unsigned int e) const
 {
-  libmesh_assert(e < n_edges());
+  libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 3; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
@@ -105,7 +105,7 @@ bool InfHex18::is_node_on_edge(const unsigned int n,
 
 unsigned int InfHex18::key (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
   switch (s)
@@ -159,7 +159,7 @@ unsigned int InfHex18::key (const unsigned int s) const
 AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
 				    bool proxy) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
@@ -282,7 +282,7 @@ AutoPtr<Elem> InfHex18::build_side (const unsigned int i,
 
 AutoPtr<Elem> InfHex18::build_edge (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_edges());
+  libmesh_assert_less (i, this->n_edges());
 
   if (i < 4) // base edges
     return AutoPtr<Elem>(new SideEdge<Edge3,InfHex18>(this,i));
@@ -296,9 +296,9 @@ void InfHex18::connectivity(const unsigned int sc,
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (_nodes != NULL);
-  libmesh_assert (sc < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert(_nodes);
+  libmesh_assert_less (sc, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
   switch (iop)
     {
@@ -404,9 +404,9 @@ unsigned int InfHex18::n_second_order_adjacent_vertices (const unsigned int n) c
 unsigned short int InfHex18::second_order_adjacent_vertex (const unsigned int n,
 							   const unsigned int v) const
 {
-  libmesh_assert (n >= this->n_vertices());
-  libmesh_assert (n <  this->n_nodes());
-  libmesh_assert (v <  this->n_second_order_adjacent_vertices(n));
+  libmesh_assert_greater_equal (n, this->n_vertices());
+  libmesh_assert_less (n, this->n_nodes());
+  libmesh_assert_less (v, this->n_second_order_adjacent_vertices(n));
 
   if (n == 16)
       /*
@@ -439,8 +439,8 @@ unsigned short int InfHex18::second_order_adjacent_vertex (const unsigned int n,
 std::pair<unsigned short int, unsigned short int>
 InfHex18::second_order_child_vertex (const unsigned int n) const
 {
-  libmesh_assert (n >= this->n_vertices());
-  libmesh_assert (n < this->n_nodes());
+  libmesh_assert_greater_equal (n, this->n_vertices());
+  libmesh_assert_less (n, this->n_nodes());
   /*
    * the _second_order_vertex_child_* vectors are
    * stored in cell_inf_hex.C, since they are identical

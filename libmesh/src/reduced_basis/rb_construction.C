@@ -384,13 +384,13 @@ void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number>& vect
 void RBConstruction::initialize_rb_construction()
 {
   // Check that the theta and assembly objects are consistently sized
-  libmesh_assert(get_rb_theta_expansion().get_n_A_terms() == get_rb_assembly_expansion().get_n_A_terms());
-  libmesh_assert(get_rb_theta_expansion().get_n_F_terms() == get_rb_assembly_expansion().get_n_F_terms());
-  libmesh_assert(get_rb_theta_expansion().get_n_outputs() == get_rb_assembly_expansion().get_n_outputs());
+  libmesh_assert_equal_to (get_rb_theta_expansion().get_n_A_terms(), get_rb_assembly_expansion().get_n_A_terms());
+  libmesh_assert_equal_to (get_rb_theta_expansion().get_n_F_terms(), get_rb_assembly_expansion().get_n_F_terms());
+  libmesh_assert_equal_to (get_rb_theta_expansion().get_n_outputs(), get_rb_assembly_expansion().get_n_outputs());
   for(unsigned int i=0; i<get_rb_theta_expansion().get_n_outputs(); i++)
   {
-    libmesh_assert(get_rb_theta_expansion().get_n_output_terms(i) ==
-                   get_rb_assembly_expansion().get_n_output_terms(i));
+    libmesh_assert_equal_to (get_rb_theta_expansion().get_n_output_terms(i),
+                            get_rb_assembly_expansion().get_n_output_terms(i));
   }
 
 
@@ -1238,7 +1238,7 @@ void RBConstruction::load_basis_function(unsigned int i)
 {
   START_LOG("load_basis_function()", "RBConstruction");
 
-  libmesh_assert(i < get_rb_evaluation().get_n_basis_functions());
+  libmesh_assert_less (i, get_rb_evaluation().get_n_basis_functions());
 
   *solution = get_rb_evaluation().get_basis_function(i);
 
@@ -2292,7 +2292,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
     for (unsigned int j=jstart; j<jstop; ++j)
     {
       libMesh::out << "Writing out Aq_representor[" << i << "][" << j << "]..." << std::endl;
-      libmesh_assert(get_rb_evaluation().Aq_representor[i][j] != NULL);
+      libmesh_assert(get_rb_evaluation().Aq_representor[i][j]);
 
       file_name.str(""); // reset filename
       file_name << riesz_representors_dir

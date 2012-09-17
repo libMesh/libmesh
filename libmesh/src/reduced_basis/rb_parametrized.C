@@ -143,7 +143,7 @@ unsigned int RBParametrized::get_n_params() const
     libmesh_error();
   }
   
-  libmesh_assert( parameters_min.n_parameters() == parameters_max.n_parameters() );
+  libmesh_assert_equal_to ( parameters_min.n_parameters(), parameters_max.n_parameters() );
 
   return parameters_min.n_parameters();
 }

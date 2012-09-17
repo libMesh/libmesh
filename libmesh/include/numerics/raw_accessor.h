@@ -116,7 +116,7 @@ template<>
 inline
 Number& RawAccessor<Number>::operator()( unsigned int i )
 {
-  libmesh_assert(i == 0);
+  libmesh_assert_equal_to (i, 0);
   return this->_data;
 }
 
@@ -124,7 +124,7 @@ template<>
 inline
 Number& RawAccessor<Gradient>::operator()( unsigned int i )
 {
-  libmesh_assert(i < this->_dim);
+  libmesh_assert_less (i, this->_dim);
   return this->_data(i);
 }
 
@@ -132,7 +132,7 @@ template<>
 inline
 Number& RawAccessor<Tensor>::operator()( unsigned int k )
 {
-  libmesh_assert(k < this->_dim*this->_dim);
+  libmesh_assert_less (k, this->_dim*this->_dim);
 
   // For tensors, each row is filled first, i.e. for 2-D
   // [ 0 1; 2 3]
@@ -180,7 +180,7 @@ template<>
 inline
 Real& RawAccessor<Real>::operator()( unsigned int i )
 {
-  libmesh_assert(i == 0);
+  libmesh_assert_equal_to (i, 0);
   return this->_data;
 }
 
@@ -188,7 +188,7 @@ template<>
 inline
 Real& RawAccessor<RealGradient>::operator()( unsigned int i )
 {
-  libmesh_assert(i < this->_dim);
+  libmesh_assert_less (i, this->_dim);
   return this->_data(i);
 }
 
@@ -196,7 +196,7 @@ template<>
 inline
 Real& RawAccessor<RealTensor>::operator()( unsigned int k )
 {
-  libmesh_assert(k < this->_dim*this->_dim);
+  libmesh_assert_less (k, this->_dim*this->_dim);
 
   // For tensors, each row is filled first, i.e. for 2-D
   // [ 0 1; 2 3]

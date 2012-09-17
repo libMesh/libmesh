@@ -152,7 +152,7 @@ void WrappedFunction<Output>::operator() (const Point& p,
   // We fill each entry of output with a single scalar component of
   // the data in our System
   const unsigned int size = output.size();
-  libmesh_assert(size == _sys.n_components());
+  libmesh_assert_equal_to (size, _sys.n_components());
 
   // Loop over variables, then over each component in
   // vector-valued variables, evaluating each.
@@ -168,7 +168,7 @@ void WrappedFunction<Output>::operator() (const Point& p,
         {
           // Right now our only non-scalar variable type is the
           // SCALAR variables.  The irony is priceless.
-          libmesh_assert(_sys.variable(v).type().family == SCALAR);
+          libmesh_assert_equal_to (_sys.variable(v).type().family, SCALAR);
 
 	  // We pass the point (j,0,0) to an old-style fptr function
 	  // pointer to distinguish the different scalars within the
@@ -210,7 +210,7 @@ Output WrappedFunction<Output>::component (unsigned int i,
         {
           // Right now our only non-scalar variable type is the
           // SCALAR variables.  The irony is priceless.
-          libmesh_assert(_sys.variable(i).type().family == SCALAR);
+          libmesh_assert_equal_to (_sys.variable(i).type().family, SCALAR);
 
 	  // We pass the point (j,0,0) to an old-style fptr function
 	  // pointer to distinguish the different scalars within the

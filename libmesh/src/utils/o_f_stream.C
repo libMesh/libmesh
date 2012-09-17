@@ -38,7 +38,7 @@ template <typename T>
 OFStream& OFStream::scientific (const sizetype w,
 				const T r)
 {
-  libmesh_assert (w < 30);
+  libmesh_assert_less (w, 30);
   char buf[30];
   char format[8];
   // form the format for r
@@ -58,7 +58,7 @@ template <>
 OFStream& OFStream::scientific (const sizetype w,
 				const Complex r)
 {
-  libmesh_assert (w < 30);
+  libmesh_assert_less (w, 30);
   char buf[60];
   char format[16];
   // form the format for r

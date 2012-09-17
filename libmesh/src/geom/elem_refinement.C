@@ -40,7 +40,7 @@ namespace libMesh
 
 void Elem::refine (MeshRefinement& mesh_refinement)
 {
-  libmesh_assert (this->refinement_flag() == Elem::REFINE);
+  libmesh_assert_equal_to (this->refinement_flag(), Elem::REFINE);
   libmesh_assert (this->active());
 
   // Create my children if necessary
@@ -138,7 +138,7 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 
   for (unsigned int c=0; c<this->n_children(); c++)
     {
-      libmesh_assert(this->child(c)->parent() == this);
+      libmesh_assert_equal_to (this->child(c)->parent(), this);
       libmesh_assert(this->child(c)->active());
     }
   libmesh_assert (this->ancestor());
@@ -184,7 +184,7 @@ unsigned int Elem::_cast_node_address_to_unsigned_int(const unsigned int n)
 
 void Elem::coarsen()
 {
-  libmesh_assert (this->refinement_flag() == Elem::COARSEN_INACTIVE);
+  libmesh_assert_equal_to (this->refinement_flag(), Elem::COARSEN_INACTIVE);
   libmesh_assert (!this->active());
 
   // We no longer delete children until MeshRefinement::contract()
@@ -234,7 +234,7 @@ void Elem::coarsen()
       Elem *mychild = this->child(c);
       if (mychild == remote_elem)
         continue;
-      libmesh_assert (mychild->refinement_flag() == Elem::COARSEN);
+      libmesh_assert_equal_to (mychild->refinement_flag(), Elem::COARSEN);
       mychild->set_refinement_flag(Elem::INACTIVE);
       if (mychild->p_level() > parent_p_level)
         parent_p_level = mychild->p_level();

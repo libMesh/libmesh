@@ -280,7 +280,7 @@ protected:
 inline
 std::pair<unsigned int, Real> FrequencySystem::get_rval (unsigned int n) const
 {
-  libmesh_assert (n < vec_rval.size());
+  libmesh_assert_less (n, vec_rval.size());
 
   return vec_rval[n];
 }

@@ -153,7 +153,7 @@ AnalyticFunction<Output>::AnalyticFunction (Output fptr(const Point& p,
   _number_fptr (fptr),
   _vector_fptr (NULL)
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
   this->_initialized = true;
 }
 
@@ -168,7 +168,7 @@ AnalyticFunction<Output>::AnalyticFunction (void fptr(DenseVector<Output>& outpu
   _number_fptr (NULL),
   _vector_fptr (fptr)
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
   this->_initialized = true;
 }
 

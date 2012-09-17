@@ -292,7 +292,7 @@ void ExodusII_IO_Helper::read_block_info()
 
 int ExodusII_IO_Helper::get_block_id(int index)
 {
-  libmesh_assert (static_cast<unsigned int>(index) < block_ids.size());
+  libmesh_assert_less (static_cast<unsigned int>(index), block_ids.size());
 
   return block_ids[index];
 }
@@ -301,7 +301,7 @@ int ExodusII_IO_Helper::get_block_id(int index)
 
 std::string ExodusII_IO_Helper::get_block_name(int index)
 {
-  libmesh_assert (static_cast<unsigned int>(index) < block_ids.size());
+  libmesh_assert_less (static_cast<unsigned int>(index), block_ids.size());
 
   return id_to_block_names[block_ids[index]];
 }
@@ -310,7 +310,7 @@ std::string ExodusII_IO_Helper::get_block_name(int index)
 
 int ExodusII_IO_Helper::get_side_set_id(int index)
 {
-  libmesh_assert (static_cast<unsigned int>(index) < ss_ids.size());
+  libmesh_assert_less (static_cast<unsigned int>(index), ss_ids.size());
 
   return ss_ids[index];
 }
@@ -319,7 +319,7 @@ int ExodusII_IO_Helper::get_side_set_id(int index)
 
 std::string ExodusII_IO_Helper::get_side_set_name(int index)
 {
-  libmesh_assert (static_cast<unsigned int>(index) < ss_ids.size());
+  libmesh_assert_less (static_cast<unsigned int>(index), ss_ids.size());
 
   return id_to_ss_names[ss_ids[index]];
 }
@@ -328,7 +328,7 @@ std::string ExodusII_IO_Helper::get_side_set_name(int index)
 
 int ExodusII_IO_Helper::get_node_set_id(int index)
 {
-  libmesh_assert (static_cast<unsigned int>(index) < nodeset_ids.size());
+  libmesh_assert_less (static_cast<unsigned int>(index), nodeset_ids.size());
 
   return nodeset_ids[index];
 }
@@ -337,7 +337,7 @@ int ExodusII_IO_Helper::get_node_set_id(int index)
 
 std::string ExodusII_IO_Helper::get_node_set_name(int index)
 {
-  libmesh_assert (static_cast<unsigned int>(index) < nodeset_ids.size());
+  libmesh_assert_less (static_cast<unsigned int>(index), nodeset_ids.size());
 
   return id_to_ns_names[nodeset_ids[index]];
 }
@@ -347,7 +347,7 @@ std::string ExodusII_IO_Helper::get_node_set_name(int index)
 
 void ExodusII_IO_Helper::read_elem_in_block(int block)
 {
-  libmesh_assert (static_cast<unsigned int>(block) < block_ids.size());
+  libmesh_assert_less (static_cast<unsigned int>(block), block_ids.size());
 
   ex_err = exII::ex_get_elem_block(ex_id,
 				   block_ids[block],
@@ -479,11 +479,11 @@ void ExodusII_IO_Helper::read_nodeset_info()
 
 void ExodusII_IO_Helper::read_sideset(int id, int offset)
 {
-  libmesh_assert (static_cast<unsigned int>(id) < ss_ids.size());
-  libmesh_assert (static_cast<unsigned int>(id) < num_sides_per_set.size());
-  libmesh_assert (static_cast<unsigned int>(id) < num_df_per_set.size());
-  libmesh_assert (static_cast<unsigned int>(offset) <= elem_list.size());
-  libmesh_assert (static_cast<unsigned int>(offset) <= side_list.size());
+  libmesh_assert_less (static_cast<unsigned int>(id), ss_ids.size());
+  libmesh_assert_less (static_cast<unsigned int>(id), num_sides_per_set.size());
+  libmesh_assert_less (static_cast<unsigned int>(id), num_df_per_set.size());
+  libmesh_assert_less_equal (static_cast<unsigned int>(offset), elem_list.size());
+  libmesh_assert_less_equal (static_cast<unsigned int>(offset), side_list.size());
 
   ex_err = exII::ex_get_side_set_param(ex_id,
 				       ss_ids[id],
@@ -498,7 +498,7 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 #ifdef DEBUG
   if (static_cast<unsigned int>(offset) == elem_list.size() ||
       static_cast<unsigned int>(offset) == side_list.size() )
-    libmesh_assert(num_sides_per_set[id] == 0);
+    libmesh_assert_equal_to (num_sides_per_set[id], 0);
 #endif
 
 
@@ -522,9 +522,9 @@ void ExodusII_IO_Helper::read_sideset(int id, int offset)
 
 void ExodusII_IO_Helper::read_nodeset(int id)
 {
-  libmesh_assert (static_cast<unsigned int>(id) < nodeset_ids.size());
-  libmesh_assert (static_cast<unsigned int>(id) < num_nodes_per_set.size());
-  libmesh_assert (static_cast<unsigned int>(id) < num_node_df_per_set.size());
+  libmesh_assert_less (static_cast<unsigned int>(id), nodeset_ids.size());
+  libmesh_assert_less (static_cast<unsigned int>(id), num_nodes_per_set.size());
+  libmesh_assert_less (static_cast<unsigned int>(id), num_node_df_per_set.size());
 
   ex_err = exII::ex_get_node_set_param(ex_id,
 				       nodeset_ids[id],
@@ -978,11 +978,11 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
           const Elem* elem = mesh.elem(elem_id);
 
           // Exodus/Nemesis want every block to have the same element type
-          // libmesh_assert(elem->type() == conv.get_canonical_type());
+          // libmesh_assert_equal_to (elem->type(), conv.get_canonical_type());
 
 	  // But we can get away with writing e.g. HEX8 and INFHEX8 in
 	  // the same block...
-          libmesh_assert(elem->n_nodes() == Elem::build(conv.get_canonical_type(), NULL)->n_nodes());
+          libmesh_assert_equal_to (elem->n_nodes(), Elem::build(conv.get_canonical_type(), NULL)->n_nodes());
 
           for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
@@ -1898,7 +1898,7 @@ ExodusII_IO_Helper::NamesData::~NamesData()
 
 void ExodusII_IO_Helper::NamesData::push_back_entry(const std::string & name)
 {
-  libmesh_assert(counter < table_size);
+  libmesh_assert_less (counter, table_size);
 
   data_table[counter][ name.copy(data_table[counter], name.length()) ] = '\0';
   ++counter;

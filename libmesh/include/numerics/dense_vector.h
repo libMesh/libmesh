@@ -332,7 +332,7 @@ template<typename T>
 inline
 T DenseVector<T>::operator () (const unsigned int i) const
 {
-  libmesh_assert (i < _val.size());
+  libmesh_assert_less (i, _val.size());
 
   return _val[i];
 }
@@ -343,7 +343,7 @@ template<typename T>
 inline
 T & DenseVector<T>::operator () (const unsigned int i)
 {
-  libmesh_assert (i < _val.size());
+  libmesh_assert_less (i, _val.size());
 
   return _val[i];
 }
@@ -378,7 +378,7 @@ typename boostcopy::enable_if_c<
 DenseVector<T>::add (const T2 factor,
 		     const DenseVector<T3>& vec)
 {
-  libmesh_assert (this->size() == vec.size());
+  libmesh_assert_equal_to (this->size(), vec.size());
 
   for (unsigned int i=0; i<this->size(); i++)
     (*this)(i) += factor*vec(i);
@@ -389,7 +389,7 @@ template<typename T2>
 inline
 Number DenseVector<T>::dot (const DenseVector<T2>& vec) const
 {
-  libmesh_assert(this->size() == vec.size());
+  libmesh_assert_equal_to (this->size(), vec.size());
 
   Number val = 0.;
 
@@ -404,7 +404,7 @@ template<typename T2>
 inline
 bool DenseVector<T>::operator== (const DenseVector<T2>& vec) const
 {
-  libmesh_assert (this->size() == vec.size());
+  libmesh_assert_equal_to (this->size(), vec.size());
 
   for (unsigned int i=0; i<this->size(); i++)
     if ((*this)(i) != vec(i))
@@ -420,7 +420,7 @@ template<typename T2>
 inline
 bool DenseVector<T>::operator!= (const DenseVector<T2>& vec) const
 {
-  libmesh_assert (this->size() == vec.size());
+  libmesh_assert_equal_to (this->size(), vec.size());
 
   for (unsigned int i=0; i<this->size(); i++)
     if ((*this)(i) != vec(i))
@@ -436,7 +436,7 @@ template<typename T2>
 inline
 DenseVector<T>& DenseVector<T>::operator+= (const DenseVector<T2>& vec)
 {
-  libmesh_assert (this->size() == vec.size());
+  libmesh_assert_equal_to (this->size(), vec.size());
 
   for (unsigned int i=0; i<this->size(); i++)
     (*this)(i) += vec(i);
@@ -451,7 +451,7 @@ template<typename T2>
 inline
 DenseVector<T>& DenseVector<T>::operator-= (const DenseVector<T2>& vec)
 {
-  libmesh_assert (this->size() == vec.size());
+  libmesh_assert_equal_to (this->size(), vec.size());
 
   for (unsigned int i=0; i<this->size(); i++)
     (*this)(i) -= vec(i);
@@ -544,7 +544,7 @@ inline
 void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
                                               DenseVector<T>& dest) const
 {
-  libmesh_assert( sub_n <= this->size() );
+  libmesh_assert_less_equal ( sub_n, this->size() );
 
   dest.resize(sub_n);
   for(unsigned int i=0; i<sub_n; i++)

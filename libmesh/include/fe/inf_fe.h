@@ -467,7 +467,7 @@ public:
    * for matrix assembly of the current element.
    */
   virtual unsigned int n_quadrature_points () const
-  { libmesh_assert (radial_qrule != NULL); return _n_total_qp; }
+  { libmesh_assert(radial_qrule); return _n_total_qp; }
 
 
 protected:

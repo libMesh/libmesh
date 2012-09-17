@@ -94,7 +94,7 @@ void EquationSystems::init ()
 {
   const unsigned int n_sys = this->n_systems();
 
-  libmesh_assert (n_sys != 0);
+  libmesh_assert_not_equal_to (n_sys, 0);
 
   // Distribute the mesh if possible
   if (libMesh::n_processors() > 1)
@@ -131,7 +131,7 @@ void EquationSystems::reinit ()
 {
   parallel_only();
 
-  libmesh_assert (this->n_systems() != 0);
+  libmesh_assert_not_equal_to (this->n_systems(), 0);
 
 #ifdef DEBUG
   // Make sure all the \p DofObject entities know how many systems
@@ -144,7 +144,7 @@ void EquationSystems::reinit ()
     for ( ; node_it != node_end; ++node_it)
       {
         Node *node = *node_it;
-        libmesh_assert(node->n_systems() == this->n_systems());
+        libmesh_assert_equal_to (node->n_systems(), this->n_systems());
       }
 
     // All the elements
@@ -154,7 +154,7 @@ void EquationSystems::reinit ()
     for ( ; elem_it != elem_end; ++elem_it)
       {
         Elem *elem = *elem_it;
-        libmesh_assert(elem->n_systems() == this->n_systems());
+        libmesh_assert_equal_to (elem->n_systems(), this->n_systems());
       }
   }
 #endif
@@ -276,7 +276,7 @@ void EquationSystems::allgather ()
 
   const unsigned int n_sys = this->n_systems();
 
-  libmesh_assert (n_sys != 0);
+  libmesh_assert_not_equal_to (n_sys, 0);
 
   // Gather the mesh
   _mesh.allgather();
@@ -501,10 +501,10 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
     unsigned int n_vars = n_scalar_vars + dim*n_vector_vars;
 
     // We'd better have at least the number of system variables
-    libmesh_assert( n_vars >= this->n_vars() );
+    libmesh_assert_greater_equal ( n_vars, this->n_vars() );
 
     // We'd better not have more than dim*n_vars (all vector variables)
-    libmesh_assert( n_vars <= dim*n_vars );
+    libmesh_assert_less_equal ( n_vars, dim*n_vars );
 
     // Here, we're assuming the number of vector components is the same
     // as the mesh dimension. Will break for mixed dimension meshes.
@@ -635,7 +635,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
 //       // Sanity check -- make sure that there are the same number
 //       // of entries in the nodal_soln as there are nodes in the
 //       // element!
-//       libmesh_assert (nodal_soln.size() == elem->n_nodes());
+//       libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 
 //       // Copy the nodal solution over into the correct place in
 //       // the global soln vector which will be returned to the user.
@@ -661,7 +661,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
   const unsigned short int one = 1;
 
   // We'd better have a contiguous node numbering
-  libmesh_assert (nn == _mesh.max_node_id());
+  libmesh_assert_equal_to (nn, _mesh.max_node_id());
 
   // allocate storage to hold
   // (number_of_nodes)*(number_of_variables) entries.
@@ -792,7 +792,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 		if (!elem->infinite())
 #endif
 		  {
-		    libmesh_assert (nodal_soln.size() == n_vec_dim*elem->n_nodes());
+		    libmesh_assert_equal_to (nodal_soln.size(), n_vec_dim*elem->n_nodes());
 
 		    for (unsigned int n=0; n<elem->n_nodes(); n++)
 		      {
@@ -844,7 +844,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
   const unsigned int ne  = _mesh.n_elem();
 
-  libmesh_assert (ne == _mesh.max_elem_id());
+  libmesh_assert_equal_to (ne, _mesh.max_elem_id());
 
   // If the names vector has entries, we will only populate the soln vector
   // with names included in that list.  Note: The names vector may be
@@ -903,7 +903,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
             dof_map.dof_indices (elem, dof_indices, var);
 
-            libmesh_assert( 1 == dof_indices.size() );
+            libmesh_assert_equal_to ( 1, dof_indices.size() );
 
             soln[offset+elem->id()] = sys_soln[dof_indices[0]];
           }
@@ -1001,7 +1001,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 		  if (!elem->infinite())
 #endif
 		    {
-		      libmesh_assert (nodal_soln.size() == elem->n_nodes());
+		      libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 
 		      for (unsigned int n=0; n<elem->n_nodes(); n++)
 			{

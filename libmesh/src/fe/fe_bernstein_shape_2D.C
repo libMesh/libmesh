@@ -52,7 +52,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 			    const unsigned int i,
 			    const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   const ElemType type = elem->type();
 
@@ -72,7 +72,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
         const Real xi  = p(0);
         const Real eta = p(1);
 
-        libmesh_assert (i < (totalorder+1u)*(totalorder+1u));
+        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
 // Example i, i0, i1 values for totalorder = 5:
 //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
@@ -124,12 +124,12 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
       // handle serendipity QUAD8 element separately
     case QUAD8:
       {
-	libmesh_assert (totalorder < 3);
+	libmesh_assert_less (totalorder, 3);
 
 	const Real xi  = p(0);
 	const Real eta = p(1);
 
-	libmesh_assert (i < 8);
+	libmesh_assert_less (i, 8);
 
 	//                                0  1  2  3  4  5  6  7  8
 	static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -146,7 +146,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
       }
 
     case TRI3:
-      libmesh_assert (totalorder<2);
+      libmesh_assert_less (totalorder, 2);
     case TRI6:
       switch (totalorder)
 	{
@@ -156,7 +156,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    const Real y=p(1);
 	    const Real r=1.-x-y;
 
-	    libmesh_assert(i<3);
+	    libmesh_assert_less (i, 3);
 
 	    switch(i)
 	      {
@@ -173,7 +173,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    const Real y=p(1);
 	    const Real r=1.-x-y;
 
-	    libmesh_assert(i<6);
+	    libmesh_assert_less (i, 6);
 
 	    switch(i)
 	      {
@@ -193,7 +193,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    const Real x=p(0);
 	    const Real y=p(1);
 	    const Real r=1.-x-y;
-	    libmesh_assert(i<10);
+	    libmesh_assert_less (i, 10);
 
 	    unsigned int shape=i;
 
@@ -229,7 +229,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    const Real r=1-x-y;
 	    unsigned int shape=i;
 
-	    libmesh_assert(i<15);
+	    libmesh_assert_less (i, 15);
 
 	    if((i==3||i== 5) && elem->point(0) > elem->point(1))shape=8-i;
 	    if((i==6||i== 8) && elem->point(1) > elem->point(2))shape=14-i;
@@ -271,7 +271,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    const Real r=1-x-y;
 	    unsigned int shape=i;
 
-	    libmesh_assert(i<21);
+	    libmesh_assert_less (i, 21);
 
 	    if((i>= 3&&i<= 6) && elem->point(0) > elem->point(1))shape=9-i;
 	    if((i>= 7&&i<=10) && elem->point(1) > elem->point(2))shape=17-i;
@@ -318,7 +318,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 	    const Real r=1-x-y;
 	    unsigned int shape=i;
 
-	    libmesh_assert(i<28);
+	    libmesh_assert_less (i, 28);
 
 	    if((i>= 3&&i<= 7) && elem->point(0) > elem->point(1))shape=10-i;
 	    if((i>= 8&&i<=12) && elem->point(1) > elem->point(2))shape=20-i;
@@ -399,7 +399,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real y=p(1);
 // 	    const Real r=1.-x-y;
 
-// 	    libmesh_assert(i<3);
+// 	    libmesh_assert_less (i, 3);
 
 // 	    switch(i)
 // 	      {
@@ -416,7 +416,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real xi  = p(0);
 // 	    const Real eta = p(1);
 
-// 	    libmesh_assert (i < 4);
+// 	    libmesh_assert_less (i, 4);
 
 // 	    //                                0  1  2  3
 // 	    static const unsigned int i0[] = {0, 1, 1, 0};
@@ -439,7 +439,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real y=p(1);
 // 	    const Real r=1.-x-y;
 
-// 	    libmesh_assert(i<6);
+// 	    libmesh_assert_less (i, 6);
 
 // 	    switch(i)
 // 	      {
@@ -459,7 +459,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real xi  = p(0);
 // 	    const Real eta = p(1);
 
-// 	    libmesh_assert (i < 8);
+// 	    libmesh_assert_less (i, 8);
 
 // 	    //                                0  1  2  3  4  5  6  7  8
 // 	    static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -482,7 +482,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real xi  = p(0);
 // 	    const Real eta = p(1);
 
-// 	    libmesh_assert (i < 9);
+// 	    libmesh_assert_less (i, 9);
 
 // 	    //                                0  1  2  3  4  5  6  7  8
 // 	    static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -504,7 +504,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real x=p(0);
 // 	    const Real y=p(1);
 // 	    const Real r=1.-x-y;
-// 	    libmesh_assert(i<10);
+// 	    libmesh_assert_less (i, 10);
 
 // 	    unsigned int shape=i;
 
@@ -541,7 +541,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    Real xi  = p(0);
 // 	    Real eta = p(1);
 
-// 	    libmesh_assert (i < 16);
+// 	    libmesh_assert_less (i, 16);
 
 // 	    //                                    0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 // 	    static const unsigned int i0_reg[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
@@ -640,7 +640,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real r=1-x-y;
 // 	    unsigned int shape=i;
 
-// 	    libmesh_assert(i<15);
+// 	    libmesh_assert_less (i, 15);
 
 // 	    if((i==3||i== 5) && elem->node(0) > elem->node(1))shape=8-i;
 // 	    if((i==6||i== 8) && elem->node(1) > elem->node(2))shape=14-i;
@@ -684,7 +684,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real xi  = p(0);
 // 	    const Real eta = p(1);
 
-// 	    libmesh_assert (i < 25);
+// 	    libmesh_assert_less (i, 25);
 
 // 	    //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 // 	    static const unsigned int i0_reg[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
@@ -718,7 +718,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real r=1-x-y;
 // 	    unsigned int shape=i;
 
-// 	    libmesh_assert(i<21);
+// 	    libmesh_assert_less (i, 21);
 
 // 	    if((i>= 3&&i<= 6) && elem->node(0) > elem->node(1))shape=9-i;
 // 	    if((i>= 7&&i<=10) && elem->node(1) > elem->node(2))shape=17-i;
@@ -767,7 +767,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real xi  = p(0);
 // 	    const Real eta = p(1);
 
-// 	    libmesh_assert (i < 36);
+// 	    libmesh_assert_less (i, 36);
 
 // 	    //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
 // 	    static const unsigned int i0_reg[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
@@ -799,7 +799,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real r=1-x-y;
 // 	    unsigned int shape=i;
 
-// 	    libmesh_assert(i<28);
+// 	    libmesh_assert_less (i, 28);
 
 // 	    if((i>= 3&&i<= 7) && elem->node(0) > elem->node(1))shape=10-i;
 // 	    if((i>= 8&&i<=12) && elem->node(1) > elem->node(2))shape=20-i;
@@ -856,7 +856,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	    const Real xi  = p(0);
 // 	    const Real eta = p(1);
 
-// 	    libmesh_assert (i < 49);
+// 	    libmesh_assert_less (i, 49);
 
 // 	    //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
 // 	    static const unsigned int i0_reg[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6};
@@ -892,7 +892,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem* elem,
 // 	      const Real xi  = p(0);
 // 	      const Real eta = p(1);
 
-// 	      libmesh_assert (i < 64);
+// 	      libmesh_assert_less (i, 64);
 
 // 	      //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
 // 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7};
@@ -973,7 +973,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 				  const unsigned int j,
 				  const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   const ElemType type = elem->type();
 
@@ -989,7 +989,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
         const Real xi  = p(0);
         const Real eta = p(1);
 
-        libmesh_assert (i < (totalorder+1u)*(totalorder+1u));
+        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
         unsigned int i0, i1;
 
@@ -1048,12 +1048,12 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
       // is handled separately.
     case QUAD8:
       {
-	libmesh_assert (totalorder < 3);
+	libmesh_assert_less (totalorder, 3);
 
 	const Real xi  = p(0);
 	const Real eta = p(1);
 
-	libmesh_assert (i < 8);
+	libmesh_assert_less (i, 8);
 
 	//                                0  1  2  3  4  5  6  7  8
 	static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -1083,7 +1083,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
       }
 
     case TRI3:
-      libmesh_assert (totalorder<2);
+      libmesh_assert_less (totalorder, 2);
     case TRI6:
       {
 	// I have been lazy here and am using finite differences
@@ -1142,8 +1142,8 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      // to compute the derivatives!
 // 	      const Real eps = 1.e-6;
 
-// 	      libmesh_assert (i < 3);
-// 	      libmesh_assert (j < 2);
+// 	      libmesh_assert_less (i, 3);
+// 	      libmesh_assert_less (j, 2);
 
 // 	      switch (j)
 // 		{
@@ -1181,7 +1181,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      const Real xi  = p(0);
 // 	      const Real eta = p(1);
 
-// 	      libmesh_assert (i < 4);
+// 	      libmesh_assert_less (i, 4);
 
 // 	      //                                0  1  2  3
 // 	      static const unsigned int i0[] = {0, 1, 1, 0};
@@ -1221,8 +1221,8 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      // to compute the derivatives!
 // 	      const Real eps = 1.e-6;
 
-// 	      libmesh_assert (i < 6);
-// 	      libmesh_assert (j < 2);
+// 	      libmesh_assert_less (i, 6);
+// 	      libmesh_assert_less (j, 2);
 
 // 	      switch (j)
 // 		{
@@ -1258,7 +1258,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      const Real xi  = p(0);
 // 	      const Real eta = p(1);
 
-// 	      libmesh_assert (i < 8);
+// 	      libmesh_assert_less (i, 8);
 
 // 	      //                                0  1  2  3  4  5  6  7  8
 // 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -1295,7 +1295,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      const Real xi  = p(0);
 // 	      const Real eta = p(1);
 
-// 	      libmesh_assert (i < 9);
+// 	      libmesh_assert_less (i, 9);
 
 // 	      //                                0  1  2  3  4  5  6  7  8
 // 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -1336,8 +1336,8 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      // to compute the derivatives!
 // 	      const Real eps = 1.e-6;
 
-// 	      libmesh_assert (i < 10);
-// 	      libmesh_assert (j < 2);
+// 	      libmesh_assert_less (i, 10);
+// 	      libmesh_assert_less (j, 2);
 
 
 // 	      unsigned int shape=i;
@@ -1387,7 +1387,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      const Real xi  = p(0);
 // 	      const Real eta = p(1);
 
-// 	      libmesh_assert (i < 16);
+// 	      libmesh_assert_less (i, 16);
 
 // 		  //                                    0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
 // 	      static const unsigned int i0_reg[] = {0,  1,  1,  0,  2,  3,  1,  1,  2,  3,  0,  0,  2,  3,  2,  3};
@@ -1438,8 +1438,8 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      // to compute the derivatives!
 // 	      const Real eps = 1.e-6;
 
-// 	      libmesh_assert (i < 15);
-// 	      libmesh_assert (j < 2);
+// 	      libmesh_assert_less (i, 15);
+// 	      libmesh_assert_less (j, 2);
 
 // 	      unsigned int shape=i;
 
@@ -1481,7 +1481,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      const Real xi  = p(0);
 // 	      const Real eta = p(1);
 
-// 	      libmesh_assert (i < 25);
+// 	      libmesh_assert_less (i, 25);
 
 // 	      //                                      0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 // 	      	static const unsigned int i0_reg[] = {0, 1, 1, 0, 2, 3, 4, 1, 1, 1, 2, 3, 4, 0, 0, 0, 2, 3, 4, 2, 3, 4, 2, 3, 4};
@@ -1534,8 +1534,8 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      // to compute the derivatives!
 // 	      const Real eps = 1.e-6;
 
-// 	      libmesh_assert (i < 21);
-// 	      libmesh_assert (j < 2);
+// 	      libmesh_assert_less (i, 21);
+// 	      libmesh_assert_less (j, 2);
 
 // 	      unsigned int shape=i;
 
@@ -1576,7 +1576,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      const Real xi  = p(0);
 // 	      const Real eta = p(1);
 
-// 	      libmesh_assert (i < 36);
+// 	      libmesh_assert_less (i, 36);
 
 // 	      //                                          0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
 // 		    static const unsigned int i0_reg[] = {0, 1, 1, 0, 2, 3, 4, 5, 1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5};
@@ -1628,8 +1628,8 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      // to compute the derivatives!
 // 	      const Real eps = 1.e-6;
 
-// 	      libmesh_assert (i < 28);
-// 	      libmesh_assert (j < 2);
+// 	      libmesh_assert_less (i, 28);
+// 	      libmesh_assert_less (j, 2);
 
 // 	      unsigned int shape=i;
 
@@ -1670,7 +1670,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 	      const Real xi  = p(0);
 // 	      const Real eta = p(1);
 
-// 	      libmesh_assert (i < 49);
+// 	      libmesh_assert_less (i, 49);
 
 // 	      //                                    0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
 // 	      static const unsigned int i0_reg[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6, 2, 3, 4, 5, 6};
@@ -1720,7 +1720,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem* elem,
 // 		const Real xi  = p(0);
 // 		const Real eta = p(1);
 
-// 		libmesh_assert (i < 64);
+// 		libmesh_assert_less (i, 64);
 
 // 		//                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
 // 		static const unsigned int i0[] = {0, 1, 1, 0, 2, 3, 4, 5, 6, 7, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7};

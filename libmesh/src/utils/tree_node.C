@@ -34,8 +34,8 @@ namespace libMesh
 template <unsigned int N>
 void TreeNode<N>::insert (const Node* nd)
 {
-  libmesh_assert (nd != NULL);
-  libmesh_assert (nd->id() < mesh.n_nodes());
+  libmesh_assert(nd);
+  libmesh_assert_less (nd->id(), mesh.n_nodes());
 
   // Return if we don't bound the node
   if (!this->bounds_node(nd))
@@ -55,7 +55,7 @@ void TreeNode<N>::insert (const Node* nd)
   // our children
   else
     {
-      libmesh_assert (children.size() == N);
+      libmesh_assert_equal_to (children.size(), N);
 
       for (unsigned int c=0; c<N; c++)
 	children[c]->insert (nd);
@@ -67,7 +67,7 @@ void TreeNode<N>::insert (const Node* nd)
 template <unsigned int N>
 void TreeNode<N>::insert (const Elem* elem)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   /* We first want to find the corners of the cuboid surrounding the
      cell.  */
@@ -125,7 +125,7 @@ void TreeNode<N>::insert (const Elem* elem)
   // our children
   else
     {
-      libmesh_assert (children.size() == N);
+      libmesh_assert_equal_to (children.size(), N);
 
       for (unsigned int c=0; c<N; c++)
 	children[c]->insert (elem);
@@ -167,8 +167,8 @@ void TreeNode<N>::refine ()
   std::vector<const Node*>().swap(nodes);
   std::vector<const Elem*>().swap(elements);
 
-  libmesh_assert (nodes.capacity()    == 0);
-  libmesh_assert (elements.capacity() == 0);
+  libmesh_assert_equal_to (nodes.capacity(), 0);
+  libmesh_assert_equal_to (elements.capacity(), 0);
 }
 
 
@@ -471,8 +471,8 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
 	  // with the connected elements
 	  const unsigned int node_number = nodes[n]->id();
 
-	  libmesh_assert (node_number < mesh.n_nodes());
-	  libmesh_assert (node_number < nodes_to_elem.size());
+	  libmesh_assert_less (node_number, mesh.n_nodes());
+	  libmesh_assert_less (node_number, nodes_to_elem.size());
 
 	  for (unsigned int e=0; e<nodes_to_elem[node_number].size(); e++)
 	    elements_set.insert(nodes_to_elem[node_number][e]);

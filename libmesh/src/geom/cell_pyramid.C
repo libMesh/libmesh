@@ -32,7 +32,7 @@ namespace libMesh
 // Pyramid class member functions
 unsigned int Pyramid::key (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
 
   switch (s)
@@ -83,7 +83,7 @@ unsigned int Pyramid::key (const unsigned int s) const
 
 AutoPtr<Elem> Pyramid::side (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
 
 
@@ -165,8 +165,8 @@ AutoPtr<Elem> Pyramid::side (const unsigned int i) const
 bool Pyramid::is_child_on_side(const unsigned int c,
                              const unsigned int s) const
 {
-  libmesh_assert (c < this->n_children());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (c, this->n_children());
+  libmesh_assert_less (s, this->n_sides());
 
   for (unsigned int i = 0; i != 4; ++i)
     if (Pyramid5::side_nodes_map[s][i] == c)
@@ -179,8 +179,8 @@ bool Pyramid::is_child_on_side(const unsigned int c,
 bool Pyramid::is_edge_on_side(const unsigned int e,
                               const unsigned int s) const
 {
-  libmesh_assert (e < this->n_edges());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (e, this->n_edges());
+  libmesh_assert_less (s, this->n_sides());
 
   return (is_node_on_side(Pyramid5::edge_nodes_map[e][0],s) &&
           is_node_on_side(Pyramid5::edge_nodes_map[e][1],s));

@@ -67,15 +67,15 @@ bool Edge4::is_face(const unsigned int ) const
 bool Edge4::is_node_on_side(const unsigned int n,
                             const unsigned int s) const
 {
-  libmesh_assert(s < 2);
-  libmesh_assert(n < 4);
+  libmesh_assert_less (s, 2);
+  libmesh_assert_less (n, 4);
   return (s == n);
 }
 
 bool Edge4::is_node_on_edge(const unsigned int,
                             const unsigned int libmesh_dbg_var(e)) const
 {
-  libmesh_assert(e == 0);
+  libmesh_assert_equal_to (e, 0);
   return true;
 }
 
@@ -98,9 +98,9 @@ void Edge4::connectivity(const unsigned int sc,
 			 const IOPackage iop,
 			 std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (sc <= 2);
-  libmesh_assert (sc < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert_less_equal (sc, 2);
+  libmesh_assert_less (sc, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
   // Create storage
   conn.resize(2);

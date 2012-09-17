@@ -596,7 +596,7 @@ template<typename OutputShape>
 inline
 void FEMContext::get_element_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
 {
-  libmesh_assert( var < _element_fe_var.size() );
+  libmesh_assert_less ( var, _element_fe_var.size() );
   fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _element_fe_var[var] );
 }
 
@@ -604,7 +604,7 @@ template<typename OutputShape>
 inline
 void FEMContext::get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
 {
-  libmesh_assert( var < _side_fe_var.size() );
+  libmesh_assert_less ( var, _side_fe_var.size() );
   fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _side_fe_var[var] );
 }
 
@@ -612,7 +612,7 @@ template<typename OutputShape>
 inline
 void FEMContext::get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
 { 
-  libmesh_assert( var < _edge_fe_var.size() );
+  libmesh_assert_less ( var, _edge_fe_var.size() );
   fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _edge_fe_var[var] );
 }
 

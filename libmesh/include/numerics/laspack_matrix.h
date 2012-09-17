@@ -375,14 +375,14 @@ void LaspackMatrix<T>::zero ()
       const unsigned int len = (_row_start[row+1] - _row_start[row]);
 
       // Make sure we agree on the row length
-      libmesh_assert (len == Q_GetLen(&_QMat, row+1));
+      libmesh_assert_equal_to (len, Q_GetLen(&_QMat, row+1));
 
       for (unsigned int l=0; l<len; l++)
 	{
 	  const unsigned int j = *(r_start + l);
 
 	  // Make sure the data structures are working
-	  libmesh_assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
+	  libmesh_assert_equal_to ((j+1), Q_GetPos (&_QMat, row+1, l));
 
 	  Q_SetEntry (&_QMat, row+1, l, j+1, 0.);
 	}
@@ -438,14 +438,14 @@ void LaspackMatrix<T>::set (const unsigned int i,
 			    const T value)
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (i < this->m());
-  libmesh_assert (j < this->n());
+  libmesh_assert_less (i, this->m());
+  libmesh_assert_less (j, this->n());
 
   const unsigned int position = this->pos(i,j);
 
   // Sanity check
-  libmesh_assert (*(_row_start[i]+position) == j);
-  libmesh_assert ((j+1) == Q_GetPos (&_QMat, i+1, position));
+  libmesh_assert_equal_to (*(_row_start[i]+position), j);
+  libmesh_assert_equal_to ((j+1), Q_GetPos (&_QMat, i+1, position));
 
   Q_SetEntry (&_QMat, i+1, position, j+1, value);
 }
@@ -459,13 +459,13 @@ void LaspackMatrix<T>::add (const unsigned int i,
 			    const T value)
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (i < this->m());
-  libmesh_assert (j < this->n());
+  libmesh_assert_less (i, this->m());
+  libmesh_assert_less (j, this->n());
 
   const unsigned int position = this->pos(i,j);
 
   // Sanity check
-  libmesh_assert (*(_row_start[i]+position) == j);
+  libmesh_assert_equal_to (*(_row_start[i]+position), j);
 
   Q_AddVal (&_QMat, i+1, position, value);
 }
@@ -486,13 +486,13 @@ template <typename T>
 void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (this->m() == X_in.m());
-  libmesh_assert (this->n() == X_in.n());
+  libmesh_assert_equal_to (this->m(), X_in.m());
+  libmesh_assert_equal_to (this->n(), X_in.n());
 
   LaspackMatrix<T>* X = libmesh_cast_ptr<LaspackMatrix<T>*> (&X_in);
   _LPNumber         a = static_cast<_LPNumber>          (a_in);
 
-  libmesh_assert(X != NULL);
+  libmesh_assert(X);
 
   // loops taken from LaspackMatrix<T>::zero ()
 
@@ -506,9 +506,9 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
       const unsigned int len = (_row_start[row+1] - _row_start[row]);
 
       // Make sure we agree on the row length
-      libmesh_assert (len == Q_GetLen(&_QMat, row+1));
+      libmesh_assert_equal_to (len, Q_GetLen(&_QMat, row+1));
       // compare matrix sparsity structures
-      libmesh_assert (len == Q_GetLen(&(X->_QMat), row+1));
+      libmesh_assert_equal_to (len, Q_GetLen(&(X->_QMat), row+1));
 
 
       for (unsigned int l=0; l<len; l++)
@@ -516,7 +516,7 @@ void LaspackMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 	  const unsigned int j = *(r_start + l);
 
 	  // Make sure the data structures are working
-	  libmesh_assert ((j+1) == Q_GetPos (&_QMat, row+1, l));
+	  libmesh_assert_equal_to ((j+1), Q_GetPos (&_QMat, row+1, l));
 
 	  const _LPNumber value = a * Q_GetEl(const_cast<QMatrix*>(&(X->_QMat)), row+1, j+1);
 	  Q_AddVal   (&_QMat, row+1, l, value);
@@ -533,8 +533,8 @@ T LaspackMatrix<T>::operator () (const unsigned int i,
 				 const unsigned int j) const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (i < this->m());
-  libmesh_assert (j < this->n());
+  libmesh_assert_less (i, this->m());
+  libmesh_assert_less (j, this->n());
 
   return Q_GetEl (const_cast<QMatrix*>(&_QMat), i+1, j+1);
 }
@@ -546,9 +546,9 @@ inline
 unsigned int LaspackMatrix<T>::pos (const unsigned int i,
 				    const unsigned int j) const
 {
-  libmesh_assert (i < this->m());
-  libmesh_assert (j < this->n());
-  libmesh_assert (i+1 < _row_start.size());
+  libmesh_assert_less (i, this->m());
+  libmesh_assert_less (j, this->n());
+  libmesh_assert_less (i+1, _row_start.size());
   libmesh_assert (_row_start.back() == _csr.end());
 
   // note this requires the _csr to be

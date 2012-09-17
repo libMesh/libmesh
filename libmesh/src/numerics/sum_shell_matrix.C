@@ -31,7 +31,7 @@ unsigned int SumShellMatrix<T>::m () const
   const unsigned int result = matrices[0]->m();
   for(unsigned int i=matrices.size(); i-->1; )
     {
-      libmesh_assert(matrices[i]->m()==result);
+      libmesh_assert_equal_to (matrices[i]->m(), result);
     }
   return result;
 }
@@ -45,7 +45,7 @@ unsigned int SumShellMatrix<T>::n () const
   const unsigned int result = matrices[0]->n();
   for(unsigned int i=matrices.size(); i-->1; )
     {
-      libmesh_assert(matrices[i]->n()==result);
+      libmesh_assert_equal_to (matrices[i]->n(), result);
     }
   return result;
 }

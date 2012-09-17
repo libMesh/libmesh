@@ -83,14 +83,14 @@ void QBase::scale(std::pair<Real, Real> old_range,
 		  std::pair<Real, Real> new_range)
 {
   // Make sure we are in 1D
-  libmesh_assert(_dim == 1);
+  libmesh_assert_equal_to (_dim, 1);
 
   // Make sure that we have sane ranges
-  libmesh_assert(new_range.second > new_range.first);
-  libmesh_assert(old_range.second > old_range.first);
+  libmesh_assert_greater (new_range.second, new_range.first);
+  libmesh_assert_greater (old_range.second, old_range.first);
 
   // Make sure there are some points
-  libmesh_assert(_points.size() > 0);
+  libmesh_assert_greater (_points.size(), 0);
 
   // We're mapping from old_range -> new_range
   for (unsigned int i=0; i<_points.size(); i++)

@@ -184,9 +184,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       // Build a 0D point
     case 0:
       {
-	libmesh_assert (nx == 0);
-	libmesh_assert (ny == 0);
-	libmesh_assert (nz == 0);
+	libmesh_assert_equal_to (nx, 0);
+	libmesh_assert_equal_to (ny, 0);
+	libmesh_assert_equal_to (nz, 0);
 
         libmesh_assert (type == INVALID_ELEM || type == NODEELEM);
 
@@ -204,10 +204,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       // Build a 1D line
     case 1:
       {
-	libmesh_assert (nx != 0);
-	libmesh_assert (ny == 0);
-	libmesh_assert (nz == 0);
-	libmesh_assert (xmin < xmax);
+	libmesh_assert_not_equal_to (nx, 0);
+	libmesh_assert_equal_to (ny, 0);
+	libmesh_assert_equal_to (nz, 0);
+	libmesh_assert_less (xmin, xmax);
 
         // Reserve elements
         switch (type)
@@ -475,11 +475,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       // Build a 2D quadrilateral
     case 2:
       {
-	libmesh_assert (nx != 0);
-	libmesh_assert (ny != 0);
-	libmesh_assert (nz == 0);
-	libmesh_assert (xmin < xmax);
-	libmesh_assert (ymin < ymax);
+	libmesh_assert_not_equal_to (nx, 0);
+	libmesh_assert_not_equal_to (ny, 0);
+	libmesh_assert_equal_to (nz, 0);
+	libmesh_assert_less (xmin, xmax);
+	libmesh_assert_less (ymin, ymax);
 
 	// Reserve elements.  The TRI3 and TRI6 meshes
 	// have twice as many elements...
@@ -832,12 +832,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
       // Build a 3D mesh using hexahedral or prismatic elements.
     case 3:
       {
-	libmesh_assert (nx != 0);
-	libmesh_assert (ny != 0);
-	libmesh_assert (nz != 0);
-	libmesh_assert (xmin < xmax);
-	libmesh_assert (ymin < ymax);
-	libmesh_assert (zmin < zmax);
+	libmesh_assert_not_equal_to (nx, 0);
+	libmesh_assert_not_equal_to (ny, 0);
+	libmesh_assert_not_equal_to (nz, 0);
+	libmesh_assert_less (xmin, xmax);
+	libmesh_assert_less (ymin, ymax);
+	libmesh_assert_less (zmin, zmax);
 
 
 	// Reserve elements.  Meshes with prismatic elements require
@@ -1461,7 +1461,7 @@ void MeshTools::Generation::build_point (UnstructuredMesh& mesh,
 {
     // This method only makes sense in 0D!
     // But we now just turn a non-0D mesh into a 0D mesh
-    //libmesh_assert(mesh.mesh_dimension() == 1);
+    //libmesh_assert_equal_to (mesh.mesh_dimension(), 1);
 
     build_cube(mesh,
                0, 0, 0,
@@ -1481,7 +1481,7 @@ void MeshTools::Generation::build_line (UnstructuredMesh& mesh,
 {
     // This method only makes sense in 1D!
     // But we now just turn a non-1D mesh into a 1D mesh
-    //libmesh_assert(mesh.mesh_dimension() == 1);
+    //libmesh_assert_equal_to (mesh.mesh_dimension(), 1);
 
     build_cube(mesh,
                nx, 0, 0,
@@ -1504,7 +1504,7 @@ void MeshTools::Generation::build_square (UnstructuredMesh& mesh,
 {
   // This method only makes sense in 2D!
   // But we now just turn a non-2D mesh into a 2D mesh
-  //libmesh_assert (mesh.mesh_dimension() == 2);
+  //libmesh_assert_equal_to (mesh.mesh_dimension(), 2);
 
   // Call the build_cube() member to actually do the work for us.
   build_cube (mesh,
@@ -1541,8 +1541,8 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 					  const unsigned int nr,
 					  const ElemType type)
 {
-  libmesh_assert (rad > 0.);
-  //libmesh_assert (nr > 0); // must refine at least once otherwise will end up with a square/cube
+  libmesh_assert_greater (rad, 0.);
+  //libmesh_assert_greater (nr, 0); // must refine at least once otherwise will end up with a square/cube
 
   START_LOG("build_sphere()", "MeshTools::Generation");
 
@@ -1982,7 +1982,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
       const ElemType etype = elem->type();
 
       // build_extrusion currently only works on coarse meshes
-      libmesh_assert (elem->parent() == NULL);
+      libmesh_assert (!elem->parent());
 
       // We need a map from low-D to high-D sides for boundary id
       // setting
@@ -2144,10 +2144,10 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
 						  const std::vector<TriangleInterface::Hole*>* holes)
 {
   // Check for reasonable size
-  libmesh_assert (nx >= 1); // need at least 1 element in x-direction
-  libmesh_assert (ny >= 1); // need at least 1 element in y-direction
-  libmesh_assert (xmin < xmax);
-  libmesh_assert (ymin < ymax);
+  libmesh_assert_greater_equal (nx, 1); // need at least 1 element in x-direction
+  libmesh_assert_greater_equal (ny, 1); // need at least 1 element in y-direction
+  libmesh_assert_less (xmin, xmax);
+  libmesh_assert_less (ymin, ymax);
 
   // Clear out any data which may have been in the Mesh
   mesh.clear();
@@ -2176,7 +2176,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh& mesh,
     mesh.add_point(Point(xmin,  ymax - p*delta_y));
 
   // Be sure we added as many points as we thought we did
-  libmesh_assert (mesh.n_nodes() == 2*(nx+ny));
+  libmesh_assert_equal_to (mesh.n_nodes(), 2*(nx+ny));
 
   // Construct the Triangle Interface object
   TriangleInterface t(mesh);

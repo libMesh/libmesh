@@ -328,7 +328,7 @@ void assemble_poisson(EquationSystems& es,
 {
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert (system_name == "Poisson");
+  libmesh_assert_equal_to (system_name, "Poisson");
 
 
   // Declare a performance log.  Give it a descriptive

@@ -80,7 +80,7 @@ namespace libMesh
 
   Point TriangleInterface::ArbitraryHole::point(const unsigned int n) const
     {
-      libmesh_assert (n < _points.size());
+      libmesh_assert_less (n, _points.size());
       return _points[n];
     }
 

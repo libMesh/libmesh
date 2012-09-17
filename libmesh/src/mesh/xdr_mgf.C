@@ -213,7 +213,7 @@ void XdrMGF::init (XdrMGF::XdrIO_TYPE t, const char* fn, const char*, int)
 	// further below is ok...
 	std::string buf_buf;
 	std::getline (mp_in, buf_buf, '\n');
-	libmesh_assert (buf_buf.size() <= bufLen);
+	libmesh_assert_less_equal (buf_buf.size(), bufLen);
 
 	buf_buf.copy (buf, std::string::npos);
 #else

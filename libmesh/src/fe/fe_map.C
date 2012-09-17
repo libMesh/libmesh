@@ -309,7 +309,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 				     const Elem* elem,
 				     unsigned int p)
 {
-  libmesh_assert (elem  != NULL);
+  libmesh_assert(elem);
 
   switch (dim)
     {
@@ -707,7 +707,7 @@ void FEMap::compute_affine_map( const unsigned int dim,
    // Start logging the map computation.
   START_LOG("compute_affine_map()", "FEMap");
 
-  libmesh_assert (elem  != NULL);
+  libmesh_assert(elem);
 
   const unsigned int        n_qp = qw.size();
 
@@ -781,7 +781,7 @@ void FEMap::compute_map(const unsigned int dim,
    // Start logging the map computation.
   START_LOG("compute_map()", "FEMap");
 
-  libmesh_assert (elem  != NULL);
+  libmesh_assert(elem);
 
   const unsigned int        n_qp = qw.size();
 
@@ -819,8 +819,8 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      const Real tolerance,
 			      const bool secure)
 {
-  libmesh_assert (elem != NULL);
-  libmesh_assert (tolerance >= 0.);
+  libmesh_assert(elem);
+  libmesh_assert_greater_equal (tolerance, 0.);
 
 
   // Start logging the map inversion.
@@ -906,7 +906,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    const Real G = dxi*dxi;
 
 	    if (secure)
-	      libmesh_assert (G > 0.);
+	      libmesh_assert_greater (G, 0.);
 
 	    const Real Ginv = 1./G;
 
@@ -917,7 +917,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
             // No master elements have radius > 4, but sometimes we
             // can take a step that big while still converging
 	    // if (secure)
-	      // libmesh_assert (dp.size() < max_step_length);
+	      // libmesh_assert_less (dp.size(), max_step_length);
 
 	    break;
 	  }
@@ -959,7 +959,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 	    const Real det = (G11*G22 - G12*G21);
 
 	    if (secure)
-	      libmesh_assert (det != 0.);
+	      libmesh_assert_not_equal_to (det, 0.);
 
 	    const Real inv_det = 1./det;
 
@@ -980,7 +980,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
             // No master elements have radius > 4, but sometimes we
             // can take a step that big while still converging
 	    // if (secure)
-	      // libmesh_assert (dp.size() < max_step_length);
+	      // libmesh_assert_less (dp.size(), max_step_length);
 
 	    break;
 	  }
@@ -1023,7 +1023,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
 			      J13*(J21*J32 - J22*J31));
 
 	    if (secure)
-	      libmesh_assert (det != 0.);
+	      libmesh_assert_not_equal_to (det, 0.);
 
 	    const Real inv_det = 1./det;
 
@@ -1055,7 +1055,7 @@ Point FE<Dim,T>::inverse_map (const Elem* elem,
             // No master elements have radius > 4, but sometimes we
             // can take a step that big while still converging
 	    // if (secure)
-	      // libmesh_assert (dp.size() < max_step_length);
+	      // libmesh_assert_less (dp.size(), max_step_length);
 
 	    break;
 	  }
@@ -1230,7 +1230,7 @@ template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map (const Elem* elem,
 		      const Point& reference_point)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   Point p;
 
@@ -1256,7 +1256,7 @@ template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_xi (const Elem* elem,
 			 const Point& reference_point)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   Point p;
 
@@ -1282,7 +1282,7 @@ template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_eta (const Elem* elem,
 			  const Point& reference_point)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   Point p;
 
@@ -1308,7 +1308,7 @@ template <unsigned int Dim, FEFamily T>
 Point FE<Dim,T>::map_zeta (const Elem* elem,
 			   const Point& reference_point)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   Point p;
 
