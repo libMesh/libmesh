@@ -55,7 +55,7 @@ run: $(target)
 	@echo "* Running " $(LIBMESH_RUN) $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) -ksp_type cg -pc_type icc
+	@$(LIBMESH_RUN) $(target) -ksp_type cg -pc_type bjacobi -sub_pc_type icc
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running " $(LIBMESH_RUN) $(target)
