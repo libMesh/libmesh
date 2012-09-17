@@ -338,8 +338,8 @@ void FEMSystem::set_mesh_system(System* sys)
 
   // For the foreseeable future we'll assume that we keep these
   // Systems in the same EquationSystems
-  libmesh_assert(&this->get_equation_systems() ==
-                 &sys->get_equation_systems());
+  libmesh_assert_equal_to (&this->get_equation_systems(),
+                           &sys->get_equation_systems());
 
   // And for the immediate future this code may not even work
   libmesh_experimental();

@@ -122,7 +122,7 @@ template <typename KeyType>
 inline
 unsigned int Histogram<KeyType>::local_bin_size (const unsigned int bin) const
 {
-  libmesh_assert ((bin+1) < bin_iters.size());
+  libmesh_assert_less ((bin+1), bin_iters.size());
 
   // The number of entries in the bin (locally)
   return std::distance (bin_iters[bin], bin_iters[bin+1]);
@@ -134,7 +134,7 @@ template <typename KeyType>
 inline
 unsigned int Histogram<KeyType>::global_bin_size (const unsigned int bin) const
 {
-  libmesh_assert (bin < hist.size());
+  libmesh_assert_less (bin, hist.size());
 
   // The number of entries in the bin (globally)
   return hist[bin];
@@ -146,7 +146,7 @@ template <typename KeyType>
 inline
 double Histogram<KeyType>::lower_bound (const unsigned int bin) const
 {
-  libmesh_assert ((bin+1) < bin_bounds.size());
+  libmesh_assert_less ((bin+1), bin_bounds.size());
 
   return bin_bounds[bin];
 }
@@ -157,7 +157,7 @@ template <typename KeyType>
 inline
 double Histogram<KeyType>::upper_bound (const unsigned int bin) const
 {
-  libmesh_assert ((bin+1) < bin_bounds.size());
+  libmesh_assert_less ((bin+1), bin_bounds.size());
 
   return bin_bounds[bin+1];
 }

@@ -113,7 +113,7 @@ Node* MeshRefinement::add_point (const Point& p,
   // processor_id
   node = _mesh.add_point (p, DofObject::invalid_id, processor_id);
 
-  libmesh_assert (node != NULL);
+  libmesh_assert(node);
 
   // Add the node to the map.
   _new_nodes_map.insert(*node);
@@ -127,7 +127,7 @@ Node* MeshRefinement::add_point (const Point& p,
 
 Elem* MeshRefinement::add_elem (Elem* elem)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
 
 //   // If the unused_elements has any iterators from
@@ -168,7 +168,7 @@ void MeshRefinement::create_parent_error_vector
 #ifdef DEBUG
   for (unsigned int i=0; i != error_per_cell.size(); ++i)
     {
-      libmesh_assert(error_per_cell[i] >= 0);
+      libmesh_assert_greater_equal (error_per_cell[i], 0);
   // isnan() isn't standard C++ yet
   #ifdef isnan
       libmesh_assert(!isnan(error_per_cell[i]));
@@ -204,7 +204,7 @@ void MeshRefinement::create_parent_error_vector
           if (parent)
             {
               const unsigned int parentid  = parent->id();
-              libmesh_assert (parentid < error_per_parent.size());
+              libmesh_assert_less (parentid, error_per_parent.size());
               error_per_parent[parentid] = -1.0;
             }
         }
@@ -238,7 +238,7 @@ void MeshRefinement::create_parent_error_vector
       if (parent)
         {
           const unsigned int parentid  = parent->id();
-          libmesh_assert (parentid < error_per_parent.size());
+          libmesh_assert_less (parentid, error_per_parent.size());
 
 	  // If the parent has grandchildren we won't be able to
 	  // coarsen it, so forget it.  Otherwise, add this child's
@@ -518,8 +518,8 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
                min_satisfied = satisfied;
           Parallel::max(max_satisfied);
           Parallel::min(min_satisfied);
-          libmesh_assert (satisfied == max_satisfied);
-          libmesh_assert (satisfied == min_satisfied);
+          libmesh_assert_equal_to (satisfied, max_satisfied);
+          libmesh_assert_equal_to (satisfied, min_satisfied);
 #endif
         }
       while (!satisfied);
@@ -672,8 +672,8 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
                min_satisfied = satisfied;
           Parallel::max(max_satisfied);
           Parallel::min(min_satisfied);
-          libmesh_assert (satisfied == max_satisfied);
-          libmesh_assert (satisfied == min_satisfied);
+          libmesh_assert_equal_to (satisfied, max_satisfied);
+          libmesh_assert_equal_to (satisfied, min_satisfied);
 #endif
         }
       while (!satisfied);
@@ -786,8 +786,8 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
                min_satisfied = satisfied;
           Parallel::max(max_satisfied);
           Parallel::min(min_satisfied);
-          libmesh_assert (satisfied == max_satisfied);
-          libmesh_assert (satisfied == min_satisfied);
+          libmesh_assert_equal_to (satisfied, max_satisfied);
+          libmesh_assert_equal_to (satisfied, min_satisfied);
 #endif
         }
       while (!satisfied);
@@ -1434,8 +1434,8 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 			              {
                                         // We should already be level one
                                         // compatible
-                                        libmesh_assert(subneighbor->p_level() + 2u >
-                                                       my_p_level);
+                                        libmesh_assert_greater (subneighbor->p_level() + 2u,
+                                                               my_p_level);
 			                subneighbor->set_p_refinement_flag(Elem::REFINE);
 			                level_one_satisfied = false;
 			                compatible_with_coarsening = false;
@@ -1496,7 +1496,7 @@ bool MeshRefinement::_coarsen_elements ()
       Elem* elem = *it;
 
       // Not necessary when using elem_iterator
-      // libmesh_assert (elem != NULL);
+      // libmesh_assert(elem);
 
       // active elements flagged for coarsening will
       // no longer be deleted until MeshRefinement::contract()
@@ -1504,7 +1504,7 @@ bool MeshRefinement::_coarsen_elements ()
 	{
 	  // Huh?  no level-0 element should be active
 	  // and flagged for coarsening.
-	  libmesh_assert (elem->level() != 0);
+	  libmesh_assert_not_equal_to (elem->level(), 0);
 
 	  // Remove this element from any neighbor
 	  // lists that point to it.

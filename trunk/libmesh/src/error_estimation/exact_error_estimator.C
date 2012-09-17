@@ -47,7 +47,7 @@ void ExactErrorEstimator::attach_exact_value (Number fptr(const Point& p,
                                                           const std::string& sys_name,
                                                           const std::string& unknown_name))
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
   _exact_value = fptr;
 
   // We're not using a fine grid solution
@@ -93,7 +93,7 @@ void ExactErrorEstimator::attach_exact_deriv (Gradient gptr(const Point& p,
                                                             const std::string& sys_name,
                                                             const std::string& unknown_name))
 {
-  libmesh_assert (gptr != NULL);
+  libmesh_assert(gptr);
   _exact_deriv = gptr;
 
   // We're not using a fine grid solution
@@ -141,7 +141,7 @@ void ExactErrorEstimator::attach_exact_hessian (Tensor hptr(const Point& p,
                                                             const std::string& sys_name,
                                                             const std::string& unknown_name))
 {
-  libmesh_assert (hptr != NULL);
+  libmesh_assert(hptr);
   _exact_hessian = hptr;
 
   // We're not using a fine grid solution
@@ -184,7 +184,7 @@ void ExactErrorEstimator::attach_exact_hessian (unsigned int sys_num,
 
 void ExactErrorEstimator::attach_reference_solution (EquationSystems* es_fine)
 {
-  libmesh_assert (es_fine != NULL);
+  libmesh_assert(es_fine);
   _equation_systems_fine = es_fine;
 
   // If we're using a fine grid solution, we're not using exact value
@@ -394,7 +394,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
       if (error_per_cell[i] != 0.)
 	{
-	  libmesh_assert (error_per_cell[i] > 0.);
+	  libmesh_assert_greater (error_per_cell[i], 0.);
 	  error_per_cell[i] = std::sqrt(error_per_cell[i]);
 	}
 
@@ -540,7 +540,7 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 
     } // end qp loop
 
-  libmesh_assert (error_val >= 0.);
+  libmesh_assert_greater_equal (error_val, 0.);
 
   return error_val;
 }

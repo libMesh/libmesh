@@ -50,7 +50,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 					         bool estimate_parent_error)
 {
   // Make sure the user doesn't misunderstand what we're returning:
-  libmesh_assert(error_norm == INVALID_NORM);
+  libmesh_assert_equal_to (error_norm, INVALID_NORM);
 
   // We have to break the rules here, because we can't refine a const System
   System *system = const_cast<System *>(_system);
@@ -158,7 +158,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
         es.solve();
       else
         {
-          libmesh_assert(solution_vectors->size() == es.n_systems());
+          libmesh_assert_equal_to (solution_vectors->size(), es.n_systems());
 	  libmesh_assert(solution_vectors->find(system_list[0]) !=
 			 solution_vectors->end());
 	  const bool solve_adjoint =
@@ -360,7 +360,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
                     {
 		      L2normsq += JxW[qp] * system_i_norm.weight_sq(var) *
                                   norm_sq(val_error);
-                      libmesh_assert (L2normsq     >= 0.);
+                      libmesh_assert_greater_equal (L2normsq, 0.);
                     }
 
 
@@ -374,7 +374,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
                       H1seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
                         grad_error.size_sq();
-                      libmesh_assert (H1seminormsq >= 0.);
+                      libmesh_assert_greater_equal (H1seminormsq, 0.);
                     }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -387,7 +387,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
 		      H2seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
                         grad2_error.size_sq();
-                      libmesh_assert (H2seminormsq >= 0.);
+                      libmesh_assert_greater_equal (H2seminormsq, 0.);
                     }
 #endif
                 } // end qp loop
@@ -430,7 +430,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
     }
 
   // We should be back where we started
-  libmesh_assert(n_coarse_elem == mesh.n_elem());
+  libmesh_assert_equal_to (n_coarse_elem, mesh.n_elem());
 
   // Each processor has now computed the error contribuions
   // for its local elements.  We need to sum the vector

@@ -344,8 +344,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	  n_recv_elem_pairs++;
 	}
     }
-  libmesh_assert (n_send_node_pairs == node_send_requests.size());
-  libmesh_assert (n_send_elem_pairs == element_send_requests.size());
+  libmesh_assert_equal_to (n_send_node_pairs, node_send_requests.size());
+  libmesh_assert_equal_to (n_send_elem_pairs, element_send_requests.size());
 
   // Receive nodes.
   // We now know how many processors will be sending us nodes.
@@ -473,7 +473,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
     for (; it != it_end; ++it)
       {
 	const Elem * const elem = *it;
-	libmesh_assert (elem != NULL);
+	libmesh_assert(elem);
 
 	if (elem->on_boundary()) // denotes *any* side has a NULL neighbor
 	  {
@@ -1073,8 +1073,8 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   Parallel::verify(mesh.max_elem_id());
   const unsigned int par_max_node_id = mesh.parallel_max_node_id();
   const unsigned int par_max_elem_id = mesh.parallel_max_elem_id();
-  libmesh_assert(par_max_node_id == mesh.max_node_id());
-  libmesh_assert(par_max_elem_id == mesh.max_elem_id());
+  libmesh_assert_equal_to (par_max_node_id, mesh.max_node_id());
+  libmesh_assert_equal_to (par_max_elem_id, mesh.max_elem_id());
 #endif
 
   // FIXME - should these be "unsorted_set"s?  O(N) is O(N)...
@@ -1092,13 +1092,13 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
           unsigned int nodeid = elem->node(n);
-          libmesh_assert(nodeid < local_nodes.size());
+          libmesh_assert_less (nodeid, local_nodes.size());
           local_nodes[nodeid] = true;
         }
       while (elem)
         {
           unsigned int elemid = elem->id();
-          libmesh_assert(elemid < semilocal_elems.size());
+          libmesh_assert_less (elemid, semilocal_elems.size());
           semilocal_elems[elemid] = true;
 
 	  for (unsigned int n=0; n != elem->n_nodes(); ++n)

@@ -103,7 +103,7 @@ int XdrMESH::header(XdrMHEAD *hd)
 	    // The number of blocks (i.e. the number of element types)
 	    // for any mesh must always
 	    // be at least 1.
-	    libmesh_assert(hd->get_n_blocks() != 0);
+	    libmesh_assert_not_equal_to (hd->get_n_blocks(), 0);
 	    break;
 	  }
 
@@ -276,7 +276,7 @@ int XdrMESH::header(XdrMHEAD *hd)
               }
 
 	    // Be sure you have the right number of entries in neeb
-	    libmesh_assert (neeb.size() == (hd->get_n_blocks() * (this->get_num_levels()+1)));
+	    libmesh_assert_equal_to (neeb.size(), (hd->get_n_blocks() * (this->get_num_levels()+1)));
 
 	    break;
 	  }

@@ -55,8 +55,8 @@ namespace libMesh
 	      {
 	      case TRI6:
 		{
-		  libmesh_assert (elem_soln.size()  == 2*3);
-		  libmesh_assert (nodal_soln.size() == 2*6);
+		  libmesh_assert_equal_to (elem_soln.size(), 2*3);
+		  libmesh_assert_equal_to (nodal_soln.size(), 2*6);
 
 		  // node 0 components
 		  nodal_soln[0] = elem_soln[0];
@@ -89,12 +89,12 @@ namespace libMesh
 	      case QUAD8:
 	      case QUAD9:
 		{
-		  libmesh_assert (elem_soln.size()  == 2*4);
+		  libmesh_assert_equal_to (elem_soln.size(), 2*4);
 
 		  if (type == QUAD8)
-		    libmesh_assert (nodal_soln.size() == 2*8);
+		    libmesh_assert_equal_to (nodal_soln.size(), 2*8);
 		  else
-		    libmesh_assert (nodal_soln.size() == 2*9);
+		    libmesh_assert_equal_to (nodal_soln.size(), 2*9);
 
 		  // node 0 components
 		  nodal_soln[0] = elem_soln[0];
@@ -141,8 +141,8 @@ namespace libMesh
 
 	      case TET10:
 		{
-		  libmesh_assert (elem_soln.size()  == 3*4);
-		  libmesh_assert (nodal_soln.size() == 3*10);
+		  libmesh_assert_equal_to (elem_soln.size(), 3*4);
+		  libmesh_assert_equal_to (nodal_soln.size(), 3*10);
 
 		  // node 0 components
 		  nodal_soln[0] = elem_soln[0];
@@ -201,12 +201,12 @@ namespace libMesh
 	      case HEX20:
 	      case HEX27:
 		{
-		  libmesh_assert (elem_soln.size()  == 3*8);
+		  libmesh_assert_equal_to (elem_soln.size(), 3*8);
 
 		  if (type == HEX20)
-		    libmesh_assert (nodal_soln.size() == 3*20);
+		    libmesh_assert_equal_to (nodal_soln.size(), 3*20);
 		  else
-		    libmesh_assert (nodal_soln.size() == 3*27);
+		    libmesh_assert_equal_to (nodal_soln.size(), 3*27);
 
 		  // node 0 components
 		  nodal_soln[0]  = elem_soln[0];
@@ -358,12 +358,12 @@ namespace libMesh
 	      case PRISM15:
 	      case PRISM18:
 		{
-		  libmesh_assert (elem_soln.size()  == 3*6);
+		  libmesh_assert_equal_to (elem_soln.size(), 3*6);
 
 		  if (type == PRISM15)
-		    libmesh_assert (nodal_soln.size() == 3*15);
+		    libmesh_assert_equal_to (nodal_soln.size(), 3*15);
 		  else
-		    libmesh_assert (nodal_soln.size() == 3*18);
+		    libmesh_assert_equal_to (nodal_soln.size(), 3*18);
 
 		  // node 0 components
 		  nodal_soln[0]  = elem_soln[0];

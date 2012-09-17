@@ -655,7 +655,7 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point>&
 
 bool FEAbstract::on_reference_element(const Point& p, const ElemType t, const Real eps)
 {
-  libmesh_assert (eps >= 0.);
+  libmesh_assert_greater_equal (eps, 0.);
 
   const Real xi   = p(0);
 #if LIBMESH_DIM > 1
@@ -878,7 +878,7 @@ std::ostream& operator << (std::ostream& os, const FEAbstract& fe)
 void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
 					   const Elem* elem)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   const unsigned int Dim = elem->dim();
 
@@ -909,7 +909,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
 	  // This can't happen...  Only level-0 elements have NULL
 	  // parents, and no level-0 elements can be at a higher
 	  // level than their neighbors!
-	  libmesh_assert (parent != NULL);
+	  libmesh_assert(parent);
 
 	  const AutoPtr<Elem> my_side     (elem->build_side(s));
 	  const AutoPtr<Elem> parent_side (parent->build_side(s));
@@ -931,7 +931,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
 	       my_side_n < n_side_nodes;
 	       my_side_n++)
 	    {
-	      libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+	      libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
 	      const Node* my_node = my_nodes[my_side_n];
 
@@ -948,7 +948,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
 		   their_side_n < n_side_nodes;
 		   their_side_n++)
 		{
-	          libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
+	          libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, parent_side->type()));
 
 	          const Node* their_node = parent_nodes[their_side_n];
                   libmesh_assert(their_node);
@@ -965,8 +965,8 @@ void FEAbstract::compute_node_constraints (NodeConstraints &constraints,
 		  // in which case i better equal j.
 		  if (their_mag > 0.999)
                     {
-		      libmesh_assert (my_node == their_node);
-		      libmesh_assert (std::abs(their_value - 1.) < 0.001);
+		      libmesh_assert_equal_to (my_node, their_node);
+		      libmesh_assert_less (std::abs(their_value - 1.), 0.001);
                     }
                   else
 #endif
@@ -1028,7 +1028,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
   if (boundaries.empty())
     return;
 
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // Only constrain active elements with this method
   if (!elem->active())
@@ -1068,7 +1068,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
                 {
 	          unsigned int s_neigh =
                     mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
-                  libmesh_assert(s_neigh != libMesh::invalid_uint);
+                  libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
 
 #ifdef LIBMESH_ENABLE_AMR
                   libmesh_assert(neigh->active());
@@ -1100,7 +1100,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
 	               my_side_n < n_side_nodes;
 	               my_side_n++)
 	            {
-	              libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+	              libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
 	              const Node* my_node = my_nodes[my_side_n];
 
@@ -1129,7 +1129,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
 		           their_side_n < n_side_nodes;
 		           their_side_n++)
 		        {
-	                  libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+	                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
 
 	                  const Node* their_node = neigh_nodes[their_side_n];
 
@@ -1150,7 +1150,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
 	                         orig_side_n < n_side_nodes;
 	                         orig_side_n++)
 	                      {
-	                        libmesh_assert (orig_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+	                        libmesh_assert_less (orig_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
 	                        const Node* orig_node = my_nodes[orig_side_n];
 
@@ -1164,7 +1164,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
 	               my_side_n < n_side_nodes;
 	               my_side_n++)
 	            {
-	              libmesh_assert (my_side_n < FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
+	              libmesh_assert_less (my_side_n, FEInterface::n_dofs(Dim-1, fe_type, my_side->type()));
 
                       if (skip_constraint[my_side_n])
                         continue;
@@ -1183,7 +1183,7 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints &constraints
 		           their_side_n < n_side_nodes;
 		           their_side_n++)
 	                {
-	                  libmesh_assert (their_side_n < FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
+	                  libmesh_assert_less (their_side_n, FEInterface::n_dofs(Dim-1, fe_type, neigh_side->type()));
 
 	                  const Node* their_node = neigh_nodes[their_side_n];
                           libmesh_assert(their_node);

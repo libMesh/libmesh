@@ -56,7 +56,7 @@ namespace libMesh
 	  // Constant shape functions
 	case CONSTANT:
 	  {
-	    libmesh_assert (elem_soln.size() == 1);
+	    libmesh_assert_equal_to (elem_soln.size(), 1);
 
 	    const Number val = elem_soln[0];
 
@@ -83,11 +83,11 @@ namespace libMesh
 
 	    std::vector<Point> refspace_nodes;
 	    FEBase::get_refspace_nodes(elem_type,refspace_nodes);
-	    libmesh_assert (refspace_nodes.size() == n_nodes);
+	    libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
 
 	    for (unsigned int n=0; n<n_nodes; n++)
 	      {
-		libmesh_assert (elem_soln.size() == n_sf);
+		libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
 		// Zero before summation
 		nodal_soln[n] = 0;
@@ -127,7 +127,7 @@ namespace libMesh
 	case EDGE3:
 	  return (o+1);
 	case QUAD4:
-	  libmesh_assert(o < 2);
+	  libmesh_assert_less (o, 2);
 	case QUAD8:
 	  {
 	    if (o == 1)
@@ -140,7 +140,7 @@ namespace libMesh
 	case QUAD9:
 	  return ((o+1)*(o+1));
 	case HEX8:
-	  libmesh_assert(o < 2);
+	  libmesh_assert_less (o, 2);
 	case HEX20:
 	  {
 	    if (o == 1)
@@ -153,14 +153,14 @@ namespace libMesh
 	case HEX27:
 	  return ((o+1)*(o+1)*(o+1));
 	case TRI3:
-	  libmesh_assert (o<2);
+	  libmesh_assert_less (o, 2);
 	case TRI6:
 	  return ((o+1)*(o+2)/2);
 	case TET4:
-	  libmesh_assert (o<2);
+	  libmesh_assert_less (o, 2);
 	case TET10:
 	  {
-	    libmesh_assert (o<3);
+	    libmesh_assert_less (o, 3);
 	    return ((o+1)*(o+2)*(o+3)/6);
 	  }
 	default:
@@ -213,8 +213,8 @@ namespace libMesh
 	      libmesh_error();
 	    }
 	case QUAD8:
-	  libmesh_assert (n<8);
-	  libmesh_assert (o<3);
+	  libmesh_assert_less (n, 8);
+	  libmesh_assert_less (o, 3);
 	case QUAD9:
 	  {
 	    switch (n)
@@ -240,11 +240,11 @@ namespace libMesh
 	      }
 	  }
 	case HEX8:
-	  libmesh_assert (n < 8);
-	  libmesh_assert (o < 2);
+	  libmesh_assert_less (n, 8);
+	  libmesh_assert_less (o, 2);
 	case HEX20:
-	  libmesh_assert (n < 20);
-	  libmesh_assert (o < 3);
+	  libmesh_assert_less (n, 20);
+	  libmesh_assert_less (o, 3);
 	case HEX27:
 	  switch (n)
 	    {
@@ -288,11 +288,11 @@ namespace libMesh
 	      libmesh_error();
 	    }
 	case TET4:
-	  libmesh_assert(n<4);
-	  libmesh_assert(o<2);
+	  libmesh_assert_less (n, 4);
+	  libmesh_assert_less (o, 2);
 	case TET10:
-	  libmesh_assert (o<3);
-	  libmesh_assert (n<10);
+	  libmesh_assert_less (o, 3);
+	  libmesh_assert_less (n, 10);
 	  switch (n)
 	    {
 	    case 0:
@@ -344,16 +344,16 @@ namespace libMesh
 	case QUAD9:
 	  return ((o-1)*(o-1));
 	case HEX8:
-	  libmesh_assert(o < 2);
+	  libmesh_assert_less (o, 2);
 	case HEX20:
-	  libmesh_assert(o < 3);
+	  libmesh_assert_less (o, 3);
 	  return 0;
 	case HEX27:
 	  return ((o-1)*(o-1)*(o-1));
 	case TET4:
-	  libmesh_assert (o<2);
+	  libmesh_assert_less (o, 2);
 	case TET10:
-	  libmesh_assert (o<3);
+	  libmesh_assert_less (o, 3);
 	  return 0;
 	default:
 	  libmesh_error();

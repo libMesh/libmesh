@@ -90,9 +90,9 @@ void UnstructuredMesh::copy_nodes_and_elements
   (const UnstructuredMesh& other_mesh)
 {
   // We're assuming our subclass data needs no copy
-  libmesh_assert(_n_parts == other_mesh._n_parts);
-  libmesh_assert(_dim == other_mesh._dim);
-  libmesh_assert(_is_prepared == other_mesh._is_prepared);
+  libmesh_assert_equal_to (_n_parts, other_mesh._n_parts);
+  libmesh_assert_equal_to (_dim, other_mesh._dim);
+  libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
 
   //Copy in Nodes
   {
@@ -195,8 +195,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 {
   // We might actually want to run this on an empty mesh
   // (e.g. the boundary mesh for a nonexistant bcid!)
-  // libmesh_assert(this->n_nodes() != 0);
-  // libmesh_assert(this->n_elem()  != 0);
+  // libmesh_assert_not_equal_to (this->n_nodes(), 0);
+  // libmesh_assert_not_equal_to (this->n_elem(), 0);
 
   // This function must be run on all processors at once
   parallel_only();
@@ -268,8 +268,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 			// Get the side for the neighboring element
 			const unsigned int ns = bounds.first->second.second;
 			const AutoPtr<Elem> their_side(neighbor->side(ns));
-                        //libmesh_assert (my_side.get() != NULL);
-                        //libmesh_assert (their_side.get() != NULL);
+                        //libmesh_assert(my_side.get());
+                        //libmesh_assert(their_side.get());
 
 			// If found a match with my side
                         //
@@ -398,8 +398,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
 	              // And let's double-check that we don't have
 		      // a remote_elem neighboring a local element
-                      libmesh_assert(elem->processor_id() !=
-				     libMesh::processor_id());
+                      libmesh_assert_not_equal_to (elem->processor_id(),
+				                  libMesh::processor_id());
 #endif // DEBUG
                       neigh = const_cast<RemoteElem*>(remote_elem);
                     }
@@ -962,8 +962,8 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
   // This may happen if the user accidently passes the original mesh into
   // this function!  We will check this by making sure we did not just
   // clear ourself.
-  libmesh_assert (this->n_nodes() != 0);
-  libmesh_assert (this->n_elem()  != 0);
+  libmesh_assert_not_equal_to (this->n_nodes(), 0);
+  libmesh_assert_not_equal_to (this->n_elem(), 0);
 
   // How the nodes on this mesh will be renumbered to nodes
   // on the new_mesh.
@@ -990,12 +990,12 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
       Elem* new_elem =
 	new_mesh.add_elem (Elem::build(old_elem->type()).release());
 
-      libmesh_assert (new_elem != NULL);
+      libmesh_assert(new_elem);
 
       // Loop over the nodes on this element.
       for (unsigned int n=0; n<old_elem->n_nodes(); n++)
 	{
-	  libmesh_assert (old_elem->node(n) < new_node_numbers.size());
+	  libmesh_assert_less (old_elem->node(n), new_node_numbers.size());
 
 	  if (new_node_numbers[old_elem->node(n)] == libMesh::invalid_uint)
 	    {
@@ -1009,7 +1009,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 	    }
 
 	  // Define this element's connectivity on the new mesh
-	  libmesh_assert (new_node_numbers[old_elem->node(n)] < new_mesh.n_nodes());
+	  libmesh_assert_less (new_node_numbers[old_elem->node(n)], new_mesh.n_nodes());
 
 	  new_elem->set_node(n) = new_mesh.node_ptr (new_node_numbers[old_elem->node(n)]);
 	}
@@ -1078,7 +1078,7 @@ bool UnstructuredMesh::contract ()
 	    // Note that we CAN'T test elem->level(), as that
 	    // touches elem->parent()->dim(), and elem->parent()
 	    // might have already been deleted!
-	    libmesh_assert (elem->parent() != NULL);
+	    libmesh_assert(elem->parent());
 
 	    // Delete the element
 	    // This just sets a pointer to NULL, and doesn't

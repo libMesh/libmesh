@@ -52,7 +52,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem* elem,
 				      const Point& p)
 {
 #if LIBMESH_DIM > 1
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   const Order total_order = static_cast<Order>(order + elem->p_level());
 
@@ -65,13 +65,13 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem* elem,
 	  case QUAD8:
 	  case QUAD9:
 	    {
-	      libmesh_assert (i<4);
+	      libmesh_assert_less (i, 4);
 
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert( std::fabs(xi) <= 1.0 );
-	      libmesh_assert( std::fabs(eta) <= 1.0 );
+	      libmesh_assert_less_equal ( std::fabs(xi), 1.0 );
+	      libmesh_assert_less_equal ( std::fabs(eta), 1.0 );
 
 	      switch(i)
 		{
@@ -118,7 +118,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem* elem,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (i<3);
+	      libmesh_assert_less (i, 3);
 
 	      switch(i)
 		{
@@ -204,8 +204,8 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
 					    const Point&)
 {
 #if LIBMESH_DIM > 1
-  libmesh_assert (elem != NULL);
-  libmesh_assert (j<2);
+  libmesh_assert(elem);
+  libmesh_assert_less (j, 2);
 
   const Order total_order = static_cast<Order>(order + elem->p_level());
 
@@ -219,7 +219,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
 	  case QUAD8:
 	  case QUAD9:
 	    {
-	      libmesh_assert (i<4);
+	      libmesh_assert_less (i, 4);
 	      
 	      switch (j)
 		{
@@ -286,7 +286,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
 
 	  case TRI6:
 	    {
-	      libmesh_assert (i<3);
+	      libmesh_assert_less (i, 3);
 	      
 	      // Account for edge flipping
 	      Real f = 1.0;
@@ -385,12 +385,12 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
 						   const Point&)
 {
 #if LIBMESH_DIM > 1
-   libmesh_assert (elem != NULL);
+   libmesh_assert(elem);
 
   // j = 0 ==> d^2 phi / dxi^2
   // j = 1 ==> d^2 phi / dxi deta
   // j = 2 ==> d^2 phi / deta^2
-  libmesh_assert (j < 3);
+  libmesh_assert_less (j, 3);
 
   const Order total_order = static_cast<Order>(order + elem->p_level());
 
@@ -404,14 +404,14 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
 	  case QUAD8:
 	  case QUAD9:
 	    {
-	      libmesh_assert (i<4);
+	      libmesh_assert_less (i, 4);
 	      // All second derivatives for linear quads are zero.
 	      return RealGradient();
 	    }
 
 	  case TRI6:
 	    {
-	      libmesh_assert (i<3);
+	      libmesh_assert_less (i, 3);
 	      // All second derivatives for linear triangles are zero.
 	      return RealGradient();
 	    }

@@ -131,7 +131,7 @@ void EpetraVector<T>::set (const unsigned int i_in, const T value_in)
   int i = static_cast<int> (i_in);
   T value = value_in;
 
-  libmesh_assert(i_in<this->size());
+  libmesh_assert_less (i_in, this->size());
 
   ReplaceGlobalValues(1, &i, &value);
 
@@ -177,7 +177,7 @@ void EpetraVector<T>::add (const unsigned int i_in, const T value_in)
   int i = static_cast<int> (i_in);
   T value = value_in;
 
-  libmesh_assert(i_in<this->size());
+  libmesh_assert_less (i_in, this->size());
 
   SumIntoGlobalValues(1, &i, &value);
 
@@ -190,7 +190,7 @@ template <typename T>
 void EpetraVector<T>::add_vector (const std::vector<T>& v,
 				  const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (v.size() == dof_indices.size());
+  libmesh_assert_equal_to (v.size(), dof_indices.size());
 
   SumIntoGlobalValues (v.size(),
                        (int*) &dof_indices[0],
@@ -203,7 +203,7 @@ template <typename T>
 void EpetraVector<T>::add_vector (const NumericVector<T>& V,
 				 const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
@@ -232,7 +232,7 @@ template <typename T>
 void EpetraVector<T>::add_vector (const DenseVector<T>& V_in,
 				  const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V_in.size() == dof_indices.size());
+  libmesh_assert_equal_to (V_in.size(), dof_indices.size());
 
   SumIntoGlobalValues(dof_indices.size(),
                       (int *)&dof_indices[0],
@@ -276,7 +276,7 @@ void EpetraVector<T>::add (const T a_in, const NumericVector<T>& v_in)
 {
   const EpetraVector<T>* v = libmesh_cast_ptr<const EpetraVector<T>*>(&v_in);
 
-  libmesh_assert(this->size() == v->size());
+  libmesh_assert_equal_to (this->size(), v->size());
 
   _vec->Update(a_in,*v->_vec, 1.);
 }
@@ -287,7 +287,7 @@ template <typename T>
 void EpetraVector<T>::insert (const std::vector<T>& v,
 			      const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (v.size() == dof_indices.size());
+  libmesh_assert_equal_to (v.size(), dof_indices.size());
 
   ReplaceGlobalValues (v.size(),
                        (int*) &dof_indices[0],
@@ -300,7 +300,7 @@ template <typename T>
 void EpetraVector<T>::insert (const NumericVector<T>& V,
 			      const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   // TODO: If V is an EpetraVector this can be optimized
   for (unsigned int i=0; i<V.size(); i++)
@@ -313,7 +313,7 @@ template <typename T>
 void EpetraVector<T>::insert (const DenseVector<T>& v,
 			      const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (v.size() == dof_indices.size());
+  libmesh_assert_equal_to (v.size(), dof_indices.size());
 
   std::vector<T> &vals = const_cast<DenseVector<T>&>(v).get_values();
 
@@ -328,7 +328,7 @@ template <typename T>
 void EpetraVector<T>::insert (const DenseSubVector<T>& v,
 			      const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (v.size() == dof_indices.size());
+  libmesh_assert_equal_to (v.size(), dof_indices.size());
 
   for (unsigned int i=0; i < v.size(); ++i)
     this->set (dof_indices[i], v(i));
@@ -433,7 +433,7 @@ EpetraVector<T>::operator = (const std::vector<T>& v)
    */
   else
   {
-    libmesh_assert(v.size()==this->local_size());
+    libmesh_assert_equal_to (v.size(), this->local_size());
 
     const unsigned int nl=this->local_size();
 
@@ -470,10 +470,10 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
 //   EpetraVector<T>* v_local =
 //   libmesh_cast_ptr<EpetraVector<T>*>(&v_local_in);
 
-//   libmesh_assert (this->_map.get() != NULL);
-//   libmesh_assert (v_local->_map.get() != NULL);
-//   libmesh_assert (v_local->local_size() == this->size());
-//   libmesh_assert (send_list.size() <= v_local->size());
+//   libmesh_assert(this->_map.get());
+//   libmesh_assert(v_local->_map.get());
+//   libmesh_assert_equal_to (v_local->local_size(), this->size());
+//   libmesh_assert_less_equal (send_list.size(), v_local->size());
 
 //   Epetra_Import importer (*v_local->_map, *this->_map);
 
@@ -489,10 +489,10 @@ void EpetraVector<T>::localize (const unsigned int /* first_local_idx */,
   libmesh_not_implemented();
 
 //   // Only good for serial vectors.
-//   libmesh_assert (this->size() == this->local_size());
-//   libmesh_assert (last_local_idx > first_local_idx);
-//   libmesh_assert (send_list.size() <= this->size());
-//   libmesh_assert (last_local_idx < this->size());
+//   libmesh_assert_equal_to (this->size(), this->local_size());
+//   libmesh_assert_greater (last_local_idx, first_local_idx);
+//   libmesh_assert_less_equal (send_list.size(), this->size());
+//   libmesh_assert_less (last_local_idx, this->size());
 
 //   const unsigned int size       = this->size();
 //   const unsigned int local_size = (last_local_idx - first_local_idx + 1);
@@ -578,7 +578,7 @@ void EpetraVector<T>::localize (std::vector<T>& v_local) const
   const unsigned int n  = this->size();
   const unsigned int nl = this->local_size();
 
-  libmesh_assert (this->_vec != NULL);
+  libmesh_assert(this->_vec);
 
   v_local.clear();
   v_local.reserve(n);
@@ -602,8 +602,8 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
   const unsigned int n  = this->size();
   const unsigned int nl = this->local_size();
 
-  libmesh_assert (pid < libMesh::n_processors());
-  libmesh_assert (this->_vec != NULL);
+  libmesh_assert_less (pid, libMesh::n_processors());
+  libmesh_assert(this->_vec);
 
   v_local.clear();
   v_local.reserve(n);
@@ -691,7 +691,7 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 
 //   // Make sure the passed int subvector is really a EpetraVector
 //   EpetraVector<T>* epetra_subvector = libmesh_cast_ptr<EpetraVector<T>*>(&subvector);
-//   libmesh_assert(epetra_subvector != NULL);
+//   libmesh_assert(epetra_subvector);
 
 //   // If the epetra_subvector is already initialized, we assume that the
 //   // user has already allocated the *correct* amount of space for it.

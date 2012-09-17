@@ -1343,9 +1343,9 @@ Elem::~Elem()
 inline
 const Point & Elem::point (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_nodes());
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() != Node::invalid_id);
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_not_equal_to (_nodes[i]->id(), Node::invalid_id);
 
   return *_nodes[i];
 }
@@ -1355,7 +1355,7 @@ const Point & Elem::point (const unsigned int i) const
 inline
 Point & Elem::point (const unsigned int i)
 {
-  libmesh_assert (i < this->n_nodes());
+  libmesh_assert_less (i, this->n_nodes());
 
   return *_nodes[i];
 }
@@ -1365,9 +1365,9 @@ Point & Elem::point (const unsigned int i)
 inline
 unsigned int Elem::node (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_nodes());
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() != Node::invalid_id);
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_not_equal_to (_nodes[i]->id(), Node::invalid_id);
 
   return _nodes[i]->id();
 }
@@ -1390,8 +1390,8 @@ unsigned int Elem::local_node (const unsigned int i) const
 inline
 Node* Elem::get_node (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_nodes());
-  libmesh_assert (_nodes[i] != NULL);
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
 
   return _nodes[i];
 }
@@ -1413,7 +1413,7 @@ unsigned int Elem::get_node_index (const Node* node_ptr) const
 inline
 Node* & Elem::set_node (const unsigned int i)
 {
-  libmesh_assert (i < this->n_nodes());
+  libmesh_assert_less (i, this->n_nodes());
 
   return _nodes[i];
 }
@@ -1439,7 +1439,7 @@ subdomain_id_type & Elem::subdomain_id ()
 inline
 Elem* Elem::neighbor (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_neighbors());
+  libmesh_assert_less (i, this->n_neighbors());
 
   return _elemlinks[i+1];
 }
@@ -1449,7 +1449,7 @@ Elem* Elem::neighbor (const unsigned int i) const
 inline
 void Elem::set_neighbor (const unsigned int i, Elem* n)
 {
-  libmesh_assert (i < this->n_neighbors());
+  libmesh_assert_less (i, this->n_neighbors());
 
   _elemlinks[i+1] = n;
 }
@@ -1507,7 +1507,7 @@ bool Elem::on_boundary () const
 inline
 unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 {
-  libmesh_assert (e != NULL);
+  libmesh_assert(e);
 
   const Elem* eparent = e;
 
@@ -1529,7 +1529,7 @@ unsigned int Elem::which_neighbor_am_i (const Elem* e) const
 inline
 unsigned int Elem::which_side_am_i (const Elem* e) const
 {
-  libmesh_assert (e != NULL);
+  libmesh_assert(e);
 
   const unsigned int ns = this->n_sides();
   const unsigned int nn = this->n_nodes();
@@ -1700,8 +1700,8 @@ const Elem* Elem::top_parent () const
   while (tp->parent() != NULL)
     tp = tp->parent();
 
-  libmesh_assert (tp != NULL);
-  libmesh_assert (tp->level() == 0);
+  libmesh_assert(tp);
+  libmesh_assert_equal_to (tp->level(), 0);
 
   return tp;
 }
@@ -1712,7 +1712,7 @@ inline
 const Elem* Elem::interior_parent () const
 {
   // interior parents make no sense for full-dimensional elements.
-  libmesh_assert (this->dim() < LIBMESH_DIM);
+  libmesh_assert_less (this->dim(), LIBMESH_DIM);
 
   // // and they [USED TO BE] only good for level-0 elements
   // if (this->level() != 0)
@@ -1736,7 +1736,7 @@ inline
 void Elem::set_interior_parent (Elem *p)
 {
   // interior parents make no sense for full-dimensional elements.
-  libmesh_assert (this->dim() < LIBMESH_DIM);
+  libmesh_assert_less (this->dim(), LIBMESH_DIM);
 
   // this had better be a one-higher-dimensional interior element
   libmesh_assert (!p ||
@@ -1798,8 +1798,8 @@ unsigned int Elem::p_level() const
 inline
 Elem* Elem::child (const unsigned int i) const
 {
-  libmesh_assert (_children    != NULL);
-  libmesh_assert (_children[i] != NULL);
+  libmesh_assert(_children);
+  libmesh_assert(_children[i]);
 
   return _children[i];
 }
@@ -1819,7 +1819,7 @@ void Elem::set_child (unsigned int c, Elem *elem)
 inline
 unsigned int Elem::which_child_am_i (const Elem* e) const
 {
-  libmesh_assert (e != NULL);
+  libmesh_assert(e);
   libmesh_assert (this->has_children());
 
   for (unsigned int c=0; c<this->n_children(); c++)
@@ -2156,8 +2156,8 @@ public:
    */
   Elem::RefinementState refinement_flag () const
   {
-    libmesh_assert(*(_buf_begin+2) >= 0);
-    libmesh_assert(*(_buf_begin+2) < INVALID_REFINEMENTSTATE);
+    libmesh_assert_greater_equal (*(_buf_begin+2), 0);
+    libmesh_assert_less (*(_buf_begin+2), INVALID_REFINEMENTSTATE);
     return static_cast<Elem::RefinementState>(*(_buf_begin+2));
   }
 
@@ -2166,8 +2166,8 @@ public:
    */
   Elem::RefinementState p_refinement_flag () const
   {
-    libmesh_assert(*(_buf_begin+3) >= 0);
-    libmesh_assert(*(_buf_begin+3) < INVALID_REFINEMENTSTATE);
+    libmesh_assert_greater_equal (*(_buf_begin+3), 0);
+    libmesh_assert_less (*(_buf_begin+3), INVALID_REFINEMENTSTATE);
     return static_cast<Elem::RefinementState>(*(_buf_begin+3));
   }
 #endif // LIBMESH_ENABLE_AMR
@@ -2177,8 +2177,8 @@ public:
    */
   ElemType type () const
   {
-    libmesh_assert(*(_buf_begin+4) >= 0);
-    libmesh_assert(*(_buf_begin+4) < INVALID_ELEM);
+    libmesh_assert_greater_equal (*(_buf_begin+4), 0);
+    libmesh_assert_less (*(_buf_begin+4), INVALID_ELEM);
     return static_cast<ElemType>(*(_buf_begin+4));
   }
 
@@ -2187,8 +2187,8 @@ public:
    */
   unsigned int processor_id () const
   {
-    libmesh_assert(*(_buf_begin+5) >= 0);
-    libmesh_assert(static_cast<unsigned int>(*(_buf_begin+5)) <
+    libmesh_assert_greater_equal (*(_buf_begin+5), 0);
+    libmesh_assert_less (static_cast<unsigned int>(*(_buf_begin+5)),
                    libMesh::n_processors() ||
                    *(_buf_begin+5) == DofObject::invalid_processor_id);
     return static_cast<unsigned int>(*(_buf_begin+5));

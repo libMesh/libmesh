@@ -71,7 +71,7 @@ bool Tet4::is_face(const unsigned int) const
 bool Tet4::is_node_on_edge(const unsigned int n,
 			   const unsigned int e) const
 {
-  libmesh_assert(e < n_edges());
+  libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 2; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
@@ -119,7 +119,7 @@ bool Tet4::is_child_on_side(const unsigned int /*c*/,
 bool Tet4::is_node_on_side(const unsigned int n,
 			   const unsigned int s) const
 {
-  libmesh_assert(s < n_sides());
+  libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 3; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -129,7 +129,7 @@ bool Tet4::is_node_on_side(const unsigned int n,
 AutoPtr<Elem> Tet4::build_side (const unsigned int i,
 				bool proxy) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
@@ -190,7 +190,7 @@ AutoPtr<Elem> Tet4::build_side (const unsigned int i,
 
 AutoPtr<Elem> Tet4::build_edge (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_edges());
+  libmesh_assert_less (i, this->n_edges());
 
   return AutoPtr<Elem>(new SideEdge<Edge2,Tet4>(this,i));
 }
@@ -200,9 +200,9 @@ void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
 			const IOPackage iop,
 			std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (_nodes != NULL);
-  libmesh_assert (sc < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert(_nodes);
+  libmesh_assert_less (sc, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
 
   switch (iop)
@@ -415,16 +415,16 @@ float Tet4::embedding_matrix (const unsigned int i,
 // void Tet4::reselect_diagonal (const Diagonal diag)
 // {
 //   /* Make sure that the element has just been refined.  */
-//   libmesh_assert (_children!=NULL);
-//   libmesh_assert (n_children()==8);
-//   libmesh_assert (_children[0]->refinement_flag()==JUST_REFINED);
-//   libmesh_assert (_children[1]->refinement_flag()==JUST_REFINED);
-//   libmesh_assert (_children[2]->refinement_flag()==JUST_REFINED);
-//   libmesh_assert (_children[3]->refinement_flag()==JUST_REFINED);
-//   libmesh_assert (_children[4]->refinement_flag()==JUST_REFINED);
-//   libmesh_assert (_children[5]->refinement_flag()==JUST_REFINED);
-//   libmesh_assert (_children[6]->refinement_flag()==JUST_REFINED);
-//   libmesh_assert (_children[7]->refinement_flag()==JUST_REFINED);
+//   libmesh_assert(_children);
+//   libmesh_assert_equal_to (n_children(), 8);
+//   libmesh_assert_equal_to (_children[0]->refinement_flag(), JUST_REFINED);
+//   libmesh_assert_equal_to (_children[1]->refinement_flag(), JUST_REFINED);
+//   libmesh_assert_equal_to (_children[2]->refinement_flag(), JUST_REFINED);
+//   libmesh_assert_equal_to (_children[3]->refinement_flag(), JUST_REFINED);
+//   libmesh_assert_equal_to (_children[4]->refinement_flag(), JUST_REFINED);
+//   libmesh_assert_equal_to (_children[5]->refinement_flag(), JUST_REFINED);
+//   libmesh_assert_equal_to (_children[6]->refinement_flag(), JUST_REFINED);
+//   libmesh_assert_equal_to (_children[7]->refinement_flag(), JUST_REFINED);
 //
 //   /* Check whether anything has to be changed.  */
 //   if (_diagonal_selection!=diag)
@@ -478,7 +478,7 @@ float Tet4::embedding_matrix (const unsigned int i,
 // 		}
 //
 // 	      /* Make sure that a node has been found.  */
-// 	      libmesh_assert (child->get_node(nc)!=NULL);
+// 	      libmesh_assert(child->get_node(nc));
 // 	    }
 // 	}
 //     }

@@ -472,7 +472,7 @@ MeshBase & EquationSystems::get_mesh ()
 inline
 const MeshData & EquationSystems::get_mesh_data () const
 {
-  libmesh_assert (_mesh_data != NULL);
+  libmesh_assert(_mesh_data);
   return *_mesh_data;
 }
 
@@ -480,7 +480,7 @@ const MeshData & EquationSystems::get_mesh_data () const
 inline
 MeshData & EquationSystems::get_mesh_data ()
 {
-  libmesh_assert (_mesh_data != NULL);
+  libmesh_assert(_mesh_data);
   return *_mesh_data;
 }
 
@@ -550,7 +550,7 @@ template <typename T_sys>
 inline
 const T_sys & EquationSystems::get_system (const unsigned int num) const
 {
-  libmesh_assert (num < this->n_systems());
+  libmesh_assert_less (num, this->n_systems());
 
 
   const_system_iterator       pos = _systems.begin();
@@ -579,7 +579,7 @@ template <typename T_sys>
 inline
 T_sys & EquationSystems::get_system (const unsigned int num)
 {
-  libmesh_assert (num < this->n_systems());
+  libmesh_assert_less (num, this->n_systems());
 
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();

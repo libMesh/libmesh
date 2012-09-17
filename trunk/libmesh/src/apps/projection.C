@@ -79,7 +79,7 @@ Number fptr(const Point& p,
             const std::string& libmesh_dbg_var(sys_name),
             const std::string& unknown_name)
 {
-  libmesh_assert(sys_name == current_sys_name);
+  libmesh_assert_equal_to (sys_name, current_sys_name);
   libmesh_assert(mesh_functions.count(unknown_name));
   libmesh_assert(mesh_functions[unknown_name]);
 
@@ -94,7 +94,7 @@ Gradient gptr(const Point& p,
               const std::string& libmesh_dbg_var(sys_name),
               const std::string& unknown_name)
 {
-  libmesh_assert(sys_name == current_sys_name);
+  libmesh_assert_equal_to (sys_name, current_sys_name);
   libmesh_assert(mesh_functions.count(unknown_name));
   libmesh_assert(mesh_functions[unknown_name]);
 
@@ -165,7 +165,7 @@ int main(int argc, char** argv)
   old_es.print_info();
 
   unsigned int n_systems = old_es.n_systems();
-  libmesh_assert(new_es.n_systems() == n_systems);
+  libmesh_assert_equal_to (new_es.n_systems(), n_systems);
 
   // For each system, serialize the solution so we can project it onto
   // a potentially-very-different partitioning
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
 
       System &new_sys = new_es.get_system(current_sys_name);
       unsigned int n_vars = old_sys.n_vars();
-      libmesh_assert(new_sys.n_vars() == n_vars);
+      libmesh_assert_equal_to (new_sys.n_vars(), n_vars);
 
       AutoPtr<NumericVector<Number> > comparison_soln =
         NumericVector<Number>::build();

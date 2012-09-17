@@ -56,7 +56,7 @@ void AssemblyA0::interior_assembly(FEMContext &c)
   const unsigned int n_components = rb_sys.n_vars();
   
   // make sure we have three components
-  libmesh_assert(n_components == 3);
+  libmesh_assert_equal_to (n_components, 3);
   
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;
@@ -135,7 +135,7 @@ void AssemblyA1::interior_assembly(FEMContext &c)
   const unsigned int n_components = rb_sys.n_vars();
   
   // make sure we have three components
-  libmesh_assert(n_components == 3);
+  libmesh_assert_equal_to (n_components, 3);
   
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;
@@ -190,7 +190,7 @@ void AssemblyA2::interior_assembly(FEMContext &c)
   const unsigned int n_components = rb_sys.n_vars();
   
   // make sure we have three components
-  libmesh_assert(n_components == 3);
+  libmesh_assert_equal_to (n_components, 3);
   
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;

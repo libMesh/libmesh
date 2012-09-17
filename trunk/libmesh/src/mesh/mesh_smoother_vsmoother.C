@@ -154,7 +154,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
   free(mcells);
   free(hnodes);
   fclose(sout);
-  libmesh_assert(_dist_norm > 0);
+  libmesh_assert_greater (_dist_norm, 0);
 
   return _dist_norm;
 }
@@ -175,7 +175,7 @@ int VariationalMeshSmoother::writegr(int, int, LPLPDOUBLE R, LPINT, int, LPLPINT
     MeshBase::node_iterator       it  = _mesh.nodes_begin();
     const MeshBase::node_iterator end = _mesh.nodes_end();
 
-    libmesh_assert(_dist_norm == 0.0);
+    libmesh_assert_equal_to (_dist_norm, 0.0);
     _dist_norm=0;
     i=0;
     for (; it != end; ++it)
@@ -193,7 +193,7 @@ int VariationalMeshSmoother::writegr(int, int, LPLPDOUBLE R, LPINT, int, LPLPINT
 	(*(*it))(j)=(*(*it))(j)+(distance*_percent_to_move);
       }
 
-      libmesh_assert(total_dist >= 0.0);
+      libmesh_assert_greater_equal (total_dist, 0.0);
 
       //Add the distance this node moved to the global distance
       _dist_norm+=total_dist;
@@ -229,36 +229,36 @@ if(me>=3){
 	double d1;
 	stream1=fopen(grid_old,"r");
 	scanned = fscanf(stream1,"%d \n%d \n%d \n%d \n",&lo,&i,&Ncells,&nedges);
-	libmesh_assert(scanned != EOF);
+	libmesh_assert_not_equal_to (scanned, EOF);
 	fprintf(stream,"%d \n%d \n%d \n%d \n",n,N,Ncells,nedges);
 
 	for(i=0;i<N;i++){//node coordinates
 		for(unsigned int j=0;j<n;j++) {fprintf(stream,"%e ",R[i][j]);
 		scanned = fscanf(stream1,"%le ",&d1);
-		libmesh_assert(scanned != EOF);
+		libmesh_assert_not_equal_to (scanned, EOF);
 	}
 	fprintf(stream,"%d \n",mask[i]);
 	scanned = fscanf(stream1,"%d \n",&lo);
-	libmesh_assert(scanned != EOF);
+	libmesh_assert_not_equal_to (scanned, EOF);
     }
 	for(i=0;i<Ncells;i++){
 		for(unsigned int j=0;j<=3*n+n%2;j++){
 			scanned = fscanf(stream1,"%d ",&lo);
-			libmesh_assert(scanned != EOF);
+			libmesh_assert_not_equal_to (scanned, EOF);
 			fprintf(stream,"%d ",lo);
 		}
 		scanned = fscanf(stream1,"\n");
-		libmesh_assert(scanned != EOF);
+		libmesh_assert_not_equal_to (scanned, EOF);
 		fprintf(stream,"\n");
 	}
 	for(i=0;i<nedges;i++){
 		for(unsigned int j=0;j<3;j++){
 		scanned = fscanf(stream1,"%d ",&lo);
-		libmesh_assert(scanned != EOF);
+		libmesh_assert_not_equal_to (scanned, EOF);
 		fprintf(stream,"%d ",lo);
 		}
 	scanned = fscanf(stream1,"\n");
-	libmesh_assert(scanned != EOF);
+	libmesh_assert_not_equal_to (scanned, EOF);
 	fprintf(stream,"\n");
 	}
 	fclose(stream1);
@@ -505,10 +505,10 @@ FILE *stream;
    for(i=0;i<ncells;i++)
 	  for(j=0;j<n;j++){
 	  for(k=0;k<n;k++){scanned = fscanf(stream,"%le ",&d);
-            libmesh_assert(scanned != EOF);
+            libmesh_assert_not_equal_to (scanned, EOF);
             H[i][j][k]=d;}
 		  scanned = fscanf(stream,"\n");
-		  libmesh_assert(scanned != EOF);
+		  libmesh_assert_not_equal_to (scanned, EOF);
 	  }
 
    fclose(stream);
@@ -527,12 +527,12 @@ float VariationalMeshSmoother::adapt_minimum() const
   for (unsigned int i=0; i<n; i++)
   {
       // Only positive (or zero) values in the error vector
-    libmesh_assert(adapt_data[i] >= 0.);
+    libmesh_assert_greater_equal (adapt_data[i], 0.);
     min = std::min (min, adapt_data[i]);
   }
 
   // ErrorVectors are for positive values
-  libmesh_assert (min >= 0.);
+  libmesh_assert_greater_equal (min, 0.);
 
   return min;
 }
@@ -866,7 +866,7 @@ void VariationalMeshSmoother::full_smooth(int n, int N, LPLPDOUBLE R, LPINT mask
 
   while(((qmin<=0)||(counter<iter[0])||(fabs(emax-Enm1)>1e-3))&&(ii<iter[1])&&(counter<iter[1]))
   {
-    libmesh_assert(counter<iter[1]);
+    libmesh_assert_less (counter, iter[1]);
 
     Enm1=emax;
 
@@ -2641,7 +2641,7 @@ void VariationalMeshSmoother::metr_data_gen(char grid[], char metr[], int n, int
   //read the initial mesh
   stream=fopen(grid,"r");
   scanned = fscanf(stream, "%d \n%d \n%d \n%d \n",&i,&N,&ncells,&j);
-  libmesh_assert(scanned != EOF);
+  libmesh_assert_not_equal_to (scanned, EOF);
   fclose(stream);
 
   mask=alloc_i_n1(N);

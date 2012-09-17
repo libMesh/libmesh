@@ -290,7 +290,7 @@ void RBSCMConstruction::compute_SCM_bounding_box()
       std::pair<Real, Real> eval = get_eigenpair(0);
 
       // ensure that the eigenvalue is real
-      libmesh_assert(eval.second < TOLERANCE);
+      libmesh_assert_less (eval.second, TOLERANCE);
 
       rb_scm_eval->set_B_min(q, eval.first);
       libMesh::out << std::endl << "B_min("<<q<<") = " << rb_scm_eval->get_B_min(q) << std::endl;
@@ -312,7 +312,7 @@ void RBSCMConstruction::compute_SCM_bounding_box()
       std::pair<Real, Real> eval = get_eigenpair(0);
 
       // ensure that the eigenvalue is real
-      libmesh_assert(eval.second < TOLERANCE);
+      libmesh_assert_less (eval.second, TOLERANCE);
 
       rb_scm_eval->set_B_max(q,eval.first);
       libMesh::out << "B_max("<<q<<") = " << rb_scm_eval->get_B_max(q) << std::endl;
@@ -355,7 +355,7 @@ void RBSCMConstruction::evaluate_stability_constant()
     std::pair<Real, Real> eval = get_eigenpair(0);
 
     // ensure that the eigenvalue is real
-    libmesh_assert(eval.second < TOLERANCE);
+    libmesh_assert_less (eval.second, TOLERANCE);
 
     // Store the coercivity constant corresponding to mu_star
     rb_scm_eval->set_C_J_stability_constraint(j,eval.first);

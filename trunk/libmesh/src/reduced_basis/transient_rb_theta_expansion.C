@@ -40,14 +40,14 @@ Number TransientRBThetaExpansion::eval_M_theta(unsigned int q,
     libmesh_error();
   }
 
-  libmesh_assert(_M_theta_vector[q] != NULL);
+  libmesh_assert(_M_theta_vector[q]);
 
   return _M_theta_vector[q]->evaluate( mu );
 }
 
 void TransientRBThetaExpansion::attach_M_theta(RBTheta* theta_q_m)
 {
-  libmesh_assert(theta_q_m != NULL);
+  libmesh_assert(theta_q_m);
 
   _M_theta_vector.push_back(theta_q_m);
 }

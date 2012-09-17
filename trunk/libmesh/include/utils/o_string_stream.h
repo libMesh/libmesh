@@ -297,7 +297,7 @@ namespace libMesh
 			   const Real r,
 			   const char c)
  {
-   libmesh_assert (w < 30);
+   libmesh_assert_less (w, 30);
    char buf[30];
    char format[8];
    // form the format for r
@@ -316,7 +316,7 @@ namespace libMesh
  void OStringStream::left (const sizetype w,
 			   const int n)
  {
-   libmesh_assert (w < 30);
+   libmesh_assert_less (w, 30);
    char buf[30];
    // form string as desired
    sprintf (buf, "%d", n);
@@ -342,7 +342,7 @@ namespace libMesh
 			    const Real r,
 			    const char c)
  {
-   libmesh_assert (w < 30);
+   libmesh_assert_less (w, 30);
    char buf[30];
    char format[8];
    // form the format for r
@@ -360,7 +360,7 @@ namespace libMesh
  void OStringStream::scientific (const sizetype w,
 				 const Real r)
  {
-   libmesh_assert (w < 30);
+   libmesh_assert_less (w, 30);
    char buf[30];
    char format[8];
    // form the format for r

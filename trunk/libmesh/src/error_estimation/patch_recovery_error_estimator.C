@@ -370,12 +370,12 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	    }
 	  else if (error_estimator.error_norm.type(var) == H1_Y_SEMINORM)
 	    {
-              libmesh_assert(LIBMESH_DIM > 1);
+              libmesh_assert_greater (LIBMESH_DIM, 1);
 	      Fy.resize(matsize); Pu_y_h.resize(matsize); // Only need to compute the y gradient for the y component seminorm
 	    }
           else if (error_estimator.error_norm.type(var) == H1_Z_SEMINORM)
 	    {
-              libmesh_assert(LIBMESH_DIM > 2);
+              libmesh_assert_greater (LIBMESH_DIM, 2);
 	      Fz.resize(matsize); Pu_z_h.resize(matsize); // Only need to compute the z gradient for the z component seminorm
 	    }
 
@@ -408,7 +408,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	      // Get the global DOF indices for the current variable
 	      // in the current element
 	      dof_map.dof_indices (e_p, dof_indices, var);
-	      libmesh_assert (dof_indices.size() == phi->size());
+	      libmesh_assert_equal_to (dof_indices.size(), phi->size());
 
 	      const unsigned int n_dofs = dof_indices.size();
 	      const unsigned int n_qp   = qrule->n_points();
@@ -656,7 +656,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	      // Get the global DOF indices for the current variable
 	      // in the current element
 	      dof_map.dof_indices (e_p, dof_indices, var);
-	      libmesh_assert (dof_indices.size() == phi->size());
+	      libmesh_assert_equal_to (dof_indices.size(), phi->size());
 
 	      // The number of dofs for this variable on this element
 	      const unsigned int n_dofs = dof_indices.size();

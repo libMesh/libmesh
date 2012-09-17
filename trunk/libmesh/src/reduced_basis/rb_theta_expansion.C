@@ -60,7 +60,7 @@ unsigned int RBThetaExpansion::get_n_output_terms(unsigned int index) const
 
 void RBThetaExpansion::attach_A_theta(RBTheta* theta_q_a)
 {
-  libmesh_assert(theta_q_a != NULL);
+  libmesh_assert(theta_q_a);
 
   _A_theta_vector.push_back(theta_q_a);
 }
@@ -69,14 +69,14 @@ void RBThetaExpansion::attach_multiple_A_theta(std::vector<RBTheta*> theta_q_a)
 {
   for(unsigned int i=0; i<theta_q_a.size(); i++)
   {
-    libmesh_assert(theta_q_a[i] != NULL);
+    libmesh_assert(theta_q_a[i]);
     _A_theta_vector.push_back(theta_q_a[i]);
   }
 }
 
 void RBThetaExpansion::attach_F_theta(RBTheta* theta_q_f)
 {
-  libmesh_assert(theta_q_f != NULL);
+  libmesh_assert(theta_q_f);
 
   _F_theta_vector.push_back(theta_q_f);
 }
@@ -85,7 +85,7 @@ void RBThetaExpansion::attach_multiple_F_theta(std::vector<RBTheta*> theta_q_f)
 {
   for(unsigned int i=0; i<theta_q_f.size(); i++)
   {
-    libmesh_assert(theta_q_f[i] != NULL);
+    libmesh_assert(theta_q_f[i]);
     _F_theta_vector.push_back(theta_q_f[i]);
   }
 }
@@ -97,7 +97,7 @@ void RBThetaExpansion::attach_output_theta(std::vector<RBTheta*> theta_q_l)
 
 void RBThetaExpansion::attach_output_theta(RBTheta* theta_q_l)
 {
-  libmesh_assert(theta_q_l != NULL);
+  libmesh_assert(theta_q_l);
 
   std::vector<RBTheta*> theta_l_vector(1);
   theta_l_vector[0] = theta_q_l;
@@ -115,7 +115,7 @@ Number RBThetaExpansion::eval_A_theta(unsigned int q,
     libmesh_error();
   }
 
-  libmesh_assert(_A_theta_vector[q] != NULL);
+  libmesh_assert(_A_theta_vector[q]);
 
   return _A_theta_vector[q]->evaluate( mu );
 }
@@ -130,7 +130,7 @@ Number RBThetaExpansion::eval_F_theta(unsigned int q,
     libmesh_error();
   }
 
-  libmesh_assert(_F_theta_vector[q] != NULL);
+  libmesh_assert(_F_theta_vector[q]);
 
   return _F_theta_vector[q]->evaluate( mu );
 }
@@ -147,7 +147,7 @@ Number RBThetaExpansion::eval_output_theta(unsigned int output_index,
     libmesh_error();
   }
 
-  libmesh_assert(_output_theta_vector[output_index][q_l] != NULL);
+  libmesh_assert(_output_theta_vector[output_index][q_l]);
 
   return _output_theta_vector[output_index][q_l]->evaluate( mu );
 }

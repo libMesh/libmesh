@@ -346,12 +346,12 @@ Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<R
   // The vectors are assumed to both be vectors of the (same number
   // of) components
   unsigned int vsize = v1.size();
-  libmesh_assert(vsize == v2.size());
+  libmesh_assert_equal_to (vsize, v2.size());
 
   // We'll support implicitly defining weights, but if the user sets
   // more weights than he uses then something's probably wrong
   unsigned int diagsize = this->_weights.size();
-  libmesh_assert(vsize >= diagsize);
+  libmesh_assert_greater_equal (vsize, diagsize);
 
   // Initialize the variable val
   Real val = 0.;
@@ -371,7 +371,7 @@ Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<R
 
   // Loop over the components of the system
   unsigned int nrows = this->_off_diagonal_weights.size();
-  libmesh_assert(vsize <= nrows);
+  libmesh_assert_less_equal (vsize, nrows);
 
   for(unsigned int i = 0; i != nrows; i++)
     {

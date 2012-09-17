@@ -195,7 +195,7 @@ void QGrundmann_Moller::compose_all(unsigned int s, // number to be compositione
       // The initial entry gets the current head value, minus 1.
       // If head_value > 1, the next loop iteration will start back
       // at workspace[0] again.
-      libmesh_assert (head_value > 0);
+      libmesh_assert_greater (head_value, 0);
       workspace[0] = head_value - 1;
 
       // Increment the head+1 value

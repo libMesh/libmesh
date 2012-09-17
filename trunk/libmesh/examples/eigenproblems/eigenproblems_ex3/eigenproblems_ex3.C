@@ -222,7 +222,7 @@ int main (int argc, char** argv)
     std::pair<Real,Real> eval = eigen_system.get_eigenpair(i);
     
     // The eigenvalues should be real!
-    libmesh_assert(eval.second < TOLERANCE);
+    libmesh_assert_less (eval.second, TOLERANCE);
     evals_file << eval.first << std::endl;
     
     // plot the specified eigenvector
@@ -253,7 +253,7 @@ void assemble_matrices(EquationSystems& es,
   
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert (system_name == "Eigensystem");
+  libmesh_assert_equal_to (system_name, "Eigensystem");
 
 #ifdef LIBMESH_HAVE_SLEPC
 
@@ -401,7 +401,7 @@ void get_dirichlet_dofs(EquationSystems& es,
 
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert (system_name == "Eigensystem");
+  libmesh_assert_equal_to (system_name, "Eigensystem");
 
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();

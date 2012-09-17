@@ -49,10 +49,10 @@ void QGauss::keast_rule(const Real rule_data[][4],
     {
 
       // There must always be a non-zero entry to start the row
-      libmesh_assert(rule_data[p][0] != static_cast<Real>(0.0));
+      libmesh_assert_not_equal_to (rule_data[p][0], static_cast<Real>(0.0));
 
       // A zero weight may imply you did not set up the raw data correctly
-      libmesh_assert(rule_data[p][3] != static_cast<Real>(0.0));
+      libmesh_assert_not_equal_to (rule_data[p][3], static_cast<Real>(0.0));
 
       // What kind of point is this?
       // One non-zero entry in first 3 cols   ? 1-perm (centroid) point = 1
@@ -80,7 +80,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	case 1:
 	  {
 	    // Be sure we have enough space to insert this point
-	    libmesh_assert(offset + 0 < _points.size());
+	    libmesh_assert_less (offset + 0, _points.size());
 
 	    const Real a = rule_data[p][0];
 
@@ -97,7 +97,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	case 4:
 	  {
 	    // Be sure we have enough space to insert these points
-	    libmesh_assert(offset + 3 < _points.size());
+	    libmesh_assert_less (offset + 3, _points.size());
 
 	    const Real a = rule_data[p][0];
 	    const Real b = rule_data[p][1];
@@ -120,7 +120,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	case 6:
 	  {
 	    // Be sure we have enough space to insert these points
-	    libmesh_assert(offset + 5 < _points.size());
+	    libmesh_assert_less (offset + 5, _points.size());
 
 	    const Real a = rule_data[p][0];
 	    const Real b = rule_data[p][2];
@@ -145,7 +145,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	case 12:
 	  {
 	    // Be sure we have enough space to insert these points
-	    libmesh_assert(offset + 11 < _points.size());
+	    libmesh_assert_less (offset + 11, _points.size());
 
 	    const Real a = rule_data[p][0];
 	    const Real b = rule_data[p][1];
@@ -280,10 +280,10 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
     {
 
       // There must always be a non-zero entry to start the row
-      libmesh_assert( rule_data[p][0] != static_cast<Real>(0.0) );
+      libmesh_assert_not_equal_to ( rule_data[p][0], static_cast<Real>(0.0) );
 
       // A zero weight may imply you did not set up the raw data correctly
-      libmesh_assert( rule_data[p][3] != static_cast<Real>(0.0) );
+      libmesh_assert_not_equal_to ( rule_data[p][3], static_cast<Real>(0.0) );
 
       // What kind of point is this?
       // One non-zero entry in first 3 cols   ? 1-perm (centroid) point = 1
@@ -304,7 +304,7 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 	case 1:
 	  {
 	    // Be sure we have enough space to insert this point
-	    libmesh_assert(offset + 0 < _points.size());
+	    libmesh_assert_less (offset + 0, _points.size());
 
 	    // The point has only a single permutation (the centroid!)
 	    _points[offset  + 0] = Point(rule_data[p][0], rule_data[p][0]);
@@ -319,7 +319,7 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 	case 3:
 	  {
 	    // Be sure we have enough space to insert these points
-	    libmesh_assert(offset + 2 < _points.size());
+	    libmesh_assert_less (offset + 2, _points.size());
 
 	    // Here it's understood the second entry is to be used twice, and
 	    // thus there are three possible permutations.
@@ -337,7 +337,7 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 	case 6:
 	  {
 	    // Be sure we have enough space to insert these points
-	    libmesh_assert(offset + 5 < _points.size());
+	    libmesh_assert_less (offset + 5, _points.size());
 
 	    // Three individual entries with six permutations.
 	    _points[offset + 0] = Point(rule_data[p][0], rule_data[p][1]);

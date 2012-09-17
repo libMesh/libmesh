@@ -200,7 +200,7 @@ void MeshData::translate (const MeshBase& out_mesh,
 
     // this naming scheme only works up to n_comp=100
     // (at least for gmv-accepted variable names)
-    libmesh_assert(n_comp < 100);
+    libmesh_assert_less (n_comp, 100);
 
     for (unsigned int n=0; n<n_comp; n++)
       {
@@ -421,7 +421,7 @@ const Node* MeshData::foreign_id_to_node (const unsigned int fid) const
 
 unsigned int MeshData::node_to_foreign_id (const Node* n) const
 {
-  libmesh_assert (n != NULL);
+  libmesh_assert(n);
 
   if (_active)
     {
@@ -498,7 +498,7 @@ const Elem* MeshData::foreign_id_to_elem (const unsigned int fid) const
 
 unsigned int MeshData::elem_to_foreign_id (const Elem* e) const
 {
-  libmesh_assert (e != NULL);
+  libmesh_assert(e);
 
   if (_active)
     {

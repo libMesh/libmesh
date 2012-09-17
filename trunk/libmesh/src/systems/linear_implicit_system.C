@@ -100,7 +100,7 @@ void LinearImplicitSystem::restrict_solve_to (const SystemSubset* subset,
   _subset_solve_mode = subset_solve_mode;
   if(subset!=NULL)
     {
-      libmesh_assert(&subset->get_system()==this);
+      libmesh_assert_equal_to (&subset->get_system(), this);
     }
 }
 

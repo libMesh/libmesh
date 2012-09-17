@@ -66,9 +66,9 @@ SerialMesh::SerialMesh (const UnstructuredMesh &other_mesh) :
 
 const Point& SerialMesh::point (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_nodes());
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i); // This will change soon
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
   return (*_nodes[i]);
 }
@@ -79,9 +79,9 @@ const Point& SerialMesh::point (const unsigned int i) const
 
 const Node& SerialMesh::node (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_nodes());
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i); // This will change soon
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
   return (*_nodes[i]);
 }
@@ -100,9 +100,9 @@ Node& SerialMesh::node (const unsigned int i)
       libmesh_error();
     }
 
-  libmesh_assert (i < this->n_nodes());
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i); // This will change soon
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
   return (*_nodes[i]);
 }
@@ -111,9 +111,9 @@ Node& SerialMesh::node (const unsigned int i)
 
 const Node* SerialMesh::node_ptr (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_nodes());
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i); // This will change soon
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
   return _nodes[i];
 }
@@ -123,9 +123,9 @@ const Node* SerialMesh::node_ptr (const unsigned int i) const
 
 Node* SerialMesh::node_ptr (const unsigned int i)
 {
-  libmesh_assert (i < this->n_nodes());
-  libmesh_assert (_nodes[i] != NULL);
-  libmesh_assert (_nodes[i]->id() == i); // This will change soon
+  libmesh_assert_less (i, this->n_nodes());
+  libmesh_assert(_nodes[i]);
+  libmesh_assert_equal_to (_nodes[i]->id(), i); // This will change soon
 
   return _nodes[i];
 }
@@ -161,9 +161,9 @@ Node* SerialMesh::query_node_ptr (const unsigned int i)
 
 const Elem* SerialMesh::elem (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_elem());
-  libmesh_assert (_elements[i] != NULL);
-  libmesh_assert (_elements[i]->id() == i); // This will change soon
+  libmesh_assert_less (i, this->n_elem());
+  libmesh_assert(_elements[i]);
+  libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
 
   return _elements[i];
 }
@@ -173,9 +173,9 @@ const Elem* SerialMesh::elem (const unsigned int i) const
 
 Elem* SerialMesh::elem (const unsigned int i)
 {
-  libmesh_assert (i < this->n_elem());
-  libmesh_assert (_elements[i] != NULL);
-  libmesh_assert (_elements[i]->id() == i); // This will change soon
+  libmesh_assert_less (i, this->n_elem());
+  libmesh_assert(_elements[i]);
+  libmesh_assert_equal_to (_elements[i]->id(), i); // This will change soon
 
   return _elements[i];
 }
@@ -243,12 +243,12 @@ Elem* SerialMesh::add_elem (Elem* e)
 Elem* SerialMesh::insert_elem (Elem* e)
 {
   unsigned int eid = e->id();
-  libmesh_assert(eid < _elements.size());
+  libmesh_assert_less (eid, _elements.size());
   Elem *oldelem = _elements[eid];
 
   if (oldelem)
     {
-      libmesh_assert(oldelem->id() == eid);
+      libmesh_assert_equal_to (oldelem->id(), eid);
       this->delete_elem(oldelem);
     }
 
@@ -261,7 +261,7 @@ Elem* SerialMesh::insert_elem (Elem* e)
 
 void SerialMesh::delete_elem(Elem* e)
 {
-  libmesh_assert (e != NULL);
+  libmesh_assert(e);
 
   // Initialize an iterator to eventually point to the element we want to delete
   std::vector<Elem*>::iterator pos = _elements.end();
@@ -269,7 +269,7 @@ void SerialMesh::delete_elem(Elem* e)
   // In many cases, e->id() gives us a clue as to where e
   // is located in the _elements vector.  Try that first
   // before trying the O(n_elem) search.
-  libmesh_assert (e->id() < _elements.size());
+  libmesh_assert_less (e->id(), _elements.size());
 
   if (_elements[e->id()] == e)
     {
@@ -380,8 +380,8 @@ Node* SerialMesh::add_node (Node* n)
 
 void SerialMesh::delete_node(Node* n)
 {
-  libmesh_assert (n != NULL);
-  libmesh_assert (n->id() < _nodes.size());
+  libmesh_assert(n);
+  libmesh_assert_less (n->id(), _nodes.size());
 
   // Initialize an iterator to eventually point to the element we want
   // to delete
@@ -525,7 +525,7 @@ void SerialMesh::renumber_nodes_and_elements ()
 		const unsigned int dst_idx = next_free_node++;
                 
 		// ensure we want to swap a valid nodes
-		libmesh_assert (_nodes[src_idx] != NULL);
+		libmesh_assert(_nodes[src_idx]);
                 
 		// Swap the source and destination nodes
                 std::swap(_nodes[src_idx],
@@ -620,8 +620,8 @@ void SerialMesh::renumber_nodes_and_elements ()
     }
   }
 
-  libmesh_assert (next_free_elem == _elements.size());
-  libmesh_assert (next_free_node == _nodes.size());
+  libmesh_assert_equal_to (next_free_elem, _elements.size());
+  libmesh_assert_equal_to (next_free_node, _nodes.size());
 
   STOP_LOG("renumber_nodes_and_elem()", "Mesh");
 }

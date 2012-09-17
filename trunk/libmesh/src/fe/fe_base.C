@@ -1578,7 +1578,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 				                     const unsigned int variable_number,
 				                     const Elem* elem)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   const unsigned int Dim = elem->dim();
 
@@ -1653,7 +1653,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
         if (neigh->level() < elem->level())
           {
 	    unsigned int s_neigh = neigh->which_neighbor_am_i(elem);
-            libmesh_assert (s_neigh < neigh->n_neighbors());
+            libmesh_assert_less (s_neigh, neigh->n_neighbors());
 
             // Find the minimum p level; we build the h constraint
             // matrix with this and then constrain away all higher p
@@ -1710,7 +1710,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
               (const_cast<Elem *>(neigh))->hack_p_level(old_neigh_level);
 
 	    const unsigned int n_side_dofs = my_side_dofs.size();
-	    libmesh_assert(n_side_dofs == neigh_side_dofs.size());
+	    libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
 
 	    Ke.resize (n_side_dofs, n_side_dofs);
 	    Ue.resize(n_side_dofs);
@@ -1765,7 +1765,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 	      {
 	        const unsigned int j = my_side_dofs[js];
 	        const unsigned int my_dof_g = my_dof_indices[j];
-                libmesh_assert(my_dof_g != DofObject::invalid_id);
+                libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
                 // Hunt for "constraining against myself" cases before
                 // we bother creating a constraint row
@@ -1774,14 +1774,14 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 	          {
 	            const unsigned int i = neigh_side_dofs[is];
 	            const unsigned int their_dof_g = neigh_dof_indices[i];
-                    libmesh_assert(their_dof_g != DofObject::invalid_id);
+                    libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
 		    if (their_dof_g == my_dof_g)
 		      {
 #ifndef NDEBUG
 		        const Real their_dof_value = Ue[is](js);
-		        libmesh_assert(std::abs(their_dof_value-1.) <
-                                       10*TOLERANCE);
+		        libmesh_assert_less (std::abs(their_dof_value-1.),
+                                             10*TOLERANCE);
 
 		        for (unsigned int k = 0; k != n_side_dofs; ++k)
 		          libmesh_assert(k == is ||
@@ -1817,8 +1817,8 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 	          {
 	            const unsigned int i = neigh_side_dofs[is];
 	            const unsigned int their_dof_g = neigh_dof_indices[i];
-                    libmesh_assert(their_dof_g != DofObject::invalid_id);
-		    libmesh_assert (their_dof_g != my_dof_g);
+                    libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
+		    libmesh_assert_not_equal_to (their_dof_g, my_dof_g);
 
 		    const Real their_dof_value = Ue[is](js);
 
@@ -1867,7 +1867,7 @@ compute_periodic_constraints (DofConstraints &constraints,
   if (boundaries.empty())
     return;
 
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // Only constrain active elements with this method
   if (!elem->active())
@@ -1962,7 +1962,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                 {
 	          unsigned int s_neigh =
                     mesh.boundary_info->side_with_boundary_id (neigh, periodic->pairedboundary);
-                  libmesh_assert(s_neigh != libMesh::invalid_uint);
+                  libmesh_assert_not_equal_to (s_neigh, libMesh::invalid_uint);
 
 #ifdef LIBMESH_ENABLE_AMR
                   // Find the minimum p level; we build the h constraint
@@ -2026,7 +2026,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 	          const unsigned int n_side_dofs = my_side_dofs.size();
-	          libmesh_assert(n_side_dofs == neigh_side_dofs.size());
+	          libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
 
 	          Ke.resize (n_side_dofs, n_side_dofs);
 	          Ue.resize(n_side_dofs);
@@ -2255,7 +2255,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                               if (elem->is_node_on_edge(n,e))
                                 break;
                             }
-                          libmesh_assert(e < elem->n_edges());
+                          libmesh_assert_less (e, elem->n_edges());
 
                           // Find the edge end nodes
                           Node *e1 = NULL,
@@ -2460,7 +2460,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 	            {
 	              const unsigned int i = neigh_side_dofs[is];
 	              const unsigned int their_dof_g = neigh_dof_indices[i];
-                      libmesh_assert(their_dof_g != DofObject::invalid_id);
+                      libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
 		      {
 			Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
@@ -2476,7 +2476,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 	                {
 	                  const unsigned int j = my_side_dofs[js];
 	                  const unsigned int my_dof_g = my_dof_indices[j];
-                          libmesh_assert(my_dof_g != DofObject::invalid_id);
+                          libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
                           if (their_constraint_row.count(my_dof_g))
                             recursive_constraint[js] = true;
@@ -2492,7 +2492,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 
 	              const unsigned int j = my_side_dofs[js];
 	              const unsigned int my_dof_g = my_dof_indices[j];
-                      libmesh_assert(my_dof_g != DofObject::invalid_id);
+                      libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
                       // FIXME: new code path
                       if (!my_constrained_dofs.count(my_dof_g))
@@ -2518,17 +2518,17 @@ compute_periodic_constraints (DofConstraints &constraints,
 	                {
 	                  const unsigned int i = neigh_side_dofs[is];
 	                  const unsigned int their_dof_g = neigh_dof_indices[i];
-                          libmesh_assert(their_dof_g != DofObject::invalid_id);
+                          libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
                           // Periodic constraints should never be
                           // self-constraints
-		          // libmesh_assert(their_dof_g != my_dof_g);
+		          // libmesh_assert_not_equal_to (their_dof_g, my_dof_g);
 
 		          const Real their_dof_value = Ue[is](js);
 
 		          if (their_dof_g == my_dof_g)
 		            {
-		              libmesh_assert(std::abs(their_dof_value-1.) < 1.e-5);
+		              libmesh_assert_less (std::abs(their_dof_value-1.), 1.e-5);
 		              for (unsigned int k = 0; k != n_side_dofs; ++k)
 		                libmesh_assert(k == is || std::abs(Ue[k](js)) < 1.e-5);
 		              continue;

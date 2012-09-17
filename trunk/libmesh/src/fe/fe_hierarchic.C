@@ -53,7 +53,7 @@ namespace libMesh
 	  // Constant shape functions
 	case CONSTANT:
 	  {
-	    libmesh_assert (elem_soln.size() == 1);
+	    libmesh_assert_equal_to (elem_soln.size(), 1);
 
 	    const Number val = elem_soln[0];
 
@@ -75,11 +75,11 @@ namespace libMesh
 
 	    std::vector<Point> refspace_nodes;
 	    FEBase::get_refspace_nodes(elem_type,refspace_nodes);
-	    libmesh_assert (refspace_nodes.size() == n_nodes);
+	    libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
 
 	    for (unsigned int n=0; n<n_nodes; n++)
 	      {
-		libmesh_assert (elem_soln.size() == n_sf);
+		libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
 		// Zero before summation
 		nodal_soln[n] = 0;
@@ -101,7 +101,7 @@ namespace libMesh
 
     unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
     {
-      libmesh_assert (o > 0);
+      libmesh_assert_greater (o, 0);
       switch (t)
 	{
 	case NODEELEM:
@@ -110,14 +110,14 @@ namespace libMesh
 	case EDGE3:
 	  return (o+1);
 	case QUAD4:
-	  libmesh_assert(o < 2);
+	  libmesh_assert_less (o, 2);
 	case QUAD8:
 	case QUAD9:
 	  return ((o+1)*(o+1));
 	case HEX8:
-	  libmesh_assert(o < 2);
+	  libmesh_assert_less (o, 2);
 	case HEX20:
-	  libmesh_assert(o < 2);
+	  libmesh_assert_less (o, 2);
 	case HEX27:
 	  return ((o+1)*(o+1)*(o+1));
 	case TRI6:
@@ -137,7 +137,7 @@ namespace libMesh
 					   const Order o,
 					   const unsigned int n)
     {
-      libmesh_assert (o > 0);
+      libmesh_assert_greater (o, 0);
       switch (t)
 	{
 	case NODEELEM:
@@ -173,8 +173,8 @@ namespace libMesh
 	      libmesh_error();
 	    }
 	case QUAD4:
-	  libmesh_assert (n < 4);
-	  libmesh_assert (o < 2);
+	  libmesh_assert_less (n, 4);
+	  libmesh_assert_less (o, 2);
 	case QUAD8:
 	case QUAD9:
 	  switch (n)
@@ -199,11 +199,11 @@ namespace libMesh
 	      libmesh_error();
 	    }
 	case HEX8:
-	  libmesh_assert (n < 8);
-	  libmesh_assert (o < 2);
+	  libmesh_assert_less (n, 8);
+	  libmesh_assert_less (o, 2);
 	case HEX20:
-	  libmesh_assert (n < 20);
-	  libmesh_assert (o < 2);
+	  libmesh_assert_less (n, 20);
+	  libmesh_assert_less (o, 2);
 	case HEX27:
 	  switch (n)
 	    {
@@ -264,7 +264,7 @@ namespace libMesh
     unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
 					    const Order o)
     {
-      libmesh_assert (o > 0);
+      libmesh_assert_greater (o, 0);
       switch (t)
 	{
 	case NODEELEM:
@@ -282,7 +282,7 @@ namespace libMesh
 	  return ((o-1)*(o-1));
 	case HEX8:
 	case HEX20:
-	  libmesh_assert(o < 2);
+	  libmesh_assert_less (o, 2);
 	  return 0;
 	case HEX27:
 	  return ((o-1)*(o-1)*(o-1));

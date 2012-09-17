@@ -52,14 +52,14 @@ bool InfEdge2::is_face(const unsigned int) const
 bool InfEdge2::is_node_on_side(const unsigned int n,
 			       const unsigned int s) const
 {
-  libmesh_assert(s < 1);
+  libmesh_assert_less (s, 1);
   return (s == n);
 }
 
 bool InfEdge2::is_node_on_edge(const unsigned int,
 			       const unsigned int libmesh_dbg_var(e)) const
 {
-  libmesh_assert(e == 0);
+  libmesh_assert_equal_to (e, 0);
   return true;
 }
 
@@ -67,9 +67,9 @@ void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
 			    const IOPackage iop,
 			    std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (se == 0);
-  libmesh_assert (se < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert_equal_to (se, 0);
+  libmesh_assert_less (se, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
   conn.resize(2);
 

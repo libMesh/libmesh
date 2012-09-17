@@ -125,7 +125,7 @@ bool Quad8::is_face(const unsigned int) const
 bool Quad8::is_node_on_side(const unsigned int n,
 			    const unsigned int s) const
 {
-  libmesh_assert(s < n_sides());
+  libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 3; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -156,7 +156,7 @@ bool Quad8::has_affine_map() const
 
 unsigned int Quad8::key (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   switch (s)
     {
@@ -192,7 +192,7 @@ unsigned int Quad8::key (const unsigned int s) const
 AutoPtr<Elem> Quad8::build_side (const unsigned int i,
 				 bool proxy) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
@@ -258,8 +258,8 @@ void Quad8::connectivity(const unsigned int sf,
 			 const IOPackage iop,
 			 std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (sf < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert_less (sf, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
   switch (iop)
     {
@@ -406,9 +406,9 @@ void Quad8::connectivity(const unsigned int sf,
 unsigned short int Quad8::second_order_adjacent_vertex (const unsigned int n,
 							const unsigned int v) const
 {
-  libmesh_assert (n >= this->n_vertices());
-  libmesh_assert (n <  this->n_nodes());
-  libmesh_assert (v < 2);
+  libmesh_assert_greater_equal (n, this->n_vertices());
+  libmesh_assert_less (n, this->n_nodes());
+  libmesh_assert_less (v, 2);
   // use the matrix from \p face_quad.C
   return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
@@ -418,8 +418,8 @@ unsigned short int Quad8::second_order_adjacent_vertex (const unsigned int n,
 std::pair<unsigned short int, unsigned short int>
 Quad8::second_order_child_vertex (const unsigned int n) const
 {
-  libmesh_assert (n >= this->n_vertices());
-  libmesh_assert (n < this->n_nodes());
+  libmesh_assert_greater_equal (n, this->n_vertices());
+  libmesh_assert_less (n, this->n_nodes());
   /*
    * the _second_order_vertex_child_* vectors are
    * stored in face_quad.C, since they are identical

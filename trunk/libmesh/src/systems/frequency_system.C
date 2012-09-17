@@ -139,7 +139,7 @@ void FrequencySystem::init_data ()
 	  const unsigned int n_freq =
 	    es.parameters.get<unsigned int>("n_frequencies");
 
-	  libmesh_assert(n_freq > 0);
+	  libmesh_assert_greater (n_freq, 0);
 
 	  _finished_set_frequencies = true;
 
@@ -237,8 +237,8 @@ void FrequencySystem::set_frequencies_by_range (const Real min_freq,
   this->_keep_solution_duplicates = allocate_solution_duplicates;
 
   // sanity checks
-  libmesh_assert(max_freq > min_freq);
-  libmesh_assert(n_freq > 0);
+  libmesh_assert_greater (max_freq, min_freq);
+  libmesh_assert_greater (n_freq, 0);
 
   if (_finished_set_frequencies)
     {
@@ -322,7 +322,7 @@ unsigned int FrequencySystem::n_frequencies () const
 
 void FrequencySystem::solve ()
 {
-  libmesh_assert (this->n_frequencies() > 0);
+  libmesh_assert_greater (this->n_frequencies(), 0);
 
   // Solve for all the specified frequencies
   this->solve (0, this->n_frequencies()-1);
@@ -338,11 +338,11 @@ void FrequencySystem::solve (const unsigned int n_start,
     this->assemble ();
 
   // the user-supplied solve method _has_ to be provided by the user
-  libmesh_assert (solve_system != NULL);
+  libmesh_assert(solve_system);
 
   // existence & range checks
-  libmesh_assert(this->n_frequencies() > 0);
-  libmesh_assert(n_stop < this->n_frequencies());
+  libmesh_assert_greater (this->n_frequencies(), 0);
+  libmesh_assert_less (n_stop, this->n_frequencies());
 
   EquationSystems& es =
     this->get_equation_systems();
@@ -390,7 +390,7 @@ void FrequencySystem::solve (const unsigned int n_start,
     }
 
   // sanity check
-  //libmesh_assert (vec_rval.size() == (n_stop-n_start+1));
+  //libmesh_assert_equal_to (vec_rval.size(), (n_stop-n_start+1));
 
   //return vec_rval;
 }
@@ -400,7 +400,7 @@ void FrequencySystem::solve (const unsigned int n_start,
 void FrequencySystem::attach_solve_function(void fptr(EquationSystems& es,
 						      const std::string& name))
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
 
   solve_system = fptr;
 }
@@ -409,7 +409,7 @@ void FrequencySystem::attach_solve_function(void fptr(EquationSystems& es,
 
 void FrequencySystem::set_current_frequency(unsigned int n)
 {
-  libmesh_assert(n < n_frequencies());
+  libmesh_assert_less (n, n_frequencies());
 
   EquationSystems& es =
     this->get_equation_systems();
@@ -422,7 +422,7 @@ void FrequencySystem::set_current_frequency(unsigned int n)
 
 std::string FrequencySystem::form_freq_param_name(const unsigned int n) const
 {
-  libmesh_assert (n < 9999);
+  libmesh_assert_less (n, 9999);
   char buf[15];
   sprintf(buf, "frequency %04d", n);
   return (buf);
@@ -432,7 +432,7 @@ std::string FrequencySystem::form_freq_param_name(const unsigned int n) const
 
 std::string FrequencySystem::form_solu_vec_name(const unsigned int n) const
 {
-  libmesh_assert (n < 9999);
+  libmesh_assert_less (n, 9999);
   char buf[15];
   sprintf(buf, "solution %04d", n);
   return (buf);

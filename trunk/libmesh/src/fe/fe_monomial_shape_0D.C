@@ -34,7 +34,7 @@ Real FE<0,MONOMIAL>::shape(const ElemType,
 			   const unsigned int libmesh_dbg_var(i),
 			   const Point&)
 {
-  libmesh_assert (i < 1);
+  libmesh_assert_less (i, 1);
   return 1.;
 }
 
@@ -46,7 +46,7 @@ Real FE<0,MONOMIAL>::shape(const Elem*,
 			   const unsigned int libmesh_dbg_var(i),
 			   const Point&)
 {
-  libmesh_assert (i < 1);
+  libmesh_assert_less (i, 1);
   return 1.;
 }
 

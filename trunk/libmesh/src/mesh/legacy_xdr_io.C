@@ -273,7 +273,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert(libMesh::processor_id() == 0);
+  libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   // get a writeable reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -506,7 +506,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
                 my_parent->add_child(elem);
 
                 // sanity check
-                libmesh_assert (my_parent->type() == elem->type());
+                libmesh_assert_equal_to (my_parent->type(), elem->type());
               }
 
               // Add level-0 elements to the mesh
@@ -782,7 +782,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
       mh.set_num_elem_each_block(neeb);
     }
   else
-    libmesh_assert(etypes.size() == 1);
+    libmesh_assert_equal_to (etypes.size(), 1);
 
   mh.setNumEl(numElem);
   mh.setNumNodes(node_map.size());
@@ -1077,7 +1077,7 @@ void LegacyXdrIO::write_soln (const std::string& name,
   s.header(&sh); // Needs to work for both types of file
 
   // Write the solution vector
-  libmesh_assert (soln.size() == var_names.size()*mesh.n_nodes());
+  libmesh_assert_equal_to (soln.size(), var_names.size()*mesh.n_nodes());
 
   s.values(&soln[0], mesh.n_nodes());
 }

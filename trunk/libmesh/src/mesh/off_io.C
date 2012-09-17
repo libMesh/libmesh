@@ -45,7 +45,7 @@ void OFFIO::read_stream(std::istream& in)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert(libMesh::processor_id() == 0);
+  libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -72,7 +72,7 @@ void OFFIO::read_stream(std::istream& in)
   // Read the first string.  It should say "OFF"
   in >> label;
 
-  libmesh_assert (label == "OFF");
+  libmesh_assert_equal_to (label, "OFF");
 
   // read the number of nodes, faces, and edges
   in >> nn >> nf >> ne;
@@ -112,7 +112,7 @@ void OFFIO::read_stream(std::istream& in)
       // The number of nodes in the object
       in >> dummy;
 
-      libmesh_assert (dummy == 3);
+      libmesh_assert_equal_to (dummy, 3);
 
       in >> n0
 	 >> n1

@@ -521,7 +521,7 @@ void LaspackVector<T>::init (const unsigned int n,
 {
   // Laspack vectors only for serial cases,
   // but can provide a "parallel" vector on one processor.
-  libmesh_assert (n == n_local);
+  libmesh_assert_equal_to (n, n_local);
 
   this->_type = SERIAL;
 
@@ -704,7 +704,7 @@ inline
 void LaspackVector<T>::set (const unsigned int i, const T value)
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (i < this->size());
+  libmesh_assert_less (i, this->size());
 
   V_SetCmp (&_vec, i+1, value);
 
@@ -720,7 +720,7 @@ inline
 void LaspackVector<T>::add (const unsigned int i, const T value)
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (i < this->size());
+  libmesh_assert_less (i, this->size());
 
   V_AddCmp (&_vec, i+1, value);
 

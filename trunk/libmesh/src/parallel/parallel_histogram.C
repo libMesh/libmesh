@@ -47,7 +47,7 @@ void Histogram<KeyType>::make_histogram (const unsigned int nbins,
 					  KeyType max,
 					  KeyType min)
 {
-  libmesh_assert (min < max);
+  libmesh_assert_less (min, max);
 
   // The width of each bin.  Store this as a floating point value
   double bin_width = (Parallel::Utils::to_double(max)-

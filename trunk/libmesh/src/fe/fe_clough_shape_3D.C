@@ -51,7 +51,7 @@ Real FE<3,CLOUGH>::shape(const Elem* elem,
 			     const unsigned int,
 			     const Point&)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   libmesh_not_implemented();
   return 0.;
@@ -83,7 +83,7 @@ Real FE<3,CLOUGH>::shape_deriv(const Elem* elem,
 				   const unsigned int,
 				   const Point&)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
   libmesh_not_implemented();
   return 0.;
 }
@@ -97,7 +97,7 @@ Real FE<3,CLOUGH>::shape_second_deriv(const Elem* elem,
                                       const unsigned int,
                                       const Point&)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
   libmesh_not_implemented();
   return 0.;
 }

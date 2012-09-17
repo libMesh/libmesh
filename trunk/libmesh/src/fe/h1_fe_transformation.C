@@ -34,7 +34,7 @@ namespace libMesh
 	{
 	  for (unsigned int i=0; i<phi.size(); i++)
 	    {
-	      libmesh_assert( qp.size() == phi[i].size() );
+	      libmesh_assert_equal_to ( qp.size(), phi[i].size() );
 	      for (unsigned int p=0; p<phi[i].size(); p++)
 		FEInterface::shape<OutputShape>(0, fe.get_fe_type(), elem, i, qp[p], phi[i][p]);
 	    }
@@ -44,7 +44,7 @@ namespace libMesh
 	{
 	  for (unsigned int i=0; i<phi.size(); i++)
 	    {
-	      libmesh_assert( qp.size() == phi[i].size() );
+	      libmesh_assert_equal_to ( qp.size(), phi[i].size() );
 	      for (unsigned int p=0; p<phi[i].size(); p++)
 		FEInterface::shape<OutputShape>(1, fe.get_fe_type(), elem, i, qp[p], phi[i][p]);
 	    }
@@ -54,7 +54,7 @@ namespace libMesh
 	{
 	  for (unsigned int i=0; i<phi.size(); i++)
 	    {
-	      libmesh_assert( qp.size() == phi[i].size() );
+	      libmesh_assert_equal_to ( qp.size(), phi[i].size() );
 	      for (unsigned int p=0; p<phi[i].size(); p++)
 		FEInterface::shape<OutputShape>(2, fe.get_fe_type(), elem, i, qp[p], phi[i][p]);
 	    }
@@ -64,7 +64,7 @@ namespace libMesh
 	{
 	  for (unsigned int i=0; i<phi.size(); i++)
 	    {
-	      libmesh_assert( qp.size() == phi[i].size() );
+	      libmesh_assert_equal_to ( qp.size(), phi[i].size() );
 	      for (unsigned int p=0; p<phi[i].size(); p++)
 		FEInterface::shape<OutputShape>(3, fe.get_fe_type(), elem, i, qp[p], phi[i][p]);
 	    }

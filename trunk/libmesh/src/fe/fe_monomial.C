@@ -51,7 +51,7 @@ namespace libMesh
 	  // Constant shape functions
 	case CONSTANT:
 	  {
-	    libmesh_assert (elem_soln.size() == 1);
+	    libmesh_assert_equal_to (elem_soln.size(), 1);
 
 	    const Number val = elem_soln[0];
 
@@ -75,11 +75,11 @@ namespace libMesh
 
 	    std::vector<Point> refspace_nodes;
 	    FEBase::get_refspace_nodes(elem_type,refspace_nodes);
-	    libmesh_assert (refspace_nodes.size() == n_nodes);
+	    libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
 
 	    for (unsigned int n=0; n<n_nodes; n++)
 	      {
-		libmesh_assert (elem_soln.size() == n_sf);
+		libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
 		// Zero before summation
 		nodal_soln[n] = 0;

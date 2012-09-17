@@ -299,7 +299,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(std::map<std:
 						                                                       int training_parameters_random_seed,
                                                                    bool serial_training_set)
 {
-  libmesh_assert( min_parameters.n_parameters() == max_parameters.n_parameters() );
+  libmesh_assert_equal_to ( min_parameters.n_parameters(), max_parameters.n_parameters() );
   const unsigned int num_params = min_parameters.n_parameters();
 
   // Clear training_parameters_in
@@ -427,7 +427,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::m
                                                                           const RBParameters& max_parameters,
                                                                           bool serial_training_set)
 {
-  libmesh_assert( min_parameters.n_parameters() == max_parameters.n_parameters() );
+  libmesh_assert_equal_to ( min_parameters.n_parameters(), max_parameters.n_parameters() );
   const unsigned int num_params = min_parameters.n_parameters();
 
   if (num_params == 0)
@@ -742,7 +742,7 @@ void RBConstructionBase<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Num
 template <class Base>
 void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
 {
-  libmesh_assert(proc_id < libMesh::n_processors());
+  libmesh_assert_less (proc_id, libMesh::n_processors());
 
   // create a copy of the current parameters
   RBParameters current_parameters = get_parameters();

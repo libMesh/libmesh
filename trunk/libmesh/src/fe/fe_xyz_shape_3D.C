@@ -63,7 +63,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
 		      const Point& p)
 {
 #if LIBMESH_DIM == 3
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -84,7 +84,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = p(0);
   const Real y  = p(1);
@@ -104,7 +104,7 @@ Real FE<3,XYZ>::shape(const Elem* elem,
   // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = order + elem->p_level();
 #endif
-  libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
+  libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+3)/6);
 
@@ -273,8 +273,8 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 {
 #if LIBMESH_DIM == 3
 
-  libmesh_assert (elem != NULL);
-  libmesh_assert (j<3);
+  libmesh_assert(elem);
+  libmesh_assert_less (j, 3);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -295,7 +295,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = p(0);
   const Real y  = p(1);
@@ -315,7 +315,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
 #endif
-  libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
+  libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+3)/6);
 
@@ -764,8 +764,8 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 {
 #if LIBMESH_DIM == 3
 
-  libmesh_assert (elem != NULL);
-  libmesh_assert (j<6);
+  libmesh_assert(elem);
+  libmesh_assert_less (j, 6);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -786,7 +786,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = p(0);
   const Real y  = p(1);
@@ -812,7 +812,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   // we avoid declaring it when asserts are not active.
   const unsigned int totalorder = static_cast<Order>(order + elem->p_level());
 #endif
-  libmesh_assert (i < (static_cast<unsigned int>(totalorder)+1)*
+  libmesh_assert_less (i, (static_cast<unsigned int>(totalorder)+1)*
               (static_cast<unsigned int>(totalorder)+2)*
               (static_cast<unsigned int>(totalorder)+3)/6);
 

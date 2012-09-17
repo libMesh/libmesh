@@ -90,7 +90,7 @@ void RBSCMEvaluation::set_C_J_stability_constraint(unsigned int j, Real stabilit
 
   // we assume that C_J_stability_vector is resized elsewhere
   // to be the same size as C_J.
-  libmesh_assert(C_J_stability_vector.size() == C_J.size());
+  libmesh_assert_equal_to (C_J_stability_vector.size(), C_J.size());
 
   C_J_stability_vector[j] = stability_const_in;
 }

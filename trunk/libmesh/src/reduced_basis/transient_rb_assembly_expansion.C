@@ -40,7 +40,7 @@ void TransientRBAssemblyExpansion::perform_M_interior_assembly(unsigned int q,
     libmesh_error();
   }
 
-  libmesh_assert(_M_assembly_vector[q] != NULL);
+  libmesh_assert(_M_assembly_vector[q]);
 
   return _M_assembly_vector[q]->interior_assembly( context );
 }
@@ -55,7 +55,7 @@ void TransientRBAssemblyExpansion::perform_M_boundary_assembly(unsigned int q,
     libmesh_error();
   }
 
-  libmesh_assert(_M_assembly_vector[q] != NULL);
+  libmesh_assert(_M_assembly_vector[q]);
 
   return _M_assembly_vector[q]->boundary_assembly( context );
 }

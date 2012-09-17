@@ -51,7 +51,7 @@ namespace libMesh
 	  // Constant shape functions
 	case CONSTANT:
 	  {
-	    libmesh_assert (elem_soln.size() == 1);
+	    libmesh_assert_equal_to (elem_soln.size(), 1);
 
 	    const Number val = elem_soln[0];
 
@@ -75,7 +75,7 @@ namespace libMesh
 
 	    for (unsigned int n=0; n<n_nodes; n++)
 	      {
-		libmesh_assert (elem_soln.size() == n_sf);
+		libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
 		// Zero before summation
 		nodal_soln[n] = 0;
@@ -590,7 +590,7 @@ template <unsigned int Dim>
 void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 				      const Elem* elem)
 {
-  libmesh_assert (elem  != NULL);
+  libmesh_assert(elem);
   this->calculations_started = true;
 
   // If the user forgot to request anything, we'll be safe and
@@ -704,7 +704,7 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 template <unsigned int Dim>
 void FEXYZ<Dim>::compute_shape_functions (const Elem* elem, const std::vector<Point>&)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   //-------------------------------------------------------------------------
   // Compute the shape function values (and derivatives)

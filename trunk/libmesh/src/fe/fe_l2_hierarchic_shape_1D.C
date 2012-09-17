@@ -35,7 +35,7 @@ Real FE<1,L2_HIERARCHIC>::shape(const ElemType,
 			     const unsigned int i,
 			     const Point& p)
 {
-  libmesh_assert(i < order+1u);
+  libmesh_assert_less (i, order+1u);
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
@@ -103,7 +103,7 @@ Real FE<1,L2_HIERARCHIC>::shape(const Elem* elem,
 			     const unsigned int i,
 			     const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   return FE<1,L2_HIERARCHIC>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
 }
@@ -119,8 +119,8 @@ Real FE<1,L2_HIERARCHIC>::shape_deriv(const ElemType,
 {
   // only d()/dxi in 1D!
 
-  libmesh_assert (j == 0);
-  libmesh_assert(i < order+1u);
+  libmesh_assert_equal_to (j, 0);
+  libmesh_assert_less (i, order+1u);
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
@@ -188,7 +188,7 @@ Real FE<1,L2_HIERARCHIC>::shape_deriv(const Elem* elem,
 				   const unsigned int j,
 				   const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   return FE<1,L2_HIERARCHIC>::shape_deriv(elem->type(),
 				       static_cast<Order>(order + elem->p_level()), i, j, p);
@@ -205,8 +205,8 @@ Real FE<1,L2_HIERARCHIC>::shape_second_deriv(const ElemType,
 {
   // only d2()/d2xi in 1D!
 
-  libmesh_assert (j == 0);
-  libmesh_assert (i < order+1u);
+  libmesh_assert_equal_to (j, 0);
+  libmesh_assert_less (i, order+1u);
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
@@ -271,7 +271,7 @@ Real FE<1,L2_HIERARCHIC>::shape_second_deriv(const Elem* elem,
 				          const unsigned int j,
 				          const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   return FE<1,L2_HIERARCHIC>::shape_second_deriv(elem->type(),
 				              static_cast<Order>(order + elem->p_level()), i, j, p);
