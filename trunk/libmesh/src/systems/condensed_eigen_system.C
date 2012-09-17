@@ -111,8 +111,8 @@ void CondensedEigenSystem::solve()
   EquationSystems& es = this->get_equation_systems();
 
   // check that necessary parameters have been set
-  libmesh_assert_less (es.parameters.have_parameter, unsigned int>("eigenpairs"));
-  libmesh_assert_less (es.parameters.have_parameter, unsigned int>("basis vectors"));
+  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
+  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
 
   if (this->assemble_before_solve)
     // Assemble the linear system
