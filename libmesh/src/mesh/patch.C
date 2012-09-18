@@ -228,12 +228,12 @@ void Patch::build_around_element (const Elem* e0,
       // Check for a "stagnant" patch
       if (this->size() == old_patch_size)
 	{
-	  libMesh::err << "WARNING: stagnant patch of "
-		        << this->size() << " elements."
-		        << std::endl
-		        << "Does your target patch size exceed the number of elements in the mesh?"
-		        << std::endl;
-	  libmesh_here();
+	  libmesh_do_once(libMesh::err <<
+            "WARNING: stagnant patch of " << this->size() << " elements."
+            << std::endl <<
+            "Does the target patch size exceed the number of local elements?"
+	    << std::endl;
+	  libmesh_here(););
 	  break;
 	}
     } // end while loop
