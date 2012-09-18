@@ -57,7 +57,15 @@ void DifferentiableSystem::clear ()
 {
   this->clear_physics();
 
-  this->clear_qoi();
+  // If we had an attached QoI object, delete it.
+  if (this->diff_qoi != this)
+    {
+      delete this->diff_qoi;
+      this->diff_qoi = this;
+    }
+  // If we had no attached QoI object, clear our own QoI data
+  else
+    this->clear_qoi();
 
   use_fixed_solution = false;
 }
