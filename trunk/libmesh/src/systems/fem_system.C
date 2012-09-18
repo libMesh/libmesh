@@ -290,7 +290,8 @@ namespace {
      * constructor to set context
      */
     explicit
-    PostprocessContributions(FEMSystem &sys) : _sys(sys) {}
+    PostprocessContributions(FEMSystem &sys,
+			     DifferentiableQoI &qoi) : _sys(sys), _qoi(qoi) {}
 
     /**
      * operator() for use with Threads::parallel_for().
@@ -311,14 +312,14 @@ namespace {
           if (_sys.fe_reinit_during_postprocess)
             _femcontext.elem_fe_reinit();
 
-          _sys.element_postprocess(_femcontext);
+          _qoi.element_postprocess(_femcontext);
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
                ++_femcontext.side)
             {
               // Don't compute on non-boundary sides unless requested
-              if (!_sys.postprocess_sides ||
+              if (!_qoi.postprocess_sides ||
                   (!_sys.compute_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
@@ -327,7 +328,7 @@ namespace {
               if (_sys.fe_reinit_during_postprocess)
                 _femcontext.side_fe_reinit();
 
-              _sys.side_postprocess(_femcontext);
+              _qoi.side_postprocess(_femcontext);
             }
         }
     }
@@ -335,6 +336,7 @@ namespace {
   private:
 
     FEMSystem& _sys;
+    DifferentiableQoI& _qoi;
   };
 
   class QoIContributions
@@ -344,15 +346,15 @@ namespace {
      * constructor to set context
      */
     explicit
-    QoIContributions(FEMSystem &sys) :
-      qoi(sys.qoi.size(), 0.), _sys(sys) {}
+    QoIContributions(FEMSystem &sys, DifferentiableQoI &diff_qoi) :
+      qoi(sys.qoi.size(), 0.), _sys(sys), _diff_qoi(diff_qoi) {}
 
     /**
      * splitting constructor
      */
     QoIContributions(const QoIContributions &other,
                      Threads::split) :
-      qoi(other._sys.qoi.size(), 0.), _sys(other._sys) {}
+      qoi(other._sys.qoi.size(), 0.), _sys(other._sys), _diff_qoi(other._diff_qoi) {}
 
     /**
      * operator() for use with Threads::parallel_reduce().
@@ -371,21 +373,21 @@ namespace {
           _femcontext.pre_fe_reinit(_sys, el);
           _femcontext.elem_fe_reinit();
 
-          _sys.element_qoi(_femcontext, _qoi_indices);
+          _diff_qoi.element_qoi(_femcontext, _qoi_indices);
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
                ++_femcontext.side)
             {
               // Don't compute on non-boundary sides unless requested
-              if (!_sys.assemble_qoi_sides ||
+              if (!_diff_qoi.assemble_qoi_sides ||
                   (!_sys.compute_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
 
               _femcontext.side_fe_reinit();
 
-              _sys.side_qoi(_femcontext, _qoi_indices);
+              _diff_qoi.side_qoi(_femcontext, _qoi_indices);
             }
         }
 
@@ -406,6 +408,7 @@ namespace {
   private:
 
     FEMSystem& _sys;
+    DifferentiableQoI& _diff_qoi;
 
     const QoISet _qoi_indices;
   };
@@ -416,8 +419,9 @@ namespace {
     /**
      * constructor to set context
      */
-    QoIDerivativeContributions(FEMSystem &sys, const QoISet& qoi_indices) :
-      _sys(sys), _qoi_indices(qoi_indices) {}
+    QoIDerivativeContributions(FEMSystem &sys, const QoISet& qoi_indices,
+			       DifferentiableQoI &qoi ) :
+      _sys(sys), _qoi_indices(qoi_indices), _qoi(qoi) {}
 
     /**
      * operator() for use with Threads::parallel_for().
@@ -436,21 +440,21 @@ namespace {
           _femcontext.pre_fe_reinit(_sys, el);
           _femcontext.elem_fe_reinit();
 
-          _sys.element_qoi_derivative(_femcontext, _qoi_indices);
+          _qoi.element_qoi_derivative(_femcontext, _qoi_indices);
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
                ++_femcontext.side)
             {
               // Don't compute on non-boundary sides unless requested
-              if (!_sys.assemble_qoi_sides ||
+              if (!_qoi.assemble_qoi_sides ||
                   (!_sys.compute_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
 
               _femcontext.side_fe_reinit();
 
-              _sys.side_qoi_derivative(_femcontext, _qoi_indices);
+              _qoi.side_qoi_derivative(_femcontext, _qoi_indices);
             }
 
           // We need some unmodified indices to use for constraining
@@ -475,8 +479,8 @@ namespace {
   private:
 
     FEMSystem& _sys;
-
     const QoISet& _qoi_indices;
+    DifferentiableQoI& _qoi;
   };
 
 
@@ -702,7 +706,7 @@ void FEMSystem::postprocess ()
   // Loop over every active mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
                                          mesh.active_local_elements_end()),
-                        PostprocessContributions(*this));
+                        PostprocessContributions(*this, *(this->diff_qoi)));
 
   STOP_LOG("postprocess()", "FEMSystem");
 }
@@ -725,7 +729,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
   // Create a non-temporary qoi_contributions object, so we can query
   // its results after the reduction
-  QoIContributions qoi_contributions(*this);
+  QoIContributions qoi_contributions(*this, *(this->diff_qoi));
 
   // Loop over every active mesh element on this processor
   Threads::parallel_reduce(elem_range.reset(mesh.active_local_elements_begin(),
@@ -758,7 +762,8 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
   // Loop over every active mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
                                          mesh.active_local_elements_end()),
-                        QoIDerivativeContributions(*this, qoi_indices));
+                        QoIDerivativeContributions(*this, qoi_indices,
+						   *(this->diff_qoi)));
 
   STOP_LOG("assemble_qoi_derivative()", "FEMSystem");
 }

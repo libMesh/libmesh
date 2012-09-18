@@ -23,9 +23,6 @@ void LaplaceSystem::init_data ()
   parameters.push_back(infile("alpha_1", 1.0));
   parameters.push_back(infile("alpha_2", 1.0));
   
-  exact_QoI[0] = infile("QoI_0", 0.0);
-  exact_QoI[1] = infile("QoI_1", 0.0);
-  
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();
 
@@ -152,22 +149,6 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
     } // end of the quadrature point qp-loop
   
   return compute_jacobian;
-}
-
-// Override the default DiffSystem postprocess function to compute the 
-// approximations to the QoIs 
-void LaplaceSystem::postprocess()
-{  
-  // Reset the array holding the computed QoIs
-  computed_QoI[0] = 0.0;
-  computed_QoI[1] = 0.0;
-
-  FEMSystem::postprocess();
-
-  Parallel::sum(computed_QoI[0]);
-
-  Parallel::sum(computed_QoI[1]);
-     
 }
 
 // The exact solution to the singular problem,

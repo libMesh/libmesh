@@ -143,13 +143,18 @@ public:
                                     const QoISet&)
     {}
  
-  /*
+  /**
    * Prepares the result of a build_context() call for use.
    * 
    * Most FEMSystem-based problems will need to reimplement this in order to
    * call FE::get_*() as their particular QoI requires.
    */
   virtual void init_context(DiffContext &) {}
+
+  /**
+   * Copy of this object. User should override to copy any needed state.
+   */
+  virtual DifferentiableQoI* clone() =0;
 };
 
 } // namespace libMesh
