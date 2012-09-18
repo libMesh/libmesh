@@ -132,6 +132,27 @@ public:
    * solvers, this will integrate dx/dt = F(x).
    */
   virtual void solve ();
+
+  /**
+   * Force the user to override clone for DifferentiableQoI
+   */
+  virtual DifferentiableQoI* clone()
+  { libmesh_error(); 
+    // dummy
+    return this; }
+
+  /**
+   * Returns const reference to DifferentiableQoI object. Note that if no external
+   * QoI object is attached, the default is this.
+   */
+  const DifferentiableQoI* get_qoi()
+  { return this->diff_qoi; }
+
+  /**
+   * Attach external QoI object.
+   */
+  void attach_qoi( DifferentiableQoI* qoi )
+  { this->diff_qoi = qoi->clone(); }
  
   /**
    * A pointer to the solver object we're going to use.
@@ -198,14 +219,16 @@ public:
    * users should create separate physics objects.
    */
   DifferentiablePhysics *diff_physics;
+ 
+protected:
 
   /**
    * Pointer to object to use for quantity of interest assembly
    * evaluations.  Defaults to \p this for backwards compatibility; in
    * the future users should create separate physics objects.
    */
-  DifferentiableQoI *diff_qoi; 
-protected:
+  DifferentiableQoI* diff_qoi;
+
   /**
    * Initializes the member data fields associated with
    * the system, so that, e.g., \p assemble() may be used.

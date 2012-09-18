@@ -89,6 +89,7 @@
 // Local includes
 #include "femparameters.h"
 #include "L-shaped.h"
+#include "L-qoi.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -302,6 +303,12 @@ int main (int argc, char** argv)
 
   // Build the FEMSystem
   LaplaceSystem &system = equation_systems.add_system<LaplaceSystem> ("LaplaceSystem");
+
+  // Put some scope here to test that the cloning is working right
+  {
+    LaplaceQoI qoi;
+    system.attach_qoi( &qoi );
+  }
 
   // Set its parameters
   set_system_parameters(system, param);
