@@ -235,7 +235,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
   // value is -1, which means use std::time to seed the RNG.
-  unsigned int training_parameters_random_seed_in = -1;
+  unsigned int training_parameters_random_seed_in = static_cast<unsigned int>(-1);
   training_parameters_random_seed_in = infile("training_parameters_random_seed",
 					   training_parameters_random_seed_in);
   set_training_random_seed(training_parameters_random_seed_in);
