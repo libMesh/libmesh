@@ -138,7 +138,7 @@ InfPrism::InfPrism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
 // inline
 // unsigned int InfPrism::n_children_per_side(const unsigned int s) const
 // {
-//   libmesh_assert (s < this->n_sides());
+//   libmesh_assert_less (s, this->n_sides());
 
 //   switch (s)
 //   {

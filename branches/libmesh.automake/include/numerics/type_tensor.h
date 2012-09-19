@@ -134,7 +134,7 @@ public:
     ScalarTraits<Scalar>::value,
     TypeTensor&>::type
   operator = (const Scalar& p)
-  { libmesh_assert(p == Scalar(0)); this->zero(); return *this; }
+  { libmesh_assert_equal_to (p, Scalar(0)); this->zero(); return *this; }
 
   /**
    * Return the \f$ i,j^{th} \f$ element of the tensor.
@@ -523,7 +523,7 @@ template <typename T>
 template <typename T2>
 TypeTensor<T>::TypeTensor(const TypeVector<T2>& vx)
 {
-  libmesh_assert(LIBMESH_DIM == 1);
+  libmesh_assert_equal_to (LIBMESH_DIM, 1);
   _coords[0] = vx(0);
 }
 
@@ -531,7 +531,7 @@ template <typename T>
 template <typename T2>
 TypeTensor<T>::TypeTensor(const TypeVector<T2>& vx, const TypeVector<T2> &vy)
 {
-  libmesh_assert(LIBMESH_DIM == 2);
+  libmesh_assert_equal_to (LIBMESH_DIM, 2);
   _coords[0] = vx(0);
   _coords[1] = vx(1);
   _coords[2] = vy(0);
@@ -542,7 +542,7 @@ template <typename T>
 template <typename T2>
 TypeTensor<T>::TypeTensor(const TypeVector<T2>& vx, const TypeVector<T2> &vy, const TypeVector<T2> &vz)
 {
-  libmesh_assert(LIBMESH_DIM == 3);
+  libmesh_assert_equal_to (LIBMESH_DIM, 3);
   _coords[0] = vx(0);
   _coords[1] = vx(1);
   _coords[2] = vx(2);
@@ -581,8 +581,8 @@ inline
 const T & TypeTensor<T>::operator () (const unsigned int i,
 			      const unsigned int j) const
 {
-  libmesh_assert (i<3);
-  libmesh_assert (j<3);
+  libmesh_assert_less (i, 3);
+  libmesh_assert_less (j, 3);
 
 #if LIBMESH_DIM < 3
   const static T my_zero = 0;
@@ -612,8 +612,8 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 
 #endif
 
-  libmesh_assert (i<LIBMESH_DIM);
-  libmesh_assert (j<LIBMESH_DIM);
+  libmesh_assert_less (i, LIBMESH_DIM);
+  libmesh_assert_less (j, LIBMESH_DIM);
 
   return _coords[i*LIBMESH_DIM+j];
 }
@@ -624,7 +624,7 @@ inline
 ConstTypeTensorColumn<T> 
 TypeTensor<T>::slice (const unsigned int i) const
 {
-  libmesh_assert (i < LIBMESH_DIM);
+  libmesh_assert_less (i, LIBMESH_DIM);
   return ConstTypeTensorColumn<T>(*this, i);
 }
 
@@ -634,7 +634,7 @@ inline
 TypeTensorColumn<T> 
 TypeTensor<T>::slice (const unsigned int i)
 {
-  libmesh_assert (i < LIBMESH_DIM);
+  libmesh_assert_less (i, LIBMESH_DIM);
   return TypeTensorColumn<T>(*this, i);
 }
 
@@ -895,7 +895,7 @@ typename boostcopy::enable_if_c<
   TypeTensor<typename CompareTypes<T, Scalar>::supertype> >::type
 TypeTensor<T>::operator / (const Scalar factor) const
 {
-  libmesh_assert (factor != static_cast<T>(0.));
+  libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
 
   typedef typename CompareTypes<T, Scalar>::supertype TS;
 
@@ -960,7 +960,7 @@ template <typename T>
 inline
 const TypeTensor<T> & TypeTensor<T>::operator /= (const T factor)
 {
-  libmesh_assert (factor != static_cast<T>(0.));
+  libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
 
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
     _coords[i] /= factor;

@@ -310,7 +310,7 @@ Parameters::Value* Parameters::Parameter<T>::clone () const
   Parameter<T>
     *copy = new Parameter<T>;
 
-  libmesh_assert (copy != NULL);
+  libmesh_assert(copy);
 
   copy->_value = _value;
 
@@ -446,8 +446,8 @@ const T& Parameters::get (const std::string& name) const
 
   Parameters::const_iterator it = _values.find(name);
 
-  libmesh_assert (it != _values.end());
-  libmesh_assert (it->second != NULL);
+  libmesh_assert(it != _values.end());
+  libmesh_assert(it->second);
 
   return libmesh_cast_ptr<Parameter<T>*>(it->second)->get();
 }

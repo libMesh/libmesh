@@ -124,6 +124,7 @@ libmesh_la_SOURCES = \
 		src/error_estimation/kelly_error_estimator.C \
 		src/error_estimation/patch_recovery_error_estimator.C \
 		src/error_estimation/uniform_refinement_estimator.C \
+	        src/error_estimation/weighted_patch_recovery_estimator.C \
 		src/fe/fe.C \
                 src/fe/fe_abstract.C \
 		src/fe/fe_base.C \

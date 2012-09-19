@@ -384,7 +384,7 @@ void PerfLog::pop (const std::string &libmesh_dbg_var(label),
             if (&(i->second) == log_stack.top())
               std::cerr << '(' << i->first.first << ',' << i->first.second << ')' << std::endl;
 
-          libmesh_assert(perf_data == log_stack.top());
+          libmesh_assert_equal_to (perf_data, log_stack.top());
         }
 #endif
 

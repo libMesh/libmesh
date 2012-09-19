@@ -209,7 +209,7 @@ void ContinuationSystem::initialize_tangent()
   // 3.) Treating (u-previous_u)/(lambda - lambda_old) as an approximation to du/d(lambda),
   // we follow the same technique as Carnes and Shadid.
 //   const Real dlambda = *continuation_parameter-old_continuation_parameter;
-//   libmesh_assert (dlambda > 0.);
+//   libmesh_assert_greater (dlambda, 0.);
 
 //   // Use delta_u for temporary calculation of du/d(lambda)
 //   *delta_u = *solution;
@@ -283,7 +283,7 @@ void ContinuationSystem::initialize_tangent()
 
   // Initial change in parameter
   const Real dlambda = *continuation_parameter-old_continuation_parameter;
-  libmesh_assert (dlambda != 0.0);
+  libmesh_assert_not_equal_to (dlambda, 0.0);
 
   // Ideal initial value of dlambda_ds
   dlambda_ds = 1. / std::sqrt(2.);
@@ -445,8 +445,8 @@ void ContinuationSystem::continuation_solve()
 	      const Real alp=0.5*(1.+std::sqrt(5.));
 	      const Real gam=0.9;
 
-	      libmesh_assert (nonlinear_residual_beforestep != 0.0);
-	      libmesh_assert (nonlinear_residual_afterstep != 0.0);
+	      libmesh_assert_not_equal_to (nonlinear_residual_beforestep, 0.0);
+	      libmesh_assert_not_equal_to (nonlinear_residual_afterstep, 0.0);
 
 	      current_linear_tolerance = std::min(gam*std::pow(nonlinear_residual_afterstep/nonlinear_residual_beforestep, alp),
 						  current_linear_tolerance*current_linear_tolerance
@@ -682,7 +682,7 @@ void ContinuationSystem::continuation_solve()
 	  const Number delta_lambda_numerator   = -(N          + Theta_LOCA*Theta_LOCA*Theta*duds_dot_z);
 	  const Number delta_lambda_denominator =  (dlambda_ds - Theta_LOCA*Theta_LOCA*Theta*duds_dot_y);
 
-	  libmesh_assert (delta_lambda_denominator != 0.0);
+	  libmesh_assert_not_equal_to (delta_lambda_denominator, 0.0);
 
 	  // Now, we are ready to compute the step delta_lambda
 	  const Number delta_lambda_comp = delta_lambda_numerator /
@@ -1015,7 +1015,7 @@ void ContinuationSystem::solve_tangent()
 //   Real denom = dlambda_ds - du_ds->dot(*y);
 
 //   //libMesh::out << "denom=" << denom << std::endl;
-//   libmesh_assert (denom != 0.0);
+//   libmesh_assert_not_equal_to (denom, 0.0);
 
 //   dlambda_ds = 1.0 / denom;
 
@@ -1076,7 +1076,7 @@ void ContinuationSystem::set_Theta()
 {
   // // Use the norm of the latest solution, squared.
   //const Real normu = solution->l2_norm();
-  //libmesh_assert (normu != 0.0);
+  //libmesh_assert_not_equal_to (normu, 0.0);
   //Theta = 1./normu/normu;
 
   // // 1.) Use the norm of du, squared
@@ -1094,7 +1094,7 @@ void ContinuationSystem::set_Theta()
   Theta=1.;
 
   // 3.) Use a formula which attempts to make the "solution triangle" isosceles.
-//   libmesh_assert (std::abs(dlambda_ds) < 1.);
+//   libmesh_assert_less (std::abs(dlambda_ds), 1.);
 
 //   *delta_u = *solution;
 //   delta_u->add(-1, *previous_u);
@@ -1150,7 +1150,7 @@ void ContinuationSystem::set_Theta_LOCA()
   //   libMesh::out << "(Theta_LOCA) dlambda_ds=" << dlambda_ds << std::endl;
 
   // Formula makes no sense if |dlambda_ds| > 1
-  libmesh_assert (std::abs(dlambda_ds) < 1.);
+  libmesh_assert_less (std::abs(dlambda_ds), 1.);
 
   // 1.) Attempt to implement the method in LOCA paper
 //   const Real g = 1./std::sqrt(2.); // "desired" dlambda_ds
@@ -1285,7 +1285,7 @@ void ContinuationSystem::update_solution()
       // step (relative to the maximum-allowed number of Newton iterations) to grow the step.
       if (newton_stepgrowth_aggressiveness > 0.)
 	{
-	  libmesh_assert (newton_solver != NULL);
+	  libmesh_assert(newton_solver);
 	  const unsigned int Nmax = newton_solver->max_nonlinear_iterations;
 
 	  // // The LOCA Newton step growth technique (note: only grows step length)
@@ -1399,7 +1399,7 @@ void ContinuationSystem::apply_predictor()
   else if (predictor == AB2)
     {
       // 2.) 2nd-order explicit AB predictor
-      libmesh_assert(previous_ds != 0.0);
+      libmesh_assert_not_equal_to (previous_ds, 0.0);
       const Real stepratio = ds_current/previous_ds;
 
       // Build up next solution value.

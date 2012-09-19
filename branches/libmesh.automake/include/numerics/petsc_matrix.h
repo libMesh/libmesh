@@ -552,8 +552,8 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
   // sanity check. but this cannot avoid
   // crash due to incompatible sparsity structure...
-  libmesh_assert (this->m() == X_in.m());
-  libmesh_assert (this->n() == X_in.n());
+  libmesh_assert_equal_to (this->m(), X_in.m());
+  libmesh_assert_equal_to (this->n(), X_in.n());
 
   PetscScalar     a = static_cast<PetscScalar>      (a_in);
   PetscMatrix<T>* X = libmesh_cast_ptr<PetscMatrix<T>*> (&X_in);
@@ -640,8 +640,8 @@ T PetscMatrix<T>::operator () (const unsigned int i,
       const int j = std::distance (const_cast<int*>(&petsc_cols[0]),
 				   const_cast<int*>(p.first));
 
-      libmesh_assert (j < ncols);
-      libmesh_assert (petsc_cols[j] == j_val);
+      libmesh_assert_less (j, ncols);
+      libmesh_assert_equal_to (petsc_cols[j], j_val);
 
       value = static_cast<T> (petsc_row[j]);
     }

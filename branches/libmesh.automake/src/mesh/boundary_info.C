@@ -432,7 +432,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                     // sanity check: be sure that the new Node exists
                     // and its global id really matches
                     libmesh_assert (new_node);
-                    libmesh_assert (new_node->id() == node_id_map[new_elem->node(nn)]);
+                    libmesh_assert_equal_to (new_node->id(), node_id_map[new_elem->node(nn)]);
 
                     // Assign the new node pointer
                     new_elem->set_node(nn) = new_node;
@@ -472,7 +472,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
 		    // triangle.
                     if (!found_child)
                       {
-                        libmesh_assert(new_elem->n_vertices() == 3);
+                        libmesh_assert_equal_to (new_elem->n_vertices(), 3);
                         side_parent->add_child(new_elem, 3);
                       }
                   }
@@ -547,7 +547,7 @@ void BoundaryInfo::add_node(const Node* node,
   if (ids.empty())
     return;
 
-  libmesh_assert (node != NULL);
+  libmesh_assert(node);
 
   // A convenient typedef
   typedef std::multimap<const Node*, boundary_id_type>::const_iterator Iter;
@@ -606,10 +606,10 @@ void BoundaryInfo::add_side(const Elem* elem,
 			    const unsigned short int side,
 			    const boundary_id_type id)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // Only add BCs for level-0 elements.
-  libmesh_assert (elem->level() == 0);
+  libmesh_assert_equal_to (elem->level(), 0);
 
   if (id == invalid_id)
     {
@@ -651,10 +651,10 @@ void BoundaryInfo::add_side(const Elem* elem,
   if (ids.empty())
     return;
 
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // Only add BCs for level-0 elements.
-  libmesh_assert (elem->level() == 0);
+  libmesh_assert_equal_to (elem->level(), 0);
 
   // A convenient typedef
   typedef std::multimap<const Elem*, std::pair<unsigned short int, boundary_id_type> >::
@@ -732,7 +732,7 @@ unsigned int BoundaryInfo::n_boundary_ids(const Node* node) const
 boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
 				           const unsigned short int side) const
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element, one of its parent elements may have either internal
@@ -791,7 +791,7 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
 std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem,
                                                           const unsigned short int side) const
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   std::vector<boundary_id_type> ids;
 
@@ -844,7 +844,7 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem
 unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
                                            const unsigned short int side) const
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // Only level-0 elements store BCs.  If this is not a level-0
   // element get its level-0 parent and infer the BCs.
@@ -891,7 +891,7 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
 std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem* const elem,
                                                               const unsigned short int side) const
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   std::vector<boundary_id_type> ids;
 
@@ -926,11 +926,11 @@ std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem* const 
 void BoundaryInfo::remove_side (const Elem* elem,
                                 const unsigned short int side)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // The user shouldn't be trying to remove only one child's boundary
   // id
-  libmesh_assert (elem->level() == 0);
+  libmesh_assert_equal_to (elem->level(), 0);
 
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, boundary_id_type> >::iterator,
@@ -959,11 +959,11 @@ void BoundaryInfo::remove_side (const Elem* elem,
                                 const unsigned short int side,
                                 const boundary_id_type id)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // The user shouldn't be trying to remove only one child's boundary
   // id
-  libmesh_assert (elem->level() == 0);
+  libmesh_assert_equal_to (elem->level(), 0);
 
   std::pair<std::multimap<const Elem*,
                           std::pair<unsigned short int, boundary_id_type> >::iterator,

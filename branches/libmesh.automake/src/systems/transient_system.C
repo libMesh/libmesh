@@ -141,9 +141,9 @@ void TransientSystem<Base>::re_update ()
   const unsigned int end_local_dof  = Base::get_dof_map().end_dof();
 
   // Check sizes
-  libmesh_assert (end_local_dof >= first_local_dof);
-  libmesh_assert (older_local_solution->size() >= send_list.size());
-  libmesh_assert (old_local_solution->size()   >= send_list.size());
+  libmesh_assert_greater_equal (end_local_dof, first_local_dof);
+  libmesh_assert_greater_equal (older_local_solution->size(), send_list.size());
+  libmesh_assert_greater_equal (old_local_solution->size(), send_list.size());
 
   // Even if we don't have to do anything ourselves, localize() may
   // use parallel_only tools
@@ -168,8 +168,8 @@ template <class Base>
 Number TransientSystem<Base>::old_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
-  libmesh_assert (global_dof_number < this->get_dof_map().n_dofs());
-  libmesh_assert (global_dof_number < old_local_solution->size());
+  libmesh_assert_less (global_dof_number, this->get_dof_map().n_dofs());
+  libmesh_assert_less (global_dof_number, old_local_solution->size());
 
   return (*old_local_solution)(global_dof_number);
 }
@@ -180,8 +180,8 @@ template <class Base>
 Number TransientSystem<Base>::older_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
-  libmesh_assert (global_dof_number < this->get_dof_map().n_dofs());
-  libmesh_assert (global_dof_number < older_local_solution->size());
+  libmesh_assert_less (global_dof_number, this->get_dof_map().n_dofs());
+  libmesh_assert_less (global_dof_number, older_local_solution->size());
 
   return (*older_local_solution)(global_dof_number);
 }

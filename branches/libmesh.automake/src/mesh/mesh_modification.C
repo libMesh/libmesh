@@ -149,7 +149,7 @@ void MeshTools::Modification::translate (MeshBase& mesh,
 // void MeshTools::Modification::rotate2D (MeshBase& mesh,
 //                                         const Real alpha)
 // {
-//   libmesh_assert (mesh.mesh_dimension() != 1);
+//   libmesh_assert_not_equal_to (mesh.mesh_dimension(), 1);
 
 //   const Real pi = std::acos(-1);
 //   const Real  a = alpha/180.*pi;
@@ -173,7 +173,7 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
 				      const Real theta,
 				      const Real psi)
 {
-  libmesh_assert (mesh.mesh_dimension() != 1);
+  libmesh_assert_not_equal_to (mesh.mesh_dimension(), 1);
 
   const Real pi = std::acos(-1.);
   const Real  p = -phi/180.*pi;
@@ -214,7 +214,7 @@ void MeshTools::Modification::scale (MeshBase& mesh,
 
   if (ys == 0.)
     {
-      libmesh_assert (zs == 0.);
+      libmesh_assert_equal_to (zs, 0.);
 
       y_scale = z_scale = x_scale;
     }
@@ -278,7 +278,7 @@ void UnstructuredMesh::all_first_order ()
     {
       Elem* so_elem = *it;
 
-      libmesh_assert (so_elem != NULL);
+      libmesh_assert(so_elem);
 
       /*
        * build the first-order equivalent, add to
@@ -321,7 +321,7 @@ void UnstructuredMesh::all_first_order ()
       lo_elem->set_p_refinement_flag(so_elem->p_refinement_flag());
 #endif
 
-      libmesh_assert (lo_elem->n_vertices() == so_elem->n_vertices());
+      libmesh_assert_equal_to (lo_elem->n_vertices(), so_elem->n_vertices());
 
       /*
        * By definition the vertices of the linear and
@@ -340,7 +340,7 @@ void UnstructuredMesh::all_first_order ()
        * boundary conditions will be removed from the BoundaryInfo
        * data structure by insert_elem.
        */
-      libmesh_assert (lo_elem->n_sides() == so_elem->n_sides());
+      libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
 
       for (unsigned int s=0; s<so_elem->n_sides(); s++)
 	{
@@ -499,7 +499,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
       // the linear-order element
       const Elem* lo_elem = *it;
 
-      libmesh_assert (lo_elem != NULL);
+      libmesh_assert(lo_elem);
 
       // make sure it is linear order
       if (lo_elem->default_order() != FIRST)
@@ -510,7 +510,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	}
 
       // this does _not_ work for refined elements
-      libmesh_assert (lo_elem->level () == 0);
+      libmesh_assert_equal_to (lo_elem->level (), 0);
 
       /*
        * build the second-order equivalent, add to
@@ -524,7 +524,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	Elem::build (Elem::second_order_equivalent_type(lo_elem->type(),
 							full_ordered) ).release();
 
-      libmesh_assert (lo_elem->n_vertices() == so_elem->n_vertices());
+      libmesh_assert_equal_to (lo_elem->n_vertices(), so_elem->n_vertices());
 
 
       /*
@@ -611,7 +611,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 	  // yes, already added.
 	  else
 	    {
-	      libmesh_assert (pos.first->second != NULL);
+	      libmesh_assert(pos.first->second);
 
 	      so_elem->set_node(son) = pos.first->second;
 	    }
@@ -629,7 +629,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * mesh, they need to be preserved.  We do that in the same loop
        * here.
        */
-      libmesh_assert (lo_elem->n_sides() == so_elem->n_sides());
+      libmesh_assert_equal_to (lo_elem->n_sides(), so_elem->n_sides());
 
       for (unsigned int s=0; s<lo_elem->n_sides(); s++)
 	{
@@ -714,7 +714,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 	const ElemType etype = elem->type();
 
 	// all_tri currently only works on coarse meshes
-	libmesh_assert (elem->parent() == NULL);
+	libmesh_assert (!elem->parent());
 
 	// We split the quads using the shorter of the two diagonals
 	// to maintain the best angle properties.
@@ -1119,18 +1119,18 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
     {
       // By this time, we should have removed all of the original boundary sides
       // - except on a hybrid mesh, where we can't "start from a blank slate"! - RHS
-      // libmesh_assert (mesh.boundary_info->n_boundary_conds()==0);
+      // libmesh_assert_equal_to (mesh.boundary_info->n_boundary_conds(), 0);
 
       // Clear the boundary info, to be sure and start from a blank slate.
       // mesh.boundary_info->clear();
 
       // If the old mesh had boundary data, the new mesh better have some.
-      libmesh_assert (new_bndry_elements.size() > 0);
+      libmesh_assert_greater (new_bndry_elements.size(), 0);
 
       // We should also be sure that the lengths of the new boundary data vectors
       // are all the same.
-      libmesh_assert (new_bndry_elements.size() == new_bndry_sides.size());
-      libmesh_assert (new_bndry_sides.size()    == new_bndry_ids.size());
+      libmesh_assert_equal_to (new_bndry_elements.size(), new_bndry_sides.size());
+      libmesh_assert_equal_to (new_bndry_sides.size(), new_bndry_ids.size());
 
       // Add the new boundary info to the mesh
       for (unsigned int s=0; s<new_bndry_elements.size(); ++s)
@@ -1154,7 +1154,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
   /**
    * This implementation assumes every element "side" has only 2 nodes.
    */
-  libmesh_assert (mesh.mesh_dimension() == 2);
+  libmesh_assert_equal_to (mesh.mesh_dimension(), 2);
 
   /*
    * find the boundary nodes
@@ -1408,8 +1408,8 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 
     // Make sure we saved the same number of boundary conditions
     // in each vector.
-    libmesh_assert (saved_boundary_elements.size() == saved_bc_ids.size());
-    libmesh_assert (saved_bc_ids.size()            == saved_bc_sides.size());
+    libmesh_assert_equal_to (saved_boundary_elements.size(), saved_bc_ids.size());
+    libmesh_assert_equal_to (saved_bc_ids.size(), saved_bc_sides.size());
   }
 
 
@@ -1438,7 +1438,7 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 	// If the Elem, as it was re-added to the mesh, now has a
 	// different ID (this is unlikely, so it's just an assert)
 	// the boundary information will no longer be correct.
-	libmesh_assert(orig_id == added_id);
+	libmesh_assert_equal_to (orig_id, added_id);
       }
   }
 

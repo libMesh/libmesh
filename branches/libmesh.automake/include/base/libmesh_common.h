@@ -258,6 +258,7 @@ extern OStreamProxy err;
 // libmesh_error() (including stack trace, etc) instead of just exiting
 #ifdef NDEBUG
 #define libmesh_assert(asserted)  ((void) 0)
+#define libmesh_assert_msg(asserted, msg)  ((void) 0)
 #define libmesh_assert_equal_to(expr1,expr2)  ((void) 0)
 #define libmesh_assert_not_equal_to(expr1,expr2)  ((void) 0)
 #define libmesh_assert_less(expr1,expr2)  ((void) 0)
@@ -266,6 +267,7 @@ extern OStreamProxy err;
 #define libmesh_assert_greater_equal(expr1,expr2)  ((void) 0)
 #else
 #define libmesh_assert(asserted)  do { if (!(asserted)) { libMesh::err << "Assertion `" #asserted "' failed." << std::endl; libmesh_error(); } } while(0)
+#define libmesh_assert_msg(asserted, msg)  do { if (!(asserted)) { libMesh::err << "Assertion `" #asserted "' failed." << std::endl; libmesh_error_msg(msg); } } while(0)
 #define libmesh_assert_equal_to(expr1,expr2)  do { if (!(expr1 == expr2)) { libMesh::err << "Assertion `" #expr1 " == " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
 #define libmesh_assert_not_equal_to(expr1,expr2)  do { if (!(expr1 != expr2)) { libMesh::err << "Assertion `" #expr1 " != " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
 #define libmesh_assert_less(expr1,expr2)  do { if (!(expr1 < expr2)) { libMesh::err << "Assertion `" #expr1 " < " #expr2 "' failed.\n" #expr1 " = " << (expr1) << "\n" #expr2 " = " << (expr2) << std::endl; libmesh_error(); } } while(0)
@@ -298,8 +300,11 @@ extern OStreamProxy err;
 // exceptions they throw are uncaught then the
 // libmesh_terminate_handler will write such files.
 #define libmesh_error()    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); LIBMESH_THROW(libMesh::LogicError()); } while(0)
+#define libmesh_error_msg(msg)    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); libMesh::err << msg << std::endl; LIBMESH_THROW(libMesh::LogicError()); } while(0)
 #define libmesh_not_implemented()    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
+#define libmesh_not_implemented_msg(msg)    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); libMesh::err << msg << std::endl; LIBMESH_THROW(libMesh::NotImplemented()); } while(0)
 #define libmesh_file_error(filename)    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); LIBMESH_THROW(libMesh::FileError(filename)); } while(0)
+#define libmesh_file_error_msg(filename, msg)    do { if (libMesh::n_processors() == 1) libMesh::print_trace(); libmesh_here(); libMesh:err << msg << std::endl; LIBMESH_THROW(libMesh::FileError(filename)); } while(0)
 #define libmesh_convergence_failure()    do { LIBMESH_THROW(libMesh::ConvergenceFailure()); } while(0)
 
 // The libmesh_example_assert() macro prints a message and calls

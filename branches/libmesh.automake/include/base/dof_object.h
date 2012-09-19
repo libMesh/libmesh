@@ -434,7 +434,7 @@ void DofObject::clear_dofs ()
   // vector swap trick to force deallocation
   index_buffer_t().swap(_idx_buf);
 
-  libmesh_assert (this->n_systems() == 0);
+  libmesh_assert_equal_to (this->n_systems(), 0);
   libmesh_assert (_idx_buf.empty());
 }
 
@@ -444,7 +444,7 @@ inline
 unsigned int DofObject::n_dofs (const unsigned int s,
 				const unsigned int var) const
 {
-  libmesh_assert (s < this->n_systems());
+  libmesh_assert_less (s, this->n_systems());
 
   unsigned int num = 0;
 
@@ -529,7 +529,7 @@ unsigned int DofObject::n_systems () const
 inline
 unsigned int DofObject::n_vars(const unsigned int s) const
 {
-  libmesh_assert (s < this->n_systems());
+  libmesh_assert_less (s, this->n_systems());
 
   return (this->end_idx(s) - this->start_idx(s)) / 2;
 }
@@ -541,8 +541,8 @@ inline
 unsigned int DofObject::n_comp(const unsigned int s,
 			       const unsigned int var) const
 {
-  libmesh_assert (s   < this->n_systems());
-  libmesh_assert (var < this->n_vars(s));
+  libmesh_assert_less (s, this->n_systems());
+  libmesh_assert_less (var, this->n_vars(s));
 
 # ifdef DEBUG
   // Does this ever happen?  I doubt it... 3/7/2003 (BSK)
@@ -558,7 +558,7 @@ unsigned int DofObject::n_comp(const unsigned int s,
   const unsigned int
     start_idx_sys = this->start_idx(s);
 
-  libmesh_assert ((start_idx_sys + 2*var) < _idx_buf.size());
+  libmesh_assert_less ((start_idx_sys + 2*var), _idx_buf.size());
 
   return _idx_buf[start_idx_sys + 2*var];
 }
@@ -570,14 +570,14 @@ unsigned int DofObject::dof_number(const unsigned int s,
 				   const unsigned int var,
 				   const unsigned int comp) const
 {
-  libmesh_assert (s    < this->n_systems());
-  libmesh_assert (var  < this->n_vars(s));
-  libmesh_assert (comp < this->n_comp(s,var));
+  libmesh_assert_less (s, this->n_systems());
+  libmesh_assert_less (var, this->n_vars(s));
+  libmesh_assert_less (comp, this->n_comp(s,var));
 
   const unsigned int
     start_idx_sys = this->start_idx(s);
 
-  libmesh_assert ((start_idx_sys + 2*var + 1) < _idx_buf.size());
+  libmesh_assert_less ((start_idx_sys + 2*var + 1), _idx_buf.size());
 
   const unsigned int
     base_idx = _idx_buf[start_idx_sys + 2*var + 1];
@@ -607,7 +607,7 @@ bool DofObject::has_dofs (const unsigned int sys) const
 
   else
     {
-      libmesh_assert (sys < this->n_systems());
+      libmesh_assert_less (sys, this->n_systems());
 
       if (this->n_vars(sys))
 	return true;
@@ -621,8 +621,8 @@ bool DofObject::has_dofs (const unsigned int sys) const
 inline
 unsigned int DofObject::start_idx (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_systems());
-  libmesh_assert (s < _idx_buf.size());
+  libmesh_assert_less (s, this->n_systems());
+  libmesh_assert_less (s, _idx_buf.size());
 
   return _idx_buf[s];
 }
@@ -632,8 +632,8 @@ unsigned int DofObject::start_idx (const unsigned int s) const
 inline
 unsigned int DofObject::end_idx (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_systems());
-  libmesh_assert (s < _idx_buf.size());
+  libmesh_assert_less (s, this->n_systems());
+  libmesh_assert_less (s, _idx_buf.size());
 
   return ((s+1) == this->n_systems()) ? _idx_buf.size() : _idx_buf[s+1];
 }

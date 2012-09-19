@@ -57,7 +57,7 @@ FEMContext::FEMContext (const System &sys)
 
       // FIXME - we don't yet handle mixed finite elements from
       // different families which require different quadrature rules
-      // libmesh_assert (fe_type.family == hardest_fe_type.family);
+      // libmesh_assert_equal_to (fe_type.family, hardest_fe_type.family);
 
       if (fe_type.order > hardest_fe_type.order)
         hardest_fe_type = fe_type;
@@ -199,12 +199,12 @@ void FEMContext::interior_value(unsigned int var, unsigned int qp,
 				typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -239,12 +239,12 @@ void FEMContext::interior_gradient(unsigned int var, unsigned int qp,
                                    typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -280,12 +280,12 @@ void FEMContext::interior_hessian(unsigned int var, unsigned int qp,
 				  typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -311,12 +311,12 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
 			       typename FEGenericBase<OutputShape>::OutputNumber& curl_u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -341,12 +341,12 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
 			      typename FEGenericBase<OutputShape>::OutputNumberDivergence& div_u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -381,12 +381,12 @@ void FEMContext::side_value(unsigned int var, unsigned int qp,
 			    typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -422,12 +422,12 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
 			       typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -463,12 +463,12 @@ void FEMContext::side_hessian(unsigned int var, unsigned int qp,
 			      typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -504,12 +504,12 @@ void FEMContext::point_value(unsigned int var, const Point &p,
 			     typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -548,13 +548,13 @@ void FEMContext::point_gradient(unsigned int var, const Point &p,
 				typename FEGenericBase<OutputShape>::OutputNumberGradient& grad_u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -594,12 +594,12 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
 			       typename FEGenericBase<OutputShape>::OutputNumberTensor& hess_u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_subsolutions.size() > var);
-  libmesh_assert (elem_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
@@ -641,12 +641,12 @@ void FEMContext::fixed_interior_value(unsigned int var, unsigned int qp,
 			              typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert(elem_fixed_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
@@ -682,12 +682,12 @@ void FEMContext::FEMContext::fixed_interior_gradient(unsigned int var, unsigned 
 						     typename FEGenericBase<OutputShape>::OutputNumberGradient & du) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert(elem_fixed_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
@@ -724,12 +724,12 @@ void FEMContext::fixed_interior_hessian(unsigned int var, unsigned int qp,
 					typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert(elem_fixed_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
@@ -766,12 +766,12 @@ void FEMContext::fixed_side_value(unsigned int var, unsigned int qp,
 			          typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert(elem_fixed_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
@@ -807,12 +807,12 @@ void FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
 				     typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert(elem_fixed_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
@@ -848,12 +848,12 @@ void FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp,
 				    typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert(elem_fixed_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
@@ -889,12 +889,12 @@ void FEMContext::fixed_point_value(unsigned int var, const Point &p,
 			           typename FEGenericBase<OutputShape>::OutputNumber& u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert(elem_fixed_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
@@ -933,12 +933,12 @@ void FEMContext::fixed_point_gradient(unsigned int var, const Point &p,
 				      typename FEGenericBase<OutputShape>::OutputNumberGradient& grad_u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert(elem_fixed_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
@@ -978,12 +978,12 @@ void FEMContext::fixed_point_hessian(unsigned int var, const Point &p,
 				     typename FEGenericBase<OutputShape>::OutputNumberTensor& hess_u) const
 {
   // Get local-to-global dof index lookup
-  libmesh_assert (dof_indices.size() > var);
+  libmesh_assert_greater (dof_indices.size(), var);
   const unsigned int n_dofs = dof_indices_var[var].size();
 
   // Get current local coefficients
-  libmesh_assert (elem_fixed_subsolutions.size() > var);
-  libmesh_assert (elem_fixed_subsolutions[var] != NULL);
+  libmesh_assert_greater (elem_fixed_subsolutions.size(), var);
+  libmesh_assert(elem_fixed_subsolutions[var]);
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
@@ -1024,7 +1024,7 @@ void FEMContext::elem_reinit(Real theta)
     if (theta != 1.0)
       {
         // FIXME - ALE is not threadsafe yet!
-        libmesh_assert(libMesh::n_threads() == 1);
+        libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
         elem_position_set(theta);
       }
@@ -1106,7 +1106,7 @@ void FEMContext::side_fe_reinit ()
 
 void FEMContext::edge_fe_reinit ()
 {
-  libmesh_assert(dim == 3);
+  libmesh_assert_equal_to (dim, 3);
 
   // Initialize all the interior FE objects on elem/edge.
   // Logging of FE::reinit is done in the FE functions
@@ -1134,7 +1134,7 @@ void FEMContext::elem_position_get()
 
   // This will probably break with threading when two contexts are
   // operating on elements which share a node
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   // If the coordinate data is in our own system, it's already
   // been set up for us
@@ -1194,7 +1194,7 @@ void FEMContext::_do_elem_position_set(Real)
 
   // This will probably break with threading when two contexts are
   // operating on elements which share a node
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   // If the coordinate data is in our own system, it's already
   // been set up for us, and we can ignore our input parameter theta
@@ -1320,7 +1320,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
          dof_indices_var[i].size());
       sub_dofs += dof_indices_var[i].size();
     }
-  libmesh_assert(sub_dofs == n_dofs);
+  libmesh_assert_equal_to (sub_dofs, n_dofs);
 }
 
 

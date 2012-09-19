@@ -137,7 +137,7 @@ void TransientRBConstruction::initialize_rb_construction()
     libmesh_cast_ref<TransientRBAssemblyExpansion&>(get_rb_assembly_expansion());
 #endif
   // This assert only gets called if DEBUG is on
-  libmesh_assert(trans_theta_expansion.get_n_M_terms() == trans_assembly_expansion.get_n_M_terms());
+  libmesh_assert_equal_to (trans_theta_expansion.get_n_M_terms(), trans_assembly_expansion.get_n_M_terms());
   
   Parent::initialize_rb_construction();
 }
@@ -1806,7 +1806,7 @@ void TransientRBConstruction::write_riesz_representors_to_files(const std::strin
     for (unsigned int i=istart; i<istop; ++i)
     {
       libMesh::out << "Writing out M_q_representor[" << q << "][" << i << "]..." << std::endl;
-      libmesh_assert(trans_rb_eval.M_q_representor[q][i] != NULL);
+      libmesh_assert(trans_rb_eval.M_q_representor[q][i]);
 
       file_name.str(""); // reset filename
       file_name << riesz_representors_dir << "/M_q_representor" << i << riesz_representor_suffix;

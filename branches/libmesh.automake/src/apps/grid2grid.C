@@ -108,14 +108,14 @@ int main (int argc, char** argv)
     std::cout << "looking for centroid of element " << e << std::endl;
     const Elem* elem = octree_coarse.find_element(mesh_coarse.elem(e)->centroid(mesh_coarse));
 
-    libmesh_assert (elem != NULL);
+    libmesh_assert(elem);
     }
     for (unsigned int n=0; n<mesh_coarse.n_nodes(); n++)
     {
     std::cout << "looking for node " << n << std::endl;
     const Elem* elem = octree_coarse.find_element(mesh_coarse.vertex(n));
 
-    libmesh_assert (elem != NULL);
+    libmesh_assert(elem);
     }
   */
 
@@ -165,7 +165,7 @@ int main (int argc, char** argv)
           {
             Number fine_soln=0., coarse_soln=0.;
 
-            libmesh_assert (fe_fine.n_shape_functions() == fine_element->n_nodes());
+            libmesh_assert_equal_to (fe_fine.n_shape_functions(), fine_element->n_nodes());
 
             for (unsigned int i=0; i<fe_fine.n_shape_functions(); i++)
               {
@@ -186,7 +186,7 @@ int main (int argc, char** argv)
 
                 coarse_element = const_cast<Elem*>(octree_coarse.find_element(q_point[gp]));
 
-                libmesh_assert (coarse_element != NULL);
+                libmesh_assert(coarse_element);
 
                 // Recompute the element--specific data for the new coarse-mesh element.
                 fe_coarse.reinit (coarse_element);
@@ -253,7 +253,7 @@ int main (int argc, char** argv)
 
                     coarse_element = const_cast<Elem*>(octree_coarse.find_element(p));
 
-                    libmesh_assert (coarse_element != NULL);
+                    libmesh_assert(coarse_element);
 
                     // Recompute the element--specific data for the new coarse-mesh element.
                     fe_coarse.reinit (coarse_element);

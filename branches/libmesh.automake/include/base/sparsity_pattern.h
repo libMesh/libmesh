@@ -142,10 +142,10 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
 {
   if ((begin == middle) || (middle == end)) return;
 
-  libmesh_assert (std::distance (begin,  middle) > 0);
-  libmesh_assert (std::distance (middle, end)    > 0);
+  libmesh_assert_greater (std::distance (begin,  middle), 0);
+  libmesh_assert_greater (std::distance (middle, end), 0);
   libmesh_assert (std::unique (begin,  middle) == middle);
-  libmesh_assert (std::unique (middle, end)    == end);
+  libmesh_assert (std::unique (middle, end) == end);
 
   while (middle != end)
     {

@@ -147,13 +147,13 @@ public:
    * @returns the \f$ i^{th} \f$ quadrature point on the reference object.
    */
   Point qp(const unsigned int i) const
-    { libmesh_assert (i < _points.size()); return _points[i]; }
+    { libmesh_assert_less (i, _points.size()); return _points[i]; }
 
   /**
    * @returns the \f$ i^{th} \f$ quadrature weight.
    */
   Real w(const unsigned int i) const
-    { libmesh_assert (i < _weights.size()); return _weights[i]; }
+    { libmesh_assert_less (i, _weights.size()); return _weights[i]; }
 
   /**
    * Initializes the data structures to contain a quadrature rule

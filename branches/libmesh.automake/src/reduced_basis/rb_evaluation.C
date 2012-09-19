@@ -210,7 +210,7 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
 
 NumericVector<Number>& RBEvaluation::get_basis_function(unsigned int i)
 {
-  libmesh_assert(i<basis_functions.size());
+  libmesh_assert_less (i, basis_functions.size());
 
   return *(basis_functions[i]);
 }
@@ -281,7 +281,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
     // Get lower bound for coercivity constant
     const Real alpha_LB = get_stability_lower_bound();
     // alpha_LB needs to be positive to get a valid error bound
-    libmesh_assert( alpha_LB > 0. );
+    libmesh_assert_greater ( alpha_LB, 0. );
 
     // Evaluate the (absolute) error bound
     Real abs_error_bound = epsilon_N / residual_scaling_denom(alpha_LB);

@@ -86,7 +86,7 @@ ExactSolution::~ExactSolution()
 
 void ExactSolution::attach_reference_solution (const EquationSystems* es_fine)
 {
-  libmesh_assert (es_fine != NULL);
+  libmesh_assert(es_fine);
   _equation_systems_fine = es_fine;
 
   // If we're using a fine grid solution, we're not using exact values
@@ -101,7 +101,7 @@ void ExactSolution::attach_exact_value (Number fptr(const Point& p,
 						    const std::string& sys_name,
 						    const std::string& unknown_name))
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
 
   // Clear out any previous _exact_values entries, then add a new
   // entry for each system.
@@ -155,7 +155,7 @@ void ExactSolution::attach_exact_deriv (Gradient gptr(const Point& p,
 						      const std::string& sys_name,
 						      const std::string& unknown_name))
 {
-  libmesh_assert (gptr != NULL);
+  libmesh_assert(gptr);
 
   // Clear out any previous _exact_derivs entries, then add a new
   // entry for each system.
@@ -209,7 +209,7 @@ void ExactSolution::attach_exact_hessian (Tensor hptr(const Point& p,
 						      const std::string& sys_name,
 						      const std::string& unknown_name))
 {
-  libmesh_assert (hptr != NULL);
+  libmesh_assert(hptr);
 
   // Clear out any previous _exact_hessians entries, then add a new
   // entry for each system.

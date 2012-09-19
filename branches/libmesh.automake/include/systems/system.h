@@ -1805,7 +1805,7 @@ unsigned int System::n_components() const
 inline
 const Variable & System::variable (const unsigned int i) const
 {
-  libmesh_assert (i < _variables.size());
+  libmesh_assert_less (i, _variables.size());
 
   return _variables[i];
 }
@@ -1815,7 +1815,7 @@ const Variable & System::variable (const unsigned int i) const
 inline
 const std::string & System::variable_name (const unsigned int i) const
 {
-  libmesh_assert (i < _variables.size());
+  libmesh_assert_less (i, _variables.size());
 
   return _variables[i].name();
 }
@@ -1845,7 +1845,7 @@ System::variable_scalar_number (unsigned short var_num,
 inline
 const FEType & System::variable_type (const unsigned int i) const
 {
-  libmesh_assert (i < _variables.size());
+  libmesh_assert_less (i, _variables.size());
 
   return _variables[i].type();
 }

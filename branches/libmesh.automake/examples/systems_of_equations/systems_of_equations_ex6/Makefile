@@ -55,7 +55,7 @@ run: $(target)
 	@echo "* Running " $(LIBMESH_RUN) $(target)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) -ksp_type cg -pc_type icc
+	@$(LIBMESH_RUN) $(target) -ksp_type cg -pc_type bjacobi -sub_pc_type icc
 	@echo " "
 	@echo "***************************************************************"
 	@echo "* Done Running " $(LIBMESH_RUN) $(target)
@@ -70,7 +70,6 @@ include .depend
 # Dependencies
 #
 .depend: $(srcfiles) $(LIBMESH_DIR)/include/*/*.h
-	@$(perl) $(LIBMESH_DIR)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(wildcard $(LIBMESH_DIR)/include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
-	@echo "Updated .depend"
+	@$(perl) $(LIBMESH_DIR)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(LIBMESH_DIR)/include $(wildcard $(LIBMESH_DIR)/include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
 
 ###############################################################################

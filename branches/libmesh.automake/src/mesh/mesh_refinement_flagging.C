@@ -102,7 +102,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
   for (; el_it != el_end; ++el_it)
   {
     const unsigned int id  = (*el_it)->id();
-    libmesh_assert (id < error_per_cell.size());
+    libmesh_assert_less (id, error_per_cell.size());
 
     error_max = std::max (error_max, error_per_cell[id]);
     error_min = std::min (error_min, error_per_cell[id]);
@@ -141,7 +141,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
     Elem* elem             = *e_it;
     const unsigned int id  = elem->id();
 
-    libmesh_assert (id < error_per_cell.size());
+    libmesh_assert_less (id, error_per_cell.size());
 
     const float elem_error = error_per_cell[id];
 
@@ -288,7 +288,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
       {
         const unsigned int eid = (*elem_it)->id();
         is_active[eid] = true;
-        libmesh_assert(eid < error_per_cell.size());
+        libmesh_assert_less (eid, error_per_cell.size());
         sorted_error.push_back
           (std::make_pair(error_per_cell[eid], eid));
       }
@@ -625,7 +625,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
       Elem* elem             = *elem_it;
       const unsigned int id  = elem->id();
 
-      libmesh_assert (id < error_per_cell.size());
+      libmesh_assert_less (id, error_per_cell.size());
 
       const float elem_error = error_per_cell[id];
 

@@ -91,8 +91,8 @@ int NumericVector<T>::compare (const NumericVector<T> &other_vector,
 {
   libmesh_assert (this->initialized());
   libmesh_assert (other_vector.initialized());
-  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
-  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int first_different_i = std::numeric_limits<int>::max();
   unsigned int i = first_local_index();
@@ -123,8 +123,8 @@ int NumericVector<T>::local_relative_compare (const NumericVector<T> &other_vect
 {
   libmesh_assert (this->initialized());
   libmesh_assert (other_vector.initialized());
-  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
-  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int first_different_i = std::numeric_limits<int>::max();
   unsigned int i = first_local_index();
@@ -156,8 +156,8 @@ int NumericVector<T>::global_relative_compare (const NumericVector<T> &other_vec
 {
   libmesh_assert (this->initialized());
   libmesh_assert (other_vector.initialized());
-  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
-  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int first_different_i = std::numeric_limits<int>::max();
   unsigned int i = first_local_index();
@@ -194,8 +194,8 @@ int NumericVector<float>::compare (const NumericVector<float> &other_vector,
 {
   libmesh_assert (this->initialized());
   libmesh_assert (other_vector.initialized());
-  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
-  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int rvalue     = -1;
   unsigned int i = first_local_index();
@@ -219,8 +219,8 @@ int NumericVector<double>::compare (const NumericVector<double> &other_vector,
 {
   libmesh_assert (this->initialized());
   libmesh_assert (other_vector.initialized());
-  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
-  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int rvalue     = -1;
   unsigned int i = first_local_index();
@@ -245,8 +245,8 @@ int NumericVector<long double>::compare (const NumericVector<long double> &other
 {
   libmesh_assert (this->initialized());
   libmesh_assert (other_vector.initialized());
-  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
-  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int rvalue     = -1;
   unsigned int i = first_local_index();
@@ -272,8 +272,8 @@ int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
 {
   libmesh_assert (this->initialized());
   libmesh_assert (other_vector.initialized());
-  libmesh_assert (this->first_local_index() == other_vector.first_local_index());
-  libmesh_assert (this->last_local_index()  == other_vector.last_local_index());
+  libmesh_assert_equal_to (this->first_local_index(), other_vector.first_local_index());
+  libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int rvalue     = -1;
   unsigned int i = first_local_index();

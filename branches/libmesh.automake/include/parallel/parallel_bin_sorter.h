@@ -72,7 +72,7 @@ template <typename KeyType>
 inline
 unsigned int BinSorter<KeyType>::sizeof_bin (const unsigned int bin) const
 {
-  libmesh_assert ((bin+1) < bin_iters.size());
+  libmesh_assert_less ((bin+1), bin_iters.size());
 
   // The size of the bin is defined by the distance between
   // its bounding iterators

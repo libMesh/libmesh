@@ -130,7 +130,7 @@ adjoints_ex1_LDADD   = $(top_builddir)/libmesh.la
 check_PROGRAMS += adjoints_ex2
 check_SCRIPTS  += adjoints/adjoints_ex2/run.sh
 adjoints_ex2dir      = $(examples_install_path)/adjoints/ex2
-adjoints_ex2_DATA    = adjoints/adjoints_ex2/adjoints_ex2.C adjoints/adjoints_ex1/element_qoi_derivative.C adjoints/adjoints_ex1/lshaped.xda adjoints/adjoints_ex2/L-shaped.C adjoints/adjoints_ex2/L-shaped.h adjoints/adjoints_ex2/femparameters.C adjoints/adjoints_ex2/femparameters.h adjoints/adjoints_ex2/general.in adjoints/adjoints_ex2/l-shaped.in adjoints/adjoints_ex2/element_qoi.C
+adjoints_ex2_DATA    = adjoints/adjoints_ex2/adjoints_ex2.C adjoints/adjoints_ex1/lshaped.xda adjoints/adjoints_ex2/L-shaped.C adjoints/adjoints_ex2/L-shaped.h adjoints/adjoints_ex2/femparameters.C adjoints/adjoints_ex2/femparameters.h adjoints/adjoints_ex2/general.in adjoints/adjoints_ex2/l-shaped.in adjoints/adjoints_ex2/L-qoi.C adjoints/adjoints_ex2/L-qoi.h
 adjoints_ex2_SOURCES = $(adjoints_ex2_DATA) adjoints/adjoints_ex2/run.sh
 adjoints_ex2_LDADD   = $(top_builddir)/libmesh.la
 

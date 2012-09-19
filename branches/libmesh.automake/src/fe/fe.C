@@ -43,7 +43,7 @@ unsigned int FE<Dim,T>::n_shape_functions () const
 template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::attach_quadrature_rule (QBase* q)
 {
-  libmesh_assert (q != NULL);
+  libmesh_assert(q);
   this->qrule = q;
   // make sure we don't cache results from a previous quadrature rule
   this->elem_type = INVALID_ELEM;
@@ -54,7 +54,7 @@ void FE<Dim,T>::attach_quadrature_rule (QBase* q)
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_quadrature_points () const
 {
-  libmesh_assert (this->qrule != NULL);
+  libmesh_assert(this->qrule);
   return this->qrule->n_points();
 }
 
@@ -65,8 +65,8 @@ void FE<Dim,T>::dofs_on_side(const Elem* const elem,
 			     unsigned int s,
 			     std::vector<unsigned int>& di)
 {
-  libmesh_assert(elem != NULL);
-  libmesh_assert(s < elem->n_sides());
+  libmesh_assert(elem);
+  libmesh_assert_less (s, elem->n_sides());
 
   di.clear();
   unsigned int nodenum = 0;
@@ -91,8 +91,8 @@ void FE<Dim,T>::dofs_on_edge(const Elem* const elem,
 			     unsigned int e,
 			     std::vector<unsigned int>& di)
 {
-  libmesh_assert(elem != NULL);
-  libmesh_assert(e < elem->n_edges());
+  libmesh_assert(elem);
+  libmesh_assert_less (e, elem->n_edges());
 
   di.clear();
   unsigned int nodenum = 0;
@@ -116,7 +116,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
 		       const std::vector<Point>* const pts,
                        const std::vector<Real>* const weights)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // Try to avoid calling init_shape_functions
   // even when shapes_need_reinit
@@ -147,7 +147,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
   // reinit, since they depend on the particular element shape
   else
     {
-      libmesh_assert (this->qrule   != NULL);
+      libmesh_assert(this->qrule);
       this->qrule->init(elem->type(), elem->p_level());
 
       if(this->qrule->shapes_need_reinit())
@@ -175,7 +175,7 @@ void FE<Dim,T>::reinit(const Elem* elem,
         }
       else
         {
-          // libmesh_assert(elem->n_nodes() > 1);
+          // libmesh_assert_greater (elem->n_nodes(), 1);
 
           cached_nodes_still_fit = true;
           if (cached_nodes.size() != elem->n_nodes())
@@ -241,7 +241,7 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 				     const Elem* elem)
 {
-  libmesh_assert (elem  != NULL);
+  libmesh_assert(elem);
   this->calculations_started = true;
 
   // If the user forgot to request anything, we'll be safe and

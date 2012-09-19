@@ -21,7 +21,7 @@ namespace libMesh {
 
 void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem* side)
 {
-  libmesh_assert (side != NULL);
+  libmesh_assert(side);
 
   START_LOG("compute_face_map()", "FEXYZMap");
 
@@ -89,7 +89,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
 	    // negative curvature.  Be sure to take that into account!
 	    const Real numerator   = this->d2xyzdxi2_map[p] * this->normals[p];
 	    const Real denominator = this->dxyzdxi_map[p].size_sq();
-	    libmesh_assert (denominator != 0);
+	    libmesh_assert_not_equal_to (denominator, 0);
 	    this->curvatures[p] = numerator / denominator;
 	  }
 
@@ -99,7 +99,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
 	    const Real jac = std::sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
 				       this->dydxi_map(p)*this->dydxi_map(p));
 
-	    libmesh_assert (jac > 0.);
+	    libmesh_assert_greater (jac, 0.);
 
 	    this->JxW[p] = jac*qw[p];
 	  }
@@ -175,7 +175,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
 
 	    const Real numerator   = E*N -2.*F*M + G*L;
 	    const Real denominator = E*G - F*F;
-	    libmesh_assert (denominator != 0.);
+	    libmesh_assert_not_equal_to (denominator, 0.);
 	    this->curvatures[p] = 0.5*numerator/denominator;
 	  }
 
@@ -200,7 +200,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
 
 	    const Real jac = std::sqrt(g11*g22 - g12*g21);
 
-	    libmesh_assert (jac > 0.);
+	    libmesh_assert_greater (jac, 0.);
 
 	    this->JxW[p] = jac*qw[p];
 	  }

@@ -51,7 +51,7 @@ Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (i<4);
+	      libmesh_assert_less (i, 4);
 
 	      //                                0  1  2  3
 	      static const unsigned int i0[] = {0, 1, 1, 0};
@@ -68,7 +68,7 @@ Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
 	      const Real zeta2 = p(1);
 	      const Real zeta0 = 1. - zeta1 - zeta2;
 
-	      libmesh_assert (i<3);
+	      libmesh_assert_less (i, 3);
 
 	      switch(i)
 		{
@@ -107,7 +107,7 @@ Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (i<8);
+	      libmesh_assert_less (i, 8);
 
 	      switch (i)
 		{
@@ -146,7 +146,7 @@ Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (i<9);
+	      libmesh_assert_less (i, 9);
 
 	      //                                0  1  2  3  4  5  6  7  8
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -162,7 +162,7 @@ Real FE<2,L2_LAGRANGE>::shape(const ElemType type,
 	      const Real zeta2 = p(1);
 	      const Real zeta0 = 1. - zeta1 - zeta2;
 
-	      libmesh_assert (i<6);
+	      libmesh_assert_less (i, 6);
 
 	      switch(i)
 		{
@@ -224,7 +224,7 @@ Real FE<2,L2_LAGRANGE>::shape(const Elem* elem,
 			      const unsigned int i,
 			      const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // call the orientation-independent shape functions
   return FE<2,L2_LAGRANGE>::shape(elem->type(), static_cast<Order>(order + elem->p_level()), i, p);
@@ -242,7 +242,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
 #if LIBMESH_DIM > 1
 
 
-  libmesh_assert (j<2);
+  libmesh_assert_less (j, 2);
 
   switch (order)
     {
@@ -259,7 +259,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (i<4);
+	      libmesh_assert_less (i, 4);
 
 	      //                                0  1  2  3
 	      static const unsigned int i0[] = {0, 1, 1, 0};
@@ -285,7 +285,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
 	  case TRI3:
 	  case TRI6:
 	    {
-	      libmesh_assert (i<3);
+	      libmesh_assert_less (i, 3);
 
 	      const Real dzeta0dxi  = -1.;
 	      const Real dzeta1dxi  = 1.;
@@ -359,7 +359,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (i<8);
+	      libmesh_assert_less (i, 8);
 
 	      switch (j)
 		{
@@ -446,7 +446,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (i<9);
+	      libmesh_assert_less (i, 9);
 
 	      //                                0  1  2  3  4  5  6  7  8
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -471,7 +471,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const ElemType type,
 
 	  case TRI6:
 	    {
-	      libmesh_assert (i<6);
+	      libmesh_assert_less (i, 6);
 
 	      const Real zeta1 = p(0);
 	      const Real zeta2 = p(1);
@@ -581,7 +581,7 @@ Real FE<2,L2_LAGRANGE>::shape_deriv(const Elem* elem,
 				    const unsigned int j,
 				    const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
 
   // call the orientation-independent shape functions
@@ -603,7 +603,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
   // j = 0 ==> d^2 phi / dxi^2
   // j = 1 ==> d^2 phi / dxi deta
   // j = 2 ==> d^2 phi / deta^2
-  libmesh_assert (j < 3);
+  libmesh_assert_less (j, 3);
 
   switch (order)
     {
@@ -620,7 +620,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (i<4);
+	      libmesh_assert_less (i, 4);
 
 	      //                                0  1  2  3
 	      static const unsigned int i0[] = {0, 1, 1, 0};
@@ -678,7 +678,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (j < 3);
+	      libmesh_assert_less (j, 3);
 
 	      switch (j)
 		{
@@ -800,7 +800,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
 	      const Real xi  = p(0);
 	      const Real eta = p(1);
 
-	      libmesh_assert (i<9);
+	      libmesh_assert_less (i, 9);
 
 	      //                                0  1  2  3  4  5  6  7  8
 	      static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
@@ -842,7 +842,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const ElemType type,
 	      const Real dzeta1deta = 0.;
 	      const Real dzeta2deta = 1.;
 
-	      libmesh_assert (j < 3);
+	      libmesh_assert_less (j, 3);
 
 	      switch (j)
 		{
@@ -987,7 +987,7 @@ Real FE<2,L2_LAGRANGE>::shape_second_deriv(const Elem* elem,
 				           const unsigned int j,
 				           const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // call the orientation-independent shape functions
   return FE<2,L2_LAGRANGE>::shape_second_deriv(elem->type(), static_cast<Order>(order + elem->p_level()), i, j, p);

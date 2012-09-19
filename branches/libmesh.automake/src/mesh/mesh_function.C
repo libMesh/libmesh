@@ -95,12 +95,12 @@ MeshFunction::~MeshFunction ()
 void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
 {
   // are indices of the desired variable(s) provided?
-  libmesh_assert (this->_system_vars.size() > 0);
+  libmesh_assert_greater (this->_system_vars.size(), 0);
 
   // Don't do twice...
   if (this->_initialized)
     {
-      libmesh_assert(this->_point_locator != NULL);
+      libmesh_assert(this->_point_locator);
       return;
     }
 
@@ -180,7 +180,7 @@ Number MeshFunction::operator() (const Point& p,
 {
   libmesh_assert (this->initialized());
   // At the moment the function we call ignores the time
-  libmesh_assert (time == 0.);
+  libmesh_assert_equal_to (time, 0.);
 
   DenseVector<Number> buf (1);
   this->operator() (p, time, buf);
@@ -194,7 +194,7 @@ Gradient MeshFunction::gradient (const Point& p,
 {
   libmesh_assert (this->initialized());
   // At the moment the function we call ignores the time
-  libmesh_assert (time == 0.);
+  libmesh_assert_equal_to (time, 0.);
 
   std::vector<Gradient> buf (1);
   this->gradient(p, time, buf);
@@ -209,7 +209,7 @@ Tensor MeshFunction::hessian (const Point& p,
 {
   libmesh_assert (this->initialized());
   // At the moment the function we call ignores the time
-  libmesh_assert (time == 0.);
+  libmesh_assert_equal_to (time, 0.);
 
   std::vector<Tensor> buf (1);
   this->hessian(p, time, buf);

@@ -244,7 +244,7 @@ void UNVIO::read_implementation (std::istream& in_stream)
   {
     // Read the datasets in the order that
     // we already know
-    libmesh_assert (order_of_datasets.size()==2);
+    libmesh_assert_equal_to (order_of_datasets.size(), 2);
 
     for (unsigned int ds=0; ds < order_of_datasets.size(); ds++)
       {
@@ -937,8 +937,8 @@ void UNVIO::element_in (std::istream& in_file)
 				   node_labels[j]);
 
 	  // it better be there, so libmesh_assert that it was found.
-	  libmesh_assert (it.first  != it.second);
-	  libmesh_assert (*(it.first) == node_labels[j]);
+	  libmesh_assert (it.first != it.second);
+	  libmesh_assert_equal_to (*(it.first), node_labels[j]);
 
 	  // Now, the distance between this UNV id and the beginning of
 	  // the _assign_nodes vector will give us a unique id in the
@@ -948,7 +948,7 @@ void UNVIO::element_in (std::istream& in_file)
 							    it.first);
 
 	  // Make sure we didn't get an out-of-bounds id
-	  libmesh_assert (assigned_node < this->_n_nodes);
+	  libmesh_assert_less (assigned_node, this->_n_nodes);
 
 	  elem->set_node(assign_elem_nodes[j]) =
 	    mesh.node_ptr(assigned_node);

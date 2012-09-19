@@ -67,12 +67,12 @@ public:
     }
 
     bool operator==(const iterator &other) const {
-      libmesh_assert(&_vecbool == &other._vecbool);
+      libmesh_assert_equal_to (&_vecbool, &other._vecbool);
       return _i == other._i;
     }
 
     bool operator!=(const iterator &other) const {
-      libmesh_assert(&_vecbool == &other._vecbool);
+      libmesh_assert_equal_to (&_vecbool, &other._vecbool);
       return _i != other._i;
     }
 

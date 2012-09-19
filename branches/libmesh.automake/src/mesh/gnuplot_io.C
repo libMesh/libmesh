@@ -65,7 +65,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
 {
   // Even when writing on a serialized ParallelMesh, we expect
   // non-proc-0 help with calls like n_active_elem
-  // libmesh_assert(libMesh::processor_id() == 0);
+  // libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
@@ -78,7 +78,7 @@ void GnuPlotIO::write_solution(const std::string& fname,
   const std::string data_file_name = data_stream_name.str();
 
   // This class is designed only for use with 1D meshes
-  libmesh_assert (mesh.mesh_dimension() == 1);
+  libmesh_assert_equal_to (mesh.mesh_dimension(), 1);
 
   // Make sure we have a solution to plot
   libmesh_assert ((names != NULL) && (soln != NULL));

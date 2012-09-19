@@ -34,7 +34,7 @@ namespace libMesh
 void LinearPartitioner::_do_partition (MeshBase& mesh,
 				       const unsigned int n)
 {
-  libmesh_assert (n > 0);
+  libmesh_assert_greater (n, 0);
 
   // Check for an easy return
   if (n == 1)

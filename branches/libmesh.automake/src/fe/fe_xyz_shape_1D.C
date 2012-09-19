@@ -64,8 +64,8 @@ Real FE<1,XYZ>::shape(const Elem* elem,
 		      const unsigned int i,
 		      const Point& p)
 {
-  libmesh_assert (elem != NULL);
-  libmesh_assert (i <= order + elem->p_level());
+  libmesh_assert(elem);
+  libmesh_assert_less_equal (i, order + elem->p_level());
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -85,7 +85,7 @@ Real FE<1,XYZ>::shape(const Elem* elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = p(0);
   const Real xc = centroid(0);
@@ -147,12 +147,12 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
 			    const unsigned int libmesh_dbg_var(j),
 			    const Point& p)
 {
-  libmesh_assert (elem != NULL);
-  libmesh_assert (i <= order + elem->p_level());
+  libmesh_assert(elem);
+  libmesh_assert_less_equal (i, order + elem->p_level());
 
   // only d()/dxi in 1D!
 
-  libmesh_assert (j == 0);
+  libmesh_assert_equal_to (j, 0);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -172,7 +172,7 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = p(0);
   const Real xc = centroid(0);
@@ -233,12 +233,12 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
 			           const unsigned int libmesh_dbg_var(j),
 			           const Point& p)
 {
-  libmesh_assert (elem != NULL);
-  libmesh_assert (i <= order + elem->p_level());
+  libmesh_assert(elem);
+  libmesh_assert_less_equal (i, order + elem->p_level());
 
   // only d2()/dxi2 in 1D!
 
-  libmesh_assert (j == 0);
+  libmesh_assert_equal_to (j, 0);
 
   // Only recompute the centroid if the element
   // has changed from the last one we computed.
@@ -258,7 +258,7 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
 
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   const Real x  = p(0);
   const Real xc = centroid(0);

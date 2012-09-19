@@ -89,6 +89,7 @@
 // Local includes
 #include "femparameters.h"
 #include "L-shaped.h"
+#include "L-qoi.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -303,6 +304,12 @@ int main (int argc, char** argv)
   // Build the FEMSystem
   LaplaceSystem &system = equation_systems.add_system<LaplaceSystem> ("LaplaceSystem");
 
+  // Put some scope here to test that the cloning is working right
+  {
+    LaplaceQoI qoi;
+    system.attach_qoi( &qoi );
+  }
+
   // Set its parameters
   set_system_parameters(system, param);
   
@@ -322,11 +329,11 @@ int main (int argc, char** argv)
 	// We can't adapt to both a tolerance and a
 	// target mesh size
 	if (param.global_tolerance != 0.)
-	  libmesh_assert (param.nelem_target == 0);
+	  libmesh_assert_equal_to (param.nelem_target, 0);
 	// If we aren't adapting to a tolerance we need a
 	// target mesh size
             else
-              libmesh_assert (param.nelem_target > 0);
+              libmesh_assert_greater (param.nelem_target, 0);
     
 	// Solve the forward problem
 	system.solve();

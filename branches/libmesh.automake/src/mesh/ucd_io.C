@@ -110,7 +110,7 @@ void UCDIO::read_implementation (std::istream& in)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert(libMesh::processor_id() == 0);
+  libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   // Check input buffer
   libmesh_assert (in.good());
@@ -198,7 +198,7 @@ void UCDIO::read_implementation (std::istream& in)
 	    in >> node; // read the current node
 	    node -= 1;  // UCD is 1-based, so subtract
 
-	    libmesh_assert (node < mesh.n_nodes());
+	    libmesh_assert_less (node, mesh.n_nodes());
 
 	    elem->set_node(n) =
 	      mesh.node_ptr(node); // assign the node
@@ -239,7 +239,7 @@ void UCDIO::write_implementation (std::ostream& out)
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   // UCD doesn't work in 1D
-  libmesh_assert (mesh.mesh_dimension() != 1);
+  libmesh_assert_not_equal_to (mesh.mesh_dimension(), 1);
 
   // Write header to stream
 

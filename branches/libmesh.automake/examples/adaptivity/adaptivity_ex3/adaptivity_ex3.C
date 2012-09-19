@@ -338,7 +338,7 @@ int main(int argc, char** argv)
                 }
               else
                 {
-                  libmesh_assert (indicator_type == "kelly");
+                  libmesh_assert_equal_to (indicator_type, "kelly");
 
                   // The Kelly error estimator is based on 
                   // an error bound for the Poisson problem
@@ -499,7 +499,7 @@ Gradient exact_derivative(const Point& p,
   if (singularity)
     {
       // We can't compute the gradient at x=0, it is not defined.
-      libmesh_assert (x != 0.);
+      libmesh_assert_not_equal_to (x, 0.);
 
       // For convenience...
       const Real tt = 2./3.;
@@ -556,7 +556,7 @@ void assemble_laplace(EquationSystems& es,
 #ifdef LIBMESH_ENABLE_AMR
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert (system_name == "Laplace");
+  libmesh_assert_equal_to (system_name, "Laplace");
 
 
   // Declare a performance log.  Give it a descriptive

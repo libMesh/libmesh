@@ -21,8 +21,8 @@ includedir=$(prefix)/include/libmesh
 
 # run ./rebuild_include_HEADERS.sh to regenerate this list.
 include_HEADERS = \
-                base/auto_ptr.h \
-	        base/dirichlet_boundaries.h \
+		base/auto_ptr.h \
+		base/dirichlet_boundaries.h \
 		base/dof_map.h \
 		base/dof_object.h \
 		base/factory.h \
@@ -76,6 +76,7 @@ include_HEADERS = \
 		error_estimation/kelly_error_estimator.h \
 		error_estimation/patch_recovery_error_estimator.h \
 		error_estimation/uniform_refinement_estimator.h \
+		error_estimation/weighted_patch_recovery_error_estimator.h \
 		fe/fe.h \
                 fe/fe_abstract.h \
 		fe/fe_base.h \
@@ -202,6 +203,7 @@ include_HEADERS = \
 		mesh/xdr_shead.h \
 		mesh/xdr_soln.h \
 		numerics/analytic_function.h \
+		numerics/const_fem_function.h \
 	        numerics/const_function.h \
 		numerics/coupling_matrix.h \
 		numerics/dense_matrix.h \
@@ -211,6 +213,7 @@ include_HEADERS = \
 		numerics/dense_vector.h \
 		numerics/dense_vector_base.h \
 		numerics/distributed_vector.h \
+		numerics/fem_function_base.h \
 		numerics/function_base.h \
 		numerics/numeric_vector.h \
 		numerics/parsed_function.h \

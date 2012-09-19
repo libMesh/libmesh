@@ -132,7 +132,7 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
   // it's serialized properly
   if (libMesh::processor_id() == 0)
     {
-      libmesh_assert(this->_dof_map->first_dof() == 0);
+      libmesh_assert_equal_to (this->_dof_map->first_dof(), 0);
       for (unsigned int i=this->_dof_map->first_dof();
            i!=this->_dof_map->end_dof(); ++i)
         {
@@ -163,13 +163,13 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
           Parallel::receive(p, ibuf);
           Parallel::receive(p, jbuf);
           Parallel::receive(p, cbuf);
-          libmesh_assert(ibuf.size() == jbuf.size());
-          libmesh_assert(ibuf.size() == cbuf.size());
+          libmesh_assert_equal_to (ibuf.size(), jbuf.size());
+          libmesh_assert_equal_to (ibuf.size(), cbuf.size());
 
           if (ibuf.empty())
             continue;
-          libmesh_assert(ibuf.front() >= currenti);
-          libmesh_assert(ibuf.back() >= ibuf.front());
+          libmesh_assert_greater_equal (ibuf.front(), currenti);
+          libmesh_assert_greater_equal (ibuf.back(), ibuf.front());
 
           unsigned int currentb = 0;
           for (;currenti <= ibuf.back(); ++currenti)

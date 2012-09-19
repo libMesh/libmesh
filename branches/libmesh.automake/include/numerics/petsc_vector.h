@@ -767,12 +767,12 @@ void PetscVector<T>::init (const unsigned int n,
   else if (this->_type == PARALLEL)
     {
 #ifdef LIBMESH_HAVE_MPI
-      libmesh_assert (n_local <= n);
+      libmesh_assert_less_equal (n_local, n);
       ierr = VecCreateMPI (libMesh::COMM_WORLD, petsc_n_local, petsc_n,
 			   &_vec);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #else
-      libmesh_assert (n_local == n);
+      libmesh_assert_equal_to (n_local, n);
       ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
              CHKERRABORT(PETSC_COMM_SELF,ierr);
 #endif
@@ -1130,7 +1130,7 @@ unsigned int PetscVector<T>::map_global_to_local_index (const unsigned int i) co
 
       libmesh_error();
     }
-  libmesh_assert (it!=_global_to_local_map.end());
+  libmesh_assert (it != _global_to_local_map.end());
 #endif
   return it->second+last-first;
 }
@@ -1148,7 +1148,7 @@ T PetscVector<T>::operator() (const unsigned int i) const
 #ifndef NDEBUG
   if(this->type() == GHOSTED)
     {
-      libmesh_assert(local_index<_local_size);
+      libmesh_assert_less (local_index, _local_size);
     }
 #endif
 
@@ -1172,7 +1172,7 @@ void PetscVector<T>::get(const std::vector<unsigned int>& index, std::vector<T>&
 #ifndef NDEBUG
       if(this->type() == GHOSTED)
 	{
-	  libmesh_assert(local_index<_local_size);
+	  libmesh_assert_less (local_index, _local_size);
 	}
 #endif
       values[i] = static_cast<T>(_values[local_index]);

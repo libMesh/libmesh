@@ -85,7 +85,7 @@ bool Prism6::is_face(const unsigned int) const
 bool Prism6::is_node_on_side(const unsigned int n,
 			     const unsigned int s) const
 {
-  libmesh_assert(s < n_sides());
+  libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 4; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -95,7 +95,7 @@ bool Prism6::is_node_on_side(const unsigned int n,
 bool Prism6::is_node_on_edge(const unsigned int n,
 			     const unsigned int e) const
 {
-  libmesh_assert(e < n_edges());
+  libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 2; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
@@ -119,7 +119,7 @@ bool Prism6::has_affine_map() const
 AutoPtr<Elem> Prism6::build_side (const unsigned int i,
 				  bool proxy) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
@@ -220,7 +220,7 @@ AutoPtr<Elem> Prism6::build_side (const unsigned int i,
 
 AutoPtr<Elem> Prism6::build_edge (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_edges());
+  libmesh_assert_less (i, this->n_edges());
 
   return AutoPtr<Elem>(new SideEdge<Edge2,Prism6>(this,i));
 }
@@ -231,9 +231,9 @@ void Prism6::connectivity(const unsigned int libmesh_dbg_var(sc),
 			  const IOPackage iop,
 			  std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (_nodes != NULL);
-  libmesh_assert (sc < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert(_nodes);
+  libmesh_assert_less (sc, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
   switch (iop)
     {

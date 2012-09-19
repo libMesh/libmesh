@@ -185,8 +185,8 @@ unsigned int System::n_local_dofs() const
 Number System::current_solution (const unsigned int global_dof_number) const
 {
   // Check the sizes
-  libmesh_assert (global_dof_number < _dof_map->n_dofs());
-  libmesh_assert (global_dof_number < current_local_solution->size());
+  libmesh_assert_less (global_dof_number, _dof_map->n_dofs());
+  libmesh_assert_less (global_dof_number, current_local_solution->size());
 
   return (*current_local_solution)(global_dof_number);
 }
@@ -383,9 +383,9 @@ void System::reinit ()
   // current_local_solution.
   solution->init (this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
 
-  libmesh_assert (solution->size() == current_local_solution->size());
+  libmesh_assert_equal_to (solution->size(), current_local_solution->size());
   // Not true with ghosted vectors
-  // libmesh_assert (solution->size() == current_local_solution->local_size());
+  // libmesh_assert_equal_to (solution->size(), current_local_solution->local_size());
 
   const unsigned int first_local_dof = solution->first_local_index();
   const unsigned int local_size      = solution->local_size();
@@ -407,10 +407,10 @@ void System::update ()
   const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
 
   // Check sizes
-  libmesh_assert (current_local_solution->size() == solution->size());
+  libmesh_assert_equal_to (current_local_solution->size(), solution->size());
 // More processors than elements => empty send_list
 //  libmesh_assert (!send_list.empty());
-  libmesh_assert (send_list.size() <= solution->size());
+  libmesh_assert_less_equal (send_list.size(), solution->size());
 
   // Create current_local_solution from solution.  This will
   // put a local copy of solution into current_local_solution.
@@ -432,11 +432,11 @@ void System::re_update ()
   const std::vector<unsigned int>& send_list = this->get_dof_map().get_send_list ();
 
   // Check sizes
-  libmesh_assert (current_local_solution->size()       == solution->size());
+  libmesh_assert_equal_to (current_local_solution->size(), solution->size());
   // Not true with ghosted vectors
-  // libmesh_assert (current_local_solution->local_size() == solution->size());
+  // libmesh_assert_equal_to (current_local_solution->local_size(), solution->size());
   // libmesh_assert (!send_list.empty());
-  libmesh_assert (send_list.size() <= solution->size());
+  libmesh_assert_less_equal (send_list.size(), solution->size());
 
   // Create current_local_solution from solution.  This will
   // put a local copy of solution into current_local_solution.
@@ -822,7 +822,7 @@ const NumericVector<Number> & System::get_vector (const unsigned int vec_num) co
       num++;
       ++v;
     }
-  libmesh_assert(v!=v_end);
+  libmesh_assert (v != v_end);
   return *(v->second);
 }
 
@@ -838,7 +838,7 @@ NumericVector<Number> & System::get_vector (const unsigned int vec_num)
       num++;
       ++v;
     }
-  libmesh_assert(v!=v_end);
+  libmesh_assert (v != v_end);
   return *(v->second);
 }
 
@@ -854,7 +854,7 @@ const std::string& System::vector_name (const unsigned int vec_num)
       num++;
       ++v;
     }
-  libmesh_assert(v!=v_end);
+  libmesh_assert (v != v_end);
   return v->first;
 }
 
@@ -1061,7 +1061,7 @@ unsigned int System::add_variable (const std::string& var,
 		       Variable(var, curr_n_vars,
 				next_first_component, type, *active_subdomains));
 
-  libmesh_assert ((curr_n_vars+1) == this->n_vars());
+  libmesh_assert_equal_to ((curr_n_vars+1), this->n_vars());
 
   _variable_numbers[var] = curr_n_vars;
 
@@ -1107,7 +1107,7 @@ unsigned short int System::variable_number (const std::string& var) const
 		    << std::endl;
       libmesh_error();
     }
-  libmesh_assert (_variables[pos->second].name() == var);
+  libmesh_assert_equal_to (_variables[pos->second].name(), var);
 
   return pos->second;
 }
@@ -1152,7 +1152,7 @@ void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & 
 void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) const
 {
   /* Make sure the call makes sense.  */
-  libmesh_assert(var_num<this->n_vars());
+  libmesh_assert_less (var_num, this->n_vars());
 
   /* Get a reference to the mesh.  */
   const MeshBase& mesh = this->get_mesh();
@@ -1548,7 +1548,7 @@ std::string System::get_info() const
 void System::attach_init_function (void fptr(EquationSystems& es,
 					     const std::string& name))
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
 
   if (_init_system_object != NULL)
     {
@@ -1583,7 +1583,7 @@ void System::attach_init_object (System::Initialization& init)
 void System::attach_assemble_function (void fptr(EquationSystems& es,
 						 const std::string& name))
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
 
   if (_assemble_system_object != NULL)
     {
@@ -1618,7 +1618,7 @@ void System::attach_assemble_object (System::Assembly& assemble)
 void System::attach_constraint_function(void fptr(EquationSystems& es,
 						  const std::string& name))
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
 
   if (_constrain_system_object != NULL)
     {
@@ -1654,7 +1654,7 @@ void System::attach_QOI_function(void fptr(EquationSystems&,
 					   const std::string&,
                                            const QoISet&))
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
 
   if (_qoi_evaluate_object != NULL)
     {
@@ -1690,7 +1690,7 @@ void System::attach_QOI_derivative(void fptr(EquationSystems&,
 					     const std::string&,
                                              const QoISet&))
 {
-  libmesh_assert (fptr != NULL);
+  libmesh_assert(fptr);
 
   if (_qoi_evaluate_derivative_object != NULL)
     {
@@ -1841,7 +1841,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
 
 Number System::point_value(unsigned int var, const Point &p, const Elem &e) const
 {
-  libmesh_assert (e.processor_id() == libMesh::processor_id());
+  libmesh_assert_equal_to (e.processor_id(), libMesh::processor_id());
 
   // Ensuring that the given point is really in the element is an
   // expensive assert, but as long as debugging is turned on we might
@@ -1938,7 +1938,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
 
 Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e) const
 {
-  libmesh_assert (e.processor_id() == libMesh::processor_id());
+  libmesh_assert_equal_to (e.processor_id(), libMesh::processor_id());
 
   // Ensuring that the given point is really in the element is an
   // expensive assert, but as long as debugging is turned on we might
@@ -2035,7 +2035,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 
 Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) const
 {
-  libmesh_assert (e.processor_id() == libMesh::processor_id());
+  libmesh_assert_equal_to (e.processor_id(), libMesh::processor_id());
 
   // Ensuring that the given point is really in the element is an
   // expensive assert, but as long as debugging is turned on we might

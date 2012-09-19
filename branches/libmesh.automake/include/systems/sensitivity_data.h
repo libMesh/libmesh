@@ -210,8 +210,8 @@ inline
 const Number& SensitivityData::derivative(unsigned int qoi_index,
                                           unsigned int parameter_index) const
 {
-  libmesh_assert(qoi_index < _grad_data.size());
-  libmesh_assert(parameter_index < _grad_data[qoi_index].size());
+  libmesh_assert_less (qoi_index, _grad_data.size());
+  libmesh_assert_less (parameter_index, _grad_data[qoi_index].size());
 
   return _grad_data[qoi_index][parameter_index];
 }
@@ -222,8 +222,8 @@ inline
 Number& SensitivityData::derivative(unsigned int qoi_index,
                                     unsigned int parameter_index)
 {
-  libmesh_assert(qoi_index < _grad_data.size());
-  libmesh_assert(parameter_index < _grad_data[qoi_index].size());
+  libmesh_assert_less (qoi_index, _grad_data.size());
+  libmesh_assert_less (parameter_index, _grad_data[qoi_index].size());
 
   return _grad_data[qoi_index][parameter_index];
 }
@@ -235,9 +235,9 @@ const Number& SensitivityData::second_derivative(unsigned int qoi_index,
                                                  unsigned int parameter_index1,
                                                  unsigned int parameter_index2) const
 {
-  libmesh_assert(qoi_index < _hess_data.size());
-  libmesh_assert(parameter_index1 < _hess_data[qoi_index].size());
-  libmesh_assert(parameter_index2 < _hess_data[qoi_index][parameter_index1].size());
+  libmesh_assert_less (qoi_index, _hess_data.size());
+  libmesh_assert_less (parameter_index1, _hess_data[qoi_index].size());
+  libmesh_assert_less (parameter_index2, _hess_data[qoi_index][parameter_index1].size());
 
   return _hess_data[qoi_index][parameter_index1][parameter_index2];
 }
@@ -249,9 +249,9 @@ Number& SensitivityData::second_derivative(unsigned int qoi_index,
                                            unsigned int parameter_index1,
                                            unsigned int parameter_index2)
 {
-  libmesh_assert(qoi_index < _hess_data.size());
-  libmesh_assert(parameter_index1 < _hess_data[qoi_index].size());
-  libmesh_assert(parameter_index2 < _hess_data[qoi_index][parameter_index1].size());
+  libmesh_assert_less (qoi_index, _hess_data.size());
+  libmesh_assert_less (parameter_index1, _hess_data[qoi_index].size());
+  libmesh_assert_less (parameter_index2, _hess_data[qoi_index][parameter_index1].size());
 
   return _hess_data[qoi_index][parameter_index1][parameter_index2];
 }

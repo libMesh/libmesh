@@ -307,9 +307,9 @@ public:
    * not required in user-level code. Just don't do anything crazy like
    * calling LibMeshMatDestroy()!
    */
-  Epetra_FECrsMatrix * mat () { libmesh_assert (_mat != NULL); return _mat; }
+  Epetra_FECrsMatrix * mat () { libmesh_assert(_mat); return _mat; }
 
-  const Epetra_FECrsMatrix * mat () const { libmesh_assert (_mat != NULL); return _mat; }
+  const Epetra_FECrsMatrix * mat () const { libmesh_assert(_mat); return _mat; }
 
 
 protected:
@@ -392,7 +392,7 @@ template <typename T>
 inline
 void EpetraMatrix<T>::close () const
 {
-  libmesh_assert (_mat != NULL);
+  libmesh_assert(_mat);
 
   _mat->GlobalAssemble();
 }
@@ -426,7 +426,7 @@ inline
 unsigned int EpetraMatrix<T>::row_start () const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_map != NULL);
+  libmesh_assert(_map);
 
   return static_cast<unsigned int>(_map->MinMyGID());
 }
@@ -438,7 +438,7 @@ inline
 unsigned int EpetraMatrix<T>::row_stop () const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_map != NULL);
+  libmesh_assert(_map);
 
   return static_cast<unsigned int>(_map->MaxMyGID())+1;
 }
@@ -504,8 +504,8 @@ void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
   // sanity check. but this cannot avoid
   // crash due to incompatible sparsity structure...
-  libmesh_assert (this->m() == X_in.m());
-  libmesh_assert (this->n() == X_in.n());
+  libmesh_assert_equal_to (this->m(), X_in.m());
+  libmesh_assert_equal_to (this->n(), X_in.n());
 
   EpetraMatrix<T>* X = libmesh_cast_ptr<EpetraMatrix<T>*> (&X_in);
 
@@ -521,10 +521,10 @@ T EpetraMatrix<T>::operator () (const unsigned int i,
 				const unsigned int j) const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (this->_mat != NULL);
+  libmesh_assert(this->_mat);
   libmesh_assert (this->_mat->MyGlobalRow(i));
-  libmesh_assert (i >= this->row_start());
-  libmesh_assert (i < this->row_stop());
+  libmesh_assert_greater_equal (i, this->row_start());
+  libmesh_assert_less (i, this->row_stop());
 
 
   int row_length, *row_indices;
@@ -539,8 +539,8 @@ T EpetraMatrix<T>::operator () (const unsigned int i,
 
   int *index = std::lower_bound (row_indices, row_indices+row_length, j);
 
-  libmesh_assert (*index < row_length);
-  libmesh_assert (static_cast<unsigned int>(row_indices[*index]) == j);
+  libmesh_assert_less (*index, row_length);
+  libmesh_assert_equal_to (static_cast<unsigned int>(row_indices[*index]), j);
 
   //libMesh::out << "val=" << values[*index] << std::endl;
 
@@ -555,7 +555,7 @@ inline
 bool EpetraMatrix<T>::closed() const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (this->_mat != NULL);
+  libmesh_assert(this->_mat);
 
   return this->_mat->Filled();
 }
@@ -578,7 +578,7 @@ inline
 void EpetraMatrix<T>::print_personal(std::ostream& os) const
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (_mat != NULL);
+  libmesh_assert(_mat);
 
   os << *_mat;
 }

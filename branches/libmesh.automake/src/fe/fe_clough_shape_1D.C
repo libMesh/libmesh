@@ -51,7 +51,7 @@ void clough_compute_coefs(const Elem* elem)
 {
   // Using static globals for old_elem_id, etc. will fail
   // horribly with more than one thread.
-  libmesh_assert(libMesh::n_threads() == 1);
+  libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
   // Coefficients are cached from old elements
   if (elem->id() == old_elem_id)
@@ -199,7 +199,7 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
 			     const unsigned int i,
 			     const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   clough_compute_coefs(elem);
 
@@ -218,7 +218,7 @@ Real FE<1,CLOUGH>::shape(const Elem* elem,
 	  case EDGE2:
 	  case EDGE3:
 	    {
-	      libmesh_assert (i<4);
+	      libmesh_assert_less (i, 4);
 
 	      switch (i)
 		{
@@ -275,7 +275,7 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem* elem,
 				   const unsigned int j,
 				   const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   clough_compute_coefs(elem);
 
@@ -332,7 +332,7 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem* elem,
                                       const unsigned int j,
                                       const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   clough_compute_coefs(elem);
 

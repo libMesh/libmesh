@@ -32,7 +32,7 @@ namespace libMesh
 // Prism class member functions
 unsigned int Prism::key (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   switch (s)
     {
@@ -83,7 +83,7 @@ unsigned int Prism::key (const unsigned int s) const
 
 AutoPtr<Elem> Prism::side (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   switch (i)
     {
@@ -166,8 +166,8 @@ AutoPtr<Elem> Prism::side (const unsigned int i) const
 bool Prism::is_child_on_side(const unsigned int c,
                              const unsigned int s) const
 {
-  libmesh_assert (c < this->n_children());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (c, this->n_children());
+  libmesh_assert_less (s, this->n_sides());
 
   for (unsigned int i = 0; i != 4; ++i)
     if (Prism6::side_elems_map[s][i] == c)
@@ -180,8 +180,8 @@ bool Prism::is_child_on_side(const unsigned int c,
 bool Prism::is_edge_on_side(const unsigned int e,
                             const unsigned int s) const
 {
-  libmesh_assert (e < this->n_edges());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (e, this->n_edges());
+  libmesh_assert_less (s, this->n_sides());
 
   return (is_node_on_side(Prism6::edge_nodes_map[e][0],s) &&
           is_node_on_side(Prism6::edge_nodes_map[e][1],s));

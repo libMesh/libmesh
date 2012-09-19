@@ -371,8 +371,8 @@ Real Elem::hmax() const
 Real Elem::length(const unsigned int n1,
 		  const unsigned int n2) const
 {
-  libmesh_assert ( n1 < this->n_vertices() );
-  libmesh_assert ( n2 < this->n_vertices() );
+  libmesh_assert_less ( n1, this->n_vertices() );
+  libmesh_assert_less ( n2, this->n_vertices() );
 
   return (this->point(n1) - this->point(n2)).size();
 }
@@ -792,7 +792,7 @@ Elem* Elem::topological_neighbor (const unsigned int i,
                                   const PointLocatorBase& point_locator,
                                   const PeriodicBoundaries * pb)
 {
-  libmesh_assert (i < this->n_neighbors());
+  libmesh_assert_less (i, this->n_neighbors());
 
   Elem * neighbor = this->neighbor(i);
   if (neighbor != NULL)
@@ -830,7 +830,7 @@ const Elem* Elem::topological_neighbor (const unsigned int i,
                                         const PointLocatorBase& point_locator,
                                         const PeriodicBoundaries * pb) const
 {
-  libmesh_assert (i < this->n_neighbors());
+  libmesh_assert_less (i, this->n_neighbors());
 
   const Elem * neighbor = this->neighbor(i);
   if (neighbor != NULL)
@@ -926,7 +926,7 @@ void Elem::libmesh_assert_valid_neighbors() const
           else
             {
               unsigned int rev = neigh->which_neighbor_am_i(elem);
-              libmesh_assert (rev < neigh->n_neighbors());
+              libmesh_assert_less (rev, neigh->n_neighbors());
 
               if (this->subactive() && !neigh->subactive())
                 {
@@ -976,7 +976,7 @@ void Elem::make_links_to_me_local(unsigned int n)
   libmesh_assert(!neigh->is_remote());
 
   // We never have neighbors more refined than us
-  libmesh_assert(neigh->level() <= this->level());
+  libmesh_assert_less_equal (neigh->level(), this->level());
 
   // We never have subactive neighbors of non subactive elements
   libmesh_assert(!neigh->subactive() || this->subactive());
@@ -1012,7 +1012,7 @@ void Elem::make_links_to_me_local(unsigned int n)
     }
 
   // we had better be on *some* side of neigh
-  libmesh_assert(nn < neigh->n_sides());
+  libmesh_assert_less (nn, neigh->n_sides());
 
   // Find any elements that ought to point to elem
   std::vector<const Elem*> neigh_family;
@@ -1053,7 +1053,7 @@ void Elem::make_links_to_me_local(unsigned int n)
 
 void Elem::make_links_to_me_remote()
 {
-  libmesh_assert (this != remote_elem);
+  libmesh_assert_not_equal_to (this, remote_elem);
 
   // We need to have handled any children first
 #if defined(LIBMESH_ENABLE_AMR) && defined(DEBUG)
@@ -1061,7 +1061,7 @@ void Elem::make_links_to_me_remote()
     for (unsigned int c = 0; c != this->n_children(); ++c)
       {
         Elem *child = this->child(c);
-        libmesh_assert (child == remote_elem);
+        libmesh_assert_equal_to (child, remote_elem);
       }
 #endif
 
@@ -1075,7 +1075,7 @@ void Elem::make_links_to_me_remote()
             {
 	      // My neighbor should never be more refined than me; my real
 	      // neighbor would have been its parent in that case.
-	      libmesh_assert(this->level() >= neigh->level());
+	      libmesh_assert_greater_equal (this->level(), neigh->level());
 
               if (this->level() == neigh->level() &&
                   neigh->has_neighbor(this))
@@ -1096,14 +1096,14 @@ void Elem::make_links_to_me_remote()
                       if (n == remote_elem)
                         continue;
                       unsigned int my_s = n->which_neighbor_am_i(this);
-                      libmesh_assert (my_s < n->n_neighbors());
-                      libmesh_assert (n->neighbor(my_s) == this);
+                      libmesh_assert_less (my_s, n->n_neighbors());
+                      libmesh_assert_equal_to (n->neighbor(my_s), this);
                       n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
                     }
 #else
                   unsigned int my_s = neigh->which_neighbor_am_i(this);
-                  libmesh_assert (my_s < neigh->n_neighbors());
-                  libmesh_assert (neigh->neighbor(my_s) == this);
+                  libmesh_assert_less (my_s, neigh->n_neighbors());
+                  libmesh_assert_equal_to (neigh->neighbor(my_s), this);
                   neigh->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
 #endif
                 }
@@ -1142,8 +1142,8 @@ void Elem::make_links_to_me_remote()
                       if (n == remote_elem)
                         continue;
                       unsigned int my_s = n->which_neighbor_am_i(this);
-                      libmesh_assert (my_s < n->n_neighbors());
-                      libmesh_assert (n->neighbor(my_s) == this);
+                      libmesh_assert_less (my_s, n->n_neighbors());
+                      libmesh_assert_equal_to (n->neighbor(my_s), this);
                       n->set_neighbor(my_s, const_cast<RemoteElem*>(remote_elem));
                     }
                 }
@@ -1162,7 +1162,7 @@ void Elem::make_links_to_me_remote()
       this->dim() == parent->dim())
     {
       unsigned int me = parent->which_child_am_i(this);
-      libmesh_assert (parent->child(me) == this);
+      libmesh_assert_equal_to (parent->child(me), this);
       parent->set_child(me, const_cast<RemoteElem*>(remote_elem));
     }
 #endif
@@ -1174,8 +1174,8 @@ void Elem::write_connectivity (std::ostream& out,
 			       const IOPackage iop) const
 {
   libmesh_assert (out.good());
-  libmesh_assert (_nodes != NULL);
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert(_nodes);
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
   switch (iop)
     {
@@ -1217,7 +1217,7 @@ void Elem::write_connectivity (std::ostream& out,
 // void Elem::write_tecplot_connectivity(std::ostream& out) const
 // {
 //   libmesh_assert (!out.bad());
-//   libmesh_assert (_nodes != NULL);
+//   libmesh_assert(_nodes);
 
 //   // This connectivity vector will be used repeatedly instead
 //   // of being reconstructed inside the loop.
@@ -1239,7 +1239,7 @@ void Elem::write_connectivity (std::ostream& out,
 // void Elem::write_ucd_connectivity(std::ostream &out) const
 // {
 //   libmesh_assert (out);
-//   libmesh_assert (_nodes != NULL);
+//   libmesh_assert(_nodes);
 
 //   for (unsigned int i=0; i<this->n_nodes(); i++)
 //     out << this->node(i)+1 << "\t";
@@ -1314,7 +1314,7 @@ void Elem::add_child (Elem* elem)
     {
       if(this->_children[c] == NULL || this->_children[c] == remote_elem)
 	{
-	  libmesh_assert (this == elem->parent());
+	  libmesh_assert_equal_to (this, elem->parent());
 	  this->set_child(c, elem);
 	  return;
 	}
@@ -1349,7 +1349,7 @@ void Elem::replace_child (Elem* elem, unsigned int c)
 {
   libmesh_assert(this->has_children());
 
-  libmesh_assert (this->child(c) != NULL);
+  libmesh_assert(this->child(c));
 
   this->set_child(c, elem);
 }
@@ -1359,8 +1359,8 @@ void Elem::replace_child (Elem* elem, unsigned int c)
 bool Elem::is_child_on_edge(const unsigned int libmesh_dbg_var(c),
                             const unsigned int e) const
 {
-  libmesh_assert (c < this->n_children());
-  libmesh_assert (e < this->n_edges());
+  libmesh_assert_less (c, this->n_children());
+  libmesh_assert_less (e, this->n_edges());
 
   AutoPtr<Elem> my_edge = this->build_edge(e);
   AutoPtr<Elem> child_edge = this->build_edge(e);
@@ -1450,7 +1450,7 @@ void Elem::family_tree_by_side (std::vector<const Elem*>& family,
   if (reset)
     family.clear();
 
-  libmesh_assert(s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   // Add this element to the family tree.
   family.push_back(this);
@@ -1476,7 +1476,7 @@ void Elem::active_family_tree_by_side (std::vector<const Elem*>& family,
   if (reset)
     family.clear();
 
-  libmesh_assert(s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   // Add an active element to the family tree.
   if (this->active())
@@ -1536,12 +1536,12 @@ void Elem::family_tree_by_subneighbor (std::vector<const Elem*>& family,
 
   // To simplifly this function we need an existing neighbor
   libmesh_assert (neighbor);
-  libmesh_assert (neighbor != remote_elem);
+  libmesh_assert_not_equal_to (neighbor, remote_elem);
   libmesh_assert (this->has_neighbor(neighbor));
 
   // This only makes sense if subneighbor descends from neighbor
   libmesh_assert (subneighbor);
-  libmesh_assert (subneighbor != remote_elem);
+  libmesh_assert_not_equal_to (subneighbor, remote_elem);
   libmesh_assert (neighbor->is_ancestor_of(subneighbor));
 
   // Add this element to the family tree if applicable.
@@ -1649,7 +1649,7 @@ unsigned int Elem::min_new_p_level_by_neighbor(const Elem* neighbor,
         new_p_level += 1;
       if (this->p_refinement_flag() == Elem::COARSEN)
         {
-          libmesh_assert (new_p_level > 0);
+          libmesh_assert_greater (new_p_level, 0);
           new_p_level -= 1;
         }
       return std::min(current_min, new_p_level);
@@ -1716,8 +1716,8 @@ bool Elem::close_to_point (const Point& p, Real tol) const
 
 bool Elem::point_test(const Point& p, Real box_tol, Real map_tol) const
 {
-  libmesh_assert (box_tol > 0.);
-  libmesh_assert (map_tol > 0.);
+  libmesh_assert_greater (box_tol, 0.);
+  libmesh_assert_greater (map_tol, 0.);
 
   // This is a great optimization on first order elements, but it
   // could return false negatives on higher orders
@@ -1903,7 +1903,7 @@ void Elem::nullify_neighbors ()
 	  if (neighbor->level() == this->level())
 	    {
 	      const unsigned int w_n_a_i = neighbor->which_neighbor_am_i(this);
-              libmesh_assert (w_n_a_i < neighbor->n_neighbors());
+              libmesh_assert_less (w_n_a_i, neighbor->n_neighbors());
 	      neighbor->set_neighbor(w_n_a_i, NULL);
 	      this->set_neighbor(n, NULL);
 	    }
@@ -2155,7 +2155,7 @@ const unsigned int Elem::PackedElem::header_size = 10;
 // Elem::PackedElem member funcions
 void Elem::PackedElem::pack (std::vector<int> &conn, const Elem* elem)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   // we can do at least this good. note that hopefully in general
   // the user will already have reserved the full space, which will render
@@ -2221,10 +2221,10 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 #ifdef LIBMESH_ENABLE_AMR
   if (this->level() != 0)
     {
-      libmesh_assert (parent != NULL);
+      libmesh_assert(parent);
       parent->add_child(elem, this->which_child_am_i());
-      libmesh_assert (parent->type() == elem->type());
-      libmesh_assert (parent->child(this->which_child_am_i()) == elem);
+      libmesh_assert_equal_to (parent->type(), elem->type());
+      libmesh_assert_equal_to (parent->child(this->which_child_am_i()), elem);
     }
 #endif
 
@@ -2233,7 +2233,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
   elem->set_p_level(this->p_level());
   elem->set_refinement_flag(this->refinement_flag());
   elem->set_p_refinement_flag(this->p_refinement_flag());
-  libmesh_assert (elem->level() == this->level());
+  libmesh_assert_equal_to (elem->level(), this->level());
 
   // If this element definitely should have children, assign
   // remote_elem for now; later unpacked elements may overwrite that.
@@ -2248,13 +2248,13 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
   elem->set_id()       = this->id();
 
   // Assign the connectivity
-  libmesh_assert (elem->n_nodes() == this->n_nodes());
+  libmesh_assert_equal_to (elem->n_nodes(), this->n_nodes());
 
   for (unsigned int n=0; n<elem->n_nodes(); n++)
     elem->set_node(n) = mesh.node_ptr (this->node(n));
 
   // Assign the connectivity
-  libmesh_assert (elem->n_neighbors() == this->n_neighbors());
+  libmesh_assert_equal_to (elem->n_neighbors(), this->n_neighbors());
 
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     {
@@ -2262,7 +2262,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 
       // We should only be unpacking elements sent by their owners,
       // and their owners should know all their neighbors
-      libmesh_assert (neighbor_id != remote_elem->id());
+      libmesh_assert_not_equal_to (neighbor_id, remote_elem->id());
 
       if (neighbor_id == DofObject::invalid_id)
 	continue;
@@ -2275,7 +2275,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 	}
 
       // We never have neighbors more refined than us
-      libmesh_assert(neigh->level() <= elem->level());
+      libmesh_assert_less_equal (neigh->level(), elem->level());
 
       // We never have subactive neighbors of non subactive elements
       libmesh_assert(!neigh->subactive() || elem->subactive());
@@ -2306,7 +2306,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 	}
 
       // elem had better be on *some* side of neigh
-      libmesh_assert(nn < neigh->n_sides());
+      libmesh_assert_less (nn, neigh->n_sides());
 
       // Find any elements that ought to point to elem
       std::vector<const Elem*> neigh_family;

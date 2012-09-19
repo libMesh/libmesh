@@ -61,7 +61,7 @@ namespace {
   template <typename T>
   inline unsigned int to_uint ( const T &t )
   {
-    libmesh_assert (t == static_cast<T>(static_cast<unsigned int>(t)));
+    libmesh_assert_equal_to (t, static_cast<T>(static_cast<unsigned int>(t)));
 
     return static_cast<unsigned int>(t);
   }
@@ -180,16 +180,16 @@ void Nemesis_IO::read (const std::string& base_filename)
       libmesh_error();
     }
 
-  libmesh_assert (nemhelper->num_nodes ==
-		  (nemhelper->num_internal_nodes +
-		   nemhelper->num_border_nodes));
+  libmesh_assert_equal_to (nemhelper->num_nodes,
+		           (nemhelper->num_internal_nodes +
+		            nemhelper->num_border_nodes));
 
-  libmesh_assert (nemhelper->num_elem ==
-		  (nemhelper->num_internal_elems +
-		   nemhelper->num_border_elems));
+  libmesh_assert_equal_to (nemhelper->num_elem,
+		           (nemhelper->num_internal_elems +
+		            nemhelper->num_border_elems));
 
-  libmesh_assert (nemhelper->num_nodes <= nemhelper->num_nodes_global);
-  libmesh_assert (nemhelper->num_elem  <= nemhelper->num_elems_global);
+  libmesh_assert_less_equal (nemhelper->num_nodes, nemhelper->num_nodes_global);
+  libmesh_assert_less_equal (nemhelper->num_elem, nemhelper->num_elems_global);
 
   // Read nodes from the exodus file: this fills the nemhelper->x,y,z arrays.
   nemhelper->read_nodes();
@@ -218,9 +218,9 @@ void Nemesis_IO::read (const std::string& base_filename)
   //  node_cmap_proc_ids[][]
   nemhelper->get_node_cmap();
 
-  libmesh_assert (to_uint(nemhelper->num_node_cmaps) == nemhelper->node_cmap_node_cnts.size());
-  libmesh_assert (to_uint(nemhelper->num_node_cmaps) == nemhelper->node_cmap_node_ids.size());
-  libmesh_assert (to_uint(nemhelper->num_node_cmaps) == nemhelper->node_cmap_proc_ids.size());
+  libmesh_assert_equal_to (to_uint(nemhelper->num_node_cmaps), nemhelper->node_cmap_node_cnts.size());
+  libmesh_assert_equal_to (to_uint(nemhelper->num_node_cmaps), nemhelper->node_cmap_node_ids.size());
+  libmesh_assert_equal_to (to_uint(nemhelper->num_node_cmaps), nemhelper->node_cmap_proc_ids.size());
 
 #ifndef NDEBUG
   // We expect the communication maps to be symmetric - e.g. if processor i thinks it
@@ -236,7 +236,7 @@ void Nemesis_IO::read (const std::string& base_filename)
     // mark each processor id we reference with a node cmap
     for (unsigned int cmap=0; cmap<to_uint(nemhelper->num_node_cmaps); cmap++)
       {
-	libmesh_assert (to_uint(nemhelper->node_cmap_ids[cmap]) < libMesh::n_processors());
+	libmesh_assert_less (to_uint(nemhelper->node_cmap_ids[cmap]), libMesh::n_processors());
 
 	pid_send_partner[nemhelper->node_cmap_ids[cmap]] = 1;
       }
@@ -266,18 +266,18 @@ void Nemesis_IO::read (const std::string& base_filename)
   for (unsigned int cmap=0; cmap<to_uint(nemhelper->num_node_cmaps); cmap++)
     {
       // Good time for error checking...
-      libmesh_assert (to_uint(nemhelper->node_cmap_node_cnts[cmap]) ==
-		      nemhelper->node_cmap_node_ids[cmap].size());
+      libmesh_assert_equal_to (to_uint(nemhelper->node_cmap_node_cnts[cmap]),
+		               nemhelper->node_cmap_node_ids[cmap].size());
 
-      libmesh_assert (to_uint(nemhelper->node_cmap_node_cnts[cmap]) ==
-		      nemhelper->node_cmap_proc_ids[cmap].size());
+      libmesh_assert_equal_to (to_uint(nemhelper->node_cmap_node_cnts[cmap]),
+		               nemhelper->node_cmap_proc_ids[cmap].size());
 
       // In all the samples I have seen, node_cmap_ids[cmap] is the processor
       // rank of the remote processor...
       const unsigned short int adjcnt_pid_idx = nemhelper->node_cmap_ids[cmap];
 
-      libmesh_assert (adjcnt_pid_idx <  libMesh::n_processors());
-      libmesh_assert (adjcnt_pid_idx != libMesh::processor_id());
+      libmesh_assert_less (adjcnt_pid_idx, libMesh::n_processors());
+      libmesh_assert_not_equal_to (adjcnt_pid_idx, libMesh::processor_id());
 
       // We only expect one cmap per adjacent processor
       libmesh_assert (!pid_to_cmap_map.count(adjcnt_pid_idx));
@@ -288,12 +288,12 @@ void Nemesis_IO::read (const std::string& base_filename)
       for (unsigned int idx=0; idx<to_uint(nemhelper->node_cmap_node_cnts[cmap]); idx++)
 	{
 	  //  Are the node_cmap_ids and node_cmap_proc_ids really redundant?
-	  libmesh_assert (adjcnt_pid_idx == nemhelper->node_cmap_proc_ids[cmap][idx]);
+	  libmesh_assert_equal_to (adjcnt_pid_idx, nemhelper->node_cmap_proc_ids[cmap][idx]);
 
 	  // we are expecting the exodus node numbering to be 1-based...
 	  const unsigned int local_node_idx = nemhelper->node_cmap_node_ids[cmap][idx]-1;
 
-	  libmesh_assert (local_node_idx < node_ownership.size());
+	  libmesh_assert_less (local_node_idx, node_ownership.size());
 
 	  // if the adjacent processor is lower rank than the current
 	  // owner for this node, then it will get the node...
@@ -311,7 +311,7 @@ void Nemesis_IO::read (const std::string& base_filename)
       num_nodes_i_must_number++;
 
   // more error checking...
-  libmesh_assert (num_nodes_i_must_number >= to_uint(nemhelper->num_internal_nodes));
+  libmesh_assert_greater_equal (num_nodes_i_must_number, to_uint(nemhelper->num_internal_nodes));
   libmesh_assert (num_nodes_i_must_number <= to_uint(nemhelper->num_internal_nodes +
 						  nemhelper->num_border_nodes));
   if (_verbose)
@@ -418,8 +418,8 @@ void Nemesis_IO::read (const std::string& base_filename)
 #endif
 
       // an internal node we do not own? huh??
-      libmesh_assert (owning_pid_idx == libMesh::processor_id());
-      libmesh_assert (global_node_idx < to_uint(nemhelper->num_nodes_global));
+      libmesh_assert_equal_to (owning_pid_idx, libMesh::processor_id());
+      libmesh_assert_less (global_node_idx, to_uint(nemhelper->num_nodes_global));
 
       // "Catch" the node pointer after addition, make sure the
       // ID matches the requested value.
@@ -493,7 +493,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	}
     }
   // That should cover numbering all the nodes which belong to us...
-  libmesh_assert (num_nodes_i_must_number == (my_next_node - my_node_offset));
+  libmesh_assert_equal_to (num_nodes_i_must_number, (my_next_node - my_node_offset));
 
   // Let's sort the mapping so we can efficiently answer requests
   std::sort (old_global_to_new_global_map.begin(),
@@ -567,9 +567,9 @@ void Nemesis_IO::read (const std::string& base_filename)
 				  global_idx_mapping_comp);
 
 	      libmesh_assert (it != old_global_to_new_global_map.end());
-	      libmesh_assert (it->first == old_global_node_idx);
-	      libmesh_assert (it->second >= my_node_offset);
-	      libmesh_assert (it->second <  my_next_node);
+	      libmesh_assert_equal_to (it->first, old_global_node_idx);
+	      libmesh_assert_greater_equal (it->second, my_node_offset);
+	      libmesh_assert_less (it->second, my_next_node);
 
 	      // overwrite the requested old global node index with the new global index
 	      xfer_buf[i] = it->second;
@@ -594,15 +594,15 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  // if we have received a reply, our send *must* have completed
 	  // (note we never actually need to wait on the request)
 	  libmesh_assert (needed_nodes_requests[cmap].test());
-	  libmesh_assert (to_uint(nemhelper->node_cmap_ids[cmap]) == source_pid_idx);
+	  libmesh_assert_equal_to (to_uint(nemhelper->node_cmap_ids[cmap]), source_pid_idx);
 
 	  // now post the receive for this cmap
 	  Parallel::receive (source_pid_idx,
 			     needed_node_idxs[cmap],
 			     nodes_tag);
 
-	  libmesh_assert (needed_node_idxs[cmap].size() <=
-			  nemhelper->node_cmap_node_ids[cmap].size());
+	  libmesh_assert_less_equal (needed_node_idxs[cmap].size(),
+			             nemhelper->node_cmap_node_ids[cmap].size());
 
 	  for (unsigned int i=0,j=0; i<nemhelper->node_cmap_node_ids[cmap].size(); i++)
 	    {
@@ -614,7 +614,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	      // is in the buffer we just received
 	      if (owning_pid_idx == source_pid_idx)
 		{
-		  libmesh_assert (j < needed_node_idxs[cmap].size());
+		  libmesh_assert_less (j, needed_node_idxs[cmap].size());
 
 		  const unsigned int // now 0-based!
 		    global_node_idx = needed_node_idxs[cmap][j++];
@@ -649,7 +649,7 @@ void Nemesis_IO::read (const std::string& base_filename)
     } // end of node index communication loop
 
   // we had better have added all the nodes we need to!
-  libmesh_assert ((my_next_node - my_node_offset) == to_uint(nemhelper->num_nodes));
+  libmesh_assert_equal_to ((my_next_node - my_node_offset), to_uint(nemhelper->num_nodes));
 
   // After all that, we should be done with all node-related arrays *except* the
   // node_num_map, which we have transformed to use our new numbering...
@@ -714,7 +714,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	libMesh::out << "sum_border_elems=" << sum_border_elems << std::endl;
       }
 
-    libmesh_assert(sum_internal_elems+sum_border_elems == nemhelper->num_elems_global);
+    libmesh_assert_equal_to (sum_internal_elems+sum_border_elems, nemhelper->num_elems_global);
   }
 #endif
 
@@ -856,7 +856,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	} // for (unsigned int j=0; j<nemhelper->num_elem_this_blk; j++)
     } // end for (unsigned int i=0; i<nemhelper->num_elem_blk; i++)
 
-  libmesh_assert ((my_next_elem - my_elem_offset) == to_uint(nemhelper->num_elem));
+  libmesh_assert_equal_to ((my_next_elem - my_elem_offset), to_uint(nemhelper->num_elem));
 
   if (_verbose)
     {

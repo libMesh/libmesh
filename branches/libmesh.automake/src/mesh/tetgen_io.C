@@ -36,7 +36,7 @@ void TetGenIO::read (const std::string& name)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert(libMesh::processor_id() == 0);
+  libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   std::string name_node, name_ele, dummy;
 
@@ -235,8 +235,8 @@ void TetGenIO::element_in (std::istream& ele_stream)
 
       mesh.add_elem (elem);
 
-      libmesh_assert (elem != NULL);
-      libmesh_assert (elem->n_nodes() == n_nodes);
+      libmesh_assert(elem);
+      libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
 
       // Read the element label
       ele_stream >> element_lab;
@@ -271,7 +271,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
 void TetGenIO::write (const std::string& fname)
 {
   // libmesh_assert three dimensions (should be extended later)
-  libmesh_assert (MeshOutput<MeshBase>::mesh().mesh_dimension() == 3);
+  libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().mesh_dimension(), 3);
 
   if (!(fname.rfind(".poly") < fname.size()))
     {

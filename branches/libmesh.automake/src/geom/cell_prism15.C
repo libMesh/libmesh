@@ -80,7 +80,7 @@ bool Prism15::is_face(const unsigned int) const
 bool Prism15::is_node_on_side(const unsigned int n,
 			      const unsigned int s) const
 {
-  libmesh_assert(s < n_sides());
+  libmesh_assert_less (s, n_sides());
   for (unsigned int i = 0; i != 8; ++i)
     if (side_nodes_map[s][i] == n)
       return true;
@@ -90,7 +90,7 @@ bool Prism15::is_node_on_side(const unsigned int n,
 bool Prism15::is_node_on_edge(const unsigned int n,
 			      const unsigned int e) const
 {
-  libmesh_assert(e < n_edges());
+  libmesh_assert_less (e, n_edges());
   for (unsigned int i = 0; i != 3; ++i)
     if (edge_nodes_map[e][i] == n)
       return true;
@@ -132,7 +132,7 @@ bool Prism15::has_affine_map() const
 AutoPtr<Elem> Prism15::build_side (const unsigned int i,
 				   bool proxy) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
   if (proxy)
     {
@@ -250,7 +250,7 @@ AutoPtr<Elem> Prism15::build_side (const unsigned int i,
 
 AutoPtr<Elem> Prism15::build_edge (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_edges());
+  libmesh_assert_less (i, this->n_edges());
 
   return AutoPtr<Elem>(new SideEdge<Edge3,Prism15>(this,i));
 }
@@ -260,9 +260,9 @@ void Prism15::connectivity(const unsigned int libmesh_dbg_var(sc),
 			   const IOPackage iop,
 			   std::vector<unsigned int>& conn) const
 {
-  libmesh_assert (_nodes != NULL);
-  libmesh_assert (sc < this->n_sub_elem());
-  libmesh_assert (iop != INVALID_IO_PACKAGE);
+  libmesh_assert(_nodes);
+  libmesh_assert_less (sc, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
 
   switch (iop)
     {
@@ -327,9 +327,9 @@ void Prism15::connectivity(const unsigned int libmesh_dbg_var(sc),
 unsigned short int Prism15::second_order_adjacent_vertex (const unsigned int n,
 							  const unsigned int v) const
 {
-  libmesh_assert (n >= this->n_vertices());
-  libmesh_assert (n <  this->n_nodes());
-  libmesh_assert (v < 2);
+  libmesh_assert_greater_equal (n, this->n_vertices());
+  libmesh_assert_less (n, this->n_nodes());
+  libmesh_assert_less (v, 2);
   return _second_order_adjacent_vertices[n-this->n_vertices()][v];
 }
 
@@ -338,8 +338,8 @@ unsigned short int Prism15::second_order_adjacent_vertex (const unsigned int n,
 std::pair<unsigned short int, unsigned short int>
 Prism15::second_order_child_vertex (const unsigned int n) const
 {
-  libmesh_assert (n >= this->n_vertices());
-  libmesh_assert (n < this->n_nodes());
+  libmesh_assert_greater_equal (n, this->n_vertices());
+  libmesh_assert_less (n, this->n_nodes());
 
   return std::pair<unsigned short int, unsigned short int>
     (_second_order_vertex_child_number[n],

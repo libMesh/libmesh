@@ -120,8 +120,8 @@ namespace
       libmesh_assert(dxdxi[1][p]);
       // No non-rectilinear or non-axis-aligned elements!
 #ifdef DEBUG
-      libmesh_assert(std::abs(dxdeta[p]) < 1e-9);
-      libmesh_assert(std::abs(dydxi[p]) < 1e-9);
+      libmesh_assert_less (std::abs(dxdeta[p]), 1e-9);
+      libmesh_assert_less (std::abs(dydxi[p]), 1e-9);
 #endif
     }
 }
@@ -254,7 +254,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 			  const unsigned int i,
 			  const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
 
   hermite_compute_coefs(elem);
 
@@ -269,11 +269,11 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
   switch (type)
     {
     case QUAD4:
-      libmesh_assert (totalorder < 4);
+      libmesh_assert_less (totalorder, 4);
     case QUAD8:
     case QUAD9:
       {
-        libmesh_assert (i<(totalorder+1u)*(totalorder+1u));
+        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
         std::vector<unsigned int> bases1D;
 
@@ -317,7 +317,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 				const unsigned int j,
 				const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1);
 
   hermite_compute_coefs(elem);
@@ -333,11 +333,11 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
   switch (type)
     {
     case QUAD4:
-      libmesh_assert (totalorder < 4);
+      libmesh_assert_less (totalorder, 4);
     case QUAD8:
     case QUAD9:
       {
-        libmesh_assert (i<(totalorder+1u)*(totalorder+1u));
+        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
         std::vector<unsigned int> bases1D;
 
@@ -375,7 +375,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
                                        const unsigned int j,
                                        const Point& p)
 {
-  libmesh_assert (elem != NULL);
+  libmesh_assert(elem);
   libmesh_assert (j == 0 || j == 1 || j == 2);
 
   hermite_compute_coefs(elem);
@@ -391,11 +391,11 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
   switch (type)
     {
     case QUAD4:
-      libmesh_assert (totalorder < 4);
+      libmesh_assert_less (totalorder, 4);
     case QUAD8:
     case QUAD9:
       {
-        libmesh_assert (i<(totalorder+1u)*(totalorder+1u));
+        libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
         std::vector<unsigned int> bases1D;
 

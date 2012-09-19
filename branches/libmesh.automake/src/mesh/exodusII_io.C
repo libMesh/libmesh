@@ -100,7 +100,7 @@ void ExodusII_IO::read (const std::string& fname)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-//  libmesh_assert(libMesh::processor_id() == 0);
+//  libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
 #ifndef LIBMESH_HAVE_EXODUS_API
 
@@ -133,7 +133,7 @@ void ExodusII_IO::read (const std::string& fname)
   exio_helper->print_header();            // Print header information
 
   //assertion fails due to inconsistent mesh dimension
-//  libmesh_assert(static_cast<unsigned int>(exio_helper->get_num_dim()) == mesh.mesh_dimension()); // Be sure number of dimensions
+//  libmesh_assert_equal_to (static_cast<unsigned int>(exio_helper->get_num_dim()), mesh.mesh_dimension()); // Be sure number of dimensions
                                                                                 // is equal to the number of
                                                                                 // dimensions in the mesh supplied.
 
@@ -146,7 +146,7 @@ void ExodusII_IO::read (const std::string& fname)
 			  exio_helper->get_y(i),
 			  exio_helper->get_z(i)), i);
 
-  libmesh_assert (static_cast<unsigned int>(exio_helper->get_num_nodes()) == mesh.n_nodes());
+  libmesh_assert_equal_to (static_cast<unsigned int>(exio_helper->get_num_nodes()), mesh.n_nodes());
 
   exio_helper->read_block_info();                 // Get information about all the blocks
   mesh.reserve_elem(exio_helper->get_num_elem()); // Reserve space for the elements
@@ -204,7 +204,7 @@ void ExodusII_IO::read (const std::string& fname)
       // (should equal total number of elements in the end)
       nelem_last_block += exio_helper->get_num_elem_this_blk();
     }
-  libmesh_assert (static_cast<unsigned int>(nelem_last_block) == mesh.n_elem());
+  libmesh_assert_equal_to (static_cast<unsigned int>(nelem_last_block), mesh.n_elem());
 
    // Set the mesh dimension to the largest encountered for an element
   for (unsigned int i=0; i!=4; ++i)

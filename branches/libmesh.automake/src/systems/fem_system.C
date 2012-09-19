@@ -81,7 +81,7 @@ namespace {
           if (_get_jacobian && !jacobian_computed)
             {
               // Make sure we didn't compute a jacobian and lie about it
-              libmesh_assert(_femcontext.elem_jacobian.l1_norm() == 0.0);
+              libmesh_assert_equal_to (_femcontext.elem_jacobian.l1_norm(), 0.0);
               // Logging of numerical jacobians is done separately
               _sys.numerical_elem_jacobian(_femcontext);
             }
@@ -171,7 +171,7 @@ namespace {
 	          // so we can make sure side_residual didn't compute a
                   // jacobian and lie about it
 #ifdef DEBUG
-                  libmesh_assert(_femcontext.elem_jacobian.l1_norm() == 0.0);
+                  libmesh_assert_equal_to (_femcontext.elem_jacobian.l1_norm(), 0.0);
 #endif
                   // Logging of numerical jacobians is done separately
                   _sys.numerical_side_jacobian(_femcontext);
@@ -290,7 +290,8 @@ namespace {
      * constructor to set context
      */
     explicit
-    PostprocessContributions(FEMSystem &sys) : _sys(sys) {}
+    PostprocessContributions(FEMSystem &sys,
+			     DifferentiableQoI &qoi) : _sys(sys), _qoi(qoi) {}
 
     /**
      * operator() for use with Threads::parallel_for().
@@ -311,14 +312,14 @@ namespace {
           if (_sys.fe_reinit_during_postprocess)
             _femcontext.elem_fe_reinit();
 
-          _sys.element_postprocess(_femcontext);
+          _qoi.element_postprocess(_femcontext);
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
                ++_femcontext.side)
             {
               // Don't compute on non-boundary sides unless requested
-              if (!_sys.postprocess_sides ||
+              if (!_qoi.postprocess_sides ||
                   (!_sys.compute_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
@@ -327,7 +328,7 @@ namespace {
               if (_sys.fe_reinit_during_postprocess)
                 _femcontext.side_fe_reinit();
 
-              _sys.side_postprocess(_femcontext);
+              _qoi.side_postprocess(_femcontext);
             }
         }
     }
@@ -335,6 +336,7 @@ namespace {
   private:
 
     FEMSystem& _sys;
+    DifferentiableQoI& _qoi;
   };
 
   class QoIContributions
@@ -344,15 +346,15 @@ namespace {
      * constructor to set context
      */
     explicit
-    QoIContributions(FEMSystem &sys) :
-      qoi(sys.qoi.size(), 0.), _sys(sys) {}
+    QoIContributions(FEMSystem &sys, DifferentiableQoI &diff_qoi) :
+      qoi(sys.qoi.size(), 0.), _sys(sys), _diff_qoi(diff_qoi) {}
 
     /**
      * splitting constructor
      */
     QoIContributions(const QoIContributions &other,
                      Threads::split) :
-      qoi(other._sys.qoi.size(), 0.), _sys(other._sys) {}
+      qoi(other._sys.qoi.size(), 0.), _sys(other._sys), _diff_qoi(other._diff_qoi) {}
 
     /**
      * operator() for use with Threads::parallel_reduce().
@@ -371,21 +373,21 @@ namespace {
           _femcontext.pre_fe_reinit(_sys, el);
           _femcontext.elem_fe_reinit();
 
-          _sys.element_qoi(_femcontext, _qoi_indices);
+          _diff_qoi.element_qoi(_femcontext, _qoi_indices);
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
                ++_femcontext.side)
             {
               // Don't compute on non-boundary sides unless requested
-              if (!_sys.assemble_qoi_sides ||
+              if (!_diff_qoi.assemble_qoi_sides ||
                   (!_sys.compute_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
 
               _femcontext.side_fe_reinit();
 
-              _sys.side_qoi(_femcontext, _qoi_indices);
+              _diff_qoi.side_qoi(_femcontext, _qoi_indices);
             }
         }
 
@@ -395,7 +397,7 @@ namespace {
     void join (const QoIContributions& other)
     {
       const unsigned int my_size = this->qoi.size();
-      libmesh_assert(my_size == other.qoi.size());
+      libmesh_assert_equal_to (my_size, other.qoi.size());
 
       for (unsigned int i=0; i != my_size; ++i)
         this->qoi[i] += other.qoi[i];
@@ -406,6 +408,7 @@ namespace {
   private:
 
     FEMSystem& _sys;
+    DifferentiableQoI& _diff_qoi;
 
     const QoISet _qoi_indices;
   };
@@ -416,8 +419,9 @@ namespace {
     /**
      * constructor to set context
      */
-    QoIDerivativeContributions(FEMSystem &sys, const QoISet& qoi_indices) :
-      _sys(sys), _qoi_indices(qoi_indices) {}
+    QoIDerivativeContributions(FEMSystem &sys, const QoISet& qoi_indices,
+			       DifferentiableQoI &qoi ) :
+      _sys(sys), _qoi_indices(qoi_indices), _qoi(qoi) {}
 
     /**
      * operator() for use with Threads::parallel_for().
@@ -436,21 +440,21 @@ namespace {
           _femcontext.pre_fe_reinit(_sys, el);
           _femcontext.elem_fe_reinit();
 
-          _sys.element_qoi_derivative(_femcontext, _qoi_indices);
+          _qoi.element_qoi_derivative(_femcontext, _qoi_indices);
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
                ++_femcontext.side)
             {
               // Don't compute on non-boundary sides unless requested
-              if (!_sys.assemble_qoi_sides ||
+              if (!_qoi.assemble_qoi_sides ||
                   (!_sys.compute_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
 
               _femcontext.side_fe_reinit();
 
-              _sys.side_qoi_derivative(_femcontext, _qoi_indices);
+              _qoi.side_qoi_derivative(_femcontext, _qoi_indices);
             }
 
           // We need some unmodified indices to use for constraining
@@ -475,8 +479,8 @@ namespace {
   private:
 
     FEMSystem& _sys;
-
     const QoISet& _qoi_indices;
+    DifferentiableQoI& _qoi;
   };
 
 
@@ -585,7 +589,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
   // In time-dependent problems, the nonlinear function we're trying
   // to solve at each timestep may depend on the particular solver
   // we're using
-  libmesh_assert (time_solver.get() != NULL);
+  libmesh_assert(time_solver.get());
 
   // Build the residual and jacobian contributions on every active
   // mesh element on this processor
@@ -660,7 +664,7 @@ void FEMSystem::mesh_position_set()
   // out how to better abstract the "ask other procs for their local
   // data, respond to others' queries, work on my query's results"
   // pattern that we seem to be using a lot.
-  libmesh_assert(libMesh::n_processors() == 1);
+  libmesh_assert_equal_to (libMesh::n_processors(), 1);
 
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
@@ -702,7 +706,7 @@ void FEMSystem::postprocess ()
   // Loop over every active mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
                                          mesh.active_local_elements_end()),
-                        PostprocessContributions(*this));
+                        PostprocessContributions(*this, *(this->diff_qoi)));
 
   STOP_LOG("postprocess()", "FEMSystem");
 }
@@ -725,7 +729,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
   // Create a non-temporary qoi_contributions object, so we can query
   // its results after the reduction
-  QoIContributions qoi_contributions(*this);
+  QoIContributions qoi_contributions(*this, *(this->diff_qoi));
 
   // Loop over every active mesh element on this processor
   Threads::parallel_reduce(elem_range.reset(mesh.active_local_elements_begin(),
@@ -758,7 +762,8 @@ void FEMSystem::assemble_qoi_derivative (const QoISet& qoi_indices)
   // Loop over every active mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
                                          mesh.active_local_elements_end()),
-                        QoIDerivativeContributions(*this, qoi_indices));
+                        QoIDerivativeContributions(*this, qoi_indices,
+						   *(this->diff_qoi)));
 
   STOP_LOG("assemble_qoi_derivative()", "FEMSystem");
 }
@@ -823,7 +828,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
       context.elem_residual.zero();
       ((*time_solver).*(res))(false, context);
 #ifdef DEBUG
-      libmesh_assert(old_jacobian == context.elem_jacobian);
+      libmesh_assert_equal_to (old_jacobian, context.elem_jacobian);
 #endif
       backwards_residual = context.elem_residual;
 
@@ -837,7 +842,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
       context.elem_residual.zero();
       ((*time_solver).*(res))(false, context);
 #ifdef DEBUG
-      libmesh_assert(old_jacobian == context.elem_jacobian);
+      libmesh_assert_equal_to (old_jacobian, context.elem_jacobian);
 #endif
 
       context.elem_solution(j) = original_solution;
@@ -990,7 +995,7 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
   FEMContext &context = libmesh_cast_ref<FEMContext&>(c);
 
   // This function only supports fully coupled mesh motion for now
-  libmesh_assert(_mesh_sys == this);
+  libmesh_assert_equal_to (_mesh_sys, this);
 
   unsigned int n_qpoints = (context.get_element_qrule())->n_points();
 
@@ -1009,7 +1014,7 @@ bool FEMSystem::eulerian_residual (bool request_jacobian,
   // If we're our own _mesh_sys, we'd better be in charge of
   // at least one coordinate, and we'd better have the same
   // FE type for all coordinates we are in charge of
-  libmesh_assert(mesh_xyz_var != libMesh::invalid_uint);
+  libmesh_assert_not_equal_to (mesh_xyz_var, libMesh::invalid_uint);
   libmesh_assert(!n_x_dofs || context.element_fe_var[_mesh_x_var] ==
                               context.element_fe_var[mesh_xyz_var]);
   libmesh_assert(!n_y_dofs || context.element_fe_var[_mesh_y_var] ==
@@ -1170,7 +1175,7 @@ bool FEMSystem::mass_residual (bool request_jacobian,
               Fu(i) += JxWxU * phi[i][qp];
               if (request_jacobian && context.elem_solution_derivative)
                 {
-                  libmesh_assert (context.elem_solution_derivative == 1.0);
+                  libmesh_assert_equal_to (context.elem_solution_derivative, 1.0);
 
                   Number JxWxPhiI = JxW[qp] * phi[i][qp];
                   Kuu(i,i) += JxWxPhiI * phi[i][qp];

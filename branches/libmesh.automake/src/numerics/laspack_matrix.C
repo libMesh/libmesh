@@ -42,7 +42,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
   this->clear ();
 
   // big trouble if this fails!
-  libmesh_assert (this->_dof_map != NULL);
+  libmesh_assert(this->_dof_map);
 
   const unsigned int n_rows = sparsity_pattern.size();
 
@@ -87,7 +87,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
   libmesh_assert (this->initialized());
   //libMesh::out << "n_rows=" << n_rows << std::endl;
   //libMesh::out << "m()=" << m() << std::endl;
-  libmesh_assert (n_rows == this->m());
+  libmesh_assert_equal_to (n_rows, this->m());
 
   // Tell the matrix about its structure.  Initialize it
   // to zero.
@@ -112,7 +112,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 	  // 	          << ")" << std::endl;
 	  //libMesh::out << "pos(i,j)=" << pos(i,j)
 	  //              << std::endl;
-	  libmesh_assert (this->pos(i,j) == l);
+	  libmesh_assert_equal_to (this->pos(i,j), l);
 	  Q_SetEntry (&_QMat, i+1, l, j+1, 0.);
 	}
     }
@@ -132,10 +132,10 @@ void LaspackMatrix<T>::init (const unsigned int libmesh_dbg_var(m),
 			     const unsigned int)
 {
   // noz ignored...  only used for multiple processors!
-  libmesh_assert (m == m_l);
-  libmesh_assert (n == n_l);
-  libmesh_assert (m == n);
-  libmesh_assert (nnz > 0);
+  libmesh_assert_equal_to (m, m_l);
+  libmesh_assert_equal_to (n, n_l);
+  libmesh_assert_equal_to (m, n);
+  libmesh_assert_greater (nnz, 0);
 
 
   libMesh::err << "ERROR: Only the init() member that uses the" << std::endl
@@ -155,7 +155,7 @@ void LaspackMatrix<T>::init ()
     return;
 
   // We need the DofMap for this!
-  libmesh_assert (this->_dof_map != NULL);
+  libmesh_assert(this->_dof_map);
 
   // Clear intialized matrices
   if (this->initialized())
@@ -171,9 +171,9 @@ void LaspackMatrix<T>::init ()
 #endif
 
   // Laspack Matrices only work for uniprocessor cases
-  libmesh_assert (m   == n);
-  libmesh_assert (m_l == m);
-  libmesh_assert (n_l == n);
+  libmesh_assert_equal_to (m, n);
+  libmesh_assert_equal_to (m_l, m);
+  libmesh_assert_equal_to (n_l, n);
 
 #ifndef NDEBUG
   // The following variables are only used for assertions,
@@ -183,8 +183,8 @@ void LaspackMatrix<T>::init ()
 #endif
 
   // Make sure the sparsity pattern isn't empty
-  libmesh_assert (n_nz.size() == n_l);
-  libmesh_assert (n_oz.size() == n_l);
+  libmesh_assert_equal_to (n_nz.size(), n_l);
+  libmesh_assert_equal_to (n_oz.size(), n_l);
 
   if (m==0)
     return;
@@ -193,7 +193,7 @@ void LaspackMatrix<T>::init ()
 
   this->_is_initialized = true;
 
-  libmesh_assert (m == this->m());
+  libmesh_assert_equal_to (m, this->m());
 }
 
 
@@ -205,8 +205,8 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 {
   libmesh_assert (this->initialized());
-  libmesh_assert (dm.m() == rows.size());
-  libmesh_assert (dm.n() == cols.size());
+  libmesh_assert_equal_to (dm.m(), rows.size());
+  libmesh_assert_equal_to (dm.n(), cols.size());
 
 
   for (unsigned int i=0; i<rows.size(); i++)

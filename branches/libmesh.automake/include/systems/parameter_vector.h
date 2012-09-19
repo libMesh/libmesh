@@ -141,7 +141,7 @@ private:
 inline
 Number* ParameterVector::operator[] (unsigned int i) const
 {
-  libmesh_assert(_params.size() > i);
+  libmesh_assert_greater (_params.size(), i);
 
   return _params[i];
 }
@@ -151,7 +151,7 @@ Number* ParameterVector::operator[] (unsigned int i) const
 inline
 Number*& ParameterVector::operator[] (unsigned int i)
 {
-  libmesh_assert(_params.size() > i);
+  libmesh_assert_greater (_params.size(), i);
 
   return _params[i];
 }

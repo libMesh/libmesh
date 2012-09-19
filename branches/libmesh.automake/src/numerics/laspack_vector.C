@@ -115,7 +115,7 @@ void LaspackVector<T>::reciprocal()
       T v = (*this)(i);
 
       // Don't divide by zero!
-      libmesh_assert (v != T(0));
+      libmesh_assert_not_equal_to (v, T(0));
 
       this->set(i, 1. / v);
     }
@@ -158,8 +158,8 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
   const bool was_closed = this->_is_closed;
 #endif
 
-  libmesh_assert (v != NULL);
-  libmesh_assert (this->size() == v->size());
+  libmesh_assert(v);
+  libmesh_assert_equal_to (this->size(), v->size());
 
   for (unsigned int i=0; i<v->size(); i++)
     this->add (i, a*(*v)(i));
@@ -176,7 +176,7 @@ void LaspackVector<T>::add_vector (const std::vector<T>& v,
 				   const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (!v.empty());
-  libmesh_assert (v.size() == dof_indices.size());
+  libmesh_assert_equal_to (v.size(), dof_indices.size());
 
   for (unsigned int i=0; i<v.size(); i++)
     this->add (dof_indices[i], v[i]);
@@ -188,7 +188,7 @@ template <typename T>
 void LaspackVector<T>::add_vector (const NumericVector<T>& V,
 				   const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
@@ -200,7 +200,7 @@ template <typename T>
 void LaspackVector<T>::add_vector (const DenseVector<T>& V,
 				   const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
@@ -213,7 +213,7 @@ void LaspackVector<T>::insert (const std::vector<T>& v,
 			       const std::vector<unsigned int>& dof_indices)
 {
   libmesh_assert (!v.empty());
-  libmesh_assert (v.size() == dof_indices.size());
+  libmesh_assert_equal_to (v.size(), dof_indices.size());
 
   for (unsigned int i=0; i<v.size(); i++)
     this->set (dof_indices[i], v[i]);
@@ -225,7 +225,7 @@ template <typename T>
 void LaspackVector<T>::insert (const NumericVector<T>& V,
 			       const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
    this->set (dof_indices[i], V(i));
@@ -237,7 +237,7 @@ template <typename T>
 void LaspackVector<T>::insert (const DenseVector<T>& V,
 			       const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
@@ -249,7 +249,7 @@ template <typename T>
 void LaspackVector<T>::insert (const DenseSubVector<T>& V,
 			       const std::vector<unsigned int>& dof_indices)
 {
-  libmesh_assert (V.size() == dof_indices.size());
+  libmesh_assert_equal_to (V.size(), dof_indices.size());
 
   for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
@@ -265,8 +265,8 @@ void LaspackVector<T>::add_vector (const NumericVector<T> &vec_in,
   const LaspackVector<T>* vec = libmesh_cast_ptr<const LaspackVector<T>*>(&vec_in);
   const LaspackMatrix<T>* mat = libmesh_cast_ptr<const LaspackMatrix<T>*>(&mat_in);
 
-  libmesh_assert (vec != NULL);
-  libmesh_assert (mat != NULL);
+  libmesh_assert(vec);
+  libmesh_assert(mat);
 
   // += mat*vec
   AddAsgn_VV (&_vec, Mul_QV(const_cast<QMatrix*>(&mat->_QMat),
@@ -309,7 +309,7 @@ T LaspackVector<T>::dot (const NumericVector<T>& V) const
 
   // Make sure the NumericVector passed in is really a LaspackVector
   const LaspackVector<T>* v = libmesh_cast_ptr<const LaspackVector<T>*>(&V);
-  libmesh_assert (v != NULL);
+  libmesh_assert(v);
 
   return Mul_VV (const_cast<QVector*>(&(this->_vec)),
 		 const_cast<QVector*>(&(v->_vec)));
@@ -339,7 +339,7 @@ LaspackVector<T>::operator = (const NumericVector<T>& v_in)
   const LaspackVector<T>* v =
     libmesh_cast_ptr<const LaspackVector<T>*>(&v_in);
 
-  libmesh_assert (v != NULL);
+  libmesh_assert(v);
 
   *this = *v;
 
@@ -354,7 +354,7 @@ LaspackVector<T>::operator = (const LaspackVector<T>& v)
 {
   libmesh_assert (this->initialized());
   libmesh_assert (v.closed());
-  libmesh_assert (this->size() == v.size());
+  libmesh_assert_equal_to (this->size(), v.size());
 
   if (v.size() != 0)
     Asgn_VV (const_cast<QVector*>(&_vec),
@@ -396,7 +396,7 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in) const
   LaspackVector<T>* v_local =
     libmesh_cast_ptr<LaspackVector<T>*>(&v_local_in);
 
-  libmesh_assert (v_local != NULL);
+  libmesh_assert(v_local);
 
   *v_local = *this;
 }
@@ -411,8 +411,8 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
   LaspackVector<T>* v_local =
     libmesh_cast_ptr<LaspackVector<T>*>(&v_local_in);
 
-  libmesh_assert (v_local != NULL);
-  libmesh_assert (send_list.size() <= v_local->size());
+  libmesh_assert(v_local);
+  libmesh_assert_less_equal (send_list.size(), v_local->size());
 
   *v_local = *this;
 }
@@ -424,10 +424,10 @@ void LaspackVector<T>::localize (const unsigned int libmesh_dbg_var(first_local_
 				 const unsigned int libmesh_dbg_var(last_local_idx),
 				 const std::vector<unsigned int>& libmesh_dbg_var(send_list))
 {
-  libmesh_assert (first_local_idx  == 0);
-  libmesh_assert (last_local_idx+1 == this->size());
+  libmesh_assert_equal_to (first_local_idx, 0);
+  libmesh_assert_equal_to (last_local_idx+1, this->size());
 
-  libmesh_assert (send_list.size() <= this->size());
+  libmesh_assert_less_equal (send_list.size(), this->size());
 
 #ifndef NDEBUG
   this->_is_closed = true;
@@ -452,7 +452,7 @@ template <typename T>
 void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
 					const unsigned int libmesh_dbg_var(pid)) const
 {
-  libmesh_assert (pid == 0);
+  libmesh_assert_equal_to (pid, 0);
 
   this->localize (v_local);
 }

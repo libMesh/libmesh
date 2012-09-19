@@ -53,8 +53,8 @@ MeshBase::MeshBase (unsigned int d) :
   _skip_partitioning(false),
   _skip_renumber_nodes_and_elements(false)
 {
-  libmesh_assert (LIBMESH_DIM <= 3);
-  libmesh_assert (LIBMESH_DIM >= _dim);
+  libmesh_assert_less_equal (LIBMESH_DIM, 3);
+  libmesh_assert_greater_equal (LIBMESH_DIM, _dim);
   libmesh_assert (libMesh::initialized());
 }
 
@@ -208,7 +208,7 @@ unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
 
 unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
 {
-  libmesh_assert (proc_id < libMesh::n_processors());
+  libmesh_assert_less (proc_id, libMesh::n_processors());
   return static_cast<unsigned int>(std::distance (this->active_pid_elements_begin(proc_id),
 						  this->active_pid_elements_end  (proc_id)));
 }

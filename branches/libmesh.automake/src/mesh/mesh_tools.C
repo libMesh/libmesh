@@ -113,7 +113,7 @@ namespace {
       for (ConstNodeRange::const_iterator it = range.begin(); it != range.end(); ++it)
 	{
           const Node *node = *it;
-	  libmesh_assert (node != NULL);
+	  libmesh_assert(node);
 
 	  for (unsigned int i=0; i<LIBMESH_DIM; i++)
 	    {
@@ -128,7 +128,7 @@ namespace {
       for (ConstElemRange::const_iterator it = range.begin(); it != range.end(); ++it)
 	{
           const Elem *elem = *it;
-	  libmesh_assert (elem != NULL);
+	  libmesh_assert(elem);
 
 	  for (unsigned int n=0; n<elem->n_nodes(); n++)
 	    {
@@ -312,8 +312,8 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       {
-	libmesh_assert ((*el)->node(n) < nodes_to_elem_map.size());
-	libmesh_assert ((*el)->id()    < mesh.n_elem());
+	libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
+	libmesh_assert_less ((*el)->id(), mesh.n_elem());
 
 	nodes_to_elem_map[(*el)->node(n)].push_back((*el)->id());
       }
@@ -332,7 +332,7 @@ void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
   for (; el != end; ++el)
     for (unsigned int n=0; n<(*el)->n_nodes(); n++)
       {
-	libmesh_assert ((*el)->node(n) < nodes_to_elem_map.size());
+	libmesh_assert_less ((*el)->node(n), nodes_to_elem_map.size());
 
 	nodes_to_elem_map[(*el)->node(n)].push_back(*el);
       }
@@ -410,7 +410,7 @@ MeshTools::BoundingBox
 MeshTools::processor_bounding_box (const MeshBase& mesh,
 				   const unsigned int pid)
 {
-  libmesh_assert (pid < libMesh::n_processors());
+  libmesh_assert_less (pid, libMesh::n_processors());
 
   FindBBox find_bbox;
 
@@ -441,7 +441,7 @@ MeshTools::BoundingBox
 MeshTools::subdomain_bounding_box (const MeshBase& mesh,
 				   const subdomain_id_type sid)
 {
-  libmesh_assert (mesh.n_nodes() != 0);
+  libmesh_assert_not_equal_to (mesh.n_nodes(), 0);
 
   Point min( 1.e30,  1.e30,  1.e30);
   Point max(-1.e30, -1.e30, -1.e30);
@@ -749,7 +749,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
     const Elem* elem = (*it);
 
     //Right now this only works for quad4's
-    //libmesh_assert(elem->type() == libMeshEnums::QUAD4);
+    //libmesh_assert_equal_to (elem->type(), libMeshEnums::QUAD4);
     if(elem->type() == libMeshEnums::QUAD4)
     {
       //Loop over the sides looking for sides that have hanging nodes
@@ -769,7 +769,7 @@ void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<un
             while (neigh->level() < ancestor->level())
               ancestor = ancestor->parent();
             unsigned int s_neigh = neigh->which_neighbor_am_i(ancestor);
-            libmesh_assert (s_neigh < neigh->n_neighbors());
+            libmesh_assert_less (s_neigh, neigh->n_neighbors());
 
             //Couple of helper uints...
             unsigned int node1=0;
@@ -910,7 +910,7 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
   for (; el != el_end; ++el)
     {
       const Elem *elem = *el;
-      libmesh_assert (elem->n_systems() == n_sys);
+      libmesh_assert_equal_to (elem->n_systems(), n_sys);
     }
 
   MeshBase::const_node_iterator node_it =
@@ -924,7 +924,7 @@ void MeshTools::libmesh_assert_equal_n_systems (const MeshBase &mesh)
   for (; node_it != node_end; ++node_it)
     {
       const Node *node = *node_it;
-      libmesh_assert (node->n_systems() == n_sys);
+      libmesh_assert_equal_to (node->n_systems(), n_sys);
     }
 }
 
@@ -947,13 +947,13 @@ void MeshTools::libmesh_assert_old_dof_objects (const MeshBase &mesh)
         continue;
 
       if (elem->has_dofs())
-        libmesh_assert (elem->old_dof_object != NULL);
+        libmesh_assert(elem->old_dof_object);
 
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
 	{
           const Node *node = elem->get_node(n);
 	  if (node->has_dofs())
-            libmesh_assert (elem->get_node(n)->old_dof_object != NULL);
+            libmesh_assert(elem->get_node(n)->old_dof_object);
 	}
     }
 #endif // LIBMESH_ENABLE_AMR
@@ -978,7 +978,7 @@ void MeshTools::libmesh_assert_valid_node_pointers(const MeshBase &mesh)
                 elem->neighbor(n) != remote_elem)
 	      elem->neighbor(n)->libmesh_assert_valid_node_pointers();
 
-          libmesh_assert (elem->parent() != remote_elem);
+          libmesh_assert_not_equal_to (elem->parent(), remote_elem);
 	  elem = elem->parent();
 	}
     }
@@ -995,14 +995,14 @@ void MeshTools::libmesh_assert_valid_remote_elems(const MeshBase &mesh)
       const Elem* elem = *el;
       libmesh_assert (elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-	libmesh_assert (elem->neighbor(n) != remote_elem);
+	libmesh_assert_not_equal_to (elem->neighbor(n), remote_elem);
 #ifdef LIBMESH_ENABLE_AMR
       const Elem* parent = elem->parent();
       if (parent)
 	{
-          libmesh_assert (parent != remote_elem);
+          libmesh_assert_not_equal_to (parent, remote_elem);
           for (unsigned int c=0; c != elem->n_children(); ++c)
-	    libmesh_assert (parent->child(c) != remote_elem);
+	    libmesh_assert_not_equal_to (parent->child(c), remote_elem);
 	}
 #endif
     }
@@ -1019,13 +1019,13 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase &mesh,
     {
       const Elem* elem = *el;
       libmesh_assert (elem);
-      libmesh_assert (elem->parent() != bad_elem);
+      libmesh_assert_not_equal_to (elem->parent(), bad_elem);
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
-	libmesh_assert(elem->neighbor(n) != bad_elem);
+	libmesh_assert_not_equal_to (elem->neighbor(n), bad_elem);
 #ifdef LIBMESH_ENABLE_AMR
       if (elem->has_children())
         for (unsigned int c=0; c != elem->n_children(); ++c)
-	  libmesh_assert(elem->child(c) != bad_elem);
+	  libmesh_assert_not_equal_to (elem->child(c), bad_elem);
 #endif
     }
 }
@@ -1047,8 +1047,8 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
       unsigned int elemprocid = elem->processor_id();
       unsigned int elemid = elem->id();
 
-      libmesh_assert(elemid >= lastelemid);
-      libmesh_assert(elemprocid >= lastprocid);
+      libmesh_assert_greater_equal (elemid, lastelemid);
+      libmesh_assert_greater_equal (elemprocid, lastprocid);
 
       lastelemid = elemid;
       lastprocid = elemprocid;
@@ -1090,8 +1090,8 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
 
       if (elem)
         {
-          libmesh_assert(min_id == elem->processor_id());
-          libmesh_assert(max_id == elem->processor_id());
+          libmesh_assert_equal_to (min_id, elem->processor_id());
+          libmesh_assert_equal_to (max_id, elem->processor_id());
         }
 
       if (min_id == libMesh::processor_id())
@@ -1175,8 +1175,8 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
 
       if (node)
         {
-          libmesh_assert(min_id == node->processor_id());
-          libmesh_assert(max_id == node->processor_id());
+          libmesh_assert_equal_to (min_id, node->processor_id());
+          libmesh_assert_equal_to (max_id, node->processor_id());
         }
 
       if (min_id == libMesh::processor_id())
@@ -1282,7 +1282,7 @@ void MeshTools::libmesh_assert_valid_refinement_tree(const MeshBase &mesh)
           {
             libmesh_assert(elem->child(n));
             if (elem->child(n) != remote_elem)
-              libmesh_assert(elem->child(n)->parent() == elem);
+              libmesh_assert_equal_to (elem->child(n)->parent(), elem);
           }
       if (elem->active())
         {

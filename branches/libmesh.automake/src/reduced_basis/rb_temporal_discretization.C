@@ -61,7 +61,7 @@ unsigned int RBTemporalDiscretization::get_time_step() const
 
 void RBTemporalDiscretization::set_time_step(const unsigned int k)
 {
-  libmesh_assert(k <= get_n_time_steps());
+  libmesh_assert_less_equal (k, get_n_time_steps());
   this->_current_time_step = k;
 }
 

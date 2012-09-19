@@ -145,7 +145,7 @@ int main (int argc, char** argv)
     {
       system.time_solver =
         AutoPtr<TimeSolver>(new SteadySolver(system));
-      libmesh_assert(n_timesteps == 1);
+      libmesh_assert_equal_to (n_timesteps, 1);
     }
 
   // Initialize the system
@@ -202,7 +202,7 @@ int main (int argc, char** argv)
             {
               // We can't adapt to both a tolerance and a mesh
               // size at once
-              libmesh_assert (nelem_target == 0);
+              libmesh_assert_equal_to (nelem_target, 0);
 
               UniformRefinementEstimator *u =
                 new UniformRefinementEstimator;
@@ -217,7 +217,7 @@ int main (int argc, char** argv)
             {
               // If we aren't adapting to a tolerance we need a
               // target mesh size
-              libmesh_assert (nelem_target > 0);
+              libmesh_assert_greater (nelem_target, 0);
 
               // Kelly is a lousy estimator to use for a problem
               // not in H1 - if we were doing more than a few

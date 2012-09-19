@@ -152,7 +152,7 @@ void DenseSubVector<T>::reposition(const unsigned int ioff,
   _n = n;
 
   // Make sure we still fit in the parent vector.
-  libmesh_assert ((this->i_off() + this->size()) <= _parent_vector.size());
+  libmesh_assert_less_equal ((this->i_off() + this->size()), _parent_vector.size());
 }
 
 
@@ -171,8 +171,8 @@ template<typename T>
 inline
 T DenseSubVector<T>::operator () (const unsigned int i) const
 {
-  libmesh_assert (i < this->size());
-  libmesh_assert (i + this->i_off() < _parent_vector.size());
+  libmesh_assert_less (i, this->size());
+  libmesh_assert_less (i + this->i_off(), _parent_vector.size());
 
   return _parent_vector (i + this->i_off());
 }
@@ -182,8 +182,8 @@ template<typename T>
 inline
 T & DenseSubVector<T>::operator () (const unsigned int i)
 {
-  libmesh_assert (i < this->size());
-  libmesh_assert (i + this->i_off() < _parent_vector.size());
+  libmesh_assert_less (i, this->size());
+  libmesh_assert_less (i + this->i_off(), _parent_vector.size());
 
   return _parent_vector (i + this->i_off());
 }

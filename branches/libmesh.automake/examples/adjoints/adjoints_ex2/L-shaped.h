@@ -23,22 +23,6 @@ public:
   std::string & fe_family() { return _fe_family;  }
   unsigned int & fe_order() { return _fe_order;  }
   bool & analytic_jacobians() { return _analytic_jacobians; }
-    
-  // Postprocessing function which we are going to override for this application
-
-  virtual void postprocess(void);
-
-  Number &get_QoI_value(std::string type, unsigned int QoI_index)
-    {
-      if(type == "exact")
-	{
-	  return exact_QoI[QoI_index];
-	}
-      else
-	{
-	  return computed_QoI[QoI_index];
-	}
-    }
 
   Number &get_parameter_value(unsigned int parameter_index)
     {
@@ -71,16 +55,6 @@ public:
   // Constraint parts
   virtual bool side_constraint (bool request_jacobian,
 				DiffContext &context);
-
-  // Overloading the qoi function on elements
-
-  virtual void element_qoi_derivative
-    (DiffContext &context,
-     const QoISet & qois);  
-
-  virtual void element_qoi
-    (DiffContext &context,
-     const QoISet & qois);  
  
   Number exact_solution (const Point&);
 
@@ -90,14 +64,6 @@ public:
   // The ParameterVector object that will contain pointers to
   // the system parameters
   ParameterVector parameter_vector;
-
-  // Variables to hold the computed QoIs
-  
-  Number computed_QoI[2];
-
-  // Variables to read in the exact QoIs from l-shaped.in
- 
-  Number exact_QoI[2];
   
   // The FE type to use
   std::string _fe_family;

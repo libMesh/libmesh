@@ -34,7 +34,7 @@ namespace libMesh
 // Hex class member functions
 unsigned int Hex::key (const unsigned int s) const
 {
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (s, this->n_sides());
 
   // Think of a unit cube: (-1,1) x (-1,1)x (-1,1)
   switch (s)
@@ -97,7 +97,7 @@ unsigned int Hex::key (const unsigned int s) const
 
 AutoPtr<Elem> Hex::side (const unsigned int i) const
 {
-  libmesh_assert (i < this->n_sides());
+  libmesh_assert_less (i, this->n_sides());
 
 
 
@@ -185,8 +185,8 @@ AutoPtr<Elem> Hex::side (const unsigned int i) const
 bool Hex::is_child_on_side(const unsigned int c,
                            const unsigned int s) const
 {
-  libmesh_assert (c < this->n_children());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (c, this->n_children());
+  libmesh_assert_less (s, this->n_sides());
 
   // This array maps the Hex8 node numbering to the Hex8 child
   // numbering.  I.e.
@@ -206,8 +206,8 @@ bool Hex::is_child_on_side(const unsigned int c,
 bool Hex::is_edge_on_side(const unsigned int e,
                           const unsigned int s) const
 {
-  libmesh_assert (e < this->n_edges());
-  libmesh_assert (s < this->n_sides());
+  libmesh_assert_less (e, this->n_edges());
+  libmesh_assert_less (s, this->n_sides());
 
   return (is_node_on_side(Hex8::edge_nodes_map[e][0],s) &&
           is_node_on_side(Hex8::edge_nodes_map[e][1],s));
@@ -217,7 +217,7 @@ bool Hex::is_edge_on_side(const unsigned int e,
 
 unsigned int Hex::opposite_side(const unsigned int side) const
 {
-  libmesh_assert(side < 6);
+  libmesh_assert_less (side, 6);
   static const unsigned char hex_opposites[6] = {5, 3, 4, 1, 2, 0};
   return hex_opposites[side];
 }
@@ -227,9 +227,9 @@ unsigned int Hex::opposite_side(const unsigned int side) const
 unsigned int Hex::opposite_node(const unsigned int node,
                                 const unsigned int side) const
 {
-  libmesh_assert(node < 26);
-  libmesh_assert(node < this->n_nodes());
-  libmesh_assert(side < this->n_sides());
+  libmesh_assert_less (node, 26);
+  libmesh_assert_less (node, this->n_nodes());
+  libmesh_assert_less (side, this->n_sides());
   libmesh_assert(this->is_node_on_side(node, side));
 
   switch (side)
@@ -287,7 +287,7 @@ Real Hex::quality (const ElemQuality q) const
 	const Real min = std::min(d06, std::min(d35, std::min(d17, d24)));
 	const Real max = std::max(d06, std::max(d35, std::max(d17, d24)));
 
-	libmesh_assert (max != 0.0);
+	libmesh_assert_not_equal_to (max, 0.0);
 
 	return min / max;
 
@@ -365,7 +365,7 @@ Real Hex::quality (const ElemQuality q) const
 	const Real d24 = this->length(2,4);
 	const Real max_diag = std::max(d06, std::max(d17, std::max(d35, d24)));
 
-	libmesh_assert ( max_diag != 0.0 );
+	libmesh_assert_not_equal_to ( max_diag, 0.0 );
 
 	/**
 	 * Compute the minimum edge length.

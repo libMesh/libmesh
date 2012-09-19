@@ -217,8 +217,8 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
       std::vector<typename SyncFunctor::datum> received_data;
       Parallel::send_receive(procdown, data,
                              procup, received_data);
-      libmesh_assert(requested_objs_x[procup].size() ==
-                     received_data.size());
+      libmesh_assert_equal_to (requested_objs_x[procup].size(),
+                               received_data.size());
 
       // Let the user process the results
       sync.act_on_data(requested_objs_id[procup], received_data);
@@ -292,8 +292,8 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
       std::vector<typename SyncFunctor::datum> received_data;
       Parallel::send_receive(procdown, data,
                              procup, received_data);
-      libmesh_assert(requested_objs_id[procup].size() ==
-                     received_data.size());
+      libmesh_assert_equal_to (requested_objs_id[procup].size(),
+                               received_data.size());
 
       // Let the user process the results
       sync.act_on_data(requested_objs_id[procup], received_data);
@@ -398,8 +398,8 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       std::vector<typename SyncFunctor::datum> received_data;
       Parallel::send_receive(procdown, data,
                              procup, received_data);
-      libmesh_assert(requested_objs_id[procup].size() ==
-                     received_data.size());
+      libmesh_assert_equal_to (requested_objs_id[procup].size(),
+                              received_data.size());
 
       // Let the user process the results
       sync.act_on_data(requested_objs_id[procup], received_data);

@@ -225,7 +225,7 @@ template <class MT>
 inline
 const MT& MeshOutput<MT>::mesh () const
 {
-  libmesh_assert (_obj != NULL);
+  libmesh_assert(_obj);
   return *_obj;
 }
 

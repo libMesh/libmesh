@@ -376,8 +376,8 @@ void _init (int &argc, char** & argv,
     }
 
   // Could we have gotten bad values from the above calls?
-  libmesh_assert (libMeshPrivateData::_n_processors >  0);
-  libmesh_assert (libMeshPrivateData::_processor_id >= 0);
+  libmesh_assert_greater (libMeshPrivateData::_n_processors, 0);
+  libmesh_assert_greater_equal (libMeshPrivateData::_processor_id, 0);
 
   // Let's be sure we properly initialize on every processor at once:
   parallel_only();
@@ -706,7 +706,7 @@ LibMeshInit::~LibMeshInit()
 bool on_command_line (const std::string& arg)
 {
   // Make sure the command line parser is ready for use
-  libmesh_assert (command_line.get() != NULL);
+  libmesh_assert(command_line.get());
 
   return command_line->search (arg);
 }
@@ -717,7 +717,7 @@ template <typename T>
 T command_line_value (const std::string &name, T value)
 {
   // Make sure the command line parser is ready for use
-  libmesh_assert (command_line.get() != NULL);
+  libmesh_assert(command_line.get());
 
     // only if the variable exists in the file
     if (command_line->have_variable(name.c_str()))
@@ -730,7 +730,7 @@ template <typename T>
 T command_line_value (const std::vector<std::string> &name, T value)
 {
   // Make sure the command line parser is ready for use
-  libmesh_assert (command_line.get() != NULL);
+  libmesh_assert(command_line.get());
 
   // Check for multiple options (return the first that matches)
   for (std::vector<std::string>::const_iterator i=name.begin(); i != name.end(); ++i)
@@ -750,7 +750,7 @@ template <typename T>
 void command_line_vector (const std::string &name, std::vector<T>& vec)
 {
   // Make sure the command line parser is ready for use
-  libmesh_assert (command_line.get() != NULL);
+  libmesh_assert(command_line.get());
 
   // only if the variable exists on the command line
   if (command_line->have_variable(name.c_str()))

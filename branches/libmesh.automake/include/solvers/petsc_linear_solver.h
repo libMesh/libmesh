@@ -348,7 +348,7 @@ inline size_t
 PetscLinearSolver<T>::
 _restrict_solve_to_is_local_size(void)const
 {
-  libmesh_assert(_restrict_solve_to_is!=NULL);
+  libmesh_assert(_restrict_solve_to_is);
 
   PetscInt s;
   int ierr = ISGetLocalSize(_restrict_solve_to_is,&s);
@@ -369,7 +369,7 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
 #endif
   )
 {
-  libmesh_assert(_restrict_solve_to_is!=NULL);
+  libmesh_assert(_restrict_solve_to_is);
 #if PETSC_VERSION_LESS_THAN(3,0,0)
   // No ISComplement in PETSc 2.3.3
   libmesh_not_implemented();
