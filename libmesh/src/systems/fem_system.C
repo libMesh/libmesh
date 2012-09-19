@@ -398,7 +398,6 @@ namespace {
     {
       libmesh_assert_equal_to (this->qoi.size(), other.qoi.size());
       this->_diff_qoi.thread_join( this->qoi, other.qoi, _qoi_indices );
-      return;
     }
 
     std::vector<Number> qoi;
