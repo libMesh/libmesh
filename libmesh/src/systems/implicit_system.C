@@ -122,8 +122,13 @@ void ImplicitSystem::init_matrices ()
   for (matrices_iterator pos = _matrices.begin();
        pos != _matrices.end(); ++pos)
     {
-      libmesh_assert (!pos->second->initialized());
-      dof_map.attach_matrix (*(pos->second));
+      SparseMatrix<Number> &m = *(pos->second);
+      libmesh_assert (!m.initialized());
+
+      // We want to allow repeated init() on systems, but we don't
+      // want to attach the same matrix to the DofMap twice
+      if (!dof_map.is_attached(m))
+        dof_map.attach_matrix (m);
     }
 
   // Compute the sparsity pattern for the current
