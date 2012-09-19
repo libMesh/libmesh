@@ -51,33 +51,33 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESH_RUN) $(target) element_type=TRI6 $(LIBMESH_OPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) element_type=TRI6 $(LIBMESH_OPTIONS) -pc_type jacobi
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) element_type=TRI6 $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) element_type=TRI6 $(LIBMESH_OPTIONS) -pc_type jacobi
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) element_type=TRI6 $(LIBMESH_OPTIONS)
-	@echo "***************************************************************"
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD8 $(LIBMESH_OPTIONS)
-	@echo "***************************************************************"
-	@echo " "
-	@$(LIBMESH_RUN) $(target) element_type=QUAD8 $(LIBMESH_OPTIONS)
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD8 $(LIBMESH_OPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) element_type=TRI6 $(LIBMESH_OPTIONS) -pc_type jacobi
 	@echo "***************************************************************"
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD9 $(LIBMESH_OPTIONS)
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD8 $(LIBMESH_OPTIONS) -pc_type jacobi
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) element_type=QUAD9 $(LIBMESH_OPTIONS)
+	@$(LIBMESH_RUN) $(target) element_type=QUAD8 $(LIBMESH_OPTIONS) -pc_type jacobi
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD9 $(LIBMESH_OPTIONS)
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD8 $(LIBMESH_OPTIONS) -pc_type jacobi
+	@echo "***************************************************************"
+	@echo " "
+	@echo "***************************************************************"
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD9 $(LIBMESH_OPTIONS) -pc_type jacobi
+	@echo "***************************************************************"
+	@echo " "
+	@$(LIBMESH_RUN) $(target) element_type=QUAD9 $(LIBMESH_OPTIONS) -pc_type jacobi
+	@echo " "
+	@echo "***************************************************************"
+	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD9 $(LIBMESH_OPTIONS) -pc_type jacobi
 	@echo "***************************************************************"
 
 
