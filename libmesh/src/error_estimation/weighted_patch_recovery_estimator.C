@@ -175,6 +175,9 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
             // We can't mix L_inf and L_2 norms
             libmesh_assert (((error_estimator.error_norm.type(var) == L2 ||
 			      error_estimator.error_norm.type(var) == H1_SEMINORM ||
+			      error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
+			      error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
+			      error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
                               error_estimator.error_norm.type(var) == H2_SEMINORM) &&
                              (error_estimator.error_norm.type(var-1) == L2 ||
 			      error_estimator.error_norm.type(var-1) == H1_SEMINORM ||
