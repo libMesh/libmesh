@@ -21,14 +21,31 @@
 namespace libMesh
 {
 
-
-
 DifferentiableQoI::DifferentiableQoI () :
   postprocess_sides(false),
   assemble_qoi_sides(false)
 {
 }
 
+void DifferentiableQoI::thread_join( std::vector<Number>& qoi, const std::vector<Number>& other_qoi,
+				     const QoISet& )
+{
+  for (unsigned int i=0; i != qoi.size(); ++i)
+    qoi[i] += other_qoi[i];
 
+  return;
+}
+
+void DifferentiableQoI::parallel_op( std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
+				     const QoISet& )
+{
+  // Sum everything into local_qoi
+  Parallel::sum(local_qoi);
+
+  // Now put into system qoi
+  sys_qoi = local_qoi;
+
+  return;
+}
 
 } // namespace libMesh

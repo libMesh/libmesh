@@ -18,7 +18,7 @@ public:
                const unsigned int number)
   : FEMSystem(es, name, number),
     _fe_family("LAGRANGE"), _fe_order(1),
-    _analytic_jacobians(true) { qoi.resize(1); }
+    _analytic_jacobians(true) { }
 
   std::string & fe_family() { return _fe_family;  }
   unsigned int & fe_order() { return _fe_order;  }
