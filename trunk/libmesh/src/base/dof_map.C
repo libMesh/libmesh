@@ -260,6 +260,14 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 
 
 
+bool DofMap::is_attached (SparseMatrix<Number>& matrix)
+{
+  return (std::find(_matrices.begin(), _matrices.end(),
+                            &matrix) != _matrices.end());
+}
+
+
+
 DofObject* DofMap::node_ptr(MeshBase& mesh, unsigned int i) const
 {
   return mesh.node_ptr(i);
