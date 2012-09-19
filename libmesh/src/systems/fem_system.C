@@ -363,7 +363,7 @@ namespace {
     {
       AutoPtr<DiffContext> con = _sys.build_context();
       FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
-      _sys.init_context(_femcontext);
+      _diff_qoi.init_context(_femcontext);
 
       for (ConstElemRange::const_iterator elem_it = range.begin();
            elem_it != range.end(); ++elem_it)
@@ -427,7 +427,7 @@ namespace {
     {
       AutoPtr<DiffContext> con = _sys.build_context();
       FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
-      _sys.init_context(_femcontext);
+      _qoi.init_context(_femcontext);
 
       for (ConstElemRange::const_iterator elem_it = range.begin();
            elem_it != range.end(); ++elem_it)
