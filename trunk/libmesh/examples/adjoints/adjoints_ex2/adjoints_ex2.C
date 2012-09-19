@@ -304,10 +304,18 @@ int main (int argc, char** argv)
   // Build the FEMSystem
   LaplaceSystem &system = equation_systems.add_system<LaplaceSystem> ("LaplaceSystem");
 
+  QoISet qois;
+	
+  std::vector<unsigned int> qoi_indices;
+  qoi_indices.push_back(0);
+  qois.add_indices(qoi_indices);
+  
+  qois.set_weight(0, 0.5);
+
   // Put some scope here to test that the cloning is working right
   {
     LaplaceQoI qoi;
-    system.attach_qoi( &qoi );
+    system.attach_qoi( &qoi, qois );
   }
 
   // Set its parameters
@@ -343,20 +351,6 @@ int main (int argc, char** argv)
 	
 	// Get a pointer to the primal solution vector
 	NumericVector<Number> &primal_solution = *system.solution;
-	
-	// Declare a QoISet object, we need this object to set weights for our QoI error contributions
-	QoISet qois;
-
-	// Declare a qoi_indices vector, each index will correspond to a QoI
-	std::vector<unsigned int> qoi_indices;
-	qoi_indices.push_back(0);
-	qoi_indices.push_back(1);
-	qois.add_indices(qoi_indices);
-
-	// Set weights for each index, these will weight the contribution of each QoI in the final error
-	// estimate to be used for flagging elements for refinement
-	qois.set_weight(0, 0.5);
-	qois.set_weight(1, 0.5);
 
 	// A SensitivityData object to hold the qois and parameters
 	SensitivityData sensitivities(qois, system, system.get_parameter_vector());
@@ -471,16 +465,6 @@ int main (int argc, char** argv)
 	write_output(equation_systems, a_step, "primal");
 
 	NumericVector<Number> &primal_solution = *system.solution;
-				     	
-	QoISet qois;
-	
-	std::vector<unsigned int> qoi_indices;
-	qoi_indices.push_back(0);
-	qoi_indices.push_back(1);
-	qois.add_indices(qoi_indices);
-	
-	qois.set_weight(0, 0.5);
-	qois.set_weight(1, 0.5);
 	
 	SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 	
