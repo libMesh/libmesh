@@ -17,16 +17,16 @@ class LaplaceQoI : public DifferentiableQoI
 {
 public:
   LaplaceQoI(){}
-  virtual ~LaplaceQoI(){}
+  virtual ~LaplaceQoI(){} 
 
-  virtual void postprocess( ){ }
+  virtual void postprocess( ){} 
   
   virtual void element_qoi_derivative(DiffContext &context, const QoISet & qois);  
 
   virtual void element_qoi (DiffContext &context, const QoISet & qois); 
 
-  virtual DifferentiableQoI* clone( )
-  { return new LaplaceQoI(); }
+  virtual AutoPtr<DifferentiableQoI> clone( )
+  { return AutoPtr<DifferentiableQoI>( new LaplaceQoI ); }
 
 };
 #endif // L_QOI_H

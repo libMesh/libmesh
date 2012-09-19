@@ -64,8 +64,8 @@ public:
    * data structures.
    */
   DifferentiableSystem (EquationSystems& es,
-	         const std::string& name,
-	         const unsigned int number);
+			const std::string& name,
+			const unsigned int number);
 
   /**
    * Destructor.
@@ -136,10 +136,10 @@ public:
   /**
    * Force the user to override clone for DifferentiableQoI
    */
-  virtual DifferentiableQoI* clone()
+  virtual AutoPtr<DifferentiableQoI> clone()
   { libmesh_error(); 
     // dummy
-    return this; }
+    return AutoPtr<DifferentiableQoI>(this); }
 
   /**
    * Returns const reference to DifferentiableQoI object. Note that if no external
@@ -152,7 +152,7 @@ public:
    * Attach external QoI object.
    */
   void attach_qoi( DifferentiableQoI* qoi )
-  { this->diff_qoi = qoi->clone(); }
+  { this->diff_qoi = (qoi->clone()).release(); }
  
   /**
    * A pointer to the solver object we're going to use.
