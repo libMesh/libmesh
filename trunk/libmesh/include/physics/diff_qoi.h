@@ -24,6 +24,7 @@
 // Local Includes
 #include "libmesh/diff_context.h"
 #include "libmesh/qoi_set.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 
@@ -154,7 +155,7 @@ public:
   /**
    * Copy of this object. User should override to copy any needed state.
    */
-  virtual DifferentiableQoI* clone() =0;
+  virtual AutoPtr<DifferentiableQoI> clone() =0;
 };
 
 } // namespace libMesh
