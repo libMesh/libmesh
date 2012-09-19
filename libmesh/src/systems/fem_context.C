@@ -17,6 +17,7 @@
 
 
 
+#include "libmesh/boundary_info.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
@@ -41,7 +42,8 @@ FEMContext::FEMContext (const System &sys)
     _mesh_y_var(sys.get_mesh_y_var()),
     _mesh_z_var(sys.get_mesh_z_var()),
     elem(NULL),
-    side(0), edge(0), dim(sys.get_mesh().mesh_dimension())
+    side(0), edge(0), dim(sys.get_mesh().mesh_dimension()),
+    _boundary_info(sys.get_mesh().boundary_info.get())
 {
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
@@ -181,6 +183,13 @@ FEMContext::~FEMContext()
   if (edge_qrule)
     delete edge_qrule;
   side_qrule = NULL;
+}
+
+
+
+std::vector<boundary_id_type> FEMContext::side_boundary_ids()
+{
+  return _boundary_info->boundary_ids(elem, side);
 }
 
 
