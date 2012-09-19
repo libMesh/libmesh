@@ -396,11 +396,9 @@ namespace {
 
     void join (const QoIContributions& other)
     {
-      const unsigned int my_size = this->qoi.size();
-      libmesh_assert_equal_to (my_size, other.qoi.size());
-
-      for (unsigned int i=0; i != my_size; ++i)
-        this->qoi[i] += other.qoi[i];
+      libmesh_assert_equal_to (this->qoi.size(), other.qoi.size());
+      this->_diff_qoi.thread_join( this->qoi, other.qoi, _qoi_indices );
+      return;
     }
 
     std::vector<Number> qoi;
@@ -736,9 +734,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
                                             mesh.active_local_elements_end()),
                            qoi_contributions);
 
-  Parallel::sum(qoi_contributions.qoi);
-
-  this->qoi = qoi_contributions.qoi;
+  this->diff_qoi->parallel_op( this->qoi, qoi_contributions.qoi, qoi_indices );
 
   STOP_LOG("assemble_qoi()", "FEMSystem");
 }

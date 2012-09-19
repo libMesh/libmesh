@@ -25,6 +25,7 @@
 #include "libmesh/diff_context.h"
 #include "libmesh/qoi_set.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/parallel.h"
 
 // C++ includes
 
@@ -60,6 +61,12 @@ public:
    * Destructor.
    */
   virtual ~DifferentiableQoI () {}
+
+  /**
+   * Initialize system qoi. By default, does nothing in order to maintain backward
+   * compatibility for FEMSystem applications that control qoi.
+   */
+  virtual void init_qoi( std::vector<Number>& /*sys_qoi*/, const QoISet& /*qoi_indices*/ ){};
 
   /**
    * Clear all the data structures associated with
@@ -156,6 +163,19 @@ public:
    * Copy of this object. User should override to copy any needed state.
    */
   virtual AutoPtr<DifferentiableQoI> clone() =0;
+
+  /**
+   * Method to combine thread-local qois. By default, simply sums thread qois.
+   */
+  virtual void thread_join( std::vector<Number>& qoi, const std::vector<Number>& other_qoi,
+			    const QoISet& qoi_indices );
+
+  /**
+   * Method to populate system qoi data structure with process-local qoi. By default, simply
+   * sums process qois into system qoi.
+   */
+  virtual void parallel_op( std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
+			    const QoISet& qoi_indices );
 };
 
 } // namespace libMesh
