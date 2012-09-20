@@ -77,9 +77,14 @@ public:
   virtual ~FEMContext ();
 
   /**
+   * Reports if the boundary id is found on the current side
+   */
+  bool has_side_boundary_id(boundary_id_type id) const;
+
+  /**
    * Lists the boundary ids found on the current side
    */
-  std::vector<boundary_id_type> side_boundary_ids();
+  std::vector<boundary_id_type> side_boundary_ids() const;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature

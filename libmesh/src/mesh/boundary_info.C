@@ -700,6 +700,23 @@ void BoundaryInfo::add_side(const Elem* elem,
 
 
 
+bool BoundaryInfo::has_boundary_id(const Node* const node,
+                                   const boundary_id_type id) const
+{
+  // A convenient typedef
+  typedef std::multimap<const Node*, boundary_id_type>::const_iterator Iter;
+
+  std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
+
+  for (;pos.first != pos.second; ++pos.first)
+    if (pos.first->second == id)
+      return true;
+
+  return false;
+}
+
+
+
 std::vector<boundary_id_type> BoundaryInfo::boundary_ids(const Node* node) const
 {
   std::vector<boundary_id_type> ids;
@@ -784,6 +801,51 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
   // if we get here, we found elem in the data structure but not
   // the requested side, so return the default value
   return invalid_id;
+}
+
+
+
+bool BoundaryInfo::has_boundary_id(const Elem* const elem,
+                                   const unsigned short int side,
+                                   const boundary_id_type id) const
+{
+  libmesh_assert(elem);
+
+  // Only level-0 elements store BCs.  If this is not a level-0
+  // element get its level-0 parent and infer the BCs.
+  const Elem*  searched_elem = elem;
+  if (elem->level() != 0)
+  {
+    if (elem->neighbor(side) == NULL)
+      searched_elem = elem->top_parent ();
+#ifdef LIBMESH_ENABLE_AMR
+    else
+      while (searched_elem->parent() != NULL)
+	{
+	  const Elem * parent = searched_elem->parent();
+	  if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+	    return false;
+	  searched_elem = parent;
+	}
+#endif
+  }
+
+  std::pair<std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator,
+            std::multimap<const Elem*,
+                          std::pair<unsigned short int, boundary_id_type> >::const_iterator >
+    e = _boundary_side_id.equal_range(searched_elem);
+
+  // elem is there, maybe multiple occurances
+  while (e.first != e.second)
+    {
+      // if this is true we found the requested id on this side of the element
+      if (e.first->second.first == side &&
+          e.first->second.second == id)
+        return true;
+    }
+
+  return false;
 }
 
 
