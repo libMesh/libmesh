@@ -19,7 +19,7 @@ public:
   LaplaceQoI(){}
   virtual ~LaplaceQoI(){} 
 
-  virtual void init_qoi( std::vector<Number>& sys_qoi, const QoISet& qoi_indices);
+  virtual void init_qoi( std::vector<Number>& sys_qoi );
 
   virtual void postprocess( ){} 
   
