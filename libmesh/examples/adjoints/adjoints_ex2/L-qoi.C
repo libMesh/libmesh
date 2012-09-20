@@ -2,7 +2,7 @@
 
 using namespace libMesh;
 
-void LaplaceQoI::init_qoi( std::vector<Number>& sys_qoi, const QoISet& /*qoi_indices*/)
+void LaplaceQoI::init_qoi( std::vector<Number>& sys_qoi )
 {
   //Only 1 qoi to worry about
   sys_qoi.resize(1);
