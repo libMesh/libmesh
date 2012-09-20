@@ -22,7 +22,9 @@ namespace libMesh
 {
 
 DifferentiableQoI::DifferentiableQoI () :
-  assemble_qoi_sides(false)
+  assemble_qoi_sides(false),
+  assemble_qoi_internal_sides(false),
+  assemble_qoi_elements(true)
 {
 }
 
