@@ -369,9 +369,13 @@ namespace {
           Elem *el = const_cast<Elem *>(*elem_it);
 
           _femcontext.pre_fe_reinit(_sys, el);
-          _femcontext.elem_fe_reinit();
 
-          _diff_qoi.element_qoi(_femcontext, _qoi_indices);
+          if (_diff_qoi.assemble_qoi_elements)
+            {
+              _femcontext.elem_fe_reinit();
+
+              _diff_qoi.element_qoi(_femcontext, _qoi_indices);
+            }
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
@@ -379,7 +383,7 @@ namespace {
             {
               // Don't compute on non-boundary sides unless requested
               if (!_diff_qoi.assemble_qoi_sides ||
-                  (!_sys.compute_internal_sides &&
+                  (!_diff_qoi.assemble_qoi_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
 
@@ -433,9 +437,13 @@ namespace {
           Elem *el = const_cast<Elem *>(*elem_it);
 
           _femcontext.pre_fe_reinit(_sys, el);
-          _femcontext.elem_fe_reinit();
 
-          _qoi.element_qoi_derivative(_femcontext, _qoi_indices);
+          if (_qoi.assemble_qoi_elements)
+            {
+              _femcontext.elem_fe_reinit();
+
+              _qoi.element_qoi_derivative(_femcontext, _qoi_indices);
+            }
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
@@ -443,7 +451,7 @@ namespace {
             {
               // Don't compute on non-boundary sides unless requested
               if (!_qoi.assemble_qoi_sides ||
-                  (!_sys.compute_internal_sides &&
+                  (!_qoi.assemble_qoi_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
 
