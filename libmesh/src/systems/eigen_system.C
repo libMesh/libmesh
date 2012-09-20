@@ -235,7 +235,7 @@ void EigenSystem::solve ()
 
   else
     {
-      libmesh_assert_equal_to (matrix_B, NULL);
+      libmesh_assert (!matrix_B);
 
       //in case of a standard eigenproblem
       solve_data = eigen_solver->solve_standard (*matrix_A, nev, ncv, tol, maxits);
