@@ -312,18 +312,14 @@ void assemble_elasticity(EquationSystems& es,
         for (unsigned int side=0; side<elem->n_sides(); side++)
           if (elem->neighbor(side) == NULL)
             {
-              boundary_id_type bc_id = mesh.boundary_info->boundary_id (elem,side);
-              if (bc_id==BoundaryInfo::invalid_id)
-                  libmesh_error();
-
               const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
               const std::vector<Real>& JxW_face = fe_face->get_JxW();
 
               fe_face->reinit(elem, side);
 
-              for (unsigned int qp=0; qp<qface.n_points(); qp++)
+              if( mesh.boundary_info->has_boundary_id (elem, size,1) ) // Apply a traction on the right side
               {
-                if( bc_id == 1 ) // Apply a traction on the right side
+                for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
                   for (unsigned int i=0; i<n_v_dofs; i++)
                   {

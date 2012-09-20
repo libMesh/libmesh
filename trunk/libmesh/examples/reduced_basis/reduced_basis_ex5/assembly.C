@@ -239,7 +239,7 @@ void AssemblyA2::interior_assembly(FEMContext &c)
 
 void AssemblyF0::boundary_assembly(FEMContext &c)
 {
-  if(rb_sys.get_mesh().boundary_info->boundary_id(c.elem, c.side) == BOUNDARY_ID_MAX_X)
+  if(rb_sys.get_mesh().boundary_info->has_boundary_id(c.elem, c.side, BOUNDARY_ID_MAX_X) )
   {
     const unsigned int u_var = 0;
 
@@ -266,7 +266,7 @@ void AssemblyF0::boundary_assembly(FEMContext &c)
 
 void AssemblyF1::boundary_assembly(FEMContext &c)
 {
-  if(rb_sys.get_mesh().boundary_info->boundary_id(c.elem, c.side) == BOUNDARY_ID_MAX_X)
+  if(rb_sys.get_mesh().boundary_info->has_boundary_id(c.elem, c.side, BOUNDARY_ID_MAX_X) )
   {
     const unsigned int u_var = 0;
     const unsigned int v_var = 1;
