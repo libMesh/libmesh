@@ -27,7 +27,7 @@ objects		:= $(patsubst %.C, %.$(obj-suffix), $(srcfiles))
 ###############################################################################
 # Target:
 #
-target 	   := ./vector_fe_ex3-$(METHOD)
+target 	   := ./adjoints_ex3-$(METHOD)
 
 
 all:: $(target)
@@ -37,13 +37,14 @@ $(target): $(objects)
 	@echo "Linking "$@"..."
 	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(objects) -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS)
 
+
 # Useful rules.
 clean:
-	@rm -f $(objects) *~ .depend
+	@rm -f $(objects) *.gmv.* *~ .depend
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out.e
+	@rm -f $(target) out*.gmv out*.e
 
 distclean:
 	@$(MAKE) clobber
@@ -51,35 +52,14 @@ distclean:
 
 run: $(target)
 	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESH_RUN) $(target) element_type=TRI6 $(LIBMESH_OPTIONS) -pc_type jacobi
+	@echo "* Running Example " $(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo "***************************************************************"
 	@echo " "
-	@$(LIBMESH_RUN) $(target) element_type=TRI6 $(LIBMESH_OPTIONS) -pc_type jacobi
+	@$(LIBMESH_RUN) $(target) $(LIBMESH_OPTIONS)
 	@echo " "
 	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) element_type=TRI6 $(LIBMESH_OPTIONS) -pc_type jacobi
+	@echo "* Done Running Example " $(target)
 	@echo "***************************************************************"
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD8 $(LIBMESH_OPTIONS) -pc_type jacobi
-	@echo "***************************************************************"
-	@echo " "
-	@$(LIBMESH_RUN) $(target) element_type=QUAD8 $(LIBMESH_OPTIONS) -pc_type jacobi
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD8 $(LIBMESH_OPTIONS) -pc_type jacobi
-	@echo "***************************************************************"
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD9 $(LIBMESH_OPTIONS) -pc_type jacobi
-	@echo "***************************************************************"
-	@echo " "
-	@$(LIBMESH_RUN) $(target) element_type=QUAD9 $(LIBMESH_OPTIONS) -pc_type jacobi
-	@echo " "
-	@echo "***************************************************************"
-	@echo "* Done Running Example " $(LIBMESH_RUN) $(target) element_type=QUAD9 $(LIBMESH_OPTIONS) -pc_type jacobi
-	@echo "***************************************************************"
-
 
 # include the dependency list
 include .depend
@@ -90,3 +70,5 @@ include .depend
 #
 .depend: $(srcfiles) $(LIBMESH_DIR)/include/*/*.h
 	@$(perl) $(LIBMESH_DIR)/contrib/bin/make_dependencies.pl -I. $(foreach i, $(LIBMESH_DIR)/include $(wildcard $(LIBMESH_DIR)/include/*), -I$(i)) "-S\$$(obj-suffix)" $(srcfiles) > .depend
+
+###############################################################################

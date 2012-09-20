@@ -22,9 +22,10 @@
 
 // Local Includes
 #include "libmesh/diff_context.h"
-#include "libmesh/vector_value.h"
+#include "libmesh/id_types.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_base.h"
+#include "libmesh/vector_value.h"
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #include "libmesh/tensor_value.h"
@@ -37,6 +38,7 @@ namespace libMesh
 {
 
   // Forward Declarations
+  class BoundaryInfo;
   class Elem;
   template <typename T> class FEGenericBase;
   typedef FEGenericBase<Real> FEBase;
@@ -73,6 +75,16 @@ public:
    * Destructor.
    */
   virtual ~FEMContext ();
+
+  /**
+   * Reports if the boundary id is found on the current side
+   */
+  bool has_side_boundary_id(boundary_id_type id) const;
+
+  /**
+   * Lists the boundary ids found on the current side
+   */
+  std::vector<boundary_id_type> side_boundary_ids() const;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature
@@ -560,6 +572,12 @@ protected:
   std::vector<FEAbstract*> _element_fe_var;
   std::vector<FEAbstract*> _side_fe_var;
   std::vector<FEAbstract*> _edge_fe_var;
+
+  /**
+   * Saved pointer to BoundaryInfo on the mesh for this System.  Used
+   * to answer boundary id requests.
+   */
+  BoundaryInfo* _boundary_info;
 
 private:
   /**

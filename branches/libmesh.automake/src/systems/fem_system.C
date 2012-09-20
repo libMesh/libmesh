@@ -290,8 +290,7 @@ namespace {
      * constructor to set context
      */
     explicit
-    PostprocessContributions(FEMSystem &sys,
-			     DifferentiableQoI &qoi) : _sys(sys), _qoi(qoi) {}
+    PostprocessContributions(FEMSystem &sys) : _sys(sys) {}
 
     /**
      * operator() for use with Threads::parallel_for().
@@ -312,14 +311,14 @@ namespace {
           if (_sys.fe_reinit_during_postprocess)
             _femcontext.elem_fe_reinit();
 
-          _qoi.element_postprocess(_femcontext);
+          _sys.element_postprocess(_femcontext);
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
                ++_femcontext.side)
             {
               // Don't compute on non-boundary sides unless requested
-              if (!_qoi.postprocess_sides ||
+              if (!_sys.postprocess_sides ||
                   (!_sys.compute_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
@@ -328,7 +327,7 @@ namespace {
               if (_sys.fe_reinit_during_postprocess)
                 _femcontext.side_fe_reinit();
 
-              _qoi.side_postprocess(_femcontext);
+              _sys.side_postprocess(_femcontext);
             }
         }
     }
@@ -336,7 +335,6 @@ namespace {
   private:
 
     FEMSystem& _sys;
-    DifferentiableQoI& _qoi;
   };
 
   class QoIContributions
@@ -363,7 +361,7 @@ namespace {
     {
       AutoPtr<DiffContext> con = _sys.build_context();
       FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
-      _sys.init_context(_femcontext);
+      _diff_qoi.init_context(_femcontext);
 
       for (ConstElemRange::const_iterator elem_it = range.begin();
            elem_it != range.end(); ++elem_it)
@@ -396,11 +394,8 @@ namespace {
 
     void join (const QoIContributions& other)
     {
-      const unsigned int my_size = this->qoi.size();
-      libmesh_assert_equal_to (my_size, other.qoi.size());
-
-      for (unsigned int i=0; i != my_size; ++i)
-        this->qoi[i] += other.qoi[i];
+      libmesh_assert_equal_to (this->qoi.size(), other.qoi.size());
+      this->_diff_qoi.thread_join( this->qoi, other.qoi, _qoi_indices );
     }
 
     std::vector<Number> qoi;
@@ -430,7 +425,7 @@ namespace {
     {
       AutoPtr<DiffContext> con = _sys.build_context();
       FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
-      _sys.init_context(_femcontext);
+      _qoi.init_context(_femcontext);
 
       for (ConstElemRange::const_iterator elem_it = range.begin();
            elem_it != range.end(); ++elem_it)
@@ -706,7 +701,7 @@ void FEMSystem::postprocess ()
   // Loop over every active mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
                                          mesh.active_local_elements_end()),
-                        PostprocessContributions(*this, *(this->diff_qoi)));
+                        PostprocessContributions(*this));
 
   STOP_LOG("postprocess()", "FEMSystem");
 }
@@ -736,9 +731,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
                                             mesh.active_local_elements_end()),
                            qoi_contributions);
 
-  Parallel::sum(qoi_contributions.qoi);
-
-  this->qoi = qoi_contributions.qoi;
+  this->diff_qoi->parallel_op( this->qoi, qoi_contributions.qoi, qoi_indices );
 
   STOP_LOG("assemble_qoi()", "FEMSystem");
 }

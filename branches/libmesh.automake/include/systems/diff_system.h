@@ -151,8 +151,10 @@ public:
   /**
    * Attach external QoI object.
    */
-  void attach_qoi( DifferentiableQoI* qoi )
-  { this->diff_qoi = (qoi->clone()).release(); }
+  void attach_qoi( DifferentiableQoI* qoi_in, const QoISet& qoi_indices )
+  { this->diff_qoi = (qoi_in->clone()).release();
+    // User needs to resize qoi system qoi accordingly
+    this->diff_qoi->init_qoi( this->qoi, qoi_indices );}
  
   /**
    * A pointer to the solver object we're going to use.
@@ -175,6 +177,29 @@ public:
    * also reimplement this method to build it.
    */
   virtual AutoPtr<DiffContext> build_context();
+
+  /**
+   * Executes a postprocessing loop over all elements, and if
+   * \p postprocess_sides is true over all sides.
+   */
+  virtual void postprocess (){}
+
+  /**
+   * Does any work that needs to be done on \p elem in a postprocessing loop.
+   */
+  virtual void element_postprocess (DiffContext &) {}
+  
+  /**
+   * Does any work that needs to be done on \p side of \p elem in a
+   * postprocessing loop.
+   */
+  virtual void side_postprocess (DiffContext &) {}
+
+  /**
+   * If \p postprocess_sides is true (it is false by default), the
+   * postprocessing loop will loop over all sides as well as all elements.
+   */
+  bool postprocess_sides;
 
   /**
    * Set print_residual_norms to true to print |U| whenever it is

@@ -206,6 +206,12 @@ public:
   unsigned int n_boundary_ids () const { return _boundary_ids.size(); }
 
   /**
+   * Returns true iff the given node is associated with the given id.
+   */
+  bool has_boundary_id (const Node* const node,
+                        const boundary_id_type id) const;
+
+  /**
    * Returns the boundary ids associated with \p Node \p node.
    */
   std::vector<boundary_id_type> boundary_ids (const Node* node) const;
@@ -214,6 +220,14 @@ public:
    * Returns the number of boundary ids associated with \p Node \p node.
    */
   unsigned int n_boundary_ids (const Node* node) const;
+
+  /**
+   * Returns true iff the given side of the given element is
+   * associated with the given id.
+   */
+  bool has_boundary_id (const Elem* const elem,
+                        const unsigned short int side,
+                        const boundary_id_type id) const;
 
   /**
    * Returns the boundary id associated with the \p side side of

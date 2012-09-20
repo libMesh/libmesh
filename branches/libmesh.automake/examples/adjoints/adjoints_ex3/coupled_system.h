@@ -1,0 +1,166 @@
+/* The Next Great Finite Element Library. */
+/* Copyright (C) 2003  Benjamin S. Kirk */
+
+/* This library is free software; you can redistribute it and/or */
+/* modify it under the terms of the GNU Lesser General Public */
+/* License as published by the Free Software Foundation; either */
+/* version 2.1 of the License, or (at your option) any later version. */
+
+/* This library is distributed in the hope that it will be useful, */
+/* but WITHOUT ANY WARRANTY; without even the implied warranty of */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
+/* Lesser General Public License for more details. */
+
+/* You should have received a copy of the GNU Lesser General Public */
+/* License along with this library; if not, write to the Free Software */
+/* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+
+#ifndef __coupled_system_h__
+#define __coupled_system_h__
+
+// DiffSystem framework files
+#include "libmesh/fem_function_base.h"
+#include "libmesh/fem_system.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/parameter_vector.h"
+
+using namespace libMesh;
+
+// The Navier-Stokes system class.
+// FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
+// but we must specify element residuals
+class CoupledSystem : public FEMSystem
+{
+public:
+  // Constructor
+  CoupledSystem(EquationSystems& es,
+               const std::string& name,
+               const unsigned int number)
+    : FEMSystem(es, name, number), Peclet(1.) {qoi.resize(1);}
+
+  // Set species transport boolean, this is used for the initial value simulation
+  // See March 26, 2012 entry in lab book
+  void set_species_transport(bool species_transport_flag)
+  {
+    species_transport = species_transport_flag;
+  }
+
+  // Function to get computed QoI values
+
+  Number &get_QoI_value()
+    {
+      return computed_QoI;       
+    }
+    
+  Number &get_parameter_value(unsigned int parameter_index)
+    {
+      return parameters[parameter_index];
+    }
+
+  ParameterVector &get_parameter_vector()
+    {
+      parameter_vector.resize(parameters.size());
+      for(unsigned int i = 0; i != parameters.size(); ++i)
+	{
+	  parameter_vector[i] = &parameters[i];
+	}
+      
+      return parameter_vector;
+    }
+
+  Number &get_Pe()
+    {
+      return Peclet;       
+    }
+
+ protected:
+
+  // System initialization
+  virtual void init_data ();
+
+  // Context initialization
+  virtual void init_context(DiffContext &context);
+
+  // Element residual and jacobian calculations
+  // Time dependent parts
+  virtual bool element_time_derivative (bool request_jacobian,
+                                        DiffContext& context);
+
+  // Constraint parts
+  virtual bool element_constraint (bool request_jacobian,
+                                   DiffContext& context);
+  //virtual bool side_constraint (bool request_jacobian,
+  //DiffContext& context);
+
+  // Overloading the qoi derivative function on sides
+
+  virtual void side_qoi_derivative
+    (DiffContext &context,
+     const QoISet & qois);  
+
+  // Mass matrix part
+  //virtual bool mass_residual (bool request_jacobian,
+  //                          DiffContext& context);
+
+  // Postprocessed output
+  virtual void postprocess ();
+
+  virtual void side_postprocess(DiffContext &context);
+
+  // Parameters associated with the system
+  std::vector<Number> parameters;
+
+  // Indices for each variable;
+  unsigned int p_var, u_var, v_var, C_var;
+
+  // The ParameterVector object that will contain pointers to
+  // the system parameters
+  ParameterVector parameter_vector;
+
+  // The Peclet number for the species transport
+  Real Peclet;
+
+  // Are we solving the species transport problem ?
+  bool species_transport;
+
+  // The functionals to be computed as QoIs
+  Number computed_QoI;
+
+};
+
+
+class CoupledFEMFunctionsx : public FEMFunctionBase<Number>
+{
+public:
+  // Constructor
+  CoupledFEMFunctionsx(System &sys) {}
+
+  // Destructor
+  virtual ~CoupledFEMFunctionsx () {}
+        
+ protected:
+
+  virtual Number operator() (const FEMContext&, const Point& p,
+			     const Real time = 0.);
+     
+};
+
+
+class CoupledFEMFunctionsy : public FEMFunctionBase<Number>
+{
+public:
+  // Constructor
+  CoupledFEMFunctionsy(System &sys) {}
+
+  // Destructor
+  virtual ~CoupledFEMFunctionsy () {}
+    
+  
+ protected:
+
+  virtual Number operator() (const FEMContext&, const Point& p,
+			     const Real time = 0.);
+  
+};
+
+#endif //__coupled_system_h__

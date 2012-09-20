@@ -193,6 +193,12 @@ public:
    * the major matrix.
    */
   void attach_matrix (SparseMatrix<Number>& matrix);
+   
+  /**
+   * Matrices should not be attached more than once.  We can test for
+   * an already-attached matrix if necessary using \p is_attached
+   */
+  bool is_attached (SparseMatrix<Number>& matrix);
 
   /**
    * Distrubute dofs on the current mesh.  Also builds the send list for

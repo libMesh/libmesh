@@ -328,42 +328,46 @@ void assemble_elasticity(EquationSystems& es,
         for (unsigned int side=0; side<elem->n_sides(); side++)
           if (elem->neighbor(side) == NULL)
             {
-              boundary_id_type bc_id = mesh.boundary_info->boundary_id (elem,side);
-              if (bc_id==BoundaryInfo::invalid_id)
-                  libmesh_error();
+              const std::vector<boundary_id_type> bc_ids =
+                mesh.boundary_info->boundary_ids (elem,side);
 
               const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
               const std::vector<Real>& JxW_face = fe_face->get_JxW();
 
               fe_face->reinit(elem, side);
 
-              for (unsigned int qp=0; qp<qface.n_points(); qp++)
-              {
-                // Add the loading
-                if( bc_id == 2 )
+              for (std::vector<boundary_id_type>::const_iterator b =
+                   bc_ids.begin(); b != bc_ids.end(); ++b)
                 {
-                  for (unsigned int i=0; i<n_v_dofs; i++)
-                  {
-                    Fv(i) += JxW_face[qp]* (-1.) * phi_face[i][qp];
-                  }
-                }
+                  const boundary_id_type bc_id = *b;
+                  for (unsigned int qp=0; qp<qface.n_points(); qp++)
+                    {
+                      // Add the loading
+                      if( bc_id == 2 )
+                        {
+                          for (unsigned int i=0; i<n_v_dofs; i++)
+                            {
+                              Fv(i) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                            }
+                        }
 
-                // Add the constraint contributions
-                if( bc_id == 1 )
-                {
-                  for (unsigned int i=0; i<n_v_dofs; i++)
-                    for (unsigned int j=0; j<n_lambda_dofs; j++)
-                    {
-                      Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
-                    }
-                    
-                  for (unsigned int i=0; i<n_lambda_dofs; i++)
-                    for (unsigned int j=0; j<n_v_dofs; j++)
-                    {
-                      Klambda_v(i,j) += JxW_face[qp]* (-1.) * phi_face[j][qp];
+                      // Add the constraint contributions
+                      if( bc_id == 1 )
+                        {
+                          for (unsigned int i=0; i<n_v_dofs; i++)
+                            for (unsigned int j=0; j<n_lambda_dofs; j++)
+                            {
+                              Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                            }
+                        
+                          for (unsigned int i=0; i<n_lambda_dofs; i++)
+                            for (unsigned int j=0; j<n_v_dofs; j++)
+                              {
+                                Klambda_v(i,j) += JxW_face[qp]* (-1.) * phi_face[j][qp];
+                              }
+                        }
                     }
                 }
-              }
             }
       } 
 
