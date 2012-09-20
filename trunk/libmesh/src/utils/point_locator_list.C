@@ -83,7 +83,7 @@ void PointLocatorList::clear ()
 
 void PointLocatorList::init ()
 {
-  libmesh_assert_equal_to (this->_list, NULL);
+  libmesh_assert (!this->_list);
 
   if (this->_initialized)
     {
