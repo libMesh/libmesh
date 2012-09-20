@@ -459,6 +459,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
         mesh.boundary_info->sideset_name(0) = "left";
         mesh.boundary_info->sideset_name(1) = "right";
 
+        // Add nodeset names to boundary info
+        mesh.boundary_info->nodeset_name(0) = "left";
+        mesh.boundary_info->nodeset_name(1) = "right";
+
 	break;
       }
 
@@ -814,6 +818,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
         mesh.boundary_info->sideset_name(1) = "right";
         mesh.boundary_info->sideset_name(2) = "top";
         mesh.boundary_info->sideset_name(3) = "left";
+
+        // Add nodeset names to boundary info
+        mesh.boundary_info->nodeset_name(0) = "bottom";
+	mesh.boundary_info->nodeset_name(1) = "right";
+	mesh.boundary_info->nodeset_name(2) = "top";
+	mesh.boundary_info->nodeset_name(3) = "left";
 
 	break;
       }
@@ -1435,6 +1445,14 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
         mesh.boundary_info->sideset_name(3) = "top";
         mesh.boundary_info->sideset_name(4) = "left";
         mesh.boundary_info->sideset_name(5) = "front";
+
+        // Add nodeset names to boundary info
+        mesh.boundary_info->nodeset_name(0) = "back";
+	mesh.boundary_info->nodeset_name(1) = "bottom";
+	mesh.boundary_info->nodeset_name(2) = "right";
+	mesh.boundary_info->nodeset_name(3) = "top";
+	mesh.boundary_info->nodeset_name(4) = "left";
+	mesh.boundary_info->nodeset_name(5) = "front";
 
 	break;
       } // end case dim==3
