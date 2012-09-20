@@ -179,6 +179,29 @@ public:
   virtual AutoPtr<DiffContext> build_context();
 
   /**
+   * Executes a postprocessing loop over all elements, and if
+   * \p postprocess_sides is true over all sides.
+   */
+  virtual void postprocess (){}
+
+  /**
+   * Does any work that needs to be done on \p elem in a postprocessing loop.
+   */
+  virtual void element_postprocess (DiffContext &) {}
+  
+  /**
+   * Does any work that needs to be done on \p side of \p elem in a
+   * postprocessing loop.
+   */
+  virtual void side_postprocess (DiffContext &) {}
+
+  /**
+   * If \p postprocess_sides is true (it is false by default), the
+   * postprocessing loop will loop over all sides as well as all elements.
+   */
+  bool postprocess_sides;
+
+  /**
    * Set print_residual_norms to true to print |U| whenever it is
    * used in an assembly() call
    */

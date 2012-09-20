@@ -75,35 +75,11 @@ public:
   virtual void clear_qoi () {}
 
   /**
-   * Executes a postprocessing loop over all elements, and if
-   * \p postprocess_sides is true over all sides.
-   */
-  virtual void postprocess () = 0;
-
-  /**
-   * If \p postprocess_sides is true (it is false by default), the
-   * postprocessing loop will loop over all sides as well as all
-   * elements.
-   */
-  bool postprocess_sides;
-
-  /**
    * If \p assemble_qoi_sides is true (it is false by default), the
    * assembly loop for a quantity of interest or its derivatives will
    * loop over all sides as well as all elements.
    */
   bool assemble_qoi_sides;
-
-  /**
-   * Does any work that needs to be done on \p elem in a postprocessing loop.
-   */
-  virtual void element_postprocess (DiffContext &) {}
- 
-  /**
-   * Does any work that needs to be done on \p side of \p elem in a
-   * postprocessing loop.
-   */
-  virtual void side_postprocess (DiffContext &) {}
  
   /**
    * Does any work that needs to be done on \p elem in a quantity of

@@ -290,8 +290,7 @@ namespace {
      * constructor to set context
      */
     explicit
-    PostprocessContributions(FEMSystem &sys,
-			     DifferentiableQoI &qoi) : _sys(sys), _qoi(qoi) {}
+    PostprocessContributions(FEMSystem &sys) : _sys(sys) {}
 
     /**
      * operator() for use with Threads::parallel_for().
@@ -312,14 +311,14 @@ namespace {
           if (_sys.fe_reinit_during_postprocess)
             _femcontext.elem_fe_reinit();
 
-          _qoi.element_postprocess(_femcontext);
+          _sys.element_postprocess(_femcontext);
 
           for (_femcontext.side = 0;
                _femcontext.side != _femcontext.elem->n_sides();
                ++_femcontext.side)
             {
               // Don't compute on non-boundary sides unless requested
-              if (!_qoi.postprocess_sides ||
+              if (!_sys.postprocess_sides ||
                   (!_sys.compute_internal_sides &&
                    _femcontext.elem->neighbor(_femcontext.side) != NULL))
                 continue;
@@ -328,7 +327,7 @@ namespace {
               if (_sys.fe_reinit_during_postprocess)
                 _femcontext.side_fe_reinit();
 
-              _qoi.side_postprocess(_femcontext);
+              _sys.side_postprocess(_femcontext);
             }
         }
     }
@@ -336,7 +335,6 @@ namespace {
   private:
 
     FEMSystem& _sys;
-    DifferentiableQoI& _qoi;
   };
 
   class QoIContributions
@@ -703,7 +701,7 @@ void FEMSystem::postprocess ()
   // Loop over every active mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
                                          mesh.active_local_elements_end()),
-                        PostprocessContributions(*this, *(this->diff_qoi)));
+                        PostprocessContributions(*this));
 
   STOP_LOG("postprocess()", "FEMSystem");
 }
