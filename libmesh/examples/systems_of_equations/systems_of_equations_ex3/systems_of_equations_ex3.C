@@ -601,26 +601,20 @@ void assemble_stokes (EquationSystems& es,
         for (unsigned int s=0; s<elem->n_sides(); s++)
           if (elem->neighbor(s) == NULL)
             {
-              // Get the boundary ID for side 's'.
-              // These are set internally by build_square().
-              // 0=bottom
-              // 1=right
-              // 2=top
-              // 3=left
-              boundary_id_type bc_id = mesh.boundary_info->boundary_id (elem,s);
-              if (bc_id==BoundaryInfo::invalid_id)
-                  libmesh_error();
-
-              
               AutoPtr<Elem> side (elem->build_side(s));
                             
               // Loop over the nodes on the side.
               for (unsigned int ns=0; ns<side->n_nodes(); ns++)
                 {
-                  // Get the boundary values.
+                  // Boundary ids are set internally by
+                  // build_square().
+                  // 0=bottom
+                  // 1=right
+                  // 2=top
+                  // 3=left
                    
                   // Set u = 1 on the top boundary, 0 everywhere else
-                  const Real u_value = (bc_id==2) ? 1. : 0.;
+                  const Real u_value = (mesh.boundary_info->has_boundary_id(elem,s,2)) ? 1. : 0.;
                   
                   // Set v = 0 everywhere
                   const Real v_value = 0.;

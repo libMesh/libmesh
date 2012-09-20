@@ -749,6 +749,12 @@ unsigned int BoundaryInfo::n_boundary_ids(const Node* node) const
 boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
 				           const unsigned short int side) const
 {
+  // Asking for just one boundary id means your code isn't safe to use
+  // on meshes with overlapping boundary ids.  Try using
+  // BoundaryInfo::boundary_ids or BoundaryInfo::has_boundary_id
+  // instead.
+  libmesh_deprecated();
+
   libmesh_assert(elem);
 
   // Only level-0 elements store BCs.  If this is not a level-0
