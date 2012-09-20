@@ -187,7 +187,13 @@ FEMContext::~FEMContext()
 
 
 
-std::vector<boundary_id_type> FEMContext::side_boundary_ids()
+bool FEMContext::has_side_boundary_id(boundary_id_type id) const
+{
+  return _boundary_info->has_boundary_id(elem, side, id);
+}
+
+
+std::vector<boundary_id_type> FEMContext::side_boundary_ids() const
 {
   return _boundary_info->boundary_ids(elem, side);
 }
