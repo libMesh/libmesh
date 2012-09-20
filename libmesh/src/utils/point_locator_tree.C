@@ -89,7 +89,7 @@ void PointLocatorTree::clear ()
 
 void PointLocatorTree::init (const Trees::BuildType build_type)
 {
-  libmesh_assert_equal_to (this->_tree, NULL);
+  libmesh_assert (!this->_tree);
 
   if (this->_initialized)
     {
