@@ -21,6 +21,7 @@
 // Local includes
 #include "libmesh/off_io.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/edge_edge2.h"
 #include "libmesh/face_tri3.h"
 
 namespace libMesh
@@ -53,15 +54,6 @@ void OFFIO::read_stream(std::istream& in)
   // Clear any existing mesh data
   mesh.clear();
 
-  // STL only works in 2D
-  mesh.set_mesh_dimension(2);
-
-#if LIBMESH_DIM < 2
-  libMesh::err << "Cannot open dimension 2 mesh file when configured without 2D support." <<
-                  std::endl;
-  libmesh_error();
-#endif
-
   // Check the input buffer
   libmesh_assert (in.good());
 
@@ -76,10 +68,6 @@ void OFFIO::read_stream(std::istream& in)
 
   // read the number of nodes, faces, and edges
   in >> nn >> nf >> ne;
-
-  // resize local vectors.
-  //  _nodes.resize(nn);
-  //_elements.resize(nf);
 
 
   Real x=0., y=0., z=0.;
@@ -96,31 +84,46 @@ void OFFIO::read_stream(std::istream& in)
       mesh.add_point ( Point(x,y,z), n );
     }
 
-  unsigned int dummy, n0, n1, n2;
+  unsigned int nv, nid;
 
-  // Read the triangles
+  // Read the elements
   for (unsigned int e=0; e<nf; e++)
     {
       libmesh_assert (in.good());
 
-      // _elements[e] = new Tri3;
-      // _elements[e]->set_id (e);
-      Elem* elem = new Tri3;
+      // The number of vertices in the element
+      in >> nv;
+
+      libmesh_assert(nv == 2 || nv == 3);
+      if (e == 0)
+      {
+        mesh.set_mesh_dimension(nv-1);
+        if (nv == 3)
+        {
+#if LIBMESH_DIM < 2
+          libMesh::err << "Cannot open dimension 2 mesh file when configured without 2D support." <<
+                          std::endl;
+          libmesh_error();
+#endif
+        }
+      }
+
+      Elem* elem;
+      switch (nv)
+      {
+        case 2: elem = new Edge2; break;
+        case 3: elem = new Tri3 ; break;
+        default: libmesh_error();
+      }
+      
       elem->set_id(e);
       mesh.add_elem (elem);
 
-      // The number of nodes in the object
-      in >> dummy;
-
-      libmesh_assert_equal_to (dummy, 3);
-
-      in >> n0
-	 >> n1
-	 >> n2;
-
-      elem->set_node(0) = mesh.node_ptr(n0);
-      elem->set_node(1) = mesh.node_ptr(n1);
-      elem->set_node(2) = mesh.node_ptr(n2);
+      for (unsigned int i=0; i<nv; i++)
+      {
+        in >> nid;
+        elem->set_node(i) = mesh.node_ptr(nid);
+      }
     }
 }
 
