@@ -88,28 +88,33 @@ struct AssemblyA0 : ElemAssemblyWithConstruction
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    short int bc_id = rb_con->get_mesh().boundary_info->boundary_id (c.elem,c.side);
-    if( bc_id == 1 || bc_id == 2 || bc_id == 3 || bc_id == 4 )
-    {
-      const unsigned int u_var = 0;
+    const std::vector<boundary_id_type> bc_ids =
+      rb_con->get_mesh().boundary_info->boundary_ids (c.elem,c.side);
+    for (std::vector<boundary_id_type>::const_iterator b =
+         bc_ids.begin(); b != bc_ids.end(); ++b)
+      if( *b == 1 || *b == 2 || *b == 3 || *b == 4 )
+        {
+          const unsigned int u_var = 0;
 
-      const std::vector<Real> &JxW_side =
-        c.side_fe_var[u_var]->get_JxW();
+          const std::vector<Real> &JxW_side =
+            c.side_fe_var[u_var]->get_JxW();
 
-      const std::vector<std::vector<Real> >& phi_side =
-        c.side_fe_var[u_var]->get_phi();
+          const std::vector<std::vector<Real> >& phi_side =
+            c.side_fe_var[u_var]->get_phi();
 
-      // The number of local degrees of freedom in each variable
-      const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+          // The number of local degrees of freedom in each variable
+          const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
-      // Now we will build the affine operator
-      unsigned int n_sidepoints = c.side_qrule->n_points();
+          // Now we will build the affine operator
+          unsigned int n_sidepoints = c.side_qrule->n_points();
 
-      for (unsigned int qp=0; qp != n_sidepoints; qp++)
-        for (unsigned int i=0; i != n_u_dofs; i++)
-          for (unsigned int j=0; j != n_u_dofs; j++)
-            c.elem_jacobian(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
-    }
+          for (unsigned int qp=0; qp != n_sidepoints; qp++)
+            for (unsigned int i=0; i != n_u_dofs; i++)
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                c.elem_jacobian(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+
+          break;
+        }
   }
 };
 
@@ -123,35 +128,40 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    short int bc_id = rb_con->get_mesh().boundary_info->boundary_id (c.elem,c.side);
-    if( bc_id == 1 || bc_id == 3 ) // y == -0.2, y == 0.2
-    {
-      const unsigned int u_var = 0;
+    const std::vector<boundary_id_type> bc_ids =
+      rb_con->get_mesh().boundary_info->boundary_ids (c.elem,c.side);
+    for (std::vector<boundary_id_type>::const_iterator b =
+         bc_ids.begin(); b != bc_ids.end(); ++b)
+      if( *b == 1 || *b == 3 ) // y == -0.2, y == 0.2
+        {
+          const unsigned int u_var = 0;
 
-      const std::vector<Real> &JxW_side =
-        c.side_fe_var[u_var]->get_JxW();
+          const std::vector<Real> &JxW_side =
+            c.side_fe_var[u_var]->get_JxW();
 
-      const std::vector<std::vector<Real> >& phi_side =
-        c.side_fe_var[u_var]->get_phi();
-        
-      const std::vector<Point>& xyz =
-        c.side_fe_var[u_var]->get_xyz();
+          const std::vector<std::vector<Real> >& phi_side =
+            c.side_fe_var[u_var]->get_phi();
 
-      // The number of local degrees of freedom in each variable
-      const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+          const std::vector<Point>& xyz =
+            c.side_fe_var[u_var]->get_xyz();
 
-      // Now we will build the affine operator
-      unsigned int n_sidepoints = c.side_qrule->n_points();
+          // The number of local degrees of freedom in each variable
+          const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
 
-      for (unsigned int qp=0; qp != n_sidepoints; qp++)
-      {
-        Real x_hat = xyz[qp](0);
-        
-        for (unsigned int i=0; i != n_u_dofs; i++)
-          for (unsigned int j=0; j != n_u_dofs; j++)
-            c.elem_jacobian(i,j) += JxW_side[qp] * x_hat * phi_side[j][qp]*phi_side[i][qp];
-      }
-    }
+          // Now we will build the affine operator
+          unsigned int n_sidepoints = c.side_qrule->n_points();
+
+          for (unsigned int qp=0; qp != n_sidepoints; qp++)
+          {
+            Real x_hat = xyz[qp](0);
+
+            for (unsigned int i=0; i != n_u_dofs; i++)
+              for (unsigned int j=0; j != n_u_dofs; j++)
+                c.elem_jacobian(i,j) += JxW_side[qp] * x_hat * phi_side[j][qp]*phi_side[i][qp];
+          }
+
+          break;
+        }
   }
 };
 
@@ -165,44 +175,46 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
 {
   virtual void boundary_assembly(FEMContext &c)
   {
-    short int bc_id = rb_con->get_mesh().boundary_info->boundary_id (c.elem,c.side);
-    if( bc_id == 2 || bc_id == 4) // x == 0.2, x == -0.2
-    {
-      const unsigned int u_var = 0;
-
-      const std::vector<Real> &JxW_side =
-        c.side_fe_var[u_var]->get_JxW();
-
-      const std::vector<std::vector<Real> >& phi_side =
-        c.side_fe_var[u_var]->get_phi();
-
-      // The number of local degrees of freedom in each variable
-      const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
-
-      // Now we will build the affine operator
-      unsigned int n_sidepoints = c.side_qrule->n_points();
-
-      if(bc_id==2)
-      {
-        for (unsigned int qp=0; qp != n_sidepoints; qp++)
+    const std::vector<boundary_id_type> bc_ids =
+      rb_con->get_mesh().boundary_info->boundary_ids (c.elem,c.side);
+    for (std::vector<boundary_id_type>::const_iterator b =
+         bc_ids.begin(); b != bc_ids.end(); ++b)
+      if( *b == 2 || *b == 4) // x == 0.2, x == -0.2
         {
-          for (unsigned int i=0; i != n_u_dofs; i++)
-            for (unsigned int j=0; j != n_u_dofs; j++)
+          const unsigned int u_var = 0;
+
+          const std::vector<Real> &JxW_side =
+            c.side_fe_var[u_var]->get_JxW();
+
+          const std::vector<std::vector<Real> >& phi_side =
+            c.side_fe_var[u_var]->get_phi();
+
+          // The number of local degrees of freedom in each variable
+          const unsigned int n_u_dofs = c.dof_indices_var[u_var].size();
+
+          // Now we will build the affine operator
+          unsigned int n_sidepoints = c.side_qrule->n_points();
+
+          if(*b==2)
+          {
+            for (unsigned int qp=0; qp != n_sidepoints; qp++)
+            {
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                for (unsigned int j=0; j != n_u_dofs; j++)
               c.elem_jacobian(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
-        }
-      }
+            }
+          }
       
-      if(bc_id==4)
-      {
-        for (unsigned int qp=0; qp != n_sidepoints; qp++)
-        {
-          for (unsigned int i=0; i != n_u_dofs; i++)
-            for (unsigned int j=0; j != n_u_dofs; j++)
+          if(*b==4)
+          {
+            for (unsigned int qp=0; qp != n_sidepoints; qp++)
+            {
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                for (unsigned int j=0; j != n_u_dofs; j++)
               c.elem_jacobian(i,j) -= JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+            }
+          }
         }
-      }
-
-    }
   }
 };
 
