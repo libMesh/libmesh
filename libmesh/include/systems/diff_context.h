@@ -67,12 +67,6 @@ public:
   virtual ~DiffContext ();
 
   /**
-   * If \p postprocess_sides is true (it is false by default), the
-   * postprocessing loop will loop over all sides as well as all elements.
-   */
-  bool postprocess_sides;
-
-  /**
    * Gives derived classes the opportunity to reinitialize data (FE objects in
    * FEMSystem, for example) needed for an interior integration at a new point
    * within a timestep

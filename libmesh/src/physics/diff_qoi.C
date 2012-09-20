@@ -22,7 +22,6 @@ namespace libMesh
 {
 
 DifferentiableQoI::DifferentiableQoI () :
-  postprocess_sides(false),
   assemble_qoi_sides(false)
 {
 }
