@@ -77,10 +77,27 @@ public:
   /**
    * If \p assemble_qoi_sides is true (it is false by default), the
    * assembly loop for a quantity of interest or its derivatives will
-   * loop over all sides as well as all elements.
+   * loop over domain boundary sides.  To add domain interior sides,
+   * also set assemble_qoi_internal_sides to true.
    */
   bool assemble_qoi_sides;
  
+  /**
+   * If \p assemble_qoi_internal_sides is true (it is false by
+   * default), the assembly loop for a quantity of interest or its
+   * derivatives will loop over element sides which do not fall on
+   * domain boundaries.
+   */
+  bool assemble_qoi_internal_sides;
+ 
+  /**
+   * If \p assemble_qoi_elements is false (it is true by default), the
+   * assembly loop for a quantity of interest or its derivatives will
+   * skip computing on mesh elements, and will only compute on mesh
+   * sides.
+   */
+  bool assemble_qoi_elements;
+
   /**
    * Does any work that needs to be done on \p elem in a quantity of
    * interest assembly loop, outputting to elem_qoi.
