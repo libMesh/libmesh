@@ -200,7 +200,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
             bool add_this_side = false;
             short int this_bcid = invalid_id;
 
-            while (pos.first != pos.second)
+            for (; pos.first != pos.second; ++pos.first)
               {
                 this_bcid = pos.first->second.second;
 
@@ -212,8 +212,6 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                     add_this_side = true;
                     break;
                   }
-
-                ++pos.first;
               }
 
 	    // if side s wasn't found or doesn't have a boundary
@@ -288,7 +286,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
             bool add_this_side = false;
             short int this_bcid = invalid_id;
 
-            while (pos.first != pos.second)
+            for (; pos.first != pos.second; ++pos.first)
               {
                 this_bcid = pos.first->second.second;
                 // if this side is flagged with a boundary condition
@@ -299,8 +297,6 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                     add_this_side = true;
                     break;
                   }
-
-                ++pos.first;
               }
 
             // if side s doesn't have a boundary condition we may
@@ -378,7 +374,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
             bool add_this_side = false;
             boundary_id_type this_bcid = invalid_id;
 
-            while (pos.first != pos.second)
+            for (; pos.first != pos.second; ++pos.first)
               {
                 this_bcid = pos.first->second.second;
 
@@ -390,8 +386,6 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                     add_this_side = true;
                     break;
                   }
-
-                ++pos.first;
               }
 
 	    // if side s wasn't found or doesn't have a boundary
@@ -794,15 +788,11 @@ boundary_id_type BoundaryInfo::boundary_id(const Elem* const elem,
     return invalid_id;
 
   // elem is there, maybe multiple occurances
-  while (e.first != e.second)
-    {
+  for (; e.first != e.second; ++e.first)
       // if this is true we found the requested side
       // of the element and want to return the id
       if (e.first->second.first == side)
 	return e.first->second.second;
-
-      ++e.first;
-    }
 
   // if we get here, we found elem in the data structure but not
   // the requested side, so return the default value
@@ -843,13 +833,11 @@ bool BoundaryInfo::has_boundary_id(const Elem* const elem,
     e = _boundary_side_id.equal_range(searched_elem);
 
   // elem is there, maybe multiple occurances
-  while (e.first != e.second)
-    {
-      // if this is true we found the requested id on this side of the element
-      if (e.first->second.first == side &&
-          e.first->second.second == id)
-        return true;
-    }
+  for (; e.first != e.second; ++e.first)
+    // if this is true we found the requested id on this side of the element
+    if (e.first->second.first == side &&
+        e.first->second.second == id)
+      return true;
 
   return false;
 }
@@ -893,14 +881,10 @@ std::vector<boundary_id_type> BoundaryInfo::boundary_ids (const Elem* const elem
     return ids;
 
   // elem is there, maybe multiple occurances
-  while (e.first != e.second)
-    {
-      // if this is true we found the requested side of the element
-      if (e.first->second.first == side)
-        ids.push_back(e.first->second.second);
-
-      ++e.first;
-    }
+  for (; e.first != e.second; ++e.first)
+    // if this is true we found the requested side of the element
+    if (e.first->second.first == side)
+      ids.push_back(e.first->second.second);
 
   // Whether or not we found anything, return "ids".  If it's empty, it
   // means no valid bounary IDs were found for "side"
@@ -942,14 +926,10 @@ unsigned int BoundaryInfo::n_boundary_ids (const Elem* const elem,
   unsigned int n_ids = 0;
 
   // elem is there, maybe multiple occurances
-  while (e.first != e.second)
-    {
-      // if this is true we found the requested side of the element
-      if (e.first->second.first == side)
-        n_ids++;
-
-      ++e.first;
-    }
+  for (; e.first != e.second; ++e.first)
+    // if this is true we found the requested side of the element
+    if (e.first->second.first == side)
+      n_ids++;
 
   return n_ids;
 }
@@ -974,14 +954,10 @@ std::vector<boundary_id_type> BoundaryInfo::raw_boundary_ids (const Elem* const 
     e = _boundary_side_id.equal_range(elem);
 
   // Check any occurances
-  while (e.first != e.second)
-    {
-      // if this is true we found the requested side of the element
-      if (e.first->second.first == side)
-        ids.push_back(e.first->second.second);
-
-      ++e.first;
-    }
+  for (; e.first != e.second; ++e.first)
+    // if this is true we found the requested side of the element
+    if (e.first->second.first == side)
+      ids.push_back(e.first->second.second);
 
   // if nothing got pushed back, we didn't find elem in the data
   // structure with the requested side, so return the default empty
