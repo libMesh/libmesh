@@ -21,6 +21,7 @@
 
 // Bring in bits from the libMesh namespace.
 // Just the bits we're using, since this is a header.
+using libMesh::boundary_id_type;
 using libMesh::DenseSubMatrix;
 using libMesh::ElemAssembly;
 using libMesh::FEInterface;

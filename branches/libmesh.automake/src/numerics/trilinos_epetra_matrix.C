@@ -131,8 +131,8 @@ void EpetraMatrix<T>::init (const unsigned int m,
     if (this->initialized())
       this->clear();
 
-    libmesh_assert_equal_to (this->_mat, NULL);
-    libmesh_assert_equal_to (this->_map, NULL);
+    libmesh_assert (!this->_mat);
+    libmesh_assert (!this->_map);
 
     this->_is_initialized = true;
   }

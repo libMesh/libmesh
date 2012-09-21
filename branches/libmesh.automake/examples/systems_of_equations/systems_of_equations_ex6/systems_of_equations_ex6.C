@@ -404,7 +404,8 @@ void assemble_elasticity(EquationSystems& es,
 
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
               {
-                if( mesh.boundary_info->has_boundary_id(BOUNDARY_ID_MAX_X) ) // Apply a traction
+                // Apply a traction
+                if( mesh.boundary_info->has_boundary_id(elem, side, BOUNDARY_ID_MAX_X) )
                 {
                   for (unsigned int i=0; i<n_v_dofs; i++)
                   {
