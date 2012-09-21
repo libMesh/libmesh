@@ -563,6 +563,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 	  // Get an FEMContext for this system, this will help us in
 	  // obtaining the weights from the user code
 	  FEMContext femcontext(system);
+	  error_estimator.weight_functions[var]->init_context(femcontext);
 	  
 	  // Loop over every element in the patch
 	  for (unsigned int i = 0 ; patch_re_it != patch_re_end; patch_re_it++, ++i)
