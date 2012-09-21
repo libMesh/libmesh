@@ -841,7 +841,7 @@ unsigned int DofMap::n_local_constrained_dofs() const
   const DofConstraints::const_iterator lower =
     _dof_constraints.lower_bound(this->first_dof()),
                                        upper =
-    _dof_constraints.upper_bound(this->end_dof());
+    _dof_constraints.upper_bound(this->end_dof()-1);
 
   return std::distance(lower, upper);
 }
