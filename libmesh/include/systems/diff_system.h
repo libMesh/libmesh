@@ -151,7 +151,7 @@ public:
   /**
    * Attach external QoI object.
    */
-  void attach_qoi( DifferentiableQoI* qoi_in, const QoISet& qoi_indices )
+  void attach_qoi( DifferentiableQoI* qoi_in )
   { this->diff_qoi = (qoi_in->clone()).release();
     // User needs to resize qoi system qoi accordingly
     this->diff_qoi->init_qoi( this->qoi );}
