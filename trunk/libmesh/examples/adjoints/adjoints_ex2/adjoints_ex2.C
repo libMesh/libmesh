@@ -315,7 +315,7 @@ int main (int argc, char** argv)
   // Put some scope here to test that the cloning is working right
   {
     LaplaceQoI qoi;
-    system.attach_qoi( &qoi, qois );
+    system.attach_qoi( &qoi );
   }
 
   // Set its parameters
