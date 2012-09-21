@@ -772,7 +772,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		    }
 		  
 		  // Get the weight from the user code
-		  Real weight = (*error_estimator.weight_functions[var])(femcontext, q_point[sp], system.time);	
+		  Number weight = (*error_estimator.weight_functions[var])(femcontext, q_point[sp], system.time);	
 
 		  // Add up relevant terms.  We can easily optimize the
 		  // LIBMESH_DIM < 3 cases a little bit with the exception
