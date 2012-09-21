@@ -59,6 +59,15 @@ public:
 virtual ~FEMFunctionBase () {};
 
 
+  /**
+   * Prepares a context object for use.
+   * 
+   * Most problems will want to reimplement this for efficiency, in
+   * order to call FE::get_*() as their particular function requires.
+   */
+virtual void init_context (const FEMContext &) {}
+
+
   // ------------------------------------------------------
   // misc
   /**
