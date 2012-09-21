@@ -421,9 +421,8 @@ ImplicitSystem::adjoint_solve (const QoISet& qoi_indices)
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_constraints_exactly
-        (*this, &this->get_adjoint_solution(i));
-  // FIXME - should this be heterogenous or homogenous in the
-  // Dirichlet case??
+        (*this, &this->get_adjoint_solution(i),
+         /* homogeneous = */ true);
 #endif
 
   // Stop logging the nonlinear solve
@@ -562,9 +561,8 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector& param
   for (unsigned int i=0; i != this->qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       this->get_dof_map().enforce_constraints_exactly
-        (*this, &this->get_weighted_sensitivity_adjoint_solution(i));
-  // FIXME - should this be heterogenous or homogenous in the
-  // Dirichlet case??
+        (*this, &this->get_weighted_sensitivity_adjoint_solution(i),
+         /* homogeneous = */ true);
 #endif
 
   // Stop logging the nonlinear solve
