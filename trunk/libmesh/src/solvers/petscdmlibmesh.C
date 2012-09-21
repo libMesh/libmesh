@@ -13,9 +13,11 @@
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/petsc_matrix.h"
-#include <libmesh/petscdmlibmesh.h>
+#include "libmesh/petscdmlibmesh.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
+
+using namespace libMesh;
 
 #define DMLIBMESH_NO_DECOMPOSITION     0
 #define DMLIBMESH_FIELD_DECOMPOSITION  1
