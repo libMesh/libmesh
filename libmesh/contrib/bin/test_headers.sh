@@ -52,7 +52,7 @@ for i in $headers_to_test; do
 
     rm -f $source_file $app_file
     
-    echo "#include \"$header_name\"" >> $source_file
+    echo "#include \"libmesh/$header_name\"" >> $source_file
     echo "int main () { return 0; }" >> $source_file
 
     echo -n "Testing Header File $header_name ... "
