@@ -4,8 +4,8 @@ AM_CPPFLAGS = $(libmesh_CPPFLAGS)
 AM_CFLAGS   = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
-INCLUDES = -I$(top_srcdir)/contrib/exodusii/Lib/include \
-           -I$(top_srcdir)/contrib/netcdf/Lib
+AM_CPPFLAGS += -I$(top_srcdir)/contrib/exodusii/Lib/include \
+               -I$(top_srcdir)/contrib/netcdf/Lib
 
 noinst_LTLIBRARIES    = libnemesis.la
 libnemesis_la_SOURCES = \

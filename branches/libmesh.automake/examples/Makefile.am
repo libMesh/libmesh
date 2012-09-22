@@ -4,14 +4,14 @@ include $(top_builddir)/Make.common.@METHOD@
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS)
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-INCLUDES    = $(libmesh_INCLUDE) -I$(top_builddir)/include
-LIBS        = $(libmesh_LIBS)
+AM_CPPFLAGS  = $(libmesh_CPPFLAGS)
+AM_CFLAGS    = $(libmesh_CFLAGS)
+AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
+AM_CPPFLAGS += $(libmesh_INCLUDE) -I$(top_builddir)/include
+LIBS         = $(libmesh_LIBS)
 
 if LIBMESH_ENABLE_FPARSER
-  INCLUDES +=  -I$(top_srcdir)/contrib/fparser
+  AM_CPPFLAGS += -I$(top_srcdir)/contrib/fparser
 endif
 
 EXTRA_DIST = run_common.sh

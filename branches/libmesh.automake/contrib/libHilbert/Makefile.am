@@ -6,7 +6,7 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-INCLUDES = -I$(srcdir)/include
+AM_CPPFLAGS += -I$(srcdir)/include
 
 noinst_LTLIBRARIES    = libHilbert.la
 

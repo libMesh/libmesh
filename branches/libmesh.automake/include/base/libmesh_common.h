@@ -238,7 +238,7 @@ extern OStreamProxy err;
 #  define libmesh_stop()     do { if (libMesh::n_processors() == 1) { libmesh_here(); libMesh::out << "WARNING:  libmesh_stop() does not work without the <csignal> header file!" << std::endl; } } while(0)
 #endif
 
-// The libmesh_dbg_use() macro indicates that an argument to a function
+// The libmesh_dbg_var() macro indicates that an argument to a function
 // is used only in debug mode (i.e., when NDEBUG is not defined).
 #ifndef NDEBUG
 #define libmesh_dbg_var(var) var
@@ -246,7 +246,7 @@ extern OStreamProxy err;
 #define libmesh_dbg_var(var)
 #endif
 
-// The libmesh_dbg_use() macro indicates that an argument to a function
+// The libmesh_dbg_var() macro indicates that an argument to a function
 // is used only in debug mode (i.e., when NDEBUG is not defined).
 #ifndef NDEBUG
 #define libmesh_dbg_var(var) var

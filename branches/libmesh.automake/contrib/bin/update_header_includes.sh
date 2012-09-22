@@ -33,8 +33,20 @@ for file in $@ ; do
 	    echo "          "$replacement_string
 	
 	
-	   #echo $file
-	   #echo "sed \"s/$string_to_replace/$replacement_regex/\" $file > $file.new"
+	   sed "s/$search_regex/$replacement_regex/" $file > $file.new
+	   mv $file.new $file
+
+	   string_to_replace="#include <$header_name>"
+	   replacement_string="#include <libmesh/$header_name>"
+	    
+	   search_regex="include <$header_name>"
+	   replacement_regex="include <libmesh\/$header_name>"
+	   
+ 	   echo "        Replacing "
+	   echo "          "$string_to_replace" with"
+	   echo "          "$replacement_string
+	   
+	
 	   sed "s/$search_regex/$replacement_regex/" $file > $file.new
 	   mv $file.new $file
 	fi

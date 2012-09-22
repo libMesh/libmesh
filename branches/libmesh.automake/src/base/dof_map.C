@@ -2616,6 +2616,12 @@ std::string DofMap::get_info() const
   for (DofConstraints::const_iterator it=_dof_constraints.begin();
        it != _dof_constraints.end(); ++it)
     {
+      // Only count local constraints, then sum later
+      const unsigned int constrained_dof = it->first;
+      if (constrained_dof < this->first_dof() ||
+          constrained_dof >= this->end_dof())
+        continue;
+
       const DofConstraintRow& row = it->second.first;
       unsigned int rowsize = row.size();
 
@@ -2627,6 +2633,11 @@ std::string DofMap::get_info() const
       if (it->second.second != Number(0))
         n_rhss++;
     }
+
+  Parallel::sum(n_constraints);
+  Parallel::sum(n_rhss);
+  Parallel::sum(avg_constraint_length);
+  Parallel::max(max_constraint_length);
 
   os << "    DofMap Constraints\n      Number of DoF Constraints = "
      << n_constraints;
@@ -2649,6 +2660,11 @@ std::string DofMap::get_info() const
   for (NodeConstraints::const_iterator it=_node_constraints.begin();
        it != _node_constraints.end(); ++it)
     {
+      // Only count local constraints, then sum later
+      const Node *node = it->first;
+      if (node->processor_id() != libMesh::processor_id())
+        continue;
+
       const NodeConstraintRow& row = it->second.first;
       unsigned int rowsize = row.size();
 
@@ -2660,6 +2676,11 @@ std::string DofMap::get_info() const
       if (it->second.second != Point(0))
         n_node_rhss++;
     }
+
+  Parallel::sum(n_node_constraints);
+  Parallel::sum(n_node_rhss);
+  Parallel::sum(avg_node_constraint_length);
+  Parallel::max(max_node_constraint_length);
 
   os << "\n      Number of Node Constraints = " << n_node_constraints;
   if (n_node_rhss)

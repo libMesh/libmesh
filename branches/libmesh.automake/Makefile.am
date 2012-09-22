@@ -10,7 +10,7 @@ ACLOCAL_AMFLAGS  = -I m4
 AM_CPPFLAGS      = $(libmesh_CPPFLAGS)
 AM_CFLAGS        = $(libmesh_CFLAGS)
 AM_CXXFLAGS      = $(libmesh_CXXFLAGS)
-INCLUDES         = $(libmesh_contrib_INCLUDES) \
+AM_CPPFLAGS     += $(libmesh_contrib_INCLUDES) \
                    $(libmesh_INCLUDE) \
                    -I$(top_builddir)/include # required for libmesh_version.h
 

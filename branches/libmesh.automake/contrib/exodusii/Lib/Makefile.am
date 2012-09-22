@@ -6,7 +6,7 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-INCLUDES = -I$(srcdir)/include -I$(top_srcdir)/contrib/netcdf/Lib
+AM_CPPFLAGS += -I$(srcdir)/include -I$(top_srcdir)/contrib/netcdf/Lib
 
 noinst_LTLIBRARIES     = libexodusII.la
 

@@ -33,7 +33,7 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-INCLUDES = -I$(srcdir)/fpoptimizer
+AM_CPPFLAGS += -I$(srcdir)/fpoptimizer
 
 EXTRA_DIST    = # none, append below
 BUILT_SOURCES = # none, append below
