@@ -73,7 +73,6 @@ class LaspackLinearSolver : public LinearSolver<T>
    */
   void init ();
 
-
   /**
    * Call the Laspack solver
    */
@@ -83,6 +82,17 @@ class LaspackLinearSolver : public LinearSolver<T>
 	   NumericVector<T> &rhs,
 	   const double tol,
 	   const unsigned int m_its);
+
+  /**
+   * Call the Laspack solver to solve A^T x = b
+   */
+  std::pair<unsigned int, Real>
+    adjoint_solve (SparseMatrix<T>  &matrix,
+	           NumericVector<T> &solution,
+	           NumericVector<T> &rhs,
+	           const double tol,
+	           const unsigned int m_its);
+
   /**
    * Call the Laspack solver
    */
