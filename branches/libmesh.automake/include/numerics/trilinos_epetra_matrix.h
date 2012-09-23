@@ -351,6 +351,12 @@ private:
    * for the constructor which takes a PETSc Mat object.
    */
   bool _destroy_mat_on_exit;
+
+  /**
+   * Epetra has no GetUseTranspose so we need to keep track of whether
+   * we're transposed manually.
+   */
+  bool _use_transpose;
 };
 
 
@@ -361,7 +367,8 @@ private:
 template <typename T>
 inline
 EpetraMatrix<T>::EpetraMatrix()
-  : _destroy_mat_on_exit(true)
+  : _destroy_mat_on_exit(true),
+    _use_transpose(false)
 {}
 
 
@@ -370,7 +377,8 @@ EpetraMatrix<T>::EpetraMatrix()
 template <typename T>
 inline
 EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m)
- : _destroy_mat_on_exit(false)
+ : _destroy_mat_on_exit(false),
+   _use_transpose(false) // dumb guess is the best we can do...
 {
   this->_mat = m;
   this->_is_initialized = true;

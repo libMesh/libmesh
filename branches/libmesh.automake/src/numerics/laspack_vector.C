@@ -288,7 +288,7 @@ void LaspackVector<T>::scale (const T factor)
 {
   libmesh_assert (this->initialized());
 
-  Mul_SV (factor, &_vec);
+  Asgn_VV(&_vec, Mul_SV (factor, &_vec));
 }
 
 template <typename T>
