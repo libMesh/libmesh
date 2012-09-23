@@ -281,6 +281,183 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 
 template <typename T>
 std::pair<unsigned int, Real>
+LaspackLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
+			               NumericVector<T> &solution_in,
+			               NumericVector<T> &rhs_in,
+			               const double tol,
+			               const unsigned int m_its)
+{
+  START_LOG("adjoint_solve()", "LaspackLinearSolver");
+  this->init ();
+
+  // Make sure the data passed in are really in Laspack types
+  LaspackMatrix<T>* matrix   = libmesh_cast_ptr<LaspackMatrix<T>*>(&matrix_in);
+  LaspackVector<T>* solution = libmesh_cast_ptr<LaspackVector<T>*>(&solution_in);
+  LaspackVector<T>* rhs      = libmesh_cast_ptr<LaspackVector<T>*>(&rhs_in);
+
+  // Zero-out the solution to prevent the solver from exiting in 0
+  // iterations (?)
+  //TODO:[BSK] Why does Laspack do this?  Comment out this and try ex13...
+  solution->zero();
+
+  // Close the matrix and vectors in case this wasn't already done.
+  matrix->close ();
+  solution->close ();
+  rhs->close ();
+
+  // Set the preconditioner type
+  this->set_laspack_preconditioner_type ();
+
+  // Set the solver tolerance
+  SetRTCAccuracy (tol);
+
+  // Solve the linear system
+  switch (this->_solver_type)
+    {
+      // Conjugate-Gradient
+    case CG:
+      {
+	CGIter (Transp_Q(&matrix->_QMat),
+		&solution->_vec,
+		&rhs->_vec,
+		m_its,
+		_precond_type,
+		1.);
+	break;
+      }
+
+      // Conjugate-Gradient Normalized
+    case CGN:
+      {
+	CGNIter (Transp_Q(&matrix->_QMat),
+		 &solution->_vec,
+		 &rhs->_vec,
+		 m_its,
+		 _precond_type,
+		 1.);
+	break;
+      }
+
+      // Conjugate-Gradient Squared
+    case CGS:
+      {
+	CGSIter (Transp_Q(&matrix->_QMat),
+		 &solution->_vec,
+		 &rhs->_vec,
+		 m_its,
+		 _precond_type,
+		 1.);
+	break;
+      }
+
+      // Bi-Conjugate Gradient
+    case BICG:
+      {
+	BiCGIter (Transp_Q(&matrix->_QMat),
+		  &solution->_vec,
+		  &rhs->_vec,
+		  m_its,
+		  _precond_type,
+		  1.);
+	break;
+      }
+
+      // Bi-Conjugate Gradient Stabilized
+    case BICGSTAB:
+      {
+	BiCGSTABIter (Transp_Q(&matrix->_QMat),
+		      &solution->_vec,
+		      &rhs->_vec,
+		      m_its,
+		      _precond_type,
+		      1.);
+	break;
+      }
+
+      // Quasi-Minimum Residual
+    case QMR:
+      {
+	QMRIter (Transp_Q(&matrix->_QMat),
+		 &solution->_vec,
+		 &rhs->_vec,
+		 m_its,
+		 _precond_type,
+		 1.);
+	break;
+      }
+
+      // Symmetric over-relaxation
+    case SSOR:
+      {
+	SSORIter (Transp_Q(&matrix->_QMat),
+		  &solution->_vec,
+		  &rhs->_vec,
+		  m_its,
+		  _precond_type,
+		  1.);
+	break;
+      }
+
+      // Jacobi Relaxation
+    case JACOBI:
+      {
+	JacobiIter (Transp_Q(&matrix->_QMat),
+		    &solution->_vec,
+		    &rhs->_vec,
+		    m_its,
+		    _precond_type,
+		    1.);
+	break;
+      }
+
+      // Generalized Minimum Residual
+    case GMRES:
+      {
+	SetGMRESRestart (30);
+	GMRESIter (Transp_Q(&matrix->_QMat),
+		   &solution->_vec,
+		   &rhs->_vec,
+		   m_its,
+		   _precond_type,
+		   1.);
+	break;
+      }
+
+      // Unknown solver, use GMRES
+    default:
+      {
+	libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
+		      << this->_solver_type      << std::endl
+		      << "Continuing with GMRES" << std::endl;
+
+	this->_solver_type = GMRES;
+
+	return this->solve (*matrix,
+			    *solution,
+			    *rhs,
+			    tol,
+			    m_its);
+      }
+    }
+
+  // Check for an error
+  if (LASResult() != LASOK)
+    {
+      libMesh::err << "ERROR:  LASPACK Error: " << std::endl;
+      WriteLASErrDescr(stdout);
+      libmesh_error();
+    }
+
+  STOP_LOG("adjoint_solve()", "LaspackLinearSolver");
+  // Get the convergence step # and residual
+  return std::make_pair(GetLastNoIter(), GetLastAccuracy());
+}
+
+
+
+
+template <typename T>
+std::pair<unsigned int, Real>
 LaspackLinearSolver<T>::solve (const ShellMatrix<T>& /*shell_matrix*/,
 			       NumericVector<T>& /*solution_in*/,
 			       NumericVector<T>& /*rhs_in*/,
