@@ -377,9 +377,16 @@ void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 
 
 template <typename T>
-void EpetraMatrix<T>::get_transpose (SparseMatrix<T>&) const
+void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 {
-  libmesh_not_implemented();
+  // Make sure the SparseMatrix passed in is really a EpetraMatrix
+  EpetraMatrix<T>& epetra_dest = libmesh_cast_ref<EpetraMatrix<T>&>(dest);
+
+  if(&epetra_dest != this)
+    epetra_dest = *this;
+
+  epetra_dest._use_transpose = !epetra_dest._use_transpose;
+  epetra_dest._mat->SetUseTranspose(epetra_dest._use_transpose);
 }
 
 
