@@ -28,10 +28,10 @@ public:
       timesolver_upper_tolerance(0.),
       steadystate_tolerance(0.),
       timesolver_norm(0,L2),
-      dimension(2), 
+      dimension(2),
+	domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),	
 	fine_mesh_file_primal("fine_mesh.xda"), fine_mesh_soln_primal("fine_mesh_soln.xda"),
-	fine_mesh_file_adjoint("fine_mesh.xda"), fine_mesh_soln_adjoint("fine_mesh_soln.xda"),	
-      domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),	
+	fine_mesh_file_adjoint("fine_mesh.xda"), fine_mesh_soln_adjoint("fine_mesh_soln.xda"),	      
       elementorder(2),
       domain_xmin(0.0), domain_ymin(0.0), domain_zmin(0.0),
       domain_edge_width(1.0), domain_edge_length(1.0), domain_edge_height(1.0),
@@ -103,16 +103,16 @@ public:
     unsigned int nelem_target;
     Real global_tolerance;
     Real refine_fraction, coarsen_fraction, coarsen_threshold;
+    bool refine_uniformly;
     unsigned int max_adaptivesteps;
     unsigned int initial_adaptivesteps;
     unsigned int initial_sobolev_order;
     unsigned int initial_extra_quadrature;
 
-    bool refine_uniformly;
     std::string indicator_type;
-    std::string adjoint_residual_type;
     bool patch_reuse;
     unsigned int sobolev_order;
+    std::string adjoint_residual_type;   
     bool alternate_with_uniform_steps;
     unsigned int alternate_step_number;
     bool component_wise_error;

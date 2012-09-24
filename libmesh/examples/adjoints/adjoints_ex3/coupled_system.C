@@ -29,14 +29,12 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/zero_function.h"
 
-
 #include "coupled_system.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-
-// Boundary conditions for the 3D test case
+// Function to set the Dirichlet boundary function for the inlet boundary velocities
 class BdyFunction : public FunctionBase<Number>
 {
 public:
@@ -53,7 +51,8 @@ public:
     {
       output.resize(2);
       output.zero();
-      const Real x=p(0), y=p(1);
+      const Real y=p(1);
+      // Set the parabolic inflow boundary conditions at stations 0 & 1
       output(_u_var) = (_sign)*((y-2) * (y-3));
       output(_v_var) = 0;      
     }
@@ -96,15 +95,18 @@ void CoupledSystem::init_data ()
   p_var = this->add_variable ("p", static_cast<Order>(pressure_p),
 			      fefamily);
 
-  
+  // Add the Concentration variable "C". They will
+  // be approximated using second-order approximation, the same as the velocity components
+  C_var = this->add_variable ("C", static_cast<Order>(pressure_p+1),
+			      fefamily);
+
   // Tell the system to march velocity forward in time, but 
   // leave p as a constraint only
   this->time_evolving(u_var);
   this->time_evolving(v_var);
-  
+  this->time_evolving(C_var);
 
   // Useful debugging options
-  // Set verify_analytic_jacobians to 1e-6 to use
   this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
   this->print_jacobians = infile("print_jacobians", false);
   this->print_element_jacobians = infile("print_element_jacobians", false);
@@ -126,53 +128,47 @@ void CoupledSystem::init_data ()
   std::set<boundary_id_type> wall_bdy;
   wall_bdy.insert(wall_id);
   
-  std::vector<unsigned int> u_only(1, u_var);
+  // The uv identifier for the setting the inlet and wall velocity boundary conditions
   std::vector<unsigned int> uv(1, u_var);
   uv.push_back(v_var);
-      
+  // The C_only identifier for setting the concentrations at the inlets
+  std::vector<unsigned int> C_only(1, C_var);
+    
   // The zero and constant functions
   ZeroFunction<Number> zero;
   ConstFunction<Number> one(1);
 
-  // We need two functions for the inlets, because the signs on the velocities
+  // We need two boundary functions for the inlets, because the signs on the velocities
   // will be different
   int velocity_sign = 1;
   BdyFunction inflow_left(u_var, v_var, -velocity_sign);
   BdyFunction inflow_right(u_var, v_var, velocity_sign);
 
-  // On the walls we will apply the no slip boundary condition, u=0, v=0
+  // On the walls we will apply the no slip and no penetration boundary condition, u=0, v=0
   this->get_dof_map().add_dirichlet_boundary
         (DirichletBoundary (wall_bdy, uv, &zero));
 
-  // On the inlet (left)
+  // On the inlet (left), we apply parabolic inflow boundary conditions for the velocity, u = - (y-2)*(y-3), v=0
+  // and set C = 1
   this->get_dof_map().add_dirichlet_boundary
     (DirichletBoundary (left_inlet_bdy, uv, &inflow_left));
-  
+  this->get_dof_map().add_dirichlet_boundary
+    (DirichletBoundary (left_inlet_bdy, C_only, &one));
    
-  // On the inlet (right)
+  // On the inlet (right), we apply parabolic inflow boundary conditions for the velocity, u = (y-2)*(y-3), v=0
+  // and set C = 0
   this->get_dof_map().add_dirichlet_boundary
     (DirichletBoundary (right_inlet_bdy, uv, &inflow_right));
-  
-  //if(species_transport)
-  //{
-      // Add the Concentration variable "C". They will
-      // be approximated using second-order approximation
-      C_var = this->add_variable ("C", static_cast<Order>(pressure_p+1),
-			      fefamily);
-      this->time_evolving(C_var);
-      std::vector<unsigned int> C_only(1, C_var);
-      this->get_dof_map().add_dirichlet_boundary
-	(DirichletBoundary (left_inlet_bdy, C_only, &one));
-      this->get_dof_map().add_dirichlet_boundary
-	(DirichletBoundary (right_inlet_bdy, C_only, &zero));
-      //}
-  
+  this->get_dof_map().add_dirichlet_boundary
+    (DirichletBoundary (right_inlet_bdy, C_only, &zero));
 
+  // Note that the remaining boundary conditions are the natural boundary conditions for the concentration 
+  // on the wall (grad(c) dot n = 0) and natural boundary conditions for the velocity and the concentration 
+  // on the outlets ((grad(velocity) dot n - p n) dot t = 0, grad(C) dot n = 0)
+  
   // Do the parent's initialization after variables and boundary constraints are defined
   FEMSystem::init_data();
 }
-
-
 
 void CoupledSystem::init_context(DiffContext &context)
 {
@@ -220,10 +216,6 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
   // quadrature points.
   const std::vector<std::vector<Real> >& psi =
     c.element_fe_var[p_var]->get_phi();
-
-  // Physical location of the quadrature points
-  const std::vector<Point>& qpoint = 
-    c.element_fe_var[u_var]->get_xyz();
  
   // The number of local degrees of freedom in each variable
   const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
@@ -231,13 +223,10 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
   libmesh_assert_equal_to (n_u_dofs, c.dof_indices_var[v_var].size()); 
 
   // The subvectors and submatrices we need to fill:
-  const unsigned int dim = this->get_mesh().mesh_dimension();
   DenseSubMatrix<Number> &Kuu = *c.elem_subjacobians[u_var][u_var];
-  DenseSubMatrix<Number> &Kuv = *c.elem_subjacobians[u_var][v_var];
   DenseSubMatrix<Number> &Kup = *c.elem_subjacobians[u_var][p_var];
   DenseSubVector<Number> &Fu = *c.elem_subresiduals[u_var];
   
-  DenseSubMatrix<Number> &Kvu = *c.elem_subjacobians[v_var][u_var];  
   DenseSubMatrix<Number> &Kvv = *c.elem_subjacobians[v_var][v_var];      
   DenseSubMatrix<Number> &Kvp = *c.elem_subjacobians[v_var][p_var];    
   DenseSubVector<Number> &Fv = *c.elem_subresiduals[v_var];  
@@ -267,11 +256,7 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
 
       // Definitions for convenience.  It is sometimes simpler to do a
       // dot product if you have the full vector at your disposal.
-      NumberVectorValue U     (u,     v);      
-      const Number u_x = grad_u(0);
-      const Number u_y = grad_u(1);      
-      const Number v_x = grad_v(0);
-      const Number v_y = grad_v(1);            
+      NumberVectorValue U     (u,     v);           
       const Number C_x = grad_C(0);
       const Number C_y = grad_C(1);
 
@@ -280,6 +265,7 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
       // for both at the same time.
       for (unsigned int i=0; i != n_u_dofs; i++)
         {
+	  // Stokes equations residuals
           Fu(i) += JxW[qp] *
                    (p*dphi[i][qp](0) -                // pressure term
 		    (grad_u*dphi[i][qp]));            // diffusion term                  		    
@@ -288,7 +274,10 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
                    (p*dphi[i][qp](1) -                // pressure term
 		    (grad_v*dphi[i][qp]));            // diffusion term		    		    	    
 
-	  FC(i) += JxW[qp] * ( (U*grad_C)*phi[i][qp] + (1./Peclet)*(grad_C*dphi[i][qp]) ); // Concentration Equation Residual	      	    
+	  // Concentration Equation Residual
+	  FC(i) += JxW[qp] * 
+	           ( (U*grad_C)*phi[i][qp] +                // convection term
+	            (1./Peclet)*(grad_C*dphi[i][qp]) );     // diffusion term     	    
 
           // Note that the Fp block is identically zero unless we are using
           // some kind of artificial compressibility scheme...
@@ -304,13 +293,13 @@ bool CoupledSystem::element_time_derivative (bool request_jacobian,
                          		  
                   Kvv(i,j) += JxW[qp] * (-(dphi[i][qp]*dphi[j][qp])); /* diffusion term  */
 		                    
-		  KCu(i,j) += JxW[qp]* ( (phi[j][qp]*C_x)*phi[i][qp] );
+		  KCu(i,j) += JxW[qp]* ( (phi[j][qp]*C_x)*phi[i][qp] ); /* convection term */
 		  
-		  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );		  	   
+		  KCv(i,j) += JxW[qp]*( (phi[j][qp]*C_y)*phi[i][qp] );  /* convection term */		  	   
 		  
 		  KCC(i,j) += JxW[qp]*
-		    ( (U*dphi[j][qp])*phi[i][qp] + (1./Peclet)*(dphi[j][qp]*dphi[i][qp]) );
-
+		              ( (U*dphi[j][qp])*phi[i][qp] +      /* nonlinear term (convection) */  
+		              (1./Peclet)*(dphi[j][qp]*dphi[i][qp]) ); /* diffusion term */
 		}
 	      
 	      // Matrix contributions for the up and vp couplings.
@@ -354,7 +343,6 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
   const unsigned int n_p_dofs = c.dof_indices_var[p_var].size();
 
   // The subvectors and submatrices we need to fill:
-  const unsigned int dim = this->get_mesh().mesh_dimension();
   DenseSubMatrix<Number> &Kpu = *c.elem_subjacobians[p_var][u_var];
   DenseSubMatrix<Number> &Kpv = *c.elem_subjacobians[p_var][v_var];  
   DenseSubVector<Number> &Fp = *c.elem_subresiduals[p_var];
@@ -391,151 +379,23 @@ bool CoupledSystem::element_constraint (bool request_jacobian,
 }
 
 void CoupledSystem::postprocess()
-{  
-  // We need to overload the postprocess function
-  // to get the contributions to computed_QoI from each parallel node
-
+{    
+  // We need to overload the postprocess function to set the computed_QoI variable of the CoupledSystem class
+  // to the qoi value stored in System::qoi[0]
+  
   computed_QoI = 0.0;
 
-  FEMSystem::postprocess();
-
-  Parallel::sum(computed_QoI);
+  computed_QoI = System::qoi[0];
 }
 
-
-
-void CoupledSystem::side_postprocess(DiffContext &context)
-{
-  
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
-  
-  // First we get some references to cell-specific data that
-  // will be used to assemble the linear system.
-
-  // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.side_fe_var[0]->get_JxW();
-
-  const std::vector<Point > &q_point = c.side_fe_var[0]->get_xyz();
-
-  const std::vector<Point> &face_normals = c.side_fe_var[0]->get_normals();
-
-  // Loop over qp's, compute the function at each qp and add
-  // to get the QoI
-
-  unsigned int n_qpoints = c.side_qrule->n_points();  
-    
-  // Get the bdry id for this bdry
-  short int bc_id = this->get_mesh().boundary_info->boundary_id (c.elem, c.side);
-  if (bc_id==BoundaryInfo::invalid_id)
-    {
-      std::cout<<"Invalid Boundary id "<<std::endl<<std::endl;
-      libmesh_error();
-    }
-
-  Real dQoI_0 = 0. ;
-  Number u = 0. ;
-  Number C = 0. ;
-  
-  // If side is on the left outlet
-  if(bc_id == 2) 
-    {             
-      //Loop over all the qps on this side 
-      for (unsigned int qp=0; qp != n_qpoints; qp++) 
-	{ 
-	  Real x = q_point[qp](0);
-
-	  if(x < 0.)
-	    {
-	      // Get u and C at the qp 
-	      u = c.side_value(0,qp);
-	      C = c.side_value(3,qp);
-	  
-	      dQoI_0 += JxW[qp] * -u * C;
-	    } // end if
-	  
-  	} // end quadrature loop
-
-    } // end if on bdry
-    
-  computed_QoI += dQoI_0;
-    
-}
-
-
-
-void CoupledSystem::side_qoi_derivative (DiffContext &context,
-                                      const QoISet &qois)
-{
-  FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
-   
-  // Element Jacobian * quadrature weights for interior integration
-  const std::vector<Real> &JxW = c.side_fe_var[0]->get_JxW();
-
-  // Get velocity basis functions phi
-  const std::vector<std::vector<Real> > &phi = c.side_fe_var[0]->get_phi();
-
-  const std::vector<Point > &q_point = c.side_fe_var[0]->get_xyz();
-          
-  // The number of local degrees of freedom in each variable  
-  const unsigned int n_u_dofs = c.dof_indices_var[1].size();  
-        
-  DenseSubVector<Number> &Qu = *c.elem_qoi_subderivatives[0][0];
-  DenseSubVector<Number> &QC = *c.elem_qoi_subderivatives[0][3];
-  
-  // Now we will build the element Jacobian and residual.
-  // Constructing the residual requires the solution and its
-  // gradient from the previous timestep.  This must be
-  // calculated at each quadrature point by summing the
-  // solution degree-of-freedom values by the appropriate
-  // weight functions.
-  unsigned int n_qpoints = c.side_qrule->n_points();  
-  
-  // Get the bdry id for this bdry
-  short int bc_id = this->get_mesh().boundary_info->boundary_id (c.elem, c.side);
-  if (bc_id==BoundaryInfo::invalid_id)
-    {
-      std::cout<<"Invalid Boundary id "<<std::endl<<std::endl;
-      libmesh_error();
-    }
-
-  Number u = 0. ;
-  Number C = 0. ;
-
-  // // If side is on outlet
-  if(bc_id == 2)
-    {
-      // Loop over all the qps on this side
-      for (unsigned int qp=0; qp != n_qpoints; qp++)
-  	{      
-	  Real x = q_point[qp](0);
-
-	  if(x < 0.)
-	    {
-	      // Get u at the qp 
-	      u = c.side_value(0,qp);
-	      C = c.side_value(3,qp);
-	      
-	      // Add the contribution from each basis function
-	      for (unsigned int i=0; i != n_u_dofs; i++)
-		{
-		  Qu(i) += JxW[qp] * -phi[i][qp] * C;
-		  QC(i) += JxW[qp] * phi[i][qp] * -u;
-		}
-	    } // end if
-	    	  
-  	} // end quadrature loop
-
-    } // end if on outlet    
-
-}
-
-
-
+// These functions supply the nonlinear weighting for the adjoint residual error estimate which 
+// arise due to the convection term in the convection-diffusion equation:
+// ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} +  
+// ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2}
+// These functions compute (u_1)_h and (u_2)_h and supply it to the weighted patch recovery error estimator
 Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
-			     const Real time)
-{
-  //FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
- 
+					const Real /* time */)
+{ 
   Real w = 1.;
   
   Number u = c.point_value(0, p);
@@ -546,13 +406,9 @@ Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
 
 }
 
-
-
 Number CoupledFEMFunctionsy::operator()(const FEMContext& c, const Point& p,
-			     const Real time)
+					const Real /* time */)
 {
-  //FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
- 
   Real w = 1.;
   
   Number v = c.point_value(1, p);
