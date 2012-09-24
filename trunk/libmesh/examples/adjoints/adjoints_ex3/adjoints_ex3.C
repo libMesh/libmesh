@@ -55,6 +55,46 @@
 #include "femparameters.h"
 #include "mysystems.h"
 #include "output.h"
+#include "H-qoi.h"
+
+// We solve a coupled Stokes + Convection Diffusion system in an H channel geometry 
+// with 2 inlets and 2 outlets. The QoI is the species 
+// flux from left outlet
+
+// Channel Geometry:
+//                              Wall
+//  ----------------------------------------------------------------
+// 0                                                                1
+//  ----------------------------     ------------------------------- 
+//                             |     |
+//                        Wall |     | Wall
+//                             |     |
+// -----------------------------     -------------------------------
+// 2                                                               2
+// -----------------------------------------------------------------
+//                              Wall
+
+// The equations governing this flow are:
+// Stokes: -VectorLaplacian(velocity) + grad(pressure) = vector(0)
+// Convection-Diffusion: - dot(velocity, grad(concentration) ) + Laplacian(concentration) = 0  
+
+// The boundary conditions are:
+// u_1(0) = -(y-2)*(y-3), u_2(0) = 0 ; u_1(1) = (y-2)*(y-3), u_2(1) = 0 ; 
+// u_1(walls) = 0, u_2(walls) = 0;
+// C(0) = 1 ; C(1) = 0;
+// grad(C) dot n (walls) = 0 ;
+// grad(C) dot n (2) = 0 ; grad(C) dot n (3) = 0  
+
+// The QoI is:
+// Q((u,v), C) = integral_{left_outlet}  - u * C ds
+
+// The complete equal order adjoint QoI error estimate is: (Notation for derivatives: grad(C) = C,1 + C,2) 
+// Q(u) - Q(u_h) \leq 
+// |e(u_1)|_{H1} |e(u_1^*)|_{H1} +  |e(u_2)|_{H1} |e(u_2^*)|_{H1} +  (1/Pe) * |e(C)|_{H1} |e(C^*)|_{H1}  + 
+//  ||e(u_1,1)||_{L2} ||e(p^*)||_{L2} + ||e(u_2,2)||_{L2} ||e(p^*)||_{L2} + ||e(u_1,1^*)||_{L2} ||e(p)||_{L2} + ||e(u_2,2^*)||_{L2} ||e(p)||_{L2}  +
+// ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} +  
+// ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2}
+// = error_non_pressure + error_with_pressure + error_convection_diffusion_x + error_convection_diffusion_y
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -495,7 +535,9 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
   return mesh_refinement;
 }
 
-AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
+// This function builds the Kelly error indicator. This indicator can be used
+// for comparisons of adjoint and non-adjoint based error indicators 
+AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters& /* param */)
 {
   AutoPtr<ErrorEstimator> error_estimator;
 
@@ -504,15 +546,15 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
   return error_estimator;
 }
 
-
+// Functions to build the adjoint based error indicators
+// The error_non_pressure and error_pressure constributions are estimated using 
+// the build_error_estimator_component_wise function below
 AutoPtr<ErrorEstimator>
 build_error_estimator_component_wise
   (FEMParameters &param, 
-   unsigned int a_number,
    std::vector<std::vector<Number> > &term_weights,
    std::vector<libMeshEnums::FEMNormType> &primal_error_norm_type,
-   std::vector<libMeshEnums::FEMNormType> &dual_error_norm_type,
-   unsigned int gmv_flag)
+   std::vector<libMeshEnums::FEMNormType> &dual_error_norm_type)
 {  
   AutoPtr<ErrorEstimator> error_estimator;
 
@@ -523,17 +565,7 @@ build_error_estimator_component_wise
   // We solve the adjoint problem beforehand reusing the preconditioner from the forward solve
   adjoint_residual_estimator->adjoint_already_solved = true;
 
-  if(param.write_gmv_error)
-     {
-       OStringStream error_gmv;
-       error_gmv << "error.gmv.";
-       OSSRealzeroright(error_gmv,3,0, a_number);
-       error_gmv <<".";
-       OSSRealzeroright(error_gmv,1,0, gmv_flag);      
-
-       adjoint_residual_estimator->error_plot_suffix = error_gmv.str();
-     }
-
+  // Both the primal and dual weights are going to be estimated using the patch recovery error estimator
   PatchRecoveryErrorEstimator *p1 =
     new PatchRecoveryErrorEstimator;
   adjoint_residual_estimator->primal_error_estimator().reset(p1);
@@ -542,9 +574,14 @@ build_error_estimator_component_wise
     new PatchRecoveryErrorEstimator;
   adjoint_residual_estimator->dual_error_estimator().reset(p2);  
 
+  // Set the boolean for specifying whether we are reusing patches while building the patch recovery estimates
   p1->set_patch_reuse(param.patch_reuse);
   p2->set_patch_reuse(param.patch_reuse);
 
+  // Using the user filled error norm type vector, we pass the type of norm to be used for 
+  // the error in each variable, we can have different types of norms for the primal and
+  // dual variables
+  
   adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(0, primal_error_norm_type[0]);      
   adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(1, primal_error_norm_type[1]);
   adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(2, primal_error_norm_type[2]);
@@ -555,7 +592,8 @@ build_error_estimator_component_wise
   adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(2, dual_error_norm_type[2]);
   adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(3, dual_error_norm_type[3]);  
 
-  // Now set the right weights for each term in the error estimate
+  // Now we set the right weights for each term in the error estimate, using the user provided
+  // term_weights matrix
   adjoint_residual_estimator->error_norm.set_weight(0, term_weights[0][0]);
   adjoint_residual_estimator->error_norm.set_weight(1, term_weights[1][1]);
   adjoint_residual_estimator->error_norm.set_weight(2, term_weights[2][2]);
@@ -580,15 +618,15 @@ build_error_estimator_component_wise
   return error_estimator;
 }
 
+// The error_convection_diffusion_x and error_convection_diffusion_y are the nonlinear contributions which 
+// are computed using the build_weighted_error_estimator_component_wise below
 AutoPtr<ErrorEstimator>
 build_weighted_error_estimator_component_wise
   (FEMParameters &param,
-   unsigned int a_number,
    std::vector<std::vector<Number> > &term_weights,
    std::vector<libMeshEnums::FEMNormType> &primal_error_norm_type,
    std::vector<libMeshEnums::FEMNormType> &dual_error_norm_type,
-   std::vector<FEMFunctionBase<Number>*> coupled_system_weight_functions,
-   unsigned int gmv_flag)
+   std::vector<FEMFunctionBase<Number>*> coupled_system_weight_functions)
 {  
   AutoPtr<ErrorEstimator> error_estimator;
 
@@ -599,16 +637,9 @@ build_weighted_error_estimator_component_wise
   // We solve the adjoint problem beforehand reusing the preconditioner from the forward solve
   adjoint_residual_estimator->adjoint_already_solved = true;
 
-  if(param.write_gmv_error)
-     {
-       OStringStream error_gmv;
-       error_gmv << "error.gmv.";
-       OSSRealzeroright(error_gmv,3,0, a_number);
-       error_gmv <<".";
-       OSSRealzeroright(error_gmv,1,0, gmv_flag);      
-
-       adjoint_residual_estimator->error_plot_suffix = error_gmv.str();
-     }
+  // Using the user filled error norm type vector, we pass the type of norm to be used for 
+  // the error in each variable, we can have different types of norms for the primal and
+  // dual variables
 
   WeightedPatchRecoveryErrorEstimator *p1 =
     new WeightedPatchRecoveryErrorEstimator;
@@ -621,8 +652,11 @@ build_weighted_error_estimator_component_wise
   p1->set_patch_reuse(param.patch_reuse);
   p2->set_patch_reuse(param.patch_reuse);
 
+  // This is the critical difference with the build_error_estimate_component_wise
   p1->weight_functions.clear();
 
+  // We pass the pointers to the user specified weight functions to the patch recovery
+  // error estimator objects declared above
   p1->weight_functions.push_back(coupled_system_weight_functions[0]);
   p1->weight_functions.push_back(coupled_system_weight_functions[1]);
   p1->weight_functions.push_back(coupled_system_weight_functions[2]);
@@ -638,7 +672,8 @@ build_weighted_error_estimator_component_wise
   adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(2, dual_error_norm_type[2]);
   adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(3, dual_error_norm_type[3]);  
 
-  // Now set the right weights for each term in the error estimate
+  // Now we set the right weights for each term in the error estimate, using the user provided
+  // term_weights matrix
   adjoint_residual_estimator->error_norm.set_weight(0, term_weights[0][0]);
   adjoint_residual_estimator->error_norm.set_weight(1, term_weights[1][1]);
   adjoint_residual_estimator->error_norm.set_weight(2, term_weights[2][2]);
@@ -704,9 +739,6 @@ int main (int argc, char** argv)
   if (!param.initial_timestep && param.run_simulation)
     build_domain(mesh, param);
 
-  // Uniformly refine it
-  //mesh_refinement->uniformly_refine(1);
-
   std::cout << "Building system" << std::endl;
 
   FEMSystem &system = build_system(equation_systems, infile, param);
@@ -714,6 +746,14 @@ int main (int argc, char** argv)
   set_system_parameters(system, param);
 
   std::cout << "Initializing systems" << std::endl;
+
+  // Create a QoI object, we will need this to compute the QoI
+  {
+    CoupledSystemQoI qoi;
+    // Our QoI is computed on the side
+    qoi.assemble_qoi_sides = true;
+    system.attach_qoi(&qoi);
+  }
 
   equation_systems.init ();
 
@@ -723,9 +763,7 @@ int main (int argc, char** argv)
 
   std::cout<<"Starting adaptive loop"<<std::endl<<std::endl;
 
-  // Count the number of steps used
-  unsigned int newton_steps = 0;
-  unsigned int krylov_steps = 0;
+  // Count the number of steps used  
   unsigned int a_step = 0;
 
   // Get the linear solver object to set the preconditioner reuse flag
@@ -755,17 +793,21 @@ int main (int argc, char** argv)
                     << " active elements and " << equation_systems.n_active_dofs()
                 << " active dofs." << std::endl << std::endl;
 
+      // Solve the forward system
       system.solve();
 
+      // Write the output
       write_output(equation_systems, 0, a_step, "primal", param);
 
-      // Our QoI is integrated on the side
-      system.postprocess_sides = true;
+      // Compute the QoI
+      system.assemble_qoi();
 
-      // Postprocess to get the averaged corner velocities and the QoI
+      // We just call a postprocess here to set the variable computed_QoI to the value computed by assemble_qoi
       system.postprocess();
 
+      // Get the value of the computed_QoI variable of the CoupledSystem class 
       Number QoI_0_computed = (dynamic_cast<CoupledSystem&>(system)).get_QoI_value();
+
       std::cout<< "The boundary QoI is " << std::setprecision(17) << QoI_0_computed << std::endl << std::endl;
 
       // You dont need to compute error estimates and refine at the last
@@ -786,6 +828,8 @@ int main (int argc, char** argv)
           std::cout<< "Solving the adjoint problem" <<std::endl;
           system.adjoint_solve();
 
+	  // To plot the adjoint solution, we swap it with the primal solution 
+	  // and use the write_output function
           NumericVector<Number> &dual_solution = system.get_adjoint_solution();
           primal_solution.swap(dual_solution);
 
@@ -794,23 +838,21 @@ int main (int argc, char** argv)
           // Swap back
           primal_solution.swap(dual_solution);
 
-          // We need the values of the parameters beta and Pe from the
+          // We need the values of the parameters Pe from the
           // system for the adjoint error estimate
           Number Pe = (dynamic_cast<CoupledSystem&>(system)).get_Pe();
 
-          ErrorVector error;
-
-          // The total error is the sum of the error_non_pressure +
+	  // The total error is the sum: error = error_non_pressure +
           // error_with_pressure + ...
           // error_estimator_convection_diffusion_x +
           // error_estimator_convection_diffusion_y
-
-          // We construct the non-pressure and pressure contributions
-          // to the error separately
+          ErrorVector error;
+          
+          // We first construct the non-pressure contributions 
           ErrorVector error_non_pressure;
 
-          // First building norm_type_vector_non_pressure and
-          // weights_matrix_non_pressure for the non-pressure term
+          // First we build the norm_type_vector_non_pressure vectors and
+          // weights_matrix_non_pressure matrix for the non-pressure term
           // error contributions
           std::vector<libMeshEnums::FEMNormType>
             primal_norm_type_vector_non_pressure;                        
@@ -844,32 +886,32 @@ int main (int argc, char** argv)
           weights_matrix_non_pressure[2][2] = 0.;
           weights_matrix_non_pressure[2][3] = 0.;
 
-
           weights_matrix_non_pressure[3][0] = 0.;
           weights_matrix_non_pressure[3][1] = 0.;
           weights_matrix_non_pressure[3][2] = 0.;
           weights_matrix_non_pressure[3][3] = 1./Pe;
 
-          // Build the error estimator to estimate the contributions
+          // We build the error estimator to estimate the contributions
           // to the QoI error from the non pressure term
           AutoPtr<ErrorEstimator> error_estimator_non_pressure = 
             build_error_estimator_component_wise
-              (param, a_step, weights_matrix_non_pressure,
+              (param, weights_matrix_non_pressure,
                primal_norm_type_vector_non_pressure,
-               dual_norm_type_vector_non_pressure, 10);
+               dual_norm_type_vector_non_pressure);
 
           // Estimate the contributions to the QoI error from the non
           // pressure terms
           error_estimator_non_pressure->estimate_error(system, error_non_pressure);
 
+	  // Plot the estimated error from the non_pressure terms
           write_error(equation_systems, error_non_pressure, 0, a_step, param, "_non_pressure");
 
-          // Now for the pressure contribs
+          // Now for the pressure contributions
           ErrorVector error_with_pressure;
 
-          // Now building norm_type_vector_with_pressure and
-          // weights_matrix_with_pressure for the pressure term error
-          // contributions
+	  // Next we build the norm_type_vector_with_pressure vectors and
+          // weights_matrix_with_pressure matrix for the pressure term
+          // error contributions
           std::vector<libMeshEnums::FEMNormType>
             primal_norm_type_vector_with_pressure;                        
           primal_norm_type_vector_with_pressure.push_back(H1_X_SEMINORM);
@@ -908,26 +950,25 @@ int main (int argc, char** argv)
           weights_matrix_with_pressure[3][2] = 0.;
           weights_matrix_with_pressure[3][3] = 0.;                  
 
-          // Build the error estimator to estimate the contributions
+          // We build the error estimator to estimate the contributions
           // to the QoI error from the pressure term
           AutoPtr<ErrorEstimator> error_estimator_with_pressure =
             build_error_estimator_component_wise
-              (param, a_step, weights_matrix_with_pressure,
+              (param, weights_matrix_with_pressure,
                primal_norm_type_vector_with_pressure,
-               dual_norm_type_vector_with_pressure, 20);
+               dual_norm_type_vector_with_pressure);
 
           // Estimate the contributions to the QoI error from the pressure terms  
           error_estimator_with_pressure->estimate_error(system, error_with_pressure);
 
+	  // Plot the error due to the pressure terms
           write_error(equation_systems, error_with_pressure, 0, a_step, param, "_with_pressure");
 
-          // Get the error contribution from the convection diffusion
-          // equation weighted with the dual concentration
+          // Now for the convection diffusion term errors (in the x and y directions)
+	  
           ErrorVector error_convection_diffusion_x;
 
-          // Now building norm_type_vector_with_pressure and
-          // weights_matrix_with_pressure for the pressure term error
-          // contributions
+          // The norm type vectors and weights matrix for the convection_diffusion_x errors
           std::vector<libMeshEnums::FEMNormType>
             primal_norm_type_vector_convection_diffusion_x;                        
           primal_norm_type_vector_convection_diffusion_x.push_back(L2);
@@ -942,7 +983,7 @@ int main (int argc, char** argv)
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
           // Note that we need the error of the dual concentration in L2
           dual_norm_type_vector_convection_diffusion_x.push_back(L2);
-
+	  
           std::vector<std::vector<Number> >
             weights_matrix_convection_diffusion_x
               (system.n_vars(),
@@ -967,9 +1008,13 @@ int main (int argc, char** argv)
           weights_matrix_convection_diffusion_x[3][2] = 0.;
           weights_matrix_convection_diffusion_x[3][3] = 1.;                  
 
+	  // We will also have to build and pass the weight functions to the weighted patch recovery estimators
+	  
+	  // We pass the identity function as weights to error entries that the above matrix will scale to 0.
           ConstFEMFunction<Number> identity(1);
 
-          // Declare objects of class CoupledFEMFunctionsx
+          // Declare object of class CoupledFEMFunctionsx, the definition of the function contains the weight 
+	  // to be applied to the relevant terms
           CoupledFEMFunctionsx convdiffx(system);                  
 
           // Make a vector of pointers to these objects
@@ -977,30 +1022,30 @@ int main (int argc, char** argv)
           coupled_system_weight_functions_x.push_back(&identity);
           coupled_system_weight_functions_x.push_back(&identity);
           coupled_system_weight_functions_x.push_back(&identity);                  
-          coupled_system_weight_functions_x.push_back(&convdiffx);                  
+          coupled_system_weight_functions_x.push_back(&convdiffx);                         
 
           // Build the error estimator to estimate the contributions
-          // to the QoI error from the pressure term
+          // to the QoI error from the convection diffusion x term
           AutoPtr<ErrorEstimator> error_estimator_convection_diffusion_x =
           build_weighted_error_estimator_component_wise
-            (param, a_step, weights_matrix_convection_diffusion_x,
+            (param, weights_matrix_convection_diffusion_x,
              primal_norm_type_vector_convection_diffusion_x,
              dual_norm_type_vector_convection_diffusion_x,
-             coupled_system_weight_functions_x, 30);
+             coupled_system_weight_functions_x);
 
           // Estimate the contributions to the QoI error from the
-          // convection diffusion terms  
+          // convection diffusion x term  
           error_estimator_convection_diffusion_x->estimate_error
             (system, error_convection_diffusion_x);
 
+	  // Plot this error
           write_error(equation_systems, error_convection_diffusion_x,
                       0, a_step, param, "_convection_diffusion_x");
-
+	  
+	  // Now for the y direction terms
           ErrorVector error_convection_diffusion_y;
 
-          // Now building norm_type_vector_with_pressure and
-          // weights_matrix_with_pressure for the pressure term error
-          // contributions
+          // The norm type vectors and weights matrix for the convection_diffusion_x errors
           std::vector<libMeshEnums::FEMNormType>
             primal_norm_type_vector_convection_diffusion_y;                        
           primal_norm_type_vector_convection_diffusion_y.push_back(L2);
@@ -1015,7 +1060,7 @@ int main (int argc, char** argv)
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
           // Note that we need the error of the dual concentration in L2
           dual_norm_type_vector_convection_diffusion_y.push_back(L2);
-
+	  
           std::vector<std::vector<Number> >
             weights_matrix_convection_diffusion_y
               (system.n_vars(), std::vector<Number>(system.n_vars(), 0.0));
@@ -1038,8 +1083,7 @@ int main (int argc, char** argv)
           weights_matrix_convection_diffusion_y[3][1] = 0.;
           weights_matrix_convection_diffusion_y[3][2] = 0.;
           weights_matrix_convection_diffusion_y[3][3] = 1.;                  
-
-          // Declare objects of class CoupledFEMFunctionsy                  
+          
           CoupledFEMFunctionsy convdiffy(system);                  
 
           // Make a vector of pointers to these objects
@@ -1048,25 +1092,23 @@ int main (int argc, char** argv)
           coupled_system_weight_functions_y.push_back(&identity);
           coupled_system_weight_functions_y.push_back(&identity);
           coupled_system_weight_functions_y.push_back(&convdiffy);                  
-
+	  
           // Build the error estimator to estimate the contributions
-          // to the QoI error from the pressure term
+          // to the QoI error from the convection diffsion y term
           AutoPtr<ErrorEstimator> error_estimator_convection_diffusion_y =
             build_weighted_error_estimator_component_wise
-              (param, a_step, weights_matrix_convection_diffusion_y,
+              (param, weights_matrix_convection_diffusion_y,
                primal_norm_type_vector_convection_diffusion_y,
                dual_norm_type_vector_convection_diffusion_y,
-               coupled_system_weight_functions_y, 40);
+               coupled_system_weight_functions_y);
 
           // Estimate the contributions to the QoI error from the
-          // convection diffusion terms  
+          // convection diffusion y terms  
           error_estimator_convection_diffusion_y->estimate_error(system, error_convection_diffusion_y);
 
+	  // Plot this error
           write_error(equation_systems, error_convection_diffusion_y, 0, a_step, param, "_convection_diffusion_y");
-
-          libmesh_assert_equal_to(error_non_pressure.size(), error_with_pressure.size()); 
-          libmesh_assert_equal_to(error_convection_diffusion_x.size(), error_non_pressure.size());
-
+	            
           if(param.indicator_type == "adjoint_residual")
             {
               error.resize(error_non_pressure.size());
@@ -1107,23 +1149,6 @@ int main (int argc, char** argv)
 
               // Carry out the adaptive mesh refinement/coarsening
               mesh_refinement->refine_and_coarsen_elements();
-            }
-          else if(param.alternate_with_uniform_steps) // Do alternate adaptive and uniform steps
-            {
-              //Refine uniformly every param.alternate_step_number, For eg. if param.alternate_step_number = 5, every 5th step will be uniform
-              if((a_step !=0 && a_step >= 10) && ((a_step % param.alternate_step_number == 0) || (a_step % param.alternate_step_number == 1)) )
-                {
-                  std::cout<<"Not refining adaptively ! Doing a uniform refinement step !"<<std::endl<<std::endl;
-                  mesh_refinement->uniformly_refine(1);
-
-                }
-              else // Refine adaptively on the other steps
-                {
-                  std::cout<<"Refining adaptively based on n elem target"<<std::endl<<std::endl;
-                  mesh_refinement->flag_elements_by_nelem_target (error);              
-                  // Carry out the adaptive mesh refinement/coarsening
-                  mesh_refinement->refine_and_coarsen_elements();
-                }
             }
           else // Refine based on reaching a target number of elements
             {                                
