@@ -470,10 +470,6 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
                                         param.deltat_reductions;
   system.time_solver->quiet           = param.time_solver_quiet;
 
-  // Create any periodic boundary conditions
-  for (unsigned int i=0; i != param.periodic_boundaries.size(); ++i)
-    system.get_dof_map().add_periodic_boundary(param.periodic_boundaries[i]);
-
   // Set the time stepping options
   system.deltat = param.deltat;
 
@@ -515,6 +511,8 @@ void set_system_parameters(FEMSystem &system, FEMParameters &param)
     }
 }
 
+#ifdef LIBMESH_ENABLE_AMR
+
 AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
                                               FEMParameters &param)
 {
@@ -528,6 +526,8 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
 
   return mesh_refinement;
 }
+
+#endif // LIBMESH_ENABLE_AMR
 
 // This function builds the Kelly error indicator. This indicator can be used
 // for comparisons of adjoint and non-adjoint based error indicators 
@@ -670,6 +670,11 @@ int main (int argc, char** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
+
+  // Skip adaptive examples on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_assert(false, "--enable-amr");
+#else
 
   std::cout << "Started " << argv[0] << std::endl;
 
@@ -1080,6 +1085,8 @@ int main (int argc, char** argv)
 
   write_output_footers(param);
 
+#endif // #ifndef LIBMESH_ENABLE_AMR
+    
   // All done.  
   return 0;    
 

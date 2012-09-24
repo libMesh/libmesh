@@ -1,7 +1,4 @@
 
-#include "libmesh/periodic_boundaries.h"
-#include "libmesh/periodic_boundary.h"
-
 #include "femparameters.h"
 
 using namespace libMesh;
@@ -76,65 +73,6 @@ void FEMParameters::read(GetPot &input)
     GETPOT_INT_INPUT(coarserefinements);
     GETPOT_INT_INPUT(coarsecoarsenings);
     GETPOT_INT_INPUT(extrarefinements);
-    
-    //GETPOT_REGISTER(periodic_boundaries);
-    // const unsigned int n_periodic_bcs =
-    //   input.vector_variable_size("periodic_boundaries");
-
-    // if (n_periodic_bcs)
-    //   {
-    //     if (domaintype != "square" && domaintype != "od2")
-    //       {
-    //         std::cout << "Periodic boundaries need rectilinear domains" << std::endl;;
-    //         libmesh_error();
-    //       }
-    //     periodic_boundaries.resize(n_periodic_bcs);
-    //     for (unsigned int i=0; i != n_periodic_bcs; ++i)
-    //       {
-    //         periodic_boundaries[i].myboundary =
-    //           input("periodic_boundaries", (int)periodic_boundaries[i].myboundary, i);
-    //         if (dimension == 2)
-    //           switch (periodic_boundaries[i].myboundary)
-    //           {
-    //           case 0:
-    //             periodic_boundaries[i].pairedboundary = 2;
-    //             periodic_boundaries[i].translation_vector =
-    //               RealVectorValue(0., domain_edge_length);
-    //             break;
-    //           case 1:
-    //             periodic_boundaries[i].pairedboundary = 3;
-    //                 periodic_boundaries[i].translation_vector =
-    //           RealVectorValue(-domain_edge_width, 0);
-    //             break;
-    //           default:
-    //             std::cout << "Unrecognized periodic boundary id" << std::endl;;
-    //             libmesh_error();
-    //           }
-    //         else if (dimension == 3)
-    //           switch (periodic_boundaries[i].myboundary)
-    //           {
-    //           case 0:
-    //             periodic_boundaries[i].pairedboundary = 5;
-    //             periodic_boundaries[i].translation_vector =
-    //               RealVectorValue(0., 0., domain_edge_height);
-    //             break;
-    //           case 1:
-    //             periodic_boundaries[i].pairedboundary = 3;
-    //             periodic_boundaries[i].translation_vector =
-    //               RealVectorValue(0., domain_edge_length, 0.);
-    //             break;
-    //           case 2:
-    //             periodic_boundaries[i].pairedboundary = 4;
-    //             periodic_boundaries[i].translation_vector =
-    //               RealVectorValue(-domain_edge_width, 0., 0.);
-    //             break;
-    //           default:
-    //             std::cout << "Unrecognized periodic boundary id" << std::endl;;
-    //             libmesh_error();
-    //           }
-    //       }
-    //   }
-
     GETPOT_INPUT(use_petsc_snes);
     GETPOT_INPUT(time_solver_quiet);
     GETPOT_INPUT(solver_quiet);
