@@ -8,8 +8,6 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/getpot.h"
-#include "libmesh/periodic_boundaries.h"
-#include "libmesh/periodic_boundary.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -37,7 +35,6 @@ public:
       domain_edge_width(1.0), domain_edge_length(1.0), domain_edge_height(1.0),
       coarsegridx(1), coarsegridy(1), coarsegridz(1),
 	coarserefinements(0), coarsecoarsenings(0), extrarefinements(0),
-      periodic_boundaries(0),
       use_petsc_snes(false),
       time_solver_quiet(true), solver_quiet(true),
 	reuse_preconditioner(false),
@@ -89,8 +86,6 @@ public:
     Real domain_edge_width, domain_edge_length, domain_edge_height;
     unsigned int coarsegridx, coarsegridy, coarsegridz;
     unsigned int coarserefinements, coarsecoarsenings, extrarefinements;
-
-    std::vector<PeriodicBoundary> periodic_boundaries;
 
     bool use_petsc_snes;
     bool time_solver_quiet, solver_quiet, reuse_preconditioner, require_residual_reduction;
