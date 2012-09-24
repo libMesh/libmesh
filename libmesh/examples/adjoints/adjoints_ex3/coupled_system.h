@@ -37,14 +37,7 @@ public:
                const std::string& name,
                const unsigned int number)
     : FEMSystem(es, name, number), Peclet(1.) {qoi.resize(1);}
-
-  // Set species transport boolean, this is used for the initial value simulation
-  // See March 26, 2012 entry in lab book
-  void set_species_transport(bool species_transport_flag)
-  {
-    species_transport = species_transport_flag;
-  }
-
+ 
   // Function to get computed QoI values
 
   Number &get_QoI_value()
@@ -89,23 +82,9 @@ public:
   // Constraint parts
   virtual bool element_constraint (bool request_jacobian,
                                    DiffContext& context);
-  //virtual bool side_constraint (bool request_jacobian,
-  //DiffContext& context);
-
-  // Overloading the qoi derivative function on sides
-
-  virtual void side_qoi_derivative
-    (DiffContext &context,
-     const QoISet & qois);  
-
-  // Mass matrix part
-  //virtual bool mass_residual (bool request_jacobian,
-  //                          DiffContext& context);
 
   // Postprocessed output
   virtual void postprocess ();
-
-  virtual void side_postprocess(DiffContext &context);
 
   // Parameters associated with the system
   std::vector<Number> parameters;
@@ -120,9 +99,6 @@ public:
   // The Peclet number for the species transport
   Real Peclet;
 
-  // Are we solving the species transport problem ?
-  bool species_transport;
-
   // The functionals to be computed as QoIs
   Number computed_QoI;
 
@@ -133,7 +109,7 @@ class CoupledFEMFunctionsx : public FEMFunctionBase<Number>
 {
 public:
   // Constructor
-  CoupledFEMFunctionsx(System &sys) {}
+  CoupledFEMFunctionsx(System& /* sys */) {}
 
   // Destructor
   virtual ~CoupledFEMFunctionsx () {}
@@ -150,7 +126,7 @@ class CoupledFEMFunctionsy : public FEMFunctionBase<Number>
 {
 public:
   // Constructor
-  CoupledFEMFunctionsy(System &sys) {}
+  CoupledFEMFunctionsy(System& /* sys */) {}
 
   // Destructor
   virtual ~CoupledFEMFunctionsy () {}
