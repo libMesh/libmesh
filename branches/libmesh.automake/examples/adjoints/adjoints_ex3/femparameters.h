@@ -8,8 +8,6 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/getpot.h"
-#include "libmesh/periodic_boundaries.h"
-#include "libmesh/periodic_boundary.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -28,16 +26,15 @@ public:
       timesolver_upper_tolerance(0.),
       steadystate_tolerance(0.),
       timesolver_norm(0,L2),
-      dimension(2), 
+      dimension(2),
+	domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),	
 	fine_mesh_file_primal("fine_mesh.xda"), fine_mesh_soln_primal("fine_mesh_soln.xda"),
-	fine_mesh_file_adjoint("fine_mesh.xda"), fine_mesh_soln_adjoint("fine_mesh_soln.xda"),	
-      domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),	
+	fine_mesh_file_adjoint("fine_mesh.xda"), fine_mesh_soln_adjoint("fine_mesh_soln.xda"),	      
       elementorder(2),
       domain_xmin(0.0), domain_ymin(0.0), domain_zmin(0.0),
       domain_edge_width(1.0), domain_edge_length(1.0), domain_edge_height(1.0),
       coarsegridx(1), coarsegridy(1), coarsegridz(1),
 	coarserefinements(0), coarsecoarsenings(0), extrarefinements(0),
-      periodic_boundaries(0),
       use_petsc_snes(false),
       time_solver_quiet(true), solver_quiet(true),
 	reuse_preconditioner(false),
@@ -90,8 +87,6 @@ public:
     unsigned int coarsegridx, coarsegridy, coarsegridz;
     unsigned int coarserefinements, coarsecoarsenings, extrarefinements;
 
-    std::vector<PeriodicBoundary> periodic_boundaries;
-
     bool use_petsc_snes;
     bool time_solver_quiet, solver_quiet, reuse_preconditioner, require_residual_reduction;
     Real min_step_length;
@@ -103,16 +98,16 @@ public:
     unsigned int nelem_target;
     Real global_tolerance;
     Real refine_fraction, coarsen_fraction, coarsen_threshold;
+    bool refine_uniformly;
     unsigned int max_adaptivesteps;
     unsigned int initial_adaptivesteps;
     unsigned int initial_sobolev_order;
     unsigned int initial_extra_quadrature;
 
-    bool refine_uniformly;
     std::string indicator_type;
-    std::string adjoint_residual_type;
     bool patch_reuse;
     unsigned int sobolev_order;
+    std::string adjoint_residual_type;   
     bool alternate_with_uniform_steps;
     unsigned int alternate_step_number;
     bool component_wise_error;
