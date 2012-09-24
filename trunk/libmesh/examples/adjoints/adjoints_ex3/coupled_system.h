@@ -97,7 +97,7 @@ public:
   ParameterVector parameter_vector;
 
   // The Peclet number for the species transport
-  Real Peclet;
+  Number Peclet;
 
   // The functionals to be computed as QoIs
   Number computed_QoI;
