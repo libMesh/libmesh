@@ -8,7 +8,6 @@
 #include "libmesh/twostep_time_solver.h"
 #include "libmesh/euler_solver.h"
 #include "libmesh/euler2_solver.h"
-#include "libmesh/exact_error_estimator.h"
 #include "libmesh/steady_solver.h"
 
 #include "libmesh/newton_solver.h"
@@ -16,7 +15,6 @@
 #include "libmesh/petsc_diff_solver.h"
 
 #include "libmesh/mesh.h"
-#include "libmesh/serial_mesh.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_refinement.h"
@@ -27,19 +25,15 @@
 #include "libmesh/adjoint_residual_error_estimator.h"
 #include "libmesh/const_fem_function.h"
 #include "libmesh/error_vector.h"
-#include "libmesh/exact_solution.h"
 #include "libmesh/fem_function_base.h"
-#include "libmesh/fourth_error_estimators.h"
 #include "libmesh/getpot.h"
 #include "libmesh/gmv_io.h"
 #include "libmesh/kelly_error_estimator.h"
 #include "libmesh/parameter_vector.h"
 #include "libmesh/patch_recovery_error_estimator.h"
 #include "libmesh/petsc_vector.h"
-#include "libmesh/refinement_selector.h"
 #include "libmesh/sensitivity_data.h"
 #include "libmesh/tecplot_io.h"
-#include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/qoi_set.h"
 #include "libmesh/weighted_patch_recovery_error_estimator.h"
@@ -581,39 +575,26 @@ build_error_estimator_component_wise
   // Using the user filled error norm type vector, we pass the type of norm to be used for 
   // the error in each variable, we can have different types of norms for the primal and
   // dual variables
+  unsigned int size = primal_error_norm_type.size();
   
-  adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(0, primal_error_norm_type[0]);      
-  adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(1, primal_error_norm_type[1]);
-  adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(2, primal_error_norm_type[2]);
-  adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(3, primal_error_norm_type[3]);
-
-  adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(0, dual_error_norm_type[0]);
-  adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(1, dual_error_norm_type[1]);
-  adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(2, dual_error_norm_type[2]);
-  adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(3, dual_error_norm_type[3]);  
+  libmesh_assert_equal_to (size, dual_error_norm_type.size());
+  for (unsigned int i = 0; i != size; ++i)
+    {
+      adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(i, primal_error_norm_type[i]);      
+      adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(i, dual_error_norm_type[i]);
+    }
 
   // Now we set the right weights for each term in the error estimate, using the user provided
   // term_weights matrix
-  adjoint_residual_estimator->error_norm.set_weight(0, term_weights[0][0]);
-  adjoint_residual_estimator->error_norm.set_weight(1, term_weights[1][1]);
-  adjoint_residual_estimator->error_norm.set_weight(2, term_weights[2][2]);
-  adjoint_residual_estimator->error_norm.set_weight(3, term_weights[3][3]);
-
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(0, 1, term_weights[0][1]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(0, 2, term_weights[0][2]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(0, 3, term_weights[0][3]);
-
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(1, 0, term_weights[1][0]);  
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(1, 2, term_weights[1][2]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(1, 3, term_weights[1][3]);  
-
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(2, 0, term_weights[2][0]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(2, 1, term_weights[2][1]);  
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(2, 3, term_weights[2][3]);  
-
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(3, 0, term_weights[3][0]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(3, 1, term_weights[3][1]);           
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(3, 2, term_weights[3][2]);
+  libmesh_assert_equal_to (size, term_weights.size());
+  for (unsigned int i = 0; i != term_weights.size(); ++i)
+    {
+      libmesh_assert_equal_to (size, term_weights[i].size());
+      adjoint_residual_estimator->error_norm.set_weight(i, term_weights[i][i]);
+      for (unsigned int j = 0; j != size; ++j)
+        if (i != j)
+          adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
+    }
 
   return error_estimator;
 }
@@ -657,43 +638,29 @@ build_weighted_error_estimator_component_wise
 
   // We pass the pointers to the user specified weight functions to the patch recovery
   // error estimator objects declared above
-  p1->weight_functions.push_back(coupled_system_weight_functions[0]);
-  p1->weight_functions.push_back(coupled_system_weight_functions[1]);
-  p1->weight_functions.push_back(coupled_system_weight_functions[2]);
-  p1->weight_functions.push_back(coupled_system_weight_functions[3]);  
+  unsigned int size = primal_error_norm_type.size();
 
-  adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(0, primal_error_norm_type[0]);      
-  adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(1, primal_error_norm_type[1]);
-  adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(2, primal_error_norm_type[2]);
-  adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(3, primal_error_norm_type[3]);  
+  libmesh_assert(coupled_system_weight_functions.size() == size);
+  libmesh_assert(dual_error_norm_type.size() == size);
 
-  adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(0, dual_error_norm_type[0]);
-  adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(1, dual_error_norm_type[1]);
-  adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(2, dual_error_norm_type[2]);
-  adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(3, dual_error_norm_type[3]);  
+  for (unsigned int i = 0; i != size; ++i)
+    {
+      p1->weight_functions.push_back(coupled_system_weight_functions[i]);
+      adjoint_residual_estimator->primal_error_estimator()->error_norm.set_type(i, primal_error_norm_type[i]);      
+      adjoint_residual_estimator->dual_error_estimator()->error_norm.set_type(i, dual_error_norm_type[i]);
+    }
 
   // Now we set the right weights for each term in the error estimate, using the user provided
   // term_weights matrix
-  adjoint_residual_estimator->error_norm.set_weight(0, term_weights[0][0]);
-  adjoint_residual_estimator->error_norm.set_weight(1, term_weights[1][1]);
-  adjoint_residual_estimator->error_norm.set_weight(2, term_weights[2][2]);
-  adjoint_residual_estimator->error_norm.set_weight(3, term_weights[3][3]);  
-
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(0, 1, term_weights[0][1]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(0, 2, term_weights[0][2]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(0, 3, term_weights[0][3]);  
-
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(1, 0, term_weights[1][0]);  
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(1, 2, term_weights[1][2]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(1, 3, term_weights[1][3]);  
-
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(2, 0, term_weights[2][0]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(2, 1, term_weights[2][1]);  
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(2, 3, term_weights[2][3]);  
-
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(3, 0, term_weights[3][0]);
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(3, 1, term_weights[3][1]);           
-  adjoint_residual_estimator->error_norm.set_off_diagonal_weight(3, 2, term_weights[3][2]);
+  libmesh_assert_equal_to (size, term_weights.size());
+  for (unsigned int i = 0; i != term_weights.size(); ++i)
+    {
+      libmesh_assert_equal_to (size, term_weights[i].size());
+      adjoint_residual_estimator->error_norm.set_weight(i, term_weights[i][i]);
+      for (unsigned int j = 0; j != size; ++j)
+        if (i != j)
+          adjoint_residual_estimator->error_norm.set_off_diagonal_weight(i, j, term_weights[i][j]);
+    }
 
   return error_estimator;
 }
@@ -724,6 +691,9 @@ int main (int argc, char** argv)
   FEMParameters param;
   param.read(infile);
 
+  // Skip higher-dimensional examples on a lower-dimensional libMesh build
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+  
   // Create a mesh.
   Mesh mesh (param.dimension);
 
@@ -872,23 +842,7 @@ int main (int argc, char** argv)
             weights_matrix_non_pressure(system.n_vars(),
               std::vector<Number>(system.n_vars(), 0.0));
           weights_matrix_non_pressure[0][0] = 1.;
-          weights_matrix_non_pressure[0][1] = 0.;
-          weights_matrix_non_pressure[0][2] = 0.;
-          weights_matrix_non_pressure[0][3] = 0.;                  
-
-          weights_matrix_non_pressure[1][0] = 0.;
           weights_matrix_non_pressure[1][1] = 1.;
-          weights_matrix_non_pressure[1][2] = 0.;
-          weights_matrix_non_pressure[1][3] = 0.;                  
-
-          weights_matrix_non_pressure[2][0] = 0.;
-          weights_matrix_non_pressure[2][1] = 0.;
-          weights_matrix_non_pressure[2][2] = 0.;
-          weights_matrix_non_pressure[2][3] = 0.;
-
-          weights_matrix_non_pressure[3][0] = 0.;
-          weights_matrix_non_pressure[3][1] = 0.;
-          weights_matrix_non_pressure[3][2] = 0.;
           weights_matrix_non_pressure[3][3] = 1./Pe;
 
           // We build the error estimator to estimate the contributions
@@ -930,25 +884,12 @@ int main (int argc, char** argv)
             weights_matrix_with_pressure
               (system.n_vars(),
                std::vector<Number>(system.n_vars(), 0.0));
-          weights_matrix_with_pressure[0][0] = 0.;
-          weights_matrix_with_pressure[0][1] = 0.;
           weights_matrix_with_pressure[0][2] = 1.;
-          weights_matrix_with_pressure[0][3] = 0.;                  
 
-          weights_matrix_with_pressure[1][0] = 0.;
-          weights_matrix_with_pressure[1][1] = 0.;
           weights_matrix_with_pressure[1][2] = 1.;
-          weights_matrix_with_pressure[1][3] = 0.;                  
 
           weights_matrix_with_pressure[2][0] = 1.;
           weights_matrix_with_pressure[2][1] = 1.;
-          weights_matrix_with_pressure[2][2] = 0.;
-          weights_matrix_with_pressure[2][3] = 0.;                  
-
-          weights_matrix_with_pressure[3][0] = 0.;
-          weights_matrix_with_pressure[3][1] = 0.;
-          weights_matrix_with_pressure[3][2] = 0.;
-          weights_matrix_with_pressure[3][3] = 0.;                  
 
           // We build the error estimator to estimate the contributions
           // to the QoI error from the pressure term
@@ -988,24 +929,6 @@ int main (int argc, char** argv)
             weights_matrix_convection_diffusion_x
               (system.n_vars(),
                std::vector<Number>(system.n_vars(), 0.0));
-          weights_matrix_convection_diffusion_x[0][0] = 0.;
-          weights_matrix_convection_diffusion_x[0][1] = 0.;
-          weights_matrix_convection_diffusion_x[0][2] = 0.;
-          weights_matrix_convection_diffusion_x[0][3] = 0.;                  
-
-          weights_matrix_convection_diffusion_x[1][0] = 0.;
-          weights_matrix_convection_diffusion_x[1][1] = 0.;
-          weights_matrix_convection_diffusion_x[1][2] = 0.;
-          weights_matrix_convection_diffusion_x[1][3] = 0.;                  
-
-          weights_matrix_convection_diffusion_x[2][0] = 0.;
-          weights_matrix_convection_diffusion_x[2][1] = 0.;
-          weights_matrix_convection_diffusion_x[2][2] = 0.;
-          weights_matrix_convection_diffusion_x[2][3] = 0.;                  
-
-          weights_matrix_convection_diffusion_x[3][0] = 0.;
-          weights_matrix_convection_diffusion_x[3][1] = 0.;
-          weights_matrix_convection_diffusion_x[3][2] = 0.;
           weights_matrix_convection_diffusion_x[3][3] = 1.;                  
 
 	  // We will also have to build and pass the weight functions to the weighted patch recovery estimators
@@ -1064,24 +987,6 @@ int main (int argc, char** argv)
           std::vector<std::vector<Number> >
             weights_matrix_convection_diffusion_y
               (system.n_vars(), std::vector<Number>(system.n_vars(), 0.0));
-          weights_matrix_convection_diffusion_y[0][0] = 0.;
-          weights_matrix_convection_diffusion_y[0][1] = 0.;
-          weights_matrix_convection_diffusion_y[0][2] = 0.;
-          weights_matrix_convection_diffusion_y[0][3] = 0.;                  
-
-          weights_matrix_convection_diffusion_y[1][0] = 0.;
-          weights_matrix_convection_diffusion_y[1][1] = 0.;
-          weights_matrix_convection_diffusion_y[1][2] = 0.;
-          weights_matrix_convection_diffusion_y[1][3] = 0.;                  
-
-          weights_matrix_convection_diffusion_y[2][0] = 0.;
-          weights_matrix_convection_diffusion_y[2][1] = 0.;
-          weights_matrix_convection_diffusion_y[2][2] = 0.;
-          weights_matrix_convection_diffusion_y[2][3] = 0.;                  
-
-          weights_matrix_convection_diffusion_y[3][0] = 0.;
-          weights_matrix_convection_diffusion_y[3][1] = 0.;
-          weights_matrix_convection_diffusion_y[3][2] = 0.;
           weights_matrix_convection_diffusion_y[3][3] = 1.;                  
           
           CoupledFEMFunctionsy convdiffy(system);                  
