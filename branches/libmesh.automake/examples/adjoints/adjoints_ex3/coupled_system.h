@@ -61,7 +61,7 @@ public:
       return parameter_vector;
     }
 
-  Number &get_Pe()
+  Real &get_Pe()
     {
       return Peclet;       
     }
