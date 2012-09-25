@@ -19,6 +19,8 @@ systems_of_equations_ex3_DATA    = systems_of_equations_ex3.C
 systems_of_equations_ex3_SOURCES = $(systems_of_equations_ex3_DATA) run.sh
 systems_of_equations_ex3_LDADD   = $(top_builddir)/libmesh.la
 
+CLEANFILES = out_*.e
+
 ######################################################################
 #
 # Running the tests

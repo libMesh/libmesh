@@ -19,6 +19,8 @@ systems_of_equations_ex5_DATA    = systems_of_equations_ex5.C
 systems_of_equations_ex5_SOURCES = $(systems_of_equations_ex5_DATA) run.sh
 systems_of_equations_ex5_LDADD   = $(top_builddir)/libmesh.la
 
+CLEANFILES = displacement.e
+
 ######################################################################
 #
 # Running the tests

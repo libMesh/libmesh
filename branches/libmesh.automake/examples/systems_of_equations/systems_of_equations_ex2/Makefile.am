@@ -19,6 +19,8 @@ systems_of_equations_ex2_DATA    = systems_of_equations_ex2.C gmv_attributes.att
 systems_of_equations_ex2_SOURCES = $(systems_of_equations_ex2_DATA) run.sh
 systems_of_equations_ex2_LDADD   = $(top_builddir)/libmesh.la
 
+CLEANFILES = out_*.e
+
 ######################################################################
 #
 # Running the tests
