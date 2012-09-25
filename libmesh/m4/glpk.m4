@@ -116,7 +116,7 @@ AC_DEFUN([CONFIGURE_GLPK],
        fi
        
        dnl If both the header file and the required libs were found, continue.
-       if (test $enableglpk = yes); then
+       if (test x$enableglpk = xyes); then
          GLPK_INCLUDE="-I$GLPK_INC"
          GLPK_LIBRARY="-L$GLPK_LIB -lglpk"
 	 if (test "x$RPATHFLAG" != "x" -a -d $GLPK_LIB); then # add the GLPK_LIB to the linker run path, if it is a directory
@@ -126,8 +126,6 @@ AC_DEFUN([CONFIGURE_GLPK],
 	 fi
          AC_DEFINE(HAVE_GLPK, 1, [Flag indicating whether the library will be compiled with GLPK support])
          AC_MSG_RESULT(<<< Configuring library with GLPK support >>>)
-	 libmesh_optional_INCLUDES="$GLPK_INCLUDE $libmesh_optional_INCLUDES"
-	 libmesh_optional_LIBS="$GLPK_LIBRARY $libmesh_optional_LIBS"
        fi
     fi
   fi

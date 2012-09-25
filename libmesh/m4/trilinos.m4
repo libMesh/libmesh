@@ -109,9 +109,6 @@ EOF
     #echo TRILINOS_LIBS=$TRILINOS_LIBS
     #echo TRILINOS_INCLUDES=$TRILINOS_INCLUDES
 
-    libmesh_optional_INCLUDES="$TRILINOS_INCLUDES $libmesh_optional_INCLUDES"
-    libmesh_optional_LIBS="$TRILINOS_LIBS $libmesh_optional_LIBS"
-
     rm -f Makefile_config_trilinos
   fi
 
@@ -233,9 +230,6 @@ EOF
     #echo AZTECOO_LIBS=$AZTECOO_LIBS
     #echo AZTECOO_INCLUDES=$AZTECOO_INCLUDES
 
-    libmesh_optional_INCLUDES="$AZTECOO_INCLUDES $libmesh_optional_INCLUDES"
-    libmesh_optional_LIBS="$AZTECOO_LIBS $libmesh_optional_LIBS"
-
     rm -f Makefile_config_trilinos
   fi
 
@@ -259,9 +253,6 @@ EOF
     #echo NOX_LIBS=$NOX_LIBS
     #echo NOX_INCLUDES=$NOX_INCLUDES
 
-    libmesh_optional_INCLUDES="$NOX_INCLUDES $libmesh_optional_INCLUDES"
-    libmesh_optional_LIBS="$NOX_LIBS $libmesh_optional_LIBS"
-
     rm -f Makefile_config_trilinos
   fi
 
@@ -284,9 +275,6 @@ EOF
 
     #echo ML_LIBS=$ML_LIBS
     #echo ML_INCLUDES=$ML_INCLUDES
-
-    libmesh_optional_INCLUDES="$ML_INCLUDES $libmesh_optional_INCLUDES"
-    libmesh_optional_LIBS="$ML_LIBS $libmesh_optional_LIBS"
 
     rm -f Makefile_config_trilinos
   fi
@@ -330,7 +318,7 @@ AC_DEFUN([CONFIGURE_TRILINOS],
       if test "$enabletrilinos" != no ; then
           # -- try Trilinos 10 first
 	  CONFIGURE_TRILINOS_10
-          # -- then Trlinos 9
+          # -- then Trilinos 9
 	  if test "$enabletrilinos10" = no ; then
               CONFIGURE_TRILINOS_9
              if test "$enabletrilinos9" = no; then

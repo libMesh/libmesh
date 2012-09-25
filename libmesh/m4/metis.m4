@@ -22,7 +22,6 @@ AC_DEFUN([CONFIGURE_METIS],
      METIS_LIB="\$(EXTERNAL_LIBDIR)/libmetis\$(libext) \$(EXTERNAL_LIBDIR)/libGK\$(libext)"
      AC_DEFINE(HAVE_METIS, 1, [Flag indicating whether the library will be compiled with Metis support])
      AC_MSG_RESULT(<<< Configuring library with Metis support >>>)
-     libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"
   else
      METIS_INCLUDE=""
      METIS_LIB=""
@@ -32,6 +31,4 @@ AC_DEFUN([CONFIGURE_METIS],
   AC_SUBST(METIS_INCLUDE)
   AC_SUBST(METIS_LIB)	
   AC_SUBST(enablemetis)
-
-  AM_CONDITIONAL(LIBMESH_ENABLE_METIS, test x$enablemetis = xyes)		 
 ])

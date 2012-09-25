@@ -136,10 +136,6 @@ AC_DEFUN([CONFIGURE_VTK],
 	 fi
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
          AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
-	 
-         libmesh_optional_INCLUDES="$VTK_INCLUDE $libmesh_optional_INCLUDES"
-         libmesh_optional_LIBS="$VTK_LIBRARY $libmesh_optional_LIBS"
-	 
        fi
     fi
   fi
