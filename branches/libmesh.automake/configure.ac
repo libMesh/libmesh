@@ -38,7 +38,6 @@ AC_CONFIG_FILES([Makefile
 		 include/libmesh/Makefile
                  include/libmesh/libmesh_version.h
 	         contrib/utils/Make.common
-		 examples/Makefile
 		 doc/Doxyfile
 		 contrib/utils/libmesh.pc
 		 ])
@@ -56,7 +55,8 @@ AC_CONFIG_HEADER(include/libmesh/libmesh_config.h.tmp:include/libmesh/libmesh_co
 # Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
 AX_PREFIX_CONFIG_H(include/libmesh/libmesh_config.h,LIBMESH,include/libmesh/libmesh_config.h.tmp)
 
-AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar 1.10]) # require automake 1.10 - I havent tried anything older
+#AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar 1.10]) # require automake 1.10 - I havent tried anything older
+AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests parallel-tests 1.11]) # require automake 1.11 - color tests
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)]) # use silent rules where available - automake 1.11
 
 
@@ -223,7 +223,53 @@ LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
 # Query configuration environment
 AX_SUMMARIZE_ENV
 
+# Each example gets a makefile
+AC_CONFIG_FILES([
+		examples/introduction/introduction_ex1/Makefile
+		examples/introduction/introduction_ex2/Makefile
+		examples/introduction/introduction_ex3/Makefile
+		examples/introduction/introduction_ex4/Makefile
+		examples/introduction/introduction_ex5/Makefile
+		examples/adaptivity/adaptivity_ex1/Makefile
+		examples/adaptivity/adaptivity_ex2/Makefile
+		examples/adaptivity/adaptivity_ex3/Makefile
+		examples/adaptivity/adaptivity_ex4/Makefile
+		examples/adaptivity/adaptivity_ex5/Makefile
+		examples/adjoints/adjoints_ex1/Makefile
+		examples/adjoints/adjoints_ex2/Makefile
+		examples/adjoints/adjoints_ex3/Makefile
+		examples/eigenproblems/eigenproblems_ex1/Makefile
+		examples/eigenproblems/eigenproblems_ex2/Makefile
+		examples/eigenproblems/eigenproblems_ex3/Makefile
+		examples/fem_system/fem_system_ex1/Makefile
+		examples/miscellaneous/miscellaneous_ex1/Makefile
+		examples/miscellaneous/miscellaneous_ex2/Makefile
+		examples/miscellaneous/miscellaneous_ex3/Makefile
+		examples/miscellaneous/miscellaneous_ex4/Makefile
+		examples/miscellaneous/miscellaneous_ex5/Makefile
+		examples/miscellaneous/miscellaneous_ex6/Makefile
+		examples/miscellaneous/miscellaneous_ex7/Makefile
+		examples/subdomains/subdomains_ex1/Makefile
+		examples/subdomains/subdomains_ex2/Makefile
+		examples/reduced_basis/reduced_basis_ex1/Makefile
+		examples/reduced_basis/reduced_basis_ex2/Makefile
+		examples/reduced_basis/reduced_basis_ex3/Makefile
+		examples/reduced_basis/reduced_basis_ex4/Makefile
+		examples/reduced_basis/reduced_basis_ex5/Makefile
+		examples/reduced_basis/reduced_basis_ex6/Makefile
+		examples/transient/transient_ex1/Makefile
+		examples/transient/transient_ex2/Makefile
+		examples/vector_fe/vector_fe_ex1/Makefile
+		examples/vector_fe/vector_fe_ex2/Makefile
+		examples/vector_fe/vector_fe_ex3/Makefile
+		examples/Makefile
+		])		
 
+dnl 		examples/systems_of_equations/systems_of_equations_ex1/Makefile
+dnl 		examples/systems_of_equations/systems_of_equations_ex2/Makefile
+dnl 		examples/systems_of_equations/systems_of_equations_ex3/Makefile
+dnl 		examples/systems_of_equations/systems_of_equations_ex4/Makefile
+dnl 		examples/systems_of_equations/systems_of_equations_ex5/Makefile
 
 # Create output files
 AC_OUTPUT

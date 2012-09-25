@@ -645,15 +645,16 @@ SUBDIRS += examples
 .PHONY: doc svnexpand
 
 #
-# doxygen documentation
+# doxygen documentation - be sure to generate symlinks in include/libmesh!
 doc html:
+	@cd $(top_builddir)/include/libmesh && $(MAKE)
 	$(MKDIR_P) $(top_builddir)/doc/html
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
 
-#
-# Mark source files for SVN keyword expansion
-svnexpand:
-	svn -R propset svn:keywords "Date Author Revision HeadURL Id" $(top_srcdir)/include $(top_srcdir)/src
+# #
+# # Mark source files for SVN keyword expansion
+# svnexpand:
+# 	svn -R propset svn:keywords "Date Author Revision HeadURL Id" $(top_srcdir)/include $(top_srcdir)/src
 
 
 #

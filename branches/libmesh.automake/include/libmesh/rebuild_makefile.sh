@@ -32,7 +32,7 @@ EXTRA_DIST = rebuild_makefile.sh
 
 BUILT_SOURCES = $built_sources
 
-CLEANFILES = \$(BUILT_SOURCES)
+DISTCLEANFILES += \$(BUILT_SOURCES)
 
 EOF
 

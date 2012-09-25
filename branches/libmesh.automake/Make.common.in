@@ -171,6 +171,14 @@ SHELL=$(libmesh_save_SHELL)
 
 
 ###############################################################################
+# Examples-related common variables
+#
+examples_source_path=$(top_srcdir)/examples
+examples_install_path=$(prefix)/examples
+
+
+
+###############################################################################
 #
 # 
 #

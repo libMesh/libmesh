@@ -2,22 +2,18 @@
 
 #./bootstrap
 
+top_dir=`pwd`
 
+
+#
+# Figure out the installation prefix
+#
 if (test "x$AEROLAB_SYSTEM_CLASS" = "x"); then
     install_dir=$HOME/codes/install
-    AEROLAB_SYSTEM_CLASS="foo"
-    # echo "ERROR:  expecting a AEROLAB_SYSTEM_CLASS env var!"
-    # exit 1
+    AEROLAB_SYSTEM_CLASS="local"
 else
     install_dir=/lustre/work/benkirk/codes/install/$AEROLAB_SYSTEM_CLASS
 fi
-
-if (test "x$METHODS" = "x"); then
-    METHODS="opt devel dbg"
-fi
-echo "building methods \"$METHODS\""
-
-top_dir=`pwd`
 
 if (test "x$MPI_ID_STRING" != "x"); then
     install_dir="$install_dir-$MPI_ID_STRING"
@@ -28,6 +24,19 @@ fi
 echo "installing in $install_dir"
 
 #rm -rf $install_dir
+
+
+
+#
+# honor METHODS, but set a default
+#  e.g. could use 
+#  $ METHODS="opt devel" ./buildall.sh 
+#
+if (test "x$METHODS" = "x"); then
+    METHODS="opt devel dbg"
+fi
+echo "building methods \"$METHODS\""
+
 
 for METHOD in $METHODS ; do
 
