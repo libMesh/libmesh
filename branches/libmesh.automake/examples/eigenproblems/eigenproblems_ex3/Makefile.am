@@ -17,7 +17,8 @@ eigenproblems_ex3dir      = $(examples_install_path)/eigenproblems/ex3
 eigenproblems_ex3_DATA    = eigenproblems_ex3.C drum1_mesh.e drum2_mesh.e
 eigenproblems_ex3_SOURCES = $(eigenproblems_ex3_DATA) run.sh
 eigenproblems_ex3_LDADD   = $(top_builddir)/libmesh.la
-CLEANFILES                = drum1_evals.txt drum2_evals.txt
+
+CLEANFILES                = drum1_evals.txt drum2_evals.txt drum1_evec.e drum2_evec.e
 
 # Only *run* the tests if SLEPc is actually enabled
 if LIBMESH_ENABLE_SLEPC

@@ -18,6 +18,11 @@ reduced_basis_ex3_DATA    = reduced_basis_ex3.C assembly.h rb_classes.h reduced_
 reduced_basis_ex3_SOURCES = $(reduced_basis_ex3_DATA) run.sh
 reduced_basis_ex3_LDADD   = $(top_builddir)/libmesh.la
 
+CLEANFILES = bf0.e offline_data/* RB_sol.e
+
+clean-local:
+	-rm -rf offline_data
+
 # Only *run* the tests if SLEPc is actually enabled
 if LIBMESH_ENABLE_SLEPC
   check_SCRIPTS = run.sh

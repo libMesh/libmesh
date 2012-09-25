@@ -18,6 +18,12 @@ reduced_basis_ex2_DATA    = reduced_basis_ex2.C assembly.h rb_classes.h reduced_
 reduced_basis_ex2_SOURCES = $(reduced_basis_ex2_DATA) run.sh
 reduced_basis_ex2_LDADD   = $(top_builddir)/libmesh.la
 
+
+CLEANFILES = bf0.e RB_sol.e rb_data/* scm_data/*
+
+clean-local:
+	-rm -rf rb_data scm_data
+
 # Only *run* the tests if SLEPc and GLPK is actually enabled
 if LIBMESH_ENABLE_SLEPC
 if LIBMESH_ENABLE_GLPK

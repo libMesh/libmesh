@@ -18,6 +18,8 @@ eigenproblems_ex2_DATA    = eigenproblems_ex2.C
 eigenproblems_ex2_SOURCES = $(eigenproblems_ex2_DATA) run.sh
 eigenproblems_ex2_LDADD   = $(top_builddir)/libmesh.la
 
+CLEANFILES = out.e
+
 # Only *run* the tests if SLEPc is actually enabled
 if LIBMESH_ENABLE_SLEPC
   check_SCRIPTS = run.sh
