@@ -108,11 +108,17 @@ AC_DEFUN([CONFIGURE_VTK],
   
          dnl Save original value of LIBS, then append $VTK_LIB
          old_LIBS="$LIBS"
-         LIBS="$old_LIBS -L$VTK_LIB"
   
+         VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
+	   VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
+	 fi
+
+         LIBS="$old_LIBS $VTK_LIBRARY"
+
          dnl Try to compile test prog to check for existence of VTK libraries
          dnl AC_HAVE_LIBRARY uses the LIBS variable.
-         AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no])
+         AC_HAVE_LIBRARY([vtkIO], [enablevtk=yes], [enablevtk=no], [-lvtkCommon -lvtkFiltering])
          
          if (test $enablevtk = yes); then
            AC_HAVE_LIBRARY([vtkCommon], [enablevtk=yes], [enablevtk=no])
@@ -130,10 +136,6 @@ AC_DEFUN([CONFIGURE_VTK],
        dnl If both the header file and the required libs were found, continue.
        if (test x$enablevtk = xyes); then
          VTK_INCLUDE="-I$VTK_INC"
-         VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
-	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
-	   VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
-	 fi
          AC_DEFINE(HAVE_VTK, 1, [Flag indicating whether the library will be compiled with VTK support])
          AC_MSG_RESULT(<<< Configuring library with VTK support >>>)
        fi
