@@ -25,6 +25,11 @@ SUBDIRS = \
 	miscellaneous/miscellaneous_ex7 \
 	subdomains/subdomains_ex1 \
 	subdomains/subdomains_ex2 \
+	systems_of_equations/systems_of_equations_ex1 \
+	systems_of_equations/systems_of_equations_ex2 \
+	systems_of_equations/systems_of_equations_ex3 \
+	systems_of_equations/systems_of_equations_ex4 \
+	systems_of_equations/systems_of_equations_ex5 \
 	reduced_basis/reduced_basis_ex1 \
 	reduced_basis/reduced_basis_ex2 \
 	reduced_basis/reduced_basis_ex3 \
@@ -37,11 +42,6 @@ SUBDIRS = \
 	vector_fe/vector_fe_ex2 \
 	vector_fe/vector_fe_ex3
 
-# 	systems_of_equations/systems_of_equations_ex1
-# 	systems_of_equations/systems_of_equations_ex2
-# 	systems_of_equations/systems_of_equations_ex3
-# 	systems_of_equations/systems_of_equations_ex4
-# 	systems_of_equations/systems_of_equations_ex5
 
 
 include $(top_builddir)/Make.common.@METHOD@

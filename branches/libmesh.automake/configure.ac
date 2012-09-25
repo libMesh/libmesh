@@ -251,6 +251,11 @@ AC_CONFIG_FILES([
 		examples/miscellaneous/miscellaneous_ex7/Makefile
 		examples/subdomains/subdomains_ex1/Makefile
 		examples/subdomains/subdomains_ex2/Makefile
+		examples/systems_of_equations/systems_of_equations_ex1/Makefile
+		examples/systems_of_equations/systems_of_equations_ex2/Makefile
+		examples/systems_of_equations/systems_of_equations_ex3/Makefile
+		examples/systems_of_equations/systems_of_equations_ex4/Makefile
+		examples/systems_of_equations/systems_of_equations_ex5/Makefile
 		examples/reduced_basis/reduced_basis_ex1/Makefile
 		examples/reduced_basis/reduced_basis_ex2/Makefile
 		examples/reduced_basis/reduced_basis_ex3/Makefile
@@ -265,11 +270,6 @@ AC_CONFIG_FILES([
 		examples/Makefile
 		])		
 
-dnl 		examples/systems_of_equations/systems_of_equations_ex1/Makefile
-dnl 		examples/systems_of_equations/systems_of_equations_ex2/Makefile
-dnl 		examples/systems_of_equations/systems_of_equations_ex3/Makefile
-dnl 		examples/systems_of_equations/systems_of_equations_ex4/Makefile
-dnl 		examples/systems_of_equations/systems_of_equations_ex5/Makefile
 
 # Create output files
 AC_OUTPUT
