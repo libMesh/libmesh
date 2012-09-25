@@ -22,7 +22,6 @@ AC_DEFUN([CONFIGURE_NETCDF],
      NETCDF_LIBRARY="\$(EXTERNAL_LIBDIR)/libnetcdf\$(libext)"
      AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
      AC_MSG_RESULT(<<< Configuring library with Netcdf support >>>)
-     libmesh_contrib_INCLUDES="$NETCDF_INCLUDE $libmesh_contrib_INCLUDES"
      have_netcdf=yes
   else
      NETCDF_INCLUDE=""
@@ -34,6 +33,4 @@ AC_DEFUN([CONFIGURE_NETCDF],
   AC_SUBST(NETCDF_INCLUDE)
   AC_SUBST(NETCDF_LIBRARY)	
   AC_SUBST(enablenetcdf)
-
-  AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF, test x$enablenetcdf = xyes)
 ])

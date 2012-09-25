@@ -22,7 +22,6 @@ AC_DEFUN([CONFIGURE_EXODUS],
      EXODUS_LIBRARY="\$(EXTERNAL_LIBDIR)/libexodusii\$(libext)"
      AC_DEFINE(HAVE_EXODUS_API, 1, [Flag indicating whether the library will be compiled with Exodus support])
      AC_MSG_RESULT(<<< Configuring library with Exodus support >>>)
-     libmesh_contrib_INCLUDES="$EXODUS_INCLUDE $libmesh_contrib_INCLUDES"
      have_exodus=yes
   else
      EXODUS_INCLUDE=""
@@ -34,6 +33,4 @@ AC_DEFUN([CONFIGURE_EXODUS],
   AC_SUBST(EXODUS_INCLUDE)
   AC_SUBST(EXODUS_LIBRARY)	
   AC_SUBST(enableexodus)
-		 
-  AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS, test x$enableexodus = xyes)
 ])

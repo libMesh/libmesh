@@ -60,13 +60,13 @@ AC_DEFUN([CONFIGURE_PETSC],
       AC_SUBST(petscmajorminor)
   
       AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MAJOR, [$petscmajor],
-        [PETSc's major version number, as detected by LibMesh])
+        [PETSc's major version number, as detected by petsc.m4])
   	      
       AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_MINOR, [$petscminor],
-        [PETSc's minor version number, as detected by LibMesh])
+        [PETSc's minor version number, as detected by petsc.m4])
   	      
       AC_DEFINE_UNQUOTED(DETECTED_PETSC_VERSION_SUBMINOR, [$petscsubminor],
-        [PETSc's subminor version number, as detected by LibMesh])
+        [PETSc's subminor version number, as detected by petsc.m4])
   
       if test $petscmajor = 2; then
         if test "x$PETSC_ARCH" = x ; then
@@ -126,7 +126,7 @@ getincludedirs:
 	echo -I\$(PETSC_DIR)/include -I\$(PETSC_DIR)/\$(PETSC_ARCH)/include \$(BLOCKSOLVE_INCLUDE) \$(HYPRE_INCLUDE) \$(PACKAGES_INCLUDES)
 
 getlinklibs:
-	echo \$(PETSC_SNES_LIB)\$(libmesh_LIBS)
+	echo \$(PETSC_SNES_LIB)
 EOF
 	  # cat Makefile_config_petsc
           PETSCLINKLIBS=`make -s -f Makefile_config_petsc getlinklibs`
@@ -137,9 +137,6 @@ EOF
         #echo "PETSCLINKLIBS=$PETSCLINKLIBS"
         #echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
         #echo ""
-  
-        libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
-        libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
   
         AC_SUBST(PETSCLINKLIBS)
         AC_SUBST(PETSCINCLUDEDIRS)
@@ -174,7 +171,6 @@ EOF
   fi
     
   AC_SUBST(enablepetsc)
-  AM_CONDITIONAL(LIBMESH_ENABLE_PETSC, test x$enablepetsc = xyes)		 
 ])
 
 
