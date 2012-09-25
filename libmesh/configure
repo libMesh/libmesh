@@ -733,6 +733,8 @@ MPI_LIBS_PATH
 MPI_LIBS
 MPI
 MPI_IMPL
+PETSC_FC_INCLUDES
+PETSC_CC_INCLUDES
 PETSCINCLUDEDIRS
 PETSCLINKLIBS
 petscmajorminor
@@ -9017,18 +9019,28 @@ include $PETSC_DIR/conf/variables
 getincludedirs:
 	echo -I\$(PETSC_DIR)/include -I\$(PETSC_DIR)/\$(PETSC_ARCH)/include \$(BLOCKSOLVE_INCLUDE) \$(HYPRE_INCLUDE) \$(PACKAGES_INCLUDES)
 
+getPETSC_CC_INCLUDES:
+	echo \$(PETSC_CC_INCLUDES)
+
+getPETSC_FC_INCLUDES:
+	echo \$(PETSC_FC_INCLUDES)
+
 getlinklibs:
 	echo \$(PETSC_SNES_LIB)
 EOF
 	  # cat Makefile_config_petsc
           PETSCLINKLIBS=`make -s -f Makefile_config_petsc getlinklibs`
           PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc getincludedirs`
+          PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
+          PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
 	  rm -f Makefile_config_petsc
 	fi
         #echo ""
         #echo "PETSCLINKLIBS=$PETSCLINKLIBS"
         #echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
         #echo ""
+
+
 
 
 

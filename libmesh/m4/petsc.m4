@@ -125,12 +125,20 @@ include $PETSC_DIR/conf/variables
 getincludedirs:
 	echo -I\$(PETSC_DIR)/include -I\$(PETSC_DIR)/\$(PETSC_ARCH)/include \$(BLOCKSOLVE_INCLUDE) \$(HYPRE_INCLUDE) \$(PACKAGES_INCLUDES)
 
+getPETSC_CC_INCLUDES:
+	echo \$(PETSC_CC_INCLUDES)
+
+getPETSC_FC_INCLUDES:
+	echo \$(PETSC_FC_INCLUDES)
+
 getlinklibs:
 	echo \$(PETSC_SNES_LIB)
 EOF
 	  # cat Makefile_config_petsc
           PETSCLINKLIBS=`make -s -f Makefile_config_petsc getlinklibs`
           PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc getincludedirs`
+          PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
+          PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
 	  rm -f Makefile_config_petsc
 	fi
         #echo ""
@@ -140,6 +148,8 @@ EOF
   
         AC_SUBST(PETSCLINKLIBS)
         AC_SUBST(PETSCINCLUDEDIRS)
+        AC_SUBST(PETSC_CC_INCLUDES)
+        AC_SUBST(PETSC_FC_INCLUDES)
   
         AC_SUBST(MPI_IMPL)
   
@@ -173,164 +183,3 @@ EOF
   AC_SUBST(enablepetsc)
 ])
 
-
-
-# ----------------------------------------------------------------------------
-# check for the required PETSc library
-# ----------------------------------------------------------------------------
-AC_DEFUN([ACX_PETSc], [
-AC_REQUIRE([ACX_LAPACK])
-BLAS_LIBS="$BLAS_LIBS $FLIBS"
-LAPACK_LIBS="$LAPACK_LIBS $BLAS_LIBS"
-AC_PATH_XTRA
-X_LIBS="$X_PRE_LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
-
-# Set variables...
-AC_ARG_WITH([PETSc],
-	    AC_ARG_HELP([--with-PETSc=PATH],
-                        [Prefix where PETSc is installed (PETSC_DIR)]),
-	    [PETSc="$withval"],
-	    [
-              if test $PETSC_DIR; then
-		PETSc="$PETSC_DIR"
-		echo "note: assuming PETSc library is in $PETSc (/lib,/include) as specified by environment variable PETSC_DIR"
-	      else
-		PETSc="/usr/local"
-		echo "note: assuming PETSc library is in /usr/local (/lib,/include)"
-	      fi
-            ])
-
-AC_ARG_WITH([BOPT],
-	    AC_ARG_HELP([--with-BOPT=VAL],[BOPT setting for PETSc (BOPT)]),
- 	    [BOPT="$withval"],
-	    [
-              echo "note: assuming BOPT to O"
-	      BOPT="O"
-            ])
-
-AC_ARG_WITH([PETSc_ARCH],
-	    AC_ARG_HELP([--with-PETSc_ARCH=VAL],[PETSc hardware architecture (PETSC_ARCH)]),
-	    [PETSc_ARCH="$withval"],
-	    [
-              if test $PETSC_ARCH; then
-		PETSc_ARCH="$PETSC_ARCH"
-		echo "note: assuming PETSc hardware architecture to be $PETSc_ARCH as specified by environment variable PETSC_ARCH"
-	      else
-		PETSc_ARCH=`uname -p`
-		echo "note: assuming PETSc hardware architecture to be $PETSc_ARCH"
-	      fi
-            ])
-
-PETSc_LIBS_PATH="$PETSc/lib/lib$BOPT/$PETSc_ARCH"
-PETSc_INCLUDES_PATH="$PETSc/include"
-
-# Check that the compiler uses the library we specified...
-if test -e $PETSc_LIBS_PATH/libpetsc.a || test -e $PETSc_LIBS_PATH/libpetsc.so; then
-	echo "note: using $PETSc_LIBS_PATH/libpetsc (.a/.so)"
-else
-	AC_MSG_ERROR( [Could not physically find PETSc library... exiting] )
-fi 
-if test -e $PETSc_INCLUDES_PATH/petsc.h; then
-	echo "note: using $PETSc_INCLUDES_PATH/petsc.h"
-else
-	AC_MSG_ERROR( [Could not physically find PETSc header file... exiting] )
-fi 
-
-# Ensure the comiler finds the library...
-tmpLIBS=$LIBS
-tmpCPPFLAGS=$CPPFLAGS
-AC_LANG_SAVE
-AC_LANG_CPLUSPLUS
-AC_CHECK_LIB(
-	[dl],
-	[dlopen],
-	[DL_LIBS="-ldl"],
-	[DL_LIBS=""; echo "libdl not found, assuming not needed for this architecture"] )
-LIBS="-L$PETSc_LIBS_PATH $MPI_LIBS_PATHS $MPI_LIBS $LAPACK_LIBS $X_LIBS $LIBS -lm $DL_LIBS"
-CPPFLAGS="$MPI_INCLUDES_PATHS -I$PETSc_INCLUDES_PATH -I$PETSc/bmake/$PETSc_ARCH $CPPFLAGS"
-echo "cppflags=$CPPFLAGS"
-
-AC_CHECK_LIB(
-	[petsc],
-	[PetscError],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc library... exiting] )] )
-AC_CHECK_LIB(
-	[petscvec],
-	[ISCreateGeneral],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petscvec library... exiting] )] )
-AC_CHECK_LIB(
-	[petscmat],
-	[MAT_Copy],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petscmat library... exiting] )] )
-AC_CHECK_LIB(
-	[petscdm],
-	[DMInitializePackage],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petscdm library... exiting] )] )
-AC_CHECK_LIB(
-	[petscsles],
-	[SLESCreate],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petscsles library... exiting] )] )
-AC_CHECK_LIB(
-	[petscsnes],
-	[SNESCreate],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petscsnes library... exiting] )] )
-AC_CHECK_LIB(
-	[petscts],
-	[TSCreate],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petscts library... exiting] )] )
-AC_CHECK_LIB(
-	[petscmesh],
-	[MESH_CreateFullCSR],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petscmesh library... exiting] )] )
-AC_CHECK_LIB(
-	[petscgrid],
-	[GridCreate],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petscgrid library... exiting] )] )
-AC_CHECK_LIB(
-	[petscgsolver],
-	[GSolverInitializePackage],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petscgsolver library... exiting] )] )
-AC_CHECK_LIB(
-	[petscfortran],
-	[meshcreate_],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc library... exiting] )] )
-	AC_CHECK_LIB(
-	[petsccontrib],
-	[SDACreate1d],
-	[],
-	[AC_MSG_ERROR( [Could not link in the PETSc petsccontrib library... exiting] )] )
-AC_CHECK_HEADER(
-	[petsc.h],
-	[AC_DEFINE( 
-		[HAVE_PETSC],,
-		[Define to 1 if you have the <petsc.h> header file.])],
-	[AC_MSG_ERROR( [Could not compile in the PETSc headers... exiting] )] )
-PETSc_LIBS="-lpetsc -lpetscvec -lpetscmat -lpetscdm -lpetscsles -lpetscsnes \
-	-lpetscts -lpetscmesh -lpetscgrid -lpetscgsolver -lpetscfortran -lpetsccontrib \
-	$PETSc_ARCH_LIBS"
-PETSc_LIBS_PATHS="-L$PETSc_LIBS_PATH"
-PETSc_INCLUDES_PATHS="-I$PETSc_INCLUDES_PATH -I$PETSc/bmake/$PETSc_ARCH"
-
-# Save variables...
-AC_LANG_RESTORE
-LIBS=$tmpLIBS
-CPPFLAGS=$tmpCPPFLAGS
-AC_SUBST( PETSc )
-AC_SUBST( PETSc_IMPL )
-AC_SUBST( PETSc_LIBS )
-AC_SUBST( PETSc_LIBS_PATH )
-AC_SUBST( PETSc_LIBS_PATHS )
-AC_SUBST( PETSc_INCLUDES_PATH )
-AC_SUBST( PETSc_INCLUDES_PATHS )
-])# ACX_PETSc ------------------------------------------------------------
