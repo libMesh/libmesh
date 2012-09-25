@@ -9007,12 +9007,27 @@ $as_echo "<<< Warning: configuring in serial - no MPI in PETSC config >>>" >&6; 
 $as_echo "<<< Configuring library with PETSc version $petscversion support >>>" >&6; }
 
 
-        # If we have a full petsc distro with a makefile query it to get the includes and link libs
+        # If we have a full petsc distro with a makefile query it for
+        # what we can
 	if (test -r $PETSC_DIR/makefile); then
           PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
           PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
 
-	# otherwise create a simple makefile to provide what we want, then query it.
+	# otherwise create a simple makefile to provide what we want,
+	# then query it.
+ 	  cat <<EOF >Makefile_config_petsc
+include $PETSC_DIR/conf/variables
+
+getPETSC_CC_INCLUDES:
+	echo \$(PETSC_CC_INCLUDES)
+
+getPETSC_FC_INCLUDES:
+	echo \$(PETSC_FC_INCLUDES)
+EOF
+          PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
+          PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
+	  rm -f Makefile_config_petsc
+
   	elif (test -r $PETSC_DIR/conf/variables); then
  	  cat <<EOF >Makefile_config_petsc
 include $PETSC_DIR/conf/variables
@@ -9028,7 +9043,6 @@ getPETSC_FC_INCLUDES:
 getlinklibs:
 	echo \$(PETSC_SNES_LIB)
 EOF
-	  # cat Makefile_config_petsc
           PETSCLINKLIBS=`make -s -f Makefile_config_petsc getlinklibs`
           PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc getincludedirs`
           PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
@@ -11977,7 +11991,13 @@ $as_echo "<<< Configuring library with VTK version $vtkversion support >>>" >&6;
 
 
                   old_LIBS="$LIBS"
-         LIBS="$old_LIBS -L$VTK_LIB"
+
+         VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
+	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
+	   VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
+	 fi
+
+         LIBS="$old_LIBS $VTK_LIBRARY"
 
                            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lvtkIO" >&5
 $as_echo_n "checking for main in -lvtkIO... " >&6; }
@@ -11985,7 +12005,7 @@ if ${ac_cv_lib_vtkIO_main+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lvtkIO  $LIBS"
+LIBS="-lvtkIO -lvtkCommon -lvtkFiltering $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -12102,10 +12122,6 @@ ac_cv_lib_vtkFiltering=ac_cv_lib_vtkFiltering_main
 
               if (test x$enablevtk = xyes); then
          VTK_INCLUDE="-I$VTK_INC"
-         VTK_LIBRARY="-L$VTK_LIB -lvtkIO -lvtkCommon -lvtkFiltering"
-	 if (test "x$RPATHFLAG" != "x" -a -d $VTK_LIB); then # add the VTK_LIB to the linker run path, if it is a directory
-	   VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
-	 fi
 
 $as_echo "#define HAVE_VTK 1" >>confdefs.h
 
