@@ -113,12 +113,27 @@ AC_DEFUN([CONFIGURE_PETSC],
         AC_MSG_RESULT([<<< Configuring library with PETSc version $petscversion support >>>])
   	
 	
-        # If we have a full petsc distro with a makefile query it to get the includes and link libs
+        # If we have a full petsc distro with a makefile query it for
+        # what we can
 	if (test -r $PETSC_DIR/makefile); then
           PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
           PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
 
-	# otherwise create a simple makefile to provide what we want, then query it.
+	# otherwise create a simple makefile to provide what we want,
+	# then query it.
+ 	  cat <<EOF >Makefile_config_petsc
+include $PETSC_DIR/conf/variables
+
+getPETSC_CC_INCLUDES:
+	echo \$(PETSC_CC_INCLUDES)
+
+getPETSC_FC_INCLUDES:
+	echo \$(PETSC_FC_INCLUDES)
+EOF
+          PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
+          PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_FC_INCLUDES`
+	  rm -f Makefile_config_petsc
+
   	elif (test -r $PETSC_DIR/conf/variables); then
  	  cat <<EOF >Makefile_config_petsc
 include $PETSC_DIR/conf/variables
@@ -134,7 +149,6 @@ getPETSC_FC_INCLUDES:
 getlinklibs:
 	echo \$(PETSC_SNES_LIB)
 EOF
-	  # cat Makefile_config_petsc
           PETSCLINKLIBS=`make -s -f Makefile_config_petsc getlinklibs`
           PETSCINCLUDEDIRS=`make -s -f Makefile_config_petsc getincludedirs`
           PETSC_CC_INCLUDES=`make -s -f Makefile_config_petsc getPETSC_CC_INCLUDES`
