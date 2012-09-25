@@ -61,7 +61,7 @@ public:
       return parameter_vector;
     }
 
-  Number &get_Pe()
+  Real &get_Pe()
     {
       return Peclet;       
     }
@@ -97,7 +97,7 @@ public:
   ParameterVector parameter_vector;
 
   // The Peclet number for the species transport
-  Number Peclet;
+  Real Peclet;
 
   // The functionals to be computed as QoIs
   Number computed_QoI;
