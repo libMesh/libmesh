@@ -42,8 +42,6 @@ AC_DEFUN([CONFIGURE_TBB],
     if (test -r $TBB_INCLUDE_PATH/tbb/task_scheduler_init.h) ; then
       TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
       TBB_INCLUDE=-I$TBB_INCLUDE_PATH
-      libmesh_optional_INCLUDES="$TBB_INCLUDE $libmesh_optional_INCLUDES"
-      libmesh_optional_LIBS="$TBB_LIBRARY $libmesh_optional_LIBS"
       AC_SUBST(TBB_LIBRARY)
       AC_SUBST(TBB_INCLUDE)
       AC_DEFINE(HAVE_TBB_API, 1,

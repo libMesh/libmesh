@@ -54,6 +54,11 @@ AC_CONFIG_FILES([contrib/boost/include/Makefile])
 # Petsc -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_PETSC
+if (test $enablepetsc != no) ; then
+  libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_PETSC, test x$enablepetsc = xyes)		 
 # -------------------------------------------------------------
 
 
@@ -62,6 +67,10 @@ CONFIGURE_PETSC
 # SLEPc -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_SLEPC
+if (test $enableslepc = yes ) ; then
+  libmesh_optional_INCLUDES="-I$SLEPC_DIR/include $libmesh_optional_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_SLEPC, test x$enableslepc = xyes)	 
 # -------------------------------------------------------------
 
 
@@ -71,6 +80,10 @@ CONFIGURE_SLEPC
 #               complex numbers.
 # -------------------------------------------------------------
 CONFIGURE_TRILINOS
+if ( test "$enabletrilinos" = yes ); then
+  libmesh_optional_INCLUDES="$TRILINOS_INCLUDES $AZTECOO_INCLUDES $NOX_INCLUDES $ML_INCLUDES $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$TRILINOS_LIBS $AZTECOO_LIBS $NOX_LIBS $ML_LIBS $libmesh_optional_LIBS"
+fi
 # -------------------------------------------------------------
 
 
@@ -79,6 +92,10 @@ CONFIGURE_TRILINOS
 # Intel's Threading Building Blocks -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_TBB
+if (test $enabletbb = yes); then
+  libmesh_optional_INCLUDES="$TBB_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$TBB_LIBRARY $libmesh_optional_LIBS"
+fi
 # -------------------------------------------------------------
 
 
@@ -87,6 +104,10 @@ CONFIGURE_TBB
 # LASPACK iterative solvers -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_LASPACK
+if (test $enablelaspack = yes); then
+  libmesh_contrib_INCLUDES="$LASPACK_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_LASPACK, test x$enablelaspack = xyes)		 
 AC_CONFIG_FILES([contrib/laspack/Makefile])
 # -------------------------------------------------------------
 
@@ -96,6 +117,10 @@ AC_CONFIG_FILES([contrib/laspack/Makefile])
 # Space filling curves -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_SFC
+if (test $enablesfc = yes); then
+  libmesh_contrib_INCLUDES="$SFC_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_SFC, test x$enablesfc = xyes)		 
 AC_CONFIG_FILES([contrib/sfcurves/Makefile])
 # -------------------------------------------------------------
 
@@ -105,6 +130,11 @@ AC_CONFIG_FILES([contrib/sfcurves/Makefile])
 # Compressed Streams with gzstream -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_GZ
+if (test "$enablegz" = yes) ; then
+  libmesh_contrib_INCLUDES="$GZSTREAM_INCLUDE $libmesh_contrib_INCLUDES"
+  libmesh_optional_LIBS="-lz $libmesh_optional_LIBS"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_GZSTREAMS, test x$enablegz = xyes)
 AC_CONFIG_FILES([contrib/gzstream/Makefile])
 # -------------------------------------------------------------
 
@@ -160,6 +190,10 @@ fi
 # Tecplot, from source -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_TECIO
+if (test $enabletecio = yes); then
+  libmesh_contrib_INCLUDES="$TECIO_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_TECIO, test x$enabletecio = xyes)
 AC_CONFIG_FILES([contrib/tecplot/tecio/Makefile])
 # -------------------------------------------------------------
 
@@ -169,6 +203,10 @@ AC_CONFIG_FILES([contrib/tecplot/tecio/Makefile])
 # Tecplot, vendor provided libraries -- disabled by default
 # -------------------------------------------------------------
 CONFIGURE_TECPLOT
+if (test $enabletecplot = yes); then
+  libmesh_contrib_INCLUDES="$TECPLOT_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_TECPLOT, test x$enabletecplot = xyes)		 
 # -------------------------------------------------------------
 
 
@@ -177,6 +215,10 @@ CONFIGURE_TECPLOT
 # Metis Partitioning -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_METIS
+if (test $enablemetis = yes); then
+  libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_METIS, test x$enablemetis = xyes)		 
 AC_CONFIG_FILES([contrib/metis/Makefile])
 # -------------------------------------------------------------
 
@@ -186,6 +228,10 @@ AC_CONFIG_FILES([contrib/metis/Makefile])
 # Parmetis Partitioning -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_PARMETIS
+if (test $enableparmetis = yes); then
+  libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_PARMETIS, test x$enableparmetis = xyes)		 
 AC_CONFIG_FILES([contrib/parmetis/Makefile])
 # -------------------------------------------------------------
 
@@ -218,6 +264,10 @@ fi
 # TetGen -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_TETGEN
+if (test $enabletetgen = yes); then
+  libmesh_contrib_INCLUDES="$TETGEN_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_TETGEN, test x$enabletetgen = xyes)
 AC_CONFIG_FILES([contrib/tetgen/Makefile])
 # -------------------------------------------------------------
 
@@ -227,6 +277,10 @@ AC_CONFIG_FILES([contrib/tetgen/Makefile])
 # Triangle -- enabled by default (it is distributed in contrib)
 # -------------------------------------------------------------
 CONFIGURE_TRIANGLE
+if (test $enabletriangle = yes); then
+  libmesh_contrib_INCLUDES="$TRIANGLE_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_TRIANGLE, test x$enabletriangle = xyes)
 AC_CONFIG_FILES([contrib/triangle/Makefile])
 # -------------------------------------------------------------
 
@@ -236,6 +290,10 @@ AC_CONFIG_FILES([contrib/triangle/Makefile])
 # GMV -- file I/O API is enabled by default (it is distributed in contrib)
 # -------------------------------------------------------------
 CONFIGURE_GMV
+if (test x$enablegmv = xyes); then
+  libmesh_contrib_INCLUDES="$GMV_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_GMV, test x$enablegmv = xyes)		 
 AC_CONFIG_FILES([contrib/gmv/Makefile])
 # -------------------------------------------------------------
 
@@ -245,6 +303,10 @@ AC_CONFIG_FILES([contrib/gmv/Makefile])
 # VTK -- Mesh I/O API is enabled by default
 # -------------------------------------------------------------
 CONFIGURE_VTK
+if (test x$enablevtk = xyes); then
+  libmesh_optional_INCLUDES="$VTK_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$VTK_LIBRARY $libmesh_optional_LIBS"
+fi
 AM_CONDITIONAL(LIBMESH_ENABLE_VTK, test x$enablevtk = xyes)
 # -------------------------------------------------------------
 
@@ -254,6 +316,9 @@ AM_CONDITIONAL(LIBMESH_ENABLE_VTK, test x$enablevtk = xyes)
 # Eigen -- Optimized linear algebra routines, enabled by default
 # -------------------------------------------------------------
 CONFIGURE_EIGEN
+if (test x$enableeigen = xyes); then
+  libmesh_optional_INCLUDES="$EIGEN_INCLUDE $libmesh_optional_INCLUDES"
+fi
 AM_CONDITIONAL(LIBMESH_ENABLE_EIGEN, test x$enableeigen = xyes)
 # -------------------------------------------------------------
 
@@ -264,6 +329,10 @@ AM_CONDITIONAL(LIBMESH_ENABLE_EIGEN, test x$enableeigen = xyes)
 # Enabled by default.
 # -------------------------------------------------------------
 CONFIGURE_GLPK
+if (test x$enableglpk = xyes); then
+  libmesh_optional_INCLUDES="$GLPK_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$GLPK_LIBRARY $libmesh_optional_LIBS"
+fi
 AM_CONDITIONAL(LIBMESH_ENABLE_GLPK, test x$enableglpk = xyes)
 # -------------------------------------------------------------
 
@@ -273,6 +342,10 @@ AM_CONDITIONAL(LIBMESH_ENABLE_GLPK, test x$enableglpk = xyes)
 # netCDF -- enabled by default (it is distributed in contrib)
 # --------------------------------------------------------------
 CONFIGURE_NETCDF
+if (test $enablenetcdf = yes); then
+  libmesh_contrib_INCLUDES="$NETCDF_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF, test x$enablenetcdf = xyes)
 AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
 
    # -------------------------------------------------------------
@@ -280,6 +353,10 @@ AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
    # (note that ExodusII requires netCDF
    # -------------------------------------------------------------
    CONFIGURE_EXODUS
+   if (test $enableexodus = yes); then
+     libmesh_contrib_INCLUDES="$EXODUS_INCLUDE $libmesh_contrib_INCLUDES"
+   fi
+   AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS, test x$enableexodus = xyes)
    AC_CONFIG_FILES([contrib/exodusii/Lib/Makefile])
 
       # -------------------------------------------------------------
@@ -287,6 +364,10 @@ AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
       # (note that Nemesis requires netCDF and exodus)
       # -------------------------------------------------------------
       CONFIGURE_NEMESIS
+      if (test $enablenemesis = yes); then
+         libmesh_contrib_INCLUDES="$NEMESIS_INCLUDE $libmesh_contrib_INCLUDES"
+      fi
+      AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS, test x$enablenemesis = xyes)
       AC_CONFIG_FILES([contrib/nemesis/Lib/Makefile])
       # -------------------------------------------------------------
    # -------------------------------------------------------------
@@ -299,6 +380,10 @@ AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
 #               enabled by default
 # -------------------------------------------------------------
 CONFIGURE_LIBHILBERT
+if (test $enablelibhilbert = yes); then
+  libmesh_contrib_INCLUDES="$LIBHILBERT_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_LIBHILBERT, test x$enablelibhilbert = xyes)
 AC_CONFIG_FILES([contrib/libHilbert/Makefile])
 # -------------------------------------------------------------
 
@@ -309,6 +394,10 @@ AC_CONFIG_FILES([contrib/libHilbert/Makefile])
 #            enabled by default
 # -------------------------------------------------------------
 CONFIGURE_FPARSER
+if (test $enablefparser = yes); then
+  libmesh_contrib_INCLUDES="$FPARSER_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_FPARSER, test x$enablefparser = xyes)
 AC_CONFIG_FILES([contrib/fparser/Makefile])
 # -------------------------------------------------------------
 

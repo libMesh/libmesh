@@ -19,26 +19,25 @@ if (test $enablegz = yes); then
   # First check for the required system headers and libraries
   AC_CHECK_HEADERS(zlib.h, have_zlib_h=yes)
   AC_CHECK_LIB(z, gzopen, have_libz=yes)
+fi
 
-  # If both tests succeded, continue the configuration process.
-  if (test "$have_zlib_h" = yes -a "$have_libz" = yes) ; then
-    GZSTREAM_INCLUDE="-I\$(top_srcdir)/contrib/gzstream"
-    GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
-    AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
-    AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)     
-    libmesh_contrib_INCLUDES="$GZSTREAM_INCLUDE $libmesh_contrib_INCLUDES"
-    libmesh_optional_LIBS="-lz $libmesh_optional_LIBS"
-  # Otherwise do not enable gzstreams
-  else
-    GZSTREAM_INCLUDE=""
-    GZSTREAM_LIB=""
-    enablegz=no;
-  fi
+if (test "$have_zlib_h" != yes -o "$have_libz" != yes) ; then
+  enablegz = no
+fi
+
+# If both tests succeded, continue the configuration process.
+if (test "$enablegz" = yes) ; then
+  GZSTREAM_INCLUDE="-I\$(top_srcdir)/contrib/gzstream"
+  GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
+  AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
+  AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)     
+# Otherwise do not enable gzstreams
+else
+  GZSTREAM_INCLUDE=""
+  GZSTREAM_LIB=""
 fi
 
 AC_SUBST(GZSTREAM_INCLUDE)
 AC_SUBST(GZSTREAM_LIB)	
 AC_SUBST(enablegz)
-
-AM_CONDITIONAL(LIBMESH_ENABLE_GZSTREAMS, test x$enablegz = xyes)
 ])

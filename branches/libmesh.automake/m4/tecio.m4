@@ -44,7 +44,6 @@ AC_DEFUN([CONFIGURE_TECIO],
      AC_DEFINE(HAVE_TECPLOT_API, 1, [Flag indicating whether the library will be compiled with Tecplot TecIO API support])
      AC_DEFINE(HAVE_TECPLOT_API_112, 1, [Flag indicating tecplot API understands newer features])
      AC_MSG_RESULT(<<< Configuring library with Tecplot TecIO support >>>)
-     libmesh_contrib_INCLUDES="$TECIO_INCLUDE $libmesh_contrib_INCLUDES"
      have_tecio=yes
   else
      TECIO_INCLUDE=""
@@ -55,6 +54,4 @@ AC_DEFUN([CONFIGURE_TECIO],
   AC_SUBST(TECIO_INCLUDE)
   AC_SUBST(TECIO_CPPFLAGS)
   AC_SUBST(enabletecio)
-		 
-  AM_CONDITIONAL(LIBMESH_ENABLE_TECIO, test x$enabletecio = xyes)
 ])
