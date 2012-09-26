@@ -179,8 +179,6 @@ Number MeshFunction::operator() (const Point& p,
 				 const Real time)
 {
   libmesh_assert (this->initialized());
-  // At the moment the function we call ignores the time
-  libmesh_assert_equal_to (time, 0.);
 
   DenseVector<Number> buf (1);
   this->operator() (p, time, buf);
@@ -193,8 +191,6 @@ Gradient MeshFunction::gradient (const Point& p,
 				 const Real time)
 {
   libmesh_assert (this->initialized());
-  // At the moment the function we call ignores the time
-  libmesh_assert_equal_to (time, 0.);
 
   std::vector<Gradient> buf (1);
   this->gradient(p, time, buf);
@@ -208,8 +204,6 @@ Tensor MeshFunction::hessian (const Point& p,
 			      const Real time)
 {
   libmesh_assert (this->initialized());
-  // At the moment the function we call ignores the time
-  libmesh_assert_equal_to (time, 0.);
 
   std::vector<Tensor> buf (1);
   this->hessian(p, time, buf);
