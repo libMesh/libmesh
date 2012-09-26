@@ -21,6 +21,17 @@ adjoints_ex3_LDADD   = $(top_builddir)/libmesh.la
 
 CLEANFILES = primal.out.gmv.000.05 primal.out.gmv.000.04 primal.out.gmv.000.03 primal.out.gmv.000.02 primal.out.gmv.000.01 primal.out.gmv.000.00 out_timesteps.m out_time.m out_solvesteps.m out_clocktime.m out_activemesh.m error.gmv.004.00_with_pressure error.gmv.004.00_total error.gmv.004.00_non_pressure error.gmv.004.00_convection_diffusion_y error.gmv.004.00_convection_diffusion_x error.gmv.003.00_with_pressure error.gmv.003.00_total error.gmv.003.00_non_pressure error.gmv.003.00_convection_diffusion_y error.gmv.003.00_convection_diffusion_x error.gmv.002.00_with_pressure error.gmv.002.00_total error.gmv.002.00_non_pressure error.gmv.002.00_convection_diffusion_y error.gmv.002.00_convection_diffusion_x error.gmv.001.00_with_pressure error.gmv.001.00_total error.gmv.001.00_non_pressure error.gmv.001.00_convection_diffusion_y error.gmv.001.00_convection_diffusion_x error.gmv.000.00_with_pressure error.gmv.000.00_total error.gmv.000.00_non_pressure error.gmv.000.00_convection_diffusion_y error.gmv.000.00_convection_diffusion_x complete adjoint.out.gmv.000.04 adjoint.out.gmv.000.03 adjoint.out.gmv.000.02 adjoint.out.gmv.000.01 adjoint.out.gmv.000.00 
 
+# also need links for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f general.in  && $(LN_S) $(srcdir)/general.in .
+	-rm -f H_channel_quads.xda && $(LN_S) $(srcdir)/H_channel_quads.xda .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += general.in H_channel_quads.xda .linkstamp
+endif
+
 ######################################################################
 #
 # Running the tests

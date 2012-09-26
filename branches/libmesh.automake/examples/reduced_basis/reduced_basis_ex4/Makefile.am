@@ -24,6 +24,18 @@ CLEANFILES = RB_sol.e rb_data/RB_F_019.xdr rb_data/RB_F_018.xdr rb_data/RB_F_017
 clean-local:
 	-rm -rf rb_data eim_data
 
+# also need to link files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f reduced_basis_ex4.in && $(LN_S) $(srcdir)/reduced_basis_ex4.in .
+	-rm -f eim.in               && $(LN_S) $(srcdir)/eim.in .
+	-rm -f rb.in                && $(LN_S) $(srcdir)/rb.in .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += reduced_basis_ex4.in eim.in rb.in .linkstamp
+endif
+
 ######################################################################
 #
 # Running the tests

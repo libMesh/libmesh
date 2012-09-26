@@ -8,10 +8,6 @@ example_name=reduced_basis_ex4
 
 example_dir=examples/reduced_basis/$example_name
 
-link_if_needed $LIBMESH_DIR/$example_dir/reduced_basis_ex4.in
-link_if_needed $LIBMESH_DIR/$example_dir/eim.in
-link_if_needed $LIBMESH_DIR/$example_dir/rb.in
-
 message_running "$example_name" 
 
 options="-online_mode 0"
@@ -21,7 +17,3 @@ options="-online_mode 1"
 run_example "$example_name" "$options"
 
 message_done_running "$example_name"
-
-discard_link $LIBMESH_DIR/$example_dir/reduced_basis_ex4.in
-discard_link $LIBMESH_DIR/$example_dir/eim.in
-discard_link $LIBMESH_DIR/$example_dir/rb.in

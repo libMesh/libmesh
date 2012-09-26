@@ -28,6 +28,16 @@ if LIBMESH_ENABLE_SLEPC
   check_SCRIPTS = run.sh
 endif
 
+# also need to link files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f reduced_basis_ex3.in && $(LN_S) $(srcdir)/reduced_basis_ex3.in .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += reduced_basis_ex3.in .linkstamp
+endif
+
 ######################################################################
 #
 # Running the tests

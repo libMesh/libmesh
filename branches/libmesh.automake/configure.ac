@@ -59,8 +59,20 @@ AX_PREFIX_CONFIG_H(include/libmesh/libmesh_config.h,LIBMESH,include/libmesh/libm
 AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests parallel-tests 1.11]) # require automake 1.11 - color tests
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)]) # use silent rules where available - automake 1.11
 
+# --------------------------------------------------------------
+# Determine if we are doing a local or VPATH build. In the case
+# of the latter we will need to go through some extra effort to
+# create links for the example source files.
+# --------------------------------------------------------------
+AC_CHECK_FILE(src/base/libmesh.C, [libmesh_vpath_build=no], [libmesh_vpath_build=yes])
+if (test $libmesh_vpath_build = yes); then
+    AC_MSG_RESULT(<<< Configuring build directory for VPATH build >>>)
+fi	 
+AM_CONDITIONAL(LIBMESH_VPATH_BUILD, test x$libmesh_vpath_build = xyes)
 
-dnl Release versioning
+# --------------------------------------------------------------
+# Release versioning
+# --------------------------------------------------------------
 AX_SPLIT_VERSION
 
 GENERIC_MAJOR_VERSION=$AX_MAJOR_VERSION
@@ -256,6 +268,7 @@ AC_CONFIG_FILES([
 		examples/systems_of_equations/systems_of_equations_ex3/Makefile
 		examples/systems_of_equations/systems_of_equations_ex4/Makefile
 		examples/systems_of_equations/systems_of_equations_ex5/Makefile
+		examples/systems_of_equations/systems_of_equations_ex6/Makefile
 		examples/reduced_basis/reduced_basis_ex1/Makefile
 		examples/reduced_basis/reduced_basis_ex2/Makefile
 		examples/reduced_basis/reduced_basis_ex3/Makefile

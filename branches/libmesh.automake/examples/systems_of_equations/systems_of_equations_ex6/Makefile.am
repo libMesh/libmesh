@@ -19,6 +19,8 @@ systems_of_equations_ex6_DATA    = systems_of_equations_ex6.C
 systems_of_equations_ex6_SOURCES = $(systems_of_equations_ex6_DATA) run.sh
 systems_of_equations_ex6_LDADD   = $(top_builddir)/libmesh.la
 
+CLEANFILES = displacement.e
+
 ######################################################################
 #
 # Running the tests

@@ -21,6 +21,15 @@ transient_ex2_LDADD   = $(top_builddir)/libmesh.la
 
 CLEANFILES = pressure_node.res out.*.gmv
 
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f pipe-mesh.unv && $(LN_S) $(srcdir)/pipe-mesh.unv .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += pipe-mesh.unv .linkstamp
+endif
+
 ######################################################################
 #
 # Running the tests

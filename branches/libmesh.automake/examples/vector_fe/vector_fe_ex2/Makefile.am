@@ -22,6 +22,16 @@ vector_fe_ex2_LDADD   = $(top_builddir)/libmesh.la
 
 CLEANFILES = out.e 
 
+# also need to link files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f vector_fe_ex2.in && $(LN_S) $(srcdir)/vector_fe_ex2.in .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += vector_fe_ex2.in .linkstamp
+endif
+
 ######################################################################
 #
 # Running the tests

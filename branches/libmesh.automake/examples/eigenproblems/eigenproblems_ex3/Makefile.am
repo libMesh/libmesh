@@ -25,6 +25,17 @@ if LIBMESH_ENABLE_SLEPC
   check_SCRIPTS = run.sh
 endif
 
+# also need to link files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f drum1_mesh.e && $(LN_S) $(srcdir)/drum1_mesh.e .
+	-rm -f drum2_mesh.e && $(LN_S) $(srcdir)/drum2_mesh.e .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += drum*_mesh.xda .linkstamp
+endif
+
 ######################################################################
 #
 # Running the tests

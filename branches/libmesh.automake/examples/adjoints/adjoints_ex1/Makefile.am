@@ -21,6 +21,18 @@ adjoints_ex1_LDADD   = $(top_builddir)/libmesh.la
 
 CLEANFILES = primal_error.gmv primal.out.* dual_error.gmv adjoint_?.out.*
 
+# also need to link mesh.xda for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f general.in  && $(LN_S) $(srcdir)/general.in .
+	-rm -f l-shaped.in && $(LN_S) $(srcdir)/l-shaped.in .
+	-rm -f lshaped.xda && $(LN_S) $(srcdir)/lshaped.xda .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += general.in l-shaped.in lshaped.xda .linkstamp
+endif
+
 ######################################################################
 #
 # Running the tests

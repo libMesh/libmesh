@@ -21,6 +21,18 @@ adaptivity_ex3_LDADD   = $(top_builddir)/libmesh.la
 
 CLEANFILES = lshaped.e biquadratic_h_adaptive.m 
 
+# need to link files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f lshaped.xda       && $(LN_S) $(srcdir)/lshaped.xda .
+	-rm -f lshaped3D.xda     && $(LN_S) $(srcdir)/lshaped3D.xda .
+	-rm -f adaptivity_ex3.in && $(LN_S) $(srcdir)/adaptivity_ex3.in .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += lshaped.xda lshaped3D.xda adaptivity_ex3.in .linkstamp
+endif
+
 ######################################################################
 #
 # Running the tests

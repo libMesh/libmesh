@@ -7,8 +7,6 @@ source $LIBMESH_DIR/examples/run_common.sh
 example_name=adaptivity_ex2
 example_dir=examples/adaptivity/$example_name
 
-link_if_needed $LIBMESH_DIR/$example_dir/mesh.xda
-
 # Specify the number of timesteps to do
 n_timesteps=25
 
@@ -34,5 +32,3 @@ run_example "$example_name" "$options"
 
 options=" \[-read_solution\] -n_timesteps $n_timesteps -n_refinements $n_refinements -init_timestep \[0\|$n_timesteps\]"
 message_done_running "$example_name" "$options"
-
-discard_link $LIBMESH_DIR/$example_dir/mesh.xda

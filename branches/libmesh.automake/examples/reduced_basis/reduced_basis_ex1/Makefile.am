@@ -24,6 +24,16 @@ CLEANFILES = RB_sol.e offline_data/RB_F_000.xdr offline_data/RB_A_002.xdr offlin
 clean-local:
 	-rm -rf offline_data 
 
+# also need to link files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f reduced_basis_ex1.in && $(LN_S) $(srcdir)/reduced_basis_ex1.in .
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += reduced_basis_ex1.in .linkstamp
+endif
+
 ######################################################################
 #
 # Running the tests
