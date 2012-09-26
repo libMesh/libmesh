@@ -344,8 +344,9 @@ namespace {
      * constructor to set context
      */
     explicit
-    QoIContributions(FEMSystem &sys, DifferentiableQoI &diff_qoi) :
-      qoi(sys.qoi.size(), 0.), _sys(sys), _diff_qoi(diff_qoi) {}
+    QoIContributions(FEMSystem &sys, DifferentiableQoI &diff_qoi,
+		     const QoISet &qoi_indices) :
+      qoi(sys.qoi.size(), 0.), _sys(sys), _diff_qoi(diff_qoi),_qoi_indices(qoi_indices) {}
 
     /**
      * splitting constructor
@@ -392,8 +393,8 @@ namespace {
               _diff_qoi.side_qoi(_femcontext, _qoi_indices);
             }
         }
-
-      this->qoi = _femcontext.elem_qoi;
+      
+      this->_diff_qoi.thread_join( this->qoi, _femcontext.elem_qoi, _qoi_indices );
     }
 
     void join (const QoIContributions& other)
@@ -732,7 +733,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
   // Create a non-temporary qoi_contributions object, so we can query
   // its results after the reduction
-  QoIContributions qoi_contributions(*this, *(this->diff_qoi));
+  QoIContributions qoi_contributions(*this, *(this->diff_qoi), qoi_indices);
 
   // Loop over every active mesh element on this processor
   Threads::parallel_reduce(elem_range.reset(mesh.active_local_elements_begin(),
