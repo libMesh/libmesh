@@ -487,7 +487,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
     // We get different scalars as different
     // components from a new-style f functor.
     DenseVector<Number> fout(this->n_components());
-    (*f) (Point(), system.time, fout);
+    (*f) (Point(), this->time, fout);
 
     const DofMap& dof_map = this->get_dof_map();
     for (unsigned int var=0; var<this->n_vars(); var++)
