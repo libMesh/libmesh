@@ -59,7 +59,7 @@ namespace libMesh
       case SCALAR:
 	{
 	  // Should never need this for SCALARs
-	  AutoPtr<FETransformationBase<OutputShape> > ap( NULL );
+	  AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
 	  return ap;
 	}
 	
