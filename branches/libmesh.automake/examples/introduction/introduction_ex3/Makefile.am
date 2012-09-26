@@ -19,6 +19,8 @@ introduction_ex3_DATA    = introduction_ex3.C exact_solution.C
 introduction_ex3_SOURCES = $(introduction_ex3_DATA) run.sh
 introduction_ex3_LDADD   = $(top_builddir)/libmesh.la
 
+CLEANFILES = out_0.vtu out.pvtu
+
 ######################################################################
 #
 # Running the tests

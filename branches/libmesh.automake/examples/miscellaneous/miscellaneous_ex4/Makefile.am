@@ -19,6 +19,8 @@ miscellaneous_ex4_SOURCES = $(miscellaneous_ex4_DATA) run.sh
 miscellaneous_ex4_LDADD   = $(top_builddir)/libmesh.la
 check_SCRIPTS             = run.sh
 
+CLEANFILES = out_0.vtu out.pvtu
+
 ######################################################################
 #
 # Running the tests
