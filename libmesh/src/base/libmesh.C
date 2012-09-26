@@ -16,15 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-
-// C++ includes
-#include <iostream>
-#include <fstream>
-
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-#include <exception>
-#endif
-
 // Local includes
 #include "libmesh/libmesh.h"
 #include "libmesh/auto_ptr.h"
@@ -33,6 +24,17 @@
 #include "libmesh/reference_counter.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
+
+
+// C/C++ includes
+#include <iostream>
+#include <fstream>
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+#include <exception>
+#endif
+
+#include "signal.h"
 
 
 // floating-point exceptions
