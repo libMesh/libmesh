@@ -396,25 +396,12 @@ void CoupledSystem::postprocess()
 Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
 					const Real /* time */)
 { 
-  Real w = 1.;
-  
-  Number u = c.point_value(0, p);
-	
-  w = u;		
-  
-  return w;
-
+  return c.point_value(0, p);
 }
 
 Number CoupledFEMFunctionsy::operator()(const FEMContext& c, const Point& p,
 					const Real /* time */)
 {
-  Real w = 1.;
-  
-  Number v = c.point_value(1, p);
-	
-  w = v;	
-	    
-  return w;      
+  return c.point_value(1, p);
 }
 
