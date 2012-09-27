@@ -34,7 +34,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
     case "${host_os}" in
       *darwin* | *cygwin*) 
         enablefparseroptimizer=no 
-        AC_MSG_RESULT(>>> Disabling fparser optimization on ${host_os} <<<)
+        AC_MSG_RESULT(<<< Disabling fparser optimization on ${host_os} >>>)
         ;;
         *) ;;
     esac	

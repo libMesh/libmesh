@@ -64,7 +64,7 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
       if (test $slepcversion != $petscversion) ; then
         AC_MSG_RESULT(WARNING:)
-        AC_MSG_RESULT(>>> Different version numbers for SLEPc and PETSc <<<)
+        AC_MSG_RESULT(<<< Different version numbers for SLEPc and PETSc >>>)
       fi
   dnl        AC_MSG_RESULT(Will skip SLEPc support)
   dnl        enableslepc=no
