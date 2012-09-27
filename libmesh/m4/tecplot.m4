@@ -14,7 +14,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 		 [enabletecplot=$enableoptional])
 
   # Can't support both vendor-provided libraries and building from source, and we prefer the latter
-  if (test $enabletecplot = yes -a $enabletecio = yes); then
+  if (test "x$enabletecplot" = "xyes" -a "x$enabletecio" = "xyes"); then
      AC_MSG_RESULT([>>> Not using vendor provided tecio libraries, deferring to source build <<<])
      enabletecplot=no
   fi
