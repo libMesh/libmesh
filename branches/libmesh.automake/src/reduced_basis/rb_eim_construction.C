@@ -362,6 +362,8 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
     truth_solve(-1);
     
     _parametrized_functions_in_training_set[i] = solution->clone().release();
+    
+    libMesh::out << "Completed solve for training sample " << (i+1) << " of " << get_n_training_samples() << std::endl;
   }
   
   _parametrized_functions_in_training_set_initialized = true;

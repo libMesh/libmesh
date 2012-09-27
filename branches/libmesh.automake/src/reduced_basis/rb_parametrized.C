@@ -156,28 +156,10 @@ void RBParametrized::set_parameters(const RBParameters& params)
     libmesh_error();
   }
 
-  if(!valid_params(params))
-  {
-    libMesh::err << "Invalid input parameters in RBParametrized::set_parameters" << std::endl;
+  valid_params(params); // Terminates if params has the wrong number of parameters
 
-    RBParameters::const_iterator it     = params.begin();
-    RBParameters::const_iterator it_end = params.end();
-    for( ; it != it_end; ++it)
-    {
-      std::string param_name = it->first;
-      Real param_value = it->second;
-      libMesh::out << "parameter: " << param_name << ", value = " << param_value << ", min = "
-                   << this->get_parameter_min(param_name) << ", max = "
-                   << this->get_parameter_max(param_name) << std::endl;
-    }
-
-    libmesh_error();
-  }
-  else
-  {
-    // Make a copy of params (default assignment operator just does memberwise copy, which is sufficient here)
-    this->parameters = params;
-  }
+  // Make a copy of params (default assignment operator just does memberwise copy, which is sufficient here)
+  this->parameters = params;
 }
 
 const RBParameters& RBParametrized::get_parameters() const
@@ -321,7 +303,9 @@ bool RBParametrized::valid_params(const RBParameters& params)
 {
   if(params.n_parameters() != get_n_params())
   {
-   return false;
+    libMesh::out << "Error: Number of parameters don't match" << std::endl;
+    libmesh_error();
+    return false;
   }
   else
   {
@@ -334,6 +318,12 @@ bool RBParametrized::valid_params(const RBParameters& params)
       valid = valid && ( (get_parameter_min(param_name) <= params.get_value(param_name)) &&
                          (params.get_value(param_name) <= get_parameter_max(param_name)) );
     }
+    
+    if(!valid)
+    {
+      libMesh::out << "Warning: parameter is outside parameter range" << std::endl;      
+    }
+
     return valid;
   }
 }
