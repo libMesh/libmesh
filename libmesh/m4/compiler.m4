@@ -336,7 +336,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
         CXXFLAGS_DVL="-fno-common"
         CXXFLAGS_DBG="-fno-common"
         LDFLAGS="$LDFLAGS -Wl,-undefined,dynamic_lookup,-flat_namespace"
-        if test $APPLE_GCC = true ; then
+        if (test "x$APPLE_GCC" = "xtrue") ; then
           case "$GXX_VERSION_STRING" in
             *4.0.* | *3.4.* | *3.3.* | *3.2.* | *3.1.* | *3.0.* | *2.97* | *2.96* | *2.95* | *"egcs-1.1"*)
               CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
