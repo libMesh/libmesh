@@ -38,10 +38,10 @@
 
 
 // floating-point exceptions
-// prefer fenv on linux
 #ifdef LIBMESH_HAVE_FENV_H
 #  include <fenv.h>
-#elif LIBMESH_HAVE_XMMINTRIN_H
+#endif
+#ifdef LIBMESH_HAVE_XMMINTRIN_H
 #  include <xmmintrin.h>
 #endif
 

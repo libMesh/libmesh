@@ -92,7 +92,7 @@ void CoupledSystemQoI::side_qoi(DiffContext &context, const QoISet & /* qois */)
 
   unsigned int n_qpoints = c.side_qrule->n_points();  
     
-  Real dQoI_0 = 0. ;
+  Number dQoI_0 = 0. ;
   Number u = 0. ;
   Number C = 0. ;
   
