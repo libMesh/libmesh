@@ -282,7 +282,7 @@ AC_ARG_ENABLE(shared,
               enableshared=$enableval,
               enableshared=yes)
 AC_SUBST(enableshared)	
-dnl --------------------------------------------------------------
+dnl -------------------------------------------------------------
 
 
 
@@ -902,11 +902,33 @@ dnl -------------------------------------------------------------
 
 
 dnl -------------------------------------------------------------
+dnl The AX_TLS test checks whether things *compile* with __thread, but
+dnl not whether they will actually link in a shared library.  The __thread keyword
+dnl does *compile* on OSX/clang, but fails to link, so we explicitly handle
+dnl that case by setting an environment variable that AX_TLS respects.
+dnl -------------------------------------------------------------
+if (test "x$GXX_VERSION" = "xclang" -a "x$enableshared" = "xyes") ; then
+  dnl The 'test' command cannot do regular expression matching, so use a case statement
+  dnl to find Darwin in $target_os.
+  case "$target_os" in
+    *darwin*)
+      AC_MSG_RESULT([<<< Clang compiler building shared library on OSX detected, disabling TLS. >>>])
+      ac_cv_tls=none;
+      ;;
+  esac
+fi
+
+dnl -------------------------------------------------------------
 dnl Intel's Threading Building Blocks  -- enabled by default
 dnl -------------------------------------------------------------
 CONFIGURE_TBB
-AX_TLS
 dnl -------------------------------------------------------------
+
+dnl -------------------------------------------------------------
+dnl Check whether the __thread keyword (or some variant) is supported
+dnl -------------------------------------------------------------
+AX_TLS
+
 
 dnl -------------------------------------------------------------
 dnl OpenMP Support  -- enabled by default
