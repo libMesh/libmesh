@@ -710,6 +710,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
       unsigned int this_node_id = *set_it;
       Node& this_node = this->node(this_node_id);
       
+      bool found_matching_nodes = false;
+      
       std::set<unsigned int>::iterator other_set_it     = other_boundary_node_ids.begin();
       std::set<unsigned int>::iterator other_set_it_end = other_boundary_node_ids.end();
       for( ; other_set_it != other_set_it_end; ++other_set_it)
@@ -721,6 +723,13 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
         
         if(node_distance < tol)
         {
+          // Make sure we didn't already find a matching node!
+          if(found_matching_nodes)
+          {
+            libMesh::out << "Error: Found multiple matching nodes in stitch_meshes" << std::endl;
+            libmesh_error();
+          }
+          
           node_to_node_map[this_node_id] = other_node_id;
           
           // Build a vector of all the elements in other_mesh that contain other_node
@@ -738,7 +747,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
           }
           
           node_to_elems_map[this_node_id] = other_elem_ids;
-          break;
+          
+          found_matching_nodes = true;
         }
       }
     }
@@ -884,8 +894,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     {
       Elem *elem = *elem_it;
       
-      // First copy boundary info to the stitched mesh
       for (unsigned int side_id=0; side_id<elem->n_sides(); side_id++)
+      {
         if (elem->neighbor(side_id) != NULL)
         {
           boundary_id_type bc_id = this->boundary_info->boundary_id (elem, side_id);
@@ -896,6 +906,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
             this->boundary_info->remove_side(elem, side_id);
           }
         }
+      }
     }
   }
 
