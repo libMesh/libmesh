@@ -49,5 +49,5 @@ for METHOD in $METHODS ; do
     echo " "
 
     ../configure --with-cxx=`which mpicxx` --with-cc=`which mpicc` --with-f77=`which mpif77` --with-fc=`which mpif90` --prefix=$install_dir --disable-dependency-tracking $@
-    make --no-print-directory -j 8 && make --no-print-directory -j 8 install || exit 1
+    make --no-print-directory -j 2 && make --no-print-directory -j 2 install || exit 1
 done

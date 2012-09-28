@@ -131,12 +131,7 @@ examples/reduced_basis/reduced_basis_ex4/equation_systems.xda
 examples/reduced_basis/reduced_basis_ex4/equation_systems.xda.0000
 examples/adaptivity/adaptivity_ex2/saved_mesh.xda
 examples/adaptivity/adaptivity_ex2/saved_solution.xda
-examples/adaptivity/adaptivity_ex5/out.e.000
-examples/adaptivity/adaptivity_ex5/out.e.010
-examples/adaptivity/adaptivity_ex5/out.e.020
-examples/adaptivity/adaptivity_ex5/out.e.030
-examples/adaptivity/adaptivity_ex5/out.e.040
-examples/adaptivity/adaptivity_ex5/out.e.050
+examples/adaptivity/adaptivity_ex5/out_*.e
 examples/adaptivity/adaptivity_ex5/saved_mesh.xdr
 examples/adaptivity/adaptivity_ex5/saved_solution.e
 examples/adaptivity/adaptivity_ex5/saved_solution.xdr
@@ -168,3 +163,10 @@ examples/vector_fe/vector_fe_ex1/out.e
 examples/vector_fe/vector_fe_ex2/out.e
 bin/*/libmesh-config
 include/utils/libmesh_version.h
+examples/adjoints/adjoints_ex3/complete
+examples/adjoints/adjoints_ex3/out_activemesh.m
+examples/adjoints/adjoints_ex3/out_clocktime.m
+examples/adjoints/adjoints_ex3/out_solvesteps.m
+examples/adjoints/adjoints_ex3/out_time.m
+examples/adjoints/adjoints_ex3/out_timesteps.m
+examples/vector_fe/vector_fe_ex3/out.e
