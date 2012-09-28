@@ -1,16 +1,16 @@
-dnl ----------------------------------------------------------------
-dnl Locate header files for the C++ linear algebra library Eigen.
-dnl Eigen is a header-only template library. By default we check for the
-dnl Eigen files in the --with-eigen-include=xxx argument provided to
-dnl configure, or if those don't exist in the $EIGEN_INC/Eigen directory,
-dnl or in /usr/include.  
+# ----------------------------------------------------------------
+# Locate header files for the C++ linear algebra library Eigen.
+# Eigen is a header-only template library. By default we check for the
+# Eigen files in the --with-eigen-include=xxx argument provided to
+# configure, or if those don't exist in the $EIGEN_INC/Eigen directory,
+# or in /usr/include.  
 dnl
-dnl Note: Eigen is installed (by default) at the location
-dnl /path/to/eigen/Eigen, i.e. with path ending in capital 'Eigen'.
-dnl You should specify --with-eigen-include=/path/to/eigen
-dnl during configure, or set your $EIGEN_INC environment variable
-dnl to /path/to/eigen.
-dnl ----------------------------------------------------------------
+# Note: Eigen is installed (by default) at the location
+# /path/to/eigen/Eigen, i.e. with path ending in capital 'Eigen'.
+# You should specify --with-eigen-include=/path/to/eigen
+# during configure, or set your $EIGEN_INC environment variable
+# to /path/to/eigen.
+# ----------------------------------------------------------------
 
 AC_DEFUN([CONFIGURE_EIGEN], 
 [
@@ -27,32 +27,40 @@ AC_DEFUN([CONFIGURE_EIGEN],
 
   if (test $enableeigen = yes); then
   
-    dnl User-specific include path
+    # User-specific include path
     AC_ARG_WITH(eigen-include,
                 AC_HELP_STRING([--with-eigen-include=PATH],[Specify the path for EIGEN header files]),
                 witheigeninc=$withval,
                 witheigeninc=no)
   
-    dnl Fall back on default paths to Eigen's include files
+    # Fall back on default paths to Eigen's include files
     if (test $witheigeninc != no); then
       EIGEN_INC="$witheigeninc"
+
     elif test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen/Eigen; then
       echo "Environment EIGEN_INC=$EIGEN_INC"
+
+    elif test "x$EIGEN3_INCLUDE" != x -a -f $EIGEN3_INCLUDE/Eigen/Eigen; then
+      EIGEN_INC=$EIGEN3_INCLUDE
+      echo "Environment EIGEN_INC=$EIGEN_INC"
+      
+
     elif test -f /usr/include/eigen3/Eigen/Eigen ; then
       EIGEN_INC="/usr/include/eigen3"
+
     else
       EIGEN_INC="/usr/include"
     fi
   
-    dnl Initialize Makefile/config.h substitution variables
+    # Initialize Makefile/config.h substitution variables
     EIGEN_INCLUDE=""
   
-    dnl Properly let the substitution variables
+    # Properly let the substitution variables
     if (test $enableeigen = yes); then
     
-       dnl Check for existence of a header file in the specified location.  Note: here
-       dnl we are checking for the header file "Eigen" in the Eigen directory.
-       dnl AC_CHECK_FILE([$EIGEN_INC/Eigen], [eigenincFound="OK"], [eigenincFound="FAIL"])
+       # Check for existence of a header file in the specified location.  Note: here
+       # we are checking for the header file "Eigen" in the Eigen directory.
+       # AC_CHECK_FILE([$EIGEN_INC/Eigen], [eigenincFound="OK"], [eigenincFound="FAIL"])
        eigenincFound=no;
        AC_CHECK_HEADERS($EIGEN_INC/Eigen/Eigen, eigenincFound=yes)
   
@@ -61,7 +69,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
          enableeigen=no;
        fi
   
-       dnl If the Eigen headers were found, continue.
+       # If the Eigen headers were found, continue.
        if (test x$enableeigen = xyes); then
          EIGEN_INCLUDE="-I$EIGEN_INC"
          AC_DEFINE(HAVE_EIGEN, 1, [Flag indicating whether the library will be compiled with Eigen support])
@@ -70,7 +78,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
     fi
   fi
   
-  dnl Substitute the substitution variables
+  # Substitute the substitution variables
   AC_SUBST(EIGEN_INCLUDE)	
   AC_SUBST(enableeigen)
 ])
