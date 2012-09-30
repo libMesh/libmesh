@@ -211,7 +211,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       node_keys.resize (nr.size());
       Threads::parallel_for (nr, ComputeHilbertKeys (bbox, node_keys));
 
-#ifndef NDEBUG
+#if 0
     // It's O(N^2) to check that these keys don't duplicate before the
     // sort...
       MeshBase::const_node_iterator nodei = mesh.local_nodes_begin();
@@ -249,7 +249,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       elem_keys.resize (er.size());
       Threads::parallel_for (er, ComputeHilbertKeys (bbox, elem_keys));
 
-#ifndef NDEBUG
+#if 0
     // For elements, the keys can be (and in the case of TRI, are
     // expected to be) duplicates, but only if the elements are at
     // different levels
