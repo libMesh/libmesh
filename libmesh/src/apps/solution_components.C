@@ -1,0 +1,178 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+// Open the mesh and solution file given, create a new solution file,
+// and copy all listed variables from the old solution to the new.
+
+#include "libmesh/libmesh.h"
+
+#include "libmesh/equation_systems.h"
+#include "libmesh/mesh.h"
+#include "libmesh/numeric_vector.h"
+
+using namespace libMesh;
+
+unsigned int dim = 2; // This gets overridden by most mesh formats
+
+int main(int argc, char** argv)
+{
+  LibMeshInit init(argc, argv);
+
+  Mesh mesh1(dim), mesh2(dim);
+  EquationSystems es1(mesh1), es2(mesh2);
+
+  std::cout << "Usage: " << argv[0]
+            << " mesh oldsolution newsolution system1 variable1 [sys2 var2...]" << std::endl;
+
+  // We should have one system name for each variable name, and those
+  // get preceded by an even number of arguments.
+  libmesh_assert (!(argc % 2));
+
+  // We should have at least one system/variable pair following the
+  // initial arguments
+  libmesh_assert_greater_equal (argc, 6);
+
+  mesh1.read(argv[1]);
+  std::cout << "Loaded mesh " << argv[1] << std::endl;
+  mesh2 = mesh1;
+
+  es1.read(argv[2]);
+  std::cout << "Loaded solution " << argv[2] << std::endl;
+
+  std::vector<unsigned int> old_sys_num((argc-4)/2),
+                            new_sys_num((argc-4)/2),
+                            old_var_num((argc-4)/2),
+                            new_var_num((argc-4)/2);
+
+  std::vector<const System *> old_system((argc-4)/2);
+  std::vector<System *> new_system((argc-4)/2);
+
+  for (int argi = 4; argi < argc; argi += 2)
+    {
+      const char* sysname = argv[argi];
+      const char* varname = argv[argi+1];
+
+      const unsigned int pairnum = (argi-4)/2;
+
+      libmesh_assert(es1.has_system(sysname));
+
+      const System &old_sys = es1.get_system(sysname);
+      old_system[pairnum] = &old_sys;
+      old_sys_num[pairnum] = old_sys.number();
+
+      libmesh_assert(old_sys.has_variable(varname));
+
+      old_var_num[pairnum] = old_sys.variable_number(varname);
+
+      const Variable &variable = old_sys.variable(old_var_num[pairnum]);
+
+      std::string systype = old_sys.system_type();
+
+      System &new_sys = es2.add_system(systype, sysname);
+      new_system[pairnum] = &new_sys;
+      new_sys_num[pairnum] = new_sys.number();
+
+      new_var_num[pairnum] =
+        new_sys.add_variable(varname, variable.type(),
+                             &variable.active_subdomains());
+    }
+
+  es2.init();
+
+  // Copy over any nodal degree of freedom coefficients
+
+  MeshBase::const_node_iterator       old_nit     = mesh1.local_nodes_begin(),
+                                      new_nit     = mesh2.local_nodes_begin();
+  const MeshBase::const_node_iterator old_nit_end = mesh1.local_nodes_end(),
+                                      new_nit_end = mesh2.local_nodes_end();
+
+  for (; old_nit != old_nit_end; ++old_nit, ++new_nit)
+    {
+      const Node* old_node = *old_nit;
+      const Node* new_node = *new_nit;
+
+      // Mesh::operator= hopefully preserved elem/node orderings...
+      libmesh_assert (*old_node == *new_node);
+       
+      for (int argi = 4; argi < argc; argi += 2)
+        {
+          const unsigned int pairnum = (argi-4)/2;
+
+          const System &old_sys = *old_system[pairnum];
+          System &new_sys = *new_system[pairnum];
+ 
+          const unsigned int n_comp =
+            old_node->n_comp(old_sys_num[pairnum],old_var_num[pairnum]);
+          libmesh_assert_equal_to(n_comp,
+            new_node->n_comp(new_sys_num[pairnum],new_var_num[pairnum]));
+
+          for(unsigned int i=0; i<n_comp; i++)
+            {
+              const unsigned int
+                old_index = old_node->dof_number
+                  (old_sys_num[pairnum], old_var_num[pairnum], i),
+                new_index = new_node->dof_number
+                  (new_sys_num[pairnum], new_var_num[pairnum], i);
+              new_sys.solution->set(new_index,(*old_sys.solution)(old_index));
+            }
+        }
+    }
+
+
+  // Copy over any element degree of freedom coefficients
+
+  MeshBase::const_element_iterator       old_eit     = mesh1.active_local_elements_begin(),
+                                         new_eit     = mesh2.active_local_elements_begin();
+  const MeshBase::const_element_iterator old_eit_end = mesh1.active_local_elements_end(),
+                                         new_eit_end = mesh2.active_local_elements_end();
+
+  for (; old_eit != old_eit_end; ++old_eit, ++new_eit)
+    {
+      const Elem* old_elem = *old_eit;
+      const Elem* new_elem = *new_eit;
+
+      // Mesh::operator= hopefully preserved elem/node orderings...
+      libmesh_assert (*old_elem == *new_elem);
+       
+      for (int argi = 4; argi < argc; argi += 2)
+        {
+          const unsigned int pairnum = (argi-4)/2;
+
+          const System &old_sys = *old_system[pairnum];
+          System &new_sys = *new_system[pairnum];
+ 
+          const unsigned int n_comp =
+            old_elem->n_comp(old_sys_num[pairnum],old_var_num[pairnum]);
+          libmesh_assert_equal_to(n_comp,
+            new_elem->n_comp(new_sys_num[pairnum],new_var_num[pairnum]));
+
+          for(unsigned int i=0; i<n_comp; i++)
+            {
+              const unsigned int
+                old_index = old_elem->dof_number
+                  (old_sys_num[pairnum], old_var_num[pairnum], i),
+                new_index = new_elem->dof_number
+                  (new_sys_num[pairnum], new_var_num[pairnum], i);
+              new_sys.solution->set(new_index,(*old_sys.solution)(old_index));
+            }
+        }
+    }
+
+
+  return 0;
+}
