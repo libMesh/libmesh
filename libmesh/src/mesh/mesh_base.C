@@ -368,6 +368,9 @@ std::string& MeshBase::subdomain_name(subdomain_id_type id)
 
 const std::string& MeshBase::subdomain_name(subdomain_id_type id) const
 {
+  // An empty string to return when no matching subdomain name is found
+  static const std::string empty;
+
   std::map<subdomain_id_type, std::string>::const_iterator iter = _block_id_to_name.find(id);
   if (iter == _block_id_to_name.end())
     return empty;
