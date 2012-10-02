@@ -867,12 +867,6 @@ protected:
   std::map<subdomain_id_type, std::string> _block_id_to_name;
 
   /**
-   * An empty string that can be used as a constant reference when
-   * a non-existent name is requested
-   */
-  const std::string empty;
-
-  /**
    * The partitioner class is a friend so that it can set
    * the number of partitions.
    */
