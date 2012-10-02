@@ -801,8 +801,6 @@ protected:
 
 
 
-
-
   /**
    * Returns a writeable reference to the number of partitions.
    */
@@ -878,6 +876,14 @@ protected:
    */
   friend class BoundaryInfo;
 
+private:
+  /**
+   *  The default shallow assignment operator is a very bad idea, so
+   *  we'll make it a compile-time error to try and do it from other
+   *  classes and a link-time error to try and do it from this class.
+   *  Use clone() if necessary.
+   */
+  MeshBase& operator= (const MeshBase& other);
 };
 
 
