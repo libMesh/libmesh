@@ -33,8 +33,8 @@ int main(int argc, char** argv)
 {
   LibMeshInit init(argc, argv);
 
-  Mesh mesh1(dim), mesh2(dim);
-  EquationSystems es1(mesh1), es2(mesh2);
+  Mesh mesh1(dim);
+  EquationSystems es1(mesh1);
 
   std::cout << "Usage: " << argv[0]
             << " mesh oldsolution newsolution system1 variable1 [sys2 var2...]" << std::endl;
@@ -49,9 +49,14 @@ int main(int argc, char** argv)
 
   mesh1.read(argv[1]);
   std::cout << "Loaded mesh " << argv[1] << std::endl;
-  mesh2 = mesh1;
+  Mesh mesh2(mesh1);
+  EquationSystems es2(mesh2);
 
-  es1.read(argv[2]);
+  es1.read(argv[2], 
+           EquationSystems::READ_HEADER |
+           EquationSystems::READ_DATA |
+           EquationSystems::READ_ADDITIONAL_DATA |
+           EquationSystems::READ_BASIC_ONLY);
   std::cout << "Loaded solution " << argv[2] << std::endl;
 
   std::vector<unsigned int> old_sys_num((argc-4)/2),
@@ -94,12 +99,14 @@ int main(int argc, char** argv)
 
   es2.init();
 
+  // A future version of this app should copy variables for
+  // non-solution vectors too.
+
   // Copy over any nodal degree of freedom coefficients
 
   MeshBase::const_node_iterator       old_nit     = mesh1.local_nodes_begin(),
                                       new_nit     = mesh2.local_nodes_begin();
-  const MeshBase::const_node_iterator old_nit_end = mesh1.local_nodes_end(),
-                                      new_nit_end = mesh2.local_nodes_end();
+  const MeshBase::const_node_iterator old_nit_end = mesh1.local_nodes_end();
 
   for (; old_nit != old_nit_end; ++old_nit, ++new_nit)
     {
@@ -138,8 +145,7 @@ int main(int argc, char** argv)
 
   MeshBase::const_element_iterator       old_eit     = mesh1.active_local_elements_begin(),
                                          new_eit     = mesh2.active_local_elements_begin();
-  const MeshBase::const_element_iterator old_eit_end = mesh1.active_local_elements_end(),
-                                         new_eit_end = mesh2.active_local_elements_end();
+  const MeshBase::const_element_iterator old_eit_end = mesh1.active_local_elements_end();
 
   for (; old_eit != old_eit_end; ++old_eit, ++new_eit)
     {
@@ -173,6 +179,7 @@ int main(int argc, char** argv)
         }
     }
 
+  es2.write(argv[3], EquationSystems::WRITE_DATA);
 
   return 0;
 }
