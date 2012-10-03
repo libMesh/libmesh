@@ -25,12 +25,12 @@
 #include "libmesh/mesh.h"
 #include "libmesh/numeric_vector.h"
 
-using namespace libMesh;
-
 unsigned int dim = 2; // This gets overridden by most mesh formats
 
 int main(int argc, char** argv)
 {
+  using namespace libMesh;
+
   LibMeshInit init(argc, argv);
 
   Mesh mesh1(dim);

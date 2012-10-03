@@ -1,22 +1,24 @@
 // Open the mesh and solution file named in command line arguments,
 // and plot them out to the given filename.
 
-#include "libmesh.h"
+#include "libmesh/libmesh.h"
 
-#include "mesh.h"
-#include "equation_systems.h"
+#include "libmesh/mesh.h"
+#include "libmesh/equation_systems.h"
 
-#include "exodusII_io.h"
-#include "gmsh_io.h"
-#include "gmv_io.h"
-#include "gnuplot_io.h"
-#include "medit_io.h"
-#include "nemesis_io.h"
-#include "tecplot_io.h"
-#include "vtk_io.h"
+#include "libmesh/exodusII_io.h"
+#include "libmesh/gmsh_io.h"
+#include "libmesh/gmv_io.h"
+#include "libmesh/gnuplot_io.h"
+#include "libmesh/medit_io.h"
+#include "libmesh/nemesis_io.h"
+#include "libmesh/tecplot_io.h"
+#include "libmesh/vtk_io.h"
 
 int main(int argc, char** argv)
 {
+  using namespace libMesh;
+
   LibMeshInit init(argc, argv);
 
   Mesh mesh;
