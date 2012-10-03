@@ -394,7 +394,7 @@ namespace Parallel
 #ifdef LIBMESH_HAVE_MPI
       if (_I_duped_it)
         {
-          libmesh_assert_not_equal_to (_communicator, static_cast<int>(MPI_COMM_NULL));
+          libmesh_assert (_communicator != MPI_COMM_NULL);
           MPI_Comm_free(&_communicator);
           _communicator = MPI_COMM_NULL;
         }
@@ -720,7 +720,7 @@ namespace Parallel
 		MPI_STATUS_IGNORE);
       if (val)
 	{
-	  libmesh_assert_equal_to (_request, static_cast<int>(MPI_REQUEST_NULL));
+	  libmesh_assert          (_request == MPI_REQUEST_NULL);
 	  libmesh_assert_equal_to (val, 1);
 	}
 
@@ -2637,7 +2637,7 @@ namespace Parallel
 		tag.value(),
 		comm.get());
 
-    libmesh_assert_equal_to (ierr, static_cast<int>(MPI_SUCCESS));
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("send()", "Parallel");
   }
@@ -2664,7 +2664,7 @@ namespace Parallel
 		 tag.value(),
 		 comm.get(),
 		 req.get());
-    libmesh_assert_equal_to (ierr, static_cast<int>(MPI_SUCCESS));
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("send()", "Parallel");
   }
@@ -2739,7 +2739,7 @@ namespace Parallel
 		tag.value(),
 		comm.get(),
 		status.get());
-    libmesh_assert_equal_to (ierr, static_cast<int>(MPI_SUCCESS));
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("receive()", "Parallel");
 
@@ -2769,7 +2769,7 @@ namespace Parallel
 		 tag.value(),
 		 comm.get(),
 		 req.get());
-    libmesh_assert_equal_to (ierr, static_cast<int>(MPI_SUCCESS));
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("receive()", "Parallel");
   }
@@ -3400,7 +3400,7 @@ namespace Parallel
 		   root_id,
 		   comm.get());
 
-    libmesh_assert_equal_to (ierr, static_cast<int>(MPI_SUCCESS));
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("gather()", "Parallel");
   }
@@ -3531,7 +3531,7 @@ namespace Parallel
 		      &r[0], &sendlengths[0],
 		      &displacements[0], send_type, comm.get());
 
-    libmesh_assert_equal_to (ierr, static_cast<int>(MPI_SUCCESS));
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("allgather()", "Parallel");
   }
@@ -3596,7 +3596,7 @@ namespace Parallel
 		    size_per_proc,
 		    send_type,
 		    comm.get());
-    libmesh_assert_equal_to (ierr, static_cast<int>(MPI_SUCCESS));
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("alltoall()", "Parallel");
   }
@@ -3625,7 +3625,7 @@ namespace Parallel
 #endif
       MPI_Bcast (&data, 1, StandardType<T>(&data), root_id, comm.get());
 
-    libmesh_assert_equal_to (ierr, static_cast<int>(MPI_SUCCESS));
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
   }
@@ -3696,7 +3696,7 @@ namespace Parallel
       MPI_Bcast (data_ptr, data.size(), StandardType<T>(data_ptr),
 		 root_id, comm.get());
 
-    libmesh_assert_equal_to (ierr, static_cast<int>(MPI_SUCCESS));
+    libmesh_assert (ierr == MPI_SUCCESS);
 
     STOP_LOG("broadcast()", "Parallel");
   }
