@@ -34,16 +34,8 @@ namespace libMesh
 
 bool Node::operator==(const Node& rhs) const
 {
-  // Cast rhs to a Node*
-//  const Node* rhs_node = dynamic_cast<const Node*>(&rhs);
-  const Node* rhs_node = &rhs;
-
-  // If we can't cast to a Node* then rhs must be an Elem
-  if(rhs_node == NULL)
-    return false;
-
   // Explicitly calling the operator== defined in Point
-  return this->Point::operator==(*rhs_node);
+  return this->Point::operator==(rhs);
 }
 
 

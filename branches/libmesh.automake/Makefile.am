@@ -619,9 +619,17 @@ bin_PROGRAMS += amr
 amr_SOURCES   = src/apps/amr.C
 amr_LDADD     = libmesh.la
 
-bin_PROGRAMS += output_libmesh_version
+bin_PROGRAMS                  += output_libmesh_version
 output_libmesh_version_SOURCES = src/utils/output_libmesh_version.C
-output_libmesh_version_LDADD = libmesh.la
+output_libmesh_version_LDADD   = libmesh.la
+
+bin_PROGRAMS     += meshplot
+meshplot_SOURCES  = src/apps/meshplot.C
+meshplot_LDADD    = libmesh.la
+
+bin_PROGRAMS               += solution_components
+solution_components_SOURCES = src/apps/solution_components.C
+solution_components_LDADD   = libmesh.la
 
 # create a METHOD-specific configure script - will need to clean it too!
 bin_SCRIPTS += contrib/bin/@host@_@METHOD@/libmesh-config

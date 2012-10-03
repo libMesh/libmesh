@@ -47,7 +47,9 @@ int main(int argc, char** argv)
   std::cout << "Loaded mesh " << argv[1] << std::endl;
   mesh.print_info();
 
-  es.read(argv[2]);
+  es.read(argv[2], EquationSystems::READ_HEADER | 
+                   EquationSystems::READ_DATA | 
+                   EquationSystems::READ_ADDITIONAL_DATA);
   std::cout << "Loaded solution " << argv[2] << std::endl;
   es.print_info();
 

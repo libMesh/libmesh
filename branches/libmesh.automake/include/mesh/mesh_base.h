@@ -24,6 +24,7 @@
 
 // Local Includes -----------------------------------
 #include "libmesh/auto_ptr.h"
+#include "libmesh/boundary_info.h"
 #include "libmesh/dof_object.h" // for invalid_processor_id
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/libmesh_common.h"
@@ -43,7 +44,6 @@ namespace libMesh
 class Elem;
 class Node;
 class Point;
-class BoundaryInfo;
 class MeshData;
 
 
@@ -801,8 +801,6 @@ protected:
 
 
 
-
-
   /**
    * Returns a writeable reference to the number of partitions.
    */
@@ -867,12 +865,6 @@ protected:
   std::map<subdomain_id_type, std::string> _block_id_to_name;
 
   /**
-   * An empty string that can be used as a constant reference when
-   * a non-existent name is requested
-   */
-  const std::string empty;
-
-  /**
    * The partitioner class is a friend so that it can set
    * the number of partitions.
    */
@@ -884,6 +876,14 @@ protected:
    */
   friend class BoundaryInfo;
 
+private:
+  /**
+   *  The default shallow assignment operator is a very bad idea, so
+   *  we'll make it a compile-time error to try and do it from other
+   *  classes and a link-time error to try and do it from this class.
+   *  Use clone() if necessary.
+   */
+  MeshBase& operator= (const MeshBase& other);
 };
 
 
