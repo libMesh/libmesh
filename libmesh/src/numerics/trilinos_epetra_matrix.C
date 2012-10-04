@@ -238,7 +238,6 @@ Real EpetraMatrix<T>::linfty_norm () const
 
 
 template <typename T>
-//void EpetraMatrix<T>::print_matlab (const std::string name) const
 void EpetraMatrix<T>::print_matlab (const std::string) const
 {
   libmesh_assert (this->initialized());
@@ -247,53 +246,6 @@ void EpetraMatrix<T>::print_matlab (const std::string) const
   this->close();
 
   libmesh_not_implemented();
-
-//   int ierr=0;
-//   PetscViewer petsc_viewer;
-
-
-//   ierr = PetscViewerCreate (libMesh::COMM_WORLD,
-// 			    &petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   /**
-//    * Create an ASCII file containing the matrix
-//    * if a filename was provided.
-//    */
-//   if (name != "NULL")
-//     {
-//       ierr = PetscViewerASCIIOpen( libMesh::COMM_WORLD,
-// 				   name.c_str(),
-// 				   &petsc_viewer);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = PetscViewerSetFormat (petsc_viewer,
-// 				   PETSC_VIEWER_ASCII_MATLAB);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = MatView (_mat, petsc_viewer);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
-
-//   /**
-//    * Otherwise the matrix will be dumped to the screen.
-//    */
-//   else
-//     {
-//       ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-// 				   PETSC_VIEWER_ASCII_MATLAB);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = MatView (_mat, PETSC_VIEWER_STDOUT_WORLD);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
-
-
-//   /**
-//    * Destroy the viewer.
-//    */
-//   ierr = LibMeshPetscViewerDestroy (petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -319,50 +271,6 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 
-// template <typename T>
-// void EpetraMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
-// 				     const std::vector<unsigned int> &rows,
-// 				     const std::vector<unsigned int> &cols,
-// 				     const bool reuse_submatrix) const
-// {
-//   // Can only extract submatrices from closed matrices
-//   this->close();
-
-//   libmesh_not_implemented();
-
-// //   // Attempt to cast the input matrix to a EpetraMatrix*
-// //   EpetraMatrix<T>* petsc_submatrix = libmesh_cast_ptr<EpetraMatrix<T>*>(&submatrix);
-
-// //   // Construct row and column index sets.
-// //   int ierr=0;
-// //   IS isrow, iscol;
-
-// //   ierr = ISCreateGeneral(libMesh::COMM_WORLD,
-// // 			 rows.size(),
-// // 			 (int*) &rows[0],
-// // 			 &isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// //   ierr = ISCreateGeneral(libMesh::COMM_WORLD,
-// // 			 cols.size(),
-// // 			 (int*) &cols[0],
-// // 			 &iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// //   // Extract submatrix
-// //   ierr = MatGetSubMatrix(_mat,
-// // 			 isrow,
-// // 			 iscol,
-// // 			 PETSC_DECIDE,
-// // 			 (reuse_submatrix ? MAT_RELIBMESH_USE_MATRIX : MAT_INITIAL_MATRIX),
-// // 			 &(petsc_submatrix->_mat));  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// //   // Specify that the new submatrix is initialized and close it.
-// //   petsc_submatrix->_is_initialized = true;
-// //   petsc_submatrix->close();
-
-// //   // Clean up PETSc data structures
-// //   ierr = LibMeshISDestroy(isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-// //   ierr = LibMeshISDestroy(iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-// }
 
 template <typename T>
 void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
