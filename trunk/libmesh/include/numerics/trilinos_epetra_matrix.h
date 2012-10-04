@@ -74,33 +74,33 @@ public:
    */
   EpetraMatrix ();
 
-   /**
-    * Constructor.  Creates a EpetraMatrix assuming you already
-    * have a valid Epetra_FECrsMatrix object.  In this case, m is NOT destroyed
-    * by the EpetraMatrix destructor when this object goes out of scope.
-    * This allows ownership of m to remain with the original creator,
-    * and to simply provide additional functionality with the EpetraMatrix.
-    */
-   EpetraMatrix (Epetra_FECrsMatrix * m);
+  /**
+   * Constructor.  Creates a EpetraMatrix assuming you already
+   * have a valid Epetra_FECrsMatrix object.  In this case, m is NOT destroyed
+   * by the EpetraMatrix destructor when this object goes out of scope.
+   * This allows ownership of m to remain with the original creator,
+   * and to simply provide additional functionality with the EpetraMatrix.
+   */
+  EpetraMatrix (Epetra_FECrsMatrix * m);
 
   /**
    * Destructor. Free all memory, but do not
    * release the memory of the sparsity
    * structure.
    */
-  ~EpetraMatrix ();
+  virtual ~EpetraMatrix ();
 
-//   /**
-//    * The \p EpetraMatrix needs the full sparsity pattern.
-//    */
+  /**
+   * The \p EpetraMatrix needs the full sparsity pattern.
+   */
   bool need_full_sparsity_pattern () const
   { return true; }
 
-//   /**
-//    * Updates the matrix sparsity pattern.  This will
-//    * tell the underlying matrix storage scheme how
-//    * to map the \f$ (i,j) \f$ elements.
-//    */
+  /**
+   * Updates the matrix sparsity pattern.  This will
+   * tell the underlying matrix storage scheme how
+   * to map the \f$ (i,j) \f$ elements.
+   */
   void update_sparsity_pattern (const SparsityPattern::Graph &);
 
   /**
