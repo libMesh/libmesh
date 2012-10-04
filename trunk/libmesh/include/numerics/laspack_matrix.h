@@ -47,16 +47,10 @@ template <typename T> class LaspackLinearSolver;
 
 
 /**
- * Generic laspack matrix. This class contains
- * pure virtual members that must be overloaded
- * in derived classes.  Using a derived class
- * allows for uniform access to laspack matrices
- * from various different solver packages in
- * different formats.
- * Currently Laspack only supports real datatypes, so
- * this class is a full specialization of \p SparseMatrix<>
- * with \p T = \p Real
-
+ * The LaspackMatrix class wraps a QMatrix object from the Laspack
+ * library. Currently Laspack only supports real datatypes, so this
+ * class is a full specialization of \p SparseMatrix<T> with \p T = \p
+ * Real.
  *
  * @author Benjamin S. Kirk, 2003
  */
@@ -219,13 +213,9 @@ public:
   /**
    * Return the value of the entry
    * \p (i,j).  This may be an
-   * expensive operation and you
-   * should always take care where
-   * to call this function.  In
-   * order to avoid abuse, this
-   * function throws an exception
-   * if the required element does
-   * not exist in the matrix.
+   * expensive operation, and you
+   * should always be careful where
+   * you call this function.
    */
   T operator () (const unsigned int i,
 		 const unsigned int j) const;

@@ -47,7 +47,7 @@ template <typename T> class NumericVector;
 /**
  * Generic sparse matrix. This class contains
  * pure virtual members that must be overloaded
- * in derived classes.  Using a derived class
+ * in derived classes.  Using a common base class
  * allows for uniform access to sparse matrices
  * from various different solver packages in
  * different formats.
@@ -211,7 +211,7 @@ public:
 		    const T value) = 0;
 
   /**
-   * Add the full matrix to the
+   * Add the full matrix \p dm to the
    * Sparse matrix.  This is useful
    * for adding an element matrix
    * at assembly time
@@ -237,13 +237,9 @@ public:
   /**
    * Return the value of the entry
    * \p (i,j).  This may be an
-   * expensive operation and you
-   * should always take care where
-   * to call this function.  In
-   * order to avoid abuse, this
-   * function throws an exception
-   * if the required element does
-   * not exist in the matrix.
+   * expensive operation, and you
+   * should always be careful where
+   * you call this function.
    */
   virtual T operator () (const unsigned int i,
 			 const unsigned int j) const = 0;
@@ -304,7 +300,7 @@ public:
    * sparse matrix format. Optionally prints the
    * matrix to the file named \p name.  If \p name
    * is not specified it is dumped to the screen.
-x   */
+   */
   virtual void print_matlab(const std::string name="NULL") const
   {
     libMesh::err << "ERROR: Not Implemented in base class yet!" << std::endl;
