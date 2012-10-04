@@ -391,6 +391,219 @@ void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 
 
 
+template <typename T>
+EpetraMatrix<T>::EpetraMatrix()
+  : _destroy_mat_on_exit(true),
+    _use_transpose(false)
+{}
+
+
+
+
+template <typename T>
+EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m)
+ : _destroy_mat_on_exit(false),
+   _use_transpose(false) // dumb guess is the best we can do...
+{
+  this->_mat = m;
+  this->_is_initialized = true;
+}
+
+
+
+
+template <typename T>
+EpetraMatrix<T>::~EpetraMatrix()
+{
+  this->clear();
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::close () const
+{
+  libmesh_assert(_mat);
+
+  _mat->GlobalAssemble();
+}
+
+
+
+template <typename T>
+unsigned int EpetraMatrix<T>::m () const
+{
+  libmesh_assert (this->initialized());
+
+  return static_cast<unsigned int>(_mat->NumGlobalRows());
+}
+
+
+
+template <typename T>
+unsigned int EpetraMatrix<T>::n () const
+{
+  libmesh_assert (this->initialized());
+
+  return static_cast<unsigned int>(_mat->NumGlobalCols());
+}
+
+
+
+template <typename T>
+unsigned int EpetraMatrix<T>::row_start () const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_map);
+
+  return static_cast<unsigned int>(_map->MinMyGID());
+}
+
+
+
+template <typename T>
+unsigned int EpetraMatrix<T>::row_stop () const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_map);
+
+  return static_cast<unsigned int>(_map->MaxMyGID())+1;
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::set (const unsigned int i,
+			   const unsigned int j,
+			   const T value)
+{
+  libmesh_assert (this->initialized());
+
+  int
+    epetra_i = static_cast<int>(i),
+    epetra_j = static_cast<int>(j);
+
+  T epetra_value = value;
+
+  if (_mat->Filled())
+    _mat->ReplaceGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+  else
+    _mat->InsertGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::add (const unsigned int i,
+			   const unsigned int j,
+			   const T value)
+{
+  libmesh_assert (this->initialized());
+
+  int
+    epetra_i = static_cast<int>(i),
+    epetra_j = static_cast<int>(j);
+
+  T epetra_value = value;
+
+  _mat->SumIntoGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
+				 const std::vector<unsigned int>& dof_indices)
+{
+  this->add_matrix (dm, dof_indices, dof_indices);
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
+{
+  libmesh_assert (this->initialized());
+
+  // sanity check. but this cannot avoid
+  // crash due to incompatible sparsity structure...
+  libmesh_assert_equal_to (this->m(), X_in.m());
+  libmesh_assert_equal_to (this->n(), X_in.n());
+
+  EpetraMatrix<T>* X = libmesh_cast_ptr<EpetraMatrix<T>*> (&X_in);
+
+  EpetraExt::MatrixMatrix::Add 	(*X->_mat, false, a_in, *_mat, 1.);
+}
+
+
+
+
+template <typename T>
+T EpetraMatrix<T>::operator () (const unsigned int i,
+				const unsigned int j) const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(this->_mat);
+  libmesh_assert (this->_mat->MyGlobalRow(i));
+  libmesh_assert_greater_equal (i, this->row_start());
+  libmesh_assert_less (i, this->row_stop());
+
+
+  int row_length, *row_indices;
+  double *values;
+
+  _mat->ExtractMyRowView (i-this->row_start(),
+			  row_length,
+			  values,
+			  row_indices);
+
+  //libMesh::out << "row_length=" << row_length << std::endl;
+
+  int *index = std::lower_bound (row_indices, row_indices+row_length, j);
+
+  libmesh_assert_less (*index, row_length);
+  libmesh_assert_equal_to (static_cast<unsigned int>(row_indices[*index]), j);
+
+  //libMesh::out << "val=" << values[*index] << std::endl;
+
+  return values[*index];
+}
+
+
+
+
+template <typename T>
+bool EpetraMatrix<T>::closed() const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(this->_mat);
+
+  return this->_mat->Filled();
+}
+
+
+template <typename T>
+void EpetraMatrix<T>::swap(EpetraMatrix<T> & m)
+{
+   std::swap(_mat, m._mat);
+   std::swap(_destroy_mat_on_exit, m._destroy_mat_on_exit);
+}
+
+
+
+
+
+template <typename T>
+void EpetraMatrix<T>::print_personal(std::ostream& os) const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_mat);
+
+  os << *_mat;
+}
+
+
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class EpetraMatrix<Number>;
