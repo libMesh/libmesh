@@ -38,10 +38,14 @@ namespace libMesh
 // forward declarations
 template <typename T> class SparseMatrix;
 template <typename T> class DenseMatrix;
-template <typename T> inline std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
 class DofMap;
 namespace SparsityPattern { class Graph; }
 template <typename T> class NumericVector;
+
+// This template helper function must be declared before it
+// can be defined below.
+template <typename T>
+std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
 
 
 /**
@@ -285,9 +289,29 @@ public:
   /**
    * Same as the print method above, but allows you
    * to print to a stream in the standard syntax.
+   *
+   * template <typename U>
+   * friend std::ostream& operator << (std::ostream& os, const SparseMatrix<U>& m);
+   *
+   * Obscure C++ note 1: the above syntax, which does not require any
+   * prior declaration of operator<<, declares *any* instantiation of
+   * SparseMatrix<X> is friend to *any* instantiation of
+   * operator<<(ostream&, SparseMatrix<Y>&).  It would not happen in
+   * practice, but in principle it means that SparseMatrix<Complex>
+   * would be friend to operator<<(ostream&, SparseMatrix<Real>).
+   *
+   * Obscure C++ note 2: The form below, which requires a previous
+   * declaration of the operator<<(stream&, SparseMatrix<T>&) function
+   * (see top of this file), means that any instantiation of
+   * SparseMatrix<T> is friend to the specialization
+   * operator<<(ostream&, SparseMatrix<T>&), but e.g. SparseMatrix<U>
+   * is *not* friend to the same function.  So this is slightly
+   * different to the form above...
+   *
+   * This method seems to be the "preferred" technique, see
+   * http://www.parashift.com/c++-faq-lite/template-friends.html
    */
-  template <typename U>
-  friend std::ostream& operator << (std::ostream& os, const SparseMatrix<U>& m);
+  friend std::ostream& operator << <>(std::ostream& os, const SparseMatrix<T>& m);
 
   /**
    * Print the contents of the matrix to the screen
@@ -399,8 +423,10 @@ protected:
 
 // For SGI MIPSpro this implementation must occur after
 // the full specialization of the print() member.
+//
+// It's generally easier to define these friend functions in the header
+// file.
 template <typename T>
-inline
 std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m)
 {
   m.print(os);
