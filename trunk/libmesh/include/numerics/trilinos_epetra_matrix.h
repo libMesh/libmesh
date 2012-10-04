@@ -229,13 +229,6 @@ public:
    * function throws an exception
    * if the required element does
    * not exist in the matrix.
-   *
-   * In case you want a function
-   * that returns zero instead (for
-   * entries that are not in the
-   * sparsity pattern of the
-   * matrix), use the \p el
-   * function.
    */
   T operator () (const unsigned int i,
 		 const unsigned int j) const;
