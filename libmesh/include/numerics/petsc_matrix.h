@@ -251,13 +251,9 @@ public:
   /**
    * Return the value of the entry
    * \p (i,j).  This may be an
-   * expensive operation and you
-   * should always take care where
-   * to call this function.  In
-   * order to avoid abuse, this
-   * function throws an exception
-   * if the required element does
-   * not exist in the matrix.
+   * expensive operation, and you
+   * should always be careful where
+   * you call this function.
    */
   T operator () (const unsigned int i,
 		 const unsigned int j) const;
