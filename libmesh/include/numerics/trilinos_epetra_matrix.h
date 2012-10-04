@@ -222,13 +222,9 @@ public:
   /**
    * Return the value of the entry
    * \p (i,j).  This may be an
-   * expensive operation and you
-   * should always take care where
-   * to call this function.  In
-   * order to avoid abuse, this
-   * function throws an exception
-   * if the required element does
-   * not exist in the matrix.
+   * expensive operation, and you
+   * should always be careful where
+   * you call this function.
    */
   T operator () (const unsigned int i,
 		 const unsigned int j) const;
@@ -304,22 +300,6 @@ public:
 
   const Epetra_FECrsMatrix * mat () const { libmesh_assert(_mat); return _mat; }
 
-
-protected:
-
-//   /**
-//    * This function either creates or re-initializes
-//    * a matrix called "submatrix" which is defined
-//    * by the row and column indices given in the "rows" and "cols" entries.
-//    * This function is implemented in terms of the MatGetSubMatrix()
-//    * routine of PETSc.  The boolean reuse_submatrix parameter determines
-//    * whether or not PETSc will treat "submatrix" as one which has already
-//    * been used (had memory allocated) or as a new matrix.
-//    */
-//   virtual void _get_submatrix(SparseMatrix<T>& submatrix,
-// 			      const std::vector<unsigned int>& rows,
-// 			      const std::vector<unsigned int>& cols,
-// 			      const bool reuse_submatrix) const;
 
 private:
 
