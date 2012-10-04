@@ -396,57 +396,9 @@ protected:
 
 //-----------------------------------------------------------------------
 // SparseMatrix inline members
-template <typename T>
-inline
-SparseMatrix<T>::SparseMatrix () :
-  _dof_map(NULL),
-  _is_initialized(false)
-{}
-
-
-
-template <typename T>
-inline
-SparseMatrix<T>::~SparseMatrix ()
-{}
-
-
-
-
-
-// Full specialization for Complex datatypes
-template <>
-inline
-  void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
-{
-  // std::complex<>::operator<<() is defined, but use this form
-
-  if(sparse)
-    {
-      libmesh_not_implemented();
-    }
-
-  os << "Real part:" << std::endl;
-  for (unsigned int i=0; i<this->m(); i++)
-    {
-      for (unsigned int j=0; j<this->n(); j++)
-	os << std::setw(8) << (*this)(i,j).real() << " ";
-      os << std::endl;
-    }
-
-  os << std::endl << "Imaginary part:" << std::endl;
-  for (unsigned int i=0; i<this->m(); i++)
-    {
-      for (unsigned int j=0; j<this->n(); j++)
-	os << std::setw(8) << (*this)(i,j).imag() << " ";
-      os << std::endl;
-    }
-}
-
-
 
 // For SGI MIPSpro this implementation must occur after
-// the partial specialization of the print() member.
+// the full specialization of the print() member.
 template <typename T>
 inline
 std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m)

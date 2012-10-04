@@ -35,6 +35,57 @@ namespace libMesh
 //------------------------------------------------------------------
 // SparseMatrix Methods
 
+
+// Constructor
+template <typename T>
+SparseMatrix<T>::SparseMatrix () :
+  _dof_map(NULL),
+  _is_initialized(false)
+{}
+
+
+
+// Destructor
+template <typename T>
+inline
+SparseMatrix<T>::~SparseMatrix ()
+{}
+
+
+
+// Full specialization of print method for Complex datatypes
+template <>
+void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
+{
+  // std::complex<>::operator<<() is defined, but use this form
+
+  if(sparse)
+    {
+      libmesh_not_implemented();
+    }
+
+  os << "Real part:" << std::endl;
+  for (unsigned int i=0; i<this->m(); i++)
+    {
+      for (unsigned int j=0; j<this->n(); j++)
+	os << std::setw(8) << (*this)(i,j).real() << " ";
+      os << std::endl;
+    }
+
+  os << std::endl << "Imaginary part:" << std::endl;
+  for (unsigned int i=0; i<this->m(); i++)
+    {
+      for (unsigned int j=0; j<this->n(); j++)
+	os << std::setw(8) << (*this)(i,j).imag() << " ";
+      os << std::endl;
+    }
+}
+
+
+
+
+
+
 // Full specialization for Real datatypes
 template <typename T>
 AutoPtr<SparseMatrix<T> >
@@ -115,7 +166,6 @@ void SparseMatrix<T>::zero_rows (std::vector<int> &, T)
 
 
 template <typename T>
-inline
 void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
 {
   parallel_only();
