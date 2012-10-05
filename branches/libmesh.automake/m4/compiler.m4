@@ -170,7 +170,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
     case "$GXX_VERSION_STRING" in
       *4.8.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.8 >>>)
-  	GXX_VERSION=gcc4.6
+  	GXX_VERSION=gcc4.8
   	;;
       *4.7.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
@@ -340,6 +340,10 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
           if test "x$is_intel_icc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *13.*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 13 >>>)
+                GXX_VERSION=intel_icc_v13.x
+                ;;
               *12.1*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 12.1 >>>)
   	        GXX_VERSION=intel_icc_v12.x
@@ -584,7 +588,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       # 
       # Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       #        when dealing with C APIs that take void* pointers.
-      gcc4.3)
+      gcc4.4 | gcc4.5 | gcc4.6 | gcc4.7 | gcc4.8)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
          CXXFLAGS_DVL="$CXXFLAGS_DVL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 
@@ -696,7 +700,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
         case "$GXX_VERSION" in
 
           # Intel ICC >= v11.x
- 	  intel_icc_v11.x | intel_icc_v12.x)
+ 	  intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x)
               # Disable some warning messages:
               # #175: 'subscript out of range'
               #       FIN-S application code causes many false
@@ -713,10 +717,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               #        was from an assignment.
               PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
-              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz -par-report0 -openmp-report0"
+              CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
               CXXFLAGS_DVL="$CXXFLAGS_DVL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572"
-              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz -par-report0 -openmp-report0"
+              CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
               CFLAGS_DVL="$CFLAGS_DBG"
               ;;
           intel_icc_v10.1)

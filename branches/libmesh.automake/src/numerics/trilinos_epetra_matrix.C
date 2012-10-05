@@ -238,7 +238,6 @@ Real EpetraMatrix<T>::linfty_norm () const
 
 
 template <typename T>
-//void EpetraMatrix<T>::print_matlab (const std::string name) const
 void EpetraMatrix<T>::print_matlab (const std::string) const
 {
   libmesh_assert (this->initialized());
@@ -247,53 +246,6 @@ void EpetraMatrix<T>::print_matlab (const std::string) const
   this->close();
 
   libmesh_not_implemented();
-
-//   int ierr=0;
-//   PetscViewer petsc_viewer;
-
-
-//   ierr = PetscViewerCreate (libMesh::COMM_WORLD,
-// 			    &petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   /**
-//    * Create an ASCII file containing the matrix
-//    * if a filename was provided.
-//    */
-//   if (name != "NULL")
-//     {
-//       ierr = PetscViewerASCIIOpen( libMesh::COMM_WORLD,
-// 				   name.c_str(),
-// 				   &petsc_viewer);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = PetscViewerSetFormat (petsc_viewer,
-// 				   PETSC_VIEWER_ASCII_MATLAB);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = MatView (_mat, petsc_viewer);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
-
-//   /**
-//    * Otherwise the matrix will be dumped to the screen.
-//    */
-//   else
-//     {
-//       ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-// 				   PETSC_VIEWER_ASCII_MATLAB);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = MatView (_mat, PETSC_VIEWER_STDOUT_WORLD);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
-
-
-//   /**
-//    * Destroy the viewer.
-//    */
-//   ierr = LibMeshPetscViewerDestroy (petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -319,50 +271,6 @@ void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 
 
-// template <typename T>
-// void EpetraMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
-// 				     const std::vector<unsigned int> &rows,
-// 				     const std::vector<unsigned int> &cols,
-// 				     const bool reuse_submatrix) const
-// {
-//   // Can only extract submatrices from closed matrices
-//   this->close();
-
-//   libmesh_not_implemented();
-
-// //   // Attempt to cast the input matrix to a EpetraMatrix*
-// //   EpetraMatrix<T>* petsc_submatrix = libmesh_cast_ptr<EpetraMatrix<T>*>(&submatrix);
-
-// //   // Construct row and column index sets.
-// //   int ierr=0;
-// //   IS isrow, iscol;
-
-// //   ierr = ISCreateGeneral(libMesh::COMM_WORLD,
-// // 			 rows.size(),
-// // 			 (int*) &rows[0],
-// // 			 &isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// //   ierr = ISCreateGeneral(libMesh::COMM_WORLD,
-// // 			 cols.size(),
-// // 			 (int*) &cols[0],
-// // 			 &iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// //   // Extract submatrix
-// //   ierr = MatGetSubMatrix(_mat,
-// // 			 isrow,
-// // 			 iscol,
-// // 			 PETSC_DECIDE,
-// // 			 (reuse_submatrix ? MAT_RELIBMESH_USE_MATRIX : MAT_INITIAL_MATRIX),
-// // 			 &(petsc_submatrix->_mat));  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// //   // Specify that the new submatrix is initialized and close it.
-// //   petsc_submatrix->_is_initialized = true;
-// //   petsc_submatrix->close();
-
-// //   // Clean up PETSc data structures
-// //   ierr = LibMeshISDestroy(isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-// //   ierr = LibMeshISDestroy(iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-// }
 
 template <typename T>
 void EpetraMatrix<T>::get_diagonal (NumericVector<T>& dest) const
@@ -387,6 +295,219 @@ void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 
   epetra_dest._use_transpose = !epetra_dest._use_transpose;
   epetra_dest._mat->SetUseTranspose(epetra_dest._use_transpose);
+}
+
+
+
+template <typename T>
+EpetraMatrix<T>::EpetraMatrix()
+  : _destroy_mat_on_exit(true),
+    _use_transpose(false)
+{}
+
+
+
+
+template <typename T>
+EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m)
+ : _destroy_mat_on_exit(false),
+   _use_transpose(false) // dumb guess is the best we can do...
+{
+  this->_mat = m;
+  this->_is_initialized = true;
+}
+
+
+
+
+template <typename T>
+EpetraMatrix<T>::~EpetraMatrix()
+{
+  this->clear();
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::close () const
+{
+  libmesh_assert(_mat);
+
+  _mat->GlobalAssemble();
+}
+
+
+
+template <typename T>
+unsigned int EpetraMatrix<T>::m () const
+{
+  libmesh_assert (this->initialized());
+
+  return static_cast<unsigned int>(_mat->NumGlobalRows());
+}
+
+
+
+template <typename T>
+unsigned int EpetraMatrix<T>::n () const
+{
+  libmesh_assert (this->initialized());
+
+  return static_cast<unsigned int>(_mat->NumGlobalCols());
+}
+
+
+
+template <typename T>
+unsigned int EpetraMatrix<T>::row_start () const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_map);
+
+  return static_cast<unsigned int>(_map->MinMyGID());
+}
+
+
+
+template <typename T>
+unsigned int EpetraMatrix<T>::row_stop () const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_map);
+
+  return static_cast<unsigned int>(_map->MaxMyGID())+1;
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::set (const unsigned int i,
+			   const unsigned int j,
+			   const T value)
+{
+  libmesh_assert (this->initialized());
+
+  int
+    epetra_i = static_cast<int>(i),
+    epetra_j = static_cast<int>(j);
+
+  T epetra_value = value;
+
+  if (_mat->Filled())
+    _mat->ReplaceGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+  else
+    _mat->InsertGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::add (const unsigned int i,
+			   const unsigned int j,
+			   const T value)
+{
+  libmesh_assert (this->initialized());
+
+  int
+    epetra_i = static_cast<int>(i),
+    epetra_j = static_cast<int>(j);
+
+  T epetra_value = value;
+
+  _mat->SumIntoGlobalValues (epetra_i, 1, &epetra_value, &epetra_j);
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
+				 const std::vector<unsigned int>& dof_indices)
+{
+  this->add_matrix (dm, dof_indices, dof_indices);
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
+{
+  libmesh_assert (this->initialized());
+
+  // sanity check. but this cannot avoid
+  // crash due to incompatible sparsity structure...
+  libmesh_assert_equal_to (this->m(), X_in.m());
+  libmesh_assert_equal_to (this->n(), X_in.n());
+
+  EpetraMatrix<T>* X = libmesh_cast_ptr<EpetraMatrix<T>*> (&X_in);
+
+  EpetraExt::MatrixMatrix::Add 	(*X->_mat, false, a_in, *_mat, 1.);
+}
+
+
+
+
+template <typename T>
+T EpetraMatrix<T>::operator () (const unsigned int i,
+				const unsigned int j) const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(this->_mat);
+  libmesh_assert (this->_mat->MyGlobalRow(i));
+  libmesh_assert_greater_equal (i, this->row_start());
+  libmesh_assert_less (i, this->row_stop());
+
+
+  int row_length, *row_indices;
+  double *values;
+
+  _mat->ExtractMyRowView (i-this->row_start(),
+			  row_length,
+			  values,
+			  row_indices);
+
+  //libMesh::out << "row_length=" << row_length << std::endl;
+
+  int *index = std::lower_bound (row_indices, row_indices+row_length, j);
+
+  libmesh_assert_less (*index, row_length);
+  libmesh_assert_equal_to (static_cast<unsigned int>(row_indices[*index]), j);
+
+  //libMesh::out << "val=" << values[*index] << std::endl;
+
+  return values[*index];
+}
+
+
+
+
+template <typename T>
+bool EpetraMatrix<T>::closed() const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(this->_mat);
+
+  return this->_mat->Filled();
+}
+
+
+template <typename T>
+void EpetraMatrix<T>::swap(EpetraMatrix<T> & m)
+{
+   std::swap(_mat, m._mat);
+   std::swap(_destroy_mat_on_exit, m._destroy_mat_on_exit);
+}
+
+
+
+
+
+template <typename T>
+void EpetraMatrix<T>::print_personal(std::ostream& os) const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_mat);
+
+  os << *_mat;
 }
 
 
