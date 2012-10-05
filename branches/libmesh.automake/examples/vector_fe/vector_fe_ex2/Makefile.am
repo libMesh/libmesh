@@ -20,7 +20,7 @@ vector_fe_ex2_DATA    = laplace.in laplace_system.C solution_function.h vector_f
 vector_fe_ex2_SOURCES = $(vector_fe_ex2_DATA) run.sh
 vector_fe_ex2_LDADD   = $(top_builddir)/libmesh.la
 
-CLEANFILES = out.e 
+CLEANFILES = out.e out.inp
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD
