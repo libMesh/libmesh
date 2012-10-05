@@ -3585,6 +3585,11 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
         GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
+      *4.7.*)
+  	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.7 >>>" >&5
+$as_echo "<<< C++ compiler is gcc-4.7 >>>" >&6; }
+  	GXX_VERSION=gcc4.7
+  	;;
       *4.6.*)
   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-4.6 >>>" >&5
 $as_echo "<<< C++ compiler is gcc-4.6 >>>" >&6; }
@@ -3766,6 +3771,11 @@ $as_echo "<<< C++ compiler is Intel Itanium ICC 7.0 >>>" >&6; }
           if test "x$is_intel_icc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *13.*)
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 13 >>>" >&5
+$as_echo "<<< C++ compiler is Intel(R) icc 13 >>>" >&6; }
+  	        GXX_VERSION=intel_icc_v13.x
+                ;;
               *12.1*)
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 12.1 >>>" >&5
 $as_echo "<<< C++ compiler is Intel(R) icc 12.1 >>>" >&6; }
@@ -5100,7 +5110,7 @@ fi
 
                 case "$GXX_VERSION" in
 
-                    intel_icc_v10.1 | intel_icc_v11.x | intel_icc_v12.x)
+                    intel_icc_v10.1 | intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x)
                                                                                                                                                                                                                   PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
