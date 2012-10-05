@@ -24,6 +24,10 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
     dnl find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
     case "$GXX_VERSION_STRING" in
+      *4.7.*)
+  	AC_MSG_RESULT(<<< C++ compiler is gcc-4.7 >>>)
+  	GXX_VERSION=gcc4.7
+  	;;
       *4.6.*)
   	AC_MSG_RESULT(<<< C++ compiler is gcc-4.6 >>>)
   	GXX_VERSION=gcc4.6
@@ -188,6 +192,10 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
           if test "x$is_intel_icc" != "x" ; then
             GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
             case "$GXX_VERSION_STRING" in
+              *13.*)
+                AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 13 >>>)
+  	        GXX_VERSION=intel_icc_v13.x
+                ;;
               *12.1*)
                 AC_MSG_RESULT(<<< C++ compiler is Intel(R) icc 12.1 >>>)
   	        GXX_VERSION=intel_icc_v12.x
@@ -544,7 +552,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
         case "$GXX_VERSION" in
 
           dnl Intel ICC >= v10.1
-          intel_icc_v10.1 | intel_icc_v11.x | intel_icc_v12.x)
+          intel_icc_v10.1 | intel_icc_v11.x | intel_icc_v12.x | intel_icc_v13.x)
               dnl Disable some warning messages:
               dnl #175: 'subscript out of range'
               dnl       FIN-S application code causes many false
