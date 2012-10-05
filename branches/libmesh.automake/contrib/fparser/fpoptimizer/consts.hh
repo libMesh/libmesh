@@ -47,10 +47,6 @@ namespace FUNCTIONPARSERTYPES
     template<typename Value_t>
     inline Value_t fp_const_negativezero()
     {
-#ifdef FP_EPSILON
         return -fp_epsilon<Value_t>();
-#else
-        return Value_t(-1e-14);
-#endif
     }
 }

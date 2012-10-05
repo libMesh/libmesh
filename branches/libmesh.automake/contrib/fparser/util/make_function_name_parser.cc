@@ -7,7 +7,7 @@
   See gpl.txt for the license text.
 ============================================================================*/
 
-// #define FUNCTIONPARSER_SUPPORT_DEBUGGING // set via Makefile
+#define FUNCTIONPARSER_SUPPORT_DEBUGGING
 
 #include <set>
 #include <iostream>

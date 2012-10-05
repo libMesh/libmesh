@@ -76,6 +76,7 @@ util_tree_grammar_parser_SOURCES   = \
                                  mpfr/GmpInt.hh \
                                  fparser_mpfr.hh \
                                  fparser.hh \
+				 fparser.cc \
                                  fpoptimizer/logic_comparisons.hh \
                                  fpoptimizer/constantfolding.hh \
                                  fpoptimizer/logic_ifoperations.hh \

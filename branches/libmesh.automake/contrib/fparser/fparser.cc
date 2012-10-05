@@ -1,5 +1,5 @@
 /***************************************************************************\
-|* Function Parser for C++ v4.4.3                                          *|
+|* Function Parser for C++ v4.5                                            *|
 |*-------------------------------------------------------------------------*|
 |* Copyright: Juha Nieminen, Joel Yliluoma                                 *|
 |*                                                                         *|
@@ -205,7 +205,6 @@ unsigned FUNCTIONPARSERTYPES::GetParamSwappedBinaryOpcode(unsigned op)
 template<bool ComplexType>
 bool FUNCTIONPARSERTYPES::HasInvalidRangesOpcode(unsigned op)
 {
-#ifndef FP_NO_EVALUATION_CHECKS
     // Returns true, if the given opcode has a range of
     // input values that gives an error.
     if(ComplexType)
@@ -265,7 +264,6 @@ bool FUNCTIONPARSERTYPES::HasInvalidRangesOpcode(unsigned op)
           return true;
         }
     }
-#endif
     return false;
 }
 
@@ -424,15 +422,6 @@ namespace
         if( (value & 0x80000000U) != 0) // Function?
         {
             // Verify that the function actually exists for this datatype
-        #ifdef FP_DISABLE_EVAL
-            //if(!Functions[(value >> 16) & 0x7FFF].evalOnly())
-            if( value == ((cEval << 16) | 0x80000004U) ) // faster test
-            {
-                // If it's cEval, return it as an identifier instead
-                //return value & 0xFFFFu;
-                return 4;
-            }
-        #endif
             if(IsIntType<Value_t>::result
             && !Functions[(value >> 16) & 0x7FFF].okForInt())
             {
@@ -467,7 +456,7 @@ namespace
         return std::strtod(str, endptr);
     }
 
-#ifdef FP_USE_STRTOLD
+#if defined(FP_USE_STRTOLD) || __cplusplus > 201100
     template<>
     inline long double fp_parseLiteral<long double>(const char* str,
                                                     char** endptr)
@@ -728,7 +717,6 @@ FunctionParserBase<Value_t>::Data::Data():
     mParseErrorType(NO_FUNCTION_PARSED_YET),
     mEvalErrorType(0),
     mUseDegreeConversion(false),
-    mEvalRecursionLevel(0),
     mErrorLocation(0),
     mVariablesAmount(0),
     mStackSize(0)
@@ -741,7 +729,6 @@ FunctionParserBase<Value_t>::Data::Data(const Data& rhs):
     mParseErrorType(rhs.mParseErrorType),
     mEvalErrorType(rhs.mEvalErrorType),
     mUseDegreeConversion(rhs.mUseDegreeConversion),
-    mEvalRecursionLevel(rhs.mEvalRecursionLevel),
     mErrorLocation(rhs.mErrorLocation),
     mVariablesAmount(rhs.mVariablesAmount),
     mVariablesString(rhs.mVariablesString),
@@ -923,6 +910,45 @@ template<typename Value_t>
 void FunctionParserBase<Value_t>::ForceDeepCopy()
 {
     CopyOnWrite();
+}
+
+
+//=========================================================================
+// Epsilon
+//=========================================================================
+template<> double FunctionParserBase<double>::sEpsilon = 1E-12;
+template<> float FunctionParserBase<float>::sEpsilon = 1E-5F;
+template<> long double FunctionParserBase<long double>::sEpsilon = 1E-14L;
+template<> long FunctionParserBase<long>::sEpsilon = 0;
+
+template<> std::complex<double>
+FunctionParserBase<std::complex<double> >::sEpsilon = 1E-12;
+
+template<> std::complex<float>
+FunctionParserBase<std::complex<float> >::sEpsilon = 1E-5F;
+
+template<> std::complex<long double>
+FunctionParserBase<std::complex<long double> >::sEpsilon = 1E-14L;
+
+#ifdef FP_SUPPORT_MPFR_FLOAT_TYPE
+template<> MpfrFloat
+FunctionParserBase<MpfrFloat>::sEpsilon(MpfrFloat::someEpsilon());
+#endif
+
+#ifdef FP_SUPPORT_GMP_INT_TYPE
+template<> GmpInt FunctionParserBase<GmpInt>::sEpsilon = 0;
+#endif
+
+template<typename Value_t>
+Value_t FunctionParserBase<Value_t>::epsilon()
+{
+    return sEpsilon;
+}
+
+template<typename Value_t>
+void FunctionParserBase<Value_t>::setEpsilon(Value_t value)
+{
+    sEpsilon = value;
 }
 
 
@@ -1502,12 +1528,6 @@ namespace
     #endif
     }
 
-#ifdef FP_EPSILON
-    const double EpsilonOrZero = FP_EPSILON;
-#else
-    const double EpsilonOrZero = 0.0;
-#endif
-
     /* Needed by fp_opcode_add.inc if tracing is enabled */
     template<typename Value_t>
     std::string findName(const NamePtrsMap<Value_t>& nameMap,
@@ -2009,10 +2029,6 @@ inline const char* FunctionParserBase<Value_t>::CompileFunction
         return CompileIf(function);
 
     unsigned requiredParams = funcDef.params;
-#ifndef FP_DISABLE_EVAL
-    if(func_opcode == cEval)
-        requiredParams = mData->mVariablesAmount;
-#endif
 
     function = CompileFunctionParams(function, requiredParams);
     if(!function) return 0;
@@ -2634,27 +2650,21 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
           case   cAbs: Stack[SP] = fp_abs(Stack[SP]); break;
 
           case  cAcos:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(IsComplexType<Value_t>::result == false
               && (Stack[SP] < Value_t(-1) || Stack[SP] > Value_t(1)))
               { mData->mEvalErrorType=4; return Value_t(0); }
-#           endif
               Stack[SP] = fp_acos(Stack[SP]); break;
 
           case cAcosh:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(IsComplexType<Value_t>::result == false
               && Stack[SP] < Value_t(1))
               { mData->mEvalErrorType=4; return Value_t(0); }
-#           endif
               Stack[SP] = fp_acosh(Stack[SP]); break;
 
           case  cAsin:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(IsComplexType<Value_t>::result == false
               && (Stack[SP] < Value_t(-1) || Stack[SP] > Value_t(1)))
               { mData->mEvalErrorType=4; return Value_t(0); }
-#           endif
               Stack[SP] = fp_asin(Stack[SP]); break;
 
           case cAsinh: Stack[SP] = fp_asinh(Stack[SP]); break;
@@ -2665,12 +2675,10 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
                        --SP; break;
 
           case cAtanh:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(IsComplexType<Value_t>::result
               ?  (Stack[SP] == Value_t(-1) || Stack[SP] == Value_t(1))
               :  (Stack[SP] <= Value_t(-1) || Stack[SP] >= Value_t(1)))
               { mData->mEvalErrorType=4; return Value_t(0); }
-#           endif
               Stack[SP] = fp_atanh(Stack[SP]); break;
 
           case  cCbrt: Stack[SP] = fp_cbrt(Stack[SP]); break;
@@ -2684,60 +2692,19 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
           case   cCot:
               {
                   const Value_t t = fp_tan(Stack[SP]);
-#               ifndef FP_NO_EVALUATION_CHECKS
                   if(t == Value_t(0))
                   { mData->mEvalErrorType=1; return Value_t(0); }
-#               endif
                   Stack[SP] = Value_t(1)/t; break;
               }
 
           case   cCsc:
               {
                   const Value_t s = fp_sin(Stack[SP]);
-#               ifndef FP_NO_EVALUATION_CHECKS
                   if(s == Value_t(0))
                   { mData->mEvalErrorType=1; return Value_t(0); }
-#               endif
                   Stack[SP] = Value_t(1)/s; break;
               }
 
-
-#       ifndef FP_DISABLE_EVAL
-          case  cEval:
-              {
-                  const unsigned varAmount = mData->mVariablesAmount;
-                  Value_t retVal = Value_t(0);
-                  if(mData->mEvalRecursionLevel == FP_EVAL_MAX_REC_LEVEL)
-                  {
-                      mData->mEvalErrorType = 5;
-                  }
-                  else
-                  {
-                      ++mData->mEvalRecursionLevel;
-#                   ifndef FP_USE_THREAD_SAFE_EVAL
-                      /* Eval() will use mData->mStack for its storage.
-                       * Swap the current stack with an empty one.
-                       * This is the not-thread-safe method.
-                       */
-                      std::vector<Value_t> tmpStack(Stack.size());
-                      mData->mStack.swap(tmpStack);
-                      retVal = Eval(&tmpStack[SP - varAmount + 1]);
-                      mData->mStack.swap(tmpStack);
-#                   else
-                      /* Thread safety mode. We don't need to
-                       * worry about stack reusing here, because
-                       * each instance of Eval() will allocate
-                       * their own stack.
-                       */
-                      retVal = Eval(&Stack[SP - varAmount + 1]);
-#                   endif
-                      --mData->mEvalRecursionLevel;
-                  }
-                  SP -= varAmount-1;
-                  Stack[SP] = retVal;
-                  break;
-              }
-#       endif
 
           case   cExp: Stack[SP] = fp_exp(Stack[SP]); break;
 
@@ -2763,31 +2730,25 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
           case   cInt: Stack[SP] = fp_int(Stack[SP]); break;
 
           case   cLog:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(IsComplexType<Value_t>::result
                ?   Stack[SP] == Value_t(0)
                :   !(Stack[SP] > Value_t(0)))
               { mData->mEvalErrorType=3; return Value_t(0); }
-#           endif
               Stack[SP] = fp_log(Stack[SP]); break;
 
           case cLog10:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(IsComplexType<Value_t>::result
                ?   Stack[SP] == Value_t(0)
                :   !(Stack[SP] > Value_t(0)))
               { mData->mEvalErrorType=3; return Value_t(0); }
-#           endif
               Stack[SP] = fp_log10(Stack[SP]);
               break;
 
           case  cLog2:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(IsComplexType<Value_t>::result
                ?   Stack[SP] == Value_t(0)
                :   !(Stack[SP] > Value_t(0)))
               { mData->mEvalErrorType=3; return Value_t(0); }
-#           endif
               Stack[SP] = fp_log2(Stack[SP]);
               break;
 
@@ -2798,7 +2759,6 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
                        --SP; break;
 
           case   cPow:
-#           ifndef FP_NO_EVALUATION_CHECKS
               // x:Negative ^ y:NonInteger is failure,
               // except when the reciprocal of y forms an integer
               /*if(IsComplexType<Value_t>::result == false
@@ -2810,7 +2770,6 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
               if(Stack[SP-1] == Value_t(0) &&
                  Stack[SP] < Value_t(0))
               { mData->mEvalErrorType=3; return Value_t(0); }
-#           endif
               Stack[SP-1] = fp_pow(Stack[SP-1], Stack[SP]);
               --SP; break;
 
@@ -2819,10 +2778,8 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
           case   cSec:
               {
                   const Value_t c = fp_cos(Stack[SP]);
-#               ifndef FP_NO_EVALUATION_CHECKS
                   if(c == Value_t(0))
                   { mData->mEvalErrorType=1; return Value_t(0); }
-#               endif
                   Stack[SP] = Value_t(1)/c; break;
               }
 
@@ -2831,11 +2788,9 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
           case  cSinh: Stack[SP] = fp_sinh(Stack[SP]); break;
 
           case  cSqrt:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(IsComplexType<Value_t>::result == false &&
                  Stack[SP] < Value_t(0))
               { mData->mEvalErrorType=2; return Value_t(0); }
-#           endif
               Stack[SP] = fp_sqrt(Stack[SP]); break;
 
           case   cTan: Stack[SP] = fp_tan(Stack[SP]); break;
@@ -2861,13 +2816,8 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
           case   cMul: Stack[SP-1] *= Stack[SP]; --SP; break;
 
           case   cDiv:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(Stack[SP] == Value_t(0))
               { mData->mEvalErrorType=1; return Value_t(0); }
-#           else
-              if(IsIntType<Value_t>::result && Stack[SP] == Value_t(0))
-              { mData->mEvalErrorType=1; return Value_t(0); }
-#           endif
               Stack[SP-1] /= Stack[SP]; --SP; break;
 
           case   cMod:
@@ -2969,12 +2919,10 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
               }
 
           case  cLog2by:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(IsComplexType<Value_t>::result
                ?   Stack[SP-1] == Value_t(0)
                :   !(Stack[SP-1] > Value_t(0)))
               { mData->mEvalErrorType=3; return Value_t(0); }
-#           endif
               Stack[SP-1] = fp_log2(Stack[SP-1]) * Stack[SP];
               --SP;
               break;
@@ -3015,13 +2963,8 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
           case   cDup: Stack[SP+1] = Stack[SP]; ++SP; break;
 
           case   cInv:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(Stack[SP] == Value_t(0))
               { mData->mEvalErrorType=1; return Value_t(0); }
-#           else
-              if(IsIntType<Value_t>::result && Stack[SP] == Value_t(0))
-              { mData->mEvalErrorType=1; return Value_t(0); }
-#           endif
               Stack[SP] = Value_t(1)/Stack[SP];
               break;
 
@@ -3030,22 +2973,15 @@ Value_t FunctionParserBase<Value_t>::Eval(const Value_t* Vars)
               break;
 
           case   cRDiv:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(Stack[SP-1] == Value_t(0))
               { mData->mEvalErrorType=1; return Value_t(0); }
-#           else
-              if(IsIntType<Value_t>::result && Stack[SP-1] == Value_t(0))
-              { mData->mEvalErrorType=1; return Value_t(0); }
-#           endif
               Stack[SP-1] = Stack[SP] / Stack[SP-1]; --SP; break;
 
           case   cRSub: Stack[SP-1] = Stack[SP] - Stack[SP-1]; --SP; break;
 
           case   cRSqrt:
-#           ifndef FP_NO_EVALUATION_CHECKS
               if(Stack[SP] == Value_t(0))
               { mData->mEvalErrorType=1; return Value_t(0); }
-#           endif
               Stack[SP] = Value_t(1) / fp_sqrt(Stack[SP]); break;
 
 #ifdef FP_SUPPORT_COMPLEX_NUMBERS
@@ -3650,10 +3586,6 @@ void FunctionParserBase<Value_t>::PrintByteCode(std::ostream& dest,
                         case cNotNot: n = "notnot"; params = 1; break;
                         case cDeg: n = "deg"; params = 1; break;
                         case cRad: n = "rad"; params = 1; break;
-
-    #ifndef FP_DISABLE_EVAL
-                        case cEval: n = "eval"; params = mData->mVariablesAmount; break;
-    #endif
 
                         case cFetch:
                         {

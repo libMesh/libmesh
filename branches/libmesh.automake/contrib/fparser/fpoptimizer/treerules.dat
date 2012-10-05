@@ -871,6 +871,9 @@ cMul (cAdd %@M <1>) &  : (cAdd *(% &) (cMul & (cAdd <1>)))     # TEST 20/addcons
 @F cPow [ (cAdd {(           cPow [x %@E]  )  (cMul {z@C (cPow [y &@E])})} ) 0.5 ] -> (cHypot [(cPow [      x              *(% 0.5)]) (cPow [(cMul y POW(z@C /&)) *(& 0.5)])])
 @F cPow [ (cAdd {(cMul {a@C (cPow [x %@E])})  (cMul {z@C (cPow [y &@E])})} ) 0.5 ] -> (cHypot [(cPow [(cMul x POW(a@C /%)) *(% 0.5)]) (cPow [(cMul y POW(z@C /&)) *(& 0.5)])])
 
+@F cMul (cExp[x]) (cExp[y])   : (cExp[(cAdd x y)])  # TEST 20/expexp_a 20/expexp_b 20/expexp_c
+@F cMul (cExp2[x]) (cExp2[y]) : (cExp2[(cAdd x y)]) # TEST 20/expexp_a 20/expexp_b 20/expexp_c
+
 [ABS_LOGICAL]
 
 @R cNot    [x@P] -> cAbsNot [x]        # TEST 20/posnot
@@ -976,6 +979,10 @@ REGENERATE_TANH
 
 $optimize_round4:
 REGENERATE_HIGHLEVEL_OPCODES
+
+$optimize_recreate:
+REGENERATE_HIGHLEVEL_OPCODES
+BINOMIAL
 
 $optimize_ignore_if_sideeffects
 IGNORE_IF_SIDEEFFECTS
