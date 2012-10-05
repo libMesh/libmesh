@@ -47,7 +47,7 @@ void LaplaceSystem::init_data ()
   GetPot infile("laplace.in");
 
   // Add the solution variable
-  u_var = this->add_variable ("u", SECOND, LAGRANGE_VEC);
+  u_var = this->add_variable ("u", FIRST, LAGRANGE_VEC);
 
   this->time_evolving(u_var);
 

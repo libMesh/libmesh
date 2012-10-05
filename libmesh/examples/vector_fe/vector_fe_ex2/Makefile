@@ -43,7 +43,7 @@ clean:
 
 clobber:
 	@$(MAKE) clean
-	@rm -f $(target) out.e
+	@rm -f $(target) out.e out.inp
 
 distclean:
 	@$(MAKE) clobber
