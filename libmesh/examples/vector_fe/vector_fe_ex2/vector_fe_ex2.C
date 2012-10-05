@@ -29,6 +29,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/exact_solution.h"
+#include "libmesh/ucd_io.h"
 
 // The systems and solvers we may use
 #include "laplace_system.h"
@@ -68,7 +69,7 @@ int main (int argc, char** argv)
 				     -1., 1.,
 				     -1., 1.,
 				     -1., 1.,
-				     HEX27);
+				     HEX8);
 
   // Print information about the mesh to the screen.
   mesh.print_info();
@@ -143,6 +144,8 @@ int main (int argc, char** argv)
   ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
   
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+
+  UCDIO(mesh).write_equation_systems("out.inp", equation_systems);
 
   // All done.  
   return 0;

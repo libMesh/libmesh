@@ -26,6 +26,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
+#include "libmesh/boundary_info.h"
 
 namespace libMesh
 {
@@ -74,6 +75,14 @@ class UCDIO : public MeshInput<MeshBase>,
    */
   virtual void write (const std::string& );
 
+  /**
+   * This method implements writing a mesh and solution to a specified file
+   * in UCD format. This is internally called by MeshOutput::write_equation_systems
+   */
+  virtual void write_nodal_data(const std::string& fname, 
+				const std::vector<Number>&soln, 
+				const std::vector<std::string>& names);
+  
 
  private:
 
@@ -91,7 +100,30 @@ class UCDIO : public MeshInput<MeshBase>,
    */
   void write_implementation (std::ostream& out_stream);
 
-};
+  /**
+   * Write UCD format header
+   */
+  void write_header(std::ostream& out, const MeshBase& mesh,
+		    int n_elems, unsigned int n_vars );
+
+  /**
+   * Write node information
+   */
+  void write_nodes(std::ostream& out, const MeshBase& mesh);
+
+  /**
+   * Write element information
+   */
+  void write_interior_elems(std::ostream& out, const MeshBase& mesh);
+
+  /**
+   * Writes all nodal solution variables
+   */
+  void write_soln(std::ostream& out, const MeshBase& mesh,
+		  const std::vector<std::string>& names,
+		  const std::vector<Number>&soln);
+
+ };
 
 
 
