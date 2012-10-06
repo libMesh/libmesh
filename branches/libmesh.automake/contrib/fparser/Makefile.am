@@ -115,6 +115,7 @@ util_tree_grammar_parser_SOURCES   = \
 
 # extrasrc/fp_opcode_add.inc is a generated source, and this rule specifies how we build it.
 BUILT_SOURCES += extrasrc/fp_opcode_add.inc
+fparser.cc: extrasrc/fp_opcode_add.inc
 extrasrc/fp_opcode_add.inc: \
 		util/bytecoderules_parser \
 		util/bytecoderules.dat \
