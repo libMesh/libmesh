@@ -100,8 +100,10 @@ public:
   
   /**
    * Get a string that specifies the contents of this RBParameters object.
+   * \p precision specifies the number of digits of precision we use
+   * in scientific notation in the string.
    */
-  std::string get_string() const;
+  std::string get_string(unsigned int precision=6) const;
   
   /**
    * Print the parameters.
