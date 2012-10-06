@@ -90,15 +90,16 @@ bool RBParameters::operator!=(const RBParameters& rhs) const
   return !(*this == rhs);
 }
 
-std::string RBParameters::get_string() const
+std::string RBParameters::get_string(unsigned int precision) const
 {
   std::stringstream param_stringstream;
+  param_stringstream.precision(precision);
   
   const_iterator it     = _parameters.begin();
   const_iterator it_end = _parameters.end();
   for( ; it != it_end; ++it)
   {
-    param_stringstream << it->first << ": " << it->second << std::endl;
+    param_stringstream << it->first << ": " << std::scientific <<  it->second << std::endl;
   }
   return param_stringstream.str();
 }
