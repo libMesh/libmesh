@@ -11,7 +11,7 @@ using namespace FUNCTIONPARSERTYPES;
 
 //#define DEBUG_POWI
 
-#if defined(__x86_64) || !defined(FP_SUPPORT_CBRT)
+#if defined(__x86_64) || __cplusplus < 201100
 # define CBRT_IS_SLOW
 #endif
 

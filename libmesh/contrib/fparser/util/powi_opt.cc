@@ -77,10 +77,6 @@ void PrintByteCode(const std::vector<unsigned>& ByteCode,
                     case cDeg: n = "deg"; break;
                     case cRad: n = "rad"; break;
 
-#ifndef FP_DISABLE_EVAL
-                    case cEval: n = "call\t0"; break;
-#endif
-
 #ifdef FP_SUPPORT_OPTIMIZER
                     case cDup: n = "dup"; break;
                     case cInv: n = "inv"; break;

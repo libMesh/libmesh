@@ -1,5 +1,5 @@
 /***************************************************************************\
-|* Function Parser for C++ v4.4.3                                          *|
+|* Function Parser for C++ v4.5                                            *|
 |*-------------------------------------------------------------------------*|
 |* Copyright: Juha Nieminen, Joel Yliluoma                                 *|
 |*                                                                         *|
@@ -16,7 +16,7 @@
 #ifndef ONCE_FPARSER_TYPES_H_
 #define ONCE_FPARSER_TYPES_H_
 
-#include "fpconfig.hh"
+#include "../fpconfig.hh"
 #include <cstring>
 
 #ifdef ONCE_FPARSER_H_
@@ -37,7 +37,6 @@ namespace FUNCTIONPARSERTYPES
         cCbrt, cCeil,
         cConj,  /* get the complex conjugate of a complex value */
         cCos, cCosh, cCot, cCsc,
-        cEval,
         cExp, cExp2, cFloor, cHypot,
         cIf,
         cImag,  /* get imaginary part of a complex value */
@@ -68,6 +67,7 @@ namespace FUNCTIONPARSERTYPES
         cLog2by, /* log2by(x,y) = log2(x) * y */
 #endif
         cNop,    /* Used by fpoptimizer internally; should not occur in bytecode */
+
         cSinCos,   /* sin(x) followed by cos(x) (two values are pushed to stack) */
         cSinhCosh, /* hyperbolic equivalent of sincos */
         cAbsAnd,    /* As cAnd,       but assume both operands are absolute values */
@@ -97,8 +97,7 @@ namespace FUNCTIONPARSERTYPES
             AngleIn     = 0x02,
             AngleOut    = 0x04,
             OkForInt    = 0x08,
-            ComplexOnly = 0x10,
-            EvalOnly    = 0x20
+            ComplexOnly = 0x10
         };
 
 #ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
@@ -111,7 +110,6 @@ namespace FUNCTIONPARSERTYPES
 
         inline bool okForInt() const { return (flags & OkForInt) != 0; }
         inline bool complexOnly() const { return (flags & ComplexOnly) != 0; }
-        inline bool evalOnly() const { return (flags & EvalOnly) != 0; }
     };
 
 #ifdef FUNCTIONPARSER_SUPPORT_DEBUGGING
@@ -140,7 +138,6 @@ namespace FUNCTIONPARSERTYPES
         /*cCosh */ { FP_FNAME("cosh"),  1, FuncDefinition::AngleIn },
         /*cCot  */ { FP_FNAME("cot"),   1, FuncDefinition::AngleIn },
         /*cCsc  */ { FP_FNAME("csc"),   1, FuncDefinition::AngleIn },
-        /*cEval */ { FP_FNAME("eval"),  0, FuncDefinition::EvalOnly | FuncDefinition::OkForInt },
         /*cExp  */ { FP_FNAME("exp"),   1, 0 },
         /*cExp2 */ { FP_FNAME("exp2"),  1, 0 },
         /*cFloor*/ { FP_FNAME("floor"), 1, 0 },
@@ -228,7 +225,6 @@ struct FunctionParserBase<Value_t>::Data
     int mEvalErrorType;
     bool mUseDegreeConversion;
     bool mHasByteCodeFlags;
-    unsigned mEvalRecursionLevel;
     const char* mErrorLocation;
 
     unsigned mVariablesAmount;

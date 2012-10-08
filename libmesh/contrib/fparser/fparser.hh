@@ -1,5 +1,5 @@
 /***************************************************************************\
-|* Function Parser for C++ v4.4.3                                          *|
+|* Function Parser for C++ v4.5                                            *|
 |*-------------------------------------------------------------------------*|
 |* Copyright: Juha Nieminen, Joel Yliluoma                                 *|
 |*                                                                         *|
@@ -49,6 +49,9 @@ class FunctionParserBase
               bool useDegrees = false);
 
     void setDelimiterChar(char);
+
+    static Value_t epsilon();
+    static void setEpsilon(Value_t);
 
     const char* ErrorMsg() const;
     ParseErrorType GetParseErrorType() const;
@@ -135,6 +138,7 @@ class FunctionParserBase
 // ------------
     Data* mData;
     unsigned mStackPtr;
+    static Value_t sEpsilon;
 
 
 // Private methods:

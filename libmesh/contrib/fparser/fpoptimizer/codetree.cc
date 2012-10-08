@@ -446,7 +446,7 @@ namespace FPoptimizer_CodeTree
 {
 #define FP_INSTANTIATE(type) \
     template class CodeTree<type>; \
-    template struct CodeTreeData<type>;
+    template class CodeTreeData<type>;
     FPOPTIMIZER_EXPLICITLY_INSTANTIATE(FP_INSTANTIATE)
 #undef FP_INSTANTIATE
 }

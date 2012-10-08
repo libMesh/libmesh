@@ -62,7 +62,6 @@ const std::string FP_GetOpcodeName(FUNCTIONPARSERTYPES::OPCODE opcode,        bo
         case cCosh: p = "cCosh"; break;
         case cCot: p = "cCot"; break;
         case cCsc: p = "cCsc"; break;
-        case cEval: p = "cEval"; break;
         case cExp: p = "cExp"; break;
         case cExp2: p = "cExp2"; break;
         case cFloor: p = "cFloor"; break;
@@ -106,12 +105,12 @@ const std::string FP_GetOpcodeName(FUNCTIONPARSERTYPES::OPCODE opcode,        bo
         case cRad: p = "cRad"; break;
         case cFCall: p = "cFCall"; break;
         case cPCall: p = "cPCall"; break;
-        case cFetch: p = "cFetch"; break;
 #ifdef FP_SUPPORT_OPTIMIZER
+        case cFetch: p = "cFetch"; break;
         case cPopNMov: p = "cPopNMov"; break;
         case cLog2by: p = "cLog2by"; break;
-#endif
         case cNop: p = "cNop"; break;
+#endif
         case cSinCos: p = "cSinCos"; break;
         case cSinhCosh: p = "cSinhCosh"; break;
         case cAbsNot: p = "cAbsNot"; break;
