@@ -84,7 +84,6 @@ namespace
                     op(cCeil,ceil,ceil);
                     op(cCos,cos,cos);
                     op(cCosh,cosh,cosh);
-                    case cEval: return;
                     case cIf:
                         fp_pref = "if((";
                         return;
