@@ -863,6 +863,9 @@ public:
         return result.str();
     }
 
+    static inline bool fp_equal(double v1, double v2)
+    { return fp_abs(v1 - v2) < 1e-12; }
+
     static std::string ConstValueToString(const stdcomplex& value)
     {
         using namespace FUNCTIONPARSERTYPES;

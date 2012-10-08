@@ -33,14 +33,13 @@ endif
 # The optimizer code generator requires bison.
 #===========================================================================
 
-RELEASE_VERSION=4.4.3
+RELEASE_VERSION=4.5
 
 # The FP_FEATURE_FLAGS is set by run_full_release_testing.sh, but can be
 # used otherwise as well.
 ifeq ($(FP_FEATURE_FLAGS),)
 FEATURE_FLAGS =
 FEATURE_FLAGS += -DFP_ENABLE_EVAL
-#FEATURE_FLAGS += -DFP_SUPPORT_TR1_MATH_FUNCS
 
 # Mac OSX has trouble linking the optimizer stuff, so we disable
 # it on those systems.
@@ -48,9 +47,9 @@ ifeq ($(findstring darwin,$(hostos)),darwin)
   FEATURE_FLAGS += -DFP_NO_SUPPORT_OPTIMIZER
 endif
 
+#FEATURE_FLAGS += -DFP_NO_SUPPORT_OPTIMIZER
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL
 #FEATURE_FLAGS += -DFP_USE_THREAD_SAFE_EVAL_WITH_ALLOCA
-#FEATURE_FLAGS += -DFP_NO_EVALUATION_CHECKS
 #FEATURE_FLAGS += -D_GLIBCXX_DEBUG
 #FEATURE_FLAGS += -DFP_DISABLE_SHORTCUT_LOGICAL_EVALUATION
 FEATURE_FLAGS += -DFP_SUPPORT_FLOAT_TYPE
@@ -74,14 +73,14 @@ fp_LDFLAGS=$(libmesh_LDFLAGS)
 
 ifneq (,$(findstring -DFP_SUPPORT_MPFR_FLOAT_TYPE,$(FEATURE_FLAGS)))
 fp_LDFLAGS += -lgmp -lmpfr
-ADDITIONAL_SRCS = mpfr/MpfrFloat.cc
+ADDITIONAL_MODULES = mpfr/MpfrFloat.$(obj-suffix)
 ifneq (,$(findstring -DFP_SUPPORT_GMP_INT_TYPE,$(FEATURE_FLAGS)))
-ADDITIONAL_SRCS += mpfr/GmpInt.cc
+ADDITIONAL_MODULES += mpfr/GmpInt.$(obj-suffix)
 endif
 else
 ifneq (,$(findstring -DFP_SUPPORT_GMP_INT_TYPE,$(FEATURE_FLAGS)))
 fp_LDFLAGS += -lgmp
-ADDITIONAL_SRCS = mpfr/GmpInt.cc
+ADDITIONAL_MODULES = mpfr/GmpInt.$(obj-suffix)
 endif
 endif
 
@@ -95,6 +94,10 @@ endif
 
 fp_CPPFLAGS += -I.
 
+ifeq ($(findstring darwin,$(hostos)),darwin)
+SRC = 	fparser.cc \
+	$(ADDITIONAL_MODULES)
+else
 SRC = 	fparser.cc \
 		fpoptimizer/grammar_data.cc \
 		fpoptimizer/optimize_main.cc \
@@ -115,31 +118,49 @@ SRC = 	fparser.cc \
 		fpoptimizer/cse.cc \
 		fpoptimizer/debug.cc \
 		fpoptimizer/hash.cc \
-		$(ADDITIONAL_SRCS)
+		$(ADDITIONAL_MODULES)
+endif
 
 OBJS   	:= $(patsubst %.cc, %.$(obj-suffix), $(SRC))
 
-testbed: testbed.$(obj-suffix) $(target)
-	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(BOOST_THREAD_LIB) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+#RELEASE_PACK_FILES = examples/example.cc examples/example2.cc fparser.cc \
+#	fparser.hh fparser_mpfr.hh fparser_gmpint.hh \
+#	fpoptimizer.cc fpconfig.hh extrasrc/fptypes.hh extrasrc/fpaux.hh \
+#	mpfr/MpfrFloat.hh mpfr/MpfrFloat.cc mpfr/GmpInt.hh mpfr/GmpInt.cc \
+#	extrasrc/fp_opcode_add.inc \
+#	extrasrc/fp_identifier_parser.inc \
+#	docs/fparser.html docs/style.css docs/lgpl.txt docs/gpl.txt
+
+testbed: testbed.$(obj-suffix) $(FP_MODULES)
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
 fpoptimizer.$(obj-suffix): fpoptimizer.cc
 
-speedtest: util/speedtest.$(obj-suffix) $(target)
+testbed_release: testbed.$(obj-suffix) fparser.$(obj-suffix) fpoptimizer.$(obj-suffix) $(ADDITIONAL_MODULES)
 	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
-examples/example: examples/example.$(obj-suffix) $(target)
+speedtest: util/speedtest.$(obj-suffix) $(FP_MODULES)
 	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
-examples/example2: examples/example2.$(obj-suffix) $(target)
+speedtest_release: util/speedtest.$(obj-suffix) fparser.$(obj-suffix) fpoptimizer.$(obj-suffix)
 	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
-ftest: util/ftest.$(obj-suffix) $(target)
+examples/example: examples/example.$(obj-suffix) $(FP_MODULES)
 	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
-powi_speedtest: util/powi_speedtest.$(obj-suffix) $(target)
+examples/example2: examples/example2.$(obj-suffix) $(FP_MODULES)
 	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
-functioninfo: util/functioninfo.$(obj-suffix) $(target)
+ftest: util/ftest.$(obj-suffix) $(FP_MODULES)
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+
+powi_speedtest: util/powi_speedtest.$(obj-suffix) $(FP_MODULES)
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+
+koe: koe.$(obj-suffix) $(FP_MODULES)
+	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
+
+functioninfo: util/functioninfo.$(obj-suffix) $(FP_MODULES)
 	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
 fpoptimizer/grammar_data.cc: \
@@ -160,11 +181,9 @@ extrasrc/fp_opcode_add.inc: \
 		| util/cpp_compress \
 		>> $@
 
-fpoptimizer/bytecodesynth.$(obj-suffix): extrasrc/fp_opcode_add.inc
-
-tests/make_tests: tests/make_tests.$(obj-suffix) \
-                  util/cpp_compress.$(obj-suffix)
-	$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS)
+tests/make_tests: \
+		tests/make_tests.$(obj-suffix) util/cpp_compress.$(obj-suffix)
+	@$(libmesh_CXX) -o $@ $^ $(fp_LDFLAGS)
 
 testbed_tests.inc: tests/make_tests
 	tests/make_tests tests/*/* -o $@
@@ -353,9 +372,7 @@ clean:
 		util/*.$(obj-suffix) \
 		*.$(obj-suffix) \
 		.dep \
-		util/tree_grammar_parser.output \
-		extrasrc/fp_opcode_add.inc \
-                fpoptimizer/grammar_data.cc
+		util/tree_grammar_parser.output
 
 release_clean:
 	@rm -f testbed_release speedtest_release \
