@@ -1,5 +1,5 @@
 /***************************************************************************\
-|* Function Parser for C++ v4.5                                            *|
+|* Function Parser for C++ v4.4.3                                          *|
 |*-------------------------------------------------------------------------*|
 |* Copyright: Juha Nieminen, Joel Yliluoma                                 *|
 |*                                                                         *|
@@ -19,6 +19,9 @@
 #include "fptypes.hh"
 
 #include <cmath>
+#ifdef FP_SUPPORT_TR1_MATH_FUNCS
+#include <tr1/cmath>
+#endif
 
 #ifdef FP_SUPPORT_MPFR_FLOAT_TYPE
 #include "mpfr/MpfrFloat.hh"
@@ -35,6 +38,26 @@
 #ifdef ONCE_FPARSER_H_
 namespace FUNCTIONPARSERTYPES
 {
+    // Forward declarations
+    template<typename Value_t>
+    inline Value_t fp_exp(const Value_t&);
+
+    template<typename Value_t>
+    inline Value_t fp_log(const Value_t&);
+
+    template<typename Value_t>
+    inline Value_t fp_pow_base(const Value_t& x, const Value_t& y);
+
+    template<typename Value_t>
+    inline bool isInteger(const Value_t&);
+
+    template<typename Value_t>
+    inline bool isLongInteger(const Value_t&);
+
+    template<typename Value_t>
+    inline long makeLongInteger(const Value_t&);
+
+    // Definitions
     template<typename>
     struct IsIntType
     {
@@ -66,6 +89,54 @@ namespace FUNCTIONPARSERTYPES
     };
 #endif
 
+    // Commented versions in fparser.cc
+    template<typename Value_t>
+    inline Value_t fp_pow_with_exp_log(const Value_t& x, const Value_t& y)
+    {
+        return fp_exp(fp_log(x) * y);
+    }
+
+    template<typename Value_t>
+    inline Value_t fp_powi(Value_t x, unsigned long y)
+    {
+        Value_t result(1);
+        while(y != 0)
+        {
+            if(y & 1) { result *= x; y -= 1; }
+            else      { x *= x;      y /= 2; }
+        }
+        return result;
+    }
+
+    template<typename Value_t>
+    Value_t fp_pow(const Value_t& x, const Value_t& y)
+    {
+        if(x == Value_t(1)) return Value_t(1);
+        if(isLongInteger(y))
+        {
+            if(y >= Value_t(0))
+                return fp_powi(x, makeLongInteger(y));
+            else
+                return Value_t(1) / fp_powi(x, -makeLongInteger(y));
+        }
+        if(y >= Value_t(0))
+        {
+            if(x > Value_t(0)) return fp_pow_with_exp_log(x, y);
+            if(x == Value_t(0)) return Value_t(0);
+            if(!isInteger(y*Value_t(16)))
+                return -fp_pow_with_exp_log(-x, y);
+        }
+        else
+        {
+            if(x > Value_t(0)) return fp_pow_with_exp_log(Value_t(1) / x, -y);
+            if(x < Value_t(0))
+            {
+                if(!isInteger(y*Value_t(-16)))
+                    return -fp_pow_with_exp_log(Value_t(-1) / x, -y);
+            }
+        }
+        return fp_pow_base(x, y);
+    }
 
 //==========================================================================
 // Constants
@@ -166,6 +237,19 @@ namespace FUNCTIONPARSERTYPES
     inline Value_t fp_atan2(const Value_t& x, const Value_t& y)
     { return std::atan2(x, y); }
 
+#ifdef FP_SUPPORT_CBRT
+    template<typename Value_t>
+    inline Value_t fp_cbrt(const Value_t& x) { return std::tr1::cbrt(x); }
+#else
+    template<typename Value_t>
+    inline Value_t fp_cbrt(const Value_t& x)
+    {
+        return (x > Value_t() ?  fp_exp(fp_log( x) / Value_t(3)) :
+                x < Value_t() ? -fp_exp(fp_log(-x) / Value_t(3)) :
+                Value_t());
+    }
+#endif
+
     template<typename Value_t>
     inline Value_t fp_ceil(const Value_t& x) { return std::ceil(x); }
 
@@ -203,15 +287,15 @@ namespace FUNCTIONPARSERTYPES
     template<typename Value_t>
     inline Value_t fp_tanh(const Value_t& x) { return std::tanh(x); }
 
-#if __cplusplus > 201100
+#ifdef FP_SUPPORT_ASINH
     template<typename Value_t>
-    inline Value_t fp_asinh(const Value_t& x) { return std::asinh(x); }
+    inline Value_t fp_asinh(const Value_t& x) { return std::tr1::asinh(x); }
 
     template<typename Value_t>
-    inline Value_t fp_acosh(const Value_t& x) { return std::acosh(x); }
+    inline Value_t fp_acosh(const Value_t& x) { return std::tr1::acosh(x); }
 
     template<typename Value_t>
-    inline Value_t fp_atanh(const Value_t& x) { return std::atanh(x); }
+    inline Value_t fp_atanh(const Value_t& x) { return std::tr1::atanh(x); }
 #else
     template<typename Value_t>
     inline Value_t fp_asinh(const Value_t& x)
@@ -231,10 +315,10 @@ namespace FUNCTIONPARSERTYPES
     }
 #endif // FP_SUPPORT_ASINH
 
-#if __cplusplus > 201100
+#ifdef FP_SUPPORT_HYPOT
     template<typename Value_t>
     inline Value_t fp_hypot(const Value_t& x, const Value_t& y)
-    { return std::hypot(x,y); }
+    { return std::tr1::hypot(x,y); }
 #else
     template<typename Value_t>
     inline Value_t fp_hypot(const Value_t& x, const Value_t& y)
@@ -245,9 +329,9 @@ namespace FUNCTIONPARSERTYPES
     inline Value_t fp_pow_base(const Value_t& x, const Value_t& y)
     { return std::pow(x, y); }
 
-#if __cplusplus > 201100
+#ifdef FP_SUPPORT_LOG2
     template<typename Value_t>
-    inline Value_t fp_log2(const Value_t& x) { return std::log2(x); }
+    inline Value_t fp_log2(const Value_t& x) { return std::tr1::log2(x); }
 #else
     template<typename Value_t>
     inline Value_t fp_log2(const Value_t& x)
@@ -260,6 +344,12 @@ namespace FUNCTIONPARSERTYPES
     inline Value_t fp_log10(const Value_t& x)
     {
         return fp_log(x) * fp_const_log10inv<Value_t>();
+    }
+
+    template<typename Value_t>
+    inline Value_t fp_exp2(const Value_t& x)
+    {
+        return fp_pow(Value_t(2), x);
     }
 
     template<typename Value_t>
@@ -294,11 +384,13 @@ namespace FUNCTIONPARSERTYPES
         coshvalue = Value_t(0.5)*(ex+emx);
     }
 
+#ifdef FP_EPSILON
     template<typename Value_t>
-    inline Value_t fp_epsilon()
-    {
-        return FunctionParserBase<Value_t>::epsilon();
-    }
+    inline Value_t fp_epsilon() { return Value_t(FP_EPSILON); }
+#else
+    template<typename Value_t>
+    inline Value_t fp_epsilon() { return Value_t(0); }
+#endif
 
 
 #ifdef _GNU_SOURCE
@@ -448,20 +540,6 @@ namespace FUNCTIONPARSERTYPES
     template<>
     inline GmpInt fp_epsilon<GmpInt>() { return 0; }
 #endif // FP_SUPPORT_GMP_INT_TYPE
-
-
-#if __cplusplus > 201100
-    template<typename Value_t>
-    inline Value_t fp_cbrt(const Value_t& x) { return std::cbrt(x); }
-#else
-    template<typename Value_t>
-    inline Value_t fp_cbrt(const Value_t& x)
-    {
-        return (x > Value_t() ?  fp_exp(fp_log( x) / Value_t(3)) :
-                x < Value_t() ? -fp_exp(fp_log(-x) / Value_t(3)) :
-                Value_t());
-    }
-#endif
 
 // -------------------------------------------------------------------------
 // Synthetic functions and fallbacks for when an optimized
@@ -727,8 +805,7 @@ namespace FUNCTIONPARSERTYPES
         // const std::complex<T> exp2x=fp_exp(x+x);
         // return (exp2x-T(1)) / (exp2x+T(1));
     }
-
-#if __cplusplus > 201100
+#ifdef FP_SUPPORT_ASINH
     template<typename T>
     inline std::complex<T> fp_acosh(const std::complex<T>& x)
     { return fp_log(x + fp_sqrt(x*x - std::complex<T>(1))); }
@@ -913,6 +990,7 @@ namespace FUNCTIONPARSERTYPES
 // -------------------------------------------------------------------------
 // Comparison
 // -------------------------------------------------------------------------
+#ifdef FP_EPSILON
     template<typename Value_t>
     inline bool fp_equal(const Value_t& x, const Value_t& y)
     { return IsIntType<Value_t>::result
@@ -936,7 +1014,19 @@ namespace FUNCTIONPARSERTYPES
     { return IsIntType<Value_t>::result
         ? (x <= y)
         : (x <= y + fp_epsilon<Value_t>()); }
+#else // FP_EPSILON
+    template<typename Value_t>
+    inline bool fp_equal(const Value_t& x, const Value_t& y) { return x == y; }
 
+    template<typename Value_t>
+    inline bool fp_nequal(const Value_t& x, const Value_t& y) { return x != y; }
+
+    template<typename Value_t>
+    inline bool fp_less(const Value_t& x, const Value_t& y) { return x < y; }
+
+    template<typename Value_t>
+    inline bool fp_lessOrEq(const Value_t& x, const Value_t& y) { return x <= y; }
+#endif // FP_EPSILON
 
     template<typename Value_t>
     inline bool fp_greater(const Value_t& x, const Value_t& y)
@@ -1040,34 +1130,6 @@ namespace FUNCTIONPARSERTYPES
     }
 
     template<typename Value_t>
-    inline long makeLongInteger(const Value_t& value)
-    {
-        return (long) fp_int(value);
-    }
-
-#ifdef FP_SUPPORT_COMPLEX_NUMBERS
-    template<typename T>
-    inline long makeLongInteger(const std::complex<T>& value)
-    {
-        return (long) fp_int( std::abs(value) );
-    }
-#endif
-
-    // Is value an integer that fits in "long" datatype?
-    template<typename Value_t>
-    inline bool isLongInteger(const Value_t& value)
-    {
-        return value == Value_t( makeLongInteger(value) );
-    }
-
-    template<typename Value_t>
-    inline bool isOddInteger(const Value_t& value)
-    {
-        const Value_t halfValue = (value + Value_t(1)) * Value_t(0.5);
-        return fp_equal(halfValue, fp_floor(halfValue));
-    }
-
-    template<typename Value_t>
     inline bool isEvenInteger(const Value_t& value)
     {
         const Value_t halfValue = value * Value_t(0.5);
@@ -1079,6 +1141,37 @@ namespace FUNCTIONPARSERTYPES
     {
         return fp_equal(value, fp_floor(value));
     }
+
+    // Is value an integer that fits in "long" datatype?
+    template<typename Value_t>
+    inline bool isLongInteger(const Value_t& value)
+    {
+        return value == Value_t( makeLongInteger(value) );
+    }
+
+    template<typename Value_t>
+    inline long makeLongInteger(const Value_t& value)
+    {
+        return (long) fp_int(value);
+    }
+
+#ifdef FP_SUPPORT_COMPLEX_FLOAT_TYPE
+    template<>
+    inline long makeLongInteger(const std::complex<float>& value)
+    { return (long) fp_int( std::abs(value) ); }
+#endif
+
+#ifdef FP_SUPPORT_COMPLEX_DOUBLE_TYPE
+    template<>
+    inline long makeLongInteger(const std::complex<double>& value)
+    { return (long) fp_int( std::abs(value) ); }
+#endif
+
+#ifdef FP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE
+    template<>
+    inline long makeLongInteger(const std::complex<long double>& value)
+    { return (long) fp_int( std::abs(value) ); }
+#endif
 
 #ifdef FP_SUPPORT_LONG_INT_TYPE
     template<>
@@ -1134,6 +1227,13 @@ namespace FUNCTIONPARSERTYPES
     }
 #endif
 
+    template<typename Value_t>
+    inline bool isOddInteger(const Value_t& value)
+    {
+        const Value_t halfValue = (value + Value_t(1)) * Value_t(0.5);
+        return fp_equal(halfValue, fp_floor(halfValue));
+    }
+
 #ifdef FP_SUPPORT_LONG_INT_TYPE
     template<>
     inline bool isOddInteger(const long& value)
@@ -1157,65 +1257,6 @@ namespace FUNCTIONPARSERTYPES
         return value%2 != 0;
     }
 #endif
-
-
-// -------------------------------------------------------------------------
-// fp_pow
-// -------------------------------------------------------------------------
-    // Commented versions in fparser.cc
-    template<typename Value_t>
-    inline Value_t fp_pow_with_exp_log(const Value_t& x, const Value_t& y)
-    {
-        return fp_exp(fp_log(x) * y);
-    }
-
-    template<typename Value_t>
-    inline Value_t fp_powi(Value_t x, unsigned long y)
-    {
-        Value_t result(1);
-        while(y != 0)
-        {
-            if(y & 1) { result *= x; y -= 1; }
-            else      { x *= x;      y /= 2; }
-        }
-        return result;
-    }
-
-    template<typename Value_t>
-    Value_t fp_pow(const Value_t& x, const Value_t& y)
-    {
-        if(x == Value_t(1)) return Value_t(1);
-        if(isLongInteger(y))
-        {
-            if(y >= Value_t(0))
-                return fp_powi(x, makeLongInteger(y));
-            else
-                return Value_t(1) / fp_powi(x, -makeLongInteger(y));
-        }
-        if(y >= Value_t(0))
-        {
-            if(x > Value_t(0)) return fp_pow_with_exp_log(x, y);
-            if(x == Value_t(0)) return Value_t(0);
-            if(!isInteger(y*Value_t(16)))
-                return -fp_pow_with_exp_log(-x, y);
-        }
-        else
-        {
-            if(x > Value_t(0)) return fp_pow_with_exp_log(Value_t(1) / x, -y);
-            if(x < Value_t(0))
-            {
-                if(!isInteger(y*Value_t(-16)))
-                    return -fp_pow_with_exp_log(Value_t(-1) / x, -y);
-            }
-        }
-        return fp_pow_base(x, y);
-    }
-
-    template<typename Value_t>
-    inline Value_t fp_exp2(const Value_t& x)
-    {
-        return fp_pow(Value_t(2), x);
-    }
 } // namespace FUNCTIONPARSERTYPES
 
 #endif // ONCE_FPARSER_H_

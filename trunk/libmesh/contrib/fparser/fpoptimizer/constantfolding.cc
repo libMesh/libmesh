@@ -915,6 +915,7 @@ namespace FPoptimizer_CodeTree
             /* Opcodes that we can't do anything about */
             case cPCall:
             case cFCall:
+            case cEval:
                 break;
         }
     do_return:;
