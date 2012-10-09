@@ -147,7 +147,6 @@ namespace FPoptimizer_Grammar
 {
 #define FP_INSTANTIATE(type) \
     template void DumpParams<type>(unsigned, unsigned, std::ostream& ); \
-    template void DumpParam<type>(const ParamSpec&, std::ostream& );
     FPOPTIMIZER_EXPLICITLY_INSTANTIATE(FP_INSTANTIATE)
 #undef FP_INSTANTIATE
 }

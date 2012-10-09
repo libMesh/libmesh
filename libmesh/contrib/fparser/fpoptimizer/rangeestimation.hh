@@ -26,8 +26,8 @@ namespace FPoptimizer_CodeTree
     {
         if(!tree.IsImmed()) return Unknown;
         const Value_t& value = tree.GetImmed();
-        if(isEvenInteger(value)) return IsAlways;
-        if(isOddInteger(value)) return IsNever;
+        if(FUNCTIONPARSERTYPES::isEvenInteger(value)) return IsAlways;
+        if(FUNCTIONPARSERTYPES::isOddInteger(value)) return IsNever;
         return Unknown;
     }
 

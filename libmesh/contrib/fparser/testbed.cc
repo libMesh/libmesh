@@ -7,7 +7,7 @@
   See gpl.txt for the license text.
 ============================================================================*/
 
-static const char* const kVersionNumber = "2.3.0.12";
+static const char* const kVersionNumber = "2.2.3.11";
 
 #include "fpconfig.hh"
 #include "fparser.hh"
@@ -34,21 +34,6 @@ static const char* const kVersionNumber = "2.3.0.12";
 
 #define StringifyHlp(x) #x
 #define Stringify(x) StringifyHlp(x)
-
-#ifndef FP_DISABLE_DOUBLE_TYPE
-typedef FunctionParser DefaultParser;
-#elif defined(FP_SUPPORT_LONG_DOUBLE_TYPE)
-typedef FunctionParser_ld DefaultParser;
-#elif defined(FP_SUPPORT_FLOAT_TYPE)
-typedef FunctionParser_f DefaultParser;
-#elif defined(FP_SUPPORT_MPFR_FLOAT_TYPE)
-typedef FunctionParser_mpfr DefaultParser;
-#else
-#error "FunctionParserBase<double> was disabled and no viable floating point alternative has been defined"
-#endif
-
-typedef DefaultParser::value_type DefaultValue_t;
-
 
 namespace
 {
@@ -182,11 +167,11 @@ namespace
 //=========================================================================
 // Copying testing functions
 //=========================================================================
-bool TestCopyingNoDeepCopy(DefaultParser p)
+bool TestCopyingNoDeepCopy(FunctionParser p)
 {
-    DefaultValue_t vars[2] = { 3, 5 };
+    double vars[2] = { 3, 5 };
 
-    if(std::fabs(p.Eval(vars) - 13) > Epsilon<DefaultValue_t>())
+    if(std::fabs(p.Eval(vars) - 13) > Epsilon<double>())
     {
         if(verbosityLevel >= 2)
         {
@@ -202,13 +187,13 @@ bool TestCopyingNoDeepCopy(DefaultParser p)
     return true;
 }
 
-bool TestCopyingDeepCopy(DefaultParser p)
+bool TestCopyingDeepCopy(FunctionParser p)
 {
-    DefaultValue_t vars[2] = { 3, 5 };
+    double vars[2] = { 3, 5 };
 
     p.Parse("x*y-1", "x,y");
 
-    if(std::fabs(p.Eval(vars) - 14) > Epsilon<DefaultValue_t>())
+    if(std::fabs(p.Eval(vars) - 14) > Epsilon<double>())
     {
         if(verbosityLevel >= 2)
         {
@@ -227,14 +212,13 @@ bool TestCopyingDeepCopy(DefaultParser p)
 int TestCopying()
 {
     bool retval = true;
-    DefaultValue_t vars[2] = { 2, 5 };
-    const DefaultValue_t epsilon = Epsilon<DefaultValue_t>();
+    double vars[2] = { 2, 5 };
 
-    DefaultParser p1, p3;
+    FunctionParser p1, p3;
     p1.Parse("x*y-2", "x,y");
 
-    DefaultParser p2(p1);
-    if(std::fabs(p2.Eval(vars) - 8) > epsilon)
+    FunctionParser p2(p1);
+    if(std::fabs(p2.Eval(vars) - 8) > Epsilon<double>())
     {
         retval = false;
         if(verbosityLevel >= 2)
@@ -248,7 +232,7 @@ int TestCopying()
     }
 
     p2.Parse("x*y-1", "x,y");
-    if(std::fabs(p2.Eval(vars) - 9) > epsilon)
+    if(std::fabs(p2.Eval(vars) - 9) > Epsilon<double>())
     {
         retval = false;
         if(verbosityLevel >= 2)
@@ -262,7 +246,7 @@ int TestCopying()
     }
 
     p3 = p1;
-    if(std::fabs(p3.Eval(vars) - 8) > epsilon)
+    if(std::fabs(p3.Eval(vars) - 8) > Epsilon<double>())
     {
         retval = false;
         if(verbosityLevel >= 2)
@@ -276,7 +260,7 @@ int TestCopying()
     }
 
     p3.Parse("x*y-1", "x,y");
-    if(std::fabs(p3.Eval(vars) - 9) > epsilon)
+    if(std::fabs(p3.Eval(vars) - 9) > Epsilon<double>())
     {
         retval = false;
         if(verbosityLevel >= 2)
@@ -293,7 +277,7 @@ int TestCopying()
         retval = false;
 
     // Final test to check that p1 still works:
-    if(std::fabs(p1.Eval(vars) - 8) > epsilon)
+    if(std::fabs(p1.Eval(vars) - 8) > Epsilon<double>())
     {
         retval = false;
         if(verbosityLevel >= 2)
@@ -304,7 +288,7 @@ int TestCopying()
         retval = false;
 
     // Final test to check that p1 still works:
-    if(std::fabs(p1.Eval(vars) - 8) > epsilon)
+    if(std::fabs(p1.Eval(vars) - 8) > Epsilon<double>())
     {
         retval = false;
         if(verbosityLevel >= 2)
@@ -326,81 +310,83 @@ int TestCopying()
 int TestErrorSituations()
 {
     bool retval = true;
-    DefaultParser fp, tmpfp;
+    FunctionParser fp, tmpfp;
     fp.AddUnit("unit", 2);
-    fp.AddFunction("Value", userDefFuncValue<DefaultValue_t>, 0);
-    fp.AddFunction("Sqr", userDefFuncSqr<DefaultValue_t>, 1);
-    fp.AddFunctionWrapper("Sub", UserDefFuncWrapper<DefaultValue_t>
-                          (userDefFuncSub<DefaultValue_t>), 2);
+    fp.AddFunction("Value", userDefFuncValue<double>, 0);
+    fp.AddFunction("Sqr", userDefFuncSqr<double>, 1);
+    fp.AddFunctionWrapper
+        ("Sub", UserDefFuncWrapper<double>(userDefFuncSub<double>), 2);
     tmpfp.Parse("0", "x");
 
     static const struct
     {
-        DefaultParser::ParseErrorType expected_error;
+        FunctionParser::ParseErrorType expected_error;
         int                            expected_error_position;
         const char*                    function_string;
     } invalidFuncs[] =
     {
-      { DefaultParser::MISSING_PARENTH,     5, "sin(x"},
-      { DefaultParser::EXPECT_PARENTH_FUNC, 4, "sin x"},
-      { DefaultParser::SYNTAX_ERROR,        2, "x+" },
-      { DefaultParser::EXPECT_OPERATOR,     2, "x x"},
-      { DefaultParser::UNKNOWN_IDENTIFIER,  4, "sin(y)" },
-      { DefaultParser::ILL_PARAMS_AMOUNT,   5, "sin(x, 1)" },
-      { DefaultParser::EXPECT_OPERATOR,     1, "x, x"},
-      { DefaultParser::SYNTAX_ERROR,        2, "x^^2" },
-      { DefaultParser::SYNTAX_ERROR,        2, "x**x" },
-      { DefaultParser::SYNTAX_ERROR,        2, "x+*x" },
-      { DefaultParser::SYNTAX_ERROR,        0, "unit" },
-      { DefaultParser::SYNTAX_ERROR,        0, "unit x" },
-      { DefaultParser::SYNTAX_ERROR,        2, "x*unit" },
-      { DefaultParser::SYNTAX_ERROR,        0, "unit*unit" },
-      { DefaultParser::SYNTAX_ERROR,        0, "unit unit" },
-      { DefaultParser::EXPECT_OPERATOR,     1, "x(unit)"},
-      { DefaultParser::SYNTAX_ERROR,        2, "x+unit" },
-      { DefaultParser::SYNTAX_ERROR,        2, "x*unit" },
-      { DefaultParser::EMPTY_PARENTH,       1, "()"},
-      { DefaultParser::SYNTAX_ERROR,        0, "" },
-      { DefaultParser::EXPECT_OPERATOR,     1, "x()"},
-      { DefaultParser::EMPTY_PARENTH,       3, "x*()"},
-      { DefaultParser::SYNTAX_ERROR,        4, "sin(unit)" },
-      { DefaultParser::EXPECT_PARENTH_FUNC, 4, "sin unit"},
-      { DefaultParser::EXPECT_OPERATOR,     2, "1..2"},
-      { DefaultParser::SYNTAX_ERROR,        1, "(" },
-      { DefaultParser::MISM_PARENTH,        0, ")"},
-      { DefaultParser::MISSING_PARENTH,     2, "(x"},
-      { DefaultParser::EXPECT_OPERATOR,     1, "x)"},
-      { DefaultParser::MISM_PARENTH,        0, ")x("},
-      { DefaultParser::MISSING_PARENTH,     14,"(((((((x))))))"},
-      { DefaultParser::EXPECT_OPERATOR,     15,"(((((((x))))))))"},
-      { DefaultParser::EXPECT_OPERATOR,     1, "2x"},
-      { DefaultParser::EXPECT_OPERATOR,     3, "(2)x"},
-      { DefaultParser::EXPECT_OPERATOR,     3, "(x)2"},
-      { DefaultParser::EXPECT_OPERATOR,     1, "2(x)"},
-      { DefaultParser::EXPECT_OPERATOR,     1, "x(2)"},
-      { DefaultParser::SYNTAX_ERROR,        0, "[x]" },
-      { DefaultParser::SYNTAX_ERROR,        0, "@x" },
-      { DefaultParser::SYNTAX_ERROR,        0, "$x" },
-      { DefaultParser::SYNTAX_ERROR,        0, "{x}" },
-      { DefaultParser::ILL_PARAMS_AMOUNT,   5, "max(x)" },
-      { DefaultParser::ILL_PARAMS_AMOUNT,   8, "max(x, 1, 2)" },
-      { DefaultParser::ILL_PARAMS_AMOUNT,   6, "if(x,2)" },
-      { DefaultParser::ILL_PARAMS_AMOUNT,   10,"if(x, 2, 3, 4)" },
-      { DefaultParser::MISSING_PARENTH,     6, "Value(x)"},
-      { DefaultParser::MISSING_PARENTH,     6, "Value(1+x)"},
-      { DefaultParser::MISSING_PARENTH,     6, "Value(1,x)"},
+      { FunctionParser::MISSING_PARENTH,     5, "sin(x"},
+      { FunctionParser::EXPECT_PARENTH_FUNC, 4, "sin x"},
+      { FunctionParser::SYNTAX_ERROR,        2, "x+" },
+      { FunctionParser::EXPECT_OPERATOR,     2, "x x"},
+      { FunctionParser::UNKNOWN_IDENTIFIER,  4, "sin(y)" },
+      { FunctionParser::ILL_PARAMS_AMOUNT,   5, "sin(x, 1)" },
+      { FunctionParser::EXPECT_OPERATOR,     1, "x, x"},
+      { FunctionParser::SYNTAX_ERROR,        2, "x^^2" },
+      { FunctionParser::SYNTAX_ERROR,        2, "x**x" },
+      { FunctionParser::SYNTAX_ERROR,        2, "x+*x" },
+      { FunctionParser::SYNTAX_ERROR,        0, "unit" },
+      { FunctionParser::SYNTAX_ERROR,        0, "unit x" },
+      { FunctionParser::SYNTAX_ERROR,        2, "x*unit" },
+      { FunctionParser::SYNTAX_ERROR,        0, "unit*unit" },
+      { FunctionParser::SYNTAX_ERROR,        0, "unit unit" },
+      { FunctionParser::EXPECT_OPERATOR,     1, "x(unit)"},
+      { FunctionParser::SYNTAX_ERROR,        2, "x+unit" },
+      { FunctionParser::SYNTAX_ERROR,        2, "x*unit" },
+      { FunctionParser::EMPTY_PARENTH,       1, "()"},
+      { FunctionParser::SYNTAX_ERROR,        0, "" },
+      { FunctionParser::EXPECT_OPERATOR,     1, "x()"},
+      { FunctionParser::EMPTY_PARENTH,       3, "x*()"},
+      { FunctionParser::SYNTAX_ERROR,        4, "sin(unit)" },
+      { FunctionParser::EXPECT_PARENTH_FUNC, 4, "sin unit"},
+      { FunctionParser::EXPECT_OPERATOR,     2, "1..2"},
+      { FunctionParser::SYNTAX_ERROR,        1, "(" },
+      { FunctionParser::MISM_PARENTH,        0, ")"},
+      { FunctionParser::MISSING_PARENTH,     2, "(x"},
+      { FunctionParser::EXPECT_OPERATOR,     1, "x)"},
+      { FunctionParser::MISM_PARENTH,        0, ")x("},
+      { FunctionParser::MISSING_PARENTH,     14,"(((((((x))))))"},
+      { FunctionParser::EXPECT_OPERATOR,     15,"(((((((x))))))))"},
+      { FunctionParser::EXPECT_OPERATOR,     1, "2x"},
+      { FunctionParser::EXPECT_OPERATOR,     3, "(2)x"},
+      { FunctionParser::EXPECT_OPERATOR,     3, "(x)2"},
+      { FunctionParser::EXPECT_OPERATOR,     1, "2(x)"},
+      { FunctionParser::EXPECT_OPERATOR,     1, "x(2)"},
+      { FunctionParser::SYNTAX_ERROR,        0, "[x]" },
+      { FunctionParser::SYNTAX_ERROR,        0, "@x" },
+      { FunctionParser::SYNTAX_ERROR,        0, "$x" },
+      { FunctionParser::SYNTAX_ERROR,        0, "{x}" },
+      { FunctionParser::ILL_PARAMS_AMOUNT,   5, "max(x)" },
+      { FunctionParser::ILL_PARAMS_AMOUNT,   8, "max(x, 1, 2)" },
+      { FunctionParser::ILL_PARAMS_AMOUNT,   6, "if(x,2)" },
+      { FunctionParser::ILL_PARAMS_AMOUNT,   10,"if(x, 2, 3, 4)" },
+      { FunctionParser::MISSING_PARENTH,     6, "Value(x)"},
+      { FunctionParser::MISSING_PARENTH,     6, "Value(1+x)"},
+      { FunctionParser::MISSING_PARENTH,     6, "Value(1,x)"},
       // Note: ^should these three not return ILL_PARAMS_AMOUNT instead?
-      { DefaultParser::ILL_PARAMS_AMOUNT,   4, "Sqr()"},
-      { DefaultParser::ILL_PARAMS_AMOUNT,   5, "Sqr(x,1)" },
-      { DefaultParser::ILL_PARAMS_AMOUNT,   5, "Sqr(1,2,x)" },
-      { DefaultParser::ILL_PARAMS_AMOUNT,   4, "Sub()" },
-      { DefaultParser::ILL_PARAMS_AMOUNT,   5, "Sub(x)" },
-      { DefaultParser::ILL_PARAMS_AMOUNT,   7, "Sub(x,1,2)" },
-      { DefaultParser::UNKNOWN_IDENTIFIER,  2, "x+Sin(1)" },
-      { DefaultParser::UNKNOWN_IDENTIFIER,  0, "sub(1,2)" },
-      { DefaultParser::UNKNOWN_IDENTIFIER,  0, "sinx(1)"  },
-      { DefaultParser::UNKNOWN_IDENTIFIER,  2, "1+X"      },
-      { DefaultParser::UNKNOWN_IDENTIFIER,  0, "eval(x)" }
+      { FunctionParser::ILL_PARAMS_AMOUNT,   4, "Sqr()"},
+      { FunctionParser::ILL_PARAMS_AMOUNT,   5, "Sqr(x,1)" },
+      { FunctionParser::ILL_PARAMS_AMOUNT,   5, "Sqr(1,2,x)" },
+      { FunctionParser::ILL_PARAMS_AMOUNT,   4, "Sub()" },
+      { FunctionParser::ILL_PARAMS_AMOUNT,   5, "Sub(x)" },
+      { FunctionParser::ILL_PARAMS_AMOUNT,   7, "Sub(x,1,2)" },
+      { FunctionParser::UNKNOWN_IDENTIFIER,  2, "x+Sin(1)" },
+      { FunctionParser::UNKNOWN_IDENTIFIER,  0, "sub(1,2)" },
+      { FunctionParser::UNKNOWN_IDENTIFIER,  0, "sinx(1)"  },
+      { FunctionParser::UNKNOWN_IDENTIFIER,  2, "1+X"      },
+#ifdef FP_DISABLE_EVAL
+      { FunctionParser::UNKNOWN_IDENTIFIER,  0, "eval(x)" }
+#endif
     };
     const unsigned amnt = sizeof(invalidFuncs)/sizeof(invalidFuncs[0]);
     for(unsigned i = 0; i < amnt; ++i)
@@ -456,7 +442,7 @@ int TestErrorSituations()
                 std::cout << "\n - Adding an invalid name (\"" << n
                           << "\") as constant didn't fail" << std::endl;
         }
-        if(fp.AddFunction(n, userDefFuncSqr<DefaultValue_t>, 1))
+        if(fp.AddFunction(n, userDefFuncSqr<double>, 1))
         {
             retval = false;
             if(verbosityLevel >= 2)
@@ -480,7 +466,7 @@ int TestErrorSituations()
     }
 
     fp.AddConstant("CONST", 1);
-    fp.AddFunction("PTR", userDefFuncSqr<DefaultValue_t>, 1);
+    fp.AddFunction("PTR", userDefFuncSqr<double>, 1);
     fp.AddFunction("PARSER", tmpfp);
 
     if(fp.AddConstant("PTR", 1))
@@ -490,7 +476,7 @@ int TestErrorSituations()
             std::cout << "\n - Adding a userdef function (\"PTR\") as "
                       << "constant didn't fail" << std::endl;
     }
-    if(fp.AddFunction("CONST", userDefFuncSqr<DefaultValue_t>, 1))
+    if(fp.AddFunction("CONST", userDefFuncSqr<double>, 1))
     {
         retval = false;
         if(verbosityLevel >= 2)
@@ -512,14 +498,13 @@ int TestErrorSituations()
 //=========================================================================
 // Thoroughly test whitespaces
 //=========================================================================
-DefaultValue_t wsFunc(DefaultValue_t x)
+double wsFunc(double x)
 {
-    return
-        x + std::sin((x*-1.5)-(.5*2.0)*(((-x)*1.5+(2-(x)*2.0)*2.0)+(3.0*2.0))+
-                     (1.5*2.0))+(cos(x)*2.0);
+    return x + sin((x*-1.5)-(.5*2.0)*(((-x)*1.5+(2-(x)*2.0)*2.0)+(3.0*2.0))+
+                   (1.5*2.0))+(cos(x)*2.0);
 }
 
-bool testWsFunc(DefaultParser& fp, const std::string& function)
+bool testWsFunc(FunctionParser& fp, const std::string& function)
 {
     int res = fp.Parse(function, "x");
     if(res > -1)
@@ -531,10 +516,9 @@ bool testWsFunc(DefaultParser& fp, const std::string& function)
         return false;
     }
 
-    DefaultValue_t vars[1];
+    double vars[1];
     for(vars[0] = -2.0; vars[0] <= 2.0; vars[0] += .1)
-        if(std::fabs(fp.Eval(vars) - wsFunc(vars[0])) >
-           Epsilon<DefaultValue_t>())
+        if(fabs(fp.Eval(vars) - wsFunc(vars[0])) > Epsilon<double>())
         {
             return false;
         }
@@ -543,7 +527,7 @@ bool testWsFunc(DefaultParser& fp, const std::string& function)
 
 int WhiteSpaceTest()
 {
-    DefaultParser fp;
+    FunctionParser fp;
     fp.AddConstant("const", 1.5);
     fp.AddUnit("unit", 2.0);
     std::string function(" x + sin ( ( x * - 1.5 ) - .5 unit * ( ( ( - x ) * "
@@ -594,19 +578,21 @@ int WhiteSpaceTest()
 //=========================================================================
 // Test integer powers
 //=========================================================================
-bool compareExpValues(DefaultValue_t value,
-                      const std::string& funcStr,
-                      DefaultValue_t v1,
-                      DefaultValue_t v2,
-                      bool isOptimized)
+bool compareExpValues(double value, const std::string& funcStr,
+                      double v1, double v2, bool isOptimized)
 {
-    const DefaultValue_t epsilon = Epsilon<DefaultValue_t>();
-    const DefaultValue_t diff =
-        std::fabs(v1) < epsilon ?
-        (std::fabs(v2) < epsilon ? std::fabs(v1 - v2) :
-         std::fabs((v1 - v2) / v2)) :
-        std::fabs((v1 - v2) / v1);
-    if(diff > epsilon)
+    /*
+    const double scale = pow(10.0, floor(log10(fabs(v1))));
+    const double sv1 = fabs(v1) < Epsilon<double>() ? 0 : v1/scale;
+    const double sv2 = fabs(v2) < Epsilon<double>() ? 0 : v2/scale;
+    const double diff = fabs(sv2-sv1);
+    */
+    const double diff =
+        fabs(v1) < Epsilon<double>() ?
+        (fabs(v2) < Epsilon<double>() ? fabs(v1 - v2) :
+         fabs((v1 - v2) / v2)) :
+        fabs((v1 - v2) / v1);
+    if(diff > Epsilon<double>())
     {
         if(verbosityLevel >= 2)
         {
@@ -622,22 +608,22 @@ bool compareExpValues(DefaultValue_t value,
     return true;
 }
 
-bool runIntPowTest(DefaultParser& fp, const std::string& funcStr,
+bool runIntPowTest(FunctionParser& fp, const std::string& funcStr,
                    int exponent, bool isOptimized)
 {
     const int absExponent = exponent < 0 ? -exponent : exponent;
 
     for(int valueOffset = 0; valueOffset <= 5; ++valueOffset)
     {
-        const DefaultValue_t value =
+        const double value =
             (exponent >= 0 && valueOffset == 0) ? 0.0 :
             1.0+(valueOffset-1)/100.0;
-        DefaultValue_t v1 = exponent == 0 ? 1 : value;
+        double v1 = exponent == 0 ? 1 : value;
         for(int i = 2; i <= absExponent; ++i)
             v1 *= value;
         if(exponent < 0) v1 = 1.0/v1;
 
-        const DefaultValue_t v2 = fp.Eval(&value);
+        const double v2 = fp.Eval(&value);
 
         if(!compareExpValues(value, funcStr, v1, v2, isOptimized))
             return false;
@@ -648,7 +634,7 @@ bool runIntPowTest(DefaultParser& fp, const std::string& funcStr,
 
 bool runFractionalPowTest(const std::string& funcStr, double exponent)
 {
-    DefaultParser fp;
+    FunctionParser fp;
     if(fp.Parse(funcStr, "x") != -1)
     {
         if(verbosityLevel >= 2)
@@ -661,11 +647,11 @@ bool runFractionalPowTest(const std::string& funcStr, double exponent)
     {
         for(int valueOffset = 0; valueOffset <= 10; ++valueOffset)
         {
-            const DefaultValue_t value =
+            const double value =
                 (exponent >= 0 && valueOffset == 0) ? 0.0 :
                 1.0+(valueOffset-1)/2.0;
-            const DefaultValue_t v1 = std::pow(value, exponent);
-            const DefaultValue_t v2 = fp.Eval(&value);
+            const double v1 = std::pow(value, exponent);
+            const double v2 = fp.Eval(&value);
 
             if(!compareExpValues(value, funcStr, v1, v2, i > 0))
                 return false;
@@ -678,7 +664,7 @@ bool runFractionalPowTest(const std::string& funcStr, double exponent)
 
 int TestIntPow()
 {
-    DefaultParser fp;
+    FunctionParser fp;
 
     for(int exponent = -1300; exponent <= 1300; ++exponent)
     {
@@ -701,20 +687,20 @@ int TestIntPow()
     for(int m = -27; m <= 27; ++m)
     {
         for(int n_sqrt=0; n_sqrt<=4; ++n_sqrt)
-            for(int n_cbrt=0; n_cbrt<=4; ++n_cbrt)
-            {
-                if(n_sqrt+n_cbrt == 0) continue;
+        for(int n_cbrt=0; n_cbrt<=4; ++n_cbrt)
+        {
+            if(n_sqrt+n_cbrt == 0) continue;
 
-                std::ostringstream os;
-                os << "x^(" << m << "/(1";
-                for(int n=0; n<n_sqrt; ++n) os << "*2";
-                for(int n=0; n<n_cbrt; ++n) os << "*3";
-                os << "))";
-                DefaultValue_t exponent = DefaultValue_t(m);
-                if(n_sqrt > 0) exponent /= std::pow(2.0, n_sqrt);
-                if(n_cbrt > 0) exponent /= std::pow(3.0, n_cbrt);
-                if(!runFractionalPowTest(os.str(), exponent)) return false;
-            }
+            std::ostringstream os;
+            os << "x^(" << m << "/(1";
+            for(int n=0; n<n_sqrt; ++n) os << "*2";
+            for(int n=0; n<n_cbrt; ++n) os << "*3";
+            os << "))";
+            double exponent = double(m);
+            if(n_sqrt > 0) exponent /= std::pow(2.0, n_sqrt);
+            if(n_cbrt > 0) exponent /= std::pow(3.0, n_cbrt);
+            if(!runFractionalPowTest(os.str(), exponent)) return false;
+        }
     }
 
     return true;
@@ -938,16 +924,14 @@ namespace
 
 int UTF8Test()
 {
-    typedef DefaultParser::value_type Value_t;
-
     CharIter iters[4] =
         { CharIter(true, false),
           CharIter(false, true),
           CharIter(false, false),
           CharIter(false, false) };
     std::string identifier;
-    DefaultParser fp;
-    const Value_t value = 0.0;
+    FunctionParser fp;
+    const double value = 0.0;
 
     for(unsigned length = 1; length <= 4; ++length)
     {
@@ -1019,9 +1003,9 @@ int UTF8Test()
 //=========================================================================
 // Test identifier adding and removal
 //=========================================================================
-bool AddIdentifier(DefaultParser& fp, const std::string& name, int type)
+bool AddIdentifier(FunctionParser& fp, const std::string& name, int type)
 {
-    static DefaultParser anotherParser;
+    static FunctionParser anotherParser;
     static bool anotherParserInitialized = false;
     if(!anotherParserInitialized)
     {
@@ -1033,7 +1017,7 @@ bool AddIdentifier(DefaultParser& fp, const std::string& name, int type)
     {
       case 0: return fp.AddConstant(name, 123);
       case 1: return fp.AddUnit(name, 456);
-      case 2: return fp.AddFunction(name, userDefFuncSqr<DefaultValue_t>, 1);
+      case 2: return fp.AddFunction(name, userDefFuncSqr<double>, 1);
       case 3: return fp.AddFunction(name, anotherParser);
     }
     return false;
@@ -1041,7 +1025,7 @@ bool AddIdentifier(DefaultParser& fp, const std::string& name, int type)
 
 int TestIdentifiers()
 {
-    DefaultParser fParser;
+    FunctionParser fParser;
     std::vector<std::string> identifierNames(26*26, std::string("AA"));
 
     unsigned nameInd = 0;
@@ -1132,15 +1116,15 @@ int TestIdentifiers()
 namespace
 {
     template<int VarsAmount>
-    DefaultValue_t userFunction(const DefaultValue_t* p)
+    double userFunction(const double* p)
     {
-        DefaultValue_t result = 1.0;
+        double result = 1.0;
         for(int i = 0; i < VarsAmount; ++i)
             result += (VarsAmount+i/10.0) * p[i];
         return result;
     }
 
-    DefaultValue_t(*userFunctions[])(const DefaultValue_t*) =
+    double(*userFunctions[])(const double*) =
     {
         userFunction<0>, userFunction<1>, userFunction<2>, userFunction<3>,
         userFunction<4>, userFunction<5>, userFunction<6>, userFunction<7>,
@@ -1149,30 +1133,28 @@ namespace
     const unsigned userFunctionsAmount =
         sizeof(userFunctions) / sizeof(userFunctions[0]);
 
-    DefaultValue_t nestedFunc1(const DefaultValue_t* p)
+    double nestedFunc1(const double* p)
     {
         return p[0] + 2.0*p[1] + 3.0*p[2];
     }
 
-    DefaultValue_t nestedFunc2(const DefaultValue_t* p)
+    double nestedFunc2(const double* p)
     {
-        const DefaultValue_t params[3] = { -5.0*p[0], -10.0*p[1], -p[0] };
+        const double params[3] = { -5.0*p[0], -10.0*p[1], -p[0] };
         return p[0] + 4.0*nestedFunc1(params);
     }
 
-    DefaultValue_t nestedFunc3(const DefaultValue_t* p)
+    double nestedFunc3(const double* p)
     {
-        const DefaultValue_t params1[3] = { 2.5*p[0]+2.0, p[2], p[1]/2.5 };
-        const DefaultValue_t params2[2] = { p[1] / 1.5 - 1.0, p[0] - 2.5 };
+        const double params1[3] = { 2.5*p[0]+2.0, p[2], p[1]/2.5 };
+        const double params2[2] = { p[1] / 1.5 - 1.0, p[0] - 2.5 };
         return nestedFunc1(params1) + nestedFunc2(params2);
     }
 }
 
 int testUserDefinedFunctions()
 {
-    const DefaultValue_t epsilon = Epsilon<DefaultValue_t>();
-
-    DefaultParser nestedParser1, nestedParser2, nestedParser3;
+    FunctionParser nestedParser1, nestedParser2, nestedParser3;
     nestedParser1.Parse("x + 2.0*y + 3.0*z", "x, y, z");
     nestedParser2.AddFunction("nestedFunc1", nestedParser1);
     nestedParser2.Parse("x + 4.0*nestedFunc1(-5.0*x, -10.0*y, -x)", "x,y");
@@ -1183,7 +1165,7 @@ int testUserDefinedFunctions()
 
     for(int iteration = 0; iteration < 2; ++iteration)
     {
-        DefaultValue_t nestedFuncParams[3];
+        double nestedFuncParams[3];
         for(int i = 0; i < 100; ++i)
         {
             nestedFuncParams[0] = -10.0 + 20.0*i/100.0;
@@ -1194,11 +1176,9 @@ int testUserDefinedFunctions()
                 {
                     nestedFuncParams[2] = -10.0 + 20.0*k/100.0;
 
-                    const DefaultValue_t v1 =
-                        nestedParser3.Eval(nestedFuncParams);
-                    const DefaultValue_t v2 =
-                        nestedFunc3(nestedFuncParams);
-                    if(std::fabs(v1-v2) > epsilon)
+                    const double v1 = nestedParser3.Eval(nestedFuncParams);
+                    const double v2 = nestedFunc3(nestedFuncParams);
+                    if(fabs(v1-v2) > 1e-10)
                     {
                         if(verbosityLevel >= 2)
                             std::cout
@@ -1221,9 +1201,9 @@ int testUserDefinedFunctions()
     std::string funcNames[userFunctionsAmount];
     std::string userFunctionParserFunctions[userFunctionsAmount];
     std::string userFunctionParserParameters[userFunctionsAmount];
-    DefaultParser userFunctionParsers[userFunctionsAmount];
-    DefaultValue_t funcParams[userFunctionsAmount];
-    DefaultParser parser1, parser2;
+    FunctionParser userFunctionParsers[userFunctionsAmount];
+    double funcParams[userFunctionsAmount];
+    FunctionParser parser1, parser2;
 
     for(unsigned funcInd = 0; funcInd < userFunctionsAmount; ++funcInd)
     {
@@ -1258,10 +1238,10 @@ int testUserDefinedFunctions()
         {
             for(unsigned paramInd = 0; paramInd < testInd; ++paramInd)
                 funcParams[paramInd] = testInd+paramInd;
-            const DefaultValue_t result = userFunctions[funcInd](funcParams);
-            const DefaultValue_t parserResult =
+            const double result = userFunctions[funcInd](funcParams);
+            const double parserResult =
                 userFunctionParsers[funcInd].Eval(funcParams);
-            if(std::fabs(result - parserResult) > epsilon)
+            if(fabs(result - parserResult) > 1e-8)
             {
                 if(verbosityLevel >= 2)
                 {
@@ -1340,8 +1320,8 @@ int testUserDefinedFunctions()
         {
             for(unsigned testInd = 0; testInd < 100; ++testInd)
             {
-                const DefaultValue_t x = testInd/10.0;
-                DefaultValue_t result = 0.0;
+                const double x = testInd/10.0;
+                double result = 0.0;
                 for(unsigned factorInd = 0; factorInd <= funcInd; ++factorInd)
                 {
                     for(unsigned paramInd = 0; paramInd < factorInd; ++paramInd)
@@ -1353,12 +1333,10 @@ int testUserDefinedFunctions()
                         (factorInd+1) * userFunctions[factorInd](funcParams);
                 }
 
-                const DefaultValue_t parser1Result = parser1.Eval(&x);
-                const DefaultValue_t parser2Result = parser2.Eval(&x);
-                const bool parser1Failed =
-                    std::fabs(result - parser1Result) > epsilon;
-                const bool parser2Failed =
-                    std::fabs(result - parser2Result) > epsilon;
+                const double parser1Result = parser1.Eval(&x);
+                const double parser2Result = parser2.Eval(&x);
+                const bool parser1Failed = fabs(result - parser1Result) > 1e-8;
+                const bool parser2Failed = fabs(result - parser2Result) > 1e-8;
 
                 if(parser1Failed || parser2Failed)
                 {
@@ -1410,17 +1388,17 @@ int testUserDefinedFunctions()
 class TestingThread
 {
     int mThreadNumber;
-    DefaultParser* mFp;
+    FunctionParser* mFp;
     volatile static bool mOk;
 
-    static DefaultValue_t function(const DefaultValue_t* vars)
+    static double function(const double* vars)
     {
-        const DefaultValue_t x = vars[0], y = vars[1];
+        const double x = vars[0], y = vars[1];
         return sin(sqrt(x*x+y*y)) + 2*cos(2*sqrt(2*x*x+2*y*y));
     }
 
  public:
-    TestingThread(int n, DefaultParser* fp):
+    TestingThread(int n, FunctionParser* fp):
         mThreadNumber(n), mFp(fp)
     {}
 
@@ -1428,30 +1406,28 @@ class TestingThread
 
     void operator()()
     {
-        const DefaultValue_t epsilon = Epsilon<DefaultValue_t>();
-        DefaultValue_t vars[2];
+        double vars[2];
         for(vars[0] = -10.0; vars[0] <= 10.0; vars[0] += 0.02)
         {
             for(vars[1] = -10.0; vars[1] <= 10.0; vars[1] += 0.02)
             {
                 if(!mOk) return;
 
-                const DefaultValue_t v1 = function(vars);
-                const DefaultValue_t v2 = mFp->Eval(vars);
+                const double v1 = function(vars);
+                const double v2 = mFp->Eval(vars);
                 /*
                 const double scale = pow(10.0, floor(log10(fabs(v1))));
                 const double sv1 = fabs(v1) < Epsilon<double>() ? 0 : v1/scale;
                 const double sv2 = fabs(v2) < Epsilon<double>() ? 0 : v2/scale;
                 const double diff = fabs(sv2-sv1);
                 */
-                const DefaultValue_t diff =
-                    std::fabs(v1) < epsilon ?
-                    (std::fabs(v2) < epsilon ?
-                     std::fabs(v1 - v2) :
-                     std::fabs((v1 - v2) / v2)) :
-                    std::fabs((v1 - v2) / v1);
+                const double diff =
+                    fabs(v1) < Epsilon<double>() ?
+                    (fabs(v2) < Epsilon<double>() ? fabs(v1 - v2) :
+                     fabs((v1 - v2) / v2)) :
+                    fabs((v1 - v2) / v1);
 
-                if(std::fabs(diff) > epsilon)
+                if(fabs(diff) > 1e-6)
                 {
                     mOk = false;
                     if(verbosityLevel >= 2)
@@ -1470,7 +1446,7 @@ volatile bool TestingThread::mOk = true;
 
 int testMultithreadedEvaluation()
 {
-    DefaultParser fp;
+    FunctionParser fp;
     fp.Parse("sin(sqrt(x*x+y*y)) + 2*cos(2*sqrt(2*x*x+2*y*y))", "x,y");
 
     if(verbosityLevel >= 1)
@@ -1735,10 +1711,10 @@ namespace
         const double diff = fp_abs(sv2-sv1);
         */
         const double diff =
-            std::fabs(v1) < Eps ?
-            (std::fabs(v2) < Eps ? std::fabs(v1 - v2) :
-             std::fabs((v1 - v2) / v2)) :
-            std::fabs((v1 - v2) / v1);
+            fabs(v1) < Eps ?
+            (fabs(v2) < Eps ? fabs(v1 - v2) :
+             fabs((v1 - v2) / v2)) :
+            fabs((v1 - v2) / v1);
 
         if(diff > Eps)
         {
@@ -2226,11 +2202,12 @@ bool runRegressionTests(const std::string& valueType)
         std::cout << briefErrorMessages.str() << std::flush;
     }
 
-    if(verbosityLevel >= 2)
-        std::cout << "User-defined function \"sub\" was called "
-                  << (dynamic_cast<UserDefFuncWrapper<Value_t>*>
-                      (fp.GetFunctionWrapper("sub"))->counter())
-                  << " times." << std::endl;
+    /*
+    std::cout << "User-defined function \"sub\" was called "
+              << (dynamic_cast<UserDefFuncWrapper<Value_t>*>
+                  (fp.GetFunctionWrapper("sub"))->counter())
+              << " times." << std::endl;
+    */
 
     return allRegressionTestsOk;
 }
@@ -2251,15 +2228,14 @@ namespace OptimizerTests
     */
     struct MathFuncData
     {
-        DefaultValue_t (*mathFunc)(DefaultValue_t d);
+        double (*mathFunc)(double d);
         const char* funcName;
     };
 
     const MathFuncData mathFuncs[] =
     {
-        { &std::sin, "sin" }, { &std::cos, "cos" }, { &std::tan, "tan" },
-        { &std::sinh, "sinh" }, { &std::cosh, "cosh" }, { &std::tanh, "tanh" },
-        { &std::exp, "exp" }
+        { &sin, "sin" }, { &cos, "cos" }, { &tan, "tan" }, { &sinh, "sinh" },
+        { &cosh, "cosh" }, { &tanh, "tanh" }, { &exp, "exp" }
     };
     const unsigned mathFuncsAmount = sizeof(mathFuncs) / sizeof(mathFuncs[0]);
 
@@ -2268,20 +2244,16 @@ namespace OptimizerTests
     int exponent_C, exponent_F;
     unsigned operatorIndex;
 
-    DefaultValue_t evaluateFunction(const DefaultValue_t* params)
+    double evaluateFunction(const double* params)
     {
-        const DefaultValue_t x = params[0];
+        const double x = params[0];
         const MathFuncData& data1 = mathFuncs[mathFuncIndexA];
         const MathFuncData& data2 = mathFuncs[mathFuncIndexD];
 
-        const DefaultValue_t angle1 =
-            (exponent_B == 1 ? x : std::pow(x, exponent_B));
-        const DefaultValue_t angle2 =
-            (exponent_E == 1 ? x : std::pow(x, exponent_E));
-        const DefaultValue_t part1 =
-            std::pow(data1.mathFunc(angle1), exponent_C);
-        const DefaultValue_t part2 =
-            std::pow(data2.mathFunc(angle2), exponent_F);
+        const double angle1 = (exponent_B == 1 ? x : pow(x, exponent_B));
+        const double angle2 = (exponent_E == 1 ? x : pow(x, exponent_E));
+        const double part1 = pow(data1.mathFunc(angle1), exponent_C);
+        const double part2 = pow(data2.mathFunc(angle2), exponent_F);
 
         if(operatorIndex == 0) return part1 + part2;
         return part1 * part2;
@@ -2299,13 +2271,13 @@ namespace OptimizerTests
         os << data2.funcName << "(x^" << exponent_E << ")^" << exponent_F;
         const std::string funcString = os.str();
 
-        const TestType<DefaultValue_t> testData =
+        const TestType<double> testData =
         {
             1, -4.0, 4.0, 0.49, false, &evaluateFunction, 0, 0, "x",
             "'trig. combo optimizer test'", funcString.c_str()
         };
 
-        DefaultParser parser;
+        FunctionParser parser;
         if(parser.Parse(funcString, "x") >= 0)
         {
             std::cout << "Oops: Function \"" << funcString
@@ -2315,8 +2287,8 @@ namespace OptimizerTests
 
         std::ostringstream briefErrorMessages;
 
-        if(!runRegressionTest(parser, testData, "DefaultValue_t",
-                              Epsilon<DefaultValue_t>(), briefErrorMessages))
+        if(!runRegressionTest(parser, testData, "double", Epsilon<double>(),
+                              briefErrorMessages))
         {
             if(verbosityLevel == 1)
                 std::cout << "\n - " << briefErrorMessages.str() << std::flush;
@@ -2662,7 +2634,7 @@ int testOptimizer1()
 
 int testOptimizer2()
 {
-    return OptimizerTests::runBooleanComparisonTestsForType<DefaultValue_t>();
+    return OptimizerTests::runBooleanComparisonTestsForType<double>();
 }
 
 int testOptimizer3()
@@ -2813,10 +2785,8 @@ int main(int argc, char* argv[])
             runAlgoTests = false;
 
             std::vector<std::string> tests;
-#ifndef FP_DISABLE_DOUBLE_TYPE
             for(unsigned a=0; RegressionTests<double>::Tests[a].testName; ++a)
                 tests.push_back(RegressionTests<double>::Tests[a].testName);
-#endif
 #ifdef FP_SUPPORT_FLOAT_TYPE
             for(unsigned a=0; RegressionTests<float>::Tests[a].testName; ++a)
                 tests.push_back(RegressionTests<float>::Tests[a].testName);
@@ -2908,7 +2878,7 @@ int main(int argc, char* argv[])
     if(selectedRegressionTests.empty())
         selectedRegressionTests.push_back("*");
 
-    DefaultParser fp0;
+    FunctionParser fp0;
 
     // Test that the parser doesn't crash if Eval() is called before Parse():
     fp0.Eval(0);
@@ -2935,11 +2905,9 @@ int main(int argc, char* argv[])
 
     if(!runAllTypes || runAlgoTest == 0)
     {
-#ifndef FP_DISABLE_DOUBLE_TYPE
         if(runAllTypes || run_d)
             if(!runRegressionTests<double>("double"))
                 allTestsOk = false;
-#endif
 #ifdef FP_SUPPORT_FLOAT_TYPE
         if(runAllTypes || run_f)
             if(!runRegressionTests<float>("float"))
