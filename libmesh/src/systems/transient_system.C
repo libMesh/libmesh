@@ -41,12 +41,21 @@ TransientSystem<Base>::TransientSystem (EquationSystems& es,
 
   Base                 (es, name, number)
 {
+#ifdef LIBMESH_ENABLE_GHOSTED
   old_local_solution =
     AutoPtr<NumericVector<Number> >
-      (&(this->add_vector("_transient_old_local_solution")));
+      (&(this->add_vector("_transient_old_local_solution", true, GHOSTED)));
   older_local_solution =
     AutoPtr<NumericVector<Number> >
-      (&(this->add_vector("_transient_older_local_solution")));
+      (&(this->add_vector("_transient_older_local_solution", true, GHOSTED)));
+#else
+  old_local_solution =
+    AutoPtr<NumericVector<Number> >
+      (&(this->add_vector("_transient_old_local_solution", true, SERIAL)));
+  older_local_solution =
+    AutoPtr<NumericVector<Number> >
+      (&(this->add_vector("_transient_older_local_solution", true, SERIAL)));
+#endif
 }
 
 
