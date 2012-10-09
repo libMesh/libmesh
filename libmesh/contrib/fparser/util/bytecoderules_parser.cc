@@ -348,7 +348,7 @@ namespace
         }
         bool HasOperations() const { return !seq.empty(); }
     private:
-        friend class OutLine;
+        friend struct OutLine;
         void DidLine(const std::string& line) { seq.push_back(line); }
         std::ostream& out;
         std::vector<std::string> seq;
