@@ -29,10 +29,10 @@
 #include <cstddef>
 #include <vector>
 
+#ifdef LIBMESH_ENABLE_AMR
+
 namespace libMesh
 {
-
-#ifdef LIBMESH_ENABLE_AMR
 
 /**
  * This class implements a ``brute force'' goal-oriented error
@@ -98,6 +98,15 @@ public:
 			       bool estimate_parent_error = false);
 
   /**
+   * This is an accessor function to access the computed global
+   * QoI error estimates
+   */
+  Number &get_global_QoI_error_estimate(unsigned int qoi_index)
+    {
+      return computed_global_QoI_errors[qoi_index];
+    }
+
+  /**
    * How many h refinements to perform to get the fine grid
    */
   unsigned char number_h_refinements;
@@ -108,16 +117,20 @@ public:
   unsigned char number_p_refinements;
 
 protected:
-  /**
-   * The code for estimate_error and both estimate_errors versions is very
-   * similar, so we use the same function for all three
-   */
-  virtual void _estimate_error (const EquationSystems *equation_systems,
-                                const System* system,
-				ErrorVector* error_per_cell,
-			        std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell,
-			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL,
-				bool estimate_parent_error = false);
+
+  /* A vector to hold the computed global QoI error estimate */
+  std::vector<Number> computed_global_QoI_errors;
+     
+  /* /\** */
+  /*  * The code for estimate_error and both estimate_errors versions is very */
+  /*  * similar, so we use the same function for all three */
+  /*  *\/ */
+  /* virtual void _estimate_error (const EquationSystems *equation_systems, */
+  /*                               const System* system, */
+  /* 				ErrorVector* error_per_cell, */
+  /* 			        std::map<std::pair<const System*, unsigned int>, ErrorVector*>* errors_per_cell, */
+  /* 			        const std::map<const System*, const NumericVector<Number>* >* solution_vectors = NULL, */
+  /* 				bool estimate_parent_error = false); */
 
   /**
    * A QoISet to handle cases with multiple QoIs available
@@ -125,9 +138,9 @@ protected:
   QoISet _qoi_set;
 };
 
-#endif // #ifdef LIBMESH_ENABLE_AMR
-
 } // namespace libMesh
+
+ #endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif
 
