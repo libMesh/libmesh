@@ -15,17 +15,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#if 0
-
-#ifdef LIBMESH_ENABLE_AMR
-
-namespace libMesh
-{
-
 // C++ includes
 #include <algorithm> // for std::fill
 #include <cmath>    // for sqrt
-
+#include <set>
 
 // Local Includes
 #include "libmesh/dof_map.h"
@@ -36,42 +29,61 @@ namespace libMesh
 #include "libmesh/fe_interface.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_base.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
+#include "libmesh/implicit_system.h"
+#include "libmesh/partitioner.h"
 #include "libmesh/adjoint_refinement_estimator.h"
 
+#include LIBMESH_INCLUDE_UNORDERED_MAP
+
+#ifdef LIBMESH_ENABLE_AMR
+
+namespace libMesh
+{
+
 //-----------------------------------------------------------------
-// ErrorEstimator implementations
+// AdjointRefinementErrorEstimator
+
+// As of 10/2/2012, this function implements a 'brute-force' adjoint based QoI
+// error estimator, using the following relationship:
+// Q(u) - Q(u_h) \aprrox - R( (u_h)_(h/2), z_(h/2) ) .
+// where: Q(u) is the true QoI
+// u_h is the approximate primal solution on the current FE space
+// Q(u_h) is the approximate QoI
+// z_(h/2) is the adjoint corresponding to Q, on a richer FE space
+// (u_h)_(h/2) is a projection of the primal solution on the richer FE space
+// By richer FE space, we mean a grid that has been refined once and a polynomial order
+// that has been increased once, i.e. one h and one p refinement
+
+// Both a global QoI error estimate and element wise error indicators are included
+// Note that the element wise error indicators slightly over estimate the error in
+// each element
+
 void AdjointRefinementEstimator::estimate_error (const System& _system,
 					         ErrorVector& error_per_cell,
 					         const NumericVector<Number>* solution_vector,
 					         bool estimate_parent_error)
 {
-  // Make sure the user doesn't misunderstand what we're returning:
-  libmesh_assert_equal_to (error_norm, INVALID_NORM);
-
   // We have to break the rules here, because we can't refine a const System
-  System *system = const_cast<System *>(_system);
+  System& system = const_cast<System&>(_system);
 
   // An EquationSystems reference will be convenient.
-  EquationSystems& es = system->get_equation_systems());
+  EquationSystems& es = system.get_equation_systems();
 
   // The current mesh
   MeshBase& mesh = es.get_mesh();
 
-  // The dimensionality of the mesh
-  const unsigned int dim = mesh.mesh_dimension();
-
   // Resize the error_per_cell vector to be
   // the number of elements, initialized to 0.
   error_per_cell.clear();
-  error_per_cell->resize (mesh.max_elem_id(), 0.);
+  error_per_cell.resize (mesh.max_elem_id(), 0.);
 
   // We'll want to back up all coarse grid vectors
-  std::map<std::string, NumericVector<Number> *>
-    coarse_vectors();
+  std::map<std::string, NumericVector<Number> *> coarse_vectors;
   for (System::vectors_iterator vec = system.vectors_begin(); vec !=
        system.vectors_end(); ++vec)
     {
@@ -80,15 +92,20 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
       coarse_vectors[var_name] = vec->second->clone().release();
     }
+  // Back up the coarse solution and coarse local solution
   NumericVector<Number> * coarse_solution =
     system.solution->clone().release();
   NumericVector<Number> * coarse_local_solution =
     system.current_local_solution->clone().release();
-  // And make copies of projected solutions
+  // And make copies of the projected solution
   NumericVector<Number> * projected_solution;
 
   // And we'll need to temporarily change solution projection settings
   bool old_projection_setting;
+  old_projection_setting = system.project_solution_on_reinit();
+
+  // Make sure the solution is projected when we refine the mesh
+  system.project_solution_on_reinit() = true;
 
   // And it'll be best to avoid any repartitioning
   AutoPtr<Partitioner> old_partitioner = mesh.partitioner();
@@ -97,15 +114,11 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // Use a non-standard solution vector if necessary
   if (solution_vector && solution_vector != system.solution.get())
     {
-      NumericVector<Number>* newsol =
+      NumericVector<Number> *newsol =
         const_cast<NumericVector<Number>*> (solution_vector);
       newsol->swap(*system.solution);
       system.update();
     }
-
-  // Make sure the solution is projected when we refine the mesh
-  old_projection_setting = system.project_solution_on_reinit();
-  system.project_solution_on_reinit() = true;
 
   // Find the number of coarse mesh elements, to make it possible
   // to find correct coarse elem ids later
@@ -136,282 +149,228 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       es.reinit();
     }
 
-  for (unsigned int i=0; i != system_list.size(); ++i)
-    {
-      System &system = *system_list[i];
+  // Copy the projected coarse grid solutions, which will be
+  // overwritten by solve()
+  projected_solution = NumericVector<Number>::build().release();
+  projected_solution->init(system.solution->size(), true, SERIAL);
+  system.solution->localize(*projected_solution,
+			    system.get_dof_map().get_send_list());
 
-      // Copy the projected coarse grid solutions, which will be
-      // overwritten by solve()
-//      projected_solutions[i] = system.solution->clone().release();
-      projected_solutions[i] = NumericVector<Number>::build().release();
-      projected_solutions[i]->init(system.solution->size(), true, SERIAL);
-      system.solution->localize(*projected_solutions[i],
-                                system.get_dof_map().get_send_list());
+  // Rebuild the rhs with the projected primal solution 
+  (dynamic_cast<ImplicitSystem&>(system)).assembly(true, false);
+  NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem&>(system)).get_vector("RHS Vector");
+  projected_residual.close();
+
+  // Solve the adjoint problem on the refined FE space
+  system.adjoint_solve();	      
+
+  // Now that we have the refined adjoint solution and the projected primal solution, 
+  // we first compute the global QoI error estimate
+
+  // Resize the computed_global_QoI_errors vector to hold the error estimates for each QoI
+  computed_global_QoI_errors.resize(system.qoi.size());
+
+  // Loop over all the adjoint solutions and get the QoI error
+  // contributions from all of them
+  for (unsigned int j=0; j != system.qoi.size(); j++)
+    {
+      computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));      
     }
+      
+  // Done with the global error estimates, now construct the element wise error indicators 
 
-  // Get the uniformly refined solution.
+  // We need to account for 'spill-over' effects while computing the element error indicators
+  // This happens because the same dof is shared by multiple elements, one way of mitigating
+  // this is to scale the contribution from each dof by the number of elements it belongs to
+  // We first obtain the number of elements each node belongs to
+  
+  // A map that relates a node id to an int that will tell us how many elements it is a node of
+  LIBMESH_BEST_UNORDERED_MULTIMAP<Node * , unsigned int>shared_element_count;
 
-  if (_es)
+  // To fill this map, we will loop over elements, and then in each element, we will loop
+  // over the nodes each element contains, and then query it for the number of coarse
+  // grid elements it was a node of
+  
+  // We will be iterating over all the active elements in the fine mesh that live on 
+  // this processor
+  MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
+
+  // A vector to hold the ids of the nodes we have already dealt with
+  std::vector<unsigned int> processed_node_ids;
+
+  // Start loop over elems
+  for(; elem_it != elem_end; ++elem_it)
     {
-      // No specified vectors == forward solve
-      if (!solution_vectors)
-        es.solve();
-      else
-        {
-          libmesh_assert_equal_to (solution_vectors->size(), es.n_systems());
-	  libmesh_assert(solution_vectors->find(system_list[0]) !=
-			 solution_vectors->end());
-	  const bool solve_adjoint =
-            (system_list[0]->have_vector("adjoint_solution0") &&
-             (solution_vectors->find(system_list[0])->second ==
-	      &system_list[0]->get_adjoint_solution()));
-	  libmesh_assert(solve_adjoint ||
-	    (solution_vectors->find(system_list[0])->second ==
-	     system_list[0]->solution.get()) ||
-	     !solution_vectors->find(system_list[0])->second);
+      // Pointer to this element
+      const Elem* elem = *elem_it;
+                  
+      // Loop over the nodes in the element
+      for(unsigned int n=0; n != elem->n_nodes(); ++n)
+	{
+	  // Get a pointer to the current node
+	  Node* node = elem->get_node(n);
 
-#ifdef DEBUG
-	  for (unsigned int i=0; i != system_list.size(); ++i)
+	  // Get the id of this node
+	  unsigned int node_id = node->id();
+
+	  // A processed node flag
+	  bool processed_node = false;
+
+	  // Loop over existing processed nodes and see if 
+	  // we have already done this one
+	  for(unsigned int i = 0; i != processed_node_ids.size(); i++)
 	    {
-	      libmesh_assert(solution_vectors->find(system_list[i]) !=
-			     solution_vectors->end());
-	      libmesh_assert(!solve_adjoint ||
-			     solution_vectors->find(system_list[i])->second ==
-			     &system_list[i]->get_adjoint_solution());
-	      libmesh_assert(solve_adjoint ||
-			     solution_vectors->find(system_list[i])->second ==
-			     system_list[i]->solution.get() ||
-			     !solution_vectors->find(system_list[i])->second);
+	      if(node_id == processed_node_ids[i])
+		{
+		  processed_node = true;
+		}
 	    }
-#endif
+	  
+	  // If we havent already processed this node, do so now
+	  if(!processed_node)
+	    {	      
+	      // Declare a neighbor_set to be filled by the find_point_neighbors
+	      std::set<const Elem *> fine_grid_neighbor_set;
+	      
+	      // Call find_point_neighbors to fill the neighbor_set
+	      elem->find_point_neighbors(*node, fine_grid_neighbor_set);
+	      
+	      // A vector to hold the coarse grid parents neighbors
+	      std::vector<unsigned int> coarse_grid_neighbors;
+	  
+	      // Iterators over the fine grid neighbors set
+	      std::set<const Elem*>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
+	      const std::set<const Elem*>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
+	      
+	      // Loop over all the fine neighbors of this node
+	      for(; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
+		{
+		  // Pointer to the current fine neighbor element
+		  const Elem* fine_elem = *fine_neighbor_it;
+	  
+		  // Find the element id for the corresponding coarse grid element
+		  const Elem* coarse_elem = fine_elem;
+		  unsigned int e_id = coarse_elem->id();
+		  while (e_id >= max_coarse_elem_id)
+		    {
+		      libmesh_assert (coarse_elem->parent());
+		      
+		      // Go up number_h_refinements levels up to find the coarse parent
+		      for (unsigned int j = 0; j != number_h_refinements; ++j)
+			{		  
+			  coarse_elem = coarse_elem->parent();
+			}
+		      e_id = coarse_elem->id();
+		    }
+	      
+		  // Loop over the existing coarse neighbors and check if this one is
+		  // already in there
+		  for (unsigned int j = 0; j!= coarse_grid_neighbors.size(); j++)
+		    {
+		      // If the set already contains this element break out of the loop
+		      if(coarse_grid_neighbors[j] == e_id)
+			{
+			  break;
+			}
+		      
+		      // If we havent left the loop even at the last element,
+		      // this is a new neighbour, put in the coarse_grid_neighbor_set
+		      if(j == coarse_grid_neighbors.size() - 1)
+			{
+			  coarse_grid_neighbors.push_back(e_id);
+			}
+		    }	  
+		} // End loop over fine neighbors
+	  
+	      // Set the shared_neighbour index for this node to the
+	      // size of the coarse grid neighbor set
+	      shared_element_count.insert (std::make_pair(node, coarse_grid_neighbors.size()));
 
-          if (solve_adjoint)
-            {
-              // Set up proper initial guesses
-	      for (unsigned int i=0; i != system_list.size(); ++i)
-	        system_list[i]->get_adjoint_solution() = *system_list[i]->solution;
-              es.adjoint_solve();
-              // Put the adjoint_solution into solution for
-              // comparisons
-	      for (unsigned int i=0; i != system_list.size(); ++i)
-                {
-	          system_list[i]->get_adjoint_solution().swap(*system_list[i]->solution);
-	          system_list[i]->update();
-                }
-            }
-	  else
-            es.solve();
-	}
-    }
-  else
+	      // Add this node to processed_node_ids vector
+	      processed_node_ids.push_back(node_id);
+	      
+	    } // End if processed node
+	  
+	} // End loop over nodes
+      
+    }  // End loop over elems
+
+  // Get a DoF map, will be used to get the nodal dof_indices for each element
+  DofMap &dof_map = system.get_dof_map();
+  
+  // The global DOF indices, we will use these later on when we compute the element wise indicators
+  std::vector<unsigned int> dof_indices;
+
+  // Localize the global rhs and adjoint solution vectors (which might be shared on multiple processsors) onto a 
+  // local ghosted vector, this ensures each processor has all the dof_indices to compute an error indicator for
+  // an element it owns
+  AutoPtr<NumericVector<Number> > localized_projected_residual = NumericVector<Number>::build();
+  localized_projected_residual->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
+  projected_residual.localize(*localized_projected_residual, system.get_dof_map().get_send_list());
+
+  // We will loop over each adjoint solution, localize that adjoint
+  // solution and then loop over elements
+  for (unsigned int i=0; i != system.qoi.size(); i++)
     {
-      // No specified vectors == forward solve
-      if (!solution_vectors)
-        system_list[0]->solve();
-      else
-        {
-	  libmesh_assert(solution_vectors->find(system_list[0]) !=
-			 solution_vectors->end());
-
-	  const bool solve_adjoint =
-            (system_list[0]->have_vector("adjoint_solution0") &&
-             (solution_vectors->find(system_list[0])->second ==
-	      &system_list[0]->get_adjoint_solution()));
-	  libmesh_assert(solve_adjoint ||
-	    (solution_vectors->find(system_list[0])->second ==
-	     system_list[0]->solution.get()) ||
-	    !solution_vectors->find(system_list[0])->second);
-
-          if (solve_adjoint)
-            {
-              // Set up proper initial guesses
-	      for (unsigned int i=0; i != system_list.size(); ++i)
-	        system_list[0]->get_adjoint_solution() = *system_list[0]->solution;
-              system_list[0]->adjoint_solve();
-              // Put the adjoint_solution into solution for
-              // comparisons
-	      system_list[0]->get_adjoint_solution().swap(*system_list[0]->solution);
-	      system_list[0]->update();
-            }
-	  else
-            system_list[0]->solve();
-        }
-    }
-
-  // Get the error in the uniformly refined solution(s).
-
-  for (unsigned int i=0; i != system_list.size(); ++i)
-    {
-      System &system = *system_list[i];
-
-      unsigned int n_vars = system.n_vars();
-
-      DofMap &dof_map = system.get_dof_map();
-
-      const SystemNorm &system_i_norm =
-        _error_norms->find(&system)->second;
-
-      NumericVector<Number> *projected_solution = projected_solutions[i];
-
-      // Loop over all the variables in the system
-      for (unsigned int var=0; var<n_vars; var++)
-        {
-          // Get the error vector to fill for this system and variable
-          ErrorVector *err_vec = error_per_cell;
-          if (!err_vec)
-            {
-              libmesh_assert(errors_per_cell);
-	      err_vec =
-		(*errors_per_cell)[std::make_pair(&system,var)];
-            }
-
-          // The type of finite element to use for this variable
-          const FEType& fe_type = dof_map.variable_type (var);
-
-          // Finite element object for each fine element
-          AutoPtr<FEBase> fe (FEBase::build (dim, fe_type));
-
-          // Build and attach an appropriate quadrature rule
-          AutoPtr<QBase> qrule = fe_type.default_quadrature_rule(dim);
-          fe->attach_quadrature_rule (qrule.get());
-
-          const std::vector<Real>&  JxW = fe->get_JxW();
-          const std::vector<std::vector<Real> >& phi = fe->get_phi();
-          const std::vector<std::vector<RealGradient> >& dphi =
-            fe->get_dphi();
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          const std::vector<std::vector<RealTensor> >& d2phi =
-            fe->get_d2phi();
-#endif
-
-          // The global DOF indices for the fine element
-          std::vector<unsigned int> dof_indices;
-
-          // Iterate over all the active elements in the fine mesh
-          // that live on this processor.
-          MeshBase::const_element_iterator       elem_it  = mesh.active_local_elements_begin();
-          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
-
-          for (; elem_it != elem_end; ++elem_it)
+      // Skip this QoI if not in the QoI Set
+      if (_qoi_set.has_index(i))
+	{
+	  // Get the weight for the current QoI
+	  Real error_weight = _qoi_set.weight(i);
+	  
+	  // Now localize this solution onto a local ghosted vector, just like we did for the projected_residual above
+	  AutoPtr<NumericVector<Number> > localized_adjoint_solution = NumericVector<Number>::build();
+	  localized_adjoint_solution->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
+	  (system.get_adjoint_solution(i)).localize(*localized_adjoint_solution, system.get_dof_map().get_send_list());
+           
+	  // Loop over elements
+	  for(; elem_it != elem_end; ++elem_it)
 	    {
-	      // e is necessarily an active element on the local processor
+	      // Pointer to the element
 	      const Elem* elem = *elem_it;
+	      
+	      // Find the element id for the corresponding coarse grid element
+	      const Elem* coarse = elem;
+	      unsigned int e_id = coarse->id();
+	      while (e_id >= max_coarse_elem_id)
+		{
+		  libmesh_assert (coarse->parent());
 
-              // Find the element id for the corresponding coarse grid element
-              const Elem* coarse = elem;
-              unsigned int e_id = coarse->id();
-              while (e_id >= max_coarse_elem_id)
-                {
-                  libmesh_assert (coarse->parent());
-                  coarse = coarse->parent();
-                  e_id = coarse->id();
-                }
+		  // Go up number_h_refinements levels up to find the coarse parent
+		  for (unsigned int j = 0; j != number_h_refinements; ++j)
+		    {		  		      
+		      coarse = coarse->parent();
+		    }
 
-              double L2normsq = 0., H1seminormsq = 0., H2seminormsq = 0.;
+		  e_id = coarse->id();
+		}
+	      
+	      // Get the local to global degree of freedom maps for this element
+	      dof_map.dof_indices (elem, dof_indices);
+	      
+	      // We will have to manually do the dot products
+	      for (unsigned int j=0; j != (*localized_projected_residual).size(); j++)
+		{
+		  for (unsigned int k=0; k != (*localized_adjoint_solution).size(); k++)
+		    {		 
+		      // The contribution to the error indicator for this element from the current QoI
+		      error_per_cell[e_id] += (*localized_projected_residual)(dof_indices[j]) * (*localized_adjoint_solution)(dof_indices[k]);
+		    }
+		}
+	      
+	      // Multiply by the QoI error weight
+	      error_per_cell[e_id] *= error_weight;
 
-              // reinitialize the element-specific data
-              // for the current element
-              fe->reinit (elem);
+	    } // End loop over elements
 
-              // Get the local to global degree of freedom maps
-              dof_map.dof_indices (elem, dof_indices, var);
-
-              // The number of quadrature points
-              const unsigned int n_qp = qrule->n_points();
-
-              // The number of shape functions
-              const unsigned int n_sf = dof_indices.size();
-
-              //
-              // Begin the loop over the Quadrature points.
-              //
-              for (unsigned int qp=0; qp<n_qp; qp++)
-                {
-                  Number u_fine = 0., u_coarse = 0.;
-
-                  Gradient grad_u_fine, grad_u_coarse;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                  Tensor grad2_u_fine, grad2_u_coarse;
-#endif
-
-                  // Compute solution values at the current
-                  // quadrature point.  This reqiures a sum
-                  // over all the shape functions evaluated
-                  // at the quadrature point.
-                  for (unsigned int i=0; i<n_sf; i++)
-                    {
-                      u_fine            += phi[i][qp]*system.current_solution (dof_indices[i]);
-                      u_coarse          += phi[i][qp]*(*projected_solution) (dof_indices[i]);
-                      grad_u_fine       += dphi[i][qp]*system.current_solution (dof_indices[i]);
-                      grad_u_coarse     += dphi[i][qp]*(*projected_solution) (dof_indices[i]);
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                      grad2_u_fine      += d2phi[i][qp]*system.current_solution (dof_indices[i]);
-                      grad2_u_coarse    += d2phi[i][qp]*(*projected_solution) (dof_indices[i]);
-#endif
-                    }
-
-                  // Compute the value of the error at this quadrature point
-                  const Number val_error = u_fine - u_coarse;
-
-                  // Add the squares of the error to each contribution
-                  if (system_i_norm.type(var) == L2 ||
-                      system_i_norm.type(var) == H1 ||
-                      system_i_norm.type(var) == H2)
-                    {
-		      L2normsq += JxW[qp] * system_i_norm.weight_sq(var) *
-                                  norm_sq(val_error);
-                      libmesh_assert_greater_equal (L2normsq, 0.);
-                    }
-
-
-                  // Compute the value of the error in the gradient at this
-                  // quadrature point
-                  if (system_i_norm.type(var) == H1 ||
-                      system_i_norm.type(var) == H2 ||
-                      system_i_norm.type(var) == H1_SEMINORM)
-                    {
-                      Gradient grad_error = grad_u_fine - grad_u_coarse;
-
-                      H1seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
-                        grad_error.size_sq();
-                      libmesh_assert_greater_equal (H1seminormsq, 0.);
-                    }
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                  // Compute the value of the error in the hessian at this
-                  // quadrature point
-                  if (system_i_norm.type(var) == H2 ||
-                      system_i_norm.type(var) == H2_SEMINORM)
-                    {
-                      Tensor grad2_error = grad2_u_fine - grad2_u_coarse;
-
-		      H2seminormsq += JxW[qp] * system_i_norm.weight_sq(var) *
-                        grad2_error.size_sq();
-                      libmesh_assert_greater_equal (H2seminormsq, 0.);
-                    }
-#endif
-                } // end qp loop
-
-              if (system_i_norm.type(var) == L2 ||
-                  system_i_norm.type(var) == H1 ||
-                  system_i_norm.type(var) == H2)
-                (*err_vec)[e_id] += L2normsq;
-              if (system_i_norm.type(var) == H1 ||
-                  system_i_norm.type(var) == H2 ||
-                  system_i_norm.type(var) == H1_SEMINORM)
-                (*err_vec)[e_id] += H1seminormsq;
-
-              if (system_i_norm.type(var) == H2 ||
-                  system_i_norm.type(var) == H2_SEMINORM)
-                (*err_vec)[e_id] += H2seminormsq;
-            } // End loop over active local elements
-        } // End loop over variables
-
-      // Don't bother projecting the solution; we'll restore from backup
-      // after coarsening
-      system.project_solution_on_reinit() = false;
-    }
-
+	} // End if belong to QoI set
+      
+    } // End loop over QoIs
+  
+  // Don't bother projecting the solution; we'll restore from backup
+  // after coarsening
+  system.project_solution_on_reinit() = false;
 
   // Uniformly coarsen the mesh, without projecting the solution
   libmesh_assert (number_h_refinements > 0 || number_p_refinements > 0);
@@ -432,77 +391,33 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // We should be back where we started
   libmesh_assert_equal_to (n_coarse_elem, mesh.n_elem());
 
-  // Each processor has now computed the error contribuions
-  // for its local elements.  We need to sum the vector
-  // and then take the square-root of each component.  Note
-  // that we only need to sum if we are running on multiple
-  // processors, and we only need to take the square-root
-  // if the value is nonzero.  There will in general be many
-  // zeros for the inactive elements.
-
-  if (error_per_cell)
+  // Restore old solutions and clean up the heap  
+  system.project_solution_on_reinit() = old_projection_setting;
+  
+  // Restore the coarse solution vectors and delete their copies
+  *system.solution = *coarse_solution;
+  delete coarse_solution;
+  *system.current_local_solution = *coarse_local_solution;
+  delete coarse_local_solution;
+  delete projected_solution;
+  
+  for (System::vectors_iterator vec = system.vectors_begin(); vec !=
+	 system.vectors_end(); ++vec)
     {
-      // First sum the vector of estimated error values
-      this->reduce_error(*error_per_cell);
+      // The (string) name of this vector
+      const std::string& var_name = vec->first;
 
-      // Compute the square-root of each component.
-      START_LOG("std::sqrt()", "AdjointRefinementEstimator");
-      for (unsigned int i=0; i<error_per_cell->size(); i++)
-        if ((*error_per_cell)[i] != 0.)
-          (*error_per_cell)[i] = std::sqrt((*error_per_cell)[i]);
-      STOP_LOG("std::sqrt()", "AdjointRefinementEstimator");
-    }
-  else
-    {
-      for (ErrorMap::iterator i = errors_per_cell->begin();
-           i != errors_per_cell->end(); ++i)
-        {
-          ErrorVector *e = i->second;
-          // First sum the vector of estimated error values
-          this->reduce_error(*e);
-
-          // Compute the square-root of each component.
-          START_LOG("std::sqrt()", "AdjointRefinementEstimator");
-          for (unsigned int i=0; i<e->size(); i++)
-            if ((*e)[i] != 0.)
-              (*e)[i] = std::sqrt((*e)[i]);
-          STOP_LOG("std::sqrt()", "AdjointRefinementEstimator");
-        }
-    }
-
-  // Restore old solutions and clean up the heap
-  for (unsigned int i=0; i != system_list.size(); ++i)
-    {
-      System &system = *system_list[i];
-
-      system.project_solution_on_reinit() = old_projection_settings[i];
-
-      // Restore the coarse solution vectors and delete their copies
-      *system.solution = *coarse_solutions[i];
-      delete coarse_solutions[i];
-      *system.current_local_solution = *coarse_local_solutions[i];
-      delete coarse_local_solutions[i];
-      delete projected_solutions[i];
-
-      for (System::vectors_iterator vec = system.vectors_begin(); vec !=
-           system.vectors_end(); ++vec)
-        {
-          // The (string) name of this vector
-          const std::string& var_name = vec->first;
-
-          system.get_vector(var_name) = *coarse_vectors[i][var_name];
-
-          coarse_vectors[i][var_name]->clear();
-          delete coarse_vectors[i][var_name];
-        }
+      system.get_vector(var_name) = *coarse_vectors[var_name];
+      
+      coarse_vectors[var_name]->clear();
+      delete coarse_vectors[var_name];
     }
 
   // Restore old partitioner settings
   mesh.partitioner() = old_partitioner;
-}
 
-} // namespace libMesh
+} // end estimate_error function
+  
+}// namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
-
-#endif
