@@ -179,13 +179,19 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       
   // Done with the global error estimates, now construct the element wise error indicators 
 
-  // We need to account for 'spill-over' effects while computing the element error indicators
-  // This happens because the same dof is shared by multiple elements, one way of mitigating
-  // this is to scale the contribution from each dof by the number of elements it belongs to
-  // We first obtain the number of elements each node belongs to
+  // We ought to account for 'spill-over' effects while computing the
+  // element error indicators This happens because the same dof is
+  // shared by multiple elements, one way of mitigating this is to
+  // scale the contribution from each dof by the number of elements it
+  // belongs to We first obtain the number of elements each node
+  // belongs to
+
+  bool split_shared_dofs = false;
   
+  if (split_shared_dofs) {
+
   // A map that relates a node id to an int that will tell us how many elements it is a node of
-  LIBMESH_BEST_UNORDERED_MULTIMAP<Node * , unsigned int>shared_element_count;
+  LIBMESH_BEST_UNORDERED_MAP<unsigned int, unsigned int>shared_element_count;
 
   // To fill this map, we will loop over elements, and then in each element, we will loop
   // over the nodes each element contains, and then query it for the number of coarse
@@ -196,7 +202,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
-  // A vector to hold the ids of the nodes we have already dealt with
+  // Keep track of which nodes we have already dealt with
   std::vector<unsigned int> processed_node_ids;
 
   // Start loop over elems
@@ -285,7 +291,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	  
 	      // Set the shared_neighbour index for this node to the
 	      // size of the coarse grid neighbor set
-	      shared_element_count.insert (std::make_pair(node, coarse_grid_neighbors.size()));
+	      shared_element_count[node_id] = coarse_grid_neighbors.size();
 
 	      // Add this node to processed_node_ids vector
 	      processed_node_ids.push_back(node_id);
@@ -295,6 +301,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	} // End loop over nodes
       
     }  // End loop over elems
+
+  } // if (split_shared_dofs)
 
   // Get a DoF map, will be used to get the nodal dof_indices for each element
   DofMap &dof_map = system.get_dof_map();
@@ -310,7 +318,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   projected_residual.localize(*localized_projected_residual, system.get_dof_map().get_send_list());
 
   // We will loop over each adjoint solution, localize that adjoint
-  // solution and then loop over elements
+  // solution and then loop over local elements
   for (unsigned int i=0; i != system.qoi.size(); i++)
     {
       // Skip this QoI if not in the QoI Set
@@ -325,6 +333,9 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	  (system.get_adjoint_solution(i)).localize(*localized_adjoint_solution, system.get_dof_map().get_send_list());
            
 	  // Loop over elements
+          MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
+          const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
+
 	  for(; elem_it != elem_end; ++elem_it)
 	    {
 	      // Pointer to the element
