@@ -49,7 +49,8 @@ int main(int argc, char** argv)
 
   es.read(argv[2], EquationSystems::READ_HEADER | 
                    EquationSystems::READ_DATA | 
-                   EquationSystems::READ_ADDITIONAL_DATA);
+                   EquationSystems::READ_ADDITIONAL_DATA |
+                   EquationSystems::READ_BASIC_ONLY);
   std::cout << "Loaded solution " << argv[2] << std::endl;
   es.print_info();
 
