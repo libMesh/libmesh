@@ -114,10 +114,10 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
   // this case, the ordering of the nodes may depend on an accompanying
   // solution, and the node ordering cannot be changed.
   bool old_skip_renumber_value = _skip_renumber_nodes_and_elements;
-  _skip_renumber_nodes_and_elements = _skip_renumber_nodes_and_elements &&
+  _skip_renumber_nodes_and_elements = _skip_renumber_nodes_and_elements ||
                                       skip_renumber_nodes_and_elements;
   
-  if(!skip_renumber_nodes_and_elements)
+  if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
 
   // Let all the elements find their neighbors
@@ -129,7 +129,7 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
   // If we're using ParallelMesh, we'll want it parallelized.
   this->delete_remote_elements();
 
-  if(!skip_renumber_nodes_and_elements)
+  if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
 
   // Restore previously requested behavior
