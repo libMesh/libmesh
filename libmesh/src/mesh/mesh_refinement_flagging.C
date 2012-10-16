@@ -67,8 +67,10 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 
   // Check for valid fractions..
   // The fraction values must be in [0,1]
-  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert_greater_equal (_refine_fraction, 0);
+  libmesh_assert_less_equal (_refine_fraction, 1);
+  libmesh_assert_greater_equal (_coarsen_fraction, 0);
+  libmesh_assert_less_equal (_coarsen_fraction, 1);
 
   // Clean up the refinement flags.  These could be left
   // over from previous refinement steps.
@@ -177,11 +179,14 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 {
   parallel_only();
 
+  libmesh_assert_greater (_coarsen_threshold, 0);
+
   // Check for valid fractions..
   // The fraction values must be in [0,1]
-  libmesh_assert (_coarsen_threshold  >= 0. && _refine_fraction  <= 1.);
-  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert_greater_equal (_refine_fraction, 0);
+  libmesh_assert_less_equal (_refine_fraction, 1);
+  libmesh_assert_greater_equal (_coarsen_fraction, 0);
+  libmesh_assert_less_equal (_coarsen_fraction, 1);
 
   // How much error per cell will we tolerate?
   const Real local_refinement_tolerance =
@@ -243,8 +248,10 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // Check for valid fractions..
   // The fraction values must be in [0,1]
-  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert_greater_equal (_refine_fraction, 0);
+  libmesh_assert_less_equal (_refine_fraction, 1);
+  libmesh_assert_greater_equal (_coarsen_fraction, 0);
+  libmesh_assert_less_equal (_coarsen_fraction, 1);
 
   // This function is currently only coded to work when coarsening by
   // parents - it's too hard to guess how many coarsenings will be
@@ -467,8 +474,10 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
 
   // Check for valid fractions..
   // The fraction values must be in [0,1]
-  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert_greater_equal (_refine_fraction, 0);
+  libmesh_assert_less_equal (_refine_fraction, 1);
+  libmesh_assert_greater_equal (_coarsen_fraction, 0);
+  libmesh_assert_less_equal (_coarsen_fraction, 1);
 
   // The number of active elements in the mesh
   const unsigned int n_active_elem  = _mesh.n_elem();
@@ -608,8 +617,10 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
   const Real stddev = std::sqrt (error_per_cell.variance());
 
   // Check for valid fractions
-  libmesh_assert (_refine_fraction  >= 0. && _refine_fraction  <= 1.);
-  libmesh_assert (_coarsen_fraction >= 0. && _coarsen_fraction <= 1.);
+  libmesh_assert_greater_equal (_refine_fraction, 0);
+  libmesh_assert_less_equal (_refine_fraction, 1);
+  libmesh_assert_greater_equal (_coarsen_fraction, 0);
+  libmesh_assert_less_equal (_coarsen_fraction, 1);
 
   // The refine and coarsen cutoff
   const Real refine_cutoff  =  mean + _refine_fraction  * stddev;
