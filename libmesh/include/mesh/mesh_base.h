@@ -497,6 +497,15 @@ public:
   virtual void update_post_partitioning () {}
 
   /**
+   * If true is passed in then this mesh will no longer be renumbered
+   * when being prepared for use.  This may slightly adversely affect
+   * performance during subsequent element access, particulary when
+   * using a distributed mesh.
+   */
+  void skip_renumbering(bool skip) { _skip_renumber_nodes_and_elements = skip; }
+  bool skip_renumbering() const { return _skip_renumber_nodes_and_elements; }
+
+  /**
    * If true is passed in then this mesh will no longer be (re)partitioned.
    * It would probably be a bad idea to call this on a Serial Mesh _before_
    * the first partitioning has happened... because no elements would get assigned
@@ -509,7 +518,7 @@ public:
    * of the rebalance and repartition is too high for your application.
    */
   void skip_partitioning(bool skip) { _skip_partitioning = skip; }
-  bool skip_partitioning() { return _skip_partitioning; }
+  bool skip_partitioning() const { return _skip_partitioning; }
 
   /**
    * Returns the number of subdomains in the global mesh. Subdomains correspond
