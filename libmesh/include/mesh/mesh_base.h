@@ -497,13 +497,13 @@ public:
   virtual void update_post_partitioning () {}
 
   /**
-   * If true is passed in then this mesh will no longer be renumbered
+   * If false is passed in then this mesh will no longer be renumbered
    * when being prepared for use.  This may slightly adversely affect
    * performance during subsequent element access, particulary when
    * using a distributed mesh.
    */
-  void skip_renumbering(bool skip) { _skip_renumber_nodes_and_elements = skip; }
-  bool skip_renumbering() const { return _skip_renumber_nodes_and_elements; }
+  void allow_renumbering(bool allow) { _skip_renumber_nodes_and_elements = !allow; }
+  bool allow_renumbering() const { return !_skip_renumber_nodes_and_elements; }
 
   /**
    * If true is passed in then this mesh will no longer be (re)partitioned.
