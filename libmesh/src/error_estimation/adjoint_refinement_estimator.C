@@ -111,6 +111,10 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   AutoPtr<Partitioner> old_partitioner = mesh.partitioner();
   mesh.partitioner().reset(NULL);
 
+  // And we can't allow any renumbering
+  const bool old_renumbering_setting = mesh.allow_renumbering();
+  mesh.allow_renumbering(false);
+
   // Use a non-standard solution vector if necessary
   if (solution_vector && solution_vector != system.solution.get())
     {
@@ -120,9 +124,6 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       system.update();
     }
 
-  // Find the number of coarse mesh elements, to make it possible
-  // to find correct coarse elem ids later
-  const unsigned int max_coarse_elem_id = mesh.max_elem_id();
 #ifndef NDEBUG
   // n_coarse_elem is only used in an assertion later so
   // avoid declaring it unless asserts are active.
@@ -257,36 +258,33 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	  
 		  // Find the element id for the corresponding coarse grid element
 		  const Elem* coarse_elem = fine_elem;
-		  unsigned int e_id = coarse_elem->id();
-		  while (e_id >= max_coarse_elem_id)
-		    {
+		  for (unsigned int j = 0; j != number_h_refinements; ++j)
+		    {		  
 		      libmesh_assert (coarse_elem->parent());
-		      
-		      // Go up number_h_refinements levels up to find the coarse parent
-		      for (unsigned int j = 0; j != number_h_refinements; ++j)
-			{		  
-			  coarse_elem = coarse_elem->parent();
-			}
-		      e_id = coarse_elem->id();
+
+		      coarse_elem = coarse_elem->parent();
 		    }
 	      
 		  // Loop over the existing coarse neighbors and check if this one is
 		  // already in there
-		  for (unsigned int j = 0; j!= coarse_grid_neighbors.size(); j++)
+                  const unsigned int coarse_id = coarse_elem->id();
+                  unsigned int j = 0;
+		  for (; j != coarse_grid_neighbors.size(); j++)
 		    {
 		      // If the set already contains this element break out of the loop
-		      if(coarse_grid_neighbors[j] == e_id)
+		      if(coarse_grid_neighbors[j] == coarse_id)
 			{
 			  break;
 			}
-		      
-		      // If we havent left the loop even at the last element,
-		      // this is a new neighbour, put in the coarse_grid_neighbor_set
-		      if(j == coarse_grid_neighbors.size() - 1)
-			{
-			  coarse_grid_neighbors.push_back(e_id);
-			}
 		    }	  
+
+		  // If we didn't leave the loop even at the last element,
+		  // this is a new neighbour, put in the coarse_grid_neighbor_set
+		  if(j == coarse_grid_neighbors.size())
+		    {
+		      coarse_grid_neighbors.push_back(coarse_id);
+		    }
+
 		} // End loop over fine neighbors
 	  
 	      // Set the shared_neighbour index for this node to the
@@ -317,6 +315,10 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   localized_projected_residual->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
   projected_residual.localize(*localized_projected_residual, system.get_dof_map().get_send_list());
 
+  // Each adjoint solution will also require ghosting; for efficiency we'll reuse the same memory
+  AutoPtr<NumericVector<Number> > localized_adjoint_solution = NumericVector<Number>::build();
+  localized_adjoint_solution->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
+
   // We will loop over each adjoint solution, localize that adjoint
   // solution and then loop over local elements
   for (unsigned int i=0; i != system.qoi.size(); i++)
@@ -327,9 +329,6 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	  // Get the weight for the current QoI
 	  Real error_weight = _qoi_set.weight(i);
 	  
-	  // Now localize this solution onto a local ghosted vector, just like we did for the projected_residual above
-	  AutoPtr<NumericVector<Number> > localized_adjoint_solution = NumericVector<Number>::build();
-	  localized_adjoint_solution->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
 	  (system.get_adjoint_solution(i)).localize(*localized_adjoint_solution, system.get_dof_map().get_send_list());
            
 	  // Loop over elements
@@ -341,37 +340,34 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	      // Pointer to the element
 	      const Elem* elem = *elem_it;
 	      
-	      // Find the element id for the corresponding coarse grid element
+	      // Go up number_h_refinements levels up to find the coarse parent
 	      const Elem* coarse = elem;
-	      unsigned int e_id = coarse->id();
-	      while (e_id >= max_coarse_elem_id)
-		{
+
+	      for (unsigned int j = 0; j != number_h_refinements; ++j)
+	        {		  		      
 		  libmesh_assert (coarse->parent());
 
-		  // Go up number_h_refinements levels up to find the coarse parent
-		  for (unsigned int j = 0; j != number_h_refinements; ++j)
-		    {		  		      
-		      coarse = coarse->parent();
-		    }
-
-		  e_id = coarse->id();
+		  coarse = coarse->parent();
 		}
-	      
+
+              const unsigned int e_id = coarse->id();
+
 	      // Get the local to global degree of freedom maps for this element
 	      dof_map.dof_indices (elem, dof_indices);
 	      
-	      // We will have to manually do the dot products
-	      for (unsigned int j=0; j != (*localized_projected_residual).size(); j++)
+	      // We will have to manually do the dot products.
+              Number local_contribution = 0.;
+
+	      for (unsigned int j=0; j != dof_indices.size(); j++)
 		{
-		  for (unsigned int k=0; k != (*localized_adjoint_solution).size(); k++)
-		    {		 
-		      // The contribution to the error indicator for this element from the current QoI
-		      error_per_cell[e_id] += (*localized_projected_residual)(dof_indices[j]) * (*localized_adjoint_solution)(dof_indices[k]);
-		    }
+		  // The contribution to the error indicator for this element from the current QoI
+		  local_contribution += (*localized_projected_residual)(dof_indices[j]) * (*localized_adjoint_solution)(dof_indices[j]);
 		}
 	      
-	      // Multiply by the QoI error weight
-	      error_per_cell[e_id] *= error_weight;
+	      // Multiply by the error weight for this QoI
+              local_contribution *= error_weight;
+
+	      error_per_cell[e_id] *= local_contribution;
 
 	    } // End loop over elements
 
@@ -424,8 +420,9 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       delete coarse_vectors[var_name];
     }
 
-  // Restore old partitioner settings
+  // Restore old partitioner and renumbering settings
   mesh.partitioner() = old_partitioner;
+  mesh.allow_renumbering(old_renumbering_setting);
 
 } // end estimate_error function
   
