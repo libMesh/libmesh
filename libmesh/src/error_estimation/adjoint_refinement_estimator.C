@@ -367,7 +367,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	      // Multiply by the error weight for this QoI
               local_contribution *= error_weight;
 
-	      error_per_cell[e_id] *= local_contribution;
+	      error_per_cell[e_id] += local_contribution;
 
 	    } // End loop over elements
 
