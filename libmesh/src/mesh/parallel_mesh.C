@@ -938,6 +938,15 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 
 void ParallelMesh::renumber_nodes_and_elements ()
 {
+  if (_skip_renumber_nodes_and_elements)
+    {
+      _n_elem  = this->parallel_n_elem();
+      _n_nodes = this->parallel_n_nodes();
+      _max_node_id = this->parallel_max_node_id();
+      _max_elem_id = this->parallel_max_elem_id();
+      return;
+    }
+
   START_LOG("renumber_nodes_and_elements()", "ParallelMesh");
 
 #ifdef DEBUG
@@ -1021,8 +1030,10 @@ void ParallelMesh::renumber_nodes_and_elements ()
 #ifdef DEBUG
   libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
-  libmesh_assert_equal_to (this->max_node_id(), this->parallel_max_node_id());
-  libmesh_assert_equal_to (this->max_elem_id(), this->parallel_max_elem_id());
+  const unsigned int pmax_node_id = this->parallel_max_node_id();
+  const unsigned int pmax_elem_id = this->parallel_max_elem_id();
+  libmesh_assert_equal_to (this->max_node_id(), pmax_node_id);
+  libmesh_assert_equal_to (this->max_elem_id(), pmax_elem_id);
   libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
   libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
 
@@ -1101,11 +1112,18 @@ void ParallelMesh::delete_remote_elements()
 // And our child/parent links, and our flags
   MeshTools::libmesh_assert_valid_refinement_tree(*this);
 
+  libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
+  const unsigned int pmax_node_id = this->parallel_max_node_id();
+  const unsigned int pmax_elem_id = this->parallel_max_elem_id();
+  libmesh_assert_equal_to (this->max_node_id(), pmax_node_id);
+  libmesh_assert_equal_to (this->max_elem_id(), pmax_elem_id);
 #endif
 
   _is_serial = false;
   MeshCommunication().delete_remote_elements(*this, _extra_ghost_elems);
+
+  libmesh_assert_equal_to (this->max_elem_id(), this->parallel_max_elem_id());
 
   // Now make sure the containers actually shrink - strip
   // any newly-created NULL voids out of the element array
@@ -1125,16 +1143,18 @@ void ParallelMesh::delete_remote_elements()
     else
       ++n_it;
 
+  // We may have deleted no-longer-connected nodes or coarsened-away
+  // elements; let's update our caches.
+  _n_nodes = this->parallel_n_nodes();
+  _max_node_id = this->parallel_max_node_id();
+  _n_elem = this->parallel_n_elem();
+  _max_elem_id = this->parallel_max_elem_id();
 
 #ifdef DEBUG
-// Make sure our caches are up to date and our
-// DofObjects are well packed
-  libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
-  libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
-  libmesh_assert_equal_to (this->max_node_id(), this->parallel_max_node_id());
-  libmesh_assert_equal_to (this->max_elem_id(), this->parallel_max_elem_id());
-  libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
-  libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
+  // We might not have well-packed objects if the user didn't allow us
+  // to renumber
+  // libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
+  // libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
 
 // Make sure our neighbor links are all fine
   MeshTools::libmesh_assert_valid_neighbors(*this);
@@ -1172,8 +1192,10 @@ void ParallelMesh::allgather()
 #ifdef DEBUG
   libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
-  libmesh_assert_equal_to (this->max_node_id(), this->parallel_max_node_id());
-  libmesh_assert_equal_to (this->max_elem_id(), this->parallel_max_elem_id());
+  const unsigned int pmax_node_id = this->parallel_max_node_id();
+  const unsigned int pmax_elem_id = this->parallel_max_elem_id();
+  libmesh_assert_equal_to (this->max_node_id(), pmax_node_id);
+  libmesh_assert_equal_to (this->max_elem_id(), pmax_elem_id);
   libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
   libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
 
