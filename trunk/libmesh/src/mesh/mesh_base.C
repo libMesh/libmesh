@@ -113,7 +113,9 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
   // and elements include reading in e.g. an xda/r or gmv file. In
   // this case, the ordering of the nodes may depend on an accompanying
   // solution, and the node ordering cannot be changed.
-  _skip_renumber_nodes_and_elements = skip_renumber_nodes_and_elements;
+  bool old_skip_renumber_value = _skip_renumber_nodes_and_elements;
+  _skip_renumber_nodes_and_elements = _skip_renumber_nodes_and_elements &&
+                                      skip_renumber_nodes_and_elements;
   
   if(!skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
@@ -129,6 +131,9 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 
   if(!skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
+
+  // Restore previously requested behavior
+  _skip_renumber_nodes_and_elements = old_skip_renumber_value;
 
   // Reset our PointLocator.  This needs to happen any time the elements
   // in the underlying elements in the mesh have changed, so we do it here.
