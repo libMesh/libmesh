@@ -22,7 +22,7 @@ if (test $enablegz = yes); then
 fi
 
 if (test "$have_zlib_h" != yes -o "$have_libz" != yes) ; then
-  enablegz = no
+  enablegz=no
 fi
 
 # If both tests succeded, continue the configuration process.
