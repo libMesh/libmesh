@@ -12,6 +12,7 @@ SUBDIRS = \
 	adjoints/adjoints_ex1 \
 	adjoints/adjoints_ex2 \
 	adjoints/adjoints_ex3 \
+	adjoints/adjoints_ex4 \
 	eigenproblems/eigenproblems_ex1 \
 	eigenproblems/eigenproblems_ex2 \
 	eigenproblems/eigenproblems_ex3 \
