@@ -642,7 +642,8 @@ RBConstructionBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >&
   // Note: #define PCType char*, and PCGetType just sets a pointer.  We'll use
   // the string below to make a real copy, and set the PC back to its original
   // type at the end of the function.
-#if PETSC_VERSION_LESS_THAN(3,0,0)
+#if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_VERSION_RELEASE
+  // Pre-3.0 and petsc-dev (as of October 2012) use non-const versions
   PCType orig_petsc_pc_type;
   KSPType orig_petsc_ksp_type;
 #else
