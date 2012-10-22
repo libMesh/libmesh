@@ -189,7 +189,7 @@ void EquationSystems::reinit ()
         sys.user_constrain();
 
         // Expand any recursive constraints
-        sys.get_dof_map().process_constraints();
+        sys.get_dof_map().process_constraints(_mesh);
 
         // And clean up the send_list before we use it again
         sys.get_dof_map().prepare_send_list();
@@ -219,7 +219,7 @@ void EquationSystems::reinit ()
               sys.get_dof_map().distribute_dofs(_mesh);
               sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
               sys.user_constrain();
-              sys.get_dof_map().process_constraints();
+              sys.get_dof_map().process_constraints(_mesh);
               sys.get_dof_map().prepare_send_list();
 
             }
@@ -246,7 +246,7 @@ void EquationSystems::reinit ()
               sys.get_dof_map().distribute_dofs(_mesh);
               sys.get_dof_map().create_dof_constraints(_mesh, sys.time);
               sys.user_constrain();
-              sys.get_dof_map().process_constraints();
+              sys.get_dof_map().process_constraints(_mesh);
               sys.get_dof_map().prepare_send_list();
 
             }
@@ -310,7 +310,7 @@ void EquationSystems::allgather ()
       // shape just in case.
       dof_map.create_dof_constraints(_mesh, sys.time);
       sys.user_constrain();
-      dof_map.process_constraints();
+      dof_map.process_constraints(_mesh);
 #endif
       dof_map.prepare_send_list();
     }

@@ -501,9 +501,14 @@ public:
   void create_dof_constraints (const MeshBase&, Real time=0);
 
   /**
-   * Gathers any relevant constraint equations from other processors
+   * Gathers constraint equation dependencies from other processors
    */
   void allgather_recursive_constraints (const MeshBase&);
+
+  /**
+   * Sends constraint equations to constraining processors
+   */
+  void scatter_constraints (const MeshBase&);
 
   /**
    * Postprocesses any constrained degrees of freedom
@@ -512,7 +517,7 @@ public:
    * This should be run after both system (create_dof_constraints) and
    * user constraints have all been added.
    */
-  void process_constraints ();
+  void process_constraints (const MeshBase&);
 
   /**
    * Adds a copy of the user-defined row to the constraint matrix, using
