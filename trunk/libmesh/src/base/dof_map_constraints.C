@@ -966,12 +966,6 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
     }
 #endif // LIBMESH_ENABLE_DIRICHLET
 
-  // With a parallelized Mesh, we've computed our local constraints,
-  // but they may depend on non-local constraints that we'll need to
-  // take into account.
-  if (!mesh.is_serial())
-    this->allgather_recursive_constraints(mesh);
-
   STOP_LOG("create_dof_constraints()", "DofMap");
 }
 
@@ -2410,8 +2404,14 @@ mesh
 
 
 
-void DofMap::process_constraints ()
+void DofMap::process_constraints (const MeshBase& mesh)
 {
+  // With a parallelized Mesh, we've computed our local constraints,
+  // but they may depend on non-local constraints that we'll need to
+  // take into account.
+  if (!mesh.is_serial())
+    this->allgather_recursive_constraints(mesh);
+
   // Create a set containing the DOFs we already depend on
   typedef std::set<unsigned int> RCSet;
   RCSet unexpanded_set;
@@ -2476,11 +2476,25 @@ void DofMap::process_constraints ()
 	  i++;
       }
 
+  // In parallel we can't guarantee that nodes/dofs which constrain
+  // others are on processors which are aware of that constraint, yet
+  // we need such awareness for sparsity pattern generation.  So send
+  // other processors any constraints they might need to know about.
+  if (!mesh.is_serial())
+    this->scatter_constraints(mesh);
+
   // Now that we have our root constraint dependencies sorted out, add
   // them to the send_list
   this->add_constraints_to_send_list();
 }
 
+
+void DofMap::scatter_constraints(const MeshBase& mesh)
+{
+  // FIXME: at this point each processor with a constrained node knows
+  // the corresponding constraint row, but we also need each processor
+  // with a constrainer node to know the corresponding row(s).
+}
 
 
 void DofMap::add_constraints_to_send_list()
