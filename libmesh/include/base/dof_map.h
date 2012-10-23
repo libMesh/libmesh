@@ -503,7 +503,7 @@ public:
   /**
    * Gathers constraint equation dependencies from other processors
    */
-  void allgather_recursive_constraints (const MeshBase&);
+  void allgather_recursive_constraints (MeshBase&);
 
   /**
    * Sends constraint equations to constraining processors
@@ -517,7 +517,7 @@ public:
    * This should be run after both system (create_dof_constraints) and
    * user constraints have all been added.
    */
-  void process_constraints (const MeshBase&);
+  void process_constraints (MeshBase&);
 
   /**
    * Adds a copy of the user-defined row to the constraint matrix, using
