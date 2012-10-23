@@ -173,8 +173,6 @@ AutoPtr<MeshRefinement> build_mesh_refinement(MeshBase &mesh,
   return mesh_refinement;
 }
 
-#endif // LIBMESH_ENABLE_AMR
-
 // This is where declare the adjoint refined error estimator. This estimator builds an error bound
 // for Q(u) - Q(u_h), by solving the adjoint problem on a finer Finite Element space. For more details
 // see the description of the Adjoint Refinement Error Estimator in adjoint_refinement_error_estimator.C
@@ -195,6 +193,8 @@ AutoPtr<AdjointRefinementEstimator> build_adjoint_refinement_error_estimator(QoI
       
   return error_estimator;
 }
+
+#endif // LIBMESH_ENABLE_AMR
 
 
 // The main program.
