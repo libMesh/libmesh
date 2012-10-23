@@ -192,6 +192,8 @@ void unpack (std::vector<int>::const_iterator in,
           libmesh_assert_equal_to ((*node)(i), *ints_as_Real);
           in += ints_per_Real;
         }
+#else
+      in += LIBMESH_DIM * ints_per_Real;
 #endif // !NDEBUG
 
       if (!node->has_dofs())
