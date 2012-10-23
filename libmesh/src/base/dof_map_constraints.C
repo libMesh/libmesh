@@ -1979,12 +1979,15 @@ mesh
       const DofObject *constrained = i->first;
       nodes_pushed_on_proc[constrained->processor_id()]++;
     }
+#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+
   for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
     {
       pushed_ids[p].reserve(pushed_on_proc[p]);
-      pushed_node_ids[p].reserve(pushed_on_proc[p]);
-    }
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+      pushed_node_ids[p].reserve(nodes_pushed_on_proc[p]);
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+    }
 
   // Collect the dof constraints to push to each processor
   push_proc_id = 0;
