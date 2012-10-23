@@ -33,9 +33,11 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/system.h" // needed by enforce_constraints_exactly()
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_inserter_iterator.h"
 #include "libmesh/numeric_vector.h" // for enforce_constraints_exactly()
 #include "libmesh/quadrature.h" // for dirichlet constraints
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_algebra.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/point_locator_base.h"
 #include "libmesh/threads.h"
@@ -1924,12 +1926,7 @@ void DofMap::build_constraint_matrix_and_vector
 }
 
 
-// NodeConstraints can fail in parallel when we try to look up a node
-// that our processor doesn't have.  Until we have a fix for that,
-// let's just disable the allgather attempt.
-#undef LIBMESH_ENABLE_NODE_CONSTRAINTS
-
-void DofMap::allgather_recursive_constraints(const MeshBase&
+void DofMap::allgather_recursive_constraints(MeshBase&
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
 mesh
 #endif
@@ -2176,6 +2173,9 @@ mesh
 
   while (unexpanded_set_nonempty)
     {
+      // Let's make sure we don't lose sync in this loop.
+      parallel_only();
+
       // Request sets
       DoF_RCSet   dof_request_set;
       Node_RCSet node_request_set;
@@ -2197,7 +2197,16 @@ mesh
           DofConstraintRow &row = _dof_constraints[*i].first;
           for (DofConstraintRow::iterator j = row.begin();
                j != row.end(); ++j)
-            dof_request_set.insert(j->first);
+            {
+              const unsigned int constraining_dof = j->first;
+
+              // If it's non-local and we haven't already got a
+              // constraint for it, we might need to ask for one
+              if (((constraining_dof < this->first_dof()) ||
+                   (constraining_dof >= this->end_dof())) &&
+                  !_dof_constraints.count(constraining_dof))
+                dof_request_set.insert(constraining_dof);
+            }
         }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -2208,8 +2217,14 @@ mesh
           for (NodeConstraintRow::iterator j = row.begin();
                j != row.end(); ++j)
             {
-              libmesh_assert(j->first);
-              node_request_set.insert(j->first);
+              const Node* const node = j->first;
+              libmesh_assert(node);
+
+              // If it's non-local and we haven't already got a
+              // constraint for it, we might need to ask for one
+              if ((node->processor_id() != libMesh::processor_id()) &&
+                  !_node_constraints.count(node))
+                node_request_set.insert(node);
             }
         }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
@@ -2278,6 +2293,11 @@ mesh
           // Fill those requests
           std::vector<std::vector<unsigned int> > dof_row_keys(dof_request_to_fill.size()),
                                                   node_row_keys(node_request_to_fill.size());
+
+          // FIXME - this could be an unordered set, given a
+          // hash<pointers> specialization
+          std::set<const Node*> nodes_requested;
+
           std::vector<std::vector<Real> > dof_row_vals(dof_request_to_fill.size()),
                                           node_row_vals(node_request_to_fill.size());
           std::vector<Number> dof_row_rhss(dof_request_to_fill.size());
@@ -2296,6 +2316,11 @@ mesh
                     {
                       dof_row_keys[i].push_back(j->first);
                       dof_row_vals[i].push_back(j->second);
+
+                      // We should never have a 0 constraint
+                      // coefficient; that's implicit via sparse
+                      // constraint storage
+                      libmesh_assert(j->second);
                     }
                   dof_row_rhss[i] = _dof_constraints[constrained].second;
                 }
@@ -2316,7 +2341,14 @@ mesh
                        j != row.end(); ++j)
                     {
                       node_row_keys[i].push_back(j->first->id());
+                      nodes_requested.insert(j->first);
                       node_row_vals[i].push_back(j->second);
+
+                      // We can have 0 nodal constraint
+                      // coefficients, where no Lagrange constrant
+                      // exists but non-Lagrange basis constraints
+                      // might.
+                      // libmesh_assert(j->second);
                     }
                   node_row_rhss[i] = _node_constraints[constrained_node].second;
                 }
@@ -2343,6 +2375,13 @@ mesh
                                  procup, node_filled_vals);
           Parallel::send_receive(procdown, node_row_rhss,
                                  procup, node_filled_rhss);
+
+          // Constraining nodes might not even exist on our subset of
+          // a distributed mesh, so let's make them exist.
+          Parallel::send_receive_packed_range
+            (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
+             procup,   &mesh, mesh_inserter_iterator<Node>(mesh));
+
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
           libmesh_assert_equal_to (dof_filled_keys.size(), requested_dof_ids[procup].size());
           libmesh_assert_equal_to (dof_filled_vals.size(), requested_dof_ids[procup].size());
@@ -2404,7 +2443,7 @@ mesh
 
 
 
-void DofMap::process_constraints (const MeshBase& mesh)
+void DofMap::process_constraints (MeshBase& mesh)
 {
   // With a parallelized Mesh, we've computed our local constraints,
   // but they may depend on non-local constraints that we'll need to
