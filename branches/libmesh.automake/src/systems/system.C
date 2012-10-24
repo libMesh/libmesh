@@ -261,7 +261,7 @@ void System::init_data ()
   this->user_constrain();
 
   // Expand any recursive constraints
-  _dof_map->process_constraints();
+  _dof_map->process_constraints(mesh);
 
 #endif
 
