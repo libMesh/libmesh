@@ -878,7 +878,20 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
   NumericVector<Number>* nv = (dlm->sys->solution).get();
   PetscVector<Number>*   pv = dynamic_cast<PetscVector<Number>*>(nv);
   Vec                    v  = pv->vec();
-  ierr = VecDuplicate(v,x); CHKERRQ(ierr);
+  /* Unfortunately, currently this does not produce a ghosted vector, so nonlinear subproblem solves aren't going to be easily available.
+     Should work fine for getting vectors out for linear subproblem solvers. */
+  if(dlm->embedding) {
+    PetscInt n;
+    ierr = VecCreate(((PetscObject)v)->comm, x);       CHKERRQ(ierr);
+    ierr = ISGetLocalSize(dlm->embedding, &n);         CHKERRQ(ierr);
+    ierr = VecSetSizes(*x,n,PETSC_DETERMINE);           CHKERRQ(ierr);
+    ierr = VecSetType(*x,((PetscObject)v)->type_name); CHKERRQ(ierr);
+    ierr = VecSetFromOptions(*x);                      CHKERRQ(ierr);
+    ierr = VecSetUp(*x);                               CHKERRQ(ierr);
+  }
+  else {
+    ierr = VecDuplicate(v,x); CHKERRQ(ierr);
+  }
   ierr = PetscObjectCompose((PetscObject)*x,"DM",(PetscObject)dm); CHKERRQ(ierr);
   PetscFunctionReturn(0);
 }
