@@ -52,17 +52,21 @@ std::string Node::get_info () const
 {
   std::ostringstream out;
 
-  out << "  Node Information"                                      << '\n'
-      << "   id()=";
+  out << "  Node id()=";
 
   if (this->valid_id())
     out << this->id();
   else
     out << "invalid";
 
-  out << ", processor_id()=" << this->processor_id()               << '\n';
+  out << ", processor_id()=" << this->processor_id() << 
+         ", Point=" << *static_cast<const Point*>(this) << '\n';
 
-  out << "    Point=" << *static_cast<const Point*>(this)              << '\n';
+  out << "    DoFs=";
+  for (unsigned int s=0; s != this->n_systems(); ++s)
+    for (unsigned int v=0; v != this->n_vars(s); ++v)
+      for (unsigned int c=0; c != this->n_comp(s,v); ++c)
+        out << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
 
   return out.str();
 }
