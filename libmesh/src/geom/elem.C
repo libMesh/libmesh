@@ -1844,8 +1844,7 @@ std::string Elem::get_info () const
       << "   n_nodes()=" << this->n_nodes()                        << '\n';
 
   for (unsigned int n=0; n != this->n_nodes(); ++n)
-    out << "    node(" << n << ")=" << this->node(n)
-        << ", " << this->point(n)           << '\n';
+    out << "    " << n << *this->get_node(n);
 
   out << "   n_sides()=" << this->n_sides()                        << '\n';
 
@@ -1882,6 +1881,13 @@ std::string Elem::get_info () const
         out << "   origin()=" << this->origin()    << '\n'
 #endif
       ;
+
+  out << "   DoFs=";
+  for (unsigned int s=0; s != this->n_systems(); ++s)
+    for (unsigned int v=0; v != this->n_vars(s); ++v)
+      for (unsigned int c=0; c != this->n_comp(s,v); ++c)
+        out << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
+
 
   return out.str();
 }
