@@ -155,6 +155,11 @@ public:
    * Stores the current nonlinear iteration number
    */
   unsigned _current_nonlinear_iteration_number;
+
+ private:
+#if !PETSC_VERSION_LESS_THAN(3,3,0)
+  void buildMatNullSpace(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject, void (*)(std::vector<NumericVector<Number>*>&, sys_type&), MatNullSpace*);
+#endif
 };
 
 
