@@ -173,11 +173,41 @@ public:
   void (* bounds) (NumericVector<Number>& XL,
 		   NumericVector<Number>& XU,
 		   sys_type& S);
-
   /**
    * Object that computes the bounds vectors  \f$ XL \f$ and \f$ XU \f$.
    */
   NonlinearImplicitSystem::ComputeBounds *bounds_object;
+
+  /**
+   * Function that computes a basis for the Jacobian's nullspace -- 
+   * the kernel or the "zero energy modes" -- that can be used in 
+   * solving a degenerate problem iteratively, if the solver supports it
+   * (e.g., PETSc's KSP).
+   */
+  void (* nullspace) (std::vector<NumericVector<Number>*>& sp, sys_type& S);
+
+  /**
+   * A callable object that computes a basis for the Jacobian's nullspace -- 
+   * the kernel or the "zero energy modes" -- that can be used in 
+   * solving a degenerate problem iteratively, if the solver supports it
+   * (e.g., PETSc's KSP).
+   */
+  NonlinearImplicitSystem::ComputeVectorSubspace *nullspace_object;
+
+  /**
+   * Function that computes a basis for the Jacobian's near nullspace -- 
+   * the set of "low energy modes" -- that can be used for AMG coarsening,
+   * if the solver supports it (e.g., ML, PETSc's GAMG).
+   */
+  void (* nearnullspace) (std::vector<NumericVector<Number>*>& sp, sys_type& S);
+
+  /**
+   * A callable object that computes a basis for the Jacobian's near nullspace -- 
+   * the set of "low energy modes" -- that can be used for AMG coarsening,
+   * if the solver supports it (e.g., ML, PETSc's GAMG).
+   */
+  NonlinearImplicitSystem::ComputeVectorSubspace *nearnullspace_object;
+
 
   void (* user_presolve)(sys_type& S);
 
