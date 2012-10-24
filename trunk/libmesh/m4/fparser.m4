@@ -1,7 +1,7 @@
 # -------------------------------------------------------------
 # fparser
 # -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_FPARSER], 
+AC_DEFUN([CONFIGURE_FPARSER],
 [
   AC_ARG_ENABLE(fparser,
                 AC_HELP_STRING([--enable-fparser],
@@ -9,7 +9,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
 		[case "${enableval}" in
 		  yes)  enablefparser=yes ;;
 		   no)  enablefparser=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser) ;;
+		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser) ;;
 		 esac],
 		 [enablefparser=$enableoptional])
 
@@ -19,7 +19,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
 		[case "${enableval}" in
 		  yes)  enablefparseroptimizer=yes ;;
 		   no)  enablefparseroptimizer=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-optimizer) ;;
+		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-optimizer) ;;
 		 esac],
 		 [enablefparseroptimizer=yes])
 
@@ -32,12 +32,12 @@ AC_DEFUN([CONFIGURE_FPARSER],
 
     # note - fparser optimization currently fails on OSX, to disable it regardless
     case "${host_os}" in
-      *darwin* | *cygwin*) 
-        enablefparseroptimizer=no 
+      *darwin* | *cygwin*)
+        enablefparseroptimizer=no
         AC_MSG_RESULT(<<< Disabling fparser optimization on ${host_os} >>>)
         ;;
         *) ;;
-    esac	
+    esac
 
      FPARSER_INCLUDE="-I\$(top_srcdir)/contrib/fparser"
      FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
@@ -46,7 +46,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
        AC_MSG_RESULT(<<< Configuring library with fparser support (with optimizer) >>>)
      else
        AC_MSG_RESULT(<<< Configuring library with fparser support (without optimizer) >>>)
-     fi	
+     fi
   else
      FPARSER_INCLUDE=""
      FPARSER_LIBRARY=""
@@ -54,9 +54,9 @@ AC_DEFUN([CONFIGURE_FPARSER],
   fi
 
   AC_SUBST(FPARSER_INCLUDE)
-  AC_SUBST(FPARSER_LIBRARY)	
+  AC_SUBST(FPARSER_LIBRARY)
   AC_SUBST(enablefparser)
-		 		 
+
   AM_CONDITIONAL(FPARSER_NO_SUPPORT_OPTIMIZER, test x$enablefparseroptimizer = xno)
   AM_CONDITIONAL(FPARSER_SUPPORT_OPTIMIZER,    test x$enablefparseroptimizer = xyes)
 ])

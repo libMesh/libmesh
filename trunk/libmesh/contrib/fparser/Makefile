@@ -17,6 +17,9 @@ ifeq ($(enable-fparser),no)
 	@echo "<<< $(pkgname) is disabled, not building >>>"
 else
   all:: $(target)
+endif
+
+ifeq ($(enable-fparser-devel),yes)
   extra:: examples/example examples/example2 ftest functioninfo powi_speedtest speedtest testbed
 endif
 
@@ -95,6 +98,7 @@ endif
 
 fp_CPPFLAGS += -I.
 
+ifeq ($(enable-fparser-devel),yes)
 SRC = 	fparser.cc \
 		fpoptimizer/grammar_data.cc \
 		fpoptimizer/optimize_main.cc \
@@ -116,13 +120,19 @@ SRC = 	fparser.cc \
 		fpoptimizer/debug.cc \
 		fpoptimizer/hash.cc \
 		$(ADDITIONAL_SRCS)
+else
+SRC = 	fparser.cc
+endif
+
 
 OBJS   	:= $(patsubst %.cc, %.$(obj-suffix), $(SRC))
 
 testbed: testbed.$(obj-suffix) $(target)
 	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(BOOST_THREAD_LIB) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
 
-fpoptimizer.$(obj-suffix): fpoptimizer.cc
+fpoptimizer.$(obj-suffix): fpoptimizer.cc extrasrc/fp_opcode_add.inc
+
+fparser.$(obj-suffix): extrasrc/fp_opcode_add.inc
 
 speedtest: util/speedtest.$(obj-suffix) $(target)
 	$(libmesh_CXX) -o $@ $< $(fp_LDFLAGS) $(libmesh_RPATHFLAG)$(EXTERNAL_LIBDIR) -L$(EXTERNAL_LIBDIR) -lfparser
@@ -148,6 +158,7 @@ fpoptimizer/grammar_data.cc: \
 	@echo "Parsing Grammar (in "$(mode)" mode) "$<"..."
 	@util/tree_grammar_parser < fpoptimizer/treerules.dat > $@
 
+ifeq ($(enable-fparser-devel),yes)
 extrasrc/fp_opcode_add.inc: \
 		util/bytecoderules_parser \
 		util/bytecoderules.dat \
@@ -159,6 +170,12 @@ extrasrc/fp_opcode_add.inc: \
 		< util/bytecoderules.dat \
 		| util/cpp_compress \
 		>> $@
+else
+extrasrc/fp_opcode_add.inc: 
+	@cp extrasrc/fp_opcode_add.inc.release extrasrc/fp_opcode_add.inc
+
+fparser.$(obj-suffix): extrasrc/fp_opcode_add.inc
+endif
 
 fpoptimizer/bytecodesynth.$(obj-suffix): extrasrc/fp_opcode_add.inc
 
@@ -369,7 +386,6 @@ TESTBED_TEST_FILES = $(wildcard tests/*/*)
 testbed_tests.inc: $(TESTBED_TEST_FILES)
 
 .dep:
-	@touch extrasrc/fp_opcode_add.inc
 	@$(perl) ../bin/make_dependencies.pl $(foreach i, $(wildcard */) ., -I./$(i)) "-S\$$(obj-suffix)" $(wildcard *.cc) $(wildcard examples/*.cc) $(wildcard fpoptimizer/*.cc) $(wildcard tests/*.cc) $(wildcard util/*.cc) $(wildcard mpfr/*.cc) > .dep
 
 -include .dep

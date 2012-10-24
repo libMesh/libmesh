@@ -96,6 +96,7 @@ enable-optional      = @enableoptional@
 enable-eigen         = @enableeigen@
 enable-exodus	     = @enableexodus@
 enable-fparser       = @enablefparser@
+enable-fparser-devel = @enablefparserdevel@
 enable-glpk          = @enableglpk@
 enable-gmv           = @enablegmv@
 enable-gzstream      = @enablegz@
