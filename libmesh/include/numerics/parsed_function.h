@@ -3,19 +3,19 @@
 #define __parsed_function_h__
 
 #include "libmesh/libmesh_config.h"
+#include "libmesh/function_base.h"
 
 #ifdef LIBMESH_HAVE_FPARSER
 
 // Local includes
 #include "libmesh/dense_vector.h"
-#include "libmesh/function_base.h"
 #include "libmesh/point.h"
 
 // FParser includes
 #include "fparser.hh"
 
 // C++ includes
-#include <algorithm> // std::find 
+#include <algorithm> // std::find
 #include <cmath>
 #include <cstddef>
 #include <string>
@@ -238,7 +238,7 @@ public:
 
   virtual void init() {}
   virtual void clear() {}
-  virtual Output & getVarAddress() { return _dummy; }
+  virtual Output & getVarAddress(const std::string & /*variable_name*/) { return _dummy; }
   virtual AutoPtr<FunctionBase<Output> > clone() const {
     return AutoPtr<FunctionBase<Output> >
       (new ParsedFunction<Output>(""));
