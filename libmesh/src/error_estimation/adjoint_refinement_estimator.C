@@ -66,7 +66,7 @@ namespace libMesh
 void AdjointRefinementEstimator::estimate_error (const System& _system,
 					         ErrorVector& error_per_cell,
 					         const NumericVector<Number>* solution_vector,
-					         bool estimate_parent_error)
+					         bool /*estimate_parent_error*/)
 {
   // We have to break the rules here, because we can't refine a const System
   System& system = const_cast<System&>(_system);
