@@ -128,12 +128,12 @@ public:
   };
 
   /**
-   *   Callable abstract base class to be used as a callback to provide 
-   * the solver with a basis for the system's Jacobian's nullspace 
-   * (the kernel or the "zero energy modes") or near-nullspace 
-   * (the "low energy modes").  
-   *   A nullspace can be used to solve a degenerate problem iteratively 
-   * (e.g., with a Krylov subspace method). A near nullspace can be used 
+   *   Callable abstract base class to be used as a callback to provide
+   * the solver with a basis for the system's Jacobian's nullspace
+   * (the kernel or the "zero energy modes") or near-nullspace
+   * (the "low energy modes").
+   *   A nullspace can be used to solve a degenerate problem iteratively
+   * (e.g., with a Krylov subspace method). A near nullspace can be used
    * by an Algebraic Multigrid (AMG) preconditioner to construct smoothed-
    * aggregation-like coarse spaces.
    */

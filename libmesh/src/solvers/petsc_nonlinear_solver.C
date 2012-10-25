@@ -341,14 +341,14 @@ void PetscNonlinearSolver<T>::init ()
 
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
 template <typename T>
-void 
-PetscNonlinearSolver<T>::buildMatNullSpace(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject, void (*computeSubspace)(std::vector<NumericVector<Number>*>&, sys_type&), MatNullSpace *msp) 
+void
+PetscNonlinearSolver<T>::buildMatNullSpace(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject, void (*computeSubspace)(std::vector<NumericVector<Number>*>&, sys_type&), MatNullSpace *msp)
 {
   PetscErrorCode ierr;
   std::vector<NumericVector<Number>* > sp;
-  if(computeSubspaceObject) 
+  if(computeSubspaceObject)
     (*computeSubspaceObject)(sp, this->system());
-  else 
+  else
     (*computeSubspace)(sp, this->system());
   *msp = PETSC_NULL;
   if(sp.size()) {
@@ -378,7 +378,7 @@ PetscNonlinearSolver<T>::buildMatNullSpace(NonlinearImplicitSystem::ComputeVecto
     ierr = PetscFree2(modes,dots);CHKERRABORT(libMesh::COMM_WORLD,ierr);
   }
 }
-#endif 
+#endif
 
 template <typename T>
 std::pair<unsigned int, Real>
@@ -413,7 +413,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
    }
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
    // Only set the nullspace if we have a way of computing it.
-   if(this->nullspace || this->nullspace_object) 
+   if(this->nullspace || this->nullspace_object)
    {
      MatNullSpace msp;
      this->buildMatNullSpace(this->nullspace_object, this->nullspace, &msp);
@@ -424,7 +424,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
    }
 
    // Only set the nearnullspace if we have a way of computing it.
-   if(this->nearnullspace || this->nearnullspace_object) 
+   if(this->nearnullspace || this->nearnullspace_object)
    {
      MatNullSpace msp = PETSC_NULL;
      this->buildMatNullSpace(this->nearnullspace_object, this->nearnullspace, &msp);
