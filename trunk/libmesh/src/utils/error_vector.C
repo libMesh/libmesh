@@ -31,6 +31,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/gmv_io.h"
 #include "libmesh/tecplot_io.h"
+#include "libmesh/exodusII_io.h"
 
 namespace libMesh
 {
@@ -222,7 +223,7 @@ void ErrorVector::plot_error(const std::string& filename,
   EquationSystems temp_es (mesh);
   ExplicitSystem& error_system
     = temp_es.add_system<ExplicitSystem> ("Error");
-  error_system.add_variable("e", CONSTANT, MONOMIAL);
+  error_system.add_variable("error", CONSTANT, MONOMIAL);
   temp_es.init();
 
   const DofMap& error_dof_map = error_system.get_dof_map();
@@ -249,7 +250,6 @@ void ErrorVector::plot_error(const std::string& filename,
 //    libmesh_assert_greater ((*this)[elem_id], 0.);
     error_system.solution->set(solution_index, (*this)[elem_id]);
   }
-
   if (filename.rfind(".gmv") < filename.size())
     {
 //      GMVIO(mesh).write_equation_systems(filename,
@@ -264,11 +264,20 @@ void ErrorVector::plot_error(const std::string& filename,
       TecplotIO (mesh).write_equation_systems
         (filename, temp_es);
     }
+#ifdef LIBMESH_HAVE_EXODUS_API
+  else if( (filename.rfind(".exo") < filename.size()) ||
+	   (filename.rfind(".e") < filename.size()) )
+    {
+      ExodusII_IO io(mesh);
+      io.write(filename);
+      io.write_element_data(temp_es);
+    }
+#endif
   else
     {
       libmesh_here();
       libMesh::err << "Warning: ErrorVector::plot_error currently only"
-                    << " supports .gmv and .plt output;" << std::endl;
+                    << " supports .gmv and .plt and .exo/.e (if enabled) output;" << std::endl;
       libMesh::err << "Could not recognize filename: " << filename
                     << std::endl;
     }
