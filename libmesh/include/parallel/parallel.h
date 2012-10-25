@@ -3980,6 +3980,7 @@ namespace Parallel
                                         Context2*,
                                         OutputIter out,
 		                        const MessageTag &,
+		                        const MessageTag &,
                                         const Communicator&)
   { libmesh_error(); }
 
