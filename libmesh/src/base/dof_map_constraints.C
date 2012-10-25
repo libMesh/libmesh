@@ -2544,7 +2544,11 @@ void DofMap::process_constraints (MeshBase& mesh)
 }
 
 
-void DofMap::scatter_constraints(MeshBase& /*mesh*/)
+void DofMap::scatter_constraints(MeshBase&
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+    mesh
+#endif
+  )
 {
   // At this point each processor with a constrained node knows
   // the corresponding constraint row, but we also need each processor
