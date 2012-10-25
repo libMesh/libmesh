@@ -74,6 +74,9 @@ class UnstructuredMesh : public MeshBase
    * In order to read the UNV and TetGen file types, you must
    * also pass a separate pointer to the MeshData object you will
    * use with this mesh, since these read methods expect it.
+   *
+   * The skip_renumber_nodes_and_elements argument is now deprecated -
+   * to disallow renumbering, set \p MeshBase::allow_renumbering(false)
    */
   void read (const std::string& name,
 	     MeshData* mesh_data=NULL,
