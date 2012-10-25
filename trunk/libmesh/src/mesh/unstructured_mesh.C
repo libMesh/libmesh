@@ -173,8 +173,11 @@ void UnstructuredMesh::copy_nodes_and_elements
     }
   }
 
-  //Finally prepare the Mesh for use
-  this->prepare_for_use(/*skip_renumber =*/true);
+  //Finally prepare the new Mesh for use.  Keep the same numbering but
+  //also the same renumbering policy as our source mesh.
+  this->allow_renumbering(false);
+  this->prepare_for_use();
+  this->allow_renumbering(other_mesh.allow_renumbering());
 }
 
 
@@ -691,10 +694,15 @@ void UnstructuredMesh::read (const std::string& name,
       MeshCommunication().broadcast (*this);
     }
 
+  if (skip_renumber_nodes_and_elements)
+    {
+      // Use MeshBase::allow_renumbering() yourself instead.
+      libmesh_deprecated();
+      this->allow_renumbering(false);
+    }
 
   // Done reading the mesh.  Now prepare it for use.
-  this->prepare_for_use(skip_renumber_nodes_and_elements);
-
+  this->prepare_for_use();
 }
 
 
