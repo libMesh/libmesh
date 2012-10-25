@@ -158,7 +158,9 @@ public:
 
  private:
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
-  void buildMatNullSpace(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject, void (*)(std::vector<NumericVector<Number>*>&, sys_type&), MatNullSpace*);
+  void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject,
+                            void (*)(std::vector<NumericVector<Number>*>&, sys_type&),
+                            MatNullSpace*);
 #endif
 };
 
