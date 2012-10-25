@@ -342,41 +342,71 @@ void PetscNonlinearSolver<T>::init ()
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
 template <typename T>
 void
-PetscNonlinearSolver<T>::buildMatNullSpace(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject, void (*computeSubspace)(std::vector<NumericVector<Number>*>&, sys_type&), MatNullSpace *msp)
+PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace* computeSubspaceObject,
+                                              void (*computeSubspace)(std::vector<NumericVector<Number>*>&, sys_type&),
+                                              MatNullSpace *msp)
 {
   PetscErrorCode ierr;
   std::vector<NumericVector<Number>* > sp;
-  if(computeSubspaceObject)
+  if (computeSubspaceObject)
     (*computeSubspaceObject)(sp, this->system());
   else
     (*computeSubspace)(sp, this->system());
+
   *msp = PETSC_NULL;
-  if(sp.size()) {
-    Vec *modes;
-    PetscScalar *dots;
-    PetscInt nmodes = sp.size();
-    ierr = PetscMalloc2(nmodes,Vec,&modes,nmodes,PetscScalar,&dots);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    for(PetscInt i = 0; i < nmodes; ++i) {
-      PetscVector<T>* pv = libmesh_cast_ptr<PetscVector<T>*>(sp[i]);
-      Vec v = pv->vec();
-      ierr = VecDuplicate(v, modes+i);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = VecCopy(v,modes[i]);CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  if (sp.size())
+    {
+      Vec *modes;
+      PetscScalar *dots;
+      PetscInt nmodes = sp.size();
+
+      ierr = PetscMalloc2(nmodes,Vec,&modes,nmodes,PetscScalar,&dots);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      for (PetscInt i=0; i<nmodes; ++i)
+        {
+          PetscVector<T>* pv = libmesh_cast_ptr<PetscVector<T>*>(sp[i]);
+          Vec v = pv->vec();
+
+          ierr = VecDuplicate(v, modes+i);
+          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+          ierr = VecCopy(v,modes[i]);
+          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        }
+
+      // Normalize.
+      ierr = VecNormalize(modes[0],PETSC_NULL);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      for (PetscInt i=1; i<nmodes; i++)
+        {
+          // Orthonormalize vec[i] against vec[0:i-1]
+          ierr = VecMDot(modes[i],i,modes,dots);
+          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+          for (PetscInt j=0; j<i; j++)
+            dots[j] *= -1.;
+
+          ierr = VecMAXPY(modes[i],i,dots,modes);
+          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+          ierr = VecNormalize(modes[i],PETSC_NULL);
+          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        }
+
+      ierr = MatNullSpaceCreate(libMesh::COMM_WORLD, PETSC_FALSE, nmodes, modes, msp);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+      for (PetscInt i=0; i<nmodes; ++i)
+        {
+          ierr = VecDestroy(modes+i);
+          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        }
+
+      ierr = PetscFree2(modes,dots);
+      CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
-    /* Normalize. */
-    ierr = VecNormalize(modes[0],PETSC_NULL);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    for(PetscInt i=1; i<nmodes; i++) {
-      /* Orthonormalize vec[i] against vec[0:i-1] */
-      ierr = VecMDot(modes[i],i,modes,dots);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      for (PetscInt j=0; j<i; j++) dots[j] *= -1.;
-      ierr = VecMAXPY(modes[i],i,dots,modes);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-      ierr = VecNormalize(modes[i],PETSC_NULL);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
-    ierr = MatNullSpaceCreate(libMesh::COMM_WORLD, PETSC_FALSE, nmodes, modes, msp);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    for(PetscInt i = 0; i < nmodes; ++i) {
-      ierr = VecDestroy(modes+i);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-    }
-    ierr = PetscFree2(modes,dots);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  }
 }
 #endif
 
@@ -413,23 +443,31 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
    }
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
    // Only set the nullspace if we have a way of computing it.
-   if(this->nullspace || this->nullspace_object)
+   if (this->nullspace || this->nullspace_object)
    {
      MatNullSpace msp;
-     this->buildMatNullSpace(this->nullspace_object, this->nullspace, &msp);
-     if(msp) {
-       ierr = MatSetNullSpace(jac->mat(), msp);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-       ierr = MatNullSpaceDestroy(&msp);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-     }
+     this->build_mat_null_space(this->nullspace_object, this->nullspace, &msp);
+     if (msp)
+       {
+         ierr = MatSetNullSpace(jac->mat(), msp);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+         ierr = MatNullSpaceDestroy(&msp);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+       }
    }
 
    // Only set the nearnullspace if we have a way of computing it.
-   if(this->nearnullspace || this->nearnullspace_object)
+   if (this->nearnullspace || this->nearnullspace_object)
    {
      MatNullSpace msp = PETSC_NULL;
-     this->buildMatNullSpace(this->nearnullspace_object, this->nearnullspace, &msp);
-     ierr = MatSetNearNullSpace(jac->mat(), msp);CHKERRABORT(libMesh::COMM_WORLD,ierr);
-     ierr = MatNullSpaceDestroy(&msp);CHKERRABORT(libMesh::COMM_WORLD,ierr);
+     this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, &msp);
+
+     ierr = MatSetNearNullSpace(jac->mat(), msp);
+     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+     ierr = MatNullSpaceDestroy(&msp);
+     CHKERRABORT(libMesh::COMM_WORLD,ierr);
    }
 #endif
    // Have the Krylov subspace method use our good initial guess rather than 0
