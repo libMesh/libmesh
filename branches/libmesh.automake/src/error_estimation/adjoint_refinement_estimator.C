@@ -66,7 +66,7 @@ namespace libMesh
 void AdjointRefinementEstimator::estimate_error (const System& _system,
 					         ErrorVector& error_per_cell,
 					         const NumericVector<Number>* solution_vector,
-					         bool estimate_parent_error)
+					         bool /*estimate_parent_error*/)
 {
   // We have to break the rules here, because we can't refine a const System
   System& system = const_cast<System&>(_system);
@@ -367,7 +367,9 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	      // Multiply by the error weight for this QoI
               local_contribution *= error_weight;
 
-	      error_per_cell[e_id] += local_contribution;
+              // FIXME: we're throwing away information in the
+              // --enable-complex case
+	      error_per_cell[e_id] += libmesh_real(local_contribution);
 
 	    } // End loop over elements
 

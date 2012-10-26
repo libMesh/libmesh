@@ -348,7 +348,17 @@ int main(int argc, char** argv)
 
                   error_estimator.estimate_error (system, error);
                 }
-              
+
+              // Write out the error distribution
+	      OStringStream ss;
+	      ss << r_step;
+#ifdef LIBMESH_HAVE_EXODUS_API
+	      std::string error_output = "error_"+ss.str()+".e";
+#else
+	      std::string error_output = "error_"+ss.str()+".gmv";
+#endif
+              error.plot_error( error_output, mesh );
+ 
               // This takes the error in \p error and decides which elements
               // will be coarsened or refined.  Any element within 20% of the
               // maximum error on any element will be refined, and any

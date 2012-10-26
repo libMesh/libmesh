@@ -508,7 +508,7 @@ public:
   /**
    * Sends constraint equations to constraining processors
    */
-  void scatter_constraints (const MeshBase&);
+  void scatter_constraints (MeshBase&);
 
   /**
    * Postprocesses any constrained degrees of freedom

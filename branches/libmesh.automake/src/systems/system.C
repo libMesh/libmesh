@@ -288,19 +288,26 @@ void System::init_data ()
   {
     ParallelType type = _vector_types[pos->first];
 
-    if(type == GHOSTED)
-    {
+    if (type == GHOSTED)
+      {
 #ifdef LIBMESH_ENABLE_GHOSTED
-      pos->second->init (this->n_dofs(), this->n_local_dofs(),
-                         _dof_map->get_send_list(), false,
-                         GHOSTED);
+        pos->second->init (this->n_dofs(), this->n_local_dofs(),
+                           _dof_map->get_send_list(), false,
+                           GHOSTED);
 #else
-      libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
-      libmesh_error();
+        libMesh::err << "Cannot initialize ghosted vectors when they are not enabled." << std::endl;
+        libmesh_error();
 #endif
-    }
+      }
+    else if (type == SERIAL)
+      {
+        pos->second->init (this->n_dofs(), false, type);
+      }
     else
-      pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+      {
+        libmesh_assert_equal_to(type, PARALLEL);
+        pos->second->init (this->n_dofs(), this->n_local_dofs(), false, type);
+      }
   }
 }
 

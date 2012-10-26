@@ -105,18 +105,23 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
     }
 
   // Renumber the nodes and elements so that they in contiguous
-  // blocks.  By default, skip_renumber_nodes_and_elements is false,
-  // however we may skip this step by passing
-  // skip_renumber_nodes_and_elements==true to this function.
+  // blocks.  By default, _skip_renumber_nodes_and_elements is false.
+  //
+  // We may currently change that by passing
+  // skip_renumber_nodes_and_elements==true to this function, but we
+  // should use the allow_renumbering() accessor instead.
   //
   // Instances where you if prepare_for_use() should not renumber the nodes
   // and elements include reading in e.g. an xda/r or gmv file. In
   // this case, the ordering of the nodes may depend on an accompanying
   // solution, and the node ordering cannot be changed.
-  bool old_skip_renumber_value = _skip_renumber_nodes_and_elements;
-  _skip_renumber_nodes_and_elements = _skip_renumber_nodes_and_elements ||
-                                      skip_renumber_nodes_and_elements;
-  
+
+  if (skip_renumber_nodes_and_elements)
+    {
+      libmesh_deprecated();
+      this->allow_renumbering(false);
+    }
+
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
 
@@ -131,9 +136,6 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
-
-  // Restore previously requested behavior
-  _skip_renumber_nodes_and_elements = old_skip_renumber_value;
 
   // Reset our PointLocator.  This needs to happen any time the elements
   // in the underlying elements in the mesh have changed, so we do it here.
@@ -383,19 +385,24 @@ const std::string& MeshBase::subdomain_name(subdomain_id_type id) const
     return iter->second;
 }
 
+
+
+
 subdomain_id_type MeshBase::get_id_by_name(const std::string& name) const
 {
-  // This function is searching the keys of the map
-  // We might want to make this more efficient
-  std::map<subdomain_id_type, std::string>::const_iterator iter = _block_id_to_name.begin();
-  std::map<subdomain_id_type, std::string>::const_iterator end_iter = _block_id_to_name.end();
+  // This function is searching the *values* of the map (linear search)
+  // We might want to make this more efficient...
+  std::map<subdomain_id_type, std::string>::const_iterator
+    iter = _block_id_to_name.begin(),
+    end_iter = _block_id_to_name.end();
 
   for ( ; iter != end_iter; ++iter)
-  {
-    if (iter->second == name)
-      return iter->first;
-  }
-  std::cerr << "Block name does not exist in mesh";
+    {
+      if (iter->second == name)
+        return iter->first;
+    }
+
+  libMesh::err << "Block '" << name << "' does not exist in mesh" << std::endl;
   libmesh_error();
 }
 

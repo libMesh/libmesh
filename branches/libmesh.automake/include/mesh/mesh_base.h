@@ -469,14 +469,10 @@ public:
    *  2.) call \p partition()
    *  3.) call \p renumber_nodes_and_elements()
    *
-   * The read_xda_file boolean flag is true when prepare_for_use
-   * is called from Mesh::read after reading an xda file.  It prevents
-   * the renumbering of nodes and elements.  In general, leave this at
-   * the default value of false.
-   *
-   * skip_renumber is currently set to TRUE to work around an I/O bug
+   * The argument to skip renumbering is now deprecated - to prevent a
+   * mesh from being renumbered, set allow_renumbering(false).
    */
-  void prepare_for_use (const bool skip_renumber_nodes_and_elements=true);
+  void prepare_for_use (const bool skip_renumber_nodes_and_elements=false);
 
   /**
    * Call the default partitioner (currently \p metis_partition()).

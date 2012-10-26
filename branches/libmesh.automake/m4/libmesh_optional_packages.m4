@@ -399,6 +399,7 @@ if (test $enablefparser = yes); then
 fi
 AM_CONDITIONAL(LIBMESH_ENABLE_FPARSER, test x$enablefparser = xyes)
 AC_CONFIG_FILES([contrib/fparser/Makefile])
+AC_CONFIG_FILES([contrib/fparser/extrasrc/Makefile])
 # -------------------------------------------------------------
 
 

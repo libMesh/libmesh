@@ -592,7 +592,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
          CXXFLAGS_DVL="$CXXFLAGS_DVL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 
-         if test "x$APPLE_GCC" = "xtrue" ; then
+         if test `uname` = "Darwin" ; then
            CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
          else
            CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
@@ -603,7 +603,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
          CXXFLAGS_DVL="$CXXFLAGS_DVL -Woverloaded-virtual -Wdisabled-optimization"
          
-         if test "x$APPLE_GCC" = "xtrue" ; then
+         if test `uname` = "Darwin" ; then
 	   CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
 	 else    
 	   CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"	

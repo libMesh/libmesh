@@ -19,7 +19,7 @@ adaptivity_ex3_DATA    = adaptivity_ex3.C adaptivity_ex3.in lshaped.xda lshaped3
 adaptivity_ex3_SOURCES = $(adaptivity_ex3_DATA) run.sh
 adaptivity_ex3_LDADD   = $(top_builddir)/libmesh.la
 
-CLEANFILES = lshaped.e biquadratic_h_adaptive.m 
+CLEANFILES = lshaped.e biquadratic_h_adaptive.m error_*.e
 
 # need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD
