@@ -216,6 +216,9 @@ else
   SUBDIRS = extrasrc
 
   noinst_LTLIBRARIES    = libfparser.la
-  libfparser_la_SOURCES = fparser.cc fparser_gmpint.hh fparser.hh fparser_mpfr.hh fpconfig.hh fpoptimizer.cc
+  libfparser_la_SOURCES = fparser.cc fparser_gmpint.hh fparser.hh fparser_mpfr.hh fpconfig.hh
 
+if FPARSER_SUPPORT_OPTIMIZER
+  libfparser_la_SOURCES += fpoptimizer.cc
+endif
 endif
