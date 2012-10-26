@@ -949,6 +949,27 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Blocking-send string to one processor.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::basic_string<T> &buf,
+		    const MessageTag &tag=no_tag,
+                    const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send string to one processor.
+   */
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::basic_string<T> &buf,
+		    Request &req,
+		    const MessageTag &tag=no_tag,
+                    const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
    * Blocking-send vector to one processor with user-defined type.
    */
   template <typename T>
@@ -1230,6 +1251,28 @@ namespace Parallel
 	  tag,
           comm);
   }
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive string from one processor.
+   */
+  template <typename T>
+  inline Status receive (const unsigned int dest_processor_id,
+		         std::basic_string<T> &buf,
+		         const MessageTag &tag=any_tag,
+                         const Communicator &comm = Communicator_World);
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive string to one processor.
+   */
+  template <typename T>
+  inline void receive (const unsigned int dest_processor_id,
+		       std::basic_string<T> &buf,
+		       Request &req,
+		       const MessageTag &tag=any_tag,
+                       const Communicator &comm = Communicator_World);
 
 
   //-------------------------------------------------------------------
@@ -2617,6 +2660,63 @@ namespace Parallel
 
 
 
+  template<typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::basic_string<T> &buf,
+		    const MessageTag &tag,
+                    const Communicator &comm)
+  {
+    START_LOG("send()", "Parallel");
+
+    T* dataptr = buf.empty() ? NULL : const_cast<T*>(buf.data());
+
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
+      MPI_Send (dataptr,
+		buf.size(),
+		StandardType<T>(dataptr),
+		dest_processor_id,
+		tag.value(),
+		comm.get());
+
+    libmesh_assert (ierr == MPI_SUCCESS);
+
+    STOP_LOG("send()", "Parallel");
+  }
+
+
+
+  template <typename T>
+  inline void send (const unsigned int dest_processor_id,
+		    std::basic_string<T> &buf,
+		    Request &req,
+		    const MessageTag &tag,
+                    const Communicator &comm)
+  {
+    START_LOG("send()", "Parallel");
+
+    T* dataptr = buf.empty() ? NULL : const_cast<T*>(buf.data());
+
+#ifndef NDEBUG
+    // Only catch the return value when asserts are active.
+    const int ierr =
+#endif
+      MPI_Isend (dataptr,
+		 buf.size(),
+		 StandardType<T>(dataptr),
+		 dest_processor_id,
+		 tag.value(),
+		 comm.get(),
+		 req.get());
+    libmesh_assert (ierr == MPI_SUCCESS);
+
+    STOP_LOG("send()", "Parallel");
+  }
+
+
+
   template <typename T>
   inline void send (const unsigned int dest_processor_id,
 		    std::vector<T> &buf,
@@ -2711,6 +2811,53 @@ namespace Parallel
     // Non-blocking send of the buffer
     Parallel::send(dest_processor_id, *buffer, req, tag, comm);
   }
+
+
+
+  template <typename T>
+  inline Status receive (const unsigned int src_processor_id,
+		         std::basic_string<T> &buf,
+		         const MessageTag &tag,
+                         const Communicator &comm)
+  {
+    std::vector<T> tempbuf;  // Officially C++ won't let us get a
+                             // modifiable array from a string
+
+    Status status = Parallel::receive(src_processor_id, tempbuf, tag, comm);
+    buf.assign(tempbuf.begin(), tempbuf.end());
+    return status;
+  }
+
+
+
+  template <typename T>
+  inline void receive (const unsigned int src_processor_id,
+		       std::basic_string<T> &buf,
+		       Request &req,
+		       const MessageTag &tag,
+                       const Communicator &comm)
+  {
+    // Officially C++ won't let us get a modifiable array from a
+    // string, and we can't even put one on the stack for the
+    // non-blocking case.
+    std::vector<T> *tempbuf = new std::vector<T>();
+
+    // We can clear the string, but the Request::wait() will need to
+    // handle copying our temporary buffer to it
+    buf.clear();
+
+    req.add_post_wait_work
+      (new Parallel::PostWaitCopyBuffer<std::vector<T>,
+         std::back_insert_iterator<std::basic_string<T> > >
+	   (tempbuf, std::back_inserter(buf)));
+
+    // Make the Request::wait() then handle deleting the buffer
+    req.add_post_wait_work
+      (new Parallel::PostWaitDeleteBuffer<std::vector<T> >(tempbuf));
+
+    Parallel::receive(src_processor_id, tempbuf, req, tag, comm);
+  }
+
 
 
   template <typename T>
@@ -3830,6 +3977,35 @@ namespace Parallel
 
   //-------------------------------------------------------------------
   /**
+   * Blocking-send string to one processor.
+   *
+   * we do not currently support this operation on one processor without MPI.
+   */
+  template <typename T>
+  inline void send (const unsigned int,
+		    std::basic_string<T> &,
+		    const MessageTag &,
+                    const Communicator&)
+  { libmesh_error(); }
+
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-send string to one processor.
+   *
+   * we do not currently support this operation on one processor without MPI.
+   */
+  template <typename T>
+  inline void send (const unsigned int,
+		    std::basic_string<T> &,
+		    Request &,
+		    const MessageTag &,
+                    const Communicator&)
+  { libmesh_error(); }
+
+
+  //-------------------------------------------------------------------
+  /**
    * Blocking-send vector to one processor with user-defined type.
    *
    * we do not currently support this operation on one processor without MPI.
@@ -3887,6 +4063,34 @@ namespace Parallel
 		                 const MessageTag&,
                                  const Communicator&)
   { libmesh_error(); }
+
+  //-------------------------------------------------------------------
+  /**
+   * Blocking-receive string from one processor.
+   *
+   * we do not currently support this operation on one processor without MPI.
+   */
+  template <typename T>
+  inline Status receive (const unsigned int,
+		         std::basic_string<T> &,
+		         const MessageTag &,
+                         const Communicator&)
+  { libmesh_error(); return Status(); }
+
+  //-------------------------------------------------------------------
+  /**
+   * Nonblocking-receive string from one processor.
+   *
+   * we do not currently support this operation on one processor without MPI.
+   */
+  template <typename T>
+  inline void receive (const unsigned int,
+		       std::basic_string<T> &,
+		       Request &,
+		       const MessageTag &,
+                       const Communicator&)
+  { libmesh_error(); }
+
 
   //-------------------------------------------------------------------
   /**
@@ -3979,7 +4183,6 @@ namespace Parallel
 			                const unsigned int source_processor_id,
                                         Context2*,
                                         OutputIter out,
-		                        const MessageTag &,
 		                        const MessageTag &,
                                         const Communicator&)
   { libmesh_error(); }
