@@ -108,6 +108,40 @@ public:
   void reposition(const unsigned int ioff,
 		  const unsigned int n);
 
+  /**
+   * @returns the minimum element in the vector.
+   * In case of complex numbers, this returns the minimum
+   * Real part.
+   */
+  Real min () const;
+
+  /**
+   * @returns the maximum element in the vector.
+   * In case of complex numbers, this returns the maximum
+   * Real part.
+   */
+  Real max () const;
+
+  /**
+   * @returns the \f$l_1\f$-norm of the vector, i.e.
+   * the sum of the absolute values.
+   */
+  Real l1_norm () const;
+
+  /**
+   * @returns the \f$l_2\f$-norm of the vector, i.e.
+   * the square root of the sum of the
+   * squares of the elements.
+   */
+  Real l2_norm () const;
+
+  /**
+   * @returns the maximum absolute value of the
+   * elements of this vector, which is the
+   * \f$l_\infty\f$-norm of a vector.
+   */
+  Real linfty_norm () const;
+
 private:
 
 
@@ -188,6 +222,83 @@ T & DenseSubVector<T>::operator () (const unsigned int i)
   return _parent_vector (i + this->i_off());
 }
 
+template<typename T>
+inline
+Real DenseSubVector<T>::min () const
+{
+  libmesh_assert (this->size());
+  Real my_min = libmesh_real(_parent_vector (this->i_off()));
+
+  for (unsigned int i=1; i!=this->size(); i++)
+    {
+      Real current = libmesh_real(_parent_vector (i + this->i_off()));
+      my_min = (my_min < current? my_min : current);
+    }
+  return my_min;
+}
+
+
+
+template<typename T>
+inline
+Real DenseSubVector<T>::max () const
+{
+  libmesh_assert (this->size());
+  Real my_max = libmesh_real(_parent_vector (this->i_off()));
+
+  for (unsigned int i=1; i!=this->size(); i++)
+    {
+      Real current = libmesh_real(_parent_vector (i + this->i_off()));
+      my_max = (my_max > current? my_max : current);
+    }
+  return my_max;
+}
+
+
+
+template<typename T>
+inline
+Real DenseSubVector<T>::l1_norm () const
+{
+  Real my_norm = 0.;
+  for (unsigned int i=0; i!=this->size(); i++)
+    {
+      my_norm += std::abs(_parent_vector (i + this->i_off()));
+    }
+  return my_norm;
+}
+
+
+
+template<typename T>
+inline
+Real DenseSubVector<T>::l2_norm () const
+{
+  Real my_norm = 0.;
+  for (unsigned int i=0; i!=this->size(); i++)
+    {
+      my_norm += TensorTools::norm_sq(_parent_vector (i + this->i_off()));
+    }
+  return sqrt(my_norm);
+}
+
+
+
+template<typename T>
+inline
+Real DenseSubVector<T>::linfty_norm () const
+{
+  if (!this->size())
+    return 0.;
+  Real my_norm = TensorTools::norm_sq(_parent_vector (this->i_off()));
+
+  for (unsigned int i=1; i!=this->size(); i++)
+    {
+      Real current = TensorTools::norm_sq(_parent_vector (i + this->i_off()));
+      my_norm = (my_norm > current? my_norm : current);
+    }
+  return sqrt(my_norm);
+}
 
 } // namespace libMesh
 
