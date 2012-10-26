@@ -73,6 +73,12 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'eigen............................ : $enableeigen
   echo '  'exodus........................... : $enableexodus
   echo '  'fparser.......................... : $enablefparser
+  if (test "x$enablefparser" = "xyes" -a "x$enablefparserdevel" = "xno"); then
+  echo '     'build from version............ : release
+  fi
+  if (test "x$enablefparser" = "xyes" -a "x$enablefparserdevel" = "xyes"); then
+  echo '     'build from version............ : devel
+  fi
   echo '  'glpk............................. : $enableglpk
   echo '  'gmv.............................. : $enablegmv
   echo '  'gzstream......................... : $enablegz
