@@ -1196,8 +1196,10 @@ void ParallelMesh::allgather()
   const unsigned int pmax_elem_id = this->parallel_max_elem_id();
   libmesh_assert_equal_to (this->max_node_id(), pmax_node_id);
   libmesh_assert_equal_to (this->max_elem_id(), pmax_elem_id);
-  libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
-  libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
+
+  // If we've disabled renumbering we can't be sure we're contiguous
+  // libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
+  // libmesh_assert_equal_to (this->n_elem(), this->max_elem_id());
 
 // Make sure our neighbor links are all fine
   MeshTools::libmesh_assert_valid_neighbors(*this);
