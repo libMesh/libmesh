@@ -76,9 +76,9 @@ if FPARSER_DEVEL
   # the issue of 'object created both with libtool and without' that would
   # otherwise occur when we build objects directly for our temporary utility
   # programs and when constructing the final library.
-  if FPARSER_SUPPORT_OPTIMIZER
+if FPARSER_SUPPORT_OPTIMIZER
     noinst_PROGRAMS                 +=  util/tree_grammar_parser
-  endif
+endif
   util_tree_grammar_parser_CXXFLAGS  = # nothing fancy - don't use our compile flags for this utility code lest it be horribly slow
   util_tree_grammar_parser_SOURCES   = \
                                    util/tree_grammar_parser.yy fpoptimizer/opcodename.cc fpoptimizer/opcodename.hh \
@@ -143,9 +143,9 @@ extrasrc/fp_opcode_add.inc: \
 
 
   # fpoptimizer/grammar_data.cc is a generated source, and this rule specifies how we build it.
-  if FPARSER_SUPPORT_OPTIMIZER
+if FPARSER_SUPPORT_OPTIMIZER
     BUILT_SOURCES += fpoptimizer/grammar_data.cc
-  endif
+endif
 fpoptimizer/grammar_data.cc: \
 		util/tree_grammar_parser \
 		fpoptimizer/treerules.dat
@@ -203,9 +203,9 @@ fpoptimizer/grammar_data.cc: \
   noinst_LTLIBRARIES    = libfparser.la
   libfparser_la_SOURCES = fparser.cc
 
-  if FPARSER_SUPPORT_OPTIMIZER 
+if FPARSER_SUPPORT_OPTIMIZER 
     libfparser_la_SOURCES += $(FPOPTIMIZER_CC_FILES) #fpoptimizer.cc
-  endif
+endif
 
   # when doing 'make clean' we need to remove the generated sources
   CLEANFILES += extrasrc/fp_opcode_add.inc fpoptimizer/grammar_data.cc fpoptimizer.cc
