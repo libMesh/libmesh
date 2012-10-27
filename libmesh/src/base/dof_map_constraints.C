@@ -1968,11 +1968,7 @@ void DofMap::build_constraint_matrix_and_vector
 }
 
 
-void DofMap::allgather_recursive_constraints(MeshBase&
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-mesh
-#endif
-)
+void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 {
   // This function must be run on all processors at once
   parallel_only();
