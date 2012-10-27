@@ -41,7 +41,15 @@ AC_DEFUN([CONFIGURE_FPARSER],
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-optimizer) ;;
 		 esac],
 		 [enablefparseroptimizer=yes])
-		 
+  # note - fparser optimization currently fails on OSX, to disable it regardless	
+  case "${host_os}" in	
+    *darwin* | *cygwin*) 	
+      enablefparseroptimizer=no 	
+      AC_MSG_RESULT(>>> Disabling fparser optimization on ${host_os} <<<)	
+      ;;	
+      *) ;;	
+    esac
+			 
   # The FPARSER API is distributed with libmesh, so we don't have to guess
   # where it might be installed...
   if (test $enablefparser = yes); then
