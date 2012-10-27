@@ -279,7 +279,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // Create an vector with active element errors and ids,
   // sorted by highest errors first
-  const unsigned int n_elem = _mesh.n_elem();
+  const unsigned int max_elem_id = _mesh.max_elem_id();
   std::vector<std::pair<float, unsigned int> > sorted_error;
 
   sorted_error.reserve (n_active_elem);
@@ -287,7 +287,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   // On a ParallelMesh, we need to communicate to know which remote ids
   // correspond to active elements.
   {
-    std::vector<bool> is_active(n_elem, false);
+    std::vector<bool> is_active(max_elem_id, false);
 
     MeshBase::element_iterator       elem_it  = _mesh.active_local_elements_begin();
     const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
@@ -371,7 +371,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   // correspond to refinable elements
   unsigned int successful_refine_count = 0;
   {
-    std::vector<bool> is_refinable(n_elem, false);
+    std::vector<bool> is_refinable(max_elem_id, false);
 
     for (unsigned int i=0; i != sorted_error.size(); ++i)
       {
