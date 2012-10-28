@@ -577,10 +577,21 @@ public:
   bool is_constrained_node (const Node* node) const;
 
   /**
-   * Prints the whole \p _dof_constraints and \p
-   * _node_constraints data structures.
+   * Prints (from processor 0) all DoF and Node constraints.  If \p
+   * print_nonlocal is true, then each constraint is printed once for
+   * each processor that knows about it, which may be useful for \p
+   * ParallelMesh debugging.
    */
-  void print_dof_constraints(std::ostream& os=libMesh::out) const;
+  void print_dof_constraints(std::ostream& os=libMesh::out,
+                             bool print_nonlocal=false) const;
+
+  /**
+   * Gets a string reporting all DoF and Node constraints local to
+   * this processor.  If \p print_nonlocal is true, then nonlocal
+   * constraints which are locally known are included.
+   */
+  std::string get_local_constraints(bool print_nonlocal=false) const;
+
 
   /**
    * Tests the constrained degrees of freedom on the numeric vector \p v, which
