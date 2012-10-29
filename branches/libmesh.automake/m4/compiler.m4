@@ -588,7 +588,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       # 
       # Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       #        when dealing with C APIs that take void* pointers.
-      gcc4.4 | gcc4.5 | gcc4.6 | gcc4.7 | gcc4.8)
+      gcc4.4 | gcc4.5 | gcc4.6)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
          CXXFLAGS_DVL="$CXXFLAGS_DVL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 
