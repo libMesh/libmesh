@@ -17,15 +17,15 @@ AC_DEFUN([CONFIGURE_FPARSER],
 	       AC_HELP_STRING([--with-fparser=<release|none|devel>],
                               [Determine which version of the C++ function parser to use]),
 	      [case "${withval}" in
-		  release)  enablefparserdevel=no  ; enablefparser=yes ;;
-		    devel)  enablefparserdevel=yes ; enablefparser=yes ;;
-		     none)  enablefparserdevel=no  ; enablefparser=no ;;
+		  release)  enablefparserdevel=no  ;;
+		    devel)  enablefparserdevel=yes ;;
+		     none)  enablefparser=no ;;
  		    *)  AC_MSG_ERROR(bad value ${withval} for --with-fparser) ;;
 		 esac],
-	      [fparser_value=release])
+	      [enablefparserdevel=no])
 
 	      
-  if (test $enablefparser = yes); then
+  if (test x$enablefparser = xyes); then
   
     
     AC_ARG_ENABLE(fparser-optimizer,
