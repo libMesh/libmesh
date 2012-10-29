@@ -174,11 +174,13 @@ std::string PerfLog::get_info_header() const
       osrel_stream   << "| OS Release:     " << sysInfo.release        ;
       osver_stream   << "| OS Version:     " << sysInfo.version        ;
       machine_stream << "| Machine:        " << sysInfo.machine        ;
+      user_stream    << "| Username:       ";
 #ifdef LIBMESH_HAVE_GETPWUID
-      user_stream    << "| Username:       " << p->pw_name             ;
-#else
-      user_stream    << "| Username:       " << "Unknown"              ;
+      if (p && p->pw_name)
+        user_stream  << p->pw_name;
+      else
 #endif
+        user_stream  << "Unknown";
       config_stream  << "| Configuration:  " << LIBMESH_CONFIGURE_INFO;
 
       // Find the longest string, use that to set the line length for formatting.
