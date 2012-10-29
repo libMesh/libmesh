@@ -17,6 +17,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// C++ includes
+#include <ctime>
+#include <cmath>
+
 // rbOOmit includes
 #include "libmesh/rb_construction_base.h"
 
@@ -29,9 +33,6 @@
 // Includes for template instantiation
 #include "libmesh/condensed_eigen_system.h"
 #include "libmesh/linear_implicit_system.h"
-
-// C++ includes
-#include <ctime>
 
 namespace libMesh
 {
@@ -530,7 +531,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::m
   if(num_params == 2)
   {
     // First make sure n_training_samples_in is a square number
-    unsigned int n_training_parameters_per_var = static_cast<unsigned int>( std::sqrt(n_training_samples_in) );
+    unsigned int n_training_parameters_per_var = static_cast<unsigned int>( std::sqrt(static_cast<Real>(n_training_samples_in)) );
     if( (n_training_parameters_per_var*n_training_parameters_per_var) != n_training_samples_in)
     {
       libMesh::out << "Error: Number of training parameters = " << n_training_samples_in << "." << std::endl
