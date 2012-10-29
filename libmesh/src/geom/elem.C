@@ -20,6 +20,8 @@
 // C++ includes
 #include <algorithm> // for std::sort
 #include <iterator>  // for std::ostream_iterator
+#include <sstream>
+
 
 // Local includes
 #include "libmesh/elem.h"
