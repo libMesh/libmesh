@@ -19,6 +19,7 @@
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 
 // Local includes
 #include "libmesh/postscript_io.h"
