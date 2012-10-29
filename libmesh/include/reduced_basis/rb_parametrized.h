@@ -135,6 +135,11 @@ public:
   void read_parameter_ranges_from_file(const std::string& file_name,
                                        const bool read_binary);
 
+  /**
+   * Public boolean to toggle verbose mode.
+   */
+  bool verbose_mode;
+
 private:
 
   /**
