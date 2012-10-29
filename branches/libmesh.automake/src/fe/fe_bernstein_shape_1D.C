@@ -21,6 +21,8 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
+#include <cmath>
+
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/utility.h"

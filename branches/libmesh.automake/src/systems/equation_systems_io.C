@@ -22,6 +22,7 @@
 
 // C++ Includes
 #include <cstdio> // for std::sprintf
+#include <sstream>
 
 // Local Includes
 #include "libmesh/equation_systems.h"

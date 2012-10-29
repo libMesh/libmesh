@@ -17,6 +17,8 @@
 
 
 
+// C++ includes
+#include <sstream>
 
 // Local includes
 #include "libmesh/node.h"

@@ -35,6 +35,7 @@ namespace libMesh
 
 RBParametrized::RBParametrized()
   :
+  verbose_mode(false),
   parameters_initialized(false)
 {
   libmesh_experimental();
@@ -319,7 +320,7 @@ bool RBParametrized::valid_params(const RBParameters& params)
                          (params.get_value(param_name) <= get_parameter_max(param_name)) );
     }
     
-    if(!valid)
+    if(!valid && verbose_mode)
     {
       libMesh::out << "Warning: parameter is outside parameter range" << std::endl;      
     }
