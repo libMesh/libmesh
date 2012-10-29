@@ -20,9 +20,6 @@ AC_DEFUN([CONFIGURE_FPARSER],
   elif test "$fparser_value" == devel; then
     enablefparser="yes"
     enablefparserdevel="yes"
-    AC_PROG_MKDIR_P
-    AC_PROG_SED
-    AC_PROG_YACC
 
   else
     enablefparser="yes"
@@ -41,6 +38,7 @@ AC_DEFUN([CONFIGURE_FPARSER],
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-fparser-optimizer) ;;
 		 esac],
 		 [enablefparseroptimizer=yes])
+
   # note - fparser optimization currently fails on OSX, to disable it regardless	
   case "${host_os}" in	
     *darwin* | *cygwin*) 	
@@ -53,6 +51,11 @@ AC_DEFUN([CONFIGURE_FPARSER],
   # The FPARSER API is distributed with libmesh, so we don't have to guess
   # where it might be installed...
   if (test $enablefparser = yes); then
+
+     AC_PROG_MKDIR_P
+     AC_PROG_SED
+     AC_PROG_YACC
+
      FPARSER_INCLUDE="-I\$(top_srcdir)/contrib/fparser"
      FPARSER_LIBRARY="\$(EXTERNAL_LIBDIR)/libfparser\$(libext)"
      AC_DEFINE(HAVE_FPARSER, 1, [Flag indicating whether the library will be compiled with FPARSER support])

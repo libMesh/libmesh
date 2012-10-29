@@ -8,7 +8,7 @@ EXTRA_DIST = fp_opcode_add.inc.release
 if FPARSER_RELEASE
     # handle linking source files
     BUILT_SOURCES  = fp_opcode_add.inc
-    DISTCLEANFILES = $(BUILT_SOURCES)
+    CLEANFILES = $(BUILT_SOURCES)
 
 fp_opcode_add.inc: $(srcdir)/fp_opcode_add.inc.release
 	$(AM_V_GEN)$(LN_S) $< $@
