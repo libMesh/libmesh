@@ -257,7 +257,7 @@ static void EstimEigenvals(QMatrix *A, PrecondProcType PrecondProc, _LPDouble Om
 	    if (Q_GetSymmetry(A)) {
 	        LambdaMin = (1.0 - j * EigenvalEps) * LambdaMin;
 	    } else {
-	        LambdaMin = (1.0 - sqrt(j) * EigenvalEps) * sqrt(LambdaMin);
+	      LambdaMin = (1.0 - sqrt((_LPDouble) j) * EigenvalEps) * sqrt(LambdaMin);
             }
             if (Alpha != NULL)
                 free(Alpha);
