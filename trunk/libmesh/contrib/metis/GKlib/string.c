@@ -13,6 +13,9 @@ of standard functions (but with enhanced functionality).
 */
 /************************************************************************/
 
+#define _XOPEN_SOURCE 
+#include <stddef.h>
+#include <time.h>
 #include <GKlib.h>
 
 
