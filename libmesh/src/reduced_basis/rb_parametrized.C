@@ -35,8 +35,8 @@ namespace libMesh
 
 RBParametrized::RBParametrized()
   :
-  parameters_initialized(false),
-  verbose_mode(false)
+  verbose_mode(false),
+  parameters_initialized(false)
 {
   libmesh_experimental();
   
