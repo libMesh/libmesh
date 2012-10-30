@@ -18,6 +18,8 @@
 // C++ Includes -------------------------------------
 #include <set>
 #include <algorithm> // for std::count, std::fill
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath>
 
 // Local Includes -----------------------------------
 #include "libmesh/boundary_info.h" // needed for dirichlet constraints

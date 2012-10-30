@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <algorithm> // for std::fill
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>     // for std::sqrt std::pow std::abs
 
 

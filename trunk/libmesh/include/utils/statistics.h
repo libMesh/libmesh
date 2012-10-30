@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <vector>
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 
 namespace libMesh
