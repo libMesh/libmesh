@@ -27,6 +27,7 @@
 // C++ include files that we need
 #include <iostream>
 #include <algorithm>
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 
 // Basic include file needed for the mesh functionality.
