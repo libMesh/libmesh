@@ -21,6 +21,7 @@
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 
 #include "libmesh/fe.h"
