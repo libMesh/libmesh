@@ -329,7 +329,7 @@ Real UNVIO::D_to_e (std::string& number) const
   const std::string::size_type position = number.find("D",6);
 #endif
 
-  libmesh_assert_not_equal_to (position, std::string::npos);
+  libmesh_assert (position != std::string::npos);
   number.replace(position, 1, "e");
 
   return std::atof (number.c_str());
