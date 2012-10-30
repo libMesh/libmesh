@@ -453,21 +453,68 @@ public:
   /**
    * Accessor for element interior quadrature rule.
    */
-  const QBase* get_element_qrule()
+  const QBase* get_element_qrule() const
   { return this->element_qrule; }
 
   /**
    * Accessor for element side quadrature rule.
    */
-  const QBase* get_side_qrule()
+  const QBase* get_side_qrule() const
   { return this->side_qrule; }
 
   /**
    * Accessor for element edge quadrature rule.
    */
-  const QBase* get_edge_qrule()
+  const QBase* get_edge_qrule() const
   { return this->edge_qrule; }
   
+  /**
+   * Accessor for moving mesh System
+   */
+  const System& get_mesh_system() const
+  { return *(this->_mesh_sys); }
+
+  /**
+   * Accessor for x-variable of moving mesh System
+   */
+  unsigned int get_mesh_sys_x_var() const
+  { return _mesh_x_var; }
+
+  /**
+   * Accessor for y-variable of moving mesh System
+   */
+  unsigned int get_mesh_sys_y_var() const
+  { return _mesh_y_var; }
+
+  /**
+   * Accessor for z-variable of moving mesh System
+   */
+  unsigned int get_mesh_sys_z_var() const
+  { return _mesh_z_var; }
+
+  /**
+   * Accessor for current Elem object
+   */
+  const Elem& get_elem() const
+  { return *elem; }
+
+  /**
+   * Accessor for current side of Elem object
+   */
+  unsigned char get_side() const
+  { return side; }
+
+  /**
+   * Accessor for current edge of Elem object
+   */
+  unsigned char get_edge() const
+  { return edge; }
+
+  /**
+   * Accessor for cached element dimension
+   */
+  unsigned char get_dim() const
+  { return dim; }
 
 // should be protected?:
   /**
