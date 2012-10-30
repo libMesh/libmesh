@@ -47,7 +47,6 @@ SparseMatrix<T>::SparseMatrix () :
 
 // Destructor
 template <typename T>
-inline
 SparseMatrix<T>::~SparseMatrix ()
 {}
 
