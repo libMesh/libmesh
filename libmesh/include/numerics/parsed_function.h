@@ -17,6 +17,7 @@
 // C++ includes
 #include <algorithm> // std::find
 #include <cmath>
+#include <cmath>
 #include <cstddef>
 #include <string>
 

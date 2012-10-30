@@ -20,6 +20,7 @@
 #include "libmesh/libmesh_common.h"
 
 // C++ includes
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath> // for std::abs
 #include <limits> // std::numeric_limits<T>::min()
 

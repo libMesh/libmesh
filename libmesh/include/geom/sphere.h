@@ -25,6 +25,7 @@
 #include "libmesh/libmesh.h"
 
 // C++ includes
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 
 namespace libMesh
