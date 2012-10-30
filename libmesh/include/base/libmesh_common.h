@@ -88,6 +88,12 @@ namespace std {
   { return (a>b?a:b); }
   inline long double min(float a, long double b)
   { return (a<b?a:b); }
+
+#if defined (__SUNPRO_CC) || defined(__PGI)
+  inline double abs(double a)
+  { return ::fabs(a); }
+  
+#endif
 }
 
 namespace libMesh
@@ -408,5 +414,6 @@ template<class T> inline void libmesh_ignore( const T& ) { }
 #define LIBMESH_VERSION(major,minor,patch) (((major) << 16) | ((minor) << 8) | ((patch) & 0xFF))
 
 } // namespace libMesh
+
 
 #endif // #define __libmesh_common_h__

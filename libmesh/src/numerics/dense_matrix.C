@@ -17,6 +17,7 @@
 
 
 // C++ Includes
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath> // for sqrt
 
 // Local Includes

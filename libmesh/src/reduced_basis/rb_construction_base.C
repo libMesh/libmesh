@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <ctime>
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 
 // rbOOmit includes
