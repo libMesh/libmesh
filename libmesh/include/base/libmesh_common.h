@@ -89,19 +89,24 @@ namespace std {
   inline long double min(float a, long double b)
   { return (a<b?a:b); }
 
+  // fix for std::abs() overload ambiguity
 #if defined (__SUNPRO_CC) || defined(__PGI)
   inline double abs(double a)
   { return ::fabs(a); }
-  
+
+#endif
+
+  // fix for std::pow() overload ambiguity
+#if defined (__SUNPRO_CC)
+  inline double pow(double a, int b)
+  { return std::pow(a, static_cast<double>(b)); }
 #endif
 }
 
+
+
 namespace libMesh
 {
-
-
-
-
 
 // Undefine any existing macros
 #ifdef Real

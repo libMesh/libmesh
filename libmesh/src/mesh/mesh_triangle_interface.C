@@ -20,6 +20,9 @@
 
 #ifdef LIBMESH_HAVE_TRIANGLE
 
+// C/C++ includes
+#include <sstream>
+
 #include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/face_tri3.h"
