@@ -533,7 +533,7 @@ void UnstructuredMesh::read (const std::string& name,
 	  // to the node ordering, so we better not reorder the nodes!
 	  if (xdr_io.legacy())
 	    {
-	      skip_renumber_nodes_and_elements = true;
+	      this->allow_renumbering(false);
 	      MeshCommunication().broadcast(*this);
 	    }
 
@@ -549,7 +549,7 @@ void UnstructuredMesh::read (const std::string& name,
 	  // if (!xdr_io.libhilbert_ordering())
 	  //   skip_renumber_nodes_and_elements = true;
 #else
-	  skip_renumber_nodes_and_elements = true;
+	  this->allow_renumbering(false);
 #endif
 	}
       else if (name.rfind(".nem") < name.size() ||
