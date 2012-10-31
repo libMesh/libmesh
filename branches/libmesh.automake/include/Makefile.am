@@ -5,6 +5,7 @@ SUBDIRS = libmesh
 # not be installed.  These header files may have implementation
 # details which are not required for the public interface
 noinst_HEADERS = \
+		base/libmesh_augment_std_namespace.h \
 		mesh/exodusII_io_helper.h \
 		mesh/nemesis_io_helper.h \
 		numerics/laspack_matrix.h \

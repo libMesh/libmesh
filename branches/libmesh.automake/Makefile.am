@@ -7,7 +7,7 @@ SUBDIRS = include #src
 
 AUTOMAKE_OPTIONS = foreign subdir-objects 
 ACLOCAL_AMFLAGS  = -I m4
-AM_CPPFLAGS      = $(libmesh_CPPFLAGS)
+AM_CPPFLAGS      = $(libmesh_CPPFLAGS) -DLIBMESH_IS_COMPILING_ITSELF
 AM_CFLAGS        = $(libmesh_CFLAGS)
 AM_CXXFLAGS      = $(libmesh_CXXFLAGS)
 AM_CPPFLAGS     += $(libmesh_contrib_INCLUDES) \
