@@ -27,3 +27,10 @@ CLEANFILES = 2D_hermite_adaptive.m 2D_hermite_adaptive.e
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir)
 TESTS = $(check_SCRIPTS)
+
+
+# Convenience method: 'make run'
+run:
+	LIBMESH_DIR=$(abs_top_srcdir) 	  $(srcdir)/$(check_SCRIPTS)
+
+

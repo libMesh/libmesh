@@ -32,3 +32,10 @@ CLEANFILES = out_*.gmv out_*.e gnuplot_*
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir)
 TESTS = $(check_SCRIPTS)
+
+
+# Convenience method: 'make run'
+run:
+	LIBMESH_DIR=$(abs_top_srcdir) 	  $(srcdir)/$(check_SCRIPTS)
+
+

@@ -32,3 +32,10 @@ CLEANFILES = solution_read_in.gmv solution_read_in.e saved_solution.xdr saved_so
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir)
 TESTS = $(check_SCRIPTS)
+
+
+# Convenience method: 'make run'
+run:
+	LIBMESH_DIR=$(abs_top_srcdir) 	  $(srcdir)/$(check_SCRIPTS)
+
+
