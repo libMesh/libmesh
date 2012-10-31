@@ -85,7 +85,9 @@ public:
    * write_nodal_data there would be no way to export cell centered data
    */
 
-  virtual void write_equation_systems(const std::string& fname, const EquationSystems& es);
+  virtual void write_equation_systems(const std::string& fname,
+                                      const EquationSystems& es,
+                                      const std::set<std::string>* system_names=NULL);
 
   /**
    * This method implements reading a mesh from a specified file
