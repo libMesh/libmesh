@@ -578,7 +578,9 @@ void VTKIO::read (const std::string& name)
  * This method writes out the equationsystems to a .pvtu file (VTK parallel
  * unstructured grid).
  */
-void VTKIO::write_equation_systems(const std::string& fname, const EquationSystems& es)
+void VTKIO::write_equation_systems(const std::string& fname,
+                                   const EquationSystems& es,
+                                   const std::set<std::string>*)
 {
 #ifndef LIBMESH_HAVE_VTK
 
