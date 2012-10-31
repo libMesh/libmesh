@@ -469,7 +469,9 @@ void EquationSystems::adjoint_solve (const QoISet& qoi_indices)
 
 
 
-void EquationSystems::build_variable_names (std::vector<std::string>& var_names, const FEType *type) const
+void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
+                                            const FEType *type,
+                                            const std::set<std::string>* system_names) const
 {
   libmesh_assert (this->n_systems());
 
@@ -486,6 +488,18 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
     unsigned int n_vector_vars = 0;
 
     for (; pos != end; ++pos)
+    {
+      // Check current system is listed in system_names, and skip pos if not
+      bool use_current_system = (system_names == NULL);
+      if(!use_current_system)
+      {
+        use_current_system = std::find( system_names->begin(), system_names->end(), pos->first ) != system_names->end();
+      }
+      if(!use_current_system)
+      {
+        continue;
+      }
+      
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
 	{
 	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
@@ -494,6 +508,7 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
 	  else
 	    n_scalar_vars++;
 	}
+    }
 
     // Here, we're assuming the number of vector components is the same
     // as the mesh dimension. Will break for mixed dimension meshes.
@@ -517,6 +532,17 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
 
   for (; pos != end; ++pos)
     {
+      // Check current system is listed in system_names, and skip pos if not
+      bool use_current_system = (system_names == NULL);
+      if(!use_current_system)
+      {
+        use_current_system = std::find( system_names->begin(), system_names->end(), pos->first ) != system_names->end();
+      }
+      if(!use_current_system)
+      {
+        continue;
+      }
+
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
 	{
 	  std::string var_name = pos->second->variable_name(vn);
@@ -647,7 +673,8 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
 
 
 
-void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
+void EquationSystems::build_solution_vector (std::vector<Number>& soln,
+                                             const std::set<std::string>* system_names) const
 {
   START_LOG("build_solution_vector()", "EquationSystems");
 
@@ -679,6 +706,18 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
     const const_system_iterator end = _systems.end();
 
     for (; pos != end; ++pos)
+    {
+      // Check current system is listed in system_names, and skip pos if not
+      bool use_current_system = (system_names == NULL);
+      if(!use_current_system)
+      {
+        use_current_system = std::find( system_names->begin(), system_names->end(), pos->first ) != system_names->end();
+      }
+      if(!use_current_system)
+      {
+        continue;
+      }
+      
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
 	{
 	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
@@ -687,6 +726,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 	  else
 	    n_scalar_vars++;
 	}
+    }
     // Here, we're assuming the number of vector components is the same
     // as the mesh dimension. Will break for mixed dimension meshes.
     nv = n_scalar_vars + dim*n_vector_vars;
@@ -731,6 +771,17 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln) const
 
   for (; pos != end; ++pos)
     {
+      // Check current system is listed in system_names, and skip pos if not
+      bool use_current_system = (system_names == NULL);
+      if(!use_current_system)
+      {
+        use_current_system = std::find( system_names->begin(), system_names->end(), pos->first ) != system_names->end();
+      }
+      if(!use_current_system)
+      {
+        continue;
+      }
+      
       const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
 

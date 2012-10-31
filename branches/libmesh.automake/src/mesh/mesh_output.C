@@ -30,7 +30,8 @@ template <class MT>
 void MeshOutput<MT>::
 _build_variable_names_and_solution_vector (const EquationSystems& es,
 					   std::vector<Number>& soln,
-					   std::vector<std::string>& names)
+					   std::vector<std::string>& names,
+					   const std::set<std::string>* system_names)
 {
   if(!_is_parallel_format)
   {
@@ -38,8 +39,8 @@ _build_variable_names_and_solution_vector (const EquationSystems& es,
     const_cast<EquationSystems&>(es).allgather();
   }
 
-  es.build_variable_names  (names);
-  es.build_solution_vector (soln);
+  es.build_variable_names  (names, NULL, system_names);
+  es.build_solution_vector (soln, system_names);
 }
 
 
