@@ -244,18 +244,27 @@ void ErrorVector::plot_error(const std::string& filename,
 
     //0 for the monomial basis
     const unsigned int solution_index = dof_indices[0];
+
     // libMesh::out << "elem_number=" << elem_number << std::endl;
     libmesh_assert_less (elem_id, (*this).size());
-//  We may have zero error values in special circumstances
-//    libmesh_assert_greater ((*this)[elem_id], 0.);
+
+    // We may have zero error values in special circumstances
+    // libmesh_assert_greater ((*this)[elem_id], 0.);
     error_system.solution->set(solution_index, (*this)[elem_id]);
   }
+
+  // We may have to renumber if the original numbering was not
+  // contiguous.  Since this is just a temporary mesh, that's probably
+  // fine.
+  if (mesh.max_elem_id() != mesh.n_elem() ||
+      mesh.max_node_id() != mesh.n_nodes())
+    {
+      mesh.allow_renumbering(true);
+      mesh.renumber_nodes_and_elements();
+    }
+
   if (filename.rfind(".gmv") < filename.size())
     {
-//      GMVIO(mesh).write_equation_systems(filename,
-//                                         temp_es);
-// write_discontinuous_gmv doesn't work on second order meshes??
-// [RHS]
       GMVIO(mesh).write_discontinuous_gmv(filename,
                                           temp_es, false);
     }
