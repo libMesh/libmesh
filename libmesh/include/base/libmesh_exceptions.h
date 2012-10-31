@@ -24,7 +24,7 @@
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 #include <stdexcept>
-
+#include <string>
 
 namespace libMesh {
 
