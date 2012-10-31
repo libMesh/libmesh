@@ -6,8 +6,6 @@ source $LIBMESH_DIR/examples/run_common.sh
 
 example_name=introduction_ex2
 
-echo "foo=$foo"
-
 message_running "$example_name" 
 run_example "$example_name"
 echo " "

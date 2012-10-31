@@ -31,7 +31,7 @@ TESTS = $(check_SCRIPTS)
 
 
 # Convenience method: 'make run'
-run:
-	LIBMESH_DIR=$(abs_top_srcdir) 	  $(srcdir)/$(check_SCRIPTS)
+run: $(check_PROGRAMS)
+	LIBMESH_DIR=$(abs_top_srcdir) $(srcdir)/$(check_SCRIPTS)
 
 

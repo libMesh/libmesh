@@ -81,7 +81,7 @@ int main (int argc, char** argv)
   // 2D grid on the unit square.  By default a mesh of QUAD4
   // elements will be created.  We instruct the mesh generator
   // to build a mesh of 5x5 elements.
-  MeshTools::Generation::build_square (mesh, 5, 5);
+  MeshTools::Generation::build_square (mesh, 50, 50);
 
   // Create an equation systems object. This object can
   // contain multiple systems of different 
