@@ -144,7 +144,7 @@ MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
       if (libMesh::processor_id() == 0)
 	{
           libmesh_do_once(libMesh::err <<
-            "Warning:  This MeshInput subclass only support meshes which have been serialized!"
+            "Warning:  This MeshInput subclass only supports meshes which have been serialized!"
 	    << std::endl; libmesh_here(););
         }
     }
