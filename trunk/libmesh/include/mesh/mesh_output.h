@@ -88,7 +88,8 @@ class MeshOutput
    * where the data is taken from the \p EquationSystems object.
    */
   virtual void write_equation_systems (const std::string&,
-				       const EquationSystems&);
+				       const EquationSystems&,
+				       const std::set<std::string>* system_names=NULL);
 
   /**
    * This method implements writing a mesh with nodal data to a
@@ -141,11 +142,14 @@ class MeshOutput
 
   /**
    * A helper function which allows us to fill temporary
-   * name and solution vectors with an EquationSystems object
+   * name and solution vectors with an EquationSystems object.
+   * Only generate names and solution data corresponding to
+   * systems specified in system_names.
    */
   void _build_variable_names_and_solution_vector(const EquationSystems& es,
 						 std::vector<Number>& soln,
-						 std::vector<std::string>& names);
+						 std::vector<std::string>& names,
+                                                 const std::set<std::string>* system_names=NULL);
 };
 
 
@@ -197,7 +201,8 @@ MeshOutput<MT>::~MeshOutput ()
 template <class MT>
 inline
 void MeshOutput<MT>::write_equation_systems (const std::string& fname,
-					     const EquationSystems& es)
+					     const EquationSystems& es,
+					     const std::set<std::string>* system_names)
 {
   START_LOG("write_equation_systems()", "MeshOutput");
 
@@ -210,7 +215,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
   std::vector<Number>      soln;
   std::vector<std::string> names;
 
-  this->_build_variable_names_and_solution_vector(es, soln, names);
+  this->_build_variable_names_and_solution_vector(es, soln, names, system_names);
   //es.build_variable_names  (names);
   //es.build_solution_vector (soln);
 
