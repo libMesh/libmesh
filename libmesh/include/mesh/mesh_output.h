@@ -215,6 +215,10 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
   if (mesh.max_elem_id() != mesh.n_elem() ||
       mesh.max_node_id() != mesh.n_nodes())
     {
+      // If we were allowed to renumber then we should have already
+      // been properly renumbered...
+      libmesh_assert(!mesh.allow_renumbering());
+
       libmesh_do_once(libMesh::out <<
         "Warning:  This MeshOutput subclass only supports meshes which are contiguously renumbered!" 
         << std::endl;);
