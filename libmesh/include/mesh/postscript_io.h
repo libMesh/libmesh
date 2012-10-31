@@ -28,6 +28,7 @@
 
 // C++ includes
 #include <vector>
+#include <sstream>
 
 namespace libMesh
 {
