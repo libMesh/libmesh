@@ -1,131 +1,3 @@
-Index: contrib/patches/serialized_io_refactor.patch
-===================================================================
---- contrib/patches/serialized_io_refactor.patch	(revision 6270)
-+++ contrib/patches/serialized_io_refactor.patch	(working copy)
-@@ -1,123 +0,0 @@
--Index: include/systems/system.h
--===================================================================
----- include/systems/system.h	(revision 6265)
--+++ include/systems/system.h	(working copy)
--@@ -1510,8 +1510,8 @@
--    * Reads a vector for this System.
--    * This method may safely be called on a distributed-memory mesh.
--    */
---  void read_serialized_vector (Xdr& io,
---			       NumericVector<Number> &vec);
--+  unsigned int read_serialized_vector (Xdr& io,
--+				       NumericVector<Number> &vec);
-- 
--   /**
--    * Writes an output vector to the stream \p io for a set of \p DofObjects.
--@@ -1536,8 +1536,8 @@
--    * Writes a vector for this System.
--    * This method may safely be called on a distributed-memory mesh.
--    */
---  void write_serialized_vector (Xdr& io,
---				const NumericVector<Number> &vec) const;
--+  unsigned int write_serialized_vector (Xdr& io,
--+					const NumericVector<Number> &vec) const;
-- 
--   /**
--    * Function that initializes the system.
--Index: src/systems/system_io.C
--===================================================================
----- src/systems/system_io.C	(revision 6265)
--+++ src/systems/system_io.C	(working copy)
--@@ -665,10 +665,15 @@
--   parallel_only();
--   std::string comment;
-- 
--+  PerfLog pl("IO Performance",false);
--+  pl.push("read_serialized_data");
--+  unsigned int total_read_size = 0;
--+
--   // 10.)
--   // Read the global solution vector
--   {
---    this->read_serialized_vector(io, *this->solution);
--+    total_read_size +=
--+      this->read_serialized_vector(io, *this->solution);
-- 
--     // get the comment
--     if (libMesh::processor_id() == 0)
--@@ -684,7 +689,8 @@
-- 
--       for(; pos != this->_vectors.end(); ++pos)
--         {
---	  this->read_serialized_vector(io, *pos->second);
--+	  total_read_size +=
--+	    this->read_serialized_vector(io, *pos->second);
-- 
-- 	  // get the comment
-- 	  if (libMesh::processor_id() == 0)
--@@ -692,6 +698,16 @@
-- 
-- 	}
--     }
--+
--+  const Real 
--+    dt   = pl.get_elapsed_time(),
--+    rate = total_read_size*sizeof(Number)/dt; 
--+
--+  std::cout << "Read " << total_read_size << " \"Number\" values\n"
--+	    << " Elapsed time = " << dt << '\n'
--+	    << " Rate = " <<rate/1.e6 << "(MB/sec)\n\n";
--+
--+    pl.pop("read_serialized_data");
-- }
-- 
-- 
--@@ -894,7 +910,7 @@
-- 
-- 
-- 
---void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
--+unsigned int System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
-- {
--   parallel_only();
-- 
--@@ -966,6 +982,8 @@
--   Parallel::sum (n_assigned_vals);
--   libmesh_assert_equal_to (n_assigned_vals, vector_length);
-- #endif
--+
--+  return vector_length;
-- }
-- 
-- 
--@@ -1854,7 +1872,7 @@
-- }
-- 
-- 
---void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec) const
--+unsigned int System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec) const
-- {
--   parallel_only();
-- 
--@@ -1900,6 +1918,8 @@
-- 
--   if (libMesh::processor_id() == 0)
--     libmesh_assert_equal_to (written_length, vec_length);
--+
--+  return written_length;
-- }
-- 
-- } // namespace libMesh
--Index: examples/introduction/introduction_ex2/introduction_ex2.C
--===================================================================
----- examples/introduction/introduction_ex2/introduction_ex2.C	(revision 6269)
--+++ examples/introduction/introduction_ex2/introduction_ex2.C	(working copy)
--@@ -81,7 +81,7 @@
--   // 2D grid on the unit square.  By default a mesh of QUAD4
--   // elements will be created.  We instruct the mesh generator
--   // to build a mesh of 5x5 elements.
---  MeshTools::Generation::build_square (mesh, 5, 5);
--+  MeshTools::Generation::build_square (mesh, 500, 50);
-- 
--   // Create an equation systems object. This object can
--   // contain multiple systems of different 
 Index: examples/introduction/introduction_ex2/introduction_ex2.C
 ===================================================================
 --- examples/introduction/introduction_ex2/introduction_ex2.C	(revision 6270)
@@ -150,7 +22,7 @@ Index: examples/introduction/introduction_ex2/introduction_ex2.C
    equation_systems.get_system("Complex System").add_variable("dv", SECOND, MONOMIAL);
      
    // Initialize the data structures for the equation system.
-@@ -150,22 +150,33 @@
+@@ -150,22 +150,34 @@
    if (argc > 1)
      if (argv[1][0] != '-')
        {
@@ -164,7 +36,8 @@ Index: examples/introduction/introduction_ex2/introduction_ex2.C
 +        // equation_systems.write (argv[1],   libMeshEnums::WRITE);
 +	std::cout << "Binary\n";
 +        equation_systems.write ("foo.xdr", libMeshEnums::ENCODE,
-+				(EquationSystems::WRITE_DATA |
++				(EquationSystems::WRITE_PARALLEL_FILES |
++				 EquationSystems::WRITE_DATA |
 +				 EquationSystems::WRITE_ADDITIONAL_DATA));
          
          // Clear the equation systems data structure.
@@ -235,7 +108,53 @@ Index: src/systems/system_io.C
 ===================================================================
 --- src/systems/system_io.C	(revision 6270)
 +++ src/systems/system_io.C	(working copy)
-@@ -665,10 +665,15 @@
+@@ -475,6 +475,10 @@
+    * ASCII output.  Thus this one section of code will read XDR or ASCII
+    * files with no changes.
+    */
++  PerfLog pl("IO Performance",false);
++  pl.push("read_parallel_data");
++  unsigned int total_read_size = 0;
++  
+   libmesh_assert (io.reading());
+   libmesh_assert (io.is_open());
+ 
+@@ -514,6 +518,8 @@
+   // for the ith system to disk
+   io.data(io_buffer);
+ 
++  total_read_size += io_buffer.size();
++
+   const unsigned int sys_num = this->number();
+   const unsigned int n_vars  = this->_written_var_indices.size();
+   libmesh_assert_less_equal (n_vars, this->n_vars());
+@@ -590,6 +596,8 @@
+ 	  // for the ith system to disk
+ 	  io.data(io_buffer);
+ 
++	  total_read_size += io_buffer.size();
++
+ 	  // Loop over each non-SCALAR variable and each node, and read out the value.
+           for (unsigned int data_var=0; data_var<n_vars; data_var++)
+             {
+@@ -644,6 +652,16 @@
+           pos->second->close();
+ 	}
+     }
++
++  const Real 
++    dt   = pl.get_elapsed_time(),
++    rate = total_read_size*sizeof(Number)/dt; 
++
++  std::cerr << "Read " << total_read_size << " \"Number\" values\n"
++	    << " Elapsed time = " << dt << '\n'
++	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
++
++  pl.pop("read_parallel_data");
+ }
+ 
+ 
+@@ -665,10 +683,15 @@
    parallel_only();
    std::string comment;
  
@@ -252,7 +171,7 @@ Index: src/systems/system_io.C
  
      // get the comment
      if (libMesh::processor_id() == 0)
-@@ -684,7 +689,8 @@
+@@ -684,7 +707,8 @@
  
        for(; pos != this->_vectors.end(); ++pos)
          {
@@ -262,7 +181,7 @@ Index: src/systems/system_io.C
  
  	  // get the comment
  	  if (libMesh::processor_id() == 0)
-@@ -692,6 +698,16 @@
+@@ -692,6 +716,16 @@
  
  	}
      }
@@ -279,7 +198,7 @@ Index: src/systems/system_io.C
  }
  
  
-@@ -894,7 +910,7 @@
+@@ -894,7 +928,7 @@
  
  
  
@@ -288,7 +207,7 @@ Index: src/systems/system_io.C
  {
    parallel_only();
  
-@@ -966,6 +982,8 @@
+@@ -966,6 +1000,8 @@
    Parallel::sum (n_assigned_vals);
    libmesh_assert_equal_to (n_assigned_vals, vector_length);
  #endif
@@ -297,13 +216,54 @@ Index: src/systems/system_io.C
  }
  
  
-@@ -1598,7 +1616,12 @@
+@@ -1408,6 +1444,10 @@
+    * ASCII output.  Thus this one section of code will read XDR or ASCII
+    * files with no changes.
+    */
++  PerfLog pl("IO Performance",false);
++  pl.push("write_parallel_data");
++  unsigned int total_written_size = 0;
++  
+   std::string comment;
+ 
+   libmesh_assert (io.writing());
+@@ -1504,6 +1544,8 @@
+ 
+   io.data (io_buffer, comment.c_str());
+ 
++  total_written_size += io_buffer.size();
++
+   // Only write additional vectors if wanted
+   if (write_additional_data)
+     {
+@@ -1573,8 +1615,20 @@
+ 	  }
+ 
+ 	  io.data (io_buffer, comment.c_str());
++
++	  total_written_size += io_buffer.size();
+ 	}
+     }
++
++  const Real 
++    dt   = pl.get_elapsed_time(),
++    rate = total_written_size*sizeof(Number)/dt; 
++
++  std::cerr << "Write " << total_written_size << " \"Number\" values\n"
++	    << " Elapsed time = " << dt << '\n'
++	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
++  
++  pl.pop("write_parallel_data");
+ }
+ 
+ 
+@@ -1598,7 +1652,12 @@
    parallel_only();
    std::string comment;
  
 -  this->write_serialized_vector(io, *this->solution);
 +  PerfLog pl("IO Performance",false);
-+  pl.push("read_serialized_data");
++  pl.push("write_serialized_data");
 +  unsigned int total_written_size = 0;
 +  
 +  total_written_size +=
@@ -311,7 +271,7 @@ Index: src/systems/system_io.C
  
    // set up the comment
    if (libMesh::processor_id() == 0)
-@@ -1618,7 +1641,8 @@
+@@ -1618,7 +1677,8 @@
  
        for(; pos != this->_vectors.end(); ++pos)
          {
@@ -321,7 +281,7 @@ Index: src/systems/system_io.C
  
  	  // set up the comment
  	  if (libMesh::processor_id() == 0)
-@@ -1632,6 +1656,16 @@
+@@ -1632,6 +1692,16 @@
  	    }
  	}
      }
@@ -334,11 +294,11 @@ Index: src/systems/system_io.C
 +	    << " Elapsed time = " << dt << '\n'
 +	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
 +  
-+  pl.pop("read_serialized_data");
++  pl.pop("write_serialized_data");
  }
  
  
-@@ -1854,7 +1888,7 @@
+@@ -1854,7 +1924,7 @@
  }
  
  
@@ -347,7 +307,7 @@ Index: src/systems/system_io.C
  {
    parallel_only();
  
-@@ -1900,6 +1934,8 @@
+@@ -1900,6 +1970,8 @@
  
    if (libMesh::processor_id() == 0)
      libmesh_assert_equal_to (written_length, vec_length);
