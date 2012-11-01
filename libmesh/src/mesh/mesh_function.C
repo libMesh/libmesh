@@ -240,7 +240,31 @@ void MeshFunction::operator() (const Point& p,
   // locate the point in the other mesh
   const Elem* element = this->_point_locator->operator()(p);
 
-  if(element==NULL)
+  // If we have an element, but it's not a local element, then we
+  // either need to have a serialized vector or we need to find a
+  // local element sharing the same point.
+  if (element && 
+     (element->processor_id() != libMesh::processor_id()) &&
+     _vector.type() != SERIAL)
+    {
+      // look for a local element containing the point
+      std::set<const Elem*> point_neighbors;
+      element->find_point_neighbors(p, point_neighbors);
+      element = NULL;
+      std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
+      const std::set<const Elem*>::const_iterator end = point_neighbors.end();
+      for (; it != end; ++it)
+        {
+          const Elem* elem = *it;
+          if (elem->processor_id() == libMesh::processor_id())
+            {
+              element = elem;
+              break;
+            }
+        }
+    }
+
+  if (!element)
     {
       output = _out_of_mesh_value;
     }
@@ -338,7 +362,31 @@ void MeshFunction::gradient (const Point& p,
   // locate the point in the other mesh
   const Elem* element = this->_point_locator->operator()(p);
 
-  if(element==NULL)
+  // If we have an element, but it's not a local element, then we
+  // either need to have a serialized vector or we need to find a
+  // local element sharing the same point.
+  if (element && 
+     (element->processor_id() != libMesh::processor_id()) &&
+     _vector.type() != SERIAL)
+    {
+      // look for a local element containing the point
+      std::set<const Elem*> point_neighbors;
+      element->find_point_neighbors(p, point_neighbors);
+      element = NULL;
+      std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
+      const std::set<const Elem*>::const_iterator end = point_neighbors.end();
+      for (; it != end; ++it)
+        {
+          const Elem* elem = *it;
+          if (elem->processor_id() == libMesh::processor_id())
+            {
+              element = elem;
+              break;
+            }
+        }
+    }
+
+  if (!element)
     {
       output.resize(0);
     }
@@ -427,7 +475,31 @@ void MeshFunction::hessian (const Point& p,
   // locate the point in the other mesh
   const Elem* element = this->_point_locator->operator()(p);
 
-  if(element==NULL)
+  // If we have an element, but it's not a local element, then we
+  // either need to have a serialized vector or we need to find a
+  // local element sharing the same point.
+  if (element && 
+     (element->processor_id() != libMesh::processor_id()) &&
+     _vector.type() != SERIAL)
+    {
+      // look for a local element containing the point
+      std::set<const Elem*> point_neighbors;
+      element->find_point_neighbors(p, point_neighbors);
+      element = NULL;
+      std::set<const Elem*>::const_iterator       it  = point_neighbors.begin();
+      const std::set<const Elem*>::const_iterator end = point_neighbors.end();
+      for (; it != end; ++it)
+        {
+          const Elem* elem = *it;
+          if (elem->processor_id() == libMesh::processor_id())
+            {
+              element = elem;
+              break;
+            }
+        }
+    }
+
+  if (!element)
     {
       output.resize(0);
     }
