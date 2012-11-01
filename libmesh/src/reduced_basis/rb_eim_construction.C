@@ -226,7 +226,11 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
     value = values(var_number);
   }
   
-  Parallel::max(root_id); // root_id is only non-zero on one processor
+  // root_id may be non-zero on more than one processor due to ghost elements
+  // so use Parallel::max to get just one proc id
+  Parallel::max(root_id);
+  
+  // Then broadcast the result
   Parallel::broadcast(value, root_id);
 
   return value;
