@@ -134,6 +134,10 @@ public:
 // Anonymous namespace for helper functions
 namespace {
 
+// Safe to use this here since it won't "infect" anything outside the
+// anonymous namespace
+using namespace libMesh;
+
 // Internal helper function to create vector<something_useable> from
 // vector<bool> for compatibility with MPI bitwise operations
 template <typename T>
@@ -305,6 +309,13 @@ namespace libMesh
 
 namespace Parallel
 {
+
+/*
+ * A reference to the default libMesh communicator.  This is now
+ * deprecated - instead of libMesh::Parallel::Communicator_World use
+ * libMesh::CommWorld
+ */
+extern Communicator& Communicator_World;
 
 
 /**
