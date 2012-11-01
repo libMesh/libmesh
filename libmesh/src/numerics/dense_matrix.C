@@ -738,7 +738,7 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
       for (unsigned int k=0; k<i; ++k)
 	temp -= A(i,k)*x(k);
 
-      x(i) = b(i) / A(i,i);
+      x(i) = temp / A(i,i);
     }
 
   // Solve for L^T x = y
