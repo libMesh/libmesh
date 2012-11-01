@@ -215,10 +215,13 @@ MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
 int                COMM_WORLD = 0;
 #endif
 
+Parallel::Communicator CommWorld;
+Parallel::Communicator& Parallel::Communicator_World = CommWorld;
+
+
 OStreamProxy out(std::cout);
 OStreamProxy err(std::cerr);
 
-Parallel::Communicator Parallel::Communicator_World;
 
 PerfLog            perflog ("libMesh",
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
