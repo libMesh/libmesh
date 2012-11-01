@@ -1,6 +1,213 @@
+Index: contrib/patches/serialized_io_refactor.patch
+===================================================================
+--- contrib/patches/serialized_io_refactor.patch	(revision 6270)
++++ contrib/patches/serialized_io_refactor.patch	(working copy)
+@@ -1,123 +0,0 @@
+-Index: include/systems/system.h
+-===================================================================
+---- include/systems/system.h	(revision 6265)
+-+++ include/systems/system.h	(working copy)
+-@@ -1510,8 +1510,8 @@
+-    * Reads a vector for this System.
+-    * This method may safely be called on a distributed-memory mesh.
+-    */
+--  void read_serialized_vector (Xdr& io,
+--			       NumericVector<Number> &vec);
+-+  unsigned int read_serialized_vector (Xdr& io,
+-+				       NumericVector<Number> &vec);
+- 
+-   /**
+-    * Writes an output vector to the stream \p io for a set of \p DofObjects.
+-@@ -1536,8 +1536,8 @@
+-    * Writes a vector for this System.
+-    * This method may safely be called on a distributed-memory mesh.
+-    */
+--  void write_serialized_vector (Xdr& io,
+--				const NumericVector<Number> &vec) const;
+-+  unsigned int write_serialized_vector (Xdr& io,
+-+					const NumericVector<Number> &vec) const;
+- 
+-   /**
+-    * Function that initializes the system.
+-Index: src/systems/system_io.C
+-===================================================================
+---- src/systems/system_io.C	(revision 6265)
+-+++ src/systems/system_io.C	(working copy)
+-@@ -665,10 +665,15 @@
+-   parallel_only();
+-   std::string comment;
+- 
+-+  PerfLog pl("IO Performance",false);
+-+  pl.push("read_serialized_data");
+-+  unsigned int total_read_size = 0;
+-+
+-   // 10.)
+-   // Read the global solution vector
+-   {
+--    this->read_serialized_vector(io, *this->solution);
+-+    total_read_size +=
+-+      this->read_serialized_vector(io, *this->solution);
+- 
+-     // get the comment
+-     if (libMesh::processor_id() == 0)
+-@@ -684,7 +689,8 @@
+- 
+-       for(; pos != this->_vectors.end(); ++pos)
+-         {
+--	  this->read_serialized_vector(io, *pos->second);
+-+	  total_read_size +=
+-+	    this->read_serialized_vector(io, *pos->second);
+- 
+- 	  // get the comment
+- 	  if (libMesh::processor_id() == 0)
+-@@ -692,6 +698,16 @@
+- 
+- 	}
+-     }
+-+
+-+  const Real 
+-+    dt   = pl.get_elapsed_time(),
+-+    rate = total_read_size*sizeof(Number)/dt; 
+-+
+-+  std::cout << "Read " << total_read_size << " \"Number\" values\n"
+-+	    << " Elapsed time = " << dt << '\n'
+-+	    << " Rate = " <<rate/1.e6 << "(MB/sec)\n\n";
+-+
+-+    pl.pop("read_serialized_data");
+- }
+- 
+- 
+-@@ -894,7 +910,7 @@
+- 
+- 
+- 
+--void System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
+-+unsigned int System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
+- {
+-   parallel_only();
+- 
+-@@ -966,6 +982,8 @@
+-   Parallel::sum (n_assigned_vals);
+-   libmesh_assert_equal_to (n_assigned_vals, vector_length);
+- #endif
+-+
+-+  return vector_length;
+- }
+- 
+- 
+-@@ -1854,7 +1872,7 @@
+- }
+- 
+- 
+--void System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec) const
+-+unsigned int System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec) const
+- {
+-   parallel_only();
+- 
+-@@ -1900,6 +1918,8 @@
+- 
+-   if (libMesh::processor_id() == 0)
+-     libmesh_assert_equal_to (written_length, vec_length);
+-+
+-+  return written_length;
+- }
+- 
+- } // namespace libMesh
+-Index: examples/introduction/introduction_ex2/introduction_ex2.C
+-===================================================================
+---- examples/introduction/introduction_ex2/introduction_ex2.C	(revision 6269)
+-+++ examples/introduction/introduction_ex2/introduction_ex2.C	(working copy)
+-@@ -81,7 +81,7 @@
+-   // 2D grid on the unit square.  By default a mesh of QUAD4
+-   // elements will be created.  We instruct the mesh generator
+-   // to build a mesh of 5x5 elements.
+--  MeshTools::Generation::build_square (mesh, 5, 5);
+-+  MeshTools::Generation::build_square (mesh, 500, 50);
+- 
+-   // Create an equation systems object. This object can
+-   // contain multiple systems of different 
+Index: examples/introduction/introduction_ex2/introduction_ex2.C
+===================================================================
+--- examples/introduction/introduction_ex2/introduction_ex2.C	(revision 6270)
++++ examples/introduction/introduction_ex2/introduction_ex2.C	(working copy)
+@@ -81,7 +81,7 @@
+   // 2D grid on the unit square.  By default a mesh of QUAD4
+   // elements will be created.  We instruct the mesh generator
+   // to build a mesh of 5x5 elements.
+-  MeshTools::Generation::build_square (mesh, 5, 5);
++  MeshTools::Generation::build_cube (mesh, 70, 70, 70);
+ 
+   // Create an equation systems object. This object can
+   // contain multiple systems of different 
+@@ -124,8 +124,8 @@
+   // order.  Variables "c" and "T" will use first-order Lagrange approximation, 
+   // while variable "dv" will use a second-order discontinuous
+   // approximation space.
+-  equation_systems.get_system("Complex System").add_variable("c", FIRST);
+-  equation_systems.get_system("Complex System").add_variable("T", FIRST);
++  equation_systems.get_system("Complex System").add_variable("c",  FIRST);
++  equation_systems.get_system("Complex System").add_variable("T",  FIRST);
+   equation_systems.get_system("Complex System").add_variable("dv", SECOND, MONOMIAL);
+     
+   // Initialize the data structures for the equation system.
+@@ -150,22 +150,33 @@
+   if (argc > 1)
+     if (argv[1][0] != '-')
+       {
+-        std::cout << "<<< Writing system to file " << argv[1]
++        std::cout << "<<< Writing system to file " << "foo.xdr" //argv[1]
+                   << std::endl;
+         
+         // Write the system.
+-        equation_systems.write (argv[1], libMeshEnums::WRITE);
++	// std::cout << "ASCII\n";
++        // equation_systems.write (argv[1],   libMeshEnums::WRITE);
++	std::cout << "Binary\n";
++        equation_systems.write ("foo.xdr", libMeshEnums::ENCODE,
++				(EquationSystems::WRITE_DATA |
++				 EquationSystems::WRITE_ADDITIONAL_DATA));
+         
+         // Clear the equation systems data structure.
+         equation_systems.clear ();
+ 
+-        std::cout << ">>> Reading system from file " << argv[1]
++        std::cout << ">>> Reading system from file " << "foo.xdr" //argv[1]
+                   << std::endl << std::endl;
+         
+         // Read the file we just wrote.  This better
+         // work!
+-        equation_systems.read (argv[1], libMeshEnums::READ);
++        //equation_systems.read (argv[1], libMeshEnums::READ);
++	std::cout << "Binary\n";
++        equation_systems.read ("foo.xdr", libMeshEnums::DECODE,			       
++			       (EquationSystems::READ_HEADER |
++				EquationSystems::READ_DATA |
++				EquationSystems::READ_ADDITIONAL_DATA));
+ 
++
+         // Print the information again.
+         equation_systems.print_info();
+       }
+Index: examples/introduction/introduction_ex2/run.sh
+===================================================================
+--- examples/introduction/introduction_ex2/run.sh	(revision 6270)
++++ examples/introduction/introduction_ex2/run.sh	(working copy)
+@@ -6,9 +6,9 @@
+ 
+ example_name=introduction_ex2
+ 
+-message_running "$example_name" 
+-run_example "$example_name"
+-echo " "
++#message_running "$example_name" 
++#run_example "$example_name"
++#echo " "
+ options="eqn_sys.dat"
+ run_example "$example_name" "$options"
+ message_done_running "$example_name"
 Index: include/systems/system.h
 ===================================================================
---- include/systems/system.h	(revision 6265)
+--- include/systems/system.h	(revision 6270)
 +++ include/systems/system.h	(working copy)
 @@ -1510,8 +1510,8 @@
     * Reads a vector for this System.
@@ -26,7 +233,7 @@ Index: include/systems/system.h
     * Function that initializes the system.
 Index: src/systems/system_io.C
 ===================================================================
---- src/systems/system_io.C	(revision 6265)
+--- src/systems/system_io.C	(revision 6270)
 +++ src/systems/system_io.C	(working copy)
 @@ -665,10 +665,15 @@
    parallel_only();
@@ -66,9 +273,9 @@ Index: src/systems/system_io.C
 +
 +  std::cout << "Read " << total_read_size << " \"Number\" values\n"
 +	    << " Elapsed time = " << dt << '\n'
-+	    << " Rate = " <<rate/1.e6 << "(MB/sec)\n\n";
++	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
 +
-+    pl.pop("read_serialized_data");
++  pl.pop("read_serialized_data");
  }
  
  
@@ -90,7 +297,48 @@ Index: src/systems/system_io.C
  }
  
  
-@@ -1854,7 +1872,7 @@
+@@ -1598,7 +1616,12 @@
+   parallel_only();
+   std::string comment;
+ 
+-  this->write_serialized_vector(io, *this->solution);
++  PerfLog pl("IO Performance",false);
++  pl.push("read_serialized_data");
++  unsigned int total_written_size = 0;
++  
++  total_written_size +=
++    this->write_serialized_vector(io, *this->solution);
+ 
+   // set up the comment
+   if (libMesh::processor_id() == 0)
+@@ -1618,7 +1641,8 @@
+ 
+       for(; pos != this->_vectors.end(); ++pos)
+         {
+-	  this->write_serialized_vector(io, *pos->second);
++	  total_written_size +=
++	    this->write_serialized_vector(io, *pos->second);
+ 
+ 	  // set up the comment
+ 	  if (libMesh::processor_id() == 0)
+@@ -1632,6 +1656,16 @@
+ 	    }
+ 	}
+     }
++
++  const Real 
++    dt   = pl.get_elapsed_time(),
++    rate = total_written_size*sizeof(Number)/dt; 
++
++  std::cout << "Write " << total_written_size << " \"Number\" values\n"
++	    << " Elapsed time = " << dt << '\n'
++	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
++  
++  pl.pop("read_serialized_data");
+ }
+ 
+ 
+@@ -1854,7 +1888,7 @@
  }
  
  
@@ -99,7 +347,7 @@ Index: src/systems/system_io.C
  {
    parallel_only();
  
-@@ -1900,6 +1918,8 @@
+@@ -1900,6 +1934,8 @@
  
    if (libMesh::processor_id() == 0)
      libmesh_assert_equal_to (written_length, vec_length);
@@ -108,16 +356,3 @@ Index: src/systems/system_io.C
  }
  
  } // namespace libMesh
-Index: examples/introduction/introduction_ex2/introduction_ex2.C
-===================================================================
---- examples/introduction/introduction_ex2/introduction_ex2.C	(revision 6269)
-+++ examples/introduction/introduction_ex2/introduction_ex2.C	(working copy)
-@@ -81,7 +81,7 @@
-   // 2D grid on the unit square.  By default a mesh of QUAD4
-   // elements will be created.  We instruct the mesh generator
-   // to build a mesh of 5x5 elements.
--  MeshTools::Generation::build_square (mesh, 5, 5);
-+  MeshTools::Generation::build_square (mesh, 500, 50);
- 
-   // Create an equation systems object. This object can
-   // contain multiple systems of different 
