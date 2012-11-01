@@ -625,7 +625,7 @@ T DenseMatrix<T>::det ()
 // routine to find the solution x.
 template <typename T>
 template <typename T2>
-void DenseMatrix<T>::cholesky_solve (DenseVector<T2>& b,
+void DenseMatrix<T>::cholesky_solve (const DenseVector<T2>& b,
 				     DenseVector<T2>& x)
 {
   // Check for a previous decomposition
@@ -713,7 +713,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
 
 template <typename T>
 template <typename T2>
-void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
+void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
 						DenseVector<T2>& x) const
 {
   // Shorthand notation for number of rows and columns.
@@ -733,8 +733,10 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
   // Solve for Ly=b
   for (unsigned int i=0; i<n; ++i)
     {
+      T2 temp = b(i);
+
       for (unsigned int k=0; k<i; ++k)
-	b(i) -= A(i,k)*x(k);
+	temp -= A(i,k)*x(k);
 
       x(i) = b(i) / A(i,i);
     }
@@ -805,15 +807,15 @@ void DenseMatrix<T>::_cholesky_back_substitute (DenseVector<T2>& b,
 //--------------------------------------------------------------
 // Explicit instantiations
 template class DenseMatrix<Real>;
-template void DenseMatrix<Real>::cholesky_solve(DenseVector<Real>&, DenseVector<Real>&);
-template void DenseMatrix<Real>::_cholesky_back_substitute(DenseVector<Real>&, DenseVector<Real>&) const;
-template void DenseMatrix<Real>::cholesky_solve(DenseVector<Complex>&, DenseVector<Complex>&);
-template void DenseMatrix<Real>::_cholesky_back_substitute(DenseVector<Complex>&, DenseVector<Complex>&) const;
+template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Real>&, DenseVector<Real>&);
+template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Real>&, DenseVector<Real>&) const;
+template void DenseMatrix<Real>::cholesky_solve(const DenseVector<Complex>&, DenseVector<Complex>&);
+template void DenseMatrix<Real>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template class DenseMatrix<Complex>;
-template void DenseMatrix<Complex>::cholesky_solve(DenseVector<Complex>&,DenseVector<Complex>&);
-template void DenseMatrix<Complex>::_cholesky_back_substitute(DenseVector<Complex>&, DenseVector<Complex>&) const;
+template void DenseMatrix<Complex>::cholesky_solve(const DenseVector<Complex>&,DenseVector<Complex>&);
+template void DenseMatrix<Complex>::_cholesky_back_substitute(const DenseVector<Complex>&, DenseVector<Complex>&) const;
 #endif
 
 } // namespace libMesh

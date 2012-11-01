@@ -296,7 +296,7 @@ public:
    * A is real-valued and x and b are complex-valued.
    */
   template <typename T2>
-  void cholesky_solve(DenseVector<T2>& b,
+  void cholesky_solve(const DenseVector<T2>& b,
 		      DenseVector<T2>& x);
 
 
@@ -386,7 +386,7 @@ private:
    * are complex-valued.
    */
   template <typename T2>
-  void _cholesky_back_substitute(DenseVector<T2>& b,
+  void _cholesky_back_substitute(const DenseVector<T2>& b,
 				 DenseVector<T2>& x) const;
 
   /**
