@@ -167,14 +167,19 @@ void RBEIMConstruction::initialize_rb_construction()
   Parent::initialize_rb_construction();
 
   // initialize a serial vector that we will use for MeshFunction evaluations
-  _serialized_vector = NumericVector<Number>::build();
-  _serialized_vector->init (this->n_dofs(), false, SERIAL);
+  _ghosted_meshfunction_vector = NumericVector<Number>::build();
+  _ghosted_meshfunction_vector->init (this->n_dofs(), this->n_local_dofs(),
+                                      this->get_dof_map().get_send_list(), false,
+                                      GHOSTED);
 
   // Initialize the MeshFunction for interpolating the
   // solution vector at quadrature points
   std::vector<unsigned int> vars(n_vars());
   Utility::iota(vars.begin(), vars.end(), 0); // By default use all variables
-  _mesh_function = new MeshFunction(get_equation_systems(), *_serialized_vector, get_dof_map(), vars);
+  _mesh_function = new MeshFunction(get_equation_systems(),
+                                    *_ghosted_meshfunction_vector,
+                                    get_dof_map(),
+                                    vars);
   _mesh_function->init();
 
   // Load up the inner product matrix
@@ -209,7 +214,22 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
   (*_mesh_function)(p,
                     /*time*/ 0.,
                     values);
-  return values(var_number);
+
+  // We evaluated the mesh function, but it will only return a valid set of values on one processor
+  // (values will be empty on all other processors) so we need to broadcast those valid values
+  // to all processors.
+  Number value;
+  unsigned int root_id=0;
+  if(values.size() != 0)
+  {
+    root_id = libMesh::processor_id();
+    value = values(var_number);
+  }
+  
+  Parallel::sum(root_id); // root_id is only non-zero on one processor
+  Parallel::broadcast(value, root_id);
+
+  return value;
 }
 
 void RBEIMConstruction::initialize_eim_assembly_objects()
@@ -230,9 +250,9 @@ void RBEIMConstruction::enrich_RB_space()
 {
   START_LOG("enrich_RB_space()", "RBEIMConstruction");
 
-  // put solution in _serialized_vector so we can access it from the mesh function
+  // put solution in _ghosted_meshfunction_vector so we can access it from the mesh function
   // this allows us to compute EIM_rhs appropriately
-  solution->localize(*_serialized_vector);
+  solution->localize(*_ghosted_meshfunction_vector, this->get_dof_map().get_send_list());
 
   RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
 
@@ -593,7 +613,7 @@ void RBEIMConstruction::update_RB_system_matrices()
   {
     // Sample the basis functions at the
     // new interpolation point
-    get_rb_evaluation().get_basis_function(j).localize(*_serialized_vector);
+    get_rb_evaluation().get_basis_function(j).localize(*_ghosted_meshfunction_vector, this->get_dof_map().get_send_list());
 
     if(!_performing_extra_greedy_step)
     {

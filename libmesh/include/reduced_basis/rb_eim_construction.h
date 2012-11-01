@@ -251,11 +251,10 @@ private:
   bool _performing_extra_greedy_step;
 
   /**
-   * We also need an extra vector in which we can store a serialized
-   * copy of the solution vector so that we can use MeshFunction
-   * in parallel.
+   * We also need an extra vector in which we can store a ghosted
+   * copy of the vector that we wish to use MeshFunction on.
    */
-  AutoPtr< NumericVector<Number> > _serialized_vector;
+  AutoPtr< NumericVector<Number> > _ghosted_meshfunction_vector;
 
   /**
    * We initialize RBEIMConstruction so that it has an "empty" RBAssemblyExpansion,
