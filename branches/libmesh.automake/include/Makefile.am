@@ -243,9 +243,9 @@ include_HEADERS = \
 		numerics/zero_function.h \
 		parallel/parallel.h \
 		parallel/parallel_algebra.h \
-		parallel/parallel_bin_sorter.h \
-		parallel/parallel_ghost_sync.h \
+		parallel/parallel_communicator_specializations \
 		parallel/parallel_histogram.h \
+		parallel/parallel_implementation.h \
 		parallel/parallel_sort.h \
 		parallel/threads.h \
 		parallel/threads_allocators.h \

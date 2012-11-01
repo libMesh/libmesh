@@ -1,9 +1,8 @@
 #!/bin/sh
 
-headers=`find .. -name "*.h" -type f | sort`
-#echo $headers
-
 built_sources=""
+
+headers=`find .. -name "*.h" -type f | sort`
 
 for header_with_path in $headers ; do
     
@@ -11,6 +10,16 @@ for header_with_path in $headers ; do
     header=`basename $header_with_path`
     #echo $header
     built_sources="$built_sources $header"
+done
+
+specializations=`find .. -name "*specializations" -type f | sort`
+
+for specialization_with_path in $specializations ; do
+    
+    #echo $specialization_with_path
+    specialization=`basename $specialization_with_path`
+    #echo $specialization
+    built_sources="$built_sources $specialization"
 done
 
 
@@ -37,7 +46,7 @@ DISTCLEANFILES += \$(BUILT_SOURCES)
 EOF
 
 
-for header_with_path in $headers ; do
+for header_with_path in $headers $specializations ; do  
     header=`basename $header_with_path`
     source=`echo $header_with_path | sed 's/../$(top_srcdir)\/include/' -`
     #echo $source
@@ -47,4 +56,4 @@ $header: $source
 
 EOF
 done
-cat Makefile.am
+#cat Makefile.am

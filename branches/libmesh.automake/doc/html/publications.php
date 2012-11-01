@@ -58,7 +58,33 @@ B.&nbsp;S. Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lee_dissertation">1</a>]
+[<a name="Bornia_thesis">1</a>]
+</td>
+<td class="bibtexitem">
+G.&nbsp;Bornia.
+ <em>Analysis of optimal control problems for the incompressible MHD
+  equations and implementation in a finite element multiphysics code</em>.
+ PhD thesis, Universit&aacute; di Bologna, 2012.
+ 
+  <a href="http://amsdottorato.cib.unibo.it/4868/1/giorgio_bornia_tesi.pdf">http://amsdottorato.cib.unibo.it/4868/1/giorgio_bornia_tesi.pdf</a>.
+<a name="Bornia_thesis"></a><pre>
+@phdthesis{Bornia_thesis,
+  author = {G.~Bornia},
+  school = {Universit\'{a} di Bologna},
+  title = {{Analysis of optimal control problems for the incompressible MHD equations and implementation in a finite element multiphysics code}},
+  note = {\url{http://amsdottorato.cib.unibo.it/4868/1/giorgio_bornia_tesi.pdf}},
+  year = {2012}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Lee_dissertation">2</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Lee.
@@ -83,7 +109,7 @@ K.&nbsp;Lee.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nagler_dissertation">2</a>]
+[<a name="Nagler_dissertation">3</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Nagler.
@@ -111,7 +137,31 @@ L.&nbsp;Nagler.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nenning_Dissertation">3</a>]
+[<a name="Brown_thesis">4</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;A. Kallen-Brown.
+ <em>Computational methods for ice flow simulation</em>.
+ PhD thesis, ETH Z&uuml;rich, 2011.
+ <a href="http://dx.doi.org/10.3929/ethz-a-007316245">http://dx.doi.org/10.3929/ethz-a-007316245</a>.
+<a name="Brown_thesis"></a><pre>
+@phdthesis{Brown_thesis,
+  author = {J.~A.~Kallen-Brown},
+  school = {ETH Z\"{u}rich},
+  title = {{Computational methods for ice flow simulation}},
+  note = {\url{http://dx.doi.org/10.3929/ethz-a-007316245}},
+  year = {2011}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Nenning_Dissertation">5</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Nenning.
@@ -138,7 +188,7 @@ M.&nbsp;Nenning.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petrolati_Dissertation">4</a>]
+[<a name="Petrolati_Dissertation">6</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;Petrolati.
@@ -164,7 +214,7 @@ E.&nbsp;Petrolati.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_Dissertation">5</a>]
+[<a name="Stogner_Dissertation">7</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner.
@@ -192,7 +242,7 @@ R.&nbsp;H. Stogner.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Wang_Dissertation">6</a>]
+[<a name="Wang_Dissertation">8</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Wang.
@@ -218,7 +268,7 @@ S.&nbsp;Wang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Dissertation">7</a>]
+[<a name="Peterson_Dissertation">9</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -245,7 +295,7 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_Dissertation">8</a>]
+[<a name="Knezevic_Dissertation">10</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic.
@@ -272,7 +322,7 @@ D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_Dissertation">9</a>]
+[<a name="Kirk_Dissertation">11</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -299,7 +349,7 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Thesis">10</a>]
+[<a name="Peterson_Thesis">12</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -336,7 +386,34 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Curtis_2012">1</a>]
+[<a name="Huynh_2012">1</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
+ A static condensation reduced basis element method: approximation
+  and a posteriori error estimation.
+ <em>ESAIM: Mathematical Modelling and Numerical Analysis</em>, October
+  2012.
+ <a href="http://dx.doi.org/10.1051/m2an/2012022">http://dx.doi.org/10.1051/m2an/2012022</a>.
+<a name="Huynh_2012"></a><pre>
+@article{Huynh_2012,
+  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and A.~T.~Patera},
+  title = {{A static condensation reduced basis element method: approximation and a posteriori error estimation}},
+  journal = {ESAIM: Mathematical Modelling and Numerical Analysis},
+  month = oct,
+  year = 2012,
+  note = {\url{http://dx.doi.org/10.1051/m2an/2012022}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Curtis_2012">2</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
@@ -363,25 +440,21 @@ F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hales_2012">2</a>]
+[<a name="Vavourakis_2012b">3</a>]
 </td>
 <td class="bibtexitem">
-J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston, and M.&nbsp;R. Tonks.
- Solving nonlinear solid mechanics problems with the Jacobian-free
-  Newton Krylov Method.
- <em>Computer Modeling in Engineering &amp; Sciences</em>, 84(2):123-152,
-  2012.
- <a href="http://dx.doi.org/10.3970/cmes.2012.084.123.pdf">http://dx.doi.org/10.3970/cmes.2012.084.123.pdf</a>.
-<a name="Hales_2012"></a><pre>
-@article{Hales_2012,
-  author = {J.~D.~Hales and S.~R.~Novascone and R.~L.~Williamson and D.~R.~Gaston and M.~R.~Tonks},
-  title = {{Solving nonlinear solid mechanics problems with the Jacobian-free Newton Krylov Method}},
-  journal = {Computer Modeling in Engineering \& Sciences},
+V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanastasiou.
+ Assessment of remeshing and remapping strategies for large
+  deformation elastoplastic finite element analysis.
+ <em>Computers &amp; Structures</em>, 2012.
+ <a href="http://dx.doi.org/10.1016/j.compstruc.2012.09.010">http://dx.doi.org/10.1016/j.compstruc.2012.09.010</a>.
+<a name="Vavourakis_2012b"></a><pre>
+@article{Vavourakis_2012b,
+  author = {V.~Vavourakis and D.~Loukidis and D.~C.~Charmpis and P.~Papanastasiou},
+  title = {{Assessment of remeshing and remapping strategies for large deformation elastoplastic finite element analysis}},
+  journal = {Computers \& Structures},
   year = 2012,
-  volume = 84,
-  number = 2,
-  pages = {123--152},
-  note = {\url{http://dx.doi.org/10.3970/cmes.2012.084.123.pdf}}
+  note = {\url{http://dx.doi.org/10.1016/j.compstruc.2012.09.010}}
 }
 </pre>
 
@@ -392,7 +465,87 @@ J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2012">3</a>]
+[<a name="Vavourakis_2012">4</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekaterinaris.
+ A nonlinear dynamic finite element approach for simulating muscular
+  hydrostats.
+ <em>Computer Methods in Biomechanics and Biomedical Engineering</em>,
+  2012.
+ <a href="http://dx.doi.org/10.1080/10255842.2012.723702">http://dx.doi.org/10.1080/10255842.2012.723702</a>.
+<a name="Vavourakis_2012"></a><pre>
+@article{Vavourakis_2012,
+  author = {V.~Vavourakis and A.~Kazakidi and D.~P.~Tsakiris and J.~A.~Ekaterinaris},
+  title = {{A nonlinear dynamic finite element approach for simulating muscular hydrostats}},
+  journal = {Computer Methods in Biomechanics and Biomedical Engineering},
+  year = 2012,
+  note = {\url{http://dx.doi.org/10.1080/10255842.2012.723702}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fuentes_2012">5</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;Weinberg, A.&nbsp;Shetty, J.&nbsp;Hazle, and R.&nbsp;Stafford.
+ An inverse problem approach to recovery of <em>in vivo</em>
+  nanoparticle concentrations from thermal image monitoring of MR-guided laser
+  induced thermal therapy.
+ <em>Annals of Biomedical Engineering</em>, pages 1-12, 2012.
+ <a href="http://dx.doi.org/10.1007/s10439-012-0638-9">http://dx.doi.org/10.1007/s10439-012-0638-9</a>.
+<a name="Fuentes_2012"></a><pre>
+@article{Fuentes_2012,
+  author = {D.~Fuentes and A.~Elliott and J.~Weinberg and A.~Shetty and J.~Hazle and R.~Stafford},
+  title = {{An inverse problem approach to recovery of \emph{in vivo} nanoparticle concentrations
+              from thermal image monitoring of MR-guided laser induced thermal therapy}},
+  journal = {Annals of Biomedical Engineering},
+  year = 2012,
+  pages = {1--12},
+  note = {\url{http://dx.doi.org/10.1007/s10439-012-0638-9}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Vallaghe_2012">6</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
+ The static condensation reduced basis element method for a
+  mixed-mean conjugate heat exchanger model.
+ <em>PREPRINT, submitted to SISC</em>, 2012.
+ 
+  <a href="http://augustine.mit.edu/methodology/papers/VP_SISC_Aug2012.pdf">http://augustine.mit.edu/methodology/papers/VP_SISC_Aug2012.pdf</a>.
+<a name="Vallaghe_2012"></a><pre>
+@article{Vallaghe_2012,
+  author = {S.~Vallagh\'{e} and A.~T.~Patera},
+  title = {{The static condensation reduced basis element method for a mixed-mean conjugate heat exchanger model}},
+  journal = {PREPRINT, submitted to SISC},
+  year = 2012,
+  note = {\url{http://augustine.mit.edu/methodology/papers/VP_SISC_Aug2012.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Griffith_2012">7</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -418,7 +571,7 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Sopeju_2011">4</a>]
+[<a name="Sopeju_2011">8</a>]
 </td>
 <td class="bibtexitem">
 O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
@@ -449,60 +602,7 @@ O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2011">5</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
- A static condensation reduced basis element method: approximation
-  and a posteriori error estimation.
- <em>PREPRINT, Mathematical Modelling and Numerical Analysis</em>, 2011.
- 
-  <a href="http://augustine.mit.edu/methodology/papers/HKP_RBcomponents_M2AN.pdf">http://augustine.mit.edu/methodology/papers/HKP_RBcomponents_M2AN.pdf</a>.
-<a name="Huynh_2011"></a><pre>
-@article{Huynh_2011,
-  author = {D.~B.~P.~Huynh and D.~J.~Knezevic and A.~T.~Patera},
-  title = {{A static condensation reduced basis element method:  
-approximation and a posteriori error estimation}},
-  journal = {PREPRINT, Mathematical Modelling and Numerical Analysis},
-  year = 2011,
-  note = {\url{http://augustine.mit.edu/methodology/papers/HKP_RBcomponents_M2AN.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Oliveira_2011">6</a>]
-</td>
-<td class="bibtexitem">
-S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
- Damage identification in a concrete dam by fitting measured modal
-  parameters.
- <em>PREPRINT</em>, 2011.
- 
-  <a href="http://cmaf.ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2011/artigo_parametros_110514.pdf">http://cmaf.ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2011/artigo_parametros_110514.pdf</a>.
-<a name="Oliveira_2011"></a><pre>
-@article{Oliveira_2011,
-  author = {S.~Oliveira and A.-M.~Toader and P.~Vieira},
-  title = {{Damage identification in a concrete dam by fitting measured modal parameters}},
-  journal = {PREPRINT},
-  year = 2011,
-  note = {\url{http://cmaf.ptmat.fc.ul.pt/arquivo/docs/preprints/pdf/2011/artigo_parametros_110514.pdf}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Griffith_2010">7</a>]
+[<a name="Griffith_2010">9</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -536,7 +636,35 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vetter_2013">1</a>]
+[<a name="Zhu_2013">1</a>]
+</td>
+<td class="bibtexitem">
+Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
+ Three-dimensional non-linear buckling of thick-walled elastic tubes
+  under pressure.
+ <em>International Journal of Non-Linear Mechanics</em>, 48, January
+  2013.
+ <a href="http://dx.doi.org/10.1016/j.ijnonlinmec.2012.06.013">http://dx.doi.org/10.1016/j.ijnonlinmec.2012.06.013</a>.
+<a name="Zhu_2013"></a><pre>
+@article{Zhu_2013,
+  author = {Y.~Zhu and X.~Y.~Luo and H.~M.~Wang and R.~W.~Ogden and C.~Berry},
+  title = {{Three-dimensional non-linear buckling of thick-walled elastic tubes under pressure}},
+  journal = {International Journal of Non-Linear Mechanics},
+  year = 2013,
+  volume = 48,
+  month = jan,
+  note = {\url{http://dx.doi.org/10.1016/j.ijnonlinmec.2012.06.013}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Vetter_2013">2</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
@@ -573,7 +701,64 @@ R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Amaziane_2012">1</a>]
+[<a name="Oliveira_2012">1</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
+ Damage identification in a concrete dam by fitting measured modal
+  parameters.
+ <em>Nonlinear Analysis: Real World Applications</em>, 13(6):2888-2899,
+  December 2012.
+ <a href="http://dx.doi.org/10.1016/j.nonrwa.2012.05.003">http://dx.doi.org/10.1016/j.nonrwa.2012.05.003</a>.
+<a name="Oliveira_2012"></a><pre>
+@article{Oliveira_2012,
+  author = {S.~Oliveira and A.-M.~Toader and P.~Vieira},
+  title = {{Damage identification in a concrete dam by fitting measured modal parameters}},
+  journal = {Nonlinear Analysis: Real World Applications},
+  year = 2012,
+  volume = 13,
+  number = 6,
+  month = dec,
+  pages = {2888--2899},
+  note = {\url{http://dx.doi.org/10.1016/j.nonrwa.2012.05.003}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Clarno_2012">2</a>]
+</td>
+<td class="bibtexitem">
+K.&nbsp;T. Clarno et&nbsp;al.
+ The AMP (Advanced MultiPhysics) nuclear fuel performance code.
+ <em>Nuclear Engineering and Design</em>, 252:108-120, November 2012.
+ <a href="http://dx.doi.org/10.1016/j.nucengdes.2012.07.018">http://dx.doi.org/10.1016/j.nucengdes.2012.07.018</a>.
+<a name="Clarno_2012"></a><pre>
+@article{Clarno_2012,
+  author = {K.~T.~Clarno and others},
+  title = {{The AMP (Advanced MultiPhysics) nuclear fuel performance code}},
+  journal = {Nuclear Engineering and Design},
+  year = 2012,
+  volume = 252,
+  month = nov,
+  pages = {108--120},
+  note = {\url{http://dx.doi.org/10.1016/j.nucengdes.2012.07.018}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Amaziane_2012">3</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;Amaziane, M.&nbsp;Jurak, and A.&nbsp;Keko.
@@ -606,7 +791,7 @@ B.&nbsp;Amaziane, M.&nbsp;Jurak, and A.&nbsp;Keko.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2012">2</a>]
+[<a name="Gaston_2012">4</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Gaston, L.&nbsp;Guo, G.&nbsp;Hansen, H.&nbsp;Huang, R.&nbsp;Johnson, D.&nbsp;Knoll, C.&nbsp;Newman, H.&nbsp;K.
@@ -639,7 +824,85 @@ D.&nbsp;Gaston, L.&nbsp;Guo, G.&nbsp;Hansen, H.&nbsp;Huang, R.&nbsp;Johnson, D.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Camata_2012">3</a>]
+[<a name="Gerner_2012c">5</a>]
+</td>
+<td class="bibtexitem">
+A.-L. Gerner and K.&nbsp;Veroy.
+ Reduced basis <em>a posteriori</em> error bounds for symmetric
+  parametrized saddle point problems.
+ August&nbsp;24, 2012.
+ <a href="http://arxiv.org/abs/1208.5011">http://arxiv.org/abs/1208.5011</a>.
+<a name="Gerner_2012c"></a><pre>
+@article{Gerner_2012c,
+  author = {A.-L.~Gerner and K.~Veroy},
+  title = {{Reduced basis \emph{a posteriori} error bounds for symmetric parametrized saddle point problems}},
+  month = aug # {~24,},
+  year = 2012,
+  note = {\url{http://arxiv.org/abs/1208.5011}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gerner_2012b">6</a>]
+</td>
+<td class="bibtexitem">
+A.-L. Gerner, A.&nbsp;Reusken, and K.&nbsp;Veroy.
+ Reduced basis <em>a posteriori</em> error bounds for the instationary
+  Stokes equations.
+ August&nbsp;24, 2012.
+ <a href="http://arxiv.org/abs/1208.5010">http://arxiv.org/abs/1208.5010</a>.
+<a name="Gerner_2012b"></a><pre>
+@article{Gerner_2012b,
+  author = {A.-L.~Gerner and A.~Reusken and K.~Veroy},
+  title = {{Reduced basis \emph{a posteriori} error bounds for the instationary Stokes equations}},
+  month = aug # {~24,},
+  year = 2012,
+  note = {\url{http://arxiv.org/abs/1208.5010}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bauman_2012">7</a>]
+</td>
+<td class="bibtexitem">
+P.&nbsp;T. Bauman, J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, S.&nbsp;Prudhomme, and K.&nbsp;Ravi-Chandar.
+ Dynamic data driven application systems for monitoring damage in
+  composite materials under dynamic loads.
+ Technical Report 12-37, Institute for Computational Engineering and
+  Sciences (ICES), The University of Texas at Austin, August 2012.
+ <a href="http://www.ices.utexas.edu/media/reports/2012/1237.pdf">http://www.ices.utexas.edu/media/reports/2012/1237.pdf</a>.
+<a name="Bauman_2012"></a><pre>
+@techreport{Bauman_2012,
+  author = {P.~T.~Bauman and J.~T.~Oden and E.~E.~Prudencio and S.~Prudhomme and K.~Ravi-Chandar},
+  title = {{Dynamic data driven application systems for monitoring damage in composite materials under dynamic loads}},
+  institution = {Institute for Computational Engineering and Sciences (ICES), The University of Texas at Austin},
+  month = aug,
+  year = 2012,
+  number = {12-37},
+  note = {\url{http://www.ices.utexas.edu/media/reports/2012/1237.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Camata_2012">8</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
@@ -670,7 +933,7 @@ J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2012">4</a>]
+[<a name="Corsini_2012">9</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.&nbsp;G. Sheard.
@@ -699,7 +962,7 @@ A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2012">5</a>]
+[<a name="Zhu_2012">10</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -729,7 +992,7 @@ Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Akkoyun_2012">6</a>]
+[<a name="Akkoyun_2012">11</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Akkoyun et&nbsp;al.
@@ -758,7 +1021,7 @@ S.&nbsp;Akkoyun et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2012">7</a>]
+[<a name="Mahadevan_2012">12</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
@@ -786,7 +1049,7 @@ V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2012">8</a>]
+[<a name="Podgorney_2012">13</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
@@ -816,7 +1079,64 @@ R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bassi_2012">9</a>]
+[<a name="Bordas_2012">14</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;M. Bordas, K.&nbsp;Gillow, D.&nbsp;Gavaghan, B.&nbsp;Rodriguez, and D.&nbsp;Kay.
+ A bidomain model of the ventricular specialized conduction system of
+  the heart.
+ <em>SIAM J. Appl. Math.</em>, 72(5):1618-1643, 2012.
+ <a href="http://dx.doi.org/10.1137/11082796X">http://dx.doi.org/10.1137/11082796X</a>.
+<a name="Bordas_2012"></a><pre>
+@article{Bordas_2012,
+  author = {R.~ M.~Bordas and K.~Gillow and D.~Gavaghan and B.~Rodriguez and D.~Kay},
+  title = {{A bidomain model of the ventricular specialized conduction system of the heart}},
+  journal = {SIAM J. Appl. Math.},
+  year = 2012,
+  volume = 72,
+  number = 5,
+  pages = {1618--1643},
+  note = {\url{http://dx.doi.org/10.1137/11082796X}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Hales_2012">15</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston, and M.&nbsp;R. Tonks.
+ Solving nonlinear solid mechanics problems with the Jacobian-free
+  Newton Krylov Method.
+ <em>Computer Modeling in Engineering &amp; Sciences</em>, 84(2):123-152,
+  2012.
+ <a href="http://www.techscience.com/doi/10.3970/cmes.2012.084.123.html">http://www.techscience.com/doi/10.3970/cmes.2012.084.123.html</a>.
+<a name="Hales_2012"></a><pre>
+@article{Hales_2012,
+  author = {J.~D.~Hales and S.~R.~Novascone and R.~L.~Williamson and D.~R.~Gaston and M.~R.~Tonks},
+  title = {{Solving nonlinear solid mechanics problems with the Jacobian-free Newton Krylov Method}},
+  journal = {Computer Modeling in Engineering \& Sciences},
+  year = 2012,
+  volume = 84,
+  number = 2,
+  pages = {123--152},
+  note = {\url{http://www.techscience.com/doi/10.3970/cmes.2012.084.123.html}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bassi_2012">16</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.&nbsp;Tesini.
@@ -845,7 +1165,7 @@ F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Andrijauskas_2012">10</a>]
+[<a name="Andrijauskas_2012">17</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
@@ -873,7 +1193,7 @@ T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Williamson_2012">11</a>]
+[<a name="Williamson_2012">18</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks, D.&nbsp;R. Gaston,
@@ -901,7 +1221,7 @@ R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks,
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2012">12</a>]
+[<a name="Eftang_2012">19</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -928,7 +1248,7 @@ J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012">13</a>]
+[<a name="Gerner_2012">20</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner and K.&nbsp;Veroy.
@@ -959,7 +1279,7 @@ A.-L. Gerner and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brummelen_2012">14</a>]
+[<a name="Brummelen_2012">21</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
@@ -988,7 +1308,7 @@ E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2012">15</a>]
+[<a name="Huynh_2012">22</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
