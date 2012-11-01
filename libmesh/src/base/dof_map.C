@@ -1506,8 +1506,9 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
       std::vector<unsigned int> constrained_dof_indices(dof_indices);
 
       DenseMatrix<Number> C;
-
-      this->build_constraint_matrix (C, constrained_dof_indices);
+      DenseVector<Number> H;
+	
+      this->build_constraint_matrix_and_vector (C, H, constrained_dof_indices);
 
       libmesh_assert_equal_to (dof_indices.size(), C.m());
       libmesh_assert_equal_to (constrained_dof_indices.size(), C.n());
@@ -1517,18 +1518,22 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 
       // compute Ue = C Ug, with proper mapping.
       for (unsigned int i=0; i<dof_indices.size(); i++)
-	for (unsigned int j=0; j<constrained_dof_indices.size(); j++)
-	  {
-	    const unsigned int jg = constrained_dof_indices[j];
-
+	{
+	  Ue.el(i) = H(i);
+	  
+	  for (unsigned int j=0; j<constrained_dof_indices.size(); j++)
+	    {
+	      const unsigned int jg = constrained_dof_indices[j];
+	      
 //          If Ug is a serial or ghosted vector, then this assert is
 //          overzealous.  If Ug is a parallel vector, then this assert
 //          is redundant.
 //	    libmesh_assert ((jg >= Ug.first_local_index()) &&
 //		    (jg <  Ug.last_local_index()));
 
-	    Ue.el(i) += C(i,j)*Ug(jg);
-	  }
+	      Ue.el(i) += C(i,j)*Ug(jg);
+	    }
+	}
     }
 
 #else
