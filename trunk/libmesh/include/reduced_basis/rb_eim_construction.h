@@ -243,10 +243,10 @@ private:
   MeshFunction* _mesh_function;
 
   /**
-   * This flag allows us to perform one extra Greedy step
-   * in order to compute the data needed for the EIM
-   * a posteriori error bound in the case that we use
-   * all of our basis functions.
+   * This flag indicates that we're in the process of
+   * performing one extra Greedy step in order to compute
+   * the data needed for the EIM a posteriori error bound
+   * in the case that we use all of our basis functions.
    */
   bool _performing_extra_greedy_step;
 

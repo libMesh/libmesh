@@ -182,8 +182,8 @@ void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsign
     root_id = libMesh::processor_id();
   }
   
-  // broad
-  Parallel::sum(root_id);
+  // broadcast
+  Parallel::max(root_id);
   broadcast_parameters(root_id);
 }
 

@@ -226,7 +226,7 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
     value = values(var_number);
   }
   
-  Parallel::sum(root_id); // root_id is only non-zero on one processor
+  Parallel::max(root_id); // root_id is only non-zero on one processor
   Parallel::broadcast(value, root_id);
 
   return value;
