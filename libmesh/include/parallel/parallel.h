@@ -479,11 +479,6 @@ namespace Parallel
 		          const Iter range_end,
                           std::vector<int>& buffer);
 
-  /*
-   * The default libMesh communicator
-   */
-  extern Communicator Communicator_World;
-
   //-------------------------------------------------------------------
   /**
    * Encapsulates the MPI_Comm object.  Allows the size of the group
@@ -1071,6 +1066,11 @@ namespace Parallel
   };
 
 } // namespace Parallel
+
+  /**
+   * The default libMesh communicator
+   */
+  extern Parallel::Communicator CommWorld;
 
 } // namespace libMesh
 
