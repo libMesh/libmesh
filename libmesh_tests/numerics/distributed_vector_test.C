@@ -1,4 +1,4 @@
-#include <distributed_vector.h>
+#include <libmesh/distributed_vector.h>
 
 #include "numeric_vector_test.h"
 

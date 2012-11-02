@@ -1,7 +1,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-#include <quadrature.h>
+#include <libmesh/quadrature.h>
 
 class QuadratureTest : public CppUnit::TestCase { 
 public: 
