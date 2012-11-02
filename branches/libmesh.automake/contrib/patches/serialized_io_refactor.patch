@@ -1,31 +1,33 @@
-Index: include/parallel/parallel.h
+Index: include/parallel/parallel_implementation.h
 ===================================================================
---- include/parallel/parallel.h	(revision 6289)
-+++ include/parallel/parallel.h	(working copy)
-@@ -148,11 +148,17 @@
-   class MessageTag
-   {
-   public:
-+
-     /**
-+     * Invalid tag, to allow for default construction.
-+     */
-+    static const int invalid_tag = -1234565;
-+
-+    /**
-      * Explicit constructor, to discourage using "magic numbers"
-      * as tags.  Communicator::get_unique_tag is recommended instead.
-      */
--    explicit MessageTag(int tagvalue)
-+    explicit MessageTag(int tagvalue = invalid_tag)
-       : _tagvalue(tagvalue), _comm(NULL) {}
+--- include/parallel/parallel_implementation.h	(revision 6294)
++++ include/parallel/parallel_implementation.h	(working copy)
+@@ -1047,13 +1047,13 @@
+     }
+   used_tag_values[tagvalue] = 1;
  
-     /**
+-#ifndef NDEBUG
+-  // Make sure everyone called get_unique_tag and make sure
+-  // everyone got the same value
+-  int maxval = tagvalue;
+-  this->max(maxval);
+-  libmesh_assert_equal_to (tagvalue, maxval);
+-#endif
++// #ifndef NDEBUG
++//   // Make sure everyone called get_unique_tag and make sure
++//   // everyone got the same value
++//   int maxval = tagvalue;
++//   this->max(maxval);
++//   libmesh_assert_equal_to (tagvalue, maxval);
++// #endif
+ 
+   return MessageTag(tagvalue, this);
+ }
 Index: include/systems/system.h
 ===================================================================
---- include/systems/system.h	(revision 6289)
+--- include/systems/system.h	(revision 6294)
 +++ include/systems/system.h	(working copy)
-@@ -1104,6 +1104,13 @@
+@@ -1110,6 +1110,13 @@
  			      const bool write_additional_data = true) const;
  
    /**
@@ -39,7 +41,7 @@ Index: include/systems/system.h
     * Writes additional data, namely vectors, for this System.
     * This method may safely be called on a distributed-memory mesh.
     * This method will create an individual file for each processor in the simulation
-@@ -1510,8 +1517,8 @@
+@@ -1516,8 +1523,8 @@
     * Reads a vector for this System.
     * This method may safely be called on a distributed-memory mesh.
     */
@@ -50,7 +52,7 @@ Index: include/systems/system.h
  
    /**
     * Writes an output vector to the stream \p io for a set of \p DofObjects.
-@@ -1526,6 +1533,17 @@
+@@ -1532,6 +1539,17 @@
  						     Xdr &io) const;
  
    /**
@@ -68,7 +70,7 @@ Index: include/systems/system.h
     * Writes the SCALAR dofs associated with var to the stream \p io.
     */
    unsigned int write_SCALAR_dofs (const NumericVector<Number> &vec,
-@@ -1536,8 +1554,8 @@
+@@ -1542,8 +1560,8 @@
     * Writes a vector for this System.
     * This method may safely be called on a distributed-memory mesh.
     */
@@ -81,13 +83,13 @@ Index: include/systems/system.h
     * Function that initializes the system.
 Index: src/systems/equation_systems_io.C
 ===================================================================
---- src/systems/equation_systems_io.C	(revision 6289)
+--- src/systems/equation_systems_io.C	(revision 6294)
 +++ src/systems/equation_systems_io.C	(working copy)
 @@ -256,6 +256,9 @@
  	iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
- 	io.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+ 	io.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
  
-+	std::cerr << "ver_major.ver_minor.ver_patch=" 
++	std::cout << "ver_major.ver_minor.ver_patch=" 
 +		  << ver_major << "." << ver_minor << "." << ver_patch
 +		  << std::endl;
  
@@ -95,7 +97,7 @@ Index: src/systems/equation_systems_io.C
  
 Index: src/systems/system_io.C
 ===================================================================
---- src/systems/system_io.C	(revision 6289)
+--- src/systems/system_io.C	(revision 6294)
 +++ src/systems/system_io.C	(working copy)
 @@ -475,6 +475,10 @@
     * ASCII output.  Thus this one section of code will read XDR or ASCII
@@ -270,7 +272,7 @@ Index: src/systems/system_io.C
  
  	  // set up the comment
  	  if (libMesh::processor_id() == 0)
-@@ -1632,6 +1692,43 @@
+@@ -1632,6 +1692,53 @@
  	    }
  	}
      }
@@ -309,12 +311,22 @@ Index: src/systems/system_io.C
 +	  }
 +      }
 +
-+    this->write_serialized_vectors (io, names, vectors_to_write);    
++    total_written_size =
++      this->write_serialized_vectors (io, names, vectors_to_write);
++
++    const Real 
++      dt2   = pl.get_elapsed_time(),
++      rate2 = total_written_size*sizeof(Number)/(dt2-dt);
++    
++    std::cout << "Write (new) " << total_written_size << " \"Number\" values\n"
++	      << " Elapsed time = " << (dt2-dt) << '\n'
++	      << " Rate = " << rate2/1.e6 << "(MB/sec)\n\n";
++
 +  }
  }
  
  
-@@ -1804,6 +1901,232 @@
+@@ -1804,6 +1911,305 @@
    return written_length;
  }
  
@@ -333,10 +345,10 @@ Index: src/systems/system_io.C
 +    io_blksize = std::min(max_io_blksize, n_objects),
 +    num_blks   = std::ceil(static_cast<double>(n_objects)/static_cast<double>(io_blksize));
 +
-+  std::cout << "io_blksize = "    << io_blksize
-+	    << ", num_objects = " << n_objects
-+	    << ", num_blks = "    << num_blks
-+	    << std::endl;
++  // std::cout << "io_blksize = "    << io_blksize
++  // 	    << ", num_objects = " << n_objects
++  // 	    << ", num_blks = "    << num_blks
++  // 	    << std::endl;
 +  
 +  unsigned int written_length=0;                       // The numer of values written.  This will be returned
 +
@@ -344,9 +356,9 @@ Index: src/systems/system_io.C
 +
 +  std::vector<std::vector<unsigned int> > xfer_ids(num_blks);      // The global IDs and # of components for the local objects in all blocks
 +  std::vector<std::vector<Number> >       xfer_vals(num_blks);     // The raw values for the local objects in all blocks
-+  std::vector<Parallel::Request>          send_requests(num_blks); // send request handle for each block
-+  std::vector<Parallel::MessageTag>
-+    id_tags(num_blks), val_tags(num_blks);
++  std::vector<Parallel::Request>
++    id_requests(num_blks), val_requests(num_blks);                 // send request handle for each block
++  
 +  // ------------------------------------------------------
 +  // First pass - count the number of objects in each block
 +  // traverse all the objects and figure out which block they
@@ -371,18 +383,17 @@ Index: src/systems/system_io.C
 +
 +  //---------------------------------
 +  // Collect the values for all objects
-+  unsigned int first_object=0, last_object=0;
-+
-+  for (unsigned int blk=0; last_object<n_objects; blk++)
++  for (unsigned int blk=0; blk<num_blks; blk++)
 +    {
-+      libMesh::out << "Writing object block " << blk << std::endl;
++      //libMesh::out << "Writing object block " << blk << std::endl;
 +
 +      libmesh_assert_less (blk, num_blks);
 +
 +      // Each processor should build up its transfer buffers for its
 +      // local objects in [first_object,last_object).
-+      first_object = blk*io_blksize;
-+      last_object  = std::min((blk+1)*io_blksize,n_objects);
++      const unsigned int 
++	first_object = blk*io_blksize,
++	last_object  = std::min((blk+1)*io_blksize,n_objects);
 +
 +      // convenience
 +      std::vector<unsigned int> &ids  (xfer_ids[blk]);
@@ -392,30 +403,104 @@ Index: src/systems/system_io.C
 +      // so we can do efficient preallocation
 +      ids.clear();  /**/ ids.reserve  (xfer_ids_size[blk]);
 +      vals.clear(); /**/ vals.reserve (xfer_vals_size[blk]);
++
++      if (xfer_vals_size[blk] != 0) // this is possible - for example, may be called for a range of elements, with only nodal data
++	for (iterator_type it=begin; it!=end; ++it)
++	  if (((*it)->id() >= first_object) && // object in [first_object,last_object)
++	      ((*it)->id() <   last_object))
++	    {
++	      ids.push_back((*it)->id());
++	      
++	      for (unsigned int var=0; var<num_vars; var++)
++		{
++		  const unsigned int n_comp = (*it)->n_comp(sys_num,var);
++		  
++		  ids.push_back (n_comp); // even if 0 - processor 0 has no way of knowing otherwise...
++		  
++		  for (unsigned int comp=0; comp<n_comp; comp++)
++		    {
++		      libmesh_assert_greater_equal ((*it)->dof_number(sys_num, var, comp), vec.first_local_index());
++		      libmesh_assert_less ((*it)->dof_number(sys_num, var, comp), vec.last_local_index());
++		      vals.push_back(vec((*it)->dof_number(sys_num, var, comp)));
++		    }
++		}
++	    }
 +      
-+      for (iterator_type it=begin; it!=end; ++it)
-+	if (((*it)->id() >= first_object) && // object in [first_object,last_object)
-+	    ((*it)->id() <   last_object))
-+	  {
-+	    ids.push_back((*it)->id());
-+
-+	    for (unsigned int var=0; var<num_vars; var++)
-+	      {
-+		const unsigned int n_comp = (*it)->n_comp(sys_num,var);
-+
-+		ids.push_back (n_comp);
-+
-+		for (unsigned int comp=0; comp<n_comp; comp++)
-+		  {
-+		    libmesh_assert_greater_equal ((*it)->dof_number(sys_num, var, comp), vec.first_local_index());
-+		    libmesh_assert_less ((*it)->dof_number(sys_num, var, comp), vec.last_local_index());
-+		    vals.push_back(vec((*it)->dof_number(sys_num, var, comp)));
-+		  }
-+	      }
-+	  }
-+
++      Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
++      Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
++      
 +      // send the data for this block
++      Parallel::send (0, ids,  id_requests[blk],  id_tag);
++      Parallel::send (0, vals, val_requests[blk], val_tag);
 +    }
++
++
++  if (libMesh::processor_id() == 0)
++    {
++      std::vector<std::vector<unsigned int> > recv_ids  (libMesh::n_processors());
++      std::vector<std::vector<Number> >       recv_vals (libMesh::n_processors());
++      std::vector<std::vector<Number>::iterator>           // The next value on each processor for the current block
++	val_iters(libMesh::n_processors());
++      std::vector<unsigned int> idx_map;                   // map to traverse entry-wise rather than processor-wise
++      std::vector<Number>       output_vals;              // The output buffer for the current block
++
++      const unsigned int idx_obj_size = (2+num_vars);
++      
++      for (unsigned int blk=0; blk<num_blks; blk++)
++	{
++	  // Each processor should build up its transfer buffers for its
++	  // local objects in [first_object,last_object).
++	  const unsigned int 
++	    first_object = blk*io_blksize,
++	    last_object  = std::min((blk+1)*io_blksize,n_objects);
++
++	  // Create a map to avoid searching.  This will allow us to
++	  // traverse the received values in [first_object,last_object) order.
++	  idx_map.resize(idx_obj_size*io_blksize); std::fill (idx_map.begin(), idx_map.end(), libMesh::invalid_uint);
++	  
++	  // receive this block of data from all processors.
++	  for (unsigned int comm_step=0; comm_step<libMesh::n_processors(); comm_step++)
++	    {
++	      std::vector<unsigned int> &ids (recv_ids [comm_step]);
++	      std::vector<Number>       &vals(recv_vals[comm_step]);
++	      
++	      Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
++	      Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
++	      
++	      // receive data for this block, imposing no particular order on processor
++	      Parallel::receive (Parallel::any_source, ids,  id_tag);
++	      Parallel::receive (Parallel::any_source, vals, val_tag);
++	      
++	      written_length += vals.size();
++
++	      if (vals.size()) // if we actually recevied any values
++		{
++		  val_iters[comm_step] = vals.begin();
++		  for (unsigned int idx=0; idx<ids.size(); idx+=(1+num_vars))
++		    {
++		      const unsigned int local_idx = ids[idx+0]-first_object;
++		      libmesh_assert_less (local_idx, std::min(io_blksize,n_objects));
++
++		      idx_map[idx_obj_size*local_idx+0] = comm_step;
++		      idx_map[idx_obj_size*local_idx+1] = std::distance(vals.begin(), val_iters[comm_step]);
++		      
++		      for (unsigned int var=0; var<num_vars; var++)
++			{
++			  const unsigned int n_comp = ids[idx+var];
++			  idx_map[idx_obj_size*local_idx+2+var] = n_comp;
++			}
++		    }
++		}
++	      else
++		libmesh_here();
++	      
++	    }
++	}
++    }
++
++
++  Parallel::wait(id_requests);
++  Parallel::wait(val_requests);
 +  
 +  return written_length;
 +//   std::vector<unsigned int> xfer_ids;                  // The global IDs and # of components for the local objects in the current block
@@ -547,7 +632,7 @@ Index: src/systems/system_io.C
  unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
                                          const unsigned int var,
  					Xdr &io) const
-@@ -1854,7 +2177,8 @@
+@@ -1854,7 +2260,8 @@
  }
  
  
@@ -557,7 +642,7 @@ Index: src/systems/system_io.C
  {
    parallel_only();
  
-@@ -1900,8 +2224,58 @@
+@@ -1900,8 +2307,58 @@
  
    if (libMesh::processor_id() == 0)
      libmesh_assert_equal_to (written_length, vec_length);
@@ -618,14 +703,14 @@ Index: src/systems/system_io.C
  
 Index: examples/introduction/introduction_ex2/introduction_ex2.C
 ===================================================================
---- examples/introduction/introduction_ex2/introduction_ex2.C	(revision 6289)
+--- examples/introduction/introduction_ex2/introduction_ex2.C	(revision 6294)
 +++ examples/introduction/introduction_ex2/introduction_ex2.C	(working copy)
 @@ -81,7 +81,7 @@
    // 2D grid on the unit square.  By default a mesh of QUAD4
    // elements will be created.  We instruct the mesh generator
    // to build a mesh of 5x5 elements.
 -  MeshTools::Generation::build_square (mesh, 5, 5);
-+  MeshTools::Generation::build_cube (mesh, 70, 70, 70);
++  MeshTools::Generation::build_cube (mesh, 25, 25, 25);
  
    // Create an equation systems object. This object can
    // contain multiple systems of different 
@@ -679,20 +764,3 @@ Index: examples/introduction/introduction_ex2/introduction_ex2.C
          // Print the information again.
          equation_systems.print_info();
        }
-Index: examples/introduction/introduction_ex2/run.sh
-===================================================================
---- examples/introduction/introduction_ex2/run.sh	(revision 6289)
-+++ examples/introduction/introduction_ex2/run.sh	(working copy)
-@@ -6,9 +6,9 @@
- 
- example_name=introduction_ex2
- 
--message_running "$example_name" 
--run_example "$example_name"
--echo " "
-+#message_running "$example_name" 
-+#run_example "$example_name"
-+#echo " "
- options="eqn_sys.dat"
- run_example "$example_name" "$options"
- message_done_running "$example_name"
