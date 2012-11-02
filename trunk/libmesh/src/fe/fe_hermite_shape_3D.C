@@ -58,8 +58,11 @@ static tbb::enumerable_thread_specific< std::vector<Real> > dzdxi_tls, dxdeta_tl
   {
 #ifndef LIBMESH_HAVE_TBB_API
     // Coefficients are cached from old elements
-    if (elem->id() == old_elem_id)
-      return;
+    // ... except that we can't be sure that a renumbering didn't
+    // cause the first element id in a new assembly to match the
+    // last element id in an old assembly ...
+//    if (elem->id() == old_elem_id)
+//      return;
 
     old_elem_id = elem->id();
 #else
@@ -70,8 +73,11 @@ static tbb::enumerable_thread_specific< std::vector<Real> > dzdxi_tls, dxdeta_tl
       old_elem_id = libMesh::invalid_uint;
     
     // Coefficients are cached from old elements
-    if (elem->id() == old_elem_id)
-      return;
+    // ... except that we can't be sure that a renumbering didn't
+    // cause the first element id in a new assembly to match the
+    // last element id in an old assembly ...
+//    if (elem->id() == old_elem_id)
+//      return;
 
     old_elem_id = elem->id();
 
