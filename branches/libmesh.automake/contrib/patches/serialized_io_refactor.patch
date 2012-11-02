@@ -1,6 +1,29 @@
+Index: include/parallel/parallel.h
+===================================================================
+--- include/parallel/parallel.h	(revision 6289)
++++ include/parallel/parallel.h	(working copy)
+@@ -148,11 +148,17 @@
+   class MessageTag
+   {
+   public:
++
+     /**
++     * Invalid tag, to allow for default construction.
++     */
++    static const int invalid_tag = -1234565;
++
++    /**
+      * Explicit constructor, to discourage using "magic numbers"
+      * as tags.  Communicator::get_unique_tag is recommended instead.
+      */
+-    explicit MessageTag(int tagvalue)
++    explicit MessageTag(int tagvalue = invalid_tag)
+       : _tagvalue(tagvalue), _comm(NULL) {}
+ 
+     /**
 Index: include/systems/system.h
 ===================================================================
---- include/systems/system.h	(revision 6279)
+--- include/systems/system.h	(revision 6289)
 +++ include/systems/system.h	(working copy)
 @@ -1104,6 +1104,13 @@
  			      const bool write_additional_data = true) const;
@@ -56,9 +79,23 @@ Index: include/systems/system.h
  
    /**
     * Function that initializes the system.
+Index: src/systems/equation_systems_io.C
+===================================================================
+--- src/systems/equation_systems_io.C	(revision 6289)
++++ src/systems/equation_systems_io.C	(working copy)
+@@ -256,6 +256,9 @@
+ 	iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
+ 	io.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+ 
++	std::cerr << "ver_major.ver_minor.ver_patch=" 
++		  << ver_major << "." << ver_minor << "." << ver_patch
++		  << std::endl;
+ 
+ 	read_parallel_files = (version.rfind(" parallel") < version.size());
+ 
 Index: src/systems/system_io.C
 ===================================================================
---- src/systems/system_io.C	(revision 6279)
+--- src/systems/system_io.C	(revision 6289)
 +++ src/systems/system_io.C	(working copy)
 @@ -475,6 +475,10 @@
     * ASCII output.  Thus this one section of code will read XDR or ASCII
@@ -277,7 +314,7 @@ Index: src/systems/system_io.C
  }
  
  
-@@ -1804,6 +1901,211 @@
+@@ -1804,6 +1901,232 @@
    return written_length;
  }
  
@@ -305,30 +342,82 @@ Index: src/systems/system_io.C
 +
 +  
 +
-+  std::vector<std::vector<unsigned int> > xfer_ids(num_blks);  // The global IDs and # of components for the local objects in all blocks
-+  std::vector<std::vector<Number> >       xfer_vals(num_blks); // The raw values for the local objects in all blocks
-+
-+
++  std::vector<std::vector<unsigned int> > xfer_ids(num_blks);      // The global IDs and # of components for the local objects in all blocks
++  std::vector<std::vector<Number> >       xfer_vals(num_blks);     // The raw values for the local objects in all blocks
++  std::vector<Parallel::Request>          send_requests(num_blks); // send request handle for each block
++  std::vector<Parallel::MessageTag>
++    id_tags(num_blks), val_tags(num_blks);
++  // ------------------------------------------------------
 +  // First pass - count the number of objects in each block
-+  {
-+    std::vector<unsigned int>
-+      xfer_ids_size  (num_blks,0),
-+      xfer_vals_size (num_blks,0);
-+
-+    for (iterator_type it=begin; it!=end; ++it)
-+      {
-+	const unsigned int
-+	  id    = (*it)->id(),
-+	  block = id/io_blksize;
-+
-+	libmesh_assert_less (block, num_blks);
-+
-+	//xfer_ids_size[block]  += 2;
-+	//xfer_vals_size[block] += (*it)->n_comp(sys_num, var)
-+      }
-+  }
-+
++  // traverse all the objects and figure out which block they
++  // will utlimately live in.
++  std::vector<unsigned int>
++    xfer_ids_size  (num_blks,0),
++    xfer_vals_size (num_blks,0);
 +  
++  for (iterator_type it=begin; it!=end; ++it)
++    {
++      const unsigned int
++	id    = (*it)->id(),
++	block = id/io_blksize;
++      
++      libmesh_assert_less (block, num_blks);
++      
++      xfer_ids_size[block]  += (1 + num_vars); // for each object, we store its id, as well as the number of components for each variable
++
++      for (unsigned int var=0; var<num_vars; var++)
++	xfer_vals_size[block] += (*it)->n_comp(sys_num, var); // for each variable, we will store the nonzero components
++    }
++
++  //---------------------------------
++  // Collect the values for all objects
++  unsigned int first_object=0, last_object=0;
++
++  for (unsigned int blk=0; last_object<n_objects; blk++)
++    {
++      libMesh::out << "Writing object block " << blk << std::endl;
++
++      libmesh_assert_less (blk, num_blks);
++
++      // Each processor should build up its transfer buffers for its
++      // local objects in [first_object,last_object).
++      first_object = blk*io_blksize;
++      last_object  = std::min((blk+1)*io_blksize,n_objects);
++
++      // convenience
++      std::vector<unsigned int> &ids  (xfer_ids[blk]);
++      std::vector<Number>       &vals (xfer_vals[blk]);
++
++      // we now know the number of values we will store for each block,
++      // so we can do efficient preallocation
++      ids.clear();  /**/ ids.reserve  (xfer_ids_size[blk]);
++      vals.clear(); /**/ vals.reserve (xfer_vals_size[blk]);
++      
++      for (iterator_type it=begin; it!=end; ++it)
++	if (((*it)->id() >= first_object) && // object in [first_object,last_object)
++	    ((*it)->id() <   last_object))
++	  {
++	    ids.push_back((*it)->id());
++
++	    for (unsigned int var=0; var<num_vars; var++)
++	      {
++		const unsigned int n_comp = (*it)->n_comp(sys_num,var);
++
++		ids.push_back (n_comp);
++
++		for (unsigned int comp=0; comp<n_comp; comp++)
++		  {
++		    libmesh_assert_greater_equal ((*it)->dof_number(sys_num, var, comp), vec.first_local_index());
++		    libmesh_assert_less ((*it)->dof_number(sys_num, var, comp), vec.last_local_index());
++		    vals.push_back(vec((*it)->dof_number(sys_num, var, comp)));
++		  }
++	      }
++	  }
++
++      // send the data for this block
++    }
++  
++  return written_length;
 +//   std::vector<unsigned int> xfer_ids;                  // The global IDs and # of components for the local objects in the current block
 +//   std::vector<Number>       xfer_vals;                 // The raw values for the local objects in the current block
 +//   std::vector<std::vector<unsigned int> >              // The global ID and # of components received from each processor
@@ -341,37 +430,6 @@ Index: src/systems/system_io.C
 +//   std::vector<unsigned int> &idx_map     = xfer_ids;   // map to traverse entry-wise rather than processor-wise (renamed for notational convenience)
 +//   std::vector<Number>       &output_vals = xfer_vals;  // The output buffer for the current block (renamed for notational convenience)
 +
-+//   //---------------------------------
-+//   // Collect the values for all objects
-+//   unsigned int first_object=0, last_object=0;
-+
-+//   for (unsigned int blk=0; last_object<n_objects; blk++)
-+//     {
-+//       //libMesh::out << "Writing object block " << blk << " for var " << var << std::endl;
-+
-+//       // Each processor should build up its transfer buffers for its
-+//       // local objects in [first_object,last_object).
-+//       first_object = blk*io_blksize;
-+//       last_object  = std::min((blk+1)*io_blksize,n_objects);
-+
-+//       // Clear the transfer buffers for this block.
-+//       xfer_ids.clear(); xfer_vals.clear();
-+
-+//       for (iterator_type it=begin; it!=end; ++it)
-+// 	if (((*it)->id() >= first_object) && // object in [first_object,last_object)
-+// 	    ((*it)->id() <   last_object) &&
-+// 	    (*it)->n_comp(sys_num,var)  )    // var has a nonzero # of components on this object
-+// 	  {
-+// 	    xfer_ids.push_back((*it)->id());
-+// 	    xfer_ids.push_back((*it)->n_comp(sys_num, var));
-+
-+// 	    for (unsigned int comp=0; comp<(*it)->n_comp(sys_num, var); comp++)
-+// 	      {
-+// 		libmesh_assert_greater_equal ((*it)->dof_number(sys_num, var, comp), vec.first_local_index());
-+// 		libmesh_assert_less ((*it)->dof_number(sys_num, var, comp), vec.last_local_index());
-+// 		xfer_vals.push_back(vec((*it)->dof_number(sys_num, var, comp)));
-+// 	      }
-+// 	  }
 +
 +//       //-----------------------------------------
 +//       // Send the transfer buffers to processor 0.
@@ -489,7 +547,7 @@ Index: src/systems/system_io.C
  unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
                                          const unsigned int var,
  					Xdr &io) const
-@@ -1854,7 +2156,8 @@
+@@ -1854,7 +2177,8 @@
  }
  
  
@@ -499,7 +557,7 @@ Index: src/systems/system_io.C
  {
    parallel_only();
  
-@@ -1900,8 +2203,58 @@
+@@ -1900,8 +2224,58 @@
  
    if (libMesh::processor_id() == 0)
      libmesh_assert_equal_to (written_length, vec_length);
@@ -560,7 +618,7 @@ Index: src/systems/system_io.C
  
 Index: examples/introduction/introduction_ex2/introduction_ex2.C
 ===================================================================
---- examples/introduction/introduction_ex2/introduction_ex2.C	(revision 6279)
+--- examples/introduction/introduction_ex2/introduction_ex2.C	(revision 6289)
 +++ examples/introduction/introduction_ex2/introduction_ex2.C	(working copy)
 @@ -81,7 +81,7 @@
    // 2D grid on the unit square.  By default a mesh of QUAD4
@@ -623,7 +681,7 @@ Index: examples/introduction/introduction_ex2/introduction_ex2.C
        }
 Index: examples/introduction/introduction_ex2/run.sh
 ===================================================================
---- examples/introduction/introduction_ex2/run.sh	(revision 6279)
+--- examples/introduction/introduction_ex2/run.sh	(revision 6289)
 +++ examples/introduction/introduction_ex2/run.sh	(working copy)
 @@ -6,9 +6,9 @@
  
