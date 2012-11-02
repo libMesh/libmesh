@@ -1,7 +1,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-#include <node.h>
+#include <libmesh/node.h>
 
 #include "../geom/point_test.h"
 #include "../base/dof_object_test.h"

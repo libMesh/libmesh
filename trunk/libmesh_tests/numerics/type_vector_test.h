@@ -1,7 +1,7 @@
 #ifndef __type_vector_test_h__
 #define __type_vector_test_h__
 
-#include <type_vector.h>
+#include <libmesh/type_vector.h>
 
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>

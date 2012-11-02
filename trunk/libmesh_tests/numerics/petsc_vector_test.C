@@ -1,4 +1,4 @@
-#include <petsc_vector.h>
+#include <libmesh/petsc_vector.h>
 
 #ifdef HAVE_PETSC
 

@@ -1,7 +1,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-#include <parallel.h>
+#include <libmesh/parallel.h>
 
 class ParallelTest : public CppUnit::TestCase { 
 public: 

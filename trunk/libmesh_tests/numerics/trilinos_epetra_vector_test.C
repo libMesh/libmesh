@@ -1,4 +1,4 @@
-#include <trilinos_epetra_vector.h>
+#include <libmesh/trilinos_epetra_vector.h>
 
 #ifdef HAVE_TRILINOS
 
