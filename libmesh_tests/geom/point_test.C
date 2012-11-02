@@ -1,7 +1,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
-#include <point.h>
+#include <libmesh/point.h>
 
 #include "point_test.h"
 

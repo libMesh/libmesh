@@ -1,7 +1,7 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-#include <libmesh.h>
+#include <libmesh/libmesh.h>
 
 int main( int argc, char **argv)
 {
