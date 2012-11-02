@@ -1008,6 +1008,12 @@ public:
   unsigned short int variable_number (const std::string& var) const;
 
   /**
+   * Fills \p all_variable_numbers with all the variable numbers for the
+   * variables that have been added to this system.
+   */
+  void get_all_variable_numbers(std::vector<unsigned int>& all_variable_numbers) const;
+
+  /**
    * @returns an index, starting from 0 for the first component of the
    * first variable, and incrementing for each component of each
    * (potentially vector-valued) variable in the system in order.
