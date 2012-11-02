@@ -174,8 +174,8 @@ void RBEIMConstruction::initialize_rb_construction()
 
   // Initialize the MeshFunction for interpolating the
   // solution vector at quadrature points
-  std::vector<unsigned int> vars(n_vars());
-  Utility::iota(vars.begin(), vars.end(), 0); // By default use all variables
+  std::vector<unsigned int> vars;
+  get_all_variable_numbers(vars);
   _mesh_function = new MeshFunction(get_equation_systems(),
                                     *_ghosted_meshfunction_vector,
                                     get_dof_map(),

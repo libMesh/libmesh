@@ -1120,6 +1120,24 @@ unsigned short int System::variable_number (const std::string& var) const
 }
 
 
+void System::get_all_variable_numbers(std::vector<unsigned int>& all_variable_numbers) const
+{
+  all_variable_numbers.resize(n_vars());
+  
+  // Make sure the variable exists
+  std::map<std::string, unsigned short int>::const_iterator
+    it = _variable_numbers.begin();
+  std::map<std::string, unsigned short int>::const_iterator
+    it_end = _variable_numbers.end();
+
+  unsigned int count = 0;
+  for( ; it != it_end; ++it)
+  {
+    all_variable_numbers[count] = it->second;
+    count++;
+  }
+}
+
 
 void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & var_indices) const
 {
