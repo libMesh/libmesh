@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <cstddef>
+#include <climits>
 #include <iterator>
 #include <map>
 #include <set>
@@ -148,11 +149,17 @@ namespace Parallel
   class MessageTag
   {
   public:
+
+    /**
+     * Invalid tag, to allow for default construction.
+     */
+    static const int invalid_tag = INT_MIN;
+
     /**
      * Explicit constructor, to discourage using "magic numbers"
      * as tags.  Communicator::get_unique_tag is recommended instead.
      */
-    explicit MessageTag(int tagvalue)
+    explicit MessageTag(int tagvalue = invalid_tag)
       : _tagvalue(tagvalue), _comm(NULL) {}
 
     /**
