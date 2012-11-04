@@ -558,7 +558,7 @@ void TransientRBConstruction::truth_assembly()
         Mq_context[q_m]->elem_fe_reinit();
         trans_assembly_expansion.perform_M_interior_assembly(q_m, *Mq_context[q_m]);
         // Now overwrite the local matrix with a matrix multiplication
-        Mq_context[q_m]->elem_jacobian.vector_mult(Mq_context[q_m]->elem_residual, Mq_context[q_m]->elem_solution);
+        Mq_context[q_m]->get_elem_jacobian().vector_mult(Mq_context[q_m]->get_elem_residual(), Mq_context[q_m]->get_elem_solution());
       }
 
       for(unsigned int q_a=0; q_a<Q_a; q_a++)
@@ -567,7 +567,7 @@ void TransientRBConstruction::truth_assembly()
         Aq_context[q_a]->elem_fe_reinit();
         get_rb_assembly_expansion().perform_A_interior_assembly(q_a, *Aq_context[q_a]);
         // Now overwrite the local matrix with a matrix multiplication
-        Aq_context[q_a]->elem_jacobian.vector_mult(Aq_context[q_a]->elem_residual, Aq_context[q_a]->elem_solution);
+        Aq_context[q_a]->get_elem_jacobian().vector_mult(Aq_context[q_a]->get_elem_residual(), Aq_context[q_a]->get_elem_solution());
       }
 
       for(unsigned int q_f=0; q_f<Q_f; q_f++)
@@ -616,19 +616,19 @@ void TransientRBConstruction::truth_assembly()
       for(unsigned int q_m=0; q_m<Q_m; q_m++)
       {
         this->get_dof_map().constrain_element_matrix_and_vector
-          (Mq_context[q_m]->elem_jacobian, Mq_context[q_m]->elem_residual, Mq_context[q_m]->dof_indices);
+          (Mq_context[q_m]->elem_jacobian, Mq_context[q_m]->get_elem_residual(), Mq_context[q_m]->dof_indices);
       }
 
       for(unsigned int q_a=0; q_a<Q_a; q_a++)
       {
         this->get_dof_map().constrain_element_matrix_and_vector
-          (Aq_context[q_a]->elem_jacobian, Aq_context[q_a]->elem_residual, Aq_context[q_a]->dof_indices);
+          (Aq_context[q_a]->elem_jacobian, Aq_context[q_a]->get_elem_residual(), Aq_context[q_a]->dof_indices);
       }
 
       for(unsigned int q_f=0; q_f<Q_f; q_f++)
       {
         this->get_dof_map().constrain_element_matrix_and_vector
-          (Fq_context[q_f]->elem_jacobian, Fq_context[q_f]->elem_residual, Fq_context[q_f]->dof_indices);
+          (Fq_context[q_f]->elem_jacobian, Fq_context[q_f]->get_elem_residual(), Fq_context[q_f]->dof_indices);
       }
 
       // Finally, add local matrices/vectors to the global system
@@ -637,15 +637,15 @@ void TransientRBConstruction::truth_assembly()
         Aq_context[q_a]->elem_jacobian *= euler_theta*trans_theta_expansion.eval_A_theta(q_a,mu);
         this->matrix->add_matrix (Aq_context[q_a]->elem_jacobian,
                                   Aq_context[q_a]->dof_indices);
-        Aq_context[q_a]->elem_residual *= -(1.-euler_theta)*trans_theta_expansion.eval_A_theta(q_a,mu);
-        this->rhs->add_vector    (Aq_context[q_a]->elem_residual,
+        Aq_context[q_a]->get_elem_residual() *= -(1.-euler_theta)*trans_theta_expansion.eval_A_theta(q_a,mu);
+        this->rhs->add_vector    (Aq_context[q_a]->get_elem_residual(),
                                   Aq_context[q_a]->dof_indices);
       }
 
       for(unsigned int q_f=0; q_f<Q_f; q_f++)
       {
-        Fq_context[q_f]->elem_residual *= trans_theta_expansion.eval_F_theta(q_f,mu);
-        this->rhs->add_vector (Fq_context[q_f]->elem_residual,
+        Fq_context[q_f]->get_elem_residual() *= trans_theta_expansion.eval_F_theta(q_f,mu);
+        this->rhs->add_vector (Fq_context[q_f]->get_elem_residual(),
                                Fq_context[q_f]->dof_indices);
       }
 
@@ -654,8 +654,8 @@ void TransientRBConstruction::truth_assembly()
         Mq_context[q_m]->elem_jacobian *= 1./dt*trans_theta_expansion.eval_M_theta(q_m,mu);
         this->matrix->add_matrix (Mq_context[q_m]->elem_jacobian,
                                   Mq_context[q_m]->dof_indices);
-        Mq_context[q_m]->elem_residual *= 1./dt*trans_theta_expansion.eval_M_theta(q_m,mu);
-        this->rhs->add_vector    (Mq_context[q_m]->elem_residual,
+        Mq_context[q_m]->get_elem_residual() *= 1./dt*trans_theta_expansion.eval_M_theta(q_m,mu);
+        this->rhs->add_vector    (Mq_context[q_m]->get_elem_residual(),
                                   Mq_context[q_m]->dof_indices);
       }
     }

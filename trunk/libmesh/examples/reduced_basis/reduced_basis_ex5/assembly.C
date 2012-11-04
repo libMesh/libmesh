@@ -93,7 +93,7 @@ void AssemblyA0::interior_assembly(FEMContext &c)
           {
             for (unsigned int j=0; j<n_var_dofs[C_k]; j++)
             {
-              (*c.elem_subjacobians[C_i][C_k])(i,j) += 
+              (c.get_elem_jacobian(C_i,C_k))(i,j) += 
                 JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
             }
           }
@@ -118,7 +118,7 @@ void AssemblyA0::interior_assembly(FEMContext &c)
           {
             for (unsigned int j=0; j<n_var_dofs[C_k]; j++)
             {
-              (*c.elem_subjacobians[C_i][C_k])(i,j) += 
+              (c.get_elem_jacobian(C_i,C_k))(i,j) += 
                 JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
             }
           }
@@ -173,7 +173,7 @@ void AssemblyA1::interior_assembly(FEMContext &c)
             {
               for (unsigned int j=0; j<n_var_dofs[C_k]; j++)
               {
-                (*c.elem_subjacobians[C_i][C_k])(i,j) += 
+                (c.get_elem_jacobian(C_i,C_k))(i,j) += 
                   JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
               }
             }
@@ -227,7 +227,7 @@ void AssemblyA2::interior_assembly(FEMContext &c)
         {
           for (unsigned int j=0; j<n_var_dofs[C_k]; j++)
           {
-            (*c.elem_subjacobians[C_i][C_k])(i,j) += 
+            (c.get_elem_jacobian(C_i,C_k))(i,j) += 
               JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
           }
         }
@@ -254,7 +254,7 @@ void AssemblyF0::boundary_assembly(FEMContext &c)
 
     // Now we will build the affine operator
     unsigned int n_qpoints = c.side_qrule->n_points();
-    DenseSubVector<Number>& Fu = *c.elem_subresiduals[u_var];
+    DenseSubVector<Number>& Fu = c.get_elem_residual(u_var);
 
     for (unsigned int qp=0; qp < n_qpoints; qp++)
       for (unsigned int i=0; i < n_u_dofs; i++)
@@ -282,7 +282,7 @@ void AssemblyF1::boundary_assembly(FEMContext &c)
 
     // Now we will build the affine operator
     unsigned int n_qpoints = c.side_qrule->n_points();
-    DenseSubVector<Number>& Fv = *c.elem_subresiduals[v_var];
+    DenseSubVector<Number>& Fv = c.get_elem_residual(v_var);
 
     for (unsigned int qp=0; qp < n_qpoints; qp++)
       for (unsigned int i=0; i < n_v_dofs; i++)
@@ -310,7 +310,7 @@ void AssemblyF2::boundary_assembly(FEMContext &c)
 
     // Now we will build the affine operator
     unsigned int n_qpoints = c.side_qrule->n_points();
-    DenseSubVector<Number>& Fw = *c.elem_subresiduals[w_var];
+    DenseSubVector<Number>& Fw = c.get_elem_residual(w_var);
 
     for (unsigned int qp=0; qp < n_qpoints; qp++)
       for (unsigned int i=0; i < n_w_dofs; i++)
@@ -342,9 +342,9 @@ void InnerProductAssembly::interior_assembly(FEMContext &c)
   // Now we will build the affine operator
   unsigned int n_qpoints = (c.get_element_qrule())->n_points();
       
-  DenseSubMatrix<Number>& Kuu = *c.elem_subjacobians[u_var][u_var];
-  DenseSubMatrix<Number>& Kvv = *c.elem_subjacobians[v_var][v_var];
-  DenseSubMatrix<Number>& Kww = *c.elem_subjacobians[w_var][w_var];
+  DenseSubMatrix<Number>& Kuu = c.get_elem_jacobian(u_var,u_var);
+  DenseSubMatrix<Number>& Kvv = c.get_elem_jacobian(v_var,v_var);
+  DenseSubMatrix<Number>& Kww = c.get_elem_jacobian(w_var,w_var);
   
   for (unsigned int qp=0; qp<n_qpoints; qp++)
   {

@@ -112,7 +112,7 @@ struct AssemblyA0 : ElemAssemblyWithConstruction
           for (unsigned int qp=0; qp != n_sidepoints; qp++)
             for (unsigned int i=0; i != n_u_dofs; i++)
               for (unsigned int j=0; j != n_u_dofs; j++)
-                c.elem_jacobian(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+                c.get_elem_jacobian()(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
 
           break;
         }
@@ -158,7 +158,7 @@ struct AssemblyA1 : ElemAssemblyWithConstruction
 
             for (unsigned int i=0; i != n_u_dofs; i++)
               for (unsigned int j=0; j != n_u_dofs; j++)
-                c.elem_jacobian(i,j) += JxW_side[qp] * x_hat * phi_side[j][qp]*phi_side[i][qp];
+                c.get_elem_jacobian()(i,j) += JxW_side[qp] * x_hat * phi_side[j][qp]*phi_side[i][qp];
           }
 
           break;
@@ -202,7 +202,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
             {
               for (unsigned int i=0; i != n_u_dofs; i++)
                 for (unsigned int j=0; j != n_u_dofs; j++)
-              c.elem_jacobian(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+              c.get_elem_jacobian()(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
             }
           }
       
@@ -212,7 +212,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
             {
               for (unsigned int i=0; i != n_u_dofs; i++)
                 for (unsigned int j=0; j != n_u_dofs; j++)
-              c.elem_jacobian(i,j) -= JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
+              c.get_elem_jacobian()(i,j) -= JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
             }
           }
         }
@@ -288,9 +288,9 @@ struct AssemblyEIM : RBEIMAssembly
       for (unsigned int i=0; i != n_u_dofs; i++)
         for (unsigned int j=0; j != n_u_dofs; j++)
         {
-          c.elem_jacobian(i,j) += JxW[qp] * ( eim_values_Gx[qp]*dphi[i][qp](0)*dphi[j][qp](0) + 
-                                              eim_values_Gy[qp]*dphi[i][qp](1)*dphi[j][qp](1) + 
-                                              eim_values_Gz[qp]*dphi[i][qp](2)*dphi[j][qp](2) );
+          c.get_elem_jacobian()(i,j) += JxW[qp] * ( eim_values_Gx[qp]*dphi[i][qp](0)*dphi[j][qp](0) + 
+                                                    eim_values_Gy[qp]*dphi[i][qp](1)*dphi[j][qp](1) + 
+                                                    eim_values_Gz[qp]*dphi[i][qp](2)*dphi[j][qp](2) );
         }
     }
   }
@@ -320,7 +320,7 @@ struct AssemblyF0 : ElemAssembly
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
-        c.elem_residual(i) += JxW[qp] * ( 1.*phi[i][qp] );
+        c.get_elem_residual()(i) += JxW[qp] * ( 1.*phi[i][qp] );
   }
 };
 
@@ -352,7 +352,7 @@ struct AssemblyF1 : ElemAssembly
       Real x_hat = xyz[qp](0);
       
       for (unsigned int i=0; i != n_u_dofs; i++)
-        c.elem_residual(i) += JxW[qp] * ( 1.*x_hat*phi[i][qp] );
+        c.get_elem_residual()(i) += JxW[qp] * ( 1.*x_hat*phi[i][qp] );
     }
   }
 };
@@ -381,7 +381,7 @@ struct Ex6InnerProduct : ElemAssembly
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
         for (unsigned int j=0; j != n_u_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
+          c.get_elem_jacobian()(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
   }
 };
 
@@ -405,9 +405,9 @@ struct Ex6EIMInnerProduct : ElemAssembly
 
     unsigned int n_qpoints = (c.get_element_qrule())->n_points();
     
-    DenseSubMatrix<Number>& Kxx = *c.elem_subjacobians[Gx_var][Gx_var];
-    DenseSubMatrix<Number>& Kyy = *c.elem_subjacobians[Gy_var][Gy_var];
-    DenseSubMatrix<Number>& Kzz = *c.elem_subjacobians[Gz_var][Gz_var];
+    DenseSubMatrix<Number>& Kxx = c.get_elem_jacobian(Gx_var,Gx_var);
+    DenseSubMatrix<Number>& Kyy = c.get_elem_jacobian(Gy_var,Gy_var);
+    DenseSubMatrix<Number>& Kzz = c.get_elem_jacobian(Gz_var,Gz_var);
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
