@@ -547,10 +547,10 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       }
 
       // Apply constraints, e.g. periodic constraints
-      this->get_dof_map().constrain_element_vector(context.elem_residual, context.dof_indices);
+      this->get_dof_map().constrain_element_vector(context.get_elem_residual(), context.dof_indices);
 
       // Add element vector to global vector
-      rhs->add_vector(context.elem_residual, context.dof_indices);
+      rhs->add_vector(context.get_elem_residual(), context.dof_indices);
     }
 
     // Solve to find the best fit, then solution stores the truth representation
