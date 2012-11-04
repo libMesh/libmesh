@@ -2732,7 +2732,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
               pushed_node_keys[push_i].push_back(constraining->id());
               pushed_node_vals[push_i].push_back(j->second);
               
-              if (constraining->processor_id() != procdown)
+              if (constraining->processor_id() != procup)
                 pushed_nodes.insert(constraining);
             }
           pushed_node_offsets[push_i] = _node_constraints[constrained].second;

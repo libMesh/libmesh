@@ -102,12 +102,6 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--disable-singleprecision");
 #endif
 
-#ifdef LIBMESH_ENABLE_PARMESH
-  // RBEIMConstruction currently tries to query the entire mesh on
-  // every processor
-  libmesh_example_assert(false, "--disable-parmesh");
-#endif
-
   // This is a 3D example
   libmesh_example_assert(3 == LIBMESH_DIM, "3D support");
   

@@ -72,7 +72,7 @@ struct A0 : ElemAssembly
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
         for (unsigned int j=0; j != n_u_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
+          c.get_elem_jacobian()(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
   }
 };
 
@@ -98,7 +98,7 @@ struct EIM_IP_assembly : ElemAssembly
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
         for (unsigned int j=0; j != n_u_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
+          c.get_elem_jacobian()(i,j) += JxW[qp] * phi[j][qp]*phi[i][qp];
   }
 };
 
@@ -142,7 +142,7 @@ struct EIM_F : RBEIMAssembly
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
-        c.elem_residual(i) += JxW[qp] * ( eim_values[qp]*phi[i][qp] );
+        c.get_elem_residual()(i) += JxW[qp] * ( eim_values[qp]*phi[i][qp] );
   }
 
 };

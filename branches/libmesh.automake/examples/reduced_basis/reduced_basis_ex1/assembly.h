@@ -59,7 +59,7 @@ struct A0 : ElemAssembly
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
         for (unsigned int j=0; j != n_u_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
+          c.get_elem_jacobian()(i,j) += JxW[qp] * dphi[j][qp]*dphi[i][qp];
   }
 };
 
@@ -89,7 +89,7 @@ struct A1 : ElemAssembly
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
         for (unsigned int j=0; j != n_u_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] *dphi[j][qp](0)*phi[i][qp];
+          c.get_elem_jacobian()(i,j) += JxW[qp] *dphi[j][qp](0)*phi[i][qp];
   }
 };
 
@@ -118,7 +118,7 @@ struct A2 : ElemAssembly
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
         for (unsigned int j=0; j != n_u_dofs; j++)
-          c.elem_jacobian(i,j) += JxW[qp] *dphi[j][qp](1)*phi[i][qp];
+          c.get_elem_jacobian()(i,j) += JxW[qp] *dphi[j][qp](1)*phi[i][qp];
   }
 };
 
@@ -143,7 +143,7 @@ struct F0 : ElemAssembly
 
     for (unsigned int qp=0; qp != n_qpoints; qp++)
       for (unsigned int i=0; i != n_u_dofs; i++)
-        c.elem_residual(i) += JxW[qp] * ( 1.*phi[i][qp] );
+        c.get_elem_residual()(i) += JxW[qp] * ( 1.*phi[i][qp] );
   }
 };
 
@@ -182,7 +182,7 @@ struct OutputAssembly : ElemAssembly
         (min_y <= centroid(1)) && (centroid(1) <= max_y) )
       for (unsigned int qp=0; qp != n_qpoints; qp++)
         for (unsigned int i=0; i != n_u_dofs; i++)
-          c.elem_residual(i) += JxW[qp] * ( 1.*phi[i][qp] ) / output_area;
+          c.get_elem_residual()(i) += JxW[qp] * ( 1.*phi[i][qp] ) / output_area;
   }
   
   // Member variables that define the output region in 2D

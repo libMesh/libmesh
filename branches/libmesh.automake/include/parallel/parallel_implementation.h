@@ -872,6 +872,23 @@ inline void receive (const unsigned int src_processor_id,
                      const Communicator &comm = Communicator_World)
 { comm.receive (src_processor_id, buf, req, tag); }
 
+template <typename T>
+inline Status receive (const unsigned int src_processor_id,
+                       T &buf,
+                       const DataType &type,
+                       const MessageTag &tag=any_tag,
+                       const Communicator &comm = Communicator_World)
+{ return comm.receive (src_processor_id, buf, type, tag); }
+
+template <typename T>
+inline void receive (const unsigned int src_processor_id,
+                     T &buf,
+                     const DataType &type,
+                     Request &req,
+                     const MessageTag &tag=any_tag,
+                     const Communicator &comm = Communicator_World)
+{ comm.receive (src_processor_id, buf, type, req, tag); }
+
 template <typename Context, typename OutputIter>
 inline void receive_packed_range (const unsigned int src_processor_id,
                                   Context *context,
