@@ -572,21 +572,21 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
     if(assemble_matrix && symmetrize)
     {
       DenseMatrix<Number> Ke_transpose;
-      context.elem_jacobian.get_transpose(Ke_transpose);
-      context.elem_jacobian += Ke_transpose;
-      context.elem_jacobian *= 0.5;
+      context.get_elem_jacobian().get_transpose(Ke_transpose);
+      context.get_elem_jacobian() += Ke_transpose;
+      context.get_elem_jacobian() *= 0.5;
     }
 
     if(apply_dof_constraints)
     {
       // Apply constraints, e.g. Dirichlet and periodic constraints
       this->get_dof_map().constrain_element_matrix_and_vector
-        (context.elem_jacobian, context.elem_residual, context.dof_indices);
+        (context.get_elem_jacobian(), context.get_elem_residual(), context.dof_indices);
     }
 
     // Scale and add to global matrix and/or vector
-    context.elem_jacobian *= scalar;
-    context.elem_residual *= scalar;
+    context.get_elem_jacobian() *= scalar;
+    context.get_elem_residual() *= scalar;
 
     if(assemble_matrix)
     {
@@ -596,7 +596,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       {
         // If we haven't defined a _dof_coupling matrix then just add
         // the whole matrix
-        input_matrix->add_matrix (context.elem_jacobian,
+        input_matrix->add_matrix (context.get_elem_jacobian(),
                                   context.dof_indices);        
       }
       else
@@ -625,7 +625,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
     }
     
     if(assemble_vector)
-      input_vector->add_vector (context.elem_residual,
+      input_vector->add_vector (context.get_elem_residual(),
                                 context.dof_indices);
   }
 
@@ -690,15 +690,15 @@ void RBConstruction::assemble_scaled_matvec(Number scalar,
 
 
     // Now perform the local matrix multiplcation
-    context.elem_jacobian.vector_mult(context.elem_residual, context.elem_solution);
-    context.elem_residual *= scalar;
+    context.get_elem_jacobian().vector_mult(context.get_elem_residual(), context.get_elem_solution());
+    context.get_elem_residual() *= scalar;
 
     // Apply dof constraints, e.g. Dirichlet or periodic constraints
     this->get_dof_map().constrain_element_matrix_and_vector
-      (context.elem_jacobian, context.elem_residual, context.dof_indices);
+      (context.get_elem_jacobian(), context.get_elem_residual(), context.dof_indices);
 
-    dest.add_vector (context.elem_residual,
-                      context.dof_indices);
+    dest.add_vector (context.get_elem_residual(),
+                     context.dof_indices);
   }
 
   dest.close();
@@ -824,7 +824,7 @@ void RBConstruction::truth_assembly()
       for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
       {
         this->get_dof_map().constrain_element_vector
-          (Fq_context[q_f]->elem_residual, Fq_context[q_f]->dof_indices);
+          (Fq_context[q_f]->get_elem_residual(), Fq_context[q_f]->dof_indices);
       }
 
       // Finally add local matrices/vectors to global system
@@ -839,8 +839,8 @@ void RBConstruction::truth_assembly()
       for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
       {
         // Scale by theta_q_f
-        Fq_context[q_f]->elem_residual *= get_rb_theta_expansion().eval_F_theta(q_f, mu);
-        this->rhs->add_vector (Fq_context[q_f]->elem_residual,
+        Fq_context[q_f]->get_elem_residual() *= get_rb_theta_expansion().eval_F_theta(q_f, mu);
+        this->rhs->add_vector (Fq_context[q_f]->get_elem_residual(),
                               Fq_context[q_f]->dof_indices);
       }
     }
