@@ -2848,7 +2848,11 @@ template <typename T>
 inline void Communicator::sum(T &) const {}
 
 template <typename T>
-inline void Communicator::set_union(T&, const unsigned int) const {}
+inline void Communicator::set_union(T&) const {}
+
+template <typename T>
+inline void Communicator::set_union(T&, const unsigned int root_id) const
+{ libmesh_assert_equal_to(root_id, 0); }
 
 /**
  * We do not currently support probes on one processor without MPI.
