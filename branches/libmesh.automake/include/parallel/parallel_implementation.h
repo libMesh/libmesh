@@ -1047,13 +1047,13 @@ MessageTag Communicator::get_unique_tag(int tagvalue) const
     }
   used_tag_values[tagvalue] = 1;
 
-#ifndef NDEBUG
-  // Make sure everyone called get_unique_tag and make sure
-  // everyone got the same value
-  int maxval = tagvalue;
-  this->max(maxval);
-  libmesh_assert_equal_to (tagvalue, maxval);
-#endif
+// #ifndef NDEBUG
+//   // Make sure everyone called get_unique_tag and make sure
+//   // everyone got the same value
+//   int maxval = tagvalue;
+//   this->max(maxval);
+//   libmesh_assert_equal_to (tagvalue, maxval);
+// #endif
 
   return MessageTag(tagvalue, this);
 }
