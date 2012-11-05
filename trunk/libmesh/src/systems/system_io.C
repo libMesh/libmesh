@@ -665,11 +665,16 @@ void System::read_serialized_data (Xdr& io,
   parallel_only();
   std::string comment;
 
+  // PerfLog pl("IO Performance",false);
+  // pl.push("read_serialized_data");
+  unsigned int total_read_size = 0;
+  
   // 10.)
   // Read the global solution vector
   {
     this->read_serialized_vector(io, *this->solution);
-
+    total_read_size += this->solution->size();
+    
     // get the comment
     if (libMesh::processor_id() == 0)
       io.comment (comment);
@@ -685,13 +690,24 @@ void System::read_serialized_data (Xdr& io,
       for(; pos != this->_vectors.end(); ++pos)
         {
 	  this->read_serialized_vector(io, *pos->second);
-
+	  total_read_size += pos->second->size();
+	  
 	  // get the comment
 	  if (libMesh::processor_id() == 0)
 	    io.comment (comment);
 
 	}
     }
+  
+  // const Real 
+  //   dt   = pl.get_elapsed_time(),
+  //   rate = total_read_size*sizeof(Number)/dt; 
+  
+  // std::cout << "Read " << total_read_size << " \"Number\" values\n"
+  // 	    << " Elapsed time = " << dt << '\n'
+  // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
+
+  // pl.pop("read_serialized_data");
 }
 
 
@@ -1598,8 +1614,13 @@ void System::write_serialized_data (Xdr& io,
   parallel_only();
   std::string comment;
 
+  // PerfLog pl("IO Performance",false);
+  // pl.push("write_serialized_data");
+  unsigned int total_written_size = 0;
+  
   this->write_serialized_vector(io, *this->solution);
-
+  total_written_size += this->solution->size();
+  
   // set up the comment
   if (libMesh::processor_id() == 0)
     {
@@ -1619,7 +1640,8 @@ void System::write_serialized_data (Xdr& io,
       for(; pos != this->_vectors.end(); ++pos)
         {
 	  this->write_serialized_vector(io, *pos->second);
-
+	  total_written_size += pos->second->size();
+	  
 	  // set up the comment
 	  if (libMesh::processor_id() == 0)
 	    {
@@ -1632,6 +1654,16 @@ void System::write_serialized_data (Xdr& io,
 	    }
 	}
     }
+
+  // const Real 
+  //   dt   = pl.get_elapsed_time(),
+  //   rate = total_written_size*sizeof(Number)/dt; 
+  
+  // std::cout << "Write " << total_written_size << " \"Number\" values\n"
+  // 	    << " Elapsed time = " << dt << '\n'
+  // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
+  
+  // pl.pop("write_serialized_data");
 }
 
 
