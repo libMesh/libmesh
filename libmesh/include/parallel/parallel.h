@@ -407,13 +407,13 @@ namespace Parallel
   /**
    * Wait for a non-blocking send or receive to finish
    */
-  inline Status wait (Request &r) { libmesh_deprecated(); return r.wait(); }
+  inline Status wait (Request &r) { return r.wait(); }
 
   /**
    * Wait for a non-blocking send or receive to finish
    */
   inline void wait (std::vector<Request> &r)
-  { libmesh_deprecated(); for (unsigned int i=0; i<r.size(); i++) r[i].wait(); }
+  { for (unsigned int i=0; i<r.size(); i++) r[i].wait(); }
 
 
 
