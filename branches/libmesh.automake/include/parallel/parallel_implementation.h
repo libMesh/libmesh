@@ -178,6 +178,7 @@ inline void unpack_vector_bool(const std::vector<T> &in,
 }
 
 
+#ifdef LIBMESH_HAVE_MPI
 // We use a helper function here to avoid ambiguity when calling
 // send_receive of (vector<vector<T>>,vector<vector<T>>)
 template <typename T1, typename T2>
@@ -300,9 +301,11 @@ inline void send_receive_vec_of_vec
   STOP_LOG("send_receive()", "Parallel");
 }
 
-
+#endif // LIBMESH_HAVE_MPI
 
 } // Anonymous namespace
+
+
 
 namespace libMesh
 {
@@ -2868,12 +2871,12 @@ inline void Communicator::send (const unsigned int, T&, Request&,
 
 template <typename T>
 inline void Communicator::send (const unsigned int, T&, const DataType&,
-                                const MessageTag &, const Communicator&) const
+                                const MessageTag &) const
 { libmesh_error(); }
 
 template <typename T>
 inline void Communicator::send (const unsigned int, T&, const DataType&, Request&,
-                                const MessageTag &, const Communicator&) const
+                                const MessageTag &) const
 { libmesh_error(); }
 
 template <typename Context, typename Iter>
@@ -2930,7 +2933,8 @@ inline void Communicator::send_receive (const unsigned int send_tgt,
                                         const MessageTag &,
                                         const MessageTag &) const
 {
-  libmesh_assert_equal_to (send_tgt, recv_source);
+  libmesh_assert_equal_to (send_tgt, 0);
+  libmesh_assert_equal_to (recv_source, 0);
   recv = send;
 }
 
@@ -2944,7 +2948,7 @@ template <typename Context1, typename RangeIter,
 inline void Communicator::send_receive_packed_range
   (const unsigned int dest_processor_id, const Context1*, RangeIter send_begin,
    const RangeIter send_end, const unsigned int source_processor_id, Context2*,
-   OutputIter out, const MessageTag &) const
+   OutputIter out, const MessageTag &, const MessageTag &) const
 { libmesh_error(); }
 
 /**
@@ -2955,13 +2959,14 @@ inline void Communicator::gather(const unsigned int root_id,
                                  T send,
                                  std::vector<T> &recv) const
 {
-  libmesh_assert (!root_id);
+  libmesh_assert_equal_to (root_id, 0);
   recv.resize(1);
   recv[0] = send;
 }
 
 template <typename T>
-inline void Communicator::gather(const unsigned int, std::vector<T>&) const {}
+inline void Communicator::gather(const unsigned int root_id, std::vector<T>&) const
+{ libmesh_assert_equal_to(root_id, 0); }
 
 template <typename T>
 inline void Communicator::allgather(T send, std::vector<T> &recv) const
@@ -2977,13 +2982,8 @@ template <typename T>
 inline void Communicator::alltoall(std::vector<T> &) const {}
 
 template <typename T>
-inline void Communicator::broadcast (T &, const unsigned int) const {}
-
-template <typename T>
-inline void Communicator::broadcast (std::vector<T> &, const unsigned int) const {}
-
-template <typename T>
-inline void Communicator::broadcast(std::set<T> &, const unsigned int) const {}
+inline void Communicator::broadcast (T &, const unsigned int root_id) const
+{ libmesh_assert_equal_to(root_id, 0); }
 
 #endif // LIBMESH_HAVE_MPI
 
