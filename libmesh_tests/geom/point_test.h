@@ -7,6 +7,8 @@
 
 #define POINTTEST TYPEVECTORTEST
 
+using namespace libMesh;
+
 template <class DerivedClass>
 class PointTestBase : public TypeVectorTestBase<DerivedClass> {
 public:

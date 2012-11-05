@@ -51,6 +51,8 @@
   CPPUNIT_TEST( testVectorSubAssignBase );
 
 
+using namespace libMesh;
+
 template <class DerivedClass>
 class TypeVectorTestBase : public CppUnit::TestCase { 
 

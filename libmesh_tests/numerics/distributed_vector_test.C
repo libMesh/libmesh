@@ -5,6 +5,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
+using namespace libMesh;
+
 class DistributedVectorTest : public NumericVectorTest<DistributedVector<Number> > { 
 public: 
   CPPUNIT_TEST_SUITE( DistributedVectorTest );

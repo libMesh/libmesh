@@ -7,6 +7,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
+using namespace libMesh;
+
 class PetscVectorTest : public NumericVectorTest<PetscVector<Real> > { 
 public: 
   CPPUNIT_TEST_SUITE( PetscVectorTest );
