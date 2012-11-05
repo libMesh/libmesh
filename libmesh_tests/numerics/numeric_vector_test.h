@@ -10,6 +10,8 @@
   CPPUNIT_TEST( testLocalizeToOne ); \
   CPPUNIT_TEST( testLocalizeToOneBase );
 
+using namespace libMesh;
+
 template <class DerivedClass>
 class NumericVectorTest : public CppUnit::TestCase { 
 

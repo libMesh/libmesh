@@ -5,6 +5,8 @@
 
 #include "point_test.h"
 
+using namespace libMesh;
+
 class PointTest : public PointTestBase<Point> { 
 public: 
   CPPUNIT_TEST_SUITE( PointTest );

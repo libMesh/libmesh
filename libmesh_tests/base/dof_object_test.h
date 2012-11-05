@@ -12,6 +12,8 @@
   CPPUNIT_TEST( testValidProcId ); \
   CPPUNIT_TEST( testInvalidateProcId );
 
+using namespace libMesh;
+
 template <class DerivedClass>
 class DofObjectTest {
 
