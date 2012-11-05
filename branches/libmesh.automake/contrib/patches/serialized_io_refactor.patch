@@ -102,7 +102,7 @@ Index: include/systems/system.h
     * Function that initializes the system.
 Index: src/systems/system_io.C
 ===================================================================
---- src/systems/system_io.C	(revision 6305)
+--- src/systems/system_io.C	(revision 6306)
 +++ src/systems/system_io.C	(working copy)
 @@ -22,6 +22,7 @@
  // C++ Includes
@@ -158,42 +158,58 @@ Index: src/systems/system_io.C
  }
  
  
-@@ -665,10 +684,15 @@
+@@ -665,16 +684,16 @@
    parallel_only();
    std::string comment;
  
+-  // PerfLog pl("IO Performance",false);
+-  // pl.push("read_serialized_data");
 +  PerfLog pl("IO Performance",false);
 +  pl.push("read_serialized_data");
-+  unsigned int total_read_size = 0;
+   unsigned int total_read_size = 0;
+-  
 +
    // 10.)
    // Read the global solution vector
    {
 -    this->read_serialized_vector(io, *this->solution);
+-    total_read_size += this->solution->size();
+-    
 +    total_read_size +=
 +      this->read_serialized_vector(io, *this->solution);
- 
++
      // get the comment
      if (libMesh::processor_id() == 0)
-@@ -684,7 +708,8 @@
+       io.comment (comment);
+@@ -689,9 +708,9 @@
  
        for(; pos != this->_vectors.end(); ++pos)
          {
 -	  this->read_serialized_vector(io, *pos->second);
+-	  total_read_size += pos->second->size();
+-	  
 +	  total_read_size +=
 +	    this->read_serialized_vector(io, *pos->second);
- 
++
  	  // get the comment
  	  if (libMesh::processor_id() == 0)
-@@ -692,160 +717,422 @@
- 
+ 	    io.comment (comment);
+@@ -699,169 +718,421 @@
  	}
      }
-+  
+   
+-  // const Real 
+-  //   dt   = pl.get_elapsed_time(),
+-  //   rate = total_read_size*sizeof(Number)/dt; 
+-  
+-  // std::cout << "Read " << total_read_size << " \"Number\" values\n"
+-  // 	    << " Elapsed time = " << dt << '\n'
+-  // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
 +  const Real 
 +    dt   = pl.get_elapsed_time(),
 +    rate = total_read_size*sizeof(Number)/dt; 
-+
+ 
+-  // pl.pop("read_serialized_data");
 +  std::cout << "Read " << total_read_size << " \"Number\" values\n"
 +	    << " Elapsed time = " << dt << '\n'
 +	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
@@ -725,7 +741,7 @@ Index: src/systems/system_io.C
  unsigned int System::read_SCALAR_dofs (const unsigned int var,
                                         Xdr &io,
                                         NumericVector<Number> &vec) const
-@@ -894,7 +1181,7 @@
+@@ -910,7 +1181,7 @@
  
  
  
@@ -734,7 +750,7 @@ Index: src/systems/system_io.C
  {
    parallel_only();
  
-@@ -917,7 +1204,11 @@
+@@ -933,38 +1204,61 @@
    if (libMesh::processor_id() == 0) io.data(vector_length, "# vector length");
    Parallel::broadcast(vector_length);
  
@@ -746,38 +762,84 @@ Index: src/systems/system_io.C
 +  
    libmesh_assert_less_equal (n_vars, this->n_vars());
  
-   // Loop over each variable in the system, and then each node/element in the mesh.
-@@ -929,23 +1220,23 @@
-           //---------------------------------
-           // Collect the values for all nodes
-           n_assigned_vals +=
+-  // Loop over each variable in the system, and then each node/element in the mesh.
+-  for (unsigned int data_var=0; data_var<n_vars; data_var++)
+-    {
+-      const unsigned int var = _written_var_indices[data_var];
+-      if(this->variable(var).type().family != SCALAR)
+-        {
+-          //---------------------------------
+-          // Collect the values for all nodes
+-          n_assigned_vals +=
 -	    this->read_serialized_blocked_dof_objects (var,
 -                                                       this->get_mesh().n_nodes(),
-+	    this->read_serialized_blocked_dof_objects (n_nodes,
- 						       this->get_mesh().local_nodes_begin(),
- 						       this->get_mesh().local_nodes_end(),
- 						       io,
+-						       this->get_mesh().local_nodes_begin(),
+-						       this->get_mesh().local_nodes_end(),
+-						       io,
 -						       vec);
-+						       vec,
-+						       var);
++  // // Loop over each variable in the system, and then each node/element in the mesh.
++  // for (unsigned int data_var=0; data_var<n_vars; data_var++)
++  //   {
++  //     const unsigned int var = _written_var_indices[data_var];
++  //     if(this->variable(var).type().family != SCALAR)
++  //       {
++  //         //---------------------------------
++  //         // Collect the values for all nodes
++  //         n_assigned_vals +=
++  // 	    this->read_serialized_blocked_dof_objects (n_nodes,
++  // 						       this->get_mesh().local_nodes_begin(),
++  // 						       this->get_mesh().local_nodes_end(),
++  // 						       io,
++  // 						       vec,
++  // 						       var);
  
  
-           //------------------------------------
-           // Collect the values for all elements
-           n_assigned_vals +=
+-          //------------------------------------
+-          // Collect the values for all elements
+-          n_assigned_vals +=
 -	    this->read_serialized_blocked_dof_objects (var,
 -						       this->get_mesh().n_elem(),
-+	    this->read_serialized_blocked_dof_objects (n_elem,
- 						       this->get_mesh().local_elements_begin(),
- 						       this->get_mesh().local_elements_end(),
- 						       io,
+-						       this->get_mesh().local_elements_begin(),
+-						       this->get_mesh().local_elements_end(),
+-						       io,
 -						       vec);
-+						       vec,
-+						       var);
-         } // end variable loop
-     }
+-        } // end variable loop
+-    }
++  //         //------------------------------------
++  //         // Collect the values for all elements
++  //         n_assigned_vals +=
++  // 	    this->read_serialized_blocked_dof_objects (n_elem,
++  // 						       this->get_mesh().local_elements_begin(),
++  // 						       this->get_mesh().local_elements_end(),
++  // 						       io,
++  // 						       vec,
++  // 						       var);
++  //       } // end variable loop
++  //   }
++  
++  //---------------------------------
++  // Collect the values for all nodes
++  n_assigned_vals +=
++    this->read_serialized_blocked_dof_objects (n_nodes,
++					       this->get_mesh().local_nodes_begin(),
++					       this->get_mesh().local_nodes_end(),
++					       io,
++					       vec);
  
-@@ -966,6 +1257,28 @@
++
++  //------------------------------------
++  // Collect the values for all elements
++  n_assigned_vals +=
++    this->read_serialized_blocked_dof_objects (n_elem,
++					       this->get_mesh().local_elements_begin(),
++					       this->get_mesh().local_elements_end(),
++					       io,
++					       vec);
++  
+   // Finally loop over all the SCALAR variables
+   for (unsigned int data_var=0; data_var<n_vars; data_var++)
+     {
+@@ -982,6 +1276,28 @@
    Parallel::sum (n_assigned_vals);
    libmesh_assert_equal_to (n_assigned_vals, vector_length);
  #endif
@@ -806,7 +868,7 @@ Index: src/systems/system_io.C
  }
  
  
-@@ -1178,214 +1491,6 @@
+@@ -1194,214 +1510,6 @@
  
  
  
@@ -1021,7 +1083,7 @@ Index: src/systems/system_io.C
  void System::write_parallel_data (Xdr &io,
  				  const bool write_additional_data) const
  {
-@@ -1408,6 +1513,10 @@
+@@ -1424,6 +1532,10 @@
     * ASCII output.  Thus this one section of code will read XDR or ASCII
     * files with no changes.
     */
@@ -1032,7 +1094,7 @@ Index: src/systems/system_io.C
    std::string comment;
  
    libmesh_assert (io.writing());
-@@ -1504,6 +1613,8 @@
+@@ -1520,6 +1632,8 @@
  
    io.data (io_buffer, comment.c_str());
  
@@ -1041,7 +1103,7 @@ Index: src/systems/system_io.C
    // Only write additional vectors if wanted
    if (write_additional_data)
      {
-@@ -1573,8 +1684,20 @@
+@@ -1589,8 +1703,20 @@
  	  }
  
  	  io.data (io_buffer, comment.c_str());
@@ -1062,35 +1124,45 @@ Index: src/systems/system_io.C
  }
  
  
-@@ -1598,7 +1721,12 @@
+@@ -1614,13 +1740,13 @@
    parallel_only();
    std::string comment;
  
--  this->write_serialized_vector(io, *this->solution);
+-  // PerfLog pl("IO Performance",false);
+-  // pl.push("write_serialized_data");
 +  PerfLog pl("IO Performance",false);
 +  pl.push("write_serialized_data");
-+  unsigned int total_written_size = 0;
-+  
+   unsigned int total_written_size = 0;
+   
+-  this->write_serialized_vector(io, *this->solution);
+-  total_written_size += this->solution->size();
+-  
 +  total_written_size +=
 +    this->write_serialized_vector(io, *this->solution);
- 
++
    // set up the comment
    if (libMesh::processor_id() == 0)
-@@ -1618,7 +1746,8 @@
+     {
+@@ -1639,9 +1765,9 @@
  
        for(; pos != this->_vectors.end(); ++pos)
          {
 -	  this->write_serialized_vector(io, *pos->second);
+-	  total_written_size += pos->second->size();
+-	  
 +	  total_written_size +=
 +	    this->write_serialized_vector(io, *pos->second);
- 
++
  	  // set up the comment
  	  if (libMesh::processor_id() == 0)
-@@ -1632,178 +1761,466 @@
- 	    }
+ 	    {
+@@ -1655,187 +1781,465 @@
  	}
      }
-+
+ 
+-  // const Real 
+-  //   dt   = pl.get_elapsed_time(),
+-  //   rate = total_written_size*sizeof(Number)/dt; 
 +  const Real 
 +    dt   = pl.get_elapsed_time(),
 +    rate = total_written_size*sizeof(Number)/dt; 
@@ -1098,10 +1170,14 @@ Index: src/systems/system_io.C
 +  std::cout << "Write " << total_written_size << " \"Number\" values\n"
 +	    << " Elapsed time = " << dt << '\n'
 +	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
-+  
+   
+-  // std::cout << "Write " << total_written_size << " \"Number\" values\n"
+-  // 	    << " Elapsed time = " << dt << '\n'
+-  // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
 +  pl.pop("write_serialized_data");
 +
-+  
+   
+-  // pl.pop("write_serialized_data");
 +
 +  
 +  // // test the new method
@@ -1689,7 +1765,7 @@ Index: src/systems/system_io.C
  unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
                                          const unsigned int var,
  					Xdr &io) const
-@@ -1854,7 +2271,8 @@
+@@ -1886,7 +2290,8 @@
  }
  
  
@@ -1699,33 +1775,80 @@ Index: src/systems/system_io.C
  {
    parallel_only();
  
-@@ -1873,21 +2291,21 @@
-       // Collect the values for all nodes
-       written_length +=
- 	this->write_serialized_blocked_dof_objects (vec,
--						    var,
- 						    this->get_mesh().n_nodes(),
- 						    this->get_mesh().local_nodes_begin(),
- 						    this->get_mesh().local_nodes_end(),
--						    io);
-+						    io,
-+						    var);
+@@ -1897,31 +2302,49 @@
  
-       //------------------------------------
-       // Collect the values for all elements
-       written_length +=
- 	this->write_serialized_blocked_dof_objects (vec,
--						    var,
- 						    this->get_mesh().n_elem(),
- 						    this->get_mesh().local_elements_begin(),
- 						    this->get_mesh().local_elements_end(),
--						    io);
-+						    io,
-+						    var);
-     } // end variable loop
+   unsigned int written_length = 0;
  
+-  // Loop over each non-SCALAR variable in the system, and then each node/element in the mesh.
+-  for (unsigned int var=0; var<this->n_vars(); var++)
+-    if(this->variable(var).type().family != SCALAR)
+-    {
+-      //---------------------------------
+-      // Collect the values for all nodes
+-      written_length +=
+-	this->write_serialized_blocked_dof_objects (vec,
+-						    var,
+-						    this->get_mesh().n_nodes(),
+-						    this->get_mesh().local_nodes_begin(),
+-						    this->get_mesh().local_nodes_end(),
+-						    io);
++  // // Loop over each non-SCALAR variable in the system, and then each node/element in the mesh.
++  // for (unsigned int var=0; var<this->n_vars(); var++)
++  //   if(this->variable(var).type().family != SCALAR)
++  //   {
++  //     //---------------------------------
++  //     // Collect the values for all nodes
++  //     written_length +=
++  // 	this->write_serialized_blocked_dof_objects (vec,
++  // 						    this->get_mesh().n_nodes(),
++  // 						    this->get_mesh().local_nodes_begin(),
++  // 						    this->get_mesh().local_nodes_end(),
++  // 						    io,
++  // 						    var);
+ 
+-      //------------------------------------
+-      // Collect the values for all elements
+-      written_length +=
+-	this->write_serialized_blocked_dof_objects (vec,
+-						    var,
+-						    this->get_mesh().n_elem(),
+-						    this->get_mesh().local_elements_begin(),
+-						    this->get_mesh().local_elements_end(),
+-						    io);
+-    } // end variable loop
++  //     //------------------------------------
++  //     // Collect the values for all elements
++  //     written_length +=
++  // 	this->write_serialized_blocked_dof_objects (vec,
++  // 						    this->get_mesh().n_elem(),
++  // 						    this->get_mesh().local_elements_begin(),
++  // 						    this->get_mesh().local_elements_end(),
++  // 						    io,
++  // 						    var);
++  //   } // end variable loop
++  
++  //---------------------------------
++  // Collect the values for all nodes
++  written_length +=
++    this->write_serialized_blocked_dof_objects (vec,
++						this->get_mesh().n_nodes(),
++						this->get_mesh().local_nodes_begin(),
++						this->get_mesh().local_nodes_end(),
++						io);
+ 
++  //------------------------------------
++  // Collect the values for all elements
++  written_length +=
++    this->write_serialized_blocked_dof_objects (vec,
++						this->get_mesh().n_elem(),
++						this->get_mesh().local_elements_begin(),
++						this->get_mesh().local_elements_end(),
++						io);
++  
    // Finally loop over all the SCALAR variables
-@@ -1900,8 +2318,58 @@
+   for (unsigned int var=0; var<this->n_vars(); var++)
+     if(this->variable(var).type().family == SCALAR)
+@@ -1932,8 +2355,58 @@
  
    if (libMesh::processor_id() == 0)
      libmesh_assert_equal_to (written_length, vec_length);
