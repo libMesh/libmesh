@@ -7,6 +7,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
+using namespace libMesh;
+
 class LaspackVectorTest : public NumericVectorTest<LaspackVector<Real> > { 
 public: 
   CPPUNIT_TEST_SUITE( LaspackVectorTest );

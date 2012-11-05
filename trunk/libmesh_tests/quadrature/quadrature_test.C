@@ -3,6 +3,8 @@
 
 #include <libmesh/quadrature.h>
 
+using namespace libMesh;
+
 class QuadratureTest : public CppUnit::TestCase { 
 public: 
   CPPUNIT_TEST_SUITE( QuadratureTest );

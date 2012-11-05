@@ -6,6 +6,8 @@
 #include "../geom/point_test.h"
 #include "../base/dof_object_test.h"
 
+using namespace libMesh;
+
 class NodeTest : public PointTestBase<Node>, public DofObjectTest<Node> { 
 public: 
   CPPUNIT_TEST_SUITE( NodeTest );

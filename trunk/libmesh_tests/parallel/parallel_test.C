@@ -3,6 +3,8 @@
 
 #include <libmesh/parallel.h>
 
+using namespace libMesh;
+
 class ParallelTest : public CppUnit::TestCase { 
 public: 
   CPPUNIT_TEST_SUITE( ParallelTest );

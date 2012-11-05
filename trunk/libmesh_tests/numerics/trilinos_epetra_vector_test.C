@@ -7,6 +7,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 
+using namespace libMesh;
+
 class EpetraVectorTest : public NumericVectorTest<EpetraVector<Real> > { 
 public: 
   CPPUNIT_TEST_SUITE( EpetraVectorTest );
