@@ -713,6 +713,42 @@ namespace Parallel
                const MessageTag &tag=no_tag) const;
 
     /**
+     * Blocking-receive from one processor with data-defined type.
+     */
+    template <typename T>
+    Status receive (const unsigned int dest_processor_id,
+                    T &buf,
+                    const MessageTag &tag=no_tag) const;
+
+    /**
+     * Nonblocking-receive from one processor with data-defined type.
+     */
+    template <typename T>
+    void receive (const unsigned int dest_processor_id,
+                  T &buf,
+                  Request &req,
+                  const MessageTag &tag=no_tag) const;
+
+    /**
+     * Blocking-receive from one processor with user-defined type.
+     */
+    template <typename T>
+    Status receive (const unsigned int dest_processor_id,
+                    T &buf,
+                    const DataType &type,
+                    const MessageTag &tag=no_tag) const;
+
+    /**
+     * Nonblocking-receive from one processor with user-defined type.
+     */
+    template <typename T>
+    void receive (const unsigned int dest_processor_id,
+                  T &buf,
+                  const DataType &type,
+                  Request &req,
+                  const MessageTag &tag=no_tag) const;
+
+    /**
      * Blocking-send range-of-pointers to one processor.  This
      * function does not send the raw pointers, but rather constructs
      * new objects at the other end whose contents match the objects
