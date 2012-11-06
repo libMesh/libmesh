@@ -48,6 +48,8 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
   typedef std::vector<unsigned int, Threads::scalable_allocator<unsigned int> > Row;
   class Graph : public std::vector<Row> {};
 
+  class NonlocalGraph : public std::map<unsigned int, Row> {};
+
   /**
    * Splices the two sorted ranges [begin,middle) and [middle,end)
    * into one sorted range [begin,end).  This method is much like
@@ -85,6 +87,8 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
   public:
 
     SparsityPattern::Graph sparsity_pattern;
+    SparsityPattern::NonlocalGraph nonlocal_pattern;
+
     std::vector<unsigned int> n_nz;
     std::vector<unsigned int> n_oz;
 
@@ -99,6 +103,7 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
       implicit_neighbor_dofs(implicit_neighbor_dofs_in),
       need_full_sparsity_pattern(need_full_sparsity_pattern_in),
       sparsity_pattern(),
+      nonlocal_pattern(),
       n_nz(),
       n_oz()
     {}
@@ -110,6 +115,7 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
       implicit_neighbor_dofs(other.implicit_neighbor_dofs),
       need_full_sparsity_pattern(other.need_full_sparsity_pattern),
       sparsity_pattern(),
+      nonlocal_pattern(),
       n_nz(),
       n_oz()
     {}
@@ -117,6 +123,8 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
     void operator()(const ConstElemRange &range);
 
     void join (const Build &other);
+
+    void parallel_sync ();
   };
 
 #if defined(__GNUC__) && (__GNUC__ < 4) && !defined(__INTEL_COMPILER)
