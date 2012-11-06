@@ -1226,7 +1226,7 @@ unsigned int System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec
   libmesh_assert_less_equal (n_vars, this->n_vars());
 
   // for newer versions, read variables node/elem major
-  if (io.version() >= LIBMESH_VERSION(0,7,4))
+  if (io.version() >= LIBMESH_VERSION_ID(0,7,4))
     {
       //---------------------------------
       // Collect the values for all nodes
