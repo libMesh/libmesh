@@ -9,11 +9,11 @@ define([AC_CACHE_LOAD], )dnl
 define([AC_CACHE_SAVE], )dnl
 
 
-AC_INIT([libmesh], [0.8.0], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
+AC_INIT([libmesh], [0.7.4], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
 AC_PREREQ([2.61]) # require autoconf 2.61 - I havent tried anything older
 
 
-VERSION=0.8.0
+VERSION=0.7.4
 AC_SUBST(VERSION)
 AC_REVISION($Revision$)
 

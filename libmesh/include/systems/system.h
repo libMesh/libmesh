@@ -1109,6 +1109,13 @@ public:
   void write_serialized_data (Xdr& io,
 			      const bool write_additional_data = true) const;
 
+  // /**
+  //  *
+  //  */
+  // unsigned int write_serialized_vectors (Xdr &io,
+  // 					 const std::vector<std::string> &names,
+  // 					 const std::vector<NumericVector<Number>*> &vectors) const;
+     
   /**
    * Writes additional data, namely vectors, for this System.
    * This method may safely be called on a distributed-memory mesh.
@@ -1491,18 +1498,32 @@ private:
 			  unsigned int var,
 			  FEMNormType norm_type) const;
 
+  // /**
+  //  * Reads an input vector from the stream \p io and assigns
+  //  * the values to a set of \p DofObjects.  This method uses
+  //  * blocked input and is safe to call on a distributed memory-mesh.
+  //  */
+  // template <typename iterator_type>
+  // unsigned int read_serialized_blocked_dof_objects (const unsigned int var,
+  // 						    const unsigned int n_objects,
+  // 						    const iterator_type begin,
+  // 						    const iterator_type end,
+  // 						    Xdr &io,
+  // 						    NumericVector<Number> &vec) const;
+
   /**
    * Reads an input vector from the stream \p io and assigns
    * the values to a set of \p DofObjects.  This method uses
    * blocked input and is safe to call on a distributed memory-mesh.
+   * Unless otherwise specified, all variables are read.
    */
   template <typename iterator_type>
-  unsigned int read_serialized_blocked_dof_objects (const unsigned int var,
-						    const unsigned int n_objects,
+  unsigned int read_serialized_blocked_dof_objects (const unsigned int n_objects,
 						    const iterator_type begin,
 						    const iterator_type end,
 						    Xdr &io,
-						    NumericVector<Number> &vec) const;
+						    NumericVector<Number> &vec,
+						    const unsigned int var_to_read=libMesh::invalid_uint) const;
 
   /**
    * Reads the SCALAR dofs from the stream \p io and assigns the values
@@ -1516,8 +1537,20 @@ private:
    * Reads a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
-  void read_serialized_vector (Xdr& io,
-			       NumericVector<Number> &vec);
+  unsigned int read_serialized_vector (Xdr& io,
+				       NumericVector<Number> &vec);
+
+  // /**
+  //  * Writes an output vector to the stream \p io for a set of \p DofObjects.
+  //  * This method uses blocked output and is safe to call on a distributed memory-mesh.
+  //  */
+  // template <typename iterator_type>
+  // unsigned int write_serialized_blocked_dof_objects (const NumericVector<Number> &vec,
+  // 						     const unsigned int var,
+  // 						     const unsigned int n_objects,
+  // 						     const iterator_type begin,
+  // 						     const iterator_type end,
+  // 						     Xdr &io) const;
 
   /**
    * Writes an output vector to the stream \p io for a set of \p DofObjects.
@@ -1525,11 +1558,11 @@ private:
    */
   template <typename iterator_type>
   unsigned int write_serialized_blocked_dof_objects (const NumericVector<Number> &vec,
-						     const unsigned int var,
 						     const unsigned int n_objects,
 						     const iterator_type begin,
 						     const iterator_type end,
-						     Xdr &io) const;
+						     Xdr &io,
+						     const unsigned int var_to_write=libMesh::invalid_uint) const;
 
   /**
    * Writes the SCALAR dofs associated with var to the stream \p io.
@@ -1542,8 +1575,8 @@ private:
    * Writes a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
-  void write_serialized_vector (Xdr& io,
-				const NumericVector<Number> &vec) const;
+  unsigned int write_serialized_vector (Xdr& io,
+					const NumericVector<Number> &vec) const;
 
   /**
    * Function that initializes the system.
