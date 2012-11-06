@@ -25,6 +25,7 @@
 #include <sstream>
 
 // Local Includes
+#include "libmesh/libmesh_version.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
@@ -481,13 +482,18 @@ void EquationSystems::write(const std::string& name,
     std::string comment;
     char buf[256];
 
+    // set the version number in the Xdr object
+    io.set_version(LIBMESH_VERSION(LIBMESH_MAJOR_VERSION,
+				   LIBMESH_MINOR_VERSION,
+				   LIBMESH_MICRO_VERSION));
+    
     // Only write the header information
     // if we are processor 0.
     if (proc_id == 0)
       {
 	// 1.)
 	// Write the version header
-	std::string version = "libMesh-0.7.2";
+	std::string version = "libMesh-0.7.4";
 	if (write_parallel_files) version += " parallel";
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
