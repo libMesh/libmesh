@@ -113,6 +113,12 @@ int main(int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
+  // Adaptive constraint calculations for fine Hermite elements seems
+  // to require half-decent precision
+#ifdef LIBMESH_DEFAULT_SINGLE_PRECISION
+  libmesh_example_assert(false, "double precision");
+#endif
+
   // This example requires Adaptive Mesh Refinement support
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_assert(false, "--enable-amr");
