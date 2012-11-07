@@ -91,10 +91,9 @@ namespace Threads
    * Fall back to tbb::tbb_thread when available.
    */
   typedef tbb::tbb_thread Thread;
-
   
 #else
-
+  //--------------------------------------------------------------------
   /**
    * Simple compatibility class for std::thread 'concurrent' execution.
    * Not at all concurrent, but provides a compatible interface.
@@ -108,15 +107,19 @@ namespace Threads
      * is complete.
      */
     template <typename Callable>
-    Thread (Callable f)
-    { f(); }
+    Thread (Callable f) { f(); }
 
     /**
      * Join is a no-op, since the constructor blocked until completion.
      */
-    void join() {};
-    
+    void join() {}
+
+    /**
+     * Always joinable.
+     */
+    bool joinable() const { return true; }
   };
+  
 #endif
 
 
