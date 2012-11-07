@@ -62,7 +62,7 @@ distclean:
 	@rm -f ../../lib/*/libmetis.*
 
 # include the dependency list
-include .depend
+-include .depend
 
 
 #
