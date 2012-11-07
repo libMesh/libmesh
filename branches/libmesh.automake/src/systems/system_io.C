@@ -2090,7 +2090,7 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
   // sent to processor 0
   for (unsigned int blk=0; blk<num_blks; blk++)
     {
-      libMesh::out << "Writing object block " << blk << std::endl;
+      // libMesh::out << "Writing object block " << blk << std::endl;
 
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).
