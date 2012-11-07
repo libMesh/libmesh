@@ -112,7 +112,7 @@ restart: $(target)
 
 
 # include the dependency list
-include .depend
+-include .depend
 
 
 #

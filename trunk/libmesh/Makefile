@@ -279,7 +279,7 @@ src/mesh/vtk_io.$(obj-suffix) : src/mesh/vtk_io.C
 
 
 ###############################################################################
-include .depend
+-include .depend
 
 
 # Local Variables:
