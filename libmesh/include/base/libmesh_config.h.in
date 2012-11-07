@@ -275,6 +275,9 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
+/* define if the compiler supports std::thread */
+#undef HAVE_STD_THREAD
+
 /* define if the compiler supports std::unordered_map */
 #undef HAVE_STD_UNORDERED_MAP
 
