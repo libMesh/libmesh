@@ -27,10 +27,43 @@ fi
 
 
 # ------------------------------------------------------------------------------
-# Choose the best unordered_map implementation available
+# Check to see if the compiler can invoke the TBB to compile a
+# test program using tbb::tbb_thread
+# ------------------------------------------------------------------------------
+AC_DEFUN([ACX_TBB_STD_THREAD],
+[AC_CACHE_CHECK(whether TBB supports tbb::tbb_thread,
+ac_cv_tbb_cxx_thread,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ saveCXXFLAGS="$CXXFLAGS"
+ CXXFLAGS="$TBB_INCLUDE"
+ AC_TRY_COMPILE([#include <tbb/tbb_thread.h>],
+[
+  tbb::tbb_thread t;
+  t.join();
+],
+ ac_cv_tbb_cxx_thread=yes, ac_cv_tbb_cxx_thread=no)
+ AC_LANG_RESTORE
+]
+CXXFLAGS="$saveCXXFLAGS"
+)
+if test "$ac_cv_tbb_cxx_thread" = yes; then
+  AC_DEFINE(HAVE_TBB_CXX_THREAD,1,
+            [define if the compiler supports std::thread])
+  [$1]
+else
+  false
+  [$2]
+fi
+])
+
+
+# ------------------------------------------------------------------------------
+# Choose the best thread option available, if any
 # ------------------------------------------------------------------------------
 AC_DEFUN([ACX_BEST_THREAD],
 [
-ACX_STD_THREAD([])
-# ACX_BOOST_THREAD([],[]))
+ACX_STD_THREAD([enablestdthreads=yes],
+ACX_TBB_STD_THREAD([enabletbbthreads=yes],
+[enablecppthreads=no]))
 ])
