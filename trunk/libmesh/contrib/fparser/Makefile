@@ -409,6 +409,7 @@ $(EXTERNAL_LIBDIR)/lib$(pkgname)$(shared_libext): $(OBJS)
 	@$(libmesh_CXX) $(libmesh_CXXSHAREDFLAG) -o $@ $(OBJS) $(libmesh_LDFLAGS)
 
 clobber: clean
+	@rm -f $(EXTERNAL_LIBDIR)/lib$(pkgname).*
 
 %.$(obj-suffix) : %.cc
 	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
