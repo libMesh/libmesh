@@ -71,7 +71,7 @@ run: $(target)
 	@echo "***************************************************************"
 
 # include the dependency list
-include .depend
+-include .depend
 
 
 #
