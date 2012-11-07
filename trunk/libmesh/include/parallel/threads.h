@@ -38,6 +38,11 @@
 #endif
 
 // C++ includes
+#ifdef LIBMESH_HAVE_STD_THREAD
+#  include <thread>
+#endif
+
+
 
 namespace libMesh
 {
@@ -69,6 +74,48 @@ namespace Threads
   private:
     bool& _b;
   };
+
+
+#ifdef LIBMESH_HAVE_STD_THREAD
+  //--------------------------------------------------------------------
+  /**
+   * Use std::thread when available.
+   */
+  typedef std::thread Thread;
+
+#else
+
+  /**
+   * Simple compatibility class for std::thread 'concurrent' execution.
+   * Not at all concurrent, but provides a compatible interface.
+   */
+  class Thread
+  {
+  private:
+    /**
+     * No default constructor!.
+     */
+    Thread () {};
+
+  public:
+    /**
+     * Constructor.  Takes a callable function object and executes it.
+     * Our wrapper class actually blocks execution until the thread
+     * is complete.
+     */
+    template <typename Callable>
+    Thread (Callable f)
+    { f(); }
+
+    /**
+     * Join is a no-op, since the constructor blocked until completion.
+     */
+    void join() {};
+    
+  };
+#endif
+
+
 
 #ifdef LIBMESH_HAVE_TBB_API
   //-------------------------------------------------------------------
