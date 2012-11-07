@@ -63,7 +63,7 @@ fi
 # ------------------------------------------------------------------------------
 AC_DEFUN([ACX_BEST_THREAD],
 [
-ACX_STD_THREAD([enablestdthreads=yes],
-ACX_TBB_STD_THREAD([enabletbbthreads=yes],
+ACX_STD_THREAD([cppthreadflavor="std::thread"],
+ACX_TBB_STD_THREAD([cppthreadflavor="tbb::tbb_thread"],
 [enablecppthreads=no]))
 ])
