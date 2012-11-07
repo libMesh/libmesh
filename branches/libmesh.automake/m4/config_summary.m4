@@ -97,6 +97,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'sfcurves......................... : $enablesfc
   echo '  'slepc............................ : $enableslepc
   echo '  'tbb.............................. : $enabletbb
+  echo '  'c++ threads...................... : $enablecppthreads
   echo '  'tecio............................ : $enabletecio
   echo '  'tecplot...\(vendor binaries\)...... : $enabletecplot
   echo '  'tetgen........................... : $enabletetgen

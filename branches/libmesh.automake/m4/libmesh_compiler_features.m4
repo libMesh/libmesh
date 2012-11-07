@@ -154,6 +154,18 @@ AX_CXX_GCC_ABI_DEMANGLE
 AX_CXX_GLIBC_BACKTRACE
 
 
+# -------------------------------------------------------------
+# C++ Thread Support  -- enabled by default
+# -------------------------------------------------------------
+AC_ARG_ENABLE(cppthreads,
+             AC_HELP_STRING([--enable-cppthreads],
+                            [Build with C++ std::thread Support]),
+             enablecppthreads=$enableval,
+             enablecppthreads=yes)
+if (test "$enablecppthreads" != no) ; then
+  ACX_BEST_THREAD
+fi
+# -------------------------------------------------------------
 
 
 
