@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_TECIO],
 		   no)  enabletecio=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tecio) ;;
 		 esac],
-		 [enabletecio=no]) #disabled by default, do more portability.
+		 [enabletecio=$enableoptional])
 
 
 		

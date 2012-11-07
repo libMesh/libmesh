@@ -11,7 +11,8 @@ AC_DEFUN([CONFIGURE_TECPLOT],
 		   no)  enabletecplot=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-tecplot) ;;
 		 esac],
-		 [enabletecplot=$enableoptional])
+		 [enabletecplot=no]) # disabled by default -- mutually exclusive
+		                     # with tecio
 
   # Can't support both vendor-provided libraries and building from source, and we prefer the latter
   if (test "x$enabletecplot" = "xyes" -a "x$enabletecio" = "xyes"); then

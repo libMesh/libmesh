@@ -101,6 +101,21 @@ fi
 
 
 # -------------------------------------------------------------
+# C++ Thread Support  -- enabled by default
+# -------------------------------------------------------------
+AC_ARG_ENABLE(cppthreads,
+             AC_HELP_STRING([--enable-cppthreads],
+                            [Build with C++ std::thread Support]),
+             enablecppthreads=$enableval,
+             enablecppthreads=yes)
+if (test "$enablecppthreads" != no) ; then
+  ACX_BEST_THREAD
+fi
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
 # LASPACK iterative solvers -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_LASPACK
