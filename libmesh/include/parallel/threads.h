@@ -40,6 +40,8 @@
 // C++ includes
 #ifdef LIBMESH_HAVE_STD_THREAD
 #  include <thread>
+#elif LIBMESH_HAVE_TBB_CXX_THREAD
+#  include "tbb/tbb_thread.h"
 #endif
 
 
@@ -83,6 +85,14 @@ namespace Threads
    */
   typedef std::thread Thread;
 
+#elif LIBMESH_HAVE_TBB_CXX_THREAD
+  //--------------------------------------------------------------------
+  /**
+   * Fall back to tbb::tbb_thread when available.
+   */
+  typedef tbb::tbb_thread Thread;
+
+  
 #else
 
   /**
@@ -91,12 +101,6 @@ namespace Threads
    */
   class Thread
   {
-  private:
-    /**
-     * No default constructor!.
-     */
-    Thread () {};
-
   public:
     /**
      * Constructor.  Takes a callable function object and executes it.
