@@ -40,7 +40,8 @@
 namespace {
 
   using libMesh::DofObject;
-
+  using libMesh::Number;
+  
   // Comments:
   // ---------
   // - The max_io_blksize governs how many nodes or elements will be
@@ -58,7 +59,7 @@ namespace {
   // - If the library exhausts memory during IO you might reduce this
   // parameter.
 
-  const unsigned int max_io_blksize = 256000;
+  const unsigned int max_io_blksize = 25600000;
 
 
   /**
@@ -76,6 +77,28 @@ namespace {
 
       return a->id() < b->id();
     }
+  };
+
+  /**
+   *
+   */
+  class ThreadedIO
+  {
+  private:
+    libMesh::Xdr &_io;
+    std::vector<Number> &_data;
+    
+  public:
+    ThreadedIO (libMesh::Xdr &io, std::vector<Number> &data) :
+      _io(io),
+      _data(data)      
+    {}
+    
+    void operator()()
+    {
+      if (_data.empty()) return;
+      _io.data_stream (&_data[0], _data.size());
+    }        
   };
 }
 
@@ -2067,7 +2090,7 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
   // sent to processor 0
   for (unsigned int blk=0; blk<num_blks; blk++)
     {
-      //libMesh::out << "Writing object block " << blk << std::endl;
+      libMesh::out << "Writing object block " << blk << std::endl;
 
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).
@@ -2127,6 +2150,10 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
       std::vector<unsigned int> obj_val_offsets;          // map to traverse entry-wise rather than processor-wise
       std::vector<Number>       output_vals;              // The output buffer for the current block
 
+      // a ThreadedIO object to perform asychronous file IO
+      ThreadedIO threaded_io(io, output_vals);
+      AutoPtr<Threads::Thread> async_io;
+      
       for (unsigned int blk=0; blk<num_blks; blk++)
 	{
 	  // Each processor should build up its transfer buffers for its
@@ -2193,6 +2220,10 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 	  std::partial_sum(obj_val_offsets.begin(), obj_val_offsets.end(),
 			   obj_val_offsets.begin());
 
+	  // wait on any previous asynchronous IO - this *must* complete before
+	  // we start messing with the output_vals buffer!
+	  if (async_io.get()) async_io->join();
+	  
 	  // this is the actual output buffer that will be written to disk.
 	  // at ths point we finally know wha size it will be.
 	  output_vals.resize(n_val_recvd_blk);
@@ -2218,12 +2249,6 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 		  
 		  for (unsigned int comp=0; comp<n_comp_tot; comp++, ++out_vals, ++proc_vals)
 		    {
-		      if (out_vals == output_vals.end())
-			{
-			  std::cerr << "local_idx=" << local_idx
-				    << ", n_comp_tot=" << n_comp_tot
-				    << ", obj_val_offsets[local_idx]=" << obj_val_offsets[local_idx] << '\n';
-			}
 		      libmesh_assert (out_vals  != output_vals.end());
 		      libmesh_assert (proc_vals != vals.end());
 		      *out_vals = *proc_vals;
@@ -2233,9 +2258,15 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 	  
 	  // output_vals buffer is now filled for this block.
 	  // write it to disk
-	  io.data_stream (output_vals.empty() ? NULL : &output_vals[0], output_vals.size());
+	  async_io.reset(new Threads::Thread(threaded_io));
+
+	  //io.data_stream (output_vals.empty() ? NULL : &output_vals[0], output_vals.size());
 	  written_length += output_vals.size();
 	}
+
+      // wait on any previous asynchronous IO - this *must* complete before
+      // our stuff goes out of scope
+      async_io->join();	  
     }
 
   Parallel::wait(id_requests);
