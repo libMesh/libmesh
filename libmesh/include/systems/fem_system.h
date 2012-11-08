@@ -23,6 +23,7 @@
 
 // Local Includes
 #include "libmesh/diff_system.h"
+#include "libmesh/fem_physics.h"
 
 // C++ includes
 #include <cstddef>
@@ -52,7 +53,8 @@ class FEMContext;
 // ------------------------------------------------------------
 // FEMSystem class definition
 
-class FEMSystem : public DifferentiableSystem
+class FEMSystem : public DifferentiableSystem,
+                  public FEMPhysics
 {
 public:
 
@@ -103,72 +105,6 @@ public:
   virtual void solve ();
 
   /**
-   * Tells the FEMSystem that variable \p var is evolving with
-   * respect to time.  In general, the user's init() function
-   * should call time_evolving() for any variables which
-   * behave like du/dt = F(u), and should not call time_evolving()
-   * for any variables which behave like 0 = G(u).
-   *
-   * Most derived systems will not have to reimplment this function; however
-   * any system which reimplements mass_residual() may have to reimplement
-   * time_evolving() to prepare data structures.
-   */
-  virtual void time_evolving (unsigned int var);
-
-  /**
-   * Tells the FEMSystem that system \p sys contains the
-   * isoparametric Lagrangian variables which correspond to the
-   * coordinates of mesh nodes, in problems where the mesh itself is
-   * expected to move in time.
-   *
-   * The system with mesh coordinate data (which may be \p this system
-   * itself, for fully coupled moving mesh problems) is currently
-   * assumed to have new (end of time step) mesh coordinates stored in
-   * solution, old (beginning of time step) mesh coordinates stored in
-   * _old_nonlinear_solution, and constant velocity motion during each
-   * time step.
-   *
-   * Activating this function ensures that local (but not neighbor!) element
-   * geometry is correctly repositioned when evaluating element residuals.
-   *
-   * Currently \p sys must be \p *this for a tightly coupled moving
-   * mesh problem or NULL to stop mesh movement; loosely coupled
-   * moving mesh problems are not implemented.
-   *
-   * This code is experimental.  "Trust but verify, and not in that
-   * order"
-   */
-  virtual void set_mesh_system(System* sys);
-
-  /**
-   * Tells the FEMSystem that variable \p var from the mesh system
-   * should be used to update the x coordinate of mesh nodes, in problems where
-   * the mesh itself is expected to move in time.
-   *
-   * The system with mesh coordinate data (which may be this system itself, for
-   * fully coupled moving mesh problems) is currently assumed to have new (end
-   * of time step) mesh coordinates stored in solution, old (beginning of time
-   * step) mesh coordinates stored in _old_nonlinear_solution, and constant
-   * velocity motion during each time step.
-   *
-   * Activating this function ensures that local (but not neighbor!) element
-   * geometry is correctly repositioned when evaluating element residuals.
-   */
-  virtual void set_mesh_x_var(unsigned int var);
-
-  /**
-   * Tells the FEMSystem that variable \p var from the mesh system
-   * should be used to update the y coordinate of mesh nodes.
-   */
-  virtual void set_mesh_y_var(unsigned int var);
-
-  /**
-   * Tells the FEMSystem that variable \p var from the mesh system
-   * should be used to update the z coordinate of mesh nodes.
-   */
-  virtual void set_mesh_z_var(unsigned int var);
-
-  /**
    * Tells the FEMSystem to set the degree of freedom coefficients
    * which should correspond to mesh nodal coordinates.
    */
@@ -179,39 +115,6 @@ public:
    * which should correspond to degree of freedom coefficients.
    */
   void mesh_position_set();
-
-  /**
-   * Adds a pseudo-convection contribution on \p elem to
-   * elem_residual, if the nodes of \p elem are being translated by a
-   * moving mesh.
-   *
-   * This function assumes that the user's time derivative equations
-   * (except for any equations involving unknown mesh xyz coordinates
-   * themselves) are expressed in an Eulerian frame of reference, and
-   * that the user is satisfied with an unstabilized convection term.
-   * Lagrangian equations will probably require overriding
-   * eulerian_residual() with a blank function; ALE or stabilized
-   * formulations will require reimplementing eulerian_residual()
-   * entirely.
-   */
-  virtual bool eulerian_residual (bool request_jacobian,
-                                  DiffContext &context);
-
-  /**
-   * Adds a mass vector contribution on \p elem to elem_residual.
-   * If this method receives request_jacobian = true, then it
-   * should compute elem_jacobian and return true if possible.  If
-   * elem_jacobian has not been computed then the method should
-   * return false.
-   *
-   * Most problems can use the FEMSystem::mass_residual implementation,
-   * which calculates the residual (u, phi_i) and jacobian (phi_i, phi_j);
-   * few users will need to reimplement this themselves.  Using a custom
-   * mass matrix (e.g. for divergence-free elements or mass lumping)
-   * requires reimplementing mass_residual().
-   */
-  virtual bool mass_residual (bool request_jacobian,
-                              DiffContext &context);
 
   /**
    * Builds a FEMContext object with enough information to do
@@ -322,54 +225,6 @@ protected:
   virtual void init_data ();
 };
 
-
-
-// ------------------------------------------------------------
-// FEMSystem inline methods
-
-
-
-inline
-void FEMSystem::set_mesh_system(System* sys)
-{
-  // For now we assume that we're doing fully coupled mesh motion
-  if (sys && sys != this)
-    libmesh_not_implemented();
-
-  // For the foreseeable future we'll assume that we keep these
-  // Systems in the same EquationSystems
-  libmesh_assert_equal_to (&this->get_equation_systems(),
-                           &sys->get_equation_systems());
-
-  // And for the immediate future this code may not even work
-  libmesh_experimental();
-
-  _mesh_sys = sys;
-}
-
-
-
-inline
-void FEMSystem::set_mesh_x_var (unsigned int var)
-{
-  _mesh_x_var = var;
-}
-
-
-
-inline
-void FEMSystem::set_mesh_y_var (unsigned int var)
-{
-  _mesh_y_var = var;
-}
-
-
-
-inline
-void FEMSystem::set_mesh_z_var (unsigned int var)
-{
-  _mesh_z_var = var;
-}
 
 } // namespace libMesh
 

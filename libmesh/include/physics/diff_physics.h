@@ -68,6 +68,11 @@ public:
   virtual ~DifferentiablePhysics ();
 
   /**
+   * Copy of this object. User should override to copy any needed state.
+   */
+  virtual AutoPtr<DifferentiablePhysics> clone_physics() = 0;
+
+  /**
    * Clear any data structures associated with the physics. 
    */
   virtual void clear_physics ();
@@ -166,6 +171,17 @@ public:
     if (_time_evolving.size() <= var)
       _time_evolving.resize(var+1, false);
     _time_evolving[var] = true;
+  }
+
+  /**
+   * Returns true iff variable \p var is evolving with
+   * respect to time.  In general, the user's init() function
+   * should have set time_evolving() for any variables which
+   * behave like du/dt = F(u), and should not call time_evolving()
+   * for any variables which behave like 0 = G(u).
+   */
+  bool is_time_evolving (unsigned int var) const {
+    return _time_evolving[var];
   }
 
   /**

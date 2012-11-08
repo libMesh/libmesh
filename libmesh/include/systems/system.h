@@ -1245,31 +1245,6 @@ public:
   virtual void prolong_vectors ();
 
   /**
-   * Returns a reference to the system with variables corresponding to
-   * mesh nodal coordinates, or NULL if the mesh is fixed.
-   * Useful for ALE calculations.
-   */
-  const System* get_mesh_system() const;
-
-  /**
-   * Returns the variable number corresponding to the
-   * mesh x coordinate. Useful for ALE calculations.
-   */
-  unsigned int get_mesh_x_var() const;
-
-  /**
-   * Returns the variable number corresponding to the
-   * mesh y coordinate. Useful for ALE calculations.
-   */
-  unsigned int get_mesh_y_var() const;
-
-  /**
-   * Returns the variable number corresponding to the
-   * mesh z coordinate. Useful for ALE calculations.
-   */
-  unsigned int get_mesh_z_var() const;
-
-  /**
    * Flag which tells the system to whether or not to
    * call the user assembly function during each call to solve().
    * By default, every call to solve() begins with a call to the
@@ -1462,16 +1437,6 @@ protected:
    */
   void project_vector (const NumericVector<Number>&,
 		       NumericVector<Number>&) const;
-
-  /**
-   * System from which to acquire moving mesh information
-   */
-  System *_mesh_sys;
-
-  /**
-   * Variables from which to acquire moving mesh information
-   */
-  unsigned int _mesh_x_var, _mesh_y_var, _mesh_z_var;
 
 private:
   /**
@@ -2028,29 +1993,6 @@ System::qoi_parameter_hessian_vector_product(const QoISet&,
   libmesh_not_implemented();
 }
 
-inline
-const System* System::get_mesh_system() const
-{
-  return _mesh_sys;
-}
-
-inline
-unsigned int System::get_mesh_x_var() const
-{
-  return _mesh_x_var;
-}
-
-inline
-unsigned int System::get_mesh_y_var() const
-{
-  return _mesh_y_var;
-}
-
-inline
-unsigned int System::get_mesh_z_var() const
-{
-  return _mesh_z_var;
-}
 
 } // namespace libMesh
 
