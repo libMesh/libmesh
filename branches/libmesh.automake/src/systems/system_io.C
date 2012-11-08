@@ -59,7 +59,7 @@ namespace {
   // - If the library exhausts memory during IO you might reduce this
   // parameter.
 
-  const unsigned int max_io_blksize = 25600000;
+  const unsigned int max_io_blksize = 256000;
 
 
   /**
