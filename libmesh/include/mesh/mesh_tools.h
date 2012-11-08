@@ -356,6 +356,24 @@ namespace MeshTools
   void libmesh_assert_valid_elem_ids (const MeshBase &mesh);
 
   /**
+   * A function for verifying that ids of elements are correctly
+   * sorted for AMR (parents have lower ids than children)
+   */
+  void libmesh_assert_valid_amr_elem_ids (const MeshBase &mesh);
+
+  /**
+   * A function for verifying that all nodes are connected to at least
+   * one element.
+   *
+   * This will fail in the most general case.  When ParallelMesh and
+   * NodeConstraints are enabled, we expect the possibility that a
+   * processor will be given remote nodes to satisfy node constraints
+   * without also being given the remote elements connected to those
+   * nodes.
+   */
+  void libmesh_assert_connected_nodes (const MeshBase &mesh);
+
+  /**
    * A function for verifying that processor assignment is
    * self-consistent on nodes (each node part of an active element on
    * its processor) or elements (each parent has the processor id of
