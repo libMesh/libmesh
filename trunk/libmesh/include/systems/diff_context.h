@@ -86,6 +86,11 @@ public:
   virtual void elem_edge_reinit(Real) {}
 
   /**
+   * Number of variables in solution.
+   */
+  unsigned int n_vars() const { return dof_indices_var.size(); }
+
+  /**
    * Accessor for element solution.
    */
   const DenseVector<Number>& get_elem_solution() const
