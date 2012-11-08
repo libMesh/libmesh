@@ -10,6 +10,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 noinst_LTLIBRARIES = libtecio.la
 
 libtecio_la_SOURCES = \
+	include/TECIO.h \
+	include/TECXXX.h \
 	tecsrc/ALLOC.h \
 	tecsrc/ARRLIST.h \
 	tecsrc/AUXDATA.h \
