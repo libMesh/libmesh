@@ -1057,6 +1057,57 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 
 
 
+void MeshTools::libmesh_assert_valid_amr_elem_ids(const MeshBase &mesh)
+{
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+  for (MeshBase::const_element_iterator el =
+       mesh.elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+
+      const Elem* parent = elem->parent();
+
+      if (parent)
+        {
+          libmesh_assert_greater_equal (elem->id(), parent->id());
+          libmesh_assert_greater_equal (elem->processor_id(), parent->processor_id());
+        }
+    }
+}
+
+
+
+void MeshTools::libmesh_assert_connected_nodes (const MeshBase &mesh)
+{
+  std::set<const Node*> used_nodes;
+
+  const MeshBase::const_element_iterator el_end =
+    mesh.elements_end();
+  for (MeshBase::const_element_iterator el =
+       mesh.elements_begin(); el != el_end; ++el)
+    {
+      const Elem* elem = *el;
+      libmesh_assert (elem);
+
+      for (unsigned int n=0; n<elem->n_nodes(); ++n)
+        used_nodes.insert(elem->get_node(n));
+    }
+
+  const MeshBase::const_node_iterator node_end = mesh.nodes_end();
+
+  for (MeshBase::const_node_iterator node_it = mesh.nodes_begin();
+       node_it != node_end; ++node_it)
+    {
+      Node *node = *node_it;
+      libmesh_assert(node);
+      libmesh_assert(used_nodes.count(node));
+    }
+}
+
+
+
 namespace MeshTools {
 
 template <>
