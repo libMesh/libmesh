@@ -102,21 +102,10 @@ void ParallelMesh::update_parallel_id_counts()
   // This function must be run on all processors at once
   parallel_only();
 
-  _n_elem = this->n_local_elem();
-  Parallel::sum(_n_elem);
-  _n_elem += this->n_unpartitioned_elem();
-
-  _max_elem_id = _elements.empty() ?
-    0 : _elements.rbegin()->first + 1;
-  Parallel::max(_max_elem_id);
-
-  _n_nodes = this->n_local_nodes();
-  Parallel::sum(_n_nodes);
-  _n_nodes += this->n_unpartitioned_nodes();
-
-  _max_node_id = _nodes.empty() ?
-    0 : _nodes.rbegin()->first + 1;
-  Parallel::max(_max_node_id);
+  _n_elem  = this->parallel_n_elem();
+  _n_nodes = this->parallel_n_nodes();
+  _max_node_id = this->parallel_max_node_id();
+  _max_elem_id = this->parallel_max_elem_id();
 }
 
 
@@ -641,7 +630,11 @@ void ParallelMesh::redistribute ()
       // Is this necessary?  If we are called from prepare_for_use(), this will be called
       // anyway... but users can always call partition directly, in which case we do need
       // to call delete_remote_elements()...
-      this->delete_remote_elements();
+      //
+      // Regardless of whether it's necessary, it isn't safe.  We
+      // haven't communicated new node processor_ids yet, and we can't
+      // delete nodes until we do.
+      // this->delete_remote_elements();
     }
 }
 
@@ -938,12 +931,11 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 
 void ParallelMesh::renumber_nodes_and_elements ()
 {
+  parallel_only();
+
   if (_skip_renumber_nodes_and_elements)
     {
-      _n_elem  = this->parallel_n_elem();
-      _n_nodes = this->parallel_n_nodes();
-      _max_node_id = this->parallel_max_node_id();
-      _max_elem_id = this->parallel_max_elem_id();
+      this->update_parallel_id_counts();
       return;
     }
 
@@ -1112,6 +1104,10 @@ void ParallelMesh::delete_remote_elements()
 // And our child/parent links, and our flags
   MeshTools::libmesh_assert_valid_refinement_tree(*this);
 
+// Make sure our ids and flags are consistent
+  this->libmesh_assert_valid_parallel_ids();
+  this->libmesh_assert_valid_parallel_flags();
+
   libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
   const unsigned int pmax_node_id = this->parallel_max_node_id();
@@ -1145,10 +1141,7 @@ void ParallelMesh::delete_remote_elements()
 
   // We may have deleted no-longer-connected nodes or coarsened-away
   // elements; let's update our caches.
-  _n_nodes = this->parallel_n_nodes();
-  _max_node_id = this->parallel_max_node_id();
-  _n_elem = this->parallel_n_elem();
-  _max_elem_id = this->parallel_max_elem_id();
+  this->update_parallel_id_counts();
 
 #ifdef DEBUG
   // We might not have well-packed objects if the user didn't allow us
