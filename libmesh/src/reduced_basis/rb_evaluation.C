@@ -986,11 +986,13 @@ void RBEvaluation::read_in_basis_functions(System& sys,
 
 std::string RBEvaluation::get_io_version_string()
 {
+  std::string retval("libMesh-" + libMesh::get_io_compatibility_version());
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  return "libMesh-0.7.4 with infinite elements";
-#else
-  return "libMesh-0.7.4";
+  retval += " with infinite elements";
 #endif
+
+  return retval;
 }
 
 } // namespace libMesh
