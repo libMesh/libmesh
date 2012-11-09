@@ -493,7 +493,7 @@ void EquationSystems::write(const std::string& name,
       {
 	// 1.)
 	// Write the version header
-	std::string version = "libMesh-0.7.4";
+	std::string version("libMesh-" + libMesh::get_io_compatibility_version());
 	if (write_parallel_files) version += " parallel";
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
