@@ -39,7 +39,7 @@ DifferentiableSystem::DifferentiableSystem
   print_jacobian_norms(false),
   print_jacobians(false),
   print_element_jacobians(false),
-  diff_physics(this),
+  _diff_physics(this),
   diff_qoi(this)
 {
 }
@@ -55,7 +55,15 @@ DifferentiableSystem::~DifferentiableSystem ()
 
 void DifferentiableSystem::clear ()
 {
-  this->clear_physics();
+  // If we had an attached Physics object, delete it.
+  if (this->_diff_physics != this)
+    {
+      delete this->_diff_physics;
+      this->_diff_physics = this;
+    }
+  // If we had no attached Physics object, clear our own Physics data
+  else
+    this->clear_physics();
 
   // If we had an attached QoI object, delete it.
   if (this->diff_qoi != this)
@@ -86,8 +94,10 @@ void DifferentiableSystem::reinit ()
 
 void DifferentiableSystem::init_data ()
 {
-  // Do any initialization our physics needs
-  this->init_physics(*this);
+  // If it isn't a separate initialized-upon-attachment object, do any
+  // initialization our physics needs.
+  if (this->_diff_physics == this)
+    this->init_physics(*this);
 
   // Do any initialization our solvers need
   libmesh_assert(time_solver.get());

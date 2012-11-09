@@ -261,6 +261,7 @@ include_HEADERS = \
 		partitioning/sfc_partitioner.h \
 		physics/diff_physics.h \
 		physics/diff_qoi.h \
+		physics/fem_physics.h \
 		quadrature/quadrature.h \
 		quadrature/quadrature_clough.h \
 		quadrature/quadrature_conical.h \

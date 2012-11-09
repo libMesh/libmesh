@@ -54,8 +54,8 @@ template <typename T> class NumericVector;
 // DifferentiableSystem class definition
 
 class DifferentiableSystem : public ImplicitSystem,
-                             public DifferentiablePhysics,
-                             public DifferentiableQoI
+                             public virtual DifferentiablePhysics,
+                             public virtual DifferentiableQoI
 {
 public:
 
@@ -134,12 +134,35 @@ public:
   virtual void solve ();
 
   /**
-   * Force the user to override clone for DifferentiableQoI
+   * We don't allow systems to be attached to each other
+   */
+  virtual AutoPtr<DifferentiablePhysics> clone_physics()
+  { libmesh_error(); 
+    // dummy
+    return AutoPtr<DifferentiablePhysics>(this); }
+
+  /**
+   * We don't allow systems to be attached to each other
    */
   virtual AutoPtr<DifferentiableQoI> clone()
   { libmesh_error(); 
     // dummy
     return AutoPtr<DifferentiableQoI>(this); }
+
+  /**
+   * Returns const reference to DifferentiablePhysics object. Note
+   * that if no external Physics object is attached, the default is
+   * this.
+   */
+  const DifferentiablePhysics* get_physics()
+  { return this->_diff_physics; }
+
+  /**
+   * Attach external Physics object.
+   */
+  void attach_physics( DifferentiablePhysics* physics_in )
+  { this->_diff_physics = (physics_in->clone_physics()).release();
+    this->_diff_physics->init_physics(*this);}
 
   /**
    * Returns const reference to DifferentiableQoI object. Note that if no external
@@ -238,15 +261,15 @@ public:
    */
   bool print_element_jacobians;
 
+protected:
+
   /**
    * Pointer to object to use for physics assembly evaluations.
    * Defaults to \p this for backwards compatibility; in the future
    * users should create separate physics objects.
    */
-  DifferentiablePhysics *diff_physics;
+  DifferentiablePhysics *_diff_physics;
  
-protected:
-
   /**
    * Pointer to object to use for quantity of interest assembly
    * evaluations.  Defaults to \p this for backwards compatibility; in

@@ -359,6 +359,7 @@ libmesh_la_SOURCES = \
 		src/partitioning/sfc_partitioner.C \
 		src/physics/diff_physics.C \
 		src/physics/diff_qoi.C \
+		src/physics/fem_physics.C \
 		src/quadrature/quadrature.C \
 		src/quadrature/quadrature_build.C \
 		src/quadrature/quadrature_clough.C \

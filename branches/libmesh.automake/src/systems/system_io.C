@@ -946,6 +946,7 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int n_o
   std::vector<unsigned int>
     xfer_ids_size  (num_blks,0),
     recv_vals_size (num_blks,0);
+    
   
   for (iterator_type it=begin; it!=end; ++it)
     {
@@ -961,6 +962,12 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int n_o
 	   var_it!=vars_to_read.end(); ++var_it)
 	recv_vals_size[block] += (*it)->n_comp(sys_num, *var_it); // for each variable, we will receive the nonzero components
     }
+
+  // knowing the recv_vals_size[block] for each processor allows
+  // us to sum them and find the global size for each block.
+  std::vector<unsigned int> tot_vals_size(recv_vals_size);
+  Parallel::sum (tot_vals_size);
+
 
   //------------------------------------------
   // Collect the ids & number of values needed
@@ -1016,7 +1023,7 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int n_o
   // We have to do this block-wise to ensure that we 
   // do not exhaust memory on processor 0.
   
-  // give these variables scope outside the block for efficient allocation
+  // give these variables scope outside the block to avoid reallocation
   std::vector<std::vector<unsigned int> > recv_ids       (libMesh::n_processors());
   std::vector<std::vector<Number> >       send_vals      (libMesh::n_processors());
   std::vector<Parallel::Request>          reply_requests (libMesh::n_processors());
@@ -1037,6 +1044,13 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int n_o
       // disk, and reply 
       if (libMesh::processor_id() == 0)
 	{
+	  // we know the input buffer size for this block and can begin reading it now
+	  input_vals.resize(tot_vals_size[blk]);
+	  
+	  // a ThreadedIO object to perform asychronous file IO
+	  ThreadedIO threaded_io(io, input_vals);
+	  Threads::Thread async_io(threaded_io);
+	  
 	  Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
 	  Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
 
@@ -1090,10 +1104,10 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int n_o
 			   obj_val_offsets.begin());
 
 	  libmesh_assert_equal_to (n_vals_blk, obj_val_offsets.back());
+	  libmesh_assert_equal_to (n_vals_blk, tot_vals_size[blk]);
 	  
-	  // Read data buffer
-	  input_vals.resize(n_vals_blk);
-	  io.data_stream(input_vals.empty() ? NULL : &input_vals[0], input_vals.size());
+	  // Wait for read completion
+	  async_io.join();
 
 	  n_read_values += input_vals.size();
 	  
@@ -2259,8 +2273,6 @@ unsigned int System::write_serialized_blocked_dof_objects (const NumericVector<N
 	  // output_vals buffer is now filled for this block.
 	  // write it to disk
 	  async_io.reset(new Threads::Thread(threaded_io));
-
-	  //io.data_stream (output_vals.empty() ? NULL : &output_vals[0], output_vals.size());
 	  written_length += output_vals.size();
 	}
 
