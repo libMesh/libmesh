@@ -22,6 +22,7 @@
 #define __fem_physics_h__
 
 // Local Includes
+#include "libmesh/libmesh.h" // for libMesh::invalid_uint
 #include "libmesh/diff_physics.h"
 
 // C++ includes
