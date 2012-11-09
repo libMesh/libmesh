@@ -1,7 +1,7 @@
 include $(top_builddir)/Make.common.@METHOD@
 
-bindir=$(exec_prefix)/bin/@host@_@METHOD@
-libdir=$(exec_prefix)/lib/@host@_@METHOD@
+bindir=@bindir@/@host@_@METHOD@
+libdir=@libdir@/@host@_@METHOD@
 
 SUBDIRS = include #src
 
