@@ -37,6 +37,8 @@ void libMesh::libmesh_version_stdout()
   return;
 }
 
+
+
 int libMesh::get_libmesh_version()
 {
   /* Note: return format follows the versioning convention xx.yy.zz where
@@ -67,4 +69,12 @@ int libMesh::get_libmesh_version()
 #endif
 
     return major_version*10000 + minor_version*100 + micro_version;
+}
+
+
+
+std::string libMesh::get_io_compatibility_version ()
+{
+  std::string retval(LIBMESH_IO_COMPATIBILITY_VERSION);
+  return retval;
 }

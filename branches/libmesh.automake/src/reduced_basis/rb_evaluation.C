@@ -21,6 +21,7 @@
 #include "libmesh/rb_evaluation.h"
 
 // libMesh includes
+#include "libmesh/libmesh_version.h"
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel.h"
@@ -882,6 +883,11 @@ void RBEvaluation::write_out_basis_functions(System& sys,
     Xdr bf_data(file_name.str(),
                 write_binary_basis_functions ? ENCODE : WRITE);
 
+    // set the current version
+    bf_data.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
+					   LIBMESH_MINOR_VERSION,
+					   LIBMESH_MICRO_VERSION));
+    
     sys.write_serialized_data(bf_data, false);
 
     // Synchronize before moving on
@@ -957,6 +963,9 @@ void RBEvaluation::read_in_basis_functions(System& sys,
     Xdr bf_data(file_name.str(),
                 read_binary_basis_functions ? DECODE : READ);
 
+    // The bf_data needs to know which version to read.
+    bf_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+    
     sys.read_serialized_data(bf_data, false);
 
     basis_functions[i] = NumericVector<Number>::build().release();
@@ -977,11 +986,13 @@ void RBEvaluation::read_in_basis_functions(System& sys,
 
 std::string RBEvaluation::get_io_version_string()
 {
+  std::string retval("libMesh-" + libMesh::get_io_compatibility_version());
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  return "libMesh-0.7.2 with infinite elements";
-#else
-  return "libMesh-0.7.2";
+  retval += " with infinite elements";
 #endif
+
+  return retval;
 }
 
 } // namespace libMesh
