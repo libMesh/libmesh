@@ -846,6 +846,23 @@ void RBEvaluation::write_out_basis_functions(System& sys,
                                              const bool write_binary_basis_functions)
 {
   START_LOG("write_out_basis_functions()", "RBEvaluation");
+  
+  write_out_vectors(sys,
+                    basis_functions,
+                    directory_name,
+                    "bf",
+                    write_binary_basis_functions);
+  
+  STOP_LOG("write_out_basis_functions()", "RBEvaluation");
+}
+
+void RBEvaluation::write_out_vectors(System& sys,
+                                     std::vector<NumericVector<Number>*>& vectors,
+                                     const std::string& directory_name,
+                                     const std::string& data_name,
+                                     const bool write_binary_vectors)
+{
+  START_LOG("write_out_vectors()", "RBEvaluation");
   //libMesh::out << "Writing out the basis functions..." << std::endl;
 
   if(libMesh::processor_id() == 0)
@@ -858,11 +875,11 @@ void RBEvaluation::write_out_basis_functions(System& sys,
   Parallel::barrier();
 
   std::ostringstream file_name;
-  const std::string basis_function_suffix = (write_binary_basis_functions ? ".xdr" : ".dat");
+  const std::string basis_function_suffix = (write_binary_vectors ? ".xdr" : ".dat");
 
-  file_name << directory_name << "/bf_header" << basis_function_suffix;
+  file_name << directory_name << "/" << data_name << "_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
-                  write_binary_basis_functions ? ENCODE : WRITE);
+                  write_binary_vectors ? ENCODE : WRITE);
   sys.write_header(header_data, get_io_version_string(), /*write_additional_data=*/false);
 
   // Following EquationSystemsIO::write, we use a temporary numbering (node major)
@@ -871,18 +888,15 @@ void RBEvaluation::write_out_basis_functions(System& sys,
 
   // // Use System::write_serialized_data to write out the basis functions
   // // by copying them into this->solution one at a time.
-  // for(unsigned int i=0; i<basis_functions.size(); i++)
+  // for(unsigned int i=0; i<vectors.size(); i++)
   // {
   //   // No need to copy, just swap
-  //   // *solution = *basis_functions[i];
-  //   basis_functions[i]->swap(*sys.solution);
-
+  //   // *solution = *vectors[i];
+  //   vectors[i]->swap(*sys.solution);
   //   file_name.str(""); // reset the string
   //   file_name << directory_name << "/bf" << i << basis_function_suffix;
-
   //   Xdr bf_data(file_name.str(),
-  //               write_binary_basis_functions ? ENCODE : WRITE);
-
+  //               write_binary_vectors ? ENCODE : WRITE);
   //   // set the current version
   //   bf_data.set_version(LIBMESH_VERSION(LIBMESH_MAJOR_VERSION,
   // 					   LIBMESH_MINOR_VERSION,
@@ -892,24 +906,23 @@ void RBEvaluation::write_out_basis_functions(System& sys,
 
   //   // Synchronize before moving on
   //   Parallel::barrier();
-
   //   // Swap back
-  //   basis_functions[i]->swap(*sys.solution);
+  //   vectors[i]->swap(*sys.solution);
   // }
 
   file_name.str("");
-  file_name << directory_name << "/bf_data" << basis_function_suffix;
+  file_name << directory_name << "/" << data_name << "_data" << basis_function_suffix;
 
   Xdr bf_data(file_name.str(),
-	      write_binary_basis_functions ? ENCODE : WRITE);
+	      write_binary_vectors ? ENCODE : WRITE);
   
   // Write all vectors at once.
   {
     // Note the API wants pointers to constant vectors, hence this...
-    std::vector<const NumericVector<Number>*> bf_out(basis_functions.begin(),
-						     basis_functions.end());
-    // for(unsigned int i=0; i<basis_functions.size(); i++)
-    //   bf_out.push_back(basis_functions[i]);
+    std::vector<const NumericVector<Number>*> bf_out(vectors.begin(),
+						     vectors.end());
+    // for(unsigned int i=0; i<vectors.size(); i++)
+    //   bf_out.push_back(vectors[i]);
     sys.write_serialized_vectors (bf_data, bf_out);
   }
 
@@ -923,7 +936,7 @@ void RBEvaluation::write_out_basis_functions(System& sys,
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
 
-  STOP_LOG("write_out_basis_functions()", "RBEvaluation");
+  STOP_LOG("write_out_vectors()", "RBEvaluation");
 }
 
 void RBEvaluation::read_in_basis_functions(System& sys,
@@ -932,28 +945,45 @@ void RBEvaluation::read_in_basis_functions(System& sys,
 {
   START_LOG("read_in_basis_functions()", "RBEvaluation");
   
+  read_in_vectors(sys,
+                  basis_functions,
+                  directory_name,
+                  "bf",
+                  read_binary_basis_functions);
+
+  STOP_LOG("read_in_basis_functions()", "RBEvaluation");
+}
+
+void RBEvaluation::read_in_vectors(System& sys,
+                                   std::vector<NumericVector<Number>*>& vectors,
+                                   const std::string& directory_name,
+                                   const std::string& data_name,
+                                   const bool read_binary_vectors)
+{
+  START_LOG("read_in_vectors()", "RBEvaluation");
+  
   //libMesh::out << "Reading in the basis functions..." << std::endl;
 
   // Make sure processors are synced up before we begin
   Parallel::barrier();
 
   std::ostringstream file_name;
-  const std::string basis_function_suffix = (read_binary_basis_functions ? ".xdr" : ".dat");
+  const std::string basis_function_suffix = (read_binary_vectors ? ".xdr" : ".dat");
   struct stat stat_info;
 
-  file_name << directory_name << "/bf_header" << basis_function_suffix;
+  file_name << directory_name << "/" << data_name << "_header" << basis_function_suffix;
   Xdr header_data(file_name.str(),
-                  read_binary_basis_functions ? DECODE : READ);
+                  read_binary_vectors ? DECODE : READ);
 
   // set the version number in header_data from io_version_string
   // (same code as in EquationSystemsIO::_read_impl)
   std::string io_version_string = get_io_version_string();
   std::string::size_type lm_pos = io_version_string.find("libMesh");
-	std::istringstream iss(io_version_string.substr(lm_pos + 8));
-	int ver_major = 0, ver_minor = 0, ver_patch = 0;
-	char dot;
-	iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
-	header_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
+  std::istringstream iss(io_version_string.substr(lm_pos + 8));
+  int ver_major = 0, ver_minor = 0, ver_patch = 0;
+  char dot;
+  iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
+  header_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
   
   // We need to call sys.read_header (e.g. to set _written_var_indices properly),
   // but by setting the read_header argument to false, it doesn't reinitialize the system
@@ -970,10 +1000,10 @@ void RBEvaluation::read_in_basis_functions(System& sys,
       // Use System::read_serialized_data to read in the basis functions
       // into this->solution and then swap with the appropriate
       // of basis function.
-      for(unsigned int i=0; i<basis_functions.size(); i++)
+      for(unsigned int i=0; i<vectors.size(); i++)
 	{
 	  file_name.str(""); // reset the string
-	  file_name << directory_name << "/bf" << i << basis_function_suffix;
+	  file_name << directory_name << "/" << data_name << i << basis_function_suffix;
 	  
 	  // On processor zero check to be sure the file exists
 	  if (libMesh::processor_id() == 0)
@@ -987,20 +1017,20 @@ void RBEvaluation::read_in_basis_functions(System& sys,
 		}
 	    }
 	  
-	  Xdr bf_data(file_name.str(),
-		      read_binary_basis_functions ? DECODE : READ);
+	  Xdr vector_data(file_name.str(),
+		          read_binary_vectors ? DECODE : READ);
 	  
 	  // The bf_data needs to know which version to read.
-	  bf_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
+	  vector_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
     
-	  sys.read_serialized_data(bf_data, false);
+	  sys.read_serialized_data(vector_data, false);
 	  
-	  basis_functions[i] = NumericVector<Number>::build().release();
-	  basis_functions[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+	  vectors[i] = NumericVector<Number>::build().release();
+	  vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 
 	  // No need to copy, just swap
-	  // *basis_functions[i] = *solution;
-	  basis_functions[i]->swap(*sys.solution);
+	  // *vectors[i] = *solution;
+	  vectors[i]->swap(*sys.solution);
 	}
     }
 
@@ -1008,15 +1038,15 @@ void RBEvaluation::read_in_basis_functions(System& sys,
   // new implementation
   else
     {
-      // Allocate storage for each basis function vector
-      for(unsigned int i=0; i<basis_functions.size(); i++)
+      // Allocate storage for each vector
+      for(unsigned int i=0; i<vectors.size(); i++)
 	{
-	  basis_functions[i] = NumericVector<Number>::build().release();
-	  basis_functions[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+	  vectors[i] = NumericVector<Number>::build().release();
+	  vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 	}
 
       file_name.str("");
-      file_name << directory_name << "/bf_data" << basis_function_suffix;
+      file_name << directory_name << "/" << data_name << "_data" << basis_function_suffix;
 
       // On processor zero check to be sure the file exists
       if (libMesh::processor_id() == 0)
@@ -1030,13 +1060,13 @@ void RBEvaluation::read_in_basis_functions(System& sys,
 	    }
 	}
 
-      Xdr bf_data(file_name.str(),
-		  read_binary_basis_functions ? DECODE : READ);
+      Xdr vector_data(file_name.str(),
+		      read_binary_vectors ? DECODE : READ);
 
-      // The bf_data needs to know which version to read.
-      bf_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));    
+      // The vector_data needs to know which version to read.
+      vector_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));    
 
-      sys.read_serialized_vectors (bf_data, basis_functions);
+      sys.read_serialized_vectors (vector_data, vectors);
     }
   //------------------------------------------------------
 
@@ -1045,7 +1075,7 @@ void RBEvaluation::read_in_basis_functions(System& sys,
 
   //libMesh::out << "Finished reading in the basis functions..." << std::endl;
   
-  STOP_LOG("read_in_basis_functions()", "RBEvaluation");
+  STOP_LOG("read_in_vectors()", "RBEvaluation");
 }
 
 std::string RBEvaluation::get_io_version_string()
