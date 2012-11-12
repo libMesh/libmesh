@@ -20,4 +20,4 @@ max_linear_iterations = 5000
 
 initial_linear_tolerance = 1.0e-14
 
-relative_residual_tolerance = 1.0e-10
+relative_residual_tolerance = 1.0e-6
