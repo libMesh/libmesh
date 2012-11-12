@@ -777,7 +777,7 @@ void EpetraVector<T>::init (const unsigned int n,
   libmesh_assert ((this->_type==SERIAL && n==my_n_local) ||
                   this->_type==PARALLEL);
 
-  _map = new Epetra_Map(n,
+  _map = new Epetra_Map(static_cast<int>(n),
                         my_n_local,
                         0,
                         Epetra_MpiComm (libMesh::COMM_WORLD));
