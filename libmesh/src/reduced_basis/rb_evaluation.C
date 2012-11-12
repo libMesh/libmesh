@@ -869,33 +869,56 @@ void RBEvaluation::write_out_basis_functions(System& sys,
   // before writing out the data
   MeshTools::Private::globally_renumber_nodes_and_elements(sys.get_mesh());
 
-  // Use System::write_serialized_data to write out the basis functions
-  // by copying them into this->solution one at a time.
-  for(unsigned int i=0; i<basis_functions.size(); i++)
-  {
-    // No need to copy, just swap
-    // *solution = *basis_functions[i];
-    basis_functions[i]->swap(*sys.solution);
+  // // Use System::write_serialized_data to write out the basis functions
+  // // by copying them into this->solution one at a time.
+  // for(unsigned int i=0; i<basis_functions.size(); i++)
+  // {
+  //   // No need to copy, just swap
+  //   // *solution = *basis_functions[i];
+  //   basis_functions[i]->swap(*sys.solution);
 
-    file_name.str(""); // reset the string
-    file_name << directory_name << "/bf" << i << basis_function_suffix;
+  //   file_name.str(""); // reset the string
+  //   file_name << directory_name << "/bf" << i << basis_function_suffix;
 
-    Xdr bf_data(file_name.str(),
-                write_binary_basis_functions ? ENCODE : WRITE);
+  //   Xdr bf_data(file_name.str(),
+  //               write_binary_basis_functions ? ENCODE : WRITE);
 
-    // set the current version
-    bf_data.set_version(LIBMESH_VERSION(LIBMESH_MAJOR_VERSION,
-					LIBMESH_MINOR_VERSION,
-					LIBMESH_MICRO_VERSION));
+  //   // set the current version
+  //   bf_data.set_version(LIBMESH_VERSION(LIBMESH_MAJOR_VERSION,
+  // 					   LIBMESH_MINOR_VERSION,
+  // 					   LIBMESH_MICRO_VERSION));
     
-    sys.write_serialized_data(bf_data, false);
+  //   sys.write_serialized_data(bf_data, false);
 
-    // Synchronize before moving on
-    Parallel::barrier();
+  //   // Synchronize before moving on
+  //   Parallel::barrier();
 
-    // Swap back
-    basis_functions[i]->swap(*sys.solution);
+  //   // Swap back
+  //   basis_functions[i]->swap(*sys.solution);
+  // }
+
+  file_name.str("");
+  file_name << directory_name << "/bf_data" << basis_function_suffix;
+
+  Xdr bf_data(file_name.str(),
+	      write_binary_basis_functions ? ENCODE : WRITE);
+  
+  // Write all vectors at once.
+  {
+    // Note the API wants pointers to constant vectors, hence this...
+    std::vector<const NumericVector<Number>*> bf_out(basis_functions.begin(),
+						     basis_functions.end());
+    // for(unsigned int i=0; i<basis_functions.size(); i++)
+    //   bf_out.push_back(basis_functions[i]);
+    sys.write_serialized_vectors (bf_data, bf_out);
   }
+
+
+  // set the current version
+  bf_data.set_version(LIBMESH_VERSION(LIBMESH_MAJOR_VERSION,
+					 LIBMESH_MINOR_VERSION,
+					 LIBMESH_MICRO_VERSION));
+
 
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
@@ -940,41 +963,82 @@ void RBEvaluation::read_in_basis_functions(System& sys,
   // before writing out the data
   MeshTools::Private::globally_renumber_nodes_and_elements(sys.get_mesh());
 
-  // Use System::read_serialized_data to read in the basis functions
-  // into this->solution and then swap with the appropriate
-  // of basis function.
-  for(unsigned int i=0; i<basis_functions.size(); i++)
-  {
-    file_name.str(""); // reset the string
-    file_name << directory_name << "/bf" << i << basis_function_suffix;
 
-    // On processor zero check to be sure the file exists
-    if (libMesh::processor_id() == 0)
+  const bool read_legacy_format = false;
+  if (read_legacy_format)
     {
-      int stat_result = stat(file_name.str().c_str(), &stat_info);
+      // Use System::read_serialized_data to read in the basis functions
+      // into this->solution and then swap with the appropriate
+      // of basis function.
+      for(unsigned int i=0; i<basis_functions.size(); i++)
+	{
+	  file_name.str(""); // reset the string
+	  file_name << directory_name << "/bf" << i << basis_function_suffix;
+	  
+	  // On processor zero check to be sure the file exists
+	  if (libMesh::processor_id() == 0)
+	    {
+	      int stat_result = stat(file_name.str().c_str(), &stat_info);
+	      
+	      if (stat_result != 0)
+		{
+		  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
+		  libmesh_error();
+		}
+	    }
+	  
+	  Xdr bf_data(file_name.str(),
+		      read_binary_basis_functions ? DECODE : READ);
+	  
+	  // The bf_data needs to know which version to read.
+	  bf_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
+    
+	  sys.read_serialized_data(bf_data, false);
+	  
+	  basis_functions[i] = NumericVector<Number>::build().release();
+	  basis_functions[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 
-      if (stat_result != 0)
-      {
-        libMesh::out << "File does not exist: " << file_name.str() << std::endl;
-        libmesh_error();
-      }
+	  // No need to copy, just swap
+	  // *basis_functions[i] = *solution;
+	  basis_functions[i]->swap(*sys.solution);
+	}
     }
 
-    Xdr bf_data(file_name.str(),
-                read_binary_basis_functions ? DECODE : READ);
+  //------------------------------------------------------
+  // new implementation
+  else
+    {
+      // Allocate storage for each basis function vector
+      for(unsigned int i=0; i<basis_functions.size(); i++)
+	{
+	  basis_functions[i] = NumericVector<Number>::build().release();
+	  basis_functions[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+	}
 
-    // The bf_data needs to know which version to read.
-    bf_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
-    
-    sys.read_serialized_data(bf_data, false);
+      file_name.str("");
+      file_name << directory_name << "/bf_data" << basis_function_suffix;
 
-    basis_functions[i] = NumericVector<Number>::build().release();
-    basis_functions[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
+      // On processor zero check to be sure the file exists
+      if (libMesh::processor_id() == 0)
+	{
+	  int stat_result = stat(file_name.str().c_str(), &stat_info);
+	  
+	  if (stat_result != 0)
+	    {
+	      libMesh::out << "File does not exist: " << file_name.str() << std::endl;
+	      libmesh_error();
+	    }
+	}
 
-    // No need to copy, just swap
-    // *basis_functions[i] = *solution;
-    basis_functions[i]->swap(*sys.solution);
-  }
+      Xdr bf_data(file_name.str(),
+		  read_binary_basis_functions ? DECODE : READ);
+
+      // The bf_data needs to know which version to read.
+      bf_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));    
+
+      sys.read_serialized_vectors (bf_data, basis_functions);
+    }
+  //------------------------------------------------------
 
   // Undo the temporary renumbering
   sys.get_mesh().fix_broken_node_and_element_numbering();
