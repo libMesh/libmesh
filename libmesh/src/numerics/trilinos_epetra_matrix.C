@@ -72,7 +72,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
 #endif
 
   // build a map defining the data distribution
-  _map = new Epetra_Map (m,
+  _map = new Epetra_Map (static_cast<int>(m),
                          m_l,
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
@@ -156,7 +156,7 @@ void EpetraMatrix<T>::init (const unsigned int m,
 #endif
 
   // build a map defining the data distribution
-  _map = new Epetra_Map (m,
+  _map = new Epetra_Map (static_cast<int>(m),
                          m_l,
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
@@ -452,7 +452,7 @@ T EpetraMatrix<T>::operator () (const unsigned int i,
 {
   libmesh_assert (this->initialized());
   libmesh_assert(this->_mat);
-  libmesh_assert (this->_mat->MyGlobalRow(i));
+  libmesh_assert (this->_mat->MyGlobalRow(static_cast<int>(i)));
   libmesh_assert_greater_equal (i, this->row_start());
   libmesh_assert_less (i, this->row_stop());
 
