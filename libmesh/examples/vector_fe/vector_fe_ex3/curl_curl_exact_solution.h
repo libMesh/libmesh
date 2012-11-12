@@ -45,7 +45,7 @@ public:
     const Real duy_dx = -pi*cos(pi*x)*cos(pi*y);
     const Real duy_dy = pi*sin(pi*x)*sin(pi*y);
 
-    return RealTensor( dux_dx, dux_dy, 0.0, duy_dx, duy_dy );
+    return RealTensor( dux_dx, dux_dy, Real(0), duy_dx, duy_dy );
   }
 
   RealGradient curl( Real x, Real y )
@@ -53,7 +53,7 @@ public:
     const Real dux_dy =  pi*cos(pi*x)*cos(pi*y);
     const Real duy_dx = -pi*cos(pi*x)*cos(pi*y);
 
-    return RealGradient( 0.0, 0.0, duy_dx - dux_dy );
+    return RealGradient( Real(0), Real(0), duy_dx - dux_dy );
   }
 
   RealGradient forcing(  Real x, Real y )
