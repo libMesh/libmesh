@@ -541,32 +541,14 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
 	  elem->get_node(n)->processor_id() = elem->processor_id();
     }
 
-#ifndef NDEBUG
-  {
-    // make sure all the nodes connected to any element have received a
-    // valid processor id
-    std::set<const Node*> used_nodes;
-    MeshBase::element_iterator       all_it  = mesh.elements_begin();
-    const MeshBase::element_iterator all_end = mesh.elements_end();
+  // We can't assert that all nodes are connected to elements, because
+  // a ParallelMesh with NodeConstraints might have pulled in some
+  // remote nodes solely for evaluating those constraints.
+  // MeshTools::libmesh_assert_connected_nodes(mesh);
 
-    for ( ; all_it != all_end; ++all_it)
-      {
-	Elem* elem = *all_it;
-	libmesh_assert(elem);
-	libmesh_assert_not_equal_to (elem->processor_id(), DofObject::invalid_processor_id);
-	for (unsigned int n=0; n<elem->n_nodes(); ++n)
-	  used_nodes.insert(elem->get_node(n));
-      }
-
-    for (node_it = mesh.nodes_begin(); node_it != node_end; ++node_it)
-      {
-	Node *node = *node_it;
-	libmesh_assert(node);
-	libmesh_assert(used_nodes.count(node));
-	libmesh_assert_not_equal_to (node->processor_id(), DofObject::invalid_processor_id);
-      }
-  }
-#endif
+  // For such nodes, we'll do a sanity check later when making sure
+  // that we successfully reset their processor ids to something
+  // valid.
 
   // Next set node ids from other processors, excluding self
   for (unsigned int p=1; p != libMesh::n_processors(); ++p)
