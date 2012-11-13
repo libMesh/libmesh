@@ -122,8 +122,12 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
       this->allow_renumbering(false);
     }
 
+  // Mesh modification operations might not leave us with consistent
+  // id counts, but our partitioner might need that consistency.
   if(!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
+  else
+    this->update_parallel_id_counts();
 
   // Let all the elements find their neighbors
   this->find_neighbors();

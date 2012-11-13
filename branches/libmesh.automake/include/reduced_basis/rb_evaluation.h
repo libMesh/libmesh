@@ -185,6 +185,16 @@ public:
                                          const bool write_binary_basis_functions = true);
 
   /**
+   * Same as write_out_basis_functions, except in this case we pass in the vectors to be
+   * written.
+   */
+  virtual void write_out_vectors(System& sys,
+                                 std::vector<NumericVector<Number>*>& vectors,
+                                 const std::string& directory_name = "offline_data",
+                                 const std::string& data_name = "bf",
+                                 const bool write_binary_basis_functions = true);
+
+  /**
    * Read in all the basis functions from file.
    * \p sys is used for file IO
    * \p directory_name specifies which directory to write files to
@@ -194,6 +204,17 @@ public:
   virtual void read_in_basis_functions(System& sys,
                                        const std::string& directory_name = "offline_data",
                                        const bool read_binary_basis_functions = true);
+
+  /**
+   * Same as read_in_basis_functions, except in this case we pass in the vectors to be
+   * written. We assume that the size of vectors indicates the number of vectors
+   * that need to be read in.
+   */
+  virtual void read_in_vectors(System& sys,
+                               std::vector<NumericVector<Number>*>& vectors,
+                               const std::string& directory_name,
+                               const std::string& data_name,
+                               const bool read_binary_vectors);
 
   /**
    * Version string that we need to use for writing/reading basis functions.

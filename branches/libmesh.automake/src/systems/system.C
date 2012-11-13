@@ -863,6 +863,24 @@ const std::string& System::vector_name (const unsigned int vec_num)
 
 
 
+void System::set_vector_preservation (const std::string &vec_name,
+                                      bool preserve)
+{
+  _vector_projections[vec_name] = preserve;
+}
+
+
+
+bool System::vector_preservation (const std::string &vec_name) const
+{
+  if (_vector_projections.find(vec_name) == _vector_projections.end())
+    return false;
+
+  return _vector_projections.find(vec_name)->second;
+}
+
+
+
 NumericVector<Number> & System::add_sensitivity_solution (unsigned int i)
 {
   OStringStream sensitivity_name;
