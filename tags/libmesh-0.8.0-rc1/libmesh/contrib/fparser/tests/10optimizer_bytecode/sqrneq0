@@ -1,0 +1,5 @@
+T=d li
+V=x
+R=0,1,1
+F=(x*x=0) + (0=x*x)
+C=fp_equal(x*x,0) + fp_equal(0,x*x)

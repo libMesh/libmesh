@@ -1,0 +1,5 @@
+T=f
+V=x
+R=-40, 40, 0.025
+F=cosh(x)
+C=coshf(x)

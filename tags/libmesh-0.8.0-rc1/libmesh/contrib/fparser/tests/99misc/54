@@ -1,0 +1,20 @@
+T=d f ld mf
+V=x,y
+R=-10, 100, .5
+F=(x<y)+(x<=y)+(x>y)+(x>=y)+ \
+  (x=y)+(x!=y)+(x&y)+(x|y)+ \
+  (!x)+(!!x)+ \
+  !((x<y)&(x<3))+ \
+  !!(!(x>y)|(x>3))
+C=fp_less(x,y)+\
+  fp_lessOrEq(x,y)+\
+  fp_greater(x,y)+\
+  fp_greaterOrEq(x,y)+ \
+  fp_equal(x,y)+\
+  fp_nequal(x,y)+\
+  fp_and(x,y)+\
+  fp_or(x,y)+ \
+  fp_not(x)+\
+  fp_truth(x)+ \
+  fp_not(fp_and(fp_less(x,y),fp_less(x,3)))+ \
+  fp_or( fp_not(fp_greater(x,y)), fp_greater(x,3))

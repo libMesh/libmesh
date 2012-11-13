@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=w,x,y,z
+R=0,1,1
+F=if(if(x,1,y),z,w) + if(if(w,z,0),x,y)
+C=(fp_truth(fp_truth(x)!=0 ? 1 : y)!=0 ? z : w) + (fp_truth(fp_truth(w)!=0 ? z : 0)!=0 ? x : y)

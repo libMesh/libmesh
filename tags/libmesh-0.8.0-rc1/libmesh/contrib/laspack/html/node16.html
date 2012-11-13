@@ -1,0 +1,301 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> INTRO(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" INTRO(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html344 HREF="node17.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html342 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html336 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html346 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html345 HREF="node17.html"> EIGENVAL(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html343 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html337 HREF="node15.html"> Manual Pages</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00081000000000000000>&#160</A><A NAME=INTRO> INTRO(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION00081100000000000000> NAME</A></H3>
+<P>
+
+<P>
+intro
+-- introduction to <tt> LASPack</tt>
+  (Package for Linear Algebra
+with Sparse Matrices)
+<P>
+<H3><A NAME=SECTION00081200000000000000> DESCRIPTION</A></H3>
+<P>
+<tt> LASPack</tt>
+  is a package for solving large sparse systems of linear equations
+like those which arise from discretization of partial differential equations.
+<P>
+Main features:
+<UL><LI> 
+  The primary aim of <tt> LASPack</tt>
+  is the implementation of efficient iterative
+  methods for the solution of systems of linear equations.
+  All routines and data structures are optimized for effective usage
+  of resources especially with regard to large sparse matrices.
+  The package can be accessed from an application through
+  a straightforward interface defined in the form of procedure calls.
+<LI>
+  Beside the obligatory Jacobi, successive over-relaxation, Chebyshev, and
+  conjugate gradient solvers,
+  <tt> LASPack</tt>
+  contains selected state-of-the-art algorithms
+  (cf. Barrett et al. [1], McCormick[5])
+  which are commonly used for large sparse systems:
+  <UL><LI>
+    CG-like methods for non-symmetric systems: CGN, GMRES, BiCG, QMR, CGS, and
+    BiCGStab,
+  <LI>
+    multilevel methods such as the multigrid and conjugate gradient methods
+    preconditioned by multigrid and BPX preconditioners.
+  </UL>
+  All the above solvers are applicable not only to the positive definite or
+  non-symmetric matrices,
+  but are also adopted for singular systems
+  (e.g. arising from discretization of Neumann boundary value problems).
+<LI>
+  The implementation is based on an object-oriented approach  
+  (although C as programming language is used).
+  Vectors and matrices are defined as new data types in connection with
+  the corresponding supporting routines.
+  The basic operations are implemented in such a way
+  that they allow the programming of linear algebra algorithms
+  in a natural way.
+<LI>
+  <tt> LASPack</tt>
+  is extensible in a simple manner. 
+  An access to the internal representation of vectors and matrices
+  is not necessary and is avoided,
+  as required of the object-oriented programming.
+  This allows an improvement of algorithms or a modification
+  of data structures with no adjustment of application programs
+  using the package.
+<LI>
+  <tt> LASPack</tt>
+  is written in ANSI C and is thus largely portable.
+</UL>
+<P>
+The structure of <tt> LASPack</tt>
+  is depicted in 
+the following figure:
+
+<P>
+<P><IMG  ALIGN=BOTTOM ALT="" SRC="img1.gif"><P>
+
+The library consists of several modules
+of which some may be grouped together forming larger units.
+<P>
+The modules <A HREF="node27.html#VECTOR"><b> VECTOR</b></A>, <A HREF="node21.html#MATRIX"><b> MATRIX</b></A>, and
+<A HREF="node25.html#QMATRIX"><b> QMATRIX</b></A> as well as <A HREF="node23.html#OPERATS"><b> OPERATS</b></A>, and
+<A HREF="node19.html#FACTOR"><b> FACTOR</b></A> are the main component of the library.
+The basic objects of linear algebra, vectors and matrices,
+are here implemented as data types.
+Their definition consists not only of data structures,
+but also of the corresponding management routines,
+e.g. for allocation and release of variables of the above types,
+or storage and querying of vector components and matrix elements.
+For matrix storage, the compressed row format or the compressed column format
+can be used.
+Two different types of matrices are implemented in <tt> LASPack</tt>
+ .
+The type <tt> Matrix</tt> is a data type for general rectangular sparse matrices.
+Variables of such a kind in <tt> LASPack</tt>
+  are intended especially 
+for the description of restriction and prolongation operators 
+within multigrid algorithms.
+The type <tt> QMatrix</tt> is designed for quadratic sparse matrices 
+of systems of linear equations.
+With regard to the type <tt> Matrix</tt>,
+some additional properties are available for this data type
+such as symmetry, invertability etc.
+These are also taken into account for storage and in numerical algorithms.
+<P>
+The basic operations of linear algebra are implemented 
+in the module <A HREF="node23.html#OPERATS"><b> OPERATS</b></A>.
+It contains procedures for e.g. assignment and addition of vectors,
+multiplication of vectors by scalars and matrices,
+or generation of transposed, diagonal, and triangular matrices.
+For complex algebraic expressions,
+the usage of temporary variables allows to chain these routines up so
+that numerical algorithms could be transcribed directly in <tt> LASPack</tt>
+ .
+<P>
+The module <A HREF="node19.html#FACTOR"><b> FACTOR</b></A> consists of procedures
+for incomplete factorization of quadratic matrices.
+<P>
+In top-level modules,
+several iterative solvers are implemented:
+the classical iterative, semi-iterative, and conjugate gradient methods, 
+selected procedures for non-symmetric systems
+(module <A HREF="node20.html#ITERSOLV"><b> ITERSOLV</b></A>),
+and multilevel solvers (module <A HREF="node22.html#MLSOLV"><b> MLSOLV</b></A>).
+<P>
+In addition, the most common types of preconditioners are available
+in the module <A HREF="node24.html#PRECOND"><b> PRECOND</b></A>.
+The module <A HREF="node17.html#EIGENVAL"><b> EIGENVAL</b></A> contains procedures
+for the estimation of extremal eigenvalues which are required
+e.g. by the Chebyshev method.
+<P>
+Whereas the above modules define basic objects of linear algebra
+and the corresponding operations concerning them,
+the remaining modules <A HREF="node26.html#RTC"><b> RTC</b></A> and
+<A HREF="node18.html#ERRHANDL"><b> ERRHANDL</b></A> are of a global kind.
+<P>
+Convergence of iterative solution is controlled by routines
+of the module <A HREF="node26.html#RTC"><b> RTC</b></A>.
+In order to terminate the solution process,
+a residual criterion is applied.
+<P>
+Routines in the module <A HREF="node18.html#ERRHANDL"><b> ERRHANDL</b></A> support
+the error handling.
+They supervise some exceptional states
+which may happen during generating or solving systems of equations
+and allow their treatment in the application code.
+<P>
+From a global (object-oriented) point of view,
+<tt> LASPack</tt>
+  consists of definition of the objects <tt> Vector</tt>,
+<tt> Matrix</tt>, and <tt> QMatrix</tt> and of a set of more or less 
+complicated operations on them.
+For the extensibility of the library,
+there are the strict hiding of internal representation of these objects
+as well as the communication between the hierarchically built modules
+by simple structured interfaces in the form of procedure calls.
+This makes it possible to extend or exchange <tt> LASPack</tt>
+  modules 
+in a simple manner.
+<P>
+<tt> LASPack</tt>
+  is written in ANSI C and
+thus portable to most computer platforms.
+It was successfully tested on Sun Sparc5 (SunOS 4.1.3, gcc 2.4.5), 
+HP 9000/735 (HP-UX 9.05), IBM RS/6000 550 (AIX 3.2.5),
+DEC 3000/800 M (OSF/1 3.0), SGI IRIS Indigo (IRIX 5.3),
+and PC 486 (MS-DOS 6.2, BC 2.0/MSC 6.0; Linux 1.1.54, gcc 2.5.8/libc 4.5.26).
+<P>
+
+<H3><A NAME=SECTION00081300000000000000> REFERENCES</A></H3>
+<P>
+
+<P>
+
+<blockquote> [1] R. Barrett, M. Berry, T. F. Chan, J. Demmel, J. Donato, J. Dongarra, 
+      V. Eijkhout, R. Pozo, Ch. Romine, H. van der Vorst:
+      <A NAME=tex2html11 HREF="http://www.netlib.org/templates/templates.ps">
+      Templates for the Solution of Linear Systems: Building Blocks
+      for Iterative Solvers</A>,
+      SIAM, Philadelphia, 1994.
+      (A <A NAME=tex2html12 HREF="http://www.netlib.org/templates/Templates.html">HTML version</A> is also available).
+<P>
+  [2] G. Golub, C. van Loan:
+      Matrix Computations, second edition,
+      The Johns Hopkins University Press, Baltimore, 1989.
+<P>
+  [3] W. Hackbusch:
+      Iterative Solution of Large Sparse Systems of Equations,
+      Springer-Verlag, Berlin, 1994.
+<P>
+  [4] W. Hackbusch:
+      Multi-Grid Methods and Applications,
+      Springer-Verlag, Berlin, 1985.
+<P>
+  [5] S. F. McCormick:
+      Multigrid Methods,
+      SIAM, Philadelphia, 1987.
+</blockquote>
+<P>
+
+<H3><A NAME=SECTION00081400000000000000> AUTHOR</A></H3>
+<P>
+
+<P>
+The library <tt> LASPack</tt>
+  was developed by 
+Tomas Skalicky.
+<P>
+
+<H3><A NAME=SECTION00081500000000000000> COPYRIGHT</A></H3>
+<P>
+
+<P>
+Copyright (C) 1992-1996 Tomas Skalicky.
+ All 
+rights reserved.
+
+<b>
+  ANY USE OF THIS CODE CONSTITUTES ACCEPTANCE <BR> 
+  OF THE TERMS OF THE COPYRIGHT NOTICE
+<P>
+
+See the file <tt> laspack/copyrght.h</tt> for details.
+<P>
+
+</b><H3><A NAME=SECTION00081600000000000000> FILES</A></H3>
+<P>
+
+<P>
+<UL><LI>
+  installed:
+<P>
+  <tt> /usr/local/include/laspack/*.h ... </tt> <tt> LASPack</tt>
+  header files <BR> 
+
+  <tt> /usr/local/lib/liblaspack.a ... </tt>    <tt> LASPack</tt>
+  library
+<P>
+<LI>
+  in the distribution:
+<P>
+  <tt> laspack/*.h ... </tt>        <tt> LASPack</tt>
+  header files <BR> 
+
+  <tt> laspack/*.c ... </tt>        <tt> LASPack</tt>
+  sources <BR> 
+
+  <tt> laspack/examples/* ... </tt> some examples and test programs <BR> 
+
+  <tt> laspack/doc/*.ps ... </tt>   reference manual incl. these manual pages
+<P>
+</UL>
+<P>
+
+<H3><A NAME=SECTION00081700000000000000> LIST OF MANUAL PAGES</A></H3>
+<P>
+
+<P>
+
+
+<PRE>    eigenval(3LAS)  estimation of extremal eigenvalues
+    errhandl(3LAS)  error handling routines
+    factor(3LAS)    incomplete factorization of quadratic matrices
+    itersolv(3LAS)  classical iterative, semi-iterative, CG, and
+                    CG-like solvers
+    matrix(3LAS)    type Matrix for general rectangular sparse 
+                    matrices
+    mlsolv(3LAS)    multilevel solvers
+    operats(3LAS)   basic operations of linear algebra
+    precond(3LAS)   pre-defined preconditioners
+    qmatrix(3LAS)   type QMatrix for quadratic sparse matrices
+    rtc(3LAS)       residual termination control of iterative 
+                    solvers
+    vector(3LAS)    type Vector
+</PRE>
+<P>
+<BR> <HR><A NAME=tex2html344 HREF="node17.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html342 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html336 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html346 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html345 HREF="node17.html"> EIGENVAL(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html343 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html337 HREF="node15.html"> Manual Pages</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

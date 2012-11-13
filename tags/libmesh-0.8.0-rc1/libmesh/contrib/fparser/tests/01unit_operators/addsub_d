@@ -1,0 +1,5 @@
+T=d f ld mf cd cf cld
+V=x,y,z
+R=-6, 6, 0.5
+F=x+y+x+x-z+x
+C=x+y+x+x-z+x

@@ -1,0 +1,5 @@
+T=cd cf cld
+V=x,y
+R=0.01, 4, 0.05
+F=polar(x,y)
+C=fp_polar(x,y)

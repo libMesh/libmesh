@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=0,1,1
+F=asinh(1.1)+x
+C=logl(1.1 + sqrtl(1.1*1.1+1))+x

@@ -1,0 +1,5 @@
+T=d
+V=x
+R=-400, 400, 0.1
+F=atan(x)
+C=atan(x)

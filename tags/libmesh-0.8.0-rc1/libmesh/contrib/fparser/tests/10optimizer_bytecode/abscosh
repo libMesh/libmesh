@@ -1,0 +1,5 @@
+T=d f
+V=x
+R=-0.7, 0.7, 0.28
+F=cosh(abs(x))
+C=fp_cosh(fp_abs(x))

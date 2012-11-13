@@ -1,0 +1,6 @@
+T=d f ld li cd cf cld
+V=x
+R=0,1,1
+F=(!x=if(1,1,1))
+C=fp_equal(fp_not(x),1)
+
