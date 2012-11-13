@@ -789,6 +789,20 @@ public:
   const std::string & vector_name (const unsigned int vec_num);
 
   /**
+   * Allows one to set the boolean controlling whether the vector
+   * identified by vec_name should be "preserved": projected to new
+   * meshes, saved, etc.
+   */
+  void set_vector_preservation (const std::string &vec_name, bool preserve);
+
+  /**
+   * @returns the boolean describing whether the vector identified by
+   * vec_name should be "preserved": projected to new meshes, saved,
+   * etc.
+   */
+  bool vector_preservation (const std::string &vec_name) const;
+
+  /**
    * @returns a reference to one of the system's adjoint solution
    * vectors, by default the one corresponding to the first qoi.
    * Creates the vector if it doesn't already exist.
