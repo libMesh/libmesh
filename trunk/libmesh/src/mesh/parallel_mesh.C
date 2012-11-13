@@ -329,10 +329,17 @@ Elem* ParallelMesh::add_elem (Elem *e)
     }
   else
     {
+      // Advance next_ids up high enough that each is pointing to an
+      // unused id and any subsequent increments will still point us
+      // to unused ids
       if (_next_free_unpartitioned_elem_id <= e->id())
-        _next_free_unpartitioned_elem_id += libMesh::n_processors() + 1;
+        _next_free_unpartitioned_elem_id =
+          (e->id() / (libMesh::n_processors() + 1) + 1) *
+            (libMesh::n_processors() + 1);
       if (_next_free_local_elem_id <= e->id())
-        _next_free_local_elem_id += libMesh::n_processors() + 1;
+        _next_free_local_elem_id =
+          ((e->id() + libMesh::processor_id()) / (libMesh::n_processors() + 1) + 1) *
+            (libMesh::n_processors() + 1) + libMesh::processor_id();
     }
 
   // Don't try to overwrite existing elems
