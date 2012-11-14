@@ -1735,7 +1735,7 @@ void RBConstruction::compute_output_dual_innerprods()
     // Only log if we get to here
     START_LOG("compute_output_dual_innerprods()", "RBConstruction");
 
-    libMesh::out << "Compute output dual norms" << std::endl;
+    libMesh::out << "Compute output dual inner products" << std::endl;
 
     // Note: the solves in this function employ a single system matrix and multiple
     // right-hand sides, so we may get better performance using a different
