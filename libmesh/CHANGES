@@ -1,3 +1,33 @@
+0.7.3 -> 0.8.0
+  * Vector-valued finite elements & related examples
+  * Entirely refactored Parallel namespace implementation
+  * Properly communicate DofIndices when communicating DofObjects
+  * std::thread-like asynchronous function execution
+  * Refactored serialized EquationSystems I/O for increased performance
+  * Heterogeneous constraints & bug fixes
+  * Proper DirichletConstraints Dirichlet boundary conditions
+  * Improved PeriodicBoundary support
+  * Refactored, parallelized SparsityPattern generation
+  * Weighted Patch Recovery Error Estimator suppport
+  * Relocated header files, e.g.
+      #include "dof_map.h" becomes
+      #include "libmesh/dof_map.h"
+    this will be strictly enforced in the next release.
+  * ParallelMesh fixes
+  * PGI, Sun Studio compiler portability fixes
+  * Improved Abaqus reader support
+  * Improved UCDIO writer support
+  * Output only a subset of variables from EquationSystems
+  * Run-time floating point exception trapping via --enable-fpe
+  * Refreshed packaged METIS and ParMETIS to latest versions
+  * PETSc-3.3, SLEPc 3.3 support
+  * Trilinos-11 support
+  * Mac OSX 10.8 "Mountain Lion" fixes
+  * New Examples:
+     o ??
+     o ??
+  
+
 0.7.2 -> 0.7.3
   * Templated FunctionBase and subclass functors
   * Functor-based versions of more system APIs
