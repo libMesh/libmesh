@@ -94,6 +94,12 @@ void UnstructuredMesh::copy_nodes_and_elements
   libmesh_assert_equal_to (_dim, other_mesh._dim);
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
 
+  // We're assuming the other mesh has proper element number ordering,
+  // so that we add parents before their children.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_amr_elem_ids(other_mesh);
+#endif
+
   //Copy in Nodes
   {
     //Preallocate Memory if necessary
