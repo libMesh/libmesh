@@ -32,7 +32,7 @@ if LIBMESH_VPATH_BUILD
 	-rm -f horn.msh             && $(LN_S) $(srcdir)/horn.msh .
 	$(AM_V_GEN)touch .linkstamp
 
-  CLEANFILES += reduced_basis_ex7.in horn.in
+  CLEANFILES += reduced_basis_ex7.in horn.in .linkstamp
 endif
 
 ######################################################################
