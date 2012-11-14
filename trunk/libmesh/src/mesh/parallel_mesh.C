@@ -65,6 +65,14 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
   _n_elem  = other_mesh.n_elem();
   _max_node_id = other_mesh.max_node_id();
   _max_elem_id = other_mesh.max_elem_id();
+  _next_free_local_node_id = 
+    other_mesh._next_free_local_node_id;
+  _next_free_local_elem_id = 
+    other_mesh._next_free_local_elem_id;
+  _next_free_unpartitioned_node_id = 
+    other_mesh._next_free_unpartitioned_node_id;
+  _next_free_unpartitioned_elem_id = 
+    other_mesh._next_free_unpartitioned_elem_id;
   *this->boundary_info = *other_mesh.boundary_info;
 
   // Need to copy extra_ghost_elems
@@ -85,11 +93,9 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
   _next_free_unpartitioned_elem_id(libMesh::n_processors())
 {
   this->copy_nodes_and_elements(other_mesh);
-  _n_nodes = other_mesh.n_nodes();
-  _n_elem  = other_mesh.n_elem();
-  _max_node_id = other_mesh.max_node_id();
-  _max_elem_id = other_mesh.max_elem_id();
   *this->boundary_info = *other_mesh.boundary_info;
+
+  this->update_parallel_id_counts();
 }
 
 
@@ -106,6 +112,24 @@ void ParallelMesh::update_parallel_id_counts()
   _n_nodes = this->parallel_n_nodes();
   _max_node_id = this->parallel_max_node_id();
   _max_elem_id = this->parallel_max_elem_id();
+
+  if (_next_free_unpartitioned_elem_id < _max_elem_id)
+    _next_free_unpartitioned_elem_id =
+      ((_max_elem_id-1) / (libMesh::n_processors() + 1) + 1) *
+        (libMesh::n_processors() + 1) + libMesh::n_processors();
+  if (_next_free_local_elem_id < _max_elem_id)
+    _next_free_local_elem_id =
+      ((_max_elem_id + libMesh::n_processors() - 1) / (libMesh::n_processors() + 1) + 1) *
+        (libMesh::n_processors() + 1) + libMesh::processor_id();
+
+  if (_next_free_unpartitioned_node_id < _max_node_id)
+    _next_free_unpartitioned_node_id =
+      ((_max_node_id-1) / (libMesh::n_processors() + 1) + 1) *
+        (libMesh::n_processors() + 1) + libMesh::n_processors();
+  if (_next_free_local_node_id < _max_node_id)
+    _next_free_local_node_id =
+      ((_max_node_id + libMesh::n_processors() - 1) / (libMesh::n_processors() + 1) + 1) *
+        (libMesh::n_processors() + 1) + libMesh::processor_id();
 }
 
 
@@ -318,6 +342,12 @@ Elem* ParallelMesh::add_elem (Elem *e)
 
   if (!e->valid_id())
     {
+      // We should only be creating new ids past the end of the range
+      // of existing ids
+      libmesh_assert_greater_equal(_next_free_unpartitioned_elem_id,
+                                   _max_elem_id);
+      libmesh_assert_greater_equal(_next_free_local_elem_id, _max_elem_id);
+
       // Use the unpartitioned ids for unpartitioned elems,
       // in serial, and temporarily for ghost elems
       unsigned int *next_id = &_next_free_unpartitioned_elem_id;
@@ -325,21 +355,30 @@ Elem* ParallelMesh::add_elem (Elem *e)
           !this->is_serial())
         next_id = &_next_free_local_elem_id;
       e->set_id (*next_id);
-      *next_id += libMesh::n_processors() + 1;
     }
-  else
+
     {
       // Advance next_ids up high enough that each is pointing to an
       // unused id and any subsequent increments will still point us
       // to unused ids
-      if (_next_free_unpartitioned_elem_id <= e->id())
+      _max_elem_id = std::max(_max_elem_id, e->id()+1);
+
+      if (_next_free_unpartitioned_elem_id < _max_elem_id)
         _next_free_unpartitioned_elem_id =
-          (e->id() / (libMesh::n_processors() + 1) + 1) *
-            (libMesh::n_processors() + 1);
-      if (_next_free_local_elem_id <= e->id())
+          ((_max_elem_id-1) / (libMesh::n_processors() + 1) + 1) *
+            (libMesh::n_processors() + 1) + libMesh::n_processors();
+      if (_next_free_local_elem_id < _max_elem_id)
         _next_free_local_elem_id =
-          ((e->id() + libMesh::processor_id()) / (libMesh::n_processors() + 1) + 1) *
+          ((_max_elem_id + libMesh::n_processors() - 1) / (libMesh::n_processors() + 1) + 1) *
             (libMesh::n_processors() + 1) + libMesh::processor_id();
+
+#ifndef NDEBUG
+      // We need a const mapvector so we don't inadvertently create
+      // NULL entries when testing for non-NULL ones
+      const mapvector<Elem*>& const_elements = _elements;
+#endif
+      libmesh_assert(!const_elements[_next_free_unpartitioned_elem_id]);
+      libmesh_assert(!const_elements[_next_free_local_elem_id]);
     }
 
   // Don't try to overwrite existing elems
@@ -351,7 +390,6 @@ Elem* ParallelMesh::add_elem (Elem *e)
   if (elem_procid == libMesh::processor_id() ||
       elem_procid == DofObject::invalid_processor_id)
     _n_elem++;
-  _max_elem_id = std::max(_max_elem_id, e->id()+1);
 
 // Unpartitioned elems should be added on every processor
 // And shouldn't be added in the same batch as ghost elems
@@ -459,6 +497,12 @@ Node* ParallelMesh::add_node (Node *n)
 
   if (!n->valid_id())
     {
+      // We should only be creating new ids past the end of the range
+      // of existing ids
+      libmesh_assert_greater_equal(_next_free_unpartitioned_node_id,
+                                   _max_node_id);
+      libmesh_assert_greater_equal(_next_free_local_node_id, _max_node_id);
+
       // Use the unpartitioned ids for unpartitioned nodes,
       // in serial, and temporarily for ghost nodes
       unsigned int *next_id = &_next_free_unpartitioned_node_id;
@@ -466,14 +510,30 @@ Node* ParallelMesh::add_node (Node *n)
           !this->is_serial())
         next_id = &_next_free_local_node_id;
       n->set_id (*next_id);
-      *next_id += libMesh::n_processors() + 1;
     }
-  else
+
     {
-      if (_next_free_unpartitioned_node_id <= n->id())
-        _next_free_unpartitioned_node_id += libMesh::n_processors() + 1;
-      if (_next_free_local_node_id <= n->id())
-        _next_free_local_node_id += libMesh::n_processors() + 1;
+      // Advance next_ids up high enough that each is pointing to an
+      // unused id and any subsequent increments will still point us
+      // to unused ids
+      _max_node_id = std::max(_max_node_id, n->id()+1);
+
+      if (_next_free_unpartitioned_node_id < _max_node_id)
+        _next_free_unpartitioned_node_id =
+          ((_max_node_id-1) / (libMesh::n_processors() + 1) + 1) *
+            (libMesh::n_processors() + 1) + libMesh::n_processors();
+      if (_next_free_local_node_id < _max_node_id)
+        _next_free_local_node_id =
+          ((_max_node_id + libMesh::n_processors() - 1) / (libMesh::n_processors() + 1) + 1) *
+            (libMesh::n_processors() + 1) + libMesh::processor_id();
+
+#ifndef NDEBUG
+      // We need a const mapvector so we don't inadvertently create
+      // NULL entries when testing for non-NULL ones
+      const mapvector<Node*>& const_nodes = _nodes;
+#endif
+      libmesh_assert(!const_nodes[_next_free_unpartitioned_node_id]);
+      libmesh_assert(!const_nodes[_next_free_local_node_id]);
     }
 
   // Don't try to overwrite existing nodes
@@ -485,7 +545,6 @@ Node* ParallelMesh::add_node (Node *n)
   if (node_procid == libMesh::processor_id() ||
       node_procid == DofObject::invalid_processor_id)
     _n_nodes++;
-  _max_node_id = std::max(_max_node_id, n->id()+1);
 
 // Unpartitioned nodes should be added on every processor
 // And shouldn't be added in the same batch as ghost nodes
@@ -999,30 +1058,13 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
   // Finally renumber all the elements
   _n_elem = this->renumber_dof_objects (this->_elements);
-  _max_elem_id = _n_elem;
-  _next_free_local_elem_id = _n_elem;
 
   // and all the remaining nodes
   _n_nodes = this->renumber_dof_objects (this->_nodes);
-  _max_node_id = _n_nodes;
-  _next_free_local_node_id = _n_nodes;
 
   // And figure out what IDs we should use when adding new nodes and
   // new elements
-  unsigned int cycle = libMesh::n_processors()+1;
-  unsigned int offset = _next_free_local_elem_id % cycle;
-  if (offset)
-    _next_free_local_elem_id += cycle - offset;
-  _next_free_unpartitioned_elem_id = _next_free_local_elem_id +
-                                     libMesh::n_processors();
-  _next_free_local_elem_id += libMesh::processor_id();
-
-  offset = _next_free_local_node_id % cycle;
-  if (offset)
-    _next_free_local_node_id += cycle - offset;
-  _next_free_unpartitioned_node_id = _next_free_local_node_id +
-                                     libMesh::n_processors();
-  _next_free_local_node_id += libMesh::processor_id();
+  this->update_parallel_id_counts();
 
 // Make sure our caches are up to date and our
 // DofObjects are well packed
