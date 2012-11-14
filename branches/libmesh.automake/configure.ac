@@ -276,6 +276,7 @@ AC_CONFIG_FILES([
 		examples/reduced_basis/reduced_basis_ex4/Makefile
 		examples/reduced_basis/reduced_basis_ex5/Makefile
 		examples/reduced_basis/reduced_basis_ex6/Makefile
+		examples/reduced_basis/reduced_basis_ex7/Makefile
 		examples/transient/transient_ex1/Makefile
 		examples/transient/transient_ex2/Makefile
 		examples/vector_fe/vector_fe_ex1/Makefile

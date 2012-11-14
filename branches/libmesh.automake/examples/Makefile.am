@@ -38,6 +38,7 @@ SUBDIRS = \
 	reduced_basis/reduced_basis_ex4 \
 	reduced_basis/reduced_basis_ex5 \
 	reduced_basis/reduced_basis_ex6 \
+	reduced_basis/reduced_basis_ex7 \
 	transient/transient_ex1 \
 	transient/transient_ex2 \
 	vector_fe/vector_fe_ex1 \
