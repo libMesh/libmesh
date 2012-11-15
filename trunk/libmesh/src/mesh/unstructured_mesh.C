@@ -179,11 +179,14 @@ void UnstructuredMesh::copy_nodes_and_elements
     }
   }
 
-  //Finally prepare the new Mesh for use.  Keep the same numbering but
-  //also the same renumbering policy as our source mesh.
+  //Finally prepare the new Mesh for use.  Keep the same numbering and
+  //partitioning but also the same renumbering and partitioning
+  //policies as our source mesh.
   this->allow_renumbering(false);
+  this->skip_partitioning(true);
   this->prepare_for_use();
   this->allow_renumbering(other_mesh.allow_renumbering());
+  this->skip_partitioning(other_mesh.skip_partitioning());
 }
 
 
