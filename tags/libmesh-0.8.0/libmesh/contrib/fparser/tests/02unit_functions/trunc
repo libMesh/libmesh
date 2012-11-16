@@ -1,0 +1,5 @@
+T=d
+V=x
+R=-4000, 4000, 0.1
+F=trunc(x)
+C=x<0 ? ceil(x) : floor(x)

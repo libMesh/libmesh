@@ -1,0 +1,5 @@
+T=d li gi
+V=x
+R=-5,5,1
+F=sub(abs(x) < 4, abs(x) < 0)
+C=userDefFuncSub({fp_less(fp_abs(x),4), fp_less(fp_abs(x),0)})

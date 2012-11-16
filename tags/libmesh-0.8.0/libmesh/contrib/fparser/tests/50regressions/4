@@ -1,0 +1,9 @@
+# Bug fixed in commit d0c31571026723d9c5852a4de33bc7a616a4943e
+#        sub(!(x-y), !!(x-y)) bugs when double-optimized
+#        due to buggy CopyOnWrite calling in cSub/cRSub reconstruction
+
+T=d f ld mf li gi
+V=x,y
+R=-2, 2, 1
+F=sub(!(x-y), !!(x-y))
+C=userDefFuncSub({ fp_not(x-y), fp_notNot(x-y) })

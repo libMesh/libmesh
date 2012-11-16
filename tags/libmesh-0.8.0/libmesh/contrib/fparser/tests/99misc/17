@@ -1,0 +1,5 @@
+T=d f ld mf li gi
+V=x,y
+R=-20, 20, 1
+F=sqr(x)+sub(x,y)+psqr(y)+psub(y+1,x-2)-1
+C=userDefFuncSqr({x})+userDefFuncSub({x,y})+userDefFuncSqr({y})+userDefFuncSub({y+1,x-2})-1

@@ -1,0 +1,5 @@
+T=d f ld mf
+V=a,b,c
+R=1,3,.2
+F=a^b^c + a^-2 * (-b^2) + (-b^-c)
+C=fp_pow(a, fp_pow(b, c)) + fp_pow(a, -2) * (-fp_pow(b, 2)) + (-fp_pow(b, -c))

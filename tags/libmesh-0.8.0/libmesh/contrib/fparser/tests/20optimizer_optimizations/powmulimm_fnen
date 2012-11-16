@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=x,y
+R=-3,3,2
+F=((-5.1)*x*y)^(-8)
+C=fp_pow((-5.1)*x*y, (-8))
