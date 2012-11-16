@@ -94,6 +94,12 @@ void UnstructuredMesh::copy_nodes_and_elements
   libmesh_assert_equal_to (_dim, other_mesh._dim);
   libmesh_assert_equal_to (_is_prepared, other_mesh._is_prepared);
 
+  // We're assuming the other mesh has proper element number ordering,
+  // so that we add parents before their children.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_amr_elem_ids(other_mesh);
+#endif
+
   //Copy in Nodes
   {
     //Preallocate Memory if necessary
@@ -173,11 +179,14 @@ void UnstructuredMesh::copy_nodes_and_elements
     }
   }
 
-  //Finally prepare the new Mesh for use.  Keep the same numbering but
-  //also the same renumbering policy as our source mesh.
+  //Finally prepare the new Mesh for use.  Keep the same numbering and
+  //partitioning but also the same renumbering and partitioning
+  //policies as our source mesh.
   this->allow_renumbering(false);
+  this->skip_partitioning(true);
   this->prepare_for_use();
   this->allow_renumbering(other_mesh.allow_renumbering());
+  this->skip_partitioning(other_mesh.skip_partitioning());
 }
 
 

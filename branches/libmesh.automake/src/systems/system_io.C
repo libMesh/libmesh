@@ -2154,8 +2154,6 @@ unsigned int System::read_serialized_vectors (Xdr &io,
 
   libmesh_assert (io.reading());
 
-  libmesh_here();
-
   // sizes
   unsigned int num_vecs=0, vector_length=0;
 
@@ -2235,8 +2233,6 @@ unsigned int System::write_serialized_vectors (Xdr &io,
   parallel_only();
 
   libmesh_assert (io.writing());
-
-  libmesh_here();
 
   // Cache these - they are not free!
   const unsigned int
