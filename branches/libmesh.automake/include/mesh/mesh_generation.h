@@ -111,7 +111,9 @@ namespace MeshTools
     void build_sphere (UnstructuredMesh& mesh,
 		       const Real rad=1,
 		       const unsigned int nr=2,
-		       const ElemType type=INVALID_ELEM);
+		       const ElemType type=INVALID_ELEM,
+		       const unsigned int n_smooth=2,
+		       const bool flat=true);
 
     /**
      * Meshes the tensor product of a 1D and a 1D-or-2D domain.
