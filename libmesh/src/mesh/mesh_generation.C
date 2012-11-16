@@ -1547,7 +1547,9 @@ void MeshTools::Generation::build_square (UnstructuredMesh& mesh,
 void MeshTools::Generation::build_sphere (UnstructuredMesh&,
 					  const Real,
 					  const unsigned int,
-					  const ElemType)
+					  const ElemType,
+					  const unsigned int,
+					  const bool)
 {
  	libMesh::out << "Building a circle/sphere only works with AMR." << std::endl;
  	libmesh_error();
@@ -1558,7 +1560,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh&,
 void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 					  const Real rad,
 					  const unsigned int nr,
-					  const ElemType type)
+					  const ElemType type,
+					  const unsigned int n_smooth,
+					  const bool flat)
 {
   libmesh_assert_greater (rad, 0.);
   //libmesh_assert_greater (nr, 0); // must refine at least once otherwise will end up with a square/cube
@@ -1586,92 +1590,150 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
 
       //-----------------------------------------------------------------
-      // Build a circle in two dimensions
+      // Build a circle or hollow sphere in two dimensions
     case 2:
       {
-	const Real sqrt_2     = std::sqrt(2.);
-        const Real rad_2      = .25*rad;
-        const Real rad_sqrt_2 = rad/sqrt_2;
-
 	// For ParallelMesh, if we don't specify node IDs the Mesh
 	// will try to pick an appropriate (unique) one for us.  But
 	// since we are adding these nodes on all processors, we want
 	// to be sure they have consistent IDs across all processors.
 	unsigned node_id = 0;
 
-	// (Temporary) convenient storage for node pointers
-	std::vector<Node*> nodes(8);
+	if (flat)
+	  {
+	    const Real sqrt_2     = std::sqrt(2.);
+	    const Real rad_2      = .25*rad;
+	    const Real rad_sqrt_2 = rad/sqrt_2;
 
-	// Point 0
-	nodes[0] = mesh.add_point (Point(-rad_2,-rad_2, 0.), node_id++);
+	    // (Temporary) convenient storage for node pointers
+	    std::vector<Node*> nodes(8);
 
-	// Point 1
-	nodes[1] = mesh.add_point (Point( rad_2,-rad_2, 0.), node_id++);
+	    // Point 0
+	    nodes[0] = mesh.add_point (Point(-rad_2,-rad_2, 0.), node_id++);
 
-	// Point 2
-	nodes[2] = mesh.add_point (Point( rad_2, rad_2, 0.), node_id++);
+	    // Point 1
+	    nodes[1] = mesh.add_point (Point( rad_2,-rad_2, 0.), node_id++);
 
-	// Point 3
-	nodes[3] = mesh.add_point (Point(-rad_2, rad_2, 0.), node_id++);
+	    // Point 2
+	    nodes[2] = mesh.add_point (Point( rad_2, rad_2, 0.), node_id++);
 
-	// Point 4
-	nodes[4] = mesh.add_point (Point(-rad_sqrt_2,-rad_sqrt_2, 0.), node_id++);
+	    // Point 3
+	    nodes[3] = mesh.add_point (Point(-rad_2, rad_2, 0.), node_id++);
 
-	// Point 5
-	nodes[5] = mesh.add_point (Point( rad_sqrt_2,-rad_sqrt_2, 0.), node_id++);
+	    // Point 4
+	    nodes[4] = mesh.add_point (Point(-rad_sqrt_2,-rad_sqrt_2, 0.), node_id++);
 
-	// Point 6
-	nodes[6] = mesh.add_point (Point( rad_sqrt_2, rad_sqrt_2, 0.), node_id++);
+	    // Point 5
+	    nodes[5] = mesh.add_point (Point( rad_sqrt_2,-rad_sqrt_2, 0.), node_id++);
 
-	// Point 7
-	nodes[7] = mesh.add_point (Point(-rad_sqrt_2, rad_sqrt_2, 0.), node_id++);
+	    // Point 6
+	    nodes[6] = mesh.add_point (Point( rad_sqrt_2, rad_sqrt_2, 0.), node_id++);
 
-	// Build the elements & set node pointers
+	    // Point 7
+	    nodes[7] = mesh.add_point (Point(-rad_sqrt_2, rad_sqrt_2, 0.), node_id++);
 
-	// Element 0
-	{
-	  Elem* elem0 = mesh.add_elem (new Quad4);
-	  elem0->set_node(0) = nodes[0];
-	  elem0->set_node(1) = nodes[1];
-	  elem0->set_node(2) = nodes[2];
-	  elem0->set_node(3) = nodes[3];
-	}
+	    // Build the elements & set node pointers
 
-	// Element 1
-	{
-	  Elem* elem1 = mesh.add_elem (new Quad4);
-	  elem1->set_node(0) = nodes[4];
-	  elem1->set_node(1) = nodes[0];
-	  elem1->set_node(2) = nodes[3];
-	  elem1->set_node(3) = nodes[7];
-	}
+	    // Element 0
+	    {
+	      Elem* elem0 = mesh.add_elem (new Quad4);
+	      elem0->set_node(0) = nodes[0];
+	      elem0->set_node(1) = nodes[1];
+	      elem0->set_node(2) = nodes[2];
+	      elem0->set_node(3) = nodes[3];
+	    }
 
-	// Element 2
-	{
-	  Elem* elem2 = mesh.add_elem (new Quad4);
-	  elem2->set_node(0) = nodes[4];
-	  elem2->set_node(1) = nodes[5];
-	  elem2->set_node(2) = nodes[1];
-	  elem2->set_node(3) = nodes[0];
-	}
+	    // Element 1
+	    {
+	      Elem* elem1 = mesh.add_elem (new Quad4);
+	      elem1->set_node(0) = nodes[4];
+	      elem1->set_node(1) = nodes[0];
+	      elem1->set_node(2) = nodes[3];
+	      elem1->set_node(3) = nodes[7];
+	    }
 
-	// Element 3
-	{
-	  Elem* elem3 = mesh.add_elem (new Quad4);
-	  elem3->set_node(0) = nodes[1];
-	  elem3->set_node(1) = nodes[5];
-	  elem3->set_node(2) = nodes[6];
-	  elem3->set_node(3) = nodes[2];
-	}
+	    // Element 2
+	    {
+	      Elem* elem2 = mesh.add_elem (new Quad4);
+	      elem2->set_node(0) = nodes[4];
+	      elem2->set_node(1) = nodes[5];
+	      elem2->set_node(2) = nodes[1];
+	      elem2->set_node(3) = nodes[0];
+	    }
 
-	// Element 4
-	{
-	  Elem* elem4 = mesh.add_elem (new Quad4);
-	  elem4->set_node(0) = nodes[3];
-	  elem4->set_node(1) = nodes[2];
-	  elem4->set_node(2) = nodes[6];
-	  elem4->set_node(3) = nodes[7];
-	}
+	    // Element 3
+	    {
+	      Elem* elem3 = mesh.add_elem (new Quad4);
+	      elem3->set_node(0) = nodes[1];
+	      elem3->set_node(1) = nodes[5];
+	      elem3->set_node(2) = nodes[6];
+	      elem3->set_node(3) = nodes[2];
+	    }
+
+	    // Element 4
+	    {
+	      Elem* elem4 = mesh.add_elem (new Quad4);
+	      elem4->set_node(0) = nodes[3];
+	      elem4->set_node(1) = nodes[2];
+	      elem4->set_node(2) = nodes[6];
+	      elem4->set_node(3) = nodes[7];
+	    }
+
+	  }
+	else
+	  {
+	    // Create the 12 vertices of a regular unit icosahedron
+	    Real t = 0.5 * (1 + std::sqrt(5.0));
+	    Real s = rad / std::sqrt(1 + t*t);
+	    t *= s;
+
+	    mesh.add_point (Point(-s,  t,  0), node_id++);
+	    mesh.add_point (Point( s,  t,  0), node_id++);
+	    mesh.add_point (Point(-s, -t,  0), node_id++);
+	    mesh.add_point (Point( s, -t,  0), node_id++);
+
+	    mesh.add_point (Point( 0, -s,  t), node_id++);
+	    mesh.add_point (Point( 0,  s,  t), node_id++);
+	    mesh.add_point (Point( 0, -s, -t), node_id++);
+	    mesh.add_point (Point( 0,  s, -t), node_id++);
+
+	    mesh.add_point (Point( t,  0, -s), node_id++);
+	    mesh.add_point (Point( t,  0,  s), node_id++);
+	    mesh.add_point (Point(-t,  0, -s), node_id++);
+	    mesh.add_point (Point(-t,  0,  s), node_id++);
+
+	    // Create the 20 triangles of the icosahedron
+	    static const unsigned int idx1 [6] = {11, 5, 1, 7, 10, 11};
+	    static const unsigned int idx2 [6] = {9, 4, 2, 6, 8, 9};
+	    static const unsigned int idx3 [6] = {1, 5, 11, 10, 7, 1};
+
+	    for (unsigned int i = 0; i < 5; ++i)
+	      {
+		// 5 elems around point 0
+		Elem* new_elem = mesh.add_elem (new Tri3);
+		new_elem->set_node(0) = mesh.node_ptr(0);
+		new_elem->set_node(1) = mesh.node_ptr(idx1[i]);
+		new_elem->set_node(2) = mesh.node_ptr(idx1[i+1]);
+
+		// 5 adjacent elems
+		new_elem = mesh.add_elem (new Tri3);
+		new_elem->set_node(0) = mesh.node_ptr(idx3[i]);
+		new_elem->set_node(1) = mesh.node_ptr(idx3[i+1]);
+		new_elem->set_node(2) = mesh.node_ptr(idx2[i]);
+
+		// 5 elems around point 3
+		new_elem = mesh.add_elem (new Tri3);
+		new_elem->set_node(0) = mesh.node_ptr(3);
+		new_elem->set_node(1) = mesh.node_ptr(idx2[i]);
+		new_elem->set_node(2) = mesh.node_ptr(idx2[i+1]);
+
+		// 5 adjacent elems
+		new_elem = mesh.add_elem (new Tri3);
+		new_elem->set_node(0) = mesh.node_ptr(idx2[i+1]);
+		new_elem->set_node(1) = mesh.node_ptr(idx2[i]);
+		new_elem->set_node(2) = mesh.node_ptr(idx3[i+1]);
+	      }
+	  }
 
 	break;
       } // end case 2
@@ -1849,7 +1911,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 	  Elem* elem = *it;
 
 	  for (unsigned int s=0; s<elem->n_sides(); s++)
-	    if (elem->neighbor(s) == NULL)
+	    if (elem->neighbor(s) == NULL || (mesh.mesh_dimension() == 2 && !flat))
 	      {
 		AutoPtr<Elem> side(elem->build_side(s));
 
@@ -1911,7 +1973,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh& mesh,
 
   // The meshes could probably use some smoothing.
   LaplaceMeshSmoother smoother(mesh);
-  smoother.smooth(2);
+  smoother.smooth(n_smooth);
 
   // We'll give the whole sphere surface a boundary id of 0
   {

@@ -15,6 +15,7 @@
     this will be strictly enforced in the next release.
   * ParallelMesh fixes
   * PGI, Sun Studio compiler portability fixes
+  * MeshTools::Generation::build_sphere() icosahedron support
   * Improved Abaqus reader support
   * Improved UCDIO writer support
   * Output only a subset of variables from EquationSystems
