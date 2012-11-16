@@ -23,7 +23,7 @@
 
 #include <iostream>
 #include <time.h> // time
-#include <stdlib.h> // random, srandom
+#include <stdlib.h> // rand, srand
 
 #include "libmesh/libmesh_config.h"
 
@@ -248,11 +248,13 @@ void gen_random_string(std::string& s, const int len)
     "abcdefghijklmnopqrstuvwxyz";
 
   // Seed the random number generator with the current time
-  srandom( static_cast<unsigned>(time(NULL)) );
+  srand( static_cast<unsigned>(time(NULL)) );
 
   s.resize(len);
   for (int i = 0; i < len; ++i)
     {
-      s[i] = alphanum[random() % (sizeof(alphanum) - 1)];
+      unsigned int alphai = static_cast<unsigned int>
+        (rand() / (RAND_MAX+1.0) * (sizeof(alphanum)-1));
+      s[i] = alphanum[alphai];
     }
 }
