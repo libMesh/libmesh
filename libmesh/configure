@@ -4978,7 +4978,7 @@ fi
     CFLAGS_DBG="-g -Wimplicit"
     ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
-        if test "$enableshared" = yes ; then
+        if test "$enableshared" = yes -a `uname -o` != "Cygwin"; then
       CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
       CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
       CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
