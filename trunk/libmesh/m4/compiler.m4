@@ -393,7 +393,7 @@ AC_DEFUN([SET_CXX_FLAGS], dnl
     ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
     dnl Position-independent code for shared libraries
-    if test "$enableshared" = yes ; then
+    if test "$enableshared" = yes -a `uname -o` != "Cygwin"; then
       CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
       CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
       CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
