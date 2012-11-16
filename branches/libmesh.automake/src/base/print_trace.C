@@ -119,9 +119,9 @@ void print_trace(std::ostream &out)
 
 namespace libMesh
 {
-void libMesh::print_trace(std::ostream &) {}
+void print_trace(std::ostream &) {}
 
-std::string demangle(const char *name) {}
+std::string demangle(const char *name) { return std::string(name); }
 }
 
 #endif
