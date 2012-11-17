@@ -1,0 +1,6 @@
+DEG=1
+T=d f ld mf
+V=x
+R=-1,1,0.5
+F=acos(x)*2
+C=r2d(fp_acos(x))*2

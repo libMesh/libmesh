@@ -1,0 +1,9 @@
+T=d ld f mf cd cf cld
+V=x
+R=-1,1,1
+F=ceil(x*(abs(x)-abs(x)-1))
+C=fp_ceil(-x)
+
+
+# abs(x)-abs(x)-1 is used to produce a -1 without
+# the bytecode optimizer taking a bite of it

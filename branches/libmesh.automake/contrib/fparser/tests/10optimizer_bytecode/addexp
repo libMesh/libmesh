@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-3,-3,0.7
+F=exp(x+4)
+C=fp_exp(x+4)

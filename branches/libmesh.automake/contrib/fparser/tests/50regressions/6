@@ -1,0 +1,8 @@
+# Bug: !(x+4) fails on integer types
+# Introduced in commit ________
+# Fixed in commit 6461cac2dab474ea091befd3782717ccd573b385
+T=d li gi
+V=x
+R=-5,5,1
+F=sub(!(x+4), !!(x+3))
+C=userDefFuncSub({fp_not(x+4), fp_notNot(x+3)})

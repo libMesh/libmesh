@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x,y
+R=0,1,1
+F=if(x >= y,x,y)
+C=((fp_greaterOrEq(x,y)!=0)?x:y)

@@ -1,0 +1,5 @@
+T=d ld mf
+V=x,y,z
+R=-.9, .9, .1
+F=asinh(x) + 1.5*acosh(y+3) + 2.5*atanh(z)
+C=fp_asinh(x) + 1.5*fp_acosh(y+3) + 2.5*fp_atanh(z)

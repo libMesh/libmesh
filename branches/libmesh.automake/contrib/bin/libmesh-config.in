@@ -1,0 +1,50 @@
+#!/bin/sh
+
+#
+# values substituted from configure
+#
+host=@host@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+
+
+#
+# For a libMesh installation configure scripts could live in
+# one of two places:
+#
+#  @exec_prefix@/bin/libmesh-config 
+#  @exec_prefix@/bin/@host@_${METHOD}/libmes-config-$METHOD
+#
+# When the user calls the first we just examine the ${METHOD}
+# variable and cleverly dispatch to the proper subdirectory.
+# When the user calls the second directly we assume she knows 
+# what she is doing.
+#
+# define that functionality here.
+if (test "x$METHOD" = x); then
+    #echo "No METHOD specified - defaulting to opt"
+    METHOD=opt
+fi
+
+script_path=`dirname $0`
+#echo "script_path=$script_path"
+
+if (test -d $script_path); then
+    
+    cd $script_path
+    
+    if (test -d @host@_$METHOD -a -x @host@_$METHOD/libmesh-config); then
+	$script_path/@host@_$METHOD/libmesh-config $@
+    else
+	echo " "
+	echo "ERROR: no $script_path/@host@_$METHOD/libmesh-config"
+	echo " "
+	echo "Installed builds are:"
+	echo `ls -d $script_path/@host@*`
+	echo " "
+	echo "Did you 'make install' a METHOD=$METHOD build?"
+	exit 1
+    fi	    
+fi
+
+exit 0

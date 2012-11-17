@@ -1,0 +1,11 @@
+T=d f ld mf
+V=x
+R=-3, 3, 0.2
+F=(cos(x) < sin(x)) + \
+  (cos(x)-sin(x)) + \
+  sub(sinh(x)-cosh(x), sinh(x)/cosh(x)) + \
+  sqrt(cos(x)^2+sin(x)^2)
+C=fp_less(fp_cos(x), fp_sin(x)) + \
+  (fp_cos(x) - fp_sin(x)) + \
+  ((fp_sinh(x)-fp_cosh(x)) - (fp_sinh(x)/fp_cosh(x))) + \
+  Value_t(1)

@@ -1,0 +1,5 @@
+T=d f ld mf
+V=x
+R=-1,1,0.5
+F=floor(x>4)
+C=fp_floor(fp_greater(x,4))

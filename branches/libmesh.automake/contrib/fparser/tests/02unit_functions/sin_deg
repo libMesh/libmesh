@@ -1,0 +1,6 @@
+DEG=true
+T=d
+V=x
+R=-40000, 40000, 5
+F=sin(x)
+C=sin(d2r(x))
