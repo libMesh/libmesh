@@ -731,15 +731,6 @@ namespace FPoptimizer_CodeTree
                         sim.PopNMov(stackOffs_target, stackOffs_source);
                         break;
                     }
-                    // Other functions
-#ifndef FP_DISABLE_EVAL
-                    case cEval:
-                    {
-                        size_t paramcount = fpdata.mVariablesAmount;
-                        sim.Eat(paramcount, OPCODE(opcode));
-                        break;
-                    }
-#endif
 
                     default:
                     default_function_handling:;

@@ -834,8 +834,6 @@ namespace FPoptimizer_CodeTree
                 break;
             case cFCall:
                 break; // Cannot deduce
-            case cEval:
-                break; // Cannot deduce
         }
         return range<Value_t>(); /* Cannot deduce */
     }

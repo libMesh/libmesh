@@ -8,6 +8,8 @@
 #include "optimize.hh"
 #include "bytecodesynth.hh"
 
+//#include "grammar.hh"
+
 #ifdef FP_SUPPORT_OPTIMIZER
 
 using namespace FUNCTIONPARSERTYPES;
@@ -96,6 +98,13 @@ namespace FPoptimizer_CodeTree
             DumpTreeWithIndent(*this);
         #endif
             FixIncompleteHashes();
+
+            using namespace FPoptimizer_Optimize;
+            using namespace FPoptimizer_Grammar;
+            const void* g = (const void*)&grammar_optimize_recreate;
+            while(ApplyGrammar(*(const Grammar*)g, *this))
+                {   FixIncompleteHashes();
+                }
         }
     #ifdef DEBUG_SUBSTITUTIONS
         std::cout << "Actually synthesizing, after recreating inv/neg:\n";

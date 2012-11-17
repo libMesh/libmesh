@@ -898,7 +898,7 @@ void RBEvaluation::write_out_vectors(System& sys,
   //   Xdr bf_data(file_name.str(),
   //               write_binary_vectors ? ENCODE : WRITE);
   //   // set the current version
-  //   bf_data.set_version(LIBMESH_VERSION(LIBMESH_MAJOR_VERSION,
+  //   bf_data.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
   // 					   LIBMESH_MINOR_VERSION,
   // 					   LIBMESH_MICRO_VERSION));
     
@@ -928,7 +928,7 @@ void RBEvaluation::write_out_vectors(System& sys,
 
 
   // set the current version
-  bf_data.set_version(LIBMESH_VERSION(LIBMESH_MAJOR_VERSION,
+  bf_data.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
 					 LIBMESH_MINOR_VERSION,
 					 LIBMESH_MICRO_VERSION));
 
@@ -983,7 +983,7 @@ void RBEvaluation::read_in_vectors(System& sys,
   int ver_major = 0, ver_minor = 0, ver_patch = 0;
   char dot;
   iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
-  header_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
+  header_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
   
   // We need to call sys.read_header (e.g. to set _written_var_indices properly),
   // but by setting the read_header argument to false, it doesn't reinitialize the system
@@ -1021,7 +1021,7 @@ void RBEvaluation::read_in_vectors(System& sys,
 		          read_binary_vectors ? DECODE : READ);
 	  
 	  // The bf_data needs to know which version to read.
-	  vector_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
+	  vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
     
 	  sys.read_serialized_data(vector_data, false);
 	  
@@ -1064,7 +1064,7 @@ void RBEvaluation::read_in_vectors(System& sys,
 		      read_binary_vectors ? DECODE : READ);
 
       // The vector_data needs to know which version to read.
-      vector_data.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));    
+      vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));    
 
       sys.read_serialized_vectors (vector_data, vectors);
     }

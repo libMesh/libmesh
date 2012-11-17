@@ -56,11 +56,11 @@ typedef struct QMatrixType {
     struct QMatrixType *ILU;
 } QMatrix;
 
-void Q_Constr(QMatrix *Q, char *Name, size_t Dim, _LPBoolean Symmetry,
+void Q_Constr(QMatrix *Q, const char *Name, size_t Dim, _LPBoolean Symmetry,
               ElOrderType ElOrder, InstanceType Instance, _LPBoolean OwnData);
 void Q_Destr(QMatrix *Q);
-void Q_SetName(QMatrix *Q, char *Name);
-char *Q_GetName(QMatrix *Q);
+void Q_SetName(QMatrix *Q, const char *Name);
+const char *Q_GetName(QMatrix *Q);
 size_t Q_GetDim(QMatrix *Q);
 _LPBoolean Q_GetSymmetry(QMatrix *Q);
 ElOrderType Q_GetElOrder(QMatrix *Q);

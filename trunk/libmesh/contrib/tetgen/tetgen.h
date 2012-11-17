@@ -128,6 +128,15 @@
   #define REAL double
 #endif 	// not defined SINGLE
 
+
+#ifdef LIBMESH_IS_COMPILING_TETGEN
+#  if defined(__GNUC__) && !defined(__INTEL_COMPILER) // intel can masquerade as GNUC...
+#    pragma GCC diagnostic ignored "-Wuninitialized"
+#    pragma GCC diagnostic ignored "-Warray-bounds"
+#  endif
+#endif
+
+
 // Here are the most general used head files for C/C++ programs.
 
 #include <stdio.h>            // Standard IO: FILE, NULL, EOF, printf(), ...

@@ -1,0 +1,92 @@
+SUBDIRS = \
+	introduction/introduction_ex1 \
+	introduction/introduction_ex2 \
+	introduction/introduction_ex3 \
+	introduction/introduction_ex4 \
+	introduction/introduction_ex5 \
+	adaptivity/adaptivity_ex1 \
+	adaptivity/adaptivity_ex2 \
+	adaptivity/adaptivity_ex3 \
+	adaptivity/adaptivity_ex4 \
+	adaptivity/adaptivity_ex5 \
+	adjoints/adjoints_ex1 \
+	adjoints/adjoints_ex2 \
+	adjoints/adjoints_ex3 \
+	adjoints/adjoints_ex4 \
+	eigenproblems/eigenproblems_ex1 \
+	eigenproblems/eigenproblems_ex2 \
+	eigenproblems/eigenproblems_ex3 \
+	fem_system/fem_system_ex1 \
+	miscellaneous/miscellaneous_ex1 \
+	miscellaneous/miscellaneous_ex2 \
+	miscellaneous/miscellaneous_ex3 \
+	miscellaneous/miscellaneous_ex4 \
+	miscellaneous/miscellaneous_ex5 \
+	miscellaneous/miscellaneous_ex6 \
+	miscellaneous/miscellaneous_ex7 \
+	subdomains/subdomains_ex1 \
+	subdomains/subdomains_ex2 \
+	systems_of_equations/systems_of_equations_ex1 \
+	systems_of_equations/systems_of_equations_ex2 \
+	systems_of_equations/systems_of_equations_ex3 \
+	systems_of_equations/systems_of_equations_ex4 \
+	systems_of_equations/systems_of_equations_ex5 \
+	systems_of_equations/systems_of_equations_ex6 \
+	reduced_basis/reduced_basis_ex1 \
+	reduced_basis/reduced_basis_ex2 \
+	reduced_basis/reduced_basis_ex3 \
+	reduced_basis/reduced_basis_ex4 \
+	reduced_basis/reduced_basis_ex5 \
+	reduced_basis/reduced_basis_ex6 \
+	reduced_basis/reduced_basis_ex7 \
+	transient/transient_ex1 \
+	transient/transient_ex2 \
+	vector_fe/vector_fe_ex1 \
+	vector_fe/vector_fe_ex2 \
+	vector_fe/vector_fe_ex3
+
+
+
+include $(top_builddir)/Make.common.@METHOD@
+
+AUTOMAKE_OPTIONS = subdir-objects 
+
+AM_CPPFLAGS  = $(libmesh_CPPFLAGS)
+AM_CFLAGS    = $(libmesh_CFLAGS)
+AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
+AM_CPPFLAGS += $(libmesh_INCLUDE) -I$(top_builddir)/include
+LIBS         = $(libmesh_LIBS)
+
+if LIBMESH_ENABLE_FPARSER
+  AM_CPPFLAGS += -I$(top_srcdir)/contrib/fparser
+endif
+
+EXTRA_DIST = run_common.sh
+
+# clean-local:
+# 	-rm -rf eim_data offline_data rb_data
+
+examples_source_path=$(top_srcdir)/examples
+examples_install_path=$(prefix)/examples
+
+# include our header checking script when doing 'make dist'
+EXTRA_DIST += ../contrib/bin/test_installed_examples.sh
+
+
+######################################################################
+#
+# What to do for 'make installcheck'
+bindir=@bindir@/@host@_@METHOD@
+libdir=@libdir@/@host@_@METHOD@
+pkgconfigdir=$(libdir)/pkgconfig
+
+installcheck-local:
+	@echo " "
+	@echo "Checking for self-sufficient examples..."
+	@echo " "
+	@CXX="$(CXX)" \
+	  examples_install_path=$(examples_install_path) \
+	  PKG_CONFIG=$(PKG_CONFIG) \
+	  PKG_CONFIG_PATH=$(pkgconfigdir) \
+	  LIBMESH_CONFIG_PATH=$(bindir) \
+	  $(top_srcdir)/contrib/bin/test_installed_examples.sh

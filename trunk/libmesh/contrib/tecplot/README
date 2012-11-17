@@ -1,3 +1,28 @@
+**********************************************************************
+As of r5852, http://download.tecplot.com/tecio/2009, the source files
+distributed by Tecplot(R) are bundled and build directly into libMesh
+
+from the webpage:
+
+"Tecplot's TecIO library ("TECIO") and preplot executables may be
+distributed for the purpose of generating data files compatible with
+Tecplot's software. We provide precompiled libraries for a variety of
+platforms. Or, if you are inclined, you may compile the source
+yourself and link the library into your own solver." 
+
+--benkirk, Tue Jul 17 08:36:32 CDT 2012
+*********************************************************************
+
+
+
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~ The following notes refer to the headers and binary files ~~~~~~~
+~~~~~~~~~~~~~~~~~~~ distributed in ./include and ./lib ~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 These libraries are copyright AMTEC Engineering.
 http://www.amtec.com
 

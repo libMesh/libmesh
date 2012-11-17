@@ -1,84 +1,50 @@
 #!/bin/sh
 
 #
-# Define the usage() function
+# values substituted from configure
 #
-
-usage ()
-{
-  echo "usage: $0 --cppflags --cxxflags --include --ldflags"
-  echo "       $0 --cxx"
-  echo "       $0 --cc"
-  echo "       $0 --fc"
-  echo "       $0 --fflags"
-  exit
-}
+host=@host@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
 
 
 #
-# Need at least one command-line argument
+# For a libMesh installation configure scripts could live in
+# one of two places:
 #
-if [ "$#" = "0" ] ; then
-    usage $0
+#  @exec_prefix@/bin/libmesh-config 
+#  @exec_prefix@/bin/@host@_${METHOD}/libmes-config-$METHOD
+#
+# When the user calls the first we just examine the ${METHOD}
+# variable and cleverly dispatch to the proper subdirectory.
+# When the user calls the second directly we assume she knows 
+# what she is doing.
+#
+# define that functionality here.
+if (test "x$METHOD" = x); then
+    #echo "No METHOD specified - defaulting to opt"
+    METHOD=opt
 fi
 
-echo_list=""
+script_path=`dirname $0`
+#echo "script_path=$script_path"
 
-#
-# Process the command-line arguments, build up
-# echo_list
-#
-while [ "x$1" != "x" ]; do
-    case "$1" in
-	"--cxx")
-	    echo_list="echo_cxx $echo_list"
-	    ;;
+if (test -d $script_path); then
+    
+    cd $script_path
+    
+    if (test -d @host@_$METHOD -a -x @host@_$METHOD/libmesh-config); then
+	$script_path/@host@_$METHOD/libmesh-config $@
+    else
+	echo " "
+	echo "ERROR: no $script_path/@host@_$METHOD/libmesh-config"
+	echo " "
+	echo "Installed builds are:"
+	echo `ls -d $script_path/@host@*`
+	echo " "
+	echo "Did you 'make install' a METHOD=$METHOD build?"
+	exit 1
+    fi	    
+fi
 
-	"--cc")
-	    echo_list="echo_cc $echo_list"
-	    ;;
-
-	"--fc")
-	    echo_list="echo_fc $echo_list"
-	    ;;
-
-	"--cppflags")
-	    echo_list="echo_cppflags $echo_list"
-	    ;;
-	
-	"--cxxflags")
-	    echo_list="echo_cxxflags $echo_list"
-	    ;;
-	
-	"--cflags")
-	    echo_list="echo_cflags $echo_list"
-	    ;;
-	
-	"--fflags")
-	    echo_list="echo_fflags $echo_list"
-	    ;;
-	
-	"--include")
-	    echo_list="echo_include $echo_list"
-	    ;;
-	
-	"--ldflags")
-	    echo_list="echo_ldflags $echo_list"
-	    ;;
-	
-	*)
-	    echo "Unknown argument: $1"
-	    usage $0
-    esac
-    shift
-done
-
-
-#
-# Use make to process the echo_list
-#
-make --no-print-directory -C @PWD@ -f Makefile.const $echo_list
-
-# Local Variables:
-# mode: shell-script
-# End:
+exit 0
