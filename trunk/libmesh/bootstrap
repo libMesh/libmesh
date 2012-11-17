@@ -29,6 +29,107 @@ if (test "x`cd "${dir}" 2>/dev/null && pwd`" != "x`pwd`"); then
     exit 1
 fi
 
+
+#########################################################################################
+function check_autotool_prerequisites ()
+{
+    build_autotools=0
+
+    automake=`which automake 2>/dev/null`
+    if (test "x$automake" != "x"); then
+	if (test -x $automake); then
+	    automake_version=`$automake --version | grep " 1\." | cut -d"." -f2`
+	    if (test $automake_version -lt 8); then
+		echo "Automake Version 1.$automake_version too old, building a new one..."
+		build_autotools=1
+	    fi
+	else
+	    build_autotools=1
+	fi
+    else
+	build_autotools=1
+    fi
+    
+    libtool=`which libtool 2>/dev/null`
+    if (test "x$libtool" != "x"); then
+	if (test -x $libtool); then
+	    libtool_version=`$libtool --version | grep " 2\." | cut -d"." -f2`
+	    if (test "x$libtool_version" = "x"); then
+		echo "Indaequate Libtool, building a new one..."
+		build_autotools=1
+	    elif (test $libtool_version -lt 2); then
+		echo "Libtool Version 2.$libtool_version too old, building a new one..."
+		build_autotools=1
+	    fi
+	else
+	    build_autotools=1
+	fi
+    else
+	build_autotools=1
+    fi
+    
+    autoreconf=`which autoreconf 2>/dev/null`
+    if (test "x$autoreconf" != "x"); then
+	if (test -x $autoreconf); then
+	    autoconf_version=`$autoreconf --version | grep " 2\." | cut -d"." -f2`
+	    if (test $autoconf_version -lt 61); then
+		echo "Autoconf Version 2.$autoconf_version too old, building a new one..."
+		build_autotools=1
+	    fi
+	else
+	    build_autotools=1
+	fi
+    else
+	build_autotools=1
+    fi
+    
+    return $build_autotools
+}
+#########################################################################################
+
+
+
+check_autotool_prerequisites
+build_autotools=$?
+
+
+
+#########################################################################################
+if (test "x$build_autotools" = "x1"); then
+    # when there is no autoreconf try to actually build one.
+    echo "Inadequate autotools in your path, I'll build new ones..."
+
+    top_srcdir=`pwd`
+    autotools_distdir=$top_srcdir/contrib/autotools
+
+
+    if (test -d $autotools_distdir); then
+    # set the path to use the new tools as they are installed.
+    # for example, the new autoconf is needed to build automake.
+	PATH=$autotools_distdir/bin:$PATH
+	for tool in autoconf-2.69 automake-1.12.4 libtool-2.4.2 ; do
+	    cd $autotools_distdir
+	    echo "  building $tool in $autotools_distdir"
+	    tar zxf $tool.tar.gz
+	    cd $tool && ./configure --prefix=$autotools_distdir >/dev/null && make install >/dev/null
+	    cd .. && rm -rf $tool
+	done
+	
+	cd $top_srcdir
+	
+	if (test -x $autotools_distdir/bin/autoreconf -a -x $autotools_distdir/bin/automake -a -x $autotools_distdir/bin/libtool); then
+	    echo " "
+	    echo " --> successfully installed autoreconf in $autotools_distdir/bin - please update your PATH and try again!"
+	    echo " "
+	    PATH=$autotools_distdir/bin:$PATH ./$0
+	    exit 0
+	fi
+    fi
+fi
+#########################################################################################
+
+
+
 autoreconf=`which autoreconf 2>/dev/null`
 # prefer autoreconf when it is available
 if (test "x$autoreconf" != "x"); then
@@ -39,34 +140,6 @@ if (test "x$autoreconf" != "x"); then
 fi
 
 
-# when there is no autoreconf try to actually build one.
-echo "no autoreconf in your path, I'll try to build one..."
-
-top_srcdir=`pwd`
-autotools_distdir=$top_srcdir/contrib/autotools
-
-
-if (test -d $autotools_distdir); then
-    # set the path to use the new tools as they are installed.
-    # for example, the new autoconf is needed to build automake.
-    PATH=$autotools_distdir/bin:$PATH
-    for tool in autoconf-2.69 automake-1.12.4 libtool-2.4.2 ; do
-	cd $autotools_distdir
-	echo "  building $tool in $autotools_distdir"
-	tar zxf $tool.tar.gz
-	cd $tool && ./configure --prefix=$autotools_distdir >/dev/null && make install >/dev/null
-	cd .. && rm -rf $tool
-    done
-    
-    cd $top_srcdir
-
-    if (test -x $autotools_distdir/bin/autoreconf -a -x $autotools_distdir/bin/automake -a -x $autotools_distdir/bin/libtool); then
-	echo " "
-	echo " --> successfully installed autoreconf in $autotools_distdir/bin - please update your PATH and try again!"
-	echo " "
-	exit 0
-    fi
-fi
 
 
 # # now recursively call bootstrap with the autotools in our path
