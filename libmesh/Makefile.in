@@ -128,7 +128,8 @@ DIST_COMMON = $(am__configure_deps) $(srcdir)/Make.common.in \
 	$(top_srcdir)/contrib/utils/libmesh.pc.in \
 	$(top_srcdir)/doc/Doxyfile.in $(top_srcdir)/doc/dot.in \
 	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
-	build-aux/install-sh build-aux/ltmain.sh build-aux/missing
+	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
+	build-aux/ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
