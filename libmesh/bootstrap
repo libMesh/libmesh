@@ -50,7 +50,10 @@ function check_autotool_prerequisites ()
 	build_autotools=1
     fi
     
-    libtool=`which libtool 2>/dev/null`
+    libtool=`which glibtool 2>/dev/null`
+    if (test "x$libtool" = "x"); then
+	libtool=`which libtool 2>/dev/null`
+    fi
     if (test "x$libtool" != "x"); then
 	if (test -x $libtool); then
 	    libtool_version=`$libtool --version | grep " 2\." | cut -d"." -f2`
@@ -67,7 +70,7 @@ function check_autotool_prerequisites ()
     else
 	build_autotools=1
     fi
-    
+
     autoreconf=`which autoreconf 2>/dev/null`
     if (test "x$autoreconf" != "x"); then
 	if (test -x $autoreconf); then
