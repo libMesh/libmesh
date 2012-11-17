@@ -1,0 +1,454 @@
+/* include/libmesh/libmesh_config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* definition of the final detected unordered_map type */
+#undef BEST_UNORDERED_MAP
+
+/* definition of the final detected unordered_multimap type */
+#undef BEST_UNORDERED_MULTIMAP
+
+/* definition of the final detected unordered_set type */
+#undef BEST_UNORDERED_SET
+
+/* This compiler is known not to support some iostream functionality */
+#undef BROKEN_IOSTREAM
+
+/* Architecture of the build host */
+#undef BUILD_ARCH
+
+/* Build date */
+#undef BUILD_DATE
+
+/* Dev/Release build */
+#undef BUILD_DEVSTATUS
+
+/* Build host name */
+#undef BUILD_HOST
+
+/* The fine user who built the package */
+#undef BUILD_USER
+
+/* SVN revision */
+#undef BUILD_VERSION
+
+/* Configuration information. */
+#undef CONFIGURE_INFO
+
+/* Flag indicating if double-precision (double) should be used for most
+   floating-point calculations */
+#undef DEFAULT_DOUBLE_PRECISION
+
+/* Flag indicating if quadruple-precision (__float128) should be used for most
+   floating-point calculations */
+#undef DEFAULT_QUADRUPLE_PRECISION
+
+/* Data type to be used for most floating-point calculations */
+#undef DEFAULT_SCALAR_TYPE
+
+/* Flag indicating if single-precision (float) should be used for most
+   floating-point calculations */
+#undef DEFAULT_SINGLE_PRECISION
+
+/* Flag indicating if triple-precision (long double) should be used for most
+   floating-point calculations */
+#undef DEFAULT_TRIPLE_PRECISION
+
+/* workaround for potentially missing hash<T*> */
+#undef DEFINE_HASH_POINTERS
+
+/* workaround for potentially missing hash<string> */
+#undef DEFINE_HASH_STRING
+
+/* PETSc's major version number, as detected by petsc.m4 */
+#undef DETECTED_PETSC_VERSION_MAJOR
+
+/* PETSc's minor version number, as detected by petsc.m4 */
+#undef DETECTED_PETSC_VERSION_MINOR
+
+/* PETSc's subminor version number, as detected by petsc.m4 */
+#undef DETECTED_PETSC_VERSION_SUBMINOR
+
+/* Integer indicating the highest spatial dimensionality supported by libMesh
+   */
+#undef DIM
+
+/* Flag indicating if the library should be built with AMR support */
+#undef ENABLE_AMR
+
+/* Flag indicating if the library should be built with Dirichlet boundary
+   constraint support */
+#undef ENABLE_DIRICHLET
+
+/* Flag indicating if the library should be built to throw C++ exceptions on
+   unexpected errors */
+#undef ENABLE_EXCEPTIONS
+
+/* Flag indicating if the library should use ghosted local vectors */
+#undef ENABLE_GHOSTED
+
+/* Flag indicating if the library should offer higher order p-FEM shapes */
+#undef ENABLE_HIGHER_ORDER_SHAPES
+
+/* Flag indicating if the library should be built with infinite elements */
+#undef ENABLE_INFINITE_ELEMENTS
+
+/* Flag indicating if the library should be built with node constraints
+   support */
+#undef ENABLE_NODE_CONSTRAINTS
+
+/* Flag indicating if the library should use the experimental ParallelMesh as
+   its default Mesh type */
+#undef ENABLE_PARMESH
+
+/* Flag indicating if the library should be built with performance logging
+   support */
+#undef ENABLE_PERFORMANCE_LOGGING
+
+/* Flag indicating if the library should be built with periodic boundary
+   condition support */
+#undef ENABLE_PERIODIC
+
+/* Flag indicating if the library should be built with reference counting
+   support */
+#undef ENABLE_REFERENCE_COUNTING
+
+/* Flag indicating if the library should be built with second derivatives */
+#undef ENABLE_SECOND_DERIVATIVES
+
+/* Flag indicating if the library should be built to write stack trace files
+   on unexpected errors */
+#undef ENABLE_TRACEFILES
+
+/* Flag indicating if the library should be built with variational smoother
+   support */
+#undef ENABLE_VSMOOTHER
+
+/* Flag indicating whether the library shall be compiled to use the Trilinos
+   solver collection */
+#undef HAVE_AZTECOO
+
+/* define if the Boost library is available */
+#undef HAVE_BOOST
+
+/* Flag indicating bzip2/bunzip2 are available for handling compressed .bz2
+   files */
+#undef HAVE_BZIP
+
+/* Define to 1 if you have the <csignal> header file. */
+#undef HAVE_CSIGNAL
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Flag indicating whether the library will be compiled with Eigen support */
+#undef HAVE_EIGEN
+
+/* Flag indicating whether the library will be compiled with Exodus support */
+#undef HAVE_EXODUS_API
+
+/* define if the compiler supports __gnu_cxx::hash_map */
+#undef HAVE_EXT_HASH_MAP
+
+/* define if the compiler supports __gnu_cxx::hash_multimap */
+#undef HAVE_EXT_HASH_MULTIMAP
+
+/* define if the compiler supports __gnu_cxx::hash_set */
+#undef HAVE_EXT_HASH_SET
+
+/* define if the compiler supports fedisableexcept */
+#undef HAVE_FEDISABLEEXCEPT
+
+/* define if the compiler supports feenableexcept */
+#undef HAVE_FEENABLEEXCEPT
+
+/* Define to 1 if you have the <fenv.h> header file. */
+#undef HAVE_FENV_H
+
+/* Flag indicating whether the library will be compiled with FPARSER support
+   */
+#undef HAVE_FPARSER
+
+/* Flag indicating whether FPARSER will build the full development version */
+#undef HAVE_FPARSER_DEVEL
+
+/* define if the compiler supports GCC C++ ABI name demangling */
+#undef HAVE_GCC_ABI_DEMANGLE
+
+/* Define to 1 if you have the <getopt.h> header file. */
+#undef HAVE_GETOPT_H
+
+/* Flag indicating if the library should be built with calls to getpwuid() */
+#undef HAVE_GETPWUID
+
+/* define if the compiler supports glibc backtrace */
+#undef HAVE_GLIBC_BACKTRACE
+
+/* Flag indicating whether the library will be compiled with GLPK support */
+#undef HAVE_GLPK
+
+/* Flag indicating whether the library will be compiled with GMV support */
+#undef HAVE_GMV
+
+/* Flag indicating whether or not gzstreams are available */
+#undef HAVE_GZSTREAM
+
+/* define if the compiler supports std::hash_map */
+#undef HAVE_HASH_MAP
+
+/* define if the compiler supports std::hash_multimap */
+#undef HAVE_HASH_MULTIMAP
+
+/* define if the compiler supports std::hash_set */
+#undef HAVE_HASH_SET
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Flag indicating whether the library will be compiled with LASPACK support
+   */
+#undef HAVE_LASPACK
+
+/* Flag indicating whether the library will be compiled with libHilbert
+   support */
+#undef HAVE_LIBHILBERT
+
+/* define if the compiler has locale */
+#undef HAVE_LOCALE
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Flag indicating whether the library will be compiled with Metis support */
+#undef HAVE_METIS
+
+/* Flag indicating whether the library shall be compiled to use the ML package
+   */
+#undef HAVE_ML
+
+/* Flag indicating whether or not MPI is available */
+#undef HAVE_MPI
+
+/* define if the compiler implements namespaces */
+#undef HAVE_NAMESPACES
+
+/* Flag indicating whether the library will be compiled with Nemesis support
+   */
+#undef HAVE_NEMESIS_API
+
+/* Flag indicating whether the library will be compiled with Netcdf support */
+#undef HAVE_NETCDF
+
+/* Flag indicating whether the library shall be compiled to use the Nox solver
+   collection */
+#undef HAVE_NOX
+
+/* Define if OpenMP is enabled */
+#undef HAVE_OPENMP
+
+/* Flag indicating whether the library will be compiled with Parmetis support
+   */
+#undef HAVE_PARMETIS
+
+/* Flag indicating whether or not PETSc is available */
+#undef HAVE_PETSC
+
+/* Flag indicating whether or not PETSc was compiled with Hypre support */
+#undef HAVE_PETSC_HYPRE
+
+/* Define to 1 if you have the <rpc/rpc.h> header file. */
+#undef HAVE_RPC_RPC_H
+
+/* define if the compiler supports Run-Time Type Identification */
+#undef HAVE_RTTI
+
+/* Flag indicating whether the library will be compiled with SFC support */
+#undef HAVE_SFCURVES
+
+/* Flag indicating whether or not SLEPc is available */
+#undef HAVE_SLEPC
+
+/* define if the compiler has the sstream header */
+#undef HAVE_SSTREAM
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* define if the compiler supports std::thread */
+#undef HAVE_STD_THREAD
+
+/* define if the compiler supports std::unordered_map */
+#undef HAVE_STD_UNORDERED_MAP
+
+/* define if the compiler supports std::unordered_multimap */
+#undef HAVE_STD_UNORDERED_MULTIMAP
+
+/* define if the compiler supports std::unordered_set */
+#undef HAVE_STD_UNORDERED_SET
+
+/* define if the compiler has stringstream functionality */
+#undef HAVE_STRINGSTREAM
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* define if the compiler has the strstream header */
+#undef HAVE_STRSTREAM
+
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#undef HAVE_SYS_RESOURCE_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Flag indicating whether the library shall be compiled to use the Threading
+   Building Blocks */
+#undef HAVE_TBB_API
+
+/* define if the compiler supports std::thread */
+#undef HAVE_TBB_CXX_THREAD
+
+/* Flag indicating whether the library shall be compiled to use the Tecplot
+   interface */
+#undef HAVE_TECPLOT_API
+
+/* Flag indicating tecplot API understands newer features */
+#undef HAVE_TECPLOT_API_112
+
+/* Flag indicating whether the library will be compiled with Tetgen support */
+#undef HAVE_TETGEN
+
+/* define if the compiler supports std::tr1::unordered_map */
+#undef HAVE_TR1_UNORDERED_MAP
+
+/* define if the compiler supports std::tr1::unordered_multimap */
+#undef HAVE_TR1_UNORDERED_MULTIMAP
+
+/* define if the compiler supports std::tr1::unordered_set */
+#undef HAVE_TR1_UNORDERED_SET
+
+/* Flag indicating whether the library will be compiled with Triangle support
+   */
+#undef HAVE_TRIANGLE
+
+/* Flag indicating whether the library shall be compiled to use the Trilinos
+   solver collection */
+#undef HAVE_TRILINOS
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Flag indicating whether the library will be compiled with VTK support */
+#undef HAVE_VTK
+
+/* Flag indicating headers and libraries for XDR IO are available */
+#undef HAVE_XDR
+
+/* Define to 1 if you have the <xmmintrin.h> header file. */
+#undef HAVE_XMMINTRIN_H
+
+/* Flag indicating xz is available for handling compressed .xz files */
+#undef HAVE_XZ
+
+/* Define to 1 if you have the <zlib.h> header file. */
+#undef HAVE_ZLIB_H
+
+/* header file for the final detected unordered_map type */
+#undef INCLUDE_UNORDERED_MAP
+
+/* header file for the final detected unordered_multimap type */
+#undef INCLUDE_UNORDERED_MULTIMAP
+
+/* header file for the final detected unordered_set type */
+#undef INCLUDE_UNORDERED_SET
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Flag indicating if the library should keep names in libMesh namespace */
+#undef REQUIRE_SEPARATE_NAMESPACE
+
+/* The size of `double', as computed by sizeof. */
+#undef SIZEOF_DOUBLE
+
+/* The size of `float', as computed by sizeof. */
+#undef SIZEOF_FLOAT
+
+/* The size of `function_pointer', as computed by sizeof. */
+#undef SIZEOF_FUNCTION_POINTER
+
+/* The size of `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of `long int', as computed by sizeof. */
+#undef SIZEOF_LONG_INT
+
+/* The size of `short int', as computed by sizeof. */
+#undef SIZEOF_SHORT_INT
+
+/* The size of `unsigned int', as computed by sizeof. */
+#undef SIZEOF_UNSIGNED_INT
+
+/* The size of `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* size of subdomain_id */
+#undef SUBDOMAIN_ID_BYTES
+
+/* If the compiler supports a TLS storage class define it to that here */
+#undef TLS
+
+/* Flag indicating if the library should be built using complxex numbers */
+#undef USE_COMPLEX_NUMBERS
+
+/* Flag indicating if the library should be built using real numbers */
+#undef USE_REAL_NUMBERS
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to the equivalent of the C99 'restrict' keyword, or to
+   nothing if this is not supported.  Do not define if restrict is
+   supported directly.  */
+#undef restrict
+/* Work around a bug in Sun C++: it does not support _Restrict or
+   __restrict__, even though the corresponding Sun C compiler ends up with
+   "#define restrict _Restrict" or "#define restrict __restrict__" in the
+   previous line.  Perhaps some future version of Sun C++ will work with
+   restrict; if so, hopefully it defines __RESTRICT like Sun C does.  */
+#if defined __SUNPRO_CC && !defined __RESTRICT
+# define _Restrict
+# define __restrict__
+#endif
