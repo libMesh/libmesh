@@ -1,1 +1,0 @@
-../quadrature/quadrature_jacobi.h

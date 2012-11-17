@@ -1,4 +1,5 @@
-#! /bin/sh
+#! /bin/bash
+# $Id$
 #
 # bootstrap: Utility to easy autoconf/automake toolchain setup on
 #            checkout from revision control.
@@ -23,22 +24,52 @@
 dir=`echo "$0" | sed 's,[^/]*$,,'`
 test "x${dir}" = "x" && dir='.'
 
-if test "x`cd "${dir}" 2>/dev/null && pwd`" != "x`pwd`"
-then
+if (test "x`cd "${dir}" 2>/dev/null && pwd`" != "x`pwd`"); then
     echo "This script must be executed directly from the source directory."
     exit 1
 fi
 
-rm -f config.cache acconfig.h
+autoreconf=`which autoreconf 2>/dev/null`
+# prefer autoreconf when it is available
+if (test "x$autoreconf" != "x"); then
+    if (test -x $autoreconf); then
+	$autoreconf -iv
+	exit 0
+    fi
+fi
 
-echo "- aclocal."             && \
-aclocal -I m4                 && \
-echo "- autoconf."            && \
-autoconf                      && \
-echo "- autoheader."          && \
-autoheader                    && \
-#echo "- automake."            && \
-#automake --add-missing --copy && \
-exit 0
 
-exit 1
+# when there is no autoreconf try to actually build one.
+echo "no autoreconf in your path, I'll try to build one..."
+
+top_srcdir=`pwd`
+autotools_distdir=$top_srcdir/contrib/autotools
+
+
+if (test -d $autotools_distdir); then
+    # set the path to use the new tools as they are installed.
+    # for example, the new autoconf is needed to build automake.
+    PATH=$autotools_distdir/bin:$PATH
+    for tool in autoconf-2.69 automake-1.12.4 libtool-2.4.2 ; do
+	cd $autotools_distdir
+	echo "  building $tool in $autotools_distdir"
+	tar zxf $tool.tar.gz
+	cd $tool && ./configure --prefix=$autotools_distdir >/dev/null && make install >/dev/null
+	cd .. && rm -rf $tool
+    done
+    
+    cd $top_srcdir
+
+    if (test -x $autotools_distdir/bin/autoreconf -a -x $autotools_distdir/bin/automake -a -x $autotools_distdir/bin/libtool); then
+	echo " "
+	echo " --> successfully installed autoreconf in $autotools_distdir/bin - please update your PATH and try again!"
+	echo " "
+	exit 0
+    fi
+fi
+
+
+# # now recursively call bootstrap with the autotools in our path
+# export PATH=$autotools_distdir/bin:$PATH
+# which autoreconf
+# $0

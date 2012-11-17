@@ -179,7 +179,7 @@ void System::read_header (Xdr& io,
 
 	// 6.1.)
 	std::set<subdomain_id_type> domains;
-	if (io.version() >= LIBMESH_VERSION(0,7,2))
+	if (io.version() >= LIBMESH_VERSION_ID(0,7,2))
 	{
 	  std::vector<subdomain_id_type> domain_array;
 	  if (libMesh::processor_id() == 0) io.data (domain_array);
@@ -1139,7 +1139,7 @@ unsigned int System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec
   libmesh_assert_less_equal (n_vars, this->n_vars());
 
   // for newer versions, read variables node/elem major
-  if (io.version() >= LIBMESH_VERSION(0,7,4))
+  if (io.version() >= LIBMESH_VERSION_ID(0,7,4))
     {
       //---------------------------------
       // Collect the values for all nodes

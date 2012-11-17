@@ -1,1 +1,0 @@
-../enums/enum_point_locator_type.h

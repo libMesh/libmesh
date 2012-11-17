@@ -19,6 +19,7 @@
 #define __single_predicates_h__
 
 // Local includes
+#include <cstddef>         // for NULL with gcc 4.6.2 - I'm serious!
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/id_types.h"
 

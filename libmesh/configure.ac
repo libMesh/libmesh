@@ -1,0 +1,302 @@
+# --------------------------------------------------------------
+# $Id$
+# --------------------------------------------------------------
+
+
+
+AC_INIT([libmesh], [0.9.0], [libmesh-users@lists.sourceforge.net], [libmesh], [http://libmesh.sourceforge.net])
+AC_PREREQ([2.61]) # require autoconf 2.61 - I havent tried anything older
+
+# by default CFLAGS and CXXFLAGS are set to '-g -O2' on systems that support them.
+# this causes a problem if we then declare a different optimization level. So
+# default them to empty, regardless of what the system supports.
+: ${CFLAGS=""}
+: ${CXXFLAGS=""}
+
+# Infer the source directory as the path to the ./configure script
+srcdir=`dirname $0`
+top_srcdir=`dirname $0`
+
+
+AC_MSG_RESULT(---------------------------------------------)
+AC_MSG_RESULT(----------- Configuring libMesh -------------)
+AC_MSG_RESULT(---------------------------------------------)
+
+AC_REVISION($Revision$)
+
+AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([m4])
+
+# --------------------------------------------------------------
+# Compute the canonical target system type variable "target", and its
+# three individual parts: "target_cpu", "target_vendor", and "target_os"
+# --------------------------------------------------------------
+AC_CANONICAL_TARGET
+
+AC_CONFIG_FILES([Makefile
+		 include/Makefile
+		 include/libmesh/Makefile
+                 include/libmesh/libmesh_version.h
+	         contrib/utils/Make.common
+		 doc/Doxyfile
+		 contrib/utils/libmesh.pc
+		 ])
+
+AC_CONFIG_FILES(contrib/bin/libmesh-config,          [chmod +x contrib/bin/libmesh-config])
+AC_CONFIG_FILES(contrib/bin/libmesh-config-METHOD,   [chmod +x contrib/bin/libmesh-config-METHOD])
+#AC_CONFIG_FILES(contrib/bin/strip_dup_libs.pl,       [chmod +x contrib/bin/strip_dup_libs.pl])
+#AC_CONFIG_FILES(contrib/bin/strip_dup_incl_paths.pl, [chmod +x contrib/bin/strip_dup_incl_paths.pl])
+AC_CONFIG_FILES(contrib/bin/xda2mgf,                 [chmod +x contrib/bin/xda2mgf])
+AC_CONFIG_FILES(contrib/bin/create_libmesh_release,  [chmod +x contrib/bin/create_libmesh_release])
+AC_CONFIG_FILES(doc/dot,                             [chmod +x doc/dot])
+
+# Create a temporary file with e.g. HAVE_MPI
+AC_CONFIG_HEADER(include/libmesh/libmesh_config.h.tmp:include/libmesh/libmesh_config.h.in)
+# Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
+AX_PREFIX_CONFIG_H(include/libmesh/libmesh_config.h,LIBMESH,include/libmesh/libmesh_config.h.tmp)
+
+#AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar 1.10]) # require automake 1.10 - I havent tried anything older
+AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests parallel-tests 1.11]) # require automake 1.11 - color tests
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)]) # use silent rules where available - automake 1.11
+
+# --------------------------------------------------------------
+# Determine if we are doing a local or VPATH build. In the case
+# of the latter we will need to go through some extra effort to
+# create links for the example source files.
+# --------------------------------------------------------------
+AC_CHECK_FILE(src/base/libmesh.C, [libmesh_vpath_build=no], [libmesh_vpath_build=yes])
+if (test $libmesh_vpath_build = yes); then
+    AC_MSG_RESULT(<<< Configuring build directory for VPATH build >>>)
+fi	 
+AM_CONDITIONAL(LIBMESH_VPATH_BUILD, test x$libmesh_vpath_build = xyes)
+
+# --------------------------------------------------------------
+# Release versioning
+# --------------------------------------------------------------
+AX_SPLIT_VERSION
+
+GENERIC_MAJOR_VERSION=$AX_MAJOR_VERSION
+GENERIC_MINOR_VERSION=$AX_MINOR_VERSION
+GENERIC_MICRO_VERSION=$AX_POINT_VERSION
+
+AC_SUBST(GENERIC_MAJOR_VERSION)
+AC_SUBST(GENERIC_MINOR_VERSION)
+AC_SUBST(GENERIC_MICRO_VERSION)
+
+
+# --------------------------------------------------------------
+# Print configuration info to the header file
+# --------------------------------------------------------------
+AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 run on `date`"], [Configuration information.])	
+
+# --------------------------------------------------------------
+# Do compilation tests using the compiler, preprocessor, and file extensions
+# of C++.  This uses the .C extension for test programs.
+# --------------------------------------------------------------
+AC_LANG([C++])
+
+
+# --------------------------------------------------------------
+# Set our preferred compilers
+# --------------------------------------------------------------
+LIBMESH_SET_COMPILERS
+
+# --------------------------------------------------------------
+# See aclocal.m4 for the definition of this as well.  It uses the
+# output of DETERMINE_CXX_BRAND to set special flags for idiosyncratic
+# compilers.  For example, newer versions of GCC have additional C++ debugging
+# flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
+# --------------------------------------------------------------
+LIBMESH_SET_CXX_FLAGS
+LIBMESH_SET_METHOD
+
+LT_INIT([disable-static])
+
+LIBMESH_COMPILER_FEATURES
+
+# --------------------------------------------------------------
+# The AC_SUBST(foo) command creates an output variable from a shell
+# variable.  This command also causes AC_OUTPUT to replace all
+# instances of @VAR@ with the value of the shell variable VAR in the
+# output files (e.g. one or more Makefiles).
+# --------------------------------------------------------------
+AC_SUBST(host)
+AC_SUBST(GXX_VERSION)
+AC_SUBST(CXXFLAGS_OPT)
+AC_SUBST(CXXFLAGS_DBG)
+AC_SUBST(CXXFLAGS_DVL)
+AC_SUBST(CFLAGS_OPT)
+AC_SUBST(CFLAGS_DBG)
+AC_SUBST(CFLAGS_DVL)
+AC_SUBST(LDFLAGS)
+AC_SUBST(NODEPRECATEDFLAG)
+AC_SUBST(CXXSHAREDFLAG)
+AC_SUBST(RPATHFLAG)
+AC_SUBST(PROFILING_FLAGS)
+AC_SUBST(OPROFILE_FLAGS)
+AC_SUBST(FLIBS)
+AC_SUBST(METHOD)
+
+
+
+# --------------------------------------------------------------
+# Portable symbolic links
+# --------------------------------------------------------------
+AC_PROG_LN_S
+# -------------------------------------------------------------
+
+
+
+# --------------------------------------------------------------
+# parent directories -- portably and without race conditions
+# --------------------------------------------------------------
+AC_PROG_MKDIR_P
+# -------------------------------------------------------------
+
+# --------------------------------------------------------------
+# nice sed that doesn't truncate output
+# --------------------------------------------------------------
+AC_PROG_SED
+AC_SUBST(SED)
+# --------------------------------------------------------------
+
+
+# -------------------------------------------------------------
+# Perl - look for perl.  Perl is used to generate dependencies
+# -------------------------------------------------------------
+AC_PATH_PROG(PERL, perl)
+AC_SUBST(PERL)
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# pkg-config - used to configure installed pakages.  We can
+# use it to query our installed targets, if it exists.
+# Otherwise we caln fall back to libmesh-config.
+#
+# Not required to build libmesh, but we can install a config
+# file so that users can use 'pkg-config libmesh ...'
+# -------------------------------------------------------------
+if (test -z "$PKG_CONFIG"); then
+  AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+fi
+# -------------------------------------------------------------
+ 
+
+
+# --------------------------------------------------------------
+# This is a special test for the mpCC (IBM) compiler.
+# mpCC fails the AC_LANG tests. Set the compiler to 
+# mpCC if it is there instead of xlC, but only do this
+# _after_ configure is finished using CXX!
+# --------------------------------------------------------------
+if test "$CXX" = xlC_r; then
+  #           Var   | look for | name if found | name if not | where
+  AC_CHECK_PROG(MPCXX,  mpCC_r,      mpCC_r,           $CXX,         $PATH)
+  CXX=$MPCXX
+  if test "$CXX" = mpCC_r; then
+    AC_MSG_RESULT(<<< Using $CXX instead of xlC_r to compile C++ >>>)
+  fi
+fi
+if test "$CXX" = xlC; then
+  #           Var   | look for | name if found | name if not | where
+  AC_CHECK_PROG(MPCXX,  mpCC,      mpCC,           $CXX,         $PATH)
+  CXX=$MPCXX
+  if test "$CXX" = mpCC; then
+    AC_MSG_RESULT(<<< Using $CXX instead of xlC to compile C++ >>>)
+  fi
+fi
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
+# Get the source tree directory
+# --------------------------------------------------------------
+PWD=`pwd`
+AC_SUBST(PWD)
+
+
+
+# --------------------------------------------------------------
+# configure parts of the libmesh core
+# --------------------------------------------------------------
+LIBMESH_CORE_FEATURES
+
+
+
+# --------------------------------------------------------------
+# configure optional, external packages and libraries
+# --------------------------------------------------------------
+LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
+
+
+
+# Query configuration environment
+AX_SUMMARIZE_ENV
+
+# Each example gets a makefile
+AC_CONFIG_FILES([
+		examples/introduction/introduction_ex1/Makefile
+		examples/introduction/introduction_ex2/Makefile
+		examples/introduction/introduction_ex3/Makefile
+		examples/introduction/introduction_ex4/Makefile
+		examples/introduction/introduction_ex5/Makefile
+		examples/adaptivity/adaptivity_ex1/Makefile
+		examples/adaptivity/adaptivity_ex2/Makefile
+		examples/adaptivity/adaptivity_ex3/Makefile
+		examples/adaptivity/adaptivity_ex4/Makefile
+		examples/adaptivity/adaptivity_ex5/Makefile
+		examples/adjoints/adjoints_ex1/Makefile
+		examples/adjoints/adjoints_ex2/Makefile
+		examples/adjoints/adjoints_ex3/Makefile
+		examples/adjoints/adjoints_ex4/Makefile
+		examples/eigenproblems/eigenproblems_ex1/Makefile
+		examples/eigenproblems/eigenproblems_ex2/Makefile
+		examples/eigenproblems/eigenproblems_ex3/Makefile
+		examples/fem_system/fem_system_ex1/Makefile
+		examples/miscellaneous/miscellaneous_ex1/Makefile
+		examples/miscellaneous/miscellaneous_ex2/Makefile
+		examples/miscellaneous/miscellaneous_ex3/Makefile
+		examples/miscellaneous/miscellaneous_ex4/Makefile
+		examples/miscellaneous/miscellaneous_ex5/Makefile
+		examples/miscellaneous/miscellaneous_ex6/Makefile
+		examples/miscellaneous/miscellaneous_ex7/Makefile
+		examples/subdomains/subdomains_ex1/Makefile
+		examples/subdomains/subdomains_ex2/Makefile
+		examples/systems_of_equations/systems_of_equations_ex1/Makefile
+		examples/systems_of_equations/systems_of_equations_ex2/Makefile
+		examples/systems_of_equations/systems_of_equations_ex3/Makefile
+		examples/systems_of_equations/systems_of_equations_ex4/Makefile
+		examples/systems_of_equations/systems_of_equations_ex5/Makefile
+		examples/systems_of_equations/systems_of_equations_ex6/Makefile
+		examples/reduced_basis/reduced_basis_ex1/Makefile
+		examples/reduced_basis/reduced_basis_ex2/Makefile
+		examples/reduced_basis/reduced_basis_ex3/Makefile
+		examples/reduced_basis/reduced_basis_ex4/Makefile
+		examples/reduced_basis/reduced_basis_ex5/Makefile
+		examples/reduced_basis/reduced_basis_ex6/Makefile
+		examples/reduced_basis/reduced_basis_ex7/Makefile
+		examples/transient/transient_ex1/Makefile
+		examples/transient/transient_ex2/Makefile
+		examples/vector_fe/vector_fe_ex1/Makefile
+		examples/vector_fe/vector_fe_ex2/Makefile
+		examples/vector_fe/vector_fe_ex3/Makefile
+		examples/Makefile
+		])		
+
+
+# Create output files
+AC_OUTPUT
+
+
+
+# Final summary
+AX_SUMMARIZE_CONFIG
+
+
+
+AC_MSG_RESULT(---------------------------------------------)
+AC_MSG_RESULT(--------- Done Configuring libMesh ----------)
+AC_MSG_RESULT(---------------------------------------------)
+# rm -f -r conftest* config.cache include/libmesh/libmesh_config.h.tmp

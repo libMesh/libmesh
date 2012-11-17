@@ -20,6 +20,7 @@
 #include <fstream>
 
 // Local includes
+#include "libmesh/libmesh_config.h"
 #include "libmesh/vtk_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/equation_systems.h"

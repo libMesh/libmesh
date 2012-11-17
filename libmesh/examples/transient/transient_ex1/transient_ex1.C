@@ -121,7 +121,7 @@ int main (int argc, char** argv)
   // with it.
   Mesh mesh;
       
-  mesh.read ("../../adaptivity/adaptivity_ex2/mesh.xda");
+  mesh.read ("mesh.xda");
   
   // Create a MeshRefinement object to handle refinement of our mesh.
   // This class handles all the details of mesh refinement and coarsening.

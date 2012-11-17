@@ -53,56 +53,19 @@ extern "C" {
 
 // Proxy class for libMesh::out/err output
 #include "libmesh/ostream_proxy.h"
+#include "libmesh/print_trace.h"
 
-# include "libmesh/print_trace.h"
-
-// For some reason the real std::max, std::min
-// don't handle mixed compatible types
-namespace std {
-  inline long double max(long double a, double b)
-  { return (a>b?a:b); }
-  inline long double min(long double a, double b)
-  { return (a<b?a:b); }
-
-  inline long double max(double a, long double b)
-  { return (a>b?a:b); }
-  inline long double min(double a, long double b)
-  { return (a<b?a:b); }
-
-  inline double max(double a, float b)
-  { return (a>b?a:b); }
-  inline double min(double a, float b)
-  { return (a<b?a:b); }
-
-  inline double max(float a, double b)
-  { return (a>b?a:b); }
-  inline double min(float a, double b)
-  { return (a<b?a:b); }
-
-  inline long double max(long double a, float b)
-  { return (a>b?a:b); }
-  inline long double min(long double a, float b)
-  { return (a<b?a:b); }
-
-  inline long double max(float a, long double b)
-  { return (a>b?a:b); }
-  inline long double min(float a, long double b)
-  { return (a<b?a:b); }
-
-  // fix for std::abs() overload ambiguity
-#if defined (__SUNPRO_CC) || defined(__PGI)
-  inline double abs(double a)
-  { return ::fabs(a); }
-
+// Here we add missing types to the standard namespace.  For example,
+// std::max(double, float) etc... are well behaved but not defined
+// by the standard.  This also includes workarounds for super-strict
+// implementations, for example Sun Studio and PGI C++.  However,
+// this necessarily requires breaking the ISO-C++ standard, and is
+// really just a hack.  As such, only do it if we are building the
+// libmesh library itself.  Specifially, *DO NOT* export this to
+// user code or install this header.
+#ifdef LIBMESH_IS_COMPILING_ITSELF
+#  include "libmesh/libmesh_augment_std_namespace.h"
 #endif
-
-  // fix for std::pow() overload ambiguity
-#if defined (__SUNPRO_CC)
-  inline double pow(double a, int b)
-  { return std::pow(a, static_cast<double>(b)); }
-#endif
-}
-
 
 
 namespace libMesh
@@ -416,7 +379,7 @@ template<class T> inline void libmesh_ignore( const T& ) { }
 
 
 // build a integer representation of version
-#define LIBMESH_VERSION(major,minor,patch) (((major) << 16) | ((minor) << 8) | ((patch) & 0xFF))
+#define LIBMESH_VERSION_ID(major,minor,patch) (((major) << 16) | ((minor) << 8) | ((patch) & 0xFF))
 
 } // namespace libMesh
 

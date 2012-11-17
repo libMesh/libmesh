@@ -255,7 +255,7 @@ void EquationSystems::_read_impl (const std::string& name,
 	int ver_major = 0, ver_minor = 0, ver_patch = 0;
 	char dot;
 	iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
-	io.set_version(LIBMESH_VERSION(ver_major, ver_minor, ver_patch));
+	io.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
 
 
 	read_parallel_files = (version.rfind(" parallel") < version.size());
@@ -483,9 +483,9 @@ void EquationSystems::write(const std::string& name,
     char buf[256];
 
     // set the version number in the Xdr object
-    io.set_version(LIBMESH_VERSION(LIBMESH_MAJOR_VERSION,
-				   LIBMESH_MINOR_VERSION,
-				   LIBMESH_MICRO_VERSION));
+    io.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
+				      LIBMESH_MINOR_VERSION,
+				      LIBMESH_MICRO_VERSION));
     
     // Only write the header information
     // if we are processor 0.
