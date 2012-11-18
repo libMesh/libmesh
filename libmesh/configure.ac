@@ -55,9 +55,19 @@ AC_CONFIG_HEADER(include/libmesh/libmesh_config.h.tmp:include/libmesh/libmesh_co
 # Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
 AX_PREFIX_CONFIG_H(include/libmesh/libmesh_config.h,LIBMESH,include/libmesh/libmesh_config.h.tmp)
 
-#AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar 1.10]) # require automake 1.10 - I havent tried anything older
-AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests parallel-tests 1.11]) # require automake 1.11 - color tests
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)]) # use silent rules where available - automake 1.11
+
+
+# require automake 1.11 - color tests
+AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests parallel-tests 1.11])
+
+# use silent rules where available - automake 1.11
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)]) 
+
+# by default we want 'maintainer mode', which means automake will generate rules to recreate e.g. Makefile.in from
+# Makefile.am. But this adds support for --disable-maintainer-mode, which may be useful for forcing configure to 
+# work on systems with no autotools
+AM_MAINTAINER_MODE([enable])
+
 
 # --------------------------------------------------------------
 # Determine if we are doing a local or VPATH build. In the case
