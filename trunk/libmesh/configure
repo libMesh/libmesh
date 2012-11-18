@@ -908,6 +908,9 @@ GENERIC_MAJOR_VERSION
 SED
 LIBMESH_VPATH_BUILD_FALSE
 LIBMESH_VPATH_BUILD_TRUE
+MAINT
+MAINTAINER_MODE_FALSE
+MAINTAINER_MODE_TRUE
 AM_BACKSLASH
 AM_DEFAULT_VERBOSITY
 AM_DEFAULT_V
@@ -989,6 +992,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_silent_rules
+enable_maintainer_mode
 enable_mpi
 with_cxx
 enable_dependency_tracking
@@ -1727,6 +1731,9 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-silent-rules   less verbose build output (undo: "make V=1")
   --disable-silent-rules  verbose build output (undo: "make V=0")
+  --disable-maintainer-mode
+                          disable make rules and dependencies not useful (and
+                          sometimes confusing) to the casual installer
   --enable-mpi            build with MPI message passing support
   --enable-dependency-tracking
                           do not reject slow dependency extractors
@@ -3448,7 +3455,9 @@ ac_config_headers="$ac_config_headers include/libmesh/libmesh_config.h.tmp:inclu
 ac_config_commands="$ac_config_commands include/libmesh/libmesh_config.h"
 
 
-#AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar 1.10]) # require automake 1.10 - I havent tried anything older
+
+
+# require automake 1.11 - color tests
 am__api_version='1.12'
 
 # Find a good install program.  We prefer a C program (faster),
@@ -4022,7 +4031,9 @@ $as_echo "$am_cv_prog_tar_ustar" >&6; }
 
 
 
- # require automake 1.11 - color tests
+
+
+# use silent rules where available - automake 1.11
 # Check whether --enable-silent-rules was given.
 if test "${enable_silent_rules+set}" = set; then :
   enableval=$enable_silent_rules;
@@ -4061,7 +4072,35 @@ else
   AM_DEFAULT_V=$AM_DEFAULT_VERBOSITY
 fi
 AM_BACKSLASH='\'
- # use silent rules where available - automake 1.11
+
+
+# by default we want 'maintainer mode', which means automake will generate rules to recreate e.g. Makefile.in from
+# Makefile.am. But this adds support for --disable-maintainer-mode, which may be useful for forcing configure to
+# work on systems with no autotools
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to enable maintainer-specific portions of Makefiles" >&5
+$as_echo_n "checking whether to enable maintainer-specific portions of Makefiles... " >&6; }
+    # Check whether --enable-maintainer-mode was given.
+if test "${enable_maintainer_mode+set}" = set; then :
+  enableval=$enable_maintainer_mode; USE_MAINTAINER_MODE=$enableval
+else
+  USE_MAINTAINER_MODE=yes
+fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USE_MAINTAINER_MODE" >&5
+$as_echo "$USE_MAINTAINER_MODE" >&6; }
+   if test $USE_MAINTAINER_MODE = yes; then
+  MAINTAINER_MODE_TRUE=
+  MAINTAINER_MODE_FALSE='#'
+else
+  MAINTAINER_MODE_TRUE='#'
+  MAINTAINER_MODE_FALSE=
+fi
+
+  MAINT=$MAINTAINER_MODE_TRUE
+
+
+
 
 # --------------------------------------------------------------
 # Determine if we are doing a local or VPATH build. In the case
@@ -31975,6 +32014,10 @@ else
   am__EXEEXT_FALSE=
 fi
 
+if test -z "${MAINTAINER_MODE_TRUE}" && test -z "${MAINTAINER_MODE_FALSE}"; then
+  as_fn_error $? "conditional \"MAINTAINER_MODE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_VPATH_BUILD_TRUE}" && test -z "${LIBMESH_VPATH_BUILD_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_VPATH_BUILD\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
