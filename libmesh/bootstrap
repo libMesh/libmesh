@@ -33,14 +33,24 @@ fi
 #########################################################################################
 function check_autotool_prerequisites ()
 {
+    # prerequisite versions
+    automake_major=1
+    automake_minor=11
+    
+    libtool_major=2
+    libtool_minor=4
+
+    autoconf_major=2
+    autoconf_minor=61
+
     build_autotools=0
 
     automake=`which automake 2>/dev/null`
     if (test "x$automake" != "x"); then
 	if (test -x $automake); then
-	    automake_version=`$automake --version | grep " 1\." | cut -d"." -f2`
-	    if (test $automake_version -lt 8); then
-		echo "Automake Version 1.$automake_version too old, building a new one..."
+	    automake_version=`$automake --version | grep " $automake_major\." | cut -d"." -f2`
+	    if (test $automake_version -lt $automake_minor); then
+		echo "Automake Version $automake_major.$automake_version too old, building a new one..."
 		build_autotools=1
 	    fi
 	else
@@ -56,12 +66,12 @@ function check_autotool_prerequisites ()
     fi
     if (test "x$libtool" != "x"); then
 	if (test -x $libtool); then
-	    libtool_version=`$libtool --version | grep " 2\." | cut -d"." -f2`
+	    libtool_version=`$libtool --version | grep " $libtool_major\." | cut -d"." -f2`
 	    if (test "x$libtool_version" = "x"); then
 		echo "Indaequate Libtool, building a new one..."
 		build_autotools=1
-	    elif (test $libtool_version -lt 2); then
-		echo "Libtool Version 2.$libtool_version too old, building a new one..."
+	    elif (test $libtool_version -lt $libtool_minor); then
+		echo "Libtool Version $libtool_major$libtool_version too old, building a new one..."
 		build_autotools=1
 	    fi
 	else
@@ -74,9 +84,9 @@ function check_autotool_prerequisites ()
     autoreconf=`which autoreconf 2>/dev/null`
     if (test "x$autoreconf" != "x"); then
 	if (test -x $autoreconf); then
-	    autoconf_version=`$autoreconf --version | grep " 2\." | cut -d"." -f2`
-	    if (test $autoconf_version -lt 61); then
-		echo "Autoconf Version 2.$autoconf_version too old, building a new one..."
+	    autoconf_version=`$autoreconf --version | grep " $autoconf_major\." | cut -d"." -f2`
+	    if (test $autoconf_version -lt $autoconf_minor); then
+		echo "Autoconf Version $autoconf_major.$autoconf_version too old, building a new one..."
 		build_autotools=1
 	    fi
 	else
