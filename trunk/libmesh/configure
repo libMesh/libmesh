@@ -26089,7 +26089,7 @@ fi
 
 
 # --------------------------------------------------------------
-# legacy "using namespace libMesh" - enabled by default
+# legacy "using namespace libMesh" - disabled by default
 # --------------------------------------------------------------
 # Check whether --enable-legacy-using-namespace was given.
 if test "${enable_legacy_using_namespace+set}" = set; then :
