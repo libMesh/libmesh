@@ -60,8 +60,8 @@ AX_PREFIX_CONFIG_H(include/libmesh/libmesh_config.h,LIBMESH,include/libmesh/libm
 # require automake 1.11 - color tests
 AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests parallel-tests 1.11])
 
-# use silent rules where available - automake 1.11
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES(yes)]) 
+# use silent rules - automake 1.11
+AM_SILENT_RULES(yes) 
 
 # by default we want 'maintainer mode', which means automake will generate rules to recreate e.g. Makefile.in from
 # Makefile.am. But this adds support for --disable-maintainer-mode, which may be useful for forcing configure to 
