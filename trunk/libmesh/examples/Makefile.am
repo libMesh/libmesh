@@ -90,3 +90,14 @@ installcheck-local:
 	  PKG_CONFIG_PATH=$(pkgconfigdir) \
 	  LIBMESH_CONFIG_PATH=$(bindir) \
 	  $(top_srcdir)/contrib/bin/test_installed_examples.sh
+
+######################################################################
+#
+# What to do for 'make doc'
+doc:
+	for dir in $(SUBDIRS) ; do \
+	  cd $$dir ; \
+	  make doc ; \
+	  cp *.php $(abs_top_srcdir)/doc/html ; \
+	  cd - ; \
+	done

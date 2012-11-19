@@ -282,6 +282,7 @@ SUBDIRS += examples
 # doxygen documentation - be sure to generate symlinks in include/libmesh!
 doc html:
 	@cd $(top_builddir)/include/libmesh && $(MAKE)
+	@cd $(top_builddir)/examples && $(MAKE)
 	$(MKDIR_P) $(top_builddir)/doc/html
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
 

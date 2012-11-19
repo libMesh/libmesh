@@ -49,3 +49,14 @@ run: $(check_PROGRAMS)
 	LIBMESH_DIR=$(abs_top_srcdir) $(srcdir)/$(check_SCRIPTS)
 
 
+# how to make documentation
+CLEANFILES += $(check_PROGRAMS).php stdout.log
+doc: $(check_PROGRAMS).php
+html: $(check_PROGRAMS).php
+$(check_PROGRAMS).php: $(check_PROGRAMS) \
+                        $(top_srcdir)/contrib/bin/ex2html.sh \
+                       Makefile
+	$(MAKE) -s run > stdout.log
+	$(AM_V_GEN) PATH=$(abs_top_srcdir)/contrib/bin:$(PATH) \
+	  ex2html.sh $(check_PROGRAMS) $(abs_srcdir)
+

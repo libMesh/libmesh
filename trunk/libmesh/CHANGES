@@ -1,3 +1,22 @@
+0.8.0 -> 0.9.0
+  * automake build system
+    libMesh-specific implementation features:
+    source and header files must be listed explicitly.
+    When adding a header file,
+      1.) svn add the file
+      2.) cd include ; ./rebuild_include_HEADERS.sh
+      3.) cd include/libmesh ; ./rebuild_makefile.sh
+    When adding a soure file,
+      1.) svn add the file
+      2.) cd src ; ./rebuild_libmesh_la_SOURCES.sh
+
+    General notes:
+      o make install && make installcheck
+        installs the built library & performs sanity checking
+      o make distcheck
+        packages up a tarball and tests it for self-sufficiency.
+	always do this when modifying the build system.
+
 0.7.3 -> 0.8.0
   * Vector-valued finite elements & related examples
   * Entirely refactored Parallel namespace implementation

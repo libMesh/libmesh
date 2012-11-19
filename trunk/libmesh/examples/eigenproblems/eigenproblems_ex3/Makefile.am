@@ -20,11 +20,6 @@ eigenproblems_ex3_LDADD   = $(top_builddir)/libmesh.la
 
 CLEANFILES                = drum1_evals.txt drum2_evals.txt drum1_evec.e drum2_evec.e
 
-# Only *run* the tests if SLEPc is actually enabled
-if LIBMESH_ENABLE_SLEPC
-  check_SCRIPTS = run.sh
-endif
-
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
@@ -49,3 +44,19 @@ run: $(check_PROGRAMS)
 	LIBMESH_DIR=$(abs_top_srcdir) $(srcdir)/$(check_SCRIPTS)
 
 
+# Only *run* the tests if SLEPc is actually enabled
+if LIBMESH_ENABLE_SLEPC
+  check_SCRIPTS = run.sh
+
+# how to make documentation
+CLEANFILES += $(check_PROGRAMS).php stdout.log
+doc: $(check_PROGRAMS).php
+html: $(check_PROGRAMS).php
+$(check_PROGRAMS).php: $(check_PROGRAMS) \
+                        $(top_srcdir)/contrib/bin/ex2html.sh \
+                       Makefile
+	$(MAKE) -s run > stdout.log
+	$(AM_V_GEN) PATH=$(abs_top_srcdir)/contrib/bin:$(PATH) \
+	  ex2html.sh $(check_PROGRAMS) $(abs_srcdir)
+
+endif
