@@ -1,3 +1,6 @@
+#!/usr/bin/perl
+
+
 # Copyright (C) 1999, 2000, 2001, 2002 by Wolfgang Bangerth, University of Heidelberg
 # With modifications for libmesh by John W. Peterson, 2003.
 
