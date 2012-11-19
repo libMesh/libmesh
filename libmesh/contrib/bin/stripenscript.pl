@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 # This perl script strips out the junk that enscript puts before and
 # after the colorized code that it generates.  It cuts out everything
 # before <PRE> and after </PRE>.  This way the output can be stuck

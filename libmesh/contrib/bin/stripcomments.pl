@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 # Modifications to program2plain originally
 # Copyright (C) 1999, 2000, 2001, 2002 by Wolfgang Bangerth, University of Heidelberg
 # by John W. Peterson.
