@@ -18,8 +18,8 @@ ConstFEMFunction (const Output c) {_c = c;}
 
 ~ConstFEMFunction() {}
 
-  virtual Output operator() (const FEMContext&, const Point& p,
-			     const Real time = 0.)
+  virtual Output operator() (const FEMContext&, const Point&,
+			     const Real /* time */ = 0.)
     { return _c; }
 
   private:
