@@ -598,6 +598,7 @@ enabletecplot = @enabletecplot@
 enabletetgen = @enabletetgen@
 enabletriangle = @enabletriangle@
 enabletrilinos10 = @enabletrilinos10@
+enabletrilinos9 = @enabletrilinos9@
 enablevtk = @enablevtk@
 enablexdr = @enablexdr@
 exec_prefix = @exec_prefix@
