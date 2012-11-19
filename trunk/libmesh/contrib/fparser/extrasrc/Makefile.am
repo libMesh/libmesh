@@ -11,6 +11,7 @@ if FPARSER_RELEASE
     CLEANFILES = $(BUILT_SOURCES)
 
 fp_opcode_add.inc: $(srcdir)/fp_opcode_add.inc.release
+	$(AM_V_at)$(RM) $@
 	$(AM_V_GEN)$(LN_S) $< $@
 
 endif
