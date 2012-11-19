@@ -207,6 +207,13 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   AC_SUBST(ML_MAKEFILE_EXPORT)
   AC_SUBST(enableml)
 
+  if test "x$enableml" = xyes -o "x$enableaztecoo" = xyes -o "x$enablenox" = xyes; then
+    enabletrilinos9=yes
+  else
+    enabletrilinos9=no
+  fi
+  AC_SUBST(enabletrilinos9)
+
   #########################################################
   # get requisite include and library variables by snarfing
   # them from the exported makefiles
