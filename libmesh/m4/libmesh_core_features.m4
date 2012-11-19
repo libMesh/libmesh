@@ -26,7 +26,7 @@ fi
 
 
 # --------------------------------------------------------------
-# legacy "using namespace libMesh" - enabled by default
+# legacy "using namespace libMesh" - disabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(legacy-using-namespace,
               [AC_HELP_STRING([--enable-legacy-using-namespace],[add "using namespace libMesh" to libMesh headers])],
