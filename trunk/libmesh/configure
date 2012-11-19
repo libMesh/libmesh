@@ -765,6 +765,7 @@ NOX_INCLUDES
 NOX_LIBS
 AZTECOO_INCLUDES
 AZTECOO_LIBS
+enabletrilinos9
 enableml
 ML_MAKEFILE_EXPORT
 enablenox
@@ -29207,6 +29208,13 @@ $as_echo "<<< Configuring library with ML support >>>" >&6; }
 
 
 
+
+
+  if test "x$enableml" = xyes -o "x$enableaztecoo" = xyes -o "x$enablenox" = xyes; then
+    enabletrilinos9=yes
+  else
+    enabletrilinos9=no
+  fi
 
 
   #########################################################
