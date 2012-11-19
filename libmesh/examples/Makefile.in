@@ -859,6 +859,17 @@ installcheck-local:
 	  LIBMESH_CONFIG_PATH=$(bindir) \
 	  $(top_srcdir)/contrib/bin/test_installed_examples.sh
 
+######################################################################
+#
+# What to do for 'make doc'
+doc:
+	for dir in $(SUBDIRS) ; do \
+	  cd $$dir ; \
+	  make doc ; \
+	  cp *.php $(abs_top_srcdir)/doc/html ; \
+	  cd - ; \
+	done
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

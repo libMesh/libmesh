@@ -653,7 +653,10 @@ subdomains_ex1dir = $(examples_install_path)/subdomains/ex1
 subdomains_ex1_DATA = subdomains_ex1.C exact_solution.C
 subdomains_ex1_SOURCES = $(subdomains_ex1_DATA) run.sh
 subdomains_ex1_LDADD = $(top_builddir)/libmesh.la
-CLEANFILES = out_*.gmv out_*.e gnuplot_*
+
+# how to make documentation
+CLEANFILES = out_*.gmv out_*.e gnuplot_* $(check_PROGRAMS).php \
+	stdout.log
 
 ######################################################################
 #
@@ -1090,8 +1093,6 @@ dvi: dvi-am
 
 dvi-am:
 
-html: html-am
-
 html-am:
 
 info: info-am
@@ -1170,6 +1171,14 @@ exact_solution.C: $(top_srcdir)/examples/introduction/introduction_ex3/exact_sol
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
 	LIBMESH_DIR=$(abs_top_srcdir) $(srcdir)/$(check_SCRIPTS)
+doc: $(check_PROGRAMS).php
+html: $(check_PROGRAMS).php
+$(check_PROGRAMS).php: $(check_PROGRAMS) \
+                        $(top_srcdir)/contrib/bin/ex2html.sh \
+                       Makefile
+	$(MAKE) -s run > stdout.log
+	$(AM_V_GEN) PATH=$(abs_top_srcdir)/contrib/bin:$(PATH) \
+	  ex2html.sh $(check_PROGRAMS) $(abs_srcdir)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

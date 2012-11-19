@@ -606,6 +606,7 @@ uninstall-am:
 @FPARSER_RELEASE_TRUE@    # handle linking source files
 
 @FPARSER_RELEASE_TRUE@fp_opcode_add.inc: $(srcdir)/fp_opcode_add.inc.release
+@FPARSER_RELEASE_TRUE@	$(AM_V_at)$(RM) $@
 @FPARSER_RELEASE_TRUE@	$(AM_V_GEN)$(LN_S) $< $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

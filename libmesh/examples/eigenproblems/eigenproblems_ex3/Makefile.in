@@ -54,6 +54,9 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = -I$(top_srcdir)/contrib/fparser
 check_PROGRAMS = eigenproblems_ex3$(EXEEXT)
 @LIBMESH_VPATH_BUILD_TRUE@am__append_2 = drum*_mesh.xda .linkstamp
+
+# how to make documentation
+@LIBMESH_ENABLE_SLEPC_TRUE@am__append_3 = $(check_PROGRAMS).php stdout.log
 subdir = examples/eigenproblems/eigenproblems_ex3
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
@@ -652,10 +655,7 @@ eigenproblems_ex3_DATA = eigenproblems_ex3.C drum1_mesh.e drum2_mesh.e
 eigenproblems_ex3_SOURCES = $(eigenproblems_ex3_DATA) run.sh
 eigenproblems_ex3_LDADD = $(top_builddir)/libmesh.la
 CLEANFILES = drum1_evals.txt drum2_evals.txt drum1_evec.e drum2_evec.e \
-	$(am__append_2)
-
-# Only *run* the tests if SLEPc is actually enabled
-@LIBMESH_ENABLE_SLEPC_TRUE@check_SCRIPTS = run.sh
+	$(am__append_2) $(am__append_3)
 
 # also need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
@@ -666,6 +666,9 @@ CLEANFILES = drum1_evals.txt drum2_evals.txt drum1_evec.e drum2_evec.e \
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir)
 TESTS = $(check_SCRIPTS)
+
+# Only *run* the tests if SLEPc is actually enabled
+@LIBMESH_ENABLE_SLEPC_TRUE@check_SCRIPTS = run.sh
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -1093,7 +1096,7 @@ dvi: dvi-am
 
 dvi-am:
 
-html: html-am
+@LIBMESH_ENABLE_SLEPC_FALSE@html: html-am
 
 html-am:
 
@@ -1175,6 +1178,14 @@ include $(top_builddir)/Make.common.@METHOD@
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
 	LIBMESH_DIR=$(abs_top_srcdir) $(srcdir)/$(check_SCRIPTS)
+@LIBMESH_ENABLE_SLEPC_TRUE@doc: $(check_PROGRAMS).php
+@LIBMESH_ENABLE_SLEPC_TRUE@html: $(check_PROGRAMS).php
+@LIBMESH_ENABLE_SLEPC_TRUE@$(check_PROGRAMS).php: $(check_PROGRAMS) \
+@LIBMESH_ENABLE_SLEPC_TRUE@                        $(top_srcdir)/contrib/bin/ex2html.sh \
+@LIBMESH_ENABLE_SLEPC_TRUE@                       Makefile
+@LIBMESH_ENABLE_SLEPC_TRUE@	$(MAKE) -s run > stdout.log
+@LIBMESH_ENABLE_SLEPC_TRUE@	$(AM_V_GEN) PATH=$(abs_top_srcdir)/contrib/bin:$(PATH) \
+@LIBMESH_ENABLE_SLEPC_TRUE@	  ex2html.sh $(check_PROGRAMS) $(abs_srcdir)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
