@@ -45,9 +45,9 @@ for METHOD in $METHODS ; do
     rm -rf $builddir && mkdir $builddir && cd $builddir
 
     echo " "
-    echo " Configuring METHOD=$METHOD via ../configure --with-cxx=`which mpicxx` --with-cc=`which mpicc` --with-f77=`which mpif77` --with-fc=`which mpif90` --prefix=$install_dir --disable-dependency-tracking $@"
+    echo " Configuring METHOD=$METHOD via ../configure --with-cxx=`which mpicxx` --with-cc=`which mpicc` --with-f77=`which mpif77` --with-fc=`which mpif90` --prefix=$install_dir $@"
     echo " "
 
-    ../configure --with-cxx=`which mpicxx` --with-cc=`which mpicc` --with-f77=`which mpif77` --with-fc=`which mpif90` --prefix=$install_dir --disable-dependency-tracking $@
+    ../configure --with-cxx=`which mpicxx` --with-cc=`which mpicc` --with-f77=`which mpif77` --with-fc=`which mpif90` --prefix=$install_dir $@
     make --no-print-directory -j6 && make --no-print-directory -j6 install || exit 1
 done
