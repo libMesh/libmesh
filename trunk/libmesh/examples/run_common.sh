@@ -17,7 +17,7 @@ message_done_running() {
 }
 
 run_example() {
-    $LIBMESH_RUN ./$1 $2 || exit 1
+    $LIBMESH_RUN ./$1 $2 $LIBMESH_OPTIONS || exit 1
 }
 
 # link_if_needed() {
