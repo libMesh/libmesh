@@ -13,6 +13,7 @@ AM_CPPFLAGS += -I$(top_srcdir)/contrib/metis/GKlib \
                -I$(srcdir)/Lib 
 
 AM_CPPFLAGS += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
+AM_CPPFLAGS += $(libmesh_INCLUDE) # for a PETSc-provided MPI, if required
 
 noinst_LTLIBRARIES     = libparmetis.la
 

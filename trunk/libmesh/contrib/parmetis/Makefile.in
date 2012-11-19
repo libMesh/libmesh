@@ -448,8 +448,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DLIBMESH_IS_COMPILING_PARMETIS \
 	-I$(top_srcdir)/contrib/metis/GKlib \
 	-I$(top_srcdir)/contrib/metis/include -I$(srcdir)/include \
-	-I$(srcdir)/Lib -I$(top_builddir)/include #for #include \
-	"libmesh/libmesh_config.h"
+	-I$(srcdir)/Lib -I$(top_builddir)/include $(libmesh_INCLUDE) # \
+	for a PETSc-provided MPI, if required
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 noinst_LTLIBRARIES = libparmetis.la
