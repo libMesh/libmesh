@@ -1,21 +1,53 @@
 #!/bin/bash
 
-headers=`find . -name "*.h" -type f | sort`
-#echo $headers
+# these specific headers are required to build libMesh
+# but we do not want to install them!
+noinst_blacklist="base/libmesh_augment_std_namespace.h \
+mesh/exodusII_io_helper.h \
+mesh/nemesis_io_helper.h \
+numerics/laspack_matrix.h \
+numerics/laspack_vector.h \
+solvers/laspack_linear_solver.h \
+parallel/parallel_conversion_utils.h \
+parallel/parallel_hilbert.h"
 
-include_headers="include_HEADERS = "'\n'
+echo "# Do not edit - automatically generated from $0" > include_HEADERS
 
-echo -n "include_HEADERS = "
-for header_with_path in $headers ; do
-    
-    header=`basename $header_with_path`
-    source=`echo $header_with_path | gsed 's/.\///' -`
 
-    echo " \\"
-    echo -n "        "$source
+echo "# These are headers we need to compile the libMesh library but should" >> include_HEADERS
+echo "# not be installed.  These header files may have implementation" >> include_HEADERS 
+echo "# details which are not required for the public interface" >> include_HEADERS
 
+echo -n "noinst_HEADERS = " >> include_HEADERS
+for header_with_path in $noinst_blacklist ; do
+    echo " \\" >> include_HEADERS
+    echo -n "        "$header_with_path >> include_HEADERS
 done
+echo " " >> include_HEADERS
+echo " " >> include_HEADERS
 
 
-echo " "
+
+headers=`find base enums error_estimation fe geom libmesh mesh numerics parallel partitioning physics quadrature reduced_basis solvers systems utils -name "*.h" -o -name "*specializations" -type f | sort`
+headers="libmesh/libmesh_config.h libmesh/libmesh_version.h $headers"
+
+echo "# These are the headers we actually want to install and make available" >> include_HEADERS
+echo "# to a user.  Consider these the public interface of libMesh." >> include_HEADERS
+echo "# will get installed into '\$(prefix)/include/libmesh'" >> include_HEADERS
+echo -n "include_HEADERS = " >> include_HEADERS
+for header_with_path in $headers ; do
+    add_header=1
+    for blacklist in $noinst_blacklist ; do
+	if (test "$blacklist" = "$header_with_path"); then
+	    add_header=0
+	fi
+    done
+    if (test $add_header -eq 1); then
+	echo " \\" >> include_HEADERS
+	echo -n "        "$header_with_path >> include_HEADERS
+    fi
+done
+echo " " >> include_HEADERS
+
+
 

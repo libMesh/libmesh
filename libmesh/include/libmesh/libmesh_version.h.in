@@ -22,12 +22,6 @@
 #define LIBMESH_MINOR_VERSION  @GENERIC_MINOR_VERSION@
 #define LIBMESH_MICRO_VERSION  @GENERIC_MICRO_VERSION@
 
-#define LIBMESH_BUILD_USER     "@BUILD_USER@"
-#define LIBMESH_BUILD_ARCH     "@BUILD_ARCH@"
-#define LIBMESH_BUILD_HOST     "@BUILD_HOST@"
-#define LIBMESH_BUILD_DATE     "@BUILD_DATE@"
-#define LIBMESH_BUILD_VERSION  "@BUILD_VERSION@"
-
 #define LIBMESH_LIB_VERSION    "@VERSION@"
 #define LIBMESH_LIB_RELEASE    "@BUILD_DEVSTATUS@"
 
@@ -36,6 +30,7 @@
 
 #define LIBMESH_IO_COMPATIBILITY_VERSION "0.7.4"
 
+#include "libmesh_config.h"
 #include <iostream>
 #include <iomanip>
 

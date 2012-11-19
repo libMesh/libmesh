@@ -54,6 +54,27 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
+DIST_COMMON = $(am__configure_deps) $(srcdir)/Make.common.in \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/src/libmesh_la_SOURCES \
+	$(top_srcdir)/build-aux/config.guess \
+	$(top_srcdir)/build-aux/config.sub \
+	$(top_srcdir)/build-aux/depcomp \
+	$(top_srcdir)/build-aux/install-sh \
+	$(top_srcdir)/build-aux/ltmain.sh \
+	$(top_srcdir)/build-aux/missing $(top_srcdir)/configure \
+	$(top_srcdir)/contrib/bin/create_libmesh_release.in \
+	$(top_srcdir)/contrib/bin/libmesh-config-METHOD.in \
+	$(top_srcdir)/contrib/bin/libmesh-config.in \
+	$(top_srcdir)/contrib/bin/xda2mgf.in \
+	$(top_srcdir)/contrib/utils/Make.common.in \
+	$(top_srcdir)/contrib/utils/libmesh.pc.in \
+	$(top_srcdir)/doc/Doxyfile.in $(top_srcdir)/doc/dot.in \
+	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
+	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
+	build-aux/ylwrap
+
+# definition of libmesh_la_SOURCES - get from auto-maintained list
 
 # ###########################################################
 # # building up libmesh.la - actually delegate the compilation
@@ -112,24 +133,6 @@ bin_PROGRAMS = meshtool$(EXEEXT) compare$(EXEEXT) meshbcid$(EXEEXT) \
 	amr$(EXEEXT) output_libmesh_version$(EXEEXT) meshplot$(EXEEXT) \
 	solution_components$(EXEEXT)
 subdir = .
-DIST_COMMON = $(am__configure_deps) $(srcdir)/Make.common.in \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/build-aux/config.guess \
-	$(top_srcdir)/build-aux/config.sub \
-	$(top_srcdir)/build-aux/depcomp \
-	$(top_srcdir)/build-aux/install-sh \
-	$(top_srcdir)/build-aux/ltmain.sh \
-	$(top_srcdir)/build-aux/missing $(top_srcdir)/configure \
-	$(top_srcdir)/contrib/bin/create_libmesh_release.in \
-	$(top_srcdir)/contrib/bin/libmesh-config-METHOD.in \
-	$(top_srcdir)/contrib/bin/libmesh-config.in \
-	$(top_srcdir)/contrib/bin/xda2mgf.in \
-	$(top_srcdir)/contrib/utils/Make.common.in \
-	$(top_srcdir)/contrib/utils/libmesh.pc.in \
-	$(top_srcdir)/doc/Doxyfile.in $(top_srcdir)/doc/dot.in \
-	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
-	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
-	build-aux/ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -218,8 +221,9 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am_libmesh_la_OBJECTS = src/base/dof_map.lo \
 	src/base/dof_map_constraints.lo src/base/dof_object.lo \
 	src/base/libmesh.lo src/base/libmesh_isnan.lo \
-	src/base/periodic_boundaries.lo src/base/periodic_boundary.lo \
-	src/base/periodic_boundary_base.lo src/base/print_trace.lo \
+	src/base/periodic_boundaries.lo \
+	src/base/periodic_boundary_base.lo \
+	src/base/periodic_boundary.lo src/base/print_trace.lo \
 	src/base/reference_counted_object.lo \
 	src/base/reference_counter.lo \
 	src/error_estimation/adjoint_refinement_estimator.lo \
@@ -237,12 +241,12 @@ am_libmesh_la_OBJECTS = src/base/dof_map.lo \
 	src/error_estimation/patch_recovery_error_estimator.lo \
 	src/error_estimation/uniform_refinement_estimator.lo \
 	src/error_estimation/weighted_patch_recovery_estimator.lo \
-	src/fe/fe.lo src/fe/fe_abstract.lo src/fe/fe_base.lo \
-	src/fe/fe_bernstein.lo src/fe/fe_bernstein_shape_0D.lo \
+	src/fe/fe_abstract.lo src/fe/fe_base.lo src/fe/fe_bernstein.lo \
+	src/fe/fe_bernstein_shape_0D.lo \
 	src/fe/fe_bernstein_shape_1D.lo \
 	src/fe/fe_bernstein_shape_2D.lo \
 	src/fe/fe_bernstein_shape_3D.lo src/fe/fe_boundary.lo \
-	src/fe/fe_clough.lo src/fe/fe_clough_shape_0D.lo \
+	src/fe/fe.lo src/fe/fe_clough.lo src/fe/fe_clough_shape_0D.lo \
 	src/fe/fe_clough_shape_1D.lo src/fe/fe_clough_shape_2D.lo \
 	src/fe/fe_clough_shape_3D.lo src/fe/fe_compute_data.lo \
 	src/fe/fe_hermite.lo src/fe/fe_hermite_shape_0D.lo \
@@ -274,47 +278,47 @@ am_libmesh_la_OBJECTS = src/base/dof_map.lo \
 	src/fe/fe_szabab.lo src/fe/fe_szabab_shape_0D.lo \
 	src/fe/fe_szabab_shape_1D.lo src/fe/fe_szabab_shape_2D.lo \
 	src/fe/fe_szabab_shape_3D.lo src/fe/fe_transformation_base.lo \
-	src/fe/fe_type.lo src/fe/fe_xyz.lo src/fe/fe_xyz_boundary.lo \
+	src/fe/fe_type.lo src/fe/fe_xyz_boundary.lo src/fe/fe_xyz.lo \
 	src/fe/fe_xyz_map.lo src/fe/fe_xyz_shape_0D.lo \
 	src/fe/fe_xyz_shape_1D.lo src/fe/fe_xyz_shape_2D.lo \
 	src/fe/fe_xyz_shape_3D.lo src/fe/h1_fe_transformation.lo \
-	src/fe/hcurl_fe_transformation.lo src/fe/inf_fe.lo \
-	src/fe/inf_fe_base_radial.lo src/fe/inf_fe_boundary.lo \
+	src/fe/hcurl_fe_transformation.lo src/fe/inf_fe_base_radial.lo \
+	src/fe/inf_fe_boundary.lo src/fe/inf_fe.lo \
 	src/fe/inf_fe_jacobi_20_00_eval.lo \
 	src/fe/inf_fe_jacobi_30_00_eval.lo \
 	src/fe/inf_fe_lagrange_eval.lo src/fe/inf_fe_legendre_eval.lo \
 	src/fe/inf_fe_map.lo src/fe/inf_fe_map_eval.lo \
-	src/fe/inf_fe_static.lo src/geom/cell.lo src/geom/cell_hex.lo \
+	src/fe/inf_fe_static.lo src/geom/cell.lo \
 	src/geom/cell_hex20.lo src/geom/cell_hex27.lo \
-	src/geom/cell_hex8.lo src/geom/cell_inf.lo \
-	src/geom/cell_inf_hex.lo src/geom/cell_inf_hex16.lo \
+	src/geom/cell_hex8.lo src/geom/cell_hex.lo \
+	src/geom/cell_inf.lo src/geom/cell_inf_hex16.lo \
 	src/geom/cell_inf_hex18.lo src/geom/cell_inf_hex8.lo \
-	src/geom/cell_inf_prism.lo src/geom/cell_inf_prism12.lo \
-	src/geom/cell_inf_prism6.lo src/geom/cell_prism.lo \
+	src/geom/cell_inf_hex.lo src/geom/cell_inf_prism12.lo \
+	src/geom/cell_inf_prism6.lo src/geom/cell_inf_prism.lo \
 	src/geom/cell_prism15.lo src/geom/cell_prism18.lo \
-	src/geom/cell_prism6.lo src/geom/cell_pyramid.lo \
-	src/geom/cell_pyramid5.lo src/geom/cell_tet.lo \
-	src/geom/cell_tet10.lo src/geom/cell_tet4.lo src/geom/edge.lo \
-	src/geom/edge_edge2.lo src/geom/edge_edge3.lo \
-	src/geom/edge_edge4.lo src/geom/edge_inf_edge2.lo \
-	src/geom/elem.lo src/geom/elem_quality.lo \
-	src/geom/elem_refinement.lo src/geom/elem_type.lo \
-	src/geom/face.lo src/geom/face_inf_quad.lo \
+	src/geom/cell_prism6.lo src/geom/cell_prism.lo \
+	src/geom/cell_pyramid5.lo src/geom/cell_pyramid.lo \
+	src/geom/cell_tet10.lo src/geom/cell_tet4.lo \
+	src/geom/cell_tet.lo src/geom/edge.lo src/geom/edge_edge2.lo \
+	src/geom/edge_edge3.lo src/geom/edge_edge4.lo \
+	src/geom/edge_inf_edge2.lo src/geom/elem.lo \
+	src/geom/elem_quality.lo src/geom/elem_refinement.lo \
+	src/geom/elem_type.lo src/geom/face.lo \
 	src/geom/face_inf_quad4.lo src/geom/face_inf_quad6.lo \
-	src/geom/face_quad.lo src/geom/face_quad4.lo \
+	src/geom/face_inf_quad.lo src/geom/face_quad4.lo \
 	src/geom/face_quad8.lo src/geom/face_quad9.lo \
-	src/geom/face_tri.lo src/geom/face_tri3.lo \
-	src/geom/face_tri6.lo src/geom/node.lo src/geom/node_elem.lo \
-	src/geom/plane.lo src/geom/point.lo src/geom/remote_elem.lo \
-	src/geom/sphere.lo src/geom/surface.lo src/mesh/abaqus_io.lo \
-	src/mesh/boundary_info.lo src/mesh/boundary_mesh.lo \
-	src/mesh/diva_io.lo src/mesh/ensight_io.lo \
-	src/mesh/exodusII_io.lo src/mesh/exodusII_io_helper.lo \
-	src/mesh/fro_io.lo src/mesh/gmsh_io.lo src/mesh/gmv_io.lo \
-	src/mesh/gnuplot_io.lo src/mesh/inf_elem_builder.lo \
-	src/mesh/legacy_xdr_io.lo src/mesh/matlab_io.lo \
-	src/mesh/medit_io.lo src/mesh/mesh_base.lo \
-	src/mesh/mesh_communication.lo \
+	src/geom/face_quad.lo src/geom/face_tri3.lo \
+	src/geom/face_tri6.lo src/geom/face_tri.lo src/geom/node.lo \
+	src/geom/node_elem.lo src/geom/plane.lo src/geom/point.lo \
+	src/geom/remote_elem.lo src/geom/sphere.lo src/geom/surface.lo \
+	src/mesh/abaqus_io.lo src/mesh/boundary_info.lo \
+	src/mesh/boundary_mesh.lo src/mesh/diva_io.lo \
+	src/mesh/ensight_io.lo src/mesh/exodusII_io.lo \
+	src/mesh/exodusII_io_helper.lo src/mesh/fro_io.lo \
+	src/mesh/gmsh_io.lo src/mesh/gmv_io.lo src/mesh/gnuplot_io.lo \
+	src/mesh/inf_elem_builder.lo src/mesh/legacy_xdr_io.lo \
+	src/mesh/matlab_io.lo src/mesh/medit_io.lo \
+	src/mesh/mesh_base.lo src/mesh/mesh_communication.lo \
 	src/mesh/mesh_communication_global_indices.lo \
 	src/mesh/mesh_data.lo src/mesh/mesh_data_tetgen_support.lo \
 	src/mesh/mesh_data_unv_support.lo \
@@ -340,12 +344,12 @@ am_libmesh_la_OBJECTS = src/base/dof_map.lo \
 	src/mesh/unv_io.lo src/mesh/vtk_io.lo src/mesh/xdr_head.lo \
 	src/mesh/xdr_io.lo src/mesh/xdr_mesh.lo src/mesh/xdr_mgf.lo \
 	src/mesh/xdr_soln.lo src/numerics/analytic_function.lo \
-	src/numerics/coupling_matrix.lo src/numerics/dense_matrix.lo \
+	src/numerics/coupling_matrix.lo \
 	src/numerics/dense_matrix_base.lo \
 	src/numerics/dense_matrix_blas_lapack.lo \
-	src/numerics/dense_submatrix.lo \
-	src/numerics/dense_subvector.lo src/numerics/dense_vector.lo \
-	src/numerics/dense_vector_base.lo \
+	src/numerics/dense_matrix.lo src/numerics/dense_submatrix.lo \
+	src/numerics/dense_subvector.lo \
+	src/numerics/dense_vector_base.lo src/numerics/dense_vector.lo \
 	src/numerics/distributed_vector.lo \
 	src/numerics/function_base.lo src/numerics/laspack_matrix.lo \
 	src/numerics/laspack_vector.lo src/numerics/numeric_vector.lo \
@@ -374,44 +378,44 @@ am_libmesh_la_OBJECTS = src/base/dof_map.lo \
 	src/partitioning/partitioner_factory.lo \
 	src/partitioning/sfc_partitioner.lo \
 	src/physics/diff_physics.lo src/physics/diff_qoi.lo \
-	src/physics/fem_physics.lo src/quadrature/quadrature.lo \
-	src/quadrature/quadrature_build.lo \
-	src/quadrature/quadrature_clough.lo \
+	src/physics/fem_physics.lo src/quadrature/quadrature_build.lo \
+	src/quadrature/quadrature.lo \
 	src/quadrature/quadrature_clough_1D.lo \
 	src/quadrature/quadrature_clough_2D.lo \
 	src/quadrature/quadrature_clough_3D.lo \
-	src/quadrature/quadrature_conical.lo \
+	src/quadrature/quadrature_clough.lo \
 	src/quadrature/quadrature_conical_2D.lo \
 	src/quadrature/quadrature_conical_3D.lo \
-	src/quadrature/quadrature_gauss.lo \
+	src/quadrature/quadrature_conical.lo \
 	src/quadrature/quadrature_gauss_1D.lo \
 	src/quadrature/quadrature_gauss_2D.lo \
 	src/quadrature/quadrature_gauss_3D.lo \
-	src/quadrature/quadrature_gm.lo \
+	src/quadrature/quadrature_gauss.lo \
 	src/quadrature/quadrature_gm_3D.lo \
-	src/quadrature/quadrature_grid.lo \
+	src/quadrature/quadrature_gm.lo \
 	src/quadrature/quadrature_grid_1D.lo \
 	src/quadrature/quadrature_grid_2D.lo \
 	src/quadrature/quadrature_grid_3D.lo \
-	src/quadrature/quadrature_jacobi.lo \
+	src/quadrature/quadrature_grid.lo \
 	src/quadrature/quadrature_jacobi_1D.lo \
-	src/quadrature/quadrature_monomial.lo \
+	src/quadrature/quadrature_jacobi.lo \
 	src/quadrature/quadrature_monomial_2D.lo \
 	src/quadrature/quadrature_monomial_3D.lo \
+	src/quadrature/quadrature_monomial.lo \
 	src/quadrature/quadrature_rules.lo \
-	src/quadrature/quadrature_simpson.lo \
 	src/quadrature/quadrature_simpson_1D.lo \
 	src/quadrature/quadrature_simpson_2D.lo \
 	src/quadrature/quadrature_simpson_3D.lo \
-	src/quadrature/quadrature_trap.lo \
+	src/quadrature/quadrature_simpson.lo \
 	src/quadrature/quadrature_trap_1D.lo \
 	src/quadrature/quadrature_trap_2D.lo \
 	src/quadrature/quadrature_trap_3D.lo \
+	src/quadrature/quadrature_trap.lo \
 	src/reduced_basis/derived_rb_construction.lo \
 	src/reduced_basis/derived_rb_evaluation.lo \
 	src/reduced_basis/rb_assembly_expansion.lo \
-	src/reduced_basis/rb_construction.lo \
 	src/reduced_basis/rb_construction_base.lo \
+	src/reduced_basis/rb_construction.lo \
 	src/reduced_basis/rb_eim_assembly.lo \
 	src/reduced_basis/rb_eim_construction.lo \
 	src/reduced_basis/rb_eim_evaluation.lo \
@@ -434,11 +438,10 @@ am_libmesh_la_OBJECTS = src/base/dof_map.lo \
 	src/solvers/laspack_linear_solver.lo \
 	src/solvers/linear_solver.lo src/solvers/newton_solver.lo \
 	src/solvers/nonlinear_solver.lo \
-	src/solvers/petsc_diff_solver.lo \
+	src/solvers/petsc_diff_solver.lo src/solvers/petscdmlibmesh.lo \
 	src/solvers/petsc_dm_nonlinear_solver.lo \
 	src/solvers/petsc_linear_solver.lo \
 	src/solvers/petsc_nonlinear_solver.lo \
-	src/solvers/petscdmlibmesh.lo \
 	src/solvers/slepc_eigen_solver.lo src/solvers/steady_solver.lo \
 	src/solvers/time_solver.lo \
 	src/solvers/trilinos_aztec_linear_solver.lo \
@@ -459,14 +462,14 @@ am_libmesh_la_OBJECTS = src/base/dof_map.lo \
 	src/systems/parameter_vector.lo src/systems/qoi_set.lo \
 	src/systems/steady_system.lo src/systems/system.lo \
 	src/systems/system_io.lo src/systems/system_projection.lo \
-	src/systems/system_subset.lo \
 	src/systems/system_subset_by_subdomain.lo \
-	src/systems/transient_system.lo src/utils/error_vector.lo \
-	src/utils/hashword.lo src/utils/libmesh_version.lo \
-	src/utils/location_maps.lo src/utils/number_lookups.lo \
-	src/utils/o_f_stream.lo src/utils/perf_log.lo \
-	src/utils/plt_loader.lo src/utils/plt_loader_read.lo \
-	src/utils/plt_loader_write.lo src/utils/point_locator_base.lo \
+	src/systems/system_subset.lo src/systems/transient_system.lo \
+	src/utils/error_vector.lo src/utils/hashword.lo \
+	src/utils/libmesh_version.lo src/utils/location_maps.lo \
+	src/utils/number_lookups.lo src/utils/o_f_stream.lo \
+	src/utils/perf_log.lo src/utils/plt_loader.lo \
+	src/utils/plt_loader_read.lo src/utils/plt_loader_write.lo \
+	src/utils/point_locator_base.lo \
 	src/utils/point_locator_list.lo \
 	src/utils/point_locator_tree.lo src/utils/statistics.lo \
 	src/utils/string_to_enum.lo src/utils/timestamp.lo \
@@ -500,7 +503,7 @@ am_meshtool_OBJECTS = src/apps/meshtool.$(OBJEXT)
 meshtool_OBJECTS = $(am_meshtool_OBJECTS)
 meshtool_DEPENDENCIES = libmesh.la
 am_output_libmesh_version_OBJECTS =  \
-	src/utils/output_libmesh_version.$(OBJEXT)
+	src/apps/output_libmesh_version.$(OBJEXT)
 output_libmesh_version_OBJECTS = $(am_output_libmesh_version_OBJECTS)
 output_libmesh_version_DEPENDENCIES = libmesh.la
 am_projection_OBJECTS = src/apps/projection.$(OBJEXT)
@@ -946,7 +949,9 @@ AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 # additional files which must be included in 'make dist'
-EXTRA_DIST = license reference_elements contrib/tecplot/include \
+EXTRA_DIST = license reference_elements include/include_HEADERS \
+	include/rebuild_include_HEADERS.sh src/libmesh_la_SOURCES \
+	src/rebuild_libmesh_la_SOURCES.sh contrib/tecplot/include \
 	contrib/tecplot/lib contrib/tecplot/README \
 	contrib/bin/strip_dup_incl_paths.pl \
 	contrib/bin/strip_dup_libs.pl contrib/bin/make_dependencies.pl
@@ -1018,388 +1023,390 @@ libmesh_la_LIBADD = $(am__append_3) $(am__append_5) $(am__append_7) \
 	$(am__append_14) $(am__append_16) $(am__append_18) \
 	$(am__append_20) $(am__append_22) $(am__append_24) \
 	$(am__append_26) $(am__append_28) $(am__append_30)
+
+# Do not edit - automatically generated from ./rebuild_libmesh_la_SOURCES.sh
 libmesh_la_SOURCES = \
-		src/base/dof_map.C \
-		src/base/dof_map_constraints.C \
-		src/base/dof_object.C \
-		src/base/libmesh.C \
-		src/base/libmesh_isnan.c \
-		src/base/periodic_boundaries.C \
-		src/base/periodic_boundary.C \
-		src/base/periodic_boundary_base.C \
-		src/base/print_trace.C \
-		src/base/reference_counted_object.C \
-		src/base/reference_counter.C \
-		src/error_estimation/adjoint_refinement_estimator.C \
-		src/error_estimation/adjoint_residual_error_estimator.C \
-		src/error_estimation/discontinuity_measure.C \
-		src/error_estimation/error_estimator.C \
-		src/error_estimation/exact_error_estimator.C \
-		src/error_estimation/exact_solution.C \
-		src/error_estimation/fourth_error_estimators.C \
-		src/error_estimation/hp_coarsentest.C \
-		src/error_estimation/hp_selector.C \
-		src/error_estimation/hp_singular.C \
-		src/error_estimation/jump_error_estimator.C \
-		src/error_estimation/kelly_error_estimator.C \
-		src/error_estimation/patch_recovery_error_estimator.C \
-		src/error_estimation/uniform_refinement_estimator.C \
-	        src/error_estimation/weighted_patch_recovery_estimator.C \
-		src/fe/fe.C \
-                src/fe/fe_abstract.C \
-		src/fe/fe_base.C \
-		src/fe/fe_bernstein.C \
-		src/fe/fe_bernstein_shape_0D.C \
-		src/fe/fe_bernstein_shape_1D.C \
-		src/fe/fe_bernstein_shape_2D.C \
-		src/fe/fe_bernstein_shape_3D.C \
-		src/fe/fe_boundary.C \
-		src/fe/fe_clough.C \
-		src/fe/fe_clough_shape_0D.C \
-		src/fe/fe_clough_shape_1D.C \
-		src/fe/fe_clough_shape_2D.C \
-		src/fe/fe_clough_shape_3D.C \
-		src/fe/fe_compute_data.C \
-		src/fe/fe_hermite.C \
-		src/fe/fe_hermite_shape_0D.C \
-		src/fe/fe_hermite_shape_1D.C \
-		src/fe/fe_hermite_shape_2D.C \
-		src/fe/fe_hermite_shape_3D.C \
-		src/fe/fe_hierarchic.C \
-		src/fe/fe_hierarchic_shape_0D.C \
-		src/fe/fe_hierarchic_shape_1D.C \
-		src/fe/fe_hierarchic_shape_2D.C \
-		src/fe/fe_hierarchic_shape_3D.C \
-		src/fe/fe_interface.C \
-		src/fe/fe_interface_inf_fe.C \
-		src/fe/fe_l2_hierarchic.C \
-		src/fe/fe_l2_hierarchic_shape_0D.C \
-		src/fe/fe_l2_hierarchic_shape_1D.C \
-		src/fe/fe_l2_hierarchic_shape_2D.C \
-		src/fe/fe_l2_hierarchic_shape_3D.C \
-		src/fe/fe_l2_lagrange.C \
-		src/fe/fe_l2_lagrange_shape_0D.C \
-		src/fe/fe_l2_lagrange_shape_1D.C \
-		src/fe/fe_l2_lagrange_shape_2D.C \
-		src/fe/fe_l2_lagrange_shape_3D.C \
-		src/fe/fe_lagrange.C \
-		src/fe/fe_lagrange_shape_0D.C \
-		src/fe/fe_lagrange_shape_1D.C \
-		src/fe/fe_lagrange_shape_2D.C \
-		src/fe/fe_lagrange_shape_3D.C \
-		src/fe/fe_lagrange_vec.C \
-		src/fe/fe_map.C \
-		src/fe/fe_monomial.C \
-		src/fe/fe_monomial_shape_0D.C \
-		src/fe/fe_monomial_shape_1D.C \
-		src/fe/fe_monomial_shape_2D.C \
-		src/fe/fe_monomial_shape_3D.C \
-		src/fe/fe_nedelec_one.C \
-		src/fe/fe_nedelec_one_shape_2D.C \
-		src/fe/fe_nedelec_one_shape_3D.C \
-		src/fe/fe_scalar.C \
-		src/fe/fe_scalar_shape_0D.C \
-		src/fe/fe_scalar_shape_1D.C \
-		src/fe/fe_scalar_shape_2D.C \
-		src/fe/fe_scalar_shape_3D.C \
-		src/fe/fe_szabab.C \
-		src/fe/fe_szabab_shape_0D.C \
-		src/fe/fe_szabab_shape_1D.C \
-		src/fe/fe_szabab_shape_2D.C \
-		src/fe/fe_szabab_shape_3D.C \
-                src/fe/fe_transformation_base.C \
-		src/fe/fe_type.C \
-		src/fe/fe_xyz.C \
-		src/fe/fe_xyz_boundary.C \
-		src/fe/fe_xyz_map.C \
-		src/fe/fe_xyz_shape_0D.C \
-		src/fe/fe_xyz_shape_1D.C \
-		src/fe/fe_xyz_shape_2D.C \
-		src/fe/fe_xyz_shape_3D.C \
-                src/fe/h1_fe_transformation.C \
-                src/fe/hcurl_fe_transformation.C \
-		src/fe/inf_fe.C \
-		src/fe/inf_fe_base_radial.C \
-		src/fe/inf_fe_boundary.C \
-		src/fe/inf_fe_jacobi_20_00_eval.C \
-		src/fe/inf_fe_jacobi_30_00_eval.C \
-		src/fe/inf_fe_lagrange_eval.C \
-		src/fe/inf_fe_legendre_eval.C \
-		src/fe/inf_fe_map.C \
-		src/fe/inf_fe_map_eval.C \
-		src/fe/inf_fe_static.C \
-		src/geom/cell.C \
-		src/geom/cell_hex.C \
-		src/geom/cell_hex20.C \
-		src/geom/cell_hex27.C \
-		src/geom/cell_hex8.C \
-		src/geom/cell_inf.C \
-		src/geom/cell_inf_hex.C \
-		src/geom/cell_inf_hex16.C \
-		src/geom/cell_inf_hex18.C \
-		src/geom/cell_inf_hex8.C \
-		src/geom/cell_inf_prism.C \
-		src/geom/cell_inf_prism12.C \
-		src/geom/cell_inf_prism6.C \
-		src/geom/cell_prism.C \
-		src/geom/cell_prism15.C \
-		src/geom/cell_prism18.C \
-		src/geom/cell_prism6.C \
-		src/geom/cell_pyramid.C \
-		src/geom/cell_pyramid5.C \
-		src/geom/cell_tet.C \
-		src/geom/cell_tet10.C \
-		src/geom/cell_tet4.C \
-		src/geom/edge.C \
-		src/geom/edge_edge2.C \
-		src/geom/edge_edge3.C \
-		src/geom/edge_edge4.C \
-		src/geom/edge_inf_edge2.C \
-		src/geom/elem.C \
-		src/geom/elem_quality.C \
-		src/geom/elem_refinement.C \
-		src/geom/elem_type.C \
-		src/geom/face.C \
-		src/geom/face_inf_quad.C \
-		src/geom/face_inf_quad4.C \
-		src/geom/face_inf_quad6.C \
-		src/geom/face_quad.C \
-		src/geom/face_quad4.C \
-		src/geom/face_quad8.C \
-		src/geom/face_quad9.C \
-		src/geom/face_tri.C \
-		src/geom/face_tri3.C \
-		src/geom/face_tri6.C \
-		src/geom/node.C \
-		src/geom/node_elem.C \
-		src/geom/plane.C \
-		src/geom/point.C \
-		src/geom/remote_elem.C \
-		src/geom/sphere.C \
-		src/geom/surface.C \
-		src/mesh/abaqus_io.C \
-		src/mesh/boundary_info.C \
-		src/mesh/boundary_mesh.C \
-		src/mesh/diva_io.C \
-		src/mesh/ensight_io.C \
-		src/mesh/exodusII_io.C \
-		src/mesh/exodusII_io_helper.C \
-		src/mesh/fro_io.C \
-		src/mesh/gmsh_io.C \
-		src/mesh/gmv_io.C \
-		src/mesh/gnuplot_io.C \
-		src/mesh/inf_elem_builder.C \
-		src/mesh/legacy_xdr_io.C \
-		src/mesh/matlab_io.C \
-		src/mesh/medit_io.C \
-		src/mesh/mesh_base.C \
-		src/mesh/mesh_communication.C \
-		src/mesh/mesh_communication_global_indices.C \
-		src/mesh/mesh_data.C \
-		src/mesh/mesh_data_tetgen_support.C \
-		src/mesh/mesh_data_unv_support.C \
-		src/mesh/mesh_data_xdr_support.C \
-		src/mesh/mesh_function.C \
-		src/mesh/mesh_generation.C \
-		src/mesh/mesh_modification.C \
-		src/mesh/mesh_output.C \
-		src/mesh/mesh_refinement.C \
-		src/mesh/mesh_refinement_flagging.C \
-		src/mesh/mesh_refinement_smoothing.C \
-		src/mesh/mesh_serializer.C \
-		src/mesh/mesh_smoother.C \
-		src/mesh/mesh_smoother_laplace.C \
-		src/mesh/mesh_smoother_vsmoother.C \
-		src/mesh/mesh_tetgen_interface.C \
-		src/mesh/mesh_tetgen_wrapper.C \
-		src/mesh/mesh_tools.C \
-		src/mesh/mesh_triangle_holes.C \
-		src/mesh/mesh_triangle_interface.C \
-		src/mesh/mesh_triangle_wrapper.C \
-		src/mesh/nemesis_io.C \
-		src/mesh/nemesis_io_helper.C \
-		src/mesh/off_io.C \
-		src/mesh/parallel_mesh.C \
-		src/mesh/parallel_mesh_iterators.C \
-		src/mesh/patch.C \
-		src/mesh/postscript_io.C \
-		src/mesh/serial_mesh.C \
-		src/mesh/serial_mesh_iterators.C \
-		src/mesh/tecplot_io.C \
-		src/mesh/tetgen_io.C \
-		src/mesh/ucd_io.C \
-		src/mesh/unstructured_mesh.C \
-		src/mesh/unv_io.C \
-		src/mesh/vtk_io.C \
-		src/mesh/xdr_head.C \
-		src/mesh/xdr_io.C \
-		src/mesh/xdr_mesh.C \
-		src/mesh/xdr_mgf.C \
-		src/mesh/xdr_soln.C \
-		src/numerics/analytic_function.C \
-		src/numerics/coupling_matrix.C \
-		src/numerics/dense_matrix.C \
-		src/numerics/dense_matrix_base.C \
-		src/numerics/dense_matrix_blas_lapack.C \
-		src/numerics/dense_submatrix.C \
-		src/numerics/dense_subvector.C \
-		src/numerics/dense_vector.C \
-		src/numerics/dense_vector_base.C \
-		src/numerics/distributed_vector.C \
-		src/numerics/function_base.C \
-		src/numerics/laspack_matrix.C \
-		src/numerics/laspack_vector.C \
-		src/numerics/numeric_vector.C \
-		src/numerics/petsc_matrix.C \
-		src/numerics/petsc_preconditioner.C \
-		src/numerics/petsc_vector.C \
-		src/numerics/preconditioner.C \
-		src/numerics/sparse_matrix.C \
-		src/numerics/sparse_shell_matrix.C \
-		src/numerics/sum_shell_matrix.C \
-		src/numerics/tensor_shell_matrix.C \
-		src/numerics/tensor_tools.C \
-		src/numerics/trilinos_epetra_matrix.C \
-		src/numerics/trilinos_epetra_vector.C \
-		src/numerics/trilinos_preconditioner.C \
-		src/numerics/type_tensor.C \
-		src/numerics/type_vector.C \
-		src/parallel/parallel_bin_sorter.C \
-	 	src/parallel/parallel_elem.C \
-		src/parallel/parallel_histogram.C \
-		src/parallel/parallel_node.C \
-		src/parallel/parallel_sort.C \
-		src/parallel/threads.C \
-		src/partitioning/centroid_partitioner.C \
-		src/partitioning/linear_partitioner.C \
-		src/partitioning/metis_partitioner.C \
-		src/partitioning/parmetis_partitioner.C \
-		src/partitioning/partitioner.C \
-		src/partitioning/partitioner_factory.C \
-		src/partitioning/sfc_partitioner.C \
-		src/physics/diff_physics.C \
-		src/physics/diff_qoi.C \
-		src/physics/fem_physics.C \
-		src/quadrature/quadrature.C \
-		src/quadrature/quadrature_build.C \
-		src/quadrature/quadrature_clough.C \
-		src/quadrature/quadrature_clough_1D.C \
-		src/quadrature/quadrature_clough_2D.C \
-		src/quadrature/quadrature_clough_3D.C \
-		src/quadrature/quadrature_conical.C \
-		src/quadrature/quadrature_conical_2D.C \
-		src/quadrature/quadrature_conical_3D.C \
-		src/quadrature/quadrature_gauss.C \
-		src/quadrature/quadrature_gauss_1D.C \
-		src/quadrature/quadrature_gauss_2D.C \
-		src/quadrature/quadrature_gauss_3D.C \
-		src/quadrature/quadrature_gm.C \
-		src/quadrature/quadrature_gm_3D.C \
-		src/quadrature/quadrature_grid.C \
-		src/quadrature/quadrature_grid_1D.C \
-		src/quadrature/quadrature_grid_2D.C \
-		src/quadrature/quadrature_grid_3D.C \
-		src/quadrature/quadrature_jacobi.C \
-		src/quadrature/quadrature_jacobi_1D.C \
-		src/quadrature/quadrature_monomial.C \
-		src/quadrature/quadrature_monomial_2D.C \
-		src/quadrature/quadrature_monomial_3D.C \
-		src/quadrature/quadrature_rules.C \
-		src/quadrature/quadrature_simpson.C \
-		src/quadrature/quadrature_simpson_1D.C \
-		src/quadrature/quadrature_simpson_2D.C \
-		src/quadrature/quadrature_simpson_3D.C \
-		src/quadrature/quadrature_trap.C \
-		src/quadrature/quadrature_trap_1D.C \
-		src/quadrature/quadrature_trap_2D.C \
-		src/quadrature/quadrature_trap_3D.C \
-		src/reduced_basis/derived_rb_construction.C \
-		src/reduced_basis/derived_rb_evaluation.C \
-		src/reduced_basis/rb_assembly_expansion.C \
-		src/reduced_basis/rb_construction.C \
-		src/reduced_basis/rb_construction_base.C \
-		src/reduced_basis/rb_eim_assembly.C \
-		src/reduced_basis/rb_eim_construction.C \
-		src/reduced_basis/rb_eim_evaluation.C \
-		src/reduced_basis/rb_eim_theta.C \
-		src/reduced_basis/rb_evaluation.C \
-                src/reduced_basis/rb_parameters.C \
-		src/reduced_basis/rb_parametrized.C \
-		src/reduced_basis/rb_scm_construction.C \
-		src/reduced_basis/rb_scm_evaluation.C \
-		src/reduced_basis/rb_temporal_discretization.C \
-		src/reduced_basis/rb_theta_expansion.C \
-		src/reduced_basis/steady_derived_rb_construction.C \
-		src/reduced_basis/transient_rb_assembly_expansion.C \
-		src/reduced_basis/transient_rb_construction.C \
-		src/reduced_basis/transient_rb_evaluation.C \
-		src/reduced_basis/transient_rb_theta_expansion.C \
-		src/solvers/adaptive_time_solver.C \
-		src/solvers/diff_solver.C \
-		src/solvers/eigen_solver.C \
-		src/solvers/eigen_time_solver.C \
-		src/solvers/euler2_solver.C \
-		src/solvers/euler_solver.C \
-		src/solvers/laspack_linear_solver.C \
-		src/solvers/linear_solver.C \
-		src/solvers/newton_solver.C \
-		src/solvers/nonlinear_solver.C \
-		src/solvers/petsc_diff_solver.C \
-		src/solvers/petsc_dm_nonlinear_solver.C \
-		src/solvers/petsc_linear_solver.C \
-		src/solvers/petsc_nonlinear_solver.C \
-		src/solvers/petscdmlibmesh.C \
-		src/solvers/slepc_eigen_solver.C \
-		src/solvers/steady_solver.C \
-		src/solvers/time_solver.C \
-		src/solvers/trilinos_aztec_linear_solver.C \
-		src/solvers/trilinos_nox_nonlinear_solver.C \
-		src/solvers/twostep_time_solver.C \
-		src/solvers/unsteady_solver.C \
-		src/systems/condensed_eigen_system.C \
-		src/systems/continuation_system.C \
-		src/systems/diff_context.C \
-		src/systems/diff_system.C \
-		src/systems/eigen_system.C \
-		src/systems/equation_systems.C \
-		src/systems/equation_systems_io.C \
-		src/systems/explicit_system.C \
-		src/systems/fem_context.C \
-		src/systems/fem_system.C \
-		src/systems/frequency_system.C \
-		src/systems/implicit_system.C \
-		src/systems/linear_implicit_system.C \
-		src/systems/newmark_system.C \
-		src/systems/nonlinear_implicit_system.C \
-		src/systems/parameter_vector.C \
-		src/systems/qoi_set.C \
-		src/systems/steady_system.C \
-		src/systems/system.C \
-		src/systems/system_io.C \
-		src/systems/system_projection.C \
-		src/systems/system_subset.C \
-		src/systems/system_subset_by_subdomain.C \
-		src/systems/transient_system.C \
-		src/utils/error_vector.C \
-		src/utils/hashword.C \
-		src/utils/libmesh_version.C \
-		src/utils/location_maps.C \
-		src/utils/number_lookups.C \
-		src/utils/o_f_stream.C \
-		src/utils/perf_log.C \
-		src/utils/plt_loader.C \
-		src/utils/plt_loader_read.C \
-		src/utils/plt_loader_write.C \
-		src/utils/point_locator_base.C \
-		src/utils/point_locator_list.C \
-		src/utils/point_locator_tree.C \
-		src/utils/statistics.C \
-		src/utils/string_to_enum.C \
-		src/utils/timestamp.C \
-		src/utils/tree.C \
-		src/utils/tree_node.C \
-		src/utils/utility.C \
-		src/utils/xdr_cxx.C 
+        src/base/dof_map.C \
+        src/base/dof_map_constraints.C \
+        src/base/dof_object.C \
+        src/base/libmesh.C \
+        src/base/libmesh_isnan.c \
+        src/base/periodic_boundaries.C \
+        src/base/periodic_boundary_base.C \
+        src/base/periodic_boundary.C \
+        src/base/print_trace.C \
+        src/base/reference_counted_object.C \
+        src/base/reference_counter.C \
+        src/error_estimation/adjoint_refinement_estimator.C \
+        src/error_estimation/adjoint_residual_error_estimator.C \
+        src/error_estimation/discontinuity_measure.C \
+        src/error_estimation/error_estimator.C \
+        src/error_estimation/exact_error_estimator.C \
+        src/error_estimation/exact_solution.C \
+        src/error_estimation/fourth_error_estimators.C \
+        src/error_estimation/hp_coarsentest.C \
+        src/error_estimation/hp_selector.C \
+        src/error_estimation/hp_singular.C \
+        src/error_estimation/jump_error_estimator.C \
+        src/error_estimation/kelly_error_estimator.C \
+        src/error_estimation/patch_recovery_error_estimator.C \
+        src/error_estimation/uniform_refinement_estimator.C \
+        src/error_estimation/weighted_patch_recovery_estimator.C \
+        src/fe/fe_abstract.C \
+        src/fe/fe_base.C \
+        src/fe/fe_bernstein.C \
+        src/fe/fe_bernstein_shape_0D.C \
+        src/fe/fe_bernstein_shape_1D.C \
+        src/fe/fe_bernstein_shape_2D.C \
+        src/fe/fe_bernstein_shape_3D.C \
+        src/fe/fe_boundary.C \
+        src/fe/fe.C \
+        src/fe/fe_clough.C \
+        src/fe/fe_clough_shape_0D.C \
+        src/fe/fe_clough_shape_1D.C \
+        src/fe/fe_clough_shape_2D.C \
+        src/fe/fe_clough_shape_3D.C \
+        src/fe/fe_compute_data.C \
+        src/fe/fe_hermite.C \
+        src/fe/fe_hermite_shape_0D.C \
+        src/fe/fe_hermite_shape_1D.C \
+        src/fe/fe_hermite_shape_2D.C \
+        src/fe/fe_hermite_shape_3D.C \
+        src/fe/fe_hierarchic.C \
+        src/fe/fe_hierarchic_shape_0D.C \
+        src/fe/fe_hierarchic_shape_1D.C \
+        src/fe/fe_hierarchic_shape_2D.C \
+        src/fe/fe_hierarchic_shape_3D.C \
+        src/fe/fe_interface.C \
+        src/fe/fe_interface_inf_fe.C \
+        src/fe/fe_l2_hierarchic.C \
+        src/fe/fe_l2_hierarchic_shape_0D.C \
+        src/fe/fe_l2_hierarchic_shape_1D.C \
+        src/fe/fe_l2_hierarchic_shape_2D.C \
+        src/fe/fe_l2_hierarchic_shape_3D.C \
+        src/fe/fe_l2_lagrange.C \
+        src/fe/fe_l2_lagrange_shape_0D.C \
+        src/fe/fe_l2_lagrange_shape_1D.C \
+        src/fe/fe_l2_lagrange_shape_2D.C \
+        src/fe/fe_l2_lagrange_shape_3D.C \
+        src/fe/fe_lagrange.C \
+        src/fe/fe_lagrange_shape_0D.C \
+        src/fe/fe_lagrange_shape_1D.C \
+        src/fe/fe_lagrange_shape_2D.C \
+        src/fe/fe_lagrange_shape_3D.C \
+        src/fe/fe_lagrange_vec.C \
+        src/fe/fe_map.C \
+        src/fe/fe_monomial.C \
+        src/fe/fe_monomial_shape_0D.C \
+        src/fe/fe_monomial_shape_1D.C \
+        src/fe/fe_monomial_shape_2D.C \
+        src/fe/fe_monomial_shape_3D.C \
+        src/fe/fe_nedelec_one.C \
+        src/fe/fe_nedelec_one_shape_2D.C \
+        src/fe/fe_nedelec_one_shape_3D.C \
+        src/fe/fe_scalar.C \
+        src/fe/fe_scalar_shape_0D.C \
+        src/fe/fe_scalar_shape_1D.C \
+        src/fe/fe_scalar_shape_2D.C \
+        src/fe/fe_scalar_shape_3D.C \
+        src/fe/fe_szabab.C \
+        src/fe/fe_szabab_shape_0D.C \
+        src/fe/fe_szabab_shape_1D.C \
+        src/fe/fe_szabab_shape_2D.C \
+        src/fe/fe_szabab_shape_3D.C \
+        src/fe/fe_transformation_base.C \
+        src/fe/fe_type.C \
+        src/fe/fe_xyz_boundary.C \
+        src/fe/fe_xyz.C \
+        src/fe/fe_xyz_map.C \
+        src/fe/fe_xyz_shape_0D.C \
+        src/fe/fe_xyz_shape_1D.C \
+        src/fe/fe_xyz_shape_2D.C \
+        src/fe/fe_xyz_shape_3D.C \
+        src/fe/h1_fe_transformation.C \
+        src/fe/hcurl_fe_transformation.C \
+        src/fe/inf_fe_base_radial.C \
+        src/fe/inf_fe_boundary.C \
+        src/fe/inf_fe.C \
+        src/fe/inf_fe_jacobi_20_00_eval.C \
+        src/fe/inf_fe_jacobi_30_00_eval.C \
+        src/fe/inf_fe_lagrange_eval.C \
+        src/fe/inf_fe_legendre_eval.C \
+        src/fe/inf_fe_map.C \
+        src/fe/inf_fe_map_eval.C \
+        src/fe/inf_fe_static.C \
+        src/geom/cell.C \
+        src/geom/cell_hex20.C \
+        src/geom/cell_hex27.C \
+        src/geom/cell_hex8.C \
+        src/geom/cell_hex.C \
+        src/geom/cell_inf.C \
+        src/geom/cell_inf_hex16.C \
+        src/geom/cell_inf_hex18.C \
+        src/geom/cell_inf_hex8.C \
+        src/geom/cell_inf_hex.C \
+        src/geom/cell_inf_prism12.C \
+        src/geom/cell_inf_prism6.C \
+        src/geom/cell_inf_prism.C \
+        src/geom/cell_prism15.C \
+        src/geom/cell_prism18.C \
+        src/geom/cell_prism6.C \
+        src/geom/cell_prism.C \
+        src/geom/cell_pyramid5.C \
+        src/geom/cell_pyramid.C \
+        src/geom/cell_tet10.C \
+        src/geom/cell_tet4.C \
+        src/geom/cell_tet.C \
+        src/geom/edge.C \
+        src/geom/edge_edge2.C \
+        src/geom/edge_edge3.C \
+        src/geom/edge_edge4.C \
+        src/geom/edge_inf_edge2.C \
+        src/geom/elem.C \
+        src/geom/elem_quality.C \
+        src/geom/elem_refinement.C \
+        src/geom/elem_type.C \
+        src/geom/face.C \
+        src/geom/face_inf_quad4.C \
+        src/geom/face_inf_quad6.C \
+        src/geom/face_inf_quad.C \
+        src/geom/face_quad4.C \
+        src/geom/face_quad8.C \
+        src/geom/face_quad9.C \
+        src/geom/face_quad.C \
+        src/geom/face_tri3.C \
+        src/geom/face_tri6.C \
+        src/geom/face_tri.C \
+        src/geom/node.C \
+        src/geom/node_elem.C \
+        src/geom/plane.C \
+        src/geom/point.C \
+        src/geom/remote_elem.C \
+        src/geom/sphere.C \
+        src/geom/surface.C \
+        src/mesh/abaqus_io.C \
+        src/mesh/boundary_info.C \
+        src/mesh/boundary_mesh.C \
+        src/mesh/diva_io.C \
+        src/mesh/ensight_io.C \
+        src/mesh/exodusII_io.C \
+        src/mesh/exodusII_io_helper.C \
+        src/mesh/fro_io.C \
+        src/mesh/gmsh_io.C \
+        src/mesh/gmv_io.C \
+        src/mesh/gnuplot_io.C \
+        src/mesh/inf_elem_builder.C \
+        src/mesh/legacy_xdr_io.C \
+        src/mesh/matlab_io.C \
+        src/mesh/medit_io.C \
+        src/mesh/mesh_base.C \
+        src/mesh/mesh_communication.C \
+        src/mesh/mesh_communication_global_indices.C \
+        src/mesh/mesh_data.C \
+        src/mesh/mesh_data_tetgen_support.C \
+        src/mesh/mesh_data_unv_support.C \
+        src/mesh/mesh_data_xdr_support.C \
+        src/mesh/mesh_function.C \
+        src/mesh/mesh_generation.C \
+        src/mesh/mesh_modification.C \
+        src/mesh/mesh_output.C \
+        src/mesh/mesh_refinement.C \
+        src/mesh/mesh_refinement_flagging.C \
+        src/mesh/mesh_refinement_smoothing.C \
+        src/mesh/mesh_serializer.C \
+        src/mesh/mesh_smoother.C \
+        src/mesh/mesh_smoother_laplace.C \
+        src/mesh/mesh_smoother_vsmoother.C \
+        src/mesh/mesh_tetgen_interface.C \
+        src/mesh/mesh_tetgen_wrapper.C \
+        src/mesh/mesh_tools.C \
+        src/mesh/mesh_triangle_holes.C \
+        src/mesh/mesh_triangle_interface.C \
+        src/mesh/mesh_triangle_wrapper.C \
+        src/mesh/nemesis_io.C \
+        src/mesh/nemesis_io_helper.C \
+        src/mesh/off_io.C \
+        src/mesh/parallel_mesh.C \
+        src/mesh/parallel_mesh_iterators.C \
+        src/mesh/patch.C \
+        src/mesh/postscript_io.C \
+        src/mesh/serial_mesh.C \
+        src/mesh/serial_mesh_iterators.C \
+        src/mesh/tecplot_io.C \
+        src/mesh/tetgen_io.C \
+        src/mesh/ucd_io.C \
+        src/mesh/unstructured_mesh.C \
+        src/mesh/unv_io.C \
+        src/mesh/vtk_io.C \
+        src/mesh/xdr_head.C \
+        src/mesh/xdr_io.C \
+        src/mesh/xdr_mesh.C \
+        src/mesh/xdr_mgf.C \
+        src/mesh/xdr_soln.C \
+        src/numerics/analytic_function.C \
+        src/numerics/coupling_matrix.C \
+        src/numerics/dense_matrix_base.C \
+        src/numerics/dense_matrix_blas_lapack.C \
+        src/numerics/dense_matrix.C \
+        src/numerics/dense_submatrix.C \
+        src/numerics/dense_subvector.C \
+        src/numerics/dense_vector_base.C \
+        src/numerics/dense_vector.C \
+        src/numerics/distributed_vector.C \
+        src/numerics/function_base.C \
+        src/numerics/laspack_matrix.C \
+        src/numerics/laspack_vector.C \
+        src/numerics/numeric_vector.C \
+        src/numerics/petsc_matrix.C \
+        src/numerics/petsc_preconditioner.C \
+        src/numerics/petsc_vector.C \
+        src/numerics/preconditioner.C \
+        src/numerics/sparse_matrix.C \
+        src/numerics/sparse_shell_matrix.C \
+        src/numerics/sum_shell_matrix.C \
+        src/numerics/tensor_shell_matrix.C \
+        src/numerics/tensor_tools.C \
+        src/numerics/trilinos_epetra_matrix.C \
+        src/numerics/trilinos_epetra_vector.C \
+        src/numerics/trilinos_preconditioner.C \
+        src/numerics/type_tensor.C \
+        src/numerics/type_vector.C \
+        src/parallel/parallel_bin_sorter.C \
+        src/parallel/parallel_elem.C \
+        src/parallel/parallel_histogram.C \
+        src/parallel/parallel_node.C \
+        src/parallel/parallel_sort.C \
+        src/parallel/threads.C \
+        src/partitioning/centroid_partitioner.C \
+        src/partitioning/linear_partitioner.C \
+        src/partitioning/metis_partitioner.C \
+        src/partitioning/parmetis_partitioner.C \
+        src/partitioning/partitioner.C \
+        src/partitioning/partitioner_factory.C \
+        src/partitioning/sfc_partitioner.C \
+        src/physics/diff_physics.C \
+        src/physics/diff_qoi.C \
+        src/physics/fem_physics.C \
+        src/quadrature/quadrature_build.C \
+        src/quadrature/quadrature.C \
+        src/quadrature/quadrature_clough_1D.C \
+        src/quadrature/quadrature_clough_2D.C \
+        src/quadrature/quadrature_clough_3D.C \
+        src/quadrature/quadrature_clough.C \
+        src/quadrature/quadrature_conical_2D.C \
+        src/quadrature/quadrature_conical_3D.C \
+        src/quadrature/quadrature_conical.C \
+        src/quadrature/quadrature_gauss_1D.C \
+        src/quadrature/quadrature_gauss_2D.C \
+        src/quadrature/quadrature_gauss_3D.C \
+        src/quadrature/quadrature_gauss.C \
+        src/quadrature/quadrature_gm_3D.C \
+        src/quadrature/quadrature_gm.C \
+        src/quadrature/quadrature_grid_1D.C \
+        src/quadrature/quadrature_grid_2D.C \
+        src/quadrature/quadrature_grid_3D.C \
+        src/quadrature/quadrature_grid.C \
+        src/quadrature/quadrature_jacobi_1D.C \
+        src/quadrature/quadrature_jacobi.C \
+        src/quadrature/quadrature_monomial_2D.C \
+        src/quadrature/quadrature_monomial_3D.C \
+        src/quadrature/quadrature_monomial.C \
+        src/quadrature/quadrature_rules.C \
+        src/quadrature/quadrature_simpson_1D.C \
+        src/quadrature/quadrature_simpson_2D.C \
+        src/quadrature/quadrature_simpson_3D.C \
+        src/quadrature/quadrature_simpson.C \
+        src/quadrature/quadrature_trap_1D.C \
+        src/quadrature/quadrature_trap_2D.C \
+        src/quadrature/quadrature_trap_3D.C \
+        src/quadrature/quadrature_trap.C \
+        src/reduced_basis/derived_rb_construction.C \
+        src/reduced_basis/derived_rb_evaluation.C \
+        src/reduced_basis/rb_assembly_expansion.C \
+        src/reduced_basis/rb_construction_base.C \
+        src/reduced_basis/rb_construction.C \
+        src/reduced_basis/rb_eim_assembly.C \
+        src/reduced_basis/rb_eim_construction.C \
+        src/reduced_basis/rb_eim_evaluation.C \
+        src/reduced_basis/rb_eim_theta.C \
+        src/reduced_basis/rb_evaluation.C \
+        src/reduced_basis/rb_parameters.C \
+        src/reduced_basis/rb_parametrized.C \
+        src/reduced_basis/rb_scm_construction.C \
+        src/reduced_basis/rb_scm_evaluation.C \
+        src/reduced_basis/rb_temporal_discretization.C \
+        src/reduced_basis/rb_theta_expansion.C \
+        src/reduced_basis/steady_derived_rb_construction.C \
+        src/reduced_basis/transient_rb_assembly_expansion.C \
+        src/reduced_basis/transient_rb_construction.C \
+        src/reduced_basis/transient_rb_evaluation.C \
+        src/reduced_basis/transient_rb_theta_expansion.C \
+        src/solvers/adaptive_time_solver.C \
+        src/solvers/diff_solver.C \
+        src/solvers/eigen_solver.C \
+        src/solvers/eigen_time_solver.C \
+        src/solvers/euler2_solver.C \
+        src/solvers/euler_solver.C \
+        src/solvers/laspack_linear_solver.C \
+        src/solvers/linear_solver.C \
+        src/solvers/newton_solver.C \
+        src/solvers/nonlinear_solver.C \
+        src/solvers/petsc_diff_solver.C \
+        src/solvers/petscdmlibmesh.C \
+        src/solvers/petsc_dm_nonlinear_solver.C \
+        src/solvers/petsc_linear_solver.C \
+        src/solvers/petsc_nonlinear_solver.C \
+        src/solvers/slepc_eigen_solver.C \
+        src/solvers/steady_solver.C \
+        src/solvers/time_solver.C \
+        src/solvers/trilinos_aztec_linear_solver.C \
+        src/solvers/trilinos_nox_nonlinear_solver.C \
+        src/solvers/twostep_time_solver.C \
+        src/solvers/unsteady_solver.C \
+        src/systems/condensed_eigen_system.C \
+        src/systems/continuation_system.C \
+        src/systems/diff_context.C \
+        src/systems/diff_system.C \
+        src/systems/eigen_system.C \
+        src/systems/equation_systems.C \
+        src/systems/equation_systems_io.C \
+        src/systems/explicit_system.C \
+        src/systems/fem_context.C \
+        src/systems/fem_system.C \
+        src/systems/frequency_system.C \
+        src/systems/implicit_system.C \
+        src/systems/linear_implicit_system.C \
+        src/systems/newmark_system.C \
+        src/systems/nonlinear_implicit_system.C \
+        src/systems/parameter_vector.C \
+        src/systems/qoi_set.C \
+        src/systems/steady_system.C \
+        src/systems/system.C \
+        src/systems/system_io.C \
+        src/systems/system_projection.C \
+        src/systems/system_subset_by_subdomain.C \
+        src/systems/system_subset.C \
+        src/systems/transient_system.C \
+        src/utils/error_vector.C \
+        src/utils/hashword.C \
+        src/utils/libmesh_version.C \
+        src/utils/location_maps.C \
+        src/utils/number_lookups.C \
+        src/utils/o_f_stream.C \
+        src/utils/perf_log.C \
+        src/utils/plt_loader.C \
+        src/utils/plt_loader_read.C \
+        src/utils/plt_loader_write.C \
+        src/utils/point_locator_base.C \
+        src/utils/point_locator_list.C \
+        src/utils/point_locator_tree.C \
+        src/utils/statistics.C \
+        src/utils/string_to_enum.C \
+        src/utils/timestamp.C \
+        src/utils/tree.C \
+        src/utils/tree_node.C \
+        src/utils/utility.C \
+        src/utils/xdr_cxx.C 
 
 
 # create a METHOD-specific configure script - will need to clean it too!
@@ -1419,7 +1426,7 @@ projection_SOURCES = src/apps/projection.C
 projection_LDADD = libmesh.la
 amr_SOURCES = src/apps/amr.C
 amr_LDADD = libmesh.la
-output_libmesh_version_SOURCES = src/utils/output_libmesh_version.C
+output_libmesh_version_SOURCES = src/apps/output_libmesh_version.C
 output_libmesh_version_LDADD = libmesh.la
 meshplot_SOURCES = src/apps/meshplot.C
 meshplot_LDADD = libmesh.la
@@ -1435,7 +1442,7 @@ all: all-recursive
 .SUFFIXES: .C .c .lo .o .obj
 am--refresh: Makefile
 	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/src/libmesh_la_SOURCES $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -1458,6 +1465,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
+$(srcdir)/src/libmesh_la_SOURCES:
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
@@ -1543,9 +1551,9 @@ src/base/libmesh_isnan.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/periodic_boundaries.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
-src/base/periodic_boundary.lo: src/base/$(am__dirstamp) \
-	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/periodic_boundary_base.lo: src/base/$(am__dirstamp) \
+	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/periodic_boundary.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/print_trace.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
@@ -1610,7 +1618,6 @@ src/fe/$(am__dirstamp):
 src/fe/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/fe/$(DEPDIR)
 	@: > src/fe/$(DEPDIR)/$(am__dirstamp)
-src/fe/fe.lo: src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/fe_abstract.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/fe_base.lo: src/fe/$(am__dirstamp) \
@@ -1627,6 +1634,7 @@ src/fe/fe_bernstein_shape_3D.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/fe_boundary.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
+src/fe/fe.lo: src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/fe_clough.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/fe_clough_shape_0D.lo: src/fe/$(am__dirstamp) \
@@ -1737,9 +1745,9 @@ src/fe/fe_transformation_base.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/fe_type.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
-src/fe/fe_xyz.lo: src/fe/$(am__dirstamp) \
-	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/fe_xyz_boundary.lo: src/fe/$(am__dirstamp) \
+	src/fe/$(DEPDIR)/$(am__dirstamp)
+src/fe/fe_xyz.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/fe_xyz_map.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
@@ -1755,11 +1763,11 @@ src/fe/h1_fe_transformation.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/hcurl_fe_transformation.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
-src/fe/inf_fe.lo: src/fe/$(am__dirstamp) \
-	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/inf_fe_base_radial.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/inf_fe_boundary.lo: src/fe/$(am__dirstamp) \
+	src/fe/$(DEPDIR)/$(am__dirstamp)
+src/fe/inf_fe.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/inf_fe_jacobi_20_00_eval.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
@@ -1783,17 +1791,15 @@ src/geom/$(DEPDIR)/$(am__dirstamp):
 	@: > src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/cell_hex.lo: src/geom/$(am__dirstamp) \
-	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_hex20.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_hex27.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_hex8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/cell_inf.lo: src/geom/$(am__dirstamp) \
+src/geom/cell_hex.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/cell_inf_hex.lo: src/geom/$(am__dirstamp) \
+src/geom/cell_inf.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_inf_hex16.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -1801,13 +1807,13 @@ src/geom/cell_inf_hex18.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_inf_hex8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/cell_inf_prism.lo: src/geom/$(am__dirstamp) \
+src/geom/cell_inf_hex.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_inf_prism12.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_inf_prism6.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/cell_prism.lo: src/geom/$(am__dirstamp) \
+src/geom/cell_inf_prism.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_prism15.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -1815,15 +1821,17 @@ src/geom/cell_prism18.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_prism6.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/cell_pyramid.lo: src/geom/$(am__dirstamp) \
+src/geom/cell_prism.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_pyramid5.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/cell_tet.lo: src/geom/$(am__dirstamp) \
+src/geom/cell_pyramid.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_tet10.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/cell_tet4.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/cell_tet.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/edge.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -1845,13 +1853,11 @@ src/geom/elem_type.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/face.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/face_inf_quad.lo: src/geom/$(am__dirstamp) \
-	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/face_inf_quad4.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/face_inf_quad6.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/face_quad.lo: src/geom/$(am__dirstamp) \
+src/geom/face_inf_quad.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/face_quad4.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -1859,11 +1865,13 @@ src/geom/face_quad8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/face_quad9.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
-src/geom/face_tri.lo: src/geom/$(am__dirstamp) \
+src/geom/face_quad.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/face_tri3.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/face_tri6.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/face_tri.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/node.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -2013,20 +2021,20 @@ src/numerics/analytic_function.lo: src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/coupling_matrix.lo: src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
-src/numerics/dense_matrix.lo: src/numerics/$(am__dirstamp) \
-	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/dense_matrix_base.lo: src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/dense_matrix_blas_lapack.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/dense_matrix.lo: src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/dense_submatrix.lo: src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/dense_subvector.lo: src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
-src/numerics/dense_vector.lo: src/numerics/$(am__dirstamp) \
-	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/dense_vector_base.lo: src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/dense_vector.lo: src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/distributed_vector.lo: src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -2127,11 +2135,9 @@ src/quadrature/$(am__dirstamp):
 src/quadrature/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/quadrature/$(DEPDIR)
 	@: > src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature.lo: src/quadrature/$(am__dirstamp) \
-	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_build.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_clough.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_clough_1D.lo:  \
 	src/quadrature/$(am__dirstamp) \
@@ -2142,7 +2148,7 @@ src/quadrature/quadrature_clough_2D.lo:  \
 src/quadrature/quadrature_clough_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_conical.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature_clough.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_conical_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
@@ -2150,7 +2156,7 @@ src/quadrature/quadrature_conical_2D.lo:  \
 src/quadrature/quadrature_conical_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_gauss.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature_conical.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_gauss_1D.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -2158,11 +2164,11 @@ src/quadrature/quadrature_gauss_2D.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_gauss_3D.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_gm.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature_gauss.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_gm_3D.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_grid.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature_gm.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_grid_1D.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -2170,12 +2176,12 @@ src/quadrature/quadrature_grid_2D.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_grid_3D.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_jacobi.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature_grid.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_jacobi_1D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_monomial.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature_jacobi.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_monomial_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
@@ -2183,9 +2189,9 @@ src/quadrature/quadrature_monomial_2D.lo:  \
 src/quadrature/quadrature_monomial_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_rules.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature_monomial.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_simpson.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature_rules.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_simpson_1D.lo:  \
 	src/quadrature/$(am__dirstamp) \
@@ -2196,13 +2202,15 @@ src/quadrature/quadrature_simpson_2D.lo:  \
 src/quadrature/quadrature_simpson_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
-src/quadrature/quadrature_trap.lo: src/quadrature/$(am__dirstamp) \
+src/quadrature/quadrature_simpson.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_trap_1D.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_trap_2D.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/quadrature_trap_3D.lo: src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/quadrature_trap.lo: src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/$(am__dirstamp):
 	@$(MKDIR_P) src/reduced_basis
@@ -2219,10 +2227,10 @@ src/reduced_basis/derived_rb_evaluation.lo:  \
 src/reduced_basis/rb_assembly_expansion.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/rb_construction.lo:  \
+src/reduced_basis/rb_construction_base.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
-src/reduced_basis/rb_construction_base.lo:  \
+src/reduced_basis/rb_construction.lo:  \
 	src/reduced_basis/$(am__dirstamp) \
 	src/reduced_basis/$(DEPDIR)/$(am__dirstamp)
 src/reduced_basis/rb_eim_assembly.lo:  \
@@ -2298,13 +2306,13 @@ src/solvers/nonlinear_solver.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/petsc_diff_solver.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/petscdmlibmesh.lo: src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/petsc_dm_nonlinear_solver.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/petsc_linear_solver.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/petsc_nonlinear_solver.lo: src/solvers/$(am__dirstamp) \
-	src/solvers/$(DEPDIR)/$(am__dirstamp)
-src/solvers/petscdmlibmesh.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/slepc_eigen_solver.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
@@ -2370,10 +2378,10 @@ src/systems/system_io.lo: src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/system_projection.lo: src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
-src/systems/system_subset.lo: src/systems/$(am__dirstamp) \
-	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/system_subset_by_subdomain.lo:  \
 	src/systems/$(am__dirstamp) \
+	src/systems/$(DEPDIR)/$(am__dirstamp)
+src/systems/system_subset.lo: src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
 src/systems/transient_system.lo: src/systems/$(am__dirstamp) \
 	src/systems/$(DEPDIR)/$(am__dirstamp)
@@ -2512,8 +2520,8 @@ src/apps/meshtool.$(OBJEXT): src/apps/$(am__dirstamp) \
 meshtool$(EXEEXT): $(meshtool_OBJECTS) $(meshtool_DEPENDENCIES) $(EXTRA_meshtool_DEPENDENCIES) 
 	@rm -f meshtool$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(meshtool_OBJECTS) $(meshtool_LDADD) $(LIBS)
-src/utils/output_libmesh_version.$(OBJEXT): src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/apps/output_libmesh_version.$(OBJEXT): src/apps/$(am__dirstamp) \
+	src/apps/$(DEPDIR)/$(am__dirstamp)
 output_libmesh_version$(EXEEXT): $(output_libmesh_version_OBJECTS) $(output_libmesh_version_DEPENDENCIES) $(EXTRA_output_libmesh_version_DEPENDENCIES) 
 	@rm -f output_libmesh_version$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(output_libmesh_version_OBJECTS) $(output_libmesh_version_LDADD) $(LIBS)
@@ -2675,6 +2683,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshnorm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshplot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/meshtool.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/output_libmesh_version.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/projection.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/solution_components.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/dof_map.Plo@am__quote@
@@ -3044,7 +3053,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/location_maps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/number_lookups.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/o_f_stream.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/output_libmesh_version.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/perf_log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/plt_loader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/plt_loader_read.Plo@am__quote@
