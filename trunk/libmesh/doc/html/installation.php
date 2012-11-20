@@ -125,7 +125,13 @@ optional libraries:
 
 <br>
 <div class="fragment">
-<pre>./configure --prefix=/tmp/foo --with-glpk-include=/opt/local/include --with-glpk-lib=/opt/local/lib --with-vtk-include=/opt/local/include/vtk-5.10 --with-vtk-lib=/opt/local/lib/vtk-5.10 --with-eigen-include=/opt/local/include/eigen3 --with-cxx=clang++-mp-3.2 --with-cc=clang-mp-3.2 --disable-fortran
+<pre>./configure --prefix=/tmp/foo \
+       --with-glpk-include=/opt/local/include \
+       --with-glpk-lib=/opt/local/lib \
+       --with-vtk-include=/opt/local/include/vtk-5.10 \
+       --with-vtk-lib=/opt/local/lib/vtk-5.10 \
+       --with-eigen-include=/opt/local/include/eigen3 \
+       --with-cxx=clang++-mp-3.2 --with-cc=clang-mp-3.2 --disable-fortran
 </div>
 
 <br>
