@@ -58,7 +58,7 @@ AX_PREFIX_CONFIG_H(include/libmesh/libmesh_config.h,LIBMESH,include/libmesh/libm
 
 
 # require automake 1.11 - color tests
-AM_INIT_AUTOMAKE([dist-bzip2 tar-ustar color-tests parallel-tests 1.11])
+AM_INIT_AUTOMAKE([dist-xz dist-bzip2 tar-ustar color-tests parallel-tests 1.11])
 
 # use silent rules - automake 1.11
 AM_SILENT_RULES(yes) 
