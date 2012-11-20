@@ -34,7 +34,7 @@ if (test -d $script_path); then
     cd $script_path
     
     if (test -d @host@_$METHOD -a -x @host@_$METHOD/libmesh-config); then
-	$script_path/@host@_$METHOD/libmesh-config $@
+	@host@_$METHOD/libmesh-config $@
     else
 	echo " "
 	echo "ERROR: no $script_path/@host@_$METHOD/libmesh-config"
