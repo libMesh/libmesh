@@ -207,7 +207,7 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
 
   for (unsigned int var = 0; var != context.n_vars(); ++var)
     {
-      if (this->is_time_evolving(var))
+      if (!this->is_time_evolving(var))
         continue;
 
       const std::vector<Real> &JxW =
