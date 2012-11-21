@@ -96,7 +96,7 @@ libmesh_CFLAGS   := @CFLAGS_METHOD@
 libmesh_INCLUDE += -I$(top_srcdir)/include
 
 ifeq (@enablelegacyincludepaths@,yes)
-  libmesh_INCLUDE += -I$(libmesh_dir)/include/libmesh
+  libmesh_INCLUDE += -I$(top_srcdir)/include/libmesh
 endif
 
 #
