@@ -1,6 +1,6 @@
 check_PROGRAMS            = reduced_basis_ex3
 reduced_basis_ex3dir      = $(examples_install_path)/reduced_basis/ex3
-reduced_basis_ex3_DATA    = reduced_basis_ex3.C assembly.h rb_classes.h reduced_basis_ex3.in
+reduced_basis_ex3_DATA    = reduced_basis_ex3.C assembly.h rb_classes.h reduced_basis_ex3.in run.sh $(top_srcdir)/contrib/utils/Makefile
 reduced_basis_ex3_SOURCES = $(reduced_basis_ex3_DATA) run.sh
 reduced_basis_ex3_LDADD   = $(top_builddir)/libmesh.la
 

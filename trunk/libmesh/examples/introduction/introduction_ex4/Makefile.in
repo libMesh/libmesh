@@ -645,7 +645,7 @@ BUILT_SOURCES = exact_solution.C
 DISTCLEANFILES = $(BUILT_SOURCES)
 check_SCRIPTS = run.sh
 introduction_ex4dir = $(examples_install_path)/introduction/ex4
-introduction_ex4_DATA = introduction_ex4.C exact_solution.C 
+introduction_ex4_DATA = introduction_ex4.C exact_solution.C run.sh $(top_srcdir)/contrib/utils/Makefile
 introduction_ex4_SOURCES = $(introduction_ex4_DATA) run.sh
 introduction_ex4_LDADD = $(top_builddir)/libmesh.la
 

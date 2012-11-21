@@ -1,7 +1,7 @@
 check_PROGRAMS        = transient_ex2
 check_SCRIPTS         = run.sh
 transient_ex2dir      = $(examples_install_path)/transient/ex2
-transient_ex2_DATA    = transient_ex2.C pipe-mesh.unv
+transient_ex2_DATA    = transient_ex2.C pipe-mesh.unv run.sh $(top_srcdir)/contrib/utils/Makefile
 transient_ex2_SOURCES = $(transient_ex2_DATA) run.sh
 transient_ex2_LDADD   = $(top_builddir)/libmesh.la
 

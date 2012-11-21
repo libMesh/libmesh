@@ -1,6 +1,6 @@
 check_PROGRAMS            = eigenproblems_ex3
 eigenproblems_ex3dir      = $(examples_install_path)/eigenproblems/ex3
-eigenproblems_ex3_DATA    = eigenproblems_ex3.C drum1_mesh.e drum2_mesh.e
+eigenproblems_ex3_DATA    = eigenproblems_ex3.C drum1_mesh.e drum2_mesh.e run.sh $(top_srcdir)/contrib/utils/Makefile
 eigenproblems_ex3_SOURCES = $(eigenproblems_ex3_DATA) run.sh
 eigenproblems_ex3_LDADD   = $(top_builddir)/libmesh.la
 

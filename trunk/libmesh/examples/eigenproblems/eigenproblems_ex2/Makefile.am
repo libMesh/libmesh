@@ -1,6 +1,6 @@
 check_PROGRAMS            = eigenproblems_ex2
 eigenproblems_ex2dir      = $(examples_install_path)/eigenproblems/ex2
-eigenproblems_ex2_DATA    = eigenproblems_ex2.C
+eigenproblems_ex2_DATA    = eigenproblems_ex2.C run.sh $(top_srcdir)/contrib/utils/Makefile
 eigenproblems_ex2_SOURCES = $(eigenproblems_ex2_DATA) run.sh
 eigenproblems_ex2_LDADD   = $(top_builddir)/libmesh.la
 

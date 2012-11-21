@@ -8,7 +8,7 @@ CLEANFILES = lshaped.xda
 check_PROGRAMS       = adjoints_ex2
 check_SCRIPTS        = run.sh
 adjoints_ex2dir      = $(examples_install_path)/adjoints/ex2
-adjoints_ex2_DATA    = adjoints_ex2.C ../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h femparameters.C femparameters.h general.in l-shaped.in L-qoi.C L-qoi.h
+adjoints_ex2_DATA    = adjoints_ex2.C ../adjoints_ex1/lshaped.xda L-shaped.C L-shaped.h femparameters.C femparameters.h general.in l-shaped.in L-qoi.C L-qoi.h run.sh $(top_srcdir)/contrib/utils/Makefile
 adjoints_ex2_SOURCES = $(adjoints_ex2_DATA) run.sh
 adjoints_ex2_LDADD   = $(top_builddir)/libmesh.la
 

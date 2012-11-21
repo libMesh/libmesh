@@ -1,7 +1,7 @@
 check_PROGRAMS            = reduced_basis_ex6
 check_SCRIPTS             = run.sh
 reduced_basis_ex6dir      = $(examples_install_path)/reduced_basis/ex6
-reduced_basis_ex6_DATA    = reduced_basis_ex6.C assembly.h eim_classes.h rb_classes.h reduced_basis_ex6.in eim.in rb.in
+reduced_basis_ex6_DATA    = reduced_basis_ex6.C assembly.h eim_classes.h rb_classes.h reduced_basis_ex6.in eim.in rb.in run.sh $(top_srcdir)/contrib/utils/Makefile
 reduced_basis_ex6_SOURCES = $(reduced_basis_ex6_DATA) run.sh
 reduced_basis_ex6_LDADD   = $(top_builddir)/libmesh.la
 

@@ -642,7 +642,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 miscellaneous_ex1dir = $(examples_install_path)/miscellaneous/ex1
-miscellaneous_ex1_DATA = miscellaneous_ex1.C
+miscellaneous_ex1_DATA = miscellaneous_ex1.C run.sh $(top_srcdir)/contrib/utils/Makefile
 miscellaneous_ex1_SOURCES = $(miscellaneous_ex1_DATA) run.sh
 miscellaneous_ex1_LDADD = $(top_builddir)/libmesh.la
 
