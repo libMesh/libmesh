@@ -5,7 +5,7 @@ lshaped.xda:
 
 check_PROGRAMS            = miscellaneous_ex5
 miscellaneous_ex5dir      = $(examples_install_path)/miscellaneous/ex5
-miscellaneous_ex5_DATA    = miscellaneous_ex5.C ../../adjoints/adjoints_ex1/lshaped.xda lshaped3D.xda miscellaneous_ex5.in
+miscellaneous_ex5_DATA    = miscellaneous_ex5.C ../../adjoints/adjoints_ex1/lshaped.xda lshaped3D.xda miscellaneous_ex5.in run.sh $(top_srcdir)/contrib/utils/Makefile
 miscellaneous_ex5_SOURCES = $(miscellaneous_ex5_DATA) run.sh
 miscellaneous_ex5_LDADD   = $(top_builddir)/libmesh.la
 check_SCRIPTS             = run.sh

@@ -7,7 +7,7 @@ DISTCLEANFILES = $(BUILT_SOURCES)
 check_PROGRAMS         = adaptivity_ex2
 check_SCRIPTS          = run.sh
 adaptivity_ex2dir      = $(examples_install_path)/adaptivity/ex2
-adaptivity_ex2_DATA    = adaptivity_ex2.C exact_solution.C mesh.xda
+adaptivity_ex2_DATA    = adaptivity_ex2.C exact_solution.C mesh.xda run.sh $(top_srcdir)/contrib/utils/Makefile
 adaptivity_ex2_SOURCES = $(adaptivity_ex2_DATA) run.sh
 adaptivity_ex2_LDADD   = $(top_builddir)/libmesh.la
 

@@ -1,7 +1,7 @@
 check_PROGRAMS       = adjoints_ex4
 check_SCRIPTS        = run.sh
 adjoints_ex4dir      = $(examples_install_path)/adjoints/ex4
-adjoints_ex4_DATA    = L-shaped.C element_qoi_derivative.C general.in side_postprocess.C L-shaped.h adjoints_ex4.C femparameters.C l-shaped.in side_qoi_derivative.C element_postprocess.C femparameters.h lshaped.xda
+adjoints_ex4_DATA    = L-shaped.C element_qoi_derivative.C general.in side_postprocess.C L-shaped.h adjoints_ex4.C femparameters.C l-shaped.in side_qoi_derivative.C element_postprocess.C femparameters.h lshaped.xda run.sh $(top_srcdir)/contrib/utils/Makefile
 adjoints_ex4_SOURCES = $(adjoints_ex4_DATA) run.sh
 adjoints_ex4_LDADD   = $(top_builddir)/libmesh.la
 

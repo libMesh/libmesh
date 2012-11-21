@@ -1,7 +1,7 @@
 check_PROGRAMS       = adjoints_ex3
 check_SCRIPTS        = run.sh
 adjoints_ex3dir      = $(examples_install_path)/adjoints/ex3
-adjoints_ex3_DATA    = H-qoi.C H-qoi.h H_channel_quads.xda adjoints_ex3.C coupled_system.C coupled_system.h coupled_system.in domain.C domain.h femparameters.C femparameters.h general.in initial.C initial.h mysystems.h output.C output.h
+adjoints_ex3_DATA    = H-qoi.C H-qoi.h H_channel_quads.xda adjoints_ex3.C coupled_system.C coupled_system.h coupled_system.in domain.C domain.h femparameters.C femparameters.h general.in initial.C initial.h mysystems.h output.C output.h run.sh $(top_srcdir)/contrib/utils/Makefile
 adjoints_ex3_SOURCES = $(adjoints_ex3_DATA) run.sh
 adjoints_ex3_LDADD   = $(top_builddir)/libmesh.la
 

@@ -6,7 +6,7 @@ exact_solution.C: $(top_srcdir)/examples/introduction/introduction_ex3/exact_sol
 check_PROGRAMS         = subdomains_ex2
 check_SCRIPTS          = run.sh
 subdomains_ex2dir      = $(examples_install_path)/subdomains/ex2
-subdomains_ex2_DATA    = subdomains_ex2.C exact_solution.C
+subdomains_ex2_DATA    = subdomains_ex2.C exact_solution.C run.sh $(top_srcdir)/contrib/utils/Makefile
 subdomains_ex2_SOURCES = $(subdomains_ex2_DATA) run.sh
 subdomains_ex2_LDADD   = $(top_builddir)/libmesh.la
 

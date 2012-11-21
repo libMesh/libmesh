@@ -1,7 +1,7 @@
 check_PROGRAMS         = adaptivity_ex3
 check_SCRIPTS          = run.sh
 adaptivity_ex3dir      = $(examples_install_path)/adaptivity/ex3
-adaptivity_ex3_DATA    = adaptivity_ex3.C adaptivity_ex3.in lshaped.xda lshaped3D.xda
+adaptivity_ex3_DATA    = adaptivity_ex3.C adaptivity_ex3.in lshaped.xda lshaped3D.xda run.sh $(top_srcdir)/contrib/utils/Makefile
 adaptivity_ex3_SOURCES = $(adaptivity_ex3_DATA) run.sh
 adaptivity_ex3_LDADD   = $(top_builddir)/libmesh.la
 

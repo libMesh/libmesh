@@ -57,13 +57,15 @@ AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
 AM_CPPFLAGS += $(libmesh_INCLUDE) -I$(top_builddir)/include
 LIBS         = $(libmesh_LIBS)
 
-EXTRA_DIST = run_common.sh
+examples_source_path  = $(top_srcdir)/examples
+examples_install_path = $(prefix)/examples
 
-# clean-local:
-# 	-rm -rf eim_data offline_data rb_data
+#
+# anything defined in 'data_DATA' will be installed in 'datadir'
+datadir   = $(examples_install_path)
+data_DATA = run_common.sh
 
-examples_source_path=$(top_srcdir)/examples
-examples_install_path=$(prefix)/examples
+EXTRA_DIST = $(data_DATA)
 
 # include our header checking script when doing 'make dist'
 EXTRA_DIST += ../contrib/bin/test_installed_examples.sh Make.common
