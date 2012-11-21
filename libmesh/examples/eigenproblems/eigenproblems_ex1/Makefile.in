@@ -51,15 +51,12 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = -I$(top_srcdir)/contrib/fparser
 check_PROGRAMS = eigenproblems_ex1$(EXEEXT)
-
-# how to make documentation
-@LIBMESH_ENABLE_SLEPC_TRUE@am__append_2 = $(check_PROGRAMS).php stdout.log
-subdir = examples/eigenproblems/eigenproblems_ex1
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
-	$(top_srcdir)/build-aux/test-driver
+	$(top_srcdir)/build-aux/test-driver \
+	$(top_srcdir)/examples/Make.common
+subdir = examples/eigenproblems/eigenproblems_ex1
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -644,16 +641,24 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_INCLUDE) \
-	-I$(top_builddir)/include $(am__append_1)
-AM_CFLAGS = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 eigenproblems_ex1dir = $(examples_install_path)/eigenproblems/ex1
 eigenproblems_ex1_DATA = eigenproblems_ex1.C
 eigenproblems_ex1_SOURCES = $(eigenproblems_ex1_DATA) run.sh
 eigenproblems_ex1_LDADD = $(top_builddir)/libmesh.la
-CLEANFILES = out.e $(am__append_2)
+
+######################################################################
+#
+# how to make documentation
+#
+CLEANFILES = out.e $(check_PROGRAMS).php stdout.log
+
+# conditionally enable this test
+@LIBMESH_ENABLE_SLEPC_TRUE@check_SCRIPTS = run.sh
+AUTOMAKE_OPTIONS = subdir-objects 
+AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_INCLUDE) \
+	-I$(top_builddir)/include
+AM_CFLAGS = $(libmesh_CFLAGS)
+AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 ######################################################################
 #
@@ -661,14 +666,11 @@ CLEANFILES = out.e $(am__append_2)
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir)
 TESTS = $(check_SCRIPTS)
-
-# Only *run* the test if SLEPc is actually enabled
-@LIBMESH_ENABLE_SLEPC_TRUE@check_SCRIPTS = run.sh
 all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .C .lo .log .o .obj .test .test$(EXEEXT) .trs
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/examples/Make.common $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -689,6 +691,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
+$(top_srcdir)/examples/Make.common:
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
@@ -1087,8 +1090,6 @@ dvi: dvi-am
 
 dvi-am:
 
-@LIBMESH_ENABLE_SLEPC_FALSE@html: html-am
-
 html-am:
 
 info: info-am
@@ -1160,19 +1161,31 @@ uninstall-am: uninstall-eigenproblems_ex1DATA
 	mostlyclean-libtool pdf pdf-am ps ps-am recheck tags uninstall \
 	uninstall-am uninstall-eigenproblems_ex1DATA
 
+
+######################################################################
+#
+# Common environment for all examples
+# 
+# This file is included by *every* example.  If we are careful, common
+# rules like 'make doc' or 'make run' can be defined here, once and 
+# for all.
+# 
 include $(top_builddir)/Make.common.@METHOD@
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
 	LIBMESH_DIR=$(abs_top_srcdir) $(srcdir)/$(check_SCRIPTS)
-@LIBMESH_ENABLE_SLEPC_TRUE@doc: $(check_PROGRAMS).php
-@LIBMESH_ENABLE_SLEPC_TRUE@html: $(check_PROGRAMS).php
-@LIBMESH_ENABLE_SLEPC_TRUE@$(check_PROGRAMS).php: $(check_PROGRAMS) \
-@LIBMESH_ENABLE_SLEPC_TRUE@                        $(top_srcdir)/contrib/bin/ex2html.sh \
-@LIBMESH_ENABLE_SLEPC_TRUE@                       Makefile
-@LIBMESH_ENABLE_SLEPC_TRUE@	$(MAKE) -s run > stdout.log
-@LIBMESH_ENABLE_SLEPC_TRUE@	$(AM_V_GEN) PATH=$(abs_top_srcdir)/contrib/bin:$(PATH) \
-@LIBMESH_ENABLE_SLEPC_TRUE@	  ex2html.sh $(check_PROGRAMS) $(abs_srcdir)
+doc: $(check_PROGRAMS).php
+html: $(check_PROGRAMS).php
+$(check_PROGRAMS).php: $(check_PROGRAMS) \
+                        $(top_srcdir)/contrib/bin/ex2html.sh \
+                       Makefile
+	$(MAKE) -s run > stdout.log
+	$(AM_V_GEN) PATH=$(abs_top_srcdir)/contrib/bin:$(PATH) \
+	  ex2html.sh $(check_PROGRAMS) $(abs_srcdir)
+
+##############################################
+# include common example environment
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
