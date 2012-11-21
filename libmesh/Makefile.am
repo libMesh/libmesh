@@ -286,7 +286,7 @@ examples_doc:
 #
 # doxygen documentation - be sure to generate symlinks in include/libmesh!
 doc html:
-#	$(MAKE) examples_doc
+	$(MAKE) examples_doc
 	@cd $(top_builddir)/include/libmesh && $(MAKE)
 	$(MKDIR_P) $(top_builddir)/doc/html
 	$(DOXYGEN) $(top_builddir)/doc/Doxyfile
