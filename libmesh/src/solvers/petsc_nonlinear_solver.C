@@ -442,7 +442,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
      CHKERRABORT(libMesh::COMM_WORLD,ierr);
    }
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
-   // Only set the nullspace if we have a way of computing it.
+   // Only set the nullspace if we have a way of computing it and the result is non-empty.
    if (this->nullspace || this->nullspace_object)
    {
      MatNullSpace msp;
@@ -457,17 +457,19 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
        }
    }
 
-   // Only set the nearnullspace if we have a way of computing it.
+   // Only set the nearnullspace if we have a way of computing it and the result is non-empty.
    if (this->nearnullspace || this->nearnullspace_object)
    {
      MatNullSpace msp = PETSC_NULL;
      this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, &msp);
-
-     ierr = MatSetNearNullSpace(jac->mat(), msp);
-     CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-     ierr = MatNullSpaceDestroy(&msp);
-     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+     
+     if(msp) {
+       ierr = MatSetNearNullSpace(jac->mat(), msp);
+       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+       
+       ierr = MatNullSpaceDestroy(&msp);
+       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+     }
    }
 #endif
    // Have the Krylov subspace method use our good initial guess rather than 0
