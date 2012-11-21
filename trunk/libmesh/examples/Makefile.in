@@ -50,7 +50,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = -I$(top_srcdir)/contrib/fparser
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -492,12 +491,13 @@ SUBDIRS = \
 
 AUTOMAKE_OPTIONS = subdir-objects 
 AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_INCLUDE) \
-	-I$(top_builddir)/include $(am__append_1)
+	-I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 # include our header checking script when doing 'make dist'
-EXTRA_DIST = run_common.sh ../contrib/bin/test_installed_examples.sh
+EXTRA_DIST = run_common.sh ../contrib/bin/test_installed_examples.sh \
+	Make.common
 
 # clean-local:
 # 	-rm -rf eim_data offline_data rb_data

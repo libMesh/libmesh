@@ -51,13 +51,13 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = -I$(top_srcdir)/contrib/fparser
 check_PROGRAMS = reduced_basis_ex1$(EXEEXT)
-@LIBMESH_VPATH_BUILD_TRUE@am__append_2 = reduced_basis_ex1.in .linkstamp
-subdir = examples/reduced_basis/reduced_basis_ex1
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = reduced_basis_ex1.in .linkstamp
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
-	$(top_srcdir)/build-aux/test-driver
+	$(top_srcdir)/build-aux/test-driver \
+	$(top_srcdir)/examples/Make.common
+subdir = examples/reduced_basis/reduced_basis_ex1
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -660,18 +660,16 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_INCLUDE) \
-	-I$(top_builddir)/include $(am__append_1)
-AM_CFLAGS = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 check_SCRIPTS = run.sh
 reduced_basis_ex1dir = $(examples_install_path)/reduced_basis/ex1
 reduced_basis_ex1_DATA = reduced_basis_ex1.C assembly.h  rb_classes.h reduced_basis_ex1.in
 reduced_basis_ex1_SOURCES = $(reduced_basis_ex1_DATA) run.sh
 reduced_basis_ex1_LDADD = $(top_builddir)/libmesh.la
 
+######################################################################
+#
 # how to make documentation
+#
 CLEANFILES = RB_sol.e offline_data/RB_F_000.xdr \
 	offline_data/RB_A_002.xdr offline_data/RB_A_001.xdr \
 	offline_data/RB_A_000.xdr offline_data/parameter_ranges.xdr \
@@ -694,11 +692,16 @@ CLEANFILES = RB_sol.e offline_data/RB_F_000.xdr \
 	offline_data/bf13.xdr offline_data/bf12.xdr \
 	offline_data/bf11.xdr offline_data/bf10.xdr \
 	offline_data/bf1.xdr offline_data/bf0.xdr \
-	offline_data/Aq_Aq_innerprods.xdr bf0.e $(am__append_2) \
+	offline_data/Aq_Aq_innerprods.xdr bf0.e $(am__append_1) \
 	$(check_PROGRAMS).php stdout.log
 
 # also need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
+AUTOMAKE_OPTIONS = subdir-objects 
+AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_INCLUDE) \
+	-I$(top_builddir)/include
+AM_CFLAGS = $(libmesh_CFLAGS)
+AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 
 ######################################################################
 #
@@ -711,7 +714,7 @@ all: $(BUILT_SOURCES)
 
 .SUFFIXES:
 .SUFFIXES: .C .lo .log .o .obj .test .test$(EXEEXT) .trs
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/examples/Make.common $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -732,6 +735,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
+$(top_srcdir)/examples/Make.common:
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
@@ -1204,13 +1208,22 @@ uninstall-am: uninstall-reduced_basis_ex1DATA
 	pdf pdf-am ps ps-am recheck tags uninstall uninstall-am \
 	uninstall-reduced_basis_ex1DATA
 
-include $(top_builddir)/Make.common.@METHOD@
 
 clean-local:
 	-rm -rf offline_data 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f reduced_basis_ex1.in && $(LN_S) $(srcdir)/reduced_basis_ex1.in .
 @LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
+
+######################################################################
+#
+# Common environment for all examples
+# 
+# This file is included by *every* example.  If we are careful, common
+# rules like 'make doc' or 'make run' can be defined here, once and 
+# for all.
+# 
+include $(top_builddir)/Make.common.@METHOD@
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
@@ -1223,6 +1236,9 @@ $(check_PROGRAMS).php: $(check_PROGRAMS) \
 	$(MAKE) -s run > stdout.log
 	$(AM_V_GEN) PATH=$(abs_top_srcdir)/contrib/bin:$(PATH) \
 	  ex2html.sh $(check_PROGRAMS) $(abs_srcdir)
+
+##############################################
+# include common example environment
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

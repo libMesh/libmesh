@@ -57,10 +57,6 @@ AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
 AM_CPPFLAGS += $(libmesh_INCLUDE) -I$(top_builddir)/include
 LIBS         = $(libmesh_LIBS)
 
-if LIBMESH_ENABLE_FPARSER
-  AM_CPPFLAGS += -I$(top_srcdir)/contrib/fparser
-endif
-
 EXTRA_DIST = run_common.sh
 
 # clean-local:
@@ -70,7 +66,7 @@ examples_source_path=$(top_srcdir)/examples
 examples_install_path=$(prefix)/examples
 
 # include our header checking script when doing 'make dist'
-EXTRA_DIST += ../contrib/bin/test_installed_examples.sh
+EXTRA_DIST += ../contrib/bin/test_installed_examples.sh Make.common
 
 
 ######################################################################
