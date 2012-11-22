@@ -1,0 +1,5 @@
+T=d
+V=x
+R=-140, 140, 0.1
+F=cosh(x)
+C=cosh(x)

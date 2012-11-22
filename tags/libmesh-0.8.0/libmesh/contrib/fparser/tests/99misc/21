@@ -1,0 +1,5 @@
+T=d f ld mf li gi
+V=x
+R=-10,10,1
+F=sqr(x)+value()-pvalue ( )
+C=userDefFuncSqr({x})+userDefFuncValue({})-5

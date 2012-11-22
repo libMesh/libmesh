@@ -1,0 +1,15 @@
+T=d f ld
+V=x
+R=-3,3,0.5
+F=1*(log10(abs(x))=-2) + \
+  2*(log10(abs(x))<-2) + \
+  4*(log10(abs(x))<=-2) + \
+  8*(log10(abs(x))>-2) + \
+  16*(log10(abs(x))>=-2) + \
+  32*(log10(abs(x))!=-2)
+C=1*fp_equal(fp_log10(fp_abs(x)),-2) + \
+  2*fp_less(fp_log10(fp_abs(x)),-2) + \
+  4*fp_lessOrEq(fp_log10(fp_abs(x)),-2) + \
+  8*fp_greater(fp_log10(fp_abs(x)),-2) + \
+  16*fp_greaterOrEq(fp_log10(fp_abs(x)),-2) + \
+  32*fp_nequal(fp_log10(fp_abs(x)),-2)

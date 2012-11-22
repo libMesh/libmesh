@@ -1,0 +1,5 @@
+T=f
+V=x
+R=0, 100000, 1000
+F=sqrt(x)
+C=sqrtf(x)

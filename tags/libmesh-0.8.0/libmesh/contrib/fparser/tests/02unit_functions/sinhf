@@ -1,0 +1,5 @@
+T=f
+V=x
+R=-40, 40, 0.1
+F=sinh(x)
+C=sinhf(x)
