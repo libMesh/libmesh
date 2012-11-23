@@ -3443,7 +3443,7 @@ test -n "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
-ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile include/libmesh/libmesh_version.h contrib/utils/Make.common doc/Doxyfile contrib/utils/libmesh.pc"
+ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile include/libmesh/libmesh_version.h contrib/utils/Make.common tests/Makefile doc/Doxyfile contrib/utils/libmesh.pc"
 
 
 ac_config_files="$ac_config_files contrib/bin/libmesh-config"
@@ -31835,7 +31835,7 @@ $as_echo "no" >&6; }
 fi
 
 
-  cppunit_version_min=
+  cppunit_version_min=1.10.0
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Cppunit - version >= $cppunit_version_min" >&5
 $as_echo_n "checking for Cppunit - version >= $cppunit_version_min... " >&6; }
@@ -31893,11 +31893,11 @@ $as_echo "no" >&6; }
   fi
 
   if test "x$no_cppunit" = x ; then
-     :
+     enablecppunit=yes
   else
      CPPUNIT_CFLAGS=""
      CPPUNIT_LIBS=""
-     :
+     enablecppunit=no
   fi
 
 
@@ -33496,6 +33496,7 @@ do
     "include/libmesh/Makefile") CONFIG_FILES="$CONFIG_FILES include/libmesh/Makefile" ;;
     "include/libmesh/libmesh_version.h") CONFIG_FILES="$CONFIG_FILES include/libmesh/libmesh_version.h" ;;
     "contrib/utils/Make.common") CONFIG_FILES="$CONFIG_FILES contrib/utils/Make.common" ;;
+    "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
     "doc/Doxyfile") CONFIG_FILES="$CONFIG_FILES doc/Doxyfile" ;;
     "contrib/utils/libmesh.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh.pc" ;;
     "contrib/bin/libmesh-config") CONFIG_FILES="$CONFIG_FILES contrib/bin/libmesh-config" ;;
