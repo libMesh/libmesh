@@ -432,7 +432,7 @@ AC_ARG_ENABLE(cppunit,
 		 esac],
 		 [enablecppunit=$enableoptional])
 if (test "$enablecppunit" = yes) ; then
-   AM_PATH_CPPUNIT
+  AM_PATH_CPPUNIT([1.10.0],[enablecppunit=yes],[enablecppunit=no])
 fi
 AM_CONDITIONAL(LIBMESH_ENABLE_CPPUNIT, test x$enablecppunit = xyes)		 
 # -------------------------------------------------------------

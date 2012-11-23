@@ -207,6 +207,10 @@ if LIBMESH_ENABLE_FPARSER
   SUBDIRS += contrib/fparser
   libmesh_la_LIBADD += contrib/fparser/libfparser.la
 endif
+
+if LIBMESH_ENABLE_CPPUNIT
+  SUBDIRS += tests
+endif
 ###########################################################
 
 

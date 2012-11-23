@@ -38,6 +38,7 @@ AC_CONFIG_FILES([Makefile
 		 include/libmesh/Makefile
                  include/libmesh/libmesh_version.h
 	         contrib/utils/Make.common
+		 tests/Makefile
 		 doc/Doxyfile
 		 contrib/utils/libmesh.pc
 		 ])
