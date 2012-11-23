@@ -70,6 +70,11 @@ if (test "x$enableoptional" = "xyes"); then
   echo
   echo Optional Packages:
   echo '  'boost............................ : $enableboost
+  echo '  'cppunit.......................... : $enablecppunit
+#  if (test "x$enablecppunit" = "xyes"); then
+#  echo '     'CPPUNIT_CFLAGS................ : $CPPUNIT_CFLAGS
+#  echo '     'CPPUNIT_LIBS.................. : $CPPUNIT_LIBS
+#  fi
   echo '  'eigen............................ : $enableeigen
   echo '  'exodus........................... : $enableexodus
   echo '  'fparser.......................... : $enablefparser

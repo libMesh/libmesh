@@ -105,7 +105,7 @@ fi
 # -------------------------------------------------------------
 AC_ARG_ENABLE(cppthreads,
              AC_HELP_STRING([--enable-cppthreads],
-                            [Build with C++ std::thread Support]),
+                            [Build with C++ std::thread support]),
              enablecppthreads=$enableval,
              enablecppthreads=yes)
 if (test "$enablecppthreads" != no) ; then
@@ -415,6 +415,26 @@ fi
 AM_CONDITIONAL(LIBMESH_ENABLE_FPARSER, test x$enablefparser = xyes)
 AC_CONFIG_FILES([contrib/fparser/Makefile])
 AC_CONFIG_FILES([contrib/fparser/extrasrc/Makefile])
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# cppunit C++ unit testing -- enabled by default
+# -------------------------------------------------------------
+AC_ARG_ENABLE(cppunit,
+             AC_HELP_STRING([--enable-cppunit],
+                            [Build with cppunit C++ unit testing support]),
+		[case "${enableval}" in
+		  yes)  enablecppunit=yes ;;
+		   no)  enablecppunit=no ;;
+ 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-cppunit) ;;
+		 esac],
+		 [enablecppunit=$enableoptional])
+if (test "$enablecppunit" = yes) ; then
+   AM_PATH_CPPUNIT
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_CPPUNIT, test x$enablecppunit = xyes)		 
 # -------------------------------------------------------------
 
 

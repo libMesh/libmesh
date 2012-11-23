@@ -65,7 +65,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
 	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/compiler.m4 \
 	$(top_srcdir)/m4/config_environment.m4 \
-	$(top_srcdir)/m4/config_summary.m4 \
+	$(top_srcdir)/m4/config_summary.m4 $(top_srcdir)/m4/cppunit.m4 \
 	$(top_srcdir)/m4/demangle.m4 $(top_srcdir)/m4/eigen.m4 \
 	$(top_srcdir)/m4/exodus.m4 $(top_srcdir)/m4/feexcept.m4 \
 	$(top_srcdir)/m4/fparser.m4 $(top_srcdir)/m4/glpk.m4 \
@@ -407,6 +407,9 @@ CPPFLAGS_DBG = @CPPFLAGS_DBG@
 CPPFLAGS_DVL = @CPPFLAGS_DVL@
 CPPFLAGS_METHOD = @CPPFLAGS_METHOD@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
+CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
+CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
+CPPUNIT_LIBS = @CPPUNIT_LIBS@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
