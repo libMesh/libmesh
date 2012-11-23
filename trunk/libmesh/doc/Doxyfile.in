@@ -885,7 +885,7 @@ HTML_OUTPUT            = ./html/doxygen
 # each generated HTML page (for example: .htm,.php,.asp). If it is left blank
 # doxygen will generate files with .html extension.
 
-# HTML_FILE_EXTENSION    = .php
+HTML_FILE_EXTENSION    = .php
 
 # The HTML_HEADER tag can be used to specify a personal HTML header for
 # each generated HTML page. If it is left blank doxygen will generate a
@@ -898,13 +898,13 @@ HTML_OUTPUT            = ./html/doxygen
 # have to redo this when upgrading to a newer version of doxygen or when
 # changing the value of configuration settings such as GENERATE_TREEVIEW!
 
-# HTML_HEADER            = @abs_top_srcdir@/doc/header.php
+HTML_HEADER            = @abs_top_srcdir@/doc/header.php
 
 # The HTML_FOOTER tag can be used to specify a personal HTML footer for
 # each generated HTML page. If it is left blank doxygen will generate a
 # standard footer.
 
-# HTML_FOOTER            = @abs_top_srcdir@/doc/footer.php
+HTML_FOOTER            = @abs_top_srcdir@/doc/footer.php
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading
 # style sheet that is used by each HTML page. It can be used to
@@ -913,7 +913,7 @@ HTML_OUTPUT            = ./html/doxygen
 # the style sheet file to the HTML output directory, so don't put your own
 # style sheet in the HTML output directory as well, or it will be erased!
 
-# HTML_STYLESHEET        = @abs_top_srcdir@/doc/stylesheet.css
+HTML_STYLESHEET        = @abs_top_srcdir@/doc/stylesheet.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
