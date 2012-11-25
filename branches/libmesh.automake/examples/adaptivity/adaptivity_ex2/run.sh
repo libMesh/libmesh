@@ -17,7 +17,6 @@ n_refinements=5
 output_freq=10
 
 options=" \[-read_solution\] -n_timesteps $n_timesteps -n_refinements $n_refinements -init_timestep \[0\|$n_timesteps\]"
-message_running "$example_name" "$options"
 
 options="-n_timesteps $n_timesteps -n_refinements $n_refinements -output_freq $output_freq -init_timestep 0"
 run_example "$example_name" "$options"
@@ -31,4 +30,3 @@ options="-read_solution -n_timesteps $n_timesteps -output_freq $output_freq -ini
 run_example "$example_name" "$options"
 
 options=" \[-read_solution\] -n_timesteps $n_timesteps -n_refinements $n_refinements -init_timestep \[0\|$n_timesteps\]"
-message_done_running "$example_name" "$options"

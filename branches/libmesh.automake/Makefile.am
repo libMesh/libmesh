@@ -136,9 +136,10 @@ if LIBMESH_OPT_MODE
 endif
 
 
-if LIBMESH_ENABLE_CPPUNIT
-  SUBDIRS += tests
-endif
+#if LIBMESH_ENABLE_CPPUNIT
+#  SUBDIRS += tests
+#endif
+
 ###########################################################
 
 

@@ -76,11 +76,10 @@ DIST_COMMON = $(am__configure_deps) $(srcdir)/Make.common.in \
 @LIBMESH_DBG_MODE_TRUE@am__append_1 = dbg/libmesh.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_2 = devel/libmesh.la
 @LIBMESH_OPT_MODE_TRUE@am__append_3 = opt/libmesh.la
-@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_4 = tests
 bin_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_4) $(am__EXEEXT_6)
-@LIBMESH_OPT_MODE_TRUE@am__append_5 = $(opt_programs)
-@LIBMESH_DEVEL_MODE_TRUE@am__append_6 = $(devel_programs)
-@LIBMESH_DBG_MODE_TRUE@am__append_7 = $(dbg_programs)
+@LIBMESH_OPT_MODE_TRUE@am__append_4 = $(opt_programs)
+@LIBMESH_DEVEL_MODE_TRUE@am__append_5 = $(devel_programs)
+@LIBMESH_DBG_MODE_TRUE@am__append_6 = $(dbg_programs)
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -2413,7 +2412,7 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = include contrib tests examples
+DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -2772,7 +2771,7 @@ top_srcdir = @top_srcdir@
 
 ###########################################################
 # Examples
-SUBDIRS = include contrib $(am__append_4) examples
+SUBDIRS = include contrib examples
 AUTOMAKE_OPTIONS = foreign subdir-objects 
 ACLOCAL_AMFLAGS = -I m4
 AM_CPPFLAGS = $(libmesh_CPPFLAGS) 
