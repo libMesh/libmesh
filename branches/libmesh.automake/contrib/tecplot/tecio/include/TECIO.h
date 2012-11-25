@@ -1,1 +1,0 @@
-../tecsrc/TECIO.h
