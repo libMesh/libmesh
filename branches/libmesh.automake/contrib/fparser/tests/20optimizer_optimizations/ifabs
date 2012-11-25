@@ -1,0 +1,21 @@
+T=d ld li f mf gi cd cf cld
+V=x
+R=-1,1,1
+F=        1*(5+if(x< 0,-x,x)) + \
+         10*(5+if(x<=0,-x,x)) + \
+        100*(5+if(x> 0,-x,x)) + \
+       1000*(5+if(x>=0,-x,x)) + \
+      10000*(5+if(x< 0,x,-x)) + \
+     100000*(5+if(x<=0,x,-x)) + \
+    1000000*(5+if(x> 0,x,-x)) + \
+   10000000*(5+if(x>=0,x,-x))
+C=        1*(5+(fp_less(x,       0)!=0?-x:x)) + \
+         10*(5+(fp_lessOrEq(x,   0)!=0?-x:x)) + \
+        100*(5+(fp_greater(x,    0)!=0?-x:x)) + \
+       1000*(5+(fp_greaterOrEq(x,0)!=0?-x:x)) + \
+      10000*(5+(fp_less(x,       0)!=0?x:-x)) + \
+     100000*(5+(fp_lessOrEq(x,   0)!=0?x:-x)) + \
+    1000000*(5+(fp_greater(x,    0)!=0?x:-x)) + \
+   10000000*(5+(fp_greaterOrEq(x,0)!=0?x:-x))
+
+# Expected result: 55555555+10888911*abs(x)

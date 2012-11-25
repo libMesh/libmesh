@@ -1,0 +1,5 @@
+T=d f ld
+V=x
+R=-3,3,0.41
+F=log(1.1^x*4.1)
+C=fp_log(fp_pow(1.1, x) * 4.1)

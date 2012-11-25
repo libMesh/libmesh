@@ -1,0 +1,5 @@
+T=ld
+V=x
+R=-1, 1, 0.01
+F=acos(x)
+C=acosl(x)

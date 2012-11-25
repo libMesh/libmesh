@@ -1,0 +1,5 @@
+T=d ld li f mf gi cd cf cld
+V=x,y
+R=-2,2,1
+F=!!x + if(y, 1,0)
+C=fp_truth(x) + fp_truth(y)

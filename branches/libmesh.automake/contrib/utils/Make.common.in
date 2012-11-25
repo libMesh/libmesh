@@ -1,0 +1,172 @@
+###############################################################################
+## Please note:
+##   The ./configure script generates this Make.common from 
+##   contrib/utils/Make.common.in, so if you want to change something,
+##   then do it in the latter file (here!) and re-run
+##   ./configure in the top level directory
+###############################################################################
+
+###############################################################################
+#
+# The Make.common file defines the build environment for libMesh
+# and all its helper applications. For backwards-compatible builds (before v0.8.0)
+# you can include this Make.common file in your project.  Note this is not the 
+# preferred method for using libMesh -- we provide libmesh-config as a better
+# solution.
+#
+###############################################################################
+
+default: all
+
+# Where libMesh is installed.
+prefix              := @prefix@
+exec_prefix         := @exec_prefix@
+libmesh_install_dir := $(prefix)
+
+###############################################################################
+# the following lines will be replaced by the output 
+# of ./configure
+hosttype            := @host@
+hostos              := @host_os@
+
+# Perl for making .depend
+perl                := @PERL@
+###############################################################################
+
+
+
+
+###############################################################################
+#
+# Figure out the compilation mode based on the
+# environment variable METHOD.
+opt-mode   := off
+debug-mode := off
+prof-mode  := off
+oprof-mode := off
+syn-mode   := off
+devel-mode := off
+
+# Unless we find a valid or an unset METHOD 
+# variable, there's something wrong.
+mode := "INVALID"
+
+# If the user has no environment variable
+# called METHOD, he gets optimized mode.
+ifeq (x$(METHOD),x)
+  METHOD := opt
+endif
+
+# If METHOD=opt, compile in optimized mode.
+ifeq ($(METHOD),optimized)
+  METHOD := opt
+endif
+
+ifeq ($(METHOD),opt)
+  opt-mode := on
+  mode     := "optimized"
+endif
+
+#
+# If METHOD=devel, compile in development mode.
+ifeq ($(METHOD),development)
+  METHOD := devel
+endif
+
+ifeq ($(METHOD),devel)
+  devel-mode := on
+  mode       := "development"
+endif
+
+#
+# If METHOD=dbg, compile in debug mode.
+ifeq ($(METHOD),debug)
+  METHOD := dbg
+endif
+ifeq ($(METHOD),dbg)
+  debug-mode := on
+  mode       := "debug"
+endif
+
+#
+# If METHOD=prof, compile in profiling mode
+ifeq ($(METHOD),profiling)
+  METHOD := pro
+endif
+ifeq ($(METHOD),prof)
+  METHOD := pro
+endif
+ifeq ($(METHOD),pro)
+  prof-mode     := on
+  mode          := "profiling"
+endif
+
+#
+# If METHOD=oprof, compile in OProfile mode
+ifeq ($(METHOD),oprofile)
+  METHOD := oprof
+endif
+ifeq ($(METHOD),oprof)
+  oprof-mode    := on
+  mode          := "oprofile"
+endif
+
+# If the user had a METHOD variable we didn't
+# recognize, there's been some mistake.  Let's
+# yell at them.
+ifeq ($(mode),"INVALID")
+  $(error Invalid environment variable METHOD=$(METHOD) specified)
+endif
+
+# The file extension for object files.
+# foo.C is compiled to foo.$(obj-suffix)
+# We don't use this in the libMesh build system, but old application codes do.
+obj-suffix := @host@.$(METHOD).o
+
+
+# include the proper Make.common depending on the build method
+include @exec_prefix@/lib/@host@_$(METHOD)/pkgconfig/Make.common.$(METHOD)
+
+# append the actual installed library
+libmesh_LIBS += -L@exec_prefix@/lib/@host@_$(METHOD) @RPATHFLAG@@exec_prefix@/lib/@host@_$(METHOD) -lmesh
+###############################################################################
+
+
+
+###############################################################################
+# Build rules
+
+##################################
+# C++ rules                      #
+##################################
+%.$(obj-suffix) : %.C
+	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+
+
+##################################
+# C rules                        #
+##################################
+%.$(obj-suffix) : %.c
+	@echo "Compiling C (in "$(mode)" mode) "$<"..."
+	@$(libmesh_CC) $(libmesh_CPPFLAGS) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+
+
+##################################
+# Fortran rules                  #
+##################################
+%.$(obj-suffix) : %.f
+	@echo "Compiling Fortan (in "$(mode)" mode) "$<"..."
+	@$(libmesh_F77) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+%.$(obj-suffix) : %.f90
+	@echo "Compiling Fortan90 (in "$(mode)" mode) "$<"..."
+	@$(libmesh_F90) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+
+
+
+# Local Variables:
+# mode: makefile
+# End:

@@ -1,0 +1,5 @@
+T=d f ld li gi mf
+V=x
+R=-10,10,1
+F=x+(x*4)
+C=x*5

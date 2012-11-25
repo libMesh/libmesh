@@ -1,0 +1,5 @@
+T=mf
+V=x,y
+R=-4, 4, 0.15
+F=atan2(x,y)
+C=MpfrFloat::atan2(x,y)

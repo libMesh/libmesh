@@ -1,0 +1,5 @@
+T=d ld f mf cd cf cld
+V=x,y
+R=-4,4,0.5
+F=if(x, sin(y), sin(x))
+C=fp_sin(fp_truth(x)!=0 ? y : x)
