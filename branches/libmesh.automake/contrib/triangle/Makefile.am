@@ -1,8 +1,8 @@
-include $(top_builddir)/Make.common.@METHOD@
+#include $(top_builddir)/Make.common
 
-AM_CPPFLAGS  = $(libmesh_CPPFLAGS) -DTRILIBRARY -DANSI_DECLARATORS
-AM_CFLAGS    = $(libmesh_CFLAGS) 
-AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
+AM_CPPFLAGS  = $(CPPFLAGS_OPT) -DTRILIBRARY -DANSI_DECLARATORS
+AM_CFLAGS    = $(CFLAGS_OPT) 
+AM_CXXFLAGS  = $(CXXFLAGS_OPT)
 AM_CPPFLAGS += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
 
 # generally we do not install contributed headers, but for triangle we

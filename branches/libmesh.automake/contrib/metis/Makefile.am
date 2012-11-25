@@ -1,10 +1,10 @@
-include $(top_builddir)/Make.common.@METHOD@
+# include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DLIBMESH_IS_COMPILING_METIS
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
+AM_CPPFLAGS = $(CPPFLAGS_OPT) -DLIBMESH_IS_COMPILING_METIS
+AM_CFLAGS   = $(CFLAGS_OPT)
+AM_CXXFLAGS = $(CXXFLAGS_OPT)
 
 AM_CPPFLAGS += -I$(srcdir)/include  -I$(srcdir)/GKlib -I$(srcdir)/Lib
 AM_CPPFLAGS += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"

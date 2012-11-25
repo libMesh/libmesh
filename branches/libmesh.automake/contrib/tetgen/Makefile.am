@@ -1,8 +1,8 @@
-include $(top_builddir)/Make.common.@METHOD@
+include $(top_builddir)/Make.common
 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DTETLIBRARY -DLIBMESH_IS_COMPILING_TETGEN
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
+AM_CPPFLAGS = $(CPPFLAGS_OPT) -DTETLIBRARY -DLIBMESH_IS_COMPILING_TETGEN
+AM_CFLAGS   = $(CFLAGS_OPT)
+AM_CXXFLAGS = $(CXXFLAGS_OPT)
 
 # generally we do not install contributed headers, but for tetgen we
 # must because it can optionally be included directly by our

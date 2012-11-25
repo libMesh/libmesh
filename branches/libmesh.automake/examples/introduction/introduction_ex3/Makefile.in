@@ -379,14 +379,13 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
+CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
-CFLAGS_METHOD = @CFLAGS_METHOD@
 CFLAGS_OPT = @CFLAGS_OPT@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
-CPPFLAGS_DVL = @CPPFLAGS_DVL@
-CPPFLAGS_METHOD = @CPPFLAGS_METHOD@
+CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
@@ -396,8 +395,8 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
+CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
-CXXFLAGS_METHOD = @CXXFLAGS_METHOD@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
@@ -421,7 +420,6 @@ F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
-FFLAGS_METHOD = @FFLAGS_METHOD@
 FGREP = @FGREP@
 FLIBS = @FLIBS@
 FPARSER_INCLUDE = @FPARSER_INCLUDE@
@@ -459,6 +457,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 METHOD = @METHOD@
+METHODS = @METHODS@
 METIS_INCLUDE = @METIS_INCLUDE@
 METIS_LIB = @METIS_LIB@
 MKDIR_P = @MKDIR_P@
@@ -1172,7 +1171,7 @@ uninstall-am: uninstall-introduction_ex3DATA
 # rules like 'make doc' or 'make run' can be defined here, once and 
 # for all.
 # 
-include $(top_builddir)/Make.common.@METHOD@
+include $(top_builddir)/Make.common
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
@@ -1185,6 +1184,10 @@ $(check_PROGRAMS).php: $(check_PROGRAMS) \
 	$(MAKE) -s run > stdout.log
 	$(AM_V_GEN) PATH=$(abs_top_srcdir)/contrib/bin:$(PATH) \
 	  ex2html.sh $(check_PROGRAMS) $(abs_srcdir)
+
+# Local Variables:
+# mode: makefile
+# End:
 
 ##############################################
 # include common example environment

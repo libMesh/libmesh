@@ -14,6 +14,8 @@
 
 @SET_MAKE@
 
+#include $(top_builddir)/Make.common
+
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -51,8 +53,39 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-subdir = examples
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+@LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@am__append_1 = boost/include
+@LIBMESH_ENABLE_GMV_TRUE@am__append_2 = gmv
+@LIBMESH_ENABLE_GMV_TRUE@am__append_3 = gmv/libgmv.la
+@LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_4 = gzstream
+@LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_5 = gzstream/libgzstream.la
+@LIBMESH_ENABLE_NETCDF_TRUE@am__append_6 = netcdf/Lib
+@LIBMESH_ENABLE_NETCDF_TRUE@am__append_7 = netcdf/Lib/libnetcdf.la
+@LIBMESH_ENABLE_EXODUS_TRUE@am__append_8 = exodusii/Lib
+@LIBMESH_ENABLE_EXODUS_TRUE@am__append_9 = exodusii/Lib/libexodusII.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_10 = nemesis/Lib
+@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_11 = nemesis/Lib/libnemesis.la
+@LIBMESH_ENABLE_TECIO_TRUE@am__append_12 = tecplot/tecio
+@LIBMESH_ENABLE_TECIO_TRUE@am__append_13 = tecplot/tecio/libtecio.la
+@LIBMESH_ENABLE_TECPLOT_TRUE@am__append_14 = @TECPLOT_LIBRARY@
+@LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_15 = triangle
+@LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_16 = triangle/libtriangle.la
+@LIBMESH_ENABLE_TETGEN_TRUE@am__append_17 = tetgen
+@LIBMESH_ENABLE_TETGEN_TRUE@am__append_18 = tetgen/libtetgen.la
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_19 = libHilbert
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_20 = libHilbert/libHilbert.la
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_21 = laspack
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_22 = laspack/liblaspack.la
+@LIBMESH_ENABLE_METIS_TRUE@am__append_23 = metis
+@LIBMESH_ENABLE_METIS_TRUE@am__append_24 = metis/libmetis.la
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_25 = parmetis
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_26 = parmetis/libparmetis.la
+@LIBMESH_ENABLE_SFC_TRUE@am__append_27 = sfcurves
+@LIBMESH_ENABLE_SFC_TRUE@am__append_28 = sfcurves/libsfcurves.la
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_29 = fparser
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_30 = fparser/libfparser.la
+subdir = contrib
+DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/build-aux/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -92,6 +125,20 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+LTLIBRARIES = $(noinst_LTLIBRARIES)
+am__DEPENDENCIES_1 =
+libcontrib_la_DEPENDENCIES = $(am__append_3) $(am__append_5) \
+	$(am__append_7) $(am__append_9) $(am__append_11) \
+	$(am__append_13) $(am__DEPENDENCIES_1) $(am__append_16) \
+	$(am__append_18) $(am__append_20) $(am__append_22) \
+	$(am__append_24) $(am__append_26) $(am__append_28) \
+	$(am__append_30)
+am_libcontrib_la_OBJECTS = cppsource.lo
+libcontrib_la_OBJECTS = $(am_libcontrib_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -104,8 +151,30 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-SOURCES =
-DIST_SOURCES =
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include/libmesh
+depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
+am__depfiles_maybe = depfiles
+am__mv = mv -f
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CXXFLAGS) $(CXXFLAGS)
+AM_V_CXX = $(am__v_CXX_@AM_V@)
+am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
+am__v_CXX_0 = @echo "  CXX     " $@;
+am__v_CXX_1 = 
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
+am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
+am__v_CXXLD_0 = @echo "  CXXLD   " $@;
+am__v_CXXLD_1 = 
+SOURCES = $(libcontrib_la_SOURCES)
+DIST_SOURCES = $(libcontrib_la_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -118,35 +187,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  test -z "$$files" \
-    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-         $(am__cd) "$$dir" && rm -f $$files; }; \
-  }
-am__installdirs = "$(DESTDIR)$(datadir)"
-DATA = $(data_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
@@ -154,7 +194,9 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	distdir
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = $(SUBDIRS)
+DIST_SUBDIRS = boost/include gmv gzstream netcdf/Lib exodusii/Lib \
+	nemesis/Lib tecplot/tecio triangle tetgen libHilbert laspack \
+	metis parmetis sfcurves fparser
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -275,7 +317,7 @@ LDFLAGS = @LDFLAGS@
 LIBHILBERT_INCLUDE = @LIBHILBERT_INCLUDE@
 LIBHILBERT_LIBRARY = @LIBHILBERT_LIBRARY@
 LIBOBJS = @LIBOBJS@
-LIBS = $(libmesh_LIBS)
+LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -384,21 +426,14 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
-
-######################################################################
-#
-# What to do for 'make installcheck'
-bindir = @bindir@/@host@_@METHOD@
+bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
 build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
-
-#
-# anything defined in 'data_DATA' will be installed in 'datadir'
-datadir = $(examples_install_path)
+datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
@@ -443,7 +478,7 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-libdir = @libdir@/@host@_@METHOD@
+libdir = @libdir@
 libexecdir = @libexecdir@
 libmesh_CFLAGS = @libmesh_CFLAGS@
 libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
@@ -477,69 +512,28 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = \
-	introduction/introduction_ex1 \
-	introduction/introduction_ex2 \
-	introduction/introduction_ex3 \
-	introduction/introduction_ex4 \
-	introduction/introduction_ex5 \
-	adaptivity/adaptivity_ex1 \
-	adaptivity/adaptivity_ex2 \
-	adaptivity/adaptivity_ex3 \
-	adaptivity/adaptivity_ex4 \
-	adaptivity/adaptivity_ex5 \
-	adjoints/adjoints_ex1 \
-	adjoints/adjoints_ex2 \
-	adjoints/adjoints_ex3 \
-	adjoints/adjoints_ex4 \
-	eigenproblems/eigenproblems_ex1 \
-	eigenproblems/eigenproblems_ex2 \
-	eigenproblems/eigenproblems_ex3 \
-	fem_system/fem_system_ex1 \
-	miscellaneous/miscellaneous_ex1 \
-	miscellaneous/miscellaneous_ex2 \
-	miscellaneous/miscellaneous_ex3 \
-	miscellaneous/miscellaneous_ex4 \
-	miscellaneous/miscellaneous_ex5 \
-	miscellaneous/miscellaneous_ex6 \
-	miscellaneous/miscellaneous_ex7 \
-	subdomains/subdomains_ex1 \
-	subdomains/subdomains_ex2 \
-	systems_of_equations/systems_of_equations_ex1 \
-	systems_of_equations/systems_of_equations_ex2 \
-	systems_of_equations/systems_of_equations_ex3 \
-	systems_of_equations/systems_of_equations_ex4 \
-	systems_of_equations/systems_of_equations_ex5 \
-	systems_of_equations/systems_of_equations_ex6 \
-	reduced_basis/reduced_basis_ex1 \
-	reduced_basis/reduced_basis_ex2 \
-	reduced_basis/reduced_basis_ex3 \
-	reduced_basis/reduced_basis_ex4 \
-	reduced_basis/reduced_basis_ex5 \
-	reduced_basis/reduced_basis_ex6 \
-	reduced_basis/reduced_basis_ex7 \
-	transient/transient_ex1 \
-	transient/transient_ex2 \
-	vector_fe/vector_fe_ex1 \
-	vector_fe/vector_fe_ex2 \
-	vector_fe/vector_fe_ex3
+AM_CPPFLAGS = $(CPPFLAGS_OPT)
+AM_CFLAGS = $(CFLAGS_OPT)
+AM_CXXFLAGS = $(CXXFLAGS_OPT)
+noinst_LTLIBRARIES = libcontrib.la
 
-AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_INCLUDE) \
-	-I$(top_builddir)/include
-AM_CFLAGS = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-examples_source_path = $(top_srcdir)/examples
-examples_install_path = $(prefix)/examples
-data_DATA = run_common.sh
-
-# include our header checking script when doing 'make dist'
-EXTRA_DIST = $(data_DATA) ../contrib/bin/test_installed_examples.sh \
-	Make.common
-pkgconfigdir = $(libdir)/pkgconfig
+###########################################################
+# add contributed libraries that are conditionally compiled
+libcontrib_la_LIBADD = $(am__append_3) $(am__append_5) $(am__append_7) \
+	$(am__append_9) $(am__append_11) $(am__append_13) \
+	$(am__append_14) $(am__append_16) $(am__append_18) \
+	$(am__append_20) $(am__append_22) $(am__append_24) \
+	$(am__append_26) $(am__append_28) $(am__append_30)
+libcontrib_la_SOURCES = cppsource.C # Dummy C++ source to cause C++ linking.
+SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_4) \
+	$(am__append_6) $(am__append_8) $(am__append_10) \
+	$(am__append_12) $(am__append_15) $(am__append_17) \
+	$(am__append_19) $(am__append_21) $(am__append_23) \
+	$(am__append_25) $(am__append_27) $(am__append_29)
 all: all-recursive
 
 .SUFFIXES:
+.SUFFIXES: .C .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -549,9 +543,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu examples/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu examples/Makefile
+	  $(AUTOMAKE) --gnu contrib/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -571,32 +565,53 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; \
+	locs=`for p in $$list; do echo $$p; done | \
+	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
+	      sort -u`; \
+	test -z "$$locs" || { \
+	  echo rm -f $${locs}; \
+	  rm -f $${locs}; \
+	}
+libcontrib.la: $(libcontrib_la_OBJECTS) $(libcontrib_la_DEPENDENCIES) $(EXTRA_libcontrib_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(CXXLINK)  $(libcontrib_la_OBJECTS) $(libcontrib_la_LIBADD) $(LIBS)
+
+mostlyclean-compile:
+	-rm -f *.$(OBJEXT)
+
+distclean-compile:
+	-rm -f *.tab.c
+
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cppsource.Plo@am__quote@
+
+.C.o:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
+
+.C.obj:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.C.lo:
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-dataDATA: $(data_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(data_DATA)'; test -n "$(datadir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(datadir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(datadir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(datadir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(datadir)" || exit $$?; \
-	done
-
-uninstall-dataDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(data_DATA)'; test -n "$(datadir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(datadir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -781,12 +796,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(DATA)
+all-am: Makefile $(LTLIBRARIES)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(datadir)"; do \
-	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-	done
 install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
@@ -819,11 +831,14 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-recursive
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
+	mostlyclean-am
 
 distclean: distclean-recursive
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-tags
+distclean-am: clean-am distclean-compile distclean-generic \
+	distclean-tags
 
 dvi: dvi-recursive
 
@@ -837,7 +852,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-dataDATA
+install-data-am:
 
 install-dvi: install-dvi-recursive
 
@@ -863,15 +878,17 @@ install-ps: install-ps-recursive
 
 install-ps-am:
 
-installcheck-am: installcheck-local
+installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
+	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-recursive
 
-mostlyclean-am: mostlyclean-generic mostlyclean-libtool
+mostlyclean-am: mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool
 
 pdf: pdf-recursive
 
@@ -881,7 +898,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-dataDATA
+uninstall-am:
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) \
 	cscopelist-recursive ctags-recursive install-am install-strip \
@@ -889,43 +906,19 @@ uninstall-am: uninstall-dataDATA
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am check check-am clean clean-generic clean-libtool \
-	cscopelist cscopelist-recursive ctags ctags-recursive \
-	distclean distclean-generic distclean-libtool distclean-tags \
-	distdir dvi dvi-am html html-am info info-am install \
-	install-am install-data install-data-am install-dataDATA \
-	install-dvi install-dvi-am install-exec install-exec-am \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installcheck-local installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
-	uninstall uninstall-am uninstall-dataDATA
+	clean-noinstLTLIBRARIES cscopelist cscopelist-recursive ctags \
+	ctags-recursive distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-recursive uninstall uninstall-am
 
-
-include $(top_builddir)/Make.common
-
-installcheck-local:
-	@echo " "
-	@echo "Checking for self-sufficient examples..."
-	@echo " "
-	@CXX="$(CXX)" \
-	  examples_install_path=$(examples_install_path) \
-	  PKG_CONFIG=$(PKG_CONFIG) \
-	  PKG_CONFIG_PATH=$(pkgconfigdir) \
-	  LIBMESH_CONFIG_PATH=$(bindir) \
-	  $(top_srcdir)/contrib/bin/test_installed_examples.sh
-
-######################################################################
-#
-# What to do for 'make doc'
-doc:
-	for dir in $(SUBDIRS) ; do \
-	  cd $$dir ; \
-	  make doc ; \
-	  cp *.php $(abs_top_srcdir)/doc/html ; \
-	  cd - ; \
-	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -470,15 +470,15 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
 # Set C++ compiler flags to their default values. They will be 
 # modified according to other options in later steps of
 # configuration
-dnl
+#
 # CXXFLAGS_OPT    : flags for optimized mode
-# CXXFLAGS_DVL    : flags for development mode
+# CXXFLAGS_DEVEL  : flags for development mode
 # CXXFLAGS_DBG    : flags for debug mode
 # PROFILING_FLAGS : flags to enable code profiling
 # ASSEMBLY_FLAGS  : flags to enable assembly language output
-dnl
+#
 # Usage: SET_CXX_FLAGS
-dnl
+#
 # (Note the CXXFLAGS and the CPPFLAGS used for further tests may
 #  be augmented)
 # -------------------------------------------------------------
@@ -489,7 +489,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
   #   *darwin*)
   #     if test "$enableshared" = yes ; then
   #       CXXFLAGS_OPT="-fno-common"
-  #       CXXFLAGS_DVL="-fno-common"
+  #       CXXFLAGS_DEVEL="-fno-common"
   #       CXXFLAGS_DBG="-fno-common"
   #       LDFLAGS="$LDFLAGS -Wl,-undefined,dynamic_lookup,-flat_namespace"
   #       if test $APPLE_GCC = true ; then
@@ -531,23 +531,23 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
   # First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
-    CXXFLAGS_DVL="$CXXFLAGS_DVL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized"
+    CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized"
     CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses"
     NODEPRECATEDFLAG="-Wno-deprecated"
 
     CFLAGS_OPT="-O2"
-    CFLAGS_DVL="$CFLAGS_OPT -g -Wimplicit"
+    CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit"
     CFLAGS_DBG="-g -Wimplicit"
     ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
 
     # # Position-independent code for shared libraries
     # if test "$enableshared" = yes ; then
     #   CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
-    #   CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
+    #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -fPIC"
     #   CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
 
     #   CFLAGS_OPT="$CFLAGS_OPT -fPIC"
-    #   CFLAGS_DVL="$CFLAGS_DVL -fPIC"
+    #   CFLAGS_DEVEL="$CFLAGS_DEVEL -fPIC"
     #   CFLAGS_DBG="$CFLAGS_DBG -fPIC"
 
     #   FFLAGS="$FFLAGS -fPIC"
@@ -567,10 +567,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       # All other gcc versions
       *)
           CXXFLAGS_OPT="$CXXFLAGS_OPT -funroll-loops -fstrict-aliasing"
-          CXXFLAGS_DVL="$CXXFLAGS_DVL -funroll-loops -fstrict-aliasing"
+          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -funroll-loops -fstrict-aliasing"
 
           CFLAGS_OPT="$CFLAGS_OPT -funroll-loops -fstrict-aliasing"
-          CFLAGS_DVL="$CFLAGS_DVL -funroll-loops -fstrict-aliasing"
+          CFLAGS_DEVEL="$CFLAGS_DEVEL -funroll-loops -fstrict-aliasing"
           ;;
     esac
   
@@ -590,7 +590,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       #        when dealing with C APIs that take void* pointers.
       gcc4.4 | gcc4.5 | gcc4.6)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
-         CXXFLAGS_DVL="$CXXFLAGS_DVL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
+         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 
          if test `uname` = "Darwin" ; then
            CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
@@ -601,7 +601,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 
       gcc3.* | gcc4.*)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
-         CXXFLAGS_DVL="$CXXFLAGS_DVL -Woverloaded-virtual -Wdisabled-optimization"
+         CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
          
          if test `uname` = "Darwin" ; then
 	   CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
@@ -636,11 +636,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       ibm_xlc)
           CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
           CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
           CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
           CFLAGS_DBG="-qansialias -g"
-          CFLAGS_DVL="$CFLAGS_DBG"
+          CFLAGS_DEVEL="$CFLAGS_DBG"
 	  # CXXSHAREDFLAG="-G -qmkshrobj -bnoerrmsg"
 	  # CSHAREDFLAG="-G -qmkshrobj"
 	  # RPATHFLAG="-Qoption,link,-rpath,"
@@ -649,11 +649,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       MIPSpro)
           CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -O2 -w"
           CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -g -woff 1460"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
           CFLAGS_OPT="-O2 -w"
           CFLAGS_DBG="-g"
-          CFLAGS_DVL="$CFLAGS_DBG"
+          CFLAGS_DEVEL="$CFLAGS_DBG"
 
           # For some reason, CC forgets to add the math lib to the
           # linker line, so we do that ourselves
@@ -663,11 +663,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           # if test "$enableshared" = yes ; then
           #   CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
           #   CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-          #   CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
+          #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -KPIC"
 
           #   CFLAGS_OPT="$CFLAGS_OPT -KPIC"
           #   CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-          #   CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+          #   CFLAGS_DEVEL="$CFLAGS_DEVEL -KPIC"
 
           #   FFLAGS="$FFLAGS -KPIC"
 
@@ -718,10 +718,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz"
-              CXXFLAGS_DVL="$CXXFLAGS_DVL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572"
               CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz"
-              CFLAGS_DVL="$CFLAGS_DBG"
+              CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
           intel_icc_v10.1)
               # Disable some warning messages:
@@ -741,10 +741,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CXXFLAGS_DVL="$CXXFLAGS_DVL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
+              CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -w1 -g -wd175 -wd1476 -wd1505 -wd1572"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -g -wd266 -wd1572"
               CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CFLAGS_DVL="$CFLAGS_DBG"
+              CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
 	      
           # Intel ICC >= 10.0	          
@@ -768,10 +768,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               PROFILING_FLAGS="-p"
               CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -g -inline_debug_info -wd266 -wd1572"
               CFLAGS_OPT="$CFLAGS_OPT -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CFLAGS_DVL="$CFLAGS_DBG"
+              CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
           
           # Intel ICC >= 8.1	
@@ -794,10 +794,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 
               CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -O1 -w1 -g -wd504 -wd1572"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -g -inline_debug_info -wd266 -wd1572"
               CFLAGS_OPT="$CFLAGS_OPT -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CFLAGS_DVL="$CFLAGS_DBG"
+              CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
           
           # Intel ICC < v8.1
@@ -807,11 +807,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               #       Metis function "GKfree" caused this error
               #       in almost every file.
               CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CXXFLAGS_DVL="-Kc++eh -Krtti -O1 -w1 -inline_debug_info -g -wd504"
+              CXXFLAGS_DEVEL="-Kc++eh -Krtti -O1 -w1 -inline_debug_info -g -wd504"
               CXXFLAGS_DBG="-Kc++eh -Krtti -O0 -w1 -inline_debug_info -g -wd504"
               CFLAGS_DBG="-w1 -inline_debug_info -wd266"
               CFLAGS_OPT="-O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
-              CFLAGS_DVL="$CFLAGS_DBG"
+              CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
           
           # Intel Itanium ICC >= v10.1
@@ -829,10 +829,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               #        was from an assignment.
               CXXFLAGS_DBG="$CXXFLAGS_DBG -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -inline_debug_info -g -wd266 -wd1572"
               CFLAGS_OPT="$CFLAGS_OPT -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CFLAGS_DVL="$CFLAGS_DBG"
+              CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
           
           intel_itanium_icc_v8.1 | intel_itanium_icc_v9.0 | intel_itanium_icc_v9.1 | intel_itanium_icc_v10.0)
@@ -849,10 +849,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               #        was from an assignment.
               CXXFLAGS_DBG="$CXXFLAGS_DBG -Kc++eh -Krtti -w1 -inline_debug_info -g -wd1476 -wd1505 -wd1572"
               CXXFLAGS_OPT="$CXXFLAGS_OPT -Kc++eh -Krtti -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
               CFLAGS_DBG="$CFLAGS_DBG -w1 -inline_debug_info -g -wd266 -wd1572"
               CFLAGS_OPT="$CFLAGS_OPT -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
-              CFLAGS_DVL="$CFLAGS_DBG"
+              CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
           
           # Intel Itanium ICC < v8.1
@@ -863,10 +863,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               #       in almost every file.
               CXXFLAGS_DBG="-Kc++eh -Krtti -w1 -inline_debug_info -g"
               CXXFLAGS_OPT="-Kc++eh -Krtti -O2 -unroll -w0 -ftz"
-              CXXFLAGS_DVL="$CXXFLAGS_DBG"
+              CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
               CFLAGS_DBG="-w1 -inline_debug_info -g -wd266"
               CFLAGS_OPT="-O2 -unroll -w0 -ftz"
-              CFLAGS_DVL="$CFLAGS_DBG"
+              CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
 
           *)
@@ -884,11 +884,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
         #     intel_*_v1?.*)
         #       CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
         #       CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
-        #       CXXFLAGS_DVL="$CXXFLAGS_DVL -fPIC"
+        #       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -fPIC"
         
         #       CFLAGS_OPT="$CFLAGS_OPT -fPIC"
         #       CFLAGS_DBG="$CFLAGS_DBG -fPIC"
-        #       CFLAGS_DVL="$CFLAGS_DVL -fPIC"
+        #       CFLAGS_DEVEL="$CFLAGS_DEVEL -fPIC"
 
         #       FFLAGS="$FFLAGS -fPIC"
 
@@ -897,11 +897,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 	#     *)
         #       CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
         #       CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-        #       CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
+        #       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -KPIC"
         
         #       CFLAGS_OPT="$CFLAGS_OPT -KPIC"
         #       CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-        #       CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+        #       CFLAGS_DEVEL="$CFLAGS_DEVEL -KPIC"
 
 	#       FFLAGS="$FFLAGS -KPIC"
 
@@ -949,17 +949,17 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
   
           CXXFLAGS_DBG="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local"
           CXXFLAGS_OPT="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -O2 -fast"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           CFLAGS_DBG="-w1 -msg_display_number -timplicit_local"
           CFLAGS_OPT="-w2 -msg_display_number -timplicit_local -O2 -fast"
-  	  CFLAGS_DVL="$CFLAGS_DBG"
+  	  CFLAGS_DEVEL="$CFLAGS_DBG"
         
           NODEPRECATEDFLAG=""
 
           for i in 175 236 237 487 1136 1156 111 1182 265 ; do
             CXXFLAGS_DBG="$CXXFLAGS_DBG -msg_disable $i"
             CXXFLAGS_OPT="$CXXFLAGS_OPT -msg_disable $i"
-            CXXFLAGS_DVL="$CXXFLAGS_DVL -msg_disable $i"
+            CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -msg_disable $i"
           done
   
           # If we use -model ansi to compile the files, we also have to
@@ -975,11 +975,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           # if test "$enableshared" = yes ; then
           #   CXXFLAGS_OPT="$CXXFLAGS_OPT -shared"
           #   CXXFLAGS_DBG="$CXXFLAGS_DBG -shared"
-          #   CXXFLAGS_DVL="$CXXFLAGS_DVL -shared"
+          #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -shared"
 
           #   CFLAGS_OPT="$CFLAGS_OPT -shared"
           #   CFLAGS_DBG="$CFLAGS_DBG -shared"
-          #   CFLAGS_DVL="$CFLAGS_DVL -shared"
+          #   CFLAGS_DEVEL="$CFLAGS_DEVEL -shared"
 
           #   LDFLAGS="$LDFLAGS -shared"
           # fi
@@ -988,11 +988,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       sun_studio | sun_forte)
           CXXFLAGS_DBG="-library=stlport4 -g"
           CXXFLAGS_OPT="-library=stlport4 -fast -xO4"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
           CFLAGS_DBG="-g"
           CFLAGS_OPT="-xO4"
-          CFLAGS_DVL="$CFLAGS_DBG"
+          CFLAGS_DEVEL="$CFLAGS_DBG"
 
           # CXXSHAREDFLAG="-G"
           # CSHAREDFLAG="-G"
@@ -1005,11 +1005,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           # if test "$enableshared" = yes ; then
           #   CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
           #   CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-          #   CXXFLAGS_DVL="$CXXFLAGS_DVL -KPIC"
+          #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -KPIC"
 
           #   CFLAGS_OPT="$CFLAGS_OPT -KPIC"
           #   CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-          #   CFLAGS_DVL="$CFLAGS_DVL -KPIC"
+          #   CFLAGS_DEVEL="$CFLAGS_DEVEL -KPIC"
 
 	  #   FFLAGS="$FFLAGS -KPIC"
 
@@ -1020,14 +1020,14 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       portland_group)
 	  CXXFLAGS_DBG="-g --no_using_std"
           CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
 
           # PG C++ definitely doesn't understand -Wno-deprecated...
           NODEPRECATEDFLAG=""
 
 	  CFLAGS_DBG="-g"
           CFLAGS_OPT="-O2"
-          CFLAGS_DVL="$CFLAGS_DBG"
+          CFLAGS_DEVEL="$CFLAGS_DBG"
 
           # Disable exception handling if we don't use it
           if test "$enableexceptions" = no ; then
@@ -1039,11 +1039,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           # if test "$enableshared" = yes ; then
           #   CXXFLAGS_OPT="$CXXFLAGS_OPT -fpic"
           #   CXXFLAGS_DBG="$CXXFLAGS_DBG -fpic"
-          #   CXXFLAGS_DVL="$CXXFLAGS_DVL -fpic"
+          #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -fpic"
           
           #   CFLAGS_OPT="$CFLAGS_OPT -fpic"
           #   CFLAGS_DBG="$CFLAGS_DBG -fpic"
-          #   CFLAGS_DVL="$CFLAGS_DVL -fpic"
+          #   CFLAGS_DEVEL="$CFLAGS_DEVEL -fpic"
           
           #   LDFLAGS="$LDFLAGS -fpic"
           # fi
@@ -1051,10 +1051,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 	  # if test $target_cpu = "x86_64" ; then
 	  #   CXXFLAGS_DBG="$CXXFLAGS_DBG -tp amd64"
 	  #   CXXFLAGS_OPT="$CXXFLAGS_OPT -tp amd64"
-	  #   CXXFLAGS_DVL="$CXXFLAGS_DVL -tp amd64"
+	  #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -tp amd64"
 	  #   CFLAGS_DBG="$CFLAGS_DBG -tp amd64"
 	  #   CFLAGS_OPT="$CFLAGS_OPT -tp amd64"
-	  #   CFLAGS_DVL="$CFLAGS_DVL -tp amd64"
+	  #   CFLAGS_DEVEL="$CFLAGS_DEVEL -tp amd64"
           # fi
           ;;
 
@@ -1074,11 +1074,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           #  -Ae turns on ANSI C with some HP extensions
           CXXFLAGS_DBG="+DA2.0W -AA +z -ext -g"
           CXXFLAGS_OPT="+DA2.0W -AA +z -ext -O +Onolimit"
-	  CXXFLAGS_DVL="$CXXFLAGS_DBG"
+	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           NODEPRECATEDFLAG=""
 	  CFLAGS_DBG="+DA2.0W -Aa +z -Ae -g"
           CFLAGS_OPT="+DA2.0W -Aa +z -Ae -O +Onolimit"
-          CFLAGS_DVL="$CFLAGS_DBG"
+          CFLAGS_DEVEL="$CFLAGS_DBG"
           LDFLAGS="$LDFLAGS -I/usr/lib/pa20_64"
           LIBS="$LIBS -lrpcsvc"
           FLIBS="$FLIBS -lF90 -lcl -I/opt/fortran90/lib/pa20_64"
@@ -1087,11 +1087,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       cray_cc)
 	  CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
  	  CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
- 	  CXXFLAGS_DVL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+ 	  CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
           NODEPRECATEDFLAG=""
 	  CFLAGS_DBG="-G n"
 	  CFLAGS_OPT="-G n"
-	  CFLAGS_DVL="-G n"
+	  CFLAGS_DEVEL="-G n"
 
 	  # CXXSHAREDFLAG=""
 	  # CSHAREDFLAG=""
@@ -1100,12 +1100,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 
       clang)
           CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
-	  CXXFLAGS_DVL="$CXXFLAGS_DVL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized"
+	  CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -O2 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized"
 	  CXXFLAGS_DBG="$CXXFLAGS_DBG -O0 -felide-constructors -g -ansi -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses"
 	  NODEPRECATEDFLAG="-Wno-deprecated"
 
 	  CFLAGS_OPT="-O2"
-	  CFLAGS_DVL="$CFLAGS_OPT -g -Wimplicit"
+	  CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit"
 	  CFLAGS_DBG="-g -Wimplicit"
 	  ;;
 
@@ -1113,12 +1113,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           AC_MSG_RESULT(No specific options for this C++ compiler known)
 	  CXXFLAGS_DBG="$CXXFLAGS"
 	  CXXFLAGS_OPT="$CXXFLAGS"
-	  CXXFLAGS_DVL="$CXXFLAGS"
+	  CXXFLAGS_DEVEL="$CXXFLAGS"
           NODEPRECATEDFLAG=""
 
 	  CFLAGS_DBG="$CFLAGS"
 	  CFLAGS_OPT="$CFLAGS"
-	  CFLAGS_DVL="$CFLAGS"
+	  CFLAGS_DEVEL="$CFLAGS"
 	  ;;
     esac
   fi

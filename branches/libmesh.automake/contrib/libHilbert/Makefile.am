@@ -1,8 +1,8 @@
-include $(top_builddir)/Make.common.@METHOD@
+# include $(top_builddir)/Make.common
 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS)
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
+AM_CPPFLAGS = $(CPPFLAGS_OPT)
+AM_CFLAGS   = $(CFLAGS_OPT)
+AM_CXXFLAGS = $(CXXFLAGS_OPT)
 
 AUTOMAKE_OPTIONS = subdir-objects 
 

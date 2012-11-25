@@ -26,10 +26,26 @@ echo C++ compiler type.................. : $GXX_VERSION
 echo C++ compiler....................... : $CXX
 echo C compiler......................... : $CC
 echo Fortran compiler................... : $FC
-echo Build Method....................... : $METHOD
-echo CPPFLAGS........................... : $CPPFLAGS_METHOD
-echo CXXFLAGS........................... : $CXXFLAGS_METHOD
-echo CFLAGS............................. : $CFLAGS_METHOD
+echo Build Methods...................... : $METHODS
+for method in ${METHODS}; do
+     case "${method}" in
+         opt)   
+echo CPPFLAGS...\(opt\)................... : $CPPFLAGS_OPT
+echo CXXFLAGS...\(opt\)................... : $CXXFLAGS_OPT
+echo CFLAGS.....\(opt\)................... : $CFLAGS_OPT
+     ;;					 
+         devel)   
+echo CPPFLAGS...\(devel\)................. : $CPPFLAGS_DEVEL
+echo CXXFLAGS...\(devel\)................. : $CXXFLAGS_DEVEL
+echo CFLAGS.....\(devel\)................. : $CFLAGS_DEVEL
+     ;;					 
+         dbg)   
+echo CPPFLAGS...\(dbg\)................... : $CPPFLAGS_DBG
+echo CXXFLAGS...\(dbg\)................... : $CXXFLAGS_DBG
+echo CFLAGS.....\(dbg\)................... : $CFLAGS_DBG
+     ;;					 
+     esac
+done
 echo Install dir........................ : $prefix 
 echo Build user......................... : $USER
 echo Build host......................... : $BUILD_HOST

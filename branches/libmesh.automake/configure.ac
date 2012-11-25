@@ -37,6 +37,7 @@ AC_CONFIG_FILES([Makefile
 		 include/Makefile
 		 include/libmesh/Makefile
                  include/libmesh/libmesh_version.h
+		 contrib/Makefile
 	         contrib/utils/Make.common
 		 tests/Makefile
 		 doc/Doxyfile
@@ -119,7 +120,7 @@ LIBMESH_SET_COMPILERS
 # flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
 # --------------------------------------------------------------
 LIBMESH_SET_CXX_FLAGS
-LIBMESH_SET_METHOD
+LIBMESH_SET_METHODS
 
 LT_INIT([disable-static])
 

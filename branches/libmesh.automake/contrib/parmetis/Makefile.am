@@ -1,10 +1,10 @@
-include $(top_builddir)/Make.common.@METHOD@
+include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DLIBMESH_IS_COMPILING_PARMETIS
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
+AM_CPPFLAGS = $(CPPFLAGS_OPT) -DLIBMESH_IS_COMPILING_PARMETIS
+AM_CFLAGS   = $(CFLAGS_OPT)
+AM_CXXFLAGS = $(CXXFLAGS_OPT)
 
 # include paths - note that parmetis needs metis!
 AM_CPPFLAGS += -I$(top_srcdir)/contrib/metis/GKlib \

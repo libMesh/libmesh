@@ -14,6 +14,8 @@
 
 @SET_MAKE@
 
+# include $(top_builddir)/Make.common
+
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -190,14 +192,13 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
+CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
-CFLAGS_METHOD = @CFLAGS_METHOD@
 CFLAGS_OPT = @CFLAGS_OPT@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
-CPPFLAGS_DVL = @CPPFLAGS_DVL@
-CPPFLAGS_METHOD = @CPPFLAGS_METHOD@
+CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
@@ -207,8 +208,8 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
+CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
-CXXFLAGS_METHOD = @CXXFLAGS_METHOD@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
@@ -232,7 +233,6 @@ F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
-FFLAGS_METHOD = @FFLAGS_METHOD@
 FGREP = @FGREP@
 FLIBS = @FLIBS@
 FPARSER_INCLUDE = @FPARSER_INCLUDE@
@@ -270,6 +270,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 METHOD = @METHOD@
+METHODS = @METHODS@
 METIS_INCLUDE = @METIS_INCLUDE@
 METIS_LIB = @METIS_LIB@
 MKDIR_P = @MKDIR_P@
@@ -455,10 +456,10 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) -I$(top_builddir)/include #for \
-	#include "libmesh/libmesh_config.h"
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-AM_CFLAGS = $(libmesh_CFLAGS)
+AM_CPPFLAGS = $(CPPFLAGS_OPT) -I$(top_builddir)/include #for #include \
+	"libmesh/libmesh_config.h"
+AM_CXXFLAGS = $(CXXFLAGS_OPT)
+AM_CFLAGS = $(CFLAGS_OPT)
 noinst_LTLIBRARIES = liblaspack.la
 liblaspack_la_SOURCES = \
 	copyrght.h \
@@ -799,7 +800,6 @@ uninstall-am:
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am
 
-include $(top_builddir)/Make.common.@METHOD@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

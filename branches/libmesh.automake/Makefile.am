@@ -1,16 +1,21 @@
-include $(top_builddir)/Make.common.@METHOD@
+include $(top_builddir)/Make.common
 
-bindir=@bindir@/@host@_@METHOD@
-libdir=@libdir@/@host@_@METHOD@
+#bindir=@bindir@/@host@_@METHOD@
+#libdir=@libdir@/@host@_@METHOD@
 
 SUBDIRS = include #src
 
 AUTOMAKE_OPTIONS = foreign subdir-objects 
 ACLOCAL_AMFLAGS  = -I m4
-AM_CPPFLAGS      = $(libmesh_CPPFLAGS) -DLIBMESH_IS_COMPILING_ITSELF
+AM_CPPFLAGS      = $(libmesh_CPPFLAGS) 
 AM_CFLAGS        = $(libmesh_CFLAGS)
-AM_CXXFLAGS      = $(libmesh_CXXFLAGS)
-AM_CPPFLAGS     += $(libmesh_contrib_INCLUDES) \
+
+# common_cppflags are method-independent cppflags that 
+# we use when compiling libmesh proper, or its utility
+# codes.  These will be augmented with method-specific
+# cppflags later on
+common_cppflags  = -DLIBMESH_IS_COMPILING_ITSELF \
+		   $(libmesh_contrib_INCLUDES) \
                    $(libmesh_INCLUDE) \
                    -I$(top_builddir)/include # required for libmesh_version.h
 
@@ -51,7 +56,7 @@ AUX_DIST = build-aux/install-sh \
 
 # Support for pkgconfig
 pkgconfigdir     = $(libdir)/pkgconfig
-pkgconfig_DATA   = Make.common.@METHOD@ contrib/utils/libmesh.pc
+pkgconfig_DATA   = Make.common contrib/utils/libmesh.pc
 configdir        = $(sysconfdir)/libmesh
 config_DATA      = contrib/utils/Make.common contrib/utils/libmesh.pc
 
@@ -94,119 +99,42 @@ DISTCLEANFILES =  \
 
 
 
+SUBDIRS += contrib
 
+include src/libmesh_SOURCES
 
 # A convenience library to hold proper libMesh 
 # objects.  This will get appended with any contributed 
 # sources to create the final library.
-lib_LTLIBRARIES = libmesh.la
+nobase_lib_LTLIBRARIES = 
 
-libmesh_la_LIBADD = # start empty, append below
-
-# definition of libmesh_la_SOURCES - get from auto-maintained list
-include src/libmesh_la_SOURCES
-
-
-# ###########################################################
-# # building up libmesh.la - actually delegate the compilation
-# # of the libMesh sources to our ./src subdirectoty.
-# #
-# # see file:///Users/benkirk/Desktop/automake.html#Libtool-Convenience-Libraries 
-# #     file:///Users/benkirk/Desktop/automake.html#How-the-Linker-is-Chosen
-# # without sources we may be using the c linker?
-# lib_LTLIBRARIES    = libmesh.la              # !!! the final library that we will install
-# libmesh_la_SOURCES =                         # !!! no local sources for this library             
-# libmesh_la_LIBADD  = src/libmesh_local.la    # !!! but import from our sources
-# libmesh_la_LINK    = $(CXXLINK)              # manually specify the linker because there are no 
-#                                              # listed sources to infer it from
-
-# # This rule will be run after install
-# install-exec-hook:
-# 	cd $(DESTDIR)$(bindir) && \
-#  	  $(MKDIR_P) $(hosttype)_$(METHOD) && \
-# 	  mv -f meshtool $(hosttype)_$(METHOD) && \
-# 	  $(LN_S) $(hosttype)_$(METHOD)/meshtool meshtool
-
-###########################################################
-# add contributed libraries that are conditionally compiled
-
-if LIBMESH_INSTALL_INTERNAL_BOOST
-   SUBDIRS += contrib/boost/include
+if LIBMESH_DBG_MODE
+  nobase_lib_LTLIBRARIES += dbg/libmesh.la
+  dbg_libmesh_la_SOURCES  = $(libmesh_SOURCES)
+  dbg_libmesh_la_CPPFLAGS = $(CPPFLAGS_DBG) $(common_cppflags) 
+  dbg_libmesh_la_CXXFLAGS = $(CXXFLAGS_DBG)
+  dbg_libmesh_la_CFLAGS   = $(CFLAGS_DBG)
+  dbg_libmesh_la_LIBADD   = contrib/libcontrib.la
 endif
 
-if LIBMESH_ENABLE_GMV
-  SUBDIRS += contrib/gmv
-  libmesh_la_LIBADD += contrib/gmv/libgmv.la
+if LIBMESH_DEVEL_MODE
+  nobase_lib_LTLIBRARIES   += devel/libmesh.la
+  devel_libmesh_la_SOURCES  = $(libmesh_SOURCES)
+  devel_libmesh_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags) 
+  devel_libmesh_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
+  devel_libmesh_la_CFLAGS   = $(CFLAGS_DEVEL)
+  devel_libmesh_la_LIBADD   = contrib/libcontrib.la
 endif
 
-if LIBMESH_ENABLE_GZSTREAMS
-  SUBDIRS += contrib/gzstream
-  libmesh_la_LIBADD += contrib/gzstream/libgzstream.la
+if LIBMESH_OPT_MODE
+  nobase_lib_LTLIBRARIES += opt/libmesh.la
+  opt_libmesh_la_SOURCES  = $(libmesh_SOURCES)
+  opt_libmesh_la_CPPFLAGS = $(CPPFLAGS_OPT) $(common_cppflags) 
+  opt_libmesh_la_CXXFLAGS = $(CXXFLAGS_OPT)
+  opt_libmesh_la_CFLAGS   = $(CFLAGS_OPT)
+  opt_libmesh_la_LIBADD   = contrib/libcontrib.la
 endif
 
-if LIBMESH_ENABLE_NETCDF
-  SUBDIRS += contrib/netcdf/Lib
-  libmesh_la_LIBADD += contrib/netcdf/Lib/libnetcdf.la
-endif
-
-if LIBMESH_ENABLE_EXODUS
-  SUBDIRS += contrib/exodusii/Lib
-  libmesh_la_LIBADD += contrib/exodusii/Lib/libexodusII.la
-endif
-
-if LIBMESH_ENABLE_NEMESIS
-  SUBDIRS += contrib/nemesis/Lib
-  libmesh_la_LIBADD += contrib/nemesis/Lib/libnemesis.la
-endif
-
-if LIBMESH_ENABLE_TECIO
-  SUBDIRS += contrib/tecplot/tecio
-  libmesh_la_LIBADD += contrib/tecplot/tecio/libtecio.la
-endif
-
-if LIBMESH_ENABLE_TECPLOT
-  libmesh_la_LIBADD += @TECPLOT_LIBRARY@
-endif
-
-if LIBMESH_ENABLE_TRIANGLE
-  SUBDIRS += contrib/triangle
-  libmesh_la_LIBADD += contrib/triangle/libtriangle.la
-endif
-
-if LIBMESH_ENABLE_TETGEN
-  SUBDIRS += contrib/tetgen
-  libmesh_la_LIBADD += contrib/tetgen/libtetgen.la
-endif
-
-if LIBMESH_ENABLE_LIBHILBERT
-  SUBDIRS += contrib/libHilbert
-  libmesh_la_LIBADD += contrib/libHilbert/libHilbert.la
-endif
-
-if LIBMESH_ENABLE_LASPACK
-  SUBDIRS += contrib/laspack
-  libmesh_la_LIBADD += contrib/laspack/liblaspack.la
-endif
-
-if LIBMESH_ENABLE_METIS
-  SUBDIRS += contrib/metis
-  libmesh_la_LIBADD += contrib/metis/libmetis.la
-endif
-
-if LIBMESH_ENABLE_PARMETIS
-  SUBDIRS += contrib/parmetis
-  libmesh_la_LIBADD += contrib/parmetis/libparmetis.la
-endif
-
-if LIBMESH_ENABLE_SFC
-  SUBDIRS += contrib/sfcurves
-  libmesh_la_LIBADD += contrib/sfcurves/libsfcurves.la
-endif
-
-if LIBMESH_ENABLE_FPARSER
-  SUBDIRS += contrib/fparser
-  libmesh_la_LIBADD += contrib/fparser/libfparser.la
-endif
 
 if LIBMESH_ENABLE_CPPUNIT
   SUBDIRS += tests
@@ -214,52 +142,200 @@ endif
 ###########################################################
 
 
-
-###########################################################
-# Utility programs
 bin_PROGRAMS = # empty, append below
 bin_SCRIPTS  = # empty, append below
 CLEANFILES   = # empty, append below
 
-bin_PROGRAMS     += meshtool
-meshtool_SOURCES  = src/apps/meshtool.C
-meshtool_LDADD    = libmesh.la
+###########################################################
+# Utility programs
+opt_programs   = # empty, append below
+devel_programs = # empty, append below
+dbg_programs   = # empty, append below
 
-bin_PROGRAMS    += compare
-compare_SOURCES  = src/apps/compare.C
-compare_LDADD    = libmesh.la
+# meshtool
+opt_programs           += opt/meshtool
+opt_meshtool_SOURCES    = src/apps/meshtool.C
+opt_meshtool_CPPFLAGS   = $(CPPFLAGS_OPT) $(common_cppflags)
+opt_meshtool_CXXFLAGS   = $(CPPFLAGS_OPT)
+opt_meshtool_LDADD      = opt/libmesh.la
 
-bin_PROGRAMS     += meshbcid
-meshbcid_SOURCES  = src/apps/meshbcid.C
-meshbcid_LDADD    = libmesh.la
+devel_programs         += devel/meshtool-devel
+devel_meshtool_devel_SOURCES  = src/apps/meshtool.C
+devel_meshtool_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+devel_meshtool_devel_CXXFLAGS = $(CPPFLAGS_DEVEL)
+devel_meshtool_devel_LDADD    = devel/libmesh.la
 
-bin_PROGRAMS   += meshid
-meshid_SOURCES  = src/apps/meshid.C
-meshid_LDADD    = libmesh.la
+dbg_programs           += dbg/meshtool-dbg
+dbg_meshtool_dbg_SOURCES    = src/apps/meshtool.C
+dbg_meshtool_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(common_cppflags)
+dbg_meshtool_dbg_CXXFLAGS   = $(CPPFLAGS_DBG)
+dbg_meshtool_dbg_LDADD      = dbg/libmesh.la
 
-bin_PROGRAMS     += meshnorm
-meshnorm_SOURCES  = src/apps/meshnorm.C
-meshnorm_LDADD    = libmesh.la
+# compare
+opt_programs          += opt/compare
+opt_compare_SOURCES    = src/apps/compare.C
+opt_compare_CPPFLAGS   = $(CPPFLAGS_OPT) $(common_cppflags)
+opt_compare_CXXFLAGS   = $(CPPFLAGS_OPT)
+opt_compare_LDADD      = opt/libmesh.la
 
-bin_PROGRAMS       += projection
-projection_SOURCES  = src/apps/projection.C
-projection_LDADD    = libmesh.la
+devel_programs        += devel/compare-devel
+devel_compare_devel_SOURCES  = src/apps/compare.C
+devel_compare_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+devel_compare_devel_CXXFLAGS = $(CPPFLAGS_DEVEL)
+devel_compare_devel_LDADD    = devel/libmesh.la
 
-bin_PROGRAMS += amr
-amr_SOURCES   = src/apps/amr.C
-amr_LDADD     = libmesh.la
+dbg_programs          += dbg/compare-dbg
+dbg_compare_dbg_SOURCES    = src/apps/compare.C
+dbg_compare_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(common_cppflags)
+dbg_compare_dbg_CXXFLAGS   = $(CPPFLAGS_DBG)
+dbg_compare_dbg_LDADD      = dbg/libmesh.la
 
-bin_PROGRAMS                  += output_libmesh_version
-output_libmesh_version_SOURCES = src/apps/output_libmesh_version.C
-output_libmesh_version_LDADD   = libmesh.la
+# meshbcid
+opt_programs           += opt/meshbcid
+opt_meshbcid_SOURCES    = src/apps/meshbcid.C
+opt_meshbcid_CPPFLAGS   = $(CPPFLAGS_OPT) $(common_cppflags)
+opt_meshbcid_CXXFLAGS   = $(CPPFLAGS_OPT)
+opt_meshbcid_LDADD      = opt/libmesh.la
 
-bin_PROGRAMS     += meshplot
-meshplot_SOURCES  = src/apps/meshplot.C
-meshplot_LDADD    = libmesh.la
+devel_programs         += devel/meshbcid-devel
+devel_meshbcid_devel_SOURCES  = src/apps/meshbcid.C
+devel_meshbcid_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+devel_meshbcid_devel_CXXFLAGS = $(CPPFLAGS_DEVEL)
+devel_meshbcid_devel_LDADD    = devel/libmesh.la
 
-bin_PROGRAMS               += solution_components
-solution_components_SOURCES = src/apps/solution_components.C
-solution_components_LDADD   = libmesh.la
+dbg_programs           += dbg/meshbcid-dbg
+dbg_meshbcid_dbg_SOURCES    = src/apps/meshbcid.C
+dbg_meshbcid_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(common_cppflags)
+dbg_meshbcid_dbg_CXXFLAGS   = $(CPPFLAGS_DBG)
+dbg_meshbcid_dbg_LDADD      = dbg/libmesh.la
+
+# meshid
+opt_programs         += opt/meshid
+opt_meshid_SOURCES    = src/apps/meshid.C
+opt_meshid_CPPFLAGS   = $(CPPFLAGS_OPT) $(common_cppflags)
+opt_meshid_CXXFLAGS   = $(CPPFLAGS_OPT)
+opt_meshid_LDADD      = opt/libmesh.la
+
+devel_programs        += devel/meshid-devel
+devel_meshid_devel_SOURCES  = src/apps/meshid.C
+devel_meshid_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+devel_meshid_devel_CXXFLAGS = $(CPPFLAGS_DEVEL)
+devel_meshid_devel_LDADD    = devel/libmesh.la
+
+dbg_programs         += dbg/meshid-dbg
+dbg_meshid_dbg_SOURCES    = src/apps/meshid.C
+dbg_meshid_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(common_cppflags)
+dbg_meshid_dbg_CXXFLAGS   = $(CPPFLAGS_DBG)
+dbg_meshid_dbg_LDADD      = dbg/libmesh.la
+
+# meshnorm
+opt_programs           += opt/meshnorm
+opt_meshnorm_SOURCES    = src/apps/meshnorm.C
+opt_meshnorm_CPPFLAGS   = $(CPPFLAGS_OPT) $(common_cppflags)
+opt_meshnorm_CXXFLAGS   = $(CPPFLAGS_OPT)
+opt_meshnorm_LDADD      = opt/libmesh.la
+
+devel_programs         += devel/meshnorm-devel
+devel_meshnorm_devel_SOURCES  = src/apps/meshnorm.C
+devel_meshnorm_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+devel_meshnorm_devel_CXXFLAGS = $(CPPFLAGS_DEVEL)
+devel_meshnorm_devel_LDADD    = devel/libmesh.la
+
+dbg_programs           += dbg/meshnorm-dbg
+dbg_meshnorm_dbg_SOURCES    = src/apps/meshnorm.C
+dbg_meshnorm_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(common_cppflags)
+dbg_meshnorm_dbg_CXXFLAGS   = $(CPPFLAGS_DBG)
+dbg_meshnorm_dbg_LDADD      = dbg/libmesh.la
+
+# projection
+opt_programs             += opt/projection
+opt_projection_SOURCES    = src/apps/projection.C
+opt_projection_CPPFLAGS   = $(CPPFLAGS_OPT) $(common_cppflags)
+opt_projection_CXXFLAGS   = $(CPPFLAGS_OPT)
+opt_projection_LDADD      = opt/libmesh.la
+
+devel_programs           += devel/projection-devel
+devel_projection_devel_SOURCES  = src/apps/projection.C
+devel_projection_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+devel_projection_devel_CXXFLAGS = $(CPPFLAGS_DEVEL)
+devel_projection_devel_LDADD    = devel/libmesh.la
+
+dbg_programs             += dbg/projection-dbg
+dbg_projection_dbg_SOURCES    = src/apps/projection.C
+dbg_projection_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(common_cppflags)
+dbg_projection_dbg_CXXFLAGS   = $(CPPFLAGS_DBG)
+dbg_projection_dbg_LDADD      = dbg/libmesh.la
+
+# output_libmesh_version
+opt_programs                         += opt/output_libmesh_version
+opt_output_libmesh_version_SOURCES    = src/apps/output_libmesh_version.C
+opt_output_libmesh_version_CPPFLAGS   = $(CPPFLAGS_OPT) $(common_cppflags)
+opt_output_libmesh_version_CXXFLAGS   = $(CPPFLAGS_OPT)
+opt_output_libmesh_version_LDADD      = opt/libmesh.la
+
+devel_programs                       += devel/output_libmesh_version-devel
+devel_output_libmesh_version_devel_SOURCES  = src/apps/output_libmesh_version.C
+devel_output_libmesh_version_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+devel_output_libmesh_version_devel_CXXFLAGS = $(CPPFLAGS_DEVEL)
+devel_output_libmesh_version_devel_LDADD    = devel/libmesh.la
+
+dbg_programs                         += dbg/output_libmesh_version-dbg
+dbg_output_libmesh_version_dbg_SOURCES    = src/apps/output_libmesh_version.C
+dbg_output_libmesh_version_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(common_cppflags)
+dbg_output_libmesh_version_dbg_CXXFLAGS   = $(CPPFLAGS_DBG)
+dbg_output_libmesh_version_dbg_LDADD      = dbg/libmesh.la
+
+# meshplot
+opt_programs           += opt/meshplot
+opt_meshplot_SOURCES    = src/apps/meshplot.C
+opt_meshplot_CPPFLAGS   = $(CPPFLAGS_OPT) $(common_cppflags)
+opt_meshplot_CXXFLAGS   = $(CPPFLAGS_OPT)
+opt_meshplot_LDADD      = opt/libmesh.la
+
+devel_programs         += devel/meshplot-devel
+devel_meshplot_devel_SOURCES  = src/apps/meshplot.C
+devel_meshplot_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+devel_meshplot_devel_CXXFLAGS = $(CPPFLAGS_DEVEL)
+devel_meshplot_devel_LDADD    = devel/libmesh.la
+
+dbg_programs           += dbg/meshplot-dbg
+dbg_meshplot_dbg_SOURCES    = src/apps/meshplot.C
+dbg_meshplot_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(common_cppflags)
+dbg_meshplot_dbg_CXXFLAGS   = $(CPPFLAGS_DBG)
+dbg_meshplot_dbg_LDADD      = dbg/libmesh.la
+
+# solution_components
+opt_programs                      += opt/solution_components
+opt_solution_components_SOURCES    = src/apps/solution_components.C
+opt_solution_components_CPPFLAGS   = $(CPPFLAGS_OPT) $(common_cppflags)
+opt_solution_components_CXXFLAGS   = $(CPPFLAGS_OPT)
+opt_solution_components_LDADD      = opt/libmesh.la
+
+devel_programs                    += devel/solution_components-devel
+devel_solution_components_devel_SOURCES  = src/apps/solution_components.C
+devel_solution_components_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+devel_solution_components_devel_CXXFLAGS = $(CPPFLAGS_DEVEL)
+devel_solution_components_devel_LDADD    = devel/libmesh.la
+
+dbg_programs                      += dbg/solution_components-dbg
+dbg_solution_components_dbg_SOURCES    = src/apps/solution_components.C
+dbg_solution_components_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(common_cppflags)
+dbg_solution_components_dbg_CXXFLAGS   = $(CPPFLAGS_DBG)
+dbg_solution_components_dbg_LDADD      = dbg/libmesh.la
+
+
+if LIBMESH_OPT_MODE
+  bin_PROGRAMS += $(opt_programs)
+endif
+
+if LIBMESH_DEVEL_MODE
+  bin_PROGRAMS += $(devel_programs)
+endif
+
+if LIBMESH_DBG_MODE
+  bin_PROGRAMS += $(dbg_programs)
+endif
+
 
 # create a METHOD-specific configure script - will need to clean it too!
 bin_SCRIPTS += contrib/bin/@host@_@METHOD@/libmesh-config

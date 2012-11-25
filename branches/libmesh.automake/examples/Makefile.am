@@ -47,7 +47,7 @@ SUBDIRS = \
 
 
 
-include $(top_builddir)/Make.common.@METHOD@
+include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects 
 

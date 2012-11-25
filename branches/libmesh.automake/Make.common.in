@@ -81,9 +81,9 @@ enable-optional      = @enableoptional@
 
 
 ###############################################################################
-libmesh_CPPFLAGS := @CPPFLAGS_METHOD@
-libmesh_CXXFLAGS := @CXXFLAGS_METHOD@
-libmesh_CFLAGS   := @CFLAGS_METHOD@
+libmesh_CPPFLAGS := $(CPPFLAGS_METHOD)
+libmesh_CXXFLAGS := $(CXXFLAGS_METHOD)
+libmesh_CFLAGS   := $(CFLAGS_METHOD)
 
 
 
