@@ -10,14 +10,10 @@ include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-AM_CPPFLAGS  = $(libmesh_CPPFLAGS)
+AM_CPPFLAGS  = $(libmesh_INCLUDE) -I$(top_builddir)/include
 AM_CFLAGS    = $(libmesh_CFLAGS)
 AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
 LIBS         = $(libmesh_LIBS)
-
-common_cppflags = $(libmesh_INCLUDE) -I$(top_builddir)/include
-
-
 
 ######################################################################
 #
@@ -30,7 +26,8 @@ data_DATA = $(data)
 
 if LIBMESH_OPT_MODE
   check_PROGRAMS += example
-  example_CPPFLAGS = $(CPPFLAGS_OPT) $(common_cppflags)
+  example_SOURCES  = $(sources)
+  example_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
   example_CXXFLAGS = $(CXXFLAGS_OPT)
   example_LDADD    = $(top_builddir)/opt/libmesh.la
 endif
@@ -38,7 +35,7 @@ endif
 if LIBMESH_DBG_MODE
   check_PROGRAMS += example-dbg
   example_dbg_SOURCES  = $(sources)
-  example_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(common_cppflags)
+  example_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
   example_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
   example_dbg_LDADD    = $(top_builddir)/dbg/libmesh.la
 endif
@@ -46,7 +43,7 @@ endif
 if LIBMESH_DEVEL_MODE
   check_PROGRAMS += example-devel
   example_devel_SOURCES  = $(sources)
-  example_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+  example_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
   example_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
   example_devel_LDADD    = $(top_builddir)/opt/libmesh.la
 endif
@@ -62,7 +59,7 @@ TESTS = $(check_SCRIPTS)
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
-	LIBMESH_DIR=$(abs_top_srcdir) $(srcdir)/$(check_SCRIPTS)
+	LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)" $(srcdir)/$(check_SCRIPTS)
 
 
 ######################################################################

@@ -210,9 +210,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(exampledir)" \
-	"$(DESTDIR)$(example_dbgdir)" "$(DESTDIR)$(example_develdir)"
-DATA = $(example_DATA) $(example_dbg_DATA) $(example_devel_DATA)
+am__installdirs = "$(DESTDIR)$(datadir)"
+DATA = $(data_DATA)
 ETAGS = etags
 CTAGS = ctags
 am__tty_colors_dummy = \
@@ -448,7 +447,7 @@ build_cpu = @build_cpu@
 build_os = @build_os@
 build_vendor = @build_vendor@
 builddir = @builddir@
-datadir = @datadir@
+datadir = $(install_dir)
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
@@ -539,26 +538,20 @@ sources = $(data) run.sh
 #
 CLEANFILES = out_*.e $(example_name).php stdout.log
 AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS)
+AM_CPPFLAGS = $(libmesh_INCLUDE) -I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-common_cppflags = $(libmesh_INCLUDE) -I$(top_builddir)/include
-@LIBMESH_OPT_MODE_TRUE@exampledir = $(install_dir)
-@LIBMESH_OPT_MODE_TRUE@example_DATA = $(data)
+data_DATA = $(data)
 @LIBMESH_OPT_MODE_TRUE@example_SOURCES = $(sources)
-@LIBMESH_OPT_MODE_TRUE@example_CPPFLAGS = $(CPPFLAGS_OPT) $(common_cppflags)
+@LIBMESH_OPT_MODE_TRUE@example_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@example_CXXFLAGS = $(CXXFLAGS_OPT)
 @LIBMESH_OPT_MODE_TRUE@example_LDADD = $(top_builddir)/opt/libmesh.la
-@LIBMESH_DBG_MODE_TRUE@example_dbgdir = $(install_dir)
-@LIBMESH_DBG_MODE_TRUE@example_dbg_DATA = $(data)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_SOURCES = $(sources)
-@LIBMESH_DBG_MODE_TRUE@example_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(common_cppflags)
+@LIBMESH_DBG_MODE_TRUE@example_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_LDADD = $(top_builddir)/dbg/libmesh.la
-@LIBMESH_DEVEL_MODE_TRUE@example_develdir = $(install_dir)
-@LIBMESH_DEVEL_MODE_TRUE@example_devel_DATA = $(data)
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_SOURCES = $(sources)
-@LIBMESH_DEVEL_MODE_TRUE@example_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+@LIBMESH_DEVEL_MODE_TRUE@example_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_LDADD = $(top_builddir)/opt/libmesh.la
 
@@ -703,69 +696,27 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-exampleDATA: $(example_DATA)
+install-dataDATA: $(data_DATA)
 	@$(NORMAL_INSTALL)
-	@list='$(example_DATA)'; test -n "$(exampledir)" || list=; \
+	@list='$(data_DATA)'; test -n "$(datadir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(exampledir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(exampledir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(datadir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(datadir)" || exit 1; \
 	fi; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  echo "$$d$$p"; \
 	done | $(am__base_list) | \
 	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(exampledir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(exampledir)" || exit $$?; \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(datadir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(datadir)" || exit $$?; \
 	done
 
-uninstall-exampleDATA:
+uninstall-dataDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(example_DATA)'; test -n "$(exampledir)" || list=; \
+	@list='$(data_DATA)'; test -n "$(datadir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(exampledir)'; $(am__uninstall_files_from_dir)
-install-example_dbgDATA: $(example_dbg_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(example_dbg_DATA)'; test -n "$(example_dbgdir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(example_dbgdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(example_dbgdir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(example_dbgdir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(example_dbgdir)" || exit $$?; \
-	done
-
-uninstall-example_dbgDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(example_dbg_DATA)'; test -n "$(example_dbgdir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(example_dbgdir)'; $(am__uninstall_files_from_dir)
-install-example_develDATA: $(example_devel_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(example_devel_DATA)'; test -n "$(example_develdir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(example_develdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(example_develdir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(example_develdir)'"; \
-	  $(INSTALL_DATA) $$files "$(DESTDIR)$(example_develdir)" || exit $$?; \
-	done
-
-uninstall-example_develDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(example_devel_DATA)'; test -n "$(example_develdir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(example_develdir)'; $(am__uninstall_files_from_dir)
+	dir='$(DESTDIR)$(datadir)'; $(am__uninstall_files_from_dir)
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -962,7 +913,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(exampledir)" "$(DESTDIR)$(example_dbgdir)" "$(DESTDIR)$(example_develdir)"; do \
+	for dir in "$(DESTDIR)$(datadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -1017,8 +968,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-exampleDATA install-example_dbgDATA \
-	install-example_develDATA
+install-data-am: install-dataDATA
 
 install-dvi: install-dvi-am
 
@@ -1064,8 +1014,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-exampleDATA uninstall-example_dbgDATA \
-	uninstall-example_develDATA
+uninstall-am: uninstall-dataDATA
 
 .MAKE: check-am install-am install-strip
 
@@ -1074,16 +1023,14 @@ uninstall-am: uninstall-exampleDATA uninstall-example_dbgDATA \
 	ctags distclean distclean-compile distclean-generic \
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exampleDATA \
-	install-example_dbgDATA install-example_develDATA install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-data-am install-dataDATA install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-exampleDATA \
-	uninstall-example_dbgDATA uninstall-example_develDATA
+	tags uninstall uninstall-am uninstall-dataDATA
 
 
 ######################################################################
@@ -1098,7 +1045,7 @@ include $(top_builddir)/Make.common
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
-	LIBMESH_DIR=$(abs_top_srcdir) $(srcdir)/$(check_SCRIPTS)
+	LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)" $(srcdir)/$(check_SCRIPTS)
 doc: $(example_name).php
 html: $(example_name).php
 $(example_name).php: $(example_name) \

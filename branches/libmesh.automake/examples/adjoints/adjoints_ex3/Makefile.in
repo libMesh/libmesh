@@ -102,27 +102,40 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = example$(EXEEXT)
 @LIBMESH_DBG_MODE_TRUE@am__EXEEXT_2 = example-dbg$(EXEEXT)
 @LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_3 = example-devel$(EXEEXT)
-example_SOURCES = example.c
-example_OBJECTS = example-example.$(OBJEXT)
+am__example_SOURCES_DIST = H-qoi.C H-qoi.h H_channel_quads.xda \
+	adjoints_ex3.C coupled_system.C coupled_system.h \
+	coupled_system.in domain.C domain.h femparameters.C \
+	femparameters.h general.in initial.C initial.h mysystems.h \
+	output.C output.h run.sh $(top_srcdir)/contrib/utils/Makefile
+am__objects_1 = example-H-qoi.$(OBJEXT) example-adjoints_ex3.$(OBJEXT) \
+	example-coupled_system.$(OBJEXT) example-domain.$(OBJEXT) \
+	example-femparameters.$(OBJEXT) example-initial.$(OBJEXT) \
+	example-output.$(OBJEXT)
+am__objects_2 = $(am__objects_1)
+@LIBMESH_OPT_MODE_TRUE@am_example_OBJECTS = $(am__objects_2)
+example_OBJECTS = $(am_example_OBJECTS)
 @LIBMESH_OPT_MODE_TRUE@example_DEPENDENCIES =  \
 @LIBMESH_OPT_MODE_TRUE@	$(top_builddir)/opt/libmesh.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+example_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_dbg_SOURCES_DIST = H-qoi.C H-qoi.h H_channel_quads.xda \
 	adjoints_ex3.C coupled_system.C coupled_system.h \
 	coupled_system.in domain.C domain.h femparameters.C \
 	femparameters.h general.in initial.C initial.h mysystems.h \
 	output.C output.h run.sh $(top_srcdir)/contrib/utils/Makefile
-am__objects_1 = example_dbg-H-qoi.$(OBJEXT) \
+am__objects_3 = example_dbg-H-qoi.$(OBJEXT) \
 	example_dbg-adjoints_ex3.$(OBJEXT) \
 	example_dbg-coupled_system.$(OBJEXT) \
 	example_dbg-domain.$(OBJEXT) \
 	example_dbg-femparameters.$(OBJEXT) \
 	example_dbg-initial.$(OBJEXT) example_dbg-output.$(OBJEXT)
-am__objects_2 = $(am__objects_1)
-@LIBMESH_DBG_MODE_TRUE@am_example_dbg_OBJECTS = $(am__objects_2)
+am__objects_4 = $(am__objects_3)
+@LIBMESH_DBG_MODE_TRUE@am_example_dbg_OBJECTS = $(am__objects_4)
 example_dbg_OBJECTS = $(am_example_dbg_OBJECTS)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_DEPENDENCIES =  \
 @LIBMESH_DBG_MODE_TRUE@	$(top_builddir)/dbg/libmesh.la
@@ -134,14 +147,14 @@ am__example_devel_SOURCES_DIST = H-qoi.C H-qoi.h H_channel_quads.xda \
 	coupled_system.in domain.C domain.h femparameters.C \
 	femparameters.h general.in initial.C initial.h mysystems.h \
 	output.C output.h run.sh $(top_srcdir)/contrib/utils/Makefile
-am__objects_3 = example_devel-H-qoi.$(OBJEXT) \
+am__objects_5 = example_devel-H-qoi.$(OBJEXT) \
 	example_devel-adjoints_ex3.$(OBJEXT) \
 	example_devel-coupled_system.$(OBJEXT) \
 	example_devel-domain.$(OBJEXT) \
 	example_devel-femparameters.$(OBJEXT) \
 	example_devel-initial.$(OBJEXT) example_devel-output.$(OBJEXT)
-am__objects_4 = $(am__objects_3)
-@LIBMESH_DEVEL_MODE_TRUE@am_example_devel_OBJECTS = $(am__objects_4)
+am__objects_6 = $(am__objects_5)
+@LIBMESH_DEVEL_MODE_TRUE@am_example_devel_OBJECTS = $(am__objects_6)
 example_devel_OBJECTS = $(am_example_devel_OBJECTS)
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_DEPENDENCIES =  \
 @LIBMESH_DEVEL_MODE_TRUE@	$(top_builddir)/opt/libmesh.la
@@ -201,8 +214,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = example.c $(example_dbg_SOURCES) $(example_devel_SOURCES)
-DIST_SOURCES = example.c $(am__example_dbg_SOURCES_DIST) \
+SOURCES = $(example_SOURCES) $(example_dbg_SOURCES) \
+	$(example_devel_SOURCES)
+DIST_SOURCES = $(am__example_SOURCES_DIST) \
+	$(am__example_dbg_SOURCES_DIST) \
 	$(am__example_devel_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -594,20 +609,20 @@ CLEANFILES = primal.out.gmv.000.05 primal.out.gmv.000.04 \
 # also need links for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
 AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS)
+AM_CPPFLAGS = $(libmesh_INCLUDE) -I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-common_cppflags = $(libmesh_INCLUDE) -I$(top_builddir)/include
 data_DATA = $(data)
-@LIBMESH_OPT_MODE_TRUE@example_CPPFLAGS = $(CPPFLAGS_OPT) $(common_cppflags)
+@LIBMESH_OPT_MODE_TRUE@example_SOURCES = $(sources)
+@LIBMESH_OPT_MODE_TRUE@example_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@example_CXXFLAGS = $(CXXFLAGS_OPT)
 @LIBMESH_OPT_MODE_TRUE@example_LDADD = $(top_builddir)/opt/libmesh.la
 @LIBMESH_DBG_MODE_TRUE@example_dbg_SOURCES = $(sources)
-@LIBMESH_DBG_MODE_TRUE@example_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(common_cppflags)
+@LIBMESH_DBG_MODE_TRUE@example_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_LDADD = $(top_builddir)/dbg/libmesh.la
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_SOURCES = $(sources)
-@LIBMESH_DEVEL_MODE_TRUE@example_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(common_cppflags)
+@LIBMESH_DEVEL_MODE_TRUE@example_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_LDADD = $(top_builddir)/opt/libmesh.la
 
@@ -621,7 +636,7 @@ all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .C .c .lo .o .obj
+.SUFFIXES: .C .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/examples/Make.common $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -664,7 +679,7 @@ clean-checkPROGRAMS:
 	rm -f $$list
 example$(EXEEXT): $(example_OBJECTS) $(example_DEPENDENCIES) $(EXTRA_example_DEPENDENCIES) 
 	@rm -f example$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(example_OBJECTS) $(example_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(example_LINK) $(example_OBJECTS) $(example_LDADD) $(LIBS)
 example-dbg$(EXEEXT): $(example_dbg_OBJECTS) $(example_dbg_DEPENDENCIES) $(EXTRA_example_dbg_DEPENDENCIES) 
 	@rm -f example-dbg$(EXEEXT)
 	$(AM_V_CXXLD)$(example_dbg_LINK) $(example_dbg_OBJECTS) $(example_dbg_LDADD) $(LIBS)
@@ -678,7 +693,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example-example.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example-H-qoi.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example-adjoints_ex3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example-coupled_system.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example-domain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example-femparameters.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example-initial.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example-output.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-H-qoi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-adjoints_ex3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/example_dbg-coupled_system.Po@am__quote@
@@ -717,6 +738,104 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+example-H-qoi.o: H-qoi.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-H-qoi.o -MD -MP -MF $(DEPDIR)/example-H-qoi.Tpo -c -o example-H-qoi.o `test -f 'H-qoi.C' || echo '$(srcdir)/'`H-qoi.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-H-qoi.Tpo $(DEPDIR)/example-H-qoi.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='H-qoi.C' object='example-H-qoi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-H-qoi.o `test -f 'H-qoi.C' || echo '$(srcdir)/'`H-qoi.C
+
+example-H-qoi.obj: H-qoi.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-H-qoi.obj -MD -MP -MF $(DEPDIR)/example-H-qoi.Tpo -c -o example-H-qoi.obj `if test -f 'H-qoi.C'; then $(CYGPATH_W) 'H-qoi.C'; else $(CYGPATH_W) '$(srcdir)/H-qoi.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-H-qoi.Tpo $(DEPDIR)/example-H-qoi.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='H-qoi.C' object='example-H-qoi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-H-qoi.obj `if test -f 'H-qoi.C'; then $(CYGPATH_W) 'H-qoi.C'; else $(CYGPATH_W) '$(srcdir)/H-qoi.C'; fi`
+
+example-adjoints_ex3.o: adjoints_ex3.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-adjoints_ex3.o -MD -MP -MF $(DEPDIR)/example-adjoints_ex3.Tpo -c -o example-adjoints_ex3.o `test -f 'adjoints_ex3.C' || echo '$(srcdir)/'`adjoints_ex3.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-adjoints_ex3.Tpo $(DEPDIR)/example-adjoints_ex3.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='adjoints_ex3.C' object='example-adjoints_ex3.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-adjoints_ex3.o `test -f 'adjoints_ex3.C' || echo '$(srcdir)/'`adjoints_ex3.C
+
+example-adjoints_ex3.obj: adjoints_ex3.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-adjoints_ex3.obj -MD -MP -MF $(DEPDIR)/example-adjoints_ex3.Tpo -c -o example-adjoints_ex3.obj `if test -f 'adjoints_ex3.C'; then $(CYGPATH_W) 'adjoints_ex3.C'; else $(CYGPATH_W) '$(srcdir)/adjoints_ex3.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-adjoints_ex3.Tpo $(DEPDIR)/example-adjoints_ex3.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='adjoints_ex3.C' object='example-adjoints_ex3.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-adjoints_ex3.obj `if test -f 'adjoints_ex3.C'; then $(CYGPATH_W) 'adjoints_ex3.C'; else $(CYGPATH_W) '$(srcdir)/adjoints_ex3.C'; fi`
+
+example-coupled_system.o: coupled_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-coupled_system.o -MD -MP -MF $(DEPDIR)/example-coupled_system.Tpo -c -o example-coupled_system.o `test -f 'coupled_system.C' || echo '$(srcdir)/'`coupled_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-coupled_system.Tpo $(DEPDIR)/example-coupled_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='coupled_system.C' object='example-coupled_system.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-coupled_system.o `test -f 'coupled_system.C' || echo '$(srcdir)/'`coupled_system.C
+
+example-coupled_system.obj: coupled_system.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-coupled_system.obj -MD -MP -MF $(DEPDIR)/example-coupled_system.Tpo -c -o example-coupled_system.obj `if test -f 'coupled_system.C'; then $(CYGPATH_W) 'coupled_system.C'; else $(CYGPATH_W) '$(srcdir)/coupled_system.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-coupled_system.Tpo $(DEPDIR)/example-coupled_system.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='coupled_system.C' object='example-coupled_system.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-coupled_system.obj `if test -f 'coupled_system.C'; then $(CYGPATH_W) 'coupled_system.C'; else $(CYGPATH_W) '$(srcdir)/coupled_system.C'; fi`
+
+example-domain.o: domain.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-domain.o -MD -MP -MF $(DEPDIR)/example-domain.Tpo -c -o example-domain.o `test -f 'domain.C' || echo '$(srcdir)/'`domain.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-domain.Tpo $(DEPDIR)/example-domain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='domain.C' object='example-domain.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-domain.o `test -f 'domain.C' || echo '$(srcdir)/'`domain.C
+
+example-domain.obj: domain.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-domain.obj -MD -MP -MF $(DEPDIR)/example-domain.Tpo -c -o example-domain.obj `if test -f 'domain.C'; then $(CYGPATH_W) 'domain.C'; else $(CYGPATH_W) '$(srcdir)/domain.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-domain.Tpo $(DEPDIR)/example-domain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='domain.C' object='example-domain.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-domain.obj `if test -f 'domain.C'; then $(CYGPATH_W) 'domain.C'; else $(CYGPATH_W) '$(srcdir)/domain.C'; fi`
+
+example-femparameters.o: femparameters.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-femparameters.o -MD -MP -MF $(DEPDIR)/example-femparameters.Tpo -c -o example-femparameters.o `test -f 'femparameters.C' || echo '$(srcdir)/'`femparameters.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-femparameters.Tpo $(DEPDIR)/example-femparameters.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='femparameters.C' object='example-femparameters.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-femparameters.o `test -f 'femparameters.C' || echo '$(srcdir)/'`femparameters.C
+
+example-femparameters.obj: femparameters.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-femparameters.obj -MD -MP -MF $(DEPDIR)/example-femparameters.Tpo -c -o example-femparameters.obj `if test -f 'femparameters.C'; then $(CYGPATH_W) 'femparameters.C'; else $(CYGPATH_W) '$(srcdir)/femparameters.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-femparameters.Tpo $(DEPDIR)/example-femparameters.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='femparameters.C' object='example-femparameters.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-femparameters.obj `if test -f 'femparameters.C'; then $(CYGPATH_W) 'femparameters.C'; else $(CYGPATH_W) '$(srcdir)/femparameters.C'; fi`
+
+example-initial.o: initial.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-initial.o -MD -MP -MF $(DEPDIR)/example-initial.Tpo -c -o example-initial.o `test -f 'initial.C' || echo '$(srcdir)/'`initial.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-initial.Tpo $(DEPDIR)/example-initial.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='initial.C' object='example-initial.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-initial.o `test -f 'initial.C' || echo '$(srcdir)/'`initial.C
+
+example-initial.obj: initial.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-initial.obj -MD -MP -MF $(DEPDIR)/example-initial.Tpo -c -o example-initial.obj `if test -f 'initial.C'; then $(CYGPATH_W) 'initial.C'; else $(CYGPATH_W) '$(srcdir)/initial.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-initial.Tpo $(DEPDIR)/example-initial.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='initial.C' object='example-initial.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-initial.obj `if test -f 'initial.C'; then $(CYGPATH_W) 'initial.C'; else $(CYGPATH_W) '$(srcdir)/initial.C'; fi`
+
+example-output.o: output.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-output.o -MD -MP -MF $(DEPDIR)/example-output.Tpo -c -o example-output.o `test -f 'output.C' || echo '$(srcdir)/'`output.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-output.Tpo $(DEPDIR)/example-output.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='output.C' object='example-output.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-output.o `test -f 'output.C' || echo '$(srcdir)/'`output.C
+
+example-output.obj: output.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -MT example-output.obj -MD -MP -MF $(DEPDIR)/example-output.Tpo -c -o example-output.obj `if test -f 'output.C'; then $(CYGPATH_W) 'output.C'; else $(CYGPATH_W) '$(srcdir)/output.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-output.Tpo $(DEPDIR)/example-output.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='output.C' object='example-output.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(example_CXXFLAGS) $(CXXFLAGS) -c -o example-output.obj `if test -f 'output.C'; then $(CYGPATH_W) 'output.C'; else $(CYGPATH_W) '$(srcdir)/output.C'; fi`
 
 example_dbg-H-qoi.o: H-qoi.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_dbg_CPPFLAGS) $(CPPFLAGS) $(example_dbg_CXXFLAGS) $(CXXFLAGS) -MT example_dbg-H-qoi.o -MD -MP -MF $(DEPDIR)/example_dbg-H-qoi.Tpo -c -o example_dbg-H-qoi.o `test -f 'H-qoi.C' || echo '$(srcdir)/'`H-qoi.C
@@ -913,44 +1032,6 @@ example_devel-output.obj: output.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='output.C' object='example_devel-output.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_devel_CPPFLAGS) $(CPPFLAGS) $(example_devel_CXXFLAGS) $(CXXFLAGS) -c -o example_devel-output.obj `if test -f 'output.C'; then $(CYGPATH_W) 'output.C'; else $(CYGPATH_W) '$(srcdir)/output.C'; fi`
-
-.c.o:
-@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
-
-.c.obj:
-@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.c.lo:
-@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
-
-example-example.o: example.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT example-example.o -MD -MP -MF $(DEPDIR)/example-example.Tpo -c -o example-example.o `test -f 'example.c' || echo '$(srcdir)/'`example.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-example.Tpo $(DEPDIR)/example-example.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='example.c' object='example-example.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o example-example.o `test -f 'example.c' || echo '$(srcdir)/'`example.c
-
-example-example.obj: example.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT example-example.obj -MD -MP -MF $(DEPDIR)/example-example.Tpo -c -o example-example.obj `if test -f 'example.c'; then $(CYGPATH_W) 'example.c'; else $(CYGPATH_W) '$(srcdir)/example.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/example-example.Tpo $(DEPDIR)/example-example.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='example.c' object='example-example.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(example_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o example-example.obj `if test -f 'example.c'; then $(CYGPATH_W) 'example.c'; else $(CYGPATH_W) '$(srcdir)/example.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1313,7 +1394,7 @@ include $(top_builddir)/Make.common
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
-	LIBMESH_DIR=$(abs_top_srcdir) $(srcdir)/$(check_SCRIPTS)
+	LIBMESH_DIR=$(abs_top_srcdir) METHODS="$(METHODS)" $(srcdir)/$(check_SCRIPTS)
 doc: $(example_name).php
 html: $(example_name).php
 $(example_name).php: $(example_name) \
