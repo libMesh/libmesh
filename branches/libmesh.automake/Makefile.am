@@ -59,7 +59,7 @@ AUX_DIST = build-aux/install-sh \
 
 # Support for pkgconfig
 pkgconfigdir     = $(libdir)/pkgconfig
-pkgconfig_DATA   = Make.common \
+pkgconfig_DATA   = contrib/utils/Make.common \
                    contrib/utils/libmesh.pc \
                    contrib/utils/libmesh-opt.pc \
                    contrib/utils/libmesh-dbg.pc \
@@ -354,8 +354,9 @@ libmesh_config_SCRIPTS = contrib/bin/libmesh-config
 
 ###########################################################
 # Examples
-SUBDIRS += examples
-
+if LIBMESH_ENABLE_EXAMPLES
+  SUBDIRS += examples
+endif
 
 #
 .PHONY: examples_doc doc svnexpand

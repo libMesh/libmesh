@@ -83,6 +83,10 @@ bin_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_4) $(am__EXEEXT_6)
 @LIBMESH_OPT_MODE_TRUE@am__append_6 = $(opt_programs)
 @LIBMESH_DEVEL_MODE_TRUE@am__append_7 = $(devel_programs)
 @LIBMESH_DBG_MODE_TRUE@am__append_8 = $(dbg_programs)
+
+###########################################################
+# Examples
+@LIBMESH_ENABLE_EXAMPLES_TRUE@am__append_9 = examples
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -2779,10 +2783,7 @@ top_srcdir = @top_srcdir@
 # 	   test/common/Makefile.in 		    \
 # 	   test/comp_ns/Makefile.in		    \
 # 	   test/unit/Makefile.in                    
-
-###########################################################
-# Examples
-SUBDIRS = include contrib $(am__append_5) examples
+SUBDIRS = include contrib $(am__append_5) $(am__append_9)
 AUTOMAKE_OPTIONS = foreign subdir-objects 
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(libmesh_CFLAGS)
@@ -2828,7 +2829,7 @@ AUX_DIST = build-aux/install-sh \
 
 # Support for pkgconfig
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = Make.common \
+pkgconfig_DATA = contrib/utils/Make.common \
                    contrib/utils/libmesh.pc \
                    contrib/utils/libmesh-opt.pc \
                    contrib/utils/libmesh-dbg.pc \

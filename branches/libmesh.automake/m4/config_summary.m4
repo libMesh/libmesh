@@ -60,6 +60,7 @@ echo
 echo Library Features:
 echo '  'adaptive mesh refinement......... : $enableamr
 echo '  'complex variables................ : $enablecomplex
+echo '  'example suite.................... : $enableexamples
 echo '  'ghosted vectors.................. : $enableghosted
 echo '  'high-order shape functions....... : $enablepfem
 echo '  'infinite elements................ : $enableifem

@@ -254,55 +254,56 @@ LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
 AX_SUMMARIZE_ENV
 
 # Each example gets a makefile
-AC_CONFIG_FILES([
-		examples/introduction/introduction_ex1/Makefile
-		examples/introduction/introduction_ex2/Makefile
-		examples/introduction/introduction_ex3/Makefile
-		examples/introduction/introduction_ex4/Makefile
-		examples/introduction/introduction_ex5/Makefile
-		examples/adaptivity/adaptivity_ex1/Makefile
-		examples/adaptivity/adaptivity_ex2/Makefile
-		examples/adaptivity/adaptivity_ex3/Makefile
-		examples/adaptivity/adaptivity_ex4/Makefile
-		examples/adaptivity/adaptivity_ex5/Makefile
-		examples/adjoints/adjoints_ex1/Makefile
-		examples/adjoints/adjoints_ex2/Makefile
-		examples/adjoints/adjoints_ex3/Makefile
-		examples/adjoints/adjoints_ex4/Makefile
-		examples/eigenproblems/eigenproblems_ex1/Makefile
-		examples/eigenproblems/eigenproblems_ex2/Makefile
-		examples/eigenproblems/eigenproblems_ex3/Makefile
-		examples/fem_system/fem_system_ex1/Makefile
-		examples/miscellaneous/miscellaneous_ex1/Makefile
-		examples/miscellaneous/miscellaneous_ex2/Makefile
-		examples/miscellaneous/miscellaneous_ex3/Makefile
-		examples/miscellaneous/miscellaneous_ex4/Makefile
-		examples/miscellaneous/miscellaneous_ex5/Makefile
-		examples/miscellaneous/miscellaneous_ex6/Makefile
-		examples/miscellaneous/miscellaneous_ex7/Makefile
-		examples/subdomains/subdomains_ex1/Makefile
-		examples/subdomains/subdomains_ex2/Makefile
-		examples/systems_of_equations/systems_of_equations_ex1/Makefile
-		examples/systems_of_equations/systems_of_equations_ex2/Makefile
-		examples/systems_of_equations/systems_of_equations_ex3/Makefile
-		examples/systems_of_equations/systems_of_equations_ex4/Makefile
-		examples/systems_of_equations/systems_of_equations_ex5/Makefile
-		examples/systems_of_equations/systems_of_equations_ex6/Makefile
-		examples/reduced_basis/reduced_basis_ex1/Makefile
-		examples/reduced_basis/reduced_basis_ex2/Makefile
-		examples/reduced_basis/reduced_basis_ex3/Makefile
-		examples/reduced_basis/reduced_basis_ex4/Makefile
-		examples/reduced_basis/reduced_basis_ex5/Makefile
-		examples/reduced_basis/reduced_basis_ex6/Makefile
-		examples/reduced_basis/reduced_basis_ex7/Makefile
-		examples/transient/transient_ex1/Makefile
-		examples/transient/transient_ex2/Makefile
-		examples/vector_fe/vector_fe_ex1/Makefile
-		examples/vector_fe/vector_fe_ex2/Makefile
-		examples/vector_fe/vector_fe_ex3/Makefile
-		examples/Makefile
-		])		
-
+if (test "x$enableexamples" = "xyes"); then
+   AC_CONFIG_FILES([
+  		examples/introduction/introduction_ex1/Makefile
+  		examples/introduction/introduction_ex2/Makefile
+  		examples/introduction/introduction_ex3/Makefile
+  		examples/introduction/introduction_ex4/Makefile
+  		examples/introduction/introduction_ex5/Makefile
+  		examples/adaptivity/adaptivity_ex1/Makefile
+  		examples/adaptivity/adaptivity_ex2/Makefile
+  		examples/adaptivity/adaptivity_ex3/Makefile
+  		examples/adaptivity/adaptivity_ex4/Makefile
+  		examples/adaptivity/adaptivity_ex5/Makefile
+  		examples/adjoints/adjoints_ex1/Makefile
+  		examples/adjoints/adjoints_ex2/Makefile
+  		examples/adjoints/adjoints_ex3/Makefile
+  		examples/adjoints/adjoints_ex4/Makefile
+  		examples/eigenproblems/eigenproblems_ex1/Makefile
+  		examples/eigenproblems/eigenproblems_ex2/Makefile
+  		examples/eigenproblems/eigenproblems_ex3/Makefile
+  		examples/fem_system/fem_system_ex1/Makefile
+  		examples/miscellaneous/miscellaneous_ex1/Makefile
+  		examples/miscellaneous/miscellaneous_ex2/Makefile
+  		examples/miscellaneous/miscellaneous_ex3/Makefile
+  		examples/miscellaneous/miscellaneous_ex4/Makefile
+  		examples/miscellaneous/miscellaneous_ex5/Makefile
+  		examples/miscellaneous/miscellaneous_ex6/Makefile
+  		examples/miscellaneous/miscellaneous_ex7/Makefile
+  		examples/subdomains/subdomains_ex1/Makefile
+  		examples/subdomains/subdomains_ex2/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex1/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex2/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex3/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex4/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex5/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex6/Makefile
+  		examples/reduced_basis/reduced_basis_ex1/Makefile
+  		examples/reduced_basis/reduced_basis_ex2/Makefile
+  		examples/reduced_basis/reduced_basis_ex3/Makefile
+  		examples/reduced_basis/reduced_basis_ex4/Makefile
+  		examples/reduced_basis/reduced_basis_ex5/Makefile
+  		examples/reduced_basis/reduced_basis_ex6/Makefile
+  		examples/reduced_basis/reduced_basis_ex7/Makefile
+  		examples/transient/transient_ex1/Makefile
+  		examples/transient/transient_ex2/Makefile
+  		examples/vector_fe/vector_fe_ex1/Makefile
+  		examples/vector_fe/vector_fe_ex2/Makefile
+  		examples/vector_fe/vector_fe_ex3/Makefile
+  		examples/Makefile
+  		])		
+fi		
 
 # Create output files
 AC_OUTPUT
