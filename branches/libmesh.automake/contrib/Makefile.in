@@ -66,6 +66,9 @@ target_triplet = @target@
 @LIBMESH_ENABLE_NEMESIS_TRUE@am__append_11 = nemesis/Lib/libnemesis.la
 @LIBMESH_ENABLE_TECIO_TRUE@am__append_12 = tecplot/tecio
 @LIBMESH_ENABLE_TECIO_TRUE@am__append_13 = tecplot/tecio/libtecio.la
+
+# I don't think this actually copies any sombols into
+# libcontrib.la because we aren't using them here...
 @LIBMESH_ENABLE_TECPLOT_TRUE@am__append_14 = @TECPLOT_LIBRARY@
 @LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_15 = triangle
 @LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_16 = triangle/libtriangle.la
@@ -317,7 +320,7 @@ LDFLAGS = @LDFLAGS@
 LIBHILBERT_INCLUDE = @LIBHILBERT_INCLUDE@
 LIBHILBERT_LIBRARY = @LIBHILBERT_LIBRARY@
 LIBOBJS = @LIBOBJS@
-LIBS = @LIBS@
+LIBS = 
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -524,6 +527,7 @@ libcontrib_la_LIBADD = $(am__append_3) $(am__append_5) $(am__append_7) \
 	$(am__append_14) $(am__append_16) $(am__append_18) \
 	$(am__append_20) $(am__append_22) $(am__append_24) \
 	$(am__append_26) $(am__append_28) $(am__append_30)
+libcontrib_la_LIBS = 
 libcontrib_la_SOURCES = cppsource.C # Dummy C++ source to cause C++ linking.
 SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \

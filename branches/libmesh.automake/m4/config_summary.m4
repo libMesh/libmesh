@@ -27,6 +27,7 @@ echo C++ compiler....................... : $CXX
 echo C compiler......................... : $CC
 echo Fortran compiler................... : $FC
 echo Build Methods...................... : $METHODS
+echo " "
 for method in ${METHODS}; do
      case "${method}" in
          opt)   
@@ -45,6 +46,7 @@ echo CXXFLAGS...\(dbg\)................... : $CXXFLAGS_DBG
 echo CFLAGS.....\(dbg\)................... : $CFLAGS_DBG
      ;;					 
      esac
+     echo " "
 done
 echo Install dir........................ : $prefix 
 echo Build user......................... : $USER

@@ -10,9 +10,11 @@ noinst_LTLIBRARIES = libcontrib.la
 ###########################################################
 # add contributed libraries that are conditionally compiled
 libcontrib_la_LIBADD  =             # start empty, append below
+libcontrib_la_LIBS    =
 libcontrib_la_SOURCES = cppsource.C # Dummy C++ source to cause C++ linking.
 
 SUBDIRS =
+LIBS =
 
 if LIBMESH_INSTALL_INTERNAL_BOOST
    SUBDIRS += boost/include
@@ -48,6 +50,8 @@ if LIBMESH_ENABLE_TECIO
   libcontrib_la_LIBADD += tecplot/tecio/libtecio.la
 endif
 
+# I don't think this actually copies any sombols into
+# libcontrib.la because we aren't using them here...
 if LIBMESH_ENABLE_TECPLOT
   libcontrib_la_LIBADD += @TECPLOT_LIBRARY@
 endif

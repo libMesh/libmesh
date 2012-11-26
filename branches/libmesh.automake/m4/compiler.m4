@@ -145,9 +145,9 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
 # -------------------------------------------------------------
 # Determine the C++ compiler in use. Return the name and possibly
 # version of this compiler in GXX_VERSION.
-dnl
+#
 # Usage: DETERMINE_CXX_BRAND
-dnl
+#
 # -------------------------------------------------------------
 AC_DEFUN([DETERMINE_CXX_BRAND],
 [
@@ -474,6 +474,9 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
 # CXXFLAGS_OPT    : flags for optimized mode
 # CXXFLAGS_DEVEL  : flags for development mode
 # CXXFLAGS_DBG    : flags for debug mode
+# CPPFLAGS_OPT    : preprocessor flags for optimized mode
+# CPPFLAGS_DEVEL  : preprocessor flags for development mode
+# CPPFLAGS_DBG    : preprocessor flags for debug mode
 # PROFILING_FLAGS : flags to enable code profiling
 # ASSEMBLY_FLAGS  : flags to enable assembly language output
 #
@@ -482,37 +485,13 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
 # (Note the CXXFLAGS and the CPPFLAGS used for further tests may
 #  be augmented)
 # -------------------------------------------------------------
-AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
+AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 [
-  # # Flag for creating shared objects; can be modified at a later stage
-  # case "$target_os" in
-  #   *darwin*)
-  #     if test "$enableshared" = yes ; then
-  #       CXXFLAGS_OPT="-fno-common"
-  #       CXXFLAGS_DEVEL="-fno-common"
-  #       CXXFLAGS_DBG="-fno-common"
-  #       LDFLAGS="$LDFLAGS -Wl,-undefined,dynamic_lookup,-flat_namespace"
-  #       if test $APPLE_GCC = true ; then
-  #         case "$GXX_VERSION_STRING" in
-  #           *4.0.* | *3.4.* | *3.3.* | *3.2.* | *3.1.* | *3.0.* | *2.97* | *2.96* | *2.95* | *"egcs-1.1"*)
-  #             CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
-  #             ;;
-  #           *)
-  #             CXXSHAREDFLAG="-ldylib1.o -dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace,-no_compact_linkedit"
-  #             ;;
-  #           *)
-  #         esac
-  #       else
-  #         CXXSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
-  #       fi
-  #       CSHAREDFLAG="-dynamiclib -Wl,-undefined,dynamic_lookup,-flat_namespace"
-  #     fi
-  #     ;;
-  #   *)  
-  #     CXXSHAREDFLAG="-shared"
-  #     ;;
-  # esac
-
+  # method-specific preprocessor flags, independent of compiler.
+  CPPFLAGS_OPT="-DNDEBUG"
+  CPPFLAGS_DBG="-DDEBUG"
+  CPPFLAGS_DEVEL=""
+  
   # Flag to add directories to the dynamic library search path; can
   # be changed at a later stage
   RPATHFLAG="-Wl,-rpath,"
@@ -539,19 +518,6 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
     CFLAGS_DEVEL="$CFLAGS_OPT -g -Wimplicit"
     CFLAGS_DBG="-g -Wimplicit"
     ASSEMBLY_FLAGS="$ASSEMBLY_FLAGS -fverbose-asm"
-
-    # # Position-independent code for shared libraries
-    # if test "$enableshared" = yes ; then
-    #   CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
-    #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -fPIC"
-    #   CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
-
-    #   CFLAGS_OPT="$CFLAGS_OPT -fPIC"
-    #   CFLAGS_DEVEL="$CFLAGS_DEVEL -fPIC"
-    #   CFLAGS_DBG="$CFLAGS_DBG -fPIC"
-
-    #   FFLAGS="$FFLAGS -fPIC"
-    # fi
 
     # set some flags that are specific to some versions of the
     # compiler:
@@ -591,22 +557,20 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
       gcc4.4 | gcc4.5 | gcc4.6)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
-
-         if test `uname` = "Darwin" ; then
-           CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
-         else
-           CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
+	 CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
+	 
+         if test `uname` != "Darwin" ; then
+           CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
          fi
 	 ;;
 
       gcc3.* | gcc4.*)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
+	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
          
-         if test `uname` = "Darwin" ; then
-	   CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
-	 else    
-	   CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"	
+         if test `uname` != "Darwin" ; then
+	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"	
 	 fi
   	 ;;
       *)
@@ -641,9 +605,6 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
           CFLAGS_DBG="-qansialias -g"
           CFLAGS_DEVEL="$CFLAGS_DBG"
-	  # CXXSHAREDFLAG="-G -qmkshrobj -bnoerrmsg"
-	  # CSHAREDFLAG="-G -qmkshrobj"
-	  # RPATHFLAG="-Qoption,link,-rpath,"
           ;;
   
       MIPSpro)
@@ -658,21 +619,6 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           # For some reason, CC forgets to add the math lib to the
           # linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
-
-          # # Position-independent code for shared libraries
-          # if test "$enableshared" = yes ; then
-          #   CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-          #   CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-          #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -KPIC"
-
-          #   CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-          #   CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-          #   CFLAGS_DEVEL="$CFLAGS_DEVEL -KPIC"
-
-          #   FFLAGS="$FFLAGS -KPIC"
-
-          #   LDFLAGS="$LDFLAGS -KPIC"
-          # fi
 
 	  # Augment CXXFLAGS to include -LANG:std if not there.  This is
           # needed to compile the remaining configure tests
@@ -821,7 +767,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               #       Metis function "GKfree" caused this error
               #       in almost every file.
               # #1476: 'field uses tail padding of a base class'
-          	  # #1505: 'size of class is affected by tail padding'
+              # #1505: 'size of class is affected by tail padding'
               #        simply warns of a possible incompatibility with
               #        the g++ ABI for this case
               # #1572: 'floating-point equality and inequality comparisons are unreliable'
@@ -841,7 +787,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
               #       Metis function "GKfree" caused this error
               #       in almost every file.
               # #1476: 'field uses tail padding of a base class'
-          	  # #1505: 'size of class is affected by tail padding'
+              # #1505: 'size of class is affected by tail padding'
               #        simply warns of a possible incompatibility with
               #        the g++ ABI for this case
               # #1572: 'floating-point equality and inequality comparisons are unreliable'
@@ -873,42 +819,6 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 	      AC_MSG_RESULT(Unknown Intel complier, "$GXX_VERSION")
               ;;
         esac
-
-        # # Position-independent code for shared libraries
-        # if test "$enableshared" = yes ; then
-	        
-        #   # Specific flags for specific versions
-        #   case "$GXX_VERSION" in
-
-        #     # Intel ICC >= 10.0	
-        #     intel_*_v1?.*)
-        #       CXXFLAGS_OPT="$CXXFLAGS_OPT -fPIC"
-        #       CXXFLAGS_DBG="$CXXFLAGS_DBG -fPIC"
-        #       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -fPIC"
-        
-        #       CFLAGS_OPT="$CFLAGS_OPT -fPIC"
-        #       CFLAGS_DBG="$CFLAGS_DBG -fPIC"
-        #       CFLAGS_DEVEL="$CFLAGS_DEVEL -fPIC"
-
-        #       FFLAGS="$FFLAGS -fPIC"
-
-        #       LDFLAGS="$LDFLAGS -fPIC"
-	#       ;;
-	#     *)
-        #       CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-        #       CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-        #       CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -KPIC"
-        
-        #       CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-        #       CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-        #       CFLAGS_DEVEL="$CFLAGS_DEVEL -KPIC"
-
-	#       FFLAGS="$FFLAGS -KPIC"
-
-        #       LDFLAGS="$LDFLAGS -KPIC"
-	#       ;;
-        #   esac
-        # fi
       ;;
   
       compaq_cxx)
@@ -932,14 +842,14 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           # #1182:`statement either is unreachable or causes unreachable code'
           #       (happens in switch(dim) clauses for other dimensions than
           #       the present one)
-          dnl
+          #
           # Also disable the following error:
           # #265: `class "..." is inaccessible' (happens when we try to
           #       initialize a static member variable in terms of another
           #       static member variable of the same class if the latter is
           #       not public and therefore not accessible at global scope in
           #       general. I nevertheless think that this is valid.)
-          dnl
+          #
           # Besides this, choose the most standard conforming mode of the
           # compiler, i.e. -model ansi and -std strict_ansi. Unfortunately,
           # we have to also add the flag -implicit_local (generating implicit
@@ -962,27 +872,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
             CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -msg_disable $i"
           done
   
-          # If we use -model ansi to compile the files, we also have to
-          # specify it for linking
-          # LDFLAGS="$LDFLAGS -model ansi"
-  
           # For some reason, cxx also forgets to add the math lib to the
           # linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
-
-
-          # # Position-independent code for shared libraries
-          # if test "$enableshared" = yes ; then
-          #   CXXFLAGS_OPT="$CXXFLAGS_OPT -shared"
-          #   CXXFLAGS_DBG="$CXXFLAGS_DBG -shared"
-          #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -shared"
-
-          #   CFLAGS_OPT="$CFLAGS_OPT -shared"
-          #   CFLAGS_DBG="$CFLAGS_DBG -shared"
-          #   CFLAGS_DEVEL="$CFLAGS_DEVEL -shared"
-
-          #   LDFLAGS="$LDFLAGS -shared"
-          # fi
           ;;
   
       sun_studio | sun_forte)
@@ -993,28 +885,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
           CFLAGS_DBG="-g"
           CFLAGS_OPT="-xO4"
           CFLAGS_DEVEL="$CFLAGS_DBG"
-
-          # CXXSHAREDFLAG="-G"
-          # CSHAREDFLAG="-G"
-
-          # # Linker flags & librpcsvc for XDR
-          # RPATHFLAG="-R"
+	  
+          # librpcsvc for XDR
           LIBS="-lrpcsvc $LIBS"
-
-          # # Position-independent code for shared libraries
-          # if test "$enableshared" = yes ; then
-          #   CXXFLAGS_OPT="$CXXFLAGS_OPT -KPIC"
-          #   CXXFLAGS_DBG="$CXXFLAGS_DBG -KPIC"
-          #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -KPIC"
-
-          #   CFLAGS_OPT="$CFLAGS_OPT -KPIC"
-          #   CFLAGS_DBG="$CFLAGS_DBG -KPIC"
-          #   CFLAGS_DEVEL="$CFLAGS_DEVEL -KPIC"
-
-	  #   FFLAGS="$FFLAGS -KPIC"
-
-          #   LDFLAGS="$LDFLAGS -KPIC"
-          # fi
           ;;
   
       portland_group)
@@ -1034,28 +907,6 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 	    CXXFLAGS_DBG="$CXXFLAGS_DBG --no_exceptions"
             CXXFLAGS_OPT="$CXXFLAGS_OPT --no_exceptions"
           fi
-
-          # # Position-independent code for shared libraries
-          # if test "$enableshared" = yes ; then
-          #   CXXFLAGS_OPT="$CXXFLAGS_OPT -fpic"
-          #   CXXFLAGS_DBG="$CXXFLAGS_DBG -fpic"
-          #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -fpic"
-          
-          #   CFLAGS_OPT="$CFLAGS_OPT -fpic"
-          #   CFLAGS_DBG="$CFLAGS_DBG -fpic"
-          #   CFLAGS_DEVEL="$CFLAGS_DEVEL -fpic"
-          
-          #   LDFLAGS="$LDFLAGS -fpic"
-          # fi
-
-	  # if test $target_cpu = "x86_64" ; then
-	  #   CXXFLAGS_DBG="$CXXFLAGS_DBG -tp amd64"
-	  #   CXXFLAGS_OPT="$CXXFLAGS_OPT -tp amd64"
-	  #   CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -tp amd64"
-	  #   CFLAGS_DBG="$CFLAGS_DBG -tp amd64"
-	  #   CFLAGS_OPT="$CFLAGS_OPT -tp amd64"
-	  #   CFLAGS_DEVEL="$CFLAGS_DEVEL -tp amd64"
-          # fi
           ;;
 
       hpux_acc)
@@ -1092,10 +943,6 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS], dnl
 	  CFLAGS_DBG="-G n"
 	  CFLAGS_OPT="-G n"
 	  CFLAGS_DEVEL="-G n"
-
-	  # CXXSHAREDFLAG=""
-	  # CSHAREDFLAG=""
-	  # RPATHFLAG=""
 	  ;;
 
       clang)
