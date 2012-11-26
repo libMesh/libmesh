@@ -42,6 +42,9 @@ AC_CONFIG_FILES([Makefile
 		 tests/Makefile
 		 doc/Doxyfile
 		 contrib/utils/libmesh.pc
+		 contrib/utils/libmesh-opt.pc:contrib/utils/libmesh.pc.in
+		 contrib/utils/libmesh-dbg.pc
+		 contrib/utils/libmesh-devel.pc
 		 ])
 
 AC_CONFIG_FILES(contrib/bin/libmesh-config,          [chmod +x contrib/bin/libmesh-config])

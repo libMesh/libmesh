@@ -37,7 +37,7 @@ if LIBMESH_DBG_MODE
   example_dbg_SOURCES  = $(sources)
   example_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
   example_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
-  example_dbg_LDADD    = $(top_builddir)/dbg/libmesh.la
+  example_dbg_LDADD    = $(top_builddir)/dbg/libmesh_dbg.la
 endif
 
 if LIBMESH_DEVEL_MODE
@@ -45,7 +45,7 @@ if LIBMESH_DEVEL_MODE
   example_devel_SOURCES  = $(sources)
   example_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
   example_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
-  example_devel_LDADD    = $(top_builddir)/opt/libmesh.la
+  example_devel_LDADD    = $(top_builddir)/devel/libmesh_devel.la
 endif
 
 ######################################################################

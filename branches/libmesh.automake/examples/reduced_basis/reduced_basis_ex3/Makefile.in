@@ -126,7 +126,7 @@ am__objects_4 = $(am__objects_3)
 @LIBMESH_DBG_MODE_TRUE@am_example_dbg_OBJECTS = $(am__objects_4)
 example_dbg_OBJECTS = $(am_example_dbg_OBJECTS)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_DEPENDENCIES =  \
-@LIBMESH_DBG_MODE_TRUE@	$(top_builddir)/dbg/libmesh.la
+@LIBMESH_DBG_MODE_TRUE@	$(top_builddir)/dbg/libmesh_dbg.la
 example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -137,8 +137,7 @@ am__objects_5 = example_devel-reduced_basis_ex3.$(OBJEXT)
 am__objects_6 = $(am__objects_5)
 @LIBMESH_DEVEL_MODE_TRUE@am_example_devel_OBJECTS = $(am__objects_6)
 example_devel_OBJECTS = $(am_example_devel_OBJECTS)
-@LIBMESH_DEVEL_MODE_TRUE@example_devel_DEPENDENCIES =  \
-@LIBMESH_DEVEL_MODE_TRUE@	$(top_builddir)/opt/libmesh.la
+@LIBMESH_DEVEL_MODE_TRUE@example_devel_DEPENDENCIES = $(top_builddir)/devel/libmesh_devel.la
 example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
@@ -577,11 +576,11 @@ data_DATA = $(data)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_SOURCES = $(sources)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@example_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@example_dbg_LDADD = $(top_builddir)/dbg/libmesh.la
+@LIBMESH_DBG_MODE_TRUE@example_dbg_LDADD = $(top_builddir)/dbg/libmesh_dbg.la
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_SOURCES = $(sources)
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
 @LIBMESH_DEVEL_MODE_TRUE@example_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
-@LIBMESH_DEVEL_MODE_TRUE@example_devel_LDADD = $(top_builddir)/opt/libmesh.la
+@LIBMESH_DEVEL_MODE_TRUE@example_devel_LDADD = $(top_builddir)/devel/libmesh_devel.la
 
 ######################################################################
 #

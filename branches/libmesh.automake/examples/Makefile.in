@@ -384,11 +384,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
-
-######################################################################
-#
-# What to do for 'make installcheck'
-bindir = @bindir@/@host@_@METHOD@
+bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
 build_cpu = @build_cpu@
@@ -443,7 +439,7 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-libdir = @libdir@/@host@_@METHOD@
+libdir = @libdir@
 libexecdir = @libexecdir@
 libmesh_CFLAGS = @libmesh_CFLAGS@
 libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
@@ -536,6 +532,12 @@ data_DATA = run_common.sh
 # include our header checking script when doing 'make dist'
 EXTRA_DIST = $(data_DATA) ../contrib/bin/test_installed_examples.sh \
 	Make.common
+
+######################################################################
+#
+# What to do for 'make installcheck'
+#bindir=@bindir@/@host@_@METHOD@
+#libdir=@libdir@/@host@_@METHOD@
 pkgconfigdir = $(libdir)/pkgconfig
 all: all-recursive
 

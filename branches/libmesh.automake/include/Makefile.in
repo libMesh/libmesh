@@ -388,11 +388,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
-
-######################################################################
-#
-# What to do for 'make installcheck'
-bindir = @bindir@/@host@_@METHOD@
+bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
 build_cpu = @build_cpu@
@@ -446,7 +442,7 @@ htmldir = @htmldir@
 includedir = $(prefix)/include/libmesh
 infodir = @infodir@
 install_sh = @install_sh@
-libdir = @libdir@/@host@_@METHOD@
+libdir = @libdir@
 libexecdir = @libexecdir@
 libmesh_CFLAGS = @libmesh_CFLAGS@
 libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
@@ -859,6 +855,12 @@ include_HEADERS = \
 
 # include our header checking script when doing 'make dist'
 EXTRA_DIST = ../contrib/bin/test_installed_headers.sh
+
+######################################################################
+#
+# What to do for 'make installcheck'
+#bindir=@bindir@/@host@_@METHOD@
+#libdir=@libdir@/@host@_@METHOD@
 pkgconfigdir = $(libdir)/pkgconfig
 
 # the actual header files we want to test for self-sufficiency

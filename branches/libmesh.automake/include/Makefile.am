@@ -16,8 +16,8 @@ EXTRA_DIST = ../contrib/bin/test_installed_headers.sh
 ######################################################################
 #
 # What to do for 'make installcheck'
-bindir=@bindir@/@host@_@METHOD@
-libdir=@libdir@/@host@_@METHOD@
+#bindir=@bindir@/@host@_@METHOD@
+#libdir=@libdir@/@host@_@METHOD@
 pkgconfigdir=$(libdir)/pkgconfig
 
 # the actual header files we want to test for self-sufficiency

@@ -74,8 +74,8 @@ EXTRA_DIST += ../contrib/bin/test_installed_examples.sh Make.common
 ######################################################################
 #
 # What to do for 'make installcheck'
-bindir=@bindir@/@host@_@METHOD@
-libdir=@libdir@/@host@_@METHOD@
+#bindir=@bindir@/@host@_@METHOD@
+#libdir=@libdir@/@host@_@METHOD@
 pkgconfigdir=$(libdir)/pkgconfig
 
 installcheck-local:
