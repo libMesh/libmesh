@@ -1,5 +1,3 @@
-#include $(top_builddir)/Make.common
-
 AM_CPPFLAGS  = $(CPPFLAGS_OPT) -DTRILIBRARY -DANSI_DECLARATORS
 AM_CFLAGS    = $(CFLAGS_OPT) 
 AM_CXXFLAGS  = $(CXXFLAGS_OPT)

@@ -1,5 +1,3 @@
-#include $(top_builddir)/Make.common
-
 #bindir=@bindir@/@host@_@METHOD@
 #libdir=@libdir@/@host@_@METHOD@
 

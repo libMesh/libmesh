@@ -1,6 +1,3 @@
-#include $(top_builddir)/Make.common
-# handle linking source files
-
 AUTOMAKE_OPTIONS = subdir-objects 
 
 AM_CPPFLAGS = $(CPPFLAGS_OPT)

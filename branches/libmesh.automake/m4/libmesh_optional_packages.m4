@@ -28,7 +28,6 @@ AC_ARG_ENABLE(optional,
                              [en/disable optional external libraries]),
               enableoptional=$enableval,
               enableoptional=yes)
-AC_SUBST(enableoptional)	
 
 # Note that even when optional packages are disabled we need to
 # run their m4 macros to get proper AM_CONDITIONALs.  Just be
@@ -68,7 +67,8 @@ AM_CONDITIONAL(LIBMESH_ENABLE_PETSC, test x$enablepetsc = xyes)
 # -------------------------------------------------------------
 CONFIGURE_SLEPC
 if (test $enableslepc = yes ) ; then
-  libmesh_optional_INCLUDES="-I$SLEPC_DIR/include $libmesh_optional_INCLUDES"
+  libmesh_optional_INCLUDES="$SLEPC_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$SLEPC_LIBS $libmesh_optional_LIBS"
 fi
 AM_CONDITIONAL(LIBMESH_ENABLE_SLEPC, test x$enableslepc = xyes)	 
 # -------------------------------------------------------------

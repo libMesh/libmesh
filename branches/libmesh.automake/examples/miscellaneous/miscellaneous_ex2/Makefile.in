@@ -14,16 +14,6 @@
 
 @SET_MAKE@
 
-######################################################################
-#
-# Common environment for all examples
-# 
-# This file is included by *every* example.  If we are careful, common
-# rules like 'make doc' or 'make run' can be defined here, once and 
-# for all.
-# 
-#include $(top_builddir)/Make.common
-
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -408,6 +398,8 @@ SFC_INCLUDE = @SFC_INCLUDE@
 SFC_LIB = @SFC_LIB@
 SHELL = @SHELL@
 SLEPC_DIR = @SLEPC_DIR@
+SLEPC_INCLUDE = @SLEPC_INCLUDE@
+SLEPC_LIBS = @SLEPC_LIBS@
 STRIP = @STRIP@
 SVN_REVISION = @SVN_REVISION@
 TBB_INCLUDE = @TBB_INCLUDE@
@@ -457,37 +449,7 @@ datadir = $(install_dir)
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
-enableaztecoo = @enableaztecoo@
-enablecomplex = @enablecomplex@
-enableeigen = @enableeigen@
-enableexodus = @enableexodus@
-enablefparser = @enablefparser@
-enablefparserdevel = @enablefparserdevel@
-enableglpk = @enableglpk@
-enablegmv = @enablegmv@
-enablegz = @enablegz@
-enablelaspack = @enablelaspack@
 enablelegacyincludepaths = @enablelegacyincludepaths@
-enablelibhilbert = @enablelibhilbert@
-enablemetis = @enablemetis@
-enableml = @enableml@
-enablenemesis = @enablenemesis@
-enablenetcdf = @enablenetcdf@
-enablenox = @enablenox@
-enableopenmp = @enableopenmp@
-enableoptional = @enableoptional@
-enableparmetis = @enableparmetis@
-enablepetsc = @enablepetsc@
-enablesfc = @enablesfc@
-enableslepc = @enableslepc@
-enabletecio = @enabletecio@
-enabletecplot = @enabletecplot@
-enabletetgen = @enabletetgen@
-enabletriangle = @enabletriangle@
-enabletrilinos10 = @enabletrilinos10@
-enabletrilinos9 = @enabletrilinos9@
-enablevtk = @enablevtk@
-enablexdr = @enablexdr@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
@@ -520,7 +482,6 @@ program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
-slepcversion = @slepcversion@
 srcdir = @srcdir@
 svnquery = @svnquery@
 sysconfdir = @sysconfdir@
@@ -545,6 +506,15 @@ sources = $(data) run.sh
 
 # conditionally enable this test
 @LIBMESH_ENABLE_COMPLEX_TRUE@check_SCRIPTS = run.sh
+
+######################################################################
+#
+# Common environment for all examples
+# 
+# This file is included by *every* example.  If we are careful, common
+# rules like 'make doc' or 'make run' can be defined here, once and 
+# for all.
+# 
 AUTOMAKE_OPTIONS = subdir-objects 
 AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)

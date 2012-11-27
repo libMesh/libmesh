@@ -45,10 +45,6 @@ SUBDIRS = \
 	vector_fe/vector_fe_ex2 \
 	vector_fe/vector_fe_ex3
 
-
-
-#include $(top_builddir)/Make.common
-
 AUTOMAKE_OPTIONS = subdir-objects 
 
 AM_CPPFLAGS  = $(libmesh_CPPFLAGS)

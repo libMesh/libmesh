@@ -1,0 +1,50 @@
+######################################################################
+#
+# Common environment for all contribued packages
+# 
+# If we are careful, common rules can be defined here, 
+# once and for all.
+# 
+AUTOMAKE_OPTIONS = subdir-objects 
+
+AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
+AM_CFLAGS    = $(libmesh_CFLAGS)
+AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
+LIBS         = $(libmesh_optional_LIBS)
+
+######################################################################
+#
+# Building the flavors
+#
+noinst_LTLIBRARIES = 
+
+if LIBMESH_OPT_MODE
+  noinst_LTLIBRARIES        += libcontrib_opt.la
+  libcontrib_opt_la_SOURCES  = $(sources)
+  libcontrib_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+  libcontrib_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
+  libcontrib_opt_la_CFLAGS   = $(CFLAGS_OPT)
+  libcontrib_opt_la_LDADD    = $(libs)
+endif
+
+if LIBMESH_DBG_MODE
+  noinst_LTLIBRARIES        += libcontrib_dbg.la
+  libcontrib_dbg_la_SOURCES  = $(sources)
+  libcontrib_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+  libcontrib_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
+  libcontrib_dbg_la_CFLAGS   = $(CFLAGS_DBG)
+  libcontrib_dbg_la_LDADD    = $(libs)
+endif
+
+if LIBMESH_DEVEL_MODE
+  noinst_LTLIBRARIES          += libcontrib_devel.la
+  libcontrib_devel_la_SOURCES  = $(sources)
+  libcontrib_devel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+  libcontrib_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
+  libcontrib_devel_la_CFLAGS   = $(CFLAGS_DEVEL)
+  libcontrib_devel_la_LDADD    = $(libs)
+endif
+
+# Local Variables:
+# mode: makefile
+# End:

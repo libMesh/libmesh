@@ -102,8 +102,4 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       enabletecplot=no
     fi
   fi
-
-
-
-  AC_SUBST(enabletecplot)
 ])

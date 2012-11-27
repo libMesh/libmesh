@@ -13,8 +13,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
-#include $(top_builddir)/Make.common
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -339,7 +337,7 @@ LDFLAGS = @LDFLAGS@
 LIBHILBERT_INCLUDE = @LIBHILBERT_INCLUDE@
 LIBHILBERT_LIBRARY = @LIBHILBERT_LIBRARY@
 LIBOBJS = @LIBOBJS@
-LIBS = $(libmesh_LIBS) $(CPPUNIT_LIBS)
+LIBS = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -410,6 +408,8 @@ SFC_INCLUDE = @SFC_INCLUDE@
 SFC_LIB = @SFC_LIB@
 SHELL = @SHELL@
 SLEPC_DIR = @SLEPC_DIR@
+SLEPC_INCLUDE = @SLEPC_INCLUDE@
+SLEPC_LIBS = @SLEPC_LIBS@
 STRIP = @STRIP@
 SVN_REVISION = @SVN_REVISION@
 TBB_INCLUDE = @TBB_INCLUDE@
@@ -459,37 +459,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
-enableaztecoo = @enableaztecoo@
-enablecomplex = @enablecomplex@
-enableeigen = @enableeigen@
-enableexodus = @enableexodus@
-enablefparser = @enablefparser@
-enablefparserdevel = @enablefparserdevel@
-enableglpk = @enableglpk@
-enablegmv = @enablegmv@
-enablegz = @enablegz@
-enablelaspack = @enablelaspack@
 enablelegacyincludepaths = @enablelegacyincludepaths@
-enablelibhilbert = @enablelibhilbert@
-enablemetis = @enablemetis@
-enableml = @enableml@
-enablenemesis = @enablenemesis@
-enablenetcdf = @enablenetcdf@
-enablenox = @enablenox@
-enableopenmp = @enableopenmp@
-enableoptional = @enableoptional@
-enableparmetis = @enableparmetis@
-enablepetsc = @enablepetsc@
-enablesfc = @enablesfc@
-enableslepc = @enableslepc@
-enabletecio = @enabletecio@
-enabletecplot = @enabletecplot@
-enabletetgen = @enabletetgen@
-enabletriangle = @enabletriangle@
-enabletrilinos10 = @enabletrilinos10@
-enabletrilinos9 = @enabletrilinos9@
-enablevtk = @enablevtk@
-enablexdr = @enablexdr@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
@@ -522,7 +492,6 @@ program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
-slepcversion = @slepcversion@
 srcdir = @srcdir@
 svnquery = @svnquery@
 sysconfdir = @sysconfdir@

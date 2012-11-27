@@ -1,5 +1,3 @@
-#include $(top_builddir)/Make.common
-
 AUTOMAKE_OPTIONS = subdir-objects 
 
 AM_CPPFLAGS = $(CPPFLAGS_OPT) -DLIBMESH_IS_COMPILING_PARMETIS

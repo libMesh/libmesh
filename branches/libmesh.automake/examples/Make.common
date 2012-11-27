@@ -6,8 +6,6 @@
 # rules like 'make doc' or 'make run' can be defined here, once and 
 # for all.
 # 
-#include $(top_builddir)/Make.common
-
 AUTOMAKE_OPTIONS = subdir-objects 
 
 AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include

@@ -181,7 +181,6 @@ if (test "$enableopenmp" != no) ; then
    AC_SUBST(OPENMP_CXXFLAGS)
    AC_SUBST(OPENMP_CFLAGS)
    AC_SUBST(OPENMP_FFLAGS)
-   AC_SUBST(enableopenmp)
 fi
 # -------------------------------------------------------------
 

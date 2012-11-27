@@ -134,5 +134,4 @@ AC_DEFUN([CONFIGURE_GLPK],
   # Substitute the substitution variables
   AC_SUBST(GLPK_INCLUDE)
   AC_SUBST(GLPK_LIBRARY)	
-  AC_SUBST(enableglpk)
 ])

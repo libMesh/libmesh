@@ -1,5 +1,3 @@
-#include $(top_builddir)/Make.common
-
 AM_CPPFLAGS  = $(CPPFLAGS_OPT)
 AM_CXXFLAGS  = $(CXXFLAGS_OPT)
 AM_CFLAGS    = $(CFLAGS_OPT)

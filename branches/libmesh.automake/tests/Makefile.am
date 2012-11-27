@@ -1,5 +1,3 @@
-#include $(top_builddir)/Make.common
-
 AUTOMAKE_OPTIONS = subdir-objects 
 
 AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
