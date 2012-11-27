@@ -1,4 +1,4 @@
-include $(top_builddir)/Make.common
+#include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
@@ -13,7 +13,7 @@ AM_CPPFLAGS += -I$(top_srcdir)/contrib/metis/GKlib \
                -I$(srcdir)/Lib 
 
 AM_CPPFLAGS += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
-AM_CPPFLAGS += $(libmesh_INCLUDE) # for a PETSc-provided MPI, if required
+AM_CPPFLAGS += $(libmesh_optional_INCLUDES) # for a PETSc-provided MPI, if required
 
 noinst_LTLIBRARIES     = libparmetis.la
 

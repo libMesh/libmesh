@@ -11,7 +11,7 @@ AC_DEFUN([CONFIGURE_SLEPC],
 		   no)  enableslepc=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-slepc) ;;
 		 esac],
-		 [enableslepc=$enablepetsc]) # if unspecified, infer from what's up with PETSc
+		 [enableslepc=no]) # if unspecified, infer from what's up with PETSc
 
 
 

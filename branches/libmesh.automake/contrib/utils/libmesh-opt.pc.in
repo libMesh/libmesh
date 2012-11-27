@@ -7,7 +7,8 @@ Name: libmesh
 Description: The libMesh Finite Element Library
 Requires:
 Version: @VERSION@
-Libs: @libmesh_optional_LIBS@ -Wl,-rpath,${libdir} -L${libdir} -lmesh
+Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_opt \
+      @libmesh_optional_LIBS@      
 Libs.private: 
 Cflags: @CPPFLAGS_OPT@ @CXXFLAGS_OPT@ \
         -I${includedir} -I${includedir}/contrib \

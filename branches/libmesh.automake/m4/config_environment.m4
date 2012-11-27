@@ -29,7 +29,7 @@ AC_CANONICAL_HOST
 BUILD_USER=${USER}
 BUILD_ARCH=${host}
 BUILD_HOST=${ac_hostname}
-BUILD_DATE=`date +'%F %H:%M'`
+#BUILD_DATE=`date +'%F %H:%M'`
 
 # Determine method for querying Source code revisioning (assumes SVN)
 
@@ -59,14 +59,14 @@ BUILD_VERSION=`${SVN_REVISION}`
 AC_DEFINE_UNQUOTED([BUILD_USER],     "${BUILD_USER}",     [The fine user who built the package])
 AC_DEFINE_UNQUOTED([BUILD_ARCH],     "${BUILD_ARCH}",     [Architecture of the build host])
 AC_DEFINE_UNQUOTED([BUILD_HOST],     "${BUILD_HOST}",     [Build host name])
-AC_DEFINE_UNQUOTED([BUILD_DATE],     "${BUILD_DATE}",     [Build date])
+#AC_DEFINE_UNQUOTED([BUILD_DATE],     "${BUILD_DATE}",     [Build date])
 AC_DEFINE_UNQUOTED([BUILD_VERSION],  "${BUILD_VERSION}",  [SVN revision])
 AC_DEFINE_UNQUOTED([BUILD_DEVSTATUS],"${BUILD_DEVSTATUS}",[Dev/Release build])
 
 AC_SUBST(BUILD_USER)
 AC_SUBST(BUILD_ARCH)
 AC_SUBST(BUILD_HOST)
-AC_SUBST(BUILD_DATE)
+#AC_SUBST(BUILD_DATE)
 AC_SUBST(BUILD_VERSION)
 
 ])

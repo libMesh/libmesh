@@ -1,4 +1,4 @@
-# include $(top_builddir)/Make.common
+#include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects
 

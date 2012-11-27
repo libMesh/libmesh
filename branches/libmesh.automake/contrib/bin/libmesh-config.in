@@ -44,7 +44,7 @@ case "$METHOD" in
 	CXXFLAGS="@CXXFLAGS_OPT@"
 	CPPFLAGS="@CPPFLAGS_OPT@"
 	CFLAGS="@CFLAGS_OPT@"
-	libext=""
+	libext="_opt"
 	;;
     dbg)
 	CXXFLAGS="@CXXFLAGS_DBG@"

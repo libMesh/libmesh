@@ -36,13 +36,12 @@ AC_CANONICAL_TARGET
 AC_CONFIG_FILES([Makefile
 		 include/Makefile
 		 include/libmesh/Makefile
-                 include/libmesh/libmesh_version.h
 		 contrib/Makefile
 	         contrib/utils/Make.common
 		 tests/Makefile
 		 doc/Doxyfile
-		 contrib/utils/libmesh.pc
-		 contrib/utils/libmesh-opt.pc:contrib/utils/libmesh.pc.in
+		 contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in
+		 contrib/utils/libmesh-opt.pc
 		 contrib/utils/libmesh-dbg.pc
 		 contrib/utils/libmesh-devel.pc
 		 ])
@@ -55,11 +54,13 @@ AC_CONFIG_FILES(contrib/bin/create_libmesh_release,  [chmod +x contrib/bin/creat
 AC_CONFIG_FILES(doc/dot,                             [chmod +x doc/dot])
 
 # Create a temporary file with e.g. HAVE_MPI
-AC_CONFIG_HEADER(include/libmesh/libmesh_config.h.tmp:include/libmesh/libmesh_config.h.in)
+AC_CONFIG_HEADER(include/libmesh_config.h.tmp:include/libmesh_config.h.in)
 # Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
-AX_PREFIX_CONFIG_H(include/libmesh/libmesh_config.h,LIBMESH,include/libmesh/libmesh_config.h.tmp)
+AX_PREFIX_CONFIG_H(include/libmesh_config.h,LIBMESH,include/libmesh_config.h.tmp)
 
-
+# Print configuration info to the header file
+AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 $ac_configure_args"], [Configuration information.])	
+-
 
 # require automake 1.11 - color tests
 AM_INIT_AUTOMAKE([dist-xz dist-bzip2 tar-ustar color-tests serial-tests 1.11])
@@ -85,25 +86,6 @@ fi
 AM_CONDITIONAL(LIBMESH_VPATH_BUILD, test x$libmesh_vpath_build = xyes)
 
 # --------------------------------------------------------------
-# Release versioning
-# --------------------------------------------------------------
-AX_SPLIT_VERSION
-
-GENERIC_MAJOR_VERSION=$AX_MAJOR_VERSION
-GENERIC_MINOR_VERSION=$AX_MINOR_VERSION
-GENERIC_MICRO_VERSION=$AX_POINT_VERSION
-
-AC_SUBST(GENERIC_MAJOR_VERSION)
-AC_SUBST(GENERIC_MINOR_VERSION)
-AC_SUBST(GENERIC_MICRO_VERSION)
-
-
-# --------------------------------------------------------------
-# Print configuration info to the header file
-# --------------------------------------------------------------
-AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 run on `date`"], [Configuration information.])	
-
-# --------------------------------------------------------------
 # Do compilation tests using the compiler, preprocessor, and file extensions
 # of C++.  This uses the .C extension for test programs.
 # --------------------------------------------------------------
@@ -125,6 +107,21 @@ LIBMESH_SET_CXX_FLAGS
 LIBMESH_SET_METHODS
 
 LT_INIT([disable-static])
+
+
+
+# --------------------------------------------------------------
+# Release versioning - after we find the C++ compiler
+# --------------------------------------------------------------
+AX_SPLIT_VERSION
+
+AC_DEFINE_UNQUOTED(MAJOR_VERSION,            [$AX_MAJOR_VERSION],  [libMesh major version number])
+AC_DEFINE_UNQUOTED(MINOR_VERSION,            [$AX_MINOR_VERSION],  [libMesh minor version number])
+AC_DEFINE_UNQUOTED(MICRO_VERSION,            [$AX_POINT_VERSION],  [libMesh micro version number])
+AC_DEFINE_UNQUOTED(LIB_VERSION,              ["$VERSION"],         [libMesh version number])
+AC_DEFINE_UNQUOTED(LIB_RELEASE,              ["$BUILD_DEVSTATUS"], [libMesh source code version])
+AC_DEFINE_UNQUOTED(CXX,                      ["$CXX"],             [C++ compiler])
+AC_DEFINE_UNQUOTED(IO_COMPATIBILITY_VERSION, ["0.7.4"],            [libMesh I/O file format compatiblity string])
 
 
 

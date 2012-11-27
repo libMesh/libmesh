@@ -25,13 +25,14 @@ void libMesh::libmesh_version_stdout()
 
   std::cout << LIBMESH_LIB_RELEASE << std::endl << std::endl;
 
-  std::cout << "Build Date   = " << LIBMESH_BUILD_DATE     << std::endl;
+  //std::cout << "Build Date   = " << LIBMESH_BUILD_DATE     << std::endl;
   std::cout << "Build Host   = " << LIBMESH_BUILD_HOST     << std::endl;
   std::cout << "Build User   = " << LIBMESH_BUILD_USER     << std::endl;
   std::cout << "Build Arch   = " << LIBMESH_BUILD_ARCH     << std::endl;
   std::cout << "Build Rev    = " << LIBMESH_BUILD_VERSION  << std::endl << std::endl;
 
-  std::cout << "C++ Config   = " << LIBMESH_CXX << " " << LIBMESH_CXXFLAGS << std::endl;
+  // CXXFLAGS is ambiguous wth multiple methods - could add all three but why not libmesh-config?
+  //std::cout << "C++ Config   = " << LIBMESH_CXX << " " << LIBMESH_CXXFLAGS << std::endl;
   std::cout << "--------------------------------------------------------" << std::endl;
 
   return;

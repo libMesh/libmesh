@@ -1,14 +1,21 @@
 SUBDIRS = libmesh
 
+# special handholding for prefix_config.m4 generated files
+# so that 'make clean ; make' works as does 'make distcheck'
+# libmesh_config.h is made by ./configure, so it should get 
+# cleaned by 'make distclean'
+DISTCLEANFILES = libmesh_config.h
+
+#
+# special things to do when running 'make dist'
+dist-hook:
+	rm -rf $(distdir)/libmesh_config.h
 
 # where to install our headers
 includedir=$(prefix)/include/libmesh
 
 # definition of include_HEADERS - get from auto-maintained list
 include include_HEADERS
-
-# TESTS_ENVIRONMENT = CXX="$(CXX)" INCLUDEDIR="$(srcdir)" HEADERS_TO_TEST="$(nobase_include_HEADERS)" LIBMESH_DIR=$(abs_top_srcdir)
-# TESTS = $(check_SCRIPTS)
 
 # include our header checking script when doing 'make dist'
 EXTRA_DIST = ../contrib/bin/test_installed_headers.sh

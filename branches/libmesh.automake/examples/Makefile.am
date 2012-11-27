@@ -47,15 +47,15 @@ SUBDIRS = \
 
 
 
-include $(top_builddir)/Make.common
+#include $(top_builddir)/Make.common
 
 AUTOMAKE_OPTIONS = subdir-objects 
 
 AM_CPPFLAGS  = $(libmesh_CPPFLAGS)
 AM_CFLAGS    = $(libmesh_CFLAGS)
 AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
-AM_CPPFLAGS += $(libmesh_INCLUDE) -I$(top_builddir)/include
-LIBS         = $(libmesh_LIBS)
+AM_CPPFLAGS += $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
+LIBS         = $(libmesh_optional_LIBS)
 
 examples_source_path  = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples

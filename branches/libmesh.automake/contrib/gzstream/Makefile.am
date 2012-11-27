@@ -1,4 +1,4 @@
-# include $(top_builddir)/Make.common
+#include $(top_builddir)/Make.common
 
 AM_CPPFLAGS = $(CPPFLAGS_OPT)
 AM_CFLAGS   = $(CFLAGS_OPT)

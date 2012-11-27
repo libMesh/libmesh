@@ -31,7 +31,7 @@ options="-n_timesteps $n_timesteps -n_refinements $n_refinements \
 for method in ${METHODS}; do
     
     case "${method}" in
-	opt)   executable=example ;;
+	opt)   executable=example-opt ;;
 	dbg)   executable=example-dbg ;;
 	devel) executable=example-devel ;;
 	*) echo "ERROR: unknown method: ${method}!" ; exit 1 ;;

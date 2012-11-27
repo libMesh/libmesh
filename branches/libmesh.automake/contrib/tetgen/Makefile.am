@@ -1,4 +1,4 @@
-include $(top_builddir)/Make.common
+#include $(top_builddir)/Make.common
 
 AM_CPPFLAGS = $(CPPFLAGS_OPT) -DTETLIBRARY -DLIBMESH_IS_COMPILING_TETGEN
 AM_CFLAGS   = $(CFLAGS_OPT)

@@ -140,7 +140,7 @@ AC_DEFUN([LIBMESH_SET_METHODS],
  CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $libmesh_CXXFLAGS"
  CFLAGS_DEVEL="$CFLAGS_DEVEL $libmesh_CFLAGS"
 
- AC_CONFIG_FILES(Make.common:Make.common.in)
+ #AC_CONFIG_FILES(Make.common:Make.common.in)
 
  # conditionally compile selected methods
  for method in ${METHODS}; do

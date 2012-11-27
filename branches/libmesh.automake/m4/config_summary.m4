@@ -51,7 +51,7 @@ done
 echo Install dir........................ : $prefix 
 echo Build user......................... : $USER
 echo Build host......................... : $BUILD_HOST
-echo Configure date..................... : $BUILD_DATE
+#echo Configure date..................... : $BUILD_DATE
 echo Build architecture................. : $BUILD_ARCH
 echo SVN revision number................ : $BUILD_VERSION
 
