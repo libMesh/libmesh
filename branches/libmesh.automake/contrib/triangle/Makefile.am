@@ -1,13 +1,12 @@
-AM_CPPFLAGS  = $(CPPFLAGS_OPT) -DTRILIBRARY -DANSI_DECLARATORS
-AM_CFLAGS    = $(CFLAGS_OPT) 
-AM_CXXFLAGS  = $(CXXFLAGS_OPT)
-AM_CPPFLAGS += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
-
 # generally we do not install contributed headers, but for triangle we
 # must because it can optionally be included directly by our
 # mesh_triangle_interface.h
 includedir = $(prefix)/include/libmesh
 
-noinst_LTLIBRARIES     = libtriangle.la
-include_HEADERS        = triangle.h
-libtriangle_la_SOURCES = triangle.c
+include_HEADERS = triangle.h
+pkg_sources     = triangle.c
+pkg_cppflags    = -DTRILIBRARY -DANSI_DECLARATORS \
+                  -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
+
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common

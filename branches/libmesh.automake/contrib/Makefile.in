@@ -53,37 +53,70 @@ host_triplet = @host@
 target_triplet = @target@
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@am__append_1 = boost/include
 @LIBMESH_ENABLE_GMV_TRUE@am__append_2 = gmv
-@LIBMESH_ENABLE_GMV_TRUE@am__append_3 = gmv/libgmv.la
-@LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_4 = gzstream
-@LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_5 = gzstream/libgzstream.la
-@LIBMESH_ENABLE_NETCDF_TRUE@am__append_6 = netcdf/Lib
-@LIBMESH_ENABLE_NETCDF_TRUE@am__append_7 = netcdf/Lib/libnetcdf.la
-@LIBMESH_ENABLE_EXODUS_TRUE@am__append_8 = exodusii/Lib
-@LIBMESH_ENABLE_EXODUS_TRUE@am__append_9 = exodusii/Lib/libexodusII.la
-@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_10 = nemesis/Lib
-@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_11 = nemesis/Lib/libnemesis.la
-@LIBMESH_ENABLE_TECIO_TRUE@am__append_12 = tecplot/tecio
-@LIBMESH_ENABLE_TECIO_TRUE@am__append_13 = tecplot/tecio/libtecio.la
+@LIBMESH_ENABLE_GMV_TRUE@am__append_3 = gmv/libopt.la 
+@LIBMESH_ENABLE_GMV_TRUE@am__append_4 = gmv/libdbg.la 
+@LIBMESH_ENABLE_GMV_TRUE@am__append_5 = gmv/libdevel.la 
+@LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_6 = gzstream
+@LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_7 = gzstream/libopt.la
+@LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_8 = gzstream/libdbg.la
+@LIBMESH_ENABLE_GZSTREAMS_TRUE@am__append_9 = gzstream/libdevel.la
+@LIBMESH_ENABLE_NETCDF_TRUE@am__append_10 = netcdf/Lib
+@LIBMESH_ENABLE_NETCDF_TRUE@am__append_11 = netcdf/Lib/libopt.la
+@LIBMESH_ENABLE_NETCDF_TRUE@am__append_12 = netcdf/Lib/libdbg.la
+@LIBMESH_ENABLE_NETCDF_TRUE@am__append_13 = netcdf/Lib/libdevel.la
+@LIBMESH_ENABLE_EXODUS_TRUE@am__append_14 = exodusii/Lib
+@LIBMESH_ENABLE_EXODUS_TRUE@am__append_15 = exodusii/Lib/libopt.la
+@LIBMESH_ENABLE_EXODUS_TRUE@am__append_16 = exodusii/Lib/libdbg.la
+@LIBMESH_ENABLE_EXODUS_TRUE@am__append_17 = exodusii/Lib/libdevel.la
+@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_18 = nemesis/Lib
+@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_19 = nemesis/Lib/libopt.la 
+@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_20 = nemesis/Lib/libdbg.la 
+@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_21 = nemesis/Lib/libdevel.la 
+@LIBMESH_ENABLE_TECIO_TRUE@am__append_22 = tecplot/tecio
+@LIBMESH_ENABLE_TECIO_TRUE@am__append_23 = tecplot/tecio/libopt.la
+@LIBMESH_ENABLE_TECIO_TRUE@am__append_24 = tecplot/tecio/libdbg.la
+@LIBMESH_ENABLE_TECIO_TRUE@am__append_25 = tecplot/tecio/libdevel.la
 
-# I don't think this actually copies any sombols into
+# I don't think this actually copies any symbols into
 # libcontrib.la because we aren't using them here...
-@LIBMESH_ENABLE_TECPLOT_TRUE@am__append_14 = @TECPLOT_LIBRARY@
-@LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_15 = triangle
-@LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_16 = triangle/libtriangle.la
-@LIBMESH_ENABLE_TETGEN_TRUE@am__append_17 = tetgen
-@LIBMESH_ENABLE_TETGEN_TRUE@am__append_18 = tetgen/libtetgen.la
-@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_19 = libHilbert
-@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_20 = libHilbert/libHilbert.la
-@LIBMESH_ENABLE_LASPACK_TRUE@am__append_21 = laspack
-@LIBMESH_ENABLE_LASPACK_TRUE@am__append_22 = laspack/liblaspack.la
-@LIBMESH_ENABLE_METIS_TRUE@am__append_23 = metis
-@LIBMESH_ENABLE_METIS_TRUE@am__append_24 = metis/libmetis.la
-@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_25 = parmetis
-@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_26 = parmetis/libparmetis.la
-@LIBMESH_ENABLE_SFC_TRUE@am__append_27 = sfcurves
-@LIBMESH_ENABLE_SFC_TRUE@am__append_28 = sfcurves/libsfcurves.la
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_29 = fparser
-@LIBMESH_ENABLE_FPARSER_TRUE@am__append_30 = fparser/libfparser.la
+@LIBMESH_ENABLE_TECPLOT_TRUE@am__append_26 = @TECPLOT_LIBRARY@
+@LIBMESH_ENABLE_TECPLOT_TRUE@am__append_27 = @TECPLOT_LIBRARY@
+@LIBMESH_ENABLE_TECPLOT_TRUE@am__append_28 = @TECPLOT_LIBRARY@
+@LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_29 = triangle
+@LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_30 = triangle/libopt.la
+@LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_31 = triangle/libdbg.la
+@LIBMESH_ENABLE_TRIANGLE_TRUE@am__append_32 = triangle/libdevel.la
+@LIBMESH_ENABLE_TETGEN_TRUE@am__append_33 = tetgen
+@LIBMESH_ENABLE_TETGEN_TRUE@am__append_34 = tetgen/libopt.la
+@LIBMESH_ENABLE_TETGEN_TRUE@am__append_35 = tetgen/libdbg.la
+@LIBMESH_ENABLE_TETGEN_TRUE@am__append_36 = tetgen/libdevel.la
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_37 = libHilbert
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_38 = libHilbert/libopt.la
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_39 = libHilbert/libdbg.la
+@LIBMESH_ENABLE_LIBHILBERT_TRUE@am__append_40 = libHilbert/libdevel.la
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_41 = laspack
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_42 = laspack/libopt.la
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_43 = laspack/libdbg.la
+@LIBMESH_ENABLE_LASPACK_TRUE@am__append_44 = laspack/libdevel.la
+@LIBMESH_ENABLE_METIS_TRUE@am__append_45 = metis
+@LIBMESH_ENABLE_METIS_TRUE@am__append_46 = metis/libopt.la
+@LIBMESH_ENABLE_METIS_TRUE@am__append_47 = metis/libdbg.la
+@LIBMESH_ENABLE_METIS_TRUE@am__append_48 = metis/libdevel.la
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_49 = parmetis
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_50 = parmetis/libopt.la
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_51 = parmetis/libdbg.la
+@LIBMESH_ENABLE_PARMETIS_TRUE@am__append_52 = parmetis/libdevel.la
+@LIBMESH_ENABLE_SFC_TRUE@am__append_53 = sfcurves
+@LIBMESH_ENABLE_SFC_TRUE@am__append_54 = sfcurves/libopt.la
+@LIBMESH_ENABLE_SFC_TRUE@am__append_55 = sfcurves/libdbg.la
+@LIBMESH_ENABLE_SFC_TRUE@am__append_56 = sfcurves/libdevel.la
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_57 = fparser
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_58 = fparser/libfparser.la
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_59 = fparser/libfparser.la
+@LIBMESH_ENABLE_FPARSER_TRUE@am__append_60 = fparser/libfparser.la
+@LIBMESH_OPT_MODE_TRUE@am__append_61 = libcontrib_opt.la
+@LIBMESH_DBG_MODE_TRUE@am__append_62 = libcontrib_dbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_63 = libcontrib_devel.la
 subdir = contrib
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp
@@ -128,18 +161,58 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-libcontrib_la_DEPENDENCIES = $(am__append_3) $(am__append_5) \
-	$(am__append_7) $(am__append_9) $(am__append_11) \
-	$(am__append_13) $(am__DEPENDENCIES_1) $(am__append_16) \
-	$(am__append_18) $(am__append_20) $(am__append_22) \
-	$(am__append_24) $(am__append_26) $(am__append_28) \
-	$(am__append_30)
-am_libcontrib_la_OBJECTS = cppsource.lo
-libcontrib_la_OBJECTS = $(am_libcontrib_la_OBJECTS)
+am__DEPENDENCIES_2 = $(am__append_4) $(am__append_8) $(am__append_12) \
+	$(am__append_16) $(am__append_20) $(am__append_24) \
+	$(am__DEPENDENCIES_1) $(am__append_31) $(am__append_35) \
+	$(am__append_39) $(am__append_43) $(am__append_47) \
+	$(am__append_51) $(am__append_55) $(am__append_59)
+@LIBMESH_DBG_MODE_TRUE@libcontrib_dbg_la_DEPENDENCIES =  \
+@LIBMESH_DBG_MODE_TRUE@	$(am__DEPENDENCIES_2)
+am__libcontrib_dbg_la_SOURCES_DIST = cppsource.C
+@LIBMESH_DBG_MODE_TRUE@am_libcontrib_dbg_la_OBJECTS =  \
+@LIBMESH_DBG_MODE_TRUE@	libcontrib_dbg_la-cppsource.lo
+libcontrib_dbg_la_OBJECTS = $(am_libcontrib_dbg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+libcontrib_dbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libcontrib_dbg_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+@LIBMESH_DBG_MODE_TRUE@am_libcontrib_dbg_la_rpath =
+am__DEPENDENCIES_3 = $(am__append_5) $(am__append_9) $(am__append_13) \
+	$(am__append_17) $(am__append_21) $(am__append_25) \
+	$(am__DEPENDENCIES_1) $(am__append_32) $(am__append_36) \
+	$(am__append_40) $(am__append_44) $(am__append_48) \
+	$(am__append_52) $(am__append_56) $(am__append_60)
+@LIBMESH_DEVEL_MODE_TRUE@libcontrib_devel_la_DEPENDENCIES =  \
+@LIBMESH_DEVEL_MODE_TRUE@	$(am__DEPENDENCIES_3)
+am__libcontrib_devel_la_SOURCES_DIST = cppsource.C
+@LIBMESH_DEVEL_MODE_TRUE@am_libcontrib_devel_la_OBJECTS =  \
+@LIBMESH_DEVEL_MODE_TRUE@	libcontrib_devel_la-cppsource.lo
+libcontrib_devel_la_OBJECTS = $(am_libcontrib_devel_la_OBJECTS)
+libcontrib_devel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libcontrib_devel_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+@LIBMESH_DEVEL_MODE_TRUE@am_libcontrib_devel_la_rpath =
+am__DEPENDENCIES_4 = $(am__append_3) $(am__append_7) $(am__append_11) \
+	$(am__append_15) $(am__append_19) $(am__append_23) \
+	$(am__DEPENDENCIES_1) $(am__append_30) $(am__append_34) \
+	$(am__append_38) $(am__append_42) $(am__append_46) \
+	$(am__append_50) $(am__append_54) $(am__append_58)
+@LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_DEPENDENCIES =  \
+@LIBMESH_OPT_MODE_TRUE@	$(am__DEPENDENCIES_4)
+am__libcontrib_opt_la_SOURCES_DIST = cppsource.C
+@LIBMESH_OPT_MODE_TRUE@am_libcontrib_opt_la_OBJECTS =  \
+@LIBMESH_OPT_MODE_TRUE@	libcontrib_opt_la-cppsource.lo
+libcontrib_opt_la_OBJECTS = $(am_libcontrib_opt_la_OBJECTS)
+libcontrib_opt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(libcontrib_opt_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+@LIBMESH_OPT_MODE_TRUE@am_libcontrib_opt_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -174,8 +247,11 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(libcontrib_la_SOURCES)
-DIST_SOURCES = $(libcontrib_la_SOURCES)
+SOURCES = $(libcontrib_dbg_la_SOURCES) $(libcontrib_devel_la_SOURCES) \
+	$(libcontrib_opt_la_SOURCES)
+DIST_SOURCES = $(am__libcontrib_dbg_la_SOURCES_DIST) \
+	$(am__libcontrib_devel_la_SOURCES_DIST) \
+	$(am__libcontrib_opt_la_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -314,7 +390,7 @@ LDFLAGS = @LDFLAGS@
 LIBHILBERT_INCLUDE = @LIBHILBERT_INCLUDE@
 LIBHILBERT_LIBRARY = @LIBHILBERT_LIBRARY@
 LIBOBJS = @LIBOBJS@
-LIBS = 
+LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -480,25 +556,52 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CPPFLAGS = $(CPPFLAGS_OPT)
-AM_CFLAGS = $(CFLAGS_OPT)
-AM_CXXFLAGS = $(CXXFLAGS_OPT)
-noinst_LTLIBRARIES = libcontrib.la
+AUTOMAKE_OPTIONS = subdir-objects 
 
 ###########################################################
 # add contributed libraries that are conditionally compiled
-libcontrib_la_LIBADD = $(am__append_3) $(am__append_5) $(am__append_7) \
-	$(am__append_9) $(am__append_11) $(am__append_13) \
-	$(am__append_14) $(am__append_16) $(am__append_18) \
-	$(am__append_20) $(am__append_22) $(am__append_24) \
-	$(am__append_26) $(am__append_28) $(am__append_30)
-libcontrib_la_LIBS = 
-libcontrib_la_SOURCES = cppsource.C # Dummy C++ source to cause C++ linking.
-SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_4) \
-	$(am__append_6) $(am__append_8) $(am__append_10) \
-	$(am__append_12) $(am__append_15) $(am__append_17) \
-	$(am__append_19) $(am__append_21) $(am__append_23) \
-	$(am__append_25) $(am__append_27) $(am__append_29)
+SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_6) \
+	$(am__append_10) $(am__append_14) $(am__append_18) \
+	$(am__append_22) $(am__append_29) $(am__append_33) \
+	$(am__append_37) $(am__append_41) $(am__append_45) \
+	$(am__append_49) $(am__append_53) $(am__append_57)
+opt_libs = $(am__append_3) $(am__append_7) $(am__append_11) \
+	$(am__append_15) $(am__append_19) $(am__append_23) \
+	$(am__append_26) $(am__append_30) $(am__append_34) \
+	$(am__append_38) $(am__append_42) $(am__append_46) \
+	$(am__append_50) $(am__append_54) $(am__append_58)
+dbg_libs = $(am__append_4) $(am__append_8) $(am__append_12) \
+	$(am__append_16) $(am__append_20) $(am__append_24) \
+	$(am__append_27) $(am__append_31) $(am__append_35) \
+	$(am__append_39) $(am__append_43) $(am__append_47) \
+	$(am__append_51) $(am__append_55) $(am__append_59)
+devel_libs = $(am__append_5) $(am__append_9) $(am__append_13) \
+	$(am__append_17) $(am__append_21) $(am__append_25) \
+	$(am__append_28) $(am__append_32) $(am__append_36) \
+	$(am__append_40) $(am__append_44) $(am__append_48) \
+	$(am__append_52) $(am__append_56) $(am__append_60)
+
+######################################################################
+#
+# Building the flavors
+#
+noinst_LTLIBRARIES = $(am__append_61) $(am__append_62) \
+	$(am__append_63)
+@LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_SOURCES = cppsource.C
+@LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+@LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
+@LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_CFLAGS = $(CFLAGS_OPT)
+@LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_LIBADD = $(opt_libs)
+@LIBMESH_DBG_MODE_TRUE@libcontrib_dbg_la_SOURCES = cppsource.C
+@LIBMESH_DBG_MODE_TRUE@libcontrib_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+@LIBMESH_DBG_MODE_TRUE@libcontrib_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
+@LIBMESH_DBG_MODE_TRUE@libcontrib_dbg_la_CFLAGS = $(CFLAGS_DBG)
+@LIBMESH_DBG_MODE_TRUE@libcontrib_dbg_la_LIBADD = $(dbg_libs)
+@LIBMESH_DEVEL_MODE_TRUE@libcontrib_devel_la_SOURCES = cppsource.C
+@LIBMESH_DEVEL_MODE_TRUE@libcontrib_devel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+@LIBMESH_DEVEL_MODE_TRUE@libcontrib_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
+@LIBMESH_DEVEL_MODE_TRUE@libcontrib_devel_la_CFLAGS = $(CFLAGS_DEVEL)
+@LIBMESH_DEVEL_MODE_TRUE@libcontrib_devel_la_LIBADD = $(devel_libs)
 all: all-recursive
 
 .SUFFIXES:
@@ -544,8 +647,12 @@ clean-noinstLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-libcontrib.la: $(libcontrib_la_OBJECTS) $(libcontrib_la_DEPENDENCIES) $(EXTRA_libcontrib_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK)  $(libcontrib_la_OBJECTS) $(libcontrib_la_LIBADD) $(LIBS)
+libcontrib_dbg.la: $(libcontrib_dbg_la_OBJECTS) $(libcontrib_dbg_la_DEPENDENCIES) $(EXTRA_libcontrib_dbg_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(libcontrib_dbg_la_LINK) $(am_libcontrib_dbg_la_rpath) $(libcontrib_dbg_la_OBJECTS) $(libcontrib_dbg_la_LIBADD) $(LIBS)
+libcontrib_devel.la: $(libcontrib_devel_la_OBJECTS) $(libcontrib_devel_la_DEPENDENCIES) $(EXTRA_libcontrib_devel_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(libcontrib_devel_la_LINK) $(am_libcontrib_devel_la_rpath) $(libcontrib_devel_la_OBJECTS) $(libcontrib_devel_la_LIBADD) $(LIBS)
+libcontrib_opt.la: $(libcontrib_opt_la_OBJECTS) $(libcontrib_opt_la_DEPENDENCIES) $(EXTRA_libcontrib_opt_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(libcontrib_opt_la_LINK) $(am_libcontrib_opt_la_rpath) $(libcontrib_opt_la_OBJECTS) $(libcontrib_opt_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -553,28 +660,54 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cppsource.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcontrib_dbg_la-cppsource.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcontrib_devel_la-cppsource.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libcontrib_opt_la-cppsource.Plo@am__quote@
 
 .C.o:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
 
 .C.obj:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .C.lo:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+libcontrib_dbg_la-cppsource.lo: cppsource.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcontrib_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libcontrib_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT libcontrib_dbg_la-cppsource.lo -MD -MP -MF $(DEPDIR)/libcontrib_dbg_la-cppsource.Tpo -c -o libcontrib_dbg_la-cppsource.lo `test -f 'cppsource.C' || echo '$(srcdir)/'`cppsource.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcontrib_dbg_la-cppsource.Tpo $(DEPDIR)/libcontrib_dbg_la-cppsource.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cppsource.C' object='libcontrib_dbg_la-cppsource.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcontrib_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libcontrib_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libcontrib_dbg_la-cppsource.lo `test -f 'cppsource.C' || echo '$(srcdir)/'`cppsource.C
+
+libcontrib_devel_la-cppsource.lo: cppsource.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcontrib_devel_la_CPPFLAGS) $(CPPFLAGS) $(libcontrib_devel_la_CXXFLAGS) $(CXXFLAGS) -MT libcontrib_devel_la-cppsource.lo -MD -MP -MF $(DEPDIR)/libcontrib_devel_la-cppsource.Tpo -c -o libcontrib_devel_la-cppsource.lo `test -f 'cppsource.C' || echo '$(srcdir)/'`cppsource.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcontrib_devel_la-cppsource.Tpo $(DEPDIR)/libcontrib_devel_la-cppsource.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cppsource.C' object='libcontrib_devel_la-cppsource.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcontrib_devel_la_CPPFLAGS) $(CPPFLAGS) $(libcontrib_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o libcontrib_devel_la-cppsource.lo `test -f 'cppsource.C' || echo '$(srcdir)/'`cppsource.C
+
+libcontrib_opt_la-cppsource.lo: cppsource.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcontrib_opt_la_CPPFLAGS) $(CPPFLAGS) $(libcontrib_opt_la_CXXFLAGS) $(CXXFLAGS) -MT libcontrib_opt_la-cppsource.lo -MD -MP -MF $(DEPDIR)/libcontrib_opt_la-cppsource.Tpo -c -o libcontrib_opt_la-cppsource.lo `test -f 'cppsource.C' || echo '$(srcdir)/'`cppsource.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libcontrib_opt_la-cppsource.Tpo $(DEPDIR)/libcontrib_opt_la-cppsource.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='cppsource.C' object='libcontrib_opt_la-cppsource.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libcontrib_opt_la_CPPFLAGS) $(CPPFLAGS) $(libcontrib_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o libcontrib_opt_la-cppsource.lo `test -f 'cppsource.C' || echo '$(srcdir)/'`cppsource.C
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -888,6 +1021,9 @@ uninstall-am:
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-recursive uninstall uninstall-am
 
+
+@LIBMESH_ENABLE_FPARSER_TRUE@  # ATM always compile fparser with optimized flags,
+@LIBMESH_ENABLE_FPARSER_TRUE@  # and reuse in all methods
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

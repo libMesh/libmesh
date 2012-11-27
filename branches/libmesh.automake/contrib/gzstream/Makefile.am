@@ -1,7 +1,5 @@
-AM_CPPFLAGS = $(CPPFLAGS_OPT)
-AM_CFLAGS   = $(CFLAGS_OPT)
-AM_CXXFLAGS = $(CXXFLAGS_OPT)
+pkg_sources = gzstream.C gzstream.h
+pkg_libs    = -lz
 
-noinst_LTLIBRARIES     = libgzstream.la
-libgzstream_la_SOURCES = gzstream.C gzstream.h
-libgzstream_la_LIBADD  = -lz
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common

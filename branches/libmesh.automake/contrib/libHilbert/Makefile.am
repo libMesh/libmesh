@@ -1,14 +1,5 @@
-AM_CPPFLAGS = $(CPPFLAGS_OPT)
-AM_CFLAGS   = $(CFLAGS_OPT)
-AM_CXXFLAGS = $(CXXFLAGS_OPT)
-
-AUTOMAKE_OPTIONS = subdir-objects 
-
-AM_CPPFLAGS += -I$(srcdir)/include
-
-noinst_LTLIBRARIES    = libHilbert.la
-
-libHilbert_la_SOURCES = \
+pkg_cppflags = -I$(srcdir)/include
+pkg_sources = \
 	src/BigBitVec.C \
 	src/FixBitVec.C \
 	src/Hilbert.C \
@@ -24,3 +15,6 @@ libHilbert_la_SOURCES = \
 	include/Hilbert/SetLocation.hpp \
 	include/Hilbert.hpp \
 	include/hilbert.h 
+
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common

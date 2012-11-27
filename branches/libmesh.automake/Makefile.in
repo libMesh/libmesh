@@ -77,9 +77,9 @@ DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
 	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
 	build-aux/ylwrap
-@LIBMESH_DBG_MODE_TRUE@am__append_2 = libmesh_dbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_3 = libmesh_devel.la
-@LIBMESH_OPT_MODE_TRUE@am__append_4 = libmesh_opt.la
+@LIBMESH_OPT_MODE_TRUE@am__append_2 = libmesh_opt.la
+@LIBMESH_DBG_MODE_TRUE@am__append_3 = libmesh_dbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_4 = libmesh_devel.la
 @LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_5 = tests
 bin_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_4) $(am__EXEEXT_6)
 @LIBMESH_OPT_MODE_TRUE@am__append_6 = $(opt_programs)
@@ -170,7 +170,7 @@ LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
 am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 @LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_DEPENDENCIES =  \
-@LIBMESH_DBG_MODE_TRUE@	contrib/libcontrib.la \
+@LIBMESH_DBG_MODE_TRUE@	contrib/libcontrib_dbg.la \
 @LIBMESH_DBG_MODE_TRUE@	$(am__DEPENDENCIES_2)
 am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/base/dof_map_constraints.C src/base/dof_object.C \
@@ -812,7 +812,7 @@ libmesh_dbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 @LIBMESH_DBG_MODE_TRUE@am_libmesh_dbg_la_rpath = -rpath $(libdir)
 @LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_DEPENDENCIES =  \
-@LIBMESH_DEVEL_MODE_TRUE@	contrib/libcontrib.la \
+@LIBMESH_DEVEL_MODE_TRUE@	contrib/libcontrib_devel.la \
 @LIBMESH_DEVEL_MODE_TRUE@	$(am__DEPENDENCIES_2)
 am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/base/dof_map_constraints.C src/base/dof_object.C \
@@ -1450,7 +1450,7 @@ libmesh_devel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(LDFLAGS) -o $@
 @LIBMESH_DEVEL_MODE_TRUE@am_libmesh_devel_la_rpath = -rpath $(libdir)
 @LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_DEPENDENCIES =  \
-@LIBMESH_OPT_MODE_TRUE@	contrib/libcontrib.la \
+@LIBMESH_OPT_MODE_TRUE@	contrib/libcontrib_opt.la \
 @LIBMESH_OPT_MODE_TRUE@	$(am__DEPENDENCIES_2)
 am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/base/dof_map_constraints.C src/base/dof_object.C \
@@ -3183,21 +3183,21 @@ libmesh_SOURCES = \
 # objects.  This will get appended with any contributed 
 # sources to create the final library.
 lib_LTLIBRARIES = $(am__append_2) $(am__append_3) $(am__append_4)
-@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_SOURCES = $(libmesh_SOURCES)
-@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS) 
-@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CFLAGS = $(CFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_LIBADD = contrib/libcontrib.la $(LIBS)
-@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_SOURCES = $(libmesh_SOURCES)
-@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS) 
-@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
-@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_CFLAGS = $(CFLAGS_DEVEL)
-@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_LIBADD = contrib/libcontrib.la $(LIBS)
 @LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_SOURCES = $(libmesh_SOURCES)
 @LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS) 
 @LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
 @LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_CFLAGS = $(CFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_LIBADD = contrib/libcontrib.la $(LIBS)
+@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_LIBADD = contrib/libcontrib_opt.la $(LIBS)
+@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_SOURCES = $(libmesh_SOURCES)
+@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS) 
+@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
+@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CFLAGS = $(CFLAGS_DBG)
+@LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_LIBADD = contrib/libcontrib_dbg.la $(LIBS)
+@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_SOURCES = $(libmesh_SOURCES)
+@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS) 
+@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
+@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_CFLAGS = $(CFLAGS_DEVEL)
+@LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_LIBADD = contrib/libcontrib_devel.la $(LIBS)
 bin_SCRIPTS = # empty, append below
 CLEANFILES = # empty, append below
 

@@ -1,13 +1,5 @@
-AM_CPPFLAGS = $(CPPFLAGS_OPT) @TECIO_CPPFLAGS@ -DUSEENUM -DTHREED -DMAKEARCHIVE -DNO_ASSERTS
-AM_CFLAGS   = $(CFLAGS_OPT)
-AM_CXXFLAGS = $(CXXFLAGS_OPT)
-
-AUTOMAKE_OPTIONS = subdir-objects 
-
-
-noinst_LTLIBRARIES = libtecio.la
-
-libtecio_la_SOURCES = \
+pkg_cppflags = @TECIO_CPPFLAGS@ -DUSEENUM -DTHREED -DMAKEARCHIVE -DNO_ASSERTS
+pkg_sources  = \
 	include/TECIO.h \
 	include/TECXXX.h \
 	tecsrc/ALLOC.h \
@@ -59,3 +51,6 @@ libtecio_la_SOURCES = \
 	tecsrc/strutil.cpp \
 	tecsrc/tassert.cpp \
 	tecsrc/tecxxx.cpp 
+
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common

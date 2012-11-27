@@ -7,10 +7,9 @@
 # 
 AUTOMAKE_OPTIONS = subdir-objects 
 
-AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
-AM_CFLAGS    = $(libmesh_CFLAGS)
-AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
-LIBS         = $(libmesh_optional_LIBS)
+AM_CPPFLAGS  = $(pkg_cppflags) # any defined package-specific include paths
+AM_CFLAGS    = 
+AM_CXXFLAGS  = 
 
 ######################################################################
 #
@@ -19,30 +18,30 @@ LIBS         = $(libmesh_optional_LIBS)
 noinst_LTLIBRARIES = 
 
 if LIBMESH_OPT_MODE
-  noinst_LTLIBRARIES        += libcontrib_opt.la
-  libcontrib_opt_la_SOURCES  = $(sources)
-  libcontrib_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
-  libcontrib_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
-  libcontrib_opt_la_CFLAGS   = $(CFLAGS_OPT)
-  libcontrib_opt_la_LDADD    = $(libs)
+  noinst_LTLIBRARIES        += libopt.la
+  libopt_la_SOURCES  = $(pkg_sources)
+  libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+  libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
+  libopt_la_CFLAGS   = $(CFLAGS_OPT)
+  libopt_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
 endif
 
 if LIBMESH_DBG_MODE
-  noinst_LTLIBRARIES        += libcontrib_dbg.la
-  libcontrib_dbg_la_SOURCES  = $(sources)
-  libcontrib_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
-  libcontrib_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
-  libcontrib_dbg_la_CFLAGS   = $(CFLAGS_DBG)
-  libcontrib_dbg_la_LDADD    = $(libs)
+  noinst_LTLIBRARIES        += libdbg.la
+  libdbg_la_SOURCES  = $(pkg_sources)
+  libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+  libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
+  libdbg_la_CFLAGS   = $(CFLAGS_DBG)
+  libdbg_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
 endif
 
 if LIBMESH_DEVEL_MODE
-  noinst_LTLIBRARIES          += libcontrib_devel.la
-  libcontrib_devel_la_SOURCES  = $(sources)
-  libcontrib_devel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
-  libcontrib_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
-  libcontrib_devel_la_CFLAGS   = $(CFLAGS_DEVEL)
-  libcontrib_devel_la_LDADD    = $(libs)
+  noinst_LTLIBRARIES          += libdevel.la
+  libdevel_la_SOURCES  = $(pkg_sources)
+  libdevel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+  libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
+  libdevel_la_CFLAGS   = $(CFLAGS_DEVEL)
+  libdevel_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
 endif
 
 # Local Variables:

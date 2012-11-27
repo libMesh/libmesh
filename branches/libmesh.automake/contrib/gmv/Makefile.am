@@ -1,6 +1,4 @@
-AM_CPPFLAGS = $(CPPFLAGS_OPT)
-AM_CFLAGS   = $(CFLAGS_OPT)
-AM_CXXFLAGS = $(CXXFLAGS_OPT)
+pkg_sources = gmvread.c gmvread.h
 
-noinst_LTLIBRARIES = libgmv.la
-libgmv_la_SOURCES  = gmvread.c gmvread.h
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common
