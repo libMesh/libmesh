@@ -21,25 +21,42 @@ if (test "X$TERM" != Xdumb); then
   colorreset="\033[m"; # Terminal command to reset to terminal default
 fi
 
+
 #echo "CXX=$CXX"
 
-if (test "x$PKG_CONFIG" != "xno"); then
-    installed_CXXFLAGS=`pkg-config libmesh --cflags`
+testing_installed_tree="no"
 
-elif (test -x $LIBMESH_CONFIG_PATH/libmesh-config); then
-    installed_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
+if (test "x$test_CXXFLAGS" = "x"); then
+    
+    testing_installed_tree="yes"
 
-else
-    echo "Cannot query package installation!!"
-    exit 1
+    if (test "x$PKG_CONFIG" != "xno"); then
+	test_CXXFLAGS=`pkg-config libmesh --cflags`
+	
+    elif (test -x $LIBMESH_CONFIG_PATH/libmesh-config); then
+	test_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
+	
+    else
+	echo "Cannot query package installation!!"
+	exit 1
+    fi
 fi
 
 
 
 returnval=0
 for header_to_test in $HEADERS_TO_TEST ; do
-    echo -n "Testing Header $header_to_test ... "
 
+    # skip the files that live in contrib that we are installing when testing
+    # from the source tree - paths will not be correct
+    if (test "x$testing_installed_tree" = "xno"); then
+	if (test "x`dirname $header_to_test`" = "xcontrib"); then
+	    continue
+	fi
+    fi
+    
+    echo -n "Testing Header $header_to_test ... "
+    
     header_name=`basename $header_to_test`
     app_file=`mktemp -t $header_name.XXXXXXXXXX`
     source_file=$app_file.cxx
@@ -49,8 +66,8 @@ for header_to_test in $HEADERS_TO_TEST ; do
     echo "#include \"libmesh/$header_name\"" >> $source_file
     echo "int foo () { return 0; }" >> $source_file
 
-    #echo $CXX $installed_CXXFLAGS $source_file -o $app_file
-    if $CXX $installed_CXXFLAGS $source_file -c -o $object_file >$errlog 2>&1 ; then
+    #echo $CXX $test_CXXFLAGS $source_file -o $app_file
+    if $CXX $test_CXXFLAGS $source_file -c -o $object_file >$errlog 2>&1 ; then
  	echo -e $gotocolumn $white"["$green"   OK   "$white"]";
 	echo -e -n $colorreset;    
     else
@@ -60,7 +77,7 @@ for header_to_test in $HEADERS_TO_TEST ; do
 	cat $source_file
 	echo ""
 	echo "Command line:"
-	echo $CXX $installed_CXXFLAGS $source_file -c -o $object_file
+	echo $CXX $test_CXXFLAGS $source_file -c -o $object_file
 	echo ""
 	echo "Output:"
 	cat $errlog
