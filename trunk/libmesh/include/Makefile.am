@@ -29,14 +29,22 @@ if LIBMESH_ENABLE_FPARSER
   headers_to_test += contrib/fparser.hh
 endif 
 
-installcheck-local:
+test_headers:
 	@echo " "
-	@echo "Checking for standalone headers..."
+	@echo "Checking for standalone headers in source tree..."
 	@echo " "
 	@CXX="$(CXX)" \
-	  HEADERS_TO_TEST="$(headers_to_test)" \
-	  PKG_CONFIG=$(PKG_CONFIG) \
-	  PKG_CONFIG_PATH=$(pkgconfigdir) \
-	  LIBMESH_CONFIG_PATH=$(bindir) \
-	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
+          HEADERS_TO_TEST="$(headers_to_test)" \
+          test_CXXFLAGS="$(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) -I$(top_builddir)/include" \
+          $(top_srcdir)/contrib/bin/test_installed_headers.sh
 
+installcheck-local:
+	@echo " "
+	@echo "Checking for standalone headers in installed tree..."
+	@echo " "
+	@CXX="$(CXX)" \
+          HEADERS_TO_TEST="$(headers_to_test)" \
+          PKG_CONFIG=$(PKG_CONFIG) \
+          PKG_CONFIG_PATH=$(pkgconfigdir) \
+          LIBMESH_CONFIG_PATH=$(bindir) \
+          $(top_srcdir)/contrib/bin/test_installed_headers.sh

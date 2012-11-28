@@ -330,3 +330,8 @@ dist-hook:
 # support 'make run_examples'
 run_examples:
 	@$(MAKE) && cd $(top_builddir)/examples && $(MAKE) check
+
+#
+# support top-level 'make test_headers'
+test_headers:
+	@cd $(top_builddir)/include && $(MAKE) test_headers

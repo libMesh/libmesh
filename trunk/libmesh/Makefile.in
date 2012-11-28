@@ -3773,6 +3773,11 @@ dist-hook:
 run_examples:
 	@$(MAKE) && cd $(top_builddir)/examples && $(MAKE) check
 
+#
+# support top-level 'make test_headers'
+test_headers:
+	@cd $(top_builddir)/include && $(MAKE) test_headers
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
