@@ -24,7 +24,12 @@ fi
 
 #echo "CXX=$CXX"
 
+testing_installed_tree="no"
+
 if (test "x$test_CXXFLAGS" = "x"); then
+    
+    testing_installed_tree="yes"
+
     if (test "x$PKG_CONFIG" != "xno"); then
 	test_CXXFLAGS=`pkg-config libmesh --cflags`
 	
@@ -41,8 +46,17 @@ fi
 
 returnval=0
 for header_to_test in $HEADERS_TO_TEST ; do
-    echo -n "Testing Header $header_to_test ... "
 
+    # skip the files that live in contrib that we are installing when testing
+    # from the source tree - paths will not be correct
+    if (test "x$testing_installed_tree" = "xno"); then
+	if (test "x`dirname $header_to_test`" = "xcontrib"); then
+	    continue
+	fi
+    fi
+    
+    echo -n "Testing Header $header_to_test ... "
+    
     header_name=`basename $header_to_test`
     app_file=`mktemp -t $header_name.XXXXXXXXXX`
     source_file=$app_file.cxx
