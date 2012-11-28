@@ -15,6 +15,9 @@
 /* Architecture of the build host */
 #undef BUILD_ARCH
 
+/* Build date */
+#undef BUILD_DATE
+
 /* Dev/Release build */
 #undef BUILD_DEVSTATUS
 

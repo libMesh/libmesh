@@ -31847,7 +31847,7 @@ fi
 BUILD_USER=${USER}
 BUILD_ARCH=${host}
 BUILD_HOST=${ac_hostname}
-#BUILD_DATE=`date +'%F %H:%M'`
+BUILD_DATE=`date +'%F %H:%M'`
 
 # Determine method for querying Source code revisioning (assumes SVN)
 
@@ -31892,7 +31892,8 @@ fi
 
 
 
-if test "x${svnquery}" = "x" || test `${svnquery} -n $srcdir` = "exported"; then
+# svnversion 1.7.x changed the return value for unversioned directories
+if test "x${svnquery}" = "x" || test "`${svnquery} -n $srcdir`" = "exported" || test "`${svnquery} -n $srcdir`" = "Unversioned directory"; then
    SVN_REVISION="cat $srcdir/dist_version"
    SVN_CHECKOUT=false
    BUILD_DEVSTATUS="External Release"
@@ -31935,7 +31936,6 @@ cat >>confdefs.h <<_ACEOF
 #define BUILD_HOST "${BUILD_HOST}"
 _ACEOF
 
-#AC_DEFINE_UNQUOTED([BUILD_DATE],     "${BUILD_DATE}",     [Build date])
 
 cat >>confdefs.h <<_ACEOF
 #define BUILD_VERSION "${BUILD_VERSION}"
@@ -31945,6 +31945,9 @@ _ACEOF
 cat >>confdefs.h <<_ACEOF
 #define BUILD_DEVSTATUS "${BUILD_DEVSTATUS}"
 _ACEOF
+
+
+$as_echo "#define BUILD_DATE __DATE__\" \"__TIME__" >>confdefs.h
 
 
 

@@ -25,7 +25,7 @@ void libMesh::libmesh_version_stdout()
 
   std::cout << LIBMESH_LIB_RELEASE << std::endl << std::endl;
 
-  //std::cout << "Build Date   = " << LIBMESH_BUILD_DATE     << std::endl;
+  std::cout << "Build Date   = " << LIBMESH_BUILD_DATE     << std::endl;
   std::cout << "Build Host   = " << LIBMESH_BUILD_HOST     << std::endl;
   std::cout << "Build User   = " << LIBMESH_BUILD_USER     << std::endl;
   std::cout << "Build Arch   = " << LIBMESH_BUILD_ARCH     << std::endl;

@@ -11,7 +11,7 @@
 #
 # LAST MODIFICATION
 #
-#   $Id: config_environment.m4 21681 2011-06-11 03:39:51Z karl $
+#   $Id: config_environment.m4 34934 2012-11-28 18:15:04Z benkirk $
 #
 # COPYLEFT
 #
@@ -29,13 +29,14 @@ AC_CANONICAL_HOST
 BUILD_USER=${USER}
 BUILD_ARCH=${host}
 BUILD_HOST=${ac_hostname}
-#BUILD_DATE=`date +'%F %H:%M'`
+BUILD_DATE=`date +'%F %H:%M'`
 
 # Determine method for querying Source code revisioning (assumes SVN)
 
 AC_PATH_PROG(svnquery,svnversion)
 
-if test "x${svnquery}" = "x" || test `${svnquery} -n $srcdir` = "exported"; then
+# svnversion 1.7.x changed the return value for unversioned directories
+if test "x${svnquery}" = "x" || test "`${svnquery} -n $srcdir`" = "exported" || test "`${svnquery} -n $srcdir`" = "Unversioned directory"; then
    SVN_REVISION="cat $srcdir/dist_version"
    SVN_CHECKOUT=false
    BUILD_DEVSTATUS="External Release"
@@ -59,9 +60,9 @@ BUILD_VERSION=`${SVN_REVISION}`
 AC_DEFINE_UNQUOTED([BUILD_USER],     "${BUILD_USER}",     [The fine user who built the package])
 AC_DEFINE_UNQUOTED([BUILD_ARCH],     "${BUILD_ARCH}",     [Architecture of the build host])
 AC_DEFINE_UNQUOTED([BUILD_HOST],     "${BUILD_HOST}",     [Build host name])
-#AC_DEFINE_UNQUOTED([BUILD_DATE],     "${BUILD_DATE}",     [Build date])
 AC_DEFINE_UNQUOTED([BUILD_VERSION],  "${BUILD_VERSION}",  [SVN revision])
 AC_DEFINE_UNQUOTED([BUILD_DEVSTATUS],"${BUILD_DEVSTATUS}",[Dev/Release build])
+AC_DEFINE(         [BUILD_DATE],     __DATE__" "__TIME__, [Build date])
 
 AC_SUBST(BUILD_USER)
 AC_SUBST(BUILD_ARCH)
