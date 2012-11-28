@@ -48,6 +48,11 @@ AC_DEFUN([CONFIGURE_SLEPC],
 		      unset SLEPC_DIR
         	      enableslepc=no
 		    ])
+
+      if (test "x$PETSC_ARCH" != "x"); then
+	  AC_CHECK_FILE([$SLEPC_DIR/$PETSC_ARCH/include/slepc.h],
+                        [SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"])
+      fi
     fi
 
     if (test "x$enableslepc" = "xyes") ; then
