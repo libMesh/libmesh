@@ -785,7 +785,8 @@ TRILINOS_DIR
 LIBMESH_ENABLE_SLEPC_FALSE
 LIBMESH_ENABLE_SLEPC_TRUE
 enableslepc
-slepcversion
+SLEPC_LIBS
+SLEPC_INCLUDE
 SLEPC_DIR
 LIBMESH_ENABLE_PETSC_FALSE
 LIBMESH_ENABLE_PETSC_TRUE
@@ -28562,12 +28563,24 @@ fi
 
   if (test "$enableslepc" !=  no) ; then
 
+    # Although PETSc 3.x does not require PETSC_ARCH, it appears that
+    # SLEPc 3.x may (based on patches sent in by Jed Brown)?
+    # If that's the case, we should probably uncomment
+    # this check and disable SLEPc when PETSC_ARCH is not set...
+    # if test "x$PETSC_ARCH" = x ; then
+    #   enableslepc=no
+    #   AC_MSG_RESULT([<<< SLEPc disabled.  Please set your "\$PETSC_ARCH" environment variable correctly. >>>])
+    # fi
 
-            if test "x$SLEPC_DIR" = x ; then
+    # Test to see if SLEPC_DIR set by user.  If not set, then
+    # try to autodetect in a default directory
+    if test "x$SLEPC_DIR" = x ; then
       SLEPC_DIR=/usr/lib/slepc
     fi
 
-            if test "x$SLEPC_DIR" = x || test "x$petscversion" = x; then
+    # Test to see if SLEPC_DIR and petscversion were set by user or
+    # autodetection.  If not set, then disable slepc, print a message.
+    if (test "x$SLEPC_DIR" = x || test "x$petscversion" = x); then
       enableslepc=no
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly to enable SLEPc. >>>" >&5
 $as_echo "<<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly to enable SLEPc. >>>" >&6; }
@@ -28590,26 +28603,50 @@ eval ac_res=\$$as_ac_File
 	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
 $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  SLEPC_H_PATH=$SLEPC_DIR/include/slepc.h
+  SLEPC_INCLUDE="-I$SLEPC_DIR/include"
+else
+
+		      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Invalid \"\$SLEPC_DIR\" detected (slepc.h not found). SLEPc disabled. >>>" >&5
+$as_echo "<<< Invalid \"\$SLEPC_DIR\" detected (slepc.h not found). SLEPc disabled. >>>" >&6; }
+		      unset SLEPC_DIR
+        	      enableslepc=no
+
 fi
 
 
-      if (test ! -r $SLEPC_DIR/include/slepc.h) ; then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Invalid \"\$SLEPC_DIR\" detected (slepc.h not found). SLEPc disabled. >>>" >&5
-$as_echo "<<< Invalid \"\$SLEPC_DIR\" detected (slepc.h not found). SLEPc disabled. >>>" >&6; }
-        unset SLEPC_DIR
-        enableslepc=no
+      if (test "x$PETSC_ARCH" != "x"); then
+	  as_ac_File=`$as_echo "ac_cv_file_$SLEPC_DIR/$PETSC_ARCH/include/slepc.h" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SLEPC_DIR/$PETSC_ARCH/include/slepc.h" >&5
+$as_echo_n "checking for $SLEPC_DIR/$PETSC_ARCH/include/slepc.h... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "$SLEPC_DIR/$PETSC_ARCH/include/slepc.h"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"
+fi
+
       fi
     fi
 
-    if (test $enableslepc = yes ) ; then
+    if (test "x$enableslepc" = "xyes") ; then
 
-                  slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
+      # Similar to petsc, we need the slepc version number.
+      # Note slepc will most likely only work with the corresponding version of petsc
+      slepcmajor=`grep "define SLEPC_VERSION_MAJOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MAJOR[ ]*//g"`
       slepcminor=`grep "define SLEPC_VERSION_MINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_MINOR[ ]*//g"`
       slepcsubminor=`grep "define SLEPC_VERSION_SUBMINOR" $SLEPC_DIR/include/slepcversion.h | sed -e "s/#define SLEPC_VERSION_SUBMINOR[ ]*//g"`
       slepcversion=$slepcmajor.$slepcminor.$slepcsubminor
-
-
 
       if (test $slepcversion != $petscversion) ; then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: WARNING:" >&5
@@ -28618,17 +28655,109 @@ $as_echo "WARNING:" >&6; }
 $as_echo "<<< Different version numbers for SLEPc and PETSc >>>" >&6; }
       fi
 
+      # OK, now we will create a temporary makefile to query SLEPc libs
+      includefile=""
+      as_ac_File=`$as_echo "ac_cv_file_${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf" >&5
+$as_echo_n "checking for ${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  includefile=${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf
+else
+  as_ac_File=`$as_echo "ac_cv_file_${SLEPC_DIR}/conf/slepc_common_variables" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${SLEPC_DIR}/conf/slepc_common_variables" >&5
+$as_echo_n "checking for ${SLEPC_DIR}/conf/slepc_common_variables... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "${SLEPC_DIR}/conf/slepc_common_variables"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  includefile=${SLEPC_DIR}/conf/slepc_common_variables
+else
+  as_ac_File=`$as_echo "ac_cv_file_${SLEPC_DIR}/conf/slepc_variables" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${SLEPC_DIR}/conf/slepc_variables" >&5
+$as_echo_n "checking for ${SLEPC_DIR}/conf/slepc_variables... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "${SLEPC_DIR}/conf/slepc_variables"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  includefile=${SLEPC_DIR}/conf/slepc_variables
+else
+  enableslepc=no
+fi
+
+fi
+
+fi
+
+
+      if (test "x$enableslepc" = "xyes" -a "x$includefile" != "x" -a -r $includefile); then
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Querying SLEPc configuration from $includefile >>>" >&5
+$as_echo "<<< Querying SLEPc configuration from $includefile >>>" >&6; }
+	  cat <<EOF >Makefile_config_slepc
+include $includefile
+getSLEPC_LIBS:
+	echo \$(SLEPC_LIB) \$(ARPACK_LIB)
+EOF
+	SLEPC_LIBS=`make -s -f Makefile_config_slepc getSLEPC_LIBS`
+	rm -f Makefile_config_slepc
+
+	#echo " "
+	#echo "SLEPC_INCLUDE=$SLEPC_INCLUDE"
+	#echo "SLEPC_LIBS=$SLEPC_LIBS"
+	#echo " "
+
+
 $as_echo "#define HAVE_SLEPC 1" >>confdefs.h
 
-      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with SLEPc version $slepcversion support >>>" >&5
 $as_echo "<<< Configuring library with SLEPc version $slepcversion support >>>" >&6; }
+
+
+
       fi
+    fi
   fi
 
 
 
 if (test $enableslepc = yes ) ; then
-  libmesh_optional_INCLUDES="-I$SLEPC_DIR/include $libmesh_optional_INCLUDES"
+  libmesh_optional_INCLUDES="$SLEPC_INCLUDE $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$SLEPC_LIBS $libmesh_optional_LIBS"
 fi
  if test x$enableslepc = xyes; then
   LIBMESH_ENABLE_SLEPC_TRUE=
