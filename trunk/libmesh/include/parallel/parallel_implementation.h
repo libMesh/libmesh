@@ -120,8 +120,8 @@ class StandardType<std::complex<T> > : public DataType
 {
 public:
   explicit
-  StandardType(const std::complex<T> *example = NULL) :
-    DataType(StandardType<T>(example ? &(example->real()) : NULL), 2) {}
+  StandardType(const std::complex<T> * /*example*/ = NULL) :
+    DataType(StandardType<T>(NULL), 2) {}
 
   ~StandardType() { this->free(); }
 };
@@ -1631,7 +1631,7 @@ inline void Communicator::sum(std::complex<T> &r) const
       MPI_Allreduce (&temp,
                      &r,
                      2,
-                     StandardType<T>(&(r.real())),
+                     StandardType<T>(),
                      MPI_SUM,
                      this->get());
 
@@ -1653,7 +1653,7 @@ inline void Communicator::sum(std::vector<std::complex<T> > &r) const
       MPI_Allreduce (&temp[0],
                      &r[0],
                      r.size() * 2,
-                     StandardType<T>(&(r[0].real())),
+                     StandardType<T>(NULL),
                      MPI_SUM,
                      this->get());
 
