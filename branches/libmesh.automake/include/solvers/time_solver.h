@@ -26,6 +26,7 @@
 #include "libmesh/linear_solver.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/solution_history.h"
 
 // C++ includes
 
@@ -107,9 +108,9 @@ public:
   /**
    * This method advances the adjoint solution to the previous
    * timestep, after an adjoint_solve() has been performed.  This will
-   * probably be done after every UnsteadySolver::adjoint_solve().
+   * be done before every UnsteadySolver::adjoint_solve().
    */
-  virtual void adjoint_recede_timestep ();
+  virtual void adjoint_advance_timestep ();
 
   /**
    * This method uses the DifferentiableSystem's
@@ -190,6 +191,12 @@ public:
    */
   unsigned int reduce_deltat_on_diffsolver_failure;
 
+  /**
+   * A setter function users will employ if they need to do something 
+   * other than save no solution history
+   */
+  void set_solution_history(const SolutionHistory & _solution_history);
+
 protected:
 
   /**
@@ -217,6 +224,13 @@ protected:
    * Serial vector of _system.get_vector("_old_nonlinear_solution")
    */
   AutoPtr<NumericVector<Number> > old_local_nonlinear_solution;
+
+  /**
+   * An AutoPtr to a SolutionHistory object. Default is
+   * NoSolutionHistory, which the user can override by declaring a
+   * different kind of SolutionHistory in the application
+   */
+  AutoPtr<SolutionHistory> solution_history;
 };
 
 

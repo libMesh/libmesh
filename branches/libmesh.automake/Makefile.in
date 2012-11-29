@@ -381,7 +381,9 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solvers/eigen_solver.C src/solvers/eigen_time_solver.C \
 	src/solvers/euler2_solver.C src/solvers/euler_solver.C \
 	src/solvers/laspack_linear_solver.C \
-	src/solvers/linear_solver.C src/solvers/newton_solver.C \
+	src/solvers/linear_solver.C \
+	src/solvers/memory_solution_history.C \
+	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
 	src/solvers/nonlinear_solver.C src/solvers/petsc_diff_solver.C \
 	src/solvers/petsc_dm_nonlinear_solver.C \
 	src/solvers/petsc_linear_solver.C \
@@ -742,7 +744,9 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/solvers/libmesh_dbg_la-euler_solver.lo \
 	src/solvers/libmesh_dbg_la-laspack_linear_solver.lo \
 	src/solvers/libmesh_dbg_la-linear_solver.lo \
+	src/solvers/libmesh_dbg_la-memory_solution_history.lo \
 	src/solvers/libmesh_dbg_la-newton_solver.lo \
+	src/solvers/libmesh_dbg_la-no_solution_history.lo \
 	src/solvers/libmesh_dbg_la-nonlinear_solver.lo \
 	src/solvers/libmesh_dbg_la-petsc_diff_solver.lo \
 	src/solvers/libmesh_dbg_la-petsc_dm_nonlinear_solver.lo \
@@ -1023,7 +1027,9 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solvers/eigen_solver.C src/solvers/eigen_time_solver.C \
 	src/solvers/euler2_solver.C src/solvers/euler_solver.C \
 	src/solvers/laspack_linear_solver.C \
-	src/solvers/linear_solver.C src/solvers/newton_solver.C \
+	src/solvers/linear_solver.C \
+	src/solvers/memory_solution_history.C \
+	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
 	src/solvers/nonlinear_solver.C src/solvers/petsc_diff_solver.C \
 	src/solvers/petsc_dm_nonlinear_solver.C \
 	src/solvers/petsc_linear_solver.C \
@@ -1383,7 +1389,9 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/solvers/libmesh_devel_la-euler_solver.lo \
 	src/solvers/libmesh_devel_la-laspack_linear_solver.lo \
 	src/solvers/libmesh_devel_la-linear_solver.lo \
+	src/solvers/libmesh_devel_la-memory_solution_history.lo \
 	src/solvers/libmesh_devel_la-newton_solver.lo \
+	src/solvers/libmesh_devel_la-no_solution_history.lo \
 	src/solvers/libmesh_devel_la-nonlinear_solver.lo \
 	src/solvers/libmesh_devel_la-petsc_diff_solver.lo \
 	src/solvers/libmesh_devel_la-petsc_dm_nonlinear_solver.lo \
@@ -1661,7 +1669,9 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solvers/eigen_solver.C src/solvers/eigen_time_solver.C \
 	src/solvers/euler2_solver.C src/solvers/euler_solver.C \
 	src/solvers/laspack_linear_solver.C \
-	src/solvers/linear_solver.C src/solvers/newton_solver.C \
+	src/solvers/linear_solver.C \
+	src/solvers/memory_solution_history.C \
+	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
 	src/solvers/nonlinear_solver.C src/solvers/petsc_diff_solver.C \
 	src/solvers/petsc_dm_nonlinear_solver.C \
 	src/solvers/petsc_linear_solver.C \
@@ -2021,7 +2031,9 @@ am__objects_3 = src/base/libmesh_opt_la-dof_map.lo \
 	src/solvers/libmesh_opt_la-euler_solver.lo \
 	src/solvers/libmesh_opt_la-laspack_linear_solver.lo \
 	src/solvers/libmesh_opt_la-linear_solver.lo \
+	src/solvers/libmesh_opt_la-memory_solution_history.lo \
 	src/solvers/libmesh_opt_la-newton_solver.lo \
+	src/solvers/libmesh_opt_la-no_solution_history.lo \
 	src/solvers/libmesh_opt_la-nonlinear_solver.lo \
 	src/solvers/libmesh_opt_la-petsc_diff_solver.lo \
 	src/solvers/libmesh_opt_la-petsc_dm_nonlinear_solver.lo \
@@ -3119,7 +3131,9 @@ libmesh_SOURCES = \
         src/solvers/euler_solver.C \
         src/solvers/laspack_linear_solver.C \
         src/solvers/linear_solver.C \
+        src/solvers/memory_solution_history.C \
         src/solvers/newton_solver.C \
+        src/solvers/no_solution_history.C \
         src/solvers/nonlinear_solver.C \
         src/solvers/petsc_diff_solver.C \
         src/solvers/petsc_dm_nonlinear_solver.C \
@@ -4273,7 +4287,13 @@ src/solvers/libmesh_dbg_la-laspack_linear_solver.lo:  \
 src/solvers/libmesh_dbg_la-linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_dbg_la-memory_solution_history.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-newton_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_dbg_la-no_solution_history.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-nonlinear_solver.lo:  \
@@ -5203,7 +5223,13 @@ src/solvers/libmesh_devel_la-laspack_linear_solver.lo:  \
 src/solvers/libmesh_devel_la-linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_devel_la-memory_solution_history.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-newton_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_devel_la-no_solution_history.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-nonlinear_solver.lo:  \
@@ -6122,7 +6148,13 @@ src/solvers/libmesh_opt_la-laspack_linear_solver.lo:  \
 src/solvers/libmesh_opt_la-linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_opt_la-memory_solution_history.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-newton_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_opt_la-no_solution_history.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-nonlinear_solver.lo:  \
@@ -7582,7 +7614,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-euler_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-laspack_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-linear_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-memory_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-newton_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-no_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-nonlinear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-petsc_diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-petsc_dm_nonlinear_solver.Plo@am__quote@
@@ -7604,7 +7638,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-euler_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-laspack_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-linear_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-memory_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-newton_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-no_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-nonlinear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-petsc_diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-petsc_dm_nonlinear_solver.Plo@am__quote@
@@ -7626,7 +7662,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-euler_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-laspack_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-linear_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-memory_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-newton_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-no_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-nonlinear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-petsc_diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-petsc_dm_nonlinear_solver.Plo@am__quote@
@@ -10051,12 +10089,26 @@ src/solvers/libmesh_dbg_la-linear_solver.lo: src/solvers/linear_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-linear_solver.lo `test -f 'src/solvers/linear_solver.C' || echo '$(srcdir)/'`src/solvers/linear_solver.C
 
+src/solvers/libmesh_dbg_la-memory_solution_history.lo: src/solvers/memory_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-memory_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-memory_solution_history.Tpo -c -o src/solvers/libmesh_dbg_la-memory_solution_history.lo `test -f 'src/solvers/memory_solution_history.C' || echo '$(srcdir)/'`src/solvers/memory_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_dbg_la-memory_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_dbg_la-memory_solution_history.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/memory_solution_history.C' object='src/solvers/libmesh_dbg_la-memory_solution_history.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-memory_solution_history.lo `test -f 'src/solvers/memory_solution_history.C' || echo '$(srcdir)/'`src/solvers/memory_solution_history.C
+
 src/solvers/libmesh_dbg_la-newton_solver.lo: src/solvers/newton_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-newton_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-newton_solver.Tpo -c -o src/solvers/libmesh_dbg_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_dbg_la-newton_solver.Tpo src/solvers/$(DEPDIR)/libmesh_dbg_la-newton_solver.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/newton_solver.C' object='src/solvers/libmesh_dbg_la-newton_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
+
+src/solvers/libmesh_dbg_la-no_solution_history.lo: src/solvers/no_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-no_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-no_solution_history.Tpo -c -o src/solvers/libmesh_dbg_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_dbg_la-no_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_dbg_la-no_solution_history.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/no_solution_history.C' object='src/solvers/libmesh_dbg_la-no_solution_history.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
 
 src/solvers/libmesh_dbg_la-nonlinear_solver.lo: src/solvers/nonlinear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-nonlinear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-nonlinear_solver.Tpo -c -o src/solvers/libmesh_dbg_la-nonlinear_solver.lo `test -f 'src/solvers/nonlinear_solver.C' || echo '$(srcdir)/'`src/solvers/nonlinear_solver.C
@@ -12711,12 +12763,26 @@ src/solvers/libmesh_devel_la-linear_solver.lo: src/solvers/linear_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-linear_solver.lo `test -f 'src/solvers/linear_solver.C' || echo '$(srcdir)/'`src/solvers/linear_solver.C
 
+src/solvers/libmesh_devel_la-memory_solution_history.lo: src/solvers/memory_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-memory_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-memory_solution_history.Tpo -c -o src/solvers/libmesh_devel_la-memory_solution_history.lo `test -f 'src/solvers/memory_solution_history.C' || echo '$(srcdir)/'`src/solvers/memory_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-memory_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-memory_solution_history.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/memory_solution_history.C' object='src/solvers/libmesh_devel_la-memory_solution_history.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-memory_solution_history.lo `test -f 'src/solvers/memory_solution_history.C' || echo '$(srcdir)/'`src/solvers/memory_solution_history.C
+
 src/solvers/libmesh_devel_la-newton_solver.lo: src/solvers/newton_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-newton_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-newton_solver.Tpo -c -o src/solvers/libmesh_devel_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-newton_solver.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-newton_solver.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/newton_solver.C' object='src/solvers/libmesh_devel_la-newton_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
+
+src/solvers/libmesh_devel_la-no_solution_history.lo: src/solvers/no_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-no_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-no_solution_history.Tpo -c -o src/solvers/libmesh_devel_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-no_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-no_solution_history.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/no_solution_history.C' object='src/solvers/libmesh_devel_la-no_solution_history.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
 
 src/solvers/libmesh_devel_la-nonlinear_solver.lo: src/solvers/nonlinear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-nonlinear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-nonlinear_solver.Tpo -c -o src/solvers/libmesh_devel_la-nonlinear_solver.lo `test -f 'src/solvers/nonlinear_solver.C' || echo '$(srcdir)/'`src/solvers/nonlinear_solver.C
@@ -15371,12 +15437,26 @@ src/solvers/libmesh_opt_la-linear_solver.lo: src/solvers/linear_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-linear_solver.lo `test -f 'src/solvers/linear_solver.C' || echo '$(srcdir)/'`src/solvers/linear_solver.C
 
+src/solvers/libmesh_opt_la-memory_solution_history.lo: src/solvers/memory_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-memory_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-memory_solution_history.Tpo -c -o src/solvers/libmesh_opt_la-memory_solution_history.lo `test -f 'src/solvers/memory_solution_history.C' || echo '$(srcdir)/'`src/solvers/memory_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-memory_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-memory_solution_history.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/memory_solution_history.C' object='src/solvers/libmesh_opt_la-memory_solution_history.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-memory_solution_history.lo `test -f 'src/solvers/memory_solution_history.C' || echo '$(srcdir)/'`src/solvers/memory_solution_history.C
+
 src/solvers/libmesh_opt_la-newton_solver.lo: src/solvers/newton_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-newton_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-newton_solver.Tpo -c -o src/solvers/libmesh_opt_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-newton_solver.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-newton_solver.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/newton_solver.C' object='src/solvers/libmesh_opt_la-newton_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-newton_solver.lo `test -f 'src/solvers/newton_solver.C' || echo '$(srcdir)/'`src/solvers/newton_solver.C
+
+src/solvers/libmesh_opt_la-no_solution_history.lo: src/solvers/no_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-no_solution_history.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-no_solution_history.Tpo -c -o src/solvers/libmesh_opt_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-no_solution_history.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-no_solution_history.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/no_solution_history.C' object='src/solvers/libmesh_opt_la-no_solution_history.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-no_solution_history.lo `test -f 'src/solvers/no_solution_history.C' || echo '$(srcdir)/'`src/solvers/no_solution_history.C
 
 src/solvers/libmesh_opt_la-nonlinear_solver.lo: src/solvers/nonlinear_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-nonlinear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-nonlinear_solver.Tpo -c -o src/solvers/libmesh_opt_la-nonlinear_solver.lo `test -f 'src/solvers/nonlinear_solver.C' || echo '$(srcdir)/'`src/solvers/nonlinear_solver.C
