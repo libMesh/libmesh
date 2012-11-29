@@ -28575,7 +28575,7 @@ fi
     # Test to see if SLEPC_DIR set by user.  If not set, then
     # try to autodetect in a default directory
     if test "x$SLEPC_DIR" = x ; then
-      SLEPC_DIR=/usr/lib/slepc
+      export SLEPC_DIR=/usr/lib/slepc
     fi
 
     # Test to see if SLEPC_DIR and petscversion were set by user or
