@@ -32,9 +32,9 @@ AC_DEFUN([CONFIGURE_SLEPC],
     # Test to see if SLEPC_DIR set by user.  If not set, then
     # try to autodetect in a default directory
     if test "x$SLEPC_DIR" = x ; then
-      SLEPC_DIR=/usr/lib/slepc
+      export SLEPC_DIR=/usr/lib/slepc
     fi
-  
+    
     # Test to see if SLEPC_DIR and petscversion were set by user or
     # autodetection.  If not set, then disable slepc, print a message.
     if (test "x$SLEPC_DIR" = x || test "x$petscversion" = x); then
