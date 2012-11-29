@@ -8,6 +8,4 @@ example_name=adjoints_ex2
 
 example_dir=examples/adjoints/$example_name
 
-message_running "$example_name" 
 run_example "$example_name"
-message_done_running "$example_name"
