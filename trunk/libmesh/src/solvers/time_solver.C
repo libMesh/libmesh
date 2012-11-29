@@ -15,11 +15,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 #include "libmesh/diff_solver.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/time_solver.h"
+#include "libmesh/no_solution_history.h"
 
 namespace libMesh
 {
@@ -31,7 +31,8 @@ TimeSolver::TimeSolver (sys_type& s)
     reduce_deltat_on_diffsolver_failure (0),
     _diff_solver (NULL),
     _linear_solver (NULL),
-    _system (s)
+    _system (s),
+    solution_history(new NoSolutionHistory()) // Default setting for solution_history
 {
 }
 
@@ -80,14 +81,16 @@ void TimeSolver::solve ()
 }
 
 
+void TimeSolver::set_solution_history (const SolutionHistory & _solution_history)
+ {
+   solution_history = _solution_history.clone();
+ }
 
 void TimeSolver::advance_timestep ()
 {
 }
 
-
-
-void TimeSolver::adjoint_recede_timestep ()
+void TimeSolver::adjoint_advance_timestep ()
 {
 }
 
