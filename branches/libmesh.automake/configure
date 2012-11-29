@@ -6840,12 +6840,10 @@ fi
 
 
 
-  CPPFLAGS_DEVEL="$libmesh_CPPFLAGS"
 
 
 
 
-  CPPFLAGS_OPT="-DNDEBUG $libmesh_CPPFLAGS"
 
 
 
