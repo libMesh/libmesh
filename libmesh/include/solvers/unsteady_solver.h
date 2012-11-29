@@ -87,6 +87,13 @@ public:
   virtual void advance_timestep ();
 
   /**
+   * This method advances the adjoint solution to the previous
+   * timestep, after an adjoint_solve() has been performed.  This will
+   * be done before every UnsteadySolver::adjoint_solve().
+   */
+  virtual void adjoint_advance_timestep ();
+
+  /**
    * This method should return the expected convergence order of the
    * (non-local) error of the time discretization scheme - e.g. 2 for the
    * O(deltat^2) Crank-Nicholson, or 1 for the O(deltat) Backward Euler.

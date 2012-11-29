@@ -133,7 +133,23 @@ void UnsteadySolver::advance_timestep ()
 
   if (!first_solve)
     _system.time += _system.deltat;
+
+  // Store the solution, does nothing by default
+  // User has to attach appropriate solution_history object for this to
+  // actually store anything anywhere
+  solution_history->store();
 }
+
+
+  void UnsteadySolver::adjoint_advance_timestep ()
+  {
+    // Decrement the system time
+    _system.time -= _system.deltat;
+
+    // Retrieve the primal solution vectors at this time using thr
+    // solution_history object
+    solution_history->retrieve();
+  }
 
 
 

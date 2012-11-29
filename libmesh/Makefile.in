@@ -437,8 +437,10 @@ am_libmesh_la_OBJECTS = src/base/dof_map.lo \
 	src/solvers/eigen_solver.lo src/solvers/eigen_time_solver.lo \
 	src/solvers/euler2_solver.lo src/solvers/euler_solver.lo \
 	src/solvers/laspack_linear_solver.lo \
-	src/solvers/linear_solver.lo src/solvers/newton_solver.lo \
-	src/solvers/nonlinear_solver.lo \
+	src/solvers/linear_solver.lo \
+	src/solvers/memory_solution_history.lo \
+	src/solvers/newton_solver.lo src/solvers/nonlinear_solver.lo \
+	src/solvers/no_solution_history.lo \
 	src/solvers/petsc_diff_solver.lo src/solvers/petscdmlibmesh.lo \
 	src/solvers/petsc_dm_nonlinear_solver.lo \
 	src/solvers/petsc_linear_solver.lo \
@@ -1356,8 +1358,10 @@ libmesh_la_SOURCES = \
         src/solvers/euler_solver.C \
         src/solvers/laspack_linear_solver.C \
         src/solvers/linear_solver.C \
+        src/solvers/memory_solution_history.C \
         src/solvers/newton_solver.C \
         src/solvers/nonlinear_solver.C \
+        src/solvers/no_solution_history.C \
         src/solvers/petsc_diff_solver.C \
         src/solvers/petscdmlibmesh.C \
         src/solvers/petsc_dm_nonlinear_solver.C \
@@ -2307,9 +2311,13 @@ src/solvers/laspack_linear_solver.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/linear_solver.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/memory_solution_history.lo: src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/newton_solver.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/nonlinear_solver.lo: src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/no_solution_history.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/petsc_diff_solver.lo: src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
@@ -3016,7 +3024,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/euler_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/laspack_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/linear_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/memory_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/newton_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/no_solution_history.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/nonlinear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/petsc_diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/petsc_dm_nonlinear_solver.Plo@am__quote@

@@ -323,8 +323,10 @@ libmesh_la_SOURCES =  \
         src/solvers/euler_solver.C \
         src/solvers/laspack_linear_solver.C \
         src/solvers/linear_solver.C \
+        src/solvers/memory_solution_history.C \
         src/solvers/newton_solver.C \
         src/solvers/nonlinear_solver.C \
+        src/solvers/no_solution_history.C \
         src/solvers/petsc_diff_solver.C \
         src/solvers/petscdmlibmesh.C \
         src/solvers/petsc_dm_nonlinear_solver.C \

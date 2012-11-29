@@ -527,11 +527,12 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	steady_system.h system.h system_norm.h system_subset.h \
 	system_subset_by_subdomain.h transient_system.h \
 	compare_types.h error_vector.h hashword.h ignore_warnings.h \
-	location_maps.h mapvector.h null_output_iterator.h \
-	number_lookups.h o_f_stream.h o_string_stream.h \
-	ostream_proxy.h parameters.h perf_log.h perfmon.h plt_loader.h \
-	point_locator_base.h point_locator_list.h point_locator_tree.h \
-	pool_allocator.h restore_warnings.h statistics.h \
+	location_maps.h mapvector.h memory_solution_history.h \
+	no_solution_history.h null_output_iterator.h number_lookups.h \
+	o_f_stream.h o_string_stream.h ostream_proxy.h parameters.h \
+	perf_log.h perfmon.h plt_loader.h point_locator_base.h \
+	point_locator_list.h point_locator_tree.h pool_allocator.h \
+	restore_warnings.h solution_history.h statistics.h \
 	string_to_enum.h timestamp.h tree.h tree_base.h tree_node.h \
 	utility.h xdr_cxx.h parallel_communicator_specializations \
 	$(am__append_1)
@@ -1624,8 +1625,14 @@ linear.h: $(top_srcdir)/include/solvers/linear.h
 linear_solver.h: $(top_srcdir)/include/solvers/linear_solver.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solvers/linear_solver.h linear_solver.h
 
+memory_solution_history.h: $(top_srcdir)/include/solvers/memory_solution_history.h
+	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solvers/memory_solution_history.h memory_solution_history.h
+
 newton_solver.h: $(top_srcdir)/include/solvers/newton_solver.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solvers/newton_solver.h newton_solver.h
+
+no_solution_history.h: $(top_srcdir)/include/solvers/no_solution_history.h
+	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solvers/no_solution_history.h no_solution_history.h
 
 nonlinear_solver.h: $(top_srcdir)/include/solvers/nonlinear_solver.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solvers/nonlinear_solver.h nonlinear_solver.h
@@ -1650,6 +1657,9 @@ slepc_eigen_solver.h: $(top_srcdir)/include/solvers/slepc_eigen_solver.h
 
 slepc_macro.h: $(top_srcdir)/include/solvers/slepc_macro.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solvers/slepc_macro.h slepc_macro.h
+
+solution_history.h: $(top_srcdir)/include/solvers/solution_history.h
+	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solvers/solution_history.h solution_history.h
 
 solver.h: $(top_srcdir)/include/solvers/solver.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solvers/solver.h solver.h
