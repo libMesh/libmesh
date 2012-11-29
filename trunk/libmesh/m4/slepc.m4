@@ -50,7 +50,7 @@ AC_DEFUN([CONFIGURE_SLEPC],
 		    ])
 
       if (test "x$PETSC_ARCH" != "x"); then
-	  AC_CHECK_FILE([$SLEPC_DIR/$PETSC_ARCH/include/slepc.h],
+	  AC_CHECK_FILE([$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h],
                         [SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"])
       fi
     fi
