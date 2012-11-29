@@ -70,7 +70,7 @@ if (test $enableslepc = yes ) ; then
   libmesh_optional_INCLUDES="$SLEPC_INCLUDE $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$SLEPC_LIBS $libmesh_optional_LIBS"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_SLEPC, test x$enableslepc = xyes)	 
+AM_CONDITIONAL(LIBMESH_ENABLE_SLEPC, test x$enableslepc = xyes)  
 # -------------------------------------------------------------
 
 
