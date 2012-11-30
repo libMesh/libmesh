@@ -1,14 +1,7 @@
-include $(top_builddir)/Make.common.@METHOD@
-
-AM_CPPFLAGS = $(libmesh_CPPFLAGS)
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-
-AM_CPPFLAGS += -I$(top_srcdir)/contrib/exodusii/Lib/include \
+pkg_cppflags = -I$(top_srcdir)/contrib/exodusii/Lib/include \
                -I$(top_srcdir)/contrib/netcdf/Lib
 
-noinst_LTLIBRARIES    = libnemesis.la
-libnemesis_la_SOURCES = \
+pkg_sources = \
 	ne_nemesisI.h \
 	ne_nemesisI_int.h \
 	ne_gcmp.c \
@@ -59,3 +52,7 @@ libnemesis_la_SOURCES = \
 	ne_pnvs.c \
 	ne_psspg.c \
 	ne_util.c
+
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common
+

@@ -66,7 +66,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
                                      [int ierr = TECEND112 ();])
                   ],
                   [
-                     TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
+                     TECPLOT_LIBRARY="\$(top_srcdir)/contrib/tecplot/lib/$host/tecio.a"
                      AC_SUBST(TECPLOT_LIBRARY)
                      AC_SUBST(TECPLOT_INCLUDE)
                      AC_DEFINE(HAVE_TECPLOT_API, 1,
@@ -82,7 +82,7 @@ AC_DEFUN([CONFIGURE_TECPLOT],
                                                     [int ierr = TECEND ();])
                                  ],
                                  [
-                                    TECPLOT_LIBRARY=$TECPLOT_LIBRARY_PATH/tecio.a
+                                    TECPLOT_LIBRARY="\$(top_srcdir)/contrib/tecplot/lib/$host/tecio.a"
                                     TECPLOT_INCLUDE=-I$TECPLOT_INCLUDE_PATH
                                     AC_SUBST(TECPLOT_LIBRARY)
                                     AC_SUBST(TECPLOT_INCLUDE)
@@ -102,8 +102,4 @@ AC_DEFUN([CONFIGURE_TECPLOT],
       enabletecplot=no
     fi
   fi
-
-
-
-  AC_SUBST(enabletecplot)
 ])

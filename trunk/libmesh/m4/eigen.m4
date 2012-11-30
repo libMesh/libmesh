@@ -79,6 +79,5 @@ AC_DEFUN([CONFIGURE_EIGEN],
   fi
   
   # Substitute the substitution variables
-  AC_SUBST(EIGEN_INCLUDE)	
-  AC_SUBST(enableeigen)
+  AC_SUBST(EIGEN_INCLUDE)
 ])

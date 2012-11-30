@@ -23,6 +23,9 @@ prefix              := @prefix@
 exec_prefix         := @exec_prefix@
 libmesh_install_dir := $(prefix)
 
+# the libtool to use in these defined rules.
+#LIBTOOL ?= @prefix@/contrib/bin/libtool
+
 ###############################################################################
 # the following lines will be replaced by the output 
 # of ./configure
@@ -88,29 +91,6 @@ ifeq ($(METHOD),dbg)
   mode       := "debug"
 endif
 
-#
-# If METHOD=prof, compile in profiling mode
-ifeq ($(METHOD),profiling)
-  METHOD := pro
-endif
-ifeq ($(METHOD),prof)
-  METHOD := pro
-endif
-ifeq ($(METHOD),pro)
-  prof-mode     := on
-  mode          := "profiling"
-endif
-
-#
-# If METHOD=oprof, compile in OProfile mode
-ifeq ($(METHOD),oprofile)
-  METHOD := oprof
-endif
-ifeq ($(METHOD),oprof)
-  oprof-mode    := on
-  mode          := "oprofile"
-endif
-
 # If the user had a METHOD variable we didn't
 # recognize, there's been some mistake.  Let's
 # yell at them.
@@ -124,13 +104,17 @@ endif
 obj-suffix := @host@.$(METHOD).o
 
 
-# include the proper Make.common depending on the build method
-include @exec_prefix@/lib/@host@_$(METHOD)/pkgconfig/Make.common.$(METHOD)
-
-# append the actual installed library
-libmesh_LIBS += -L@exec_prefix@/lib/@host@_$(METHOD) @RPATHFLAG@@exec_prefix@/lib/@host@_$(METHOD) -lmesh
-###############################################################################
-
+# use libmesh-config to get configuration details
+libmesh_CXX      := $(shell @exec_prefix@/bin/libmesh-config --cxx)
+libmesh_CC       := $(shell @exec_prefix@/bin/libmesh-config --cc)
+libmesh_F77      := $(shell @exec_prefix@/bin/libmesh-config --fc)
+libmesh_F90      := $(shell @exec_prefix@/bin/libmesh-config --fc)
+libmesh_INCLUDE  := $(shell @exec_prefix@/bin/libmesh-config --include)
+libmesh_CPPFLAGS := $(shell @exec_prefix@/bin/libmesh-config --cppflags)
+libmesh_CXXFLAGS := $(shell @exec_prefix@/bin/libmesh-config --cxxflags)
+libmesh_CFLAGS   := $(shell @exec_prefix@/bin/libmesh-config --cflags)
+libmesh_FFLAGS   := $(shell @exec_prefix@/bin/libmesh-config --fflags)
+libmesh_LIBS     := $(shell @exec_prefix@/bin/libmesh-config --libs)
 
 
 ###############################################################################

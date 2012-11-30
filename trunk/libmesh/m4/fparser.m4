@@ -74,8 +74,6 @@ AC_DEFUN([CONFIGURE_FPARSER],
 
   AC_SUBST(FPARSER_INCLUDE)
   AC_SUBST(FPARSER_LIBRARY)
-  AC_SUBST(enablefparser)
-  AC_SUBST(enablefparserdevel)
 
   AM_CONDITIONAL(FPARSER_RELEASE,              test x$enablefparserdevel = xno) 
   AM_CONDITIONAL(FPARSER_DEVEL,                test x$enablefparserdevel = xyes)

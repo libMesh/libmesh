@@ -3,12 +3,11 @@ BUILT_SOURCES = lshaped.xda
 lshaped.xda:
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/examples/adjoints/adjoints_ex1/lshaped.xda .
 
-check_PROGRAMS            = miscellaneous_ex5
-miscellaneous_ex5dir      = $(examples_install_path)/miscellaneous/ex5
-miscellaneous_ex5_DATA    = miscellaneous_ex5.C ../../adjoints/adjoints_ex1/lshaped.xda lshaped3D.xda miscellaneous_ex5.in run.sh $(top_srcdir)/contrib/utils/Makefile
-miscellaneous_ex5_SOURCES = $(miscellaneous_ex5_DATA) run.sh
-miscellaneous_ex5_LDADD   = $(top_builddir)/libmesh.la
-check_SCRIPTS             = run.sh
+example_name  = miscellaneous_ex5
+install_dir   = $(examples_install_path)/miscellaneous/ex5
+data          = miscellaneous_ex5.C ../../adjoints/adjoints_ex1/lshaped.xda lshaped3D.xda miscellaneous_ex5.in run.sh
+sources       = $(data) run.sh
+check_SCRIPTS = run.sh
 
 CLEANFILES = lshaped.xda lshaped_dg.e 
 

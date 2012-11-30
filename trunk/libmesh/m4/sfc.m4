@@ -30,7 +30,6 @@ AC_DEFUN([CONFIGURE_SFC],
 
   AC_SUBST(SFC_INCLUDE)
   AC_SUBST(SFC_LIB)	
-  AC_SUBST(enablesfc)
 ])
 
 

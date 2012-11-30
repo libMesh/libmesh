@@ -1,16 +1,7 @@
-include $(top_builddir)/Make.common.@METHOD@
-
-AUTOMAKE_OPTIONS = subdir-objects
-
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DLIBMESH_IS_COMPILING_METIS
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-
-AM_CPPFLAGS += -I$(srcdir)/include  -I$(srcdir)/GKlib -I$(srcdir)/Lib
-AM_CPPFLAGS += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
-
-noinst_LTLIBRARIES    = libmetis.la
-libmetis_la_SOURCES = \
+pkg_cppflags  = -DLIBMESH_IS_COMPILING_METIS
+pkg_cppflags += -I$(srcdir)/include  -I$(srcdir)/GKlib -I$(srcdir)/Lib
+pkg_cppflags += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
+pkg_sources = \
 	include/metis.h \
 	GKlib/GKlib.h \
 	GKlib/gk_arch.h \
@@ -99,3 +90,6 @@ libmetis_la_SOURCES = \
 	Lib/timing.c \
 	Lib/util.c \
 	Lib/wspace.c
+
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common

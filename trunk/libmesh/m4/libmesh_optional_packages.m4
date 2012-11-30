@@ -28,7 +28,6 @@ AC_ARG_ENABLE(optional,
                              [en/disable optional external libraries]),
               enableoptional=$enableval,
               enableoptional=yes)
-AC_SUBST(enableoptional)	
 
 # Note that even when optional packages are disabled we need to
 # run their m4 macros to get proper AM_CONDITIONALs.  Just be
@@ -465,5 +464,4 @@ fi
 AC_SUBST(libmesh_optional_INCLUDES)
 AC_SUBST(libmesh_optional_LIBS)
 AC_SUBST(libmesh_contrib_INCLUDES)
-
 ])

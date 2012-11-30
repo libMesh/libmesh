@@ -1,15 +1,5 @@
-include $(top_builddir)/Make.common.@METHOD@
-
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) @TECIO_CPPFLAGS@ -DUSEENUM -DTHREED -DMAKEARCHIVE -DNO_ASSERTS
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-
-AUTOMAKE_OPTIONS = subdir-objects 
-
-
-noinst_LTLIBRARIES = libtecio.la
-
-libtecio_la_SOURCES = \
+pkg_cppflags = @TECIO_CPPFLAGS@ -DUSEENUM -DTHREED -DMAKEARCHIVE -DNO_ASSERTS
+pkg_sources  = \
 	include/TECIO.h \
 	include/TECXXX.h \
 	tecsrc/ALLOC.h \
@@ -61,3 +51,6 @@ libtecio_la_SOURCES = \
 	tecsrc/strutil.cpp \
 	tecsrc/tassert.cpp \
 	tecsrc/tecxxx.cpp 
+
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common

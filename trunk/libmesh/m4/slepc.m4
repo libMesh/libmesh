@@ -105,6 +105,4 @@ EOF
       fi
     fi
   fi
-  
-  AC_SUBST(enableslepc)
 ])

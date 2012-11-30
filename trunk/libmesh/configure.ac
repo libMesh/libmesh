@@ -36,15 +36,20 @@ AC_CANONICAL_TARGET
 AC_CONFIG_FILES([Makefile
 		 include/Makefile
 		 include/libmesh/Makefile
-                 include/libmesh/libmesh_version.h
+		 contrib/Makefile
+	         contrib/utils/Makefile
 	         contrib/utils/Make.common
 		 tests/Makefile
 		 doc/Doxyfile
-		 contrib/utils/libmesh.pc
+		 contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in
+		 contrib/utils/libmesh-opt.pc
+		 contrib/utils/libmesh-dbg.pc
+		 contrib/utils/libmesh-devel.pc
+		 contrib/utils/libmesh-prof.pc
+		 contrib/utils/libmesh-oprof.pc
 		 ])
 
 AC_CONFIG_FILES(contrib/bin/libmesh-config,          [chmod +x contrib/bin/libmesh-config])
-AC_CONFIG_FILES(contrib/bin/libmesh-config-METHOD,   [chmod +x contrib/bin/libmesh-config-METHOD])
 #AC_CONFIG_FILES(contrib/bin/strip_dup_libs.pl,       [chmod +x contrib/bin/strip_dup_libs.pl])
 #AC_CONFIG_FILES(contrib/bin/strip_dup_incl_paths.pl, [chmod +x contrib/bin/strip_dup_incl_paths.pl])
 AC_CONFIG_FILES(contrib/bin/xda2mgf,                 [chmod +x contrib/bin/xda2mgf])
@@ -52,14 +57,15 @@ AC_CONFIG_FILES(contrib/bin/create_libmesh_release,  [chmod +x contrib/bin/creat
 AC_CONFIG_FILES(doc/dot,                             [chmod +x doc/dot])
 
 # Create a temporary file with e.g. HAVE_MPI
-AC_CONFIG_HEADER(include/libmesh/libmesh_config.h.tmp:include/libmesh/libmesh_config.h.in)
+AC_CONFIG_HEADER(include/libmesh_config.h.tmp:include/libmesh_config.h.in)
 # Prefixes everything in the temporary file with LIBMESH_, e.g. LIBMESH_HAVE_MPI
-AX_PREFIX_CONFIG_H(include/libmesh/libmesh_config.h,LIBMESH,include/libmesh/libmesh_config.h.tmp)
+AX_PREFIX_CONFIG_H(include/libmesh_config.h,LIBMESH,include/libmesh_config.h.tmp)
 
-
+# Print configuration info to the header file
+AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 $ac_configure_args"], [Configuration information.])	
 
 # require automake 1.11 - color tests
-AM_INIT_AUTOMAKE([dist-xz dist-bzip2 tar-ustar color-tests parallel-tests 1.11])
+AM_INIT_AUTOMAKE([dist-xz dist-bzip2 tar-ustar color-tests serial-tests 1.11])
 
 # use silent rules - automake 1.11
 AM_SILENT_RULES(yes) 
@@ -82,25 +88,6 @@ fi
 AM_CONDITIONAL(LIBMESH_VPATH_BUILD, test x$libmesh_vpath_build = xyes)
 
 # --------------------------------------------------------------
-# Release versioning
-# --------------------------------------------------------------
-AX_SPLIT_VERSION
-
-GENERIC_MAJOR_VERSION=$AX_MAJOR_VERSION
-GENERIC_MINOR_VERSION=$AX_MINOR_VERSION
-GENERIC_MICRO_VERSION=$AX_POINT_VERSION
-
-AC_SUBST(GENERIC_MAJOR_VERSION)
-AC_SUBST(GENERIC_MINOR_VERSION)
-AC_SUBST(GENERIC_MICRO_VERSION)
-
-
-# --------------------------------------------------------------
-# Print configuration info to the header file
-# --------------------------------------------------------------
-AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 run on `date`"], [Configuration information.])	
-
-# --------------------------------------------------------------
 # Do compilation tests using the compiler, preprocessor, and file extensions
 # of C++.  This uses the .C extension for test programs.
 # --------------------------------------------------------------
@@ -119,9 +106,24 @@ LIBMESH_SET_COMPILERS
 # flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
 # --------------------------------------------------------------
 LIBMESH_SET_CXX_FLAGS
-LIBMESH_SET_METHOD
+LIBMESH_SET_METHODS
 
 LT_INIT([disable-static])
+
+
+
+# --------------------------------------------------------------
+# Release versioning - after we find the C++ compiler
+# --------------------------------------------------------------
+AX_SPLIT_VERSION
+
+AC_DEFINE_UNQUOTED(MAJOR_VERSION,            [$AX_MAJOR_VERSION],  [libMesh major version number])
+AC_DEFINE_UNQUOTED(MINOR_VERSION,            [$AX_MINOR_VERSION],  [libMesh minor version number])
+AC_DEFINE_UNQUOTED(MICRO_VERSION,            [$AX_POINT_VERSION],  [libMesh micro version number])
+AC_DEFINE_UNQUOTED(LIB_VERSION,              ["$VERSION"],         [libMesh version number])
+AC_DEFINE_UNQUOTED(LIB_RELEASE,              ["$BUILD_DEVSTATUS"], [libMesh source code version])
+AC_DEFINE_UNQUOTED(CXX,                      ["$CXX"],             [C++ compiler])
+AC_DEFINE_UNQUOTED(IO_COMPATIBILITY_VERSION, ["0.7.4"],            [libMesh I/O file format compatiblity string])
 
 
 
@@ -251,55 +253,56 @@ LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
 AX_SUMMARIZE_ENV
 
 # Each example gets a makefile
-AC_CONFIG_FILES([
-		examples/introduction/introduction_ex1/Makefile
-		examples/introduction/introduction_ex2/Makefile
-		examples/introduction/introduction_ex3/Makefile
-		examples/introduction/introduction_ex4/Makefile
-		examples/introduction/introduction_ex5/Makefile
-		examples/adaptivity/adaptivity_ex1/Makefile
-		examples/adaptivity/adaptivity_ex2/Makefile
-		examples/adaptivity/adaptivity_ex3/Makefile
-		examples/adaptivity/adaptivity_ex4/Makefile
-		examples/adaptivity/adaptivity_ex5/Makefile
-		examples/adjoints/adjoints_ex1/Makefile
-		examples/adjoints/adjoints_ex2/Makefile
-		examples/adjoints/adjoints_ex3/Makefile
-		examples/adjoints/adjoints_ex4/Makefile
-		examples/eigenproblems/eigenproblems_ex1/Makefile
-		examples/eigenproblems/eigenproblems_ex2/Makefile
-		examples/eigenproblems/eigenproblems_ex3/Makefile
-		examples/fem_system/fem_system_ex1/Makefile
-		examples/miscellaneous/miscellaneous_ex1/Makefile
-		examples/miscellaneous/miscellaneous_ex2/Makefile
-		examples/miscellaneous/miscellaneous_ex3/Makefile
-		examples/miscellaneous/miscellaneous_ex4/Makefile
-		examples/miscellaneous/miscellaneous_ex5/Makefile
-		examples/miscellaneous/miscellaneous_ex6/Makefile
-		examples/miscellaneous/miscellaneous_ex7/Makefile
-		examples/subdomains/subdomains_ex1/Makefile
-		examples/subdomains/subdomains_ex2/Makefile
-		examples/systems_of_equations/systems_of_equations_ex1/Makefile
-		examples/systems_of_equations/systems_of_equations_ex2/Makefile
-		examples/systems_of_equations/systems_of_equations_ex3/Makefile
-		examples/systems_of_equations/systems_of_equations_ex4/Makefile
-		examples/systems_of_equations/systems_of_equations_ex5/Makefile
-		examples/systems_of_equations/systems_of_equations_ex6/Makefile
-		examples/reduced_basis/reduced_basis_ex1/Makefile
-		examples/reduced_basis/reduced_basis_ex2/Makefile
-		examples/reduced_basis/reduced_basis_ex3/Makefile
-		examples/reduced_basis/reduced_basis_ex4/Makefile
-		examples/reduced_basis/reduced_basis_ex5/Makefile
-		examples/reduced_basis/reduced_basis_ex6/Makefile
-		examples/reduced_basis/reduced_basis_ex7/Makefile
-		examples/transient/transient_ex1/Makefile
-		examples/transient/transient_ex2/Makefile
-		examples/vector_fe/vector_fe_ex1/Makefile
-		examples/vector_fe/vector_fe_ex2/Makefile
-		examples/vector_fe/vector_fe_ex3/Makefile
-		examples/Makefile
-		])		
-
+if (test "x$enableexamples" = "xyes"); then
+   AC_CONFIG_FILES([
+  		examples/introduction/introduction_ex1/Makefile
+  		examples/introduction/introduction_ex2/Makefile
+  		examples/introduction/introduction_ex3/Makefile
+  		examples/introduction/introduction_ex4/Makefile
+  		examples/introduction/introduction_ex5/Makefile
+  		examples/adaptivity/adaptivity_ex1/Makefile
+  		examples/adaptivity/adaptivity_ex2/Makefile
+  		examples/adaptivity/adaptivity_ex3/Makefile
+  		examples/adaptivity/adaptivity_ex4/Makefile
+  		examples/adaptivity/adaptivity_ex5/Makefile
+  		examples/adjoints/adjoints_ex1/Makefile
+  		examples/adjoints/adjoints_ex2/Makefile
+  		examples/adjoints/adjoints_ex3/Makefile
+  		examples/adjoints/adjoints_ex4/Makefile
+  		examples/eigenproblems/eigenproblems_ex1/Makefile
+  		examples/eigenproblems/eigenproblems_ex2/Makefile
+  		examples/eigenproblems/eigenproblems_ex3/Makefile
+  		examples/fem_system/fem_system_ex1/Makefile
+  		examples/miscellaneous/miscellaneous_ex1/Makefile
+  		examples/miscellaneous/miscellaneous_ex2/Makefile
+  		examples/miscellaneous/miscellaneous_ex3/Makefile
+  		examples/miscellaneous/miscellaneous_ex4/Makefile
+  		examples/miscellaneous/miscellaneous_ex5/Makefile
+  		examples/miscellaneous/miscellaneous_ex6/Makefile
+  		examples/miscellaneous/miscellaneous_ex7/Makefile
+  		examples/subdomains/subdomains_ex1/Makefile
+  		examples/subdomains/subdomains_ex2/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex1/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex2/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex3/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex4/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex5/Makefile
+  		examples/systems_of_equations/systems_of_equations_ex6/Makefile
+  		examples/reduced_basis/reduced_basis_ex1/Makefile
+  		examples/reduced_basis/reduced_basis_ex2/Makefile
+  		examples/reduced_basis/reduced_basis_ex3/Makefile
+  		examples/reduced_basis/reduced_basis_ex4/Makefile
+  		examples/reduced_basis/reduced_basis_ex5/Makefile
+  		examples/reduced_basis/reduced_basis_ex6/Makefile
+  		examples/reduced_basis/reduced_basis_ex7/Makefile
+  		examples/transient/transient_ex1/Makefile
+  		examples/transient/transient_ex2/Makefile
+  		examples/vector_fe/vector_fe_ex1/Makefile
+  		examples/vector_fe/vector_fe_ex2/Makefile
+  		examples/vector_fe/vector_fe_ex3/Makefile
+  		examples/Makefile
+  		])		
+fi		
 
 # Create output files
 AC_OUTPUT

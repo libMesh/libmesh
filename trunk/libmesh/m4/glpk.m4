@@ -1,11 +1,11 @@
-dnl ----------------------------------------------------------------
-dnl Certain parts of rbOOmit require GLPK, the GNU Linear Programming
-dnl Kit.  By default we check for the GLPK installation files in 
-dnl --with-glpk-include=xxx and --with-glpk-lib=yyy arguments provided to
-dnl configure, or if those don't exist in $GLPK_INC and $GPLK_LIB
-dnl directories, or in $GLPK_DIR/include and $GLPK_DIR/lib directories, or
-dnl in /usr/local, or in /usr.
-dnl ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# Certain parts of rbOOmit require GLPK, the GNU Linear Programming
+# Kit.  By default we check for the GLPK installation files in 
+# --with-glpk-include=xxx and --with-glpk-lib=yyy arguments provided to
+# configure, or if those don't exist in $GLPK_INC and $GPLK_LIB
+# directories, or in $GLPK_DIR/include and $GLPK_DIR/lib directories, or
+# in /usr/local, or in /usr.
+# ----------------------------------------------------------------
 
 AC_DEFUN([CONFIGURE_GLPK], 
 [
@@ -22,19 +22,19 @@ AC_DEFUN([CONFIGURE_GLPK],
 
   if (test $enableglpk = yes); then
   
-    dnl User-specific include path
+    # User-specific include path
     AC_ARG_WITH(glpk-include,
                 AC_HELP_STRING([--with-glpk-include=PATH],[Specify the path for GLPK header files]),
                 withglpkinc=$withval,
                 withglpkinc=no)
   	      
-    dnl User-specific library path
+    # User-specific library path
     AC_ARG_WITH(glpk-lib,
                 AC_HELP_STRING([--with-glpk-lib=PATH],[Specify the path for GLPK libs]),
                 withglpklib=$withval,
                 withglpklib=no)
   
-    dnl Fall back on default paths to GLPK's include and lib files
+    # Fall back on default paths to GLPK's include and lib files
     if (test $withglpkinc != no); then
       GLPK_INC="$withglpkinc"
     elif test "x$GLPK_INC" != x -a -f $GLPK_INC/glpk.h; then
@@ -67,15 +67,15 @@ AC_DEFUN([CONFIGURE_GLPK],
       GLPK_LIB="/usr/lib"
     fi
   
-    dnl Initialize Makefile/config.h substitution variables
+    # Initialize Makefile/config.h substitution variables
     GLPK_INCLUDE=""
     GLPK_LIBRARY=""
   
-    dnl Properly let the substitution variables
+    # Properly let the substitution variables
     if (test $enableglpk = yes); then
     
-       dnl Check for existence of a header file in the specified location
-       dnl AC_CHECK_FILE([$GLPK_INC/glpk.h], [glpkincFound="OK"], [glpkincFound="FAIL"])
+       # Check for existence of a header file in the specified location
+       # AC_CHECK_FILE([$GLPK_INC/glpk.h], [glpkincFound="OK"], [glpkincFound="FAIL"])
        glpkincFound=no;
        AC_CHECK_HEADERS($GLPK_INC/glpk.h, glpkincFound=yes)
   
@@ -84,9 +84,9 @@ AC_DEFUN([CONFIGURE_GLPK],
          enableglpk=no;
        fi
   
-       dnl Discover the major and minor version numbers of GLPK by looking in
-       dnl glpk.h.  This may eventually be useful for compiling against different
-       dnl GLPK APIs...
+       # Discover the major and minor version numbers of GLPK by looking in
+       # glpk.h.  This may eventually be useful for compiling against different
+       # GLPK APIs...
        if (test $enableglpk = yes); then
          glpkmajor=`grep "define GLP_MAJOR_VERSION" $GLPK_INC/glpk.h | sed -e "s/#define GLP_MAJOR_VERSION[ ]*//g"`
          glpkminor=`grep "define GLP_MINOR_VERSION" $GLPK_INC/glpk.h | sed -e "s/#define GLP_MINOR_VERSION[ ]*//g"`
@@ -95,27 +95,27 @@ AC_DEFUN([CONFIGURE_GLPK],
        fi
   
        if (test $enableglpk = yes); then
-         dnl Also Check for existence of required libraries.  This is not really the
-         dnl right way to do it -- it's not portable to Macs, where .so's are called
-         dnl .dylib's instead.
-         dnl AC_CHECK_FILE($GLPK_LIB/glpk.so, [enableglpk=yes], [enableglpk=no])
+         # Also Check for existence of required libraries.  This is not really the
+         # right way to do it -- it's not portable to Macs, where .so's are called
+         # .dylib's instead.
+         # AC_CHECK_FILE($GLPK_LIB/glpk.so, [enableglpk=yes], [enableglpk=no])
          
-         dnl AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
-         dnl Note: Basically tries to compile a function which calls main().  
+         # AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
+         # Note: Basically tries to compile a function which calls main().  
   
-         dnl Save original value of LIBS, then append $GLPK_LIB
+         # Save original value of LIBS, then append $GLPK_LIB
          old_LIBS="$LIBS"
          LIBS="$old_LIBS -L$GLPK_LIB"
   
-         dnl Try to compile test prog to check for existence of GLPK libraries
-         dnl AC_HAVE_LIBRARY uses the LIBS variable.
+         # Try to compile test prog to check for existence of GLPK libraries
+         # AC_HAVE_LIBRARY uses the LIBS variable.
          AC_HAVE_LIBRARY([glpk], [enableglpk=yes], [enableglpk=no])
          
-         dnl Reset $LIBS
+         # Reset $LIBS
          LIBS="$old_LIBS"
        fi
        
-       dnl If both the header file and the required libs were found, continue.
+       # If both the header file and the required libs were found, continue.
        if (test x$enableglpk = xyes); then
          GLPK_INCLUDE="-I$GLPK_INC"
          GLPK_LIBRARY="-L$GLPK_LIB -lglpk"
@@ -131,8 +131,7 @@ AC_DEFUN([CONFIGURE_GLPK],
   fi
 
   
-  dnl Substitute the substitution variables
+  # Substitute the substitution variables
   AC_SUBST(GLPK_INCLUDE)
   AC_SUBST(GLPK_LIBRARY)	
-  AC_SUBST(enableglpk)
 ])

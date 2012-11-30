@@ -1,9 +1,8 @@
-check_PROGRAMS            = miscellaneous_ex6
-miscellaneous_ex6dir      = $(examples_install_path)/miscellaneous/ex6
-miscellaneous_ex6_DATA    = miscellaneous_ex6.C run.sh $(top_srcdir)/contrib/utils/Makefile
-miscellaneous_ex6_SOURCES = $(miscellaneous_ex6_DATA) run.sh
-miscellaneous_ex6_LDADD   = $(top_builddir)/libmesh.la
-check_SCRIPTS             = run.sh
+example_name  = miscellaneous_ex6
+install_dir   = $(examples_install_path)/miscellaneous/ex6
+data          = miscellaneous_ex6.C run.sh
+sources       = $(data) run.sh
+check_SCRIPTS = run.sh
 
 CLEANFILES = hole_3D.e delaunay_l_shaped_hole.e 
 

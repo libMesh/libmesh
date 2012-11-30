@@ -56,8 +56,7 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = fparser.hh
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_2 = fparser.hh
 subdir = include/libmesh
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/libmesh_config.h.in $(srcdir)/libmesh_version.h.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -94,8 +93,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = libmesh_config.h.tmp
-CONFIG_CLEAN_FILES = libmesh_version.h
+CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -131,7 +130,6 @@ AZTECOO_MAKEFILE_EXPORT = @AZTECOO_MAKEFILE_EXPORT@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
 BOOST_LDFLAGS = @BOOST_LDFLAGS@
 BUILD_ARCH = @BUILD_ARCH@
-BUILD_DATE = @BUILD_DATE@
 BUILD_DEVSTATUS = @BUILD_DEVSTATUS@
 BUILD_HOST = @BUILD_HOST@
 BUILD_USER = @BUILD_USER@
@@ -142,15 +140,18 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
+CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
-CFLAGS_METHOD = @CFLAGS_METHOD@
+CFLAGS_OPROF = @CFLAGS_OPROF@
 CFLAGS_OPT = @CFLAGS_OPT@
+CFLAGS_PROF = @CFLAGS_PROF@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
-CPPFLAGS_DVL = @CPPFLAGS_DVL@
-CPPFLAGS_METHOD = @CPPFLAGS_METHOD@
+CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
+CPPFLAGS_OPROF = @CPPFLAGS_OPROF@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
+CPPFLAGS_PROF = @CPPFLAGS_PROF@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
 CPPUNIT_LIBS = @CPPUNIT_LIBS@
@@ -159,9 +160,11 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
+CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
-CXXFLAGS_METHOD = @CXXFLAGS_METHOD@
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
+CXXFLAGS_PROF = @CXXFLAGS_PROF@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -184,14 +187,10 @@ F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
-FFLAGS_METHOD = @FFLAGS_METHOD@
 FGREP = @FGREP@
 FLIBS = @FLIBS@
 FPARSER_INCLUDE = @FPARSER_INCLUDE@
 FPARSER_LIBRARY = @FPARSER_LIBRARY@
-GENERIC_MAJOR_VERSION = @GENERIC_MAJOR_VERSION@
-GENERIC_MICRO_VERSION = @GENERIC_MICRO_VERSION@
-GENERIC_MINOR_VERSION = @GENERIC_MINOR_VERSION@
 GLPK_INCLUDE = @GLPK_INCLUDE@
 GLPK_LIBRARY = @GLPK_LIBRARY@
 GMV_INCLUDE = @GMV_INCLUDE@
@@ -222,6 +221,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 METHOD = @METHOD@
+METHODS = @METHODS@
 METIS_INCLUDE = @METIS_INCLUDE@
 METIS_LIB = @METIS_LIB@
 MKDIR_P = @MKDIR_P@
@@ -334,37 +334,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
-enableaztecoo = @enableaztecoo@
-enablecomplex = @enablecomplex@
-enableeigen = @enableeigen@
-enableexodus = @enableexodus@
-enablefparser = @enablefparser@
-enablefparserdevel = @enablefparserdevel@
-enableglpk = @enableglpk@
-enablegmv = @enablegmv@
-enablegz = @enablegz@
-enablelaspack = @enablelaspack@
 enablelegacyincludepaths = @enablelegacyincludepaths@
-enablelibhilbert = @enablelibhilbert@
-enablemetis = @enablemetis@
-enableml = @enableml@
-enablenemesis = @enablenemesis@
-enablenetcdf = @enablenetcdf@
-enablenox = @enablenox@
-enableopenmp = @enableopenmp@
-enableoptional = @enableoptional@
-enableparmetis = @enableparmetis@
-enablepetsc = @enablepetsc@
-enablesfc = @enablesfc@
-enableslepc = @enableslepc@
-enabletecio = @enabletecio@
-enabletecplot = @enabletecplot@
-enabletetgen = @enabletetgen@
-enabletriangle = @enabletriangle@
-enabletrilinos10 = @enabletrilinos10@
-enabletrilinos9 = @enabletrilinos9@
-enablevtk = @enablevtk@
-enablexdr = @enablexdr@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
@@ -409,12 +379,6 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
-# special handholding for prefix_config.m4 generated files
-# so that 'make clean ; make' works as does 'make distcheck'
-# libmesh_config.h is made by ./configure, so it should get 
-# cleaned by 'make distclean'
-DISTCLEANFILES = libmesh_config.h $(BUILT_SOURCES) $(am__append_2)
-
 #
 # include the magic script!
 EXTRA_DIST = rebuild_makefile.sh
@@ -422,8 +386,8 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	dof_object.h factory.h getpot.h id_types.h libmesh.h \
 	libmesh_C_isnan.h libmesh_augment_std_namespace.h \
 	libmesh_base.h libmesh_common.h libmesh_documentation.h \
-	libmesh_exceptions.h libmesh_logging.h multi_predicates.h \
-	periodic_boundaries.h periodic_boundary.h \
+	libmesh_exceptions.h libmesh_logging.h libmesh_version.h \
+	multi_predicates.h periodic_boundaries.h periodic_boundary.h \
 	periodic_boundary_base.h print_trace.h \
 	reference_counted_object.h reference_counter.h \
 	single_predicates.h sparsity_pattern.h variable.h \
@@ -462,15 +426,16 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	boundary_info.h boundary_mesh.h diva_io.h ensight_io.h \
 	exodusII_io.h exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h \
 	gnuplot_io.h inf_elem_builder.h legacy_xdr_io.h matlab_io.h \
-	medit_io.h mesh.h mesh_base.h mesh_communication.h mesh_data.h \
-	mesh_function.h mesh_generation.h mesh_input.h \
-	mesh_inserter_iterator.h mesh_modification.h mesh_output.h \
-	mesh_refinement.h mesh_serializer.h mesh_smoother.h \
-	mesh_smoother_laplace.h mesh_smoother_vsmoother.h \
-	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
-	mesh_triangle_holes.h mesh_triangle_interface.h \
-	mesh_triangle_wrapper.h nemesis_io.h nemesis_io_helper.h \
-	off_io.h parallel_mesh.h patch.h postscript_io.h serial_mesh.h \
+	medit_io.h memory_solution_history.h mesh.h mesh_base.h \
+	mesh_communication.h mesh_data.h mesh_function.h \
+	mesh_generation.h mesh_input.h mesh_inserter_iterator.h \
+	mesh_modification.h mesh_output.h mesh_refinement.h \
+	mesh_serializer.h mesh_smoother.h mesh_smoother_laplace.h \
+	mesh_smoother_vsmoother.h mesh_tetgen_interface.h \
+	mesh_tetgen_wrapper.h mesh_tools.h mesh_triangle_holes.h \
+	mesh_triangle_interface.h mesh_triangle_wrapper.h nemesis_io.h \
+	nemesis_io_helper.h no_solution_history.h off_io.h \
+	parallel_mesh.h patch.h postscript_io.h serial_mesh.h \
 	tecplot_io.h tetgen_io.h ucd_io.h unstructured_mesh.h unv_io.h \
 	vtk_io.h xdr_head.h xdr_io.h xdr_mesh.h xdr_mgf.h xdr_mhead.h \
 	xdr_shead.h xdr_soln.h analytic_function.h \
@@ -514,29 +479,30 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	linear.h linear_solver.h newton_solver.h nonlinear_solver.h \
 	petsc_diff_solver.h petsc_dm_nonlinear_solver.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
-	petscdmlibmesh.h slepc_eigen_solver.h slepc_macro.h solver.h \
-	steady_solver.h time_solver.h trilinos_aztec_linear_solver.h \
-	trilinos_nox_nonlinear_solver.h twostep_time_solver.h \
-	unsteady_solver.h condensed_eigen_system.h \
-	continuation_system.h diff_context.h diff_system.h \
-	eigen_system.h elem_assembly.h equation_systems.h \
-	explicit_system.h fem_context.h fem_system.h \
-	frequency_system.h implicit_system.h linear_implicit_system.h \
-	newmark_system.h nonlinear_implicit_system.h \
-	parameter_vector.h qoi_set.h sensitivity_data.h \
-	steady_system.h system.h system_norm.h system_subset.h \
-	system_subset_by_subdomain.h transient_system.h \
-	compare_types.h error_vector.h hashword.h ignore_warnings.h \
-	location_maps.h mapvector.h memory_solution_history.h \
-	no_solution_history.h null_output_iterator.h number_lookups.h \
-	o_f_stream.h o_string_stream.h ostream_proxy.h parameters.h \
-	perf_log.h perfmon.h plt_loader.h point_locator_base.h \
+	petscdmlibmesh.h slepc_eigen_solver.h slepc_macro.h \
+	solution_history.h solver.h steady_solver.h time_solver.h \
+	trilinos_aztec_linear_solver.h trilinos_nox_nonlinear_solver.h \
+	twostep_time_solver.h unsteady_solver.h \
+	condensed_eigen_system.h continuation_system.h diff_context.h \
+	diff_system.h eigen_system.h elem_assembly.h \
+	equation_systems.h explicit_system.h fem_context.h \
+	fem_system.h frequency_system.h implicit_system.h \
+	linear_implicit_system.h newmark_system.h \
+	nonlinear_implicit_system.h parameter_vector.h qoi_set.h \
+	sensitivity_data.h steady_system.h system.h system_norm.h \
+	system_subset.h system_subset_by_subdomain.h \
+	transient_system.h compare_types.h error_vector.h hashword.h \
+	ignore_warnings.h location_maps.h mapvector.h \
+	null_output_iterator.h number_lookups.h o_f_stream.h \
+	o_string_stream.h ostream_proxy.h parameters.h perf_log.h \
+	perfmon.h plt_loader.h point_locator_base.h \
 	point_locator_list.h point_locator_tree.h pool_allocator.h \
-	restore_warnings.h solution_history.h statistics.h \
-	string_to_enum.h timestamp.h tree.h tree_base.h tree_node.h \
-	utility.h xdr_cxx.h parallel_communicator_specializations \
-	$(am__append_1)
-all: $(BUILT_SOURCES) libmesh_config.h.tmp
+	restore_warnings.h statistics.h string_to_enum.h timestamp.h \
+	tree.h tree_base.h tree_node.h utility.h xdr_cxx.h \
+	parallel_communicator_specializations $(am__append_1) \
+	libmesh_config.h
+DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) libmesh_config.h
+all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
@@ -570,23 +536,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-
-libmesh_config.h.tmp: stamp-h1
-	@if test ! -f $@; then rm -f stamp-h1; else :; fi
-	@if test ! -f $@; then $(MAKE) $(AM_MAKEFLAGS) stamp-h1; else :; fi
-
-stamp-h1: $(srcdir)/libmesh_config.h.in $(top_builddir)/config.status
-	@rm -f stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status include/libmesh/libmesh_config.h.tmp
-$(srcdir)/libmesh_config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
-	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
-	rm -f stamp-h1
-	touch $@
-
-distclean-hdr:
-	-rm -f libmesh_config.h.tmp stamp-h1
-libmesh_version.h: $(top_builddir)/config.status $(srcdir)/libmesh_version.h.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -632,13 +581,10 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	$(MAKE) $(AM_MAKEFLAGS) \
-	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
-	  dist-hook
 check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile libmesh_config.h.tmp
+all-am: Makefile
 installdirs:
 install: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) install-am
@@ -679,7 +625,7 @@ clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-hdr
+distclean-am: clean-am distclean-generic
 
 dvi: dvi-am
 
@@ -742,28 +688,27 @@ uninstall-am:
 .MAKE: all check install install-am install-strip
 
 .PHONY: all all-am check check-am clean clean-generic clean-libtool \
-	dist-hook distclean distclean-generic distclean-hdr \
-	distclean-libtool distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-info install-info-am install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	uninstall uninstall-am
+	distclean distclean-generic distclean-libtool distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dvi install-dvi-am \
+	install-exec install-exec-am install-html install-html-am \
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am
 
-
-#
-# special things to do when running 'make dist'
-dist-hook:
-	rm -rf $(distdir)/libmesh_config.h
 
 #
 # contrib rules
 
 @LIBMESH_ENABLE_FPARSER_TRUE@fparser.hh: $(top_srcdir)/contrib/fparser/fparser.hh
 @LIBMESH_ENABLE_FPARSER_TRUE@	$(AM_V_GEN)$(LN_S) $(top_srcdir)/contrib/fparser/fparser.hh fparser.hh
+
+#
+# libmesh_config.h rule
+libmesh_config.h: $(top_builddir)/include/libmesh_config.h
+	$(AM_V_GEN)$(LN_S) $(top_builddir)/include/libmesh_config.h libmesh_config.h
 
 #
 # libMesh header rules
@@ -811,6 +756,9 @@ libmesh_exceptions.h: $(top_srcdir)/include/base/libmesh_exceptions.h
 
 libmesh_logging.h: $(top_srcdir)/include/base/libmesh_logging.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/base/libmesh_logging.h libmesh_logging.h
+
+libmesh_version.h: $(top_srcdir)/include/base/libmesh_version.h
+	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/base/libmesh_version.h libmesh_version.h
 
 multi_predicates.h: $(top_srcdir)/include/base/multi_predicates.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/base/multi_predicates.h multi_predicates.h

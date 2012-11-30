@@ -1,13 +1,13 @@
-# Do not edit - automatically generated from ./rebuild_libmesh_la_SOURCES.sh
-libmesh_la_SOURCES =  \
+# Do not edit - automatically generated from ./rebuild_libmesh_SOURCES.sh
+libmesh_SOURCES =  \
         src/base/dof_map.C \
         src/base/dof_map_constraints.C \
         src/base/dof_object.C \
         src/base/libmesh.C \
         src/base/libmesh_isnan.c \
         src/base/periodic_boundaries.C \
-        src/base/periodic_boundary_base.C \
         src/base/periodic_boundary.C \
+        src/base/periodic_boundary_base.C \
         src/base/print_trace.C \
         src/base/reference_counted_object.C \
         src/base/reference_counter.C \
@@ -26,6 +26,7 @@ libmesh_la_SOURCES =  \
         src/error_estimation/patch_recovery_error_estimator.C \
         src/error_estimation/uniform_refinement_estimator.C \
         src/error_estimation/weighted_patch_recovery_estimator.C \
+        src/fe/fe.C \
         src/fe/fe_abstract.C \
         src/fe/fe_base.C \
         src/fe/fe_bernstein.C \
@@ -34,7 +35,6 @@ libmesh_la_SOURCES =  \
         src/fe/fe_bernstein_shape_2D.C \
         src/fe/fe_bernstein_shape_3D.C \
         src/fe/fe_boundary.C \
-        src/fe/fe.C \
         src/fe/fe_clough.C \
         src/fe/fe_clough_shape_0D.C \
         src/fe/fe_clough_shape_1D.C \
@@ -90,8 +90,8 @@ libmesh_la_SOURCES =  \
         src/fe/fe_szabab_shape_3D.C \
         src/fe/fe_transformation_base.C \
         src/fe/fe_type.C \
-        src/fe/fe_xyz_boundary.C \
         src/fe/fe_xyz.C \
+        src/fe/fe_xyz_boundary.C \
         src/fe/fe_xyz_map.C \
         src/fe/fe_xyz_shape_0D.C \
         src/fe/fe_xyz_shape_1D.C \
@@ -99,9 +99,9 @@ libmesh_la_SOURCES =  \
         src/fe/fe_xyz_shape_3D.C \
         src/fe/h1_fe_transformation.C \
         src/fe/hcurl_fe_transformation.C \
+        src/fe/inf_fe.C \
         src/fe/inf_fe_base_radial.C \
         src/fe/inf_fe_boundary.C \
-        src/fe/inf_fe.C \
         src/fe/inf_fe_jacobi_20_00_eval.C \
         src/fe/inf_fe_jacobi_30_00_eval.C \
         src/fe/inf_fe_lagrange_eval.C \
@@ -110,27 +110,27 @@ libmesh_la_SOURCES =  \
         src/fe/inf_fe_map_eval.C \
         src/fe/inf_fe_static.C \
         src/geom/cell.C \
+        src/geom/cell_hex.C \
         src/geom/cell_hex20.C \
         src/geom/cell_hex27.C \
         src/geom/cell_hex8.C \
-        src/geom/cell_hex.C \
         src/geom/cell_inf.C \
+        src/geom/cell_inf_hex.C \
         src/geom/cell_inf_hex16.C \
         src/geom/cell_inf_hex18.C \
         src/geom/cell_inf_hex8.C \
-        src/geom/cell_inf_hex.C \
+        src/geom/cell_inf_prism.C \
         src/geom/cell_inf_prism12.C \
         src/geom/cell_inf_prism6.C \
-        src/geom/cell_inf_prism.C \
+        src/geom/cell_prism.C \
         src/geom/cell_prism15.C \
         src/geom/cell_prism18.C \
         src/geom/cell_prism6.C \
-        src/geom/cell_prism.C \
-        src/geom/cell_pyramid5.C \
         src/geom/cell_pyramid.C \
+        src/geom/cell_pyramid5.C \
+        src/geom/cell_tet.C \
         src/geom/cell_tet10.C \
         src/geom/cell_tet4.C \
-        src/geom/cell_tet.C \
         src/geom/edge.C \
         src/geom/edge_edge2.C \
         src/geom/edge_edge3.C \
@@ -141,16 +141,16 @@ libmesh_la_SOURCES =  \
         src/geom/elem_refinement.C \
         src/geom/elem_type.C \
         src/geom/face.C \
+        src/geom/face_inf_quad.C \
         src/geom/face_inf_quad4.C \
         src/geom/face_inf_quad6.C \
-        src/geom/face_inf_quad.C \
+        src/geom/face_quad.C \
         src/geom/face_quad4.C \
         src/geom/face_quad8.C \
         src/geom/face_quad9.C \
-        src/geom/face_quad.C \
+        src/geom/face_tri.C \
         src/geom/face_tri3.C \
         src/geom/face_tri6.C \
-        src/geom/face_tri.C \
         src/geom/node.C \
         src/geom/node_elem.C \
         src/geom/plane.C \
@@ -219,13 +219,13 @@ libmesh_la_SOURCES =  \
         src/mesh/xdr_soln.C \
         src/numerics/analytic_function.C \
         src/numerics/coupling_matrix.C \
+        src/numerics/dense_matrix.C \
         src/numerics/dense_matrix_base.C \
         src/numerics/dense_matrix_blas_lapack.C \
-        src/numerics/dense_matrix.C \
         src/numerics/dense_submatrix.C \
         src/numerics/dense_subvector.C \
-        src/numerics/dense_vector_base.C \
         src/numerics/dense_vector.C \
+        src/numerics/dense_vector_base.C \
         src/numerics/distributed_vector.C \
         src/numerics/function_base.C \
         src/numerics/laspack_matrix.C \
@@ -261,44 +261,44 @@ libmesh_la_SOURCES =  \
         src/physics/diff_physics.C \
         src/physics/diff_qoi.C \
         src/physics/fem_physics.C \
-        src/quadrature/quadrature_build.C \
         src/quadrature/quadrature.C \
+        src/quadrature/quadrature_build.C \
+        src/quadrature/quadrature_clough.C \
         src/quadrature/quadrature_clough_1D.C \
         src/quadrature/quadrature_clough_2D.C \
         src/quadrature/quadrature_clough_3D.C \
-        src/quadrature/quadrature_clough.C \
+        src/quadrature/quadrature_conical.C \
         src/quadrature/quadrature_conical_2D.C \
         src/quadrature/quadrature_conical_3D.C \
-        src/quadrature/quadrature_conical.C \
+        src/quadrature/quadrature_gauss.C \
         src/quadrature/quadrature_gauss_1D.C \
         src/quadrature/quadrature_gauss_2D.C \
         src/quadrature/quadrature_gauss_3D.C \
-        src/quadrature/quadrature_gauss.C \
-        src/quadrature/quadrature_gm_3D.C \
         src/quadrature/quadrature_gm.C \
+        src/quadrature/quadrature_gm_3D.C \
+        src/quadrature/quadrature_grid.C \
         src/quadrature/quadrature_grid_1D.C \
         src/quadrature/quadrature_grid_2D.C \
         src/quadrature/quadrature_grid_3D.C \
-        src/quadrature/quadrature_grid.C \
-        src/quadrature/quadrature_jacobi_1D.C \
         src/quadrature/quadrature_jacobi.C \
+        src/quadrature/quadrature_jacobi_1D.C \
+        src/quadrature/quadrature_monomial.C \
         src/quadrature/quadrature_monomial_2D.C \
         src/quadrature/quadrature_monomial_3D.C \
-        src/quadrature/quadrature_monomial.C \
         src/quadrature/quadrature_rules.C \
+        src/quadrature/quadrature_simpson.C \
         src/quadrature/quadrature_simpson_1D.C \
         src/quadrature/quadrature_simpson_2D.C \
         src/quadrature/quadrature_simpson_3D.C \
-        src/quadrature/quadrature_simpson.C \
+        src/quadrature/quadrature_trap.C \
         src/quadrature/quadrature_trap_1D.C \
         src/quadrature/quadrature_trap_2D.C \
         src/quadrature/quadrature_trap_3D.C \
-        src/quadrature/quadrature_trap.C \
         src/reduced_basis/derived_rb_construction.C \
         src/reduced_basis/derived_rb_evaluation.C \
         src/reduced_basis/rb_assembly_expansion.C \
-        src/reduced_basis/rb_construction_base.C \
         src/reduced_basis/rb_construction.C \
+        src/reduced_basis/rb_construction_base.C \
         src/reduced_basis/rb_eim_assembly.C \
         src/reduced_basis/rb_eim_construction.C \
         src/reduced_basis/rb_eim_evaluation.C \
@@ -325,13 +325,13 @@ libmesh_la_SOURCES =  \
         src/solvers/linear_solver.C \
         src/solvers/memory_solution_history.C \
         src/solvers/newton_solver.C \
-        src/solvers/nonlinear_solver.C \
         src/solvers/no_solution_history.C \
+        src/solvers/nonlinear_solver.C \
         src/solvers/petsc_diff_solver.C \
-        src/solvers/petscdmlibmesh.C \
         src/solvers/petsc_dm_nonlinear_solver.C \
         src/solvers/petsc_linear_solver.C \
         src/solvers/petsc_nonlinear_solver.C \
+        src/solvers/petscdmlibmesh.C \
         src/solvers/slepc_eigen_solver.C \
         src/solvers/steady_solver.C \
         src/solvers/time_solver.C \
@@ -360,8 +360,8 @@ libmesh_la_SOURCES =  \
         src/systems/system.C \
         src/systems/system_io.C \
         src/systems/system_projection.C \
-        src/systems/system_subset_by_subdomain.C \
         src/systems/system_subset.C \
+        src/systems/system_subset_by_subdomain.C \
         src/systems/transient_system.C \
         src/utils/error_vector.C \
         src/utils/hashword.C \

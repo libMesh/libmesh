@@ -346,7 +346,6 @@ if test "$enablexdr" != no ; then
                     ],
                     [enablexdr=no])
 fi
-AC_SUBST(enablexdr)	
 # -------------------------------------------------------------
 
 
@@ -368,13 +367,11 @@ if test "$enablecomplex" != no ; then
   AC_DEFINE(USE_COMPLEX_NUMBERS, 1,
      [Flag indicating if the library should be built using complxex numbers])
   AC_MSG_RESULT(<<< Configuring library with complex number support >>>)
-  AC_SUBST(enablecomplex)
 
 else
   AC_DEFINE(USE_REAL_NUMBERS, 1,
      [Flag indicating if the library should be built using real numbers])
   AC_MSG_RESULT(<<< Configuring library with real number support >>>)
-  AC_SUBST(enablecomplex)
 fi
 
 AM_CONDITIONAL(LIBMESH_ENABLE_COMPLEX, test x$enablecomplex = xyes)
@@ -403,6 +400,7 @@ fi
 # -------------------------------------------------------------
 
 
+
 # -------------------------------------------------------------
 # Performance Logging -- disabled by default
 # -------------------------------------------------------------
@@ -417,6 +415,27 @@ if test "$enableperflog" != no ; then
            [Flag indicating if the library should be built with performance logging support])
   AC_MSG_RESULT(<<< Configuring library with performance logging support >>>)
 fi
+# ------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# Examples - enabled by default
+# -------------------------------------------------------------
+AC_ARG_ENABLE(examples,
+              AC_HELP_STRING([--enable-examples],
+                             [support compilation, installation, & running example suite]),
+ 	      [case "${enableval}" in
+	          yes)  enableexamples=yes ;;
+		   no)  enableexamples=no ;;
+ 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-examples) ;;
+	       esac],
+              [enableexamples=yes])
+
+if test "$enableexamples" = yes ; then
+  AC_MSG_RESULT(<<< Configuring library example suite support >>>)
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_EXAMPLES, test x$enableexamples = xyes)
 # ------------------------------------------------------------
 
 AC_MSG_RESULT(---------------------------------------------)

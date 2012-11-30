@@ -1,23 +1,12 @@
-include $(top_builddir)/Make.common.@METHOD@
-
-AUTOMAKE_OPTIONS = subdir-objects 
-
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) -DLIBMESH_IS_COMPILING_PARMETIS
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-
 # include paths - note that parmetis needs metis!
-AM_CPPFLAGS += -I$(top_srcdir)/contrib/metis/GKlib \
-               -I$(top_srcdir)/contrib/metis/include \
-               -I$(srcdir)/include \
-               -I$(srcdir)/Lib 
-
-AM_CPPFLAGS += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
-AM_CPPFLAGS += $(libmesh_INCLUDE) # for a PETSc-provided MPI, if required
-
-noinst_LTLIBRARIES     = libparmetis.la
-
-libparmetis_la_SOURCES = \
+pkg_cppflags  = -DLIBMESH_IS_COMPILING_PARMETIS
+pkg_cppflags += -I$(top_srcdir)/contrib/metis/GKlib \
+                -I$(top_srcdir)/contrib/metis/include \
+                -I$(srcdir)/include \
+                -I$(srcdir)/Lib 
+pkg_cppflags += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
+pkg_cppflags += $(libmesh_optional_INCLUDES) # for a PETSc-provided MPI, if required
+pkg_sources   = \
 	include/parmetis.h \
 	Lib/defs.h \
 	Lib/macros.h \
@@ -64,3 +53,6 @@ libparmetis_la_SOURCES = \
 	Lib/weird.c \
 	Lib/wspace.c \
 	Lib/xyzpart.c
+
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common

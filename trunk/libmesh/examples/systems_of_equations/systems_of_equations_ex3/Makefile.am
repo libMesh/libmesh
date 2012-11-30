@@ -1,9 +1,8 @@
-check_PROGRAMS                   = systems_of_equations_ex3
-check_SCRIPTS                    = run.sh
-systems_of_equations_ex3dir      = $(examples_install_path)/systems_of_equations/ex3
-systems_of_equations_ex3_DATA    = systems_of_equations_ex3.C run.sh $(top_srcdir)/contrib/utils/Makefile
-systems_of_equations_ex3_SOURCES = $(systems_of_equations_ex3_DATA) run.sh
-systems_of_equations_ex3_LDADD   = $(top_builddir)/libmesh.la
+example_name  = systems_of_equations_ex3
+check_SCRIPTS = run.sh
+install_dir   = $(examples_install_path)/systems_of_equations/ex3
+data          = systems_of_equations_ex3.C run.sh
+sources       = $(data) run.sh
 
 CLEANFILES = out_*.e
 

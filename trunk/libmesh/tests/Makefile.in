@@ -50,11 +50,24 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-check_PROGRAMS = unit_tests$(EXEEXT)
+check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
+	$(am__EXEEXT_4)
+@LIBMESH_OPT_MODE_TRUE@am__append_1 = unit_tests-opt
+
+# our GLIBC debugging preprocessor flags break this.
+# if LIBMESH_DBG_MODE
+#   check_PROGRAMS         += unit_tests-dbg
+#   unit_tests_dbg_SOURCES  = $(unit_tests_sources)
+#   unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+#   unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+#   unit_tests_dbg_LDADD    = $(top_builddir)/libmesh_dbg.la
+# endif
+@LIBMESH_DEVEL_MODE_TRUE@am__append_2 = unit_tests-devel
+@LIBMESH_PROF_MODE_TRUE@am__append_3 = unit_tests-prof
+@LIBMESH_OPROF_MODE_TRUE@am__append_4 = unit_tests-oprof
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/build-aux/depcomp \
-	$(top_srcdir)/build-aux/test-driver
+	$(top_srcdir)/build-aux/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -91,24 +104,120 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/include/libmesh/libmesh_config.h.tmp
+CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = unit_tests-opt$(EXEEXT)
+@LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_2 = unit_tests-devel$(EXEEXT)
+@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_3 = unit_tests-prof$(EXEEXT)
+@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-oprof$(EXEEXT)
+am__unit_tests_devel_SOURCES_DIST = driver.C base/dof_object_test.h \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	numerics/distributed_vector_test.C \
+	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
+	numerics/petsc_vector_test.C \
+	numerics/trilinos_epetra_vector_test.C \
+	numerics/type_vector_test.h parallel/parallel_test.C \
+	quadrature/quadrature_test.C
 am__dirstamp = $(am__leading_dot)dirstamp
-am_unit_tests_OBJECTS = driver.$(OBJEXT) geom/node_test.$(OBJEXT) \
-	geom/point_test.$(OBJEXT) \
-	numerics/distributed_vector_test.$(OBJEXT) \
-	numerics/laspack_vector_test.$(OBJEXT) \
-	numerics/petsc_vector_test.$(OBJEXT) \
-	numerics/trilinos_epetra_vector_test.$(OBJEXT) \
-	parallel/parallel_test.$(OBJEXT) \
-	quadrature/quadrature_test.$(OBJEXT)
-unit_tests_OBJECTS = $(am_unit_tests_OBJECTS)
-unit_tests_DEPENDENCIES = $(top_builddir)/libmesh.la
+am__objects_1 = unit_tests_devel-driver.$(OBJEXT) \
+	geom/unit_tests_devel-node_test.$(OBJEXT) \
+	geom/unit_tests_devel-point_test.$(OBJEXT) \
+	numerics/unit_tests_devel-distributed_vector_test.$(OBJEXT) \
+	numerics/unit_tests_devel-laspack_vector_test.$(OBJEXT) \
+	numerics/unit_tests_devel-petsc_vector_test.$(OBJEXT) \
+	numerics/unit_tests_devel-trilinos_epetra_vector_test.$(OBJEXT) \
+	parallel/unit_tests_devel-parallel_test.$(OBJEXT) \
+	quadrature/unit_tests_devel-quadrature_test.$(OBJEXT)
+@LIBMESH_DEVEL_MODE_TRUE@am_unit_tests_devel_OBJECTS =  \
+@LIBMESH_DEVEL_MODE_TRUE@	$(am__objects_1)
+unit_tests_devel_OBJECTS = $(am_unit_tests_devel_OBJECTS)
+@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_DEPENDENCIES =  \
+@LIBMESH_DEVEL_MODE_TRUE@	$(top_builddir)/libmesh_devel.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am__unit_tests_oprof_SOURCES_DIST = driver.C base/dof_object_test.h \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	numerics/distributed_vector_test.C \
+	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
+	numerics/petsc_vector_test.C \
+	numerics/trilinos_epetra_vector_test.C \
+	numerics/type_vector_test.h parallel/parallel_test.C \
+	quadrature/quadrature_test.C
+am__objects_2 = unit_tests_oprof-driver.$(OBJEXT) \
+	geom/unit_tests_oprof-node_test.$(OBJEXT) \
+	geom/unit_tests_oprof-point_test.$(OBJEXT) \
+	numerics/unit_tests_oprof-distributed_vector_test.$(OBJEXT) \
+	numerics/unit_tests_oprof-laspack_vector_test.$(OBJEXT) \
+	numerics/unit_tests_oprof-petsc_vector_test.$(OBJEXT) \
+	numerics/unit_tests_oprof-trilinos_epetra_vector_test.$(OBJEXT) \
+	parallel/unit_tests_oprof-parallel_test.$(OBJEXT) \
+	quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT)
+@LIBMESH_OPROF_MODE_TRUE@am_unit_tests_oprof_OBJECTS =  \
+@LIBMESH_OPROF_MODE_TRUE@	$(am__objects_2)
+unit_tests_oprof_OBJECTS = $(am_unit_tests_oprof_OBJECTS)
+@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_DEPENDENCIES =  \
+@LIBMESH_OPROF_MODE_TRUE@	$(top_builddir)/libmesh_oprof.la
+unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am__unit_tests_opt_SOURCES_DIST = driver.C base/dof_object_test.h \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	numerics/distributed_vector_test.C \
+	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
+	numerics/petsc_vector_test.C \
+	numerics/trilinos_epetra_vector_test.C \
+	numerics/type_vector_test.h parallel/parallel_test.C \
+	quadrature/quadrature_test.C
+am__objects_3 = unit_tests_opt-driver.$(OBJEXT) \
+	geom/unit_tests_opt-node_test.$(OBJEXT) \
+	geom/unit_tests_opt-point_test.$(OBJEXT) \
+	numerics/unit_tests_opt-distributed_vector_test.$(OBJEXT) \
+	numerics/unit_tests_opt-laspack_vector_test.$(OBJEXT) \
+	numerics/unit_tests_opt-petsc_vector_test.$(OBJEXT) \
+	numerics/unit_tests_opt-trilinos_epetra_vector_test.$(OBJEXT) \
+	parallel/unit_tests_opt-parallel_test.$(OBJEXT) \
+	quadrature/unit_tests_opt-quadrature_test.$(OBJEXT)
+@LIBMESH_OPT_MODE_TRUE@am_unit_tests_opt_OBJECTS = $(am__objects_3)
+unit_tests_opt_OBJECTS = $(am_unit_tests_opt_OBJECTS)
+@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DEPENDENCIES =  \
+@LIBMESH_OPT_MODE_TRUE@	$(top_builddir)/libmesh_opt.la
+unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am__unit_tests_prof_SOURCES_DIST = driver.C base/dof_object_test.h \
+	geom/node_test.C geom/point_test.C geom/point_test.h \
+	numerics/distributed_vector_test.C \
+	numerics/laspack_vector_test.C numerics/numeric_vector_test.h \
+	numerics/petsc_vector_test.C \
+	numerics/trilinos_epetra_vector_test.C \
+	numerics/type_vector_test.h parallel/parallel_test.C \
+	quadrature/quadrature_test.C
+am__objects_4 = unit_tests_prof-driver.$(OBJEXT) \
+	geom/unit_tests_prof-node_test.$(OBJEXT) \
+	geom/unit_tests_prof-point_test.$(OBJEXT) \
+	numerics/unit_tests_prof-distributed_vector_test.$(OBJEXT) \
+	numerics/unit_tests_prof-laspack_vector_test.$(OBJEXT) \
+	numerics/unit_tests_prof-petsc_vector_test.$(OBJEXT) \
+	numerics/unit_tests_prof-trilinos_epetra_vector_test.$(OBJEXT) \
+	parallel/unit_tests_prof-parallel_test.$(OBJEXT) \
+	quadrature/unit_tests_prof-quadrature_test.$(OBJEXT)
+@LIBMESH_PROF_MODE_TRUE@am_unit_tests_prof_OBJECTS = $(am__objects_4)
+unit_tests_prof_OBJECTS = $(am_unit_tests_prof_OBJECTS)
+@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_DEPENDENCIES =  \
+@LIBMESH_PROF_MODE_TRUE@	$(top_builddir)/libmesh_prof.la
+unit_tests_prof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -121,7 +230,7 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include/libmesh
+DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
@@ -161,8 +270,12 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(unit_tests_SOURCES)
-DIST_SOURCES = $(unit_tests_SOURCES)
+SOURCES = $(unit_tests_devel_SOURCES) $(unit_tests_oprof_SOURCES) \
+	$(unit_tests_opt_SOURCES) $(unit_tests_prof_SOURCES)
+DIST_SOURCES = $(am__unit_tests_devel_SOURCES_DIST) \
+	$(am__unit_tests_oprof_SOURCES_DIST) \
+	$(am__unit_tests_opt_SOURCES_DIST) \
+	$(am__unit_tests_prof_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -192,188 +305,6 @@ am__tty_colors = { \
     std='[m'; \
   fi; \
 }
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  test -z "$$files" \
-    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-         $(am__cd) "$$dir" && rm -f $$files; }; \
-  }
-am__recheck_rx = ^[ 	]*:recheck:[ 	]*
-am__global_test_result_rx = ^[ 	]*:global-test-result:[ 	]*
-am__copy_in_global_log_rx = ^[ 	]*:copy-in-global-log:[ 	]*
-# A command that, given a newline-separated list of test names on the
-# standard input, print the name of the tests that are to be re-run
-# upon "make recheck".
-am__list_recheck_tests = $(AWK) '{ \
-  recheck = 1; \
-  while ((rc = (getline line < ($$0 ".trs"))) != 0) \
-    { \
-      if (rc < 0) \
-        { \
-          if ((getline line2 < ($$0 ".log")) < 0) \
-	    recheck = 0; \
-          break; \
-        } \
-      else if (line ~ /$(am__recheck_rx)[nN][Oo]/) \
-        { \
-          recheck = 0; \
-          break; \
-        } \
-      else if (line ~ /$(am__recheck_rx)[yY][eE][sS]/) \
-        { \
-          break; \
-        } \
-    }; \
-  if (recheck) \
-    print $$0; \
-  close ($$0 ".trs"); \
-  close ($$0 ".log"); \
-}'
-# A command that, given a newline-separated list of test names on the
-# standard input, create the global log from their .trs and .log files.
-am__create_global_log = $(AWK) ' \
-function fatal(msg) \
-{ \
-  print "fatal: making $@: " msg | "cat >&2"; \
-  exit 1; \
-} \
-function rst_section(header) \
-{ \
-  print header; \
-  len = length(header); \
-  for (i = 1; i <= len; i = i + 1) \
-    printf "="; \
-  printf "\n\n"; \
-} \
-{ \
-  copy_in_global_log = 1; \
-  global_test_result = "RUN"; \
-  while ((rc = (getline line < ($$0 ".trs"))) != 0) \
-    { \
-      if (rc < 0) \
-         fatal("failed to read from " $$0 ".trs"); \
-      if (line ~ /$(am__global_test_result_rx)/) \
-        { \
-          sub("$(am__global_test_result_rx)", "", line); \
-          sub("[ 	]*$$", "", line); \
-          global_test_result = line; \
-        } \
-      else if (line ~ /$(am__copy_in_global_log_rx)[nN][oO]/) \
-        copy_in_global_log = 0; \
-    }; \
-  if (copy_in_global_log) \
-    { \
-      rst_section(global_test_result ": " $$0); \
-      while ((rc = (getline line < ($$0 ".log"))) != 0) \
-      { \
-        if (rc < 0) \
-          fatal("failed to read from " $$0 ".log"); \
-        print line; \
-      }; \
-      printf "\n"; \
-    }; \
-  close ($$0 ".trs"); \
-  close ($$0 ".log"); \
-}'
-# Restructured Text title.
-am__rst_title = { sed 's/.*/   &   /;h;s/./=/g;p;x;s/ *$$//;p;g' && echo; }
-# Solaris 10 'make', and several other traditional 'make' implementations,
-# pass "-e" to $(SHELL), and POSIX 2008 even requires this.  Work around it
-# by disabling -e (using the XSI extension "set +e") if it's set.
-am__sh_e_setup = case $$- in *e*) set +e;; esac
-# Default flags passed to test drivers.
-am__common_driver_flags = \
-  --color-tests "$$am__color_tests" \
-  --enable-hard-errors "$$am__enable_hard_errors" \
-  --expect-failure "$$am__expect_failure"
-# To be inserted before the command running the test.  Creates the
-# directory for the log if needed.  Stores in $dir the directory
-# containing $f, in $tst the test, in $log the log.  Executes the
-# developer- defined test setup AM_TESTS_ENVIRONMENT (if any), and
-# passes TESTS_ENVIRONMENT.  Set up options for the wrapper that
-# will run the test scripts (or their associated LOG_COMPILER, if
-# thy have one).
-am__check_pre = \
-$(am__sh_e_setup);					\
-$(am__vpath_adj_setup) $(am__vpath_adj)			\
-$(am__tty_colors);					\
-srcdir=$(srcdir); export srcdir;			\
-case "$@" in						\
-  */*) am__odir=`echo "./$@" | sed 's|/[^/]*$$||'`;;	\
-    *) am__odir=.;; 					\
-esac;							\
-test "x$$am__odir" = x"." || test -d "$$am__odir" 	\
-  || $(MKDIR_P) "$$am__odir" || exit $$?;		\
-if test -f "./$$f"; then dir=./;			\
-elif test -f "$$f"; then dir=;				\
-else dir="$(srcdir)/"; fi;				\
-tst=$$dir$$f; log='$@'; 				\
-if test -n '$(DISABLE_HARD_ERRORS)'; then		\
-  am__enable_hard_errors=no; 				\
-else							\
-  am__enable_hard_errors=yes; 				\
-fi; 							\
-case " $(XFAIL_TESTS) " in				\
-  *[\ \	]$$f[\ \	]* | *[\ \	]$$dir$$f[\ \	]*) \
-    am__expect_failure=yes;;				\
-  *)							\
-    am__expect_failure=no;;				\
-esac; 							\
-$(AM_TESTS_ENVIRONMENT) $(TESTS_ENVIRONMENT)
-# A shell command to get the names of the tests scripts with any registered
-# extension removed (i.e., equivalently, the names of the test logs, with
-# the '.log' extension removed).  The result is saved in the shell variable
-# '$bases'.  This honors runtime overriding of TESTS and TEST_LOGS.  Sadly,
-# we cannot use something simpler, involving e.g., "$(TEST_LOGS:.log=)",
-# since that might cause problem with VPATH rewrites for suffix-less tests.
-# See also 'test-harness-vpath-rewrite.sh' and 'test-trs-basic.sh'.
-am__set_TESTS_bases = \
-  bases='$(TEST_LOGS)'; \
-  bases=`for i in $$bases; do echo $$i; done | sed 's/\.log$$//'`; \
-  bases=`echo $$bases`
-RECHECK_LOGS = $(TEST_LOGS)
-AM_RECURSIVE_TARGETS = check recheck
-TEST_SUITE_LOG = test-suite.log
-TEST_EXTENSIONS = @EXEEXT@ .test
-LOG_DRIVER = $(SHELL) $(top_srcdir)/build-aux/test-driver
-LOG_COMPILE = $(LOG_COMPILER) $(AM_LOG_FLAGS) $(LOG_FLAGS)
-am__set_b = \
-  case '$@' in \
-    */*) \
-      case '$*' in \
-        */*) b='$*';; \
-          *) b=`echo '$@' | sed 's/\.log$$//'`; \
-       esac;; \
-    *) \
-      b='$*';; \
-  esac
-am__test_logs1 = $(TESTS:=.log)
-am__test_logs2 = $(am__test_logs1:@EXEEXT@.log=.log)
-TEST_LOGS = $(am__test_logs2:.test.log=.log)
-TEST_LOG_DRIVER = $(SHELL) $(top_srcdir)/build-aux/test-driver
-TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
-	$(TEST_LOG_FLAGS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -389,7 +320,6 @@ AZTECOO_MAKEFILE_EXPORT = @AZTECOO_MAKEFILE_EXPORT@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
 BOOST_LDFLAGS = @BOOST_LDFLAGS@
 BUILD_ARCH = @BUILD_ARCH@
-BUILD_DATE = @BUILD_DATE@
 BUILD_DEVSTATUS = @BUILD_DEVSTATUS@
 BUILD_HOST = @BUILD_HOST@
 BUILD_USER = @BUILD_USER@
@@ -400,15 +330,18 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
+CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
-CFLAGS_METHOD = @CFLAGS_METHOD@
+CFLAGS_OPROF = @CFLAGS_OPROF@
 CFLAGS_OPT = @CFLAGS_OPT@
+CFLAGS_PROF = @CFLAGS_PROF@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
-CPPFLAGS_DVL = @CPPFLAGS_DVL@
-CPPFLAGS_METHOD = @CPPFLAGS_METHOD@
+CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
+CPPFLAGS_OPROF = @CPPFLAGS_OPROF@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
+CPPFLAGS_PROF = @CPPFLAGS_PROF@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
 CPPUNIT_LIBS = @CPPUNIT_LIBS@
@@ -417,9 +350,11 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
+CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
-CXXFLAGS_METHOD = @CXXFLAGS_METHOD@
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
+CXXFLAGS_PROF = @CXXFLAGS_PROF@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -442,14 +377,10 @@ F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
-FFLAGS_METHOD = @FFLAGS_METHOD@
 FGREP = @FGREP@
 FLIBS = @FLIBS@
 FPARSER_INCLUDE = @FPARSER_INCLUDE@
 FPARSER_LIBRARY = @FPARSER_LIBRARY@
-GENERIC_MAJOR_VERSION = @GENERIC_MAJOR_VERSION@
-GENERIC_MICRO_VERSION = @GENERIC_MICRO_VERSION@
-GENERIC_MINOR_VERSION = @GENERIC_MINOR_VERSION@
 GLPK_INCLUDE = @GLPK_INCLUDE@
 GLPK_LIBRARY = @GLPK_LIBRARY@
 GMV_INCLUDE = @GMV_INCLUDE@
@@ -471,7 +402,7 @@ LDFLAGS = @LDFLAGS@
 LIBHILBERT_INCLUDE = @LIBHILBERT_INCLUDE@
 LIBHILBERT_LIBRARY = @LIBHILBERT_LIBRARY@
 LIBOBJS = @LIBOBJS@
-LIBS = $(libmesh_LIBS) $(CPPUNIT_LIBS)
+LIBS = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -480,6 +411,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 METHOD = @METHOD@
+METHODS = @METHODS@
 METIS_INCLUDE = @METIS_INCLUDE@
 METIS_LIB = @METIS_LIB@
 MKDIR_P = @MKDIR_P@
@@ -592,37 +524,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
-enableaztecoo = @enableaztecoo@
-enablecomplex = @enablecomplex@
-enableeigen = @enableeigen@
-enableexodus = @enableexodus@
-enablefparser = @enablefparser@
-enablefparserdevel = @enablefparserdevel@
-enableglpk = @enableglpk@
-enablegmv = @enablegmv@
-enablegz = @enablegz@
-enablelaspack = @enablelaspack@
 enablelegacyincludepaths = @enablelegacyincludepaths@
-enablelibhilbert = @enablelibhilbert@
-enablemetis = @enablemetis@
-enableml = @enableml@
-enablenemesis = @enablenemesis@
-enablenetcdf = @enablenetcdf@
-enablenox = @enablenox@
-enableopenmp = @enableopenmp@
-enableoptional = @enableoptional@
-enableparmetis = @enableparmetis@
-enablepetsc = @enablepetsc@
-enablesfc = @enablesfc@
-enableslepc = @enableslepc@
-enabletecio = @enabletecio@
-enabletecplot = @enabletecplot@
-enabletetgen = @enabletetgen@
-enabletriangle = @enabletriangle@
-enabletrilinos10 = @enabletrilinos10@
-enabletrilinos9 = @enabletrilinos9@
-enablevtk = @enablevtk@
-enablexdr = @enablexdr@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
@@ -667,12 +569,12 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_INCLUDE) \
-	-I$(top_builddir)/include $(libmesh_contrib_INCLUDES) \
-	$(CPPUNIT_CFLAGS)
-AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-unit_tests_SOURCES = \
+AM_CFLAGS = $(libmesh_CFLAGS)
+AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
+               $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS)
+
+unit_tests_sources = \
 	driver.C \
 	base/dof_object_test.h \
 	geom/node_test.C \
@@ -687,12 +589,27 @@ unit_tests_SOURCES = \
 	parallel/parallel_test.C \
 	quadrature/quadrature_test.C
 
-unit_tests_LDADD = $(top_builddir)/libmesh.la
+@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_SOURCES = $(unit_tests_sources)
+@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
+@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_SOURCES = $(unit_tests_sources)
+@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+@LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_LDADD = $(top_builddir)/libmesh_devel.la
+@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_SOURCES = $(unit_tests_sources)
+@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
+@LIBMESH_PROF_MODE_TRUE@unit_tests_prof_LDADD = $(top_builddir)/libmesh_prof.la
+@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_SOURCES = $(unit_tests_sources)
+@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
+@LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
 TESTS = $(check_PROGRAMS)
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .C .lo .log .o .obj .test .test$(EXEEXT) .trs
+.SUFFIXES: .C .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -738,9 +655,9 @@ geom/$(am__dirstamp):
 geom/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) geom/$(DEPDIR)
 	@: > geom/$(DEPDIR)/$(am__dirstamp)
-geom/node_test.$(OBJEXT): geom/$(am__dirstamp) \
+geom/unit_tests_devel-node_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
-geom/point_test.$(OBJEXT): geom/$(am__dirstamp) \
+geom/unit_tests_devel-point_test.$(OBJEXT): geom/$(am__dirstamp) \
 	geom/$(DEPDIR)/$(am__dirstamp)
 numerics/$(am__dirstamp):
 	@$(MKDIR_P) numerics
@@ -748,13 +665,13 @@ numerics/$(am__dirstamp):
 numerics/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) numerics/$(DEPDIR)
 	@: > numerics/$(DEPDIR)/$(am__dirstamp)
-numerics/distributed_vector_test.$(OBJEXT): numerics/$(am__dirstamp) \
-	numerics/$(DEPDIR)/$(am__dirstamp)
-numerics/laspack_vector_test.$(OBJEXT): numerics/$(am__dirstamp) \
-	numerics/$(DEPDIR)/$(am__dirstamp)
-numerics/petsc_vector_test.$(OBJEXT): numerics/$(am__dirstamp) \
-	numerics/$(DEPDIR)/$(am__dirstamp)
-numerics/trilinos_epetra_vector_test.$(OBJEXT):  \
+numerics/unit_tests_devel-distributed_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_devel-laspack_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_devel-petsc_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_devel-trilinos_epetra_vector_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 parallel/$(am__dirstamp):
 	@$(MKDIR_P) parallel
@@ -762,19 +679,80 @@ parallel/$(am__dirstamp):
 parallel/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) parallel/$(DEPDIR)
 	@: > parallel/$(DEPDIR)/$(am__dirstamp)
-parallel/parallel_test.$(OBJEXT): parallel/$(am__dirstamp) \
-	parallel/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_devel-parallel_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
 quadrature/$(am__dirstamp):
 	@$(MKDIR_P) quadrature
 	@: > quadrature/$(am__dirstamp)
 quadrature/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) quadrature/$(DEPDIR)
 	@: > quadrature/$(DEPDIR)/$(am__dirstamp)
-quadrature/quadrature_test.$(OBJEXT): quadrature/$(am__dirstamp) \
+quadrature/unit_tests_devel-quadrature_test.$(OBJEXT):  \
+	quadrature/$(am__dirstamp) \
 	quadrature/$(DEPDIR)/$(am__dirstamp)
-unit_tests$(EXEEXT): $(unit_tests_OBJECTS) $(unit_tests_DEPENDENCIES) $(EXTRA_unit_tests_DEPENDENCIES) 
-	@rm -f unit_tests$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(unit_tests_OBJECTS) $(unit_tests_LDADD) $(LIBS)
+unit_tests-devel$(EXEEXT): $(unit_tests_devel_OBJECTS) $(unit_tests_devel_DEPENDENCIES) $(EXTRA_unit_tests_devel_DEPENDENCIES) 
+	@rm -f unit_tests-devel$(EXEEXT)
+	$(AM_V_CXXLD)$(unit_tests_devel_LINK) $(unit_tests_devel_OBJECTS) $(unit_tests_devel_LDADD) $(LIBS)
+geom/unit_tests_oprof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_oprof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_oprof-distributed_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_oprof-laspack_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_oprof-petsc_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_oprof-trilinos_epetra_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_oprof-parallel_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+quadrature/unit_tests_oprof-quadrature_test.$(OBJEXT):  \
+	quadrature/$(am__dirstamp) \
+	quadrature/$(DEPDIR)/$(am__dirstamp)
+unit_tests-oprof$(EXEEXT): $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_DEPENDENCIES) $(EXTRA_unit_tests_oprof_DEPENDENCIES) 
+	@rm -f unit_tests-oprof$(EXEEXT)
+	$(AM_V_CXXLD)$(unit_tests_oprof_LINK) $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_LDADD) $(LIBS)
+geom/unit_tests_opt-node_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_opt-point_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_opt-distributed_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_opt-laspack_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_opt-petsc_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_opt-trilinos_epetra_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_opt-parallel_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+quadrature/unit_tests_opt-quadrature_test.$(OBJEXT):  \
+	quadrature/$(am__dirstamp) \
+	quadrature/$(DEPDIR)/$(am__dirstamp)
+unit_tests-opt$(EXEEXT): $(unit_tests_opt_OBJECTS) $(unit_tests_opt_DEPENDENCIES) $(EXTRA_unit_tests_opt_DEPENDENCIES) 
+	@rm -f unit_tests-opt$(EXEEXT)
+	$(AM_V_CXXLD)$(unit_tests_opt_LINK) $(unit_tests_opt_OBJECTS) $(unit_tests_opt_LDADD) $(LIBS)
+geom/unit_tests_prof-node_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+geom/unit_tests_prof-point_test.$(OBJEXT): geom/$(am__dirstamp) \
+	geom/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_prof-distributed_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_prof-laspack_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_prof-petsc_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_prof-trilinos_epetra_vector_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+parallel/unit_tests_prof-parallel_test.$(OBJEXT):  \
+	parallel/$(am__dirstamp) parallel/$(DEPDIR)/$(am__dirstamp)
+quadrature/unit_tests_prof-quadrature_test.$(OBJEXT):  \
+	quadrature/$(am__dirstamp) \
+	quadrature/$(DEPDIR)/$(am__dirstamp)
+unit_tests-prof$(EXEEXT): $(unit_tests_prof_OBJECTS) $(unit_tests_prof_DEPENDENCIES) $(EXTRA_unit_tests_prof_DEPENDENCIES) 
+	@rm -f unit_tests-prof$(EXEEXT)
+	$(AM_V_CXXLD)$(unit_tests_prof_LINK) $(unit_tests_prof_OBJECTS) $(unit_tests_prof_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -786,15 +764,42 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/driver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/node_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/point_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/distributed_vector_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/laspack_vector_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/petsc_vector_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/trilinos_epetra_vector_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/parallel_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/quadrature_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_devel-driver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_oprof-driver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_opt-driver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unit_tests_prof-driver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-node_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_devel-point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-node_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_oprof-point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-node_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_opt-point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-node_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@geom/$(DEPDIR)/unit_tests_prof-point_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-distributed_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-laspack_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-distributed_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-laspack_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-distributed_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-laspack_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-distributed_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-laspack_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -819,6 +824,510 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+unit_tests_devel-driver.o: driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_devel-driver.o -MD -MP -MF $(DEPDIR)/unit_tests_devel-driver.Tpo -c -o unit_tests_devel-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_devel-driver.Tpo $(DEPDIR)/unit_tests_devel-driver.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_devel-driver.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_devel-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
+
+unit_tests_devel-driver.obj: driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_devel-driver.obj -MD -MP -MF $(DEPDIR)/unit_tests_devel-driver.Tpo -c -o unit_tests_devel-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_devel-driver.Tpo $(DEPDIR)/unit_tests_devel-driver.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_devel-driver.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_devel-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+
+geom/unit_tests_devel-node_test.o: geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo -c -o geom/unit_tests_devel-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo geom/$(DEPDIR)/unit_tests_devel-node_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_devel-node_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
+
+geom/unit_tests_devel-node_test.obj: geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-node_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo -c -o geom/unit_tests_devel-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-node_test.Tpo geom/$(DEPDIR)/unit_tests_devel-node_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_devel-node_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
+
+geom/unit_tests_devel-point_test.o: geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-point_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-point_test.Tpo -c -o geom/unit_tests_devel-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-point_test.Tpo geom/$(DEPDIR)/unit_tests_devel-point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_devel-point_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
+
+geom/unit_tests_devel-point_test.obj: geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_devel-point_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_devel-point_test.Tpo -c -o geom/unit_tests_devel-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_devel-point_test.Tpo geom/$(DEPDIR)/unit_tests_devel-point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_devel-point_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_devel-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+numerics/unit_tests_devel-distributed_vector_test.o: numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-distributed_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-distributed_vector_test.Tpo -c -o numerics/unit_tests_devel-distributed_vector_test.o `test -f 'numerics/distributed_vector_test.C' || echo '$(srcdir)/'`numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-distributed_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-distributed_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/distributed_vector_test.C' object='numerics/unit_tests_devel-distributed_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-distributed_vector_test.o `test -f 'numerics/distributed_vector_test.C' || echo '$(srcdir)/'`numerics/distributed_vector_test.C
+
+numerics/unit_tests_devel-distributed_vector_test.obj: numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-distributed_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-distributed_vector_test.Tpo -c -o numerics/unit_tests_devel-distributed_vector_test.obj `if test -f 'numerics/distributed_vector_test.C'; then $(CYGPATH_W) 'numerics/distributed_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/distributed_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-distributed_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-distributed_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/distributed_vector_test.C' object='numerics/unit_tests_devel-distributed_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-distributed_vector_test.obj `if test -f 'numerics/distributed_vector_test.C'; then $(CYGPATH_W) 'numerics/distributed_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/distributed_vector_test.C'; fi`
+
+numerics/unit_tests_devel-laspack_vector_test.o: numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-laspack_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-laspack_vector_test.Tpo -c -o numerics/unit_tests_devel-laspack_vector_test.o `test -f 'numerics/laspack_vector_test.C' || echo '$(srcdir)/'`numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-laspack_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-laspack_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/laspack_vector_test.C' object='numerics/unit_tests_devel-laspack_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-laspack_vector_test.o `test -f 'numerics/laspack_vector_test.C' || echo '$(srcdir)/'`numerics/laspack_vector_test.C
+
+numerics/unit_tests_devel-laspack_vector_test.obj: numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-laspack_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-laspack_vector_test.Tpo -c -o numerics/unit_tests_devel-laspack_vector_test.obj `if test -f 'numerics/laspack_vector_test.C'; then $(CYGPATH_W) 'numerics/laspack_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/laspack_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-laspack_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-laspack_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/laspack_vector_test.C' object='numerics/unit_tests_devel-laspack_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-laspack_vector_test.obj `if test -f 'numerics/laspack_vector_test.C'; then $(CYGPATH_W) 'numerics/laspack_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/laspack_vector_test.C'; fi`
+
+numerics/unit_tests_devel-petsc_vector_test.o: numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-petsc_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Tpo -c -o numerics/unit_tests_devel-petsc_vector_test.o `test -f 'numerics/petsc_vector_test.C' || echo '$(srcdir)/'`numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/petsc_vector_test.C' object='numerics/unit_tests_devel-petsc_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-petsc_vector_test.o `test -f 'numerics/petsc_vector_test.C' || echo '$(srcdir)/'`numerics/petsc_vector_test.C
+
+numerics/unit_tests_devel-petsc_vector_test.obj: numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-petsc_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Tpo -c -o numerics/unit_tests_devel-petsc_vector_test.obj `if test -f 'numerics/petsc_vector_test.C'; then $(CYGPATH_W) 'numerics/petsc_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/petsc_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/petsc_vector_test.C' object='numerics/unit_tests_devel-petsc_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-petsc_vector_test.obj `if test -f 'numerics/petsc_vector_test.C'; then $(CYGPATH_W) 'numerics/petsc_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/petsc_vector_test.C'; fi`
+
+numerics/unit_tests_devel-trilinos_epetra_vector_test.o: numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-trilinos_epetra_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Tpo -c -o numerics/unit_tests_devel-trilinos_epetra_vector_test.o `test -f 'numerics/trilinos_epetra_vector_test.C' || echo '$(srcdir)/'`numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_devel-trilinos_epetra_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-trilinos_epetra_vector_test.o `test -f 'numerics/trilinos_epetra_vector_test.C' || echo '$(srcdir)/'`numerics/trilinos_epetra_vector_test.C
+
+numerics/unit_tests_devel-trilinos_epetra_vector_test.obj: numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-trilinos_epetra_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Tpo -c -o numerics/unit_tests_devel-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_devel-trilinos_epetra_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+
+parallel/unit_tests_devel-parallel_test.o: parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_devel-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Tpo -c -o parallel/unit_tests_devel-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_devel-parallel_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_devel-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
+
+parallel/unit_tests_devel-parallel_test.obj: parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_devel-parallel_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Tpo -c -o parallel/unit_tests_devel-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_devel-parallel_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_devel-parallel_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_devel-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+
+quadrature/unit_tests_devel-quadrature_test.o: quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_devel-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Tpo -c -o quadrature/unit_tests_devel-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_devel-quadrature_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_devel-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
+
+quadrature/unit_tests_devel-quadrature_test.obj: quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_devel-quadrature_test.obj -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Tpo -c -o quadrature/unit_tests_devel-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_devel-quadrature_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_devel-quadrature_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_devel-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
+
+unit_tests_oprof-driver.o: driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_oprof-driver.o -MD -MP -MF $(DEPDIR)/unit_tests_oprof-driver.Tpo -c -o unit_tests_oprof-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_oprof-driver.Tpo $(DEPDIR)/unit_tests_oprof-driver.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_oprof-driver.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_oprof-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
+
+unit_tests_oprof-driver.obj: driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_oprof-driver.obj -MD -MP -MF $(DEPDIR)/unit_tests_oprof-driver.Tpo -c -o unit_tests_oprof-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_oprof-driver.Tpo $(DEPDIR)/unit_tests_oprof-driver.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_oprof-driver.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_oprof-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+
+geom/unit_tests_oprof-node_test.o: geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo -c -o geom/unit_tests_oprof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-node_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_oprof-node_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
+
+geom/unit_tests_oprof-node_test.obj: geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-node_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo -c -o geom/unit_tests_oprof-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-node_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-node_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_oprof-node_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
+
+geom/unit_tests_oprof-point_test.o: geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-point_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-point_test.Tpo -c -o geom/unit_tests_oprof-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-point_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_oprof-point_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
+
+geom/unit_tests_oprof-point_test.obj: geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_oprof-point_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_oprof-point_test.Tpo -c -o geom/unit_tests_oprof-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_oprof-point_test.Tpo geom/$(DEPDIR)/unit_tests_oprof-point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_oprof-point_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_oprof-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+numerics/unit_tests_oprof-distributed_vector_test.o: numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-distributed_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-distributed_vector_test.Tpo -c -o numerics/unit_tests_oprof-distributed_vector_test.o `test -f 'numerics/distributed_vector_test.C' || echo '$(srcdir)/'`numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-distributed_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-distributed_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/distributed_vector_test.C' object='numerics/unit_tests_oprof-distributed_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-distributed_vector_test.o `test -f 'numerics/distributed_vector_test.C' || echo '$(srcdir)/'`numerics/distributed_vector_test.C
+
+numerics/unit_tests_oprof-distributed_vector_test.obj: numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-distributed_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-distributed_vector_test.Tpo -c -o numerics/unit_tests_oprof-distributed_vector_test.obj `if test -f 'numerics/distributed_vector_test.C'; then $(CYGPATH_W) 'numerics/distributed_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/distributed_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-distributed_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-distributed_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/distributed_vector_test.C' object='numerics/unit_tests_oprof-distributed_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-distributed_vector_test.obj `if test -f 'numerics/distributed_vector_test.C'; then $(CYGPATH_W) 'numerics/distributed_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/distributed_vector_test.C'; fi`
+
+numerics/unit_tests_oprof-laspack_vector_test.o: numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-laspack_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-laspack_vector_test.Tpo -c -o numerics/unit_tests_oprof-laspack_vector_test.o `test -f 'numerics/laspack_vector_test.C' || echo '$(srcdir)/'`numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-laspack_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-laspack_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/laspack_vector_test.C' object='numerics/unit_tests_oprof-laspack_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-laspack_vector_test.o `test -f 'numerics/laspack_vector_test.C' || echo '$(srcdir)/'`numerics/laspack_vector_test.C
+
+numerics/unit_tests_oprof-laspack_vector_test.obj: numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-laspack_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-laspack_vector_test.Tpo -c -o numerics/unit_tests_oprof-laspack_vector_test.obj `if test -f 'numerics/laspack_vector_test.C'; then $(CYGPATH_W) 'numerics/laspack_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/laspack_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-laspack_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-laspack_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/laspack_vector_test.C' object='numerics/unit_tests_oprof-laspack_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-laspack_vector_test.obj `if test -f 'numerics/laspack_vector_test.C'; then $(CYGPATH_W) 'numerics/laspack_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/laspack_vector_test.C'; fi`
+
+numerics/unit_tests_oprof-petsc_vector_test.o: numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-petsc_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Tpo -c -o numerics/unit_tests_oprof-petsc_vector_test.o `test -f 'numerics/petsc_vector_test.C' || echo '$(srcdir)/'`numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/petsc_vector_test.C' object='numerics/unit_tests_oprof-petsc_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-petsc_vector_test.o `test -f 'numerics/petsc_vector_test.C' || echo '$(srcdir)/'`numerics/petsc_vector_test.C
+
+numerics/unit_tests_oprof-petsc_vector_test.obj: numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-petsc_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Tpo -c -o numerics/unit_tests_oprof-petsc_vector_test.obj `if test -f 'numerics/petsc_vector_test.C'; then $(CYGPATH_W) 'numerics/petsc_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/petsc_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/petsc_vector_test.C' object='numerics/unit_tests_oprof-petsc_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-petsc_vector_test.obj `if test -f 'numerics/petsc_vector_test.C'; then $(CYGPATH_W) 'numerics/petsc_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/petsc_vector_test.C'; fi`
+
+numerics/unit_tests_oprof-trilinos_epetra_vector_test.o: numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-trilinos_epetra_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Tpo -c -o numerics/unit_tests_oprof-trilinos_epetra_vector_test.o `test -f 'numerics/trilinos_epetra_vector_test.C' || echo '$(srcdir)/'`numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_oprof-trilinos_epetra_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-trilinos_epetra_vector_test.o `test -f 'numerics/trilinos_epetra_vector_test.C' || echo '$(srcdir)/'`numerics/trilinos_epetra_vector_test.C
+
+numerics/unit_tests_oprof-trilinos_epetra_vector_test.obj: numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-trilinos_epetra_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Tpo -c -o numerics/unit_tests_oprof-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_oprof-trilinos_epetra_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+
+parallel/unit_tests_oprof-parallel_test.o: parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_oprof-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Tpo -c -o parallel/unit_tests_oprof-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_oprof-parallel_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_oprof-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
+
+parallel/unit_tests_oprof-parallel_test.obj: parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_oprof-parallel_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Tpo -c -o parallel/unit_tests_oprof-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_oprof-parallel_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_oprof-parallel_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_oprof-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+
+quadrature/unit_tests_oprof-quadrature_test.o: quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_oprof-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Tpo -c -o quadrature/unit_tests_oprof-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_oprof-quadrature_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_oprof-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
+
+quadrature/unit_tests_oprof-quadrature_test.obj: quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_oprof-quadrature_test.obj -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Tpo -c -o quadrature/unit_tests_oprof-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_oprof-quadrature_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_oprof-quadrature_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_oprof-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
+
+unit_tests_opt-driver.o: driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_opt-driver.o -MD -MP -MF $(DEPDIR)/unit_tests_opt-driver.Tpo -c -o unit_tests_opt-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_opt-driver.Tpo $(DEPDIR)/unit_tests_opt-driver.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_opt-driver.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_opt-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
+
+unit_tests_opt-driver.obj: driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_opt-driver.obj -MD -MP -MF $(DEPDIR)/unit_tests_opt-driver.Tpo -c -o unit_tests_opt-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_opt-driver.Tpo $(DEPDIR)/unit_tests_opt-driver.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_opt-driver.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_opt-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+
+geom/unit_tests_opt-node_test.o: geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo -c -o geom/unit_tests_opt-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo geom/$(DEPDIR)/unit_tests_opt-node_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_opt-node_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
+
+geom/unit_tests_opt-node_test.obj: geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-node_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo -c -o geom/unit_tests_opt-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-node_test.Tpo geom/$(DEPDIR)/unit_tests_opt-node_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_opt-node_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
+
+geom/unit_tests_opt-point_test.o: geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-point_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-point_test.Tpo -c -o geom/unit_tests_opt-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-point_test.Tpo geom/$(DEPDIR)/unit_tests_opt-point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_opt-point_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
+
+geom/unit_tests_opt-point_test.obj: geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_opt-point_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_opt-point_test.Tpo -c -o geom/unit_tests_opt-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_opt-point_test.Tpo geom/$(DEPDIR)/unit_tests_opt-point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_opt-point_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_opt-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+numerics/unit_tests_opt-distributed_vector_test.o: numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-distributed_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-distributed_vector_test.Tpo -c -o numerics/unit_tests_opt-distributed_vector_test.o `test -f 'numerics/distributed_vector_test.C' || echo '$(srcdir)/'`numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-distributed_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-distributed_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/distributed_vector_test.C' object='numerics/unit_tests_opt-distributed_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-distributed_vector_test.o `test -f 'numerics/distributed_vector_test.C' || echo '$(srcdir)/'`numerics/distributed_vector_test.C
+
+numerics/unit_tests_opt-distributed_vector_test.obj: numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-distributed_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-distributed_vector_test.Tpo -c -o numerics/unit_tests_opt-distributed_vector_test.obj `if test -f 'numerics/distributed_vector_test.C'; then $(CYGPATH_W) 'numerics/distributed_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/distributed_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-distributed_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-distributed_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/distributed_vector_test.C' object='numerics/unit_tests_opt-distributed_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-distributed_vector_test.obj `if test -f 'numerics/distributed_vector_test.C'; then $(CYGPATH_W) 'numerics/distributed_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/distributed_vector_test.C'; fi`
+
+numerics/unit_tests_opt-laspack_vector_test.o: numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-laspack_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-laspack_vector_test.Tpo -c -o numerics/unit_tests_opt-laspack_vector_test.o `test -f 'numerics/laspack_vector_test.C' || echo '$(srcdir)/'`numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-laspack_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-laspack_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/laspack_vector_test.C' object='numerics/unit_tests_opt-laspack_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-laspack_vector_test.o `test -f 'numerics/laspack_vector_test.C' || echo '$(srcdir)/'`numerics/laspack_vector_test.C
+
+numerics/unit_tests_opt-laspack_vector_test.obj: numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-laspack_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-laspack_vector_test.Tpo -c -o numerics/unit_tests_opt-laspack_vector_test.obj `if test -f 'numerics/laspack_vector_test.C'; then $(CYGPATH_W) 'numerics/laspack_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/laspack_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-laspack_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-laspack_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/laspack_vector_test.C' object='numerics/unit_tests_opt-laspack_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-laspack_vector_test.obj `if test -f 'numerics/laspack_vector_test.C'; then $(CYGPATH_W) 'numerics/laspack_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/laspack_vector_test.C'; fi`
+
+numerics/unit_tests_opt-petsc_vector_test.o: numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-petsc_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Tpo -c -o numerics/unit_tests_opt-petsc_vector_test.o `test -f 'numerics/petsc_vector_test.C' || echo '$(srcdir)/'`numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/petsc_vector_test.C' object='numerics/unit_tests_opt-petsc_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-petsc_vector_test.o `test -f 'numerics/petsc_vector_test.C' || echo '$(srcdir)/'`numerics/petsc_vector_test.C
+
+numerics/unit_tests_opt-petsc_vector_test.obj: numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-petsc_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Tpo -c -o numerics/unit_tests_opt-petsc_vector_test.obj `if test -f 'numerics/petsc_vector_test.C'; then $(CYGPATH_W) 'numerics/petsc_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/petsc_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/petsc_vector_test.C' object='numerics/unit_tests_opt-petsc_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-petsc_vector_test.obj `if test -f 'numerics/petsc_vector_test.C'; then $(CYGPATH_W) 'numerics/petsc_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/petsc_vector_test.C'; fi`
+
+numerics/unit_tests_opt-trilinos_epetra_vector_test.o: numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-trilinos_epetra_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Tpo -c -o numerics/unit_tests_opt-trilinos_epetra_vector_test.o `test -f 'numerics/trilinos_epetra_vector_test.C' || echo '$(srcdir)/'`numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_opt-trilinos_epetra_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-trilinos_epetra_vector_test.o `test -f 'numerics/trilinos_epetra_vector_test.C' || echo '$(srcdir)/'`numerics/trilinos_epetra_vector_test.C
+
+numerics/unit_tests_opt-trilinos_epetra_vector_test.obj: numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-trilinos_epetra_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Tpo -c -o numerics/unit_tests_opt-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_opt-trilinos_epetra_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+
+parallel/unit_tests_opt-parallel_test.o: parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_opt-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Tpo -c -o parallel/unit_tests_opt-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_opt-parallel_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_opt-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
+
+parallel/unit_tests_opt-parallel_test.obj: parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_opt-parallel_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Tpo -c -o parallel/unit_tests_opt-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_opt-parallel_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_opt-parallel_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_opt-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+
+quadrature/unit_tests_opt-quadrature_test.o: quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_opt-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Tpo -c -o quadrature/unit_tests_opt-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_opt-quadrature_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_opt-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
+
+quadrature/unit_tests_opt-quadrature_test.obj: quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_opt-quadrature_test.obj -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Tpo -c -o quadrature/unit_tests_opt-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_opt-quadrature_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_opt-quadrature_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_opt-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
+
+unit_tests_prof-driver.o: driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_prof-driver.o -MD -MP -MF $(DEPDIR)/unit_tests_prof-driver.Tpo -c -o unit_tests_prof-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_prof-driver.Tpo $(DEPDIR)/unit_tests_prof-driver.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_prof-driver.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_prof-driver.o `test -f 'driver.C' || echo '$(srcdir)/'`driver.C
+
+unit_tests_prof-driver.obj: driver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT unit_tests_prof-driver.obj -MD -MP -MF $(DEPDIR)/unit_tests_prof-driver.Tpo -c -o unit_tests_prof-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/unit_tests_prof-driver.Tpo $(DEPDIR)/unit_tests_prof-driver.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='driver.C' object='unit_tests_prof-driver.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o unit_tests_prof-driver.obj `if test -f 'driver.C'; then $(CYGPATH_W) 'driver.C'; else $(CYGPATH_W) '$(srcdir)/driver.C'; fi`
+
+geom/unit_tests_prof-node_test.o: geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-node_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo -c -o geom/unit_tests_prof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo geom/$(DEPDIR)/unit_tests_prof-node_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_prof-node_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-node_test.o `test -f 'geom/node_test.C' || echo '$(srcdir)/'`geom/node_test.C
+
+geom/unit_tests_prof-node_test.obj: geom/node_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-node_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo -c -o geom/unit_tests_prof-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-node_test.Tpo geom/$(DEPDIR)/unit_tests_prof-node_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/node_test.C' object='geom/unit_tests_prof-node_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-node_test.obj `if test -f 'geom/node_test.C'; then $(CYGPATH_W) 'geom/node_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/node_test.C'; fi`
+
+geom/unit_tests_prof-point_test.o: geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-point_test.o -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-point_test.Tpo -c -o geom/unit_tests_prof-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-point_test.Tpo geom/$(DEPDIR)/unit_tests_prof-point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_prof-point_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-point_test.o `test -f 'geom/point_test.C' || echo '$(srcdir)/'`geom/point_test.C
+
+geom/unit_tests_prof-point_test.obj: geom/point_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT geom/unit_tests_prof-point_test.obj -MD -MP -MF geom/$(DEPDIR)/unit_tests_prof-point_test.Tpo -c -o geom/unit_tests_prof-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) geom/$(DEPDIR)/unit_tests_prof-point_test.Tpo geom/$(DEPDIR)/unit_tests_prof-point_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='geom/point_test.C' object='geom/unit_tests_prof-point_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o geom/unit_tests_prof-point_test.obj `if test -f 'geom/point_test.C'; then $(CYGPATH_W) 'geom/point_test.C'; else $(CYGPATH_W) '$(srcdir)/geom/point_test.C'; fi`
+
+numerics/unit_tests_prof-distributed_vector_test.o: numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-distributed_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-distributed_vector_test.Tpo -c -o numerics/unit_tests_prof-distributed_vector_test.o `test -f 'numerics/distributed_vector_test.C' || echo '$(srcdir)/'`numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-distributed_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-distributed_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/distributed_vector_test.C' object='numerics/unit_tests_prof-distributed_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-distributed_vector_test.o `test -f 'numerics/distributed_vector_test.C' || echo '$(srcdir)/'`numerics/distributed_vector_test.C
+
+numerics/unit_tests_prof-distributed_vector_test.obj: numerics/distributed_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-distributed_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-distributed_vector_test.Tpo -c -o numerics/unit_tests_prof-distributed_vector_test.obj `if test -f 'numerics/distributed_vector_test.C'; then $(CYGPATH_W) 'numerics/distributed_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/distributed_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-distributed_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-distributed_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/distributed_vector_test.C' object='numerics/unit_tests_prof-distributed_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-distributed_vector_test.obj `if test -f 'numerics/distributed_vector_test.C'; then $(CYGPATH_W) 'numerics/distributed_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/distributed_vector_test.C'; fi`
+
+numerics/unit_tests_prof-laspack_vector_test.o: numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-laspack_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-laspack_vector_test.Tpo -c -o numerics/unit_tests_prof-laspack_vector_test.o `test -f 'numerics/laspack_vector_test.C' || echo '$(srcdir)/'`numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-laspack_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-laspack_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/laspack_vector_test.C' object='numerics/unit_tests_prof-laspack_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-laspack_vector_test.o `test -f 'numerics/laspack_vector_test.C' || echo '$(srcdir)/'`numerics/laspack_vector_test.C
+
+numerics/unit_tests_prof-laspack_vector_test.obj: numerics/laspack_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-laspack_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-laspack_vector_test.Tpo -c -o numerics/unit_tests_prof-laspack_vector_test.obj `if test -f 'numerics/laspack_vector_test.C'; then $(CYGPATH_W) 'numerics/laspack_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/laspack_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-laspack_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-laspack_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/laspack_vector_test.C' object='numerics/unit_tests_prof-laspack_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-laspack_vector_test.obj `if test -f 'numerics/laspack_vector_test.C'; then $(CYGPATH_W) 'numerics/laspack_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/laspack_vector_test.C'; fi`
+
+numerics/unit_tests_prof-petsc_vector_test.o: numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-petsc_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Tpo -c -o numerics/unit_tests_prof-petsc_vector_test.o `test -f 'numerics/petsc_vector_test.C' || echo '$(srcdir)/'`numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/petsc_vector_test.C' object='numerics/unit_tests_prof-petsc_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-petsc_vector_test.o `test -f 'numerics/petsc_vector_test.C' || echo '$(srcdir)/'`numerics/petsc_vector_test.C
+
+numerics/unit_tests_prof-petsc_vector_test.obj: numerics/petsc_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-petsc_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Tpo -c -o numerics/unit_tests_prof-petsc_vector_test.obj `if test -f 'numerics/petsc_vector_test.C'; then $(CYGPATH_W) 'numerics/petsc_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/petsc_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/petsc_vector_test.C' object='numerics/unit_tests_prof-petsc_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-petsc_vector_test.obj `if test -f 'numerics/petsc_vector_test.C'; then $(CYGPATH_W) 'numerics/petsc_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/petsc_vector_test.C'; fi`
+
+numerics/unit_tests_prof-trilinos_epetra_vector_test.o: numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-trilinos_epetra_vector_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Tpo -c -o numerics/unit_tests_prof-trilinos_epetra_vector_test.o `test -f 'numerics/trilinos_epetra_vector_test.C' || echo '$(srcdir)/'`numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_prof-trilinos_epetra_vector_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-trilinos_epetra_vector_test.o `test -f 'numerics/trilinos_epetra_vector_test.C' || echo '$(srcdir)/'`numerics/trilinos_epetra_vector_test.C
+
+numerics/unit_tests_prof-trilinos_epetra_vector_test.obj: numerics/trilinos_epetra_vector_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-trilinos_epetra_vector_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Tpo -c -o numerics/unit_tests_prof-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/trilinos_epetra_vector_test.C' object='numerics/unit_tests_prof-trilinos_epetra_vector_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-trilinos_epetra_vector_test.obj `if test -f 'numerics/trilinos_epetra_vector_test.C'; then $(CYGPATH_W) 'numerics/trilinos_epetra_vector_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/trilinos_epetra_vector_test.C'; fi`
+
+parallel/unit_tests_prof-parallel_test.o: parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_prof-parallel_test.o -MD -MP -MF parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Tpo -c -o parallel/unit_tests_prof-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_prof-parallel_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_prof-parallel_test.o `test -f 'parallel/parallel_test.C' || echo '$(srcdir)/'`parallel/parallel_test.C
+
+parallel/unit_tests_prof-parallel_test.obj: parallel/parallel_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT parallel/unit_tests_prof-parallel_test.obj -MD -MP -MF parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Tpo -c -o parallel/unit_tests_prof-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Tpo parallel/$(DEPDIR)/unit_tests_prof-parallel_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parallel/parallel_test.C' object='parallel/unit_tests_prof-parallel_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o parallel/unit_tests_prof-parallel_test.obj `if test -f 'parallel/parallel_test.C'; then $(CYGPATH_W) 'parallel/parallel_test.C'; else $(CYGPATH_W) '$(srcdir)/parallel/parallel_test.C'; fi`
+
+quadrature/unit_tests_prof-quadrature_test.o: quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_prof-quadrature_test.o -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Tpo -c -o quadrature/unit_tests_prof-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_prof-quadrature_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_prof-quadrature_test.o `test -f 'quadrature/quadrature_test.C' || echo '$(srcdir)/'`quadrature/quadrature_test.C
+
+quadrature/unit_tests_prof-quadrature_test.obj: quadrature/quadrature_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT quadrature/unit_tests_prof-quadrature_test.obj -MD -MP -MF quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Tpo -c -o quadrature/unit_tests_prof-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Tpo quadrature/$(DEPDIR)/unit_tests_prof-quadrature_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='quadrature/quadrature_test.C' object='quadrature/unit_tests_prof-quadrature_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o quadrature/unit_tests_prof-quadrature_test.obj `if test -f 'quadrature/quadrature_test.C'; then $(CYGPATH_W) 'quadrature/quadrature_test.C'; else $(CYGPATH_W) '$(srcdir)/quadrature/quadrature_test.C'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -892,168 +1401,98 @@ cscopelist:  $(HEADERS) $(SOURCES) $(LISP)
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
-# Recover from deleted '.trs' file; this should ensure that
-# "rm -f foo.log; make foo.trs" re-run 'foo.test', and re-create
-# both 'foo.log' and 'foo.trs'.  Break the recipe in two subshells
-# to avoid problems with "make -n".
-.log.trs:
-	rm -f $< $@
-	$(MAKE) $(AM_MAKEFLAGS) $<
-
-# Leading 'am--fnord' is there to ensure the list of targets does not
-# exand to empty, as could happen e.g. with make check TESTS=''.
-am--fnord $(TEST_LOGS) $(TEST_LOGS:.log=.trs): $(am__force_recheck)
-am--force-recheck:
-	@:
-
-$(TEST_SUITE_LOG): $(TEST_LOGS)
-	@$(am__set_TESTS_bases); \
-	am__f_ok () { test -f "$$1" && test -r "$$1"; }; \
-	redo_bases=`for i in $$bases; do \
-	              am__f_ok $$i.trs && am__f_ok $$i.log || echo $$i; \
-	            done`; \
-	if test -n "$$redo_bases"; then \
-	  redo_logs=`for i in $$redo_bases; do echo $$i.log; done`; \
-	  redo_results=`for i in $$redo_bases; do echo $$i.trs; done`; \
-	  if $(am__make_dryrun); then :; else \
-	    rm -f $$redo_logs && rm -f $$redo_results || exit 1; \
-	  fi; \
-	fi; \
-	if test -n "$$am__remaking_logs"; then \
-	  echo "fatal: making $(TEST_SUITE_LOG): possible infinite" \
-	       "recursion detected" >&2; \
-	else \
-	  am__remaking_logs=yes $(MAKE) $(AM_MAKEFLAGS) $$redo_logs; \
-	fi; \
-	if $(am__make_dryrun); then :; else \
-	  st=0;  \
-	  errmsg="fatal: making $(TEST_SUITE_LOG): failed to create"; \
-	  for i in $$redo_bases; do \
-	    test -f $$i.trs && test -r $$i.trs \
-	      || { echo "$$errmsg $$i.trs" >&2; st=1; }; \
-	    test -f $$i.log && test -r $$i.log \
-	      || { echo "$$errmsg $$i.log" >&2; st=1; }; \
+check-TESTS: $(TESTS)
+	@failed=0; all=0; xfail=0; xpass=0; skip=0; \
+	srcdir=$(srcdir); export srcdir; \
+	list=' $(TESTS) '; \
+	$(am__tty_colors); \
+	if test -n "$$list"; then \
+	  for tst in $$list; do \
+	    if test -f ./$$tst; then dir=./; \
+	    elif test -f $$tst; then dir=; \
+	    else dir="$(srcdir)/"; fi; \
+	    if $(TESTS_ENVIRONMENT) $${dir}$$tst $(AM_TESTS_FD_REDIRECT); then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *[\ \	]$$tst[\ \	]*) \
+		xpass=`expr $$xpass + 1`; \
+		failed=`expr $$failed + 1`; \
+		col=$$red; res=XPASS; \
+	      ;; \
+	      *) \
+		col=$$grn; res=PASS; \
+	      ;; \
+	      esac; \
+	    elif test $$? -ne 77; then \
+	      all=`expr $$all + 1`; \
+	      case " $(XFAIL_TESTS) " in \
+	      *[\ \	]$$tst[\ \	]*) \
+		xfail=`expr $$xfail + 1`; \
+		col=$$lgn; res=XFAIL; \
+	      ;; \
+	      *) \
+		failed=`expr $$failed + 1`; \
+		col=$$red; res=FAIL; \
+	      ;; \
+	      esac; \
+	    else \
+	      skip=`expr $$skip + 1`; \
+	      col=$$blu; res=SKIP; \
+	    fi; \
+	    echo "$${col}$$res$${std}: $$tst"; \
 	  done; \
-	  test $$st -eq 0 || exit 1; \
-	fi
-	@$(am__sh_e_setup); $(am__tty_colors); $(am__set_TESTS_bases); \
-	ws='[ 	]'; \
-	results=`for b in $$bases; do echo $$b.trs; done`; \
-	test -n "$$results" || results=/dev/null; \
-	all=`  grep "^$$ws*:test-result:"           $$results | wc -l`; \
-	pass=` grep "^$$ws*:test-result:$$ws*PASS"  $$results | wc -l`; \
-	fail=` grep "^$$ws*:test-result:$$ws*FAIL"  $$results | wc -l`; \
-	skip=` grep "^$$ws*:test-result:$$ws*SKIP"  $$results | wc -l`; \
-	xfail=`grep "^$$ws*:test-result:$$ws*XFAIL" $$results | wc -l`; \
-	xpass=`grep "^$$ws*:test-result:$$ws*XPASS" $$results | wc -l`; \
-	error=`grep "^$$ws*:test-result:$$ws*ERROR" $$results | wc -l`; \
-	if test `expr $$fail + $$xpass + $$error` -eq 0; then \
-	  success=true; \
-	else \
-	  success=false; \
-	fi; \
-	br='==================='; br=$$br$$br$$br$$br; \
-	result_count () \
-	{ \
-	    if test x"$$1" = x"--maybe-color"; then \
-	      maybe_colorize=yes; \
-	    elif test x"$$1" = x"--no-color"; then \
-	      maybe_colorize=no; \
+	  if test "$$all" -eq 1; then \
+	    tests="test"; \
+	    All=""; \
+	  else \
+	    tests="tests"; \
+	    All="All "; \
+	  fi; \
+	  if test "$$failed" -eq 0; then \
+	    if test "$$xfail" -eq 0; then \
+	      banner="$$All$$all $$tests passed"; \
 	    else \
-	      echo "$@: invalid 'result_count' usage" >&2; exit 4; \
+	      if test "$$xfail" -eq 1; then failures=failure; else failures=failures; fi; \
+	      banner="$$All$$all $$tests behaved as expected ($$xfail expected $$failures)"; \
 	    fi; \
-	    shift; \
-	    desc=$$1 count=$$2; \
-	    if test $$maybe_colorize = yes && test $$count -gt 0; then \
-	      color_start=$$3 color_end=$$std; \
+	  else \
+	    if test "$$xpass" -eq 0; then \
+	      banner="$$failed of $$all $$tests failed"; \
 	    else \
-	      color_start= color_end=; \
+	      if test "$$xpass" -eq 1; then passes=pass; else passes=passes; fi; \
+	      banner="$$failed of $$all $$tests did not behave as expected ($$xpass unexpected $$passes)"; \
 	    fi; \
-	    echo "$${color_start}# $$desc $$count$${color_end}"; \
-	}; \
-	create_testsuite_report () \
-	{ \
-	  result_count $$1 "TOTAL:" $$all   "$$brg"; \
-	  result_count $$1 "PASS: " $$pass  "$$grn"; \
-	  result_count $$1 "SKIP: " $$skip  "$$blu"; \
-	  result_count $$1 "XFAIL:" $$xfail "$$lgn"; \
-	  result_count $$1 "FAIL: " $$fail  "$$red"; \
-	  result_count $$1 "XPASS:" $$xpass "$$red"; \
-	  result_count $$1 "ERROR:" $$error "$$mgn"; \
-	}; \
-	{								\
-	  echo "$(PACKAGE_STRING): $(subdir)/$(TEST_SUITE_LOG)" |	\
-	    $(am__rst_title);						\
-	  create_testsuite_report --no-color;				\
-	  echo;								\
-	  echo ".. contents:: :depth: 2";				\
-	  echo;								\
-	  for b in $$bases; do echo $$b; done				\
-	    | $(am__create_global_log);					\
-	} >$(TEST_SUITE_LOG).tmp || exit 1;				\
-	mv $(TEST_SUITE_LOG).tmp $(TEST_SUITE_LOG);			\
-	if $$success; then						\
-	  col="$$grn";							\
-	 else								\
-	  col="$$red";							\
-	  test x"$$VERBOSE" = x || cat $(TEST_SUITE_LOG);		\
-	fi;								\
-	echo "$${col}$$br$${std}"; 					\
-	echo "$${col}Testsuite summary for $(PACKAGE_STRING)$${std}";	\
-	echo "$${col}$$br$${std}"; 					\
-	create_testsuite_report --maybe-color;				\
-	echo "$$col$$br$$std";						\
-	if $$success; then :; else					\
-	  echo "$${col}See $(subdir)/$(TEST_SUITE_LOG)$${std}";		\
-	  if test -n "$(PACKAGE_BUGREPORT)"; then			\
-	    echo "$${col}Please report to $(PACKAGE_BUGREPORT)$${std}";	\
-	  fi;								\
-	  echo "$$col$$br$$std";					\
-	fi;								\
-	$$success || exit 1
-
-check-TESTS:
-	@list='$(RECHECK_LOGS)';           test -z "$$list" || rm -f $$list
-	@list='$(RECHECK_LOGS:.log=.trs)'; test -z "$$list" || rm -f $$list
-	@test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
-	@set +e; $(am__set_TESTS_bases); \
-	log_list=`for i in $$bases; do echo $$i.log; done`; \
-	trs_list=`for i in $$bases; do echo $$i.trs; done`; \
-	log_list=`echo $$log_list`; trs_list=`echo $$trs_list`; \
-	$(MAKE) $(AM_MAKEFLAGS) $(TEST_SUITE_LOG) TEST_LOGS="$$log_list"; \
-	exit $$?;
-recheck: all $(check_PROGRAMS)
-	@test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
-	@set +e; $(am__set_TESTS_bases); \
-	bases=`for i in $$bases; do echo $$i; done \
-	         | $(am__list_recheck_tests)` || exit 1; \
-	log_list=`for i in $$bases; do echo $$i.log; done`; \
-	log_list=`echo $$log_list`; \
-	$(MAKE) $(AM_MAKEFLAGS) $(TEST_SUITE_LOG) \
-	        am__force_recheck=am--force-recheck \
-	        TEST_LOGS="$$log_list"; \
-	exit $$?
-unit_tests.log: unit_tests$(EXEEXT)
-	@p='unit_tests$(EXEEXT)'; \
-	b='unit_tests'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-.test.log:
-	@p='$<'; \
-	$(am__set_b); \
-	$(am__check_pre) $(TEST_LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_TEST_LOG_DRIVER_FLAGS) $(TEST_LOG_DRIVER_FLAGS) -- $(TEST_LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-@am__EXEEXT_TRUE@.test$(EXEEXT).log:
-@am__EXEEXT_TRUE@	@p='$<'; \
-@am__EXEEXT_TRUE@	$(am__set_b); \
-@am__EXEEXT_TRUE@	$(am__check_pre) $(TEST_LOG_DRIVER) --test-name "$$f" \
-@am__EXEEXT_TRUE@	--log-file $$b.log --trs-file $$b.trs \
-@am__EXEEXT_TRUE@	$(am__common_driver_flags) $(AM_TEST_LOG_DRIVER_FLAGS) $(TEST_LOG_DRIVER_FLAGS) -- $(TEST_LOG_COMPILE) \
-@am__EXEEXT_TRUE@	"$$tst" $(AM_TESTS_FD_REDIRECT)
+	  fi; \
+	  dashes="$$banner"; \
+	  skipped=""; \
+	  if test "$$skip" -ne 0; then \
+	    if test "$$skip" -eq 1; then \
+	      skipped="($$skip test was not run)"; \
+	    else \
+	      skipped="($$skip tests were not run)"; \
+	    fi; \
+	    test `echo "$$skipped" | wc -c` -le `echo "$$banner" | wc -c` || \
+	      dashes="$$skipped"; \
+	  fi; \
+	  report=""; \
+	  if test "$$failed" -ne 0 && test -n "$(PACKAGE_BUGREPORT)"; then \
+	    report="Please report to $(PACKAGE_BUGREPORT)"; \
+	    test `echo "$$report" | wc -c` -le `echo "$$banner" | wc -c` || \
+	      dashes="$$report"; \
+	  fi; \
+	  dashes=`echo "$$dashes" | sed s/./=/g`; \
+	  if test "$$failed" -eq 0; then \
+	    col="$$grn"; \
+	  else \
+	    col="$$red"; \
+	  fi; \
+	  echo "$${col}$$dashes$${std}"; \
+	  echo "$${col}$$banner$${std}"; \
+	  test -z "$$skipped" || echo "$${col}$$skipped$${std}"; \
+	  test -z "$$report" || echo "$${col}$$report$${std}"; \
+	  echo "$${col}$$dashes$${std}"; \
+	  test "$$failed" -eq 0; \
+	else :; fi
 
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
@@ -1111,9 +1550,6 @@ install-strip:
 	    "INSTALL_PROGRAM_ENV=STRIPPROG='$(STRIP)'" install; \
 	fi
 mostlyclean-generic:
-	-test -z "$(TEST_LOGS)" || rm -f $(TEST_LOGS)
-	-test -z "$(TEST_LOGS:.log=.trs)" || rm -f $(TEST_LOGS:.log=.trs)
-	-test -z "$(TEST_SUITE_LOG)" || rm -f $(TEST_SUITE_LOG)
 
 clean-generic:
 
@@ -1217,9 +1653,8 @@ uninstall-am:
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	recheck tags uninstall uninstall-am
+	tags uninstall uninstall-am
 
-include $(top_builddir)/Make.common.@METHOD@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -34,19 +34,29 @@ message_done_running() {
 run_example() {
 
     example_name=$1
-    executable=$1
     shift
     options=$@
-    
 
-    if (test ! -x ${executable}); then
-	echo "ERROR: cannot find ${executable}!"
-	exit 1
-    fi
+    for method in ${METHODS}; do
 	
-    message_running $example_name $executable $options
-    
-    $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS || exit 1
-    
-    message_done_running $example_name $executable $options
+	case "${method}" in
+	    optimized|opt)      executable=example-opt   ;;
+	    debug|dbg)          executable=example-dbg   ;;
+	    devel)              executable=example-devel ;;
+	    profiling|pro|prof) executable=example-prof  ;;
+	    oprofile|oprof)     executable=example-oprof ;;
+	    *) echo "ERROR: unknown method: ${method}!" ; exit 1 ;;
+	esac
+
+	if (test ! -x ${executable}); then
+	    echo "ERROR: cannot find ${executable}!"
+	    exit 1
+	fi
+	
+	message_running $example_name $executable $options
+
+	$LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS || exit 1
+	
+	message_done_running $example_name $executable $options
+    done
 }

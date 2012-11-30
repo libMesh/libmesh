@@ -1,15 +1,3 @@
-include $(top_builddir)/Make.common.@METHOD@
-
-AM_CPPFLAGS = $(libmesh_CPPFLAGS)
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-
-AUTOMAKE_OPTIONS = subdir-objects 
-
-AM_CPPFLAGS += -I$(srcdir)/include -I$(top_srcdir)/contrib/netcdf/Lib
-
-noinst_LTLIBRARIES     = libexodusII.la
-
 # generally we do not install contributed headers, but Moose and
 # some client apps expect exodusII.h to be there when libMesh
 # is present. since we've implicitly guaranteed this for ~10 years
@@ -17,8 +5,8 @@ noinst_LTLIBRARIES     = libexodusII.la
 includedir      = $(prefix)/include/libmesh
 include_HEADERS = include/exodusII.h include/exodusII_ext.h
 
-# the files required to actually build libexodusII.la
-libexodusII_la_SOURCES = \
+pkg_cppflags = -I$(srcdir)/include -I$(top_srcdir)/contrib/netcdf/Lib
+pkg_sources  = \
 	include/exodusII_int.h \
 	include/exodusII.h \
 	include/doxygen.h \
@@ -200,3 +188,5 @@ libexodusII_la_SOURCES = \
 	src/exupda.c \
 	src/ex_utils.c
 
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common
