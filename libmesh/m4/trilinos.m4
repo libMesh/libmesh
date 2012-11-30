@@ -86,7 +86,6 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
   fi
 
   AC_SUBST(TRILINOS_MAKEFILE_EXPORT)
-  AC_SUBST(enabletrilinos10)
   
   #########################################################
   # get requisite include and library variables by snarfing
@@ -199,20 +198,16 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   fi
 
   AC_SUBST(AZTECOO_MAKEFILE_EXPORT)
-  AC_SUBST(enableaztecoo)
 
   AC_SUBST(NOX_MAKEFILE_EXPORT)
-  AC_SUBST(enablenox)
 
   AC_SUBST(ML_MAKEFILE_EXPORT)
-  AC_SUBST(enableml)
 
   if test "x$enableml" = xyes -o "x$enableaztecoo" = xyes -o "x$enablenox" = xyes; then
     enabletrilinos9=yes
   else
     enabletrilinos9=no
   fi
-  AC_SUBST(enabletrilinos9)
 
   #########################################################
   # get requisite include and library variables by snarfing

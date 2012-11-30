@@ -1,8 +1,4 @@
-include $(top_builddir)/Make.common.@METHOD@
+pkg_sources = gmvread.c gmvread.h
 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS)
-AM_CFLAGS   = $(libmesh_CFLAGS)
-AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-
-noinst_LTLIBRARIES = libgmv.la
-libgmv_la_SOURCES  = gmvread.c gmvread.h
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common

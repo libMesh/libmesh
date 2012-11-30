@@ -1,10 +1,9 @@
 CLEANFILES   = # start empty, append beloe
 
-check_PROGRAMS            = miscellaneous_ex2
-miscellaneous_ex2dir      = $(examples_install_path)/miscellaneous/ex2
-miscellaneous_ex2_DATA    = miscellaneous_ex2.C lshape.unv lshape_data.unv
-miscellaneous_ex2_SOURCES = $(miscellaneous_ex2_DATA) run.sh
-miscellaneous_ex2_LDADD   = $(top_builddir)/libmesh.la
+example_name = miscellaneous_ex2
+install_dir  = $(examples_install_path)/miscellaneous/ex2
+data         = miscellaneous_ex2.C lshape.unv lshape_data.unv
+sources      = $(data) run.sh
 
 # conditionally enable this test
 if LIBMESH_ENABLE_COMPLEX

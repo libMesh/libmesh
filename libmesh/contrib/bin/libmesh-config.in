@@ -3,48 +3,149 @@
 #
 # values substituted from configure
 #
-host=@host@
+#host=@host@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+legacyinclude=@enablelegacyincludepaths@
 
+#
+# Define the usage() function
+#
+usage ()
+{
+  echo "usage: $0 --cppflags --cxxflags --include --libs"
+  echo "       $0 --cxx"
+  echo "       $0 --cc"
+  echo "       $0 --fc"
+  echo "       $0 --fflags"
+  echo "       $0 --version"
+  exit
+}
 
 #
-# For a libMesh installation configure scripts could live in
-# one of two places:
+# Need at least one command-line argument
 #
-#  @exec_prefix@/bin/libmesh-config 
-#  @exec_prefix@/bin/@host@_${METHOD}/libmes-config-$METHOD
+if [ "$#" = "0" ] ; then
+    usage $0
+fi
+
 #
-# When the user calls the first we just examine the ${METHOD}
-# variable and cleverly dispatch to the proper subdirectory.
-# When the user calls the second directly we assume she knows 
-# what she is doing.
+# Need a valid METHOD 
 #
-# define that functionality here.
 if (test "x$METHOD" = x); then
     #echo "No METHOD specified - defaulting to opt"
     METHOD=opt
 fi
 
-script_path=`dirname $0`
-#echo "script_path=$script_path"
-
-if (test -d $script_path); then
-    
-    cd $script_path
-    
-    if (test -d @host@_$METHOD -a -x @host@_$METHOD/libmesh-config); then
-	@host@_$METHOD/libmesh-config $@
-    else
-	echo " "
-	echo "ERROR: no $script_path/@host@_$METHOD/libmesh-config"
-	echo " "
-	echo "Installed builds are:"
-	echo `ls -d $script_path/@host@*`
-	echo " "
-	echo "Did you 'make install' a METHOD=$METHOD build?"
+case "$METHOD" in
+    optimized|opt)
+	CXXFLAGS="@CXXFLAGS_OPT@"
+	CPPFLAGS="@CPPFLAGS_OPT@"
+	CFLAGS="@CFLAGS_OPT@"
+	libext="_opt"
+	;;
+    debug|dbg)
+	CXXFLAGS="@CXXFLAGS_DBG@"
+	CPPFLAGS="@CPPFLAGS_DBG@"
+	CFLAGS="@CFLAGS_DBG@"
+	libext="_dbg"
+	;;
+    devel)
+	CXXFLAGS="@CXXFLAGS_DEVEL@"
+	CPPFLAGS="@CPPFLAGS_DEVEL@"
+	CFLAGS="@CFLAGS_DEVEL@"
+	libext="_devel"
+	;;
+    profiling|pro|prof)
+	CXXFLAGS="@CXXFLAGS_PROF@"
+	CPPFLAGS="@CPPFLAGS_PROF@"
+	CFLAGS="@CFLAGS_PROF@"
+	libext="_prof"
+	;;
+    oprofile|oprof)
+	CXXFLAGS="@CXXFLAGS_OPROF@"
+	CPPFLAGS="@CPPFLAGS_OPROF@"
+	CFLAGS="@CFLAGS_OPROF@"
+	libext="_oprof"
+	;;
+    *)
+	echo "ERROR: Unknown \$METHOD: $METHOD"
+	echo "  should be one of: <opt,dbg,devel,prof,oprof>"
 	exit 1
-    fi	    
-fi
+	;;
+esac
 
-exit 0
+#
+# Process the command-line arguments, build up
+# return_val
+#
+return_val=""
+
+while [ "x$1" != "x" ]; do
+    case "$1" in
+	"--cxx")
+	    return_val="@CXX@ $return_val"
+	    ;;
+
+	"--cc")
+	    return_val="@CC@ $return_val"
+	    ;;
+
+	"--f77")
+	    return_val="@F77@ $return_val"
+	    ;;
+
+	"--fc")
+	    return_val="@FC@ $return_val"
+	    ;;
+
+	"--cppflags")
+	    return_val="${CPPFLAGS} $return_val"
+	    ;;
+	
+	"--cxxflags")
+	    return_val="${CXXFLAGS} $return_val"
+	    ;;
+	
+	"--cflags")
+	    return_val="${CFLAGS} $return_val"
+	    ;;
+	
+	"--fflags")
+	    return_val="@FFLAGS@ $return_val"
+	    ;;
+	
+	"--include")
+	    # handle legacy include paths when needed.
+	    if (test "x$legacyinclude" = "xyes"); then
+		return_val="-I${includedir}/libmesh $return_val"
+	    fi
+	    return_val="-I${includedir}
+ 	                @libmesh_optional_INCLUDES@
+                        $return_val"
+	    ;;
+	
+	"--ldflags" | "--libs")
+	    return_val="@libmesh_optional_LIBS@ 
+                        -Wl,-rpath,${libdir} -L${libdir} -lmesh${libext} 
+                        $return_val"
+	    ;;
+
+	"--version")
+	    return_val="@VERSION@"
+	    ;;
+	
+	*)
+	    echo "Unknown argument: $1"
+	    usage $0
+    esac
+    shift
+done
+
+echo $return_val
+
+# Local Variables:
+# mode: shell-script
+# End:

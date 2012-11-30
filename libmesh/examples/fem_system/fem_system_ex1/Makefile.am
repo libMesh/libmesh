@@ -1,9 +1,8 @@
-check_PROGRAMS         = fem_system_ex1
-check_SCRIPTS          = run.sh
-fem_system_ex1dir      = $(examples_install_path)/fem_system/ex1
-fem_system_ex1_DATA    = fem_system_ex1.C fem_system_ex1.in navier.in naviersystem.C naviersystem.h run.sh $(top_srcdir)/contrib/utils/Makefile
-fem_system_ex1_SOURCES = $(fem_system_ex1_DATA) run.sh
-fem_system_ex1_LDADD   = $(top_builddir)/libmesh.la
+example_name  = fem_system_ex1
+check_SCRIPTS = run.sh
+install_dir   = $(examples_install_path)/fem_system/ex1
+data          = fem_system_ex1.C fem_system_ex1.in navier.in naviersystem.C naviersystem.h run.sh
+sources       = $(data) run.sh
 
 CLEANFILES = out_*.e
 

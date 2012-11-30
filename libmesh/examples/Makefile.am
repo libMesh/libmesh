@@ -45,17 +45,13 @@ SUBDIRS = \
 	vector_fe/vector_fe_ex2 \
 	vector_fe/vector_fe_ex3
 
-
-
-include $(top_builddir)/Make.common.@METHOD@
-
 AUTOMAKE_OPTIONS = subdir-objects 
 
 AM_CPPFLAGS  = $(libmesh_CPPFLAGS)
 AM_CFLAGS    = $(libmesh_CFLAGS)
 AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
-AM_CPPFLAGS += $(libmesh_INCLUDE) -I$(top_builddir)/include
-LIBS         = $(libmesh_LIBS)
+AM_CPPFLAGS += $(libmesh_optional_INCLUDES) -I$(top_builddir)/include
+LIBS         = $(libmesh_optional_LIBS)
 
 examples_source_path  = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples
@@ -74,8 +70,8 @@ EXTRA_DIST += ../contrib/bin/test_installed_examples.sh Make.common
 ######################################################################
 #
 # What to do for 'make installcheck'
-bindir=@bindir@/@host@_@METHOD@
-libdir=@libdir@/@host@_@METHOD@
+#bindir=@bindir@/@host@_@METHOD@
+#libdir=@libdir@/@host@_@METHOD@
 pkgconfigdir=$(libdir)/pkgconfig
 
 installcheck-local:

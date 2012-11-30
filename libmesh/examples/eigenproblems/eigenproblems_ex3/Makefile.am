@@ -1,8 +1,7 @@
-check_PROGRAMS            = eigenproblems_ex3
-eigenproblems_ex3dir      = $(examples_install_path)/eigenproblems/ex3
-eigenproblems_ex3_DATA    = eigenproblems_ex3.C drum1_mesh.e drum2_mesh.e run.sh $(top_srcdir)/contrib/utils/Makefile
-eigenproblems_ex3_SOURCES = $(eigenproblems_ex3_DATA) run.sh
-eigenproblems_ex3_LDADD   = $(top_builddir)/libmesh.la
+example_name = eigenproblems_ex3
+install_dir  = $(examples_install_path)/eigenproblems/ex3
+data         = eigenproblems_ex3.C drum1_mesh.e drum2_mesh.e run.sh
+sources      = $(data) run.sh
 
 CLEANFILES                = drum1_evals.txt drum2_evals.txt drum1_evec.e drum2_evec.e
 

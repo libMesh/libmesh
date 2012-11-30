@@ -1,9 +1,8 @@
-check_PROGRAMS            = reduced_basis_ex7
-check_SCRIPTS             = run.sh
-reduced_basis_ex7dir      = $(examples_install_path)/reduced_basis/ex7
-reduced_basis_ex7_DATA    = assembly.h horn.geo horn.msh rb_classes.h reduced_basis_ex7.C reduced_basis_ex7.in run.sh $(top_srcdir)/contrib/utils/Makefile
-reduced_basis_ex7_SOURCES = $(reduced_basis_ex7_DATA) run.sh
-reduced_basis_ex7_LDADD   = $(top_builddir)/libmesh.la
+example_name  = reduced_basis_ex7
+check_SCRIPTS = run.sh
+install_dir   = $(examples_install_path)/reduced_basis/ex7
+data          = assembly.h horn.geo horn.msh rb_classes.h reduced_basis_ex7.C reduced_basis_ex7.in run.sh
+sources       = $(data) run.sh
 
 CLEANFILES =
 

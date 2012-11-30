@@ -1,9 +1,8 @@
-check_PROGRAMS        = vector_fe_ex1
-check_SCRIPTS         = run.sh
-vector_fe_ex1dir      = $(examples_install_path)/vector_fe/ex1
-vector_fe_ex1_DATA    = vector_fe_ex1.C exact_solution.C run.sh $(top_srcdir)/contrib/utils/Makefile
-vector_fe_ex1_SOURCES = $(vector_fe_ex1_DATA) run.sh
-vector_fe_ex1_LDADD   = $(top_builddir)/libmesh.la
+example_name  = vector_fe_ex1
+check_SCRIPTS = run.sh
+install_dir   = $(examples_install_path)/vector_fe/ex1
+data          = vector_fe_ex1.C exact_solution.C run.sh
+sources       = $(data) run.sh
 
 CLEANFILES = out.gmv out.e 
 

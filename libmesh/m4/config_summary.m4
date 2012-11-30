@@ -26,14 +26,41 @@ echo C++ compiler type.................. : $GXX_VERSION
 echo C++ compiler....................... : $CXX
 echo C compiler......................... : $CC
 echo Fortran compiler................... : $FC
-echo Build Method....................... : $METHOD
-echo CPPFLAGS........................... : $CPPFLAGS_METHOD
-echo CXXFLAGS........................... : $CXXFLAGS_METHOD
-echo CFLAGS............................. : $CFLAGS_METHOD
+echo Build Methods...................... : $METHODS
+echo " "
+for method in ${METHODS}; do
+     case "${method}" in
+         opt)   
+echo CPPFLAGS...\(opt\)................... : $CPPFLAGS_OPT
+echo CXXFLAGS...\(opt\)................... : $CXXFLAGS_OPT
+echo CFLAGS.....\(opt\)................... : $CFLAGS_OPT
+     ;;					 
+         devel)   
+echo CPPFLAGS...\(devel\)................. : $CPPFLAGS_DEVEL
+echo CXXFLAGS...\(devel\)................. : $CXXFLAGS_DEVEL
+echo CFLAGS.....\(devel\)................. : $CFLAGS_DEVEL
+     ;;					 
+         dbg)   
+echo CPPFLAGS...\(dbg\)................... : $CPPFLAGS_DBG
+echo CXXFLAGS...\(dbg\)................... : $CXXFLAGS_DBG
+echo CFLAGS.....\(dbg\)................... : $CFLAGS_DBG
+     ;;					 
+         prof)   
+echo CPPFLAGS...\(prof\).................. : $CPPFLAGS_PROF
+echo CXXFLAGS...\(prof\).................. : $CXXFLAGS_PROF
+echo CFLAGS.....\(prof\).................. : $CFLAGS_PROF
+     ;;					 
+         oprof)   
+echo CPPFLAGS...\(oprof\)................. : $CPPFLAGS_OPROF
+echo CXXFLAGS...\(oprof\)................. : $CXXFLAGS_OPROF
+echo CFLAGS.....\(oprof\)................. : $CFLAGS_OPROF
+     esac
+     echo " "
+done
 echo Install dir........................ : $prefix 
 echo Build user......................... : $USER
 echo Build host......................... : $BUILD_HOST
-echo Configure date..................... : $BUILD_DATE
+#echo Configure date..................... : $BUILD_DATE
 echo Build architecture................. : $BUILD_ARCH
 echo SVN revision number................ : $BUILD_VERSION
 
@@ -42,6 +69,7 @@ echo
 echo Library Features:
 echo '  'adaptive mesh refinement......... : $enableamr
 echo '  'complex variables................ : $enablecomplex
+echo '  'example suite.................... : $enableexamples
 echo '  'ghosted vectors.................. : $enableghosted
 echo '  'high-order shape functions....... : $enablepfem
 echo '  'infinite elements................ : $enableifem

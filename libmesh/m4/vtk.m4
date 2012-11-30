@@ -145,5 +145,4 @@ AC_DEFUN([CONFIGURE_VTK],
   dnl Substitute the substitution variables
   AC_SUBST(VTK_INCLUDE)
   AC_SUBST(VTK_LIBRARY)	
-  AC_SUBST(enablevtk)
 ])

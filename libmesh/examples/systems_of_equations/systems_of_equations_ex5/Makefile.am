@@ -1,9 +1,8 @@
-check_PROGRAMS                   = systems_of_equations_ex5
-check_SCRIPTS                    = run.sh
-systems_of_equations_ex5dir      = $(examples_install_path)/systems_of_equations/ex5
-systems_of_equations_ex5_DATA    = systems_of_equations_ex5.C run.sh $(top_srcdir)/contrib/utils/Makefile
-systems_of_equations_ex5_SOURCES = $(systems_of_equations_ex5_DATA) run.sh
-systems_of_equations_ex5_LDADD   = $(top_builddir)/libmesh.la
+example_name  = systems_of_equations_ex5
+check_SCRIPTS = run.sh
+install_dir   = $(examples_install_path)/systems_of_equations/ex5
+data          = systems_of_equations_ex5.C run.sh
+sources       = $(data) run.sh
 
 CLEANFILES = displacement.e
 

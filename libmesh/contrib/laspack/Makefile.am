@@ -1,13 +1,5 @@
-include $(top_builddir)/Make.common.@METHOD@
-
-AM_CPPFLAGS  = $(libmesh_CPPFLAGS)
-AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
-AM_CFLAGS    = $(libmesh_CFLAGS)
-AM_CPPFLAGS += -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
-
-noinst_LTLIBRARIES = liblaspack.la
-
-liblaspack_la_SOURCES  = \
+pkg_cppflags = -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
+pkg_sources  = \
 	copyrght.h \
 	eigenval.h \
 	elcmp.h \
@@ -35,3 +27,6 @@ liblaspack_la_SOURCES  = \
 	qmatrix.C \
 	qvector.C \
 	rtc.C
+
+# import as much commonality as possible
+include $(top_srcdir)/contrib/Make.common

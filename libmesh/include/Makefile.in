@@ -53,7 +53,7 @@ host_triplet = @host@
 target_triplet = @target@
 DIST_COMMON = $(include_HEADERS) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/include_HEADERS
+	$(srcdir)/include_HEADERS $(srcdir)/libmesh_config.h.in
 @LIBMESH_ENABLE_EXODUS_TRUE@am__append_1 = contrib/exodusII.h
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_2 = contrib/fparser.hh
 subdir = include
@@ -93,7 +93,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/include/libmesh/libmesh_config.h.tmp
+CONFIG_HEADER = libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -199,7 +199,6 @@ AZTECOO_MAKEFILE_EXPORT = @AZTECOO_MAKEFILE_EXPORT@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
 BOOST_LDFLAGS = @BOOST_LDFLAGS@
 BUILD_ARCH = @BUILD_ARCH@
-BUILD_DATE = @BUILD_DATE@
 BUILD_DEVSTATUS = @BUILD_DEVSTATUS@
 BUILD_HOST = @BUILD_HOST@
 BUILD_USER = @BUILD_USER@
@@ -210,15 +209,18 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
+CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
-CFLAGS_METHOD = @CFLAGS_METHOD@
+CFLAGS_OPROF = @CFLAGS_OPROF@
 CFLAGS_OPT = @CFLAGS_OPT@
+CFLAGS_PROF = @CFLAGS_PROF@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
-CPPFLAGS_DVL = @CPPFLAGS_DVL@
-CPPFLAGS_METHOD = @CPPFLAGS_METHOD@
+CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
+CPPFLAGS_OPROF = @CPPFLAGS_OPROF@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
+CPPFLAGS_PROF = @CPPFLAGS_PROF@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
 CPPUNIT_LIBS = @CPPUNIT_LIBS@
@@ -227,9 +229,11 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
+CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
-CXXFLAGS_METHOD = @CXXFLAGS_METHOD@
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
+CXXFLAGS_PROF = @CXXFLAGS_PROF@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -252,14 +256,10 @@ F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
-FFLAGS_METHOD = @FFLAGS_METHOD@
 FGREP = @FGREP@
 FLIBS = @FLIBS@
 FPARSER_INCLUDE = @FPARSER_INCLUDE@
 FPARSER_LIBRARY = @FPARSER_LIBRARY@
-GENERIC_MAJOR_VERSION = @GENERIC_MAJOR_VERSION@
-GENERIC_MICRO_VERSION = @GENERIC_MICRO_VERSION@
-GENERIC_MINOR_VERSION = @GENERIC_MINOR_VERSION@
 GLPK_INCLUDE = @GLPK_INCLUDE@
 GLPK_LIBRARY = @GLPK_LIBRARY@
 GMV_INCLUDE = @GMV_INCLUDE@
@@ -290,6 +290,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 METHOD = @METHOD@
+METHODS = @METHODS@
 METIS_INCLUDE = @METIS_INCLUDE@
 METIS_LIB = @METIS_LIB@
 MKDIR_P = @MKDIR_P@
@@ -391,11 +392,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
-
-######################################################################
-#
-# What to do for 'make installcheck'
-bindir = @bindir@/@host@_@METHOD@
+bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
 build_cpu = @build_cpu@
@@ -406,37 +403,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
-enableaztecoo = @enableaztecoo@
-enablecomplex = @enablecomplex@
-enableeigen = @enableeigen@
-enableexodus = @enableexodus@
-enablefparser = @enablefparser@
-enablefparserdevel = @enablefparserdevel@
-enableglpk = @enableglpk@
-enablegmv = @enablegmv@
-enablegz = @enablegz@
-enablelaspack = @enablelaspack@
 enablelegacyincludepaths = @enablelegacyincludepaths@
-enablelibhilbert = @enablelibhilbert@
-enablemetis = @enablemetis@
-enableml = @enableml@
-enablenemesis = @enablenemesis@
-enablenetcdf = @enablenetcdf@
-enablenox = @enablenox@
-enableopenmp = @enableopenmp@
-enableoptional = @enableoptional@
-enableparmetis = @enableparmetis@
-enablepetsc = @enablepetsc@
-enablesfc = @enablesfc@
-enableslepc = @enableslepc@
-enabletecio = @enabletecio@
-enabletecplot = @enabletecplot@
-enabletetgen = @enabletetgen@
-enabletriangle = @enabletriangle@
-enabletrilinos10 = @enabletrilinos10@
-enabletrilinos9 = @enabletrilinos9@
-enablevtk = @enablevtk@
-enablexdr = @enablexdr@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
@@ -449,7 +416,7 @@ htmldir = @htmldir@
 includedir = $(prefix)/include/libmesh
 infodir = @infodir@
 install_sh = @install_sh@
-libdir = @libdir@/@host@_@METHOD@
+libdir = @libdir@
 libexecdir = @libexecdir@
 libmesh_CFLAGS = @libmesh_CFLAGS@
 libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
@@ -484,6 +451,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = libmesh
 
+# special handholding for prefix_config.m4 generated files
+# so that 'make clean ; make' works as does 'make distcheck'
+# libmesh_config.h is made by ./configure, so it should get 
+# cleaned by 'make distclean'
+DISTCLEANFILES = libmesh_config.h
+
 # Do not edit - automatically generated from ./rebuild_include_HEADERS.sh
 # These are headers we need to compile the libMesh library but should
 # not be installed.  These header files may have implementation
@@ -504,7 +477,6 @@ noinst_HEADERS = \
 # will get installed into '$(prefix)/include/libmesh'
 include_HEADERS = \
         libmesh/libmesh_config.h \
-        libmesh/libmesh_version.h \
         base/auto_ptr.h \
         base/dirichlet_boundaries.h \
         base/dof_map.h \
@@ -512,17 +484,18 @@ include_HEADERS = \
         base/factory.h \
         base/getpot.h \
         base/id_types.h \
-        base/libmesh_base.h \
+        base/libmesh.h \
         base/libmesh_C_isnan.h \
+        base/libmesh_base.h \
         base/libmesh_common.h \
         base/libmesh_documentation.h \
         base/libmesh_exceptions.h \
-        base/libmesh.h \
         base/libmesh_logging.h \
+        base/libmesh_version.h \
         base/multi_predicates.h \
         base/periodic_boundaries.h \
-        base/periodic_boundary_base.h \
         base/periodic_boundary.h \
+        base/periodic_boundary_base.h \
         base/print_trace.h \
         base/reference_counted_object.h \
         base/reference_counter.h \
@@ -561,10 +534,10 @@ include_HEADERS = \
         error_estimation/patch_recovery_error_estimator.h \
         error_estimation/uniform_refinement_estimator.h \
         error_estimation/weighted_patch_recovery_error_estimator.h \
+        fe/fe.h \
         fe/fe_abstract.h \
         fe/fe_base.h \
         fe/fe_compute_data.h \
-        fe/fe.h \
         fe/fe_interface.h \
         fe/fe_macro.h \
         fe/fe_map.h \
@@ -579,49 +552,49 @@ include_HEADERS = \
         fe/inf_fe_instantiate_3D.h \
         fe/inf_fe_macro.h \
         geom/cell.h \
+        geom/cell_hex.h \
         geom/cell_hex20.h \
         geom/cell_hex27.h \
         geom/cell_hex8.h \
-        geom/cell_hex.h \
         geom/cell_inf.h \
+        geom/cell_inf_hex.h \
         geom/cell_inf_hex16.h \
         geom/cell_inf_hex18.h \
         geom/cell_inf_hex8.h \
-        geom/cell_inf_hex.h \
+        geom/cell_inf_prism.h \
         geom/cell_inf_prism12.h \
         geom/cell_inf_prism6.h \
-        geom/cell_inf_prism.h \
+        geom/cell_prism.h \
         geom/cell_prism15.h \
         geom/cell_prism18.h \
         geom/cell_prism6.h \
-        geom/cell_prism.h \
-        geom/cell_pyramid5.h \
         geom/cell_pyramid.h \
+        geom/cell_pyramid5.h \
+        geom/cell_tet.h \
         geom/cell_tet10.h \
         geom/cell_tet4.h \
-        geom/cell_tet.h \
+        geom/edge.h \
         geom/edge_edge2.h \
         geom/edge_edge3.h \
         geom/edge_edge4.h \
-        geom/edge.h \
         geom/edge_inf_edge2.h \
         geom/elem.h \
         geom/elem_quality.h \
         geom/elem_range.h \
         geom/elem_type.h \
         geom/face.h \
+        geom/face_inf_quad.h \
         geom/face_inf_quad4.h \
         geom/face_inf_quad6.h \
-        geom/face_inf_quad.h \
+        geom/face_quad.h \
         geom/face_quad4.h \
         geom/face_quad8.h \
         geom/face_quad9.h \
-        geom/face_quad.h \
+        geom/face_tri.h \
         geom/face_tri3.h \
         geom/face_tri6.h \
-        geom/face_tri.h \
-        geom/node_elem.h \
         geom/node.h \
+        geom/node_elem.h \
         geom/node_range.h \
         geom/plane.h \
         geom/point.h \
@@ -644,12 +617,12 @@ include_HEADERS = \
         mesh/legacy_xdr_io.h \
         mesh/matlab_io.h \
         mesh/medit_io.h \
+        mesh/mesh.h \
         mesh/mesh_base.h \
         mesh/mesh_communication.h \
         mesh/mesh_data.h \
         mesh/mesh_function.h \
         mesh/mesh_generation.h \
-        mesh/mesh.h \
         mesh/mesh_input.h \
         mesh/mesh_inserter_iterator.h \
         mesh/mesh_modification.h \
@@ -688,12 +661,12 @@ include_HEADERS = \
         numerics/const_fem_function.h \
         numerics/const_function.h \
         numerics/coupling_matrix.h \
-        numerics/dense_matrix_base.h \
         numerics/dense_matrix.h \
+        numerics/dense_matrix_base.h \
         numerics/dense_submatrix.h \
         numerics/dense_subvector.h \
-        numerics/dense_vector_base.h \
         numerics/dense_vector.h \
+        numerics/dense_vector_base.h \
         numerics/distributed_vector.h \
         numerics/fem_function_base.h \
         numerics/function_base.h \
@@ -722,16 +695,16 @@ include_HEADERS = \
         numerics/vector_value.h \
         numerics/wrapped_function.h \
         numerics/zero_function.h \
+        parallel/parallel.h \
         parallel/parallel_algebra.h \
         parallel/parallel_bin_sorter.h \
         parallel/parallel_communicator_specializations \
         parallel/parallel_ghost_sync.h \
-        parallel/parallel.h \
         parallel/parallel_histogram.h \
         parallel/parallel_implementation.h \
         parallel/parallel_sort.h \
-        parallel/threads_allocators.h \
         parallel/threads.h \
+        parallel/threads_allocators.h \
         partitioning/centroid_partitioner.h \
         partitioning/hilbert_sfc_partitioner.h \
         partitioning/linear_partitioner.h \
@@ -743,12 +716,12 @@ include_HEADERS = \
         physics/diff_physics.h \
         physics/diff_qoi.h \
         physics/fem_physics.h \
+        quadrature/quadrature.h \
         quadrature/quadrature_clough.h \
         quadrature/quadrature_conical.h \
         quadrature/quadrature_gauss.h \
         quadrature/quadrature_gm.h \
         quadrature/quadrature_grid.h \
-        quadrature/quadrature.h \
         quadrature/quadrature_jacobi.h \
         quadrature/quadrature_monomial.h \
         quadrature/quadrature_rules.h \
@@ -757,21 +730,21 @@ include_HEADERS = \
         reduced_basis/derived_rb_construction.h \
         reduced_basis/derived_rb_evaluation.h \
         reduced_basis/rb_assembly_expansion.h \
-        reduced_basis/rb_construction_base.h \
         reduced_basis/rb_construction.h \
+        reduced_basis/rb_construction_base.h \
         reduced_basis/rb_eim_assembly.h \
         reduced_basis/rb_eim_construction.h \
         reduced_basis/rb_eim_evaluation.h \
         reduced_basis/rb_eim_theta.h \
         reduced_basis/rb_evaluation.h \
         reduced_basis/rb_parameters.h \
-        reduced_basis/rb_parametrized_function.h \
         reduced_basis/rb_parametrized.h \
+        reduced_basis/rb_parametrized_function.h \
         reduced_basis/rb_scm_construction.h \
         reduced_basis/rb_scm_evaluation.h \
         reduced_basis/rb_temporal_discretization.h \
-        reduced_basis/rb_theta_expansion.h \
         reduced_basis/rb_theta.h \
+        reduced_basis/rb_theta_expansion.h \
         reduced_basis/transient_rb_assembly_expansion.h \
         reduced_basis/transient_rb_construction.h \
         reduced_basis/transient_rb_evaluation.h \
@@ -789,10 +762,10 @@ include_HEADERS = \
         solvers/nonlinear_solver.h \
         solvers/no_solution_history.h \
         solvers/petsc_diff_solver.h \
-        solvers/petscdmlibmesh.h \
         solvers/petsc_dm_nonlinear_solver.h \
         solvers/petsc_linear_solver.h \
         solvers/petsc_nonlinear_solver.h \
+        solvers/petscdmlibmesh.h \
         solvers/slepc_eigen_solver.h \
         solvers/slepc_macro.h \
         solvers/solution_history.h \
@@ -824,8 +797,8 @@ include_HEADERS = \
         systems/steady_system.h \
         systems/system.h \
         systems/system_norm.h \
-        systems/system_subset_by_subdomain.h \
         systems/system_subset.h \
+        systems/system_subset_by_subdomain.h \
         systems/transient_system.h \
         utils/compare_types.h \
         utils/error_vector.h \
@@ -836,8 +809,8 @@ include_HEADERS = \
         utils/null_output_iterator.h \
         utils/number_lookups.h \
         utils/o_f_stream.h \
-        utils/ostream_proxy.h \
         utils/o_string_stream.h \
+        utils/ostream_proxy.h \
         utils/parameters.h \
         utils/perf_log.h \
         utils/perfmon.h \
@@ -850,8 +823,8 @@ include_HEADERS = \
         utils/statistics.h \
         utils/string_to_enum.h \
         utils/timestamp.h \
-        utils/tree_base.h \
         utils/tree.h \
+        utils/tree_base.h \
         utils/tree_node.h \
         utils/utility.h \
         utils/xdr_cxx.h 
@@ -859,16 +832,20 @@ include_HEADERS = \
 
 # definition of include_HEADERS - get from auto-maintained list
 
-# TESTS_ENVIRONMENT = CXX="$(CXX)" INCLUDEDIR="$(srcdir)" HEADERS_TO_TEST="$(nobase_include_HEADERS)" LIBMESH_DIR=$(abs_top_srcdir)
-# TESTS = $(check_SCRIPTS)
-
 # include our header checking script when doing 'make dist'
 EXTRA_DIST = ../contrib/bin/test_installed_headers.sh
+
+######################################################################
+#
+# What to do for 'make installcheck'
+#bindir=@bindir@/@host@_@METHOD@
+#libdir=@libdir@/@host@_@METHOD@
 pkgconfigdir = $(libdir)/pkgconfig
 
 # the actual header files we want to test for self-sufficiency
 headers_to_test = $(include_HEADERS) $(am__append_1) $(am__append_2)
-all: all-recursive
+all: libmesh_config.h.tmp
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 .SUFFIXES:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/include_HEADERS $(am__configure_deps)
@@ -902,6 +879,21 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+
+libmesh_config.h.tmp: stamp-h1
+	@if test ! -f $@; then rm -f stamp-h1; else :; fi
+	@if test ! -f $@; then $(MAKE) $(AM_MAKEFLAGS) stamp-h1; else :; fi
+
+stamp-h1: $(srcdir)/libmesh_config.h.in $(top_builddir)/config.status
+	@rm -f stamp-h1
+	cd $(top_builddir) && $(SHELL) ./config.status include/libmesh_config.h.tmp
+$(srcdir)/libmesh_config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
+	rm -f stamp-h1
+	touch $@
+
+distclean-hdr:
+	-rm -f libmesh_config.h.tmp stamp-h1
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -987,7 +979,7 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS: tags-recursive $(HEADERS) $(SOURCES) libmesh_config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	set x; \
 	here=`pwd`; \
@@ -1004,7 +996,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	      set "$$@" "$$include_option=$$here/$$subdir/TAGS"; \
 	  fi; \
 	done; \
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) libmesh_config.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -1022,9 +1014,9 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	  fi; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS: ctags-recursive $(HEADERS) $(SOURCES) libmesh_config.h.in $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
-	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS) libmesh_config.h.in $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -1111,9 +1103,12 @@ distdir: $(DISTFILES)
 	      || exit 1; \
 	  fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) \
+	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
+	  dist-hook
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(HEADERS)
+all-am: Makefile $(HEADERS) libmesh_config.h.tmp
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(includedir)"; do \
@@ -1145,6 +1140,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -1155,7 +1151,7 @@ clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-tags
+distclean-am: clean-am distclean-generic distclean-hdr distclean-tags
 
 dvi: dvi-recursive
 
@@ -1215,46 +1211,51 @@ ps-am:
 
 uninstall-am: uninstall-includeHEADERS
 
-.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) \
+.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) all \
 	cscopelist-recursive ctags-recursive install-am install-strip \
 	tags-recursive
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am check check-am clean clean-generic clean-libtool \
 	cscopelist cscopelist-recursive ctags ctags-recursive \
-	distclean distclean-generic distclean-libtool distclean-tags \
-	distdir dvi dvi-am html html-am info info-am install \
-	install-am install-data install-data-am install-dvi \
-	install-dvi-am install-exec install-exec-am install-html \
-	install-html-am install-includeHEADERS install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installcheck-local installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am \
-	uninstall-includeHEADERS
+	dist-hook distclean distclean-generic distclean-hdr \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am \
+	install-includeHEADERS install-info install-info-am \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installcheck-local installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-includeHEADERS
 
+
+#
+# special things to do when running 'make dist'
+dist-hook:
+	rm -rf $(distdir)/libmesh_config.h
 
 test_headers:
 	@echo " "
 	@echo "Checking for standalone headers in source tree..."
 	@echo " "
 	@CXX="$(CXX)" \
-          HEADERS_TO_TEST="$(headers_to_test)" \
-          test_CXXFLAGS="$(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) -I$(top_builddir)/include" \
-          $(top_srcdir)/contrib/bin/test_installed_headers.sh
+	  HEADERS_TO_TEST="$(headers_to_test)" \
+	  test_CXXFLAGS="$(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) -I$(top_builddir)/include" \
+	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
 
 installcheck-local:
 	@echo " "
 	@echo "Checking for standalone headers in installed tree..."
 	@echo " "
 	@CXX="$(CXX)" \
-          HEADERS_TO_TEST="$(headers_to_test)" \
-          PKG_CONFIG=$(PKG_CONFIG) \
-          PKG_CONFIG_PATH=$(pkgconfigdir) \
-          LIBMESH_CONFIG_PATH=$(bindir) \
-          $(top_srcdir)/contrib/bin/test_installed_headers.sh
+	  HEADERS_TO_TEST="$(headers_to_test)" \
+	  PKG_CONFIG=$(PKG_CONFIG) \
+	  PKG_CONFIG_PATH=$(pkgconfigdir) \
+	  LIBMESH_CONFIG_PATH=$(bindir) \
+	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -13,7 +13,17 @@ AC_DEFUN([CONFIGURE_METIS],
 		 esac],
 		 [enablemetis=$enableoptional])
 
-
+ AC_ARG_WITH(metis,
+             AC_HELP_STRING([--with-metis=<internal,PETSc>],
+                            [metis to use.
+			      interal: build from contrib.
+			      PETSc: rely on PETSc]),
+             [case "${withval}" in
+                  internal)   build_metis=yes ;;
+		  PETSc)      build_metis=no ;;
+                      *) AC_MSG_ERROR(bad value ${withval} for --with-metis) ;;
+                  esac],
+                 [build_metis=yes])
 
   dnl The METIS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
@@ -27,8 +37,8 @@ AC_DEFUN([CONFIGURE_METIS],
      METIS_LIB=""
      enablemetis=no
   fi
-
+  AM_CONDITIONAL(BUILD_METIS, test x$build_metis = xyes)
+  
   AC_SUBST(METIS_INCLUDE)
   AC_SUBST(METIS_LIB)	
-  AC_SUBST(enablemetis)
 ])

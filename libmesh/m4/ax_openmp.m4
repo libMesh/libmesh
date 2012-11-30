@@ -68,7 +68,7 @@
 #serial 8
 
 AC_DEFUN([AX_OPENMP], [
-AC_PREREQ(2.59) dnl for _AC_LANG_PREFIX
+AC_PREREQ(2.59) # for _AC_LANG_PREFIX
 
 AC_CACHE_CHECK([for OpenMP flag of _AC_LANG compiler], ax_cv_[]_AC_LANG_ABBREV[]_openmp, [save[]_AC_LANG_PREFIX[]FLAGS=$[]_AC_LANG_PREFIX[]FLAGS
 ax_cv_[]_AC_LANG_ABBREV[]_openmp=unknown
@@ -96,4 +96,4 @@ else
   fi
   m4_default([$1], [AC_DEFINE(HAVE_OPENMP,1,[Define if OpenMP is enabled])])
 fi
-])dnl AX_OPENMP
+])# AX_OPENMP

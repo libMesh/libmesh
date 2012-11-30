@@ -1,4 +1,4 @@
-/* include/libmesh/libmesh_config.h.in.  Generated from configure.ac by autoheader.  */
+/* include/libmesh_config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* definition of the final detected unordered_map type */
 #undef BEST_UNORDERED_MAP
@@ -32,6 +32,9 @@
 
 /* Configuration information. */
 #undef CONFIGURE_INFO
+
+/* C++ compiler */
+#undef CXX
 
 /* Flag indicating if double-precision (double) should be used for most
    floating-point calculations */
@@ -369,9 +372,27 @@
 /* header file for the final detected unordered_set type */
 #undef INCLUDE_UNORDERED_SET
 
+/* libMesh I/O file format compatiblity string */
+#undef IO_COMPATIBILITY_VERSION
+
+/* libMesh source code version */
+#undef LIB_RELEASE
+
+/* libMesh version number */
+#undef LIB_VERSION
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
+
+/* libMesh major version number */
+#undef MAJOR_VERSION
+
+/* libMesh micro version number */
+#undef MICRO_VERSION
+
+/* libMesh minor version number */
+#undef MINOR_VERSION
 
 /* Name of package */
 #undef PACKAGE

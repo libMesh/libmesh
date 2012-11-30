@@ -89,7 +89,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = $(top_builddir)/include/libmesh/libmesh_config.h.tmp
+CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -195,7 +195,6 @@ AZTECOO_MAKEFILE_EXPORT = @AZTECOO_MAKEFILE_EXPORT@
 BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
 BOOST_LDFLAGS = @BOOST_LDFLAGS@
 BUILD_ARCH = @BUILD_ARCH@
-BUILD_DATE = @BUILD_DATE@
 BUILD_DEVSTATUS = @BUILD_DEVSTATUS@
 BUILD_HOST = @BUILD_HOST@
 BUILD_USER = @BUILD_USER@
@@ -206,15 +205,18 @@ CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
+CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
-CFLAGS_METHOD = @CFLAGS_METHOD@
+CFLAGS_OPROF = @CFLAGS_OPROF@
 CFLAGS_OPT = @CFLAGS_OPT@
+CFLAGS_PROF = @CFLAGS_PROF@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
-CPPFLAGS_DVL = @CPPFLAGS_DVL@
-CPPFLAGS_METHOD = @CPPFLAGS_METHOD@
+CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
+CPPFLAGS_OPROF = @CPPFLAGS_OPROF@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
+CPPFLAGS_PROF = @CPPFLAGS_PROF@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
 CPPUNIT_LIBS = @CPPUNIT_LIBS@
@@ -223,9 +225,11 @@ CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
+CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
-CXXFLAGS_METHOD = @CXXFLAGS_METHOD@
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
+CXXFLAGS_PROF = @CXXFLAGS_PROF@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -248,14 +252,10 @@ F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
 FFLAGS = @FFLAGS@
-FFLAGS_METHOD = @FFLAGS_METHOD@
 FGREP = @FGREP@
 FLIBS = @FLIBS@
 FPARSER_INCLUDE = @FPARSER_INCLUDE@
 FPARSER_LIBRARY = @FPARSER_LIBRARY@
-GENERIC_MAJOR_VERSION = @GENERIC_MAJOR_VERSION@
-GENERIC_MICRO_VERSION = @GENERIC_MICRO_VERSION@
-GENERIC_MINOR_VERSION = @GENERIC_MINOR_VERSION@
 GLPK_INCLUDE = @GLPK_INCLUDE@
 GLPK_LIBRARY = @GLPK_LIBRARY@
 GMV_INCLUDE = @GMV_INCLUDE@
@@ -277,7 +277,7 @@ LDFLAGS = @LDFLAGS@
 LIBHILBERT_INCLUDE = @LIBHILBERT_INCLUDE@
 LIBHILBERT_LIBRARY = @LIBHILBERT_LIBRARY@
 LIBOBJS = @LIBOBJS@
-LIBS = $(libmesh_LIBS)
+LIBS = $(libmesh_optional_LIBS)
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -286,6 +286,7 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 METHOD = @METHOD@
+METHODS = @METHODS@
 METIS_INCLUDE = @METIS_INCLUDE@
 METIS_LIB = @METIS_LIB@
 MKDIR_P = @MKDIR_P@
@@ -387,11 +388,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
-
-######################################################################
-#
-# What to do for 'make installcheck'
-bindir = @bindir@/@host@_@METHOD@
+bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
 build_cpu = @build_cpu@
@@ -405,37 +402,7 @@ datadir = $(examples_install_path)
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
-enableaztecoo = @enableaztecoo@
-enablecomplex = @enablecomplex@
-enableeigen = @enableeigen@
-enableexodus = @enableexodus@
-enablefparser = @enablefparser@
-enablefparserdevel = @enablefparserdevel@
-enableglpk = @enableglpk@
-enablegmv = @enablegmv@
-enablegz = @enablegz@
-enablelaspack = @enablelaspack@
 enablelegacyincludepaths = @enablelegacyincludepaths@
-enablelibhilbert = @enablelibhilbert@
-enablemetis = @enablemetis@
-enableml = @enableml@
-enablenemesis = @enablenemesis@
-enablenetcdf = @enablenetcdf@
-enablenox = @enablenox@
-enableopenmp = @enableopenmp@
-enableoptional = @enableoptional@
-enableparmetis = @enableparmetis@
-enablepetsc = @enablepetsc@
-enablesfc = @enablesfc@
-enableslepc = @enableslepc@
-enabletecio = @enabletecio@
-enabletecplot = @enabletecplot@
-enabletetgen = @enabletetgen@
-enabletriangle = @enabletriangle@
-enabletrilinos10 = @enabletrilinos10@
-enabletrilinos9 = @enabletrilinos9@
-enablevtk = @enablevtk@
-enablexdr = @enablexdr@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
@@ -446,7 +413,7 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
-libdir = @libdir@/@host@_@METHOD@
+libdir = @libdir@
 libexecdir = @libexecdir@
 libmesh_CFLAGS = @libmesh_CFLAGS@
 libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
@@ -527,7 +494,7 @@ SUBDIRS = \
 	vector_fe/vector_fe_ex3
 
 AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_INCLUDE) \
+AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_optional_INCLUDES) \
 	-I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
@@ -538,6 +505,12 @@ data_DATA = run_common.sh
 # include our header checking script when doing 'make dist'
 EXTRA_DIST = $(data_DATA) ../contrib/bin/test_installed_examples.sh \
 	Make.common
+
+######################################################################
+#
+# What to do for 'make installcheck'
+#bindir=@bindir@/@host@_@METHOD@
+#libdir=@libdir@/@host@_@METHOD@
 pkgconfigdir = $(libdir)/pkgconfig
 all: all-recursive
 
@@ -904,8 +877,6 @@ uninstall-am: uninstall-dataDATA
 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
 	uninstall uninstall-am uninstall-dataDATA
 
-
-include $(top_builddir)/Make.common.@METHOD@
 
 installcheck-local:
 	@echo " "

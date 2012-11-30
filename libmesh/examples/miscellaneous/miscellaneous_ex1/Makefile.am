@@ -1,8 +1,7 @@
-check_PROGRAMS            = miscellaneous_ex1
-miscellaneous_ex1dir      = $(examples_install_path)/miscellaneous/ex1
-miscellaneous_ex1_DATA    = miscellaneous_ex1.C run.sh $(top_srcdir)/contrib/utils/Makefile
-miscellaneous_ex1_SOURCES = $(miscellaneous_ex1_DATA) run.sh
-miscellaneous_ex1_LDADD   = $(top_builddir)/libmesh.la
+example_name = miscellaneous_ex1
+install_dir  = $(examples_install_path)/miscellaneous/ex1
+data         = miscellaneous_ex1.C run.sh
+sources      = $(data) run.sh
 
 # conditionally enable this test
 if LIBMESH_ENABLE_INFINITE_ELEMENTS

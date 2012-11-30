@@ -17,7 +17,6 @@ noinst_HEADERS =  \
 # will get installed into '$(prefix)/include/libmesh'
 include_HEADERS =  \
         libmesh/libmesh_config.h \
-        libmesh/libmesh_version.h \
         base/auto_ptr.h \
         base/dirichlet_boundaries.h \
         base/dof_map.h \
@@ -25,17 +24,18 @@ include_HEADERS =  \
         base/factory.h \
         base/getpot.h \
         base/id_types.h \
-        base/libmesh_base.h \
+        base/libmesh.h \
         base/libmesh_C_isnan.h \
+        base/libmesh_base.h \
         base/libmesh_common.h \
         base/libmesh_documentation.h \
         base/libmesh_exceptions.h \
-        base/libmesh.h \
         base/libmesh_logging.h \
+        base/libmesh_version.h \
         base/multi_predicates.h \
         base/periodic_boundaries.h \
-        base/periodic_boundary_base.h \
         base/periodic_boundary.h \
+        base/periodic_boundary_base.h \
         base/print_trace.h \
         base/reference_counted_object.h \
         base/reference_counter.h \
@@ -74,10 +74,10 @@ include_HEADERS =  \
         error_estimation/patch_recovery_error_estimator.h \
         error_estimation/uniform_refinement_estimator.h \
         error_estimation/weighted_patch_recovery_error_estimator.h \
+        fe/fe.h \
         fe/fe_abstract.h \
         fe/fe_base.h \
         fe/fe_compute_data.h \
-        fe/fe.h \
         fe/fe_interface.h \
         fe/fe_macro.h \
         fe/fe_map.h \
@@ -92,49 +92,49 @@ include_HEADERS =  \
         fe/inf_fe_instantiate_3D.h \
         fe/inf_fe_macro.h \
         geom/cell.h \
+        geom/cell_hex.h \
         geom/cell_hex20.h \
         geom/cell_hex27.h \
         geom/cell_hex8.h \
-        geom/cell_hex.h \
         geom/cell_inf.h \
+        geom/cell_inf_hex.h \
         geom/cell_inf_hex16.h \
         geom/cell_inf_hex18.h \
         geom/cell_inf_hex8.h \
-        geom/cell_inf_hex.h \
+        geom/cell_inf_prism.h \
         geom/cell_inf_prism12.h \
         geom/cell_inf_prism6.h \
-        geom/cell_inf_prism.h \
+        geom/cell_prism.h \
         geom/cell_prism15.h \
         geom/cell_prism18.h \
         geom/cell_prism6.h \
-        geom/cell_prism.h \
-        geom/cell_pyramid5.h \
         geom/cell_pyramid.h \
+        geom/cell_pyramid5.h \
+        geom/cell_tet.h \
         geom/cell_tet10.h \
         geom/cell_tet4.h \
-        geom/cell_tet.h \
+        geom/edge.h \
         geom/edge_edge2.h \
         geom/edge_edge3.h \
         geom/edge_edge4.h \
-        geom/edge.h \
         geom/edge_inf_edge2.h \
         geom/elem.h \
         geom/elem_quality.h \
         geom/elem_range.h \
         geom/elem_type.h \
         geom/face.h \
+        geom/face_inf_quad.h \
         geom/face_inf_quad4.h \
         geom/face_inf_quad6.h \
-        geom/face_inf_quad.h \
+        geom/face_quad.h \
         geom/face_quad4.h \
         geom/face_quad8.h \
         geom/face_quad9.h \
-        geom/face_quad.h \
+        geom/face_tri.h \
         geom/face_tri3.h \
         geom/face_tri6.h \
-        geom/face_tri.h \
-        geom/node_elem.h \
         geom/node.h \
+        geom/node_elem.h \
         geom/node_range.h \
         geom/plane.h \
         geom/point.h \
@@ -157,12 +157,12 @@ include_HEADERS =  \
         mesh/legacy_xdr_io.h \
         mesh/matlab_io.h \
         mesh/medit_io.h \
+        mesh/mesh.h \
         mesh/mesh_base.h \
         mesh/mesh_communication.h \
         mesh/mesh_data.h \
         mesh/mesh_function.h \
         mesh/mesh_generation.h \
-        mesh/mesh.h \
         mesh/mesh_input.h \
         mesh/mesh_inserter_iterator.h \
         mesh/mesh_modification.h \
@@ -201,12 +201,12 @@ include_HEADERS =  \
         numerics/const_fem_function.h \
         numerics/const_function.h \
         numerics/coupling_matrix.h \
-        numerics/dense_matrix_base.h \
         numerics/dense_matrix.h \
+        numerics/dense_matrix_base.h \
         numerics/dense_submatrix.h \
         numerics/dense_subvector.h \
-        numerics/dense_vector_base.h \
         numerics/dense_vector.h \
+        numerics/dense_vector_base.h \
         numerics/distributed_vector.h \
         numerics/fem_function_base.h \
         numerics/function_base.h \
@@ -235,16 +235,16 @@ include_HEADERS =  \
         numerics/vector_value.h \
         numerics/wrapped_function.h \
         numerics/zero_function.h \
+        parallel/parallel.h \
         parallel/parallel_algebra.h \
         parallel/parallel_bin_sorter.h \
         parallel/parallel_communicator_specializations \
         parallel/parallel_ghost_sync.h \
-        parallel/parallel.h \
         parallel/parallel_histogram.h \
         parallel/parallel_implementation.h \
         parallel/parallel_sort.h \
-        parallel/threads_allocators.h \
         parallel/threads.h \
+        parallel/threads_allocators.h \
         partitioning/centroid_partitioner.h \
         partitioning/hilbert_sfc_partitioner.h \
         partitioning/linear_partitioner.h \
@@ -256,12 +256,12 @@ include_HEADERS =  \
         physics/diff_physics.h \
         physics/diff_qoi.h \
         physics/fem_physics.h \
+        quadrature/quadrature.h \
         quadrature/quadrature_clough.h \
         quadrature/quadrature_conical.h \
         quadrature/quadrature_gauss.h \
         quadrature/quadrature_gm.h \
         quadrature/quadrature_grid.h \
-        quadrature/quadrature.h \
         quadrature/quadrature_jacobi.h \
         quadrature/quadrature_monomial.h \
         quadrature/quadrature_rules.h \
@@ -270,21 +270,21 @@ include_HEADERS =  \
         reduced_basis/derived_rb_construction.h \
         reduced_basis/derived_rb_evaluation.h \
         reduced_basis/rb_assembly_expansion.h \
-        reduced_basis/rb_construction_base.h \
         reduced_basis/rb_construction.h \
+        reduced_basis/rb_construction_base.h \
         reduced_basis/rb_eim_assembly.h \
         reduced_basis/rb_eim_construction.h \
         reduced_basis/rb_eim_evaluation.h \
         reduced_basis/rb_eim_theta.h \
         reduced_basis/rb_evaluation.h \
         reduced_basis/rb_parameters.h \
-        reduced_basis/rb_parametrized_function.h \
         reduced_basis/rb_parametrized.h \
+        reduced_basis/rb_parametrized_function.h \
         reduced_basis/rb_scm_construction.h \
         reduced_basis/rb_scm_evaluation.h \
         reduced_basis/rb_temporal_discretization.h \
-        reduced_basis/rb_theta_expansion.h \
         reduced_basis/rb_theta.h \
+        reduced_basis/rb_theta_expansion.h \
         reduced_basis/transient_rb_assembly_expansion.h \
         reduced_basis/transient_rb_construction.h \
         reduced_basis/transient_rb_evaluation.h \
@@ -302,10 +302,10 @@ include_HEADERS =  \
         solvers/nonlinear_solver.h \
         solvers/no_solution_history.h \
         solvers/petsc_diff_solver.h \
-        solvers/petscdmlibmesh.h \
         solvers/petsc_dm_nonlinear_solver.h \
         solvers/petsc_linear_solver.h \
         solvers/petsc_nonlinear_solver.h \
+        solvers/petscdmlibmesh.h \
         solvers/slepc_eigen_solver.h \
         solvers/slepc_macro.h \
         solvers/solution_history.h \
@@ -337,8 +337,8 @@ include_HEADERS =  \
         systems/steady_system.h \
         systems/system.h \
         systems/system_norm.h \
-        systems/system_subset_by_subdomain.h \
         systems/system_subset.h \
+        systems/system_subset_by_subdomain.h \
         systems/transient_system.h \
         utils/compare_types.h \
         utils/error_vector.h \
@@ -349,8 +349,8 @@ include_HEADERS =  \
         utils/null_output_iterator.h \
         utils/number_lookups.h \
         utils/o_f_stream.h \
-        utils/ostream_proxy.h \
         utils/o_string_stream.h \
+        utils/ostream_proxy.h \
         utils/parameters.h \
         utils/perf_log.h \
         utils/perfmon.h \
@@ -363,8 +363,8 @@ include_HEADERS =  \
         utils/statistics.h \
         utils/string_to_enum.h \
         utils/timestamp.h \
-        utils/tree_base.h \
         utils/tree.h \
+        utils/tree_base.h \
         utils/tree_node.h \
         utils/utility.h \
         utils/xdr_cxx.h 

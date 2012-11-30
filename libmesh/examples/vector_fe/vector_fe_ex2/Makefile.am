@@ -1,10 +1,8 @@
-check_PROGRAMS        = vector_fe_ex2
-check_SCRIPTS         = run.sh
-vector_fe_ex2dir      = $(examples_install_path)/vector_fe/ex2
-vector_fe_ex2_DATA    = laplace.in laplace_system.C solution_function.h vector_fe_ex2.in laplace_exact_solution.h laplace_system.h vector_fe_ex2.C run.sh $(top_srcdir)/contrib/utils/Makefile
-
-vector_fe_ex2_SOURCES = $(vector_fe_ex2_DATA) run.sh
-vector_fe_ex2_LDADD   = $(top_builddir)/libmesh.la
+example_name  = vector_fe_ex2
+check_SCRIPTS = run.sh
+install_dir   = $(examples_install_path)/vector_fe/ex2
+data          = laplace.in laplace_system.C solution_function.h vector_fe_ex2.in laplace_exact_solution.h laplace_system.h vector_fe_ex2.C run.sh
+sources       = $(data) run.sh
 
 CLEANFILES = out.e out.inp
 

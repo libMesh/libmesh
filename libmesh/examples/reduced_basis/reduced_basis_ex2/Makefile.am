@@ -1,8 +1,7 @@
-check_PROGRAMS            = reduced_basis_ex2
-reduced_basis_ex2dir      = $(examples_install_path)/reduced_basis/ex2
-reduced_basis_ex2_DATA    = reduced_basis_ex2.C assembly.h rb_classes.h reduced_basis_ex2.in run.sh $(top_srcdir)/contrib/utils/Makefile
-reduced_basis_ex2_SOURCES = $(reduced_basis_ex2_DATA) run.sh
-reduced_basis_ex2_LDADD   = $(top_builddir)/libmesh.la
+example_name = reduced_basis_ex2
+install_dir  = $(examples_install_path)/reduced_basis/ex2
+data         = reduced_basis_ex2.C assembly.h rb_classes.h reduced_basis_ex2.in run.sh
+sources      = $(data) run.sh
 
 
 CLEANFILES = bf0.e RB_sol.e rb_data/* scm_data/*
