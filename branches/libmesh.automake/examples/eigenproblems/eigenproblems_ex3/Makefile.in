@@ -108,7 +108,7 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = example-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
 am__example_dbg_SOURCES_DIST = eigenproblems_ex3.C drum1_mesh.e \
-	drum2_mesh.e run.sh $(top_srcdir)/contrib/utils/Makefile
+	drum2_mesh.e run.sh
 am__objects_1 = example_dbg-eigenproblems_ex3.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
 @LIBMESH_DBG_MODE_TRUE@am_example_dbg_OBJECTS = $(am__objects_2)
@@ -123,7 +123,7 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_devel_SOURCES_DIST = eigenproblems_ex3.C drum1_mesh.e \
-	drum2_mesh.e run.sh $(top_srcdir)/contrib/utils/Makefile
+	drum2_mesh.e run.sh
 am__objects_3 = example_devel-eigenproblems_ex3.$(OBJEXT)
 am__objects_4 = $(am__objects_3)
 @LIBMESH_DEVEL_MODE_TRUE@am_example_devel_OBJECTS = $(am__objects_4)
@@ -135,7 +135,7 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_oprof_SOURCES_DIST = eigenproblems_ex3.C drum1_mesh.e \
-	drum2_mesh.e run.sh $(top_srcdir)/contrib/utils/Makefile
+	drum2_mesh.e run.sh
 am__objects_5 = example_oprof-eigenproblems_ex3.$(OBJEXT)
 am__objects_6 = $(am__objects_5)
 @LIBMESH_OPROF_MODE_TRUE@am_example_oprof_OBJECTS = $(am__objects_6)
@@ -147,7 +147,7 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_opt_SOURCES_DIST = eigenproblems_ex3.C drum1_mesh.e \
-	drum2_mesh.e run.sh $(top_srcdir)/contrib/utils/Makefile
+	drum2_mesh.e run.sh
 am__objects_7 = example_opt-eigenproblems_ex3.$(OBJEXT)
 am__objects_8 = $(am__objects_7)
 @LIBMESH_OPT_MODE_TRUE@am_example_opt_OBJECTS = $(am__objects_8)
@@ -158,7 +158,7 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_prof_SOURCES_DIST = eigenproblems_ex3.C drum1_mesh.e \
-	drum2_mesh.e run.sh $(top_srcdir)/contrib/utils/Makefile
+	drum2_mesh.e run.sh
 am__objects_9 = example_prof-eigenproblems_ex3.$(OBJEXT)
 am__objects_10 = $(am__objects_9)
 @LIBMESH_PROF_MODE_TRUE@am_example_prof_OBJECTS = $(am__objects_10)
@@ -533,7 +533,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 example_name = eigenproblems_ex3
 install_dir = $(examples_install_path)/eigenproblems/ex3
-data = eigenproblems_ex3.C drum1_mesh.e drum2_mesh.e run.sh $(top_srcdir)/contrib/utils/Makefile
+data = eigenproblems_ex3.C drum1_mesh.e drum2_mesh.e run.sh
 sources = $(data) run.sh
 
 ######################################################################
@@ -563,7 +563,7 @@ AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 examples_source_path = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples
-data_DATA = $(data)
+data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 @LIBMESH_OPT_MODE_TRUE@example_opt_SOURCES = $(sources)
 @LIBMESH_OPT_MODE_TRUE@example_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@example_opt_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -605,9 +605,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu examples/eigenproblems/eigenproblems_ex3/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign examples/eigenproblems/eigenproblems_ex3/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu examples/eigenproblems/eigenproblems_ex3/Makefile
+	  $(AUTOMAKE) --foreign examples/eigenproblems/eigenproblems_ex3/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

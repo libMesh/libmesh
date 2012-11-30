@@ -1,7 +1,7 @@
 example_name  = reduced_basis_ex7
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/reduced_basis/ex7
-data          = assembly.h horn.geo horn.msh rb_classes.h reduced_basis_ex7.C reduced_basis_ex7.in run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = assembly.h horn.geo horn.msh rb_classes.h reduced_basis_ex7.C reduced_basis_ex7.in run.sh
 sources       = $(data) run.sh
 
 CLEANFILES =

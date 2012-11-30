@@ -110,8 +110,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__example_dbg_SOURCES_DIST = adjoints_ex1.C L-shaped.C L-shaped.h \
 	element_postprocess.C element_qoi_derivative.C femparameters.C \
 	femparameters.h general.in l-shaped.in lshaped.xda \
-	side_postprocess.C side_qoi_derivative.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	side_postprocess.C side_qoi_derivative.C run.sh
 am__objects_1 = example_dbg-adjoints_ex1.$(OBJEXT) \
 	example_dbg-L-shaped.$(OBJEXT) \
 	example_dbg-element_postprocess.$(OBJEXT) \
@@ -134,8 +133,7 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 am__example_devel_SOURCES_DIST = adjoints_ex1.C L-shaped.C L-shaped.h \
 	element_postprocess.C element_qoi_derivative.C femparameters.C \
 	femparameters.h general.in l-shaped.in lshaped.xda \
-	side_postprocess.C side_qoi_derivative.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	side_postprocess.C side_qoi_derivative.C run.sh
 am__objects_3 = example_devel-adjoints_ex1.$(OBJEXT) \
 	example_devel-L-shaped.$(OBJEXT) \
 	example_devel-element_postprocess.$(OBJEXT) \
@@ -155,8 +153,7 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__example_oprof_SOURCES_DIST = adjoints_ex1.C L-shaped.C L-shaped.h \
 	element_postprocess.C element_qoi_derivative.C femparameters.C \
 	femparameters.h general.in l-shaped.in lshaped.xda \
-	side_postprocess.C side_qoi_derivative.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	side_postprocess.C side_qoi_derivative.C run.sh
 am__objects_5 = example_oprof-adjoints_ex1.$(OBJEXT) \
 	example_oprof-L-shaped.$(OBJEXT) \
 	example_oprof-element_postprocess.$(OBJEXT) \
@@ -176,8 +173,7 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__example_opt_SOURCES_DIST = adjoints_ex1.C L-shaped.C L-shaped.h \
 	element_postprocess.C element_qoi_derivative.C femparameters.C \
 	femparameters.h general.in l-shaped.in lshaped.xda \
-	side_postprocess.C side_qoi_derivative.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	side_postprocess.C side_qoi_derivative.C run.sh
 am__objects_7 = example_opt-adjoints_ex1.$(OBJEXT) \
 	example_opt-L-shaped.$(OBJEXT) \
 	example_opt-element_postprocess.$(OBJEXT) \
@@ -196,8 +192,7 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 am__example_prof_SOURCES_DIST = adjoints_ex1.C L-shaped.C L-shaped.h \
 	element_postprocess.C element_qoi_derivative.C femparameters.C \
 	femparameters.h general.in l-shaped.in lshaped.xda \
-	side_postprocess.C side_qoi_derivative.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	side_postprocess.C side_qoi_derivative.C run.sh
 am__objects_9 = example_prof-adjoints_ex1.$(OBJEXT) \
 	example_prof-L-shaped.$(OBJEXT) \
 	example_prof-element_postprocess.$(OBJEXT) \
@@ -597,7 +592,7 @@ top_srcdir = @top_srcdir@
 example_name = adjoints_ex1
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/adjoints/ex1
-data = adjoints_ex1.C L-shaped.C L-shaped.h element_postprocess.C element_qoi_derivative.C femparameters.C femparameters.h general.in l-shaped.in lshaped.xda side_postprocess.C side_qoi_derivative.C run.sh $(top_srcdir)/contrib/utils/Makefile
+data = adjoints_ex1.C L-shaped.C L-shaped.h element_postprocess.C element_qoi_derivative.C femparameters.C femparameters.h general.in l-shaped.in lshaped.xda side_postprocess.C side_qoi_derivative.C run.sh
 sources = $(data) run.sh
 
 ######################################################################
@@ -624,7 +619,7 @@ AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 examples_source_path = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples
-data_DATA = $(data)
+data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 @LIBMESH_OPT_MODE_TRUE@example_opt_SOURCES = $(sources)
 @LIBMESH_OPT_MODE_TRUE@example_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@example_opt_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -666,9 +661,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu examples/adjoints/adjoints_ex1/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign examples/adjoints/adjoints_ex1/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu examples/adjoints/adjoints_ex1/Makefile
+	  $(AUTOMAKE) --foreign examples/adjoints/adjoints_ex1/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

@@ -1,6 +1,6 @@
 example_name  = miscellaneous_ex6
 install_dir   = $(examples_install_path)/miscellaneous/ex6
-data          = miscellaneous_ex6.C run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = miscellaneous_ex6.C run.sh
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 

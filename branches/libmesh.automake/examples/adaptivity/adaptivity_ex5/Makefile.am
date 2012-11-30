@@ -6,7 +6,7 @@ exact_solution.C: $(top_srcdir)/examples/transient/transient_ex1/exact_solution.
 example_name  = adaptivity_ex5
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/adaptivity/ex5
-data          = adaptivity_ex5.C exact_solution.C run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = adaptivity_ex5.C exact_solution.C run.sh
 sources       = $(data) run.sh
 
 CLEANFILES = solution_read_in.gmv solution_read_in.e saved_solution.xdr saved_solution.gmv saved_solution.e saved_mesh.xdr out_*.e out.gmv.*

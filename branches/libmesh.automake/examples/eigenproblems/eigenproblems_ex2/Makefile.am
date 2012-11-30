@@ -1,6 +1,6 @@
 example_name = eigenproblems_ex2
 install_dir  = $(examples_install_path)/eigenproblems/ex2
-data         = eigenproblems_ex2.C run.sh $(top_srcdir)/contrib/utils/Makefile
+data         = eigenproblems_ex2.C run.sh
 sources      = $(data) run.sh
 
 CLEANFILES = out.e

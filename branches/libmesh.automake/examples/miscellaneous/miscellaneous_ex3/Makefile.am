@@ -5,7 +5,7 @@ lshaped.xda:
 
 example_name  = miscellaneous_ex3
 install_dir   = $(examples_install_path)/miscellaneous/ex3
-data          = miscellaneous_ex3.C ../../adjoints/adjoints_ex1/lshaped.xda run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = miscellaneous_ex3.C ../../adjoints/adjoints_ex1/lshaped.xda run.sh
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 

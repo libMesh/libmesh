@@ -6,7 +6,7 @@ exact_solution.C: $(top_srcdir)/examples/introduction/introduction_ex3/exact_sol
 example_name  = introduction_ex4
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/introduction/ex4
-data          = introduction_ex4.C exact_solution.C run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = introduction_ex4.C exact_solution.C run.sh
 sources       = $(data) run.sh
 CLEANFILES    = gnuplot_script gnuplot_script_data out_2.e out_3.e
 

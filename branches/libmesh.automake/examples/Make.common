@@ -23,7 +23,7 @@ examples_install_path = $(prefix)/examples
 check_PROGRAMS =
 
 datadir	  = $(install_dir)
-data_DATA = $(data)
+data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 
 if LIBMESH_OPT_MODE
   check_PROGRAMS      += example-opt

@@ -1,6 +1,6 @@
 example_name = reduced_basis_ex2
 install_dir  = $(examples_install_path)/reduced_basis/ex2
-data         = reduced_basis_ex2.C assembly.h rb_classes.h reduced_basis_ex2.in run.sh $(top_srcdir)/contrib/utils/Makefile
+data         = reduced_basis_ex2.C assembly.h rb_classes.h reduced_basis_ex2.in run.sh
 sources      = $(data) run.sh
 
 

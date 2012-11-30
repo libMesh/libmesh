@@ -8,7 +8,7 @@ DISTCLEANFILES = $(BUILT_SOURCES)
 example_name  = transient_ex1
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/transient/ex1
-data          = transient_ex1.C exact_solution.C ../../adaptivity/adaptivity_ex2/mesh.xda run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = transient_ex1.C exact_solution.C ../../adaptivity/adaptivity_ex2/mesh.xda run.sh
 sources       = $(data) run.sh
 
 CLEANFILES = out_*.gmv

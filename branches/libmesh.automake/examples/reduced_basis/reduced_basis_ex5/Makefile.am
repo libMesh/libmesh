@@ -1,7 +1,7 @@
 example_name  = reduced_basis_ex5
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/reduced_basis/ex5
-data          = reduced_basis_ex5.C assembly.h assembly.C rb_classes.h reduced_basis_ex5.in run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = reduced_basis_ex5.C assembly.h assembly.C rb_classes.h reduced_basis_ex5.in run.sh
 sources       = $(data) run.sh
 
 CLEANFILES = RB_sol.e offline_data/*

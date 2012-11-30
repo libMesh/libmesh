@@ -1,7 +1,7 @@
 example_name  = adjoints_ex4
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/adjoints/ex4
-data          = L-shaped.C element_qoi_derivative.C general.in side_postprocess.C L-shaped.h adjoints_ex4.C femparameters.C l-shaped.in side_qoi_derivative.C element_postprocess.C femparameters.h lshaped.xda run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = L-shaped.C element_qoi_derivative.C general.in side_postprocess.C L-shaped.h adjoints_ex4.C femparameters.C l-shaped.in side_qoi_derivative.C element_postprocess.C femparameters.h lshaped.xda run.sh
 sources       = $(data) run.sh
 
 CLEANFILES = primal.out.* adjoint_*.out.*

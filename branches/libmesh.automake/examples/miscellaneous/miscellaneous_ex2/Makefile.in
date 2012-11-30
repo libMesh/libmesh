@@ -558,7 +558,7 @@ AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 examples_source_path = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples
-data_DATA = $(data)
+data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 @LIBMESH_OPT_MODE_TRUE@example_opt_SOURCES = $(sources)
 @LIBMESH_OPT_MODE_TRUE@example_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@example_opt_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -599,9 +599,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu examples/miscellaneous/miscellaneous_ex2/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign examples/miscellaneous/miscellaneous_ex2/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu examples/miscellaneous/miscellaneous_ex2/Makefile
+	  $(AUTOMAKE) --foreign examples/miscellaneous/miscellaneous_ex2/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

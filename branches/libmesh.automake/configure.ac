@@ -37,6 +37,7 @@ AC_CONFIG_FILES([Makefile
 		 include/Makefile
 		 include/libmesh/Makefile
 		 contrib/Makefile
+	         contrib/utils/Makefile
 	         contrib/utils/Make.common
 		 tests/Makefile
 		 doc/Doxyfile

@@ -1,6 +1,6 @@
 example_name  = miscellaneous_ex7
 install_dir   = $(examples_install_path)/miscellaneous/ex7
-data          = biharmonic.C biharmonic.h biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = biharmonic.C biharmonic.h biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 

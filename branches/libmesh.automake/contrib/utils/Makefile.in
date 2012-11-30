@@ -1,6 +1,8 @@
 ######################################################################
 #
 # Template libMesh application Makefile
+LIBMESH_DIR ?= @prefix@
+
 
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
@@ -43,7 +45,7 @@ dust:
 	@rm -f out*.m job_output.txt output.txt* *.gmv.* *.plt.* out*.xdr* out*.xda* PI* complete
 
 clean: dust
-	@rm -f $(objects)
+	@rm -f $(objects) *.o
 
 clobber: clean 
 	@rm -f $(target)

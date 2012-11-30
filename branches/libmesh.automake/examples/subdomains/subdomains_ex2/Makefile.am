@@ -6,7 +6,7 @@ exact_solution.C: $(top_srcdir)/examples/introduction/introduction_ex3/exact_sol
 example_name  = subdomains_ex2
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/subdomains/ex2
-data          = subdomains_ex2.C exact_solution.C run.sh $(top_srcdir)/contrib/utils/Makefile
+data          = subdomains_ex2.C exact_solution.C run.sh
 sources       = $(data) run.sh
 
 CLEANFILES = out_*.e gnuplot_*

@@ -23,6 +23,9 @@ prefix              := @prefix@
 exec_prefix         := @exec_prefix@
 libmesh_install_dir := $(prefix)
 
+# the libtool to use in these defined rules.
+#LIBTOOL ?= @prefix@/contrib/bin/libtool
+
 ###############################################################################
 # the following lines will be replaced by the output 
 # of ./configure

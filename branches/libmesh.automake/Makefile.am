@@ -76,7 +76,7 @@ config_DATA      = contrib/utils/Make.common \
 
 # install the old make_dependencies.pl script for backwards compatibility
 contribbindir      = $(prefix)/contrib/bin
-contribbin_SCRIPTS = contrib/bin/make_dependencies.pl
+contribbin_SCRIPTS = contrib/bin/make_dependencies.pl libtool
 EXTRA_DIST        += contrib/bin/make_dependencies.pl
 
 # when doing 'make install, symlik etc/libmesh/Make.common

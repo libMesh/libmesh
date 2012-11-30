@@ -1,6 +1,6 @@
 example_name = miscellaneous_ex1
 install_dir  = $(examples_install_path)/miscellaneous/ex1
-data         = miscellaneous_ex1.C run.sh $(top_srcdir)/contrib/utils/Makefile
+data         = miscellaneous_ex1.C run.sh
 sources      = $(data) run.sh
 
 # conditionally enable this test

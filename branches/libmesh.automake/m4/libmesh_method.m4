@@ -91,31 +91,33 @@
 # -------------------------------------------------------------
 AC_DEFUN([LIBMESH_SET_METHODS],
 [
- AC_ARG_VAR([METHODS], [methods used to build libMesh (opt,dbg,devel,prof,oprof)])
-
+ AC_ARG_VAR([METHODS], [methods used to build libMesh, e.g. "opt dbg devel". Possibilities include: (opt,dbg,devel,prof,oprof)])
+ 
 
  # accept --with-methods=METHODS.  but default to $METHODS, which is either set
  # by the user already or defaulted above
  AC_ARG_WITH(methods,
-             AC_HELP_STRING([--with-methods=METHOD],
+             AC_HELP_STRING([--with-methods=METHODS],
                             [methods used to build libMesh (opt,dbg,devel,prof,oprof)]),
              [for method in ${withval} ; do
                 # make sure each method specified makes sense
 	        case "${method}" in
-                  opt)   ;;
-                  dbg)   ;;
-                  devel) ;;
-                  prof) ;;
-                  oprof) ;;
-                      *) AC_MSG_ERROR(bad value ${method} for --with-methods) ;;
+		    optimized|opt)      ;;
+		    debug|dbg)          ;;  
+		    devel)              ;;
+		    profiling|pro|prof) ;;
+		    oprofile|oprof)     ;;
+                    *)
+			AC_MSG_ERROR(bad value ${method} for --with-methods)
+			;;
                 esac
               done
 	      METHODS=${withval}],
               [
 	       # default METHOD is opt if not specified.
-	        if test "x${METHODS}" = x; then
-   		  AC_MSG_RESULT([No build methods specified, defaulting to "dbg devel opt"])
+	        if (test "x${METHODS}" = x); then
   		  METHODS="dbg devel opt"
+   		  AC_MSG_RESULT([No build methods specified, defaulting to "$METHODS"])
  		fi 
 	      ])
 

@@ -107,8 +107,7 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = example-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
 am__example_dbg_SOURCES_DIST = biharmonic.C biharmonic.h \
-	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh
 am__objects_1 = example_dbg-biharmonic.$(OBJEXT) \
 	example_dbg-biharmonic_jr.$(OBJEXT) \
 	example_dbg-miscellaneous_ex7.$(OBJEXT)
@@ -125,8 +124,7 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_devel_SOURCES_DIST = biharmonic.C biharmonic.h \
-	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh
 am__objects_3 = example_devel-biharmonic.$(OBJEXT) \
 	example_devel-biharmonic_jr.$(OBJEXT) \
 	example_devel-miscellaneous_ex7.$(OBJEXT)
@@ -140,8 +138,7 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_oprof_SOURCES_DIST = biharmonic.C biharmonic.h \
-	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh
 am__objects_5 = example_oprof-biharmonic.$(OBJEXT) \
 	example_oprof-biharmonic_jr.$(OBJEXT) \
 	example_oprof-miscellaneous_ex7.$(OBJEXT)
@@ -155,8 +152,7 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_opt_SOURCES_DIST = biharmonic.C biharmonic.h \
-	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh
 am__objects_7 = example_opt-biharmonic.$(OBJEXT) \
 	example_opt-biharmonic_jr.$(OBJEXT) \
 	example_opt-miscellaneous_ex7.$(OBJEXT)
@@ -169,8 +165,7 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_prof_SOURCES_DIST = biharmonic.C biharmonic.h \
-	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh \
-	$(top_srcdir)/contrib/utils/Makefile
+	biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh
 am__objects_9 = example_prof-biharmonic.$(OBJEXT) \
 	example_prof-biharmonic_jr.$(OBJEXT) \
 	example_prof-miscellaneous_ex7.$(OBJEXT)
@@ -565,7 +560,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 example_name = miscellaneous_ex7
 install_dir = $(examples_install_path)/miscellaneous/ex7
-data = biharmonic.C biharmonic.h biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh $(top_srcdir)/contrib/utils/Makefile
+data = biharmonic.C biharmonic.h biharmonic_jr.C biharmonic_jr.h miscellaneous_ex7.C run.sh
 sources = $(data) run.sh
 check_SCRIPTS = run.sh
 
@@ -589,7 +584,7 @@ AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 examples_source_path = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples
-data_DATA = $(data)
+data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 @LIBMESH_OPT_MODE_TRUE@example_opt_SOURCES = $(sources)
 @LIBMESH_OPT_MODE_TRUE@example_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@example_opt_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -630,9 +625,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu examples/miscellaneous/miscellaneous_ex7/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign examples/miscellaneous/miscellaneous_ex7/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu examples/miscellaneous/miscellaneous_ex7/Makefile
+	  $(AUTOMAKE) --foreign examples/miscellaneous/miscellaneous_ex7/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

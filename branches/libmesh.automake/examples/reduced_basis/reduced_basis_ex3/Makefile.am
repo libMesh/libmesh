@@ -1,6 +1,6 @@
 example_name = reduced_basis_ex3
 install_dir  = $(examples_install_path)/reduced_basis/ex3
-data         = reduced_basis_ex3.C assembly.h rb_classes.h reduced_basis_ex3.in run.sh $(top_srcdir)/contrib/utils/Makefile
+data         = reduced_basis_ex3.C assembly.h rb_classes.h reduced_basis_ex3.in run.sh
 sources      = $(data) run.sh
 
 CLEANFILES = bf0.e offline_data/* RB_sol.e
