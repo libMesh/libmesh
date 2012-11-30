@@ -49,6 +49,11 @@ echo CFLAGS.....\(dbg\)................... : $CFLAGS_DBG
 echo CPPFLAGS...\(prof\).................. : $CPPFLAGS_PROF
 echo CXXFLAGS...\(prof\).................. : $CXXFLAGS_PROF
 echo CFLAGS.....\(prof\).................. : $CFLAGS_PROF
+     ;;					 
+         oprof)   
+echo CPPFLAGS...\(oprof\)................. : $CPPFLAGS_OPROF
+echo CXXFLAGS...\(oprof\)................. : $CXXFLAGS_OPROF
+echo CFLAGS.....\(oprof\)................. : $CFLAGS_OPROF
      esac
      echo " "
 done

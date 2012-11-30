@@ -40,13 +40,13 @@ if (test "x$METHOD" = x); then
 fi
 
 case "$METHOD" in
-    opt)
+    optimized|opt)
 	CXXFLAGS="@CXXFLAGS_OPT@"
 	CPPFLAGS="@CPPFLAGS_OPT@"
 	CFLAGS="@CFLAGS_OPT@"
 	libext="_opt"
 	;;
-    dbg)
+    debug|dbg)
 	CXXFLAGS="@CXXFLAGS_DBG@"
 	CPPFLAGS="@CPPFLAGS_DBG@"
 	CFLAGS="@CFLAGS_DBG@"
@@ -58,9 +58,21 @@ case "$METHOD" in
 	CFLAGS="@CFLAGS_DEVEL@"
 	libext="_devel"
 	;;
+    profiling|pro|prof)
+	CXXFLAGS="@CXXFLAGS_PROF@"
+	CPPFLAGS="@CPPFLAGS_PROF@"
+	CFLAGS="@CFLAGS_PROF@"
+	libext="_prof"
+	;;
+    oprofile|oprof)
+	CXXFLAGS="@CXXFLAGS_OPROF@"
+	CPPFLAGS="@CPPFLAGS_OPROF@"
+	CFLAGS="@CFLAGS_OPROF@"
+	libext="_oprof"
+	;;
     *)
 	echo "ERROR: Unknown \$METHOD: $METHOD"
-	echo "  should be one of: <opt,dbg,devel>"
+	echo "  should be one of: <opt,dbg,devel,prof,oprof>"
 	exit 1
 	;;
 esac
