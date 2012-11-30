@@ -3452,7 +3452,6 @@ cat >>confdefs.h <<_ACEOF
 #define CONFIGURE_INFO "$0 $ac_configure_args"
 _ACEOF
 
--
 
 # require automake 1.11 - color tests
 am__api_version='1.12'
