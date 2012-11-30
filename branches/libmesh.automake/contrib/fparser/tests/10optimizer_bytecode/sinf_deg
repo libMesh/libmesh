@@ -1,0 +1,6 @@
+DEG=true
+T=f
+V=x
+R=0,1,1
+F=sin(1.1)+x
+C=sinf(d2r(1.1))+x

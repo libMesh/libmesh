@@ -1,0 +1,15 @@
+T=d f ld
+V=x
+R=0.25,3,0.25
+F=1*((x^5.1)=(x^6.1)) +\
+  2*((x^5.1)<(x^6.1)) +\
+  4*((x^5.1)<=(x^6.1)) +\
+  8*((x^5.1)>(x^6.1)) +\
+  16*((x^5.1)>=(x^6.1)) +\
+  32*((x^5.1)!=(x^6.1))
+C=1*fp_equal(fp_pow(x,5.1),fp_pow(x,6.1)) +\
+  2*fp_less(fp_pow(x,5.1),fp_pow(x,6.1)) +\
+  4*fp_lessOrEq(fp_pow(x,5.1),fp_pow(x,6.1)) +\
+  8*fp_greater(fp_pow(x,5.1),fp_pow(x,6.1)) +\
+  16*fp_greaterOrEq(fp_pow(x,5.1),fp_pow(x,6.1)) +\
+  32*fp_nequal(fp_pow(x,5.1),fp_pow(x,6.1))

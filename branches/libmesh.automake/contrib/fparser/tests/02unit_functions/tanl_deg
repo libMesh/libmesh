@@ -1,0 +1,6 @@
+DEG=true
+T=ld
+V=x
+R=-89, 89, 0.25
+F=tan(x)
+C=tanl(d2r(x))

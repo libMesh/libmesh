@@ -1,0 +1,11 @@
+T=d ld f mf cd cf cld
+V=x,y
+R=0.25, 1, 0.25
+F=log(if(1,5,0)*x*y)
+C=fp_log(5*x*y)
+
+# Expected result: log(x*y) + log(5)
+
+# Using if(1,5,0) to prevent bytecode optimizer
+# from doing this optimization.
+# The test subject is fpoptimizer.

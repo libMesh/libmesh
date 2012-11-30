@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3O//DTD W3 HTML 2.0//EN">
+<!Converted with LaTeX2HTML 95 (Thu Jan 19 1995) by Nikos Drakos (nikos@cbl.leeds.ac.uk), CBLU, University of Leeds >
+<HEAD>
+<TITLE> MATRIX(3LAS)</TITLE>
+</HEAD>
+<BODY>
+<meta name="description" value=" MATRIX(3LAS)">
+<meta name="keywords" value="html">
+<meta name="resource-type" value="document">
+<meta name="distribution" value="global">
+<P>
+ <BR> <HR><A NAME=tex2html399 HREF="node22.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html397 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html391 HREF="node20.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html401 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html400 HREF="node22.html"> MLSOLV(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html398 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html392 HREF="node20.html"> ITERSOLV(3LAS)</A>
+<BR> <HR> <P>
+<H2><A NAME=SECTION00086000000000000000>&#160;</A><A NAME=MATRIX> MATRIX(3LAS)</A></H2>
+<P>
+<P>
+
+<H3><A NAME=SECTION00086100000000000000> NAME</A></H3>
+<P>
+
+<P>
+<tt> M_Constr</tt>, <tt> M_Destr</tt>, 
+<tt> M_SetName</tt>, <tt> M_GetName</tt>,
+<tt> M_GetRowDim</tt>, <tt> M_GetClmDim</tt>, <tt> M_GetElOrder</tt>,
+<tt> M_SetLen</tt>, <tt> M_GetLen</tt>,
+<tt> M_SetEntry</tt>, <tt> M_GetPos</tt>, <tt> M_GetVal</tt>, <tt> M_AddVal</tt>,
+<tt> M__SetEntry</tt>, <tt> M__GetPos</tt>, <tt> M__GetVal</tt>, <tt> M__AddVal</tt>,
+<tt> M_GetEl</tt>,
+<tt> M_SortEl</tt>,
+<tt> M_Lock</tt>, <tt> M_Unlock</tt>
+-- type <tt> Matrix</tt> for general rectangular sparse matrices
+<P>
+<H3><A NAME=SECTION00086200000000000000> SYNOPSIS</A></H3>
+<P>
+
+<PRE>#include &lt;laspack/matrix.h&gt;
+
+typedef double Real; 
+
+typedef enum {
+    Rowws,
+    Clmws
+} ElOrderType; 
+
+typedef enum {
+    Normal,
+    Tempor
+} InstanceType; 
+
+void M_Constr(Matrix *M, char *Name, size_t RowDim, size_t ClmDim,
+              ElOrderType ElOrder, InstanceType Instance, Boolean OwnData);
+void M_Destr(Matrix *M);
+void M_SetName(Matrix *M, char *Name);
+char *M_GetName(Matrix *M);
+size_t M_GetRowDim(Matrix *M);
+size_t M_GetClmDim(Matrix *M);
+ElOrderType M_GetElOrder(Matrix *M);
+void M_SetLen(Matrix *M, size_t RoC, size_t Len);
+size_t M_GetLen(Matrix *M, size_t RoC);
+void M_SetEntry(Matrix *M, size_t RoC, size_t Entry, size_t Pos, Real Val);
+Real M_GetPos(Matrix *M, size_t RoC, size_t Entry);
+size_t M_GetEVal(Matrix *M, size_t RoC, size_t Entry);
+void M_AddVal(Matrix *M, size_t RoC, size_t Entry, Real Val);
+void M__SetEntry(Matrix *M, size_t RoC, size_t Entry, size_t Pos, Real Val);
+Real M__GetPos(Matrix *M, size_t RoC, size_t Entry);
+size_t M__GetVal(Matrix *M, size_t RoC, size_t Entry);
+void M__AddVal(Matrix *M, size_t RoC, size_t Entry, Real Val);
+Real M_GetEl(Matrix *M, size_t Row, size_t Clm);
+void M_SortEl(Matrix *M);
+void M_Lock(Matrix *M);
+void M_Unlock(Matrix *M);
+</PRE>
+<H3><A NAME=SECTION00086300000000000000> DESCRIPTION</A></H3>
+<P>
+<H6><A NAME=M_Constr>&#160;</A></H6>
+The procedure <tt> M_Constr</tt> is the constructor of the type <tt> Matrix</tt>. 
+It creates and initializes a new variable of this type directed
+by the parameter <tt> M</tt>.
+As a symbolic name, the string <tt> Name</tt> is used.
+The row and column dimensions of the matrix are defined by <tt> RowDim</tt> and
+<tt> ClmDim</tt>. 
+The parameter <tt> ElOrder</tt> determines the order in which the matrix elements
+are stored.
+It can be set to <tt> Rowws</tt> and <tt> Clmws</tt> for row-wise and column-wise
+ordering, respectively.
+For matrices used in application codes,
+own should always use the parameters
+<tt> Instance = Normal</tt> and <tt> OwnData = True</tt>.
+In this case, <tt> M_Constr</tt> allocates memory for internal auxiliary
+variables needed for storage of matrix elements and initializes them.
+Other parameter combinations for <tt> Instance</tt> and <tt> OwnData</tt>
+are intended for internal usage by <tt> LASPack</tt>
+ .
+<P>
+<H6><A NAME=M_Destr>&#160;</A></H6>
+The procedure <tt> M_Destr</tt> is the destructor of the type <tt> Matrix</tt>.
+It releases memory of matrix elements as well as internal auxiliary variables.
+<P>
+<H6><A NAME=M_SetName>&#160;</A><A NAME=M_GetName>&#160;</A></H6>
+The procedure <tt> M_SetName</tt> resets the symbolic name of the matrix.
+This can be queried by the procedure <tt> M_GetName</tt>.
+<P>
+<H6><A NAME=M_GetRowDim>&#160;</A><A NAME=M_GetClmDim>&#160;</A></H6>
+The procedures <tt> M_GetRowDim</tt> and <tt> M_GetClmDim</tt> return the row and column dimension,
+respectively, of the matrix.
+<P>
+<H6><A NAME=M_GetElOrder>&#160;</A></H6>
+The procedure <tt> M_GetElOrder</tt> returns the element order
+of matrix elements.
+<P>
+<H6><A NAME=M_SetLen>&#160;</A><A NAME=M_GetLen>&#160;</A></H6>
+The procedure <tt> M_SetLen</tt> sets or resets the length,
+i.e. the number of non-zero elements,
+of the row or column <tt> RoC</tt>
+<tt> (1 &lt;= RoC &lt;= RowDim / ClmDim)</tt>
+ to <tt> Len</tt>,
+and allocates memory for element storage.
+The length of each row or column is initialized by zero.
+The current value can be queried by the procedure <tt> M_GetLen</tt>.
+<P>
+<H6><A NAME=M_SetEntry>&#160;</A></H6>
+The procedure <tt> M_SetEntry</tt> assigns the position <tt> Pos</tt> and
+the value <tt> Val</tt> of a non-zero element in the row or column <tt> RoC</tt>
+to the entry <tt> Entry</tt>
+<tt> (0 &lt;= Entry &lt;= Len - 1).</tt>
+<P>
+<H6><A NAME=M_GetPos>&#160;</A><A NAME=M_GetVal>&#160;</A></H6>
+The procedures <tt> M_GetPos</tt> and <tt> M_GetVal</tt> return the position and
+the value of the non-zero element stored as entry <tt> Entry</tt>
+in the row or column <tt> RoC</tt>, respectively.
+<P>
+<H6><A NAME=M_AddVal>&#160;</A></H6>
+The procedure <tt> M_AddEntry</tt> adds the value <tt> Val</tt>
+to the non-zero element stored as entry <tt> Entry</tt>
+in the row or column <tt> RoC</tt>.
+<P>
+<H6><A NAME=M__SetEntry>&#160;</A><A NAME=M__GetPos>&#160;</A><A NAME=M__GetVal>&#160;</A><A NAME=M__AddVal>&#160;</A></H6>
+The procedures  <tt> M__GetLen</tt>, <tt> M__SetEntry</tt>, <tt> M__GetPos</tt>,
+<tt> M__GetVal</tt> and <tt> M__AddEntry</tt> have the same functionality as
+the routines <tt> M_GetLen</tt>, <tt> M_SetEntry</tt>, <tt> M_GetPos</tt>,
+<tt> M_GetVal</tt> and <tt> M_AddEntry</tt>.
+They are designed as preprocessing macros and are thus essentially faster.
+Because no range check is made they should not be used in the test
+phase of the application code.
+<P>
+<H6><A NAME=M_GetEl>&#160;</A></H6>
+The procedure <tt> M_GetEl</tt> returns the value of the matrix element
+in the row <tt> Row</tt> and column <tt> Clm</tt>.
+In contrast to other procedures, all matrix elements are considered here.
+If any element is not stored, zero is returned.
+<P>
+<H6><A NAME=M_SortEl>&#160;</A></H6>
+The procedure <tt> M_SortEl</tt> sorts elements of each row or column
+in ascending order.
+<P>
+<H6><A NAME=M_Lock>&#160;</A><A NAME=M_Unlock>&#160;</A></H6>
+In subroutines, the procedure <tt> M_Lock</tt> should be applied
+to all passed parameters of the type <tt> Matrix</tt>.
+This ensures that,
+if they are of a temporary kind,
+they are not released within any <tt> LASPack</tt>
+  routine
+before the procedure is left.
+This should be carried out by a call of <tt> M_Unlock</tt>
+which has to be called at the end of the procedure.
+<P>
+<H3><A NAME=SECTION00086400000000000000> FILES</A></H3>
+<P>
+  <tt> matrix.h ... </tt> header file <BR> 
+
+  <tt> matrix.c ... </tt> source file
+<P>
+<H3><A NAME=SECTION00086500000000000000> EXAMPLES</A></H3>
+<P>
+<H6><A NAME=MATRIXExample>&#160;</A></H6>
+<P>
+The matrix 
+
+<PRE>    | 1  2  1  0  0  0  0 |
+    | 0  0  1  2  1  0  0 |
+    | 0  0  0  0  1  2  1 |
+</PRE>
+<P>
+which may be used e.g. for weighted restriction 
+of grid functions from a seven point to a three point grid,
+could be generated by the following code fragment:
+
+<PRE>Matrix R;
+size_t Row;
+
+...
+
+M_Constr(&amp;R, &quot;R&quot;, 3, 7, Rowws, Normal, True);
+
+for (Row = 1; Row &lt;= 3; Row++) {
+    M_SetLen(&amp;R, Row, 3);
+    M_SetEntry(&amp;R, Row, 0, 2 * Row - 1, 0.5);      
+    M_SetEntry(&amp;R, Row, 1, 2 * Row,     1.0);      
+    M_SetEntry(&amp;R, Row, 2, 2 * Row + 1, 0.5);      
+}
+
+...
+
+M_Destr(&amp;R);
+</PRE>
+<P>
+<H3><A NAME=SECTION00086600000000000000> SEE ALSO</A></H3>
+<P>
+<A HREF="node23.html#OPERATS">operats(3LAS)</A>, <A HREF="node18.html#ERRHANDL">errhandl(3LAS)</A>
+<P>
+<BR> <HR><A NAME=tex2html399 HREF="node22.html"><IMG ALIGN=BOTTOM ALT="next" SRC="next_motif.gif"></A> <A NAME=tex2html397 HREF="node15.html"><IMG ALIGN=BOTTOM ALT="up" SRC="up_motif.gif"></A> <A NAME=tex2html391 HREF="node20.html"><IMG ALIGN=BOTTOM ALT="previous" SRC="previous_motif.gif"></A> <A NAME=tex2html401 HREF="node1.html"><IMG ALIGN=BOTTOM ALT="contents" SRC="contents_motif.gif"></A>   <A HREF="node28.html#SectionIndex"><IMG ALIGN=BOTTOM ALT="index" SRC="index_motif.gif"></A> <BR>
+<B> Next:</B> <A NAME=tex2html400 HREF="node22.html"> MLSOLV(3LAS)</A>
+<B>Up:</B> <A NAME=tex2html398 HREF="node15.html"> Manual Pages</A>
+<B> Previous:</B> <A NAME=tex2html392 HREF="node20.html"> ITERSOLV(3LAS)</A>
+<BR> <HR> <P>
+<BR> <HR>
+<P><ADDRESS>
+Tomas Skalicky (skalicky@msmfs1.mw.tu-dresden.de)
+</ADDRESS>
+</BODY>
+</BODY>

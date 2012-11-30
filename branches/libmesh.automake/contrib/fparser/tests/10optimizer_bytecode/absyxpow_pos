@@ -1,0 +1,6 @@
+# y [isEvenInteger(y)&&!isEvenInteger(x*y)] cPow  x cPow
+T=d
+V=x
+R=-10,10,0.1
+F=(x^4)^1.5
+C=fp_pow(fp_pow(x,4),1.5)

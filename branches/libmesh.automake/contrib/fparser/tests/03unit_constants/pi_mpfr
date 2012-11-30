@@ -1,0 +1,5 @@
+T=mf
+V=x
+R=0,1,1
+F=x*0+ pi
+C=MpfrFloat::atan2(x*0,-1)
