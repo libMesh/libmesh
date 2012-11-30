@@ -120,12 +120,12 @@ target_triplet = @target@
 @LIBMESH_ENABLE_LASPACK_TRUE@am__append_64 = laspack/libdevel.la
 @LIBMESH_ENABLE_LASPACK_TRUE@am__append_65 = laspack/libprof.la
 @LIBMESH_ENABLE_LASPACK_TRUE@am__append_66 = laspack/liboprof.la
-@LIBMESH_ENABLE_METIS_TRUE@am__append_67 = metis
-@LIBMESH_ENABLE_METIS_TRUE@am__append_68 = metis/libopt.la
-@LIBMESH_ENABLE_METIS_TRUE@am__append_69 = metis/libdbg.la
-@LIBMESH_ENABLE_METIS_TRUE@am__append_70 = metis/libdevel.la
-@LIBMESH_ENABLE_METIS_TRUE@am__append_71 = metis/libprof.la
-@LIBMESH_ENABLE_METIS_TRUE@am__append_72 = metis/liboprof.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_67 = metis
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_68 = metis/libopt.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_69 = metis/libdbg.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_70 = metis/libdevel.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_71 = metis/libprof.la
+@BUILD_METIS_TRUE@@LIBMESH_ENABLE_METIS_TRUE@am__append_72 = metis/liboprof.la
 @LIBMESH_ENABLE_PARMETIS_TRUE@am__append_73 = parmetis
 @LIBMESH_ENABLE_PARMETIS_TRUE@am__append_74 = parmetis/libopt.la
 @LIBMESH_ENABLE_PARMETIS_TRUE@am__append_75 = parmetis/libdbg.la
@@ -708,9 +708,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign contrib/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign contrib/Makefile
+	  $(AUTOMAKE) --gnu contrib/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

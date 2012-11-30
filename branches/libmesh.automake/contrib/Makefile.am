@@ -115,12 +115,14 @@ if LIBMESH_ENABLE_LASPACK
 endif
 
 if LIBMESH_ENABLE_METIS
+if BUILD_METIS
   SUBDIRS    += metis
   opt_libs   += metis/libopt.la
   dbg_libs   += metis/libdbg.la
   devel_libs += metis/libdevel.la
   prof_libs  += metis/libprof.la
   oprof_libs += metis/liboprof.la
+endif
 endif
 
 if LIBMESH_ENABLE_PARMETIS
