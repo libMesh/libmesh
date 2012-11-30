@@ -44,6 +44,24 @@ if LIBMESH_DEVEL_MODE
   libdevel_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
 endif
 
+if LIBMESH_PROF_MODE
+  noinst_LTLIBRARIES          += libprof.la
+  libprof_la_SOURCES  = $(pkg_sources)
+  libprof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+  libprof_la_CXXFLAGS = $(CXXFLAGS_PROF)
+  libprof_la_CFLAGS   = $(CFLAGS_PROF)
+  libprof_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
+endif
+
+if LIBMESH_OPROF_MODE
+  noinst_LTLIBRARIES          += liboprof.la
+  liboprof_la_SOURCES  = $(pkg_sources)
+  liboprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+  liboprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
+  liboprof_la_CFLAGS   = $(CFLAGS_OPROF)
+  liboprof_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
+endif
+
 # Local Variables:
 # mode: makefile
 # End:

@@ -91,20 +91,22 @@
 # -------------------------------------------------------------
 AC_DEFUN([LIBMESH_SET_METHODS],
 [
- AC_ARG_VAR([METHODS], [methods used to build libMesh (opt,dbg,devel)])
+ AC_ARG_VAR([METHODS], [methods used to build libMesh (opt,dbg,devel,prof,oprof)])
 
 
  # accept --with-methods=METHODS.  but default to $METHODS, which is either set
  # by the user already or defaulted above
  AC_ARG_WITH(methods,
              AC_HELP_STRING([--with-methods=METHOD],
-                            [methods used to build libMesh (opt,dbg,devel)]),
+                            [methods used to build libMesh (opt,dbg,devel,prof,oprof)]),
              [for method in ${withval} ; do
                 # make sure each method specified makes sense
 	        case "${method}" in
                   opt)   ;;
                   dbg)   ;;
                   devel) ;;
+                  prof) ;;
+                  oprof) ;;
                       *) AC_MSG_ERROR(bad value ${method} for --with-methods) ;;
                 esac
               done
@@ -126,6 +128,8 @@ AC_DEFUN([LIBMESH_SET_METHODS],
  build_opt=no
  build_dbg=no
  build_devel=no
+ build_prof=no
+ build_oprof=no
  
  # define compiler flags for all methods
  CPPFLAGS_OPT="$CPPFLAGS_OPT $libmesh_CPPFLAGS"
@@ -140,14 +144,24 @@ AC_DEFUN([LIBMESH_SET_METHODS],
  CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $libmesh_CXXFLAGS"
  CFLAGS_DEVEL="$CFLAGS_DEVEL $libmesh_CFLAGS"
 
+ CPPFLAGS_PROF="$CPPFLAGS_PROF $libmesh_CPPFLAGS"
+ CXXFLAGS_PROF="$CXXFLAGS_PROF $libmesh_CXXFLAGS"
+ CFLAGS_PROF="$CFLAGS_PROF $libmesh_CFLAGS"
+
+ CPPFLAGS_OPROF="$CPPFLAGS_OPROF $libmesh_CPPFLAGS"
+ CXXFLAGS_OPROF="$CXXFLAGS_OPROF $libmesh_CXXFLAGS"
+ CFLAGS_OPROF="$CFLAGS_OPROF $libmesh_CFLAGS"
+
  #AC_CONFIG_FILES(Make.common:Make.common.in)
 
  # conditionally compile selected methods
  for method in ${METHODS}; do
      case "${method}" in
-         opt)   build_opt=yes   ;;  
-         dbg)   build_dbg=yes   ;;  
-         devel) build_devel=yes ;;
+         optimized|opt)      build_opt=yes   ;;  
+         debug|dbg)          build_dbg=yes   ;;  
+         devel)              build_devel=yes ;;
+         profiling|pro|prof) build_prof=yes  ;;
+         oprofile|oprof)     build_oprof=yes ;;
          *)
 	     AC_MSG_ERROR(bad value ${method} for --with-methods) 
 	     ;;
@@ -157,6 +171,8 @@ AC_DEFUN([LIBMESH_SET_METHODS],
  AM_CONDITIONAL(LIBMESH_OPT_MODE,   test x$build_opt   = xyes)
  AM_CONDITIONAL(LIBMESH_DBG_MODE,   test x$build_dbg   = xyes)
  AM_CONDITIONAL(LIBMESH_DEVEL_MODE, test x$build_devel = xyes)
+ AM_CONDITIONAL(LIBMESH_PROF_MODE,  test x$build_prof = xyes)
+ AM_CONDITIONAL(LIBMESH_OPROF_MODE, test x$build_oprof = xyes)
 
   # substitute all methods
   AC_SUBST(CPPFLAGS_DBG)
@@ -170,6 +186,14 @@ AC_DEFUN([LIBMESH_SET_METHODS],
   AC_SUBST(CPPFLAGS_OPT)
   AC_SUBST(CXXFLAGS_OPT)
   AC_SUBST(CFLAGS_OPT)
+  
+  AC_SUBST(CPPFLAGS_PROF)
+  AC_SUBST(CXXFLAGS_PROF)
+  AC_SUBST(CFLAGS_PROF)
+  
+  AC_SUBST(CPPFLAGS_OPROF)
+  AC_SUBST(CXXFLAGS_OPROF)
+  AC_SUBST(CFLAGS_OPROF)
   
 ])
 # -------------------------------------------------------------

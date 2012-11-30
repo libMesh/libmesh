@@ -48,5 +48,20 @@ if LIBMESH_DEVEL_MODE
   unit_tests_devel_LDADD    = $(top_builddir)/libmesh_devel.la
 endif
 
+if LIBMESH_PROF_MODE
+  check_PROGRAMS          += unit_tests-prof
+  unit_tests_prof_SOURCES  = $(unit_tests_sources)
+  unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+  unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
+  unit_tests_prof_LDADD    = $(top_builddir)/libmesh_prof.la
+endif
+
+if LIBMESH_OPROF_MODE
+  check_PROGRAMS           += unit_tests-oprof
+  unit_tests_oprof_SOURCES  = $(unit_tests_sources)
+  unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+  unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
+  unit_tests_oprof_LDADD    = $(top_builddir)/libmesh_oprof.la
+endif
 
 TESTS = $(check_PROGRAMS)

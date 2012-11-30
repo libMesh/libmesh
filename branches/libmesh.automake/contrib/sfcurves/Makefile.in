@@ -57,6 +57,8 @@ DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 @LIBMESH_OPT_MODE_TRUE@am__append_1 = libopt.la
 @LIBMESH_DBG_MODE_TRUE@am__append_2 = libdbg.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_3 = libdevel.la
+@LIBMESH_PROF_MODE_TRUE@am__append_4 = libprof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_5 = liboprof.la
 subdir = contrib/sfcurves
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -124,17 +126,39 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libdevel_la_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
+liboprof_la_DEPENDENCIES =
+am__liboprof_la_SOURCES_DIST = sfcurves.h sfcurves_internal.h cmp.c \
+	hilbert.c morton.c
+am__objects_3 = liboprof_la-cmp.lo liboprof_la-hilbert.lo \
+	liboprof_la-morton.lo
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_3)
+liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
+liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(liboprof_la_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
 libopt_la_DEPENDENCIES =
 am__libopt_la_SOURCES_DIST = sfcurves.h sfcurves_internal.h cmp.c \
 	hilbert.c morton.c
-am__objects_3 = libopt_la-cmp.lo libopt_la-hilbert.lo \
+am__objects_4 = libopt_la-cmp.lo libopt_la-hilbert.lo \
 	libopt_la-morton.lo
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_3)
+@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_4)
 libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
 libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libopt_la_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
+libprof_la_DEPENDENCIES =
+am__libprof_la_SOURCES_DIST = sfcurves.h sfcurves_internal.h cmp.c \
+	hilbert.c morton.c
+am__objects_5 = libprof_la-cmp.lo libprof_la-hilbert.lo \
+	libprof_la-morton.lo
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_5)
+libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
+libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libprof_la_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -170,9 +194,12 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libdbg_la_SOURCES) $(libdevel_la_SOURCES) \
-	$(libopt_la_SOURCES)
+	$(liboprof_la_SOURCES) $(libopt_la_SOURCES) \
+	$(libprof_la_SOURCES)
 DIST_SOURCES = $(am__libdbg_la_SOURCES_DIST) \
-	$(am__libdevel_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST)
+	$(am__libdevel_la_SOURCES_DIST) \
+	$(am__liboprof_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST) \
+	$(am__libprof_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -207,12 +234,16 @@ CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
 CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
+CFLAGS_OPROF = @CFLAGS_OPROF@
 CFLAGS_OPT = @CFLAGS_OPT@
+CFLAGS_PROF = @CFLAGS_PROF@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
 CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
+CPPFLAGS_OPROF = @CPPFLAGS_OPROF@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
+CPPFLAGS_PROF = @CPPFLAGS_PROF@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
 CPPUNIT_LIBS = @CPPUNIT_LIBS@
@@ -223,7 +254,9 @@ CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
 CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
+CXXFLAGS_PROF = @CXXFLAGS_PROF@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -455,7 +488,8 @@ AM_CXXFLAGS =
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3)
+noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_SOURCES = $(pkg_sources)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -471,6 +505,16 @@ noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CFLAGS = $(CFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_LIBADD = $(pkg_libs) # any defined package-specific libs
+@LIBMESH_PROF_MODE_TRUE@libprof_la_SOURCES = $(pkg_sources)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CXXFLAGS = $(CXXFLAGS_PROF)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CFLAGS = $(CFLAGS_PROF)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_SOURCES = $(pkg_sources)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CFLAGS = $(CFLAGS_OPROF)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
 all: all-am
 
 .SUFFIXES:
@@ -521,8 +565,12 @@ libdbg.la: $(libdbg_la_OBJECTS) $(libdbg_la_DEPENDENCIES) $(EXTRA_libdbg_la_DEPE
 	$(AM_V_CCLD)$(libdbg_la_LINK) $(am_libdbg_la_rpath) $(libdbg_la_OBJECTS) $(libdbg_la_LIBADD) $(LIBS)
 libdevel.la: $(libdevel_la_OBJECTS) $(libdevel_la_DEPENDENCIES) $(EXTRA_libdevel_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libdevel_la_LINK) $(am_libdevel_la_rpath) $(libdevel_la_OBJECTS) $(libdevel_la_LIBADD) $(LIBS)
+liboprof.la: $(liboprof_la_OBJECTS) $(liboprof_la_DEPENDENCIES) $(EXTRA_liboprof_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(liboprof_la_LINK) $(am_liboprof_la_rpath) $(liboprof_la_OBJECTS) $(liboprof_la_LIBADD) $(LIBS)
 libopt.la: $(libopt_la_OBJECTS) $(libopt_la_DEPENDENCIES) $(EXTRA_libopt_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libopt_la_LINK) $(am_libopt_la_rpath) $(libopt_la_OBJECTS) $(libopt_la_LIBADD) $(LIBS)
+libprof.la: $(libprof_la_OBJECTS) $(libprof_la_DEPENDENCIES) $(EXTRA_libprof_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libprof_la_LINK) $(am_libprof_la_rpath) $(libprof_la_OBJECTS) $(libprof_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -536,9 +584,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-cmp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-hilbert.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-morton.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-cmp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-hilbert.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-morton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-cmp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-hilbert.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-morton.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-cmp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-hilbert.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-morton.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -606,6 +660,27 @@ libdevel_la-morton.lo: morton.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o libdevel_la-morton.lo `test -f 'morton.c' || echo '$(srcdir)/'`morton.c
 
+liboprof_la-cmp.lo: cmp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT liboprof_la-cmp.lo -MD -MP -MF $(DEPDIR)/liboprof_la-cmp.Tpo -c -o liboprof_la-cmp.lo `test -f 'cmp.c' || echo '$(srcdir)/'`cmp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboprof_la-cmp.Tpo $(DEPDIR)/liboprof_la-cmp.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cmp.c' object='liboprof_la-cmp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o liboprof_la-cmp.lo `test -f 'cmp.c' || echo '$(srcdir)/'`cmp.c
+
+liboprof_la-hilbert.lo: hilbert.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT liboprof_la-hilbert.lo -MD -MP -MF $(DEPDIR)/liboprof_la-hilbert.Tpo -c -o liboprof_la-hilbert.lo `test -f 'hilbert.c' || echo '$(srcdir)/'`hilbert.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboprof_la-hilbert.Tpo $(DEPDIR)/liboprof_la-hilbert.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hilbert.c' object='liboprof_la-hilbert.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o liboprof_la-hilbert.lo `test -f 'hilbert.c' || echo '$(srcdir)/'`hilbert.c
+
+liboprof_la-morton.lo: morton.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT liboprof_la-morton.lo -MD -MP -MF $(DEPDIR)/liboprof_la-morton.Tpo -c -o liboprof_la-morton.lo `test -f 'morton.c' || echo '$(srcdir)/'`morton.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboprof_la-morton.Tpo $(DEPDIR)/liboprof_la-morton.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='morton.c' object='liboprof_la-morton.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o liboprof_la-morton.lo `test -f 'morton.c' || echo '$(srcdir)/'`morton.c
+
 libopt_la-cmp.lo: cmp.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT libopt_la-cmp.lo -MD -MP -MF $(DEPDIR)/libopt_la-cmp.Tpo -c -o libopt_la-cmp.lo `test -f 'cmp.c' || echo '$(srcdir)/'`cmp.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libopt_la-cmp.Tpo $(DEPDIR)/libopt_la-cmp.Plo
@@ -626,6 +701,27 @@ libopt_la-morton.lo: morton.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='morton.c' object='libopt_la-morton.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o libopt_la-morton.lo `test -f 'morton.c' || echo '$(srcdir)/'`morton.c
+
+libprof_la-cmp.lo: cmp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT libprof_la-cmp.lo -MD -MP -MF $(DEPDIR)/libprof_la-cmp.Tpo -c -o libprof_la-cmp.lo `test -f 'cmp.c' || echo '$(srcdir)/'`cmp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libprof_la-cmp.Tpo $(DEPDIR)/libprof_la-cmp.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cmp.c' object='libprof_la-cmp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o libprof_la-cmp.lo `test -f 'cmp.c' || echo '$(srcdir)/'`cmp.c
+
+libprof_la-hilbert.lo: hilbert.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT libprof_la-hilbert.lo -MD -MP -MF $(DEPDIR)/libprof_la-hilbert.Tpo -c -o libprof_la-hilbert.lo `test -f 'hilbert.c' || echo '$(srcdir)/'`hilbert.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libprof_la-hilbert.Tpo $(DEPDIR)/libprof_la-hilbert.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='hilbert.c' object='libprof_la-hilbert.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o libprof_la-hilbert.lo `test -f 'hilbert.c' || echo '$(srcdir)/'`hilbert.c
+
+libprof_la-morton.lo: morton.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT libprof_la-morton.lo -MD -MP -MF $(DEPDIR)/libprof_la-morton.Tpo -c -o libprof_la-morton.lo `test -f 'morton.c' || echo '$(srcdir)/'`morton.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libprof_la-morton.Tpo $(DEPDIR)/libprof_la-morton.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='morton.c' object='libprof_la-morton.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o libprof_la-morton.lo `test -f 'morton.c' || echo '$(srcdir)/'`morton.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

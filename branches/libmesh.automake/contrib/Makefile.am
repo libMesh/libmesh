@@ -6,6 +6,8 @@ SUBDIRS    =
 opt_libs   =
 dbg_libs   =
 devel_libs =
+prof_libs  =
+oprof_libs =
 
 if LIBMESH_INSTALL_INTERNAL_BOOST
    SUBDIRS += boost/include
@@ -17,6 +19,8 @@ if LIBMESH_ENABLE_GMV
   opt_libs   += gmv/libopt.la 
   dbg_libs   += gmv/libdbg.la 
   devel_libs += gmv/libdevel.la 
+  prof_libs  += gmv/libprof.la 
+  oprof_libs += gmv/liboprof.la 
 endif
 
 if LIBMESH_ENABLE_GZSTREAMS
@@ -24,6 +28,8 @@ if LIBMESH_ENABLE_GZSTREAMS
   opt_libs   += gzstream/libopt.la
   dbg_libs   += gzstream/libdbg.la
   devel_libs += gzstream/libdevel.la
+  prof_libs  += gzstream/libprof.la
+  oprof_libs += gzstream/liboprof.la
 endif
 
 if LIBMESH_ENABLE_NETCDF
@@ -31,6 +37,8 @@ if LIBMESH_ENABLE_NETCDF
   opt_libs   += netcdf/Lib/libopt.la
   dbg_libs   += netcdf/Lib/libdbg.la
   devel_libs += netcdf/Lib/libdevel.la
+  prof_libs  += netcdf/Lib/libprof.la
+  oprof_libs += netcdf/Lib/liboprof.la
 endif
 
 if LIBMESH_ENABLE_EXODUS
@@ -38,6 +46,8 @@ if LIBMESH_ENABLE_EXODUS
   opt_libs   += exodusii/Lib/libopt.la
   dbg_libs   += exodusii/Lib/libdbg.la
   devel_libs += exodusii/Lib/libdevel.la
+  prof_libs  += exodusii/Lib/libprof.la
+  oprof_libs += exodusii/Lib/liboprof.la
 endif
 
 if LIBMESH_ENABLE_NEMESIS
@@ -45,6 +55,8 @@ if LIBMESH_ENABLE_NEMESIS
   opt_libs   += nemesis/Lib/libopt.la 
   dbg_libs   += nemesis/Lib/libdbg.la 
   devel_libs += nemesis/Lib/libdevel.la 
+  prof_libs  += nemesis/Lib/libprof.la 
+  oprof_libs += nemesis/Lib/liboprof.la 
 endif
 
 if LIBMESH_ENABLE_TECIO
@@ -52,6 +64,8 @@ if LIBMESH_ENABLE_TECIO
   opt_libs   += tecplot/tecio/libopt.la
   dbg_libs   += tecplot/tecio/libdbg.la
   devel_libs += tecplot/tecio/libdevel.la
+  prof_libs  += tecplot/tecio/libprof.la
+  oprof_libs += tecplot/tecio/liboprof.la
 endif
 
 # I don't think this actually copies any symbols into
@@ -60,6 +74,8 @@ if LIBMESH_ENABLE_TECPLOT
   opt_libs   += @TECPLOT_LIBRARY@
   dbg_libs   += @TECPLOT_LIBRARY@
   devel_libs += @TECPLOT_LIBRARY@
+  prof_libs  += @TECPLOT_LIBRARY@
+  oprof_libs += @TECPLOT_LIBRARY@
 endif
 
 if LIBMESH_ENABLE_TRIANGLE
@@ -67,6 +83,8 @@ if LIBMESH_ENABLE_TRIANGLE
   opt_libs   += triangle/libopt.la
   dbg_libs   += triangle/libdbg.la
   devel_libs += triangle/libdevel.la
+  prof_libs  += triangle/libprof.la
+  oprof_libs += triangle/liboprof.la
 endif
 
 if LIBMESH_ENABLE_TETGEN
@@ -74,6 +92,8 @@ if LIBMESH_ENABLE_TETGEN
   opt_libs   += tetgen/libopt.la
   dbg_libs   += tetgen/libdbg.la
   devel_libs += tetgen/libdevel.la
+  prof_libs  += tetgen/libprof.la
+  oprof_libs += tetgen/liboprof.la
 endif
 
 if LIBMESH_ENABLE_LIBHILBERT
@@ -81,6 +101,8 @@ if LIBMESH_ENABLE_LIBHILBERT
   opt_libs   += libHilbert/libopt.la
   dbg_libs   += libHilbert/libdbg.la
   devel_libs += libHilbert/libdevel.la
+  prof_libs  += libHilbert/libprof.la
+  oprof_libs += libHilbert/liboprof.la
 endif
 
 if LIBMESH_ENABLE_LASPACK
@@ -88,6 +110,8 @@ if LIBMESH_ENABLE_LASPACK
   opt_libs   += laspack/libopt.la
   dbg_libs   += laspack/libdbg.la
   devel_libs += laspack/libdevel.la
+  prof_libs  += laspack/libprof.la
+  oprof_libs += laspack/liboprof.la
 endif
 
 if LIBMESH_ENABLE_METIS
@@ -95,6 +119,8 @@ if LIBMESH_ENABLE_METIS
   opt_libs   += metis/libopt.la
   dbg_libs   += metis/libdbg.la
   devel_libs += metis/libdevel.la
+  prof_libs  += metis/libprof.la
+  oprof_libs += metis/liboprof.la
 endif
 
 if LIBMESH_ENABLE_PARMETIS
@@ -102,6 +128,8 @@ if LIBMESH_ENABLE_PARMETIS
   opt_libs   += parmetis/libopt.la
   dbg_libs   += parmetis/libdbg.la
   devel_libs += parmetis/libdevel.la
+  prof_libs  += parmetis/libprof.la
+  oprof_libs += parmetis/liboprof.la
 endif
 
 if LIBMESH_ENABLE_SFC
@@ -109,6 +137,8 @@ if LIBMESH_ENABLE_SFC
   opt_libs   += sfcurves/libopt.la
   dbg_libs   += sfcurves/libdbg.la
   devel_libs += sfcurves/libdevel.la
+  prof_libs  += sfcurves/libprof.la
+  oprof_libs += sfcurves/liboprof.la
 endif
 
 if LIBMESH_ENABLE_FPARSER
@@ -118,6 +148,8 @@ if LIBMESH_ENABLE_FPARSER
   opt_libs   += fparser/libfparser.la
   dbg_libs   += fparser/libfparser.la
   devel_libs += fparser/libfparser.la
+  prof_libs  += fparser/libfparser.la
+  oprof_libs += fparser/libfparser.la
 endif
 
 
@@ -153,4 +185,22 @@ if LIBMESH_DEVEL_MODE
   libcontrib_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
   libcontrib_devel_la_CFLAGS   = $(CFLAGS_DEVEL)
   libcontrib_devel_la_LIBADD   = $(devel_libs)
+endif
+
+if LIBMESH_PROF_MODE
+  noinst_LTLIBRARIES         += libcontrib_prof.la
+  libcontrib_prof_la_SOURCES  = cppsource.C
+  libcontrib_prof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+  libcontrib_prof_la_CXXFLAGS = $(CXXFLAGS_PROF)
+  libcontrib_prof_la_CFLAGS   = $(CFLAGS_PROF)
+  libcontrib_prof_la_LIBADD   = $(prof_libs)
+endif
+
+if LIBMESH_OPROF_MODE
+  noinst_LTLIBRARIES          += libcontrib_oprof.la
+  libcontrib_oprof_la_SOURCES  = cppsource.C
+  libcontrib_oprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+  libcontrib_oprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
+  libcontrib_oprof_la_CFLAGS   = $(CFLAGS_OPROF)
+  libcontrib_oprof_la_LIBADD   = $(oprof_libs)
 endif

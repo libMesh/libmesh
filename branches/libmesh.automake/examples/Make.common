@@ -49,6 +49,22 @@ if LIBMESH_DEVEL_MODE
   example_devel_LDADD    = $(top_builddir)/libmesh_devel.la
 endif
 
+if LIBMESH_PROF_MODE
+  check_PROGRAMS        += example-prof
+  example_prof_SOURCES  = $(sources)
+  example_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+  example_prof_CXXFLAGS = $(CXXFLAGS_PROF)
+  example_prof_LDADD    = $(top_builddir)/libmesh_prof.la
+endif
+
+if LIBMESH_OPROF_MODE
+  check_PROGRAMS        += example-oprof
+  example_oprof_SOURCES  = $(sources)
+  example_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+  example_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
+  example_oprof_LDADD    = $(top_builddir)/libmesh_oprof.la
+endif
+
 ######################################################################
 #
 # Running the tests

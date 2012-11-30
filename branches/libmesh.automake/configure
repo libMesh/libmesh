@@ -832,6 +832,12 @@ EGREP
 GREP
 SED
 LIBTOOL
+CFLAGS_OPROF
+CXXFLAGS_OPROF
+CPPFLAGS_OPROF
+CFLAGS_PROF
+CXXFLAGS_PROF
+CPPFLAGS_PROF
 CFLAGS_OPT
 CXXFLAGS_OPT
 CPPFLAGS_OPT
@@ -841,6 +847,10 @@ CPPFLAGS_DEVEL
 CFLAGS_DBG
 CXXFLAGS_DBG
 CPPFLAGS_DBG
+LIBMESH_OPROF_MODE_FALSE
+LIBMESH_OPROF_MODE_TRUE
+LIBMESH_PROF_MODE_FALSE
+LIBMESH_PROF_MODE_TRUE
 LIBMESH_DEVEL_MODE_FALSE
 LIBMESH_DEVEL_MODE_TRUE
 LIBMESH_DBG_MODE_FALSE
@@ -1802,7 +1812,8 @@ Optional Packages:
   --with-cc=CC            C compiler to use
   --with-fc=FC            Fortran compiler to use
   --with-f77=F77          Fortran compiler to use
-  --with-methods=METHOD   methods used to build libMesh (opt,dbg,devel)
+  --with-methods=METHOD   methods used to build libMesh
+                          (opt,dbg,devel,prof,oprof)
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
@@ -1857,7 +1868,7 @@ Some influential environment variables:
   FCFLAGS     Fortran compiler flags
   F77         Fortran 77 compiler command
   FFLAGS      Fortran 77 compiler flags
-  METHODS     methods used to build libMesh (opt,dbg,devel)
+  METHODS     methods used to build libMesh (opt,dbg,devel,prof,oprof)
   libmesh_CPPFLAGS
               User-specified C/C++ preprocessor flags
   libmesh_CXXFLAGS
@@ -3413,7 +3424,7 @@ test -n "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
-ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile contrib/Makefile contrib/utils/Make.common tests/Makefile doc/Doxyfile contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in contrib/utils/libmesh-opt.pc contrib/utils/libmesh-dbg.pc contrib/utils/libmesh-devel.pc"
+ac_config_files="$ac_config_files Makefile include/Makefile include/libmesh/Makefile contrib/Makefile contrib/utils/Make.common tests/Makefile doc/Doxyfile contrib/utils/libmesh.pc:contrib/utils/libmesh-opt.pc.in contrib/utils/libmesh-opt.pc contrib/utils/libmesh-dbg.pc contrib/utils/libmesh-devel.pc contrib/utils/libmesh-prof.pc contrib/utils/libmesh-oprof.pc"
 
 
 ac_config_files="$ac_config_files contrib/bin/libmesh-config"
@@ -6756,6 +6767,8 @@ if test "${with_methods+set}" = set; then :
                   opt)   ;;
                   dbg)   ;;
                   devel) ;;
+                  prof) ;;
+                  oprof) ;;
                       *) as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5 ;;
                 esac
               done
@@ -6782,6 +6795,8 @@ $as_echo "<<< Configuring libMesh with methods \"$METHODS\" >>>" >&6; }
  build_opt=no
  build_dbg=no
  build_devel=no
+ build_prof=no
+ build_oprof=no
 
  # define compiler flags for all methods
  CPPFLAGS_OPT="$CPPFLAGS_OPT $libmesh_CPPFLAGS"
@@ -6796,14 +6811,24 @@ $as_echo "<<< Configuring libMesh with methods \"$METHODS\" >>>" >&6; }
  CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $libmesh_CXXFLAGS"
  CFLAGS_DEVEL="$CFLAGS_DEVEL $libmesh_CFLAGS"
 
+ CPPFLAGS_PROF="$CPPFLAGS_PROF $libmesh_CPPFLAGS"
+ CXXFLAGS_PROF="$CXXFLAGS_PROF $libmesh_CXXFLAGS"
+ CFLAGS_PROF="$CFLAGS_PROF $libmesh_CFLAGS"
+
+ CPPFLAGS_OPROF="$CPPFLAGS_OPROF $libmesh_CPPFLAGS"
+ CXXFLAGS_OPROF="$CXXFLAGS_OPROF $libmesh_CXXFLAGS"
+ CFLAGS_OPROF="$CFLAGS_OPROF $libmesh_CFLAGS"
+
  #AC_CONFIG_FILES(Make.common:Make.common.in)
 
  # conditionally compile selected methods
  for method in ${METHODS}; do
      case "${method}" in
-         opt)   build_opt=yes   ;;
-         dbg)   build_dbg=yes   ;;
-         devel) build_devel=yes ;;
+         optimized|opt)      build_opt=yes   ;;
+         debug|dbg)          build_dbg=yes   ;;
+         devel)              build_devel=yes ;;
+         profiling|pro|prof) build_prof=yes  ;;
+         oprofile|oprof)     build_oprof=yes ;;
          *)
 	     as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5
 	     ;;
@@ -6834,8 +6859,32 @@ else
   LIBMESH_DEVEL_MODE_FALSE=
 fi
 
+  if test x$build_prof = xyes; then
+  LIBMESH_PROF_MODE_TRUE=
+  LIBMESH_PROF_MODE_FALSE='#'
+else
+  LIBMESH_PROF_MODE_TRUE='#'
+  LIBMESH_PROF_MODE_FALSE=
+fi
+
+  if test x$build_oprof = xyes; then
+  LIBMESH_OPROF_MODE_TRUE=
+  LIBMESH_OPROF_MODE_FALSE='#'
+else
+  LIBMESH_OPROF_MODE_TRUE='#'
+  LIBMESH_OPROF_MODE_FALSE=
+fi
+
 
   # substitute all methods
+
+
+
+
+
+
+
+
 
 
 
@@ -25671,9 +25720,13 @@ $as_echo "<<< Configuring library with OpenMP support >>>" >&6; }
      CXXFLAGS_OPT="$CXXFLAGS_OPT $OPENMP_CXXFLAGS"
      CXXFLAGS_DBG="$CXXFLAGS_DBG $OPENMP_CXXFLAGS"
      CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $OPENMP_CXXFLAGS"
+     CXXFLAGS_PROF="$CXXFLAGS_PROF $OPENMP_CXXFLAGS"
+     CXXFLAGS_OPROF="$CXXFLAGS_OPROF $OPENMP_CXXFLAGS"
      CFLAGS_OPT="$CFLAGS_OPT $OPENMP_CFLAGS"
      CFLAGS_DBG="$CFLAGS_DBG $OPENMP_CFLAGS"
      CFLAGS_DEVEL="$CFLAGS_DEVEL $OPENMP_CFLAGS"
+     CFLAGS_PROF="$CFLAGS_PROF $OPENMP_CFLAGS"
+     CFLAGS_OPROF="$CFLAGS_OPROF $OPENMP_CFLAGS"
      FFLAGS="$FFLAGS $OPENMP_FFLAGS"
    fi
 
@@ -32144,6 +32197,14 @@ if test -z "${LIBMESH_DEVEL_MODE_TRUE}" && test -z "${LIBMESH_DEVEL_MODE_FALSE}"
   as_fn_error $? "conditional \"LIBMESH_DEVEL_MODE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${LIBMESH_PROF_MODE_TRUE}" && test -z "${LIBMESH_PROF_MODE_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_PROF_MODE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_OPROF_MODE_TRUE}" && test -z "${LIBMESH_OPROF_MODE_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_OPROF_MODE\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_TRUE}" && test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_INFINITE_ELEMENTS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -33416,6 +33477,8 @@ do
     "contrib/utils/libmesh-opt.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-opt.pc" ;;
     "contrib/utils/libmesh-dbg.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-dbg.pc" ;;
     "contrib/utils/libmesh-devel.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-devel.pc" ;;
+    "contrib/utils/libmesh-prof.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-prof.pc" ;;
+    "contrib/utils/libmesh-oprof.pc") CONFIG_FILES="$CONFIG_FILES contrib/utils/libmesh-oprof.pc" ;;
     "contrib/bin/libmesh-config") CONFIG_FILES="$CONFIG_FILES contrib/bin/libmesh-config" ;;
     "contrib/bin/xda2mgf") CONFIG_FILES="$CONFIG_FILES contrib/bin/xda2mgf" ;;
     "contrib/bin/create_libmesh_release") CONFIG_FILES="$CONFIG_FILES contrib/bin/create_libmesh_release" ;;
@@ -35444,6 +35507,10 @@ echo CPPFLAGS...\(dbg\)................... : $CPPFLAGS_DBG
 echo CXXFLAGS...\(dbg\)................... : $CXXFLAGS_DBG
 echo CFLAGS.....\(dbg\)................... : $CFLAGS_DBG
      ;;
+         prof)
+echo CPPFLAGS...\(prof\).................. : $CPPFLAGS_PROF
+echo CXXFLAGS...\(prof\).................. : $CXXFLAGS_PROF
+echo CFLAGS.....\(prof\).................. : $CFLAGS_PROF
      esac
      echo " "
 done

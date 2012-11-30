@@ -61,14 +61,18 @@ pkgconfig_DATA   = contrib/utils/Make.common \
                    contrib/utils/libmesh.pc \
                    contrib/utils/libmesh-opt.pc \
                    contrib/utils/libmesh-dbg.pc \
-                   contrib/utils/libmesh-devel.pc
+                   contrib/utils/libmesh-devel.pc \
+                   contrib/utils/libmesh-prof.pc \
+                   contrib/utils/libmesh-oprof.pc
 
 configdir        = $(sysconfdir)/libmesh
 config_DATA      = contrib/utils/Make.common \
                    contrib/utils/libmesh.pc \
                    contrib/utils/libmesh-opt.pc \
                    contrib/utils/libmesh-dbg.pc \
-                   contrib/utils/libmesh-devel.pc
+                   contrib/utils/libmesh-devel.pc \
+                   contrib/utils/libmesh-prof.pc \
+                   contrib/utils/libmesh-oprof.pc
 
 # install the old make_dependencies.pl script for backwards compatibility
 contribbindir      = $(prefix)/contrib/bin
@@ -143,6 +147,24 @@ if LIBMESH_DEVEL_MODE
   libmesh_devel_la_LIBADD   = contrib/libcontrib_devel.la $(LIBS)
 endif
 
+if LIBMESH_PROF_MODE
+  lib_LTLIBRARIES          += libmesh_prof.la
+  libmesh_prof_la_SOURCES  = $(libmesh_SOURCES)
+  libmesh_prof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS) 
+  libmesh_prof_la_CXXFLAGS = $(CXXFLAGS_PROF)
+  libmesh_prof_la_CFLAGS   = $(CFLAGS_PROF)
+  libmesh_prof_la_LIBADD   = contrib/libcontrib_prof.la $(LIBS)
+endif
+
+if LIBMESH_OPROF_MODE
+  lib_LTLIBRARIES          += libmesh_oprof.la
+  libmesh_oprof_la_SOURCES  = $(libmesh_SOURCES)
+  libmesh_oprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS) 
+  libmesh_oprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
+  libmesh_oprof_la_CFLAGS   = $(CFLAGS_OPROF)
+  libmesh_oprof_la_LIBADD   = contrib/libcontrib_oprof.la $(LIBS)
+endif
+
 
 if LIBMESH_ENABLE_CPPUNIT
  SUBDIRS += tests
@@ -160,6 +182,8 @@ CLEANFILES   = # empty, append below
 opt_programs   = # empty, append below
 devel_programs = # empty, append below
 dbg_programs   = # empty, append below
+prof_programs  = # empty, append below
+oprof_programs = # empty, append below
 
 # meshtool
 opt_programs           += meshtool-opt

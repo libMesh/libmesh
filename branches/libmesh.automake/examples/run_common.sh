@@ -40,9 +40,11 @@ run_example() {
     for method in ${METHODS}; do
 	
 	case "${method}" in
-	    opt)   executable=example-opt ;;
-	    dbg)   executable=example-dbg ;;
-	    devel) executable=example-devel ;;
+	    optimized|opt)      executable=example-opt   ;;
+	    debug|dbg)          executable=example-dbg   ;;
+	    devel)              executable=example-devel ;;
+	    profiling|pro|prof) executable=example-prof  ;;
+	    oprofile|oprof)     executable=example-oprof ;;
 	    *) echo "ERROR: unknown method: ${method}!" ; exit 1 ;;
 	esac
 

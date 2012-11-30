@@ -58,6 +58,8 @@ DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 @LIBMESH_OPT_MODE_TRUE@am__append_1 = libopt.la
 @LIBMESH_DBG_MODE_TRUE@am__append_2 = libdbg.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_3 = libdevel.la
+@LIBMESH_PROF_MODE_TRUE@am__append_4 = libprof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_5 = liboprof.la
 subdir = contrib/libHilbert
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -139,6 +141,24 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdevel_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
+liboprof_la_DEPENDENCIES =
+am__liboprof_la_SOURCES_DIST = src/BigBitVec.C src/FixBitVec.C \
+	src/Hilbert.C src/hilbert_mpi_ops.C \
+	include/Hilbert/GetLocation.hpp include/Hilbert/SetBits.hpp \
+	include/Hilbert/Common.hpp include/Hilbert/BigBitVec.hpp \
+	include/Hilbert/FixBitVec.hpp include/Hilbert/Algorithm.hpp \
+	include/Hilbert/GetBits.hpp include/Hilbert/GrayCodeRank.hpp \
+	include/Hilbert/SetLocation.hpp include/Hilbert.hpp \
+	include/hilbert.h
+am__objects_3 = src/liboprof_la-BigBitVec.lo \
+	src/liboprof_la-FixBitVec.lo src/liboprof_la-Hilbert.lo \
+	src/liboprof_la-hilbert_mpi_ops.lo
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_3)
+liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
+liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(liboprof_la_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
 libopt_la_DEPENDENCIES =
 am__libopt_la_SOURCES_DIST = src/BigBitVec.C src/FixBitVec.C \
 	src/Hilbert.C src/hilbert_mpi_ops.C \
@@ -148,14 +168,32 @@ am__libopt_la_SOURCES_DIST = src/BigBitVec.C src/FixBitVec.C \
 	include/Hilbert/GetBits.hpp include/Hilbert/GrayCodeRank.hpp \
 	include/Hilbert/SetLocation.hpp include/Hilbert.hpp \
 	include/hilbert.h
-am__objects_3 = src/libopt_la-BigBitVec.lo src/libopt_la-FixBitVec.lo \
+am__objects_4 = src/libopt_la-BigBitVec.lo src/libopt_la-FixBitVec.lo \
 	src/libopt_la-Hilbert.lo src/libopt_la-hilbert_mpi_ops.lo
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_3)
+@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_4)
 libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
 libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libopt_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
+libprof_la_DEPENDENCIES =
+am__libprof_la_SOURCES_DIST = src/BigBitVec.C src/FixBitVec.C \
+	src/Hilbert.C src/hilbert_mpi_ops.C \
+	include/Hilbert/GetLocation.hpp include/Hilbert/SetBits.hpp \
+	include/Hilbert/Common.hpp include/Hilbert/BigBitVec.hpp \
+	include/Hilbert/FixBitVec.hpp include/Hilbert/Algorithm.hpp \
+	include/Hilbert/GetBits.hpp include/Hilbert/GrayCodeRank.hpp \
+	include/Hilbert/SetLocation.hpp include/Hilbert.hpp \
+	include/hilbert.h
+am__objects_5 = src/libprof_la-BigBitVec.lo \
+	src/libprof_la-FixBitVec.lo src/libprof_la-Hilbert.lo \
+	src/libprof_la-hilbert_mpi_ops.lo
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_5)
+libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
+libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libprof_la_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -209,9 +247,12 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libdbg_la_SOURCES) $(libdevel_la_SOURCES) \
-	$(libopt_la_SOURCES)
+	$(liboprof_la_SOURCES) $(libopt_la_SOURCES) \
+	$(libprof_la_SOURCES)
 DIST_SOURCES = $(am__libdbg_la_SOURCES_DIST) \
-	$(am__libdevel_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST)
+	$(am__libdevel_la_SOURCES_DIST) \
+	$(am__liboprof_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST) \
+	$(am__libprof_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -246,12 +287,16 @@ CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
 CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
+CFLAGS_OPROF = @CFLAGS_OPROF@
 CFLAGS_OPT = @CFLAGS_OPT@
+CFLAGS_PROF = @CFLAGS_PROF@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
 CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
+CPPFLAGS_OPROF = @CPPFLAGS_OPROF@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
+CPPFLAGS_PROF = @CPPFLAGS_PROF@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
 CPPUNIT_LIBS = @CPPUNIT_LIBS@
@@ -262,7 +307,9 @@ CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
 CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
+CXXFLAGS_PROF = @CXXFLAGS_PROF@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -511,7 +558,8 @@ AM_CXXFLAGS =
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3)
+noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_SOURCES = $(pkg_sources)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -527,6 +575,16 @@ noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CFLAGS = $(CFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_LIBADD = $(pkg_libs) # any defined package-specific libs
+@LIBMESH_PROF_MODE_TRUE@libprof_la_SOURCES = $(pkg_sources)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CXXFLAGS = $(CXXFLAGS_PROF)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CFLAGS = $(CFLAGS_PROF)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_SOURCES = $(pkg_sources)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CFLAGS = $(CFLAGS_OPROF)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
 all: all-am
 
 .SUFFIXES:
@@ -599,6 +657,16 @@ src/libdevel_la-hilbert_mpi_ops.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 libdevel.la: $(libdevel_la_OBJECTS) $(libdevel_la_DEPENDENCIES) $(EXTRA_libdevel_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libdevel_la_LINK) $(am_libdevel_la_rpath) $(libdevel_la_OBJECTS) $(libdevel_la_LIBADD) $(LIBS)
+src/liboprof_la-BigBitVec.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/liboprof_la-FixBitVec.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/liboprof_la-Hilbert.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/liboprof_la-hilbert_mpi_ops.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+liboprof.la: $(liboprof_la_OBJECTS) $(liboprof_la_DEPENDENCIES) $(EXTRA_liboprof_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(liboprof_la_LINK) $(am_liboprof_la_rpath) $(liboprof_la_OBJECTS) $(liboprof_la_LIBADD) $(LIBS)
 src/libopt_la-BigBitVec.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 src/libopt_la-FixBitVec.lo: src/$(am__dirstamp) \
@@ -609,6 +677,16 @@ src/libopt_la-hilbert_mpi_ops.lo: src/$(am__dirstamp) \
 	src/$(DEPDIR)/$(am__dirstamp)
 libopt.la: $(libopt_la_OBJECTS) $(libopt_la_DEPENDENCIES) $(EXTRA_libopt_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libopt_la_LINK) $(am_libopt_la_rpath) $(libopt_la_OBJECTS) $(libopt_la_LIBADD) $(LIBS)
+src/libprof_la-BigBitVec.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/libprof_la-FixBitVec.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/libprof_la-Hilbert.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+src/libprof_la-hilbert_mpi_ops.lo: src/$(am__dirstamp) \
+	src/$(DEPDIR)/$(am__dirstamp)
+libprof.la: $(libprof_la_OBJECTS) $(libprof_la_DEPENDENCIES) $(EXTRA_libprof_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(libprof_la_LINK) $(am_libprof_la_rpath) $(libprof_la_OBJECTS) $(libprof_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -626,10 +704,18 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libdevel_la-FixBitVec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libdevel_la-Hilbert.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libdevel_la-hilbert_mpi_ops.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/liboprof_la-BigBitVec.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/liboprof_la-FixBitVec.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/liboprof_la-Hilbert.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/liboprof_la-hilbert_mpi_ops.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libopt_la-BigBitVec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libopt_la-FixBitVec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libopt_la-Hilbert.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libopt_la-hilbert_mpi_ops.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libprof_la-BigBitVec.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libprof_la-FixBitVec.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libprof_la-Hilbert.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/$(DEPDIR)/libprof_la-hilbert_mpi_ops.Plo@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -711,6 +797,34 @@ src/libdevel_la-hilbert_mpi_ops.lo: src/hilbert_mpi_ops.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/libdevel_la-hilbert_mpi_ops.lo `test -f 'src/hilbert_mpi_ops.C' || echo '$(srcdir)/'`src/hilbert_mpi_ops.C
 
+src/liboprof_la-BigBitVec.lo: src/BigBitVec.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/liboprof_la-BigBitVec.lo -MD -MP -MF src/$(DEPDIR)/liboprof_la-BigBitVec.Tpo -c -o src/liboprof_la-BigBitVec.lo `test -f 'src/BigBitVec.C' || echo '$(srcdir)/'`src/BigBitVec.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/liboprof_la-BigBitVec.Tpo src/$(DEPDIR)/liboprof_la-BigBitVec.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/BigBitVec.C' object='src/liboprof_la-BigBitVec.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/liboprof_la-BigBitVec.lo `test -f 'src/BigBitVec.C' || echo '$(srcdir)/'`src/BigBitVec.C
+
+src/liboprof_la-FixBitVec.lo: src/FixBitVec.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/liboprof_la-FixBitVec.lo -MD -MP -MF src/$(DEPDIR)/liboprof_la-FixBitVec.Tpo -c -o src/liboprof_la-FixBitVec.lo `test -f 'src/FixBitVec.C' || echo '$(srcdir)/'`src/FixBitVec.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/liboprof_la-FixBitVec.Tpo src/$(DEPDIR)/liboprof_la-FixBitVec.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/FixBitVec.C' object='src/liboprof_la-FixBitVec.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/liboprof_la-FixBitVec.lo `test -f 'src/FixBitVec.C' || echo '$(srcdir)/'`src/FixBitVec.C
+
+src/liboprof_la-Hilbert.lo: src/Hilbert.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/liboprof_la-Hilbert.lo -MD -MP -MF src/$(DEPDIR)/liboprof_la-Hilbert.Tpo -c -o src/liboprof_la-Hilbert.lo `test -f 'src/Hilbert.C' || echo '$(srcdir)/'`src/Hilbert.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/liboprof_la-Hilbert.Tpo src/$(DEPDIR)/liboprof_la-Hilbert.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/Hilbert.C' object='src/liboprof_la-Hilbert.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/liboprof_la-Hilbert.lo `test -f 'src/Hilbert.C' || echo '$(srcdir)/'`src/Hilbert.C
+
+src/liboprof_la-hilbert_mpi_ops.lo: src/hilbert_mpi_ops.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/liboprof_la-hilbert_mpi_ops.lo -MD -MP -MF src/$(DEPDIR)/liboprof_la-hilbert_mpi_ops.Tpo -c -o src/liboprof_la-hilbert_mpi_ops.lo `test -f 'src/hilbert_mpi_ops.C' || echo '$(srcdir)/'`src/hilbert_mpi_ops.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/liboprof_la-hilbert_mpi_ops.Tpo src/$(DEPDIR)/liboprof_la-hilbert_mpi_ops.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/hilbert_mpi_ops.C' object='src/liboprof_la-hilbert_mpi_ops.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/liboprof_la-hilbert_mpi_ops.lo `test -f 'src/hilbert_mpi_ops.C' || echo '$(srcdir)/'`src/hilbert_mpi_ops.C
+
 src/libopt_la-BigBitVec.lo: src/BigBitVec.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT src/libopt_la-BigBitVec.lo -MD -MP -MF src/$(DEPDIR)/libopt_la-BigBitVec.Tpo -c -o src/libopt_la-BigBitVec.lo `test -f 'src/BigBitVec.C' || echo '$(srcdir)/'`src/BigBitVec.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libopt_la-BigBitVec.Tpo src/$(DEPDIR)/libopt_la-BigBitVec.Plo
@@ -738,6 +852,34 @@ src/libopt_la-hilbert_mpi_ops.lo: src/hilbert_mpi_ops.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/hilbert_mpi_ops.C' object='src/libopt_la-hilbert_mpi_ops.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/libopt_la-hilbert_mpi_ops.lo `test -f 'src/hilbert_mpi_ops.C' || echo '$(srcdir)/'`src/hilbert_mpi_ops.C
+
+src/libprof_la-BigBitVec.lo: src/BigBitVec.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/libprof_la-BigBitVec.lo -MD -MP -MF src/$(DEPDIR)/libprof_la-BigBitVec.Tpo -c -o src/libprof_la-BigBitVec.lo `test -f 'src/BigBitVec.C' || echo '$(srcdir)/'`src/BigBitVec.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libprof_la-BigBitVec.Tpo src/$(DEPDIR)/libprof_la-BigBitVec.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/BigBitVec.C' object='src/libprof_la-BigBitVec.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/libprof_la-BigBitVec.lo `test -f 'src/BigBitVec.C' || echo '$(srcdir)/'`src/BigBitVec.C
+
+src/libprof_la-FixBitVec.lo: src/FixBitVec.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/libprof_la-FixBitVec.lo -MD -MP -MF src/$(DEPDIR)/libprof_la-FixBitVec.Tpo -c -o src/libprof_la-FixBitVec.lo `test -f 'src/FixBitVec.C' || echo '$(srcdir)/'`src/FixBitVec.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libprof_la-FixBitVec.Tpo src/$(DEPDIR)/libprof_la-FixBitVec.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/FixBitVec.C' object='src/libprof_la-FixBitVec.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/libprof_la-FixBitVec.lo `test -f 'src/FixBitVec.C' || echo '$(srcdir)/'`src/FixBitVec.C
+
+src/libprof_la-Hilbert.lo: src/Hilbert.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/libprof_la-Hilbert.lo -MD -MP -MF src/$(DEPDIR)/libprof_la-Hilbert.Tpo -c -o src/libprof_la-Hilbert.lo `test -f 'src/Hilbert.C' || echo '$(srcdir)/'`src/Hilbert.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libprof_la-Hilbert.Tpo src/$(DEPDIR)/libprof_la-Hilbert.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/Hilbert.C' object='src/libprof_la-Hilbert.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/libprof_la-Hilbert.lo `test -f 'src/Hilbert.C' || echo '$(srcdir)/'`src/Hilbert.C
+
+src/libprof_la-hilbert_mpi_ops.lo: src/hilbert_mpi_ops.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/libprof_la-hilbert_mpi_ops.lo -MD -MP -MF src/$(DEPDIR)/libprof_la-hilbert_mpi_ops.Tpo -c -o src/libprof_la-hilbert_mpi_ops.lo `test -f 'src/hilbert_mpi_ops.C' || echo '$(srcdir)/'`src/hilbert_mpi_ops.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/$(DEPDIR)/libprof_la-hilbert_mpi_ops.Tpo src/$(DEPDIR)/libprof_la-hilbert_mpi_ops.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/hilbert_mpi_ops.C' object='src/libprof_la-hilbert_mpi_ops.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/libprof_la-hilbert_mpi_ops.lo `test -f 'src/hilbert_mpi_ops.C' || echo '$(srcdir)/'`src/hilbert_mpi_ops.C
 
 mostlyclean-libtool:
 	-rm -f *.lo

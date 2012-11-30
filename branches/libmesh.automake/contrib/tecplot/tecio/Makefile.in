@@ -57,6 +57,8 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 @LIBMESH_OPT_MODE_TRUE@am__append_1 = libopt.la
 @LIBMESH_DBG_MODE_TRUE@am__append_2 = libdbg.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_3 = libdevel.la
+@LIBMESH_PROF_MODE_TRUE@am__append_4 = libprof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_5 = liboprof.la
 subdir = contrib/tecplot/tecio
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -171,6 +173,40 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdevel_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
+liboprof_la_DEPENDENCIES =
+am__liboprof_la_SOURCES_DIST = include/TECIO.h include/TECXXX.h \
+	tecsrc/ALLOC.h tecsrc/ARRLIST.h tecsrc/AUXDATA.h \
+	tecsrc/CHARTYPE.h tecsrc/DATAIO.h tecsrc/DATAIO4.h \
+	tecsrc/DATASET.h tecsrc/DATASET0.h tecsrc/DATASHR.h \
+	tecsrc/DATAUTIL.h tecsrc/FACE.h tecsrc/FILESTREAM.h \
+	tecsrc/GEOM.h tecsrc/GEOM2.h tecsrc/GLOBAL.h tecsrc/INPUT.h \
+	tecsrc/MASTER.h tecsrc/Q_MSG.h tecsrc/Q_UNICODE.h tecsrc/SET.h \
+	tecsrc/STRLIST.h tecsrc/STRUTIL.h tecsrc/SYSTEM.h \
+	tecsrc/TASSERT.h tecsrc/TECIO.h tecsrc/TECXXX.h tecsrc/TEXT.h \
+	tecsrc/TranslatedString.h tecsrc/VERSION.h tecsrc/W__BASE.h \
+	tecsrc/stdafx.h tecsrc/TranslatedString.cpp tecsrc/alloc.cpp \
+	tecsrc/arrlist.cpp tecsrc/auxdata.cpp tecsrc/dataio.cpp \
+	tecsrc/dataio4.cpp tecsrc/dataset.cpp tecsrc/dataset0.cpp \
+	tecsrc/datautil.cpp tecsrc/filestream.cpp tecsrc/geom2.cpp \
+	tecsrc/q_msg.cpp tecsrc/q_unicode.cpp tecsrc/set.cpp \
+	tecsrc/strlist.cpp tecsrc/strutil.cpp tecsrc/tassert.cpp \
+	tecsrc/tecxxx.cpp
+am__objects_3 = tecsrc/liboprof_la-TranslatedString.lo \
+	tecsrc/liboprof_la-alloc.lo tecsrc/liboprof_la-arrlist.lo \
+	tecsrc/liboprof_la-auxdata.lo tecsrc/liboprof_la-dataio.lo \
+	tecsrc/liboprof_la-dataio4.lo tecsrc/liboprof_la-dataset.lo \
+	tecsrc/liboprof_la-dataset0.lo tecsrc/liboprof_la-datautil.lo \
+	tecsrc/liboprof_la-filestream.lo tecsrc/liboprof_la-geom2.lo \
+	tecsrc/liboprof_la-q_msg.lo tecsrc/liboprof_la-q_unicode.lo \
+	tecsrc/liboprof_la-set.lo tecsrc/liboprof_la-strlist.lo \
+	tecsrc/liboprof_la-strutil.lo tecsrc/liboprof_la-tassert.lo \
+	tecsrc/liboprof_la-tecxxx.lo
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_3)
+liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
+liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(liboprof_la_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
 libopt_la_DEPENDENCIES =
 am__libopt_la_SOURCES_DIST = include/TECIO.h include/TECXXX.h \
 	tecsrc/ALLOC.h tecsrc/ARRLIST.h tecsrc/AUXDATA.h \
@@ -189,7 +225,7 @@ am__libopt_la_SOURCES_DIST = include/TECIO.h include/TECXXX.h \
 	tecsrc/q_msg.cpp tecsrc/q_unicode.cpp tecsrc/set.cpp \
 	tecsrc/strlist.cpp tecsrc/strutil.cpp tecsrc/tassert.cpp \
 	tecsrc/tecxxx.cpp
-am__objects_3 = tecsrc/libopt_la-TranslatedString.lo \
+am__objects_4 = tecsrc/libopt_la-TranslatedString.lo \
 	tecsrc/libopt_la-alloc.lo tecsrc/libopt_la-arrlist.lo \
 	tecsrc/libopt_la-auxdata.lo tecsrc/libopt_la-dataio.lo \
 	tecsrc/libopt_la-dataio4.lo tecsrc/libopt_la-dataset.lo \
@@ -199,12 +235,46 @@ am__objects_3 = tecsrc/libopt_la-TranslatedString.lo \
 	tecsrc/libopt_la-set.lo tecsrc/libopt_la-strlist.lo \
 	tecsrc/libopt_la-strutil.lo tecsrc/libopt_la-tassert.lo \
 	tecsrc/libopt_la-tecxxx.lo
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_3)
+@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_4)
 libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
 libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libopt_la_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
+libprof_la_DEPENDENCIES =
+am__libprof_la_SOURCES_DIST = include/TECIO.h include/TECXXX.h \
+	tecsrc/ALLOC.h tecsrc/ARRLIST.h tecsrc/AUXDATA.h \
+	tecsrc/CHARTYPE.h tecsrc/DATAIO.h tecsrc/DATAIO4.h \
+	tecsrc/DATASET.h tecsrc/DATASET0.h tecsrc/DATASHR.h \
+	tecsrc/DATAUTIL.h tecsrc/FACE.h tecsrc/FILESTREAM.h \
+	tecsrc/GEOM.h tecsrc/GEOM2.h tecsrc/GLOBAL.h tecsrc/INPUT.h \
+	tecsrc/MASTER.h tecsrc/Q_MSG.h tecsrc/Q_UNICODE.h tecsrc/SET.h \
+	tecsrc/STRLIST.h tecsrc/STRUTIL.h tecsrc/SYSTEM.h \
+	tecsrc/TASSERT.h tecsrc/TECIO.h tecsrc/TECXXX.h tecsrc/TEXT.h \
+	tecsrc/TranslatedString.h tecsrc/VERSION.h tecsrc/W__BASE.h \
+	tecsrc/stdafx.h tecsrc/TranslatedString.cpp tecsrc/alloc.cpp \
+	tecsrc/arrlist.cpp tecsrc/auxdata.cpp tecsrc/dataio.cpp \
+	tecsrc/dataio4.cpp tecsrc/dataset.cpp tecsrc/dataset0.cpp \
+	tecsrc/datautil.cpp tecsrc/filestream.cpp tecsrc/geom2.cpp \
+	tecsrc/q_msg.cpp tecsrc/q_unicode.cpp tecsrc/set.cpp \
+	tecsrc/strlist.cpp tecsrc/strutil.cpp tecsrc/tassert.cpp \
+	tecsrc/tecxxx.cpp
+am__objects_5 = tecsrc/libprof_la-TranslatedString.lo \
+	tecsrc/libprof_la-alloc.lo tecsrc/libprof_la-arrlist.lo \
+	tecsrc/libprof_la-auxdata.lo tecsrc/libprof_la-dataio.lo \
+	tecsrc/libprof_la-dataio4.lo tecsrc/libprof_la-dataset.lo \
+	tecsrc/libprof_la-dataset0.lo tecsrc/libprof_la-datautil.lo \
+	tecsrc/libprof_la-filestream.lo tecsrc/libprof_la-geom2.lo \
+	tecsrc/libprof_la-q_msg.lo tecsrc/libprof_la-q_unicode.lo \
+	tecsrc/libprof_la-set.lo tecsrc/libprof_la-strlist.lo \
+	tecsrc/libprof_la-strutil.lo tecsrc/libprof_la-tassert.lo \
+	tecsrc/libprof_la-tecxxx.lo
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_5)
+libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
+libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libprof_la_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -258,9 +328,12 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libdbg_la_SOURCES) $(libdevel_la_SOURCES) \
-	$(libopt_la_SOURCES)
+	$(liboprof_la_SOURCES) $(libopt_la_SOURCES) \
+	$(libprof_la_SOURCES)
 DIST_SOURCES = $(am__libdbg_la_SOURCES_DIST) \
-	$(am__libdevel_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST)
+	$(am__libdevel_la_SOURCES_DIST) \
+	$(am__liboprof_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST) \
+	$(am__libprof_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -295,12 +368,16 @@ CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
 CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
+CFLAGS_OPROF = @CFLAGS_OPROF@
 CFLAGS_OPT = @CFLAGS_OPT@
+CFLAGS_PROF = @CFLAGS_PROF@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
 CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
+CPPFLAGS_OPROF = @CPPFLAGS_OPROF@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
+CPPFLAGS_PROF = @CPPFLAGS_PROF@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
 CPPUNIT_LIBS = @CPPUNIT_LIBS@
@@ -311,7 +388,9 @@ CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
 CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
+CXXFLAGS_PROF = @CXXFLAGS_PROF@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -596,7 +675,8 @@ AM_CXXFLAGS =
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3)
+noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_SOURCES = $(pkg_sources)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -612,6 +692,16 @@ noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CFLAGS = $(CFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_LIBADD = $(pkg_libs) # any defined package-specific libs
+@LIBMESH_PROF_MODE_TRUE@libprof_la_SOURCES = $(pkg_sources)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CXXFLAGS = $(CXXFLAGS_PROF)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CFLAGS = $(CFLAGS_PROF)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_SOURCES = $(pkg_sources)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CFLAGS = $(CFLAGS_OPROF)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
 all: all-am
 
 .SUFFIXES:
@@ -740,6 +830,44 @@ tecsrc/libdevel_la-tecxxx.lo: tecsrc/$(am__dirstamp) \
 	tecsrc/$(DEPDIR)/$(am__dirstamp)
 libdevel.la: $(libdevel_la_OBJECTS) $(libdevel_la_DEPENDENCIES) $(EXTRA_libdevel_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libdevel_la_LINK) $(am_libdevel_la_rpath) $(libdevel_la_OBJECTS) $(libdevel_la_LIBADD) $(LIBS)
+tecsrc/liboprof_la-TranslatedString.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-alloc.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-arrlist.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-auxdata.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-dataio.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-dataio4.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-dataset.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-dataset0.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-datautil.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-filestream.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-geom2.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-q_msg.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-q_unicode.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-set.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-strlist.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-strutil.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-tassert.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/liboprof_la-tecxxx.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+liboprof.la: $(liboprof_la_OBJECTS) $(liboprof_la_DEPENDENCIES) $(EXTRA_liboprof_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(liboprof_la_LINK) $(am_liboprof_la_rpath) $(liboprof_la_OBJECTS) $(liboprof_la_LIBADD) $(LIBS)
 tecsrc/libopt_la-TranslatedString.lo: tecsrc/$(am__dirstamp) \
 	tecsrc/$(DEPDIR)/$(am__dirstamp)
 tecsrc/libopt_la-alloc.lo: tecsrc/$(am__dirstamp) \
@@ -778,6 +906,44 @@ tecsrc/libopt_la-tecxxx.lo: tecsrc/$(am__dirstamp) \
 	tecsrc/$(DEPDIR)/$(am__dirstamp)
 libopt.la: $(libopt_la_OBJECTS) $(libopt_la_DEPENDENCIES) $(EXTRA_libopt_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libopt_la_LINK) $(am_libopt_la_rpath) $(libopt_la_OBJECTS) $(libopt_la_LIBADD) $(LIBS)
+tecsrc/libprof_la-TranslatedString.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-alloc.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-arrlist.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-auxdata.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-dataio.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-dataio4.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-dataset.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-dataset0.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-datautil.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-filestream.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-geom2.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-q_msg.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-q_unicode.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-set.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-strlist.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-strutil.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-tassert.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+tecsrc/libprof_la-tecxxx.lo: tecsrc/$(am__dirstamp) \
+	tecsrc/$(DEPDIR)/$(am__dirstamp)
+libprof.la: $(libprof_la_OBJECTS) $(libprof_la_DEPENDENCIES) $(EXTRA_libprof_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(libprof_la_LINK) $(am_libprof_la_rpath) $(libprof_la_OBJECTS) $(libprof_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -823,6 +989,24 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libdevel_la-strutil.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libdevel_la-tassert.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libdevel_la-tecxxx.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-TranslatedString.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-alloc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-arrlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-auxdata.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-dataio.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-dataio4.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-dataset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-dataset0.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-datautil.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-filestream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-geom2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-q_msg.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-q_unicode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-set.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-strlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-strutil.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-tassert.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/liboprof_la-tecxxx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libopt_la-TranslatedString.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libopt_la-alloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libopt_la-arrlist.Plo@am__quote@
@@ -841,6 +1025,24 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libopt_la-strutil.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libopt_la-tassert.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libopt_la-tecxxx.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-TranslatedString.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-alloc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-arrlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-auxdata.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-dataio.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-dataio4.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-dataset.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-dataset0.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-datautil.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-filestream.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-geom2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-q_msg.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-q_unicode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-set.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-strlist.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-strutil.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-tassert.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tecsrc/$(DEPDIR)/libprof_la-tecxxx.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1118,6 +1320,132 @@ tecsrc/libdevel_la-tecxxx.lo: tecsrc/tecxxx.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libdevel_la-tecxxx.lo `test -f 'tecsrc/tecxxx.cpp' || echo '$(srcdir)/'`tecsrc/tecxxx.cpp
 
+tecsrc/liboprof_la-TranslatedString.lo: tecsrc/TranslatedString.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-TranslatedString.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-TranslatedString.Tpo -c -o tecsrc/liboprof_la-TranslatedString.lo `test -f 'tecsrc/TranslatedString.cpp' || echo '$(srcdir)/'`tecsrc/TranslatedString.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-TranslatedString.Tpo tecsrc/$(DEPDIR)/liboprof_la-TranslatedString.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/TranslatedString.cpp' object='tecsrc/liboprof_la-TranslatedString.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-TranslatedString.lo `test -f 'tecsrc/TranslatedString.cpp' || echo '$(srcdir)/'`tecsrc/TranslatedString.cpp
+
+tecsrc/liboprof_la-alloc.lo: tecsrc/alloc.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-alloc.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-alloc.Tpo -c -o tecsrc/liboprof_la-alloc.lo `test -f 'tecsrc/alloc.cpp' || echo '$(srcdir)/'`tecsrc/alloc.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-alloc.Tpo tecsrc/$(DEPDIR)/liboprof_la-alloc.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/alloc.cpp' object='tecsrc/liboprof_la-alloc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-alloc.lo `test -f 'tecsrc/alloc.cpp' || echo '$(srcdir)/'`tecsrc/alloc.cpp
+
+tecsrc/liboprof_la-arrlist.lo: tecsrc/arrlist.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-arrlist.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-arrlist.Tpo -c -o tecsrc/liboprof_la-arrlist.lo `test -f 'tecsrc/arrlist.cpp' || echo '$(srcdir)/'`tecsrc/arrlist.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-arrlist.Tpo tecsrc/$(DEPDIR)/liboprof_la-arrlist.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/arrlist.cpp' object='tecsrc/liboprof_la-arrlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-arrlist.lo `test -f 'tecsrc/arrlist.cpp' || echo '$(srcdir)/'`tecsrc/arrlist.cpp
+
+tecsrc/liboprof_la-auxdata.lo: tecsrc/auxdata.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-auxdata.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-auxdata.Tpo -c -o tecsrc/liboprof_la-auxdata.lo `test -f 'tecsrc/auxdata.cpp' || echo '$(srcdir)/'`tecsrc/auxdata.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-auxdata.Tpo tecsrc/$(DEPDIR)/liboprof_la-auxdata.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/auxdata.cpp' object='tecsrc/liboprof_la-auxdata.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-auxdata.lo `test -f 'tecsrc/auxdata.cpp' || echo '$(srcdir)/'`tecsrc/auxdata.cpp
+
+tecsrc/liboprof_la-dataio.lo: tecsrc/dataio.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-dataio.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-dataio.Tpo -c -o tecsrc/liboprof_la-dataio.lo `test -f 'tecsrc/dataio.cpp' || echo '$(srcdir)/'`tecsrc/dataio.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-dataio.Tpo tecsrc/$(DEPDIR)/liboprof_la-dataio.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/dataio.cpp' object='tecsrc/liboprof_la-dataio.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-dataio.lo `test -f 'tecsrc/dataio.cpp' || echo '$(srcdir)/'`tecsrc/dataio.cpp
+
+tecsrc/liboprof_la-dataio4.lo: tecsrc/dataio4.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-dataio4.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-dataio4.Tpo -c -o tecsrc/liboprof_la-dataio4.lo `test -f 'tecsrc/dataio4.cpp' || echo '$(srcdir)/'`tecsrc/dataio4.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-dataio4.Tpo tecsrc/$(DEPDIR)/liboprof_la-dataio4.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/dataio4.cpp' object='tecsrc/liboprof_la-dataio4.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-dataio4.lo `test -f 'tecsrc/dataio4.cpp' || echo '$(srcdir)/'`tecsrc/dataio4.cpp
+
+tecsrc/liboprof_la-dataset.lo: tecsrc/dataset.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-dataset.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-dataset.Tpo -c -o tecsrc/liboprof_la-dataset.lo `test -f 'tecsrc/dataset.cpp' || echo '$(srcdir)/'`tecsrc/dataset.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-dataset.Tpo tecsrc/$(DEPDIR)/liboprof_la-dataset.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/dataset.cpp' object='tecsrc/liboprof_la-dataset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-dataset.lo `test -f 'tecsrc/dataset.cpp' || echo '$(srcdir)/'`tecsrc/dataset.cpp
+
+tecsrc/liboprof_la-dataset0.lo: tecsrc/dataset0.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-dataset0.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-dataset0.Tpo -c -o tecsrc/liboprof_la-dataset0.lo `test -f 'tecsrc/dataset0.cpp' || echo '$(srcdir)/'`tecsrc/dataset0.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-dataset0.Tpo tecsrc/$(DEPDIR)/liboprof_la-dataset0.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/dataset0.cpp' object='tecsrc/liboprof_la-dataset0.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-dataset0.lo `test -f 'tecsrc/dataset0.cpp' || echo '$(srcdir)/'`tecsrc/dataset0.cpp
+
+tecsrc/liboprof_la-datautil.lo: tecsrc/datautil.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-datautil.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-datautil.Tpo -c -o tecsrc/liboprof_la-datautil.lo `test -f 'tecsrc/datautil.cpp' || echo '$(srcdir)/'`tecsrc/datautil.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-datautil.Tpo tecsrc/$(DEPDIR)/liboprof_la-datautil.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/datautil.cpp' object='tecsrc/liboprof_la-datautil.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-datautil.lo `test -f 'tecsrc/datautil.cpp' || echo '$(srcdir)/'`tecsrc/datautil.cpp
+
+tecsrc/liboprof_la-filestream.lo: tecsrc/filestream.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-filestream.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-filestream.Tpo -c -o tecsrc/liboprof_la-filestream.lo `test -f 'tecsrc/filestream.cpp' || echo '$(srcdir)/'`tecsrc/filestream.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-filestream.Tpo tecsrc/$(DEPDIR)/liboprof_la-filestream.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/filestream.cpp' object='tecsrc/liboprof_la-filestream.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-filestream.lo `test -f 'tecsrc/filestream.cpp' || echo '$(srcdir)/'`tecsrc/filestream.cpp
+
+tecsrc/liboprof_la-geom2.lo: tecsrc/geom2.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-geom2.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-geom2.Tpo -c -o tecsrc/liboprof_la-geom2.lo `test -f 'tecsrc/geom2.cpp' || echo '$(srcdir)/'`tecsrc/geom2.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-geom2.Tpo tecsrc/$(DEPDIR)/liboprof_la-geom2.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/geom2.cpp' object='tecsrc/liboprof_la-geom2.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-geom2.lo `test -f 'tecsrc/geom2.cpp' || echo '$(srcdir)/'`tecsrc/geom2.cpp
+
+tecsrc/liboprof_la-q_msg.lo: tecsrc/q_msg.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-q_msg.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-q_msg.Tpo -c -o tecsrc/liboprof_la-q_msg.lo `test -f 'tecsrc/q_msg.cpp' || echo '$(srcdir)/'`tecsrc/q_msg.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-q_msg.Tpo tecsrc/$(DEPDIR)/liboprof_la-q_msg.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/q_msg.cpp' object='tecsrc/liboprof_la-q_msg.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-q_msg.lo `test -f 'tecsrc/q_msg.cpp' || echo '$(srcdir)/'`tecsrc/q_msg.cpp
+
+tecsrc/liboprof_la-q_unicode.lo: tecsrc/q_unicode.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-q_unicode.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-q_unicode.Tpo -c -o tecsrc/liboprof_la-q_unicode.lo `test -f 'tecsrc/q_unicode.cpp' || echo '$(srcdir)/'`tecsrc/q_unicode.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-q_unicode.Tpo tecsrc/$(DEPDIR)/liboprof_la-q_unicode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/q_unicode.cpp' object='tecsrc/liboprof_la-q_unicode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-q_unicode.lo `test -f 'tecsrc/q_unicode.cpp' || echo '$(srcdir)/'`tecsrc/q_unicode.cpp
+
+tecsrc/liboprof_la-set.lo: tecsrc/set.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-set.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-set.Tpo -c -o tecsrc/liboprof_la-set.lo `test -f 'tecsrc/set.cpp' || echo '$(srcdir)/'`tecsrc/set.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-set.Tpo tecsrc/$(DEPDIR)/liboprof_la-set.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/set.cpp' object='tecsrc/liboprof_la-set.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-set.lo `test -f 'tecsrc/set.cpp' || echo '$(srcdir)/'`tecsrc/set.cpp
+
+tecsrc/liboprof_la-strlist.lo: tecsrc/strlist.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-strlist.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-strlist.Tpo -c -o tecsrc/liboprof_la-strlist.lo `test -f 'tecsrc/strlist.cpp' || echo '$(srcdir)/'`tecsrc/strlist.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-strlist.Tpo tecsrc/$(DEPDIR)/liboprof_la-strlist.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/strlist.cpp' object='tecsrc/liboprof_la-strlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-strlist.lo `test -f 'tecsrc/strlist.cpp' || echo '$(srcdir)/'`tecsrc/strlist.cpp
+
+tecsrc/liboprof_la-strutil.lo: tecsrc/strutil.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-strutil.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-strutil.Tpo -c -o tecsrc/liboprof_la-strutil.lo `test -f 'tecsrc/strutil.cpp' || echo '$(srcdir)/'`tecsrc/strutil.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-strutil.Tpo tecsrc/$(DEPDIR)/liboprof_la-strutil.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/strutil.cpp' object='tecsrc/liboprof_la-strutil.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-strutil.lo `test -f 'tecsrc/strutil.cpp' || echo '$(srcdir)/'`tecsrc/strutil.cpp
+
+tecsrc/liboprof_la-tassert.lo: tecsrc/tassert.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-tassert.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-tassert.Tpo -c -o tecsrc/liboprof_la-tassert.lo `test -f 'tecsrc/tassert.cpp' || echo '$(srcdir)/'`tecsrc/tassert.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-tassert.Tpo tecsrc/$(DEPDIR)/liboprof_la-tassert.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/tassert.cpp' object='tecsrc/liboprof_la-tassert.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-tassert.lo `test -f 'tecsrc/tassert.cpp' || echo '$(srcdir)/'`tecsrc/tassert.cpp
+
+tecsrc/liboprof_la-tecxxx.lo: tecsrc/tecxxx.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/liboprof_la-tecxxx.lo -MD -MP -MF tecsrc/$(DEPDIR)/liboprof_la-tecxxx.Tpo -c -o tecsrc/liboprof_la-tecxxx.lo `test -f 'tecsrc/tecxxx.cpp' || echo '$(srcdir)/'`tecsrc/tecxxx.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/liboprof_la-tecxxx.Tpo tecsrc/$(DEPDIR)/liboprof_la-tecxxx.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/tecxxx.cpp' object='tecsrc/liboprof_la-tecxxx.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/liboprof_la-tecxxx.lo `test -f 'tecsrc/tecxxx.cpp' || echo '$(srcdir)/'`tecsrc/tecxxx.cpp
+
 tecsrc/libopt_la-TranslatedString.lo: tecsrc/TranslatedString.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libopt_la-TranslatedString.lo -MD -MP -MF tecsrc/$(DEPDIR)/libopt_la-TranslatedString.Tpo -c -o tecsrc/libopt_la-TranslatedString.lo `test -f 'tecsrc/TranslatedString.cpp' || echo '$(srcdir)/'`tecsrc/TranslatedString.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libopt_la-TranslatedString.Tpo tecsrc/$(DEPDIR)/libopt_la-TranslatedString.Plo
@@ -1243,6 +1571,132 @@ tecsrc/libopt_la-tecxxx.lo: tecsrc/tecxxx.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/tecxxx.cpp' object='tecsrc/libopt_la-tecxxx.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libopt_la-tecxxx.lo `test -f 'tecsrc/tecxxx.cpp' || echo '$(srcdir)/'`tecsrc/tecxxx.cpp
+
+tecsrc/libprof_la-TranslatedString.lo: tecsrc/TranslatedString.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-TranslatedString.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-TranslatedString.Tpo -c -o tecsrc/libprof_la-TranslatedString.lo `test -f 'tecsrc/TranslatedString.cpp' || echo '$(srcdir)/'`tecsrc/TranslatedString.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-TranslatedString.Tpo tecsrc/$(DEPDIR)/libprof_la-TranslatedString.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/TranslatedString.cpp' object='tecsrc/libprof_la-TranslatedString.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-TranslatedString.lo `test -f 'tecsrc/TranslatedString.cpp' || echo '$(srcdir)/'`tecsrc/TranslatedString.cpp
+
+tecsrc/libprof_la-alloc.lo: tecsrc/alloc.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-alloc.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-alloc.Tpo -c -o tecsrc/libprof_la-alloc.lo `test -f 'tecsrc/alloc.cpp' || echo '$(srcdir)/'`tecsrc/alloc.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-alloc.Tpo tecsrc/$(DEPDIR)/libprof_la-alloc.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/alloc.cpp' object='tecsrc/libprof_la-alloc.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-alloc.lo `test -f 'tecsrc/alloc.cpp' || echo '$(srcdir)/'`tecsrc/alloc.cpp
+
+tecsrc/libprof_la-arrlist.lo: tecsrc/arrlist.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-arrlist.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-arrlist.Tpo -c -o tecsrc/libprof_la-arrlist.lo `test -f 'tecsrc/arrlist.cpp' || echo '$(srcdir)/'`tecsrc/arrlist.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-arrlist.Tpo tecsrc/$(DEPDIR)/libprof_la-arrlist.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/arrlist.cpp' object='tecsrc/libprof_la-arrlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-arrlist.lo `test -f 'tecsrc/arrlist.cpp' || echo '$(srcdir)/'`tecsrc/arrlist.cpp
+
+tecsrc/libprof_la-auxdata.lo: tecsrc/auxdata.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-auxdata.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-auxdata.Tpo -c -o tecsrc/libprof_la-auxdata.lo `test -f 'tecsrc/auxdata.cpp' || echo '$(srcdir)/'`tecsrc/auxdata.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-auxdata.Tpo tecsrc/$(DEPDIR)/libprof_la-auxdata.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/auxdata.cpp' object='tecsrc/libprof_la-auxdata.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-auxdata.lo `test -f 'tecsrc/auxdata.cpp' || echo '$(srcdir)/'`tecsrc/auxdata.cpp
+
+tecsrc/libprof_la-dataio.lo: tecsrc/dataio.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-dataio.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-dataio.Tpo -c -o tecsrc/libprof_la-dataio.lo `test -f 'tecsrc/dataio.cpp' || echo '$(srcdir)/'`tecsrc/dataio.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-dataio.Tpo tecsrc/$(DEPDIR)/libprof_la-dataio.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/dataio.cpp' object='tecsrc/libprof_la-dataio.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-dataio.lo `test -f 'tecsrc/dataio.cpp' || echo '$(srcdir)/'`tecsrc/dataio.cpp
+
+tecsrc/libprof_la-dataio4.lo: tecsrc/dataio4.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-dataio4.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-dataio4.Tpo -c -o tecsrc/libprof_la-dataio4.lo `test -f 'tecsrc/dataio4.cpp' || echo '$(srcdir)/'`tecsrc/dataio4.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-dataio4.Tpo tecsrc/$(DEPDIR)/libprof_la-dataio4.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/dataio4.cpp' object='tecsrc/libprof_la-dataio4.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-dataio4.lo `test -f 'tecsrc/dataio4.cpp' || echo '$(srcdir)/'`tecsrc/dataio4.cpp
+
+tecsrc/libprof_la-dataset.lo: tecsrc/dataset.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-dataset.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-dataset.Tpo -c -o tecsrc/libprof_la-dataset.lo `test -f 'tecsrc/dataset.cpp' || echo '$(srcdir)/'`tecsrc/dataset.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-dataset.Tpo tecsrc/$(DEPDIR)/libprof_la-dataset.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/dataset.cpp' object='tecsrc/libprof_la-dataset.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-dataset.lo `test -f 'tecsrc/dataset.cpp' || echo '$(srcdir)/'`tecsrc/dataset.cpp
+
+tecsrc/libprof_la-dataset0.lo: tecsrc/dataset0.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-dataset0.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-dataset0.Tpo -c -o tecsrc/libprof_la-dataset0.lo `test -f 'tecsrc/dataset0.cpp' || echo '$(srcdir)/'`tecsrc/dataset0.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-dataset0.Tpo tecsrc/$(DEPDIR)/libprof_la-dataset0.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/dataset0.cpp' object='tecsrc/libprof_la-dataset0.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-dataset0.lo `test -f 'tecsrc/dataset0.cpp' || echo '$(srcdir)/'`tecsrc/dataset0.cpp
+
+tecsrc/libprof_la-datautil.lo: tecsrc/datautil.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-datautil.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-datautil.Tpo -c -o tecsrc/libprof_la-datautil.lo `test -f 'tecsrc/datautil.cpp' || echo '$(srcdir)/'`tecsrc/datautil.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-datautil.Tpo tecsrc/$(DEPDIR)/libprof_la-datautil.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/datautil.cpp' object='tecsrc/libprof_la-datautil.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-datautil.lo `test -f 'tecsrc/datautil.cpp' || echo '$(srcdir)/'`tecsrc/datautil.cpp
+
+tecsrc/libprof_la-filestream.lo: tecsrc/filestream.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-filestream.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-filestream.Tpo -c -o tecsrc/libprof_la-filestream.lo `test -f 'tecsrc/filestream.cpp' || echo '$(srcdir)/'`tecsrc/filestream.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-filestream.Tpo tecsrc/$(DEPDIR)/libprof_la-filestream.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/filestream.cpp' object='tecsrc/libprof_la-filestream.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-filestream.lo `test -f 'tecsrc/filestream.cpp' || echo '$(srcdir)/'`tecsrc/filestream.cpp
+
+tecsrc/libprof_la-geom2.lo: tecsrc/geom2.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-geom2.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-geom2.Tpo -c -o tecsrc/libprof_la-geom2.lo `test -f 'tecsrc/geom2.cpp' || echo '$(srcdir)/'`tecsrc/geom2.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-geom2.Tpo tecsrc/$(DEPDIR)/libprof_la-geom2.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/geom2.cpp' object='tecsrc/libprof_la-geom2.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-geom2.lo `test -f 'tecsrc/geom2.cpp' || echo '$(srcdir)/'`tecsrc/geom2.cpp
+
+tecsrc/libprof_la-q_msg.lo: tecsrc/q_msg.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-q_msg.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-q_msg.Tpo -c -o tecsrc/libprof_la-q_msg.lo `test -f 'tecsrc/q_msg.cpp' || echo '$(srcdir)/'`tecsrc/q_msg.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-q_msg.Tpo tecsrc/$(DEPDIR)/libprof_la-q_msg.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/q_msg.cpp' object='tecsrc/libprof_la-q_msg.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-q_msg.lo `test -f 'tecsrc/q_msg.cpp' || echo '$(srcdir)/'`tecsrc/q_msg.cpp
+
+tecsrc/libprof_la-q_unicode.lo: tecsrc/q_unicode.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-q_unicode.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-q_unicode.Tpo -c -o tecsrc/libprof_la-q_unicode.lo `test -f 'tecsrc/q_unicode.cpp' || echo '$(srcdir)/'`tecsrc/q_unicode.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-q_unicode.Tpo tecsrc/$(DEPDIR)/libprof_la-q_unicode.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/q_unicode.cpp' object='tecsrc/libprof_la-q_unicode.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-q_unicode.lo `test -f 'tecsrc/q_unicode.cpp' || echo '$(srcdir)/'`tecsrc/q_unicode.cpp
+
+tecsrc/libprof_la-set.lo: tecsrc/set.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-set.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-set.Tpo -c -o tecsrc/libprof_la-set.lo `test -f 'tecsrc/set.cpp' || echo '$(srcdir)/'`tecsrc/set.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-set.Tpo tecsrc/$(DEPDIR)/libprof_la-set.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/set.cpp' object='tecsrc/libprof_la-set.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-set.lo `test -f 'tecsrc/set.cpp' || echo '$(srcdir)/'`tecsrc/set.cpp
+
+tecsrc/libprof_la-strlist.lo: tecsrc/strlist.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-strlist.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-strlist.Tpo -c -o tecsrc/libprof_la-strlist.lo `test -f 'tecsrc/strlist.cpp' || echo '$(srcdir)/'`tecsrc/strlist.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-strlist.Tpo tecsrc/$(DEPDIR)/libprof_la-strlist.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/strlist.cpp' object='tecsrc/libprof_la-strlist.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-strlist.lo `test -f 'tecsrc/strlist.cpp' || echo '$(srcdir)/'`tecsrc/strlist.cpp
+
+tecsrc/libprof_la-strutil.lo: tecsrc/strutil.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-strutil.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-strutil.Tpo -c -o tecsrc/libprof_la-strutil.lo `test -f 'tecsrc/strutil.cpp' || echo '$(srcdir)/'`tecsrc/strutil.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-strutil.Tpo tecsrc/$(DEPDIR)/libprof_la-strutil.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/strutil.cpp' object='tecsrc/libprof_la-strutil.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-strutil.lo `test -f 'tecsrc/strutil.cpp' || echo '$(srcdir)/'`tecsrc/strutil.cpp
+
+tecsrc/libprof_la-tassert.lo: tecsrc/tassert.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-tassert.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-tassert.Tpo -c -o tecsrc/libprof_la-tassert.lo `test -f 'tecsrc/tassert.cpp' || echo '$(srcdir)/'`tecsrc/tassert.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-tassert.Tpo tecsrc/$(DEPDIR)/libprof_la-tassert.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/tassert.cpp' object='tecsrc/libprof_la-tassert.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-tassert.lo `test -f 'tecsrc/tassert.cpp' || echo '$(srcdir)/'`tecsrc/tassert.cpp
+
+tecsrc/libprof_la-tecxxx.lo: tecsrc/tecxxx.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT tecsrc/libprof_la-tecxxx.lo -MD -MP -MF tecsrc/$(DEPDIR)/libprof_la-tecxxx.Tpo -c -o tecsrc/libprof_la-tecxxx.lo `test -f 'tecsrc/tecxxx.cpp' || echo '$(srcdir)/'`tecsrc/tecxxx.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) tecsrc/$(DEPDIR)/libprof_la-tecxxx.Tpo tecsrc/$(DEPDIR)/libprof_la-tecxxx.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tecsrc/tecxxx.cpp' object='tecsrc/libprof_la-tecxxx.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o tecsrc/libprof_la-tecxxx.lo `test -f 'tecsrc/tecxxx.cpp' || echo '$(srcdir)/'`tecsrc/tecxxx.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -57,6 +57,8 @@ DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 @LIBMESH_OPT_MODE_TRUE@am__append_1 = libopt.la
 @LIBMESH_DBG_MODE_TRUE@am__append_2 = libdbg.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_3 = libdevel.la
+@LIBMESH_PROF_MODE_TRUE@am__append_4 = libprof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_5 = liboprof.la
 subdir = contrib/metis
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -225,6 +227,67 @@ libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libdevel_la_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
+liboprof_la_DEPENDENCIES =
+am__liboprof_la_SOURCES_DIST = include/metis.h GKlib/GKlib.h \
+	GKlib/gk_arch.h GKlib/gk_defs.h GKlib/gk_externs.h \
+	GKlib/gk_getopt.h GKlib/gk_macros.h GKlib/gk_mkblas.h \
+	GKlib/gk_mkmemory.h GKlib/gk_mkpqueue.h GKlib/gk_mkrandom.h \
+	GKlib/gk_mksort.h GKlib/gk_mkutils.h GKlib/gk_proto.h \
+	GKlib/gk_struct.h GKlib/gk_types.h GKlib/gkregex.h \
+	GKlib/ms_inttypes.h GKlib/ms_stat.h GKlib/ms_stdint.h \
+	GKlib/b64.c GKlib/blas.c GKlib/csr.c GKlib/error.c \
+	GKlib/evaluate.c GKlib/fkvkselect.c GKlib/fs.c GKlib/getopt.c \
+	GKlib/gkregex.c GKlib/htable.c GKlib/io.c GKlib/itemsets.c \
+	GKlib/mcore.c GKlib/memory.c GKlib/omp.c GKlib/pdb.c \
+	GKlib/pqueue.c GKlib/random.c GKlib/seq.c GKlib/sort.c \
+	GKlib/string.c GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
+	Lib/defs.h Lib/gklib_defs.h Lib/gklib_rename.h Lib/macros.h \
+	Lib/metislib.h Lib/proto.h Lib/rename.h Lib/stdheaders.h \
+	Lib/struct.h Lib/auxapi.c Lib/balance.c Lib/bucketsort.c \
+	Lib/checkgraph.c Lib/coarsen.c Lib/compress.c Lib/contig.c \
+	Lib/debug.c Lib/fm.c Lib/fortran.c Lib/frename.c Lib/gklib.c \
+	Lib/graph.c Lib/initpart.c Lib/kmetis.c Lib/kwayfm.c \
+	Lib/kwayrefine.c Lib/mcutil.c Lib/mesh.c Lib/meshpart.c \
+	Lib/minconn.c Lib/mincover.c Lib/mmd.c Lib/ometis.c \
+	Lib/options.c Lib/parmetis.c Lib/pmetis.c Lib/refine.c \
+	Lib/separator.c Lib/sfm.c Lib/srefine.c Lib/stat.c \
+	Lib/timing.c Lib/util.c Lib/wspace.c
+am__objects_3 = GKlib/liboprof_la-b64.lo GKlib/liboprof_la-blas.lo \
+	GKlib/liboprof_la-csr.lo GKlib/liboprof_la-error.lo \
+	GKlib/liboprof_la-evaluate.lo GKlib/liboprof_la-fkvkselect.lo \
+	GKlib/liboprof_la-fs.lo GKlib/liboprof_la-getopt.lo \
+	GKlib/liboprof_la-gkregex.lo GKlib/liboprof_la-htable.lo \
+	GKlib/liboprof_la-io.lo GKlib/liboprof_la-itemsets.lo \
+	GKlib/liboprof_la-mcore.lo GKlib/liboprof_la-memory.lo \
+	GKlib/liboprof_la-omp.lo GKlib/liboprof_la-pdb.lo \
+	GKlib/liboprof_la-pqueue.lo GKlib/liboprof_la-random.lo \
+	GKlib/liboprof_la-seq.lo GKlib/liboprof_la-sort.lo \
+	GKlib/liboprof_la-string.lo GKlib/liboprof_la-timers.lo \
+	GKlib/liboprof_la-tokenizer.lo GKlib/liboprof_la-util.lo \
+	Lib/liboprof_la-auxapi.lo Lib/liboprof_la-balance.lo \
+	Lib/liboprof_la-bucketsort.lo Lib/liboprof_la-checkgraph.lo \
+	Lib/liboprof_la-coarsen.lo Lib/liboprof_la-compress.lo \
+	Lib/liboprof_la-contig.lo Lib/liboprof_la-debug.lo \
+	Lib/liboprof_la-fm.lo Lib/liboprof_la-fortran.lo \
+	Lib/liboprof_la-frename.lo Lib/liboprof_la-gklib.lo \
+	Lib/liboprof_la-graph.lo Lib/liboprof_la-initpart.lo \
+	Lib/liboprof_la-kmetis.lo Lib/liboprof_la-kwayfm.lo \
+	Lib/liboprof_la-kwayrefine.lo Lib/liboprof_la-mcutil.lo \
+	Lib/liboprof_la-mesh.lo Lib/liboprof_la-meshpart.lo \
+	Lib/liboprof_la-minconn.lo Lib/liboprof_la-mincover.lo \
+	Lib/liboprof_la-mmd.lo Lib/liboprof_la-ometis.lo \
+	Lib/liboprof_la-options.lo Lib/liboprof_la-parmetis.lo \
+	Lib/liboprof_la-pmetis.lo Lib/liboprof_la-refine.lo \
+	Lib/liboprof_la-separator.lo Lib/liboprof_la-sfm.lo \
+	Lib/liboprof_la-srefine.lo Lib/liboprof_la-stat.lo \
+	Lib/liboprof_la-timing.lo Lib/liboprof_la-util.lo \
+	Lib/liboprof_la-wspace.lo
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_3)
+liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
+liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(liboprof_la_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
 libopt_la_DEPENDENCIES =
 am__libopt_la_SOURCES_DIST = include/metis.h GKlib/GKlib.h \
 	GKlib/gk_arch.h GKlib/gk_defs.h GKlib/gk_externs.h \
@@ -250,7 +313,7 @@ am__libopt_la_SOURCES_DIST = include/metis.h GKlib/GKlib.h \
 	Lib/options.c Lib/parmetis.c Lib/pmetis.c Lib/refine.c \
 	Lib/separator.c Lib/sfm.c Lib/srefine.c Lib/stat.c \
 	Lib/timing.c Lib/util.c Lib/wspace.c
-am__objects_3 = GKlib/libopt_la-b64.lo GKlib/libopt_la-blas.lo \
+am__objects_4 = GKlib/libopt_la-b64.lo GKlib/libopt_la-blas.lo \
 	GKlib/libopt_la-csr.lo GKlib/libopt_la-error.lo \
 	GKlib/libopt_la-evaluate.lo GKlib/libopt_la-fkvkselect.lo \
 	GKlib/libopt_la-fs.lo GKlib/libopt_la-getopt.lo \
@@ -280,12 +343,73 @@ am__objects_3 = GKlib/libopt_la-b64.lo GKlib/libopt_la-blas.lo \
 	Lib/libopt_la-srefine.lo Lib/libopt_la-stat.lo \
 	Lib/libopt_la-timing.lo Lib/libopt_la-util.lo \
 	Lib/libopt_la-wspace.lo
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_3)
+@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_4)
 libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
 libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libopt_la_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 @LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
+libprof_la_DEPENDENCIES =
+am__libprof_la_SOURCES_DIST = include/metis.h GKlib/GKlib.h \
+	GKlib/gk_arch.h GKlib/gk_defs.h GKlib/gk_externs.h \
+	GKlib/gk_getopt.h GKlib/gk_macros.h GKlib/gk_mkblas.h \
+	GKlib/gk_mkmemory.h GKlib/gk_mkpqueue.h GKlib/gk_mkrandom.h \
+	GKlib/gk_mksort.h GKlib/gk_mkutils.h GKlib/gk_proto.h \
+	GKlib/gk_struct.h GKlib/gk_types.h GKlib/gkregex.h \
+	GKlib/ms_inttypes.h GKlib/ms_stat.h GKlib/ms_stdint.h \
+	GKlib/b64.c GKlib/blas.c GKlib/csr.c GKlib/error.c \
+	GKlib/evaluate.c GKlib/fkvkselect.c GKlib/fs.c GKlib/getopt.c \
+	GKlib/gkregex.c GKlib/htable.c GKlib/io.c GKlib/itemsets.c \
+	GKlib/mcore.c GKlib/memory.c GKlib/omp.c GKlib/pdb.c \
+	GKlib/pqueue.c GKlib/random.c GKlib/seq.c GKlib/sort.c \
+	GKlib/string.c GKlib/timers.c GKlib/tokenizer.c GKlib/util.c \
+	Lib/defs.h Lib/gklib_defs.h Lib/gklib_rename.h Lib/macros.h \
+	Lib/metislib.h Lib/proto.h Lib/rename.h Lib/stdheaders.h \
+	Lib/struct.h Lib/auxapi.c Lib/balance.c Lib/bucketsort.c \
+	Lib/checkgraph.c Lib/coarsen.c Lib/compress.c Lib/contig.c \
+	Lib/debug.c Lib/fm.c Lib/fortran.c Lib/frename.c Lib/gklib.c \
+	Lib/graph.c Lib/initpart.c Lib/kmetis.c Lib/kwayfm.c \
+	Lib/kwayrefine.c Lib/mcutil.c Lib/mesh.c Lib/meshpart.c \
+	Lib/minconn.c Lib/mincover.c Lib/mmd.c Lib/ometis.c \
+	Lib/options.c Lib/parmetis.c Lib/pmetis.c Lib/refine.c \
+	Lib/separator.c Lib/sfm.c Lib/srefine.c Lib/stat.c \
+	Lib/timing.c Lib/util.c Lib/wspace.c
+am__objects_5 = GKlib/libprof_la-b64.lo GKlib/libprof_la-blas.lo \
+	GKlib/libprof_la-csr.lo GKlib/libprof_la-error.lo \
+	GKlib/libprof_la-evaluate.lo GKlib/libprof_la-fkvkselect.lo \
+	GKlib/libprof_la-fs.lo GKlib/libprof_la-getopt.lo \
+	GKlib/libprof_la-gkregex.lo GKlib/libprof_la-htable.lo \
+	GKlib/libprof_la-io.lo GKlib/libprof_la-itemsets.lo \
+	GKlib/libprof_la-mcore.lo GKlib/libprof_la-memory.lo \
+	GKlib/libprof_la-omp.lo GKlib/libprof_la-pdb.lo \
+	GKlib/libprof_la-pqueue.lo GKlib/libprof_la-random.lo \
+	GKlib/libprof_la-seq.lo GKlib/libprof_la-sort.lo \
+	GKlib/libprof_la-string.lo GKlib/libprof_la-timers.lo \
+	GKlib/libprof_la-tokenizer.lo GKlib/libprof_la-util.lo \
+	Lib/libprof_la-auxapi.lo Lib/libprof_la-balance.lo \
+	Lib/libprof_la-bucketsort.lo Lib/libprof_la-checkgraph.lo \
+	Lib/libprof_la-coarsen.lo Lib/libprof_la-compress.lo \
+	Lib/libprof_la-contig.lo Lib/libprof_la-debug.lo \
+	Lib/libprof_la-fm.lo Lib/libprof_la-fortran.lo \
+	Lib/libprof_la-frename.lo Lib/libprof_la-gklib.lo \
+	Lib/libprof_la-graph.lo Lib/libprof_la-initpart.lo \
+	Lib/libprof_la-kmetis.lo Lib/libprof_la-kwayfm.lo \
+	Lib/libprof_la-kwayrefine.lo Lib/libprof_la-mcutil.lo \
+	Lib/libprof_la-mesh.lo Lib/libprof_la-meshpart.lo \
+	Lib/libprof_la-minconn.lo Lib/libprof_la-mincover.lo \
+	Lib/libprof_la-mmd.lo Lib/libprof_la-ometis.lo \
+	Lib/libprof_la-options.lo Lib/libprof_la-parmetis.lo \
+	Lib/libprof_la-pmetis.lo Lib/libprof_la-refine.lo \
+	Lib/libprof_la-separator.lo Lib/libprof_la-sfm.lo \
+	Lib/libprof_la-srefine.lo Lib/libprof_la-stat.lo \
+	Lib/libprof_la-timing.lo Lib/libprof_la-util.lo \
+	Lib/libprof_la-wspace.lo
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_5)
+libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
+libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libprof_la_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+@LIBMESH_PROF_MODE_TRUE@am_libprof_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -321,9 +445,12 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libdbg_la_SOURCES) $(libdevel_la_SOURCES) \
-	$(libopt_la_SOURCES)
+	$(liboprof_la_SOURCES) $(libopt_la_SOURCES) \
+	$(libprof_la_SOURCES)
 DIST_SOURCES = $(am__libdbg_la_SOURCES_DIST) \
-	$(am__libdevel_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST)
+	$(am__libdevel_la_SOURCES_DIST) \
+	$(am__liboprof_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST) \
+	$(am__libprof_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -358,12 +485,16 @@ CFLAGS = @CFLAGS@
 CFLAGS_DBG = @CFLAGS_DBG@
 CFLAGS_DEVEL = @CFLAGS_DEVEL@
 CFLAGS_DVL = @CFLAGS_DVL@
+CFLAGS_OPROF = @CFLAGS_OPROF@
 CFLAGS_OPT = @CFLAGS_OPT@
+CFLAGS_PROF = @CFLAGS_PROF@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CPPFLAGS_DBG = @CPPFLAGS_DBG@
 CPPFLAGS_DEVEL = @CPPFLAGS_DEVEL@
+CPPFLAGS_OPROF = @CPPFLAGS_OPROF@
 CPPFLAGS_OPT = @CPPFLAGS_OPT@
+CPPFLAGS_PROF = @CPPFLAGS_PROF@
 CPPUNIT_CFLAGS = @CPPUNIT_CFLAGS@
 CPPUNIT_CONFIG = @CPPUNIT_CONFIG@
 CPPUNIT_LIBS = @CPPUNIT_LIBS@
@@ -374,7 +505,9 @@ CXXFLAGS = @CXXFLAGS@
 CXXFLAGS_DBG = @CXXFLAGS_DBG@
 CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@
 CXXFLAGS_OPT = @CXXFLAGS_OPT@
+CXXFLAGS_PROF = @CXXFLAGS_PROF@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -698,7 +831,8 @@ AM_CXXFLAGS =
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3)
+noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_SOURCES = $(pkg_sources)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -714,6 +848,16 @@ noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CFLAGS = $(CFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_LIBADD = $(pkg_libs) # any defined package-specific libs
+@LIBMESH_PROF_MODE_TRUE@libprof_la_SOURCES = $(pkg_sources)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CXXFLAGS = $(CXXFLAGS_PROF)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_CFLAGS = $(CFLAGS_PROF)
+@LIBMESH_PROF_MODE_TRUE@libprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_SOURCES = $(pkg_sources)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CFLAGS = $(CFLAGS_OPROF)
+@LIBMESH_OPROF_MODE_TRUE@liboprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
 all: all-am
 
 .SUFFIXES:
@@ -1011,6 +1155,126 @@ Lib/libdevel_la-wspace.lo: Lib/$(am__dirstamp) \
 	Lib/$(DEPDIR)/$(am__dirstamp)
 libdevel.la: $(libdevel_la_OBJECTS) $(libdevel_la_DEPENDENCIES) $(EXTRA_libdevel_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libdevel_la_LINK) $(am_libdevel_la_rpath) $(libdevel_la_OBJECTS) $(libdevel_la_LIBADD) $(LIBS)
+GKlib/liboprof_la-b64.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-blas.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-csr.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-error.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-evaluate.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-fkvkselect.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-fs.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-getopt.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-gkregex.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-htable.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-io.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-itemsets.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-mcore.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-memory.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-omp.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-pdb.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-pqueue.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-random.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-seq.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-sort.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-string.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-timers.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-tokenizer.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/liboprof_la-util.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-auxapi.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-balance.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-bucketsort.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-checkgraph.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-coarsen.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-compress.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-contig.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-debug.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-fm.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-fortran.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-frename.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-gklib.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-graph.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-initpart.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-kmetis.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-kwayfm.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-kwayrefine.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-mcutil.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-mesh.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-meshpart.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-minconn.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-mincover.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-mmd.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-ometis.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-options.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-parmetis.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-pmetis.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-refine.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-separator.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-sfm.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-srefine.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-stat.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-timing.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-util.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/liboprof_la-wspace.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+liboprof.la: $(liboprof_la_OBJECTS) $(liboprof_la_DEPENDENCIES) $(EXTRA_liboprof_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(liboprof_la_LINK) $(am_liboprof_la_rpath) $(liboprof_la_OBJECTS) $(liboprof_la_LIBADD) $(LIBS)
 GKlib/libopt_la-b64.lo: GKlib/$(am__dirstamp) \
 	GKlib/$(DEPDIR)/$(am__dirstamp)
 GKlib/libopt_la-blas.lo: GKlib/$(am__dirstamp) \
@@ -1130,6 +1394,126 @@ Lib/libopt_la-wspace.lo: Lib/$(am__dirstamp) \
 	Lib/$(DEPDIR)/$(am__dirstamp)
 libopt.la: $(libopt_la_OBJECTS) $(libopt_la_DEPENDENCIES) $(EXTRA_libopt_la_DEPENDENCIES) 
 	$(AM_V_CCLD)$(libopt_la_LINK) $(am_libopt_la_rpath) $(libopt_la_OBJECTS) $(libopt_la_LIBADD) $(LIBS)
+GKlib/libprof_la-b64.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-blas.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-csr.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-error.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-evaluate.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-fkvkselect.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-fs.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-getopt.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-gkregex.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-htable.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-io.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-itemsets.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-mcore.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-memory.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-omp.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-pdb.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-pqueue.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-random.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-seq.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-sort.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-string.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-timers.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-tokenizer.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+GKlib/libprof_la-util.lo: GKlib/$(am__dirstamp) \
+	GKlib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-auxapi.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-balance.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-bucketsort.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-checkgraph.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-coarsen.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-compress.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-contig.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-debug.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-fm.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-fortran.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-frename.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-gklib.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-graph.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-initpart.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-kmetis.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-kwayfm.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-kwayrefine.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-mcutil.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-mesh.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-meshpart.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-minconn.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-mincover.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-mmd.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-ometis.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-options.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-parmetis.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-pmetis.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-refine.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-separator.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-sfm.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-srefine.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-stat.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-timing.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-util.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+Lib/libprof_la-wspace.lo: Lib/$(am__dirstamp) \
+	Lib/$(DEPDIR)/$(am__dirstamp)
+libprof.la: $(libprof_la_OBJECTS) $(libprof_la_DEPENDENCIES) $(EXTRA_libprof_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libprof_la_LINK) $(am_libprof_la_rpath) $(libprof_la_OBJECTS) $(libprof_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -1189,6 +1573,30 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-timers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-tokenizer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libdevel_la-util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-b64.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-blas.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-csr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-fkvkselect.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-fs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-getopt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-gkregex.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-htable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-io.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-itemsets.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-mcore.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-memory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-omp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-pdb.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-pqueue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-random.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-seq.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-sort.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-timers.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-tokenizer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/liboprof_la-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-b64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-blas.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-csr.Plo@am__quote@
@@ -1213,6 +1621,30 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-timers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-tokenizer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libopt_la-util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-b64.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-blas.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-csr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-evaluate.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-fkvkselect.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-fs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-getopt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-gkregex.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-htable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-io.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-itemsets.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-mcore.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-memory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-omp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-pdb.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-pqueue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-random.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-seq.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-sort.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-timers.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-tokenizer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@GKlib/$(DEPDIR)/libprof_la-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libdbg_la-auxapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libdbg_la-balance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libdbg_la-bucketsort.Plo@am__quote@
@@ -1283,6 +1715,41 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libdevel_la-timing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libdevel_la-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libdevel_la-wspace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-auxapi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-balance.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-bucketsort.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-checkgraph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-coarsen.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-compress.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-contig.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-debug.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-fm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-fortran.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-frename.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-gklib.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-graph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-initpart.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-kmetis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-kwayfm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-kwayrefine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-mcutil.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-mesh.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-meshpart.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-minconn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-mincover.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-mmd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-ometis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-options.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-parmetis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-pmetis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-refine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-separator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-sfm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-srefine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-stat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-timing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/liboprof_la-wspace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libopt_la-auxapi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libopt_la-balance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libopt_la-bucketsort.Plo@am__quote@
@@ -1318,6 +1785,41 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libopt_la-timing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libopt_la-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libopt_la-wspace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-auxapi.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-balance.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-bucketsort.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-checkgraph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-coarsen.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-compress.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-contig.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-debug.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-fm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-fortran.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-frename.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-gklib.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-graph.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-initpart.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-kmetis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-kwayfm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-kwayrefine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-mcutil.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-mesh.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-meshpart.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-minconn.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-mincover.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-mmd.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-ometis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-options.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-parmetis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-pmetis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-refine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-separator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-sfm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-srefine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-stat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-timing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Lib/$(DEPDIR)/libprof_la-wspace.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -2169,6 +2671,419 @@ Lib/libdevel_la-wspace.lo: Lib/wspace.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CFLAGS) $(CFLAGS) -c -o Lib/libdevel_la-wspace.lo `test -f 'Lib/wspace.c' || echo '$(srcdir)/'`Lib/wspace.c
 
+GKlib/liboprof_la-b64.lo: GKlib/b64.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-b64.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-b64.Tpo -c -o GKlib/liboprof_la-b64.lo `test -f 'GKlib/b64.c' || echo '$(srcdir)/'`GKlib/b64.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-b64.Tpo GKlib/$(DEPDIR)/liboprof_la-b64.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/b64.c' object='GKlib/liboprof_la-b64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-b64.lo `test -f 'GKlib/b64.c' || echo '$(srcdir)/'`GKlib/b64.c
+
+GKlib/liboprof_la-blas.lo: GKlib/blas.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-blas.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-blas.Tpo -c -o GKlib/liboprof_la-blas.lo `test -f 'GKlib/blas.c' || echo '$(srcdir)/'`GKlib/blas.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-blas.Tpo GKlib/$(DEPDIR)/liboprof_la-blas.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/blas.c' object='GKlib/liboprof_la-blas.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-blas.lo `test -f 'GKlib/blas.c' || echo '$(srcdir)/'`GKlib/blas.c
+
+GKlib/liboprof_la-csr.lo: GKlib/csr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-csr.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-csr.Tpo -c -o GKlib/liboprof_la-csr.lo `test -f 'GKlib/csr.c' || echo '$(srcdir)/'`GKlib/csr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-csr.Tpo GKlib/$(DEPDIR)/liboprof_la-csr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/csr.c' object='GKlib/liboprof_la-csr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-csr.lo `test -f 'GKlib/csr.c' || echo '$(srcdir)/'`GKlib/csr.c
+
+GKlib/liboprof_la-error.lo: GKlib/error.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-error.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-error.Tpo -c -o GKlib/liboprof_la-error.lo `test -f 'GKlib/error.c' || echo '$(srcdir)/'`GKlib/error.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-error.Tpo GKlib/$(DEPDIR)/liboprof_la-error.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/error.c' object='GKlib/liboprof_la-error.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-error.lo `test -f 'GKlib/error.c' || echo '$(srcdir)/'`GKlib/error.c
+
+GKlib/liboprof_la-evaluate.lo: GKlib/evaluate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-evaluate.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-evaluate.Tpo -c -o GKlib/liboprof_la-evaluate.lo `test -f 'GKlib/evaluate.c' || echo '$(srcdir)/'`GKlib/evaluate.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-evaluate.Tpo GKlib/$(DEPDIR)/liboprof_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/evaluate.c' object='GKlib/liboprof_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-evaluate.lo `test -f 'GKlib/evaluate.c' || echo '$(srcdir)/'`GKlib/evaluate.c
+
+GKlib/liboprof_la-fkvkselect.lo: GKlib/fkvkselect.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-fkvkselect.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-fkvkselect.Tpo -c -o GKlib/liboprof_la-fkvkselect.lo `test -f 'GKlib/fkvkselect.c' || echo '$(srcdir)/'`GKlib/fkvkselect.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-fkvkselect.Tpo GKlib/$(DEPDIR)/liboprof_la-fkvkselect.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/fkvkselect.c' object='GKlib/liboprof_la-fkvkselect.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-fkvkselect.lo `test -f 'GKlib/fkvkselect.c' || echo '$(srcdir)/'`GKlib/fkvkselect.c
+
+GKlib/liboprof_la-fs.lo: GKlib/fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-fs.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-fs.Tpo -c -o GKlib/liboprof_la-fs.lo `test -f 'GKlib/fs.c' || echo '$(srcdir)/'`GKlib/fs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-fs.Tpo GKlib/$(DEPDIR)/liboprof_la-fs.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/fs.c' object='GKlib/liboprof_la-fs.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-fs.lo `test -f 'GKlib/fs.c' || echo '$(srcdir)/'`GKlib/fs.c
+
+GKlib/liboprof_la-getopt.lo: GKlib/getopt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-getopt.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-getopt.Tpo -c -o GKlib/liboprof_la-getopt.lo `test -f 'GKlib/getopt.c' || echo '$(srcdir)/'`GKlib/getopt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-getopt.Tpo GKlib/$(DEPDIR)/liboprof_la-getopt.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/getopt.c' object='GKlib/liboprof_la-getopt.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-getopt.lo `test -f 'GKlib/getopt.c' || echo '$(srcdir)/'`GKlib/getopt.c
+
+GKlib/liboprof_la-gkregex.lo: GKlib/gkregex.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-gkregex.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-gkregex.Tpo -c -o GKlib/liboprof_la-gkregex.lo `test -f 'GKlib/gkregex.c' || echo '$(srcdir)/'`GKlib/gkregex.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-gkregex.Tpo GKlib/$(DEPDIR)/liboprof_la-gkregex.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/gkregex.c' object='GKlib/liboprof_la-gkregex.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-gkregex.lo `test -f 'GKlib/gkregex.c' || echo '$(srcdir)/'`GKlib/gkregex.c
+
+GKlib/liboprof_la-htable.lo: GKlib/htable.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-htable.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-htable.Tpo -c -o GKlib/liboprof_la-htable.lo `test -f 'GKlib/htable.c' || echo '$(srcdir)/'`GKlib/htable.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-htable.Tpo GKlib/$(DEPDIR)/liboprof_la-htable.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/htable.c' object='GKlib/liboprof_la-htable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-htable.lo `test -f 'GKlib/htable.c' || echo '$(srcdir)/'`GKlib/htable.c
+
+GKlib/liboprof_la-io.lo: GKlib/io.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-io.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-io.Tpo -c -o GKlib/liboprof_la-io.lo `test -f 'GKlib/io.c' || echo '$(srcdir)/'`GKlib/io.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-io.Tpo GKlib/$(DEPDIR)/liboprof_la-io.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/io.c' object='GKlib/liboprof_la-io.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-io.lo `test -f 'GKlib/io.c' || echo '$(srcdir)/'`GKlib/io.c
+
+GKlib/liboprof_la-itemsets.lo: GKlib/itemsets.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-itemsets.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-itemsets.Tpo -c -o GKlib/liboprof_la-itemsets.lo `test -f 'GKlib/itemsets.c' || echo '$(srcdir)/'`GKlib/itemsets.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-itemsets.Tpo GKlib/$(DEPDIR)/liboprof_la-itemsets.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/itemsets.c' object='GKlib/liboprof_la-itemsets.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-itemsets.lo `test -f 'GKlib/itemsets.c' || echo '$(srcdir)/'`GKlib/itemsets.c
+
+GKlib/liboprof_la-mcore.lo: GKlib/mcore.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-mcore.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-mcore.Tpo -c -o GKlib/liboprof_la-mcore.lo `test -f 'GKlib/mcore.c' || echo '$(srcdir)/'`GKlib/mcore.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-mcore.Tpo GKlib/$(DEPDIR)/liboprof_la-mcore.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/mcore.c' object='GKlib/liboprof_la-mcore.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-mcore.lo `test -f 'GKlib/mcore.c' || echo '$(srcdir)/'`GKlib/mcore.c
+
+GKlib/liboprof_la-memory.lo: GKlib/memory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-memory.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-memory.Tpo -c -o GKlib/liboprof_la-memory.lo `test -f 'GKlib/memory.c' || echo '$(srcdir)/'`GKlib/memory.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-memory.Tpo GKlib/$(DEPDIR)/liboprof_la-memory.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/memory.c' object='GKlib/liboprof_la-memory.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-memory.lo `test -f 'GKlib/memory.c' || echo '$(srcdir)/'`GKlib/memory.c
+
+GKlib/liboprof_la-omp.lo: GKlib/omp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-omp.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-omp.Tpo -c -o GKlib/liboprof_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-omp.Tpo GKlib/$(DEPDIR)/liboprof_la-omp.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/omp.c' object='GKlib/liboprof_la-omp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
+
+GKlib/liboprof_la-pdb.lo: GKlib/pdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-pdb.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-pdb.Tpo -c -o GKlib/liboprof_la-pdb.lo `test -f 'GKlib/pdb.c' || echo '$(srcdir)/'`GKlib/pdb.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-pdb.Tpo GKlib/$(DEPDIR)/liboprof_la-pdb.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/pdb.c' object='GKlib/liboprof_la-pdb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-pdb.lo `test -f 'GKlib/pdb.c' || echo '$(srcdir)/'`GKlib/pdb.c
+
+GKlib/liboprof_la-pqueue.lo: GKlib/pqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-pqueue.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-pqueue.Tpo -c -o GKlib/liboprof_la-pqueue.lo `test -f 'GKlib/pqueue.c' || echo '$(srcdir)/'`GKlib/pqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-pqueue.Tpo GKlib/$(DEPDIR)/liboprof_la-pqueue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/pqueue.c' object='GKlib/liboprof_la-pqueue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-pqueue.lo `test -f 'GKlib/pqueue.c' || echo '$(srcdir)/'`GKlib/pqueue.c
+
+GKlib/liboprof_la-random.lo: GKlib/random.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-random.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-random.Tpo -c -o GKlib/liboprof_la-random.lo `test -f 'GKlib/random.c' || echo '$(srcdir)/'`GKlib/random.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-random.Tpo GKlib/$(DEPDIR)/liboprof_la-random.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/random.c' object='GKlib/liboprof_la-random.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-random.lo `test -f 'GKlib/random.c' || echo '$(srcdir)/'`GKlib/random.c
+
+GKlib/liboprof_la-seq.lo: GKlib/seq.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-seq.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-seq.Tpo -c -o GKlib/liboprof_la-seq.lo `test -f 'GKlib/seq.c' || echo '$(srcdir)/'`GKlib/seq.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-seq.Tpo GKlib/$(DEPDIR)/liboprof_la-seq.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/seq.c' object='GKlib/liboprof_la-seq.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-seq.lo `test -f 'GKlib/seq.c' || echo '$(srcdir)/'`GKlib/seq.c
+
+GKlib/liboprof_la-sort.lo: GKlib/sort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-sort.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-sort.Tpo -c -o GKlib/liboprof_la-sort.lo `test -f 'GKlib/sort.c' || echo '$(srcdir)/'`GKlib/sort.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-sort.Tpo GKlib/$(DEPDIR)/liboprof_la-sort.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/sort.c' object='GKlib/liboprof_la-sort.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-sort.lo `test -f 'GKlib/sort.c' || echo '$(srcdir)/'`GKlib/sort.c
+
+GKlib/liboprof_la-string.lo: GKlib/string.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-string.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-string.Tpo -c -o GKlib/liboprof_la-string.lo `test -f 'GKlib/string.c' || echo '$(srcdir)/'`GKlib/string.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-string.Tpo GKlib/$(DEPDIR)/liboprof_la-string.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/string.c' object='GKlib/liboprof_la-string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-string.lo `test -f 'GKlib/string.c' || echo '$(srcdir)/'`GKlib/string.c
+
+GKlib/liboprof_la-timers.lo: GKlib/timers.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-timers.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-timers.Tpo -c -o GKlib/liboprof_la-timers.lo `test -f 'GKlib/timers.c' || echo '$(srcdir)/'`GKlib/timers.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-timers.Tpo GKlib/$(DEPDIR)/liboprof_la-timers.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/timers.c' object='GKlib/liboprof_la-timers.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-timers.lo `test -f 'GKlib/timers.c' || echo '$(srcdir)/'`GKlib/timers.c
+
+GKlib/liboprof_la-tokenizer.lo: GKlib/tokenizer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-tokenizer.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-tokenizer.Tpo -c -o GKlib/liboprof_la-tokenizer.lo `test -f 'GKlib/tokenizer.c' || echo '$(srcdir)/'`GKlib/tokenizer.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-tokenizer.Tpo GKlib/$(DEPDIR)/liboprof_la-tokenizer.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/tokenizer.c' object='GKlib/liboprof_la-tokenizer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-tokenizer.lo `test -f 'GKlib/tokenizer.c' || echo '$(srcdir)/'`GKlib/tokenizer.c
+
+GKlib/liboprof_la-util.lo: GKlib/util.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT GKlib/liboprof_la-util.lo -MD -MP -MF GKlib/$(DEPDIR)/liboprof_la-util.Tpo -c -o GKlib/liboprof_la-util.lo `test -f 'GKlib/util.c' || echo '$(srcdir)/'`GKlib/util.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/liboprof_la-util.Tpo GKlib/$(DEPDIR)/liboprof_la-util.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/util.c' object='GKlib/liboprof_la-util.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/liboprof_la-util.lo `test -f 'GKlib/util.c' || echo '$(srcdir)/'`GKlib/util.c
+
+Lib/liboprof_la-auxapi.lo: Lib/auxapi.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-auxapi.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-auxapi.Tpo -c -o Lib/liboprof_la-auxapi.lo `test -f 'Lib/auxapi.c' || echo '$(srcdir)/'`Lib/auxapi.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-auxapi.Tpo Lib/$(DEPDIR)/liboprof_la-auxapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/auxapi.c' object='Lib/liboprof_la-auxapi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-auxapi.lo `test -f 'Lib/auxapi.c' || echo '$(srcdir)/'`Lib/auxapi.c
+
+Lib/liboprof_la-balance.lo: Lib/balance.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-balance.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-balance.Tpo -c -o Lib/liboprof_la-balance.lo `test -f 'Lib/balance.c' || echo '$(srcdir)/'`Lib/balance.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-balance.Tpo Lib/$(DEPDIR)/liboprof_la-balance.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/balance.c' object='Lib/liboprof_la-balance.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-balance.lo `test -f 'Lib/balance.c' || echo '$(srcdir)/'`Lib/balance.c
+
+Lib/liboprof_la-bucketsort.lo: Lib/bucketsort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-bucketsort.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-bucketsort.Tpo -c -o Lib/liboprof_la-bucketsort.lo `test -f 'Lib/bucketsort.c' || echo '$(srcdir)/'`Lib/bucketsort.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-bucketsort.Tpo Lib/$(DEPDIR)/liboprof_la-bucketsort.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/bucketsort.c' object='Lib/liboprof_la-bucketsort.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-bucketsort.lo `test -f 'Lib/bucketsort.c' || echo '$(srcdir)/'`Lib/bucketsort.c
+
+Lib/liboprof_la-checkgraph.lo: Lib/checkgraph.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-checkgraph.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-checkgraph.Tpo -c -o Lib/liboprof_la-checkgraph.lo `test -f 'Lib/checkgraph.c' || echo '$(srcdir)/'`Lib/checkgraph.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-checkgraph.Tpo Lib/$(DEPDIR)/liboprof_la-checkgraph.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/checkgraph.c' object='Lib/liboprof_la-checkgraph.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-checkgraph.lo `test -f 'Lib/checkgraph.c' || echo '$(srcdir)/'`Lib/checkgraph.c
+
+Lib/liboprof_la-coarsen.lo: Lib/coarsen.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-coarsen.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-coarsen.Tpo -c -o Lib/liboprof_la-coarsen.lo `test -f 'Lib/coarsen.c' || echo '$(srcdir)/'`Lib/coarsen.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-coarsen.Tpo Lib/$(DEPDIR)/liboprof_la-coarsen.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/coarsen.c' object='Lib/liboprof_la-coarsen.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-coarsen.lo `test -f 'Lib/coarsen.c' || echo '$(srcdir)/'`Lib/coarsen.c
+
+Lib/liboprof_la-compress.lo: Lib/compress.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-compress.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-compress.Tpo -c -o Lib/liboprof_la-compress.lo `test -f 'Lib/compress.c' || echo '$(srcdir)/'`Lib/compress.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-compress.Tpo Lib/$(DEPDIR)/liboprof_la-compress.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/compress.c' object='Lib/liboprof_la-compress.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-compress.lo `test -f 'Lib/compress.c' || echo '$(srcdir)/'`Lib/compress.c
+
+Lib/liboprof_la-contig.lo: Lib/contig.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-contig.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-contig.Tpo -c -o Lib/liboprof_la-contig.lo `test -f 'Lib/contig.c' || echo '$(srcdir)/'`Lib/contig.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-contig.Tpo Lib/$(DEPDIR)/liboprof_la-contig.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/contig.c' object='Lib/liboprof_la-contig.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-contig.lo `test -f 'Lib/contig.c' || echo '$(srcdir)/'`Lib/contig.c
+
+Lib/liboprof_la-debug.lo: Lib/debug.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-debug.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-debug.Tpo -c -o Lib/liboprof_la-debug.lo `test -f 'Lib/debug.c' || echo '$(srcdir)/'`Lib/debug.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-debug.Tpo Lib/$(DEPDIR)/liboprof_la-debug.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/debug.c' object='Lib/liboprof_la-debug.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-debug.lo `test -f 'Lib/debug.c' || echo '$(srcdir)/'`Lib/debug.c
+
+Lib/liboprof_la-fm.lo: Lib/fm.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-fm.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-fm.Tpo -c -o Lib/liboprof_la-fm.lo `test -f 'Lib/fm.c' || echo '$(srcdir)/'`Lib/fm.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-fm.Tpo Lib/$(DEPDIR)/liboprof_la-fm.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/fm.c' object='Lib/liboprof_la-fm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-fm.lo `test -f 'Lib/fm.c' || echo '$(srcdir)/'`Lib/fm.c
+
+Lib/liboprof_la-fortran.lo: Lib/fortran.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-fortran.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-fortran.Tpo -c -o Lib/liboprof_la-fortran.lo `test -f 'Lib/fortran.c' || echo '$(srcdir)/'`Lib/fortran.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-fortran.Tpo Lib/$(DEPDIR)/liboprof_la-fortran.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/fortran.c' object='Lib/liboprof_la-fortran.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-fortran.lo `test -f 'Lib/fortran.c' || echo '$(srcdir)/'`Lib/fortran.c
+
+Lib/liboprof_la-frename.lo: Lib/frename.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-frename.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-frename.Tpo -c -o Lib/liboprof_la-frename.lo `test -f 'Lib/frename.c' || echo '$(srcdir)/'`Lib/frename.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-frename.Tpo Lib/$(DEPDIR)/liboprof_la-frename.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/frename.c' object='Lib/liboprof_la-frename.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-frename.lo `test -f 'Lib/frename.c' || echo '$(srcdir)/'`Lib/frename.c
+
+Lib/liboprof_la-gklib.lo: Lib/gklib.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-gklib.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-gklib.Tpo -c -o Lib/liboprof_la-gklib.lo `test -f 'Lib/gklib.c' || echo '$(srcdir)/'`Lib/gklib.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-gklib.Tpo Lib/$(DEPDIR)/liboprof_la-gklib.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/gklib.c' object='Lib/liboprof_la-gklib.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-gklib.lo `test -f 'Lib/gklib.c' || echo '$(srcdir)/'`Lib/gklib.c
+
+Lib/liboprof_la-graph.lo: Lib/graph.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-graph.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-graph.Tpo -c -o Lib/liboprof_la-graph.lo `test -f 'Lib/graph.c' || echo '$(srcdir)/'`Lib/graph.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-graph.Tpo Lib/$(DEPDIR)/liboprof_la-graph.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/graph.c' object='Lib/liboprof_la-graph.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-graph.lo `test -f 'Lib/graph.c' || echo '$(srcdir)/'`Lib/graph.c
+
+Lib/liboprof_la-initpart.lo: Lib/initpart.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-initpart.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-initpart.Tpo -c -o Lib/liboprof_la-initpart.lo `test -f 'Lib/initpart.c' || echo '$(srcdir)/'`Lib/initpart.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-initpart.Tpo Lib/$(DEPDIR)/liboprof_la-initpart.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/initpart.c' object='Lib/liboprof_la-initpart.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-initpart.lo `test -f 'Lib/initpart.c' || echo '$(srcdir)/'`Lib/initpart.c
+
+Lib/liboprof_la-kmetis.lo: Lib/kmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-kmetis.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-kmetis.Tpo -c -o Lib/liboprof_la-kmetis.lo `test -f 'Lib/kmetis.c' || echo '$(srcdir)/'`Lib/kmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-kmetis.Tpo Lib/$(DEPDIR)/liboprof_la-kmetis.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/kmetis.c' object='Lib/liboprof_la-kmetis.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-kmetis.lo `test -f 'Lib/kmetis.c' || echo '$(srcdir)/'`Lib/kmetis.c
+
+Lib/liboprof_la-kwayfm.lo: Lib/kwayfm.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-kwayfm.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-kwayfm.Tpo -c -o Lib/liboprof_la-kwayfm.lo `test -f 'Lib/kwayfm.c' || echo '$(srcdir)/'`Lib/kwayfm.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-kwayfm.Tpo Lib/$(DEPDIR)/liboprof_la-kwayfm.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/kwayfm.c' object='Lib/liboprof_la-kwayfm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-kwayfm.lo `test -f 'Lib/kwayfm.c' || echo '$(srcdir)/'`Lib/kwayfm.c
+
+Lib/liboprof_la-kwayrefine.lo: Lib/kwayrefine.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-kwayrefine.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-kwayrefine.Tpo -c -o Lib/liboprof_la-kwayrefine.lo `test -f 'Lib/kwayrefine.c' || echo '$(srcdir)/'`Lib/kwayrefine.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-kwayrefine.Tpo Lib/$(DEPDIR)/liboprof_la-kwayrefine.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/kwayrefine.c' object='Lib/liboprof_la-kwayrefine.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-kwayrefine.lo `test -f 'Lib/kwayrefine.c' || echo '$(srcdir)/'`Lib/kwayrefine.c
+
+Lib/liboprof_la-mcutil.lo: Lib/mcutil.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-mcutil.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-mcutil.Tpo -c -o Lib/liboprof_la-mcutil.lo `test -f 'Lib/mcutil.c' || echo '$(srcdir)/'`Lib/mcutil.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-mcutil.Tpo Lib/$(DEPDIR)/liboprof_la-mcutil.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/mcutil.c' object='Lib/liboprof_la-mcutil.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-mcutil.lo `test -f 'Lib/mcutil.c' || echo '$(srcdir)/'`Lib/mcutil.c
+
+Lib/liboprof_la-mesh.lo: Lib/mesh.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-mesh.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-mesh.Tpo -c -o Lib/liboprof_la-mesh.lo `test -f 'Lib/mesh.c' || echo '$(srcdir)/'`Lib/mesh.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-mesh.Tpo Lib/$(DEPDIR)/liboprof_la-mesh.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/mesh.c' object='Lib/liboprof_la-mesh.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-mesh.lo `test -f 'Lib/mesh.c' || echo '$(srcdir)/'`Lib/mesh.c
+
+Lib/liboprof_la-meshpart.lo: Lib/meshpart.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-meshpart.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-meshpart.Tpo -c -o Lib/liboprof_la-meshpart.lo `test -f 'Lib/meshpart.c' || echo '$(srcdir)/'`Lib/meshpart.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-meshpart.Tpo Lib/$(DEPDIR)/liboprof_la-meshpart.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/meshpart.c' object='Lib/liboprof_la-meshpart.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-meshpart.lo `test -f 'Lib/meshpart.c' || echo '$(srcdir)/'`Lib/meshpart.c
+
+Lib/liboprof_la-minconn.lo: Lib/minconn.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-minconn.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-minconn.Tpo -c -o Lib/liboprof_la-minconn.lo `test -f 'Lib/minconn.c' || echo '$(srcdir)/'`Lib/minconn.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-minconn.Tpo Lib/$(DEPDIR)/liboprof_la-minconn.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/minconn.c' object='Lib/liboprof_la-minconn.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-minconn.lo `test -f 'Lib/minconn.c' || echo '$(srcdir)/'`Lib/minconn.c
+
+Lib/liboprof_la-mincover.lo: Lib/mincover.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-mincover.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-mincover.Tpo -c -o Lib/liboprof_la-mincover.lo `test -f 'Lib/mincover.c' || echo '$(srcdir)/'`Lib/mincover.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-mincover.Tpo Lib/$(DEPDIR)/liboprof_la-mincover.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/mincover.c' object='Lib/liboprof_la-mincover.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-mincover.lo `test -f 'Lib/mincover.c' || echo '$(srcdir)/'`Lib/mincover.c
+
+Lib/liboprof_la-mmd.lo: Lib/mmd.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-mmd.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-mmd.Tpo -c -o Lib/liboprof_la-mmd.lo `test -f 'Lib/mmd.c' || echo '$(srcdir)/'`Lib/mmd.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-mmd.Tpo Lib/$(DEPDIR)/liboprof_la-mmd.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/mmd.c' object='Lib/liboprof_la-mmd.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-mmd.lo `test -f 'Lib/mmd.c' || echo '$(srcdir)/'`Lib/mmd.c
+
+Lib/liboprof_la-ometis.lo: Lib/ometis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-ometis.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-ometis.Tpo -c -o Lib/liboprof_la-ometis.lo `test -f 'Lib/ometis.c' || echo '$(srcdir)/'`Lib/ometis.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-ometis.Tpo Lib/$(DEPDIR)/liboprof_la-ometis.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/ometis.c' object='Lib/liboprof_la-ometis.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-ometis.lo `test -f 'Lib/ometis.c' || echo '$(srcdir)/'`Lib/ometis.c
+
+Lib/liboprof_la-options.lo: Lib/options.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-options.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-options.Tpo -c -o Lib/liboprof_la-options.lo `test -f 'Lib/options.c' || echo '$(srcdir)/'`Lib/options.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-options.Tpo Lib/$(DEPDIR)/liboprof_la-options.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/options.c' object='Lib/liboprof_la-options.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-options.lo `test -f 'Lib/options.c' || echo '$(srcdir)/'`Lib/options.c
+
+Lib/liboprof_la-parmetis.lo: Lib/parmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-parmetis.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-parmetis.Tpo -c -o Lib/liboprof_la-parmetis.lo `test -f 'Lib/parmetis.c' || echo '$(srcdir)/'`Lib/parmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-parmetis.Tpo Lib/$(DEPDIR)/liboprof_la-parmetis.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/parmetis.c' object='Lib/liboprof_la-parmetis.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-parmetis.lo `test -f 'Lib/parmetis.c' || echo '$(srcdir)/'`Lib/parmetis.c
+
+Lib/liboprof_la-pmetis.lo: Lib/pmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-pmetis.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-pmetis.Tpo -c -o Lib/liboprof_la-pmetis.lo `test -f 'Lib/pmetis.c' || echo '$(srcdir)/'`Lib/pmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-pmetis.Tpo Lib/$(DEPDIR)/liboprof_la-pmetis.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/pmetis.c' object='Lib/liboprof_la-pmetis.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-pmetis.lo `test -f 'Lib/pmetis.c' || echo '$(srcdir)/'`Lib/pmetis.c
+
+Lib/liboprof_la-refine.lo: Lib/refine.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-refine.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-refine.Tpo -c -o Lib/liboprof_la-refine.lo `test -f 'Lib/refine.c' || echo '$(srcdir)/'`Lib/refine.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-refine.Tpo Lib/$(DEPDIR)/liboprof_la-refine.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/refine.c' object='Lib/liboprof_la-refine.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-refine.lo `test -f 'Lib/refine.c' || echo '$(srcdir)/'`Lib/refine.c
+
+Lib/liboprof_la-separator.lo: Lib/separator.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-separator.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-separator.Tpo -c -o Lib/liboprof_la-separator.lo `test -f 'Lib/separator.c' || echo '$(srcdir)/'`Lib/separator.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-separator.Tpo Lib/$(DEPDIR)/liboprof_la-separator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/separator.c' object='Lib/liboprof_la-separator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-separator.lo `test -f 'Lib/separator.c' || echo '$(srcdir)/'`Lib/separator.c
+
+Lib/liboprof_la-sfm.lo: Lib/sfm.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-sfm.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-sfm.Tpo -c -o Lib/liboprof_la-sfm.lo `test -f 'Lib/sfm.c' || echo '$(srcdir)/'`Lib/sfm.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-sfm.Tpo Lib/$(DEPDIR)/liboprof_la-sfm.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/sfm.c' object='Lib/liboprof_la-sfm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-sfm.lo `test -f 'Lib/sfm.c' || echo '$(srcdir)/'`Lib/sfm.c
+
+Lib/liboprof_la-srefine.lo: Lib/srefine.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-srefine.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-srefine.Tpo -c -o Lib/liboprof_la-srefine.lo `test -f 'Lib/srefine.c' || echo '$(srcdir)/'`Lib/srefine.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-srefine.Tpo Lib/$(DEPDIR)/liboprof_la-srefine.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/srefine.c' object='Lib/liboprof_la-srefine.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-srefine.lo `test -f 'Lib/srefine.c' || echo '$(srcdir)/'`Lib/srefine.c
+
+Lib/liboprof_la-stat.lo: Lib/stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-stat.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-stat.Tpo -c -o Lib/liboprof_la-stat.lo `test -f 'Lib/stat.c' || echo '$(srcdir)/'`Lib/stat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-stat.Tpo Lib/$(DEPDIR)/liboprof_la-stat.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/stat.c' object='Lib/liboprof_la-stat.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-stat.lo `test -f 'Lib/stat.c' || echo '$(srcdir)/'`Lib/stat.c
+
+Lib/liboprof_la-timing.lo: Lib/timing.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-timing.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-timing.Tpo -c -o Lib/liboprof_la-timing.lo `test -f 'Lib/timing.c' || echo '$(srcdir)/'`Lib/timing.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-timing.Tpo Lib/$(DEPDIR)/liboprof_la-timing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/timing.c' object='Lib/liboprof_la-timing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-timing.lo `test -f 'Lib/timing.c' || echo '$(srcdir)/'`Lib/timing.c
+
+Lib/liboprof_la-util.lo: Lib/util.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-util.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-util.Tpo -c -o Lib/liboprof_la-util.lo `test -f 'Lib/util.c' || echo '$(srcdir)/'`Lib/util.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-util.Tpo Lib/$(DEPDIR)/liboprof_la-util.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/util.c' object='Lib/liboprof_la-util.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-util.lo `test -f 'Lib/util.c' || echo '$(srcdir)/'`Lib/util.c
+
+Lib/liboprof_la-wspace.lo: Lib/wspace.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -MT Lib/liboprof_la-wspace.lo -MD -MP -MF Lib/$(DEPDIR)/liboprof_la-wspace.Tpo -c -o Lib/liboprof_la-wspace.lo `test -f 'Lib/wspace.c' || echo '$(srcdir)/'`Lib/wspace.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/liboprof_la-wspace.Tpo Lib/$(DEPDIR)/liboprof_la-wspace.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/wspace.c' object='Lib/liboprof_la-wspace.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CFLAGS) $(CFLAGS) -c -o Lib/liboprof_la-wspace.lo `test -f 'Lib/wspace.c' || echo '$(srcdir)/'`Lib/wspace.c
+
 GKlib/libopt_la-b64.lo: GKlib/b64.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -MT GKlib/libopt_la-b64.lo -MD -MP -MF GKlib/$(DEPDIR)/libopt_la-b64.Tpo -c -o GKlib/libopt_la-b64.lo `test -f 'GKlib/b64.c' || echo '$(srcdir)/'`GKlib/b64.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libopt_la-b64.Tpo GKlib/$(DEPDIR)/libopt_la-b64.Plo
@@ -2581,6 +3496,419 @@ Lib/libopt_la-wspace.lo: Lib/wspace.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/wspace.c' object='Lib/libopt_la-wspace.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CFLAGS) $(CFLAGS) -c -o Lib/libopt_la-wspace.lo `test -f 'Lib/wspace.c' || echo '$(srcdir)/'`Lib/wspace.c
+
+GKlib/libprof_la-b64.lo: GKlib/b64.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-b64.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-b64.Tpo -c -o GKlib/libprof_la-b64.lo `test -f 'GKlib/b64.c' || echo '$(srcdir)/'`GKlib/b64.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-b64.Tpo GKlib/$(DEPDIR)/libprof_la-b64.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/b64.c' object='GKlib/libprof_la-b64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-b64.lo `test -f 'GKlib/b64.c' || echo '$(srcdir)/'`GKlib/b64.c
+
+GKlib/libprof_la-blas.lo: GKlib/blas.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-blas.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-blas.Tpo -c -o GKlib/libprof_la-blas.lo `test -f 'GKlib/blas.c' || echo '$(srcdir)/'`GKlib/blas.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-blas.Tpo GKlib/$(DEPDIR)/libprof_la-blas.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/blas.c' object='GKlib/libprof_la-blas.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-blas.lo `test -f 'GKlib/blas.c' || echo '$(srcdir)/'`GKlib/blas.c
+
+GKlib/libprof_la-csr.lo: GKlib/csr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-csr.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-csr.Tpo -c -o GKlib/libprof_la-csr.lo `test -f 'GKlib/csr.c' || echo '$(srcdir)/'`GKlib/csr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-csr.Tpo GKlib/$(DEPDIR)/libprof_la-csr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/csr.c' object='GKlib/libprof_la-csr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-csr.lo `test -f 'GKlib/csr.c' || echo '$(srcdir)/'`GKlib/csr.c
+
+GKlib/libprof_la-error.lo: GKlib/error.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-error.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-error.Tpo -c -o GKlib/libprof_la-error.lo `test -f 'GKlib/error.c' || echo '$(srcdir)/'`GKlib/error.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-error.Tpo GKlib/$(DEPDIR)/libprof_la-error.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/error.c' object='GKlib/libprof_la-error.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-error.lo `test -f 'GKlib/error.c' || echo '$(srcdir)/'`GKlib/error.c
+
+GKlib/libprof_la-evaluate.lo: GKlib/evaluate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-evaluate.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-evaluate.Tpo -c -o GKlib/libprof_la-evaluate.lo `test -f 'GKlib/evaluate.c' || echo '$(srcdir)/'`GKlib/evaluate.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-evaluate.Tpo GKlib/$(DEPDIR)/libprof_la-evaluate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/evaluate.c' object='GKlib/libprof_la-evaluate.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-evaluate.lo `test -f 'GKlib/evaluate.c' || echo '$(srcdir)/'`GKlib/evaluate.c
+
+GKlib/libprof_la-fkvkselect.lo: GKlib/fkvkselect.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-fkvkselect.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-fkvkselect.Tpo -c -o GKlib/libprof_la-fkvkselect.lo `test -f 'GKlib/fkvkselect.c' || echo '$(srcdir)/'`GKlib/fkvkselect.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-fkvkselect.Tpo GKlib/$(DEPDIR)/libprof_la-fkvkselect.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/fkvkselect.c' object='GKlib/libprof_la-fkvkselect.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-fkvkselect.lo `test -f 'GKlib/fkvkselect.c' || echo '$(srcdir)/'`GKlib/fkvkselect.c
+
+GKlib/libprof_la-fs.lo: GKlib/fs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-fs.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-fs.Tpo -c -o GKlib/libprof_la-fs.lo `test -f 'GKlib/fs.c' || echo '$(srcdir)/'`GKlib/fs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-fs.Tpo GKlib/$(DEPDIR)/libprof_la-fs.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/fs.c' object='GKlib/libprof_la-fs.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-fs.lo `test -f 'GKlib/fs.c' || echo '$(srcdir)/'`GKlib/fs.c
+
+GKlib/libprof_la-getopt.lo: GKlib/getopt.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-getopt.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-getopt.Tpo -c -o GKlib/libprof_la-getopt.lo `test -f 'GKlib/getopt.c' || echo '$(srcdir)/'`GKlib/getopt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-getopt.Tpo GKlib/$(DEPDIR)/libprof_la-getopt.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/getopt.c' object='GKlib/libprof_la-getopt.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-getopt.lo `test -f 'GKlib/getopt.c' || echo '$(srcdir)/'`GKlib/getopt.c
+
+GKlib/libprof_la-gkregex.lo: GKlib/gkregex.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-gkregex.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-gkregex.Tpo -c -o GKlib/libprof_la-gkregex.lo `test -f 'GKlib/gkregex.c' || echo '$(srcdir)/'`GKlib/gkregex.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-gkregex.Tpo GKlib/$(DEPDIR)/libprof_la-gkregex.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/gkregex.c' object='GKlib/libprof_la-gkregex.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-gkregex.lo `test -f 'GKlib/gkregex.c' || echo '$(srcdir)/'`GKlib/gkregex.c
+
+GKlib/libprof_la-htable.lo: GKlib/htable.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-htable.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-htable.Tpo -c -o GKlib/libprof_la-htable.lo `test -f 'GKlib/htable.c' || echo '$(srcdir)/'`GKlib/htable.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-htable.Tpo GKlib/$(DEPDIR)/libprof_la-htable.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/htable.c' object='GKlib/libprof_la-htable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-htable.lo `test -f 'GKlib/htable.c' || echo '$(srcdir)/'`GKlib/htable.c
+
+GKlib/libprof_la-io.lo: GKlib/io.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-io.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-io.Tpo -c -o GKlib/libprof_la-io.lo `test -f 'GKlib/io.c' || echo '$(srcdir)/'`GKlib/io.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-io.Tpo GKlib/$(DEPDIR)/libprof_la-io.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/io.c' object='GKlib/libprof_la-io.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-io.lo `test -f 'GKlib/io.c' || echo '$(srcdir)/'`GKlib/io.c
+
+GKlib/libprof_la-itemsets.lo: GKlib/itemsets.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-itemsets.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-itemsets.Tpo -c -o GKlib/libprof_la-itemsets.lo `test -f 'GKlib/itemsets.c' || echo '$(srcdir)/'`GKlib/itemsets.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-itemsets.Tpo GKlib/$(DEPDIR)/libprof_la-itemsets.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/itemsets.c' object='GKlib/libprof_la-itemsets.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-itemsets.lo `test -f 'GKlib/itemsets.c' || echo '$(srcdir)/'`GKlib/itemsets.c
+
+GKlib/libprof_la-mcore.lo: GKlib/mcore.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-mcore.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-mcore.Tpo -c -o GKlib/libprof_la-mcore.lo `test -f 'GKlib/mcore.c' || echo '$(srcdir)/'`GKlib/mcore.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-mcore.Tpo GKlib/$(DEPDIR)/libprof_la-mcore.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/mcore.c' object='GKlib/libprof_la-mcore.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-mcore.lo `test -f 'GKlib/mcore.c' || echo '$(srcdir)/'`GKlib/mcore.c
+
+GKlib/libprof_la-memory.lo: GKlib/memory.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-memory.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-memory.Tpo -c -o GKlib/libprof_la-memory.lo `test -f 'GKlib/memory.c' || echo '$(srcdir)/'`GKlib/memory.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-memory.Tpo GKlib/$(DEPDIR)/libprof_la-memory.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/memory.c' object='GKlib/libprof_la-memory.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-memory.lo `test -f 'GKlib/memory.c' || echo '$(srcdir)/'`GKlib/memory.c
+
+GKlib/libprof_la-omp.lo: GKlib/omp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-omp.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-omp.Tpo -c -o GKlib/libprof_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-omp.Tpo GKlib/$(DEPDIR)/libprof_la-omp.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/omp.c' object='GKlib/libprof_la-omp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-omp.lo `test -f 'GKlib/omp.c' || echo '$(srcdir)/'`GKlib/omp.c
+
+GKlib/libprof_la-pdb.lo: GKlib/pdb.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-pdb.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-pdb.Tpo -c -o GKlib/libprof_la-pdb.lo `test -f 'GKlib/pdb.c' || echo '$(srcdir)/'`GKlib/pdb.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-pdb.Tpo GKlib/$(DEPDIR)/libprof_la-pdb.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/pdb.c' object='GKlib/libprof_la-pdb.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-pdb.lo `test -f 'GKlib/pdb.c' || echo '$(srcdir)/'`GKlib/pdb.c
+
+GKlib/libprof_la-pqueue.lo: GKlib/pqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-pqueue.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-pqueue.Tpo -c -o GKlib/libprof_la-pqueue.lo `test -f 'GKlib/pqueue.c' || echo '$(srcdir)/'`GKlib/pqueue.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-pqueue.Tpo GKlib/$(DEPDIR)/libprof_la-pqueue.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/pqueue.c' object='GKlib/libprof_la-pqueue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-pqueue.lo `test -f 'GKlib/pqueue.c' || echo '$(srcdir)/'`GKlib/pqueue.c
+
+GKlib/libprof_la-random.lo: GKlib/random.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-random.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-random.Tpo -c -o GKlib/libprof_la-random.lo `test -f 'GKlib/random.c' || echo '$(srcdir)/'`GKlib/random.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-random.Tpo GKlib/$(DEPDIR)/libprof_la-random.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/random.c' object='GKlib/libprof_la-random.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-random.lo `test -f 'GKlib/random.c' || echo '$(srcdir)/'`GKlib/random.c
+
+GKlib/libprof_la-seq.lo: GKlib/seq.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-seq.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-seq.Tpo -c -o GKlib/libprof_la-seq.lo `test -f 'GKlib/seq.c' || echo '$(srcdir)/'`GKlib/seq.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-seq.Tpo GKlib/$(DEPDIR)/libprof_la-seq.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/seq.c' object='GKlib/libprof_la-seq.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-seq.lo `test -f 'GKlib/seq.c' || echo '$(srcdir)/'`GKlib/seq.c
+
+GKlib/libprof_la-sort.lo: GKlib/sort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-sort.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-sort.Tpo -c -o GKlib/libprof_la-sort.lo `test -f 'GKlib/sort.c' || echo '$(srcdir)/'`GKlib/sort.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-sort.Tpo GKlib/$(DEPDIR)/libprof_la-sort.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/sort.c' object='GKlib/libprof_la-sort.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-sort.lo `test -f 'GKlib/sort.c' || echo '$(srcdir)/'`GKlib/sort.c
+
+GKlib/libprof_la-string.lo: GKlib/string.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-string.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-string.Tpo -c -o GKlib/libprof_la-string.lo `test -f 'GKlib/string.c' || echo '$(srcdir)/'`GKlib/string.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-string.Tpo GKlib/$(DEPDIR)/libprof_la-string.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/string.c' object='GKlib/libprof_la-string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-string.lo `test -f 'GKlib/string.c' || echo '$(srcdir)/'`GKlib/string.c
+
+GKlib/libprof_la-timers.lo: GKlib/timers.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-timers.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-timers.Tpo -c -o GKlib/libprof_la-timers.lo `test -f 'GKlib/timers.c' || echo '$(srcdir)/'`GKlib/timers.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-timers.Tpo GKlib/$(DEPDIR)/libprof_la-timers.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/timers.c' object='GKlib/libprof_la-timers.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-timers.lo `test -f 'GKlib/timers.c' || echo '$(srcdir)/'`GKlib/timers.c
+
+GKlib/libprof_la-tokenizer.lo: GKlib/tokenizer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-tokenizer.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-tokenizer.Tpo -c -o GKlib/libprof_la-tokenizer.lo `test -f 'GKlib/tokenizer.c' || echo '$(srcdir)/'`GKlib/tokenizer.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-tokenizer.Tpo GKlib/$(DEPDIR)/libprof_la-tokenizer.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/tokenizer.c' object='GKlib/libprof_la-tokenizer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-tokenizer.lo `test -f 'GKlib/tokenizer.c' || echo '$(srcdir)/'`GKlib/tokenizer.c
+
+GKlib/libprof_la-util.lo: GKlib/util.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT GKlib/libprof_la-util.lo -MD -MP -MF GKlib/$(DEPDIR)/libprof_la-util.Tpo -c -o GKlib/libprof_la-util.lo `test -f 'GKlib/util.c' || echo '$(srcdir)/'`GKlib/util.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) GKlib/$(DEPDIR)/libprof_la-util.Tpo GKlib/$(DEPDIR)/libprof_la-util.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='GKlib/util.c' object='GKlib/libprof_la-util.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o GKlib/libprof_la-util.lo `test -f 'GKlib/util.c' || echo '$(srcdir)/'`GKlib/util.c
+
+Lib/libprof_la-auxapi.lo: Lib/auxapi.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-auxapi.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-auxapi.Tpo -c -o Lib/libprof_la-auxapi.lo `test -f 'Lib/auxapi.c' || echo '$(srcdir)/'`Lib/auxapi.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-auxapi.Tpo Lib/$(DEPDIR)/libprof_la-auxapi.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/auxapi.c' object='Lib/libprof_la-auxapi.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-auxapi.lo `test -f 'Lib/auxapi.c' || echo '$(srcdir)/'`Lib/auxapi.c
+
+Lib/libprof_la-balance.lo: Lib/balance.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-balance.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-balance.Tpo -c -o Lib/libprof_la-balance.lo `test -f 'Lib/balance.c' || echo '$(srcdir)/'`Lib/balance.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-balance.Tpo Lib/$(DEPDIR)/libprof_la-balance.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/balance.c' object='Lib/libprof_la-balance.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-balance.lo `test -f 'Lib/balance.c' || echo '$(srcdir)/'`Lib/balance.c
+
+Lib/libprof_la-bucketsort.lo: Lib/bucketsort.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-bucketsort.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-bucketsort.Tpo -c -o Lib/libprof_la-bucketsort.lo `test -f 'Lib/bucketsort.c' || echo '$(srcdir)/'`Lib/bucketsort.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-bucketsort.Tpo Lib/$(DEPDIR)/libprof_la-bucketsort.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/bucketsort.c' object='Lib/libprof_la-bucketsort.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-bucketsort.lo `test -f 'Lib/bucketsort.c' || echo '$(srcdir)/'`Lib/bucketsort.c
+
+Lib/libprof_la-checkgraph.lo: Lib/checkgraph.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-checkgraph.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-checkgraph.Tpo -c -o Lib/libprof_la-checkgraph.lo `test -f 'Lib/checkgraph.c' || echo '$(srcdir)/'`Lib/checkgraph.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-checkgraph.Tpo Lib/$(DEPDIR)/libprof_la-checkgraph.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/checkgraph.c' object='Lib/libprof_la-checkgraph.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-checkgraph.lo `test -f 'Lib/checkgraph.c' || echo '$(srcdir)/'`Lib/checkgraph.c
+
+Lib/libprof_la-coarsen.lo: Lib/coarsen.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-coarsen.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-coarsen.Tpo -c -o Lib/libprof_la-coarsen.lo `test -f 'Lib/coarsen.c' || echo '$(srcdir)/'`Lib/coarsen.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-coarsen.Tpo Lib/$(DEPDIR)/libprof_la-coarsen.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/coarsen.c' object='Lib/libprof_la-coarsen.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-coarsen.lo `test -f 'Lib/coarsen.c' || echo '$(srcdir)/'`Lib/coarsen.c
+
+Lib/libprof_la-compress.lo: Lib/compress.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-compress.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-compress.Tpo -c -o Lib/libprof_la-compress.lo `test -f 'Lib/compress.c' || echo '$(srcdir)/'`Lib/compress.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-compress.Tpo Lib/$(DEPDIR)/libprof_la-compress.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/compress.c' object='Lib/libprof_la-compress.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-compress.lo `test -f 'Lib/compress.c' || echo '$(srcdir)/'`Lib/compress.c
+
+Lib/libprof_la-contig.lo: Lib/contig.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-contig.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-contig.Tpo -c -o Lib/libprof_la-contig.lo `test -f 'Lib/contig.c' || echo '$(srcdir)/'`Lib/contig.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-contig.Tpo Lib/$(DEPDIR)/libprof_la-contig.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/contig.c' object='Lib/libprof_la-contig.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-contig.lo `test -f 'Lib/contig.c' || echo '$(srcdir)/'`Lib/contig.c
+
+Lib/libprof_la-debug.lo: Lib/debug.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-debug.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-debug.Tpo -c -o Lib/libprof_la-debug.lo `test -f 'Lib/debug.c' || echo '$(srcdir)/'`Lib/debug.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-debug.Tpo Lib/$(DEPDIR)/libprof_la-debug.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/debug.c' object='Lib/libprof_la-debug.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-debug.lo `test -f 'Lib/debug.c' || echo '$(srcdir)/'`Lib/debug.c
+
+Lib/libprof_la-fm.lo: Lib/fm.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-fm.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-fm.Tpo -c -o Lib/libprof_la-fm.lo `test -f 'Lib/fm.c' || echo '$(srcdir)/'`Lib/fm.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-fm.Tpo Lib/$(DEPDIR)/libprof_la-fm.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/fm.c' object='Lib/libprof_la-fm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-fm.lo `test -f 'Lib/fm.c' || echo '$(srcdir)/'`Lib/fm.c
+
+Lib/libprof_la-fortran.lo: Lib/fortran.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-fortran.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-fortran.Tpo -c -o Lib/libprof_la-fortran.lo `test -f 'Lib/fortran.c' || echo '$(srcdir)/'`Lib/fortran.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-fortran.Tpo Lib/$(DEPDIR)/libprof_la-fortran.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/fortran.c' object='Lib/libprof_la-fortran.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-fortran.lo `test -f 'Lib/fortran.c' || echo '$(srcdir)/'`Lib/fortran.c
+
+Lib/libprof_la-frename.lo: Lib/frename.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-frename.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-frename.Tpo -c -o Lib/libprof_la-frename.lo `test -f 'Lib/frename.c' || echo '$(srcdir)/'`Lib/frename.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-frename.Tpo Lib/$(DEPDIR)/libprof_la-frename.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/frename.c' object='Lib/libprof_la-frename.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-frename.lo `test -f 'Lib/frename.c' || echo '$(srcdir)/'`Lib/frename.c
+
+Lib/libprof_la-gklib.lo: Lib/gklib.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-gklib.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-gklib.Tpo -c -o Lib/libprof_la-gklib.lo `test -f 'Lib/gklib.c' || echo '$(srcdir)/'`Lib/gklib.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-gklib.Tpo Lib/$(DEPDIR)/libprof_la-gklib.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/gklib.c' object='Lib/libprof_la-gklib.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-gklib.lo `test -f 'Lib/gklib.c' || echo '$(srcdir)/'`Lib/gklib.c
+
+Lib/libprof_la-graph.lo: Lib/graph.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-graph.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-graph.Tpo -c -o Lib/libprof_la-graph.lo `test -f 'Lib/graph.c' || echo '$(srcdir)/'`Lib/graph.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-graph.Tpo Lib/$(DEPDIR)/libprof_la-graph.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/graph.c' object='Lib/libprof_la-graph.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-graph.lo `test -f 'Lib/graph.c' || echo '$(srcdir)/'`Lib/graph.c
+
+Lib/libprof_la-initpart.lo: Lib/initpart.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-initpart.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-initpart.Tpo -c -o Lib/libprof_la-initpart.lo `test -f 'Lib/initpart.c' || echo '$(srcdir)/'`Lib/initpart.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-initpart.Tpo Lib/$(DEPDIR)/libprof_la-initpart.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/initpart.c' object='Lib/libprof_la-initpart.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-initpart.lo `test -f 'Lib/initpart.c' || echo '$(srcdir)/'`Lib/initpart.c
+
+Lib/libprof_la-kmetis.lo: Lib/kmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-kmetis.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-kmetis.Tpo -c -o Lib/libprof_la-kmetis.lo `test -f 'Lib/kmetis.c' || echo '$(srcdir)/'`Lib/kmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-kmetis.Tpo Lib/$(DEPDIR)/libprof_la-kmetis.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/kmetis.c' object='Lib/libprof_la-kmetis.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-kmetis.lo `test -f 'Lib/kmetis.c' || echo '$(srcdir)/'`Lib/kmetis.c
+
+Lib/libprof_la-kwayfm.lo: Lib/kwayfm.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-kwayfm.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-kwayfm.Tpo -c -o Lib/libprof_la-kwayfm.lo `test -f 'Lib/kwayfm.c' || echo '$(srcdir)/'`Lib/kwayfm.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-kwayfm.Tpo Lib/$(DEPDIR)/libprof_la-kwayfm.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/kwayfm.c' object='Lib/libprof_la-kwayfm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-kwayfm.lo `test -f 'Lib/kwayfm.c' || echo '$(srcdir)/'`Lib/kwayfm.c
+
+Lib/libprof_la-kwayrefine.lo: Lib/kwayrefine.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-kwayrefine.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-kwayrefine.Tpo -c -o Lib/libprof_la-kwayrefine.lo `test -f 'Lib/kwayrefine.c' || echo '$(srcdir)/'`Lib/kwayrefine.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-kwayrefine.Tpo Lib/$(DEPDIR)/libprof_la-kwayrefine.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/kwayrefine.c' object='Lib/libprof_la-kwayrefine.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-kwayrefine.lo `test -f 'Lib/kwayrefine.c' || echo '$(srcdir)/'`Lib/kwayrefine.c
+
+Lib/libprof_la-mcutil.lo: Lib/mcutil.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-mcutil.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-mcutil.Tpo -c -o Lib/libprof_la-mcutil.lo `test -f 'Lib/mcutil.c' || echo '$(srcdir)/'`Lib/mcutil.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-mcutil.Tpo Lib/$(DEPDIR)/libprof_la-mcutil.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/mcutil.c' object='Lib/libprof_la-mcutil.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-mcutil.lo `test -f 'Lib/mcutil.c' || echo '$(srcdir)/'`Lib/mcutil.c
+
+Lib/libprof_la-mesh.lo: Lib/mesh.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-mesh.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-mesh.Tpo -c -o Lib/libprof_la-mesh.lo `test -f 'Lib/mesh.c' || echo '$(srcdir)/'`Lib/mesh.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-mesh.Tpo Lib/$(DEPDIR)/libprof_la-mesh.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/mesh.c' object='Lib/libprof_la-mesh.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-mesh.lo `test -f 'Lib/mesh.c' || echo '$(srcdir)/'`Lib/mesh.c
+
+Lib/libprof_la-meshpart.lo: Lib/meshpart.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-meshpart.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-meshpart.Tpo -c -o Lib/libprof_la-meshpart.lo `test -f 'Lib/meshpart.c' || echo '$(srcdir)/'`Lib/meshpart.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-meshpart.Tpo Lib/$(DEPDIR)/libprof_la-meshpart.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/meshpart.c' object='Lib/libprof_la-meshpart.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-meshpart.lo `test -f 'Lib/meshpart.c' || echo '$(srcdir)/'`Lib/meshpart.c
+
+Lib/libprof_la-minconn.lo: Lib/minconn.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-minconn.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-minconn.Tpo -c -o Lib/libprof_la-minconn.lo `test -f 'Lib/minconn.c' || echo '$(srcdir)/'`Lib/minconn.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-minconn.Tpo Lib/$(DEPDIR)/libprof_la-minconn.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/minconn.c' object='Lib/libprof_la-minconn.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-minconn.lo `test -f 'Lib/minconn.c' || echo '$(srcdir)/'`Lib/minconn.c
+
+Lib/libprof_la-mincover.lo: Lib/mincover.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-mincover.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-mincover.Tpo -c -o Lib/libprof_la-mincover.lo `test -f 'Lib/mincover.c' || echo '$(srcdir)/'`Lib/mincover.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-mincover.Tpo Lib/$(DEPDIR)/libprof_la-mincover.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/mincover.c' object='Lib/libprof_la-mincover.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-mincover.lo `test -f 'Lib/mincover.c' || echo '$(srcdir)/'`Lib/mincover.c
+
+Lib/libprof_la-mmd.lo: Lib/mmd.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-mmd.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-mmd.Tpo -c -o Lib/libprof_la-mmd.lo `test -f 'Lib/mmd.c' || echo '$(srcdir)/'`Lib/mmd.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-mmd.Tpo Lib/$(DEPDIR)/libprof_la-mmd.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/mmd.c' object='Lib/libprof_la-mmd.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-mmd.lo `test -f 'Lib/mmd.c' || echo '$(srcdir)/'`Lib/mmd.c
+
+Lib/libprof_la-ometis.lo: Lib/ometis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-ometis.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-ometis.Tpo -c -o Lib/libprof_la-ometis.lo `test -f 'Lib/ometis.c' || echo '$(srcdir)/'`Lib/ometis.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-ometis.Tpo Lib/$(DEPDIR)/libprof_la-ometis.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/ometis.c' object='Lib/libprof_la-ometis.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-ometis.lo `test -f 'Lib/ometis.c' || echo '$(srcdir)/'`Lib/ometis.c
+
+Lib/libprof_la-options.lo: Lib/options.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-options.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-options.Tpo -c -o Lib/libprof_la-options.lo `test -f 'Lib/options.c' || echo '$(srcdir)/'`Lib/options.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-options.Tpo Lib/$(DEPDIR)/libprof_la-options.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/options.c' object='Lib/libprof_la-options.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-options.lo `test -f 'Lib/options.c' || echo '$(srcdir)/'`Lib/options.c
+
+Lib/libprof_la-parmetis.lo: Lib/parmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-parmetis.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-parmetis.Tpo -c -o Lib/libprof_la-parmetis.lo `test -f 'Lib/parmetis.c' || echo '$(srcdir)/'`Lib/parmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-parmetis.Tpo Lib/$(DEPDIR)/libprof_la-parmetis.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/parmetis.c' object='Lib/libprof_la-parmetis.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-parmetis.lo `test -f 'Lib/parmetis.c' || echo '$(srcdir)/'`Lib/parmetis.c
+
+Lib/libprof_la-pmetis.lo: Lib/pmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-pmetis.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-pmetis.Tpo -c -o Lib/libprof_la-pmetis.lo `test -f 'Lib/pmetis.c' || echo '$(srcdir)/'`Lib/pmetis.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-pmetis.Tpo Lib/$(DEPDIR)/libprof_la-pmetis.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/pmetis.c' object='Lib/libprof_la-pmetis.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-pmetis.lo `test -f 'Lib/pmetis.c' || echo '$(srcdir)/'`Lib/pmetis.c
+
+Lib/libprof_la-refine.lo: Lib/refine.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-refine.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-refine.Tpo -c -o Lib/libprof_la-refine.lo `test -f 'Lib/refine.c' || echo '$(srcdir)/'`Lib/refine.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-refine.Tpo Lib/$(DEPDIR)/libprof_la-refine.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/refine.c' object='Lib/libprof_la-refine.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-refine.lo `test -f 'Lib/refine.c' || echo '$(srcdir)/'`Lib/refine.c
+
+Lib/libprof_la-separator.lo: Lib/separator.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-separator.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-separator.Tpo -c -o Lib/libprof_la-separator.lo `test -f 'Lib/separator.c' || echo '$(srcdir)/'`Lib/separator.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-separator.Tpo Lib/$(DEPDIR)/libprof_la-separator.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/separator.c' object='Lib/libprof_la-separator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-separator.lo `test -f 'Lib/separator.c' || echo '$(srcdir)/'`Lib/separator.c
+
+Lib/libprof_la-sfm.lo: Lib/sfm.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-sfm.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-sfm.Tpo -c -o Lib/libprof_la-sfm.lo `test -f 'Lib/sfm.c' || echo '$(srcdir)/'`Lib/sfm.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-sfm.Tpo Lib/$(DEPDIR)/libprof_la-sfm.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/sfm.c' object='Lib/libprof_la-sfm.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-sfm.lo `test -f 'Lib/sfm.c' || echo '$(srcdir)/'`Lib/sfm.c
+
+Lib/libprof_la-srefine.lo: Lib/srefine.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-srefine.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-srefine.Tpo -c -o Lib/libprof_la-srefine.lo `test -f 'Lib/srefine.c' || echo '$(srcdir)/'`Lib/srefine.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-srefine.Tpo Lib/$(DEPDIR)/libprof_la-srefine.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/srefine.c' object='Lib/libprof_la-srefine.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-srefine.lo `test -f 'Lib/srefine.c' || echo '$(srcdir)/'`Lib/srefine.c
+
+Lib/libprof_la-stat.lo: Lib/stat.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-stat.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-stat.Tpo -c -o Lib/libprof_la-stat.lo `test -f 'Lib/stat.c' || echo '$(srcdir)/'`Lib/stat.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-stat.Tpo Lib/$(DEPDIR)/libprof_la-stat.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/stat.c' object='Lib/libprof_la-stat.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-stat.lo `test -f 'Lib/stat.c' || echo '$(srcdir)/'`Lib/stat.c
+
+Lib/libprof_la-timing.lo: Lib/timing.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-timing.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-timing.Tpo -c -o Lib/libprof_la-timing.lo `test -f 'Lib/timing.c' || echo '$(srcdir)/'`Lib/timing.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-timing.Tpo Lib/$(DEPDIR)/libprof_la-timing.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/timing.c' object='Lib/libprof_la-timing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-timing.lo `test -f 'Lib/timing.c' || echo '$(srcdir)/'`Lib/timing.c
+
+Lib/libprof_la-util.lo: Lib/util.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-util.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-util.Tpo -c -o Lib/libprof_la-util.lo `test -f 'Lib/util.c' || echo '$(srcdir)/'`Lib/util.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-util.Tpo Lib/$(DEPDIR)/libprof_la-util.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/util.c' object='Lib/libprof_la-util.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-util.lo `test -f 'Lib/util.c' || echo '$(srcdir)/'`Lib/util.c
+
+Lib/libprof_la-wspace.lo: Lib/wspace.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -MT Lib/libprof_la-wspace.lo -MD -MP -MF Lib/$(DEPDIR)/libprof_la-wspace.Tpo -c -o Lib/libprof_la-wspace.lo `test -f 'Lib/wspace.c' || echo '$(srcdir)/'`Lib/wspace.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) Lib/$(DEPDIR)/libprof_la-wspace.Tpo Lib/$(DEPDIR)/libprof_la-wspace.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='Lib/wspace.c' object='Lib/libprof_la-wspace.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CFLAGS) $(CFLAGS) -c -o Lib/libprof_la-wspace.lo `test -f 'Lib/wspace.c' || echo '$(srcdir)/'`Lib/wspace.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -5,7 +5,6 @@
 source $LIBMESH_DIR/examples/run_common.sh
 
 example_name=adaptivity_ex5
-example_dir=examples/adaptivity/$example_name
 
 # Specify the number of timesteps to do
 n_timesteps=25
@@ -31,9 +30,11 @@ options="-n_timesteps $n_timesteps -n_refinements $n_refinements \
 for method in ${METHODS}; do
     
     case "${method}" in
-	opt)   executable=example-opt ;;
-	dbg)   executable=example-dbg ;;
-	devel) executable=example-devel ;;
+	optimized|opt)      executable=example-opt   ;;
+	debug|dbg)          executable=example-dbg   ;;
+	devel)              executable=example-devel ;;
+	profiling|pro|prof) executable=example-prof  ;;
+	oprofile|oprof)     executable=example-oprof ;;
 	*) echo "ERROR: unknown method: ${method}!" ; exit 1 ;;
     esac
     
