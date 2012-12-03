@@ -299,8 +299,8 @@ include_HEADERS =  \
         solvers/linear_solver.h \
         solvers/memory_solution_history.h \
         solvers/newton_solver.h \
-        solvers/nonlinear_solver.h \
         solvers/no_solution_history.h \
+        solvers/nonlinear_solver.h \
         solvers/petsc_diff_solver.h \
         solvers/petsc_dm_nonlinear_solver.h \
         solvers/petsc_linear_solver.h \
@@ -341,6 +341,7 @@ include_HEADERS =  \
         systems/system_subset_by_subdomain.h \
         systems/transient_system.h \
         utils/compare_types.h \
+        utils/disable_pedantic.h \
         utils/error_vector.h \
         utils/hashword.h \
         utils/ignore_warnings.h \
@@ -359,6 +360,7 @@ include_HEADERS =  \
         utils/point_locator_list.h \
         utils/point_locator_tree.h \
         utils/pool_allocator.h \
+        utils/restore_pedantic.h \
         utils/restore_warnings.h \
         utils/statistics.h \
         utils/string_to_enum.h \
