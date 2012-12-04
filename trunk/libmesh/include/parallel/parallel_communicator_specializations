@@ -5,6 +5,11 @@
     bool verify(const std::string & r) const;
 
     template <typename T>
+    bool semiverify(const std::vector<T> * r) const;
+
+    bool semiverify(const std::string * r) const;
+
+    template <typename T>
     void min(std::vector<T> &r) const;
 
     void min(bool &r) const;
