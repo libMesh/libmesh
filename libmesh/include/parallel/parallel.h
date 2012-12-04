@@ -27,6 +27,7 @@
 #include <cstddef>
 #include <climits>
 #include <iterator>
+#include <limits>
 #include <map>
 #include <set>
 #include <string>
@@ -294,12 +295,16 @@ namespace Parallel
 
   /*
    * The unspecialized class gives default, lowest-common-denominator
-   * attributes.  More specialized classes can override them.
+   * attributes, for values which can't be used with Parallel min/max.
+   * Specialized classes can set this to true, and should define
+   * the lowest and highest values possible for the type.
    */
   template<typename T>
   struct Attributes
   {
     static const bool has_min_max = false;
+    static void set_lowest(T&) {}
+    static void set_highest(T&) {}
   };
 
 
@@ -596,6 +601,14 @@ namespace Parallel
      */
     template <typename T>
     bool verify(const T &r) const;
+
+    /**
+     * Verify that a local pointer points to the same value on all
+     * processors where it is not NULL.
+     * Containers must have the same value in every entry.
+     */
+    template <typename T>
+    bool semiverify(const T *r) const;
 
     /**
      * Take a local variable and replace it with the minimum of it's values

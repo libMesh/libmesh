@@ -38,12 +38,6 @@ class StandardType<cxxtype> : public DataType \
 public: \
   explicit \
   StandardType(const cxxtype* = NULL) : DataType(mpitype) {} \
-}; \
- \
-template<> \
-struct Attributes<cxxtype> \
-{ \
-  static const bool has_min_max = true; \
 }
 
 #else
@@ -55,27 +49,59 @@ class StandardType<cxxtype> : public DataType \
 public: \
   explicit \
   StandardType(const cxxtype* = NULL) : DataType() {} \
-}; \
+}
+
+#endif
+
+#define INT_TYPE(cxxtype,mpitype) \
+STANDARD_TYPE(cxxtype,mpitype); \
  \
 template<> \
 struct Attributes<cxxtype> \
 { \
   static const bool has_min_max = true; \
+  static void set_lowest(cxxtype& x) { x = std::numeric_limits<cxxtype>::min(); } \
+  static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
 }
 
-#endif
+#define FLOAT_TYPE(cxxtype,mpitype) \
+STANDARD_TYPE(cxxtype,mpitype); \
+ \
+template<> \
+struct Attributes<cxxtype> \
+{ \
+  static const bool has_min_max = true; \
+  static void set_lowest(cxxtype& x) { x = -std::numeric_limits<cxxtype>::max(); } \
+  static void set_highest(cxxtype& x) { x = std::numeric_limits<cxxtype>::max(); } \
+}
 
-STANDARD_TYPE(char,MPI_CHAR);
-STANDARD_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
-STANDARD_TYPE(short int,MPI_SHORT);
-STANDARD_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
-STANDARD_TYPE(int,MPI_INT);
-STANDARD_TYPE(unsigned int,MPI_UNSIGNED);
-STANDARD_TYPE(long,MPI_LONG);
-STANDARD_TYPE(unsigned long,MPI_UNSIGNED_LONG);
-STANDARD_TYPE(float,MPI_FLOAT);
-STANDARD_TYPE(double,MPI_DOUBLE);
-STANDARD_TYPE(long double,MPI_LONG_DOUBLE);
+#define CONTAINER_TYPE(cxxtype) \
+template<typename T> \
+struct Attributes<cxxtype<T> > \
+{ \
+  static const bool has_min_max = Attributes<T>::has_min_max; \
+  static void set_lowest(cxxtype<T>& x) { \
+    for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
+      Attributes<T>::set_lowest(*i); } \
+  static void set_highest(cxxtype<T>& x) { \
+    for (typename cxxtype<T>::iterator i = x.begin(); i != x.end(); ++i) \
+      Attributes<T>::set_highest(*i); } \
+}
+
+
+INT_TYPE(char,MPI_CHAR);
+INT_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
+INT_TYPE(short int,MPI_SHORT);
+INT_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
+INT_TYPE(int,MPI_INT);
+INT_TYPE(unsigned int,MPI_UNSIGNED);
+INT_TYPE(long,MPI_LONG);
+INT_TYPE(unsigned long,MPI_UNSIGNED_LONG);
+FLOAT_TYPE(float,MPI_FLOAT);
+FLOAT_TYPE(double,MPI_DOUBLE);
+FLOAT_TYPE(long double,MPI_LONG_DOUBLE);
+CONTAINER_TYPE(std::set);
+CONTAINER_TYPE(std::vector);
 
 // We'd love to do a singleton pattern on derived data types, rather
 // than commit, free, commit, free, ad infinitum... but it's a
@@ -1122,6 +1148,69 @@ inline bool Communicator::verify(const T &r) const
 }
 
 
+
+template <typename T>
+inline bool Communicator::semiverify(const T *r) const
+{
+  if (this->size() > 1 && Attributes<T>::has_min_max == true)
+    {
+      T tempmin, tempmax;
+      if (r)
+        tempmin = tempmax = *r;
+      else
+        {
+          Attributes<T>::set_highest(tempmin);
+          Attributes<T>::set_lowest(tempmax);
+        }
+      this->min(tempmin);
+      this->max(tempmax);
+      bool invalid = r && ((*r != tempmin) &&
+                           (*r != tempmax));
+      this->max(invalid);
+      return !invalid;
+    }
+  return true;
+}
+
+
+
+template <typename T>
+inline bool Communicator::semiverify(const std::vector<T> *r) const
+{
+  if (this->size() > 1 && Attributes<T>::has_min_max == true)
+    {
+      unsigned int rsize = r ? r->size() : 0;
+      unsigned int *psize = r ? &rsize : NULL;
+
+      if (!this->semiverify(psize))
+        return false;
+
+      Parallel::max(rsize);
+
+      std::vector<T> tempmin, tempmax;
+      if (r)
+        {
+          tempmin = tempmax = *r;
+        }
+      else
+        {
+          tempmin.resize(rsize);
+          tempmax.resize(rsize);
+          Attributes<std::vector<T> >::set_highest(tempmin);
+          Attributes<std::vector<T> >::set_lowest(tempmax);
+        }
+      this->min(tempmin);
+      this->max(tempmax);
+      bool invalid = r && ((*r != tempmin) &&
+                           (*r != tempmax));
+      this->max(invalid);
+      return !invalid;
+    }
+  return true;
+}
+
+
+
 inline bool Communicator::verify(const std::string & r) const
 {
   if (this->size() > 1)
@@ -1135,6 +1224,38 @@ inline bool Communicator::verify(const std::string & r) const
     }
   return true;
 }
+
+
+
+inline bool Communicator::semiverify(const std::string * r) const
+{
+  if (this->size() > 1)
+    {
+      unsigned int rsize = r ? r->size() : 0;
+      unsigned int *psize = r ? &rsize : NULL;
+
+      if (!this->semiverify(psize))
+        return false;
+
+      Parallel::max(rsize);
+
+      // Cannot use <char> since MPI_MIN is not
+      // strictly defined for chars!
+      std::vector<short int> temp (rsize);
+      if (r)
+        {
+          temp.reserve(rsize);
+          for (unsigned int i=0; i != rsize; ++i)
+            temp.push_back((*r)[i]);
+        }
+
+      std::vector<short int> *ptemp = r ? &temp: NULL;
+
+      return this->semiverify(ptemp);
+    }
+  return true;
+}
+
 
 
 template <typename T>
