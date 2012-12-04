@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <limits>
+#include <numeric> // for std::accumulate
 #include <set>
 
 // Local includes
@@ -184,6 +185,49 @@ namespace {
     std::vector<Real> _vmin;
     std::vector<Real> _vmax;
   };
+
+#ifdef DEBUG
+  void assert_semiverify_dofobj(const DofObject *d)
+    {
+      if (d)
+        {
+          const unsigned int n_sys = d->n_systems();
+         
+          std::vector<unsigned int> n_vars (n_sys, 0);
+          for (unsigned int s = 0; s != n_sys; ++s)
+            n_vars[s] = d->n_vars(s);
+
+	  const unsigned int tot_n_vars =
+            std::accumulate(n_vars.begin(), n_vars.end(), 0);
+
+          std::vector<unsigned int> n_comp (tot_n_vars, 0);
+          std::vector<unsigned int> first_dof (tot_n_vars, 0);
+         
+          for (unsigned int s = 0, i=0; s != n_sys; ++s)
+            for (unsigned int v = 0; v != n_vars[s]; ++v, ++i)
+              {
+                n_comp[i] = d->n_comp(s,v);
+                first_dof[i] = n_comp[i] ? d->dof_number(s,v,0) : libMesh::invalid_uint;
+              }
+
+          libmesh_assert(CommWorld.semiverify(&n_sys));
+          libmesh_assert(CommWorld.semiverify(&n_vars));
+          libmesh_assert(CommWorld.semiverify(&n_comp));
+          libmesh_assert(CommWorld.semiverify(&first_dof));
+        }
+      else
+        {
+          const unsigned int* p_ui = NULL;
+          const std::vector<unsigned int>* p_vui = NULL;
+
+          libmesh_assert(CommWorld.semiverify(p_ui));
+          libmesh_assert(CommWorld.semiverify(p_vui));
+          libmesh_assert(CommWorld.semiverify(p_vui));
+          libmesh_assert(CommWorld.semiverify(p_vui));
+        }
+    }
+#endif // DEBUG
+
 }
 
 
@@ -1110,6 +1154,26 @@ void MeshTools::libmesh_assert_connected_nodes (const MeshBase &mesh)
 
 namespace MeshTools {
 
+void libmesh_assert_valid_dof_ids(const MeshBase &mesh)
+{
+  if (libMesh::n_processors() == 1)
+    return;
+
+  parallel_only();
+
+  unsigned int pmax_elem_id = mesh.max_elem_id();
+  Parallel::max(pmax_elem_id);
+
+  for (unsigned int i=0; i != pmax_elem_id; ++i)
+    assert_semiverify_dofobj(mesh.query_elem(i));
+
+  unsigned int pmax_node_id = mesh.max_node_id();
+  Parallel::max(pmax_node_id);
+
+  for (unsigned int i=0; i != pmax_node_id; ++i)
+    assert_semiverify_dofobj(mesh.query_node_ptr(i));
+}
+
 template <>
 void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
 {
@@ -1367,6 +1431,9 @@ void MeshTools::libmesh_assert_valid_neighbors(const MeshBase &mesh)
       elem->libmesh_assert_valid_neighbors();
     }
 }
+
+
+
 #endif
 
 
