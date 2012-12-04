@@ -374,6 +374,12 @@ namespace MeshTools
   void libmesh_assert_connected_nodes (const MeshBase &mesh);
 
   /**
+   * A function for verifying that degree of freedom indexing matches
+   * across processors.
+   */
+  void libmesh_assert_valid_dof_ids (const MeshBase &mesh);
+
+  /**
    * A function for verifying that processor assignment is
    * self-consistent on nodes (each node part of an active element on
    * its processor) or elements (each parent has the processor id of
