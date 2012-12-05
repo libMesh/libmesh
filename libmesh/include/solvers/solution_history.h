@@ -19,7 +19,7 @@ namespace libMesh
     SolutionHistory() {};
     
     // Destructor
-    ~SolutionHistory () {};
+    virtual ~SolutionHistory () {};
 
     // Function to store a solution, pure virtual
     virtual void store() = 0;
