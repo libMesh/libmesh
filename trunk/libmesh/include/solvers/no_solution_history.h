@@ -18,7 +18,7 @@ namespace libMesh
   NoSolutionHistory() : SolutionHistory() {};
 
     // Destructor
-    ~NoSolutionHistory() {};
+    virtual ~NoSolutionHistory() {};
 
     // Virtual function store which we will be overriding
     virtual void store();
