@@ -30,7 +30,8 @@ DiffContext::DiffContext (const System& sys) :
   elem_solution_derivative(1.),
   fixed_solution_derivative(0.),
   dof_indices_var(sys.n_vars()),
-  _deltat(NULL)
+  _deltat(NULL),
+  _system(sys)
 {
   // Finally initialize solution/residual/jacobian data structures
   unsigned int n_vars = sys.n_vars();
