@@ -1185,7 +1185,7 @@ inline bool Communicator::semiverify(const std::vector<T> *r) const
       if (!this->semiverify(psize))
         return false;
 
-      Parallel::max(rsize);
+      this->max(rsize);
 
       std::vector<T> tempmin, tempmax;
       if (r)
@@ -1237,7 +1237,7 @@ inline bool Communicator::semiverify(const std::string * r) const
       if (!this->semiverify(psize))
         return false;
 
-      Parallel::max(rsize);
+      this->max(rsize);
 
       // Cannot use <char> since MPI_MIN is not
       // strictly defined for chars!
