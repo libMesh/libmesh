@@ -91,6 +91,12 @@ public:
   unsigned int n_vars() const { return dof_indices_var.size(); }
 
   /**
+   * Accessor for associated system.
+   */
+  const System& get_system() const
+  { return _system; }
+
+  /**
    * Accessor for element solution.
    */
   const DenseVector<Number>& get_elem_solution() const
@@ -347,6 +353,8 @@ private:
    * Always test for NULL before using!
    */
   Real* _deltat;
+
+  const System& _system;
 };
 
 } // namespace libMesh
