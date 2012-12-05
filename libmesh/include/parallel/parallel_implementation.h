@@ -2944,6 +2944,9 @@ template <typename T>
 inline bool Communicator::verify(const T &) const { return true; }
 
 template <typename T>
+inline bool Communicator::semiverify(const T *) const { return true; }
+  
+template <typename T>
 inline void Communicator::min(T &) const {}
 
 template <typename T>
