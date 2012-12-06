@@ -373,7 +373,7 @@ mesh
 	    }
 
 	  // then find the global minimum
-	  Parallel::min (parent_processor_ids);
+	  CommWorld.min (parent_processor_ids);
 
 	  // and assign the ids, if we have a parent in this block.
 	  if (have_parent_in_block)
@@ -560,7 +560,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
                                libMesh::processor_id() - p) %
                                libMesh::n_processors();
       std::vector<unsigned int> request_to_fill;
-      Parallel::send_receive(procup, requested_node_ids[procup],
+      CommWorld.send_receive(procup, requested_node_ids[procup],
                              procdown, request_to_fill);
 
       // Fill those requests in-place
@@ -576,7 +576,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
 
       // Trade back the results
       std::vector<unsigned int> filled_request;
-      Parallel::send_receive(procdown, request_to_fill,
+      CommWorld.send_receive(procdown, request_to_fill,
                              procup,   filled_request);
       libmesh_assert_equal_to (filled_request.size(), requested_node_ids[procup].size());
 

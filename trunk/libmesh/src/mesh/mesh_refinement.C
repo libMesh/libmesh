@@ -177,9 +177,9 @@ void MeshRefinement::create_parent_error_vector
     }
 
   // Use a reference to std::vector to avoid confusing
-  // Parallel::verify
+  // CommWorld.verify
   std::vector<ErrorVectorReal> &epc = error_per_parent;
-  libmesh_assert(Parallel::verify(epc));
+  libmesh_assert(CommWorld.verify(epc));
 #endif // #ifdef DEBUG
 
   // error values on uncoarsenable elements will be left at -1
@@ -213,9 +213,9 @@ void MeshRefinement::create_parent_error_vector
 
   // Sync between processors.
   // Use a reference to std::vector to avoid confusing
-  // Parallel::min
+  // CommWorld.min
   std::vector<ErrorVectorReal> &epp = error_per_parent;
-  Parallel::min(epp);
+  CommWorld.min(epp);
   }
 
   // The parent's error is defined as the square root of the
@@ -252,7 +252,7 @@ void MeshRefinement::create_parent_error_vector
   }
 
   // Sum the vector across all processors
-  Parallel::sum(static_cast<std::vector<ErrorVectorReal>&>(error_per_parent));
+  CommWorld.sum(static_cast<std::vector<ErrorVectorReal>&>(error_per_parent));
 
   // Calculate the min and max as we loop
   parent_error_min = std::numeric_limits<double>::max();
@@ -262,7 +262,7 @@ void MeshRefinement::create_parent_error_vector
     {
       // If this element isn't a coarsenable parent with error, we
       // have nothing to do.  Just flag it as -1 and move on
-      // Note that Parallel::sum might have left uncoarsenable
+      // Note that CommWorld.sum might have left uncoarsenable
       // elements with error_per_parent=-n_proc, so reset it to
       // error_per_parent=-1
       if (error_per_parent[i] < 0.)
@@ -312,7 +312,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
     _periodic_boundaries && !_periodic_boundaries->empty();
-  libmesh_assert(Parallel::verify(has_periodic_boundaries));
+  libmesh_assert(CommWorld.verify(has_periodic_boundaries));
 
   if (has_periodic_boundaries)
     point_locator = _mesh.sub_point_locator();
@@ -357,7 +357,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
     }
 
   // If any processor failed, we failed globally
-  Parallel::max(failure);
+  CommWorld.max(failure);
 
   if (failure)
     {
@@ -416,7 +416,7 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
     }
 
   // If we found a flag on any processor, it counts
-  Parallel::max(found_flag);
+  CommWorld.max(found_flag);
 
   if (found_flag)
     {
@@ -517,8 +517,8 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 #ifdef DEBUG
           bool max_satisfied = satisfied,
                min_satisfied = satisfied;
-          Parallel::max(max_satisfied);
-          Parallel::min(min_satisfied);
+          CommWorld.max(max_satisfied);
+          CommWorld.min(min_satisfied);
           libmesh_assert_equal_to (satisfied, max_satisfied);
           libmesh_assert_equal_to (satisfied, min_satisfied);
 #endif
@@ -671,8 +671,8 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 #ifdef DEBUG
           bool max_satisfied = satisfied,
                min_satisfied = satisfied;
-          Parallel::max(max_satisfied);
-          Parallel::min(min_satisfied);
+          CommWorld.max(max_satisfied);
+          CommWorld.min(min_satisfied);
           libmesh_assert_equal_to (satisfied, max_satisfied);
           libmesh_assert_equal_to (satisfied, min_satisfied);
 #endif
@@ -785,8 +785,8 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
 #ifdef DEBUG
           bool max_satisfied = satisfied,
                min_satisfied = satisfied;
-          Parallel::max(max_satisfied);
-          Parallel::min(min_satisfied);
+          CommWorld.max(max_satisfied);
+          CommWorld.min(min_satisfied);
           libmesh_assert_equal_to (satisfied, max_satisfied);
           libmesh_assert_equal_to (satisfied, min_satisfied);
 #endif
@@ -908,7 +908,7 @@ bool MeshRefinement::make_flags_parallel_consistent()
   // we weren't globally consistent
   bool parallel_consistent = hsync.parallel_consistent &&
                              psync.parallel_consistent;
-  Parallel::min(parallel_consistent);
+  CommWorld.min(parallel_consistent);
 
   STOP_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
 
@@ -930,7 +930,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
     _periodic_boundaries && !_periodic_boundaries->empty();
-  libmesh_assert(Parallel::verify(has_periodic_boundaries));
+  libmesh_assert(CommWorld.verify(has_periodic_boundaries));
 
   if (has_periodic_boundaries)
     point_locator = _mesh.sub_point_locator();
@@ -995,7 +995,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
       STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
 
       // But we still have to check with other processors
-      Parallel::min(compatible_with_refinement);
+      CommWorld.min(compatible_with_refinement);
 
       return compatible_with_refinement;
     }
@@ -1253,7 +1253,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
   // If one processor finds an incompatibility, we're globally
   // incompatible
-  Parallel::min(compatible_with_refinement);
+  CommWorld.min(compatible_with_refinement);
 
   return compatible_with_refinement;
 }
@@ -1278,7 +1278,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
     _periodic_boundaries && !_periodic_boundaries->empty();
-  libmesh_assert(Parallel::verify(has_periodic_boundaries));
+  libmesh_assert(CommWorld.verify(has_periodic_boundaries));
 
   if (has_periodic_boundaries)
     point_locator = _mesh.sub_point_locator();
@@ -1462,7 +1462,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
   // If we're not compatible on one processor, we're globally not
   // compatible
-  Parallel::min(compatible_with_coarsening);
+  CommWorld.min(compatible_with_coarsening);
 
   STOP_LOG ("make_refinement_compatible()", "MeshRefinement");
 
@@ -1554,7 +1554,7 @@ bool MeshRefinement::_coarsen_elements ()
     }
 
   // If the mesh changed on any processor, it changed globally
-  Parallel::max(mesh_changed);
+  CommWorld.max(mesh_changed);
   // And we may need to update ParallelMesh values reflecting the changes
   if (mesh_changed)
     _mesh.update_parallel_id_counts();
@@ -1642,7 +1642,7 @@ bool MeshRefinement::_refine_elements ()
   bool mesh_changed = !local_copy_of_elements.empty();
 
   // If the mesh changed on any processor, it changed globally
-  Parallel::max(mesh_changed);
+  CommWorld.max(mesh_changed);
 
   // And we may need to update ParallelMesh values reflecting the changes
   if (mesh_changed)

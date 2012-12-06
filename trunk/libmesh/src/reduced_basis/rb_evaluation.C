@@ -872,7 +872,7 @@ void RBEvaluation::write_out_vectors(System& sys,
   }
 
   // Make sure processors are synced up before we begin
-  Parallel::barrier();
+  CommWorld.barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (write_binary_vectors ? ".xdr" : ".dat");
@@ -905,7 +905,7 @@ void RBEvaluation::write_out_vectors(System& sys,
   //   sys.write_serialized_data(bf_data, false);
 
   //   // Synchronize before moving on
-  //   Parallel::barrier();
+  //   CommWorld.barrier();
   //   // Swap back
   //   vectors[i]->swap(*sys.solution);
   // }
@@ -965,7 +965,7 @@ void RBEvaluation::read_in_vectors(System& sys,
   //libMesh::out << "Reading in the basis functions..." << std::endl;
 
   // Make sure processors are synced up before we begin
-  Parallel::barrier();
+  CommWorld.barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (read_binary_vectors ? ".xdr" : ".dat");

@@ -235,7 +235,7 @@ void EquationSystems::_read_impl (const std::string& name,
     if (!read_legacy_format)
       {
 	if (libMesh::processor_id() == 0) io.data(version);
-	Parallel::broadcast(version);
+	CommWorld.broadcast(version);
 
 	// All processors have the version header, if it does not contain
 	// "libMesh" something then it is a legacy file.
@@ -278,7 +278,7 @@ void EquationSystems::_read_impl (const std::string& name,
     // Read the number of equation systems
     unsigned int n_sys=0;
     if (libMesh::processor_id() == 0) io.data (n_sys);
-    Parallel::broadcast(n_sys);
+    CommWorld.broadcast(n_sys);
 
     for (unsigned int sys=0; sys<n_sys; sys++)
       {
@@ -286,13 +286,13 @@ void EquationSystems::_read_impl (const std::string& name,
 	// Read the name of the sys-th equation system
 	std::string sys_name;
 	if (libMesh::processor_id() == 0) io.data (sys_name);
-	Parallel::broadcast(sys_name);
+	CommWorld.broadcast(sys_name);
 
 	// 4.)
 	// Read the type of the sys-th equation system
 	std::string sys_type;
 	if (libMesh::processor_id() == 0) io.data (sys_type);
-	Parallel::broadcast(sys_type);
+	CommWorld.broadcast(sys_type);
 
 	if (read_header)
 	  this->add_system (sys_type, sys_name);

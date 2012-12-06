@@ -155,7 +155,7 @@ namespace libMesh
       {
 	if(proc!=libMesh::processor_id())
 	  {
-	    Parallel::nonblocking_send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
+	    CommWorld.send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
 	  }
       }
     for(unsigned int proc=0; proc<libMesh::n_processors(); proc++)
@@ -167,7 +167,7 @@ namespace libMesh
 	  }
 	else
 	  {
-	    Parallel::receive(proc,received_dofs);
+	    CommWorld.receive(proc,received_dofs);
 	  }
 	for(unsigned int i=0; i<received_dofs.size(); i++)
 	  {

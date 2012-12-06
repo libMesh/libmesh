@@ -163,8 +163,9 @@ void System::read_header (Xdr& io,
     // 5.)
     // Read the number of variables in the system
     unsigned int n_vars=0;
-    if (libMesh::processor_id() == 0) io.data (n_vars);
-    Parallel::broadcast(n_vars);
+    if (libMesh::processor_id() == 0)
+      io.data (n_vars);
+    CommWorld.broadcast(n_vars);
 
     _written_var_indices.clear();
     _written_var_indices.resize(n_vars, 0);
@@ -174,40 +175,45 @@ void System::read_header (Xdr& io,
 	// 6.)
 	// Read the name of the var-th variable
 	std::string var_name;
-	if (libMesh::processor_id() == 0) io.data (var_name);
-	Parallel::broadcast(var_name);
+	if (libMesh::processor_id() == 0)
+          io.data (var_name);
+	CommWorld.broadcast(var_name);
 
 	// 6.1.)
 	std::set<subdomain_id_type> domains;
 	if (io.version() >= LIBMESH_VERSION_ID(0,7,2))
 	{
 	  std::vector<subdomain_id_type> domain_array;
-	  if (libMesh::processor_id() == 0) io.data (domain_array);
+	  if (libMesh::processor_id() == 0)
+            io.data (domain_array);
 	  for (std::vector<subdomain_id_type>::iterator it = domain_array.begin(); it != domain_array.end(); ++it)
 		  domains.insert(*it);
 	}
-	Parallel::broadcast(domains);
+	CommWorld.broadcast(domains);
 
 	// 7.)
 	// Read the approximation order(s) of the var-th variable
 	int order=0;
-	if (libMesh::processor_id() == 0) io.data (order);
-	Parallel::broadcast(order);
+	if (libMesh::processor_id() == 0)
+          io.data (order);
+	CommWorld.broadcast(order);
 
 
 	// do the same for infinite element radial_order
 	int rad_order=0;
 	if (read_ifem_info)
 	  {
-	    if (libMesh::processor_id() == 0) io.data(rad_order);
-	    Parallel::broadcast(rad_order);
+	    if (libMesh::processor_id() == 0)
+              io.data(rad_order);
+	    CommWorld.broadcast(rad_order);
 	  }
 
 
 	// Read the finite element type of the var-th variable
 	int fam=0;
-	if (libMesh::processor_id() == 0) io.data (fam);
-	Parallel::broadcast(fam);
+	if (libMesh::processor_id() == 0)
+          io.data (fam);
+	CommWorld.broadcast(fam);
 	FEType type;
 	type.order  = static_cast<Order>(order);
 	type.family = static_cast<FEFamily>(fam);
@@ -235,10 +241,12 @@ void System::read_header (Xdr& io,
 	int i_map=0;
 	if (read_ifem_info)
 	  {
-	    if (libMesh::processor_id() == 0) io.data (radial_fam);
-	    Parallel::broadcast(radial_fam);
-	    if (libMesh::processor_id() == 0) io.data (i_map);
-	    Parallel::broadcast(i_map);
+	    if (libMesh::processor_id() == 0)
+              io.data (radial_fam);
+	    CommWorld.broadcast(radial_fam);
+	    if (libMesh::processor_id() == 0)
+              io.data (i_map);
+	    CommWorld.broadcast(i_map);
 	  }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -264,8 +272,9 @@ void System::read_header (Xdr& io,
   // 8.)
   // Read the number of additional vectors.
   unsigned int n_vectors=0;
-  if (libMesh::processor_id() == 0) io.data (n_vectors);
-  Parallel::broadcast(n_vectors);
+  if (libMesh::processor_id() == 0)
+    io.data (n_vectors);
+  CommWorld.broadcast(n_vectors);
 
   // If n_vectors > 0, this means that write_additional_data
   // was true when this file was written.  We will need to
@@ -278,8 +287,9 @@ void System::read_header (Xdr& io,
       // 9.)
       // Read the name of the vec-th additional vector
       std::string vec_name;
-      if (libMesh::processor_id() == 0) io.data (vec_name);
-      Parallel::broadcast(vec_name);
+      if (libMesh::processor_id() == 0)
+        io.data (vec_name);
+      CommWorld.broadcast(vec_name);
 
       if (read_additional_data)
 	{
@@ -320,8 +330,9 @@ void System::read_legacy_data (Xdr& io,
   // 10.)
   // Read and set the solution vector
   {
-    if (libMesh::processor_id() == 0) io.data (global_vector);
-    Parallel::broadcast(global_vector);
+    if (libMesh::processor_id() == 0)
+      io.data (global_vector);
+    CommWorld.broadcast(global_vector);
 
     // Remember that the stored vector is node-major.
     // We need to put it into whatever application-specific
@@ -403,8 +414,9 @@ void System::read_legacy_data (Xdr& io,
 	  // as the solution vector
 	  std::fill (global_vector.begin(), global_vector.end(), libMesh::zero);
 
-	  if (libMesh::processor_id() == 0) io.data (global_vector);
-	  Parallel::broadcast(global_vector);
+	  if (libMesh::processor_id() == 0)
+            io.data (global_vector);
+	  CommWorld.broadcast(global_vector);
 
 	  // If read_additional_data==true, then we will keep this vector, otherwise
 	  // we are going to throw it away.
@@ -835,7 +847,7 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int n_o
   // knowing the recv_vals_size[block] for each processor allows
   // us to sum them and find the global size for each block.
   std::vector<unsigned int> tot_vals_size(recv_vals_size);
-  Parallel::sum (tot_vals_size);
+  CommWorld.sum (tot_vals_size);
 
 
   //------------------------------------------
@@ -880,10 +892,10 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int n_o
       Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
       
       // nonblocking send the data for this block
-      Parallel::send (0, ids,  id_requests[blk],  id_tag);
+      CommWorld.send (0, ids,  id_requests[blk],  id_tag);
       
       // Go ahead and post the receive too
-      Parallel::receive (0, vals, val_requests[blk], val_tag);
+      CommWorld.receive (0, vals, val_requests[blk], val_tag);
 #endif
     }
 
@@ -936,10 +948,10 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int n_o
 	    {
 #ifdef LIBMESH_HAVE_MPI
 	      // blocking receive indices for this block, imposing no particular order on processor
-	      Parallel::Status id_status (Parallel::probe (Parallel::any_source, id_tag));
+	      Parallel::Status id_status (CommWorld.probe (Parallel::any_source, id_tag));
 	      std::vector<unsigned int> &ids (recv_ids[id_status.source()]);
 	      unsigned int &n_vals_proc (recv_vals_size[id_status.source()]);
-	      Parallel::receive (id_status.source(), ids,  id_tag);
+	      CommWorld.receive (id_status.source(), ids,  id_tag);
 #else
 	      // straight copy without MPI
 	      std::vector<unsigned int> &ids (recv_ids[0]);
@@ -1009,7 +1021,7 @@ unsigned int System::read_serialized_blocked_dof_objects (const unsigned int n_o
 	      
 #ifdef LIBMESH_HAVE_MPI
 	      // send the relevant values to this processor
-	      Parallel::send (proc, vals, reply_requests[proc], val_tag);
+	      CommWorld.send (proc, vals, reply_requests[proc], val_tag);
 #else
 	      recv_vals[blk] = vals;
 #endif
@@ -1081,11 +1093,11 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 
       // Post the receive on the last processor
       if (libMesh::processor_id() == (libMesh::n_processors()-1))
-        Parallel::receive(0, input_buffer, val_tag);
+        CommWorld.receive(0, input_buffer, val_tag);
 
       // Send the data to processor 0
       if (libMesh::processor_id() == 0)
-        Parallel::send(libMesh::n_processors()-1, input_buffer, val_tag);
+        CommWorld.send(libMesh::n_processors()-1, input_buffer, val_tag);
     }
 #endif
 
@@ -1128,8 +1140,9 @@ unsigned int System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec
   unsigned int vector_length=0, n_assigned_vals=0;
 
   // Get the buffer size
-  if (libMesh::processor_id() == 0) io.data(vector_length, "# vector length");
-  Parallel::broadcast(vector_length);
+  if (libMesh::processor_id() == 0)
+    io.data(vector_length, "# vector length");
+  CommWorld.broadcast(vector_length);
 
   const unsigned int
     n_vars  = this->_written_var_indices.size(),
@@ -1209,7 +1222,7 @@ unsigned int System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec
   vec.close();
 
 #ifndef NDEBUG
-  Parallel::sum (n_assigned_vals);
+  CommWorld.sum (n_assigned_vals);
   libmesh_assert_equal_to (n_assigned_vals, vector_length);
 #endif
 
@@ -1892,8 +1905,8 @@ unsigned int System::write_serialized_blocked_dof_objects (const std::vector<con
       Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
       
       // nonblocking send the data for this block
-      Parallel::send (0, ids,  id_requests[blk],  id_tag);
-      Parallel::send (0, vals, val_requests[blk], val_tag);
+      CommWorld.send (0, ids,  id_requests[blk],  id_tag);
+      CommWorld.send (0, vals, val_requests[blk], val_tag);
 #endif
     }
 
@@ -1934,9 +1947,9 @@ unsigned int System::write_serialized_blocked_dof_objects (const std::vector<con
 	    {
 #ifdef LIBMESH_HAVE_MPI
 	      // blocking receive indices for this block, imposing no particular order on processor
-	      Parallel::Status id_status     (Parallel::probe (Parallel::any_source, id_tag));
+	      Parallel::Status id_status     (CommWorld.probe (Parallel::any_source, id_tag));
 	      std::vector<unsigned int> &ids (recv_ids[id_status.source()]);
-	      Parallel::receive (id_status.source(), ids,  id_tag);
+	      CommWorld.receive (id_status.source(), ids,  id_tag);
 #else
 	      std::vector<unsigned int> &ids (recv_ids[0]);
 #endif
@@ -1957,9 +1970,9 @@ unsigned int System::write_serialized_blocked_dof_objects (const std::vector<con
 
 #ifdef LIBMESH_HAVE_MPI
 	      // blocking receive values for this block, imposing no particular order on processor
-	      Parallel::Status val_status  (Parallel::probe (Parallel::any_source, val_tag));
+	      Parallel::Status val_status  (CommWorld.probe (Parallel::any_source, val_tag));
 	      std::vector<Number> &vals    (recv_vals[val_status.source()]);
-	      Parallel::receive (val_status.source(), vals, val_tag);
+	      CommWorld.receive (val_status.source(), vals, val_tag);
 #else
 	      // straight copy without MPI
 	      std::vector<Number> &vals (recv_vals[0]);
@@ -2032,7 +2045,7 @@ unsigned int System::write_serialized_blocked_dof_objects (const std::vector<con
   // approach would be to figure out unique tags for each range,
   // but for now we just impose a barrier here.  And might as 
   // well have it do some useful work.
-  Parallel::broadcast(written_length);
+  CommWorld.broadcast(written_length);
 
   return written_length;
 }
@@ -2066,13 +2079,13 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
       // Post the receive on processor 0
       if ( libMesh::processor_id() == 0 )
         {
-          Parallel::receive(libMesh::n_processors()-1, vals, val_tag);
+          CommWorld.receive(libMesh::n_processors()-1, vals, val_tag);
         }
 
       // Send the data to processor 0
       if (libMesh::processor_id() == (libMesh::n_processors()-1))
         {
-          Parallel::send(0, vals, val_tag);
+          CommWorld.send(0, vals, val_tag);
         }
     }
 #endif
@@ -2174,8 +2187,8 @@ unsigned int System::read_serialized_vectors (Xdr &io,
     }
 
   // no need to actually communicate these.
-  // Parallel::broadcast(num_vecs);
-  // Parallel::broadcast(vector_length);
+  // CommWorld.broadcast(num_vecs);
+  // CommWorld.broadcast(vector_length);
   
   // Cache these - they are not free!
   const unsigned int

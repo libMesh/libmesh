@@ -63,8 +63,8 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
       summed_m_l = m_l,
       summed_n_l = n_l;
 
-    Parallel::sum (summed_m_l);
-    Parallel::sum (summed_n_l);
+    CommWorld.sum (summed_m_l);
+    CommWorld.sum (summed_n_l);
 
     libmesh_assert_equal_to (m, summed_m_l);
     libmesh_assert_equal_to (n, summed_n_l);
@@ -147,8 +147,8 @@ void EpetraMatrix<T>::init (const unsigned int m,
       summed_m_l = m_l,
       summed_n_l = n_l;
 
-    Parallel::sum (summed_m_l);
-    Parallel::sum (summed_n_l);
+    CommWorld.sum (summed_m_l);
+    CommWorld.sum (summed_n_l);
 
     libmesh_assert_equal_to (m, summed_m_l);
     libmesh_assert_equal_to (n, summed_n_l);

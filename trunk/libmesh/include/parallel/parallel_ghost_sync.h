@@ -120,7 +120,7 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
   // We need a valid location_map
 #ifdef DEBUG
   bool need_map_update = (range_begin != range_end && location_map.empty());
-  Parallel::max(need_map_update);
+  CommWorld.max(need_map_update);
   libmesh_assert(!need_map_update);
 #endif
 
@@ -183,11 +183,11 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
       std::vector<Real> request_to_fill_x,
                         request_to_fill_y,
                         request_to_fill_z;
-      Parallel::send_receive(procup, requested_objs_x[procup],
+      CommWorld.send_receive(procup, requested_objs_x[procup],
                              procdown, request_to_fill_x);
-      Parallel::send_receive(procup, requested_objs_y[procup],
+      CommWorld.send_receive(procup, requested_objs_y[procup],
                              procdown, request_to_fill_y);
-      Parallel::send_receive(procup, requested_objs_z[procup],
+      CommWorld.send_receive(procup, requested_objs_z[procup],
                              procdown, request_to_fill_z);
 
       // Find the local id of each requested object
@@ -215,7 +215,7 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
 
       // Trade back the results
       std::vector<typename SyncFunctor::datum> received_data;
-      Parallel::send_receive(procdown, data,
+      CommWorld.send_receive(procdown, data,
                              procup, received_data);
       libmesh_assert_equal_to (requested_objs_x[procup].size(),
                                received_data.size());
@@ -281,7 +281,7 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
                                libMesh::processor_id() - p) %
                                libMesh::n_processors();
       std::vector<unsigned int> request_to_fill_id;
-      Parallel::send_receive(procup, requested_objs_id[procup],
+      CommWorld.send_receive(procup, requested_objs_id[procup],
                              procdown, request_to_fill_id);
 
       // Gather whatever data the user wants
@@ -290,7 +290,7 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
 
       // Trade back the results
       std::vector<typename SyncFunctor::datum> received_data;
-      Parallel::send_receive(procdown, data,
+      CommWorld.send_receive(procdown, data,
                              procup, received_data);
       libmesh_assert_equal_to (requested_objs_id[procup].size(),
                                received_data.size());
@@ -371,9 +371,9 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
                                libMesh::n_processors();
       std::vector<unsigned int> request_to_fill_parent_id,
                                 request_to_fill_child_num;
-      Parallel::send_receive(procup, requested_objs_parent_id[procup],
+      CommWorld.send_receive(procup, requested_objs_parent_id[procup],
                              procdown, request_to_fill_parent_id);
-      Parallel::send_receive(procup, requested_objs_child_num[procup],
+      CommWorld.send_receive(procup, requested_objs_child_num[procup],
                              procdown, request_to_fill_child_num);
 
       // Find the id of each requested element
@@ -396,7 +396,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
 
       // Trade back the results
       std::vector<typename SyncFunctor::datum> received_data;
-      Parallel::send_receive(procdown, data,
+      CommWorld.send_receive(procdown, data,
                              procup, received_data);
       libmesh_assert_equal_to (requested_objs_id[procup].size(),
                               received_data.size());

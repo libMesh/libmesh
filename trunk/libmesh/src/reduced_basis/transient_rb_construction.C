@@ -1822,7 +1822,7 @@ void TransientRBConstruction::write_riesz_representors_to_files(const std::strin
         write_serialized_data(mr_data, false);
 
 	// Synchronize before moving on
-	Parallel::barrier();
+	CommWorld.barrier();
 
 	// Swap back.
 	trans_rb_eval.M_q_representor[q][i]->swap(*solution);

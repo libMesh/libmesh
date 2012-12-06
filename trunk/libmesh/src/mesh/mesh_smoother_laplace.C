@@ -376,7 +376,7 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out) const
     // std::vector<unsigned> copy_of_flat_graph(flat_graph);
 
     // Use the allgather routine to combine all the flat graphs on all processors
-    Parallel::allgather(flat_graph);
+    CommWorld.allgather(flat_graph);
 
     // Now reconstruct _graph from the allgathered flat_graph.
 

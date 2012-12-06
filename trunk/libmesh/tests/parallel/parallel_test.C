@@ -34,7 +34,7 @@ public:
   void testGather()
   {
     std::vector<unsigned int> vals;
-    Parallel::gather(0,libMesh::processor_id(),vals);
+    CommWorld.gather(0,libMesh::processor_id(),vals);
     
     if (libMesh::processor_id() == 0)
       for (unsigned int i=0; i<vals.size(); i++)
@@ -46,7 +46,7 @@ public:
   void testAllGather()
   {
     std::vector<unsigned int> vals;
-    Parallel::allgather(libMesh::processor_id(),vals);
+    CommWorld.allgather(libMesh::processor_id(),vals);
     
     for (unsigned int i=0; i<vals.size(); i++)
       CPPUNIT_ASSERT_EQUAL( i , vals[i] );
@@ -65,7 +65,7 @@ public:
     if (libMesh::processor_id() == 0)
       dest = src;
 
-    Parallel::broadcast(dest);
+    CommWorld.broadcast(dest);
 
     for (unsigned int i=0; i<src.size(); i++)
       CPPUNIT_ASSERT_EQUAL( src[i] , dest[i] );
@@ -75,7 +75,7 @@ public:
 
   void testBarrier()
   {
-    Parallel::barrier();
+    CommWorld.barrier();
   }
 
 
@@ -84,7 +84,7 @@ public:
   {
     unsigned int min = libMesh::processor_id();
     
-    Parallel::min(min);
+    CommWorld.min(min);
     
     CPPUNIT_ASSERT_EQUAL (min, static_cast<unsigned int>(0));
   }
@@ -95,7 +95,7 @@ public:
   {
     unsigned int max = libMesh::processor_id();
     
-    Parallel::max(max);
+    CommWorld.max(max);
     
     CPPUNIT_ASSERT_EQUAL (max+1, libMesh::n_processors());
   }
@@ -120,11 +120,11 @@ public:
 
     if (libMesh::n_processors() > 1)
       {
-        Parallel::send (procup,
+        CommWorld.send (procup,
 		        src_val,
 		        request);
 
-        Parallel::receive (procdown,
+        CommWorld.receive (procdown,
 		           recv_val);
 
         Parallel::wait (request);
@@ -156,11 +156,11 @@ public:
 
     if (libMesh::n_processors() > 1)
       {
-        Parallel::receive (procdown,
+        CommWorld.receive (procdown,
 		           recv_val,
 		           request);
 
-        Parallel::send (procup,
+        CommWorld.send (procup,
 		        src_val);
 
         Parallel::wait (request);

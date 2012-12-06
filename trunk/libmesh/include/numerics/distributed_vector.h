@@ -571,7 +571,7 @@ void DistributedVector<T>::init (const unsigned int n,
 
   local_sizes[libMesh::processor_id()] = n_local;
 
-  Parallel::sum(local_sizes);
+  CommWorld.sum(local_sizes);
 
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
@@ -834,7 +834,7 @@ Real DistributedVector<T>::min () const
   for (unsigned int i = 1; i < _values.size(); ++i)
     local_min = std::min(libmesh_real(_values[i]), local_min);
 
-  Parallel::min(local_min);
+  CommWorld.min(local_min);
 
   return local_min;
 }
@@ -857,7 +857,7 @@ Real DistributedVector<T>::max() const
   for (unsigned int i = 1; i < _values.size(); ++i)
     local_max = std::max(libmesh_real(_values[i]), local_max);
 
-  Parallel::max(local_max);
+  CommWorld.max(local_max);
 
   return local_max;
 }

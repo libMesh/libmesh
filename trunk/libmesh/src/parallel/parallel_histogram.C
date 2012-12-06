@@ -97,7 +97,7 @@ void Histogram<KeyType>::build_histogram ()
 
   // Add all the local histograms to get the global histogram
   hist = local_hist;
-  Parallel::sum(hist);
+  CommWorld.sum(hist);
 
   // All done!
 }

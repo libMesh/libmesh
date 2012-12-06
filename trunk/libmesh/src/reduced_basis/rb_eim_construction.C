@@ -227,11 +227,11 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
   }
   
   // root_id may be non-zero on more than one processor due to ghost elements
-  // so use Parallel::max to get just one proc id
-  Parallel::max(root_id);
+  // so use CommWorld.max to get just one proc id
+  CommWorld.max(root_id);
   
   // Then broadcast the result
-  Parallel::broadcast(value, root_id);
+  CommWorld.broadcast(value, root_id);
 
   return value;
 }
@@ -333,14 +333,14 @@ void RBEIMConstruction::enrich_RB_space()
 
   Real global_abs_value = std::abs(optimal_value);
   unsigned int proc_ID_index;
-  Parallel::maxloc(global_abs_value, proc_ID_index);
+  CommWorld.maxloc(global_abs_value, proc_ID_index);
 
   // Broadcast the optimal point from proc_ID_index
-  Parallel::broadcast(optimal_point, proc_ID_index);
+  CommWorld.broadcast(optimal_point, proc_ID_index);
 
   // Also broadcast the corresponding optimal_var and optimal_value
-  Parallel::broadcast(optimal_var, proc_ID_index);
-  Parallel::broadcast(optimal_value, proc_ID_index);
+  CommWorld.broadcast(optimal_var, proc_ID_index);
+  CommWorld.broadcast(optimal_value, proc_ID_index);
 
   // Scale the solution
   solution->scale(1./optimal_value);

@@ -1034,7 +1034,7 @@ void PetscVector<T>::localize (std::vector<T>& v_local) const
   ierr = VecRestoreArray (_vec, &values);
 	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  Parallel::sum(v_local);
+  CommWorld.sum(v_local);
 }
 
 

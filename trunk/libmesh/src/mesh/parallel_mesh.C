@@ -141,7 +141,7 @@ unsigned int ParallelMesh::parallel_n_elem() const
   parallel_only();
 
   unsigned int n_local = this->n_local_elem();
-  Parallel::sum(n_local);
+  CommWorld.sum(n_local);
   n_local += this->n_unpartitioned_elem();
   return n_local;
 }
@@ -155,7 +155,7 @@ unsigned int ParallelMesh::parallel_max_elem_id() const
 
   unsigned int max_local = _elements.empty() ?
     0 : _elements.rbegin()->first + 1;
-  Parallel::max(max_local);
+  CommWorld.max(max_local);
   return max_local;
 }
 
@@ -167,7 +167,7 @@ unsigned int ParallelMesh::parallel_n_nodes() const
   parallel_only();
 
   unsigned int n_local = this->n_local_nodes();
-  Parallel::sum(n_local);
+  CommWorld.sum(n_local);
   n_local += this->n_unpartitioned_nodes();
   return n_local;
 }
@@ -181,7 +181,7 @@ unsigned int ParallelMesh::parallel_max_node_id() const
 
   unsigned int max_local = _nodes.empty() ?
     0 : _nodes.rbegin()->first + 1;
-  Parallel::max(max_local);
+  CommWorld.max(max_local);
   return max_local;
 }
 
@@ -400,7 +400,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
   if (elem_procid == DofObject::invalid_processor_id)
     {
       unsigned int elem_id = e->id();
-      Parallel::max(elem_id);
+      CommWorld.max(elem_id);
       libmesh_assert_equal_to (elem_id, e->id());
     }
 #endif
@@ -555,7 +555,7 @@ Node* ParallelMesh::add_node (Node *n)
   if (node_procid == DofObject::invalid_processor_id)
     {
       unsigned int node_id = n->id();
-      Parallel::max(node_id);
+      CommWorld.max(node_id);
       libmesh_assert_equal_to (node_id, n->id());
     }
 #endif
@@ -735,7 +735,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
       libmesh_assert(!obj || obj->id() == i);
 
       unsigned int min_dofid = dofid;
-      Parallel::min(min_dofid);
+      CommWorld.min(min_dofid);
       // All processors with an object should agree on id
       libmesh_assert (!obj || dofid == min_dofid);
 
@@ -743,7 +743,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
         obj->processor_id() : DofObject::invalid_processor_id;
 
       unsigned int min_procid = procid;
-      Parallel::min(min_procid);
+      CommWorld.min(min_procid);
 
       // All processors with an object should agree on processor id
       libmesh_assert (!obj || procid == min_procid);
@@ -795,7 +795,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 #endif
 
       unsigned int min_rflag = refinement_flag;
-      Parallel::min(min_rflag);
+      CommWorld.min(min_rflag);
       // All processors with this element should agree on flag
       libmesh_assert (!elem || min_rflag == refinement_flag);
 
@@ -848,11 +848,11 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
     }
 
   std::vector<unsigned int> objects_on_proc(libMesh::n_processors(), 0);
-  Parallel::allgather(ghost_objects_from_proc[libMesh::processor_id()],
+  CommWorld.allgather(ghost_objects_from_proc[libMesh::processor_id()],
                       objects_on_proc);
 
 #ifndef NDEBUG
-  libmesh_assert(Parallel::verify(unpartitioned_objects));
+  libmesh_assert(CommWorld.verify(unpartitioned_objects));
   for (unsigned int p=0; p != libMesh::n_processors(); ++p)
     libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
 #endif
@@ -903,7 +903,7 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
                                    libMesh::processor_id() - p) %
                                    libMesh::n_processors();
           std::vector<unsigned int> request_to_fill;
-          Parallel::send_receive(procup, requested_ids[procup],
+          CommWorld.send_receive(procup, requested_ids[procup],
                                  procdown, request_to_fill);
 
           // Fill those requests
@@ -923,7 +923,7 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 
           // Trade back the results
           std::vector<unsigned int> filled_request;
-          Parallel::send_receive(procdown, new_ids,
+          CommWorld.send_receive(procdown, new_ids,
                                  procup, filled_request);
 
           // And copy the id changes we've now been informed of
@@ -1131,7 +1131,7 @@ unsigned int ParallelMesh::n_active_elem () const
   unsigned int active_elements =
     static_cast<unsigned int>(std::distance (this->active_local_elements_begin(),
 					     this->active_local_elements_end()));
-  Parallel::sum(active_elements);
+  CommWorld.sum(active_elements);
 
   // Then add unpartitioned active elements, which should exist on
   // every processor

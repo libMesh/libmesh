@@ -109,8 +109,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
     error_max = std::max (error_max, error_per_cell[id]);
     error_min = std::min (error_min, error_per_cell[id]);
   }
-  Parallel::max(error_max);
-  Parallel::min(error_min);
+  CommWorld.max(error_max);
+  CommWorld.min(error_min);
 
   // Compute the cutoff values for coarsening and refinement
   const Real error_delta = (error_max - error_min);
@@ -300,9 +300,9 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
           (std::make_pair(error_per_cell[eid], eid));
       }
 
-    Parallel::max(is_active);
+    CommWorld.max(is_active);
 
-    Parallel::allgather(sorted_error);
+    CommWorld.allgather(sorted_error);
   }
 
   // Default sort works since pairs are sorted lexicographically
@@ -380,7 +380,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
         if (elem && elem->level() < _max_h_level)
 	  is_refinable[eid] = true;
       }
-    Parallel::max(is_refinable);
+    CommWorld.max(is_refinable);
 
     if (refine_count > max_elem_refine)
       refine_count = max_elem_refine;
@@ -512,7 +512,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   for (; elem_it != elem_end; ++elem_it)
     sorted_error.push_back (error_per_cell[(*elem_it)->id()]);
 
-  Parallel::allgather(sorted_error);
+  CommWorld.allgather(sorted_error);
 
   // Now sort the sorted_error vector
   std::sort (sorted_error.begin(), sorted_error.end());

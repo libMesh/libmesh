@@ -118,7 +118,7 @@ void BoundaryInfo::sync (UnstructuredMesh& boundary_mesh,
   std::set<boundary_id_type> request_boundary_ids(_boundary_ids);
   request_boundary_ids.insert(invalid_id);
   if (!_mesh.is_serial())
-    Parallel::set_union(request_boundary_ids);
+    CommWorld.set_union(request_boundary_ids);
 
   this->sync(request_boundary_ids, boundary_mesh,
              boundary_mesh_data, this_mesh_data);
@@ -253,8 +253,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
     }
 
   // Join up the results from other processors
-  Parallel::set_union(side_id_map);
-  Parallel::set_union(node_id_map);
+  CommWorld.set_union(side_id_map);
+  CommWorld.set_union(node_id_map);
 
   // Finally we'll pass through any unpartitioned elements to add them
   // to the maps and counts.
@@ -1137,7 +1137,7 @@ unsigned int BoundaryInfo::n_boundary_conds () const
     if (pos->first->processor_id() == libMesh::processor_id())
       nbcs++;
 
-  Parallel::sum (nbcs);
+  CommWorld.sum (nbcs);
 
   return nbcs;
 }

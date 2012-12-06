@@ -43,9 +43,9 @@ namespace libMesh
 #undef parallel_only
 #ifndef NDEBUG
   #define parallel_only() do { \
-    libmesh_assert(Parallel::verify(std::string(__FILE__).size())); \
-    libmesh_assert(Parallel::verify(std::string(__FILE__))); \
-    libmesh_assert(Parallel::verify(__LINE__)); } while (0)
+    libmesh_assert(CommWorld.verify(std::string(__FILE__).size())); \
+    libmesh_assert(CommWorld.verify(std::string(__FILE__))); \
+    libmesh_assert(CommWorld.verify(__LINE__)); } while (0)
 #else
   #define parallel_only()  ((void) 0)
 #endif
@@ -56,9 +56,9 @@ namespace libMesh
 #undef parallel_only_on
 #ifndef NDEBUG
   #define parallel_only_on(comm_arg) do { \
-    libmesh_assert(Parallel::verify(std::string(__FILE__).size(), comm_arg)); \
-    libmesh_assert(Parallel::verify(std::string(__FILE__), comm_arg)); \
-    libmesh_assert(Parallel::verify(__LINE__), comm_arg); } while (0)
+    libmesh_assert(CommWorld.verify(std::string(__FILE__).size(), comm_arg)); \
+    libmesh_assert(CommWorld.verify(std::string(__FILE__), comm_arg)); \
+    libmesh_assert(CommWorld.verify(__LINE__), comm_arg); } while (0)
 #else
   #define parallel_only_on(comm_arg)  ((void) 0)
 #endif

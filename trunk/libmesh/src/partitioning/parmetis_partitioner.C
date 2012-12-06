@@ -264,7 +264,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
   // processor. This will not in general be correct for parallel meshes
   // when (pid!=libMesh::processor_id()).
   _n_active_elem_on_proc.resize(libMesh::n_processors());
-  Parallel::allgather(n_active_local_elem, _n_active_elem_on_proc);
+  CommWorld.allgather(n_active_local_elem, _n_active_elem_on_proc);
 
   // count the total number of active elements in the mesh.  Note we cannot
   // use mesh.n_active_elem() in general since this only returns the number
@@ -600,7 +600,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 				     libMesh::processor_id() - pid) %
 	                             libMesh::n_processors();
 
-      Parallel::send_receive (procup,   requested_ids[procup],
+      CommWorld.send_receive (procup,   requested_ids[procup],
 			      procdown, requests_to_fill[procdown]);
 
       // we can overwrite these requested ids in-place.
@@ -629,7 +629,7 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 	}
 
       // Trade back
-      Parallel::send_receive (procdown, requests_to_fill[procdown],
+      CommWorld.send_receive (procdown, requests_to_fill[procdown],
 			      procup,   requested_ids[procup]);
     }
 

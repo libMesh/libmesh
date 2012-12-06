@@ -75,7 +75,7 @@ void BinSorter<KeyType>::binsort (const unsigned int nbins,
     unsigned int local_data_size = data.size();
     unsigned int global_data_size = local_data_size;
 
-    Parallel::sum(global_data_size);
+    CommWorld.sum(global_data_size);
 
     std::vector<unsigned int> target_bin_size (nbins, global_data_size / nbins);
 

@@ -58,7 +58,7 @@ T EpetraVector<T>::sum () const
   for (unsigned int i=0; i<nl; i++)
     sum += values[i];
 
-  Parallel::sum<T>(sum);
+  CommWorld.sum<T>(sum);
 
   return sum;
 }
@@ -587,7 +587,7 @@ void EpetraVector<T>::localize (std::vector<T>& v_local) const
   for (unsigned int i=0; i<nl; i++)
     v_local.push_back((*this->_vec)[i]);
 
-  Parallel::allgather (v_local);
+  CommWorld.allgather (v_local);
 }
 
 
@@ -613,7 +613,7 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
   for (unsigned int i=0; i<nl; i++)
     v_local.push_back((*this->_vec)[i]);
 
-  Parallel::gather (pid, v_local);
+  CommWorld.gather (pid, v_local);
 }
 
 

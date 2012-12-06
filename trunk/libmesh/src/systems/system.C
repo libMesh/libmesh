@@ -1492,12 +1492,12 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 
   if (using_hilbert_norm)
     {
-      Parallel::sum(v_norm);
+      CommWorld.sum(v_norm);
       v_norm = std::sqrt(v_norm);
     }
   else
     {
-      Parallel::max(v_norm);
+      CommWorld.max(v_norm);
     }
 
   STOP_LOG ("calculate_norm()", "System");
@@ -1840,7 +1840,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  Parallel::verify(p);
+  CommWorld.verify(p);
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -1865,13 +1865,13 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   unsigned int lowest_owner =
     (e && (e->processor_id() == libMesh::processor_id())) ?
     libMesh::processor_id() : libMesh::n_processors();
-  Parallel::min(lowest_owner);
+  CommWorld.min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
   // If nobody admits owning the point, we have a problem.
   if (lowest_owner != libMesh::n_processors())
-    Parallel::broadcast(u, lowest_owner);
+    CommWorld.broadcast(u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 
@@ -1936,7 +1936,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  Parallel::verify(p);
+  CommWorld.verify(p);
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -1961,13 +1961,13 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   unsigned int lowest_owner =
     (e && (e->processor_id() == libMesh::processor_id())) ?
     libMesh::processor_id() : libMesh::n_processors();
-  Parallel::min(lowest_owner);
+  CommWorld.min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
   // If nobody admits owning the point, we may have a problem.
   if (lowest_owner != libMesh::n_processors())
-    Parallel::broadcast(grad_u, lowest_owner);
+    CommWorld.broadcast(grad_u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 
@@ -2034,7 +2034,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  Parallel::verify(p);
+  CommWorld.verify(p);
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -2059,13 +2059,13 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   unsigned int lowest_owner =
     (e && (e->processor_id() == libMesh::processor_id())) ?
     libMesh::processor_id() : libMesh::n_processors();
-  Parallel::min(lowest_owner);
+  CommWorld.min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
   // If nobody admits owning the point, we may have a problem.
   if (lowest_owner != libMesh::n_processors())
-    Parallel::broadcast(hess_u, lowest_owner);
+    CommWorld.broadcast(hess_u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 

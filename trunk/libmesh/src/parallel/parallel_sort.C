@@ -65,7 +65,7 @@ void Sort<KeyType>::sort()
   // work with, so catch the degenerate cases here
   unsigned int global_data_size = _data.size();
 
-  Parallel::sum (global_data_size);
+  CommWorld.sum (global_data_size);
 
   if (global_data_size < 2)
     {
@@ -73,7 +73,7 @@ void Sort<KeyType>::sort()
       // or contains only one element
       _my_bin = _data;
 
-      Parallel::allgather (static_cast<unsigned int>(_my_bin.size()),
+      CommWorld.allgather (static_cast<unsigned int>(_my_bin.size()),
 			   _local_bin_sizes);
     }
   else
@@ -108,7 +108,7 @@ void Sort<KeyType>::binsort()
 
   // Communicate to determine the global
   // min and max for all processors.
-  Parallel::max(global_min_max);
+  CommWorld.max(global_min_max);
 
   // Multiply the min by -1 to obtain the true min
   global_min_max[0] *= -1;
@@ -196,7 +196,7 @@ void Sort<KeyType>::communicate_bins()
   std::vector<unsigned int> global_bin_sizes = _local_bin_sizes;
 
   // Sum to find the total number of entries in each bin.
-  Parallel::sum(global_bin_sizes);
+  CommWorld.sum(global_bin_sizes);
 
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which

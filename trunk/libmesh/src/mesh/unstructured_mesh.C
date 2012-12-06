@@ -745,7 +745,7 @@ void UnstructuredMesh::write (const std::string& name,
       unsigned int pid_0 = 0;
       if (libMesh::processor_id() == 0)
         pid_0 = getpid();
-      Parallel::broadcast(pid_0);
+      CommWorld.broadcast(pid_0);
       OStringStream pid_suffix;
       pid_suffix << '_' << pid_0;
 
@@ -856,7 +856,7 @@ void UnstructuredMesh::write (const std::string& name,
 		libmesh_file_error(system_string);
 	      std::remove(new_name.c_str());
 	    }
-	  Parallel::barrier();
+	  CommWorld.barrier();
 	  STOP_LOG("system(bzip2)", "Mesh");
 	}
       if (name.size() - name.rfind(".xz") == 3)
@@ -870,7 +870,7 @@ void UnstructuredMesh::write (const std::string& name,
 		libmesh_file_error(system_string);
 	      std::remove(new_name.c_str());
 	    }
-	  Parallel::barrier();
+	  CommWorld.barrier();
 	  STOP_LOG("system(xz)", "Mesh");
 	}
 

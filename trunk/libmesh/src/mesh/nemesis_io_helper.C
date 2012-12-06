@@ -1362,7 +1362,7 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
   local_side_boundary_ids = global_side_boundary_ids;
 
   // 2.) Gather boundary side IDs from other processors
-  Parallel::set_union(global_side_boundary_ids);
+  CommWorld.set_union(global_side_boundary_ids);
 
   // 3.) Now global_side_boundary_ids actually contains a global list of all side boundary IDs
   this->num_side_sets_global = global_side_boundary_ids.size();
@@ -1434,7 +1434,7 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
     }
 
   // Finally sum up the result
-  Parallel::sum(this->num_global_side_counts);
+  CommWorld.sum(this->num_global_side_counts);
 
   if (_verbose)
     {
@@ -1463,7 +1463,7 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
   local_node_boundary_ids = global_node_boundary_ids;
 
   // 2.) Gather boundary node IDs from other processors
-  Parallel::set_union(global_node_boundary_ids);
+  CommWorld.set_union(global_node_boundary_ids);
 
   // 3.) Now global_node_boundary_ids actually contains a global list of all node boundary IDs
   this->num_node_sets_global = global_node_boundary_ids.size();
@@ -1548,7 +1548,7 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
     }
 
   // And finally we can sum them up
-  Parallel::sum(this->num_global_node_counts);
+  CommWorld.sum(this->num_global_node_counts);
 
   if (_verbose)
     {
@@ -1592,7 +1592,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
       global_subdomain_counts[cur_subdomain]++;
     }
 
-  // We're next going to Parallel::sum the subdomain counts, so save the local counts
+  // We're next going to CommWorld.sum the subdomain counts, so save the local counts
   this->local_subdomain_counts = global_subdomain_counts;
 
   {
@@ -1601,7 +1601,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
 							       global_subdomain_ids.end());
 
     // 3.) Gather them into an enlarged vector
-    Parallel::allgather(global_subdomain_ids_vector);
+    CommWorld.allgather(global_subdomain_ids_vector);
 
     // 4.) Insert any new IDs into the set (any duplicates will be dropped)
     global_subdomain_ids.insert(global_subdomain_ids_vector.begin(),
@@ -1626,7 +1626,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
       libMesh::out << std::endl;
     }
 
-  // 6.) Parallel::sum up the number of elements in each block.  We know the global
+  // 6.) CommWorld.sum up the number of elements in each block.  We know the global
   // subdomain IDs, so pack them into a vector one by one.  Use a vector of int since
   // that is what Nemesis wants
   this->global_elem_blk_cnts.resize(global_subdomain_ids.size());
@@ -1640,7 +1640,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
     }
 
   // Sum up subdomain counts from all processors
-  Parallel::sum(this->global_elem_blk_cnts);
+  CommWorld.sum(this->global_elem_blk_cnts);
 
   if (_verbose)
     {

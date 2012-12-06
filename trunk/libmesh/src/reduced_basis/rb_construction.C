@@ -1429,7 +1429,7 @@ Real RBConstruction::compute_max_error_bound()
       root_id = libMesh::processor_id();
     }
 
-    Parallel::sum(root_id); // root_id is only non-zero on one processor
+    CommWorld.sum(root_id); // root_id is only non-zero on one processor
     broadcast_parameters(root_id);
   }
 
@@ -2271,7 +2271,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
 	  write_serialized_data(fqr_data, false);
 
 	  // Synchronize before moving on
-	  Parallel::barrier();
+	  CommWorld.barrier();
 
 	  // Swap back.
 	  Fq_representor[i]->swap(*solution);
@@ -2309,7 +2309,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
         write_serialized_data(aqr_data, false);
 
         // Synchronize before moving on
-        Parallel::barrier();
+        CommWorld.barrier();
 
         // Swap back.
         get_rb_evaluation().Aq_representor[i][j]->swap(*solution);

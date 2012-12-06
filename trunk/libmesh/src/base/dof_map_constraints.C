@@ -836,7 +836,7 @@ unsigned int DofMap::n_constrained_dofs() const
   parallel_only();
 
   unsigned int n_dofs = this->n_local_constrained_dofs();
-  Parallel::sum(n_dofs);
+  CommWorld.sum(n_dofs);
   return n_dofs;
 }
 
@@ -879,10 +879,10 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   // Even if we don't have constraints, another processor might.
   bool possible_global_constraints = possible_local_constraints;
 #if defined(LIBMESH_ENABLE_PERIODIC) || defined(LIBMESH_ENABLE_DIRICHLET) || defined(LIBMESH_ENABLE_AMR)
-  libmesh_assert(Parallel::verify(mesh.is_serial()));
+  libmesh_assert(CommWorld.verify(mesh.is_serial()));
 
   if (!mesh.is_serial())
-    Parallel::max(possible_global_constraints);
+    CommWorld.max(possible_global_constraints);
 #endif
 
   if (!possible_global_constraints)
@@ -1007,7 +1007,7 @@ void DofMap::print_dof_constraints(std::ostream& os,
 
   if (libMesh::processor_id())
     {
-      Parallel::send(0, local_constraints);
+      CommWorld.send(0, local_constraints);
     }
   else
     {
@@ -1016,7 +1016,7 @@ void DofMap::print_dof_constraints(std::ostream& os,
 
       for (unsigned int i=1; i<libMesh::n_processors(); ++i)
         {
-          Parallel::receive(i, local_constraints);
+          CommWorld.receive(i, local_constraints);
           os << "Processor " << i << ":\n";
           os << local_constraints;
         }
@@ -1990,7 +1990,7 @@ mesh
                                  || !_node_constraints.empty()
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
                                  ;
-  Parallel::max(has_constraints);
+  CommWorld.max(has_constraints);
   if (!has_constraints)
     return;
 
@@ -2110,13 +2110,13 @@ mesh
       std::vector<std::vector<unsigned int> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
-      Parallel::send_receive(procup, pushed_ids[procup],
+      CommWorld.send_receive(procup, pushed_ids[procup],
                              procdown, pushed_ids_to_me);
-      Parallel::send_receive(procup, pushed_keys,
+      CommWorld.send_receive(procup, pushed_keys,
                              procdown, pushed_keys_to_me);
-      Parallel::send_receive(procup, pushed_vals,
+      CommWorld.send_receive(procup, pushed_vals,
                              procdown, pushed_vals_to_me);
-      Parallel::send_receive(procup, pushed_rhss,
+      CommWorld.send_receive(procup, pushed_rhss,
                              procdown, pushed_rhss_to_me);
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
@@ -2128,13 +2128,13 @@ mesh
       std::vector<std::vector<unsigned int> > pushed_node_keys_to_me;
       std::vector<std::vector<Real> > pushed_node_vals_to_me;
       std::vector<Point> pushed_node_offsets_to_me;
-      Parallel::send_receive(procup, pushed_node_ids[procup],
+      CommWorld.send_receive(procup, pushed_node_ids[procup],
                              procdown, pushed_node_ids_to_me);
-      Parallel::send_receive(procup, pushed_node_keys,
+      CommWorld.send_receive(procup, pushed_node_keys,
                              procdown, pushed_node_keys_to_me);
-      Parallel::send_receive(procup, pushed_node_vals,
+      CommWorld.send_receive(procup, pushed_node_vals,
                              procdown, pushed_node_vals_to_me);
-      Parallel::send_receive(procup, pushed_node_offsets,
+      CommWorld.send_receive(procup, pushed_node_offsets,
                              procdown, pushed_node_offsets_to_me);
 
       // Note that we aren't doing a send_receive on the Nodes
@@ -2223,7 +2223,7 @@ mesh
   // nonempty on *any* processor
   bool unexpanded_set_nonempty = !unexpanded_dofs.empty() ||
                                  !unexpanded_nodes.empty();
-  Parallel::max(unexpanded_set_nonempty);
+  CommWorld.max(unexpanded_set_nonempty);
 
   while (unexpanded_set_nonempty)
     {
@@ -2339,9 +2339,9 @@ mesh
                                    libMesh::n_processors();
           std::vector<unsigned int> dof_request_to_fill,
                                     node_request_to_fill;
-          Parallel::send_receive(procup, requested_dof_ids[procup],
+          CommWorld.send_receive(procup, requested_dof_ids[procup],
                                  procdown, dof_request_to_fill);
-          Parallel::send_receive(procup, requested_node_ids[procup],
+          CommWorld.send_receive(procup, requested_node_ids[procup],
                                  procdown, node_request_to_fill);
 
           // Fill those requests
@@ -2422,23 +2422,23 @@ mesh
                                           node_filled_vals;
           std::vector<Number> dof_filled_rhss;
           std::vector<Point> node_filled_rhss;
-          Parallel::send_receive(procdown, dof_row_keys,
+          CommWorld.send_receive(procdown, dof_row_keys,
                                  procup, dof_filled_keys);
-          Parallel::send_receive(procdown, dof_row_vals,
+          CommWorld.send_receive(procdown, dof_row_vals,
                                  procup, dof_filled_vals);
-          Parallel::send_receive(procdown, dof_row_rhss,
+          CommWorld.send_receive(procdown, dof_row_rhss,
                                  procup, dof_filled_rhss);
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-          Parallel::send_receive(procdown, node_row_keys,
+          CommWorld.send_receive(procdown, node_row_keys,
                                  procup, node_filled_keys);
-          Parallel::send_receive(procdown, node_row_vals,
+          CommWorld.send_receive(procdown, node_row_vals,
                                  procup, node_filled_vals);
-          Parallel::send_receive(procdown, node_row_rhss,
+          CommWorld.send_receive(procdown, node_row_rhss,
                                  procup, node_filled_rhss);
 
           // Constraining nodes might not even exist on our subset of
           // a distributed mesh, so let's make them exist.
-          Parallel::send_receive_packed_range
+          CommWorld.send_receive_packed_range
             (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
              procup,   &mesh, mesh_inserter_iterator<Node>(mesh));
 
@@ -2497,7 +2497,7 @@ mesh
       // nonempty on *any* processor
       unexpanded_set_nonempty = !unexpanded_dofs.empty() ||
                                 !unexpanded_nodes.empty();
-      Parallel::max(unexpanded_set_nonempty);
+      CommWorld.max(unexpanded_set_nonempty);
     }
 }
 
@@ -2608,7 +2608,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
                                  || !_node_constraints.empty()
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
                                  ;
-  Parallel::max(has_constraints);
+  CommWorld.max(has_constraints);
   if (!has_constraints)
     return;
 
@@ -2746,13 +2746,13 @@ void DofMap::scatter_constraints(MeshBase& mesh)
       std::vector<std::vector<unsigned int> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
-      Parallel::send_receive(procup, pushed_ids_from_me,
+      CommWorld.send_receive(procup, pushed_ids_from_me,
                              procdown, pushed_ids_to_me);
-      Parallel::send_receive(procup, pushed_keys,
+      CommWorld.send_receive(procup, pushed_keys,
                              procdown, pushed_keys_to_me);
-      Parallel::send_receive(procup, pushed_vals,
+      CommWorld.send_receive(procup, pushed_vals,
                              procdown, pushed_vals_to_me);
-      Parallel::send_receive(procup, pushed_rhss,
+      CommWorld.send_receive(procup, pushed_rhss,
                              procdown, pushed_rhss_to_me);
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
@@ -2766,18 +2766,18 @@ void DofMap::scatter_constraints(MeshBase& mesh)
       std::vector<std::vector<unsigned int> > pushed_node_keys_to_me;
       std::vector<std::vector<Real> > pushed_node_vals_to_me;
       std::vector<Point> pushed_node_offsets_to_me;
-      Parallel::send_receive(procup, pushed_node_ids_from_me,
+      CommWorld.send_receive(procup, pushed_node_ids_from_me,
                              procdown, pushed_node_ids_to_me);
-      Parallel::send_receive(procup, pushed_node_keys,
+      CommWorld.send_receive(procup, pushed_node_keys,
                              procdown, pushed_node_keys_to_me);
-      Parallel::send_receive(procup, pushed_node_vals,
+      CommWorld.send_receive(procup, pushed_node_vals,
                              procdown, pushed_node_vals_to_me);
-      Parallel::send_receive(procup, pushed_node_offsets,
+      CommWorld.send_receive(procup, pushed_node_offsets,
                              procdown, pushed_node_offsets_to_me);
 
       // Constraining nodes might not even exist on our subset of
       // a distributed mesh, so let's make them exist.
-      Parallel::send_receive_packed_range
+      CommWorld.send_receive_packed_range
         (procup, &mesh, pushed_nodes.begin(), pushed_nodes.end(),
          procdown, &mesh, mesh_inserter_iterator<Node>(mesh));
 
@@ -2945,13 +2945,13 @@ void DofMap::scatter_constraints(MeshBase& mesh)
       std::vector<std::vector<unsigned int> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
-      Parallel::send_receive(procup, pushed_ids_from_me,
+      CommWorld.send_receive(procup, pushed_ids_from_me,
                              procdown, pushed_ids_to_me);
-      Parallel::send_receive(procup, pushed_keys,
+      CommWorld.send_receive(procup, pushed_keys,
                              procdown, pushed_keys_to_me);
-      Parallel::send_receive(procup, pushed_vals,
+      CommWorld.send_receive(procup, pushed_vals,
                              procdown, pushed_vals_to_me);
-      Parallel::send_receive(procup, pushed_rhss,
+      CommWorld.send_receive(procup, pushed_rhss,
                              procdown, pushed_rhss_to_me);
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
@@ -2992,7 +2992,7 @@ void DofMap::add_constraints_to_send_list()
   // We might get to return immediately if none of the processors
   // found any constraints
   unsigned int has_constraints = !_dof_constraints.empty();
-  Parallel::max(has_constraints);
+  CommWorld.max(has_constraints);
   if (!has_constraints)
     return;
 
