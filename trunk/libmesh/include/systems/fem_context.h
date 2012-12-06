@@ -245,12 +245,28 @@ public:
                       typename FEGenericBase<OutputShape>::OutputNumber& u) const;
 
   /**
+   * Fills a vector of values of the _system_vector at the all the quadrature
+   * points in the current element interior.
+   */
+  template<typename OutputShape> 
+  void interior_values(unsigned int var, const NumericVector<Number> & _system_vector,
+		       std::vector<typename FEGenericBase<OutputShape>::OutputNumber>& interior_values_vector) const;
+
+  /**
    * Returns the value of the solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
   template<typename OutputShape> 
   void side_value(unsigned int var, unsigned int qp,
                   typename FEGenericBase<OutputShape>::OutputNumber& u) const;
+
+  /**
+   * Fills a vector of values of the _system_vector at the all the quadrature
+   * points on the current element side.
+   */
+  template<typename OutputShape> 
+  void side_values(unsigned int var, const NumericVector<Number> & _system_vector,
+		   std::vector<typename FEGenericBase<OutputShape>::OutputNumber>& side_values_vector) const;
 
   /**
    * Returns the value of the solution variable \p var at the physical
@@ -269,12 +285,28 @@ public:
 			 typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const;
 
   /**
+   * Fills a vector with the gradient of the solution variable \p var at all the quadrature
+   * points in the current element interior. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void interior_gradients(unsigned int var, const NumericVector<Number> & _system_vector, 
+			  std::vector<typename FEGenericBase<OutputShape>::OutputNumberGradient>& interior_gradients_vector) const;
+
+  /**
    * Returns the gradient of the solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
   template<typename OutputShape> 
   void side_gradient(unsigned int var, unsigned int qp, 
 		     typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const;
+
+  /**
+   * Fills a vector with the gradient of the solution variable \p var at all the quadrature
+   * points on the current element side. This is the preferred API.
+   */
+  template<typename OutputShape>
+  void side_gradients(unsigned int var, const NumericVector<Number> & _system_vector, 
+		      std::vector<typename FEGenericBase<OutputShape>::OutputNumberGradient>& side_gradients_vector) const;
 
    /**
    * Returns the gradient of the solution variable \p var at the physical
@@ -294,12 +326,30 @@ public:
 			typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const;
 
   /**
+   * Fills a vector of hessians of the _system_vector at the all the
+   * quadrature points in the current element interior. This is the
+   * preferred API.
+   */
+  template<typename OutputShape> 
+  void interior_hessians(unsigned int var, const NumericVector<Number> & _system_vector,
+		         std::vector<typename FEGenericBase<OutputShape>::OutputNumberTensor>& d2u_vals) const;
+
+  /**
    * Returns the hessian of the solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
   template<typename OutputShape>
   void side_hessian(unsigned int var, unsigned int qp, 
 		    typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const;
+
+  /**
+   * Fills a vector of hessians of the _system_vector at the all the
+   * quadrature points on the current element side.  This is the
+   * preferred API.
+   */
+  template<typename OutputShape>
+  void side_hessians(unsigned int var, const NumericVector<Number> & _system_vector, 
+		     std::vector<typename FEGenericBase<OutputShape>::OutputNumberTensor>& d2u_vals) const;
 
   /**
    * Returns the hessian of the solution variable \p var at the physical
