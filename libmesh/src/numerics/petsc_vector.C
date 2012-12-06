@@ -269,6 +269,32 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T>& V_in,
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
+template <typename T>
+void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>& V_in,
+				                     const SparseMatrix<T>& A_in)
+{
+  this->_restore_array();
+  // Make sure the data passed in are really of Petsc types
+  const PetscVector<T>* V = libmesh_cast_ptr<const PetscVector<T>*>(&V_in);
+  const PetscMatrix<T>* A = libmesh_cast_ptr<const PetscMatrix<T>*>(&A_in);
+
+  int ierr=0;
+
+  A->close();
+
+  // Store a temporary copy since MatMultHermitianTransposeAdd doesn't seem to work
+  // TODO: Find out why MatMultHermitianTransposeAdd doesn't work, might be a PETSc bug?
+  AutoPtr< NumericVector<Number> > this_clone = this->clone();
+
+  // The const_cast<> is not elegant, but it is required since PETSc
+  // is not const-correct.
+  ierr = MatMultHermitianTranspose(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec);
+  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  // Add the temporary copy to the matvec result
+  this->add(1., *this_clone);
+}
+
 
 template <typename T>
 void PetscVector<T>::add (const T v_in)
@@ -533,7 +559,26 @@ T PetscVector<T>::dot (const NumericVector<T>& V) const
   return static_cast<T>(value);
 }
 
+template <typename T>
+T PetscVector<T>::indefinite_dot (const NumericVector<T>& V) const
+{
+  this->_restore_array();
 
+  // Error flag
+  int ierr = 0;
+
+  // Return value
+  PetscScalar value=0.;
+
+  // Make sure the NumericVector passed in is really a PetscVector
+  const PetscVector<T>* v = libmesh_cast_ptr<const PetscVector<T>*>(&V);
+
+  // 2.3.x (at least) style.  Untested for previous versions.
+  ierr = VecTDot(this->_vec, v->_vec, &value);
+         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  return static_cast<T>(value);
+}
 
 
 template <typename T>
