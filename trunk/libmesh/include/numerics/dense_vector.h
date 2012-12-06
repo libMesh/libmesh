@@ -143,10 +143,18 @@ public:
        const DenseVector<T3>& vec);
 
   /**
-   * Evaluate dot product with \p vec.
+   * Evaluate dot product with \p vec. In the complex-valued case, use the
+   * complex conjugate of vec.
    */
   template <typename T2>
   Number dot (const DenseVector<T2> &vec) const;
+
+  /**
+   * Evaluate dot product with \p vec. In the complex-valued case, do not
+   * use the complex conjugate of vec.
+   */
+  template <typename T2>
+  Number indefinite_dot (const DenseVector<T2> &vec) const;
 
   /**
    * Tests if \p vec is exactly equal to this vector.
@@ -395,6 +403,21 @@ Number DenseVector<T>::dot (const DenseVector<T2>& vec) const
 
   for (unsigned int i=0; i<this->size(); i++)
     val += (*this)(i)*libmesh_conj(vec(i));
+
+  return val;
+}
+
+template<typename T>
+template<typename T2>
+inline
+Number DenseVector<T>::indefinite_dot (const DenseVector<T2>& vec) const
+{
+  libmesh_assert_equal_to (this->size(), vec.size());
+
+  Number val = 0.;
+
+  for (unsigned int i=0; i<this->size(); i++)
+    val += (*this)(i)*(vec(i));
 
   return val;
 }

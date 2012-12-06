@@ -388,6 +388,14 @@ public:
 		             const SparseMatrix<T> &A_trans);
 
   /**
+   * \f$U+=A^H*V\f$, add the product of the conjugate-transpose
+   * of \p SparseMatrix \p A_trans and a \p NumericVector \p V to
+   * \p this, where \p this=U.
+   */
+  void add_vector_conjugate_transpose (const NumericVector<T> &V,
+		                       const SparseMatrix<T> &A_trans);
+
+  /**
    * \f$ U=v \f$ where v is a std::vector<T>
    * and you want to specify WHERE to insert it
    */
@@ -433,9 +441,16 @@ public:
   virtual void abs();
 
   /**
-   * Computes the dot product, p = U.V
+   * Computes the dot product, p = U.V. Use complex-conjugate of V
+   * in the complex-valued case.
    */
-  virtual T dot(const NumericVector<T>& V) const;
+  virtual T dot(const NumericVector<T>&) const;
+
+  /**
+   * Computes the dot product, p = U.V. Do not use complex-conjugate of V
+   * in the complex-valued case.
+   */
+  virtual T indefinite_dot(const NumericVector<T>&) const;
 
   /**
    * Creates a copy of the global vector in the

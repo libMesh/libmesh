@@ -270,7 +270,7 @@ Real RBEvaluation::rb_solve(unsigned int N)
     for(unsigned int q_l=0; q_l<rb_theta_expansion->get_n_output_terms(n); q_l++)
     {
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
-      RB_outputs[n] += libmesh_conj(rb_theta_expansion->eval_output_theta(n,q_l,mu))*RB_output_vector_N.dot(RB_solution);
+      RB_outputs[n] += rb_theta_expansion->eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
     }
   }
 
