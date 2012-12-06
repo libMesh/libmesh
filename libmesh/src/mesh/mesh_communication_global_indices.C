@@ -319,13 +319,13 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       empty_elem  (libMesh::n_processors());
     std::vector<Hilbert::HilbertIndices> my_max(2);
 
-    Parallel::allgather (static_cast<unsigned short int>(my_node_bin.empty()), empty_nodes);
-    Parallel::allgather (static_cast<unsigned short int>(my_elem_bin.empty()),  empty_elem);
+    CommWorld.allgather (static_cast<unsigned short int>(my_node_bin.empty()), empty_nodes);
+    CommWorld.allgather (static_cast<unsigned short int>(my_elem_bin.empty()),  empty_elem);
 
     if (!my_node_bin.empty()) my_max[0] = my_node_bin.back();
     if (!my_elem_bin.empty()) my_max[1] = my_elem_bin.back();
 
-    Parallel::allgather (my_max, /* identical_buffer_sizes = */ true);
+    CommWorld.allgather (my_max, /* identical_buffer_sizes = */ true);
 
     // Be cereful here.  The *_upper_bounds will be used to find the processor
     // a given object belongs to.  So, if a processor contains no objects (possible!)
@@ -382,7 +382,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
       // The number of objects in my_node_bin on each processor
       std::vector<unsigned int> node_bin_sizes(libMesh::n_processors());
-      Parallel::allgather (static_cast<unsigned int>(my_node_bin.size()), node_bin_sizes);
+      CommWorld.allgather (static_cast<unsigned int>(my_node_bin.size()), node_bin_sizes);
 
       // The offset of my first global index
       unsigned int my_offset = 0;
@@ -400,7 +400,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
                                          libMesh::n_processors();
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
-          Parallel::send_receive(procup, requested_ids[procup],
+          CommWorld.send_receive(procup, requested_ids[procup],
                                  procdown, request_to_fill);
 
 	  // Fill the requests
@@ -422,7 +422,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	    }
 
 	  // and trade back
-	  Parallel::send_receive (procdown, global_ids,
+	  CommWorld.send_receive (procdown, global_ids,
 				  procup,   filled_request[procup]);
 	}
 
@@ -493,7 +493,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
       // The number of objects in my_elem_bin on each processor
       std::vector<unsigned int> elem_bin_sizes(libMesh::n_processors());
-      Parallel::allgather (static_cast<unsigned int>(my_elem_bin.size()), elem_bin_sizes);
+      CommWorld.allgather (static_cast<unsigned int>(my_elem_bin.size()), elem_bin_sizes);
 
       // The offset of my first global index
       unsigned int my_offset = 0;
@@ -511,7 +511,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
                                          libMesh::n_processors();
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
-          Parallel::send_receive(procup, requested_ids[procup],
+          CommWorld.send_receive(procup, requested_ids[procup],
                                  procdown, request_to_fill);
 
 	  // Fill the requests
@@ -533,7 +533,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	    }
 
 	  // and trade back
-	  Parallel::send_receive (procdown, global_ids,
+	  CommWorld.send_receive (procdown, global_ids,
 				  procup,   filled_request[procup]);
 	}
 
@@ -642,7 +642,7 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 
   // The number of objects in my_bin on each processor
   std::vector<unsigned int> bin_sizes(libMesh::n_processors());
-  Parallel::allgather (static_cast<unsigned int>(my_bin.size()), bin_sizes);
+  CommWorld.allgather (static_cast<unsigned int>(my_bin.size()), bin_sizes);
 
   // The offset of my first global index
   unsigned int my_offset = 0;
@@ -657,7 +657,7 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
   if (!my_bin.empty())
     upper_bounds[0] = my_bin.back();
 
-  Parallel::allgather (upper_bounds, /* identical_buffer_sizes = */ true);
+  CommWorld.allgather (upper_bounds, /* identical_buffer_sizes = */ true);
 
   // Be cereful here.  The *_upper_bounds will be used to find the processor
   // a given object belongs to.  So, if a processor contains no objects (possible!)
@@ -715,7 +715,7 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
                                        libMesh::processor_id() - pid) %
                                        libMesh::n_processors();
 
-	Parallel::send_receive(procup, requested_ids[procup],
+	CommWorld.send_receive(procup, requested_ids[procup],
 			       procdown, request_to_fill);
 
 	// Fill the requests
@@ -737,7 +737,7 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	  }
 
 	// and trade back
-	Parallel::send_receive (procdown, global_ids,
+	CommWorld.send_receive (procdown, global_ids,
 				procup,   filled_request[procup]);
       }
 

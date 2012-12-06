@@ -87,7 +87,7 @@ unsigned int CondensedEigenSystem::n_global_non_condensed_dofs() const
   else
   {
     unsigned int n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
-    Parallel::sum(n_global_non_condensed_dofs);
+    CommWorld.sum(n_global_non_condensed_dofs);
 
     return n_global_non_condensed_dofs;
   }
@@ -191,7 +191,7 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
   AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build();
   unsigned int n_local = local_non_condensed_dofs_vector.size();
   unsigned int n       = n_local;
-  Parallel::sum(n);
+  CommWorld.sum(n);
 
   temp->init (n, n_local, false, libMeshEnums::PARALLEL);
 

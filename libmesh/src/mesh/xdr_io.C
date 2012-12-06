@@ -249,7 +249,7 @@ void XdrIO::write (const std::string& name)
   // followed immediately by a read.  The write must be
   // guaranteed to complete first.
   io.close();
-  Parallel::barrier();
+  CommWorld.barrier();
 }
 
 
@@ -282,7 +282,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 
       n_local_elem_at_level[level] = n_global_elem_at_level[level] = MeshTools::n_elem(it, end);
 
-      Parallel::sum(n_global_elem_at_level[level]);
+      CommWorld.sum(n_global_elem_at_level[level]);
       tot_n_elem += n_global_elem_at_level[level];
       libmesh_assert_less_equal (n_global_elem_at_level[level], n_elem);
       libmesh_assert_less_equal (tot_n_elem, n_elem);
@@ -312,8 +312,8 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
   xfer_conn.push_back(my_next_elem); // toss in the number of elements transferred.
 
   unsigned int my_size = xfer_conn.size();
-  Parallel::gather (0, my_next_elem, n_elem_on_proc);
-  Parallel::gather (0, my_size,      xfer_buf_sizes);
+  CommWorld.gather (0, my_next_elem, n_elem_on_proc);
+  CommWorld.gather (0, my_size,      xfer_buf_sizes);
 
   processor_offsets[0] = 0;
   for (unsigned int pid=1; pid<libMesh::n_processors(); pid++)
@@ -343,7 +343,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
           if (pid == 0)
 	    recv_conn = xfer_conn;
           else
-	    Parallel::receive (pid, recv_conn);
+	    CommWorld.receive (pid, recv_conn);
 
 	  // at a minimum, the buffer should contain the number of elements,
 	  // which could be 0.
@@ -377,7 +377,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 	}
     }
   else
-    Parallel::send (0, xfer_conn);
+    CommWorld.send (0, xfer_conn);
 
 #ifdef LIBMESH_ENABLE_AMR
   //--------------------------------------------------------------------
@@ -415,7 +415,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 	  }
       xfer_conn.push_back(my_n_elem_written_at_level);
       my_size = xfer_conn.size();
-      Parallel::gather (0, my_size,   xfer_buf_sizes);
+      CommWorld.gather (0, my_size,   xfer_buf_sizes);
 
       // Processor 0 will receive the data and write the elements.
       if (libMesh::processor_id() == 0)
@@ -443,7 +443,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
               if (pid == 0)
 	        recv_conn = xfer_conn;
               else
-	        Parallel::receive (pid, recv_conn);
+	        CommWorld.receive (pid, recv_conn);
 
 	      // at a minimum, the buffer should contain the number of elements,
 	      // which could be 0.
@@ -480,11 +480,11 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 	    }
 	}
       else
-        Parallel::send  (0, xfer_conn);
+        CommWorld.send  (0, xfer_conn);
 
       // update the processor_offsets
       processor_offsets[0] = processor_offsets.back() + n_elem_on_proc.back();
-      Parallel::gather (0, my_n_elem_written_at_level, n_elem_on_proc);
+      CommWorld.gather (0, my_n_elem_written_at_level, n_elem_on_proc);
       for (unsigned int pid=1; pid<libMesh::n_processors(); pid++)
 	processor_offsets[pid] = processor_offsets[pid-1] + n_elem_on_proc[pid-1];
 
@@ -515,7 +515,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
                                      libMesh::processor_id() - p) %
 	                             libMesh::n_processors();
 
-	    Parallel::send_receive(procup, requested_ids[procup],
+	    CommWorld.send_receive(procup, requested_ids[procup],
 				   procdown, request_to_fill);
 
 	    // Fill those requests by overwriting the requested ids
@@ -529,7 +529,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 
 	    // Trade back the results
 	    std::vector<unsigned int> filled_request;
-	    Parallel::send_receive(procdown, request_to_fill,
+	    CommWorld.send_receive(procdown, request_to_fill,
 				   procup, filled_request);
 
 	    libmesh_assert_equal_to (filled_request.size(), requested_ids[procup].size());
@@ -600,7 +600,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
       const unsigned int my_ids_size = xfer_ids.size();
 
       // explicitly gather ids_size
-      Parallel::gather (0, my_ids_size, ids_size);
+      CommWorld.gather (0, my_ids_size, ids_size);
 
       // infer coords_size on processor 0
       if (libMesh::processor_id() == 0)
@@ -635,20 +635,20 @@ void XdrIO::write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const
                 }
               else
                 {
-	          Parallel::nonblocking_receive (pid, recv_ids[pid],
-					         id_request_handles[pid-1],
-                                                 id_tag);
-	          Parallel::nonblocking_receive (pid, recv_coords[pid],
-					         coord_request_handles[pid-1],
-                                                 coord_tag);
+	          CommWorld.receive (pid, recv_ids[pid],
+				     id_request_handles[pid-1],
+                                     id_tag);
+	          CommWorld.receive (pid, recv_coords[pid],
+				     coord_request_handles[pid-1],
+                                     coord_tag);
                 }
             }
         }
       else
         {
           // Send -- do this on all other processors.
-          Parallel::send(0, xfer_ids,    id_tag);
-          Parallel::send(0, xfer_coords, coord_tag);
+          CommWorld.send(0, xfer_ids,    id_tag);
+          CommWorld.send(0, xfer_coords, coord_tag);
         }
 
       // -------------------------------------------------------
@@ -755,7 +755,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
 
   xfer_bcs.push_back(n_local_level_0_elem);
   unsigned int my_size = xfer_bcs.size();
-  Parallel::gather (0, my_size, bc_sizes);
+  CommWorld.gather (0, my_size, bc_sizes);
 
   // All processors send their xfer buffers to processor 0
   // Processor 0 will receive all buffers and write out the bcs
@@ -767,7 +767,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
           if (pid == 0)
 	    recv_bcs = xfer_bcs;
           else
-	    Parallel::receive (pid, recv_bcs);
+	    CommWorld.receive (pid, recv_bcs);
 
 	  const unsigned int n_local_level_0_elem
 	    = recv_bcs.back(); recv_bcs.pop_back();
@@ -781,7 +781,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
       libmesh_assert_equal_to (n_bcs, n_bcs_out);
     }
   else
-    Parallel::send (0, xfer_bcs);
+    CommWorld.send (0, xfer_bcs);
 }
 
 
@@ -799,7 +799,7 @@ void XdrIO::read (const std::string& name)
   // get the version string.
   if (libMesh::processor_id() == 0)
     io.data (this->version());
-  Parallel::broadcast (this->version());
+  CommWorld.broadcast (this->version());
 
   // note that for "legacy" files the first entry is an
   // integer -- not a string at all.
@@ -827,12 +827,12 @@ void XdrIO::read (const std::string& name)
     }
 
   //TODO:[BSK] a little extra effort here could change this to two broadcasts...
-  Parallel::broadcast (n_elem);
-  Parallel::broadcast (n_nodes);
-  Parallel::broadcast (this->boundary_condition_file_name());
-  Parallel::broadcast (this->subdomain_map_file_name());
-  Parallel::broadcast (this->partition_map_file_name());
-  Parallel::broadcast (this->polynomial_level_file_name());
+  CommWorld.broadcast (n_elem);
+  CommWorld.broadcast (n_nodes);
+  CommWorld.broadcast (this->boundary_condition_file_name());
+  CommWorld.broadcast (this->subdomain_map_file_name());
+  CommWorld.broadcast (this->partition_map_file_name());
+  CommWorld.broadcast (this->polynomial_level_file_name());
 
   // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
   // this may allow for efficient adding of nodes/elements.
@@ -933,9 +933,9 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const unsigned int n_elem)
 	  }
 
       unsigned int conn_size = conn.size();
-      Parallel::broadcast(conn_size);
+      CommWorld.broadcast(conn_size);
       conn.resize (conn_size);
-      Parallel::broadcast (conn);
+      CommWorld.broadcast (conn);
 
       // All processors now have the connectivity for this block.
       std::vector<unsigned int>::const_iterator it = conn.begin();
@@ -1051,7 +1051,7 @@ void XdrIO::read_serialized_nodes (Xdr &io, const unsigned int n_nodes)
       // For large numbers of processors the majority of processors at any given
       // block may not actually need these data.  It may be worth profiling this,
       // although it is expected that disk IO will be the bottleneck
-      Parallel::broadcast (coords);
+      CommWorld.broadcast (coords);
 
       for (unsigned int n=first_node, idx=0; n<last_node; n++, idx+=3)
 	{
@@ -1093,7 +1093,7 @@ void XdrIO::read_serialized_bcs (Xdr &io)
   unsigned int n_bcs=0;
   if (libMesh::processor_id() == 0)
     io.data (n_bcs);
-  Parallel::broadcast (n_bcs);
+  CommWorld.broadcast (n_bcs);
 
   for (unsigned int blk=0, first_bc=0, last_bc=0; last_bc<n_bcs; blk++)
     {
@@ -1105,7 +1105,7 @@ void XdrIO::read_serialized_bcs (Xdr &io)
       if (libMesh::processor_id() == 0)
 	io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0], input_buffer.size());
 
-      Parallel::broadcast (input_buffer);
+      CommWorld.broadcast (input_buffer);
       elem_bc_data.clear(); /**/ elem_bc_data.reserve (input_buffer.size()/3);
 
       // convert the input_buffer to ElemBCData to facilitate searching

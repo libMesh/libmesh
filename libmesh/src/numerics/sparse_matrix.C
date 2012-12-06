@@ -209,9 +209,9 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
       unsigned int currenti = this->_dof_map->end_dof();
       for (unsigned int p=1; p < libMesh::n_processors(); ++p)
         {
-          Parallel::receive(p, ibuf);
-          Parallel::receive(p, jbuf);
-          Parallel::receive(p, cbuf);
+          CommWorld.receive(p, ibuf);
+          CommWorld.receive(p, jbuf);
+          CommWorld.receive(p, cbuf);
           libmesh_assert_equal_to (ibuf.size(), jbuf.size());
           libmesh_assert_equal_to (ibuf.size(), cbuf.size());
 
@@ -285,9 +285,9 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
                 }
 	    }
         }
-      Parallel::send(0,ibuf);
-      Parallel::send(0,jbuf);
-      Parallel::send(0,cbuf);
+      CommWorld.send(0,ibuf);
+      CommWorld.send(0,jbuf);
+      CommWorld.send(0,cbuf);
     }
 }
 

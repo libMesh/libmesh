@@ -858,8 +858,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // Add up the error values on all processors, except for the L-infty
   // norm, for which the maximum is computed.
   Real l_infty_norm = error_vals[4];
-  Parallel::max(l_infty_norm);
-  Parallel::sum(error_vals);
+  CommWorld.max(l_infty_norm);
+  CommWorld.sum(error_vals);
   error_vals[4] = l_infty_norm;
 }
 

@@ -109,7 +109,7 @@ int NumericVector<T>::compare (const NumericVector<T> &other_vector,
          && i<last_local_index());
 
   // Find the correct first differing index in parallel
-  Parallel::min(first_different_i);
+  CommWorld.min(first_different_i);
 
   if (first_different_i == std::numeric_limits<int>::max())
     return -1;
@@ -142,7 +142,7 @@ int NumericVector<T>::local_relative_compare (const NumericVector<T> &other_vect
          && i<last_local_index());
 
   // Find the correct first differing index in parallel
-  Parallel::min(first_different_i);
+  CommWorld.min(first_different_i);
 
   if (first_different_i == std::numeric_limits<int>::max())
     return -1;
@@ -178,7 +178,7 @@ int NumericVector<T>::global_relative_compare (const NumericVector<T> &other_vec
          && i<last_local_index());
 
   // Find the correct first differing index in parallel
-  Parallel::min(first_different_i);
+  CommWorld.min(first_different_i);
 
   if (first_different_i == std::numeric_limits<int>::max())
     return -1;
@@ -307,7 +307,7 @@ Real NumericVector<T>::subset_l1_norm (const std::set<unsigned int> & indices) c
   for(; it!=it_end; ++it)
     norm += std::abs(v(*it));
 
-  Parallel::sum(norm);
+  CommWorld.sum(norm);
 
   return norm;
 }
@@ -325,7 +325,7 @@ Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices) c
   for(; it!=it_end; ++it)
     norm += TensorTools::norm_sq(v(*it));
 
-  Parallel::sum(norm);
+  CommWorld.sum(norm);
 
   return std::sqrt(norm);
 }
@@ -347,7 +347,7 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<unsigned int> & indice
         norm = value;
     }
 
-  Parallel::max(norm);
+  CommWorld.max(norm);
 
   return norm;
 }

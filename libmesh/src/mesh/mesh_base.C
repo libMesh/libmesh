@@ -95,12 +95,12 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
   // processors with no elements of higher dimension, if we ever
   // support mixed-dimension meshes), but we want consistent
   // mesh_dimension anyways.
-  libmesh_assert(Parallel::verify(this->is_serial()));
+  libmesh_assert(CommWorld.verify(this->is_serial()));
 
   if (!this->is_serial())
     {
       unsigned int dim = this->mesh_dimension();
-      Parallel::max(dim);
+      CommWorld.max(dim);
       this->set_mesh_dimension(dim);
     }
 
@@ -182,10 +182,10 @@ unsigned int MeshBase::n_subdomains() const
     subdomain_ids.insert((*el)->subdomain_id());
 
   // Some subdomains may only live on other processors
-  Parallel::set_union(subdomain_ids, 0);
+  CommWorld.set_union(subdomain_ids, 0);
 
   unsigned int n_sbd_ids = subdomain_ids.size();
-  Parallel::broadcast(n_sbd_ids);
+  CommWorld.broadcast(n_sbd_ids);
 
   return n_sbd_ids;
 }
@@ -327,7 +327,7 @@ unsigned int MeshBase::recalculate_n_partitions()
   // The number of partitions is one more than the max processor ID.
   _n_parts = max_proc_id+1;
 
-  Parallel::max(_n_parts);
+  CommWorld.max(_n_parts);
 
   return _n_parts;
 }

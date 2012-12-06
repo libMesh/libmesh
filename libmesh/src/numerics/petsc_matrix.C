@@ -458,7 +458,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
       }
 
       // Now broadcast the filename from processor 0 to all processors.
-      Parallel::broadcast(temp_filename);
+      CommWorld.broadcast(temp_filename);
 
       // PetscViewer object for passing to MatView
       PetscViewer petsc_viewer;

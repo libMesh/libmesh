@@ -100,10 +100,10 @@ void RBConstructionBase<Base>::get_global_max_error_pair(std::pair<unsigned int,
   // Set error_pair.second to the maximum global value and also
   // find which processor contains the maximum value
   unsigned int proc_ID_index;
-  Parallel::maxloc(error_pair.second, proc_ID_index);
+  CommWorld.maxloc(error_pair.second, proc_ID_index);
 
   // Then broadcast error_pair.first from proc_ID_index
-  Parallel::broadcast(error_pair.first, proc_ID_index);
+  CommWorld.broadcast(error_pair.first, proc_ID_index);
 }
 
 template <class Base>
@@ -183,7 +183,7 @@ void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsign
   }
   
   // broadcast
-  Parallel::max(root_id);
+  CommWorld.max(root_id);
   broadcast_parameters(root_id);
 }
 
@@ -267,7 +267,7 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
   // Get the number of local and global training parameters
   unsigned int n_local_training_samples  = new_training_set.begin()->second.size();
   unsigned int n_global_training_samples = n_local_training_samples;
-  Parallel::sum(n_global_training_samples);
+  CommWorld.sum(n_global_training_samples);
 
   it = training_parameters.begin();
   for( ; it != it_end; ++it)
@@ -762,7 +762,7 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
   }
   
   // do the broadcast
-  Parallel::broadcast(current_parameters_vector, proc_id);
+  CommWorld.broadcast(current_parameters_vector, proc_id);
   
   // update the copy of the RBParameters object
   it = current_parameters.begin();

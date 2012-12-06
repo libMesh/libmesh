@@ -316,7 +316,7 @@ unsigned int MeshTools::total_weight(const MeshBase& mesh)
     {
       parallel_only();
       unsigned int weight = MeshTools::weight (mesh, libMesh::processor_id());
-      Parallel::sum(weight);
+      CommWorld.sum(weight);
       unsigned int unpartitioned_weight =
         MeshTools::weight (mesh, DofObject::invalid_processor_id);
       return weight + unpartitioned_weight;
@@ -429,8 +429,8 @@ MeshTools::bounding_box(const MeshBase& mesh)
 			    find_bbox);
 
   // Compare the bounding boxes across processors
-  Parallel::min(find_bbox.min());
-  Parallel::max(find_bbox.max());
+  CommWorld.min(find_bbox.min());
+  CommWorld.max(find_bbox.max());
 
   return find_bbox.bbox();
 }
@@ -600,7 +600,7 @@ unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
     if ((*el)->active())
       nl = std::max((*el)->level() + 1, nl);
 
-  Parallel::max(nl);
+  CommWorld.max(nl);
   return nl;
 }
 
@@ -635,7 +635,7 @@ unsigned int MeshTools::n_levels(const MeshBase& mesh)
   for( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
-  Parallel::max(nl);
+  CommWorld.max(nl);
   return nl;
 }
 
@@ -694,7 +694,7 @@ unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
   for( ; el != end_el; ++el)
     max_p_level = std::max((*el)->p_level(), max_p_level);
 
-  Parallel::max(max_p_level);
+  CommWorld.max(max_p_level);
   return max_p_level + 1;
 }
 
@@ -1162,13 +1162,13 @@ void libmesh_assert_valid_dof_ids(const MeshBase &mesh)
   parallel_only();
 
   unsigned int pmax_elem_id = mesh.max_elem_id();
-  Parallel::max(pmax_elem_id);
+  CommWorld.max(pmax_elem_id);
 
   for (unsigned int i=0; i != pmax_elem_id; ++i)
     assert_semiverify_dofobj(mesh.query_elem(i));
 
   unsigned int pmax_node_id = mesh.max_node_id();
-  Parallel::max(pmax_node_id);
+  CommWorld.max(pmax_node_id);
 
   for (unsigned int i=0; i != pmax_node_id; ++i)
     assert_semiverify_dofobj(mesh.query_node_ptr(i));
@@ -1185,7 +1185,7 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
   // We want this test to be valid even when called even after nodes
   // have been added asynchonously but before they're renumbered
   unsigned int parallel_max_elem_id = mesh.max_elem_id();
-  Parallel::max(parallel_max_elem_id);
+  CommWorld.max(parallel_max_elem_id);
 
   // Check processor ids for consistency between processors
 
@@ -1196,12 +1196,12 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
       unsigned int min_id =
         elem ? elem->processor_id() :
                std::numeric_limits<unsigned int>::max();
-      Parallel::min(min_id);
+      CommWorld.min(min_id);
 
       unsigned int max_id =
         elem ? elem->processor_id() :
                std::numeric_limits<unsigned int>::min();
-      Parallel::max(max_id);
+      CommWorld.max(max_id);
 
       if (elem)
         {
@@ -1270,7 +1270,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
   // We want this test to be valid even when called even after nodes
   // have been added asynchonously but before they're renumbered
   unsigned int parallel_max_node_id = mesh.max_node_id();
-  Parallel::max(parallel_max_node_id);
+  CommWorld.max(parallel_max_node_id);
 
   // Check processor ids for consistency between processors
 
@@ -1281,12 +1281,12 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
       unsigned int min_id =
         node ? node->processor_id() :
                std::numeric_limits<unsigned int>::max();
-      Parallel::min(min_id);
+      CommWorld.min(min_id);
 
       unsigned int max_id =
         node ? node->processor_id() :
                std::numeric_limits<unsigned int>::min();
-      Parallel::max(max_id);
+      CommWorld.max(max_id);
 
       if (node)
         {
@@ -1316,7 +1316,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
         }
     }
   std::vector<bool> node_touched_by_anyone(node_touched_by_me);
-  Parallel::max(node_touched_by_anyone);
+  CommWorld.max(node_touched_by_anyone);
 
   const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
   for (MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
@@ -1361,10 +1361,10 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
         static_cast<unsigned char>(elem->p_refinement_flag());
     }
   std::vector<unsigned char> min_elem_h_state(my_elem_h_state);
-  Parallel::min(min_elem_h_state);
+  CommWorld.min(min_elem_h_state);
 
   std::vector<unsigned char> min_elem_p_state(my_elem_p_state);
-  Parallel::min(min_elem_p_state);
+  CommWorld.min(min_elem_p_state);
 
   for (unsigned int i=0; i!= mesh.max_elem_id(); ++i)
     {

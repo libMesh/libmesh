@@ -41,7 +41,7 @@ void DifferentiableQoI::parallel_op( std::vector<Number>& sys_qoi, std::vector<N
 				     const QoISet& )
 {
   // Sum everything into local_qoi
-  Parallel::sum(local_qoi);
+  CommWorld.sum(local_qoi);
 
   // Now put into system qoi
   sys_qoi = local_qoi;

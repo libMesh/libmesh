@@ -244,7 +244,7 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
   bool computed_sparsity_already =
     ((_n_nz && !_n_nz->empty()) ||
      (_n_oz && !_n_oz->empty()));
-  Parallel::max(computed_sparsity_already);
+  CommWorld.max(computed_sparsity_already);
   if (computed_sparsity_already &&
       matrix.need_full_sparsity_pattern())
     {
@@ -314,7 +314,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
     }
 
   std::vector<unsigned int> objects_on_proc(libMesh::n_processors(), 0);
-  Parallel::allgather(ghost_objects_from_proc[libMesh::processor_id()],
+  CommWorld.allgather(ghost_objects_from_proc[libMesh::processor_id()],
                       objects_on_proc);
 
 #ifdef DEBUG
@@ -353,7 +353,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                                libMesh::processor_id() - p) %
                                libMesh::n_processors();
       std::vector<unsigned int> request_to_fill;
-      Parallel::send_receive(procup, requested_ids[procup],
+      CommWorld.send_receive(procup, requested_ids[procup],
                              procdown, request_to_fill);
 
       // Fill those requests
@@ -382,7 +382,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
       // Trade back the results
       std::vector<unsigned int> filled_request;
-      Parallel::send_receive(procdown, ghost_data,
+      CommWorld.send_receive(procdown, ghost_data,
                              procup, filled_request);
 
       // And copy the id changes we've now been informed of
@@ -861,7 +861,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   // Get DOF counts on all processors
   std::vector<unsigned int> dofs_on_proc(n_proc, 0);
-  Parallel::allgather(next_free_dof, dofs_on_proc);
+  CommWorld.allgather(next_free_dof, dofs_on_proc);
 
   // Resize and fill the _first_df and _end_df arrays
 #ifdef LIBMESH_ENABLE_AMR
@@ -2608,7 +2608,7 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 void SparsityPattern::Build::parallel_sync ()
 {
   parallel_only();
-  Parallel::verify(need_full_sparsity_pattern);
+  CommWorld.verify(need_full_sparsity_pattern);
 
   const unsigned int n_global_dofs   = dof_map.n_dofs();
   const unsigned int n_dofs_on_proc  = dof_map.n_dofs_on_processor(libMesh::processor_id());
@@ -2659,9 +2659,9 @@ void SparsityPattern::Build::parallel_sync ()
             ++it;
         }
 
-      Parallel::send_receive(procup, pushed_row_ids,
+      CommWorld.send_receive(procup, pushed_row_ids,
                              procdown, pushed_row_ids_to_me);
-      Parallel::send_receive(procup, pushed_rows,
+      CommWorld.send_receive(procup, pushed_rows,
                              procdown, pushed_rows_to_me);
       pushed_row_ids.clear();
       pushed_rows.clear();
@@ -2771,9 +2771,9 @@ std::string DofMap::get_info() const
 
       int n_nz_size = _n_nz->size();
 
-      Parallel::max(max_n_nz);
-      Parallel::sum(avg_n_nz);
-      Parallel::sum(n_nz_size);
+      CommWorld.max(max_n_nz);
+      CommWorld.sum(avg_n_nz);
+      CommWorld.sum(n_nz_size);
 
       avg_n_nz /= std::max(n_nz_size,1);
 
@@ -2787,9 +2787,9 @@ std::string DofMap::get_info() const
 
       int n_oz_size = _n_oz->size();
 
-      Parallel::max(max_n_oz);
-      Parallel::sum(avg_n_oz);
-      Parallel::sum(n_oz_size);
+      CommWorld.max(max_n_oz);
+      CommWorld.sum(avg_n_oz);
+      CommWorld.sum(n_oz_size);
 
       avg_n_oz /= std::max(n_oz_size,1);
     }
@@ -2833,10 +2833,10 @@ std::string DofMap::get_info() const
         n_rhss++;
     }
 
-  Parallel::sum(n_constraints);
-  Parallel::sum(n_rhss);
-  Parallel::sum(avg_constraint_length);
-  Parallel::max(max_constraint_length);
+  CommWorld.sum(n_constraints);
+  CommWorld.sum(n_rhss);
+  CommWorld.sum(avg_constraint_length);
+  CommWorld.max(max_constraint_length);
 
   os << "    DofMap Constraints\n      Number of DoF Constraints = "
      << n_constraints;
@@ -2876,10 +2876,10 @@ std::string DofMap::get_info() const
         n_node_rhss++;
     }
 
-  Parallel::sum(n_node_constraints);
-  Parallel::sum(n_node_rhss);
-  Parallel::sum(avg_node_constraint_length);
-  Parallel::max(max_node_constraint_length);
+  CommWorld.sum(n_node_constraints);
+  CommWorld.sum(n_node_rhss);
+  CommWorld.sum(avg_node_constraint_length);
+  CommWorld.max(max_node_constraint_length);
 
   os << "\n      Number of Node Constraints = " << n_node_constraints;
   if (n_node_rhss)
