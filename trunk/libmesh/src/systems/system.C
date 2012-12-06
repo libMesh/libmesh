@@ -847,7 +847,7 @@ NumericVector<Number> & System::get_vector (const unsigned int vec_num)
 
 
 
-const std::string& System::vector_name (const unsigned int vec_num)
+const std::string& System::vector_name (const unsigned int vec_num) const
 {
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();

@@ -786,7 +786,7 @@ public:
    * @returns the name of this system's @e additional vector number \p
    * vec_num (where the vectors are counted starting with 0).
    */
-  const std::string & vector_name (const unsigned int vec_num);
+  const std::string & vector_name (const unsigned int vec_num) const;
 
   /**
    * Allows one to set the boolean controlling whether the vector
