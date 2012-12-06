@@ -61,120 +61,120 @@
     template<typename T>
     void send (const unsigned int dest_processor_id,
                std::basic_string<T> &buf,
-               const MessageTag &tag) const;
+               const MessageTag &tag=no_tag) const;
  
     template<typename T>
     void send (const unsigned int dest_processor_id,
                std::basic_string<T> &buf,
                Request &req,
-               const MessageTag &tag) const;
+               const MessageTag &tag=no_tag) const;
  
     template<typename T>
     void send (const unsigned int dest_processor_id,
                std::set<T> &buf,
-               const MessageTag &tag) const;
+               const MessageTag &tag=no_tag) const;
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
                std::set<T> &buf,
                Request &req,
-               const MessageTag &tag) const;
-
-    template<typename T>
-    void send (const unsigned int dest_processor_id,
-               std::set<T> &buf,
-               const DataType &type,
-               const MessageTag &tag) const;
+               const MessageTag &tag=no_tag) const;
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
                std::set<T> &buf,
                const DataType &type,
+               const MessageTag &tag=no_tag) const;
+
+    template<typename T>
+    void send (const unsigned int dest_processor_id,
+               std::set<T> &buf,
+               const DataType &type,
                Request &req,
-               const MessageTag &tag) const;
+               const MessageTag &tag=no_tag) const;
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
                std::vector<T> &buf,
-               const MessageTag &tag) const;
+               const MessageTag &tag=no_tag) const;
 
     template<typename T>
     void send (const unsigned int dest_processor_id,
                std::vector<T> &buf,
                Request &req,
-               const MessageTag &tag) const;
+               const MessageTag &tag=no_tag) const;
 
     template <typename T>
     void send (const unsigned int dest_processor_id,
                std::vector<T> &buf,
                const DataType &type,
-               const MessageTag &tag) const;
+               const MessageTag &tag=no_tag) const;
 
     template <typename T>
     void send (const unsigned int dest_processor_id,
                std::vector<T> &buf,
                const DataType &type,
                Request &req,
-               const MessageTag &tag) const;
+               const MessageTag &tag=no_tag) const;
 
     template<typename T>
     Status receive (const unsigned int src_processor_id,
                     std::basic_string<T> &buf,
-                    const MessageTag &tag) const;
+                    const MessageTag &tag=any_tag) const;
 
     template<typename T>
     void receive (const unsigned int src_processor_id,
                   std::basic_string<T> &buf,
                   Request &req,
-                  const MessageTag &tag) const;
+                  const MessageTag &tag=any_tag) const;
 
     template<typename T>
     Status receive (const unsigned int src_processor_id,
                     std::set<T> &buf,
-                    const MessageTag &tag) const;
+                    const MessageTag &tag=any_tag) const;
 
     template<typename T>
     void receive (const unsigned int src_processor_id,
                   std::set<T> &buf,
                   Request &req,
-                  const MessageTag &tag) const;
+                  const MessageTag &tag=any_tag) const;
 
     template <typename T>
     Status receive (const unsigned int src_processor_id,
                     std::set<T> &buf,
                     const DataType &type,
-                    const MessageTag &tag) const;
+                    const MessageTag &tag=any_tag) const;
 
     template <typename T>
     void receive (const unsigned int src_processor_id,
                   std::set<T> &buf,
                   const DataType &type,
                   Request &req,
-                  const MessageTag &tag) const;
+                  const MessageTag &tag=any_tag) const;
  
     template<typename T>
     Status receive (const unsigned int src_processor_id,
                     std::vector<T> &buf,
-                    const MessageTag &tag) const;
+                    const MessageTag &tag=any_tag) const;
 
     template<typename T>
     void receive (const unsigned int src_processor_id,
                   std::vector<T> &buf,
                   Request &req,
-                  const MessageTag &tag) const;
+                  const MessageTag &tag=any_tag) const;
 
     template <typename T>
     Status receive (const unsigned int src_processor_id,
                     std::vector<T> &buf,
                     const DataType &type,
-                    const MessageTag &tag) const;
+                    const MessageTag &tag=any_tag) const;
 
     template <typename T>
     void receive (const unsigned int src_processor_id,
                   std::vector<T> &buf,
                   const DataType &type,
                   Request &req,
-                  const MessageTag &tag) const;
+                  const MessageTag &tag=any_tag) const;
 
     template <typename T>
     void broadcast(std::basic_string<T> &data,
