@@ -5,6 +5,29 @@
 
 namespace libMesh
 {
+  // The Destructor
+  MemorySolutionHistory::~MemorySolutionHistory ()
+  {
+    stored_solutions_iterator stored_sols_it = stored_solutions.begin();
+    const stored_solutions_iterator stored_sols_end = stored_solutions.end();
+
+    for(; stored_sols_it != stored_sols_end; ++stored_sols_it)
+      {
+	// The saved vectors at this timestep
+	std::map<std::string, NumericVector<Number> *> saved_vectors = stored_sols_it->second;
+
+	std::map<std::string, NumericVector<Number> *>::iterator vec = saved_vectors.begin();
+	std::map<std::string, NumericVector<Number> *>::iterator vec_end = saved_vectors.end();
+
+	// Loop over all the saved vectors
+	for (; vec != vec_end; ++vec)
+	  {		    	
+	    // Delete this saved vector
+	    delete vec->second;	    
+	  }
+      }
+  }
+
   // This functions saves all the 'projection-worthy' system vectors for
   // future use
   void MemorySolutionHistory::store()
@@ -52,14 +75,18 @@ namespace libMesh
     // Get the saved vectors at this timestep
     std::map<std::string, NumericVector<Number> *> saved_vectors = stored_sols->second;
 
+    std::map<std::string, NumericVector<Number> *>::iterator vec = saved_vectors.begin();
+    std::map<std::string, NumericVector<Number> *>::iterator vec_end = saved_vectors.end();
+
     // Loop over all the saved vectors
-    for (System::vectors_iterator vec = saved_vectors.begin(); vec != saved_vectors.end(); ++vec)
+    for (; vec != vec_end; ++vec)
       {	
   	// The name of this vector
   	const std::string& vec_name = vec->first;
 	
 	// Get the vec_name entry in the saved vectors map and set the current system vec[vec_name] entry to it
-	vec->second = saved_vectors[vec_name];	    
+	if(vec_name != "_solution")
+	  _system.get_vector(vec_name) = *(vec->second);	    
       }
     
     // Of course, we will *always* have to get the actual solution
@@ -69,4 +96,3 @@ namespace libMesh
   }
 
 }
-    
