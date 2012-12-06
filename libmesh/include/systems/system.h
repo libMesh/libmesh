@@ -789,6 +789,11 @@ public:
   const std::string & vector_name (const unsigned int vec_num) const;
 
   /**
+   * @returns the name of a system vector, given a reference to that vector
+   */
+  const std::string & vector_name (const NumericVector<Number> & vec_reference) const;
+
+  /**
    * Allows one to set the boolean controlling whether the vector
    * identified by vec_name should be "preserved": projected to new
    * meshes, saved, etc.

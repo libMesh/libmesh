@@ -861,7 +861,24 @@ const std::string& System::vector_name (const unsigned int vec_num) const
   return v->first;
 }
 
-
+const std::string & System::vector_name (const NumericVector<Number> & vec_reference) const
+{
+  const_vectors_iterator v = vectors_begin();
+  const_vectors_iterator v_end = vectors_end();
+  
+  for(; v != v_end; ++v)
+    {
+      // Check if the current vector is the one whose name we want
+      if(&vec_reference == v->second)
+	break; // exit loop if it is
+    }
+  
+  // Before returning, make sure we didnt loop till the end and not find any match
+  libmesh_assert (v != v_end);
+  
+  // Return the string associated with the current vector
+  return v->first;
+}
 
 void System::set_vector_preservation (const std::string &vec_name,
                                       bool preserve)
