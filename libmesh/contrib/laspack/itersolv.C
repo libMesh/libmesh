@@ -33,7 +33,7 @@
 static int GMRESSteps = 10;
 
 QVector *JacobiIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-		    PrecondProcType Dummy, _LPDouble Omega)
+		    PrecondProcType /* Dummy */, _LPDouble Omega)
 {
     int Iter;
     _LPReal bNorm;
@@ -82,7 +82,7 @@ QVector *JacobiIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *SORForwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType Dummy, _LPDouble Omega)
+		     PrecondProcType /* Dummy */, _LPDouble Omega)
 {
     int Iter;
     _LPReal bNorm;
@@ -131,7 +131,7 @@ QVector *SORForwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *SORBackwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType Dummy, _LPDouble Omega)
+		      PrecondProcType /* Dummy */, _LPDouble Omega)
 {
     int Iter;
     _LPReal bNorm;
@@ -180,7 +180,7 @@ QVector *SORBackwIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
 }
 
 QVector *SSORIter(QMatrix *A, QVector *x, QVector *b, int MaxIter,
-            PrecondProcType Dummy, _LPDouble Omega)
+		  PrecondProcType /* Dummy */, _LPDouble Omega)
 {
     int Iter;
     _LPReal bNorm;

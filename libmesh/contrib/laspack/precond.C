@@ -72,7 +72,7 @@ QVector *SSORPrecond(QMatrix *A, QVector *y, QVector *c, _LPDouble Omega)
     return(y);
 }
 
-QVector *ILUPrecond(QMatrix *A, QVector *y, QVector *c, _LPDouble Dummy)
+QVector *ILUPrecond(QMatrix *A, QVector *y, QVector *c, _LPDouble /* Dummy */)
 /* incomplete factorization preconditioner */
 {
     Q_Lock(A);
