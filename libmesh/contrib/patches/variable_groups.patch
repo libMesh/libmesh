@@ -1,0 +1,927 @@
+Index: include/systems/system.h
+===================================================================
+--- include/systems/system.h	(revision 6500)
++++ include/systems/system.h	(working copy)
+@@ -1006,11 +1006,34 @@
+ 			     const std::set<subdomain_id_type> * const active_subdomains = NULL);
+ 
+   /**
++   * Adds the variable \p var to the list of variables
++   * for this system.  Returns the index number for the new variable.
++   */
++  unsigned int add_variables (const std::vector<std::string> &vars,
++			      const FEType& type,
++			      const std::set<subdomain_id_type> * const active_subdomains = NULL);
++  
++  /**
++   * Adds the variable \p var to the list of variables
++   * for this system.  Same as before, but assumes \p LAGRANGE
++   * as default value for \p FEType.family.
++   */
++  unsigned int add_variables (const std::vector<std::string> &vars,
++			      const Order order = FIRST,
++			      const FEFamily = LAGRANGE,
++			      const std::set<subdomain_id_type> * const active_subdomains = NULL);
++
++  /**
+    * Return a constant reference to \p Variable \p var.
+    */
+   const Variable & variable (unsigned int var) const;
+ 
+   /**
++   * Return a constant reference to \p VariableGroup \p vg.
++   */
++  const VariableGroup & variable_group (unsigned int vg) const;
++
++  /**
+    * @returns true if a variable named \p var exists in this System
+    */
+   bool has_variable(const std::string& var) const;
+@@ -1631,11 +1654,16 @@
+   const unsigned int _sys_number;
+ 
+   /**
+-   * The \p Variables in this \p System.
++   * The \p Variable in this \p System.
+    */
+   std::vector<Variable> _variables;
+ 
+   /**
++   * The \p VariableGroup in this \p System.
++   */
++  std::vector<VariableGroup> _variable_groups;
++
++  /**
+    * The variable numbers corresponding to user-specified
+    * names, useful for name-based lookups.
+    */
+@@ -1819,6 +1847,16 @@
+ 
+ 
+ inline
++const VariableGroup & System::variable_group (const unsigned int vg) const
++{
++  libmesh_assert_less (vg, _variable_groups.size());
++
++  return _variable_groups[vg];
++}
++
++
++
++inline
+ const std::string & System::variable_name (const unsigned int i) const
+ {
+   libmesh_assert_less (i, _variables.size());
+Index: include/base/dof_object.h
+===================================================================
+--- include/base/dof_object.h	(revision 6500)
++++ include/base/dof_object.h	(working copy)
+@@ -67,6 +67,7 @@
+ 
+   /**
+    * Copy-constructor.
++
+    */
+   DofObject (const DofObject&);
+ 
+@@ -196,18 +197,33 @@
+   void add_system ();
+ 
+   /**
+-   * @returns the number of variables associated with system \p s
+-   * for this \p DofObject
++   * @returns the number of \p VariableGroup variable groups
++   * associated with system \p s for this \p DofObject
+    */
++  unsigned int n_var_groups(const unsigned int s) const;
++
++  /**
++   * @returns the number of \p Variable variables associated
++   * with \p VariableGroup \p vg in system \p s for this \p DofObject
++   */
++  unsigned int n_vars(const unsigned int s,
++		      const unsigned int vg) const;
++
++  /**
++   * @returns the number of \p Variable variables associated
++   * with system \p s for this \p DofObject
++   */
+   unsigned int n_vars(const unsigned int s) const;
+ 
+   /**
+-   * Sets number of variables associated with system \p s for this
+-   * \p DofObject.  Has the effect of setting the number of components
+-   * to 0 even when called even with (nvars == this->n_vars(s)).
++   * Sets number of variables in each group associated with system \p s for this
++   * \p DofObject. Implicit in this is salso setting the number of \p VariableGroup
++   * variable groups for the system.
++   * Has the effect of setting the number of components
++   * to 0 even when called even with (nvg == this->n_var_groups(s)).
+    */
+-  void set_n_vars(const unsigned int s,
+-		  const unsigned int nvars);
++  void set_n_vars_per_group(const unsigned int s,
++			    const std::vector<unsigned int> &nvpg);
+ 
+   /**
+    * @returns the number of components for variable \p var
+@@ -253,13 +269,6 @@
+   bool has_dofs(const unsigned int s=libMesh::invalid_uint) const;
+ 
+   /**
+-   * Implemented in Elem and Node.
+-   */
+-//  virtual bool operator==(const DofObject& ) const
+-//  { libmesh_error(); return false; }
+-
+-
+-  /**
+    * An invaild \p id to distinguish an uninitialized \p DofObject
+    */
+   static const unsigned int invalid_id = libMesh::invalid_uint;
+@@ -298,8 +307,14 @@
+ 
+ private:
+ 
+-
+   /**
++   * Utility function - for variable \p v in system \p s, figure out what
++   * variable group it lives in.
++   */
++  unsigned int var_to_vg (const unsigned int s,
++			  const unsigned int var) const;
++  
++  /**
+    * The \p id of the \p DofObject
+    */
+   unsigned int _id;
+@@ -318,29 +333,52 @@
+   /**
+    * DOF index information.  This is packed into a contiguous buffer of the following format:
+    *
+-   * [ns end_0 end_1 ... end_{ns-1} (nc_0 idx_0 nc_1 idx_1 ... nc_nv idx_nv)_0 (nc_0 idx_0 nc_1 idx_1 ... nc_nv idx_nv)_1 ... (nc_0 idx_0 nc_1 idx_1 ... nc_nv idx_nv)_ns ]
++   * [ns end_0 end_1 ... end_{ns-1} (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_0 (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_1 ... (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_ns ]
+    *
+-   * where 'end_s' is the index past the end of the variable storage for system \p s.
++   * where 'end_s' is the index past the end of the variable group storage for system \p s.
+    * Note that we specifically do not store the end for the last system - this always _idx_buf.size().
+    *
+-   * Specifically, consider the case of 4 systems, with 3, 0, 1, 2 DOFs respectively.  The _idx_buf then looks like
+-   *
+-   * [4 10 10 12 () (nc_0 idx_0 nc_1 idx_1 nc_2 idx_2) () (nc_0 idx_0) (nc_0 idx_0 nc_1 idx_1)]
+-   * [0  1  2  3        4     5    6     7    8     9        10    11     12    13   14    15]
+-   *
++   * Specifically, consider the case of 4 systems, with 3, 0, 1, 2 variable groups, respectively.  The _idx_buf then looks like:
++   \verbatim
++    [4 10 10 12 () (ncv_0 idx_0 ncv_1 idx_1 ncv_2 idx_2) () (ncv_0 idx_0) (ncv_0 idx_0 ncv_1 idx_1)]
++    [0  1  2  3         4     5     6     7     8     9         10    11      12    13    14    15]
++
++   \endverbatim
+    * The ending index is then given by
++   \verbatim
++    end_s = _idx_buf.size(), s == (ns-1),
++          = _idx_buf[s+1]    otherwise.
++   \endverbatim
++   * The starting indices are not specifically stored, but rather inferred as follows:
+    *
+-   * end_s = _idx_buf.size(), s == (ns-1),
+-   *       = _idx_buf[s+1]    otherwise.
++   * start_s = _idx_buf[s];
++
++   * Now, the defining characteristic of the \p VariableGroup is that it supports
++   * an arbitrary number of variables of the same type.  At the \p DofObject level, what
++   * that means is that each \p Variable in the \p VariableGroup will have the same number
++   * of nonzero components, and they can all be indexed from the same base number.  We use this
++   * information in the ncv_# and idx_# entries as follows:
++   * 
++   * ncv_# = n_vars*ncv_magic + n_comp      for variable group #
++   * idx_# = base_offset                    for variable group #
+    *
+-   * The starting indices are not specifically stored, but rather inferred as follows:
++   * the DOF index for a particular component c of variable v within that group is then given by
+    *
+-   * start_s = _idx_buf[s];
++   *  idx_var = idx_# + n_comp*v + c
+    */
+-  typedef std::vector<unsigned int> index_buffer_t;
++  typedef unsigned int index_t;
++  typedef std::vector<index_t> index_buffer_t;
+   index_buffer_t _idx_buf;
+ 
+   /**
++   * Above we introduced the chimera ncv, which is a hybrid of the form   
++   * ncv = ncv_magic*nv + nc
++   * where nv are the number of identical variables of a given type,
++   * and nc is the number of components for this set of variables.
++   */
++  static const index_t ncv_magic = 1000;
++  
++  /**
+    * The starting index for system \p s.
+    */
+   unsigned int start_idx(const unsigned int s) const;
+@@ -527,6 +565,33 @@
+ 
+ 
+ inline
++unsigned int DofObject::n_var_groups(const unsigned int s) const
++{
++  libmesh_assert_less (s, this->n_systems());
++
++  return (this->end_idx(s) - this->start_idx(s)) / 2;
++}
++
++
++
++inline
++unsigned int DofObject::n_vars(const unsigned int s,
++			       const unsigned int vg) const
++{
++  libmesh_assert_less (s,  this->n_systems());
++  libmesh_assert_less (vg, this->n_var_groups(s));
++  
++  const unsigned int
++    start_idx_sys = this->start_idx(s),
++    nvg           = _idx_buf[start_idx_sys] / ncv_magic;
++
++
++  return nvg;
++}
++
++
++
++inline
+ unsigned int DofObject::n_vars(const unsigned int s) const
+ {
+   libmesh_assert_less (s, this->n_systems());
+@@ -639,6 +704,26 @@
+ }
+ 
+ 
++
++inline
++unsigned int DofObject::var_to_vg (const unsigned int s,
++				   const unsigned int var) const
++{
++  const unsigned int
++    nvg = this->n_var_groups(s);
++
++  for (unsigned int vg=0, vg_end=0; vg<nvg; vg++)
++    {
++      vg_end += this->n_vars(s,vg);
++      if (var < vg_end) return vg;
++    }
++
++  // we should never get here
++  libmesh_error();
++  return 0;
++}
++
++
+ } // namespace libMesh
+ 
+ 
+Index: include/base/dof_map.h
+===================================================================
+--- include/base/dof_map.h	(revision 6500)
++++ include/base/dof_map.h	(working copy)
+@@ -309,13 +309,24 @@
+     return *_n_oz;
+   }
+ 
++  // /**
++  //  * Add an unknown of order \p order and finite element type
++  //  * \p type to the system of equations.
++  //  */
++  // void add_variable (const Variable &var);
++
+   /**
+-   * Add an unknown of order \p order and finite element type
++   * Add a group of unknowns of order \p order and finite element type
+    * \p type to the system of equations.
+    */
+-  void add_variable (const Variable &var);
++  void add_variable_group (const VariableGroup &var_group);
+ 
+   /**
++   * @returns the \p VariableGroup description object for group \p g.
++   */
++  const VariableGroup& variable_group (const unsigned int c) const;
++
++  /**
+    * @returns the variable description object for variable \p c.
+    */
+   const Variable& variable (const unsigned int c) const;
+@@ -335,14 +346,22 @@
+    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
+    * Stokes (u,v,p), etc...
+    */
++  unsigned int n_variable_groups() const
++  { return _variable_groups.size(); }
++
++  /**
++   * Returns the number of variables in the global solution vector. Defaults
++   * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
++   * Stokes (u,v,p), etc...
++   */
+   unsigned int n_variables() const
+   { return _variables.size(); }
+ 
+   /**
+    * @returns the total number of degrees of freedom in the problem.
+    */
+-
+   unsigned int n_dofs() const { return _n_dfs; }
++  
+   /**
+    * @returns the number of SCALAR dofs.
+    */
+@@ -399,27 +418,6 @@
+ #endif //LIBMESH_ENABLE_AMR
+ 
+   /**
+-   * Returns the first local degree of freedom index for variable \p var.
+-   */
+-  unsigned int variable_first_local_dof (const unsigned int var) const
+-  {
+-    libmesh_assert_less ((var+1), _var_first_local_df.size());
+-    libmesh_assert_not_equal_to (_var_first_local_df[var], DofObject::invalid_id);
+-    return _var_first_local_df[var];
+-  }
+-
+-  /**
+-   * Returns (one past) the last local degree of freedom index for variable \p var.
+-   * Analogous to the end() member function of STL containers.
+-   */
+-  unsigned int variable_last_local_dof (const unsigned int var) const
+-  {
+-    libmesh_assert_less ((var+1), _var_first_local_df.size());
+-    libmesh_assert_not_equal_to (_var_first_local_df[var+1], DofObject::invalid_id);
+-    return _var_first_local_df[var+1];
+-  }
+-
+-  /**
+    * Fills the vector \p di with the global degree of freedom indices
+    * for the element. If no variable number is specified then all
+    * variables are returned.
+@@ -979,14 +977,18 @@
+   void add_constraints_to_send_list();
+ 
+ #endif // LIBMESH_ENABLE_CONSTRAINTS
+-
+-
++  
+   /**
+    * The finite element type for each variable.
+    */
+   std::vector<Variable> _variables;
+ 
+   /**
++   * The finite element type for each variable.
++   */
++  std::vector<VariableGroup> _variable_groups;
++
++  /**
+    * The number of the system we manage DOFs for.
+    */
+   const unsigned int _sys_number;
+@@ -1009,18 +1011,13 @@
+   std::vector<unsigned int> _end_df;
+ 
+   /**
+-   * The first local DOF index for each variable in the \p System.
+-   */
+-  std::vector<unsigned int> _var_first_local_df;
+-
+-  /**
+    * A list containing all the global DOF indicies that affect the
+    * solution on my subdomain.
+    */
+   std::vector<unsigned int> _send_list;
+ 
+   /**
+-   *
++   * Funtion object to call to add extra entries to the sparsity pattern
+    */
+   AugmentSparsityPattern *_augment_sparsity_pattern;
+ 
+@@ -1037,7 +1034,7 @@
+   void * _extra_sparsity_context;
+ 
+   /**
+-   * 
++   * Function object to call to add extra entries to the send list
+    */
+   AugmentSendList *_augment_send_list;
+ 
+Index: include/base/variable.h
+===================================================================
+--- include/base/variable.h	(revision 6500)
++++ include/base/variable.h	(working copy)
+@@ -109,7 +109,7 @@
+    * empty \p _active_subdomains container as active everywhere, i.e.
+    * for all subdomains.
+    */
+-  bool active_on_subdomain (const subdomain_id_type sid) const
++  bool active_on_subdomain (subdomain_id_type sid) const
+   { return (_active_subdomains.empty() || _active_subdomains.count(sid));  }
+ 
+   /**
+@@ -126,7 +126,7 @@
+   const std::set<subdomain_id_type> & active_subdomains() const
+   { return _active_subdomains; }
+ 
+-private:
++protected:
+   std::string             _name;
+   unsigned int            _number;
+   unsigned int            _first_scalar_number;
+@@ -134,6 +134,114 @@
+   std::set<subdomain_id_type> _active_subdomains;
+ };
+ 
++
++
++/**
++ * This class defines a logically grouped set of variables in
++ * the system.  \p VariableGroup is appropriate for representing
++ * several unknowns in the problem that are all approximated
++ * with the same finite element approximation family and
++ * (optionally) a list of subdomains to which the
++ * variables are restricted.
++ */
++class VariableGroup : public Variable
++{
++public:
++  /**
++   * Constructor.  Omits the subdomain mapping, hence this
++   * constructor creates a variable which is active on
++   * all subdomains.
++   */
++  VariableGroup (const std::vector<std::string> &var_names,
++		 const unsigned int var_number,
++		 const unsigned int first_scalar_number,
++		 const FEType &var_type) :
++    Variable ("var_group",
++	      var_number,
++	      first_scalar_number,
++	      var_type),
++    _names(var_names)
++  {}
++
++   
++  /**
++   * Constructor.  Takes a set which contains the subdomain
++   * indices for which this variable is active.
++   */
++  VariableGroup (const std::vector<std::string> &var_names,
++		 const unsigned int var_number,
++		 const unsigned int first_scalar_number,
++		 const FEType &var_type,
++		 const std::set<subdomain_id_type> &var_active_subdomains) :
++     
++    Variable ("var_group",
++	      var_number,
++	      first_scalar_number,
++	      var_type,
++	      var_active_subdomains),
++    _names(var_names)
++  {}
++
++  /**
++   * The number of variables in this \p VariableGroup
++   */
++  unsigned int n_variables () const
++  { return _names.size(); }
++
++  /**
++   * Construct a \p Variable object for an individual member
++   * of our group.
++   */
++  Variable variable (unsigned int v) const
++  {
++    libmesh_assert_less (v, this->n_variables());
++    return Variable (this->name(v),
++		     this->number(v),
++		     this->first_scalar_number(v),
++		     this->type(),
++		     this->active_subdomains());
++  }
++
++  /**
++   * Support vg(v) - returns a \p Variable for v.
++   */
++  Variable operator() (unsigned int v) const
++  { return this->variable(v); }
++  
++  /**
++   * Arbitrary, user-specified name of the variable.
++   */
++  const std::string & name(unsigned int v) const
++  {
++    libmesh_assert_less (v, this->n_variables());
++    return _names[v];
++  }
++
++  /**
++   * The rank of this variable in the system.
++   */
++  unsigned int number(unsigned int v) const
++  {
++    libmesh_assert_less (v, this->n_variables());
++    return _number + v;
++  }
++
++  /**
++   * The index of the first scalar component of this variable in the
++   * system.
++   */
++  unsigned int first_scalar_number(unsigned int v) const
++  {
++    libmesh_assert_less (v, this->n_variables());
++    if ((this->type().family == SCALAR) &&
++	(this->n_variables() > 1)) libmesh_error(); // [BSK] I am not yet sure what this means!
++    return _first_scalar_number;
++  }
++
++protected:
++  std::vector<std::string> _names;
++};
++  
+ } // namespace libMesh
+ 
+ #endif // #define __variable_h__
+Index: src/systems/system.C
+===================================================================
+--- src/systems/system.C	(revision 6500)
++++ src/systems/system.C	(working copy)
+@@ -1073,53 +1073,86 @@
+ 			           const FEType& type,
+ 				   const std::set<subdomain_id_type> * const active_subdomains)
+ {
++  return this->add_variables (std::vector<std::string>(1, var),
++			      type,
++			      active_subdomains);
++}
++
++
++
++unsigned int System::add_variable (const std::string& var,
++			           const Order order,
++			           const FEFamily family,
++				   const std::set<subdomain_id_type> * const active_subdomains)
++{
++  return this->add_variables(std::vector<std::string>(1, var),
++			     FEType(order, family),
++			     active_subdomains);
++}
++
++
++
++unsigned int System::add_variables (const std::vector<std::string> &vars,
++				    const FEType& type,
++				    const std::set<subdomain_id_type> * const active_subdomains)
++{
++  const std::string var = vars[0];
++  
+   // Make sure the variable isn't there already
+   // or if it is, that it's the type we want
+-  for (unsigned int v=0; v<this->n_vars(); v++)
+-    if (this->variable_name(v) == var)
+-      {
+-	if (this->variable_type(v) == type)
+-	  return _variables[v].number();
++  for (unsigned int ov=0; ov<vars.size(); ov++)
++    for (unsigned int v=0; v<this->n_vars(); v++)
++      if (this->variable_name(v) == vars[ov])
++	{
++	  if (this->variable_type(v) == type)
++	    return _variables[v].number();
++	  
++	  libMesh::err << "ERROR: incompatible variable "
++		       << vars[ov]
++		       << " has already been added for this system!"
++		       << std::endl;
++	  libmesh_error();
++	}
+ 
+-	libMesh::err << "ERROR: incompatible variable "
+-		      << var
+-		      << " has already been added for this system!"
+-		      << std::endl;
+-	libmesh_error();
+-      }
+-
+   const unsigned int curr_n_vars = this->n_vars();
+ 
+   const unsigned int next_first_component = this->n_components();
+ 
+-  // Add the variable to the list
+-  _variables.push_back((active_subdomains == NULL) ?
+-		       Variable(var, curr_n_vars,
+-				next_first_component, type) :
+-		       Variable(var, curr_n_vars,
+-				next_first_component, type, *active_subdomains));
++  // Add the variable group to the list
++  _variable_groups.push_back((active_subdomains == NULL) ?
++			     VariableGroup(vars, curr_n_vars,
++					   next_first_component, type) :
++			     VariableGroup(vars, curr_n_vars,
++					   next_first_component, type, *active_subdomains));
+ 
+-  libmesh_assert_equal_to ((curr_n_vars+1), this->n_vars());
++  const VariableGroup &vg (_variable_groups.back());
++  
++  // Add each component of the group individually
++  for (unsigned int v=0; v<vars.size(); v++)
++    {
++      _variables.push_back (vg(v));
++      _variable_numbers[vars[v]] = curr_n_vars+v;  
++    }
++  
++  libmesh_assert_equal_to ((curr_n_vars+vars.size()), this->n_vars());
++    
++  // Add the variable group to the _dof_map
++  _dof_map->add_variable_group (vg);
+ 
+-  _variable_numbers[var] = curr_n_vars;
+-
+-  // Add the variable to the _dof_map
+-  _dof_map->add_variable (_variables.back());
+-
+   // Return the number of the new variable
+   return curr_n_vars;
+ }
+ 
+ 
+ 
+-unsigned int System::add_variable (const std::string& var,
+-			           const Order order,
+-			           const FEFamily family,
+-				   const std::set<subdomain_id_type> * const active_subdomains)
++unsigned int System::add_variables (const std::vector<std::string> &vars,
++				    const Order order,
++				    const FEFamily family,
++				    const std::set<subdomain_id_type> * const active_subdomains)
+ {
+-  return this->add_variable(var,
+-			    FEType(order, family),
+-			    active_subdomains);
++  return this->add_variables(vars,
++			     FEType(order, family),
++			     active_subdomains);
+ }
+ 
+ 
+Index: src/base/dof_object.C
+===================================================================
+--- src/base/dof_object.C	(revision 6500)
++++ src/base/dof_object.C	(working copy)
+@@ -199,11 +199,15 @@
+ 
+ 
+ 
+-void DofObject::set_n_vars(const unsigned int s,
+-			   const unsigned int nvars)
++void DofObject::set_n_vars_per_group(const unsigned int s,
++				     const std::vector<unsigned int> &nvpg)
+ {
++  
+   libmesh_assert_less (s, this->n_systems());
+ 
++  // number of varaible groups for this system - inferred
++  const unsigned int nvg = nvpg.size();
++  
+   // BSK - note that for compatibility with the previous implementation
+   // calling this method when (nvars == this->n_vars()) requires that
+   // we invalidate the DOF indices and set the number of components to 0.
+@@ -212,10 +216,10 @@
+   // even in the case of (nvars == this->n_vars()), resulting in n_comp(s,v)
+   // implicitly becoming 0 regardless of any previous value.
+   // quick return?
+-  if (nvars == this->n_vars(s))
++  if (nvg == this->n_var_groups(s))
+     {
+-      for (unsigned int v=0; v<nvars; v++)
+-	this->set_n_comp(s,v,0);
++      for (unsigned int vg=0; vg<nvg; vg++)
++	this->set_n_comp(s,vg,0);
+       return;
+     }
+ 
+@@ -226,13 +230,13 @@
+   old_system_sizes.reserve(this->n_systems());
+ 
+   for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
+-    old_system_sizes.push_back(this->n_vars(s_ctr));
++    old_system_sizes.push_back(this->n_var_groups(s_ctr));
+ #endif
+ 
+   // remove current indices if we have some
+-  if (this->n_vars(s) != 0)
++  if (this->n_var_groups(s) != 0)
+     {
+-      const unsigned int old_nvars_s = this->n_vars(s);
++      const unsigned int old_nvg_s = this->n_var_groups(s);
+ 
+       DofObject::index_buffer_t::iterator
+ 	it  = _idx_buf.begin(),
+@@ -243,27 +247,27 @@
+       _idx_buf.erase(it,end);
+ 
+       for (unsigned int ctr=(s+1); ctr<this->n_systems(); ctr++)
+-	_idx_buf[ctr] -= 2*old_nvars_s;
++	_idx_buf[ctr] -= 2*old_nvg_s;
+     }
+ 
+   // better not have any now!
+-  libmesh_assert_equal_to (this->n_vars(s), 0);
++  libmesh_assert_equal_to (this->n_var_groups(s), 0);
+ 
+   // had better not screwed up any of our sizes!
+ #ifdef DEBUG
+   for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
+     if (s_ctr != s)
+-      libmesh_assert_equal_to (this->n_vars(s_ctr), old_system_sizes[s_ctr]);
++      libmesh_assert_equal_to (this->n_var_groups(s_ctr), old_system_sizes[s_ctr]);
+ #endif
+ 
+   // OK, if the user requested 0 that is what we have
+-  if (nvars == 0)
++  if (nvg == 0)
+     return;
+ 
+   {
+     // array to hold new indices
+-    DofObject::index_buffer_t var_idxs(2*nvars);
+-    for (unsigned int v=0; v<nvars; v++)
++    DofObject::index_buffer_t var_idxs(2*nvg);
++    for (unsigned int v=0; v<nvg; v++)
+       {
+ 	var_idxs[2*v    ] = 0;
+ 	var_idxs[2*v + 1] = invalid_id - 1;
+@@ -274,14 +278,14 @@
+     _idx_buf.insert(it, var_idxs.begin(), var_idxs.end());
+ 
+     for (unsigned int ctr=(s+1); ctr<this->n_systems(); ctr++)
+-      _idx_buf[ctr] += 2*nvars;
++      _idx_buf[ctr] += 2*nvg;
+ 
+     // resize _idx_buf to fit so no memory is wasted.
+     DofObject::index_buffer_t(_idx_buf).swap(_idx_buf);
+   }
+ 
+   // that better had worked.  Assert stuff.
+-  libmesh_assert_equal_to (nvars, this->n_vars(s));
++  libmesh_assert_equal_to (nvg, this->n_var_groups(s));
+ 
+ #ifdef DEBUG
+   for (unsigned int v=0; v<this->n_vars(s); v++)
+Index: src/base/dof_map.C
+===================================================================
+--- src/base/dof_map.C	(revision 6500)
++++ src/base/dof_map.C	(working copy)
+@@ -128,11 +128,11 @@
+ DofMap::DofMap(const unsigned int number) :
+   _dof_coupling(NULL),
+   _variables(),
++  _variable_groups(),
+   _sys_number(number),
+   _matrices(),
+   _first_df(),
+   _end_df(),
+-  _var_first_local_df(),
+   _send_list(),
+   _augment_sparsity_pattern(NULL),
+   _extra_sparsity_function(NULL),
+@@ -192,13 +192,33 @@
+ 
+ 
+ 
+-void DofMap::add_variable (const Variable &var)
++// void DofMap::add_variable (const Variable &var)
++// {
++//   libmesh_error();
++//   _variables.push_back (var);
++// }
++
++
++
++void DofMap::add_variable_group (const VariableGroup &var_group)
+ {
+-  _variables.push_back (var);
++  _variable_groups.push_back(var_group);
++  
++  for (unsigned int var=0; var<var_group.n_variables(); var++)    
++    _variables.push_back (var_group(var));
+ }
+ 
+ 
+ 
++const VariableGroup & DofMap::variable_group (const unsigned int g) const
++{
++  libmesh_assert_less (g, _variable_groups.size());
++
++  return _variable_groups[g];
++}
++
++
++
+ const Variable & DofMap::variable (const unsigned int c) const
+ {
+   libmesh_assert_less (c, _variables.size());
+@@ -436,10 +456,15 @@
+ 
+   START_LOG("reinit()", "DofMap");
+ 
+-  //this->clear();
++  const unsigned int
++    n_vars_tot   = this->n_variables(),
++    n_var_groups = this->n_variable_groups();
+ 
+-  const unsigned int n_var = this->n_variables();
+-
++  std::vector<unsigned int> n_vars_per_group; /**/ n_vars_per_group.reserve (n_var_groups);
++  
++  for (unsigned int vg=0; vg<n_var_groups; vg++)
++    n_vars_per_group.push_back (this->variable_group(vg).n_variables());
++  
+ #ifdef LIBMESH_ENABLE_AMR
+ 
+   //------------------------------------------------------------
+@@ -510,14 +535,14 @@
+     const MeshBase::node_iterator node_end = mesh.nodes_end();
+ 
+     for ( ; node_it != node_end; ++node_it)
+-      (*node_it)->set_n_vars(this->sys_number(),n_var);
++      (*node_it)->set_n_vars_per_group(this->sys_number(), n_vars_per_group);
+ 
+     // All the elements
+     MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+     const MeshBase::element_iterator elem_end = mesh.elements_end();
+ 
+     for ( ; elem_it != elem_end; ++elem_it)
+-      (*elem_it)->set_n_vars(this->sys_number(),n_var);
++      (*elem_it)->set_n_vars_per_group(this->sys_number(), n_vars_per_group);
+   }
+ 
+ 
+@@ -799,9 +824,9 @@
+   //_dof_coupling->clear();
+ 
+   _variables.clear();
++  _variable_groups.clear();
+   _first_df.clear();
+   _end_df.clear();
+-  _var_first_local_df.clear();
+   _send_list.clear();
+   this->clear_sparsity();
+   need_full_sparsity_pattern = false;
+@@ -938,12 +963,6 @@
+   // We now only add remote dofs to the _send_list
+   // unsigned int send_list_size = 0;
+ 
+-  // _var_first_local_df does not work with node_major dofs
+-  _var_first_local_df.resize(n_vars+1);
+-  std::fill (_var_first_local_df.begin(),
+-	     _var_first_local_df.end(),
+-	     DofObject::invalid_id);
+-
+   //-------------------------------------------------------------------------
+   // First count and assign temporary numbers to local dofs
+   MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
+@@ -1085,15 +1104,10 @@
+   // We now only add remote dofs to the _send_list
+   // unsigned int send_list_size = 0;
+ 
+-  // We will cache the first local index for each variable
+-  _var_first_local_df.clear();
+-
+   //-------------------------------------------------------------------------
+   // First count and assign temporary numbers to local dofs
+   for (unsigned var=0; var<n_vars; var++)
+     {
+-      _var_first_local_df.push_back(next_free_dof);
+-
+       const Variable var_description = this->variable(var);
+ 
+       // Skip the SCALAR dofs
+@@ -1198,9 +1212,6 @@
+   if ( libMesh::processor_id() == (libMesh::n_processors()-1) )
+     next_free_dof += _n_SCALAR_dofs;
+ 
+-  // Cache the last local dof number too
+-  _var_first_local_df.push_back(next_free_dof);
+-
+ #ifdef DEBUG
+   {
+     // Make sure we didn't miss any nodes
+@@ -1713,6 +1724,8 @@
+   STOP_LOG("dof_indices()", "DofMap");
+ }
+ 
++
++
+ void DofMap::SCALAR_dof_indices (std::vector<unsigned int>& di,
+ 			         const unsigned int vn,
+ #ifdef LIBMESH_ENABLE_AMR
