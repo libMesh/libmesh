@@ -28,11 +28,14 @@
 
 // C++ includes
 #include <cstddef>
+#include <map>
+#include <vector>
 
 namespace libMesh
 {
 
 // Forward declarations
+template <typename T> class NumericVector;
 class System;
 
 /**
@@ -340,7 +343,41 @@ public:
    */
   Real get_deltat_value();
 
-private:
+  /**
+   * Adds a vector to the map of localized vectors. We can later evaluate interior_values,
+   * interior_gradients and side_values for these fields these vectors represent.
+   */
+  void add_localized_vector (NumericVector<Number> & _localized_vector, const System & _sys);
+
+  /**
+   * Typedef for the localized_vectors iterator
+   */
+  typedef std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > >::iterator localized_vectors_iterator;  
+
+  /**
+   * Return a reference to DenseVector localization of _localized_vector 
+   * contained in the localized_vectors map
+   */
+  DenseVector<Number> & get_localized_vector (const NumericVector<Number> & _localized_vector);
+
+  /**
+   * const accessible version of get_localized_vector function
+   */
+  const DenseVector<Number> & get_localized_vector (const NumericVector<Number> & _localized_vector) const;
+
+  /**
+   * Return a reference to DenseSubVector localization of _localized_vector at variable _var
+   * contained in the localized_vectors map
+   */
+  DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var);
+
+  /**
+   * const accessible version of get_localized_subvector function
+   */
+  const DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var) const; 
+
+ private:
+
   /**
    * Default NULL, can optionally be used to point to a timestep value
    * in the System-derived class responsible for creating this DiffContext.
@@ -354,7 +391,20 @@ private:
    */
   Real* _deltat;
 
+  /**
+   * A reference to the system this context is constructed with
+   */
   const System& _system;
+
+ protected:
+ 
+  /**
+   * Contains pointers to vectors the user has asked to be localized, keyed with
+   * pairs of element localized versions of that vector and per variable views
+   */
+
+  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > > localized_vectors;  
+  
 };
 
 } // namespace libMesh
