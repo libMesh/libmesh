@@ -689,7 +689,6 @@ void ParallelMesh::redistribute ()
       // and elements according to the partitioner, and then to re-gather the neighbors.
       MeshCommunication mc;
       mc.redistribute(*this);
-      mc.gather_neighboring_elements(*this);
 
       this->update_parallel_id_counts();
 

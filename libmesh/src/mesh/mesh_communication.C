@@ -199,76 +199,52 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     if (pid != libMesh::processor_id()) // don't send to ourselves!!
       {
 	// Build up a list of nodes and elements to send to processor pid.
-	// We will certainly send all the active elements assigned to this processor,
-	// but we will also ship off the other elements in the same family tree
-	// as the active ones for data structure consistency.  We also
-	// ship any nodes connected to these elements.  Note some of these nodes
-	// and elements may be replicated from other processors, but that is OK.
-	//
-	// FIXME - this ends up serializing meshes with only one
-	// top_parent!!!
-	std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
+	// We will certainly send all the elements assigned to this processor,
+	// but we will also ship off any other elements which touch
+	// their nodes.
 	std::set<const Node*> connected_nodes;
 	{
-	  MeshBase::const_element_iterator       elem_it  = mesh.active_pid_elements_begin(pid);
-	  const MeshBase::const_element_iterator elem_end = mesh.active_pid_elements_end(pid);
+	  MeshBase::const_element_iterator       elem_it  = mesh.pid_elements_begin(pid);
+	  const MeshBase::const_element_iterator elem_end = mesh.pid_elements_end(pid);
 
 	  for (; elem_it!=elem_end; ++elem_it)
 	    {
               const Elem* elem = *elem_it;
 
-	      std::vector<const Elem*> family_tree;
-
-	      const Elem *top_parent = elem->top_parent();
-
-	      // avoid a lot of duplication -- if we already have top_parent
-	      // in the set its entire family tree is already in the set.
-	      if (!elements_to_send.count(top_parent))
-		{
-#ifdef LIBMESH_ENABLE_AMR
-		  top_parent->family_tree(family_tree);
-#else
-		  family_tree.push_back(top_parent);
-#endif
-                }
-
-	      // then add the face neighbors
-	      for (unsigned int s=0; s<elem->n_sides(); s++)
-                {
-                  const Elem* neigh = elem->neighbor(s);
-		  if (neigh && !neigh->is_remote())
-		    {
-		      top_parent = (*elem_it)->neighbor(s)->top_parent();
-
-		      if (!elements_to_send.count(top_parent))
-#ifdef LIBMESH_ENABLE_AMR
-			top_parent->family_tree(family_tree, /*reset=*/ false);
-#else
-			family_tree.push_back(top_parent);
-#endif
-		    }
-                }
-
-              for (unsigned int e=0; e<family_tree.size(); e++)
-                {
-                  const Elem *elem = family_tree[e];
-                  elements_to_send.insert (elem);
-
-                  for (unsigned int n=0; n<elem->n_nodes(); n++)
-                    connected_nodes.insert (elem->get_node(n));
-                }
+              for (unsigned int n=0; n<elem->n_nodes(); n++)
+                connected_nodes.insert (elem->get_node(n));
             }
 	}
 
-	// The elements_to_send set now contains all the elements stored on the local
-	// processor but owned by processor pid.  Additionally, the face neighbors
-	// for these elements are also transferred.  Finally, the entire refinement
-	// tree is also included.  This is a very simplistic way of ensuring data
-	// structure consistency at the cost of larger communication buffers.
-        //
-	// FIXME: profile this on several parallel architectures to
-	// assess its impact.
+	std::set<const Elem*, CompareElemIdsByLevel> elements_to_send;
+	{
+	  MeshBase::const_element_iterator       elem_it  = mesh.elements_begin();
+	  const MeshBase::const_element_iterator elem_end = mesh.elements_end();
 
+	  for (; elem_it!=elem_end; ++elem_it)
+	    {
+              const Elem* elem = *elem_it;
+
+              for (unsigned int n=0; n<elem->n_nodes(); n++)
+                if (connected_nodes.count(elem->get_node(n)))
+                  elements_to_send.insert (elem);
+            }
+	}
+
+        connected_nodes.clear();
+        {
+	  std::set<const Elem*, CompareElemIdsByLevel>::iterator
+            elem_it  = elements_to_send.begin(),
+            elem_end = elements_to_send.end();
+
+	  for (; elem_it!=elem_end; ++elem_it)
+	    {
+              const Elem* elem = *elem_it;
+
+              for (unsigned int n=0; n<elem->n_nodes(); n++)
+                connected_nodes.insert(elem->get_node(n));
+            }
+        }
 
 	// the number of nodes we will ship to pid
 	send_n_nodes_and_elem_per_proc[2*pid+0] = connected_nodes.size();
