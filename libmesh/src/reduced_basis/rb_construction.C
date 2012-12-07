@@ -116,6 +116,14 @@ void RBConstruction::clear()
     }
   }
 
+  for(unsigned int i=0; i<outputs_vector.size(); i++)
+    for(unsigned int q_l=0; q_l<outputs_vector[i].size(); q_l++)
+      if(outputs_vector[i][q_l])
+      {
+        delete outputs_vector[i][q_l];
+        outputs_vector[i][q_l] = NULL;
+      }
+
   if(store_non_dirichlet_operators)
   {
     for(unsigned int q=0; q<non_dirichlet_Aq_vector.size(); q++)
@@ -135,15 +143,15 @@ void RBConstruction::clear()
         non_dirichlet_Fq_vector[q] = NULL;
       }
     }
-  }
 
-  for(unsigned int i=0; i<outputs_vector.size(); i++)
-    for(unsigned int q_l=0; q_l<outputs_vector[i].size(); q_l++)
-      if(outputs_vector[i][q_l])
-      {
-        delete outputs_vector[i][q_l];
-        outputs_vector[i][q_l] = NULL;
-      }
+    for(unsigned int i=0; i<non_dirichlet_outputs_vector.size(); i++)
+      for(unsigned int q_l=0; q_l<non_dirichlet_outputs_vector[i].size(); q_l++)
+        if(non_dirichlet_outputs_vector[i][q_l])
+        {
+          delete non_dirichlet_outputs_vector[i][q_l];
+          non_dirichlet_outputs_vector[i][q_l] = NULL;
+        }
+  }
 
   // Also delete the Fq representors
   for(unsigned int q_f=0; q_f<Fq_representor.size(); q_f++)
@@ -513,6 +521,21 @@ void RBConstruction::allocate_data_structures()
       outputs_vector[n][q_l] = (NumericVector<Number>::build().release());
       outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     }
+
+  if(store_non_dirichlet_operators)
+  {
+    non_dirichlet_outputs_vector.resize(get_rb_theta_expansion().get_n_outputs());
+    for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
+    {
+      non_dirichlet_outputs_vector[n].resize( get_rb_theta_expansion().get_n_output_terms(n) );
+      for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
+      {
+        // Initialize the memory for the truth output vectors
+        non_dirichlet_outputs_vector[n][q_l] = (NumericVector<Number>::build().release());
+        non_dirichlet_outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+      }
+    }
+  }
 
   // Resize truth_outputs vector
   truth_outputs.resize(this->get_rb_theta_expansion().get_n_outputs());
@@ -1020,8 +1043,24 @@ void RBConstruction::assemble_all_output_vectors()
       get_output_vector(n, q_l)->zero();
       add_scaled_matrix_and_vector(1., &rb_assembly_expansion->get_output_assembly(n,q_l),
                                        NULL,
-                                       get_output_vector(n,q_l));
+                                       get_output_vector(n,q_l),
+                                       false, /* symmetrize */
+                                       true   /* apply_dof_constraints */);
     }
+
+  if(store_non_dirichlet_operators)
+  {
+    for(unsigned int n=0; n<get_rb_theta_expansion().get_n_outputs(); n++)
+      for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
+      {
+        get_non_dirichlet_output_vector(n, q_l)->zero();
+        add_scaled_matrix_and_vector(1., &rb_assembly_expansion->get_output_assembly(n,q_l),
+                                         NULL,
+                                         get_non_dirichlet_output_vector(n,q_l),
+                                         false, /* symmetrize */
+                                         false  /* apply_dof_constraints */);
+      }
+  }
 }
 
 Real RBConstruction::train_reduced_basis(const std::string& directory_name,
@@ -2202,6 +2241,19 @@ NumericVector<Number>* RBConstruction::get_output_vector(unsigned int n, unsigne
   }
 
   return outputs_vector[n][q_l];
+}
+
+NumericVector<Number>* RBConstruction::get_non_dirichlet_output_vector(unsigned int n, unsigned int q_l)
+{
+  if( (n >= get_rb_theta_expansion().get_n_outputs()) || (q_l >= get_rb_theta_expansion().get_n_output_terms(n)) )
+  {
+    libMesh::err << "Error: We must have n < n_outputs and "
+                 << "q_l < get_rb_theta_expansion().get_n_output_terms(n) in get_non_dirichlet_output_vector."
+                 << std::endl;
+    libmesh_error();
+  }
+
+  return non_dirichlet_outputs_vector[n][q_l];
 }
 
 AutoPtr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_object()
