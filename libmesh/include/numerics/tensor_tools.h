@@ -133,7 +133,8 @@ namespace libMesh
     template <typename T>
     struct DecrementRank
     {
-      typedef VectorValue<T> type;
+      // The default case is typically an error...
+      typedef bool type;
     };
     
     template <typename T>
@@ -175,7 +176,7 @@ namespace libMesh
 #else
       typedef T type;
 #endif
-};
+    };
     
     template <typename T>
     struct MakeNumber<std::complex<T> >
@@ -218,6 +219,50 @@ namespace libMesh
 #else
       typedef TypeNTensor<N,T> type;
 #endif
+    };
+
+    // A utility for determining real-valued (e.g. shape function)
+    // types from corresponding complex-valued types
+    template <typename T>
+    struct MakeReal
+    {
+      typedef T type;
+    };
+    
+    template <typename T>
+    struct MakeReal<std::complex<T> >
+    {
+      typedef T type;
+    };
+    
+    template <typename T>
+    struct MakeReal<TypeVector<T> >
+    {
+      typedef TypeVector<typename MakeReal<T>::type > type;
+    };
+
+    template <typename T>
+    struct MakeReal<VectorValue<T> >
+    {
+      typedef VectorValue<typename MakeReal<T>::type > type;
+    };
+
+    template <typename T>
+    struct MakeReal<TypeTensor<T> >
+    {
+      typedef TypeTensor<typename MakeReal<T>::type> type;
+    };
+
+    template <typename T>
+    struct MakeReal<TensorValue<T> >
+    {
+      typedef TypeTensor<typename MakeReal<T>::type> type;
+    };
+
+    template <unsigned int N, typename T>
+    struct MakeReal<TypeNTensor<N,T> >
+    {
+      typedef TypeNTensor<N,typename MakeReal<T>::type> type;
     };
 
     // Needed for ExactSolution to compile
