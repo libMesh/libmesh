@@ -259,6 +259,11 @@ public:
   NumericVector<Number>* get_output_vector(unsigned int n, unsigned int q_l);
 
   /**
+   * Get a pointer to non-Dirichlet output vector.
+   */
+  NumericVector<Number>* get_non_dirichlet_output_vector(unsigned int n, unsigned int q_l);
+
+  /**
    * Assemble the inner product matrix and store it in input_matrix.
    */
   void assemble_inner_product_matrix(SparseMatrix<Number>* input_matrix, bool apply_dof_constraints=true);
@@ -747,18 +752,19 @@ private:
   std::vector< NumericVector<Number>* > Fq_vector;
 
   /**
-   * We sometimes also need a second set of matrices/vectors
+   * The libMesh vectors that define the output functionals.
+   * Each row corresponds to the affine expansion of an output.
+   */
+  std::vector< std::vector< NumericVector<Number>* > > outputs_vector;
+
+  /**
+   * We may also need a second set of matrices/vectors
    * that do not have the Dirichlet boundary conditions
    * enforced.
    */
   std::vector< SparseMatrix<Number>* > non_dirichlet_Aq_vector;
   std::vector< NumericVector<Number>* > non_dirichlet_Fq_vector;
-
-  /**
-   * The libMesh vectors that define the output functionals.
-   * Each row corresponds to the affine expansion of an output.
-   */
-  std::vector< std::vector< NumericVector<Number>* > > outputs_vector;
+  std::vector< std::vector< NumericVector<Number>* > > non_dirichlet_outputs_vector;
 
   /**
    * Tolerance for training reduced basis using the Greedy scheme.
