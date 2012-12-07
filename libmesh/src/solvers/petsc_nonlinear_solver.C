@@ -485,7 +485,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   // Set the tolerances for the non-linear solver.
   ierr = SNESSetTolerances(_snes, this->absolute_residual_tolerance, this->relative_residual_tolerance,
-                           this->absolute_step_tolerance, this->max_nonlinear_iterations, this->max_function_evaluations);
+                           this->relative_step_tolerance, this->max_nonlinear_iterations, this->max_function_evaluations);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   //Pull in command-line options
