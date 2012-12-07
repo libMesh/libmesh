@@ -593,12 +593,12 @@ namespace libMesh
 
   
   template< >
-  void H1FETransformation<Real>::map_div( const unsigned int,
-					  const Elem* const,
-					  const std::vector<Point>&,
-					  const FEGenericBase<Real>&,
-					  // Default struct for DecrementRank is VectorValue
-					  std::vector<std::vector<VectorValue<Real> > >& ) const
+  void H1FETransformation<Real>::map_div
+    (const unsigned int,
+     const Elem* const,
+     const std::vector<Point>&,
+     const FEGenericBase<Real>&,
+     std::vector<std::vector<FEGenericBase<Real>::OutputDivergence> >& ) const
   {
     libMesh::err << "Computing the divergence of a shape function only\n"
 		 << "makes sense for vector-valued elements." << std::endl;
@@ -607,11 +607,12 @@ namespace libMesh
   
 
   template<>
-  void H1FETransformation<RealGradient>::map_div( const unsigned int dim,
-						  const Elem* const,
-						  const std::vector<Point>&,
-						  const FEGenericBase<RealGradient>& fe,
-						  std::vector<std::vector<Real> >& div_phi ) const
+  void H1FETransformation<RealGradient>::map_div
+    (const unsigned int dim,
+     const Elem* const,
+     const std::vector<Point>&,
+     const FEGenericBase<RealGradient>& fe,
+     std::vector<std::vector<FEGenericBase<RealGradient>::OutputDivergence> >& div_phi) const
   {
     switch(dim)
       {
