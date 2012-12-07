@@ -150,9 +150,9 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
       Gradient u;
       Gradient curl_u;
       
-      c.interior_value<RealGradient>( u_var, qp, u );
+      c.interior_value( u_var, qp, u );
 
-      c.interior_curl<RealGradient>( u_var, qp, curl_u );
+      c.interior_curl( u_var, qp, curl_u );
 
       // Value of the forcing function at this quadrature point
       RealGradient f = this->forcing(qpoint[qp]);     
@@ -217,7 +217,7 @@ bool CurlCurlSystem::side_time_derivative (bool request_jacobian,
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       Gradient u;
-      c.side_value<RealGradient>( u_var, qp, u );
+      c.side_value( u_var, qp, u );
 
       RealGradient N( normals[qp](0), normals[qp](1) );
 
