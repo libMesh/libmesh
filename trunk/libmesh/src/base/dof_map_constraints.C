@@ -1970,11 +1970,7 @@ void DofMap::build_constraint_matrix_and_vector
 }
 
 
-void DofMap::allgather_recursive_constraints(MeshBase&
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-mesh
-#endif
-)
+void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 {
   // This function must be run on all processors at once
   parallel_only();
@@ -1995,64 +1991,37 @@ mesh
     return;
 
   // We might have calculated constraints for constrained dofs
-  // which live on other processors.
+  // which have support on other processors.
   // Push these out first.
   {
-  std::vector<std::vector<unsigned int> > pushed_ids(libMesh::n_processors());
-  std::vector<unsigned int> pushed_on_proc(libMesh::n_processors(), 0);
-
-  // Count the dof constraints to push to each processor
-  unsigned int push_proc_id = 0;
-  for (DofConstraints::iterator i = _dof_constraints.begin();
-	 i != _dof_constraints.end(); ++i)
-    {
-      unsigned int constrained = i->first;
-      while (constrained >= _end_df[push_proc_id])
-        push_proc_id++;
-      pushed_on_proc[push_proc_id]++;
-    }
+  std::vector<std::set<unsigned int> > pushed_ids(libMesh::n_processors());
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  std::vector<std::vector<unsigned int> > pushed_node_ids(libMesh::n_processors());
-  std::vector<unsigned int> nodes_pushed_on_proc(libMesh::n_processors(), 0);
+  std::vector<std::set<unsigned int> > pushed_node_ids(libMesh::n_processors());
+#endif
 
-  // Count the node constraints to push to each processor
-  for (NodeConstraints::iterator i = _node_constraints.begin();
-	 i != _node_constraints.end(); ++i)
-    {
-      const DofObject *constrained = i->first;
-      nodes_pushed_on_proc[constrained->processor_id()]++;
-    }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
+  MeshBase::element_iterator
+    foreign_elem_it  = mesh.active_not_local_elements_begin(),
+    foreign_elem_end = mesh.active_not_local_elements_end();
 
-  for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
+  // Collect the constraints to push to each processor
+  for (; foreign_elem_it != foreign_elem_end; ++foreign_elem_it)
     {
-      pushed_ids[p].reserve(pushed_on_proc[p]);
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-      pushed_node_ids[p].reserve(nodes_pushed_on_proc[p]);
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
-    }
+      Elem *elem = *foreign_elem_it;
 
-  // Collect the dof constraints to push to each processor
-  push_proc_id = 0;
-  for (DofConstraints::iterator i = _dof_constraints.begin();
-	 i != _dof_constraints.end(); ++i)
-    {
-      unsigned int constrained = i->first;
-      while (constrained >= _end_df[push_proc_id])
-        push_proc_id++;
-      pushed_ids[push_proc_id].push_back(constrained);
-    }
+      std::vector<unsigned int> dof_indices;
+      this->dof_indices (elem, dof_indices);
+
+      for (unsigned int i=0; i != dof_indices.size(); ++i)
+        if (this->is_constrained_dof(dof_indices[i]))
+          pushed_ids[elem->processor_id()].insert(dof_indices[i]);
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  // Collect the node constraints to push to each processor
-  for (NodeConstraints::iterator i = _node_constraints.begin();
-	 i != _node_constraints.end(); ++i)
-    {
-      const Node *constrained = i->first;
-      pushed_node_ids[constrained->processor_id()].push_back(constrained->id());
+      for (unsigned int n=0; n != elem->n_nodes(); ++n)
+        if (this->is_constrained_node(elem->get_node(n)))
+          pushed_node_ids[elem->processor_id()].insert(elem->node(n));
+#endif
     }
-#endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   // Now trade constraint rows
   for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
@@ -2065,12 +2034,16 @@ mesh
                                libMesh::n_processors();
 
       // Pack the dof constraint rows and rhs's to push to procup
-      std::vector<std::vector<unsigned int> > pushed_keys(pushed_ids[procup].size());
-      std::vector<std::vector<Real> > pushed_vals(pushed_ids[procup].size());
-      std::vector<Number> pushed_rhss(pushed_ids[procup].size());
-      for (unsigned int i = 0; i != pushed_ids[procup].size(); ++i)
+      const unsigned int pushed_ids_size = pushed_ids[procup].size();
+      std::vector<std::vector<unsigned int> > pushed_keys(pushed_ids_size);
+      std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
+      std::vector<Number> pushed_rhss(pushed_ids_size);
+      std::set<unsigned int>::const_iterator it = pushed_ids[procup].begin();
+      for (unsigned int i = 0; it != pushed_ids[procup].end();
+           ++i, ++it)
         {
-          DofConstraintRow &row = _dof_constraints[pushed_ids[procup][i]].first;
+          const unsigned int pushed_id = *it;
+          DofConstraintRow &row = _dof_constraints[pushed_id].first;
           unsigned int row_size = row.size();
           pushed_keys[i].reserve(row_size);
           pushed_vals[i].reserve(row_size);
@@ -2080,17 +2053,20 @@ mesh
               pushed_keys[i].push_back(j->first);
               pushed_vals[i].push_back(j->second);
             }
-          pushed_rhss[i] = _dof_constraints[pushed_ids[procup][i]].second;
+          pushed_rhss[i] = _dof_constraints[pushed_id].second;
         }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Pack the node constraint rows to push to procup
-      std::vector<std::vector<unsigned int> > pushed_node_keys(pushed_node_ids[procup].size());
-      std::vector<std::vector<Real> > pushed_node_vals(pushed_node_ids[procup].size());
-      std::vector<Point> pushed_node_offsets(pushed_node_ids[procup].size());
-      for (unsigned int i = 0; i != pushed_node_ids[procup].size(); ++i)
+      const unsigned int pushed_nodes_size = pushed_node_ids[procup].size();
+      std::vector<std::vector<unsigned int> > pushed_node_keys(pushed_nodes_size);
+      std::vector<std::vector<Real> > pushed_node_vals(pushed_nodes_size);
+      std::vector<Point> pushed_node_offsets(pushed_nodes_size);
+      std::set<unsigned int>::const_iterator node_it = pushed_node_ids[procup].begin();
+      for (unsigned int i = 0; node_it != pushed_node_ids[procup].end();
+           ++i, ++node_it)
         {
-          const Node *node = mesh.node_ptr(pushed_node_ids[procup][i]);
+          const Node *node = mesh.node_ptr(*node_it);
           NodeConstraintRow &row = _node_constraints[node].first;
           unsigned int row_size = row.size();
           pushed_node_keys[i].reserve(row_size);
@@ -2106,11 +2082,13 @@ mesh
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Trade pushed dof constraint rows
+      std::vector<unsigned int> pushed_ids_from_me
+        (pushed_ids[procup].begin(), pushed_ids[procup].end());
       std::vector<unsigned int> pushed_ids_to_me;
       std::vector<std::vector<unsigned int> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
-      CommWorld.send_receive(procup, pushed_ids[procup],
+      CommWorld.send_receive(procup, pushed_ids_from_me,
                              procdown, pushed_ids_to_me);
       CommWorld.send_receive(procup, pushed_keys,
                              procdown, pushed_keys_to_me);
@@ -2124,11 +2102,13 @@ mesh
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Trade pushed node constraint rows
+      std::vector<unsigned int> pushed_node_ids_from_me
+        (pushed_node_ids[procup].begin(), pushed_node_ids[procup].end());
       std::vector<unsigned int> pushed_node_ids_to_me;
       std::vector<std::vector<unsigned int> > pushed_node_keys_to_me;
       std::vector<std::vector<Real> > pushed_node_vals_to_me;
       std::vector<Point> pushed_node_offsets_to_me;
-      CommWorld.send_receive(procup, pushed_node_ids[procup],
+      CommWorld.send_receive(procup, pushed_node_ids_from_me,
                              procdown, pushed_node_ids_to_me);
       CommWorld.send_receive(procup, pushed_node_keys,
                              procdown, pushed_node_keys_to_me);
