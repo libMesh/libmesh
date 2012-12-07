@@ -907,6 +907,10 @@ void DofMap::distribute_dofs (MeshBase& mesh)
       this->set_nonlocal_dof_objects(mesh.elements_begin(),
                                      mesh.elements_end(),
                                      mesh, &DofMap::elem_ptr);
+
+#ifdef DEBUG
+      MeshTools::libmesh_assert_valid_dof_ids(mesh);
+#endif
     }
 
   // Set the total number of degrees of freedom
