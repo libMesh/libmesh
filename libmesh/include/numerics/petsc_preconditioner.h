@@ -135,7 +135,8 @@ private:
 template <typename T>
 inline
 PetscPreconditioner<T>::PetscPreconditioner () :
-  Preconditioner<T>()
+  Preconditioner<T>(),
+  _pc(PETSC_NULL)
 {
 }
 
