@@ -1,5 +1,5 @@
 example_name  = vector_fe_ex3
-#check_SCRIPTS = run.sh
+#check_SCRIPTS = run.sh # Convergence too poor with default solvers
 install_dir   = $(examples_install_path)/vector_fe/ex3
 data          = curl_curl_exact_solution.h vector_fe_ex3.in curl_curl_system.C solution_function.h curl_curl_system.h vector_fe_ex3.C run.sh
 sources       = $(data) run.sh
