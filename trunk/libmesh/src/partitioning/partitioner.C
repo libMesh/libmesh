@@ -30,6 +30,7 @@
 
 //FIXME
 #include "libmesh/parallel_mesh.h"
+#include "libmesh/mesh_tools.h"
 
 namespace libMesh
 {
@@ -74,14 +75,16 @@ void Partitioner::partition (MeshBase& mesh,
   // Call the partitioning function
   this->_do_partition(mesh,n_parts);
 
-  // Redistribute elements if necessary, before setting parent or node
-  // processor ids, to make sure those will be set consistently
-  mesh.redistribute();
-
   // Set the parent's processor ids
   Partitioner::set_parent_processor_ids(mesh);
 
+  // Redistribute elements if necessary, before setting node processor
+  // ids, to make sure those will be set consistently
+  mesh.redistribute();
+
 #ifdef DEBUG
+  MeshTools::libmesh_assert_valid_remote_elems(mesh);
+
   // Messed up elem processor_id()s can leave us without the child
   // elements we need to restrict vectors on a distributed mesh
   MeshTools::libmesh_assert_valid_procids<Elem>(mesh);
