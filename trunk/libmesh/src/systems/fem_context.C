@@ -338,7 +338,7 @@ void FEMContext::interior_gradients
   // Loop over all the q_points in this finite element
   for (unsigned int qp=0; qp != du_vals.size(); qp++)
     {      
-      typename FEGenericBase<OutputShape>::OutputGradient
+      typename FEGenericBase<OutputShape>::OutputNumberGradient
         &du = du_vals[qp];
 
       // Compute the gradient at this q_point
