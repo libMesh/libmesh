@@ -723,9 +723,11 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
   // This function must be run on all processors at once
   parallel_only();
 
-  unsigned int pmax_elem_id = this->parallel_max_elem_id();
+  const unsigned int pmax_node_id = this->parallel_max_node_id();
+  const unsigned int pmax_elem_id = this->parallel_max_elem_id();
+  const unsigned int pmax_id = std::max(pmax_node_id, pmax_elem_id);
 
-  for (unsigned int i=0; i != pmax_elem_id; ++i)
+  for (unsigned int i=0; i != pmax_id; ++i)
     {
       T* obj = objects[i]; // Returns NULL if there's no map entry
 
