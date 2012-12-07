@@ -145,7 +145,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
     {
       Tensor grad_u;
       
-      c.interior_gradient<RealGradient>( u_var, qp, grad_u );
+      c.interior_gradient( u_var, qp, grad_u );
 
 
       // Value of the forcing function at this quadrature point
@@ -208,11 +208,11 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
-      RealGradient u;
-      c.side_value<RealGradient>( u_var, qp, u );
+      Gradient u;
+      c.side_value( u_var, qp, u );
  
-      RealGradient u_exact( this->exact_solution( 0, qpoint[qp](0), qpoint[qp](1) ),
-			    this->exact_solution( 1, qpoint[qp](0), qpoint[qp](1) ));
+      Gradient u_exact( this->exact_solution( 0, qpoint[qp](0), qpoint[qp](1) ),
+			this->exact_solution( 1, qpoint[qp](0), qpoint[qp](1) ));
 
       for (unsigned int i=0; i != n_u_dofs; i++)
 	{

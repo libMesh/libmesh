@@ -240,124 +240,124 @@ public:
    * Returns the value of the solution variable \p var at the quadrature
    * point \p qp on the current element interior. This is the preferred API.
    */
-  template<typename OutputShape> 
+  template<typename OutputType> 
   void interior_value(unsigned int var, unsigned int qp,
-                      typename FEGenericBase<OutputShape>::OutputNumber& u) const;
+                      OutputType& u) const;
 
   /**
    * Fills a vector of values of the _system_vector at the all the quadrature
    * points in the current element interior.
    */
-  template<typename OutputShape> 
+  template<typename OutputType> 
   void interior_values(unsigned int var, const NumericVector<Number> & _system_vector,
-		       std::vector<typename FEGenericBase<OutputShape>::OutputNumber>& interior_values_vector) const;
+		       std::vector<OutputType>& interior_values_vector) const;
 
   /**
    * Returns the value of the solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
-  template<typename OutputShape> 
+  template<typename OutputType> 
   void side_value(unsigned int var, unsigned int qp,
-                  typename FEGenericBase<OutputShape>::OutputNumber& u) const;
+                  OutputType& u) const;
 
   /**
    * Fills a vector of values of the _system_vector at the all the quadrature
    * points on the current element side.
    */
-  template<typename OutputShape> 
+  template<typename OutputType> 
   void side_values(unsigned int var, const NumericVector<Number> & _system_vector,
-		   std::vector<typename FEGenericBase<OutputShape>::OutputNumber>& side_values_vector) const;
+		   std::vector<OutputType>& side_values_vector) const;
 
   /**
    * Returns the value of the solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void point_value(unsigned int var, const Point &p,
-                   typename FEGenericBase<OutputShape>::OutputNumber& u) const;
+                   OutputType& u) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the quadrature
    * point \p qp on the current element interior. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void interior_gradient(unsigned int var, unsigned int qp, 
-			 typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const;
+			 OutputType& du) const;
 
   /**
    * Fills a vector with the gradient of the solution variable \p var at all the quadrature
    * points in the current element interior. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void interior_gradients(unsigned int var, const NumericVector<Number> & _system_vector, 
-			  std::vector<typename FEGenericBase<OutputShape>::OutputNumberGradient>& interior_gradients_vector) const;
+			  std::vector<OutputType>& interior_gradients_vector) const;
 
   /**
    * Returns the gradient of the solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
-  template<typename OutputShape> 
+  template<typename OutputType>
   void side_gradient(unsigned int var, unsigned int qp, 
-		     typename FEGenericBase<OutputShape>::OutputNumberGradient& du) const;
+		     OutputType & du) const;
 
   /**
    * Fills a vector with the gradient of the solution variable \p var at all the quadrature
    * points on the current element side. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void side_gradients(unsigned int var, const NumericVector<Number> & _system_vector, 
-		      std::vector<typename FEGenericBase<OutputShape>::OutputNumberGradient>& side_gradients_vector) const;
+		      std::vector<OutputType>& side_gradients_vector) const;
 
    /**
    * Returns the gradient of the solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void point_gradient(unsigned int var, const Point &p, 
-		      typename FEGenericBase<OutputShape>::OutputNumberGradient& grad_u) const;
+		      OutputType& grad_u) const;
   
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
    * point \p qp on the current element interior. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void interior_hessian(unsigned int var, unsigned int qp,
-			typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const;
+			OutputType& d2u) const;
 
   /**
    * Fills a vector of hessians of the _system_vector at the all the
    * quadrature points in the current element interior. This is the
    * preferred API.
    */
-  template<typename OutputShape> 
+  template<typename OutputType>
   void interior_hessians(unsigned int var, const NumericVector<Number> & _system_vector,
-		         std::vector<typename FEGenericBase<OutputShape>::OutputNumberTensor>& d2u_vals) const;
+		         std::vector<OutputType>& d2u_vals) const;
 
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void side_hessian(unsigned int var, unsigned int qp, 
-		    typename FEGenericBase<OutputShape>::OutputNumberTensor& d2u) const;
+		    OutputType& d2u) const;
 
   /**
    * Fills a vector of hessians of the _system_vector at the all the
    * quadrature points on the current element side.  This is the
    * preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void side_hessians(unsigned int var, const NumericVector<Number> & _system_vector, 
-		     std::vector<typename FEGenericBase<OutputShape>::OutputNumberTensor>& d2u_vals) const;
+		     std::vector<OutputType>& d2u_vals) const;
 
   /**
    * Returns the hessian of the solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void point_hessian(unsigned int var, const Point &p, 
-		      typename FEGenericBase<OutputShape>::OutputNumberTensor& hess_u) const;
+		     OutputType& hess_u) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -365,74 +365,74 @@ public:
    * Returns the value of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element interior. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void fixed_interior_value(unsigned int var, unsigned int qp,
-                            typename FEGenericBase<OutputShape>::OutputNumber& u) const;
+                            OutputType& u) const;
 
   /**
    * Returns the value of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void fixed_side_value(unsigned int var, unsigned int qp,
-                        typename FEGenericBase<OutputShape>::OutputNumber& u) const;
+                        OutputType& u) const;
 
   /**
    * Returns the value of the fixed_solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void fixed_point_value(unsigned int var, const Point &p,
-                         typename FEGenericBase<OutputShape>::OutputNumber& u) const;
+                         OutputType& u) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element interior. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void fixed_interior_gradient(unsigned int var, unsigned int qp,
-			       typename FEGenericBase<OutputShape>::OutputNumberGradient& grad_u) const;
+			       OutputType& grad_u) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void fixed_side_gradient(unsigned int var, unsigned int qp,
-			   typename FEGenericBase<OutputShape>::OutputNumberGradient& grad_u) const;
+			   OutputType& grad_u) const;
 
   /**
    * Returns the gradient of the fixed_solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void fixed_point_gradient(unsigned int var, const Point &p,
-			    typename FEGenericBase<OutputShape>::OutputNumberGradient& grad_u) const;
+			    OutputType& grad_u) const;
   
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element interior. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void fixed_interior_hessian(unsigned int var, unsigned int qp,
-			      typename FEGenericBase<OutputShape>::OutputNumberTensor& hess_u) const;
+			      OutputType& hess_u) const;
   
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void fixed_side_hessian(unsigned int var, unsigned int qp,
-			  typename FEGenericBase<OutputShape>::OutputNumberTensor& hess_u) const;
+			  OutputType& hess_u) const;
   
   /**
    * Returns the hessian of the fixed_solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void fixed_point_hessian(unsigned int var, const Point &p,
-			   typename FEGenericBase<OutputShape>::OutputNumberTensor& hess_u) const;
+			   OutputType& hess_u) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -440,17 +440,17 @@ public:
    * Returns the curl of the solution variable \p var at the physical
    * point \p p on the current element.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void interior_curl(unsigned int var, unsigned int qp,
-		     typename FEGenericBase<OutputShape>::OutputNumber& curl_u) const;
+		     OutputType& curl_u) const;
 
   /**
    * Returns the divergence of the solution variable \p var at the physical
    * point \p p on the current element.
    */
-  template<typename OutputShape>
+  template<typename OutputType>
   void interior_div(unsigned int var, unsigned int qp,
-		    typename FEGenericBase<OutputShape>::OutputNumberDivergence& div_u) const;
+		    OutputType& div_u) const;
 
   /**
    * Reinitialize all my FEM context data on a given
