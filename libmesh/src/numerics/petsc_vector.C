@@ -288,9 +288,20 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>& V_i
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // is not const-correct.
+#if PETSC_VERSION_LESS_THAN(3,1,0)
+  
+  libMesh::out << "MatMultHermitianTranspose was introduced in PETSc 3.1.0,"
+	       << "No one has made it backwards compatible with older "
+	       << "versions of PETSc so far." << std::endl;
+  libmesh_error();
+
+#else
+  
   ierr = MatMultHermitianTranspose(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
+  
+#endif
+  
   // Add the temporary copy to the matvec result
   this->add(1., *this_clone);
 }
