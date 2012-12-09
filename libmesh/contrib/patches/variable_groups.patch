@@ -582,7 +582,7 @@ Index: include/base/dof_object.h
  
    // if the first component is invalid, they
    // are all invalid
-@@ -590,7 +723,13 @@
+@@ -590,7 +723,21 @@
    // otherwise the index is the first component
    // index augemented by the component number
    else
@@ -592,12 +592,20 @@ Index: include/base/dof_object.h
 +	ncg = this->n_comp_group(s,vg),
 +	vig = this->system_var_to_vg_var(s,vg,var);
 +
++      // std::cout << "base_idx, var, vg, vig, ncg, comp="
++      // 		<< base_idx << " "
++      // 		<< var << " "
++      // 		<< vg << " "
++      // 		<< vig << " "
++      // 		<< ncg << " "
++      // 		<< comp << '\n';
++
 +      return (base_idx + vig*ncg + comp);
 +    }
  }
  
  
-@@ -639,6 +778,87 @@
+@@ -639,6 +786,87 @@
  }
  
  
@@ -674,7 +682,7 @@ Index: include/base/dof_object.h
 +  unsigned int accumulated_sum=0;
 +  
 +  for (unsigned int vgc=0; vgc<vg; vgc++)
-+    accumulated_sum += this->n_vars(s,vg);
++    accumulated_sum += this->n_vars(s,vgc);
 +  
 +  libmesh_assert_less_equal (accumulated_sum, var);
 +  
@@ -1326,7 +1334,7 @@ Index: src/base/dof_map.C
    //-------------------------------------------------------------------------
    // First count and assign temporary numbers to local dofs
    MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
-@@ -964,45 +954,51 @@
+@@ -964,45 +954,52 @@
        for (unsigned int n=0; n<n_nodes; n++)
          {
            Node* node = elem->get_node(n);
@@ -1371,6 +1379,7 @@ Index: src/base/dof_map.C
 +					    next_free_dof);
 +		      next_free_dof += (vg_description.n_variables()*
 +					node->n_comp_group(sys_num,vg));
++		      //node->debug_buffer();
 +		    }
 +		}
 +	    }
@@ -1412,7 +1421,7 @@ Index: src/base/dof_map.C
      } // done looping over elements
  
  
-@@ -1023,27 +1019,34 @@
+@@ -1023,27 +1020,34 @@
  	Node *node = *node_it;
  	libmesh_assert(node);
  
@@ -1460,7 +1469,17 @@ Index: src/base/dof_map.C
            continue;
          }
      }
-@@ -1064,13 +1067,13 @@
+@@ -1055,6 +1059,9 @@
+ 
+ #ifdef DEBUG
+   {
++    // std::cout << "next_free_dof=" << next_free_dof << std::endl
++    // 	      << "_n_SCALAR_dofs=" << _n_SCALAR_dofs << std::endl;
++
+     // Make sure we didn't miss any nodes
+     MeshTools::libmesh_assert_valid_procids<Node>(mesh);
+ 
+@@ -1064,13 +1071,13 @@
        {
  	Node *obj = *node_it;
  	libmesh_assert(obj);
@@ -1480,7 +1499,7 @@ Index: src/base/dof_map.C
  	    libmesh_assert_not_equal_to (first_dof, DofObject::invalid_id);
  	  }
        }
-@@ -1083,25 +1086,19 @@
+@@ -1083,25 +1090,19 @@
  void DofMap::distribute_local_dofs_var_major(unsigned int &next_free_dof,
                                               MeshBase& mesh)
  {
@@ -1514,7 +1533,7 @@ Index: src/base/dof_map.C
          continue;
  
        MeshBase::element_iterator       elem_it  = mesh.active_local_elements_begin();
-@@ -1115,7 +1112,7 @@
+@@ -1115,7 +1116,7 @@
  
  	  // ... and only variables which are active on
  	  // on this element's subdomain
@@ -1523,7 +1542,7 @@ Index: src/base/dof_map.C
  	    continue;
  
            const unsigned int n_nodes = elem->n_nodes();
-@@ -1127,31 +1124,32 @@
+@@ -1127,31 +1128,32 @@
  
                // assign dof numbers (all at once) if this is
                // our node and if they aren't already there
@@ -1570,7 +1589,7 @@ Index: src/base/dof_map.C
              }
          } // end loop on elements
  
-@@ -1172,27 +1170,30 @@
+@@ -1172,27 +1174,30 @@
  	    Node *node = *node_it;
  	    libmesh_assert(node);
  
@@ -1612,7 +1631,7 @@ Index: src/base/dof_map.C
            continue;
          }
      }
-@@ -1202,27 +1203,24 @@
+@@ -1202,27 +1207,24 @@
    if ( libMesh::processor_id() == (libMesh::n_processors()-1) )
      next_free_dof += _n_SCALAR_dofs;
  
@@ -1647,7 +1666,25 @@ Index: src/base/dof_map.C
  	    libmesh_assert_not_equal_to (first_dof, DofObject::invalid_id);
  	  }
        }
-@@ -1717,6 +1715,8 @@
+@@ -1277,7 +1279,16 @@
+                 {
+                   const unsigned int di = node->dof_number(sys_num, v, c);
+ 		  if (di < this->first_dof() || di >= this->end_dof())
+-	            _send_list.push_back(di);
++		    {
++		      _send_list.push_back(di);
++		      // libmesh_here();
++		      // std::cout << "sys_num,v,c,di="
++		      // 		<< sys_num << ", "
++		      // 		<< v << ", "
++		      // 		<< c << ", "
++		      // 		<< di << '\n';
++		      // node->debug_buffer();
++		    }
+                 }
+             }
+         }
+@@ -1717,6 +1728,8 @@
    STOP_LOG("dof_indices()", "DofMap");
  }
  
