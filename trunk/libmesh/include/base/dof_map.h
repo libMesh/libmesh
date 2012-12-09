@@ -309,11 +309,22 @@ public:
     return *_n_oz;
   }
 
+  // /**
+  //  * Add an unknown of order \p order and finite element type
+  //  * \p type to the system of equations.
+  //  */
+  // void add_variable (const Variable &var);
+
   /**
-   * Add an unknown of order \p order and finite element type
+   * Add a group of unknowns of order \p order and finite element type
    * \p type to the system of equations.
    */
-  void add_variable (const Variable &var);
+  void add_variable_group (const VariableGroup &var_group);
+
+  /**
+   * @returns the \p VariableGroup description object for group \p g.
+   */
+  const VariableGroup& variable_group (const unsigned int c) const;
 
   /**
    * @returns the variable description object for variable \p c.
@@ -326,9 +337,27 @@ public:
   Order variable_order (const unsigned int c) const;
 
   /**
+   * @returns the approximation order for \p VariableGroup \p vg.
+   */
+  Order variable_group_order (const unsigned int vg) const;
+
+  /**
    * @returns the finite element type for variable \p c.
    */
   const FEType& variable_type (const unsigned int c) const;
+
+  /**
+   * @returns the finite element type for \p VariableGroup \p vg.
+   */
+  const FEType& variable_group_type (const unsigned int vg) const;
+
+  /**
+   * Returns the number of variables in the global solution vector. Defaults
+   * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
+   * Stokes (u,v,p), etc...
+   */
+  unsigned int n_variable_groups() const
+  { return _variable_groups.size(); }
 
   /**
    * Returns the number of variables in the global solution vector. Defaults
@@ -341,8 +370,8 @@ public:
   /**
    * @returns the total number of degrees of freedom in the problem.
    */
-
   unsigned int n_dofs() const { return _n_dfs; }
+  
   /**
    * @returns the number of SCALAR dofs.
    */
@@ -397,27 +426,6 @@ public:
   unsigned int end_old_dof(const unsigned int proc = libMesh::processor_id()) const
   { libmesh_assert_less (proc, _end_old_df.size()); return _end_old_df[proc]; }
 #endif //LIBMESH_ENABLE_AMR
-
-  /**
-   * Returns the first local degree of freedom index for variable \p var.
-   */
-  unsigned int variable_first_local_dof (const unsigned int var) const
-  {
-    libmesh_assert_less ((var+1), _var_first_local_df.size());
-    libmesh_assert_not_equal_to (_var_first_local_df[var], DofObject::invalid_id);
-    return _var_first_local_df[var];
-  }
-
-  /**
-   * Returns (one past) the last local degree of freedom index for variable \p var.
-   * Analogous to the end() member function of STL containers.
-   */
-  unsigned int variable_last_local_dof (const unsigned int var) const
-  {
-    libmesh_assert_less ((var+1), _var_first_local_df.size());
-    libmesh_assert_not_equal_to (_var_first_local_df[var+1], DofObject::invalid_id);
-    return _var_first_local_df[var+1];
-  }
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -979,12 +987,16 @@ private:
   void add_constraints_to_send_list();
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
-
-
+  
   /**
    * The finite element type for each variable.
    */
   std::vector<Variable> _variables;
+
+  /**
+   * The finite element type for each variable.
+   */
+  std::vector<VariableGroup> _variable_groups;
 
   /**
    * The number of the system we manage DOFs for.
@@ -1009,18 +1021,13 @@ private:
   std::vector<unsigned int> _end_df;
 
   /**
-   * The first local DOF index for each variable in the \p System.
-   */
-  std::vector<unsigned int> _var_first_local_df;
-
-  /**
    * A list containing all the global DOF indicies that affect the
    * solution on my subdomain.
    */
   std::vector<unsigned int> _send_list;
 
   /**
-   *
+   * Funtion object to call to add extra entries to the sparsity pattern
    */
   AugmentSparsityPattern *_augment_sparsity_pattern;
 
@@ -1037,7 +1044,7 @@ private:
   void * _extra_sparsity_context;
 
   /**
-   * 
+   * Function object to call to add extra entries to the send list
    */
   AugmentSendList *_augment_send_list;
 
@@ -1145,12 +1152,73 @@ private:
 
 // ------------------------------------------------------------
 // Dof Map inline member functions
-
 inline
 unsigned int DofMap::sys_number() const
 {
   return _sys_number;
 }
+
+
+
+inline
+const VariableGroup & DofMap::variable_group (const unsigned int g) const
+{
+  libmesh_assert_less (g, _variable_groups.size());
+
+  return _variable_groups[g];
+}
+
+
+
+inline
+const Variable & DofMap::variable (const unsigned int c) const
+{
+  libmesh_assert_less (c, _variables.size());
+
+  return _variables[c];
+}
+
+
+
+inline
+Order DofMap::variable_order (const unsigned int c) const
+{
+  libmesh_assert_less (c, _variables.size());
+
+  return _variables[c].type().order;
+}
+
+
+
+inline
+Order DofMap::variable_group_order (const unsigned int vg) const
+{
+  libmesh_assert_less (vg, _variable_groups.size());
+
+  return _variable_groups[vg].type().order;
+}
+
+
+
+inline
+const FEType& DofMap::variable_type (const unsigned int c) const
+{
+  libmesh_assert_less (c, _variables.size());
+
+  return _variables[c].type();
+}
+
+
+
+inline
+const FEType& DofMap::variable_group_type (const unsigned int vg) const
+{
+  libmesh_assert_less (vg, _variable_groups.size());
+
+  return _variable_groups[vg].type();
+}
+
+
 
 inline
 bool DofMap::is_constrained_node (const Node*

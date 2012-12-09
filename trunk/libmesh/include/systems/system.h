@@ -952,6 +952,11 @@ public:
   unsigned int n_vars() const;
 
   /**
+   * @returns the number of \p VariableGroup variable groups in the system
+   */
+  unsigned int n_variable_groups() const;
+
+  /**
    * @returns the total number of scalar components in the system's
    * variables.  This will equal \p n_vars() in the case of all
    * scalar-valued variables.
@@ -1006,9 +1011,32 @@ public:
 			     const std::set<subdomain_id_type> * const active_subdomains = NULL);
 
   /**
+   * Adds the variable \p var to the list of variables
+   * for this system.  Returns the index number for the new variable.
+   */
+  unsigned int add_variables (const std::vector<std::string> &vars,
+			      const FEType& type,
+			      const std::set<subdomain_id_type> * const active_subdomains = NULL);
+  
+  /**
+   * Adds the variable \p var to the list of variables
+   * for this system.  Same as before, but assumes \p LAGRANGE
+   * as default value for \p FEType.family.
+   */
+  unsigned int add_variables (const std::vector<std::string> &vars,
+			      const Order order = FIRST,
+			      const FEFamily = LAGRANGE,
+			      const std::set<subdomain_id_type> * const active_subdomains = NULL);
+
+  /**
    * Return a constant reference to \p Variable \p var.
    */
   const Variable & variable (unsigned int var) const;
+
+  /**
+   * Return a constant reference to \p VariableGroup \p vg.
+   */
+  const VariableGroup & variable_group (unsigned int vg) const;
 
   /**
    * @returns true if a variable named \p var exists in this System
@@ -1631,9 +1659,14 @@ private:
   const unsigned int _sys_number;
 
   /**
-   * The \p Variables in this \p System.
+   * The \p Variable in this \p System.
    */
   std::vector<Variable> _variables;
+
+  /**
+   * The \p VariableGroup in this \p System.
+   */
+  std::vector<VariableGroup> _variable_groups;
 
   /**
    * The variable numbers corresponding to user-specified
@@ -1797,6 +1830,14 @@ unsigned int System::n_vars() const
 
 
 inline
+unsigned int System::n_variable_groups() const
+{
+  return _variable_groups.size();
+}
+
+
+
+inline
 unsigned int System::n_components() const
 {
   if (_variables.empty())
@@ -1814,6 +1855,16 @@ const Variable & System::variable (const unsigned int i) const
   libmesh_assert_less (i, _variables.size());
 
   return _variables[i];
+}
+
+
+
+inline
+const VariableGroup & System::variable_group (const unsigned int vg) const
+{
+  libmesh_assert_less (vg, _variable_groups.size());
+
+  return _variable_groups[vg];
 }
 
 

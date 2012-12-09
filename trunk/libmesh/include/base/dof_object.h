@@ -67,6 +67,7 @@ public:
 
   /**
    * Copy-constructor.
+
    */
   DofObject (const DofObject&);
 
@@ -196,18 +197,33 @@ public:
   void add_system ();
 
   /**
-   * @returns the number of variables associated with system \p s
-   * for this \p DofObject
+   * @returns the number of \p VariableGroup variable groups
+   * associated with system \p s for this \p DofObject
+   */
+  unsigned int n_var_groups(const unsigned int s) const;
+
+  /**
+   * @returns the number of \p Variable variables associated
+   * with \p VariableGroup \p vg in system \p s for this \p DofObject
+   */
+  unsigned int n_vars(const unsigned int s,
+		      const unsigned int vg) const;
+
+  /**
+   * @returns the number of \p Variable variables associated
+   * with system \p s for this \p DofObject
    */
   unsigned int n_vars(const unsigned int s) const;
 
   /**
-   * Sets number of variables associated with system \p s for this
-   * \p DofObject.  Has the effect of setting the number of components
-   * to 0 even when called even with (nvars == this->n_vars(s)).
+   * Sets number of variables in each group associated with system \p s for this
+   * \p DofObject. Implicit in this is salso setting the number of \p VariableGroup
+   * variable groups for the system.
+   * Has the effect of setting the number of components
+   * to 0 even when called even with (nvg == this->n_var_groups(s)).
    */
-  void set_n_vars(const unsigned int s,
-		  const unsigned int nvars);
+  void set_n_vars_per_group(const unsigned int s,
+			    const std::vector<unsigned int> &nvpg);
 
   /**
    * @returns the number of components for variable \p var
@@ -222,12 +238,32 @@ public:
 		      const unsigned int var) const;
 
   /**
-   * Sets the number of components for variable \p var
+   * @returns the number of components for \p VariableGroup \p vg
+   * of system \p s associated with this \p DofObject.
+   * For example, the \p HIERARCHIC shape functions may
+   * have @e multiple dof's associated with @e one node.  Another
+   * example is the \p MONOMIALs, where only the elements
+   * hold the dof's, but for the different spatial directions,
+   * and orders, see \p FE.
+   */
+  unsigned int n_comp_group(const unsigned int s,
+			    const unsigned int vg) const;
+
+  /**
+   * Sets the number of components for \p Variable \p var
    * of system \p s associated with this \p DofObject
    */
   void set_n_comp(const unsigned int s,
 		  const unsigned int var,
 		  const unsigned int ncomp);
+
+  /**
+   * Sets the number of components for \p VariableGroup \p vg
+   * of system \p s associated with this \p DofObject
+   */
+  void set_n_comp_group(const unsigned int s,
+			const unsigned int vg,
+			const unsigned int ncomp);
 
   /**
    * @returns the global degree of freedom number for variable \p var,
@@ -253,12 +289,22 @@ public:
   bool has_dofs(const unsigned int s=libMesh::invalid_uint) const;
 
   /**
-   * Implemented in Elem and Node.
+   * \p VariableGroup DOF indices are indexed as
+   * id = base + var_in_vg*ncomp + comp
+   * This method allows for direct access to the base.
    */
-//  virtual bool operator==(const DofObject& ) const
-//  { libmesh_error(); return false; }
+  void set_vg_dof_base(const unsigned int s,
+		       const unsigned int vg,
+		       const unsigned int db);
 
-
+  /**
+   * \p VariableGroup DOF indices are indexed as
+   * id = base + var_in_vg*ncomp + comp
+   * This method allows for direct access to the base.
+   */
+  unsigned int vg_dof_base(const unsigned int s,
+			   const unsigned int vg) const;
+  
   /**
    * An invaild \p id to distinguish an uninitialized \p DofObject
    */
@@ -296,9 +342,28 @@ public:
    */
   void pack_indexing(std::back_insert_iterator<std::vector<int> > target) const;
 
+  /**
+   * Print our buffer for debugging.
+   */
+  void debug_buffer () const;
+
 private:
 
+  /**
+   * Utility function - for variable \p var in system \p s, figure out what
+   * variable group it lives in.
+   */
+  unsigned int var_to_vg (const unsigned int s,
+			  const unsigned int var) const;
 
+  /**
+   * Utility function - for variable \p var in system \p s, figure out what
+   * variable group it lives in.
+   */
+  unsigned int system_var_to_vg_var (const unsigned int s,
+				     const unsigned int vg,
+				     const unsigned int var) const;
+  
   /**
    * The \p id of the \p DofObject
    */
@@ -318,28 +383,60 @@ private:
   /**
    * DOF index information.  This is packed into a contiguous buffer of the following format:
    *
-   * [ns end_0 end_1 ... end_{ns-1} (nc_0 idx_0 nc_1 idx_1 ... nc_nv idx_nv)_0 (nc_0 idx_0 nc_1 idx_1 ... nc_nv idx_nv)_1 ... (nc_0 idx_0 nc_1 idx_1 ... nc_nv idx_nv)_ns ]
+   * [ns end_0 end_1 ... end_{ns-1} (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_0 (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_1 ... (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_ns ]
    *
-   * where 'end_s' is the index past the end of the variable storage for system \p s.
+   * where 'end_s' is the index past the end of the variable group storage for system \p s.
    * Note that we specifically do not store the end for the last system - this always _idx_buf.size().
    *
-   * Specifically, consider the case of 4 systems, with 3, 0, 1, 2 DOFs respectively.  The _idx_buf then looks like
-   *
-   * [4 10 10 12 () (nc_0 idx_0 nc_1 idx_1 nc_2 idx_2) () (nc_0 idx_0) (nc_0 idx_0 nc_1 idx_1)]
-   * [0  1  2  3        4     5    6     7    8     9        10    11     12    13   14    15]
-   *
+   * Specifically, consider the case of 4 systems, with 3, 0, 1, 2 variable groups, respectively.  The _idx_buf then looks like:
+   \verbatim
+    [4 10 10 12 () (ncv_0 idx_0 ncv_1 idx_1 ncv_2 idx_2) () (ncv_0 idx_0) (ncv_0 idx_0 ncv_1 idx_1)]
+    [0  1  2  3         4     5     6     7     8     9         10    11      12    13    14    15]
+
+   \endverbatim
    * The ending index is then given by
-   *
-   * end_s = _idx_buf.size(), s == (ns-1),
-   *       = _idx_buf[s+1]    otherwise.
-   *
+   \verbatim
+    end_s = _idx_buf.size(), s == (ns-1),
+          = _idx_buf[s+1]    otherwise.
+   \endverbatim
    * The starting indices are not specifically stored, but rather inferred as follows:
    *
    * start_s = _idx_buf[s];
+
+   * Now, the defining characteristic of the \p VariableGroup is that it supports
+   * an arbitrary number of variables of the same type.  At the \p DofObject level, what
+   * that means is that each \p Variable in the \p VariableGroup will have the same number
+   * of nonzero components, and they can all be indexed from the same base number.  We use this
+   * information in the ncv_# and idx_# entries as follows:
+   * 
+   * ncv_# = n_vars*ncv_magic + n_comp      for variable group #
+   * idx_# = base_offset                    for variable group #
+   *
+   * the DOF index for a particular component c of variable v within that group is then given by
+   *
+   *  idx_var = idx_# + n_comp*v + c
+   *
+   * note there is a subtlety here - "variable v within that group" usually means nothing to the
+   * user. This class is either indexed with variable group numbers, or variable numbers counted
+   * *within the system*. So for a system with 2 variable groups, 4 and 8 variables each,
+   * the 5th variable in the system is the 1st variable in 2nd variable group.
+   * (Now of course 0-base everything...  but you get the idea.)
    */
-  typedef std::vector<unsigned int> index_buffer_t;
+  typedef unsigned int index_t;
+  typedef std::vector<index_t> index_buffer_t;
   index_buffer_t _idx_buf;
 
+  /**
+   * Above we introduced the chimera ncv, which is a hybrid of the form   
+   * ncv = ncv_magic*nv + nc
+   * where nv are the number of identical variables of a given type,
+   * and nc is the number of components for this set of variables.
+   *
+   * It is hoped that by setting this to a power of two, an optimizing compiler
+   * will recgnize later that  #/ncv_magic is simply a bitshift
+   */
+  static const index_t ncv_magic = 256; // = 2^8, in case we want to manually bitshift
+  
   /**
    * The starting index for system \p s.
    */
@@ -389,15 +486,15 @@ void DofObject::invalidate_dofs (const unsigned int sys_num)
   if (sys_num >= this->n_systems())
     {
       for (unsigned int s=0; s<this->n_systems(); s++)
-        for (unsigned int v=0; v<this->n_vars(s); v++)
-	  if (this->n_comp(s,v))
-	    this->set_dof_number(s,v,0,invalid_id);
+        for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
+	  if (this->n_comp_group(s,vg))
+	    this->set_vg_dof_base(s,vg,invalid_id);
     }
   // ...otherwise invalidate the dofs for all systems
   else
-    for (unsigned int v=0; v<this->n_vars(sys_num); v++)
-      if (this->n_comp(sys_num,v))
-        this->set_dof_number(sys_num,v,0,invalid_id);
+    for (unsigned int vg=0; vg<this->n_var_groups(sys_num); vg++)
+      if (this->n_comp_group(sys_num,vg))
+        this->set_vg_dof_base(sys_num,vg,invalid_id);
 }
 
 
@@ -527,11 +624,44 @@ unsigned int DofObject::n_systems () const
 
 
 inline
-unsigned int DofObject::n_vars(const unsigned int s) const
+unsigned int DofObject::n_var_groups(const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_systems());
 
   return (this->end_idx(s) - this->start_idx(s)) / 2;
+}
+
+
+
+inline
+unsigned int DofObject::n_vars(const unsigned int s,
+			       const unsigned int vg) const
+{
+  libmesh_assert_less (s,  this->n_systems());
+  libmesh_assert_less (vg, this->n_var_groups(s));
+  
+  const unsigned int start_idx_sys = this->start_idx(s);
+  
+  libmesh_assert_less ((start_idx_sys + 2*vg), _idx_buf.size());
+
+  return (_idx_buf[start_idx_sys + 2*vg] / ncv_magic);
+}
+
+
+
+inline
+unsigned int DofObject::n_vars(const unsigned int s) const
+{
+  libmesh_assert_less (s, this->n_systems());
+
+  const unsigned int nvg = this->n_var_groups(s);
+    
+  unsigned int val=0;
+
+  for (unsigned int vg=0; vg<nvg; vg++)
+    val += this->n_vars(s,vg);
+
+  return val;
 }
 
 
@@ -541,26 +671,28 @@ inline
 unsigned int DofObject::n_comp(const unsigned int s,
 			       const unsigned int var) const
 {
-  libmesh_assert_less (s, this->n_systems());
+  libmesh_assert_less (s,   this->n_systems());
   libmesh_assert_less (var, this->n_vars(s));
 
-# ifdef DEBUG
-  // Does this ever happen?  I doubt it... 3/7/2003 (BSK)
-  if (var >= this->n_vars(s))
-    {
-      libMesh::err << "s=" << s << ", var=" << var << std::endl
-		    << "this->n_vars(s)=" << this->n_vars(s) << std::endl
-		    << "this->n_systems()=" << this->n_systems() << std::endl;
-      libmesh_error();
-    }
-# endif
+  return this->n_comp_group(s,this->var_to_vg(s,var));
+}
+
+
+
+
+inline
+unsigned int DofObject::n_comp_group(const unsigned int s,
+				     const unsigned int vg) const
+{
+  libmesh_assert_less (s,  this->n_systems());
+  libmesh_assert_less (vg, this->n_var_groups(s));
 
   const unsigned int
     start_idx_sys = this->start_idx(s);
 
-  libmesh_assert_less ((start_idx_sys + 2*var), _idx_buf.size());
+  libmesh_assert_less ((start_idx_sys + 2*vg), _idx_buf.size());
 
-  return _idx_buf[start_idx_sys + 2*var];
+  return (_idx_buf[start_idx_sys + 2*vg] % ncv_magic);
 }
 
 
@@ -570,17 +702,18 @@ unsigned int DofObject::dof_number(const unsigned int s,
 				   const unsigned int var,
 				   const unsigned int comp) const
 {
-  libmesh_assert_less (s, this->n_systems());
-  libmesh_assert_less (var, this->n_vars(s));
+  libmesh_assert_less (s,    this->n_systems());
+  libmesh_assert_less (var,  this->n_vars(s));
   libmesh_assert_less (comp, this->n_comp(s,var));
 
   const unsigned int
+    vg            = this->var_to_vg(s,var),
     start_idx_sys = this->start_idx(s);
 
-  libmesh_assert_less ((start_idx_sys + 2*var + 1), _idx_buf.size());
+  libmesh_assert_less ((start_idx_sys + 2*vg + 1), _idx_buf.size());
 
   const unsigned int
-    base_idx = _idx_buf[start_idx_sys + 2*var + 1];
+    base_idx = _idx_buf[start_idx_sys + 2*vg + 1];
 
   // if the first component is invalid, they
   // are all invalid
@@ -590,7 +723,21 @@ unsigned int DofObject::dof_number(const unsigned int s,
   // otherwise the index is the first component
   // index augemented by the component number
   else
-    return (base_idx + comp);
+    {
+      const unsigned int
+	ncg = this->n_comp_group(s,vg),
+	vig = this->system_var_to_vg_var(s,vg,var);
+
+      // std::cout << "base_idx, var, vg, vig, ncg, comp="
+      // 		<< base_idx << " "
+      // 		<< var << " "
+      // 		<< vg << " "
+      // 		<< vig << " "
+      // 		<< ncg << " "
+      // 		<< comp << '\n';
+
+      return (base_idx + vig*ncg + comp);
+    }
 }
 
 
@@ -636,6 +783,87 @@ unsigned int DofObject::end_idx (const unsigned int s) const
   libmesh_assert_less (s, _idx_buf.size());
 
   return ((s+1) == this->n_systems()) ? _idx_buf.size() : _idx_buf[s+1];
+}
+
+
+
+inline
+void DofObject::set_vg_dof_base(const unsigned int s,
+				const unsigned int vg,
+				const unsigned int db)
+{
+  libmesh_assert_less (s,  this->n_systems());
+  libmesh_assert_less (vg, this->n_var_groups(s));
+
+  const unsigned int
+    start_idx_sys = this->start_idx(s);
+
+  libmesh_assert_less ((start_idx_sys + 2*vg + 1), _idx_buf.size());
+
+  _idx_buf[start_idx_sys + 2*vg + 1] = db;
+
+  libmesh_assert_equal_to (this->vg_dof_base(s,vg), db);
+}
+
+
+
+inline
+unsigned int DofObject::vg_dof_base(const unsigned int s,
+				    const unsigned int vg) const
+{
+  libmesh_assert_less (s,  this->n_systems());
+  libmesh_assert_less (vg, this->n_var_groups(s));
+
+  const unsigned int
+    start_idx_sys = this->start_idx(s);
+
+  libmesh_assert_less ((start_idx_sys + 2*vg + 1), _idx_buf.size());
+
+// #ifdef DEBUG
+//   std::cout << " [ ";
+//   for (unsigned int i=0; i<_idx_buf.size(); i++)
+//     std::cout << _idx_buf[i] << " ";
+//   std::cout << "]\n";
+// #endif
+
+  return _idx_buf[start_idx_sys + 2*vg + 1];
+}
+
+
+
+inline
+unsigned int DofObject::var_to_vg (const unsigned int s,
+				   const unsigned int var) const
+{
+  const unsigned int
+    nvg = this->n_var_groups(s);
+
+  for (unsigned int vg=0, vg_end=0; vg<nvg; vg++)
+    {
+      vg_end += this->n_vars(s,vg);
+      if (var < vg_end) return vg;
+    }
+
+  // we should never get here
+  libmesh_error();
+  return 0;
+}
+
+
+
+inline
+unsigned int DofObject::system_var_to_vg_var (const unsigned int s,
+					      const unsigned int vg,
+					      const unsigned int var) const
+{
+  unsigned int accumulated_sum=0;
+  
+  for (unsigned int vgc=0; vgc<vg; vgc++)
+    accumulated_sum += this->n_vars(s,vgc);
+  
+  libmesh_assert_less_equal (accumulated_sum, var);
+  
+  return (var - accumulated_sum);
 }
 
 

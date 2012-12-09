@@ -19,12 +19,14 @@
 #define __variable_h__
 
 // Local Includes
+#include "libmesh/libmesh_common.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/id_types.h"
 
 // C++ includes
 #include <set>
 #include <string>
+#include <vector>
 
 namespace libMesh {
 
@@ -109,7 +111,7 @@ public:
    * empty \p _active_subdomains container as active everywhere, i.e.
    * for all subdomains.
    */
-  bool active_on_subdomain (const subdomain_id_type sid) const
+  bool active_on_subdomain (subdomain_id_type sid) const
   { return (_active_subdomains.empty() || _active_subdomains.count(sid));  }
 
   /**
@@ -126,7 +128,7 @@ public:
   const std::set<subdomain_id_type> & active_subdomains() const
   { return _active_subdomains; }
 
-private:
+protected:
   std::string             _name;
   unsigned int            _number;
   unsigned int            _first_scalar_number;
@@ -134,6 +136,114 @@ private:
   std::set<subdomain_id_type> _active_subdomains;
 };
 
+
+
+/**
+ * This class defines a logically grouped set of variables in
+ * the system.  \p VariableGroup is appropriate for representing
+ * several unknowns in the problem that are all approximated
+ * with the same finite element approximation family and
+ * (optionally) a list of subdomains to which the
+ * variables are restricted.
+ */
+class VariableGroup : public Variable
+{
+public:
+  /**
+   * Constructor.  Omits the subdomain mapping, hence this
+   * constructor creates a variable which is active on
+   * all subdomains.
+   */
+  VariableGroup (const std::vector<std::string> &var_names,
+		 const unsigned int var_number,
+		 const unsigned int first_scalar_number,
+		 const FEType &var_type) :
+    Variable ("var_group",
+	      var_number,
+	      first_scalar_number,
+	      var_type),
+    _names(var_names)
+  {}
+
+   
+  /**
+   * Constructor.  Takes a set which contains the subdomain
+   * indices for which this variable is active.
+   */
+  VariableGroup (const std::vector<std::string> &var_names,
+		 const unsigned int var_number,
+		 const unsigned int first_scalar_number,
+		 const FEType &var_type,
+		 const std::set<subdomain_id_type> &var_active_subdomains) :
+     
+    Variable ("var_group",
+	      var_number,
+	      first_scalar_number,
+	      var_type,
+	      var_active_subdomains),
+    _names(var_names)
+  {}
+
+  /**
+   * The number of variables in this \p VariableGroup
+   */
+  unsigned int n_variables () const
+  { return _names.size(); }
+
+  /**
+   * Construct a \p Variable object for an individual member
+   * of our group.
+   */
+  Variable variable (unsigned int v) const
+  {
+    libmesh_assert_less (v, this->n_variables());
+    return Variable (this->name(v),
+		     this->number(v),
+		     this->first_scalar_number(v),
+		     this->type(),
+		     this->active_subdomains());
+  }
+
+  /**
+   * Support vg(v) - returns a \p Variable for v.
+   */
+  Variable operator() (unsigned int v) const
+  { return this->variable(v); }
+  
+  /**
+   * Arbitrary, user-specified name of the variable.
+   */
+  const std::string & name(unsigned int v) const
+  {
+    libmesh_assert_less (v, this->n_variables());
+    return _names[v];
+  }
+
+  /**
+   * The rank of this variable in the system.
+   */
+  unsigned int number(unsigned int v) const
+  {
+    libmesh_assert_less (v, this->n_variables());
+    return _number + v;
+  }
+
+  /**
+   * The index of the first scalar component of this variable in the
+   * system.
+   */
+  unsigned int first_scalar_number(unsigned int v) const
+  {
+    libmesh_assert_less (v, this->n_variables());
+    if ((this->type().family == SCALAR) &&
+	(this->n_variables() > 1)) libmesh_error(); // [BSK] I am not yet sure what this means!
+    return _first_scalar_number;
+  }
+
+protected:
+  std::vector<std::string> _names;
+};
+  
 } // namespace libMesh
 
 #endif // #define __variable_h__
