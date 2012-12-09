@@ -1073,41 +1073,9 @@ unsigned int System::add_variable (const std::string& var,
 			           const FEType& type,
 				   const std::set<subdomain_id_type> * const active_subdomains)
 {
-  // Make sure the variable isn't there already
-  // or if it is, that it's the type we want
-  for (unsigned int v=0; v<this->n_vars(); v++)
-    if (this->variable_name(v) == var)
-      {
-	if (this->variable_type(v) == type)
-	  return _variables[v].number();
-
-	libMesh::err << "ERROR: incompatible variable "
-		      << var
-		      << " has already been added for this system!"
-		      << std::endl;
-	libmesh_error();
-      }
-
-  const unsigned int curr_n_vars = this->n_vars();
-
-  const unsigned int next_first_component = this->n_components();
-
-  // Add the variable to the list
-  _variables.push_back((active_subdomains == NULL) ?
-		       Variable(var, curr_n_vars,
-				next_first_component, type) :
-		       Variable(var, curr_n_vars,
-				next_first_component, type, *active_subdomains));
-
-  libmesh_assert_equal_to ((curr_n_vars+1), this->n_vars());
-
-  _variable_numbers[var] = curr_n_vars;
-
-  // Add the variable to the _dof_map
-  _dof_map->add_variable (_variables.back());
-
-  // Return the number of the new variable
-  return curr_n_vars;
+  return this->add_variables (std::vector<std::string>(1, var),
+			      type,
+			      active_subdomains);
 }
 
 
@@ -1117,9 +1085,74 @@ unsigned int System::add_variable (const std::string& var,
 			           const FEFamily family,
 				   const std::set<subdomain_id_type> * const active_subdomains)
 {
-  return this->add_variable(var,
-			    FEType(order, family),
-			    active_subdomains);
+  return this->add_variables(std::vector<std::string>(1, var),
+			     FEType(order, family),
+			     active_subdomains);
+}
+
+
+
+unsigned int System::add_variables (const std::vector<std::string> &vars,
+				    const FEType& type,
+				    const std::set<subdomain_id_type> * const active_subdomains)
+{
+  const std::string var = vars[0];
+  
+  // Make sure the variable isn't there already
+  // or if it is, that it's the type we want
+  for (unsigned int ov=0; ov<vars.size(); ov++)
+    for (unsigned int v=0; v<this->n_vars(); v++)
+      if (this->variable_name(v) == vars[ov])
+	{
+	  if (this->variable_type(v) == type)
+	    return _variables[v].number();
+	  
+	  libMesh::err << "ERROR: incompatible variable "
+		       << vars[ov]
+		       << " has already been added for this system!"
+		       << std::endl;
+	  libmesh_error();
+	}
+
+  const unsigned int curr_n_vars = this->n_vars();
+
+  const unsigned int next_first_component = this->n_components();
+
+  // Add the variable group to the list
+  _variable_groups.push_back((active_subdomains == NULL) ?
+			     VariableGroup(vars, curr_n_vars,
+					   next_first_component, type) :
+			     VariableGroup(vars, curr_n_vars,
+					   next_first_component, type, *active_subdomains));
+
+  const VariableGroup &vg (_variable_groups.back());
+  
+  // Add each component of the group individually
+  for (unsigned int v=0; v<vars.size(); v++)
+    {
+      _variables.push_back (vg(v));
+      _variable_numbers[vars[v]] = curr_n_vars+v;  
+    }
+  
+  libmesh_assert_equal_to ((curr_n_vars+vars.size()), this->n_vars());
+    
+  // Add the variable group to the _dof_map
+  _dof_map->add_variable_group (vg);
+
+  // Return the number of the new variable
+  return curr_n_vars;
+}
+
+
+
+unsigned int System::add_variables (const std::vector<std::string> &vars,
+				    const Order order,
+				    const FEFamily family,
+				    const std::set<subdomain_id_type> * const active_subdomains)
+{
+  return this->add_variables(vars,
+			     FEType(order, family),
+			     active_subdomains);
 }
 
 
@@ -1535,48 +1568,55 @@ std::string System::get_info() const
       << "    Type \""  << this->system_type() << "\"\n"
       << "    Variables=";
 
-  for (unsigned int vn=0; vn<this->n_vars(); vn++)
-      out << "\"" << this->variable_name(vn) << "\" ";
+  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+    {
+      const VariableGroup &vg_description (this->variable_group(vg));
+
+      if (vg_description.n_variables() > 1) out << "{ ";
+      for (unsigned int vn=0; vn<vg_description.n_variables(); vn++)
+	out << "\"" << vg_description.name(vn) << "\" ";
+      if (vg_description.n_variables() > 1) out << "} ";      
+    }
 
   out << '\n';
 
   out << "    Finite Element Types=";
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  for (unsigned int vn=0; vn<this->n_vars(); vn++)
+  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     out << "\""
-	<< Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_type(vn).family)
+	<< Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
 	<< "\" ";
 #else
-  for (unsigned int vn=0; vn<this->n_vars(); vn++)
+  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     {
       out << "\""
-	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_type(vn).family)
+	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
 	  << "\", \""
-	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_type(vn).radial_family)
+	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().radial_family)
 	  << "\" ";
     }
 
   out << '\n' << "    Infinite Element Mapping=";
-  for (unsigned int vn=0; vn<this->n_vars(); vn++)
+  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     out << "\""
-	<< Utility::enum_to_string<InfMapType>(this->get_dof_map().variable_type(vn).inf_map)
+	<< Utility::enum_to_string<InfMapType>(this->get_dof_map().variable_group(vg).type().inf_map)
 	<< "\" ";
 #endif
 
   out << '\n';
 
   out << "    Approximation Orders=";
-  for (unsigned int vn=0; vn<this->n_vars(); vn++)
+  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     {
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
       out << "\""
-	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_type(vn).order)
+	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
 	  << "\" ";
 #else
       out << "\""
-	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_type(vn).order)
+	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
 	  << "\", \""
-	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_type(vn).radial_order)
+	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().radial_order)
 	  << "\" ";
 #endif
     }
