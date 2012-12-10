@@ -253,6 +253,20 @@ public:
   { return fixed_solution_derivative; }
 
   /**
+   * Accessor for querying whether we need to do a primal
+   * or adjoint solve
+   */
+  bool is_adjoint() const
+  { return _is_adjoint; }
+
+  /**
+   * Accessor for setting whether we need to do a primal
+   * or adjoint solve
+   */
+  bool& is_adjoint()
+  { return _is_adjoint; }
+
+  /**
    * For time-dependent problems, this is the time t for which the current
    * nonlinear_solution is defined.
    * FIXME - this needs to be tweaked mid-timestep by all transient solvers!
@@ -395,6 +409,11 @@ public:
    * A reference to the system this context is constructed with
    */
   const System& _system;
+
+  /**
+   * Is this context to be used for a primal or adjoint solve?
+   */
+  bool _is_adjoint;
 
  protected:
  
