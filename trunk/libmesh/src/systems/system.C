@@ -1140,7 +1140,7 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
   _dof_map->add_variable_group (vg);
 
   // Return the number of the new variable
-  return curr_n_vars;
+  return curr_n_vars+vars.size()-1;
 }
 
 
