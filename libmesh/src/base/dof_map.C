@@ -341,26 +341,28 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                              procdown, request_to_fill);
 
       // Fill those requests
-      const unsigned int n_variables = this->n_variables();
+      const unsigned int
+	sys_num      = this->sys_number(),
+	n_var_groups = this->n_variable_groups();
 
       std::vector<unsigned int> ghost_data
-        (request_to_fill.size() * 2 * n_variables);
+        (request_to_fill.size() * 2 * n_var_groups);
 
       for (unsigned int i=0; i != request_to_fill.size(); ++i)
         {
           DofObject *requested = (this->*objects)(mesh, request_to_fill[i]);
           libmesh_assert(requested);
           libmesh_assert_equal_to (requested->processor_id(), libMesh::processor_id());
-          libmesh_assert_equal_to (requested->n_vars(this->sys_number()), n_variables);
-          for (unsigned int v=0; v != n_variables; ++v)
+          libmesh_assert_equal_to (requested->n_var_groups(sys_num), n_var_groups);
+          for (unsigned int vg=0; vg != n_var_groups; ++vg)
             {
-              unsigned int n_comp =
-                requested->n_comp(this->sys_number(), v);
-              ghost_data[i*2*n_variables+v] = n_comp;
-              unsigned int first_dof = n_comp ?
-                requested->dof_number(this->sys_number(), v, 0) : 0;
+              unsigned int n_comp_g =
+                requested->n_comp_group(sys_num, vg);
+              ghost_data[i*2*n_var_groups+vg] = n_comp_g;
+              unsigned int first_dof = n_comp_g ?
+                requested->vg_dof_base(sys_num, vg) : 0;
               libmesh_assert_not_equal_to (first_dof, DofObject::invalid_id);
-              ghost_data[i*2*n_variables+n_variables+v] = first_dof;
+              ghost_data[i*2*n_var_groups+n_var_groups+vg] = first_dof;
             }
         }
 
@@ -371,23 +373,23 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
       // And copy the id changes we've now been informed of
       libmesh_assert_equal_to (filled_request.size(),
-                              requested_ids[procup].size() * 2 * n_variables);
+                              requested_ids[procup].size() * 2 * n_var_groups);
       for (unsigned int i=0; i != requested_ids[procup].size(); ++i)
         {
           DofObject *requested = (this->*objects)(mesh, requested_ids[procup][i]);
           libmesh_assert(requested);
           libmesh_assert_equal_to (requested->processor_id(), procup);
-          for (unsigned int v=0; v != n_variables; ++v)
+          for (unsigned int vg=0; vg != n_var_groups; ++vg)
             {
-              unsigned int n_comp = filled_request[i*2*n_variables+v];
-              requested->set_n_comp(this->sys_number(), v, n_comp);
-              if (n_comp)
+              unsigned int n_comp_g = filled_request[i*2*n_var_groups+vg];
+              requested->set_n_comp_group(sys_num, vg, n_comp_g);
+              if (n_comp_g)
                 {
                   unsigned int first_dof =
-                    filled_request[i*2*n_variables+n_variables+v];
+                    filled_request[i*2*n_var_groups+n_var_groups+vg];
                   libmesh_assert_not_equal_to (first_dof, DofObject::invalid_id);
-                  requested->set_dof_number
-                    (this->sys_number(), v, 0, first_dof);
+                  requested->set_vg_dof_base
+                    (sys_num, vg, first_dof);
                 }
             }
         }
