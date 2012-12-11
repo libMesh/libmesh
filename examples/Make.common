@@ -86,7 +86,7 @@ run: $(check_PROGRAMS)
 CLEANFILES += $(example_name).php stdout.log
 doc: $(example_name).php
 html: $(example_name).php
-$(example_name).php: $(example_name) \
+$(example_name).php: example-opt example-dbg example-devel \
                         $(top_srcdir)/contrib/bin/ex2html.sh \
                        Makefile
 	$(MAKE) -s run > stdout.log
