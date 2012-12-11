@@ -3,7 +3,7 @@
 
 SUBDIRS = include #src
 
-AUTOMAKE_OPTIONS = foreign subdir-objects 
+AUTOMAKE_OPTIONS = subdir-objects 
 ACLOCAL_AMFLAGS  = -I m4
 AM_CFLAGS        = $(libmesh_CFLAGS)
 
@@ -23,8 +23,7 @@ if LIBMESH_ENABLE_TECPLOT
 endif
 
 # additional files which must be included in 'make dist'
-EXTRA_DIST = license \
-             reference_elements \
+EXTRA_DIST = reference_elements \
              include/include_HEADERS \
 	     include/rebuild_include_HEADERS.sh \
 	     src/libmesh_SOURCES \

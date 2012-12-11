@@ -58,7 +58,7 @@ build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
 @LIBMESH_ENABLE_TECPLOT_TRUE@am__append_1 = @TECPLOT_LIBRARY@
-DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
+DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/src/libmesh_SOURCES \
 	$(top_srcdir)/build-aux/config.guess \
 	$(top_srcdir)/build-aux/config.sub \
@@ -76,10 +76,10 @@ DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(top_srcdir)/contrib/utils/libmesh-oprof.pc.in \
 	$(top_srcdir)/contrib/utils/libmesh-opt.pc.in \
 	$(top_srcdir)/contrib/utils/libmesh-prof.pc.in \
-	$(top_srcdir)/doc/Doxyfile.in $(top_srcdir)/doc/dot.in \
-	build-aux/config.guess build-aux/config.sub build-aux/depcomp \
-	build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
-	build-aux/ylwrap
+	$(top_srcdir)/doc/Doxyfile.in $(top_srcdir)/doc/dot.in AUTHORS \
+	COPYING ChangeLog INSTALL NEWS build-aux/config.guess \
+	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
+	build-aux/ltmain.sh build-aux/missing build-aux/ylwrap
 @LIBMESH_OPT_MODE_TRUE@am__append_2 = libmesh_opt.la
 @LIBMESH_DBG_MODE_TRUE@am__append_3 = libmesh_dbg.la
 @LIBMESH_DEVEL_MODE_TRUE@am__append_4 = libmesh_devel.la
@@ -4035,7 +4035,7 @@ top_srcdir = @top_srcdir@
 # 	   test/comp_ns/Makefile.in		    \
 # 	   test/unit/Makefile.in                    
 SUBDIRS = include contrib $(am__append_7) $(am__append_11)
-AUTOMAKE_OPTIONS = foreign subdir-objects 
+AUTOMAKE_OPTIONS = subdir-objects 
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(libmesh_CFLAGS)
 
@@ -4050,7 +4050,7 @@ AM_CPPFLAGS = -DLIBMESH_IS_COMPILING_ITSELF \
 
 
 # additional files which must be included in 'make dist'
-EXTRA_DIST = license reference_elements include/include_HEADERS \
+EXTRA_DIST = reference_elements include/include_HEADERS \
 	include/rebuild_include_HEADERS.sh src/libmesh_SOURCES \
 	src/rebuild_libmesh_SOURCES.sh contrib/tecplot/include \
 	contrib/tecplot/lib contrib/tecplot/README \
@@ -4682,15 +4682,15 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/sr
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --foreign \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu'; \
+	      $(am__cd) $(srcdir) && $(AUTOMAKE) --gnu \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign Makefile
+	  $(AUTOMAKE) --gnu Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
