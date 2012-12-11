@@ -3,6 +3,20 @@ libMesh-specific configuration options
 
 For generic installation instructions refer also to the file INSTALL.
 
+Build Process
+-------------
+   (0) ./bootstrap
+       (optional, needed if you will modify the GNU autotools build system)
+       
+   (1) ./configure --prefix=/path/to/libmesh/install
+   
+   (2) make
+   
+   (3) make check
+       (optional, runs the example programs and unit tests when possible)
+       
+   (4) make install
+
 
 METHODS
 -------
@@ -39,4 +53,18 @@ $ ./configure METHODS="devel oprof"
 If unspecified, the three METHODS="opt dbg devel" are default.
 
 
-	 
+Multiple Builds with Different Compilers
+----------------------------------------
+
+libMesh fully supports out-of-tree builds, and users are encouraged to use this
+feature when needed to support multiple compilers. For example, on a system
+where multiple compilers are availble and accessible via modules, you can share
+the same source tree by creating a subdirectory for each compiler build:
+
+$ export LIBMESH_SRC=/local/libmesh
+$ cd $LIBMESH_SRC
+$ module load gcc/4.6
+$ cd $LIBMESH_SRC && mkdir gcc-4.6 && cd gcc-4.6 && ../configure && make && make install
+$ module swap gcc intel/12.1
+$ cd $LIBMESH_SRC && mkdir intel-12.1 && cd intel-12.1 && ../configure && make && make install
+
