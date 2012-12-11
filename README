@@ -1,0 +1,11 @@
+GitHub Markup
+=============
+
+We use this library on GitHub when rendering your README or any other
+rich text file.
+
+Markups
+-------
+
+The following markups are supported.  The dependencies listed are required if
+you wish to run the library.
