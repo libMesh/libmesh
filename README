@@ -1,11 +1,42 @@
-GitHub Markup
-=============
+libMesh-specific configuration options
+======================================
 
-We use this library on GitHub when rendering your README or any other
-rich text file.
+For generic installation instructions refer also to the file INSTALL.
 
-Markups
+
+METHODS
 -------
 
-The following markups are supported.  The dependencies listed are required if
-you wish to run the library.
+libMesh supports the notion of multiple methods - that is, compilation
+settings used to build the library.  The major methods supported by
+the library are:
+
+    opt: Fully Optimized mode, with little to no error checking. No debugging
+         symbols are included in the resulting library.  Agressive optimization
+	 flags are used.
+    
+    dbg: Full debugging mode - all useful compiler warnings are enabled,
+         as well as robust internal state checking.
+	 
+  devel: Use high levels of compiler optimization, but also enable internal
+         state checking.  Debugging symbols are included, but the resulting
+	 code is not always easy to navigate in a debugger because of
+	 compiler optimizations.
+
+    pro: Optimized code path with compiler flags suitable for use with gprof.
+
+  oprof: Optimized code path with compiler flags suitable for use with oprofile.
+
+
+To select a set of methods, you can pass them to configure in one of two ways:
+
+$ ./configure --with-methods="opt dbg devel"
+
+or
+
+$ ./configure METHODS="devel oprof"
+
+If unspecified, the three METHODS="opt dbg devel" are default.
+
+
+	 
