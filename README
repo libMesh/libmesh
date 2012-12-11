@@ -67,4 +67,3 @@ $ module load gcc/4.6
 $ cd $LIBMESH_SRC && mkdir gcc-4.6 && cd gcc-4.6 && ../configure && make && make install
 $ module swap gcc intel/12.1
 $ cd $LIBMESH_SRC && mkdir intel-12.1 && cd intel-12.1 && ../configure && make && make install
-
