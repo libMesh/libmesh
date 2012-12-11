@@ -17,27 +17,26 @@
 <a name="getsoftware"></a><h2>Getting the Software</h2>
 
 The <code>libMesh</code> source can be 
-<a href="http://sourceforge.net/project/showfiles.php?group_id=71130">downloaded from the project's SourceForge homepage</a>.
-Stable releases are located there as compressed tar archives. You may also
-access the SVN source tree for the latest code. You can get read-only access
-to the SVN repository via:
+<a href="http://github.com/libMesh/libmesh/downloads">downloaded from the project's GitHub homepage</a>.
+Stable releases are located there as compressed tar archives. 
+Previous versions are also available from our SourceForge <a href="http://sourceforge.net/project/showfiles.php?group_id=71130">archive</a>.
+
+You may also
+access the Git source tree for the latest code. You can get read-only access
+to the Git repository via:
 <br>
 
 <div class="fragment">
-  <pre>svn checkout https://libmesh.svn.sourceforge.net/svnroot/libmesh/trunk/libmesh </pre>
+  <pre>git clone git://github.com/libMesh/libmesh.git </pre>
 </div>
 
 <br>
-More information regarding the <code>libMesh</code> SVN repository may be found <a href="subversion.php"> here</a>.
-
-<br>
-<br>
-If you would like to contribute to the project you will need a SourceForge
+If you would like to contribute to the project you will need a GitHub
 developer account, or you can contribute patches. To create a patch from a
-modified SVN tree simply do:
+modified Git tree simply do:
 <br>
 <div class="fragment">
-  <pre>svn diff &gt; patch </pre>
+  <pre>git diff &gt; patch </pre>
 </div>
 
 <br>
@@ -143,14 +142,12 @@ but <code>configure</code> uses it to find out how to link Fortran libraries wit
 
 To build the library you need <code>GNU</code> <code>Make</code> and a supported compiler,
 as listed in the <a href="installation.php#compilers">Compiler</a> section. After the library
-is configured simply type <code>make</code> to build the library. Typing
-<code>make bin/meshtool</code> will build a mesh translation tool using the library.
+is configured simply type <code>make</code> to build the library.
 
 <br>
-The Makefiles distributed with the library look at the shell environment variable
-<code>METHOD</code> to determine what mode the library should be built in. Valid 
-values for <code>METHOD</code> are <code>opt</code> (optimized mode, the default 
-if <code>METHOD</code> is empty), <code>dbg</code> (build with debug symbols), 
+The <code>./configure</code> script distributed with the library looks at the shell 
+environment variable <code>METHODS</code> to determine what modes the library should be built in. 
+Valid values for <code>METHOD</code> are <code>opt</code> (optimized mode), <code>dbg</code> (build with debug symbols), 
 and <code>pro</code> (build with profiling support for use with <code>gprof)</code>. 
 Once the library is configured you can build it simply by typing
 
@@ -182,12 +179,12 @@ in the example to write a different formats, however.
 
 
 <h3>Unit Tests</h3>
-The SVN repository contains a <code>libmesh_tests</code> entry in the main trunk
+The source tree contains a <code>tests</code> entry in the main trunk
 that contains a series of unit tests which can be used to validate a <code>libMesh</code>
-installation.  You may download the tests via
-<div class="fragment">
-  <pre> svn checkout https://libmesh.svn.sourceforge.net/svnroot/libmesh/trunk/libmesh_tests</pre>
-</div>
+installation.  These unit tests require <a href="https://sourceforge.net/apps/mediawiki/cppunit/index.php?title=Main_Page">CPPUnit</a> 
+to run properly.  To run the unit test suite, simply do
+
+<pre>make -C test check </pre>
 
 
 <a name="link"></a><h2>Linking With Your Application</h2>
