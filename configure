@@ -640,11 +640,11 @@ BUILD_VERSION
 BUILD_HOST
 BUILD_ARCH
 BUILD_USER
-SVN_CHECKOUT_FALSE
-SVN_CHECKOUT_TRUE
+GIT_CHECKOUT_FALSE
+GIT_CHECKOUT_TRUE
 BUILD_DEVSTATUS
-SVN_REVISION
-svnquery
+GIT_REVISION
+gitquery
 libmesh_contrib_INCLUDES
 libmesh_optional_LIBS
 libmesh_optional_INCLUDES
@@ -31952,18 +31952,18 @@ BUILD_ARCH=${host}
 BUILD_HOST=${ac_hostname}
 BUILD_DATE=`date +'%F %H:%M'`
 
-# Determine method for querying Source code revisioning (assumes SVN)
+# Determine method for querying Source code revisioning (assumes git)
 
-# Extract the first word of "svnversion", so it can be a program name with args.
-set dummy svnversion; ac_word=$2
+# Extract the first word of "git", so it can be a program name with args.
+set dummy git; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
-if ${ac_cv_path_svnquery+:} false; then :
+if ${ac_cv_path_gitquery+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  case $svnquery in
+  case $gitquery in
   [\\/]* | ?:[\\/]*)
-  ac_cv_path_svnquery="$svnquery" # Let the user override the test with a path.
+  ac_cv_path_gitquery="$gitquery" # Let the user override the test with a path.
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
@@ -31973,7 +31973,7 @@ do
   test -z "$as_dir" && as_dir=.
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_svnquery="$as_dir/$ac_word$ac_exec_ext"
+    ac_cv_path_gitquery="$as_dir/$ac_word$ac_exec_ext"
     $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -31984,10 +31984,10 @@ IFS=$as_save_IFS
   ;;
 esac
 fi
-svnquery=$ac_cv_path_svnquery
-if test -n "$svnquery"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $svnquery" >&5
-$as_echo "$svnquery" >&6; }
+gitquery=$ac_cv_path_gitquery
+if test -n "$gitquery"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $gitquery" >&5
+$as_echo "$gitquery" >&6; }
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -31995,32 +31995,35 @@ fi
 
 
 
-# svnversion 1.7.x changed the return value for unversioned directories
-if test "x${svnquery}" = "x" || test "`${svnquery} -n $srcdir`" = "exported" || test "`${svnquery} -n $srcdir`" = "Unversioned directory"; then
-   SVN_REVISION="cat $srcdir/dist_version"
-   SVN_CHECKOUT=false
+if (test "x${gitquery}" = "x" -o ! -d $srcdir/.git) ; then
+   GIT_REVISION="external" #"cat $srcdir/dist_version"
+   GIT_CHECKOUT=false
    BUILD_DEVSTATUS="External Release"
 else
-   SVN_REVISION="${svnquery} -n $srcdir"
-   SVN_CHECKOUT=true
+
+   #echo "git revision=`cd $srcdir ; ${gitquery} rev-parse HEAD`"
+   #echo "git branch=`cd $srcdir ; ${gitquery} branch | awk '/^\\* / { print  }'`"
+
+   GIT_REVISION="`cd $srcdir ; ${gitquery} rev-parse HEAD`"
+   GIT_CHECKOUT=true
    BUILD_DEVSTATUS="Development Build"
 fi
 
 
 
 
- if test x${SVN_CHECKOUT} = xtrue ; then
-  SVN_CHECKOUT_TRUE=
-  SVN_CHECKOUT_FALSE='#'
+ if test x${GIT_CHECKOUT} = xtrue ; then
+  GIT_CHECKOUT_TRUE=
+  GIT_CHECKOUT_FALSE='#'
 else
-  SVN_CHECKOUT_TRUE='#'
-  SVN_CHECKOUT_FALSE=
+  GIT_CHECKOUT_TRUE='#'
+  GIT_CHECKOUT_FALSE=
 fi
 
 
 # Query current version.
 
-BUILD_VERSION=`${SVN_REVISION}`
+BUILD_VERSION=${GIT_REVISION}
 
 # Versioning info - check local developer version (if checked out)
 
@@ -32353,8 +32356,8 @@ if test -z "${LIBMESH_ENABLE_CPPUNIT_TRUE}" && test -z "${LIBMESH_ENABLE_CPPUNIT
   as_fn_error $? "conditional \"LIBMESH_ENABLE_CPPUNIT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${SVN_CHECKOUT_TRUE}" && test -z "${SVN_CHECKOUT_FALSE}"; then
-  as_fn_error $? "conditional \"SVN_CHECKOUT\" was never defined.
+if test -z "${GIT_CHECKOUT_TRUE}" && test -z "${GIT_CHECKOUT_FALSE}"; then
+  as_fn_error $? "conditional \"GIT_CHECKOUT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -35555,9 +35558,8 @@ done
 echo Install dir........................ : $prefix
 echo Build user......................... : $USER
 echo Build host......................... : $BUILD_HOST
-#echo Configure date..................... : $BUILD_DATE
 echo Build architecture................. : $BUILD_ARCH
-echo SVN revision number................ : $BUILD_VERSION
+echo Git revision....................... : $BUILD_VERSION
 
 ######################################################################################
 echo

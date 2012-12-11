@@ -31,29 +31,32 @@ BUILD_ARCH=${host}
 BUILD_HOST=${ac_hostname}
 BUILD_DATE=`date +'%F %H:%M'`
 
-# Determine method for querying Source code revisioning (assumes SVN)
+# Determine method for querying Source code revisioning (assumes git)
 
-AC_PATH_PROG(svnquery,svnversion)
+AC_PATH_PROG(gitquery,git)
 
-# svnversion 1.7.x changed the return value for unversioned directories
-if test "x${svnquery}" = "x" || test "`${svnquery} -n $srcdir`" = "exported" || test "`${svnquery} -n $srcdir`" = "Unversioned directory"; then
-   SVN_REVISION="cat $srcdir/dist_version"
-   SVN_CHECKOUT=false
+if (test "x${gitquery}" = "x" -o ! -d $srcdir/.git) ; then
+   GIT_REVISION="external" #"cat $srcdir/dist_version"
+   GIT_CHECKOUT=false
    BUILD_DEVSTATUS="External Release"
 else
-   SVN_REVISION="${svnquery} -n $srcdir"
-   SVN_CHECKOUT=true
+
+   #echo "git revision=`cd $srcdir ; ${gitquery} rev-parse HEAD`"
+   #echo "git branch=`cd $srcdir ; ${gitquery} branch | awk '/^\\* / { print $2 }'`"
+
+   GIT_REVISION="`cd $srcdir ; ${gitquery} rev-parse HEAD`"
+   GIT_CHECKOUT=true
    BUILD_DEVSTATUS="Development Build"
 fi
 
 
-AC_SUBST(SVN_REVISION)
+AC_SUBST(GIT_REVISION)
 AC_SUBST(BUILD_DEVSTATUS)
-AM_CONDITIONAL(SVN_CHECKOUT,test x${SVN_CHECKOUT} = xtrue )
+AM_CONDITIONAL(GIT_CHECKOUT,test x${GIT_CHECKOUT} = xtrue )
 
 # Query current version.
 
-BUILD_VERSION=`${SVN_REVISION}`
+BUILD_VERSION=${GIT_REVISION}
 
 # Versioning info - check local developer version (if checked out)
 
