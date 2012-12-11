@@ -46,7 +46,7 @@ function load_style($root)
         <?php if ($mode=="download") { ?>
               <?php echo "<a class=\"L2\" href = \"", $root, "installation.php\" title=\"Installation\">Installation</a><BR>"; ?>
               <?php echo "<a class=\"L2\" href = \"", $root, "subversion.php\" title=\"SVN Repository\">SVN Repository</a><BR>"; ?>
-              <?php echo "<a class=\"L2\" href = \"", $root, "http://sourceforge.net/project/showfiles.php?group_id=71130\" title=\"Source Files\">Source Files</a><BR>"; ?>
+              <?php echo "<a class=\"L2\" href = \"", $root, "https://github.com/libMesh/libmesh/downloads\" title=\"Source Files\">Source Files</a><BR>"; ?>
         <?php } ?>
 	
     <?php echo "<a class=\"L1\" href = \"", $root, "examples.php\">Examples</a><BR>"; ?>
