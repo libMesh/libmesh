@@ -441,34 +441,7 @@ F.&nbsp;G. Gonz&aacute;lez and J.&nbsp;R.&nbsp;R. Galv&aacute;n.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Curtis_2012">2</a>]
-</td>
-<td class="bibtexitem">
-F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
- A note on the implementation of an interior-point algorithm for
-  nonlinear optimization with inexact step computations.
- <em>Mathematical Programming, Ser. B</em>, April 2012.
- <a href="http://dx.doi.org/10.1007/s10107-012-0557-4">http://dx.doi.org/10.1007/s10107-012-0557-4</a>.
-<a name="Curtis_2012"></a><pre>
-@article{Curtis_2012,
-  author = {F.~E.~Curtis and J.~Huber and O.~Schenk and A.~W\"{a}chter},
-  title = {{A note on the implementation of an interior-point algorithm for nonlinear
-              optimization with inexact step computations}},
-  month = apr,
-  year = 2012,
-  note = {\url{http://dx.doi.org/10.1007/s10107-012-0557-4}},
-  journal = {Mathematical Programming, Ser.\ B}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2012">3</a>]
+[<a name="Vavourakis_2012">2</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekaterinaris.
@@ -494,7 +467,7 @@ V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekater
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2012">4</a>]
+[<a name="Fuentes_2012">3</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;Weinberg, A.&nbsp;Shetty, J.&nbsp;Hazle, and R.&nbsp;Stafford.
@@ -522,7 +495,7 @@ D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;Weinberg, A.&nbsp;Shetty, J.&nbsp;Hazl
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vallaghe_2012">5</a>]
+[<a name="Vallaghe_2012">4</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
@@ -548,7 +521,7 @@ S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2012">6</a>]
+[<a name="Griffith_2012">5</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -574,7 +547,7 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Sopeju_2011">7</a>]
+[<a name="Sopeju_2011">6</a>]
 </td>
 <td class="bibtexitem">
 O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
@@ -605,7 +578,7 @@ O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2010">8</a>]
+[<a name="Griffith_2010">7</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -763,7 +736,65 @@ R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rossa_2012">1</a>]
+[<a name="Galloway_2012">1</a>]
+</td>
+<td class="bibtexitem">
+J.&nbsp;D. Galloway, N.&nbsp;N. Carlson, and C.&nbsp;Unal.
+ BISON framework for the analysis of performance of metallic fuels.
+ Technical Report LA-UR-12-26297, Los Alamos National Laboratory,
+  December 2012.
+ <a href="http://www.osti.gov/bridge/purl.cover.jsp?purl=/1055254/">http://www.osti.gov/bridge/purl.cover.jsp?purl=/1055254/</a>.
+<a name="Galloway_2012"></a><pre>
+@techreport{Galloway_2012,
+  author = {J.~D.~Galloway and N.~N.~Carlson and C.~Unal},
+  title = {{BISON framework for the analysis of performance of metallic fuels}},
+  institution = {Los Alamos National Laboratory},
+  month = dec,
+  year = {2012},
+  number = {LA-UR-12-26297},
+  note = {\url{http://www.osti.gov/bridge/purl.cover.jsp?purl=/1055254/}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Curtis_2012">2</a>]
+</td>
+<td class="bibtexitem">
+F.&nbsp;E. Curtis, J.&nbsp;Huber, O.&nbsp;Schenk, and A.&nbsp;W&auml;chter.
+ A note on the implementation of an interior-point algorithm for
+  nonlinear optimization with inexact step computations.
+ <em>Mathematical Programming, Ser. B</em>, 136(1):209-227, December
+  2012.
+ <a href="http://dx.doi.org/10.1007/s10107-012-0557-4">http://dx.doi.org/10.1007/s10107-012-0557-4</a>.
+<a name="Curtis_2012"></a><pre>
+@article{Curtis_2012,
+  author = {F.~E.~Curtis and J.~Huber and O.~Schenk and A.~W\"{a}chter},
+  title = {{A note on the implementation of an interior-point algorithm for nonlinear
+              optimization with inexact step computations}},
+  month = dec,
+  year = 2012,
+  pages = {209--227},
+  volume = {136},
+  number = {1},
+  note = {\url{http://dx.doi.org/10.1007/s10107-012-0557-4}},
+  journal = {Mathematical Programming, Ser.\ B}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Rossa_2012">3</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;L. Rossa and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
@@ -793,7 +824,7 @@ A.&nbsp;L. Rossa and A.&nbsp;L.&nbsp;G.&nbsp;A. Coutinho.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Oliveira_2012">2</a>]
+[<a name="Oliveira_2012">4</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
@@ -823,7 +854,7 @@ S.&nbsp;Oliveira, A.-M. Toader, and P.&nbsp;Vieira.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Trepanier_2012">3</a>]
+[<a name="Trepanier_2012">5</a>]
 </td>
 <td class="bibtexitem">
 P.-Y. Tr&eacute;panier, I.&nbsp;Fortin, C.&nbsp;Lambert, and F.&nbsp;Lacroix.
@@ -854,7 +885,7 @@ P.-Y. Tr&eacute;panier, I.&nbsp;Fortin, C.&nbsp;Lambert, and F.&nbsp;Lacroix.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Clarno_2012">4</a>]
+[<a name="Clarno_2012">6</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;T. Clarno et&nbsp;al.
@@ -881,7 +912,7 @@ K.&nbsp;T. Clarno et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Amaziane_2012">5</a>]
+[<a name="Amaziane_2012">7</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;Amaziane, M.&nbsp;Jurak, and A.&nbsp;Keko.
@@ -914,7 +945,7 @@ B.&nbsp;Amaziane, M.&nbsp;Jurak, and A.&nbsp;Keko.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gaston_2012">6</a>]
+[<a name="Gaston_2012">8</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Gaston, L.&nbsp;Guo, G.&nbsp;Hansen, H.&nbsp;Huang, R.&nbsp;Johnson, D.&nbsp;Knoll, C.&nbsp;Newman, H.&nbsp;K.
@@ -947,7 +978,7 @@ D.&nbsp;Gaston, L.&nbsp;Guo, G.&nbsp;Hansen, H.&nbsp;Huang, R.&nbsp;Johnson, D.&
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012c">7</a>]
+[<a name="Gerner_2012c">9</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner and K.&nbsp;Veroy.
@@ -972,7 +1003,7 @@ A.-L. Gerner and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012b">8</a>]
+[<a name="Gerner_2012b">10</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner, A.&nbsp;Reusken, and K.&nbsp;Veroy.
@@ -997,7 +1028,7 @@ A.-L. Gerner, A.&nbsp;Reusken, and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bauman_2012">9</a>]
+[<a name="Bauman_2012">11</a>]
 </td>
 <td class="bibtexitem">
 P.&nbsp;T. Bauman, J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, S.&nbsp;Prudhomme, and K.&nbsp;Ravi-Chandar.
@@ -1025,7 +1056,7 @@ P.&nbsp;T. Bauman, J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, S.&nbsp;Prudhomme, and
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Camata_2012">10</a>]
+[<a name="Camata_2012">12</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
@@ -1056,7 +1087,7 @@ J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Schulz_2012">11</a>]
+[<a name="Schulz_2012">13</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;W. Schulz, R.&nbsp;Ulerich, N.&nbsp;Malaya, P.&nbsp;T. Bauman, R.&nbsp;Stogner, and C.&nbsp;Simmons.
@@ -1084,7 +1115,7 @@ K.&nbsp;W. Schulz, R.&nbsp;Ulerich, N.&nbsp;Malaya, P.&nbsp;T. Bauman, R.&nbsp;S
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2012">12</a>]
+[<a name="Corsini_2012">14</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.&nbsp;G. Sheard.
@@ -1113,7 +1144,7 @@ A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2012">13</a>]
+[<a name="Zhu_2012">15</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -1143,7 +1174,7 @@ Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Akkoyun_2012">14</a>]
+[<a name="Akkoyun_2012">16</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Akkoyun et&nbsp;al.
@@ -1172,7 +1203,7 @@ S.&nbsp;Akkoyun et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2012">15</a>]
+[<a name="Mahadevan_2012">17</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
@@ -1200,7 +1231,7 @@ V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2012">16</a>]
+[<a name="Podgorney_2012">18</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
@@ -1230,7 +1261,7 @@ R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Slaughter_2012">17</a>]
+[<a name="Slaughter_2012">19</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;E. Slaughter and N.&nbsp;Zabaras.
@@ -1257,7 +1288,7 @@ A.&nbsp;E. Slaughter and N.&nbsp;Zabaras.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bordas_2012">18</a>]
+[<a name="Bordas_2012">20</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;M. Bordas, K.&nbsp;Gillow, D.&nbsp;Gavaghan, B.&nbsp;Rodriguez, and D.&nbsp;Kay.
@@ -1285,7 +1316,7 @@ R.&nbsp;M. Bordas, K.&nbsp;Gillow, D.&nbsp;Gavaghan, B.&nbsp;Rodriguez, and D.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hales_2012">19</a>]
+[<a name="Hales_2012">21</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston, and M.&nbsp;R. Tonks.
@@ -1314,7 +1345,7 @@ J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bassi_2012">20</a>]
+[<a name="Bassi_2012">22</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.&nbsp;Tesini.
@@ -1343,7 +1374,7 @@ F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Andrijauskas_2012">21</a>]
+[<a name="Andrijauskas_2012">23</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
@@ -1371,7 +1402,7 @@ T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Williamson_2012">22</a>]
+[<a name="Williamson_2012">24</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks, D.&nbsp;R. Gaston,
@@ -1399,7 +1430,7 @@ R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks,
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2012">23</a>]
+[<a name="Eftang_2012">25</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -1426,7 +1457,7 @@ J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012">24</a>]
+[<a name="Gerner_2012">26</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner and K.&nbsp;Veroy.
@@ -1457,7 +1488,7 @@ A.-L. Gerner and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brummelen_2012">25</a>]
+[<a name="Brummelen_2012">27</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
@@ -1486,7 +1517,7 @@ E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2012">26</a>]
+[<a name="Huynh_2012">28</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
