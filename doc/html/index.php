@@ -108,7 +108,7 @@ and <a href="http://augustine.mit.edu">MIT</a>.
 The <code>libMesh</code> <a href="http://libmesh.sf.net/developers.php">developers</a> welcome contributions
 in the form of patches and bug reports (preferably with a minimal test case that reliably reproduces the error)
 to the official <a href="http://sourceforge.net/mail/?group_id=71130">mailing lists</a>.
-Many thanks to <a href="http://sourceforge.net">SourceForge</a> and <a href="http://github.com">GitHub> for
+Many thanks to <a href="http://sourceforge.net">SourceForge</a> and <a href="http://github.com">GitHub</a> for
 <a href="http://github.com/libMesh">hosting the
 project</a>.  You can find out what is currently happening in the
 development branch by checking out the
