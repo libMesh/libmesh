@@ -129,9 +129,23 @@ void DifferentiableSystem::assemble ()
 
 void DifferentiableSystem::solve ()
 {
-  libmesh_assert(time_solver.get());
+  // Get the time solver object associated with the system, and tell it that
+  // we are not solving the adjoint problem
+  this->get_time_solver().set_is_adjoint(false);
+
   libmesh_assert_equal_to (&(time_solver->system()), this);
   time_solver->solve();
+}
+
+
+
+std::pair<unsigned int, Real> DifferentiableSystem::adjoint_solve (const QoISet& qoi_indices)
+{
+  // Get the time solver object associated with the system, and tell it that
+  // we are solving the adjoint problem
+  this->get_time_solver().set_is_adjoint(true);
+
+  return this->ImplicitSystem::adjoint_solve(qoi_indices);
 }
 
 

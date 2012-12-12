@@ -27,6 +27,7 @@
 #include "libmesh/diff_physics.h"
 #include "libmesh/diff_qoi.h"
 #include "libmesh/implicit_system.h"
+#include "libmesh/time_solver.h"
 
 // C++ includes
 
@@ -134,6 +135,12 @@ public:
   virtual void solve ();
 
   /**
+   * This function sets the _is_adjoint boolean member of TimeSolver to
+   * true and then calls the adjoint_solve in implicit system
+   */
+  virtual std::pair<unsigned int, Real> adjoint_solve (const QoISet& qoi_indices = QoISet());
+
+  /**
    * We don't allow systems to be attached to each other
    */
   virtual AutoPtr<DifferentiablePhysics> clone_physics()
@@ -184,6 +191,24 @@ public:
    * This must be instantiated by the user before solving!
    */
   AutoPtr<TimeSolver> time_solver;
+
+  /**
+   * Sets the time_solver
+   */
+  void set_time_solver(AutoPtr<TimeSolver> _time_solver)
+  {
+    time_solver = _time_solver;
+  }
+
+  /**
+   * Returns a pointer to the time solver attached to the calling system
+   */
+  TimeSolver& get_time_solver();
+
+  /**
+   * Non-const version of the above
+   */
+  const TimeSolver& get_time_solver() const;
 
   /**
    * For time-dependent problems, this is the amount delta t to advance the
@@ -283,6 +308,24 @@ protected:
    */
   virtual void init_data ();
 };
+
+// --------------------------------------------------------------
+// DifferentiableSystem inline methods
+inline
+  TimeSolver& DifferentiableSystem::get_time_solver() 
+{
+  libmesh_assert(time_solver.get());
+  libmesh_assert_equal_to (&(time_solver->system()), this);
+  return *time_solver;
+}
+
+inline
+ const TimeSolver& DifferentiableSystem::get_time_solver() const
+{
+  libmesh_assert(time_solver.get());
+  libmesh_assert_equal_to (&(time_solver->system()), this);
+  return *time_solver;
+}
 
 } // namespace libMesh
 

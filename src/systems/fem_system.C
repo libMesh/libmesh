@@ -642,6 +642,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 
 void FEMSystem::solve()
 {
+  // We are solving the primal problem
   Parent::solve();
 
   // On a moving mesh we want the mesh to reflect the new solution
@@ -898,6 +899,9 @@ AutoPtr<DiffContext> FEMSystem::build_context ()
   AutoPtr<DiffContext> ap(new FEMContext(*this));
 
   ap->set_deltat_pointer( &deltat );
+
+  // If we are solving the adjoint problem, tell that to the Context
+  ap->is_adjoint() = this->get_time_solver().is_adjoint();
 
   return ap;
 }
