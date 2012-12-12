@@ -36,7 +36,8 @@ all:: $(notdir $(target))
 # Production rules:  how to make the target - depends on library configuration
 $(notdir $(target)): $(objects)
 	@echo "Linking "$@"..."
-	@$(libmesh_CXX) $(libmesh_CXXFLAGS) $(objects) -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS) $(EXTERNAL_FLAGS)
+	@$(libmesh_LIBTOOL) --tag=CXX $(LIBTOOLFLAGS) --mode=link \
+	  $(libmesh_CXX) $(libmesh_CXXFLAGS) $(objects) -o $@ $(libmesh_LIBS) $(libmesh_LDFLAGS) $(EXTERNAL_FLAGS)
 
 
 # Useful rules.
@@ -45,13 +46,13 @@ dust:
 	@rm -f out*.m job_output.txt output.txt* *.gmv.* *.plt.* out*.xdr* out*.xda* PI* complete
 
 clean: dust
-	@rm -f $(objects) *.o
+	@rm -f $(objects) *.$(obj-suffix)
 
 clobber: clean 
 	@rm -f $(target)
 
 distclean: clean
-	@rm -f *.o
+	@rm -rf *.o .libs .depend
 
 echo:
 	@echo srcfiles = $(srcfiles)

@@ -24,7 +24,7 @@ exec_prefix         := @exec_prefix@
 libmesh_install_dir := $(prefix)
 
 # the libtool to use in these defined rules.
-#LIBTOOL ?= @prefix@/contrib/bin/libtool
+libmesh_LIBTOOL ?= @prefix@/contrib/bin/libtool
 
 ###############################################################################
 # the following lines will be replaced by the output 
@@ -101,7 +101,7 @@ endif
 # The file extension for object files.
 # foo.C is compiled to foo.$(obj-suffix)
 # We don't use this in the libMesh build system, but old application codes do.
-obj-suffix := @host@.$(METHOD).o
+obj-suffix := @host@.$(METHOD).lo
 
 
 # use libmesh-config to get configuration details
@@ -115,6 +115,8 @@ libmesh_CXXFLAGS := $(shell @exec_prefix@/bin/libmesh-config --cxxflags)
 libmesh_CFLAGS   := $(shell @exec_prefix@/bin/libmesh-config --cflags)
 libmesh_FFLAGS   := $(shell @exec_prefix@/bin/libmesh-config --fflags)
 libmesh_LIBS     := $(shell @exec_prefix@/bin/libmesh-config --libs)
+libmesh_shared   := $(shell $(libmesh_LIBTOOL) --config | grep build_libtool_libs | cut -d'=' -f2)
+libmesh_static   := $(shell $(libmesh_LIBTOOL) --config | grep build_old_libs | cut -d'=' -f2)
 
 
 ###############################################################################
@@ -125,7 +127,8 @@ libmesh_LIBS     := $(shell @exec_prefix@/bin/libmesh-config --libs)
 ##################################
 %.$(obj-suffix) : %.C
 	@echo "Compiling C++ (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_LIBTOOL) --tag=CXX $(LIBTOOLFLAGS) --mode=compile --quiet \
+	  $(libmesh_CXX) $(libmesh_CPPFLAGS) $(libmesh_CXXFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 
 
@@ -134,7 +137,8 @@ libmesh_LIBS     := $(shell @exec_prefix@/bin/libmesh-config --libs)
 ##################################
 %.$(obj-suffix) : %.c
 	@echo "Compiling C (in "$(mode)" mode) "$<"..."
-	@$(libmesh_CC) $(libmesh_CPPFLAGS) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_LIBTOOL) --tag=CC $(LIBTOOLFLAGS) --mode=compile --quiet \
+	  $(libmesh_CC) $(libmesh_CPPFLAGS) $(libmesh_CFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 
 
@@ -143,13 +147,18 @@ libmesh_LIBS     := $(shell @exec_prefix@/bin/libmesh-config --libs)
 ##################################
 %.$(obj-suffix) : %.f
 	@echo "Compiling Fortan (in "$(mode)" mode) "$<"..."
-	@$(libmesh_F77) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_LIBTOOL) --tag=F77 $(LIBTOOLFLAGS) --mode=compile --quiet \
+	  $(libmesh_F77) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 %.$(obj-suffix) : %.f90
 	@echo "Compiling Fortan90 (in "$(mode)" mode) "$<"..."
-	@$(libmesh_F90) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
+	@$(libmesh_LIBTOOL) --tag=FC $(LIBTOOLFLAGS) --mode=compile --quiet \
+	  $(libmesh_F90) $(libmesh_FFLAGS) $(libmesh_INCLUDE) -c $< -o $@
 
 
+echo_libmode:
+	echo "libmesh_shared=$(libmesh_shared)"
+	echo "libmesh_static=$(libmesh_static)"
 
 # Local Variables:
 # mode: makefile
