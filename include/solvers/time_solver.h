@@ -197,6 +197,20 @@ public:
    */
   void set_solution_history(const SolutionHistory & _solution_history);
 
+  /**
+   * Accessor for querying whether we need to do a primal
+   * or adjoint solve
+   */
+  bool is_adjoint() const
+  { return _is_adjoint; }
+
+  /**
+   * Accessor for setting whether we need to do a primal
+   * or adjoint solve
+   */
+  void set_is_adjoint(bool _is_adjoint_value)
+  { _is_adjoint = _is_adjoint_value; }
+  
 protected:
 
   /**
@@ -231,6 +245,15 @@ protected:
    * different kind of SolutionHistory in the application
    */
   AutoPtr<SolutionHistory> solution_history;
+
+ private:
+
+  /**
+   * This boolean tells the TimeSolver whether we are solving a primal or
+   * adjoint problem
+   */
+  bool _is_adjoint;
+
 };
 
 
