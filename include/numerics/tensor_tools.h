@@ -133,8 +133,10 @@ namespace libMesh
     template <typename T>
     struct DecrementRank
     {
-      // The default case is typically an error...
-      typedef bool type;
+      // The default case is typically an error, but for simpler
+      // templated code we need it to be compatible with Number
+      // operations...
+      typedef T type;
     };
     
     template <typename T>
