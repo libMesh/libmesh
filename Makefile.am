@@ -434,4 +434,5 @@ run_examples:
 #
 # support top-level 'make test_headers'
 test_headers:
+	@$(MAKE) -C $(top_builddir)/include/libmesh
 	@cd $(top_builddir)/include && $(MAKE) test_headers
