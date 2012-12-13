@@ -12,7 +12,8 @@
   CPPUNIT_TEST( testValidProcId ); \
   CPPUNIT_TEST( testInvalidateProcId ); \
   CPPUNIT_TEST( testSetNSystems ); \
-  CPPUNIT_TEST( testSetNVariableGroups );
+  CPPUNIT_TEST( testSetNVariableGroups ); \
+  CPPUNIT_TEST( testJensEftangBug );
 
 using namespace libMesh;
 
@@ -118,6 +119,13 @@ public:
 	for (unsigned int vg=0; vg<3; vg++)
 	  CPPUNIT_ASSERT_EQUAL( nvpg[vg], aobject.n_vars(s,vg) );
       }
+  }
+
+  void testJensEftangBug()
+  {
+    libmesh_here();
+    DofObject aobject(*instance);    
+    libmesh_here();
   }
 };
 

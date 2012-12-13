@@ -3,7 +3,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
 AM_CFLAGS    = $(libmesh_CFLAGS)
 AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
-               $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS)
+               $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS) \
+	       -D__LIBMESH_IS_UNIT_TESTING__
 LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 
 unit_tests_sources = \
