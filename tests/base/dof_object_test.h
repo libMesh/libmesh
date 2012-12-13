@@ -124,8 +124,35 @@ public:
   void testJensEftangBug()
   {
     libmesh_here();
+    std::cout << "Debugging DofObject buffer\n"
+	      << " https://sourceforge.net/mailarchive/forum.php?thread_name=50C8EE7C.8090405%40gmail.com&forum_name=libmesh-users\n";
+
     DofObject aobject(*instance);    
-    libmesh_here();
+    unsigned int buf0[] = {2, 8, 257, 0, 257, 96, 257, 192, 257, 0};
+    aobject.set_buffer(std::vector<unsigned int>(buf0, buf0+10));
+    aobject.debug_buffer();
+    std::cout << "aobject.dof_number(0,0,0)=" << aobject.dof_number(0,0,0) << '\n'
+	      << "aobject.dof_number(0,1,0)=" << aobject.dof_number(0,1,0) << '\n'
+	      << "aobject.dof_number(0,2,0)=" << aobject.dof_number(0,2,0) << '\n'
+	      << "aobject.dof_number(1,0,0)=" << aobject.dof_number(1,0,0) << '\n';
+
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), (unsigned int)   0);
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,1,0), (unsigned int)  96);
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,2,0), (unsigned int) 192);
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(1,0,0), (unsigned int)   0);
+
+    unsigned int buf1[] = {2, 8, 257, 1, 257, 97, 257, 193, 257, 1};
+    aobject.set_buffer(std::vector<unsigned int>(buf1, buf1+10));
+    aobject.debug_buffer();
+    std::cout << "aobject.dof_number(0,0,0)=" << aobject.dof_number(0,0,0) << '\n'
+	      << "aobject.dof_number(0,1,0)=" << aobject.dof_number(0,1,0) << '\n'
+	      << "aobject.dof_number(0,2,0)=" << aobject.dof_number(0,2,0) << '\n'
+	      << "aobject.dof_number(1,0,0)=" << aobject.dof_number(1,0,0) << '\n';
+
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), (unsigned int)   1);
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,1,0), (unsigned int)  97);
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,2,0), (unsigned int) 193);
+    CPPUNIT_ASSERT_EQUAL (aobject.dof_number(1,0,0), (unsigned int)   1);
   }
 };
 

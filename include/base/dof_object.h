@@ -446,6 +446,13 @@ private:
    * The ending index for system \p s.
    */
   unsigned int end_idx(const unsigned int s) const;
+
+  // methods only available for unit testing
+#ifdef __LIBMESH_IS_UNIT_TESTING__
+public:
+  void set_buffer (const std::vector<unsigned int> &buf)
+  { _idx_buf = buf; }
+#endif
 };
 
 
