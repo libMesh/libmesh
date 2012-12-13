@@ -33,13 +33,15 @@ if LIBMESH_OPT_MODE
 endif
 
 # our GLIBC debugging preprocessor flags break this.
-# if LIBMESH_DBG_MODE
-#   check_PROGRAMS         += unit_tests-dbg
-#   unit_tests_dbg_SOURCES  = $(unit_tests_sources)
-#   unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
-#   unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
-#   unit_tests_dbg_LDADD    = $(top_builddir)/libmesh_dbg.la
-# endif
+if !LIBMESH_ENABLE_GCC_DEBUGGING
+if LIBMESH_DBG_MODE
+  check_PROGRAMS         += unit_tests-dbg
+  unit_tests_dbg_SOURCES  = $(unit_tests_sources)
+  unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+  unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+  unit_tests_dbg_LDADD    = $(top_builddir)/libmesh_dbg.la
+endif
+endif
 
 if LIBMESH_DEVEL_MODE
   check_PROGRAMS           += unit_tests-devel

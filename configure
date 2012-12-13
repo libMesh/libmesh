@@ -863,6 +863,8 @@ libmesh_CFLAGS
 libmesh_CXXFLAGS
 libmesh_CPPFLAGS
 METHODS
+LIBMESH_ENABLE_GCC_DEBUGGING_FALSE
+LIBMESH_ENABLE_GCC_DEBUGGING_TRUE
 ac_ct_F77
 FFLAGS
 F77
@@ -986,6 +988,7 @@ with_cc
 enable_fortran
 with_fc
 with_f77
+enable_gcc_debugging
 with_methods
 enable_static
 enable_shared
@@ -1731,6 +1734,8 @@ Optional Features:
   --disable-dependency-tracking
                           speeds up one-time build
   --enable-fortran        build with Fortran language support
+  --enable-gcc-debugging  add -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC to
+                          CXXFLAGS_DBG (yes by default)
   --enable-static[=PKGS]  build static libraries [default=no]
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -6293,6 +6298,32 @@ $as_echo ">>> Disabling Fortran language support per user request <<<" >&6; }
   # interferes with OProfile callgraphs
   OPROFILE_FLAGS="-g -fno-omit-frame-pointer"
 
+
+
+  # in the case blocks below we may add GCC-specific pedantic debugging preprocessor
+  # definitions. however, allow the knowing user to preclude that if they need to.
+  # Check whether --enable-gcc-debugging was given.
+if test "${enable_gcc_debugging+set}" = set; then :
+  enableval=$enable_gcc_debugging; case "${enableval}" in
+	   yes)  enablegccdebugging=yes ;;
+	    no)  enablegccdebugging=no ;;
+ 	     *)  as_fn_error $? "bad value ${enableval} for --enable-gcc-debugging" "$LINENO" 5 ;;
+	  esac
+else
+  enablegccdebugging=yes
+fi
+
+
+   if test x$enablegccdebugging = xyes; then
+  LIBMESH_ENABLE_GCC_DEBUGGING_TRUE=
+  LIBMESH_ENABLE_GCC_DEBUGGING_FALSE='#'
+else
+  LIBMESH_ENABLE_GCC_DEBUGGING_TRUE='#'
+  LIBMESH_ENABLE_GCC_DEBUGGING_FALSE=
+fi
+
+
+
   # First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
@@ -6345,7 +6376,7 @@ $as_echo ">>> Disabling Fortran language support per user request <<<" >&6; }
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
 
-         if test `uname` != "Darwin" ; then
+         if (test "x$enablegccdebugging" = "xyes" -a `uname` != "Darwin"); then
            CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
          fi
 	 ;;
@@ -6355,7 +6386,7 @@ $as_echo ">>> Disabling Fortran language support per user request <<<" >&6; }
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
 
-         if test `uname` != "Darwin" ; then
+         if (test "x$enablegccdebugging" = "xyes" -a `uname` != "Darwin"); then
 	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
 	 fi
   	 ;;
@@ -32214,6 +32245,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_GCC_DEBUGGING_TRUE}" && test -z "${LIBMESH_ENABLE_GCC_DEBUGGING_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_GCC_DEBUGGING\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_OPT_MODE_TRUE}" && test -z "${LIBMESH_OPT_MODE_FALSE}"; then
