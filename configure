@@ -863,8 +863,8 @@ libmesh_CFLAGS
 libmesh_CXXFLAGS
 libmesh_CPPFLAGS
 METHODS
-LIBMESH_ENABLE_GCC_DEBUGGING_FALSE
-LIBMESH_ENABLE_GCC_DEBUGGING_TRUE
+LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE
+LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE
 ac_ct_F77
 FFLAGS
 F77
@@ -988,7 +988,7 @@ with_cc
 enable_fortran
 with_fc
 with_f77
-enable_gcc_debugging
+enable_glibcxx_debugging
 with_methods
 enable_static
 enable_shared
@@ -1734,7 +1734,8 @@ Optional Features:
   --disable-dependency-tracking
                           speeds up one-time build
   --enable-fortran        build with Fortran language support
-  --enable-gcc-debugging  add -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC to
+  --enable-glibcxx-debugging
+                          add -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC to
                           CXXFLAGS_DBG (yes by default)
   --enable-static[=PKGS]  build static libraries [default=no]
   --enable-shared[=PKGS]  build shared libraries [default=yes]
@@ -6300,26 +6301,26 @@ $as_echo ">>> Disabling Fortran language support per user request <<<" >&6; }
 
 
 
-  # in the case blocks below we may add GCC-specific pedantic debugging preprocessor
+  # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
   # definitions. however, allow the knowing user to preclude that if they need to.
-  # Check whether --enable-gcc-debugging was given.
-if test "${enable_gcc_debugging+set}" = set; then :
-  enableval=$enable_gcc_debugging; case "${enableval}" in
-	   yes)  enablegccdebugging=yes ;;
-	    no)  enablegccdebugging=no ;;
- 	     *)  as_fn_error $? "bad value ${enableval} for --enable-gcc-debugging" "$LINENO" 5 ;;
+  # Check whether --enable-glibcxx-debugging was given.
+if test "${enable_glibcxx_debugging+set}" = set; then :
+  enableval=$enable_glibcxx_debugging; case "${enableval}" in
+	   yes)  enableglibcxxdebugging=yes ;;
+	    no)  enableglibcxxdebugging=no ;;
+ 	     *)  as_fn_error $? "bad value ${enableval} for --enable-glibcxx-debugging" "$LINENO" 5 ;;
 	  esac
 else
-  enablegccdebugging=yes
+  enableglibcxxdebugging=yes
 fi
 
 
-   if test x$enablegccdebugging = xyes; then
-  LIBMESH_ENABLE_GCC_DEBUGGING_TRUE=
-  LIBMESH_ENABLE_GCC_DEBUGGING_FALSE='#'
+   if test x$enableglibcxxdebugging = xyes; then
+  LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE=
+  LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE='#'
 else
-  LIBMESH_ENABLE_GCC_DEBUGGING_TRUE='#'
-  LIBMESH_ENABLE_GCC_DEBUGGING_FALSE=
+  LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE='#'
+  LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE=
 fi
 
 
@@ -32247,8 +32248,8 @@ if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${LIBMESH_ENABLE_GCC_DEBUGGING_TRUE}" && test -z "${LIBMESH_ENABLE_GCC_DEBUGGING_FALSE}"; then
-  as_fn_error $? "conditional \"LIBMESH_ENABLE_GCC_DEBUGGING\" was never defined.
+if test -z "${LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE}" && test -z "${LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_GLIBCXX_DEBUGGING\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_OPT_MODE_TRUE}" && test -z "${LIBMESH_OPT_MODE_FALSE}"; then

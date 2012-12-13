@@ -55,7 +55,7 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 @LIBMESH_OPT_MODE_TRUE@am__append_1 = unit_tests-opt
 
 # our GLIBC debugging preprocessor flags break this.
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GCC_DEBUGGING_FALSE@am__append_2 = unit_tests-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__append_2 = unit_tests-dbg
 @LIBMESH_DEVEL_MODE_TRUE@am__append_3 = unit_tests-devel
 @LIBMESH_PROF_MODE_TRUE@am__append_4 = unit_tests-prof
 @LIBMESH_OPROF_MODE_TRUE@am__append_5 = unit_tests-oprof
@@ -102,7 +102,7 @@ CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_OPT_MODE_TRUE@am__EXEEXT_1 = unit_tests-opt$(EXEEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GCC_DEBUGGING_FALSE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
 @LIBMESH_DEVEL_MODE_TRUE@am__EXEEXT_3 = unit_tests-devel$(EXEEXT)
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
@@ -124,9 +124,9 @@ am__objects_1 = unit_tests_dbg-driver.$(OBJEXT) \
 	numerics/unit_tests_dbg-trilinos_epetra_vector_test.$(OBJEXT) \
 	parallel/unit_tests_dbg-parallel_test.$(OBJEXT) \
 	quadrature/unit_tests_dbg-quadrature_test.$(OBJEXT)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GCC_DEBUGGING_FALSE@am_unit_tests_dbg_OBJECTS = $(am__objects_1)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@am_unit_tests_dbg_OBJECTS = $(am__objects_1)
 unit_tests_dbg_OBJECTS = $(am_unit_tests_dbg_OBJECTS)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GCC_DEBUGGING_FALSE@unit_tests_dbg_DEPENDENCIES = $(top_builddir)/libmesh_dbg.la
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_DEPENDENCIES = $(top_builddir)/libmesh_dbg.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -615,10 +615,10 @@ unit_tests_sources = \
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
 @LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GCC_DEBUGGING_FALSE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GCC_DEBUGGING_FALSE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GCC_DEBUGGING_FALSE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GCC_DEBUGGING_FALSE@unit_tests_dbg_LDADD = $(top_builddir)/libmesh_dbg.la
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE@unit_tests_dbg_LDADD = $(top_builddir)/libmesh_dbg.la
 @LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_SOURCES = $(unit_tests_sources)
 @LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
 @LIBMESH_DEVEL_MODE_TRUE@unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)

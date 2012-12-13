@@ -33,7 +33,7 @@ if LIBMESH_OPT_MODE
 endif
 
 # our GLIBC debugging preprocessor flags break this.
-if !LIBMESH_ENABLE_GCC_DEBUGGING
+if !LIBMESH_ENABLE_GLIBCXX_DEBUGGING
 if LIBMESH_DBG_MODE
   check_PROGRAMS         += unit_tests-dbg
   unit_tests_dbg_SOURCES  = $(unit_tests_sources)

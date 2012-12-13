@@ -509,19 +509,19 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 
   
   
-  # in the case blocks below we may add GCC-specific pedantic debugging preprocessor
+  # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
   # definitions. however, allow the knowing user to preclude that if they need to.
-  AC_ARG_ENABLE(gcc-debugging,
-	 [AC_HELP_STRING([--enable-gcc-debugging],
+  AC_ARG_ENABLE(glibcxx-debugging,
+	 [AC_HELP_STRING([--enable-glibcxx-debugging],
 	                 [add -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC to CXXFLAGS_DBG (yes by default)])],
 	 [case "${enableval}" in
-	   yes)  enablegccdebugging=yes ;;
-	    no)  enablegccdebugging=no ;;
- 	     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gcc-debugging) ;;
+	   yes)  enableglibcxxdebugging=yes ;;
+	    no)  enableglibcxxdebugging=no ;;
+ 	     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging) ;;
 	  esac],
-	[enablegccdebugging=yes])
+	[enableglibcxxdebugging=yes])
 	
-  AM_CONDITIONAL(LIBMESH_ENABLE_GCC_DEBUGGING, test x$enablegccdebugging = xyes)
+  AM_CONDITIONAL(LIBMESH_ENABLE_GLIBCXX_DEBUGGING, test x$enableglibcxxdebugging = xyes)
 
 	
   # First the flags for gcc compilers
