@@ -573,7 +573,7 @@ AM_CXXFLAGS = $(libmesh_CXXFLAGS)
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
                $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS) \
-	       -D__LIBMESH_IS_UNIT_TESTING__
+	       -DLIBMESH_IS_UNIT_TESTING
 
 unit_tests_sources = \
 	driver.C \

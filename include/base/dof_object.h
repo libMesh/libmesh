@@ -67,7 +67,6 @@ public:
 
   /**
    * Copy-constructor.
-
    */
   DofObject (const DofObject&);
 
@@ -448,7 +447,7 @@ private:
   unsigned int end_idx(const unsigned int s) const;
 
   // methods only available for unit testing
-#ifdef __LIBMESH_IS_UNIT_TESTING__
+#ifdef LIBMESH_IS_UNIT_TESTING
 public:
   void set_buffer (const std::vector<unsigned int> &buf)
   { _idx_buf = buf; }
