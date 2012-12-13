@@ -67,7 +67,6 @@ public:
 
   /**
    * Copy-constructor.
-
    */
   DofObject (const DofObject&);
 
@@ -446,6 +445,13 @@ private:
    * The ending index for system \p s.
    */
   unsigned int end_idx(const unsigned int s) const;
+
+  // methods only available for unit testing
+#ifdef LIBMESH_IS_UNIT_TESTING
+public:
+  void set_buffer (const std::vector<unsigned int> &buf)
+  { _idx_buf = buf; }
+#endif
 };
 
 
