@@ -120,15 +120,19 @@ void Sphere::create_from_center_radius (const Point& c, const Real r)
 
 bool Sphere::intersects (const Sphere& other_sphere) const
 {
+  return distance(other_sphere) < 0 ? true : false;
+}
+
+
+
+Real Sphere::distance (const Sphere& other_sphere) const
+{
   libmesh_assert_greater ( this->radius(), 0. );
   libmesh_assert_greater ( other_sphere.radius(), 0. );
 
   const Real distance = (this->center() - other_sphere.center()).size();
 
-  if (distance < (this->radius() + other_sphere.radius()) )
-    return true;
-
-  return false;
+  return distance - (this->radius() + other_sphere.radius());
 }
 
 

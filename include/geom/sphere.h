@@ -113,6 +113,12 @@ public:
   bool intersects (const Sphere& other_sphere) const;
 
   /**
+   * @returns the distance between the surface of this sphere and
+   * another sphere.
+   */
+  Real distance (const Sphere& other_sphere) const;
+
+  /**
    * @returns true if the point p is above the surface,
    * false otherwise.
    */
