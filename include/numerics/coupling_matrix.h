@@ -17,8 +17,8 @@
 
 
 
-#ifndef __coupling_matrix_h__
-#define __coupling_matrix_h__
+#ifndef LIBMESH_COUPLING_MATRIX_H
+#define LIBMESH_COUPLING_MATRIX_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -181,4 +181,4 @@ bool CouplingMatrix::empty() const
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_COUPLING_MATRIX_H

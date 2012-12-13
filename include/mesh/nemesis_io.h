@@ -17,8 +17,8 @@
 
 
 
-#ifndef __nemesis_io_h__
-#define __nemesis_io_h__
+#ifndef LIBMESH_NEMESIS_IO_H
+#define LIBMESH_NEMESIS_IO_H
 
 
 // Local includes
@@ -118,4 +118,4 @@ private:
 } // namespace libMesh
 
 
-#endif // #ifndef __nemesis_io_h__
+#endif // LIBMESH_NEMESIS_IO_H

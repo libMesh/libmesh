@@ -17,8 +17,8 @@
 
 
 
-#ifndef __parallel_conversion_utils_h__
-#define __parallel_conversion_utils_h__
+#ifndef LIBMESH_PARALLEL_CONVERSION_UTILS_H
+#define LIBMESH_PARALLEL_CONVERSION_UTILS_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -111,4 +111,4 @@ namespace Parallel {
 
 } // namespace libMesh
 
-#endif // #define __parallel_conversion_utils_h__
+#endif // LIBMESH_PARALLEL_CONVERSION_UTILS_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tensor_value_h__
-#define __tensor_value_h__
+#ifndef LIBMESH_TENSOR_VALUE_H
+#define LIBMESH_TENSOR_VALUE_H
 
 // Local includes
 #include "libmesh/type_tensor.h"
@@ -272,4 +272,4 @@ TensorValue<T>::TensorValue (const TypeTensor<Real>& p_re,
 
 } // namespace libMesh
 
-#endif // #define __tensor_value_h__
+#endif // LIBMESH_TENSOR_VALUE_H

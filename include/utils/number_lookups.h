@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
 
 
-#ifndef __number_lookups_h__
-#define __number_lookups_h__
+#ifndef LIBMESH_NUMBER_LOOKUPS_H
+#define LIBMESH_NUMBER_LOOKUPS_H
 
 namespace libMesh
 {
@@ -33,4 +33,4 @@ extern const unsigned char cube_number_page[];
 
 } // namespace libMesh
 
-#endif // ifndef __number_lookups_h__
+#endif // LIBMESH_NUMBER_LOOKUPS_H

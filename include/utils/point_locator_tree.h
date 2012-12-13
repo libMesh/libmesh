@@ -17,8 +17,8 @@
 
 
 
-#ifndef __point_locator_tree_h__
-#define __point_locator_tree_h__
+#ifndef LIBMESH_POINT_LOCATOR_TREE_H
+#define LIBMESH_POINT_LOCATOR_TREE_H
 
 // Local Includes
 #include "libmesh/point_locator_base.h"
@@ -161,6 +161,6 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_POINT_LOCATOR_TREE_H
 
 

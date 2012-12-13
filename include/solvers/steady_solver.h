@@ -1,4 +1,3 @@
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
@@ -18,8 +17,8 @@
 
 
 
-#ifndef __steady_solver_h__
-#define __steady_solver_h__
+#ifndef LIBMESH_STEADY_SOLVER_H
+#define LIBMESH_STEADY_SOLVER_H
 
 // Local includes
 #include "libmesh/time_solver.h"
@@ -111,4 +110,4 @@ public:
 } // namespace libMesh
 
 
-#endif // #define __steady_solver_h__
+#endif // LIBMESH_STEADY_SOLVER_H

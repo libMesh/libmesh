@@ -17,8 +17,8 @@
 
 
 
-#ifndef __libmesh_base_h__
-#define __libmesh_base_h__
+#ifndef LIBMESH_LIBMESH_BASE_H
+#define LIBMESH_LIBMESH_BASE_H
 
 
 namespace libMesh {
@@ -117,4 +117,4 @@ using namespace libMesh;
 #endif
 
 
-#endif // #define __libmesh_base_h__
+#endif // LIBMESH_LIBMESH_BASE_H

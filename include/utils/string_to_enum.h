@@ -17,8 +17,8 @@
 
 
 
-#ifndef __string_to_enum_h__
-#define __string_to_enum_h__
+#ifndef LIBMESH_STRING_TO_ENUM_H
+#define LIBMESH_STRING_TO_ENUM_H
 
 
 
@@ -57,7 +57,7 @@ namespace Utility {
 } // namespace libMesh
 
 
-#endif // #define __string_to_enum_h__
+#endif // LIBMESH_STRING_TO_ENUM_H
 
 
 

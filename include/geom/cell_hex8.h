@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_hex8_h__
-#define __cell_hex8_h__
+#ifndef LIBMESH_CELL_HEX8_H
+#define LIBMESH_CELL_HEX8_H
 
 // Local includes
 #include "libmesh/cell_hex.h"
@@ -197,4 +197,4 @@ Hex8::Hex8(Elem* p) :
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_CELL_HEX8_H

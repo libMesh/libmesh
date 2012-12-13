@@ -17,8 +17,8 @@
 
 
 
-#ifndef __sparse_matrix_h__
-#define __sparse_matrix_h__
+#ifndef LIBMESH_SPARSE_MATRIX_H
+#define LIBMESH_SPARSE_MATRIX_H
 
 
 // Local includes
@@ -437,4 +437,4 @@ std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m)
 } // namespace libMesh
 
 
-#endif // #ifndef __sparse_matrix_h__
+#endif // LIBMESH_SPARSE_MATRIX_H

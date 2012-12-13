@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __mesh_serializer_h__
-#define __mesh_serializer_h__
+#ifndef LIBMESH_MESH_SERIALIZER_H
+#define LIBMESH_MESH_SERIALIZER_H
 
 // Local includes
 
@@ -49,4 +49,4 @@ namespace libMesh
 
 } // namespace libMesh
 
-#endif // __mesh_serializer_h__
+#endif // LIBMESH_MESH_SERIALIZER_H

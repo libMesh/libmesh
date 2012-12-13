@@ -17,8 +17,8 @@
 
 
 
-#ifndef __parmetis_partitioner_h__
-#define __parmetis_partitioner_h__
+#ifndef LIBMESH_PARMETIS_PARTITIONER_H
+#define LIBMESH_PARMETIS_PARTITIONER_H
 
 // Local Includes -----------------------------------
 #include "libmesh/partitioner.h"
@@ -137,4 +137,4 @@ private:
 
 
 
-#endif // #define __parmetis_partitioner_h__
+#endif // LIBMESH_PARMETIS_PARTITIONER_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __petsc_diff_solver_h__
-#define __petsc_diff_solver_h__
+#ifndef LIBMESH_PETSC_DIFF_SOLVER_H
+#define LIBMESH_PETSC_DIFF_SOLVER_H
 
 #include "libmesh/libmesh_common.h"
 
@@ -105,4 +105,4 @@ protected:
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
 
-#endif // #define __petsc_diff_solver_h__
+#endif // LIBMESH_PETSC_DIFF_SOLVER_H

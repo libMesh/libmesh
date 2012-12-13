@@ -17,8 +17,8 @@
 
 
 
-#ifndef __id_types_h__
-#define __id_types_h__
+#ifndef LIBMESH_ID_TYPES_H
+#define LIBMESH_ID_TYPES_H
 
 #include <limits>
 #include <stdint.h>
@@ -67,4 +67,4 @@ typedef int16_t boundary_id_type;
 
 } // namespace libMesh
 
-#endif // end #ifndef __id_types_h__
+#endif // LIBMESH_ID_TYPES_H

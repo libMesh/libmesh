@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_tet_h__
-#define __cell_tet_h__
+#ifndef LIBMESH_CELL_TET_H
+#define LIBMESH_CELL_TET_H
 
 // Local includes
 #include "libmesh/cell.h"
@@ -170,4 +170,4 @@ Tet::Tet(const unsigned int nn, Elem* p, Node** nodelinkdata) :
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_CELL_TET_H

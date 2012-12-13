@@ -17,8 +17,8 @@
 
 
 
-#ifndef __reference_counted_object_h__
-#define __reference_counted_object_h__
+#ifndef LIBMESH_REFERENCE_COUNTED_OBJECT_H
+#define LIBMESH_REFERENCE_COUNTED_OBJECT_H
 
 // Local includes
 #include "libmesh/reference_counter.h"
@@ -119,7 +119,7 @@ private:
 } // namespace libMesh
 
 
-#endif // end #ifndef __reference_counted_object_h__
+#endif // LIBMESH_REFERENCE_COUNTED_OBJECT_H
 
 
 

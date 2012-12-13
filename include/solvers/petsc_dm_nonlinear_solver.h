@@ -17,8 +17,8 @@
 
 
 
-#ifndef __petsc_dm_nonlinear_solver_h__
-#define __petsc_dm_nonlinear_solver_h__
+#ifndef LIBMESH_PETSC_DM_NONLINEAR_SOLVER_H
+#define LIBMESH_PETSC_DM_NONLINEAR_SOLVER_H
 
 #include "libmesh/petsc_macro.h"
 
@@ -98,4 +98,4 @@ public:
 
 
 #endif // #if !PETSC_VERSION_LESS_THAN(3,3,0)
-#endif // #ifdef __petsc_dm_nonlinear_solver_h__
+#endif // LIBMESH_PETSC_DM_NONLINEAR_SOLVER_H

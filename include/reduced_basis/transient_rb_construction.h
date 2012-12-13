@@ -17,8 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __transient_rb_construction_h__
-#define __transient_rb_construction_h__
+#ifndef LIBMESH_TRANSIENT_RB_CONSTRUCTION_H
+#define LIBMESH_TRANSIENT_RB_CONSTRUCTION_H
 
 // rbOOmit includes
 #include "libmesh/rb_construction.h"
@@ -398,4 +398,4 @@ private:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_TRANSIENT_RB_CONSTRUCTION_H

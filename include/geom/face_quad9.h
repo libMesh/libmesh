@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quad9_h__
-#define __quad9_h__
+#ifndef LIBMESH_FACE_QUAD9_H
+#define LIBMESH_FACE_QUAD9_H
 
 
 // Local includes
@@ -205,4 +205,4 @@ protected:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_FACE_QUAD9_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_io_package_h__
-#define __enum_io_package_h__
+#ifndef LIBMESH_ENUM_IO_PACKAGE_H
+#define LIBMESH_ENUM_IO_PACKAGE_H
 
 /*
  * The \p libMeshEnums namespace is the namespace all \p enum definitions
@@ -51,7 +51,7 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // #define __enum_io_package_h__
+#endif // LIBMESH_ENUM_IO_PACKAGE_H
 
 
 

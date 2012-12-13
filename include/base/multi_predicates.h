@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __multi_predicates_h__
-#define __multi_predicates_h__
+#ifndef LIBMESH_MULTI_PREDICATES_H
+#define LIBMESH_MULTI_PREDICATES_H
 
 // Local includes
 #include "libmesh/libmesh_base.h" // for libMesh::processor_id()
@@ -459,4 +459,4 @@ namespace Predicates
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_MULTI_PREDICATES_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __parameter_vector_h__
-#define __parameter_vector_h__
+#ifndef LIBMESH_PARAMETER_VECTOR_H
+#define LIBMESH_PARAMETER_VECTOR_H
 
 
 // Local Includes -----------------------------------
@@ -158,4 +158,4 @@ Number*& ParameterVector::operator[] (unsigned int i)
 
 } // namespace libMesh
 
-#endif // #define __parameter_vector_h__
+#endif // LIBMESH_PARAMETER_VECTOR_H

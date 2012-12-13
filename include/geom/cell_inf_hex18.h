@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_inf_hex18_h__
-#define __cell_inf_hex18_h__
+#ifndef LIBMESH_CELL_INF_HEX18_H
+#define LIBMESH_CELL_INF_HEX18_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -255,4 +255,4 @@ InfHex18::InfHex18(Elem* p) :
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
-#endif
+#endif // LIBMESH_CELL_INF_HEX18_H

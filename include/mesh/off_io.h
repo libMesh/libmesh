@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __off_io_h__
-#define __off_io_h__
+#ifndef LIBMESH_OFF_IO_H
+#define LIBMESH_OFF_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -77,4 +77,4 @@ OFFIO::OFFIO (MeshBase& mesh) :
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_OFF_IO_H

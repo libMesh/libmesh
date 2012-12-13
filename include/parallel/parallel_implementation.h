@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __parallel_implementation_h__
-#define __parallel_implementation_h__
+#ifndef LIBMESH_PARALLEL_IMPLEMENTATION_H
+#define LIBMESH_PARALLEL_IMPLEMENTATION_H
 
 // Local includes
 #include "parallel.h"
@@ -3119,4 +3119,4 @@ inline void Communicator::broadcast (T &, const unsigned int root_id) const
 
 } // namespace libMesh
 
-#endif // #define __parallel_h__
+#endif // LIBMESH_PARALLEL_IMPLEMENTATION_H

@@ -17,8 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_theta_h__
-#define __rb_theta_h__
+#ifndef LIBMESH_RB_THETA_H
+#define LIBMESH_RB_THETA_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -68,4 +68,4 @@ public:
 
 }
 
-#endif
+#endif // LIBMESH_RB_THETA_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fro_io_h__
-#define __fro_io_h__
+#ifndef LIBMESH_FRO_IO_H
+#define LIBMESH_FRO_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -78,4 +78,4 @@ FroIO::FroIO (const MeshBase& mesh) :
 } // namespace libMesh
 
 
-#endif // #define __fro_io_h__
+#endif // LIBMESH_FRO_IO_H

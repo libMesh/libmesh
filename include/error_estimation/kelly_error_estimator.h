@@ -17,8 +17,8 @@
 
 
 
-#ifndef __kelly_error_estimator_h__
-#define __kelly_error_estimator_h__
+#ifndef LIBMESH_KELLY_ERROR_ESTIMATOR_H
+#define LIBMESH_KELLY_ERROR_ESTIMATOR_H
 
 // Local Includes
 #include "libmesh/jump_error_estimator.h"
@@ -122,5 +122,5 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_KELLY_ERROR_ESTIMATOR_H
 

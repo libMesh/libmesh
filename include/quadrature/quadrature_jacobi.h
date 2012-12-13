@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_jacobi_h__
-#define __quadrature_jacobi_h__
+#ifndef LIBMESH_QUADRATURE_JACOBI_H
+#define LIBMESH_QUADRATURE_JACOBI_H
 
 // Local includes
 #include "libmesh/quadrature.h"
@@ -126,4 +126,4 @@ QuadratureType QJacobi::type() const
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_QUADRATURE_JACOBI_H

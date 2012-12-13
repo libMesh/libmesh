@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __centroid_partitioner_h__
-#define __centroid_partitioner_h__
+#ifndef LIBMESH_CENTROID_PARTITIONER_H
+#define LIBMESH_CENTROID_PARTITIONER_H
 
 // Local includes
 #include "libmesh/partitioner.h"
@@ -163,4 +163,4 @@ private:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_CENTROID_PARTITIONER_H

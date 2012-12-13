@@ -17,8 +17,8 @@
 
 
 
-#ifndef __system_subset_h__
-#define __system_subset_h__
+#ifndef LIBMESH_SYSTEM_SUBSET_H
+#define LIBMESH_SYSTEM_SUBSET_H
 
 // Local Includes
 #include "libmesh/reference_counted_object.h"
@@ -98,5 +98,5 @@ private:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_SYSTEM_SUBSET_H
 

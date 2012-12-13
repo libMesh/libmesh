@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_function_h__
-#define __mesh_function_h__
+#ifndef LIBMESH_MESH_FUNCTION_H
+#define LIBMESH_MESH_FUNCTION_H
 
 // Local Includes
 #include "libmesh/function_base.h"
@@ -257,5 +257,5 @@ protected:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_MESH_FUNCTION_H
 

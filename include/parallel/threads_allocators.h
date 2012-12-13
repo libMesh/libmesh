@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __threads_allocators_h__
-#define __threads_allocators_h__
+#ifndef LIBMESH_THREADS_ALLOCATORS_H
+#define LIBMESH_THREADS_ALLOCATORS_H
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -125,4 +125,4 @@ namespace Threads
 
 } // namespace libMesh
 
-#endif // #define __threads_allocators_h__
+#endif // LIBMESH_THREADS_ALLOCATORS_H

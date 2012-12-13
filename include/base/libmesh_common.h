@@ -17,8 +17,8 @@
 
 
 
-#ifndef __libmesh_common_h__
-#define __libmesh_common_h__
+#ifndef LIBMESH_LIBMESH_COMMON_H
+#define LIBMESH_LIBMESH_COMMON_H
 
 
 // The library configuration options
@@ -384,4 +384,4 @@ template<class T> inline void libmesh_ignore( const T& ) { }
 } // namespace libMesh
 
 
-#endif // #define __libmesh_common_h__
+#endif // LIBMESH_LIBMESH_COMMON_H

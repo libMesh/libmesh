@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __variable_h__
-#define __variable_h__
+#ifndef LIBMESH_VARIABLE_H
+#define LIBMESH_VARIABLE_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -246,4 +246,4 @@ protected:
   
 } // namespace libMesh
 
-#endif // #define __variable_h__
+#endif // LIBMESH_VARIABLE_H

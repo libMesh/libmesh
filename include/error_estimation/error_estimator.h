@@ -17,8 +17,8 @@
 
 
 
-#ifndef __error_estimator_h__
-#define __error_estimator_h__
+#ifndef LIBMESH_ERROR_ESTIMATOR_H
+#define LIBMESH_ERROR_ESTIMATOR_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -151,5 +151,5 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_ERROR_ESTIMATOR_H
 

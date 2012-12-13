@@ -18,8 +18,8 @@
 
 
 
-#ifndef __diff_qoi_h__
-#define __diff_qoi_h__
+#ifndef LIBMESH_DIFF_QOI_H
+#define LIBMESH_DIFF_QOI_H
 
 // Local Includes
 #include "libmesh/diff_context.h"
@@ -174,4 +174,4 @@ public:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_DIFF_QOI_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __exact_error_estimator_h__
-#define __exact_error_estimator_h__
+#ifndef LIBMESH_EXACT_ERROR_ESTIMATOR_H
+#define LIBMESH_EXACT_ERROR_ESTIMATOR_H
 
 // Local Includes
 #include "libmesh/error_estimator.h"
@@ -258,5 +258,5 @@ private:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_EXACT_ERROR_ESTIMATOR_H
 

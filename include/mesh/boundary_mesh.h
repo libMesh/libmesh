@@ -17,8 +17,8 @@
 
 
 
-#ifndef __boundary_mesh_h__
-#define __boundary_mesh_h__
+#ifndef LIBMESH_BOUNDARY_MESH_H
+#define LIBMESH_BOUNDARY_MESH_H
 
 // Local Includes -----------------------------------
 #include "libmesh/mesh.h"
@@ -61,4 +61,4 @@ class BoundaryMesh : public Mesh
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_BOUNDARY_MESH_H

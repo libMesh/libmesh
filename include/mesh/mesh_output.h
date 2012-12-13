@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_output_h__
-#define __mesh_output_h__
+#ifndef LIBMESH_MESH_OUTPUT_H
+#define LIBMESH_MESH_OUTPUT_H
 
 
 // Local includes
@@ -271,4 +271,4 @@ unsigned int & MeshOutput<MT>::ascii_precision ()
 } // namespace libMesh
 
 
-#endif // #define __mesh_io_h__
+#endif // LIBMESH_MESH_OUTPUT_H

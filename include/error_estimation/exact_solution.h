@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __exact_solution_h__
-#define __exact_solution_h__
+#ifndef LIBMESH_EXACT_SOLUTION_H
+#define LIBMESH_EXACT_SOLUTION_H
 
 
 // Local Includes
@@ -323,4 +323,4 @@ private:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_EXACT_SOLUTION_H

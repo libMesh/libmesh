@@ -17,8 +17,8 @@
 
 
 
-#ifndef __transient_system_h__
-#define __transient_system_h__
+#ifndef LIBMESH_TRANSIENT_SYSTEM_H
+#define LIBMESH_TRANSIENT_SYSTEM_H
 
 // Local Includes
 #include "libmesh/system.h"
@@ -172,4 +172,4 @@ std::string TransientSystem<Base>::system_type () const
 
 
 
-#endif
+#endif // LIBMESH_TRANSIENT_SYSTEM_H

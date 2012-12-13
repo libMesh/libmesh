@@ -17,8 +17,8 @@
 
 
 
-#ifndef __nonlinear_solver_h__
-#define __nonlinear_solver_h__
+#ifndef LIBMESH_NONLINEAR_SOLVER_H
+#define LIBMESH_NONLINEAR_SOLVER_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -351,4 +351,4 @@ NonlinearSolver<T>::~NonlinearSolver ()
 } // namespace libMesh
 
 
-#endif // #ifdef __solver_h__
+#endif // LIBMESH_NONLINEAR_SOLVER_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __edge_inf_edge2_h__
-#define __edge_inf_edge2_h__
+#ifndef LIBMESH_EDGE_INF_EDGE2_H
+#define LIBMESH_EDGE_INF_EDGE2_H
 
 #include "libmesh/libmesh_common.h"
 
@@ -173,4 +173,4 @@ Point InfEdge2::origin () const
 
 #endif
 
-#endif
+#endif // LIBMESH_EDGE_INF_EDGE2_H

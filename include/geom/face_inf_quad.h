@@ -17,8 +17,8 @@
 
 
 
-#ifndef __face_inf_quad_h__
-#define __face_inf_quad_h__
+#ifndef LIBMESH_FACE_INF_QUAD_H
+#define LIBMESH_FACE_INF_QUAD_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -212,7 +212,7 @@ Point InfQuad::origin () const
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-#endif
+#endif // LIBMESH_FACE_INF_QUAD_H
 
 
 

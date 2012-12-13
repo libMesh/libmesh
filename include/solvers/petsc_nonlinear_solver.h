@@ -17,8 +17,8 @@
 
 
 
-#ifndef __petsc_nonlinear_solver_h__
-#define __petsc_nonlinear_solver_h__
+#ifndef LIBMESH_PETSC_NONLINEAR_SOLVER_H
+#define LIBMESH_PETSC_NONLINEAR_SOLVER_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -170,4 +170,4 @@ public:
 
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
-#endif // #ifdef __petsc_nonlinear_solver_h__
+#endif // LIBMESH_PETSC_NONLINEAR_SOLVER_H

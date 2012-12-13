@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tecplot_io_h__
-#define __tecplot_io_h__
+#ifndef LIBMESH_TECPLOT_IO_H
+#define LIBMESH_TECPLOT_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -130,4 +130,4 @@ bool & TecplotIO::binary ()
 } // namespace libMesh
 
 
-#endif // #define __tecplot_io_h__
+#endif // LIBMESH_TECPLOT_IO_H
