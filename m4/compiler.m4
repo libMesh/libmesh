@@ -507,6 +507,23 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # interferes with OProfile callgraphs
   OPROFILE_FLAGS="-g -fno-omit-frame-pointer"
 
+  
+  
+  # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
+  # definitions. however, allow the knowing user to preclude that if they need to.
+  AC_ARG_ENABLE(glibcxx-debugging,
+	 [AC_HELP_STRING([--enable-glibcxx-debugging],
+	                 [add -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC to CXXFLAGS_DBG (yes by default)])],
+	 [case "${enableval}" in
+	   yes)  enableglibcxxdebugging=yes ;;
+	    no)  enableglibcxxdebugging=no ;;
+ 	     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging) ;;
+	  esac],
+	[enableglibcxxdebugging=yes])
+	
+  AM_CONDITIONAL(LIBMESH_ENABLE_GLIBCXX_DEBUGGING, test x$enableglibcxxdebugging = xyes)
+
+	
   # First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
@@ -540,7 +557,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           ;;
     esac
   
-  
+    
     case "$GXX_VERSION" in
       # - after gcc2.95, some flags were deemed obsolete for C++
       #   (and are only supported for C any more), so only define them for
@@ -559,7 +576,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
 	 
-         if test `uname` != "Darwin" ; then
+         if (test "x$enablegccdebugging" = "xyes" -a `uname` != "Darwin"); then
            CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
          fi
 	 ;;
@@ -569,7 +586,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
          
-         if test `uname` != "Darwin" ; then
+         if (test "x$enablegccdebugging" = "xyes" -a `uname` != "Darwin"); then
 	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"	
 	 fi
   	 ;;
