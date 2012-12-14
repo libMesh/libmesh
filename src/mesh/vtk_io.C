@@ -315,8 +315,16 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 			// loop over variables
 			for(unsigned int j=0;j<n_vars;++j){
 
-				if (sys.variable_type(j).family == MONOMIAL) { 
-					continue;
+				if (sys.variable_type(j).family == MONOMIAL) {
+				  libmesh_do_once(
+						  libMesh::err 
+						  << "WARNING: skipping MONOMIAL variable in VTK\n"
+						  << "as they are presently unsuppoted.\n\n"
+						  << "please contact \n\n"
+						  << LIBMESH_PACKAGE_BUGREPORT
+						  << "\n\nif you need this support added\n";
+						  );
+				  continue;
 				}
 
 				std::string name = sys.variable_name(j);
