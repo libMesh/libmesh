@@ -27869,6 +27869,37 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 		CPPFLAGS=$tmpCPPFLAGS
+	elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
+		MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
+		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+		tmpCPPFLAGS=$CPPFLAGS
+
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+if test "x$ac_cv_header_mpi_h" = xyes; then :
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
+$as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
+fi
+
+
+		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS=$tmpCPPFLAGS
 	else
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
 $as_echo "Could not find MPI header <mpi.h>..." >&6; }
@@ -28356,6 +28387,37 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 		CPPFLAGS=$tmpCPPFLAGS
+	elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
+		MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
+		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+		tmpCPPFLAGS=$CPPFLAGS
+
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+		ac_fn_cxx_check_header_mongrel "$LINENO" "mpi.h" "ac_cv_header_mpi_h" "$ac_includes_default"
+if test "x$ac_cv_header_mpi_h" = xyes; then :
+
+$as_echo "#define HAVE_MPI 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not compile in the MPI headers..." >&5
+$as_echo "Could not compile in the MPI headers..." >&6; }; enablempi=no
+fi
+
+
+		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+		ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+		CPPFLAGS=$tmpCPPFLAGS
 	else
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find MPI header <mpi.h>..." >&5
 $as_echo "Could not find MPI header <mpi.h>..." >&6; }
@@ -28403,6 +28465,10 @@ fi
     fi
   fi
 
+if (test $enablempi != no) ; then
+  libmesh_optional_INCLUDES="$MPI_INCLUDES_PATHS $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$MPI_LIBS_PATHS $MPI_LIBS $libmesh_optional_LIBS"
+fi
 if (test $enablepetsc != no) ; then
   libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"

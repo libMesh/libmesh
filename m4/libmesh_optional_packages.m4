@@ -53,6 +53,10 @@ AC_CONFIG_FILES([contrib/boost/include/Makefile])
 # Petsc -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_PETSC
+if (test $enablempi != no) ; then
+  libmesh_optional_INCLUDES="$MPI_INCLUDES_PATHS $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$MPI_LIBS_PATHS $MPI_LIBS $libmesh_optional_LIBS"
+fi
 if (test $enablepetsc != no) ; then
   libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
