@@ -315,6 +315,10 @@ void VTKIO::solution_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& gri
 			// loop over variables
 			for(unsigned int j=0;j<n_vars;++j){
 
+				if (sys.variable_type(j).family == MONOMIAL) { 
+					continue;
+				}
+
 				std::string name = sys.variable_name(j);
 
 				vtkDoubleArray *data = vtkDoubleArray::New();
