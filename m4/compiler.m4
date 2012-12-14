@@ -576,7 +576,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
 	 
-         if (test "x$enablegccdebugging" = "xyes" -a `uname` != "Darwin"); then
+         if (test "x$enableglibcxxdebugging" = "xyes" -a `uname` != "Darwin"); then
            CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
          fi
 	 ;;
@@ -586,7 +586,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
          
-         if (test "x$enablegccdebugging" = "xyes" -a `uname` != "Darwin"); then
+         if (test "x$enableglibcxxdebugging" = "xyes" -a `uname` != "Darwin"); then
 	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"	
 	 fi
   	 ;;
