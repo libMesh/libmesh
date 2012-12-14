@@ -163,6 +163,19 @@ if (test "x$MPI_IMPL" != x) ; then
 		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
 		AC_LANG_RESTORE
 		CPPFLAGS=$tmpCPPFLAGS
+	elif test -e $MPI_INCLUDES_PATH/mpi/mpi.h; then
+		MPI_INCLUDES_PATH=$MPI_INCLUDES_PATH/mpi
+		echo "note: using $MPI_INCLUDES_PATH/mpi.h"
+		tmpCPPFLAGS=$CPPFLAGS
+		AC_LANG_SAVE
+		AC_LANG_CPLUSPLUS
+		CPPFLAGS="-I$MPI_INCLUDES_PATH $CPPFLAGS"
+		AC_CHECK_HEADER([mpi.h],
+			        [AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])],
+			        [AC_MSG_RESULT([Could not compile in the MPI headers...]); enablempi=no] )
+		MPI_INCLUDES_PATHS="-I$MPI_INCLUDES_PATH"
+		AC_LANG_RESTORE
+		CPPFLAGS=$tmpCPPFLAGS
 	else
 		AC_MSG_RESULT([Could not find MPI header <mpi.h>...])
                 enablempi=no
