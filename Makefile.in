@@ -418,14 +418,15 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/system_subset_by_subdomain.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
-	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/location_maps.C src/utils/meshfree_interpolation.C \
+	src/utils/number_lookups.C src/utils/o_f_stream.C \
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/base/libmesh_dbg_la-dof_map_constraints.lo \
@@ -794,6 +795,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/utils/libmesh_dbg_la-hashword.lo \
 	src/utils/libmesh_dbg_la-libmesh_version.lo \
 	src/utils/libmesh_dbg_la-location_maps.lo \
+	src/utils/libmesh_dbg_la-meshfree_interpolation.lo \
 	src/utils/libmesh_dbg_la-number_lookups.lo \
 	src/utils/libmesh_dbg_la-o_f_stream.lo \
 	src/utils/libmesh_dbg_la-perf_log.lo \
@@ -1064,14 +1066,15 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/system_subset_by_subdomain.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
-	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/location_maps.C src/utils/meshfree_interpolation.C \
+	src/utils/number_lookups.C src/utils/o_f_stream.C \
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/base/libmesh_devel_la-dof_map_constraints.lo \
 	src/base/libmesh_devel_la-dof_object.lo \
@@ -1439,6 +1442,7 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/utils/libmesh_devel_la-hashword.lo \
 	src/utils/libmesh_devel_la-libmesh_version.lo \
 	src/utils/libmesh_devel_la-location_maps.lo \
+	src/utils/libmesh_devel_la-meshfree_interpolation.lo \
 	src/utils/libmesh_devel_la-number_lookups.lo \
 	src/utils/libmesh_devel_la-o_f_stream.lo \
 	src/utils/libmesh_devel_la-perf_log.lo \
@@ -1706,14 +1710,15 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/system_subset_by_subdomain.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
-	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/location_maps.C src/utils/meshfree_interpolation.C \
+	src/utils/number_lookups.C src/utils/o_f_stream.C \
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/base/libmesh_oprof_la-dof_map_constraints.lo \
 	src/base/libmesh_oprof_la-dof_object.lo \
@@ -2081,6 +2086,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/utils/libmesh_oprof_la-hashword.lo \
 	src/utils/libmesh_oprof_la-libmesh_version.lo \
 	src/utils/libmesh_oprof_la-location_maps.lo \
+	src/utils/libmesh_oprof_la-meshfree_interpolation.lo \
 	src/utils/libmesh_oprof_la-number_lookups.lo \
 	src/utils/libmesh_oprof_la-o_f_stream.lo \
 	src/utils/libmesh_oprof_la-perf_log.lo \
@@ -2348,14 +2354,15 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/system_subset_by_subdomain.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
-	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/location_maps.C src/utils/meshfree_interpolation.C \
+	src/utils/number_lookups.C src/utils/o_f_stream.C \
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/base/libmesh_opt_la-dof_map_constraints.lo \
 	src/base/libmesh_opt_la-dof_object.lo \
@@ -2723,6 +2730,7 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/utils/libmesh_opt_la-hashword.lo \
 	src/utils/libmesh_opt_la-libmesh_version.lo \
 	src/utils/libmesh_opt_la-location_maps.lo \
+	src/utils/libmesh_opt_la-meshfree_interpolation.lo \
 	src/utils/libmesh_opt_la-number_lookups.lo \
 	src/utils/libmesh_opt_la-o_f_stream.lo \
 	src/utils/libmesh_opt_la-perf_log.lo \
@@ -2989,14 +2997,15 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/system_subset_by_subdomain.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
-	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/location_maps.C src/utils/meshfree_interpolation.C \
+	src/utils/number_lookups.C src/utils/o_f_stream.C \
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/base/libmesh_prof_la-dof_map_constraints.lo \
 	src/base/libmesh_prof_la-dof_object.lo \
@@ -3364,6 +3373,7 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/utils/libmesh_prof_la-hashword.lo \
 	src/utils/libmesh_prof_la-libmesh_version.lo \
 	src/utils/libmesh_prof_la-location_maps.lo \
+	src/utils/libmesh_prof_la-meshfree_interpolation.lo \
 	src/utils/libmesh_prof_la-number_lookups.lo \
 	src/utils/libmesh_prof_la-o_f_stream.lo \
 	src/utils/libmesh_prof_la-perf_log.lo \
@@ -4477,6 +4487,7 @@ libmesh_SOURCES = \
         src/utils/hashword.C \
         src/utils/libmesh_version.C \
         src/utils/location_maps.C \
+        src/utils/meshfree_interpolation.C \
         src/utils/number_lookups.C \
         src/utils/o_f_stream.C \
         src/utils/perf_log.C \
@@ -5744,6 +5755,8 @@ src/utils/libmesh_dbg_la-libmesh_version.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-location_maps.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_dbg_la-meshfree_interpolation.lo:  \
+	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-number_lookups.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-o_f_stream.lo: src/utils/$(am__dirstamp) \
@@ -6669,6 +6682,8 @@ src/utils/libmesh_devel_la-hashword.lo: src/utils/$(am__dirstamp) \
 src/utils/libmesh_devel_la-libmesh_version.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_devel_la-location_maps.lo:  \
+	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_devel_la-meshfree_interpolation.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_devel_la-number_lookups.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
@@ -7596,6 +7611,8 @@ src/utils/libmesh_oprof_la-libmesh_version.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-location_maps.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_oprof_la-meshfree_interpolation.lo:  \
+	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-number_lookups.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-o_f_stream.lo: src/utils/$(am__dirstamp) \
@@ -8519,6 +8536,8 @@ src/utils/libmesh_opt_la-libmesh_version.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_opt_la-location_maps.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_opt_la-meshfree_interpolation.lo:  \
+	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_opt_la-number_lookups.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_opt_la-o_f_stream.lo: src/utils/$(am__dirstamp) \
@@ -9443,6 +9462,8 @@ src/utils/libmesh_prof_la-libmesh_version.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-location_maps.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
+src/utils/libmesh_prof_la-meshfree_interpolation.lo:  \
+	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-number_lookups.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-o_f_stream.lo: src/utils/$(am__dirstamp) \
@@ -11651,6 +11672,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-hashword.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-location_maps.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-meshfree_interpolation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-number_lookups.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-perf_log.Plo@am__quote@
@@ -11671,6 +11693,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-hashword.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-location_maps.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-meshfree_interpolation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-number_lookups.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-perf_log.Plo@am__quote@
@@ -11691,6 +11714,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-hashword.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-location_maps.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-meshfree_interpolation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-number_lookups.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-perf_log.Plo@am__quote@
@@ -11711,6 +11735,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-hashword.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-location_maps.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-meshfree_interpolation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-number_lookups.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-perf_log.Plo@am__quote@
@@ -11731,6 +11756,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-hashword.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-location_maps.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-meshfree_interpolation.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-number_lookups.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-perf_log.Plo@am__quote@
@@ -14333,6 +14359,13 @@ src/utils/libmesh_dbg_la-location_maps.lo: src/utils/location_maps.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/location_maps.C' object='src/utils/libmesh_dbg_la-location_maps.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_dbg_la-location_maps.lo `test -f 'src/utils/location_maps.C' || echo '$(srcdir)/'`src/utils/location_maps.C
+
+src/utils/libmesh_dbg_la-meshfree_interpolation.lo: src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_dbg_la-meshfree_interpolation.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_dbg_la-meshfree_interpolation.Tpo -c -o src/utils/libmesh_dbg_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_dbg_la-meshfree_interpolation.Tpo src/utils/$(DEPDIR)/libmesh_dbg_la-meshfree_interpolation.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/meshfree_interpolation.C' object='src/utils/libmesh_dbg_la-meshfree_interpolation.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_dbg_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
 
 src/utils/libmesh_dbg_la-number_lookups.lo: src/utils/number_lookups.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_dbg_la-number_lookups.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_dbg_la-number_lookups.Tpo -c -o src/utils/libmesh_dbg_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C
@@ -17008,6 +17041,13 @@ src/utils/libmesh_devel_la-location_maps.lo: src/utils/location_maps.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_devel_la-location_maps.lo `test -f 'src/utils/location_maps.C' || echo '$(srcdir)/'`src/utils/location_maps.C
 
+src/utils/libmesh_devel_la-meshfree_interpolation.lo: src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_devel_la-meshfree_interpolation.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_devel_la-meshfree_interpolation.Tpo -c -o src/utils/libmesh_devel_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_devel_la-meshfree_interpolation.Tpo src/utils/$(DEPDIR)/libmesh_devel_la-meshfree_interpolation.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/meshfree_interpolation.C' object='src/utils/libmesh_devel_la-meshfree_interpolation.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_devel_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
+
 src/utils/libmesh_devel_la-number_lookups.lo: src/utils/number_lookups.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_devel_la-number_lookups.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_devel_la-number_lookups.Tpo -c -o src/utils/libmesh_devel_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_devel_la-number_lookups.Tpo src/utils/$(DEPDIR)/libmesh_devel_la-number_lookups.Plo
@@ -19681,6 +19721,13 @@ src/utils/libmesh_oprof_la-location_maps.lo: src/utils/location_maps.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/location_maps.C' object='src/utils/libmesh_oprof_la-location_maps.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_oprof_la-location_maps.lo `test -f 'src/utils/location_maps.C' || echo '$(srcdir)/'`src/utils/location_maps.C
+
+src/utils/libmesh_oprof_la-meshfree_interpolation.lo: src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_oprof_la-meshfree_interpolation.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_oprof_la-meshfree_interpolation.Tpo -c -o src/utils/libmesh_oprof_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_oprof_la-meshfree_interpolation.Tpo src/utils/$(DEPDIR)/libmesh_oprof_la-meshfree_interpolation.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/meshfree_interpolation.C' object='src/utils/libmesh_oprof_la-meshfree_interpolation.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_oprof_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
 
 src/utils/libmesh_oprof_la-number_lookups.lo: src/utils/number_lookups.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_oprof_la-number_lookups.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_oprof_la-number_lookups.Tpo -c -o src/utils/libmesh_oprof_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C
@@ -22356,6 +22403,13 @@ src/utils/libmesh_opt_la-location_maps.lo: src/utils/location_maps.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_opt_la-location_maps.lo `test -f 'src/utils/location_maps.C' || echo '$(srcdir)/'`src/utils/location_maps.C
 
+src/utils/libmesh_opt_la-meshfree_interpolation.lo: src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_opt_la-meshfree_interpolation.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_opt_la-meshfree_interpolation.Tpo -c -o src/utils/libmesh_opt_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_opt_la-meshfree_interpolation.Tpo src/utils/$(DEPDIR)/libmesh_opt_la-meshfree_interpolation.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/meshfree_interpolation.C' object='src/utils/libmesh_opt_la-meshfree_interpolation.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_opt_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
+
 src/utils/libmesh_opt_la-number_lookups.lo: src/utils/number_lookups.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_opt_la-number_lookups.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_opt_la-number_lookups.Tpo -c -o src/utils/libmesh_opt_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_opt_la-number_lookups.Tpo src/utils/$(DEPDIR)/libmesh_opt_la-number_lookups.Plo
@@ -25029,6 +25083,13 @@ src/utils/libmesh_prof_la-location_maps.lo: src/utils/location_maps.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/location_maps.C' object='src/utils/libmesh_prof_la-location_maps.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_prof_la-location_maps.lo `test -f 'src/utils/location_maps.C' || echo '$(srcdir)/'`src/utils/location_maps.C
+
+src/utils/libmesh_prof_la-meshfree_interpolation.lo: src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_prof_la-meshfree_interpolation.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_prof_la-meshfree_interpolation.Tpo -c -o src/utils/libmesh_prof_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_prof_la-meshfree_interpolation.Tpo src/utils/$(DEPDIR)/libmesh_prof_la-meshfree_interpolation.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/meshfree_interpolation.C' object='src/utils/libmesh_prof_la-meshfree_interpolation.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_prof_la-meshfree_interpolation.lo `test -f 'src/utils/meshfree_interpolation.C' || echo '$(srcdir)/'`src/utils/meshfree_interpolation.C
 
 src/utils/libmesh_prof_la-number_lookups.lo: src/utils/number_lookups.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_prof_la-number_lookups.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_prof_la-number_lookups.Tpo -c -o src/utils/libmesh_prof_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C

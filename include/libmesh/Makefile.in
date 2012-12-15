@@ -426,16 +426,15 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	boundary_info.h boundary_mesh.h diva_io.h ensight_io.h \
 	exodusII_io.h exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h \
 	gnuplot_io.h inf_elem_builder.h legacy_xdr_io.h matlab_io.h \
-	medit_io.h memory_solution_history.h mesh.h mesh_base.h \
-	mesh_communication.h mesh_data.h mesh_function.h \
-	mesh_generation.h mesh_input.h mesh_inserter_iterator.h \
-	mesh_modification.h mesh_output.h mesh_refinement.h \
-	mesh_serializer.h mesh_smoother.h mesh_smoother_laplace.h \
-	mesh_smoother_vsmoother.h mesh_tetgen_interface.h \
-	mesh_tetgen_wrapper.h mesh_tools.h mesh_triangle_holes.h \
-	mesh_triangle_interface.h mesh_triangle_wrapper.h nemesis_io.h \
-	nemesis_io_helper.h no_solution_history.h off_io.h \
-	parallel_mesh.h patch.h postscript_io.h serial_mesh.h \
+	medit_io.h mesh.h mesh_base.h mesh_communication.h mesh_data.h \
+	mesh_function.h mesh_generation.h mesh_input.h \
+	mesh_inserter_iterator.h mesh_modification.h mesh_output.h \
+	mesh_refinement.h mesh_serializer.h mesh_smoother.h \
+	mesh_smoother_laplace.h mesh_smoother_vsmoother.h \
+	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
+	mesh_triangle_holes.h mesh_triangle_interface.h \
+	mesh_triangle_wrapper.h nemesis_io.h nemesis_io_helper.h \
+	off_io.h parallel_mesh.h patch.h postscript_io.h serial_mesh.h \
 	tecplot_io.h tetgen_io.h ucd_io.h unstructured_mesh.h unv_io.h \
 	vtk_io.h xdr_head.h xdr_io.h xdr_mesh.h xdr_mgf.h xdr_mhead.h \
 	xdr_shead.h xdr_soln.h analytic_function.h \
@@ -476,7 +475,8 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	transient_rb_theta_expansion.h adaptive_time_solver.h \
 	diff_solver.h eigen_solver.h eigen_time_solver.h \
 	euler2_solver.h euler_solver.h laspack_linear_solver.h \
-	linear.h linear_solver.h newton_solver.h nonlinear_solver.h \
+	linear.h linear_solver.h memory_solution_history.h \
+	newton_solver.h no_solution_history.h nonlinear_solver.h \
 	petsc_diff_solver.h petsc_dm_nonlinear_solver.h \
 	petsc_linear_solver.h petsc_nonlinear_solver.h \
 	petscdmlibmesh.h slepc_eigen_solver.h slepc_macro.h \
@@ -493,14 +493,14 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	system_subset.h system_subset_by_subdomain.h \
 	transient_system.h compare_types.h error_vector.h hashword.h \
 	ignore_warnings.h location_maps.h mapvector.h \
-	null_output_iterator.h number_lookups.h o_f_stream.h \
-	o_string_stream.h ostream_proxy.h parameters.h perf_log.h \
-	perfmon.h plt_loader.h point_locator_base.h \
-	point_locator_list.h point_locator_tree.h pool_allocator.h \
-	restore_warnings.h statistics.h string_to_enum.h timestamp.h \
-	tree.h tree_base.h tree_node.h utility.h xdr_cxx.h \
-	parallel_communicator_specializations $(am__append_1) \
-	libmesh_config.h
+	meshfree_interpolation.h null_output_iterator.h \
+	number_lookups.h o_f_stream.h o_string_stream.h \
+	ostream_proxy.h parameters.h perf_log.h perfmon.h plt_loader.h \
+	point_locator_base.h point_locator_list.h point_locator_tree.h \
+	pool_allocator.h restore_warnings.h statistics.h \
+	string_to_enum.h timestamp.h tree.h tree_base.h tree_node.h \
+	utility.h xdr_cxx.h parallel_communicator_specializations \
+	$(am__append_1) libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) libmesh_config.h
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -1719,6 +1719,9 @@ location_maps.h: $(top_srcdir)/include/utils/location_maps.h
 
 mapvector.h: $(top_srcdir)/include/utils/mapvector.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/utils/mapvector.h mapvector.h
+
+meshfree_interpolation.h: $(top_srcdir)/include/utils/meshfree_interpolation.h
+	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/utils/meshfree_interpolation.h meshfree_interpolation.h
 
 null_output_iterator.h: $(top_srcdir)/include/utils/null_output_iterator.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/utils/null_output_iterator.h null_output_iterator.h
