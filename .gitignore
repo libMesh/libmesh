@@ -116,6 +116,12 @@ examples/adjoints/adjoints_ex3/out_clocktime.m
 examples/adjoints/adjoints_ex3/out_solvesteps.m
 examples/adjoints/adjoints_ex3/out_time.m
 examples/adjoints/adjoints_ex3/out_timesteps.m
+examples/eigenproblems/eigenproblems_ex1/out.e
+examples/eigenproblems/eigenproblems_ex2/out.e
+examples/eigenproblems/eigenproblems_ex3/drum1_evals.txt
+examples/eigenproblems/eigenproblems_ex3/drum1_evec.e
+examples/eigenproblems/eigenproblems_ex3/drum2_evals.txt
+examples/eigenproblems/eigenproblems_ex3/drum2_evec.e
 examples/ex10/saved_solution.xda.0000
 examples/ex2/eqn_sys.dat.0000
 examples/fem_system/fem_system_ex1/out_*.e
@@ -131,6 +137,9 @@ examples/introduction/introduction_ex4/out_2.e
 examples/introduction/introduction_ex4/out_3.e
 examples/introduction/introduction_ex5/exact_solution.C
 examples/introduction/introduction_ex5/out_0.e
+examples/miscellaneous/miscellaneous_ex1/eqn_sys.dat
+examples/miscellaneous/miscellaneous_ex1/ifems_added.e
+examples/miscellaneous/miscellaneous_ex1/orig_mesh.e
 examples/miscellaneous/miscellaneous_ex3/lshaped.xda
 examples/miscellaneous/miscellaneous_ex3/out.e
 examples/miscellaneous/miscellaneous_ex4/out.pvtu
@@ -149,6 +158,13 @@ examples/reduced_basis/reduced_basis_ex1/equation_systems.dat.0000
 examples/reduced_basis/reduced_basis_ex1/equation_systems.xda
 examples/reduced_basis/reduced_basis_ex1/equation_systems.xda.0000
 examples/reduced_basis/reduced_basis_ex1/offline_data/
+examples/reduced_basis/reduced_basis_ex2/RB_sol.e
+examples/reduced_basis/reduced_basis_ex2/bf0.e
+examples/reduced_basis/reduced_basis_ex2/rb_data/
+examples/reduced_basis/reduced_basis_ex2/scm_data/
+examples/reduced_basis/reduced_basis_ex3/RB_sol.e
+examples/reduced_basis/reduced_basis_ex3/bf0.e
+examples/reduced_basis/reduced_basis_ex3/offline_data/
 examples/reduced_basis/reduced_basis_ex4/RB_sol.e
 examples/reduced_basis/reduced_basis_ex4/eim_data/
 examples/reduced_basis/reduced_basis_ex4/equation_systems.dat
