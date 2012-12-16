@@ -13,6 +13,7 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -57,8 +58,8 @@ check_PROGRAMS = pointcloud_kdd_radius$(EXEEXT) \
 @LIBMESH_ENABLE_EIGEN_TRUE@am__append_1 = $(EIGEN_INCLUDE)
 @LIBMESH_ENABLE_EIGEN_TRUE@am__append_2 = matrix_example
 subdir = contrib/nanoflann
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/build-aux/depcomp COPYING
+DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(top_srcdir)/build-aux/depcomp COPYING
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -174,6 +175,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 am__tty_colors_dummy = \
@@ -466,6 +468,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = -I$(srcdir)/include $(am__append_1)
 AM_CFLAGS = 
 AM_CXXFLAGS = 
+noinst_HEADERS = include/nanoflann.hpp
 pointcloud_kdd_radius_SOURCES = examples/pointcloud_kdd_radius.cpp
 pointcloud_example_SOURCES = examples/pointcloud_example.cpp
 pointcloud_adaptor_example_SOURCES = examples/pointcloud_adaptor_example.cpp
@@ -783,7 +786,7 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
-all-am: Makefile
+all-am: Makefile $(HEADERS)
 installdirs:
 install: install-am
 install-exec: install-exec-am
