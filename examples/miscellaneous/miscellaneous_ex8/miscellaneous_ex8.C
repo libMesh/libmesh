@@ -26,8 +26,43 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/meshfree_interpolation.h"
 
+// C++ includes
+#include <cstdlib>
+
+
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
+
+
+void create_random_point_cloud (const unsigned int Npts,
+				std::vector<Point> &pts,
+				const Real max_range = 10)
+{
+  std::cout << "Generating "<< Npts << " point cloud...";
+  pts.resize(Npts);
+
+  for (size_t i=0;i<Npts;i++)
+    {
+      pts[i](0) = max_range * (std::rand() % 1000) / Real(1000);
+      pts[i](1) = max_range * (std::rand() % 1000) / Real(1000);
+      pts[i](2) = max_range * (std::rand() % 1000) / Real(1000);
+    }
+  std::cout << "done\n";
+}
+
+
+
+Real exact_solution (const Point &p)
+{
+  const Real
+    x = p(0),
+    y = p(1),
+    z = p(2);
+  
+  return (x*x*x   +
+	  y*y*y*y +
+	  z*z*z*z*z);
+}
 
 
 
@@ -36,9 +71,39 @@ int main(int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
   {
-    InverseDistanceInterpolation idi;
+    std::vector<Point>       tgt_pts;
+    std::vector<Real>        tgt_data;
+    std::vector<std::string> field_vars(1, std::string("u"));
+
+    InverseDistanceInterpolation<3> idi (/* power =        */ 2,
+					 /* n_interp_pts = */ 8,
+					 /* verbose =      */ true);
+
+    idi.set_field_variables (field_vars);
+
+    create_random_point_cloud (1e5,
+			       idi.get_source_points());
+
+    // Explicitly set the data values we will interpolate from
+    {
+      const std::vector<Point> &src_pts  (idi.get_source_points());
+      std::vector<Real>        &src_vals (idi.get_source_vals());
+      
+      src_vals.clear(); src_vals.reserve(src_pts.size());
+					  
+      for (std::vector<Point>::const_iterator pt_it=src_pts.begin();
+	   pt_it != src_pts.end(); ++pt_it)
+	src_vals.push_back (exact_solution (*pt_it));	
+    }
 
     std::cout << idi;
+
+    create_random_point_cloud (10,
+			       tgt_pts);
+
+    idi.interpolate_field_data (field_vars,
+				tgt_pts,
+				tgt_data);
   }
   return 0;
 }

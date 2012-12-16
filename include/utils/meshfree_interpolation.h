@@ -21,8 +21,13 @@
 #define LIBMESH_MESHFREE_INTERPOLATION_H
 
 // Local includes
+#include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/auto_ptr.h"
 #include "libmesh/point.h"
+#ifdef LIBMESH_HAVE_NANOFLANN
+#  include "libmesh/nanoflann.hpp"
+#endif
 
 // C++ includes
 #include <string>
@@ -70,11 +75,30 @@ public:
   virtual void clear();
 
   /**
-   * The numer of field variables.
+   * The number of field variables.
    */
   unsigned int n_field_variables () const 
   { return _names.size(); }
   
+  /**
+   * Defines the field variable(s) we are responsible for,
+   * and importantly their assumed ordering.
+   */
+  void set_field_variables (const std::vector<std::string> &names)
+  { _names = names; }
+  
+  /**
+   * @returns a writeable reference to the point list.
+   */
+  std::vector<Point> & get_source_points ()
+  { return _src_pts; }
+  
+  /**
+   * @returns a writeable reference to the point list.
+   */
+  std::vector<Real> & get_source_vals ()
+  { return _src_vals; }
+
   /**
    * Sets source data at specified points.
    */     
@@ -102,16 +126,153 @@ protected:
 /**
  * Inverse distance interplation.
  */
+template <unsigned int KDDim>
 class InverseDistanceInterpolation : public MeshfreeInterpolation
 {
+private:
+
+#ifdef LIBMESH_HAVE_NANOFLANN  
+  /**
+   * This class adapts list of libMesh \p Point types
+   * for use in a nanoflann KD-Tree. For more on the 
+   * basic idea see examples/pointcloud_adaptor_example.cpp
+   * in the nanoflann source tree.
+   */
+  template <unsigned int PLDim>
+  class PointListAdaptor
+  {    
+  private:
+    const std::vector<Point> &_pts;
+
+  public:
+    PointListAdaptor (const std::vector<Point> &pts) :
+      _pts(pts)
+    {}
+
+    /**
+     * libMesh \p Point coordinate type
+     */
+    typedef Real coord_t;
+
+    /**
+     * Must return the number of data points
+     */
+    inline size_t kdtree_get_point_count() const { return _pts.size(); }
+    
+    /**
+     * Returns the distance between the vector "p1[0:size-1]" 
+     * and the data point with index "idx_p2" stored in the class
+     */
+    inline coord_t kdtree_distance(const coord_t *p1, const size_t idx_p2, size_t size) const
+    {
+      libmesh_assert_equal_to (size, PLDim);
+      libmesh_assert_less (idx_p2, _pts.size());
+
+      const Point &p2(_pts[idx_p2]);
+
+      switch (size)
+	{
+	case 3:
+	  {
+	    const coord_t d0=p1[0] - p2(0);
+	    const coord_t d1=p1[1] - p2(1);
+	    const coord_t d2=p1[2] - p2(2);
+
+	    return d0*d0 + d1*d1 + d2*d2;
+	  }
+	 
+	case 2:
+	  {
+	    const coord_t d0=p1[0] - p2(0);
+	    const coord_t d1=p1[1] - p2(1);
+
+	    return d0*d0 + d1*d1;
+	  }
+	 
+	case 1:
+	  {
+	    const coord_t d0=p1[0] - p2(0);
+
+	    return d0*d0;
+	  }
+	 
+	default:
+	  libMesh::err << "ERROR: unknown size " << size << std::endl;
+	  libmesh_error();
+	}
+
+      return -1.;
+    }
+    
+    /**
+     * Returns the dim'th component of the idx'th point in the class:
+     * Since this is inlined and the "dim" argument is typically an immediate value, the
+     *  "if's" are actually solved at compile time.
+     */
+    inline coord_t kdtree_get_pt(const size_t idx, int dim) const
+    {
+      libmesh_assert_less (dim, (int) PLDim);
+      libmesh_assert_less (idx, _pts.size());
+      libmesh_assert_less (dim, 3);
+
+      const Point &p(_pts[idx]);
+
+      if (dim==0) return p(0);
+      if (dim==1) return p(1);
+      return p(2);
+    }
+    
+    /**
+     * Optional bounding-box computation: return false to default to a standard bbox computation loop.
+     * Return true if the BBOX was already computed by the class and returned in "bb" so it can be 
+     * avoided to redo it again. Look at bb.size() to find out the expected dimensionality 
+     * (e.g. 2 or 3 for point clouds)
+     */
+    template <class BBOX>
+    bool kdtree_get_bbox(BBOX & /* bb */) const { return false; }
+  };
+
+  PointListAdaptor<KDDim> _point_list_adaptor;
+
+  // template <int KDDIM>
+  // class KDTree : public KDTreeSingleIndexAdaptor<L2_Simple_Adaptor<num_t, PointListAdaptor >,
+  // 						 PointListAdaptor,
+  // 						 KDDIM>
+  // {
+  // };
+
+  typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<Real, PointListAdaptor<KDDim> >,
+					      PointListAdaptor<KDDim>, KDDim> kd_tree_t;
+
+  mutable AutoPtr<kd_tree_t> _kd_tree;
+
+#endif // LIBMESH_HAVE_NANOFLANN
+
+  /**
+   * Build & initialize the KD tree, if needed.
+   */
+  void construct_kd_tree ();
+
+  const unsigned int _power;
+  const unsigned int _n_interp_pts;
+  const bool _verbose;
+
 public:
+
   /**
    * Constructor. Takes the inverse distance power, 
    * which defaults to 2. 
    */
-  InverseDistanceInterpolation (const unsigned int power=2) :
+  InverseDistanceInterpolation (const unsigned int power        = 2,
+				const unsigned int n_interp_pts = 8,
+				const bool verbose              = false) :
     MeshfreeInterpolation(),
-    _power(power)
+#if LIBMESH_HAVE_NANOFLANN
+    _point_list_adaptor(_src_pts),
+#endif
+    _power(power),
+    _n_interp_pts(n_interp_pts),
+    _verbose(verbose)
   {}
   
   /**
@@ -122,8 +283,6 @@ public:
 				       const std::vector<Point>  &tgt_pts,
 				       std::vector<Number> &tgt_vals) const;
 
-private:
-  const unsigned int _power;
 };
 
 } // namespace libMesh

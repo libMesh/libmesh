@@ -21,6 +21,16 @@ fparser.hh: $(top_srcdir)/contrib/fparser/fparser.hh
 
 endif
 
+if LIBMESH_ENABLE_NANOFLANN
+
+nanoflann.hpp: $(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp
+	$(AM_V_GEN)$(LN_S) $(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp nanoflann.hpp
+
+  BUILT_SOURCES  += nanoflann.hpp
+  DISTCLEANFILES += nanoflann.hpp
+
+endif
+
 #
 # libmesh_config.h rule
 libmesh_config.h: $(top_builddir)/include/libmesh_config.h

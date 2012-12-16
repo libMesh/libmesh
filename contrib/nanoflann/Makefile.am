@@ -4,7 +4,11 @@ AM_CPPFLAGS  = -I$(srcdir)/include
 AM_CFLAGS    = 
 AM_CXXFLAGS  = 
 
-noinst_HEADERS = include/nanoflann.hpp
+# generally we do not install contributed headers, but 
+# for nanoflann we will because of its tight inlining
+# in InverseDistanceInterpolation and friends
+includedir      = $(prefix)/include/libmesh
+include_HEADERS = include/nanoflann.hpp
 
 ######################################################################
 #

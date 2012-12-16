@@ -68,6 +68,7 @@ src/*/.dirstamp
 
 include/libmesh/*.h
 include/libmesh/fparser.hh
+include/libmesh/nanoflann.hpp
 include/libmesh/parallel_communicator_specializations
 include/libmesh_config.h
 include/libmesh_config.h.tmp

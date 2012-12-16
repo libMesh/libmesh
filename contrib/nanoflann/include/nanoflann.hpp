@@ -357,7 +357,7 @@ namespace nanoflann
 		}
 
 		template <typename U, typename V>
-		inline DistanceType accum_dist(const U a, const V b, int dim) const
+		inline DistanceType accum_dist(const U a, const V b, int /* dim */) const
 		{
 			return (a-b)*(a-b);
 		}
@@ -408,7 +408,7 @@ namespace nanoflann
 	struct SearchParams
 	{
 		/** Note: The first argument (checks_IGNORED_) is ignored, but kept for compatibility with the FLANN interface */
-		SearchParams(int checks_IGNORED_ = 32, float eps_ = 0, bool sorted_ = true ) :
+	  SearchParams(int /* checks_IGNORED_ */ = 32, float eps_ = 0, bool sorted_ = true ) :
 			eps(eps_), sorted(sorted_) {}
 
 		int   checks;  //!< Ignored parameter (Kept for compatibility with the FLANN interface).
@@ -802,7 +802,7 @@ namespace nanoflann
 		 *  \sa radiusSearch, findNeighbors
 		 * \note nChecks_IGNORED is ignored but kept for compatibility with the original FLANN interface.
 		 */
-		inline void knnSearch(const ElementType *query_point, const size_t num_closest, IndexType *out_indices, DistanceType *out_distances_sq, const int nChecks_IGNORED = 10) const
+		inline void knnSearch(const ElementType *query_point, const size_t num_closest, IndexType *out_indices, DistanceType *out_distances_sq, const int /* nChecks_IGNORED */ = 10) const
 		{
 			nanoflann::KNNResultSet<DistanceType,IndexType> resultSet(num_closest);
 			resultSet.init(out_indices, out_distances_sq);

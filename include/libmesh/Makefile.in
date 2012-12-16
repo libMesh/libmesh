@@ -55,6 +55,8 @@ host_triplet = @host@
 target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_1 = fparser.hh
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_2 = fparser.hh
+@LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_3 = nanoflann.hpp
+@LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_4 = nanoflann.hpp
 subdir = include/libmesh
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -502,8 +504,9 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	pool_allocator.h restore_warnings.h statistics.h \
 	string_to_enum.h timestamp.h tree.h tree_base.h tree_node.h \
 	utility.h xdr_cxx.h parallel_communicator_specializations \
-	$(am__append_1) libmesh_config.h
-DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) libmesh_config.h
+	$(am__append_1) $(am__append_3) libmesh_config.h
+DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
+	libmesh_config.h
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -706,6 +709,9 @@ uninstall-am:
 
 @LIBMESH_ENABLE_FPARSER_TRUE@fparser.hh: $(top_srcdir)/contrib/fparser/fparser.hh
 @LIBMESH_ENABLE_FPARSER_TRUE@	$(AM_V_GEN)$(LN_S) $(top_srcdir)/contrib/fparser/fparser.hh fparser.hh
+
+@LIBMESH_ENABLE_NANOFLANN_TRUE@nanoflann.hpp: $(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp
+@LIBMESH_ENABLE_NANOFLANN_TRUE@	$(AM_V_GEN)$(LN_S) $(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp nanoflann.hpp
 
 #
 # libmesh_config.h rule
