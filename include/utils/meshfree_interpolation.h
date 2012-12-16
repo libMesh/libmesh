@@ -45,7 +45,23 @@ namespace libMesh
 class MeshfreeInterpolation
 {
 public:
-  MeshfreeInterpolation () {}
+
+  /**
+   * Constructor.
+   */
+  MeshfreeInterpolation () 
+  {}
+
+  /**
+   * Prints information about this object, by default to
+   * libMesh::out.
+   */
+  void print_info (std::ostream& os=libMesh::out) const;
+
+  /**
+   * Same as above, but allows you to also use stream syntax.
+   */
+  friend std::ostream& operator << (std::ostream& os, const MeshfreeInterpolation& mfi);
 
   /**
    * Clears all internal data structures and restores to a
@@ -65,19 +81,49 @@ public:
   virtual void add_field_data (const std::vector<std::string> &field_names,
 			       const std::vector<Point>  &pts,
 			       const std::vector<Number> &vals);
+
   /**
    * Interpolate source data at target points.
    * Pure virtual, must be overriden in derived classes.
    */
   virtual void interpolate_field_data (const std::vector<std::string> &field_names,
 				       const std::vector<Point>  &tgt_pts,
-				       const std::vector<Number> &tgt_vals) const = 0;
+				       std::vector<Number> &tgt_vals) const = 0;
 
 protected:
     
   std::vector<std::string> _names;
   std::vector<Point>       _src_pts;
   std::vector<Number>      _src_vals;
+};
+
+
+
+/**
+ * Inverse distance interplation.
+ */
+class InverseDistanceInterpolation : public MeshfreeInterpolation
+{
+public:
+  /**
+   * Constructor. Takes the inverse distance power, 
+   * which defaults to 2. 
+   */
+  InverseDistanceInterpolation (const unsigned int power=2) :
+    MeshfreeInterpolation(),
+    _power(power)
+  {}
+  
+  /**
+   * Interpolate source data at target points.
+   * Pure virtual, must be overriden in derived classes.
+   */
+  virtual void interpolate_field_data (const std::vector<std::string> &field_names,
+				       const std::vector<Point>  &tgt_pts,
+				       std::vector<Number> &tgt_vals) const;
+
+private:
+  const unsigned int _power;
 };
 
 } // namespace libMesh

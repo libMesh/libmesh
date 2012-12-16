@@ -27,6 +27,23 @@
 namespace libMesh
 {
   
+  void MeshfreeInterpolation::print_info (std::ostream& os) const
+  {
+    os << "MeshfreeInterpolation\n"
+       << " n_field_variables()=" << this->n_field_variables() 
+       << std::endl;
+  }
+
+
+  
+  std::ostream& operator << (std::ostream& os, const MeshfreeInterpolation& mfi)
+  {
+    mfi.print_info(os);
+    return os;
+  }
+
+
+
   void MeshfreeInterpolation::clear ()
   {
     _names.clear();
@@ -59,8 +76,7 @@ namespace libMesh
 	      libMesh::err << "ERROR:  when adding field data to an existing list the\n"
 			   << "varaible list must be the same!\n";
 	      libmesh_error();	      	      
-	    }
-	    
+	    }	    
       }
     
     // otherwise copy the names
@@ -68,6 +84,43 @@ namespace libMesh
       _names = field_names;
 
     // append the data
+    _src_pts.insert (_src_pts.end(),
+		     pts.begin(), 
+		     pts.end());
+
+    _src_vals.insert (_src_vals.end(),
+		      vals.begin(),
+		      vals.end());
+
+    libmesh_assert_equal_to (_src_vals.size(), 
+			     _src_pts.size()*this->n_field_variables());
+  }
+
+
+
+  void InverseDistanceInterpolation::interpolate_field_data (const std::vector<std::string> &field_names,
+							     const std::vector<Point>  &tgt_pts,
+							     std::vector<Number> &tgt_vals) const
+  {
+    libmesh_assert_equal_to (field_names.size(), this->n_field_variables());
+
+    // If we already have field variables, we assume we are appending.
+    // that means the names and ordering better be identical!
+    if (_names.size() != field_names.size())
+      {
+	libMesh::err << "ERROR:  when adding field data to an existing list the\n"
+		     << "varaible list must be the same!\n";
+	libmesh_error();	      	      
+      }
+    for (unsigned int v=0; v<_names.size(); v++)
+      if (_names[v] != field_names[v])
+	{
+	  libMesh::err << "ERROR:  when adding field data to an existing list the\n"
+		       << "varaible list must be the same!\n";
+	  libmesh_error();	      	      
+	}	    
+    
+    tgt_vals.resize (tgt_pts.size(), this->n_field_variables());
   }
 
   
