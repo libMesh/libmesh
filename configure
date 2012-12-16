@@ -6320,6 +6320,12 @@ else
 fi
 
 
+  # GLIBCXX debugging causes untold woes on mac machines - so disable it
+  if (test `uname` = "Darwin"); then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: << Disabling GLIBCXX debugging on Darwin >>>" >&5
+$as_echo "<< Disabling GLIBCXX debugging on Darwin >>>" >&6; }
+    enableglibcxxdebugging=no
+  fi
    if test x$enableglibcxxdebugging = xyes; then
   LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE=
   LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE='#'
@@ -6382,7 +6388,7 @@ fi
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
 
-         if (test "x$enableglibcxxdebugging" = "xyes" -a `uname` != "Darwin"); then
+         if (test "x$enableglibcxxdebugging" = "xyes"); then
            CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
          fi
 	 ;;
@@ -6392,7 +6398,7 @@ fi
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
 
-         if (test "x$enableglibcxxdebugging" = "xyes" -a `uname` != "Darwin"); then
+         if (test "x$enableglibcxxdebugging" = "xyes"); then
 	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
 	 fi
   	 ;;
