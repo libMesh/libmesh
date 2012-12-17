@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_pyramid_h__
-#define __cell_pyramid_h__
+#ifndef LIBMESH_CELL_PYRAMID_H
+#define LIBMESH_CELL_PYRAMID_H
 
 // Local includes
 #include "libmesh/cell.h"
@@ -137,4 +137,4 @@ Pyramid::Pyramid(const unsigned int nn, Elem* p, Node** nodelinkdata) :
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_CELL_PYRAMID_H

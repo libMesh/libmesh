@@ -1,4 +1,3 @@
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
@@ -18,8 +17,8 @@
 
 
 
-#ifndef __fem_system_h__
-#define __fem_system_h__
+#ifndef LIBMESH_FEM_SYSTEM_H
+#define LIBMESH_FEM_SYSTEM_H
 
 // Local Includes
 #include "libmesh/diff_system.h"
@@ -229,4 +228,4 @@ protected:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_FEM_SYSTEM_H

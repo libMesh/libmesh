@@ -17,8 +17,8 @@
 
 
 
-#ifndef __trilinos_preconditioner_h__
-#define __trilinos_preconditioner_h__
+#ifndef LIBMESH_TRILINOS_PRECONDITIONER_H
+#define LIBMESH_TRILINOS_PRECONDITIONER_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -160,4 +160,4 @@ TrilinosPreconditioner<T>::~TrilinosPreconditioner ()
 } // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_TRILINOS
-#endif // #ifdef __trilinos_preconditioner_h__
+#endif // LIBMESH_TRILINOS_PRECONDITIONER_H

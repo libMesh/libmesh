@@ -17,8 +17,8 @@
 
 
 
-#ifndef __adaptive_time_solver_h__
-#define __adaptive_time_solver_h__
+#ifndef LIBMESH_ADAPTIVE_TIME_SOLVER_H
+#define LIBMESH_ADAPTIVE_TIME_SOLVER_H
 
 // Local includes
 #include "libmesh/system_norm.h"
@@ -191,4 +191,4 @@ protected:
 } // namespace libMesh
 
 
-#endif // #define __adaptive_time_solver_
+#endif // LIBMESH_ADAPTIVE_TIME_SOLVER_H

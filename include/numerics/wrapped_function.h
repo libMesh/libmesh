@@ -17,8 +17,8 @@
 
 
 
-#ifndef __wrapped_function_h__
-#define __wrapped_function_h__
+#ifndef LIBMESH_WRAPPED_FUNCTION_H
+#define LIBMESH_WRAPPED_FUNCTION_H
 
 // Local Includes
 #include "libmesh/dense_vector.h"
@@ -231,4 +231,4 @@ Output WrappedFunction<Output>::component (unsigned int i,
 
 } // namespace libMesh
 
-#endif // __wrapped_function__
+#endif // LIBMESH_WRAPPED_FUNCTION_H

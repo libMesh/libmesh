@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_monomial_h__
-#define __quadrature_monomial_h__
+#ifndef LIBMESH_QUADRATURE_MONOMIAL_H
+#define LIBMESH_QUADRATURE_MONOMIAL_H
 
 // Local includes
 #include "libmesh/quadrature.h"
@@ -195,4 +195,4 @@ class QMonomial : public QBase
 
 
 
-#endif
+#endif // LIBMESH_QUADRATURE_MONOMIAL_H

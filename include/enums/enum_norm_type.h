@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_norm_type_h__
-#define __enum_norm_type_h__
+#ifndef LIBMESH_ENUM_NORM_TYPE_H
+#define LIBMESH_ENUM_NORM_TYPE_H
 
 // ------------------------------------------------------------
 // enum NormType definition
@@ -65,7 +65,7 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // #ifndef __norm_type_h__
+#endif // LIBMESH_ENUM_NORM_TYPE_H
 
 
 

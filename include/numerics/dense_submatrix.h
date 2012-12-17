@@ -17,8 +17,8 @@
 
 
 
-#ifndef __dense_submatrix_h__
-#define __dense_submatrix_h__
+#ifndef LIBMESH_DENSE_SUBMATRIX_H
+#define LIBMESH_DENSE_SUBMATRIX_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -259,5 +259,5 @@ T & DenseSubMatrix<T>::operator () (const unsigned int i,
 } // namespace libMesh
 
 
-#endif // #ifndef __dense_matrix_h__
+#endif // LIBMESH_DENSE_SUBMATRIX_H
 

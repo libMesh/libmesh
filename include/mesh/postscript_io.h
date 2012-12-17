@@ -17,8 +17,8 @@
 
 
 
-#ifndef __postscript_io_h__
-#define __postscript_io_h__
+#ifndef LIBMESH_POSTSCRIPT_IO_H
+#define LIBMESH_POSTSCRIPT_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -147,4 +147,4 @@ private:
 
 } // namespace libMesh
 
-#endif // #ifndef __postscript_io_h__
+#endif // LIBMESH_POSTSCRIPT_IO_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_prism6_h__
-#define __cell_prism6_h__
+#ifndef LIBMESH_CELL_PRISM6_H
+#define LIBMESH_CELL_PRISM6_H
 
 // Local includes
 #include "libmesh/cell_prism.h"
@@ -193,4 +193,4 @@ Prism6::Prism6(Elem* p) :
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_CELL_PRISM6_H

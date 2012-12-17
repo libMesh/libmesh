@@ -18,8 +18,8 @@
 
 
 
-#ifndef __mesh_inserter_iterator_h__
-#define __mesh_inserter_iterator_h__
+#ifndef LIBMESH_MESH_INSERTER_ITERATOR_H
+#define LIBMESH_MESH_INSERTER_ITERATOR_H
 
 // Local includes
 #include "libmesh/elem.h"
@@ -70,4 +70,4 @@ private:
 } // namespace libMesh
 
 
-#endif // __mesh_inserter_iterator_h__
+#endif // LIBMESH_MESH_INSERTER_ITERATOR_H

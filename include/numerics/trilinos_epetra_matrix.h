@@ -17,8 +17,8 @@
 
 
 
-#ifndef __trilinos_epetra_matrix_h__
-#define __trilinos_epetra_matrix_h__
+#ifndef LIBMESH_TRILINOS_EPETRA_MATRIX_H
+#define LIBMESH_TRILINOS_EPETRA_MATRIX_H
 
 #include "libmesh/libmesh_common.h"
 
@@ -335,4 +335,4 @@ private:
 } // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_TRILINOS
-#endif // #ifdef __trilinos_epetra_matrix_h__
+#endif // LIBMESH_TRILINOS_EPETRA_MATRIX_H

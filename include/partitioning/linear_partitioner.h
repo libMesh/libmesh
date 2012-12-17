@@ -17,8 +17,8 @@
 
 
 
-#ifndef __linear_partitioner_h__
-#define __linear_partitioner_h__
+#ifndef LIBMESH_LINEAR_PARTITIONER_H
+#define LIBMESH_LINEAR_PARTITIONER_H
 
 // Local Includes -----------------------------------
 #include "libmesh/partitioner.h"
@@ -74,4 +74,4 @@ private:
 
 
 
-#endif  // #define __linear_partitioner_h__
+#endif  // LIBMESH_LINEAR_PARTITIONER_H

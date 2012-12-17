@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __trilinos_epetra_vector_h__
-#define __trilinos_epetra_vector_h__
+#ifndef LIBMESH_TRILINOS_EPETRA_VECTOR_H
+#define LIBMESH_TRILINOS_EPETRA_VECTOR_H
 
 
 #include "libmesh/libmesh_common.h"
@@ -993,7 +993,7 @@ void EpetraVector<T>::swap (NumericVector<T> &other)
 
 
 #endif // #ifdef HAVE_EPETRA
-#endif // #ifdef __trilinos_epetra_vector_h__
+#endif // LIBMESH_TRILINOS_EPETRA_VECTOR_H
 
 
 

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __face_h__
-#define __face_h__
+#ifndef LIBMESH_FACE_H
+#define LIBMESH_FACE_H
 
 // Local includes
 #include "libmesh/elem.h"
@@ -98,7 +98,7 @@ public:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FACE_H
 
 
 

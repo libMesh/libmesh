@@ -18,8 +18,8 @@
 
 
 
-#ifndef __laspack_vector_h__
-#define __laspack_vector_h__
+#ifndef LIBMESH_LASPACK_VECTOR_H
+#define LIBMESH_LASPACK_VECTOR_H
 
 
 
@@ -771,4 +771,4 @@ void LaspackVector<T>::swap (NumericVector<T> &other)
 
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK
-#endif // #ifdef __laspack_vector_h__
+#endif // LIBMESH_LASPACK_VECTOR_H

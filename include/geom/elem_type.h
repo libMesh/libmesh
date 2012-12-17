@@ -17,8 +17,8 @@
 
 
 
-#ifndef __elem_type_h__
-#define __elem_type_h__
+#ifndef LIBMESH_ELEM_TYPE_H
+#define LIBMESH_ELEM_TYPE_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -67,7 +67,7 @@ namespace ElementTypes
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_ELEM_TYPE_H
 
 
 

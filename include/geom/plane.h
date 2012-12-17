@@ -17,8 +17,8 @@
 
 
 
-#ifndef __plane_h__
-#define __plane_h__
+#ifndef LIBMESH_PLANE_H
+#define LIBMESH_PLANE_H
 
 // Local includes
 #include "libmesh/surface.h"
@@ -162,4 +162,4 @@ inline const Point & Plane::normal () const
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_PLANE_H

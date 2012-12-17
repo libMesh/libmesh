@@ -17,8 +17,8 @@
 
 
 
-#ifndef __petsc_matrix_h__
-#define __petsc_matrix_h__
+#ifndef LIBMESH_PETSC_MATRIX_H
+#define LIBMESH_PETSC_MATRIX_H
 
 #include "libmesh/libmesh_common.h"
 
@@ -364,4 +364,4 @@ private:
 } // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
-#endif // #ifdef __petsc_matrix_h__
+#endif // LIBMESH_PETSC_MATRIX_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __unsteady_solver_h__
-#define __unsteady_solver_h__
+#ifndef LIBMESH_UNSTEADY_SOLVER_H
+#define LIBMESH_UNSTEADY_SOLVER_H
 
 // Local includes
 #include "libmesh/auto_ptr.h"
@@ -142,4 +142,4 @@ protected:
 } // namespace libMesh
 
 
-#endif // #define __time_solver_h__
+#endif // LIBMESH_UNSTEADY_SOLVER_H

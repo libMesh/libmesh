@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __hcurl_fe_transformation_h__
-#define __hcurl_fe_transformation_h__
+#ifndef LIBMESH_HCURL_FE_TRANSFORMATION_H
+#define LIBMESH_HCURL_FE_TRANSFORMATION_H
 
 #include "libmesh/fe_transformation_base.h"
 
@@ -116,4 +116,4 @@ namespace libMesh
 
 }
 
-#endif // __hcurl_fe_transformation_h__
+#endif // LIBMESH_HCURL_FE_TRANSFORMATION_H

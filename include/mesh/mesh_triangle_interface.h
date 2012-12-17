@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __mesh_triangle_interface_h__
-#define __mesh_triangle_interface_h__
+#ifndef LIBMESH_MESH_TRIANGLE_INTERFACE_H
+#define LIBMESH_MESH_TRIANGLE_INTERFACE_H
 
 
 #include "libmesh/libmesh_config.h"
@@ -209,4 +209,4 @@ namespace libMesh
 
 #endif // LIBMESH_HAVE_TRIANGLE
 
-#endif // ifndef __mesh_triangle_interface_h__
+#endif // ifndef LIBMESH_MESH_TRIANGLE_INTERFACE_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __steady_system_h__
-#define __steady_system_h__
+#ifndef LIBMESH_STEADY_SYSTEM_H
+#define LIBMESH_STEADY_SYSTEM_H
 
 // Local Includes
 #include "libmesh/linear_implicit_system.h"
@@ -36,4 +36,4 @@ typedef LinearImplicitSystem SteadyLinearSystem;
 
 } // namespace libMesh
 
-#endif // #ifndef __steady_system__
+#endif // LIBMESH_STEADY_SYSTEM_H

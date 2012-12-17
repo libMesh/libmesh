@@ -17,8 +17,8 @@
 
 
 
-#ifndef __surface_h__
-#define __surface_h__
+#ifndef LIBMESH_SURFACE_H
+#define LIBMESH_SURFACE_H
 
 // Local includes
 #include "libmesh/point.h"
@@ -139,4 +139,4 @@ Point Surface::world_coords (const Point& surf_coords) const
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_SURFACE_H

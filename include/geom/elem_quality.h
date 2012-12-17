@@ -17,8 +17,8 @@
 
 
 
-#ifndef __elem_quality_h__
-#define __elem_quality_h__
+#ifndef LIBMESH_ELEM_QUALITY_H
+#define LIBMESH_ELEM_QUALITY_H
 
 // Local includes
 #include "libmesh/enum_elem_type.h"
@@ -66,4 +66,4 @@ namespace Quality
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_ELEM_QUALITY_H

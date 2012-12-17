@@ -17,8 +17,8 @@
 
 
 
-#ifndef __hp_selector_h__
-#define __hp_selector_h__
+#ifndef LIBMESH_HP_SELECTOR_H
+#define LIBMESH_HP_SELECTOR_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -81,5 +81,5 @@ public:
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-#endif
+#endif // LIBMESH_HP_SELECTOR_H
 

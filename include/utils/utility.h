@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __utility_h__
-#define __utility_h__
+#ifndef LIBMESH_UTILITY_H
+#define LIBMESH_UTILITY_H
 
 // Local includes
 #include "libmesh/libmesh_common.h" // for Real
@@ -318,4 +318,4 @@ namespace Utility
 
 } // namespace libMesh
 
-#endif // #define __utility_h__
+#endif // LIBMESH_UTILITY_H

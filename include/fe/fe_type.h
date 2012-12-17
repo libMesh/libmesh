@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fe_type_h__
-#define __fe_type_h__
+#ifndef LIBMESH_FE_TYPE_H
+#define LIBMESH_FE_TYPE_H
 
 // Local includes
 #include "libmesh/auto_ptr.h"
@@ -205,7 +205,7 @@ Order FEType::default_quadrature_order () const
 } // namespace libMesh
 
 
-#endif // #ifndef __fe_type_h__
+#endif // LIBMESH_FE_TYPE_H
 
 
 

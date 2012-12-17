@@ -17,8 +17,8 @@
 
 
 
-#ifndef __elem_h__
-#define __elem_h__
+#ifndef LIBMESH_ELEM_H
+#define LIBMESH_ELEM_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -2439,4 +2439,4 @@ Elem::packed_size() const
 } // namespace libMesh
 
 
-#endif // end #ifndef __elem_h__
+#endif // LIBMESH_ELEM_H

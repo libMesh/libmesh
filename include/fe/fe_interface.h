@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fe_interface_h__
-#define __fe_interface_h__
+#ifndef LIBMESH_FE_INTERFACE_H
+#define LIBMESH_FE_INTERFACE_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -486,4 +486,4 @@ inline bool FEInterface::is_InfFE_elem(const ElemType et)
 
 
 
-#endif // ifndef __fe_interface_h__
+#endif // LIBMESH_FE_INTERFACE_H

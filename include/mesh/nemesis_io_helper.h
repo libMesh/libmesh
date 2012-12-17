@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __nemesis_io_helper_h__
-#define __nemesis_io_helper_h__
+#ifndef LIBMESH_NEMESIS_IO_HELPER_H
+#define LIBMESH_NEMESIS_IO_HELPER_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -649,4 +649,4 @@ private:
 } // namespace libMesh
 
 #endif // #if defined(LIBMESH_HAVE_NEMESIS_API) && defined(LIBMESH_HAVE_EXODUS_API)
-#endif // #ifndef __nemesis_io_helper_h__
+#endif // LIBMESH_NEMESIS_IO_HELPER_H

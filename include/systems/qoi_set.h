@@ -17,8 +17,8 @@
 
 
 
-#ifndef __qoi_set_h__
-#define __qoi_set_h__
+#ifndef LIBMESH_QOI_SET_H
+#define LIBMESH_QOI_SET_H
 
 
 // Local Includes -----------------------------------
@@ -242,4 +242,4 @@ Real QoISet::weight(unsigned int i) const
 
 } // namespace libMesh
 
-#endif // #define __qoi_set_h__
+#endif // LIBMESH_QOI_SET_H

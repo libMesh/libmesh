@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __libmesh_version_h__
-#define __libmesh_version_h__
+#ifndef LIBMESH_LIBMESH_VERSION_H
+#define LIBMESH_LIBMESH_VERSION_H
 
 // #define LIBMESH_MAJOR_VERSION  @GENERIC_MAJOR_VERSION@
 // #define LIBMESH_MINOR_VERSION  @GENERIC_MINOR_VERSION@
@@ -48,4 +48,4 @@ namespace libMesh
 }
 
 
-#endif
+#endif // LIBMESH_LIBMESH_VERSION_H

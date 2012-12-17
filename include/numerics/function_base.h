@@ -17,8 +17,8 @@
 
 
 
-#ifndef __function_base_h__
-#define __function_base_h__
+#ifndef LIBMESH_FUNCTION_BASE_H
+#define LIBMESH_FUNCTION_BASE_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -222,4 +222,4 @@ void FunctionBase<Output>::operator() (const Point& p,
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FUNCTION_BASE_H

@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __petsc_macro_h__
-#define __petsc_macro_h__
+#ifndef LIBMESH_PETSC_MACRO_H
+#define LIBMESH_PETSC_MACRO_H
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -128,4 +128,4 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
 
 #endif // LIBMESH_HAVE_PETSC
 
-#endif // __petsc_macro_h__
+#endif // LIBMESH_PETSC_MACRO_H

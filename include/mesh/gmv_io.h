@@ -17,8 +17,8 @@
 
 
 
-#ifndef __gmv_io_h__
-#define __gmv_io_h__
+#ifndef LIBMESH_GMV_IO_H
+#define LIBMESH_GMV_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -355,4 +355,4 @@ void GMVIO::to_binary_stream(std::ostream& out,
 } // namespace libMesh
 
 
-#endif // #define __gmv_io_h__
+#endif // LIBMESH_GMV_IO_H

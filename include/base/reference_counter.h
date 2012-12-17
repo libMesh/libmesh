@@ -17,8 +17,8 @@
 
 
 
-#ifndef __reference_counter_h__
-#define __reference_counter_h__
+#ifndef LIBMESH_REFERENCE_COUNTER_H
+#define LIBMESH_REFERENCE_COUNTER_H
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -186,7 +186,7 @@ void ReferenceCounter::increment_destructor_count (const std::string& name)
 } // namespace libMesh
 
 
-#endif // end #ifndef __reference_counter_h__
+#endif // LIBMESH_REFERENCE_COUNTER_H
 
 
 

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_inf_hex16_h__
-#define __cell_inf_hex16_h__
+#ifndef LIBMESH_CELL_INF_HEX16_H
+#define LIBMESH_CELL_INF_HEX16_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -245,4 +245,4 @@ InfHex16::InfHex16(Elem* p) :
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
-#endif
+#endif // LIBMESH_CELL_INF_HEX16_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __type_tensor_h__
-#define __type_tensor_h__
+#ifndef LIBMESH_TYPE_TENSOR_H
+#define LIBMESH_TYPE_TENSOR_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -1127,4 +1127,4 @@ bool TypeTensor<T>::operator == (const TypeTensor<T>& rhs) const
 
 } // namespace libMesh
 
-#endif // #define __type_tensor_h__
+#endif // LIBMESH_TYPE_TENSOR_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_inf_prism6_h__
-#define __cell_inf_prism6_h__
+#ifndef LIBMESH_CELL_INF_PRISM6_H
+#define LIBMESH_CELL_INF_PRISM6_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -211,4 +211,4 @@ InfPrism6::InfPrism6(Elem* p) :
 
 #endif  // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-#endif
+#endif // LIBMESH_CELL_INF_PRISM6_H

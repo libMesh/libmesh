@@ -17,8 +17,8 @@
 
 
 
-#ifndef __perflog_h__
-#define __perflog_h__
+#ifndef LIBMESH_PERFLOG_H
+#define LIBMESH_PERFLOG_H
 
 
 // Local includes
@@ -416,4 +416,4 @@ double PerfLog::get_elapsed_time () const
 
 
 
-#endif
+#endif // LIBMESH_PERFLOG_H

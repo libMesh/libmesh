@@ -17,8 +17,8 @@
 
 
 
-#ifndef __exodusII_io_h__
-#define __exodusII_io_h__
+#ifndef LIBMESH_EXODUSII_IO_H
+#define LIBMESH_EXODUSII_IO_H
 
 
 // Local includes
@@ -199,4 +199,4 @@ class ExodusII_IO : public MeshInput<MeshBase>,
 } // namespace libMesh
 
 
-#endif // #define __exodusII_io_h__
+#endif // LIBMESH_EXODUSII_IO_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_hex_h__
-#define __cell_hex_h__
+#ifndef LIBMESH_CELL_HEX_H
+#define LIBMESH_CELL_HEX_H
 
 // Local includes
 #include "libmesh/cell.h"
@@ -164,4 +164,4 @@ Hex::Hex(const unsigned int nn, Elem* p, Node** nodelinkdata) :
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_CELL_HEX_H

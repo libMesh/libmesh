@@ -17,8 +17,8 @@
 
 
 
-#ifndef __system_subset_by_subdomain_h__
-#define __system_subset_by_subdomain_h__
+#ifndef LIBMESH_SYSTEM_SUBSET_BY_SUBDOMAIN_H
+#define LIBMESH_SYSTEM_SUBSET_BY_SUBDOMAIN_H
 
 // Local Includes
 #include "libmesh/system_subset.h"
@@ -195,5 +195,5 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_SYSTEM_SUBSET_BY_SUBDOMAIN_H
 

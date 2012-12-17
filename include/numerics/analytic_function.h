@@ -17,8 +17,8 @@
 
 
 
-#ifndef __analytic_function_h__
-#define __analytic_function_h__
+#ifndef LIBMESH_ANALYTIC_FUNCTION_H
+#define LIBMESH_ANALYTIC_FUNCTION_H
 
 // Local Includes
 #include "libmesh/function_base.h"
@@ -223,5 +223,5 @@ AnalyticFunction<Output>::clone () const
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_ANALYTIC_FUNCTION_H
 

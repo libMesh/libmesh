@@ -16,8 +16,8 @@
 
 
 
-#ifndef __plt_loader_h__
-#define __plt_loader_h__
+#ifndef LIBMESH_PLT_LOADER_H
+#define LIBMESH_PLT_LOADER_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -710,4 +710,4 @@ PltLoader::get_data () const
 } // namespace libMesh
 
 
-#endif // #ifndef __plt_loader_h__
+#endif // LIBMESH_PLT_LOADER_H

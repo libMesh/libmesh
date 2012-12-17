@@ -18,8 +18,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_scm_evaluation_h__
-#define __rb_scm_evaluation_h__
+#ifndef LIBMESH_RB_SCM_EVALUATION_H
+#define LIBMESH_RB_SCM_EVALUATION_H
 
 // rbOOmit includes
 #include "libmesh/rb_parametrized.h"
@@ -214,4 +214,4 @@ private:
 
 }
 
-#endif
+#endif // LIBMESH_RB_SCM_EVALUATION_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fe_xyz_map_h__
-#define __fe_xyz_map_h__
+#ifndef LIBMESH_FE_XYZ_MAP_H
+#define LIBMESH_FE_XYZ_MAP_H
 
 #include "libmesh/fe_map.h"
 #include "libmesh/libmesh_logging.h"
@@ -44,4 +44,5 @@ namespace libMesh
 
   }; // class FEXYZMap
 } // namespace libMesh
-#endif //__fe_xyz_map_h__
+
+#endif // LIBMESH_FE_XYZ_MAP_H

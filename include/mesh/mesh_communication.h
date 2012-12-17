@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_communication_h__
-#define __mesh_communication_h__
+#ifndef LIBMESH_MESH_COMMUNICATION_H
+#define LIBMESH_MESH_COMMUNICATION_H
 
 
 
@@ -193,4 +193,4 @@ public:
 
 } // namespace libMesh
 
-#endif // end #ifndef __mesh_communication_h__
+#endif // LIBMESH_MESH_COMMUNICATION_H

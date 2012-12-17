@@ -17,8 +17,8 @@
 
 
 
-#ifndef __ostream_proxy_h__
-#define __ostream_proxy_h__
+#ifndef LIBMESH_OSTREAM_PROXY_H
+#define LIBMESH_OSTREAM_PROXY_H
 
 
 
@@ -240,5 +240,5 @@ typedef BasicOStreamProxy<> OStreamProxy;
 
 } // namespace libMesh
 
-#endif // ifndef __ostream_proxy_h__
+#endif // LIBMESH_OSTREAM_PROXY_H
 

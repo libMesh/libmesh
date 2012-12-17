@@ -17,8 +17,8 @@
 
 
 
-#ifndef __inf_quad6_h__
-#define __inf_quad6_h__
+#ifndef LIBMESH_FACE_INF_QUAD6_H
+#define LIBMESH_FACE_INF_QUAD6_H
 
 
 #include "libmesh/libmesh_config.h"
@@ -204,4 +204,4 @@ private:
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-#endif
+#endif // LIBMESH_FACE_INF_QUAD6_H

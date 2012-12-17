@@ -1,4 +1,3 @@
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
@@ -17,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __compare_types_h__
-#define __compare_types_h__
+#ifndef LIBMESH_COMPARE_TYPES_H
+#define LIBMESH_COMPARE_TYPES_H
 
 // System includes
 #include <complex>
@@ -162,4 +161,4 @@ struct CompareTypes<S, std::complex<T> > {
 
 } // namespace libMesh
 
-#endif // __compare_types_h__
+#endif // LIBMESH_COMPARE_TYPES_H

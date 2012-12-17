@@ -17,8 +17,8 @@
 
 
 
-#ifndef __medit_io_h__
-#define __medit_io_h__
+#ifndef LIBMESH_MEDIT_IO_H
+#define LIBMESH_MEDIT_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -133,4 +133,4 @@ bool & MEDITIO::binary ()
 } // namespace libMesh
 
 
-#endif // #define __medit_io_h__
+#endif // LIBMESH_MEDIT_IO_H

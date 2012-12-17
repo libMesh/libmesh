@@ -6,7 +6,7 @@
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
 
-// This library is distributd in the hope that it will be useful,
+// This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
@@ -17,8 +17,8 @@
 
 
 
-#ifndef __eigen_solver_h__
-#define __eigen_solver_h__
+#ifndef LIBMESH_EIGEN_SOLVER_H
+#define LIBMESH_EIGEN_SOLVER_H
 
 
 #include "libmesh/libmesh_config.h"
@@ -261,4 +261,4 @@ EigenSolver<T>::~EigenSolver ()
 
 #endif // LIBMESH_HAVE_SLEPC
 
-#endif // #ifdef __eigen_solver_h__
+#endif // LIBMESH_EIGEN_SOLVER_H

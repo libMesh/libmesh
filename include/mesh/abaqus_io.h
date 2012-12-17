@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __abaqus_io_h__
-#define __abaqus_io_h__
+#ifndef LIBMESH_ABAQUS_IO_H
+#define LIBMESH_ABAQUS_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -203,4 +203,4 @@ namespace libMesh
 
 } // namespace
 
-#endif // __abaqus_io_h__
+#endif // LIBMESH_ABAQUS_IO_H

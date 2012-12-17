@@ -17,8 +17,8 @@
 
 
 
-#ifndef __petsc_preconditioner_h__
-#define __petsc_preconditioner_h__
+#ifndef LIBMESH_PETSC_PRECONDITIONER_H
+#define LIBMESH_PETSC_PRECONDITIONER_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -152,4 +152,4 @@ PetscPreconditioner<T>::~PetscPreconditioner ()
 } // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
-#endif // #ifdef __petsc_linear_solver_h__
+#endif // LIBMESH_PETSC_PRECONDITIONER_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __libmesh_h__
-#define __libmesh_h__
+#ifndef LIBMESH_LIBMESH_H
+#define LIBMESH_LIBMESH_H
 
 
 // Local includes
@@ -190,4 +190,4 @@ public:
 
 } // namespace libMesh
 
-#endif // #define __libmesh_h__
+#endif // LIBMESH_LIBMESH_H

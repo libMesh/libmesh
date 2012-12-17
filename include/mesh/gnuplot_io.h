@@ -17,8 +17,8 @@
 
 
 
-#ifndef __gnuplot_io_h__
-#define __gnuplot_io_h__
+#ifndef LIBMESH_GNUPLOT_IO_H
+#define LIBMESH_GNUPLOT_IO_H
 
 // Local includes
 #include "libmesh/mesh_output.h"
@@ -121,4 +121,4 @@ class GnuPlotIO : public MeshOutput<MeshBase>
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_GNUPLOT_IO_H

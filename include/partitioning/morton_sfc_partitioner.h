@@ -17,8 +17,8 @@
 
 
 
-#ifndef __morton_sfc_partitioner_h__
-#define __morton_sfc_partitioner_h__
+#ifndef LIBMESH_MORTON_SFC_PARTITIONER_H
+#define LIBMESH_MORTON_SFC_PARTITIONER_H
 
 // Local Includes -----------------------------------
 #include "libmesh/sfc_partitioner.h"
@@ -75,4 +75,4 @@ private:
 } // namespace libMesh
 
 
-#endif // #define __morton_sfc_partitioner_h__
+#endif // LIBMESH_MORTON_SFC_PARTITIONER_H
