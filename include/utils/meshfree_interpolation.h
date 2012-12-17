@@ -253,27 +253,40 @@ private:
    */
   void construct_kd_tree ();
 
-  const unsigned int _power;
+  /**
+   * Performs inverse distance interpolation at the input point from
+   * the specified points.
+   */
+  void interpolate (const Point               &pt,
+		    const std::vector<size_t> &src_indices,
+		    const std::vector<Real>   &src_dist_sqr,
+		    std::vector<Number>::iterator &out_it) const;
+  
+  const unsigned int _half_power;
   const unsigned int _n_interp_pts;
-  const bool _verbose;
 
+  /**
+   * Temporary work array.  Object level scope to avoid cache thrashing.
+   */  
+  mutable std::vector<Number> _vals;
+  
 public:
 
   /**
    * Constructor. Takes the inverse distance power, 
    * which defaults to 2. 
    */
-  InverseDistanceInterpolation (const unsigned int power        = 2,
-				const unsigned int n_interp_pts = 8,
-				const bool verbose              = false) :
+  InverseDistanceInterpolation (const unsigned int n_interp_pts = 8,
+				const unsigned int power        = 2) :
     MeshfreeInterpolation(),
 #if LIBMESH_HAVE_NANOFLANN
     _point_list_adaptor(_src_pts),
 #endif
-    _power(power),
-    _n_interp_pts(n_interp_pts),
-    _verbose(verbose)
-  {}
+    _half_power(power/2),
+    _n_interp_pts(n_interp_pts)
+  {
+    libmesh_assert_greater_equal (power, 2);
+  }
   
   /**
    * Interpolate source data at target points.

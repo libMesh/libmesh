@@ -52,7 +52,7 @@ void create_random_point_cloud (const unsigned int Npts,
 
 
 
-Real exact_solution (const Point &p)
+Real exact_solution_u (const Point &p)
 {
   const Real
     x = p(0),
@@ -66,18 +66,34 @@ Real exact_solution (const Point &p)
 
 
 
+Real exact_solution_v (const Point &p)
+{
+  const Real
+    x = p(0),
+    y = p(1),
+    z = p(2);
+  
+  return (x*x   +
+	  y*y +
+	  z*z*z);
+}
+
+
+
 int main(int argc, char** argv)
 {
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
   {
     std::vector<Point>       tgt_pts;
-    std::vector<Real>        tgt_data;
-    std::vector<std::string> field_vars(1, std::string("u"));
+    std::vector<Number>      tgt_data;
+    std::vector<std::string> field_vars;
 
-    InverseDistanceInterpolation<3> idi (/* power =        */ 2,
-					 /* n_interp_pts = */ 8,
-					 /* verbose =      */ true);
+    field_vars.push_back("u");
+    field_vars.push_back("v");
+
+    InverseDistanceInterpolation<3> idi (/* n_interp_pts = */ 8,
+					 /* power =        */ 2);
 
     idi.set_field_variables (field_vars);
 
@@ -93,17 +109,39 @@ int main(int argc, char** argv)
 					  
       for (std::vector<Point>::const_iterator pt_it=src_pts.begin();
 	   pt_it != src_pts.end(); ++pt_it)
-	src_vals.push_back (exact_solution (*pt_it));	
+	{
+	  src_vals.push_back (exact_solution_u (*pt_it));
+	  src_vals.push_back (exact_solution_v (*pt_it));
+	}	  
     }
 
     std::cout << idi;
 
-    create_random_point_cloud (10,
-			       tgt_pts);
+    // Interpolate to some other random points, and evaluate the result
+    {
+      create_random_point_cloud (10,
+				 tgt_pts);
+      
+      idi.interpolate_field_data (field_vars,
+				  tgt_pts,
+				  tgt_data);
+      
+      
+      std::vector<Number>::const_iterator v_it=tgt_data.begin();
 
-    idi.interpolate_field_data (field_vars,
-				tgt_pts,
-				tgt_data);
+      for (std::vector<Point>::const_iterator  p_it=tgt_pts.begin();
+	   p_it!=tgt_pts.end(); ++p_it)
+	{
+	  std::cout << "\nAt target point " << *p_it
+		    << "\n u_interp=" << *v_it
+		    << ", u_exact="  << exact_solution_u(*p_it);
+	  ++v_it;
+	  std::cout << "\n v_interp=" << *v_it
+		    << ", v_exact="  << exact_solution_v(*p_it)
+		    << std::endl;
+	  ++v_it;
+	}
+    }
   }
   return 0;
 }

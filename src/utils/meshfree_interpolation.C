@@ -156,8 +156,9 @@ namespace libMesh
 	  libmesh_error();	      	      
 	}	    
     
-    tgt_vals.resize (tgt_pts.size(), this->n_field_variables());
-
+    tgt_vals.resize (tgt_pts.size()*this->n_field_variables());
+    
+    std::vector<Number>::iterator out_it = tgt_vals.begin();
 
 #ifdef LIBMESH_HAVE_NANOFLANN
     {
@@ -174,14 +175,18 @@ namespace libMesh
 
 	  _kd_tree->knnSearch(&query_pt[0], num_results, &ret_index[0], &ret_dist_sqr[0]);
 
-	  std::cout << "knnSearch(): num_results=" << num_results << "\n";
-	  for (size_t i=0;i<num_results;i++)
-	    std::cout << "idx[" << i << "]=" 
-		      << std::setw(6) << ret_index[i] 
-		      << "\t dist["<< i << "]=" << ret_dist_sqr[i] 
-		      << "\t val[" << std::setw(6) << ret_index[i] << "]=" << _src_vals[ret_index[i]]
-		      << std::endl;
-	  std::cout << "\n";
+	  this->interpolate (tgt, ret_index, ret_dist_sqr, out_it);
+
+	  // std::cout << "knnSearch(): num_results=" << num_results << "\n";
+	  // for (size_t i=0;i<num_results;i++)
+	  //   std::cout << "idx[" << i << "]=" 
+	  // 	      << std::setw(6) << ret_index[i] 
+	  // 	      << "\t dist["<< i << "]=" << ret_dist_sqr[i] 
+	  // 	      << "\t val[" << std::setw(6) << ret_index[i] << "]=" << _src_vals[ret_index[i]]
+	  // 	      << std::endl;
+	  // std::cout << "\n";
+
+	  // std::cout << "ival=" << _vals[0] << '\n';
 	}
     }    
 #else
@@ -196,8 +201,77 @@ namespace libMesh
     STOP_LOG ("interpolate_field_data()", "InverseDistanceInterpolation<>");
   }
 
-  
+  template <unsigned int KDDim>
+  void InverseDistanceInterpolation<KDDim>::interpolate (const Point               & /* pt */,
+							 const std::vector<size_t> &src_indices,
+							 const std::vector<Real>   &src_dist_sqr,
+							 std::vector<Number>::iterator &out_it) const
+  {
+    // We explicitly assume that the input source points are sorted from closest to
+    // farthests.  assert that assumption in DEBUG mode.
+#ifdef DEBUG
+    if (!src_dist_sqr.empty())
+      {
+	Real min_dist = src_dist_sqr.front();
+	std::vector<Real>::const_iterator it = src_dist_sqr.begin();
 
+	for (++it; it!= src_dist_sqr.end(); ++it)
+	  {
+	    if (*it < min_dist) libmesh_error();
+	    min_dist = *it;
+	  }
+      }    
+#endif
+
+
+    libmesh_assert_equal_to (src_dist_sqr.size(), src_indices.size());
+
+
+    // Compute the interpolation weights & interpolated value
+    const unsigned int n_fv = this->n_field_variables();
+    _vals.resize(n_fv); /**/ std::fill (_vals.begin(), _vals.end(), Number(0.));
+    
+    Real tot_weight = 0.;
+
+    std::vector<Real>::const_iterator src_dist_sqr_it=src_dist_sqr.begin();
+    std::vector<size_t>::const_iterator src_idx_it=src_indices.begin();
+
+    // Loop over source points
+    while ((src_dist_sqr_it != src_dist_sqr.end()) &&
+	   (src_idx_it      != src_indices.end()))
+      {
+	libmesh_assert_greater_equal (*src_dist_sqr_it, 0.);
+	
+	const Real
+	  dist_sq = std::max(*src_dist_sqr_it, std::numeric_limits<Real>::epsilon()),
+	  weight = 1./std::pow(dist_sq, _half_power);
+
+	tot_weight += weight;
+
+	const unsigned int src_idx = *src_idx_it;
+
+	// loop over field variables
+	for (unsigned int v=0; v<n_fv; v++)
+	  {
+	    libmesh_assert_less (src_idx*n_fv+v, _src_vals.size());
+	    _vals[v] += _src_vals[src_idx*n_fv+v]*weight;
+	  }
+
+	++src_dist_sqr_it;
+	++src_idx_it;
+      }
+
+    // don't forget normalizing term & set the output buffer!
+    for (unsigned int v=0; v<n_fv; v++, ++out_it)
+      {	
+	_vals[v] /= tot_weight;
+	
+	*out_it = _vals[v];
+      }	
+  }
+
+
+  
 // ------------------------------------------------------------
 // Explicit Instantiations
   template class InverseDistanceInterpolation<1>;
