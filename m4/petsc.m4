@@ -41,9 +41,23 @@ AC_DEFUN([CONFIGURE_PETSC],
       fi	
     fi
   
-    AC_CHECK_FILE($PETSC_DIR/include/petsc.h,
-                  PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
-  
+    # We need to add $PETSC_DIR to the current value of the $CPPFLAGS
+    # in order for the call to AC_CHECK_HEADER to succeed.  Also, we
+    # use a C compiler for the test compilation rather than C++.
+
+    # Save original value of CPPFLAGS, then append $PETSC_DIR/include to CPPFLAGS so the
+    # configure test can find the other headers that petsc.h includes...
+    old_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$old_CPPFLAGS -I$PETSC_DIR/include"
+
+    AC_LANG_PUSH(C)
+    AC_CHECK_HEADER($PETSC_DIR/include/petsc.h,
+                    PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
+    AC_LANG_POP
+
+    # Reset the value of CPPFLAGS
+    CPPFLAGS="$old_CPPFLAGS"
+
     # Grab PETSc version and substitute into Makefile.
     # If version 2.x, also check that PETSC_ARCH is set
     if (test -r $PETSC_DIR/include/petsc.h) ; then
