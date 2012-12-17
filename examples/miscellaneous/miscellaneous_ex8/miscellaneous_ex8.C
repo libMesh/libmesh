@@ -25,6 +25,10 @@
 // Example include files
 #include "libmesh/libmesh.h"
 #include "libmesh/meshfree_interpolation.h"
+#include "libmesh/mesh.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/tecplot_io.h"
 
 // C++ includes
 #include <cstdlib>
@@ -78,6 +82,29 @@ Real exact_solution_v (const Point &p)
 	  z*z*z);
 }
 
+Number exact_value (const Point& p,
+                    const Parameters&,
+                    const std::string&,
+                    const std::string&)
+{
+  return exact_solution_v(p);
+}
+
+// We now define the function which provides the
+// initialization routines for the "Convection-Diffusion"
+// system.  This handles things like setting initial
+// conditions and boundary conditions.
+void init_sys(EquationSystems& es,
+              const std::string& system_name)
+{
+  // Get a reference to the Convection-Diffusion system object.
+  System & system =
+    es.get_system<System>(system_name);
+  
+  system.project_solution(exact_value, NULL, es.parameters);
+}
+
+
 
 
 int main(int argc, char** argv)
@@ -85,63 +112,149 @@ int main(int argc, char** argv)
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
   {
-    std::vector<Point>       tgt_pts;
-    std::vector<Number>      tgt_data;
-    std::vector<std::string> field_vars;
-
-    field_vars.push_back("u");
-    field_vars.push_back("v");
-
-    InverseDistanceInterpolation<3> idi (/* n_interp_pts = */ 8,
-					 /* power =        */ 2);
-
-    idi.set_field_variables (field_vars);
-
-    create_random_point_cloud (1e5,
-			       idi.get_source_points());
-
-    // Explicitly set the data values we will interpolate from
+    // Demonstration case 1
     {
-      const std::vector<Point> &src_pts  (idi.get_source_points());
-      std::vector<Real>        &src_vals (idi.get_source_vals());
+      std::vector<Point>       tgt_pts;
+      std::vector<Number>      tgt_data;
+      std::vector<std::string> field_vars;
       
-      src_vals.clear(); src_vals.reserve(src_pts.size());
-					  
-      for (std::vector<Point>::const_iterator pt_it=src_pts.begin();
-	   pt_it != src_pts.end(); ++pt_it)
-	{
-	  src_vals.push_back (exact_solution_u (*pt_it));
-	  src_vals.push_back (exact_solution_v (*pt_it));
-	}	  
+      field_vars.push_back("u");
+      field_vars.push_back("v");
+      
+      InverseDistanceInterpolation<3> idi (/* n_interp_pts = */ 8,
+					   /* power =        */ 2);
+      
+      idi.set_field_variables (field_vars);
+      
+      create_random_point_cloud (1e5,
+				 idi.get_source_points());
+      
+      // Explicitly set the data values we will interpolate from
+      {
+	const std::vector<Point> &src_pts  (idi.get_source_points());
+	std::vector<Real>        &src_vals (idi.get_source_vals());
+	
+	src_vals.clear(); src_vals.reserve(src_pts.size());
+	
+	for (std::vector<Point>::const_iterator pt_it=src_pts.begin();
+	     pt_it != src_pts.end(); ++pt_it)
+	  {
+	    src_vals.push_back (exact_solution_u (*pt_it));
+	    src_vals.push_back (exact_solution_v (*pt_it));
+	  }	  
+      }
+
+      std::cout << idi;
+      
+      // Interpolate to some other random points, and evaluate the result
+      {
+	create_random_point_cloud (10,
+				   tgt_pts);
+	
+	idi.interpolate_field_data (field_vars,
+				    tgt_pts,
+				    tgt_data);
+	
+      
+	std::vector<Number>::const_iterator v_it=tgt_data.begin();
+	
+	for (std::vector<Point>::const_iterator  p_it=tgt_pts.begin();
+	     p_it!=tgt_pts.end(); ++p_it)
+	  {
+	    std::cout << "\nAt target point " << *p_it
+		      << "\n u_interp=" << *v_it
+		      << ", u_exact="  << exact_solution_u(*p_it);
+	    ++v_it;
+	    std::cout << "\n v_interp=" << *v_it
+		      << ", v_exact="  << exact_solution_v(*p_it)
+		      << std::endl;
+	    ++v_it;
+	  }
+      }
     }
 
-    std::cout << idi;
 
-    // Interpolate to some other random points, and evaluate the result
+    // Demonstration case 2
     {
-      create_random_point_cloud (10,
-				 tgt_pts);
-      
-      idi.interpolate_field_data (field_vars,
-				  tgt_pts,
-				  tgt_data);
-      
-      
-      std::vector<Number>::const_iterator v_it=tgt_data.begin();
+      Mesh mesh_a, mesh_b;
 
-      for (std::vector<Point>::const_iterator  p_it=tgt_pts.begin();
-	   p_it!=tgt_pts.end(); ++p_it)
-	{
-	  std::cout << "\nAt target point " << *p_it
-		    << "\n u_interp=" << *v_it
-		    << ", u_exact="  << exact_solution_u(*p_it);
-	  ++v_it;
-	  std::cout << "\n v_interp=" << *v_it
-		    << ", v_exact="  << exact_solution_v(*p_it)
-		    << std::endl;
-	  ++v_it;
-	}
+      mesh_a.read("unstruct.ucd.gz"); mesh_b.read("struct.ucd.gz");
+
+      // Create equation systems objects.
+      EquationSystems
+	es_a(mesh_a), es_b(mesh_b);
+
+      System
+	&sys_a = es_a.add_system<System>("src_system"),
+	&sys_b = es_b.add_system<System>("dest_system");
+
+      sys_a.add_variable ("Cp", FIRST);
+      sys_b.add_variable ("Cp", FIRST);
+
+      sys_a.attach_init_function (init_sys);
+
+      es_a.init();
+      es_b.init();
+      
+      // Write out the initial conditions.
+      TecplotIO(mesh_a).write_equation_systems ("src.dat",
+						es_a);
+
+      InverseDistanceInterpolation<3> idi (/* n_interp_pts = */ 4,
+					   /* power =        */ 2);
+
+      std::vector<Point>  &src_pts  (idi.get_source_points());
+      std::vector<Number> &src_vals (idi.get_source_vals());
+      std::vector<std::string> field_vars;      
+      field_vars.push_back("Cp");
+      idi.set_field_variables(field_vars);
+
+      // We now will loop over every node in the source mesh
+      // and add it to a source point list, along with the solution
+      {
+	MeshBase::const_node_iterator nd  = mesh_a.nodes_begin();
+	MeshBase::const_node_iterator end = mesh_a.nodes_end();
+
+	for (; nd!=end; ++nd)
+	  {
+	    const Node *node(*nd);
+	    src_pts.push_back(*node);
+	    src_vals.push_back(sys_a.current_solution(node->dof_number(0,0,0)));
+	  }	  	
+      }
+
+      // We now will loop over every node in the target mesh
+      // and interpolate the solution for inspection.
+      {
+	MeshBase::const_node_iterator nd  = mesh_b.nodes_begin();
+	MeshBase::const_node_iterator end = mesh_b.nodes_end();
+
+	std::vector<Point>  tgt_p(1);
+	std::vector<Number> tgt_v;
+	
+	for (; nd!=end; ++nd)
+	  {
+	    const Node *node(*nd);
+
+	    tgt_p[0] = *node;
+
+	    idi.interpolate_field_data (field_vars,
+					tgt_p, tgt_v);
+	    
+	    sys_b.solution->set(node->dof_number(0,0,0), tgt_v[0]);
+	  }	  	
+
+	sys_b.solution->close();
+	sys_b.update();
+      }
+
+      // Write the result
+      TecplotIO(mesh_b).write_equation_systems ("dest.dat",
+						es_b);
     }
+
+
+    
   }
   return 0;
 }

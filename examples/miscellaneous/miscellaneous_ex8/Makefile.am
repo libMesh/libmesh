@@ -8,7 +8,19 @@ if LIBMESH_ENABLE_NANOFLANN
   check_SCRIPTS = run.sh
 endif
 
-CLEANFILES = 
+CLEANFILES =
+
+# also need to link files for VPATH builds
+if LIBMESH_VPATH_BUILD
+  BUILT_SOURCES = .linkstamp
+.linkstamp:
+	-rm -f struct.ucd.gz   && $(LN_S) $(srcdir)/struct.ucd.gz
+	-rm -f unstruct.ucd.gz && $(LN_S) $(srcdir)/unstruct.ucd.gz
+	$(AM_V_GEN)touch .linkstamp
+
+  CLEANFILES += struct.ucd.gz unstruct.ucd.gz .linkstamp
+endif
+
 
 ##############################################
 # include common example environment
