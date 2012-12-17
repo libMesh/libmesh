@@ -16,8 +16,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __periodic_boundary_base_h__
-#define __periodic_boundary_base_h__
+#ifndef LIBMESH_PERIODIC_BOUNDARY_BASE_H
+#define LIBMESH_PERIODIC_BOUNDARY_BASE_H
 
 // Local Includes -----------------------------------
 #include "libmesh/libmesh_config.h"
@@ -106,4 +106,4 @@ protected:
 
 #endif // LIBMESH_ENABLE_PERIODIC
 
-#endif // __periodic_boundary_base_h__
+#endif // LIBMESH_PERIODIC_BOUNDARY_BASE_H

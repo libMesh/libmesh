@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_prism_h__
-#define __cell_prism_h__
+#ifndef LIBMESH_CELL_PRISM_H
+#define LIBMESH_CELL_PRISM_H
 
 // Local includes
 #include "libmesh/cell.h"
@@ -144,4 +144,4 @@ Prism::Prism(const unsigned int nn, Elem* p, Node** nodelinkdata) :
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_CELL_PRISM_H

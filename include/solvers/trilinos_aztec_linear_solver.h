@@ -17,8 +17,8 @@
 
 
 
-#ifndef __trilinos_azec_linear_solver_h__
-#define __trilinos_azec_linear_solver_h__
+#ifndef LIBMESH_TRILINOS_AZTEC_LINEAR_SOLVER_H
+#define LIBMESH_TRILINOS_AZTEC_LINEAR_SOLVER_H
 
 
 
@@ -187,4 +187,4 @@ AztecLinearSolver<T>::~AztecLinearSolver ()
 
 
 #endif // #ifdef LIBMESH_HAVE_AZTECOO
-#endif // #ifdef __trilinos_azec_linear_solver_h__
+#endif // LIBMESH_TRILINOS_AZTEC_LINEAR_SOLVER_H

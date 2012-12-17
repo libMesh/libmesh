@@ -17,8 +17,8 @@
 
 
 
-#ifndef __perfmon_h__
-#define __perfmon_h__
+#ifndef LIBMESH_PERFMON_H
+#define LIBMESH_PERFMON_H
 
 
 // Local includes
@@ -157,4 +157,4 @@ PerfMon::~PerfMon ()
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_PERFMON_H

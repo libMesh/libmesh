@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_hex27_h__
-#define __cell_hex27_h__
+#ifndef LIBMESH_CELL_HEX27_H
+#define LIBMESH_CELL_HEX27_H
 
 // Local includes
 #include "libmesh/cell_hex.h"
@@ -258,4 +258,4 @@ Hex27::Hex27(Elem* p) :
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_CELL_HEX27_H

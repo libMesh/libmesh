@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __elem_assembly_h__
-#define __elem_assembly_h__
+#ifndef LIBMESH_ELEM_ASSEMBLY_H
+#define LIBMESH_ELEM_ASSEMBLY_H
 
 // Local includes
 #include "libmesh/reference_counted_object.h"
@@ -63,4 +63,4 @@ public:
 
 }
 
-#endif
+#endif // LIBMESH_ELEM_ASSEMBLY_H

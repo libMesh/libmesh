@@ -17,8 +17,8 @@
 
 
 
-#ifndef __edge4_h__
-#define __edge4_h__
+#ifndef LIBMESH_EDGE_EDGE4_H
+#define LIBMESH_EDGE_EDGE4_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -166,4 +166,4 @@ protected:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_EDGE_EDGE4_H

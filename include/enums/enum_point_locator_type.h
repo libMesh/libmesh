@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_point_locator_type_h__
-#define __enum_point_locator_type_h__
+#ifndef LIBMESH_ENUM_POINT_LOCATOR_TYPE_H
+#define LIBMESH_ENUM_POINT_LOCATOR_TYPE_H
 
 // ------------------------------------------------------------
 // enum PointLocatorType definition
@@ -36,7 +36,7 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // #ifndef __enum_point_locator_type_h__
+#endif // LIBMESH_ENUM_POINT_LOCATOR_TYPE_H
 
 
 

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __o_f_stream_h__
-#define __o_f_stream_h__
+#ifndef LIBMESH_OFSTREAM_H
+#define LIBMESH_OFSTREAM_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -146,5 +146,5 @@ namespace libMesh
 
 
 
-#endif // ifndef __o_f_stream_h__
+#endif // LIBMESH_OFSTREAM_H
 

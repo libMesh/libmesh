@@ -17,8 +17,8 @@
 
 
 
-#ifndef __laspack_matrix_h__
-#define __laspack_matrix_h__
+#ifndef LIBMESH_LASPACK_MATRIX_H
+#define LIBMESH_LASPACK_MATRIX_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -308,4 +308,4 @@ private:
 } // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK
-#endif // #ifdef __laspack_matrix_h__
+#endif // #ifdef LIBMESH_LASPACK_MATRIX_H

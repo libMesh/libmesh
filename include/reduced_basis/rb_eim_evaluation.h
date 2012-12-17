@@ -17,8 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __rb_eim_evaluation_h__
-#define __rb_eim_evaluation_h__
+#ifndef LIBMESH_RB_EIM_EVALUATION_H
+#define LIBMESH_RB_EIM_EVALUATION_H
 
 // libMesh includes
 #include "libmesh/auto_ptr.h"
@@ -223,4 +223,4 @@ private:
 
 }
 
-#endif
+#endif // LIBMESH_RB_EIM_EVALUATION_H

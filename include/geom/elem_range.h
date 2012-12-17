@@ -17,8 +17,8 @@
 
 
 
-#ifndef __elem_range_h__
-#define __elem_range_h__
+#ifndef LIBMESH_ELEM_RANGE_H
+#define LIBMESH_ELEM_RANGE_H
 
 // Local includes
 #include "libmesh/elem.h"
@@ -33,4 +33,4 @@ typedef StoredRange<MeshBase::const_element_iterator, const Elem*> ConstElemRang
 
 } // namespace libMesh
 
-#endif // end #ifndef __elem_range_h__
+#endif // LIBMESH_ELEM_RANGE_H

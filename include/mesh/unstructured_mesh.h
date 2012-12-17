@@ -17,8 +17,8 @@
 
 
 
-#ifndef __unstructured_mesh_h__
-#define __unstructured_mesh_h__
+#ifndef LIBMESH_UNSTRUCTURED_MESH_H
+#define LIBMESH_UNSTRUCTURED_MESH_H
 
 // Local Includes -----------------------------------
 #include "libmesh/mesh_base.h"
@@ -167,4 +167,4 @@ class UnstructuredMesh : public MeshBase
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_UNSTRUCTURED_MESH_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_h__
-#define __quadrature_h__
+#ifndef LIBMESH_QUADRATURE_H
+#define LIBMESH_QUADRATURE_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -376,4 +376,4 @@ void QBase::print_info(std::ostream& os) const
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_QUADRATURE_H

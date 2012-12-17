@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fe_h__
-#define __fe_h__
+#ifndef LIBMESH_FE_H
+#define LIBMESH_FE_H
 
 // Local includes
 #include "libmesh/fe_base.h"
@@ -1028,4 +1028,4 @@ FENedelecOne<Dim>::FENedelecOne (const FEType& fet) :
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FE_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_simpson_h__
-#define __quadrature_simpson_h__
+#ifndef LIBMESH_QUADRATURE_SIMPSON_H
+#define LIBMESH_QUADRATURE_SIMPSON_H
 
 // Local includes
 #include "libmesh/quadrature.h"
@@ -95,4 +95,4 @@ QSimpson::QSimpson(const unsigned int d) : QBase(d,THIRD)
 
 
 
-#endif
+#endif // LIBMESH_QUADRATURE_SIMPSON_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __dense_matrix_base_h__
-#define __dense_matrix_base_h__
+#ifndef LIBMESH_DENSE_MATRIX_BASE_H
+#define LIBMESH_DENSE_MATRIX_BASE_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -195,5 +195,5 @@ DenseMatrixBase<T>::add (const T2 factor,
 
 } // namespace libMesh
 
-#endif // #ifndef __dense_matrix_base_h__
+#endif // LIBMESH_DENSE_MATRIX_BASE_H
 

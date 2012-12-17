@@ -17,8 +17,8 @@
 
 
 
-#ifndef __parameters_h__
-#define __parameters_h__
+#ifndef LIBMESH_PARAMETERS_H
+#define LIBMESH_PARAMETERS_H
 
 // C++ includes
 #include <typeinfo>
@@ -550,4 +550,4 @@ void print_helper(std::ostream& os, const std::vector<P>* param)
 
 } // namespace libMesh
 
-#endif // #define __parameters_h__
+#endif // LIBMESH_PARAMETERS_H

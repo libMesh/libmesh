@@ -18,8 +18,8 @@
 
 
 
-#ifndef __petsc_vector_h__
-#define __petsc_vector_h__
+#ifndef LIBMESH_PETSC_VECTOR_H
+#define LIBMESH_PETSC_VECTOR_H
 
 
 #include "libmesh/libmesh_config.h"
@@ -1318,7 +1318,7 @@ void PetscVector<T>::_restore_array(void) const
 
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
-#endif // #ifdef __petsc_vector_h__
+#endif // LIBMESH_PETSC_VECTOR_H
 
 
 

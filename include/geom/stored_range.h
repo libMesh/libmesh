@@ -17,8 +17,8 @@
 
 
 
-#ifndef __stored_range_h__
-#define __stored_range_h__
+#ifndef LIBMESH_STORED_RANGE_H
+#define LIBMESH_STORED_RANGE_H
 
 // Local includes
 #include "libmesh/threads.h"
@@ -244,4 +244,4 @@ private:
 
 } // namespace libMesh
 
-#endif // end #ifndef __stored_range_h__
+#endif // LIBMESH_STORED_RANGE_H

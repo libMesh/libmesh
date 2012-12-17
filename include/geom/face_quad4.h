@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quad4_h__
-#define __quad4_h__
+#ifndef LIBMESH_FACE_QUAD4_H
+#define LIBMESH_FACE_QUAD4_H
 
 
 // Local includes
@@ -169,4 +169,4 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FACE_QUAD4_H

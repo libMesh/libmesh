@@ -17,8 +17,8 @@
 
 
 
-#ifndef __trilinos_nox_nonlinear_solver_h__
-#define __trilinos_nox_nonlinear_solver_h__
+#ifndef LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
+#define LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H
 
 #ifdef LIBMESH_HAVE_NOX
 
@@ -147,4 +147,4 @@ NoxNonlinearSolver<T>::~NoxNonlinearSolver ()
 
 
 #endif // #ifdef LIBMESH_HAVE_NOX
-#endif // #ifdef __trilinos_nox_nonlinear_solver_h__
+#endif // LIBMESH_TRILINOS_NOX_NONLINEAR_SOLVER_H

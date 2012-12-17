@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __xdr_head_h__
-#define __xdr_head_h__
+#ifndef LIBMESH_XDR_HEAD_H
+#define LIBMESH_XDR_HEAD_H
 
 // Local includes
 #include "libmesh/xdr_mgf.h"
@@ -205,5 +205,5 @@ private:
 } // namespace libMesh
 
 
-#endif // #ifndef __xdr_head_h__
+#endif // LIBMESH_XDR_HEAD_H
 

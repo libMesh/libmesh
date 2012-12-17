@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_smoother_vsmoother_h__
-#define __mesh_smoother_vsmoother_h__
+#ifndef LIBMESH_MESH_SMOOTHER_VSMOOTHER_H
+#define LIBMESH_MESH_SMOOTHER_VSMOOTHER_H
 
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_ENABLE_VSMOOTHER
@@ -312,4 +312,4 @@ private:
 
 #endif // LIBMESH_ENABLE_VSMOOTHER
 
-#endif
+#endif // LIBMESH_MESH_SMOOTHER_VSMOOTHER_H

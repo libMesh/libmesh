@@ -17,8 +17,8 @@
 
 
 
-#ifndef __dirichlet_boundaries_h__
-#define __dirichlet_boundaries_h__
+#ifndef LIBMESH_DIRICHLET_BOUNDARIES_H
+#define LIBMESH_DIRICHLET_BOUNDARIES_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -94,4 +94,4 @@ public:
 
 #endif // LIBMESH_ENABLE_DIRICHLET
 
-#endif // __dirichlet_boundaries_h__
+#endif // LIBMESH_DIRICHLET_BOUNDARIES_H

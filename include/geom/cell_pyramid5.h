@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_pyramid5_h__
-#define __cell_pyramid5_h__
+#ifndef LIBMESH_CELL_PYRAMID5_H
+#define LIBMESH_CELL_PYRAMID5_H
 
 // Local includes
 #include "libmesh/cell_pyramid.h"
@@ -183,4 +183,4 @@ Pyramid5::Pyramid5(Elem* p) :
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_CELL_PYRAMID5_H

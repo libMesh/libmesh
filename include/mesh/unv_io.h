@@ -17,8 +17,8 @@
 
 
 
-#ifndef __unv_io_h__
-#define __unv_io_h__
+#ifndef LIBMESH_UNV_IO_H
+#define LIBMESH_UNV_IO_H
 
 
 // Local includes
@@ -339,4 +339,4 @@ Real UNVIO::D_to_e (std::string& number) const
 } // namespace libMesh
 
 
-#endif // #define __unv_io_h__
+#endif // LIBMESH_UNV_IO_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __hilbert_sfc_partitioner_h__
-#define __hilbert_sfc_partitioner_h__
+#ifndef LIBMESH_HILBERT_SFC_PARTITIONER_H
+#define LIBMESH_HILBERT_SFC_PARTITIONER_H
 
 // Local Includes -----------------------------------
 #include "libmesh/sfc_partitioner.h"
@@ -76,4 +76,4 @@ private:
 } // namespace libMesh
 
 
-#endif // #define __hilbert_sfc_partitioner_h__
+#endif // LIBMESH_HILBERT_SFC_PARTITIONER_H

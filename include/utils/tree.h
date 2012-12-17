@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tree_h__
-#define __tree_h__
+#ifndef LIBMESH_TREE_H
+#define LIBMESH_TREE_H
 
 // Local includes
 #include "libmesh/tree_node.h"
@@ -162,4 +162,4 @@ const Elem* Tree<N>::operator() (const Point& p) const
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_TREE_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_quadrature_type_h__
-#define __enum_quadrature_type_h__
+#ifndef LIBMESH_ENUM_QUADRATURE_TYPE_H
+#define LIBMESH_ENUM_QUADRATURE_TYPE_H
 
 // ------------------------------------------------------------
 // enum QuadratureType definition
@@ -46,7 +46,7 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // #define __enum_quadrature_type_h__
+#endif // LIBMESH_ENUM_QUADRATURE_TYPE_H
 
 
 

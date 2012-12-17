@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_inf_map_type_h__
-#define __enum_inf_map_type_h__
+#ifndef LIBMESH_ENUM_INF_MAP_TYPE_H
+#define LIBMESH_ENUM_INF_MAP_TYPE_H
 
 /**
  * The \p libMeshEnums namespace is the namespace all \p enum definitions
@@ -42,4 +42,4 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // #define __enum_inf_map_type_h__
+#endif // LIBMESH_ENUM_INF_MAP_TYPE_H

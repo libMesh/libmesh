@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __sparsity_pattern_h__
-#define __sparsity_pattern_h__
+#ifndef LIBMESH_SPARSITY_PATTERN_H
+#define LIBMESH_SPARSITY_PATTERN_H
 
 // Local Includes
 #include "libmesh/elem_range.h"
@@ -203,4 +203,4 @@ void SparsityPattern::sort_row (const BidirectionalIterator begin,
 
 } // namespace libMesh
 
-#endif // __sparsity_pattern_h__
+#endif // LIBMESH_SPARSITY_PATTERN_H

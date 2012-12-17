@@ -17,8 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __transient_rb_assembly_expansion_h__
-#define __transient_rb_assembly_expansion_h__
+#ifndef LIBMESH_TRANSIENT_RB_ASSEMBLY_EXPANSION_H
+#define LIBMESH_TRANSIENT_RB_ASSEMBLY_EXPANSION_H
 
 // libMesh includes
 #include "libmesh/rb_assembly_expansion.h"
@@ -90,4 +90,4 @@ private:
 
 }
 
-#endif 
+#endif // LIBMESH_TRANSIENT_RB_ASSEMBLY_EXPANSION_H

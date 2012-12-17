@@ -17,8 +17,8 @@
 
 
 
-#ifndef __vector_value_h__
-#define __vector_value_h__
+#ifndef LIBMESH_VECTOR_VALUE_H
+#define LIBMESH_VECTOR_VALUE_H
 
 // Local includes
 #include "libmesh/type_vector.h"
@@ -186,4 +186,4 @@ VectorValue<T>::VectorValue (const TypeVector<Real>& p_re,
 
 } // namespace libMesh
 
-#endif // #define __vector_value_h__
+#endif // LIBMESH_VECTOR_VALUE_H

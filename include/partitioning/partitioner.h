@@ -17,8 +17,8 @@
 
 
 
-#ifndef __partitioner_h__
-#define __partitioner_h__
+#ifndef LIBMESH_PARTITIONER_H
+#define LIBMESH_PARTITIONER_H
 
 // Local Includes -----------------------------------
 #include "libmesh/libmesh.h"
@@ -159,4 +159,4 @@ protected:
 
 
 
-#endif
+#endif // LIBMESH_PARTITIONER_H

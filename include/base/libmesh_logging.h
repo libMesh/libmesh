@@ -17,8 +17,8 @@
 
 
 
-#ifndef __libmesh_logging_h__
-#define __libmesh_logging_h__
+#ifndef LIBMESH_LIBMESH_LOGGING_H
+#define LIBMESH_LIBMESH_LOGGING_H
 
 
 // The library configuration options
@@ -34,7 +34,7 @@ namespace libMesh
 // in perf_log.{C,h} because the preceeding
 // #include "libmesh/perf_log.h" is ineffective.
 // Multiple inclusion avoidance problem...
-// __perf_log_h__ already #define'd, but the
+// LIBMESH_PERF_LOG_H already #define'd, but the
 // class has not been declared yet!.
 class PerfLog;
 
@@ -75,4 +75,4 @@ class PerfLog;
 
 
 
-#endif // #define __libmesh_logging_h__
+#endif // LIBMESH_LIBMESH_LOGGING_H

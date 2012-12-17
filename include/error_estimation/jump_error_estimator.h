@@ -17,8 +17,8 @@
 
 
 
-#ifndef __jump_error_estimator_h__
-#define __jump_error_estimator_h__
+#ifndef LIBMESH_JUMP_ERROR_ESTIMATOR_H
+#define LIBMESH_JUMP_ERROR_ESTIMATOR_H
 
 // Local Includes
 #include "libmesh/auto_ptr.h"
@@ -160,5 +160,5 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_JUMP_ERROR_ESTIMATOR_H
 

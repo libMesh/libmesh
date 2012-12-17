@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fourth_error_estimators_h__
-#define __fourth_error_estimators_h__
+#ifndef LIBMESH_FOURTH_ERROR_ESTIMATORS_H
+#define LIBMESH_FOURTH_ERROR_ESTIMATORS_H
 
 // Local Includes
 #include "libmesh/jump_error_estimator.h"
@@ -78,5 +78,5 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FOURTH_ERROR_ESTIMATORS_H
 

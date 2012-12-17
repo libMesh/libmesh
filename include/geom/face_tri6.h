@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tri6_h__
-#define __tri6_h__
+#ifndef LIBMESH_FACE_TRI6_H
+#define LIBMESH_FACE_TRI6_H
 
 
 // Local includes
@@ -224,4 +224,4 @@ private:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FACE_TRI6_H

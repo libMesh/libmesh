@@ -17,8 +17,8 @@
 
 
 
-#ifndef __discontinuity_measure_h___
-#define __discontinuity_measure_h__
+#ifndef LIBMESH_DISCONTINUITY_MEASURE_H
+#define LIBMESH_DISCONTINUITY_MEASURE_H
 
 // Local Includes
 #include "libmesh/jump_error_estimator.h"
@@ -108,5 +108,5 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_DISCONTINUITY_MEASURE_H
 

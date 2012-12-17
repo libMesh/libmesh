@@ -17,8 +17,8 @@
 
 
 
-#ifndef __solver_h__
-#define __solver_h__
+#ifndef LIBMESH_SOLVER_H
+#define LIBMESH_SOLVER_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -201,4 +201,4 @@ void Solver::post_process ()
 } // namespace libMesh
 
 
-#endif // #define __solver_h__
+#endif // LIBMESH_SOLVER_H

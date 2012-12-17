@@ -17,8 +17,8 @@
 
 
 
-#ifndef __petsc_linear_solver_h__
-#define __petsc_linear_solver_h__
+#ifndef LIBMESH_PETSC_LINEAR_SOLVER_H
+#define LIBMESH_PETSC_LINEAR_SOLVER_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -391,4 +391,4 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
 
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
-#endif // #ifdef __petsc_linear_solver_h__
+#endif // LIBMESH_PETSC_LINEAR_SOLVER_H

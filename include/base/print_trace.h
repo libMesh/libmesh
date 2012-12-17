@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __print_trace_h__
-#define __print_trace_h__
+#ifndef LIBMESH_PRINT_TRACE_H
+#define LIBMESH_PRINT_TRACE_H
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -39,4 +39,4 @@ std::string demangle(const char *name);
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_PRINT_TRACE_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __parallel_mesh_h__
-#define __parallel_mesh_h__
+#ifndef LIBMESH_PARALLEL_MESH_H
+#define LIBMESH_PARALLEL_MESH_H
 
 // Local Includes -----------------------------------
 #include "libmesh/mapvector.h"
@@ -441,4 +441,4 @@ private:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_PARALLEL_MESH_H

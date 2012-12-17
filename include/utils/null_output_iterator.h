@@ -1,4 +1,3 @@
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
@@ -18,8 +17,8 @@
 
 
 
-#ifndef __null_output_iterator_h__
-#define __null_output_iterator_h__
+#ifndef LIBMESH_NULL_OUTPUT_ITERATOR_H
+#define LIBMESH_NULL_OUTPUT_ITERATOR_H
 
 // Local includes
 
@@ -54,4 +53,4 @@ struct null_output_iterator
 } // namespace libMesh
 
 
-#endif // __null_output_iterator_h__
+#endif // LIBMESH_NULL_OUTPUT_ITERATOR_H

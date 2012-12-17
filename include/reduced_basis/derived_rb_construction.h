@@ -17,8 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __derived_rb_construction_h__
-#define __derived_rb_construction_h__
+#ifndef LIBMESH_DERIVED_RB_CONSTRUCTION_H
+#define LIBMESH_DERIVED_RB_CONSTRUCTION_H
 
 // Local includes
 #include "libmesh/dense_vector.h"
@@ -175,4 +175,4 @@ typedef DerivedRBConstruction<RBConstruction> SteadyDerivedRBConstruction;
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_DERIVED_RB_CONSTRUCTION_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_grid_h__
-#define __quadrature_grid_h__
+#ifndef LIBMESH_QUADRATURE_GRID_H
+#define LIBMESH_QUADRATURE_GRID_H
 
 // Local includes
 #include "libmesh/quadrature.h"
@@ -94,4 +94,4 @@ QGrid::~QGrid()
 
 
 
-#endif
+#endif // LIBMESH_QUADRATURE_GRID_H

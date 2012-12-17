@@ -17,8 +17,8 @@
 
 
 
-#ifndef __patch_recovery_error_estimator_h__
-#define __patch_recovery_error_estimator_h__
+#ifndef LIBMESH_PATCH_RECOVERY_ERROR_ESTIMATOR_H
+#define LIBMESH_PATCH_RECOVERY_ERROR_ESTIMATOR_H
 
 // Local Includes
 #include "libmesh/error_estimator.h"
@@ -143,4 +143,4 @@ public:
 } // namespace libMesh
 
 
-#endif // #define __patch_recovery_error_estimator_h__
+#endif // LIBMESH_PATCH_RECOVERY_ERROR_ESTIMATOR_H

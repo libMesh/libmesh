@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __diva_io_h__
-#define __diva_io_h__
+#ifndef LIBMESH_DIVA_IO_H
+#define LIBMESH_DIVA_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -83,4 +83,4 @@ DivaIO::DivaIO (const MeshBase& mesh) :
 
 } // namespace libMesh
 
-#endif // #define __diva_io_h__
+#endif // LIBMESH_DIVA_IO_H
