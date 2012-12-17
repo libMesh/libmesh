@@ -17,8 +17,8 @@
 
 
 
-#ifndef __slepc_eigen_solver_h__
-#define __slepc_eigen_solver_h__
+#ifndef LIBMESH_SLEPC_EIGEN_SOLVER_H
+#define LIBMESH_SLEPC_EIGEN_SOLVER_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -278,4 +278,4 @@ SlepcEigenSolver<T>::~SlepcEigenSolver ()
 
 
 #endif // #ifdef LIBMESH_HAVE_SLEPC
-#endif // #ifdef __slepc_linear_solver_h__
+#endif // LIBMESH_SLEPC_EIGEN_SOLVER_H

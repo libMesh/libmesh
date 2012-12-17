@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fe_base_h__
-#define __fe_base_h__
+#ifndef LIBMESH_FE_BASE_H
+#define LIBMESH_FE_BASE_H
 
 // Local includes
 #include "libmesh/reference_counted_object.h"
@@ -729,4 +729,4 @@ FEGenericBase<OutputType>::~FEGenericBase()
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FE_BASE_H

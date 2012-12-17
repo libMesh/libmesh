@@ -17,8 +17,8 @@
 
 
 
-#ifndef __statistics_h__
-#define __statistics_h__
+#ifndef LIBMESH_STATISTICS_H
+#define LIBMESH_STATISTICS_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -230,4 +230,4 @@ class StatisticsVector : public std::vector<T>
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_STATISTICS_H

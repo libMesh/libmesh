@@ -17,8 +17,8 @@
 
 
 
-#ifndef __twostep_time_solver_h__
-#define __twostep_time_solver_h__
+#ifndef LIBMESH_TWOSTEP_TIME_SOLVER_H
+#define LIBMESH_TWOSTEP_TIME_SOLVER_H
 
 // Local includes
 #include "libmesh/adaptive_time_solver.h"
@@ -76,4 +76,4 @@ public:
 } // namespace libMesh
 
 
-#endif // #define __twostep_time_solver_
+#endif // LIBMESH_TWOSTEP_TIME_SOLVER_H

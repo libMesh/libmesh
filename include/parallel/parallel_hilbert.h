@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __parallel_hilbert_h__
-#define __parallel_hilbert_h__
+#ifndef LIBMESH_PARALLEL_HILBERT_H
+#define LIBMESH_PARALLEL_HILBERT_H
 
 // This class contains all the functionality for bin sorting
 // Templated on the type of keys you will be sorting and the
@@ -63,5 +63,5 @@ namespace Parallel {
 
 #endif // LIBMESH_HAVE_LIBHILBERT && LIBMESH_HAVE_MPI
 
-#endif // __parallel_hilbert_h__
+#endif // LIBMESH_PARALLEL_HILBERT_H
 

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __laspack_linear_solver_h__
-#define __laspack_linear_solver_h__
+#ifndef LIBMESH_LASPACK_LINEAR_SOLVER_H
+#define LIBMESH_LASPACK_LINEAR_SOLVER_H
 
 #include "libmesh/libmesh_common.h"
 
@@ -188,4 +188,4 @@ LaspackLinearSolver<T>::solve (SparseMatrix<T>&,
 } // namespace libMesh
 
 #endif // #ifdef LIBMESH_HAVE_LASPACK
-#endif // #ifndef __laspack_linear_solver_h__
+#endif // LIBMESH_LASPACK_LINEAR_SOLVER_H

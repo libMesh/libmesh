@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_refinement_h__
-#define __mesh_refinement_h__
+#ifndef LIBMESH_MESH_REFINEMENT_H
+#define LIBMESH_MESH_REFINEMENT_H
 
 
 
@@ -714,4 +714,4 @@ inline unsigned char& MeshRefinement::node_level_mismatch_limit()
 } // namespace libMesh
 
 #endif // end #ifdef LIBMESH_ENABLE_AMR
-#endif // end #ifndef __mesh_refinement_h__
+#endif // LIBMESH_MESH_REFINEMENT_H

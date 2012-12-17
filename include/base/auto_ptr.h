@@ -41,8 +41,8 @@
 
 
 
-#ifndef __auto_ptr_h__
-#define __auto_ptr_h__
+#ifndef LIBMESH_AUTO_PTR_H
+#define LIBMESH_AUTO_PTR_H
 
 namespace libMesh
 {
@@ -313,4 +313,4 @@ public:
 
 } // namespace libMesh
 
-#endif /* __auto_ptr_h__ */
+#endif // LIBMESH_AUTO_PTR_H

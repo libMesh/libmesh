@@ -17,8 +17,8 @@
 
 
 
-#ifndef __linear_solver_h__
-#define __linear_solver_h__
+#ifndef LIBMESH_LINEAR_SOLVER_H
+#define LIBMESH_LINEAR_SOLVER_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -323,4 +323,4 @@ LinearSolver<T>::solve (const ShellMatrix<T>&  mat,
 } // namespace libMesh
 
 
-#endif // #ifdef __solver_h__
+#endif // LIBMESH_LINEAR_SOLVER_H

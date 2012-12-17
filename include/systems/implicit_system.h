@@ -17,8 +17,8 @@
 
 
 
-#ifndef __implicit_system_h__
-#define __implicit_system_h__
+#ifndef LIBMESH_IMPLICIT_SYSTEM_H
+#define LIBMESH_IMPLICIT_SYSTEM_H
 
 // Local Includes
 #include "libmesh/explicit_system.h"
@@ -389,4 +389,4 @@ unsigned int ImplicitSystem::n_matrices () const
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_IMPLICIT_SYSTEM_H

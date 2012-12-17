@@ -17,8 +17,8 @@
 
 
 
-#ifndef __adjoint_refinement_estimator_h__
-#define __adjoint_refinement_estimator_h__
+#ifndef LIBMESH_ADJOINT_REFINEMENT_ESTIMATOR_H
+#define LIBMESH_ADJOINT_REFINEMENT_ESTIMATOR_H
 
 // Local Includes
 #include "libmesh/error_estimator.h"
@@ -142,5 +142,5 @@ protected:
 
  #endif // #ifdef LIBMESH_ENABLE_AMR
 
-#endif
+#endif // LIBMESH_ADJOINT_REFINEMENT_ESTIMATOR_H
 

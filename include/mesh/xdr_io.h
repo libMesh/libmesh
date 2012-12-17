@@ -17,8 +17,8 @@
 
 
 
-#ifndef __xdr_io_h__
-#define __xdr_io_h__
+#ifndef LIBMESH_XDR_IO_H
+#define LIBMESH_XDR_IO_H
 
 
 // Local includes
@@ -267,4 +267,4 @@ void XdrIO::set_auto_parallel ()
 
 
 
-#endif // #define __xdr_io_h__
+#endif // LIBMESH_XDR_IO_H

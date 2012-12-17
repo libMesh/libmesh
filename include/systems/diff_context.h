@@ -17,8 +17,8 @@
 
 
 
-#ifndef __diff_context_h__
-#define __diff_context_h__
+#ifndef LIBMESH_DIFF_CONTEXT_H
+#define LIBMESH_DIFF_CONTEXT_H
 
 // Local Includes
 #include "libmesh/dense_matrix.h"
@@ -429,4 +429,4 @@ public:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_DIFF_CONTEXT_H

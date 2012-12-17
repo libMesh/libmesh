@@ -17,8 +17,8 @@
 
 
 
-#ifndef __frequency_system_h__
-#define __frequency_system_h__
+#ifndef LIBMESH_FREQUENCY_SYSTEM_H
+#define LIBMESH_FREQUENCY_SYSTEM_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -290,4 +290,4 @@ std::pair<unsigned int, Real> FrequencySystem::get_rval (unsigned int n) const
 
 #endif // if defined(LIBMESH_USE_COMPLEX_NUMBERS)
 
-#endif // ifndef __frequency_system_h__
+#endif // LIBMESH_FREQUENCY_SYSTEM_H

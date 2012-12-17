@@ -17,8 +17,8 @@
 
 
 
-#ifndef __slepc_macro_h__
-#define __slepc_macro_h__
+#ifndef LIBMESH_SLEPC_MACRO_H
+#define LIBMESH_SLEPC_MACRO_H
 
 // C++ includes
 
@@ -57,4 +57,4 @@
 #endif
 
 #endif // #if LIBMESH_HAVE_SLEPC
-#endif // #ifdef __slepc_macro_h__
+#endif // LIBMESH_SLEPC_MACRO_H

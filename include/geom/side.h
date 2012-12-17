@@ -17,8 +17,8 @@
 
 
 
-#ifndef __side_h__
-#define __side_h__
+#ifndef LIBMESH_SIDE_H
+#define LIBMESH_SIDE_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -232,4 +232,4 @@ class SideEdge : public EdgeType
 
 } // namespace libMesh
 
-#endif // end #ifndef __side_h__
+#endif // LIBMESH_SIDE_H

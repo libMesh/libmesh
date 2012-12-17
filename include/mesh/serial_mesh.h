@@ -17,8 +17,8 @@
 
 
 
-#ifndef __serial_mesh_h__
-#define __serial_mesh_h__
+#ifndef LIBMESH_SERIAL_MESH_H
+#define LIBMESH_SERIAL_MESH_H
 
 // Local Includes -----------------------------------
 #include "libmesh/unstructured_mesh.h"
@@ -355,4 +355,4 @@ private:
 
 
 
-#endif
+#endif // LIBMESH_SERIAL_MESH_H

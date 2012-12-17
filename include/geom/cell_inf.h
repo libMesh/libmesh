@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_inf_h__
-#define __cell_inf_h__
+#ifndef LIBMESH_CELL_INF_H
+#define LIBMESH_CELL_INF_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -89,4 +89,4 @@ Point InfCell::origin () const
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-#endif
+#endif // LIBMESH_CELL_INF_H

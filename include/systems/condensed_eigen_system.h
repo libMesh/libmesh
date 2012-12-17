@@ -6,7 +6,7 @@
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
 
-// This library is distributd in the hope that it will be useful,
+// This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __condensed_eigen_system_h__
-#define __condensed_eigen_system_h__
+#ifndef LIBMESH_CONDENSED_EIGEN_SYSTEM_H
+#define LIBMESH_CONDENSED_EIGEN_SYSTEM_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -132,4 +132,4 @@ private:
 
 #endif // LIBMESH_HAVE_SLEPC
 
-#endif
+#endif // LIBMESH_CONDENSED_EIGEN_SYSTEM_H

@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __variant_filter_iterator_h__
-#define __variant_filter_iterator_h__
+#ifndef LIBMESH_VARIANT_FILTER_ITERATOR_H
+#define LIBMESH_VARIANT_FILTER_ITERATOR_H
 
 
 // C++ includes
@@ -520,4 +520,4 @@ bool operator!=(const variant_filter_iterator<Predicate, Type, ReferenceType, Po
 
 
 
-#endif
+#endif // LIBMESH_VARIANT_FILTER_ITERATOR_H

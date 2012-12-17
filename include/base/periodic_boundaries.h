@@ -16,8 +16,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __periodic_boundaries_h__
-#define __periodic_boundaries_h__
+#ifndef LIBMESH_PERIODIC_BOUNDARIES_H
+#define LIBMESH_PERIODIC_BOUNDARIES_H
 
 // ------------------------------------------------------------
 // Periodic boundary conditions information
@@ -68,4 +68,4 @@ namespace libMesh {
 
 #endif // LIBMESH_ENABLE_PERIODIC
 
-#endif // __periodic_boundaries_h__
+#endif // LIBMESH_PERIODIC_BOUNDARIES_H

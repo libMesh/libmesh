@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mapvector_h__
-#define __mapvector_h__
+#ifndef LIBMESH_MAPVECTOR_H
+#define LIBMESH_MAPVECTOR_H
 
 // C++ Includes   -----------------------------------
 #include <map>
@@ -140,4 +140,4 @@ public:
 
 } // namespace libMesh
 
-#endif // __mapvector_h__
+#endif // LIBMESH_MAPVECTOR_H

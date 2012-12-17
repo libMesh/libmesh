@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __inf_quad4_h__
-#define __inf_quad4_h__
+#ifndef LIBMESH_FACE_INF_QUAD4_H
+#define LIBMESH_FACE_INF_QUAD4_H
 
 
 #include "libmesh/libmesh_config.h"
@@ -182,4 +182,4 @@ protected:
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-#endif
+#endif // LIBMESH_FACE_INF_QUAD4_H

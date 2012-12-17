@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_hex20_h__
-#define __cell_hex20_h__
+#ifndef LIBMESH_CELL_HEX20_H
+#define LIBMESH_CELL_HEX20_H
 
 // Local includes
 #include "libmesh/cell_hex.h"
@@ -231,4 +231,4 @@ Hex20::Hex20(Elem* p) :
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_CELL_HEX20_H

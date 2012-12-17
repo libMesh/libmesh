@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fe_abstract_h__
-#define __fe_abstract_h__
+#ifndef LIBMESH_FE_ABSTRACT_H
+#define LIBMESH_FE_ABSTRACT_H
 
 // Local includes
 #include "libmesh/reference_counted_object.h"
@@ -623,4 +623,4 @@ FEAbstract::~FEAbstract()
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FE_ABSTRACT_H

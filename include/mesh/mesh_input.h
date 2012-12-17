@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_input_h__
-#define __mesh_input_h__
+#ifndef LIBMESH_MESH_INPUT_H
+#define LIBMESH_MESH_INPUT_H
 
 
 // Local includes
@@ -188,4 +188,4 @@ void MeshInput<MT>::skip_comment_lines (std::istream &in,
 } // namespace libMesh
 
 
-#endif // #define __mesh_io_h__
+#endif // LIBMESH_MESH_INPUT_H

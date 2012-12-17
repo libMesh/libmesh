@@ -17,8 +17,8 @@
 
 
 
-#ifndef __raw_accessor_h__
-#define __raw_accessor_h__
+#ifndef LIBMESH_RAW_ACCESSOR_H
+#define LIBMESH_RAW_ACCESSOR_H
 
   // Local includes
 #include "libmesh/libmesh_common.h"
@@ -210,4 +210,4 @@ Real& RawAccessor<RealTensor>::operator()( unsigned int k )
 #endif
 
 }
-#endif //__raw_accessor_h__
+#endif // LIBMESH_RAW_ACCESSOR_H

@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __quadrature_conical_h__
-#define __quadrature_conical_h__
+#ifndef LIBMESH_QUADRATURE_CONICAL_H
+#define LIBMESH_QUADRATURE_CONICAL_H
 
 // Local includes
 #include "libmesh/quadrature.h"
@@ -102,5 +102,5 @@ class QConical : public QBase
 
 } // namespace libMesh
 
-#endif // #ifndef __quadrature_conical_h__
+#endif // LIBMESH_QUADRATURE_CONICAL_H
 

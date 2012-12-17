@@ -18,11 +18,11 @@
 
 
 
-#ifndef __libmesh_C_isnan_h__
-#define __libmesh_C_isnan_h__
+#ifndef LIBMESH_LIBMESH_C_ISNAN_H
+#define LIBMESH_LIBMESH_C_ISNAN_H
 
 int libmesh_C_isnan_float(float a);
 int libmesh_C_isnan_double(double a);
 int libmesh_C_isnan_longdouble(long double a);
 
-#endif // #define __libmesh_C_isnan_h__
+#endif // LIBMESH_LIBMESH_C_ISNAN_H

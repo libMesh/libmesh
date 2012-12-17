@@ -1,4 +1,3 @@
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
@@ -18,8 +17,8 @@
 
 
 
-#ifndef __location_maps_h__
-#define __location_maps_h__
+#ifndef LIBMESH_LOCATION_MAPS_H
+#define LIBMESH_LOCATION_MAPS_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -78,4 +77,4 @@ private:
 } // namespace libMesh
 
 
-#endif // #define __location_maps_h__
+#endif // LIBMESH_LOCATION_MAPS_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __shell_matrix_h__
-#define __shell_matrix_h__
+#ifndef LIBMESH_SHELL_MATRIX_H
+#define LIBMESH_SHELL_MATRIX_H
 
 
 // Local includes
@@ -107,4 +107,4 @@ ShellMatrix<T>::~ShellMatrix ()
 } // namespace libMesh
 
 
-#endif // #ifndef __shell_matrix_h__
+#endif // LIBMESH_SHELL_MATRIX_H

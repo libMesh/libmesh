@@ -17,8 +17,8 @@
 
 
 
-#ifndef __node_h__
-#define __node_h__
+#ifndef LIBMESH_NODE_H
+#define LIBMESH_NODE_H
 
 // Local includes
 #include "libmesh/point.h"
@@ -346,4 +346,4 @@ bool Node::active () const
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_NODE_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_fe_family_h__
-#define __enum_fe_family_h__
+#ifndef LIBMESH_ENUM_FE_FAMILY_H
+#define LIBMESH_ENUM_FE_FAMILY_H
 
 // ------------------------------------------------------------
 // enum FEFamily definition
@@ -84,7 +84,7 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // #ifndef __enum_fe_family_h__
+#endif // LIBMESH_ENUM_FE_FAMILY_H
 
 
 

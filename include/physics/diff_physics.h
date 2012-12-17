@@ -18,8 +18,8 @@
 
 
 
-#ifndef __diff_physics_h__
-#define __diff_physics_h__
+#ifndef LIBMESH_DIFF_PHYSICS_H
+#define LIBMESH_DIFF_PHYSICS_H
 
 // Local Includes
 #include "libmesh/auto_ptr.h"
@@ -250,4 +250,4 @@ protected:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_DIFF_PHYSICS_H

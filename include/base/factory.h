@@ -17,8 +17,8 @@
 
 
 
-#ifndef __factory_h__
-#define __factory_h__
+#ifndef LIBMESH_FACTORY_H
+#define LIBMESH_FACTORY_H
 
 
 // Local includes
@@ -178,4 +178,4 @@ AutoPtr<Base> FactoryImp<Derived,Base>::create ()
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FACTORY_H

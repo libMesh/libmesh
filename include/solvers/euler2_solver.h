@@ -17,8 +17,8 @@
 
 
 
-#ifndef __euler2_solver_h__
-#define __euler2_solver_h__
+#ifndef LIBMESH_EULER2_SOLVER_H
+#define LIBMESH_EULER2_SOLVER_H
 
 // Local includes
 #include "libmesh/unsteady_solver.h"
@@ -102,4 +102,4 @@ public:
 } // namespace libMesh
 
 
-#endif // #define __euler2_solver_h__
+#endif // LIBMESH_EULER2_SOLVER_H

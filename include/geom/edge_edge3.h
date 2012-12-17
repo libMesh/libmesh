@@ -17,8 +17,8 @@
 
 
 
-#ifndef __edge3_h__
-#define __edge3_h__
+#ifndef LIBMESH_EDGE_EDGE3_H
+#define LIBMESH_EDGE_EDGE3_H
 
 
 // Local includes
@@ -187,4 +187,4 @@ protected:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_EDGE_EDGE3_H

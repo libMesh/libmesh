@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_solver_type_h__
-#define __enum_solver_type_h__
+#ifndef LIBMESH_ENUM_SOLVER_TYPE_H
+#define LIBMESH_ENUM_SOLVER_TYPE_H
 
 /*
  * The \p libMeshEnums namespace is the namespace all \p enum definitions
@@ -58,7 +58,7 @@ using namespace libMeshEnums;
 
 
 
-#endif // #define __enum_solver_type_h__
+#endif // LIBMESH_ENUM_SOLVER_TYPE_H
 
 
 

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __equation_systems_h__
-#define __equation_systems_h__
+#ifndef LIBMESH_EQUATION_SYSTEMS_H
+#define LIBMESH_EQUATION_SYSTEMS_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -693,4 +693,4 @@ System & EquationSystems::get_system (const unsigned int num)
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_EQUATION_SYSTEMS_H

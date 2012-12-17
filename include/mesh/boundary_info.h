@@ -17,8 +17,8 @@
 
 
 
-#ifndef __boundary_info_h__
-#define __boundary_info_h__
+#ifndef LIBMESH_BOUNDARY_INFO_H
+#define LIBMESH_BOUNDARY_INFO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -522,4 +522,4 @@ void BoundaryInfo::remove (const Elem* elem)
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_BOUNDARY_INFO_H

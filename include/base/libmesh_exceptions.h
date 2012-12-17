@@ -17,8 +17,8 @@
 
 
 
-#ifndef __libmesh_exceptions_h__
-#define __libmesh_exceptions_h__
+#ifndef LIBMESH_LIBMESH_EXCEPTIONS_H
+#define LIBMESH_LIBMESH_EXCEPTIONS_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -106,4 +106,4 @@ namespace libMesh {
 
 #endif // LIBMESH_ENABLE_EXCEPTIONS
 
-#endif // #define __libmesh_exceptions_h__
+#endif // LIBMESH_LIBMESH_EXCEPTIONS_H

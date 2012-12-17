@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fe_map_h__
-#define __fe_map_h__
+#ifndef LIBMESH_FE_MAP_H
+#define LIBMESH_FE_MAP_H
 
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/point.h"
@@ -785,4 +785,4 @@ class Elem;
   
 }
 
-#endif //__fe_map_h__
+#endif // LIBMESH_FE_MAP_H

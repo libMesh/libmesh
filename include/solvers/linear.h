@@ -17,8 +17,8 @@
 
 
 
-#ifndef __linear_h__
-#define __linear_h__
+#ifndef LIBMESH_LINEAR_H
+#define LIBMESH_LINEAR_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -101,4 +101,4 @@ Linear<T>::~Linear ()
 } // namespace libMesh
 
 
-#endif // #define __linear_h__
+#endif // LIBMESH_LINEAR_H

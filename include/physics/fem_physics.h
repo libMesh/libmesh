@@ -18,8 +18,8 @@
 
 
 
-#ifndef __fem_physics_h__
-#define __fem_physics_h__
+#ifndef LIBMESH_FEM_PHYSICS_H
+#define LIBMESH_FEM_PHYSICS_H
 
 // Local Includes
 #include "libmesh/libmesh.h" // for libMesh::invalid_uint
@@ -267,4 +267,4 @@ unsigned int FEMPhysics::get_mesh_z_var() const
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_FEM_PHYSICS_H
