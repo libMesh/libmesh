@@ -76,7 +76,6 @@ AC_DEFUN([CONFIGURE_VTK],
     if (test $enablevtk = yes); then
     
        dnl Check for existence of a header file in the specified location
-       dnl AC_CHECK_FILE([$VTK_INC/vtkConfigure.h], [vtkincFound="OK"], [vtkincFound="FAIL"])
        vtkincFound=no;
        AC_CHECK_HEADERS($VTK_INC/vtkConfigure.h, vtkincFound=yes)
   
@@ -97,11 +96,7 @@ AC_DEFUN([CONFIGURE_VTK],
        fi
   
        if (test x$enablevtk = xyes); then
-         dnl Also Check for existence of required libraries.  This is not really
-         dnl right way to do it -- it's not portable to Macs, where .so's are called
-         dnl .dylib's instead.
-         dnl AC_CHECK_FILE($VTK_LIB/libvtkIO.so, [enablevtk=yes], [enablevtk=no])
-         dnl AC_CHECK_FILE($VTK_LIB/libvtkCommon.so, [enablevtk=yes], [enablevtk=no])
+         dnl Also Check for existence of required libraries.
          
          dnl AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
          dnl Note: Basically tries to compile a function which calls main().  
