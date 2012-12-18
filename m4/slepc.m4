@@ -41,17 +41,21 @@ AC_DEFUN([CONFIGURE_SLEPC],
       enableslepc=no
       AC_MSG_RESULT(<<< SLEPc disabled.  Please set your "\$SLEPC_DIR" environment variable correctly to enable SLEPc. >>>)
     else
-      AC_CHECK_FILE([$SLEPC_DIR/include/slepc.h],
-                    [SLEPC_INCLUDE="-I$SLEPC_DIR/include"],
-                    [
-		      AC_MSG_RESULT(<<< Invalid "\$SLEPC_DIR" detected (slepc.h not found). SLEPc disabled. >>>)
-		      unset SLEPC_DIR
-        	      enableslepc=no
-		    ])
+      AC_CHECK_HEADER([$SLEPC_DIR/include/slepcversion.h],
+                      [SLEPC_INCLUDE="-I$SLEPC_DIR/include"],
+                      [
+                      AC_MSG_RESULT(<<< Invalid "\$SLEPC_DIR" detected (slepcversion.h not found). SLEPc disabled. >>>)
+                      unset SLEPC_DIR
+                      enableslepc=no
+                      ])
 
+      # I didn't check this code branch since I don't use a
+      # PETSC_ARCH, but running AC_CHECK_HEADER on slepcconf.h
+      # should be pretty safe... from what I can tell it just
+      # #defines a few things.
       if (test "x$PETSC_ARCH" != "x"); then
-	  AC_CHECK_FILE([$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h],
-                        [SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"])
+	  AC_CHECK_HEADER([$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h],
+                          [SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"])
       fi
     fi
 
@@ -71,17 +75,21 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
       # OK, now we will create a temporary makefile to query SLEPc libs
       includefile=""
-      AC_CHECK_FILE([${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf],
-	            [includefile=${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf],
 
-      AC_CHECK_FILE([${SLEPC_DIR}/conf/slepc_common_variables],
-	            [includefile=${SLEPC_DIR}/conf/slepc_common_variables],
+      # These files are not headers, so they will never pass an AC_CHECK_HEADER test.
+      # If AC_CHECK_FILE is forbidden while cross-compiling, perhaps we can just fall back on
+      # 'if test -r' calls?
+      if (test -r ${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf) ; then
+         includefile=${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf
+      elif (test -r ${SLEPC_DIR}/conf/slepc_common_variables) ; then
+         includefile=${SLEPC_DIR}/conf/slepc_common_variables
+      elif (test -r ${SLEPC_DIR}/conf/slepc_variables) ; then
+         includefile=${SLEPC_DIR}/conf/slepc_variables
+      else
+         enableslepc=no
+      fi
 
-      AC_CHECK_FILE([${SLEPC_DIR}/conf/slepc_variables],
-	            [includefile=${SLEPC_DIR}/conf/slepc_variables],
-		    [enableslepc=no])))
-
-      if (test "x$enableslepc" = "xyes" -a "x$includefile" != "x" -a -r $includefile); then
+      if (test "x$enableslepc" = "xyes" -a "x$includefile" != "x"); then
 	  AC_MSG_RESULT(<<< Querying SLEPc configuration from $includefile >>>)
 	  cat <<EOF >Makefile_config_slepc
 include $includefile
