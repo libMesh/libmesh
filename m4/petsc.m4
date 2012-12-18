@@ -41,26 +41,18 @@ AC_DEFUN([CONFIGURE_PETSC],
       fi	
     fi
   
-    # We need to add $PETSC_DIR to the current value of the $CPPFLAGS
-    # in order for the call to AC_CHECK_HEADER to succeed.  Also, we
-    # use a C compiler for the test compilation rather than C++.
-
-    # Save original value of CPPFLAGS, then append $PETSC_DIR/include to CPPFLAGS so the
-    # configure test can find the other headers that petsc.h includes...
-    old_CPPFLAGS="$CPPFLAGS"
-    CPPFLAGS="$old_CPPFLAGS -I$PETSC_DIR/include"
-
+    # Let's use a C compiler for the AC_CHECK_HEADER test, although this is
+    # not strictly necessary...
     AC_LANG_PUSH(C)
-    AC_CHECK_HEADER($PETSC_DIR/include/petsc.h,
-                    PETSC_H_PATH=$PETSC_DIR/include/petsc.h)
+    AC_CHECK_HEADER($PETSC_DIR/include/petscversion.h,
+                    [enablepetsc=yes],
+                    [enablepetsc=no])
     AC_LANG_POP
-
-    # Reset the value of CPPFLAGS
-    CPPFLAGS="$old_CPPFLAGS"
 
     # Grab PETSc version and substitute into Makefile.
     # If version 2.x, also check that PETSC_ARCH is set
-    if (test -r $PETSC_DIR/include/petsc.h) ; then
+    # This if-test used to be: if (test -r $PETSC_DIR/include/petsc.h) ; then
+    if (test "$enablepetsc" !=  no) ; then
       # Some tricks to discover the version of petsc.
       # You have to have grep and sed for this to work.
       petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
@@ -91,7 +83,7 @@ AC_DEFUN([CONFIGURE_PETSC],
         fi
       fi
   
-    else # petsc.h was not readable
+    else # petscversion.h was not readable
         enablepetsc=no
     fi
   
