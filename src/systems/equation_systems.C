@@ -515,8 +515,8 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
     unsigned int dim = this->get_mesh().mesh_dimension();
     unsigned int n_vars = n_scalar_vars + dim*n_vector_vars;
 
-    // We'd better not have more than dim*n_vars (all vector variables)
-    libmesh_assert_less_equal ( n_vars, dim*n_vars );
+    // We'd better not have more than dim*his->n_vars() (all vector variables)
+    libmesh_assert_less_equal ( n_vars, dim*this->n_vars() );
 
     // Here, we're assuming the number of vector components is the same
     // as the mesh dimension. Will break for mixed dimension meshes.
