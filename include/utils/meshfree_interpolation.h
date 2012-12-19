@@ -86,6 +86,12 @@ public:
    */
   void set_field_variables (const std::vector<std::string> &names)
   { _names = names; }
+
+  /**
+   *@returns the field variables as a read-only reference.
+   */
+  const std::vector<std::string> & field_variables() const
+  { return _names; }
   
   /**
    * @returns a writeable reference to the point list.

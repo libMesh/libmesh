@@ -29,6 +29,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/tecplot_io.h"
+#include "meshless_interpolation_function.h"
 
 // C++ includes
 #include <cstdlib>
@@ -178,7 +179,7 @@ int main(int argc, char** argv)
     {
       Mesh mesh_a, mesh_b;
 
-      mesh_a.read("unstruct.ucd.gz"); mesh_b.read("struct.ucd.gz");
+      mesh_a.read("struct.ucd.gz"); mesh_b.read("unstruct.ucd.gz");
 
       // Create equation systems objects.
       EquationSystems
@@ -192,9 +193,7 @@ int main(int argc, char** argv)
       sys_b.add_variable ("Cp", FIRST);
 
       sys_a.attach_init_function (init_sys);
-
       es_a.init();
-      es_b.init();
       
       // Write out the initial conditions.
       TecplotIO(mesh_a).write_equation_systems ("src.dat",
@@ -223,31 +222,15 @@ int main(int argc, char** argv)
 	  }	  	
       }
 
-      // We now will loop over every node in the target mesh
-      // and interpolate the solution for inspection.
-      {
-	MeshBase::const_node_iterator nd  = mesh_b.nodes_begin();
-	MeshBase::const_node_iterator end = mesh_b.nodes_end();
 
-	std::vector<Point>  tgt_p(1);
-	std::vector<Number> tgt_v;
-	
-	for (; nd!=end; ++nd)
-	  {
-	    const Node *node(*nd);
+      // Create a MeshlessInterpolationFunction that uses our InverseDistanceInterpolation
+      // object
+      MeshlessInterpolationFunction mif(idi);
 
-	    tgt_p[0] = *node;
-
-	    idi.interpolate_field_data (field_vars,
-					tgt_p, tgt_v);
-	    
-	    sys_b.solution->set(node->dof_number(0,0,0), tgt_v[0]);
-	  }	  	
-
-	sys_b.solution->close();
-	sys_b.update();
-      }
-
+      // project the solution onto system b
+      es_b.init();
+      sys_b.project_solution (&mif);
+      
       // Write the result
       TecplotIO(mesh_b).write_equation_systems ("dest.dat",
 						es_b);

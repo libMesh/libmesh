@@ -1,6 +1,6 @@
 example_name  = miscellaneous_ex8
 install_dir   = $(examples_install_path)/miscellaneous/ex8
-data          = miscellaneous_ex8.C run.sh unstruct.ucd.gz struct.ucd.gz
+data          = miscellaneous_ex8.C meshless_interpolation_function.h run.sh unstruct.ucd.gz struct.ucd.gz
 sources       = $(data) run.sh
 
 # conditionally enable this test
