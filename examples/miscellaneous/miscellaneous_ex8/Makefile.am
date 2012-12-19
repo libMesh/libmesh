@@ -1,6 +1,6 @@
 example_name  = miscellaneous_ex8
 install_dir   = $(examples_install_path)/miscellaneous/ex8
-data          = miscellaneous_ex8.C run.sh
+data          = miscellaneous_ex8.C run.sh unstruct.ucd.gz struct.ucd.gz
 sources       = $(data) run.sh
 
 # conditionally enable this test
@@ -8,7 +8,7 @@ if LIBMESH_ENABLE_NANOFLANN
   check_SCRIPTS = run.sh
 endif
 
-CLEANFILES =
+CLEANFILES = src.dat dest.dat
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD
