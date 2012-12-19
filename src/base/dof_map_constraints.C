@@ -1764,10 +1764,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
       return;
     }
 
-  // delay inserting elem_dofs for efficiency in the case of
-  // no constraints.  In that case we don't get here!
-  dof_set.insert (elem_dofs.begin(),
-		  elem_dofs.end());
+  for (unsigned int i=0; i != elem_dofs.size(); ++i)
+    dof_set.erase (elem_dofs[i]);
 
   // If we added any DOFS then we need to do this recursively.
   // It is possible that we just added a DOF that is also
@@ -1775,20 +1773,21 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
   //
   // Also, we need to handle the special case of an element having DOFs
   // constrained in terms of other, local DOFs
-  if ((dof_set.size() != elem_dofs.size()) || // case 1: constrained in terms of other DOFs
-      !called_recursively)                    // case 2: constrained in terms of our own DOFs
+  if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
+      !called_recursively) // case 2: constrained in terms of our own DOFs
     {
-      // Create a new list of element DOFs containing the
-      // contents of the current dof_set.
-      std::vector<unsigned int> new_elem_dofs (dof_set.begin(),
-					       dof_set.end());
+      const unsigned int old_size = elem_dofs.size();
+
+      // Add new dependency dofs to the end of the current dof set
+      elem_dofs.insert(elem_dofs.end(),
+		       dof_set.begin(), dof_set.end());
 
       // Now we can build the constraint matrix.
       // Note that resize also zeros for a DenseMatrix<Number>.
-      C.resize (elem_dofs.size(), new_elem_dofs.size());
+      C.resize (old_size, elem_dofs.size());
 
       // Create the C constraint matrix.
-      for (unsigned int i=0; i<elem_dofs.size(); i++)
+      for (unsigned int i=0; i != old_size; i++)
 	if (this->is_constrained_dof(elem_dofs[i]))
 	  {
 	    // If the DOF is constrained
@@ -1805,22 +1804,18 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 	    for (DofConstraintRow::const_iterator
 		   it=constraint_row.begin(); it != constraint_row.end();
 		 ++it)
-	      for (unsigned int j=0; j<new_elem_dofs.size(); j++)
-		if (new_elem_dofs[j] == it->first)
+	      for (unsigned int j=0; j != elem_dofs.size(); j++)
+		if (elem_dofs[j] == it->first)
 		  C(i,j) = it->second;
 	  }
 	else
 	  {
-	    for (unsigned int j=0; j<new_elem_dofs.size(); j++)
-	      if (new_elem_dofs[j] == elem_dofs[i])
-		C(i,j) =  1.;
+            C(i,i) = 1.;
 	  }
 
       // May need to do this recursively.  It is possible
       // that we just replaced a constrained DOF with another
       // constrained DOF.
-      elem_dofs = new_elem_dofs;
-
       DenseMatrix<Number> Cnew;
 
       this->build_constraint_matrix (Cnew, elem_dofs, true);
@@ -1887,10 +1882,8 @@ void DofMap::build_constraint_matrix_and_vector
       return;
     }
 
-  // delay inserting elem_dofs for efficiency in the case of
-  // no constraints.  In that case we don't get here!
-  dof_set.insert (elem_dofs.begin(),
-		  elem_dofs.end());
+  for (unsigned int i=0; i != elem_dofs.size(); ++i)
+    dof_set.erase (elem_dofs[i]);
 
   // If we added any DOFS then we need to do this recursively.
   // It is possible that we just added a DOF that is also
@@ -1898,21 +1891,25 @@ void DofMap::build_constraint_matrix_and_vector
   //
   // Also, we need to handle the special case of an element having DOFs
   // constrained in terms of other, local DOFs
-  if ((dof_set.size() != elem_dofs.size()) || // case 1: constrained in terms of other DOFs
-      !called_recursively)                    // case 2: constrained in terms of our own DOFs
+  if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
+      !called_recursively) // case 2: constrained in terms of our own DOFs
     {
-      // Create a new list of element DOFs containing the
-      // contents of the current dof_set.
-      std::vector<unsigned int> new_elem_dofs (dof_set.begin(),
-					       dof_set.end());
+      const unsigned int old_size = elem_dofs.size();
+
+      // Add new dependency dofs to the end of the current dof set
+      elem_dofs.insert(elem_dofs.end(),
+		       dof_set.begin(), dof_set.end());
+
+      elem_dofs.insert(elem_dofs.end(),
+		       dof_set.begin(), dof_set.end());
 
       // Now we can build the constraint matrix and vector.
       // Note that resize also zeros for a DenseMatrix and DenseVector
-      C.resize (elem_dofs.size(), new_elem_dofs.size());
-      H.resize (elem_dofs.size());
+      C.resize (old_size, elem_dofs.size());
+      H.resize (old_size);
 
       // Create the C constraint matrix.
-      for (unsigned int i=0; i<elem_dofs.size(); i++)
+      for (unsigned int i=0; i != old_size; i++)
 	if (this->is_constrained_dof(elem_dofs[i]))
 	  {
 	    // If the DOF is constrained
@@ -1929,24 +1926,20 @@ void DofMap::build_constraint_matrix_and_vector
 	    for (DofConstraintRow::const_iterator
 		   it=constraint_row.begin(); it != constraint_row.end();
 		 ++it)
-	      for (unsigned int j=0; j<new_elem_dofs.size(); j++)
-		if (new_elem_dofs[j] == it->first)
+	      for (unsigned int j=0; j != elem_dofs.size(); j++)
+		if (elem_dofs[j] == it->first)
 		  C(i,j) = it->second;
 
             H(i) = pos->second.second;
 	  }
 	else
 	  {
-	    for (unsigned int j=0; j<new_elem_dofs.size(); j++)
-	      if (new_elem_dofs[j] == elem_dofs[i])
-		C(i,j) =  1.;
+            C(i,i) = 1.;
 	  }
 
       // May need to do this recursively.  It is possible
       // that we just replaced a constrained DOF with another
       // constrained DOF.
-      elem_dofs = new_elem_dofs;
-
       DenseMatrix<Number> Cnew;
       DenseVector<Number> Hnew;
 
