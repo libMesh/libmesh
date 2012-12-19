@@ -28541,56 +28541,32 @@ fi
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly to enable SLEPc. >>>" >&5
 $as_echo "<<< SLEPc disabled.  Please set your \"\$SLEPC_DIR\" environment variable correctly to enable SLEPc. >>>" >&6; }
     else
-      as_ac_File=`$as_echo "ac_cv_file_$SLEPC_DIR/include/slepc.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SLEPC_DIR/include/slepc.h" >&5
-$as_echo_n "checking for $SLEPC_DIR/include/slepc.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$SLEPC_DIR/include/slepc.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+      as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/include/slepcversion.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/include/slepcversion.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   SLEPC_INCLUDE="-I$SLEPC_DIR/include"
 else
 
-		      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Invalid \"\$SLEPC_DIR\" detected (slepc.h not found). SLEPc disabled. >>>" >&5
-$as_echo "<<< Invalid \"\$SLEPC_DIR\" detected (slepc.h not found). SLEPc disabled. >>>" >&6; }
-		      unset SLEPC_DIR
-        	      enableslepc=no
+                      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Invalid \"\$SLEPC_DIR\" detected (slepcversion.h not found). SLEPc disabled. >>>" >&5
+$as_echo "<<< Invalid \"\$SLEPC_DIR\" detected (slepcversion.h not found). SLEPc disabled. >>>" >&6; }
+                      unset SLEPC_DIR
+                      enableslepc=no
 
 fi
 
 
+
+      # I didn't check this code branch since I don't use a
+      # PETSC_ARCH, but running AC_CHECK_HEADER on slepcconf.h
+      # should be pretty safe... from what I can tell it just
+      # #defines a few things.
       if (test "x$PETSC_ARCH" != "x"); then
-	  as_ac_File=`$as_echo "ac_cv_file_$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" >&5
-$as_echo_n "checking for $SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+	  as_ac_Header=`$as_echo "ac_cv_header_$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$SLEPC_DIR/$PETSC_ARCH/include/slepcconf.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   SLEPC_INCLUDE="$SLEPC_INCLUDE -I$SLEPC_DIR/$PETSC_ARCH/include"
 fi
+
 
       fi
     fi
@@ -28613,75 +28589,21 @@ $as_echo "<<< Different version numbers for SLEPc and PETSc >>>" >&6; }
 
       # OK, now we will create a temporary makefile to query SLEPc libs
       includefile=""
-      as_ac_File=`$as_echo "ac_cv_file_${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf" >&5
-$as_echo_n "checking for ${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  includefile=${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf
-else
-  as_ac_File=`$as_echo "ac_cv_file_${SLEPC_DIR}/conf/slepc_common_variables" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${SLEPC_DIR}/conf/slepc_common_variables" >&5
-$as_echo_n "checking for ${SLEPC_DIR}/conf/slepc_common_variables... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "${SLEPC_DIR}/conf/slepc_common_variables"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  includefile=${SLEPC_DIR}/conf/slepc_common_variables
-else
-  as_ac_File=`$as_echo "ac_cv_file_${SLEPC_DIR}/conf/slepc_variables" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${SLEPC_DIR}/conf/slepc_variables" >&5
-$as_echo_n "checking for ${SLEPC_DIR}/conf/slepc_variables... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "${SLEPC_DIR}/conf/slepc_variables"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  includefile=${SLEPC_DIR}/conf/slepc_variables
-else
-  enableslepc=no
-fi
 
-fi
+      # These files are not headers, so they will never pass an AC_CHECK_HEADER test.
+      # If AC_CHECK_FILE is forbidden while cross-compiling, perhaps we can just fall back on
+      # 'if test -r' calls?
+      if (test -r ${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf) ; then
+         includefile=${SLEPC_DIR}/bmake/${PETSC_ARCH}/slepcconf
+      elif (test -r ${SLEPC_DIR}/conf/slepc_common_variables) ; then
+         includefile=${SLEPC_DIR}/conf/slepc_common_variables
+      elif (test -r ${SLEPC_DIR}/conf/slepc_variables) ; then
+         includefile=${SLEPC_DIR}/conf/slepc_variables
+      else
+         enableslepc=no
+      fi
 
-fi
-
-
-      if (test "x$enableslepc" = "xyes" -a "x$includefile" != "x" -a -r $includefile); then
+      if (test "x$enableslepc" = "xyes" -a "x$includefile" != "x"); then
 	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Querying SLEPc configuration from $includefile >>>" >&5
 $as_echo "<<< Querying SLEPc configuration from $includefile >>>" >&6; }
 	  cat <<EOF >Makefile_config_slepc
@@ -30207,99 +30129,62 @@ fi
 
     # unspecified - look in contrib
     if test "$withtecplot" = no ; then
-      as_ac_File=`$as_echo "ac_cv_file_$top_srcdir/contrib/tecplot/lib/$host/tecio.a" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $top_srcdir/contrib/tecplot/lib/$host/tecio.a" >&5
-$as_echo_n "checking for $top_srcdir/contrib/tecplot/lib/$host/tecio.a... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$top_srcdir/contrib/tecplot/lib/$host/tecio.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/lib/$host
-fi
+      # We will check to see if we can actually link against the Tecplot library momentarily,
+      # now we just see if the file exists, without using AC_CHECK_FILE!
+      TECPLOT_LIBRARY_PATH=""
+      if (test -r $top_srcdir/contrib/tecplot/lib/$host/tecio.a) ; then
+        TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/lib/$host
+      fi
 
-      as_ac_File=`$as_echo "ac_cv_file_$top_srcdir/contrib/tecplot/include/TECIO.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $top_srcdir/contrib/tecplot/include/TECIO.h" >&5
-$as_echo_n "checking for $top_srcdir/contrib/tecplot/include/TECIO.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$top_srcdir/contrib/tecplot/include/TECIO.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+      # Note: AC_CHECK_HEADER seems to fail if the path to the header
+      # is a relative one, i.e containing ".."  in it.  We'll work around this
+      # by setting the relevant path in $CPPFLAGS.
+      old_CPPFLAGS="$CPPFLAGS"
+      CPPFLAGS="$CPPFLAGS -I$top_srcdir/contrib/tecplot/include"
 
-   	  	      TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/include
-   	  	      TECPLOT_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/include"
+      ac_fn_cxx_check_header_mongrel "$LINENO" "TECIO.h" "ac_cv_header_TECIO_h" "$ac_includes_default"
+if test "x$ac_cv_header_TECIO_h" = xyes; then :
+
+      TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/include
+      TECPLOT_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/include"
 
 fi
 
+
+
+      # Reset CPPFLAGS
+      CPPFLAGS="$old_CPPFLAGS"
+
+      # And don't step on anybody's toes
+      unset old_CPPFLAGS
 
     # specified - look there
     else
-      as_ac_File=`$as_echo "ac_cv_file_$withtecplot/lib/tecio.a" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtecplot/lib/tecio.a" >&5
-$as_echo_n "checking for $withtecplot/lib/tecio.a... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtecplot/lib/tecio.a"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  TECPLOT_LIBRARY_PATH=$withtecplot/lib
-fi
+      TECPLOT_LIBRARY_PATH=""
+      if (test -r $withtecplot/lib/tecio.a) ; then
+        TECPLOT_LIBRARY_PATH=$withtecplot/lib
+      fi
 
-      as_ac_File=`$as_echo "ac_cv_file_$withtecplot/include/TECIO.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtecplot/include/TECIO.h" >&5
-$as_echo_n "checking for $withtecplot/include/TECIO.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtecplot/include/TECIO.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+      # To check for TECIO.h, use the CPPFLAGS trick, just in case the
+      # user specified a relative path for $withtecplot.
+      old_CPPFLAGS="$CPPFLAGS"
+      CPPFLAGS="$CPPFLAGS -I$withtecplot/include"
 
-   	  	      TECPLOT_INCLUDE_PATH=$withtecplot/include
-   	  	      TECPLOT_INCLUDE="-I$withtecplot/include"
+      ac_fn_cxx_check_header_mongrel "$LINENO" "TECIO.h" "ac_cv_header_TECIO_h" "$ac_includes_default"
+if test "x$ac_cv_header_TECIO_h" = xyes; then :
+
+                      TECPLOT_INCLUDE_PATH=$withtecplot/include
+                      TECPLOT_INCLUDE="-I$withtecplot/include"
 
 fi
 
+
+
+      # Reset CPPFLAGS
+      CPPFLAGS="$old_CPPFLAGS"
+
+      # And don't step on anybody's toes
+      unset old_CPPFLAGS
     fi
 
     if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
