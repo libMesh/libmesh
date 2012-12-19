@@ -18,11 +18,13 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
               withtrilinosdir=$TRILINOS_DIR)
 
   if test "$withtrilinosdir" != no ; then
-    AC_CHECK_FILE($withtrilinosdir/include/Makefile.export.Trilinos,
-                  TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.Trilinos,
-                  AC_CHECK_FILE($withtrilinosdir/Makefile.export.Trilinos,
-                                TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/Makefile.export.Trilinos,
-	 	                enabletrilinos10=no))
+    if (test -r $withtrilinosdir/include/Makefile.export.Trilinos) ; then
+      TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.Trilinos
+    elif (test -r $withtrilinosdir/Makefile.export.Trilinos) ; then
+      TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/Makefile.export.Trilinos
+    else
+      enabletrilinos10=no
+    fi
 
     if test "$enabletrilinos10" != no ; then
        enabletrilinos10=yes
@@ -33,11 +35,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        dnl AztecOO
        dnl ------------------------------------------------------
-       AC_CHECK_FILE($withtrilinosdir/include/AztecOO_config.h,
-                     enableaztecoo=yes,
-                     AC_CHECK_FILE($withtrilinosdir/AztecOO_config.h,
-                                   enableaztecoo=yes,
-                                   AC_CHECK_FILE($withtrilinosdir/packages/aztecoo/src/AztecOO_config.h,
+       AC_CHECK_HEADER($withtrilinosdir/include/AztecOO_config.h,
+                       enableaztecoo=yes,
+                       AC_CHECK_HEADER($withtrilinosdir/AztecOO_config.h,
+                                     enableaztecoo=yes,
+                                     AC_CHECK_HEADER($withtrilinosdir/packages/aztecoo/src/AztecOO_config.h,
                                                  enableaztecoo=yes,
                                                  enableaztecoo=no)))
                      
@@ -50,11 +52,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        dnl NOX
        dnl ------------------------------------------------------
-       AC_CHECK_FILE($withtrilinosdir/include/NOX_Config.h,
-                     enablenox=yes,
-                     AC_CHECK_FILE($withtrilinosdir/NOX_Config.h,
-                                   enablenox=yes,
-                                   AC_CHECK_FILE($withtrilinosdir/packages/nox/src/NOX_Config.h,
+       AC_CHECK_HEADER($withtrilinosdir/include/NOX_Config.h,
+                       enablenox=yes,
+                       AC_CHECK_HEADER($withtrilinosdir/NOX_Config.h,
+                                    enablenox=yes,
+                                    AC_CHECK_HEADER($withtrilinosdir/packages/nox/src/NOX_Config.h,
                                                  enablenox=yes,
                                                  enablenox=no)))
                      
@@ -67,11 +69,11 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        dnl ML
        dnl ------------------------------------------------------
-       AC_CHECK_FILE($withtrilinosdir/include/ml_include.h,
-                     enableml=yes,
-                     AC_CHECK_FILE($withtrilinosdir/ml_include.h,
-                                   enableml=yes,
-                                   AC_CHECK_FILE($withtrilinosdir/packages/ml/src/Include/ml_include.h,
+       AC_CHECK_HEADER($withtrilinosdir/include/ml_include.h,
+                       enableml=yes,
+                       AC_CHECK_HEADER($withtrilinosdir/ml_include.h,
+                                       enableml=yes,
+                                       AC_CHECK_HEADER($withtrilinosdir/packages/ml/src/Include/ml_include.h,
                                                 enableml=yes,
                                                 enableml=no)))
                      
@@ -135,11 +137,13 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
 
   dnl AztecOO
   if test "$withtrilinosdir" != no ; then
-    AC_CHECK_FILE($withtrilinosdir/include/Makefile.export.aztecoo,
-                  AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.aztecoo,
-                  AC_CHECK_FILE($withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo,
-                                AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo,
-	                        enableaztecoo=no))
+    if (test -r $withtrilinosdir/include/Makefile.export.aztecoo) ; then
+      AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.aztecoo
+    elif (test -r $withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo) ; then
+      AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo
+    else
+      enableaztecoo=no
+    fi
 
     if test "$enableaztecoo" != no ; then
        enableaztecoo=yes
@@ -158,12 +162,15 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
               AC_HELP_STRING([--with-nox=PATH],[Specify the path to Nox installation]),
               withnoxdir=$withval,
               withnoxdir=$TRILINOS_DIR)
+
   if test "$withnoxdir" != no ; then
-    AC_CHECK_FILE($withnoxdir/include/Makefile.export.nox,
-                  NOX_MAKEFILE_EXPORT=$withnoxdir/include/Makefile.export.nox,
-                  AC_CHECK_FILE($withnoxdir/packages/nox/Makefile.export.nox,
-                                NOX_MAKEFILE_EXPORT=$withnoxdir/packages/nox/Makefile.export.nox,
-	 	                enablenox=no))
+    if (test -r $withnoxdir/include/Makefile.export.nox) ; then
+      NOX_MAKEFILE_EXPORT=$withnoxdir/include/Makefile.export.nox
+    elif (test -r $withnoxdir/packages/nox/Makefile.export.nox) ; then
+      NOX_MAKEFILE_EXPORT=$withnoxdir/packages/nox/Makefile.export.nox
+    else
+      enablenox=no
+    fi
 
     if test "$enablenox" != no ; then
        enablenox=yes
@@ -180,12 +187,15 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
               AC_HELP_STRING([--with-ml=PATH],[Specify the path to ML installation]),
               withmldir=$withval,
               withmldir=$TRILINOS_DIR)
+
   if test "$withmldir" != no ; then
-    AC_CHECK_FILE($withmldir/include/Makefile.export.ml,
-                  ML_MAKEFILE_EXPORT=$withmldir/include/Makefile.export.ml,
-                  AC_CHECK_FILE($withmldir/packages/nox/Makefile.export.ml,
-                                ML_MAKEFILE_EXPORT=$withmldir/packages/nox/Makefile.export.ml,
-	 	                enableml=no))
+    if (test -r $withmldir/include/Makefile.export.ml) ; then
+      ML_MAKEFILE_EXPORT=$withmldir/include/Makefile.export.ml
+    elif (test -r $withmldir/packages/nox/Makefile.export.ml) ; then
+      ML_MAKEFILE_EXPORT=$withmldir/packages/nox/Makefile.export.ml
+    else
+      enableml=no
+    fi
 
     if test "$enableml" != no ; then
        enableml=yes

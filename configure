@@ -2922,6 +2922,97 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_cxx_check_func
+
+# ac_fn_c_check_header_mongrel LINENO HEADER VAR INCLUDES
+# -------------------------------------------------------
+# Tests whether HEADER exists, giving a warning if it cannot be compiled using
+# the include files in INCLUDES and setting the cache variable VAR
+# accordingly.
+ac_fn_c_check_header_mongrel ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if eval \${$3+:} false; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+else
+  # Is the header compilable?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking $2 usability" >&5
+$as_echo_n "checking $2 usability... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+$4
+#include <$2>
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_header_compiler=yes
+else
+  ac_header_compiler=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_header_compiler" >&5
+$as_echo "$ac_header_compiler" >&6; }
+
+# Is the header present?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking $2 presence" >&5
+$as_echo_n "checking $2 presence... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <$2>
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  ac_header_preproc=yes
+else
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_header_preproc" >&5
+$as_echo "$ac_header_preproc" >&6; }
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in #((
+  yes:no: )
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: accepted by the compiler, rejected by the preprocessor!" >&5
+$as_echo "$as_me: WARNING: $2: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: $2: proceeding with the compiler's result" >&2;}
+    ;;
+  no:yes:* )
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: present but cannot be compiled" >&5
+$as_echo "$as_me: WARNING: $2: present but cannot be compiled" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2:     check for missing prerequisite headers?" >&5
+$as_echo "$as_me: WARNING: $2:     check for missing prerequisite headers?" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: see the Autoconf documentation" >&5
+$as_echo "$as_me: WARNING: $2: see the Autoconf documentation" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2:     section \"Present But Cannot Be Compiled\"" >&5
+$as_echo "$as_me: WARNING: $2:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $2: proceeding with the compiler's result" >&5
+$as_echo "$as_me: WARNING: $2: proceeding with the compiler's result" >&2;}
+( $as_echo "## -------------------------------------------------- ##
+## Report this to libmesh-users@lists.sourceforge.net ##
+## -------------------------------------------------- ##"
+     ) | sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  eval "$3=\$ac_header_compiler"
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+fi
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_header_mongrel
 cat >config.log <<_ACEOF
 This file contains any messages produced by compilers while
 running configure, to aid debugging if configure makes a mistake.
@@ -27261,31 +27352,34 @@ $as_echo "using system-provided PETSC_ARCH $PETSC_ARCH" >&6; }
       fi
     fi
 
-    as_ac_File=`$as_echo "ac_cv_file_$PETSC_DIR/include/petsc.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $PETSC_DIR/include/petsc.h" >&5
-$as_echo_n "checking for $PETSC_DIR/include/petsc.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
+    # Let's use a C compiler for the AC_CHECK_HEADER test, although this is
+    # not strictly necessary...
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    as_ac_Header=`$as_echo "ac_cv_header_$PETSC_DIR/include/petscversion.h" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "$PETSC_DIR/include/petscversion.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enablepetsc=yes
 else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$PETSC_DIR/include/petsc.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
+  enablepetsc=no
 fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  PETSC_H_PATH=$PETSC_DIR/include/petsc.h
-fi
+
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
     # Grab PETSc version and substitute into Makefile.
     # If version 2.x, also check that PETSC_ARCH is set
-    if (test -r $PETSC_DIR/include/petsc.h) ; then
+    # This if-test used to be: if (test -r $PETSC_DIR/include/petsc.h) ; then
+    if (test "$enablepetsc" !=  no) ; then
       # Some tricks to discover the version of petsc.
       # You have to have grep and sed for this to work.
       petscmajor=`grep "define PETSC_VERSION_MAJOR" $PETSC_DIR/include/petscversion.h | sed -e "s/#define PETSC_VERSION_MAJOR[ ]*//g"`
@@ -27326,7 +27420,7 @@ $as_echo "<<< PETSc 2.x detected and \"\$PETSC_ARCH\" not set.  PETSc disabled. 
         fi
       fi
 
-    else # petsc.h was not readable
+    else # petscversion.h was not readable
         enablepetsc=no
     fi
 
@@ -28694,51 +28788,13 @@ fi
 
 
   if test "$withtrilinosdir" != no ; then
-    as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/include/Makefile.export.Trilinos" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/include/Makefile.export.Trilinos" >&5
-$as_echo_n "checking for $withtrilinosdir/include/Makefile.export.Trilinos... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/include/Makefile.export.Trilinos"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.Trilinos
-else
-  as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/Makefile.export.Trilinos" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/Makefile.export.Trilinos" >&5
-$as_echo_n "checking for $withtrilinosdir/Makefile.export.Trilinos... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/Makefile.export.Trilinos"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/Makefile.export.Trilinos
-else
-  enabletrilinos10=no
-fi
-
-fi
-
+    if (test -r $withtrilinosdir/include/Makefile.export.Trilinos) ; then
+      TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.Trilinos
+    elif (test -r $withtrilinosdir/Makefile.export.Trilinos) ; then
+      TRILINOS_MAKEFILE_EXPORT=$withtrilinosdir/Makefile.export.Trilinos
+    else
+      enabletrilinos10=no
+    fi
 
     if test "$enabletrilinos10" != no ; then
        enabletrilinos10=yes
@@ -28748,72 +28804,30 @@ $as_echo "#define HAVE_TRILINOS 1" >>confdefs.h
        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Trilinos 10 support >>>" >&5
 $as_echo "<<< Configuring library with Trilinos 10 support >>>" >&6; }
 
-                            as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/include/AztecOO_config.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/include/AztecOO_config.h" >&5
-$as_echo_n "checking for $withtrilinosdir/include/AztecOO_config.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/include/AztecOO_config.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+                            as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/AztecOO_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/AztecOO_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableaztecoo=yes
 else
-  as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/AztecOO_config.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/AztecOO_config.h" >&5
-$as_echo_n "checking for $withtrilinosdir/AztecOO_config.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/AztecOO_config.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/AztecOO_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/AztecOO_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableaztecoo=yes
 else
-  as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/packages/aztecoo/src/AztecOO_config.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/packages/aztecoo/src/AztecOO_config.h" >&5
-$as_echo_n "checking for $withtrilinosdir/packages/aztecoo/src/AztecOO_config.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/packages/aztecoo/src/AztecOO_config.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/aztecoo/src/AztecOO_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/aztecoo/src/AztecOO_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableaztecoo=yes
 else
   enableaztecoo=no
 fi
 
-fi
 
 fi
+
+
+fi
+
 
 
        if test "$enableaztecoo" != no ; then
@@ -28824,72 +28838,30 @@ $as_echo "#define HAVE_AZTECOO 1" >>confdefs.h
 $as_echo "<<< Configuring library with AztecOO support >>>" >&6; }
        fi
 
-                            as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/include/NOX_Config.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/include/NOX_Config.h" >&5
-$as_echo_n "checking for $withtrilinosdir/include/NOX_Config.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/include/NOX_Config.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+                            as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/NOX_Config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/NOX_Config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enablenox=yes
 else
-  as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/NOX_Config.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/NOX_Config.h" >&5
-$as_echo_n "checking for $withtrilinosdir/NOX_Config.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/NOX_Config.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/NOX_Config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/NOX_Config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enablenox=yes
 else
-  as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/packages/nox/src/NOX_Config.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/packages/nox/src/NOX_Config.h" >&5
-$as_echo_n "checking for $withtrilinosdir/packages/nox/src/NOX_Config.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/packages/nox/src/NOX_Config.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/nox/src/NOX_Config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/nox/src/NOX_Config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enablenox=yes
 else
   enablenox=no
 fi
 
-fi
 
 fi
+
+
+fi
+
 
 
        if test "$enablenox" != no ; then
@@ -28900,72 +28872,30 @@ $as_echo "#define HAVE_NOX 1" >>confdefs.h
 $as_echo "<<< Configuring library with NOX support >>>" >&6; }
        fi
 
-                            as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/include/ml_include.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/include/ml_include.h" >&5
-$as_echo_n "checking for $withtrilinosdir/include/ml_include.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/include/ml_include.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+                            as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/ml_include.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/ml_include.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableml=yes
 else
-  as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/ml_include.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/ml_include.h" >&5
-$as_echo_n "checking for $withtrilinosdir/ml_include.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/ml_include.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/ml_include.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/ml_include.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableml=yes
 else
-  as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/packages/ml/src/Include/ml_include.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/packages/ml/src/Include/ml_include.h" >&5
-$as_echo_n "checking for $withtrilinosdir/packages/ml/src/Include/ml_include.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/packages/ml/src/Include/ml_include.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/ml/src/Include/ml_include.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/ml/src/Include/ml_include.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableml=yes
 else
   enableml=no
 fi
 
-fi
 
 fi
+
+
+fi
+
 
 
        if test "$enableml" != no ; then
@@ -29026,51 +28956,13 @@ fi
 
 
     if test "$withtrilinosdir" != no ; then
-    as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/include/Makefile.export.aztecoo" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/include/Makefile.export.aztecoo" >&5
-$as_echo_n "checking for $withtrilinosdir/include/Makefile.export.aztecoo... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/include/Makefile.export.aztecoo"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.aztecoo
-else
-  as_ac_File=`$as_echo "ac_cv_file_$withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo" >&5
-$as_echo_n "checking for $withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo
-else
-  enableaztecoo=no
-fi
-
-fi
-
+    if (test -r $withtrilinosdir/include/Makefile.export.aztecoo) ; then
+      AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/include/Makefile.export.aztecoo
+    elif (test -r $withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo) ; then
+      AZTECOO_MAKEFILE_EXPORT=$withtrilinosdir/packages/aztecoo/Makefile.export.aztecoo
+    else
+      enableaztecoo=no
+    fi
 
     if test "$enableaztecoo" != no ; then
        enableaztecoo=yes
@@ -29094,52 +28986,15 @@ else
   withnoxdir=$TRILINOS_DIR
 fi
 
+
   if test "$withnoxdir" != no ; then
-    as_ac_File=`$as_echo "ac_cv_file_$withnoxdir/include/Makefile.export.nox" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withnoxdir/include/Makefile.export.nox" >&5
-$as_echo_n "checking for $withnoxdir/include/Makefile.export.nox... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withnoxdir/include/Makefile.export.nox"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  NOX_MAKEFILE_EXPORT=$withnoxdir/include/Makefile.export.nox
-else
-  as_ac_File=`$as_echo "ac_cv_file_$withnoxdir/packages/nox/Makefile.export.nox" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withnoxdir/packages/nox/Makefile.export.nox" >&5
-$as_echo_n "checking for $withnoxdir/packages/nox/Makefile.export.nox... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withnoxdir/packages/nox/Makefile.export.nox"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  NOX_MAKEFILE_EXPORT=$withnoxdir/packages/nox/Makefile.export.nox
-else
-  enablenox=no
-fi
-
-fi
-
+    if (test -r $withnoxdir/include/Makefile.export.nox) ; then
+      NOX_MAKEFILE_EXPORT=$withnoxdir/include/Makefile.export.nox
+    elif (test -r $withnoxdir/packages/nox/Makefile.export.nox) ; then
+      NOX_MAKEFILE_EXPORT=$withnoxdir/packages/nox/Makefile.export.nox
+    else
+      enablenox=no
+    fi
 
     if test "$enablenox" != no ; then
        enablenox=yes
@@ -29161,52 +29016,15 @@ else
   withmldir=$TRILINOS_DIR
 fi
 
+
   if test "$withmldir" != no ; then
-    as_ac_File=`$as_echo "ac_cv_file_$withmldir/include/Makefile.export.ml" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withmldir/include/Makefile.export.ml" >&5
-$as_echo_n "checking for $withmldir/include/Makefile.export.ml... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withmldir/include/Makefile.export.ml"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  ML_MAKEFILE_EXPORT=$withmldir/include/Makefile.export.ml
-else
-  as_ac_File=`$as_echo "ac_cv_file_$withmldir/packages/nox/Makefile.export.ml" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withmldir/packages/nox/Makefile.export.ml" >&5
-$as_echo_n "checking for $withmldir/packages/nox/Makefile.export.ml... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withmldir/packages/nox/Makefile.export.ml"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
-  ML_MAKEFILE_EXPORT=$withmldir/packages/nox/Makefile.export.ml
-else
-  enableml=no
-fi
-
-fi
-
+    if (test -r $withmldir/include/Makefile.export.ml) ; then
+      ML_MAKEFILE_EXPORT=$withmldir/include/Makefile.export.ml
+    elif (test -r $withmldir/packages/nox/Makefile.export.ml) ; then
+      ML_MAKEFILE_EXPORT=$withmldir/packages/nox/Makefile.export.ml
+    else
+      enableml=no
+    fi
 
     if test "$enableml" != no ; then
        enableml=yes
@@ -29370,26 +29188,12 @@ fi
       if test "x$withtbb" = x ; then
         withtbb=/usr
       fi
-      as_ac_File=`$as_echo "ac_cv_file_$withtbb/include/tbb/task_scheduler_init.h" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $withtbb/include/tbb/task_scheduler_init.h" >&5
-$as_echo_n "checking for $withtbb/include/tbb/task_scheduler_init.h... " >&6; }
-if eval \${$as_ac_File+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  test "$cross_compiling" = yes &&
-  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "$withtbb/include/tbb/task_scheduler_init.h"; then
-  eval "$as_ac_File=yes"
-else
-  eval "$as_ac_File=no"
-fi
-fi
-eval ac_res=\$$as_ac_File
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+      as_ac_Header=`$as_echo "ac_cv_header_$withtbb/include/tbb/task_scheduler_init.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtbb/include/tbb/task_scheduler_init.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   TBB_INCLUDE_PATH=$withtbb/include
 fi
+
 
       if test "x$withtbblib" != "x" ; then
         TBB_LIBS=$withtbblib
@@ -30751,7 +30555,7 @@ fi
 
         if (test $enablevtk = yes); then
 
-                     vtkincFound=no;
+              vtkincFound=no;
        for ac_header in $VTK_INC/vtkConfigure.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
@@ -31000,7 +30804,6 @@ fi
 
        # Check for existence of a header file in the specified location.  Note: here
        # we are checking for the header file "Eigen" in the Eigen directory.
-       # AC_CHECK_FILE([$EIGEN_INC/Eigen], [eigenincFound="OK"], [eigenincFound="FAIL"])
        eigenincFound=no;
        for ac_header in $EIGEN_INC/Eigen/Eigen
 do :
@@ -31133,7 +30936,6 @@ fi
     if (test $enableglpk = yes); then
 
        # Check for existence of a header file in the specified location
-       # AC_CHECK_FILE([$GLPK_INC/glpk.h], [glpkincFound="OK"], [glpkincFound="FAIL"])
        glpkincFound=no;
        for ac_header in $GLPK_INC/glpk.h
 do :
@@ -31167,10 +30969,7 @@ $as_echo "<<< Configuring library with GLPK version $glpkversion support >>>" >&
        fi
 
        if (test $enableglpk = yes); then
-         # Also Check for existence of required libraries.  This is not really the
-         # right way to do it -- it's not portable to Macs, where .so's are called
-         # .dylib's instead.
-         # AC_CHECK_FILE($GLPK_LIB/glpk.so, [enableglpk=yes], [enableglpk=no])
+         # Also Check for existence of required libraries.
 
          # AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
          # Note: Basically tries to compile a function which calls main().

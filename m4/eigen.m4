@@ -60,7 +60,6 @@ AC_DEFUN([CONFIGURE_EIGEN],
     
        # Check for existence of a header file in the specified location.  Note: here
        # we are checking for the header file "Eigen" in the Eigen directory.
-       # AC_CHECK_FILE([$EIGEN_INC/Eigen], [eigenincFound="OK"], [eigenincFound="FAIL"])
        eigenincFound=no;
        AC_CHECK_HEADERS($EIGEN_INC/Eigen/Eigen, eigenincFound=yes)
   
