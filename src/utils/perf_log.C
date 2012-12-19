@@ -149,17 +149,16 @@ std::string PerfLog::get_info_header() const
 
 
       // Put pointers to these streams in a vector
-      std::vector<OStringStream*> v(10);
-      v[0] = &pid_stream;
-      v[1] = &nprocs_stream;
-      v[2] = &time_stream;
-      v[3] = &os_stream;
-      v[4] = &host_stream;
-      v[5] = &osrel_stream;
-      v[6] = &osver_stream;
-      v[7] = &machine_stream;
-      v[8] = &user_stream;
-      v[9] = &config_stream;
+      std::vector<OStringStream*> v;
+      v.push_back(&pid_stream);
+      v.push_back(&nprocs_stream);
+      v.push_back(&time_stream);
+      v.push_back(&os_stream);
+      v.push_back(&host_stream);
+      v.push_back(&osrel_stream);
+      v.push_back(&osver_stream);
+      v.push_back(&machine_stream);
+      v.push_back(&user_stream);
 
       // Fill string stream objects
       if (libMesh::n_processors() > 1)
@@ -181,19 +180,34 @@ std::string PerfLog::get_info_header() const
       else
 #endif
         user_stream  << "Unknown";
-      config_stream  << "| Configuration:  " << LIBMESH_CONFIGURE_INFO;
 
-      // Find the longest string, use that to set the line length for formatting.
+      // Parse the LIBMESH_CONFIGURE_INFO string literal before using it in PerfLog output
+      std::string libmesh_configure_info(LIBMESH_CONFIGURE_INFO);
+      std::vector<std::string> parsed_libmesh_configure_info;
+      this->split_on_whitespace(libmesh_configure_info,
+                                parsed_libmesh_configure_info);
+
+      // There should always be at at least one entry in
+      // parsed_libmesh_configure_info, even if the user just ran
+      // ../configure.
+      libmesh_assert_greater (parsed_libmesh_configure_info.size(), 0);
+
+      // Find the longest string in all the streams
       unsigned int max_length = 0;
       for (unsigned int i=0; i<v.size(); ++i)
 	if (v[i]->str().size() > max_length)
 	  max_length = v[i]->str().size();
 
-      // Print dashed line
+      // Find the longest string in the parsed_libmesh_configure_info
+      for (unsigned i=0; i<parsed_libmesh_configure_info.size(); ++i)
+        if (parsed_libmesh_configure_info[i].size() > max_length)
+          max_length = parsed_libmesh_configure_info[i].size();
+
+      // Print dashed line for the header
       output_character_line(max_length+2, '-', out);
       out << '\n';
 
-      // Loop over all the strings and print them out with end-formatting
+      // Loop over all the strings and add end formatting
       for (unsigned int i=0; i<v.size(); ++i)
 	{
 	  if (v[i]->str().size() > 0)
@@ -202,6 +216,22 @@ std::string PerfLog::get_info_header() const
 	      OSSStringright(out, max_length+4 - v[i]->str().size(), "|\n");
 	    }
 	}
+
+      // Print out configuration header plus first parsed string.  The
+      // magic number 18 below accounts for the length of the word
+      // 'Configuration'.
+      out  << "| Configuration:  " << parsed_libmesh_configure_info[0];
+      OSSStringright(out, max_length+4 - parsed_libmesh_configure_info[0].size() - 18, "|\n");
+
+      // Loop over the parsed_libmesh_configure_info and add end formatting.  The magic
+      // number 3 below accounts for the leading 'pipe' character and indentation
+      for (unsigned i=1; i<parsed_libmesh_configure_info.size(); ++i)
+        {
+          out << "|  ";
+          out << parsed_libmesh_configure_info[i];
+          OSSStringright(out, max_length+4 - parsed_libmesh_configure_info[i].size() - 3, "|\n");
+        }
+
 
       // Print dashed line
       output_character_line(max_length+2, '-', out);
@@ -522,6 +552,24 @@ void PerfLog::restart_event(const std::string &,
   // nothing to do.  popping the top off the stack will handle it.
 }
 
+
+
+void PerfLog::split_on_whitespace(const std::string& input, std::vector<std::string>& output) const
+{
+  std::istringstream iss(input);
+
+  while (true)
+    {
+      std::string sub;
+      iss >> sub;
+
+      // Don't save a blank string if injection failed (at end of string)
+      if (iss)
+        output.push_back(sub);
+      else
+        break;
+    }
+}
 
 
 } // namespace libMesh
