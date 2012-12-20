@@ -31,21 +31,6 @@
 #include "libmesh/perf_log.h"
 #include "libmesh/timestamp.h"
 
-// Anonymous helper function
-
-namespace {
-
-void output_character_line(const unsigned int n,
-			   const char c,
-			   std::ostringstream& out)
-{
-  for (unsigned int i=0; i<n; ++i)
-    out << c;
-}
-
-}
-
-
 namespace libMesh
 {
 
@@ -203,8 +188,9 @@ std::string PerfLog::get_info_header() const
           max_length = parsed_libmesh_configure_info[i].size();
 
       // Print dashed line for the header
-      output_character_line(max_length+2, '-', out);
-      out << '\n';
+      out << ' '
+          << std::string(max_length+1, '-')
+          << '\n';
 
       // Loop over all the strings and add end formatting
       for (unsigned int i=0; i<v.size(); ++i)
@@ -238,8 +224,9 @@ std::string PerfLog::get_info_header() const
 
 
       // Print dashed line
-      output_character_line(max_length+2, '-', out);
-      out << '\n';
+      out << ' '
+          << std::string(max_length+1, '-')
+          << '\n';
     }
 
   return out.str();
@@ -294,9 +281,9 @@ std::string PerfLog::get_perf_info() const
 	pct_active_incl_sub_col_width+1;
 
       // Print dashed line
-      out << ' ';
-      output_character_line(total_col_width, '-', out);
-      out << '\n';
+      out << ' '
+          << std::string(total_col_width, '-')
+          << '\n';
 
       {
 	// Construct temporary message string
@@ -323,9 +310,9 @@ std::string PerfLog::get_perf_info() const
       }
 
       // Print dashed line
-      out << ' ';
-      output_character_line(total_col_width, '-', out);
-      out << '\n';
+      out << ' '
+          << std::string(total_col_width, '-')
+          << '\n';
 
 
       // Write out the header for the events listing
@@ -377,12 +364,11 @@ std::string PerfLog::get_perf_info() const
           << std::setw(pct_active_incl_sub_col_width)
           << std::left
           << "With S"
-          << "|\n|";
-
-      output_character_line(total_col_width, '-', out);
-      out << "|\n|";
-      output_character_line(total_col_width, ' ', out);
-      out << "|\n";
+          << "|\n|"
+          << std::string(total_col_width, '-')
+          << "|\n|"
+          << std::string(total_col_width, ' ')
+          << "|\n";
 
       unsigned int summed_function_calls = 0;
       double       summed_total_time     = 0;
@@ -422,14 +408,12 @@ std::string PerfLog::get_perf_info() const
 		    {
 		      last_header = pos->first.first;
 
-		      // print blank line
-		      out << "|";
-		      output_character_line(total_col_width, ' ', out);
-		      out << "|\n";
-
-		      // print header name (account for additional space before
-		      // the header)
-		      out << "| "
+		      // print blank line followed by header name
+		      // (account for additional space before the
+		      // header)
+		      out << "|"
+                          << std::string(total_col_width, ' ')
+                          << "|\n| "
                           << std::setw(total_col_width-1)
                           << std::left
                           << pos->first.first
@@ -500,9 +484,9 @@ std::string PerfLog::get_perf_info() const
 	    }
 	}
 
-      out << ' ';
-      output_character_line(total_col_width, '-', out);
-      out << "\n| "
+      out << ' '
+          << std::string(total_col_width, '-')
+          << "\n| "
           << std::setw(event_col_width)
           << std::left
           << "Totals:";
@@ -546,18 +530,17 @@ std::string PerfLog::get_perf_info() const
           << std::setw(avg_time_incl_sub_col_width)
           << "";
 
-      // Print the total percentage
+      // Print the total percentage followed by dashed line
       out << std::fixed
           << std::setprecision(2)
           << std::setw(pct_active_col_width)
           << std::left
-          << summed_percentage;
-
-      out << std::setw(pct_active_incl_sub_col_width) << "";
-
-      out << "|\n ";
-      output_character_line(total_col_width, '-', out);
-      out << '\n';
+          << summed_percentage
+          << std::setw(pct_active_incl_sub_col_width)
+          << ""
+          << "|\n "
+          << std::string(total_col_width, '-')
+          << '\n';
     }
 
   return out.str();
