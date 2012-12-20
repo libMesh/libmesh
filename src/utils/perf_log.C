@@ -556,18 +556,41 @@ void PerfLog::restart_event(const std::string &,
 
 void PerfLog::split_on_whitespace(const std::string& input, std::vector<std::string>& output) const
 {
-  std::istringstream iss(input);
+  // Check for easy return
+  if (input.size()==0)
+    return;
 
+  // Here we hard-code the string to split on, since the algorithm below
+  // is somewhat specific to it...
+  const std::string split_on("' '");
+
+  size_t current_pos = 0;
   while (true)
     {
-      std::string sub;
-      iss >> sub;
+      // Find next end location
+      size_t end_pos = input.find(split_on, current_pos);
 
-      // Don't save a blank string if injection failed (at end of string)
-      if (iss)
-        output.push_back(sub);
+      if (end_pos != std::string::npos)
+        {
+          // Create substring.  Note: the second argument to substr is
+          // the *length* of string to create, not the ending position!
+          output.push_back( input.substr(current_pos, end_pos - current_pos + 1) );
+
+          // Update search starting position, make sure to go past the end of the split_on string, but
+          // include the previous single quote (hence the -1).
+          current_pos = end_pos + split_on.size() - 1;
+        }
       else
-        break;
+        {
+          // Push back whatever remains of the string onto the output.
+          // Note that substr with only 1 argument pushes back
+          // whatever remains of the string.  This also handles the
+          // case where the string does not contain any matches.
+          output.push_back( input.substr(current_pos) );
+
+          // We are done searching the string, so break out of the while loop
+          break;
+        }
     }
 }
 
