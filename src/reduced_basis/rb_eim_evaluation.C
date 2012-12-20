@@ -23,7 +23,6 @@
 #include "libmesh/rb_parametrized_function.h"
 
 // libMesh includes
-#include "libmesh/o_string_stream.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/libmesh_logging.h"
 
@@ -245,7 +244,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
 
   if(libMesh::processor_id() == 0)
   {
-    OStringStream file_name;
+    std::ostringstream file_name;
     
     // Next write out the interpolation_matrix
     file_name.str("");
@@ -345,7 +344,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
   // Stream for creating file names
-  OStringStream file_name;
+  std::ostringstream file_name;
 
   // Read in the interpolation matrix
   file_name.str("");

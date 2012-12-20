@@ -27,11 +27,11 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/parallel.h"
 #include "libmesh/getpot.h"
-#include "libmesh/o_string_stream.h"
 
 // C++ includes
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 namespace libMesh
 {
@@ -735,7 +735,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
 
   if(libMesh::processor_id() == 0)
   {
-    OStringStream file_name;
+    std::ostringstream file_name;
     
     // Write out the temporal discretization data
     file_name.str("");
@@ -769,7 +769,11 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
     {
       file_name.str("");
       file_name << directory_name << "/RB_M_";
-      OSSRealzeroright(file_name,3,0,q_m);
+      file_name << std::setw(3)
+                << std::setprecision(0)
+                << std::setfill('0')
+                << std::right
+                << q_m;
       file_name << suffix;
       Xdr RB_M_q_m_out(file_name.str(), mode);
 
@@ -887,7 +891,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
   // The string stream we'll use to make the file names
-  OStringStream file_name;
+  std::ostringstream file_name;
   
   // Write out the temporal discretization data
   file_name.str("");
@@ -921,7 +925,12 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   {
     file_name.str("");
     file_name << directory_name << "/RB_M_";
-    OSSRealzeroright(file_name,3,0,q_m);
+    file_name << std::setw(3)
+              << std::setprecision(0)
+              << std::setfill('0')
+              << std::right
+              << q_m;
+
     file_name << suffix;
     Xdr RB_M_q_m_in(file_name.str(), mode);
 
