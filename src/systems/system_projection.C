@@ -627,7 +627,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
   this->get_dof_map().enforce_constraints_exactly(*this, &new_vector);
 #endif
 
-  STOP_LOG("project_vector()", "System");
+  STOP_LOG("project_fem_vector()", "System");
 }
 
 
