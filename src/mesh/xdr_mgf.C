@@ -16,6 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
+#include <iomanip>
 
 // Local includes
 #include "libmesh/xdr_mgf.h"
@@ -368,14 +369,25 @@ int XdrMGF::dataBlk(Real* array, int numvar, int size)
 
     case (XdrMGF::W_ASCII):
       {
+        // Save stream flags
+        std::ios_base::fmtflags out_flags = mp_out.flags();
+
+        // We will use scientific notation with a precision of 16
+        // digits in the following output.  The desired precision and
+        // format will automatically determine the width.
+        mp_out << std::scientific
+               << std::setprecision(16);
 
 	for (int i=0; i<size; i++)
 	  {
 	    for (int j=0; j<numvar; j++)
-	      OFSRealscientific(mp_out,17,array[i*numvar + j]) << " \t";
+              mp_out << array[i*numvar + j] << " \t";
 
 	    mp_out << '\n';
 	  }
+
+        // Restore stream flags
+        mp_out.flags(out_flags);
 
 	mp_out.flush();
 	break;
