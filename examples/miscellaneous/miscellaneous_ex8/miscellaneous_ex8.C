@@ -211,8 +211,8 @@ int main(int argc, char** argv)
       // We now will loop over every node in the source mesh
       // and add it to a source point list, along with the solution
       {
-	MeshBase::const_node_iterator nd  = mesh_a.nodes_begin();
-	MeshBase::const_node_iterator end = mesh_a.nodes_end();
+	MeshBase::const_node_iterator nd  = mesh_a.local_nodes_begin();
+	MeshBase::const_node_iterator end = mesh_a.local_nodes_end();
 
 	for (; nd!=end; ++nd)
 	  {
@@ -222,6 +222,8 @@ int main(int argc, char** argv)
 	  }	  	
       }
 
+      // We have only set local values - prepare for use by gathering remote gata
+      idi.prepare_for_use();
 
       // Create a MeshlessInterpolationFunction that uses our InverseDistanceInterpolation
       // object

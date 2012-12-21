@@ -52,9 +52,16 @@ class MeshfreeInterpolation
 public:
 
   /**
+   * "ParallelizationStrategy"
+   */
+  enum ParallelizationStrategy { SYNC_SOURCES     = 0,
+				 INVALID_STRATEGY}; 
+  /**
    * Constructor.
    */
-  MeshfreeInterpolation () 
+  MeshfreeInterpolation () :
+    _is_prepared              (false),
+    _parallelization_strategy (SYNC_SOURCES)
   {}
 
   /**
@@ -66,7 +73,8 @@ public:
   /**
    * Same as above, but allows you to also use stream syntax.
    */
-  friend std::ostream& operator << (std::ostream& os, const MeshfreeInterpolation& mfi);
+  friend std::ostream& operator << (std::ostream& os, 
+				    const MeshfreeInterpolation& mfi);
 
   /**
    * Clears all internal data structures and restores to a
@@ -113,6 +121,14 @@ public:
 			       const std::vector<Number> &vals);
 
   /**
+   * Prepares data structures for use. 
+   *
+   * This method is virtual so that it can be overwritten or extended as required
+   * in derived classes.
+   */
+  virtual void prepare_for_use ();
+
+  /**
    * Interpolate source data at target points.
    * Pure virtual, must be overriden in derived classes.
    */
@@ -121,7 +137,19 @@ public:
 				       std::vector<Number> &tgt_vals) const = 0;
 
 protected:
-    
+
+  /**
+   * Gathers source points and values that have been added on other processors.
+   * Note the user is responsible for adding points only once per processor if this
+   * method is called.  No attempt is made to identify duplicate points.
+   *
+   * This method is virtual so that it can be overwritten or extended as required
+   * in derived classes.
+   */
+  virtual void gather_remote_data ();
+  
+  bool                     _is_prepared;
+  ParallelizationStrategy  _parallelization_strategy;
   std::vector<std::string> _names;
   std::vector<Point>       _src_pts;
   std::vector<Number>      _src_vals;
