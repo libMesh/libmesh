@@ -45,10 +45,6 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 
-// Some (older) compilers do not offer full stream 
-// functionality, OStringStream works around this.
-#include "libmesh/o_string_stream.h"
-
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
 #include "libmesh/linear_implicit_system.h"
@@ -196,12 +192,20 @@ int main (int argc, char** argv)
       // We use additional curly braces here simply to enforce data
       // locality.
       {
-        OStringStream out;
+        std::ostringstream out;
 
-        OSSInt(out,2,t_step);
-        out << ", time=";
-        OSSRealzeroleft(out,6,3,system.time);
-        out <<  "...";
+        out << std::setw(2)
+            << std::right
+            << t_step
+            << ", time="
+            << std::fixed
+            << std::setw(6)
+            << std::setprecision(3)
+            << std::setfill('0')
+            << std::left
+            << system.time
+            <<  "...";
+
         std::cout << out.str() << std::endl;
       }
       
@@ -224,11 +228,14 @@ int main (int argc, char** argv)
       // Output evey 10 timesteps to file.
       if ( (t_step+1)%10 == 0)
         {
-          OStringStream file_name;
+          std::ostringstream file_name;
 
-          file_name << "out_";
-          OSSRealzeroright(file_name,3,0,t_step+1);
-          file_name << ".gmv";
+          file_name << "out_"
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << t_step+1
+                    << ".gmv";
 
           GMVIO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);

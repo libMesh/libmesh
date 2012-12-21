@@ -22,6 +22,9 @@
  // example 13 can be solved using the
  // DifferentiableSystem class framework
 
+// C++ includes
+#include <iomanip>
+
 // Basic include files
 #include "libmesh/equation_systems.h"
 #include "libmesh/error_vector.h"
@@ -32,10 +35,6 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/uniform_refinement_estimator.h"
-
-// Some (older) compilers do not offer full stream
-// functionality, OStringStream works around this.
-#include "libmesh/o_string_stream.h"
 
 // The systems and solvers we may use
 #include "naviersystem.h"
@@ -294,12 +293,15 @@ int main (int argc, char** argv)
       // Write out this timestep if we're requested to
       if ((t_step+1)%write_interval == 0)
         {
-          OStringStream file_name;
+          std::ostringstream file_name;
 
           // We write the file in the ExodusII format.
-          file_name << "out_";
-          OSSRealzeroright(file_name,3,0, t_step + 1);
-          file_name << ".e";
+          file_name << "out_"
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << t_step+1
+                    << ".e";
 
           ExodusII_IO(mesh).write_timestep(file_name.str(),
 					   equation_systems, 

@@ -50,6 +50,7 @@
 
 // C++ includes
 #include <iostream>
+#include <iomanip>
 
 // General libMesh includes
 #include "libmesh/equation_systems.h"
@@ -74,10 +75,6 @@
 #include "libmesh/getpot.h"
 #include "libmesh/gmv_io.h"
 
-// Some (older) compilers do not offer full stream
-// functionality, OStringStream works around this.
-#include "libmesh/o_string_stream.h"
-
 // Local includes
 #include "femparameters.h"
 #include "L-shaped.h"
@@ -99,9 +96,13 @@ void write_output(EquationSystems &es,
   MeshBase &mesh = es.get_mesh();
 
 #ifdef LIBMESH_HAVE_GMV
-  OStringStream file_name_gmv;
-  file_name_gmv << solution_type << ".out.gmv.";      
-  OSSRealzeroright(file_name_gmv,2,0,a_step);
+  std::ostringstream file_name_gmv;
+  file_name_gmv << solution_type
+                << ".out.gmv."
+                << std::setw(2)
+                << std::setfill('0')
+                << std::right
+                << a_step;
   
   GMVIO(mesh).write_equation_systems
     (file_name_gmv.str(), es);
