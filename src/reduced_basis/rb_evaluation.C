@@ -28,7 +28,6 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/mesh_tools.h"
-#include "libmesh/o_string_stream.h"
 
 // C/C++ includes
 #include <sys/types.h>
@@ -467,7 +466,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
 //    }
 
     // First, write out how many basis functions we have generated
-    OStringStream file_name;
+    std::ostringstream file_name;
     {
       file_name << directory_name << "/n_bfs" << suffix;
       Xdr n_bfs_out(file_name.str(), mode);
@@ -496,7 +495,12 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     {
       file_name.str("");
       file_name << directory_name << "/output_";
-      OSSRealzeroright(file_name,3,0,n);
+      file_name << std::setw(3)
+                << std::setprecision(0)
+                << std::setfill('0')
+                << std::right
+                << n;
+
       file_name << "_dual_innerprods" << suffix;
       Xdr output_dual_innerprods_out(file_name.str(), mode);
 
@@ -516,9 +520,17 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       {
         file_name.str("");
         file_name << directory_name << "/output_";
-        OSSRealzeroright(file_name,3,0,n);
+        file_name << std::setw(3)
+                  << std::setprecision(0)
+                  << std::setfill('0')
+                  << std::right
+                  << n;
         file_name << "_";
-        OSSRealzeroright(file_name,3,0,q_l);
+        file_name << std::setw(3)
+                  << std::setprecision(0)
+                  << std::setfill('0')
+                  << std::right
+                  << q_l;
         file_name << suffix;
         Xdr output_n_out(file_name.str(), mode);
 
@@ -551,7 +563,11 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     {
       file_name.str("");
       file_name << directory_name << "/RB_F_";
-      OSSRealzeroright(file_name,3,0,q_f);
+      file_name << std::setw(3)
+                << std::setprecision(0)
+                << std::setfill('0')
+                << std::right
+                << q_f;
       file_name << suffix;
       Xdr RB_Fq_f_out(file_name.str(), mode);
 
@@ -567,7 +583,11 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     {
       file_name.str("");
       file_name << directory_name << "/RB_A_";
-      OSSRealzeroright(file_name,3,0,q_a);
+      file_name << std::setw(3)
+                << std::setprecision(0)
+                << std::setfill('0')
+                << std::right
+                << q_a;
       file_name << suffix;
       Xdr RB_Aq_a_out(file_name.str(), mode);
 
@@ -655,7 +675,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
   // The string stream we'll use to make the file names
-  OStringStream file_name;
+  std::ostringstream file_name;
 
   // First, find out how many basis functions we had when Greedy terminated
   unsigned int n_bfs;
@@ -681,9 +701,17 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     {
       file_name.str("");
       file_name << directory_name << "/output_";
-      OSSRealzeroright(file_name,3,0,n);
+      file_name << std::setw(3)
+                << std::setprecision(0)
+                << std::setfill('0')
+                << std::right
+                << n;
       file_name << "_";
-      OSSRealzeroright(file_name,3,0,q_l);
+      file_name << std::setw(3)
+                << std::setprecision(0)
+                << std::setfill('0')
+                << std::right
+                << q_l;
       file_name << suffix;
       Xdr output_n_in(file_name.str(), mode);
 
@@ -721,7 +749,11 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   {
     file_name.str("");
     file_name << directory_name << "/RB_F_";
-    OSSRealzeroright(file_name,3,0,q_f);
+    file_name << std::setw(3)
+              << std::setprecision(0)
+              << std::setfill('0')
+              << std::right
+              << q_f;
     file_name << suffix;
     Xdr RB_Fq_f_in(file_name.str(), mode);
 
@@ -739,7 +771,11 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   {
     file_name.str("");
     file_name << directory_name << "/RB_A_";
-    OSSRealzeroright(file_name,3,0,q_a);
+    file_name << std::setw(3)
+              << std::setprecision(0)
+              << std::setfill('0')
+              << std::right
+              << q_a;
     file_name << suffix;
     Xdr RB_Aq_a_in(file_name.str(), mode);
 
@@ -775,7 +811,11 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     {
       file_name.str("");
       file_name << directory_name << "/output_";
-      OSSRealzeroright(file_name,3,0,n);
+      file_name << std::setw(3)
+                << std::setprecision(0)
+                << std::setfill('0')
+                << std::right
+                << n;
       file_name << "_dual_innerprods" << suffix;
       Xdr output_dual_innerprods_in(file_name.str(), mode);
       

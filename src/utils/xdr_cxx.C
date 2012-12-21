@@ -24,7 +24,6 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/o_f_stream.h"
-#include "libmesh/o_string_stream.h"
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h"
 #endif
@@ -63,7 +62,7 @@ namespace {
     // be running multiple zip utilities on parallel files.
     // libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
-    OStringStream pid_suffix;
+    std::ostringstream pid_suffix;
     pid_suffix << '_' << getpid();
 
     std::string new_name = name;
@@ -131,7 +130,7 @@ namespace {
   // remove an unzipped file
   void remove_unzipped_file (const std::string &name)
   {
-    OStringStream pid_suffix;
+    std::ostringstream pid_suffix;
     pid_suffix << '_' << getpid();
 
     // If we temporarily decompressed a file, remove the
