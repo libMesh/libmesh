@@ -52,7 +52,16 @@ class MeshfreeInterpolation
 public:
 
   /**
-   * "ParallelizationStrategy"
+   * "ParallelizationStrategy" to employ.
+   *
+   * SYNC_SOURCES assumes that the data added on each processor are
+   * independent and relatively small.  Calling the \p prepare_for_use()
+   * method with this \p ParallelizationStrategy will copy remote data 
+   * from other processors, so all interpolation can be performed 
+   * locally.
+   *
+   * Other \p ParallelizationStrategy techniques will be implemented
+   * as needed.
    */
   enum ParallelizationStrategy { SYNC_SOURCES     = 0,
 				 INVALID_STRATEGY}; 
@@ -60,7 +69,6 @@ public:
    * Constructor.
    */
   MeshfreeInterpolation () :
-    _is_prepared              (false),
     _parallelization_strategy (SYNC_SOURCES)
   {}
 
@@ -148,7 +156,6 @@ protected:
    */
   virtual void gather_remote_data ();
   
-  bool                     _is_prepared;
   ParallelizationStrategy  _parallelization_strategy;
   std::vector<std::string> _names;
   std::vector<Point>       _src_pts;

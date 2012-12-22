@@ -53,7 +53,6 @@ namespace libMesh
 
   void MeshfreeInterpolation::clear ()
   {
-    _is_prepared = false;
     _names.clear();
     _src_pts.clear();
     _src_vals.clear();
@@ -65,8 +64,6 @@ namespace libMesh
 					      const std::vector<Point>  &pts,
 					      const std::vector<Number> &vals)
   {
-    _is_prepared = false;
-    
     libmesh_assert_equal_to (field_names.size()*pts.size(), vals.size());
 
     // If we already have field variables, we assume we are appending.
@@ -123,7 +120,6 @@ namespace libMesh
 	// no preparation required for other strategies
 	break;
       }
-    _is_prepared = true;
   }
 
 
