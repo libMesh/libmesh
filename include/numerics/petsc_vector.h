@@ -28,7 +28,6 @@
 
 // Local includes
 #include "libmesh/numeric_vector.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/petsc_macro.h"
 
 /**
@@ -1126,7 +1125,7 @@ unsigned int PetscVector<T>::map_global_to_local_index (const unsigned int i) co
   const GlobalToLocalMap::const_iterator end = _global_to_local_map.end();
   if (it == end)
     {
-      OStringStream error_message;
+      std::ostringstream error_message;
       error_message << "No index " << i << " in ghosted vector.\n"
                     << "Vector contains [" << first << ',' << last << ")\n";
       GlobalToLocalMap::const_iterator b = _global_to_local_map.begin();

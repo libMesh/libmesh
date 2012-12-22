@@ -19,11 +19,11 @@
 // C/C++ includes
 #include <cstring>
 #include <limits>
+#include <iomanip>
 
 // Local includes
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/o_f_stream.h"
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "gzstream.h"
 #endif
@@ -833,12 +833,21 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 	libmesh_assert(out.get());
         libmesh_assert (out->good());
 
+        // Save stream flags
+        std::ios_base::fmtflags out_flags = out->flags();
+
+        // We will use scientific notation with a precision of 16
+        // digits in the following output.  The desired precision and
+        // format will automatically determine the width.
+        *out << std::scientific
+             << std::setprecision(16);
+
 	if (line_break == libMesh::invalid_uint)
 	  for (unsigned int i=0; i<len; i++)
 	    {
 	      libmesh_assert(out.get());
               libmesh_assert (out->good());
-	      OFSRealscientific(*out,17,val[i]) << " ";
+              *out << val[i] << ' ';
 	    }
 	else
 	  {
@@ -849,13 +858,16 @@ void Xdr::data_stream (double *val, const unsigned int len, const unsigned int l
 		  {
 		    libmesh_assert(out.get());
                     libmesh_assert (out->good());
-		    OFSRealscientific(*out,17,val[cnt++]) << " ";
+                    *out << val[cnt++] << ' ';
 		  }
 		libmesh_assert(out.get());
                 libmesh_assert (out->good());
 		*out << '\n';
 	      }
 	  }
+
+        // Restore stream flags
+        out->flags(out_flags);
 
 	return;
       }
@@ -919,12 +931,21 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
 	libmesh_assert(out.get());
         libmesh_assert (out->good());
 
+        // Save stream flags
+        std::ios_base::fmtflags out_flags = out->flags();
+
+        // We will use scientific notation with a precision of 16
+        // digits in the following output.  The desired precision and
+        // format will automatically determine the width.
+        *out << std::scientific
+             << std::setprecision(16);
+
 	if (line_break == libMesh::invalid_uint)
 	  for (unsigned int i=0; i<len; i++)
 	    {
 	      libmesh_assert(out.get());
               libmesh_assert (out->good());
-	      OFSRealscientific(*out,17,val[i]) << " ";
+              *out << val[i] << ' ';
 	    }
 	else
 	  {
@@ -935,13 +956,16 @@ void Xdr::data_stream (float *val, const unsigned int len, const unsigned int li
 		  {
 		    libmesh_assert(out.get());
                     libmesh_assert (out->good());
-		    OFSRealscientific(*out,17,val[cnt++]) << " ";
+                    *out << val[cnt++] << ' ';
 		  }
 		libmesh_assert(out.get());
                 libmesh_assert (out->good());
 		*out << '\n';
 	      }
 	  }
+
+        // Restore stream flags
+        out->flags(out_flags);
 
 	return;
       }
@@ -1031,12 +1055,21 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 	libmesh_assert(out.get());
         libmesh_assert (out->good());
 
+        // Save stream flags
+        std::ios_base::fmtflags out_flags = out->flags();
+
+        // We will use scientific notation with a precision of 16
+        // digits in the following output.  The desired precision and
+        // format will automatically determine the width.
+        *out << std::scientific
+             << std::setprecision(16);
+
 	if (line_break == libMesh::invalid_uint)
 	  for (unsigned int i=0; i<len; i++)
 	    {
 	      libmesh_assert(out.get());
               libmesh_assert (out->good());
-	      OFSRealscientific(*out,17,val[i]) << " ";
+              *out << val[i] << ' ';
 	    }
 	else
 	  {
@@ -1047,13 +1080,16 @@ void Xdr::data_stream (long double *val, const unsigned int len, const unsigned 
 		  {
 		    libmesh_assert(out.get());
                     libmesh_assert (out->good());
-		    OFSRealscientific(*out,17,val[cnt++]) << " ";
+                    *out << val[cnt++] << ' ';
 		  }
 		libmesh_assert(out.get());
                 libmesh_assert (out->good());
 		*out << '\n';
 	      }
 	  }
+
+        // Restore stream flags
+        out->flags(out_flags);
 
 	return;
       }
@@ -1141,13 +1177,22 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 	libmesh_assert(out.get());
         libmesh_assert (out->good());
 
+        // Save stream flags
+        std::ios_base::fmtflags out_flags = out->flags();
+
+        // We will use scientific notation with a precision of 16
+        // digits in the following output.  The desired precision and
+        // format will automatically determine the width.
+        *out << std::scientific
+             << std::setprecision(16);
+
 	if (line_break == libMesh::invalid_uint)
 	  for (unsigned int i=0; i<len; i++)
 	    {
 	      libmesh_assert(out.get());
               libmesh_assert (out->good());
-	      OFSRealscientific(*out,17,val[i].real()) << " ";
-	      OFSRealscientific(*out,17,val[i].imag()) << " ";
+              *out << val[i].real() << ' ';
+              *out << val[i].imag() << ' ';
 	    }
 	else
 	  {
@@ -1158,8 +1203,8 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 		  {
 		    libmesh_assert(out.get());
                     libmesh_assert (out->good());
-		    OFSRealscientific(*out,17,val[cnt].real()) << " ";
-		    OFSRealscientific(*out,17,val[cnt].imag()) << " ";
+                    *out << val[cnt].real() << ' ';
+                    *out << val[cnt].imag() << ' ';
 		    cnt++;
 		  }
 		libmesh_assert(out.get());
@@ -1167,6 +1212,9 @@ void Xdr::data_stream (std::complex<double> *val, const unsigned int len, const 
 		*out << '\n';
 	      }
 	  }
+
+        // Restore stream flags
+        out->flags(out_flags);
 
 	return;
       }
@@ -1257,13 +1305,25 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 	libmesh_assert(out.get());
         libmesh_assert (out->good());
 
+
+        // Save stream flags
+        std::ios_base::fmtflags out_flags = out->flags();
+
+        // We will use scientific notation with a precision of
+        // 'digits10' digits in the following output.  The desired
+        // precision and format will automatically determine the
+        // width.  Note: digit10 is the number of digits (in decimal
+        // base) that can be represented without change.  Equivalent
+        // to FLT_DIG, DBL_DIG or LDBL_DIG for floating types.
+        *out << std::scientific
+             << std::setprecision(std::numeric_limits<long double>::digits10);
+
 	if (line_break == libMesh::invalid_uint)
 	  for (unsigned int i=0; i<len; i++)
 	    {
 	      libmesh_assert(out.get());
               libmesh_assert (out->good());
-	      OFSRealscientific(*out,std::numeric_limits<long double>::digits10,val[i].real()) << " ";
-	      OFSRealscientific(*out,std::numeric_limits<long double>::digits10,val[i].imag()) << " ";
+              *out << val[i].real() << ' ' val[i].imag() << ' ';
 	    }
 	else
 	  {
@@ -1274,8 +1334,7 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 		  {
 		    libmesh_assert(out.get());
                     libmesh_assert (out->good());
-		    OFSRealscientific(*out,std::numeric_limits<long double>::digits10,val[cnt].real()) << " ";
-		    OFSRealscientific(*out,std::numeric_limits<long double>::digits10,val[cnt].imag()) << " ";
+                    *out << val[cnt].real() << ' ' val[cnt].imag() << ' ';
 		    cnt++;
 		  }
 		libmesh_assert(out.get());
@@ -1283,6 +1342,9 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 		*out << '\n';
 	      }
 	  }
+
+        // Restore stream flags
+        out->flags(out_flags);
 
 	return;
       }

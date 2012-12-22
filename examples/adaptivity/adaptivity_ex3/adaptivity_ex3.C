@@ -62,7 +62,6 @@
 #include "libmesh/hp_singular.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_modification.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/perf_log.h"
 #include "libmesh/getpot.h"
 #include "libmesh/exact_solution.h"
@@ -257,7 +256,7 @@ int main(int argc, char** argv)
       // to a ExodusII-formatted plot file.
       if (output_intermediate)
         {
-          OStringStream outfile;
+          std::ostringstream outfile;
           outfile << "lshaped_" << r_step << ".e";
           ExodusII_IO (mesh).write_equation_systems (outfile.str(),
                                                equation_systems);
@@ -350,7 +349,7 @@ int main(int argc, char** argv)
                 }
 
               // Write out the error distribution
-	      OStringStream ss;
+              std::ostringstream ss;
 	      ss << r_step;
 #ifdef LIBMESH_HAVE_EXODUS_API
 	      std::string error_output = "error_"+ss.str()+".e";

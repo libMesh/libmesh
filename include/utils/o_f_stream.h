@@ -112,7 +112,12 @@ namespace libMesh
   /**
    * Default constructor.
    */
-  OFStream () {}
+  OFStream ()
+   {
+     // [JWP] TODO: I will remove this class at the next libmesh
+     // release or on on March 21, 2013, whichever comes first.
+     libmesh_deprecated();
+   }
 
   /**
    * Default destructor.
