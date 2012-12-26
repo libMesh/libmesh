@@ -35,13 +35,15 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        dnl AztecOO
        dnl ------------------------------------------------------
-       AC_CHECK_HEADER($withtrilinosdir/include/AztecOO_config.h,
-                       enableaztecoo=yes,
-                       AC_CHECK_HEADER($withtrilinosdir/AztecOO_config.h,
-                                     enableaztecoo=yes,
-                                     AC_CHECK_HEADER($withtrilinosdir/packages/aztecoo/src/AztecOO_config.h,
-                                                 enableaztecoo=yes,
-                                                 enableaztecoo=no)))
+       AC_CHECK_HEADER([$withtrilinosdir/include/AztecOO_config.h],
+                       [enableaztecoo=yes],
+                       [AC_CHECK_HEADER([$withtrilinosdir/AztecOO_config.h],
+                                        [enableaztecoo=yes],
+                                        [AC_CHECK_HEADER([$withtrilinosdir/packages/aztecoo/src/AztecOO_config.h],
+                                                         [enableaztecoo=yes],
+                                                         [enableaztecoo=no])
+					])
+		       ])
                      
        if test "$enableaztecoo" != no ; then
           AC_DEFINE(HAVE_AZTECOO, 1,
@@ -52,13 +54,15 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        dnl NOX
        dnl ------------------------------------------------------
-       AC_CHECK_HEADER($withtrilinosdir/include/NOX_Config.h,
-                       enablenox=yes,
-                       AC_CHECK_HEADER($withtrilinosdir/NOX_Config.h,
-                                    enablenox=yes,
-                                    AC_CHECK_HEADER($withtrilinosdir/packages/nox/src/NOX_Config.h,
-                                                 enablenox=yes,
-                                                 enablenox=no)))
+       AC_CHECK_HEADER([$withtrilinosdir/include/NOX_Config.h],
+                       [enablenox=yes]
+                       [AC_CHECK_HEADER([$withtrilinosdir/NOX_Config.h],
+                                        [enablenox=yes],
+                                        [AC_CHECK_HEADER([$withtrilinosdir/packages/nox/src/NOX_Config.h],
+                                                         [enablenox=yes],
+                                                         [enablenox=no])
+					])
+		       ])
                      
        if test "$enablenox" != no ; then
           AC_DEFINE(HAVE_NOX, 1,
@@ -69,13 +73,15 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        dnl ML
        dnl ------------------------------------------------------
-       AC_CHECK_HEADER($withtrilinosdir/include/ml_include.h,
-                       enableml=yes,
-                       AC_CHECK_HEADER($withtrilinosdir/ml_include.h,
-                                       enableml=yes,
-                                       AC_CHECK_HEADER($withtrilinosdir/packages/ml/src/Include/ml_include.h,
-                                                enableml=yes,
-                                                enableml=no)))
+       AC_CHECK_HEADER([$withtrilinosdir/include/ml_include.h],
+                       [enableml=yes],
+                       [AC_CHECK_HEADER([$withtrilinosdir/ml_include.h],
+                                        [enableml=yes],
+                                        [AC_CHECK_HEADER([$withtrilinosdir/packages/ml/src/Include/ml_include.h],
+                                                         [enableml=yes],
+                                                         [enableml=no])
+					])
+		       ])
                      
        if test "$enableml" != no ; then
           AC_DEFINE(HAVE_ML, 1,

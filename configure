@@ -28823,7 +28823,9 @@ else
 fi
 
 
+
 fi
+
 
 
 fi
@@ -28842,8 +28844,7 @@ $as_echo "<<< Configuring library with AztecOO support >>>" >&6; }
 ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/NOX_Config.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enablenox=yes
-else
-  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/NOX_Config.h" | $as_tr_sh`
+                       as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/NOX_Config.h" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/NOX_Config.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enablenox=yes
@@ -28857,7 +28858,9 @@ else
 fi
 
 
+
 fi
+
 
 
 fi
@@ -28891,7 +28894,9 @@ else
 fi
 
 
+
 fi
+
 
 
 fi
