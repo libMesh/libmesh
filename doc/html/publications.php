@@ -91,13 +91,13 @@ A.&nbsp;L. Rossa.
 G.&nbsp;Bornia.
  <em>Analysis of optimal control problems for the incompressible MHD
   equations and implementation in a finite element multiphysics code</em>.
- PhD thesis, Universit&aacute; di Bologna, 2012.
+ PhD thesis, Universit&agrave; di Bologna, 2012.
  
   <a href="http://amsdottorato.cib.unibo.it/4868/1/giorgio_bornia_tesi.pdf">http://amsdottorato.cib.unibo.it/4868/1/giorgio_bornia_tesi.pdf</a>.
 <a name="Bornia_thesis"></a><pre>
 @phdthesis{Bornia_thesis,
   author = {G.~Bornia},
-  school = {Universit\'{a} di Bologna},
+  school = {Universit\`{a} di Bologna},
   title = {{Analysis of optimal control problems for the incompressible MHD equations and implementation in a finite element multiphysics code}},
   note = {\url{http://amsdottorato.cib.unibo.it/4868/1/giorgio_bornia_tesi.pdf}},
   year = {2012}
