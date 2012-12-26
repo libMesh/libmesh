@@ -17,8 +17,8 @@
 
 
 
-#ifndef __node_elem_h__
-#define __node_elem_h__
+#ifndef LIBMESH_NODE_ELEM_H
+#define LIBMESH_NODE_ELEM_H
 
 // Local includes
 #include "libmesh/elem.h"
@@ -230,4 +230,4 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_NODE_ELEM_H

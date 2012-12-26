@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __inf_fe_macro_h__
-#define __inf_fe_macro_h__
+#ifndef LIBMESH_INF_FE_MACRO_H
+#define LIBMESH_INF_FE_MACRO_H
 
 
 // Local includes
@@ -55,7 +55,6 @@
 
 
 
-#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
-
-#endif
+#endif // LIBMESH_INF_FE_MACRO_H

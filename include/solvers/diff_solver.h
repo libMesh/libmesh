@@ -17,8 +17,8 @@
 
 
 
-#ifndef __diff_solver_h__
-#define __diff_solver_h__
+#ifndef LIBMESH_DIFF_SOLVER_H
+#define LIBMESH_DIFF_SOLVER_H
 
 // Local includes
 #include "libmesh/auto_ptr.h"
@@ -300,4 +300,4 @@ protected:
 } // namespace libMesh
 
 
-#endif // #define __diff_solver_h__
+#endif // LIBMESH_DIFF_SOLVER_H

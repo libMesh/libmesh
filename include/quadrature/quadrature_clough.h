@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_clough_h__
-#define __quadrature_clough_h__
+#ifndef LIBMESH_QUADRATURE_CLOUGH_H
+#define LIBMESH_QUADRATURE_CLOUGH_H
 
 // Local includes
 #include "libmesh/quadrature.h"
@@ -94,4 +94,4 @@ QClough::~QClough()
 
 
 
-#endif
+#endif // LIBMESH_QUADRATURE_CLOUGH_H

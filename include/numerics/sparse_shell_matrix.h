@@ -17,8 +17,8 @@
 
 
 
-#ifndef __sparse_shell_matrix_h__
-#define __sparse_shell_matrix_h__
+#ifndef LIBMESH_SPARSE_SHELL_MATRIX_H
+#define LIBMESH_SPARSE_SHELL_MATRIX_H
 
 
 // Local includes
@@ -141,4 +141,4 @@ void SparseShellMatrix<T>::get_diagonal(NumericVector<T>& dest) const
 } // namespace libMesh
 
 
-#endif // #ifndef __sparse_shell_matrix_h__
+#endif // LIBMESH_SPARSE_SHELL_MATRIX_H

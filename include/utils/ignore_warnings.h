@@ -1,4 +1,3 @@
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
@@ -16,6 +15,9 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+
+// Note: no include guards!  We want to be able to #include this
+// header multiple times.
 
 #include "libmesh/libmesh_config.h"
 

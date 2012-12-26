@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __parallel_histogram_h__
-#define __parallel_histogram_h__
+#ifndef LIBMESH_PARALLEL_HISTOGRAM_H
+#define LIBMESH_PARALLEL_HISTOGRAM_H
 
 // This class contains all the functionality for bin sorting
 // Templated on the type of keys you will be sorting and the
@@ -166,5 +166,5 @@ double Histogram<KeyType>::upper_bound (const unsigned int bin) const
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_PARALLEL_HISTOGRAM_H
 

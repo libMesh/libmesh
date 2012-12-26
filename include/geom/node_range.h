@@ -17,8 +17,8 @@
 
 
 
-#ifndef __node_range_h__
-#define __node_range_h__
+#ifndef LIBMESH_NODE_RANGE_H
+#define LIBMESH_NODE_RANGE_H
 
 // Local includes
 #include "libmesh/mesh_base.h"
@@ -35,4 +35,4 @@ typedef StoredRange<MeshBase::const_node_iterator, const Node*> ConstNodeRange;
 
 } // namespace libMesh
 
-#endif // end #ifndef __node_range_h__
+#endif // LIBMESH_NODE_RANGE_H

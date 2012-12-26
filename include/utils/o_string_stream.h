@@ -17,8 +17,8 @@
 
 
 
-#ifndef __o_string_stream_h__
-#define __o_string_stream_h__
+#ifndef LIBMESH_OSTRINGSTREAM_H
+#define LIBMESH_OSTRINGSTREAM_H
 
 
 
@@ -200,7 +200,12 @@ namespace libMesh
   /**
    * Default constructor.
    */
-  OStringStream () : std::ostringstream() {};
+  OStringStream () : std::ostringstream()
+   {
+     // [JWP] TODO: I will remove this class at the next libmesh
+     // release or on on March 21, 2013, whichever comes first.
+     libmesh_deprecated();
+   }
 
   /**
    * Default destructor.
@@ -389,5 +394,5 @@ namespace libMesh
 
 #endif // ifdef LIBMESH_HAVE_SSTREAM
 
-#endif // ifndef __o_string_stream_h__
+#endif // LIBMESH_OSTRINGSTREAM_H
 

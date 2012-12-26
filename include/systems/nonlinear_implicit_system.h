@@ -17,8 +17,8 @@
 
 
 
-#ifndef __nonlinear_implicit_system_h__
-#define __nonlinear_implicit_system_h__
+#ifndef LIBMESH_NONLINEAR_IMPLICIT_SYSTEM_H
+#define LIBMESH_NONLINEAR_IMPLICIT_SYSTEM_H
 
 // Local Includes
 #include "libmesh/implicit_system.h"
@@ -272,4 +272,4 @@ protected:
 // NonlinearImplicitSystem inline methods
 
 
-#endif
+#endif // LIBMESH_NONLINEAR_IMPLICIT_SYSTEM_H

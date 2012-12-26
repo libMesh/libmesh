@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __ensight_io_h__
-#define __ensight_io_h__
+#ifndef LIBMESH_ENSIGHT_IO_H
+#define LIBMESH_ENSIGHT_IO_H
 
 // libMesh includes
 #include "libmesh/libmesh.h"
@@ -135,4 +135,4 @@ private:
 } // namespace libMesh
 
 
-#endif // #define __ensight_io_h__
+#endif // LIBMESH_ENSIGHT_IO_H

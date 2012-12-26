@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tree_base_h__
-#define __tree_base_h__
+#ifndef LIBMESH_TREE_BASE_H
+#define LIBMESH_TREE_BASE_H
 
 // Local includes
 #include "libmesh/reference_counted_object.h"
@@ -118,4 +118,4 @@ TreeBase::TreeBase (const MeshBase& m) :
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_TREE_BASE_H

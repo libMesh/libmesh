@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_subset_solve_mode_h__
-#define __enum_subset_solve_mode_h__
+#ifndef LIBMESH_ENUM_SUBSET_SOLVE_MODE_H
+#define LIBMESH_ENUM_SUBSET_SOLVE_MODE_H
 
 // ------------------------------------------------------------
 // enum SubsetSolveMode definition
@@ -39,5 +39,5 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // #ifndef __subset_solve_mode_h__
+#endif // LIBMESH_ENUM_SUBSET_SOLVE_MODE_H
 

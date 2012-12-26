@@ -17,8 +17,8 @@
 
 
 
-#ifndef __legacy_xdr_io_io_h__
-#define __legacy_xdr_io_io_h__
+#ifndef LIBMESH_LEGACY_XDR_IO_H
+#define LIBMESH_LEGACY_XDR_IO_H
 
 
 // Local includes
@@ -224,4 +224,4 @@ class LegacyXdrIO : public MeshInput<MeshBase>,
 
 
 
-#endif // #define __legacy_xdr_io.h__
+#endif // LIBMESH_LEGACY_XDR_IO_H

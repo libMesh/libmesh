@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __pool_allocator_h__
-#define __pool_allocator_h__
+#ifndef LIBMESH_POOL_ALLOCATOR_H
+#define LIBMESH_POOL_ALLOCATOR_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -218,4 +218,4 @@ namespace libMesh
 } // end namespace libMesh
 
 
-#endif // #define __pool_allocator_h__
+#endif // LIBMESH_POOL_ALLOCATOR_H

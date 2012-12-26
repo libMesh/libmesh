@@ -18,8 +18,8 @@
 
 
 
-#ifndef __patch_h__
-#define __patch_h__
+#ifndef LIBMESH_PATCH_H
+#define LIBMESH_PATCH_H
 
 // Local includes
 
@@ -129,4 +129,4 @@ protected:
 } // namespace libMesh
 
 
-#endif // #define __patch_h__
+#endif // LIBMESH_PATCH_H

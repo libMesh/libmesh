@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __mesh_tetgen_wrapper_h__
-#define __mesh_tetgen_wrapper_h__
+#ifndef LIBMESH_MESH_TETGEN_WRAPPER_H
+#define LIBMESH_MESH_TETGEN_WRAPPER_H
 
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_TETGEN
@@ -240,4 +240,4 @@ namespace libMesh
 
 
 #endif // LIBMESH_HAVE_TETGEN
-#endif // __mesh_tetgen_wrapper_h__
+#endif // LIBMESH_MESH_TETGEN_WRAPPER_H

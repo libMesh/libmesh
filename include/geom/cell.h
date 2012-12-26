@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_h__
-#define __cell_h__
+#ifndef LIBMESH_CELL_H
+#define LIBMESH_CELL_H
 
 // Local includes
 #include "libmesh/elem.h"
@@ -81,4 +81,4 @@ public:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_CELL_H

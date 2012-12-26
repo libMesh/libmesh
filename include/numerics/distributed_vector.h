@@ -21,8 +21,8 @@
 
 
 
-#ifndef __distributed_vector_h__
-#define __distributed_vector_h__
+#ifndef LIBMESH_DISTRIBUTED_VECTOR_H
+#define LIBMESH_DISTRIBUTED_VECTOR_H
 
 // Local includes
 #include "libmesh/numeric_vector.h"
@@ -881,4 +881,4 @@ void DistributedVector<T>::swap (NumericVector<T> &other)
 } // namespace libMesh
 
 
-#endif  // #ifdef __distributed_vector_h__
+#endif  // LIBMESH_DISTRIBUTED_VECTOR_H

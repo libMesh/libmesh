@@ -17,8 +17,8 @@
 
 
 
-#ifndef __linear_implicit_system_h__
-#define __linear_implicit_system_h__
+#ifndef LIBMESH_LINEAR_IMPLICIT_SYSTEM_H
+#define LIBMESH_LINEAR_IMPLICIT_SYSTEM_H
 
 // Local Includes
 #include "libmesh/implicit_system.h"
@@ -219,4 +219,4 @@ protected:
 // LinearImplicitSystem inline methods
 
 
-#endif
+#endif // LIBMESH_LINEAR_IMPLICIT_SYSTEM_H

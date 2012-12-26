@@ -15,13 +15,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __xdr_mgf_h__
-#define __xdr_mgf_h__
+#ifndef LIBMESH_XDR_MGF_H
+#define LIBMESH_XDR_MGF_H
 
 // Local includes
 #include "libmesh/legacy_xdr_io.h"          // for LegacyXdrIO::FileFormat
 #include "libmesh/libmesh_config.h"  // for LIBMESH_HAVE_XDR
-#include "libmesh/o_f_stream.h"      // for OFStream
 
 // C++ includes
 #include <cstdio>  // for std::FILE
@@ -242,11 +241,8 @@ protected:
 
   /**
    * An output file stream object.
-   * Use the customized class to enable
-   * features also for compilers with broken
-   * iostream
    */
-  OFStream mp_out;
+  std::ofstream mp_out;
 
 private:
   std::FILE* mp_fp;
@@ -275,4 +271,4 @@ private:
 } // namespace libMesh
 
 
-#endif // #ifndef __xdr_mgf_h__
+#endif // LIBMESH_XDR_MGF_H

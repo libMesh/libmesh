@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tree_node_h__
-#define __tree_node_h__
+#ifndef LIBMESH_TREE_NODE_H
+#define LIBMESH_TREE_NODE_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -259,4 +259,4 @@ unsigned int TreeNode<N>::level () const
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_TREE_NODE_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __remote_elem_h__
-#define __remote_elem_h__
+#ifndef LIBMESH_REMOTE_ELEM_H
+#define LIBMESH_REMOTE_ELEM_H
 
 // Local includes
 #include "libmesh/elem.h"
@@ -190,4 +190,4 @@ extern const RemoteElem* remote_elem;
 
 } // namespace libMesh
 
-#endif // end #ifndef __remote_elem_h__
+#endif // LIBMESH_REMOTE_ELEM_H

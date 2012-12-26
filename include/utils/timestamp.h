@@ -17,8 +17,8 @@
 
 
 
-#ifndef __timestamp_h__
-#define __timestamp_h__
+#ifndef LIBMESH_TIMESTAMP_H
+#define LIBMESH_TIMESTAMP_H
 
 // C++ includes
 #include <iostream>
@@ -44,4 +44,4 @@ namespace Utility
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_TIMESTAMP_H

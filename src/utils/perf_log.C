@@ -28,24 +28,8 @@
 #include <vector>
 
 // Local includes
-#include "libmesh/o_string_stream.h"
 #include "libmesh/perf_log.h"
 #include "libmesh/timestamp.h"
-
-// Anonymous helper function
-
-namespace {
-
-void output_character_line(const unsigned int n,
-			   const char c,
-			   OStringStream& out)
-{
-  for (unsigned int i=0; i<n; ++i)
-    out << c;
-}
-
-}
-
 
 namespace libMesh
 {
@@ -110,7 +94,7 @@ void PerfLog::clear()
 
 std::string PerfLog::get_info_header() const
 {
-  OStringStream out;
+  std::ostringstream out;
 
   if (log_events)
     {
@@ -136,30 +120,29 @@ std::string PerfLog::get_info_header() const
       out << "\n";
 
       // Construct string stream objects for each of the outputs
-      OStringStream pid_stream;
-      OStringStream nprocs_stream;
-      OStringStream time_stream;
-      OStringStream os_stream;
-      OStringStream host_stream;
-      OStringStream osrel_stream;
-      OStringStream osver_stream;
-      OStringStream machine_stream;
-      OStringStream user_stream;
-      OStringStream config_stream;
+      std::ostringstream
+        pid_stream,
+        nprocs_stream,
+        time_stream,
+        os_stream,
+        host_stream,
+        osrel_stream,
+        osver_stream,
+        machine_stream,
+        user_stream;
 
 
       // Put pointers to these streams in a vector
-      std::vector<OStringStream*> v(10);
-      v[0] = &pid_stream;
-      v[1] = &nprocs_stream;
-      v[2] = &time_stream;
-      v[3] = &os_stream;
-      v[4] = &host_stream;
-      v[5] = &osrel_stream;
-      v[6] = &osver_stream;
-      v[7] = &machine_stream;
-      v[8] = &user_stream;
-      v[9] = &config_stream;
+      std::vector<std::ostringstream*> v;
+      v.push_back(&pid_stream);
+      v.push_back(&nprocs_stream);
+      v.push_back(&time_stream);
+      v.push_back(&os_stream);
+      v.push_back(&host_stream);
+      v.push_back(&osrel_stream);
+      v.push_back(&osver_stream);
+      v.push_back(&machine_stream);
+      v.push_back(&user_stream);
 
       // Fill string stream objects
       if (libMesh::n_processors() > 1)
@@ -181,31 +164,69 @@ std::string PerfLog::get_info_header() const
       else
 #endif
         user_stream  << "Unknown";
-      config_stream  << "| Configuration:  " << LIBMESH_CONFIGURE_INFO;
 
-      // Find the longest string, use that to set the line length for formatting.
+      // Parse the LIBMESH_CONFIGURE_INFO string literal before using it in PerfLog output
+      std::string libmesh_configure_info(LIBMESH_CONFIGURE_INFO);
+      std::vector<std::string> parsed_libmesh_configure_info;
+      this->split_on_whitespace(libmesh_configure_info,
+                                parsed_libmesh_configure_info);
+
+      // There should always be at at least one entry in
+      // parsed_libmesh_configure_info, even if the user just ran
+      // ../configure.
+      libmesh_assert_greater (parsed_libmesh_configure_info.size(), 0);
+
+      // Find the longest string in all the streams
       unsigned int max_length = 0;
       for (unsigned int i=0; i<v.size(); ++i)
 	if (v[i]->str().size() > max_length)
 	  max_length = v[i]->str().size();
 
-      // Print dashed line
-      output_character_line(max_length+2, '-', out);
-      out << '\n';
+      // Find the longest string in the parsed_libmesh_configure_info
+      for (unsigned i=0; i<parsed_libmesh_configure_info.size(); ++i)
+        if (parsed_libmesh_configure_info[i].size() > max_length)
+          max_length = parsed_libmesh_configure_info[i].size();
 
-      // Loop over all the strings and print them out with end-formatting
+      // Print dashed line for the header
+      out << ' '
+          << std::string(max_length+1, '-')
+          << '\n';
+
+      // Loop over all the strings and add end formatting
       for (unsigned int i=0; i<v.size(); ++i)
 	{
 	  if (v[i]->str().size() > 0)
-	    {
-	      out << v[i]->str();
-	      OSSStringright(out, max_length+4 - v[i]->str().size(), "|\n");
-	    }
+            out << v[i]->str()
+                << std::setw(max_length + 4 - v[i]->str().size())
+                << std::right
+                << "|\n";
 	}
 
+      // Print out configuration header plus first parsed string.  The
+      // magic number 18 below accounts for the length of the word
+      // 'Configuration'.
+      out << "| Configuration:  "
+          << parsed_libmesh_configure_info[0]
+          << std::setw(max_length + 4 - parsed_libmesh_configure_info[0].size() - 18)
+          << std::right
+          << "|\n";
+
+      // Loop over the parsed_libmesh_configure_info and add end formatting.  The magic
+      // number 3 below accounts for the leading 'pipe' character and indentation
+      for (unsigned i=1; i<parsed_libmesh_configure_info.size(); ++i)
+        {
+          out << "|  "
+              << parsed_libmesh_configure_info[i]
+              << std::setw(max_length + 4 - parsed_libmesh_configure_info[i].size() - 3)
+              << std::right
+              << "|\n";
+        }
+
+
       // Print dashed line
-      output_character_line(max_length+2, '-', out);
-      out << '\n';
+      out << ' '
+          << std::string(max_length+1, '-')
+          << '\n';
     }
 
   return out.str();
@@ -216,7 +237,7 @@ std::string PerfLog::get_info_header() const
 
 std::string PerfLog::get_perf_info() const
 {
-  OStringStream out;
+  std::ostringstream out;
 
   if (log_events && !log.empty())
     {
@@ -260,13 +281,13 @@ std::string PerfLog::get_perf_info() const
 	pct_active_incl_sub_col_width+1;
 
       // Print dashed line
-      out << ' ';
-      output_character_line(total_col_width, '-', out);
-      out << '\n';
+      out << ' '
+          << std::string(total_col_width, '-')
+          << '\n';
 
       {
 	// Construct temporary message string
-	OStringStream temp;
+        std::ostringstream temp;
 	temp << "| " << label_name << " Performance: Alive time=" << elapsed_time
 	     << ", Active time=" << total_time;
 
@@ -281,44 +302,73 @@ std::string PerfLog::get_perf_info() const
 	// happen often, hopefully.  Add two additional characters for a
 	// space and a "|" character at the end.
 	if (temp_size < total_col_width+2)
-	  {
-	    OSSStringright(out, total_col_width-temp_size+2, "|");
-	  }
+          out << std::setw(total_col_width - temp_size + 2)
+              << std::right
+              << "|";
 
 	out << '\n';
       }
 
       // Print dashed line
-      out << ' ';
-      output_character_line(total_col_width, '-', out);
-      out << '\n';
+      out << ' '
+          << std::string(total_col_width, '-')
+          << '\n';
 
 
       // Write out the header for the events listing
-      out << "| ";
-      OSSStringleft(out,event_col_width,"Event");
-      OSSStringleft(out,ncalls_col_width,"nCalls");
-      OSSStringleft(out,tot_time_col_width,"Total Time");
-      OSSStringleft(out,avg_time_col_width,"Avg Time");
-      OSSStringleft(out,tot_time_incl_sub_col_width,"Total Time");
-      OSSStringleft(out,avg_time_incl_sub_col_width,"Avg Time");
-      OSSStringleft(out,pct_active_col_width+pct_active_incl_sub_col_width,"% of Active Time");
-      out << "|\n";
-      out << "| ";
-      OSSStringleft(out,event_col_width,"");
-      OSSStringleft(out,ncalls_col_width,"");
-      OSSStringleft(out,tot_time_col_width,"w/o Sub");
-      OSSStringleft(out,avg_time_col_width,"w/o Sub");
-      OSSStringleft(out,tot_time_incl_sub_col_width,"With Sub");
-      OSSStringleft(out,avg_time_incl_sub_col_width,"With Sub");
-      OSSStringleft(out,pct_active_col_width,"w/o S");
-      OSSStringleft(out,pct_active_incl_sub_col_width,"With S");
-
-      out << "|\n|";
-      output_character_line(total_col_width, '-', out);
-      out << "|\n|";
-      output_character_line(total_col_width, ' ', out);
-      out << "|\n";
+      out << "| "
+          << std::setw(event_col_width)
+          << std::left
+          << "Event"
+          << std::setw(ncalls_col_width)
+          << std::left
+          << "nCalls"
+          << std::setw(tot_time_col_width)
+          << std::left
+          << "Total Time"
+          << std::setw(avg_time_col_width)
+          << std::left
+          << "Avg Time"
+          << std::setw(tot_time_incl_sub_col_width)
+          << std::left
+          << "Total Time"
+          << std::setw(avg_time_incl_sub_col_width)
+          << std::left
+          << "Avg Time"
+          << std::setw(pct_active_col_width+pct_active_incl_sub_col_width)
+          << std::left
+          << "% of Active Time"
+          << "|\n"
+          << "| "
+          << std::setw(event_col_width)
+          << std::left
+          << ""
+          << std::setw(ncalls_col_width)
+          << std::left
+          << ""
+          << std::setw(tot_time_col_width)
+          << std::left
+          << "w/o Sub"
+          << std::setw(avg_time_col_width)
+          << std::left
+          << "w/o Sub"
+          << std::setw(tot_time_incl_sub_col_width)
+          << std::left
+          << "With Sub"
+          << std::setw(avg_time_incl_sub_col_width)
+          << std::left
+          << "With Sub"
+          << std::setw(pct_active_col_width)
+          << std::left
+          << "w/o S"
+          << std::setw(pct_active_incl_sub_col_width)
+          << std::left
+          << "With S"
+          << "|\n|"
+          << std::string(total_col_width, '-')
+          << "|\n|"
+          << std::string(total_col_width, ' ')
+          << "|\n";
 
       unsigned int summed_function_calls = 0;
       double       summed_total_time     = 0;
@@ -347,104 +397,150 @@ std::string PerfLog::get_perf_info() const
 
 	      // Print the event name
 	      if (pos->first.first == "")
-		{
-		  out << "| ";
-		  OSSStringleft(out,event_col_width,pos->first.second);
-		}
+                out << "| "
+                    << std::setw(event_col_width)
+                    << std::left
+                    << pos->first.second;
+
 	      else
 		{
 		  if (last_header != pos->first.first)
 		    {
 		      last_header = pos->first.first;
 
-		      // print blank line
-		      out << "|";
-		      output_character_line(total_col_width, ' ', out);
-		      out << "|\n";
-
-		      // print header name (account for additional space before
-		      // the header)
-		      out << "| ";
-		      OSSStringleft(out, total_col_width-1, pos->first.first);
-		      out << "|\n";
+		      // print blank line followed by header name
+		      // (account for additional space before the
+		      // header)
+		      out << "|"
+                          << std::string(total_col_width, ' ')
+                          << "|\n| "
+                          << std::setw(total_col_width-1)
+                          << std::left
+                          << pos->first.first
+                          << "|\n";
 		    }
 
-		  out << "|   ";
-		  OSSStringleft(out, event_col_width-2, pos->first.second);
+		  out << "|   "
+                      << std::setw(event_col_width-2)
+                      << std::left
+                      << pos->first.second;
 		}
 
 
 	      // Print the number of calls to the event.
-	      OSSInt(out,ncalls_col_width,perf_count);
+              out << std::setw(ncalls_col_width)
+                  << perf_count;
+
+              // Save the original stream flags
+              std::ios_base::fmtflags out_flags = out.flags();
 
 	      // Print the total time spent in the event
-	      out.setf(std::ios::fixed);
-	      OSSRealleft(out,tot_time_col_width,4,perf_time);
+              out << std::fixed
+                  << std::setprecision(4)
+                  << std::setw(tot_time_col_width)
+                  << std::left
+                  << perf_time;
+
 
 	      // Print the average time per function call
-	      OSSRealleft(out,avg_time_col_width,6,perf_avg_time);
+              out << std::fixed
+                  << std::setprecision(6)
+                  << std::setw(avg_time_col_width)
+                  << std::left
+                  << perf_avg_time;
 
 	      // Print the total time spent in the event incl. sub-events
-	      OSSRealleft(out,tot_time_incl_sub_col_width,4,perf_time_incl_sub);
+              out << std::fixed
+                  << std::setprecision(4)
+                  << std::setw(tot_time_incl_sub_col_width)
+                  << std::left
+                  << perf_time_incl_sub;
 
 	      // Print the average time per function call incl. sub-events
-	      OSSRealleft(out,avg_time_incl_sub_col_width,6,perf_avg_time_incl_sub);
+              out << std::fixed
+                  << std::setprecision(6)
+                  << std::setw(avg_time_incl_sub_col_width)
+                  << std::left
+                  << perf_avg_time_incl_sub;
 
 	      // Print the percentage of the time spent in the event
-	      OSSRealleft(out,pct_active_col_width,2,perf_percent);
+              out << std::fixed
+                  << std::setprecision(2)
+                  << std::setw(pct_active_col_width)
+                  << std::left
+                  << perf_percent;
 
 	      // Print the percentage of the time spent in the event incl. sub-events
-	      OSSRealleft(out,pct_active_incl_sub_col_width,2,perf_percent_incl_sub);
+              out << std::fixed
+                  << std::setprecision(2)
+                  << std::setw(pct_active_incl_sub_col_width)
+                  << std::left
+                  << perf_percent_incl_sub;
 
-	      out << "|";
-	      out << '\n';
+              // Reset the stream flags
+              out.flags(out_flags);
+
+	      out << "|\n";
 	    }
 	}
 
-      out << ' ';
-      output_character_line(total_col_width, '-', out);
-      out << '\n';
-      out << "| ";
-      OSSStringleft(out,event_col_width,"Totals:");
+      out << ' '
+          << std::string(total_col_width, '-')
+          << "\n| "
+          << std::setw(event_col_width)
+          << std::left
+          << "Totals:";
 
       // Print the total number of logged function calls
       // For routines which are called many times, summed_function_calls may
       // exceed 7 digits.  If this happens use, scientific notation.
       if (summed_function_calls < 9999999)
-	{
-	  OSSInt(out,ncalls_col_width,summed_function_calls);
-	}
+        out << std::setw(ncalls_col_width)
+            << summed_function_calls;
 
       else
 	{
-	  out.setf(std::ios::scientific);
-	  OSSRealleft(out, ncalls_col_width, 3, static_cast<Real>(summed_function_calls));
-	  out.unsetf(std::ios::scientific);
+          // Save the original stream flags
+          std::ios_base::fmtflags out_flags = out.flags();
+
+          out << std::scientific
+              << std::setprecision(3)
+              << std::setw(ncalls_col_width)
+              << std::left
+              << static_cast<Real>(summed_function_calls);
+
+          // Reset the stream flags
+	  out.flags(out_flags);
 	}
 
-      // Print the total time spent in logged function calls
-      out.setf(std::ios::fixed);
-      OSSRealleft(out,tot_time_col_width,4,summed_total_time);
+      // Print the total time spent in logged function calls.  Don't bother saving/restoring
+      // the flags here since we are almost done with this stream anyway...
+      out << std::fixed
+          << std::setprecision(4)
+          << std::setw(tot_time_col_width)
+          << std::left
+          << summed_total_time;
 
       // Null, the average time doesn't make sense as a total
-      out.width(avg_time_col_width);
-      out << "";
+      out << std::setw(avg_time_col_width) << "";
 
       // Same for times that include sub-events
-      out.width(tot_time_incl_sub_col_width);
-      out << "";
-      out.width(avg_time_incl_sub_col_width);
-      out << "";
+      out << std::setw(tot_time_incl_sub_col_width)
+          << ""
+          << std::setw(avg_time_incl_sub_col_width)
+          << "";
 
-      // Print the total percentage
-      OSSRealleft(out,pct_active_col_width,2,summed_percentage);
-
-      out.width(pct_active_incl_sub_col_width);
-      out << "";
-
-      out << "|\n ";
-      output_character_line(total_col_width, '-', out);
-      out << '\n';
+      // Print the total percentage followed by dashed line
+      out << std::fixed
+          << std::setprecision(2)
+          << std::setw(pct_active_col_width)
+          << std::left
+          << summed_percentage
+          << std::setw(pct_active_incl_sub_col_width)
+          << ""
+          << "|\n "
+          << std::string(total_col_width, '-')
+          << '\n';
     }
 
   return out.str();
@@ -454,7 +550,7 @@ std::string PerfLog::get_perf_info() const
 
 std::string PerfLog::get_log() const
 {
-  OStringStream out;
+  std::ostringstream out;
 
   if (log_events)
     {
@@ -522,6 +618,47 @@ void PerfLog::restart_event(const std::string &,
   // nothing to do.  popping the top off the stack will handle it.
 }
 
+
+
+void PerfLog::split_on_whitespace(const std::string& input, std::vector<std::string>& output) const
+{
+  // Check for easy return
+  if (input.size()==0)
+    return;
+
+  // Here we hard-code the string to split on, since the algorithm below
+  // is somewhat specific to it...
+  const std::string split_on("' '");
+
+  size_t current_pos = 0;
+  while (true)
+    {
+      // Find next end location
+      size_t end_pos = input.find(split_on, current_pos);
+
+      if (end_pos != std::string::npos)
+        {
+          // Create substring.  Note: the second argument to substr is
+          // the *length* of string to create, not the ending position!
+          output.push_back( input.substr(current_pos, end_pos - current_pos + 1) );
+
+          // Update search starting position, make sure to go past the end of the split_on string, but
+          // include the previous single quote (hence the -1).
+          current_pos = end_pos + split_on.size() - 1;
+        }
+      else
+        {
+          // Push back whatever remains of the string onto the output.
+          // Note that substr with only 1 argument pushes back
+          // whatever remains of the string.  This also handles the
+          // case where the string does not contain any matches.
+          output.push_back( input.substr(current_pos) );
+
+          // We are done searching the string, so break out of the while loop
+          break;
+        }
+    }
+}
 
 
 } // namespace libMesh

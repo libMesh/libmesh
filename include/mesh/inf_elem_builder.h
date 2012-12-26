@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __inf_elem_builder_h__
-#define __inf_elem_builder_h__
+#ifndef LIBMESH_INF_ELEM_BUILDER_H
+#define LIBMESH_INF_ELEM_BUILDER_H
 
 
 #include "libmesh/libmesh_config.h"
@@ -129,4 +129,4 @@ private:
 } // namespace libMesh
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
-#endif
+#endif // LIBMESH_INF_ELEM_BUILDER_H

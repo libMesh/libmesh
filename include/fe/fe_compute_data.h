@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __fe_compute_data_h__
-#define __fe_compute_data_h__
+#ifndef LIBMESH_FE_COMPUTE_DATA_H
+#define LIBMESH_FE_COMPUTE_DATA_H
 
 // Local includes
 #include "libmesh/libmesh.h"
@@ -126,7 +126,7 @@ public:
 
 } // namespace libMesh
 
-#endif // #ifndef __fe_compute_data_h__
+#endif // LIBMESH_FE_COMPUTE_DATA_H
 
 
 

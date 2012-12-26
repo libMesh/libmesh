@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fem_context_h__
-#define __fem_context_h__
+#ifndef LIBMESH_FEM_CONTEXT_H
+#define LIBMESH_FEM_CONTEXT_H
 
 // Local Includes
 #include "libmesh/diff_context.h"
@@ -734,4 +734,4 @@ void FEMContext::get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe
 
 } // namespace libMesh
 
-#endif //__fem_context_h__
+#endif // LIBMESH_FEM_CONTEXT_H

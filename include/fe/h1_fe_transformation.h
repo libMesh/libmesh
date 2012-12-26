@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __h1_fe_transformation_h__
-#define __h1_fe_transformation_h__
+#ifndef LIBMESH_H1_FE_TRANSFORMATION_H
+#define LIBMESH_H1_FE_TRANSFORMATION_H
 
 #include "libmesh/fe_transformation_base.h"
 #include "libmesh/compare_types.h"
@@ -108,4 +108,4 @@ namespace libMesh
 
 }
 
-#endif //__h1_fe_transformation_h__
+#endif // LIBMESH_H1_FE_TRANSFORMATION_H

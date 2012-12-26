@@ -17,8 +17,8 @@
 
 
 
-#ifndef __gmsh_io_h__
-#define __gmsh_io_h__
+#ifndef LIBMESH_GMSH_IO_H
+#define LIBMESH_GMSH_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -165,4 +165,4 @@ bool & GmshIO::binary ()
 
 } // namespace libMesh
 
-#endif // #define __gmsh_io_h__
+#endif // LIBMESH_GMSH_IO_H

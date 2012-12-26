@@ -17,8 +17,8 @@
 
 
 
-#ifndef __eigen_time_solver_h__
-#define __eigen_time_solver_h__
+#ifndef LIBMESH_EIGEN_TIME_SOLVER_H
+#define LIBMESH_EIGEN_TIME_SOLVER_H
 
 #include "libmesh/libmesh_config.h"
 #ifdef LIBMESH_HAVE_SLEPC
@@ -218,4 +218,4 @@ private:
 
 
 #endif // LIBMESH_HAVE_SLEPC
-#endif // #define __eigen_time_solver_h__
+#endif // LIBMESH_EIGEN_TIME_SOLVER_H

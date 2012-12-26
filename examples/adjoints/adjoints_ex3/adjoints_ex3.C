@@ -1,6 +1,7 @@
 // C++ includes
 #include <iostream>
 #include <sys/time.h>
+#include <iomanip>
 
 // Libmesh includes
 #include "libmesh/equation_systems.h"
@@ -37,10 +38,6 @@
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/qoi_set.h"
 #include "libmesh/weighted_patch_recovery_error_estimator.h"
-
-// Some (older) compilers do not offer full stream
-// functionality, OStringStream works around this.
-#include "libmesh/o_string_stream.h"
 
 // Local includes
 #include "coupled_system.h"
@@ -102,12 +99,22 @@ std::string numbered_filename(unsigned int t_step, // The timestep count
                               std::string extension,
                               FEMParameters &param)
 {
-  OStringStream file_name;
-  file_name << solution_type << ".out." << type << '.';
-  OSSRealzeroright(file_name, 3, 0, t_step);
-  file_name << '.' ;
-  OSSRealzeroright(file_name, 2, 0, a_step);
-  file_name << '.' << extension;
+  std::ostringstream file_name;
+  file_name << solution_type
+            << ".out."
+            << type
+            << '.'
+            << std::setw(3)
+            << std::setfill('0')
+            << std::right
+            << t_step
+            << '.'
+            << std::setw(2)
+            << std::setfill('0')
+            << std::right
+            << a_step
+            << '.'
+            << extension;
 
   if (param.output_bz2)
     file_name << ".bz2";
@@ -129,11 +136,18 @@ void write_output(EquationSystems &es,
 #ifdef LIBMESH_HAVE_GMV
   if (param.output_gmv)
     {
-      OStringStream file_name_gmv;
-      file_name_gmv << solution_type << ".out.gmv.";
-      OSSRealzeroright(file_name_gmv,3,0,t_step);
-      file_name_gmv << '.' ;
-      OSSRealzeroright(file_name_gmv,2,0,a_step);
+      std::ostringstream file_name_gmv;
+      file_name_gmv << solution_type
+                    << ".out.gmv."
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << t_step
+                    << '.'
+                    << std::setw(2)
+                    << std::setfill('0')
+                    << std::right
+                    << a_step;
 
       GMVIO(mesh).write_equation_systems
         (file_name_gmv.str(), es);
@@ -143,12 +157,19 @@ void write_output(EquationSystems &es,
 #ifdef LIBMESH_HAVE_TECPLOT_API
   if (param.output_tecplot)
     {
-      OStringStream file_name_tecplot;
-      file_name_tecplot << solution_type << ".out.";
-      OSSRealzeroright(file_name_tecplot,3,0,t_step);
-      file_name_tecplot << '.' ;
-      OSSRealzeroright(file_name_tecplot,2,0,a_step);
-      file_name_tecplot << ".plt";
+      std::ostringstream file_name_tecplot;
+      file_name_tecplot << solution_type
+                        << ".out."
+                        << std::setw(3)
+                        << std::setfill('0')
+                        << std::right
+                        << t_step
+                        << '.'
+                        << std::setw(2)
+                        << std::setfill('0')
+                        << std::right
+                        << a_step
+                        << ".plt";
 
       TecplotIO(mesh).write_equation_systems
         (file_name_tecplot.str(), es);
@@ -293,12 +314,19 @@ void write_error(EquationSystems &,
 #ifdef LIBMESH_HAVE_GMV
   if (param.write_gmv_error)
     {
-      OStringStream error_gmv;
-      error_gmv << "error.gmv.";
-      OSSRealzeroright(error_gmv,3,0, a_number);
-      error_gmv << ".";
-      OSSRealzeroright(error_gmv,2,0, t_number);
-      error_gmv << error_type;
+      std::ostringstream error_gmv;
+      error_gmv << "error.gmv."
+                << std::setw(3)
+                << std::setfill('0')
+                << std::right
+                << a_number
+                << "."
+                << std::setw(2)
+                << std::setfill('0')
+                << std::right
+                << t_number
+                << error_type;
+
       error.plot_error(error_gmv.str(), es.get_mesh());
     }
 #endif
@@ -306,12 +334,19 @@ void write_error(EquationSystems &,
 #ifdef LIBMESH_HAVE_TECPLOT_API
   if (param.write_tecplot_error)
     {
-      OStringStream error_tecplot;
-      error_tecplot << "error.plt.";
-      OSSRealzeroright(error_tecplot,3,0, a_number);
-      error_tecplot << ".";
-      OSSRealzeroright(error_tecplot,2,0, t_number);
-      error_tecplot << error_type;
+      std::ostringstream error_tecplot;
+      error_tecplot << "error.plt."
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << a_number
+                    << "."
+                    << std::setw(2)
+                    << std::setfill('0')
+                    << std::right
+                    << t_number
+                    << error_type;
+
       error.plot_error(error_tecplot.str(), es.get_mesh());
     }
 #endif

@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __parallel_bin_sorter_h__
-#define __parallel_bin_sorter_h__
+#ifndef LIBMESH_PARALLEL_BIN_SORTER_H
+#define LIBMESH_PARALLEL_BIN_SORTER_H
 
 // This class contains all the functionality for bin sorting
 // Templated on the type of keys you will be sorting and the
@@ -82,5 +82,6 @@ unsigned int BinSorter<KeyType>::sizeof_bin (const unsigned int bin) const
 }
 
 } // namespace libMesh
-#endif
+
+#endif // LIBMESH_PARALLEL_BIN_SORTER_H
 

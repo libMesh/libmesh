@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_generation_h__
-#define __mesh_generation_h__
+#ifndef LIBMESH_MESH_GENERATION_H
+#define LIBMESH_MESH_GENERATION_H
 
 // Local Includes -----------------------------------
 // #include "libmesh/libmesh_common.h" // needed for Real
@@ -144,4 +144,4 @@ namespace MeshTools
 
 } // namespace libMesh
 
-#endif // #define __mesh_generation_h__
+#endif // LIBMESH_MESH_GENERATION_H

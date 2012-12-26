@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tri3_h__
-#define __tri3_h__
+#ifndef LIBMESH_FACE_TRI3_H
+#define LIBMESH_FACE_TRI3_H
 
 
 // Local includes
@@ -178,4 +178,4 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_FACE_TRI3_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __perflog_h__
-#define __perflog_h__
+#ifndef LIBMESH_PERFLOG_H
+#define LIBMESH_PERFLOG_H
 
 
 // Local includes
@@ -29,6 +29,7 @@
 #include <map>
 #include <stack>
 #include <string>
+#include <vector>
 #include <sys/time.h>
 
 namespace libMesh
@@ -268,6 +269,13 @@ class PerfLog
    * data the first time that print_log() is called.
    */
   static bool called;
+
+  /**
+   * Splits a string on whitespace into a vector of separate strings.  This is used to make the
+   * LIBMESH_CONFIGURE_INFO a little more manageable.
+   */
+  void split_on_whitespace(const std::string& input,
+                           std::vector<std::string>& output) const;
 };
 
 
@@ -416,4 +424,4 @@ double PerfLog::get_elapsed_time () const
 
 
 
-#endif
+#endif // LIBMESH_PERFLOG_H

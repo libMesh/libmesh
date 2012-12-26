@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_tet4_h__
-#define __cell_tet4_h__
+#ifndef LIBMESH_CELL_TET4_H
+#define LIBMESH_CELL_TET4_H
 
 // Local includes
 #include "libmesh/cell_tet.h"
@@ -238,4 +238,4 @@ Tet4::Tet4(Elem* p) :
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_CELL_TET4_H

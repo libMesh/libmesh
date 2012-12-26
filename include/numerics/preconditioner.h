@@ -17,8 +17,8 @@
 
 
 
-#ifndef __preconditioner_h__
-#define __preconditioner_h__
+#ifndef LIBMESH_PRECONDITIONER_H
+#define LIBMESH_PRECONDITIONER_H
 
 
 // Local includes
@@ -179,4 +179,4 @@ Preconditioner<T>::set_type (const PreconditionerType pct)
 } // namespace libMesh
 
 
-#endif // #ifdef __preconditioner_h__
+#endif // LIBMESH_PRECONDITIONER_H

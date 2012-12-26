@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __parallel_sort_h__
-#define __parallel_sort_h__
+#ifndef LIBMESH_PARALLEL_SORT_H
+#define LIBMESH_PARALLEL_SORT_H
 
 // Local Includes
 #include "libmesh/parallel.h"
@@ -140,4 +140,5 @@ private:
 }
 
 } // namespace libMesh
-#endif
+
+#endif // LIBMESH_PARALLEL_SORT_H

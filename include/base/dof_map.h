@@ -17,8 +17,8 @@
 
 
 
-#ifndef __dof_map_h__
-#define __dof_map_h__
+#ifndef LIBMESH_DOF_MAP_H
+#define LIBMESH_DOF_MAP_H
 
 // Local Includes -----------------------------------
 #include "libmesh/libmesh_common.h"
@@ -1284,4 +1284,4 @@ inline void DofMap::enforce_constraints_exactly (const System &,
 
 } // namespace libMesh
 
-#endif // __dof_map_h__
+#endif // LIBMESH_DOF_MAP_H

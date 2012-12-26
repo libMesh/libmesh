@@ -17,8 +17,8 @@
 
 
 
-#ifndef __system_norm_h__
-#define __system_norm_h__
+#ifndef LIBMESH_SYSTEM_NORM_H
+#define LIBMESH_SYSTEM_NORM_H
 
 // Local includes
 #include "libmesh/libmesh_common.h" // for Real
@@ -423,4 +423,4 @@ bool SystemNorm::is_identity()
 
 } // namespace libMesh
 
-#endif // #define __system_norm_h__
+#endif // LIBMESH_SYSTEM_NORM_H

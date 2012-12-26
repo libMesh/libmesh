@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_tools_h__
-#define __mesh_tools_h__
+#ifndef LIBMESH_MESH_TOOLS_H
+#define LIBMESH_MESH_TOOLS_H
 
 
 
@@ -430,4 +430,4 @@ namespace MeshTools
 } // namespace libMesh
 
 
-#endif // #define __mesh_tools_h__
+#endif // LIBMESH_MESH_TOOLS_H

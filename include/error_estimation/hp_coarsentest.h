@@ -17,8 +17,8 @@
 
 
 
-#ifndef __hp_coarsentest_h__
-#define __hp_coarsentest_h__
+#ifndef LIBMESH_HP_COARSENTEST_H
+#define LIBMESH_HP_COARSENTEST_H
 
 // Local Includes
 #include "libmesh/auto_ptr.h"
@@ -157,5 +157,5 @@ protected:
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-#endif
+#endif // LIBMESH_HP_COARSENTEST_H
 

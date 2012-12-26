@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_smoother_laplace_h__
-#define __mesh_smoother_laplace_h__
+#ifndef LIBMESH_MESH_SMOOTHER_LAPLACE_H
+#define LIBMESH_MESH_SMOOTHER_LAPLACE_H
 
 
 // forward declarations
@@ -115,4 +115,4 @@ private:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_MESH_SMOOTHER_LAPLACE_H

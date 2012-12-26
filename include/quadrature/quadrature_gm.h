@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_gm_h__
-#define __quadrature_gm_h__
+#ifndef LIBMESH_QUADRATURE_GM_H
+#define LIBMESH_QUADRATURE_GM_H
 
 // Local includes
 #include "libmesh/quadrature.h"
@@ -160,4 +160,4 @@ class QGrundmann_Moller : public QBase
 
 
 
-#endif
+#endif // LIBMESH_QUADRATURE_GM_H

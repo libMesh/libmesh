@@ -17,8 +17,8 @@
 
 
 
-#ifndef __numeric_vector_h__
-#define __numeric_vector_h__
+#ifndef LIBMESH_NUMERIC_VECTOR_H
+#define LIBMESH_NUMERIC_VECTOR_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -860,4 +860,4 @@ void  NumericVector<T>::swap (NumericVector<T> &v)
 } // namespace libMesh
 
 
-#endif  // #ifdef __numeric_vector_h__
+#endif  // LIBMESH_NUMERIC_VECTOR_H

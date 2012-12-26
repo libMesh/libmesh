@@ -17,8 +17,8 @@
 
 
 
-#ifndef __type_vector_h__
-#define __type_vector_h__
+#ifndef LIBMESH_TYPE_VECTOR_H
+#define LIBMESH_TYPE_VECTOR_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -930,4 +930,4 @@ bool TypeVector<Real>::operator != (const TypeVector<Real>& rhs) const
 
 } // namespace libMesh
 
-#endif // #define __type_vector_h__
+#endif // LIBMESH_TYPE_VECTOR_H

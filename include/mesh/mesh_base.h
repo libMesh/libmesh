@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_base_h__
-#define __mesh_base_h__
+#ifndef LIBMESH_MESH_BASE_H
+#define LIBMESH_MESH_BASE_H
 
 
 
@@ -1018,4 +1018,4 @@ variant_filter_iterator<MeshBase::Predicate,
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_MESH_BASE_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tensor_shell_matrix_h__
-#define __tensor_shell_matrix_h__
+#ifndef LIBMESH_TENSOR_SHELL_MATRIX_H
+#define LIBMESH_TENSOR_SHELL_MATRIX_H
 
 
 // Local includes
@@ -139,4 +139,4 @@ unsigned int TensorShellMatrix<T>::n () const
 } // namespace libMesh
 
 
-#endif // #ifndef __tensor_shell_matrix_h__
+#endif // LIBMESH_TENSOR_SHELL_MATRIX_H

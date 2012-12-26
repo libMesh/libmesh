@@ -17,8 +17,8 @@
 
 
 
-#ifndef __inf_fe_h__
-#define __inf_fe_h__
+#ifndef LIBMESH_INF_FE_H
+#define LIBMESH_INF_FE_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -872,7 +872,7 @@ Real InfFE<Dim,T_radial,T_map>::Radial::decay(const Real v)
 } // namespace libMesh
 
 
-#endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+#endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
-#endif
+#endif // LIBMESH_INF_FE_H

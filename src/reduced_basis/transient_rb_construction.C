@@ -29,7 +29,6 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/linear_solver.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/getpot.h"
@@ -843,10 +842,14 @@ Real TransientRBConstruction::truth_solve(int write_interval)
       {
         libMesh::out << std::endl << "Truth solve, plotting time step " << time_level << std::endl;
 
-        OStringStream file_name;
+        std::ostringstream file_name;
 
         file_name << "truth.e.";
-        OSSRealzeroright(file_name,3,0, time_level);
+        file_name << std::setw(3)
+                  << std::setprecision(0)
+                  << std::setfill('0')
+                  << std::right
+                  << time_level;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
         ExodusII_IO(get_mesh()).write_equation_systems (file_name.str(),

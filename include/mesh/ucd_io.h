@@ -17,8 +17,8 @@
 
 
 
-#ifndef __ucd_io_h__
-#define __ucd_io_h__
+#ifndef LIBMESH_UCD_IO_H
+#define LIBMESH_UCD_IO_H
 
 // C++ includes
 
@@ -148,4 +148,4 @@ UCDIO::UCDIO (const MeshBase& mesh) :
 } // namespace libMesh
 
 
-#endif // #define __ucd_io_h__
+#endif // LIBMESH_UCD_IO_H

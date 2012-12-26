@@ -17,8 +17,8 @@
 
 
 
-#ifndef __continuation_system_h__
-#define __continuation_system_h__
+#ifndef LIBMESH_CONTINUATION_SYSTEM_H
+#define LIBMESH_CONTINUATION_SYSTEM_H
 
 // Local Includes
 #include "libmesh/fem_system.h"
@@ -428,4 +428,4 @@ private:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_CONTINUATION_SYSTEM_H
