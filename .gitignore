@@ -56,6 +56,8 @@ contrib/fparser/util/bytecoderules_parser
 contrib/fparser/util/cpp_compress
 contrib/fparser/util/tree_grammar_parser
 contrib/fparser/util/tree_grammar_parser.cc
+contrib/nanoflann/*_example
+contrib/nanoflann/pointcloud_kdd_radius
 contrib/utils/Make.common
 contrib/utils/libmesh*pc
 
@@ -66,6 +68,7 @@ src/*/.dirstamp
 
 include/libmesh/*.h
 include/libmesh/fparser.hh
+include/libmesh/nanoflann.hpp
 include/libmesh/parallel_communicator_specializations
 include/libmesh_config.h
 include/libmesh_config.h.tmp

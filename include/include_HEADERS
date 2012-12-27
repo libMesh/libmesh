@@ -299,8 +299,8 @@ include_HEADERS =  \
         solvers/linear_solver.h \
         solvers/memory_solution_history.h \
         solvers/newton_solver.h \
-        solvers/nonlinear_solver.h \
         solvers/no_solution_history.h \
+        solvers/nonlinear_solver.h \
         solvers/petsc_diff_solver.h \
         solvers/petsc_dm_nonlinear_solver.h \
         solvers/petsc_linear_solver.h \
@@ -346,6 +346,7 @@ include_HEADERS =  \
         utils/ignore_warnings.h \
         utils/location_maps.h \
         utils/mapvector.h \
+        utils/meshfree_interpolation.h \
         utils/null_output_iterator.h \
         utils/number_lookups.h \
         utils/o_f_stream.h \
