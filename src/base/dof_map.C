@@ -20,6 +20,7 @@
 // C++ Includes -------------------------------------
 #include <set>
 #include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
+#include <sstream>
 
 // Local Includes -----------------------------------
 #include "libmesh/coupling_matrix.h"

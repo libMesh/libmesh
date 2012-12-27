@@ -19,6 +19,7 @@
 // C++ includes
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 // Local Includes
 #include "libmesh/adjoint_residual_error_estimator.h"

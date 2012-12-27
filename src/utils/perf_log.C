@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <vector>
+#include <sstream>
 
 // Local includes
 #include "libmesh/perf_log.h"

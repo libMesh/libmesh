@@ -18,6 +18,7 @@
 // C++ Includes -------------------------------------
 #include <set>
 #include <algorithm> // for std::count, std::fill
+#include <sstream>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 
