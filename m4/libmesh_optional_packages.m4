@@ -443,6 +443,19 @@ AM_CONDITIONAL(LIBMESH_ENABLE_CPPUNIT, test x$enablecppunit = xyes)
 
 
 
+# -------------------------------------------------------------
+# nanoflann -- enabled by default
+# -------------------------------------------------------------
+CONFIGURE_NANOFLANN
+if (test $enablenanoflann = yes); then
+  libmesh_contrib_INCLUDES="$NANOFLANN_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_NANOFLANN, test x$enablenanoflann = xyes)		 
+AC_CONFIG_FILES([contrib/nanoflann/Makefile])
+# -------------------------------------------------------------
+
+
+
 if test "$enableoptional" != no ; then
    AC_MSG_RESULT(----------------------------------------------)
    AC_MSG_RESULT(--- Done configuring for optional packages ---)

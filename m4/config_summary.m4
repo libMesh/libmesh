@@ -118,6 +118,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'libhilbert....................... : $enablelibhilbert
   echo '  'metis............................ : $enablemetis
   echo '  'mpi.............................. : $enablempi
+  echo '  'nanoflann........................ : $enablenanoflann
   echo '  'nemesis.......................... : $enablenemesis
   echo '  'netcdf........................... : $enablenetcdf
   echo '  'openmp........................... : $enableopenmp

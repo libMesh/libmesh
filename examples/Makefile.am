@@ -24,6 +24,7 @@ SUBDIRS = \
 	miscellaneous/miscellaneous_ex5 \
 	miscellaneous/miscellaneous_ex6 \
 	miscellaneous/miscellaneous_ex7 \
+	miscellaneous/miscellaneous_ex8 \
 	subdomains/subdomains_ex1 \
 	subdomains/subdomains_ex2 \
 	systems_of_equations/systems_of_equations_ex1 \

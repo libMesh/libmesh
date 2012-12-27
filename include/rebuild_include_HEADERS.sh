@@ -28,7 +28,7 @@ echo " " >> include_HEADERS
 
 
 
-headers=`find base enums error_estimation fe geom libmesh mesh numerics parallel partitioning physics quadrature reduced_basis solvers systems utils -name "*.h" -o -name "*specializations" -type f | sort`
+headers=`find base enums error_estimation fe geom mesh numerics parallel partitioning physics quadrature reduced_basis solvers systems utils -name "*.h" -o -name "*specializations" -type f | sort`
 headers="libmesh/libmesh_config.h $headers"
 
 echo "# These are the headers we actually want to install and make available" >> include_HEADERS

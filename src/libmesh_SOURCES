@@ -367,6 +367,7 @@ libmesh_SOURCES =  \
         src/utils/hashword.C \
         src/utils/libmesh_version.C \
         src/utils/location_maps.C \
+        src/utils/meshfree_interpolation.C \
         src/utils/number_lookups.C \
         src/utils/o_f_stream.C \
         src/utils/perf_log.C \

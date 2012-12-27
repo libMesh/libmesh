@@ -648,6 +648,9 @@ gitquery
 libmesh_contrib_INCLUDES
 libmesh_optional_LIBS
 libmesh_optional_INCLUDES
+LIBMESH_ENABLE_NANOFLANN_FALSE
+LIBMESH_ENABLE_NANOFLANN_TRUE
+NANOFLANN_INCLUDE
 LIBMESH_ENABLE_CPPUNIT_FALSE
 LIBMESH_ENABLE_CPPUNIT_TRUE
 CPPUNIT_LIBS
@@ -1074,6 +1077,7 @@ enable_fparser_optimizer
 enable_cppunit
 with_cppunit_prefix
 with_cppunit_exec_prefix
+enable_nanoflann
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1813,6 +1817,7 @@ Optional Features:
   --enable-fparser-optimizer
                           use fparser optimization where possible
   --enable-cppunit        Build with cppunit C++ unit testing support
+  --enable-nanoflann      build with space-filling curves suppport
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -31701,6 +31706,57 @@ fi
 
 
 
+# -------------------------------------------------------------
+# nanoflann -- enabled by default
+# -------------------------------------------------------------
+
+  # Check whether --enable-nanoflann was given.
+if test "${enable_nanoflann+set}" = set; then :
+  enableval=$enable_nanoflann; case "${enableval}" in
+		  yes)  enablenanoflann=yes ;;
+		   no)  enablenanoflann=no ;;
+ 		    *)  as_fn_error $? "bad value ${enableval} for --enable-nanoflann" "$LINENO" 5 ;;
+		 esac
+else
+  enablenanoflann=$enableoptional
+fi
+
+
+
+
+  # The NANOFLANN API is distributed with libmesh, so we don't have to guess
+  # where it might be installed...
+  if (test $enablenanoflann = yes); then
+     NANOFLANN_INCLUDE="-I\$(top_srcdir)/contrib/nanoflann/include"
+
+$as_echo "#define HAVE_NANOFLANN 1" >>confdefs.h
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with nanoflann KDtree support >>>" >&5
+$as_echo "<<< Configuring library with nanoflann KDtree support >>>" >&6; }
+  else
+     NANOFLANN_INCLUDE=""
+     enablenanoflann=no
+  fi
+
+
+
+if (test $enablenanoflann = yes); then
+  libmesh_contrib_INCLUDES="$NANOFLANN_INCLUDE $libmesh_contrib_INCLUDES"
+fi
+ if test x$enablenanoflann = xyes; then
+  LIBMESH_ENABLE_NANOFLANN_TRUE=
+  LIBMESH_ENABLE_NANOFLANN_FALSE='#'
+else
+  LIBMESH_ENABLE_NANOFLANN_TRUE='#'
+  LIBMESH_ENABLE_NANOFLANN_FALSE=
+fi
+
+ac_config_files="$ac_config_files contrib/nanoflann/Makefile"
+
+# -------------------------------------------------------------
+
+
+
 if test "$enableoptional" != no ; then
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ----------------------------------------------" >&5
 $as_echo "----------------------------------------------" >&6; }
@@ -31859,7 +31915,7 @@ $as_echo "#define BUILD_DATE __DATE__\" \"__TIME__" >>confdefs.h
 
 # Each example gets a makefile
 if (test "x$enableexamples" = "xyes"); then
-   ac_config_files="$ac_config_files examples/introduction/introduction_ex1/Makefile examples/introduction/introduction_ex2/Makefile examples/introduction/introduction_ex3/Makefile examples/introduction/introduction_ex4/Makefile examples/introduction/introduction_ex5/Makefile examples/adaptivity/adaptivity_ex1/Makefile examples/adaptivity/adaptivity_ex2/Makefile examples/adaptivity/adaptivity_ex3/Makefile examples/adaptivity/adaptivity_ex4/Makefile examples/adaptivity/adaptivity_ex5/Makefile examples/adjoints/adjoints_ex1/Makefile examples/adjoints/adjoints_ex2/Makefile examples/adjoints/adjoints_ex3/Makefile examples/adjoints/adjoints_ex4/Makefile examples/eigenproblems/eigenproblems_ex1/Makefile examples/eigenproblems/eigenproblems_ex2/Makefile examples/eigenproblems/eigenproblems_ex3/Makefile examples/fem_system/fem_system_ex1/Makefile examples/miscellaneous/miscellaneous_ex1/Makefile examples/miscellaneous/miscellaneous_ex2/Makefile examples/miscellaneous/miscellaneous_ex3/Makefile examples/miscellaneous/miscellaneous_ex4/Makefile examples/miscellaneous/miscellaneous_ex5/Makefile examples/miscellaneous/miscellaneous_ex6/Makefile examples/miscellaneous/miscellaneous_ex7/Makefile examples/subdomains/subdomains_ex1/Makefile examples/subdomains/subdomains_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex1/Makefile examples/systems_of_equations/systems_of_equations_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex4/Makefile examples/systems_of_equations/systems_of_equations_ex5/Makefile examples/systems_of_equations/systems_of_equations_ex6/Makefile examples/reduced_basis/reduced_basis_ex1/Makefile examples/reduced_basis/reduced_basis_ex2/Makefile examples/reduced_basis/reduced_basis_ex3/Makefile examples/reduced_basis/reduced_basis_ex4/Makefile examples/reduced_basis/reduced_basis_ex5/Makefile examples/reduced_basis/reduced_basis_ex6/Makefile examples/reduced_basis/reduced_basis_ex7/Makefile examples/transient/transient_ex1/Makefile examples/transient/transient_ex2/Makefile examples/vector_fe/vector_fe_ex1/Makefile examples/vector_fe/vector_fe_ex2/Makefile examples/vector_fe/vector_fe_ex3/Makefile examples/Makefile"
+   ac_config_files="$ac_config_files examples/introduction/introduction_ex1/Makefile examples/introduction/introduction_ex2/Makefile examples/introduction/introduction_ex3/Makefile examples/introduction/introduction_ex4/Makefile examples/introduction/introduction_ex5/Makefile examples/adaptivity/adaptivity_ex1/Makefile examples/adaptivity/adaptivity_ex2/Makefile examples/adaptivity/adaptivity_ex3/Makefile examples/adaptivity/adaptivity_ex4/Makefile examples/adaptivity/adaptivity_ex5/Makefile examples/adjoints/adjoints_ex1/Makefile examples/adjoints/adjoints_ex2/Makefile examples/adjoints/adjoints_ex3/Makefile examples/adjoints/adjoints_ex4/Makefile examples/eigenproblems/eigenproblems_ex1/Makefile examples/eigenproblems/eigenproblems_ex2/Makefile examples/eigenproblems/eigenproblems_ex3/Makefile examples/fem_system/fem_system_ex1/Makefile examples/miscellaneous/miscellaneous_ex1/Makefile examples/miscellaneous/miscellaneous_ex2/Makefile examples/miscellaneous/miscellaneous_ex3/Makefile examples/miscellaneous/miscellaneous_ex4/Makefile examples/miscellaneous/miscellaneous_ex5/Makefile examples/miscellaneous/miscellaneous_ex6/Makefile examples/miscellaneous/miscellaneous_ex7/Makefile examples/miscellaneous/miscellaneous_ex8/Makefile examples/subdomains/subdomains_ex1/Makefile examples/subdomains/subdomains_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex1/Makefile examples/systems_of_equations/systems_of_equations_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex4/Makefile examples/systems_of_equations/systems_of_equations_ex5/Makefile examples/systems_of_equations/systems_of_equations_ex6/Makefile examples/reduced_basis/reduced_basis_ex1/Makefile examples/reduced_basis/reduced_basis_ex2/Makefile examples/reduced_basis/reduced_basis_ex3/Makefile examples/reduced_basis/reduced_basis_ex4/Makefile examples/reduced_basis/reduced_basis_ex5/Makefile examples/reduced_basis/reduced_basis_ex6/Makefile examples/reduced_basis/reduced_basis_ex7/Makefile examples/transient/transient_ex1/Makefile examples/transient/transient_ex2/Makefile examples/vector_fe/vector_fe_ex1/Makefile examples/vector_fe/vector_fe_ex2/Makefile examples/vector_fe/vector_fe_ex3/Makefile examples/Makefile"
 
 fi
 
@@ -32151,6 +32207,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_CPPUNIT_TRUE}" && test -z "${LIBMESH_ENABLE_CPPUNIT_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_CPPUNIT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_NANOFLANN_TRUE}" && test -z "${LIBMESH_ENABLE_NANOFLANN_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_NANOFLANN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${GIT_CHECKOUT_TRUE}" && test -z "${GIT_CHECKOUT_FALSE}"; then
@@ -33336,6 +33396,7 @@ do
     "contrib/libHilbert/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/libHilbert/Makefile" ;;
     "contrib/fparser/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/fparser/Makefile" ;;
     "contrib/fparser/extrasrc/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/fparser/extrasrc/Makefile" ;;
+    "contrib/nanoflann/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nanoflann/Makefile" ;;
     "examples/introduction/introduction_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/introduction/introduction_ex1/Makefile" ;;
     "examples/introduction/introduction_ex2/Makefile") CONFIG_FILES="$CONFIG_FILES examples/introduction/introduction_ex2/Makefile" ;;
     "examples/introduction/introduction_ex3/Makefile") CONFIG_FILES="$CONFIG_FILES examples/introduction/introduction_ex3/Makefile" ;;
@@ -33361,6 +33422,7 @@ do
     "examples/miscellaneous/miscellaneous_ex5/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex5/Makefile" ;;
     "examples/miscellaneous/miscellaneous_ex6/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex6/Makefile" ;;
     "examples/miscellaneous/miscellaneous_ex7/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex7/Makefile" ;;
+    "examples/miscellaneous/miscellaneous_ex8/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex8/Makefile" ;;
     "examples/subdomains/subdomains_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/subdomains/subdomains_ex1/Makefile" ;;
     "examples/subdomains/subdomains_ex2/Makefile") CONFIG_FILES="$CONFIG_FILES examples/subdomains/subdomains_ex2/Makefile" ;;
     "examples/systems_of_equations/systems_of_equations_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/systems_of_equations/systems_of_equations_ex1/Makefile" ;;
@@ -35413,6 +35475,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'libhilbert....................... : $enablelibhilbert
   echo '  'metis............................ : $enablemetis
   echo '  'mpi.............................. : $enablempi
+  echo '  'nanoflann........................ : $enablenanoflann
   echo '  'nemesis.......................... : $enablenemesis
   echo '  'netcdf........................... : $enablenetcdf
   echo '  'openmp........................... : $enableopenmp
