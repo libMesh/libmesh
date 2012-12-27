@@ -24,6 +24,7 @@
 #include <pwd.h>
 #include <unistd.h>
 #include <sys/utsname.h>
+#include <sstream>
 
 // Local includes
 #include "libmesh/utility.h"

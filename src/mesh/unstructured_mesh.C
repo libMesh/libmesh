@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <fstream>
+#include <sstream>
 
 // C includes
 #include <unistd.h>  // for unlink()

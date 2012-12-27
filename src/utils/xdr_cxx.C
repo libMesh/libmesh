@@ -20,6 +20,7 @@
 #include <cstring>
 #include <limits>
 #include <iomanip>
+#include <sstream>
 
 // Local includes
 #include "libmesh/xdr_cxx.h"
