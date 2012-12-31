@@ -549,9 +549,10 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::m
     unsigned int i = 0;
     for( ; it != it_end; ++it)
     {
-      bool use_log_scaling = log_param_scale.begin()->second;
-      Real min_param       = min_parameters.begin()->second;
-      Real max_param       = max_parameters.begin()->second;
+      std::string param_name = it->first;
+      Real min_param         = it->second;
+      bool use_log_scaling = log_param_scale[param_name];
+      Real max_param = max_parameters.get_value(param_name);
 
       training_parameters_matrix[i].resize(n_training_parameters_per_var);
 
