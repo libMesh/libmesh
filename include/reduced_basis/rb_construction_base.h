@@ -153,6 +153,27 @@ public:
    * Set the seed that is used to randomly generate training parameters.
    */
   void set_training_random_seed(unsigned int seed);
+  
+  /**
+   * Set the name of the parameter that we will generate deterministic training parameters for.
+   * Defaults to "NONE".
+   */
+  void set_deterministic_training_parameter_name(const std::string name);
+  
+  /**
+   * Get the name of the parameter that we will generate deterministic training parameters for.
+   */
+  const std::string& get_deterministic_training_parameter_name() const;
+
+  /**
+   * Set the number of times each sample of the deterministic training parameter is repeated.
+   */
+  void set_deterministic_training_parameter_repeats(unsigned int repeats);
+  
+  /**
+   * Get the number of times each sample of the deterministic training parameter is repeated.
+   */
+  unsigned int get_deterministic_training_parameter_repeats() const;
 
 protected:
 
@@ -194,6 +215,21 @@ protected:
                                                   const RBParameters& max_parameters,
                                                   int training_parameters_random_seed=-1,
                                                   bool serial_training_set=false);
+
+  /**
+   * Static helper function for generating a "partially" random set of parameters, that is
+   * the parameter indicated by this->get_deterministic_training_parameter() will be
+   * deterministic.
+   */
+  static void generate_training_parameters_partially_random(const std::string& deterministic_parameter_name,
+                                                            const unsigned int deterministic_parameter_repeats,
+                                                            std::map<std::string, bool> log_param_scale,
+                                                            std::map< std::string, NumericVector<Number>* >& training_parameters_in,
+                                                            unsigned int n_deterministic_training_samples_in,
+                                                            const RBParameters& min_parameters,
+                                                            const RBParameters& max_parameters,
+                                                            int training_parameters_random_seed=-1,
+                                                            bool serial_training_set=false);
 
   /**
    * Static helper function for generating a deterministic set of parameters. Only works with 1 or 2
@@ -259,6 +295,19 @@ private:
    * number generator seed.
    */
   int training_parameters_random_seed;
+  
+  /**
+   * The name of the parameter that we will generate a deterministic
+   * training parameters for in the case of a "partially random" training
+   * set.
+   */
+  std::string _deterministic_training_parameter_name;
+  
+  /**
+   * The number of times each sample of the deterministic training parameter
+   * is repeated in generating the training set.
+   */
+  unsigned int _deterministic_training_parameter_repeats;
 
 };
 
