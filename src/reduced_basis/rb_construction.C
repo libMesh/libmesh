@@ -327,6 +327,10 @@ void RBConstruction::print_info()
                  << ", value = " << get_parameters().get_value(param_name) << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
+  if( get_deterministic_training_parameter_name() != "NONE" )
+  {
+    libMesh::out << "using partially random training set, deterministic parameter is: " << get_deterministic_training_parameter_name() << std::endl;
+  }
   libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;
