@@ -17,8 +17,8 @@
 
 
 
-#ifndef __sensitivity_data_h__
-#define __sensitivity_data_h__
+#ifndef LIBMESH_SENSITIVITY_DATA_H
+#define LIBMESH_SENSITIVITY_DATA_H
 
 
 // Local Includes -----------------------------------
@@ -258,4 +258,4 @@ Number& SensitivityData::second_derivative(unsigned int qoi_index,
 
 } // namespace libMesh
 
-#endif // #define __sensitivity_data_h__
+#endif // LIBMESH_SENSITIVITY_DATA_H

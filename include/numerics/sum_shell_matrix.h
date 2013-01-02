@@ -17,8 +17,8 @@
 
 
 
-#ifndef __sum_shell_matrix_h__
-#define __sum_shell_matrix_h__
+#ifndef LIBMESH_SUM_SHELL_MATRIX_H
+#define LIBMESH_SUM_SHELL_MATRIX_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -132,4 +132,4 @@ SumShellMatrix<T>::~SumShellMatrix ()
 } // namespace libMesh
 
 
-#endif // #ifndef __sum_shell_matrix_h__
+#endif // LIBMESH_SUM_SHELL_MATRIX_H

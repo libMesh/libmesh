@@ -17,8 +17,8 @@
 
 
 
-#ifndef __xdr_cxx_h__
-#define __xdr_cxx_h__
+#ifndef LIBMESH_XDR_CXX_H
+#define LIBMESH_XDR_CXX_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -243,4 +243,4 @@ private:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_XDR_CXX_H

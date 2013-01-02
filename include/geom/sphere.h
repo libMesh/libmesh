@@ -17,8 +17,8 @@
 
 
 
-#ifndef __sphere_h__
-#define __sphere_h__
+#ifndef LIBMESH_SPHERE_H
+#define LIBMESH_SPHERE_H
 
 // Local includes
 #include "libmesh/surface.h"
@@ -234,4 +234,4 @@ Point Sphere::world_coords (const Point& sph) const
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_SPHERE_H

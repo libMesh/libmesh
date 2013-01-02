@@ -17,8 +17,8 @@
 
 
 
-#ifndef __dof_object_h__
-#define __dof_object_h__
+#ifndef LIBMESH_DOF_OBJECT_H
+#define LIBMESH_DOF_OBJECT_H
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -876,4 +876,4 @@ unsigned int DofObject::system_var_to_vg_var (const unsigned int s,
 } // namespace libMesh
 
 
-#endif // #ifndef __dof_object_h__
+#endif // #ifndef LIBMESH_DOF_OBJECT_H

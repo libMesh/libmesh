@@ -17,8 +17,8 @@
 
 
 
-#ifndef __error_vector_h__
-#define __error_vector_h__
+#ifndef LIBMESH_ERROR_VECTOR_H
+#define LIBMESH_ERROR_VECTOR_H
 
 // Local Includes
 #include "libmesh/statistics.h"
@@ -167,5 +167,5 @@ protected:
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_ERROR_VECTOR_H
 

@@ -233,6 +233,10 @@
 /* define if the compiler implements namespaces */
 #undef HAVE_NAMESPACES
 
+/* Flag indicating whether the library will be compiled with nanoflann KD-Tree
+   support */
+#undef HAVE_NANOFLANN
+
 /* Flag indicating whether the library will be compiled with Nemesis support
    */
 #undef HAVE_NEMESIS_API

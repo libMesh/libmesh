@@ -91,13 +91,13 @@ A.&nbsp;L. Rossa.
 G.&nbsp;Bornia.
  <em>Analysis of optimal control problems for the incompressible MHD
   equations and implementation in a finite element multiphysics code</em>.
- PhD thesis, Universit&aacute; di Bologna, 2012.
+ PhD thesis, Universit&agrave; di Bologna, 2012.
  
   <a href="http://amsdottorato.cib.unibo.it/4868/1/giorgio_bornia_tesi.pdf">http://amsdottorato.cib.unibo.it/4868/1/giorgio_bornia_tesi.pdf</a>.
 <a name="Bornia_thesis"></a><pre>
 @phdthesis{Bornia_thesis,
   author = {G.~Bornia},
-  school = {Universit\'{a} di Bologna},
+  school = {Universit\`{a} di Bologna},
   title = {{Analysis of optimal control problems for the incompressible MHD equations and implementation in a finite element multiphysics code}},
   note = {\url{http://amsdottorato.cib.unibo.it/4868/1/giorgio_bornia_tesi.pdf}},
   year = {2012}
@@ -441,7 +441,58 @@ F.&nbsp;G. Gonz&aacute;lez and J.&nbsp;R.&nbsp;R. Galv&aacute;n.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2012">2</a>]
+[<a name="Zhang_2012">2</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;Andrs, P.&nbsp;C. Millett, and
+  B.&nbsp;S. Biner.
+ A quantitative comparison between <em>C</em><sup>0</sup> and <em>C</em><sup>1</sup> elements for
+  solving the Cahn-Hilliard equation.
+ <em>Journal of Computational Physics</em>, 2012.
+ <a href="http://dx.doi.org/10.1016/j.jcp.2012.12.001">http://dx.doi.org/10.1016/j.jcp.2012.12.001</a>.
+<a name="Zhang_2012"></a><pre>
+@article{Zhang_2012,
+  author = {L.~Zhang and M.~R.~Tonks and D.~Gaston and J.~W.~Peterson and D.~Andrs and P.~C.~Millett and B.~S.~Biner},
+  title = {{A quantitative comparison between $C^0$ and $C^1$ elements for solving the Cahn-Hilliard equation}},
+  journal = {Journal of Computational Physics},
+  year = 2012,
+  note = {\url{http://dx.doi.org/10.1016/j.jcp.2012.12.001}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bittl_2012">3</a>]
+</td>
+<td class="bibtexitem">
+M.&nbsp;Bittl and D.&nbsp;Kuzmin.
+ An <em>hp</em>-adaptive flux-corrected transport algorithm for continuous
+  finite elements.
+ <em>Computing</em>, 2012.
+ <a href="http://dx.doi.org/10.1007/s00607-012-0223-y">http://dx.doi.org/10.1007/s00607-012-0223-y</a>.
+<a name="Bittl_2012"></a><pre>
+@article{Bittl_2012,
+  author = {M.~Bittl and D.~Kuzmin},
+  title = {{An $hp$-adaptive flux-corrected transport algorithm for continuous finite elements}},
+  journal = {Computing},
+  year = 2012,
+  note = {\url{http://dx.doi.org/10.1007/s00607-012-0223-y}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Vavourakis_2012">4</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekaterinaris.
@@ -467,35 +518,7 @@ V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekater
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2012">3</a>]
-</td>
-<td class="bibtexitem">
-D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;Weinberg, A.&nbsp;Shetty, J.&nbsp;Hazle, and R.&nbsp;Stafford.
- An inverse problem approach to recovery of <em>in vivo</em>
-  nanoparticle concentrations from thermal image monitoring of MR-guided laser
-  induced thermal therapy.
- <em>Annals of Biomedical Engineering</em>, pages 1-12, 2012.
- <a href="http://dx.doi.org/10.1007/s10439-012-0638-9">http://dx.doi.org/10.1007/s10439-012-0638-9</a>.
-<a name="Fuentes_2012"></a><pre>
-@article{Fuentes_2012,
-  author = {D.~Fuentes and A.~Elliott and J.~Weinberg and A.~Shetty and J.~Hazle and R.~Stafford},
-  title = {{An inverse problem approach to recovery of \emph{in vivo} nanoparticle concentrations
-              from thermal image monitoring of MR-guided laser induced thermal therapy}},
-  journal = {Annals of Biomedical Engineering},
-  year = 2012,
-  pages = {1--12},
-  note = {\url{http://dx.doi.org/10.1007/s10439-012-0638-9}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Vallaghe_2012">4</a>]
+[<a name="Vallaghe_2012">5</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
@@ -521,7 +544,7 @@ S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2012">5</a>]
+[<a name="Griffith_2012">6</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -547,7 +570,7 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Sopeju_2011">6</a>]
+[<a name="Sopeju_2011">7</a>]
 </td>
 <td class="bibtexitem">
 O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
@@ -578,7 +601,7 @@ O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2010">7</a>]
+[<a name="Griffith_2010">8</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -612,7 +635,39 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2013">1</a>]
+[<a name="Fuentes_2013">1</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D. Hazle, and R.&nbsp;J.
+  Stafford.
+ An inverse problem approach to recovery of <i>in vivo</i>
+  nanoparticle concentrations from thermal image monitoring of MR-guided laser
+  induced thermal therapy.
+ <em>Annals of Biomedical Engineering</em>, 41(1):100-111, January 2013.
+ <a href="http://dx.doi.org/10.1007/s10439-012-0638-9">http://dx.doi.org/10.1007/s10439-012-0638-9</a>.
+<a name="Fuentes_2013"></a><pre>
+@article{Fuentes_2013,
+  author = {D.~Fuentes and A.~Elliott and J.~S.~Weinberg and A.~Shetty and J.~D.~Hazle and R.~J.~Stafford},
+  title = {{An inverse problem approach to recovery of \textit{in vivo} nanoparticle concentrations
+              from thermal image monitoring of MR-guided laser induced thermal therapy}},
+  journal = {Annals of Biomedical Engineering},
+  year = 2013,
+  volume = 41,
+  number = 1,
+  month = jan,
+  pages = {100--111},
+  note = {\url{http://dx.doi.org/10.1007/s10439-012-0638-9}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Huynh_2013">2</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -643,7 +698,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2013">2</a>]
+[<a name="Vavourakis_2013">3</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanastasiou.
@@ -671,7 +726,7 @@ V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanasta
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2013">3</a>]
+[<a name="Zhu_2013">4</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -699,7 +754,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berr
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vetter_2013">4</a>]
+[<a name="Vetter_2013">5</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
@@ -1056,7 +1111,38 @@ P.&nbsp;T. Bauman, J.&nbsp;T. Oden, E.&nbsp;E. Prudencio, S.&nbsp;Prudhomme, and
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Camata_2012">12</a>]
+[<a name="Podgorney_2012b">12</a>]
+</td>
+<td class="bibtexitem">
+R.&nbsp;Podgorney, H.&nbsp;Huang, M.&nbsp;Plummer, and D.&nbsp;Gaston.
+ A globally-implicit computational framework for physics-based
+  simulation of coupled thermal-hydro-mechanical problems: Application to
+  sustainability of geothermal reservoirs.
+ Orkustofnun (National Energy Authority), June 2012.
+ 
+  <a href="http://www.os.is/gogn/Skyrslur/OS-2012/OS-2012-06/OS-2012-06-01.pdf">http://www.os.is/gogn/Skyrslur/OS-2012/OS-2012-06/OS-2012-06-01.pdf</a>.
+<a name="Podgorney_2012b"></a><pre>
+@misc{Podgorney_2012b,
+  author = {R.~Podgorney and H.~Huang and M.~Plummer and D.~Gaston},
+  title = {{A globally-implicit computational framework for
+            physics-based simulation of coupled
+            thermal-hydro-mechanical problems: Application to
+            sustainability of geothermal reservoirs}},
+  month = jun,
+  year = 2012,
+  howpublished = {{Orkustofnun (National Energy Authority)}},
+  note = {\url{http://www.os.is/gogn/Skyrslur/OS-2012/OS-2012-06/OS-2012-06-01.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Camata_2012">13</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga, G.&nbsp;F. Carey, and
@@ -1087,7 +1173,36 @@ J.&nbsp;J. Camata, A.&nbsp;L. Rossa, A.&nbsp;M.&nbsp;P. Valli, L.&nbsp;Catabriga
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Schulz_2012">13</a>]
+[<a name="NEMO5">14</a>]
+</td>
+<td class="bibtexitem">
+S.&nbsp;Steiger.
+ <em>NEMO5 User Manual</em>.
+ Network for Computational Nanotechnology, Purdue University, May&nbsp;17,
+  2012.
+ 
+  <a href="https://engineering.purdue.edu/gekcogrp/software-projects/nemo5/nemo5_manual.pdf">https://engineering.purdue.edu/gekcogrp/software-projects/nemo5/nemo5_manual.pdf</a>.
+<a name="NEMO5"></a><pre>
+@manual{NEMO5,
+  author = {S.~Steiger},
+  title = {{NEMO5 User Manual}},
+  organization = {Network for Computational Nanotechnology},
+  address = {Purdue University},
+  edition = {},
+  month = may # {~17,},
+  year = 2012,
+  note = {\url{https://engineering.purdue.edu/gekcogrp/software-projects/nemo5/nemo5_manual.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Schulz_2012">15</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;W. Schulz, R.&nbsp;Ulerich, N.&nbsp;Malaya, P.&nbsp;T. Bauman, R.&nbsp;Stogner, and C.&nbsp;Simmons.
@@ -1115,7 +1230,7 @@ K.&nbsp;W. Schulz, R.&nbsp;Ulerich, N.&nbsp;Malaya, P.&nbsp;T. Bauman, R.&nbsp;S
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Corsini_2012">14</a>]
+[<a name="Corsini_2012">16</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.&nbsp;G. Sheard.
@@ -1144,7 +1259,7 @@ A.&nbsp;Corsini, A.&nbsp;Marchegiani, F.&nbsp;Rispoli, P.&nbsp;Venturini, and A.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2012">15</a>]
+[<a name="Zhu_2012">17</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -1174,7 +1289,7 @@ Y.&nbsp;F. Zhu, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Akkoyun_2012">16</a>]
+[<a name="Akkoyun_2012">18</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Akkoyun et&nbsp;al.
@@ -1203,7 +1318,7 @@ S.&nbsp;Akkoyun et&nbsp;al.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Mahadevan_2012">17</a>]
+[<a name="Mahadevan_2012">19</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
@@ -1231,7 +1346,7 @@ V.&nbsp;S. Mahadevan, J.&nbsp;C. Ragusa, and V.&nbsp;A. Mousseau.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Podgorney_2012">18</a>]
+[<a name="Podgorney_2012">20</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
@@ -1261,7 +1376,7 @@ R.&nbsp;Podgorney, C.&nbsp;Lu, and H.&nbsp;Huang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Slaughter_2012">19</a>]
+[<a name="Slaughter_2012">21</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;E. Slaughter and N.&nbsp;Zabaras.
@@ -1288,7 +1403,7 @@ A.&nbsp;E. Slaughter and N.&nbsp;Zabaras.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bordas_2012">20</a>]
+[<a name="Bordas_2012">22</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;M. Bordas, K.&nbsp;Gillow, D.&nbsp;Gavaghan, B.&nbsp;Rodriguez, and D.&nbsp;Kay.
@@ -1316,7 +1431,7 @@ R.&nbsp;M. Bordas, K.&nbsp;Gillow, D.&nbsp;Gavaghan, B.&nbsp;Rodriguez, and D.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Hales_2012">21</a>]
+[<a name="Hales_2012">23</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston, and M.&nbsp;R. Tonks.
@@ -1345,7 +1460,7 @@ J.&nbsp;D. Hales, S.&nbsp;R. Novascone, R.&nbsp;L. Williamson, D.&nbsp;R. Gaston
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bassi_2012">22</a>]
+[<a name="Bassi_2012">24</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.&nbsp;Tesini.
@@ -1374,7 +1489,7 @@ F.&nbsp;Bassi, L.&nbsp;Botti, A.&nbsp;Colombo, D.&nbsp;A.&nbsp;Di Pietro, and P.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Andrijauskas_2012">23</a>]
+[<a name="Andrijauskas_2012">25</a>]
 </td>
 <td class="bibtexitem">
 T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
@@ -1402,7 +1517,7 @@ T.&nbsp;Andrijauskas, A.&nbsp;A. Shylau, and I.&nbsp;V. Zozoulenko.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Williamson_2012">24</a>]
+[<a name="Williamson_2012">26</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks, D.&nbsp;R. Gaston,
@@ -1430,7 +1545,7 @@ R.&nbsp;L. Williamson, J.&nbsp;D. Hales, S.&nbsp;R. Novascone, M.&nbsp;R. Tonks,
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Eftang_2012">25</a>]
+[<a name="Eftang_2012">27</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -1457,7 +1572,7 @@ J.&nbsp;L. Eftang, D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gerner_2012">26</a>]
+[<a name="Gerner_2012">28</a>]
 </td>
 <td class="bibtexitem">
 A.-L. Gerner and K.&nbsp;Veroy.
@@ -1488,7 +1603,7 @@ A.-L. Gerner and K.&nbsp;Veroy.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brummelen_2012">27</a>]
+[<a name="Brummelen_2012">29</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&nbsp;Prudhomme.
@@ -1517,7 +1632,7 @@ E.&nbsp;H. van Brummelen, K.&nbsp;G. van&nbsp;der Zee, V.&nbsp;V. Garg, and S.&n
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2012">28</a>]
+[<a name="Huynh_2012">30</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -4401,7 +4516,35 @@ M.&nbsp;Bhatia and E.&nbsp;Livnet.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Barone_2008">14</a>]
+[<a name="Kolodkin_2008">14</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;M. Kolodkin, V.&nbsp;S. Knyazhin, M.&nbsp;V. Kolodkin, and V.&nbsp;M. Senopal'nikov.
+ Design of the technology of the blacksmith mold (Russian).
+ <em>News of the Udmurtian State University, Physics and Chemistry
+  Section</em>, 1:120-128, February 2008.
+ <a href="http://vestnik.udsu.ru/2008/2008-04/vuu_08_041_10.pdf">http://vestnik.udsu.ru/2008/2008-04/vuu_08_041_10.pdf</a>.
+<a name="Kolodkin_2008"></a><pre>
+@article{Kolodkin_2008,
+  author = {V.~M.~Kolodkin and V.~S.~Knyazhin and M.~V.~Kolodkin and V.~M.~Senopal'nikov},
+  title = {{Design of the technology of the blacksmith mold (Russian)}},
+  journal = {News of the Udmurtian State University, Physics and Chemistry Section},
+  year = 2008,
+  volume = 1,
+  month = feb,
+  pages = {120--128},
+  note = {\url{http://vestnik.udsu.ru/2008/2008-04/vuu_08_041_10.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Barone_2008">15</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;F. Barone, D.&nbsp;J. Segalman, H.&nbsp;Thornquist, and I.&nbsp;Kalashnikova.
@@ -4428,7 +4571,7 @@ M.&nbsp;F. Barone, D.&nbsp;J. Segalman, H.&nbsp;Thornquist, and I.&nbsp;Kalashni
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="VonEstorff_2008">15</a>]
+[<a name="VonEstorff_2008">16</a>]
 </td>
 <td class="bibtexitem">
 O.&nbsp;von Estorff, S.&nbsp;Petersen, and D.&nbsp;Dreyer.
@@ -4459,7 +4602,7 @@ O.&nbsp;von Estorff, S.&nbsp;Petersen, and D.&nbsp;Dreyer.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="DeSturler_2008">16</a>]
+[<a name="DeSturler_2008">17</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;De Sturler, G.&nbsp;H. Paulino, and S.&nbsp;Wang.
@@ -4490,7 +4633,7 @@ E.&nbsp;De Sturler, G.&nbsp;H. Paulino, and S.&nbsp;Wang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_2008">17</a>]
+[<a name="Stogner_2008">18</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
@@ -4521,7 +4664,7 @@ R.&nbsp;H. Stogner, G.&nbsp;F. Carey, and B.&nbsp;T. Murray.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Berrone_2008">18</a>]
+[<a name="Berrone_2008">19</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Berrone and E.&nbsp;S&uuml;li.
@@ -4549,7 +4692,7 @@ S.&nbsp;Berrone and E.&nbsp;S&uuml;li.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_2008a">19</a>]
+[<a name="Kirk_2008a">20</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
@@ -4580,7 +4723,7 @@ B.&nbsp;S. Kirk and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brinkmeier_2008">20</a>]
+[<a name="Brinkmeier_2008">21</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Brinkmeier, U.&nbsp;Nackenhorst, S.&nbsp;Petersen, and O.&nbsp;von Estorff.
@@ -4608,7 +4751,7 @@ M.&nbsp;Brinkmeier, U.&nbsp;Nackenhorst, S.&nbsp;Petersen, and O.&nbsp;von Estor
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lu_2008">21</a>]
+[<a name="Lu_2008">22</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Lu and A.&nbsp;F. Chatziioannou.
@@ -5039,7 +5182,63 @@ L.&nbsp;Catabriga, J.&nbsp;J. Camata, A.&nbsp;M.&nbsp;P. Valli, A.&nbsp;L.&nbsp;
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Estorff_2006">6</a>]
+[<a name="Simedrea_2006b">6</a>]
+</td>
+<td class="bibtexitem">
+P.&nbsp;Simedrea, L.&nbsp;Antiga, and D.&nbsp;A. Steinman.
+ Towards a new framework for simulating magnetic resonance imaging.
+ In <em>First Canadian Student Conference on Biomedical Computing
+  (CSCBC 2006)</em>. Queen's University, Kingston Ontario, March&nbsp;17-19, 2006.
+ 
+  <a href="http://cscbc2006.cs.queensu.ca/assets/documents/Papers/paper108.pdf">http://cscbc2006.cs.queensu.ca/assets/documents/Papers/paper108.pdf</a>.
+<a name="Simedrea_2006b"></a><pre>
+@inproceedings{Simedrea_2006b,
+  author = {P.~Simedrea and L.~Antiga and D.~A.~Steinman},
+  title = {{Towards a new framework for simulating magnetic resonance imaging}},
+  booktitle = {{First Canadian Student Conference on Biomedical Computing (CSCBC 2006)}},
+  publisher = {Queen's University, Kingston Ontario},
+  month = mar # {~17--19,},
+  year = {2006},
+  note = {\url{http://cscbc2006.cs.queensu.ca/assets/documents/Papers/paper108.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Simedrea_2006">7</a>]
+</td>
+<td class="bibtexitem">
+P.&nbsp;Simedrea, L.&nbsp;Antiga, and D.&nbsp;A. Steinman.
+ FE-MRI: Simulation of MRI using arbitrary finite elements.
+ <em>Proceedings of the International Society for Magnetic Resonance
+  in Medicine</em>, 14:2946, 2006.
+ 
+  <a href="http://afni.nimh.nih.gov/sscc/staff/rwcox/ISMRM_2006/ISMRM%202006%20-%203340/files/02946.pdf">http://afni.nimh.nih.gov/sscc/staff/rwcox/ISMRM_2006/ISMRM%202006%20-%203340/files/02946.pdf</a>.
+<a name="Simedrea_2006"></a><pre>
+@article{Simedrea_2006,
+  author = {P.~Simedrea and L.~Antiga and D.~A.~Steinman},
+  title = {{FE-MRI: Simulation of MRI using arbitrary finite elements}},
+  journal = {Proceedings of the International Society for Magnetic Resonance in Medicine},
+  year = 2006,
+  volume = 14,
+  pages = {2946},
+  note = {\url{http://afni.nimh.nih.gov/sscc/staff/rwcox/ISMRM_2006/ISMRM%202006%20-%203340/files/02946.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Estorff_2006">8</a>]
 </td>
 <td class="bibtexitem">
 O.&nbsp;von Estorff and S.&nbsp;Petersen.
@@ -5068,7 +5267,7 @@ O.&nbsp;von Estorff and S.&nbsp;Petersen.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Marichalar_2006">7</a>]
+[<a name="Marichalar_2006">9</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;J. Marichalar, W.&nbsp;C. Rochelle, B.&nbsp;S. Kirk, and C.&nbsp;H. Campbell.
@@ -5096,7 +5295,7 @@ J.&nbsp;J. Marichalar, W.&nbsp;C. Rochelle, B.&nbsp;S. Kirk, and C.&nbsp;H. Camp
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petersen_2006">8</a>]
+[<a name="Petersen_2006">10</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Petersen, D.&nbsp;Dreyer, and O.&nbsp;von Estorff.
@@ -5126,7 +5325,7 @@ S.&nbsp;Petersen, D.&nbsp;Dreyer, and O.&nbsp;von Estorff.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Dreyer_2006">9</a>]
+[<a name="Dreyer_2006">11</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Dreyer, S.&nbsp;Petersen, and O.&nbsp;von Estorff.

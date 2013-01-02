@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_rules_h__
-#define __quadrature_rules_h__
+#ifndef LIBMESH_QUADRATURE_RULES_H
+#define LIBMESH_QUADRATURE_RULES_H
 
 // Local includes
 #include "libmesh/enum_quadrature_type.h"
@@ -70,7 +70,7 @@ namespace QuadratureRules
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_QUADRATURE_RULES_H
 
 
 

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __fem_function_base_h__
-#define __fem_function_base_h__
+#ifndef LIBMESH_FEM_FUNCTION_BASE_H
+#define LIBMESH_FEM_FUNCTION_BASE_H
 
 // C++ includes
 
@@ -94,4 +94,4 @@ unsigned int var_index ;
 
 } // namespace libMesh
 
-#endif // __fem_function_base_h__
+#endif // LIBMESH_FEM_FUNCTION_BASE_H

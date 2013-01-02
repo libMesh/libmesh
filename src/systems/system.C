@@ -27,7 +27,6 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/parameter_vector.h"
 #include "libmesh/point.h"              // For point_value
 #include "libmesh/point_locator_base.h" // For point_value
@@ -900,7 +899,7 @@ bool System::vector_preservation (const std::string &vec_name) const
 
 NumericVector<Number> & System::add_sensitivity_solution (unsigned int i)
 {
-  OStringStream sensitivity_name;
+  std::ostringstream sensitivity_name;
   sensitivity_name << "sensitivity_solution" << i;
 
   return this->add_vector(sensitivity_name.str());
@@ -910,7 +909,7 @@ NumericVector<Number> & System::add_sensitivity_solution (unsigned int i)
 
 NumericVector<Number> & System::get_sensitivity_solution (unsigned int i)
 {
-  OStringStream sensitivity_name;
+  std::ostringstream sensitivity_name;
   sensitivity_name << "sensitivity_solution" << i;
 
   return this->get_vector(sensitivity_name.str());
@@ -920,7 +919,7 @@ NumericVector<Number> & System::get_sensitivity_solution (unsigned int i)
 
 const NumericVector<Number> & System::get_sensitivity_solution (unsigned int i) const
 {
-  OStringStream sensitivity_name;
+  std::ostringstream sensitivity_name;
   sensitivity_name << "sensitivity_solution" << i;
 
   return this->get_vector(sensitivity_name.str());
@@ -951,7 +950,7 @@ const NumericVector<Number> & System::get_weighted_sensitivity_solution () const
 
 NumericVector<Number> & System::add_adjoint_solution (unsigned int i)
 {
-  OStringStream adjoint_name;
+  std::ostringstream adjoint_name;
   adjoint_name << "adjoint_solution" << i;
 
   return this->add_vector(adjoint_name.str());
@@ -961,7 +960,7 @@ NumericVector<Number> & System::add_adjoint_solution (unsigned int i)
 
 NumericVector<Number> & System::get_adjoint_solution (unsigned int i)
 {
-  OStringStream adjoint_name;
+  std::ostringstream adjoint_name;
   adjoint_name << "adjoint_solution" << i;
 
   return this->get_vector(adjoint_name.str());
@@ -971,7 +970,7 @@ NumericVector<Number> & System::get_adjoint_solution (unsigned int i)
 
 const NumericVector<Number> & System::get_adjoint_solution (unsigned int i) const
 {
-  OStringStream adjoint_name;
+  std::ostringstream adjoint_name;
   adjoint_name << "adjoint_solution" << i;
 
   return this->get_vector(adjoint_name.str());
@@ -981,7 +980,7 @@ const NumericVector<Number> & System::get_adjoint_solution (unsigned int i) cons
 
 NumericVector<Number> & System::add_weighted_sensitivity_adjoint_solution (unsigned int i)
 {
-  OStringStream adjoint_name;
+  std::ostringstream adjoint_name;
   adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
 
   return this->add_vector(adjoint_name.str());
@@ -991,7 +990,7 @@ NumericVector<Number> & System::add_weighted_sensitivity_adjoint_solution (unsig
 
 NumericVector<Number> & System::get_weighted_sensitivity_adjoint_solution (unsigned int i)
 {
-  OStringStream adjoint_name;
+  std::ostringstream adjoint_name;
   adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
 
   return this->get_vector(adjoint_name.str());
@@ -1001,7 +1000,7 @@ NumericVector<Number> & System::get_weighted_sensitivity_adjoint_solution (unsig
 
 const NumericVector<Number> & System::get_weighted_sensitivity_adjoint_solution (unsigned int i) const
 {
-  OStringStream adjoint_name;
+  std::ostringstream adjoint_name;
   adjoint_name << "weighted_sensitivity_adjoint_solution" << i;
 
   return this->get_vector(adjoint_name.str());
@@ -1011,7 +1010,7 @@ const NumericVector<Number> & System::get_weighted_sensitivity_adjoint_solution 
 
 NumericVector<Number> & System::add_adjoint_rhs (unsigned int i)
 {
-  OStringStream adjoint_rhs_name;
+  std::ostringstream adjoint_rhs_name;
   adjoint_rhs_name << "adjoint_rhs" << i;
 
   return this->add_vector(adjoint_rhs_name.str(), false);
@@ -1021,7 +1020,7 @@ NumericVector<Number> & System::add_adjoint_rhs (unsigned int i)
 
 NumericVector<Number> & System::get_adjoint_rhs (unsigned int i)
 {
-  OStringStream adjoint_rhs_name;
+  std::ostringstream adjoint_rhs_name;
   adjoint_rhs_name << "adjoint_rhs" << i;
 
   return this->get_vector(adjoint_rhs_name.str());
@@ -1031,7 +1030,7 @@ NumericVector<Number> & System::get_adjoint_rhs (unsigned int i)
 
 const NumericVector<Number> & System::get_adjoint_rhs (unsigned int i) const
 {
-  OStringStream adjoint_rhs_name;
+  std::ostringstream adjoint_rhs_name;
   adjoint_rhs_name << "adjoint_rhs" << i;
 
   return this->get_vector(adjoint_rhs_name.str());
@@ -1041,7 +1040,7 @@ const NumericVector<Number> & System::get_adjoint_rhs (unsigned int i) const
 
 NumericVector<Number> & System::add_sensitivity_rhs (unsigned int i)
 {
-  OStringStream sensitivity_rhs_name;
+  std::ostringstream sensitivity_rhs_name;
   sensitivity_rhs_name << "sensitivity_rhs" << i;
 
   return this->add_vector(sensitivity_rhs_name.str(), false);
@@ -1051,7 +1050,7 @@ NumericVector<Number> & System::add_sensitivity_rhs (unsigned int i)
 
 NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i)
 {
-  OStringStream sensitivity_rhs_name;
+  std::ostringstream sensitivity_rhs_name;
   sensitivity_rhs_name << "sensitivity_rhs" << i;
 
   return this->get_vector(sensitivity_rhs_name.str());
@@ -1061,7 +1060,7 @@ NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i)
 
 const NumericVector<Number> & System::get_sensitivity_rhs (unsigned int i) const
 {
-  OStringStream sensitivity_rhs_name;
+  std::ostringstream sensitivity_rhs_name;
   sensitivity_rhs_name << "sensitivity_rhs" << i;
 
   return this->get_vector(sensitivity_rhs_name.str());

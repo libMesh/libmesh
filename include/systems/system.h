@@ -17,8 +17,8 @@
 
 
 
-#ifndef __system_h__
-#define __system_h__
+#ifndef LIBMESH_SYSTEM_H
+#define LIBMESH_SYSTEM_H
 
 // Local Includes
 #include "libmesh/auto_ptr.h"
@@ -2049,4 +2049,4 @@ System::qoi_parameter_hessian_vector_product(const QoISet&,
 
 } // namespace libMesh
 
-#endif // #define __system_h__
+#endif // LIBMESH_SYSTEM_H

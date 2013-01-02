@@ -17,8 +17,8 @@
 
 
 
-#ifndef __dense_matrix_h__
-#define __dense_matrix_h__
+#ifndef LIBMESH_DENSE_MATRIX_H
+#define LIBMESH_DENSE_MATRIX_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -891,5 +891,5 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 
 
 
-#endif // #ifndef __dense_matrix_h__
+#endif // LIBMESH_DENSE_MATRIX_H
 

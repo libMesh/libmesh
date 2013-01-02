@@ -17,8 +17,8 @@
 
 
 
-#ifndef __point_locator_base_h__
-#define __point_locator_base_h__
+#ifndef LIBMESH_POINT_LOCATOR_BASE_H
+#define LIBMESH_POINT_LOCATOR_BASE_H
 
 // Local Includes
 #include "libmesh/reference_counted_object.h"
@@ -154,6 +154,6 @@ bool PointLocatorBase::initialized () const
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_POINT_LOCATOR_BASE_H
 
 

@@ -155,6 +155,8 @@ library features they demonstrate.
 
 <li><L1><a href="miscellaneous_ex7.php">Variational Inequalities and PetscDMNonlinearSolver</a></L1></li>
 
+<li><L1><a href="miscellaneous_ex8.php">Pointclould-based Meshfree Interpolation</a></L1></li>
+
 </ol> </li>
 
 </ul>

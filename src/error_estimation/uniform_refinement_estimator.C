@@ -17,6 +17,7 @@
 
 // C++ includes
 #include <algorithm> // for std::fill
+#include <sstream>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>    // for sqrt
 
@@ -32,7 +33,6 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/uniform_refinement_estimator.h"
@@ -296,7 +296,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
       for (unsigned int j=0; j != sys->qoi.size(); ++j)
         {
-          OStringStream adjoint_name;
+          std::ostringstream adjoint_name;
           adjoint_name << "adjoint_solution" << j;
 
           if (vec == sys->request_vector(adjoint_name.str()))
@@ -341,7 +341,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                   bool found_vec = false;
 	          for (unsigned int j=0; j != sys->qoi.size(); ++j)
                     {
-                      OStringStream adjoint_name;
+                      std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;
 
                       if (vec == sys->request_vector(adjoint_name.str()))
@@ -370,7 +370,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
                   const NumericVector<Number> *vec = solution_vectors->find(sys)->second;
 	          for (unsigned int j=0; j != sys->qoi.size(); ++j)
                     {
-                      OStringStream adjoint_name;
+                      std::ostringstream adjoint_name;
                       adjoint_name << "adjoint_solution" << j;
 
                       if (vec == sys->request_vector(adjoint_name.str()))
@@ -426,7 +426,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
               unsigned int adj = libMesh::invalid_uint;
 	      for (unsigned int j=0; j != sys->qoi.size(); ++j)
                 {
-                  OStringStream adjoint_name;
+                  std::ostringstream adjoint_name;
                   adjoint_name << "adjoint_solution" << j;
 
                   if (vec == sys->request_vector(adjoint_name.str()))

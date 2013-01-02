@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __matlab_io_h__
-#define __matlab_io_h__
+#ifndef LIBMESH_MATLAB_IO_H
+#define LIBMESH_MATLAB_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -122,4 +122,4 @@ MatlabIO::MatlabIO (MeshBase& mesh) :
 } // namespace libMesh
 
 
-#endif // #define __matlab_io_h__
+#endif // LIBMESH_MATLAB_IO_H

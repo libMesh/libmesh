@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_order_h__
-#define __enum_order_h__
+#ifndef LIBMESH_ENUM_ORDER_H
+#define LIBMESH_ENUM_ORDER_H
 
 // ------------------------------------------------------------
 // enum Order definition
@@ -84,4 +84,4 @@ namespace libMeshEnums {
 
 using namespace libMeshEnums;
 
-#endif // #define __enum_order_h__
+#endif // LIBMESH_ENUM_ORDER_H

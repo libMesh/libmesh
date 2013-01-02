@@ -20,6 +20,7 @@
 // C++ Includes -------------------------------------
 #include <set>
 #include <algorithm> // for std::fill, std::equal_range, std::max, std::lower_bound, etc.
+#include <sstream>
 
 // Local Includes -----------------------------------
 #include "libmesh/coupling_matrix.h"
@@ -35,7 +36,6 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/parallel.h"
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/sparse_matrix.h"
@@ -2760,7 +2760,7 @@ void DofMap::print_info(std::ostream& os) const
 
 std::string DofMap::get_info() const
 {
-  OStringStream os;
+  std::ostringstream os;
 
   // If we didn't calculate the exact sparsity pattern, the threaded
   // sparsity pattern assembly may have just given us an upper bound

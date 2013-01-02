@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __mesh_h__
-#define __mesh_h__
+#ifndef LIBMESH_MESH_H
+#define LIBMESH_MESH_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -77,4 +77,4 @@ class Mesh : public DefaultMesh
 
 
 
-#endif
+#endif // LIBMESH_MESH_H

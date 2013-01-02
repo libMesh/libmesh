@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_gauss_h__
-#define __quadrature_gauss_h__
+#ifndef LIBMESH_QUADRATURE_GAUSS_H
+#define LIBMESH_QUADRATURE_GAUSS_H
 
 // Local includes
 #include "libmesh/quadrature.h"
@@ -127,4 +127,4 @@ QGauss::~QGauss()
 
 
 
-#endif
+#endif // LIBMESH_QUADRATURE_GAUSS_H

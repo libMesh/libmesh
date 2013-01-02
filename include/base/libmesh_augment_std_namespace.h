@@ -17,8 +17,8 @@
 
 
 
-#ifndef __libmesh_augment_std_namespace_h__
-#define __libmesh_augment_std_namespace_h__
+#ifndef LIBMESH_LIBMESH_AUGMENT_STD_NAMESPACE_H
+#define LIBMESH_LIBMESH_AUGMENT_STD_NAMESPACE_H
 
 
 // For some reason the real std::max, std::min
@@ -68,4 +68,4 @@ namespace std {
 #endif
 }
 
-#endif // #define __libmesh_augment_std_namespace_h__
+#endif // #define LIBMESH_LIBMESH_AUGMENT_STD_NAMESPACE_H

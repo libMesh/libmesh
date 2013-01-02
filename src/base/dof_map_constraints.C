@@ -18,6 +18,7 @@
 // C++ Includes -------------------------------------
 #include <set>
 #include <algorithm> // for std::count, std::fill
+#include <sstream>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 
@@ -36,7 +37,6 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_inserter_iterator.h"
 #include "libmesh/numeric_vector.h" // for enforce_constraints_exactly()
-#include "libmesh/o_string_stream.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
 #include "libmesh/periodic_boundaries.h"
@@ -1025,7 +1025,7 @@ void DofMap::print_dof_constraints(std::ostream& os,
 
 std::string DofMap::get_local_constraints(bool print_nonlocal) const
 {
-  OStringStream os;
+  std::ostringstream os;
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   if (print_nonlocal)
     os << "All ";

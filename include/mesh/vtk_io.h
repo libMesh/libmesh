@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __vtk_io_h__
-#define __vtk_io_h__
+#ifndef LIBMESH_VTK_IO_H
+#define LIBMESH_VTK_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -171,4 +171,4 @@ VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
 } // namespace libMesh
 
 
-#endif // #define __vtk_io_h__
+#endif // LIBMESH_VTK_IO_H

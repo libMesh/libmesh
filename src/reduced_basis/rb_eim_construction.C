@@ -35,7 +35,6 @@
 #include "libmesh/getpot.h"
 #include <fstream>
 #include <sstream>
-#include "libmesh/o_string_stream.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/fem_context.h"
 

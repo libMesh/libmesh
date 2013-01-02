@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_data_h__
-#define __mesh_data_h__
+#ifndef LIBMESH_MESH_DATA_H
+#define LIBMESH_MESH_DATA_H
 
 // Local Includes
 #include "libmesh/libmesh.h"
@@ -1097,4 +1097,4 @@ void MeshData::set_unv_header (MeshDataUnvHeader* unv_header)
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_MESH_DATA_H

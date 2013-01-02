@@ -17,8 +17,8 @@
 
 
 
-#ifndef __mesh_smoother_h__
-#define __mesh_smoother_h__
+#ifndef LIBMESH_MESH_SMOOTHER_H
+#define LIBMESH_MESH_SMOOTHER_H
 
 
 
@@ -75,4 +75,4 @@ protected:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_MESH_SMOOTHER_H

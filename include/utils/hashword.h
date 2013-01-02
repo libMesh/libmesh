@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __HASHWORD_H__
-#define __HASHWORD_H__
+#ifndef LIBMESH_HASHWORD_H
+#define LIBMESH_HASHWORD_H
 
 // All functions in this file by Bob Jenkins, May 2006, Public Domain.
 
@@ -143,4 +143,4 @@ namespace libMesh
   } // end Utility namespace
 } // end libMesh namespace
 
-#endif // __HASHWORD_H__
+#endif // LIBMESH_HASHWORD_H

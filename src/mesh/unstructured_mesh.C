@@ -19,6 +19,7 @@
 
 // C++ includes
 #include <fstream>
+#include <sstream>
 
 // C includes
 #include <unistd.h>  // for unlink()
@@ -30,7 +31,6 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_tools.h" // For n_levels
-#include "libmesh/o_string_stream.h"
 #include "libmesh/parallel.h"
 #include "libmesh/remote_elem.h"
 
@@ -478,7 +478,7 @@ void UnstructuredMesh::read (const std::string& name,
   if (name.rfind(".nem") + 4 == name.size() ||
       name.rfind(".n") + 2 == name.size())
     {
-      OStringStream full_name;
+      std::ostringstream full_name;
       full_name << name << '.' << libMesh::n_processors() << '.' << libMesh::processor_id();
 
       std::ifstream in (full_name.str().c_str());
@@ -577,7 +577,7 @@ void UnstructuredMesh::read (const std::string& name,
       // the other processors will pick it up
       if (libMesh::processor_id() == 0)
 	{
-          OStringStream pid_suffix;
+          std::ostringstream pid_suffix;
           pid_suffix << '_' << getpid();
 	  // Nasty hack for reading/writing zipped files
 	  std::string new_name = name;
@@ -746,7 +746,7 @@ void UnstructuredMesh::write (const std::string& name,
       if (libMesh::processor_id() == 0)
         pid_0 = getpid();
       CommWorld.broadcast(pid_0);
-      OStringStream pid_suffix;
+      std::ostringstream pid_suffix;
       pid_suffix << '_' << pid_0;
 
       if (name.size() - name.rfind(".bz2") == 4)

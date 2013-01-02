@@ -17,11 +17,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// C++ includes
+#include <sstream>
+#include <sys/stat.h>
+
 #include "libmesh/derived_rb_evaluation.h"
 #include "libmesh/system.h"
-#include "libmesh/o_string_stream.h"
 
-#include <sys/stat.h>
 
 namespace libMesh
 {
@@ -90,7 +92,7 @@ void DerivedRBEvaluation<Base>::write_out_basis_functions(System& ,
     {
       std::ofstream derived_bf_size_out;
       {
-        OStringStream file_name;
+        std::ostringstream file_name;
         file_name << directory_name << "/derived_bf_size.dat";
         derived_bf_size_out.open(file_name.str().c_str());
       }
@@ -115,7 +117,7 @@ void DerivedRBEvaluation<Base>::read_in_basis_functions(System& ,
   // First, get the number of size of the derived basis functions
   unsigned int derived_bf_size;
   {
-    OStringStream file_name;
+    std::ostringstream file_name;
     file_name << directory_name << "/derived_bf_size.dat";
     std::ifstream derived_bf_size_in(file_name.str().c_str());
 

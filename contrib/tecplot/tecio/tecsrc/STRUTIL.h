@@ -193,10 +193,10 @@ EXTERN char *InsertNameAtPlaceHolder(char *BaseString,
 inline char* EndOfString(char* str)
 {
     return str + strlen(str);
-};
+}
 inline char const* EndOfString(char const* str)
 {
     return str + strlen(str);
-};
+}
 
 #endif

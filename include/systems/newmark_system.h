@@ -17,8 +17,8 @@
 
 
 
-#ifndef __newmark_system_h__
-#define __newmark_system_h__
+#ifndef LIBMESH_NEWMARK_SYSTEM_H
+#define LIBMESH_NEWMARK_SYSTEM_H
 
 // Local Includes
 #include "libmesh/linear_implicit_system.h"
@@ -181,4 +181,4 @@ private:
 
 
 
-#endif
+#endif // LIBMESH_NEWMARK_SYSTEM_H

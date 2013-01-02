@@ -17,8 +17,8 @@
 
 
 
-#ifndef __edge_h__
-#define __edge_h__
+#ifndef LIBMESH_EDGE_H
+#define LIBMESH_EDGE_H
 
 // Local includes
 #include "libmesh/elem.h"
@@ -181,4 +181,4 @@ class Edge : public Elem
 
 } // namespace libMesh
 
-#endif
+#endif // LIBMESH_EDGE_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __unsteady_solver_h__
-#define __unsteady_solver_h__
+#ifndef LIBMESH_UNSTEADY_SOLVER_H
+#define LIBMESH_UNSTEADY_SOLVER_H
 
 // Local includes
 #include "libmesh/auto_ptr.h"
@@ -136,10 +136,16 @@ protected:
    * and false thereafter
    */
   bool first_solve;
+
+  /**
+   * A bool that will be true the first time adjoint_advance_timestep() is called,
+   * (when the primal solution is to be used to set adjoint boundary conditions) and false thereafter
+   */
+  bool first_adjoint_step;
 };
 
 
 } // namespace libMesh
 
 
-#endif // #define __time_solver_h__
+#endif // LIBMESH_UNSTEADY_SOLVER_H

@@ -17,8 +17,8 @@
 
 
 
-#ifndef __explicit_system_h__
-#define __explicit_system_h__
+#ifndef LIBMESH_EXPLICIT_SYSTEM_H
+#define LIBMESH_EXPLICIT_SYSTEM_H
 
 // Local Includes
 #include "libmesh/system.h"
@@ -150,4 +150,4 @@ private:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_EXPLICIT_SYSTEM_H

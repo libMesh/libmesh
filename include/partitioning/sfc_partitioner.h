@@ -17,8 +17,8 @@
 
 
 
-#ifndef __sfc_partitioner_h__
-#define __sfc_partitioner_h__
+#ifndef LIBMESH_SFC_PARTITIONER_H
+#define LIBMESH_SFC_PARTITIONER_H
 
 // Local Includes -----------------------------------
 #include "libmesh/partitioner.h"
@@ -104,4 +104,4 @@ void SFCPartitioner::set_sfc_type (const std::string& sfc_type)
 
 
 
-#endif // #define __sfc_partitioner_h__
+#endif // LIBMESH_SFC_PARTITIONER_H

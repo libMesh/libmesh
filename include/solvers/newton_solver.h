@@ -17,8 +17,8 @@
 
 
 
-#ifndef __newton_solver_h__
-#define __newton_solver_h__
+#ifndef LIBMESH_NEWTON_SOLVER_H
+#define LIBMESH_NEWTON_SOLVER_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -161,4 +161,4 @@ protected:
 } // namespace libMesh
 
 
-#endif // #define __newton_solver_h__
+#endif // LIBMESH_NEWTON_SOLVER_H

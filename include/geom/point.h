@@ -17,8 +17,8 @@
 
 
 
-#ifndef __point_h__
-#define __point_h__
+#ifndef LIBMESH_POINT_H
+#define LIBMESH_POINT_H
 
 // Local includes
 #include "libmesh/type_vector.h"
@@ -112,4 +112,4 @@ Point::Point (const TypeVector<Real>& p) :
 } // namespace libMesh
 
 
-#endif // #define __point_h__
+#endif // LIBMESH_POINT_H

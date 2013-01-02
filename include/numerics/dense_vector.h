@@ -17,8 +17,8 @@
 
 
 
-#ifndef __dense_vector_h__
-#define __dense_vector_h__
+#ifndef LIBMESH_DENSE_VECTOR_H
+#define LIBMESH_DENSE_VECTOR_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -576,5 +576,5 @@ void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
 
 } // namespace libMesh
 
-#endif // #ifndef __dense_vector_h__
+#endif // LIBMESH_DENSE_VECTOR_H
 

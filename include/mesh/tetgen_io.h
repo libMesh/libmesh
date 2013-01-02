@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tetgen_io_h__
-#define __tetgen_io_h__
+#ifndef LIBMESH_TETGEN_IO_H
+#define LIBMESH_TETGEN_IO_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -173,4 +173,4 @@ TetGenIO::TetGenIO (const MeshBase& mesh, MeshData* mesh_data) :
 } // namespace libMesh
 
 
-#endif // #define __tetgen_io_h__
+#endif // LIBMESH_TETGEN_IO_H

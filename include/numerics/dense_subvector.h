@@ -17,8 +17,8 @@
 
 
 
-#ifndef __dense_subvector_h__
-#define __dense_subvector_h__
+#ifndef LIBMESH_DENSE_SUBVECTOR_H
+#define LIBMESH_DENSE_SUBVECTOR_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -303,5 +303,5 @@ Real DenseSubVector<T>::linfty_norm () const
 } // namespace libMesh
 
 
-#endif // #ifndef __dense_vector_h__
+#endif // LIBMESH_DENSE_SUBVECTOR_H
 

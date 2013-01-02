@@ -520,7 +520,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
  	     *)  AC_MSG_ERROR(bad value ${enableval} for --enable-glibcxx-debugging) ;;
 	  esac],
 	[enableglibcxxdebugging=yes])
-	
+
+  # GLIBCXX debugging causes untold woes on mac machines - so disable it
+  if (test `uname` = "Darwin"); then
+    AC_MSG_RESULT(<< Disabling GLIBCXX debugging on Darwin >>>)
+    enableglibcxxdebugging=no
+  fi   
   AM_CONDITIONAL(LIBMESH_ENABLE_GLIBCXX_DEBUGGING, test x$enableglibcxxdebugging = xyes)
 
 	
@@ -576,7 +581,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
 	 
-         if (test "x$enablegccdebugging" = "xyes" -a `uname` != "Darwin"); then
+         if (test "x$enableglibcxxdebugging" = "xyes"); then
            CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
          fi
 	 ;;
@@ -586,7 +591,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
          
-         if (test "x$enablegccdebugging" = "xyes" -a `uname` != "Darwin"); then
+         if (test "x$enableglibcxxdebugging" = "xyes"); then
 	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"	
 	 fi
   	 ;;

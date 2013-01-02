@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __exodusII_io_helper_h__
-#define __exodusII_io_helper_h__
+#ifndef LIBMESH_EXODUSII_IO_HELPER_H
+#define LIBMESH_EXODUSII_IO_HELPER_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -1159,4 +1159,4 @@ private:
 
 #endif // LIBMESH_HAVE_EXODUS_API
 
-#endif // #ifndef __exodusII_io_helper_h__
+#endif // LIBMESH_EXODUSII_IO_HELPER_H

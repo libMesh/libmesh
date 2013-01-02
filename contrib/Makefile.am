@@ -154,6 +154,11 @@ if LIBMESH_ENABLE_FPARSER
   oprof_libs += fparser/libfparser.la
 endif
 
+if LIBMESH_ENABLE_NANOFLANN
+  SUBDIRS += nanoflann
+  # header-only library - no library dependencies
+endif
+
 
 
 ######################################################################

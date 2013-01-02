@@ -17,8 +17,8 @@
 
 
 
-#ifndef __quadrature_trap_h__
-#define __quadrature_trap_h__
+#ifndef LIBMESH_QUADRATURE_TRAP_H
+#define LIBMESH_QUADRATURE_TRAP_H
 
 // Local includes
 #include "libmesh/quadrature.h"
@@ -88,4 +88,4 @@ QTrap::QTrap(const unsigned int d) : QBase(d,FIRST)
 
 
 
-#endif
+#endif // LIBMESH_QUADRATURE_TRAP_H

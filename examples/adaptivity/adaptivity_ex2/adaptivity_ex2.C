@@ -50,11 +50,6 @@
 
 #include "libmesh/getpot.h"
 
-// Some (older) compilers do not offer full stream 
-// functionality, \p OStringStream works around this.
-// Check example 9 for details.
-#include "libmesh/o_string_stream.h"
-
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
 #include "libmesh/transient_system.h"
@@ -333,16 +328,22 @@ int main (int argc, char** argv)
       // A pretty update message
       std::cout << " Solving time step ";
       
-      // As already seen in example 9, use a work-around
-      // for missing stream functionality (of older compilers).
       // Add a set of scope braces to enforce data locality.
       {
-        OStringStream out;
+        std::ostringstream out;
 
-        OSSInt(out,2,t_step);
-        out << ", time=";
-        OSSRealzeroleft(out,6,3,system.time);
-        out <<  "...";
+        out << std::setw(2)
+            << std::right
+            << t_step
+            << ", time="
+            << std::fixed
+            << std::setw(6)
+            << std::setprecision(3)
+            << std::setfill('0')
+            << std::left
+            << system.time
+            <<  "...";
+
         std::cout << out.str() << std::endl;
       }
       
@@ -423,10 +424,13 @@ int main (int argc, char** argv)
       // Output every 10 timesteps to file.
       if ( (t_step+1)%output_freq == 0)
         {
-          OStringStream file_name;
+          std::ostringstream file_name;
 
-          file_name << "out.gmv.";
-          OSSRealzeroright(file_name,3,0,t_step+1);
+          file_name << "out.gmv."
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << t_step+1;
 
           GMVIO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);

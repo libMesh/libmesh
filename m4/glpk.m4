@@ -75,7 +75,6 @@ AC_DEFUN([CONFIGURE_GLPK],
     if (test $enableglpk = yes); then
     
        # Check for existence of a header file in the specified location
-       # AC_CHECK_FILE([$GLPK_INC/glpk.h], [glpkincFound="OK"], [glpkincFound="FAIL"])
        glpkincFound=no;
        AC_CHECK_HEADERS($GLPK_INC/glpk.h, glpkincFound=yes)
   
@@ -95,10 +94,7 @@ AC_DEFUN([CONFIGURE_GLPK],
        fi
   
        if (test $enableglpk = yes); then
-         # Also Check for existence of required libraries.  This is not really the
-         # right way to do it -- it's not portable to Macs, where .so's are called
-         # .dylib's instead.
-         # AC_CHECK_FILE($GLPK_LIB/glpk.so, [enableglpk=yes], [enableglpk=no])
+         # Also Check for existence of required libraries.
          
          # AC_HAVE_LIBRARY (library, [action-if-found], [action-if-not-found], [other-libraries])
          # Note: Basically tries to compile a function which calls main().  

@@ -18,11 +18,12 @@
 
 // C++ includes
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 
 // Local Includes
 #include "libmesh/adjoint_residual_error_estimator.h"
 #include "libmesh/error_vector.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/patch_recovery_error_estimator.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/numeric_vector.h"
@@ -197,13 +198,23 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
 	  // Loop over variables
 	  for(unsigned int v = 0; v < n_vars; v++)
 	    {
-	      OStringStream primal_out;
-	      OStringStream dual_out;
+              std::ostringstream primal_out;
+              std::ostringstream dual_out;
 	      primal_out << "primal_" << error_plot_suffix << ".";
 	      dual_out << "dual_" << error_plot_suffix << ".";
 
-	      OSSRealzeroright(primal_out, 1,0,v);
-	      OSSRealzeroright(dual_out, 1,0,v);
+              primal_out << std::setw(1)
+                         << std::setprecision(0)
+                         << std::setfill('0')
+                         << std::right
+                         << v;
+
+              dual_out << std::setw(1)
+                       << std::setprecision(0)
+                       << std::setfill('0')
+                       << std::right
+                       << v;
+
 	      (*primal_errors_per_cell[std::make_pair(&_system, v)]).plot_error(primal_out.str(), _system.get_mesh());
 	      (*total_dual_errors_per_cell[std::make_pair(&_system, v)]).plot_error(dual_out.str(), _system.get_mesh());
 
@@ -213,8 +224,8 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
 	}
       else // If not
 	{
-	  OStringStream primal_out;
-	  OStringStream dual_out;
+	  std::ostringstream primal_out;
+	  std::ostringstream dual_out;
 	  primal_out << "primal_" << error_plot_suffix ;
 	  dual_out << "dual_" << error_plot_suffix ;
 

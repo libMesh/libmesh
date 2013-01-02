@@ -17,8 +17,8 @@
 
 
 
-#ifndef __adjoint_residual_error_estimator_h__
-#define __adjoint_residual_error_estimator_h__
+#ifndef LIBMESH_ADJOINT_RESIDUAL_ERROR_ESTIMATOR_H
+#define LIBMESH_ADJOINT_RESIDUAL_ERROR_ESTIMATOR_H
 
 // Local Includes
 #include "libmesh/auto_ptr.h"
@@ -140,5 +140,5 @@ protected:
 
 } // namespace libMesh
 
-#endif //__adjoint_residual_error_estimator_h__
+#endif // LIBMESH_ADJOINT_RESIDUAL_ERROR_ESTIMATOR_H
 

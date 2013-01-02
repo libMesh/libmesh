@@ -1,4 +1,3 @@
-
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
@@ -18,8 +17,8 @@
 
 
 
-#ifndef __parallel_ghost_sync_h__
-#define __parallel_ghost_sync_h__
+#ifndef LIBMESH_PARALLEL_GHOST_SYNC_H
+#define LIBMESH_PARALLEL_GHOST_SYNC_H
 
 // Local Includes -----------------------------------
 #include "libmesh/auto_ptr.h"
@@ -423,4 +422,4 @@ void sync_element_data_by_parent_id(MeshBase&,
 
 } // namespace libMesh
 
-#endif // #define __parallel_ghost_sync_h__
+#endif // LIBMESH_PARALLEL_GHOST_SYNC_H

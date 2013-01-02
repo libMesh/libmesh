@@ -17,8 +17,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef __transient_rb_theta_expansion_h__
-#define __transient_rb_theta_expansion_h__
+#ifndef LIBMESH_TRANSIENT_RB_THETA_EXPANSION_H
+#define LIBMESH_TRANSIENT_RB_THETA_EXPANSION_H
 
 // rbOOmit includes
 #include "libmesh/rb_theta_expansion.h"
@@ -85,4 +85,4 @@ private:
 
 }
 
-#endif
+#endif // LIBMESH_TRANSIENT_RB_THETA_EXPANSION_H

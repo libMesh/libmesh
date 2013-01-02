@@ -17,8 +17,8 @@
 
 
 
-#ifndef __enum_elem_quality_h__
-#define __enum_elem_quality_h__
+#ifndef LIBMESH_ENUM_ELEM_QUALITY_H
+#define LIBMESH_ENUM_ELEM_QUALITY_H
 
 // ------------------------------------------------------------
 // enum ElemType definition
@@ -48,4 +48,4 @@ namespace libMeshEnums
 
 using namespace libMeshEnums;
 
-#endif // #define __enum_elem_quality_h__
+#endif // LIBMESH_ENUM_ELEM_QUALITY_H

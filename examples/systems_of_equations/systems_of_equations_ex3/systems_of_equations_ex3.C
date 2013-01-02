@@ -46,10 +46,6 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/utility.h"
 
-// Some (older) compilers do not offer full stream 
-// functionality, OStringStream works around this.
-#include "libmesh/o_string_stream.h"
-
 // For systems of equations the \p DenseSubMatrix
 // and \p DenseSubVector provide convenient ways for
 // assembling the element matrix and vector on a
@@ -255,12 +251,15 @@ int main (int argc, char** argv)
 #ifdef LIBMESH_HAVE_EXODUS_API
       if ((t_step+1)%write_interval == 0)
         {
-          OStringStream file_name;
+          std::ostringstream file_name;
 
           // We write the file in the ExodusII format.
-          file_name << "out_";
-          OSSRealzeroright(file_name,3,0, t_step + 1);
-          file_name << ".e";
+          file_name << "out_"
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << t_step + 1
+                    << ".e";
           
           ExodusII_IO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);

@@ -6,7 +6,7 @@
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
 
-// This library is distributd in the hope that it will be useful,
+// This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
@@ -16,8 +16,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-#ifndef __eigen_system_h__
-#define __eigen_system_h__
+#ifndef LIBMESH_EIGEN_SYSTEM_H
+#define LIBMESH_EIGEN_SYSTEM_H
 
 #include "libmesh/libmesh_config.h"
 
@@ -238,4 +238,4 @@ unsigned int EigenSystem::n_matrices () const
 
 #endif // LIBMESH_HAVE_SLEPC
 
-#endif
+#endif // LIBMESH_EIGEN_SYSTEM_H

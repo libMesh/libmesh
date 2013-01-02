@@ -17,8 +17,8 @@
 
 
 
-#ifndef __o_f_stream_h__
-#define __o_f_stream_h__
+#ifndef LIBMESH_OFSTREAM_H
+#define LIBMESH_OFSTREAM_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -112,7 +112,12 @@ namespace libMesh
   /**
    * Default constructor.
    */
-  OFStream () {}
+  OFStream ()
+   {
+     // [JWP] TODO: I will remove this class at the next libmesh
+     // release or on on March 21, 2013, whichever comes first.
+     libmesh_deprecated();
+   }
 
   /**
    * Default destructor.
@@ -146,5 +151,5 @@ namespace libMesh
 
 
 
-#endif // ifndef __o_f_stream_h__
+#endif // LIBMESH_OFSTREAM_H
 

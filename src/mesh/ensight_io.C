@@ -22,13 +22,13 @@
 #include <string>
 #include <cstring>
 #include <stdio.h>
+#include <iomanip>
 
 #include "libmesh/dof_map.h"
 #include "libmesh/ensight_io.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/libmesh.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/system.h"
 
 
@@ -142,10 +142,14 @@ void EnsightIO::write_ascii (const double time)
 
 void EnsightIO::write_geometry_ascii()
 {
-  OStringStream file;
+  std::ostringstream file;
   file << _ensight_file_name << ".geo";
 
-  OSSRealzeroright(file,3,0,_time_steps.size()-1);
+  file << std::setw(3)
+       << std::setprecision(0)
+       << std::setfill('0')
+       << std::right
+       << _time_steps.size()-1;
 
   FILE* fout = fopen(file.str().c_str(),"w");
 
@@ -350,9 +354,14 @@ void EnsightIO::write_solution_ascii()
 
 void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &var_name)
 {
-  OStringStream scl_file;
+  std::ostringstream scl_file;
   scl_file << _ensight_file_name << "_" << var_name << ".scl";
-  OSSRealzeroright(scl_file,3,0,_time_steps.size()-1);
+
+  scl_file << std::setw(3)
+           << std::setprecision(0)
+           << std::setfill('0')
+           << std::right
+           << _time_steps.size()-1;
 
   FILE * fout = fopen(scl_file.str().c_str(),"w");
 
@@ -429,9 +438,14 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
 
 void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std::string> &vec, const std::string &var_name)
 {
-  OStringStream vec_file;
+  std::ostringstream vec_file;
   vec_file<<_ensight_file_name<<"_"<<var_name<<".vec";
-  OSSRealzeroright(vec_file,3,0,_time_steps.size()-1);
+
+  vec_file << std::setw(3)
+           << std::setprecision(0)
+           << std::setfill('0')
+           << std::right
+           << _time_steps.size()-1;
 
   FILE * fout = fopen(vec_file.str().c_str(),"w");
   fprintf(fout,"Per vector per value\n");

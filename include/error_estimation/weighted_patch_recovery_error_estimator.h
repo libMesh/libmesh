@@ -17,8 +17,8 @@
 
 
 
-#ifndef __weighted_patch_recovery_error_estimator_h__
-#define __weighted_patch_recovery_error_estimator_h__
+#ifndef LIBMESH_WEIGHTED_PATCH_RECOVERY_ERROR_ESTIMATOR_H
+#define LIBMESH_WEIGHTED_PATCH_RECOVERY_ERROR_ESTIMATOR_H
 
 // C++ includes
 #include <vector>
@@ -117,4 +117,4 @@ public:
 } // namespace libMesh
 
 
-#endif // #define __patch_recovery_error_estimator_h__
+#endif // LIBMESH_WEIGHTED_PATCH_RECOVERY_ERROR_ESTIMATOR_H

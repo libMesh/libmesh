@@ -30,7 +30,6 @@
 // libMesh includes
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/getpot.h"
@@ -392,7 +391,7 @@ void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_n
     const std::string suffix = write_binary_data ? ".xdr" : ".dat";
 
     // Stream for building the file names
-    OStringStream file_name;
+    std::ostringstream file_name;
     
     // Write out the parameter ranges
     file_name.str("");
@@ -496,7 +495,7 @@ void RBSCMEvaluation::read_offline_data_from_files(const std::string& directory_
   const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
   // The string stream we'll use to make the file names
-  OStringStream file_name;
+  std::ostringstream file_name;
   
   // Read in the parameter ranges
   file_name.str("");

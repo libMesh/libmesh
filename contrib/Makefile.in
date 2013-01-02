@@ -144,11 +144,12 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_88 = fparser/libfparser.la
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_89 = fparser/libfparser.la
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_90 = fparser/libfparser.la
-@LIBMESH_OPT_MODE_TRUE@am__append_91 = libcontrib_opt.la
-@LIBMESH_DBG_MODE_TRUE@am__append_92 = libcontrib_dbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_93 = libcontrib_devel.la
-@LIBMESH_PROF_MODE_TRUE@am__append_94 = libcontrib_prof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_95 = libcontrib_oprof.la
+@LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_91 = nanoflann
+@LIBMESH_OPT_MODE_TRUE@am__append_92 = libcontrib_opt.la
+@LIBMESH_DBG_MODE_TRUE@am__append_93 = libcontrib_dbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_94 = libcontrib_devel.la
+@LIBMESH_PROF_MODE_TRUE@am__append_95 = libcontrib_prof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_96 = libcontrib_oprof.la
 subdir = contrib
 DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp
@@ -174,9 +175,10 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/m4/metis.m4 $(top_srcdir)/m4/mpi.m4 \
-	$(top_srcdir)/m4/namespaces.m4 $(top_srcdir)/m4/nemesis.m4 \
-	$(top_srcdir)/m4/netcdf.m4 $(top_srcdir)/m4/parmetis.m4 \
-	$(top_srcdir)/m4/petsc.m4 $(top_srcdir)/m4/precision.m4 \
+	$(top_srcdir)/m4/namespaces.m4 $(top_srcdir)/m4/nanoflann.m4 \
+	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
+	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
+	$(top_srcdir)/m4/precision.m4 \
 	$(top_srcdir)/m4/prefix_config.m4 $(top_srcdir)/m4/sfc.m4 \
 	$(top_srcdir)/m4/slepc.m4 $(top_srcdir)/m4/sstream.m4 \
 	$(top_srcdir)/m4/strstream.m4 $(top_srcdir)/m4/tbb.m4 \
@@ -340,7 +342,7 @@ ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = boost/include gmv gzstream netcdf/Lib exodusii/Lib \
 	nemesis/Lib tecplot/tecio triangle tetgen libHilbert laspack \
-	metis parmetis sfcurves fparser
+	metis parmetis sfcurves fparser nanoflann
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
@@ -488,6 +490,7 @@ MPI_INCLUDES_PATHS = @MPI_INCLUDES_PATHS@
 MPI_LIBS = @MPI_LIBS@
 MPI_LIBS_PATH = @MPI_LIBS_PATH@
 MPI_LIBS_PATHS = @MPI_LIBS_PATHS@
+NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
 NEMESIS_LIBRARY = @NEMESIS_LIBRARY@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
@@ -637,7 +640,8 @@ SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_8) \
 	$(am__append_14) $(am__append_20) $(am__append_26) \
 	$(am__append_32) $(am__append_43) $(am__append_49) \
 	$(am__append_55) $(am__append_61) $(am__append_67) \
-	$(am__append_73) $(am__append_79) $(am__append_85)
+	$(am__append_73) $(am__append_79) $(am__append_85) \
+	$(am__append_91)
 opt_libs = $(am__append_3) $(am__append_9) $(am__append_15) \
 	$(am__append_21) $(am__append_27) $(am__append_33) \
 	$(am__append_38) $(am__append_44) $(am__append_50) \
@@ -668,8 +672,8 @@ oprof_libs = $(am__append_7) $(am__append_13) $(am__append_19) \
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_91) $(am__append_92) \
-	$(am__append_93) $(am__append_94) $(am__append_95)
+noinst_LTLIBRARIES = $(am__append_92) $(am__append_93) \
+	$(am__append_94) $(am__append_95) $(am__append_96)
 @LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_SOURCES = cppsource.C
 @LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 @LIBMESH_OPT_MODE_TRUE@libcontrib_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
@@ -1137,6 +1141,7 @@ uninstall-am:
 
 @LIBMESH_ENABLE_FPARSER_TRUE@  # ATM always compile fparser with optimized flags,
 @LIBMESH_ENABLE_FPARSER_TRUE@  # and reuse in all methods
+@LIBMESH_ENABLE_NANOFLANN_TRUE@  # header-only library - no library dependencies
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

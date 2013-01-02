@@ -17,8 +17,8 @@
 
 
 
-#ifndef __dense_vector_base_h__
-#define __dense_vector_base_h__
+#ifndef LIBMESH_DENSE_VECTOR_BASE_H
+#define LIBMESH_DENSE_VECTOR_BASE_H
 
 
 // Local Includes
@@ -114,5 +114,5 @@ public:
 
 
 
-#endif // #ifndef __dense_vector_base_h__
+#endif // LIBMESH_DENSE_VECTOR_BASE_H
 

@@ -17,13 +17,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+// C++ includes
+#include <sstream>
+
 // rbOOmit includes
 #include "libmesh/rb_eim_evaluation.h"
 #include "libmesh/rb_eim_theta.h"
 #include "libmesh/rb_parametrized_function.h"
 
 // libMesh includes
-#include "libmesh/o_string_stream.h"
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/libmesh_logging.h"
 
@@ -245,7 +247,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
 
   if(libMesh::processor_id() == 0)
   {
-    OStringStream file_name;
+    std::ostringstream file_name;
     
     // Next write out the interpolation_matrix
     file_name.str("");
@@ -345,7 +347,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
   // Stream for creating file names
-  OStringStream file_name;
+  std::ostringstream file_name;
 
   // Read in the interpolation matrix
   file_name.str("");

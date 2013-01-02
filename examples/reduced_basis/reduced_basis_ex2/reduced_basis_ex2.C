@@ -53,7 +53,6 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/getpot.h"
-#include "libmesh/o_string_stream.h"
 #include "libmesh/elem.h"
 
 // local includes

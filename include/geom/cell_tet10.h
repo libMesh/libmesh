@@ -17,8 +17,8 @@
 
 
 
-#ifndef __cell_tet10_h__
-#define __cell_tet10_h__
+#ifndef LIBMESH_CELL_TET10_H
+#define LIBMESH_CELL_TET10_H
 
 // Local includes
 #include "libmesh/cell_tet.h"
@@ -247,4 +247,4 @@ Tet10::Tet10(Elem* p) :
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_CELL_TET10_H

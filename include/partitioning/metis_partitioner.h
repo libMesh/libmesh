@@ -17,8 +17,8 @@
 
 
 
-#ifndef __metis_partitioner_h__
-#define __metis_partitioner_h__
+#ifndef LIBMESH_METIS_PARTITIONER_H
+#define LIBMESH_METIS_PARTITIONER_H
 
 // Local Includes -----------------------------------
 #include "libmesh/partitioner.h"
@@ -69,4 +69,4 @@ protected:
 } // namespace libMesh
 
 
-#endif // #define __sfc_partitioner_h__
+#endif // LIBMESH_METIS_PARTITIONER_H

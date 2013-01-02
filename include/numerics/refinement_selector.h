@@ -17,8 +17,8 @@
 
 
 
-#ifndef __refinement_selector_h__
-#define __refinement_selector_h__
+#ifndef LIBMESH_REFINEMENT_SELECTOR_H
+#define LIBMESH_REFINEMENT_SELECTOR_H
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
@@ -79,5 +79,5 @@ public:
 } // namespace libMesh
 
 
-#endif
+#endif // LIBMESH_REFINEMENT_SELECTOR_H
 

@@ -207,6 +207,14 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
+  
+  // Also, even if deterministic_training==false, we may specify one deterministic parameter
+  std::string deterministic_training_parameter_name_in = infile("deterministic_training_parameter_name","NONE");
+  set_deterministic_training_parameter_name(deterministic_training_parameter_name_in);
+  
+  // We also need to specify how many times each sample of the deterministic parameter is "repeated"
+  const unsigned int deterministic_training_parameter_repeats_in = infile("deterministic_training_parameter_repeats",1);
+  set_deterministic_training_parameter_repeats(deterministic_training_parameter_repeats_in);
 
   // String which selects an alternate pc/solver combo for the update_residual_terms solves.
   // Possible values are:
@@ -319,6 +327,10 @@ void RBConstruction::print_info()
                  << ", value = " << get_parameters().get_value(param_name) << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
+  if( get_deterministic_training_parameter_name() != "NONE" )
+  {
+    libMesh::out << "using partially random training set, deterministic parameter is: " << get_deterministic_training_parameter_name() << std::endl;
+  }
   libMesh::out << "single-matrix mode? " << single_matrix_mode << std::endl;
   libMesh::out << "reuse preconditioner? " << reuse_preconditioner << std::endl;
   libMesh::out << "use a relative error bound in greedy? " << use_relative_bound_in_greedy << std::endl;

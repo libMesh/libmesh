@@ -60,11 +60,6 @@
 
 #include "libmesh/getpot.h"
 
-// Some (older) compilers do not offer full stream 
-// functionality, \p OStringStream works around this.
-// Check example 9 for details.
-#include "libmesh/o_string_stream.h"
-
 // This example will solve a linear transient system,
 // so we need to include the \p TransientLinearImplicitSystem definition.
 #include "libmesh/transient_system.h"

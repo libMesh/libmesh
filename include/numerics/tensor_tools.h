@@ -17,8 +17,8 @@
 
 
 
-#ifndef __tensor_tools_h__
-#define __tensor_tools_h__
+#ifndef LIBMESH_TENSOR_TOOLS_H
+#define LIBMESH_TENSOR_TOOLS_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -290,4 +290,5 @@ namespace libMesh
   }//namespace TensorTools
 
 }//namespace libMesh
-#endif //__tensor_tools_h__
+
+#endif // LIBMESH_TENSOR_TOOLS_H

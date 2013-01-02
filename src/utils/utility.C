@@ -24,9 +24,9 @@
 #include <pwd.h>
 #include <unistd.h>
 #include <sys/utsname.h>
+#include <sstream>
 
 // Local includes
-#include "libmesh/o_string_stream.h"
 #include "libmesh/utility.h"
 #include "libmesh/timestamp.h"
 
@@ -44,7 +44,7 @@ namespace libMesh
 // system without creating a perf_log object.
 std::string Utility::system_info()
 {
-  OStringStream out;
+  std::ostringstream out;
 
   std::string date = Utility::get_timestamp();
 
