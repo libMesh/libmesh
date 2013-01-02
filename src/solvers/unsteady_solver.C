@@ -30,7 +30,8 @@ namespace libMesh
 UnsteadySolver::UnsteadySolver (sys_type& s)
   : TimeSolver(s),
     old_local_nonlinear_solution (NumericVector<Number>::build()),
-    first_solve                  (true)
+    first_solve                  (true),
+    first_adjoint_step (true)
 {
 }
 
@@ -143,8 +144,15 @@ void UnsteadySolver::advance_timestep ()
 
   void UnsteadySolver::adjoint_advance_timestep ()
   {
-    // Decrement the system time
-    _system.time -= _system.deltat;
+    if(!first_adjoint_step)
+      {
+	// Decrement the system time
+	_system.time -= _system.deltat;
+      }
+    else
+      {
+	first_adjoint_step = false;
+      }
 
     // Retrieve the primal solution vectors at this time using thr
     // solution_history object

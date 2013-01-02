@@ -136,6 +136,12 @@ protected:
    * and false thereafter
    */
   bool first_solve;
+
+  /**
+   * A bool that will be true the first time adjoint_advance_timestep() is called,
+   * (when the primal solution is to be used to set adjoint boundary conditions) and false thereafter
+   */
+  bool first_adjoint_step;
 };
 
 
