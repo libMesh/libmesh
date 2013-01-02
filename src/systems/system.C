@@ -222,10 +222,6 @@ void System::clear ()
 
 void System::init ()
 {
-  // Add all variable groups to our underlying DofMap
-  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
-    _dof_map->add_variable_group(this->variable_group(vg));
-
   // Next initialize any required data:
   // either only the basic System data
   if (_basic_system_only)
@@ -248,6 +244,10 @@ void System::init ()
 void System::init_data ()
 {
   MeshBase &mesh = this->get_mesh();
+
+  // Add all variable groups to our underlying DofMap
+  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+    _dof_map->add_variable_group(this->variable_group(vg));
 
   // Distribute the degrees of freedom on the mesh
   _dof_map->distribute_dofs (mesh);
@@ -1206,7 +1206,7 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
   
   libmesh_assert_equal_to ((curr_n_vars+vars.size()), this->n_vars());
 
-  // BSK - Defer this now to System::init() so we can detect
+  // BSK - Defer this now to System::init_data() so we can detect
   // VariableGroups 12/28/2012
   // // Add the variable group to the _dof_map
   // _dof_map->add_variable_group (vg);
