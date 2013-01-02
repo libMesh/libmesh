@@ -67,3 +67,5 @@ $ module load gcc/4.6
 $ cd $LIBMESH_SRC && mkdir gcc-4.6 && cd gcc-4.6 && ../configure && make && make install
 $ module swap gcc intel/12.1
 $ cd $LIBMESH_SRC && mkdir intel-12.1 && cd intel-12.1 && ../configure && make && make install
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/52c0727babae956821cca66c19c68908 "githalytics.com")](http://githalytics.com/libMesh/libmesh)
