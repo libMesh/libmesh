@@ -714,8 +714,11 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
   // We first do an adjoint solve:
   // J^T * z = (partial q / partial u)
-
-  this->adjoint_solve(qoi_indices);
+  // if we havent already or dont have an initial condition for the adjoint
+  if (!this->is_adjoint_already_solved())
+    {
+      this->adjoint_solve(qoi_indices);
+    }
 
   // Get ready to fill in senstivities:
   sensitivities.allocate_data(qoi_indices, *this, parameters);
@@ -899,8 +902,11 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
 
   // We first do an adjoint solve to get z for each quantity of
   // interest
-
-  this->adjoint_solve(qoi_indices);
+  // if we havent already or dont have an initial condition for the adjoint
+  if (!this->is_adjoint_already_solved())
+    {
+      this->adjoint_solve(qoi_indices);
+    }
 
   // Get ready to fill in senstivities:
   sensitivities.allocate_data(qoi_indices, *this, parameters);
@@ -1097,8 +1103,11 @@ void ImplicitSystem::qoi_parameter_hessian
 
   // We first do an adjoint solve to get z for each quantity of
   // interest
-
-  this->adjoint_solve(qoi_indices);
+  // if we havent already or dont have an initial condition for the adjoint
+  if (!this->is_adjoint_already_solved())
+    {
+      this->adjoint_solve(qoi_indices);
+    }
 
   // And a sensitivity solve to get u_k for each parameter
   this->sensitivity_solve(parameters);

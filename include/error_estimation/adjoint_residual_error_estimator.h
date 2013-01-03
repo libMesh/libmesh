@@ -89,14 +89,7 @@ public:
    * when computing errors
    */
   const QoISet &qoi_set() const { return _qoi_set; }
-
-  /**
-   * Has the adjoint problem already been solved?  If the user sets
-   * \p adjoint_already_solved to \p true, we won't waste time solving
-   * it again.
-   */
-  bool adjoint_already_solved;
-
+  
   /**
    * To aid in investigating error estimator behavior, set this string
    * to a suffix with which to plot (prefixed by "primal_" or "dual_")

@@ -352,7 +352,19 @@ public:
     weighted_sensitivity_adjoint_solve (const ParameterVector& parameters,
                                         const ParameterVector& weights,
                                         const QoISet& qoi_indices = QoISet());
+  /**
+   * Accessor for the adjoint_already_solved boolean
+   */
+  bool is_adjoint_already_solved() const
+  { return adjoint_already_solved;}
+  
+  /**
+   * Setter for the adjoint_already_solved boolean
+   */
+  void set_adjoint_already_solved(bool setting)
+  { adjoint_already_solved = setting;}
 
+  
   /**
    * Solves for the derivative of each of the system's quantities of
    * interest q in \p qoi[qoi_indices] with respect to each parameter
@@ -1735,6 +1747,13 @@ private:
    * different dof indices.
    */
   std::vector<unsigned int> _written_var_indices;
+
+  /**
+   * Has the adjoint problem already been solved?  If the user sets
+   * \p adjoint_already_solved to \p true, we won't waste time solving
+   * it again.
+   */
+  bool adjoint_already_solved;
 };
 
 

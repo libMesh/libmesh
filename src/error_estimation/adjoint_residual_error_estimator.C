@@ -37,8 +37,7 @@ namespace libMesh
 
 //-----------------------------------------------------------------
 // AdjointResidualErrorEstimator implementations
-AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
-  adjoint_already_solved(false),
+AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :  
   error_plot_suffix(),
   _primal_error_estimator(new PatchRecoveryErrorEstimator()),
   _dual_error_estimator(new PatchRecoveryErrorEstimator()),
@@ -71,7 +70,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
   solutionvecs[&_system] = _system.solution.get();
 
   // Solve the dual problem if we have to
-  if (!adjoint_already_solved)
+  if (!_system.is_adjoint_already_solved())
     {
       // FIXME - we'll need to change a lot of APIs to make this trick
       // work with a const System...

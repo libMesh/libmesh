@@ -590,10 +590,7 @@ build_error_estimator_component_wise
   AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
 
   error_estimator.reset (adjoint_residual_estimator);
-
-  // We solve the adjoint problem beforehand reusing the preconditioner from the forward solve
-  adjoint_residual_estimator->adjoint_already_solved = true;
-
+  
   // Both the primal and dual weights are going to be estimated using the patch recovery error estimator
   PatchRecoveryErrorEstimator *p1 =
     new PatchRecoveryErrorEstimator;
@@ -649,10 +646,7 @@ build_weighted_error_estimator_component_wise
   AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
 
   error_estimator.reset (adjoint_residual_estimator);
-
-  // We solve the adjoint problem beforehand reusing the preconditioner from the forward solve
-  adjoint_residual_estimator->adjoint_already_solved = true;
-
+  
   // Using the user filled error norm type vector, we pass the type of norm to be used for 
   // the error in each variable, we can have different types of norms for the primal and
   // dual variables
@@ -837,6 +831,9 @@ int main (int argc, char** argv)
           // Solve the adjoint system
           std::cout<< "Solving the adjoint problem" <<std::endl;
           system.adjoint_solve();
+
+	  // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+	system.set_adjoint_already_solved(true);
 
 	  // To plot the adjoint solution, we swap it with the primal solution 
 	  // and use the write_output function

@@ -205,9 +205,7 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param, QoISet &qois
       
       error_estimator.reset (adjoint_residual_estimator);
       
-      adjoint_residual_estimator->qoi_set() = qois;
-      
-      adjoint_residual_estimator->adjoint_already_solved = true;
+      adjoint_residual_estimator->qoi_set() = qois;            
 
       adjoint_residual_estimator->error_plot_suffix = "error.gmv";
       
@@ -355,6 +353,9 @@ int main (int argc, char** argv)
 	// Solve the adjoint system. This takes the transpose of the stiffness matrix and then
 	// solves the resulting system
 	system.adjoint_solve();
+	
+	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+	system.set_adjoint_already_solved(true);
 
 	// Get a pointer to the solution vector of the adjoint problem for QoI 0
 	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
@@ -472,6 +473,9 @@ int main (int argc, char** argv)
 	linear_solver->reuse_preconditioner(param.reuse_preconditioner);
 	system.adjoint_solve();
 		
+	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+	system.set_adjoint_already_solved(true);
+
 	NumericVector<Number> &dual_solution_0 = system.get_adjoint_solution(0);
 	
 	primal_solution.swap(dual_solution_0);	    

@@ -215,9 +215,7 @@ AutoPtr<ErrorEstimator> build_error_estimator(FEMParameters &param)
       AdjointResidualErrorEstimator *adjoint_residual_estimator = new AdjointResidualErrorEstimator;
       
       error_estimator.reset (adjoint_residual_estimator);
-      
-      adjoint_residual_estimator->adjoint_already_solved = true;
-
+            
       adjoint_residual_estimator->error_plot_suffix = "error.gmv";
       
       PatchRecoveryErrorEstimator *p1 =
@@ -356,8 +354,15 @@ int main (int argc, char** argv)
 	// Make sure we get the contributions to the adjoint RHS from the sides
 	system.assemble_qoi_sides = true;
 
+	// Here we solve the adjoint problem inside the adjoint_qoi_parameter_sensitivity
+	// function, so we have to set the adjoint_already_solved boolean to false
+	system.set_adjoint_already_solved(false);
+
 	// Compute the sensitivities
 	system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
+
+	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+	system.set_adjoint_already_solved(true);
 
 	GetPot infile("l-shaped.in");
 
@@ -468,8 +473,15 @@ int main (int argc, char** argv)
 	
 	system.assemble_qoi_sides = true;
 	
+	// Here we solve the adjoint problem inside the adjoint_qoi_parameter_sensitivity
+	// function, so we have to set the adjoint_already_solved boolean to false
+	system.set_adjoint_already_solved(false);
+
 	system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 	
+	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
+	system.set_adjoint_already_solved(true);
+
 	GetPot infile("l-shaped.in");
 
 	Number sensitivity_QoI_0_0_computed = sensitivities[0][0];
