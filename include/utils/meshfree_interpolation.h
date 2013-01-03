@@ -303,7 +303,7 @@ private:
 		    const std::vector<Real>   &src_dist_sqr,
 		    std::vector<Number>::iterator &out_it) const;
   
-  const unsigned int _half_power;
+  const int          _half_power;
   const unsigned int _n_interp_pts;
 
   /**
