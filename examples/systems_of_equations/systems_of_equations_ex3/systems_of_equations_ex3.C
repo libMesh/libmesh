@@ -25,6 +25,7 @@
 // C++ include files that we need
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 #include <math.h>
 
 // Basic include file needed for the mesh functionality.
