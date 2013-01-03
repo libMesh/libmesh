@@ -222,7 +222,7 @@ void System::clear ()
 
 void System::init ()
 {
-  // Next initialize any required data:
+  // First initialize any required data:
   // either only the basic System data
   if (_basic_system_only)
     System::init_data();
