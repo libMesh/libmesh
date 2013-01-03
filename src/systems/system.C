@@ -82,6 +82,7 @@ System::System (EquationSystems& es,
   _solution_projection              (true),
   _basic_system_only                (false),
   _can_add_vectors                  (true),
+  _identify_variable_groups         (true),
   _additional_data_written          (false)
 {
 }
@@ -221,7 +222,7 @@ void System::clear ()
 
 void System::init ()
 {
-  // First initialize any required data:
+  // Next initialize any required data:
   // either only the basic System data
   if (_basic_system_only)
     System::init_data();
@@ -229,8 +230,8 @@ void System::init ()
   else
     this->init_data();
 
-  //If no variables have been added to this system
-  //don't do anything
+  // If no variables have been added to this system
+  // don't do anything
   if(!this->n_vars())
     return;
 
@@ -243,6 +244,10 @@ void System::init ()
 void System::init_data ()
 {
   MeshBase &mesh = this->get_mesh();
+
+  // Add all variable groups to our underlying DofMap
+  for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
+    _dof_map->add_variable_group(this->variable_group(vg));
 
   // Distribute the degrees of freedom on the mesh
   _dof_map->distribute_dofs (mesh);
@@ -1072,6 +1077,74 @@ unsigned int System::add_variable (const std::string& var,
 			           const FEType& type,
 				   const std::set<subdomain_id_type> * const active_subdomains)
 {
+  // Make sure the variable isn't there already
+  // or if it is, that it's the type we want
+  for (unsigned int v=0; v<this->n_vars(); v++)
+    if (this->variable_name(v) == var)
+      {
+	if (this->variable_type(v) == type)
+	  return _variables[v].number();
+	  
+	libMesh::err << "ERROR: incompatible variable "
+		     << var
+		     << " has already been added for this system!"
+		     << std::endl;
+	libmesh_error();
+      }
+
+  // Optimize for VariableGroups here - if the user is adding multiple
+  // variables of the same FEType and subdomain restriction, catch 
+  // that here and add them as members of the same VariableGroup.
+  // 
+  // start by setting this flag to whatever the user has requested
+  // and then consider the conditions which should negate it.
+  bool should_be_in_vg = this->identify_variable_groups();
+  
+  // No variable groups, nothing to add to
+  if (!this->n_variable_groups())
+    should_be_in_vg = false;
+  
+  else
+    {
+      VariableGroup &vg(_variable_groups.back());
+      
+      // get a pointer to their subdomain restriction, if any.
+      const std::set<subdomain_id_type> * const 
+	their_active_subdomains (vg.implicitly_active() ? 
+				 NULL : &vg.active_subdomains());
+      
+      // Different types?
+      if (vg.type() != type)
+	should_be_in_vg = false;
+
+      // they are restricted, we aren't?
+      if (their_active_subdomains && !active_subdomains)
+	should_be_in_vg = false;
+      
+      // they aren't restriced, we are?
+      if (!their_active_subdomains && active_subdomains)
+	should_be_in_vg = false;
+	        
+      if (their_active_subdomains && active_subdomains)
+	// restricted to different sets?
+	if (*their_active_subdomains != *active_subdomains)
+	  should_be_in_vg = false;
+
+      // OK, after all that, append the variable to the vg if none of the conditions
+      // were violated
+      if (should_be_in_vg)
+	{
+	  const unsigned int curr_n_vars = this->n_vars();
+
+	  vg.append (var);
+	  
+	  _variables.push_back(vg(vg.n_variables()-1));
+	  _variable_numbers[var] = curr_n_vars;
+	  return curr_n_vars;
+	}
+    }
+    
+  // otherwise, fall back to adding a single variable group
   return this->add_variables (std::vector<std::string>(1, var),
 			      type,
 			      active_subdomains);
@@ -1084,9 +1157,9 @@ unsigned int System::add_variable (const std::string& var,
 			           const FEFamily family,
 				   const std::set<subdomain_id_type> * const active_subdomains)
 {
-  return this->add_variables(std::vector<std::string>(1, var),
-			     FEType(order, family),
-			     active_subdomains);
+  return this->add_variable(var,
+			    FEType(order, family),
+			    active_subdomains);
 }
 
 
@@ -1095,8 +1168,6 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
 				    const FEType& type,
 				    const std::set<subdomain_id_type> * const active_subdomains)
 {
-  const std::string var = vars[0];
-  
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
   for (unsigned int ov=0; ov<vars.size(); ov++)
@@ -1134,9 +1205,11 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
     }
   
   libmesh_assert_equal_to ((curr_n_vars+vars.size()), this->n_vars());
-    
-  // Add the variable group to the _dof_map
-  _dof_map->add_variable_group (vg);
+
+  // BSK - Defer this now to System::init_data() so we can detect
+  // VariableGroups 12/28/2012
+  // // Add the variable group to the _dof_map
+  // _dof_map->add_variable_group (vg);
 
   // Return the number of the new variable
   return curr_n_vars+vars.size()-1;
