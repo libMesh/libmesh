@@ -111,6 +111,11 @@ void init_sys(EquationSystems& es,
 
 int main(int argc, char** argv)
 {
+#if LIBMESH_DIM != 3
+  std::cout << "This example requires 3D support - skipping.\n";
+  return 77;
+#endif
+
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
   {
