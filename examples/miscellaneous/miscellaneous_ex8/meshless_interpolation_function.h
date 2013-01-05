@@ -23,6 +23,8 @@
 // Local Includes
 #include "libmesh/function_base.h"
 #include "libmesh/meshfree_interpolation.h"
+#include "libmesh/threads.h"
+
 
 // C++ includes
 #include <cstddef>
@@ -45,14 +47,17 @@ private:
   const MeshfreeInterpolation &_mfi;
   mutable std::vector<Point> _pts;
   mutable std::vector<Number> _vals;
+  Threads::spin_mutex &_mutex;
   
 public:
 
   /**
    * Constructor.  Requires a \p \pMeshlessInterpolation object.
    */
-  MeshlessInterpolationFunction (const MeshfreeInterpolation &mfi) :
-    _mfi (mfi)
+  MeshlessInterpolationFunction (const MeshfreeInterpolation &mfi,
+				 Threads::spin_mutex &mutex) :
+  _mfi (mfi),
+  _mutex(mutex)
   {}
   
 
@@ -100,6 +105,8 @@ Number MeshlessInterpolationFunction::operator() (const Point& p,
   _pts.push_back(p);
   _vals.resize(1);
 
+  Threads::spin_mutex::scoped_lock lock(_mutex);
+
   _mfi.interpolate_field_data (_mfi.field_variables(),
 			       _pts, _vals);
 
@@ -137,8 +144,8 @@ void MeshlessInterpolationFunction::clear ()
 inline
 AutoPtr<FunctionBase<Number> >
 MeshlessInterpolationFunction::clone () const
-{
-  return AutoPtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi) );
+{ 
+  return AutoPtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi, _mutex) );
 }
 
 

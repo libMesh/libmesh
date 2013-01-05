@@ -17,10 +17,10 @@
 
 
 
-// <h1>Miscellaneous Example 7 - Can use the PetscDMNonlinearSolver (available in PETSc-3.3.0 or above) to solve a VI version of the problem.</h1>
+// <h1>Miscellaneous Example 8 - Meshfree Interpolation Utilities.</h1>
 //
-// LibMesh interfaces directly with PETSc's variational inequality solver,
-// this example shows how to do it.
+// LibMesh provides some utilities for pointcloud-type interpolation, as 
+// demonstrated in this example.
 
 // Example include files
 #include "libmesh/libmesh.h"
@@ -29,6 +29,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/tecplot_io.h"
+#include "libmesh/threads.h"
 #include "meshless_interpolation_function.h"
 
 // C++ includes
@@ -226,8 +227,10 @@ int main(int argc, char** argv)
       idi.prepare_for_use();
 
       // Create a MeshlessInterpolationFunction that uses our InverseDistanceInterpolation
-      // object
-      MeshlessInterpolationFunction mif(idi);
+      // object.  Since each MeshlessInterpolationFunction shares the same InverseDistanceInterpolation
+      // object in a threaded environment we must also provide a locking mechanism.
+      Threads::spin_mutex mutex;
+      MeshlessInterpolationFunction mif(idi, mutex);
 
       // project the solution onto system b
       es_b.init();
