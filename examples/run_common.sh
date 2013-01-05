@@ -65,7 +65,7 @@ run_example() {
 	
 	message_running $example_name $executable $options
 
-	$LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS || exit 1
+	$LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS || exit $?
 	
 	message_done_running $example_name $executable $options
     done
