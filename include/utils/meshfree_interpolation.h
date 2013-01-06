@@ -118,7 +118,7 @@ public:
   /**
    * @returns a writeable reference to the point list.
    */
-  std::vector<Real> & get_source_vals ()
+  std::vector<Number> & get_source_vals ()
   { return _src_vals; }
 
   /**
