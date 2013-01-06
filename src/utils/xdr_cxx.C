@@ -1324,7 +1324,7 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 	    {
 	      libmesh_assert(out.get());
               libmesh_assert (out->good());
-              *out << val[i].real() << ' ' val[i].imag() << ' ';
+              *out << val[i].real() << ' ' << val[i].imag() << ' ';
 	    }
 	else
 	  {
@@ -1335,7 +1335,7 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 		  {
 		    libmesh_assert(out.get());
                     libmesh_assert (out->good());
-                    *out << val[cnt].real() << ' ' val[cnt].imag() << ' ';
+                    *out << val[cnt].real() << ' ' << val[cnt].imag() << ' ';
 		    cnt++;
 		  }
 		libmesh_assert(out.get());
