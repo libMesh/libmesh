@@ -55,7 +55,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl NOX
        dnl ------------------------------------------------------
        AC_CHECK_HEADER([$withtrilinosdir/include/NOX_Config.h],
-                       [enablenox=yes]
+                       [enablenox=yes],
                        [AC_CHECK_HEADER([$withtrilinosdir/NOX_Config.h],
                                         [enablenox=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/nox/src/NOX_Config.h],
