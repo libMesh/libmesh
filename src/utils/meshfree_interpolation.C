@@ -204,8 +204,10 @@ namespace libMesh
 	    for (unsigned int var=0; var<this->n_field_variables(); var++)
 	      {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-		val.real() = *it, ++it;
-		val.imag() = *it, ++it;
+		Real re = *it; ++it;
+		Real im = *it; ++it;
+
+		val = Number(re,im);
 #else
 		val = *it, ++it;
 #endif

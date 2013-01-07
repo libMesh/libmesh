@@ -144,7 +144,7 @@ int main(int argc, char** argv)
       // Explicitly set the data values we will interpolate from
       {
 	const std::vector<Point> &src_pts  (idi.get_source_points());
-	std::vector<Real>        &src_vals (idi.get_source_vals());
+	std::vector<Number>      &src_vals (idi.get_source_vals());
 	
 	src_vals.clear(); src_vals.reserve(src_pts.size());
 	
