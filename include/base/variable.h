@@ -240,6 +240,14 @@ public:
     return _first_scalar_number;
   }
 
+  /**
+   * Appends a variable to the group.  Really only can be used by \p System in
+   * a very limited window of opportunity - after the user specifies variables 
+   * but before the system is initialized. 
+   */
+  void append (const std::string &var_name)
+  { _names.push_back (var_name); }
+
 protected:
   std::vector<std::string> _names;
 };

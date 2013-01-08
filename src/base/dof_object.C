@@ -383,8 +383,16 @@ void DofObject::set_n_comp_group(const unsigned int s,
   // We use (invalid_id - 1) to signify no
   // components for this object
   _idx_buf[base_offset + 1] = (ncomp == 0) ? invalid_id - 1 : invalid_id;
+  
+  // this->debug_buffer();
+  // std::cout << "s,vg = " << s << "," << vg << '\n'
+  // 	    << "base_offset=" << base_offset << '\n'
+  // 	    << "this->n_comp(s,vg)=" << this->n_comp(s,vg) << '\n'
+  // 	    << "this->n_comp_group(s,vg)=" << this->n_comp_group(s,vg) << '\n'
+  // 	    << "this->n_vars(s,vg)=" << this->n_vars(s,vg) << '\n'
+  // 	    << "this->n_var_groups(s)=" << this->n_var_groups(s) << '\n';
 
-  libmesh_assert_equal_to (ncomp, this->n_comp(s,vg));
+  libmesh_assert_equal_to (ncomp, this->n_comp_group(s,vg));
 }
 
 
