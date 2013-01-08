@@ -1110,6 +1110,17 @@ public:
   const FEType & variable_type (const std::string& var) const;
 
   /**
+   * @returns \p true when \p VariableGroup structures should be 
+   * automatically identified, \p false otherwise.
+   */
+  bool identify_variable_groups () const;
+
+  /**
+   * Toggle automatic \p VariableGroup identification.
+   */
+  void identify_variable_groups (const bool);
+
+  /**
    * @returns a norm of variable \p var in the vector \p v, in the specified
    * norm (e.g. L2, L_INF, H1)
    */
@@ -1730,6 +1741,12 @@ private:
   bool _can_add_vectors;
 
   /**
+   * \p true when \p VariableGroup structures should be automatically 
+   * identified, \p false otherwise.  Defaults to \p true.
+   */
+  bool _identify_variable_groups;
+
+  /**
    * This flag is used only when *reading* in a system from file.
    * Based on the system header, it keeps track of whether or not
    * additional vectors were actually written for this file.
@@ -1932,6 +1949,22 @@ inline
 const FEType & System::variable_type (const std::string& var) const
 {
   return _variables[this->variable_number(var)].type();
+}
+
+
+
+inline
+bool System::identify_variable_groups () const
+{
+  return _identify_variable_groups;
+}
+
+
+
+inline
+void System::identify_variable_groups (const bool ivg)
+{
+  _identify_variable_groups = ivg;
 }
 
 
