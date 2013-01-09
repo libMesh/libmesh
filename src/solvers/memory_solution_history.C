@@ -41,15 +41,16 @@ namespace libMesh
 	// The name of this vector
 	const std::string& vec_name = vec->first;
 
-	// Check if this vector is to be projected
-	bool vector_projection_setting = _system.vector_preservation(vec_name);
-	
-	// If it is important enough to be projected, it is important enough to be saved
-	if(vector_projection_setting)
+	// If we haven't seen this vector before or if we have and
+	// want to overwrite it
+	if ((overwrite_previously_stored ||
+	     !saved_vectors.count(vec_name)) &&
+          // and if we think it's worth preserving
+             _system.vector_preservation(vec_name))
 	  {
+	    // Then we save it.
 	    saved_vectors[vec_name] = vec->second->clone().release();
 	  }
-
       }
     
     // Of course, we will always save the actual solution
@@ -63,9 +64,18 @@ namespace libMesh
 
   void MemorySolutionHistory::retrieve()
   {    
-    // To find the required entry in the stored_solutions list, we need to first decrement the stored_sols iterator
+    // Are we already at the end of our stored solutions?  Then
+    // there's nothing to do.
+    if(stored_sols==stored_solutions.begin())
+      {
+	std::cout<<"No more solutions to recover ! We are at time t= "<<_system.time<<std::endl<<std::endl;
+        return;
+      }
+
+    // To find the required entry in the stored_solutions list, we
+    // need to first decrement the stored_sols iterator
     --stored_sols;
-    
+
     // Get the time at which we are recovering the solution vectors
     Real recovery_time = stored_sols->first;
 
@@ -84,15 +94,16 @@ namespace libMesh
   	// The name of this vector
   	const std::string& vec_name = vec->first;
 	
-	// Get the vec_name entry in the saved vectors map and set the current system vec[vec_name] entry to it
-	if(vec_name != "_solution")
-	  _system.get_vector(vec_name) = *(vec->second);	    
+        // Get the vec_name entry in the saved vectors map and set the
+        // current system vec[vec_name] entry to it
+        if (vec_name != "_solution")
+         _system.get_vector(vec_name) = *(vec->second);
       }
-    
+
     // Of course, we will *always* have to get the actual solution
-    std::string _solution("_solution");    
+    std::string _solution("_solution");
     *(_system.solution) = *(saved_vectors[_solution]);
-        
   }
 
 }
+// End namespace libMesh
