@@ -28,12 +28,85 @@ namespace libMesh
       }
   }
 
+  // This function finds, if it can, the entry where we're supposed to
+  // be storing data
+  void MemorySolutionHistory::find_stored_entry()
+  {
+    if (stored_solutions.begin() == stored_solutions.end())
+      return;
+
+    libmesh_assert (stored_sols != stored_solutions.end());
+
+    if (stored_sols->first == _system.time)
+      return;
+
+    // If we're not at the front, check the previous entry
+    if (stored_sols != stored_solutions.begin())
+      {
+        stored_solutions_iterator test_it = stored_sols;
+        if ((--test_it)->first == _system.time)
+          {
+            --stored_sols;
+            return;
+          }
+      }
+
+    // If we're not at the end, check the subsequent entry
+    stored_solutions_iterator test_it = stored_sols;
+    if ((++test_it) != stored_solutions.end())
+      {
+        if (test_it->first == _system.time)
+          {
+            ++stored_sols;
+            return;
+          }
+      }
+  }
+
   // This functions saves all the 'projection-worthy' system vectors for
   // future use
   void MemorySolutionHistory::store()
   {    
-    // Map of to be projected vectors from this solution step
-    std::map<std::string, NumericVector<Number> *> saved_vectors;
+    this->find_stored_entry();
+
+    // In an empty history we create the first entry
+    if (stored_solutions.begin() == stored_solutions.end())
+      {
+        stored_solutions.push_back
+          (std::make_pair(_system.time,
+             std::map<std::string, NumericVector<Number> *>()));
+        stored_sols = stored_solutions.begin();
+      }
+
+    // If we're past the end we can create a new entry
+    if (stored_sols->first < _system.time)
+      {
+#ifndef NDEBUG
+        stored_sols++;
+        libmesh_assert (stored_sols == stored_solutions.end());
+#endif
+        stored_solutions.push_back
+          (std::make_pair(_system.time,
+             std::map<std::string, NumericVector<Number> *>()));
+        stored_sols = stored_solutions.end();
+        stored_sols--;
+      }
+
+    // If we're before the beginning we can create a new entry
+    else if (stored_sols->first > _system.time)
+      {
+        libmesh_assert (stored_sols == stored_solutions.begin());
+        stored_solutions.push_front
+          (std::make_pair(_system.time,
+             std::map<std::string, NumericVector<Number> *>()));
+        stored_sols = stored_solutions.begin();
+      }
+
+    // We don't support inserting entries elsewhere
+    libmesh_assert_equal_to(stored_sols->first, _system.time);
+
+    // Map of stored vectors for this solution step
+    std::map<std::string, NumericVector<Number> *>& saved_vectors = stored_sols->second;
     
     // Loop over all the system vectors
     for (System::vectors_iterator vec = _system.vectors_begin(); vec != _system.vectors_end(); ++vec)
@@ -53,28 +126,30 @@ namespace libMesh
 	  }
       }
     
-    // Of course, we will always save the actual solution
+    // Of course, we will usually save the actual solution
     std::string _solution("_solution");    
-    saved_vectors[_solution] = _system.solution->clone().release();
+    if ((overwrite_previously_stored ||
+        !saved_vectors.count(_solution)) &&
+      // and if we think it's worth preserving
+        _system.project_solution_on_reinit())
+      saved_vectors[_solution] = _system.solution->clone().release();
 
     // Put all the vectors from this timestep into stored_solutions
     stored_solutions.push_back(std::make_pair(_system.time, saved_vectors));
-    
   }
 
   void MemorySolutionHistory::retrieve()
   {    
-    // Are we already at the end of our stored solutions?  Then
+    this->find_stored_entry();
+
+    // Do we not have a solution for this time?  Then 
     // there's nothing to do.
-    if(stored_sols==stored_solutions.begin())
+    if(stored_sols == stored_solutions.end() ||
+       stored_sols->first != _system.time)
       {
 	std::cout<<"No more solutions to recover ! We are at time t= "<<_system.time<<std::endl<<std::endl;
         return;
       }
-
-    // To find the required entry in the stored_solutions list, we
-    // need to first decrement the stored_sols iterator
-    --stored_sols;
 
     // Get the time at which we are recovering the solution vectors
     Real recovery_time = stored_sols->first;
@@ -83,7 +158,7 @@ namespace libMesh
     std::cout<<"Recovering solution vectors at time: " <<recovery_time << std::endl;
 
     // Get the saved vectors at this timestep
-    std::map<std::string, NumericVector<Number> *> saved_vectors = stored_sols->second;
+    std::map<std::string, NumericVector<Number> *>& saved_vectors = stored_sols->second;
 
     std::map<std::string, NumericVector<Number> *>::iterator vec = saved_vectors.begin();
     std::map<std::string, NumericVector<Number> *>::iterator vec_end = saved_vectors.end();

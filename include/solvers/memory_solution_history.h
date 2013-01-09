@@ -65,6 +65,9 @@ namespace libMesh
     
     // The stored solutions iterator
     stored_solutions_iterator stored_sols;
+
+    // A helper function to locate entries at a given time
+    void find_stored_entry();
     
     // A system reference
     System & _system ;
