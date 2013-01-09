@@ -33,7 +33,8 @@ namespace libMesh
   public:
     
     // Constructor
-    SolutionHistory() {};
+    SolutionHistory() :
+      overwrite_previously_stored(false) {};
     
     // Destructor
     virtual ~SolutionHistory () {};
@@ -47,6 +48,17 @@ namespace libMesh
     // Cloning function for an AutoPtr, pure virtual, used in the 
     // setter function in time_solver.C
     virtual AutoPtr<SolutionHistory > clone() const = 0;
+
+    // Turn on overwrite_previously_stored to overwrite any
+    // already-saved data encountered during subsequent store() calls
+    void set_overwrite_previously_stored (bool val)
+    { overwrite_previously_stored = val; }
+
+  protected:
+
+    // Flag to specify whether we want to overwrite previously stored 
+    // vectors at a given time or not
+    bool overwrite_previously_stored;
     
   }; // end SolutionHistory class definition
 
