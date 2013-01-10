@@ -237,7 +237,7 @@ public:
     libmesh_assert_less (v, this->n_variables());
     if ((this->type().family == SCALAR) &&
 	(this->n_variables() > 1)) libmesh_error(); // [BSK] I am not yet sure what this means!
-    return _first_scalar_number;
+    return _first_scalar_number+v;
   }
 
   /**
