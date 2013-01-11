@@ -125,7 +125,7 @@ AC_DEFUN([CONFIGURE_PETSC],
           PETSCLINKLIBS=`make -s -C $PETSC_DIR getlinklibs`
           PETSCINCLUDEDIRS=`make -s -C $PETSC_DIR getincludedirs`
 
-	# otherwise create a simple makefile to provide what we want,
+	# create a simple makefile to provide other targets we want,
 	# then query it.
  	  cat <<EOF >Makefile_config_petsc
 include $PETSC_DIR/conf/variables
@@ -165,6 +165,10 @@ EOF
         #echo "PETSCLINKLIBS=$PETSCLINKLIBS"
         #echo "PETSCINCLUDEDIRS=$PETSCINCLUDEDIRS"
         #echo ""
+
+        # We sometimes need the full CC_INCLUDES to access a
+        # PETSc-snooped MPI
+        PETSCINCLUDEDIRS="$PETSCINCLUDEDIRS $PETSC_CC_INCLUDES"
   
         AC_SUBST(PETSCLINKLIBS)
         AC_SUBST(PETSCINCLUDEDIRS)
