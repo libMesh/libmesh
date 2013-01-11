@@ -2131,7 +2131,9 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	      const std::vector<Real>& JxW = edge_fe->get_JxW();
 
 	      const std::vector<std::vector<Real> >& phi = edge_fe->get_phi();
-	      const std::vector<std::vector<RealGradient> >& dphi = edge_fe->get_dphi();
+	      const std::vector<std::vector<RealGradient> >* dphi;
+	      if (cont == C_ONE)
+		dphi = &(edge_fe->get_dphi());
 	      
 	      for (unsigned int e=0; e != elem->n_edges(); ++e)
 		{
@@ -2191,12 +2193,12 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 			      if (cont == C_ONE)
 				{
 				  if (dof_is_fixed[j])
-				    Fe(freei) -= (dphi[i][qp] *
-						  dphi[j][qp]) *
+				    Fe(freei) -= ( (*dphi)[i][qp] *
+						   (*dphi)[j][qp] ) *
 				      JxW[qp] * Ue(j);
 				  else
-				    Ke(freei,freej) += (dphi[i][qp] *
-							dphi[j][qp])
+				    Ke(freei,freej) += ( (*dphi)[i][qp] *
+							 (*dphi)[j][qp] )
 				      * JxW[qp];
 				}
 			      if (!dof_is_fixed[j])
@@ -2204,7 +2206,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 			    }
 			  Fe(freei) += phi[i][qp] * fineval * JxW[qp];
 			  if (cont == C_ONE)
-			    Fe(freei) += (finegrad * dphi[i][qp]) *
+			    Fe(freei) += (finegrad * (*dphi)[i][qp] ) *
 			      JxW[qp];
 			  freei++;
 			}
@@ -2233,7 +2235,9 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	      const std::vector<Real>& JxW = side_fe->get_JxW();
 
 	      const std::vector<std::vector<Real> >& phi = side_fe->get_phi();
-	      const std::vector<std::vector<RealGradient> >& dphi = side_fe->get_dphi();
+	      const std::vector<std::vector<RealGradient> >* dphi;
+	      if (cont == C_ONE)
+		dphi = &(side_fe->get_dphi());
 
 	      for (unsigned int s=0; s != elem->n_sides(); ++s)
 		{
@@ -2293,12 +2297,12 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 			      if (cont == C_ONE)
 				{
 				  if (dof_is_fixed[j])
-				    Fe(freei) -= (dphi[i][qp] *
-						  dphi[j][qp]) *
+				    Fe(freei) -= ( (*dphi)[i][qp] *
+						   (*dphi)[j][qp] ) *
 				      JxW[qp] * Ue(j);
 				  else
-				    Ke(freei,freej) += (dphi[i][qp] *
-							dphi[j][qp])
+				    Ke(freei,freej) += ( (*dphi)[i][qp] *
+							 (*dphi)[j][qp] )
 				      * JxW[qp];
 				}
 			      if (!dof_is_fixed[j])
@@ -2306,7 +2310,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 			    }
 			  Fe(freei) += (fineval * phi[i][qp]) * JxW[qp];
 			  if (cont == C_ONE)
-			    Fe(freei) += (finegrad * dphi[i][qp]) *
+			    Fe(freei) += (finegrad * (*dphi)[i][qp] ) *
 			      JxW[qp];
 			  freei++;
 			}
@@ -2344,7 +2348,9 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	      const std::vector<Real>& JxW = fe->get_JxW();
 
 	      const std::vector<std::vector<Real> >& phi = fe->get_phi();
-	      const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
+	      const std::vector<std::vector<RealGradient> >* dphi;
+	      if (cont == C_ONE)
+		dphi = &(side_fe->get_dphi());
 
 	      Ke.resize (free_dofs, free_dofs); Ke.zero();
 	      Fe.resize (free_dofs); Fe.zero();
@@ -2384,12 +2390,12 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 			  if (cont == C_ONE)
 			    {
 			      if (dof_is_fixed[j])
-				Fe(freei) -= (dphi[i][qp] *
-					      dphi[j][qp]) * JxW[qp] *
+				Fe(freei) -= ( (*dphi)[i][qp] *
+					       (*dphi)[j][qp] ) * JxW[qp] *
 				  Ue(j);
 			      else
-				Ke(freei,freej) += (dphi[i][qp] *
-						    dphi[j][qp]) *
+				Ke(freei,freej) += ( (*dphi)[i][qp] *
+						     (*dphi)[j][qp] ) *
 				  JxW[qp];
 			    }
 			  if (!dof_is_fixed[j])
@@ -2397,7 +2403,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 			}
 		      Fe(freei) += phi[i][qp] * fineval * JxW[qp];
 		      if (cont == C_ONE)
-			Fe(freei) += (finegrad * dphi[i][qp]) * JxW[qp];
+			Fe(freei) += (finegrad * (*dphi)[i][qp] ) * JxW[qp];
 		      freei++;
 		    }
 		}
