@@ -520,8 +520,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
 
   Threads::parallel_for
     (ConstElemRange (this->get_mesh().active_local_elements_begin(),
-		     this->get_mesh().active_local_elements_end(),
-		     1000),
+		     this->get_mesh().active_local_elements_end() ),
      ProjectSolution(*this, f, g,
                      this->get_equation_systems().parameters,
 		     new_vector)
@@ -583,8 +582,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
 
   Threads::parallel_for
     (ConstElemRange (this->get_mesh().active_local_elements_begin(),
-		     this->get_mesh().active_local_elements_end(),
-		     1000),
+		     this->get_mesh().active_local_elements_end() ),
      ProjectFEMSolution(*this, f, g, new_vector)
     );
 
@@ -713,8 +711,7 @@ void System::boundary_project_vector
 
   Threads::parallel_for
     (ConstElemRange (this->get_mesh().active_local_elements_begin(),
-		     this->get_mesh().active_local_elements_end(),
-		     1000),
+		     this->get_mesh().active_local_elements_end() ),
      BoundaryProjectSolution(b, variables, *this, f, g,
                              this->get_equation_systems().parameters,
 		             new_vector)
