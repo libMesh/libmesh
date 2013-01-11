@@ -1902,20 +1902,16 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
       const Elem* elem = *elem_it;
 
       context.pre_fe_reinit(system, elem);
-      context.elem_fe_reinit();
-      if( dim > 1 )
-	context.side_fe_reinit();
-      if( dim > 2 )
-	context.edge_fe_reinit();
 
       // Loop over all the variables in the system
       for (unsigned int var=0; var<n_variables; var++)
 	{
-	  const FEType& fe_type = fe->get_fe_type();
+	  const Variable& variable = dof_map.variable(var);
+
+	  const FEType& fe_type = variable.type();
+
 	  if (fe_type.family == SCALAR)
 	    continue;
-
-	  const Variable& variable = dof_map.variable(var);
 
 	  // Per-subdomain variables don't need to be projected on
 	  // elements where they're not active
@@ -2137,6 +2133,9 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	      
 	      for (unsigned int e=0; e != elem->n_edges(); ++e)
 		{
+		  context.edge = e;
+		  context.edge_fe_reinit();
+
 		  FEInterface::dofs_on_edge(elem, dim, fe_type, e,
 					    side_dofs);
 
@@ -2260,6 +2259,9 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 		  // The new side coefficients
 		  DenseVector<Number> Uside(free_dofs);
 
+		  context.side = s;
+		  context.side_fe_reinit();
+
 		  // Loop over the quadrature points
 		  for (unsigned int qp=0; qp<n_qp; qp++)
 		    {
@@ -2342,6 +2344,8 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
           // There may be nothing to project
           if (free_dofs)
             {
+	      context.elem_fe_reinit();
+
 	      const QBase* qrule = context.get_element_qrule();
 	      const unsigned int n_qp = qrule->n_points();
 	      const std::vector<Point>& xyz_values = fe->get_xyz();
