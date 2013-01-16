@@ -487,12 +487,18 @@ void System::project_vector (NumericVector<Number>& new_vector,
     // We get different scalars as different
     // components from a new-style f functor.
     DenseVector<Number> fout(this->n_components());
-    (*f) (Point(), this->time, fout);
+    bool filled_fout = false;
 
     const DofMap& dof_map = this->get_dof_map();
     for (unsigned int var=0; var<this->n_vars(); var++)
       if(this->variable(var).type().family == SCALAR)
         {
+          if (!filled_fout)
+            {
+              (*f) (Point(), this->time, fout);
+	      filled_fout = true;
+	    }
+
           std::vector<unsigned int> SCALAR_indices;
           dof_map.SCALAR_dof_indices (SCALAR_indices, var);
           const unsigned int n_SCALAR_dofs = SCALAR_indices.size();
