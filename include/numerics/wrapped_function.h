@@ -218,7 +218,7 @@ Output WrappedFunction<Output>::component (unsigned int i,
           for (unsigned int j=0; j != n_components; ++j)
             if (i == _sys.variable_scalar_number(v,j))
               return _fptr(Point(j,0,0), *_parameters,
-			   _sys.name(), _sys.variable_name(j));
+			   _sys.name(), _sys.variable_name(v));
         }
     }
   libMesh::err << "Component index " << i <<
