@@ -205,3 +205,8 @@ examples/vector_fe/vector_fe_ex1/out.e
 examples/vector_fe/vector_fe_ex2/out.e
 examples/vector_fe/vector_fe_ex2/out.inp
 examples/vector_fe/vector_fe_ex3/out.e
+
+contrib/autotools/bin
+contrib/autotools/include
+contrib/autotools/lib
+contrib/autotools/share
