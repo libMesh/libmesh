@@ -3,7 +3,7 @@
 #
 # values substituted from configure
 #
-#host=@host@
+host=@host@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
@@ -21,6 +21,7 @@ usage ()
   echo "       $0 --fc"
   echo "       $0 --fflags"
   echo "       $0 --version"
+  echo "       $0 --host"
   exit
 }
 
@@ -135,6 +136,10 @@ while [ "x$1" != "x" ]; do
 
 	"--version")
 	    return_val="@VERSION@"
+	    ;;
+
+	"--host")
+	    return_val="$host"
 	    ;;
 	
 	*)
