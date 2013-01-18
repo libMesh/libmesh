@@ -111,14 +111,14 @@ typedef LIBMESH_DEFAULT_SCALAR_TYPE Real;
 
 #ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
   #ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
-  # define TOLERANCE 1.e-8
+static const Real TOLERANCE = 1.e-8;
   # define MPI_REAL MPI_LONG_DOUBLE
   #else
-  # define TOLERANCE 1.e-6
+static const Real TOLERANCE = 1.e-6;
   # define MPI_REAL MPI_DOUBLE
   #endif
 #else
-  # define TOLERANCE 2.5e-3
+static const Real TOLERANCE = 2.5e-3;
   # define MPI_REAL MPI_FLOAT
 #endif
 
