@@ -157,6 +157,10 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* Flag indicating whether the library shall be compiled to use the
+   DataTransferKit */
+#undef HAVE_DTK
+
 /* Flag indicating whether the library will be compiled with Eigen support */
 #undef HAVE_EIGEN
 
@@ -346,6 +350,10 @@
 
 /* Flag indicating whether the library will be compiled with Tetgen support */
 #undef HAVE_TETGEN
+
+/* Flag indicating whether the library shall be compiled to use the Tpetra
+   solver collection */
+#undef HAVE_TPETRA
 
 /* define if the compiler supports std::tr1::unordered_map */
 #undef HAVE_TR1_UNORDERED_MAP

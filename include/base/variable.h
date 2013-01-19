@@ -30,6 +30,9 @@
 
 namespace libMesh {
 
+// Forward Declaration
+class System;
+
 /**
  * This class defines the notion of a variable in the system.
  * A variable is one of potentially several unknowns in the
@@ -47,10 +50,12 @@ public:
    * constructor creates a variable which is active on
    * all subdomains.
    */
-  Variable (const std::string &var_name,
+  Variable (System *sys,
+            const std::string &var_name,
 	    const unsigned int var_number,
 	    const unsigned int first_scalar_number,
 	    const FEType &var_type) :
+    _sys(sys),
     _name(var_name),
     _number(var_number),
     _first_scalar_number(first_scalar_number),
@@ -62,17 +67,35 @@ public:
    * Constructor.  Takes a set which contains the subdomain
    * indices for which this variable is active.
    */
-  Variable (const std::string &var_name,
+  Variable (System *sys,
+            const std::string &var_name,
 	    const unsigned int var_number,
 	    const unsigned int first_scalar_number,
 	    const FEType &var_type,
 	    const std::set<subdomain_id_type> &var_active_subdomains) :
+    _sys(sys),
     _name(var_name),
     _number(var_number),
     _first_scalar_number(first_scalar_number),
     _type(var_type),
     _active_subdomains(var_active_subdomains)
   {}
+
+  /**
+   * The System this Variable is part of.
+   */
+  System * sys()
+  {
+    return _sys;
+  }
+
+  /**
+   * The System this Variable is part of.
+   */
+  System * sys() const
+  {
+    return _sys;
+  }
 
   /**
    * Arbitrary, user-specified name of the variable.
@@ -129,6 +152,7 @@ public:
   { return _active_subdomains; }
 
 protected:
+  System *                _sys;
   std::string             _name;
   unsigned int            _number;
   unsigned int            _first_scalar_number;
@@ -154,35 +178,49 @@ public:
    * constructor creates a variable which is active on
    * all subdomains.
    */
-  VariableGroup (const std::vector<std::string> &var_names,
+  VariableGroup (System *sys,
+                 const std::vector<std::string> &var_names,
 		 const unsigned int var_number,
 		 const unsigned int first_scalar_number,
 		 const FEType &var_type) :
-    Variable ("var_group",
+    Variable (sys,
+              "var_group",
 	      var_number,
 	      first_scalar_number,
 	      var_type),
+    _sys(sys),
     _names(var_names)
   {}
 
-   
+
   /**
    * Constructor.  Takes a set which contains the subdomain
    * indices for which this variable is active.
    */
-  VariableGroup (const std::vector<std::string> &var_names,
+  VariableGroup (System *sys,
+                 const std::vector<std::string> &var_names,
 		 const unsigned int var_number,
 		 const unsigned int first_scalar_number,
 		 const FEType &var_type,
 		 const std::set<subdomain_id_type> &var_active_subdomains) :
-     
-    Variable ("var_group",
+
+    Variable (sys,
+              "var_group",
 	      var_number,
 	      first_scalar_number,
 	      var_type,
 	      var_active_subdomains),
+    _sys(sys),
     _names(var_names)
   {}
+
+  /**
+   * The System this VariableGroup is part of.
+   */
+  System * sys()
+  {
+    return _sys;
+  }
 
   /**
    * The number of variables in this \p VariableGroup
@@ -197,7 +235,8 @@ public:
   Variable variable (unsigned int v) const
   {
     libmesh_assert_less (v, this->n_variables());
-    return Variable (this->name(v),
+    return Variable (this->_sys,
+                     this->name(v),
 		     this->number(v),
 		     this->first_scalar_number(v),
 		     this->type(),
@@ -209,7 +248,7 @@ public:
    */
   Variable operator() (unsigned int v) const
   { return this->variable(v); }
-  
+
   /**
    * Arbitrary, user-specified name of the variable.
    */
@@ -240,16 +279,17 @@ public:
 
   /**
    * Appends a variable to the group.  Really only can be used by \p System in
-   * a very limited window of opportunity - after the user specifies variables 
-   * but before the system is initialized. 
+   * a very limited window of opportunity - after the user specifies variables
+   * but before the system is initialized.
    */
   void append (const std::string &var_name)
   { _names.push_back (var_name); }
 
 protected:
+  System *_sys;
   std::vector<std::string> _names;
 };
-  
+
 } // namespace libMesh
 
 #endif // LIBMESH_VARIABLE_H

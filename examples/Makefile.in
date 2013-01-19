@@ -241,6 +241,7 @@ DOT = @DOT@
 DOTPATH = @DOTPATH@
 DOXYGEN = @DOXYGEN@
 DSYMUTIL = @DSYMUTIL@
+DTK_MAKEFILE_EXPORT = @DTK_MAKEFILE_EXPORT@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -365,6 +366,9 @@ TECPLOT_INCLUDE = @TECPLOT_INCLUDE@
 TECPLOT_LIBRARY = @TECPLOT_LIBRARY@
 TETGEN_INCLUDE = @TETGEN_INCLUDE@
 TETGEN_LIBRARY = @TETGEN_LIBRARY@
+TPETRA_INCLUDES = @TPETRA_INCLUDES@
+TPETRA_LIBS = @TPETRA_LIBS@
+TPETRA_MAKEFILE_EXPORT = @TPETRA_MAKEFILE_EXPORT@
 TRIANGLE_INCLUDE = @TRIANGLE_INCLUDE@
 TRIANGLE_LIBRARY = @TRIANGLE_LIBRARY@
 TRILINOS_DIR = @TRILINOS_DIR@
@@ -475,6 +479,7 @@ SUBDIRS = \
 	eigenproblems/eigenproblems_ex3 \
 	fem_system/fem_system_ex1 \
 	fem_system/fem_system_ex2 \
+	solution_transfer/solution_transfer_ex1 \
 	miscellaneous/miscellaneous_ex1 \
 	miscellaneous/miscellaneous_ex2 \
 	miscellaneous/miscellaneous_ex3 \

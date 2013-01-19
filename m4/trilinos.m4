@@ -77,7 +77,7 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
                        [enableml=yes],
                        [AC_CHECK_HEADER([$withtrilinosdir/ml_include.h],
                                         [enableml=yes],
-                                        [AC_CHECK_HEADER([$withtrilinosdir/packages/ml/src/Include/ml_include.h],
+                                        [AC_CHECK_HEADER([$withtrilinosdir/packages/ml/src/ml_config.h],
                                                          [enableml=yes],
                                                          [enableml=no])
 					])
@@ -87,6 +87,44 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
           AC_DEFINE(HAVE_ML, 1,
                     [Flag indicating whether the library shall be compiled to use the Trilinos ML package])
           AC_MSG_RESULT(<<< Configuring library with ML support >>>)
+       fi
+
+       dnl ------------------------------------------------------
+       dnl TPetra
+       dnl ------------------------------------------------------
+       AC_CHECK_HEADER([$withtrilinosdir/include/Tpetra_include.h],
+                       [enabletpetra=yes],
+                       [AC_CHECK_HEADER([$withtrilinosdir/Tpetra_include.h],
+                                        [enabletpetra=yes],
+                                        [AC_CHECK_HEADER([$withtrilinosdir/packages/tpetra/src/Tpetra_config.h],
+                                                         [enabletpetra=yes],
+                                                         [enabletpetra=no])
+					])
+		       ])
+                     
+       if test "$enabletpetra" != no ; then
+          AC_DEFINE(HAVE_TPETRA, 1,
+                    [Flag indicating whether the library shall be compiled to use the Trilinos TPetra package])
+          AC_MSG_RESULT(<<< Configuring library with TPetra support >>>)
+       fi
+
+       dnl ------------------------------------------------------
+       dnl DTK
+       dnl ------------------------------------------------------
+       AC_CHECK_HEADER([$withtrilinosdir/include/DataTransferKit_config.hpp],
+                       [enabledtk=yes],
+                       [AC_CHECK_HEADER([$withtrilinosdir/DataTransferKit_config.hpp],
+                                        [enabledtk=yes],
+                                        [AC_CHECK_HEADER([$withtrilinosdir/DataTransferKit/src/DataTransferKit_config.hpp],
+                                                         [enabledtk=yes],
+                                                         [enabledtk=no])
+					])
+		       ])
+                     
+       if test "$enabledtk" != no ; then
+          AC_DEFINE(HAVE_DTK, 1,
+                    [Flag indicating whether the library shall be compiled to use the Trilinos DTK nonlinear solver])
+          AC_MSG_RESULT(<<< Configuring library with DTK support >>>)
        fi
     fi
   else
@@ -187,6 +225,8 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
   else
     enablenox=no
   fi
+
+
   
   dnl ML
   AC_ARG_WITH(ml,
@@ -213,11 +253,69 @@ AC_DEFUN([CONFIGURE_TRILINOS_9],
     enableml=no
   fi
 
+  dnl Tpetra
+  AC_ARG_WITH(tpetra,
+              AC_HELP_STRING([--with-tpetra=PATH],[Specify the path to Tpetra installation]),
+              withtpetradir=$withval,
+              withtpetradir=$TRILINOS_DIR)
+
+  if test "$withtpetradir" != no ; then
+    if (test -r $withtpetradir/include/Makefile.export.Tpetra) ; then
+      TPETRA_MAKEFILE_EXPORT=$withtpetradir/include/Makefile.export.Tpetra
+    elif (test -r $withtpetradir/packages/tpetra/Makefile.export.Tpetra) ; then
+      TPETRA_MAKEFILE_EXPORT=$withtpetradir/packages/tpetra/Makefile.export.Tpetra
+    else
+      enabletpetra=no
+    fi
+
+    if test "$enabletpetra" != no ; then
+       enabletpetra=yes
+       AC_DEFINE(HAVE_TPETRA, 1,
+                 [Flag indicating whether the library shall be compiled to use the Tpetra solver collection])
+       AC_MSG_RESULT(<<< Configuring library with Tpetra support >>>)
+    fi
+  else
+    enabletpetra=no
+  fi
+
+
+
+  dnl DTK
+  AC_ARG_WITH(dtk,
+              AC_HELP_STRING([--with-dtk=PATH],[Specify the path to Dtk installation]),
+              withdtkdir=$withval,
+              withdtkdir=$TRILINOS_DIR)
+
+  if test "$withdtkdir" != no ; then
+    if (test -r $withdtkdir/include/Makefile.export.DataTransferKit) ; then
+      DTK_MAKEFILE_EXPORT=$withdtkdir/include/Makefile.export.Makefile.export.DataTransferKit
+    elif (test -r $withdtkdir/DataTransferKit/Makefile.export.Makefile.export.DataTransferKit) ; then
+      DTK_MAKEFILE_EXPORT=$withdtkdir/packages/dtk/Makefile.export.Makefile.export.DataTransferKit
+    else
+      enabledtk=no
+    fi
+
+    if test "$enabledtk" != no ; then
+       enabledtk=yes
+       AC_DEFINE(HAVE_DTK, 1,
+                 [Flag indicating whether the library shall be compiled to use the DataTransferKit])
+       AC_MSG_RESULT(<<< Configuring library with DTK support >>>)
+    fi
+  else
+    enabledtk=no
+  fi
+
+
+
   AC_SUBST(AZTECOO_MAKEFILE_EXPORT)
 
   AC_SUBST(NOX_MAKEFILE_EXPORT)
 
   AC_SUBST(ML_MAKEFILE_EXPORT)
+
+  AC_SUBST(TPETRA_MAKEFILE_EXPORT)
+
+  AC_SUBST(DTK_MAKEFILE_EXPORT)
 
   if test "x$enableml" = xyes -o "x$enableaztecoo" = xyes -o "x$enablenox" = xyes; then
     enabletrilinos9=yes
@@ -298,13 +396,38 @@ EOF
   fi
 
 
+
+  # 
+  # Tpetra
+  if (test $enabletpetra != no); then
+    cat <<EOF >Makefile_config_trilinos
+include $TPETRA_MAKEFILE_EXPORT
+echo_libs:
+	@echo \$(TPETRA_LIBS)
+
+echo_include:
+	@echo \$(TPETRA_INCLUDES)
+EOF
+
+    #echo "Makefile_config_trilinos="
+    #cat Makefile_config_trilinos
+    TPETRA_INCLUDES=`make -sf Makefile_config_trilinos echo_include`
+    TPETRA_LIBS=`make -sf Makefile_config_trilinos echo_libs`
+
+    #echo TPETRA_LIBS=$TPETRA_LIBS
+    #echo TPETRA_INCLUDES=$TPETRA_INCLUDES
+
+    rm -f Makefile_config_trilinos
+  fi
+
   AC_SUBST(AZTECOO_LIBS)
   AC_SUBST(AZTECOO_INCLUDES)
   AC_SUBST(NOX_LIBS)
   AC_SUBST(NOX_INCLUDES)
   AC_SUBST(ML_LIBS)
   AC_SUBST(ML_INCLUDES)
-
+  AC_SUBST(TPETRA_LIBS)
+  AC_SUBST(TPETRA_INCLUDES)
 ])
 dnl -------------------------------------------------------------
 
