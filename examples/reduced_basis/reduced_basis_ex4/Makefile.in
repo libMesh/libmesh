@@ -71,7 +71,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_tls.m4 $(top_srcdir)/m4/backtrace.m4 \
 	$(top_srcdir)/m4/boost.m4 $(top_srcdir)/m4/compiler.m4 \
 	$(top_srcdir)/m4/config_environment.m4 \
-	$(top_srcdir)/m4/config_summary.m4 $(top_srcdir)/m4/cppunit.m4 \
+	$(top_srcdir)/m4/config_summary.m4 \
+	$(top_srcdir)/m4/coverage.m4 $(top_srcdir)/m4/cppunit.m4 \
 	$(top_srcdir)/m4/demangle.m4 $(top_srcdir)/m4/eigen.m4 \
 	$(top_srcdir)/m4/exodus.m4 $(top_srcdir)/m4/feexcept.m4 \
 	$(top_srcdir)/m4/fparser.m4 $(top_srcdir)/m4/glpk.m4 \
@@ -368,6 +369,7 @@ FGREP = @FGREP@
 FLIBS = @FLIBS@
 FPARSER_INCLUDE = @FPARSER_INCLUDE@
 FPARSER_LIBRARY = @FPARSER_LIBRARY@
+GCOV_FLAGS = @GCOV_FLAGS@
 GIT_REVISION = @GIT_REVISION@
 GLPK_INCLUDE = @GLPK_INCLUDE@
 GLPK_LIBRARY = @GLPK_LIBRARY@
@@ -378,6 +380,7 @@ GXX_VERSION = @GXX_VERSION@
 GZSTREAM_INCLUDE = @GZSTREAM_INCLUDE@
 GZSTREAM_LIB = @GZSTREAM_LIB@
 HAVE_DOT = @HAVE_DOT@
+HAVE_GCOV_TOOLS = @HAVE_GCOV_TOOLS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -515,6 +518,7 @@ dvidir = @dvidir@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 exec_prefix = @exec_prefix@
 gitquery = @gitquery@
+have_gcov = @have_gcov@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@

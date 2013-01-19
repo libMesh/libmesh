@@ -94,6 +94,14 @@ AM_CONDITIONAL(LIBMESH_VPATH_BUILD, test x$libmesh_vpath_build = xyes)
 AC_LANG([C++])
 
 
+#--------------------------                                                                  
+# Checks for code coverage                                                                   
+#-------------------------                                                                   
+AX_CODE_COVERAGE
+libmesh_CFLAGS="$GCOV_FLAGS $libmesh_CFLAGS"
+libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
+
+
 # --------------------------------------------------------------
 # Set our preferred compilers
 # --------------------------------------------------------------
@@ -246,7 +254,6 @@ LIBMESH_CORE_FEATURES
 # configure optional, external packages and libraries
 # --------------------------------------------------------------
 LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
-
 
 
 # Query configuration environment
