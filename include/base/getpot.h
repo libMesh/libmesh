@@ -43,6 +43,10 @@
 #include <string>
 #include <vector>
 
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+
 extern "C" {
 #include <stdarg.h> // --> va_list and friends
 #include <string.h> // --> strcmp, strncmp, strlen, strncpy
@@ -2122,6 +2126,170 @@ GetPot::_DBE_expand(const std::string& expr)
 	}
 	return A[0];
     }
+
+    // ${=func [expr...] } function evaluation
+    else if( expr.length() >= 2 &&
+	     expr.substr(0, 1) == "=" &&
+	     expr.substr(0, 2) != "==" ) {
+	size_t funcnamestart = expr.find_first_not_of(" \t", 1);
+	if (funcnamestart != std::string::npos) {
+            size_t funcnameend = expr.find_first_of(" \t",funcnamestart);
+	    std::string funcname = expr.substr(funcnamestart,
+					       funcnameend-funcnamestart);
+	    if (funcname == "log") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::log(arg));
+	    }
+	    else if (funcname == "log10") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::sin(arg));
+	    }
+	    else if (funcname == "sin") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::sin(arg));
+	    }
+	    else if (funcname == "cos") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::cos(arg));
+	    }
+	    else if (funcname == "tan") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::tan(arg));
+	    }
+	    else if (funcname == "asin") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::asin(arg));
+	    }
+	    else if (funcname == "acos") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::acos(arg));
+	    }
+	    else if (funcname == "atan") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::atan(arg));
+	    }
+	    else if (funcname == "atan2") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 2);
+	        double arg1 = _convert_to_type(A[0], 0.0);
+	        double arg2 = _convert_to_type(A[1], 0.0);
+	        return _convert_from_type(std::atan2(arg1, arg2));
+	    }
+	    else if (funcname == "sinh") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::sinh(arg));
+	    }
+	    else if (funcname == "cosh") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::cosh(arg));
+	    }
+	    else if (funcname == "tanh") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::tanh(arg));
+	    }
+	    else if (funcname == "sqrt") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::sqrt(arg));
+	    }
+	    else if (funcname == "abs") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::abs(arg));
+	    }
+	    else if (funcname == "max") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        STRING_VECTOR::const_iterator it = A.begin();
+	        double result = _convert_to_type(*it++, 0.0);
+	        for(; it != A.end(); ++it)
+	            result = std::max(result, _convert_to_type(*it, 0.0));
+	        return _convert_from_type(result);
+	    }
+	    else if (funcname == "min") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        STRING_VECTOR::const_iterator it = A.begin();
+	        double result = _convert_to_type(*it++, 0.0);
+	        for(; it != A.end(); ++it)
+	            result = std::min(result, _convert_to_type(*it, 0.0));
+	        return _convert_from_type(result);
+	    }
+	    else if (funcname == "ceil") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::ceil(arg));
+	    }
+	    else if (funcname == "floor") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        double arg = _convert_to_type(A[0], 0.0);
+	        return _convert_from_type(std::floor(arg));
+	    }
+	    else if (funcname == "fmod") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 2);
+	        double arg1 = _convert_to_type(A[0], 0.0);
+	        double arg2 = _convert_to_type(A[1], 0.0);
+	        return _convert_from_type(std::fmod(arg1, arg2));
+	    }
+	    else if (funcname == "srand") {
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+	        unsigned int arg = _convert_to_type(A[0], 0u);
+		std::srand(arg);
+	        return A[0];
+	    }
+	    // ${=rand range} with default range==RAND_MAX
+	    else if (funcname == "rand") {
+                if (funcnameend >= expr.length() ||
+                    expr.find_first_not_of(" \t", funcnameend) == std::string::npos)
+	          return _convert_from_type(std::rand());
+
+	        STRING_VECTOR A =
+                  _DBE_get_expr_list(expr.substr(funcnameend), 1);
+		unsigned int range = _convert_to_type(A[0],0u);
+		if (!range)
+	          return _convert_from_type(0);
+		const unsigned int x = (RAND_MAX + 1u) / range;
+		const unsigned int y = x * range;
+		unsigned int returnval;
+		do {
+			returnval = rand();
+		} while(returnval >= y);
+		return _convert_from_type(returnval / x);
+	    }
+	    else if (funcname == "time") {
+	        return _convert_from_type(std::time(NULL));
+	    }
+	}
+    }
+
     // ${+ ...}, ${- ...}, ${* ...}, ${/ ...} expressions
     else if( expr[0] == '+' ) {
 	STRING_VECTOR A = _DBE_get_expr_list(expr.substr(1), 2);
