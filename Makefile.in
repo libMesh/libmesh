@@ -94,6 +94,7 @@ bin_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_4) $(am__EXEEXT_6)
 ###########################################################
 # Examples
 @LIBMESH_ENABLE_EXAMPLES_TRUE@am__append_11 = examples
+@CODE_COVERAGE_ENABLED_TRUE@am__append_12 = src/apps/*.gcda src/apps/*.gcno
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -4572,7 +4573,7 @@ lib_LTLIBRARIES = $(am__append_2) $(am__append_3) $(am__append_4) \
 @LIBMESH_OPROF_MODE_TRUE@libmesh_oprof_la_CFLAGS = $(CFLAGS_OPROF)
 @LIBMESH_OPROF_MODE_TRUE@libmesh_oprof_la_LIBADD = contrib/libcontrib_oprof.la $(LIBS)
 bin_SCRIPTS = # empty, append below
-CLEANFILES = # empty, append below
+CLEANFILES = $(am__append_12)
 
 ###########################################################
 # Utility programs

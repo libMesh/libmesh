@@ -519,6 +519,11 @@ EXTRA_DIST = $(data_DATA) ../contrib/bin/test_installed_examples.sh \
 #bindir=@bindir@/@host@_@METHOD@
 #libdir=@libdir@/@host@_@METHOD@
 pkgconfigdir = $(libdir)/pkgconfig
+
+######################################################################
+#
+# Don't leave code coverage outputs lying around
+@CODE_COVERAGE_ENABLED_TRUE@CLEANFILES = */*/*.gcda */*/*.gcno
 all: all-recursive
 
 .SUFFIXES:
@@ -791,6 +796,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)

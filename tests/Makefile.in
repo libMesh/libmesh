@@ -638,6 +638,11 @@ unit_tests_sources = \
 @LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
 @LIBMESH_OPROF_MODE_TRUE@unit_tests_oprof_LDADD = $(top_builddir)/libmesh_oprof.la
 TESTS = $(check_PROGRAMS)
+
+######################################################################
+#
+# Don't leave code coverage outputs lying around
+@CODE_COVERAGE_ENABLED_TRUE@CLEANFILES = */*.gcda */*.gcno
 all: all-am
 
 .SUFFIXES:
@@ -1739,6 +1744,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)

@@ -96,3 +96,11 @@ doc:
 	  cp *.php $(abs_top_srcdir)/doc/html ; \
 	  cd - ; \
 	done
+
+######################################################################
+#
+# Don't leave code coverage outputs lying around
+if CODE_COVERAGE_ENABLED
+  CLEANFILES = */*/*.gcda */*/*.gcno
+endif
+

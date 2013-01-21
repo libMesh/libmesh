@@ -484,4 +484,6 @@ lcov-reset:
 
 coverage: lcov-reset check lcov-report
 
+CLEANFILES += src/apps/*.gcda src/apps/*.gcno
+
 endif

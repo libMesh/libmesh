@@ -68,3 +68,11 @@ if LIBMESH_OPROF_MODE
 endif
 
 TESTS = $(check_PROGRAMS)
+
+######################################################################
+#
+# Don't leave code coverage outputs lying around
+if CODE_COVERAGE_ENABLED
+  CLEANFILES = */*.gcda */*.gcno
+endif
+
