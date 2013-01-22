@@ -32,6 +32,19 @@ namespace libMesh
 {
 
 /**
+ * Functor for use as callback in solve of newton solver.
+ */
+class LinearSolutionMonitor {
+public:
+	virtual void operator() (const NumericVector<Number>& delta_u, const double &norm_delta_u,
+			const NumericVector<Number>& u, const double &norm_u) = 0;
+	virtual ~LinearSolutionMonitor();
+};
+
+inline LinearSolutionMonitor::~LinearSolutionMonitor() {}
+
+
+/**
  * This class defines a solver which uses the default
  * libMesh linear solver in a quasiNewton method to handle a
  * DifferentiableSystem
@@ -118,6 +131,11 @@ public:
    * defaults to 1e-3) times the norm of the current nonlinear residual
    */
   Real linear_tolerance_multiplier;
+
+  /**
+   * Pointer to functor which is called right after each linear solve
+   */
+  AutoPtr<LinearSolutionMonitor> linear_solution_monitor;
 
 protected:
 
