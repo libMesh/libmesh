@@ -328,7 +328,13 @@ public:
   {
     libmesh_assert_greater_equal (power, 2);
   }
-  
+
+  /**
+   * Clears all internal data structures and restores to a
+   * pristine state.
+   */
+  virtual void clear();
+
   /**
    * Interpolate source data at target points.
    * Pure virtual, must be overriden in derived classes.
