@@ -379,6 +379,12 @@ unsigned int NewtonSolver::solve()
       newton_iterate.add (-1., linear_solution);
       newton_iterate.close();
 
+      if (this->linear_solution_monitor.get()) {
+          // Compute the l2 norm of the whole solution
+          norm_total = newton_iterate.l2_norm();
+    	  (*this->linear_solution_monitor)(linear_solution, norm_delta, newton_iterate, norm_total);
+      }
+
       // Check residual with full Newton step, if that's useful for determining
       // whether to line search, whether to quit early, or whether to die after
       // hitting our max iteration count
