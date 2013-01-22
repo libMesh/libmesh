@@ -78,9 +78,16 @@ contribbindir      = $(prefix)/contrib/bin
 contribbin_SCRIPTS = contrib/bin/make_dependencies.pl libtool
 EXTRA_DIST        += contrib/bin/make_dependencies.pl
 
-# when doing 'make install, symlik etc/libmesh/Make.common
+# Support for libmesh-config in $(exec_prefix)/bin
+libmesh_configdir      = $(exec_prefix)/bin
+libmesh_config_SCRIPTS = contrib/bin/libmesh-config
+
+# when doing 'make install', symlik etc/libmesh/Make.common
+# when doing 'make install', update libmesh_config
 install-data-hook:
 	cd $(DESTDIR)$(prefix) && rm -f Make.common && $(LN_S) etc/libmesh/Make.common Make.common
+	cat $(DESTDIR)$(libmesh_configdir)/libmesh-config | $(SED) "s/has_been_installed=no/has_been_installed=yes/g" > $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed
+	mv $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed $(DESTDIR)$(libmesh_configdir)/libmesh-config
 
 # Additional files to be deleted by 'make distclean'
 # _configs.sed seems to be leftover by prefix_config
@@ -386,11 +393,6 @@ endif
 if LIBMESH_DBG_MODE
   bin_PROGRAMS += $(dbg_programs)
 endif
-
-
-# Support for libmesh-config in $(exec_prefix)/bin
-libmesh_configdir      = $(exec_prefix)/bin
-libmesh_config_SCRIPTS = contrib/bin/libmesh-config
 
 ###########################################################
 # Examples
