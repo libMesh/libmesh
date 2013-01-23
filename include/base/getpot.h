@@ -414,6 +414,7 @@ private:
     inline const std::string  _get_next_token(std::istream& istr);
     inline const std::string  _get_string(std::istream& istr);
     inline const std::string  _get_until_closing_bracket(std::istream& istr);
+    inline const std::string  _get_until_closing_square_bracket(std::istream& istr);
 
     inline STRING_VECTOR      _read_in_stream(std::istream& istr);
     inline STRING_VECTOR      _read_in_file(const std::string& FileName);
@@ -540,10 +541,12 @@ GetPot::parse_command_line(const int argc_, char ** argv_,
 
     // -- make an internal copy of the argument list:
     STRING_VECTOR _apriori_argv;
-    // -- for the sake of clarity: we do want to include the first argument in the argument vector !
-    //    it will not be a nominus argument, though. This gives us a minimun vector size of one
-    //    which facilitates error checking in many functions. Also the user will be able to
-    //    retrieve the name of his application by "get[0]"
+    // -- for the sake of clarity: we do want to include the first
+    //    argument of the first parsing source in the argument vector!
+    //    it will not be a nominus argument, though. This gives us a
+    //    minimum vector size of one which facilitates error checking
+    //    in many functions. Also the user will be able to retrieve
+    //    the name of his application or input file by "get[0]"
     _apriori_argv.push_back(std::string(argv_[0]));
     int i=1;
     for(; i<argc_; i++) {
@@ -630,8 +633,12 @@ GetPot::parse_input_file(const std::string& FileName,
     _field_separator = FieldSeparator;
 
     STRING_VECTOR _apriori_argv;
-    // -- file name is element of argument vector, however, it is not parsed for
-    //    variable assignments or nominuses.
+    // -- the first element of the argument vector stores the name of
+    //    the first parsing source; however, this element is not
+    //    parsed for variable assignments or nominuses.
+    //
+    //    Regardless, we don't add more than one name to the argument
+    //    vector.
     _apriori_argv.push_back(FileName);
 
     STRING_VECTOR args = _read_in_file(FileName.c_str());
@@ -790,34 +797,49 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 
     section = "";
 
-    // -- do not parse the first argument, so that it is not interpreted a s a nominus or so.
-    argv.push_back(*it);
-    it++;
+    // -- do not parse the first argument, so that this parsing source
+    // name is not interpreted a s a nominus or so.  If we already
+    // have parsed arguments, don't bother adding another parsing
+    // source name
+    if (argv.empty())
+      argv.push_back(*it);
+    ++it;
 
     // -- loop over remaining arguments
-    unsigned i=1;
-    for(; it != ARGV.end(); ++it, ++i) {
+    for(; it != ARGV.end(); ++it) {
 	std::string arg = *it;
 
 	if( arg.length() == 0 ) continue;
 
-	// -- [section] labels
+	// -- [section] labels and [include file] directives
 	if( arg.length() > 1 && arg[0] == '[' && arg[arg.length()-1] == ']' ) {
 
-	    // (*) sections are considered 'requested arguments'
-	    if( request_recording_f ) {
-                // Get a lock before touching anything mutable
-                SCOPED_MUTEX;
+            // Is this an include file directive?
+            std::size_t include_pos = arg.find("include ", 1);
+            if (include_pos != std::string::npos) {
 
-                _requested_arguments.insert(arg);
+	        const std::string includefile =
+                  _DBE_expand_string(arg.substr(9, arg.length()-9-include_pos));
+
+                this->parse_input_file
+                  (includefile, _comment_start, _comment_end, _field_separator);
+            } else {
+
+	        // (*) sections are considered 'requested arguments'
+	        if( request_recording_f ) {
+                    // Get a lock before touching anything mutable
+                    SCOPED_MUTEX;
+
+                    _requested_arguments.insert(arg);
+                }
+
+	        const std::string Name = _DBE_expand_string(arg.substr(1, arg.length()-2));
+	        section = _process_section_label(Name, section_stack);
+	        // new section --> append to list of sections
+	        if( find(section_list.begin(), section_list.end(), section) == section_list.end() )
+		    if( section.length() != 0 ) section_list.push_back(section);
+	        argv.push_back(arg);
             }
-
-	    const std::string Name = _DBE_expand_string(arg.substr(1, arg.length()-2));
-	    section = _process_section_label(Name, section_stack);
-	    // new section --> append to list of sections
-	    if( find(section_list.begin(), section_list.end(), section) == section_list.end() )
-		if( section.length() != 0 ) section_list.push_back(section);
-	    argv.push_back(arg);
 	}
 	else {
 	    arg = section + _DBE_expand_string(arg);
@@ -825,7 +847,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 	}
 
 	// -- separate array for nominus arguments
-	if( arg[0] != '-' ) idx_nominus.push_back(unsigned(i));
+	if( arg[0] != '-' ) idx_nominus.push_back(argv.size()-1);
 
 	// -- variables: does arg contain a '=' operator ?
 	const char* p = arg.c_str();
@@ -1010,6 +1032,10 @@ GetPot::_get_next_token(std::istream& istr)
 	    token += '{' + _get_until_closing_bracket(istr);
 	    continue;
 	}
+	else if( tmp == '[') {
+	    token += '[' + _get_until_closing_square_bracket(istr);
+	    continue;
+	}
 	else if( tmp == '$' && last_letter == '\\') {
 	    token += tmp; tmp = 0;  //  so that last_letter will become = 0, not '$';
 	    continue;
@@ -1056,6 +1082,28 @@ GetPot::_get_until_closing_bracket(std::istream& istr)
 	    if( brackets == 0) return str + '}';
 	    else if( tmp == '\\' && last_letter != '\\')
 		continue;  // do not append an unbackslashed backslash
+	}
+	str += tmp;
+    }
+}
+
+
+inline const std::string
+GetPot::_get_until_closing_square_bracket(std::istream& istr)
+    // parse input until next matching ]
+{
+    std::string str = "";
+    int    tmp = 0;
+    int    brackets = 1;
+    while(1 + 1 == 2) {
+	tmp = istr.get();
+	if( tmp == EOF) return str;
+	else if( tmp == '[') {
+            brackets += 1;
+        }
+	else if( tmp == ']') {
+	    brackets -= 1;
+	    if( brackets == 0) return str + ']';
 	}
 	str += tmp;
     }

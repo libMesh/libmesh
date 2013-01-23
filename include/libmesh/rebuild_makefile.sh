@@ -76,6 +76,12 @@ exodusII_ext.h: \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII_ext.h
   BUILT_SOURCES  += exodusII_ext.h
   DISTCLEANFILES += exodusII_ext.h
 
+netcdf.h: \$(top_srcdir)/contrib/netcdf/Lib/netcdf.h
+	\$(AM_V_GEN)\$(LN_S) \$(top_srcdir)/contrib/netcdf/Lib/netcdf.h netcdf.h
+
+  BUILT_SOURCES  += netcdf.h
+  DISTCLEANFILES += netcdf.h
+
 endif
 
 EOF
@@ -103,8 +109,8 @@ cat <<EOF >> Makefile.am
 EOF
 for header_with_path in $headers $specializations ; do  
     header=`basename $header_with_path`
-    source=`echo $header_with_path | sed 's/../$(top_srcdir)\/include/' -`
-    #echo $source
+    source=`echo $header_with_path | sed 's/../$(top_srcdir)\/include/'`
+    #echo "source = $source"
     cat <<EOF >> Makefile.am
 $header: $source
 	\$(AM_V_GEN)\$(LN_S) $source $header
