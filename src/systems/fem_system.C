@@ -27,6 +27,8 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_algebra.h"
+#include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/time_solver.h"
@@ -657,19 +659,7 @@ void FEMSystem::mesh_position_set()
   if (_mesh_sys != this)
     return;
 
-  const MeshBase& mesh = this->get_mesh();
-
-  // This code won't work on a parallelized mesh yet -
-  // it won't get ancestor elements right.
-  libmesh_assert(mesh.is_serial());
-
-  // In fact it won't work in parallel at all yet - we don't have
-  // current_solution() data for non-ghost elements.  That's going to
-  // be put on hold until we're debugged in serial and until I figure
-  // out how to better abstract the "ask other procs for their local
-  // data, respond to others' queries, work on my query's results"
-  // pattern that we seem to be using a lot.
-  libmesh_assert_equal_to (libMesh::n_processors(), 1);
+  MeshBase& mesh = this->get_mesh();
 
   AutoPtr<DiffContext> con = this->build_context();
   FEMContext &_femcontext = libmesh_cast_ref<FEMContext&>(*con);
@@ -677,9 +667,9 @@ void FEMSystem::mesh_position_set()
 
   // Move every mesh element we can
   MeshBase::const_element_iterator el =
-    mesh.active_elements_begin();
+    mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el =
-    mesh.active_elements_end();
+    mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
     {
@@ -696,6 +686,14 @@ void FEMSystem::mesh_position_set()
 
       _femcontext.elem_position_set(1.);
     }
+
+  // We've now got positions set on all local nodes (and some
+  // semilocal nodes); let's request positions for non-local nodes
+  // from their processors.
+
+  SyncNodalPositions sync_object(mesh);
+  Parallel::sync_dofobject_data_by_id
+    (mesh.nodes_begin(), mesh.nodes_end(), sync_object);
 }
 
 
@@ -896,7 +894,17 @@ void FEMSystem::numerical_side_jacobian (FEMContext &context)
 
 AutoPtr<DiffContext> FEMSystem::build_context ()
 {
-  AutoPtr<DiffContext> ap(new FEMContext(*this));
+  FEMContext* fc = new FEMContext(*this);
+
+  AutoPtr<DiffContext> ap(fc);
+
+  FEMPhysics* phys = libmesh_cast_ptr<FEMPhysics*>(this->get_physics());
+
+  // If we are solving a moving mesh problem, tell that to the Context
+  fc->set_mesh_system(phys->get_mesh_system());
+  fc->set_mesh_x_var(phys->get_mesh_x_var());
+  fc->set_mesh_y_var(phys->get_mesh_y_var());
+  fc->set_mesh_z_var(phys->get_mesh_z_var());
 
   ap->set_deltat_pointer( &deltat );
 
@@ -979,7 +987,7 @@ void FEMSystem::mesh_position_get()
   this->solution->close();
 
   // And make sure the current_local_solution is up to date too
-  this->update();
+  this->System::update();
 }
 
 } // namespace libMesh
