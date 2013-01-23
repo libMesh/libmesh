@@ -160,7 +160,14 @@ public:
    * that if no external Physics object is attached, the default is
    * this.
    */
-  const DifferentiablePhysics* get_physics()
+  const DifferentiablePhysics* get_physics() const
+  { return this->_diff_physics; }
+
+  /**
+   * Returns reference to DifferentiablePhysics object. Note that if
+   * no external Physics object is attached, the default is this.
+   */
+  DifferentiablePhysics* get_physics()
   { return this->_diff_physics; }
 
   /**
@@ -174,7 +181,14 @@ public:
    * Returns const reference to DifferentiableQoI object. Note that if no external
    * QoI object is attached, the default is this.
    */
-  const DifferentiableQoI* get_qoi()
+  const DifferentiableQoI* get_qoi() const
+  { return this->diff_qoi; }
+
+  /**
+   * Returns reference to DifferentiableQoI object. Note that if no external
+   * QoI object is attached, the default is this.
+   */
+  DifferentiableQoI* get_qoi()
   { return this->diff_qoi; }
 
   /**
