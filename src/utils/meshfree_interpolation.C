@@ -251,12 +251,27 @@ namespace libMesh
 
 
   template <unsigned int KDDim>
+  void InverseDistanceInterpolation<KDDim>::clear()
+  {
+#ifdef LIBMESH_HAVE_NANOFLANN
+    // Delete the KD Tree and start fresh
+    if (_kd_tree.get())
+      _kd_tree.reset (NULL);
+#endif
+    
+    // Call  base class clear method
+    MeshfreeInterpolation::clear();
+  }
+
+
+
+  template <unsigned int KDDim>
   void InverseDistanceInterpolation<KDDim>::interpolate_field_data (const std::vector<std::string> &field_names,
 								    const std::vector<Point>  &tgt_pts,
 								    std::vector<Number> &tgt_vals) const
   {
     // forcibly initialize, if needed
-#if LIBMESH_HAVE_NANOFLANN
+#ifdef LIBMESH_HAVE_NANOFLANN
     if (_kd_tree.get() == NULL)
       const_cast<InverseDistanceInterpolation<KDDim>*>(this)->construct_kd_tree();
 #endif

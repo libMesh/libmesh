@@ -9,6 +9,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 legacyinclude=@enablelegacyincludepaths@
+builddir=@abs_top_builddir@
+has_been_installed=no
 
 #
 # Define the usage() function

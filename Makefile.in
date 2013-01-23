@@ -4163,6 +4163,10 @@ config_DATA = contrib/utils/Make.common \
 contribbindir = $(prefix)/contrib/bin
 contribbin_SCRIPTS = contrib/bin/make_dependencies.pl libtool
 
+# Support for libmesh-config in $(exec_prefix)/bin
+libmesh_configdir = $(exec_prefix)/bin
+libmesh_config_SCRIPTS = contrib/bin/libmesh-config
+
 # Additional files to be deleted by 'make distclean'
 # _configs.sed seems to be leftover by prefix_config
 DISTCLEANFILES = \
@@ -4747,10 +4751,6 @@ solution_components_dbg_SOURCES = src/apps/solution_components.C
 solution_components_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 solution_components_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 solution_components_dbg_LDADD = libmesh_dbg.la
-
-# Support for libmesh-config in $(exec_prefix)/bin
-libmesh_configdir = $(exec_prefix)/bin
-libmesh_config_SCRIPTS = contrib/bin/libmesh-config
 
 # -------------------------------------------
 # Optional support for code coverage analysis
@@ -26420,9 +26420,12 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
 	uninstall-nobase_dataDATA uninstall-pkgconfigDATA
 
 
-# when doing 'make install, symlik etc/libmesh/Make.common
+# when doing 'make install', symlik etc/libmesh/Make.common
+# when doing 'make install', update libmesh_config
 install-data-hook:
 	cd $(DESTDIR)$(prefix) && rm -f Make.common && $(LN_S) etc/libmesh/Make.common Make.common
+	cat $(DESTDIR)$(libmesh_configdir)/libmesh-config | $(SED) "s/has_been_installed=no/has_been_installed=yes/g" > $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed
+	mv $(DESTDIR)$(libmesh_configdir)/libmesh-config.installed $(DESTDIR)$(libmesh_configdir)/libmesh-config && chmod +x $(DESTDIR)$(libmesh_configdir)/libmesh-config
 
 #
 .PHONY: examples_doc doc svnexpand
@@ -26459,14 +26462,10 @@ upload_test:
 	rsync -nrltzve ssh --exclude '.svn' $(top_srcdir)/doc/latex/xda_format $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
 	chmod -R g-w $(top_builddir)/doc/html/* $(top_srcdir)/doc/html/* $(top_srcdir)/doc/latex/*/*
 
-# #
-# # Mark source files for SVN keyword expansion
-# svnexpand:
-# 	svn -R propset svn:keywords "Date Author Revision HeadURL Id" $(top_srcdir)/include $(top_srcdir)/src
-
 #
 # special things to do when running 'make dist'
 dist-hook:
+	rm -rf `find $(distdir) -name libmesh_config.h`
 	rm -rf `find $(distdir) -name .svn`
 
 #

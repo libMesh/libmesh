@@ -62,6 +62,22 @@ nanoflann.hpp: \$(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp
 
 endif
 
+if LIBMESH_ENABLE_EXODUS
+
+exodusII.h: \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII.h
+	\$(AM_V_GEN)\$(LN_S) \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII.h exodusII.h
+
+  BUILT_SOURCES  += exodusII.h
+  DISTCLEANFILES += exodusII.h
+
+exodusII_ext.h: \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII_ext.h
+	\$(AM_V_GEN)\$(LN_S) \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII_ext.h exodusII_ext.h
+
+  BUILT_SOURCES  += exodusII_ext.h
+  DISTCLEANFILES += exodusII_ext.h
+
+endif
+
 EOF
 
 
