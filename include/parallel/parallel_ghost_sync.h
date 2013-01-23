@@ -420,6 +420,33 @@ void sync_element_data_by_parent_id(MeshBase&,
 
 }
 
+
+// This struct can be created and passed to the
+// Parallel::sync_dofobject_data_by_id() function.
+struct SyncNodalPositions
+{
+  // The constructor.  You need a reference to the mesh where you will
+  // be setting/getting nodal positions.
+  explicit
+  SyncNodalPositions(MeshBase& m);
+
+  // The datum typedef is required of this functor, so that the
+  // Parallel::sync_dofobject_data_by_id() function can create e.g.
+  // std::vector<datum>.
+  typedef Point datum;
+
+  // First required interface.  This function must fill up the data vector for the
+  // ids specified in the ids vector.
+  void gather_data (const std::vector<unsigned int>& ids, std::vector<datum>& data);
+
+  // Second required interface.  This function must do something with the data in
+  // the data vector for the ids in the ids vector.
+  void act_on_data (const std::vector<unsigned int>& ids, std::vector<datum>& data);
+
+  MeshBase &mesh;
+};
+
+
 } // namespace libMesh
 
 #endif // LIBMESH_PARALLEL_GHOST_SYNC_H

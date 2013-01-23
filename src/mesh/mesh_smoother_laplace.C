@@ -32,45 +32,6 @@
 
 namespace libMesh
 {
-
-  // Anonymous namespace to hold functor that works with Roy's
-  // Parallel::sync_dofobject_data_by_id() utility.
-  namespace {
-
-    // This struct must be created and passed to the
-    // Parallel::sync_dofobject_data_by_id() function.  The member
-    // functions declared here are defined in an anonymous namespace
-    // at the end of this file to make it easier to read.
-    struct SyncNodalPositions
-    {
-      // The constructor.  You need a reference to the mesh where you will
-      // be setting/getting nodal positions.
-      explicit
-      SyncNodalPositions(MeshBase& m);
-
-      // The datum typedef is required of this functor, so that the
-      // Parallel::sync_dofobject_data_by_id() function can create e.g.
-      // std::vector<datum>.
-      typedef Point datum;
-
-      // First required interface.  This function must fill up the data vector for the
-      // ids specified in the ids vector.
-      void gather_data (const std::vector<unsigned int>& ids, std::vector<datum>& data);
-
-      // Second required interface.  This function must do something with the data in
-      // the data vector for the ids in the ids vector.
-      void act_on_data (const std::vector<unsigned int>& ids, std::vector<datum>& data);
-
-      // Data to be used by the SyncNodalPositions struct
-      MeshBase &mesh;
-    };
-
-  } // anonymous namespace
-
-
-
-
-
   // LaplaceMeshSmoother member functions
   LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh& mesh)
     : MeshSmoother(mesh),
@@ -433,63 +394,5 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out) const
 //      print_graph(graph_stream);
 //    }
   } // allgather_graph()
-
-
-
-
-  // Re-open anonymous namepsace, define functor functions
-  namespace {
-
-    SyncNodalPositions::SyncNodalPositions(MeshBase& m)
-      : mesh(m)
-    {}
-
-
-
-    void SyncNodalPositions::gather_data (const std::vector<unsigned int>& ids, std::vector<datum>& data)
-    {
-      data.resize(ids.size());
-
-      // Gather (x,y,z) data for all node IDs in the ids vector
-      for (unsigned i=0; i<ids.size(); ++i)
-	{
-	  // Look for this node in the mesh
-	  Node *node = mesh.node_ptr(ids[i]);
-
-	  if (node == NULL)
-	    {
-	      libMesh::err << "Error! Mesh returned a NULL node pointer in SyncNodalPosition::gather_data()." << std::endl;
-	      libmesh_error();
-	    }
-
-	  // Store this node's position in the data array.
-	  // This should call Point::op=
-	  data[i] = *node;
-	} // end for
-    } // gather_data()
-
-
-
-    void SyncNodalPositions::act_on_data (const std::vector<unsigned int>& ids, std::vector<datum>& data)
-    {
-      for (unsigned i=0; i<ids.size(); ++i)
-	{
-
-	  // Get a pointer to the node whose position is to be updated.
-	  Node* node = mesh.node_ptr(ids[i]);
-
-	  if (node == NULL)
-	    {
-	      libMesh::err << "Error! Mesh returned a NULL node pointer in SyncNodalPosition::act_on_data()." << std::endl;
-	      libmesh_error();
-	    }
-
-	  // Update this node's position.  Should call Point::op=
-	  *node = data[i];
-	} // end for
-    } // act_on_data()
-
-  } // anonymous namespace
-
 
 } // namespace libMesh

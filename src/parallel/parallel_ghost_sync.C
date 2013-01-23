@@ -1,0 +1,53 @@
+#include "libmesh/parallel_ghost_sync.h"
+
+
+SyncNodalPositions::SyncNodalPositions(MeshBase& m)
+  : mesh(m)
+{}
+
+
+
+void SyncNodalPositions::gather_data (const std::vector<unsigned int>& ids, std::vector<datum>& data)
+{
+  data.resize(ids.size());
+
+  // Gather (x,y,z) data for all node IDs in the ids vector
+  for (unsigned i=0; i<ids.size(); ++i)
+    {
+      // Look for this node in the mesh
+      Node *node = mesh.node_ptr(ids[i]);
+
+      if (node == NULL)
+        {
+          libMesh::err << "Error! Mesh returned a NULL node pointer in SyncNodalPosition::gather_data()." << std::endl;
+          libmesh_error();
+        }
+
+      // Store this node's position in the data array.
+      // This should call Point::op=
+      data[i] = *node;
+    } // end for
+} // gather_data()
+
+
+
+void SyncNodalPositions::act_on_data (const std::vector<unsigned int>& ids, std::vector<datum>& data)
+{
+  for (unsigned i=0; i<ids.size(); ++i)
+    {
+
+      // Get a pointer to the node whose position is to be updated.
+      Node* node = mesh.node_ptr(ids[i]);
+
+      if (node == NULL)
+        {
+          libMesh::err << "Error! Mesh returned a NULL node pointer in SyncNodalPosition::act_on_data()." << std::endl;
+          libmesh_error();
+        }
+
+      // Update this node's position.  Should call Point::op=
+      *node = data[i];
+    } // end for
+} // act_on_data()
+
+
