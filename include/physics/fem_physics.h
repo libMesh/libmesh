@@ -91,11 +91,17 @@ public:
   virtual void set_mesh_system(System* sys);
 
   /**
-   * Returns a reference to the system with variables corresponding to
+   * Returns a const reference to the system with variables corresponding to
    * mesh nodal coordinates, or NULL if the mesh is fixed.
    * Useful for ALE calculations.
    */
   const System* get_mesh_system() const;
+
+  /**
+   * Returns a reference to the system with variables corresponding to
+   * mesh nodal coordinates, or NULL if the mesh is fixed.
+   */
+  System* get_mesh_system();
 
   /**
    * Tells the FEMPhysics that variable \p var from the mesh system
@@ -240,6 +246,12 @@ void FEMPhysics::set_mesh_z_var (unsigned int var)
 
 inline
 const System* FEMPhysics::get_mesh_system() const
+{
+  return _mesh_sys;
+}
+
+inline
+System* FEMPhysics::get_mesh_system()
 {
   return _mesh_sys;
 }
