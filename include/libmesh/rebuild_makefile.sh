@@ -76,6 +76,12 @@ exodusII_ext.h: \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII_ext.h
   BUILT_SOURCES  += exodusII_ext.h
   DISTCLEANFILES += exodusII_ext.h
 
+netcdf.h: \$(top_srcdir)/contrib/netcdf/Lib/netcdf.h
+	\$(AM_V_GEN)\$(LN_S) \$(top_srcdir)/contrib/netcdf/Lib/netcdf.h netcdf.h
+
+  BUILT_SOURCES  += netcdf.h
+  DISTCLEANFILES += netcdf.h
+
 endif
 
 EOF
