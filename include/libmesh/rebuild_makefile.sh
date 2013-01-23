@@ -109,8 +109,8 @@ cat <<EOF >> Makefile.am
 EOF
 for header_with_path in $headers $specializations ; do  
     header=`basename $header_with_path`
-    source=`echo $header_with_path | sed 's/../$(top_srcdir)\/include/' -`
-    #echo $source
+    source=`echo $header_with_path | sed 's/../$(top_srcdir)\/include/'`
+    #echo "source = $source"
     cat <<EOF >> Makefile.am
 $header: $source
 	\$(AM_V_GEN)\$(LN_S) $source $header
