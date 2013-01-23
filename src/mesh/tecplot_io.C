@@ -59,7 +59,7 @@ namespace
     std::vector<int>   connData;
     //float* nodalData;
     //int*   connData;
-  private:
+    
     const unsigned int n_nodes;
     const unsigned int n_vars;
     const unsigned int n_cells;
@@ -252,18 +252,228 @@ void TecplotIO::write_binary (const std::string& fname,
 			      const std::vector<Number>* vec,
 			      const std::vector<std::string>* solution_names)
 {
+  //-----------------------------------------------------------
   // Call the ASCII output function if configure did not detect
   // the Tecplot binary API
 #ifndef LIBMESH_HAVE_TECPLOT_API
 
-    libMesh::err << "WARNING: Tecplot Binary files require the Tecplot API." << std::endl
-	          << "Continuing with ASCII output."
-	          << std::endl;
+  libMesh::err << "WARNING: Tecplot Binary files require the Tecplot API." << std::endl
+	       << "Continuing with ASCII output."
+	       << std::endl;
+  
+  if (libMesh::processor_id() == 0)
+    this->write_ascii (fname, vec, solution_names);
+  return;
 
-    if (libMesh::processor_id() == 0)
+
+  
+  //------------------------------------------------------------
+  // New binary formats, time aware and whatnot
+#elif defined(LIBMESH_HAVE_TECPLOT_API_112)
+  
+  // Get a constant reference to the mesh.
+  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+
+  // Tecplot binary output only good for dim=2,3
+  if (mesh.mesh_dimension() == 1)
+    {
       this->write_ascii (fname, vec, solution_names);
-    return;
 
+      return;
+    }
+
+  // Required variables
+  std::string tecplot_variable_names;
+  int
+    is_double =  0,
+    tec_debug =  0,
+    cell_type = (mesh.mesh_dimension()==2) ? 3 : 5; // FEQUADRILATERAL or FEBRICK, respectively
+
+  // Build a string containing all the variable names to pass to Tecplot
+  {
+    tecplot_variable_names += "x, y, z";
+
+    if (solution_names != NULL)
+      {
+	for (unsigned int name=0; name<solution_names->size(); name++)
+	  {
+#ifdef LIBMESH_USE_REAL_NUMBERS
+
+	    tecplot_variable_names += ", ";
+	    tecplot_variable_names += (*solution_names)[name];
+
+#else
+
+	    tecplot_variable_names += ", ";
+	    tecplot_variable_names += "r_";
+	    tecplot_variable_names += (*solution_names)[name];
+	    tecplot_variable_names += ", ";
+	    tecplot_variable_names += "i_";
+	    tecplot_variable_names += (*solution_names)[name];
+	    tecplot_variable_names += ", ";
+	    tecplot_variable_names += "a_";
+	    tecplot_variable_names += (*solution_names)[name];
+
+#endif
+	  }
+      }
+  }
+
+  // Instantiate a TecplotMacros interface.  In 2D the most nodes per
+  // face should be 4, in 3D it's 8.
+
+
+  TecplotMacros tm(mesh.n_nodes(),
+#ifdef LIBMESH_USE_REAL_NUMBERS
+		   (3 + ((solution_names == NULL) ? 0 : solution_names->size())),
+#else
+		   (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
+#endif
+		   mesh.n_active_sub_elem(),
+		   ((mesh.mesh_dimension() == 2) ? 4 : 8)
+		   );
+
+
+  // Copy the nodes and data to the TecplotMacros class. Note that we store
+  // everything as a float here since the eye doesn't require a double to
+  // understand what is going on
+  for (unsigned int v=0; v<mesh.n_nodes(); v++)
+    {
+      tm.nd(0,v) = static_cast<float>(mesh.point(v)(0));
+      tm.nd(1,v) = static_cast<float>(mesh.point(v)(1));
+      tm.nd(2,v) = static_cast<float>(mesh.point(v)(2));
+
+      if ((vec != NULL) &&
+	  (solution_names != NULL))
+	{
+	  const unsigned int n_vars = solution_names->size();
+
+	  for (unsigned int c=0; c<n_vars; c++)
+	    {
+#ifdef LIBMESH_USE_REAL_NUMBERS
+
+	      tm.nd((3+c),v)     = static_cast<float>((*vec)[v*n_vars + c]);
+#else
+	      tm.nd((3+3*c),v)   = static_cast<float>((*vec)[v*n_vars + c].real());
+	      tm.nd((3+3*c+1),v) = static_cast<float>((*vec)[v*n_vars + c].imag());
+	      tm.nd((3+3*c+2),v) = static_cast<float>(std::abs((*vec)[v*n_vars + c]));
+#endif
+	    }
+	}
+    }
+
+
+  // Copy the connectivity
+  {
+    unsigned int te = 0;
+
+//     const_active_elem_iterator       it (mesh.elements_begin());
+//     const const_active_elem_iterator end(mesh.elements_end());
+
+    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = mesh.active_elements_end();
+
+    for ( ; it != end; ++it)
+      {
+	std::vector<unsigned int> conn;
+	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	  {
+	    (*it)->connectivity(se, TECPLOT, conn);
+
+	    for (unsigned int node=0; node<conn.size(); node++)
+	      tm.cd(node,te) = conn[node];
+
+	    te++;
+	  }
+      }
+  }
+
+
+  // Ready to call the Tecplot API
+  {
+    int
+      ierr        = 0,
+      num_nodes   = static_cast<int>(mesh.n_nodes()),
+      num_cells   = static_cast<int>(mesh.n_active_sub_elem()),
+      file_type   = 0, // full
+      num_faces   = 0,
+      i_cell_max  = 0,
+      j_cell_max  = 0,
+      k_cell_max  = 0,
+      strand_id   = 1 + this->strand_offset(),
+      parent_zone = 0,
+      is_block    = 1,
+      num_face_connect   = 0,
+      face_neighbor_mode = 0,
+      tot_num_face_nodes = 0,
+      num_connect_boundary_faces = 0,
+      tot_num_boundary_connect   = 0,
+      share_connect_from_zone=0;
+
+    std::vector<int> passive_var_list (tm.n_vars+1, 0);
+      
+    ierr = TECINI112 (NULL,
+		      (char*) tecplot_variable_names.c_str(),
+		      (char*) fname.c_str(),
+		      (char*) ".",
+		      &file_type,
+		      &tec_debug,
+		      &is_double);
+
+    libmesh_assert_equal_to (ierr, 0);
+
+    ierr = TECZNE112 (NULL,
+		      &cell_type,
+		      &num_nodes,
+		      &num_cells,
+		      &num_faces,
+		      &i_cell_max,
+		      &j_cell_max,
+		      &k_cell_max,
+		      &_time,
+		      &strand_id,
+		      &parent_zone,
+		      &is_block,
+		      &num_face_connect,
+		      &face_neighbor_mode,
+		      &tot_num_face_nodes,
+		      &num_connect_boundary_faces,
+		      &tot_num_boundary_connect,
+		      &passive_var_list[0],
+		      NULL, // = all are node centered
+		      NULL, // = share_var_from_zone
+		      &share_connect_from_zone);
+
+    libmesh_assert_equal_to (ierr, 0);
+
+
+    int total =
+#ifdef LIBMESH_USE_REAL_NUMBERS
+      ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
+#else
+      ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
+#endif
+
+
+    ierr = TECDAT112 (&total,
+		      &tm.nodalData[0],
+		      &is_double);
+
+    libmesh_assert_equal_to (ierr, 0);
+
+    ierr = TECNOD112 (&tm.connData[0]);
+
+    libmesh_assert_equal_to (ierr, 0);
+
+    ierr = TECEND112 ();
+
+    libmesh_assert_equal_to (ierr, 0);
+  }
+
+
+  
+  //------------------------------------------------------------
+  // Legacy binary format
 #else
 
   // Get a constant reference to the mesh.

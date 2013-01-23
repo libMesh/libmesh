@@ -55,7 +55,8 @@ class TecplotIO : public MeshOutput<MeshBase>
    * output files.
    */
   explicit
-  TecplotIO (const MeshBase&, const bool binary=false);
+  TecplotIO (const MeshBase&, const bool binary=false,
+	     const Real time=0., const int strand_offset=0);
 
   /**
    * This method implements writing a mesh to a specified file.
@@ -76,6 +77,18 @@ class TecplotIO : public MeshOutput<MeshBase>
    */
   bool & binary ();
 
+  /**
+   * Solution time for transient data.
+   * Written to newer binary formats that are time-aware.
+   */
+  Real & time ();
+  
+  /**
+   * Solution time for transient data.
+   * Written to newer binary formats that are time-aware.
+   */
+  int & strand_offset ();
+  
  private:
 
   /**
@@ -105,6 +118,13 @@ class TecplotIO : public MeshOutput<MeshBase>
    * Flag to write binary data.
    */
   bool _binary;
+
+  /**
+   * Solution time.
+   */
+  Real _time;
+
+  int _strand_offset;
 };
 
 
@@ -112,9 +132,12 @@ class TecplotIO : public MeshOutput<MeshBase>
 // ------------------------------------------------------------
 // TecplotIO inline members
 inline
-TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary) :
+TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary, const Real time,
+		      const int strand_offset) :
   MeshOutput<MeshBase> (mesh),
-  _binary (binary)
+  _binary (binary),
+  _time (time),
+  _strand_offset (strand_offset)
 {
 }
 
@@ -124,6 +147,22 @@ inline
 bool & TecplotIO::binary ()
 {
   return _binary;
+}
+
+
+
+inline
+Real & TecplotIO::time ()
+{
+  return _time;
+}
+
+
+
+inline
+int & TecplotIO::strand_offset ()
+{
+  return _strand_offset;
 }
 
 
