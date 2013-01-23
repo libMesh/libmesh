@@ -898,7 +898,9 @@ AutoPtr<DiffContext> FEMSystem::build_context ()
 
   AutoPtr<DiffContext> ap(fc);
 
-  FEMPhysics* phys = libmesh_cast_ptr<FEMPhysics*>(this->get_physics());
+  FEMPhysics* phys = dynamic_cast<FEMPhysics*>(this->get_physics());
+
+  libmesh_assert (phys);
 
   // If we are solving a moving mesh problem, tell that to the Context
   fc->set_mesh_system(phys->get_mesh_system());
