@@ -414,6 +414,7 @@ private:
     inline const std::string  _get_next_token(std::istream& istr);
     inline const std::string  _get_string(std::istream& istr);
     inline const std::string  _get_until_closing_bracket(std::istream& istr);
+    inline const std::string  _get_until_closing_square_bracket(std::istream& istr);
 
     inline STRING_VECTOR      _read_in_stream(std::istream& istr);
     inline STRING_VECTOR      _read_in_file(const std::string& FileName);
@@ -1010,6 +1011,10 @@ GetPot::_get_next_token(std::istream& istr)
 	    token += '{' + _get_until_closing_bracket(istr);
 	    continue;
 	}
+	else if( tmp == '[') {
+	    token += '[' + _get_until_closing_square_bracket(istr);
+	    continue;
+	}
 	else if( tmp == '$' && last_letter == '\\') {
 	    token += tmp; tmp = 0;  //  so that last_letter will become = 0, not '$';
 	    continue;
@@ -1056,6 +1061,28 @@ GetPot::_get_until_closing_bracket(std::istream& istr)
 	    if( brackets == 0) return str + '}';
 	    else if( tmp == '\\' && last_letter != '\\')
 		continue;  // do not append an unbackslashed backslash
+	}
+	str += tmp;
+    }
+}
+
+
+inline const std::string
+GetPot::_get_until_closing_square_bracket(std::istream& istr)
+    // parse input until next matching ]
+{
+    std::string str = "";
+    int    tmp = 0;
+    int    brackets = 1;
+    while(1 + 1 == 2) {
+	tmp = istr.get();
+	if( tmp == EOF) return str;
+	else if( tmp == '[') {
+            brackets += 1;
+        }
+	else if( tmp == ']') {
+	    brackets -= 1;
+	    if( brackets == 0) return str + ']';
 	}
 	str += tmp;
     }
