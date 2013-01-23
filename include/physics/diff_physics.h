@@ -22,6 +22,7 @@
 #define LIBMESH_DIFF_PHYSICS_H
 
 // Local Includes
+#include "libmesh/libmesh.h"
 #include "libmesh/auto_ptr.h"
 #include "libmesh/diff_context.h"
 

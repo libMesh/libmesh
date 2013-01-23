@@ -53,7 +53,7 @@ public:
    * Constructor.
    */
   FEMPhysics () :
-    DifferentiablePhysics(),
+    DifferentiablePhysics()
     {}
 
   /**
