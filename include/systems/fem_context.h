@@ -517,30 +517,71 @@ public:
    */
   const QBase* get_edge_qrule() const
   { return this->edge_qrule; }
-  
+ 
+  /**
+   * Tells the FEMContext that system \p sys contains the
+   * isoparametric Lagrangian variables which correspond to the
+   * coordinates of mesh nodes, in problems where the mesh itself is
+   * expected to move in time.
+   *
+   * This should be set automatically if the FEMPhysics requires it.
+   */
+  virtual void set_mesh_system(System* sys)
+  { this->_mesh_sys = sys; }
+
   /**
    * Accessor for moving mesh System
    */
-  const System& get_mesh_system() const
-  { return *(this->_mesh_sys); }
+  const System* get_mesh_system() const
+  { return this->_mesh_sys; }
+
+  /**
+   * Accessor for moving mesh System
+   */
+  System* get_mesh_system()
+  { return this->_mesh_sys; }
 
   /**
    * Accessor for x-variable of moving mesh System
    */
-  unsigned int get_mesh_sys_x_var() const
+  unsigned int get_mesh_x_var() const
   { return _mesh_x_var; }
+
+  /**
+   * Accessor for x-variable of moving mesh System
+   *
+   * This should be set automatically if the FEMPhysics requires it.
+   */
+  void set_mesh_x_var(unsigned int x_var)
+  { _mesh_x_var = x_var; }
 
   /**
    * Accessor for y-variable of moving mesh System
    */
-  unsigned int get_mesh_sys_y_var() const
+  unsigned int get_mesh_y_var() const
   { return _mesh_y_var; }
+
+  /**
+   * Accessor for y-variable of moving mesh System
+   *
+   * This should be set automatically if the FEMPhysics requires it.
+   */
+  void set_mesh_y_var(unsigned int y_var)
+  { _mesh_y_var = y_var; }
 
   /**
    * Accessor for z-variable of moving mesh System
    */
-  unsigned int get_mesh_sys_z_var() const
+  unsigned int get_mesh_z_var() const
   { return _mesh_z_var; }
+
+  /**
+   * Accessor for z-variable of moving mesh System
+   *
+   * This should be set automatically if the FEMPhysics requires it.
+   */
+  void set_mesh_z_var(unsigned int z_var)
+  { _mesh_z_var = z_var; }
 
   /**
    * Accessor for current Elem object
@@ -619,7 +660,7 @@ public:
   /**
    * System from which to acquire moving mesh information
    */
-  const System *_mesh_sys;
+  System *_mesh_sys;
 
   /**
    * Variables from which to acquire moving mesh information
