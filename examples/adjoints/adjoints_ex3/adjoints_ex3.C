@@ -83,8 +83,8 @@
 // Q(u) - Q(u_h) \leq 
 // |e(u_1)|_{H1} |e(u_1^*)|_{H1} +  |e(u_2)|_{H1} |e(u_2^*)|_{H1} +  (1/Pe) * |e(C)|_{H1} |e(C^*)|_{H1}  + 
 //  ||e(u_1,1)||_{L2} ||e(p^*)||_{L2} + ||e(u_2,2)||_{L2} ||e(p^*)||_{L2} + ||e(u_1,1^*)||_{L2} ||e(p)||_{L2} + ||e(u_2,2^*)||_{L2} ||e(p)||_{L2}  +
-// ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} +  
-// ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2}
+// ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} + ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2} 
+// ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} + ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2}
 // = error_non_pressure + error_with_pressure + error_convection_diffusion_x + error_convection_diffusion_y
 
 // Bring in everything from the libMesh namespace
@@ -966,6 +966,7 @@ int main (int argc, char** argv)
             weights_matrix_convection_diffusion_x
               (system.n_vars(),
                std::vector<Real>(system.n_vars(), 0.0));
+	  weights_matrix_convection_diffusion_x[0][3] = 1.;                  
           weights_matrix_convection_diffusion_x[3][3] = 1.;                  
 
 	  // We will also have to build and pass the weight functions to the weighted patch recovery estimators
@@ -975,14 +976,17 @@ int main (int argc, char** argv)
 
           // Declare object of class CoupledFEMFunctionsx, the definition of the function contains the weight 
 	  // to be applied to the relevant terms
-          CoupledFEMFunctionsx convdiffx(system);                  
+	  // For ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2} term, returns C,1_h
+          CoupledFEMFunctionsx convdiffx0(system, 0);                  	  
+	  // For ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} term, returns (u_1)_h
+	  CoupledFEMFunctionsx convdiffx3(system, 3);                  
 
           // Make a vector of pointers to these objects
           std::vector<FEMFunctionBase<Number> *> coupled_system_weight_functions_x;
-          coupled_system_weight_functions_x.push_back(&identity);
+          coupled_system_weight_functions_x.push_back(&convdiffx0);
           coupled_system_weight_functions_x.push_back(&identity);
           coupled_system_weight_functions_x.push_back(&identity);                  
-          coupled_system_weight_functions_x.push_back(&convdiffx);                         
+          coupled_system_weight_functions_x.push_back(&convdiffx3);                         
 
           // Build the error estimator to estimate the contributions
           // to the QoI error from the convection diffusion x term
@@ -1024,16 +1028,20 @@ int main (int argc, char** argv)
           std::vector<std::vector<Real> >
             weights_matrix_convection_diffusion_y
               (system.n_vars(), std::vector<Real>(system.n_vars(), 0.0));
-          weights_matrix_convection_diffusion_y[3][3] = 1.;                  
+	  weights_matrix_convection_diffusion_y[1][3] = 1.;                  
+          weights_matrix_convection_diffusion_y[3][3] = 1.;                  	  
           
-          CoupledFEMFunctionsy convdiffy(system);                  
+	  // For ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2} term, returns C,2_h	  
+          CoupledFEMFunctionsy convdiffy1(system, 1);                  
+	  // For ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} term, returns (u_2)_h
+	  CoupledFEMFunctionsy convdiffy3(system, 3);                  
 
           // Make a vector of pointers to these objects
           std::vector<FEMFunctionBase<Number> *> coupled_system_weight_functions_y;
           coupled_system_weight_functions_y.push_back(&identity);
+          coupled_system_weight_functions_y.push_back(&convdiffy1);
           coupled_system_weight_functions_y.push_back(&identity);
-          coupled_system_weight_functions_y.push_back(&identity);
-          coupled_system_weight_functions_y.push_back(&convdiffy);                  
+          coupled_system_weight_functions_y.push_back(&convdiffy3);                  
 	  
           // Build the error estimator to estimate the contributions
           // to the QoI error from the convection diffsion y term

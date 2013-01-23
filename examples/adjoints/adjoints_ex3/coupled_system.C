@@ -390,18 +390,77 @@ void CoupledSystem::postprocess()
 
 // These functions supply the nonlinear weighting for the adjoint residual error estimate which 
 // arise due to the convection term in the convection-diffusion equation:
-// ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} +  
-// ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2}
-// These functions compute (u_1)_h and (u_2)_h and supply it to the weighted patch recovery error estimator
+// ||e((u_1)_h C,1)||_{L2} ||e(C^*)||_{L2} + ||e(u1 C,1_h)||_{L2} ||e(C^*)||_{L2}
+// ||e((u_2)_h C,2)||_{L2} ||e(C^*)||_{L2} + ||e(u2 C,2_h)||_{L2} ||e(C^*)||_{L2}
+// These functions compute (u_1)_h or C,1_h , and (u_2)_h or C,2_h , and supply it to the weighted patch recovery error estimator
+// In CoupledFEMFunctionsx, the object built with var = 0, returns the (u_1)_h weight, while 
+// the object built with var = 1, returns the C,1_h weight. The switch statment
+// distinguishes the behavior of the two objects
+// Same thing for CoupledFEMFunctionsy
 Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
 					const Real /* time */)
 { 
-  return c.point_value(0, p);
+  Real weight = 0.0;
+
+  switch(var)
+    {
+    case 0:
+      {
+	Gradient grad_C = c.point_gradient(3, p);
+
+	weight = grad_C(0);
+      }
+      break;
+
+    case 3:
+      {
+	Number u = c.point_value(0, p);
+
+	weight = u;
+      }
+      break;
+
+    default:
+      {
+	std::cout<<"Wrong variable number"<<var<<" passed to CoupledFEMFunctionsx object ! Quitting !"<<std::endl;
+	libmesh_error();
+      }
+
+    }
+
+  return weight;
 }
 
 Number CoupledFEMFunctionsy::operator()(const FEMContext& c, const Point& p,
 					const Real /* time */)
 {
-  return c.point_value(1, p);
+  Real weight = 0.0;
+
+  switch(var)
+    {
+    case 1:
+      {
+	Gradient grad_C = c.point_gradient(3, p);
+
+	weight = grad_C(1);
+      }
+      break;
+
+    case 3:
+      {
+	Number v = c.point_value(1, p);
+
+	weight = v;
+      }
+      break;
+
+    default:
+      {
+	std::cout<<"Wrong variable number "<<var<<" passed to CoupledFEMFunctionsy object ! Quitting !"<<std::endl;
+	libmesh_error();
+      }
+    }
+
+  return weight;
 }
 

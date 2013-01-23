@@ -109,7 +109,7 @@ class CoupledFEMFunctionsx : public FEMFunctionBase<Number>
 {
 public:
   // Constructor
-  CoupledFEMFunctionsx(System& /* sys */) {}
+  CoupledFEMFunctionsx(System& /* sys */, unsigned int var_number) {var = var_number;}
 
   // Destructor
   virtual ~CoupledFEMFunctionsx () {}
@@ -118,6 +118,10 @@ public:
 
   virtual Number operator() (const FEMContext&, const Point& p,
 			     const Real time = 0.);
+
+ private:
+  
+  unsigned int var;
      
 };
 
@@ -126,7 +130,7 @@ class CoupledFEMFunctionsy : public FEMFunctionBase<Number>
 {
 public:
   // Constructor
-  CoupledFEMFunctionsy(System& /* sys */) {}
+  CoupledFEMFunctionsy(System& /* sys */, unsigned int var_number) {var = var_number;}
 
   // Destructor
   virtual ~CoupledFEMFunctionsy () {}
@@ -137,6 +141,10 @@ public:
   virtual Number operator() (const FEMContext&, const Point& p,
 			     const Real time = 0.);
   
+ private:
+  
+  unsigned int var;
+
 };
 
 #endif //__coupled_system_h__
