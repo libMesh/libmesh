@@ -435,15 +435,10 @@ upload_test:
 	rsync -nrltzve ssh --exclude '.svn' $(top_srcdir)/doc/latex/xda_format $(LIBMESH_SVN_USER),libmesh@web.sourceforge.net:/home/groups/l/li/libmesh/htdocs/
 	chmod -R g-w $(top_builddir)/doc/html/* $(top_srcdir)/doc/html/* $(top_srcdir)/doc/latex/*/*
 
-# #
-# # Mark source files for SVN keyword expansion
-# svnexpand:
-# 	svn -R propset svn:keywords "Date Author Revision HeadURL Id" $(top_srcdir)/include $(top_srcdir)/src
-
-
 #
 # special things to do when running 'make dist'
 dist-hook:
+	rm -rf `find $(distdir) -name libmesh_config.h`
 	rm -rf `find $(distdir) -name .svn`
 
 
