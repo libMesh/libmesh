@@ -210,3 +210,5 @@ contrib/autotools/bin
 contrib/autotools/include
 contrib/autotools/lib
 contrib/autotools/share
+
+lib
