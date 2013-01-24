@@ -837,11 +837,6 @@ EGREP
 GREP
 SED
 LIBTOOL
-CODE_COVERAGE_ENABLED_FALSE
-CODE_COVERAGE_ENABLED_TRUE
-HAVE_GCOV_TOOLS
-GCOV_FLAGS
-have_gcov
 CFLAGS_OPROF
 CXXFLAGS_OPROF
 CPPFLAGS_OPROF
@@ -871,6 +866,11 @@ libmesh_CFLAGS
 libmesh_CXXFLAGS
 libmesh_CPPFLAGS
 METHODS
+CODE_COVERAGE_ENABLED_FALSE
+CODE_COVERAGE_ENABLED_TRUE
+HAVE_GCOV_TOOLS
+GCOV_FLAGS
+have_gcov
 LIBMESH_ENABLE_GLIBCXX_DEBUGGING_FALSE
 LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE
 ac_ct_F77
@@ -997,8 +997,8 @@ enable_fortran
 with_fc
 with_f77
 enable_glibcxx_debugging
-with_methods
 enable_coverage
+with_methods
 enable_static
 enable_shared
 with_pic
@@ -6899,156 +6899,6 @@ $as_echo "No specific options for this C++ compiler known" >&6; }
   fi
 
 
-
-
-
- # accept --with-methods=METHODS.  but default to $METHODS, which is either set
- # by the user already or defaulted above
-
-# Check whether --with-methods was given.
-if test "${with_methods+set}" = set; then :
-  withval=$with_methods; for method in ${withval} ; do
-                # make sure each method specified makes sense
-	        case "${method}" in
-		    optimized|opt)      ;;
-		    debug|dbg)          ;;
-		    devel)              ;;
-		    profiling|pro|prof) ;;
-		    oprofile|oprof)     ;;
-                    *)
-			as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5
-			;;
-                esac
-              done
-	      METHODS=${withval}
-else
-
-	       # default METHOD is opt if not specified.
-	        if (test "x${METHODS}" = x); then
-  		  METHODS="dbg devel opt"
-   		  { $as_echo "$as_me:${as_lineno-$LINENO}: result: No build methods specified, defaulting to \"$METHODS\"" >&5
-$as_echo "No build methods specified, defaulting to \"$METHODS\"" >&6; }
- 		fi
-
-fi
-
-
- { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring libMesh with methods \"$METHODS\" >>>" >&5
-$as_echo "<<< Configuring libMesh with methods \"$METHODS\" >>>" >&6; }
-
-
-
-
-
- build_opt=no
- build_dbg=no
- build_devel=no
- build_prof=no
- build_oprof=no
-
- # define compiler flags for all methods
- CPPFLAGS_OPT="$CPPFLAGS_OPT $libmesh_CPPFLAGS"
- CXXFLAGS_OPT="$CXXFLAGS_OPT $libmesh_CXXFLAGS"
- CFLAGS_OPT="$CFLAGS_OPT $libmesh_CFLAGS"
-
- CPPFLAGS_DBG="$CPPFLAGS_DBG $libmesh_CPPFLAGS"
- CXXFLAGS_DBG="$CXXFLAGS_DBG $libmesh_CXXFLAGS"
- CFLAGS_DBG="$CFLAGS_DBG $libmesh_CFLAGS"
-
- CPPFLAGS_DEVEL="$CPPFLAGS_DEVEL $libmesh_CPPFLAGS"
- CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $libmesh_CXXFLAGS"
- CFLAGS_DEVEL="$CFLAGS_DEVEL $libmesh_CFLAGS"
-
- # profiling-specific flags are derivatives of optimized flags
- CPPFLAGS_PROF="$CPPFLAGS_OPT"
- CXXFLAGS_PROF="$CXXFLAGS_OPT $PROFILING_FLAGS"
- CFLAGS_PROF="$CFLAGS_OPT $PROFILING_FLAGS"
-
- CPPFLAGS_OPROF="$CPPFLAGS_OPT"
- CXXFLAGS_OPROF="$CXXFLAGS_OPT $OPROFILE_FLAGS"
- CFLAGS_OPROF="$CFLAGS_OPT $OPROFILE_FLAGS"
-
- #AC_CONFIG_FILES(Make.common:Make.common.in)
-
- # conditionally compile selected methods
- for method in ${METHODS}; do
-     case "${method}" in
-         optimized|opt)      build_opt=yes   ;;
-         debug|dbg)          build_dbg=yes   ;;
-         devel)              build_devel=yes ;;
-         profiling|pro|prof) build_prof=yes  ;;
-         oprofile|oprof)     build_oprof=yes ;;
-         *)
-	     as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5
-	     ;;
-     esac
- done
-
-  if test x$build_opt   = xyes; then
-  LIBMESH_OPT_MODE_TRUE=
-  LIBMESH_OPT_MODE_FALSE='#'
-else
-  LIBMESH_OPT_MODE_TRUE='#'
-  LIBMESH_OPT_MODE_FALSE=
-fi
-
-  if test x$build_dbg   = xyes; then
-  LIBMESH_DBG_MODE_TRUE=
-  LIBMESH_DBG_MODE_FALSE='#'
-else
-  LIBMESH_DBG_MODE_TRUE='#'
-  LIBMESH_DBG_MODE_FALSE=
-fi
-
-  if test x$build_devel = xyes; then
-  LIBMESH_DEVEL_MODE_TRUE=
-  LIBMESH_DEVEL_MODE_FALSE='#'
-else
-  LIBMESH_DEVEL_MODE_TRUE='#'
-  LIBMESH_DEVEL_MODE_FALSE=
-fi
-
-  if test x$build_prof = xyes; then
-  LIBMESH_PROF_MODE_TRUE=
-  LIBMESH_PROF_MODE_FALSE='#'
-else
-  LIBMESH_PROF_MODE_TRUE='#'
-  LIBMESH_PROF_MODE_FALSE=
-fi
-
-  if test x$build_oprof = xyes; then
-  LIBMESH_OPROF_MODE_TRUE=
-  LIBMESH_OPROF_MODE_FALSE='#'
-else
-  LIBMESH_OPROF_MODE_TRUE='#'
-  LIBMESH_OPROF_MODE_FALSE=
-fi
-
-
-  # substitute all methods
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #------------------------------------------------------
 # Checks for code coverage
 # this must be done after we look for our own compilers
@@ -7243,6 +7093,159 @@ fi
 
 libmesh_CFLAGS="$GCOV_FLAGS $libmesh_CFLAGS"
 libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
+
+#-----------------------------------------------------
+# Set compiler flags for devel, opt, etc. methods
+#-----------------------------------------------------
+
+
+
+
+ # accept --with-methods=METHODS.  but default to $METHODS, which is either set
+ # by the user already or defaulted above
+
+# Check whether --with-methods was given.
+if test "${with_methods+set}" = set; then :
+  withval=$with_methods; for method in ${withval} ; do
+                # make sure each method specified makes sense
+	        case "${method}" in
+		    optimized|opt)      ;;
+		    debug|dbg)          ;;
+		    devel)              ;;
+		    profiling|pro|prof) ;;
+		    oprofile|oprof)     ;;
+                    *)
+			as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5
+			;;
+                esac
+              done
+	      METHODS=${withval}
+else
+
+	       # default METHOD is opt if not specified.
+	        if (test "x${METHODS}" = x); then
+  		  METHODS="dbg devel opt"
+   		  { $as_echo "$as_me:${as_lineno-$LINENO}: result: No build methods specified, defaulting to \"$METHODS\"" >&5
+$as_echo "No build methods specified, defaulting to \"$METHODS\"" >&6; }
+ 		fi
+
+fi
+
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring libMesh with methods \"$METHODS\" >>>" >&5
+$as_echo "<<< Configuring libMesh with methods \"$METHODS\" >>>" >&6; }
+
+
+
+
+
+ build_opt=no
+ build_dbg=no
+ build_devel=no
+ build_prof=no
+ build_oprof=no
+
+ # define compiler flags for all methods
+ CPPFLAGS_OPT="$CPPFLAGS_OPT $libmesh_CPPFLAGS"
+ CXXFLAGS_OPT="$CXXFLAGS_OPT $libmesh_CXXFLAGS"
+ CFLAGS_OPT="$CFLAGS_OPT $libmesh_CFLAGS"
+
+ CPPFLAGS_DBG="$CPPFLAGS_DBG $libmesh_CPPFLAGS"
+ CXXFLAGS_DBG="$CXXFLAGS_DBG $libmesh_CXXFLAGS"
+ CFLAGS_DBG="$CFLAGS_DBG $libmesh_CFLAGS"
+
+ CPPFLAGS_DEVEL="$CPPFLAGS_DEVEL $libmesh_CPPFLAGS"
+ CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL $libmesh_CXXFLAGS"
+ CFLAGS_DEVEL="$CFLAGS_DEVEL $libmesh_CFLAGS"
+
+ # profiling-specific flags are derivatives of optimized flags
+ CPPFLAGS_PROF="$CPPFLAGS_OPT"
+ CXXFLAGS_PROF="$CXXFLAGS_OPT $PROFILING_FLAGS"
+ CFLAGS_PROF="$CFLAGS_OPT $PROFILING_FLAGS"
+
+ CPPFLAGS_OPROF="$CPPFLAGS_OPT"
+ CXXFLAGS_OPROF="$CXXFLAGS_OPT $OPROFILE_FLAGS"
+ CFLAGS_OPROF="$CFLAGS_OPT $OPROFILE_FLAGS"
+
+ #AC_CONFIG_FILES(Make.common:Make.common.in)
+
+ # conditionally compile selected methods
+ for method in ${METHODS}; do
+     case "${method}" in
+         optimized|opt)      build_opt=yes   ;;
+         debug|dbg)          build_dbg=yes   ;;
+         devel)              build_devel=yes ;;
+         profiling|pro|prof) build_prof=yes  ;;
+         oprofile|oprof)     build_oprof=yes ;;
+         *)
+	     as_fn_error $? "bad value ${method} for --with-methods" "$LINENO" 5
+	     ;;
+     esac
+ done
+
+  if test x$build_opt   = xyes; then
+  LIBMESH_OPT_MODE_TRUE=
+  LIBMESH_OPT_MODE_FALSE='#'
+else
+  LIBMESH_OPT_MODE_TRUE='#'
+  LIBMESH_OPT_MODE_FALSE=
+fi
+
+  if test x$build_dbg   = xyes; then
+  LIBMESH_DBG_MODE_TRUE=
+  LIBMESH_DBG_MODE_FALSE='#'
+else
+  LIBMESH_DBG_MODE_TRUE='#'
+  LIBMESH_DBG_MODE_FALSE=
+fi
+
+  if test x$build_devel = xyes; then
+  LIBMESH_DEVEL_MODE_TRUE=
+  LIBMESH_DEVEL_MODE_FALSE='#'
+else
+  LIBMESH_DEVEL_MODE_TRUE='#'
+  LIBMESH_DEVEL_MODE_FALSE=
+fi
+
+  if test x$build_prof = xyes; then
+  LIBMESH_PROF_MODE_TRUE=
+  LIBMESH_PROF_MODE_FALSE='#'
+else
+  LIBMESH_PROF_MODE_TRUE='#'
+  LIBMESH_PROF_MODE_FALSE=
+fi
+
+  if test x$build_oprof = xyes; then
+  LIBMESH_OPROF_MODE_TRUE=
+  LIBMESH_OPROF_MODE_FALSE='#'
+else
+  LIBMESH_OPROF_MODE_TRUE='#'
+  LIBMESH_OPROF_MODE_FALSE=
+fi
+
+
+  # substitute all methods
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #-----------------------------------------------------
 # Initialize libtool.  By default, we will build
@@ -32276,6 +32279,10 @@ if test -z "${LIBMESH_ENABLE_GLIBCXX_DEBUGGING_TRUE}" && test -z "${LIBMESH_ENAB
   as_fn_error $? "conditional \"LIBMESH_ENABLE_GLIBCXX_DEBUGGING\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${CODE_COVERAGE_ENABLED_TRUE}" && test -z "${CODE_COVERAGE_ENABLED_FALSE}"; then
+  as_fn_error $? "conditional \"CODE_COVERAGE_ENABLED\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_OPT_MODE_TRUE}" && test -z "${LIBMESH_OPT_MODE_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_OPT_MODE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -32294,10 +32301,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_OPROF_MODE_TRUE}" && test -z "${LIBMESH_OPROF_MODE_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_OPROF_MODE\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${CODE_COVERAGE_ENABLED_TRUE}" && test -z "${CODE_COVERAGE_ENABLED_FALSE}"; then
-  as_fn_error $? "conditional \"CODE_COVERAGE_ENABLED\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_TRUE}" && test -z "${LIBMESH_ENABLE_INFINITE_ELEMENTS_FALSE}"; then

@@ -105,8 +105,6 @@ LIBMESH_SET_COMPILERS
 # flags like _GLIBCXX_DEBUG_PEDANTIC which were not present in older versions.
 # --------------------------------------------------------------
 LIBMESH_SET_CXX_FLAGS
-LIBMESH_SET_METHODS
-
 
 #------------------------------------------------------
 # Checks for code coverage
@@ -115,6 +113,11 @@ LIBMESH_SET_METHODS
 AX_CODE_COVERAGE
 libmesh_CFLAGS="$GCOV_FLAGS $libmesh_CFLAGS"
 libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
+
+#-----------------------------------------------------
+# Set compiler flags for devel, opt, etc. methods
+#-----------------------------------------------------
+LIBMESH_SET_METHODS
 
 #-----------------------------------------------------
 # Initialize libtool.  By default, we will build
