@@ -93,15 +93,6 @@ AM_CONDITIONAL(LIBMESH_VPATH_BUILD, test x$libmesh_vpath_build = xyes)
 # --------------------------------------------------------------
 AC_LANG([C++])
 
-
-#--------------------------                                                                  
-# Checks for code coverage                                                                   
-#-------------------------                                                                   
-AX_CODE_COVERAGE
-libmesh_CFLAGS="$GCOV_FLAGS $libmesh_CFLAGS"
-libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
-
-
 # --------------------------------------------------------------
 # Set our preferred compilers
 # --------------------------------------------------------------
@@ -116,6 +107,19 @@ LIBMESH_SET_COMPILERS
 LIBMESH_SET_CXX_FLAGS
 LIBMESH_SET_METHODS
 
+
+#------------------------------------------------------
+# Checks for code coverage
+# this must be done after we look for our own compilers
+#------------------------------------------------------
+AX_CODE_COVERAGE
+libmesh_CFLAGS="$GCOV_FLAGS $libmesh_CFLAGS"
+libmesh_CXXFLAGS="$GCOV_FLAGS $libmesh_CXXFLAGS"
+
+#-----------------------------------------------------
+# Initialize libtool.  By default, we will build
+# only shared libraries on platforms that support them
+#-----------------------------------------------------
 LT_INIT([disable-static])
 
 
