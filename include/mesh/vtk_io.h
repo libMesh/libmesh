@@ -24,6 +24,10 @@
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
 
+#ifdef LIBMESH_HAVE_VTK
+#include "vtkType.h"
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <map>
@@ -76,18 +80,20 @@ public:
    * This method implements writing a mesh with nodal data to a
    * specified file where the nodal data and variable names are provided.
    */
-//  virtual void write_nodal_data (const std::string&,
-//             const std::vector<Number>&,
-//             const std::vector<std::string>&);
+  virtual void write_nodal_data (const std::string&,
+             const std::vector<Number>&,
+             const std::vector<std::string>&);
 
   /**
    * Overloads writing equation systems, this is done because when overloading
    * write_nodal_data there would be no way to export cell centered data
    */
 
+/*
   virtual void write_equation_systems(const std::string& fname,
                                       const EquationSystems& es,
                                       const std::set<std::string>* system_names=NULL);
+*/
 
   /**
    * This method implements reading a mesh from a specified file
@@ -96,50 +102,64 @@ public:
   virtual void read (const std::string& );
 
   /**
-   * This method implements writing a mesh to a specified ".poly"   file.
-   * ".poly" files defines so called Piecewise Linear Complex   (PLC).
+   * Output the mesh without solutions to a .pvtu file
   */
   virtual void write (const std::string& );
 
   /**
    * Get a pointer to the VTK datastructure
    */
-   vtkUnstructuredGrid* get_vtk_grid(){return _vtk_grid;}
+  vtkUnstructuredGrid* get_vtk_grid() {
+    return _vtk_grid;
+  }
+
+  void set_compression(bool b) {
+    this->_compress = b;
+  }
 
 private:
+#ifdef LIBMESH_HAVE_VTK
+  /**
+   * Map libMesh element types to VTK element types
+   */
+  vtkIdType get_elem_type(ElemType type);
+#endif
 
   /**
    * write the nodes from the mesh into a vtkUnstructuredGrid
    */
-  vtkPoints* nodes_to_vtk(const MeshBase& mesh);
-//  , vtkUnstructuredGrid*& grid);
+  void nodes_to_vtk();
 
   /**
    * write the cells from the mesh into a vtkUnstructuredGrid
    */
-  vtkCellArray* cells_to_vtk(const MeshBase& mesh, std::vector<int>& types);
-//  , vtkUnstructuredGrid*& grid);
-
-  /**
-   * write the solution to a vtkUnstructuredGrid
-   */
-  void solution_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid);
+  void cells_to_vtk();
 
   /**
    * write the system vectors to vtk
    */
   void system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*& grid);
 
-   /**
-    * pointer to the VTK grid
-    */
-   vtkUnstructuredGrid* _vtk_grid;
+  /**
+   * pointer to the VTK grid
+   */
+  vtkUnstructuredGrid* _vtk_grid;
 
   /**
    * A pointer to the MeshData object you would like to use.
    * with this VTKIO object.  Can be NULL.
    */
   MeshData* _mesh_data;
+
+  /**
+   * Flag to indicate whether the output should be compressed
+   */
+  bool _compress;
+
+  /**
+   * maps global node id to node id of partition
+   */
+  std::map<unsigned int, unsigned int> _local_node_map;
 };
 
 
@@ -150,7 +170,9 @@ inline
 VTKIO::VTKIO (MeshBase& mesh, MeshData* mesh_data) :
 	MeshInput<MeshBase> (mesh),
 	MeshOutput<MeshBase>(mesh),
-	_mesh_data(mesh_data)
+	_mesh_data(mesh_data),
+	_compress(false),
+	_local_node_map()
 {
   _vtk_grid = NULL;
   libmesh_experimental();
@@ -161,7 +183,9 @@ VTKIO::VTKIO (MeshBase& mesh, MeshData* mesh_data) :
 inline
 VTKIO::VTKIO (const MeshBase& mesh, MeshData* mesh_data) :
 	MeshOutput<MeshBase>(mesh),
-	_mesh_data(mesh_data)
+	_mesh_data(mesh_data),
+	_compress(false),
+	_local_node_map()
 {
   _vtk_grid = NULL;
   libmesh_experimental();
