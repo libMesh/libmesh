@@ -423,9 +423,6 @@ void VTKIO::write_nodal_data (const std::string& fname,
 {
 #ifndef LIBMESH_HAVE_VTK
 
-  // Do something with the es to avoid a compiler warning.
-  es.n_systems();
-
   libMesh::err << "Cannot write VTK file: " << fname
 	        << "\nYou must have VTK installed and correctly configured to read VTK meshes."
 	        << std::endl;
