@@ -50,7 +50,6 @@ typedef int32_t boundary_id_type;
 #elif LIBMESH_BOUNDARY_ID_BYTES == 8
 typedef int64_t boundary_id_type;
 #else // LIBMESH_BOUNDARY_ID_BYTES = 2 (default)
-#else // LIBMESH_BOUNDARY_ID_BYTES = 2 (default)
 typedef int16_t boundary_id_type;
 #endif
 
@@ -61,7 +60,6 @@ typedef int8_t dof_id_type;
 typedef int16_t dof_id_type;
 #elif LIBMESH_DOF_ID_BYTES == 8
 typedef int64_t dof_id_type;
-#else // LIBMESH_DOF_ID_BYTES = 4 (default)
 #else // LIBMESH_DOF_ID_BYTES = 4 (default)
 typedef int32_t dof_id_type;
 #endif
