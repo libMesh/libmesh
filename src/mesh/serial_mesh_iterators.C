@@ -241,6 +241,16 @@ SerialMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_
 
 
 
+// subdomain elements begin() accessor
+SerialMesh::element_iterator
+SerialMesh::active_subdomain_elements_begin (const unsigned int subdomain_id)
+{
+  Predicates::ActiveSubdomain<elem_iterator_imp> p(subdomain_id);
+  return element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
 
 
 
@@ -449,6 +459,16 @@ SerialMesh::const_element_iterator
 SerialMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_id) const
 {
   Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
+  return const_element_iterator(_elements.begin(), _elements.end(), p);
+}
+
+
+
+// subdomain elements begin() accessor
+SerialMesh::const_element_iterator
+SerialMesh::active_subdomain_elements_begin (const unsigned int subdomain_id) const
+{
+  Predicates::ActiveSubdomain<const_elem_iterator_imp> p(subdomain_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -667,6 +687,16 @@ SerialMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id
 
 
 
+// subdomain elements end() accessor
+SerialMesh::element_iterator
+SerialMesh::active_subdomain_elements_end (const unsigned int subdomain_id)
+{
+  Predicates::ActiveSubdomain<elem_iterator_imp> p(subdomain_id);
+  return element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
 
 
 
@@ -879,6 +909,16 @@ SerialMesh::const_element_iterator
 SerialMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id) const
 {
   Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
+  return const_element_iterator(_elements.end(), _elements.end(), p);
+}
+
+
+
+// subdomain elements end() accessor
+SerialMesh::const_element_iterator
+SerialMesh::active_subdomain_elements_end (const unsigned int subdomain_id) const
+{
+  Predicates::ActiveSubdomain<const_elem_iterator_imp> p(subdomain_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
