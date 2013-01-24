@@ -2194,7 +2194,7 @@ GetPot::_DBE_expand(const std::string& expr)
 	        STRING_VECTOR A =
                   _DBE_get_expr_list(expr.substr(funcnameend), 1);
 	        double arg = _convert_to_type(A[0], 0.0);
-	        return _convert_from_type(std::sin(arg));
+	        return _convert_from_type(std::log10(arg));
 	    }
 	    else if (funcname == "sin") {
 	        STRING_VECTOR A =
