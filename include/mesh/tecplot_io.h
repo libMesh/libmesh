@@ -26,6 +26,7 @@
 
 // C++ Includes
 #include <cstddef>
+#include <set>
 
 namespace libMesh
 {
@@ -84,10 +85,17 @@ class TecplotIO : public MeshOutput<MeshBase>
   Real & time ();
   
   /**
-   * Solution time for transient data.
-   * Written to newer binary formats that are time-aware.
+   * Strand offset for this file.  Each mesh block will
+   * be written to (strand_id=block_id+1+strand_offset).
+   * Written to newer binary formats that are time-aware,
+   * defaults to 0.
    */
   int & strand_offset ();
+
+  /**
+   *  The zone title to write.
+   */
+  std::string & zone_title ();
   
  private:
 
@@ -124,25 +132,26 @@ class TecplotIO : public MeshOutput<MeshBase>
    */
   Real _time;
 
+  /**
+   * Offset for Tecplot's STRANDID.
+   */
   int _strand_offset;
+
+  /**
+   * The zone title to write.
+   */
+  std::string _zone_title;
+
+  /**
+   * The subdomains in the mesh.
+   */
+  std::set<subdomain_id_type> _subdomain_ids;
 };
 
 
 
 // ------------------------------------------------------------
 // TecplotIO inline members
-inline
-TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary, const Real time,
-		      const int strand_offset) :
-  MeshOutput<MeshBase> (mesh),
-  _binary (binary),
-  _time (time),
-  _strand_offset (strand_offset)
-{
-}
-
-
-
 inline
 bool & TecplotIO::binary ()
 {
@@ -163,6 +172,14 @@ inline
 int & TecplotIO::strand_offset ()
 {
   return _strand_offset;
+}
+
+
+
+inline
+std::string & TecplotIO::zone_title ()
+{
+  return _zone_title;
 }
 
 
