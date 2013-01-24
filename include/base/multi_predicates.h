@@ -454,6 +454,20 @@ namespace Predicates
     }
   };
 
+
+
+  // Instantiation for the ActiveSubdomain abstract_multi_predicate
+  template <typename T>
+  struct ActiveSubdomain : abstract_multi_predicate<T>
+  {
+    ActiveSubdomain(const unsigned int subdomain_id)
+    {
+      this->_predicates.push_back(new not_null<T>);
+      this->_predicates.push_back(new active<T>);
+      this->_predicates.push_back(new subdomain<T>(subdomain_id));
+    }
+  };
+
 }
 
 

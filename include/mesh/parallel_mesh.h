@@ -283,6 +283,9 @@ public:
   element_iterator active_local_subdomain_elements_begin (const unsigned int subdomain_id);
   element_iterator active_local_subdomain_elements_end   (const unsigned int subdomain_id);
 
+  element_iterator active_subdomain_elements_begin (const unsigned int subdomain_id);
+  element_iterator active_subdomain_elements_end   (const unsigned int subdomain_id);
+
 
   /**
    * const Elem iterator accessor functions.
@@ -349,6 +352,9 @@ public:
 
   const_element_iterator active_local_subdomain_elements_begin (const unsigned int subdomain_id) const;
   const_element_iterator active_local_subdomain_elements_end   (const unsigned int subdomain_id) const;
+
+  const_element_iterator active_subdomain_elements_begin (const unsigned int subdomain_id) const;
+  const_element_iterator active_subdomain_elements_end   (const unsigned int subdomain_id) const;
 
 
 
