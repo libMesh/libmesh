@@ -1413,6 +1413,7 @@ template void Xdr::data<unsigned short int>               (unsigned short int&, 
 template void Xdr::data<short int>                        (short int&,                       const char*);
 template void Xdr::data<unsigned long int>                (unsigned long int&,               const char*);
 template void Xdr::data<long int>                         (long int&,                        const char*);
+template void Xdr::data<char>                             (char&,                            const char*);
 template void Xdr::data<signed char>                      (signed char&,                     const char*);
 template void Xdr::data<unsigned char>                    (unsigned char&,                   const char*);
 template void Xdr::data<float>                            (float&,                           const char*);
@@ -1428,6 +1429,7 @@ template void Xdr::data<std::vector<short int> >          (std::vector<short int
 template void Xdr::data<std::vector<unsigned short int> > (std::vector<unsigned short int>&, const char*);
 template void Xdr::data<std::vector<long int> >           (std::vector<long int>&,           const char*);
 template void Xdr::data<std::vector<unsigned long int> >  (std::vector<unsigned long int>&,  const char*);
+template void Xdr::data<std::vector<char> >               (std::vector<char>&,               const char*);
 template void Xdr::data<std::vector<signed char> >        (std::vector<signed char>&,        const char*);
 template void Xdr::data<std::vector<unsigned char> >      (std::vector<unsigned char>&,      const char*);
 template void Xdr::data<std::vector<float> >              (std::vector<float>&,              const char*);
