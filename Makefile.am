@@ -126,15 +126,6 @@ include src/libmesh_SOURCES
 # sources to create the final library.
 lib_LTLIBRARIES = 
 
-if LIBMESH_OPT_MODE
-  lib_LTLIBRARIES        += libmesh_opt.la
-  libmesh_opt_la_SOURCES  = $(libmesh_SOURCES)
-  libmesh_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS) 
-  libmesh_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
-  libmesh_opt_la_CFLAGS   = $(CFLAGS_OPT)
-  libmesh_opt_la_LIBADD   = contrib/libcontrib_opt.la $(LIBS)
-endif
-
 if LIBMESH_DBG_MODE
   lib_LTLIBRARIES        += libmesh_dbg.la
   libmesh_dbg_la_SOURCES  = $(libmesh_SOURCES)
@@ -151,6 +142,15 @@ if LIBMESH_DEVEL_MODE
   libmesh_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
   libmesh_devel_la_CFLAGS   = $(CFLAGS_DEVEL)
   libmesh_devel_la_LIBADD   = contrib/libcontrib_devel.la $(LIBS)
+endif
+
+if LIBMESH_OPT_MODE
+  lib_LTLIBRARIES        += libmesh_opt.la
+  libmesh_opt_la_SOURCES  = $(libmesh_SOURCES)
+  libmesh_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS) 
+  libmesh_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
+  libmesh_opt_la_CFLAGS   = $(CFLAGS_OPT)
+  libmesh_opt_la_LIBADD   = contrib/libcontrib_opt.la $(LIBS)
 endif
 
 if LIBMESH_PROF_MODE

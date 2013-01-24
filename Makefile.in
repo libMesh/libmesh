@@ -80,9 +80,9 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	COPYING ChangeLog INSTALL NEWS build-aux/config.guess \
 	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
 	build-aux/ltmain.sh build-aux/missing build-aux/ylwrap
-@LIBMESH_OPT_MODE_TRUE@am__append_2 = libmesh_opt.la
-@LIBMESH_DBG_MODE_TRUE@am__append_3 = libmesh_dbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_4 = libmesh_devel.la
+@LIBMESH_DBG_MODE_TRUE@am__append_2 = libmesh_dbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_3 = libmesh_devel.la
+@LIBMESH_OPT_MODE_TRUE@am__append_4 = libmesh_opt.la
 @LIBMESH_PROF_MODE_TRUE@am__append_5 = libmesh_prof.la
 @LIBMESH_OPROF_MODE_TRUE@am__append_6 = libmesh_oprof.la
 @LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_7 = tests
@@ -4567,11 +4567,6 @@ libmesh_SOURCES = \
 # sources to create the final library.
 lib_LTLIBRARIES = $(am__append_2) $(am__append_3) $(am__append_4) \
 	$(am__append_5) $(am__append_6)
-@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_SOURCES = $(libmesh_SOURCES)
-@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS) 
-@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_CFLAGS = $(CFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_LIBADD = contrib/libcontrib_opt.la $(LIBS)
 @LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_SOURCES = $(libmesh_SOURCES)
 @LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS) 
 @LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
@@ -4582,6 +4577,11 @@ lib_LTLIBRARIES = $(am__append_2) $(am__append_3) $(am__append_4) \
 @LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_CFLAGS = $(CFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_LIBADD = contrib/libcontrib_devel.la $(LIBS)
+@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_SOURCES = $(libmesh_SOURCES)
+@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS) 
+@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
+@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_CFLAGS = $(CFLAGS_OPT)
+@LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_LIBADD = contrib/libcontrib_opt.la $(LIBS)
 @LIBMESH_PROF_MODE_TRUE@libmesh_prof_la_SOURCES = $(libmesh_SOURCES)
 @LIBMESH_PROF_MODE_TRUE@libmesh_prof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS) 
 @LIBMESH_PROF_MODE_TRUE@libmesh_prof_la_CXXFLAGS = $(CXXFLAGS_PROF)

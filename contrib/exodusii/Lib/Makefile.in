@@ -55,9 +55,9 @@ target_triplet = @target@
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/contrib/Make.common
-@LIBMESH_OPT_MODE_TRUE@am__append_1 = libopt.la
-@LIBMESH_DBG_MODE_TRUE@am__append_2 = libdbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_3 = libdevel.la
+@LIBMESH_DBG_MODE_TRUE@am__append_1 = libdbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_2 = libdevel.la
+@LIBMESH_OPT_MODE_TRUE@am__append_3 = libopt.la
 @LIBMESH_PROF_MODE_TRUE@am__append_4 = libprof.la
 @LIBMESH_OPROF_MODE_TRUE@am__append_5 = liboprof.la
 subdir = contrib/exodusii/Lib
@@ -1365,11 +1365,6 @@ AM_CXXFLAGS =
 #
 noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3) \
 	$(am__append_4) $(am__append_5)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_SOURCES = $(pkg_sources)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_CFLAGS = $(CFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_LIBADD = $(pkg_libs) # any defined package-specific libs
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_SOURCES = $(pkg_sources)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
@@ -1380,6 +1375,11 @@ noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3) \
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CFLAGS = $(CFLAGS_DEVEL)
 @LIBMESH_DEVEL_MODE_TRUE@libdevel_la_LIBADD = $(pkg_libs) # any defined package-specific libs
+@LIBMESH_OPT_MODE_TRUE@libopt_la_SOURCES = $(pkg_sources)
+@LIBMESH_OPT_MODE_TRUE@libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+@LIBMESH_OPT_MODE_TRUE@libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
+@LIBMESH_OPT_MODE_TRUE@libopt_la_CFLAGS = $(CFLAGS_OPT)
+@LIBMESH_OPT_MODE_TRUE@libopt_la_LIBADD = $(pkg_libs) # any defined package-specific libs
 @LIBMESH_PROF_MODE_TRUE@libprof_la_SOURCES = $(pkg_sources)
 @LIBMESH_PROF_MODE_TRUE@libprof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
 @LIBMESH_PROF_MODE_TRUE@libprof_la_CXXFLAGS = $(CXXFLAGS_PROF)

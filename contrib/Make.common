@@ -17,15 +17,6 @@ AM_CXXFLAGS  =
 #
 noinst_LTLIBRARIES = 
 
-if LIBMESH_OPT_MODE
-  noinst_LTLIBRARIES        += libopt.la
-  libopt_la_SOURCES  = $(pkg_sources)
-  libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
-  libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
-  libopt_la_CFLAGS   = $(CFLAGS_OPT)
-  libopt_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
-endif
-
 if LIBMESH_DBG_MODE
   noinst_LTLIBRARIES        += libdbg.la
   libdbg_la_SOURCES  = $(pkg_sources)
@@ -42,6 +33,15 @@ if LIBMESH_DEVEL_MODE
   libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
   libdevel_la_CFLAGS   = $(CFLAGS_DEVEL)
   libdevel_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
+endif
+
+if LIBMESH_OPT_MODE
+  noinst_LTLIBRARIES        += libopt.la
+  libopt_la_SOURCES  = $(pkg_sources)
+  libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+  libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
+  libopt_la_CFLAGS   = $(CFLAGS_OPT)
+  libopt_la_LIBADD   = $(pkg_libs) # any defined package-specific libs
 endif
 
 if LIBMESH_PROF_MODE
