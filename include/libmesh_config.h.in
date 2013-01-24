@@ -9,6 +9,9 @@
 /* definition of the final detected unordered_set type */
 #undef BEST_UNORDERED_SET
 
+/* size of boundary_id */
+#undef BOUNDARY_ID_BYTES
+
 /* This compiler is known not to support some iostream functionality */
 #undef BROKEN_IOSTREAM
 
@@ -73,6 +76,9 @@
 /* Integer indicating the highest spatial dimensionality supported by libMesh
    */
 #undef DIM
+
+/* size of dof_id */
+#undef DOF_ID_BYTES
 
 /* Flag indicating if the library should be built with AMR support */
 #undef ENABLE_AMR

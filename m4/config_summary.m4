@@ -66,28 +66,30 @@ echo Git revision....................... : $BUILD_VERSION
 ######################################################################################
 echo
 echo Library Features:
-echo '  'adaptive mesh refinement......... : $enableamr
-echo '  'complex variables................ : $enablecomplex
-echo '  'example suite.................... : $enableexamples
-echo '  'ghosted vectors.................. : $enableghosted
-echo '  'high-order shape functions....... : $enablepfem
-echo '  'infinite elements................ : $enableifem
-echo '  'Dirichlet constraints............ : $enabledirichlet
-echo '  'node constraints................. : $enablenodeconstraint
-echo '  'parallel mesh.................... : $enableparmesh
-echo '  'performance logging.............. : $enableperflog
-echo '  'periodic boundary conditions..... : $enableperiodic
-echo '  'reference counting............... : $enablerefct
-echo '  'shape function 2nd derivatives... : $enablesecond
-echo '  'stack trace files................ : $enabletracefiles
-echo '  'subdomain id size................ : $subdomain_bytes bytes
-echo '  'variational smoother............. : $enablevsmoother
-echo '  'xdr binary I/O................... : $enablexdr
+echo '  adaptive mesh refinement......... :' $enableamr
+echo '  complex variables................ :' $enablecomplex
+echo '  example suite.................... :' $enableexamples
+echo '  ghosted vectors.................. :' $enableghosted
+echo '  high-order shape functions....... :' $enablepfem
+echo '  id size (boundaries)............. :' $boundary_bytes bytes
+echo '  id size (dofs)................... :' $dof_bytes bytes
+echo '  id size (subdomains)............. :' $subdomain_bytes bytes
+echo '  infinite elements................ :' $enableifem
+echo '  Dirichlet constraints............ :' $enabledirichlet
+echo '  node constraints................. :' $enablenodeconstraint
+echo '  parallel mesh.................... :' $enableparmesh
+echo '  performance logging.............. :' $enableperflog
+echo '  periodic boundary conditions..... :' $enableperiodic
+echo '  reference counting............... :' $enablerefct
+echo '  shape function 2nd derivatives... :' $enablesecond
+echo '  stack trace files................ :' $enabletracefiles
+echo '  variational smoother............. :' $enablevsmoother
+echo '  xdr binary I/O................... :' $enablexdr
 if (test "x$enablelegacyincludepaths" = "xyes"); then
-echo '  'non-prefixed include paths....... : $enablelegacyincludepaths ***LEGACY FEATURE***
+echo '  non-prefixed include paths....... :' $enablelegacyincludepaths ***LEGACY FEATURE***
 fi
 if (test "x$enablelegacyusingnamespace" = "xyes"); then
-echo '  'adding using namespace libMesh... : $enablelegacyusingnamespace ***LEGACY FEATURE***
+echo '  adding using namespace libMesh... :' $enablelegacyusingnamespace ***LEGACY FEATURE***
 fi
 
 

@@ -46,10 +46,76 @@ fi
 
 
 # -------------------------------------------------------------
-# size of subdomain_id -- default 2
+# size of boundary_id_type -- default 2 bytes
+# -------------------------------------------------------------
+AC_ARG_WITH([boundary_id_bytes],
+	    AC_HELP_STRING([--with-boundary-id-bytes=<1|2|4|8>],
+                           [bytes used per boundary side per boundary_id]),
+	    [boundary_bytes="$withval"],
+	    [boundary_bytes=2])
+
+case "$boundary_bytes" in
+    1)
+	AC_DEFINE(BOUNDARY_ID_BYTES, 1, [size of boundary_id])
+	;;
+    2)
+	AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id])
+	;;
+    4)
+	AC_DEFINE(BOUNDARY_ID_BYTES, 4, [size of boundary_id])
+	;;
+    8)
+	AC_DEFINE(BOUNDARY_ID_BYTES, 8, [size of boundary_id])
+	;;
+    *)
+	AC_MSG_RESULT([>>> unrecognized boundary_id size: $boundary_bytes - configuring size...2])
+	AC_DEFINE(BOUNDARY_ID_BYTES, 2, [size of boundary_id])
+	boundary_bytes=2
+	;;
+esac
+AC_MSG_RESULT([configuring size of boundary_id... $boundary_bytes])
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# size of dof_id_type -- default 4 bytes
+# -------------------------------------------------------------
+AC_ARG_WITH([dof_id_bytes],
+	    AC_HELP_STRING([--with-dof-id-bytes=<1|2|4|8>],
+                           [bytes used per dof object id, dof index]),
+	    [dof_bytes="$withval"],
+	    [dof_bytes=4])
+
+case "$dof_bytes" in
+    1)
+	AC_DEFINE(DOF_ID_BYTES, 1, [size of dof_id])
+	;;
+    2)
+	AC_DEFINE(DOF_ID_BYTES, 2, [size of dof_id])
+	;;
+    4)
+	AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])
+	;;
+    8)
+	AC_DEFINE(DOF_ID_BYTES, 8, [size of dof_id])
+	;;
+    *)
+	AC_MSG_RESULT([>>> unrecognized dof_id size: $dof_bytes - configuring size...4])
+	AC_DEFINE(DOF_ID_BYTES, 2, [size of dof_id])
+	dof_bytes=4
+	;;
+esac
+AC_MSG_RESULT([configuring size of dof_id... $dof_bytes])
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# size of subdomain_id_type -- default 2 bytes
 # -------------------------------------------------------------
 AC_ARG_WITH([subdomain_id_bytes],
-	    AC_HELP_STRING([--with-subdomain-id-bytes=<1|2|4>],
+	    AC_HELP_STRING([--with-subdomain-id-bytes=<1|2|4|8>],
                            [bytes of storage per element used to store the subdomain_id]),
 	    [subdomain_bytes="$withval"],
 	    [subdomain_bytes=2])
@@ -63,6 +129,9 @@ case "$subdomain_bytes" in
 	;;
     4)
 	AC_DEFINE(SUBDOMAIN_ID_BYTES, 4, [size of subdomain_id])
+	;;
+    8)
+	AC_DEFINE(SUBDOMAIN_ID_BYTES, 8, [size of subdomain_id])
 	;;
     *)
 	AC_MSG_RESULT([>>> unrecognized subdomain_id size: $subdomain_bytes - configuring size...2])

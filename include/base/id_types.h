@@ -43,6 +43,30 @@ operator int() const { return _c; }
 typedef TestClass subdomain_id_type;
 #endif
 
+#if LIBMESH_BOUNDARY_ID_BYTES == 1
+typedef int8_t boundary_id_type;
+#elif LIBMESH_BOUNDARY_ID_BYTES == 4
+typedef int32_t boundary_id_type;
+#elif LIBMESH_BOUNDARY_ID_BYTES == 8
+typedef int64_t boundary_id_type;
+#else // LIBMESH_BOUNDARY_ID_BYTES = 2 (default)
+#else // LIBMESH_BOUNDARY_ID_BYTES = 2 (default)
+typedef int16_t boundary_id_type;
+#endif
+
+
+#if LIBMESH_DOF_ID_BYTES == 1
+typedef int8_t dof_id_type;
+#elif LIBMESH_DOF_ID_BYTES == 2
+typedef int16_t dof_id_type;
+#elif LIBMESH_DOF_ID_BYTES == 8
+typedef int64_t dof_id_type;
+#else // LIBMESH_DOF_ID_BYTES = 4 (default)
+#else // LIBMESH_DOF_ID_BYTES = 4 (default)
+typedef int32_t dof_id_type;
+#endif
+
+
 #if LIBMESH_SUBDOMAIN_ID_BYTES == 1
 typedef uint8_t subdomain_id_type;
 #elif LIBMESH_SUBDOMAIN_ID_BYTES == 4
@@ -52,18 +76,15 @@ typedef uint8_t subdomain_id_type;
  * possible unique blocks
  */
 typedef int32_t subdomain_id_type;
+#elif LIBMESH_SUBDOMAIN_ID_BYTES == 8
+/**
+ * Based on the 4-byte comment warning above, this probably doesn't
+ * work with exodusII *at all*...
+ */
+typedef int64_t subdomain_id_type;
 #else // LIBMESH_SUBDOMAIN_ID_BYTES = 2 (default)
 typedef uint16_t subdomain_id_type;
 #endif
-
-#if LIBMESH_BOUNDARY_ID_BYTES == 1
-typedef int8_t boundary_id_type;
-#elif LIBMESH_BOUNDARY_ID_BYTES == 4
-typedef int32_t boundary_id_type;
-#else // LIBMESH_BOUNDARY_ID_BYTES = 2 (default)
-typedef int16_t boundary_id_type;
-#endif
-
 
 } // namespace libMesh
 

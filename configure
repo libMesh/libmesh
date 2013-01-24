@@ -1015,6 +1015,8 @@ enable_unordered_containers
 enable_openmp
 enable_legacy_include_paths
 enable_legacy_using_namespace
+with_boundary_id_bytes
+with_dof_id_bytes
 with_subdomain_id_bytes
 enable_everything
 enable_tracefiles
@@ -1840,7 +1842,11 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
-  --with-subdomain-id-bytes=<1|2|4>
+  --with-boundary-id-bytes=<1|2|4|8>
+                          bytes used per boundary side per boundary_id
+  --with-dof-id-bytes=<1|2|4|8>
+                          bytes used per dof object id, dof index
+  --with-subdomain-id-bytes=<1|2|4|8>
                           bytes of storage per element used to store the
                           subdomain_id
   --with-boost[=ARG]      use Boost library from a standard location
@@ -26294,7 +26300,103 @@ fi
 
 
 # -------------------------------------------------------------
-# size of subdomain_id -- default 2
+# size of boundary_id_type -- default 2 bytes
+# -------------------------------------------------------------
+
+# Check whether --with-boundary_id_bytes was given.
+if test "${with_boundary_id_bytes+set}" = set; then :
+  withval=$with_boundary_id_bytes; boundary_bytes="$withval"
+else
+  boundary_bytes=2
+fi
+
+
+case "$boundary_bytes" in
+    1)
+
+$as_echo "#define BOUNDARY_ID_BYTES 1" >>confdefs.h
+
+	;;
+    2)
+
+$as_echo "#define BOUNDARY_ID_BYTES 2" >>confdefs.h
+
+	;;
+    4)
+
+$as_echo "#define BOUNDARY_ID_BYTES 4" >>confdefs.h
+
+	;;
+    8)
+
+$as_echo "#define BOUNDARY_ID_BYTES 8" >>confdefs.h
+
+	;;
+    *)
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized boundary_id size: $boundary_bytes - configuring size...2" >&5
+$as_echo ">>> unrecognized boundary_id size: $boundary_bytes - configuring size...2" >&6; }
+
+$as_echo "#define BOUNDARY_ID_BYTES 2" >>confdefs.h
+
+	boundary_bytes=2
+	;;
+esac
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of boundary_id... $boundary_bytes" >&5
+$as_echo "configuring size of boundary_id... $boundary_bytes" >&6; }
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# size of dof_id_type -- default 4 bytes
+# -------------------------------------------------------------
+
+# Check whether --with-dof_id_bytes was given.
+if test "${with_dof_id_bytes+set}" = set; then :
+  withval=$with_dof_id_bytes; dof_bytes="$withval"
+else
+  dof_bytes=4
+fi
+
+
+case "$dof_bytes" in
+    1)
+
+$as_echo "#define DOF_ID_BYTES 1" >>confdefs.h
+
+	;;
+    2)
+
+$as_echo "#define DOF_ID_BYTES 2" >>confdefs.h
+
+	;;
+    4)
+
+$as_echo "#define DOF_ID_BYTES 4" >>confdefs.h
+
+	;;
+    8)
+
+$as_echo "#define DOF_ID_BYTES 8" >>confdefs.h
+
+	;;
+    *)
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&5
+$as_echo ">>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&6; }
+
+$as_echo "#define DOF_ID_BYTES 2" >>confdefs.h
+
+	dof_bytes=4
+	;;
+esac
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of dof_id... $dof_bytes" >&5
+$as_echo "configuring size of dof_id... $dof_bytes" >&6; }
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# size of subdomain_id_type -- default 2 bytes
 # -------------------------------------------------------------
 
 # Check whether --with-subdomain_id_bytes was given.
@@ -26319,6 +26421,11 @@ $as_echo "#define SUBDOMAIN_ID_BYTES 2" >>confdefs.h
     4)
 
 $as_echo "#define SUBDOMAIN_ID_BYTES 4" >>confdefs.h
+
+	;;
+    8)
+
+$as_echo "#define SUBDOMAIN_ID_BYTES 8" >>confdefs.h
 
 	;;
     *)
@@ -35637,28 +35744,30 @@ echo Git revision....................... : $BUILD_VERSION
 ######################################################################################
 echo
 echo Library Features:
-echo '  'adaptive mesh refinement......... : $enableamr
-echo '  'complex variables................ : $enablecomplex
-echo '  'example suite.................... : $enableexamples
-echo '  'ghosted vectors.................. : $enableghosted
-echo '  'high-order shape functions....... : $enablepfem
-echo '  'infinite elements................ : $enableifem
-echo '  'Dirichlet constraints............ : $enabledirichlet
-echo '  'node constraints................. : $enablenodeconstraint
-echo '  'parallel mesh.................... : $enableparmesh
-echo '  'performance logging.............. : $enableperflog
-echo '  'periodic boundary conditions..... : $enableperiodic
-echo '  'reference counting............... : $enablerefct
-echo '  'shape function 2nd derivatives... : $enablesecond
-echo '  'stack trace files................ : $enabletracefiles
-echo '  'subdomain id size................ : $subdomain_bytes bytes
-echo '  'variational smoother............. : $enablevsmoother
-echo '  'xdr binary I/O................... : $enablexdr
+echo '  adaptive mesh refinement......... :' $enableamr
+echo '  complex variables................ :' $enablecomplex
+echo '  example suite.................... :' $enableexamples
+echo '  ghosted vectors.................. :' $enableghosted
+echo '  high-order shape functions....... :' $enablepfem
+echo '  id size (boundaries)............. :' $boundary_bytes bytes
+echo '  id size (dofs)................... :' $dof_bytes bytes
+echo '  id size (subdomains)............. :' $subdomain_bytes bytes
+echo '  infinite elements................ :' $enableifem
+echo '  Dirichlet constraints............ :' $enabledirichlet
+echo '  node constraints................. :' $enablenodeconstraint
+echo '  parallel mesh.................... :' $enableparmesh
+echo '  performance logging.............. :' $enableperflog
+echo '  periodic boundary conditions..... :' $enableperiodic
+echo '  reference counting............... :' $enablerefct
+echo '  shape function 2nd derivatives... :' $enablesecond
+echo '  stack trace files................ :' $enabletracefiles
+echo '  variational smoother............. :' $enablevsmoother
+echo '  xdr binary I/O................... :' $enablexdr
 if (test "x$enablelegacyincludepaths" = "xyes"); then
-echo '  'non-prefixed include paths....... : $enablelegacyincludepaths ***LEGACY FEATURE***
+echo '  non-prefixed include paths....... :' $enablelegacyincludepaths ***LEGACY FEATURE***
 fi
 if (test "x$enablelegacyusingnamespace" = "xyes"); then
-echo '  'adding using namespace libMesh... : $enablelegacyusingnamespace ***LEGACY FEATURE***
+echo '  adding using namespace libMesh... :' $enablelegacyusingnamespace ***LEGACY FEATURE***
 fi
 
 
