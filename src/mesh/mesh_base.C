@@ -168,28 +168,39 @@ void MeshBase::clear ()
 
 
 
+void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
+{
+  // This requires an inspection on every processor
+  parallel_only();
+
+  ids.clear();
+  
+  const_element_iterator       el  = this->active_elements_begin();
+  const const_element_iterator end = this->active_elements_end();
+
+  for (; el!=end; ++el)
+    ids.insert((*el)->subdomain_id());
+
+  // Some subdomains may only live on other processors
+  CommWorld.set_union(ids);
+}
+
+
+
 unsigned int MeshBase::n_subdomains() const
 {
   // This requires an inspection on every processor
   parallel_only();
 
-  const_element_iterator       el  = this->active_elements_begin();
-  const const_element_iterator end = this->active_elements_end();
+  std::set<subdomain_id_type> ids;
 
-  std::set<unsigned int> subdomain_ids;
+  this->subdomain_ids (ids);
 
-  for (; el!=end; ++el)
-    subdomain_ids.insert((*el)->subdomain_id());
-
-  // Some subdomains may only live on other processors
-  CommWorld.set_union(subdomain_ids, 0);
-
-  unsigned int n_sbd_ids = subdomain_ids.size();
-  CommWorld.broadcast(n_sbd_ids);
-
-  return n_sbd_ids;
+  return ids.size();
 }
 
+
+  
 
 unsigned int MeshBase::n_nodes_on_proc (const unsigned int proc_id) const
 {

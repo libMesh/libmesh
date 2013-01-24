@@ -125,20 +125,11 @@ TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary, const Real time,
   _strand_offset (strand_offset),
   _zone_title ("zone")
 {
-  
-  // This requires an inspection on every processor
-  parallel_only();
-  
-  _subdomain_ids.clear();
-  
-  MeshBase::const_element_iterator       el  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
-  
-  for (; el!=end; ++el)
-    _subdomain_ids.insert((*el)->subdomain_id());
-  
-  // Some subdomains may only live on other processors
-  CommWorld.set_union(_subdomain_ids);  
+  // Gather a list of subdomain ids in the mesh.
+  // We must do this now, while we have every
+  // processor's attention
+  // (some of the write methods only execute on processor 0).
+  mesh.subdomain_ids (_subdomain_ids);
 }
 
 
