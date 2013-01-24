@@ -20,6 +20,7 @@
 // C++ includes
 #include <fstream>
 #include <iomanip>
+#include <sstream>
 
 // Local includes
 #include "libmesh/libmesh_config.h"
@@ -27,6 +28,7 @@
 #include "libmesh/tecplot_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/elem.h"
+#include "libmesh/parallel.h"
 
 #ifdef LIBMESH_HAVE_TECPLOT_API
 extern "C" {
@@ -59,10 +61,12 @@ namespace
     std::vector<int>   connData;
     //float* nodalData;
     //int*   connData;
+
+    void set_n_cells (const unsigned int nc);
     
     const unsigned int n_nodes;
     const unsigned int n_vars;
-    const unsigned int n_cells;
+    unsigned int n_cells;
     const unsigned int n_vert;
   };
 }
@@ -99,6 +103,13 @@ int & TecplotMacros::cd(const unsigned int i, const unsigned int j)
   return connData[(i) + (j)*(n_vert)];
 }
 
+
+inline
+void TecplotMacros::set_n_cells (const unsigned int nc)
+{
+  n_cells = nc;
+  connData.resize(n_cells*n_vert);
+}
 #endif
 //--------------------------------------------------------
 
@@ -106,6 +117,32 @@ int & TecplotMacros::cd(const unsigned int i, const unsigned int j)
 
 // ------------------------------------------------------------
 // TecplotIO  members
+TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary, const Real time,
+		      const int strand_offset) :
+  MeshOutput<MeshBase> (mesh),
+  _binary (binary),
+  _time (time),
+  _strand_offset (strand_offset),
+  _zone_title ("zone")
+{
+  
+  // This requires an inspection on every processor
+  parallel_only();
+  
+  _subdomain_ids.clear();
+  
+  MeshBase::const_element_iterator       el  = mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end = mesh.active_elements_end();
+  
+  for (; el!=end; ++el)
+    _subdomain_ids.insert((*el)->subdomain_id());
+  
+  // Some subdomains may only live on other processors
+  CommWorld.set_union(_subdomain_ids);  
+}
+
+
+
 void TecplotIO::write (const std::string& fname)
 {
   if (libMesh::processor_id() == 0)
@@ -273,21 +310,41 @@ void TecplotIO::write_binary (const std::string& fname,
   
   // Get a constant reference to the mesh.
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
-
-  // Tecplot binary output only good for dim=2,3
-  if (mesh.mesh_dimension() == 1)
-    {
-      this->write_ascii (fname, vec, solution_names);
-
-      return;
-    }
-
+    
   // Required variables
   std::string tecplot_variable_names;
   int
+    ierr      =  0,
+    file_type =  0, // full
     is_double =  0,
+#ifdef DEBUG
+    tec_debug =  1,
+#else
     tec_debug =  0,
-    cell_type = (mesh.mesh_dimension()==2) ? 3 : 5; // FEQUADRILATERAL or FEBRICK, respectively
+#endif
+    cell_type   = -1,
+    nn_per_elem = -1;
+
+  switch (mesh.mesh_dimension())
+    {
+    case 1:
+      cell_type   = 1;  // FELINESEG
+      nn_per_elem = 2;
+      break;
+      
+    case 2:
+      cell_type   = 3; // FEQUADRILATERAL
+      nn_per_elem = 4;
+      break;
+      
+    case 3:
+      cell_type   = 5; // FEBRICK
+      nn_per_elem = 8;
+      break;
+
+    default:
+      libmesh_error();
+    }
 
   // Build a string containing all the variable names to pass to Tecplot
   {
@@ -330,7 +387,7 @@ void TecplotIO::write_binary (const std::string& fname,
 		   (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
 #endif
 		   mesh.n_active_sub_elem(),
-		   ((mesh.mesh_dimension() == 2) ? 4 : 8)
+		   nn_per_elem
 		   );
 
 
@@ -363,112 +420,154 @@ void TecplotIO::write_binary (const std::string& fname,
     }
 
 
-  // Copy the connectivity
-  {
-    unsigned int te = 0;
+  // Initialize the file
+  ierr = TECINI112 (NULL,
+		    (char*) tecplot_variable_names.c_str(),
+		    (char*) fname.c_str(),
+		    (char*) ".",
+		    &file_type,
+		    &tec_debug,
+		    &is_double);
+  
+  libmesh_assert_equal_to (ierr, 0);
 
-//     const_active_elem_iterator       it (mesh.elements_begin());
-//     const const_active_elem_iterator end(mesh.elements_end());
-
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
-
-    for ( ; it != end; ++it)
+  // A zone for each subdomain
+  bool firstzone=true;
+  for (std::set<subdomain_id_type>::const_iterator sbd_it=_subdomain_ids.begin();
+       sbd_it!=_subdomain_ids.end(); ++sbd_it)
+    {      
+      // Copy the connectivity for this subdomain
       {
-	std::vector<unsigned int> conn;
-	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	MeshBase::const_element_iterator       it  = mesh.active_subdomain_elements_begin (*sbd_it);
+	const MeshBase::const_element_iterator end = mesh.active_subdomain_elements_end   (*sbd_it);
+
+	unsigned int n_subcells_in_subdomain=0;
+
+	for (; it != end; ++it)
+	  n_subcells_in_subdomain += (*it)->n_sub_elem();
+	
+	// update the connectivty array to include only the elements in this subdomain
+	tm.set_n_cells (n_subcells_in_subdomain);
+
+	unsigned int te = 0;
+	  
+	for (it  = mesh.active_subdomain_elements_begin (*sbd_it);
+	     it != end; ++it)
 	  {
-	    (*it)->connectivity(se, TECPLOT, conn);
-
-	    for (unsigned int node=0; node<conn.size(); node++)
-	      tm.cd(node,te) = conn[node];
-
-	    te++;
+	    std::vector<unsigned int> conn;
+	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
+	      {
+		(*it)->connectivity(se, TECPLOT, conn);
+		  
+		for (unsigned int node=0; node<conn.size(); node++)
+		  tm.cd(node,te) = conn[node];
+		  
+		te++;
+	      }
 	  }
       }
-  }
+	
+	
+      // Ready to call the Tecplot API for this subdomain
+      {	
+	int
+	  num_nodes   = static_cast<int>(mesh.n_nodes()),
+	  num_cells   = static_cast<int>(tm.n_cells),
+	  num_faces   = 0,
+	  i_cell_max  = 0,
+	  j_cell_max  = 0,
+	  k_cell_max  = 0,
+	  strand_id   = std::max(*sbd_it,static_cast<subdomain_id_type>(1)) + this->strand_offset(),
+	  parent_zone = 0,
+	  is_block    = 1,
+	  num_face_connect   = 0,
+	  face_neighbor_mode = 0,
+	  tot_num_face_nodes = 0,
+	  num_connect_boundary_faces = 0,
+	  tot_num_boundary_connect   = 0,
+	  share_connect_from_zone=0;
+	  
+	std::vector<int>
+	  passive_var_list    (tm.n_vars, 0),
+	  share_var_from_zone (tm.n_vars, 1); // We only write data for the first zone, all other
+	  	                              // zones will share from this one.
 
-
-  // Ready to call the Tecplot API
-  {
-    int
-      ierr        = 0,
-      num_nodes   = static_cast<int>(mesh.n_nodes()),
-      num_cells   = static_cast<int>(mesh.n_active_sub_elem()),
-      file_type   = 0, // full
-      num_faces   = 0,
-      i_cell_max  = 0,
-      j_cell_max  = 0,
-      k_cell_max  = 0,
-      strand_id   = 1 + this->strand_offset(),
-      parent_zone = 0,
-      is_block    = 1,
-      num_face_connect   = 0,
-      face_neighbor_mode = 0,
-      tot_num_face_nodes = 0,
-      num_connect_boundary_faces = 0,
-      tot_num_boundary_connect   = 0,
-      share_connect_from_zone=0;
-
-    std::vector<int> passive_var_list (tm.n_vars+1, 0);
-      
-    ierr = TECINI112 (NULL,
-		      (char*) tecplot_variable_names.c_str(),
-		      (char*) fname.c_str(),
-		      (char*) ".",
-		      &file_type,
-		      &tec_debug,
-		      &is_double);
-
-    libmesh_assert_equal_to (ierr, 0);
-
-    ierr = TECZNE112 (NULL,
-		      &cell_type,
-		      &num_nodes,
-		      &num_cells,
-		      &num_faces,
-		      &i_cell_max,
-		      &j_cell_max,
-		      &k_cell_max,
-		      &_time,
-		      &strand_id,
-		      &parent_zone,
-		      &is_block,
-		      &num_face_connect,
-		      &face_neighbor_mode,
-		      &tot_num_face_nodes,
-		      &num_connect_boundary_faces,
-		      &tot_num_boundary_connect,
-		      &passive_var_list[0],
-		      NULL, // = all are node centered
-		      NULL, // = share_var_from_zone
-		      &share_connect_from_zone);
-
-    libmesh_assert_equal_to (ierr, 0);
-
-
-    int total =
+	// get the subdomain name from libMesh, if there is one.
+	std::string subdomain_name = mesh.subdomain_name(*sbd_it);
+	std::ostringstream zone_name;
+	zone_name << this->zone_title();
+	
+	// We will title this
+	// "{zone_title()}_{subdomain_name}", or
+	// "{zone_title()}_{subdomain_id}", or
+	// "{zone_title()}"
+	if (subdomain_name.size())	
+	  {
+	    zone_name << "_";
+	    zone_name << subdomain_name;
+	  }
+	else if (_subdomain_ids.size() > 1)
+	  {
+	    zone_name << "_";
+	    zone_name << *sbd_it;
+	  }
+	    
+	ierr = TECZNE112 ((char*) zone_name.str().c_str(),
+			  &cell_type,
+			  &num_nodes,
+			  &num_cells,
+			  &num_faces,
+			  &i_cell_max,
+			  &j_cell_max,
+			  &k_cell_max,
+			  &_time,
+			  &strand_id,
+			  &parent_zone,
+			  &is_block,
+			  &num_face_connect,
+			  &face_neighbor_mode,
+			  &tot_num_face_nodes,
+			  &num_connect_boundary_faces,
+			  &tot_num_boundary_connect,
+			  &passive_var_list[0],
+			  NULL, // = all are node centered
+			  (firstzone) ? NULL : &share_var_from_zone[0],
+			  &share_connect_from_zone);
+	  
+	libmesh_assert_equal_to (ierr, 0);
+	  	  
+	// Write *all* the data for the first zone, then share it with the others
+	if (firstzone)
+	  {
+	    int total =
 #ifdef LIBMESH_USE_REAL_NUMBERS
-      ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
+	      ((3 + ((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
 #else
-      ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
+ 	      ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
 #endif
+	    
+	  
+	    ierr = TECDAT112 (&total,
+			      &tm.nodalData[0],
+			      &is_double);
+	      
+	    libmesh_assert_equal_to (ierr, 0);
+	  }
 
+	// Write the connectivity
+	ierr = TECNOD112 (&tm.connData[0]);
+	  
+	libmesh_assert_equal_to (ierr, 0);
+      }
 
-    ierr = TECDAT112 (&total,
-		      &tm.nodalData[0],
-		      &is_double);
+      firstzone = false;
+    }
 
-    libmesh_assert_equal_to (ierr, 0);
-
-    ierr = TECNOD112 (&tm.connData[0]);
-
-    libmesh_assert_equal_to (ierr, 0);
-
-    ierr = TECEND112 ();
-
-    libmesh_assert_equal_to (ierr, 0);
-  }
+  // Done, close the file.
+  ierr = TECEND112 ();
+    
+  libmesh_assert_equal_to (ierr, 0);
+  
 
 
   
