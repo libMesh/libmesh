@@ -55,13 +55,13 @@ typedef int16_t boundary_id_type;
 
 
 #if LIBMESH_DOF_ID_BYTES == 1
-typedef int8_t dof_id_type;
+typedef uint8_t dof_id_type;
 #elif LIBMESH_DOF_ID_BYTES == 2
-typedef int16_t dof_id_type;
+typedef uint16_t dof_id_type;
 #elif LIBMESH_DOF_ID_BYTES == 8
-typedef int64_t dof_id_type;
+typedef uint64_t dof_id_type;
 #else // LIBMESH_DOF_ID_BYTES = 4 (default)
-typedef int32_t dof_id_type;
+typedef uint32_t dof_id_type;
 #endif
 
 
