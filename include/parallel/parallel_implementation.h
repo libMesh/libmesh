@@ -90,6 +90,9 @@ struct Attributes<cxxtype<T> > \
 
 
 INT_TYPE(char,MPI_CHAR);
+#if MPI_VERSION > 1
+INT_TYPE(signed char,MPI_SIGNED_CHAR);
+#endif
 INT_TYPE(unsigned char,MPI_UNSIGNED_CHAR);
 INT_TYPE(short int,MPI_SHORT);
 INT_TYPE(unsigned short int,MPI_UNSIGNED_SHORT);
