@@ -496,10 +496,25 @@ template <>
 xdrproc_t xdr_translator<unsigned int>() { return (xdrproc_t)(xdr_u_int); }
 
 template <>
+xdrproc_t xdr_translator<long int>() { return (xdrproc_t)(xdr_long); }
+
+template <>
+xdrproc_t xdr_translator<unsigned long int>() { return (xdrproc_t)(xdr_u_long); }
+
+template <>
 xdrproc_t xdr_translator<short int>() { return (xdrproc_t)(xdr_short); }
 
 template <>
 xdrproc_t xdr_translator<unsigned short int>() { return (xdrproc_t)(xdr_u_short); }
+
+template <>
+xdrproc_t xdr_translator<char>() { return (xdrproc_t)(xdr_char); }
+
+template <>
+xdrproc_t xdr_translator<signed char>() { return (xdrproc_t)(xdr_char); }
+
+template <>
+xdrproc_t xdr_translator<unsigned char>() { return (xdrproc_t)(xdr_u_char); }
 
 template <>
 xdrproc_t xdr_translator<float>() { return (xdrproc_t)(xdr_float); }
@@ -1396,6 +1411,10 @@ template void Xdr::data<int>                              (int&,                
 template void Xdr::data<unsigned int>                     (unsigned int&,                    const char*);
 template void Xdr::data<unsigned short int>               (unsigned short int&,              const char*);
 template void Xdr::data<short int>                        (short int&,                       const char*);
+template void Xdr::data<unsigned long int>                (unsigned long int&,               const char*);
+template void Xdr::data<long int>                         (long int&,                        const char*);
+template void Xdr::data<signed char>                      (signed char&,                     const char*);
+template void Xdr::data<unsigned char>                    (unsigned char&,                   const char*);
 template void Xdr::data<float>                            (float&,                           const char*);
 template void Xdr::data<double>                           (double&,                          const char*);
 template void Xdr::data<long double>                      (long double&,                     const char*);
@@ -1407,6 +1426,10 @@ template void Xdr::data<std::vector<int> >                (std::vector<int>&,   
 template void Xdr::data<std::vector<unsigned int> >       (std::vector<unsigned int>&,       const char*);
 template void Xdr::data<std::vector<short int> >          (std::vector<short int>&,          const char*);
 template void Xdr::data<std::vector<unsigned short int> > (std::vector<unsigned short int>&, const char*);
+template void Xdr::data<std::vector<long int> >           (std::vector<long int>&,           const char*);
+template void Xdr::data<std::vector<unsigned long int> >  (std::vector<unsigned long int>&,  const char*);
+template void Xdr::data<std::vector<signed char> >        (std::vector<signed char>&,        const char*);
+template void Xdr::data<std::vector<unsigned char> >      (std::vector<unsigned char>&,      const char*);
 template void Xdr::data<std::vector<float> >              (std::vector<float>&,              const char*);
 template void Xdr::data<std::vector<double> >             (std::vector<double>&,             const char*);
 template void Xdr::data<std::vector<long double> >        (std::vector<long double>&,        const char*);
