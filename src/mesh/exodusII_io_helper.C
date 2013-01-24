@@ -720,8 +720,8 @@ void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const M
 
   num_elem = mesh.n_elem();
 
-  std::vector<short int> unique_side_boundaries;
-  std::vector<short int> unique_node_boundaries;
+  std::vector<boundary_id_type> unique_side_boundaries;
+  std::vector<boundary_id_type> unique_node_boundaries;
 
   mesh.boundary_info->build_side_boundary_ids(unique_side_boundaries);
   mesh.boundary_info->build_node_boundary_ids(unique_node_boundaries);
@@ -780,8 +780,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   num_nodes = mesh.n_nodes();
   num_elem = mesh.n_elem();
 
-  std::vector<short int> unique_side_boundaries;
-  std::vector<short int> unique_node_boundaries;
+  std::vector<boundary_id_type> unique_side_boundaries;
+  std::vector<boundary_id_type> unique_node_boundaries;
 
   mesh.boundary_info->build_side_boundary_ids(unique_side_boundaries);
   mesh.boundary_info->build_node_boundary_ids(unique_node_boundaries);
@@ -1110,7 +1110,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
   std::vector< unsigned int > el;
   std::vector< unsigned short int > sl;
-  std::vector< short int > il;
+  std::vector< boundary_id_type > il;
 
   mesh.boundary_info->build_side_list(el, sl, il);
 

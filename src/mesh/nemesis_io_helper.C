@@ -1391,7 +1391,7 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
   // Similarly to the nodes, we can't count any sides for elements which aren't local
   std::vector<unsigned>::iterator it_elem=elem_list.begin();
   std::vector<unsigned short>::iterator it_side=side_list.begin();
-  std::vector<short>::iterator it_id=id_list.begin();
+  std::vector<boundary_id_type>::iterator it_id=id_list.begin();
   for ( ; it_elem != elem_list.end(); )
     {
       if (pmesh.elem( *it_elem )->processor_id() != libMesh::processor_id())
@@ -1991,8 +1991,8 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
 
   // Store a map of vectors for boundary node IDs on this processor.
   // Use a vector of int here so it can be passed directly to Exodus.
-  std::map<short, std::vector<int> > local_node_boundary_id_lists;
-  typedef std::map<short, std::vector<int> >::iterator local_node_boundary_id_lists_iterator;
+  std::map<boundary_id_type, std::vector<int> > local_node_boundary_id_lists;
+  typedef std::map<boundary_id_type, std::vector<int> >::iterator local_node_boundary_id_lists_iterator;
 
   // FIXME: We should build this list only one time!!  We already built it above, but we
   // did not have the libmesh to exodus node mapping at that time... for now we'll just

@@ -37,7 +37,7 @@ namespace libMesh
 
 //------------------------------------------------------
 // BoundaryInfo static member initializations
-const boundary_id_type BoundaryInfo::invalid_id = -1234;
+const boundary_id_type BoundaryInfo::invalid_id = -123;
 
 
 
@@ -198,7 +198,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
             std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
 
             bool add_this_side = false;
-            short int this_bcid = invalid_id;
+            boundary_id_type this_bcid = invalid_id;
 
             for (; pos.first != pos.second; ++pos.first)
               {
@@ -284,7 +284,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
             std::pair<Iter, Iter> pos = _boundary_side_id.equal_range(top_parent);
 
             bool add_this_side = false;
-            short int this_bcid = invalid_id;
+            boundary_id_type this_bcid = invalid_id;
 
             for (; pos.first != pos.second; ++pos.first)
               {
