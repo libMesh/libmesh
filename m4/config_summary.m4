@@ -147,6 +147,9 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'ML............................ : $enableml
   fi
   echo '  'vtk.............................. : $enablevtk
+  if (test "x$enablevtk" = "xyes"); then
+  echo '     'version....................... : $vtkversion
+  fi
   echo
   if (test "x$libmesh_optional_INCLUDES" != "x"); then
   echo '  'libmesh_optional_INCLUDES........ : $libmesh_optional_INCLUDES

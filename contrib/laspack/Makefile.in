@@ -526,6 +526,9 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+vtkbuild = @vtkbuild@
+vtkmajor = @vtkmajor@
+vtkversion = @vtkversion@
 pkg_cppflags = -I$(top_builddir)/include #for #include "libmesh/libmesh_config.h"
 pkg_sources = \
 	copyrght.h \

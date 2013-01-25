@@ -617,6 +617,9 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+vtkbuild = @vtkbuild@
+vtkmajor = @vtkmajor@
+vtkversion = @vtkversion@
 
 # include paths - note that parmetis needs metis!
 pkg_cppflags = -DLIBMESH_IS_COMPILING_PARMETIS \

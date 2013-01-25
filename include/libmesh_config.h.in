@@ -73,6 +73,15 @@
 /* PETSc's subminor version number, as detected by petsc.m4 */
 #undef DETECTED_PETSC_VERSION_SUBMINOR
 
+/* VTK's major version number, as detected by vtk.m4 */
+#undef DETECTED_VTK_VERSION_MAJOR
+
+/* VTK's minor version number, as detected by vtk.m4 */
+#undef DETECTED_VTK_VERSION_MINOR
+
+/* VTK's subminor version number, as detected by vtk.m4 */
+#undef DETECTED_VTK_VERSION_SUBMINOR
+
 /* Integer indicating the highest spatial dimensionality supported by libMesh
    */
 #undef DIM

@@ -455,6 +455,9 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+vtkbuild = @vtkbuild@
+vtkmajor = @vtkmajor@
+vtkversion = @vtkversion@
 SUBDIRS = libmesh
 
 # special handholding for prefix_config.m4 generated files

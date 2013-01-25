@@ -670,6 +670,9 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+vtkbuild = @vtkbuild@
+vtkmajor = @vtkmajor@
+vtkversion = @vtkversion@
 
 # These are the headers we actually want to install and make available
 @LIBMESH_INSTALL_INTERNAL_BOOST_TRUE@nobase_include_HEADERS = \

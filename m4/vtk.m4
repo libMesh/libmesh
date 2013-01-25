@@ -92,6 +92,22 @@ AC_DEFUN([CONFIGURE_VTK],
          vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MINOR_VERSION[ ]*//g"`
          vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_BUILD_VERSION[ ]*//g"`
          vtkversion=$vtkmajor.$vtkminor.$vtkbuild
+
+         vtkmajorminor=$vtkmajor.$vtkminor.x
+
+         AC_SUBST(vtkversion)
+         AC_SUBST(vtkmajor)
+         AC_SUBST(vtkbuild)
+
+         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MAJOR, [$vtkmajor],
+           [VTK's major version number, as detected by vtk.m4])
+
+         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_MINOR, [$vtkminor],
+           [VTK's minor version number, as detected by vtk.m4])
+
+         AC_DEFINE_UNQUOTED(DETECTED_VTK_VERSION_SUBMINOR, [$vtkbuild],
+           [VTK's subminor version number, as detected by vtk.m4])
+
          AC_MSG_RESULT(<<< Configuring library with VTK version $vtkversion support >>>)
        fi
   

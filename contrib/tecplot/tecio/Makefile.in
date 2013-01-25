@@ -610,6 +610,9 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+vtkbuild = @vtkbuild@
+vtkmajor = @vtkmajor@
+vtkversion = @vtkversion@
 pkg_cppflags = @TECIO_CPPFLAGS@ -DUSEENUM -DTHREED -DMAKEARCHIVE -DNO_ASSERTS
 pkg_sources = \
 	include/TECIO.h \

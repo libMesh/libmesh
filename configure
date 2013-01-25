@@ -696,6 +696,9 @@ EIGEN_INCLUDE
 LIBMESH_ENABLE_VTK_FALSE
 LIBMESH_ENABLE_VTK_TRUE
 VTK_LIBRARY
+vtkbuild
+vtkmajor
+vtkversion
 VTK_DIR
 VTK_INCLUDE
 LIBMESH_ENABLE_GMV_FALSE
@@ -30955,6 +30958,31 @@ $as_echo "VTK header files not found!" >&6; }
          vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_MINOR_VERSION[ ]*//g"`
          vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/#define VTK_BUILD_VERSION[ ]*//g"`
          vtkversion=$vtkmajor.$vtkminor.$vtkbuild
+
+         vtkmajorminor=$vtkmajor.$vtkminor.x
+
+
+
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_VTK_VERSION_MAJOR $vtkmajor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_VTK_VERSION_MINOR $vtkminor
+_ACEOF
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DETECTED_VTK_VERSION_SUBMINOR $vtkbuild
+_ACEOF
+
+
          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with VTK version $vtkversion support >>>" >&5
 $as_echo "<<< Configuring library with VTK version $vtkversion support >>>" >&6; }
        fi
@@ -35877,6 +35905,9 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'ML............................ : $enableml
   fi
   echo '  'vtk.............................. : $enablevtk
+  if (test "x$enablevtk" = "xyes"); then
+  echo '     'version....................... : $vtkversion
+  fi
   echo
   if (test "x$libmesh_optional_INCLUDES" != "x"); then
   echo '  'libmesh_optional_INCLUDES........ : $libmesh_optional_INCLUDES
