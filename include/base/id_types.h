@@ -65,6 +65,20 @@ typedef uint32_t dof_id_type;
 #endif
 
 
+// Define processor id storage type.  We default to short to save
+// space, but expanding to support more than 2^16-2 procs should work
+// too.
+#if LIBMESH_PROCESSOR_ID_BYTES == 1
+typedef uint8_t processor_id_type;
+#elif LIBMESH_PROCESSOR_ID_BYTES == 4
+typedef uint32_t processor_id_type;
+#elif LIBMESH_PROCESSOR_ID_BYTES == 8
+typedef uint64_t processor_id_type;
+#else // LIBMESH_PROCESSOR_ID_BYTES = 2 (default)
+typedef uint16_t processor_id_type;
+#endif
+
+
 #if LIBMESH_SUBDOMAIN_ID_BYTES == 1
 typedef uint8_t subdomain_id_type;
 #elif LIBMESH_SUBDOMAIN_ID_BYTES == 4

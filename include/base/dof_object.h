@@ -21,6 +21,7 @@
 #define LIBMESH_DOF_OBJECT_H
 
 // Local includes
+#include "libmesh/id_types.h"
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh.h" // libMesh::invalid_uint
@@ -36,12 +37,6 @@ namespace libMesh
 // Forward declarations
 class DofObject;
 
-
-// Define processor id storage type.  We default to short to save
-// space, but expanding to support more than 2^16-2 procs should work
-// too.
-typedef unsigned short int processor_id_type;
-//typedef unsigned int processor_id_type;
 
 /**
  * The \p DofObject defines an abstract base class for objects that

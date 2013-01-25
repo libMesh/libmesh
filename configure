@@ -1017,6 +1017,7 @@ enable_legacy_include_paths
 enable_legacy_using_namespace
 with_boundary_id_bytes
 with_dof_id_bytes
+with_processor_id_bytes
 with_subdomain_id_bytes
 enable_everything
 enable_tracefiles
@@ -1846,6 +1847,8 @@ Optional Packages:
                           bytes used per boundary side per boundary_id
   --with-dof-id-bytes=<1|2|4|8>
                           bytes used per dof object id, dof index
+  --with-processor-id-bytes=<1|2|4|8>
+                          bytes used for processor id
   --with-subdomain-id-bytes=<1|2|4|8>
                           bytes of storage per element used to store the
                           subdomain_id
@@ -26384,13 +26387,61 @@ $as_echo "#define DOF_ID_BYTES 8" >>confdefs.h
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&5
 $as_echo ">>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&6; }
 
-$as_echo "#define DOF_ID_BYTES 2" >>confdefs.h
+$as_echo "#define DOF_ID_BYTES 4" >>confdefs.h
 
 	dof_bytes=4
 	;;
 esac
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of dof_id... $dof_bytes" >&5
 $as_echo "configuring size of dof_id... $dof_bytes" >&6; }
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# size of processor_id_type -- default 4 bytes
+# -------------------------------------------------------------
+
+# Check whether --with-processor_id_bytes was given.
+if test "${with_processor_id_bytes+set}" = set; then :
+  withval=$with_processor_id_bytes; processor_bytes="$withval"
+else
+  processor_bytes=4
+fi
+
+
+case "$processor_bytes" in
+    1)
+
+$as_echo "#define PROCESSOR_ID_BYTES 1" >>confdefs.h
+
+	;;
+    2)
+
+$as_echo "#define PROCESSOR_ID_BYTES 2" >>confdefs.h
+
+	;;
+    4)
+
+$as_echo "#define PROCESSOR_ID_BYTES 4" >>confdefs.h
+
+	;;
+    8)
+
+$as_echo "#define PROCESSOR_ID_BYTES 8" >>confdefs.h
+
+	;;
+    *)
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized processor_id size: $processor_bytes - configuring size...2" >&5
+$as_echo ">>> unrecognized processor_id size: $processor_bytes - configuring size...2" >&6; }
+
+$as_echo "#define PROCESSOR_ID_BYTES 2" >>confdefs.h
+
+	processor_bytes=4
+	;;
+esac
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of processor_id... $processor_bytes" >&5
+$as_echo "configuring size of processor_id... $processor_bytes" >&6; }
 # -------------------------------------------------------------
 
 

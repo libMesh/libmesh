@@ -425,6 +425,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* size of processor_id */
+#undef PROCESSOR_ID_BYTES
+
 /* Flag indicating if the library should keep names in libMesh namespace */
 #undef REQUIRE_SEPARATE_NAMESPACE
 

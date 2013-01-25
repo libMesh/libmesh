@@ -102,11 +102,44 @@ case "$dof_bytes" in
 	;;
     *)
 	AC_MSG_RESULT([>>> unrecognized dof_id size: $dof_bytes - configuring size...4])
-	AC_DEFINE(DOF_ID_BYTES, 2, [size of dof_id])
+	AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])
 	dof_bytes=4
 	;;
 esac
 AC_MSG_RESULT([configuring size of dof_id... $dof_bytes])
+# -------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------
+# size of processor_id_type -- default 4 bytes
+# -------------------------------------------------------------
+AC_ARG_WITH([processor_id_bytes],
+	    AC_HELP_STRING([--with-processor-id-bytes=<1|2|4|8>],
+                           [bytes used for processor id]),
+	    [processor_bytes="$withval"],
+	    [processor_bytes=4])
+
+case "$processor_bytes" in
+    1)
+	AC_DEFINE(PROCESSOR_ID_BYTES, 1, [size of processor_id])
+	;;
+    2)
+	AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])
+	;;
+    4)
+	AC_DEFINE(PROCESSOR_ID_BYTES, 4, [size of processor_id])
+	;;
+    8)
+	AC_DEFINE(PROCESSOR_ID_BYTES, 8, [size of processor_id])
+	;;
+    *)
+	AC_MSG_RESULT([>>> unrecognized processor_id size: $processor_bytes - configuring size...2])
+	AC_DEFINE(PROCESSOR_ID_BYTES, 2, [size of processor_id])
+	processor_bytes=4
+	;;
+esac
+AC_MSG_RESULT([configuring size of processor_id... $processor_bytes])
 # -------------------------------------------------------------
 
 
