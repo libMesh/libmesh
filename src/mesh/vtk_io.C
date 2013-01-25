@@ -50,6 +50,21 @@
 #include "vtkSmartPointer.h"
 #include "libmesh/restore_warnings.h"
 
+// A convenient macro for comparing VTK versions.  Returns 1 if the
+// current VTK version is < major.minor.subminor and zero otherwise.
+//
+// It relies on the VTK version numbers detected during configure.  Note that if
+// LIBMESH_HAVE_VTK is not defined, none of the LIBMESH_DETECTED_VTK_VERSION_* variables will
+// be defined either.
+#define VTK_VERSION_LESS_THAN(major,minor,subminor)                                                     \
+  ((LIBMESH_DETECTED_VTK_VERSION_MAJOR < (major) ||                                                     \
+    (LIBMESH_DETECTED_VTK_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_VTK_VERSION_MINOR < (minor) ||  \
+                                  (LIBMESH_DETECTED_VTK_VERSION_MINOR == (minor) &&                     \
+                                   LIBMESH_DETECTED_VTK_VERSION_SUBMINOR < (subminor))))) ? 1 : 0)
+
+
+
+
 #endif //LIBMESH_HAVE_VTK
 
 namespace libMesh
@@ -491,7 +506,13 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
   // compress the output, if desired (switches also to binary)
   if (this->_compress)
-    writer->SetCompressorTypeToZLib();
+    {
+#if !VTK_VERSION_LESS_THAN(5,6,0)
+      writer->SetCompressorTypeToZLib();
+#else
+      libmesh_do_once(libMesh::out << "Compression not implemented with old VTK libs!" << std::endl;);
+#endif
+    }
 
   writer->Write();
 
