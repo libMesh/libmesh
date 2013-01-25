@@ -343,7 +343,7 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
       // Assemble
       for (unsigned int i = 0; i < n_x_dofs; ++i) {
         for (unsigned int d1 = 0; d1 < c.dim; ++d1) {
-          if (isnan(diff(d1)))
+          if (libmesh_isnan(diff(d1)))
             continue;
           Real val = JxW[qp] * phi[i][qp] * diff(d1) * penalty_number;
           c.elem_subresiduals[var[d1]]->operator ()(i) += val;
@@ -351,7 +351,7 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
         if (request_jacobian) {
           for (unsigned int j = 0; j < n_x_dofs; ++j) {
             for (unsigned int d1 = 0; d1 < c.dim; ++d1) {
-              if (isnan(diff(d1)))
+              if (libmesh_isnan(diff(d1)))
                 continue;
               Real val = JxW[qp] * phi[i][qp] * phi[j][qp] * penalty_number;
               c.elem_subjacobians[var[d1]][var[d1]]->operator ()(i, j) += val;

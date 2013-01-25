@@ -136,6 +136,12 @@ void run_timestepping(EquationSystems& systems, GetPot& args) {
 
 int main(int argc, char** argv) {
 
+  // Skip this example if we do not meet certain requirements
+#ifndef LIBMESH_HAVE_VTK
+  std::cout << "This example requires VTK support - skipping.\n";
+  return 77;
+#endif
+
 	// Initialize libMesh and any dependent libraries
 	LibMeshInit init(argc, argv);
 
