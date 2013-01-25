@@ -38,7 +38,7 @@ endif
 
 test_headers:
 	@echo " "
-	@echo "Checking for standalone headers in source tree..."
+	@echo "Checking for standalone headers in source tree $(top_builddir)/include ..."
 	@echo " "
 	@CXX="$(CXX)" \
 	  HEADERS_TO_TEST="$(headers_to_test)" \
@@ -47,7 +47,7 @@ test_headers:
 
 installcheck-local:
 	@echo " "
-	@echo "Checking for standalone headers in installed tree..."
+	@echo "Checking for standalone headers in installed tree $(prefix) ..."
 	@echo " "
 	@CXX="$(CXX)" \
 	  HEADERS_TO_TEST="$(headers_to_test)" \
