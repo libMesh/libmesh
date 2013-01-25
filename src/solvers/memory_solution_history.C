@@ -133,9 +133,6 @@ namespace libMesh
       // and if we think it's worth preserving
         _system.project_solution_on_reinit())
       saved_vectors[_solution] = _system.solution->clone().release();
-
-    // Put all the vectors from this timestep into stored_solutions
-    stored_solutions.push_back(std::make_pair(_system.time, saved_vectors));
   }
 
   void MemorySolutionHistory::retrieve()
