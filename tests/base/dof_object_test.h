@@ -63,7 +63,7 @@ public:
     DofObject aobject(*instance);
 
     aobject.processor_id(libMesh::processor_id());
-    CPPUNIT_ASSERT_EQUAL( (short unsigned int)libMesh::processor_id() , aobject.processor_id() );
+    CPPUNIT_ASSERT_EQUAL( (processor_id_type)libMesh::processor_id() , aobject.processor_id() );
   }
 
   void testValidProcId()
