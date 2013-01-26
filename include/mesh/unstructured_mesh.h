@@ -128,7 +128,7 @@ class UnstructuredMesh : public MeshBase
    * to the function.
    */
   void create_pid_mesh (UnstructuredMesh& pid_mesh,
-			const unsigned int pid) const;
+			const processor_id_type pid) const;
 
   /**
    * Constructs a mesh called "new_mesh" from the current mesh by

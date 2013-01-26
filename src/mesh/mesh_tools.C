@@ -72,7 +72,7 @@ namespace {
 	_weight += (*it)->n_nodes();
     }
 
-    unsigned int weight() const
+    dof_id_type weight() const
     { return _weight; }
 
 // If we don't have threads we never need a join, and icpc yells a
@@ -83,7 +83,7 @@ namespace {
 #endif
 
   private:
-    unsigned int _weight;
+    dof_id_type _weight;
   };
 
 
@@ -201,7 +201,7 @@ namespace {
             std::accumulate(n_vars.begin(), n_vars.end(), 0);
 
           std::vector<unsigned int> n_comp (tot_n_vars, 0);
-          std::vector<unsigned int> first_dof (tot_n_vars, 0);
+          std::vector<dof_id_type> first_dof (tot_n_vars, 0);
          
           for (unsigned int s = 0, i=0; s != n_sys; ++s)
             for (unsigned int v = 0; v != n_vars[s]; ++v, ++i)
@@ -310,14 +310,14 @@ bool MeshTools::BoundingBox::contains_point (const Point & p) const
 
 // ------------------------------------------------------------
 // MeshTools functions
-unsigned int MeshTools::total_weight(const MeshBase& mesh)
+dof_id_type MeshTools::total_weight(const MeshBase& mesh)
 {
   if (!mesh.is_serial())
     {
       parallel_only();
-      unsigned int weight = MeshTools::weight (mesh, libMesh::processor_id());
+      dof_id_type weight = MeshTools::weight (mesh, libMesh::processor_id());
       CommWorld.sum(weight);
-      unsigned int unpartitioned_weight =
+      dof_id_type unpartitioned_weight =
         MeshTools::weight (mesh, DofObject::invalid_processor_id);
       return weight + unpartitioned_weight;
     }
@@ -333,7 +333,7 @@ unsigned int MeshTools::total_weight(const MeshBase& mesh)
 
 
 
-unsigned int MeshTools::weight(const MeshBase& mesh, const unsigned int pid)
+dof_id_type MeshTools::weight(const MeshBase& mesh, const processor_id_type pid)
 {
   SumElemWeight sew;
 
@@ -346,7 +346,7 @@ unsigned int MeshTools::weight(const MeshBase& mesh, const unsigned int pid)
 
 
 void MeshTools::build_nodes_to_elem_map (const MeshBase& mesh,
-					 std::vector<std::vector<unsigned int> >& nodes_to_elem_map)
+					 std::vector<std::vector<dof_id_type> >& nodes_to_elem_map)
 {
   nodes_to_elem_map.resize (mesh.n_nodes());
 
@@ -452,7 +452,7 @@ MeshTools::bounding_sphere(const MeshBase& mesh)
 
 MeshTools::BoundingBox
 MeshTools::processor_bounding_box (const MeshBase& mesh,
-				   const unsigned int pid)
+				   const processor_id_type pid)
 {
   libmesh_assert_less (pid, libMesh::n_processors());
 
@@ -469,7 +469,7 @@ MeshTools::processor_bounding_box (const MeshBase& mesh,
 
 Sphere
 MeshTools::processor_bounding_sphere (const MeshBase& mesh,
-				      const unsigned int pid)
+				      const processor_id_type pid)
 {
   BoundingBox bbox = processor_bounding_box(mesh,pid);
 
@@ -537,27 +537,27 @@ void MeshTools::elem_types (const MeshBase& mesh,
 
 
 
-unsigned int MeshTools::n_elem_of_type (const MeshBase& mesh,
-					const ElemType type)
+dof_id_type MeshTools::n_elem_of_type (const MeshBase& mesh,
+				       const ElemType type)
 {
-  return static_cast<unsigned int>(std::distance(mesh.type_elements_begin(type),
-						 mesh.type_elements_end  (type)));
+  return static_cast<dof_id_type>(std::distance(mesh.type_elements_begin(type),
+						mesh.type_elements_end  (type)));
 }
 
 
 
-unsigned int MeshTools::n_active_elem_of_type (const MeshBase& mesh,
-					       const ElemType type)
+dof_id_type MeshTools::n_active_elem_of_type (const MeshBase& mesh,
+					      const ElemType type)
 {
-  return static_cast<unsigned int>(std::distance(mesh.active_type_elements_begin(type),
-						 mesh.active_type_elements_end  (type)));
+  return static_cast<dof_id_type>(std::distance(mesh.active_type_elements_begin(type),
+						mesh.active_type_elements_end  (type)));
 }
 
-unsigned int MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase& mesh,
-                                                const ElemType type,
-                                                const unsigned int level)
+dof_id_type MeshTools::n_non_subactive_elem_of_type_at_level(const MeshBase& mesh,
+                                                             const ElemType type,
+                                                             const unsigned int level)
 {
-  unsigned int cnt = 0;
+  dof_id_type cnt = 0;
   // iterate over the elements of the specified type
   MeshBase::const_element_iterator el = mesh.type_elements_begin(type);
   const MeshBase::const_element_iterator end = mesh.type_elements_end(type);
@@ -642,7 +642,7 @@ unsigned int MeshTools::n_levels(const MeshBase& mesh)
 
 
 void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
-    std::set<unsigned int>& not_subactive_node_ids)
+    std::set<dof_id_type>& not_subactive_node_ids)
 {
   MeshBase::const_element_iterator el           = mesh.elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.elements_end();
@@ -657,16 +657,16 @@ void MeshTools::get_not_subactive_node_ids(const MeshBase& mesh,
 
 
 
-unsigned int MeshTools::n_elem (const MeshBase::const_element_iterator &begin,
-                                const MeshBase::const_element_iterator &end)
+dof_id_type MeshTools::n_elem (const MeshBase::const_element_iterator &begin,
+                               const MeshBase::const_element_iterator &end)
 {
   return std::distance(begin, end);
 }
 
 
 
-unsigned int MeshTools::n_nodes (const MeshBase::const_node_iterator &begin,
-				 const MeshBase::const_node_iterator &end)
+dof_id_type MeshTools::n_nodes (const MeshBase::const_node_iterator &begin,
+				const MeshBase::const_node_iterator &end)
 {
   return std::distance(begin, end);
 }
@@ -704,7 +704,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase&, const Node& n,
                                      std::vector<std::vector<const Elem*> >& nodes_to_elem_map,
                                      std::vector<const Node*>& neighbors)
 {
-  unsigned int global_id = n.id();
+  dof_id_type global_id = n.id();
 
   //Iterators to iterate through the elements that include this node
   std::vector<const Elem*>::const_iterator el     = nodes_to_elem_map[global_id].begin();
@@ -781,7 +781,7 @@ void MeshTools::find_nodal_neighbors(const MeshBase&, const Node& n,
   }
 }
 
-void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<unsigned int, std::vector<unsigned int> >& hanging_nodes)
+void MeshTools::find_hanging_nodes_and_parents(const MeshBase& mesh, std::map<dof_id_type, std::vector<dof_id_type> >& hanging_nodes)
 {
   MeshBase::const_element_iterator it  = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_local_elements_end();
@@ -920,7 +920,7 @@ void MeshTools::correct_node_proc_ids
   for (e_it = mesh.active_elements_begin(); e_it != e_end; ++e_it)
     {
       Elem *elem = *e_it;
-      unsigned int proc_id = elem->processor_id();
+      processor_id_type proc_id = elem->processor_id();
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
           Node *node = elem->get_node(n);
@@ -1078,8 +1078,8 @@ void MeshTools::libmesh_assert_no_links_to_elem(const MeshBase &mesh,
 
 void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
 {
-  unsigned int lastprocid = 0;
-  unsigned int lastelemid = 0;
+  processor_id_type lastprocid = 0;
+  dof_id_type lastelemid = 0;
 
   const MeshBase::const_element_iterator el_end =
     mesh.active_elements_end();
@@ -1088,8 +1088,8 @@ void MeshTools::libmesh_assert_valid_elem_ids(const MeshBase &mesh)
     {
       const Elem* elem = *el;
       libmesh_assert (elem);
-      unsigned int elemprocid = elem->processor_id();
-      unsigned int elemid = elem->id();
+      processor_id_type elemprocid = elem->processor_id();
+      dof_id_type elemid = elem->id();
 
       libmesh_assert_greater_equal (elemid, lastelemid);
       libmesh_assert_greater_equal (elemprocid, lastprocid);
@@ -1161,16 +1161,16 @@ void libmesh_assert_valid_dof_ids(const MeshBase &mesh)
 
   parallel_only();
 
-  unsigned int pmax_elem_id = mesh.max_elem_id();
+  dof_id_type pmax_elem_id = mesh.max_elem_id();
   CommWorld.max(pmax_elem_id);
 
-  for (unsigned int i=0; i != pmax_elem_id; ++i)
+  for (dof_id_type i=0; i != pmax_elem_id; ++i)
     assert_semiverify_dofobj(mesh.query_elem(i));
 
-  unsigned int pmax_node_id = mesh.max_node_id();
+  dof_id_type pmax_node_id = mesh.max_node_id();
   CommWorld.max(pmax_node_id);
 
-  for (unsigned int i=0; i != pmax_node_id; ++i)
+  for (dof_id_type i=0; i != pmax_node_id; ++i)
     assert_semiverify_dofobj(mesh.query_node_ptr(i));
 }
 
@@ -1184,23 +1184,23 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
 
   // We want this test to be valid even when called even after nodes
   // have been added asynchonously but before they're renumbered
-  unsigned int parallel_max_elem_id = mesh.max_elem_id();
+  dof_id_type parallel_max_elem_id = mesh.max_elem_id();
   CommWorld.max(parallel_max_elem_id);
 
   // Check processor ids for consistency between processors
 
-  for (unsigned int i=0; i != parallel_max_elem_id; ++i)
+  for (dof_id_type i=0; i != parallel_max_elem_id; ++i)
     {
       const Elem *elem = mesh.query_elem(i);
 
-      unsigned int min_id =
+      processor_id_type min_id =
         elem ? elem->processor_id() :
-               std::numeric_limits<unsigned int>::max();
+               std::numeric_limits<processor_id_type>::max();
       CommWorld.min(min_id);
 
-      unsigned int max_id =
+      processor_id_type max_id =
         elem ? elem->processor_id() :
-               std::numeric_limits<unsigned int>::min();
+               std::numeric_limits<processor_id_type>::min();
       CommWorld.max(max_id);
 
       if (elem)
@@ -1236,7 +1236,7 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
       if (parent)
         {
           libmesh_assert(parent->has_children());
-          unsigned int parent_procid = parent->processor_id();
+          processor_id_type parent_procid = parent->processor_id();
           bool matching_child_id = false;
           for (unsigned int c = 0; c != parent->n_children(); ++c)
             {
@@ -1269,23 +1269,23 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
 
   // We want this test to be valid even when called even after nodes
   // have been added asynchonously but before they're renumbered
-  unsigned int parallel_max_node_id = mesh.max_node_id();
+  dof_id_type parallel_max_node_id = mesh.max_node_id();
   CommWorld.max(parallel_max_node_id);
 
   // Check processor ids for consistency between processors
 
-  for (unsigned int i=0; i != parallel_max_node_id; ++i)
+  for (dof_id_type i=0; i != parallel_max_node_id; ++i)
     {
       const Node *node = mesh.query_node_ptr(i);
 
-      unsigned int min_id =
+      processor_id_type min_id =
         node ? node->processor_id() :
-               std::numeric_limits<unsigned int>::max();
+               std::numeric_limits<processor_id_type>::max();
       CommWorld.min(min_id);
 
-      unsigned int max_id =
+      processor_id_type max_id =
         node ? node->processor_id() :
-               std::numeric_limits<unsigned int>::min();
+               std::numeric_limits<processor_id_type>::min();
       CommWorld.max(max_id);
 
       if (node)
@@ -1311,7 +1311,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
       for (unsigned int i=0; i != elem->n_nodes(); ++i)
         {
           const Node *node = elem->get_node(i);
-          unsigned int nodeid = node->id();
+          dof_id_type nodeid = node->id();
           node_touched_by_me[nodeid] = true;
         }
     }
@@ -1325,7 +1325,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
       const Node *node = *nd;
       libmesh_assert(node);
 
-      unsigned int nodeid = node->id();
+      dof_id_type nodeid = node->id();
       libmesh_assert(!node_touched_by_anyone[nodeid] ||
                      node_touched_by_me[nodeid]);
     }
@@ -1352,7 +1352,7 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
     {
       const Elem* elem = *el;
       libmesh_assert (elem);
-      unsigned int elemid = elem->id();
+      dof_id_type elemid = elem->id();
 
       my_elem_h_state[elemid] =
         static_cast<unsigned char>(elem->refinement_flag());
@@ -1366,7 +1366,7 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
   std::vector<unsigned char> min_elem_p_state(my_elem_p_state);
   CommWorld.min(min_elem_p_state);
 
-  for (unsigned int i=0; i!= mesh.max_elem_id(); ++i)
+  for (dof_id_type i=0; i!= mesh.max_elem_id(); ++i)
     {
       libmesh_assert(my_elem_h_state[i] == 255 ||
                      my_elem_h_state[i] == min_elem_h_state[i]);

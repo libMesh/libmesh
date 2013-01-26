@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <cstddef>
+#include <limits>
 
 namespace libMesh
 {
@@ -52,7 +53,7 @@ class RemoteElem : public Elem
   /**
    * A unique \p id to distinguish remote element links
    */
-  static const unsigned int remote_elem_id = libMesh::invalid_uint-1;
+  static const dof_id_type remote_elem_id = static_cast<dof_id_type>(-2);
 
   /**
    * Constructor.

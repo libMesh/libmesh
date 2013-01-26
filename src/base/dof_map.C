@@ -2575,8 +2575,10 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 	}
       else
         {
-          n_nz[r] += other.n_nz[r];  n_nz[r] = std::min(n_nz[r], n_dofs_on_proc);
-          n_oz[r] += other.n_oz[r];  n_oz[r] = std::min(n_oz[r], n_global_dofs-n_nz[r]);
+          n_nz[r] += other.n_nz[r];
+	  n_nz[r] = std::min(n_nz[r], n_dofs_on_proc);
+          n_oz[r] += other.n_oz[r];
+	  n_oz[r] =std::min(n_oz[r], static_cast<dof_id_type>(n_global_dofs-n_nz[r]));
 	}
     }
 
@@ -2741,7 +2743,8 @@ void SparsityPattern::Build::parallel_sync ()
                   n_nz[my_r]++;
 
               n_nz[my_r] = std::min(n_nz[my_r], n_dofs_on_proc);
-              n_oz[my_r] = std::min(n_oz[my_r], n_global_dofs-n_nz[my_r]);
+              n_oz[my_r] = std::min(n_oz[my_r],
+				    static_cast<dof_id_type>(n_global_dofs-n_nz[my_r]));
             }
         }
     }

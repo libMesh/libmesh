@@ -2189,13 +2189,13 @@ public:
   /**
    * \p return the processor id of this packed element.
    */
-  unsigned int processor_id () const
+  processor_id_type processor_id () const
   {
     libmesh_assert_greater_equal (*(_buf_begin+5), 0);
     libmesh_assert_less (static_cast<unsigned int>(*(_buf_begin+5)),
                    libMesh::n_processors() ||
-                   static_cast<unsigned int>(*(_buf_begin+5)) == DofObject::invalid_processor_id);
-    return static_cast<unsigned int>(*(_buf_begin+5));
+                   static_cast<processor_id_type>(*(_buf_begin+5)) == DofObject::invalid_processor_id);
+    return static_cast<processor_id_type>(*(_buf_begin+5));
   }
 
   /**
@@ -2209,9 +2209,9 @@ public:
   /**
    * \p return the id of this packed element.
    */
-  unsigned int id () const
+  dof_id_type id () const
   {
-    return static_cast<unsigned int>(*(_buf_begin+7));
+    return static_cast<dof_id_type>(*(_buf_begin+7));
   }
 
   /**

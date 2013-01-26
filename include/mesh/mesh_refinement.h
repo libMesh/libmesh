@@ -273,7 +273,7 @@ public:
    * from p to search for existing nodes.
    */
   Node* add_point (const Point& p,
-                   const unsigned int processor_id,
+                   const processor_id_type processor_id,
                    const Real tol);
 
   /**
@@ -345,7 +345,7 @@ public:
    *
    * \p nelem_target is 0 by default.
    */
-  unsigned int& nelem_target();
+  dof_id_type& nelem_target();
 
   /**
    * If \p absolute_global_tolerance is set to a nonzero value, methods
@@ -636,7 +636,7 @@ private:
 
   Real _coarsen_threshold;
 
-  unsigned int _nelem_target;
+  dof_id_type _nelem_target;
 
   Real _absolute_global_tolerance;
 
@@ -683,7 +683,7 @@ inline Real& MeshRefinement::coarsen_threshold()
   return _coarsen_threshold;
 }
 
-inline unsigned int& MeshRefinement::nelem_target()
+inline dof_id_type& MeshRefinement::nelem_target()
 {
   _use_member_parameters = true;
   return _nelem_target;

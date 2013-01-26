@@ -103,7 +103,7 @@ namespace MeshTools
    * A feasible load balancing scheme is to keep the weight per processor as
    * uniform as possible.
    */
-  unsigned int total_weight (const MeshBase &mesh);
+  dof_id_type total_weight (const MeshBase &mesh);
 
   /**
    * This function returns the sum over all the elemenents on processor \p pid
@@ -111,7 +111,7 @@ namespace MeshTools
    * A feasible load balancing scheme is to keep the weight per processor as
    * uniform as possible.
    */
-  unsigned int weight (const MeshBase &mesh, const unsigned int pid=libMesh::processor_id());
+  dof_id_type weight (const MeshBase &mesh, const processor_id_type pid=libMesh::processor_id());
 
   /**
    * After calling this function the input vector \p nodes_to_elem_map
@@ -120,7 +120,7 @@ namespace MeshTools
    * element connected to node \p i.
    */
   void build_nodes_to_elem_map (const MeshBase &mesh,
-				std::vector<std::vector<unsigned int> > &nodes_to_elem_map);
+				std::vector<std::vector<dof_id_type> > &nodes_to_elem_map);
 
   /**
    * The same, except element pointers are returned instead of indices.
@@ -163,14 +163,14 @@ namespace MeshTools
    */
   BoundingBox
   processor_bounding_box (const MeshBase &mesh,
-			  const unsigned int pid);
+			  const processor_id_type pid);
 
   /**
    * Same, but returns a sphere instead of a box.
    */
   Sphere
   processor_bounding_sphere (const MeshBase &mesh,
-			     const unsigned int pid);
+			     const processor_id_type pid);
 
   /**
    * @returns two points defining a Cartesian box that bounds the
@@ -199,14 +199,14 @@ namespace MeshTools
    * Return the number of elements of type \p type.  Implemented
    * in terms of type_element_iterators.
    */
-  unsigned int n_elem_of_type (const MeshBase &mesh,
+  dof_id_type n_elem_of_type (const MeshBase &mesh,
 			       const ElemType type);
 
   /**
    * Return the number of active elements of type \p type.
    * Implemented in terms of active_type_element_iterators.
    */
-  unsigned int n_active_elem_of_type (const MeshBase &mesh,
+  dof_id_type n_active_elem_of_type (const MeshBase &mesh,
 				      const ElemType type);
 
   /**
@@ -217,9 +217,9 @@ namespace MeshTools
    * a single function which takes a range of iterators and returns the
    * std::distance between them.
    */
-  unsigned int n_non_subactive_elem_of_type_at_level(const MeshBase &mesh,
-                                                     const ElemType type,
-                                                     const unsigned int level);
+  dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase &mesh,
+                                                    const ElemType type,
+                                                    const unsigned int level);
 
   /**
    * Return the number of levels of refinement in the mesh.
@@ -263,22 +263,22 @@ namespace MeshTools
    * written to a data file, and is used by the XDA mesh writing methods.
    */
   void get_not_subactive_node_ids(const MeshBase &mesh,
-                                  std::set<unsigned int> &not_subactive_node_ids);
+                                  std::set<dof_id_type> &not_subactive_node_ids);
 
   /**
    * Count up the number of elements of a specific type
    * (as defined by an iterator range).
    */
-   unsigned int n_elem (const MeshBase::const_element_iterator &begin,
-                        const MeshBase::const_element_iterator &end);
+   dof_id_type n_elem (const MeshBase::const_element_iterator &begin,
+                       const MeshBase::const_element_iterator &end);
 
 
   /**
    * Count up the number of nodes of a specific type
    * (as defined by an iterator range).
    */
-   unsigned int n_nodes (const MeshBase::const_node_iterator &begin,
-			 const MeshBase::const_node_iterator &end);
+   dof_id_type n_nodes (const MeshBase::const_node_iterator &begin,
+			const MeshBase::const_node_iterator &end);
 
 
   /**
@@ -301,7 +301,7 @@ namespace MeshTools
     * parents of the node (meaning the two nodes to either side of it that make up
     * the side the hanging node is on.
     */
-   void find_hanging_nodes_and_parents(const MeshBase &mesh, std::map<unsigned int, std::vector<unsigned int> > &hanging_nodes);
+   void find_hanging_nodes_and_parents(const MeshBase &mesh, std::map<dof_id_type, std::vector<dof_id_type> > &hanging_nodes);
 
   /**
    * Changes the processor ids on each node so be the same as the id of the

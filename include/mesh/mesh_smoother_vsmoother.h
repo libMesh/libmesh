@@ -199,7 +199,7 @@ private:
   /**
    * Map for hanging_nodes
    */
-  std::map<unsigned int, std::vector<unsigned int> > _hanging_nodes;
+  std::map<dof_id_type, std::vector<dof_id_type> > _hanging_nodes;
 
   /**
    * Vector for holding adaptive data

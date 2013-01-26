@@ -202,8 +202,8 @@ public:
   element_iterator local_not_level_elements_begin (const unsigned int level);
   element_iterator local_not_level_elements_end   (const unsigned int level);
 
-  element_iterator pid_elements_begin (const unsigned int proc_id);
-  element_iterator pid_elements_end   (const unsigned int proc_id);
+  element_iterator pid_elements_begin (const processor_id_type proc_id);
+  element_iterator pid_elements_end   (const processor_id_type proc_id);
 
   element_iterator type_elements_begin (const ElemType type);
   element_iterator type_elements_end   (const ElemType type);

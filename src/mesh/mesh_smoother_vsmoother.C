@@ -463,8 +463,8 @@ int VariationalMeshSmoother::readgr(int n, int, LPLPDOUBLE R, LPINT mask, int, L
 
   //Grab hanging node connectivity
   {
-    std::map<unsigned int, std::vector<unsigned int> >::iterator it = _hanging_nodes.begin();
-    std::map<unsigned int, std::vector<unsigned int> >::iterator end = _hanging_nodes.end();
+    std::map<dof_id_type, std::vector<dof_id_type> >::iterator it = _hanging_nodes.begin();
+    std::map<dof_id_type, std::vector<dof_id_type> >::iterator end = _hanging_nodes.end();
 
     for(i=0;it!=end;it++)
     {
@@ -521,7 +521,7 @@ float VariationalMeshSmoother::adapt_minimum() const
 {
   std::vector<float>& adapt_data = *_adapt_data;
 
-  const unsigned int n = adapt_data.size();
+  const std::size_t n = adapt_data.size();
   float min = 1.e30;
 
   for (unsigned int i=0; i<n; i++)
