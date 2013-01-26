@@ -81,9 +81,9 @@ template <typename T> class NumericVector;
 /**
  * A row of the Dof constraint matrix.
  */
-typedef std::map<unsigned int, Real,
-                 std::less<unsigned int>,
-                 Threads::scalable_allocator<std::pair<const unsigned int, Real> > > DofConstraintRow;
+typedef std::map<dof_id_type, Real,
+                 std::less<dof_id_type>,
+                 Threads::scalable_allocator<std::pair<const dof_id_type, Real> > > DofConstraintRow;
 
 /**
  * The constraint matrix storage format.
@@ -91,10 +91,10 @@ typedef std::map<unsigned int, Real,
  * declarations and future flexibility.  Don't delete this from
  * a pointer-to-std::map; the destructor isn't virtual!
  */
-class DofConstraints : public std::map<unsigned int,
+class DofConstraints : public std::map<dof_id_type,
                                        std::pair<DofConstraintRow,Number>,
-                                       std::less<unsigned int>,
-                                       Threads::scalable_allocator<std::pair<const unsigned int, std::pair<DofConstraintRow,Number> > > >
+                                       std::less<dof_id_type>,
+                                       Threads::scalable_allocator<std::pair<const dof_id_type, std::pair<DofConstraintRow,Number> > > >
 {
 };
 
@@ -168,8 +168,8 @@ public:
      * User-defined function to augment the sparsity pattern.
      */
     virtual void augment_sparsity_pattern (SparsityPattern::Graph & sparsity,
-					   std::vector<unsigned int> & n_nz,
-					   std::vector<unsigned int> & n_oz) = 0;
+					   std::vector<dof_id_type> & n_nz,
+					   std::vector<dof_id_type> & n_oz) = 0;
   };
 
   /**
@@ -184,7 +184,7 @@ public:
     /**
      * User-defined function to augment the send list.
      */
-    virtual void augment_send_list (std::vector<unsigned int> & send_list) = 0;
+    virtual void augment_send_list (std::vector<dof_id_type> & send_list) = 0;
   };
    
   /**
@@ -245,8 +245,8 @@ public:
    * This is an advanced function... use at your own peril!
    */
   void attach_extra_sparsity_function(void (*func)(SparsityPattern::Graph & sparsity,
-                                                   std::vector<unsigned int> & n_nz,
-                                                   std::vector<unsigned int> & n_oz,
+                                                   std::vector<dof_id_type> & n_nz,
+                                                   std::vector<dof_id_type> & n_oz,
                                                    void *),
                                       void * context = NULL)
   { _extra_sparsity_function = func; _extra_sparsity_context = context; }
@@ -267,7 +267,7 @@ public:
    * Attach a function pointer to use as a callback to populate the
    * send_list with extra entries.
    */
-  void attach_extra_send_list_function(void (*func)(std::vector<unsigned int> &, void *), void * context = NULL)
+  void attach_extra_send_list_function(void (*func)(std::vector<dof_id_type> &, void *), void * context = NULL)
   { _extra_send_list_function = func; _extra_send_list_context = context; }
   
   /**
@@ -285,7 +285,7 @@ public:
    * information can be used for gathers at each solution step to retrieve
    * solution values needed for computation.
    */
-  const std::vector<unsigned int>& get_send_list() const { return _send_list; }
+  const std::vector<dof_id_type>& get_send_list() const { return _send_list; }
 
   /**
    * Returns a constant reference to the \p _n_nz list for this processor.
@@ -293,7 +293,7 @@ public:
    * row of the global matrix that the current processor owns.  This
    * information can be used to preallocate space for a parallel sparse matrix.
    */
-  const std::vector<unsigned int>& get_n_nz() const {
+  const std::vector<dof_id_type>& get_n_nz() const {
     libmesh_assert(_n_nz);
     return *_n_nz;
   }
@@ -304,7 +304,7 @@ public:
    * row of the global matrix that the current processor owns.  This
    * information can be used to preallocate space for a parallel sparse matrix.
    */
-  const std::vector<unsigned int>& get_n_oz() const {
+  const std::vector<dof_id_type>& get_n_oz() const {
     libmesh_assert(_n_oz);
     return *_n_oz;
   }
@@ -370,36 +370,36 @@ public:
   /**
    * @returns the total number of degrees of freedom in the problem.
    */
-  unsigned int n_dofs() const { return _n_dfs; }
+  dof_id_type n_dofs() const { return _n_dfs; }
   
   /**
    * @returns the number of SCALAR dofs.
    */
-  unsigned int n_SCALAR_dofs() const { return _n_SCALAR_dofs; }
+  dof_id_type n_SCALAR_dofs() const { return _n_SCALAR_dofs; }
 
   /**
    * @returns the number of degrees of freedom on this processor.
    */
-  unsigned int n_local_dofs () const
+  dof_id_type n_local_dofs () const
   { return this->n_dofs_on_processor (libMesh::processor_id()); }
 
   /**
-   * Returns the number of degrees of freedom on subdomain \p proc.
+   * Returns the number of degrees of freedom on partition \p proc.
    */
-  unsigned int n_dofs_on_processor(const unsigned int proc) const
+  dof_id_type n_dofs_on_processor(const processor_id_type proc) const
   { libmesh_assert_less (proc, _first_df.size()); return (_end_df[proc] - _first_df[proc]); }
 
   /**
-   * Returns the first dof index that is local to subdomain \p proc.
+   * Returns the first dof index that is local to partition \p proc.
    */
-  unsigned int first_dof(const unsigned int proc = libMesh::processor_id()) const
+  dof_id_type first_dof(const processor_id_type proc = libMesh::processor_id()) const
   { libmesh_assert_less (proc, _first_df.size()); return _first_df[proc]; }
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
-   * Returns the first old dof index that is local to subdomain \p proc.
+   * Returns the first old dof index that is local to partition \p proc.
    */
-  unsigned int first_old_dof(const unsigned int proc = libMesh::processor_id()) const
+  dof_id_type first_old_dof(const processor_id_type proc = libMesh::processor_id()) const
   { libmesh_assert_less (proc, _first_old_df.size()); return _first_old_df[proc]; }
 #endif //LIBMESH_ENABLE_AMR
 
@@ -408,14 +408,14 @@ public:
    * This function is now deprecated, because it returns nonsense in the rare
    * case where \p proc has no local dof indices.  Use end_dof() instead.
    */
-  unsigned int last_dof(const unsigned int proc = libMesh::processor_id()) const
+  dof_id_type last_dof(const processor_id_type proc = libMesh::processor_id()) const
   { libmesh_deprecated(); libmesh_assert_less (proc, _end_df.size()); return (_end_df[proc] - 1); }
 
   /**
    * Returns the first dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
    */
-  unsigned int end_dof(const unsigned int proc = libMesh::processor_id()) const
+  dof_id_type end_dof(const processor_id_type proc = libMesh::processor_id()) const
   { libmesh_assert_less (proc, _end_df.size()); return _end_df[proc]; }
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -423,7 +423,7 @@ public:
    * Returns the first old dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
    */
-  unsigned int end_old_dof(const unsigned int proc = libMesh::processor_id()) const
+  dof_id_type end_old_dof(const processor_id_type proc = libMesh::processor_id()) const
   { libmesh_assert_less (proc, _end_old_df.size()); return _end_old_df[proc]; }
 #endif //LIBMESH_ENABLE_AMR
 
@@ -433,7 +433,7 @@ public:
    * variables are returned.
    */
   void dof_indices (const Elem* const elem,
-		    std::vector<unsigned int>& di,
+		    std::vector<dof_id_type>& di,
 		    const unsigned int vn = libMesh::invalid_uint) const;
 
   /**
@@ -442,7 +442,7 @@ public:
    * the old SCALAR dof indices are returned. Note that we do not
    * need to pass in an element since SCALARs are global variables.
    */
-  void SCALAR_dof_indices (std::vector<unsigned int>& di,
+  void SCALAR_dof_indices (std::vector<dof_id_type>& di,
 		           const unsigned int vn,
 		           const bool old_dofs=false) const;
 
@@ -452,7 +452,7 @@ public:
    * Note that this is an O(logN) operation, not O(1); we don't cache
    * enough information for O(1) right now.
    */
-  bool all_semilocal_indices (const std::vector<unsigned int>& dof_indices) const;
+  bool all_semilocal_indices (const std::vector<dof_id_type>& dof_indices) const;
 
   /**
    * Tells other library functions whether or not this problem
@@ -473,7 +473,7 @@ public:
    * is no \p resize() method in the \p DenseVectorBase<> class.
    */
   void extract_local_vector (const NumericVector<Number>& Ug,
-			     const std::vector<unsigned int>& dof_indices,
+			     const std::vector<dof_id_type>& dof_indices,
 			     DenseVectorBase<Number>& Ue) const;
 
 
@@ -485,20 +485,20 @@ public:
    * @returns the total number of constrained degrees of freedom
    * in the problem.
    */
-  unsigned int n_constrained_dofs() const;
+  dof_id_type n_constrained_dofs() const;
 
   /**
    * @returns the number of constrained degrees of freedom
    * on this processor.
    */
-  unsigned int n_local_constrained_dofs() const;
+  dof_id_type n_local_constrained_dofs() const;
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   /**
    * @returns the total number of constrained Nodes
    * in the mesh.
    */
-  unsigned int n_constrained_nodes() const { return _node_constraints.size(); }
+  dof_id_type n_constrained_nodes() const { return _node_constraints.size(); }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   /**
@@ -531,7 +531,7 @@ public:
    * Adds a copy of the user-defined row to the constraint matrix, using
    * an inhomogeneous right-hand-side for the constraint equation.
    */
-  void add_constraint_row (const unsigned int dof_number,
+  void add_constraint_row (const dof_id_type dof_number,
                            const DofConstraintRow& constraint_row,
                            const Number constraint_rhs,
                            const bool forbid_constraint_overwrite);
@@ -541,7 +541,7 @@ public:
    * a homogeneous right-hand-side for the constraint equation.
    * By default, produces an error if the DOF was already constrained.
    */
-  void add_constraint_row (const unsigned int dof_number,
+  void add_constraint_row (const dof_id_type dof_number,
                            const DofConstraintRow& constraint_row,
                            const bool forbid_constraint_overwrite = true)
     { add_constraint_row(dof_number, constraint_row, 0., forbid_constraint_overwrite); }
@@ -576,7 +576,7 @@ public:
    * @returns true if the degree of freedom dof is constrained,
    * false otherwise.
    */
-  bool is_constrained_dof (const unsigned int dof) const;
+  bool is_constrained_dof (const dof_id_type dof) const;
 
   /**
    * @returns true if the Node is constrained,
@@ -635,7 +635,7 @@ public:
    * solutions more likely to satisfy hanging node constraints.
    */
   void constrain_element_matrix (DenseMatrix<Number>& matrix,
-				 std::vector<unsigned int>& elem_dofs,
+				 std::vector<dof_id_type>& elem_dofs,
 				 bool asymmetric_constraint_rows = true) const;
 
   /**
@@ -645,15 +645,15 @@ public:
    * variables approximated in different spaces.
    */
   void constrain_element_matrix (DenseMatrix<Number>& matrix,
-				 std::vector<unsigned int>& row_dofs,
-				 std::vector<unsigned int>& col_dofs,
+				 std::vector<dof_id_type>& row_dofs,
+				 std::vector<dof_id_type>& col_dofs,
 				 bool asymmetric_constraint_rows = true) const;
 
   /**
    * Constrains the element vector.
    */
   void constrain_element_vector (DenseVector<Number>&       rhs,
-				 std::vector<unsigned int>& dofs,
+				 std::vector<dof_id_type>& dofs,
 				 bool asymmetric_constraint_rows = true) const;
 
   /**
@@ -666,7 +666,7 @@ public:
    */
   void constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 					    DenseVector<Number>& rhs,
-					    std::vector<unsigned int>& elem_dofs,
+					    std::vector<dof_id_type>& elem_dofs,
 					    bool asymmetric_constraint_rows = true) const;
   /**
    * Constrains the element matrix and vector.  This method requires
@@ -688,7 +688,7 @@ public:
    */
   void heterogenously_constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
                                                            DenseVector<Number>& rhs,
-                                                           std::vector<unsigned int>& elem_dofs,
+                                                           std::vector<dof_id_type>& elem_dofs,
                                                            bool asymmetric_constraint_rows = true) const;
 
   /**
@@ -701,7 +701,7 @@ public:
    */
   void constrain_element_dyad_matrix (DenseVector<Number>& v,
 				      DenseVector<Number>& w,
-				      std::vector<unsigned int>& row_dofs,
+				      std::vector<dof_id_type>& row_dofs,
 				      bool asymmetric_constraint_rows = true) const;
 
   /**
@@ -710,7 +710,7 @@ public:
    * those dofs in terms of which any of the existing dofs is
    * constrained.
    */
-  void constrain_nothing (std::vector<unsigned int>& dofs) const;
+  void constrain_nothing (std::vector<dof_id_type>& dofs) const;
 
   /**
    * Constrains the numeric vector \p v, which represents a solution defined on
@@ -752,7 +752,7 @@ public:
    * @returns true if the boundary given by \p boundaryid is periodic,
    * false otherwise
    */
-  bool is_periodic_boundary (const unsigned int boundaryid) const;
+  bool is_periodic_boundary (const boundary_id_type boundaryid) const;
 
   PeriodicBoundaries * get_periodic_boundaries()
     {
@@ -807,13 +807,13 @@ public:
    * variables are returned.
    */
   void old_dof_indices (const Elem* const elem,
-			std::vector<unsigned int>& di,
+			std::vector<dof_id_type>& di,
 			const unsigned int vn = libMesh::invalid_uint) const;
   /**
    * @returns the total number of degrees of freedom on old_dof_objects
    *
    */
-  unsigned int n_old_dofs() const { return _n_old_dfs; }
+  dof_id_type n_old_dofs() const { return _n_old_dfs; }
 
   /**
    * Constrains degrees of freedom on side \p s of element \p elem which
@@ -882,18 +882,18 @@ private:
   /**
    * An adapter function that returns Node pointers by index
    */
-  DofObject* node_ptr(MeshBase& mesh, unsigned int i) const;
+  DofObject* node_ptr(MeshBase& mesh, dof_id_type i) const;
 
   /**
    * An adapter function that returns Elem pointers by index
    */
-  DofObject* elem_ptr(MeshBase& mesh, unsigned int i) const;
+  DofObject* elem_ptr(MeshBase& mesh, dof_id_type i) const;
 
   /**
    * A member function type like node_ptr or elem_ptr
    */
   typedef DofObject* (DofMap::*dofobject_accessor)
-    (MeshBase& mesh, unsigned int i) const;
+    (MeshBase& mesh, dof_id_type i) const;
 
   /**
    * Helper function for distributing dofs in parallel
@@ -912,7 +912,7 @@ private:
    * Starts at index next_free_dof, and increments it to
    * the post-final index.
    */
-  void distribute_local_dofs_var_major (unsigned int& next_free_dof,
+  void distribute_local_dofs_var_major (dof_id_type& next_free_dof,
 				        MeshBase& mesh);
 
   /**
@@ -927,7 +927,7 @@ private:
    * If build_send_list is true, builds the send list.  If
    * false, clears and reserves the send list
    */
-  void distribute_local_dofs_node_major (unsigned int& next_free_dof,
+  void distribute_local_dofs_node_major (dof_id_type& next_free_dof,
 				         MeshBase& mesh);
 
   /**
@@ -949,7 +949,7 @@ private:
    * external DOFs.
    */
   void build_constraint_matrix (DenseMatrix<Number>& C,
-				std::vector<unsigned int>& elem_dofs,
+				std::vector<dof_id_type>& elem_dofs,
 				const bool called_recursively=false) const;
 
   /**
@@ -964,14 +964,14 @@ private:
    */
   void build_constraint_matrix_and_vector (DenseMatrix<Number>& C,
                                            DenseVector<Number>& H,
-                                           std::vector<unsigned int>& elem_dofs,
+                                           std::vector<dof_id_type>& elem_dofs,
                                            const bool called_recursively=false) const;
 
   /**
    * Finds all the DOFS associated with the element DOFs elem_dofs.
    * This will account for off-element couplings via hanging nodes.
    */
-  void find_connected_dofs (std::vector<unsigned int> &elem_dofs) const;
+  void find_connected_dofs (std::vector<dof_id_type> &elem_dofs) const;
 
   /**
    * Finds all the DofObjects associated with the set in \p objs.
@@ -1013,18 +1013,18 @@ private:
   /**
    * First DOF index on processor \p p.
    */
-  std::vector<unsigned int> _first_df;
+  std::vector<dof_id_type> _first_df;
 
   /**
    * Last DOF index (plus 1) on processor \p p.
    */
-  std::vector<unsigned int> _end_df;
+  std::vector<dof_id_type> _end_df;
 
   /**
    * A list containing all the global DOF indicies that affect the
    * solution on my subdomain.
    */
-  std::vector<unsigned int> _send_list;
+  std::vector<dof_id_type> _send_list;
 
   /**
    * Funtion object to call to add extra entries to the sparsity pattern
@@ -1035,8 +1035,8 @@ private:
    * A function pointer to a function to call to add extra entries to the sparsity pattern
    */
   void (*_extra_sparsity_function)(SparsityPattern::Graph &,
-                                   std::vector<unsigned int> & n_nz,
-                                   std::vector<unsigned int> & n_oz,
+                                   std::vector<dof_id_type> & n_nz,
+                                   std::vector<dof_id_type> & n_oz,
                                    void *);
   /**
    * A pointer associcated with the extra sparsity that can optionally be passed in
@@ -1051,7 +1051,7 @@ private:
   /**
    * A function pointer to a function to call to add extra entries to the send list
    */
-  void (*_extra_send_list_function)(std::vector<unsigned int> &, void *);
+  void (*_extra_send_list_function)(std::vector<dof_id_type> &, void *);
 
   /**
    * A pointer associcated with the extra send list that can optionally be passed in
@@ -1076,41 +1076,41 @@ private:
    * just be a pointer into the corresponding sparsity pattern vector.
    * Otherwise we have to new/delete it ourselves.
    */
-  std::vector<unsigned int>* _n_nz;
+  std::vector<dof_id_type>* _n_nz;
 
   /**
    * The number of off-processor nonzeros in my portion of the
    * global matrix; allocated similar to _n_nz.
    */
-  std::vector<unsigned int>* _n_oz;
+  std::vector<dof_id_type>* _n_oz;
 
   /**
    * Total number of degrees of freedom.
    */
-  unsigned int _n_dfs;
+  dof_id_type _n_dfs;
 
   /**
    * The total number of SCALAR dofs associated to
    * all SCALAR variables.
    */
-  unsigned int _n_SCALAR_dofs;
+  dof_id_type _n_SCALAR_dofs;
 
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
    * Total number of degrees of freedom on old dof objects
    */
-  unsigned int _n_old_dfs;
+  dof_id_type _n_old_dfs;
 
   /**
    * First old DOF index on processor \p p.
    */
-  std::vector<unsigned int> _first_old_df;
+  std::vector<dof_id_type> _first_old_df;
 
   /**
    * Last old DOF index (plus 1) on processor \p p.
    */
-  std::vector<unsigned int> _end_old_df;
+  std::vector<dof_id_type> _end_old_df;
 
 #endif
 
@@ -1238,7 +1238,7 @@ node
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
 inline
-bool DofMap::is_constrained_dof (const unsigned int dof) const
+bool DofMap::is_constrained_dof (const dof_id_type dof) const
 {
   if (_dof_constraints.count(dof))
     return true;
@@ -1254,26 +1254,26 @@ bool DofMap::is_constrained_dof (const unsigned int dof) const
   // use them.
 
 inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
-				              std::vector<unsigned int>&,
+				              std::vector<dof_id_type>&,
 				              bool) const {}
 
 inline void DofMap::constrain_element_matrix (DenseMatrix<Number>&,
-				              std::vector<unsigned int>&,
-				              std::vector<unsigned int>&,
+				              std::vector<dof_id_type>&,
+				              std::vector<dof_id_type>&,
 				              bool) const {}
 
 inline void DofMap::constrain_element_vector (DenseVector<Number>&,
-				              std::vector<unsigned int>&,
+				              std::vector<dof_id_type>&,
 				              bool) const {}
 
 inline void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>&,
 					                 DenseVector<Number>&,
-					                 std::vector<unsigned int>&,
+					                 std::vector<dof_id_type>&,
 					                 bool) const {}
 
 inline void DofMap::constrain_element_dyad_matrix (DenseVector<Number>&,
 				                   DenseVector<Number>&,
-				                   std::vector<unsigned int>&,
+				                   std::vector<dof_id_type>&,
 				                   bool) const {}
 
 inline void DofMap::enforce_constraints_exactly (const System &,

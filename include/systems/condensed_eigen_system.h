@@ -114,7 +114,7 @@ public:
    * All dofs that are not in this vector will be eliminated from
    * the system when we perform a solve.
    */
-  std::vector<unsigned int> local_non_condensed_dofs_vector;
+  std::vector<dof_id_type> local_non_condensed_dofs_vector;
 
 private:
 

@@ -59,7 +59,8 @@ namespace {
       libmesh_assert (a);
       libmesh_assert (b);
       const unsigned int
-	al = a->level(), bl = b->level(),
+	al = a->level(), bl = b->level();
+      const dof_id_type
 	aid = a->id(),   bid = b->id();
 
       return (al == bl) ? aid < bid : al < bl;
@@ -114,7 +115,7 @@ void MeshCommunication::clear ()
 // 		   libMesh::COMM_WORLD);
 
 
-//     for (unsigned int proc=0; proc<libMesh::n_processors(); proc++)
+//     for (processor_id_type proc=0; proc<libMesh::n_processors(); proc++)
 //       {
 // 	const Point center (recv[4*proc+0],
 // 			    recv[4*proc+1],
@@ -190,12 +191,12 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   // Format:
   //  send_n_nodes_and_elem_per_proc[2*pid+0] = number of nodes to send to pid
   //  send_n_nodes_and_elem_per_proc[2*pid+1] = number of elements to send to pid
-  std::vector<unsigned int> send_n_nodes_and_elem_per_proc(2*libMesh::n_processors(), 0);
+  std::vector<dof_id_type> send_n_nodes_and_elem_per_proc(2*libMesh::n_processors(), 0);
 
   std::vector<Parallel::Request>
     node_send_requests, element_send_requests;
 
-  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+  for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
     if (pid != libMesh::processor_id()) // don't send to ourselves!!
       {
 	// Build up a list of nodes and elements to send to processor pid.
@@ -279,7 +280,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	  }
       }
 
-  std::vector<unsigned int> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
+  std::vector<dof_id_type> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
 
   CommWorld.alltoall (recv_n_nodes_and_elem_per_proc);
 
@@ -294,7 +295,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
     n_send_node_pairs=0,      n_send_elem_pairs=0,
     n_recv_node_pairs=0,      n_recv_elem_pairs=0;
 
-  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+  for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
     {
       if (send_n_nodes_and_elem_per_proc[2*pid+0]) // we have nodes to send
 	{
@@ -425,22 +426,22 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 
   // A list of all the processors which *may* contain neighboring elements.
   // (for development simplicity, just make this the identity map)
-  std::vector<unsigned int> adjacent_processors;
-  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+  std::vector<processor_id_type> adjacent_processors;
+  for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
     if (pid != libMesh::processor_id())
       adjacent_processors.push_back (pid);
 
 
-  const unsigned int n_adjacent_processors = adjacent_processors.size();
+  const processor_id_type n_adjacent_processors = adjacent_processors.size();
 
   //-------------------------------------------------------------------------
   // Let's build a list of all nodes which live on NULL-neighbor sides.
   // For simplicity, we will use a set to build the list, then transfer
   // it to a vector for communication.
-  std::vector<unsigned int> my_interface_node_list;
+  std::vector<dof_id_type> my_interface_node_list;
   std::vector<const Elem*>  my_interface_elements;
   {
-    std::set<unsigned int> my_interface_node_set;
+    std::set<dof_id_type> my_interface_node_set;
 
     // since parent nodes are a subset of children nodes, this should be sufficient
     MeshBase::const_element_iterator       it     = mesh.active_local_elements_begin();
@@ -479,9 +480,9 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   // MPI 2.1 standard seeks to remove this restriction as unnecessary, so in
   // the future we should change this to send the same buffer to each of the
   // adjacent processors. - BSK 11/17/2008
-  std::vector<std::vector<unsigned int> >
+  std::vector<std::vector<dof_id_type> >
     my_interface_node_xfer_buffers (n_adjacent_processors, my_interface_node_list);
-  std::map<unsigned int, unsigned int> n_comm_steps;
+  std::map<processor_id_type, unsigned char> n_comm_steps;
 
   std::vector<Parallel::Request> send_requests (3*n_adjacent_processors);
   unsigned int current_request = 0;
@@ -505,7 +506,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   // clear the superset list, and we will fill it with the true list.
   adjacent_processors.clear();
 
-  std::vector<unsigned int> common_interface_node_list;
+  std::vector<dof_id_type> common_interface_node_list;
 
   // we expect two classess of messages -
   // (1) incoming interface node lists, to which we will reply with our elements
@@ -527,7 +528,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
       Parallel::Status
 	status(CommWorld.probe (Parallel::any_source,
 				element_neighbors_tag));
-      const unsigned int
+      const processor_id_type
 	source_pid_idx = status.source(),
 	dest_pid_idx   = source_pid_idx;
 
@@ -540,7 +541,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	  CommWorld.receive (source_pid_idx,
 			     common_interface_node_list,
 			     element_neighbors_tag);
-	  const unsigned int
+	  const std::size_t
 	    their_interface_node_list_size = common_interface_node_list.size();
 
 	  // we now have the interface node list from processor source_pid_idx.
@@ -609,7 +610,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 
 	  std::vector<const Elem*> family_tree;
 
-	  for (unsigned int e=0, n_shared_nodes=0; e<my_interface_elements.size(); e++, n_shared_nodes=0)
+	  for (dof_id_type e=0, n_shared_nodes=0; e<my_interface_elements.size(); e++, n_shared_nodes=0)
 	    {
 	      const Elem * elem = my_interface_elements[e];
 
@@ -839,8 +840,8 @@ namespace {
 
 struct SyncIds
 {
-typedef unsigned int datum;
-typedef void (MeshBase::*renumber_obj)(unsigned int, unsigned int);
+typedef dof_id_type datum;
+typedef void (MeshBase::*renumber_obj)(dof_id_type, dof_id_type);
 
 SyncIds(MeshBase &_mesh, renumber_obj _renumberer) :
   mesh(_mesh),
@@ -852,13 +853,13 @@ renumber_obj renumber;
 
 // Find the id of each requested DofObject -
 // sync_dofobject_data_by_xyz already did the work for us
-void gather_data (const std::vector<unsigned int>& ids,
+void gather_data (const std::vector<dof_id_type>& ids,
                   std::vector<datum>& ids_out)
 {
   ids_out = ids;
 }
 
-void act_on_data (const std::vector<unsigned int>& old_ids,
+void act_on_data (const std::vector<dof_id_type>& old_ids,
                   std::vector<datum>& new_ids)
 {
   for (unsigned int i=0; i != old_ids.size(); ++i)
@@ -913,20 +914,20 @@ namespace {
 
 struct SyncProcIds
 {
-typedef unsigned int datum;
+typedef processor_id_type datum;
 
 SyncProcIds(MeshBase &_mesh) : mesh(_mesh) {}
 
 MeshBase &mesh;
 
 // ------------------------------------------------------------
-void gather_data (const std::vector<unsigned int>& ids,
+void gather_data (const std::vector<dof_id_type>& ids,
                   std::vector<datum>& data)
 {
   // Find the processor id of each requested node
   data.resize(ids.size());
 
-  for (unsigned int i=0; i != ids.size(); ++i)
+  for (std::size_t i=0; i != ids.size(); ++i)
     {
       // Look for this point in the mesh
       // We'd better find every node we're asked for
@@ -938,11 +939,11 @@ void gather_data (const std::vector<unsigned int>& ids,
 }
 
 // ------------------------------------------------------------
-void act_on_data (const std::vector<unsigned int>& ids,
+void act_on_data (const std::vector<dof_id_type>& ids,
                   std::vector<datum> proc_ids)
 {
   // Set the ghost node processor ids we've now been informed of
-  for (unsigned int i=0; i != ids.size(); ++i)
+  for (std::size_t i=0; i != ids.size(); ++i)
     {
       Node *node = mesh.node_ptr(ids[i]);
       node->processor_id() = proc_ids[i];
@@ -1047,8 +1048,8 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
   // vectors
   CommWorld.verify(mesh.max_node_id());
   CommWorld.verify(mesh.max_elem_id());
-  const unsigned int par_max_node_id = mesh.parallel_max_node_id();
-  const unsigned int par_max_elem_id = mesh.parallel_max_elem_id();
+  const dof_id_type par_max_node_id = mesh.parallel_max_node_id();
+  const dof_id_type par_max_elem_id = mesh.parallel_max_elem_id();
   libmesh_assert_equal_to (par_max_node_id, mesh.max_node_id());
   libmesh_assert_equal_to (par_max_elem_id, mesh.max_elem_id());
 #endif
@@ -1073,7 +1074,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
         }
       while (elem)
         {
-          unsigned int elemid = elem->id();
+          dof_id_type elemid = elem->id();
           libmesh_assert_less (elemid, semilocal_elems.size());
           semilocal_elems[elemid] = true;
 

@@ -97,7 +97,7 @@ void MeshRefinement::clear ()
 
 
 Node* MeshRefinement::add_point (const Point& p,
-                                 const unsigned int processor_id,
+                                 const processor_id_type processor_id,
                                  const Real tol)
 {
   START_LOG("add_point()", "MeshRefinement");
@@ -167,7 +167,7 @@ void MeshRefinement::create_parent_error_vector
 
   // Make sure the input error vector is valid
 #ifdef DEBUG
-  for (unsigned int i=0; i != error_per_cell.size(); ++i)
+  for (std::size_t i=0; i != error_per_cell.size(); ++i)
     {
       libmesh_assert_greater_equal (error_per_cell[i], 0);
   // isnan() isn't standard C++ yet
@@ -204,7 +204,7 @@ void MeshRefinement::create_parent_error_vector
           parent = parent->parent();
           if (parent)
             {
-              const unsigned int parentid  = parent->id();
+              const dof_id_type parentid  = parent->id();
               libmesh_assert_less (parentid, error_per_parent.size());
               error_per_parent[parentid] = -1.0;
             }
@@ -238,7 +238,7 @@ void MeshRefinement::create_parent_error_vector
       // Calculate each contribution to parent cells
       if (parent)
         {
-          const unsigned int parentid  = parent->id();
+          const dof_id_type parentid  = parent->id();
           libmesh_assert_less (parentid, error_per_parent.size());
 
 	  // If the parent has grandchildren we won't be able to
@@ -258,7 +258,7 @@ void MeshRefinement::create_parent_error_vector
   parent_error_min = std::numeric_limits<double>::max();
   parent_error_max = 0.;
 
-  for (unsigned int i = 0; i != error_per_parent.size(); ++i)
+  for (std::size_t i = 0; i != error_per_parent.size(); ++i)
     {
       // If this element isn't a coarsenable parent with error, we
       // have nothing to do.  Just flag it as -1 and move on
@@ -839,12 +839,12 @@ set_a_flag set_flag;
 // set_a_flag& set_flag;
 
 // Find the refinement flag on each requested element
-void gather_data (const std::vector<unsigned int>& ids,
+void gather_data (const std::vector<dof_id_type>& ids,
                   std::vector<datum>& flags)
 {
   flags.resize(ids.size());
 
-  for (unsigned int i=0; i != ids.size(); ++i)
+  for (std::size_t i=0; i != ids.size(); ++i)
     {
       // Look for this element in the mesh
       // We'd better find every element we're asked for
@@ -855,10 +855,10 @@ void gather_data (const std::vector<unsigned int>& ids,
     }
 }
 
-void act_on_data (const std::vector<unsigned int>& ids,
+void act_on_data (const std::vector<dof_id_type>& ids,
                   std::vector<datum>& flags)
 {
-  for (unsigned int i=0; i != ids.size(); ++i)
+  for (std::size_t i=0; i != ids.size(); ++i)
     {
       Elem *elem = mesh.elem(ids[i]);
 
@@ -1598,7 +1598,7 @@ bool MeshRefinement::_refine_elements ()
 
   // Iterate over the elements, counting the elements
   // flagged for h refinement.
-  unsigned int n_elems_flagged = 0;
+  dof_id_type n_elems_flagged = 0;
 
   MeshBase::element_iterator       it  = _mesh.elements_begin();
   const MeshBase::element_iterator end = _mesh.elements_end();
@@ -1635,7 +1635,7 @@ bool MeshRefinement::_refine_elements ()
   // This may resize the mesh's internal container and invalidate
   // any existing iterators.
 
-  for (unsigned int e = 0; e != local_copy_of_elements.size(); ++e)
+  for (std::size_t e = 0; e != local_copy_of_elements.size(); ++e)
     local_copy_of_elements[e]->refine(*this);
 
   // The mesh changed if there were elements h refined

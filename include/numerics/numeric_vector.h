@@ -25,6 +25,7 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/enum_parallel_type.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/id_types.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 
@@ -67,15 +68,15 @@ public:
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  NumericVector (const unsigned int n,
+  NumericVector (const numeric_index_type n,
                  const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  NumericVector (const unsigned n,
-		 const unsigned int n_local,
+  NumericVector (const numeric_index_type n,
+		 const numeric_index_type n_local,
                  const ParallelType type = AUTOMATIC);
 
   /**
@@ -83,9 +84,9 @@ public:
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  NumericVector (const unsigned int N,
-		 const unsigned int n_local,
-		 const std::vector<unsigned int>& ghost,
+  NumericVector (const numeric_index_type N,
+		 const numeric_index_type n_local,
+		 const std::vector<numeric_index_type>& ghost,
                  const ParallelType type = AUTOMATIC);
 
 public:
@@ -168,15 +169,15 @@ public:
    * zeros.
    */
 
-  virtual void init (const unsigned int,
-		     const unsigned int,
+  virtual void init (const numeric_index_type,
+		     const numeric_index_type,
 		     const bool = false,
                      const ParallelType = AUTOMATIC) = 0;
 
   /**
    * call init with n_local = N,
    */
-  virtual void init (const unsigned int,
+  virtual void init (const numeric_index_type,
 		     const bool = false,
                      const ParallelType = AUTOMATIC) = 0;
 
@@ -184,9 +185,9 @@ public:
    * Create a vector that holds tha local indices plus those specified
    * in the \p ghost argument.
    */
-  virtual void init (const unsigned int /*N*/,
-		     const unsigned int /*n_local*/,
-		     const std::vector<unsigned int>& /*ghost*/,
+  virtual void init (const numeric_index_type /*N*/,
+		     const numeric_index_type /*n_local*/,
+		     const std::vector<numeric_index_type>& /*ghost*/,
 		     const bool /*fast*/ = false,
                      const ParallelType = AUTOMATIC) = 0;
 
@@ -259,7 +260,7 @@ public:
    * Note that the indices must necessary live on this
    * processor.
    */
-  virtual Real subset_l1_norm (const std::set<unsigned int> & indices) const;
+  virtual Real subset_l1_norm (const std::set<numeric_index_type> & indices) const;
 
   /**
    * @returns the \f$l_2\f$-norm of the vector, i.e.
@@ -270,7 +271,7 @@ public:
    * Note that the indices must necessary live on this
    * processor.
    */
-  virtual Real subset_l2_norm (const std::set<unsigned int> & indices) const;
+  virtual Real subset_l2_norm (const std::set<numeric_index_type> & indices) const;
 
   /**
    * @returns the maximum absolute value of the
@@ -280,7 +281,7 @@ public:
    * Note that the indices must necessary live on this
    * processor.
    */
-  virtual Real subset_linfty_norm (const std::set<unsigned int> & indices) const;
+  virtual Real subset_linfty_norm (const std::set<numeric_index_type> & indices) const;
 
   /**
    * @returns dimension of the vector. This
@@ -289,38 +290,38 @@ public:
    * closer to the C++ standard library's
    * \p std::vector container.
    */
-  virtual unsigned int size () const = 0;
+  virtual numeric_index_type size () const = 0;
 
   /**
    * @returns the local size of the vector
    * (index_stop-index_start).
    * In ghost cell mode, this does *not* include the ghost cells.
    */
-  virtual unsigned int local_size() const = 0;
+  virtual numeric_index_type local_size() const = 0;
 
   /**
    * @returns the index of the first vector element
    * actually stored on this processor.  Hint: the
    * minimum for this index is \p 0.
    */
-  virtual unsigned int first_local_index() const = 0;
+  virtual numeric_index_type first_local_index() const = 0;
 
   /**
    * @returns the index+1 of the last vector element
    * actually stored on this processor.  Hint: the
    * maximum for this index is \p size().
    */
-  virtual unsigned int last_local_index() const = 0;
+  virtual numeric_index_type last_local_index() const = 0;
 
   /**
    * Access components, returns \p U(i).
    */
-  virtual T operator() (const unsigned int i) const = 0;
+  virtual T operator() (const numeric_index_type i) const = 0;
 
   /**
    * @returns the element \p U(i)
    */
-  virtual T el(const unsigned int i) const { return (*this)(i); }
+  virtual T el(const numeric_index_type i) const { return (*this)(i); }
 
   /**
    * Access multiple components at once.  \p values will be resized,
@@ -328,7 +329,7 @@ public:
    * operator() for each index, but some implementations may supply
    * faster methods here.
    */
-  virtual void get(const std::vector<unsigned int>& index, std::vector<T>& values) const;
+  virtual void get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const;
 
   /**
    * Addition operator.
@@ -362,12 +363,12 @@ public:
   /**
    * v(i) = value
    */
-  virtual void set (const unsigned int i, const T value) = 0;
+  virtual void set (const numeric_index_type i, const T value) = 0;
 
   /**
    * v(i) += value
    */
-  virtual void add (const unsigned int i, const T value) = 0;
+  virtual void add (const numeric_index_type i, const T value) = 0;
 
   /**
    * \f$U(0-LIBMESH_DIM)+=s\f$.
@@ -396,7 +397,7 @@ public:
    * want to specify WHERE to add it
    */
   virtual void add_vector (const std::vector<T>& v,
-			   const std::vector<unsigned int>& dof_indices) = 0;
+			   const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$U+=V\f$, where U and V are type
@@ -405,7 +406,7 @@ public:
    * the NumericVector<T> V
    */
   virtual void add_vector (const NumericVector<T>& V,
-			   const std::vector<unsigned int>& dof_indices) = 0;
+			   const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$U+=A*V\f$, add the product of a \p SparseMatrix \p A
@@ -428,7 +429,7 @@ public:
    * the DenseVector<T> V
    */
   virtual void add_vector (const DenseVector<T>& V,
-			   const std::vector<unsigned int>& dof_indices) = 0;
+			   const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$U+=A^T*V\f$, add the product of the transpose of a \p SparseMatrix \p A_trans
@@ -442,7 +443,7 @@ public:
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
-		       const std::vector<unsigned int>& dof_indices) = 0;
+		       const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$U=V\f$, where U and V are type
@@ -451,7 +452,7 @@ public:
    * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
-		       const std::vector<unsigned int>& dof_indices) = 0;
+		       const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$ U=V \f$ where U and V are type
@@ -460,7 +461,7 @@ public:
    * the DenseVector<T> V
    */
   virtual void insert (const DenseVector<T>& V,
-		       const std::vector<unsigned int>& dof_indices) = 0;
+		       const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * \f$ U=V \f$ where V is a
@@ -468,7 +469,7 @@ public:
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseSubVector<T>& V,
-		       const std::vector<unsigned int>& dof_indices) = 0;
+		       const std::vector<numeric_index_type>& dof_indices) = 0;
 
   /**
    * Scale each element of the
@@ -505,15 +506,15 @@ public:
    * defined by the \p send_list.
    */
   virtual void localize (NumericVector<T>& v_local,
-			 const std::vector<unsigned int>& send_list) const = 0;
+			 const std::vector<numeric_index_type>& send_list) const = 0;
 
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
    */
-  virtual void localize (const unsigned int first_local_idx,
-			 const unsigned int last_local_idx,
-			 const std::vector<unsigned int>& send_list) = 0;
+  virtual void localize (const numeric_index_type first_local_idx,
+			 const numeric_index_type last_local_idx,
+			 const std::vector<numeric_index_type>& send_list) = 0;
 
   /**
    * Creates a local copy of the global vector in
@@ -522,7 +523,7 @@ public:
    * is useful for outputting data from one processor.
    */
   virtual void localize_to_one (std::vector<T>& v_local,
-				const unsigned int proc_id=0) const = 0;
+				const processor_id_type proc_id=0) const = 0;
 
   /**
    * @returns \p -1 when \p this is equivalent to \p other_vector,
@@ -605,7 +606,7 @@ public:
    * PetscVectors.
    */
   virtual void create_subvector(NumericVector<T>& ,
-				const std::vector<unsigned int>& ) const
+				const std::vector<numeric_index_type>& ) const
   {
     libMesh::err << "ERROR: Not Implemented in base class yet!" << std::endl;
     libmesh_error();
@@ -656,7 +657,7 @@ NumericVector<T>::NumericVector (const ParallelType type) :
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const unsigned int /*n*/,
+NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
                                  const ParallelType type) :
   _is_closed(false),
   _is_initialized(false),
@@ -670,8 +671,8 @@ NumericVector<T>::NumericVector (const unsigned int /*n*/,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const unsigned int /*n*/,
-				 const unsigned int /*n_local*/,
+NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
+				 const numeric_index_type /*n_local*/,
                                  const ParallelType type) :
   _is_closed(false),
   _is_initialized(false),
@@ -685,9 +686,9 @@ NumericVector<T>::NumericVector (const unsigned int /*n*/,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const unsigned int /*n*/,
-				 const unsigned int /*n_local*/,
-				 const std::vector<unsigned int>& /*ghost*/,
+NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
+				 const numeric_index_type /*n_local*/,
+				 const std::vector<numeric_index_type>& /*ghost*/,
                                  const ParallelType type) :
   _is_closed(false),
   _is_initialized(false),
@@ -756,11 +757,11 @@ void NumericVector<T>::clear ()
 
 template <typename T>
 inline
-void NumericVector<T>::get(const std::vector<unsigned int>& index, std::vector<T>& values) const
+void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const
 {
-  const unsigned int num = index.size();
+  const numeric_index_type num = index.size();
   values.resize(num);
-  for(unsigned int i=0; i<num; i++)
+  for(numeric_index_type i=0; i<num; i++)
     {
       values[i] = (*this)(index[i]);
     }
@@ -781,7 +782,7 @@ void NumericVector<Complex>::print(std::ostream& os) const
 
   // std::complex<>::operator<<() is defined, but use this form
   os << "#\tReal part\t\tImaginary part" << std::endl;
-  for (unsigned int i=this->first_local_index(); i<this->last_local_index(); i++)
+  for (numeric_index_type i=this->first_local_index(); i<this->last_local_index(); i++)
     os << i << "\t"
        << (*this)(i).real() << "\t\t"
        << (*this)(i).imag() << std::endl;
@@ -798,7 +799,7 @@ void NumericVector<T>::print(std::ostream& os) const
      << "\t\tlocal =  " << this->local_size() << std::endl;
 
   os << "#\tValue" << std::endl;
-  for (unsigned int i=this->first_local_index(); i<this->last_local_index(); i++)
+  for (numeric_index_type i=this->first_local_index(); i<this->last_local_index(); i++)
     os << i << "\t" << (*this)(i) << std::endl;
 }
 
@@ -819,7 +820,7 @@ void NumericVector<Complex>::print_global(std::ostream& os) const
 
   os << "Size\tglobal =  " << this->size() << std::endl;
   os << "#\tReal part\t\tImaginary part" << std::endl;
-  for (unsigned int i=0; i!=v.size(); i++)
+  for (numeric_index_type i=0; i!=v.size(); i++)
     os << i << "\t"
        << v[i].real() << "\t\t"
        << v[i].imag() << std::endl;
@@ -841,7 +842,7 @@ void NumericVector<T>::print_global(std::ostream& os) const
 
   os << "Size\tglobal =  " << this->size() << std::endl;
   os << "#\tValue" << std::endl;
-  for (unsigned int i=0; i!=v.size(); i++)
+  for (numeric_index_type i=0; i!=v.size(); i++)
     os << i << "\t" << v[i] << std::endl;
 }
 

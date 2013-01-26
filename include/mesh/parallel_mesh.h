@@ -112,7 +112,7 @@ class ParallelMesh : public UnstructuredMesh
    * Calls libmesh_assert() on each possible failure in that container.
    */
   template <typename T>
-  void libmesh_assert_valid_parallel_object_ids(const mapvector<T*>&) const;
+  void libmesh_assert_valid_parallel_object_ids(const mapvector<T*,dof_id_type>&) const;
 
   /**
    * Verify id and processor_id consistency of our elements and
@@ -134,7 +134,7 @@ class ParallelMesh : public UnstructuredMesh
    * container.
    */
   template <typename T>
-  unsigned int renumber_dof_objects (mapvector<T*>&);
+  dof_id_type renumber_dof_objects (mapvector<T*,dof_id_type>&);
 
   /**
    * Remove NULL elements from arrays
@@ -162,51 +162,51 @@ class ParallelMesh : public UnstructuredMesh
   virtual void insert_extra_ghost_elem(Elem* e);
 
   // Cached methods that can be called in serial
-  virtual unsigned int n_nodes () const { return _n_nodes; }
-  virtual unsigned int max_node_id () const { return _max_node_id; }
-  virtual void reserve_nodes (const unsigned int) { }
-  virtual unsigned int n_elem () const { return _n_elem; }
-  virtual unsigned int n_active_elem () const;
-  virtual unsigned int max_elem_id () const { return _max_elem_id; }
-  virtual void reserve_elem (const unsigned int) { }
+  virtual dof_id_type n_nodes () const { return _n_nodes; }
+  virtual dof_id_type max_node_id () const { return _max_node_id; }
+  virtual void reserve_nodes (const dof_id_type) { }
+  virtual dof_id_type n_elem () const { return _n_elem; }
+  virtual dof_id_type n_active_elem () const;
+  virtual dof_id_type max_elem_id () const { return _max_elem_id; }
+  virtual void reserve_elem (const dof_id_type) { }
 
   // Parallel only method to update the caches
   virtual void update_parallel_id_counts ();
 
   // And more parallel only methods to test non-cached values
-  unsigned int parallel_n_nodes () const;
-  unsigned int parallel_max_node_id () const;
-  unsigned int parallel_n_elem () const;
-  unsigned int parallel_max_elem_id () const;
+  dof_id_type parallel_n_nodes () const;
+  dof_id_type parallel_max_node_id () const;
+  dof_id_type parallel_n_elem () const;
+  dof_id_type parallel_max_elem_id () const;
 
-  virtual const Point& point (const unsigned int i) const ;
-  virtual const Node&  node  (const unsigned int i) const ;
-  virtual Node& node (const unsigned int i) ;
-  virtual const Node* node_ptr (const unsigned int i) const ;
-  virtual Node* node_ptr (const unsigned int i) ;
-  virtual const Node* query_node_ptr (const unsigned int i) const ;
-  virtual Node* query_node_ptr (const unsigned int i) ;
-  virtual const Elem* elem (const unsigned int i) const ;
-  virtual Elem* elem (const unsigned int i) ;
-  virtual const Elem* query_elem (const unsigned int i) const ;
-  virtual Elem* query_elem (const unsigned int i) ;
+  virtual const Point& point (const dof_id_type i) const ;
+  virtual const Node&  node  (const dof_id_type i) const ;
+  virtual Node& node (const dof_id_type i) ;
+  virtual const Node* node_ptr (const dof_id_type i) const ;
+  virtual Node* node_ptr (const dof_id_type i) ;
+  virtual const Node* query_node_ptr (const dof_id_type i) const ;
+  virtual Node* query_node_ptr (const dof_id_type i) ;
+  virtual const Elem* elem (const dof_id_type i) const ;
+  virtual Elem* elem (const dof_id_type i) ;
+  virtual const Elem* query_elem (const dof_id_type i) const ;
+  virtual Elem* query_elem (const dof_id_type i) ;
 
   /**
    * functions for adding /deleting nodes elements.
    */
   virtual Node* add_point (const Point& p,
-			   const unsigned int id =
+			   const dof_id_type id =
 			     DofObject::invalid_id,
-			   const unsigned int proc_id =
+			   const processor_id_type proc_id =
 			     DofObject::invalid_processor_id);
   virtual Node* add_node (Node* n) ;
   virtual Node* insert_node (Node* n);
   virtual void delete_node (Node* n) ;
-  virtual void renumber_node (unsigned int old_id, unsigned int new_id);
+  virtual void renumber_node (dof_id_type old_id, dof_id_type new_id);
   virtual Elem* add_elem (Elem* e) ;
   virtual Elem* insert_elem (Elem* e) ;
   virtual void delete_elem (Elem* e) ;
-  virtual void renumber_elem (unsigned int old_id, unsigned int new_id);
+  virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id);
 
     /**
      * There is no reason for a user to ever call this function.
@@ -265,8 +265,8 @@ public:
   element_iterator local_not_level_elements_begin (const unsigned int level);
   element_iterator local_not_level_elements_end   (const unsigned int level);
 
-  element_iterator pid_elements_begin (const unsigned int proc_id);
-  element_iterator pid_elements_end   (const unsigned int proc_id);
+  element_iterator pid_elements_begin (const processor_id_type proc_id);
+  element_iterator pid_elements_end   (const processor_id_type proc_id);
 
   element_iterator type_elements_begin (const ElemType type);
   element_iterator type_elements_end   (const ElemType type);
@@ -274,17 +274,17 @@ public:
   element_iterator active_type_elements_begin (const ElemType type);
   element_iterator active_type_elements_end   (const ElemType type);
 
-  element_iterator active_pid_elements_begin (const unsigned int proc_id);
-  element_iterator active_pid_elements_end   (const unsigned int proc_id);
+  element_iterator active_pid_elements_begin (const processor_id_type proc_id);
+  element_iterator active_pid_elements_end   (const processor_id_type proc_id);
 
   element_iterator unpartitioned_elements_begin ();
   element_iterator unpartitioned_elements_end ();
 
-  element_iterator active_local_subdomain_elements_begin (const unsigned int subdomain_id);
-  element_iterator active_local_subdomain_elements_end   (const unsigned int subdomain_id);
+  element_iterator active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id);
+  element_iterator active_local_subdomain_elements_end   (const subdomain_id_type subdomain_id);
 
-  element_iterator active_subdomain_elements_begin (const unsigned int subdomain_id);
-  element_iterator active_subdomain_elements_end   (const unsigned int subdomain_id);
+  element_iterator active_subdomain_elements_begin (const subdomain_id_type subdomain_id);
+  element_iterator active_subdomain_elements_end   (const subdomain_id_type subdomain_id);
 
 
   /**
@@ -335,8 +335,8 @@ public:
   const_element_iterator local_not_level_elements_begin (const unsigned int level) const;
   const_element_iterator local_not_level_elements_end   (const unsigned int level) const;
 
-  const_element_iterator pid_elements_begin (const unsigned int proc_id) const;
-  const_element_iterator pid_elements_end   (const unsigned int proc_id) const;
+  const_element_iterator pid_elements_begin (const processor_id_type proc_id) const;
+  const_element_iterator pid_elements_end   (const processor_id_type proc_id) const;
 
   const_element_iterator type_elements_begin (const ElemType type) const;
   const_element_iterator type_elements_end   (const ElemType type) const;
@@ -344,17 +344,17 @@ public:
   const_element_iterator active_type_elements_begin (const ElemType type) const;
   const_element_iterator active_type_elements_end   (const ElemType type) const;
 
-  const_element_iterator active_pid_elements_begin (const unsigned int proc_id) const;
-  const_element_iterator active_pid_elements_end   (const unsigned int proc_id) const;
+  const_element_iterator active_pid_elements_begin (const processor_id_type proc_id) const;
+  const_element_iterator active_pid_elements_end   (const processor_id_type proc_id) const;
 
   const_element_iterator unpartitioned_elements_begin () const;
   const_element_iterator unpartitioned_elements_end () const;
 
-  const_element_iterator active_local_subdomain_elements_begin (const unsigned int subdomain_id) const;
-  const_element_iterator active_local_subdomain_elements_end   (const unsigned int subdomain_id) const;
+  const_element_iterator active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id) const;
+  const_element_iterator active_local_subdomain_elements_end   (const subdomain_id_type subdomain_id) const;
 
-  const_element_iterator active_subdomain_elements_begin (const unsigned int subdomain_id) const;
-  const_element_iterator active_subdomain_elements_end   (const unsigned int subdomain_id) const;
+  const_element_iterator active_subdomain_elements_begin (const subdomain_id_type subdomain_id) const;
+  const_element_iterator active_subdomain_elements_end   (const subdomain_id_type subdomain_id) const;
 
 
 
@@ -372,8 +372,8 @@ public:
   node_iterator local_nodes_begin  ();
   node_iterator local_nodes_end    ();
 
-  node_iterator pid_nodes_begin (const unsigned int proc_id);
-  node_iterator pid_nodes_end   (const unsigned int proc_id);
+  node_iterator pid_nodes_begin (const processor_id_type proc_id);
+  node_iterator pid_nodes_end   (const processor_id_type proc_id);
 
   /**
    * const Node iterator accessor functions.
@@ -387,20 +387,20 @@ public:
   const_node_iterator local_nodes_begin  () const;
   const_node_iterator local_nodes_end    () const;
 
-  const_node_iterator pid_nodes_begin (const unsigned int proc_id) const;
-  const_node_iterator pid_nodes_end   (const unsigned int proc_id) const;
+  const_node_iterator pid_nodes_begin (const processor_id_type proc_id) const;
+  const_node_iterator pid_nodes_end   (const processor_id_type proc_id) const;
 
 protected:
 
   /**
    * The verices (spatial coordinates) of the mesh.
    */
-  mapvector<Node*> _nodes;
+  mapvector<Node*,dof_id_type> _nodes;
 
   /**
    * The elements in the mesh.
    */
-  mapvector<Elem*> _elements;
+  mapvector<Elem*,dof_id_type> _elements;
 
   /**
    * A boolean remembering whether we're serialized or not
@@ -410,16 +410,16 @@ protected:
   /**
    * Cached data from the last renumber_nodes_and_elements call
    */
-  unsigned int _n_nodes, _n_elem, _max_node_id, _max_elem_id;
+  dof_id_type _n_nodes, _n_elem, _max_node_id, _max_elem_id;
 
   /**
    * Guaranteed globally unused IDs for use when adding new
    * nodes or elements.
    */
-  unsigned int _next_free_local_node_id,
-	       _next_free_local_elem_id;
-  unsigned int _next_free_unpartitioned_node_id,
-	       _next_free_unpartitioned_elem_id;
+  dof_id_type _next_free_local_node_id,
+	      _next_free_local_elem_id;
+  dof_id_type _next_free_unpartitioned_node_id,
+	      _next_free_unpartitioned_elem_id;
 
   /**
    * These are extra ghost elements that we want to make sure
@@ -433,15 +433,15 @@ private:
    * Typedefs for the container implementation.  In this case,
    * it's just a std::vector<Elem*>.
    */
-  typedef mapvector<Elem*>::veclike_iterator             elem_iterator_imp;
-  typedef mapvector<Elem*>::const_veclike_iterator const_elem_iterator_imp;
+  typedef mapvector<Elem*,dof_id_type>::veclike_iterator             elem_iterator_imp;
+  typedef mapvector<Elem*,dof_id_type>::const_veclike_iterator const_elem_iterator_imp;
 
   /**
    * Typedefs for the container implementation.  In this case,
    * it's just a std::vector<Node*>.
    */
-  typedef mapvector<Node*>::veclike_iterator             node_iterator_imp;
-  typedef mapvector<Node*>::const_veclike_iterator const_node_iterator_imp;
+  typedef mapvector<Node*,dof_id_type>::veclike_iterator             node_iterator_imp;
+  typedef mapvector<Node*,dof_id_type>::const_veclike_iterator const_node_iterator_imp;
 };
 
 

@@ -40,9 +40,9 @@ T LaspackVector<T>::sum () const
 
   T _sum = 0;
 
-  const unsigned int n = this->size();
+  const numeric_index_type n = this->size();
 
-  for (unsigned int i=0; i!=n; ++i)
+  for (numeric_index_type i=0; i!=n; ++i)
     _sum += (*this)(i);
 
   return _sum;
@@ -108,9 +108,9 @@ NumericVector<T>& LaspackVector<T>::operator -= (const NumericVector<T>& v)
 template <typename T>
 void LaspackVector<T>::reciprocal()
 {
-  const unsigned int n = this->size();
+  const numeric_index_type n = this->size();
 
-  for (unsigned int i=0; i<n; i++)
+  for (numeric_index_type i=0; i<n; i++)
     {
       T v = (*this)(i);
 
@@ -127,9 +127,9 @@ void LaspackVector<T>::reciprocal()
 template <typename T>
 void LaspackVector<T>::add (const T v)
 {
-  const unsigned int n = this->size();
+  const numeric_index_type n = this->size();
 
-  for (unsigned int i=0; i<n; i++)
+  for (numeric_index_type i=0; i<n; i++)
     this->add (i, v);
 
 #ifndef NDEBUG
@@ -161,7 +161,7 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
   libmesh_assert(v);
   libmesh_assert_equal_to (this->size(), v->size());
 
-  for (unsigned int i=0; i<v->size(); i++)
+  for (numeric_index_type i=0; i<v->size(); i++)
     this->add (i, a*(*v)(i));
 
 #ifndef NDEBUG
@@ -173,12 +173,12 @@ void LaspackVector<T>::add (const T a, const NumericVector<T>& v_in)
 
 template <typename T>
 void LaspackVector<T>::add_vector (const std::vector<T>& v,
-				   const std::vector<unsigned int>& dof_indices)
+				   const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert (!v.empty());
   libmesh_assert_equal_to (v.size(), dof_indices.size());
 
-  for (unsigned int i=0; i<v.size(); i++)
+  for (numeric_index_type i=0; i<v.size(); i++)
     this->add (dof_indices[i], v[i]);
 }
 
@@ -186,11 +186,11 @@ void LaspackVector<T>::add_vector (const std::vector<T>& v,
 
 template <typename T>
 void LaspackVector<T>::add_vector (const NumericVector<T>& V,
-				   const std::vector<unsigned int>& dof_indices)
+				   const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
-  for (unsigned int i=0; i<V.size(); i++)
+  for (numeric_index_type i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
 }
 
@@ -198,11 +198,11 @@ void LaspackVector<T>::add_vector (const NumericVector<T>& V,
 
 template <typename T>
 void LaspackVector<T>::add_vector (const DenseVector<T>& V,
-				   const std::vector<unsigned int>& dof_indices)
+				   const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
-  for (unsigned int i=0; i<V.size(); i++)
+  for (numeric_index_type i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
 }
 
@@ -210,12 +210,12 @@ void LaspackVector<T>::add_vector (const DenseVector<T>& V,
 
 template <typename T>
 void LaspackVector<T>::insert (const std::vector<T>& v,
-			       const std::vector<unsigned int>& dof_indices)
+			       const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert (!v.empty());
   libmesh_assert_equal_to (v.size(), dof_indices.size());
 
-  for (unsigned int i=0; i<v.size(); i++)
+  for (numeric_index_type i=0; i<v.size(); i++)
     this->set (dof_indices[i], v[i]);
 }
 
@@ -223,11 +223,11 @@ void LaspackVector<T>::insert (const std::vector<T>& v,
 
 template <typename T>
 void LaspackVector<T>::insert (const NumericVector<T>& V,
-			       const std::vector<unsigned int>& dof_indices)
+			       const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
-  for (unsigned int i=0; i<V.size(); i++)
+  for (numeric_index_type i=0; i<V.size(); i++)
    this->set (dof_indices[i], V(i));
 }
 
@@ -235,11 +235,11 @@ void LaspackVector<T>::insert (const NumericVector<T>& V,
 
 template <typename T>
 void LaspackVector<T>::insert (const DenseVector<T>& V,
-			       const std::vector<unsigned int>& dof_indices)
+			       const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
-  for (unsigned int i=0; i<V.size(); i++)
+  for (numeric_index_type i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
 }
 
@@ -247,11 +247,11 @@ void LaspackVector<T>::insert (const DenseVector<T>& V,
 
 template <typename T>
 void LaspackVector<T>::insert (const DenseSubVector<T>& V,
-			       const std::vector<unsigned int>& dof_indices)
+			       const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
-  for (unsigned int i=0; i<V.size(); i++)
+  for (numeric_index_type i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
 }
 
@@ -296,9 +296,9 @@ void LaspackVector<T>::abs()
 {
   libmesh_assert (this->initialized());
 
-  const unsigned int n = this->size();
+  const numeric_index_type n = this->size();
 
-  for (unsigned int i=0; i!=n; ++i)
+  for (numeric_index_type i=0; i!=n; ++i)
     this->set(i,std::abs((*this)(i)));
 }
 
@@ -379,7 +379,7 @@ LaspackVector<T>::operator = (const std::vector<T>& v)
    * The global vector.  Only add the local components.
    */
   if (this->size() == v.size())
-    for (unsigned int i=0; i<v.size(); i++)
+    for (numeric_index_type i=0; i<v.size(); i++)
       this->set (i, v[i]);
 
   else
@@ -405,7 +405,7 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in) const
 
 template <typename T>
 void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
-				 const std::vector<unsigned int>& libmesh_dbg_var(send_list)) const
+				 const std::vector<numeric_index_type>& libmesh_dbg_var(send_list)) const
 {
   // Make sure the NumericVector passed in is really a LaspackVector
   LaspackVector<T>* v_local =
@@ -420,9 +420,9 @@ void LaspackVector<T>::localize (NumericVector<T>& v_local_in,
 
 
 template <typename T>
-void LaspackVector<T>::localize (const unsigned int libmesh_dbg_var(first_local_idx),
-				 const unsigned int libmesh_dbg_var(last_local_idx),
-				 const std::vector<unsigned int>& libmesh_dbg_var(send_list))
+void LaspackVector<T>::localize (const numeric_index_type libmesh_dbg_var(first_local_idx),
+				 const numeric_index_type libmesh_dbg_var(last_local_idx),
+				 const std::vector<numeric_index_type>& libmesh_dbg_var(send_list))
 {
   libmesh_assert_equal_to (first_local_idx, 0);
   libmesh_assert_equal_to (last_local_idx+1, this->size());
@@ -442,7 +442,7 @@ void LaspackVector<T>::localize (std::vector<T>& v_local) const
 {
   v_local.resize(this->size());
 
-  for (unsigned int i=0; i<v_local.size(); i++)
+  for (numeric_index_type i=0; i<v_local.size(); i++)
     v_local[i] = (*this)(i);
 }
 
@@ -450,7 +450,7 @@ void LaspackVector<T>::localize (std::vector<T>& v_local) const
 
 template <typename T>
 void LaspackVector<T>::localize_to_one (std::vector<T>& v_local,
-					const unsigned int libmesh_dbg_var(pid)) const
+					const processor_id_type libmesh_dbg_var(pid)) const
 {
   libmesh_assert_equal_to (pid, 0);
 
@@ -477,9 +477,9 @@ Real LaspackVector<T>::max() const
 
   Real max = libmesh_real((*this)(0));
 
-  const unsigned int n = this->size();
+  const numeric_index_type n = this->size();
 
-  for (unsigned int i=1; i<n; i++)
+  for (numeric_index_type i=1; i<n; i++)
     max = std::max (max, libmesh_real((*this)(i)));
 
   return max;
@@ -496,9 +496,9 @@ Real LaspackVector<T>::min () const
 
   Real min = libmesh_real((*this)(0));
 
-  const unsigned int n = this->size();
+  const numeric_index_type n = this->size();
 
-  for (unsigned int i=1; i<n; i++)
+  for (numeric_index_type i=1; i<n; i++)
     min = std::min (min, libmesh_real((*this)(i)));
 
   return min;

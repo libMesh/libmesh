@@ -111,12 +111,12 @@ public:
    * \p noz is the number of on-processor
    * nonzeros per row (defaults to 30).
    */
-  void init (const unsigned int m,
-	     const unsigned int n,
-	     const unsigned int m_l,
-	     const unsigned int n_l,
-	     const unsigned int nnz=30,
-	     const unsigned int noz=10);
+  void init (const numeric_index_type m,
+	     const numeric_index_type n,
+	     const numeric_index_type m_l,
+	     const numeric_index_type n_l,
+	     const numeric_index_type nnz=30,
+	     const numeric_index_type noz=10);
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.
@@ -148,25 +148,25 @@ public:
    * @returns \p m, the row-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
    */
-  unsigned int m () const;
+  numeric_index_type m () const;
 
   /**
    * @returns \p n, the column-dimension of
    * the matrix where the marix is \f$ M \times N \f$.
    */
-  unsigned int n () const;
+  numeric_index_type n () const;
 
   /**
    * return row_start, the index of the first
    * matrix row stored on this processor
    */
-  unsigned int row_start () const;
+  numeric_index_type row_start () const;
 
   /**
    * return row_stop, the index of the last
    * matrix row (+1) stored on this processor
    */
-  unsigned int row_stop () const;
+  numeric_index_type row_stop () const;
 
   /**
    * Set the element \p (i,j) to \p value.
@@ -174,8 +174,8 @@ public:
    * not exist. Still, it is allowed to store
    * zero values in non-existent fields.
    */
-  void set (const unsigned int i,
-	    const unsigned int j,
+  void set (const numeric_index_type i,
+	    const numeric_index_type j,
 	    const T value);
 
   /**
@@ -186,8 +186,8 @@ public:
    * store zero values in
    * non-existent fields.
    */
-  void add (const unsigned int i,
-	    const unsigned int j,
+  void add (const numeric_index_type i,
+	    const numeric_index_type j,
 	    const T value);
 
   /**
@@ -198,15 +198,15 @@ public:
    */
 
   void add_matrix (const DenseMatrix<T> &dm,
-		   const std::vector<unsigned int> &rows,
-		   const std::vector<unsigned int> &cols);
+		   const std::vector<numeric_index_type> &rows,
+		   const std::vector<numeric_index_type> &cols);
 
   /**
    * Same, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   void add_matrix (const DenseMatrix<T> &dm,
-		   const std::vector<unsigned int> &dof_indices);
+		   const std::vector<numeric_index_type> &dof_indices);
 
   /**
    * Add a Sparse matrix \p X, scaled with \p a, to \p this,
@@ -226,8 +226,8 @@ public:
    * should always be careful where
    * you call this function.
    */
-  T operator () (const unsigned int i,
-		 const unsigned int j) const;
+  T operator () (const numeric_index_type i,
+		 const numeric_index_type j) const;
 
   /**
    * Return the l1-norm of the matrix, that is

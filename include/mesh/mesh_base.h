@@ -164,7 +164,7 @@ public:
    * may return a cached value on distributed meshes, and so can be
    * called by any processor at any time.
    */
-  virtual unsigned int n_nodes () const = 0;
+  virtual dof_id_type n_nodes () const = 0;
 
   /**
    * Returns the number of nodes in the mesh. This function and others must
@@ -173,30 +173,30 @@ public:
    * returns a newly calculated parallel-synchronized value on
    * distributed meshes, and so must be called in parallel only.
    */
-  virtual unsigned int parallel_n_nodes () const = 0;
+  virtual dof_id_type parallel_n_nodes () const = 0;
 
   /**
    * Returns the number of nodes on processor \p proc.
    */
-  unsigned int n_nodes_on_proc (const unsigned int proc) const;
+  dof_id_type n_nodes_on_proc (const processor_id_type proc) const;
 
   /**
    * Returns the number of nodes on the local processor.
    */
-  unsigned int n_local_nodes () const
+  dof_id_type n_local_nodes () const
   { return this->n_nodes_on_proc (libMesh::processor_id()); }
 
   /**
    * Returns the number of nodes owned by no processor.
    */
-  unsigned int n_unpartitioned_nodes () const
+  dof_id_type n_unpartitioned_nodes () const
   { return this->n_nodes_on_proc (DofObject::invalid_processor_id); }
 
   /**
    * Returns a number greater than or equal to the maximum node id in the
    * mesh.
    */
-  virtual unsigned int max_node_id () const = 0;
+  virtual dof_id_type max_node_id () const = 0;
 
   /**
    * Reserves space for a known number of nodes.
@@ -205,14 +205,14 @@ public:
    * of nodes you will add and call this method before repeatedly
    * calling \p add_point() the implementation will be more efficient.
    */
-  virtual void reserve_nodes (const unsigned int nn) = 0;
+  virtual void reserve_nodes (const dof_id_type nn) = 0;
 
   /**
    * Returns the number of elements in the mesh.  The standard
    * n_elem() function may return a cached value on distributed
    * meshes, and so can be called by any processor at any time.
    */
-  virtual unsigned int n_elem () const = 0;
+  virtual dof_id_type n_elem () const = 0;
 
   /**
    * Returns the number of elements in the mesh.  The
@@ -220,13 +220,13 @@ public:
    * parallel-synchronized value on distributed meshes, and so must be
    * called in parallel only.
    */
-  virtual unsigned int parallel_n_elem () const = 0;
+  virtual dof_id_type parallel_n_elem () const = 0;
 
   /**
    * Returns a number greater than or equal to the maximum element id in the
    * mesh.
    */
-  virtual unsigned int max_elem_id () const = 0;
+  virtual dof_id_type max_elem_id () const = 0;
 
   /**
    * Reserves space for a known number of elements.
@@ -235,7 +235,7 @@ public:
    * of elements you will add and call this method before repeatedly
    * calling \p add_point() the implementation will be more efficient.
    */
-  virtual void reserve_elem (const unsigned int ne) = 0;
+  virtual void reserve_elem (const dof_id_type ne) = 0;
 
   /**
    * Updates parallel caches so that methods like n_elem()
@@ -247,34 +247,34 @@ public:
    * Returns the number of active elements in the mesh.  Implemented
    * in terms of active_element_iterators.
    */
-  virtual unsigned int n_active_elem () const = 0;
+  virtual dof_id_type n_active_elem () const = 0;
 
   /**
    * Returns the number of elements on processor \p proc.
    */
-  unsigned int n_elem_on_proc (const unsigned int proc) const;
+  dof_id_type n_elem_on_proc (const processor_id_type proc) const;
 
   /**
    * Returns the number of elements on the local processor.
    */
-  unsigned int n_local_elem () const
+  dof_id_type n_local_elem () const
   { return this->n_elem_on_proc (libMesh::processor_id()); }
 
   /**
    * Returns the number of elements owned by no processor.
    */
-  unsigned int n_unpartitioned_elem () const
+  dof_id_type n_unpartitioned_elem () const
   { return this->n_elem_on_proc (DofObject::invalid_processor_id); }
 
   /**
    * Returns the number of active elements on processor \p proc.
    */
-  unsigned int n_active_elem_on_proc (const unsigned int proc) const;
+  dof_id_type n_active_elem_on_proc (const processor_id_type proc) const;
 
   /**
    * Returns the number of active elements on the local processor.
    */
-  unsigned int n_active_local_elem () const
+  dof_id_type n_active_local_elem () const
   { return this->n_active_elem_on_proc (libMesh::processor_id()); }
 
   /**
@@ -284,82 +284,82 @@ public:
    * a mesh of 2 \p QUAD9 elements  \p n_tecplot_elem() will return 8.
    * Implemented in terms of element_iterators.
    */
-  unsigned int n_sub_elem () const;
+  dof_id_type n_sub_elem () const;
 
   /**
    * Same, but only counts active elements.
    */
-  unsigned int n_active_sub_elem () const;
+  dof_id_type n_active_sub_elem () const;
 
   /**
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ point, which should be present in this processor's
    * subset of the mesh data structure.
    */
-  virtual const Point& point (const unsigned int i) const = 0;
+  virtual const Point& point (const dof_id_type i) const = 0;
 
   /**
    * Return a constant reference (for reading only) to the
    * \f$ i^{th} \f$ node, which should be present in this processor's
    * subset of the mesh data structure.
    */
-  virtual const Node& node (const unsigned int i) const = 0;
+  virtual const Node& node (const dof_id_type i) const = 0;
 
   /**
    * Return a reference to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    */
-  virtual Node& node (const unsigned int i) = 0;
+  virtual Node& node (const dof_id_type i) = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node, which should be
    * present in this processor's subset of the mesh data structure.
    */
-  virtual const Node* node_ptr (const unsigned int i) const = 0;
+  virtual const Node* node_ptr (const dof_id_type i) const = 0;
 
   /**
    * Return a writeable pointer to the \f$ i^{th} \f$ node, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
-  virtual Node* node_ptr (const unsigned int i) = 0;
+  virtual Node* node_ptr (const dof_id_type i) = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ node, or NULL if no such
    * node exists in this processor's mesh data structure.
    */
-  virtual const Node* query_node_ptr (const unsigned int i) const = 0;
+  virtual const Node* query_node_ptr (const dof_id_type i) const = 0;
 
   /**
    * Return a writeable pointer to the \f$ i^{th} \f$ node, or NULL if
    * no such node exists in this processor's mesh data structure.
    */
-  virtual Node* query_node_ptr (const unsigned int i) = 0;
+  virtual Node* query_node_ptr (const dof_id_type i) = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ element, which should be
    * present in this processor's subset of the mesh data structure.
    */
-  virtual const Elem* elem (const unsigned int i) const = 0;
+  virtual const Elem* elem (const dof_id_type i) const = 0;
 
   /**
    * Return a writeable pointer to the \f$ i^{th} \f$ element, which
    * should be present in this processor's subset of the mesh data
    * structure.
    */
-  virtual Elem* elem (const unsigned int i) = 0;
+  virtual Elem* elem (const dof_id_type i) = 0;
 
   /**
    * Return a pointer to the \f$ i^{th} \f$ element, or NULL if no
    * such element exists in this processor's mesh data structure.
    */
-  virtual const Elem* query_elem (const unsigned int i) const = 0;
+  virtual const Elem* query_elem (const dof_id_type i) const = 0;
 
   /**
    * Return a writeable pointer to the \f$ i^{th} \f$ element, or NULL
    * if no such element exists in this processor's mesh data structure.
    */
-  virtual Elem* query_elem (const unsigned int i) = 0;
+  virtual Elem* query_elem (const dof_id_type i) = 0;
 
   /**
    * Add a new \p Node at \p Point \p p to the end of the vertex array,
@@ -372,8 +372,8 @@ public:
    * do this in parallel if you are manually keeping ids consistent.
    */
   virtual Node* add_point (const Point& p,
-			   const unsigned int id = DofObject::invalid_id,
-			   const unsigned int proc_id =
+			   const dof_id_type id = DofObject::invalid_id,
+			   const processor_id_type proc_id =
 			     DofObject::invalid_processor_id) = 0;
 
   /**
@@ -391,7 +391,7 @@ public:
    * by moving node(old_id) in the mesh's internal container.  No element with
    * the id \p new_id should already exist.
    */
-  virtual void renumber_node (unsigned int old_id, unsigned int new_id) = 0;
+  virtual void renumber_node (dof_id_type old_id, dof_id_type new_id) = 0;
 
   /**
    * Add elem \p e to the end of the element array.
@@ -420,7 +420,7 @@ public:
    * and by moving elem(old_id) in the mesh's internal container.  No element
    * with the id \p new_id should already exist.
    */
-  virtual void renumber_elem (unsigned int old_id, unsigned int new_id) = 0;
+  virtual void renumber_elem (dof_id_type old_id, dof_id_type new_id) = 0;
 
   /**
    * Locate element face (edge in 2D) neighbors.  This is done with the help
@@ -532,7 +532,7 @@ public:
    * physical processes are important.  The subdomain mapping is independent
    * from the parallel decomposition.
    */
-  unsigned int n_subdomains () const;
+  subdomain_id_type n_subdomains () const;
 
   /**
    * Returns the number of partitions which have been defined via
@@ -547,13 +547,13 @@ public:
    * @returns the number of processors used in the
    * current simulation.
    */
-  unsigned int n_processors () const
+  processor_id_type n_processors () const
   { return libMesh::n_processors(); }
 
   /**
    * @returns the subdomain id for this processor.
    */
-  unsigned int processor_id () const
+  processor_id_type processor_id () const
   { return libMesh::processor_id(); }
 
   /**
@@ -720,20 +720,20 @@ public:
   virtual element_iterator local_level_elements_end         (const unsigned int level  ) = 0;
   virtual element_iterator local_not_level_elements_begin   (const unsigned int level  ) = 0;
   virtual element_iterator local_not_level_elements_end     (const unsigned int level  ) = 0;
-  virtual element_iterator pid_elements_begin               (const unsigned int proc_id) = 0;
-  virtual element_iterator pid_elements_end                 (const unsigned int proc_id) = 0;
+  virtual element_iterator pid_elements_begin               (const processor_id_type proc_id) = 0;
+  virtual element_iterator pid_elements_end                 (const processor_id_type proc_id) = 0;
   virtual element_iterator type_elements_begin              (const ElemType type       ) = 0;
   virtual element_iterator type_elements_end                (const ElemType type       ) = 0;
   virtual element_iterator active_type_elements_begin       (const ElemType type       ) = 0;
   virtual element_iterator active_type_elements_end         (const ElemType type       ) = 0;
-  virtual element_iterator active_pid_elements_begin        (const unsigned int proc_id) = 0;
-  virtual element_iterator active_pid_elements_end          (const unsigned int proc_id) = 0;
+  virtual element_iterator active_pid_elements_begin        (const processor_id_type proc_id) = 0;
+  virtual element_iterator active_pid_elements_end          (const processor_id_type proc_id) = 0;
   virtual element_iterator unpartitioned_elements_begin     () = 0;
   virtual element_iterator unpartitioned_elements_end       () = 0;
-  virtual element_iterator active_local_subdomain_elements_begin   (const unsigned int subdomain_id) = 0;
-  virtual element_iterator active_local_subdomain_elements_end     (const unsigned int subdomain_id) = 0;
-  virtual element_iterator active_subdomain_elements_begin         (const unsigned int subdomain_id) = 0;
-  virtual element_iterator active_subdomain_elements_end           (const unsigned int subdomain_id) = 0;
+  virtual element_iterator active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id) = 0;
+  virtual element_iterator active_local_subdomain_elements_end   (const subdomain_id_type subdomain_id) = 0;
+  virtual element_iterator active_subdomain_elements_begin       (const subdomain_id_type subdomain_id) = 0;
+  virtual element_iterator active_subdomain_elements_end         (const subdomain_id_type subdomain_id) = 0;
 
 
 
@@ -771,20 +771,20 @@ public:
   virtual const_element_iterator local_level_elements_end         (const unsigned int level)   const = 0;
   virtual const_element_iterator local_not_level_elements_begin   (const unsigned int level)   const = 0;
   virtual const_element_iterator local_not_level_elements_end     (const unsigned int level)   const = 0;
-  virtual const_element_iterator pid_elements_begin               (const unsigned int proc_id) const = 0;
-  virtual const_element_iterator pid_elements_end                 (const unsigned int proc_id) const = 0;
+  virtual const_element_iterator pid_elements_begin               (const processor_id_type proc_id) const = 0;
+  virtual const_element_iterator pid_elements_end                 (const processor_id_type proc_id) const = 0;
   virtual const_element_iterator type_elements_begin              (const ElemType type)        const = 0;
   virtual const_element_iterator type_elements_end                (const ElemType type)        const = 0;
   virtual const_element_iterator active_type_elements_begin       (const ElemType type)        const = 0;
   virtual const_element_iterator active_type_elements_end         (const ElemType type)        const = 0;
-  virtual const_element_iterator active_pid_elements_begin        (const unsigned int proc_id) const = 0;
-  virtual const_element_iterator active_pid_elements_end          (const unsigned int proc_id) const = 0;
+  virtual const_element_iterator active_pid_elements_begin        (const processor_id_type proc_id) const = 0;
+  virtual const_element_iterator active_pid_elements_end          (const processor_id_type proc_id) const = 0;
   virtual const_element_iterator unpartitioned_elements_begin     () const = 0;
   virtual const_element_iterator unpartitioned_elements_end       () const = 0;
-  virtual const_element_iterator active_local_subdomain_elements_begin (const unsigned int subdomain_id) const = 0;
-  virtual const_element_iterator active_local_subdomain_elements_end   (const unsigned int subdomain_id) const = 0;
-  virtual const_element_iterator active_subdomain_elements_begin       (const unsigned int subdomain_id) const = 0;
-  virtual const_element_iterator active_subdomain_elements_end         (const unsigned int subdomain_id) const = 0;
+  virtual const_element_iterator active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id) const = 0;
+  virtual const_element_iterator active_local_subdomain_elements_end   (const subdomain_id_type subdomain_id) const = 0;
+  virtual const_element_iterator active_subdomain_elements_begin       (const subdomain_id_type subdomain_id) const = 0;
+  virtual const_element_iterator active_subdomain_elements_end         (const subdomain_id_type subdomain_id) const = 0;
 
 
   /**
@@ -796,8 +796,8 @@ public:
   virtual node_iterator active_nodes_end   () = 0;
   virtual node_iterator local_nodes_begin  () = 0;
   virtual node_iterator local_nodes_end    () = 0;
-  virtual node_iterator pid_nodes_begin    (const unsigned int proc_id) = 0;
-  virtual node_iterator pid_nodes_end      (const unsigned int proc_id) = 0;
+  virtual node_iterator pid_nodes_begin    (const processor_id_type proc_id) = 0;
+  virtual node_iterator pid_nodes_end      (const processor_id_type proc_id) = 0;
 
 
   /**
@@ -809,8 +809,8 @@ public:
   virtual const_node_iterator active_nodes_end   () const = 0;
   virtual const_node_iterator local_nodes_begin  () const = 0;
   virtual const_node_iterator local_nodes_end    () const = 0;
-  virtual const_node_iterator pid_nodes_begin    (const unsigned int proc_id) const = 0;
-  virtual const_node_iterator pid_nodes_end      (const unsigned int proc_id) const = 0;
+  virtual const_node_iterator pid_nodes_begin    (const processor_id_type proc_id) const = 0;
+  virtual const_node_iterator pid_nodes_end      (const processor_id_type proc_id) const = 0;
 
 
 

@@ -131,19 +131,21 @@ class Elem : public ReferenceCountedObject<Elem>,
   virtual unsigned int node (const unsigned int i) const;
 
   /**
-   * @returns the local id number of global \p Node id \p i.
+   * @returns the local id number of global \p Node id \p i,
+   * or \p invalid_id if Node id \p i is not local.
    */
-  virtual unsigned int local_node (const unsigned int i) const;
+  virtual dof_id_type local_node (const unsigned int i) const;
+
+  /**
+   * @returns the local index for the \p Node pointer \p node_ptr,
+   * or \p invalid_id if \p node_ptr is not a local node.
+   */
+  dof_id_type get_node_index (const Node* node_ptr) const;
 
   /**
    * @returns the pointer to local \p Node \p i.
    */
   virtual Node* get_node (const unsigned int i) const;
-
-  /**
-   * @returns the local index for the \p Node pointer \p node_ptr.
-   */
-  unsigned int get_node_index (const Node* node_ptr) const;
 
   /**
    * @returns the pointer to local \p Node \p i as a writeable reference.
@@ -268,6 +270,8 @@ class Elem : public ReferenceCountedObject<Elem>,
    * This function tells you which side the boundary element \p e is.
    * I.e. if e = a->build_side(s) or e = a->side(s); then
    * a->which_side_am_i(e) will be s.
+   *
+   * Returns \p invalid_uint if \p e is not a side of \p this
    */
   unsigned int which_side_am_i(const Elem *e) const;
 
@@ -1374,7 +1378,7 @@ unsigned int Elem::node (const unsigned int i) const
 
 
 inline
-unsigned int Elem::local_node (const unsigned int i) const
+dof_id_type Elem::local_node (const unsigned int i) const
 {
   for (unsigned int n=0; n != this->n_nodes(); ++n)
     if (this->node(n) == i)
@@ -1399,7 +1403,7 @@ Node* Elem::get_node (const unsigned int i) const
 
 
 inline
-unsigned int Elem::get_node_index (const Node* node_ptr) const
+dof_id_type Elem::get_node_index (const Node* node_ptr) const
 {
   for (unsigned int n=0; n != this->n_nodes(); ++n)
     if (this->_nodes[n] == node_ptr)
@@ -1542,7 +1546,7 @@ unsigned int Elem::which_side_am_i (const Elem* e) const
   for (unsigned int i=0; i != en; ++i)
     {
       Point side_point = e->point(i);
-      unsigned int local_node_id = Node::invalid_id;
+      dof_id_type local_node_id = Node::invalid_id;
 
       // Look for a node of this that's contiguous with node i of e
       for (unsigned int j=0; j != nn; ++j)
@@ -1552,7 +1556,7 @@ unsigned int Elem::which_side_am_i (const Elem* e) const
       // If a node of e isn't contiguous with some node of this, then
       // e isn't a side of this.
       if (local_node_id == Node::invalid_id)
-        return Node::invalid_id;
+        return libMesh::invalid_uint;
 
       // If a node of e isn't contiguous with some node on side s of
       // this, then e isn't on side s.

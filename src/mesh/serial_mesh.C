@@ -64,7 +64,7 @@ SerialMesh::SerialMesh (const UnstructuredMesh &other_mesh) :
 }
 
 
-const Point& SerialMesh::point (const unsigned int i) const
+const Point& SerialMesh::point (const dof_id_type i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -77,7 +77,7 @@ const Point& SerialMesh::point (const unsigned int i) const
 
 
 
-const Node& SerialMesh::node (const unsigned int i) const
+const Node& SerialMesh::node (const dof_id_type i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -90,7 +90,7 @@ const Node& SerialMesh::node (const unsigned int i) const
 
 
 
-Node& SerialMesh::node (const unsigned int i)
+Node& SerialMesh::node (const dof_id_type i)
 {
   if (i >= this->n_nodes())
     {
@@ -109,7 +109,7 @@ Node& SerialMesh::node (const unsigned int i)
 
 
 
-const Node* SerialMesh::node_ptr (const unsigned int i) const
+const Node* SerialMesh::node_ptr (const dof_id_type i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -121,7 +121,7 @@ const Node* SerialMesh::node_ptr (const unsigned int i) const
 
 
 
-Node* SerialMesh::node_ptr (const unsigned int i)
+Node* SerialMesh::node_ptr (const dof_id_type i)
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -133,7 +133,7 @@ Node* SerialMesh::node_ptr (const unsigned int i)
 
 
 
-const Node* SerialMesh::query_node_ptr (const unsigned int i) const
+const Node* SerialMesh::query_node_ptr (const dof_id_type i) const
 {
   if (i >= this->n_nodes())
     return NULL;
@@ -146,7 +146,7 @@ const Node* SerialMesh::query_node_ptr (const unsigned int i) const
 
 
 
-Node* SerialMesh::query_node_ptr (const unsigned int i)
+Node* SerialMesh::query_node_ptr (const dof_id_type i)
 {
   if (i >= this->n_nodes())
     return NULL;
@@ -159,7 +159,7 @@ Node* SerialMesh::query_node_ptr (const unsigned int i)
 
 
 
-const Elem* SerialMesh::elem (const unsigned int i) const
+const Elem* SerialMesh::elem (const dof_id_type i) const
 {
   libmesh_assert_less (i, this->n_elem());
   libmesh_assert(_elements[i]);
@@ -171,7 +171,7 @@ const Elem* SerialMesh::elem (const unsigned int i) const
 
 
 
-Elem* SerialMesh::elem (const unsigned int i)
+Elem* SerialMesh::elem (const dof_id_type i)
 {
   libmesh_assert_less (i, this->n_elem());
   libmesh_assert(_elements[i]);
@@ -183,7 +183,7 @@ Elem* SerialMesh::elem (const unsigned int i)
 
 
 
-const Elem* SerialMesh::query_elem (const unsigned int i) const
+const Elem* SerialMesh::query_elem (const dof_id_type i) const
 {
   if (i >= this->n_elem())
     return NULL;
@@ -196,7 +196,7 @@ const Elem* SerialMesh::query_elem (const unsigned int i) const
 
 
 
-Elem* SerialMesh::query_elem (const unsigned int i)
+Elem* SerialMesh::query_elem (const dof_id_type i)
 {
   if (i >= this->n_elem())
     return NULL;
@@ -221,7 +221,7 @@ Elem* SerialMesh::add_elem (Elem* e)
   if (!e->valid_id())
     e->set_id (_elements.size());
 
-  const unsigned int id = e->id();
+  const dof_id_type id = e->id();
 
   if (id < _elements.size())
     {
@@ -242,7 +242,7 @@ Elem* SerialMesh::add_elem (Elem* e)
 
 Elem* SerialMesh::insert_elem (Elem* e)
 {
-  unsigned int eid = e->id();
+  dof_id_type eid = e->id();
   libmesh_assert_less (eid, _elements.size());
   Elem *oldelem = _elements[eid];
 
@@ -301,8 +301,8 @@ void SerialMesh::delete_elem(Elem* e)
 
 
 
-void SerialMesh::renumber_elem(const unsigned int old_id,
-                               const unsigned int new_id)
+void SerialMesh::renumber_elem(const dof_id_type old_id,
+                               const dof_id_type new_id)
 {
   // This doesn't get used in serial yet
   Elem *elem = _elements[old_id];
@@ -317,8 +317,8 @@ void SerialMesh::renumber_elem(const unsigned int old_id,
 
 
 Node* SerialMesh::add_point (const Point& p,
-			     const unsigned int id,
-			     const unsigned int proc_id)
+			     const dof_id_type id,
+			     const processor_id_type proc_id)
 {
 //   // We only append points with SerialMesh
 //   libmesh_assert(id == DofObject::invalid_id || id == _nodes.size());
@@ -417,8 +417,8 @@ void SerialMesh::delete_node(Node* n)
 
 
 
-void SerialMesh::renumber_node(const unsigned int old_id,
-                               const unsigned int new_id)
+void SerialMesh::renumber_node(const dof_id_type old_id,
+                               const dof_id_type new_id)
 {
   // This doesn't get used in serial yet
   Node *node = _nodes[old_id];
@@ -475,8 +475,8 @@ void SerialMesh::renumber_nodes_and_elements ()
   START_LOG("renumber_nodes_and_elem()", "Mesh");
 
   // node and element id counters
-  unsigned int next_free_elem = 0;
-  unsigned int next_free_node = 0;
+  dof_id_type next_free_elem = 0;
+  dof_id_type next_free_node = 0;
 
   // Will hold the set of nodes that are currently connected to elements
   LIBMESH_BEST_UNORDERED_SET<Node*> connected_nodes;
@@ -521,8 +521,8 @@ void SerialMesh::renumber_nodes_and_elements ()
 	      {
 		// The source and destination indices
 		// for this node
-		const unsigned int src_idx = elem->node(n);
-		const unsigned int dst_idx = next_free_node++;
+		const dof_id_type src_idx = elem->node(n);
+		const dof_id_type dst_idx = next_free_node++;
                 
 		// ensure we want to swap a valid nodes
 		libmesh_assert(_nodes[src_idx]);
@@ -631,12 +631,12 @@ void SerialMesh::renumber_nodes_and_elements ()
 void SerialMesh::fix_broken_node_and_element_numbering ()
 {
    // Nodes first
-  for (unsigned int n=0; n<this->_nodes.size(); n++)
+  for (dof_id_type n=0; n<this->_nodes.size(); n++)
     if (this->_nodes[n] != NULL)
       this->_nodes[n]->set_id() = n;
 
   // Elements next
-  for (unsigned int e=0; e<this->_elements.size(); e++)
+  for (dof_id_type e=0; e<this->_elements.size(); e++)
     if (this->_elements[e] != NULL)
       this->_elements[e]->set_id() = e;
 }
@@ -649,13 +649,13 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                                 bool clear_stitched_boundary_ids,
                                 bool verbose)
 {
-  std::map<unsigned int, unsigned int> node_to_node_map;
-  std::map<unsigned int, std::vector<unsigned int> > node_to_elems_map;
+  std::map<dof_id_type, dof_id_type> node_to_node_map;
+  std::map<dof_id_type, std::vector<dof_id_type> > node_to_elems_map;
   
   if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
       (other_mesh_boundary_id != BoundaryInfo::invalid_id) )
   {
-    std::set<unsigned int> this_boundary_node_ids;
+    std::set<dof_id_type> this_boundary_node_ids;
     MeshBase::element_iterator elem_it  = this->elements_begin();
     MeshBase::element_iterator elem_end = this->elements_end();
     for ( ; elem_it != elem_end; ++elem_it)
@@ -679,7 +679,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
         }
     }
 
-    std::set<unsigned int> other_boundary_node_ids;
+    std::set<dof_id_type> other_boundary_node_ids;
     elem_it  = other_mesh.elements_begin();
     elem_end = other_mesh.elements_end();
     for ( ; elem_it != elem_end; ++elem_it)
@@ -703,20 +703,20 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
         }
     }
     
-    std::set<unsigned int>::iterator set_it     = this_boundary_node_ids.begin();
-    std::set<unsigned int>::iterator set_it_end = this_boundary_node_ids.end();
+    std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
+    std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
     for( ; set_it != set_it_end; ++set_it)
     {
-      unsigned int this_node_id = *set_it;
+      dof_id_type this_node_id = *set_it;
       Node& this_node = this->node(this_node_id);
       
       bool found_matching_nodes = false;
       
-      std::set<unsigned int>::iterator other_set_it     = other_boundary_node_ids.begin();
-      std::set<unsigned int>::iterator other_set_it_end = other_boundary_node_ids.end();
+      std::set<dof_id_type>::iterator other_set_it     = other_boundary_node_ids.begin();
+      std::set<dof_id_type>::iterator other_set_it_end = other_boundary_node_ids.end();
       for( ; other_set_it != other_set_it_end; ++other_set_it)
       {
-        unsigned int other_node_id = *other_set_it;
+        dof_id_type other_node_id = *other_set_it;
         Node& other_node = other_mesh.node(other_node_id);
         
         Real node_distance = (this_node - other_node).size();
@@ -733,7 +733,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
           node_to_node_map[this_node_id] = other_node_id;
           
           // Build a vector of all the elements in other_mesh that contain other_node
-          std::vector<unsigned int> other_elem_ids;
+          std::vector<dof_id_type> other_elem_ids;
           MeshBase::element_iterator elem_it  = other_mesh.elements_begin();
           MeshBase::element_iterator elem_end = other_mesh.elements_end();
           for (; elem_it != elem_end; ++elem_it)
@@ -771,8 +771,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   
 
   
-  unsigned int node_delta = this->n_nodes();
-  unsigned int elem_delta = this->n_elem();
+  dof_id_type node_delta = this->n_nodes();
+  dof_id_type elem_delta = this->n_elem();
   
   // need to increment node and element IDs of other_mesh before copying to this mesh
   MeshBase::node_iterator node_it  = other_mesh.nodes_begin();
@@ -780,7 +780,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   for (; node_it != node_end; ++node_it)
   {
     Node *node = *node_it;
-    unsigned int new_id = node->id() + node_delta;
+    dof_id_type new_id = node->id() + node_delta;
     node->set_id(new_id);
   }
   
@@ -789,23 +789,23 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   for (; elem_it != elem_end; ++elem_it)
   {
     Elem *elem = *elem_it;
-    unsigned int new_id = elem->id() + elem_delta;
+    dof_id_type new_id = elem->id() + elem_delta;
     elem->set_id(new_id);
   }
   
   // Also, increment the node_to_node_map and node_to_elems_map
-  std::map<unsigned int, unsigned int>::iterator node_map_it     = node_to_node_map.begin();
-  std::map<unsigned int, unsigned int>::iterator node_map_it_end = node_to_node_map.end();
+  std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
+  std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
   for( ; node_map_it != node_map_it_end; ++node_map_it)
   {
     node_map_it->second += node_delta;
   }
-  std::map<unsigned int, std::vector<unsigned int> >::iterator elem_map_it     = node_to_elems_map.begin();
-  std::map<unsigned int, std::vector<unsigned int> >::iterator elem_map_it_end = node_to_elems_map.end();
+  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it     = node_to_elems_map.begin();
+  std::map<dof_id_type, std::vector<dof_id_type> >::iterator elem_map_it_end = node_to_elems_map.end();
   for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
   {
-    unsigned int n_elems = elem_map_it->second.size();
-    for(unsigned int i=0; i<n_elems; i++)
+    dof_id_type n_elems = elem_map_it->second.size();
+    for(dof_id_type i=0; i<n_elems; i++)
     {
       (elem_map_it->second)[i] += elem_delta;
     }
@@ -820,7 +820,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   for (; node_it != node_end; ++node_it)
   {
     Node *node = *node_it;
-    unsigned int new_id = node->id() - node_delta;
+    dof_id_type new_id = node->id() - node_delta;
     node->set_id(new_id);
   }
   
@@ -843,7 +843,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
       }
     
     // Then decrement
-    unsigned int new_id = elem->id() - elem_delta;
+    dof_id_type new_id = elem->id() - elem_delta;
     elem->set_id(new_id);
   }
   
@@ -857,14 +857,14 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   elem_map_it_end = node_to_elems_map.end();
   for( ; elem_map_it != elem_map_it_end; ++elem_map_it)
   {
-    unsigned int target_node_id = elem_map_it->first;
-    unsigned int other_node_id = node_to_node_map[target_node_id];
+    dof_id_type target_node_id = elem_map_it->first;
+    dof_id_type other_node_id = node_to_node_map[target_node_id];
     Node& target_node = this->node(target_node_id);
     
-    unsigned int n_elems = elem_map_it->second.size();
+    dof_id_type n_elems = elem_map_it->second.size();
     for(unsigned int i=0; i<n_elems; i++)
     {
-      unsigned int elem_id = elem_map_it->second[i];
+      dof_id_type elem_id = elem_map_it->second[i];
       Elem* elem = this->elem(elem_id);
       
       // find the local node index that we want to update
@@ -878,7 +878,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   node_map_it_end = node_to_node_map.end();
   for( ; node_map_it != node_map_it_end; ++node_map_it)
   {
-    unsigned int node_id = node_map_it->second;
+    dof_id_type node_id = node_map_it->second;
     this->delete_node( this->node_ptr(node_id) );
   }
   
@@ -913,10 +913,10 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
 }
 
 
-unsigned int SerialMesh::n_active_elem () const
+dof_id_type SerialMesh::n_active_elem () const
 {
-  return static_cast<unsigned int>(std::distance (this->active_elements_begin(),
-						  this->active_elements_end()));
+  return static_cast<dof_id_type>(std::distance (this->active_elements_begin(),
+						 this->active_elements_end()));
 }
 
 } // namespace libMesh

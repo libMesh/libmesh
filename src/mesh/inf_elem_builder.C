@@ -165,7 +165,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
       // Form the list of faces of elements which finally
       // will tell us which nodes should receive boundary
       // conditions (to form the std::vector<const Node*>)
-      std::set< std::pair<unsigned int,
+      std::set< std::pair<dof_id_type,
 	                  unsigned int> > inner_faces;
 
 
@@ -183,28 +183,28 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
 		        << std::endl;
 	}
 
-      // First use a std::vector<unsigned int> that holds
+      // First use a std::vector<dof_id_type> that holds
       // the global node numbers.  Then sort this vector,
       // so that it can be made unique (no multiple occurence
       // of a node), and then finally insert the Node* in
       // the vector inner_boundary_nodes.
       //
-      // Reserve memory for the vector<unsigned int> with
+      // Reserve memory for the vector<> with
       // 4 times the size of the number of elements in the
       // std::set. This is a good bet for Quad4 face elements.
       // For higher-order elements, this probably _has_ to lead
       // to additional allocations...
       // Practice has to show how this affects performance.
-      std::vector<unsigned int> inner_boundary_node_numbers;
+      std::vector<dof_id_type> inner_boundary_node_numbers;
       inner_boundary_node_numbers.reserve(4*inner_faces.size());
 
       // Now transform the set of pairs to a list of (possibly
       // duplicate) global node numbers.
-      std::set< std::pair<unsigned int,unsigned int> >::iterator face_it = inner_faces.begin();
-      const std::set< std::pair<unsigned int,unsigned int> >::iterator face_end = inner_faces.end();
+      std::set< std::pair<dof_id_type,unsigned int> >::iterator face_it = inner_faces.begin();
+      const std::set< std::pair<dof_id_type,unsigned int> >::iterator face_end = inner_faces.end();
       for(; face_it!=face_end; ++face_it)
         {
-	  std::pair<unsigned int,unsigned int> p = *face_it;
+	  std::pair<dof_id_type,unsigned int> p = *face_it;
 
 	  // build a full-ordered side element to get _all_ the base nodes
 	  AutoPtr<Elem> side( this->_mesh.elem(p.first)->build_side(p.second) );
@@ -222,10 +222,10 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
       // it returns a pointer to the end of the unique range.
       //TODO:[BSK] int_ibn_size_before is not the same type as unique_size!
 #ifndef NDEBUG
-      const unsigned int ibn_size_before = inner_boundary_node_numbers.size();
+      const std::size_t ibn_size_before = inner_boundary_node_numbers.size();
 #endif
       std::sort (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());
-      std::vector<unsigned int>::iterator unique_end =
+      std::vector<dof_id_type>::iterator unique_end =
 	  std::unique (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());
 
       const int unique_size = std::distance(inner_boundary_node_numbers.begin(), unique_end);
@@ -239,7 +239,7 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
       inner_boundary_nodes->clear();
 
 
-      std::vector<unsigned int>::iterator pos_it = inner_boundary_node_numbers.begin();
+      std::vector<dof_id_type>::iterator pos_it = inner_boundary_node_numbers.begin();
       for (; pos_it != unique_end; ++pos_it)
         {
 	  const Node& node = this->_mesh.node(*pos_it);
@@ -283,7 +283,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 				    const bool y_sym,
 				    const bool z_sym,
 				    const bool be_verbose,
-				    std::set< std::pair<unsigned int,
+				    std::set< std::pair<dof_id_type,
 				    unsigned int> >* inner_faces)
 {
   if (be_verbose)
@@ -304,11 +304,11 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
   // A set for storing element number, side number pairs.
   // pair.first == element number, pair.second == side number
-  std::set< std::pair<unsigned int,unsigned int> > faces;
-  std::set< std::pair<unsigned int,unsigned int> > ofaces;
+  std::set< std::pair<dof_id_type,unsigned int> > faces;
+  std::set< std::pair<dof_id_type,unsigned int> > ofaces;
 
   // A set for storing node numbers on the outer faces.
-  std::set<unsigned int> onodes;
+  std::set<dof_id_type> onodes;
 
   // The distance to the farthest point in the mesh from the origin
   Real max_r=0.;
@@ -423,11 +423,11 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
 
   {
-    std::set< std::pair<unsigned int,unsigned int> >::iterator face_it = faces.begin();
+    std::set< std::pair<dof_id_type,unsigned int> >::iterator face_it = faces.begin();
     unsigned int facesfound=0;
     while (face_it != faces.end()) {
 
-      std::pair<unsigned int, unsigned int> p;
+      std::pair<dof_id_type, unsigned int> p;
       p = *face_it;
 
       // This has to be a full-ordered side element,
@@ -494,15 +494,15 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
 
   // outer_nodes maps onodes to their duplicates
-  std::map<unsigned int, Node *> outer_nodes;
+  std::map<dof_id_type, Node *> outer_nodes;
 
   // We may need to pick our own object ids in parallel
-  unsigned int old_max_node_id = _mesh.max_node_id();
-  unsigned int old_max_elem_id = _mesh.max_elem_id();
+  dof_id_type old_max_node_id = _mesh.max_node_id();
+  dof_id_type old_max_elem_id = _mesh.max_elem_id();
 
   // for each boundary node, add an outer_node with
   // double distance from origin.
-  std::set<unsigned int>::iterator on_it = onodes.begin();
+  std::set<dof_id_type>::iterator on_it = onodes.begin();
   for( ; on_it != onodes.end(); ++on_it)
     {
       Point p = (Point(this->_mesh.point(*on_it)) * 2) - origin;
@@ -515,7 +515,7 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
         {
           // Pick a unique id in parallel
           Node &bnode = _mesh.node(*on_it);
-          unsigned int new_id = bnode.id() + old_max_node_id;
+          dof_id_type new_id = bnode.id() + old_max_node_id;
           outer_nodes[*on_it] =
             this->_mesh.add_point(p, new_id,
                                   bnode.processor_id());
@@ -525,16 +525,16 @@ void InfElemBuilder::build_inf_elem(const Point& origin,
 
 #ifdef DEBUG
   // for verbose, remember n_elem
-  unsigned int n_conventional_elem = this->_mesh.n_elem();
+  dof_id_type n_conventional_elem = this->_mesh.n_elem();
 #endif
 
 
   // build Elems based on boundary side type
-  std::set< std::pair<unsigned int,unsigned int> >::iterator face_it = ofaces.begin();
+  std::set< std::pair<dof_id_type,unsigned int> >::iterator face_it = ofaces.begin();
   for( ; face_it != ofaces.end(); ++face_it)
     {
       // Shortcut to the pair being iterated over
-      std::pair<unsigned int,unsigned int> p = *face_it;
+      std::pair<dof_id_type,unsigned int> p = *face_it;
 
       // build a full-ordered side element to get the base nodes
       AutoPtr<Elem> side(this->_mesh.elem(p.first)->build_side(p.second));

@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/id_types.h"
 
 // C++ includes
 #include <vector>
@@ -81,12 +82,12 @@ class StatisticsVector : public std::vector<T>
    * Call the std::vector constructor.
    */
   explicit
-  StatisticsVector(unsigned int i=0) : std::vector<T> (i) {}
+  StatisticsVector(dof_id_type i=0) : std::vector<T> (i) {}
 
   /**
    * Call the std::vector constructor, fill each entry with \p val
    */
-  StatisticsVector(unsigned int i, T val) : std::vector<T> (i,val) {}
+  StatisticsVector(dof_id_type i, T val) : std::vector<T> (i,val) {}
 
   /**
    * Destructor.  Virtual so we can derive from the \p StatisticsVector
@@ -188,7 +189,7 @@ class StatisticsVector : public std::vector<T>
    * order.
    * Source: GNU Scientific Library
    */
-  virtual void histogram (std::vector<unsigned int>& bin_members,
+  virtual void histogram (std::vector<dof_id_type>& bin_members,
 			  unsigned int n_bins=10);
 
   /**
@@ -204,24 +205,24 @@ class StatisticsVector : public std::vector<T>
   /**
    * A const version of the histogram function.
    */
-  virtual void histogram (std::vector<unsigned int>& bin_members,
+  virtual void histogram (std::vector<dof_id_type>& bin_members,
 			  unsigned int n_bins=10) const;
 
   /**
-   * Returns a vector of unsigned ints which correspond
+   * Returns a vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * below the cutoff value "cut".
    */
-  virtual std::vector<unsigned int> cut_below(Real cut) const;
+  virtual std::vector<dof_id_type> cut_below(Real cut) const;
 
   /**
-   * Returns a vector of unsigned ints which correspond
+   * Returns a vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * above the cutoff value cut.  I chose not to combine
    * these two functions since the interface is cleaner
    * with one passed parameter instead of two.
    */
-  virtual std::vector<unsigned int> cut_above(Real cut) const;
+  virtual std::vector<dof_id_type> cut_above(Real cut) const;
 
 
  private:

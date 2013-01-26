@@ -45,10 +45,10 @@ namespace libMesh
  */
 namespace SparsityPattern // use a namespace so member classes can be forward-declared.
 {
-  typedef std::vector<unsigned int, Threads::scalable_allocator<unsigned int> > Row;
+  typedef std::vector<dof_id_type, Threads::scalable_allocator<dof_id_type> > Row;
   class Graph : public std::vector<Row> {};
 
-  class NonlocalGraph : public std::map<unsigned int, Row> {};
+  class NonlocalGraph : public std::map<dof_id_type, Row> {};
 
   /**
    * Splices the two sorted ranges [begin,middle) and [middle,end)
@@ -89,8 +89,8 @@ namespace SparsityPattern // use a namespace so member classes can be forward-de
     SparsityPattern::Graph sparsity_pattern;
     SparsityPattern::NonlocalGraph nonlocal_pattern;
 
-    std::vector<unsigned int> n_nz;
-    std::vector<unsigned int> n_oz;
+    std::vector<dof_id_type> n_nz;
+    std::vector<dof_id_type> n_oz;
 
     Build (const MeshBase &mesh_in,
 	   const DofMap &dof_map_in,

@@ -124,14 +124,14 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
 #endif
 
   // Count the objectss to ask each processor about
-  std::vector<unsigned int>
+  std::vector<dof_id_type>
     ghost_objects_from_proc(libMesh::n_processors(), 0);
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
       DofObjType *obj = *it;
       libmesh_assert (obj);
-      unsigned int obj_procid = obj->processor_id();
+      processor_id_type obj_procid = obj->processor_id();
       if (obj_procid != DofObject::invalid_processor_id)
         ghost_objects_from_proc[obj_procid]++;
     }
@@ -142,12 +142,12 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
     requested_objs_y(libMesh::n_processors()),
     requested_objs_z(libMesh::n_processors());
   // Corresponding ids to keep track of
-  std::vector<std::vector<unsigned int> >
+  std::vector<std::vector<dof_id_type> >
     requested_objs_id(libMesh::n_processors());
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
     if (p != libMesh::processor_id())
       {
         requested_objs_x[p].reserve(ghost_objects_from_proc[p]);
@@ -158,7 +158,7 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
   for (Iterator it = range_begin; it != range_end; ++it)
     {
       DofObjType *obj = *it;
-      unsigned int obj_procid = obj->processor_id();
+      processor_id_type obj_procid = obj->processor_id();
       if (obj_procid == libMesh::processor_id() ||
           obj_procid == DofObject::invalid_processor_id)
         continue;
@@ -171,14 +171,14 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
     }
 
   // Trade requests with other processors
-  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
+      processor_id_type procup = (libMesh::processor_id() + p) %
+                                  libMesh::n_processors();
+      processor_id_type procdown = (libMesh::n_processors() +
+                                    libMesh::processor_id() - p) %
+                                    libMesh::n_processors();
       std::vector<Real> request_to_fill_x,
                         request_to_fill_y,
                         request_to_fill_z;
@@ -190,8 +190,8 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
                              procdown, request_to_fill_z);
 
       // Find the local id of each requested object
-      std::vector<unsigned int> request_to_fill_id(request_to_fill_x.size());
-      for (unsigned int i=0; i != request_to_fill_x.size(); ++i)
+      std::vector<dof_id_type> request_to_fill_id(request_to_fill_x.size());
+      for (std::size_t i=0; i != request_to_fill_x.size(); ++i)
         {
           Point p(request_to_fill_x[i],
                   request_to_fill_y[i],
@@ -236,25 +236,25 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
   parallel_only();
 
   // Count the objects to ask each processor about
-  std::vector<unsigned int>
+  std::vector<dof_id_type>
     ghost_objects_from_proc(libMesh::n_processors(), 0);
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
       DofObject *obj = *it;
       libmesh_assert (obj);
-      unsigned int obj_procid = obj->processor_id();
+      processor_id_type obj_procid = obj->processor_id();
       if (obj_procid != DofObject::invalid_processor_id)
         ghost_objects_from_proc[obj_procid]++;
     }
 
   // Request sets to send to each processor
-  std::vector<std::vector<unsigned int> >
+  std::vector<std::vector<dof_id_type> >
     requested_objs_id(libMesh::n_processors());
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
     if (p != libMesh::processor_id())
       {
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
@@ -262,7 +262,7 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
   for (Iterator it = range_begin; it != range_end; ++it)
     {
       DofObject *obj = *it;
-      unsigned int obj_procid = obj->processor_id();
+      processor_id_type obj_procid = obj->processor_id();
       if (obj_procid == libMesh::processor_id() ||
           obj_procid == DofObject::invalid_processor_id)
         continue;
@@ -271,15 +271,15 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
     }
 
   // Trade requests with other processors
-  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
-      std::vector<unsigned int> request_to_fill_id;
+      processor_id_type procup = (libMesh::processor_id() + p) %
+                                  libMesh::n_processors();
+      processor_id_type procdown = (libMesh::n_processors() +
+                                    libMesh::processor_id() - p) %
+                                    libMesh::n_processors();
+      std::vector<dof_id_type> request_to_fill_id;
       CommWorld.send_receive(procup, requested_objs_id[procup],
                              procdown, request_to_fill_id);
 
@@ -314,27 +314,28 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
   parallel_only();
 
   // Count the objects to ask each processor about
-  std::vector<unsigned int>
+  std::vector<dof_id_type>
     ghost_objects_from_proc(libMesh::n_processors(), 0);
 
   for (Iterator it = range_begin; it != range_end; ++it)
     {
       DofObject *obj = *it;
       libmesh_assert (obj);
-      unsigned int obj_procid = obj->processor_id();
+      processor_id_type obj_procid = obj->processor_id();
       if (obj_procid != DofObject::invalid_processor_id)
         ghost_objects_from_proc[obj_procid]++;
     }
 
   // Request sets to send to each processor
-  std::vector<std::vector<unsigned int> >
+  std::vector<std::vector<dof_id_type> >
     requested_objs_id(libMesh::n_processors()),
-    requested_objs_parent_id(libMesh::n_processors()),
+    requested_objs_parent_id(libMesh::n_processors());
+  std::vector<std::vector<unsigned char> >
     requested_objs_child_num(libMesh::n_processors());
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
     if (p != libMesh::processor_id())
       {
         requested_objs_id[p].reserve(ghost_objects_from_proc[p]);
@@ -345,7 +346,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
   for (Iterator it = range_begin; it != range_end; ++it)
     {
       Elem *elem = *it;
-      unsigned int obj_procid = elem->processor_id();
+      processor_id_type obj_procid = elem->processor_id();
       if (obj_procid == libMesh::processor_id() ||
           obj_procid == DofObject::invalid_processor_id)
         continue;
@@ -360,25 +361,25 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
     }
 
   // Trade requests with other processors
-  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
-      std::vector<unsigned int> request_to_fill_parent_id,
-                                request_to_fill_child_num;
+      processor_id_type procup = (libMesh::processor_id() + p) %
+                                  libMesh::n_processors();
+      processor_id_type procdown = (libMesh::n_processors() +
+                                    libMesh::processor_id() - p) %
+                                    libMesh::n_processors();
+      std::vector<dof_id_type>   request_to_fill_parent_id;
+      std::vector<unsigned char> request_to_fill_child_num;
       CommWorld.send_receive(procup, requested_objs_parent_id[procup],
                              procdown, request_to_fill_parent_id);
       CommWorld.send_receive(procup, requested_objs_child_num[procup],
                              procdown, request_to_fill_child_num);
 
       // Find the id of each requested element
-      unsigned int request_size = request_to_fill_parent_id.size();
-      std::vector<unsigned int> request_to_fill_id(request_size);
-      for (unsigned int i=0; i != request_size; ++i)
+      std::size_t request_size = request_to_fill_parent_id.size();
+      std::vector<dof_id_type> request_to_fill_id(request_size);
+      for (std::size_t i=0; i != request_size; ++i)
 	{
           Elem *parent = mesh.elem(request_to_fill_parent_id[i]);
           libmesh_assert(parent);
@@ -437,11 +438,11 @@ struct SyncNodalPositions
 
   // First required interface.  This function must fill up the data vector for the
   // ids specified in the ids vector.
-  void gather_data (const std::vector<unsigned int>& ids, std::vector<datum>& data);
+  void gather_data (const std::vector<dof_id_type>& ids, std::vector<datum>& data);
 
   // Second required interface.  This function must do something with the data in
   // the data vector for the ids in the ids vector.
-  void act_on_data (const std::vector<unsigned int>& ids, std::vector<datum>& data);
+  void act_on_data (const std::vector<dof_id_type>& ids, std::vector<datum>& data);
 
   MeshBase &mesh;
 };

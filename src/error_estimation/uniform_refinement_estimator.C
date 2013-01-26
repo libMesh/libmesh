@@ -246,11 +246,11 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
   // Find the number of coarse mesh elements, to make it possible
   // to find correct coarse elem ids later
-  const unsigned int max_coarse_elem_id = mesh.max_elem_id();
+  const dof_id_type max_coarse_elem_id = mesh.max_elem_id();
 #ifndef NDEBUG
   // n_coarse_elem is only used in an assertion later so
   // avoid declaring it unless asserts are active.
-  const unsigned int n_coarse_elem = mesh.n_elem();
+  const dof_id_type n_coarse_elem = mesh.n_elem();
 #endif
 
   // Uniformly refine the mesh
@@ -497,7 +497,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 #endif
 
           // The global DOF indices for the fine element
-          std::vector<unsigned int> dof_indices;
+          std::vector<dof_id_type> dof_indices;
 
           // Iterate over all the active elements in the fine mesh
           // that live on this processor.
@@ -511,7 +511,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
               // Find the element id for the corresponding coarse grid element
               const Elem* coarse = elem;
-              unsigned int e_id = coarse->id();
+              dof_id_type e_id = coarse->id();
               while (e_id >= max_coarse_elem_id)
                 {
                   libmesh_assert (coarse->parent());

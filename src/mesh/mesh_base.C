@@ -187,7 +187,7 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
 
 
 
-unsigned int MeshBase::n_subdomains() const
+subdomain_id_type MeshBase::n_subdomains() const
 {
   // This requires an inspection on every processor
   parallel_only();
@@ -202,44 +202,44 @@ unsigned int MeshBase::n_subdomains() const
 
   
 
-unsigned int MeshBase::n_nodes_on_proc (const unsigned int proc_id) const
+dof_id_type MeshBase::n_nodes_on_proc (const processor_id_type proc_id) const
 {
   // We're either counting a processor's nodes or unpartitioned
   // nodes
   libmesh_assert (proc_id < libMesh::n_processors() ||
 	  proc_id == DofObject::invalid_processor_id);
 
-  return static_cast<unsigned int>(std::distance (this->pid_nodes_begin(proc_id),
-						  this->pid_nodes_end  (proc_id)));
+  return static_cast<dof_id_type>(std::distance (this->pid_nodes_begin(proc_id),
+						 this->pid_nodes_end  (proc_id)));
 }
 
 
 
-unsigned int MeshBase::n_elem_on_proc (const unsigned int proc_id) const
+dof_id_type MeshBase::n_elem_on_proc (const processor_id_type proc_id) const
 {
   // We're either counting a processor's elements or unpartitioned
   // elements
   libmesh_assert (proc_id < libMesh::n_processors() ||
 	  proc_id == DofObject::invalid_processor_id);
 
-  return static_cast<unsigned int>(std::distance (this->pid_elements_begin(proc_id),
-						  this->pid_elements_end  (proc_id)));
+  return static_cast<dof_id_type>(std::distance (this->pid_elements_begin(proc_id),
+						 this->pid_elements_end  (proc_id)));
 }
 
 
 
-unsigned int MeshBase::n_active_elem_on_proc (const unsigned int proc_id) const
+dof_id_type MeshBase::n_active_elem_on_proc (const processor_id_type proc_id) const
 {
   libmesh_assert_less (proc_id, libMesh::n_processors());
-  return static_cast<unsigned int>(std::distance (this->active_pid_elements_begin(proc_id),
-						  this->active_pid_elements_end  (proc_id)));
+  return static_cast<dof_id_type>(std::distance (this->active_pid_elements_begin(proc_id),
+						 this->active_pid_elements_end  (proc_id)));
 }
 
 
 
-unsigned int MeshBase::n_sub_elem () const
+dof_id_type MeshBase::n_sub_elem () const
 {
-  unsigned int ne=0;
+  dof_id_type ne=0;
 
   const_element_iterator       el  = this->elements_begin();
   const const_element_iterator end = this->elements_end();
@@ -252,9 +252,9 @@ unsigned int MeshBase::n_sub_elem () const
 
 
 
-unsigned int MeshBase::n_active_sub_elem () const
+dof_id_type MeshBase::n_active_sub_elem () const
 {
-  unsigned int ne=0;
+  dof_id_type ne=0;
 
   const_element_iterator       el  = this->active_elements_begin();
   const const_element_iterator end = this->active_elements_end();

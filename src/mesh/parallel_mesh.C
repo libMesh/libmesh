@@ -135,12 +135,12 @@ void ParallelMesh::update_parallel_id_counts()
 
 // Or in debug mode we may want to test the uncached values without
 // changing the cache
-unsigned int ParallelMesh::parallel_n_elem() const
+dof_id_type ParallelMesh::parallel_n_elem() const
 {
   // This function must be run on all processors at once
   parallel_only();
 
-  unsigned int n_local = this->n_local_elem();
+  dof_id_type n_local = this->n_local_elem();
   CommWorld.sum(n_local);
   n_local += this->n_unpartitioned_elem();
   return n_local;
@@ -148,12 +148,12 @@ unsigned int ParallelMesh::parallel_n_elem() const
 
 
 
-unsigned int ParallelMesh::parallel_max_elem_id() const
+dof_id_type ParallelMesh::parallel_max_elem_id() const
 {
   // This function must be run on all processors at once
   parallel_only();
 
-  unsigned int max_local = _elements.empty() ?
+  dof_id_type max_local = _elements.empty() ?
     0 : _elements.rbegin()->first + 1;
   CommWorld.max(max_local);
   return max_local;
@@ -161,12 +161,12 @@ unsigned int ParallelMesh::parallel_max_elem_id() const
 
 
 
-unsigned int ParallelMesh::parallel_n_nodes() const
+dof_id_type ParallelMesh::parallel_n_nodes() const
 {
   // This function must be run on all processors at once
   parallel_only();
 
-  unsigned int n_local = this->n_local_nodes();
+  dof_id_type n_local = this->n_local_nodes();
   CommWorld.sum(n_local);
   n_local += this->n_unpartitioned_nodes();
   return n_local;
@@ -174,12 +174,12 @@ unsigned int ParallelMesh::parallel_n_nodes() const
 
 
 
-unsigned int ParallelMesh::parallel_max_node_id() const
+dof_id_type ParallelMesh::parallel_max_node_id() const
 {
   // This function must be run on all processors at once
   parallel_only();
 
-  unsigned int max_local = _nodes.empty() ?
+  dof_id_type max_local = _nodes.empty() ?
     0 : _nodes.rbegin()->first + 1;
   CommWorld.max(max_local);
   return max_local;
@@ -187,7 +187,7 @@ unsigned int ParallelMesh::parallel_max_node_id() const
 
 
 
-const Point& ParallelMesh::point (const unsigned int i) const
+const Point& ParallelMesh::point (const dof_id_type i) const
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -199,7 +199,7 @@ const Point& ParallelMesh::point (const unsigned int i) const
 
 
 
-const Node& ParallelMesh::node (const unsigned int i) const
+const Node& ParallelMesh::node (const dof_id_type i) const
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -211,7 +211,7 @@ const Node& ParallelMesh::node (const unsigned int i) const
 
 
 
-Node& ParallelMesh::node (const unsigned int i)
+Node& ParallelMesh::node (const dof_id_type i)
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -221,7 +221,7 @@ Node& ParallelMesh::node (const unsigned int i)
 
 
 
-const Node* ParallelMesh::node_ptr (const unsigned int i) const
+const Node* ParallelMesh::node_ptr (const dof_id_type i) const
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -232,7 +232,7 @@ const Node* ParallelMesh::node_ptr (const unsigned int i) const
 
 
 
-Node* ParallelMesh::node_ptr (const unsigned int i)
+Node* ParallelMesh::node_ptr (const dof_id_type i)
 {
   libmesh_assert(_nodes[i]);
   libmesh_assert_equal_to (_nodes[i]->id(), i);
@@ -243,9 +243,9 @@ Node* ParallelMesh::node_ptr (const unsigned int i)
 
 
 
-const Node* ParallelMesh::query_node_ptr (const unsigned int i) const
+const Node* ParallelMesh::query_node_ptr (const dof_id_type i) const
 {
-  std::map<unsigned int, Node*>::const_iterator it = _nodes.find(i);
+  std::map<dof_id_type, Node*>::const_iterator it = _nodes.find(i);
   if (it != _nodes.end().it)
     {
       const Node* n = it->second;
@@ -259,9 +259,9 @@ const Node* ParallelMesh::query_node_ptr (const unsigned int i) const
 
 
 
-Node* ParallelMesh::query_node_ptr (const unsigned int i)
+Node* ParallelMesh::query_node_ptr (const dof_id_type i)
 {
-  std::map<unsigned int, Node*>::const_iterator it = _nodes.find(i);
+  std::map<dof_id_type, Node*>::const_iterator it = _nodes.find(i);
   if (it != _nodes.end().it)
     {
       Node* n = it->second;
@@ -275,7 +275,7 @@ Node* ParallelMesh::query_node_ptr (const unsigned int i)
 
 
 
-const Elem* ParallelMesh::elem (const unsigned int i) const
+const Elem* ParallelMesh::elem (const dof_id_type i) const
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -286,7 +286,7 @@ const Elem* ParallelMesh::elem (const unsigned int i) const
 
 
 
-Elem* ParallelMesh::elem (const unsigned int i)
+Elem* ParallelMesh::elem (const dof_id_type i)
 {
   libmesh_assert(_elements[i]);
   libmesh_assert_equal_to (_elements[i]->id(), i);
@@ -297,9 +297,9 @@ Elem* ParallelMesh::elem (const unsigned int i)
 
 
 
-const Elem* ParallelMesh::query_elem (const unsigned int i) const
+const Elem* ParallelMesh::query_elem (const dof_id_type i) const
 {
-  std::map<unsigned int, Elem*>::const_iterator it = _elements.find(i);
+  std::map<dof_id_type, Elem*>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)
     {
       const Elem* e = it->second;
@@ -313,9 +313,9 @@ const Elem* ParallelMesh::query_elem (const unsigned int i) const
 
 
 
-Elem* ParallelMesh::query_elem (const unsigned int i)
+Elem* ParallelMesh::query_elem (const dof_id_type i)
 {
-  std::map<unsigned int, Elem*>::const_iterator it = _elements.find(i);
+  std::map<dof_id_type, Elem*>::const_iterator it = _elements.find(i);
   if (it != _elements.end().it)
     {
       Elem* e = _elements[i];
@@ -338,7 +338,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
   if (e->valid_id() && _elements[e->id()] == e)
     return e;
 
-  const unsigned int elem_procid = e->processor_id();
+  const processor_id_type elem_procid = e->processor_id();
 
   if (!e->valid_id())
     {
@@ -350,7 +350,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
 
       // Use the unpartitioned ids for unpartitioned elems,
       // in serial, and temporarily for ghost elems
-      unsigned int *next_id = &_next_free_unpartitioned_elem_id;
+      dof_id_type *next_id = &_next_free_unpartitioned_elem_id;
       if (elem_procid == libMesh::processor_id() &&
           !this->is_serial())
         next_id = &_next_free_local_elem_id;
@@ -375,7 +375,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
 #ifndef NDEBUG
       // We need a const mapvector so we don't inadvertently create
       // NULL entries when testing for non-NULL ones
-      const mapvector<Elem*>& const_elements = _elements;
+      const mapvector<Elem*,dof_id_type>& const_elements = _elements;
 #endif
       libmesh_assert(!const_elements[_next_free_unpartitioned_elem_id]);
       libmesh_assert(!const_elements[_next_free_local_elem_id]);
@@ -399,7 +399,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
 #ifdef DEBUG
   if (elem_procid == DofObject::invalid_processor_id)
     {
-      unsigned int elem_id = e->id();
+      dof_id_type elem_id = e->id();
       CommWorld.max(elem_id);
       libmesh_assert_equal_to (elem_id, e->id());
     }
@@ -445,8 +445,8 @@ void ParallelMesh::delete_elem(Elem* e)
 
 
 
-void ParallelMesh::renumber_elem(const unsigned int old_id,
-                                 const unsigned int new_id)
+void ParallelMesh::renumber_elem(const dof_id_type old_id,
+                                 const dof_id_type new_id)
 {
   Elem *elem = _elements[old_id];
   libmesh_assert (elem);
@@ -461,8 +461,8 @@ void ParallelMesh::renumber_elem(const unsigned int old_id,
 
 
 Node* ParallelMesh::add_point (const Point& p,
-			       const unsigned int id,
-			       const unsigned int proc_id)
+			       const dof_id_type id,
+			       const processor_id_type proc_id)
 {
   if (_nodes.count(id))
     {
@@ -493,7 +493,7 @@ Node* ParallelMesh::add_node (Node *n)
   if (n->valid_id() && _nodes[n->id()] == n)
     return n;
 
-  const unsigned int node_procid = n->processor_id();
+  const processor_id_type node_procid = n->processor_id();
 
   if (!n->valid_id())
     {
@@ -505,7 +505,7 @@ Node* ParallelMesh::add_node (Node *n)
 
       // Use the unpartitioned ids for unpartitioned nodes,
       // in serial, and temporarily for ghost nodes
-      unsigned int *next_id = &_next_free_unpartitioned_node_id;
+      dof_id_type *next_id = &_next_free_unpartitioned_node_id;
       if (node_procid == libMesh::processor_id() &&
           !this->is_serial())
         next_id = &_next_free_local_node_id;
@@ -530,7 +530,7 @@ Node* ParallelMesh::add_node (Node *n)
 #ifndef NDEBUG
       // We need a const mapvector so we don't inadvertently create
       // NULL entries when testing for non-NULL ones
-      const mapvector<Node*>& const_nodes = _nodes;
+      const mapvector<Node*,dof_id_type>& const_nodes = _nodes;
 #endif
       libmesh_assert(!const_nodes[_next_free_unpartitioned_node_id]);
       libmesh_assert(!const_nodes[_next_free_local_node_id]);
@@ -554,7 +554,7 @@ Node* ParallelMesh::add_node (Node *n)
 #ifdef DEBUG
   if (node_procid == DofObject::invalid_processor_id)
     {
-      unsigned int node_id = n->id();
+      dof_id_type node_id = n->id();
       CommWorld.max(node_id);
       libmesh_assert_equal_to (node_id, n->id());
     }
@@ -615,8 +615,8 @@ void ParallelMesh::delete_node(Node* n)
 
 
 
-void ParallelMesh::renumber_node(const unsigned int old_id,
-                                 const unsigned int new_id)
+void ParallelMesh::renumber_node(const dof_id_type old_id,
+                                 const dof_id_type new_id)
 {
   Node *node = _nodes[old_id];
   libmesh_assert (node);
@@ -717,33 +717,33 @@ void ParallelMesh::update_post_partitioning ()
 
 template <typename T>
 void ParallelMesh::libmesh_assert_valid_parallel_object_ids
-  (const mapvector<T*> &objects) const
+  (const mapvector<T*,dof_id_type> &objects) const
 {
   // This function must be run on all processors at once
   parallel_only();
 
-  const unsigned int pmax_node_id = this->parallel_max_node_id();
-  const unsigned int pmax_elem_id = this->parallel_max_elem_id();
-  const unsigned int pmax_id = std::max(pmax_node_id, pmax_elem_id);
+  const dof_id_type pmax_node_id = this->parallel_max_node_id();
+  const dof_id_type pmax_elem_id = this->parallel_max_elem_id();
+  const dof_id_type pmax_id = std::max(pmax_node_id, pmax_elem_id);
 
-  for (unsigned int i=0; i != pmax_id; ++i)
+  for (dof_id_type i=0; i != pmax_id; ++i)
     {
       T* obj = objects[i]; // Returns NULL if there's no map entry
 
-      unsigned int dofid = obj && obj->valid_id() ?
+      dof_id_type dofid = obj && obj->valid_id() ?
         obj->id() : DofObject::invalid_id;
       // Local lookups by id should return the requested object
       libmesh_assert(!obj || obj->id() == i);
 
-      unsigned int min_dofid = dofid;
+      dof_id_type min_dofid = dofid;
       CommWorld.min(min_dofid);
       // All processors with an object should agree on id
       libmesh_assert (!obj || dofid == min_dofid);
 
-      unsigned int procid = obj && obj->valid_processor_id() ?
+      dof_id_type procid = obj && obj->valid_processor_id() ?
         obj->processor_id() : DofObject::invalid_processor_id;
 
-      unsigned int min_procid = procid;
+      dof_id_type min_procid = procid;
       CommWorld.min(min_procid);
 
       // All processors with an object should agree on processor id
@@ -782,9 +782,9 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
   // This function must be run on all processors at once
   parallel_only();
 
-  unsigned int pmax_elem_id = this->parallel_max_elem_id();
+  dof_id_type pmax_elem_id = this->parallel_max_elem_id();
 
-  for (unsigned int i=0; i != pmax_elem_id; ++i)
+  for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
       Elem* elem = _elements[i]; // Returns NULL if there's no map entry
 
@@ -812,18 +812,19 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 
 
 template <typename T>
-unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
+dof_id_type ParallelMesh::renumber_dof_objects
+  (mapvector<T*,dof_id_type> &objects)
 {
   // This function must be run on all processors at once
   parallel_only();
 
-  typedef typename mapvector<T*>::veclike_iterator object_iterator;
+  typedef typename mapvector<T*,dof_id_type>::veclike_iterator object_iterator;
 
   // In parallel we may not know what objects other processors have.
   // Start by figuring out how many
-  unsigned int unpartitioned_objects = 0;
+  dof_id_type unpartitioned_objects = 0;
 
-  std::vector<unsigned int>
+  std::vector<dof_id_type>
     ghost_objects_from_proc(libMesh::n_processors(), 0);
 
   object_iterator it  = objects.begin();
@@ -839,7 +840,7 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
         objects.erase(it++);
       else
         {
-          unsigned int obj_procid = obj->processor_id();
+          processor_id_type obj_procid = obj->processor_id();
           if (obj_procid == DofObject::invalid_processor_id)
             unpartitioned_objects++;
           else
@@ -848,23 +849,23 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
         }
     }
 
-  std::vector<unsigned int> objects_on_proc(libMesh::n_processors(), 0);
+  std::vector<dof_id_type> objects_on_proc(libMesh::n_processors(), 0);
   CommWorld.allgather(ghost_objects_from_proc[libMesh::processor_id()],
                       objects_on_proc);
 
 #ifndef NDEBUG
   libmesh_assert(CommWorld.verify(unpartitioned_objects));
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
     libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
 #endif
 
   // We'll renumber objects in blocks by processor id
-  std::vector<unsigned int> first_object_on_proc(libMesh::n_processors());
-  for (unsigned int i=1; i != libMesh::n_processors(); ++i)
+  std::vector<dof_id_type> first_object_on_proc(libMesh::n_processors());
+  for (processor_id_type i=1; i != libMesh::n_processors(); ++i)
     first_object_on_proc[i] = first_object_on_proc[i-1] +
                               objects_on_proc[i-1];
-  unsigned int next_id = first_object_on_proc[libMesh::processor_id()];
-  unsigned int first_free_id =
+  dof_id_type next_id = first_object_on_proc[libMesh::processor_id()];
+  dof_id_type first_free_id =
     first_object_on_proc[libMesh::n_processors()-1] +
     objects_on_proc[libMesh::n_processors()-1] +
     unpartitioned_objects;
@@ -873,12 +874,12 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   // for non-local object ids
 
   // Request sets to send to each processor
-  std::vector<std::vector<unsigned int> >
+  std::vector<std::vector<dof_id_type> >
     requested_ids(libMesh::n_processors());
 
   // We know how many objects live on each processor, so reseve() space for
   // each.
-  for (unsigned int p=0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
     if (p != libMesh::processor_id())
       requested_ids[p].reserve(ghost_objects_from_proc[p]);
 
@@ -895,21 +896,21 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
   // Next set ghost object ids from other processors
   if (libMesh::n_processors() > 1)
     {
-      for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+      for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
         {
           // Trade my requests with processor procup and procdown
-          unsigned int procup = (libMesh::processor_id() + p) %
-                                 libMesh::n_processors();
-          unsigned int procdown = (libMesh::n_processors() +
-                                   libMesh::processor_id() - p) %
-                                   libMesh::n_processors();
-          std::vector<unsigned int> request_to_fill;
+          processor_id_type procup = (libMesh::processor_id() + p) %
+                                      libMesh::n_processors();
+          processor_id_type procdown = (libMesh::n_processors() +
+                                        libMesh::processor_id() - p) %
+                                        libMesh::n_processors();
+          std::vector<dof_id_type> request_to_fill;
           CommWorld.send_receive(procup, requested_ids[procup],
                                  procdown, request_to_fill);
 
           // Fill those requests
-          std::vector<unsigned int> new_ids(request_to_fill.size());
-          for (unsigned int i=0; i != request_to_fill.size(); ++i)
+          std::vector<dof_id_type> new_ids(request_to_fill.size());
+          for (std::size_t i=0; i != request_to_fill.size(); ++i)
             {
               T *obj = objects[request_to_fill[i]];
               libmesh_assert(obj);
@@ -923,12 +924,12 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
             }
 
           // Trade back the results
-          std::vector<unsigned int> filled_request;
+          std::vector<dof_id_type> filled_request;
           CommWorld.send_receive(procdown, new_ids,
                                  procup, filled_request);
 
           // And copy the id changes we've now been informed of
-          for (unsigned int i=0; i != filled_request.size(); ++i)
+          for (std::size_t i=0; i != filled_request.size(); ++i)
             {
               T *obj = objects[requested_ids[procup][i]];
               libmesh_assert (obj);
@@ -945,7 +946,7 @@ unsigned int ParallelMesh::renumber_dof_objects (mapvector<T*> &objects)
 
   // Next set unpartitioned object ids
   next_id = 0;
-  for (unsigned int i=0; i != libMesh::n_processors(); ++i)
+  for (processor_id_type i=0; i != libMesh::n_processors(); ++i)
     next_id += objects_on_proc[i];
   for (it = objects.begin(); it != end; ++it)
     {
@@ -1014,7 +1015,7 @@ void ParallelMesh::renumber_nodes_and_elements ()
   this->libmesh_assert_valid_parallel_flags();
 #endif
 
-  std::set<unsigned int> used_nodes;
+  std::set<dof_id_type> used_nodes;
 
   // flag the nodes we need
   {
@@ -1072,8 +1073,8 @@ void ParallelMesh::renumber_nodes_and_elements ()
 #ifdef DEBUG
   libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
-  const unsigned int pmax_node_id = this->parallel_max_node_id();
-  const unsigned int pmax_elem_id = this->parallel_max_elem_id();
+  const dof_id_type pmax_node_id = this->parallel_max_node_id();
+  const dof_id_type pmax_elem_id = this->parallel_max_elem_id();
   libmesh_assert_equal_to (this->max_node_id(), pmax_node_id);
   libmesh_assert_equal_to (this->max_elem_id(), pmax_elem_id);
   libmesh_assert_equal_to (this->n_nodes(), this->max_node_id());
@@ -1096,12 +1097,12 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
 {
   // We need access to iterators for the underlying containers,
   // not the mapvector<> reimplementations.
-  mapvector<Node*>::maptype &nodes = this->_nodes;
-  mapvector<Elem*>::maptype &elem  = this->_elements;
+  mapvector<Node*,dof_id_type>::maptype &nodes = this->_nodes;
+  mapvector<Elem*,dof_id_type>::maptype &elem  = this->_elements;
 
   // Nodes first
   {
-    mapvector<Node*>::maptype::iterator
+    mapvector<Node*,dof_id_type>::maptype::iterator
       it  = nodes.begin(),
       end = nodes.end();
 
@@ -1112,7 +1113,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
 
   // Elements next
   {
-    mapvector<Elem*>::maptype::iterator
+    mapvector<Elem*,dof_id_type>::maptype::iterator
       it  = elem.begin(),
       end = elem.end();
 
@@ -1124,20 +1125,20 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
 
 
 
-unsigned int ParallelMesh::n_active_elem () const
+dof_id_type ParallelMesh::n_active_elem () const
 {
   parallel_only();
 
   // Get local active elements first
-  unsigned int active_elements =
-    static_cast<unsigned int>(std::distance (this->active_local_elements_begin(),
-					     this->active_local_elements_end()));
+  dof_id_type active_elements =
+    static_cast<dof_id_type>(std::distance (this->active_local_elements_begin(),
+					    this->active_local_elements_end()));
   CommWorld.sum(active_elements);
 
   // Then add unpartitioned active elements, which should exist on
   // every processor
   active_elements +=
-    static_cast<unsigned int>(std::distance
+    static_cast<dof_id_type>(std::distance
       (this->active_pid_elements_begin(DofObject::invalid_processor_id),
        this->active_pid_elements_end(DofObject::invalid_processor_id)));
   return active_elements;
@@ -1160,8 +1161,8 @@ void ParallelMesh::delete_remote_elements()
 
   libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
-  const unsigned int pmax_node_id = this->parallel_max_node_id();
-  const unsigned int pmax_elem_id = this->parallel_max_elem_id();
+  const dof_id_type pmax_node_id = this->parallel_max_node_id();
+  const dof_id_type pmax_elem_id = this->parallel_max_elem_id();
   libmesh_assert_equal_to (this->max_node_id(), pmax_node_id);
   libmesh_assert_equal_to (this->max_elem_id(), pmax_elem_id);
 #endif
@@ -1173,16 +1174,16 @@ void ParallelMesh::delete_remote_elements()
 
   // Now make sure the containers actually shrink - strip
   // any newly-created NULL voids out of the element array
-  mapvector<Elem*>::veclike_iterator e_it        = _elements.begin();
-  const mapvector<Elem*>::veclike_iterator e_end = _elements.end();
+  mapvector<Elem*,dof_id_type>::veclike_iterator e_it        = _elements.begin();
+  const mapvector<Elem*,dof_id_type>::veclike_iterator e_end = _elements.end();
   for (; e_it != e_end;)
     if (!*e_it)
       _elements.erase(e_it++);
     else
       ++e_it;
 
-  mapvector<Node*>::veclike_iterator n_it        = _nodes.begin();
-  const mapvector<Node*>::veclike_iterator n_end = _nodes.end();
+  mapvector<Node*,dof_id_type>::veclike_iterator n_it        = _nodes.begin();
+  const mapvector<Node*,dof_id_type>::veclike_iterator n_end = _nodes.end();
   for (; n_it != n_end;)
     if (!*n_it)
       _nodes.erase(n_it++);
@@ -1235,8 +1236,8 @@ void ParallelMesh::allgather()
 #ifdef DEBUG
   libmesh_assert_equal_to (this->n_nodes(), this->parallel_n_nodes());
   libmesh_assert_equal_to (this->n_elem(), this->parallel_n_elem());
-  const unsigned int pmax_node_id = this->parallel_max_node_id();
-  const unsigned int pmax_elem_id = this->parallel_max_elem_id();
+  const dof_id_type pmax_node_id = this->parallel_max_node_id();
+  const dof_id_type pmax_elem_id = this->parallel_max_elem_id();
   libmesh_assert_equal_to (this->max_node_id(), pmax_node_id);
   libmesh_assert_equal_to (this->max_elem_id(), pmax_elem_id);
 

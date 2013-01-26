@@ -229,6 +229,7 @@ void pack (const Elem* elem,
 
 
 
+// FIXME - this needs serious work to be 64-bit compatible
 template <>
 void unpack(std::vector<int>::const_iterator in,
             Elem** out,
@@ -288,14 +289,14 @@ void unpack(std::vector<int>::const_iterator in,
     static_cast<unsigned int>(*in++);
 
   // int 7: dof object id
-  const unsigned int id = 
-    static_cast<unsigned int>(*in++);
+  const dof_id_type id = 
+    static_cast<dof_id_type>(*in++);
   libmesh_assert_not_equal_to (id, DofObject::invalid_id);
 
 #ifdef LIBMESH_ENABLE_AMR
   // int 8: parent dof object id
-  const unsigned int parent_id = 
-    static_cast<unsigned int>(*in++);
+  const dof_id_type parent_id = 
+    static_cast<dof_id_type>(*in++);
   libmesh_assert (level == 0 || parent_id != DofObject::invalid_id);
   libmesh_assert (level != 0 || parent_id == DofObject::invalid_id);
 
@@ -347,8 +348,8 @@ void unpack(std::vector<int>::const_iterator in,
       // to update them, but we can check for some inconsistencies.
       for (unsigned int n=0; n != elem->n_neighbors(); ++n)
         {
-          const unsigned int neighbor_id =
-            static_cast<unsigned int>(*in++);
+          const dof_id_type neighbor_id =
+            static_cast<dof_id_type>(*in++);
 
 	  // If the sending processor sees a domain boundary here,
 	  // we'd better agree.
@@ -467,8 +468,8 @@ void unpack(std::vector<int>::const_iterator in,
 
       for (unsigned int n=0; n<elem->n_neighbors(); n++)
         {
-          const unsigned int neighbor_id =
-            static_cast<unsigned int>(*in++);
+          const dof_id_type neighbor_id =
+            static_cast<dof_id_type>(*in++);
 
           if (neighbor_id == DofObject::invalid_id)
 	    continue;

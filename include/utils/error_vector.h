@@ -62,7 +62,7 @@ public:
    * ErrorVector will assume that all 0.0 error values correspond to inactive
    * elements and all non-zero error values correspond to active elements.
    */
-  ErrorVector(unsigned int i=0, MeshBase *mesh = NULL) : StatisticsVector<ErrorVectorReal> (i), _mesh(mesh) {}
+  ErrorVector(dof_id_type i=0, MeshBase *mesh = NULL) : StatisticsVector<ErrorVectorReal> (i), _mesh(mesh) {}
 
   /**
    * ErrorVector constructor; sets initial length to \p i and initial values to \p val.
@@ -72,7 +72,7 @@ public:
    * ErrorVector will assume that all 0.0 error values correspond to inactive
    * elements and all non-zero error values correspond to active elements.
    */
-  ErrorVector(unsigned int i, ErrorVectorReal val) :
+  ErrorVector(dof_id_type i, ErrorVectorReal val) :
       StatisticsVector<ErrorVectorReal> (i,val) {}
 
   /**
@@ -130,18 +130,18 @@ public:
   virtual Real variance(const Real mean) const;
 
   /**
-   * Returns a vector of unsigned ints which correspond
+   * Returns a vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * below the cutoff value cut ignoring inactive elements.
    */
-  virtual std::vector<unsigned int> cut_below(Real cut) const;
+  virtual std::vector<dof_id_type> cut_below(Real cut) const;
 
   /**
-   * Returns a vector of unsigned ints which correspond
+   * Returns a vector of dof_id_types which correspond
    * to the indices of every member of the data set
    * above the cutoff value cut ignoring inactive elements.
    */
-  virtual std::vector<unsigned int> cut_above(Real cut) const;
+  virtual std::vector<dof_id_type> cut_above(Real cut) const;
 
   /**
    * Plots a data file, of a type determined by looking at
@@ -155,7 +155,7 @@ protected:
   /**
    * Utility function to decide whether element i is active
    */
-  bool is_active_elem (unsigned int i) const;
+  bool is_active_elem (dof_id_type i) const;
 
   /**
    * Pointer to the mesh, which may be used to decide which

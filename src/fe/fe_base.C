@@ -1033,7 +1033,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
                                                 const unsigned int var,
                                                 const bool use_old_dof_indices)
 {
-  // Side/edge DOF indices
+  // Side/edge local DOF indices
   std::vector<unsigned int> new_side_dofs, old_side_dofs;
 
   // FIXME: what about 2D shells in 3D space?
@@ -1119,7 +1119,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
 
   // Copy node values first
   {
-  std::vector<unsigned int> node_dof_indices;
+  std::vector<dof_id_type> node_dof_indices;
   if (use_old_dof_indices)
     dof_map.old_dof_indices (elem, node_dof_indices, var);
   else
@@ -1194,7 +1194,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
               continue;
             Elem *child = elem->child(c);
 
-            std::vector<unsigned int> child_dof_indices;
+            std::vector<dof_id_type> child_dof_indices;
             if (use_old_dof_indices)
               dof_map.old_dof_indices (child,
                 child_dof_indices, var);
@@ -1336,7 +1336,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
               continue;
             Elem *child = elem->child(c);
 
-            std::vector<unsigned int> child_dof_indices;
+            std::vector<dof_id_type> child_dof_indices;
             if (use_old_dof_indices)
               dof_map.old_dof_indices (child,
                 child_dof_indices, var);
@@ -1467,7 +1467,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
     {
       Elem *child = elem->child(c);
 
-      std::vector<unsigned int> child_dof_indices;
+      std::vector<dof_id_type> child_dof_indices;
       if (use_old_dof_indices)
         dof_map.old_dof_indices (child,
           child_dof_indices, var);
@@ -1618,7 +1618,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
   const std::vector<std::vector<OutputGradient> > *dphi = NULL;
   const std::vector<std::vector<OutputGradient> > *neigh_dphi = NULL;
 
-  std::vector<unsigned int> my_dof_indices, neigh_dof_indices;
+  std::vector<dof_id_type> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
 
   if (cont != C_ZERO)
@@ -1764,7 +1764,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 	    for (unsigned int js = 0; js != n_side_dofs; ++js)
 	      {
 	        const unsigned int j = my_side_dofs[js];
-	        const unsigned int my_dof_g = my_dof_indices[j];
+	        const dof_id_type my_dof_g = my_dof_indices[j];
                 libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
                 // Hunt for "constraining against myself" cases before
@@ -1773,7 +1773,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 	        for (unsigned int is = 0; is != n_side_dofs; ++is)
 	          {
 	            const unsigned int i = neigh_side_dofs[is];
-	            const unsigned int their_dof_g = neigh_dof_indices[i];
+	            const dof_id_type their_dof_g = neigh_dof_indices[i];
                     libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
 		    if (their_dof_g == my_dof_g)
@@ -1816,7 +1816,7 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
 	        for (unsigned int is = 0; is != n_side_dofs; ++is)
 	          {
 	            const unsigned int i = neigh_side_dofs[is];
-	            const unsigned int their_dof_g = neigh_dof_indices[i];
+	            const dof_id_type their_dof_g = neigh_dof_indices[i];
                     libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 		    libmesh_assert_not_equal_to (their_dof_g, my_dof_g);
 
@@ -1909,7 +1909,7 @@ compute_periodic_constraints (DofConstraints &constraints,
   const std::vector<Point> *face_normals = NULL;
   const std::vector<std::vector<OutputGradient> > *dphi = NULL;
   const std::vector<std::vector<OutputGradient> > *neigh_dphi = NULL;
-  std::vector<unsigned int> my_dof_indices, neigh_dof_indices;
+  std::vector<dof_id_type> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
 
   if (cont != C_ZERO)
@@ -2127,7 +2127,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                   // FIXME: This code doesn't yet properly handle
                   // cases where multiple different periodic BCs
                   // intersect.
-                  std::set<unsigned int> my_constrained_dofs;
+                  std::set<dof_id_type> my_constrained_dofs;
 
 		  for (unsigned int n = 0; n != elem->n_nodes(); ++n)
                     {
@@ -2459,7 +2459,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 	          for (unsigned int is = 0; is != n_side_dofs; ++is)
 	            {
 	              const unsigned int i = neigh_side_dofs[is];
-	              const unsigned int their_dof_g = neigh_dof_indices[i];
+	              const dof_id_type their_dof_g = neigh_dof_indices[i];
                       libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
 		      {
@@ -2475,7 +2475,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 	              for (unsigned int js = 0; js != n_side_dofs; ++js)
 	                {
 	                  const unsigned int j = my_side_dofs[js];
-	                  const unsigned int my_dof_g = my_dof_indices[j];
+	                  const dof_id_type my_dof_g = my_dof_indices[j];
                           libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
                           if (their_constraint_row.count(my_dof_g))
@@ -2491,7 +2491,7 @@ compute_periodic_constraints (DofConstraints &constraints,
                       //  continue;
 
 	              const unsigned int j = my_side_dofs[js];
-	              const unsigned int my_dof_g = my_dof_indices[j];
+	              const dof_id_type my_dof_g = my_dof_indices[j];
                       libmesh_assert_not_equal_to (my_dof_g, DofObject::invalid_id);
 
                       // FIXME: new code path
@@ -2517,7 +2517,7 @@ compute_periodic_constraints (DofConstraints &constraints,
 	              for (unsigned int is = 0; is != n_side_dofs; ++is)
 	                {
 	                  const unsigned int i = neigh_side_dofs[is];
-	                  const unsigned int their_dof_g = neigh_dof_indices[i];
+	                  const dof_id_type their_dof_g = neigh_dof_indices[i];
                           libmesh_assert_not_equal_to (their_dof_g, DofObject::invalid_id);
 
                           // Periodic constraints should never be

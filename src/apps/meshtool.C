@@ -696,7 +696,7 @@ int main (int argc, char** argv)
 
       // Find element indices below the specified cutoff.
       // These might be considered "bad" elements which need refinement.
-      std::vector<unsigned int> bad_elts  = sv.cut_below(0.8);
+      std::vector<dof_id_type> bad_elts  = sv.cut_below(0.8);
       std::cout << "Found " << bad_elts.size()
                 << " of " << mesh.n_elem()
                 << " elements below the cutoff." << std::endl;
@@ -708,7 +708,7 @@ int main (int argc, char** argv)
       */
 
       // Compute the histogram for this distribution
-      std::vector<unsigned int> histogram;
+      std::vector<dof_id_type> histogram;
       sv.histogram(histogram, n_bins);
 
       /*

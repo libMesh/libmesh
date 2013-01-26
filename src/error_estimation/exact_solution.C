@@ -667,7 +667,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
   // The global degree of freedom indices associated
   // with the local degrees of freedom.
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
 
   //

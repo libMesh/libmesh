@@ -2266,7 +2266,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
 
   for (unsigned int n=0; n<elem->n_neighbors(); n++)
     {
-      unsigned int neighbor_id = this->neighbor(n);
+      dof_id_type neighbor_id = this->neighbor(n);
 
       // We should only be unpacking elements sent by their owners,
       // and their owners should know all their neighbors

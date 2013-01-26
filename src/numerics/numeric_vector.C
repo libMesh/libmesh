@@ -96,7 +96,7 @@ int NumericVector<T>::compare (const NumericVector<T> &other_vector,
   libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int first_different_i = std::numeric_limits<int>::max();
-  unsigned int i = first_local_index();
+  numeric_index_type i = first_local_index();
 
   do
     {
@@ -128,7 +128,7 @@ int NumericVector<T>::local_relative_compare (const NumericVector<T> &other_vect
   libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int first_different_i = std::numeric_limits<int>::max();
-  unsigned int i = first_local_index();
+  numeric_index_type i = first_local_index();
 
   do
     {
@@ -161,7 +161,7 @@ int NumericVector<T>::global_relative_compare (const NumericVector<T> &other_vec
   libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int first_different_i = std::numeric_limits<int>::max();
-  unsigned int i = first_local_index();
+  numeric_index_type i = first_local_index();
 
   const Real my_norm = this->linfty_norm();
   const Real other_norm = other_vector.linfty_norm();
@@ -199,7 +199,7 @@ int NumericVector<float>::compare (const NumericVector<float> &other_vector,
   libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int rvalue     = -1;
-  unsigned int i = first_local_index();
+  numeric_index_type i = first_local_index();
 
   do
     {
@@ -224,7 +224,7 @@ int NumericVector<double>::compare (const NumericVector<double> &other_vector,
   libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int rvalue     = -1;
-  unsigned int i = first_local_index();
+  numeric_index_type i = first_local_index();
 
   do
     {
@@ -250,7 +250,7 @@ int NumericVector<long double>::compare (const NumericVector<long double> &other
   libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int rvalue     = -1;
-  unsigned int i = first_local_index();
+  numeric_index_type i = first_local_index();
 
   do
     {
@@ -277,7 +277,7 @@ int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
   libmesh_assert_equal_to (this->last_local_index(), other_vector.last_local_index());
 
   int rvalue     = -1;
-  unsigned int i = first_local_index();
+  numeric_index_type i = first_local_index();
 
   do
     {
@@ -295,12 +295,12 @@ int NumericVector<Complex>::compare (const NumericVector<Complex> &other_vector,
 
 
 template <class T>
-Real NumericVector<T>::subset_l1_norm (const std::set<unsigned int> & indices) const
+Real NumericVector<T>::subset_l1_norm (const std::set<numeric_index_type> & indices) const
 {
   const NumericVector<T> & v = *this;
 
-  std::set<unsigned int>::const_iterator it = indices.begin();
-  const std::set<unsigned int>::const_iterator it_end = indices.end();
+  std::set<numeric_index_type>::const_iterator it = indices.begin();
+  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
 
   Real norm = 0;
 
@@ -313,12 +313,12 @@ Real NumericVector<T>::subset_l1_norm (const std::set<unsigned int> & indices) c
 }
 
 template <class T>
-Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices) const
+Real NumericVector<T>::subset_l2_norm (const std::set<numeric_index_type> & indices) const
 {
   const NumericVector<T> & v = *this;
 
-  std::set<unsigned int>::const_iterator it = indices.begin();
-  const std::set<unsigned int>::const_iterator it_end = indices.end();
+  std::set<numeric_index_type>::const_iterator it = indices.begin();
+  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
 
   Real norm = 0;
 
@@ -331,12 +331,12 @@ Real NumericVector<T>::subset_l2_norm (const std::set<unsigned int> & indices) c
 }
 
 template <class T>
-Real NumericVector<T>::subset_linfty_norm (const std::set<unsigned int> & indices) const
+Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & indices) const
 {
   const NumericVector<T> & v = *this;
 
-  std::set<unsigned int>::const_iterator it = indices.begin();
-  const std::set<unsigned int>::const_iterator it_end = indices.end();
+  std::set<numeric_index_type>::const_iterator it = indices.begin();
+  const std::set<numeric_index_type>::const_iterator it_end = indices.end();
 
   Real norm = 0;
 

@@ -618,7 +618,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>&,
 //   std::vector<Number>       nodal_soln;
 
 //   // The DOF indices for the element
-//   std::vector<unsigned int> dof_indices;
+//   std::vector<dof_id_type> dof_indices;
 
 //   // Determine the finite/infinite element type used in this system
 //   const FEType& fe_type    = system.variable_type(variable_num);
@@ -800,9 +800,9 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
       system.update_global_solution (sys_soln);
 
-      std::vector<Number>       elem_soln;   // The finite element solution
-      std::vector<Number>       nodal_soln;  // The FE solution interpolated to the nodes
-      std::vector<unsigned int> dof_indices; // The DOF indices for the finite element
+      std::vector<Number>      elem_soln;   // The finite element solution
+      std::vector<Number>      nodal_soln;  // The FE solution interpolated to the nodes
+      std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
 
       for (unsigned int var=0; var<nv_sys; var++)
 	{
@@ -921,7 +921,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
       system.update_global_solution (sys_soln);
 
-      std::vector<unsigned int> dof_indices; // The DOF indices for the finite element
+      std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
 
       // Loop over the variable names and load them in order
       for (unsigned int var=0; var < nv_sys; ++var)
@@ -1017,7 +1017,7 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 	{
 	  std::vector<Number>       elem_soln;   // The finite element solution
 	  std::vector<Number>       nodal_soln;  // The FE solution interpolated to the nodes
-	  std::vector<unsigned int> dof_indices; // The DOF indices for the finite element
+	  std::vector<dof_id_type>  dof_indices; // The DOF indices for the finite element
 
 	  for (unsigned int var=0; var<nv_sys; var++)
 	    {

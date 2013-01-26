@@ -7,12 +7,12 @@ SyncNodalPositions::SyncNodalPositions(MeshBase& m)
 
 
 
-void SyncNodalPositions::gather_data (const std::vector<unsigned int>& ids, std::vector<datum>& data)
+void SyncNodalPositions::gather_data (const std::vector<dof_id_type>& ids, std::vector<datum>& data)
 {
   data.resize(ids.size());
 
   // Gather (x,y,z) data for all node IDs in the ids vector
-  for (unsigned i=0; i<ids.size(); ++i)
+  for (std::size_t i=0; i<ids.size(); ++i)
     {
       // Look for this node in the mesh
       Node *node = mesh.node_ptr(ids[i]);
@@ -31,9 +31,9 @@ void SyncNodalPositions::gather_data (const std::vector<unsigned int>& ids, std:
 
 
 
-void SyncNodalPositions::act_on_data (const std::vector<unsigned int>& ids, std::vector<datum>& data)
+void SyncNodalPositions::act_on_data (const std::vector<dof_id_type>& ids, std::vector<datum>& data)
 {
-  for (unsigned i=0; i<ids.size(); ++i)
+  for (std::size_t i=0; i<ids.size(); ++i)
     {
 
       // Get a pointer to the node whose position is to be updated.

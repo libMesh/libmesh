@@ -742,7 +742,7 @@ void UnstructuredMesh::write (const std::string& name,
 
       // Nasty hack for reading/writing zipped files
       std::string new_name = name;
-      unsigned int pid_0 = 0;
+      processor_id_type pid_0 = 0;
       if (libMesh::processor_id() == 0)
         pid_0 = getpid();
       CommWorld.broadcast(pid_0);
@@ -928,7 +928,7 @@ void UnstructuredMesh::write (const std::string& name,
 
 
 void UnstructuredMesh::create_pid_mesh(UnstructuredMesh& pid_mesh,
-			   const unsigned int pid) const
+			               const processor_id_type pid) const
 {
 
   // Issue a warning if the number the number of processors
@@ -984,7 +984,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 
   // How the nodes on this mesh will be renumbered to nodes
   // on the new_mesh.
-  std::vector<unsigned int> new_node_numbers (this->n_nodes());
+  std::vector<dof_id_type> new_node_numbers (this->n_nodes());
 
   std::fill (new_node_numbers.begin(),
 	     new_node_numbers.end(),
@@ -993,8 +993,8 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh& new_mesh,
 
 
   // the number of nodes on the new mesh, will be incremented
-  unsigned int n_new_nodes = 0;
-  unsigned int n_new_elem  = 0;
+  dof_id_type n_new_nodes = 0;
+  dof_id_type n_new_elem  = 0;
 
   for (; it != it_end; ++it)
     {

@@ -21,6 +21,7 @@
 #define LIBMESH_PARMETIS_PARTITIONER_H
 
 // Local Includes -----------------------------------
+#include "libmesh/id_types.h"
 #include "libmesh/partitioner.h"
 
 // C++ Includes   -----------------------------------
@@ -103,12 +104,12 @@ private:
    * ParMETIS requires that each processor have some active elements,
    * it will abort if any processor passes a NULL _part array.
    */
-  std::vector<unsigned int> _n_active_elem_on_proc;
+  std::vector<dof_id_type> _n_active_elem_on_proc;
 
   /**
    * Maps active element ids into a contiguous range, as needed by ParMETIS.
    */
-  std::map<unsigned int, unsigned int> _global_index_by_pid_map;
+  std::map<dof_id_type, dof_id_type> _global_index_by_pid_map;
 
   /**
    * Data structures used by ParMETIS to describe the connectivity graph

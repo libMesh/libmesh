@@ -39,7 +39,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Partitioner static data
-const unsigned int Partitioner::communication_blocksize = 1000000;
+const dof_id_type Partitioner::communication_blocksize = 1000000;
 
 
 
@@ -58,7 +58,8 @@ void Partitioner::partition (MeshBase& mesh,
   // we cannot partition into more pieces than we have
   // active elements!
   const unsigned int n_parts =
-    std::min(mesh.n_active_elem(), n);
+    static_cast<unsigned int>
+      (std::min(mesh.n_active_elem(), static_cast<dof_id_type>(n)));
 
   // Set the number of partitions in the mesh
   mesh.set_n_partitions()=n_parts;
@@ -112,7 +113,8 @@ void Partitioner::repartition (MeshBase& mesh,
   // we cannot partition into more pieces than we have
   // active elements!
   const unsigned int n_parts =
-    std::min(mesh.n_active_elem(), n);
+    static_cast<unsigned int>
+      (std::min(mesh.n_active_elem(), static_cast<dof_id_type>(n)));
 
   // Set the number of partitions in the mesh
   mesh.set_n_partitions()=n_parts;
@@ -169,18 +171,18 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
   MeshBase::element_iterator       it  = mesh.unpartitioned_elements_begin();
   const MeshBase::element_iterator end = mesh.unpartitioned_elements_end();
 
-  const unsigned int n_unpartitioned_elements = MeshTools::n_elem (it, end);
+  const dof_id_type n_unpartitioned_elements = MeshTools::n_elem (it, end);
 
   // the unpartitioned elements must exist on all processors. If the range is empty on one
   // it is empty on all, and we can quit right here.
   if (!n_unpartitioned_elements) return;
 
   // find the target subdomain sizes
-  std::vector<unsigned int> subdomain_bounds(libMesh::n_processors());
+  std::vector<dof_id_type> subdomain_bounds(libMesh::n_processors());
 
-  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+  for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
     {
-      unsigned int tgt_subdomain_size = 0;
+      dof_id_type tgt_subdomain_size = 0;
 
       // watch out for the case that n_subdomains < n_processors
       if (pid < n_subdomains)
@@ -203,19 +205,19 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
 
   // create the unique mapping for all unpartitioned elements independent of partitioning
   // determine the global indexing for all the unpartitoned elements
-  std::vector<unsigned int> global_indices;
+  std::vector<dof_id_type> global_indices;
 
   // Calling this on all processors a unique range in [0,n_unpartitioned_elements) is constructed.
   // Only the indices for the elements we pass in are returned in the array.
   MeshCommunication().find_global_indices (MeshTools::bounding_box(mesh), it, end,
 					   global_indices);
 
-  for (unsigned int cnt=0; it != end; ++it)
+  for (dof_id_type cnt=0; it != end; ++it)
     {
       Elem *elem = *it;
 
       libmesh_assert_less (cnt, global_indices.size());
-      const unsigned int global_index =
+      const dof_id_type global_index =
 	global_indices[cnt++];
 
       libmesh_assert_less (global_index, subdomain_bounds.back());
@@ -329,16 +331,16 @@ mesh
       libmesh_assert(MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
 			       mesh.unpartitioned_elements_end()) == 0);
 
-      const unsigned int max_elem_id = mesh.max_elem_id();
+      const dof_id_type max_elem_id = mesh.max_elem_id();
 
       std::vector<processor_id_type>
 	parent_processor_ids (std::min(communication_blocksize,
 				       max_elem_id));
 
-      for (unsigned int blk=0, last_elem_id=0; last_elem_id<max_elem_id; blk++)
+      for (dof_id_type blk=0, last_elem_id=0; last_elem_id<max_elem_id; blk++)
 	{
  	                      last_elem_id = std::min((blk+1)*communication_blocksize, max_elem_id);
-	  const unsigned int first_elem_id = blk*communication_blocksize;
+	  const dof_id_type first_elem_id = blk*communication_blocksize;
 
 	  std::fill (parent_processor_ids.begin(),
 		     parent_processor_ids.end(),
@@ -354,7 +356,7 @@ mesh
 	    {
 	      Elem *parent = *not_it;
 
-	      const unsigned int parent_idx = parent->id();
+	      const dof_id_type parent_idx = parent->id();
 	      libmesh_assert_less (parent_idx, max_elem_id);
 
 	      if ((parent_idx >= first_elem_id) &&
@@ -368,7 +370,7 @@ mesh
                   for (unsigned int i = 0; i != active_family.size(); ++i)
                     parent_pid = std::min (parent_pid, active_family[i]->processor_id());
 
-		  const unsigned int packed_idx = parent_idx - first_elem_id;
+		  const dof_id_type packed_idx = parent_idx - first_elem_id;
 		  libmesh_assert_less (packed_idx, parent_processor_ids.size());
 
 		  parent_processor_ids[packed_idx] = parent_pid;
@@ -385,12 +387,12 @@ mesh
 	      {
 		Elem *parent = *not_it;
 
-		const unsigned int parent_idx = parent->id();
+		const dof_id_type parent_idx = parent->id();
 
 		if ((parent_idx >= first_elem_id) &&
 		    (parent_idx <  last_elem_id))
 		  {
-		    const unsigned int packed_idx = parent_idx - first_elem_id;
+		    const dof_id_type packed_idx = parent_idx - first_elem_id;
 		    libmesh_assert_less (packed_idx, parent_processor_ids.size());
 
 		    const processor_id_type parent_pid =
@@ -424,7 +426,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
 			    mesh.unpartitioned_elements_end()) == 0);
 
 
-//   const unsigned int orig_n_local_nodes = mesh.n_local_nodes();
+//   const dof_id_type orig_n_local_nodes = mesh.n_local_nodes();
 
 //   libMesh::err << "[" << libMesh::processor_id() << "]: orig_n_local_nodes="
 // 	    << orig_n_local_nodes << std::endl;
@@ -438,11 +440,11 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   //
   // The only remaining issue is what to do with unpartitioned nodes.  Since they are required
   // to live on all processors we can simply rely on ourselves to number them properly.
-  std::vector<std::vector<unsigned int> >
+  std::vector<std::vector<dof_id_type> >
     requested_node_ids(libMesh::n_processors());
 
   // Loop over all the nodes, count the ones on each processor.  We can skip ourself
-  std::vector<unsigned int> ghost_nodes_from_proc(libMesh::n_processors(), 0);
+  std::vector<dof_id_type> ghost_nodes_from_proc(libMesh::n_processors(), 0);
 
   MeshBase::node_iterator       node_it  = mesh.nodes_begin();
   const MeshBase::node_iterator node_end = mesh.nodes_end();
@@ -451,7 +453,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
     {
       Node *node = *node_it;
       libmesh_assert(node);
-      const unsigned int current_pid = node->processor_id();
+      const processor_id_type current_pid = node->processor_id();
       if (current_pid != libMesh::processor_id() &&
 	  current_pid != DofObject::invalid_processor_id)
 	{
@@ -462,7 +464,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
 
   // We know how many objects live on each processor, so reserve()
   // space for each.
-  for (unsigned int pid=0; pid != libMesh::n_processors(); ++pid)
+  for (processor_id_type pid=0; pid != libMesh::n_processors(); ++pid)
     requested_node_ids[pid].reserve(ghost_nodes_from_proc[pid]);
 
   // We need to get the new pid for each node from the processor
@@ -554,20 +556,20 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   // valid.
 
   // Next set node ids from other processors, excluding self
-  for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
-      std::vector<unsigned int> request_to_fill;
+      processor_id_type procup = (libMesh::processor_id() + p) %
+                                  libMesh::n_processors();
+      processor_id_type procdown = (libMesh::n_processors() +
+                                    libMesh::processor_id() - p) %
+                                    libMesh::n_processors();
+      std::vector<dof_id_type> request_to_fill;
       CommWorld.send_receive(procup, requested_node_ids[procup],
                              procdown, request_to_fill);
 
       // Fill those requests in-place
-      for (unsigned int i=0; i != request_to_fill.size(); ++i)
+      for (std::size_t i=0; i != request_to_fill.size(); ++i)
         {
           Node *node = mesh.node_ptr(request_to_fill[i]);
           libmesh_assert(node);
@@ -578,13 +580,13 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
         }                                         //  not equal the number of processors
 
       // Trade back the results
-      std::vector<unsigned int> filled_request;
+      std::vector<dof_id_type> filled_request;
       CommWorld.send_receive(procdown, request_to_fill,
                              procup,   filled_request);
       libmesh_assert_equal_to (filled_request.size(), requested_node_ids[procup].size());
 
       // And copy the id changes we've now been informed of
-      for (unsigned int i=0; i != filled_request.size(); ++i)
+      for (std::size_t i=0; i != filled_request.size(); ++i)
         {
           Node *node = mesh.node_ptr(requested_node_ids[procup][i]);
 	  libmesh_assert(node);

@@ -34,17 +34,17 @@ namespace libMesh
  * \author  Roy H. Stogner
  */
 
-template <typename Val>
-class mapvector : public std::map<unsigned int, Val>
+template <typename Val, typename index_t=unsigned int>
+class mapvector : public std::map<index_t, Val>
 {
 public:
-  typedef std::map<unsigned int, Val> maptype;
+  typedef std::map<index_t, Val> maptype;
 
-  Val& operator[] (const unsigned int &k)
+  Val& operator[] (const index_t &k)
   {
     return maptype::operator[](k);
   }
-  Val operator[] (const unsigned int &k) const
+  Val operator[] (const index_t &k) const
   {
     typename maptype::const_iterator it = this->find(k);
       return it == this->end().it? Val() : it->second;
@@ -113,7 +113,7 @@ public:
     typename maptype::const_iterator it;
   };
 
-  void erase(unsigned int i) {
+  void erase(index_t i) {
       maptype::erase(i);
   }
 

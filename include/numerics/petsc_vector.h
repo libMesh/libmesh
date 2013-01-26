@@ -72,15 +72,15 @@ public:
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  PetscVector (const unsigned int n,
+  PetscVector (const numeric_index_type n,
                const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  PetscVector (const unsigned int n,
-	       const unsigned int n_local,
+  PetscVector (const numeric_index_type n,
+	       const numeric_index_type n_local,
                const ParallelType type = AUTOMATIC);
 
   /**
@@ -88,9 +88,9 @@ public:
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  PetscVector (const unsigned int N,
-	       const unsigned int n_local,
-	       const std::vector<unsigned int>& ghost,
+  PetscVector (const numeric_index_type N,
+	       const numeric_index_type n_local,
+	       const std::vector<numeric_index_type>& ghost,
                const ParallelType type = AUTOMATIC);
 
   /**
@@ -149,15 +149,15 @@ public:
    * zeros.
    */
 
-  void init (const unsigned int N,
-	     const unsigned int n_local,
+  void init (const numeric_index_type N,
+	     const numeric_index_type n_local,
 	     const bool         fast=false,
 	     const ParallelType type=AUTOMATIC);
 
   /**
    * call init with n_local = N,
    */
-  void init (const unsigned int N,
+  void init (const numeric_index_type N,
 	     const bool         fast=false,
 	     const ParallelType type=AUTOMATIC);
 
@@ -165,9 +165,9 @@ public:
    * Create a vector that holds tha local indices plus those specified
    * in the \p ghost argument.
    */
-  virtual void init (const unsigned int /*N*/,
-		     const unsigned int /*n_local*/,
-		     const std::vector<unsigned int>& /*ghost*/,
+  virtual void init (const numeric_index_type /*N*/,
+		     const numeric_index_type /*n_local*/,
+		     const std::vector<numeric_index_type>& /*ghost*/,
 		     const bool /*fast*/ = false,
 		     const ParallelType = AUTOMATIC);
 
@@ -256,25 +256,25 @@ public:
    * closer to the C++ standard library's
    * \p std::vector container.
    */
-  unsigned int size () const;
+  numeric_index_type size () const;
 
   /**
    * @returns the local size of the vector
    * (index_stop-index_start)
    */
-  unsigned int local_size() const;
+  numeric_index_type local_size() const;
 
   /**
    * @returns the index of the first vector element
    * actually stored on this processor
    */
-  unsigned int first_local_index() const;
+  numeric_index_type first_local_index() const;
 
   /**
    * @returns the index of the last vector element
    * actually stored on this processor
    */
-  unsigned int last_local_index() const;
+  numeric_index_type last_local_index() const;
 
   /**
    * Maps the global index \p i to the corresponding global index. If
@@ -282,19 +282,19 @@ public:
    * number of the first local index.  If it is a ghost cell, it has
    * to be looked up in the map.
    */
-  unsigned int map_global_to_local_index(const unsigned int i) const;
+  numeric_index_type map_global_to_local_index(const numeric_index_type i) const;
 
   /**
    * Access components, returns \p U(i).
    */
-  T operator() (const unsigned int i) const;
+  T operator() (const numeric_index_type i) const;
 
   /**
    * Access multiple components at once.  Overloaded method that
    * should be faster (probably much faster) than calling \p
    * operator() individually for each index.
    */
-  virtual void get(const std::vector<unsigned int>& index, std::vector<T>& values) const;
+  virtual void get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const;
 
   /**
    * Addition operator.
@@ -316,12 +316,12 @@ public:
   /**
    * v(i) = value
    */
-  void set (const unsigned int i, const T value);
+  void set (const numeric_index_type i, const T value);
 
   /**
    * v(i) += value
    */
-  void add (const unsigned int i, const T value);
+  void add (const numeric_index_type i, const T value);
 
   /**
    * \f$U(0-LIBMESH_DIM)+=s\f$.
@@ -350,7 +350,7 @@ public:
    * want to specify WHERE to add it
    */
   void add_vector (const std::vector<T>& v,
-		   const std::vector<unsigned int>& dof_indices);
+		   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U+=V \f$ where U and V are type
@@ -359,7 +359,7 @@ public:
    * the \p NumericVector<T> V
    */
   void add_vector (const NumericVector<T>& V,
-		   const std::vector<unsigned int>& dof_indices);
+		   const std::vector<numeric_index_type>& dof_indices);
 
 
   /**
@@ -376,7 +376,7 @@ public:
    * the DenseVector<T> V
    */
   void add_vector (const DenseVector<T>& V,
-		   const std::vector<unsigned int>& dof_indices);
+		   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=A^T*V\f$, add the product of the transpose
@@ -399,7 +399,7 @@ public:
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
-		       const std::vector<unsigned int>& dof_indices);
+		       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U=V\f$, where U and V are type
@@ -408,7 +408,7 @@ public:
    * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
-		       const std::vector<unsigned int>& dof_indices);
+		       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where V is type
@@ -416,7 +416,7 @@ public:
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseVector<T>& V,
-		       const std::vector<unsigned int>& dof_indices);
+		       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where V is type
@@ -424,7 +424,7 @@ public:
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseSubVector<T>& V,
-		       const std::vector<unsigned int>& dof_indices);
+		       const std::vector<numeric_index_type>& dof_indices);
 
 
   /**
@@ -469,15 +469,15 @@ public:
    * defined by the \p send_list.
    */
   void localize (NumericVector<T>& v_local,
-		 const std::vector<unsigned int>& send_list) const;
+		 const std::vector<numeric_index_type>& send_list) const;
 
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
    */
-  void localize (const unsigned int first_local_idx,
-		 const unsigned int last_local_idx,
-		 const std::vector<unsigned int>& send_list);
+  void localize (const numeric_index_type first_local_idx,
+		 const numeric_index_type last_local_idx,
+		 const std::vector<numeric_index_type>& send_list);
 
   /**
    * Creates a local copy of the global vector in
@@ -486,7 +486,7 @@ public:
    * is useful for outputting data from one processor.
    */
   void localize_to_one (std::vector<T>& v_local,
-			const unsigned int proc_id=0) const;
+			const processor_id_type proc_id=0) const;
 
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
@@ -508,7 +508,7 @@ public:
    * of the "rows" array.
    */
   virtual void create_subvector(NumericVector<T>& subvector,
-				const std::vector<unsigned int>& rows) const;
+				const std::vector<numeric_index_type>& rows) const;
 
   /**
    * Swaps the raw PETSc vector context pointers.
@@ -545,7 +545,7 @@ private:
    * contents of this field are only valid if the vector is ghosted
    * and \p _array_is_present is \p true.
    */
-  mutable unsigned int _local_size;
+  mutable numeric_index_type _local_size;
 #endif
 
   /**
@@ -576,7 +576,7 @@ private:
   /**
    * Type for map that maps global to local ghost cells.
    */
-  typedef std::map<unsigned int,unsigned int> GlobalToLocalMap;
+  typedef std::map<numeric_index_type,numeric_index_type> GlobalToLocalMap;
 
   /**
    * Map that maps global to local ghost cells (will be empty if not
@@ -612,7 +612,7 @@ PetscVector<T>::PetscVector (const ParallelType type)
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const unsigned int n,
+PetscVector<T>::PetscVector (const numeric_index_type n,
                              const ParallelType type)
   : _array_is_present(false),
     _local_form(NULL),
@@ -627,8 +627,8 @@ PetscVector<T>::PetscVector (const unsigned int n,
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const unsigned int n,
-			     const unsigned int n_local,
+PetscVector<T>::PetscVector (const numeric_index_type n,
+			     const numeric_index_type n_local,
                              const ParallelType type)
   : _array_is_present(false),
     _local_form(NULL),
@@ -643,9 +643,9 @@ PetscVector<T>::PetscVector (const unsigned int n,
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const unsigned int n,
-			     const unsigned int n_local,
-			     const std::vector<unsigned int>& ghost,
+PetscVector<T>::PetscVector (const numeric_index_type n,
+			     const numeric_index_type n_local,
+			     const std::vector<numeric_index_type>& ghost,
                              const ParallelType type)
   : _array_is_present(false),
     _local_form(NULL),
@@ -675,8 +675,8 @@ PetscVector<T>::PetscVector (Vec v)
 
   /* We need to ask PETSc about the (local to global) ghost value
      mapping and create the inverse mapping out of it.  */
-  int ierr=0;
-  int petsc_local_size=0;
+  PetscErrorCode ierr=0;
+  PetscInt petsc_local_size=0;
   ierr = VecGetLocalSize(_vec, &petsc_local_size);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -705,17 +705,17 @@ PetscVector<T>::PetscVector (Vec v)
     // If is a sparsely stored vector, set up our new mapping
     if (mapping)
     {
-      const unsigned int local_size = static_cast<unsigned int>(petsc_local_size);
-      const unsigned int ghost_begin = static_cast<unsigned int>(petsc_local_size);
-      const unsigned int ghost_end = static_cast<unsigned int>(mapping->n);
+      const numeric_index_type local_size = static_cast<numeric_index_type>(petsc_local_size);
+      const numeric_index_type ghost_begin = static_cast<numeric_index_type>(petsc_local_size);
+      const numeric_index_type ghost_end = static_cast<numeric_index_type>(mapping->n);
 #if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
-      const int *indices = mapping->indices;
+      const PetscInt *indices = mapping->indices;
 #else
-      const int *indices = mapping->indices;
+      const PetscInt *indices = mapping->indices;
       ierr = ISLocalToGlobalMappingGetIndices(mapping,&indices);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
-      for(unsigned int i=ghost_begin; i<ghost_end; i++)
+      for(numeric_index_type i=ghost_begin; i<ghost_end; i++)
         _global_to_local_map[indices[i]] = i-local_size;
       this->_type = GHOSTED;
     }
@@ -742,14 +742,14 @@ PetscVector<T>::~PetscVector ()
 
 template <typename T>
 inline
-void PetscVector<T>::init (const unsigned int n,
-			   const unsigned int n_local,
+void PetscVector<T>::init (const numeric_index_type n,
+			   const numeric_index_type n_local,
 			   const bool fast,
                            const ParallelType type)
 {
-  int ierr=0;
-  int petsc_n=static_cast<int>(n);
-  int petsc_n_local=static_cast<int>(n_local);
+  PetscErrorCode ierr=0;
+  PetscInt petsc_n=static_cast<PetscInt>(n);
+  PetscInt petsc_n_local=static_cast<PetscInt>(n_local);
 
 
   // Clear initialized vectors
@@ -810,7 +810,7 @@ void PetscVector<T>::init (const unsigned int n,
 
 template <typename T>
 inline
-void PetscVector<T>::init (const unsigned int n,
+void PetscVector<T>::init (const numeric_index_type n,
 			   const bool fast,
                            const ParallelType type)
 {
@@ -821,16 +821,16 @@ void PetscVector<T>::init (const unsigned int n,
 
 template <typename T>
 inline
-void PetscVector<T>::init (const unsigned int n,
-			   const unsigned int n_local,
-			   const std::vector<unsigned int>& ghost,
+void PetscVector<T>::init (const numeric_index_type n,
+			   const numeric_index_type n_local,
+			   const std::vector<numeric_index_type>& ghost,
 			   const bool fast,
                            const ParallelType libmesh_dbg_var(type))
 {
-  int ierr=0;
-  int petsc_n=static_cast<int>(n);
-  int petsc_n_local=static_cast<int>(n_local);
-  int petsc_n_ghost=static_cast<int>(ghost.size());
+  PetscErrorCode ierr=0;
+  PetscInt petsc_n=static_cast<PetscInt>(n);
+  PetscInt petsc_n_local=static_cast<PetscInt>(n_local);
+  PetscInt petsc_n_ghost=static_cast<PetscInt>(ghost.size());
 
   // If the mesh is not disjoint, every processor will either have
   // all the dofs, none of the dofs, or some non-zero dofs at the
@@ -843,8 +843,10 @@ void PetscVector<T>::init (const unsigned int n,
   //
   // libmesh_assert(n_local == 0 || n_local == n || !ghost.empty());
 
-  int* petsc_ghost = ghost.empty() ? PETSC_NULL :
-    const_cast<int*>(reinterpret_cast<const int*>(&ghost[0]));
+  libmesh_assert(sizeof(PetscInt) == sizeof(numeric_index_type));
+
+  PetscInt* petsc_ghost = ghost.empty() ? PETSC_NULL :
+    const_cast<PetscInt*>(reinterpret_cast<const PetscInt*>(&ghost[0]));
 
   // Clear initialized vectors
   if (this->initialized())
@@ -854,7 +856,7 @@ void PetscVector<T>::init (const unsigned int n,
   this->_type = GHOSTED;
 
   /* Make the global-to-local ghost cell map.  */
-  for(unsigned int i=0; i<ghost.size(); i++)
+  for(numeric_index_type i=0; i<ghost.size(); i++)
     {
       _global_to_local_map[ghost[i]] = i;
     }
@@ -901,7 +903,7 @@ void PetscVector<T>::init (const NumericVector<T>& other,
 
   if (v.size() != 0)
     {
-      int ierr = 0;
+      PetscErrorCode ierr = 0;
 
       ierr = VecDuplicate (v._vec, &this->_vec);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -919,7 +921,7 @@ void PetscVector<T>::close ()
 {
   this->_restore_array();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   ierr = VecAssemblyBegin(_vec);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -948,7 +950,7 @@ void PetscVector<T>::clear ()
 
   if ((this->initialized()) && (this->_destroy_vec_on_exit))
     {
-      int ierr=0;
+      PetscErrorCode ierr=0;
 
       ierr = LibMeshVecDestroy(&_vec);
              CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -969,7 +971,7 @@ void PetscVector<T>::zero ()
 
   this->_restore_array();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   PetscScalar z=0.;
 
@@ -1038,11 +1040,11 @@ AutoPtr<NumericVector<T> > PetscVector<T>::clone () const
 
 template <typename T>
 inline
-unsigned int PetscVector<T>::size () const
+numeric_index_type PetscVector<T>::size () const
 {
   libmesh_assert (this->initialized());
 
-  int ierr=0, petsc_size=0;
+  PetscErrorCode ierr=0, petsc_size=0;
 
   if (!this->initialized())
     return 0;
@@ -1050,70 +1052,70 @@ unsigned int PetscVector<T>::size () const
   ierr = VecGetSize(_vec, &petsc_size);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<unsigned int>(petsc_size);
+  return static_cast<numeric_index_type>(petsc_size);
 }
 
 
 
 template <typename T>
 inline
-unsigned int PetscVector<T>::local_size () const
+numeric_index_type PetscVector<T>::local_size () const
 {
   libmesh_assert (this->initialized());
 
-  int ierr=0, petsc_size=0;
+  PetscErrorCode ierr=0, petsc_size=0;
 
   ierr = VecGetLocalSize(_vec, &petsc_size);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<unsigned int>(petsc_size);
+  return static_cast<numeric_index_type>(petsc_size);
 }
 
 
 
 template <typename T>
 inline
-unsigned int PetscVector<T>::first_local_index () const
+numeric_index_type PetscVector<T>::first_local_index () const
 {
   libmesh_assert (this->initialized());
 
-  int ierr=0, petsc_first=0, petsc_last=0;
+  PetscErrorCode ierr=0, petsc_first=0, petsc_last=0;
 
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<unsigned int>(petsc_first);
+  return static_cast<numeric_index_type>(petsc_first);
 }
 
 
 
 template <typename T>
 inline
-unsigned int PetscVector<T>::last_local_index () const
+numeric_index_type PetscVector<T>::last_local_index () const
 {
   libmesh_assert (this->initialized());
 
-  int ierr=0, petsc_first=0, petsc_last=0;
+  PetscErrorCode ierr=0, petsc_first=0, petsc_last=0;
 
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<unsigned int>(petsc_last);
+  return static_cast<numeric_index_type>(petsc_last);
 }
 
 
 
 template <typename T>
 inline
-unsigned int PetscVector<T>::map_global_to_local_index (const unsigned int i) const
+numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_index_type i) const
 {
   libmesh_assert (this->initialized());
 
-  int ierr=0, petsc_first=0, petsc_last=0;
+  PetscErrorCode ierr=0, petsc_first=0, petsc_last=0;
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  const unsigned int first = static_cast<unsigned int>(petsc_first);
-  const unsigned int last = static_cast<unsigned int>(petsc_last);
+  const numeric_index_type first = static_cast<numeric_index_type>(petsc_first);
+  const numeric_index_type last = static_cast<numeric_index_type>(petsc_last);
 
   if((i>=first) && (i<last))
     {
@@ -1154,11 +1156,11 @@ unsigned int PetscVector<T>::map_global_to_local_index (const unsigned int i) co
 
 template <typename T>
 inline
-T PetscVector<T>::operator() (const unsigned int i) const
+T PetscVector<T>::operator() (const numeric_index_type i) const
 {
   this->_get_array();
 
-  const unsigned int local_index = this->map_global_to_local_index(i);
+  const numeric_index_type local_index = this->map_global_to_local_index(i);
 
 #ifndef NDEBUG
   if(this->type() == GHOSTED)
@@ -1174,16 +1176,16 @@ T PetscVector<T>::operator() (const unsigned int i) const
 
 template <typename T>
 inline
-void PetscVector<T>::get(const std::vector<unsigned int>& index, std::vector<T>& values) const
+void PetscVector<T>::get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const
 {
   this->_get_array();
 
-  const unsigned int num = index.size();
+  const std::size_t num = index.size();
   values.resize(num);
 
-  for(unsigned int i=0; i<num; i++)
+  for(std::size_t i=0; i<num; i++)
     {
-      const unsigned int local_index = this->map_global_to_local_index(index[i]);
+      const numeric_index_type local_index = this->map_global_to_local_index(index[i]);
 #ifndef NDEBUG
       if(this->type() == GHOSTED)
 	{
@@ -1202,7 +1204,8 @@ Real PetscVector<T>::min () const
 {
   this->_restore_array();
 
-  int index=0, ierr=0;
+  PetscErrorCode ierr=0;
+  PetscInt index=0;
   PetscReal min=0.;
 
   ierr = VecMin (_vec, &index, &min);
@@ -1220,7 +1223,8 @@ Real PetscVector<T>::max() const
 {
   this->_restore_array();
 
-  int index=0, ierr=0;
+  PetscErrorCode ierr=0;
+  PetscInt index=0;
   PetscReal max=0.;
 
   ierr = VecMax (_vec, &index, &max);
@@ -1257,7 +1261,7 @@ void PetscVector<T>::_get_array(void) const
   libmesh_assert (this->initialized());
   if(!_array_is_present)
     {
-      int ierr=0;
+      PetscErrorCode ierr=0;
       if(this->type() != GHOSTED)
 	{
 	  ierr = VecGetArray(_vec, &_values);
@@ -1270,10 +1274,10 @@ void PetscVector<T>::_get_array(void) const
 	  ierr = VecGetArray(_local_form, &_values);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #ifndef NDEBUG
-	  int local_size = 0;
+	  PetscInt local_size = 0;
 	  ierr = VecGetLocalSize(_local_form, &local_size);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  _local_size = static_cast<unsigned int>(local_size);
+	  _local_size = static_cast<numeric_index_type>(local_size);
 #endif
 	}
       _array_is_present = true;
@@ -1289,7 +1293,7 @@ void PetscVector<T>::_restore_array(void) const
   libmesh_assert (this->initialized());
   if(_array_is_present)
     {
-      int ierr=0;
+      PetscErrorCode ierr=0;
       if(this->type() != GHOSTED)
 	{
 	  ierr = VecRestoreArray (_vec, &_values);

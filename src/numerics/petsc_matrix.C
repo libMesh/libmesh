@@ -66,12 +66,12 @@ PetscMatrix<T>::~PetscMatrix()
 
 
 template <typename T>
-void PetscMatrix<T>::init (const unsigned int m,
-			   const unsigned int n,
-			   const unsigned int m_l,
-			   const unsigned int n_l,
-			   const unsigned int nnz,
-			   const unsigned int noz)
+void PetscMatrix<T>::init (const numeric_index_type m,
+			   const numeric_index_type n,
+			   const numeric_index_type m_l,
+			   const numeric_index_type n_l,
+			   const numeric_index_type nnz,
+			   const numeric_index_type noz)
 {
   // We allow 0x0 matrices now
   //if ((m==0) || (n==0))
@@ -84,13 +84,13 @@ void PetscMatrix<T>::init (const unsigned int m,
   this->_is_initialized = true;
 
 
-  int ierr     = 0;
-  int m_global = static_cast<int>(m);
-  int n_global = static_cast<int>(n);
-  int m_local  = static_cast<int>(m_l);
-  int n_local  = static_cast<int>(n_l);
-  int n_nz     = static_cast<int>(nnz);
-  int n_oz     = static_cast<int>(noz);
+  PetscErrorCode ierr     = 0;
+  PetscInt m_global = static_cast<PetscInt>(m);
+  PetscInt n_global = static_cast<PetscInt>(n);
+  PetscInt m_local  = static_cast<PetscInt>(m_l);
+  PetscInt n_local  = static_cast<PetscInt>(n_l);
+  PetscInt n_nz     = static_cast<PetscInt>(nnz);
+  PetscInt n_oz     = static_cast<PetscInt>(noz);
 
   ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -122,12 +122,12 @@ void PetscMatrix<T>::init (const unsigned int m,
 
 
 template <typename T>
-void PetscMatrix<T>::init (const unsigned int m,
-			   const unsigned int n,
-			   const unsigned int m_l,
-			   const unsigned int n_l,
-			   const std::vector<unsigned int>& n_nz,
-			   const std::vector<unsigned int>& n_oz)
+void PetscMatrix<T>::init (const numeric_index_type m,
+			   const numeric_index_type n,
+			   const numeric_index_type m_l,
+			   const numeric_index_type n_l,
+			   const std::vector<numeric_index_type>& n_nz,
+			   const std::vector<numeric_index_type>& n_oz)
 {
   // Clear initialized matrices
   if (this->initialized())
@@ -139,11 +139,11 @@ void PetscMatrix<T>::init (const unsigned int m,
   libmesh_assert_equal_to (n_nz.size(), m_l);
   libmesh_assert_equal_to (n_oz.size(), m_l);
 
-  int ierr     = 0;
-  int m_global = static_cast<int>(m);
-  int n_global = static_cast<int>(n);
-  int m_local  = static_cast<int>(m_l);
-  int n_local  = static_cast<int>(n_l);
+  PetscErrorCode ierr     = 0;
+  PetscInt m_global = static_cast<PetscInt>(m);
+  PetscInt n_global = static_cast<PetscInt>(n);
+  PetscInt m_local  = static_cast<PetscInt>(m_l);
+  PetscInt n_local  = static_cast<PetscInt>(n_l);
 
   ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -157,10 +157,10 @@ void PetscMatrix<T>::init (const unsigned int m,
   ierr = MatSetFromOptions(_mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  ierr = MatSeqAIJSetPreallocation(_mat, 0, (int*)(n_nz.empty()?NULL:&n_nz[0]));
+  ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  ierr = MatMPIAIJSetPreallocation(_mat, 0, (int*)(n_nz.empty()?NULL:&n_nz[0]),
-                                         0, (int*)(n_oz.empty()?NULL:&n_oz[0]));
+  ierr = MatMPIAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
+                                         0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   this->zero();
@@ -179,14 +179,14 @@ void PetscMatrix<T>::init ()
   this->_is_initialized = true;
 
 
-  const unsigned int m   = this->_dof_map->n_dofs();
-  const unsigned int n   = m;
-  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id());
-  const unsigned int m_l = n_l;
+  const numeric_index_type m   = this->_dof_map->n_dofs();
+  const numeric_index_type n   = m;
+  const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id());
+  const numeric_index_type m_l = n_l;
 
 
-  const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
-  const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
+  const std::vector<numeric_index_type>& n_nz = this->_dof_map->get_n_nz();
+  const std::vector<numeric_index_type>& n_oz = this->_dof_map->get_n_oz();
 
   // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
   libmesh_assert_equal_to (n_nz.size(), m_l);
@@ -196,11 +196,11 @@ void PetscMatrix<T>::init ()
   //if (m==0)
   //  return;
 
-  int ierr     = 0;
-  int m_global = static_cast<int>(m);
-  int n_global = static_cast<int>(n);
-  int m_local  = static_cast<int>(m_l);
-  int n_local  = static_cast<int>(n_l);
+  PetscErrorCode ierr     = 0;
+  PetscInt m_global = static_cast<PetscInt>(m);
+  PetscInt n_global = static_cast<PetscInt>(n);
+  PetscInt m_local  = static_cast<PetscInt>(m_l);
+  PetscInt n_local  = static_cast<PetscInt>(n_l);
 
   ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -214,10 +214,10 @@ void PetscMatrix<T>::init ()
   ierr = MatSetFromOptions(_mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   
-  ierr = MatSeqAIJSetPreallocation(_mat, 0, (int*)(n_nz.empty()?NULL:&n_nz[0]));
+  ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  ierr = MatMPIAIJSetPreallocation(_mat, 0, (int*)(n_nz.empty()?NULL:&n_nz[0]),
-                                         0, (int*)(n_oz.empty()?NULL:&n_oz[0]));
+  ierr = MatMPIAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
+                                         0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   this->zero();
@@ -232,9 +232,9 @@ void PetscMatrix<T>::zero ()
 
   semiparallel_only();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
-  int m_l, n_l;
+  PetscInt m_l, n_l;
 
   ierr = MatGetLocalSize(_mat,&m_l,&n_l);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -247,17 +247,17 @@ void PetscMatrix<T>::zero ()
 }
 
 template <typename T>
-void PetscMatrix<T>::zero_rows (std::vector<int> & rows, T diag_value)
+void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_value)
 {
   libmesh_assert (this->initialized());
 
   semiparallel_only();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
 #if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
   if(!rows.empty())
-    ierr = MatZeroRows(_mat, rows.size(), &rows[0], diag_value);
+    ierr = MatZeroRows(_mat, rows.size(), (PetscInt*)&rows[0], diag_value);
   else
     ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value);
 #else
@@ -266,7 +266,7 @@ void PetscMatrix<T>::zero_rows (std::vector<int> & rows, T diag_value)
   // solutions for the zeroed rows (x) and right hand side (b) to update.
   // Could be useful for setting boundary conditions...
   if(!rows.empty())
-    ierr = MatZeroRows(_mat, rows.size(), &rows[0], diag_value, PETSC_NULL, PETSC_NULL);
+    ierr = MatZeroRows(_mat, rows.size(), (PetscInt*)&rows[0], diag_value, PETSC_NULL, PETSC_NULL);
   else
     ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value, PETSC_NULL, PETSC_NULL);
 #endif
@@ -277,7 +277,7 @@ void PetscMatrix<T>::zero_rows (std::vector<int> & rows, T diag_value)
 template <typename T>
 void PetscMatrix<T>::clear ()
 {
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   if ((this->initialized()) && (this->_destroy_mat_on_exit))
     {
@@ -299,7 +299,7 @@ Real PetscMatrix<T>::l1_norm () const
 
   semiparallel_only();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
   PetscReal petsc_value;
   Real value;
 
@@ -322,7 +322,7 @@ Real PetscMatrix<T>::linfty_norm () const
 
   semiparallel_only();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
   PetscReal petsc_value;
   Real value;
 
@@ -348,7 +348,7 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
   // libmesh_assert (this->closed());
   this->close();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
   PetscViewer petsc_viewer;
 
 
@@ -417,7 +417,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
   // Matrix must be in an assembled state to be printed
   this->close();
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   // Print to screen if ostream is stdout
   if (os == std::cout)
@@ -503,23 +503,23 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
 
 template <typename T>
 void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				const std::vector<unsigned int>& rows,
-				const std::vector<unsigned int>& cols)
+				const std::vector<numeric_index_type>& rows,
+				const std::vector<numeric_index_type>& cols)
 {
   libmesh_assert (this->initialized());
 
-  const unsigned int m = dm.m();
-  const unsigned int n = dm.n();
+  const numeric_index_type m = dm.m();
+  const numeric_index_type n = dm.n();
 
   libmesh_assert_equal_to (rows.size(), m);
   libmesh_assert_equal_to (cols.size(), n);
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   // These casts are required for PETSc <= 2.1.5
   ierr = MatSetValues(_mat,
-		      m, (int*) &rows[0],
-		      n, (int*) &cols[0],
+		      m, (PetscInt*) &rows[0],
+		      n, (PetscInt*) &cols[0],
 		      (PetscScalar*) &dm.get_values()[0],
 		      ADD_VALUES);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -531,8 +531,8 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 template <typename T>
 void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
-				    const std::vector<unsigned int> &rows,
-				    const std::vector<unsigned int> &cols,
+				    const std::vector<numeric_index_type> &rows,
+				    const std::vector<numeric_index_type> &cols,
 				    const bool reuse_submatrix) const
 {
   // Can only extract submatrices from closed matrices
@@ -547,18 +547,18 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
     submatrix.clear();
 
   // Construct row and column index sets.
-  int ierr=0;
+  PetscErrorCode ierr=0;
   IS isrow, iscol;
 
   ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
 			 rows.size(),
-			 (int*) &rows[0],
+			 (PetscInt*) &rows[0],
 			 PETSC_USE_POINTER,
 			 &isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
 			 cols.size(),
-			 (int*) &cols[0],
+			 (PetscInt*) &cols[0],
 			 PETSC_USE_POINTER,
 			 &iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
@@ -608,7 +608,7 @@ void PetscMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 #else
 
   // Needs a const_cast since PETSc does not work with const.
-  int ierr =
+  PetscErrorCode ierr =
     MatGetDiagonal(const_cast<PetscMatrix<T>*>(this)->mat(),petsc_dest.vec()); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
 #endif
@@ -628,7 +628,7 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
   if(&petsc_dest != this)
     dest.clear();
 
-  int ierr;
+  PetscErrorCode ierr;
 #if PETSC_VERSION_LESS_THAN(3,0,0)
   if (&petsc_dest == this)
     ierr = MatTranspose(_mat,PETSC_NULL);
@@ -665,7 +665,7 @@ void PetscMatrix<T>::close () const
 //   if (this->closed())
 //     return;
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   ierr = MatAssemblyBegin (_mat, MAT_FINAL_ASSEMBLY);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
@@ -676,73 +676,78 @@ void PetscMatrix<T>::close () const
 
 
 template <typename T>
-unsigned int PetscMatrix<T>::m () const
+numeric_index_type PetscMatrix<T>::m () const
 {
   libmesh_assert (this->initialized());
 
-  int petsc_m=0, petsc_n=0, ierr=0;
+  PetscInt petsc_m=0, petsc_n=0;
+  PetscErrorCode ierr=0;
 
   ierr = MatGetSize (_mat, &petsc_m, &petsc_n);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<unsigned int>(petsc_m);
+  return static_cast<numeric_index_type>(petsc_m);
 }
 
 
 
 template <typename T>
-unsigned int PetscMatrix<T>::n () const
+numeric_index_type PetscMatrix<T>::n () const
 {
   libmesh_assert (this->initialized());
 
-  int petsc_m=0, petsc_n=0, ierr=0;
+  PetscInt petsc_m=0, petsc_n=0;
+  PetscErrorCode ierr=0;
 
   ierr = MatGetSize (_mat, &petsc_m, &petsc_n);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<unsigned int>(petsc_n);
+  return static_cast<numeric_index_type>(petsc_n);
 }
 
 
 
 template <typename T>
-unsigned int PetscMatrix<T>::row_start () const
+numeric_index_type PetscMatrix<T>::row_start () const
 {
   libmesh_assert (this->initialized());
 
-  int start=0, stop=0, ierr=0;
+  PetscInt start=0, stop=0;
+  PetscErrorCode ierr=0;
 
   ierr = MatGetOwnershipRange(_mat, &start, &stop);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<unsigned int>(start);
+  return static_cast<numeric_index_type>(start);
 }
 
 
 
 template <typename T>
-unsigned int PetscMatrix<T>::row_stop () const
+numeric_index_type PetscMatrix<T>::row_stop () const
 {
   libmesh_assert (this->initialized());
 
-  int start=0, stop=0, ierr=0;
+  PetscInt start=0, stop=0;
+  PetscErrorCode ierr=0;
 
   ierr = MatGetOwnershipRange(_mat, &start, &stop);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  return static_cast<unsigned int>(stop);
+  return static_cast<numeric_index_type>(stop);
 }
 
 
 
 template <typename T>
-void PetscMatrix<T>::set (const unsigned int i,
-			  const unsigned int j,
+void PetscMatrix<T>::set (const numeric_index_type i,
+			  const numeric_index_type j,
 			  const T value)
 {
   libmesh_assert (this->initialized());
 
-  int ierr=0, i_val=i, j_val=j;
+  PetscErrorCode ierr=0;
+  PetscInt i_val=i, j_val=j;
 
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
   ierr = MatSetValues(_mat, 1, &i_val, 1, &j_val,
@@ -753,13 +758,14 @@ void PetscMatrix<T>::set (const unsigned int i,
 
 
 template <typename T>
-void PetscMatrix<T>::add (const unsigned int i,
-			  const unsigned int j,
+void PetscMatrix<T>::add (const numeric_index_type i,
+			  const numeric_index_type j,
 			  const T value)
 {
   libmesh_assert (this->initialized());
 
-  int ierr=0, i_val=i, j_val=j;
+  PetscErrorCode ierr=0;
+  PetscInt i_val=i, j_val=j;
 
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
   ierr = MatSetValues(_mat, 1, &i_val, 1, &j_val,
@@ -771,7 +777,7 @@ void PetscMatrix<T>::add (const unsigned int i,
 
 template <typename T>
 void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				const std::vector<unsigned int>& dof_indices)
+				const std::vector<numeric_index_type>& dof_indices)
 {
   this->add_matrix (dm, dof_indices, dof_indices);
 }
@@ -797,7 +803,7 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
   libmesh_assert (X);
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
 
   // the matrix from which we copy the values has to be assembled/closed
   // X->close ();
@@ -824,8 +830,8 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
 
 template <typename T>
-T PetscMatrix<T>::operator () (const unsigned int i,
-			       const unsigned int j) const
+T PetscMatrix<T>::operator () (const numeric_index_type i,
+			       const numeric_index_type j) const
 {
   libmesh_assert (this->initialized());
 
@@ -847,11 +853,12 @@ T PetscMatrix<T>::operator () (const unsigned int i,
   // If the entry is not in the sparse matrix, it is 0.
   T value=0.;
 
-  int
-    ierr=0,
+  PetscErrorCode
+    ierr=0;
+  PetscInt
     ncols=0,
-    i_val=static_cast<int>(i),
-    j_val=static_cast<int>(j);
+    i_val=static_cast<PetscInt>(i),
+    j_val=static_cast<PetscInt>(j);
 
 
   // the matrix needs to be closed for this to work
@@ -865,7 +872,7 @@ T PetscMatrix<T>::operator () (const unsigned int i,
 
   // Perform a binary search to find the contiguous index in
   // petsc_cols (resp. petsc_row) corresponding to global index j_val
-  std::pair<const int*, const int*> p =
+  std::pair<const PetscInt*, const PetscInt*> p =
     std::equal_range (&petsc_cols[0], &petsc_cols[0] + ncols, j_val);
 
   // Found an entry for j_val
@@ -873,10 +880,11 @@ T PetscMatrix<T>::operator () (const unsigned int i,
     {
       // The entry in the contiguous row corresponding
       // to the j_val column of interest
-      const int j = std::distance (const_cast<int*>(&petsc_cols[0]),
-				   const_cast<int*>(p.first));
+      const std::size_t j =
+        std::distance (const_cast<PetscInt*>(&petsc_cols[0]),
+                       const_cast<PetscInt*>(p.first));
 
-      libmesh_assert_less (j, ncols);
+      libmesh_assert_less (static_cast<PetscInt>(j), ncols);
       libmesh_assert_equal_to (petsc_cols[j], j_val);
 
       value = static_cast<T> (petsc_row[j]);
@@ -897,7 +905,7 @@ bool PetscMatrix<T>::closed() const
 {
   libmesh_assert (this->initialized());
 
-  int ierr=0;
+  PetscErrorCode ierr=0;
   PetscBool assembled;
 
   ierr = MatAssembled(_mat, &assembled);

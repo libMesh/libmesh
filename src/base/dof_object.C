@@ -30,7 +30,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // DofObject class static member -now initialized in header
-const unsigned int DofObject::invalid_id;
+const dof_id_type       DofObject::invalid_id;
 const processor_id_type DofObject::invalid_processor_id;
 
 
@@ -400,7 +400,7 @@ void DofObject::set_n_comp_group(const unsigned int s,
 void DofObject::set_dof_number(const unsigned int s,
 			       const unsigned int var,
 			       const unsigned int comp,
-			       const unsigned int dn)
+			       const dof_id_type dn)
 {
   libmesh_assert_less (s,    this->n_systems());
   libmesh_assert_less (var,  this->n_vars(s));
@@ -414,8 +414,7 @@ void DofObject::set_dof_number(const unsigned int s,
 
   libmesh_assert_less ((start_idx_sys + 2*vg + 1), _idx_buf.size());
 
-  unsigned int
-    &base_idx(_idx_buf[start_idx_sys + 2*vg + 1]);
+  dof_id_type &base_idx = _idx_buf[start_idx_sys + 2*vg + 1];
 
   // We intend to change all dof numbers together or not at all
   if (comp || vig)
@@ -438,6 +437,7 @@ void DofObject::set_dof_number(const unsigned int s,
 
   
 
+// FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
 unsigned int DofObject::packed_indexing_size() const
 {
   return 
@@ -451,6 +451,7 @@ unsigned int DofObject::packed_indexing_size() const
 
 
   
+// FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
 unsigned int DofObject::unpackable_indexing_size(std::vector<int>::const_iterator begin)
 {
 #ifdef LIBMESH_ENABLE_AMR
@@ -472,6 +473,7 @@ unsigned int DofObject::unpackable_indexing_size(std::vector<int>::const_iterato
 }
 
 
+// FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
 void DofObject::unpack_indexing(std::vector<int>::const_iterator begin)
 {
   _idx_buf.clear();
@@ -510,6 +512,7 @@ void DofObject::unpack_indexing(std::vector<int>::const_iterator begin)
 }
 
 
+// FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
 void DofObject::pack_indexing(std::back_insert_iterator<std::vector<int> > target) const
 {
 #ifdef LIBMESH_ENABLE_AMR

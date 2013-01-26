@@ -64,17 +64,17 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
     }
 
   os << "Real part:" << std::endl;
-  for (unsigned int i=0; i<this->m(); i++)
+  for (numeric_index_type i=0; i<this->m(); i++)
     {
-      for (unsigned int j=0; j<this->n(); j++)
+      for (numeric_index_type j=0; j<this->n(); j++)
 	os << std::setw(8) << (*this)(i,j).real() << " ";
       os << std::endl;
     }
 
   os << std::endl << "Imaginary part:" << std::endl;
-  for (unsigned int i=0; i<this->m(); i++)
+  for (numeric_index_type i=0; i<this->m(); i++)
     {
-      for (unsigned int j=0; j<this->n(); j++)
+      for (numeric_index_type j=0; j<this->n(); j++)
 	os << std::setw(8) << (*this)(i,j).imag() << " ";
       os << std::endl;
     }
@@ -156,7 +156,7 @@ void SparseMatrix<T>::vector_mult_add (NumericVector<T>& dest,
 
 
 template <typename T>
-void SparseMatrix<T>::zero_rows (std::vector<int> &, T)
+void SparseMatrix<T>::zero_rows (std::vector<numeric_index_type> &, T)
 {
   /* This functionality isn't implemented or stubbed in every subclass yet */
   libmesh_not_implemented();
@@ -182,12 +182,12 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
   if (libMesh::processor_id() == 0)
     {
       libmesh_assert_equal_to (this->_dof_map->first_dof(), 0);
-      for (unsigned int i=this->_dof_map->first_dof();
+      for (numeric_index_type i=this->_dof_map->first_dof();
            i!=this->_dof_map->end_dof(); ++i)
         {
 	  if(sparse)
 	    {
-	      for (unsigned int j=0; j<this->n(); j++)
+	      for (numeric_index_type j=0; j<this->n(); j++)
 		{
 		  T c = (*this)(i,j);
 		  if (c != static_cast<T>(0.0))
@@ -198,16 +198,16 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
 	    }
 	  else
 	    {
-	      for (unsigned int j=0; j<this->n(); j++)
+	      for (numeric_index_type j=0; j<this->n(); j++)
 		os << (*this)(i,j) << " ";
 	      os << std::endl;
 	    }
         }
 
-      std::vector<unsigned int> ibuf, jbuf;
+      std::vector<numeric_index_type> ibuf, jbuf;
       std::vector<T> cbuf;
-      unsigned int currenti = this->_dof_map->end_dof();
-      for (unsigned int p=1; p < libMesh::n_processors(); ++p)
+      numeric_index_type currenti = this->_dof_map->end_dof();
+      for (processor_id_type p=1; p < libMesh::n_processors(); ++p)
         {
           CommWorld.receive(p, ibuf);
           CommWorld.receive(p, jbuf);
@@ -220,12 +220,12 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
           libmesh_assert_greater_equal (ibuf.front(), currenti);
           libmesh_assert_greater_equal (ibuf.back(), ibuf.front());
 
-          unsigned int currentb = 0;
+	  std::size_t currentb = 0;
           for (;currenti <= ibuf.back(); ++currenti)
             {
 	      if(sparse)
 		{
-		  for (unsigned int j=0; j<this->n(); j++)
+		  for (numeric_index_type j=0; j<this->n(); j++)
 		    {
 		      if (currentb < ibuf.size() &&
 			  ibuf[currentb] == currenti &&
@@ -238,7 +238,7 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
 		}
 	      else
 		{
-		  for (unsigned int j=0; j<this->n(); j++)
+		  for (numeric_index_type j=0; j<this->n(); j++)
 		    {
 		      if (currentb < ibuf.size() &&
 			  ibuf[currentb] == currenti &&
@@ -258,7 +258,7 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
 	{
 	  for (; currenti != this->m(); ++currenti)
 	    {
-	      for (unsigned int j=0; j<this->n(); j++)
+	      for (numeric_index_type j=0; j<this->n(); j++)
 		os << static_cast<T>(0.0) << " ";
 	      os << std::endl;
 	    }
@@ -266,15 +266,15 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
     }
   else
     {
-      std::vector<unsigned int> ibuf, jbuf;
+      std::vector<numeric_index_type> ibuf, jbuf;
       std::vector<T> cbuf;
 
       // We'll assume each processor has access to entire
       // matrix rows, so (*this)(i,j) is valid if i is a local index.
-      for (unsigned int i=this->_dof_map->first_dof();
+      for (numeric_index_type i=this->_dof_map->first_dof();
            i!=this->_dof_map->end_dof(); ++i)
         {
-          for (unsigned int j=0; j<this->n(); j++)
+          for (numeric_index_type j=0; j<this->n(); j++)
 	    {
               T c = (*this)(i,j);
               if (c != static_cast<T>(0.0))

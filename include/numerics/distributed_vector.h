@@ -63,15 +63,15 @@ public:
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  DistributedVector (const unsigned int n,
+  DistributedVector (const numeric_index_type n,
                      const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  DistributedVector (const unsigned int n,
-		     const unsigned int n_local,
+  DistributedVector (const numeric_index_type n,
+		     const numeric_index_type n_local,
                      const ParallelType type = AUTOMATIC);
 
   /**
@@ -79,9 +79,9 @@ public:
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  DistributedVector (const unsigned int N,
-		     const unsigned int n_local,
-		     const std::vector<unsigned int>& ghost,
+  DistributedVector (const numeric_index_type N,
+		     const numeric_index_type n_local,
+		     const std::vector<numeric_index_type>& ghost,
                      const ParallelType type = AUTOMATIC);
 
   /**
@@ -130,15 +130,15 @@ public:
    * On \p fast==false, the vector is filled by
    * zeros.
    */
-  void init (const unsigned int N,
-	     const unsigned int n_local,
+  void init (const numeric_index_type N,
+	     const numeric_index_type n_local,
 	     const bool         fast=false,
 	     const ParallelType type=AUTOMATIC);
 
   /**
    * call init with n_local = N,
    */
-  void init (const unsigned int N,
+  void init (const numeric_index_type N,
 	     const bool         fast=false,
 	     const ParallelType type=AUTOMATIC);
 
@@ -146,9 +146,9 @@ public:
    * Create a vector that holds tha local indices plus those specified
    * in the \p ghost argument.
    */
-  virtual void init (const unsigned int /*N*/,
-		     const unsigned int /*n_local*/,
-		     const std::vector<unsigned int>& /*ghost*/,
+  virtual void init (const numeric_index_type /*N*/,
+		     const numeric_index_type /*n_local*/,
+		     const std::vector<numeric_index_type>& /*ghost*/,
 		     const bool /*fast*/ = false,
 		     const ParallelType = AUTOMATIC);
 
@@ -225,30 +225,30 @@ public:
    * closer to the C++ standard library's
    * \p std::vector container.
    */
-  unsigned int size () const;
+  numeric_index_type size () const;
 
   /**
    * @returns the local size of the vector
    * (index_stop-index_start)
    */
-  unsigned int local_size() const;
+  numeric_index_type local_size() const;
 
   /**
    * @returns the index of the first vector element
    * actually stored on this processor
    */
-  unsigned int first_local_index() const;
+  numeric_index_type first_local_index() const;
 
   /**
    * @returns the index of the last vector element
    * actually stored on this processor
    */
-  unsigned int last_local_index() const;
+  numeric_index_type last_local_index() const;
 
   /**
    * Access components, returns \p U(i).
    */
-  T operator() (const unsigned int i) const;
+  T operator() (const numeric_index_type i) const;
 
   /**
    * Addition operator.
@@ -270,12 +270,12 @@ public:
   /**
    * v(i) = value
    */
-  void set (const unsigned int i, const T value);
+  void set (const numeric_index_type i, const T value);
 
   /**
    * v(i) += value
    */
-  void add (const unsigned int i, const T value);
+  void add (const numeric_index_type i, const T value);
 
   /**
    * \f$U(0-LIBMESH_DIM)+=s\f$.
@@ -304,7 +304,7 @@ public:
    * want to specify WHERE to add it
    */
   void add_vector (const std::vector<T>& v,
-		   const std::vector<unsigned int>& dof_indices);
+		   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=V\f$ where U and V are type
@@ -313,7 +313,7 @@ public:
    * the \p NumericVector<T> V
    */
   void add_vector (const NumericVector<T>& V,
-		   const std::vector<unsigned int>& dof_indices);
+		   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=A*V\f$.
@@ -332,7 +332,7 @@ public:
    * the \p DenseVector<T> V
    */
   void add_vector (const DenseVector<T>& V,
-		   const std::vector<unsigned int>& dof_indices);
+		   const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U+=A^T*V\f$.
@@ -349,7 +349,7 @@ public:
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
-		       const std::vector<unsigned int>& dof_indices);
+		       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$U=V\f$, where U and V are type
@@ -358,7 +358,7 @@ public:
    * the NumericVector<T> V
    */
   virtual void insert (const NumericVector<T>& V,
-		       const std::vector<unsigned int>& dof_indices);
+		       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where V is type
@@ -366,7 +366,7 @@ public:
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseVector<T>& V,
-		       const std::vector<unsigned int>& dof_indices);
+		       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * \f$ U=V \f$ where V is type
@@ -374,7 +374,7 @@ public:
    * want to specify WHERE to insert it
    */
   virtual void insert (const DenseSubVector<T>& V,
-		       const std::vector<unsigned int>& dof_indices);
+		       const std::vector<numeric_index_type>& dof_indices);
 
   /**
    * Scale each element of the
@@ -411,15 +411,15 @@ public:
    * defined by the \p send_list.
    */
   void localize (NumericVector<T>& v_local,
-		 const std::vector<unsigned int>& send_list) const;
+		 const std::vector<numeric_index_type>& send_list) const;
 
   /**
    * Updates a local vector with selected values from neighboring
    * processors, as defined by \p send_list.
    */
-  void localize (const unsigned int first_local_idx,
-		 const unsigned int last_local_idx,
-		 const std::vector<unsigned int>& send_list);
+  void localize (const numeric_index_type first_local_idx,
+		 const numeric_index_type last_local_idx,
+		 const std::vector<numeric_index_type>& send_list);
 
   /**
    * Creates a local copy of the global vector in
@@ -428,7 +428,7 @@ public:
    * is useful for outputting data from one processor.
    */
   void localize_to_one (std::vector<T>& v_local,
-			const unsigned int proc_id=0) const;
+			const processor_id_type proc_id=0) const;
 
   /**
    * Computes the pointwise (i.e. component-wise) product of \p vec1
@@ -453,22 +453,22 @@ private:
   /**
    * The global vector size
    */
-  unsigned int _global_size;
+  numeric_index_type _global_size;
 
   /**
    * The local vector size
    */
-  unsigned int _local_size;
+  numeric_index_type _local_size;
 
   /**
    * The first component stored locally
    */
-  unsigned int _first_local_index;
+  numeric_index_type _first_local_index;
 
   /**
    * The last component (+1) stored locally
    */
-  unsigned int _last_local_index;
+  numeric_index_type _last_local_index;
 };
 
 
@@ -489,7 +489,7 @@ DistributedVector<T>::DistributedVector (const ParallelType type) :
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const unsigned int n,
+DistributedVector<T>::DistributedVector (const numeric_index_type n,
                                          const ParallelType type)
 {
   this->init(n, n, false, type);
@@ -499,8 +499,8 @@ DistributedVector<T>::DistributedVector (const unsigned int n,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const unsigned int n,
-					 const unsigned int n_local,
+DistributedVector<T>::DistributedVector (const numeric_index_type n,
+					 const numeric_index_type n_local,
                                          const ParallelType type)
 {
   this->init(n, n_local, false, type);
@@ -510,9 +510,9 @@ DistributedVector<T>::DistributedVector (const unsigned int n,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const unsigned int n,
-					 const unsigned int n_local,
-		                         const std::vector<unsigned int>& ghost,
+DistributedVector<T>::DistributedVector (const numeric_index_type n,
+					 const numeric_index_type n_local,
+		                         const std::vector<numeric_index_type>& ghost,
                                          const ParallelType type)
 {
   this->init(n, n_local, ghost, false, type);
@@ -531,8 +531,8 @@ DistributedVector<T>::~DistributedVector ()
 
 template <typename T>
 inline
-void DistributedVector<T>::init (const unsigned int n,
-				 const unsigned int n_local,
+void DistributedVector<T>::init (const numeric_index_type n,
+				 const numeric_index_type n_local,
 				 const bool fast,
                                  const ParallelType type)
 {
@@ -575,7 +575,7 @@ void DistributedVector<T>::init (const unsigned int n,
 
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
-  for (unsigned int p=0; p!=libMesh::processor_id(); p++)
+  for (processor_id_type p=0; p!=libMesh::processor_id(); p++)
     _first_local_index += local_sizes[p];
 
 
@@ -584,7 +584,7 @@ void DistributedVector<T>::init (const unsigned int n,
   // size, otherwise there is big trouble!
   int sum=0;
 
-  for (unsigned int p=0; p!=libMesh::n_processors(); p++)
+  for (processor_id_type p=0; p!=libMesh::n_processors(); p++)
     sum += local_sizes[p];
 
   libmesh_assert_equal_to (sum, static_cast<int>(n));
@@ -616,9 +616,9 @@ void DistributedVector<T>::init (const unsigned int n,
 
 template <typename T>
 inline
-void DistributedVector<T>::init (const unsigned int n,
-			         const unsigned int n_local,
-		                 const std::vector<unsigned int>& /*ghost*/,
+void DistributedVector<T>::init (const numeric_index_type n,
+			         const numeric_index_type n_local,
+		                 const std::vector<numeric_index_type>& /*ghost*/,
 			         const bool fast,
                                  const ParallelType type)
 {
@@ -641,7 +641,7 @@ void DistributedVector<T>::init (const NumericVector<T>& other,
 
 template <typename T>
 inline
-void DistributedVector<T>::init (const unsigned int n,
+void DistributedVector<T>::init (const numeric_index_type n,
 				 const bool fast,
                                  const ParallelType type)
 {
@@ -723,7 +723,7 @@ AutoPtr<NumericVector<T> > DistributedVector<T>::clone () const
 
 template <typename T>
 inline
-unsigned int DistributedVector<T>::size () const
+numeric_index_type DistributedVector<T>::size () const
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -736,7 +736,7 @@ unsigned int DistributedVector<T>::size () const
 
 template <typename T>
 inline
-unsigned int DistributedVector<T>::local_size () const
+numeric_index_type DistributedVector<T>::local_size () const
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -749,7 +749,7 @@ unsigned int DistributedVector<T>::local_size () const
 
 template <typename T>
 inline
-unsigned int DistributedVector<T>::first_local_index () const
+numeric_index_type DistributedVector<T>::first_local_index () const
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -762,7 +762,7 @@ unsigned int DistributedVector<T>::first_local_index () const
 
 template <typename T>
 inline
-unsigned int DistributedVector<T>::last_local_index () const
+numeric_index_type DistributedVector<T>::last_local_index () const
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -775,7 +775,7 @@ unsigned int DistributedVector<T>::last_local_index () const
 
 template <typename T>
 inline
-T DistributedVector<T>::operator() (const unsigned int i) const
+T DistributedVector<T>::operator() (const numeric_index_type i) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -790,7 +790,7 @@ T DistributedVector<T>::operator() (const unsigned int i) const
 
 template <typename T>
 inline
-void DistributedVector<T>::set (const unsigned int i, const T value)
+void DistributedVector<T>::set (const numeric_index_type i, const T value)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -805,7 +805,7 @@ void DistributedVector<T>::set (const unsigned int i, const T value)
 
 template <typename T>
 inline
-void DistributedVector<T>::add (const unsigned int i, const T value)
+void DistributedVector<T>::add (const numeric_index_type i, const T value)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -831,7 +831,7 @@ Real DistributedVector<T>::min () const
 
   Real local_min = _values.size() ?
     libmesh_real(_values[0]) : std::numeric_limits<Real>::max();
-  for (unsigned int i = 1; i < _values.size(); ++i)
+  for (numeric_index_type i = 1; i < _values.size(); ++i)
     local_min = std::min(libmesh_real(_values[i]), local_min);
 
   CommWorld.min(local_min);
@@ -854,7 +854,7 @@ Real DistributedVector<T>::max() const
 
   Real local_max = _values.size() ?
     libmesh_real(_values[0]) : -std::numeric_limits<Real>::max();
-  for (unsigned int i = 1; i < _values.size(); ++i)
+  for (numeric_index_type i = 1; i < _values.size(); ++i)
     local_max = std::max(libmesh_real(_values[i]), local_max);
 
   CommWorld.max(local_max);

@@ -58,13 +58,13 @@ public:
    * @returns \p m, the row-dimension of the matrix where the marix is
    * \f$ M \times N \f$.
    */
-  virtual unsigned int m () const;
+  virtual numeric_index_type m () const;
 
   /**
    * @returns \p n, the column-dimension of the matrix where the marix
    * is \f$ M \times N \f$.
    */
-  virtual unsigned int n () const;
+  virtual numeric_index_type n () const;
 
   /**
    * Multiplies the matrix with \p arg and stores the result in \p
@@ -121,7 +121,7 @@ TensorShellMatrix<T>::~TensorShellMatrix ()
 
 template <typename T>
 inline
-unsigned int TensorShellMatrix<T>::m () const
+numeric_index_type TensorShellMatrix<T>::m () const
 {
   return _v.size();
 }
@@ -130,7 +130,7 @@ unsigned int TensorShellMatrix<T>::m () const
 
 template <typename T>
 inline
-unsigned int TensorShellMatrix<T>::n () const
+numeric_index_type TensorShellMatrix<T>::n () const
 {
   return _w.size();
 }

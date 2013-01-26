@@ -133,17 +133,17 @@ public:
   /**
    * \returns the \p id for this \p DofObject
    */
-  unsigned int id () const;
+  dof_id_type id () const;
 
   /**
    * \returns the \p id for this \p DofObject as a writeable reference.
    */
-  unsigned int & set_id ();
+  dof_id_type & set_id ();
 
   /**
    * Sets the \p id for this \p DofObject
    */
-  void set_id (const unsigned int id)
+  void set_id (const dof_id_type id)
   { this->set_id() = id; }
 
   /**
@@ -263,9 +263,9 @@ public:
    * @returns the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
    */
-  unsigned int dof_number(const unsigned int s,
-			  const unsigned int var,
-			  const unsigned int comp) const;
+  dof_id_type dof_number(const unsigned int s,
+			 const unsigned int var,
+			 const unsigned int comp) const;
 
   /**
    * Sets the global degree of freedom number for variable \p var,
@@ -274,7 +274,7 @@ public:
   void set_dof_number(const unsigned int s,
 		      const unsigned int var,
 		      const unsigned int comp,
-		      const unsigned int dn);
+		      const dof_id_type dn);
 
   /**
    * @returns true if any system has variables which have been assigned,
@@ -289,20 +289,20 @@ public:
    */
   void set_vg_dof_base(const unsigned int s,
 		       const unsigned int vg,
-		       const unsigned int db);
+		       const dof_id_type db);
 
   /**
    * \p VariableGroup DOF indices are indexed as
    * id = base + var_in_vg*ncomp + comp
    * This method allows for direct access to the base.
    */
-  unsigned int vg_dof_base(const unsigned int s,
-			   const unsigned int vg) const;
+  dof_id_type vg_dof_base(const unsigned int s,
+			  const unsigned int vg) const;
   
   /**
    * An invaild \p id to distinguish an uninitialized \p DofObject
    */
-  static const unsigned int invalid_id = libMesh::invalid_uint;
+  static const dof_id_type invalid_id = static_cast<dof_id_type>(-1);
 
   /**
    * An invalid \p processor_id to distinguish DOFs that have
@@ -361,7 +361,7 @@ private:
   /**
    * The \p id of the \p DofObject
    */
-  unsigned int _id;
+  dof_id_type _id;
 
   /**
    * The \p processor_id of the \p DofObject.
@@ -416,7 +416,7 @@ private:
    * the 5th variable in the system is the 1st variable in 2nd variable group.
    * (Now of course 0-base everything...  but you get the idea.)
    */
-  typedef unsigned int index_t;
+  typedef dof_id_type index_t;
   typedef std::vector<index_t> index_buffer_t;
   index_buffer_t _idx_buf;
 
@@ -561,7 +561,7 @@ unsigned int DofObject::n_dofs (const unsigned int s,
 
 
 inline
-unsigned int DofObject::id () const
+dof_id_type DofObject::id () const
 {
   libmesh_assert (this->valid_id());
   return _id;
@@ -570,7 +570,7 @@ unsigned int DofObject::id () const
 
 
 inline
-unsigned int & DofObject::set_id ()
+dof_id_type & DofObject::set_id ()
 {
   return _id;
 }
@@ -699,9 +699,9 @@ unsigned int DofObject::n_comp_group(const unsigned int s,
 
 
 inline
-unsigned int DofObject::dof_number(const unsigned int s,
-				   const unsigned int var,
-				   const unsigned int comp) const
+dof_id_type DofObject::dof_number(const unsigned int s,
+				  const unsigned int var,
+				  const unsigned int comp) const
 {
   libmesh_assert_less (s,    this->n_systems());
   libmesh_assert_less (var,  this->n_vars(s));
@@ -713,7 +713,7 @@ unsigned int DofObject::dof_number(const unsigned int s,
 
   libmesh_assert_less ((start_idx_sys + 2*vg + 1), _idx_buf.size());
 
-  const unsigned int
+  const dof_id_type
     base_idx = _idx_buf[start_idx_sys + 2*vg + 1];
 
   // if the first component is invalid, they
@@ -791,7 +791,7 @@ unsigned int DofObject::end_idx (const unsigned int s) const
 inline
 void DofObject::set_vg_dof_base(const unsigned int s,
 				const unsigned int vg,
-				const unsigned int db)
+				const dof_id_type db)
 {
   libmesh_assert_less (s,  this->n_systems());
   libmesh_assert_less (vg, this->n_var_groups(s));
@@ -809,8 +809,8 @@ void DofObject::set_vg_dof_base(const unsigned int s,
 
 
 inline
-unsigned int DofObject::vg_dof_base(const unsigned int s,
-				    const unsigned int vg) const
+dof_id_type DofObject::vg_dof_base(const unsigned int s,
+				   const unsigned int vg) const
 {
   libmesh_assert_less (s,  this->n_systems());
   libmesh_assert_less (vg, this->n_var_groups(s));

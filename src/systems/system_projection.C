@@ -97,7 +97,7 @@ namespace libMesh
     void unique();
     void operator()(const ConstElemRange &range);
     void join (const BuildProjectionList &other);
-    std::vector<unsigned int> send_list;
+    std::vector<dof_id_type> send_list;
   };
 
 
@@ -343,7 +343,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
       if(this->variable(var).type().family == SCALAR)
         {
           // We can just map SCALAR dofs directly across
-          std::vector<unsigned int> new_SCALAR_indices, old_SCALAR_indices;
+          std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
           dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
           dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
           const unsigned int new_n_dofs = new_SCALAR_indices.size();
@@ -368,7 +368,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
       dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
 
-      for (unsigned int i=0; i!=dist_v->size(); i++)
+      for (dof_id_type i=0; i!=dist_v->size(); i++)
         if (new_vector(i) != 0.0)
           dist_v->set(i, new_vector(i));
 
@@ -384,7 +384,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
       // We may have to set dof values that this processor doesn't
       // own in certain special cases, like LAGRANGE FIRST or
       // HERMITE THIRD elements on second-order meshes
-      for (unsigned int i=0; i!=new_v.size(); i++)
+      for (dof_id_type i=0; i!=new_v.size(); i++)
         if (new_vector(i) != 0.0)
           new_v.set(i, new_vector(i));
       new_v.close();
@@ -499,13 +499,13 @@ void System::project_vector (NumericVector<Number>& new_vector,
 	      filled_fout = true;
 	    }
 
-          std::vector<unsigned int> SCALAR_indices;
+          std::vector<dof_id_type> SCALAR_indices;
           dof_map.SCALAR_dof_indices (SCALAR_indices, var);
           const unsigned int n_SCALAR_dofs = SCALAR_indices.size();
 
           for (unsigned int i=0; i<n_SCALAR_dofs; i++)
           {
-            const unsigned int global_index = SCALAR_indices[i];
+            const dof_id_type global_index = SCALAR_indices[i];
             const unsigned int component_index =
               this->variable_scalar_number(var,i);
             new_vector.set(global_index, fout(component_index));
@@ -705,8 +705,8 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 
 
       // The global DOF indices
-      std::vector<unsigned int> new_dof_indices, old_dof_indices;
-      // Side/edge DOF indices
+      std::vector<dof_id_type> new_dof_indices, old_dof_indices;
+      // Side/edge local DOF indices
       std::vector<unsigned int> new_side_dofs, old_side_dofs;
 
       // Iterate over the elements in the range
@@ -956,7 +956,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 	         new_local_dof<new_n_dofs; new_local_dof++)
 	      {
 	        // The global DOF number for this local DOF
-	        const unsigned int new_global_dof =
+	        const dof_id_type new_global_dof =
 		  new_dof_indices[new_local_dof];
 
 	        // The global DOF might lie outside of the bounds of a
@@ -989,7 +989,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 		    for (unsigned int old_local_dof=0;
 		         old_local_dof<old_n_dofs; old_local_dof++)
 		      {
-		        const unsigned int old_global_dof =
+		        const dof_id_type old_global_dof =
 			  old_dof_indices[old_local_dof];
 
 		        Ue(new_local_dof) +=
@@ -1001,7 +1001,7 @@ void ProjectVector::operator()(const ConstElemRange &range) const
 	        else
 		  {
 		    // Get the old global DOF index
-		    const unsigned int old_global_dof =
+		    const dof_id_type old_global_dof =
 		      old_dof_indices[new_local_dof];
 
 		    Ue(new_local_dof) = old_vector(old_global_dof);
@@ -1038,13 +1038,13 @@ void BuildProjectionList::unique()
 	    this->send_list.end());
 
   // Now use std::unique to remove duplicate entries
-  std::vector<unsigned int>::iterator new_end =
+  std::vector<dof_id_type>::iterator new_end =
     std::unique (this->send_list.begin(),
 		 this->send_list.end());
 
   // Remove the end of the send_list.  Use the "swap trick"
   // from Effective STL
-  std::vector<unsigned int>
+  std::vector<dof_id_type>
     (this->send_list.begin(), new_end).swap (this->send_list);
 }
 
@@ -1061,12 +1061,12 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
   // The DofMap for this system
   const DofMap& dof_map = system.get_dof_map();
 
-  const unsigned int first_old_dof = dof_map.first_old_dof();
-  const unsigned int end_old_dof   = dof_map.end_old_dof();
+  const dof_id_type first_old_dof = dof_map.first_old_dof();
+  const dof_id_type end_old_dof   = dof_map.end_old_dof();
 
   // We can handle all the variables at once.
   // The old global DOF indices
-  std::vector<unsigned int> di;
+  std::vector<dof_id_type> di;
 
   // Iterate over the elements in the range
   for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
@@ -1108,7 +1108,7 @@ void BuildProjectionList::operator()(const ConstElemRange &range)
 	}
       else if (elem->refinement_flag() == Elem::JUST_COARSENED)
 	{
-          std::vector<unsigned int> di_child;
+          std::vector<dof_id_type> di_child;
           di.clear();
           for (unsigned int c=0; c != elem->n_children(); ++c)
             {
@@ -1218,7 +1218,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
 	fe->get_xyz();
 
       // The global DOF indices
-      std::vector<unsigned int> dof_indices;
+      std::vector<dof_id_type> dof_indices;
       // Side/edge DOF indices
       std::vector<unsigned int> side_dofs;
 
@@ -1694,7 +1694,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
 	  for (unsigned int i=0; i != n_dofs; ++i)
             libmesh_assert(dof_is_fixed[i]);
 
-	  const unsigned int
+	  const dof_id_type
 	    first = new_vector.first_local_index(),
 	    last  = new_vector.last_local_index();
 
@@ -1799,7 +1799,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
 	fe->get_xyz();
 
       // The global DOF indices
-      std::vector<unsigned int> dof_indices;
+      std::vector<dof_id_type> dof_indices;
       // Side/edge DOF indices
       std::vector<unsigned int> side_dofs;
 
@@ -2222,7 +2222,7 @@ void BoundaryProjectSolution::operator()(const ConstElemRange &range) const
                   }
               }
 
-	  const unsigned int
+	  const dof_id_type
 	    first = new_vector.first_local_index(),
 	    last  = new_vector.last_local_index();
 

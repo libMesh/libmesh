@@ -331,7 +331,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 #endif
 
 	  // global DOF indices
-	  std::vector<unsigned int> dof_indices;
+	  std::vector<dof_id_type> dof_indices;
 
 	  // Compute the approprite size for the patch projection matrices
 	  // and vectors;

@@ -119,7 +119,7 @@ namespace libMesh
     std::vector<std::vector<unsigned int> > dof_ids_per_processor(libMesh::n_processors());
 
     const DofMap & dof_map = _system.get_dof_map();
-    std::vector<unsigned int> dof_indices;
+    std::vector<dof_id_type> dof_indices;
 
     const MeshBase& mesh = _system.get_mesh();
     MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();

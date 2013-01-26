@@ -978,31 +978,31 @@ public:
   /**
    * @returns the number of degrees of freedom in the system
    */
-  unsigned int n_dofs() const;
+  dof_id_type n_dofs() const;
 
   /**
    * Returns the number of active degrees of freedom
    * for this System.
    */
-  unsigned int n_active_dofs() const;
+  dof_id_type n_active_dofs() const;
 
   /**
    * @returns the total number of constrained degrees of freedom
    * in the system.
    */
-  unsigned int n_constrained_dofs() const;
+  dof_id_type n_constrained_dofs() const;
 
   /**
    * @returns the number of constrained degrees of freedom
    * on this processor.
    */
-  unsigned int n_local_constrained_dofs() const;
+  dof_id_type n_local_constrained_dofs() const;
 
   /**
    * @returns the number of degrees of freedom local
    * to this processor
    */
-  unsigned int n_local_dofs() const;
+  dof_id_type n_local_dofs() const;
 
   /**
    * Adds the variable \p var to the list of variables
@@ -1162,8 +1162,8 @@ public:
    * allows for optimization for the multiple vector case by only communicating
    * the metadata once.
    */
-  unsigned int read_serialized_vectors (Xdr &io,
-					const std::vector<NumericVector<Number>*> &vectors) const;
+  dof_id_type read_serialized_vectors (Xdr &io,
+				       const std::vector<NumericVector<Number>*> &vectors) const;
   /**
    * Reads additional data, namely vectors, for this System.
    * This method may safely be called on a distributed-memory mesh.
@@ -1191,8 +1191,8 @@ public:
    * allows for optimization for the multiple vector case by only communicating
    * the metadata once.
    */
-  unsigned int write_serialized_vectors (Xdr &io,
-  					 const std::vector<const NumericVector<Number>*> &vectors) const;
+  dof_id_type write_serialized_vectors (Xdr &io,
+  					const std::vector<const NumericVector<Number>*> &vectors) const;
      
   /**
    * Writes additional data, namely vectors, for this System.
@@ -1383,7 +1383,7 @@ public:
    * @returns the current solution for the specified global
    * DOF.
    */
-  Number current_solution (const unsigned int global_dof_number) const;
+  Number current_solution (const dof_id_type global_dof_number) const;
 
   /**
    * Data structure to hold solution values.
@@ -1485,7 +1485,7 @@ public:
    * processor corresponding the the variable number passed in.
    */
   void local_dof_indices (const unsigned int var,
-                          std::set<unsigned int> & var_indices) const;
+                          std::set<dof_id_type> & var_indices) const;
 
   /**
    * Zeroes all dofs in \p v that correspond to variable number \p
@@ -1548,16 +1548,18 @@ private:
    * Unless otherwise specified, all variables are read.
    */
   template <typename iterator_type>
-  unsigned int read_serialized_blocked_dof_objects (const unsigned int n_objects,
-						    const iterator_type begin,
-						    const iterator_type end,
-						    Xdr &io,
-						    const std::vector<NumericVector<Number>*> &vecs,
-						    const unsigned int var_to_read=libMesh::invalid_uint) const;
+  dof_id_type read_serialized_blocked_dof_objects (const dof_id_type n_objects,
+						   const iterator_type begin,
+						   const iterator_type end,
+						   Xdr &io,
+						   const std::vector<NumericVector<Number>*> &vecs,
+						   const unsigned int var_to_read=libMesh::invalid_uint) const;
 
   /**
    * Reads the SCALAR dofs from the stream \p io and assigns the values
    * to the appropriate entries of \p vec.
+   *
+   * Returns the number of dofs read.
    */
   unsigned int read_SCALAR_dofs (const unsigned int var,
                                  Xdr &io,
@@ -1566,24 +1568,30 @@ private:
   /**
    * Reads a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
+   *
+   * Returns the length of the vector read.
    */
-  unsigned int read_serialized_vector (Xdr& io,
-				       NumericVector<Number> &vec);
+  numeric_index_type read_serialized_vector (Xdr& io,
+				             NumericVector<Number> &vec);
 
   /**
    * Writes an output vector to the stream \p io for a set of \p DofObjects.
    * This method uses blocked output and is safe to call on a distributed memory-mesh.
+   *
+   * Returns the number of values written
    */
   template <typename iterator_type>
-  unsigned int write_serialized_blocked_dof_objects (const std::vector<const NumericVector<Number>*> &vecs,
-						     const unsigned int n_objects,
-						     const iterator_type begin,
-						     const iterator_type end,
-						     Xdr &io,
-						     const unsigned int var_to_write=libMesh::invalid_uint) const;
+  dof_id_type write_serialized_blocked_dof_objects (const std::vector<const NumericVector<Number>*> &vecs,
+						    const dof_id_type n_objects,
+						    const iterator_type begin,
+						    const iterator_type end,
+						    Xdr &io,
+						    const unsigned int var_to_write=libMesh::invalid_uint) const;
 
   /**
    * Writes the SCALAR dofs associated with var to the stream \p io.
+   *
+   * Returns the number of values written.
    */
   unsigned int write_SCALAR_dofs (const NumericVector<Number> &vec,
                                   const unsigned int var,
@@ -1592,9 +1600,11 @@ private:
   /**
    * Writes a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
+   *
+   * Returns the number of values written.
    */
-  unsigned int write_serialized_vector (Xdr& io,
-					const NumericVector<Number> &vec) const;
+  dof_id_type write_serialized_vector (Xdr& io,
+				       const NumericVector<Number> &vec) const;
 
   /**
    * Function that initializes the system.
@@ -1970,7 +1980,7 @@ void System::identify_variable_groups (const bool ivg)
 
 
 inline
-unsigned int System::n_active_dofs() const
+dof_id_type System::n_active_dofs() const
 {
   return this->n_dofs() - this->n_constrained_dofs();
 }

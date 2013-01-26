@@ -240,7 +240,7 @@ void EnsightIO::write_geometry_ascii()
 
       // Write element id
       for (unsigned int i = 0; i < elem_ref.size(); i++)
-	fprintf(fout,"%10d\n",elem_ref[i]->id());
+	fprintf(fout,"%10lu\n",static_cast<unsigned long>(elem_ref[i]->id()));
 
       // Write connectivity
       for (unsigned int i = 0; i < elem_ref.size(); i++)
@@ -382,8 +382,8 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
   int var = system.variable_number(var_name);
 
 
-  std::vector<unsigned int> dof_indices;
-  std::vector<unsigned int> dof_indices_scl;
+  std::vector<dof_id_type> dof_indices;
+  std::vector<dof_id_type> dof_indices_scl;
 
   // Now we will loop over all the elements in the mesh.
 
@@ -467,10 +467,10 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
   const unsigned int v_var = system.variable_number(vec[1]);
   const unsigned int w_var = (dim==3) ? system.variable_number(vec[2]) : 0;
 
-  std::vector<unsigned int> dof_indices;
-  std::vector<unsigned int> dof_indices_u;
-  std::vector<unsigned int> dof_indices_v;
-  std::vector<unsigned int> dof_indices_w;
+  std::vector<dof_id_type> dof_indices;
+  std::vector<dof_id_type> dof_indices_u;
+  std::vector<dof_id_type> dof_indices_v;
+  std::vector<dof_id_type> dof_indices_w;
 
   // Now we will loop over all the elements in the mesh.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();

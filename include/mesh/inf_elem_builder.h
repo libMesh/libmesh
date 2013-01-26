@@ -25,6 +25,7 @@
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 // Local includes
+#include "libmesh/id_types.h"
 #include "libmesh/point.h"
 
 // C++ includes
@@ -116,7 +117,7 @@ private:
 		       const bool y_sym = false,
 		       const bool z_sym = false,
 		       const bool be_verbose = false,
-		       std::set<std::pair<unsigned int,
+		       std::set<std::pair<dof_id_type,
 		                          unsigned int> >* inner_faces = NULL);
   /**
    * Reference to the mesh we're building infinite

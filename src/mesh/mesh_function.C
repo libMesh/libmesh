@@ -309,7 +309,7 @@ void MeshFunction::operator() (const Point& p,
 	      FEInterface::compute_data (dim, fe_type, element, data);
 
 	      // where the solution values for the var-th variable are stored
-	      std::vector<unsigned int> dof_indices;
+	      std::vector<dof_id_type> dof_indices;
 	      this->_dof_map.dof_indices (element, dof_indices, var);
 
 	      // interpolate the solution
@@ -427,7 +427,7 @@ void MeshFunction::gradient (const Point& p,
             point_fe->reinit(element, &point_list);
 
 	    // where the solution values for the var-th variable are stored
-	    std::vector<unsigned int> dof_indices;
+	    std::vector<dof_id_type> dof_indices;
 	    this->_dof_map.dof_indices (element, dof_indices, var);
 
 	    // interpolate the solution
@@ -541,7 +541,7 @@ void MeshFunction::hessian (const Point& p,
             point_fe->reinit(element, &point_list);
 
 	    // where the solution values for the var-th variable are stored
-	    std::vector<unsigned int> dof_indices;
+	    std::vector<dof_id_type> dof_indices;
 	    this->_dof_map.dof_indices (element, dof_indices, var);
 
 	    // interpolate the solution

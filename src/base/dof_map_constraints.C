@@ -253,8 +253,8 @@ using namespace libMesh;
 	fe->get_xyz();
       
       // The global DOF indices
-      std::vector<unsigned int> dof_indices;
-      // Side/edge DOF indices
+      std::vector<dof_id_type> dof_indices;
+      // Side/edge local DOF indices
       std::vector<unsigned int> side_dofs;
       
       // Iterate over all the elements in the range
@@ -278,7 +278,7 @@ using namespace libMesh;
 	      const std::vector<boundary_id_type>& bc_ids =
 		boundary_info.boundary_ids (elem, s);
 	      bool do_this_side = false;
-	      for (unsigned int i=0; i != bc_ids.size(); ++i)
+	      for (std::size_t i=0; i != bc_ids.size(); ++i)
 		if (b.count(bc_ids[i]))
 		  {
 		    do_this_side = true;
@@ -325,7 +325,7 @@ using namespace libMesh;
 	  // those fixed and project boundary faces,
 	  
 	  // Interpolate node values first
-	  unsigned int current_dof = 0;
+	  dof_id_type current_dof = 0;
 	  for (unsigned int n=0; n!= n_nodes; ++n)
 	    {
 	      // FIXME: this should go through the DofMap,
@@ -560,10 +560,10 @@ using namespace libMesh;
 			// fixed DoFs aren't test functions
 			if (dof_is_fixed[i])
 			  continue;
-			for (unsigned int sidej=0, freej=0;
+			for (std::size_t sidej=0, freej=0;
 			     sidej != side_dofs.size(); ++sidej)
 			  {
-			    unsigned int j = side_dofs[sidej];
+			    dof_id_type j = side_dofs[sidej];
 			    if (dof_is_fixed[j])
 			      Fe(freei) -= phi[i][qp] * phi[j][qp] *
 				JxW[qp] * Ue(j);
@@ -676,14 +676,14 @@ using namespace libMesh;
 		    for (unsigned int sidei=0, freei=0;
 			 sidei != side_dofs.size(); ++sidei)
 		      {
-			unsigned int i = side_dofs[sidei];
+			dof_id_type i = side_dofs[sidei];
 			// fixed DoFs aren't test functions
 			if (dof_is_fixed[i])
 			  continue;
 			for (unsigned int sidej=0, freej=0;
 			     sidej != side_dofs.size(); ++sidej)
 			  {
-			    unsigned int j = side_dofs[sidej];
+			    dof_id_type j = side_dofs[sidej];
 			    if (dof_is_fixed[j])
 			      Fe(freei) -= phi[i][qp] * phi[j][qp] *
 				JxW[qp] * Ue(j);
@@ -831,17 +831,17 @@ namespace libMesh
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
 
-unsigned int DofMap::n_constrained_dofs() const
+dof_id_type DofMap::n_constrained_dofs() const
 {
   parallel_only();
 
-  unsigned int n_dofs = this->n_local_constrained_dofs();
+  dof_id_type n_dofs = this->n_local_constrained_dofs();
   CommWorld.sum(n_dofs);
   return n_dofs;
 }
 
 
-unsigned int DofMap::n_local_constrained_dofs() const
+dof_id_type DofMap::n_local_constrained_dofs() const
 {
   const DofConstraints::const_iterator lower =
     _dof_constraints.lower_bound(this->first_dof()),
@@ -976,7 +976,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 
 
 
-void DofMap::add_constraint_row (const unsigned int dof_number,
+void DofMap::add_constraint_row (const dof_id_type dof_number,
 				 const DofConstraintRow& constraint_row,
                                  const Number constraint_rhs,
 				 const bool forbid_constraint_overwrite)
@@ -990,7 +990,7 @@ void DofMap::add_constraint_row (const unsigned int dof_number,
 	libmesh_error();
       }
 
-  std::pair<unsigned int, std::pair<DofConstraintRow,Number> > kv(dof_number, std::make_pair(constraint_row, constraint_rhs));
+  std::pair<dof_id_type, std::pair<DofConstraintRow,Number> > kv(dof_number, std::make_pair(constraint_row, constraint_rhs));
 
   _dof_constraints.insert(kv);
 }
@@ -1014,7 +1014,7 @@ void DofMap::print_dof_constraints(std::ostream& os,
       os << "Processor 0:\n";
       os << local_constraints;
 
-      for (unsigned int i=1; i<libMesh::n_processors(); ++i)
+      for (processor_id_type i=1; i<libMesh::n_processors(); ++i)
         {
           CommWorld.receive(i, local_constraints);
           os << "Processor " << i << ":\n";
@@ -1073,7 +1073,7 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
   for (DofConstraints::const_iterator it=_dof_constraints.begin();
        it != _dof_constraints.end(); ++it)
     {
-      const unsigned int i = it->first;
+      const dof_id_type i = it->first;
 
       // Skip non-local dofs if requested
       if (!print_nonlocal &&
@@ -1103,7 +1103,7 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
 
 
 void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
-				       std::vector<unsigned int>& elem_dofs,
+				       std::vector<dof_id_type>& elem_dofs,
 				       bool asymmetric_constraint_rows) const
 {
   libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
@@ -1176,7 +1176,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 
 void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 						  DenseVector<Number>& rhs,
-						  std::vector<unsigned int>& elem_dofs,
+						  std::vector<dof_id_type>& elem_dofs,
 						  bool asymmetric_constraint_rows) const
 {
   libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
@@ -1258,7 +1258,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 void DofMap::heterogenously_constrain_element_matrix_and_vector 
   (DenseMatrix<Number>& matrix,
    DenseVector<Number>& rhs,
-   std::vector<unsigned int>& elem_dofs,
+   std::vector<dof_id_type>& elem_dofs,
    bool asymmetric_constraint_rows) const
 {
   libmesh_assert_equal_to (elem_dofs.size(), matrix.m());
@@ -1344,8 +1344,8 @@ void DofMap::heterogenously_constrain_element_matrix_and_vector
 
 
 void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
-				       std::vector<unsigned int>& row_dofs,
-				       std::vector<unsigned int>& col_dofs,
+				       std::vector<dof_id_type>& row_dofs,
+				       std::vector<dof_id_type>& col_dofs,
 				       bool asymmetric_constraint_rows) const
 {
   libmesh_assert_equal_to (row_dofs.size(), matrix.m());
@@ -1362,8 +1362,8 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
   // Safeguard against the user passing us the same
   // object for row_dofs and col_dofs.  If that is done
   // the calls to build_matrix would fail
-  std::vector<unsigned int> orig_row_dofs(row_dofs);
-  std::vector<unsigned int> orig_col_dofs(col_dofs);
+  std::vector<dof_id_type> orig_row_dofs(row_dofs);
+  std::vector<dof_id_type> orig_col_dofs(col_dofs);
 
   this->build_constraint_matrix (R, orig_row_dofs);
   this->build_constraint_matrix (C, orig_col_dofs);
@@ -1427,7 +1427,7 @@ void DofMap::constrain_element_matrix (DenseMatrix<Number>& matrix,
 
 
 void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
-				       std::vector<unsigned int>& row_dofs,
+				       std::vector<dof_id_type>& row_dofs,
 				       bool) const
 {
   libmesh_assert_equal_to (rhs.size(), row_dofs.size());
@@ -1473,7 +1473,7 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 
 void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
 					    DenseVector<Number>& w,
-					    std::vector<unsigned int>& row_dofs,
+					    std::vector<dof_id_type>& row_dofs,
 					    bool) const
 {
   libmesh_assert_equal_to (v.size(), row_dofs.size());
@@ -1525,7 +1525,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
 
 
 
-void DofMap::constrain_nothing (std::vector<unsigned int>& dofs) const
+void DofMap::constrain_nothing (std::vector<dof_id_type>& dofs) const
 {
   // check for easy return
   if (this->_dof_constraints.empty())
@@ -1562,7 +1562,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
       v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
       v_built->close();
 
-      for (unsigned int i=v_built->first_local_index();
+      for (dof_id_type i=v_built->first_local_index();
            i<v_built->last_local_index(); i++)
         v_built->set(i, (*v)(i));
       v_built->close();
@@ -1605,7 +1605,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
 
   for ( ; c_it != c_end; ++c_it)
     {
-      unsigned int constrained_dof = c_it->first;
+      dof_id_type constrained_dof = c_it->first;
       if (constrained_dof < this->first_dof() ||
           constrained_dof >= this->end_dof())
         continue;
@@ -1656,7 +1656,7 @@ DofMap::max_constraint_error (const System &system,
   libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
   // indices on each element
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<dof_id_type> local_dof_indices;
 
   MeshBase::const_element_iterator       elem_it  =
     mesh.active_local_elements_begin();
@@ -1668,7 +1668,7 @@ DofMap::max_constraint_error (const System &system,
       const Elem* elem = *elem_it;
 
       this->dof_indices(elem, local_dof_indices);
-      std::vector<unsigned int> raw_dof_indices = local_dof_indices;
+      std::vector<dof_id_type> raw_dof_indices = local_dof_indices;
 
       // Constraint matrix for each element
       DenseMatrix<Number> C;
@@ -1685,7 +1685,7 @@ DofMap::max_constraint_error (const System &system,
       for (unsigned int i=0; i!=C.m(); ++i)
         {
           // Recalculate any constrained dof owned by this processor
-          unsigned int global_dof = raw_dof_indices[i];
+          dof_id_type global_dof = raw_dof_indices[i];
           if (this->is_constrained_dof(global_dof) &&
               global_dof >= vec.first_local_index() &&
               global_dof < vec.last_local_index())
@@ -1718,13 +1718,13 @@ DofMap::max_constraint_error (const System &system,
 
 
 void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
-				      std::vector<unsigned int>& elem_dofs,
+				      std::vector<dof_id_type>& elem_dofs,
 				      const bool called_recursively) const
 {
   if (!called_recursively) START_LOG("build_constraint_matrix()", "DofMap");
 
   // Create a set containing the DOFs we already depend on
-  typedef std::set<unsigned int> RCSet;
+  typedef std::set<dof_id_type> RCSet;
   RCSet dof_set;
 
   bool we_have_constraints = false;
@@ -1835,14 +1835,14 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 void DofMap::build_constraint_matrix_and_vector
   (DenseMatrix<Number>& C,
    DenseVector<Number>& H,
-   std::vector<unsigned int>& elem_dofs,
+   std::vector<dof_id_type>& elem_dofs,
    const bool called_recursively) const
 {
   if (!called_recursively)
     START_LOG("build_constraint_matrix_and_vector()", "DofMap");
 
   // Create a set containing the DOFs we already depend on
-  typedef std::set<unsigned int> RCSet;
+  typedef std::set<dof_id_type> RCSet;
   RCSet dof_set;
 
   bool we_have_constraints = false;
@@ -1987,10 +1987,10 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
   // which have support on other processors.
   // Push these out first.
   {
-  std::vector<std::set<unsigned int> > pushed_ids(libMesh::n_processors());
+  std::vector<std::set<dof_id_type> > pushed_ids(libMesh::n_processors());
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  std::vector<std::set<unsigned int> > pushed_node_ids(libMesh::n_processors());
+  std::vector<std::set<dof_id_type> > pushed_node_ids(libMesh::n_processors());
 #endif
 
   MeshBase::element_iterator
@@ -2002,7 +2002,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
     {
       Elem *elem = *foreign_elem_it;
 
-      std::vector<unsigned int> dof_indices;
+      std::vector<dof_id_type> dof_indices;
       this->dof_indices (elem, dof_indices);
 
       for (unsigned int i=0; i != dof_indices.size(); ++i)
@@ -2017,27 +2017,27 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
     }
 
   // Now trade constraint rows
-  for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p = 0; p != libMesh::n_processors(); ++p)
     {
       // Push to processor procup while receiving from procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
+      processor_id_type procup = (libMesh::processor_id() + p) %
+                                  libMesh::n_processors();
+      processor_id_type procdown = (libMesh::n_processors() +
+                                    libMesh::processor_id() - p) %
+                                    libMesh::n_processors();
 
       // Pack the dof constraint rows and rhs's to push to procup
-      const unsigned int pushed_ids_size = pushed_ids[procup].size();
-      std::vector<std::vector<unsigned int> > pushed_keys(pushed_ids_size);
+      const std::size_t pushed_ids_size = pushed_ids[procup].size();
+      std::vector<std::vector<dof_id_type> > pushed_keys(pushed_ids_size);
       std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
       std::vector<Number> pushed_rhss(pushed_ids_size);
-      std::set<unsigned int>::const_iterator it = pushed_ids[procup].begin();
-      for (unsigned int i = 0; it != pushed_ids[procup].end();
+      std::set<dof_id_type>::const_iterator it = pushed_ids[procup].begin();
+      for (std::size_t i = 0; it != pushed_ids[procup].end();
            ++i, ++it)
         {
-          const unsigned int pushed_id = *it;
+          const dof_id_type pushed_id = *it;
           DofConstraintRow &row = _dof_constraints[pushed_id].first;
-          unsigned int row_size = row.size();
+	  std::size_t row_size = row.size();
           pushed_keys[i].reserve(row_size);
           pushed_vals[i].reserve(row_size);
           for (DofConstraintRow::iterator j = row.begin();
@@ -2051,17 +2051,17 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Pack the node constraint rows to push to procup
-      const unsigned int pushed_nodes_size = pushed_node_ids[procup].size();
-      std::vector<std::vector<unsigned int> > pushed_node_keys(pushed_nodes_size);
+      const std::size_t pushed_nodes_size = pushed_node_ids[procup].size();
+      std::vector<std::vector<dof_id_type> > pushed_node_keys(pushed_nodes_size);
       std::vector<std::vector<Real> > pushed_node_vals(pushed_nodes_size);
       std::vector<Point> pushed_node_offsets(pushed_nodes_size);
-      std::set<unsigned int>::const_iterator node_it = pushed_node_ids[procup].begin();
-      for (unsigned int i = 0; node_it != pushed_node_ids[procup].end();
+      std::set<dof_id_type>::const_iterator node_it = pushed_node_ids[procup].begin();
+      for (std::size_t i = 0; node_it != pushed_node_ids[procup].end();
            ++i, ++node_it)
         {
           const Node *node = mesh.node_ptr(*node_it);
           NodeConstraintRow &row = _node_constraints[node].first;
-          unsigned int row_size = row.size();
+	  std::size_t row_size = row.size();
           pushed_node_keys[i].reserve(row_size);
           pushed_node_vals[i].reserve(row_size);
           for (NodeConstraintRow::iterator j = row.begin();
@@ -2075,10 +2075,10 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Trade pushed dof constraint rows
-      std::vector<unsigned int> pushed_ids_from_me
+      std::vector<dof_id_type> pushed_ids_from_me
         (pushed_ids[procup].begin(), pushed_ids[procup].end());
-      std::vector<unsigned int> pushed_ids_to_me;
-      std::vector<std::vector<unsigned int> > pushed_keys_to_me;
+      std::vector<dof_id_type> pushed_ids_to_me;
+      std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
       CommWorld.send_receive(procup, pushed_ids_from_me,
@@ -2095,10 +2095,10 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Trade pushed node constraint rows
-      std::vector<unsigned int> pushed_node_ids_from_me
+      std::vector<dof_id_type> pushed_node_ids_from_me
         (pushed_node_ids[procup].begin(), pushed_node_ids[procup].end());
-      std::vector<unsigned int> pushed_node_ids_to_me;
-      std::vector<std::vector<unsigned int> > pushed_node_keys_to_me;
+      std::vector<dof_id_type> pushed_node_ids_to_me;
+      std::vector<std::vector<dof_id_type> > pushed_node_keys_to_me;
       std::vector<std::vector<Real> > pushed_node_vals_to_me;
       std::vector<Point> pushed_node_offsets_to_me;
       CommWorld.send_receive(procup, pushed_node_ids_from_me,
@@ -2122,18 +2122,18 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Add the dof constraints that I've been sent
-      for (unsigned int i = 0; i != pushed_ids_to_me.size(); ++i)
+      for (std::size_t i = 0; i != pushed_ids_to_me.size(); ++i)
         {
           libmesh_assert_equal_to (pushed_keys_to_me[i].size(), pushed_vals_to_me[i].size());
 
-          unsigned int constrained = pushed_ids_to_me[i];
+          dof_id_type constrained = pushed_ids_to_me[i];
 
           // If we don't already have a constraint for this dof,
           // add the one we were sent
           if (!this->is_constrained_dof(constrained))
             {
               DofConstraintRow &row = _dof_constraints[constrained].first;
-              for (unsigned int j = 0; j != pushed_keys_to_me[i].size(); ++j)
+              for (std::size_t j = 0; j != pushed_keys_to_me[i].size(); ++j)
                 {
                   row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
                 }
@@ -2143,11 +2143,11 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Add the node constraints that I've been sent
-      for (unsigned int i = 0; i != pushed_node_ids_to_me.size(); ++i)
+      for (std::size_t i = 0; i != pushed_node_ids_to_me.size(); ++i)
         {
           libmesh_assert_equal_to (pushed_node_keys_to_me[i].size(), pushed_node_vals_to_me[i].size());
 
-          unsigned int constrained_id = pushed_node_ids_to_me[i];
+          dof_id_type constrained_id = pushed_node_ids_to_me[i];
 
           // If we don't already have a constraint for this node,
           // add the one we were sent
@@ -2155,7 +2155,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
           if (!this->is_constrained_node(constrained))
             {
               NodeConstraintRow &row = _node_constraints[constrained].first;
-              for (unsigned int j = 0; j != pushed_node_keys_to_me[i].size(); ++j)
+              for (std::size_t j = 0; j != pushed_node_keys_to_me[i].size(); ++j)
                 {
                   const Node *key_node = mesh.node_ptr(pushed_node_keys_to_me[i][j]);
                   libmesh_assert(key_node);
@@ -2172,7 +2172,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
   // to know about, requesting them recursively.
 
   // Create sets containing the DOFs and nodes we already depend on
-  typedef std::set<unsigned int> DoF_RCSet;
+  typedef std::set<dof_id_type> DoF_RCSet;
   DoF_RCSet unexpanded_dofs;
 
   for (DofConstraints::iterator i = _dof_constraints.begin();
@@ -2208,12 +2208,12 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
       Node_RCSet node_request_set;
 
       // Request sets to send to each processor
-      std::vector<std::vector<unsigned int> >
+      std::vector<std::vector<dof_id_type> >
         requested_dof_ids(libMesh::n_processors()),
         requested_node_ids(libMesh::n_processors());
 
       // And the sizes of each
-      std::vector<unsigned int>
+      std::vector<dof_id_type>
         dof_ids_on_proc(libMesh::n_processors(), 0),
         node_ids_on_proc(libMesh::n_processors(), 0);
 
@@ -2225,7 +2225,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
           for (DofConstraintRow::iterator j = row.begin();
                j != row.end(); ++j)
             {
-              const unsigned int constraining_dof = j->first;
+              const dof_id_type constraining_dof = j->first;
 
               // If it's non-local and we haven't already got a
               // constraint for it, we might need to ask for one
@@ -2262,7 +2262,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
       unexpanded_nodes.clear();
 
       // Count requests by processor
-      unsigned int proc_id = 0;
+      processor_id_type proc_id = 0;
       for (DoF_RCSet::iterator i = dof_request_set.begin();
            i != dof_request_set.end(); ++i)
         {
@@ -2279,7 +2279,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
           node_ids_on_proc[(*i)->processor_id()]++;
         }
 
-      for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
+      for (processor_id_type p = 0; p != libMesh::n_processors(); ++p)
         {
           requested_dof_ids[p].reserve(dof_ids_on_proc[p]);
           requested_node_ids[p].reserve(node_ids_on_proc[p]);
@@ -2302,24 +2302,24 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
         }
 
       // Now request constraint rows from other processors
-      for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+      for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
         {
           // Trade my requests with processor procup and procdown
-          unsigned int procup = (libMesh::processor_id() + p) %
-                                 libMesh::n_processors();
-          unsigned int procdown = (libMesh::n_processors() +
-                                   libMesh::processor_id() - p) %
-                                   libMesh::n_processors();
-          std::vector<unsigned int> dof_request_to_fill,
-                                    node_request_to_fill;
+          processor_id_type procup = (libMesh::processor_id() + p) %
+                                      libMesh::n_processors();
+          processor_id_type procdown = (libMesh::n_processors() +
+                                        libMesh::processor_id() - p) %
+                                        libMesh::n_processors();
+          std::vector<dof_id_type> dof_request_to_fill,
+                                   node_request_to_fill;
           CommWorld.send_receive(procup, requested_dof_ids[procup],
                                  procdown, dof_request_to_fill);
           CommWorld.send_receive(procup, requested_node_ids[procup],
                                  procdown, node_request_to_fill);
 
           // Fill those requests
-          std::vector<std::vector<unsigned int> > dof_row_keys(dof_request_to_fill.size()),
-                                                  node_row_keys(node_request_to_fill.size());
+          std::vector<std::vector<dof_id_type> > dof_row_keys(dof_request_to_fill.size()),
+                                                 node_row_keys(node_request_to_fill.size());
 
           // FIXME - this could be an unordered set, given a
           // hash<pointers> specialization
@@ -2329,13 +2329,13 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                                           node_row_vals(node_request_to_fill.size());
           std::vector<Number> dof_row_rhss(dof_request_to_fill.size());
           std::vector<Point>  node_row_rhss(node_request_to_fill.size());
-          for (unsigned int i=0; i != dof_request_to_fill.size(); ++i)
+          for (std::size_t i=0; i != dof_request_to_fill.size(); ++i)
             {
-              unsigned int constrained = dof_request_to_fill[i];
+              dof_id_type constrained = dof_request_to_fill[i];
               if (_dof_constraints.count(constrained))
                 {
                   DofConstraintRow &row = _dof_constraints[constrained].first;
-                  unsigned int row_size = row.size();
+		  std::size_t row_size = row.size();
                   dof_row_keys[i].reserve(row_size);
                   dof_row_vals[i].reserve(row_size);
                   for (DofConstraintRow::iterator j = row.begin();
@@ -2354,14 +2354,14 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
             }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-          for (unsigned int i=0; i != node_request_to_fill.size(); ++i)
+          for (std::size_t i=0; i != node_request_to_fill.size(); ++i)
             {
-              unsigned int constrained_id = node_request_to_fill[i];
+              dof_id_type constrained_id = node_request_to_fill[i];
               const Node *constrained_node = mesh.node_ptr(constrained_id);
               if (_node_constraints.count(constrained_node))
                 {
                   const NodeConstraintRow &row = _node_constraints[constrained_node].first;
-                  unsigned int row_size = row.size();
+		  std::size_t row_size = row.size();
                   node_row_keys[i].reserve(row_size);
                   node_row_vals[i].reserve(row_size);
                   for (NodeConstraintRow::const_iterator j = row.begin();
@@ -2389,8 +2389,8 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
           // Trade back the results
-          std::vector<std::vector<unsigned int> > dof_filled_keys,
-                                                  node_filled_keys;
+          std::vector<std::vector<dof_id_type> > dof_filled_keys,
+                                                 node_filled_keys;
           std::vector<std::vector<Real> > dof_filled_vals,
                                           node_filled_vals;
           std::vector<Number> dof_filled_rhss;
@@ -2424,15 +2424,15 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
           libmesh_assert_equal_to (node_filled_rhss.size(), requested_node_ids[procup].size());
 
           // Add any new constraint rows we've found
-          for (unsigned int i=0; i != requested_dof_ids[procup].size(); ++i)
+          for (std::size_t i=0; i != requested_dof_ids[procup].size(); ++i)
             {
               libmesh_assert_equal_to (dof_filled_keys[i].size(), dof_filled_vals[i].size());
               // FIXME - what about empty p constraints!?
               if (!dof_filled_keys[i].empty())
                 {
-                  unsigned int constrained = requested_dof_ids[procup][i];
+                  dof_id_type constrained = requested_dof_ids[procup][i];
                   DofConstraintRow &row = _dof_constraints[constrained].first;
-                  for (unsigned int j = 0; j != dof_filled_keys[i].size(); ++j)
+                  for (std::size_t j = 0; j != dof_filled_keys[i].size(); ++j)
                     row[dof_filled_keys[i][j]] = dof_filled_vals[i][j];
                   _dof_constraints[constrained].second = dof_filled_rhss[i];
 
@@ -2442,15 +2442,15 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
             }
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-          for (unsigned int i=0; i != requested_node_ids[procup].size(); ++i)
+          for (std::size_t i=0; i != requested_node_ids[procup].size(); ++i)
             {
               libmesh_assert_equal_to (node_filled_keys[i].size(), node_filled_vals[i].size());
               if (!node_filled_keys[i].empty())
                 {
-                  unsigned int constrained_id = requested_node_ids[procup][i];
+                  dof_id_type constrained_id = requested_node_ids[procup][i];
                   const Node* constrained_node = mesh.node_ptr(constrained_id);
                   NodeConstraintRow &row = _node_constraints[constrained_node].first;
-                  for (unsigned int j = 0; j != node_filled_keys[i].size(); ++j)
+                  for (std::size_t j = 0; j != node_filled_keys[i].size(); ++j)
                     {
                       const Node* key_node =
                         mesh.node_ptr(node_filled_keys[i][j]);
@@ -2485,7 +2485,7 @@ void DofMap::process_constraints (MeshBase& mesh)
     this->allgather_recursive_constraints(mesh);
 
   // Create a set containing the DOFs we already depend on
-  typedef std::set<unsigned int> RCSet;
+  typedef std::set<dof_id_type> RCSet;
   RCSet unexpanded_set;
 
   for (DofConstraints::iterator i = _dof_constraints.begin();
@@ -2506,7 +2506,7 @@ void DofMap::process_constraints (MeshBase& mesh)
 
 	Number& constraint_rhs = pos->second.second;
 
-	std::vector<unsigned int> constraints_to_expand;
+	std::vector<dof_id_type> constraints_to_expand;
 
 	for (DofConstraintRow::const_iterator
 	       it=constraint_row.begin(); it != constraint_row.end();
@@ -2517,10 +2517,10 @@ void DofMap::process_constraints (MeshBase& mesh)
 	      constraints_to_expand.push_back(it->first);
 	    }
 
-	for (unsigned int j = 0; j != constraints_to_expand.size();
+	for (std::size_t j = 0; j != constraints_to_expand.size();
 	     ++j)
 	  {
-            unsigned int expandable = constraints_to_expand[j];
+            dof_id_type expandable = constraints_to_expand[j];
 
             const Real this_coef = constraint_row[expandable];
 
@@ -2586,17 +2586,17 @@ void DofMap::scatter_constraints(MeshBase& mesh)
     return;
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  std::vector<std::set<unsigned int> > pushed_node_ids(libMesh::n_processors());
+  std::vector<std::set<dof_id_type> > pushed_node_ids(libMesh::n_processors());
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
-  std::vector<std::set<unsigned int> > pushed_ids(libMesh::n_processors());
+  std::vector<std::set<dof_id_type> > pushed_ids(libMesh::n_processors());
 
   // Collect the dof constraints I need to push to each processor
-  unsigned int constrained_proc_id = 0;
+  dof_id_type constrained_proc_id = 0;
   for (DofConstraints::iterator i = _dof_constraints.begin();
 	 i != _dof_constraints.end(); ++i)
     {
-      const unsigned int constrained = i->first;
+      const dof_id_type constrained = i->first;
       while (constrained >= _end_df[constrained_proc_id])
         constrained_proc_id++;
 
@@ -2607,9 +2607,9 @@ void DofMap::scatter_constraints(MeshBase& mesh)
       for (DofConstraintRow::iterator j = row.begin();
            j != row.end(); ++j)
         {
-          const unsigned int constraining = j->first;
+          const dof_id_type constraining = j->first;
 
-          unsigned int constraining_proc_id = 0;
+          processor_id_type constraining_proc_id = 0;
           while (constraining >= _end_df[constraining_proc_id])
             constraining_proc_id++;
 
@@ -2643,29 +2643,29 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   // Now trade constraint rows
-  for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p = 0; p != libMesh::n_processors(); ++p)
     {
       // Push to processor procup while receiving from procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
+      processor_id_type procup = (libMesh::processor_id() + p) %
+                                  libMesh::n_processors();
+      processor_id_type procdown = (libMesh::n_processors() +
+                                    libMesh::processor_id() - p) %
+                                    libMesh::n_processors();
 
       // Pack the dof constraint rows and rhs's to push to procup
-      const unsigned int pushed_ids_size = pushed_ids[procup].size();
-      std::vector<std::vector<unsigned int> > pushed_keys(pushed_ids_size);
+      const std::size_t pushed_ids_size = pushed_ids[procup].size();
+      std::vector<std::vector<dof_id_type> > pushed_keys(pushed_ids_size);
       std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
       std::vector<Number> pushed_rhss(pushed_ids_size);
 
-      std::set<unsigned int>::const_iterator it;
-      unsigned int push_i;
+      std::set<dof_id_type>::const_iterator it;
+      std::size_t push_i;
       for (push_i = 0, it = pushed_ids[procup].begin();
            it != pushed_ids[procup].end(); ++push_i, ++it)
         {
-          const unsigned int constrained = *it;
+          const dof_id_type constrained = *it;
           DofConstraintRow &row = _dof_constraints[constrained].first;
-          unsigned int row_size = row.size();
+	  std::size_t row_size = row.size();
           pushed_keys[push_i].reserve(row_size);
           pushed_vals[push_i].reserve(row_size);
           for (DofConstraintRow::iterator j = row.begin();
@@ -2679,8 +2679,8 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Pack the node constraint rows to push to procup
-      const unsigned int pushed_node_ids_size = pushed_node_ids[procup].size();
-      std::vector<std::vector<unsigned int> > pushed_node_keys(pushed_node_ids_size);
+      const std::size_t pushed_node_ids_size = pushed_node_ids[procup].size();
+      std::vector<std::vector<dof_id_type> > pushed_node_keys(pushed_node_ids_size);
       std::vector<std::vector<Real> > pushed_node_vals(pushed_node_ids_size);
       std::vector<Point> pushed_node_offsets(pushed_node_ids_size);
       std::set<const Node*> pushed_nodes;
@@ -2694,7 +2694,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
             pushed_nodes.insert(constrained);
 
           NodeConstraintRow &row = _node_constraints[constrained].first;
-          unsigned int row_size = row.size();
+	  std::size_t row_size = row.size();
           pushed_node_keys[push_i].reserve(row_size);
           pushed_node_vals[push_i].reserve(row_size);
           for (NodeConstraintRow::iterator j = row.begin();
@@ -2713,10 +2713,10 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Trade pushed dof constraint rows
-      std::vector<unsigned int> pushed_ids_from_me
+      std::vector<dof_id_type> pushed_ids_from_me
         (pushed_ids[procup].begin(), pushed_ids[procup].end());
-      std::vector<unsigned int> pushed_ids_to_me;
-      std::vector<std::vector<unsigned int> > pushed_keys_to_me;
+      std::vector<dof_id_type> pushed_ids_to_me;
+      std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
       CommWorld.send_receive(procup, pushed_ids_from_me,
@@ -2733,10 +2733,10 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Trade pushed node constraint rows
-      std::vector<unsigned int> pushed_node_ids_from_me
+      std::vector<dof_id_type> pushed_node_ids_from_me
         (pushed_node_ids[procup].begin(), pushed_node_ids[procup].end());
-      std::vector<unsigned int> pushed_node_ids_to_me;
-      std::vector<std::vector<unsigned int> > pushed_node_keys_to_me;
+      std::vector<dof_id_type> pushed_node_ids_to_me;
+      std::vector<std::vector<dof_id_type> > pushed_node_keys_to_me;
       std::vector<std::vector<Real> > pushed_node_vals_to_me;
       std::vector<Point> pushed_node_offsets_to_me;
       CommWorld.send_receive(procup, pushed_node_ids_from_me,
@@ -2760,18 +2760,18 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
       // Add the dof constraints that I've been sent
-      for (unsigned int i = 0; i != pushed_ids_to_me.size(); ++i)
+      for (std::size_t i = 0; i != pushed_ids_to_me.size(); ++i)
         {
           libmesh_assert_equal_to (pushed_keys_to_me[i].size(), pushed_vals_to_me[i].size());
 
-          unsigned int constrained = pushed_ids_to_me[i];
+          dof_id_type constrained = pushed_ids_to_me[i];
 
           // If we don't already have a constraint for this dof,
           // add the one we were sent
           if (!this->is_constrained_dof(constrained))
             {
               DofConstraintRow &row = _dof_constraints[constrained].first;
-              for (unsigned int j = 0; j != pushed_keys_to_me[i].size(); ++j)
+              for (std::size_t j = 0; j != pushed_keys_to_me[i].size(); ++j)
                 {
                   row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
                 }
@@ -2781,11 +2781,11 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       // Add the node constraints that I've been sent
-      for (unsigned int i = 0; i != pushed_node_ids_to_me.size(); ++i)
+      for (std::size_t i = 0; i != pushed_node_ids_to_me.size(); ++i)
         {
           libmesh_assert_equal_to (pushed_node_keys_to_me[i].size(), pushed_node_vals_to_me[i].size());
 
-          unsigned int constrained_id = pushed_node_ids_to_me[i];
+          dof_id_type constrained_id = pushed_node_ids_to_me[i];
 
           // If we don't already have a constraint for this node,
           // add the one we were sent
@@ -2793,7 +2793,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
           if (!this->is_constrained_node(constrained))
             {
               NodeConstraintRow &row = _node_constraints[constrained].first;
-              for (unsigned int j = 0; j != pushed_node_keys_to_me[i].size(); ++j)
+              for (std::size_t j = 0; j != pushed_node_keys_to_me[i].size(); ++j)
                 {
                   const Node *key_node = mesh.node_ptr(pushed_node_keys_to_me[i][j]);
                   libmesh_assert(key_node);
@@ -2816,20 +2816,20 @@ void DofMap::scatter_constraints(MeshBase& mesh)
   //
   // Getting distributed adaptive sparsity patterns right is hard.
 
-  typedef std::map<unsigned int, std::set<unsigned int> > DofConstrainsMap;
+  typedef std::map<dof_id_type, std::set<dof_id_type> > DofConstrainsMap;
   DofConstrainsMap dof_id_constrains;
 
   for (DofConstraints::iterator i = _dof_constraints.begin();
 	 i != _dof_constraints.end(); ++i)
     {
-      const unsigned int constrained = i->first;
+      const dof_id_type constrained = i->first;
       DofConstraintRow &row = i->second.first;
       for (DofConstraintRow::iterator j = row.begin();
            j != row.end(); ++j)
         {
-          const unsigned int constraining = j->first;
+          const dof_id_type constraining = j->first;
 
-          unsigned int constraining_proc_id = 0;
+          dof_id_type constraining_proc_id = 0;
           while (constraining >= _end_df[constraining_proc_id])
             constraining_proc_id++;
 
@@ -2849,10 +2849,10 @@ void DofMap::scatter_constraints(MeshBase& mesh)
     {
       const Elem *elem = *it;
 
-      std::vector<unsigned int> dof_indices;
+      std::vector<dof_id_type> dof_indices;
       this->dof_indices (elem, dof_indices);
 
-      for (unsigned int i=0; i != dof_indices.size(); ++i)
+      for (std::size_t i=0; i != dof_indices.size(); ++i)
         {
 	  DofConstrainsMap::const_iterator dcmi =
             dof_id_constrains.find(dof_indices[i]);
@@ -2862,13 +2862,13 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 		     dcmi->second.begin();
                    mti != dcmi->second.end(); ++mti)
                 {
-                  const unsigned int constrained = *mti;
+                  const dof_id_type constrained = *mti;
                   
-                  unsigned int constrained_proc_id = 0;
+                  dof_id_type constrained_proc_id = 0;
                   while (constrained >= _end_df[constrained_proc_id])
                     constrained_proc_id++;
 
-                  const unsigned int elemproc = elem->processor_id();
+                  const dof_id_type elemproc = elem->processor_id();
                   if (elemproc != constrained_proc_id)
                     pushed_ids[elemproc].insert(constrained);
                 }
@@ -2877,29 +2877,29 @@ void DofMap::scatter_constraints(MeshBase& mesh)
     }
 
   // One last trade of constraint rows
-  for (unsigned int p = 0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p = 0; p != libMesh::n_processors(); ++p)
     {
       // Push to processor procup while receiving from procdown
-      unsigned int procup = (libMesh::processor_id() + p) %
-                             libMesh::n_processors();
-      unsigned int procdown = (libMesh::n_processors() +
-                               libMesh::processor_id() - p) %
-                               libMesh::n_processors();
+      processor_id_type procup = (libMesh::processor_id() + p) %
+                                  libMesh::n_processors();
+      processor_id_type procdown = (libMesh::n_processors() +
+                                    libMesh::processor_id() - p) %
+                                    libMesh::n_processors();
 
       // Pack the dof constraint rows and rhs's to push to procup
-      const unsigned int pushed_ids_size = pushed_ids[procup].size();
-      std::vector<std::vector<unsigned int> > pushed_keys(pushed_ids_size);
+      const std::size_t pushed_ids_size = pushed_ids[procup].size();
+      std::vector<std::vector<dof_id_type> > pushed_keys(pushed_ids_size);
       std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
       std::vector<Number> pushed_rhss(pushed_ids_size);
 
-      std::set<unsigned int>::const_iterator it;
-      unsigned int push_i;
+      std::set<dof_id_type>::const_iterator it;
+      std::size_t push_i;
       for (push_i = 0, it = pushed_ids[procup].begin();
            it != pushed_ids[procup].end(); ++push_i, ++it)
         {
-          const unsigned int constrained = *it;
+          const dof_id_type constrained = *it;
           DofConstraintRow &row = _dof_constraints[constrained].first;
-          unsigned int row_size = row.size();
+	  std::size_t row_size = row.size();
           pushed_keys[push_i].reserve(row_size);
           pushed_vals[push_i].reserve(row_size);
           for (DofConstraintRow::iterator j = row.begin();
@@ -2912,10 +2912,10 @@ void DofMap::scatter_constraints(MeshBase& mesh)
         }
 
       // Trade pushed dof constraint rows
-      std::vector<unsigned int> pushed_ids_from_me
+      std::vector<dof_id_type> pushed_ids_from_me
         (pushed_ids[procup].begin(), pushed_ids[procup].end());
-      std::vector<unsigned int> pushed_ids_to_me;
-      std::vector<std::vector<unsigned int> > pushed_keys_to_me;
+      std::vector<dof_id_type> pushed_ids_to_me;
+      std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
       CommWorld.send_receive(procup, pushed_ids_from_me,
@@ -2931,18 +2931,18 @@ void DofMap::scatter_constraints(MeshBase& mesh)
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_rhss_to_me.size());
 
       // Add the dof constraints that I've been sent
-      for (unsigned int i = 0; i != pushed_ids_to_me.size(); ++i)
+      for (std::size_t i = 0; i != pushed_ids_to_me.size(); ++i)
         {
           libmesh_assert_equal_to (pushed_keys_to_me[i].size(), pushed_vals_to_me[i].size());
 
-          unsigned int constrained = pushed_ids_to_me[i];
+          dof_id_type constrained = pushed_ids_to_me[i];
 
           // If we don't already have a constraint for this dof,
           // add the one we were sent
           if (!this->is_constrained_dof(constrained))
             {
               DofConstraintRow &row = _dof_constraints[constrained].first;
-              for (unsigned int j = 0; j != pushed_keys_to_me[i].size(); ++j)
+              for (std::size_t j = 0; j != pushed_keys_to_me[i].size(); ++j)
                 {
                   row[pushed_keys_to_me[i][j]] = pushed_vals_to_me[i][j];
                 }
@@ -2972,7 +2972,7 @@ void DofMap::add_constraints_to_send_list()
   for (DofConstraints::iterator i = _dof_constraints.begin();
 	 i != _dof_constraints.end(); ++i)
     {
-      unsigned int constrained_dof = i->first;
+      dof_id_type constrained_dof = i->first;
 
       // We only need the dependencies of our own constrained dofs
       if (constrained_dof < this->first_dof() ||
@@ -2984,7 +2984,7 @@ void DofMap::add_constraints_to_send_list()
 	   j=constraint_row.begin(); j != constraint_row.end();
 	   ++j)
         {
-          unsigned int constraint_dependency = j->first;
+          dof_id_type constraint_dependency = j->first;
 
           // No point in adding one of our own dofs to the send_list
           if (constraint_dependency >= this->first_dof() &&

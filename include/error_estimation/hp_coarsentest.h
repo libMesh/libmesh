@@ -25,6 +25,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/hp_selector.h"
+#include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
 
 #include "libmesh/fe.h"         // MipsPro requires fe.h and quadrature.h in order to
@@ -110,7 +111,7 @@ protected:
   /**
    * Global DOF indices for fine elements
    */
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   /**
    * The finite element objects for fine and coarse elements

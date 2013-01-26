@@ -94,7 +94,7 @@ void HPCoarsenTest::add_projection(const System &system,
 
       for (unsigned int i=0; i != dof_indices.size(); i++)
         {
-          unsigned int dof_num = dof_indices[i];
+          dof_id_type dof_num = dof_indices[i];
           val += (*phi)[i][qp] *
             system.current_solution(dof_num);
           if (cont == C_ZERO || cont == C_ONE)
@@ -252,7 +252,7 @@ void HPCoarsenTest::select_refinement (System &system)
           if (elem->refinement_flag() != Elem::REFINE)
             continue;
 
-          const unsigned int e_id = elem->id();
+          const dof_id_type e_id = elem->id();
 
           // Find the projection onto the parent element,
           // if necessary
@@ -335,7 +335,7 @@ void HPCoarsenTest::select_refinement (System &system)
 
                   for (unsigned int i=0; i != dof_indices.size(); i++)
                     {
-                      unsigned int dof_num = dof_indices[i];
+                      dof_id_type dof_num = dof_indices[i];
                       val += (*phi)[i][qp] *
                         system.current_solution(dof_num);
                       if (cont == C_ZERO || cont == C_ONE)
@@ -386,7 +386,7 @@ void HPCoarsenTest::select_refinement (System &system)
               Tensor hessian_error;
               for (unsigned int i=0; i<n_dofs; i++)
                 {
-                  const unsigned int dof_num = dof_indices[i];
+                  const dof_id_type dof_num = dof_indices[i];
                   value_error += (*phi)[i][qp] *
                     system.current_solution(dof_num);
                   if (cont == C_ZERO || cont == C_ONE)
@@ -460,7 +460,7 @@ void HPCoarsenTest::select_refinement (System &system)
 
                   for (unsigned int i=0; i != n_dofs; ++i)
                     {
-                      const unsigned int dof_num = dof_indices[i];
+                      const dof_id_type dof_num = dof_indices[i];
                       value_error += (*phi)[i][qp] *
                         system.current_solution(dof_num);
                       if (cont == C_ZERO || cont == C_ONE)
@@ -518,7 +518,7 @@ void HPCoarsenTest::select_refinement (System &system)
       if (elem->refinement_flag() != Elem::REFINE)
         continue;
 
-      const unsigned int e_id = elem->id();
+      const dof_id_type e_id = elem->id();
 
       unsigned int dofs_per_elem = 0, dofs_per_p_elem = 0;
 

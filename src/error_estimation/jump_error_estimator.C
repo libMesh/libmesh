@@ -167,8 +167,8 @@ void JumpErrorEstimator::estimate_error (const System& system,
       this->initialize(system, error_per_cell, estimate_parent_error);
 
       // The global DOF indices for elements e & f
-      std::vector<unsigned int> dof_indices_fine;
-      std::vector<unsigned int> dof_indices_coarse;
+      std::vector<dof_id_type> dof_indices_fine;
+      std::vector<dof_id_type> dof_indices_coarse;
 
 
 
@@ -181,7 +181,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 	{
 	  // e is necessarily an active element on the local processor
 	  const Elem* e = *elem_it;
-	  const unsigned int e_id = e->id();
+	  const dof_id_type e_id = e->id();
 
 #ifdef LIBMESH_ENABLE_AMR
           // See if the parent of element e has been examined yet;
@@ -278,7 +278,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 	      if (e->neighbor(n_e) != NULL) // e is not on the boundary
 		{
 		  const Elem* f           = e->neighbor(n_e);
-		  const unsigned int f_id = f->id();
+		  const dof_id_type f_id = f->id();
 
 		  // Compute flux jumps if we are in case 1 or case 2.
 		  if ((f->active() && (f->level() == e->level()) && (e_id < f_id))
@@ -366,7 +366,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
   this->reduce_error(error_per_cell);
 
   // Compute the square-root of each component.
-  for (unsigned int i=0; i<error_per_cell.size(); i++)
+  for (std::size_t i=0; i<error_per_cell.size(); i++)
     if (error_per_cell[i] != 0.)
       error_per_cell[i] = std::sqrt(error_per_cell[i]);
 

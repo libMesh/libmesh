@@ -25,11 +25,11 @@ namespace libMesh
 {
 
 template <typename T>
-unsigned int SumShellMatrix<T>::m () const
+numeric_index_type SumShellMatrix<T>::m () const
 {
   libmesh_assert(!matrices.empty());
-  const unsigned int result = matrices[0]->m();
-  for(unsigned int i=matrices.size(); i-->1; )
+  const numeric_index_type result = matrices[0]->m();
+  for(numeric_index_type i=matrices.size(); i-->1; )
     {
       libmesh_assert_equal_to (matrices[i]->m(), result);
     }
@@ -39,11 +39,11 @@ unsigned int SumShellMatrix<T>::m () const
 
 
 template <typename T>
-unsigned int SumShellMatrix<T>::n () const
+numeric_index_type SumShellMatrix<T>::n () const
 {
   libmesh_assert(!matrices.empty());
-  const unsigned int result = matrices[0]->n();
-  for(unsigned int i=matrices.size(); i-->1; )
+  const numeric_index_type result = matrices[0]->n();
+  for(numeric_index_type i=matrices.size(); i-->1; )
     {
       libmesh_assert_equal_to (matrices[i]->n(), result);
     }
@@ -66,7 +66,7 @@ template <typename T>
 void SumShellMatrix<T>::vector_mult_add (NumericVector<T>& dest,
 					 const NumericVector<T>& arg) const
 {
-  for(unsigned int i=matrices.size(); i-->0; )
+  for(numeric_index_type i=matrices.size(); i-->0; )
     {
       matrices[i]->vector_mult_add(dest,arg);
     }
@@ -79,7 +79,7 @@ void SumShellMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 {
   AutoPtr<NumericVector<T> > a = dest.clone();
   dest.zero();
-  for(unsigned int i=matrices.size(); i-->0; )
+  for(numeric_index_type i=matrices.size(); i-->0; )
     {
       matrices[i]->get_diagonal(*a);
       dest += *a;

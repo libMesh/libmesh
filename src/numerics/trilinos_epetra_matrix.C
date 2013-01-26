@@ -46,12 +46,12 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
   // big trouble if this fails!
   libmesh_assert(this->_dof_map);
 
-  const unsigned int n_rows = sparsity_pattern.size();
+  const numeric_index_type n_rows = sparsity_pattern.size();
 
-  const unsigned int m   = this->_dof_map->n_dofs();
-  const unsigned int n   = m;
-  const unsigned int n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id());
-  const unsigned int m_l = n_l;
+  const numeric_index_type m   = this->_dof_map->n_dofs();
+  const numeric_index_type n   = m;
+  const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id());
+  const numeric_index_type m_l = n_l;
 
   // error checking
 #ifndef NDEBUG
@@ -59,7 +59,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
     libmesh_assert_equal_to (n, m);
     libmesh_assert_equal_to (n_l, m_l);
 
-    unsigned int
+    numeric_index_type
       summed_m_l = m_l,
       summed_n_l = n_l;
 
@@ -77,11 +77,11 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
 
-  libmesh_assert_equal_to (static_cast<unsigned int>(_map->NumGlobalPoints()), m);
-  libmesh_assert_equal_to (static_cast<unsigned int>(_map->MaxAllGID()+1), m);
+  libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
+  libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);
 
-  const std::vector<unsigned int>& n_nz = this->_dof_map->get_n_nz();
-  const std::vector<unsigned int>& n_oz = this->_dof_map->get_n_oz();
+  const std::vector<numeric_index_type>& n_nz = this->_dof_map->get_n_nz();
+  const std::vector<numeric_index_type>& n_oz = this->_dof_map->get_n_oz();
 
    // Make sure the sparsity pattern isn't empty
   libmesh_assert_equal_to (n_nz.size(), n_l);
@@ -90,7 +90,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
   // Epetra wants the total number of nonzeros, both local and remote.
   std::vector<int> n_nz_tot; /**/ n_nz_tot.reserve(n_nz.size());
 
-  for (unsigned int i=0; i<n_nz.size(); i++)
+  for (numeric_index_type i=0; i<n_nz.size(); i++)
     n_nz_tot.push_back(std::min(n_nz[i] + n_oz[i], n));
 
   if (m==0)
@@ -100,7 +100,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
 
   // Tell the matrix about its structure.  Initialize it
   // to zero.
-  for (unsigned int i=0; i<n_rows; i++)
+  for (numeric_index_type i=0; i<n_rows; i++)
     _graph->InsertGlobalIndices(_graph->GRID(i),
                                 sparsity_pattern[i].size(),
                                 const_cast<int *>((const int *)&sparsity_pattern[i][0]));
@@ -116,12 +116,12 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
 
 
 template <typename T>
-void EpetraMatrix<T>::init (const unsigned int m,
-			    const unsigned int n,
-			    const unsigned int m_l,
-			    const unsigned int n_l,
-			    const unsigned int nnz,
-			    const unsigned int noz)
+void EpetraMatrix<T>::init (const numeric_index_type m,
+			    const numeric_index_type n,
+			    const numeric_index_type m_l,
+			    const numeric_index_type n_l,
+			    const numeric_index_type nnz,
+			    const numeric_index_type noz)
 {
   if ((m==0) || (n==0))
     return;
@@ -143,7 +143,7 @@ void EpetraMatrix<T>::init (const unsigned int m,
     libmesh_assert_equal_to (n, m);
     libmesh_assert_equal_to (n_l, m_l);
 
-    unsigned int
+    numeric_index_type
       summed_m_l = m_l,
       summed_n_l = n_l;
 
@@ -161,8 +161,8 @@ void EpetraMatrix<T>::init (const unsigned int m,
                          0,
                          Epetra_MpiComm (libMesh::COMM_WORLD));
 
-  libmesh_assert_equal_to (static_cast<unsigned int>(_map->NumGlobalPoints()), m);
-  libmesh_assert_equal_to (static_cast<unsigned int>(_map->MaxAllGID()+1), m);
+  libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
+  libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);
 
   _mat = new Epetra_FECrsMatrix (Copy, *_map, nnz + noz);
 }
@@ -253,13 +253,13 @@ void EpetraMatrix<T>::print_matlab (const std::string) const
 
 template <typename T>
 void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				 const std::vector<unsigned int>& rows,
-				 const std::vector<unsigned int>& cols)
+				 const std::vector<numeric_index_type>& rows,
+				 const std::vector<numeric_index_type>& cols)
 {
   libmesh_assert (this->initialized());
 
-  const unsigned int m = dm.m();
-  const unsigned int n = dm.n();
+  const numeric_index_type m = dm.m();
+  const numeric_index_type n = dm.n();
 
   libmesh_assert_equal_to (rows.size(), m);
   libmesh_assert_equal_to (cols.size(), n);
@@ -339,50 +339,50 @@ void EpetraMatrix<T>::close () const
 
 
 template <typename T>
-unsigned int EpetraMatrix<T>::m () const
+numeric_index_type EpetraMatrix<T>::m () const
 {
   libmesh_assert (this->initialized());
 
-  return static_cast<unsigned int>(_mat->NumGlobalRows());
+  return static_cast<numeric_index_type>(_mat->NumGlobalRows());
 }
 
 
 
 template <typename T>
-unsigned int EpetraMatrix<T>::n () const
+numeric_index_type EpetraMatrix<T>::n () const
 {
   libmesh_assert (this->initialized());
 
-  return static_cast<unsigned int>(_mat->NumGlobalCols());
+  return static_cast<numeric_index_type>(_mat->NumGlobalCols());
 }
 
 
 
 template <typename T>
-unsigned int EpetraMatrix<T>::row_start () const
-{
-  libmesh_assert (this->initialized());
-  libmesh_assert(_map);
-
-  return static_cast<unsigned int>(_map->MinMyGID());
-}
-
-
-
-template <typename T>
-unsigned int EpetraMatrix<T>::row_stop () const
+numeric_index_type EpetraMatrix<T>::row_start () const
 {
   libmesh_assert (this->initialized());
   libmesh_assert(_map);
 
-  return static_cast<unsigned int>(_map->MaxMyGID())+1;
+  return static_cast<numeric_index_type>(_map->MinMyGID());
 }
 
 
 
 template <typename T>
-void EpetraMatrix<T>::set (const unsigned int i,
-			   const unsigned int j,
+numeric_index_type EpetraMatrix<T>::row_stop () const
+{
+  libmesh_assert (this->initialized());
+  libmesh_assert(_map);
+
+  return static_cast<numeric_index_type>(_map->MaxMyGID())+1;
+}
+
+
+
+template <typename T>
+void EpetraMatrix<T>::set (const numeric_index_type i,
+			   const numeric_index_type j,
 			   const T value)
 {
   libmesh_assert (this->initialized());
@@ -402,8 +402,8 @@ void EpetraMatrix<T>::set (const unsigned int i,
 
 
 template <typename T>
-void EpetraMatrix<T>::add (const unsigned int i,
-			   const unsigned int j,
+void EpetraMatrix<T>::add (const numeric_index_type i,
+			   const numeric_index_type j,
 			   const T value)
 {
   libmesh_assert (this->initialized());
@@ -421,7 +421,7 @@ void EpetraMatrix<T>::add (const unsigned int i,
 
 template <typename T>
 void EpetraMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
-				 const std::vector<unsigned int>& dof_indices)
+				 const std::vector<numeric_index_type>& dof_indices)
 {
   this->add_matrix (dm, dof_indices, dof_indices);
 }
@@ -447,8 +447,8 @@ void EpetraMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 
 
 template <typename T>
-T EpetraMatrix<T>::operator () (const unsigned int i,
-				const unsigned int j) const
+T EpetraMatrix<T>::operator () (const numeric_index_type i,
+				const numeric_index_type j) const
 {
   libmesh_assert (this->initialized());
   libmesh_assert(this->_mat);
@@ -470,7 +470,7 @@ T EpetraMatrix<T>::operator () (const unsigned int i,
   int *index = std::lower_bound (row_indices, row_indices+row_length, j);
 
   libmesh_assert_less (*index, row_length);
-  libmesh_assert_equal_to (static_cast<unsigned int>(row_indices[*index]), j);
+  libmesh_assert_equal_to (static_cast<numeric_index_type>(row_indices[*index]), j);
 
   //libMesh::out << "val=" << values[*index] << std::endl;
 

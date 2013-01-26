@@ -467,7 +467,7 @@ namespace {
           // multiple vector
           // FIXME - there should be a DofMap::constrain_element_vectors
           // to do this more efficiently
-          std::vector<unsigned int> original_dofs = _femcontext.dof_indices;
+          std::vector<dof_id_type> original_dofs = _femcontext.dof_indices;
 
           for (unsigned int i=0; i != _sys.qoi.size(); ++i)
             if (_qoi_indices.has_index(i))

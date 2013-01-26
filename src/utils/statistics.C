@@ -36,7 +36,7 @@ template <typename T>
 Real StatisticsVector<T>::l2_norm() const
 {
   Real normsq = 0.;
-  for (unsigned i = 0; i != this->size(); ++i)
+  for (dof_id_type i = 0; i != this->size(); ++i)
     normsq += ((*this)[i] * (*this)[i]);
 
   return std::sqrt(normsq);
@@ -78,11 +78,11 @@ Real StatisticsVector<T>::mean() const
 {
   START_LOG ("mean()", "StatisticsVector");
 
-  const unsigned int n = this->size();
+  const dof_id_type n = this->size();
 
   Real mean = 0;
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     {
       mean += ( static_cast<Real>((*this)[i]) - mean ) / (i + 1);
     }
@@ -98,7 +98,7 @@ Real StatisticsVector<T>::mean() const
 template <typename T>
 Real StatisticsVector<T>::median()
 {
-  const unsigned int n   = this->size();
+  const dof_id_type n   = this->size();
 
   if (n == 0)
     return 0.;
@@ -107,8 +107,8 @@ Real StatisticsVector<T>::median()
 
   std::sort(this->begin(), this->end());
 
-  const unsigned int lhs = (n-1) / 2;
-  const unsigned int rhs = n / 2;
+  const dof_id_type lhs = (n-1) / 2;
+  const dof_id_type rhs = n / 2;
 
   Real median = 0;
 
@@ -146,13 +146,13 @@ Real StatisticsVector<T>::median() const
 template <typename T>
 Real StatisticsVector<T>::variance(const Real mean) const
 {
-  const unsigned int n   = this->size();
+  const dof_id_type n   = this->size();
 
   START_LOG ("variance()", "StatisticsVector");
 
   Real variance = 0;
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     {
       const Real delta = ( static_cast<Real>((*this)[i]) - mean );
       variance += (delta * delta - variance) / (i + 1);
@@ -170,10 +170,10 @@ Real StatisticsVector<T>::variance(const Real mean) const
 template <typename T>
     void StatisticsVector<T>::normalize()
 {
-  const unsigned int n   = this->size();
+  const dof_id_type n   = this->size();
   const Real max = this->maximum();
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
   {
     (*this)[i] = static_cast<T>((*this)[i] / max);
   }
@@ -184,13 +184,13 @@ template <typename T>
 
 
 template <typename T>
-void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
+void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
 				    unsigned int n_bins)
 {
   // Must have at least 1 bin
   libmesh_assert (n_bins>0);
 
-  const unsigned int n   = this->size();
+  const dof_id_type n   = this->size();
 
   std::sort(this->begin(), this->end());
 
@@ -214,12 +214,12 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
   // This vector will store the number of members each bin has.
   bin_members.resize(n_bins);
 
-  unsigned int data_index = 0;
+  dof_id_type data_index = 0;
   for (unsigned int j=0; j<bin_members.size(); j++) // bin vector indexing
     {
       // libMesh::out << "(debug) Filling bin " << j << std::endl;
 
-      for (unsigned int i=data_index; i<n; i++) // data vector indexing
+      for (dof_id_type i=data_index; i<n; i++) // data vector indexing
 	{
 	  //	libMesh::out << "(debug) Processing index=" << i << std::endl;
 	  Real current_val = static_cast<Real>( (*this)[i] );
@@ -256,10 +256,10 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 
 #ifdef DEBUG
   // Check the number of binned entries
-  const unsigned int n_binned = std::accumulate(bin_members.begin(),
-						bin_members.end(),
-						static_cast<unsigned int>(0),
-						std::plus<unsigned int>());
+  const dof_id_type n_binned = std::accumulate(bin_members.begin(),
+					       bin_members.end(),
+					       static_cast<dof_id_type>(0),
+					       std::plus<dof_id_type>());
 
   if (n != n_binned)
     {
@@ -284,7 +284,7 @@ void StatisticsVector<T>::plot_histogram(const std::string& filename,
 					 unsigned int n_bins)
 {
   // First generate the histogram with the desired number of bins
-  std::vector<unsigned int> bin_members;
+  std::vector<dof_id_type> bin_members;
   this->histogram(bin_members, n_bins);
 
   // The max, min and bin size are used to generate x-axis values.
@@ -322,7 +322,7 @@ void StatisticsVector<T>::plot_histogram(const std::string& filename,
 
 
 template <typename T>
-void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
+void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
 				    unsigned int n_bins) const
 {
   StatisticsVector<T> sv = (*this);
@@ -334,16 +334,16 @@ void StatisticsVector<T>::histogram(std::vector<unsigned int>& bin_members,
 
 
 template <typename T>
-std::vector<unsigned int> StatisticsVector<T>::cut_below(Real cut) const
+std::vector<dof_id_type> StatisticsVector<T>::cut_below(Real cut) const
 {
   START_LOG ("cut_below()", "StatisticsVector");
 
-  const unsigned int n   = this->size();
+  const dof_id_type n   = this->size();
 
-  std::vector<unsigned int> cut_indices;
+  std::vector<dof_id_type> cut_indices;
   cut_indices.reserve(n/2);  // Arbitrary
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     {
       if ((*this)[i] < cut)
 	{
@@ -360,16 +360,16 @@ std::vector<unsigned int> StatisticsVector<T>::cut_below(Real cut) const
 
 
 template <typename T>
-std::vector<unsigned int> StatisticsVector<T>::cut_above(Real cut) const
+std::vector<dof_id_type> StatisticsVector<T>::cut_above(Real cut) const
 {
   START_LOG ("cut_above()", "StatisticsVector");
 
-  const unsigned int n   = this->size();
+  const dof_id_type n   = this->size();
 
-  std::vector<unsigned int> cut_indices;
+  std::vector<dof_id_type> cut_indices;
   cut_indices.reserve(n/2);  // Arbitrary
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     {
       if ((*this)[i] > cut)
 	{

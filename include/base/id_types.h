@@ -65,6 +65,11 @@ typedef uint32_t dof_id_type;
 #endif
 
 
+// We may want to specialize this later, but for now we'll assume
+// numeric vector indices are the same as dof indices
+typedef dof_id_type numeric_index_type;
+
+
 // Define processor id storage type.  We default to short to save
 // space, but expanding to support more than 2^16-2 procs should work
 // too.

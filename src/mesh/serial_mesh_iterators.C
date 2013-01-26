@@ -184,7 +184,7 @@ SerialMesh::local_not_level_elements_begin (const unsigned int level)
 
 // pid elements begin() accessor
 SerialMesh::element_iterator
-SerialMesh::pid_elements_begin (const unsigned int proc_id)
+SerialMesh::pid_elements_begin (const processor_id_type proc_id)
 {
   Predicates::PID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -214,7 +214,7 @@ SerialMesh::active_type_elements_begin (const ElemType type)
 
 // active pid elements begin() accessor
 SerialMesh::element_iterator
-SerialMesh::active_pid_elements_begin (const unsigned int proc_id)
+SerialMesh::active_pid_elements_begin (const processor_id_type proc_id)
 {
   Predicates::ActivePID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -233,7 +233,7 @@ SerialMesh::unpartitioned_elements_begin ()
 
 // subdomain elements begin() accessor
 SerialMesh::element_iterator
-SerialMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_id)
+SerialMesh::active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id)
 {
   Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(subdomain_id);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -243,7 +243,7 @@ SerialMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_
 
 // subdomain elements begin() accessor
 SerialMesh::element_iterator
-SerialMesh::active_subdomain_elements_begin (const unsigned int subdomain_id)
+SerialMesh::active_subdomain_elements_begin (const subdomain_id_type subdomain_id)
 {
   Predicates::ActiveSubdomain<elem_iterator_imp> p(subdomain_id);
   return element_iterator(_elements.begin(), _elements.end(), p);
@@ -407,7 +407,7 @@ SerialMesh::local_not_level_elements_begin (const unsigned int level) const
 
 // const pid begin() accessor
 SerialMesh::const_element_iterator
-SerialMesh::pid_elements_begin (const unsigned int proc_id) const
+SerialMesh::pid_elements_begin (const processor_id_type proc_id) const
 {
   Predicates::PID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -437,7 +437,7 @@ SerialMesh::active_type_elements_begin (const ElemType type) const
 
 // const active pid elements begin() accessor
 SerialMesh::const_element_iterator
-SerialMesh::active_pid_elements_begin (const unsigned int proc_id) const
+SerialMesh::active_pid_elements_begin (const processor_id_type proc_id) const
 {
   Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -456,7 +456,7 @@ SerialMesh::unpartitioned_elements_begin () const
 
 // subdomain elements begin() accessor
 SerialMesh::const_element_iterator
-SerialMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_id) const
+SerialMesh::active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id) const
 {
   Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -466,7 +466,7 @@ SerialMesh::active_local_subdomain_elements_begin (const unsigned int subdomain_
 
 // subdomain elements begin() accessor
 SerialMesh::const_element_iterator
-SerialMesh::active_subdomain_elements_begin (const unsigned int subdomain_id) const
+SerialMesh::active_subdomain_elements_begin (const subdomain_id_type subdomain_id) const
 {
   Predicates::ActiveSubdomain<const_elem_iterator_imp> p(subdomain_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
@@ -630,7 +630,7 @@ SerialMesh::local_not_level_elements_end (const unsigned int level)
 
 // pid end() accessor
 SerialMesh::element_iterator
-SerialMesh::pid_elements_end (const unsigned int proc_id)
+SerialMesh::pid_elements_end (const processor_id_type proc_id)
 {
   Predicates::PID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -660,7 +660,7 @@ SerialMesh::active_type_elements_end (const ElemType type)
 
 // active PID end() accessor
 SerialMesh::element_iterator
-SerialMesh::active_pid_elements_end (const unsigned int proc_id)
+SerialMesh::active_pid_elements_end (const processor_id_type proc_id)
 {
   Predicates::ActivePID<elem_iterator_imp> p(proc_id);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -679,7 +679,7 @@ SerialMesh::unpartitioned_elements_end ()
 
 // subdomain elements end() accessor
 SerialMesh::element_iterator
-SerialMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id)
+SerialMesh::active_local_subdomain_elements_end (const subdomain_id_type subdomain_id)
 {
   Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(subdomain_id);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -689,7 +689,7 @@ SerialMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id
 
 // subdomain elements end() accessor
 SerialMesh::element_iterator
-SerialMesh::active_subdomain_elements_end (const unsigned int subdomain_id)
+SerialMesh::active_subdomain_elements_end (const subdomain_id_type subdomain_id)
 {
   Predicates::ActiveSubdomain<elem_iterator_imp> p(subdomain_id);
   return element_iterator(_elements.end(), _elements.end(), p);
@@ -857,7 +857,7 @@ SerialMesh::local_not_level_elements_end (const unsigned int level) const
 
 // pid const end() accessor
 SerialMesh::const_element_iterator
-SerialMesh::pid_elements_end (const unsigned int proc_id) const
+SerialMesh::pid_elements_end (const processor_id_type proc_id) const
 {
   Predicates::PID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -887,7 +887,7 @@ SerialMesh::active_type_elements_end (const ElemType type) const
 
 // active PID end() accessor
 SerialMesh::const_element_iterator
-SerialMesh::active_pid_elements_end (const unsigned int proc_id) const
+SerialMesh::active_pid_elements_end (const processor_id_type proc_id) const
 {
   Predicates::ActivePID<const_elem_iterator_imp> p(proc_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -906,7 +906,7 @@ SerialMesh::unpartitioned_elements_end () const
 
 // subdomain elements end() accessor
 SerialMesh::const_element_iterator
-SerialMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id) const
+SerialMesh::active_local_subdomain_elements_end (const subdomain_id_type subdomain_id) const
 {
   Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -916,7 +916,7 @@ SerialMesh::active_local_subdomain_elements_end (const unsigned int subdomain_id
 
 // subdomain elements end() accessor
 SerialMesh::const_element_iterator
-SerialMesh::active_subdomain_elements_end (const unsigned int subdomain_id) const
+SerialMesh::active_subdomain_elements_end (const subdomain_id_type subdomain_id) const
 {
   Predicates::ActiveSubdomain<const_elem_iterator_imp> p(subdomain_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
@@ -959,7 +959,7 @@ SerialMesh::local_nodes_begin ()
 
 // pid nodes begin() accessor
 SerialMesh::node_iterator
-SerialMesh::pid_nodes_begin (const unsigned int proc_id)
+SerialMesh::pid_nodes_begin (const processor_id_type proc_id)
 {
   Predicates::PID<node_iterator_imp> p(proc_id);
   return node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -999,7 +999,7 @@ SerialMesh::local_nodes_begin () const
 
 // pid const nodes begin() accessor
 SerialMesh::const_node_iterator
-SerialMesh::pid_nodes_begin (const unsigned int proc_id) const
+SerialMesh::pid_nodes_begin (const processor_id_type proc_id) const
 {
   Predicates::PID<const_node_iterator_imp> p(proc_id);
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
@@ -1039,7 +1039,7 @@ SerialMesh::local_nodes_end ()
 
 // pid nodes end() accessor
 SerialMesh::node_iterator
-SerialMesh::pid_nodes_end (const unsigned int proc_id)
+SerialMesh::pid_nodes_end (const processor_id_type proc_id)
 {
   Predicates::PID<node_iterator_imp> p(proc_id);
   return node_iterator(_nodes.end(), _nodes.end(), p);
@@ -1079,7 +1079,7 @@ SerialMesh::local_nodes_end () const
 
 // pid const nodes end() accessor
 SerialMesh::const_node_iterator
-SerialMesh::pid_nodes_end (const unsigned int proc_id) const
+SerialMesh::pid_nodes_end (const processor_id_type proc_id) const
 {
   Predicates::PID<const_node_iterator_imp> p(proc_id);
   return const_node_iterator(_nodes.end(), _nodes.end(), p);

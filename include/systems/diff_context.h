@@ -25,6 +25,7 @@
 #include "libmesh/dense_submatrix.h"
 #include "libmesh/dense_subvector.h"
 #include "libmesh/dense_vector.h"
+#include "libmesh/id_types.h"
 
 // C++ includes
 #include <cstddef>
@@ -218,14 +219,14 @@ public:
   /**
    * Accessor for element dof indices
    */
-  const std::vector<unsigned int>& get_dof_indices() const
+  const std::vector<dof_id_type>& get_dof_indices() const
   { return dof_indices; }
 
   /**
    * Accessor for element dof indices of a particular variable corresponding
    * to the index argument.
    */
-  const std::vector<unsigned int>& get_dof_indices( unsigned int var ) const
+  const std::vector<dof_id_type>& get_dof_indices( unsigned int var ) const
   { return dof_indices_var[var]; }
 
   /**
@@ -342,8 +343,8 @@ public:
   /**
    * Global Degree of freedom index lists
    */
-  std::vector<unsigned int> dof_indices;
-  std::vector<std::vector<unsigned int> > dof_indices_var;
+  std::vector<dof_id_type> dof_indices;
+  std::vector<std::vector<dof_id_type> > dof_indices_var;
 
   /**
    * Points the _deltat member of this class at a timestep value

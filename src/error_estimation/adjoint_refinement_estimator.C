@@ -128,7 +128,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 #ifndef NDEBUG
   // n_coarse_elem is only used in an assertion later so
   // avoid declaring it unless asserts are active.
-  const unsigned int n_coarse_elem = mesh.n_elem();
+  const dof_id_type n_coarse_elem = mesh.n_elem();
 #endif
 
   // Uniformly refine the mesh
@@ -193,7 +193,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   if (split_shared_dofs) {
 
   // A map that relates a node id to an int that will tell us how many elements it is a node of
-  LIBMESH_BEST_UNORDERED_MAP<unsigned int, unsigned int>shared_element_count;
+  LIBMESH_BEST_UNORDERED_MAP<dof_id_type, unsigned int>shared_element_count;
 
   // To fill this map, we will loop over elements, and then in each element, we will loop
   // over the nodes each element contains, and then query it for the number of coarse
@@ -205,7 +205,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
 
   // Keep track of which nodes we have already dealt with
-  std::vector<unsigned int> processed_node_ids;
+  std::vector<dof_id_type> processed_node_ids;
 
   // Start loop over elems
   for(; elem_it != elem_end; ++elem_it)
@@ -220,14 +220,14 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	  Node* node = elem->get_node(n);
 
 	  // Get the id of this node
-	  unsigned int node_id = node->id();
+	  dof_id_type node_id = node->id();
 
 	  // A processed node flag
 	  bool processed_node = false;
 
 	  // Loop over existing processed nodes and see if 
 	  // we have already done this one
-	  for(unsigned int i = 0; i != processed_node_ids.size(); i++)
+	  for(std::size_t i = 0; i != processed_node_ids.size(); i++)
 	    {
 	      if(node_id == processed_node_ids[i])
 		{
@@ -245,7 +245,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	      elem->find_point_neighbors(*node, fine_grid_neighbor_set);
 	      
 	      // A vector to hold the coarse grid parents neighbors
-	      std::vector<unsigned int> coarse_grid_neighbors;
+	      std::vector<dof_id_type> coarse_grid_neighbors;
 	  
 	      // Iterators over the fine grid neighbors set
 	      std::set<const Elem*>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
@@ -268,8 +268,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	      
 		  // Loop over the existing coarse neighbors and check if this one is
 		  // already in there
-                  const unsigned int coarse_id = coarse_elem->id();
-                  unsigned int j = 0;
+                  const dof_id_type coarse_id = coarse_elem->id();
+		  std::size_t j = 0;
 		  for (; j != coarse_grid_neighbors.size(); j++)
 		    {
 		      // If the set already contains this element break out of the loop
@@ -307,7 +307,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   DofMap &dof_map = system.get_dof_map();
   
   // The global DOF indices, we will use these later on when we compute the element wise indicators
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   // Localize the global rhs and adjoint solution vectors (which might be shared on multiple processsors) onto a 
   // local ghosted vector, this ensures each processor has all the dof_indices to compute an error indicator for
@@ -351,7 +351,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 		  coarse = coarse->parent();
 		}
 
-              const unsigned int e_id = coarse->id();
+              const dof_id_type e_id = coarse->id();
 
 	      // Get the local to global degree of freedom maps for this element
 	      dof_map.dof_indices (elem, dof_indices);

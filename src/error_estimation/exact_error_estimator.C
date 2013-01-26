@@ -327,7 +327,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 	{
 	  // e is necessarily an active element on the local processor
 	  const Elem* elem = *elem_it;
-	  const unsigned int e_id = elem->id();
+	  const dof_id_type e_id = elem->id();
 
 #ifdef LIBMESH_ENABLE_AMR
           // See if the parent of element e has been examined yet;
@@ -362,7 +362,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 #endif
 
           // Get the local to global degree of freedom maps
-          std::vector<unsigned int> dof_indices;
+          std::vector<dof_id_type> dof_indices;
           dof_map.dof_indices (elem, dof_indices, var);
           DenseVector<Number> Uelem(dof_indices.size());
           for (unsigned int i=0; i != dof_indices.size(); ++i)
@@ -390,7 +390,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
   // Compute the square-root of each component.
   START_LOG("std::sqrt()", "ExactErrorEstimator");
-  for (unsigned int i=0; i<error_per_cell.size(); i++)
+  for (dof_id_type i=0; i<error_per_cell.size(); i++)
     {
 
       if (error_per_cell[i] != 0.)

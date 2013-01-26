@@ -66,7 +66,7 @@ public:
   Node  (const Real x=0,
 	 const Real y=0,
 	 const Real z=0,
-	 const unsigned int id = invalid_id);
+	 const dof_id_type id = invalid_id);
 
   /**
    * Copy-constructor.
@@ -77,7 +77,7 @@ public:
    * Copy-constructor from a \p Point.  Optionally assigned the \p id.
    */
   explicit Node (const Point& p,
-	         const unsigned int id = invalid_id);
+	         const dof_id_type id = invalid_id);
 
   /**
    * Destructor.
@@ -100,7 +100,7 @@ public:
    * to the newly-created object.  Optionally assignes the \p id.
    */
   static AutoPtr<Node> build (const Point& p,
-			      const unsigned int id);
+			      const dof_id_type id);
 
   /**
    * Builds a \p Node from specified points and returns an \p AutoPtr<Node>
@@ -109,7 +109,7 @@ public:
   static AutoPtr<Node> build (const Real x,
 			      const Real y,
 			      const Real z,
-			      const unsigned int id);
+			      const dof_id_type id);
 
   /**
    * @returns \p true if the node is active.  An active node is
@@ -148,8 +148,8 @@ public:
   {
     static const unsigned int header_size = 2;
 
-    unsigned int id;
-    unsigned int pid;
+    dof_id_type id;
+    processor_id_type pid;
     Real x;
 // FIXME: We should drop z (and y) if libMesh is built 2D (or 1D) only
     Real y;
@@ -248,7 +248,7 @@ inline
 Node::Node (const Real x,
 	    const Real y,
 	    const Real z,
-	    const unsigned int id) :
+	    const dof_id_type id) :
   Point(x,y,z)
 {
   this->set_id() = id;
@@ -268,7 +268,7 @@ Node::Node (const Node& n) :
 
 inline
 Node::Node (const Point& p,
-	    const unsigned int id) :
+	    const dof_id_type id) :
   Point(p)
 {
   // optionally assign the id.  We have
@@ -315,7 +315,7 @@ AutoPtr<Node> Node::build(const Node& n)
 
 inline
 AutoPtr<Node> Node::build(const Point& p,
-			  const unsigned int id)
+			  const dof_id_type id)
 {
 
   AutoPtr<Node> ap(new Node(p,id));
@@ -328,7 +328,7 @@ inline
 AutoPtr<Node> Node::build(const Real x,
 			  const Real y,
 			  const Real z,
-			  const unsigned int id)
+			  const dof_id_type id)
 {
   AutoPtr<Node> ap(new Node(x,y,z,id));
   return ap;

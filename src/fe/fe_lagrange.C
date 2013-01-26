@@ -653,7 +653,7 @@ namespace libMesh
       FEType fe_type = dof_map.variable_type(variable_number);
       fe_type.order = static_cast<Order>(fe_type.order + elem->p_level());
 
-      std::vector<unsigned int> my_dof_indices, parent_dof_indices;
+      std::vector<dof_id_type> my_dof_indices, parent_dof_indices;
 
       // Look at the element faces.  Check to see if we need to
       // build constraints.
@@ -692,7 +692,7 @@ namespace libMesh
 		  libmesh_assert_less (my_dof, my_side->n_nodes());
 
 		  // My global dof index.
-		  const unsigned int my_dof_g = my_dof_indices[my_dof];
+		  const dof_id_type my_dof_g = my_dof_indices[my_dof];
 
                   // Hunt for "constraining against myself" cases before
                   // we bother creating a constraint row
@@ -704,7 +704,7 @@ namespace libMesh
 		      libmesh_assert_less (their_dof, parent_side->n_nodes());
 
 		      // Their global dof index.
-		      const unsigned int their_dof_g =
+		      const dof_id_type their_dof_g =
 			parent_dof_indices[their_dof];
 
 		      if (their_dof_g == my_dof_g)
@@ -749,7 +749,7 @@ namespace libMesh
 		      libmesh_assert_less (their_dof, parent_side->n_nodes());
 
 		      // Their global dof index.
-		      const unsigned int their_dof_g =
+		      const dof_id_type their_dof_g =
 			parent_dof_indices[their_dof];
 
 		      const Real their_dof_value = FEInterface::shape(Dim-1,

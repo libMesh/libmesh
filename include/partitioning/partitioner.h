@@ -23,6 +23,7 @@
 // Local Includes -----------------------------------
 #include "libmesh/libmesh.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/id_types.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>
@@ -146,7 +147,7 @@ protected:
    * The blocksize to use when doing blocked parallel communication.  This limits the
    * maximum vector size which can be used in a single communication step.
    */
-  static const unsigned int communication_blocksize;
+  static const dof_id_type communication_blocksize;
 
   /**
    * The weights that might be used for partitioning.

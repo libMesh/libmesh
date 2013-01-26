@@ -71,7 +71,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
 
   const FEType& fe_type = dof_map.variable_type(var);
 
-  std::vector<unsigned int> dof_indices_var;
+  std::vector<dof_id_type> dof_indices_var;
   dof_map.dof_indices (&element, dof_indices_var, var);
 
   values.resize(mapped_qpoints.size());

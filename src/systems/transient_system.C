@@ -144,10 +144,10 @@ void TransientSystem<Base>::re_update ()
   // re_update the parent system
   Base::re_update ();
 
-  const std::vector<unsigned int>& send_list = this->get_dof_map().get_send_list ();
+  const std::vector<dof_id_type>& send_list = this->get_dof_map().get_send_list ();
 
-  const unsigned int first_local_dof = Base::get_dof_map().first_dof();
-  const unsigned int end_local_dof  = Base::get_dof_map().end_dof();
+  const dof_id_type first_local_dof = Base::get_dof_map().first_dof();
+  const dof_id_type end_local_dof  = Base::get_dof_map().end_dof();
 
   // Check sizes
   libmesh_assert_greater_equal (end_local_dof, first_local_dof);
@@ -174,7 +174,7 @@ void TransientSystem<Base>::re_update ()
 
 
 template <class Base>
-Number TransientSystem<Base>::old_solution (const unsigned int global_dof_number) const
+Number TransientSystem<Base>::old_solution (const dof_id_type global_dof_number) const
 {
   // Check the sizes
   libmesh_assert_less (global_dof_number, this->get_dof_map().n_dofs());
@@ -186,7 +186,7 @@ Number TransientSystem<Base>::old_solution (const unsigned int global_dof_number
 
 
 template <class Base>
-Number TransientSystem<Base>::older_solution (const unsigned int global_dof_number) const
+Number TransientSystem<Base>::older_solution (const dof_id_type global_dof_number) const
 {
   // Check the sizes
   libmesh_assert_less (global_dof_number, this->get_dof_map().n_dofs());

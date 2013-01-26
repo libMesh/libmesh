@@ -134,14 +134,14 @@ System::~System ()
 
 
 
-unsigned int System::n_dofs() const
+dof_id_type System::n_dofs() const
 {
   return _dof_map->n_dofs();
 }
 
 
 
-unsigned int System::n_constrained_dofs() const
+dof_id_type System::n_constrained_dofs() const
 {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
@@ -156,7 +156,7 @@ unsigned int System::n_constrained_dofs() const
 
 
 
-unsigned int System::n_local_constrained_dofs() const
+dof_id_type System::n_local_constrained_dofs() const
 {
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
@@ -171,14 +171,14 @@ unsigned int System::n_local_constrained_dofs() const
 
 
 
-unsigned int System::n_local_dofs() const
+dof_id_type System::n_local_dofs() const
 {
   return _dof_map->n_dofs_on_processor (libMesh::processor_id());
 }
 
 
 
-Number System::current_solution (const unsigned int global_dof_number) const
+Number System::current_solution (const dof_id_type global_dof_number) const
 {
   // Check the sizes
   libmesh_assert_less (global_dof_number, _dof_map->n_dofs());
@@ -343,7 +343,7 @@ void System::restrict_vectors ()
       }
     }
 
-  const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
+  const std::vector<dof_id_type>& send_list = _dof_map->get_send_list ();
 
   // Restrict the solution on the coarsened cells
   if (_solution_projection)
@@ -394,10 +394,10 @@ void System::reinit ()
   // Not true with ghosted vectors
   // libmesh_assert_equal_to (solution->size(), current_local_solution->local_size());
 
-  const unsigned int first_local_dof = solution->first_local_index();
-  const unsigned int local_size      = solution->local_size();
+  const dof_id_type first_local_dof = solution->first_local_index();
+  const dof_id_type local_size      = solution->local_size();
 
-  for (unsigned int i=0; i<local_size; i++)
+  for (dof_id_type i=0; i<local_size; i++)
     solution->set(i+first_local_dof,
 		  (*current_local_solution)(i+first_local_dof));
 
@@ -411,7 +411,7 @@ void System::update ()
 {
   libmesh_assert(solution->closed());
 
-  const std::vector<unsigned int>& send_list = _dof_map->get_send_list ();
+  const std::vector<dof_id_type>& send_list = _dof_map->get_send_list ();
 
   // Check sizes
   libmesh_assert_equal_to (current_local_solution->size(), solution->size());
@@ -436,7 +436,7 @@ void System::re_update ()
   if(!this->n_vars())
     return;
 
-  const std::vector<unsigned int>& send_list = this->get_dof_map().get_send_list ();
+  const std::vector<dof_id_type>& send_list = this->get_dof_map().get_send_list ();
 
   // Check sizes
   libmesh_assert_equal_to (current_local_solution->size(), solution->size());
@@ -1275,12 +1275,13 @@ void System::get_all_variable_numbers(std::vector<unsigned int>& all_variable_nu
 }
 
 
-void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & var_indices) const
+void System::local_dof_indices(const unsigned int var,
+			       std::set<dof_id_type> & var_indices) const
 {
   // Make sure the set is clear
   var_indices.clear();
 
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   // Begin the loop over the elements
   MeshBase::const_element_iterator       el     =
@@ -1288,7 +1289,7 @@ void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & 
   const MeshBase::const_element_iterator end_el =
     this->get_mesh().active_local_elements_end();
 
-  const unsigned int
+  const dof_id_type
     first_local = this->get_dof_map().first_dof(),
     end_local   = this->get_dof_map().end_dof();
 
@@ -1299,7 +1300,7 @@ void System::local_dof_indices(const unsigned int var, std::set<unsigned int> & 
 
       for(unsigned int i=0; i<dof_indices.size(); i++)
         {
-          unsigned int dof = dof_indices[i];
+          dof_id_type dof = dof_indices[i];
 
           //If the dof is owned by the local processor
           if(first_local <= dof && dof < end_local)
@@ -1331,7 +1332,7 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
 	unsigned int n_comp = node->n_comp(sys_num,var_num);
 	for(unsigned int i=0; i<n_comp; i++)
 	  {
-	    const unsigned int index = node->dof_number(sys_num,var_num,i);
+	    const dof_id_type index = node->dof_number(sys_num,var_num,i);
 	    v.set(index,0.0);
 	  }
       }
@@ -1347,7 +1348,7 @@ void System::zero_variable (NumericVector<Number>& v, unsigned int var_num) cons
 	unsigned int n_comp = elem->n_comp(sys_num,var_num);
 	for(unsigned int i=0; i<n_comp; i++)
 	  {
-	    const unsigned int index = elem->dof_number(sys_num,var_num,i);
+	    const dof_id_type index = elem->dof_number(sys_num,var_num,i);
 	    v.set(index,0.0);
 	  }
       }
@@ -1360,7 +1361,7 @@ Real System::discrete_var_norm(const NumericVector<Number>& v,
                                unsigned int var,
                                FEMNormType norm_type) const
 {
-  std::set<unsigned int> var_indices;
+  std::set<dof_id_type> var_indices;
   local_dof_indices(var, var_indices);
 
   if(norm_type == DISCRETE_L1)
@@ -1519,7 +1520,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
         d2phi = &(fe->get_d2phi());
 #endif
 
-      std::vector<unsigned int> dof_indices;
+      std::vector<dof_id_type> dof_indices;
 
       // Begin the loop over the elements
       MeshBase::const_element_iterator       el     =
@@ -1991,7 +1992,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
     u = point_value(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
-  unsigned int lowest_owner =
+  processor_id_type lowest_owner =
     (e && (e->processor_id() == libMesh::processor_id())) ?
     libMesh::processor_id() : libMesh::n_processors();
   CommWorld.min(lowest_owner);
@@ -2020,7 +2021,7 @@ Number System::point_value(unsigned int var, const Point &p, const Elem &e) cons
   const DofMap& dof_map = this->get_dof_map();
 
   // Need dof_indices for phi[i][j]
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   // Fill in the dof_indices for our element
   dof_map.dof_indices (&e, dof_indices, var);
@@ -2087,7 +2088,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
     grad_u = point_gradient(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
-  unsigned int lowest_owner =
+  processor_id_type lowest_owner =
     (e && (e->processor_id() == libMesh::processor_id())) ?
     libMesh::processor_id() : libMesh::n_processors();
   CommWorld.min(lowest_owner);
@@ -2117,7 +2118,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e)
   const DofMap& dof_map = this->get_dof_map();
 
   // Need dof_indices for phi[i][j]
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   // Fill in the dof_indices for our element
   dof_map.dof_indices (&e, dof_indices, var);
@@ -2185,7 +2186,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
     hess_u = point_hessian(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
-  unsigned int lowest_owner =
+  processor_id_type lowest_owner =
     (e && (e->processor_id() == libMesh::processor_id())) ?
     libMesh::processor_id() : libMesh::n_processors();
   CommWorld.min(lowest_owner);
@@ -2214,7 +2215,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) co
   const DofMap& dof_map = this->get_dof_map();
 
   // Need dof_indices for phi[i][j]
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   // Fill in the dof_indices for our element
   dof_map.dof_indices (&e, dof_indices, var);

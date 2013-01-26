@@ -58,13 +58,13 @@ public:
    * @returns \p m, the row-dimension of the matrix where the marix is
    * \f$ M \times N \f$.
    */
-  virtual unsigned int m () const;
+  virtual numeric_index_type m () const;
 
   /**
    * @returns \p n, the column-dimension of the matrix where the marix
    * is \f$ M \times N \f$.
    */
-  virtual unsigned int n () const;
+  virtual numeric_index_type n () const;
 
   /**
    * Multiplies the matrix with \p arg and stores the result in \p
@@ -114,7 +114,7 @@ SparseShellMatrix<T>::~SparseShellMatrix ()
 
 template <typename T>
 inline
-unsigned int SparseShellMatrix<T>::m () const
+numeric_index_type SparseShellMatrix<T>::m () const
 {
   return _m.m();
 }
@@ -123,7 +123,7 @@ unsigned int SparseShellMatrix<T>::m () const
 
 template <typename T>
 inline
-unsigned int SparseShellMatrix<T>::n () const
+numeric_index_type SparseShellMatrix<T>::n () const
 {
   return _m.n();
 }

@@ -44,10 +44,10 @@ ErrorVectorReal ErrorVector::minimum() const
 {
   START_LOG ("minimum()", "ErrorVector");
 
-  const unsigned int n = this->size();
+  const dof_id_type n = this->size();
   ErrorVectorReal min = std::numeric_limits<ErrorVectorReal>::max();
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     {
       // Only positive (or zero) values in the error vector
       libmesh_assert_greater_equal ((*this)[i], 0.);
@@ -68,12 +68,12 @@ Real ErrorVector::mean() const
 {
   START_LOG ("mean()", "ErrorVector");
 
-  const unsigned int n = this->size();
+  const dof_id_type n = this->size();
 
   Real mean  = 0;
-  unsigned int nnz = 0;
+  dof_id_type nnz = 0;
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
 	mean += ( static_cast<Real>((*this)[i]) - mean ) / (nnz + 1);
@@ -91,7 +91,7 @@ Real ErrorVector::mean() const
 
 Real ErrorVector::median()
 {
-  const unsigned int n   = this->size();
+  const dof_id_type n   = this->size();
 
   if (n == 0)
     return 0.;
@@ -103,7 +103,7 @@ Real ErrorVector::median()
 
   sv.reserve (n);
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     if(this->is_active_elem(i))
       sv.push_back((*this)[i]);
 
@@ -125,14 +125,14 @@ Real ErrorVector::median() const
 
 Real ErrorVector::variance(const Real mean) const
 {
-  const unsigned int n   = this->size();
+  const dof_id_type n   = this->size();
 
   START_LOG ("variance()", "ErrorVector");
 
   Real variance = 0;
-  unsigned int nnz = 0;
+  dof_id_type nnz = 0;
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
 	const Real delta = ( static_cast<Real>((*this)[i]) - mean );
@@ -149,16 +149,16 @@ Real ErrorVector::variance(const Real mean) const
 
 
 
-std::vector<unsigned int> ErrorVector::cut_below(Real cut) const
+std::vector<dof_id_type> ErrorVector::cut_below(Real cut) const
 {
   START_LOG ("cut_below()", "ErrorVector");
 
-  const unsigned int n = this->size();
+  const dof_id_type n = this->size();
 
-  std::vector<unsigned int> cut_indices;
+  std::vector<dof_id_type> cut_indices;
   cut_indices.reserve(n/2);  // Arbitrary
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
 	if ((*this)[i] < cut)
@@ -175,16 +175,16 @@ std::vector<unsigned int> ErrorVector::cut_below(Real cut) const
 
 
 
-std::vector<unsigned int> ErrorVector::cut_above(Real cut) const
+std::vector<dof_id_type> ErrorVector::cut_above(Real cut) const
 {
   START_LOG ("cut_above()", "ErrorVector");
 
-  const unsigned int n   = this->size();
+  const dof_id_type n   = this->size();
 
-  std::vector<unsigned int> cut_indices;
+  std::vector<dof_id_type> cut_indices;
   cut_indices.reserve(n/2);  // Arbitrary
 
-  for (unsigned int i=0; i<n; i++)
+  for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
 	if ((*this)[i] > cut)
@@ -200,7 +200,7 @@ std::vector<unsigned int> ErrorVector::cut_above(Real cut) const
 
 
 
-bool ErrorVector::is_active_elem (unsigned int i) const
+bool ErrorVector::is_active_elem (dof_id_type i) const
 {
   libmesh_assert_less (i, this->size());
 
@@ -232,7 +232,7 @@ void ErrorVector::plot_error(const std::string& filename,
     mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el =
     mesh.active_local_elements_end();
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   for ( ; el != end_el; ++el)
   {
@@ -240,10 +240,10 @@ void ErrorVector::plot_error(const std::string& filename,
 
     error_dof_map.dof_indices(elem, dof_indices);
 
-    const unsigned int elem_id = elem->id();
+    const dof_id_type elem_id = elem->id();
 
     //0 for the monomial basis
-    const unsigned int solution_index = dof_indices[0];
+    const dof_id_type solution_index = dof_indices[0];
 
     // libMesh::out << "elem_number=" << elem_number << std::endl;
     libmesh_assert_less (elem_id, (*this).size());

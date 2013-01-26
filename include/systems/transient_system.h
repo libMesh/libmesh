@@ -99,13 +99,13 @@ public:
    * @returns the old solution (at the previous timestep)
    * for the specified global DOF.
    */
-  Number old_solution (const unsigned int global_dof_number) const;
+  Number old_solution (const dof_id_type global_dof_number) const;
 
   /**
    * @returns the older solution (two timesteps ago)
    * for the specified global DOF.
    */
-  Number older_solution (const unsigned int global_dof_number) const;
+  Number older_solution (const dof_id_type global_dof_number) const;
 
   /**
    * All the values I need to compute my contribution
