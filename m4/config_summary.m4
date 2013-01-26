@@ -73,6 +73,7 @@ echo '  ghosted vectors.................. :' $enableghosted
 echo '  high-order shape functions....... :' $enablepfem
 echo '  id size (boundaries)............. :' $boundary_bytes bytes
 echo '  id size (dofs)................... :' $dof_bytes bytes
+echo '  id size (processors)............. :' $processor_bytes bytes
 echo '  id size (subdomains)............. :' $subdomain_bytes bytes
 echo '  infinite elements................ :' $enableifem
 echo '  Dirichlet constraints............ :' $enabledirichlet

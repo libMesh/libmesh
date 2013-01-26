@@ -26409,7 +26409,7 @@ $as_echo "configuring size of dof_id... $dof_bytes" >&6; }
 if test "${with_processor_id_bytes+set}" = set; then :
   withval=$with_processor_id_bytes; processor_bytes="$withval"
 else
-  processor_bytes=4
+  processor_bytes=2
 fi
 
 
@@ -26440,7 +26440,7 @@ $as_echo ">>> unrecognized processor_id size: $processor_bytes - configuring siz
 
 $as_echo "#define PROCESSOR_ID_BYTES 2" >>confdefs.h
 
-	processor_bytes=4
+	processor_bytes=2
 	;;
 esac
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: configuring size of processor_id... $processor_bytes" >&5
@@ -35831,6 +35831,7 @@ echo '  ghosted vectors.................. :' $enableghosted
 echo '  high-order shape functions....... :' $enablepfem
 echo '  id size (boundaries)............. :' $boundary_bytes bytes
 echo '  id size (dofs)................... :' $dof_bytes bytes
+echo '  id size (processors)............. :' $processor_bytes bytes
 echo '  id size (subdomains)............. :' $subdomain_bytes bytes
 echo '  infinite elements................ :' $enableifem
 echo '  Dirichlet constraints............ :' $enabledirichlet
