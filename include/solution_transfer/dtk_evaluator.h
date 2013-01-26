@@ -18,6 +18,8 @@
 
 #include <string>
 
+namespace libMesh {
+
 class DTKEvaluator : public DataTransferKit::FieldEvaluator<int,DataTransferKit::FieldContainer<double> >
 {
 public:
@@ -39,6 +41,8 @@ protected:
   unsigned int var_num;
   const FEType& fe_type;
 };
+
+} // namespace libMesh
 
 #endif
 

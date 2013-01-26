@@ -14,6 +14,9 @@
 
 #include <vector>
 
+namespace libMesh
+{
+
 DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, EquationSystems & in_es):
     comm(in_comm),
     es(in_es),
@@ -259,5 +262,7 @@ DTKAdapter::get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes)
       semi_local_nodes.insert(elem.node(j));
   }
 }
+
+} // namespace libMesh
 
 #endif

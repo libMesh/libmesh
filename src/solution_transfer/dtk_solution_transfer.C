@@ -20,6 +20,8 @@
 #include <DTK_CommTools.hpp>
 #include <DTK_CommIndexer.hpp>
 
+namespace libMesh {
+
 DTKSolutionTransfer::DTKSolutionTransfer()
 {
   comm_default = Teuchos::DefaultComm<int>::getComm();
@@ -79,5 +81,7 @@ DTKSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var
 
   to_adapter->update_variable_values(to_var.name());
 }
+
+} // namespace libMesh
 
 #endif

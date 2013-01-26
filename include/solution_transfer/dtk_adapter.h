@@ -18,6 +18,8 @@
 #include <Teuchos_RCP.hpp>
 #include <Teuchos_ArrayRCP.hpp>
 
+namespace libMesh {
+
 class DTKAdapter
 {
 public:
@@ -78,6 +80,8 @@ protected:
   /// Map of variable names to RCP_Evaluator objects
   std::map<std::string, RCP_Evaluator> evaluators;
 };
+
+} // namespace libMesh
 
 #endif
 

@@ -17,6 +17,8 @@
 
 #include <string>
 
+namespace libMesh {
+
 /**
  * Implementation of a SolutionTransfer object that uses the DataTransferKit (https://github.com/CNERG/DataTransferKit) to transfer variables back and forth between systems.
  */
@@ -50,6 +52,8 @@ protected:
   /// The dtk shared domain maps for pairs of EquationSystems (from, to)
   std::map<std::pair<EquationSystems *, EquationSystems *>, shared_domain_map_type * > dtk_maps;
 };
+
+} // namespace libMesh
 
 #endif
 

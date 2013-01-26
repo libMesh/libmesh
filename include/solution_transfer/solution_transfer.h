@@ -7,6 +7,8 @@
 #include <string>
 #include <map>
 
+namespace libMesh {
+
 /**
  * Base class for objects that allow transfering variable values between different systems with different meshes.
  */
@@ -24,5 +26,7 @@ public:
    */
   virtual void transfer(const Variable & from_var, const Variable & to_var) = 0;
 };
+
+} // namespace libMesh
 
 #endif

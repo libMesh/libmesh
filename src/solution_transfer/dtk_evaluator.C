@@ -11,6 +11,8 @@
 
 #include <string>
 
+namespace libMesh {
+
 DTKEvaluator::DTKEvaluator(System & in_sys, std::string var_name):
     sys(in_sys),
     current_local_solution(*sys.current_local_solution),
@@ -57,5 +59,7 @@ DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int>& elements, const Teuchos::Ar
 
   return evaluations;
 }
+
+} // namespace libMesh
 
 #endif
