@@ -862,7 +862,8 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       // local objects in [first_object,last_object).
       const dof_id_type 
 	first_object = blk*io_blksize,
-	last_object  = std::min((blk+1)*io_blksize,n_objects);
+	last_object  = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
+				n_objects);
 
       // convenience
       std::vector<dof_id_type> &ids  (xfer_ids[blk]);
@@ -919,7 +920,8 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       // local objects in [first_object,last_object).
       const dof_id_type 
 	first_object  = blk*io_blksize,
-	last_object   = std::min((blk+1)*io_blksize,n_objects),
+	last_object   = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
+				 n_objects),
 	n_objects_blk = last_object - first_object;
 
       // Processor 0 has a special job.  It needs to gather the requested indices
@@ -1826,7 +1828,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
   
   for (iterator_type it=begin; it!=end; ++it)
     {
-      const unsigned int
+      const dof_id_type
 	id    = (*it)->id(),
 	block = id/io_blksize;
       
@@ -1853,9 +1855,10 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).
-      const unsigned int 
+      const dof_id_type
 	first_object = blk*io_blksize,
-	last_object  = std::min((blk+1)*io_blksize,n_objects);
+	last_object  = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
+				n_objects);
 
       // convenience
       std::vector<dof_id_type> &ids  (xfer_ids[blk]);
@@ -1930,9 +1933,10 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	{
 	  // Each processor should build up its transfer buffers for its
 	  // local objects in [first_object,last_object).
-	  const unsigned int 
+	  const dof_id_type
 	    first_object  = blk*io_blksize,
-	    last_object   = std::min((blk+1)*io_blksize,n_objects),
+	    last_object   = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
+				     n_objects),
 	    n_objects_blk = last_object - first_object;
 
 	  // offset array. this will define where each object's values
@@ -1940,7 +1944,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	  // 0-initialized because 0-component objects are not actually sent
 	  obj_val_offsets.resize (n_objects_blk); /**/ std::fill (obj_val_offsets.begin(), obj_val_offsets.end(), 0);
 	  
-	  unsigned int n_val_recvd_blk=0;
+	  dof_id_type n_val_recvd_blk=0;
 	  
 	  // tags to select data received
 	  Parallel::MessageTag id_tag  (Parallel::Communicator_World.get_unique_tag(100*num_blks + blk));

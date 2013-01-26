@@ -361,7 +361,8 @@ Elem* ParallelMesh::add_elem (Elem *e)
       // Advance next_ids up high enough that each is pointing to an
       // unused id and any subsequent increments will still point us
       // to unused ids
-      _max_elem_id = std::max(_max_elem_id, e->id()+1);
+      _max_elem_id = std::max(_max_elem_id,
+			      static_cast<dof_id_type>(e->id()+1));
 
       if (_next_free_unpartitioned_elem_id < _max_elem_id)
         _next_free_unpartitioned_elem_id =
@@ -516,7 +517,8 @@ Node* ParallelMesh::add_node (Node *n)
       // Advance next_ids up high enough that each is pointing to an
       // unused id and any subsequent increments will still point us
       // to unused ids
-      _max_node_id = std::max(_max_node_id, n->id()+1);
+      _max_node_id = std::max(_max_node_id,
+			      static_cast<dof_id_type>(n->id()+1));
 
       if (_next_free_unpartitioned_node_id < _max_node_id)
         _next_free_unpartitioned_node_id =

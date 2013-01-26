@@ -339,7 +339,9 @@ mesh
 
       for (dof_id_type blk=0, last_elem_id=0; last_elem_id<max_elem_id; blk++)
 	{
- 	                      last_elem_id = std::min((blk+1)*communication_blocksize, max_elem_id);
+ 	  last_elem_id =
+	    std::min(static_cast<dof_id_type>((blk+1)*communication_blocksize),
+		     max_elem_id);
 	  const dof_id_type first_elem_id = blk*communication_blocksize;
 
 	  std::fill (parent_processor_ids.begin(),
