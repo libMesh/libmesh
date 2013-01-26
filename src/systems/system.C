@@ -869,17 +869,17 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
 {
   const_vectors_iterator v = vectors_begin();
   const_vectors_iterator v_end = vectors_end();
-  
+
   for(; v != v_end; ++v)
     {
       // Check if the current vector is the one whose name we want
       if(&vec_reference == v->second)
 	break; // exit loop if it is
     }
-  
+
   // Before returning, make sure we didnt loop till the end and not find any match
   libmesh_assert (v != v_end);
-  
+
   // Return the string associated with the current vector
   return v->first;
 }
@@ -1084,7 +1084,7 @@ unsigned int System::add_variable (const std::string& var,
       {
 	if (this->variable_type(v) == type)
 	  return _variables[v].number();
-	  
+
 	libMesh::err << "ERROR: incompatible variable "
 		     << var
 		     << " has already been added for this system!"
@@ -1093,26 +1093,26 @@ unsigned int System::add_variable (const std::string& var,
       }
 
   // Optimize for VariableGroups here - if the user is adding multiple
-  // variables of the same FEType and subdomain restriction, catch 
+  // variables of the same FEType and subdomain restriction, catch
   // that here and add them as members of the same VariableGroup.
-  // 
+  //
   // start by setting this flag to whatever the user has requested
   // and then consider the conditions which should negate it.
   bool should_be_in_vg = this->identify_variable_groups();
-  
+
   // No variable groups, nothing to add to
   if (!this->n_variable_groups())
     should_be_in_vg = false;
-  
+
   else
     {
       VariableGroup &vg(_variable_groups.back());
-      
+
       // get a pointer to their subdomain restriction, if any.
-      const std::set<subdomain_id_type> * const 
-	their_active_subdomains (vg.implicitly_active() ? 
+      const std::set<subdomain_id_type> * const
+	their_active_subdomains (vg.implicitly_active() ?
 				 NULL : &vg.active_subdomains());
-      
+
       // Different types?
       if (vg.type() != type)
 	should_be_in_vg = false;
@@ -1120,11 +1120,11 @@ unsigned int System::add_variable (const std::string& var,
       // they are restricted, we aren't?
       if (their_active_subdomains && !active_subdomains)
 	should_be_in_vg = false;
-      
+
       // they aren't restriced, we are?
       if (!their_active_subdomains && active_subdomains)
 	should_be_in_vg = false;
-	        
+
       if (their_active_subdomains && active_subdomains)
 	// restricted to different sets?
 	if (*their_active_subdomains != *active_subdomains)
@@ -1137,13 +1137,13 @@ unsigned int System::add_variable (const std::string& var,
 	  const unsigned int curr_n_vars = this->n_vars();
 
 	  vg.append (var);
-	  
+
 	  _variables.push_back(vg(vg.n_variables()-1));
 	  _variable_numbers[var] = curr_n_vars;
 	  return curr_n_vars;
 	}
     }
-    
+
   // otherwise, fall back to adding a single variable group
   return this->add_variables (std::vector<std::string>(1, var),
 			      type,
@@ -1176,7 +1176,7 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
 	{
 	  if (this->variable_type(v) == type)
 	    return _variables[v].number();
-	  
+
 	  libMesh::err << "ERROR: incompatible variable "
 		       << vars[ov]
 		       << " has already been added for this system!"
@@ -1190,20 +1190,20 @@ unsigned int System::add_variables (const std::vector<std::string> &vars,
 
   // Add the variable group to the list
   _variable_groups.push_back((active_subdomains == NULL) ?
-			     VariableGroup(vars, curr_n_vars,
+			     VariableGroup(this, vars, curr_n_vars,
 					   next_first_component, type) :
-			     VariableGroup(vars, curr_n_vars,
+			     VariableGroup(this, vars, curr_n_vars,
 					   next_first_component, type, *active_subdomains));
 
   const VariableGroup &vg (_variable_groups.back());
-  
+
   // Add each component of the group individually
   for (unsigned int v=0; v<vars.size(); v++)
     {
       _variables.push_back (vg(v));
-      _variable_numbers[vars[v]] = curr_n_vars+v;  
+      _variable_numbers[vars[v]] = curr_n_vars+v;
     }
-  
+
   libmesh_assert_equal_to ((curr_n_vars+vars.size()), this->n_vars());
 
   // BSK - Defer this now to System::init_data() so we can detect
@@ -1259,7 +1259,7 @@ unsigned short int System::variable_number (const std::string& var) const
 void System::get_all_variable_numbers(std::vector<unsigned int>& all_variable_numbers) const
 {
   all_variable_numbers.resize(n_vars());
-  
+
   // Make sure the variable exists
   std::map<std::string, unsigned short int>::const_iterator
     it = _variable_numbers.begin();
@@ -1648,7 +1648,7 @@ std::string System::get_info() const
       if (vg_description.n_variables() > 1) out << "{ ";
       for (unsigned int vn=0; vn<vg_description.n_variables(); vn++)
 	out << "\"" << vg_description.name(vn) << "\" ";
-      if (vg_description.n_variables() > 1) out << "} ";      
+      if (vg_description.n_variables() > 1) out << "} ";
     }
 
   out << '\n';

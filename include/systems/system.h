@@ -357,14 +357,14 @@ public:
    */
   bool is_adjoint_already_solved() const
   { return adjoint_already_solved;}
-  
+
   /**
    * Setter for the adjoint_already_solved boolean
    */
   void set_adjoint_already_solved(bool setting)
   { adjoint_already_solved = setting;}
 
-  
+
   /**
    * Solves for the derivative of each of the system's quantities of
    * interest q in \p qoi[qoi_indices] with respect to each parameter
@@ -942,7 +942,7 @@ public:
    * vectors, by default the one corresponding to the first parameter.
    */
   const NumericVector<Number> & get_sensitivity_rhs(unsigned int i=0) const;
-  
+
   /**
    * @returns the number of vectors (in addition to the solution)
    * handled by this system
@@ -1029,7 +1029,7 @@ public:
   unsigned int add_variables (const std::vector<std::string> &vars,
 			      const FEType& type,
 			      const std::set<subdomain_id_type> * const active_subdomains = NULL);
-  
+
   /**
    * Adds the variable \p var to the list of variables
    * for this system.  Same as before, but assumes \p LAGRANGE
@@ -1110,7 +1110,7 @@ public:
   const FEType & variable_type (const std::string& var) const;
 
   /**
-   * @returns \p true when \p VariableGroup structures should be 
+   * @returns \p true when \p VariableGroup structures should be
    * automatically identified, \p false otherwise.
    */
   bool identify_variable_groups () const;
@@ -1193,7 +1193,7 @@ public:
    */
   dof_id_type write_serialized_vectors (Xdr &io,
   					const std::vector<const NumericVector<Number>*> &vectors) const;
-     
+
   /**
    * Writes additional data, namely vectors, for this System.
    * This method may safely be called on a distributed-memory mesh.
@@ -1751,7 +1751,7 @@ private:
   bool _can_add_vectors;
 
   /**
-   * \p true when \p VariableGroup structures should be automatically 
+   * \p true when \p VariableGroup structures should be automatically
    * identified, \p false otherwise.  Defaults to \p true.
    */
   bool _identify_variable_groups;
@@ -1926,7 +1926,7 @@ const std::string & System::variable_name (const unsigned int i) const
 
 
 inline
-unsigned short int 
+unsigned short int
 System::variable_scalar_number (const std::string& var,
                                 unsigned short component) const
 {
@@ -1937,7 +1937,7 @@ System::variable_scalar_number (const std::string& var,
 
 inline
 unsigned short int
-System::variable_scalar_number (unsigned short var_num, 
+System::variable_scalar_number (unsigned short var_num,
                                 unsigned short component) const
 {
   return _variables[var_num].first_scalar_number() + component;

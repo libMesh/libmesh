@@ -289,6 +289,11 @@ include_HEADERS =  \
         reduced_basis/transient_rb_construction.h \
         reduced_basis/transient_rb_evaluation.h \
         reduced_basis/transient_rb_theta_expansion.h \
+        solution_transfer/dtk_adapter.h \
+        solution_transfer/dtk_evaluator.h \
+        solution_transfer/dtk_solution_transfer.h \
+        solution_transfer/meshfree_interpolation.h \
+        solution_transfer/solution_transfer.h \
         solvers/adaptive_time_solver.h \
         solvers/diff_solver.h \
         solvers/eigen_solver.h \
@@ -346,7 +351,6 @@ include_HEADERS =  \
         utils/ignore_warnings.h \
         utils/location_maps.h \
         utils/mapvector.h \
-        utils/meshfree_interpolation.h \
         utils/null_output_iterator.h \
         utils/number_lookups.h \
         utils/o_f_stream.h \

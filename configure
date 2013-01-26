@@ -752,12 +752,16 @@ LASPACK_LIB
 LASPACK_INCLUDE
 TBB_INCLUDE
 TBB_LIBRARY
+TPETRA_INCLUDES
+TPETRA_LIBS
 ML_INCLUDES
 ML_LIBS
 NOX_INCLUDES
 NOX_LIBS
 AZTECOO_INCLUDES
 AZTECOO_LIBS
+DTK_MAKEFILE_EXPORT
+TPETRA_MAKEFILE_EXPORT
 ML_MAKEFILE_EXPORT
 NOX_MAKEFILE_EXPORT
 AZTECOO_MAKEFILE_EXPORT
@@ -1053,6 +1057,8 @@ enable_trilinos
 with_trilinos
 with_nox
 with_ml
+with_tpetra
+with_dtk
 enable_tbb
 with_tbb
 with_tbb_lib
@@ -1869,6 +1875,8 @@ Optional Packages:
   --with-trilinos=PATH    Specify the path to Trilinos installation
   --with-nox=PATH         Specify the path to Nox installation
   --with-ml=PATH          Specify the path to ML installation
+  --with-tpetra=PATH      Specify the path to Tpetra installation
+  --with-dtk=PATH         Specify the path to Dtk installation
   --with-tbb=PATH         Specify the path where Threading Building Blocks is
                           installed
   --with-tbb-lib=PATH     Specify the path to Threading Building Blocks
@@ -29257,8 +29265,8 @@ ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/ml_include.h" "$as_ac
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableml=yes
 else
-  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/ml/src/Include/ml_include.h" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/ml/src/Include/ml_include.h" "$as_ac_Header" "$ac_includes_default"
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/ml/src/ml_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/ml/src/ml_config.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enableml=yes
 else
@@ -29281,6 +29289,78 @@ $as_echo "#define HAVE_ML 1" >>confdefs.h
 
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with ML support >>>" >&5
 $as_echo "<<< Configuring library with ML support >>>" >&6; }
+       fi
+
+                            as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/Tpetra_include.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/Tpetra_include.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabletpetra=yes
+else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/Tpetra_include.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/Tpetra_include.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabletpetra=yes
+else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/packages/tpetra/src/Tpetra_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/packages/tpetra/src/Tpetra_config.h" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabletpetra=yes
+else
+  enabletpetra=no
+fi
+
+
+
+fi
+
+
+
+fi
+
+
+
+       if test "$enabletpetra" != no ; then
+
+$as_echo "#define HAVE_TPETRA 1" >>confdefs.h
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with TPetra support >>>" >&5
+$as_echo "<<< Configuring library with TPetra support >>>" >&6; }
+       fi
+
+                            as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/DataTransferKit_config.hpp" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/DataTransferKit_config.hpp" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabledtk=yes
+else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/DataTransferKit_config.hpp" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/DataTransferKit_config.hpp" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabledtk=yes
+else
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/DataTransferKit/src/DataTransferKit_config.hpp" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/DataTransferKit/src/DataTransferKit_config.hpp" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  enabledtk=yes
+else
+  enabledtk=no
+fi
+
+
+
+fi
+
+
+
+fi
+
+
+
+       if test "$enabledtk" != no ; then
+
+$as_echo "#define HAVE_DTK 1" >>confdefs.h
+
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with DTK support >>>" >&5
+$as_echo "<<< Configuring library with DTK support >>>" >&6; }
        fi
     fi
   else
@@ -29386,6 +29466,8 @@ $as_echo "<<< Configuring library with Nox support >>>" >&6; }
   fi
 
 
+
+
 # Check whether --with-ml was given.
 if test "${with_ml+set}" = set; then :
   withval=$with_ml; withmldir=$withval
@@ -29414,6 +29496,74 @@ $as_echo "<<< Configuring library with ML support >>>" >&6; }
   else
     enableml=no
   fi
+
+
+# Check whether --with-tpetra was given.
+if test "${with_tpetra+set}" = set; then :
+  withval=$with_tpetra; withtpetradir=$withval
+else
+  withtpetradir=$TRILINOS_DIR
+fi
+
+
+  if test "$withtpetradir" != no ; then
+    if (test -r $withtpetradir/include/Makefile.export.Tpetra) ; then
+      TPETRA_MAKEFILE_EXPORT=$withtpetradir/include/Makefile.export.Tpetra
+    elif (test -r $withtpetradir/packages/tpetra/Makefile.export.Tpetra) ; then
+      TPETRA_MAKEFILE_EXPORT=$withtpetradir/packages/tpetra/Makefile.export.Tpetra
+    else
+      enabletpetra=no
+    fi
+
+    if test "$enabletpetra" != no ; then
+       enabletpetra=yes
+
+$as_echo "#define HAVE_TPETRA 1" >>confdefs.h
+
+       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Tpetra support >>>" >&5
+$as_echo "<<< Configuring library with Tpetra support >>>" >&6; }
+    fi
+  else
+    enabletpetra=no
+  fi
+
+
+
+
+# Check whether --with-dtk was given.
+if test "${with_dtk+set}" = set; then :
+  withval=$with_dtk; withdtkdir=$withval
+else
+  withdtkdir=$TRILINOS_DIR
+fi
+
+
+  if test "$withdtkdir" != no ; then
+    if (test -r $withdtkdir/include/Makefile.export.DataTransferKit) ; then
+      DTK_MAKEFILE_EXPORT=$withdtkdir/include/Makefile.export.Makefile.export.DataTransferKit
+    elif (test -r $withdtkdir/DataTransferKit/Makefile.export.Makefile.export.DataTransferKit) ; then
+      DTK_MAKEFILE_EXPORT=$withdtkdir/packages/dtk/Makefile.export.Makefile.export.DataTransferKit
+    else
+      enabledtk=no
+    fi
+
+    if test "$enabledtk" != no ; then
+       enabledtk=yes
+
+$as_echo "#define HAVE_DTK 1" >>confdefs.h
+
+       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with DTK support >>>" >&5
+$as_echo "<<< Configuring library with DTK support >>>" >&6; }
+    fi
+  else
+    enabledtk=no
+  fi
+
+
+
+
+
+
 
 
 
@@ -29501,6 +29651,31 @@ EOF
 
 
 
+  #
+  # Tpetra
+  if (test $enabletpetra != no); then
+    cat <<EOF >Makefile_config_trilinos
+include $TPETRA_MAKEFILE_EXPORT
+echo_libs:
+	@echo \$(TPETRA_LIBS)
+
+echo_include:
+	@echo \$(TPETRA_INCLUDES)
+EOF
+
+    #echo "Makefile_config_trilinos="
+    #cat Makefile_config_trilinos
+    TPETRA_INCLUDES=`make -sf Makefile_config_trilinos echo_include`
+    TPETRA_LIBS=`make -sf Makefile_config_trilinos echo_libs`
+
+    #echo TPETRA_LIBS=$TPETRA_LIBS
+    #echo TPETRA_INCLUDES=$TPETRA_INCLUDES
+
+    rm -f Makefile_config_trilinos
+  fi
+
+
+
 
 
 
@@ -29517,8 +29692,8 @@ EOF
 
 
 if ( test "$enabletrilinos" = yes ); then
-  libmesh_optional_INCLUDES="$TRILINOS_INCLUDES $AZTECOO_INCLUDES $NOX_INCLUDES $ML_INCLUDES $libmesh_optional_INCLUDES"
-  libmesh_optional_LIBS="$TRILINOS_LIBS $AZTECOO_LIBS $NOX_LIBS $ML_LIBS $libmesh_optional_LIBS"
+  libmesh_optional_INCLUDES="$TRILINOS_INCLUDES $AZTECOO_INCLUDES $NOX_INCLUDES $ML_INCLUDES $TPETRA_INCLUDES $DTK_INCLUDES $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$TRILINOS_LIBS $AZTECOO_LIBS $NOX_LIBS $ML_LIBS $TPETRA_INCLUDES $DTK_INCLUDES $libmesh_optional_LIBS"
 fi
 # -------------------------------------------------------------
 
@@ -32311,7 +32486,7 @@ $as_echo "#define BUILD_DATE __DATE__\" \"__TIME__" >>confdefs.h
 
 # Each example gets a makefile
 if (test "x$enableexamples" = "xyes"); then
-   ac_config_files="$ac_config_files examples/introduction/introduction_ex1/Makefile examples/introduction/introduction_ex2/Makefile examples/introduction/introduction_ex3/Makefile examples/introduction/introduction_ex4/Makefile examples/introduction/introduction_ex5/Makefile examples/adaptivity/adaptivity_ex1/Makefile examples/adaptivity/adaptivity_ex2/Makefile examples/adaptivity/adaptivity_ex3/Makefile examples/adaptivity/adaptivity_ex4/Makefile examples/adaptivity/adaptivity_ex5/Makefile examples/adjoints/adjoints_ex1/Makefile examples/adjoints/adjoints_ex2/Makefile examples/adjoints/adjoints_ex3/Makefile examples/adjoints/adjoints_ex4/Makefile examples/eigenproblems/eigenproblems_ex1/Makefile examples/eigenproblems/eigenproblems_ex2/Makefile examples/eigenproblems/eigenproblems_ex3/Makefile examples/fem_system/fem_system_ex1/Makefile examples/fem_system/fem_system_ex2/Makefile examples/miscellaneous/miscellaneous_ex1/Makefile examples/miscellaneous/miscellaneous_ex2/Makefile examples/miscellaneous/miscellaneous_ex3/Makefile examples/miscellaneous/miscellaneous_ex4/Makefile examples/miscellaneous/miscellaneous_ex5/Makefile examples/miscellaneous/miscellaneous_ex6/Makefile examples/miscellaneous/miscellaneous_ex7/Makefile examples/miscellaneous/miscellaneous_ex8/Makefile examples/subdomains/subdomains_ex1/Makefile examples/subdomains/subdomains_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex1/Makefile examples/systems_of_equations/systems_of_equations_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex4/Makefile examples/systems_of_equations/systems_of_equations_ex5/Makefile examples/systems_of_equations/systems_of_equations_ex6/Makefile examples/reduced_basis/reduced_basis_ex1/Makefile examples/reduced_basis/reduced_basis_ex2/Makefile examples/reduced_basis/reduced_basis_ex3/Makefile examples/reduced_basis/reduced_basis_ex4/Makefile examples/reduced_basis/reduced_basis_ex5/Makefile examples/reduced_basis/reduced_basis_ex6/Makefile examples/reduced_basis/reduced_basis_ex7/Makefile examples/transient/transient_ex1/Makefile examples/transient/transient_ex2/Makefile examples/vector_fe/vector_fe_ex1/Makefile examples/vector_fe/vector_fe_ex2/Makefile examples/vector_fe/vector_fe_ex3/Makefile examples/Makefile"
+   ac_config_files="$ac_config_files examples/introduction/introduction_ex1/Makefile examples/introduction/introduction_ex2/Makefile examples/introduction/introduction_ex3/Makefile examples/introduction/introduction_ex4/Makefile examples/introduction/introduction_ex5/Makefile examples/adaptivity/adaptivity_ex1/Makefile examples/adaptivity/adaptivity_ex2/Makefile examples/adaptivity/adaptivity_ex3/Makefile examples/adaptivity/adaptivity_ex4/Makefile examples/adaptivity/adaptivity_ex5/Makefile examples/adjoints/adjoints_ex1/Makefile examples/adjoints/adjoints_ex2/Makefile examples/adjoints/adjoints_ex3/Makefile examples/adjoints/adjoints_ex4/Makefile examples/eigenproblems/eigenproblems_ex1/Makefile examples/eigenproblems/eigenproblems_ex2/Makefile examples/eigenproblems/eigenproblems_ex3/Makefile examples/fem_system/fem_system_ex1/Makefile examples/fem_system/fem_system_ex2/Makefile examples/solution_transfer/solution_transfer_ex1/Makefile examples/miscellaneous/miscellaneous_ex1/Makefile examples/miscellaneous/miscellaneous_ex2/Makefile examples/miscellaneous/miscellaneous_ex3/Makefile examples/miscellaneous/miscellaneous_ex4/Makefile examples/miscellaneous/miscellaneous_ex5/Makefile examples/miscellaneous/miscellaneous_ex6/Makefile examples/miscellaneous/miscellaneous_ex7/Makefile examples/miscellaneous/miscellaneous_ex8/Makefile examples/subdomains/subdomains_ex1/Makefile examples/subdomains/subdomains_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex1/Makefile examples/systems_of_equations/systems_of_equations_ex2/Makefile examples/systems_of_equations/systems_of_equations_ex3/Makefile examples/systems_of_equations/systems_of_equations_ex4/Makefile examples/systems_of_equations/systems_of_equations_ex5/Makefile examples/systems_of_equations/systems_of_equations_ex6/Makefile examples/reduced_basis/reduced_basis_ex1/Makefile examples/reduced_basis/reduced_basis_ex2/Makefile examples/reduced_basis/reduced_basis_ex3/Makefile examples/reduced_basis/reduced_basis_ex4/Makefile examples/reduced_basis/reduced_basis_ex5/Makefile examples/reduced_basis/reduced_basis_ex6/Makefile examples/reduced_basis/reduced_basis_ex7/Makefile examples/transient/transient_ex1/Makefile examples/transient/transient_ex2/Makefile examples/vector_fe/vector_fe_ex1/Makefile examples/vector_fe/vector_fe_ex2/Makefile examples/vector_fe/vector_fe_ex3/Makefile examples/Makefile"
 
 fi
 
@@ -33816,6 +33991,7 @@ do
     "examples/eigenproblems/eigenproblems_ex3/Makefile") CONFIG_FILES="$CONFIG_FILES examples/eigenproblems/eigenproblems_ex3/Makefile" ;;
     "examples/fem_system/fem_system_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/fem_system/fem_system_ex1/Makefile" ;;
     "examples/fem_system/fem_system_ex2/Makefile") CONFIG_FILES="$CONFIG_FILES examples/fem_system/fem_system_ex2/Makefile" ;;
+    "examples/solution_transfer/solution_transfer_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/solution_transfer/solution_transfer_ex1/Makefile" ;;
     "examples/miscellaneous/miscellaneous_ex1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex1/Makefile" ;;
     "examples/miscellaneous/miscellaneous_ex2/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex2/Makefile" ;;
     "examples/miscellaneous/miscellaneous_ex3/Makefile") CONFIG_FILES="$CONFIG_FILES examples/miscellaneous/miscellaneous_ex3/Makefile" ;;
@@ -35904,6 +36080,8 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'AztecOO....................... : $enableaztecoo
   echo '     'NOX........................... : $enablenox
   echo '     'ML............................ : $enableml
+  echo '     'Tpetra........................ : $enabletpetra
+  echo '     'DTK........................... : $enabledtk
   fi
   echo '  'vtk.............................. : $enablevtk
   if (test "x$enablevtk" = "xyes"); then
