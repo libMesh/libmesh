@@ -444,9 +444,6 @@ stored_range.h: $(top_srcdir)/include/geom/stored_range.h
 surface.h: $(top_srcdir)/include/geom/surface.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/geom/surface.h surface.h
 
-libmesh_config.h: $(top_srcdir)/include/libmesh_config.h
-	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/libmesh_config.h libmesh_config.h
-
 abaqus_io.h: $(top_srcdir)/include/mesh/abaqus_io.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/mesh/abaqus_io.h abaqus_io.h
 
