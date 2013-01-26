@@ -146,6 +146,8 @@ if (test "x$enableoptional" = "xyes"); then
   echo '     'AztecOO....................... : $enableaztecoo
   echo '     'NOX........................... : $enablenox
   echo '     'ML............................ : $enableml
+  echo '     'Tpetra........................ : $enabletpetra
+  echo '     'DTK........................... : $enabledtk
   fi
   echo '  'vtk.............................. : $enablevtk
   if (test "x$enablevtk" = "xyes"); then

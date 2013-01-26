@@ -245,6 +245,7 @@ DOT = @DOT@
 DOTPATH = @DOTPATH@
 DOXYGEN = @DOXYGEN@
 DSYMUTIL = @DSYMUTIL@
+DTK_MAKEFILE_EXPORT = @DTK_MAKEFILE_EXPORT@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
@@ -369,6 +370,9 @@ TECPLOT_INCLUDE = @TECPLOT_INCLUDE@
 TECPLOT_LIBRARY = @TECPLOT_LIBRARY@
 TETGEN_INCLUDE = @TETGEN_INCLUDE@
 TETGEN_LIBRARY = @TETGEN_LIBRARY@
+TPETRA_INCLUDES = @TPETRA_INCLUDES@
+TPETRA_LIBS = @TPETRA_LIBS@
+TPETRA_MAKEFILE_EXPORT = @TPETRA_MAKEFILE_EXPORT@
 TRIANGLE_INCLUDE = @TRIANGLE_INCLUDE@
 TRIANGLE_LIBRARY = @TRIANGLE_LIBRARY@
 TRILINOS_DIR = @TRILINOS_DIR@
@@ -758,6 +762,11 @@ include_HEADERS = \
         reduced_basis/transient_rb_construction.h \
         reduced_basis/transient_rb_evaluation.h \
         reduced_basis/transient_rb_theta_expansion.h \
+        solution_transfer/dtk_adapter.h \
+        solution_transfer/dtk_evaluator.h \
+        solution_transfer/dtk_solution_transfer.h \
+        solution_transfer/meshfree_interpolation.h \
+        solution_transfer/solution_transfer.h \
         solvers/adaptive_time_solver.h \
         solvers/diff_solver.h \
         solvers/eigen_solver.h \
@@ -815,7 +824,6 @@ include_HEADERS = \
         utils/ignore_warnings.h \
         utils/location_maps.h \
         utils/mapvector.h \
-        utils/meshfree_interpolation.h \
         utils/null_output_iterator.h \
         utils/number_lookups.h \
         utils/o_f_stream.h \
