@@ -219,7 +219,7 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
   // This vector will hold the degree of freedom indices for the element.
   // These define where in the global system the element degrees of freedom
   // get mapped.
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   // We now loop over all the active elements in the mesh in order to calculate
   // the matrix and right-hand-side contribution from each element. Use a

@@ -309,7 +309,7 @@ void assemble_matrices(EquationSystems& es,
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
 
   // Now we will loop over all the elements in the mesh that

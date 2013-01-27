@@ -206,7 +206,7 @@ bool SolidSystem::element_time_derivative(bool request_jacobian,
   // Get a reference to the auxiliary system
   TransientExplicitSystem& aux_system = this->get_equation_systems().get_system<
       TransientExplicitSystem>("auxiliary");
-  std::vector<unsigned int> undefo_index;
+  std::vector<dof_id_type> undefo_index;
 
   // Assume symmetry of local stiffness matrices
   bool use_symmetry = args("assembly/use_symmetry", false);
@@ -322,7 +322,7 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
     const System & auxsys = this->get_equation_systems().get_system(
         "auxiliary");
     const DofMap & auxmap = auxsys.get_dof_map();
-    std::vector<unsigned int> undefo_dofs[3];
+    std::vector<dof_id_type> undefo_dofs[3];
     for (unsigned int d = 0; d < c.dim; ++d) {
       auxmap.dof_indices(c.elem, undefo_dofs[d], undefo_var[d]);
     }

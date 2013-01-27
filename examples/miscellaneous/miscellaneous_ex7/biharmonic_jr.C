@@ -259,7 +259,7 @@ void Biharmonic::JR::residual_and_jacobian(const NumericVector<Number> &u,
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   // Old solution
   const NumericVector<Number>& u_old = *old_local_solution;
@@ -515,7 +515,7 @@ void Biharmonic::JR::bounds(NumericVector<Number> &XL, NumericVector<Number>& XU
   // These vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   MeshBase::const_element_iterator       el     = _biharmonic._mesh->active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = _biharmonic._mesh->active_local_elements_end();

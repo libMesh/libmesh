@@ -377,10 +377,10 @@ void assemble_stokes (EquationSystems& es,
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
-  std::vector<unsigned int> dof_indices;
-  std::vector<unsigned int> dof_indices_u;
-  std::vector<unsigned int> dof_indices_v;
-  std::vector<unsigned int> dof_indices_p;
+  std::vector<dof_id_type> dof_indices;
+  std::vector<dof_id_type> dof_indices_u;
+  std::vector<dof_id_type> dof_indices_v;
+  std::vector<dof_id_type> dof_indices_p;
 
   // Find out what the timestep size parameter is from the system, and
   // the value of theta for the theta method.  We use implicit Euler (theta=1)

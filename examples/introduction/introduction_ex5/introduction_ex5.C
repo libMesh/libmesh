@@ -326,7 +326,7 @@ void assemble_poisson(EquationSystems& es,
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
   
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
   
   
   

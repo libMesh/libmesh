@@ -378,7 +378,7 @@ void assemble_poisson(EquationSystems& es,
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
-  std::vector<unsigned int> dof_indices, dof_indices2;
+  std::vector<dof_id_type> dof_indices, dof_indices2;
 
   // Now we will loop over all the elements in the mesh.
   // We will compute the element matrix and right-hand-side

@@ -197,10 +197,10 @@ void assemble_elasticity(EquationSystems& es,
     Fu(Fe),
     Fv(Fe);
 
-  std::vector<unsigned int> dof_indices;
-  std::vector<unsigned int> dof_indices_u;
-  std::vector<unsigned int> dof_indices_v;
-  std::vector<unsigned int> dof_indices_lambda;
+  std::vector<dof_id_type> dof_indices;
+  std::vector<dof_id_type> dof_indices_u;
+  std::vector<dof_id_type> dof_indices_v;
+  std::vector<dof_id_type> dof_indices_lambda;
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();

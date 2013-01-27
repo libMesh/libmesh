@@ -305,7 +305,7 @@ void assemble (EquationSystems& es,
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
@@ -427,7 +427,7 @@ void assemble (EquationSystems& es,
       // vector has to be backuped for that because the constraining
       // functions modify it.
 
-      std::vector<unsigned int> dof_indices_backup(dof_indices);
+      std::vector<dof_id_type> dof_indices_backup(dof_indices);
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
       dof_indices = dof_indices_backup;
       dof_map.constrain_element_dyad_matrix(Ve,We,dof_indices);

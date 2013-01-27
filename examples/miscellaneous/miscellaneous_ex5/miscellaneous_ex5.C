@@ -225,7 +225,7 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   // Now we will loop over all the elements in the mesh.  We will
   // compute first the element interior matrix and right-hand-side contribution
@@ -360,7 +360,7 @@ void assemble_ellipticdg(EquationSystems& es, const std::string& system_name)
           // Get the degree of freedom indices for the
           // neighbor.  These define where in the global
           // matrix this neighbor will contribute to.
-          std::vector<unsigned int> neighbor_dof_indices;
+          std::vector<dof_id_type> neighbor_dof_indices;
           dof_map.dof_indices (neighbor, neighbor_dof_indices);
           const unsigned int n_neighbor_dofs = neighbor_dof_indices.size();
 
