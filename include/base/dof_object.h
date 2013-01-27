@@ -444,7 +444,7 @@ private:
   // methods only available for unit testing
 #ifdef LIBMESH_IS_UNIT_TESTING
 public:
-  void set_buffer (const std::vector<unsigned int> &buf)
+  void set_buffer (const std::vector<dof_id_type> &buf)
   { _idx_buf = buf; }
 #endif
 };
