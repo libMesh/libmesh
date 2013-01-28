@@ -113,6 +113,14 @@ public:
   virtual void adjoint_advance_timestep ();
 
   /**
+   * This method retrieves all the stored solutions at the current
+   * system.time
+   */
+  virtual void retrieve_timestep();
+
+  /**
+
+  /**
    * This method uses the DifferentiableSystem's
    * element_time_derivative() and element_constraint()
    * to build a full residual on an element.  What combination

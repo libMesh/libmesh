@@ -94,4 +94,8 @@ void TimeSolver::adjoint_advance_timestep ()
 {
 }
 
+void TimeSolver::retrieve_timestep ()
+{
+}
+
 } // namespace libMesh
