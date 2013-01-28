@@ -1607,10 +1607,10 @@ bool Elem::subactive() const
     return false;
   if (!this->has_children())
     return true;
-  for (const Elem* parent = this->parent();
-       parent != NULL;
-       parent = parent->parent())
-    if (parent->active())
+  for (const Elem* ancestor = this->parent();
+       ancestor != NULL;
+       ancestor = ancestor->parent())
+    if (ancestor->active())
       return true;
 #endif
 
@@ -1915,6 +1915,9 @@ unsigned int Elem::max_descendant_p_level () const
 inline
 void Elem::set_p_level(unsigned int p)
 {
+  libmesh_assert_less_equal
+    (p, std::numeric_limits<unsigned char>::max());
+
 #ifdef DEBUG
   if (p != static_cast<unsigned int>(static_cast<unsigned char>(p)))
     {
@@ -1940,8 +1943,8 @@ void Elem::set_p_level(unsigned int p)
       // our parent's, but we have to check every other child to see
       else if (parent_p_level == _p_level && _p_level < p)
 	{
-	  _p_level = p;
-	  parent_p_level = p;
+	  _p_level = static_cast<unsigned char>(p);
+	  parent_p_level = static_cast<unsigned char>(p);
 	  for (unsigned int c=0; c != this->parent()->n_children(); c++)
 	    parent_p_level = std::min(parent_p_level,
 				      this->parent()->child(c)->p_level());
@@ -1961,7 +1964,9 @@ void Elem::set_p_level(unsigned int p)
 inline
 void Elem::hack_p_level(unsigned int p)
 {
-  _p_level = p;
+  libmesh_assert_less_equal
+    (p, std::numeric_limits<unsigned char>::max());
+  _p_level = static_cast<unsigned char>(p);
 }
 
 
@@ -2287,10 +2292,10 @@ public:
   // Constructor with arguments.
   SideIter(const unsigned int side_number,
 	   Elem* parent)
-    : _side_number(side_number),
-      _side(),
+    : _side(),
       _side_ptr(NULL),
-      _parent(parent)
+      _parent(parent),
+      _side_number(side_number)
   {}
 
 
@@ -2305,18 +2310,18 @@ public:
 
   // Copy constructor
   SideIter(const SideIter& other)
-    : _side_number(other._side_number),
-      _side(),
+    : _side(),
       _side_ptr(NULL),
-      _parent(other._parent)
+      _parent(other._parent),
+      _side_number(other._side_number)
   {}
 
 
   // op=
   SideIter& operator=(const SideIter& other)
   {
-    this->_side_number = other._side_number;
     this->_parent      = other._parent;
+    this->_side_number = other._side_number;
     return *this;
   }
 
@@ -2368,9 +2373,6 @@ private:
     this->_side_ptr = _side.get();
   }
 
-  // A counter variable which keeps track of the side number
-  unsigned int _side_number;
-
   // AutoPtr to the actual side, handles memory management for
   // the sides which are created during the course of iteration.
   mutable AutoPtr<Elem> _side;
@@ -2386,6 +2388,9 @@ private:
 
   // Pointer to the parent Elem class which generated this iterator
   Elem* _parent;
+
+  // A counter variable which keeps track of the side number
+  unsigned int _side_number;
 
 };
 
