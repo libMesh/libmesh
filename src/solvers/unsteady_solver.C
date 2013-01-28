@@ -142,25 +142,27 @@ void UnsteadySolver::advance_timestep ()
 }
 
 
-  void UnsteadySolver::adjoint_advance_timestep ()
-  {
-    // Call the store function to store the last adjoint before decrementing the time
-    solution_history->store();
 
-    if(!first_adjoint_step)
-      {
-	// Decrement the system time
-	_system.time -= _system.deltat;
-      }
-    else
-      {
-	first_adjoint_step = false;
-      }
+void UnsteadySolver::adjoint_advance_timestep ()
+{
+  // On the first call of this function, we dont save the adjoint solution or
+  // decrement the time, we just call the retrieve function below
+  if(!first_adjoint_step)
+    {
+      // Call the store function to store the last adjoint before decrementing the time
+      solution_history->store();
+      // Decrement the system time
+      _system.time -= _system.deltat;
+    }
+  else
+    {
+      first_adjoint_step = false;
+    }
 
-    // Retrieve the primal solution vectors at this time using the
-    // solution_history object
-    solution_history->retrieve();
-  }
+  // Retrieve the primal solution vectors at this time using the
+  // solution_history object
+  solution_history->retrieve();
+}
 
 
 

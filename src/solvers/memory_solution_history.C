@@ -3,6 +3,8 @@
 // Local includes
 #include "libmesh/memory_solution_history.h"
 
+#include <cmath>
+
 namespace libMesh
 {
   // The Destructor
@@ -37,14 +39,14 @@ namespace libMesh
 
     libmesh_assert (stored_sols != stored_solutions.end());
 
-    if (stored_sols->first == _system.time)
+    if (std::abs(stored_sols->first - _system.time) < TOLERANCE)
       return;
 
     // If we're not at the front, check the previous entry
     if (stored_sols != stored_solutions.begin())
       {
         stored_solutions_iterator test_it = stored_sols;
-        if ((--test_it)->first == _system.time)
+        if (std::abs((--test_it)->first - _system.time) < TOLERANCE)
           {
             --stored_sols;
             return;
@@ -55,7 +57,7 @@ namespace libMesh
     stored_solutions_iterator test_it = stored_sols;
     if ((++test_it) != stored_solutions.end())
       {
-        if (test_it->first == _system.time)
+        if (std::abs(test_it->first - _system.time) < TOLERANCE)
           {
             ++stored_sols;
             return;
@@ -79,7 +81,7 @@ namespace libMesh
       }
 
     // If we're past the end we can create a new entry
-    if (stored_sols->first < _system.time)
+    if (_system.time - stored_sols->first > TOLERANCE )
       {
 #ifndef NDEBUG
         stored_sols++;
@@ -89,7 +91,7 @@ namespace libMesh
           (std::make_pair(_system.time,
              std::map<std::string, NumericVector<Number> *>()));
         stored_sols = stored_solutions.end();
-        stored_sols--;
+        --stored_sols;
       }
 
     // If we're before the beginning we can create a new entry
@@ -103,7 +105,7 @@ namespace libMesh
       }
 
     // We don't support inserting entries elsewhere
-    libmesh_assert_equal_to(stored_sols->first, _system.time);
+    libmesh_assert(std::abs(stored_sols->first - _system.time) < TOLERANCE);
 
     // Map of stored vectors for this solution step
     std::map<std::string, NumericVector<Number> *>& saved_vectors = stored_sols->second;
@@ -139,20 +141,22 @@ namespace libMesh
   {    
     this->find_stored_entry();
 
-    // Do we not have a solution for this time?  Then 
-    // there's nothing to do.
-    if(stored_sols == stored_solutions.end() ||
-       stored_sols->first != _system.time)
-      {
-	std::cout<<"No more solutions to recover ! We are at time t= "<<_system.time<<std::endl<<std::endl;
-        return;
-      }
-
     // Get the time at which we are recovering the solution vectors
     Real recovery_time = stored_sols->first;
 
     // Print out what time we are recovering vectors at
-    std::cout<<"Recovering solution vectors at time: " <<recovery_time << std::endl;
+//    std::cout << "Recovering solution vectors at time: " <<
+//                 recovery_time << std::endl;
+
+    // Do we not have a solution for this time?  Then 
+    // there's nothing to do.
+    if(stored_sols == stored_solutions.end() ||
+       std::abs(recovery_time - _system.time) > TOLERANCE)
+      {
+//	std::cout << "No more solutions to recover ! We are at time t = " <<
+//                     _system.time << std::endl;
+        return;
+      }
 
     // Get the saved vectors at this timestep
     std::map<std::string, NumericVector<Number> *>& saved_vectors = stored_sols->second;
