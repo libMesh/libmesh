@@ -54,11 +54,16 @@ class DofObject : public ReferenceCountedObject<DofObject>
 protected:
 
   /**
-   * Constructor. Protected so that you can't instantiate one of these.
+   * Constructor. Protected so that you can't instantiate one of these
+   * except as a part of a Node or Elem.
    */
   DofObject ();
 
-public:
+  /**
+   * Destructor. Protected so that you can't destroy one of these
+   * except as a part of a Node or Elem.
+   */
+  ~DofObject ();
 
   /**
    * Copy-constructor.
@@ -66,14 +71,11 @@ public:
   DofObject (const DofObject&);
 
   /**
-   * Destructor.
-   */
-  virtual ~DofObject ();
-
-  /**
    * Deep-copying assignment operator
    */
   DofObject& operator= (const DofObject& dof_obj);
+
+public:
 
 #ifdef LIBMESH_ENABLE_AMR
 

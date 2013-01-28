@@ -82,7 +82,7 @@ public:
   /**
    * Destructor.
    */
-  virtual ~Node ();
+  ~Node ();
 
   /**
    * Assign to a node from a point
