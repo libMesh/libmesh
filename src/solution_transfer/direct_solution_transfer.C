@@ -13,9 +13,13 @@ DirectSolutionTransfer::~DirectSolutionTransfer()
 
 void
 DirectSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var)
-{
+{  
   System * from_sys = from_var.sys();
   System * to_sys = to_var.sys();
+
+  // Just a couple of (not completely thorough)
+  libmesh_assert(from_sys->get_equation_systems().get_mesh().n_nodes() == from_sys->get_equation_systems().get_mesh().n_nodes());
+  libmesh_assert(from_var.type() == to_var.type());
   
   // get dof indices for source variable
   unsigned int from_vn = from_var.number();
