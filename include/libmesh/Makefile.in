@@ -493,11 +493,11 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	transient_rb_construction.h transient_rb_evaluation.h \
 	transient_rb_theta_expansion.h direct_solution_transfer.h \
 	dtk_adapter.h dtk_evaluator.h dtk_solution_transfer.h \
-	meshfree_interpolation.h solution_transfer.h \
-	adaptive_time_solver.h diff_solver.h eigen_solver.h \
-	eigen_time_solver.h euler2_solver.h euler_solver.h \
-	laspack_linear_solver.h linear.h linear_solver.h \
-	memory_solution_history.h newton_solver.h \
+	meshfree_interpolation.h meshfree_solution_transfer.h \
+	solution_transfer.h adaptive_time_solver.h diff_solver.h \
+	eigen_solver.h eigen_time_solver.h euler2_solver.h \
+	euler_solver.h laspack_linear_solver.h linear.h \
+	linear_solver.h memory_solution_history.h newton_solver.h \
 	no_solution_history.h nonlinear_solver.h petsc_diff_solver.h \
 	petsc_dm_nonlinear_solver.h petsc_linear_solver.h \
 	petsc_nonlinear_solver.h petscdmlibmesh.h slepc_eigen_solver.h \
@@ -1595,6 +1595,9 @@ dtk_solution_transfer.h: $(top_srcdir)/include/solution_transfer/dtk_solution_tr
 
 meshfree_interpolation.h: $(top_srcdir)/include/solution_transfer/meshfree_interpolation.h
 	$(AM_V_GEN)$(LN_S) $< $@
+
+meshfree_solution_transfer.h: $(top_srcdir)/include/solution_transfer/meshfree_solution_transfer.h
+	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solution_transfer/meshfree_solution_transfer.h meshfree_solution_transfer.h
 
 solution_transfer.h: $(top_srcdir)/include/solution_transfer/solution_transfer.h
 	$(AM_V_GEN)$(LN_S) $< $@
