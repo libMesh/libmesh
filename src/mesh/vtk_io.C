@@ -525,7 +525,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
  * Output the mesh without solutions to a .pvtu file
  */
 void VTKIO::write (const std::string& name) {
-  std::vector<double> soln;
+  std::vector<Number> soln;
   std::vector<std::string> names;
   this->write_nodal_data(name, soln, names);
 }
