@@ -50,8 +50,11 @@ class DofObject;
 
 class DofObject : public ReferenceCountedObject<DofObject>
 {
-
+#ifdef LIBMESH_IS_UNIT_TESTING
+public:
+#else
 protected:
+#endif
 
   /**
    * Constructor. Protected so that you can't instantiate one of these
