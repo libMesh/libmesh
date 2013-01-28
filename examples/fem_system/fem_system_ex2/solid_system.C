@@ -293,12 +293,10 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
   for (unsigned int nbc = 0; nbc < num_bc; nbc++) {
     // Get IDs of the side for this BC
     short int positive_boundary_id = args("bc/displacement", 1, nbc * 4);
-    // Check whether this element is on the current boundary
-    short int boundary_id = this->get_mesh().boundary_info->boundary_id(c.elem,
-        c.side);
 
-    // The current side is not on boundary to be restricted
-    if (boundary_id != positive_boundary_id)
+    // The current side may not be on the boundary to be restricted
+    if (!this->get_mesh().boundary_info->has_boundary_id
+	  (c.elem,c.side,positive_boundary_id))
       continue;
 
     // Read values from configuration file
