@@ -2,7 +2,7 @@
 
 built_sources=""
 
-headers=`find .. -name "*.h" -type f | sort`
+headers=`find .. -name "*.h" -a -not -name libmesh_config.h -type f | LC_COLLATE=POSIX sort`
 
 for header_with_path in $headers ; do
     
@@ -45,7 +45,7 @@ cat <<EOF >> Makefile.am
 if LIBMESH_ENABLE_FPARSER
 
 fparser.hh: \$(top_srcdir)/contrib/fparser/fparser.hh
-	\$(AM_V_GEN)\$(LN_S) \$(top_srcdir)/contrib/fparser/fparser.hh fparser.hh
+	\$(AM_V_GEN)\$(LN_S) \$< \$@
 
   BUILT_SOURCES  += fparser.hh
   DISTCLEANFILES += fparser.hh
@@ -55,7 +55,7 @@ endif
 if LIBMESH_ENABLE_NANOFLANN
 
 nanoflann.hpp: \$(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp
-	\$(AM_V_GEN)\$(LN_S) \$(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp nanoflann.hpp
+	\$(AM_V_GEN)\$(LN_S) \$< \$@
 
   BUILT_SOURCES  += nanoflann.hpp
   DISTCLEANFILES += nanoflann.hpp
@@ -65,19 +65,19 @@ endif
 if LIBMESH_ENABLE_EXODUS
 
 exodusII.h: \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII.h
-	\$(AM_V_GEN)\$(LN_S) \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII.h exodusII.h
+	\$(AM_V_GEN)\$(LN_S) \$< \$@
 
   BUILT_SOURCES  += exodusII.h
   DISTCLEANFILES += exodusII.h
 
 exodusII_ext.h: \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII_ext.h
-	\$(AM_V_GEN)\$(LN_S) \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII_ext.h exodusII_ext.h
+	\$(AM_V_GEN)\$(LN_S) \$< \$@
 
   BUILT_SOURCES  += exodusII_ext.h
   DISTCLEANFILES += exodusII_ext.h
 
 netcdf.h: \$(top_srcdir)/contrib/netcdf/Lib/netcdf.h
-	\$(AM_V_GEN)\$(LN_S) \$(top_srcdir)/contrib/netcdf/Lib/netcdf.h netcdf.h
+	\$(AM_V_GEN)\$(LN_S) \$< \$@
 
   BUILT_SOURCES  += netcdf.h
   DISTCLEANFILES += netcdf.h
@@ -93,7 +93,7 @@ cat <<EOF >> Makefile.am
 #
 # libmesh_config.h rule
 libmesh_config.h: \$(top_builddir)/include/libmesh_config.h
-	\$(AM_V_GEN)\$(LN_S) \$(top_builddir)/include/libmesh_config.h libmesh_config.h
+	\$(AM_V_GEN)\$(LN_S) \$< \$@
 
   BUILT_SOURCES  += libmesh_config.h
   DISTCLEANFILES += libmesh_config.h
@@ -113,7 +113,7 @@ for header_with_path in $headers $specializations ; do
     #echo "source = $source"
     cat <<EOF >> Makefile.am
 $header: $source
-	\$(AM_V_GEN)\$(LN_S) $source $header
+	\$(AM_V_GEN)\$(LN_S) \$< \$@
 
 EOF
 done
