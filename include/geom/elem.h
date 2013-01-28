@@ -1851,18 +1851,7 @@ Elem::RefinementState Elem::refinement_flag () const
 inline
 void Elem::set_refinement_flag(RefinementState rflag)
 {
-#ifdef DEBUG
-  if (rflag != static_cast<RefinementState>(static_cast<unsigned char>(rflag)))
-    {
-      libMesh::err << "ERROR: unsigned char too small to hold Elem::_rflag!"
-		    << std::endl
-		    << "Recompile with Elem:_*flag set to something bigger!"
-		    << std::endl;
-      libmesh_error();
-    }
-#endif
-
-  _rflag = rflag;
+  _rflag = libmesh_cast_int<RefinementState>(rflag);
 }
 
 
@@ -1878,18 +1867,7 @@ Elem::RefinementState Elem::p_refinement_flag () const
 inline
 void Elem::set_p_refinement_flag(RefinementState pflag)
 {
-#ifdef DEBUG
-  if (pflag != static_cast<RefinementState>(static_cast<unsigned char>(pflag)))
-    {
-      libMesh::err << "ERROR: unsigned char too small to hold Elem::_pflag!"
-		    << std::endl
-		    << "Recompile with Elem:_*flag set to something bigger!"
-		    << std::endl;
-      libmesh_error();
-    }
-#endif
-
-  _pflag = pflag;
+  _pflag = libmesh_cast_int<unsigned char>(pflag);
 }
 
 
@@ -1915,20 +1893,6 @@ unsigned int Elem::max_descendant_p_level () const
 inline
 void Elem::set_p_level(unsigned int p)
 {
-  libmesh_assert_less_equal
-    (p, std::numeric_limits<unsigned char>::max());
-
-#ifdef DEBUG
-  if (p != static_cast<unsigned int>(static_cast<unsigned char>(p)))
-    {
-      libMesh::err << "ERROR: unsigned char too small to hold Elem::_p_level!"
-		    << std::endl
-		    << "Recompile with Elem:_p_level set to something bigger!"
-		    << std::endl;
-      libmesh_error();
-    }
-#endif
-
   // Maintain the parent's p level as the minimum of it's children
   if (this->parent() != NULL)
     {
@@ -1943,8 +1907,8 @@ void Elem::set_p_level(unsigned int p)
       // our parent's, but we have to check every other child to see
       else if (parent_p_level == _p_level && _p_level < p)
 	{
-	  _p_level = static_cast<unsigned char>(p);
-	  parent_p_level = static_cast<unsigned char>(p);
+	  _p_level = libmesh_cast_int<unsigned char>(p);
+	  parent_p_level = libmesh_cast_int<unsigned char>(p);
 	  for (unsigned int c=0; c != this->parent()->n_children(); c++)
 	    parent_p_level = std::min(parent_p_level,
 				      this->parent()->child(c)->p_level());
@@ -1956,7 +1920,7 @@ void Elem::set_p_level(unsigned int p)
 	}
     }
 
-  _p_level = p;
+  _p_level = libmesh_cast_int<unsigned char>(p);
 }
 
 
@@ -1964,9 +1928,7 @@ void Elem::set_p_level(unsigned int p)
 inline
 void Elem::hack_p_level(unsigned int p)
 {
-  libmesh_assert_less_equal
-    (p, std::numeric_limits<unsigned char>::max());
-  _p_level = static_cast<unsigned char>(p);
+  _p_level = libmesh_cast_int<unsigned char>(p);
 }
 
 

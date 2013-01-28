@@ -293,12 +293,13 @@ extern OStreamProxy err;
 
 #define libmesh_example_assert(asserted, requirement)   do { if (!(asserted)) { libMesh::out << "Assertion `" #asserted "' failed.  Configuring libMesh with " requirement " may be required to run this code." << std::endl; return 0; } } while(0)
 
-// The libmesh_cast functions do a dynamic cast and assert the result,
-// The libmesh_cast functions do a dynamic cast and assert the result,
-// if we're in debug or development modes, but just do a faster static
-// cast if we're in optimized mode.  Use these casts when you're
-// certain that a cast will succeed in correct code but you want to be
-// able to double-check.
+// libmesh_cast_ref and libmesh_cast_ptr do a dynamic cast and assert
+// the result, if we have RTTI enabled and we're in debug or
+// development modes, but they just do a faster static cast if we're
+// in optimized mode.
+//
+// Use these casts when you're certain that a cast will succeed in
+// correct code but you want to be able to double-check.
 template <typename Tnew, typename Told>
 inline Tnew libmesh_cast_ref(Told& oldvar)
 {
@@ -344,6 +345,23 @@ inline Tnew libmesh_cast_ptr (Told* oldvar)
 #else
   return(static_cast<Tnew>(oldvar));
 #endif
+}
+
+
+// libmesh_cast_int asserts that the value of the castee is within the
+// bounds which are exactly representable by the output type, if we're
+// in debug or development modes, but it just does a faster static
+// cast if we're in optimized mode.
+//
+// Use these casts when you're certain that a cast will succeed in
+// correct code but you want to be able to double-check.
+template <typename Tnew, typename Told>
+inline Tnew libmesh_cast_int (Told oldvar)
+{
+  libmesh_assert_equal_to
+    (oldvar, static_cast<Told>(static_cast<Tnew>(oldvar)));
+
+  return(static_cast<Tnew>(oldvar));
 }
 
 
