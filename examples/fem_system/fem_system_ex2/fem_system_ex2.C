@@ -42,8 +42,8 @@ using namespace libMesh;
 
 #include "solid_system.h"
 
-void setup(EquationSystems& systems, Mesh& mesh, GetPot& args) {
-
+void setup(EquationSystems& systems, Mesh& mesh, GetPot& args)
+{
   const unsigned int dim = mesh.mesh_dimension();
   // We currently invert tensors with the assumption that they're 3x3
   libmesh_assert (dim == 3); 
@@ -79,8 +79,10 @@ void setup(EquationSystems& systems, Mesh& mesh, GetPot& args) {
   aux_sys.reinit();
 }
 
-void run_timestepping(EquationSystems& systems, GetPot& args) {
 
+
+void run_timestepping(EquationSystems& systems, GetPot& args)
+{
   TransientExplicitSystem& aux_system = systems.get_system<TransientExplicitSystem>("auxiliary");
 
   SolidSystem& solid_system = systems.get_system<SolidSystem>("solid");
@@ -134,32 +136,41 @@ void run_timestepping(EquationSystems& systems, GetPot& args) {
 
 
 
-int main(int argc, char** argv) {
-
+int main(int argc, char** argv)
+{
   // Skip this example if we do not meet certain requirements
 #ifndef LIBMESH_HAVE_VTK
-  std::cout << "This example requires VTK support - skipping.\n";
-  return 77;
+  libmesh_example_assert(false, "--enable-vtk");
 #endif
 
-	// Initialize libMesh and any dependent libraries
-	LibMeshInit init(argc, argv);
+  // Initialize libMesh and any dependent libraries
+  LibMeshInit init(argc, argv);
 
-	// read simulation parameters from file
-	GetPot args = GetPot("solid.in");
+  // Threaded assembly doesn't currently work with the moving mesh
+  // code.
+  // We'll skip this example for now.
+  if (libMesh::n_threads() > 1)
+    {
+      std::cout << "We skip fem_system_ex2 when using threads.\n"
+                << std::endl;
+      return 0;
+    }
 
-	// Create System and Mesh
-        int dim = args("mesh/generation/dimension", 3);
-	Mesh mesh(dim);
-	EquationSystems systems(mesh);
+  // read simulation parameters from file
+  GetPot args = GetPot("solid.in");
 
-	// Create and set systems up
-	setup(systems, mesh, args);
+  // Create System and Mesh
+  int dim = args("mesh/generation/dimension", 3);
+  Mesh mesh(dim);
+  EquationSystems systems(mesh);
 
-	// run the systems
-	run_timestepping(systems, args);
+  // Create and set systems up
+  setup(systems, mesh, args);
 
-	out << "Finished calculations" << std::endl;
-	return 0;
+  // run the systems
+  run_timestepping(systems, args);
+
+  out << "Finished calculations" << std::endl;
+  return 0;
 }
 
