@@ -117,8 +117,8 @@ void TecplotMacros::set_n_cells (const unsigned int nc)
 
 // ------------------------------------------------------------
 // TecplotIO  members
-TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary, const Real time,
-		      const int strand_offset) :
+TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary, const
+		      double time, const int strand_offset) :
   MeshOutput<MeshBase> (mesh),
   _binary (binary),
   _time (time),

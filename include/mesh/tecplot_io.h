@@ -57,7 +57,7 @@ class TecplotIO : public MeshOutput<MeshBase>
    */
   explicit
   TecplotIO (const MeshBase&, const bool binary=false,
-	     const Real time=0., const int strand_offset=0);
+	     const double time=0., const int strand_offset=0);
 
   /**
    * This method implements writing a mesh to a specified file.
@@ -130,7 +130,7 @@ class TecplotIO : public MeshOutput<MeshBase>
   /**
    * Solution time.
    */
-  Real _time;
+  double _time;
 
   /**
    * Offset for Tecplot's STRANDID.
