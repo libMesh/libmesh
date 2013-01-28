@@ -492,12 +492,13 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	rb_scm_evaluation.h rb_temporal_discretization.h rb_theta.h \
 	rb_theta_expansion.h transient_rb_assembly_expansion.h \
 	transient_rb_construction.h transient_rb_evaluation.h \
-	transient_rb_theta_expansion.h dtk_adapter.h dtk_evaluator.h \
-	dtk_solution_transfer.h meshfree_interpolation.h \
-	solution_transfer.h adaptive_time_solver.h diff_solver.h \
-	eigen_solver.h eigen_time_solver.h euler2_solver.h \
-	euler_solver.h laspack_linear_solver.h linear.h \
-	linear_solver.h memory_solution_history.h newton_solver.h \
+	transient_rb_theta_expansion.h direct_solution_transfer.h \
+	dtk_adapter.h dtk_evaluator.h dtk_solution_transfer.h \
+	meshfree_interpolation.h solution_transfer.h \
+	adaptive_time_solver.h diff_solver.h eigen_solver.h \
+	eigen_time_solver.h euler2_solver.h euler_solver.h \
+	laspack_linear_solver.h linear.h linear_solver.h \
+	memory_solution_history.h newton_solver.h \
 	no_solution_history.h nonlinear_solver.h petsc_diff_solver.h \
 	petsc_dm_nonlinear_solver.h petsc_linear_solver.h \
 	petsc_nonlinear_solver.h petscdmlibmesh.h slepc_eigen_solver.h \
@@ -1128,6 +1129,9 @@ stored_range.h: $(top_srcdir)/include/geom/stored_range.h
 surface.h: $(top_srcdir)/include/geom/surface.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/geom/surface.h surface.h
 
+libmesh_config.h: $(top_srcdir)/include/libmesh_config.h
+	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/libmesh_config.h libmesh_config.h
+
 abaqus_io.h: $(top_srcdir)/include/mesh/abaqus_io.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/mesh/abaqus_io.h abaqus_io.h
 
@@ -1580,6 +1584,9 @@ transient_rb_evaluation.h: $(top_srcdir)/include/reduced_basis/transient_rb_eval
 
 transient_rb_theta_expansion.h: $(top_srcdir)/include/reduced_basis/transient_rb_theta_expansion.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/reduced_basis/transient_rb_theta_expansion.h transient_rb_theta_expansion.h
+
+direct_solution_transfer.h: $(top_srcdir)/include/solution_transfer/direct_solution_transfer.h
+	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solution_transfer/direct_solution_transfer.h direct_solution_transfer.h
 
 dtk_adapter.h: $(top_srcdir)/include/solution_transfer/dtk_adapter.h
 	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solution_transfer/dtk_adapter.h dtk_adapter.h

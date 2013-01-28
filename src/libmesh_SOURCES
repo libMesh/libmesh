@@ -316,6 +316,7 @@ libmesh_SOURCES =  \
         src/reduced_basis/transient_rb_construction.C \
         src/reduced_basis/transient_rb_evaluation.C \
         src/reduced_basis/transient_rb_theta_expansion.C \
+        src/solution_transfer/direct_solution_transfer.C \
         src/solution_transfer/dtk_adapter.C \
         src/solution_transfer/dtk_evaluator.C \
         src/solution_transfer/dtk_solution_transfer.C \
