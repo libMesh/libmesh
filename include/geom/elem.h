@@ -2301,10 +2301,10 @@ public:
 
   // Empty constructor.
   SideIter()
-    : _side_number(libMesh::invalid_uint),
-      _side(),
+    : _side(),
       _side_ptr(NULL),
-      _parent(NULL)
+      _parent(NULL),
+      _side_number(libMesh::invalid_uint)
   {}
 
 
