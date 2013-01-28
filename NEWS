@@ -16,7 +16,16 @@
       o make distcheck
         packages up a tarball and tests it for self-sufficiency.
 	always do this when modifying the build system.
-
+      o for more information, view the README and INSTALL files.
+  * VariableGroups DofObject storage optimization for the common
+    case of multiple Variables of the same type within a System.
+    Note this changes the default variable ordering within a
+    System - the old format is available via System::identify_variable_groups()
+  * TecplotIO binary format updated to support v11.2 features where
+    available.  This includes encoding the solution time into output files,
+    writing each libMesh subdomain to a separate Tecplot zone, and support
+    for 1D Tecplot binary files.
+    
 0.7.3 -> 0.8.0
   * Vector-valued finite elements & related examples
   * Entirely refactored Parallel namespace implementation
