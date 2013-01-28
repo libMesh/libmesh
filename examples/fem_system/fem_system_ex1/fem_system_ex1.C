@@ -64,7 +64,7 @@ int main (int argc, char** argv)
   // We'll skip this example for now.
   if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
     {
-      std::cout << "We skip example 18 when using the Trilinos solvers.\n"
+      std::cout << "We skip fem_system_ex1 when using the Trilinos solvers.\n"
                 << std::endl;
       return 0;
     }
