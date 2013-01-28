@@ -1597,7 +1597,7 @@ meshfree_interpolation.h: $(top_srcdir)/include/solution_transfer/meshfree_inter
 	$(AM_V_GEN)$(LN_S) $< $@
 
 meshfree_solution_transfer.h: $(top_srcdir)/include/solution_transfer/meshfree_solution_transfer.h
-	$(AM_V_GEN)$(LN_S) $(top_srcdir)/include/solution_transfer/meshfree_solution_transfer.h meshfree_solution_transfer.h
+	$(AM_V_GEN)$(LN_S) $< $@
 
 solution_transfer.h: $(top_srcdir)/include/solution_transfer/solution_transfer.h
 	$(AM_V_GEN)$(LN_S) $< $@
