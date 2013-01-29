@@ -177,10 +177,10 @@ void EnsightIO::write_geometry_ascii()
   typedef std::map<ElemType, std::vector<const Elem*> >::iterator  ensight_parts_iterator;
   typedef std::pair<ElemType, std::vector<const Elem*> >           ensight_parts_value;
 
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
 
   for ( ; el != end_el ; ++el)
     {
@@ -268,7 +268,7 @@ void EnsightIO::write_geometry_ascii()
 
 void EnsightIO::write_case()
 {
-  std::stringstream case_file, geo_file, scl_file;
+  std::stringstream case_file, geo_file;
   case_file << _ensight_file_name << ".case";
 
   FILE* fout = fopen(case_file.str().c_str(),"w");
@@ -370,9 +370,9 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
   fprintf(fout,"%10d\n",1);
   fprintf(fout,"coordinates\n");
 
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
 
-  const unsigned int dim = mesh.mesh_dimension();
+  const unsigned int dim = the_mesh.mesh_dimension();
 
   const System &system = _equation_systems.get_system(sys);
 
@@ -387,8 +387,8 @@ void EnsightIO::write_scalar_ascii(const std::string &sys, const std::string &va
 
   // Now we will loop over all the elements in the mesh.
 
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
 
   typedef std::map<int,Real> map_local_soln;
   typedef map_local_soln::iterator local_soln_iterator;
@@ -454,10 +454,10 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
   fprintf(fout,"coordinates\n");
 
   // Get a constant reference to the mesh object.
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
 
   // The dimension that we are running
-  const unsigned int dim = mesh.mesh_dimension();
+  const unsigned int dim = the_mesh.mesh_dimension();
 
   const System &system = _equation_systems.get_system(sys);
 
@@ -473,8 +473,8 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
   std::vector<dof_id_type> dof_indices_w;
 
   // Now we will loop over all the elements in the mesh.
-  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+  MeshBase::const_element_iterator       el     = the_mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = the_mesh.active_local_elements_end();
 
   typedef std::map<int,std::vector<Real> > map_local_soln;
   typedef map_local_soln::iterator  local_soln_iterator;
@@ -527,12 +527,12 @@ void EnsightIO::write_vector_ascii(const std::string &sys, const std::vector<std
 
     for (unsigned int n=0; n<elem->n_nodes(); n++)
       {
-	std::vector<Real> vec(3);
-	vec[0]= libmesh_real(nodal_soln_u[n]);
-	vec[1]= libmesh_real(nodal_soln_v[n]);
-	vec[2]=0.0;
-	if(dim==3) vec[2]= libmesh_real(nodal_soln_w[n]);
-	local_soln[elem->node(n)] = vec;
+	std::vector<Real> node_vec(3);
+	node_vec[0]= libmesh_real(nodal_soln_u[n]);
+	node_vec[1]= libmesh_real(nodal_soln_v[n]);
+	node_vec[2]=0.0;
+	if(dim==3) node_vec[2]= libmesh_real(nodal_soln_w[n]);
+	local_soln[elem->node(n)] = node_vec;
       }
 
   }
