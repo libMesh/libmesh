@@ -56,11 +56,11 @@ namespace
 
       std::set<const Elem*> point_neighbors;
       elem->find_point_neighbors(p, point_neighbors);
-      for (std::set<const Elem*>::const_iterator i =
+      for (std::set<const Elem*>::const_iterator point_neighbors_iter =
            point_neighbors.begin();
-           i != point_neighbors.end(); ++i)
+           point_neighbors_iter != point_neighbors.end(); ++point_neighbors_iter)
         {
-          const Elem* pt_neighbor = *i;
+          const Elem* pt_neighbor = *point_neighbors_iter;
 
           // If this point neighbor isn't at least
           // as coarse as the current primary elem, or if it is at
@@ -119,11 +119,11 @@ namespace
 
       std::set<const Elem*> edge_neighbors;
       elem->find_edge_neighbors(p1, p2, edge_neighbors);
-      for (std::set<const Elem*>::const_iterator i =
+      for (std::set<const Elem*>::const_iterator edge_neighbors_iter =
            edge_neighbors.begin();
-           i != edge_neighbors.end(); ++i)
+           edge_neighbors_iter != edge_neighbors.end(); ++edge_neighbors_iter)
         {
-          const Elem* e_neighbor = *i;
+          const Elem* e_neighbor = *edge_neighbors_iter;
 
           // If this edge neighbor isn't at least
           // as coarse as the current primary elem, or if it is at
