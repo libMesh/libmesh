@@ -62,7 +62,7 @@ template <>
 Real FE<1,XYZ>::shape(const Elem* elem,
 		      const Order libmesh_dbg_var(order),
 		      const unsigned int i,
-		      const Point& p)
+		      const Point& point_in)
 {
   libmesh_assert(elem);
   libmesh_assert_less_equal (i, order + elem->p_level());
@@ -87,7 +87,7 @@ Real FE<1,XYZ>::shape(const Elem* elem,
   // horribly with more than one thread.
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-  const Real x  = p(0);
+  const Real x  = point_in(0);
   const Real xc = centroid(0);
   const Real dx = (x - xc)/max_distance;
 
@@ -145,7 +145,7 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
 			    const Order libmesh_dbg_var(order),
 			    const unsigned int i,
 			    const unsigned int libmesh_dbg_var(j),
-			    const Point& p)
+			    const Point& point_in)
 {
   libmesh_assert(elem);
   libmesh_assert_less_equal (i, order + elem->p_level());
@@ -174,7 +174,7 @@ Real FE<1,XYZ>::shape_deriv(const Elem* elem,
   // horribly with more than one thread.
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-  const Real x  = p(0);
+  const Real x  = point_in(0);
   const Real xc = centroid(0);
   const Real dx = (x - xc)/max_distance;
 
@@ -231,7 +231,7 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
 			           const Order libmesh_dbg_var(order),
 			           const unsigned int i,
 			           const unsigned int libmesh_dbg_var(j),
-			           const Point& p)
+			           const Point& point_in)
 {
   libmesh_assert(elem);
   libmesh_assert_less_equal (i, order + elem->p_level());
@@ -260,7 +260,7 @@ Real FE<1,XYZ>::shape_second_deriv(const Elem* elem,
   // horribly with more than one thread.
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-  const Real x  = p(0);
+  const Real x  = point_in(0);
   const Real xc = centroid(0);
   const Real dx = (x - xc)/max_distance;
   const Real dist2 = pow(max_distance,2.);
