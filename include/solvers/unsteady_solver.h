@@ -94,6 +94,12 @@ public:
   virtual void adjoint_advance_timestep ();
 
   /**
+   * This method retrieves all the stored solutions at the current
+   * system.time
+   */
+  virtual void retrieve_timestep ();
+
+  /**
    * This method should return the expected convergence order of the
    * (non-local) error of the time discretization scheme - e.g. 2 for the
    * O(deltat^2) Crank-Nicholson, or 1 for the O(deltat) Backward Euler.

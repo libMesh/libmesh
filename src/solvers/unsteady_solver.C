@@ -164,6 +164,11 @@ void UnsteadySolver::adjoint_advance_timestep ()
   solution_history->retrieve();
 }
 
+  void UnsteadySolver::retrieve_timestep()
+  {
+    // Retrieve all the stored vectors at the current time
+    solution_history->retrieve();
+  }
 
 
 Number UnsteadySolver::old_nonlinear_solution(const unsigned int global_dof_number)
