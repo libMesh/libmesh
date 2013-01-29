@@ -167,8 +167,8 @@ namespace
 namespace libMesh
 {
 
-  AbaqusIO::AbaqusIO (MeshBase& mesh) :
-    MeshInput<MeshBase> (mesh),
+  AbaqusIO::AbaqusIO (MeshBase& mesh_in) :
+    MeshInput<MeshBase> (mesh_in),
     build_sidesets_from_nodesets(false),
     _already_seen_part(false)
   {
@@ -187,10 +187,10 @@ namespace libMesh
   void AbaqusIO::read (const std::string& fname)
   {
     // Get a reference to the mesh we are reading
-    MeshBase& mesh = MeshInput<MeshBase>::mesh();
+    MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
 
     // Clear any existing mesh data
-    mesh.clear();
+    the_mesh.clear();
 
     // Open stream for reading
     _in.open(fname.c_str());
@@ -347,9 +347,9 @@ namespace libMesh
     // do some more processing.
     //
     libMesh::out << "Mesh contains "
-		 << mesh.n_elem()
+		 << the_mesh.n_elem()
 		 << " elements, and "
-		 << mesh.n_nodes()
+		 << the_mesh.n_nodes()
 		 << " nodes." << std::endl;
 
     // TODO: Remove these or write a function to do it?
@@ -384,7 +384,7 @@ namespace libMesh
     // sidesets.  So we can call the new BoundaryInfo function which
     // generates sidesets from nodesets.
     if (build_sidesets_from_nodesets)
-      mesh.boundary_info->build_side_list_from_node_list();
+      the_mesh.boundary_info->build_side_list_from_node_list();
 
   } // read()
 
@@ -397,13 +397,13 @@ namespace libMesh
   void AbaqusIO::read_nodes()
   {
     // Get a reference to the mesh we are reading
-    MeshBase& mesh = MeshInput<MeshBase>::mesh();
+    MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
 
     // Debugging: print node count
     // libMesh::out << "Before read_nodes(), mesh contains "
-    // 		 << mesh.n_elem()
+    // 		 << the_mesh.n_elem()
     // 		 << " elements, and "
-    // 		 << mesh.n_nodes()
+    // 		 << the_mesh.n_nodes()
     // 		 << " nodes." << std::endl;
 
     // In the input file I have, Abaqus neither tells what
@@ -459,16 +459,16 @@ namespace libMesh
 
 	// Add the point to the mesh using libmesh's numbering,
 	// and post-increment the libmesh node counter.
-	mesh.add_point(Point(x,y,z), libmesh_node_id++);
+	the_mesh.add_point(Point(x,y,z), libmesh_node_id++);
       } // while
 
     // Debugging: print node count.  Note: in serial mesh, this count may
     // be off by one, since Abaqus uses one-based numbering, and libmesh
     // just reports the length of its _nodes vector for the number of nodes.
     // libMesh::out << "After read_nodes(), mesh contains "
-    //              << mesh.n_elem()
+    //              << the_mesh.n_elem()
     //              << " elements, and "
-    //              << mesh.n_nodes()
+    //              << the_mesh.n_nodes()
     //              << " nodes." << std::endl;
 
   } // read_nodes()
@@ -484,7 +484,7 @@ namespace libMesh
     std::string elset_name = this->parse_label(upper, "elset");
 
     // Get a reference to the mesh we are reading
-    MeshBase& mesh = MeshInput<MeshBase>::mesh();
+    MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
 
     // initialize the eletypes map (eletypes is a file-global variable)
     init_eletypes();
@@ -498,49 +498,49 @@ namespace libMesh
       {
 	elem_type = QUAD4;
 	n_nodes_per_elem = 4;
-	mesh.set_mesh_dimension(2);
+	the_mesh.set_mesh_dimension(2);
       }
     else if (upper.find("CPS3") != std::string::npos)
       {
 	elem_type = TRI3;
 	n_nodes_per_elem = 3;
-	mesh.set_mesh_dimension(2);
+	the_mesh.set_mesh_dimension(2);
       }
     else if (upper.find("C3D8") != std::string::npos)
       {
 	elem_type = HEX8;
 	n_nodes_per_elem = 8;
-	mesh.set_mesh_dimension(3);
+	the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D4") != std::string::npos)
       {
 	elem_type = TET4;
 	n_nodes_per_elem = 4;
-	mesh.set_mesh_dimension(3);
+	the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D20") != std::string::npos)
       {
 	elem_type = HEX20;
 	n_nodes_per_elem = 20;
-	mesh.set_mesh_dimension(3);
+	the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D6") != std::string::npos)
       {
 	elem_type = PRISM6;
 	n_nodes_per_elem = 6;
-	mesh.set_mesh_dimension(3);
+	the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D15") != std::string::npos)
       {
 	elem_type = PRISM15;
 	n_nodes_per_elem = 15;
-	mesh.set_mesh_dimension(3);
+	the_mesh.set_mesh_dimension(3);
       }
     else if (upper.find("C3D10") != std::string::npos)
       {
 	elem_type = TET10;
 	n_nodes_per_elem = 10;
-	mesh.set_mesh_dimension(3);
+	the_mesh.set_mesh_dimension(3);
       }
     else
       {
@@ -583,7 +583,7 @@ namespace libMesh
 	// libMesh::out << "Reading data for element " << abaqus_elem_id << std::endl;
 
 	// Add an element of the appropriate type to the Mesh.
-	Elem* elem = mesh.add_elem(Elem::build(elem_type).release());
+	Elem* elem = the_mesh.add_elem(Elem::build(elem_type).release());
 
 	// Associate the ID returned from libmesh with the abaqus element ID
 	//_libmesh_to_abaqus_elem_mapping[elem->id()] = abaqus_elem_id;
@@ -616,7 +616,7 @@ namespace libMesh
 		    unsigned libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[abaqus_global_node_id];
 
 		    // Grab the node pointer from the mesh for this ID
-		    Node* node = mesh.node_ptr(libmesh_global_node_id);
+		    Node* node = the_mesh.node_ptr(libmesh_global_node_id);
 
 		    // Debugging:
 		    // libMesh::out << "Assigning global node id: " << abaqus_global_node_id
@@ -796,7 +796,7 @@ namespace libMesh
   void AbaqusIO::assign_subdomain_ids()
   {
     // Get a reference to the mesh we are reading
-    MeshBase& mesh = MeshInput<MeshBase>::mesh();
+    MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
 
     // The number of elemsets we've found while reading
     unsigned n_elemsets = _elemset_ids.size();
@@ -826,7 +826,7 @@ namespace libMesh
 	      unsigned libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ id_vector[i] ];
 
 	      // Get pointer to that element
-	      Elem* elem = mesh.elem(libmesh_elem_id);
+	      Elem* elem = the_mesh.elem(libmesh_elem_id);
 
 	      if (elem == NULL)
 		{
@@ -851,7 +851,7 @@ namespace libMesh
   void AbaqusIO::assign_boundary_node_ids()
   {
     // Get a reference to the mesh we are reading
-    MeshBase& mesh = MeshInput<MeshBase>::mesh();
+    MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
 
     // Iterate over the container of nodesets
     container_t::iterator it=_nodeset_ids.begin();
@@ -870,7 +870,7 @@ namespace libMesh
 	    unsigned libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[nodeset_ids[i]];
 
 	    // Get node pointer from the mesh
-	    Node* node = mesh.node_ptr(libmesh_global_node_id);
+	    Node* node = the_mesh.node_ptr(libmesh_global_node_id);
 
 	    if (node == NULL)
 	      {
@@ -880,7 +880,7 @@ namespace libMesh
 
 	    // Add this node with the current_id (which is determined by the
 	    // alphabetical ordering of the map) to the BoundaryInfo object
-	    mesh.boundary_info->add_node(node, current_id);
+	    the_mesh.boundary_info->add_node(node, current_id);
 	  }
       }
 
@@ -892,7 +892,7 @@ namespace libMesh
   void AbaqusIO::assign_sideset_ids()
   {
     // Get a reference to the mesh we are reading
-    MeshBase& mesh = MeshInput<MeshBase>::mesh();
+    MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
 
     // initialize the eletypes map (eletypes is a file-global variable)
     init_eletypes();
@@ -919,7 +919,7 @@ namespace libMesh
 	    unsigned libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
 
 	    // Get pointer to that element
-	    Elem* elem = mesh.elem(libmesh_elem_id);
+	    Elem* elem = the_mesh.elem(libmesh_elem_id);
 
 	    // Check that the pointer returned from the Mesh is non-NULL
 	    if (elem == NULL)
@@ -943,9 +943,9 @@ namespace libMesh
 	    // alphabetical ordering of the map).  Side numbers in Abaqus are 1-based,
 	    // so we subtract 1 here before passing the abaqus side number to the
 	    // mapping array
-	    mesh.boundary_info->add_side(elem,
-					 eledef.abaqus_zero_based_side_id_to_libmesh_side_id[abaqus_side_number-1],
-					 current_id);
+	    the_mesh.boundary_info->add_side(elem,
+                                             eledef.abaqus_zero_based_side_id_to_libmesh_side_id[abaqus_side_number-1],
+                                             current_id);
 	  }
       }
   } // assign_sideset_ids()
