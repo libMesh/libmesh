@@ -23,18 +23,18 @@ DirectSolutionTransfer::transfer(const Variable & from_var, const Variable & to_
   
   // get dof indices for source variable
   unsigned int from_vn = from_var.number();
-  std::set<unsigned int> from_var_indices;
+  std::set<dof_id_type> from_var_indices;
   from_sys->local_dof_indices(from_vn, from_var_indices);
 
   // get dof indices for dest variable
   unsigned int to_vn = to_var.number();
-  std::set<unsigned int> to_var_indices;
+  std::set<dof_id_type> to_var_indices;
   to_sys->local_dof_indices(to_vn, to_var_indices);
   
   // copy the values from from solution vector to to solution vector
-  std::set<unsigned int>::iterator from_it = from_var_indices.begin();
-  std::set<unsigned int>::iterator from_it_end = from_var_indices.end();
-  std::set<unsigned int>::iterator to_it = to_var_indices.begin();
+  std::set<dof_id_type>::iterator from_it = from_var_indices.begin();
+  std::set<dof_id_type>::iterator from_it_end = from_var_indices.end();
+  std::set<dof_id_type>::iterator to_it = to_var_indices.begin();
 
   NumericVector<Number> & from_solution = *from_sys->solution;
   
