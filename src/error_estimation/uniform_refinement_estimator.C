@@ -452,9 +452,9 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
   // Get the error in the uniformly refined solution(s).
 
-  for (unsigned int i=0; i != system_list.size(); ++i)
+  for (unsigned int sys_num=0; sys_num != system_list.size(); ++sys_num)
     {
-      System &system = *system_list[i];
+      System &system = *system_list[sys_num];
 
       unsigned int n_vars = system.n_vars();
 
@@ -463,7 +463,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       const SystemNorm &system_i_norm =
         _error_norms->find(&system)->second;
 
-      NumericVector<Number> *projected_solution = projected_solutions[i];
+      NumericVector<Number> *projected_solution = projected_solutions[sys_num];
 
       // Loop over all the variables in the system
       for (unsigned int var=0; var<n_vars; var++)
@@ -666,10 +666,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     }
   else
     {
-      for (ErrorMap::iterator i = errors_per_cell->begin();
-           i != errors_per_cell->end(); ++i)
+      for (ErrorMap::iterator it = errors_per_cell->begin();
+           it != errors_per_cell->end(); ++it)
         {
-          ErrorVector *e = i->second;
+          ErrorVector *e = it->second;
           // First sum the vector of estimated error values
           this->reduce_error(*e);
 
