@@ -870,7 +870,7 @@ GetPot::_parse_argument_vector(const STRING_VECTOR& ARGV)
 	    // => arg (from start to '=') = Name of variable
 	    //        (from '=' to end)   = value of variable
 	    _set_variable(arg.substr(0,equals_pos),
-		          arg.substr(equals_pos), false);
+		          arg.substr(equals_pos+1), false);
 	}
     }
 }
