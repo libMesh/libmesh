@@ -69,11 +69,11 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       // compute new nodal locations
       for (unsigned int c=0; c<this->n_children(); c++)
         {
-          Elem *child = this->child(c);
-	  p[c].resize    (child->n_nodes());
-	  nodes[c].resize(child->n_nodes());
+          Elem *current_child = this->child(c);
+	  p[c].resize    (current_child->n_nodes());
+	  nodes[c].resize(current_child->n_nodes());
 
-	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
+	  for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
 	    {
 	      // zero entries
 	      p[c][nc].zero();
@@ -98,25 +98,25 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 
 	// assign nodes to children & add them to the mesh
           const Real pointtol = this->hmin() * TOLERANCE;
-	  for (unsigned int nc=0; nc<child->n_nodes(); nc++)
+	  for (unsigned int nc=0; nc<current_child->n_nodes(); nc++)
 	    {
 	      if (nodes[c][nc] != NULL)
 	        {
-		  child->set_node(nc) = nodes[c][nc];
+		  current_child->set_node(nc) = nodes[c][nc];
 	        }
 	      else
 	        {
-		  child->set_node(nc) =
+		  current_child->set_node(nc) =
 		    mesh_refinement.add_point(p[c][nc],
-					      child->processor_id(),
+					      current_child->processor_id(),
                                               pointtol);
-		  child->get_node(nc)->set_n_systems
+		  current_child->get_node(nc)->set_n_systems
                     (this->n_systems());
 	        }
 	    }
 
-	  mesh_refinement.add_elem (child);
-          child->set_n_systems(this->n_systems());
+	  mesh_refinement.add_elem (current_child);
+          current_child->set_n_systems(this->n_systems());
         }
     }
   else
@@ -124,11 +124,11 @@ void Elem::refine (MeshRefinement& mesh_refinement)
       unsigned int parent_p_level = this->p_level();
       for (unsigned int c=0; c<this->n_children(); c++)
         {
-          Elem *child = this->child(c);
-          libmesh_assert(child->subactive());
-          child->set_refinement_flag(Elem::JUST_REFINED);
-          child->set_p_level(parent_p_level);
-          child->set_p_refinement_flag(this->p_refinement_flag());
+          Elem *current_child = this->child(c);
+          libmesh_assert(current_child->subactive());
+          current_child->set_refinement_flag(Elem::JUST_REFINED);
+          current_child->set_p_level(parent_p_level);
+          current_child->set_p_refinement_flag(this->p_refinement_flag());
         }
     }
 
