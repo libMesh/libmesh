@@ -1287,12 +1287,12 @@ void BoundaryInfo::build_side_list (std::vector<unsigned int>&       el,
 
 
 
-void BoundaryInfo::print_info(std::ostream& out) const
+void BoundaryInfo::print_info(std::ostream& out_stream) const
 {
   // Print out the nodal BCs
   if (!_boundary_node_id.empty())
     {
-      out << "Nodal Boundary conditions:" << std::endl
+      out_stream << "Nodal Boundary conditions:" << std::endl
 	  << "--------------------------" << std::endl
 	  << "  (Node No., ID)               " << std::endl;
 
@@ -1304,7 +1304,7 @@ void BoundaryInfo::print_info(std::ostream& out) const
       const std::multimap<const Node*, boundary_id_type>::const_iterator end = _boundary_node_id.end();
 
       for (; it != end; ++it)
-	out << "  (" << (*it).first->id()
+	out_stream << "  (" << (*it).first->id()
 	    << ", "  << (*it).second
 	    << ")"  << std::endl;
     }
@@ -1312,7 +1312,7 @@ void BoundaryInfo::print_info(std::ostream& out) const
   // Print out the element BCs
   if (!_boundary_side_id.empty())
     {
-      out << std::endl
+      out_stream << std::endl
 	  << "Side Boundary conditions:" << std::endl
 	  << "-------------------------" << std::endl
 	  << "  (Elem No., Side No., ID)      " << std::endl;
@@ -1327,7 +1327,7 @@ void BoundaryInfo::print_info(std::ostream& out) const
 	std::pair<unsigned short int, boundary_id_type> >::const_iterator end = _boundary_side_id.end();
 
       for (; it != end; ++it)
-        out << "  (" << (*it).first->id()
+        out_stream << "  (" << (*it).first->id()
 	    << ", "  << (*it).second.first
 	    << ", "  << (*it).second.second
 	    << ")"   << std::endl;
@@ -1336,12 +1336,12 @@ void BoundaryInfo::print_info(std::ostream& out) const
 
 
 
-void BoundaryInfo::print_summary(std::ostream& out) const
+void BoundaryInfo::print_summary(std::ostream& out_stream) const
 {
   // Print out the nodal BCs
   if (!_boundary_node_id.empty())
     {
-      out << "Nodal Boundary conditions:" << std::endl
+      out_stream << "Nodal Boundary conditions:" << std::endl
 	  << "--------------------------" << std::endl
 	  << "  (ID, number of nodes)   " << std::endl;
 
@@ -1357,7 +1357,7 @@ void BoundaryInfo::print_summary(std::ostream& out) const
       const std::map<boundary_id_type, unsigned int>::const_iterator ID_end = ID_counts.end();
 
       for (; ID_it != ID_end; ++ID_it)
-	out << "  (" << (*ID_it).first
+	out_stream << "  (" << (*ID_it).first
 	    << ", "  << (*ID_it).second
 	    << ")"  << std::endl;
     }
@@ -1365,7 +1365,7 @@ void BoundaryInfo::print_summary(std::ostream& out) const
   // Print out the element BCs
   if (!_boundary_side_id.empty())
     {
-      out << std::endl
+      out_stream << std::endl
 	  << "Side Boundary conditions:" << std::endl
 	  << "-------------------------" << std::endl
 	  << "  (ID, number of sides)   " << std::endl;
@@ -1384,7 +1384,7 @@ void BoundaryInfo::print_summary(std::ostream& out) const
       const std::map<boundary_id_type, unsigned int>::const_iterator ID_end = ID_counts.end();
 
       for (; ID_it != ID_end; ++ID_it)
-	out << "  (" << (*ID_it).first
+	out_stream << "  (" << (*ID_it).first
 	    << ", "  << (*ID_it).second
 	    << ")"  << std::endl;
     }
