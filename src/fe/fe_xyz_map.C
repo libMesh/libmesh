@@ -96,12 +96,12 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    const Real jac = std::sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
-				       this->dydxi_map(p)*this->dydxi_map(p));
+	    const Real the_jac = std::sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
+                                           this->dydxi_map(p)*this->dydxi_map(p));
 
-	    libmesh_assert_greater (jac, 0.);
+	    libmesh_assert_greater (the_jac, 0.);
 
-	    this->JxW[p] = jac*qw[p];
+	    this->JxW[p] = the_jac*qw[p];
 	  }
 	
 	break;
@@ -198,11 +198,11 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
 			      this->dzdeta_map(p)*this->dzdeta_map(p));
 
 
-	    const Real jac = std::sqrt(g11*g22 - g12*g21);
+	    const Real the_jac = std::sqrt(g11*g22 - g12*g21);
 
-	    libmesh_assert_greater (jac, 0.);
+	    libmesh_assert_greater (the_jac, 0.);
 
-	    this->JxW[p] = jac*qw[p];
+	    this->JxW[p] = the_jac*qw[p];
 	  }
 
 	break;
