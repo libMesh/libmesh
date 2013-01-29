@@ -359,6 +359,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       std::vector<std::vector<dof_id_type> >
 	filled_request (libMesh::n_processors());
 
+      {
       MeshBase::const_node_iterator       it  = mesh.nodes_begin();
       const MeshBase::const_node_iterator end = mesh.nodes_end();
 
@@ -379,6 +380,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
 	  requested_ids[pid].push_back(hi);
 	}
+      }
 
       // The number of objects in my_node_bin on each processor
       std::vector<dof_id_type> node_bin_sizes(libMesh::n_processors());
@@ -434,6 +436,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
 	  next_obj_on_proc.push_back(filled_request[pid].begin());
 
+        {
 	MeshBase::node_iterator       it  = mesh.nodes_begin();
 	const MeshBase::node_iterator end = mesh.nodes_end();
 
@@ -458,6 +461,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
 	    ++next_obj_on_proc[pid];
 	  }
+        }
       }
     }
 
@@ -471,6 +475,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
       std::vector<std::vector<dof_id_type> >
 	filled_request (libMesh::n_processors());
 
+      {
       MeshBase::const_element_iterator       it  = mesh.elements_begin();
       const MeshBase::const_element_iterator end = mesh.elements_end();
 
@@ -490,6 +495,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
 	  requested_ids[pid].push_back(hi);
 	}
+      }
 
       // The number of objects in my_elem_bin on each processor
       std::vector<dof_id_type> elem_bin_sizes(libMesh::n_processors());
@@ -545,6 +551,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
 	  next_obj_on_proc.push_back(filled_request[pid].begin());
 
+        {
 	MeshBase::element_iterator       it  = mesh.elements_begin();
 	const MeshBase::element_iterator end = mesh.elements_end();
 
@@ -569,6 +576,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
 	    ++next_obj_on_proc[pid];
 	  }
+        }
       }
     }
   }
@@ -722,14 +730,14 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	global_ids.clear(); /**/ global_ids.reserve(request_to_fill.size());
 	for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
 	  {
-	    const Hilbert::HilbertIndices &hi = request_to_fill[idx];
-	    libmesh_assert_less_equal (hi, upper_bounds[libMesh::processor_id()]);
+	    const Hilbert::HilbertIndices &hilbert_indices = request_to_fill[idx];
+	    libmesh_assert_less_equal (hilbert_indices, upper_bounds[libMesh::processor_id()]);
 
 	    // find the requested index in my node bin
 	    std::vector<Hilbert::HilbertIndices>::const_iterator pos =
-	      std::lower_bound (my_bin.begin(), my_bin.end(), hi);
+	      std::lower_bound (my_bin.begin(), my_bin.end(), hilbert_indices);
 	    libmesh_assert (pos != my_bin.end());
-	    libmesh_assert_equal_to (*pos, hi);
+	    libmesh_assert_equal_to (*pos, hilbert_indices);
 
 	    // Finally, assign the global index based off the position of the index
 	    // in my array, properly offset.
