@@ -1034,7 +1034,7 @@ void BoundaryInfo::remove_side (const Elem* elem,
 
 
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
-                                                 const boundary_id_type boundary_id) const
+                                                 const boundary_id_type boundary_id_in) const
 {
   const Elem* searched_elem = elem;
   if (elem->level() != 0)
@@ -1051,7 +1051,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem* const elem,
     {
       // if this is true we found the requested boundary_id
       // of the element and want to return the side
-      if (e.first->second.second == boundary_id)
+      if (e.first->second.second == boundary_id_in)
         {
          unsigned int side = e.first->second.first;
 
