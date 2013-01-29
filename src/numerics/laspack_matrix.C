@@ -49,7 +49,7 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
   // Initialize the _row_start data structure,
   // allocate storage for the _csr array
   {
-    numeric_index_type size = 0;
+    std::size_t size = 0;
 
     for (numeric_index_type row=0; row<n_rows; row++)
       size += sparsity_pattern[row].size();
