@@ -131,22 +131,22 @@ bool Quad::is_child_on_side(const unsigned int c,
 
 
 
-unsigned int Quad::opposite_side(const unsigned int side) const
+unsigned int Quad::opposite_side(const unsigned int side_in) const
 {
-  libmesh_assert_less (side, 4);
+  libmesh_assert_less (side_in, 4);
 
-  return (side + 2) % 4;
+  return (side_in + 2) % 4;
 }
 
 
 
-unsigned int Quad::opposite_node(const unsigned int node,
-                                 const unsigned int side) const
+unsigned int Quad::opposite_node(const unsigned int node_in,
+                                 const unsigned int side_in) const
 {
-  libmesh_assert_less (node, 8);
-  libmesh_assert_less (node, this->n_nodes());
-  libmesh_assert_less (side, this->n_sides());
-  libmesh_assert(this->is_node_on_side(node, side));
+  libmesh_assert_less (node_in, 8);
+  libmesh_assert_less (node_in, this->n_nodes());
+  libmesh_assert_less (side_in, this->n_sides());
+  libmesh_assert(this->is_node_on_side(node_in, side_in));
 
   //unsigned int opposite;
   
@@ -155,15 +155,15 @@ unsigned int Quad::opposite_node(const unsigned int node,
   static const unsigned char side13_nodes_map[] =
     {1, 0, 3, 2, 255, 7, 255, 5};
 
-  switch (side)
+  switch (side_in)
   {
   case 0:
   case 2:
-    return side02_nodes_map[node];
+    return side02_nodes_map[node_in];
     break;
   case 1:
   case 3:
-    return side13_nodes_map[node];
+    return side13_nodes_map[node_in];
     break;
   }
 
