@@ -119,8 +119,6 @@ public:
   virtual void retrieve_timestep();
 
   /**
-
-  /**
    * This method uses the DifferentiableSystem's
    * element_time_derivative() and element_constraint()
    * to build a full residual on an element.  What combination
