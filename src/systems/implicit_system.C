@@ -748,6 +748,8 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
 
       this->assembly(true, false);
       this->rhs->close();
+
+      // FIXME - this can and should be optimized to avoid the clone()
       AutoPtr<NumericVector<Number> > partialR_partialp = this->rhs->clone();
       *partialR_partialp *= -1;
 
