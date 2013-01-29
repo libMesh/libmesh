@@ -139,9 +139,9 @@ void ExodusII_IO_Helper::verbose (bool set_verbosity)
 
 
 
-void ExodusII_IO_Helper::check_err(const int err, const std::string msg)
+void ExodusII_IO_Helper::check_err(const int err_in, const std::string msg)
 {
-  if (err < 0)
+  if (err_in < 0)
     {
       libMesh::err << msg << std::endl;
       libmesh_error();
@@ -253,12 +253,10 @@ void ExodusII_IO_Helper::read_node_num_map ()
 }
 
 
-void ExodusII_IO_Helper::print_nodes(std::ostream &out)
+void ExodusII_IO_Helper::print_nodes(std::ostream &out_stream)
 {
   for (int i=0; i<num_nodes; i++)
-    {
-      out << "(" << x[i] << ", " << y[i] << ", " << z[i] << ")" << std::endl;
-    }
+    out_stream << "(" << x[i] << ", " << y[i] << ", " << z[i] << ")" << std::endl;
 }
 
 
@@ -575,10 +573,10 @@ void ExodusII_IO_Helper::close()
 
 
 
-int ExodusII_IO_Helper::inquire(int req_info, std::string error_msg)
+int ExodusII_IO_Helper::inquire(int req_info_in, std::string error_msg)
 {
   ex_err = exII::ex_inquire(ex_id,
-			    req_info,
+			    req_info_in,
 			    &ret_int,
 			    &ret_float,
 			    &ret_char);
@@ -931,7 +929,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
     subdomain_map[cur_subdomain].push_back(elem->id());
   }
 
-  std::vector<int> elem_num_map;
+  std::vector<int> elem_num_map_out;
 
   std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
 
@@ -972,8 +970,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
       for (unsigned int i=0; i<tmp_vec.size(); i++)
         {
           unsigned int elem_id = tmp_vec[i];
-          elem_num_map.push_back(elem_id);
-          libmesh_elem_num_to_exodus[elem_id] = elem_num_map.size();
+          elem_num_map_out.push_back(elem_id);
+          libmesh_elem_num_to_exodus[elem_id] = elem_num_map_out.size();
 
           const Elem* elem = mesh.elem(elem_id);
 
@@ -1007,7 +1005,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 
     counter++;
   }
-//  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
+//  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map_out[0]);
   check_err(ex_err, "Error writing element connectivities");
 
   // Write out the block names
@@ -1041,7 +1039,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
       }
     }
 
-  std::vector<int> elem_num_map;
+  std::vector<int> elem_num_map_out;
 
   std::map<unsigned int, std::vector<unsigned int>  >::iterator it;
 
@@ -1066,8 +1064,8 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
       for (unsigned int i=0; i<tmp_vec.size(); i++)
         {
           unsigned int elem_id = tmp_vec[i];
-          elem_num_map.push_back(elem_id);
-          libmesh_elem_num_to_exodus[elem_id] = elem_num_map.size();
+          elem_num_map_out.push_back(elem_id);
+          libmesh_elem_num_to_exodus[elem_id] = elem_num_map_out.size();
 
           for (unsigned int j=0; j < static_cast<unsigned int>(num_nodes_per_elem); j++)
             {
@@ -1092,7 +1090,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
     check_err(ex_err, "Error writing element map");
   }
 
-//  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map[0]);
+//  ex_err = exII::ex_put_elem_num_map(ex_id, &elem_num_map_out[0]);
   check_err(ex_err, "Error writing element connectivities");
 
   ex_err = exII::ex_update(ex_id);
