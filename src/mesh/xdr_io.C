@@ -116,10 +116,10 @@ const unsigned int XdrIO::io_blksize = 128000;
 
 // ------------------------------------------------------------
 // XdrIO members
-XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
+XdrIO::XdrIO (MeshBase& mesh, const bool binary_in) :
   MeshInput<MeshBase> (mesh,/* is_parallel_format = */ true),
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
-  _binary             (binary),
+  _binary             (binary_in),
   _legacy             (false),
   _write_serial       (false),
   _write_parallel     (false),
@@ -133,9 +133,9 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary) :
 
 
 
-XdrIO::XdrIO (const MeshBase& mesh, const bool binary) :
+XdrIO::XdrIO (const MeshBase& mesh, const bool binary_in) :
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
-  _binary (binary)
+  _binary (binary_in)
 {
 }
 
@@ -349,31 +349,33 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 	  // which could be 0.
 	  libmesh_assert (!recv_conn.empty());
 
+          {
 	  const unsigned int n_elem_received = recv_conn.back();
-	  std::vector<unsigned int>::const_iterator it = recv_conn.begin();
+	  std::vector<unsigned int>::const_iterator recv_conn_iter = recv_conn.begin();
 
 	  for (unsigned int elem=0; elem<n_elem_received; elem++, next_global_elem++)
 	    {
 	      output_buffer.clear();
-	      const unsigned int n_nodes = *it; ++it;
-	      output_buffer.push_back(*it);     /* type       */ ++it;
-	      /*output_buffer.push_back(*it);*/ /* id         */ ++it;
+	      const unsigned int n_nodes = *recv_conn_iter; ++recv_conn_iter;
+	      output_buffer.push_back(*recv_conn_iter);     /* type       */ ++recv_conn_iter;
+	      /*output_buffer.push_back(*recv_conn_iter);*/ /* id         */ ++recv_conn_iter;
 
 	      if (write_partitioning)
-		output_buffer.push_back(*it); /* processor id */ ++it;
+		output_buffer.push_back(*recv_conn_iter); /* processor id */ ++recv_conn_iter;
 
 	      if (write_subdomain_id)
-		output_buffer.push_back(*it); /* subdomain id */ ++it;
+		output_buffer.push_back(*recv_conn_iter); /* subdomain id */ ++recv_conn_iter;
 
 #ifdef LIBMESH_ENABLE_AMR
 	      if (write_p_level)
-		output_buffer.push_back(*it); /* p level      */ ++it;
+		output_buffer.push_back(*recv_conn_iter); /* p level      */ ++recv_conn_iter;
 #endif
-	      for (unsigned int node=0; node<n_nodes; node++, ++it)
-		output_buffer.push_back(*it);
+	      for (unsigned int node=0; node<n_nodes; node++, ++recv_conn_iter)
+		output_buffer.push_back(*recv_conn_iter);
 
 	      io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
 	    }
+          }
 	}
     }
   else
@@ -448,35 +450,38 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const unsigned int libmesh_d
 	      // at a minimum, the buffer should contain the number of elements,
 	      // which could be 0.
 	      libmesh_assert (!recv_conn.empty());
+
+              {
 	      const unsigned int n_elem_received = recv_conn.back();
-	      std::vector<unsigned int>::const_iterator it = recv_conn.begin();
+	      std::vector<unsigned int>::const_iterator recv_conn_iter = recv_conn.begin();
 
 	      for (unsigned int elem=0; elem<n_elem_received; elem++, next_global_elem++)
 		{
 		  output_buffer.clear();
-		  const unsigned int n_nodes = *it; ++it;
-		  output_buffer.push_back(*it);                   /* type          */ ++it;
-		  /*output_buffer.push_back(*it);*/               /* id            */ ++it;
+		  const unsigned int n_nodes = *recv_conn_iter; ++recv_conn_iter;
+		  output_buffer.push_back(*recv_conn_iter);                   /* type          */ ++recv_conn_iter;
+		  /*output_buffer.push_back(*recv_conn_iter);*/               /* id            */ ++recv_conn_iter;
 
-		  const unsigned int parent_local_id = *it; ++it;
-		  const unsigned int parent_pid      = *it; ++it;
+		  const unsigned int parent_local_id = *recv_conn_iter; ++recv_conn_iter;
+		  const unsigned int parent_pid      = *recv_conn_iter; ++recv_conn_iter;
 
 		  output_buffer.push_back (parent_local_id+processor_offsets[parent_pid]);
 
 		  if (write_partitioning)
-		    output_buffer.push_back(*it); /* processor id */ ++it;
+		    output_buffer.push_back(*recv_conn_iter); /* processor id */ ++recv_conn_iter;
 
 		  if (write_subdomain_id)
-		    output_buffer.push_back(*it); /* subdomain id */ ++it;
+		    output_buffer.push_back(*recv_conn_iter); /* subdomain id */ ++recv_conn_iter;
 
 		  if (write_p_level)
-		    output_buffer.push_back(*it); /* p level       */ ++it;
+		    output_buffer.push_back(*recv_conn_iter); /* p level       */ ++recv_conn_iter;
 
-		  for (unsigned int node=0; node<n_nodes; node++, ++it)
-		    output_buffer.push_back(*it);
+		  for (unsigned int node=0; node<n_nodes; node++, ++recv_conn_iter)
+		    output_buffer.push_back(*recv_conn_iter);
 
 		  io.data_stream (&output_buffer[0], output_buffer.size(), output_buffer.size());
 		}
+              }
 	    }
 	}
       else
@@ -769,14 +774,14 @@ void XdrIO::write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const
           else
 	    CommWorld.receive (pid, recv_bcs);
 
-	  const unsigned int n_local_level_0_elem
+	  const unsigned int my_n_local_level_0_elem
 	    = recv_bcs.back(); recv_bcs.pop_back();
 
 	  for (unsigned int idx=0; idx<recv_bcs.size(); idx += 3, n_bcs_out++)
 	    recv_bcs[idx+0] += elem_offset;
 
 	  io.data_stream (recv_bcs.empty() ? NULL : &recv_bcs[0], recv_bcs.size(), 3);
-	  elem_offset += n_local_level_0_elem;
+	  elem_offset += my_n_local_level_0_elem;
 	}
       libmesh_assert_equal_to (n_bcs, n_bcs_out);
     }

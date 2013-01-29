@@ -637,7 +637,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  // seminorm, otherwise just compute it for the current element
 
 	  // Loop over every element in the patch
-	  for (unsigned int i = 0 ; patch_re_it != patch_re_end; patch_re_it++, ++i)
+	  for (unsigned int e = 0 ; patch_re_it != patch_re_end; patch_re_it++, ++e)
 	    {
 	      // Build the Finite Element for the current element
 
@@ -874,14 +874,14 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	      if (error_estimator.error_norm.type(var) == L_INF ||
 		  error_estimator.error_norm.type(var) == W1_INF_SEMINORM ||
 		  error_estimator.error_norm.type(var) == W2_INF_SEMINORM)
-		new_error_per_cell[i] += error_estimator.error_norm.weight(var) * element_error;
+		new_error_per_cell[e] += error_estimator.error_norm.weight(var) * element_error;
 	      else if (error_estimator.error_norm.type(var) == L2 ||
 		       error_estimator.error_norm.type(var) == H1_SEMINORM ||
 		       error_estimator.error_norm.type(var) == H1_X_SEMINORM ||
 		       error_estimator.error_norm.type(var) == H1_Y_SEMINORM ||
 		       error_estimator.error_norm.type(var) == H1_Z_SEMINORM ||
 		       error_estimator.error_norm.type(var) == H2_SEMINORM)
-		new_error_per_cell[i] += error_estimator.error_norm.weight_sq(var) * element_error;
+		new_error_per_cell[e] += error_estimator.error_norm.weight_sq(var) * element_error;
 	      else
 		libmesh_error();
 	    }  // End (re) loop over patch elements
