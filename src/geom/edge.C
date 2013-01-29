@@ -28,8 +28,8 @@ namespace libMesh
 AutoPtr<Elem> Edge::side (const unsigned int i) const
 {
   libmesh_assert_less (i, 2);
-  const Elem* parent = this;
-  Elem *nodeelem = new NodeElem(const_cast<Elem*>(parent));
+  const Elem* the_parent = this;
+  Elem *nodeelem = new NodeElem(const_cast<Elem*>(the_parent));
   nodeelem->set_node(0) = this->get_node(i);
   return AutoPtr<Elem>(nodeelem);
 }
@@ -38,8 +38,8 @@ AutoPtr<Elem> Edge::side (const unsigned int i) const
 AutoPtr<Elem> Edge::build_side (const unsigned int i, bool) const
 {
   libmesh_assert_less (i, 2);
-  const Elem* parent = this;
-  Elem *nodeelem = new NodeElem(const_cast<Elem*>(parent));
+  const Elem* the_parent = this;
+  Elem *nodeelem = new NodeElem(const_cast<Elem*>(the_parent));
   nodeelem->set_node(0) = this->get_node(i);
   return AutoPtr<Elem>(nodeelem);
 }
@@ -56,22 +56,22 @@ bool Edge::is_child_on_side(const unsigned int c,
 
 
 
-unsigned int Edge::opposite_side(const unsigned int side) const
+unsigned int Edge::opposite_side(const unsigned int side_in) const
 {
-  libmesh_assert_less (side, 2);
-  return 1 - side;
+  libmesh_assert_less (side_in, 2);
+  return 1 - side_in;
 }
 
 
 
-unsigned int Edge::opposite_node(const unsigned int node,
-                                 const unsigned int libmesh_dbg_var(side)) const
+unsigned int Edge::opposite_node(const unsigned int node_in,
+                                 const unsigned int libmesh_dbg_var(side_in)) const
 {
-  libmesh_assert_less (node, 2);
-  libmesh_assert_less (side, this->n_sides());
-  libmesh_assert(this->is_node_on_side(node, side));
+  libmesh_assert_less (node_in, 2);
+  libmesh_assert_less (side_in, this->n_sides());
+  libmesh_assert(this->is_node_on_side(node_in, side_in));
 
-  return 1 - node;
+  return 1 - node_in;
 }
 
 
