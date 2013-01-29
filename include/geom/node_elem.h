@@ -168,7 +168,7 @@ class NodeElem : public Elem
 
   virtual void connectivity(const unsigned int sc,
 			    const IOPackage iop,
-			    std::vector<unsigned int>& conn) const;
+			    std::vector<dof_id_type>& conn) const;
 
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS

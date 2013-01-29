@@ -76,7 +76,7 @@ bool Edge2::is_node_on_edge(const unsigned int,
 
 void Edge2::connectivity(const unsigned int libmesh_dbg_var(sc),
 			 const IOPackage iop,
-			 std::vector<unsigned int>& conn) const
+			 std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_equal_to (sc, 0);
   libmesh_assert_less (sc, this->n_sub_elem());

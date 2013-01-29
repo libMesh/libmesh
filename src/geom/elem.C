@@ -1185,14 +1185,14 @@ void Elem::write_connectivity (std::ostream& out,
       {
 	// This connectivity vector will be used repeatedly instead
 	// of being reconstructed inside the loop.
-	std::vector<unsigned int> conn;
+	std::vector<dof_id_type> conn;
 	for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
 	  {
 	    this->connectivity(sc, TECPLOT, conn);
 
 	    std::copy(conn.begin(),
 		      conn.end(),
-		      std::ostream_iterator<unsigned int>(out, " "));
+		      std::ostream_iterator<dof_id_type>(out, " "));
 
 	    out << '\n';
 	  }
@@ -1223,14 +1223,14 @@ void Elem::write_connectivity (std::ostream& out,
 
 //   // This connectivity vector will be used repeatedly instead
 //   // of being reconstructed inside the loop.
-//   std::vector<unsigned int> conn;
+//   std::vector<dof_id_type> conn;
 //   for (unsigned int sc=0; sc <this->n_sub_elem(); sc++)
 //     {
 //       this->connectivity(sc, TECPLOT, conn);
 
 //       std::copy(conn.begin(),
 //  		conn.end(),
-//  		std::ostream_iterator<unsigned int>(out, " "));
+//  		std::ostream_iterator<dof_id_type>(out, " "));
 
 //       out << std::endl;
 //     }

@@ -216,7 +216,7 @@ bool InfPrism6::contains_point (const Point& p, Real tol) const
 
 void InfPrism6::connectivity(const unsigned int libmesh_dbg_var(sc),
 			     const IOPackage iop,
-			     std::vector<unsigned int>& conn) const
+			     std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

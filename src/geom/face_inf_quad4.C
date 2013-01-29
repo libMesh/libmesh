@@ -205,7 +205,7 @@ AutoPtr<Elem> InfQuad4::build_side (const unsigned int i,
 
 void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
 			    const IOPackage iop,
-			    std::vector<unsigned int>& conn) const
+			    std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);

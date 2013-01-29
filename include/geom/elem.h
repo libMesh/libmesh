@@ -356,7 +356,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    */
   virtual void connectivity(const unsigned int sc,
 			    const IOPackage iop,
-			    std::vector<unsigned int>& conn) const = 0;
+			    std::vector<dof_id_type>& conn) const = 0;
 
   /**
    * Writes the element connectivity for various IO packages

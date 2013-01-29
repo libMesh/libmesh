@@ -113,7 +113,7 @@ class Edge3 : public Edge
 
   virtual void connectivity(const unsigned int sc,
 			    const IOPackage iop,
-			    std::vector<unsigned int>& conn) const;
+			    std::vector<dof_id_type>& conn) const;
 
   /**
    * @returns 2 for all \p n

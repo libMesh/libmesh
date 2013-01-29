@@ -265,7 +265,7 @@ AutoPtr<Elem> Hex20::build_edge (const unsigned int i) const
 
 void Hex20::connectivity(const unsigned int sc,
 			 const IOPackage iop,
-			 std::vector<unsigned int>& conn) const
+			 std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

@@ -445,7 +445,7 @@ void TecplotIO::write_binary (const std::string& fname,
 	for (it  = mesh.active_subdomain_elements_begin (*sbd_it);
 	     it != end; ++it)
 	  {
-	    std::vector<unsigned int> conn;
+	    std::vector<dof_id_type> conn;
 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	      {
 		(*it)->connectivity(se, TECPLOT, conn);
@@ -669,7 +669,7 @@ void TecplotIO::write_binary (const std::string& fname,
 
     for ( ; it != end; ++it)
       {
-	std::vector<unsigned int> conn;
+	std::vector<dof_id_type> conn;
 	for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	  {
 	    (*it)->connectivity(se, TECPLOT, conn);

@@ -625,7 +625,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       case 1:
 	{
 	  // The same temporary storage will be used for each element
-	  std::vector<unsigned int> conn;
+	  std::vector<dof_id_type> conn;
 
 	  for ( ; it != end; ++it)
             {
@@ -667,7 +667,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       case 2:
 	{
 	  // The same temporary storage will be used for each element
-	  std::vector<unsigned int> conn;
+	  std::vector<dof_id_type> conn;
 
 	  for ( ; it != end; ++it)
             {
@@ -767,7 +767,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
       case 3:
 	{
 	  // The same temporary storage will be used for each element
-	  std::vector<unsigned int> conn;
+	  std::vector<dof_id_type> conn;
 
 	  for ( ; it != end; ++it)
             {
@@ -1296,7 +1296,7 @@ void GMVIO::write_binary (const std::string& fname,
                 std::memcpy(buf, &tempint, sizeof(unsigned int));
                 out.write(buf, sizeof(unsigned int));
 
-                std::vector<unsigned int> conn;
+                std::vector<dof_id_type> conn;
                 (*it)->connectivity(se,TECPLOT,conn);
 
                 out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
@@ -1317,7 +1317,7 @@ void GMVIO::write_binary (const std::string& fname,
                 tempint = 4;
                 std::memcpy(buf, &tempint, sizeof(unsigned int));
                 out.write(buf, sizeof(unsigned int));
-                std::vector<unsigned int> conn;
+                std::vector<dof_id_type> conn;
                 (*it)->connectivity(se,TECPLOT,conn);
                 out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
               }
@@ -1336,7 +1336,7 @@ void GMVIO::write_binary (const std::string& fname,
                 tempint = 8;
                 std::memcpy(buf, &tempint, sizeof(unsigned int));
                 out.write(buf, sizeof(unsigned int));
-                std::vector<unsigned int> conn;
+                std::vector<dof_id_type> conn;
                 (*it)->connectivity(se,TECPLOT,conn);
                 out.write(reinterpret_cast<char*>(&conn[0]), sizeof(unsigned int)*tempint);
               }

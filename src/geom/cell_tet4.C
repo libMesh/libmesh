@@ -198,7 +198,7 @@ AutoPtr<Elem> Tet4::build_edge (const unsigned int i) const
 
 void Tet4::connectivity(const unsigned int libmesh_dbg_var(sc),
 			const IOPackage iop,
-			std::vector<unsigned int>& conn) const
+			std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

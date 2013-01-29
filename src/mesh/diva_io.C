@@ -370,7 +370,7 @@ void DivaIO::write_stream (std::ostream& out)
 	  (mesh.elem(e)->type() == HEX20) ||
 	  (mesh.elem(e)->type() == HEX27)   )
 	{
-	  std::vector<unsigned int> conn;
+	  std::vector<dof_id_type> conn;
 	  for (unsigned int se=0; se<mesh.elem(e)->n_sub_elem(); se++)
 	    {
 	      mesh.elem(e)->connectivity(se, TECPLOT, conn);

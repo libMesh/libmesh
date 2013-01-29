@@ -125,7 +125,7 @@ public:
 
   virtual void connectivity(const unsigned int sf,
 			    const IOPackage iop,
-			    std::vector<unsigned int>& conn) const;
+			    std::vector<dof_id_type>& conn) const;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to

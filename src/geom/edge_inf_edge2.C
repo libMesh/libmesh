@@ -65,7 +65,7 @@ bool InfEdge2::is_node_on_edge(const unsigned int,
 
 void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
 			    const IOPackage iop,
-			    std::vector<unsigned int>& conn) const
+			    std::vector<dof_id_type>& conn) const
 {
   libmesh_assert_equal_to (se, 0);
   libmesh_assert_less (se, this->n_sub_elem());

@@ -112,7 +112,7 @@ class Edge2 : public Edge
 
   virtual void connectivity(const unsigned int sc,
 			    const IOPackage iop,
-			    std::vector<unsigned int>& conn) const;
+			    std::vector<dof_id_type>& conn) const;
 
   /**
    * An optimized method for computing the length of a 2-node edge.

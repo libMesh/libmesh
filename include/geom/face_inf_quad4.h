@@ -122,7 +122,7 @@ public:
 
   virtual void connectivity(const unsigned int sf,
 			    const IOPackage iop,
-			    std::vector<unsigned int>& conn) const;
+			    std::vector<dof_id_type>& conn) const;
 
 //   void tecplot_connectivity(const unsigned int sf,
 // 			    std::vector<unsigned int>& conn) const;

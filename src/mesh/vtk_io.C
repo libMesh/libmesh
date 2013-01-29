@@ -207,7 +207,7 @@ void VTKIO::cells_to_vtk()
       pts->SetNumberOfIds(elem->n_nodes());
 
       // get the connectivity for this element
-      std::vector<unsigned int> conn;
+      std::vector<dof_id_type> conn;
       elem->connectivity(0, VTK, conn);
 
       for (unsigned int i = 0; i < conn.size(); ++i)
@@ -396,7 +396,7 @@ void VTKIO::read (const std::string& name)
 	  elem->set_node(j) = mesh.node_ptr(cell->GetPointId(j));
   }
   // then get the connectivity
-  std::vector<unsigned int> conn;
+  std::vector<dof_id_type> conn;
   elem->connectivity(0,VTK,conn);
   // then reshuffle the nodes according to the connectivity, this
   // two-time-assign would evade the definition of the vtk_mapping

@@ -218,7 +218,7 @@ bool InfHex8::contains_point (const Point& p, Real tol) const
 
 void InfHex8::connectivity(const unsigned int libmesh_dbg_var(sc),
 			   const IOPackage iop,
-			   std::vector<unsigned int>& conn) const
+			   std::vector<dof_id_type>& conn) const
 {
   libmesh_assert(_nodes);
   libmesh_assert_less (sc, this->n_sub_elem());

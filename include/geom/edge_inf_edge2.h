@@ -109,7 +109,7 @@ class InfEdge2 : public Edge
 
   virtual void connectivity(const unsigned int se,
 			    const IOPackage iop,
-			    std::vector<unsigned int>& conn) const;
+			    std::vector<dof_id_type>& conn) const;
 
 //   const std::vector<unsigned int> tecplot_connectivity(const unsigned int se=0) const;
 

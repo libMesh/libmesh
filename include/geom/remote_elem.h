@@ -89,7 +89,7 @@ class RemoteElem : public Elem
 
   virtual void connectivity(const unsigned int,
 			    const IOPackage,
-			    std::vector<unsigned int>&) const
+			    std::vector<dof_id_type>&) const
   { libmesh_error(); }
 
   virtual ElemType type () const
