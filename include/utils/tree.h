@@ -64,14 +64,14 @@ public:
   /**
    * Prints the nodes.
    */
-  void print_nodes(std::ostream& out=libMesh::out) const
-  { out << "Printing nodes...\n"; root.print_nodes(out); }
+  void print_nodes(std::ostream& my_out=libMesh::out) const
+  { my_out << "Printing nodes...\n"; root.print_nodes(my_out); }
 
   /**
    * Prints the nodes.
    */
-  void print_elements(std::ostream& out=libMesh::out) const
-  { out << "Printing elements...\n"; root.print_elements(out); }
+  void print_elements(std::ostream& my_out=libMesh::out) const
+  { my_out << "Printing elements...\n"; root.print_elements(my_out); }
 
   /**
    * @returns the number of active bins.

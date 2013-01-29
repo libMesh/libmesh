@@ -64,7 +64,7 @@ public:
    */
   explicit
   DistributedVector (const numeric_index_type n,
-                     const ParallelType type = AUTOMATIC);
+                     const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -72,7 +72,7 @@ public:
    */
   DistributedVector (const numeric_index_type n,
 		     const numeric_index_type n_local,
-                     const ParallelType type = AUTOMATIC);
+                     const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -82,7 +82,7 @@ public:
   DistributedVector (const numeric_index_type N,
 		     const numeric_index_type n_local,
 		     const std::vector<numeric_index_type>& ghost,
-                     const ParallelType type = AUTOMATIC);
+                     const ParallelType ptype = AUTOMATIC);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -133,14 +133,14 @@ public:
   void init (const numeric_index_type N,
 	     const numeric_index_type n_local,
 	     const bool         fast=false,
-	     const ParallelType type=AUTOMATIC);
+	     const ParallelType ptype=AUTOMATIC);
 
   /**
    * call init with n_local = N,
    */
   void init (const numeric_index_type N,
 	     const bool         fast=false,
-	     const ParallelType type=AUTOMATIC);
+	     const ParallelType ptype=AUTOMATIC);
 
   /**
    * Create a vector that holds tha local indices plus those specified
@@ -476,13 +476,13 @@ private:
 // DistributedVector inline methods
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const ParallelType type) :
+DistributedVector<T>::DistributedVector (const ParallelType ptype) :
   _global_size      (0),
   _local_size       (0),
   _first_local_index(0),
   _last_local_index (0)
 {
-  this->_type = type;
+  this->_type = ptype;
 }
 
 
@@ -490,9 +490,9 @@ DistributedVector<T>::DistributedVector (const ParallelType type) :
 template <typename T>
 inline
 DistributedVector<T>::DistributedVector (const numeric_index_type n,
-                                         const ParallelType type)
+                                         const ParallelType ptype)
 {
-  this->init(n, n, false, type);
+  this->init(n, n, false, ptype);
 }
 
 
@@ -501,9 +501,9 @@ template <typename T>
 inline
 DistributedVector<T>::DistributedVector (const numeric_index_type n,
 					 const numeric_index_type n_local,
-                                         const ParallelType type)
+                                         const ParallelType ptype)
 {
-  this->init(n, n_local, false, type);
+  this->init(n, n_local, false, ptype);
 }
 
 
@@ -513,9 +513,9 @@ inline
 DistributedVector<T>::DistributedVector (const numeric_index_type n,
 					 const numeric_index_type n_local,
 		                         const std::vector<numeric_index_type>& ghost,
-                                         const ParallelType type)
+                                         const ParallelType ptype)
 {
-  this->init(n, n_local, ghost, false, type);
+  this->init(n, n_local, ghost, false, ptype);
 }
 
 
@@ -534,14 +534,14 @@ inline
 void DistributedVector<T>::init (const numeric_index_type n,
 				 const numeric_index_type n_local,
 				 const bool fast,
-                                 const ParallelType type)
+                                 const ParallelType ptype)
 {
   // This function must be run on all processors at once
   parallel_only();
 
   libmesh_assert_less_equal (n_local, n);
 
-  if (type == AUTOMATIC)
+  if (ptype == AUTOMATIC)
     {
       if (n == n_local)
         this->_type = SERIAL;
@@ -549,7 +549,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
         this->_type = PARALLEL;
     }
   else
-    this->_type = type;
+    this->_type = ptype;
 
   libmesh_assert ((this->_type==SERIAL && n==n_local) ||
                   this->_type==PARALLEL);
@@ -620,10 +620,10 @@ void DistributedVector<T>::init (const numeric_index_type n,
 			         const numeric_index_type n_local,
 		                 const std::vector<numeric_index_type>& /*ghost*/,
 			         const bool fast,
-                                 const ParallelType type)
+                                 const ParallelType ptype)
 {
   // TODO: we shouldn't ignore the ghost sparsity pattern
-  this->init(n, n_local, fast, type);
+  this->init(n, n_local, fast, ptype);
 }
 
 
@@ -643,9 +643,9 @@ template <typename T>
 inline
 void DistributedVector<T>::init (const numeric_index_type n,
 				 const bool fast,
-                                 const ParallelType type)
+                                 const ParallelType ptype)
 {
-  this->init(n,n,fast,type);
+  this->init(n,n,fast,ptype);
 }
 
 

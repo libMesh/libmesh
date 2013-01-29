@@ -20,18 +20,19 @@
 #ifndef LIBMESH_LIBMESH_BASE_H
 #define LIBMESH_LIBMESH_BASE_H
 
+#include "libmesh/id_types.h"
 
 namespace libMesh {
 
   /**
    * @returns the number of processors used in the current simulation.
    */
-  unsigned int n_processors();
+  processor_id_type n_processors();
 
   /**
    * @returns the index of the local processor.
    */
-  unsigned int processor_id();
+  processor_id_type processor_id();
 
   /**
    * @returns the maximum number of threads used in the simulation.
@@ -50,12 +51,12 @@ namespace libMesh {
     /**
      * Total number of processors used.
      */
-    extern int _n_processors;
+    extern processor_id_type _n_processors;
 
     /**
      * The local processor id.
      */
-    extern int _processor_id;
+    extern processor_id_type _processor_id;
 #endif
 
     /**
@@ -70,10 +71,10 @@ namespace libMesh {
 // ------------------------------------------------------------
 // libMesh inline member functions
 inline
-unsigned int libMesh::n_processors()
+libMesh::processor_id_type libMesh::n_processors()
 {
 #ifdef LIBMESH_HAVE_MPI
-  return static_cast<unsigned int>(libMeshPrivateData::_n_processors);
+  return libMeshPrivateData::_n_processors;
 #else
   return 1;
 #endif
@@ -82,10 +83,10 @@ unsigned int libMesh::n_processors()
 
 
 inline
-unsigned int libMesh::processor_id()
+libMesh::processor_id_type libMesh::processor_id()
 {
 #ifdef LIBMESH_HAVE_MPI
-  return static_cast<unsigned int>(libMeshPrivateData::_processor_id);
+  return libMeshPrivateData::_processor_id;
 #else
   return 0;
 #endif

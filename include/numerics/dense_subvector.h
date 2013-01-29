@@ -52,7 +52,7 @@ public:
    * and the \f$(0,0) entry of the subvector is located
    * at the \f$(ioff,joff)\f$ location in the parent vector.
    */
-  DenseSubVector(DenseVector<T>& parent,
+  DenseSubVector(DenseVector<T>& new_parent,
 		 const unsigned int ioff=0,
 		 const unsigned int n=0);
 
@@ -167,10 +167,10 @@ private:
 // Dense Vector member functions
 template<typename T>
 inline
-DenseSubVector<T>::DenseSubVector(DenseVector<T>& parent,
+DenseSubVector<T>::DenseSubVector(DenseVector<T>& new_parent,
 				  const unsigned int ioff,
 				  const unsigned int n) :
-  _parent_vector(parent)
+  _parent_vector(new_parent)
 {
   reposition (ioff, n);
 }

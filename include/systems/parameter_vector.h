@@ -76,7 +76,7 @@ public:
   /**
    * Returns the number of parameters to be used
    */
-  unsigned int size() const { return _params.size(); }
+  std::size_t size() const { return _params.size(); }
 
   /**
    * Sets the number of parameters to be used.  This method is for

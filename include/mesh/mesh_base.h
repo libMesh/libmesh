@@ -548,13 +548,13 @@ public:
    * current simulation.
    */
   processor_id_type n_processors () const
-  { return libMesh::n_processors(); }
+  { return libmesh_cast_int<processor_id_type>(libMesh::n_processors()); }
 
   /**
    * @returns the subdomain id for this processor.
    */
   processor_id_type processor_id () const
-  { return libMesh::processor_id(); }
+  { return libmesh_cast_int<processor_id_type>(libMesh::processor_id()); }
 
   /**
    * @returns a string containing relevant information

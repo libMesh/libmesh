@@ -51,8 +51,8 @@ protected:
    * Constructor.  Creates a dense matrix of dimension \p m by \p n.
    * Protected so that there is no way the user can create one.
    */
-  DenseMatrixBase(const unsigned int m=0,
-		  const unsigned int n=0) : _m(m), _n(n) {}
+  DenseMatrixBase(const unsigned int new_m=0,
+		  const unsigned int new_n=0) : _m(new_m), _n(new_n) {}
 
 public:
   /**

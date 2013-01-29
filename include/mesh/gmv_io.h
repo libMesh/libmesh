@@ -344,12 +344,12 @@ bool & GMVIO::p_levels()
 
 
 template <typename T>
-void GMVIO::to_binary_stream(std::ostream& out,
+void GMVIO::to_binary_stream(std::ostream& out_str,
 			     const T i)
 {
   static char buf[sizeof(T)];
   memcpy(buf, &i, sizeof(T));
-  out.write(buf, sizeof(T));
+  out_str.write(buf, sizeof(T));
 }
 
 } // namespace libMesh

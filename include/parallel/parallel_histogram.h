@@ -55,7 +55,7 @@ public:
   // The actual function which sorts the data into
   // nbins.  Currently based on the global min and
   // max which you must provide e.g. by using MPI.
-  void make_histogram (const unsigned int nbins,
+  void make_histogram (const std::size_t nbins,
 		       KeyType max,
 		       KeyType min);
 
@@ -67,20 +67,20 @@ public:
   const std::vector<unsigned int>& get_histogram() const;
 
   // The number of bins in the histogram
-  unsigned int n_bins () const;
+  std::size_t n_bins () const;
 
-  // Returns the size of local bin b as an unsigned int.
-  unsigned int local_bin_size (const unsigned int bin) const;
+  // Returns the size of local bin b
+  std::size_t local_bin_size (const std::size_t bin) const;
 
-  // Returns the size of global bin b as an unsigned int.
+  // Returns the size of global bin b
   // Requires that the user first call \p build_histogram()
-  unsigned int global_bin_size (const unsigned int bin) const;
+  std::size_t global_bin_size (const std::size_t bin) const;
 
   // Returns the lower boundary of bin \p bin
-  double lower_bound (const unsigned int bin) const;
+  double lower_bound (const std::size_t bin) const;
 
   // Returns the upper boundary of bin \p bin
-  double upper_bound (const unsigned int bin) const;
+  double upper_bound (const std::size_t bin) const;
 
 
 private:
@@ -108,7 +108,7 @@ const std::vector<unsigned int>& Histogram<KeyType>::get_histogram () const
 
 template <typename KeyType>
 inline
-unsigned int Histogram<KeyType>::n_bins () const
+std::size_t Histogram<KeyType>::n_bins () const
 {
   if (bin_iters.empty())
     return 0;
@@ -120,7 +120,7 @@ unsigned int Histogram<KeyType>::n_bins () const
 
 template <typename KeyType>
 inline
-unsigned int Histogram<KeyType>::local_bin_size (const unsigned int bin) const
+std::size_t Histogram<KeyType>::local_bin_size (const std::size_t bin) const
 {
   libmesh_assert_less ((bin+1), bin_iters.size());
 
@@ -132,7 +132,7 @@ unsigned int Histogram<KeyType>::local_bin_size (const unsigned int bin) const
 
 template <typename KeyType>
 inline
-unsigned int Histogram<KeyType>::global_bin_size (const unsigned int bin) const
+std::size_t Histogram<KeyType>::global_bin_size (const std::size_t bin) const
 {
   libmesh_assert_less (bin, hist.size());
 
@@ -144,7 +144,7 @@ unsigned int Histogram<KeyType>::global_bin_size (const unsigned int bin) const
 
 template <typename KeyType>
 inline
-double Histogram<KeyType>::lower_bound (const unsigned int bin) const
+double Histogram<KeyType>::lower_bound (const std::size_t bin) const
 {
   libmesh_assert_less ((bin+1), bin_bounds.size());
 
@@ -155,7 +155,7 @@ double Histogram<KeyType>::lower_bound (const unsigned int bin) const
 
 template <typename KeyType>
 inline
-double Histogram<KeyType>::upper_bound (const unsigned int bin) const
+double Histogram<KeyType>::upper_bound (const std::size_t bin) const
 {
   libmesh_assert_less ((bin+1), bin_bounds.size());
 

@@ -118,9 +118,9 @@ protected:
 // ------------------------------------------------------------
 // Surface class member functions
 inline
-Point Surface::surface_coords (const Point& world_coords) const
+Point Surface::surface_coords (const Point& from_world_coords) const
 {
-  Point p (world_coords);
+  Point p (from_world_coords);
   return p;
 }
 

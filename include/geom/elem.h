@@ -1607,10 +1607,10 @@ bool Elem::subactive() const
     return false;
   if (!this->has_children())
     return true;
-  for (const Elem* ancestor = this->parent();
-       ancestor != NULL;
-       ancestor = ancestor->parent())
-    if (ancestor->active())
+  for (const Elem* my_ancestor = this->parent();
+       my_ancestor != NULL;
+       my_ancestor = my_ancestor->parent())
+    if (my_ancestor->active())
       return true;
 #endif
 

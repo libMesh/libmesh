@@ -598,14 +598,14 @@ private:
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const ParallelType type)
+PetscVector<T>::PetscVector (const ParallelType ptype)
   : _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
-  this->_type = type;
+  this->_type = ptype;
 }
 
 
@@ -613,14 +613,14 @@ PetscVector<T>::PetscVector (const ParallelType type)
 template <typename T>
 inline
 PetscVector<T>::PetscVector (const numeric_index_type n,
-                             const ParallelType type)
+                             const ParallelType ptype)
   : _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
-  this->init(n, n, false, type);
+  this->init(n, n, false, ptype);
 }
 
 
@@ -629,14 +629,14 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const numeric_index_type n,
 			     const numeric_index_type n_local,
-                             const ParallelType type)
+                             const ParallelType ptype)
   : _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
-  this->init(n, n_local, false, type);
+  this->init(n, n_local, false, ptype);
 }
 
 
@@ -646,14 +646,14 @@ inline
 PetscVector<T>::PetscVector (const numeric_index_type n,
 			     const numeric_index_type n_local,
 			     const std::vector<numeric_index_type>& ghost,
-                             const ParallelType type)
+                             const ParallelType ptype)
   : _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
     _destroy_vec_on_exit(true)
 {
-  this->init(n, n_local, ghost, false, type);
+  this->init(n, n_local, ghost, false, ptype);
 }
 
 
@@ -685,14 +685,14 @@ PetscVector<T>::PetscVector (Vec v)
   // need to have it in the code
 #if PETSC_VERSION_LESS_THAN(3,0,0) || !PETSC_VERSION_RELEASE
   // Pre-3.0 and petsc-dev (as of October 2012) use non-const versions
-  VecType type;
+  VecType ptype;
 #else
-  const VecType type;
+  const VecType ptype;
 #endif
-  ierr = VecGetType(_vec, &type);
+  ierr = VecGetType(_vec, &ptype);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
-  if((std::strcmp(type,VECSHARED) == 0) || (std::strcmp(type,VECMPI) == 0))
+  if((std::strcmp(ptype,VECSHARED) == 0) || (std::strcmp(ptype,VECMPI) == 0))
   {
 #if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
     ISLocalToGlobalMapping mapping = _vec->mapping;
@@ -705,7 +705,7 @@ PetscVector<T>::PetscVector (Vec v)
     // If is a sparsely stored vector, set up our new mapping
     if (mapping)
     {
-      const numeric_index_type local_size = static_cast<numeric_index_type>(petsc_local_size);
+      const numeric_index_type my_local_size = static_cast<numeric_index_type>(petsc_local_size);
       const numeric_index_type ghost_begin = static_cast<numeric_index_type>(petsc_local_size);
       const numeric_index_type ghost_end = static_cast<numeric_index_type>(mapping->n);
 #if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
@@ -716,7 +716,7 @@ PetscVector<T>::PetscVector (Vec v)
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #endif
       for(numeric_index_type i=ghost_begin; i<ghost_end; i++)
-        _global_to_local_map[indices[i]] = i-local_size;
+        _global_to_local_map[indices[i]] = i-my_local_size;
       this->_type = GHOSTED;
     }
     else
@@ -745,7 +745,7 @@ inline
 void PetscVector<T>::init (const numeric_index_type n,
 			   const numeric_index_type n_local,
 			   const bool fast,
-                           const ParallelType type)
+                           const ParallelType ptype)
 {
   PetscErrorCode ierr=0;
   PetscInt petsc_n=static_cast<PetscInt>(n);
@@ -756,7 +756,7 @@ void PetscVector<T>::init (const numeric_index_type n,
   if (this->initialized())
     this->clear();
 
-  if (type == AUTOMATIC)
+  if (ptype == AUTOMATIC)
     {
       if (n == n_local)
         this->_type = SERIAL;
@@ -764,7 +764,7 @@ void PetscVector<T>::init (const numeric_index_type n,
         this->_type = PARALLEL;
     }
   else
-    this->_type = type;
+    this->_type = ptype;
 
   libmesh_assert ((this->_type==SERIAL && n==n_local) ||
                   this->_type==PARALLEL);
@@ -812,9 +812,9 @@ template <typename T>
 inline
 void PetscVector<T>::init (const numeric_index_type n,
 			   const bool fast,
-                           const ParallelType type)
+                           const ParallelType ptype)
 {
-  this->init(n,n,fast,type);
+  this->init(n,n,fast,ptype);
 }
 
 
@@ -825,7 +825,7 @@ void PetscVector<T>::init (const numeric_index_type n,
 			   const numeric_index_type n_local,
 			   const std::vector<numeric_index_type>& ghost,
 			   const bool fast,
-                           const ParallelType libmesh_dbg_var(type))
+                           const ParallelType libmesh_dbg_var(ptype))
 {
   PetscErrorCode ierr=0;
   PetscInt petsc_n=static_cast<PetscInt>(n);
@@ -852,7 +852,7 @@ void PetscVector<T>::init (const numeric_index_type n,
   if (this->initialized())
     this->clear();
 
-  libmesh_assert(type == AUTOMATIC || type == GHOSTED);
+  libmesh_assert(ptype == AUTOMATIC || ptype == GHOSTED);
   this->_type = GHOSTED;
 
   /* Make the global-to-local ghost cell map.  */
@@ -1206,13 +1206,13 @@ Real PetscVector<T>::min () const
 
   PetscErrorCode ierr=0;
   PetscInt index=0;
-  PetscReal min=0.;
+  PetscReal returnval=0.;
 
-  ierr = VecMin (_vec, &index, &min);
+  ierr = VecMin (_vec, &index, &returnval);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // this return value is correct: VecMin returns a PetscReal
-  return static_cast<Real>(min);
+  return static_cast<Real>(returnval);
 }
 
 
@@ -1225,13 +1225,13 @@ Real PetscVector<T>::max() const
 
   PetscErrorCode ierr=0;
   PetscInt index=0;
-  PetscReal max=0.;
+  PetscReal returnval=0.;
 
-  ierr = VecMax (_vec, &index, &max);
+  ierr = VecMax (_vec, &index, &returnval);
          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
   // this return value is correct: VecMax returns a PetscReal
-  return static_cast<Real>(max);
+  return static_cast<Real>(returnval);
 }
 
 
@@ -1274,10 +1274,10 @@ void PetscVector<T>::_get_array(void) const
 	  ierr = VecGetArray(_local_form, &_values);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
 #ifndef NDEBUG
-	  PetscInt local_size = 0;
-	  ierr = VecGetLocalSize(_local_form, &local_size);
+	  PetscInt my_local_size = 0;
+	  ierr = VecGetLocalSize(_local_form, &my_local_size);
 	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  _local_size = static_cast<numeric_index_type>(local_size);
+	  _local_size = static_cast<numeric_index_type>(my_local_size);
 #endif
 	}
       _array_is_present = true;

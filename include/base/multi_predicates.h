@@ -445,7 +445,7 @@ namespace Predicates
   template <typename T>
   struct ActiveLocalSubdomain : abstract_multi_predicate<T>
   {
-    ActiveLocalSubdomain(const unsigned int subdomain_id)
+    ActiveLocalSubdomain(const subdomain_id_type subdomain_id)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new active<T>);
@@ -460,7 +460,7 @@ namespace Predicates
   template <typename T>
   struct ActiveSubdomain : abstract_multi_predicate<T>
   {
-    ActiveSubdomain(const unsigned int subdomain_id)
+    ActiveSubdomain(const subdomain_id_type subdomain_id)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new active<T>);

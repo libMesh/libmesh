@@ -203,9 +203,11 @@ bool DofMap::is_periodic_boundary (const boundary_id_type boundaryid) const
 void DofMap::add_variable_group (const VariableGroup &var_group)
 {
   _variable_groups.push_back(var_group);
+
+  VariableGroup &new_var_group = _variable_groups.back();
   
-  for (unsigned int var=0; var<var_group.n_variables(); var++)    
-    _variables.push_back (var_group(var));
+  for (unsigned int var=0; var<new_var_group.n_variables(); var++)    
+    _variables.push_back (new_var_group(var));
 }
 
 

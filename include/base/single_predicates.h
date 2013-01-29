@@ -280,7 +280,7 @@ namespace Predicates
   struct subdomain : predicate<T>
   {
     // Constructor
-    subdomain(const unsigned int sid) : _subdomain(sid) {}
+    subdomain(const subdomain_id_type sid) : _subdomain(sid) {}
     virtual ~subdomain() {}
 
     // op()

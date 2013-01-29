@@ -206,7 +206,7 @@ public:
    * Set delta_N, the number of basis functions we add to the
    * RB space from each POD
    */
-  void set_delta_N(const unsigned int delta_N) { this->delta_N = delta_N; }
+  void set_delta_N(const unsigned int new_delta_N) { this->delta_N = new_delta_N; }
 
   /**
    * Load the RB solution from the current time-level

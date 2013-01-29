@@ -92,7 +92,7 @@ public:
   /**
    * Number of variables in solution.
    */
-  unsigned int n_vars() const { return dof_indices_var.size(); }
+  std::size_t n_vars() const { return dof_indices_var.size(); }
 
   /**
    * Accessor for associated system.

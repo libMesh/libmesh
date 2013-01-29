@@ -114,7 +114,7 @@ namespace libMesh
 	case 2 : b+=k[1];
 	case 1 : a+=k[0];
 	  final(a,b,c);
-	case 0:     // case 0: nothing left to add
+	default:     // case 0: nothing left to add
 	  break;
 	}
 

@@ -501,7 +501,7 @@ bool EquationSystems::has_mesh_data () const
 inline
 unsigned int EquationSystems::n_systems () const
 {
-  return _systems.size();
+  return libmesh_cast_int<unsigned int>(_systems.size());
 }
 
 

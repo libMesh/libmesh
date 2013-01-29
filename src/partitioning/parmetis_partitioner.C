@@ -275,7 +275,8 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 
   // Set up the vtxdist array.  This will be the same on each processor.
   // ***** Consult the Parmetis documentation. *****
-  libmesh_assert_equal_to (_vtxdist.size(), libMesh::n_processors()+1);
+  libmesh_assert_equal_to (_vtxdist.size(),
+			   libmesh_cast_int<std::size_t>(libMesh::n_processors()+1));
   libmesh_assert_equal_to (_vtxdist[0], 0);
 
   for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
@@ -382,9 +383,9 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 	// watch out for the case that n_subdomains < n_processors
 	if (pid < static_cast<unsigned int>(_nparts))
 	  {
-	    tgt_subdomain_size =
-	      n_active_elem/std::min(libMesh::n_processors(),
-				     static_cast<unsigned int>(_nparts));
+	    tgt_subdomain_size = n_active_elem/std::min
+	      (libmesh_cast_int<int>(libMesh::n_processors()),
+	       _nparts);
 
 	    if (pid < n_active_elem%_nparts)
 	      tgt_subdomain_size++;

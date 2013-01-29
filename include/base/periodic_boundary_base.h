@@ -50,8 +50,7 @@ public:
   /**
    * The boundary ID of this boundary and its counterpart
    */
-  unsigned int myboundary,
-    pairedboundary;
+  boundary_id_type myboundary, pairedboundary;
 
   /**
    * Constructor

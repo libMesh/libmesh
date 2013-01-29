@@ -108,15 +108,15 @@ private:
 // ------------------------------------------------------------
 // medit_io inline members
 inline
-MEDITIO::MEDITIO (const MeshBase& mesh) :
-  MeshOutput<MeshBase> (mesh),
+MEDITIO::MEDITIO (const MeshBase& mesh_in) :
+  MeshOutput<MeshBase> (mesh_in),
   _binary (false)
 {
 }
 
 inline
-MEDITIO::MEDITIO (const MeshBase& mesh, unsigned int c) :
-  MeshOutput<MeshBase> (mesh),
+MEDITIO::MEDITIO (const MeshBase& mesh_in, unsigned int c) :
+  MeshOutput<MeshBase> (mesh_in),
   _binary    (false),
   scalar_idx (c)
 {

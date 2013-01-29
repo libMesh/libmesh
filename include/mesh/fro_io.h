@@ -69,8 +69,8 @@ class FroIO : public MeshOutput<MeshBase>
 // ------------------------------------------------------------
 // FroIO inline members
 inline
-FroIO::FroIO (const MeshBase& mesh) :
-  MeshOutput<MeshBase> (mesh)
+FroIO::FroIO (const MeshBase& mesh_in) :
+  MeshOutput<MeshBase> (mesh_in)
 {
 }
 

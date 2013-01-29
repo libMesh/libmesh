@@ -69,8 +69,8 @@ private:
 // ------------------------------------------------------------
 // OFFIO inline members
 inline
-OFFIO::OFFIO (MeshBase& mesh) :
-  MeshInput<MeshBase> (mesh)
+OFFIO::OFFIO (MeshBase& mesh_in) :
+  MeshInput<MeshBase> (mesh_in)
 {}
 
 

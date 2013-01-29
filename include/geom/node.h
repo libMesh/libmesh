@@ -248,10 +248,10 @@ inline
 Node::Node (const Real x,
 	    const Real y,
 	    const Real z,
-	    const dof_id_type id) :
+	    const dof_id_type dofid) :
   Point(x,y,z)
 {
-  this->set_id() = id;
+  this->set_id() = dofid;
 }
 
 
@@ -268,15 +268,15 @@ Node::Node (const Node& n) :
 
 inline
 Node::Node (const Point& p,
-	    const dof_id_type id) :
+	    const dof_id_type dofid) :
   Point(p)
 {
   // optionally assign the id.  We have
   // to do it like this otherwise
   // Node n = Point p would erase
   // the id!
-  if (id != invalid_id)
-    this->set_id() = id;
+  if (dofid != invalid_id)
+    this->set_id() = dofid;
 }
 
 

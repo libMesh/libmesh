@@ -84,7 +84,7 @@ PerfMon::reset ()
 
 inline
 double
-PerfMon::print (std::string msg, std::ostream &out)
+PerfMon::print (std::string msg, std::ostream &my_out)
 {
   gettimeofday (&the_time_stop, NULL);
 
@@ -101,28 +101,27 @@ PerfMon::print (std::string msg, std::ostream &out)
       if (proc_id == 0)
 	{
 	  if (msg == "NULL")
-	    out << " " << id_string
-		<< ": elapsed time: "
-		<< elapsed_time << " (sec)"
-		<< std::endl;
+	    my_out << " " << id_string
+		   << ": elapsed time: "
+		   << elapsed_time << " (sec)"
+		   << std::endl;
 	  else
-	    out << " " << msg
-		<< ": elapsed time: "
-		<< elapsed_time << " (sec)"
-		<< std::endl;
+	    my_out << " " << msg
+		   << ": elapsed time: "
+		   << elapsed_time << " (sec)"
+		   << std::endl;
 
 #ifdef HAVE_PAPI_H
 	  if (msg == "NULL")
-	    out << " " << id_string
-		<< ": mflops: "
-		<< mflops
-		<< std::endl;
+	    my_out << " " << id_string
+		   << ": mflops: "
+		   << mflops
+		   << std::endl;
 	  else
-	    out << " " << msg
-		<< ": mflops: "
-		<< mflops
-		<< std::endl;
-
+	    my_out << " " << msg
+		   << ": mflops: "
+		   << mflops
+		   << std::endl;
 #endif
 
 	}

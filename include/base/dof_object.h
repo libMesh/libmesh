@@ -148,8 +148,8 @@ public:
   /**
    * Sets the \p id for this \p DofObject
    */
-  void set_id (const dof_id_type id)
-  { this->set_id() = id; }
+  void set_id (const dof_id_type dofid)
+  { this->set_id() = dofid; }
 
   /**
    * @returns \p true if this \p DofObject has a valid \p id set,
@@ -171,7 +171,7 @@ public:
   /**
    * Sets the \p processor_id for this \p DofObject.
    */
-  void processor_id (const processor_id_type id);
+  void processor_id (const processor_id_type pid);
 
   /**
    * @returns \p true if this \p DofObject has a valid \p id set,
@@ -606,9 +606,9 @@ processor_id_type& DofObject::processor_id ()
 
 
 inline
-void DofObject::processor_id (const processor_id_type id)
+void DofObject::processor_id (const processor_id_type pid)
 {
-  this->processor_id() = id;
+  this->processor_id() = pid;
 }
 
 
@@ -788,7 +788,8 @@ unsigned int DofObject::end_idx (const unsigned int s) const
   libmesh_assert_less (s, this->n_systems());
   libmesh_assert_less (s, _idx_buf.size());
 
-  return ((s+1) == this->n_systems()) ? _idx_buf.size() : _idx_buf[s+1];
+  return ((s+1) == this->n_systems()) ? 
+          libmesh_cast_int<unsigned int>(_idx_buf.size()) : _idx_buf[s+1];
 }
 
 

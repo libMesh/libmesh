@@ -204,9 +204,9 @@ Output FunctionBase<Output>::component (unsigned int i,
                                         const Point& p,
 			                Real time)
 {
-  DenseVector<Output> out(i+1);
-  (*this)(p, time, out);
-  return out(i);
+  DenseVector<Output> outvec(i+1);
+  (*this)(p, time, outvec);
+  return outvec(i);
 }
 
 

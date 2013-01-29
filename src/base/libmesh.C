@@ -253,8 +253,8 @@ const Number       imaginary (0., 1.);
 #ifdef LIBMESH_HAVE_MPI
 MPI_Errhandler libmesh_errhandler;
 
-int           libMesh::libMeshPrivateData::_n_processors = 1;
-int           libMesh::libMeshPrivateData::_processor_id = 0;
+processor_id_type libMesh::libMeshPrivateData::_n_processors = 1;
+processor_id_type libMesh::libMeshPrivateData::_processor_id = 0;
 #endif
 int           libMesh::libMeshPrivateData::_n_threads = 1; /* Threads::task_scheduler_init::automatic; */
 bool          libMesh::libMeshPrivateData::_is_initialized = false;
@@ -371,8 +371,10 @@ void _init (int &argc, char** & argv,
       //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
       //MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
 
-      libMeshPrivateData::_processor_id = Parallel::Communicator_World.rank();
-      libMeshPrivateData::_n_processors = Parallel::Communicator_World.size();
+      libMeshPrivateData::_processor_id =
+        libmesh_cast_int<processor_id_type>(Parallel::Communicator_World.rank());
+      libMeshPrivateData::_n_processors =
+        libmesh_cast_int<processor_id_type>(Parallel::Communicator_World.size());
 
       // Set up an MPI error handler if requested.  This helps us get
       // into a debugger with a proper stack when an MPI error occurs.
@@ -386,7 +388,9 @@ void _init (int &argc, char** & argv,
 
   // Could we have gotten bad values from the above calls?
   libmesh_assert_greater (libMeshPrivateData::_n_processors, 0);
-  libmesh_assert_greater_equal (libMeshPrivateData::_processor_id, 0);
+
+  // The libmesh_cast_int already tested _processor_id>=0
+  // libmesh_assert_greater_equal (libMeshPrivateData::_processor_id, 0);
 
   // Let's be sure we properly initialize on every processor at once:
   parallel_only();

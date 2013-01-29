@@ -174,11 +174,13 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
   for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      processor_id_type procup = (libMesh::processor_id() + p) %
-                                  libMesh::n_processors();
-      processor_id_type procdown = (libMesh::n_processors() +
-                                    libMesh::processor_id() - p) %
-                                    libMesh::n_processors();
+      const processor_id_type procup =
+        libmesh_cast_int<processor_id_type>
+	  ((libMesh::processor_id() + p) % libMesh::n_processors());
+      const processor_id_type procdown =
+        libmesh_cast_int<processor_id_type>
+	  ((libMesh::n_processors() + libMesh::processor_id() - p) %
+           libMesh::n_processors());
       std::vector<Real> request_to_fill_x,
                         request_to_fill_y,
                         request_to_fill_z;
@@ -193,12 +195,12 @@ void sync_dofobject_data_by_xyz(const Iterator&          range_begin,
       std::vector<dof_id_type> request_to_fill_id(request_to_fill_x.size());
       for (std::size_t i=0; i != request_to_fill_x.size(); ++i)
         {
-          Point p(request_to_fill_x[i],
-                  request_to_fill_y[i],
-                  request_to_fill_z[i]);
+          Point pt(request_to_fill_x[i],
+                   request_to_fill_y[i],
+                   request_to_fill_z[i]);
 
           // Look for this object in the multimap
-          DofObjType *obj = location_map.find(p);
+          DofObjType *obj = location_map.find(pt);
 
           // We'd better find every object we're asked for
           libmesh_assert (obj);
@@ -274,11 +276,13 @@ void sync_dofobject_data_by_id(const Iterator& range_begin,
   for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      processor_id_type procup = (libMesh::processor_id() + p) %
-                                  libMesh::n_processors();
-      processor_id_type procdown = (libMesh::n_processors() +
-                                    libMesh::processor_id() - p) %
-                                    libMesh::n_processors();
+      const processor_id_type procup =
+        libmesh_cast_int<processor_id_type>
+	  (libMesh::processor_id() + p) % libMesh::n_processors();
+      const processor_id_type procdown =
+        libmesh_cast_int<processor_id_type>
+	  ((libMesh::n_processors() + libMesh::processor_id() - p) %
+           libMesh::n_processors());
       std::vector<dof_id_type> request_to_fill_id;
       CommWorld.send_receive(procup, requested_objs_id[procup],
                              procdown, request_to_fill_id);
@@ -357,18 +361,21 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
       requested_objs_id[obj_procid].push_back(elem->id());
       requested_objs_parent_id[obj_procid].push_back(parent->id());
       requested_objs_child_num[obj_procid].push_back
-	(parent->which_child_am_i(elem));
+	(libmesh_cast_int<unsigned char>
+	  (parent->which_child_am_i(elem)));
     }
 
   // Trade requests with other processors
   for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      processor_id_type procup = (libMesh::processor_id() + p) %
-                                  libMesh::n_processors();
-      processor_id_type procdown = (libMesh::n_processors() +
-                                    libMesh::processor_id() - p) %
-                                    libMesh::n_processors();
+      const processor_id_type procup =
+        libmesh_cast_int<processor_id_type>
+	  (libMesh::processor_id() + p) % libMesh::n_processors();
+      const processor_id_type procdown =
+        libmesh_cast_int<processor_id_type>
+	  ((libMesh::n_processors() + libMesh::processor_id() - p) %
+           libMesh::n_processors());
       std::vector<dof_id_type>   request_to_fill_parent_id;
       std::vector<unsigned char> request_to_fill_child_num;
       CommWorld.send_receive(procup, requested_objs_parent_id[procup],

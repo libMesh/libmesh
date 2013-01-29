@@ -139,14 +139,14 @@ class LaspackVector : public NumericVector<T>
   void init (const numeric_index_type N,
 	     const numeric_index_type n_local,
 	     const bool         fast=false,
-             const ParallelType type=AUTOMATIC);
+             const ParallelType ptype=AUTOMATIC);
 
   /**
    * call init with n_local = N,
    */
   void init (const numeric_index_type N,
 	     const bool         fast=false,
-             const ParallelType type=AUTOMATIC);
+             const ParallelType ptype=AUTOMATIC);
 
   /**
    * Create a vector that holds tha local indices plus those specified
@@ -463,9 +463,9 @@ class LaspackVector : public NumericVector<T>
 // LaspackVector inline methods
 template <typename T>
 inline
-LaspackVector<T>::LaspackVector (const ParallelType type)
+LaspackVector<T>::LaspackVector (const ParallelType ptype)
 {
-  this->_type = type;
+  this->_type = ptype;
 }
 
 
@@ -473,9 +473,9 @@ LaspackVector<T>::LaspackVector (const ParallelType type)
 template <typename T>
 inline
 LaspackVector<T>::LaspackVector (const numeric_index_type n,
-                                 const ParallelType type)
+                                 const ParallelType ptype)
 {
-  this->init(n, n, false, type);
+  this->init(n, n, false, ptype);
 }
 
 
@@ -484,9 +484,9 @@ template <typename T>
 inline
 LaspackVector<T>::LaspackVector (const numeric_index_type n,
 				 const numeric_index_type n_local,
-                                 const ParallelType type)
+                                 const ParallelType ptype)
 {
-  this->init(n, n_local, false, type);
+  this->init(n, n_local, false, ptype);
 }
 
 
@@ -496,9 +496,9 @@ inline
 LaspackVector<T>::LaspackVector (const numeric_index_type N,
 	                         const numeric_index_type n_local,
 	                         const std::vector<numeric_index_type>& ghost,
-                                 const ParallelType type)
+                                 const ParallelType ptype)
 {
-  this->init(N, n_local, ghost, false, type);
+  this->init(N, n_local, ghost, false, ptype);
 }
 
 
@@ -555,9 +555,9 @@ template <typename T>
 inline
 void LaspackVector<T>::init (const numeric_index_type n,
 			     const bool fast,
-                             const ParallelType type)
+                             const ParallelType ptype)
 {
-  this->init(n,n,fast,type);
+  this->init(n,n,fast,ptype);
 }
 
 
@@ -567,10 +567,10 @@ void LaspackVector<T>::init (const numeric_index_type n,
 			     const numeric_index_type n_local,
 	                     const std::vector<numeric_index_type>& libmesh_dbg_var(ghost),
 			     const bool fast,
-                             const ParallelType type)
+                             const ParallelType ptype)
 {
   libmesh_assert(ghost.empty());
-  this->init(n,n_local,fast,type);
+  this->init(n,n_local,fast,ptype);
 }
 
 

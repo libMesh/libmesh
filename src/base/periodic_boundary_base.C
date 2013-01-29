@@ -20,7 +20,7 @@
 
 #ifdef LIBMESH_ENABLE_PERIODIC
 
-#include "libmesh/libmesh.h" // libMesh::invalid_uint
+#include "libmesh/boundary_info.h" // BoundaryInfo::invalid_id
 #include "libmesh/periodic_boundary_base.h"
 
 namespace libMesh {
@@ -30,8 +30,8 @@ namespace libMesh {
 
 
 PeriodicBoundaryBase::PeriodicBoundaryBase() :
-  myboundary(libMesh::invalid_uint),
-  pairedboundary(libMesh::invalid_uint)
+  myboundary(BoundaryInfo::invalid_id),
+  pairedboundary(BoundaryInfo::invalid_id)
 {
 }
 

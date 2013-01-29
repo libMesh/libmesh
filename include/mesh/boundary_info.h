@@ -203,7 +203,7 @@ public:
   /**
    * Returns the number of user-specified boundary ids.
    */
-  unsigned int n_boundary_ids () const { return _boundary_ids.size(); }
+  std::size_t n_boundary_ids () const { return _boundary_ids.size(); }
 
   /**
    * Returns true iff the given node is associated with the given id.

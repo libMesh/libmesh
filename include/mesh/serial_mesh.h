@@ -89,14 +89,29 @@ class SerialMesh : public UnstructuredMesh
    */
   virtual void renumber_nodes_and_elements ();
 
-  virtual dof_id_type n_nodes () const { return _nodes.size(); }
-  virtual dof_id_type parallel_n_nodes () const { return _nodes.size(); }
-  virtual dof_id_type max_node_id () const { return _nodes.size(); }
-  virtual void reserve_nodes (const dof_id_type nn) { _nodes.reserve (nn); }
-  virtual dof_id_type n_elem ()  const { return _elements.size(); }
-  virtual dof_id_type parallel_n_elem ()  const { return _elements.size(); }
+  virtual dof_id_type n_nodes () const
+  { return libmesh_cast_int<dof_id_type>(_nodes.size()); }
+
+  virtual dof_id_type parallel_n_nodes () const
+  { return libmesh_cast_int<dof_id_type>(_nodes.size()); }
+
+  virtual dof_id_type max_node_id () const
+  { return libmesh_cast_int<dof_id_type>(_nodes.size()); }
+
+  virtual void reserve_nodes (const dof_id_type nn)
+  { _nodes.reserve (nn); }
+
+  virtual dof_id_type n_elem () const
+  { return libmesh_cast_int<dof_id_type>(_elements.size()); }
+
+  virtual dof_id_type parallel_n_elem () const
+  { return libmesh_cast_int<dof_id_type>(_elements.size()); }
+
   virtual dof_id_type n_active_elem () const;
-  virtual dof_id_type max_elem_id ()  const { return _elements.size(); }
+
+  virtual dof_id_type max_elem_id ()  const
+  { return libmesh_cast_int<dof_id_type>(_elements.size()); }
+
   virtual void reserve_elem (const dof_id_type ne) { _elements.reserve (ne); }
 
   // SerialMesh has no caches to update

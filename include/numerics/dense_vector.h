@@ -78,7 +78,9 @@ public:
   /**
    * @returns the size of the vector.
    */
-  virtual unsigned int size() const { return _val.size(); }
+  virtual unsigned int size() const {
+    return libmesh_cast_int<unsigned int>(_val.size());
+  }
 
   /**
    * Set every element in the vector to 0.

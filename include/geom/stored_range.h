@@ -61,12 +61,12 @@ public:
    * smallest chunk the range may be broken into for parallel
    * execution.
    */
-  StoredRange (const unsigned int grainsize = 1000) :
+  StoredRange (const unsigned int new_grainsize = 1000) :
     _end(),
     _begin(),
     _last(),
     _first(),
-    _grainsize(grainsize),
+    _grainsize(new_grainsize),
     _objs()
   {}
 
@@ -78,12 +78,12 @@ public:
    */
   StoredRange (const iterator_type &first,
 	       const iterator_type &last,
-	       const unsigned int grainsize = 1000) :
+	       const unsigned int new_grainsize = 1000) :
     _end(),
     _begin(),
     _last(),
     _first(),
-    _grainsize(grainsize),
+    _grainsize(new_grainsize),
     _objs()
   {
     this->reset(first, last);
@@ -133,7 +133,7 @@ public:
 
     r._end = _begin = middle;
 
-    unsigned int
+    std::size_t
       first = r._first,
       last  = r._last,
       half  = first + (last-first)/2u;
@@ -195,18 +195,18 @@ public:
   /**
    * Index in the stored vector of the first object.
    */
-  unsigned int first_idx () const { return _first; }
+  std::size_t first_idx () const { return _first; }
 
   /**
    * Index in the stored vector of the last object.
    */
-  unsigned int last_idx () const { return _last; }
+  std::size_t last_idx () const { return _last; }
 
   /**
    * The grain size for the range.  The range will be subdivided into
    * subranges not to exceed the grain size.
    */
-  unsigned int grainsize () const {return _grainsize;}
+  std::size_t grainsize () const {return _grainsize;}
 
   /**
    * Set the grain size.
@@ -216,7 +216,7 @@ public:
   /**
    * \return the size of the range.
    */
-  unsigned int size () const { return std::distance(_begin, _end); }
+  std::size_t size () const { return std::distance(_begin, _end); }
 
   //------------------------------------------------------------------------
   // Methods that implement Range concept
@@ -236,9 +236,9 @@ private:
 
   const_iterator _end;
   const_iterator _begin;
-  unsigned int _last;
-  unsigned int _first;
-  unsigned int _grainsize;
+  std::size_t _last;
+  std::size_t _first;
+  std::size_t _grainsize;
   std::vector<object_type> _objs;
 };
 

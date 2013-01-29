@@ -76,8 +76,8 @@ private:
 // ------------------------------------------------------------
 // DivaIO inline members
 inline
-DivaIO::DivaIO (const MeshBase& mesh) :
-  MeshOutput<MeshBase>  (mesh)
+DivaIO::DivaIO (const MeshBase& mesh_in) :
+  MeshOutput<MeshBase>  (mesh_in)
 {}
 
 

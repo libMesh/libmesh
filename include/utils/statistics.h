@@ -155,7 +155,7 @@ class StatisticsVector : public std::vector<T>
    * standard deviation squared.
    * Source: GNU Scientific Library
    */
-  virtual Real variance(const Real mean) const;
+  virtual Real variance(const Real known_mean) const;
 
   /**
    * Computes the standard deviation of
@@ -171,8 +171,8 @@ class StatisticsVector : public std::vector<T>
    * of the variance.  This method can be used for
    * efficiency when the \p mean has already been computed.
    */
-  virtual Real stddev(const Real mean) const
-  { return std::sqrt(this->variance(mean)); }
+  virtual Real stddev(const Real known_mean) const
+  { return std::sqrt(this->variance(known_mean)); }
 
   /**
    * Divides all entries by the largest entry and

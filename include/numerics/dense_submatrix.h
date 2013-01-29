@@ -53,7 +53,7 @@ public:
    * and the \f$(0,0) entry of the submatrix is located
    * at the \f$(ioff,joff)\f$ location in the parent matrix.
    */
-  DenseSubMatrix(DenseMatrix<T>& parent,
+  DenseSubMatrix(DenseMatrix<T>& new_parent,
 		 const unsigned int ioff=0,
 		 const unsigned int joff=0,
 		 const unsigned int m=0,
@@ -119,8 +119,8 @@ public:
    */
   void reposition(const unsigned int ioff,
 		  const unsigned int joff,
-		  const unsigned int m,
-		  const unsigned int n);
+		  const unsigned int new_m,
+		  const unsigned int new_n);
 
   /**
    * @returns the row offset into the parent matrix.
@@ -171,15 +171,15 @@ private:
 // Constructor
 template<typename T>
 inline
-DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T>& parent,
+DenseSubMatrix<T>::DenseSubMatrix(DenseMatrix<T>& new_parent,
 				  const unsigned int ioff,
 				  const unsigned int joff,
-				  const unsigned int m,
-				  const unsigned int n)
-  : DenseMatrixBase<T>(m,n),
-    _parent_matrix(parent)
+				  const unsigned int new_m,
+				  const unsigned int new_n)
+  : DenseMatrixBase<T>(new_m,new_n),
+    _parent_matrix(new_parent)
 {
-  this->reposition (ioff, joff, m, n);
+  this->reposition (ioff, joff, new_m, new_n);
 }
 
 
@@ -199,13 +199,13 @@ template<typename T>
 inline
 void DenseSubMatrix<T>::reposition(const unsigned int ioff,
 				   const unsigned int joff,
-				   const unsigned int m,
-				   const unsigned int n)
+				   const unsigned int new_m,
+				   const unsigned int new_n)
 {
   _i_off = ioff;
   _j_off = joff;
-  this->_m = m;
-  this->_n = n;
+  this->_m = new_m;
+  this->_n = new_n;
 
   // Make sure we still fit in the parent matrix.
   libmesh_assert_less_equal ((this->i_off() + this->m()), _parent_matrix.m());

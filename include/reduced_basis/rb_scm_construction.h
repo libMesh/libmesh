@@ -131,7 +131,8 @@ public:
    * Set the name of the associated RB system --- we need
    * this to load the (symmetrized) affine operators.
    */
-  void set_RB_system_name(const std::string& name) { RB_system_name = name; }
+  void set_RB_system_name(const std::string& new_name)
+  { RB_system_name = new_name; }
 
   /**
    * Get/set SCM_training_tolerance: tolerance for SCM greedy.

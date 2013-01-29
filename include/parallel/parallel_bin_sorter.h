@@ -50,12 +50,12 @@ public:
   // The actual function which sorts the data into
   // nbins.  Currently based on the global min and
   // max which you must provide e.g. by using MPI.
-  void binsort (const unsigned int nbins,
+  void binsort (const std::size_t nbins,
 		KeyType max,
 		KeyType min);
 
   // Returns the size of bin b as an unsigned int.
-  unsigned int sizeof_bin (const unsigned int bin) const;
+  std::size_t sizeof_bin (const std::size_t bin) const;
 
 
 private:
@@ -70,7 +70,7 @@ private:
 //--------------------------------------------------------------------------
 template <typename KeyType>
 inline
-unsigned int BinSorter<KeyType>::sizeof_bin (const unsigned int bin) const
+std::size_t BinSorter<KeyType>::sizeof_bin (const std::size_t bin) const
 {
   libmesh_assert_less ((bin+1), bin_iters.size());
 

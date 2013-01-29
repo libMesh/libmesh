@@ -47,7 +47,7 @@ public:
    * matrix itself has to be stored elsewhere.
    */
   explicit
-  SparseShellMatrix (const SparseMatrix<T>& m);
+  SparseShellMatrix (const SparseMatrix<T>& new_m);
 
   /**
    * Destructor.
@@ -98,9 +98,9 @@ protected:
 // SparseShellMatrix inline members
 template <typename T>
 inline
-SparseShellMatrix<T>::SparseShellMatrix (const SparseMatrix<T>& m):
+SparseShellMatrix<T>::SparseShellMatrix (const SparseMatrix<T>& new_m):
   ShellMatrix<T>(),
-  _m(m)
+  _m(new_m)
 {}
 
 

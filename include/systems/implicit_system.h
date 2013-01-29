@@ -384,7 +384,7 @@ bool ImplicitSystem::have_matrix (const std::string& mat_name) const
 inline
 unsigned int ImplicitSystem::n_matrices () const
 {
- return _matrices.size();
+ return libmesh_cast_int<unsigned int>(_matrices.size());
 }
 
 } // namespace libMesh

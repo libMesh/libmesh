@@ -1082,8 +1082,8 @@ public:
    * Irony: currently our only non-scalar-valued variable type is
    * SCALAR.
    */
-  unsigned short int variable_scalar_number (const std::string& var,
-                                             unsigned short component) const;
+  unsigned int variable_scalar_number (const std::string& var,
+                                       unsigned int component) const;
 
   /**
    * @returns an index, starting from 0 for the first component of the
@@ -1095,8 +1095,8 @@ public:
    * Irony: currently our only non-scalar-valued variable type is
    * SCALAR.
    */
-  unsigned short int variable_scalar_number (unsigned short var_num,
-                                             unsigned short component) const;
+  unsigned int variable_scalar_number (unsigned int var_num,
+                                       unsigned int component) const;
 
 
   /**
@@ -1870,7 +1870,7 @@ void System::set_basic_system_only ()
 inline
 unsigned int System::n_vars() const
 {
-  return _variables.size();
+  return libmesh_cast_int<unsigned int>(_variables.size());
 }
 
 
@@ -1878,7 +1878,7 @@ unsigned int System::n_vars() const
 inline
 unsigned int System::n_variable_groups() const
 {
-  return _variable_groups.size();
+  return libmesh_cast_int<unsigned int>(_variable_groups.size());
 }
 
 
@@ -1926,9 +1926,9 @@ const std::string & System::variable_name (const unsigned int i) const
 
 
 inline
-unsigned short int
+unsigned int
 System::variable_scalar_number (const std::string& var,
-                                unsigned short component) const
+                                unsigned int component) const
 {
   return variable_scalar_number(this->variable_number(var), component);
 }
@@ -1936,9 +1936,9 @@ System::variable_scalar_number (const std::string& var,
 
 
 inline
-unsigned short int
-System::variable_scalar_number (unsigned short var_num,
-                                unsigned short component) const
+unsigned int
+System::variable_scalar_number (unsigned int var_num,
+                                unsigned int component) const
 {
   return _variables[var_num].first_scalar_number() + component;
 }
@@ -1998,7 +1998,7 @@ bool System::have_vector (const std::string& vec_name) const
 inline
 unsigned int System::n_vectors () const
 {
-  return _vectors.size();
+  return libmesh_cast_int<unsigned int>(_vectors.size());
 }
 
 inline

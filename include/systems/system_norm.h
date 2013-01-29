@@ -206,7 +206,7 @@ SystemNorm::SystemNorm(const std::vector<FEMNormType> &norms,
       _weights_sq.push_back(1.0);
     }
   else
-    for (unsigned int i=0; i != _weights.size(); ++i)
+    for (std::size_t i=0; i != _weights.size(); ++i)
       _weights_sq[i] = _weights[i] * _weights[i];
 }
 
@@ -227,7 +227,7 @@ inline
     {
       // Loop over the entries of the user provided matrix and store its entries in
       // the _off_diagonal_weights or _diagonal_weights
-      for(unsigned int i=0; i!=_off_diagonal_weights.size(); ++i)
+      for(std::size_t i=0; i!=_off_diagonal_weights.size(); ++i)
         {
           if(_off_diagonal_weights[i].size() > i)
             {
@@ -237,7 +237,7 @@ inline
           else
             _weights[i] = 1.0;
         }
-      for (unsigned int i=0; i != _weights.size(); ++i)
+      for (std::size_t i=0; i != _weights.size(); ++i)
         _weights_sq[i] = _weights[i] * _weights[i];
     }
 }
@@ -268,7 +268,7 @@ FEMNormType SystemNorm::type(unsigned int var) const
 {
   libmesh_assert (!_norms.empty());
 
-  unsigned int i = (var < _norms.size()) ? var : _norms.size() - 1;
+  std::size_t i = (var < _norms.size()) ? var : _norms.size() - 1;
 
   return _norms[i];
 }
@@ -345,12 +345,12 @@ Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<R
 {
   // The vectors are assumed to both be vectors of the (same number
   // of) components
-  unsigned int vsize = v1.size();
+  std::size_t vsize = v1.size();
   libmesh_assert_equal_to (vsize, v2.size());
 
   // We'll support implicitly defining weights, but if the user sets
   // more weights than he uses then something's probably wrong
-  unsigned int diagsize = this->_weights.size();
+  std::size_t diagsize = this->_weights.size();
   libmesh_assert_greater_equal (vsize, diagsize);
 
   // Initialize the variable val
@@ -358,25 +358,25 @@ Real SystemNorm::calculate_norm(const std::vector<Real>& v1, const std::vector<R
 
   // Loop over all the components of the system with explicit
   // weights
-  for(unsigned int i = 0; i != diagsize; i++)
+  for(std::size_t i = 0; i != diagsize; i++)
     {
       val += this->_weights[i] * v1[i] * v2[i];
     }
   // Loop over all the components of the system with implicit
   // weights
-  for(unsigned int i = diagsize; i < vsize; i++)
+  for(std::size_t i = diagsize; i < vsize; i++)
     {
       val += v1[i] * v2[i];
     }
 
   // Loop over the components of the system
-  unsigned int nrows = this->_off_diagonal_weights.size();
+  std::size_t nrows = this->_off_diagonal_weights.size();
   libmesh_assert_less_equal (vsize, nrows);
 
-  for(unsigned int i = 0; i != nrows; i++)
+  for(std::size_t i = 0; i != nrows; i++)
     {
-      unsigned int ncols = this->_off_diagonal_weights[i].size();
-      for(unsigned int j=0; j != ncols; j++)
+      std::size_t ncols = this->_off_diagonal_weights[i].size();
+      for(std::size_t j=0; j != ncols; j++)
         {
           // Note that the diagonal weights here were set to zero
           // in the constructor
@@ -396,13 +396,13 @@ Real SystemNorm::calculate_norm(const std::vector<Real>& v1)
 inline
 bool SystemNorm::is_identity()
 {
-  unsigned int nrows = this->_off_diagonal_weights.size();
+  std::size_t nrows = this->_off_diagonal_weights.size();
 
   // If any of the off-diagonal elements is not 0, then we are in the non-identity case
-  for(unsigned int i = 0; i != nrows; i++)
+  for(std::size_t i = 0; i != nrows; i++)
     {
-      unsigned int ncols = this->_off_diagonal_weights[i].size();
-      for(unsigned int j = 0; j != ncols; j++)
+      std::size_t ncols = this->_off_diagonal_weights[i].size();
+      for(std::size_t j = 0; j != ncols; j++)
         {
           if(_off_diagonal_weights[i][j] != 0)
             {
@@ -413,7 +413,7 @@ bool SystemNorm::is_identity()
 
   // If any of the diagonal elements is not 1, then we are in the non-identity case
   nrows = this->_weights.size();
-  for(unsigned int i = 0; i != nrows; i++)
+  for(std::size_t i = 0; i != nrows; i++)
     if(_weights[i] != 1)
       return(false);
 

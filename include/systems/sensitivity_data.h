@@ -167,13 +167,13 @@ void SensitivityData::allocate_data(const QoISet &qoi_indices,
                                     const System& sys,
                                     const ParameterVector& parameter_vector)
 {
-  const unsigned int Np = parameter_vector.size();
-  const unsigned int Nq = sys.qoi.size();
+  const std::size_t Np = parameter_vector.size();
+  const std::size_t Nq = sys.qoi.size();
 
   if (_grad_data.size() < Nq)
     _grad_data.resize(Nq);
 
-  for (unsigned int i=0; i != Nq; ++i)
+  for (std::size_t i=0; i != Nq; ++i)
     if (qoi_indices.has_index(i))
       {
         _grad_data[i].clear();
@@ -188,18 +188,18 @@ void SensitivityData::allocate_hessian_data(const QoISet &qoi_indices,
                                             const System& sys,
                                             const ParameterVector& parameter_vector)
 {
-  const unsigned int Np = parameter_vector.size();
-  const unsigned int Nq = sys.qoi.size();
+  const std::size_t Np = parameter_vector.size();
+  const std::size_t Nq = sys.qoi.size();
 
   if (_hess_data.size() < Nq)
     _hess_data.resize(Nq);
 
-  for (unsigned int i=0; i != Nq; ++i)
+  for (std::size_t i=0; i != Nq; ++i)
     if (qoi_indices.has_index(i))
       {
         _hess_data[i].clear();
         _hess_data[i].resize(Np);
-        for (unsigned int j=0; j != Np; ++j)
+        for (std::size_t j=0; j != Np; ++j)
           _hess_data[i][j].resize(Np);
       }
 }

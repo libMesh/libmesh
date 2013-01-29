@@ -356,7 +356,7 @@ public:
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
    */
-  unsigned int n_variable_groups() const
+  std::size_t n_variable_groups() const
   { return _variable_groups.size(); }
 
   /**
@@ -364,7 +364,7 @@ public:
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
    */
-  unsigned int n_variables() const
+  std::size_t n_variables() const
   { return _variables.size(); }
 
   /**
@@ -498,7 +498,8 @@ public:
    * @returns the total number of constrained Nodes
    * in the mesh.
    */
-  dof_id_type n_constrained_nodes() const { return _node_constraints.size(); }
+  dof_id_type n_constrained_nodes() const 
+  { return libmesh_cast_int<dof_id_type>(_node_constraints.size()); }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   /**

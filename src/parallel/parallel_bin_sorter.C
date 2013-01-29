@@ -52,7 +52,7 @@ BinSorter<KeyType>::BinSorter (const std::vector<KeyType>& d) :
 
 
 template <typename KeyType>
-void BinSorter<KeyType>::binsort (const unsigned int nbins,
+void BinSorter<KeyType>::binsort (const std::size_t nbins,
 				  KeyType max,
 				  KeyType min)
 {
@@ -72,15 +72,15 @@ void BinSorter<KeyType>::binsort (const unsigned int nbins,
   // that each bin is roughly equal size
   {
     // Find the total size of the data set
-    unsigned int local_data_size = data.size();
-    unsigned int global_data_size = local_data_size;
+    std::size_t local_data_size = data.size();
+    std::size_t global_data_size = local_data_size;
 
     CommWorld.sum(global_data_size);
 
     std::vector<unsigned int> target_bin_size (nbins, global_data_size / nbins);
 
     // Equally distribute the remainder
-    for (unsigned int i=0; i<(global_data_size % nbins); i++)
+    for (std::size_t i=0; i<(global_data_size % nbins); i++)
       ++target_bin_size[i];
 
     // Set the iterators corresponding to the bin boundaries

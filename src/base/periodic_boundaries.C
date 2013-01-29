@@ -33,13 +33,13 @@ namespace libMesh {
 
 PeriodicBoundaries::~PeriodicBoundaries()
 {
-  for (std::map<unsigned, PeriodicBoundaryBase*>::iterator it = begin(); it != end(); ++it)
+  for (std::map<boundary_id_type, PeriodicBoundaryBase*>::iterator it = begin(); it != end(); ++it)
     delete it->second;
 }
 
 
 
-PeriodicBoundaryBase* PeriodicBoundaries::boundary(unsigned int id)
+PeriodicBoundaryBase* PeriodicBoundaries::boundary(boundary_id_type id)
 {
   iterator i = this->find(id);
   if (i == this->end())
@@ -49,7 +49,7 @@ PeriodicBoundaryBase* PeriodicBoundaries::boundary(unsigned int id)
 
 
 
-const PeriodicBoundaryBase* PeriodicBoundaries::boundary(unsigned int id) const
+const PeriodicBoundaryBase* PeriodicBoundaries::boundary(boundary_id_type id) const
 {
   const_iterator i = this->find(id);
   if (i == this->end())
@@ -60,7 +60,7 @@ const PeriodicBoundaryBase* PeriodicBoundaries::boundary(unsigned int id) const
 
 
 
-const Elem *PeriodicBoundaries::neighbor(unsigned int boundary_id,
+const Elem *PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
 					 const PointLocatorBase& point_locator,
                                          const Elem* e,
                                          unsigned int side) const

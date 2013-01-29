@@ -57,12 +57,12 @@ class Side : public SideType
   /**
    * Constructor.  Creates a side from an element.
    */
-  Side (const Elem* parent,
-	const unsigned int side) :
-    SideType(const_cast<Elem*>(parent)),
-    _side_number(side)
+  Side (const Elem* parent_in,
+	const unsigned int side_in) :
+    SideType(const_cast<Elem*>(parent_in)),
+    _side_number(side_in)
   {
-    libmesh_assert(parent);
+    libmesh_assert(parent_in);
     // may not be true when building infinite element sides
     // libmesh_assert_less (_side_number, this->parent()->n_sides());
     libmesh_assert_equal_to ((this->dim()+1), this->parent()->dim());
@@ -157,12 +157,12 @@ class SideEdge : public EdgeType
   /**
    * Constructor.  Creates a side from an element.
    */
-  SideEdge (const Elem* parent,
-	    const unsigned int edge) :
-    EdgeType(const_cast<Elem*>(parent)),
-    _edge_number(edge)
+  SideEdge (const Elem* my_parent,
+	    const unsigned int my_edge) :
+    EdgeType(const_cast<Elem*>(my_parent)),
+    _edge_number(my_edge)
   {
-    libmesh_assert(parent);
+    libmesh_assert(my_parent);
     libmesh_assert_less (_edge_number, this->parent()->n_edges());
     libmesh_assert_equal_to (this->dim(), 1);
   }

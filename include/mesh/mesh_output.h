@@ -208,28 +208,28 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
 
   // We may need to gather and/or renumber a ParallelMesh to output
   // it, making that const qualifier in our constructor a dirty lie
-  MT& mesh = const_cast<MT&>(*_obj);
+  MT& my_mesh = const_cast<MT&>(*_obj);
 
   // A non-renumbered mesh may not have a contiguous numbering, and
   // that needs to be fixed before we can build a solution vector.
-  if (mesh.max_elem_id() != mesh.n_elem() ||
-      mesh.max_node_id() != mesh.n_nodes())
+  if (my_mesh.max_elem_id() != my_mesh.n_elem() ||
+      my_mesh.max_node_id() != my_mesh.n_nodes())
     {
       // If we were allowed to renumber then we should have already
       // been properly renumbered...
-      libmesh_assert(!mesh.allow_renumbering());
+      libmesh_assert(!my_mesh.allow_renumbering());
 
       libmesh_do_once(libMesh::out <<
         "Warning:  This MeshOutput subclass only supports meshes which are contiguously renumbered!" 
         << std::endl;);
 
-      mesh.allow_renumbering(true);
+      my_mesh.allow_renumbering(true);
 
-      mesh.renumber_nodes_and_elements();
+      my_mesh.renumber_nodes_and_elements();
 
       // Not sure what good going back to false will do here, the
       // renumbering horses have already left the barn...
-      mesh.allow_renumbering(false);
+      my_mesh.allow_renumbering(false);
     }
 
   MeshSerializer serialize(const_cast<MT&>(*_obj), !_is_parallel_format);

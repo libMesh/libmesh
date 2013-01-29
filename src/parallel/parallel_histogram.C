@@ -43,7 +43,7 @@ Histogram<KeyType>::Histogram (const std::vector<KeyType>& d) :
 
 
 template <typename KeyType>
-void Histogram<KeyType>::make_histogram (const unsigned int nbins,
+void Histogram<KeyType>::make_histogram (const std::size_t nbins,
 					  KeyType max,
 					  KeyType min)
 {
@@ -72,7 +72,7 @@ void Histogram<KeyType>::make_histogram (const unsigned int nbins,
   bin_bounds[0] = Parallel::Utils::to_double(min);
 
   // Set the internal bin boundary iterators
-  for (unsigned int b=1; b<nbins; ++b)
+  for (std::size_t b=1; b<nbins; ++b)
     {
       bin_bounds[b] = Parallel::Utils::to_double(min) + bin_width * b;
 
@@ -92,7 +92,7 @@ void Histogram<KeyType>::build_histogram ()
   // Build a local histogram
   std::vector<unsigned int> local_hist (this->n_bins());
 
-  for (unsigned int b=0; b<this->n_bins(); b++)
+  for (std::size_t b=0; b<this->n_bins(); b++)
     local_hist[b] = this->local_bin_size(b);
 
   // Add all the local histograms to get the global histogram

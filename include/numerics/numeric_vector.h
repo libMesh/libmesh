@@ -62,14 +62,14 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  NumericVector (const ParallelType type = AUTOMATIC);
+  NumericVector (const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   NumericVector (const numeric_index_type n,
-                 const ParallelType type = AUTOMATIC);
+                 const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -77,7 +77,7 @@ public:
    */
   NumericVector (const numeric_index_type n,
 		 const numeric_index_type n_local,
-                 const ParallelType type = AUTOMATIC);
+                 const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -87,7 +87,7 @@ public:
   NumericVector (const numeric_index_type N,
 		 const numeric_index_type n_local,
 		 const std::vector<numeric_index_type>& ghost,
-                 const ParallelType type = AUTOMATIC);
+                 const ParallelType ptype = AUTOMATIC);
 
 public:
 
@@ -646,10 +646,10 @@ protected:
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const ParallelType type) :
+NumericVector<T>::NumericVector (const ParallelType ptype) :
   _is_closed(false),
   _is_initialized(false),
-  _type(type)
+  _type(ptype)
 {
 }
 
@@ -658,13 +658,13 @@ NumericVector<T>::NumericVector (const ParallelType type) :
 template <typename T>
 inline
 NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
-                                 const ParallelType type) :
+                                 const ParallelType ptype) :
   _is_closed(false),
   _is_initialized(false),
-  _type(type)
+  _type(ptype)
 {
   libmesh_error(); // Abstract base class!
-  // init(n, n, false, type);
+  // init(n, n, false, ptype);
 }
 
 
@@ -673,13 +673,13 @@ template <typename T>
 inline
 NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
 				 const numeric_index_type /*n_local*/,
-                                 const ParallelType type) :
+                                 const ParallelType ptype) :
   _is_closed(false),
   _is_initialized(false),
-  _type(type)
+  _type(ptype)
 {
   libmesh_error(); // Abstract base class!
-  // init(n, n_local, false, type);
+  // init(n, n_local, false, ptype);
 }
 
 
@@ -689,13 +689,13 @@ inline
 NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
 				 const numeric_index_type /*n_local*/,
 				 const std::vector<numeric_index_type>& /*ghost*/,
-                                 const ParallelType type) :
+                                 const ParallelType ptype) :
   _is_closed(false),
   _is_initialized(false),
-  _type(type)
+  _type(ptype)
 {
   libmesh_error(); // Abstract base class!
-  // init(n, n_local, ghost, false, type);
+  // init(n, n_local, ghost, false, ptype);
 }
 
 
@@ -759,9 +759,9 @@ template <typename T>
 inline
 void NumericVector<T>::get(const std::vector<numeric_index_type>& index, std::vector<T>& values) const
 {
-  const numeric_index_type num = index.size();
+  const std::size_t num = index.size();
   values.resize(num);
-  for(numeric_index_type i=0; i<num; i++)
+  for(std::size_t i=0; i<num; i++)
     {
       values[i] = (*this)(index[i]);
     }

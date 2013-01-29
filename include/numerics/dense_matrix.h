@@ -55,8 +55,8 @@ public:
   /**
    * Constructor.  Creates a dense matrix of dimension \p m by \p n.
    */
-  DenseMatrix(const unsigned int m=0,
-	      const unsigned int n=0);
+  DenseMatrix(const unsigned int new_m=0,
+	      const unsigned int new_n=0);
 
   /**
    * Copy-constructor.
@@ -152,8 +152,8 @@ public:
    * Resize the matrix.  Will never free memory, but may
    * allocate more.  Sets all elements to 0.
    */
-  void resize(const unsigned int m,
-	      const unsigned int n);
+  void resize(const unsigned int new_m,
+	      const unsigned int new_n);
 
   /**
    * Multiplies every element in the matrix by \p factor.
@@ -541,9 +541,9 @@ using namespace DenseMatrices;
 // Dense Matrix member functions
 template<typename T>
 inline
-DenseMatrix<T>::DenseMatrix(const unsigned int m,
-			    const unsigned int n)
-  : DenseMatrixBase<T>(m,n),
+DenseMatrix<T>::DenseMatrix(const unsigned int new_m,
+			    const unsigned int new_n)
+  : DenseMatrixBase<T>(new_m,new_n),
 #if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_USE_REAL_NUMBERS) && defined(LIBMESH_DEFAULT_DOUBLE_PRECISION)
     use_blas_lapack(true),
 #else
@@ -553,7 +553,7 @@ DenseMatrix<T>::DenseMatrix(const unsigned int m,
     _decomposition_type(NONE),
     _pivots()
 {
-  this->resize(m,n);
+  this->resize(new_m,new_n);
 }
 
 
@@ -587,13 +587,13 @@ void DenseMatrix<T>::swap(DenseMatrix<T>& other_matrix)
 
 template<typename T>
 inline
-void DenseMatrix<T>::resize(const unsigned int m,
-			    const unsigned int n)
+void DenseMatrix<T>::resize(const unsigned int new_m,
+			    const unsigned int new_n)
 {
-  _val.resize(m*n);
+  _val.resize(new_m*new_n);
 
-  this->_m = m;
-  this->_n = n;
+  this->_m = new_m;
+  this->_n = new_n;
 
   _decomposition_type = NONE;
   this->zero();

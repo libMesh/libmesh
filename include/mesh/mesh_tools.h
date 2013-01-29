@@ -67,8 +67,8 @@ namespace MeshTools
   {
   public:
 
-    BoundingBox (const Point &min, const Point &max) :
-      std::pair<Point, Point>(min, max)
+    BoundingBox (const Point &new_min, const Point &new_max) :
+      std::pair<Point, Point>(new_min, new_max)
     {}
 
     BoundingBox (const std::pair<Point, Point> &bbox) :

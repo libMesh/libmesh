@@ -20,7 +20,7 @@
 #define LIBMESH_PARALLEL_H
 
 // Local includes
-#include "libmesh/libmesh_common.h" // for libmesh_assert
+#include "libmesh/libmesh_common.h" // libmesh_assert, libmesh_cast_int
 #include "libmesh/libmesh_logging.h"
 
 // C++ includes

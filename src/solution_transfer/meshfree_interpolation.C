@@ -184,7 +184,7 @@ namespace libMesh
 	CommWorld.send (proc, send_buf, send_request[cnt++], tag);
 	  
     // All data has been sent.  Receive remote data in any order
-    for (unsigned int comm_step=0; comm_step<(libMesh::n_processors()-1); comm_step++)
+    for (processor_id_type comm_step=0; comm_step<(libMesh::n_processors()-1); comm_step++)
       {
 	// blocking receive
 	CommWorld.receive (Parallel::any_source, recv_buf, tag);

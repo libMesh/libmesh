@@ -183,9 +183,9 @@ namespace libMesh
       MeshBase::node_iterator it = _mesh.nodes_begin();
       const MeshBase::node_iterator end = _mesh.nodes_end();
 
-      for (unsigned int ctr=0; it != end; ctr+=2, ++it)
+      for (dof_id_type ctr=0; it != end; ctr+=2, ++it)
 	{
-	  unsigned index = 2*hole_offset + ctr;
+	  dof_id_type index = 2*hole_offset + ctr;
 
 	  // Get pointer to the current node
 	  Node* node = *it;
@@ -200,7 +200,7 @@ namespace libMesh
 	      // Use implicit ordering to define segments
 	      if (this->segments.empty())
 		{
-		  unsigned n = ctr/2; // ctr is always even
+		  dof_id_type n = ctr/2; // ctr is always even
 		  initial.segmentlist[index] = hole_offset+n;
 		  initial.segmentlist[index+1] = (n==_mesh.n_nodes()-1) ? hole_offset : hole_offset+n+1; // wrap around
 		}

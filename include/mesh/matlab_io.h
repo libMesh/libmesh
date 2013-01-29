@@ -115,8 +115,8 @@ private:
 // ------------------------------------------------------------
 // MatlabIO inline members
 inline
-MatlabIO::MatlabIO (MeshBase& mesh) :
-  MeshInput<MeshBase>  (mesh)
+MatlabIO::MatlabIO (MeshBase& mesh_in) :
+  MeshInput<MeshBase>  (mesh_in)
 {}
 
 } // namespace libMesh

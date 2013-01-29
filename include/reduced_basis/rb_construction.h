@@ -171,8 +171,8 @@ public:
   /**
    * Get/set the tolerance for the basis training.
    */
-  void set_training_tolerance(Real training_tolerance)
-    {this->training_tolerance = training_tolerance; }
+  void set_training_tolerance(Real new_training_tolerance)
+    {this->training_tolerance = new_training_tolerance; }
   Real get_training_tolerance() { return training_tolerance; }
 
   /**

@@ -114,7 +114,8 @@ public:
    * @returns the number of points associated with the quadrature rule.
    */
   unsigned int n_points() const
-    { libmesh_assert (!_points.empty()); return _points.size(); }
+    { libmesh_assert (!_points.empty());
+      return libmesh_cast_int<unsigned int>(_points.size()); }
 
   /**
    * @returns the dimension of the quadrature rule.
@@ -364,13 +365,13 @@ void QBase::print_info(std::ostream& os) const
   libmesh_assert(!_weights.empty());
 
   os << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
-  for (unsigned int qp=0; qp<this->n_points(); qp++)
+  for (unsigned int qpoint=0; qpoint<this->n_points(); qpoint++)
     {
-      os << " Point " << qp << ":\n"
+      os << " Point " << qpoint << ":\n"
 	 << "  "
-	 << _points[qp]
+	 << _points[qpoint]
 	 << " Weight:\n "
-	 << "  w=" << _weights[qp] << "\n" << std::endl;
+	 << "  w=" << _weights[qpoint] << "\n" << std::endl;
     }
 }
 

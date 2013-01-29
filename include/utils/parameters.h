@@ -139,7 +139,7 @@ public:
   /**
    * @returns the total number of parameters.
    */
-  unsigned int n_parameters () const { return _values.size(); }
+  std::size_t n_parameters () const { return _values.size(); }
 
 #ifdef LIBMESH_HAVE_RTTI
   /**
@@ -499,9 +499,9 @@ unsigned int Parameters::n_parameters () const
   unsigned int cnt = 0;
 
   Parameters::const_iterator       it  = _values.begin();
-  const Parameters::const_iterator end = _values.end();
+  const Parameters::const_iterator vals_end = _values.end();
 
-  for (; it != end; ++it)
+  for (; it != vals_end; ++it)
     if (dynamic_cast<Parameter<T>*>(it->second) != NULL)
       cnt++;
 

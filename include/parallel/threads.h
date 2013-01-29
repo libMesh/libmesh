@@ -449,8 +449,8 @@ namespace Threads
      * smallest chunk the range may be broken into for parallel
      * execution.
      */
-    explicit BlockedRange (const unsigned int grainsize = 1000) :
-      _grainsize(grainsize)
+    explicit BlockedRange (const unsigned int new_grainsize = 1000) :
+      _grainsize(new_grainsize)
     {}
 
     /**
@@ -461,8 +461,8 @@ namespace Threads
      */
     BlockedRange (const const_iterator first,
 		  const const_iterator last,
-		  const unsigned int grainsize = 1000) :
-      _grainsize(grainsize)
+		  const unsigned int new_grainsize = 1000) :
+      _grainsize(new_grainsize)
     {
       this->reset(first, last);
     }
