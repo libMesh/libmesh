@@ -994,7 +994,8 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	  // Wait for read completion
 	  async_io.join();
 
-	  n_read_values += input_vals.size();
+	  n_read_values +=
+	    libmesh_cast_int<dof_id_type>(input_vals.size());
 	  
 	  // pack data replies for each processor
  	  for (processor_id_type proc=0; proc<libMesh::n_processors(); proc++)
@@ -1920,8 +1921,8 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 
   if (libMesh::processor_id() == 0)
     {
-      std::vector<std::vector<unsigned int> > recv_ids  (libMesh::n_processors());
-      std::vector<std::vector<Number> >       recv_vals (libMesh::n_processors());
+      std::vector<std::vector<dof_id_type> > recv_ids  (libMesh::n_processors());
+      std::vector<std::vector<Number> >      recv_vals (libMesh::n_processors());
       std::vector<unsigned int> obj_val_offsets;          // map to traverse entry-wise rather than processor-wise
       std::vector<Number>       output_vals;              // The output buffer for the current block
 
@@ -1955,18 +1956,18 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	    {
 #ifdef LIBMESH_HAVE_MPI
 	      // blocking receive indices for this block, imposing no particular order on processor
-	      Parallel::Status id_status     (CommWorld.probe (Parallel::any_source, id_tag));
-	      std::vector<unsigned int> &ids (recv_ids[id_status.source()]);
+	      Parallel::Status id_status (CommWorld.probe (Parallel::any_source, id_tag));
+	      std::vector<dof_id_type> &ids (recv_ids[id_status.source()]);
 	      CommWorld.receive (id_status.source(), ids,  id_tag);
 #else
-	      std::vector<unsigned int> &ids (recv_ids[0]);
+	      std::vector<dof_id_type> &ids (recv_ids[0]);
 #endif
 	      
 	      // note its possible we didn't receive values for objects in
 	      // this block if they have no components allocated.
-	      for (unsigned int idx=0; idx<ids.size(); idx+=2)
+	      for (dof_id_type idx=0; idx<ids.size(); idx+=2)
 		{
-		  const unsigned int 
+		  const dof_id_type
 		    local_idx          = ids[idx+0]-first_object,
 		    n_vals_tot_allvecs = ids[idx+1];
 
@@ -2007,13 +2008,13 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	  // pack data from all processors into output values
  	  for (unsigned int proc=0; proc<libMesh::n_processors(); proc++)
 	    {
-	      const std::vector<unsigned int> &ids (recv_ids [proc]);
-	      const std::vector<Number>       &vals(recv_vals[proc]);
+	      const std::vector<dof_id_type> &ids (recv_ids [proc]);
+	      const std::vector<Number>      &vals(recv_vals[proc]);
 	      std::vector<Number>::const_iterator proc_vals(vals.begin());
 	      
-	      for (unsigned int idx=0; idx<ids.size(); idx+=2)
+	      for (dof_id_type idx=0; idx<ids.size(); idx+=2)
 		{
-		  const unsigned int 
+		  const dof_id_type
 		    local_idx          = ids[idx+0]-first_object,
 		    n_vals_tot_allvecs = ids[idx+1];
 		  
