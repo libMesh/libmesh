@@ -60,7 +60,7 @@ template <>
 Real FE<3,XYZ>::shape(const Elem* elem,
 		      const Order libmesh_dbg_var(order),
 		      const unsigned int i,
-		      const Point& p)
+		      const Point& point_in)
 {
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
@@ -86,9 +86,9 @@ Real FE<3,XYZ>::shape(const Elem* elem,
   // horribly with more than one thread.
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-  const Real x  = p(0);
-  const Real y  = p(1);
-  const Real z  = p(2);
+  const Real x  = point_in(0);
+  const Real y  = point_in(1);
+  const Real z  = point_in(2);
   const Real xc = centroid(0);
   const Real yc = centroid(1);
   const Real zc = centroid(2);
@@ -269,7 +269,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
 			    const Order libmesh_dbg_var(order),
 			    const unsigned int i,
 			    const unsigned int j,
-			    const Point& p)
+			    const Point& point_in)
 {
 #if LIBMESH_DIM == 3
 
@@ -297,9 +297,9 @@ Real FE<3,XYZ>::shape_deriv(const Elem* elem,
   // horribly with more than one thread.
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-  const Real x  = p(0);
-  const Real y  = p(1);
-  const Real z  = p(2);
+  const Real x  = point_in(0);
+  const Real y  = point_in(1);
+  const Real z  = point_in(2);
   const Real xc = centroid(0);
   const Real yc = centroid(1);
   const Real zc = centroid(2);
@@ -760,7 +760,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
 			           const Order libmesh_dbg_var(order),
 			           const unsigned int i,
 			           const unsigned int j,
-			           const Point& p)
+			           const Point& point_in)
 {
 #if LIBMESH_DIM == 3
 
@@ -788,9 +788,9 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem* elem,
   // horribly with more than one thread.
   libmesh_assert_equal_to (libMesh::n_threads(), 1);
 
-  const Real x  = p(0);
-  const Real y  = p(1);
-  const Real z  = p(2);
+  const Real x  = point_in(0);
+  const Real y  = point_in(1);
+  const Real z  = point_in(2);
   const Real xc = centroid(0);
   const Real yc = centroid(1);
   const Real zc = centroid(2);
