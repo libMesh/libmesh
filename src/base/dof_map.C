@@ -361,10 +361,10 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
               unsigned int n_comp_g =
                 requested->n_comp_group(sys_num, vg);
               ghost_data[i*2*n_var_groups+vg] = n_comp_g;
-              dof_id_type first_dof = n_comp_g ?
+              dof_id_type my_first_dof = n_comp_g ?
                 requested->vg_dof_base(sys_num, vg) : 0;
-              libmesh_assert_not_equal_to (first_dof, DofObject::invalid_id);
-              ghost_data[i*2*n_var_groups+n_var_groups+vg] = first_dof;
+              libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
+              ghost_data[i*2*n_var_groups+n_var_groups+vg] = my_first_dof;
             }
         }
 
@@ -387,11 +387,11 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
               requested->set_n_comp_group(sys_num, vg, n_comp_g);
               if (n_comp_g)
                 {
-                  dof_id_type first_dof =
+                  dof_id_type my_first_dof =
                     filled_request[i*2*n_var_groups+n_var_groups+vg];
-                  libmesh_assert_not_equal_to (first_dof, DofObject::invalid_id);
+                  libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
                   requested->set_vg_dof_base
-                    (sys_num, vg, first_dof);
+                    (sys_num, vg, my_first_dof);
                 }
             }
         }
@@ -403,14 +403,14 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
     {
       DofObject *obj = *it;
       libmesh_assert (obj);
-      unsigned int n_variables = obj->n_vars(this->sys_number());
-      for (unsigned int v=0; v != n_variables; ++v)
+      unsigned int num_variables = obj->n_vars(this->sys_number());
+      for (unsigned int v=0; v != num_variables; ++v)
         {
           unsigned int n_comp =
             obj->n_comp(this->sys_number(), v);
-          dof_id_type first_dof = n_comp ?
+          dof_id_type my_first_dof = n_comp ?
             obj->dof_number(this->sys_number(), v, 0) : 0;
-          libmesh_assert_not_equal_to (first_dof, DofObject::invalid_id);
+          libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
         }
     }
 #endif
@@ -1080,9 +1080,9 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type &next_free_dof,
 	  {
 	    unsigned int n_comp_g =
 	      obj->n_comp_group(this->sys_number(), vg);
-	    dof_id_type first_dof = n_comp_g ?
+	    dof_id_type my_first_dof = n_comp_g ?
 	      obj->vg_dof_base(this->sys_number(), vg) : 0;
-	    libmesh_assert_not_equal_to (first_dof, DofObject::invalid_id);
+	    libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
 	  }
       }
   }
@@ -1227,9 +1227,9 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type &next_free_dof,
 	  {
 	    unsigned int n_comp_g =
 	      obj->n_comp_group(this->sys_number(), vg);
-	    dof_id_type first_dof = n_comp_g ?
+	    dof_id_type my_first_dof = n_comp_g ?
 	      obj->vg_dof_base(this->sys_number(), vg) : 0;
-	    libmesh_assert_not_equal_to (first_dof, DofObject::invalid_id);
+	    libmesh_assert_not_equal_to (my_first_dof, DofObject::invalid_id);
 	  }
       }
   }
@@ -1281,16 +1281,16 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
               const unsigned int n_comp = node->n_comp(sys_num, v);
               for (unsigned int c=0; c != n_comp; ++c)
                 {
-                  const dof_id_type di = node->dof_number(sys_num, v, c);
-		  if (di < this->first_dof() || di >= this->end_dof())
+                  const dof_id_type dof_index = node->dof_number(sys_num, v, c);
+		  if (dof_index < this->first_dof() || dof_index >= this->end_dof())
 		    {
-		      _send_list.push_back(di);
+		      _send_list.push_back(dof_index);
 		      // libmesh_here();
-		      // std::cout << "sys_num,v,c,di="
+		      // std::cout << "sys_num,v,c,dof_index="
 		      // 		<< sys_num << ", "
 		      // 		<< v << ", "
 		      // 		<< c << ", "
-		      // 		<< di << '\n';
+		      // 		<< dof_index << '\n';
 		      // node->debug_buffer();
 		    }
                 }
@@ -1498,19 +1498,19 @@ void DofMap::clear_sparsity()
 
 
 void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
-				   const std::vector<dof_id_type>& dof_indices,
+				   const std::vector<dof_id_type>& dof_indices_in,
 				   DenseVectorBase<Number>& Ue) const
 {
 #ifdef LIBMESH_ENABLE_AMR
 
   // Trivial mapping
-  libmesh_assert_equal_to (dof_indices.size(), Ue.size());
+  libmesh_assert_equal_to (dof_indices_in.size(), Ue.size());
   bool has_constrained_dofs = false;
 
   for (unsigned int il=0; 
-       il != libmesh_cast_int<unsigned int>(dof_indices.size()); il++)
+       il != libmesh_cast_int<unsigned int>(dof_indices_in.size()); il++)
     {
-      const dof_id_type ig = dof_indices[il];
+      const dof_id_type ig = dof_indices_in[il];
 
       if (this->is_constrained_dof (ig)) has_constrained_dofs = true;
 
@@ -1525,14 +1525,14 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
   if (has_constrained_dofs)
     {
       // Copy the input DOF indices.
-      std::vector<dof_id_type> constrained_dof_indices(dof_indices);
+      std::vector<dof_id_type> constrained_dof_indices(dof_indices_in);
 
       DenseMatrix<Number> C;
       DenseVector<Number> H;
 	
       this->build_constraint_matrix_and_vector (C, H, constrained_dof_indices);
 
-      libmesh_assert_equal_to (dof_indices.size(), C.m());
+      libmesh_assert_equal_to (dof_indices_in.size(), C.m());
       libmesh_assert_equal_to (constrained_dof_indices.size(), C.n());
 
       // zero-out Ue
@@ -1540,7 +1540,7 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 
       // compute Ue = C Ug, with proper mapping.
       const unsigned int n_original_dofs =
-        libmesh_cast_int<unsigned int>(dof_indices.size());
+        libmesh_cast_int<unsigned int>(dof_indices_in.size());
       for (unsigned int i=0; i != n_original_dofs; i++)
 	{
 	  Ue.el(i) = H(i);
@@ -1567,13 +1567,13 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
   // Trivial mapping
 
   const unsigned int n_original_dofs =
-    libmesh_cast_int<unsigned int>(dof_indices.size());
+    libmesh_cast_int<unsigned int>(dof_indices_in.size());
 
   libmesh_assert_equal_to (n_original_dofs, Ue.size());
 
   for (unsigned int il=0; il<n_original_dofs; il++)
     {
-      const dof_id_type ig = dof_indices[il];
+      const dof_id_type ig = dof_indices_in[il];
 
       libmesh_assert ((ig >= Ug.first_local_index()) && (ig <  Ug.last_local_index()));
 
@@ -1808,12 +1808,12 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type>& di,
 
 
 
-bool DofMap::all_semilocal_indices (const std::vector<dof_id_type>& dof_indices) const
+bool DofMap::all_semilocal_indices (const std::vector<dof_id_type>& dof_indices_in) const
 {
   // We're all semilocal unless we find a counterexample
-  for (std::size_t i=0; i != dof_indices.size(); ++i)
+  for (std::size_t i=0; i != dof_indices_in.size(); ++i)
     {
-      const dof_id_type di = dof_indices[i];
+      const dof_id_type di = dof_indices_in[i];
       // If it's not in the local indices
       if (di < this->first_dof() ||
           di >= this->end_dof())
@@ -2601,10 +2601,10 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
       const dof_id_type dof_id = it->first;
 
 #ifndef NDEBUG
-      processor_id_type proc_id = 0;
-      while (dof_id >= dof_map.end_dof(proc_id))
-        proc_id++;
-      libmesh_assert (proc_id != libMesh::processor_id());
+      processor_id_type dbg_proc_id = 0;
+      while (dof_id >= dof_map.end_dof(dbg_proc_id))
+        dbg_proc_id++;
+      libmesh_assert (dbg_proc_id != libMesh::processor_id());
 #endif
 
       const SparsityPattern::Row &their_row = it->second;
