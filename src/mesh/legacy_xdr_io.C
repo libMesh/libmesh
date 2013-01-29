@@ -54,19 +54,19 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // LegacyXdrIO members
-LegacyXdrIO::LegacyXdrIO (MeshBase& mesh, const bool binary) :
+LegacyXdrIO::LegacyXdrIO (MeshBase& mesh, const bool binary_in) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase>(mesh),
-  _binary (binary)
+  _binary (binary_in)
 {
 }
 
 
 
 
-LegacyXdrIO::LegacyXdrIO (const MeshBase& mesh, const bool binary) :
+LegacyXdrIO::LegacyXdrIO (const MeshBase& mesh, const bool binary_in) :
   MeshOutput<MeshBase>(mesh),
-  _binary (binary)
+  _binary (binary_in)
 {
 }
 
