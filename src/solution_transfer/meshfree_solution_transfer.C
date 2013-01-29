@@ -68,8 +68,8 @@ private:
 void
 MeshfreeSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var)
 {  
-  System * from_sys = from_var.sys();
-  System * to_sys = to_var.sys();
+  System * from_sys = from_var.system();
+  System * to_sys = to_var.system();
 
   EquationSystems & from_es = from_sys->get_equation_systems();
 

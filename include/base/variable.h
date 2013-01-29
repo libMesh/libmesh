@@ -53,12 +53,12 @@ public:
   Variable (System *sys,
             const std::string &var_name,
 	    const unsigned int var_number,
-	    const unsigned int first_scalar_number,
+	    const unsigned int first_scalar_num,
 	    const FEType &var_type) :
     _sys(sys),
     _name(var_name),
     _number(var_number),
-    _first_scalar_number(first_scalar_number),
+    _first_scalar_number(first_scalar_num),
     _type(var_type),
     _active_subdomains()
   {}
@@ -70,13 +70,13 @@ public:
   Variable (System *sys,
             const std::string &var_name,
 	    const unsigned int var_number,
-	    const unsigned int first_scalar_number,
+	    const unsigned int first_scalar_num,
 	    const FEType &var_type,
 	    const std::set<subdomain_id_type> &var_active_subdomains) :
     _sys(sys),
     _name(var_name),
     _number(var_number),
-    _first_scalar_number(first_scalar_number),
+    _first_scalar_number(first_scalar_num),
     _type(var_type),
     _active_subdomains(var_active_subdomains)
   {}
@@ -84,15 +84,7 @@ public:
   /**
    * The System this Variable is part of.
    */
-  System * sys()
-  {
-    return _sys;
-  }
-
-  /**
-   * The System this Variable is part of.
-   */
-  System * sys() const
+  System * system() const
   {
     return _sys;
   }
@@ -181,14 +173,13 @@ public:
   VariableGroup (System *sys,
                  const std::vector<std::string> &var_names,
 		 const unsigned int var_number,
-		 const unsigned int first_scalar_number,
+		 const unsigned int first_scalar_num,
 		 const FEType &var_type) :
     Variable (sys,
               "var_group",
 	      var_number,
-	      first_scalar_number,
+	      first_scalar_num,
 	      var_type),
-    _sys(sys),
     _names(var_names)
   {}
 
@@ -200,32 +191,23 @@ public:
   VariableGroup (System *sys,
                  const std::vector<std::string> &var_names,
 		 const unsigned int var_number,
-		 const unsigned int first_scalar_number,
+		 const unsigned int first_scalar_num,
 		 const FEType &var_type,
 		 const std::set<subdomain_id_type> &var_active_subdomains) :
 
     Variable (sys,
               "var_group",
 	      var_number,
-	      first_scalar_number,
+	      first_scalar_num,
 	      var_type,
 	      var_active_subdomains),
-    _sys(sys),
     _names(var_names)
   {}
 
   /**
-   * The System this VariableGroup is part of.
-   */
-  System * sys()
-  {
-    return _sys;
-  }
-
-  /**
    * The number of variables in this \p VariableGroup
    */
-  unsigned int n_variables () const
+  std::size_t n_variables () const
   { return _names.size(); }
 
   /**
@@ -235,7 +217,7 @@ public:
   Variable variable (unsigned int v) const
   {
     libmesh_assert_less (v, this->n_variables());
-    return Variable (this->_sys,
+    return Variable (this->system(),
                      this->name(v),
 		     this->number(v),
 		     this->first_scalar_number(v),
@@ -286,7 +268,6 @@ public:
   { _names.push_back (var_name); }
 
 protected:
-  System *_sys;
   std::vector<std::string> _names;
 };
 

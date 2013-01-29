@@ -14,8 +14,8 @@ DirectSolutionTransfer::~DirectSolutionTransfer()
 void
 DirectSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var)
 {  
-  System * from_sys = from_var.sys();
-  System * to_sys = to_var.sys();
+  System * from_sys = from_var.system();
+  System * to_sys = to_var.system();
 
   // Just a couple of (not completely thorough)
   libmesh_assert(from_sys->get_equation_systems().get_mesh().n_nodes() == from_sys->get_equation_systems().get_mesh().n_nodes());
