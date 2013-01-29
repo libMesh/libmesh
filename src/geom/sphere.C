@@ -130,9 +130,9 @@ Real Sphere::distance (const Sphere& other_sphere) const
   libmesh_assert_greater ( this->radius(), 0. );
   libmesh_assert_greater ( other_sphere.radius(), 0. );
 
-  const Real distance = (this->center() - other_sphere.center()).size();
+  const Real the_distance = (this->center() - other_sphere.center()).size();
 
-  return distance - (this->radius() + other_sphere.radius());
+  return the_distance - (this->radius() + other_sphere.radius());
 }
 
 
