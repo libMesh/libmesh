@@ -52,25 +52,25 @@ void Node::print_info (std::ostream& os) const
 
 std::string Node::get_info () const
 {
-  std::ostringstream out;
+  std::ostringstream oss;
 
-  out << "  Node id()=";
+  oss << "  Node id()=";
 
   if (this->valid_id())
-    out << this->id();
+    oss << this->id();
   else
-    out << "invalid";
+    oss << "invalid";
 
-  out << ", processor_id()=" << this->processor_id() << 
+  oss << ", processor_id()=" << this->processor_id() << 
          ", Point=" << *static_cast<const Point*>(this) << '\n';
 
-  out << "    DoFs=";
+  oss << "    DoFs=";
   for (unsigned int s=0; s != this->n_systems(); ++s)
     for (unsigned int v=0; v != this->n_vars(s); ++v)
       for (unsigned int c=0; c != this->n_comp(s,v); ++c)
-        out << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
+        oss << '(' << s << '/' << v << '/' << this->dof_number(s,v,c) << ") ";
 
-  return out.str();
+  return oss.str();
 }
 
 
