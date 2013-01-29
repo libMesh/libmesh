@@ -25,6 +25,14 @@
     available.  This includes encoding the solution time into output files,
     writing each libMesh subdomain to a separate Tecplot zone, and support
     for 1D Tecplot binary files.
+  * ./configure'able support for identifier types. Defaults:
+         id size (boundaries)............. : 2 bytes
+         id size (dofs)................... : 4 bytes
+         id size (processors)............. : 2 bytes
+         id size (subdomains)............. : 2 bytes
+  * New Examples:
+     o fem_system_ex2: Nonlinear elasticity, courtesy Robert Weidlich
+       
     
 0.7.3 -> 0.8.0
   * Vector-valued finite elements & related examples
