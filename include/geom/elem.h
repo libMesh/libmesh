@@ -128,19 +128,19 @@ class Elem : public ReferenceCountedObject<Elem>,
   /**
    * @returns the global id number of local \p Node \p i.
    */
-  virtual unsigned int node (const unsigned int i) const;
+  virtual dof_id_type node (const unsigned int i) const;
 
   /**
    * @returns the local id number of global \p Node id \p i,
-   * or \p invalid_id if Node id \p i is not local.
+   * or \p invalid_uint if Node id \p i is not local.
    */
-  virtual dof_id_type local_node (const unsigned int i) const;
+  virtual unsigned int local_node (const dof_id_type i) const;
 
   /**
    * @returns the local index for the \p Node pointer \p node_ptr,
    * or \p invalid_id if \p node_ptr is not a local node.
    */
-  dof_id_type get_node_index (const Node* node_ptr) const;
+  unsigned int get_node_index (const Node* node_ptr) const;
 
   /**
    * @returns the pointer to local \p Node \p i.
@@ -1367,7 +1367,7 @@ Point & Elem::point (const unsigned int i)
 
 
 inline
-unsigned int Elem::node (const unsigned int i) const
+dof_id_type Elem::node (const unsigned int i) const
 {
   libmesh_assert_less (i, this->n_nodes());
   libmesh_assert(_nodes[i]);
@@ -1377,17 +1377,16 @@ unsigned int Elem::node (const unsigned int i) const
 }
 
 
+
 inline
-dof_id_type Elem::local_node (const unsigned int i) const
+unsigned int Elem::local_node (const dof_id_type i) const
 {
   for (unsigned int n=0; n != this->n_nodes(); ++n)
     if (this->node(n) == i)
       return n;
 
-  return Node::invalid_id;
+  return libMesh::invalid_uint;
 }
-
-
 
 
 
@@ -1403,13 +1402,13 @@ Node* Elem::get_node (const unsigned int i) const
 
 
 inline
-dof_id_type Elem::get_node_index (const Node* node_ptr) const
+unsigned int Elem::get_node_index (const Node* node_ptr) const
 {
   for (unsigned int n=0; n != this->n_nodes(); ++n)
     if (this->_nodes[n] == node_ptr)
       return n;
 
-  return Node::invalid_id;
+  return libMesh::invalid_uint;
 }
 
 
@@ -1546,7 +1545,7 @@ unsigned int Elem::which_side_am_i (const Elem* e) const
   for (unsigned int i=0; i != en; ++i)
     {
       Point side_point = e->point(i);
-      dof_id_type local_node_id = Node::invalid_id;
+      unsigned int local_node_id = libMesh::invalid_uint;
 
       // Look for a node of this that's contiguous with node i of e
       for (unsigned int j=0; j != nn; ++j)
@@ -1555,7 +1554,7 @@ unsigned int Elem::which_side_am_i (const Elem* e) const
 
       // If a node of e isn't contiguous with some node of this, then
       // e isn't a side of this.
-      if (local_node_id == Node::invalid_id)
+      if (local_node_id == libMesh::invalid_uint)
         return libMesh::invalid_uint;
 
       // If a node of e isn't contiguous with some node on side s of

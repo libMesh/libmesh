@@ -386,8 +386,10 @@ public:
   /**
    * Returns the number of degrees of freedom on partition \p proc.
    */
-  dof_id_type n_dofs_on_processor(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _first_df.size()); return (_end_df[proc] - _first_df[proc]); }
+  dof_id_type n_dofs_on_processor(const processor_id_type proc) const {
+    libmesh_assert_less (proc, _first_df.size());
+    return libmesh_cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
+  }
 
   /**
    * Returns the first dof index that is local to partition \p proc.
@@ -408,8 +410,11 @@ public:
    * This function is now deprecated, because it returns nonsense in the rare
    * case where \p proc has no local dof indices.  Use end_dof() instead.
    */
-  dof_id_type last_dof(const processor_id_type proc = libMesh::processor_id()) const
-  { libmesh_deprecated(); libmesh_assert_less (proc, _end_df.size()); return (_end_df[proc] - 1); }
+  dof_id_type last_dof(const processor_id_type proc = libMesh::processor_id()) const {
+    libmesh_deprecated();
+    libmesh_assert_less (proc, _end_df.size());
+    return libmesh_cast_int<dof_id_type>(_end_df[proc] - 1);
+  }
 
   /**
    * Returns the first dof index that is after all indices local to subdomain \p proc.

@@ -452,9 +452,9 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
 
   // Get the error in the uniformly refined solution(s).
 
-  for (unsigned int i=0; i != system_list.size(); ++i)
+  for (unsigned int sysnum=0; sysnum != system_list.size(); ++sysnum)
     {
-      System &system = *system_list[i];
+      System &system = *system_list[sysnum];
 
       unsigned int n_vars = system.n_vars();
 
@@ -463,7 +463,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       const SystemNorm &system_i_norm =
         _error_norms->find(&system)->second;
 
-      NumericVector<Number> *projected_solution = projected_solutions[i];
+      NumericVector<Number> *projected_solution = projected_solutions[sysnum];
 
       // Loop over all the variables in the system
       for (unsigned int var=0; var<n_vars; var++)
@@ -532,7 +532,8 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
               const unsigned int n_qp = qrule->n_points();
 
               // The number of shape functions
-              const unsigned int n_sf = dof_indices.size();
+              const unsigned int n_sf =
+                libmesh_cast_int<unsigned int>(dof_indices.size());
 
               //
               // Begin the loop over the Quadrature points.
@@ -607,15 +608,18 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
               if (system_i_norm.type(var) == L2 ||
                   system_i_norm.type(var) == H1 ||
                   system_i_norm.type(var) == H2)
-                (*err_vec)[e_id] += L2normsq;
+                (*err_vec)[e_id] +=
+		  static_cast<ErrorVectorReal>(L2normsq);
               if (system_i_norm.type(var) == H1 ||
                   system_i_norm.type(var) == H2 ||
                   system_i_norm.type(var) == H1_SEMINORM)
-                (*err_vec)[e_id] += H1seminormsq;
+                (*err_vec)[e_id] +=
+		  static_cast<ErrorVectorReal>(H1seminormsq);
 
               if (system_i_norm.type(var) == H2 ||
                   system_i_norm.type(var) == H2_SEMINORM)
-                (*err_vec)[e_id] += H2seminormsq;
+                (*err_vec)[e_id] +=
+		  static_cast<ErrorVectorReal>(H2seminormsq);
             } // End loop over active local elements
         } // End loop over variables
 
@@ -666,10 +670,10 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
     }
   else
     {
-      for (ErrorMap::iterator i = errors_per_cell->begin();
-           i != errors_per_cell->end(); ++i)
+      for (ErrorMap::iterator it = errors_per_cell->begin();
+           it != errors_per_cell->end(); ++it)
         {
-          ErrorVector *e = i->second;
+          ErrorVector *e = it->second;
           // First sum the vector of estimated error values
           this->reduce_error(*e);
 

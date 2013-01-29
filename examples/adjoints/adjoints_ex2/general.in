@@ -4,7 +4,7 @@
 domainfile = 'lshaped.xda'
 
 # The number of uniform refinements to immediately perform on that grid
-coarserefinements = 3
+coarserefinements = 2
 
 # Should the nonlinear solver produce verbose messages?
 solver_quiet = false

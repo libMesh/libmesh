@@ -90,7 +90,7 @@ class Side : public SideType
   /**
    * @returns the global id number of local \p Node \p i.
    */
-  virtual unsigned int node (const unsigned int i) const
+  virtual dof_id_type node (const unsigned int i) const
   {
     libmesh_assert_less (i, this->n_nodes());
     return this->parent()->node (ParentType::side_nodes_map[_side_number][i]);
@@ -189,7 +189,7 @@ class SideEdge : public EdgeType
   /**
    * @returns the global id number of local \p Node \p i.
    */
-  virtual unsigned int node (const unsigned int i) const
+  virtual dof_id_type node (const unsigned int i) const
   {
     libmesh_assert_less (i, this->n_nodes());
     return this->parent()->node (ParentType::edge_nodes_map[_edge_number][i]);

@@ -72,7 +72,7 @@ class RemoteElem : public Elem
   virtual Point & point (const unsigned int i)
   { libmesh_error(); return Elem::point(i); }
 
-  virtual unsigned int node (const unsigned int i) const
+  virtual dof_id_type node (const unsigned int i) const
   { libmesh_error(); return Elem::node(i); }
 
   virtual Node* get_node (const unsigned int i) const

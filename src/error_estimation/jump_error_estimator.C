@@ -231,7 +231,8 @@ void JumpErrorEstimator::estimate_error (const System& system,
                               Ucoarse = Uparent;
 
 		              dof_map.dof_indices (fine_elem, dof_indices_fine, var);
-		              const unsigned int n_dofs_fine = dof_indices_fine.size();
+		              const unsigned int n_dofs_fine =
+				libmesh_cast_int<unsigned int>(dof_indices_fine.size());
                               Ufine.resize(n_dofs_fine);
 
 			      for (unsigned int i=0; i<n_dofs_fine; i++)
@@ -239,8 +240,10 @@ void JumpErrorEstimator::estimate_error (const System& system,
                               this->reinit_sides();
                               this->internal_side_integration();
 
-                              error_per_cell[fine_elem->id()] += fine_error;
-                              error_per_cell[coarse_elem->id()] += coarse_error;
+                              error_per_cell[fine_elem->id()] +=
+				static_cast<ErrorVectorReal>(fine_error);
+                              error_per_cell[coarse_elem->id()] += 
+				static_cast<ErrorVectorReal>(coarse_error);
 
                               // Keep track of the number of internal flux
                               // sides found on each element
@@ -259,7 +262,8 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
                       if (this->boundary_side_integration())
                         {
-                          error_per_cell[fine_elem->id()] += fine_error;
+                          error_per_cell[fine_elem->id()] +=
+			    static_cast<ErrorVectorReal>(fine_error);
                           n_flux_faces[fine_elem->id()]++;
                         }
                     }
@@ -292,8 +296,10 @@ void JumpErrorEstimator::estimate_error (const System& system,
 		      dof_map.dof_indices (coarse_elem, dof_indices_coarse, var);
 
 		      // The number of DOFS on each element
-		      const unsigned int n_dofs_fine = dof_indices_fine.size();
-		      const unsigned int n_dofs_coarse = dof_indices_coarse.size();
+		      const unsigned int n_dofs_fine = 
+			libmesh_cast_int<unsigned int>(dof_indices_fine.size());
+		      const unsigned int n_dofs_coarse =
+			libmesh_cast_int<unsigned int>(dof_indices_coarse.size());
                       Ufine.resize(n_dofs_fine);
                       Ucoarse.resize(n_dofs_coarse);
 
@@ -306,8 +312,10 @@ void JumpErrorEstimator::estimate_error (const System& system,
                       this->reinit_sides();
                       this->internal_side_integration();
 
-                      error_per_cell[fine_elem->id()] += fine_error;
-                      error_per_cell[coarse_elem->id()] += coarse_error;
+                      error_per_cell[fine_elem->id()] +=
+			static_cast<ErrorVectorReal>(fine_error);
+                      error_per_cell[coarse_elem->id()] +=
+			static_cast<ErrorVectorReal>(coarse_error);
 
                       // Keep track of the number of internal flux
                       // sides found on each element
@@ -335,7 +343,8 @@ void JumpErrorEstimator::estimate_error (const System& system,
 		      dof_map.dof_indices (fine_elem, dof_indices_fine, var);
 
 		      // The number of DOFS on each element
-		      const unsigned int n_dofs_fine = dof_indices_fine.size();
+		      const unsigned int n_dofs_fine =
+			libmesh_cast_int<unsigned int>(dof_indices_fine.size());
                       Ufine.resize(n_dofs_fine);
 
                       for (unsigned int i=0; i<n_dofs_fine; i++)
@@ -343,7 +352,8 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
                       if (this->boundary_side_integration())
                         {
-                          error_per_cell[fine_elem->id()] += fine_error;
+                          error_per_cell[fine_elem->id()] +=
+			    static_cast<ErrorVectorReal>(fine_error);
                           n_flux_faces[fine_elem->id()]++;
                         }
                     } // end if _bc_function != NULL
@@ -390,7 +400,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 	    continue;
 
 	  //libMesh::out << "Element " << i << " has " << n_flux_faces[i] << " flux faces." << std::endl;
-	  error_per_cell[i] /= static_cast<Real>(n_flux_faces[i]);
+	  error_per_cell[i] /= static_cast<ErrorVectorReal>(n_flux_faces[i]);
 	}
     }
 
@@ -449,7 +459,7 @@ float JumpErrorEstimator::coarse_n_flux_faces_increment ()
   // times in 3D so that the final flux face count for the coarse
   // element will be an integer value.
 
-  return 1.0 / static_cast<Real>(divisor);
+  return 1.0f / static_cast<float>(divisor);
 }
 
 } // namespace libMesh
