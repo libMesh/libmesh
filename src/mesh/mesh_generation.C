@@ -2185,6 +2185,10 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
 
           new_elem->set_id(elem->id() + (k * orig_elem));
           new_elem->processor_id() = elem->processor_id();
+
+          // maintain the subdomain_id
+          new_elem->subdomain_id() = elem->subdomain_id();
+
           new_elem = mesh.add_elem(new_elem);
 
           // Copy any old boundary ids on all sides
