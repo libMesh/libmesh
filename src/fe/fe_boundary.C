@@ -675,11 +675,11 @@ void FEMap::compute_face_map(int dim, const std::vector<Real>& qw,
 	// compute the jacobian at the quadrature points
 	for (unsigned int p=0; p<n_qp; p++)
 	  {
-	    const Real jac = this->dxyzdxi_map[p].size();
+	    const Real the_jac = this->dxyzdxi_map[p].size();
 
-	    libmesh_assert_greater (jac, 0.);
+	    libmesh_assert_greater (the_jac, 0.);
 
-	    this->JxW[p] = jac*qw[p];
+	    this->JxW[p] = the_jac*qw[p];
 	  }
 
 	// done computing the map
@@ -780,11 +780,11 @@ void FEMap::compute_face_map(int dim, const std::vector<Real>& qw,
 			      dzdeta_map(p)*dzdeta_map(p));
 
 
-	    const Real jac = std::sqrt(g11*g22 - g12*g21);
+	    const Real the_jac = std::sqrt(g11*g22 - g12*g21);
 
-	    libmesh_assert_greater (jac, 0.);
+	    libmesh_assert_greater (the_jac, 0.);
 
-	    this->JxW[p] = jac*qw[p];
+	    this->JxW[p] = the_jac*qw[p];
 	  }
 
 	// done computing the map
@@ -870,13 +870,13 @@ void FEMap::compute_edge_map(int dim,
       this->tangents[p][0] = this->dxyzdxi_map[p].unit();
 
       // compute the jacobian at the quadrature points
-      const Real jac = std::sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
-				 this->dydxi_map(p)*this->dydxi_map(p) +
-				 this->dzdxi_map(p)*this->dzdxi_map(p));
+      const Real the_jac = std::sqrt(this->dxdxi_map(p)*this->dxdxi_map(p) +
+                                     this->dydxi_map(p)*this->dydxi_map(p) +
+                                     this->dzdxi_map(p)*this->dzdxi_map(p));
 
-      libmesh_assert_greater (jac, 0.);
+      libmesh_assert_greater (the_jac, 0.);
 
-      this->JxW[p] = jac*qw[p];
+      this->JxW[p] = the_jac*qw[p];
     }
 
   STOP_LOG("compute_edge_map()", "FEMap");
