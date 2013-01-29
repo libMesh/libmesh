@@ -207,8 +207,8 @@ public:
   /**
    * The number of variables in this \p VariableGroup
    */
-  std::size_t n_variables () const
-  { return _names.size(); }
+  unsigned int n_variables () const
+  { return libmesh_cast_int<unsigned int>(_names.size()); }
 
   /**
    * Construct a \p Variable object for an individual member

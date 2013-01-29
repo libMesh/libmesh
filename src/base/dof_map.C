@@ -1507,7 +1507,8 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
   libmesh_assert_equal_to (dof_indices.size(), Ue.size());
   bool has_constrained_dofs = false;
 
-  for (std::size_t il=0; il<dof_indices.size(); il++)
+  for (unsigned int il=0; 
+       il != libmesh_cast_int<unsigned int>(dof_indices.size()); il++)
     {
       const dof_id_type ig = dof_indices[il];
 
@@ -1538,11 +1539,15 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
       Ue.zero();
 
       // compute Ue = C Ug, with proper mapping.
-      for (std::size_t i=0; i<dof_indices.size(); i++)
+      const unsigned int n_original_dofs =
+        libmesh_cast_int<unsigned int>(dof_indices.size());
+      for (unsigned int i=0; i != n_original_dofs; i++)
 	{
 	  Ue.el(i) = H(i);
 	  
-	  for (std::size_t j=0; j<constrained_dof_indices.size(); j++)
+          const unsigned int n_constrained =
+            libmesh_cast_int<unsigned int>(constrained_dof_indices.size());
+	  for (unsigned int j=0; j<n_constrained; j++)
 	    {
 	      const dof_id_type jg = constrained_dof_indices[j];
 	      
@@ -1560,9 +1565,13 @@ void DofMap::extract_local_vector (const NumericVector<Number>& Ug,
 #else
 
   // Trivial mapping
-  libmesh_assert_equal_to (dof_indices.size(), Ue.size());
 
-  for (std::size_t il=0; il<dof_indices.size(); il++)
+  const unsigned int n_original_dofs =
+    libmesh_cast_int<unsigned int>(dof_indices.size());
+
+  libmesh_assert_equal_to (n_original_dofs, Ue.size());
+
+  for (unsigned int il=0; il<n_original_dofs; il++)
     {
       const dof_id_type ig = dof_indices[il];
 

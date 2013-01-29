@@ -356,16 +356,16 @@ public:
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
    */
-  std::size_t n_variable_groups() const
-  { return _variable_groups.size(); }
+  unsigned int n_variable_groups() const
+  { return libmesh_cast_int<unsigned int>(_variable_groups.size()); }
 
   /**
    * Returns the number of variables in the global solution vector. Defaults
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
    */
-  std::size_t n_variables() const
-  { return _variables.size(); }
+  unsigned int n_variables() const
+  { return libmesh_cast_int<unsigned int>(_variables.size()); }
 
   /**
    * @returns the total number of degrees of freedom in the problem.
