@@ -835,9 +835,9 @@ dof_id_type DofMap::n_constrained_dofs() const
 {
   parallel_only();
 
-  dof_id_type n_dofs = this->n_local_constrained_dofs();
-  CommWorld.sum(n_dofs);
-  return n_dofs;
+  dof_id_type nc_dofs = this->n_local_constrained_dofs();
+  CommWorld.sum(nc_dofs);
+  return nc_dofs;
 }
 
 
@@ -2002,12 +2002,12 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
     {
       Elem *elem = *foreign_elem_it;
 
-      std::vector<dof_id_type> dof_indices;
-      this->dof_indices (elem, dof_indices);
+      std::vector<dof_id_type> my_dof_indices;
+      this->dof_indices (elem, my_dof_indices);
 
-      for (unsigned int i=0; i != dof_indices.size(); ++i)
-        if (this->is_constrained_dof(dof_indices[i]))
-          pushed_ids[elem->processor_id()].insert(dof_indices[i]);
+      for (unsigned int i=0; i != my_dof_indices.size(); ++i)
+        if (this->is_constrained_dof(my_dof_indices[i]))
+          pushed_ids[elem->processor_id()].insert(my_dof_indices[i]);
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
@@ -2849,13 +2849,13 @@ void DofMap::scatter_constraints(MeshBase& mesh)
     {
       const Elem *elem = *it;
 
-      std::vector<dof_id_type> dof_indices;
-      this->dof_indices (elem, dof_indices);
+      std::vector<dof_id_type> my_dof_indices;
+      this->dof_indices (elem, my_dof_indices);
 
-      for (std::size_t i=0; i != dof_indices.size(); ++i)
+      for (std::size_t i=0; i != my_dof_indices.size(); ++i)
         {
 	  DofConstrainsMap::const_iterator dcmi =
-            dof_id_constrains.find(dof_indices[i]);
+            dof_id_constrains.find(my_dof_indices[i]);
           if (dcmi != dof_id_constrains.end())
             {
               for (DofConstrainsMap::mapped_type::const_iterator mti =
@@ -2864,12 +2864,12 @@ void DofMap::scatter_constraints(MeshBase& mesh)
                 {
                   const dof_id_type constrained = *mti;
                   
-                  dof_id_type constrained_proc_id = 0;
-                  while (constrained >= _end_df[constrained_proc_id])
-                    constrained_proc_id++;
+                  dof_id_type the_constrained_proc_id = 0;
+                  while (constrained >= _end_df[the_constrained_proc_id])
+                    the_constrained_proc_id++;
 
                   const dof_id_type elemproc = elem->processor_id();
-                  if (elemproc != constrained_proc_id)
+                  if (elemproc != the_constrained_proc_id)
                     pushed_ids[elemproc].insert(constrained);
                 }
             }
@@ -2892,12 +2892,12 @@ void DofMap::scatter_constraints(MeshBase& mesh)
       std::vector<std::vector<Real> > pushed_vals(pushed_ids_size);
       std::vector<Number> pushed_rhss(pushed_ids_size);
 
-      std::set<dof_id_type>::const_iterator it;
-      std::size_t push_i;
-      for (push_i = 0, it = pushed_ids[procup].begin();
-           it != pushed_ids[procup].end(); ++push_i, ++it)
+      // As long as we're declaring them outside the loop, let's initialize them too!
+      std::set<dof_id_type>::const_iterator pushed_ids_iter = pushed_ids[procup].begin();
+      std::size_t push_i = 0;
+      for ( ; pushed_ids_iter != pushed_ids[procup].end(); ++push_i, ++pushed_ids_iter)
         {
-          const dof_id_type constrained = *it;
+          const dof_id_type constrained = *pushed_ids_iter;
           DofConstraintRow &row = _dof_constraints[constrained].first;
 	  std::size_t row_size = row.size();
           pushed_keys[push_i].reserve(row_size);
@@ -3109,9 +3109,9 @@ DirichletBoundaries::~DirichletBoundaries()
 void DofMap::add_periodic_boundary (const PeriodicBoundaryBase& periodic_boundary)
 {
   // See if we already have a periodic boundary associated myboundary...
-  PeriodicBoundaryBase* boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
+  PeriodicBoundaryBase* existing_boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
 
-  if ( boundary == NULL )
+  if ( existing_boundary == NULL )
   {
     // ...if not, clone the input (and its inverse) and add them to the PeriodicBoundaries object
     PeriodicBoundaryBase* boundary = periodic_boundary.clone().release();
@@ -3124,7 +3124,7 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase& periodic_boundar
   else
   {
     // ...otherwise, merge this object's variable IDs with the existing boundary object's.
-    boundary->merge(periodic_boundary);
+    existing_boundary->merge(periodic_boundary);
     
     // Do the same merging process for the inverse boundary.  Note: the inverse better already exist!
     PeriodicBoundaryBase* inverse_boundary = _periodic_boundaries->boundary(periodic_boundary.pairedboundary);
