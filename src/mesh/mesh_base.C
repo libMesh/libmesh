@@ -269,9 +269,9 @@ dof_id_type MeshBase::n_active_sub_elem () const
 
 std::string MeshBase::get_info() const
 {
-  std::ostringstream out;
+  std::ostringstream oss;
 
-  out << " Mesh Information:"                                  << '\n'
+  oss << " Mesh Information:"                                  << '\n'
       << "  mesh_dimension()="    << this->mesh_dimension()    << '\n'
       << "  spatial_dimension()=" << this->spatial_dimension() << '\n'
       << "  n_nodes()="           << this->n_nodes()           << '\n'
@@ -287,7 +287,7 @@ std::string MeshBase::get_info() const
       << "  n_threads()="         << libMesh::n_threads()      << '\n'
       << "  processor_id()="      << this->processor_id()      << '\n';
 
-  return out.str();
+  return oss.str();
 }
 
 
