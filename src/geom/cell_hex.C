@@ -215,22 +215,22 @@ bool Hex::is_edge_on_side(const unsigned int e,
 
 
 
-unsigned int Hex::opposite_side(const unsigned int side) const
+unsigned int Hex::opposite_side(const unsigned int side_in) const
 {
-  libmesh_assert_less (side, 6);
+  libmesh_assert_less (side_in, 6);
   static const unsigned char hex_opposites[6] = {5, 3, 4, 1, 2, 0};
-  return hex_opposites[side];
+  return hex_opposites[side_in];
 }
 
 
 
-unsigned int Hex::opposite_node(const unsigned int node,
-                                const unsigned int side) const
+unsigned int Hex::opposite_node(const unsigned int node_in,
+                                const unsigned int side_in) const
 {
-  libmesh_assert_less (node, 26);
-  libmesh_assert_less (node, this->n_nodes());
-  libmesh_assert_less (side, this->n_sides());
-  libmesh_assert(this->is_node_on_side(node, side));
+  libmesh_assert_less (node_in, 26);
+  libmesh_assert_less (node_in, this->n_nodes());
+  libmesh_assert_less (side_in, this->n_sides());
+  libmesh_assert(this->is_node_on_side(node_in, side_in));
 
   static const unsigned char side05_nodes_map[] =
     {4, 5, 6, 7, 0, 1, 2, 3, 16, 17, 18, 19, 255, 255, 255, 255, 8, 9, 10, 11, 25, 255, 255, 255, 255, 20};
@@ -239,19 +239,19 @@ unsigned int Hex::opposite_node(const unsigned int node,
   static const unsigned char side24_nodes_map[] =
     {1, 0, 3, 2, 5, 4, 7, 6, 255, 11, 255, 9, 13, 12, 15, 14, 255, 19, 255, 17, 255, 255, 24, 255, 22, 255};
   
-  switch (side)
+  switch (side_in)
   {
   case 0:
   case 5:
-    return side05_nodes_map[node];
+    return side05_nodes_map[node_in];
     break;
   case 1:
   case 3:
-    return side13_nodes_map[node];
+    return side13_nodes_map[node_in];
     break;
   case 2:
   case 4:
-    return side24_nodes_map[node];
+    return side24_nodes_map[node_in];
     break;
   }
 
