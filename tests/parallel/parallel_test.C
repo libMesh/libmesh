@@ -33,11 +33,11 @@ public:
 
   void testGather()
   {
-    std::vector<unsigned int> vals;
+    std::vector<processor_id_type> vals;
     CommWorld.gather(0,libMesh::processor_id(),vals);
     
     if (libMesh::processor_id() == 0)
-      for (unsigned int i=0; i<vals.size(); i++)
+      for (processor_id_type i=0; i<vals.size(); i++)
 	CPPUNIT_ASSERT_EQUAL( i , vals[i] );
   }
 
@@ -45,10 +45,10 @@ public:
 
   void testAllGather()
   {
-    std::vector<unsigned int> vals;
+    std::vector<processor_id_type> vals;
     CommWorld.allgather(libMesh::processor_id(),vals);
     
-    for (unsigned int i=0; i<vals.size(); i++)
+    for (processor_id_type i=0; i<vals.size(); i++)
       CPPUNIT_ASSERT_EQUAL( i , vals[i] );
   }
 
@@ -93,11 +93,12 @@ public:
 
   void testMax ()
   {
-    unsigned int max = libMesh::processor_id();
+    processor_id_type max = libMesh::processor_id();
     
     CommWorld.max(max);
     
-    CPPUNIT_ASSERT_EQUAL (max+1, libMesh::n_processors());
+    CPPUNIT_ASSERT_EQUAL (static_cast<processor_id_type>(max+1),
+			  libMesh::n_processors());
   }
 
 
