@@ -47,37 +47,36 @@ void FroIO::write (const std::string& fname)
   if (libMesh::processor_id() == 0)
     {
       // Open the output file stream
-      std::ofstream out (fname.c_str());
-      libmesh_assert (out.good());
+      std::ofstream out_stream (fname.c_str());
+      libmesh_assert (out_stream.good());
 
       // Make sure it opened correctly
-      if (!out.good())
+      if (!out_stream.good())
         libmesh_file_error(fname.c_str());
 
       // Get a reference to the mesh
-      const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+      const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
 
       // Write the header
-      out << mesh.n_elem()  << " "
-	  << mesh.n_nodes() << " "
+      out_stream << the_mesh.n_elem()  << " "
+	  << the_mesh.n_nodes() << " "
 	  << "0 0 "
-	  << mesh.boundary_info->n_boundary_ids()  << " 1\n";
+	  << the_mesh.boundary_info->n_boundary_ids()  << " 1\n";
 
       // Write the nodes -- 1-based!
-      for (unsigned int n=0; n<mesh.n_nodes(); n++)
-	out << n+1 << " \t"
+      for (unsigned int n=0; n<the_mesh.n_nodes(); n++)
+	out_stream << n+1 << " \t"
 	    << std::scientific
 	    << std::setprecision(12)
-	    << mesh.point(n)(0) << " \t"
-	    << mesh.point(n)(1) << " \t"
+	    << the_mesh.point(n)(0) << " \t"
+	    << the_mesh.point(n)(1) << " \t"
 	    << 0. << '\n';
 
       // Write the elements -- 1-based!
-      MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end = mesh.active_elements_end();
-      unsigned int e=0;
+      MeshBase::const_element_iterator       it  = the_mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
 
-      for ( ; it != end; ++it)
+      for (unsigned int e=0 ; it != end; ++it)
 	{
 	  // .fro likes TRI3's
 	  if ((*it)->type() != TRI3)
@@ -88,29 +87,29 @@ void FroIO::write (const std::string& fname)
 	      libmesh_error();
 	    }
 
-	  out << ++e << " \t";
+	  out_stream << ++e << " \t";
 
  	  for (unsigned int n=0; n<(*it)->n_nodes(); n++)
- 	    out << (*it)->node(n)+1 << " \t";
+            out_stream << (*it)->node(n)+1 << " \t";
 
 // 	  // LHS -> RHS Mapping, for inverted triangles
-// 	  out << (*it)->node(0)+1 << " \t";
-// 	  out << (*it)->node(2)+1 << " \t";
-// 	  out << (*it)->node(1)+1 << " \t";
+// 	  out_stream << (*it)->node(0)+1 << " \t";
+// 	  out_stream << (*it)->node(2)+1 << " \t";
+// 	  out_stream << (*it)->node(1)+1 << " \t";
 
-	  out << "1\n";
+	  out_stream << "1\n";
 	}
 
       // Write BCs.
       {
 	const std::set<boundary_id_type>& bc_ids =
-	  mesh.boundary_info->get_boundary_ids();
+	  the_mesh.boundary_info->get_boundary_ids();
 
  	std::vector<unsigned int>       el;
  	std::vector<unsigned short int> sl;
  	std::vector<boundary_id_type>   il;
 
- 	mesh.boundary_info->build_side_list (el, sl, il);
+        the_mesh.boundary_info->build_side_list (el, sl, il);
 
 
 	// Map the boundary ids into [1,n_bc_ids],
@@ -143,7 +142,7 @@ void FroIO::write (const std::string& fname)
 		  // "backward_edges" map n1-->n0
 		  // and then start with one chain link, and add on...
 		  //
-		  AutoPtr<Elem> side = mesh.elem(el[e])->build_side(sl[e]);
+		  AutoPtr<Elem> side = the_mesh.elem(el[e])->build_side(sl[e]);
 
 		  const unsigned int
 		    n0 = side->node(0),
@@ -207,11 +206,11 @@ void FroIO::write (const std::string& fname)
 	      }
 
 
-	    out << ++bc_id << " " << node_list.size() << '\n';
+	    out_stream << ++bc_id << " " << node_list.size() << '\n';
 
 	    std::deque<unsigned int>::iterator pos = node_list.begin();
 	    for ( ; pos != node_list.end(); ++pos)
-		out << *pos+1 << " \t0\n";
+		out_stream << *pos+1 << " \t0\n";
 	  }
       }
     }
