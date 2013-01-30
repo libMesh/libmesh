@@ -964,7 +964,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
   unsigned int max_level = 0;
   unsigned int max_p_level = 0;
 
-
+  {
   // First we look at all the active level-0 elements.  Since it doesn't make
   // sense to coarsen them we must un-set their coarsen flags if
   // they are set.
@@ -987,6 +987,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 	  (elem->p_refinement_flag() == Elem::COARSEN))
 	elem->set_p_refinement_flag(Elem::DO_NOTHING);
     }
+  }
 
   // if there are no refined elements on this processor then
   // there is no work for us to do
