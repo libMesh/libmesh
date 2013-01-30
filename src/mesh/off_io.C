@@ -49,10 +49,10 @@ void OFFIO::read_stream(std::istream& in)
   libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   // Get a reference to the mesh
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
 
   // Clear any existing mesh data
-  mesh.clear();
+  the_mesh.clear();
 
   // Check the input buffer
   libmesh_assert (in.good());
@@ -81,7 +81,7 @@ void OFFIO::read_stream(std::istream& in)
 	 >> y
 	 >> z;
 
-      mesh.add_point ( Point(x,y,z), n );
+      the_mesh.add_point ( Point(x,y,z), n );
     }
 
   unsigned int nv, nid;
@@ -97,7 +97,7 @@ void OFFIO::read_stream(std::istream& in)
       libmesh_assert(nv == 2 || nv == 3);
       if (e == 0)
       {
-        mesh.set_mesh_dimension(nv-1);
+        the_mesh.set_mesh_dimension(nv-1);
         if (nv == 3)
         {
 #if LIBMESH_DIM < 2
@@ -117,12 +117,12 @@ void OFFIO::read_stream(std::istream& in)
       }
       
       elem->set_id(e);
-      mesh.add_elem (elem);
+      the_mesh.add_elem (elem);
 
       for (unsigned int i=0; i<nv; i++)
       {
         in >> nid;
-        elem->set_node(i) = mesh.node_ptr(nid);
+        elem->set_node(i) = the_mesh.node_ptr(nid);
       }
     }
 }
