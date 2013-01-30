@@ -1201,7 +1201,9 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
             else
               dof_map.dof_indices (child,
                 child_dof_indices, var);
-            const unsigned int child_n_dofs = child_dof_indices.size();
+            const unsigned int child_n_dofs =
+	      libmesh_cast_int<unsigned int>
+	        (child_dof_indices.size());
 
             temp_fe_type = base_fe_type;
             temp_fe_type.order =
@@ -1343,7 +1345,9 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
             else
               dof_map.dof_indices (child,
                 child_dof_indices, var);
-            const unsigned int child_n_dofs = child_dof_indices.size();
+            const unsigned int child_n_dofs =
+	      libmesh_cast_int<unsigned int>
+	        (child_dof_indices.size());
 
             temp_fe_type = base_fe_type;
             temp_fe_type.order =
@@ -1474,7 +1478,9 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> &old
       else
         dof_map.dof_indices (child,
           child_dof_indices, var);
-      const unsigned int child_n_dofs = child_dof_indices.size();
+      const unsigned int child_n_dofs =
+        libmesh_cast_int<unsigned int>
+          (child_dof_indices.size());
 
       // Initialize both child and parent FE data
       // on the child's quadrature points
@@ -1709,7 +1715,8 @@ FEGenericBase<OutputType>::compute_proj_constraints (DofConstraints &constraints
             if (neigh->p_level() != old_neigh_level)
               (const_cast<Elem *>(neigh))->hack_p_level(old_neigh_level);
 
-	    const unsigned int n_side_dofs = my_side_dofs.size();
+	    const unsigned int n_side_dofs =
+	      libmesh_cast_int<unsigned int>(my_side_dofs.size());
 	    libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
 
 	    Ke.resize (n_side_dofs, n_side_dofs);
@@ -2025,7 +2032,9 @@ compute_periodic_constraints (DofConstraints &constraints,
                     (const_cast<Elem *>(neigh))->hack_p_level(old_neigh_level);
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-	          const unsigned int n_side_dofs = my_side_dofs.size();
+	          const unsigned int n_side_dofs =
+		    libmesh_cast_int<unsigned int>
+		      (my_side_dofs.size());
 	          libmesh_assert_equal_to (n_side_dofs, neigh_side_dofs.size());
 
 	          Ke.resize (n_side_dofs, n_side_dofs);

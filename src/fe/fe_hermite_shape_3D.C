@@ -35,7 +35,7 @@ namespace
   using namespace libMesh;
 
 #ifndef LIBMESH_HAVE_TBB_API
-  static unsigned int old_elem_id = libMesh::invalid_uint;
+  static dof_id_type old_elem_id = libMesh::invalid_uint;
   static std::vector<std::vector<Real> > dxdxi(3, std::vector<Real>(2, 0));
 #ifdef DEBUG
   static std::vector<Real> dydxi(2), dzdeta(2), dxdzeta(2);

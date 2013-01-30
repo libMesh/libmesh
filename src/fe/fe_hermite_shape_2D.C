@@ -36,7 +36,7 @@ namespace
   using namespace libMesh;
 
 #ifndef LIBMESH_HAVE_TBB_API
-  static unsigned int old_elem_id = libMesh::invalid_uint;
+  static dof_id_type old_elem_id = libMesh::invalid_uint;
   // Mapping functions - derivatives at each dofpt
   std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
 #else //LIBMESH_HAVE_TBB_API
