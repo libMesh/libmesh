@@ -46,13 +46,13 @@ void MatlabIO::read_stream(std::istream& in)
   libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   // Get a reference to the mesh
-  MeshBase& mesh = MeshInput<MeshBase>::mesh();
+  MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
 
   // Clear any existing mesh data
-  mesh.clear();
+  the_mesh.clear();
 
   // PDE toolkit only works in 2D
-  mesh.set_mesh_dimension(2);
+  the_mesh.set_mesh_dimension(2);
 
 #if LIBMESH_DIM < 2
   libMesh::err << "Cannot open dimension 2 mesh file when configured without 2D support." <<
@@ -81,7 +81,7 @@ void MatlabIO::read_stream(std::istream& in)
 	in >> x   // x-coordinate value
 	   >> y;  // y-coordinate value
 
-	mesh.add_point ( Point(x,y,z), i);
+	the_mesh.add_point ( Point(x,y,z), i);
       }
   }
 
@@ -93,12 +93,12 @@ void MatlabIO::read_stream(std::istream& in)
       {
 	Elem* elem = new Tri3; // Always build a triangle
         elem->set_id(i);
-	mesh.add_elem (elem);
+	the_mesh.add_elem (elem);
 
 	for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
 	  {
 	    in >> node;
-	    elem->set_node(n) = mesh.node_ptr(node-1);  // Assign the node number
+	    elem->set_node(n) = the_mesh.node_ptr(node-1);  // Assign the node number
 	  }
 
 	// There is an additional subdomain number here,
