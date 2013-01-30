@@ -338,30 +338,30 @@ void MeshData::write (const std::string& name)
 
 std::string MeshData::get_info() const
 {
-  std::ostringstream out;
+  std::ostringstream oss;
 
   if (this->active() || this->compatibility_mode())
     {
-      out << " MeshData Information:\n";
+      oss << " MeshData Information:\n";
       if (this->active())
-	  out << "  object activated.\n";
+	  oss << "  object activated.\n";
       if (this->compatibility_mode())
-	  out << "  object in compatibility mode.\n";
+	  oss << "  object in compatibility mode.\n";
       if (this->_data_descriptor != "")
-	  out << "  descriptor=" << this->_data_descriptor << '\n';
+	  oss << "  descriptor=" << this->_data_descriptor << '\n';
       if (this->elem_initialized())
-	  out << "  Element associated data initialized.\n"
+	  oss << "  Element associated data initialized.\n"
 	      << "   n_val_per_elem()=" << this->n_val_per_elem() << '\n'
 	      << "   n_elem_data()=" << this->n_elem_data() << '\n';
       if (this->node_initialized())
-	  out << "  Node associated data initialized.\n"
+	  oss << "  Node associated data initialized.\n"
 	      << "   n_val_per_node()=" << this->n_val_per_node() << '\n'
 	      << "   n_node_data()=" << this->n_node_data() << '\n';
     }
   else
-      out << " MeshData neither active nor in compatibility mode.\n";
+      oss << " MeshData neither active nor in compatibility mode.\n";
 
-  return out.str();
+  return oss.str();
 }
 
 
