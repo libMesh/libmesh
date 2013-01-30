@@ -448,8 +448,9 @@ void LegacyXdrIO::read_mesh (const std::string& name,
       // and to enable elements to be added in ascending ID order
       std::map<unsigned int, Elem*> parents;
 
+      {
       // Keep track of Element ids in MGF-style meshes;
-      unsigned int _next_elem_id = 0;
+      unsigned int next_elem_id = 0;
 
       for (unsigned int level=0; level<=n_levels; level++)
       {
@@ -530,7 +531,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
             else
             {
               elem = Elem::build(etypes[idx]).release();
-              elem->set_id(_next_elem_id++);
+              elem->set_id(next_elem_id++);
 
               elems_of_dimension[elem->dim()] = true;
 
@@ -556,13 +557,14 @@ void LegacyXdrIO::read_mesh (const std::string& name,
           }
           lastFaceIndex += neeb[idx];
         }
-
       }
+    }
 
       if (m.get_orig_flag() == LegacyXdrIO::LIBM)
         {
+          {
           // Iterate in ascending elem ID order
-          unsigned int _next_elem_id = 0;
+          unsigned int next_elem_id = 0;
           for (std::map<unsigned int, Elem *>::iterator i =
                parents.begin();
                i != parents.end(); ++i)
@@ -570,7 +572,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
               Elem *elem = i->second;
               if (elem)
                 {
-                  elem->set_id(_next_elem_id++);
+                  elem->set_id(next_elem_id++);
 
                   elems_of_dimension[elem->dim()] = true;
 
@@ -580,6 +582,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
                 // We can probably handle this, but we don't expect it
                 libmesh_error();
             }
+          }
         }
     }
 
