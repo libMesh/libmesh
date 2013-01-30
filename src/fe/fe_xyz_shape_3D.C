@@ -30,9 +30,11 @@
 // to be recalculated.
 namespace
 {
-  static unsigned int old_elem_id = libMesh::invalid_uint;
-  static libMesh::Point centroid;
-  static libMesh::Point max_distance;
+  using namespace libMesh;
+
+  static dof_id_type old_elem_id = DofObject::invalid_id;
+  static Point centroid;
+  static Point max_distance;
 }
 
 

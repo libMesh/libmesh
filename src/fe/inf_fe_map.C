@@ -642,7 +642,7 @@ void InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* elem,
 {
   // The number of points to find the
   // inverse map of
-  const unsigned int n_points = physical_points.size();
+  const std::size_t n_points = physical_points.size();
 
   // Resize the vector to hold the points
   // on the reference element
