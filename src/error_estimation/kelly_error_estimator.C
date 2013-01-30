@@ -100,6 +100,7 @@ bool
 KellyErrorEstimator::boundary_side_integration ()
 {
   const std::string &var_name = my_system->variable_name(var);
+  const unsigned int n_fine_dofs = Ufine.size();
 
   std::vector<std::vector<RealGradient> > dphi_fine = fe_fine->get_dphi();
   std::vector<Point> face_normals = fe_fine->get_normals();
@@ -137,7 +138,7 @@ KellyErrorEstimator::boundary_side_integration ()
           Gradient grad_fine;
 
           // Compute the solution gradient on element e
-          for (unsigned int i=0; i != Ufine.size(); i++)
+          for (unsigned int i=0; i != n_fine_dofs; i++)
             grad_fine.add_scaled (dphi_fine[i][qp], Ufine(i));
 
           // The difference between the desired BC and the approximate solution.
