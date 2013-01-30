@@ -137,7 +137,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
 		(_system, dual_error_per_cell, &(_system.get_adjoint_solution(i)), estimate_parent_error);
 	    }
 
-	  unsigned int error_size;
+	  std::size_t error_size;
 
 	  // Get the size of the first ErrorMap vector; this will give us the number of elements
 	  if(!error_norm_is_identity) // If in non default weights case
@@ -167,7 +167,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
 	      total_dual_error_per_cell.resize(error_size);
 	    }
 
-	  for (unsigned int e = 0; e != error_size; ++e)
+	  for (std::size_t e = 0; e != error_size; ++e)
 	    {
 	      // Have we been asked to weight the variable error contributions in any specific manner
 	      if(!error_norm_is_identity) // If we have
@@ -177,13 +177,15 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
 		    {
 		      // Now fill in total_dual_error ErrorMap with the weight
 		      (*total_dual_errors_per_cell[std::make_pair(&_system, v)])[e] +=
-			error_weight * (*dual_errors_per_cell[std::make_pair(&_system, v)])[e];
+			static_cast<ErrorVectorReal>
+			(error_weight * 
+			 (*dual_errors_per_cell[std::make_pair(&_system, v)])[e]);
 		    }
 		}
 	      else // If not
 	      {
 		total_dual_error_per_cell[e] +=
-		  error_weight * dual_error_per_cell[e];
+		  static_cast<ErrorVectorReal>(error_weight * dual_error_per_cell[e]);
 	      }
 	    }
 	}
@@ -253,7 +255,9 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
               cell_dual_error.push_back((*total_dual_errors_per_cell[std::make_pair(&_system, v)])[i]);
             }
 
-          error_per_cell[i] = error_norm.calculate_norm(cell_primal_error, cell_dual_error);
+          error_per_cell[i] =
+	   static_cast<ErrorVectorReal>
+	     (error_norm.calculate_norm(cell_primal_error, cell_dual_error));
         }
       else // If not
         {

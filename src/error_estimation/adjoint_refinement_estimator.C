@@ -290,7 +290,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	  
 	      // Set the shared_neighbour index for this node to the
 	      // size of the coarse grid neighbor set
-	      shared_element_count[node_id] = coarse_grid_neighbors.size();
+	      shared_element_count[node_id] =
+	        libmesh_cast_int<unsigned int>(coarse_grid_neighbors.size());
 
 	      // Add this node to processed_node_ids vector
 	      processed_node_ids.push_back(node_id);

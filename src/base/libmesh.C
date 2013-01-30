@@ -111,6 +111,7 @@ namespace {
       case FPE_FLTRES: std::cerr << "floating point inexact result"; break;
       case FPE_FLTINV: std::cerr << "invalid floating point operation"; break;
       case FPE_FLTSUB: std::cerr << "subscript out of range"; break;
+      default:         std::cerr << "unrecognized"; break;
       }
     std::cout << ")!" << std::endl;
     

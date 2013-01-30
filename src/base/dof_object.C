@@ -218,7 +218,7 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
   libmesh_assert_less (s, this->n_systems());
 
   // number of varaible groups for this system - inferred
-  const unsigned int nvg = nvpg.size();
+  const unsigned int nvg = libmesh_cast_int<unsigned int>(nvpg.size());
   
   // BSK - note that for compatibility with the previous implementation
   // calling this method when (nvars == this->n_vars()) requires that

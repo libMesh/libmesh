@@ -383,7 +383,8 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
           libmesh_assert_equal_to (requested->processor_id(), procup);
           for (unsigned int vg=0; vg != n_var_groups; ++vg)
             {
-              unsigned int n_comp_g = filled_request[i*2*n_var_groups+vg];
+              unsigned int n_comp_g =
+	        libmesh_cast_int<unsigned int>(filled_request[i*2*n_var_groups+vg]);
               requested->set_n_comp_group(sys_num, vg, n_comp_g);
               if (n_comp_g)
                 {
@@ -669,7 +670,7 @@ void DofMap::reinit(MeshBase& mesh)
 	        node->n_comp_group(sys_num, vg);
 
               const unsigned int vertex_dofs = old_node_dofs?
-                node->vg_dof_base (sys_num,vg):0;
+                libmesh_cast_int<unsigned int>(node->vg_dof_base (sys_num,vg)):0;
 
 	      const unsigned int new_node_dofs =
 		FEInterface::n_dofs_at_node(dim, fe_type, type, n);
@@ -1607,7 +1608,7 @@ void DofMap::dof_indices (const Elem* const elem,
 
   // Create a vector to indicate which
   // SCALAR variables have been requested
-  std::vector<dof_id_type> SCALAR_var_numbers;
+  std::vector<unsigned int> SCALAR_var_numbers;
   SCALAR_var_numbers.clear();
 
   // Get the dof numbers
@@ -1726,8 +1727,8 @@ void DofMap::dof_indices (const Elem* const elem,
 
   // Finally append any SCALAR dofs that we asked for.
   std::vector<dof_id_type> di_new;
-  std::vector<dof_id_type>::iterator it           = SCALAR_var_numbers.begin();
-  std::vector<dof_id_type>::const_iterator it_end = SCALAR_var_numbers.end();
+  std::vector<unsigned int>::iterator it           = SCALAR_var_numbers.begin();
+  std::vector<unsigned int>::const_iterator it_end = SCALAR_var_numbers.end();
   for( ; it != it_end; ++it)
   {
     this->SCALAR_dof_indices(di_new,*it);
@@ -1857,7 +1858,7 @@ void DofMap::old_dof_indices (const Elem* const elem,
 
   // Create a vector to indicate which
   // SCALAR variables have been requested
-  std::vector<dof_id_type> SCALAR_var_numbers;
+  std::vector<unsigned int> SCALAR_var_numbers;
   SCALAR_var_numbers.clear();
 
   // Get the dof numbers
@@ -1997,8 +1998,8 @@ void DofMap::old_dof_indices (const Elem* const elem,
 
   // Finally append any SCALAR dofs that we asked for.
   std::vector<dof_id_type> di_new;
-  std::vector<dof_id_type>::iterator it           = SCALAR_var_numbers.begin();
-  std::vector<dof_id_type>::const_iterator it_end = SCALAR_var_numbers.end();
+  std::vector<unsigned int>::iterator it           = SCALAR_var_numbers.begin();
+  std::vector<unsigned int>::const_iterator it_end = SCALAR_var_numbers.end();
   for( ; it != it_end; ++it)
   {
     this->SCALAR_dof_indices(di_new,*it,true);
@@ -2190,7 +2191,8 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 	  // into increasing order
 	  std::sort(element_dofs.begin(), element_dofs.end());
 
-	  const unsigned int n_dofs_on_element = element_dofs.size();
+	  const unsigned int n_dofs_on_element =
+	    libmesh_cast_int<unsigned int>(element_dofs.size());
 
 	  for (unsigned int i=0; i<n_dofs_on_element; i++)
 	    {
@@ -2346,7 +2348,8 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 	    // We can be more efficient if we sort the element DOFs
 	    // into increasing order
 	    std::sort(element_dofs_i.begin(), element_dofs_i.end());
-	    const unsigned int n_dofs_on_element_i = element_dofs_i.size();
+	    const unsigned int n_dofs_on_element_i =
+	      libmesh_cast_int<unsigned int>(element_dofs_i.size());
 
 	    for (unsigned int vj=0; vj<n_var; vj++)
 	      if ((*dof_coupling)(vi,vj)) // If vi couples to vj
@@ -2368,7 +2371,7 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 		    element_dofs_j = element_dofs_i;
 
 		  const unsigned int n_dofs_on_element_j =
-		    element_dofs_j.size();
+		    libmesh_cast_int<unsigned int>(element_dofs_j.size());
 
 		  // there might be 0 dofs for the other variable on the same element (when subdomain variables do not overlap) and that's when we do not do anything
 		  if (n_dofs_on_element_j > 0)
@@ -2477,7 +2480,8 @@ void SparsityPattern::Build::operator()(const ConstElemRange &range)
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
                                    dof_map.find_connected_dofs (neighbor_dofs);
 #endif
-                                   const unsigned int n_dofs_on_neighbor = neighbor_dofs.size();
+                                   const unsigned int n_dofs_on_neighbor =
+				     libmesh_cast_int<unsigned int>(neighbor_dofs.size());
 
                                    for (unsigned int j=0; j<n_dofs_on_neighbor; j++)
                                      {
@@ -2803,13 +2807,13 @@ std::string DofMap::get_info() const
           avg_n_nz += (*_n_nz)[i];
         }
 
-      int n_nz_size = _n_nz->size();
+      std::size_t n_nz_size = _n_nz->size();
 
       CommWorld.max(max_n_nz);
       CommWorld.sum(avg_n_nz);
       CommWorld.sum(n_nz_size);
 
-      avg_n_nz /= std::max(n_nz_size,1);
+      avg_n_nz /= std::max(n_nz_size,std::size_t(1));
 
       libmesh_assert(_n_oz);
 
@@ -2819,13 +2823,13 @@ std::string DofMap::get_info() const
           avg_n_oz += (*_n_oz)[i];
         }
 
-      int n_oz_size = _n_oz->size();
+      std::size_t n_oz_size = _n_oz->size();
 
       CommWorld.max(max_n_oz);
       CommWorld.sum(avg_n_oz);
       CommWorld.sum(n_oz_size);
 
-      avg_n_oz /= std::max(n_oz_size,1);
+      avg_n_oz /= std::max(n_oz_size,std::size_t(1));
     }
 
   os << "    DofMap Sparsity\n      Average  On-Processor Bandwidth"
