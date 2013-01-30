@@ -608,7 +608,7 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 
 
   // The number of quadrature points.
-  const unsigned int n_qp = qp.size();
+  const std::size_t n_qp = qp.size();
 
   // Number of shape functions in the finite element approximation
   // space.

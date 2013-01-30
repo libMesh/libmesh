@@ -570,7 +570,7 @@ void FEInterface::inverse_map (const unsigned int dim,
 			       const Real tolerance,
 			       const bool secure)
 {
-  const unsigned int n_pts = physical_points.size();
+  const std::size_t n_pts = physical_points.size();
 
   // Resize the vector
   reference_points.resize(n_pts);

@@ -26,7 +26,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
   START_LOG("compute_face_map()", "FEXYZMap");
 
   // The number of quadrature points.
-  const unsigned int n_qp = qw.size();
+  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qw.size());
 
   switch(dim)
     {

@@ -139,7 +139,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
   START_LOG("compute_face_values()", "FEXYZ");
 
   // The number of quadrature points.
-  const unsigned int n_qp = qw.size();
+  const std::size_t n_qp = qw.size();
 
   // Number of shape functions in the finite element approximation
   // space.
@@ -176,7 +176,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
       {
 	// compute the shape function values & gradients
 	for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	  for (unsigned int p=0; p<n_qp; p++)
+	  for (std::size_t p=0; p<n_qp; p++)
 	    {
 	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz[p]);
 
@@ -201,7 +201,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem* elem,
       {
 	// compute the shape function values & gradients
 	for (unsigned int i=0; i<n_approx_shape_functions; i++)
-	  for (unsigned int p=0; p<n_qp; p++)
+	  for (std::size_t p=0; p<n_qp; p++)
 	    {
 	      this->phi[i][p] = FE<Dim,XYZ>::shape (elem, this->fe_type.order, i, xyz[p]);
 

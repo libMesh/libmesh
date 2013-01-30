@@ -62,7 +62,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
   START_LOG("init_reference_to_physical_map()", "FEMap");
 
   // The number of quadrature points.
-  const unsigned int n_qp = qp.size();
+  const std::size_t n_qp = qp.size();
 
   // The element type and order to use in
   // the map
@@ -144,7 +144,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
     case 0:
       {
 	for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	  for (unsigned int p=0; p<n_qp; p++)
+	  for (std::size_t p=0; p<n_qp; p++)
 	    this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
 
 	break;
@@ -165,7 +165,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
                 this->d2phidxi2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 0, qp[0]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	        for (unsigned int p=1; p<n_qp; p++)
+	        for (std::size_t p=1; p<n_qp; p++)
                   {
 	            this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
 	            this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
@@ -177,7 +177,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
           }
         else
 	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
+	    for (std::size_t p=0; p<n_qp; p++)
 	      {
 	        this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
 	        this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
@@ -206,7 +206,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
                 this->d2phidxideta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 1, qp[0]);
                 this->d2phideta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 2, qp[0]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	        for (unsigned int p=1; p<n_qp; p++)
+	        for (std::size_t p=1; p<n_qp; p++)
                   {
 	            this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
 	            this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
@@ -221,7 +221,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
           }
         else
 	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
+	    for (std::size_t p=0; p<n_qp; p++)
 	      {
 	        this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
 	        this->dphidxi_map[i][p]  = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
@@ -258,7 +258,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
                 this->d2phidetadzeta_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 4, qp[0]);
                 this->d2phidzeta2_map[i][0] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 5, qp[0]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-	        for (unsigned int p=1; p<n_qp; p++)
+	        for (std::size_t p=1; p<n_qp; p++)
                   {
 	            this->phi_map[i][p]      = FE<Dim,LAGRANGE>::shape (mapping_elem_type, mapping_order, i,    qp[p]);
 	            this->dphidxi_map[i][p]  = this->dphidxi_map[i][0];
@@ -277,7 +277,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
           }
         else
 	  for (unsigned int i=0; i<n_mapping_shape_functions; i++)
-	    for (unsigned int p=0; p<n_qp; p++)
+	    for (std::size_t p=0; p<n_qp; p++)
 	      {
 	        this->phi_map[i][p]       = FE<Dim,LAGRANGE>::shape       (mapping_elem_type, mapping_order, i,    qp[p]);
 	        this->dphidxi_map[i][p]   = FE<Dim,LAGRANGE>::shape_deriv (mapping_elem_type, mapping_order, i, 0, qp[p]);
@@ -710,7 +710,7 @@ void FEMap::compute_affine_map( const unsigned int dim,
 
   libmesh_assert(elem);
 
-  const unsigned int        n_qp = qw.size();
+  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qw.size());
 
   // Resize the vectors to hold data at the quadrature points
   this->resize_quadrature_map_vectors(dim, n_qp);
@@ -784,7 +784,7 @@ void FEMap::compute_map(const unsigned int dim,
 
   libmesh_assert(elem);
 
-  const unsigned int        n_qp = qw.size();
+  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qw.size());
 
   // Resize the vectors to hold data at the quadrature points
   this->resize_quadrature_map_vectors(dim, n_qp);
@@ -1213,7 +1213,7 @@ void FE<Dim,T>::inverse_map (const Elem* elem,
 {
   // The number of points to find the
   // inverse map of
-  const unsigned int n_points = physical_points.size();
+  const std::size_t n_points = physical_points.size();
 
   // Resize the vector to hold the points
   // on the reference element
@@ -1221,7 +1221,7 @@ void FE<Dim,T>::inverse_map (const Elem* elem,
 
   // Find the coordinates on the reference
   // element of each point in physical space
-  for (unsigned int p=0; p<n_points; p++)
+  for (std::size_t p=0; p<n_points; p++)
     reference_points[p] =
       FE<Dim,T>::inverse_map (elem, physical_points[p], tolerance, secure);
 }

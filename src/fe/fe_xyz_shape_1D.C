@@ -32,7 +32,7 @@ namespace
 {
   using namespace libMesh;
 
-  static unsigned int old_elem_id = libMesh::invalid_uint;
+  static dof_id_type old_elem_id = DofObject::invalid_id;
   static libMesh::Point centroid;
   static Real max_distance;
 }
