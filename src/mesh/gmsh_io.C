@@ -616,13 +616,13 @@ void GmshIO::write (const std::string& name)
   if (libMesh::processor_id() == 0)
     {
       // Open the output file stream
-      std::ofstream out (name.c_str());
+      std::ofstream out_stream (name.c_str());
 
       // Make sure it opened correctly
-      if (!out.good())
+      if (!out_stream.good())
         libmesh_file_error(name.c_str());
 
-      this->write_mesh (out);
+      this->write_mesh (out_stream);
     }
 }
 
@@ -641,10 +641,10 @@ void GmshIO::write_nodal_data (const std::string& fname,
 }
 
 
-void GmshIO::write_mesh (std::ostream& out)
+void GmshIO::write_mesh (std::ostream& out_stream)
 {
   // Be sure that the stream is valid.
-  libmesh_assert (out.good());
+  libmesh_assert (out_stream.good());
 
   // initialize the map with element types
   init_eletypes();
@@ -656,28 +656,28 @@ void GmshIO::write_mesh (std::ostream& out)
 
   {
     // Write the file header.
-    out << "$MeshFormat\n";
-    out << "2.0 0 " << sizeof(Real) << '\n';
-    out << "$EndMeshFormat\n";
+    out_stream << "$MeshFormat\n";
+    out_stream << "2.0 0 " << sizeof(Real) << '\n';
+    out_stream << "$EndMeshFormat\n";
   }
 
   {
     // write the nodes in (n x y z) format
-    out << "$Nodes\n";
-    out << mesh.n_nodes() << '\n';
+    out_stream << "$Nodes\n";
+    out_stream << mesh.n_nodes() << '\n';
 
     for (unsigned int v=0; v<mesh.n_nodes(); v++)
-      out << mesh.node(v).id()+1 << " "
+      out_stream << mesh.node(v).id()+1 << " "
 	  << mesh.node(v)(0) << " "
 	  << mesh.node(v)(1) << " "
 	  << mesh.node(v)(2) << '\n';
-    out << "$EndNodes\n";
+    out_stream << "$EndNodes\n";
   }
 
   {
     // write the connectivity
-    out << "$Elements\n";
-    out << mesh.n_active_elem() << '\n';
+    out_stream << "$Elements\n";
+    out_stream << mesh.n_active_elem() << '\n';
 
     MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::const_element_iterator end = mesh.active_elements_end();
@@ -699,14 +699,14 @@ void GmshIO::write_mesh (std::ostream& out)
         libmesh_assert_less_equal (eletype.nodes.size(), elem->n_nodes());
 
         // elements ids are 1 based in Gmsh
-        out << elem->id()+1 << " ";
+        out_stream << elem->id()+1 << " ";
 
         // element type
-        out << eletype.exptype;
+        out_stream << eletype.exptype;
 
         // write the number of tags and
         // tag1 (physical entity), tag2 (geometric entity), and tag3 (partition entity)
-        out << " 3 "
+        out_stream << " 3 "
             << static_cast<unsigned int>(elem->subdomain_id())
             << " 1 "
             << (elem->processor_id()+1) << " ";
@@ -714,14 +714,14 @@ void GmshIO::write_mesh (std::ostream& out)
         // if there is a node translation table, use it
         if (eletype.nodes.size() > 0)
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out << elem->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based
+            out_stream << elem->node(eletype.nodes[i])+1 << " "; // gmsh is 1-based
         // otherwise keep the same node order
         else
           for (unsigned int i=0; i < elem->n_nodes(); i++)
-            out << elem->node(i)+1 << " ";                  // gmsh is 1-based
-        out << "\n";
+            out_stream << elem->node(i)+1 << " ";                  // gmsh is 1-based
+        out_stream << "\n";
       } // element loop
-    out << "$EndElements\n";
+    out_stream << "$EndElements\n";
   }
 }
 
@@ -735,10 +735,10 @@ void GmshIO::write_post (const std::string& fname,
   libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   // Create an output stream
-  std::ofstream out(fname.c_str());
+  std::ofstream out_stream(fname.c_str());
 
   // Make sure it opened correctly
-  if (!out.good())
+  if (!out_stream.good())
     libmesh_file_error(fname.c_str());
 
   // initialize the map with element types
@@ -765,12 +765,12 @@ void GmshIO::write_post (const std::string& fname,
       libmesh_assert_equal_to (v->size(), mesh.n_nodes()*n_vars);
 
       // write the header
-      out << "$PostFormat\n";
+      out_stream << "$PostFormat\n";
       if (this->binary())
-        out << "1.2 1 " << sizeof(double) << "\n";
+        out_stream << "1.2 1 " << sizeof(double) << "\n";
       else
-        out << "1.2 0 " << sizeof(double) << "\n";
-      out << "$EndPostFormat\n";
+        out_stream << "1.2 0 " << sizeof(double) << "\n";
+      out_stream << "$EndPostFormat\n";
 
       // Loop over the elements to see how much of each type there are
       unsigned int n_points=0, n_lines=0, n_triangles=0, n_quadrangles=0,
@@ -855,10 +855,10 @@ void GmshIO::write_post (const std::string& fname,
           n_scalar = 1;
 
           // write the variable as a view, and the number of time steps
-          out << "$View\n" << varname << " " << 1 << "\n";
+          out_stream << "$View\n" << varname << " " << 1 << "\n";
 
           // write how many of each geometry type are written
-          out << n_points * n_scalar << " "
+          out_stream << n_points * n_scalar << " "
               << n_points * n_vector << " "
               << n_points * n_tensor << " "
               << n_lines * n_scalar << " "
@@ -892,7 +892,7 @@ void GmshIO::write_post (const std::string& fname,
             {
               const int one = 1;
               std::memcpy(buf, &one, sizeof(int));
-              out.write(buf, sizeof(int));
+              out_stream.write(buf, sizeof(int));
             }
 
           // the time steps (there is just 1 at the moment)
@@ -900,10 +900,10 @@ void GmshIO::write_post (const std::string& fname,
             {
               double one = 1;
               std::memcpy(buf, &one, sizeof(double));
-              out.write(buf, sizeof(double));
+              out_stream.write(buf, sizeof(double));
             }
           else
-            out << "1\n";
+            out_stream << "1\n";
 
           // Loop over the elements and write out the data
           MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
@@ -923,13 +923,13 @@ void GmshIO::write_post (const std::string& fname,
                         {
                           double tmp = vertex(d);
                           std::memcpy(buf, &tmp, sizeof(double));
-                          out.write(reinterpret_cast<char *>(buf), sizeof(double));
+                          out_stream.write(reinterpret_cast<char *>(buf), sizeof(double));
                         }
                       else
-                        out << vertex(d) << " ";
+                        out_stream << vertex(d) << " ";
                     }
                   if (!this->binary())
-                    out << "\n";
+                    out_stream << "\n";
                 }
 
               // now finally write out the data
@@ -943,7 +943,7 @@ void GmshIO::write_post (const std::string& fname,
 #endif
                     double tmp = libmesh_real((*v)[elem->node(i)*n_vars + ivar]);
                     std::memcpy(buf, &tmp, sizeof(double));
-                    out.write(reinterpret_cast<char *>(buf), sizeof(double));
+                    out_stream.write(reinterpret_cast<char *>(buf), sizeof(double));
                   }
                 else
 		  {
@@ -952,12 +952,12 @@ void GmshIO::write_post (const std::string& fname,
 			          << "complex numbers. Will only write the real part of "
 			          << "variable " << varname << std::endl;
 #endif
-		    out << libmesh_real((*v)[elem->node(i)*n_vars + ivar]) << "\n";
+		    out_stream << libmesh_real((*v)[elem->node(i)*n_vars + ivar]) << "\n";
 		  }
             }
           if (this->binary())
-            out << "\n";
-          out << "$EndView\n";
+            out_stream << "\n";
+          out_stream << "$EndView\n";
 
         } // end variable loop (writing the views)
     }
