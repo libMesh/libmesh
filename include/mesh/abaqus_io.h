@@ -64,14 +64,14 @@ namespace libMesh
     /**
      * The type of data structure used to store Node and Elemset IDs.
      */
-    typedef std::map<std::string, std::vector<unsigned> > container_t;
+    typedef std::map<std::string, std::vector<dof_id_type> > container_t;
 
     /**
      * Type of the data structure for storing the (elem ID, side) pairs
      * defining sidesets.  These come from the *Surface sections of the
      * input file.
      */
-    typedef std::map<std::string, std::vector<std::pair<unsigned, unsigned> > > sideset_container_t;
+    typedef std::map<std::string, std::vector<std::pair<dof_id_type, unsigned> > > sideset_container_t;
 
     /**
      * This function parses a block of nodes in the Abaqus file
@@ -180,8 +180,8 @@ namespace libMesh
      * Map from libmesh element number -> abaqus element number,
      * and the converse.
      */
-    // std::map<unsigned, unsigned> _libmesh_to_abaqus_elem_mapping;
-    std::map<unsigned, unsigned> _abaqus_to_libmesh_elem_mapping;
+    // std::map<dof_id_type, dof_id_type> _libmesh_to_abaqus_elem_mapping;
+    std::map<dof_id_type, dof_id_type> _abaqus_to_libmesh_elem_mapping;
 
     /**
      * Map from abaqus node number -> sequential, 0-based libmesh node numbering.
@@ -190,7 +190,7 @@ namespace libMesh
      * Nevertheless, it is the most general solution in case we come across a
      * weird Abaqus file some day.
      */
-    std::map<unsigned, unsigned> _abaqus_to_libmesh_node_mapping;
+    std::map<dof_id_type, dof_id_type> _abaqus_to_libmesh_node_mapping;
 
     /**
      * This flag gets set to true after the first "*PART" section

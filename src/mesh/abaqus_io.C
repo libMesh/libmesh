@@ -37,7 +37,7 @@ namespace
    */
   struct ElementDefinition
   {
-    // Maps (zero-based!) Abaqus node numbers to libmesh node numbers
+    // Maps (zero-based!) Abaqus local node numbers to libmesh local node numbers
     std::vector<unsigned> abaqus_zero_based_node_id_to_libmesh_node_id;
 
     // Maps (zero-based!) Abaqus side numbers to libmesh side numbers
@@ -415,13 +415,13 @@ namespace libMesh
     // The z-coordinate will only be present for 3D meshes
 
     // Temporary variables for parsing lines of text
-    unsigned abaqus_node_id=0;
+    dof_id_type abaqus_node_id=0;
     Real x=0, y=0, z=0;
     char c;
     std::string dummy;
 
     // Defines the sequential node numbering used by libmesh
-    unsigned libmesh_node_id = 0;
+    dof_id_type libmesh_node_id = 0;
 
     // We will read nodes until the next line begins with *, since that will be the
     // next section.
@@ -575,7 +575,7 @@ namespace libMesh
 	// Read the element ID, it is the first number on each line.  It is
 	// followed by a comma, so read that also.  We will need this ID later
 	// when we try to assign subdomain IDs
-	unsigned abaqus_elem_id = 0;
+	dof_id_type abaqus_elem_id = 0;
 	char c;
 	_in >> abaqus_elem_id >> c;
 
@@ -613,7 +613,7 @@ namespace libMesh
 		if (abaqus_global_node_id!=0 || cell.c_str() != endptr)
 		  {
 		    // Use the global node number mapping to determine the corresponding libmesh global node id
-		    unsigned libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[abaqus_global_node_id];
+		    dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[abaqus_global_node_id];
 
 		    // Grab the node pointer from the mesh for this ID
 		    Node* node = the_mesh.node_ptr(libmesh_global_node_id);
@@ -713,7 +713,7 @@ namespace libMesh
     // libMesh::out << "Reading ids for set: " << set_name << std::endl;
 
     // Grab a reference to a vector that will hold all the IDs
-    std::vector<unsigned>& id_storage = container[set_name];
+    std::vector<dof_id_type>& id_storage = container[set_name];
 
     // Read until the start of another section is detected, or EOF is encountered
     while (_in.peek() != '*' && _in.peek() != EOF)
@@ -735,6 +735,8 @@ namespace libMesh
 	    // digits at all, however, strtol() stores the original
 	    // value of str in *endptr.
 	    char* endptr;
+
+	    // FIXME - this needs to be updated for 64-bit inputs
 	    long id = std::strtol(cell.c_str(), &endptr, /*base=*/10);
 
 	    // Note that lists of comma-separated values in abaqus also
@@ -761,10 +763,11 @@ namespace libMesh
   void AbaqusIO::read_sideset(std::string sideset_name, sideset_container_t& container)
   {
     // Grab a reference to a vector that will hold all the IDs
-    std::vector<std::pair<unsigned, unsigned> >& id_storage = container[sideset_name];
+    std::vector<std::pair<dof_id_type, unsigned> >& id_storage = container[sideset_name];
 
     // Variables for storing values read in from file
-    unsigned elem_id=0, side_id=0;
+    dof_id_type elem_id=0; 
+    unsigned side_id=0;
     char c;
     std::string dummy;
 
@@ -799,7 +802,7 @@ namespace libMesh
     MeshBase& the_mesh = MeshInput<MeshBase>::mesh();
 
     // The number of elemsets we've found while reading
-    unsigned n_elemsets = _elemset_ids.size();
+    std::size_t n_elemsets = _elemset_ids.size();
 
     // Fill in a temporary map with (ElemType, index) pairs based on the _elem_types set.  This
     // will allow us to easily look up this index in the loop below.
@@ -817,13 +820,13 @@ namespace libMesh
       for (unsigned elemset_id=0; it != _elemset_ids.end(); ++it, ++elemset_id)
 	{
 	  // Grab a reference to the vector of IDs
-	  std::vector<unsigned>& id_vector = (*it).second;
+	  std::vector<dof_id_type>& id_vector = (*it).second;
 
 	  // Loop over this vector
-	  for (unsigned i=0; i<id_vector.size(); ++i)
+	  for (std::size_t i=0; i<id_vector.size(); ++i)
 	    {
 	      // Map the id_vector[i]'th element ID (Abaqus numbering) to LibMesh numbering
-	      unsigned libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ id_vector[i] ];
+	      dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ id_vector[i] ];
 
 	      // Get pointer to that element
 	      Elem* elem = the_mesh.elem(libmesh_elem_id);
@@ -862,12 +865,12 @@ namespace libMesh
 		     << "'." << std::endl;
 
 	// Get a reference to the current vector of nodeset ID values
-	std::vector<unsigned>& nodeset_ids = (*it).second;
+	std::vector<dof_id_type>& nodeset_ids = (*it).second;
 
-	for (unsigned i=0; i<nodeset_ids.size(); ++i)
+	for (std::size_t i=0; i<nodeset_ids.size(); ++i)
 	  {
 	    // Map the Abaqus global node ID to the libmesh node ID
-	    unsigned libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[nodeset_ids[i]];
+	    dof_id_type libmesh_global_node_id = _abaqus_to_libmesh_node_mapping[nodeset_ids[i]];
 
 	    // Get node pointer from the mesh
 	    Node* node = the_mesh.node_ptr(libmesh_global_node_id);
@@ -906,17 +909,17 @@ namespace libMesh
 		     << "'." << std::endl;
 
 	// Get a reference to the current vector of nodeset ID values
-	std::vector<std::pair<unsigned,unsigned> >& sideset_ids = (*it).second;
+	std::vector<std::pair<dof_id_type,unsigned> >& sideset_ids = (*it).second;
 
-	for (unsigned i=0; i<sideset_ids.size(); ++i)
+	for (std::size_t i=0; i<sideset_ids.size(); ++i)
 	  {
 	    // sideset_ids is a vector of pairs (elem id, side id).  Pull them out
 	    // now to make the code below more readable.
-	    unsigned abaqus_elem_id = sideset_ids[i].first;
+	    dof_id_type  abaqus_elem_id = sideset_ids[i].first;
 	    unsigned abaqus_side_number = sideset_ids[i].second;
 
 	    // Map the Abaqus element ID to LibMesh numbering
-	    unsigned libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
+	    dof_id_type libmesh_elem_id = _abaqus_to_libmesh_elem_mapping[ abaqus_elem_id ];
 
 	    // Get pointer to that element
 	    Elem* elem = the_mesh.elem(libmesh_elem_id);

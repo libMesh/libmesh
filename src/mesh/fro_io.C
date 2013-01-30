@@ -105,7 +105,7 @@ void FroIO::write (const std::string& fname)
 	const std::set<boundary_id_type>& bc_ids =
 	  the_mesh.boundary_info->get_boundary_ids();
 
- 	std::vector<unsigned int>       el;
+ 	std::vector<dof_id_type>        el;
  	std::vector<unsigned short int> sl;
  	std::vector<boundary_id_type>   il;
 

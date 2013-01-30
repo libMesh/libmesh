@@ -1383,13 +1383,13 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
 
   // We also need global counts of sides in each of the sidesets.  Again, there may be a
   // better way to do this...
-  std::vector<unsigned int> elem_list;
+  std::vector<dof_id_type> elem_list;
   std::vector<unsigned short int> side_list;
   std::vector<boundary_id_type> id_list;
   pmesh.boundary_info->build_side_list(elem_list, side_list, id_list);
 
   // Similarly to the nodes, we can't count any sides for elements which aren't local
-  std::vector<unsigned>::iterator it_elem=elem_list.begin();
+  std::vector<dof_id_type>::iterator it_elem=elem_list.begin();
   std::vector<unsigned short>::iterator it_side=side_list.begin();
   std::vector<boundary_id_type>::iterator it_id=id_list.begin();
   for ( ; it_elem != elem_list.end(); )
@@ -1491,7 +1491,7 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
 
   // 7.) We also need to know the number of nodes which is in each of the nodesets, globally.
   // There is probably a better way to do this...
-  std::vector<unsigned> boundary_node_list;
+  std::vector<dof_id_type> boundary_node_list;
   std::vector<boundary_id_type> boundary_node_boundary_id_list;
   pmesh.boundary_info->build_node_list(boundary_node_list, boundary_node_boundary_id_list);
 
@@ -1518,7 +1518,7 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
   // that would give us duplicate entries when we do the parallel summation.
   // So instead, only count entries for nodes owned by this processor.
   // Start by getting rid of all non-local node entries from the vectors.
-  std::vector<unsigned>::iterator it_node=boundary_node_list.begin();
+  std::vector<dof_id_type>::iterator it_node=boundary_node_list.begin();
   std::vector<boundary_id_type>::iterator it_id=boundary_node_boundary_id_list.begin();
   for ( ; it_node != boundary_node_list.end(); )
     {
@@ -1997,7 +1997,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
   // FIXME: We should build this list only one time!!  We already built it above, but we
   // did not have the libmesh to exodus node mapping at that time... for now we'll just
   // build it here again, hopefully it's small relative to the size of the entire mesh.
-  std::vector<unsigned> boundary_node_list;
+  std::vector<dof_id_type> boundary_node_list;
   std::vector<boundary_id_type> boundary_node_boundary_id_list;
   mesh.boundary_info->build_node_list(boundary_node_list, boundary_node_boundary_id_list);
 
@@ -2138,7 +2138,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
   ExodusII_IO_Helper::ElementMaps em;
 
   // FIXME: We already built this list once, we should reuse that information!
-  std::vector< unsigned int > elem_list;
+  std::vector< dof_id_type > elem_list;
   std::vector< unsigned short int > side_list;
   std::vector< boundary_id_type > id_list;
 

@@ -1106,7 +1106,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
   ExodusII_IO_Helper::ElementMaps em;
 
-  std::vector< unsigned int > el;
+  std::vector< dof_id_type > el;
   std::vector< unsigned short int > sl;
   std::vector< boundary_id_type > il;
 
@@ -1175,7 +1175,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   // FIXME: This is not used, should it be?
   ExodusII_IO_Helper::ElementMaps em;
 
-  std::vector< unsigned int > nl;
+  std::vector< dof_id_type > nl;
   std::vector< boundary_id_type > il;
 
   mesh.boundary_info->build_node_list(nl, il);

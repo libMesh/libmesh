@@ -134,7 +134,7 @@ public:
    * Add node number \p node with boundary id \p id to the boundary
    * information data structures.
    */
-  void add_node (const unsigned int node,
+  void add_node (const dof_id_type node,
 		 const boundary_id_type id);
 
   /**
@@ -153,7 +153,7 @@ public:
    * Add side \p side of element number \p elem with boundary id \p id
    * to the boundary information data structure.
    */
-  void add_side (const unsigned int elem,
+  void add_side (const dof_id_type elem,
 		 const unsigned short int side,
 		 const boundary_id_type id);
 
@@ -286,13 +286,13 @@ public:
   /**
    * @returns the number of element-based boundary conditions.
    */
-  unsigned int n_boundary_conds () const;
+  std::size_t n_boundary_conds () const;
 
   /**
    * Creates a list of nodes and ids for those nodes.
    */
-  void build_node_list (std::vector<unsigned int>& nl,
-			std::vector<boundary_id_type>&    il) const;
+  void build_node_list (std::vector<dof_id_type>&      node_id_list,
+			std::vector<boundary_id_type>& bc_id_list) const;
 
   /**
    * Adds nodes with boundary ids based on the side's boundary
@@ -309,9 +309,9 @@ public:
   /**
    * Creates a list of element numbers, sides, and  and ids for those sides.
    */
-  void build_side_list (std::vector<unsigned int>&       el,
-			std::vector<unsigned short int>& sl,
-			std::vector<boundary_id_type>&          il) const;
+  void build_side_list (std::vector<dof_id_type>&        element_id_list,
+			std::vector<unsigned short int>& side_list,
+			std::vector<boundary_id_type>&   bc_id_list) const;
 
   /**
    * @returns the user-specified boundary ids.
@@ -473,7 +473,7 @@ public:
   class Fill
   {
   public:
-    Fill(std::map<boundary_id_type, unsigned int>& im) : id_map(im), cnt(0) {}
+    Fill(std::map<boundary_id_type, dof_id_type>& im) : id_map(im), cnt(0) {}
 
     ~Fill()
     {
@@ -487,8 +487,8 @@ public:
     }
 
   private:
-    std::map<boundary_id_type, unsigned int>& id_map;
-    unsigned int cnt;
+    std::map<boundary_id_type, dof_id_type>& id_map;
+    dof_id_type cnt;
   };
 
 };

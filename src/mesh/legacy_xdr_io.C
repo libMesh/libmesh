@@ -942,7 +942,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
       //libMesh::out << "numBCs=" << numBCs << std::endl;
 
       //libMesh::out << "Preparing to write boundary conditions." << std::endl;
-      std::vector<unsigned int> elem_list;
+      std::vector<dof_id_type> elem_list;
       std::vector<unsigned short int> side_list;
       std::vector<boundary_id_type> elem_id_list;
 

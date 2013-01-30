@@ -40,7 +40,7 @@ namespace
   // Mapping functions - derivatives at each dofpt
   std::vector<std::vector<Real> > dxdxi(2, std::vector<Real>(2, 0));
 #else //LIBMESH_HAVE_TBB_API
-  static tbb::enumerable_thread_specific< unsigned int > old_elem_id_tls;
+  static tbb::enumerable_thread_specific< dof_id_type > old_elem_id_tls;
   static tbb::enumerable_thread_specific<std::vector<std::vector<Real> > > dxdxi_tls;
 #endif //LIBMESH_HAVE_TBB_API
 
@@ -59,7 +59,7 @@ namespace
     old_elem_id = elem->id();
 #else
     bool old_elem_id_exists = false;
-    unsigned int & old_elem_id = old_elem_id_tls.local(old_elem_id_exists);
+    dof_id_type & old_elem_id = old_elem_id_tls.local(old_elem_id_exists);
 
     if(!old_elem_id_exists)
       old_elem_id = libMesh::invalid_uint;
