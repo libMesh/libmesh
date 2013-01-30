@@ -68,18 +68,24 @@ void HPCoarsenTest::add_projection(const System &system,
 
   dof_map.dof_indices(elem, dof_indices, var);
 
+  const unsigned int n_dofs =
+    libmesh_cast_int<unsigned int>(dof_indices.size());
+
   FEInterface::inverse_map (system.get_mesh().mesh_dimension(),
     fe_type, coarse, *xyz_values, coarse_qpoints);
 
   fe_coarse->reinit(coarse, &coarse_qpoints);
 
+  const unsigned int n_coarse_dofs =
+    libmesh_cast_int<unsigned int>(phi_coarse->size());
+
   if (Uc.size() == 0)
     {
-      Ke.resize(phi_coarse->size(), phi_coarse->size());
+      Ke.resize(n_coarse_dofs, n_coarse_dofs);
       Ke.zero();
-      Fe.resize(phi_coarse->size());
+      Fe.resize(n_coarse_dofs);
       Fe.zero();
-      Uc.resize(phi_coarse->size());
+      Uc.resize(n_coarse_dofs);
       Uc.zero();
     }
   libmesh_assert_equal_to (Uc.size(), phi_coarse->size());
@@ -92,7 +98,7 @@ void HPCoarsenTest::add_projection(const System &system,
       Gradient grad;
       Tensor hess;
 
-      for (unsigned int i=0; i != dof_indices.size(); i++)
+      for (unsigned int i=0; i != n_dofs; i++)
         {
           dof_id_type dof_num = dof_indices[i];
           val += (*phi)[i][qp] *
@@ -285,7 +291,8 @@ void HPCoarsenTest::select_refinement (System &system)
           const unsigned int n_qp = qrule->n_points();
 
           // The number of DOFS on the fine element
-          const unsigned int n_dofs = dof_indices.size();
+          const unsigned int n_dofs = 
+	    libmesh_cast_int<unsigned int>(dof_indices.size());
 
           // The number of nodes on the fine element
           const unsigned int n_nodes = elem->n_nodes();
@@ -318,11 +325,14 @@ void HPCoarsenTest::select_refinement (System &system)
 
               fe_coarse->reinit(elem, &(qrule->get_points()));
 
+	      const unsigned int n_coarse_dofs =
+		libmesh_cast_int<unsigned int>(phi_coarse->size());
+
               (const_cast<Elem *>(elem))->hack_p_level(old_elem_level);
 
-              Ke.resize(phi_coarse->size(), phi_coarse->size());
+              Ke.resize(n_coarse_dofs, n_coarse_dofs);
               Ke.zero();
-              Fe.resize(phi_coarse->size());
+              Fe.resize(n_coarse_dofs);
               Fe.zero();
 
               // Loop over the quadrature points
@@ -333,7 +343,7 @@ void HPCoarsenTest::select_refinement (System &system)
                   Gradient grad;
                   Tensor hess;
 
-                  for (unsigned int i=0; i != dof_indices.size(); i++)
+                  for (unsigned int i=0; i != n_dofs; i++)
                     {
                       dof_id_type dof_num = dof_indices[i];
                       val += (*phi)[i][qp] *
@@ -416,14 +426,17 @@ void HPCoarsenTest::select_refinement (System &system)
                     }
                 }
 
-	      p_error_per_cell[e_id] += component_scale[var] *
-		(*JxW)[qp] * TensorTools::norm_sq(value_error);
+	      p_error_per_cell[e_id] += static_cast<ErrorVectorReal>
+		(component_scale[var] *
+		 (*JxW)[qp] * TensorTools::norm_sq(value_error));
               if (cont == C_ZERO || cont == C_ONE)
-	        p_error_per_cell[e_id] += component_scale[var] *
-		  (*JxW)[qp] * grad_error.size_sq();
+	        p_error_per_cell[e_id] += static_cast<ErrorVectorReal>
+		  (component_scale[var] *
+		   (*JxW)[qp] * grad_error.size_sq());
               if (cont == C_ONE)
-	        p_error_per_cell[e_id] += component_scale[var] *
-		  (*JxW)[qp] * hessian_error.size_sq();
+	        p_error_per_cell[e_id] += static_cast<ErrorVectorReal>
+		  (component_scale[var] *
+		   (*JxW)[qp] * hessian_error.size_sq());
             }
 
 	  // Calculate this variable's contribution to the h
@@ -448,7 +461,8 @@ void HPCoarsenTest::select_refinement (System &system)
               (const_cast<Elem *>(coarse))->hack_p_level(old_parent_level);
 
               // The number of DOFS on the coarse element
-              unsigned int n_coarse_dofs = phi_coarse->size();
+              unsigned int n_coarse_dofs =
+		libmesh_cast_int<unsigned int>(phi_coarse->size());
 
               // Loop over the quadrature points
               for (unsigned int qp=0; qp<n_qp; qp++)
@@ -484,14 +498,17 @@ void HPCoarsenTest::select_refinement (System &system)
 			// hessian_error -= (*d2phi_coarse)[i][qp] * Uc(i);
                     }
 
-	          h_error_per_cell[e_id] += component_scale[var] *
-		    (*JxW)[qp] * TensorTools::norm_sq(value_error);
+	          h_error_per_cell[e_id] += static_cast<ErrorVectorReal>
+		    (component_scale[var] *
+		     (*JxW)[qp] * TensorTools::norm_sq(value_error));
                   if (cont == C_ZERO || cont == C_ONE)
-	            h_error_per_cell[e_id] += component_scale[var] *
-		      (*JxW)[qp] * grad_error.size_sq();
+	            h_error_per_cell[e_id] += static_cast<ErrorVectorReal>
+		      (component_scale[var] *
+		       (*JxW)[qp] * grad_error.size_sq());
                   if (cont == C_ONE)
-	            h_error_per_cell[e_id] += component_scale[var] *
-		      (*JxW)[qp] * hessian_error.size_sq();
+	            h_error_per_cell[e_id] += static_cast<ErrorVectorReal>
+		      (component_scale[var] *
+		       (*JxW)[qp] * hessian_error.size_sq());
                 }
 
             }
@@ -556,16 +573,14 @@ libMesh::err << "Cell " << e_id << ": h = " << elem->hmax()
               << "     new_h_dofs = " << new_h_dofs
               << ", new_p_dofs = " << new_p_dofs << std::endl;
 */
-
-      if ((std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs)
-          > (std::sqrt(h_error_per_cell[e_id]) / new_h_dofs))
-/*
-      if (std::sqrt(p_error_per_cell[e_id]) * p_weight
-          > std::sqrt(h_error_per_cell[e_id]))
-*/
+      const Real p_value = 
+        std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs;
+      const Real h_value =
+        std::sqrt(h_error_per_cell[e_id]) /
+	static_cast<Real>(new_h_dofs);
+      if (p_value > h_value)
         {
           elem->set_p_refinement_flag(Elem::REFINE);
-//          elem->set_refinement_flag(Elem::COARSEN);
           elem->set_refinement_flag(Elem::DO_NOTHING);
         }
     }

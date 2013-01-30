@@ -274,7 +274,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 
 
   // The number of quadrature points.
-  const unsigned int n_qp = qp.size();
+  const unsigned int n_qp = libmesh_cast_int<unsigned int>(qp.size());
 
   // Number of shape functions in the finite element approximation
   // space.

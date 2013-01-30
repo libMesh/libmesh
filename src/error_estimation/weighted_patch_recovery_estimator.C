@@ -122,7 +122,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
       const Elem* elem = *elem_it;
 
       // We'll need an index into the error vector
-      const int e_id=elem->id();
+      const dof_id_type e_id=elem->id();
 
       // We are going to build a patch containing the current element
       // and its neighbors on the local processor
@@ -330,7 +330,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 	      dof_map.dof_indices (e_p, dof_indices, var);
 	      libmesh_assert (dof_indices.size() == phi->size());
 
-	      const unsigned int n_dofs = dof_indices.size();
+	      const unsigned int n_dofs =
+		libmesh_cast_int<unsigned int>(dof_indices.size());
 	      const unsigned int n_qp   = qrule->n_points();
 	      	      
 	      // Compute the weighted projection components from this cell.
@@ -575,7 +576,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 	      const Elem* e_p = *patch_re_it;
 	    
 	      // We'll need an index into the error vector for this element
-	      const int e_p_id = e_p->id();
+	      const dof_id_type e_p_id = e_p->id();
 	      
 	      // Get a pointer to the element, we need it to initialize
 	      // the FEMContext
@@ -601,7 +602,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 	      libmesh_assert (dof_indices.size() == phi->size());
 
 	      // The number of dofs for this variable on this element
-	      const unsigned int n_dofs = dof_indices.size();
+	      const unsigned int n_dofs =
+		libmesh_cast_int<unsigned int>(dof_indices.size());
 
 	      // Variable to hold the error on the current element
 	      Real element_error = 0;
@@ -617,7 +619,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		fe->attach_quadrature_rule (&samprule);
 
 	      // The number of points we will sample over
-	      const unsigned int n_sp   = JxW.size();
+	      const unsigned int n_sp = 
+		libmesh_cast_int<unsigned int>(JxW.size());
 
 	      // Loop over every sample point for the current element
 	      for (unsigned int sp=0; sp<n_sp; sp++)
@@ -864,7 +867,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           const Elem* e_p = *patch_re_it;
 
           // We'll need an index into the error vector
-          const int e_p_id = e_p->id();
+          const dof_id_type e_p_id = e_p->id();
 
           // Update the error_per_cell vector for this element
           if (error_estimator.error_norm.type(0) == L2 ||
@@ -876,7 +879,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
             {
               Threads::spin_mutex::scoped_lock acquire(Threads::spin_mtx);
               if (!error_per_cell[e_p_id])
-  	        error_per_cell[e_p_id] = std::sqrt(new_error_per_cell[i]);
+  	        error_per_cell[e_p_id] = static_cast<ErrorVectorReal>
+		  (std::sqrt(new_error_per_cell[i]));
             }
           else
             {
@@ -885,7 +889,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
                               error_estimator.error_norm.type(0) == W2_INF_SEMINORM);
               Threads::spin_mutex::scoped_lock acquire(Threads::spin_mtx);
               if (!error_per_cell[e_p_id])
-  	        error_per_cell[e_p_id] = new_error_per_cell[i];
+  	        error_per_cell[e_p_id] = static_cast<ErrorVectorReal>
+		  (new_error_per_cell[i]);
             }
 
         } // End loop over every element in patch

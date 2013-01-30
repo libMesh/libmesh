@@ -356,8 +356,11 @@ void ExactErrorEstimator::estimate_error (const System& system,
                                            var, false);
 
               error_per_cell[parent->id()] +=
-		find_squared_element_error(system, var_name, parent, Uparent,
-                                           fe.get(), fine_values.get());
+		static_cast<ErrorVectorReal>
+		  (find_squared_element_error(system, var_name,
+					      parent, Uparent,
+					      fe.get(),
+					      fine_values.get()));
             }
 #endif
 
@@ -369,8 +372,10 @@ void ExactErrorEstimator::estimate_error (const System& system,
             Uelem(i) = system.current_solution(dof_indices[i]);
 
           error_per_cell[e_id] +=
-            find_squared_element_error(system, var_name, elem, Uelem,
-                                       fe.get(), fine_values.get());
+	    static_cast<ErrorVectorReal>
+	      (find_squared_element_error(system, var_name, elem,
+					  Uelem, fe.get(),
+					  fine_values.get()));
 
 	} // End loop over active local elements
     } // End loop over variables
@@ -448,10 +453,12 @@ Real ExactErrorEstimator::find_squared_element_error(const System& system,
 #endif
 
   // The number of shape functions
-  const unsigned int n_sf = Uelem.size();
+  const unsigned int n_sf =
+    libmesh_cast_int<unsigned int>(Uelem.size());
 
   // The number of quadrature points
-  const unsigned int n_qp = JxW.size();
+  const unsigned int n_qp =
+    libmesh_cast_int<unsigned int>(JxW.size());
 
   Real error_val = 0;
 

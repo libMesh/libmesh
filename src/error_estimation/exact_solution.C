@@ -696,7 +696,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       const unsigned int n_qp = qrule->n_points();
 
       // The number of shape functions
-      const unsigned int n_sf = dof_indices.size();
+      const unsigned int n_sf = 
+	libmesh_cast_int<unsigned int>(dof_indices.size());
 
       //
       // Begin the loop over the Quadrature points.
