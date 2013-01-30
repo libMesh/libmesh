@@ -205,21 +205,21 @@ namespace libMesh
 
 	      // The libmesh node IDs may not be sequential, but can we assume
 	      // they are at least in order???  We will do so here.
-	      std::vector<unsigned>::iterator it =
+	      std::vector<unsigned>::iterator node_iter =
 		Utility::binary_find(_sequential_to_libmesh_node_map.begin(),
 				     _sequential_to_libmesh_node_map.end(),
 				     libmesh_node_id);
 
 	      // Check to see if not found: this could also indicate the sequential
 	      // node map is not sorted...
-	      if (it == _sequential_to_libmesh_node_map.end())
+	      if (node_iter == _sequential_to_libmesh_node_map.end())
 		{
 		  libMesh::err << "Global node " << libmesh_node_id << " not found in sequential node map!"  << std::endl;
 		  libmesh_error();
 		}
 
 	      std::vector<unsigned>::difference_type
-		sequential_index = std::distance(_sequential_to_libmesh_node_map.begin(), it);
+		sequential_index = std::distance(_sequential_to_libmesh_node_map.begin(), node_iter);
 
 	      // Debugging:
 	      //	    std::cout << "libmesh_node_id=" << libmesh_node_id
