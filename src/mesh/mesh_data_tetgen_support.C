@@ -85,12 +85,12 @@ void MeshData::read_tetgen (const std::string& name)
   // Read in the data associated with the nodes.
   {
     unsigned int n_node=0, f_n_id=0, nAttri=0, BoundMark=0;
-    Real dummy=0.0;
+    Real dummy_val=0.0;
     std::vector<Number> AttriValue;
 
     // Read the parameters from the node_stream.
     node_stream >> n_node     // Read the number of nodes
-		>> dummy      // Read the dimension
+		>> dummy_val  // Read the dimension
 		>> nAttri     // Read the number of attributes
 		>> BoundMark; // (0 or 1) boundary markers are in the stream or not.
 
@@ -102,10 +102,10 @@ void MeshData::read_tetgen (const std::string& name)
 	node_stream >> f_n_id;
 
 
-	// Read the nodal coordinates for this node into dummy,
+	// Read the nodal coordinates for this node into dummy_val,
 	// since we don't need them.
 	for (unsigned int j=0; j<3; j++)
-	  node_stream >> dummy;
+	  node_stream >> dummy_val;
 
 	// Read the attributes from the stream.
 	for (unsigned int j=0; j<nAttri; j++)
@@ -113,7 +113,7 @@ void MeshData::read_tetgen (const std::string& name)
 
 	// Read boundary marker if BoundaryMarker=1.
 	if (BoundMark == 1)
-    	  node_stream >> dummy;
+          node_stream >> dummy_val;
 
 	// For the foreign node id locate the Node*.
      	const Node* node = foreign_id_to_node(f_n_id);
@@ -128,7 +128,7 @@ void MeshData::read_tetgen (const std::string& name)
   // Read in the data associated with the elements.
   {
     unsigned int n_elem, f_e_id, n_nodes, nAttri=0;
-    Real dummy=0.0;
+    Real dummy_val=0.0;
     std::vector<Number> AttriValue;
 
     // Read the parameters from the ele_stream.
@@ -143,19 +143,14 @@ void MeshData::read_tetgen (const std::string& name)
       {
 	ele_stream >> f_e_id;
 
-
-	// For the number of nodes for this element read them into dummy,
+	// For the number of nodes for this element read them into dummy_val,
 	// since we don't need them.
 	for (unsigned int n=0; n<n_nodes; n++)
-	  {
-	    ele_stream >> dummy;
-	  }
+          ele_stream >> dummy_val;
 
 	// Read the attributes from the stream.
 	for (unsigned int j=0; j<nAttri; j++)
-	  {
-	    ele_stream >> AttriValue[j];
-	  }
+          ele_stream >> AttriValue[j];
 
 	// For the foreign elem id locate the Elem*.
      	const Elem* elem = foreign_id_to_elem(f_e_id);
