@@ -303,7 +303,8 @@ using namespace libMesh;
 	  dof_map.dof_indices (elem, dof_indices, var);
 	  
 	  // The number of DOFs on the element
-	  const unsigned int n_dofs = dof_indices.size();
+	  const unsigned int n_dofs =
+	    libmesh_cast_int<unsigned int>(dof_indices.size());
 	  
 	  // Fixed vs. free DoFs on edge/face projections
 	  std::vector<char> dof_is_fixed(n_dofs, false); // bools
@@ -325,7 +326,7 @@ using namespace libMesh;
 	  // those fixed and project boundary faces,
 	  
 	  // Interpolate node values first
-	  dof_id_type current_dof = 0;
+	  unsigned int current_dof = 0;
 	  for (unsigned int n=0; n!= n_nodes; ++n)
 	    {
 	      // FIXME: this should go through the DofMap,
@@ -560,10 +561,10 @@ using namespace libMesh;
 			// fixed DoFs aren't test functions
 			if (dof_is_fixed[i])
 			  continue;
-			for (std::size_t sidej=0, freej=0;
+			for (unsigned int sidej=0, freej=0;
 			     sidej != side_dofs.size(); ++sidej)
 			  {
-			    dof_id_type j = side_dofs[sidej];
+			    unsigned int j = side_dofs[sidej];
 			    if (dof_is_fixed[j])
 			      Fe(freei) -= phi[i][qp] * phi[j][qp] *
 				JxW[qp] * Ue(j);
@@ -676,14 +677,14 @@ using namespace libMesh;
 		    for (unsigned int sidei=0, freei=0;
 			 sidei != side_dofs.size(); ++sidei)
 		      {
-			dof_id_type i = side_dofs[sidei];
+			unsigned int i = side_dofs[sidei];
 			// fixed DoFs aren't test functions
 			if (dof_is_fixed[i])
 			  continue;
 			for (unsigned int sidej=0, freej=0;
 			     sidej != side_dofs.size(); ++sidej)
 			  {
-			    dof_id_type j = side_dofs[sidej];
+			    unsigned int j = side_dofs[sidej];
 			    if (dof_is_fixed[j])
 			      Fe(freei) -= phi[i][qp] * phi[j][qp] *
 				JxW[qp] * Ue(j);
@@ -1776,7 +1777,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
   if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
       !called_recursively) // case 2: constrained in terms of our own DOFs
     {
-      const unsigned int old_size = elem_dofs.size();
+      const unsigned int old_size =
+        libmesh_cast_int<unsigned int>(elem_dofs.size());
 
       // Add new dependency dofs to the end of the current dof set
       elem_dofs.insert(elem_dofs.end(),
@@ -1784,7 +1786,8 @@ void DofMap::build_constraint_matrix (DenseMatrix<Number>& C,
 
       // Now we can build the constraint matrix.
       // Note that resize also zeros for a DenseMatrix<Number>.
-      C.resize (old_size, elem_dofs.size());
+      C.resize (old_size,
+		libmesh_cast_int<unsigned int>(elem_dofs.size()));
 
       // Create the C constraint matrix.
       for (unsigned int i=0; i != old_size; i++)
@@ -1894,7 +1897,8 @@ void DofMap::build_constraint_matrix_and_vector
   if (!dof_set.empty() ||  // case 1: constrained in terms of other DOFs
       !called_recursively) // case 2: constrained in terms of our own DOFs
     {
-      const unsigned int old_size = elem_dofs.size();
+      const unsigned int old_size =
+        libmesh_cast_int<unsigned int>(elem_dofs.size());
 
       // Add new dependency dofs to the end of the current dof set
       elem_dofs.insert(elem_dofs.end(),
@@ -1905,7 +1909,8 @@ void DofMap::build_constraint_matrix_and_vector
 
       // Now we can build the constraint matrix and vector.
       // Note that resize also zeros for a DenseMatrix and DenseVector
-      C.resize (old_size, elem_dofs.size());
+      C.resize (old_size,
+		libmesh_cast_int<unsigned int>(elem_dofs.size()));
       H.resize (old_size);
 
       // Create the C constraint matrix.
