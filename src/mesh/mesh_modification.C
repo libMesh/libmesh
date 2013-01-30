@@ -176,10 +176,9 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
 {
   libmesh_assert_not_equal_to (mesh.mesh_dimension(), 1);
 
-  const Real pi = std::acos(-1.);
-  const Real  p = -phi/180.*pi;
-  const Real  t = -theta/180.*pi;
-  const Real  s = -psi/180.*pi;
+  const Real  p = -phi/180.*libMesh::pi;
+  const Real  t = -theta/180.*libMesh::pi;
+  const Real  s = -psi/180.*libMesh::pi;
   const Real sp = std::sin(p), cp = std::cos(p);
   const Real st = std::sin(t), ct = std::cos(t);
   const Real ss = std::sin(s), cs = std::cos(s);
@@ -193,10 +192,10 @@ void MeshTools::Modification::rotate (MeshBase& mesh,
   for (MeshBase::node_iterator nd = mesh.nodes_begin();
        nd != nd_end; ++nd)
     {
-      const Point p = **nd;
-      const Real  x = p(0);
-      const Real  y = p(1);
-      const Real  z = p(2);
+      const Point pt = **nd;
+      const Real  x  = pt(0);
+      const Real  y  = pt(1);
+      const Real  z  = pt(2);
       **nd = Point(( cp*cs-sp*ct*ss)*x + ( sp*cs+cp*ct*ss)*y + (st*ss)*z,
                    (-cp*ss-sp*ct*cs)*x + (-sp*ss+cp*ct*cs)*y + (st*cs)*z,
                    ( sp*st)*x          + (-cp*st)*y          + (ct)*z   );
@@ -366,10 +365,10 @@ void UnstructuredMesh::all_first_order ()
   MeshBase::node_iterator nd = this->nodes_begin();
     while (nd != nd_end)
     {
-      Node *node = *nd;
+      Node *the_node = *nd;
       ++nd;
-      if (!node_touched_by_me[node->id()])
-        this->delete_node(node);
+      if (!node_touched_by_me[the_node->id()])
+        this->delete_node(the_node);
     }
 
   STOP_LOG("all_first_order()", "Mesh");
