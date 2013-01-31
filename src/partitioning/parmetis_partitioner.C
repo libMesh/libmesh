@@ -308,7 +308,8 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
     std::vector<dof_id_type> global_index;
 
     // create the mapping which is contiguous by processor
-    for (processor_id_type pid=0, pid_offset=0; pid<libMesh::n_processors(); pid++)
+    dof_id_type pid_offset=0;
+    for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
       {
 	MeshBase::const_element_iterator       it  = mesh.active_pid_elements_begin(pid);
 	const MeshBase::const_element_iterator end = mesh.active_pid_elements_end(pid);
