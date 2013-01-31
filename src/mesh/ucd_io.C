@@ -232,9 +232,9 @@ void UCDIO::read_implementation (std::istream& in)
 
 
 
-void UCDIO::write_implementation (std::ostream& out)
+void UCDIO::write_implementation (std::ostream& out_stream)
 {
-  libmesh_assert (out.good());
+  libmesh_assert (out_stream.good());
 
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
@@ -249,34 +249,34 @@ void UCDIO::write_implementation (std::ostream& out)
     }
 
   // Write header
-  this->write_header(out,mesh,mesh.n_elem(),0);
+  this->write_header(out_stream,mesh,mesh.n_elem(),0);
 
   // Write the node coordinates
-  this->write_nodes(out,mesh);
+  this->write_nodes(out_stream,mesh);
 
   // Write the elements
-  this->write_interior_elems(out,mesh);
+  this->write_interior_elems(out_stream,mesh);
 
   return;
 }
 
-void UCDIO::write_header(std::ostream& out, const MeshBase& mesh,
+void UCDIO::write_header(std::ostream& out_stream, const MeshBase& mesh,
 			 dof_id_type n_elems, unsigned int n_vars )
 {
-  libmesh_assert (out.good());
+  libmesh_assert (out_stream.good());
   // TODO: We used to print out the SVN revision here when we did keyword expansions...
-  out << "# For a description of the UCD format see the AVS Developer's guide.\n"
+  out_stream << "# For a description of the UCD format see the AVS Developer's guide.\n"
       << "#\n";
 
   // Write the mesh info
-  out << mesh.n_nodes() << " "
+  out_stream << mesh.n_nodes() << " "
       << n_elems  << " "
       << n_vars << " "
       << " 0 0\n";
   return;
 }
 
-void UCDIO::write_nodes(std::ostream& out, const MeshBase& mesh)
+void UCDIO::write_nodes(std::ostream& out_stream, const MeshBase& mesh)
 {
   MeshBase::const_node_iterator       it  = mesh.nodes_begin();
   const MeshBase::const_node_iterator end = mesh.nodes_end();
@@ -286,16 +286,16 @@ void UCDIO::write_nodes(std::ostream& out, const MeshBase& mesh)
   // Write the node coordinates
   for (; it != end; ++it)
     {
-      libmesh_assert (out.good());
+      libmesh_assert (out_stream.good());
       
-      out << n++ << "\t";
-      (*it)->write_unformatted(out);
+      out_stream << n++ << "\t";
+      (*it)->write_unformatted(out_stream);
     }
 
   return;
 }
 
-void UCDIO::write_interior_elems(std::ostream& out, const MeshBase& mesh)
+void UCDIO::write_interior_elems(std::ostream& out_stream, const MeshBase& mesh)
 {
   std::string type[] =
     { "edge",  "edge",  "edge",
@@ -314,7 +314,7 @@ void UCDIO::write_interior_elems(std::ostream& out, const MeshBase& mesh)
   // Write element information
   for (; it != end; ++it)
     {
-      libmesh_assert (out.good());
+      libmesh_assert (out_stream.good());
       
       // PB: I believe these are the only supported ElemTypes.
       const ElemType etype = (*it)->type();
@@ -327,9 +327,9 @@ void UCDIO::write_interior_elems(std::ostream& out, const MeshBase& mesh)
 	  libmesh_error();
 	}
 
-      out << e++ << " 0 " << type[etype] << "\t";
-      // (*it)->write_ucd_connectivity(out);
-      (*it)->write_connectivity(out, UCD);
+      out_stream << e++ << " 0 " << type[etype] << "\t";
+      // (*it)->write_ucd_connectivity(out_stream);
+      (*it)->write_connectivity(out_stream, UCD);
     }
 
   return;
@@ -339,7 +339,7 @@ void UCDIO::write_nodal_data(const std::string& fname,
 			     const std::vector<Number>&soln, 
 			     const std::vector<std::string>& names)
 {
-  std::ofstream out(fname.c_str());
+  std::ofstream out_stream(fname.c_str());
   
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
@@ -347,35 +347,35 @@ void UCDIO::write_nodal_data(const std::string& fname,
   libmesh_assert (mesh.mesh_dimension() != 1);
 
   // Write header
-  this->write_header(out,mesh,mesh.n_elem(),names.size());
+  this->write_header(out_stream,mesh,mesh.n_elem(),names.size());
 
   // Write the node coordinates
-  this->write_nodes(out,mesh);
+  this->write_nodes(out_stream,mesh);
 
   // Write the elements
-  this->write_interior_elems(out,mesh);
+  this->write_interior_elems(out_stream,mesh);
 
   // Write the solution
-  this->write_soln(out,mesh,names,soln);
+  this->write_soln(out_stream,mesh,names,soln);
 
   return;
 }
 
-void UCDIO::write_soln(std::ostream& out, const MeshBase& mesh,
+void UCDIO::write_soln(std::ostream& out_stream, const MeshBase& mesh,
 		       const std::vector<std::string>& names,
 		       const std::vector<Number>&soln)
 {
-  libmesh_assert (out.good());
+  libmesh_assert (out_stream.good());
 
   // First write out how many variables and how many components per variable
-  out << names.size();
+  out_stream << names.size();
   for( unsigned int i = 0; i < names.size(); i++ )
     {
-      libmesh_assert (out.good());
+      libmesh_assert (out_stream.good());
       // Each named variable has only 1 component
-      out << " 1";
+      out_stream << " 1";
     }
-  out << std::endl;
+  out_stream << std::endl;
 
   // Now write out variable names and units. Since we don't store units
   // We just write out dummy.
@@ -383,8 +383,8 @@ void UCDIO::write_soln(std::ostream& out, const MeshBase& mesh,
        var != names.end();
        var++)
     {
-      libmesh_assert (out.good());
-      out << (*var) << ", dummy" << std::endl;
+      libmesh_assert (out_stream.good());
+      out_stream << (*var) << ", dummy" << std::endl;
     }
 
   // Now, for each node, write out the solution variables
@@ -392,16 +392,16 @@ void UCDIO::write_soln(std::ostream& out, const MeshBase& mesh,
   for( std::size_t n = 1; // 1-based node number for UCD
        n <= mesh.n_nodes(); n++)
     {
-      libmesh_assert (out.good());
-      out << n;
+      libmesh_assert (out_stream.good());
+      out_stream << n;
 
       for( std::size_t var = 0; var != nv; var++ )
 	{
 	  std::size_t idx = nv*(n-1) + var;
 	  
-	  out << " " << soln[idx];
+	  out_stream << " " << soln[idx];
 	}
-      out << std::endl;
+      out_stream << std::endl;
     }
 
   return;
