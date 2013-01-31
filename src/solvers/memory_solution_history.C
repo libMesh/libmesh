@@ -95,7 +95,7 @@ namespace libMesh
       }
 
     // If we're before the beginning we can create a new entry
-    else if (stored_sols->first > _system.time)
+    else if (stored_sols->first - _system.time > TOLERANCE)
       {
         libmesh_assert (stored_sols == stored_solutions.begin());
         stored_solutions.push_front
