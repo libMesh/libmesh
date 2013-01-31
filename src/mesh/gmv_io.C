@@ -541,8 +541,8 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
 			   !MeshOutput<MeshBase>::_is_parallel_format);
 
   // These are parallel_only functions
-  const unsigned int n_active_elem = mesh.n_active_elem(),
-                     n_active_sub_elem = mesh.n_active_sub_elem();
+  const dof_id_type n_active_elem = mesh.n_active_elem(),
+                    n_active_sub_elem = mesh.n_active_sub_elem();
 
   if (libMesh::processor_id() != 0)
     return;
@@ -1120,7 +1120,8 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   if ((solution_names != NULL) &&
       (v != NULL))
     {
-      const unsigned int n_vars = solution_names->size();
+      const unsigned int n_vars =
+	libmesh_cast_int<unsigned int>(solution_names->size());
 
       if (!(v->size() == mesh.n_nodes()*n_vars))
 	libMesh::err << "ERROR: v->size()=" << v->size()
@@ -1200,7 +1201,7 @@ void GMVIO::write_binary (const std::string& fname,
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   // This is a parallel_only function
-  const unsigned int n_active_elem = mesh.n_active_elem();
+  const dof_id_type n_active_elem = mesh.n_active_elem();
 
   if (libMesh::processor_id() != 0)
     return;

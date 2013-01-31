@@ -197,7 +197,7 @@ void MEDITIO::write_ascii (const std::string& fname,
       (vec != NULL))
     {
       // Open the ".bb" file stream
-      int idx = fname.find_last_of(".");
+      std::size_t idx = fname.find_last_of(".");
       std::string bbname = fname.substr(0,idx) + ".bb";
 
       std::ofstream bbout (bbname.c_str());
@@ -207,9 +207,9 @@ void MEDITIO::write_ascii (const std::string& fname,
         libmesh_file_error(bbname.c_str());
 
       // Header: 3: 3D mesh, 1: scalar output, 2: node-indexed
-      const unsigned int n_vars = solution_names->size();
+      const std::size_t n_vars = solution_names->size();
       bbout << "3 1 " << the_mesh.n_nodes() << " 2\n";
-      for (unsigned int n=0; n<the_mesh.n_nodes(); n++)
+      for (dof_id_type n=0; n<the_mesh.n_nodes(); n++)
 	bbout << std::setprecision(10) << (*vec)[n*n_vars + scalar_idx] << " ";
       bbout << "\n";
     } // endif

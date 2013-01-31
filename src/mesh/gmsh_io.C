@@ -572,8 +572,8 @@ void GmshIO::read_mesh(std::istream& in)
                     if (elem->neighbor(s) == NULL)
                       {
                         AutoPtr<Elem> side (elem->build_side(s));
-                        std::set<unsigned int> side_nodes;
-                        std::set<unsigned int>::iterator iter = side_nodes.begin();
+                        std::set<dof_id_type> side_nodes;
+                        std::set<dof_id_type>::iterator iter = side_nodes.begin();
 
                         // make a set with all nodes from this side
                         // this allows for easy comparison
@@ -584,7 +584,7 @@ void GmshIO::read_mesh(std::istream& in)
                         // of tagged nodes. If we would loop over all side
                         // nodes, we would just get multiple hits, so taking
                         // node 0 is enough to do the job
-                        unsigned int sn = side->node(0);
+                        dof_id_type sn = side->node(0);
                         if (node_index.count(sn) > 0)
                           {
                             // Loop over all tagged ("physical") "sides" which
@@ -753,7 +753,8 @@ void GmshIO::write_post (const std::string& fname,
   //  write the data
   if ((solution_names != NULL) && (v != NULL))
     {
-      const unsigned int n_vars = solution_names->size();
+      const unsigned int n_vars =
+        libmesh_cast_int<unsigned int>(solution_names->size());
 
       if (!(v->size() == mesh.n_nodes()*n_vars))
         libMesh::err << "ERROR: v->size()=" << v->size()

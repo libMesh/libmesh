@@ -228,8 +228,8 @@ const Point InfElemBuilder::build_inf_elem (const InfElemOriginValue& origin_x,
       std::vector<dof_id_type>::iterator unique_end =
 	  std::unique (inner_boundary_node_numbers.begin(), inner_boundary_node_numbers.end());
 
-      const int unique_size = std::distance(inner_boundary_node_numbers.begin(), unique_end);
-      libmesh_assert_less_equal (unique_size, static_cast<int>(ibn_size_before));
+      std::size_t unique_size = std::distance(inner_boundary_node_numbers.begin(), unique_end);
+      libmesh_assert_less_equal (unique_size, ibn_size_before);
 
       // Finally, create const Node* in the inner_boundary_nodes
       // vector.  Reserve, not resize (otherwise, the push_back

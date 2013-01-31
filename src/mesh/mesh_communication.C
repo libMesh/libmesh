@@ -432,7 +432,8 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
       adjacent_processors.push_back (pid);
 
 
-  const processor_id_type n_adjacent_processors = adjacent_processors.size();
+  const processor_id_type n_adjacent_processors = 
+    libmesh_cast_int<processor_id_type>(adjacent_processors.size());
 
   //-------------------------------------------------------------------------
   // Let's build a list of all nodes which live on NULL-neighbor sides.
@@ -1068,7 +1069,7 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
       const Elem *elem = *l_elem_it;
       for (unsigned int n=0; n != elem->n_nodes(); ++n)
         {
-          unsigned int nodeid = elem->node(n);
+          dof_id_type nodeid = elem->node(n);
           libmesh_assert_less (nodeid, local_nodes.size());
           local_nodes[nodeid] = true;
         }

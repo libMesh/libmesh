@@ -712,14 +712,14 @@ void LegacyXdrIO::write_mesh (const std::string& name,
   // This map will associate
   // the distance from the beginning of the set
   // to each node ID with the node ID itself.
-  std::map<unsigned int, unsigned int> node_map;
+  std::map<dof_id_type, dof_id_type> node_map;
 
   {
     // For each non-subactive element:
     // 1.) Increment the number of non subactive elements
     // 2.) Accumulate the total weight
     // 3.) Add the node ids to a set of non subactive node ids
-    std::set<unsigned int> not_subactive_node_ids;
+    std::set<dof_id_type> not_subactive_node_ids;
     MeshBase::const_element_iterator el = mesh.elements_begin();
     const MeshBase::const_element_iterator end_el = mesh.elements_end();
     for( ; el != end_el; ++el)
@@ -737,9 +737,9 @@ void LegacyXdrIO::write_mesh (const std::string& name,
 
     // Now that the set is built, most of the hard work is done.  We build
     // the map next and let the set go out of scope.
-    std::set<unsigned int>::iterator it = not_subactive_node_ids.begin();
-    const std::set<unsigned int>::iterator end = not_subactive_node_ids.end();
-    unsigned int cnt=0;
+    std::set<dof_id_type>::iterator it = not_subactive_node_ids.begin();
+    const std::set<dof_id_type>::iterator end = not_subactive_node_ids.end();
+    dof_id_type cnt=0;
     for (; it!=end; ++it)
       node_map[*it] = cnt++;
   }
@@ -755,7 +755,8 @@ void LegacyXdrIO::write_mesh (const std::string& name,
   neeb.resize((n_levels+1)*etypes.size());
 
   // Store a variable for the number of element types
-  const unsigned int n_el_types = etypes.size();
+  const unsigned int n_el_types =
+    libmesh_cast_int<unsigned int>(etypes.size());
 
   m.set_num_levels(n_levels);
 

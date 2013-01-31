@@ -43,7 +43,7 @@ void MeshData::read_tetgen (const std::string& name)
     {
       name_node = name;
       dummy     = name;
-      int position = dummy.rfind(".node");
+      std::size_t position = dummy.rfind(".node");
       name_ele     = dummy.replace(position, 5, ".ele");
       desc.erase(position);
     }
@@ -51,7 +51,7 @@ void MeshData::read_tetgen (const std::string& name)
     {
       name_ele = name;
       dummy    = name;
-      int position = dummy.rfind(".ele");
+      std::size_t position = dummy.rfind(".ele");
       name_node    = dummy.replace(position, 4, ".node");
       desc.erase(position);
     }

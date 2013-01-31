@@ -118,13 +118,13 @@ void FroIO::write (const std::string& fname)
 	for (std::set<boundary_id_type>::const_iterator id = bc_ids.begin();
 	     id != bc_ids.end(); ++id)
 	  {
-	    std::deque<unsigned int> node_list;
+	    std::deque<dof_id_type> node_list;
 
-	    std::map<unsigned int, unsigned int>
+	    std::map<dof_id_type, dof_id_type>
 	      forward_edges, backward_edges;
 
 	    // Get all sides on this element with the relevant BC id.
-	    for (unsigned int e=0; e<el.size(); e++)
+	    for (std::size_t e=0; e<el.size(); e++)
 	      if (il[e] == *id)
 		{
 		  // need to build up node_list as a sorted array of edge nodes...
@@ -144,7 +144,7 @@ void FroIO::write (const std::string& fname)
 		  //
 		  AutoPtr<Elem> side = the_mesh.elem(el[e])->build_side(sl[e]);
 
-		  const unsigned int
+		  const dof_id_type
 		    n0 = side->node(0),
 		    n1 = side->node(1);
 
@@ -167,17 +167,17 @@ void FroIO::write (const std::string& fname)
 	    // the node_list will be filled when (node_list.size() == (n_edges+1))
 	    // until that is the case simply add on to the beginning and end of the node_list,
 	    // building up a chain of ordered nodes...
-	    const unsigned int n_edges = forward_edges.size();
+	    const std::size_t n_edges = forward_edges.size();
 
 	    while (node_list.size() != (n_edges+1))
 	      {
-		const unsigned int
+		const dof_id_type
 		  front_node = node_list.front(),
 		  back_node  = node_list.back();
 
 		// look for front_pair in the backward_edges list
 		{
-		  std::map<unsigned int, unsigned int>::iterator
+		  std::map<dof_id_type, dof_id_type>::iterator
 		    pos = backward_edges.find(front_node);
 
 		  if (pos != backward_edges.end())
@@ -190,7 +190,7 @@ void FroIO::write (const std::string& fname)
 
 		// look for back_pair in the forward_edges list
 		{
-		  std::map<unsigned int, unsigned int>::iterator
+		  std::map<dof_id_type, dof_id_type>::iterator
 		    pos = forward_edges.find(back_node);
 
 		  if (pos != forward_edges.end())
@@ -208,7 +208,7 @@ void FroIO::write (const std::string& fname)
 
 	    out_stream << ++bc_id << " " << node_list.size() << '\n';
 
-	    std::deque<unsigned int>::iterator pos = node_list.begin();
+	    std::deque<dof_id_type>::iterator pos = node_list.begin();
 	    for ( ; pos != node_list.end(); ++pos)
 		out_stream << *pos+1 << " \t0\n";
 	  }

@@ -371,10 +371,11 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	  const Hilbert::HilbertIndices hi =
 	    get_hilbert_index (*node, bbox);
 	  const processor_id_type pid =
-	    std::distance (node_upper_bounds.begin(),
-			   std::lower_bound(node_upper_bounds.begin(),
-					    node_upper_bounds.end(),
-					    hi));
+	    libmesh_cast_int<processor_id_type>
+	    (std::distance (node_upper_bounds.begin(),
+			    std::lower_bound(node_upper_bounds.begin(),
+					     node_upper_bounds.end(),
+					     hi)));
 
 	  libmesh_assert_less (pid, libMesh::n_processors());
 
@@ -447,10 +448,11 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	    const Hilbert::HilbertIndices hi =
 	      get_hilbert_index (*node, bbox);
 	    const processor_id_type pid =
-	      std::distance (node_upper_bounds.begin(),
-			     std::lower_bound(node_upper_bounds.begin(),
-					      node_upper_bounds.end(),
-					      hi));
+	      libmesh_cast_int<processor_id_type>
+	      (std::distance (node_upper_bounds.begin(),
+			      std::lower_bound(node_upper_bounds.begin(),
+					       node_upper_bounds.end(),
+					       hi)));
 
 	    libmesh_assert_less (pid, libMesh::n_processors());
 	    libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
@@ -486,10 +488,11 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	  const Hilbert::HilbertIndices hi =
 	    get_hilbert_index (elem->centroid(), bbox);
 	  const processor_id_type pid =
-	    std::distance (elem_upper_bounds.begin(),
-			   std::lower_bound(elem_upper_bounds.begin(),
-					    elem_upper_bounds.end(),
-					    hi));
+	    libmesh_cast_int<processor_id_type>
+	    (std::distance (elem_upper_bounds.begin(),
+			    std::lower_bound(elem_upper_bounds.begin(),
+					     elem_upper_bounds.end(),
+					     hi)));
 
 	  libmesh_assert_less (pid, libMesh::n_processors());
 
@@ -562,10 +565,11 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	    const Hilbert::HilbertIndices hi =
 	      get_hilbert_index (elem->centroid(), bbox);
 	    const processor_id_type pid =
-	      std::distance (elem_upper_bounds.begin(),
-			     std::lower_bound(elem_upper_bounds.begin(),
-					      elem_upper_bounds.end(),
-					      hi));
+	      libmesh_cast_int<processor_id_type>
+	      (std::distance (elem_upper_bounds.begin(),
+			      std::lower_bound(elem_upper_bounds.begin(),
+					       elem_upper_bounds.end(),
+					       hi)));
 
 	    libmesh_assert_less (pid, libMesh::n_processors());
 	    libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
@@ -695,11 +699,12 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
     for (ForwardIterator it = begin; it != end; ++it)
       {
 	libmesh_assert (hi != hilbert_keys.end());
-	const unsigned int pid =
-	  std::distance (upper_bounds.begin(),
-			 std::lower_bound(upper_bounds.begin(),
-					  upper_bounds.end(),
-					  *hi));
+	const processor_id_type pid =
+	  libmesh_cast_int<processor_id_type>
+	  (std::distance (upper_bounds.begin(),
+			  std::lower_bound(upper_bounds.begin(),
+					   upper_bounds.end(),
+					   *hi)));
 
 	libmesh_assert_less (pid, libMesh::n_processors());
 

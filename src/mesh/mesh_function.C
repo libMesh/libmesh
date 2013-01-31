@@ -272,7 +272,8 @@ void MeshFunction::operator() (const Point& p,
     {
       // resize the output vector to the number of output values
       // that the user told us
-      output.resize (this->_system_vars.size());
+      output.resize (libmesh_cast_int<unsigned int>
+		     (this->_system_vars.size()));
 
 
       {
