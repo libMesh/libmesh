@@ -287,7 +287,6 @@ Real RBEvaluation::rb_solve(unsigned int N)
     Real abs_error_bound = epsilon_N / residual_scaling_denom(alpha_LB);
 
     // Now compute the output error bounds
-    DenseVector<Number> RB_output_vector_N;
     for(unsigned int n=0; n<rb_theta_expansion->get_n_outputs(); n++)
     {
       RB_output_error_bounds[n] = abs_error_bound * eval_output_dual_norm(n, mu);
