@@ -39,9 +39,9 @@ void Patch::find_face_neighbors(std::set<const Elem *> &new_neighbors)
 {
   // Loop over all the elements in the patch
   std::set<const Elem*>::const_iterator       it  = this->begin();
-  const std::set<const Elem*>::const_iterator end = this->end();
+  const std::set<const Elem*>::const_iterator end_it = this->end();
 
-  for (; it != end; ++it)
+  for (; it != end_it; ++it)
     {
       const Elem* elem = *it;
       for (unsigned int s=0; s<elem->n_sides(); s++)
@@ -92,9 +92,9 @@ void Patch::add_local_face_neighbors()
   this->find_face_neighbors(new_neighbors);
 
   std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem*>::const_iterator end = new_neighbors.end();
+  const std::set<const Elem*>::const_iterator end_it = new_neighbors.end();
 
-  for (; it != end; ++it)
+  for (; it != end_it; ++it)
     {
       const Elem* neighbor = *it;
       if (neighbor->processor_id() ==
@@ -112,9 +112,9 @@ void Patch::add_semilocal_face_neighbors()
   this->find_face_neighbors(new_neighbors);
 
   std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem*>::const_iterator end = new_neighbors.end();
+  const std::set<const Elem*>::const_iterator end_it = new_neighbors.end();
 
-  for (; it != end; ++it)
+  for (; it != end_it; ++it)
     {
       const Elem* neighbor = *it;
       if (neighbor->is_semilocal())
@@ -128,9 +128,9 @@ void Patch::find_point_neighbors(std::set<const Elem *> &new_neighbors)
 {
   // Loop over all the elements in the patch
   std::set<const Elem*>::const_iterator       it  = this->begin();
-  const std::set<const Elem*>::const_iterator end = this->end();
+  const std::set<const Elem*>::const_iterator end_it = this->end();
 
-  for (; it != end; ++it)
+  for (; it != end_it; ++it)
     {
       std::set<const Elem*> elem_point_neighbors;
 
@@ -162,9 +162,9 @@ void Patch::add_local_point_neighbors()
   this->find_point_neighbors(new_neighbors);
 
   std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem*>::const_iterator end = new_neighbors.end();
+  const std::set<const Elem*>::const_iterator end_it = new_neighbors.end();
 
-  for (; it != end; ++it)
+  for (; it != end_it; ++it)
     {
       const Elem* neighbor = *it;
       if (neighbor->processor_id() ==
@@ -182,9 +182,9 @@ void Patch::add_semilocal_point_neighbors()
   this->find_point_neighbors(new_neighbors);
 
   std::set<const Elem*>::const_iterator       it  = new_neighbors.begin();
-  const std::set<const Elem*>::const_iterator end = new_neighbors.end();
+  const std::set<const Elem*>::const_iterator end_it = new_neighbors.end();
 
-  for (; it != end; ++it)
+  for (; it != end_it; ++it)
     {
       const Elem* neighbor = *it;
       if (neighbor->is_semilocal())
@@ -245,9 +245,9 @@ void Patch::build_around_element (const Elem* e0,
 #ifdef DEBUG
   {
     std::set<const Elem*>::const_iterator       it  = this->begin();
-    const std::set<const Elem*>::const_iterator end = this->end();
+    const std::set<const Elem*>::const_iterator end_it = this->end();
 
-    for (; it != end; ++it)
+    for (; it != end_it; ++it)
       {
 	// Convenience.  Keep the syntax simple.
 	const Elem* elem = *it;
