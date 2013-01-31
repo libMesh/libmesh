@@ -44,7 +44,7 @@ namespace libMesh
 // Member functions for the Variational Smoother
 double VariationalMeshSmoother::smooth(unsigned int)
 {
-  int n, me, gr, adp, miniter, miniterBC, maxiter, N, ncells, nedges, s, err=0;
+  int n, me, gr, adp, miniter, miniterBC, maxiter, N, ncells, nedges, s, vms_err=0;
   double theta;
   char grid[40], metr[40], grid_old[40], adap[40];
 //  FILE *stream;
@@ -107,15 +107,15 @@ double VariationalMeshSmoother::smooth(unsigned int)
   for(i=0;i<N;i++) R[i]=alloc_d_n1(n);
 
   /*----------initial grid---------*/
-  err=readgr(n,N,R,mask,ncells,cells,mcells,nedges,edges,hnodes,sout);
-  if(err<0)
+  vms_err=readgr(n,N,R,mask,ncells,cells,mcells,nedges,edges,hnodes,sout);
+  if(vms_err<0)
     {
       fprintf(sout,"Error reading input mesh file\n");
       fclose(sout);
       return _dist_norm;
     }
-  if(me>1) err=readmetr(metr,H,ncells,n,sout);
-  if(err<0)
+  if(me>1) vms_err=readmetr(metr,H,ncells,n,sout);
+  if(vms_err<0)
     { 
       fprintf(sout,"Error reading metric file\n");
       fclose(sout);
@@ -1949,7 +1949,7 @@ return (sqrt(nonzero));
 /**
  * composes local matrix W and right side F from all quadrature nodes of one cell
  */
-double VariationalMeshSmoother::localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell, LPINT mask, double epsilon,
+double VariationalMeshSmoother::localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell_in, LPINT mask, double epsilon,
 	      double w, int nvert, LPLPDOUBLE H, int me, double vol, int f, double *Vmin,
 	      double *qmin, int adp, LPDOUBLE afun, LPDOUBLE Gloc, FILE *sout)
 {
@@ -1966,7 +1966,7 @@ double VariationalMeshSmoother::localP(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLP
   if(f==0)
   {
     if(adp>0)
-      avertex(n, afun, Gloc, R, cell, nvert, adp, sout);
+      avertex(n, afun, Gloc, R, cell_in, nvert, adp, sout);
     if(adp==0)
     {
       for(i=0;i<n;i++)
@@ -1980,7 +1980,7 @@ fun=0; gqmin=1e32; g=0;//Vmin
 if(n==2){//2D
 	if(nvert==3){//tri
 		sigma=1.0;
-	fun+=vertex(n, W, F, R, cell, epsilon, w, nvert, K, H, me, vol, f, &lqmin, adp, Gloc, sigma, sout);
+	fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me, vol, f, &lqmin, adp, Gloc, sigma, sout);
 		g+=sigma*lqmin;
 	if(gqmin>lqmin) gqmin=lqmin;
 	}
@@ -1988,7 +1988,7 @@ if(n==2){//2D
 	for(i=0; i<2; i++){ K[0]=i;
 	    for(j=0; j<2; j++){ K[1]=j;
 			    sigma=0.25;
-			    fun+=vertex(n, W, F, R, cell, epsilon, w, nvert, K, H, me,
+			    fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
 				vol, f, &lqmin, adp, Gloc, sigma, sout);
 		g+=sigma*lqmin;
 		if(gqmin>lqmin) gqmin=lqmin;
@@ -1998,7 +1998,7 @@ if(n==2){//2D
 	    for(i=0; i<3; i++){ K[0]=i*0.5; k=i/2; K[1]=(double)k;
 	       for(j=0; j<3; j++){  K[2]=j*0.5; k=j/2; K[3]=(double)k;
 			       if(i==j) sigma=1.0/12; else sigma=1.0/24;
-			       fun+=vertex(n, W, F, R, cell, epsilon, w, nvert, K, H, me,
+			       fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
 				   vol, f, &lqmin, adp, Gloc, sigma, sout);
 			   g+=sigma*lqmin;
 		   if(gqmin>lqmin) gqmin=lqmin;
@@ -2009,7 +2009,7 @@ if(n==2){//2D
 if(n==3){//3D
        if(nvert==4){//tetr
 		   sigma=1.0;
-		   fun+=vertex(n, W, F, R, cell, epsilon, w, nvert, K, H, me,
+		   fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
 			   vol, f, &lqmin, adp, Gloc, sigma, sout);
 		   g+=sigma*lqmin;
 	   if(gqmin>lqmin) gqmin=lqmin;
@@ -2019,7 +2019,7 @@ if(n==3){//3D
 	      for(j=0;j<2;j++){ K[1]=j;
 		  for(k=0;k<3;k++) {K[2]=(double)k/2.0; K[3]=(double)(k%2);
 				      sigma=1.0/12.0;
-				      fun+=vertex(n, W, F, R, cell, epsilon, w, nvert, K, H, me,
+				      fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
 				      vol, f, &lqmin, adp, Gloc, sigma, sout);
 			      g+=sigma*lqmin;
 		      if(gqmin>lqmin) gqmin=lqmin;
@@ -2038,7 +2038,7 @@ if(n==3){//3D
 				if(((i==nn)&&(j==l)&&(k!=m))||((i==nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k==m))) sigma=(double)1/(27*2);
 				if(((i==nn)&&(j!=l)&&(k!=m))||((i!=nn)&&(j!=l)&&(k==m))||((i!=nn)&&(j==l)&&(k!=m))) sigma=(double)1/(27*4);
 				if((i!=nn)&&(j!=l)&&(k!=m)) sigma=(double)1/(27*8);
-							    fun+=vertex(n, W, F, R, cell, epsilon, w, nvert, K, H, me,
+							    fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
 						vol, f, &lqmin, adp, Gloc, sigma, sout);
 					g+=sigma*lqmin;
 				if(gqmin>lqmin) gqmin=lqmin;
@@ -2069,7 +2069,7 @@ if(n==3){//3D
 		      case 3 : K[6]=1.0/2; K[7]=1.0/3; K[8]=1; break; }
 			   if((i==j)&&(j==k)) sigma=1.0/120; else
 		       if((i==j)||(j==k)||(i==k)) sigma=1.0/360; else sigma=1.0/720;
-			   fun+=vertex(n, W, F, R, cell, epsilon, w, nvert, K, H, me,
+			   fun+=vertex(n, W, F, R, cell_in, epsilon, w, nvert, K, H, me,
 			       vol, f, &lqmin, adp, Gloc, sigma, sout);
 		       g+=sigma*lqmin;
 	       if(gqmin>lqmin) gqmin=lqmin;
@@ -2082,7 +2082,7 @@ if(n==3){//3D
 /*---fixed nodes correction---*/
 for(ii=0;ii<nvert;ii++)
 {
-    if(mask[cell[ii]]==1)
+    if(mask[cell_in[ii]]==1)
     {
       for(kk=0;kk<n;kk++)
       {
@@ -2109,7 +2109,7 @@ return fun;
  * avertex - assembly of adaptivity metric on a cell
  */
 // double VariationalMeshSmoother::avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDOUBLE R, LPINT cell, int nvert, int adp, FILE *sout)
-double VariationalMeshSmoother::avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDOUBLE R, LPINT cell, int nvert, int adp, FILE *)
+double VariationalMeshSmoother::avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDOUBLE R, LPINT cell_in, int nvert, int adp, FILE *)
 {
   LPLPDOUBLE Q;
   LPDOUBLE K;
@@ -2125,10 +2125,10 @@ double VariationalMeshSmoother::avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDO
   basisA(n,Q,nvert,K,Q,1);
   for(i=0;i<n;i++){a1[i]=0; a2[i]=0; a3[i]=0; qu[i]=0;
      for(j=0;j<nvert;j++){
-	a1[i]+=Q[i][j]*R[cell[j]][0];
-	a2[i]+=Q[i][j]*R[cell[j]][1];
-		if(n==3) a3[i]+=Q[i][j]*R[cell[j]][2];
-		qu[i]+=Q[i][j]*afun[cell[j]];
+	a1[i]+=Q[i][j]*R[cell_in[j]][0];
+	a2[i]+=Q[i][j]*R[cell_in[j]][1];
+		if(n==3) a3[i]+=Q[i][j]*R[cell_in[j]][2];
+		qu[i]+=Q[i][j]*afun[cell_in[j]];
      }
   }
   if(n==2) det=jac2(a1[0],a1[1],a2[0],a2[1]); else det=jac3(a1[0],a1[1],a1[2],a2[0],a2[1],a2[2],a3[0],a3[1],a3[2]);
@@ -2166,7 +2166,7 @@ double VariationalMeshSmoother::avertex(int n, LPDOUBLE afun, LPDOUBLE G, LPLPDO
 /**
  * Computes local matrics W and local rhs F on one basis
  */
-double VariationalMeshSmoother::vertex(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell,
+double VariationalMeshSmoother::vertex(int n, LPLPLPDOUBLE W, LPLPDOUBLE F, LPLPDOUBLE R, LPINT cell_in,
 	      double epsilon, double w, int nvert, LPDOUBLE K, LPLPDOUBLE H,
 		  int me, double vol, int f, double *qmin, int adp, LPDOUBLE g, double sigma, FILE *)
 //	          int me, double vol, int f, double *qmin, int adp, LPDOUBLE g, double sigma, FILE *sout)
@@ -2204,10 +2204,10 @@ if(f==0){
     a3[i]=0;
     for(j=0;j<nvert;j++)
     {
-      a1[i]+=Q[i][j]*R[cell[j]][0];
-      a2[i]+=Q[i][j]*R[cell[j]][1];
+      a1[i]+=Q[i][j]*R[cell_in[j]][0];
+      a2[i]+=Q[i][j]*R[cell_in[j]][1];
       if(n==3)
-	a3[i]+=Q[i][j]*R[cell[j]][2];
+	a3[i]+=Q[i][j]*R[cell_in[j]][2];
     }
   }
   //account for adaptation

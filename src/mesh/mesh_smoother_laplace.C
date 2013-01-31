@@ -296,15 +296,15 @@ void LaplaceMeshSmoother::init()
 
 
 
-void LaplaceMeshSmoother::print_graph(std::ostream& out) const
+void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
 {
   for (unsigned int i=0; i<_graph.size(); ++i)
     {
-      out << i << ": ";
+      out_stream << i << ": ";
       std::copy(_graph[i].begin(),
 		_graph[i].end(),
-		std::ostream_iterator<unsigned>(out, " "));
-      out << std::endl;
+		std::ostream_iterator<unsigned>(out_stream, " "));
+      out_stream << std::endl;
     }
 }
 

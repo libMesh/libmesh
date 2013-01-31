@@ -1131,8 +1131,8 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
               {
                 semilocal_elems[elem->id()] = true;
 
-	        for (unsigned int n=0; n != elem->n_nodes(); ++n)
-	          semilocal_nodes[elem->node(n)] = true;
+	        for (unsigned int nn=0; nn != elem->n_nodes(); ++nn)
+	          semilocal_nodes[elem->node(nn)] = true;
 
                 const Elem *parent = elem->parent();
 	        // Don't proceed from a boundary mesh to an interior mesh

@@ -290,11 +290,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   // The x location of the point.
                   Real x=0.;
 
-                  // Shortcut variable
-                  const Real pi = libMesh::pi;
-
                   // Shortcut quantities (do not depend on i)
-                  const Real c = std::cos( pi*i / static_cast<Real>(2*nx) );
+                  const Real c = std::cos( libMesh::pi*i / static_cast<Real>(2*nx) );
 
                   // If i is even, compute a normal Gauss-Lobatto point
                   if (i%2 == 0)
@@ -303,12 +300,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   // Otherwise, it is the average of the previous and next points
                   else
                   {
-                    Real cmin = std::cos( pi*(i-1) / static_cast<Real>(2*nx) );
-                    Real cmax = std::cos( pi*(i+1) / static_cast<Real>(2*nx) );
+                    Real cmin = std::cos( libMesh::pi*(i-1) / static_cast<Real>(2*nx) );
+                    Real cmax = std::cos( libMesh::pi*(i+1) / static_cast<Real>(2*nx) );
 
-                    Real xmin = 0.5*(1.0 - cmin);
-                    Real xmax = 0.5*(1.0 - cmax);
-                    x = 0.5*(xmin + xmax);
+                    Real gl_xmin = 0.5*(1.0 - cmin);
+                    Real gl_xmax = 0.5*(1.0 - cmax);
+                    x = 0.5*(gl_xmin + gl_xmax);
                   }
 
                   mesh.add_point (Point(x,0.,0.), node_id++);
@@ -330,10 +327,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   // The x location of the point
                   Real x=0.;
 
-                  const Real pi = libMesh::pi;
-
                   // Shortcut quantities
-                  const Real c = std::cos( pi*i / static_cast<Real>(3*nx) );
+                  const Real c = std::cos( libMesh::pi*i / static_cast<Real>(3*nx) );
 
                   // If i is multiple of 3, compute a normal Gauss-Lobatto point
                   if (i%3 == 0)
@@ -344,24 +339,24 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
                   {
                     if(i%3 == 1)
                     {
-                      Real cmin = std::cos( pi*(i-1) / static_cast<Real>(3*nx) );
-                      Real cmax = std::cos( pi*(i+2) / static_cast<Real>(3*nx) );
+                      Real cmin = std::cos( libMesh::pi*(i-1) / static_cast<Real>(3*nx) );
+                      Real cmax = std::cos( libMesh::pi*(i+2) / static_cast<Real>(3*nx) );
 
-                      Real xmin = 0.5*(1.0 - cmin);
-                      Real xmax = 0.5*(1.0 - cmax);
+                      Real gl_xmin = 0.5*(1.0 - cmin);
+                      Real gl_xmax = 0.5*(1.0 - cmax);
 
-                      x = (2.*xmin + xmax)/3.;
+                      x = (2.*gl_xmin + gl_xmax)/3.;
                     }
                     else
                     if(i%3 == 2)
                     {
-                      Real cmin = std::cos( pi*(i-2) / static_cast<Real>(3*nx) );
-                      Real cmax = std::cos( pi*(i+1) / static_cast<Real>(3*nx) );
+                      Real cmin = std::cos( libMesh::pi*(i-2) / static_cast<Real>(3*nx) );
+                      Real cmax = std::cos( libMesh::pi*(i+1) / static_cast<Real>(3*nx) );
 
-                      Real xmin = 0.5*(1.0 - cmin);
-                      Real xmax = 0.5*(1.0 - cmax);
+                      Real gl_xmin = 0.5*(1.0 - cmin);
+                      Real gl_xmax = 0.5*(1.0 - cmax);
 
-                      x = (xmin + 2.*xmax)/3.;
+                      x = (gl_xmin + 2.*gl_xmax)/3.;
                     }
 
                   }
@@ -560,11 +555,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		  {
 		    if (gauss_lobatto_grid)
 		      {
-			// Shortcut variable
-			const Real pi = libMesh::pi;
-
-			mesh.add_point (Point(0.5*(1.0 - std::cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
-					      0.5*(1.0 - std::cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
+			mesh.add_point (Point(0.5*(1.0 - std::cos(libMesh::pi*static_cast<Real>(i)/static_cast<Real>(nx))),
+					      0.5*(1.0 - std::cos(libMesh::pi*static_cast<Real>(j)/static_cast<Real>(ny))),
 					      0.), node_id++);
 		      }
 
@@ -589,16 +581,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 			// The x,y locations of the point.
 			Real x=0., y=0.;
 
-			// Shortcut variable
-			const Real pi = libMesh::pi;
-
 			// Shortcut quantities (do not depend on i,j)
-			const Real a = std::cos( pi / static_cast<Real>(2*nx) );
-			const Real b = std::cos( pi / static_cast<Real>(2*ny) );
+			const Real a = std::cos( libMesh::pi / static_cast<Real>(2*nx) );
+			const Real b = std::cos( libMesh::pi / static_cast<Real>(2*ny) );
 
 			// Shortcut quantities (depend on i,j)
-			const Real c = std::cos( pi*i / static_cast<Real>(2*nx) );
-			const Real d = std::cos( pi*j / static_cast<Real>(2*ny) );
+			const Real c = std::cos( libMesh::pi*i / static_cast<Real>(2*nx) );
+			const Real d = std::cos( libMesh::pi*j / static_cast<Real>(2*ny) );
 
 			// If i is even, compute a normal Gauss-Lobatto point
 			if (i%2 == 0)
@@ -937,12 +926,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		    {
 		      if (gauss_lobatto_grid)
 			{
-			  // Shortcut variable
-			  const Real pi = libMesh::pi;
-
-			  mesh.add_point (Point(0.5*(1.0 - std::cos(pi*static_cast<Real>(i)/static_cast<Real>(nx))),
-						0.5*(1.0 - std::cos(pi*static_cast<Real>(j)/static_cast<Real>(ny))),
-						0.5*(1.0 - std::cos(pi*static_cast<Real>(k)/static_cast<Real>(nz)))), node_id++);
+			  mesh.add_point (Point(0.5*(1.0 - std::cos(libMesh::pi*static_cast<Real>(i)/static_cast<Real>(nx))),
+						0.5*(1.0 - std::cos(libMesh::pi*static_cast<Real>(j)/static_cast<Real>(ny))),
+						0.5*(1.0 - std::cos(libMesh::pi*static_cast<Real>(k)/static_cast<Real>(nz)))), node_id++);
 			}
 
 		      else
@@ -967,23 +953,20 @@ void MeshTools::Generation::build_cube(UnstructuredMesh& mesh,
 		    {
 		      if (gauss_lobatto_grid)
 			{
-			  // Shortcut variable
-			  const Real pi = libMesh::pi;
-
 			  // The x,y locations of the point.
 			  Real x=0., y=0., z=0.;
 
 			  // Shortcut quantities (do not depend on i,j)
-			  const Real a = std::cos( pi / static_cast<Real>(2*nx) );
-			  const Real b = std::cos( pi / static_cast<Real>(2*ny) );
+			  const Real a = std::cos( libMesh::pi / static_cast<Real>(2*nx) );
+			  const Real b = std::cos( libMesh::pi / static_cast<Real>(2*ny) );
 
 			  // Shortcut quantities (depend on i,j)
-			  const Real c = std::cos( pi*i / static_cast<Real>(2*nx) );
-			  const Real d = std::cos( pi*j / static_cast<Real>(2*ny) );
+			  const Real c = std::cos( libMesh::pi*i / static_cast<Real>(2*nx) );
+			  const Real d = std::cos( libMesh::pi*j / static_cast<Real>(2*ny) );
 
 			  // Additional shortcut quantities (for 3D)
-			  const Real e = std::cos( pi / static_cast<Real>(2*nz) );
-			  const Real f = std::cos( pi*k / static_cast<Real>(2*nz) );
+			  const Real e = std::cos( libMesh::pi / static_cast<Real>(2*nz) );
+			  const Real f = std::cos( libMesh::pi*k / static_cast<Real>(2*nz) );
 
 			  // If i is even, compute a normal Gauss-Lobatto point
 			  if (i%2 == 0)
