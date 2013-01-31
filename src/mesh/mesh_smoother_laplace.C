@@ -318,18 +318,18 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
     // where:
     // * NA is the number of graph connections for node A
     // * A_0, A_1, etc. are the IDs connected to node A
-    std::vector<unsigned> flat_graph;
+    std::vector<std::size_t> flat_graph;
 
     // Reserve at least enough space for each node to have zero entries
     flat_graph.reserve(_graph.size());
 
-    for (unsigned i=0; i<_graph.size(); ++i)
+    for (std::size_t i=0; i<_graph.size(); ++i)
       {
 	// First push back the number of entries for this node
 	flat_graph.push_back (_graph[i].size());
 
 	// Then push back all the IDs
-	for (unsigned j=0; j<_graph[i].size(); ++j)
+	for (std::size_t j=0; j<_graph[i].size(); ++j)
 	  flat_graph.push_back(_graph[i][j]);
       }
 
@@ -349,21 +349,21 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
     _graph.resize(_mesh.n_nodes());
 
     // Our current position in the allgather'd flat_graph
-    unsigned cursor=0;
+    std::size_t cursor=0;
 
     // There are n_nodes * n_processors vectors to read in total
-    for (unsigned p=0; p<libMesh::n_processors(); ++p)
-      for (unsigned node_ctr=0; node_ctr<_mesh.n_nodes(); ++node_ctr)
+    for (processor_id_type p=0; p<libMesh::n_processors(); ++p)
+      for (dof_id_type node_ctr=0; node_ctr<_mesh.n_nodes(); ++node_ctr)
 	{
 	  // Read the number of entries for this node, move cursor
-	  unsigned n_entries = flat_graph[cursor++];
+	  std::size_t n_entries = flat_graph[cursor++];
 
 	  // Reserve space for that many more entries, then push back
 	  _graph[node_ctr].reserve(_graph[node_ctr].size() + n_entries);
 
 	  // Read all graph connections for this node, move the cursor each time
 	  // Note: there might be zero entries but that's fine
-	  for (unsigned i=0; i<n_entries; ++i)
+	  for (std::size_t i=0; i<n_entries; ++i)
 	    _graph[node_ctr].push_back(flat_graph[cursor++]);
 	}
 
@@ -380,12 +380,12 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
 //      print_graph(graph_stream);
 //
 //      // Print the (local) flat graph for verification
-//      for (unsigned i=0; i<copy_of_flat_graph.size(); ++i)
+//      for (std::size_t i=0; i<copy_of_flat_graph.size(); ++i)
 //	graph_stream << copy_of_flat_graph[i] << " ";
 //      graph_stream << "\n";
 //
 //      // Print the allgather'd grap for verification
-//      for (unsigned i=0; i<flat_graph.size(); ++i)
+//      for (std::size_t i=0; i<flat_graph.size(); ++i)
 //	graph_stream << flat_graph[i] << " ";
 //      graph_stream << "\n";
 //

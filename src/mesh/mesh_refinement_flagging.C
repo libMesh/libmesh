@@ -145,7 +145,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 
     libmesh_assert_less (id, error_per_cell.size());
 
-    const float elem_error = error_per_cell[id];
+    const ErrorVectorReal elem_error = error_per_cell[id];
 
     if (_coarsen_by_parents)
     {
@@ -226,7 +226,7 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
 
     if (_coarsen_by_parents && parent)
     {
-      float parent_error = error_per_parent[parent->id()];
+      ErrorVectorReal parent_error = error_per_parent[parent->id()];
       if (parent_error >= 0.)
       {
 	const Real parent_coarsening_tolerance =
@@ -263,12 +263,12 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   const dof_id_type n_active_elem  = _mesh.n_active_elem();
 
   // The maximum number of active elements to flag for coarsening
-  const unsigned int max_elem_coarsen =
-    static_cast<unsigned int>(_coarsen_fraction * n_active_elem) + 1;
+  const dof_id_type max_elem_coarsen =
+    static_cast<dof_id_type>(_coarsen_fraction * n_active_elem) + 1;
 
   // The maximum number of elements to flag for refinement
-  const unsigned int max_elem_refine  =
-    static_cast<unsigned int>(_refine_fraction  * n_active_elem) + 1;
+  const dof_id_type max_elem_refine  =
+    static_cast<dof_id_type>(_refine_fraction  * n_active_elem) + 1;
 
   // Clean up the refinement flags.  These could be left
   // over from previous refinement steps.
@@ -280,7 +280,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   // Create an vector with active element errors and ids,
   // sorted by highest errors first
   const dof_id_type max_elem_id = _mesh.max_elem_id();
-  std::vector<std::pair<float, dof_id_type> > sorted_error;
+  std::vector<std::pair<ErrorVectorReal, dof_id_type> > sorted_error;
 
   sorted_error.reserve (n_active_elem);
 
@@ -312,7 +312,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   // Create a sorted error vector with coarsenable parent elements
   // only, sorted by lowest errors first
   ErrorVector error_per_parent;
-  std::vector<std::pair<float, unsigned int> > sorted_parent_error;
+  std::vector<std::pair<ErrorVectorReal, dof_id_type> > sorted_parent_error;
   Real parent_error_min, parent_error_max;
 
   create_parent_error_vector(error_per_cell,
@@ -322,15 +322,15 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // create_parent_error_vector sets values for non-parents and
   // non-coarsenable parents to -1.  Get rid of them.
-  for (unsigned int i=0; i != error_per_parent.size(); ++i)
+  for (dof_id_type i=0; i != error_per_parent.size(); ++i)
     if (error_per_parent[i] != -1)
       sorted_parent_error.push_back(std::make_pair(error_per_parent[i], i));
 
   std::sort (sorted_parent_error.begin(), sorted_parent_error.end());
 
   // Keep track of how many elements we plan to coarsen & refine
-  unsigned int coarsen_count = 0;
-  unsigned int refine_count = 0;
+  dof_id_type coarsen_count = 0;
+  dof_id_type refine_count = 0;
 
   const unsigned int dim = _mesh.mesh_dimension();
   unsigned int twotodim = 1;
@@ -343,7 +343,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
     // Every element refinement creates at least
     // 2^dim-1 new elements
     refine_count =
-      std::min(static_cast<unsigned int>(n_elem_new / (twotodim-1)),
+      std::min(static_cast<dof_id_type>(n_elem_new / (twotodim-1)),
 	       max_elem_refine);
   }
   else
@@ -351,7 +351,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
     // Every successful element coarsening is likely to destroy
     // 2^dim-1 net elements.
     coarsen_count =
-      std::min(static_cast<unsigned int>(-n_elem_new / (twotodim-1)),
+      std::min(static_cast<dof_id_type>(-n_elem_new / (twotodim-1)),
 	       max_elem_coarsen);
   }
 
@@ -369,13 +369,13 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // On a ParallelMesh, we need to communicate to know which remote ids
   // correspond to refinable elements
-  unsigned int successful_refine_count = 0;
+  dof_id_type successful_refine_count = 0;
   {
     std::vector<bool> is_refinable(max_elem_id, false);
 
-    for (unsigned int i=0; i != sorted_error.size(); ++i)
+    for (dof_id_type i=0; i != sorted_error.size(); ++i)
       {
-        unsigned int eid = sorted_error[i].second;
+        dof_id_type eid = sorted_error[i].second;
         Elem *elem = _mesh.query_elem(eid);
         if (elem && elem->level() < _max_h_level)
 	  is_refinable[eid] = true;
@@ -384,12 +384,12 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
     if (refine_count > max_elem_refine)
       refine_count = max_elem_refine;
-    for (unsigned int i=0; i != sorted_error.size(); ++i)
+    for (dof_id_type i=0; i != sorted_error.size(); ++i)
       {
         if (successful_refine_count >= refine_count)
           break;
 
-        unsigned int eid = sorted_error[i].second;
+        dof_id_type eid = sorted_error[i].second;
         Elem *elem = _mesh.query_elem(eid);
         if (is_refinable[eid])
           {
@@ -410,15 +410,15 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   if (coarsen_count > max_elem_coarsen)
     coarsen_count = max_elem_coarsen;
 
-  unsigned int successful_coarsen_count = 0;
+  dof_id_type successful_coarsen_count = 0;
   if (coarsen_count)
     {
-      for (unsigned int i=0; i != sorted_parent_error.size(); ++i)
+      for (dof_id_type i=0; i != sorted_parent_error.size(); ++i)
         {
           if (successful_coarsen_count >= coarsen_count * twotodim)
             break;
 
-          unsigned int parent_id = sorted_parent_error[i].second;
+          dof_id_type parent_id = sorted_parent_error[i].second;
           Elem *parent = _mesh.query_elem(parent_id);
 
           // On a ParallelMesh we skip remote elements
@@ -500,7 +500,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   // This vector stores the error and element number for all the
   // active elements.  It will be sorted and the top & bottom
   // elements will then be flagged for coarsening & refinement
-  std::vector<float> sorted_error;
+  std::vector<ErrorVectorReal> sorted_error;
 
   sorted_error.reserve (n_active_elem);
 
@@ -540,7 +540,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   }
 
 
-  float top_error= 0., bottom_error = 0.;
+  ErrorVectorReal top_error= 0., bottom_error = 0.;
 
   // Get the maximum error value corresponding to the
   // bottom n_elem_coarsen elements
@@ -551,7 +551,7 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
       for (unsigned int i=0; i!=dim; ++i)
         twotodim *= 2;
 
-      unsigned int n_parent_coarsen = n_elem_coarsen / (twotodim - 1);
+      dof_id_type n_parent_coarsen = n_elem_coarsen / (twotodim - 1);
 
       if (n_parent_coarsen)
 	bottom_error = sorted_parent_error[n_parent_coarsen - 1];
@@ -638,7 +638,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 
       libmesh_assert_less (id, error_per_cell.size());
 
-      const float elem_error = error_per_cell[id];
+      const ErrorVectorReal elem_error = error_per_cell[id];
 
       // Possibly flag the element for coarsening ...
       if (elem_error <= coarsen_cutoff)

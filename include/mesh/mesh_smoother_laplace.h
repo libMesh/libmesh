@@ -109,7 +109,7 @@ private:
   /**
    * Data structure for holding the L-graph
    */
-  std::vector<std::vector<unsigned int> > _graph;
+  std::vector<std::vector<dof_id_type> > _graph;
 };
 
 
