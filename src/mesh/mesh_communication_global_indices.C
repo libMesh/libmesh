@@ -574,7 +574,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	    libmesh_assert_less (pid, libMesh::n_processors());
 	    libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
-	    const unsigned int global_index = *next_obj_on_proc[pid];
+	    const dof_id_type global_index = *next_obj_on_proc[pid];
 	    libmesh_assert_less (global_index, mesh.n_elem());
 	    elem->set_id() = global_index;
 

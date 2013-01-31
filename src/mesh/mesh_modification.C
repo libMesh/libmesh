@@ -435,7 +435,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * nodes.  We are safe to use node id's since we
    * make sure that these are correctly numbered.
    */
-  std::map<std::vector<unsigned int>, Node*> adj_vertices_to_so_nodes;
+  std::map<std::vector<dof_id_type>, Node*> adj_vertices_to_so_nodes;
 
   /*
    * for speed-up of the \p add_point() method, we
@@ -489,7 +489,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
    * loop so that silly compilers don't repeatedly
    * create and destroy the vector.
    */
-  std::vector<unsigned int> adjacent_vertices_ids;
+  std::vector<dof_id_type> adjacent_vertices_ids;
 
   /**
    * Loop over the low-ordered elements in the _elements vector.
@@ -574,8 +574,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
 
 
 	  // does this set of vertices already has a mid-node added?
-	  std::pair<std::map<std::vector<unsigned int>, Node*>::iterator,
-                    std::map<std::vector<unsigned int>, Node*>::iterator>
+	  std::pair<std::map<std::vector<dof_id_type>, Node*>::iterator,
+                    std::map<std::vector<dof_id_type>, Node*>::iterator>
 	    pos = adj_vertices_to_so_nodes.equal_range (adjacent_vertices_ids);
 
 	  // no, not added yet

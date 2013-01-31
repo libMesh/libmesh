@@ -275,7 +275,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
   this->clean_refinement_flags();
 
   // The target number of elements to add or remove
-  const int n_elem_new = _nelem_target - n_active_elem;
+  const std::ptrdiff_t n_elem_new = _nelem_target - n_active_elem;
 
   // Create an vector with active element errors and ids,
   // sorted by highest errors first
@@ -343,7 +343,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
     // Every element refinement creates at least
     // 2^dim-1 new elements
     refine_count =
-      std::min(static_cast<dof_id_type>(n_elem_new / (twotodim-1)),
+      std::min(libmesh_cast_int<dof_id_type>(n_elem_new / (twotodim-1)),
 	       max_elem_refine);
   }
   else
@@ -351,7 +351,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
     // Every successful element coarsening is likely to destroy
     // 2^dim-1 net elements.
     coarsen_count =
-      std::min(static_cast<dof_id_type>(-n_elem_new / (twotodim-1)),
+      std::min(libmesh_cast_int<dof_id_type>(-n_elem_new / (twotodim-1)),
 	       max_elem_coarsen);
   }
 
