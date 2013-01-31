@@ -80,31 +80,31 @@ void TypeTensor<T>::print(std::ostream& os) const
 
 
 template <typename T>
-void TypeTensor<T>::write_unformatted (std::ostream &out,
+void TypeTensor<T>::write_unformatted (std::ostream &out_stream,
 				       const bool newline) const
 {
-  libmesh_assert (out);
+  libmesh_assert (out_stream);
 
-  out << std::setiosflags(std::ios::showpoint)
+  out_stream << std::setiosflags(std::ios::showpoint)
       << (*this)(0,0) << " "
       << (*this)(0,1) << " "
       << (*this)(0,2) << " ";
   if (newline)
-    out << '\n';
+    out_stream << '\n';
 
-  out << std::setiosflags(std::ios::showpoint)
+  out_stream << std::setiosflags(std::ios::showpoint)
       << (*this)(1,0) << " "
       << (*this)(1,1) << " "
       << (*this)(1,2) << " ";
   if (newline)
-    out << '\n';
+    out_stream << '\n';
 
-  out << std::setiosflags(std::ios::showpoint)
+  out_stream << std::setiosflags(std::ios::showpoint)
       << (*this)(2,0) << " "
       << (*this)(2,1) << " "
       << (*this)(2,2) << " ";
   if (newline)
-    out << '\n';
+    out_stream << '\n';
 }
 
 
