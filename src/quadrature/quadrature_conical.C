@@ -70,22 +70,22 @@ void QConical::conical_product_tri(unsigned int p)
   libmesh_assert_equal_to (gauss1D.n_points(), jac1D.n_points());
 
   // Save the number of points as a convenient variable
-  const unsigned int n_points = gauss1D.n_points();
+  const unsigned int np = gauss1D.n_points();
 
   // Both rules should be between x=0 and x=1
   libmesh_assert_greater_equal (gauss1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (gauss1D.qp(n_points-1)(0), 1.0);
+  libmesh_assert_less_equal (gauss1D.qp(np-1)(0), 1.0);
   libmesh_assert_greater_equal (jac1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (jac1D.qp(n_points-1)(0), 1.0);
+  libmesh_assert_less_equal (jac1D.qp(np-1)(0), 1.0);
 
   // Resize the points and weights vectors
-  _points.resize(n_points * n_points);
-  _weights.resize(n_points * n_points);
+  _points.resize(np * np);
+  _weights.resize(np * np);
 
   // Compute the conical product
   unsigned int gp = 0;
-  for (unsigned int i=0; i<n_points; i++)
-    for (unsigned int j=0; j<n_points; j++)
+  for (unsigned int i=0; i<np; i++)
+    for (unsigned int j=0; j<np; j++)
       {
 	_points[gp](0) = jac1D.qp(j)(0);                          //s[j];
 	_points[gp](1) = gauss1D.qp(i)(0) * (1.-jac1D.qp(j)(0)); //r[i]*(1.-s[j]);
@@ -123,25 +123,25 @@ void QConical::conical_product_tet(unsigned int p)
   libmesh_assert_equal_to (jacA1D.n_points(), jacB1D.n_points());
 
   // Save the number of points as a convenient variable
-  const unsigned int n_points = gauss1D.n_points();
+  const unsigned int np = gauss1D.n_points();
 
   // All rules should be between x=0 and x=1
   libmesh_assert_greater_equal (gauss1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (gauss1D.qp(n_points-1)(0), 1.0);
+  libmesh_assert_less_equal (gauss1D.qp(np-1)(0), 1.0);
   libmesh_assert_greater_equal (jacA1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (jacA1D.qp(n_points-1)(0), 1.0);
+  libmesh_assert_less_equal (jacA1D.qp(np-1)(0), 1.0);
   libmesh_assert_greater_equal (jacB1D.qp(0)(0), 0.0);
-  libmesh_assert_less_equal (jacB1D.qp(n_points-1)(0), 1.0);
+  libmesh_assert_less_equal (jacB1D.qp(np-1)(0), 1.0);
 
   // Resize the points and weights vectors
-  _points.resize(n_points * n_points * n_points);
-  _weights.resize(n_points * n_points * n_points);
+  _points.resize(np * np * np);
+  _weights.resize(np * np * np);
 
   // Compute the conical product
   unsigned int gp = 0;
-  for (unsigned int i=0; i<n_points; i++)
-    for (unsigned int j=0; j<n_points; j++)
-      for (unsigned int k=0; k<n_points; k++)
+  for (unsigned int i=0; i<np; i++)
+    for (unsigned int j=0; j<np; j++)
+      for (unsigned int k=0; k<np; k++)
       {
 	_points[gp](0) = jacB1D.qp(k)(0);                                                  //t[k];
 	_points[gp](1) = jacA1D.qp(j)(0)  * (1.-jacB1D.qp(k)(0));                         //s[j]*(1.-t[k]);
@@ -190,26 +190,26 @@ void QConical::conical_product_pyramid(unsigned int p)
   libmesh_assert_equal_to (gauss1D.n_points(), jac1D.n_points());
 
   // Save the number of points as a convenient variable
-  const unsigned int n_points = gauss1D.n_points();
+  const unsigned int np = gauss1D.n_points();
 
   // Resize the points and weights vectors
-  _points.resize(n_points * n_points * n_points);
-  _weights.resize(n_points * n_points * n_points);
+  _points.resize(np * np * np);
+  _weights.resize(np * np * np);
 
   // Compute the conical product
-  unsigned int qp = 0;
-  for (unsigned int i=0; i<n_points; ++i)
-    for (unsigned int j=0; j<n_points; ++j)
-      for (unsigned int k=0; k<n_points; ++k, ++qp)
+  unsigned int q = 0;
+  for (unsigned int i=0; i<np; ++i)
+    for (unsigned int j=0; j<np; ++j)
+      for (unsigned int k=0; k<np; ++k, ++q)
       {
 	const Real xi=gauss1D.qp(i)(0);
 	const Real yj=gauss1D.qp(j)(0);
 	const Real zk=jac1D.qp(k)(0);
 
-	_points[qp](0) = (1.-zk) * xi;
-	_points[qp](1) = (1.-zk) * yj;
-	_points[qp](2) = zk;
-	_weights[qp]   = gauss1D.w(i) * gauss1D.w(j) * jac1D.w(k);
+	_points[q](0) = (1.-zk) * xi;
+	_points[q](1) = (1.-zk) * yj;
+	_points[q](2) = zk;
+	_weights[q]   = gauss1D.w(i) * gauss1D.w(j) * jac1D.w(k);
       }
 
 

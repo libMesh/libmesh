@@ -475,14 +475,14 @@ Real LaspackVector<T>::max() const
   if (!this->size())
     return -std::numeric_limits<Real>::max();
 
-  Real max = libmesh_real((*this)(0));
+  Real the_max = libmesh_real((*this)(0));
 
   const numeric_index_type n = this->size();
 
   for (numeric_index_type i=1; i<n; i++)
-    max = std::max (max, libmesh_real((*this)(i)));
+    the_max = std::max (the_max, libmesh_real((*this)(i)));
 
-  return max;
+  return the_max;
 }
 
 
@@ -494,14 +494,14 @@ Real LaspackVector<T>::min () const
   if (!this->size())
     return std::numeric_limits<Real>::max();
 
-  Real min = libmesh_real((*this)(0));
+  Real the_min = libmesh_real((*this)(0));
 
   const numeric_index_type n = this->size();
 
   for (numeric_index_type i=1; i<n; i++)
-    min = std::min (min, libmesh_real((*this)(i)));
+    the_min = std::min (the_min, libmesh_real((*this)(i)));
 
-  return min;
+  return the_min;
 }
 
 

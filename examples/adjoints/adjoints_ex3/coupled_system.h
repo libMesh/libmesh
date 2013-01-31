@@ -114,7 +114,12 @@ public:
   // Destructor
   virtual ~CoupledFEMFunctionsx () {}
         
- protected:
+  virtual AutoPtr<FEMFunctionBase<Number> > clone () const
+  {return AutoPtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsx(*this) ); }
+
+  virtual void operator() (const FEMContext&, const Point&,
+			   const Real, DenseVector<Number>&)
+  {libmesh_error();}
 
   virtual Number operator() (const FEMContext&, const Point& p,
 			     const Real time = 0.);
@@ -135,8 +140,13 @@ public:
   // Destructor
   virtual ~CoupledFEMFunctionsy () {}
     
-  
- protected:
+  virtual AutoPtr<FEMFunctionBase<Number> > clone () const
+  {return AutoPtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsy(*this) ); }
+
+  virtual void operator() (const FEMContext&, const Point&,
+			   const Real,
+			   DenseVector<Number>&)
+  {libmesh_error();}
 
   virtual Number operator() (const FEMContext&, const Point& p,
 			     const Real time = 0.);

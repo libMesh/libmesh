@@ -39,6 +39,94 @@
 // zero'th element.
 #define ARRAY_LENGTH(a) (sizeof((a))/sizeof((a)[0]))
 
+// Anonymous namespace for file local data
+namespace
+{
+  // Define equivalence classes of Cubit/Exodus element types that map to
+  // libmesh ElemTypes
+  std::map<std::string, libMeshEnums::ElemType> element_equivalence_map;
+
+  // This function initializes the element_equivalence_map the first time it
+  // is called, and returns early all other times.
+  void init_element_equivalence_map()
+  {
+    if (element_equivalence_map.empty())
+      {
+        // EDGE2 equivalences
+        element_equivalence_map["EDGE2"]  = EDGE2;
+        element_equivalence_map["TRUSS"]  = EDGE2;
+        element_equivalence_map["BEAM"]   = EDGE2;
+        element_equivalence_map["BAR"]    = EDGE2;
+        element_equivalence_map["TRUSS2"] = EDGE2;
+        element_equivalence_map["BEAM2"]  = EDGE2;
+        element_equivalence_map["BAR2"]   = EDGE2;
+
+        // EDGE3 equivalences
+        element_equivalence_map["EDGE3"]  = EDGE3;
+        element_equivalence_map["TRUSS3"] = EDGE3;
+        element_equivalence_map["BEAM3"]  = EDGE3;
+        element_equivalence_map["BAR3"]   = EDGE3;
+
+        // QUAD4 equivalences
+        element_equivalence_map["QUAD"]   = QUAD4;
+        element_equivalence_map["QUAD4"]  = QUAD4;
+        element_equivalence_map["SHELL"]  = QUAD4;
+        element_equivalence_map["SHELL4"] = QUAD4;
+
+        // QUAD8 equivalences
+        element_equivalence_map["QUAD8"]  = QUAD8;
+        element_equivalence_map["SHELL8"] = QUAD8;
+
+        // QUAD9 equivalences
+        element_equivalence_map["QUAD9"]  = QUAD9;
+        element_equivalence_map["SHELL9"] = QUAD9;
+
+        // TRI3 equivalences
+        element_equivalence_map["TRI"]       = TRI3;
+        element_equivalence_map["TRI3"]      = TRI3;
+        element_equivalence_map["TRIANGLE"]  = TRI3;
+        element_equivalence_map["TRISHELL"]  = TRI3;
+        element_equivalence_map["TRISHELL3"] = TRI3;
+
+        // TRI6 equivalences
+        element_equivalence_map["TRI6"]      = TRI6;
+        element_equivalence_map["TRISHELL6"] = TRI6;
+
+        // HEX8 equivalences
+        element_equivalence_map["HEX"]  = HEX8;
+        element_equivalence_map["HEX8"] = HEX8;
+
+        // HEX20 equivalences
+        element_equivalence_map["HEX20"] = HEX20;
+
+        // HEX27 equivalences
+        element_equivalence_map["HEX27"] = HEX27;
+
+        // TET4 equivalences
+        element_equivalence_map["TETRA"]  = TET4;
+        element_equivalence_map["TETRA4"] = TET4;
+
+        // TET10 equivalences
+        element_equivalence_map["TETRA10"] = TET10;
+
+        // PRISM6 equivalences
+        element_equivalence_map["WEDGE"] = PRISM6;
+
+        // PRISM15 equivalences
+        element_equivalence_map["WEDGE15"] = PRISM15;
+
+        // PRISM18 equivalences
+        element_equivalence_map["WEDGE18"] = PRISM18;
+
+        // PYRAMID5 equivalences
+        element_equivalence_map["PYRAMID"]  = PYRAMID5;
+        element_equivalence_map["PYRAMID5"] = PYRAMID5;
+      }
+  }
+}
+
+
+
 namespace libMesh
 {
 
@@ -1522,72 +1610,18 @@ bool ExodusII_IO_Helper::created()
 
 // ------------------------------------------------------------
 // ExodusII_IO_Helper::Conversion class members
-ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversion(const std::string type_str)
+ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversion(std::string type_str)
 {
-  // ExodusII defines the following types in contrib/exodusii/Lib/include/exodusII_int.h
-  // UNK         =  -1
-  // NULL_ELEMENT=   0
-  // TRIANGLE    =   1
-  // QUAD        =   2
-  // HEX         =   3
-  // WEDGE       =   4
-  // TETRA       =   5
-  // TRUSS       =   6
-  // BEAM        =   7
-  // SHELL       =   8
-  // SPHERE      =   9
-  // CIRCLE      =  10
-  // TRISHELL    =  11
-  // PYRAMID     =  12
+  init_element_equivalence_map();
 
-  if (type_str == "EDGE2" || type_str == "TRUSS" || type_str == "BEAM" )
-    return assign_conversion(EDGE2);
+  // Do only upper-case comparisons
+  std::transform(type_str.begin(), type_str.end(), type_str.begin(), ::toupper);
 
-  else if (type_str == "EDGE3" || type_str == "TRUSS" || type_str == "BEAM" )
-    return assign_conversion(EDGE3);
+  std::map<std::string, libMeshEnums::ElemType>::iterator it =
+    element_equivalence_map.find(type_str);
 
-  if ((type_str == "QUAD4") || (type_str == "QUAD") || (type_str == "quad") || (type_str == "quad4"))
-    return assign_conversion(QUAD4);
-
-  else if (type_str == "QUAD8")
-    return assign_conversion(QUAD8);
-
-  else if (type_str == "QUAD9")
-    return assign_conversion(QUAD9);
-
-  else if ((type_str == "TRI3") || (type_str == "TRIANGLE") || (type_str == "TRI") || (type_str == "tri"))
-    return assign_conversion(TRI3);
-
-  else if (type_str == "TRI6")
-    return assign_conversion(TRI6);
-
-  else if ((type_str == "HEX8") || (type_str == "HEX") || (type_str=="hex8"))
-    return assign_conversion(HEX8);
-
-  else if (type_str == "HEX20")
-    return assign_conversion(HEX20);
-
-  else if (type_str == "HEX27")
-    return assign_conversion(HEX27);
-
-  else if ((type_str == "TETRA4") || (type_str == "TETRA"))
-    return assign_conversion(TET4);
-
-  else if (type_str == "TETRA10")
-    return assign_conversion(TET10);
-
-  else if (type_str == "WEDGE")
-    return assign_conversion(PRISM6);
-
-  else if (type_str == "WEDGE15")
-    return assign_conversion(PRISM15);
-
-  else if (type_str == "WEDGE18")
-    return assign_conversion(PRISM18);
-
-  else if (type_str == "PYRAMID" || type_str == "PYRAMID5")
-    return assign_conversion(PYRAMID5);
-
+  if (it != element_equivalence_map.end())
+    return assign_conversion( it->second );
   else
     {
       libMesh::err << "ERROR! Unrecognized element type_str: " << type_str << std::endl;
@@ -1597,17 +1631,7 @@ ExodusII_IO_Helper::Conversion ExodusII_IO_Helper::ElementMaps::assign_conversio
   libmesh_error();
 
   // dummy return value, we won't get here
-  const Conversion conv(tri3_node_map,
-			ARRAY_LENGTH(tri3_node_map),
-			tri3_node_map, // inverse node map same as forward node map
-			ARRAY_LENGTH(tri3_node_map),
-			tri_edge_map,
-			ARRAY_LENGTH(tri_edge_map),
-			tri_inverse_edge_map,
-			ARRAY_LENGTH(tri_inverse_edge_map),
-			TRI3,
-			"TRI3");
-  return conv;
+  return assign_conversion (EDGE2);
 }
 
 

@@ -25,14 +25,14 @@ namespace libMesh
 {
 
 
-void QGauss::init_2D(const ElemType _type,
+void QGauss::init_2D(const ElemType type_in,
                      unsigned int p)
 {
 #if LIBMESH_DIM > 1
 
   //-----------------------------------------------------------------------
   // 2D quadrature rules
-  switch (_type)
+  switch (type_in)
     {
 
 
@@ -330,7 +330,7 @@ void QGauss::init_2D(const ElemType _type,
 
 	      // In each of the rows below, the first two entries are (z1, z2) which imply
 	      // z3.  The third entry is the weight for each of the points in the cyclic permutation.
-	      const Real p[nrows][3] = {
+	      const Real rule_data[nrows][3] = {
 		{6.2382265094402118e-02, 6.7517867073916085e-02, 2.6517028157436251e-02}, // group A
 		{5.5225456656926611e-02, 3.2150249385198182e-01, 4.3881408714446055e-02}, // group B
 		{3.4324302945097146e-02, 6.6094919618673565e-01, 2.8775042784981585e-02}, // group C
@@ -339,14 +339,14 @@ void QGauss::init_2D(const ElemType _type,
 
 	      for (unsigned int i=0, offset=0; i<nrows; ++i)
 		{
-		  _points[offset + 0] = Point(p[i][0],            p[i][1]); // (z1,z2)
-		  _points[offset + 1] = Point(1.-p[i][0]-p[i][1], p[i][0]); // (z3,z1)
-		  _points[offset + 2] = Point(p[i][1], 1.-p[i][0]-p[i][1]); // (z2,z3)
+		  _points[offset + 0] = Point(rule_data[i][0],                    rule_data[i][1]); // (z1,z2)
+		  _points[offset + 1] = Point(1.-rule_data[i][0]-rule_data[i][1], rule_data[i][0]); // (z3,z1)
+		  _points[offset + 2] = Point(rule_data[i][1], 1.-rule_data[i][0]-rule_data[i][1]); // (z2,z3)
 
 		  // All these points get the same weight
-		  _weights[offset + 0] = p[i][2];
-		  _weights[offset + 1] = p[i][2];
-		  _weights[offset + 2] = p[i][2];
+		  _weights[offset + 0] = rule_data[i][2];
+		  _weights[offset + 1] = rule_data[i][2];
+		  _weights[offset + 2] = rule_data[i][2];
 
 		  // Increment offset
 		  offset += 3;
@@ -1052,7 +1052,7 @@ void QGauss::init_2D(const ElemType _type,
 	      _weights.resize(73);
 
 	      // The raw data for the quadrature rule.
-	      const Real p[17][4] = {
+	      const Real rule_data[17][4] = {
 		{                1./3.,                    0.,                    0., 0.032906331388919e+00 / 2.0}, // 1-perm
 		{0.020780025853987e+00, 0.489609987073006e+00,                    0., 0.010330731891272e+00 / 2.0}, // 3-perm
 		{0.090926214604215e+00, 0.454536892697893e+00,                    0., 0.022387247263016e+00 / 2.0}, // 3-perm
@@ -1074,7 +1074,7 @@ void QGauss::init_2D(const ElemType _type,
 
 
 	      // Now call the dunavant routine to generate _points and _weights
-	      dunavant_rule(p, 17);
+	      dunavant_rule(rule_data, 17);
 
 	      return;
 	    }
@@ -1099,7 +1099,7 @@ void QGauss::init_2D(const ElemType _type,
 	      _weights.resize(85);
 
 	      // The raw data for the quadrature rule.
-	      const Real p[19][4] = {
+	      const Real rule_data[19][4] = {
 		{0.33333333333333e+00,                  0.0,                  0.0, 0.2761042699769952e-01 / 2.0}, // 1-perm
 		{0.00150064932443e+00, 0.49924967533779e+00,                  0.0, 0.1779029547326740e-02 / 2.0}, // 3-perm
 		{0.09413975193895e+00, 0.45293012403052e+00,                  0.0, 0.2011239811396117e-01 / 2.0}, // 3-perm
@@ -1123,7 +1123,7 @@ void QGauss::init_2D(const ElemType _type,
 
 
 	      // Now call the dunavant routine to generate _points and _weights
-	      dunavant_rule(p, 19);
+	      dunavant_rule(rule_data, 19);
 
 	      return;
 	    }
@@ -1153,7 +1153,7 @@ void QGauss::init_2D(const ElemType _type,
 	      _weights.resize(126);
 
 	      // The raw data for the quadrature rule.
-	      const Real p[26][4] = {
+	      const Real rule_data[26][4] = {
 		{0.02794648307317e+00, 0.48602675846341e+00,                  0.0, 0.8005581880020417e-02 / 2.0},  // 3-perm
 		{0.13117860132765e+00, 0.43441069933617e+00,                  0.0, 0.1594707683239050e-01 / 2.0},  // 3-perm
 		{0.22022172951207e+00, 0.38988913524396e+00,                  0.0, 0.1310914123079553e-01 / 2.0},  // 3-perm
@@ -1184,7 +1184,7 @@ void QGauss::init_2D(const ElemType _type,
 
 
 	      // Now call the dunavant routine to generate _points and _weights
-	      dunavant_rule(p, 26);
+	      dunavant_rule(rule_data, 26);
 
 	      return;
 	    }
@@ -1214,7 +1214,7 @@ void QGauss::init_2D(const ElemType _type,
 	      _weights.resize(175);
 
 	      // The raw data for the quadrature rule.
-	      const Real p[36][4] = {
+	      const Real rule_data[36][4] = {
 		{0.33333333333333e+00,                  0.0,                  0.0, 0.1557996020289920e-01 / 2.0}, // 1-perm
 		{0.00733011643277e+00, 0.49633494178362e+00,                  0.0, 0.3177233700534134e-02 / 2.0}, // 3-perm
 		{0.08299567580296e+00, 0.45850216209852e+00,                  0.0, 0.1048342663573077e-01 / 2.0}, // 3-perm
@@ -1255,7 +1255,7 @@ void QGauss::init_2D(const ElemType _type,
 
 
 	      // Now call the dunavant routine to generate _points and _weights
-	      dunavant_rule(p, 36);
+	      dunavant_rule(rule_data, 36);
 
 	      return;
 	    }
@@ -1273,7 +1273,7 @@ void QGauss::init_2D(const ElemType _type,
 	      // automatically generate using a 1D Gauss rule on
 	      // [0,1] and two 1D Jacobi-Gauss rules on [0,1].
 	      QConical conical_rule(2, _order);
-	      conical_rule.init(_type, p);
+	      conical_rule.init(type_in, p);
 
 	      // Swap points and weights with the about-to-be destroyed rule.
 	      _points.swap (conical_rule.get_points() );
@@ -1289,7 +1289,7 @@ void QGauss::init_2D(const ElemType _type,
       // Unsupported type
     default:
       {
-	libMesh::err << "Element type not supported!:" << _type << std::endl;
+	libMesh::err << "Element type not supported!:" << type_in << std::endl;
 	libmesh_error();
       }
     }

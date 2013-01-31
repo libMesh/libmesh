@@ -25,7 +25,7 @@ namespace libMesh
 
 
 
-void QGrundmann_Moller::init_3D(const ElemType _type,
+void QGrundmann_Moller::init_3D(const ElemType type_in,
 				unsigned int p)
 {
   // Nearly all GM rules contain negative weights, so if you are not
@@ -41,7 +41,7 @@ void QGrundmann_Moller::init_3D(const ElemType _type,
       libmesh_error();
     }
 
-  switch (_type)
+  switch (type_in)
     {
     case TET4:
     case TET10:
@@ -58,10 +58,10 @@ void QGrundmann_Moller::init_3D(const ElemType _type,
       // Unsupported element type
     default:
       {
-	libMesh::err << "ERROR: Unsupported element type: " << _type << std::endl;
+	libMesh::err << "ERROR: Unsupported element type: " << type_in << std::endl;
 	libmesh_error();
       }
-    } // end switch (_type)
+    } // end switch (type_in)
 
   // We must have returned or errored-out by this point.  If not,
   // throw an error now.

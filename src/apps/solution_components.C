@@ -24,6 +24,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/id_types.h"
 
 unsigned int dim = 2; // This gets overridden by most mesh formats
 
@@ -130,7 +131,7 @@ int main(int argc, char** argv)
 
           for(unsigned int i=0; i<n_comp; i++)
             {
-              const unsigned int
+              const dof_id_type
                 old_index = old_node->dof_number
                   (old_sys_num[pairnum], old_var_num[pairnum], i),
                 new_index = new_node->dof_number
@@ -169,7 +170,7 @@ int main(int argc, char** argv)
 
           for(unsigned int i=0; i<n_comp; i++)
             {
-              const unsigned int
+              const dof_id_type
                 old_index = old_elem->dof_number
                   (old_sys_num[pairnum], old_var_num[pairnum], i),
                 new_index = new_elem->dof_number

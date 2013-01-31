@@ -61,9 +61,9 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 
   // Initize the _csr data structure.
   {
-    std::vector<numeric_index_type>::iterator pos = _csr.begin();
+    std::vector<numeric_index_type>::iterator position = _csr.begin();
 
-    _row_start.push_back (pos);
+    _row_start.push_back (position);
 
     for (numeric_index_type row=0; row<n_rows; row++)
       {
@@ -71,12 +71,12 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 	for (SparsityPattern::Row::const_iterator col = sparsity_pattern[row].begin();
 	     col != sparsity_pattern[row].end(); ++col)
 	  {
-	    libmesh_assert (pos != _csr.end());
-	    *pos = *col;
-	    ++pos;
+	    libmesh_assert (position != _csr.end());
+	    *position = *col;
+	    ++position;
 	  }
 
-	_row_start.push_back (pos);
+	_row_start.push_back (position);
       }
   }
 
@@ -124,17 +124,17 @@ void LaspackMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &sp
 
 
 template <typename T>
-void LaspackMatrix<T>::init (const numeric_index_type libmesh_dbg_var(m),
-			     const numeric_index_type libmesh_dbg_var(n),
+void LaspackMatrix<T>::init (const numeric_index_type libmesh_dbg_var(m_in),
+			     const numeric_index_type libmesh_dbg_var(n_in),
 			     const numeric_index_type libmesh_dbg_var(m_l),
 			     const numeric_index_type libmesh_dbg_var(n_l),
 			     const numeric_index_type libmesh_dbg_var(nnz),
 			     const numeric_index_type)
 {
   // noz ignored...  only used for multiple processors!
-  libmesh_assert_equal_to (m, m_l);
-  libmesh_assert_equal_to (n, n_l);
-  libmesh_assert_equal_to (m, n);
+  libmesh_assert_equal_to (m_in, m_l);
+  libmesh_assert_equal_to (n_in, n_l);
+  libmesh_assert_equal_to (m_in, n_in);
   libmesh_assert_greater (nnz, 0);
 
 
@@ -161,19 +161,19 @@ void LaspackMatrix<T>::init ()
   if (this->initialized())
     this->clear();
 
-  const numeric_index_type m   = this->_dof_map->n_dofs();
+  const numeric_index_type n_rows   = this->_dof_map->n_dofs();
 #ifndef NDEBUG
   // The following variables are only used for assertions,
   // so avoid declaring them when asserts are inactive.
-  const numeric_index_type n   = m;
+  const numeric_index_type n_cols   = n_rows;
   const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(0);
   const numeric_index_type m_l = n_l;
 #endif
 
   // Laspack Matrices only work for uniprocessor cases
-  libmesh_assert_equal_to (m, n);
-  libmesh_assert_equal_to (m_l, m);
-  libmesh_assert_equal_to (n_l, n);
+  libmesh_assert_equal_to (n_rows, n_cols);
+  libmesh_assert_equal_to (m_l, n_rows);
+  libmesh_assert_equal_to (n_l, n_cols);
 
 #ifndef NDEBUG
   // The following variables are only used for assertions,
@@ -186,14 +186,14 @@ void LaspackMatrix<T>::init ()
   libmesh_assert_equal_to (n_nz.size(), n_l);
   libmesh_assert_equal_to (n_oz.size(), n_l);
 
-  if (m==0)
+  if (n_rows==0)
     return;
 
-  Q_Constr(&_QMat, const_cast<char*>("Mat"), m, _LPFalse, Rowws, Normal, _LPTrue);
+  Q_Constr(&_QMat, const_cast<char*>("Mat"), n_rows, _LPFalse, Rowws, Normal, _LPTrue);
 
   this->_is_initialized = true;
 
-  libmesh_assert_equal_to (m, this->m());
+  libmesh_assert_equal_to (n_rows, this->m());
 }
 
 

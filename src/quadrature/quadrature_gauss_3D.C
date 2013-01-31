@@ -25,14 +25,14 @@
 namespace libMesh
 {
 
-void QGauss::init_3D(const ElemType _type,
+void QGauss::init_3D(const ElemType type_in,
                      unsigned int p)
 {
 #if LIBMESH_DIM == 3
 
   //-----------------------------------------------------------------------
   // 3D quadrature rules
-  switch (_type)
+  switch (type_in)
     {
       //---------------------------------------------
       // Hex quadrature rules
@@ -169,7 +169,7 @@ void QGauss::init_3D(const ElemType _type,
 		  // product rule is third-order accurate and has less points than
 		  // the next-available positive-weight rule at FIFTH order.
 		  QConical conical_rule(3, _order);
-		  conical_rule.init(_type, p);
+		  conical_rule.init(type_in, p);
 
 		  // Swap points and weights with the about-to-be destroyed rule.
 		  _points.swap (conical_rule.get_points() );
@@ -202,7 +202,7 @@ void QGauss::init_3D(const ElemType _type,
 		  _weights.resize(11);
 
 		  // The raw data for the quadrature rule.
-		  const Real p[3][4] = {
+		  const Real rule_data[3][4] = {
 		    {0.250000000000000000e+00,                         0.,                            0.,  -0.131555555555555556e-01},  // 1
 		    {0.785714285714285714e+00,   0.714285714285714285e-01,                            0.,   0.762222222222222222e-02},  // 4
 		    {0.399403576166799219e+00,                         0.,      0.100596423833200785e+00,   0.248888888888888889e-01}   // 6
@@ -210,7 +210,7 @@ void QGauss::init_3D(const ElemType _type,
 
 
 		  // Now call the keast routine to generate _points and _weights
-		  keast_rule(p, 3);
+		  keast_rule(rule_data, 3);
 
 		  return;
 		} // end if (allow_rules_with_negative_weights)
@@ -238,11 +238,11 @@ void QGauss::init_3D(const ElemType _type,
 				 0.092735250310891226402,   // a2 from the paper
 				 0.045503704125649649492};  // a3 from the paper
 
-	      // weights.  a[] and w[] are the only floating-point inputs required
+	      // weights.  a[] and wt[] are the only floating-point inputs required
 	      // for this rule.
-	      const Real w[3] = {0.018781320953002641800,    // w1 from the paper
-				 0.012248840519393658257,    // w2 from the paper
-				 0.0070910034628469110730};  // w3 from the paper
+	      const Real wt[3] = {0.018781320953002641800,    // w1 from the paper
+                                  0.012248840519393658257,    // w2 from the paper
+                                  0.0070910034628469110730};  // w3 from the paper
 
 	      // The first two sets of 4 points are formed in a similar manner
 	      for (unsigned int i=0; i<2; ++i)
@@ -262,7 +262,7 @@ void QGauss::init_3D(const ElemType _type,
 
 		  // These 4 points all have the same weights
 		  for (unsigned int j=0; j<4; ++j)
-		    _weights[offset + j] = w[i];
+		    _weights[offset + j] = wt[i];
 		} // end for
 
 
@@ -282,7 +282,7 @@ void QGauss::init_3D(const ElemType _type,
 
 		// These 6 points all have the same weights
 		for (unsigned int j=0; j<6; ++j)
-		  _weights[offset + j] = w[2];
+		  _weights[offset + j] = wt[2];
 	      }
 
 
@@ -403,7 +403,7 @@ void QGauss::init_3D(const ElemType _type,
 	      _weights.resize(24);
 
 	      // The raw data for the quadrature rule.
-	      const Real p[4][4] = {
+	      const Real rule_data[4][4] = {
 		{0.356191386222544953e+00 , 0.214602871259151684e+00 ,                       0., 0.00665379170969464506e+00}, // 4
 		{0.877978124396165982e+00 , 0.0406739585346113397e+00,                       0., 0.00167953517588677620e+00}, // 4
 		{0.0329863295731730594e+00, 0.322337890142275646e+00 ,                       0., 0.00922619692394239843e+00}, // 4
@@ -412,7 +412,7 @@ void QGauss::init_3D(const ElemType _type,
 
 
 	      // Now call the keast routine to generate _points and _weights
-	      keast_rule(p, 4);
+	      keast_rule(rule_data, 4);
 
 	      return;
 	    }
@@ -434,7 +434,7 @@ void QGauss::init_3D(const ElemType _type,
 		  _weights.resize(45);
 
 		  // The raw data for the quadrature rule.
-		  const Real p[7][4] = {
+		  const Real rule_data[7][4] = {
 		    {0.250000000000000000e+00,                        0.,                        0.,   -0.393270066412926145e-01},  // 1
 		    {0.617587190300082967e+00,  0.127470936566639015e+00,                        0.,    0.408131605934270525e-02},  // 4
 		    {0.903763508822103123e+00,  0.320788303926322960e-01,                        0.,    0.658086773304341943e-03},  // 4
@@ -446,7 +446,7 @@ void QGauss::init_3D(const ElemType _type,
 
 
 		  // Now call the keast routine to generate _points and _weights
-		  keast_rule(p, 7);
+		  keast_rule(rule_data, 7);
 
 		  return;
 		} // end if (allow_rules_with_negative_weights)
@@ -466,7 +466,7 @@ void QGauss::init_3D(const ElemType _type,
 		  // to round-off error.  Safest is to disallow rules with negative
 		  // weights, but this decision should be made on a case-by-case basis.
 		  QGrundmann_Moller gm_rule(3, _order);
-		  gm_rule.init(_type, p);
+		  gm_rule.init(type_in, p);
 
 		  // Swap points and weights with the about-to-be destroyed rule.
 		  _points.swap (gm_rule.get_points() );
@@ -484,7 +484,7 @@ void QGauss::init_3D(const ElemType _type,
 		  // automatically generate using a 1D Gauss rule on
 		  // [0,1] and two 1D Jacobi-Gauss rules on [0,1].
 		  QConical conical_rule(3, _order);
-		  conical_rule.init(_type, p);
+		  conical_rule.init(type_in, p);
 
 		  // Swap points and weights with the about-to-be destroyed rule.
 		  _points.swap (conical_rule.get_points() );
@@ -532,7 +532,7 @@ void QGauss::init_3D(const ElemType _type,
 	// from: Stroud, A.H. "Approximate Calculation of Multiple
 	// Integrals."
 	QConical conical_rule(3, _order);
-	conical_rule.init(_type, p);
+	conical_rule.init(type_in, p);
 
 	// Swap points and weights with the about-to-be destroyed rule.
 	_points.swap (conical_rule.get_points() );
@@ -548,7 +548,7 @@ void QGauss::init_3D(const ElemType _type,
       // Unsupported type
     default:
       {
-	libMesh::err << "ERROR: Unsupported type: " << _type << std::endl;
+	libMesh::err << "ERROR: Unsupported type: " << type_in << std::endl;
 	libmesh_error();
       }
     }

@@ -99,9 +99,9 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    // Be sure we have enough space to insert these points
 	    libmesh_assert_less (offset + 3, _points.size());
 
-	    const Real a = rule_data[p][0];
-	    const Real b = rule_data[p][1];
-	    const Real w = rule_data[p][3];
+	    const Real a  = rule_data[p][0];
+	    const Real b  = rule_data[p][1];
+	    const Real wt = rule_data[p][3];
 
 	    // Here it's understood the second entry is to be used twice, and
 	    // thus there are three possible permutations.
@@ -111,7 +111,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    _points[offset + 3] = Point(b,b,b);
 
 	    for (unsigned int j=0; j<pointtype; ++j)
-	      _weights[offset + j] = w;
+	      _weights[offset + j] = wt;
 
 	    offset += pointtype;
 	    break;
@@ -122,9 +122,9 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    // Be sure we have enough space to insert these points
 	    libmesh_assert_less (offset + 5, _points.size());
 
-	    const Real a = rule_data[p][0];
-	    const Real b = rule_data[p][2];
-	    const Real w = rule_data[p][3];
+	    const Real a  = rule_data[p][0];
+	    const Real b  = rule_data[p][2];
+	    const Real wt = rule_data[p][3];
 
 	    // Three individual entries with six permutations.
 	    _points[offset + 0] = Point(a,a,b);
@@ -135,7 +135,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    _points[offset + 5] = Point(a,b,a);
 
 	    for (unsigned int j=0; j<pointtype; ++j)
-	      _weights[offset + j] = w;
+	      _weights[offset + j] = wt;
 
 	    offset += pointtype;
 	    break;
@@ -147,10 +147,10 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    // Be sure we have enough space to insert these points
 	    libmesh_assert_less (offset + 11, _points.size());
 
-	    const Real a = rule_data[p][0];
-	    const Real b = rule_data[p][1];
-	    const Real c = rule_data[p][2];
-	    const Real w = rule_data[p][3];
+	    const Real a  = rule_data[p][0];
+	    const Real b  = rule_data[p][1];
+	    const Real c  = rule_data[p][2];
+	    const Real wt = rule_data[p][3];
 
 	    // Three individual entries with six permutations.
 	    _points[offset + 0] = Point(a,a,b);  _points[offset + 6]  = Point(a,b,c);
@@ -161,7 +161,7 @@ void QGauss::keast_rule(const Real rule_data[][4],
 	    _points[offset + 5] = Point(a,c,a);	 _points[offset + 11] = Point(c,b,a);
 
 	    for (unsigned int j=0; j<pointtype; ++j)
-	      _weights[offset + j] = w;
+	      _weights[offset + j] = wt;
 
 	    offset += pointtype;
 	    break;

@@ -33,6 +33,7 @@
 #include "libmesh/qoi_set.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/variable.h"
+#include "libmesh/fem_function_base.h"
 
 // C++ includes
 #include <cstddef>
@@ -470,6 +471,18 @@ public:
 
   /**
    * Projects arbitrary functions onto the current solution.
+   * The function value \p f and its gradient \p g are
+   * user-provided cloneable functors.
+   * A gradient \p g is only required/used for projecting onto finite
+   * element spaces with continuous derivatives.
+   * If non-default \p Parameters are to be used, they can be provided
+   * in the \p parameters argument.
+   */
+  void project_solution (FEMFunctionBase<Number> *f,
+                         FEMFunctionBase<Gradient> *g = NULL) const;
+
+  /**
+   * Projects arbitrary functions onto the current solution.
    * The function value \p fptr and its gradient \p gptr are
    * represented by function pointers.
    * A gradient \p gptr is only required/used for projecting onto
@@ -498,6 +511,20 @@ public:
   void project_vector (NumericVector<Number>& new_vector,
                        FunctionBase<Number> *f,
                        FunctionBase<Gradient> *g = NULL) const;
+
+  /**
+   * Projects arbitrary functions onto a vector of degree of freedom
+   * values for the current system.
+   * The function value \p f and its gradient \p g are
+   * user-provided cloneable functors.
+   * A gradient \p g is only required/used for projecting onto finite
+   * element spaces with continuous derivatives.
+   * If non-default \p Parameters are to be used, they can be provided
+   * in the \p parameters argument.
+   */
+  void project_vector (NumericVector<Number>& new_vector,
+                       FEMFunctionBase<Number> *f,
+                       FEMFunctionBase<Gradient> *g = NULL) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
