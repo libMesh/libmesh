@@ -24,6 +24,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/id_types.h"
 
 unsigned int dim = 2; // This gets overridden by most mesh formats
 
