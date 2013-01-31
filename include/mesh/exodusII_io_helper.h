@@ -1119,7 +1119,7 @@ public:
   /**
    * @returns a conversion object given an element type name.
    */
-  ExodusII_IO_Helper::Conversion assign_conversion(const std::string type_str);
+  ExodusII_IO_Helper::Conversion assign_conversion(std::string type_str);
 
   /**
    * @returns a conversion object given an element type.
