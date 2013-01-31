@@ -24,7 +24,7 @@ namespace libMesh
 {
 
 
-void QGrid::init_3D(const ElemType _type,
+void QGrid::init_3D(const ElemType type_in,
                     unsigned int)
 {
 #if LIBMESH_DIM == 3
@@ -33,7 +33,7 @@ void QGrid::init_3D(const ElemType _type,
   // 3D quadrature rules
 
   // We ignore p - the grid rule is just for experimentation
-  switch (_type)
+  switch (type_in)
     {
       //---------------------------------------------
       // Hex quadrature rules
@@ -138,7 +138,7 @@ void QGrid::init_3D(const ElemType _type,
       // Unsupported type
     default:
       {
-	libMesh::err << "ERROR: Unsupported type: " << _type << std::endl;
+	libMesh::err << "ERROR: Unsupported type: " << type_in << std::endl;
 	libmesh_error();
       }
     }
