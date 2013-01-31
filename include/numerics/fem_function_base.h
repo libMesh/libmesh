@@ -47,16 +47,16 @@ class FEMFunctionBase
 protected:
 
   /**
-   * Constructor.  Optionally takes a master.
+   * Constructor.
    */
-FEMFunctionBase () {};
+  FEMFunctionBase () {};
 
 public:
 
   /**
    * Destructor.
    */
-virtual ~FEMFunctionBase () {};
+  virtual ~FEMFunctionBase () {};
 
 
   /**
@@ -65,8 +65,14 @@ virtual ~FEMFunctionBase () {};
    * Most problems will want to reimplement this for efficiency, in
    * order to call FE::get_*() as their particular function requires.
    */
-virtual void init_context (const FEMContext &) {}
+  virtual void init_context (const FEMContext &) {}
 
+  /**
+   * Returns a new copy of the function.  The new copy should be as
+   * ``deep'' as necessary to allow independent destruction and
+   * simultaneous evaluations of the copies in different threads.
+   */
+  virtual AutoPtr<FEMFunctionBase<Output> > clone () const = 0;
 
   // ------------------------------------------------------
   // misc
@@ -76,21 +82,73 @@ virtual void init_context (const FEMContext &) {}
    * Purely virtual, so you have to overload it.
    * Note that this cannot be a const method, check \p MeshFunction.
    */
-virtual Output operator() (const FEMContext&, const Point& p,
+  virtual Output operator() (const FEMContext&, const Point& p,
 			     const Real time = 0.) = 0;
 
+
+  /**
+   * Return function for vectors.
+   * Returns in \p output the values of the data at the
+   * coordinate \p p.
+   */
+  void operator() (const FEMContext&, const Point& p,
+		   DenseVector<Output>& output);
+
+  /**
+   * Return function for vectors.
+   * Returns in \p output the values of the data at the
+   * coordinate \p p and for time \p time.
+   * Purely virtual, so you have to overload it.
+   * Note that this cannot be a const method, check \p MeshFunction.
+   */
+  virtual void operator() (const FEMContext&, const Point& p,
+			   const Real time,
+			   DenseVector<Output>& output) = 0;
+
+  /**
+   * @returns the vector component \p i at coordinate
+   * \p p and time \p time.
+   * Subclasses aren't required to overload this, since the default
+   * implementation is based on the full vector evaluation, which is
+   * often correct.
+   * Subclasses are recommended to overload this, since the default
+   * implementation is based on a vector evaluation, which is usually
+   * unnecessarily inefficient.
+   */
+  virtual Output component(const FEMContext&, unsigned int i,
+                           const Point& p,
+			   Real time=0.);
 
 
 protected:
 
-/**
- * Variable index to decide which overloaded function should
- * be accessed
- */
-
-unsigned int var_index ;
+  /**
+   * Variable index to decide which overloaded function should
+   * be accessed
+   */
+  unsigned int var_index ;
 
 };
+
+template <typename Output>
+inline
+Output FEMFunctionBase<Output>::component (const FEMContext& context, unsigned int i,
+					   const Point& p,
+					   Real time)
+{
+  DenseVector<Output> out(i+1);
+  (*this)(context, p, time, out);
+  return out(i);
+}
+
+template <typename Output>
+inline
+void FEMFunctionBase<Output>::operator() (const FEMContext& context, const Point& p,
+					  DenseVector<Output>& output)
+{
+  // Call the time-dependent function with t=0.
+  this->operator()(context, p, 0., output);
+}
 
 } // namespace libMesh
 
