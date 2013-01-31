@@ -61,7 +61,7 @@ void LinearPartitioner::_do_partition (MeshBase& mesh,
           {
             Elem *elem = *elem_it;
 	    elem->processor_id() =
-	      libmesh_cast_int<processor_id>(e/blksize);
+	      libmesh_cast_int<processor_id_type>(e/blksize);
           }
 	else
           {
