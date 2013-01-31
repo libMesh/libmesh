@@ -943,13 +943,13 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
   libmesh_assert_less_equal (send_list.size(), this->size());
   libmesh_assert_less_equal (last_local_idx+1, this->size());
 
-  const numeric_index_type size       = this->size();
-  const numeric_index_type local_size = (last_local_idx - first_local_idx + 1);
+  const numeric_index_type my_size       = this->size();
+  const numeric_index_type my_local_size = (last_local_idx - first_local_idx + 1);
   PetscErrorCode ierr=0;
 
   // Don't bother for serial cases
 //  if ((first_local_idx == 0) &&
-//      (local_size == size))
+//      (my_local_size == my_size))
   // But we do need to stay in sync for degenerate cases
   if (libMesh::n_processors() == 1)
     return;
@@ -959,7 +959,7 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
   // parts of (*this)
   PetscVector<T> parallel_vec;
 
-  parallel_vec.init (size, local_size, true, PARALLEL);
+  parallel_vec.init (my_size, my_local_size, true, PARALLEL);
 
 
   // Copy part of *this into the parallel_vec
@@ -968,12 +968,12 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
     VecScatter scatter;
 
     // Create idx, idx[i] = i+first_local_idx;
-    std::vector<PetscInt> idx(local_size);
+    std::vector<PetscInt> idx(my_local_size);
     Utility::iota (idx.begin(), idx.end(), first_local_idx);
 
     // Create the index set & scatter object
-    ierr = ISCreateLibMesh(libMesh::COMM_WORLD, local_size,
-                           local_size ? &idx[0] : NULL, PETSC_USE_POINTER, &is);
+    ierr = ISCreateLibMesh(libMesh::COMM_WORLD, my_local_size,
+                           my_local_size ? &idx[0] : NULL, PETSC_USE_POINTER, &is);
            CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
     ierr = VecScatterCreate(_vec,              is,
