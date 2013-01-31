@@ -82,7 +82,7 @@ class TecplotIO : public MeshOutput<MeshBase>
    * Solution time for transient data.
    * Written to newer binary formats that are time-aware.
    */
-  Real & time ();
+  double & time ();
   
   /**
    * Strand offset for this file.  Each mesh block will
@@ -161,7 +161,7 @@ bool & TecplotIO::binary ()
 
 
 inline
-Real & TecplotIO::time ()
+double & TecplotIO::time ()
 {
   return _time;
 }
