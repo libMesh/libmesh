@@ -112,7 +112,7 @@ public:
    * @returns the old nonlinear solution for the specified global
    * DOF.
    */
-  Number old_nonlinear_solution (const unsigned int global_dof_number) const;
+  Number old_nonlinear_solution (const dof_id_type global_dof_number) const;
 
   /**
    * Serial vector of _system.get_vector("_old_nonlinear_solution")

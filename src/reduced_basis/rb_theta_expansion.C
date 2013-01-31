@@ -34,17 +34,20 @@ RBThetaExpansion::RBThetaExpansion()
 
 unsigned int RBThetaExpansion::get_n_A_terms() const
 {
-  return _A_theta_vector.size();
+  return libmesh_cast_int<unsigned int>
+    (_A_theta_vector.size());
 }
 
 unsigned int RBThetaExpansion::get_n_F_terms() const
 {
-  return _F_theta_vector.size();
+  return libmesh_cast_int<unsigned int>
+    (_F_theta_vector.size());
 }
 
 unsigned int RBThetaExpansion::get_n_outputs() const
 {
-  return _output_theta_vector.size();
+  return libmesh_cast_int<unsigned int>
+    (_output_theta_vector.size());
 }
 
 unsigned int RBThetaExpansion::get_n_output_terms(unsigned int index) const
@@ -55,7 +58,8 @@ unsigned int RBThetaExpansion::get_n_output_terms(unsigned int index) const
                  << std::endl;
     libmesh_error();
   }
-  return _output_theta_vector[index].size();
+  return libmesh_cast_int<unsigned int>
+    (_output_theta_vector[index].size());
 }
 
 void RBThetaExpansion::attach_A_theta(RBTheta* theta_q_a)
@@ -67,7 +71,7 @@ void RBThetaExpansion::attach_A_theta(RBTheta* theta_q_a)
 
 void RBThetaExpansion::attach_multiple_A_theta(std::vector<RBTheta*> theta_q_a)
 {
-  for(unsigned int i=0; i<theta_q_a.size(); i++)
+  for(std::size_t i=0; i<theta_q_a.size(); i++)
   {
     libmesh_assert(theta_q_a[i]);
     _A_theta_vector.push_back(theta_q_a[i]);

@@ -365,7 +365,7 @@ void ContinuationSystem::continuation_solve()
     }
 
   // Use extra precision for all the numbers printed in this function.
-  unsigned int old_precision = libMesh::out.precision();
+  std::streamsize old_precision = libMesh::out.precision();
   libMesh::out.precision(16);
   libMesh::out.setf(std::ios_base::scientific);
 
@@ -1202,7 +1202,7 @@ void ContinuationSystem::set_Theta_LOCA()
 void ContinuationSystem::update_solution()
 {
   // Set some stream formatting flags
-  unsigned int old_precision = libMesh::out.precision();
+  std::streamsize old_precision = libMesh::out.precision();
   libMesh::out.precision(16);
   libMesh::out.setf(std::ios_base::scientific);
 

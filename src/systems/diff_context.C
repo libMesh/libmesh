@@ -44,18 +44,18 @@ DiffContext::DiffContext (const System& sys) :
     elem_fixed_subsolutions.reserve(n_vars);
 
   // If the user resizes sys.qoi, it will invalidate us
-  unsigned int n_qoi = sys.qoi.size();
+  std::size_t n_qoi = sys.qoi.size();
   elem_qoi.resize(n_qoi);
   elem_qoi_derivative.resize(n_qoi);
   elem_qoi_subderivatives.resize(n_qoi);
-  for (unsigned int q=0; q != n_qoi; ++q)
+  for (std::size_t q=0; q != n_qoi; ++q)
     elem_qoi_subderivatives[q].reserve(n_vars);
 
   for (unsigned int i=0; i != n_vars; ++i)
     {
       elem_subsolutions.push_back(new DenseSubVector<Number>(elem_solution));
       elem_subresiduals.push_back(new DenseSubVector<Number>(elem_residual));
-      for (unsigned int q=0; q != n_qoi; ++q)
+      for (std::size_t q=0; q != n_qoi; ++q)
         elem_qoi_subderivatives[q].push_back(new DenseSubVector<Number>(elem_qoi_derivative[q]));
       elem_subjacobians[i].reserve(n_vars);
 
@@ -75,16 +75,16 @@ DiffContext::DiffContext (const System& sys) :
 
 DiffContext::~DiffContext ()
 {
-  for (unsigned int i=0; i != elem_subsolutions.size(); ++i)
+  for (std::size_t i=0; i != elem_subsolutions.size(); ++i)
     {
       delete elem_subsolutions[i];
       delete elem_subresiduals[i];
-      for (unsigned int q=0; q != elem_qoi_subderivatives.size(); ++q)
+      for (std::size_t q=0; q != elem_qoi_subderivatives.size(); ++q)
         delete elem_qoi_subderivatives[q][i];
       if (!elem_fixed_subsolutions.empty())
         delete elem_fixed_subsolutions[i];
 
-      for (unsigned int j=0; j != elem_subjacobians[i].size(); ++j)
+      for (std::size_t j=0; j != elem_subjacobians[i].size(); ++j)
         delete elem_subjacobians[i][j];
     }
 
@@ -100,47 +100,48 @@ DiffContext::~DiffContext ()
       std::vector<DenseSubVector<Number>* >&  localized_vector_dsv = localized_vectors_it->second.second;
 
       // Loop over that vector and delete each entry
-      for(unsigned int i=0; i != localized_vector_dsv.size(); ++i)
+      for(std::size_t i=0; i != localized_vector_dsv.size(); ++i)
 	delete localized_vector_dsv[i];
-	      
     }
-      
 }
 
 
-  void DiffContext::set_deltat_pointer(Real* dt)
-  {
-    // We may actually want to be able to set this pointer to NULL, so
-    // don't report an error for that.
-    _deltat = dt;
-  }
+void DiffContext::set_deltat_pointer(Real* dt)
+{
+  // We may actually want to be able to set this pointer to NULL, so
+  // don't report an error for that.
+  _deltat = dt;
+}
 
-  Real DiffContext::get_deltat_value()
-  {
-    libmesh_assert(_deltat);
 
-    return *_deltat;
-  }
+Real DiffContext::get_deltat_value()
+{
+  libmesh_assert(_deltat);
 
-  void DiffContext::add_localized_vector (NumericVector<Number> & _localized_vector, const System & _sys)
-  {
-    // Make an empty pair keyed with a reference to this _localized_vector
-    localized_vectors[&_localized_vector] = std::make_pair(DenseVector<Number>(), std::vector<DenseSubVector<Number>*>());
+  return *_deltat;
+}
 
-    unsigned int n_vars = _sys.n_vars();
 
-    localized_vectors[&_localized_vector].second.reserve(n_vars);
-    
-    // Fill the DenseSubVector with n_vars copies of DenseVector
-    for(unsigned int i=0; i != n_vars; ++i)
-      localized_vectors[&_localized_vector].second.push_back(new DenseSubVector<Number>(localized_vectors[&_localized_vector].first));
+void DiffContext::add_localized_vector (NumericVector<Number> & _localized_vector, const System & _sys)
+{
+  // Make an empty pair keyed with a reference to this _localized_vector
+  localized_vectors[&_localized_vector] = std::make_pair(DenseVector<Number>(), std::vector<DenseSubVector<Number>*>());
 
-  }
+  unsigned int n_vars = _sys.n_vars();
+
+  localized_vectors[&_localized_vector].second.reserve(n_vars);
+  
+  // Fill the DenseSubVector with n_vars copies of DenseVector
+  for(unsigned int i=0; i != n_vars; ++i)
+    localized_vectors[&_localized_vector].second.push_back(new DenseSubVector<Number>(localized_vectors[&_localized_vector].first));
+}
+
 
 DenseVector<Number>& DiffContext::get_localized_vector (const NumericVector<Number> & _localized_vector)
 {
   return localized_vectors[&_localized_vector].first;
 }
+
 
 const DenseVector<Number>& DiffContext::get_localized_vector (const NumericVector<Number> & _localized_vector) const
 {
@@ -150,10 +151,12 @@ const DenseVector<Number>& DiffContext::get_localized_vector (const NumericVecto
   return localized_vectors_it->second.first;
 }
 
+
 DenseSubVector<Number>& DiffContext::get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var)
 {
   return *localized_vectors[&_localized_vector].second[_var];
 }
+
 
 const DenseSubVector<Number>& DiffContext::get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var) const
 {

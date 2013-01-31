@@ -86,7 +86,8 @@ void RBEIMEvaluation::attach_parametrized_function(RBParametrizedFunction* pf)
 
 unsigned int RBEIMEvaluation::get_n_parametrized_functions() const
 {
-  return _parametrized_functions.size();
+  return libmesh_cast_int<unsigned int>
+    (_parametrized_functions.size());
 }
 
 Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index, const Point& p)
