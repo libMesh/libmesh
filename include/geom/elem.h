@@ -1242,18 +1242,6 @@ public:
    * by using friends!
    */
   friend class MeshRefinement;    // (Elem::nullify_neighbors)
-
- private:
-  /**
-   * This function is used internally for node key generation.
-   * It handles casting of pointers on various architectures.
-   */
-  unsigned int _cast_node_address_to_unsigned_int(const unsigned int n);
-
-  // Prime numbers used for computing node keys.  These are the same
-  // for every instance of the Elem class.
-  static const unsigned int _bp1;
-  static const unsigned int _bp2;
 };
 
 // ------------------------------------------------------------

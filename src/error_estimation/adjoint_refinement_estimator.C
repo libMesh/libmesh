@@ -371,7 +371,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
               // FIXME: we're throwing away information in the
               // --enable-complex case
-	      error_per_cell[e_id] += libmesh_real(local_contribution);
+	      error_per_cell[e_id] += static_cast<ErrorVectorReal>
+	        (libmesh_real(local_contribution));
 
 	    } // End loop over elements
 

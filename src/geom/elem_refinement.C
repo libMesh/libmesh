@@ -146,42 +146,6 @@ void Elem::refine (MeshRefinement& mesh_refinement)
 
 
 
-unsigned int Elem::_cast_node_address_to_unsigned_int(const unsigned int n)
-{
-  // An unsigned int associated with the
-  // address of the node n.  We can't use the
-  // node number since they can change, so we use the
-  // Node's address.  (We also can't use the x,y,z
-  // location of the node since that can change too!)
-
-#if LIBMESH_SIZEOF_INT == LIBMESH_SIZEOF_VOID_P
-
-  // 32-bit machines
-  const unsigned int n_id =
-    reinterpret_cast<unsigned int>(this->get_node(n));
-
-#elif LIBMESH_SIZEOF_LONG_INT == LIBMESH_SIZEOF_VOID_P
-
-  // 64-bit machines
-  // Another big prime number less than max_unsigned_int
-  // for key creation on 64-bit machines
-  const unsigned int bp3 = 4294967291;
-  const unsigned int n_id =
-    reinterpret_cast<long unsigned int>(this->get_node(n))%bp3;
-
-#else
-  // Huh?
-#error			WHAT KIND OF CRAZY MACHINE IS THIS? CANNOT COMPILE
-
-#endif
-
-  return n_id;
-}
-
-
-
-
-
 void Elem::coarsen()
 {
   libmesh_assert_equal_to (this->refinement_flag(), Elem::COARSEN_INACTIVE);

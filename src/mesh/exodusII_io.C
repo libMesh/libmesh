@@ -155,7 +155,7 @@ void ExodusII_IO::read (const std::string& fname)
   // Read in the element connectivity for each block.
   int nelem_last_block = 0;
 
-  std::map<int, unsigned int> exodus_id_to_mesh_id;
+  std::map<int, dof_id_type> exodus_id_to_mesh_id;
 
   // Loop over all the blocks
   for (int i=0; i<exio_helper->get_num_elem_blk(); i++)
@@ -341,7 +341,7 @@ void ExodusII_IO::copy_nodal_solution(System& system, std::string system_var_nam
           libmesh_error();
         }
 
-      unsigned dof_index = node->dof_number(system.number(), var_num, 0);
+      dof_id_type dof_index = node->dof_number(system.number(), var_num, 0);
 
       // If the dof_index is local to this processor, set the value
       if ((dof_index >= system.solution->first_local_index()) && (dof_index < system.solution->last_local_index()))
@@ -447,7 +447,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  int num_vars = names.size();
+  int num_vars = libmesh_cast_int<int>(names.size());
   int num_nodes = 0;
   MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
@@ -490,8 +490,8 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  int num_vars = names.size();
-  int num_nodes = mesh.n_nodes();
+  int num_vars = libmesh_cast_int<int>(names.size());
+  dof_id_type num_nodes = mesh.n_nodes();
 
   // The names of the variables to be output
   std::vector<std::string> output_names;
@@ -517,16 +517,18 @@ void ExodusII_IO::write_nodal_data (const std::string& fname,
   // This will count the number of variables actually output
   for (int c=0; c<num_vars; c++)
     {
-      std::vector<std::string>::iterator pos = std::find(output_names.begin(), output_names.end(), names[c]);
+      std::vector<std::string>::iterator pos =
+        std::find(output_names.begin(), output_names.end(), names[c]);
       if (pos == output_names.end())
         continue;
 
-      unsigned variable_name_position = pos - output_names.begin();
+      unsigned int variable_name_position =
+	libmesh_cast_int<unsigned int>(pos - output_names.begin());
 
       std::vector<Number> cur_soln(num_nodes);
 
       //Copy out this variable's solution
-      for(int i=0; i<num_nodes; i++)
+      for(dof_id_type i=0; i<num_nodes; i++)
         cur_soln[i] = soln[i*num_vars + c];//c*num_nodes+i];
 
       exio_helper->write_nodal_values(variable_name_position+1,cur_soln,_timestep);

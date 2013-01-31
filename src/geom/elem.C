@@ -68,8 +68,6 @@ namespace libMesh
 {
 
 // Initialize static member variables
-const unsigned int Elem::_bp1 = 65449;
-const unsigned int Elem::_bp2 = 48661;
 const unsigned int Elem::type_to_n_nodes_map [] =
   {
     2,  // EDGE2

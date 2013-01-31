@@ -735,7 +735,8 @@ unsigned int BoundaryInfo::n_boundary_ids(const Node* node) const
 
   std::pair<Iter, Iter> pos = _boundary_node_id.equal_range(node);
 
-  return (std::distance(pos.first, pos.second));
+  return libmesh_cast_int<unsigned int>
+    (std::distance(pos.first, pos.second));
 }
 
 

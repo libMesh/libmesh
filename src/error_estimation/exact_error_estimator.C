@@ -367,8 +367,10 @@ void ExactErrorEstimator::estimate_error (const System& system,
           // Get the local to global degree of freedom maps
           std::vector<dof_id_type> dof_indices;
           dof_map.dof_indices (elem, dof_indices, var);
-          DenseVector<Number> Uelem(dof_indices.size());
-          for (unsigned int i=0; i != dof_indices.size(); ++i)
+	  const unsigned int n_dofs =
+	    libmesh_cast_int<unsigned int>(dof_indices.size());
+          DenseVector<Number> Uelem(n_dofs);
+          for (unsigned int i=0; i != n_dofs; ++i)
             Uelem(i) = system.current_solution(dof_indices[i]);
 
           error_per_cell[e_id] +=
