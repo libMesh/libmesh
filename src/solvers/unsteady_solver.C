@@ -125,20 +125,22 @@ void UnsteadySolver::solve ()
 
 void UnsteadySolver::advance_timestep ()
 {
+  if (!first_solve)
+    {
+      // Store the solution, does nothing by default
+      // User has to attach appropriate solution_history object for this to
+      // actually store anything anywhere
+      solution_history->store();
+
+      _system.time += _system.deltat;
+    }
+
   NumericVector<Number> &old_nonlinear_solution =
   _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> &nonlinear_solution =
     *(_system.solution);
 
   old_nonlinear_solution = nonlinear_solution;
-
-  if (!first_solve)
-    _system.time += _system.deltat;
-
-  // Store the solution, does nothing by default
-  // User has to attach appropriate solution_history object for this to
-  // actually store anything anywhere
-  solution_history->store();
 }
 
 
