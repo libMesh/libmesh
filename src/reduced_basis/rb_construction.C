@@ -52,9 +52,9 @@ namespace libMesh
 {
 
 RBConstruction::RBConstruction (EquationSystems& es,
-		                const std::string& name,
-		                const unsigned int number)
-  : Parent(es, name, number),
+		                const std::string& name_in,
+		                const unsigned int number_in)
+  : Parent(es, name_in, number_in),
     inner_product_matrix(SparseMatrix<Number>::build()),
     non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build()),
     constraint_matrix(SparseMatrix<Number>::build()),
