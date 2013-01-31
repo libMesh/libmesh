@@ -216,7 +216,7 @@ void VTKIO::cells_to_vtk()
             {
               // Ghost node
               float pt[LIBMESH_DIM];
-              unsigned int node = elem->node(i);
+              dof_id_type node = elem->node(i);
               for (unsigned int d = 0; d < LIBMESH_DIM; ++d)
                 {
                 pt[d] = mesh.node(node)(d);
@@ -464,10 +464,10 @@ void VTKIO::write_nodal_data (const std::string& fname,
   // add nodal solutions to the grid, if solutions are given
   if (names.size() > 0)
     {
-      unsigned int num_vars = names.size();
-      unsigned int num_nodes = mesh.n_nodes();
+		std::size_t num_vars = names.size();
+      dof_id_type num_nodes = mesh.n_nodes();
 
-      for (unsigned int variable = 0; variable < num_vars; ++variable)
+      for (std::size_t variable = 0; variable < num_vars; ++variable)
         {
           vtkSmartPointer<vtkDoubleArray> data = vtkDoubleArray::New();
           data->SetName(names[variable].c_str());
@@ -477,7 +477,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
           // loop over all nodes and get the solution for the current
           // variable, if the node is in the current partition
-          for (unsigned int k = 0; k < num_nodes; ++k)
+          for (dof_id_type k = 0; k < num_nodes; ++k)
             {
               if (_local_node_map.find(k) == _local_node_map.end())
                 continue; // not a local node

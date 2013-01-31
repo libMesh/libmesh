@@ -875,7 +875,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
               // subactive nodes that will not be in the mesh we write out.
               else
               {
-                std::map<unsigned int, unsigned int>::iterator pos =
+                std::map<dof_id_type, dof_id_type>::iterator pos =
                   node_map.find(mesh.elem(e)->node(n-nstart));
 
                 libmesh_assert (pos != node_map.end());
@@ -918,8 +918,8 @@ void LegacyXdrIO::write_mesh (const std::string& name,
     coords.resize(3*node_map.size());
     int lastIndex=0;
 
-    std::map<unsigned int,unsigned int>::iterator it = node_map.begin();
-    const std::map<unsigned int,unsigned int>::iterator end = node_map.end();
+    std::map<dof_id_type,dof_id_type>::iterator it = node_map.begin();
+    const std::map<dof_id_type,dof_id_type>::iterator end = node_map.end();
     for (; it != end; ++it)
       {
         const Point& p = mesh.node((*it).first);

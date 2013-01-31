@@ -25,15 +25,16 @@
 // Local includes
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/gmsh_io.h"
-#include "libmesh/elem.h"
-#include "libmesh/mesh_base.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/elem.h"
+#include "libmesh/gmsh_io.h"
+#include "libmesh/mesh_base.h"
 
 
 // anonymous namespace to hold local data
 namespace
 {
+  using namespace libMesh;
 
   /**
    * Defines a structure to hold boundary element information.
@@ -42,7 +43,7 @@ namespace
    * easily compared to another set of nodes (the ones on the element side)
    */
   struct boundaryElementInfo {
-    std::set<unsigned int> nodes;
+    std::set<dof_id_type> nodes;
     unsigned int id;
   };
 
@@ -509,7 +510,7 @@ void GmshIO::read_mesh(std::istream& in)
                    */
 
                   boundaryElementInfo binfo;
-                  std::set<unsigned int>::iterator iter = binfo.nodes.begin();
+                  std::set<dof_id_type>::iterator iter = binfo.nodes.begin();
                   int nod = 0;
                   for (unsigned int i=0; i<nnodes; i++)
                     {
@@ -551,11 +552,11 @@ void GmshIO::read_mesh(std::istream& in)
             {
               // create a index of the boundary nodes to easily locate which
               // element might have that boundary
-              std::map<unsigned int, std::vector<unsigned int> > node_index;
+              std::map<dof_id_type, std::vector<unsigned int> > node_index;
               for (unsigned int i=0; i<boundary_elem.size(); i++)
                 {
                   boundaryElementInfo binfo = boundary_elem[i];
-                  std::set<unsigned int>::iterator iter = binfo.nodes.begin();
+                  std::set<dof_id_type>::iterator iter = binfo.nodes.begin();
                   for (;iter!= binfo.nodes.end(); iter++)
                     node_index[*iter].push_back(i);
                 }
@@ -591,7 +592,7 @@ void GmshIO::read_mesh(std::istream& in)
                             // contain the node sn (typically just 1 to
                             // three). For each of these the set of nodes is
                             // compared to the current element's side nodes
-                            for (unsigned int n=0; n<node_index[sn].size(); n++)
+                            for (std::size_t n=0; n<node_index[sn].size(); n++)
                               {
                                 unsigned int bidx = node_index[sn][n];
                                 if (boundary_elem[bidx].nodes == side_nodes)

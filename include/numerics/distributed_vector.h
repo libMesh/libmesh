@@ -567,7 +567,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 
 #ifdef LIBMESH_HAVE_MPI
 
-  std::vector<int> local_sizes (libMesh::n_processors(), 0);
+  std::vector<numeric_index_type> local_sizes (libMesh::n_processors(), 0);
 
   local_sizes[libMesh::processor_id()] = n_local;
 
@@ -582,12 +582,12 @@ void DistributedVector<T>::init (const numeric_index_type n,
 #  ifdef DEBUG
   // Make sure all the local sizes sum up to the global
   // size, otherwise there is big trouble!
-  int sum=0;
+  numeric_index_type sum=0;
 
   for (processor_id_type p=0; p!=libMesh::n_processors(); p++)
     sum += local_sizes[p];
 
-  libmesh_assert_equal_to (sum, static_cast<int>(n));
+  libmesh_assert_equal_to (sum, n);
 
 #  endif
 

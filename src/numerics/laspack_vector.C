@@ -202,7 +202,7 @@ void LaspackVector<T>::add_vector (const DenseVector<T>& V,
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
-  for (numeric_index_type i=0; i<V.size(); i++)
+  for (unsigned int i=0; i<V.size(); i++)
     this->add (dof_indices[i], V(i));
 }
 
@@ -239,7 +239,7 @@ void LaspackVector<T>::insert (const DenseVector<T>& V,
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
-  for (numeric_index_type i=0; i<V.size(); i++)
+  for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
 }
 
@@ -251,7 +251,7 @@ void LaspackVector<T>::insert (const DenseSubVector<T>& V,
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
-  for (numeric_index_type i=0; i<V.size(); i++)
+  for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
 }
 

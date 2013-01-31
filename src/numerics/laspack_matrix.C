@@ -205,12 +205,14 @@ void LaspackMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 
 {
   libmesh_assert (this->initialized());
-  libmesh_assert_equal_to (dm.m(), rows.size());
-  libmesh_assert_equal_to (dm.n(), cols.size());
+  unsigned int n_rows = libmesh_cast_int<unsigned int>(rows.size());
+  unsigned int n_cols = libmesh_cast_int<unsigned int>(cols.size());
+  libmesh_assert_equal_to (dm.m(), n_rows);
+  libmesh_assert_equal_to (dm.n(), n_cols);
 
 
-  for (numeric_index_type i=0; i<rows.size(); i++)
-    for (numeric_index_type j=0; j<cols.size(); j++)
+  for (unsigned int i=0; i<n_rows; i++)
+    for (unsigned int j=0; j<n_cols; j++)
       this->add(rows[i],cols[j],dm(i,j));
 }
 

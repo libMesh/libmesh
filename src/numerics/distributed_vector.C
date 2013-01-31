@@ -200,7 +200,7 @@ void DistributedVector<T>::add_vector (const DenseVector<T>& V,
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (std::size_t i=0; i<V.size(); i++)
+  for (unsigned int i=0; i<V.size(); i++)
     add (dof_indices[i], V(i));
 }
 
@@ -299,7 +299,7 @@ void DistributedVector<T>::insert (const DenseVector<T>& V,
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (std::size_t i=0; i<V.size(); i++)
+  for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
 }
 
@@ -314,7 +314,7 @@ void DistributedVector<T>::insert (const DenseSubVector<T>& V,
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
-  for (std::size_t i=0; i<V.size(); i++)
+  for (unsigned int i=0; i<V.size(); i++)
     this->set (dof_indices[i], V(i));
 }
 
