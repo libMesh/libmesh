@@ -1662,7 +1662,7 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
           {
             const unsigned int n_dofs_var_j =
 	      libmesh_cast_int<unsigned int>
-                (dof_indices_var[i].size());
+                (dof_indices_var[j].size());
 
             elem_subjacobians[i][j]->reposition
               (sub_dofs, elem_subresiduals[j]->i_off(),
