@@ -136,9 +136,9 @@ Output FEMFunctionBase<Output>::component (const FEMContext& context, unsigned i
 					   const Point& p,
 					   Real time)
 {
-  DenseVector<Output> out(i+1);
-  (*this)(context, p, time, out);
-  return out(i);
+  DenseVector<Output> outvec(i+1);
+  (*this)(context, p, time, outvec);
+  return outvec(i);
 }
 
 template <typename Output>
