@@ -39,8 +39,8 @@ const float PostscriptIO::_bezier_transform[3][3] =
 };
 
 
-PostscriptIO::PostscriptIO (const MeshBase& mesh)
-  : MeshOutput<MeshBase> (mesh),
+PostscriptIO::PostscriptIO (const MeshBase& mesh_in)
+  : MeshOutput<MeshBase> (mesh_in),
     shade_value(0.0),
     line_width(0.5),
     //_M(3,3),
@@ -77,10 +77,10 @@ void PostscriptIO::write (const std::string& fname)
   if (libMesh::processor_id() == 0)
     {
       // Get a constant reference to the mesh.
-      const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+      const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
 
       // Only works in 2D
-      libmesh_assert_equal_to (mesh.mesh_dimension(), 2);
+      libmesh_assert_equal_to (the_mesh.mesh_dimension(), 2);
 
       // Create output file stream.
       // _out is now a private member of the class.
@@ -92,7 +92,7 @@ void PostscriptIO::write (const std::string& fname)
 
       // The mesh bounding box gives us info about what the
       // Postscript bounding box should be.
-      MeshTools::BoundingBox bbox = MeshTools::bounding_box(mesh);
+      MeshTools::BoundingBox bbox = MeshTools::bounding_box(the_mesh);
 
       // Add a little extra padding to the "true" bounding box so
       // that we can still see the boundary
@@ -173,8 +173,8 @@ void PostscriptIO::write (const std::string& fname)
       // line sits between each pair of vertices.  Also we draw every edge
       // for an element regardless of the fact that it may overlap with
       // another.  This would probably be a useful optimization...
-      MeshBase::const_element_iterator       el     = mesh.active_elements_begin();
-      const MeshBase::const_element_iterator end_el = mesh.active_elements_end();
+      MeshBase::const_element_iterator       el     = the_mesh.active_elements_begin();
+      const MeshBase::const_element_iterator end_el = the_mesh.active_elements_end();
       for ( ; el != end_el; ++el)
 	{
 	  //const Elem* elem = *el;
