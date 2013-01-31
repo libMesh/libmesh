@@ -21,6 +21,7 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath> // for std::acos()
 #include <algorithm>
+#include <limits>
 #include <map>
 
 // Local includes
@@ -65,7 +66,8 @@ void MeshTools::Modification::distort (MeshBase& mesh,
   // Now calculate the minimum distance to
   // neighboring nodes for each node.
   // hmin holds these distances.
-  std::vector<float> hmin (mesh.n_nodes(), 1.e20);
+  std::vector<float> hmin (mesh.n_nodes(),
+			   std::numeric_limits<float>::max());
 
   MeshBase::element_iterator       el  = mesh.active_elements_begin();
   const MeshBase::element_iterator end = mesh.active_elements_end();
@@ -448,7 +450,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * to Edge3.  Something like 1/2 of n_nodes() have
        * to be added
        */
-      this->reserve_nodes(static_cast<unsigned int>(1.5*this->n_nodes()));
+      this->reserve_nodes(static_cast<unsigned int>
+			  (1.5*static_cast<double>(this->n_nodes())));
       break;
 
     case 2:
@@ -456,7 +459,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * in 2D, either refine from Tri3 to Tri6 (double the nodes)
        * or from Quad4 to Quad8 (again, double) or Quad9 (2.25 that much)
        */
-      this->reserve_nodes(static_cast<unsigned int>(2*this->n_nodes()));
+      this->reserve_nodes(static_cast<unsigned int>
+			  (2*static_cast<double>(this->n_nodes())));
       break;
 
 
@@ -467,7 +471,8 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * quite some nodes, and since we do not want to overburden the memory by
        * a too conservative guess, use the lower bound
        */
-      this->reserve_nodes(static_cast<unsigned int>(2.5*this->n_nodes()));
+      this->reserve_nodes(static_cast<unsigned int>
+			  (2.5*static_cast<double>(this->n_nodes())));
       break;
 
     default:
@@ -682,7 +687,7 @@ void MeshTools::Modification::all_tri (MeshBase& mesh)
 {
   // The number of elements in the original mesh before any additions
   // or deletions.
-  const unsigned n_orig_elem = mesh.n_elem();
+  const dof_id_type n_orig_elem = mesh.n_elem();
 
   // We store pointers to the newly created elements in a vector
   // until they are ready to be added to the mesh.  This is because
@@ -1223,7 +1228,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                                 node_weight = std::pow( diff.size(), power );
                               }
 
-                            const unsigned int id0 = node0->id(), id1 = node1->id();
+                            const dof_id_type id0 = node0->id(), id1 = node1->id();
                             new_positions[id0].add_scaled( *node1, node_weight );
                             new_positions[id1].add_scaled( *node0, node_weight );
                             weight[id0] += node_weight;
@@ -1269,7 +1274,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                                       point.add_scaled (parent->point(n), em_val);
                                   }
 
-                                const unsigned int id = elem->get_node(nc)->id();
+                                const dof_id_type id = elem->get_node(nc)->id();
                                 new_positions[id] = point;
                                 weight[id] = 1.;
                               }
@@ -1315,7 +1320,7 @@ void MeshTools::Modification::smooth (MeshBase& mesh,
                     for (unsigned int v=0; v<n_adjacent_vertices; v++)
                       point.add(elem->point( elem->second_order_adjacent_vertex(n,v) ));
 
-                    const unsigned int id = elem->get_node(n)->id();
+                    const dof_id_type id = elem->get_node(n)->id();
                     mesh.node(id) = point/n_adjacent_vertices;
                   }
               }
@@ -1429,11 +1434,11 @@ void MeshTools::Modification::flatten(MeshBase& mesh)
 	 it != new_elements.end();
 	 ++it)
       {
-	unsigned orig_id = (*it)->id();
+	dof_id_type orig_id = (*it)->id();
 
 	Elem* added_elem = mesh.add_elem(*it);
 
-	unsigned added_id = added_elem->id();
+	dof_id_type added_id = added_elem->id();
 
 	// If the Elem, as it was re-added to the mesh, now has a
 	// different ID (this is unlikely, so it's just an assert)

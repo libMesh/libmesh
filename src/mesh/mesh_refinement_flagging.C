@@ -103,7 +103,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
 
   for (; el_it != el_end; ++el_it)
   {
-    const unsigned int id  = (*el_it)->id();
+    const dof_id_type id  = (*el_it)->id();
     libmesh_assert_less (id, error_per_cell.size());
 
     error_max = std::max (error_max, error_per_cell[id]);
@@ -140,8 +140,8 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
     _mesh.active_elements_end();
   for (; e_it != e_end; ++e_it)
   {
-    Elem* elem             = *e_it;
-    const unsigned int id  = elem->id();
+    Elem* elem           = *e_it;
+    const dof_id_type id = elem->id();
 
     libmesh_assert_less (id, error_per_cell.size());
 
@@ -152,7 +152,7 @@ void MeshRefinement::flag_elements_by_error_fraction (const ErrorVector& error_p
       Elem* parent           = elem->parent();
       if (parent)
       {
-	const unsigned int parentid  = parent->id();
+	const dof_id_type parentid  = parent->id();
 	if (error_per_parent[parentid] >= 0. &&
 	    error_per_parent[parentid] <= parent_cutoff)
 	  elem->set_refinement_flag(Elem::COARSEN);
@@ -213,8 +213,8 @@ void MeshRefinement::flag_elements_by_error_tolerance (const ErrorVector& error_
   {
     Elem* elem = *elem_it;
     Elem* parent = elem->parent();
-    const unsigned int elem_number = elem->id();
-    const float        elem_error  = error_per_cell_in[elem_number];
+    const dof_id_type elem_number    = elem->id();
+    const ErrorVectorReal elem_error = error_per_cell_in[elem_number];
 
     if (elem_error > local_refinement_tolerance &&
 	elem->level() < _max_h_level)
@@ -260,7 +260,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // The number of active elements in the mesh - hopefully less than
   // 2 billion on 32 bit machines
-  const unsigned int n_active_elem  = _mesh.n_active_elem();
+  const dof_id_type n_active_elem  = _mesh.n_active_elem();
 
   // The maximum number of active elements to flag for coarsening
   const unsigned int max_elem_coarsen =
@@ -279,8 +279,8 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
 
   // Create an vector with active element errors and ids,
   // sorted by highest errors first
-  const unsigned int max_elem_id = _mesh.max_elem_id();
-  std::vector<std::pair<float, unsigned int> > sorted_error;
+  const dof_id_type max_elem_id = _mesh.max_elem_id();
+  std::vector<std::pair<float, dof_id_type> > sorted_error;
 
   sorted_error.reserve (n_active_elem);
 
@@ -293,7 +293,7 @@ bool MeshRefinement::flag_elements_by_nelem_target (const ErrorVector& error_per
     const MeshBase::element_iterator elem_end = _mesh.active_local_elements_end();
     for (; elem_it != elem_end; ++elem_it)
       {
-        const unsigned int eid = (*elem_it)->id();
+        const dof_id_type eid = (*elem_it)->id();
         is_active[eid] = true;
         libmesh_assert_less (eid, error_per_cell.size());
         sorted_error.push_back
@@ -480,15 +480,15 @@ void MeshRefinement::flag_elements_by_elem_fraction (const ErrorVector& error_pe
   libmesh_assert_less_equal (_coarsen_fraction, 1);
 
   // The number of active elements in the mesh
-  const unsigned int n_active_elem  = _mesh.n_elem();
+  const dof_id_type n_active_elem  = _mesh.n_elem();
 
   // The number of elements to flag for coarsening
-  const unsigned int n_elem_coarsen =
-    static_cast<unsigned int>(_coarsen_fraction * n_active_elem);
+  const dof_id_type n_elem_coarsen =
+    static_cast<dof_id_type>(_coarsen_fraction * n_active_elem);
 
   // The number of elements to flag for refinement
-  const unsigned int n_elem_refine =
-    static_cast<unsigned int>(_refine_fraction  * n_active_elem);
+  const dof_id_type n_elem_refine =
+    static_cast<dof_id_type>(_refine_fraction  * n_active_elem);
 
 
 
@@ -634,7 +634,7 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
   for (; elem_it != elem_end; ++elem_it)
     {
       Elem* elem             = *elem_it;
-      const unsigned int id  = elem->id();
+      const dof_id_type id  = elem->id();
 
       libmesh_assert_less (id, error_per_cell.size());
 

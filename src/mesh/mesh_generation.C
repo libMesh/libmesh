@@ -1993,8 +1993,8 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh& mesh,
 
   START_LOG("build_extrusion()", "MeshTools::Generation");
 
-  unsigned int orig_elem = cross_section.n_elem();
-  unsigned int orig_nodes = cross_section.n_nodes();
+  dof_id_type orig_elem = cross_section.n_elem();
+  dof_id_type orig_nodes = cross_section.n_nodes();
 
   unsigned int order = 1;
 
