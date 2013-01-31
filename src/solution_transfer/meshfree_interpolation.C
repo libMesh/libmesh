@@ -36,9 +36,18 @@ namespace libMesh
   void MeshfreeInterpolation::print_info (std::ostream& os) const
   {
     os << "MeshfreeInterpolation"
-       << "\n n_field_variables()=" << this->n_field_variables() 
        << "\n n_source_points()=" << _src_pts.size()
-       << std::endl;
+       << "\n n_field_variables()=" << this->n_field_variables()
+       <<  "\n";
+
+    if (this->n_field_variables())
+      {
+	os << "  variables = ";
+	for (unsigned int v=0; v<this->n_field_variables(); v++)
+	  os << _names[v] << " ";
+	os << std::endl;
+      }
+      
   }
 
 
@@ -64,6 +73,7 @@ namespace libMesh
 					      const std::vector<Point>  &pts,
 					      const std::vector<Number> &vals)
   {
+    libmesh_experimental();
     libmesh_assert_equal_to (field_names.size()*pts.size(), vals.size());
 
     // If we already have field variables, we assume we are appending.
@@ -270,6 +280,8 @@ namespace libMesh
 								    const std::vector<Point>  &tgt_pts,
 								    std::vector<Number> &tgt_vals) const
   {
+    libmesh_experimental();
+
     // forcibly initialize, if needed
 #ifdef LIBMESH_HAVE_NANOFLANN
     if (_kd_tree.get() == NULL)
