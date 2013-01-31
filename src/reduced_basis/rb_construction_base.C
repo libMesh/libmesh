@@ -44,9 +44,9 @@ namespace libMesh
 
 template <class Base>
 RBConstructionBase<Base>::RBConstructionBase (EquationSystems& es,
-                                              const std::string& name,
-                                              const unsigned int number)
-  : Base(es, name, number),
+                                              const std::string& name_in,
+                                              const unsigned int number_in)
+  : Base(es, name_in, number_in),
     serial_training_set(false),
     alternative_solver("unchanged"),
     training_parameters_initialized(false),
@@ -993,9 +993,9 @@ void RBConstructionBase<Base>::set_training_random_seed(unsigned int seed)
 }
 
 template <class Base>
-void RBConstructionBase<Base>::set_deterministic_training_parameter_name(const std::string name)
+void RBConstructionBase<Base>::set_deterministic_training_parameter_name(const std::string name_in)
 {
-  this->_deterministic_training_parameter_name = name;
+  this->_deterministic_training_parameter_name = name_in;
 }
 
 template <class Base>
