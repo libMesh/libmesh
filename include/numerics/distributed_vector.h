@@ -582,12 +582,12 @@ void DistributedVector<T>::init (const numeric_index_type n,
 #  ifdef DEBUG
   // Make sure all the local sizes sum up to the global
   // size, otherwise there is big trouble!
-  numeric_index_type sum=0;
+  numeric_index_type dbg_sum=0;
 
   for (processor_id_type p=0; p!=libMesh::n_processors(); p++)
-    sum += local_sizes[p];
+    dbg_sum += local_sizes[p];
 
-  libmesh_assert_equal_to (sum, n);
+  libmesh_assert_equal_to (dbg_sum, n);
 
 #  endif
 
