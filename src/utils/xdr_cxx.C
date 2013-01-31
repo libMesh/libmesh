@@ -1440,5 +1440,7 @@ template void Xdr::data<std::vector<std::complex<double> > > (std::vector<std::c
 template void Xdr::data<std::vector<std::complex<long double> > > (std::vector<std::complex<long double> >&, const char*);
 template void Xdr::data_stream<int>          (int *val,          const unsigned int len, const unsigned int line_break);
 template void Xdr::data_stream<unsigned int> (unsigned int *val, const unsigned int len, const unsigned int line_break);
+template void Xdr::data_stream<unsigned long int> (unsigned long int *val, const unsigned int len, const unsigned int line_break);
+
 
 } // namespace libMesh
