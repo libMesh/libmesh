@@ -23,6 +23,9 @@
 // Templated on the type of keys you will be sorting and the
 // type of iterator you will be using.
 
+// libMesh includes
+#include "libmesh/libmesh_common.h" // libmesh_cast_int
+
 // C++ includes
 #include <vector>
 #include <iterator>
