@@ -40,7 +40,7 @@ namespace Parallel {
    * Defines a histogram to be used in parallel in conjuction with
    * a \p BinSorter.
    */
-template <typename KeyType>
+template <typename KeyType, typename IdxType=unsigned int>
 class Histogram
 {
   // The type of iterator we will be using is inferred from KeyType
@@ -55,7 +55,7 @@ public:
   // The actual function which sorts the data into
   // nbins.  Currently based on the global min and
   // max which you must provide e.g. by using MPI.
-  void make_histogram (const std::size_t nbins,
+  void make_histogram (const IdxType nbins,
 		       KeyType max,
 		       KeyType min);
 
@@ -64,30 +64,30 @@ public:
   void build_histogram ();
 
   // Return the raw histogram data to the user
-  const std::vector<unsigned int>& get_histogram() const;
+  const std::vector<IdxType>& get_histogram() const;
 
   // The number of bins in the histogram
-  std::size_t n_bins () const;
+  IdxType n_bins () const;
 
   // Returns the size of local bin b
-  std::size_t local_bin_size (const std::size_t bin) const;
+  IdxType local_bin_size (const IdxType bin) const;
 
   // Returns the size of global bin b
   // Requires that the user first call \p build_histogram()
-  std::size_t global_bin_size (const std::size_t bin) const;
+  IdxType global_bin_size (const IdxType bin) const;
 
   // Returns the lower boundary of bin \p bin
-  double lower_bound (const std::size_t bin) const;
+  double lower_bound (const IdxType bin) const;
 
   // Returns the upper boundary of bin \p bin
-  double upper_bound (const std::size_t bin) const;
+  double upper_bound (const IdxType bin) const;
 
 
 private:
 
 
   const std::vector<KeyType>& data;
-  std::vector<unsigned int>   hist;        // The actual histogram
+  std::vector<IdxType>        hist;        // The actual histogram
   std::vector<double>         bin_bounds;  // The boundary values of each bin
   std::vector<IterType>       bin_iters;   // Iterators to the bin boundaries
                                            //  in data
@@ -97,42 +97,43 @@ private:
 
 
 //--------------------------------------------------------------------------
-template <typename KeyType>
+template <typename KeyType, typename IdxType>
 inline
-const std::vector<unsigned int>& Histogram<KeyType>::get_histogram () const
+const std::vector<IdxType>& Histogram<KeyType,IdxType>::get_histogram () const
 {
   return hist;
 }
 
 
 
-template <typename KeyType>
+template <typename KeyType, typename IdxType>
 inline
-std::size_t Histogram<KeyType>::n_bins () const
+IdxType Histogram<KeyType,IdxType>::n_bins () const
 {
   if (bin_iters.empty())
     return 0;
 
-  return (bin_iters.size()-1);
+  return libmesh_cast_int<IdxType>(bin_iters.size()-1);
 }
 
 
 
-template <typename KeyType>
+template <typename KeyType, typename IdxType>
 inline
-std::size_t Histogram<KeyType>::local_bin_size (const std::size_t bin) const
+IdxType Histogram<KeyType,IdxType>::local_bin_size (const IdxType bin) const
 {
   libmesh_assert_less ((bin+1), bin_iters.size());
 
   // The number of entries in the bin (locally)
-  return std::distance (bin_iters[bin], bin_iters[bin+1]);
+  return libmesh_cast_int<IdxType>
+    (std::distance (bin_iters[bin], bin_iters[bin+1]));
 }
 
 
 
-template <typename KeyType>
+template <typename KeyType, typename IdxType>
 inline
-std::size_t Histogram<KeyType>::global_bin_size (const std::size_t bin) const
+IdxType Histogram<KeyType,IdxType>::global_bin_size (const IdxType bin) const
 {
   libmesh_assert_less (bin, hist.size());
 
@@ -142,9 +143,9 @@ std::size_t Histogram<KeyType>::global_bin_size (const std::size_t bin) const
 
 
 
-template <typename KeyType>
+template <typename KeyType, typename IdxType>
 inline
-double Histogram<KeyType>::lower_bound (const std::size_t bin) const
+double Histogram<KeyType,IdxType>::lower_bound (const IdxType bin) const
 {
   libmesh_assert_less ((bin+1), bin_bounds.size());
 
@@ -153,9 +154,9 @@ double Histogram<KeyType>::lower_bound (const std::size_t bin) const
 
 
 
-template <typename KeyType>
+template <typename KeyType, typename IdxType>
 inline
-double Histogram<KeyType>::upper_bound (const std::size_t bin) const
+double Histogram<KeyType,IdxType>::upper_bound (const IdxType bin) const
 {
   libmesh_assert_less ((bin+1), bin_bounds.size());
 

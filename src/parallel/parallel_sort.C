@@ -40,10 +40,10 @@ namespace Parallel {
 // std::sort().  Therefore, the construction of
 // a Parallel::Sort object takes O(nlogn) time,
 // where n is the length of _data.
-template <typename KeyType>
-Sort<KeyType>::Sort(std::vector<KeyType>& d,
-		    const unsigned int n_procs,
-		    const unsigned int proc_id) :
+template <typename KeyType, typename IdxType>
+Sort<KeyType,IdxType>::Sort(std::vector<KeyType>& d,
+		            const processor_id_type n_procs,
+		            const processor_id_type proc_id) :
   _n_procs(n_procs),
   _proc_id(proc_id),
   _bin_is_sorted(false),
@@ -57,13 +57,13 @@ Sort<KeyType>::Sort(std::vector<KeyType>& d,
 
 
 
-template <typename KeyType>
-void Sort<KeyType>::sort()
+template <typename KeyType, typename IdxType>
+void Sort<KeyType,IdxType>::sort()
 {
   // Find the global data size.  The sorting
   // algorithms assume they have a range to
   // work with, so catch the degenerate cases here
-  unsigned int global_data_size = _data.size();
+  IdxType global_data_size = libmesh_cast_int<IdxType>(_data.size());
 
   CommWorld.sum (global_data_size);
 
@@ -73,7 +73,7 @@ void Sort<KeyType>::sort()
       // or contains only one element
       _my_bin = _data;
 
-      CommWorld.allgather (static_cast<unsigned int>(_my_bin.size()),
+      CommWorld.allgather (static_cast<IdxType>(_my_bin.size()),
 			   _local_bin_sizes);
     }
   else
@@ -95,8 +95,8 @@ void Sort<KeyType>::sort()
 
 
 
-template <typename KeyType>
-void Sort<KeyType>::binsort()
+template <typename KeyType, typename IdxType>
+void Sort<KeyType,IdxType>::binsort()
 {
   // Find the global min and max from all the
   // processors.
@@ -119,7 +119,7 @@ void Sort<KeyType>::binsort()
 
   // Now save the local bin sizes in a vector so
   // we don't have to keep around the BinSorter.
-  for (unsigned int i=0; i<_n_procs; ++i)
+  for (processor_id_type i=0; i<_n_procs; ++i)
     _local_bin_sizes[i] = bs.sizeof_bin(i);
 }
 
@@ -130,7 +130,7 @@ void Sort<KeyType>::binsort()
 // code duplication here that could potentially be consolidated with the
 // above method
 template <>
-void Sort<Hilbert::HilbertIndices>::binsort()
+void Sort<Hilbert::HilbertIndices,unsigned int>::binsort()
 {
   // Find the global min and max from all the
   // processors.  Do this using MPI_Allreduce.
@@ -179,21 +179,21 @@ void Sort<Hilbert::HilbertIndices>::binsort()
 
   // Now save the local bin sizes in a vector so
   // we don't have to keep around the BinSorter.
-  for (unsigned int i=0; i<_n_procs; ++i)
+  for (processor_id_type i=0; i<_n_procs; ++i)
     _local_bin_sizes[i] = bs.sizeof_bin(i);
 }
 
 #endif // #ifdef LIBMESH_HAVE_LIBHILBERT
 
 
-template <typename KeyType>
-void Sort<KeyType>::communicate_bins()
+template <typename KeyType, typename IdxType>
+void Sort<KeyType,IdxType>::communicate_bins()
 {
 #ifdef LIBMESH_HAVE_MPI
   // Create storage for the global bin sizes.  This
   // is the number of keys which will be held in
   // each bin over all processors.
-  std::vector<unsigned int> global_bin_sizes = _local_bin_sizes;
+  std::vector<IdxType> global_bin_sizes = _local_bin_sizes;
 
   // Sum to find the total number of entries in each bin.
   CommWorld.sum(global_bin_sizes);
@@ -203,14 +203,14 @@ void Sort<KeyType>::communicate_bins()
   // processor is being MPI_Gatherv'd.
   std::vector<KeyType> dest;
 
-  unsigned int local_offset = 0;
+  IdxType local_offset = 0;
 
-  for (unsigned int i=0; i<_n_procs; ++i)
+  for (processor_id_type i=0; i<_n_procs; ++i)
     {
       // Vector to receive the total bin size for each
       // processor.  Processor i's bin size will be
       // held in proc_bin_size[i]
-      std::vector<unsigned int> proc_bin_size;
+      std::vector<IdxType> proc_bin_size;
 
       // Find the number of contributions coming from each
       // processor for this bin.  Note: allgather combines
@@ -220,8 +220,8 @@ void Sort<KeyType>::communicate_bins()
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
       // of the proc_bin_size vector.
-      std::vector<unsigned int> displacements(_n_procs);
-      for (unsigned int j=1; j<_n_procs; ++j)
+      std::vector<IdxType> displacements(_n_procs);
+      for (processor_id_type j=1; j<_n_procs; ++j)
 	displacements[j] = proc_bin_size[j-1] + displacements[j-1];
 
       // Resize the destination buffer
@@ -259,7 +259,7 @@ void Sort<KeyType>::communicate_bins()
 // code duplication here that could potentially be consolidated with the
 // above method
 template <>
-void Sort<Hilbert::HilbertIndices>::communicate_bins()
+void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
 {
   // Create storage for the global bin sizes.  This
   // is the number of keys which will be held in
@@ -343,16 +343,16 @@ void Sort<Hilbert::HilbertIndices>::communicate_bins()
 
 
 
-template <typename KeyType>
-void Sort<KeyType>::sort_local_bin()
+template <typename KeyType, typename IdxType>
+void Sort<KeyType,IdxType>::sort_local_bin()
 {
   std::sort(_my_bin.begin(), _my_bin.end());
 }
 
 
 
-template <typename KeyType>
-const std::vector<KeyType>& Sort<KeyType>::bin()
+template <typename KeyType, typename IdxType>
+const std::vector<KeyType>& Sort<KeyType,IdxType>::bin()
 {
   if (!_bin_is_sorted)
     {
@@ -367,10 +367,10 @@ const std::vector<KeyType>& Sort<KeyType>::bin()
 
 
 // Explicitly instantiate for int, double
-template class Parallel::Sort<int>;
-template class Parallel::Sort<double>;
+template class Parallel::Sort<int, unsigned int>;
+template class Parallel::Sort<double, unsigned int>;
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
-template class Parallel::Sort<Hilbert::HilbertIndices>;
+template class Parallel::Sort<Hilbert::HilbertIndices, unsigned int>;
 #endif
 
 } // namespace libMesh

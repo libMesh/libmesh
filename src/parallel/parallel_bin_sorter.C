@@ -36,8 +36,8 @@ namespace libMesh
 
 namespace Parallel {
 
-template <typename KeyType>
-BinSorter<KeyType>::BinSorter (const std::vector<KeyType>& d) :
+template <typename KeyType, typename IdxType>
+BinSorter<KeyType,IdxType>::BinSorter (const std::vector<KeyType>& d) :
   data(d)
 {
   // Assume (& libmesh_assert) we are working with a sorted range
@@ -51,20 +51,20 @@ BinSorter<KeyType>::BinSorter (const std::vector<KeyType>& d) :
 
 
 
-template <typename KeyType>
-void BinSorter<KeyType>::binsort (const std::size_t nbins,
-				  KeyType max,
-				  KeyType min)
+template <typename KeyType, typename IdxType>
+void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
+				          KeyType max,
+				          KeyType min)
 {
   libmesh_assert_less (min, max);
 
   // Build a histogram in parallel from our data.
   // Use this to create quasi-uniform bins.
-  Parallel::Histogram<KeyType> phist (data);
+  Parallel::Histogram<KeyType,IdxType> phist (data);
   phist.make_histogram (nbins*50, max, min);
   phist.build_histogram ();
 
-  const std::vector<unsigned int>& histogram =
+  const std::vector<IdxType>& histogram =
     phist.get_histogram();
 
 
@@ -72,15 +72,15 @@ void BinSorter<KeyType>::binsort (const std::size_t nbins,
   // that each bin is roughly equal size
   {
     // Find the total size of the data set
-    std::size_t local_data_size = data.size();
-    std::size_t global_data_size = local_data_size;
+    IdxType local_data_size = libmesh_cast_int<IdxType>(data.size());
+    IdxType global_data_size = libmesh_cast_int<IdxType>(local_data_size);
 
     CommWorld.sum(global_data_size);
 
-    std::vector<unsigned int> target_bin_size (nbins, global_data_size / nbins);
+    std::vector<IdxType> target_bin_size (nbins, global_data_size / nbins);
 
     // Equally distribute the remainder
-    for (std::size_t i=0; i<(global_data_size % nbins); i++)
+    for (IdxType i=0; i<(global_data_size % nbins); i++)
       ++target_bin_size[i];
 
     // Set the iterators corresponding to the bin boundaries
@@ -93,7 +93,7 @@ void BinSorter<KeyType>::binsort (const std::size_t nbins,
       bin_bounds[0] = Parallel::Utils::to_double(min);
 
       // The current location in the histogram
-      unsigned int current_histogram_bin = 0;
+      IdxType current_histogram_bin = 0;
 
       // How much above (+) or below (-) we are from the
       // target size for the last bin.
@@ -103,7 +103,7 @@ void BinSorter<KeyType>::binsort (const std::size_t nbins,
       int delta = 0;
 
       // Set the internal bin boundary iterators
-      for (unsigned int b=0; b<nbins; ++b)
+      for (IdxType b=0; b<nbins; ++b)
 	{
 	  // The size of bin b.  We want this to
 	  // be ~= target_bin_size[b]
@@ -139,10 +139,10 @@ void BinSorter<KeyType>::binsort (const std::size_t nbins,
 
 
 // Explicitly instantiate for int, double
-template class Parallel::BinSorter<int>;
-template class Parallel::BinSorter<double>;
+template class Parallel::BinSorter<int, unsigned int>;
+template class Parallel::BinSorter<double, unsigned int>;
 #ifdef LIBMESH_HAVE_LIBHILBERT
-template class Parallel::BinSorter<Hilbert::HilbertIndices>;
+template class Parallel::BinSorter<Hilbert::HilbertIndices, unsigned int>;
 #endif
 
 } // namespace libMesh

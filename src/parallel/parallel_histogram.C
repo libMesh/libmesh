@@ -33,8 +33,8 @@ namespace libMesh
 
 
 namespace Parallel {
-template <typename KeyType>
-Histogram<KeyType>::Histogram (const std::vector<KeyType>& d) :
+template <typename KeyType, typename IdxType>
+Histogram<KeyType,IdxType>::Histogram (const std::vector<KeyType>& d) :
   data(d)
 {
   libmesh_assert (Parallel::Utils::is_sorted (data));
@@ -42,10 +42,10 @@ Histogram<KeyType>::Histogram (const std::vector<KeyType>& d) :
 
 
 
-template <typename KeyType>
-void Histogram<KeyType>::make_histogram (const std::size_t nbins,
-					  KeyType max,
-					  KeyType min)
+template <typename KeyType, typename IdxType>
+void Histogram<KeyType,IdxType>::make_histogram (const IdxType nbins,
+					 KeyType max,
+					 KeyType min)
 {
   libmesh_assert_less (min, max);
 
@@ -72,7 +72,7 @@ void Histogram<KeyType>::make_histogram (const std::size_t nbins,
   bin_bounds[0] = Parallel::Utils::to_double(min);
 
   // Set the internal bin boundary iterators
-  for (std::size_t b=1; b<nbins; ++b)
+  for (IdxType b=1; b<nbins; ++b)
     {
       bin_bounds[b] = Parallel::Utils::to_double(min) + bin_width * b;
 
@@ -86,13 +86,13 @@ void Histogram<KeyType>::make_histogram (const std::size_t nbins,
 
 
 
-template <typename KeyType>
-void Histogram<KeyType>::build_histogram ()
+template <typename KeyType, typename IdxType>
+void Histogram<KeyType,IdxType>::build_histogram ()
 {
   // Build a local histogram
-  std::vector<unsigned int> local_hist (this->n_bins());
+  std::vector<IdxType> local_hist (this->n_bins());
 
-  for (std::size_t b=0; b<this->n_bins(); b++)
+  for (IdxType b=0; b<this->n_bins(); b++)
     local_hist[b] = this->local_bin_size(b);
 
   // Add all the local histograms to get the global histogram
@@ -106,10 +106,10 @@ void Histogram<KeyType>::build_histogram ()
 
 
 // Explicitly instantiate for int, double
-template class Parallel::Histogram<int>;
-template class Parallel::Histogram<double>;
+template class Parallel::Histogram<int,    unsigned int>;
+template class Parallel::Histogram<double, unsigned int>;
 #ifdef LIBMESH_HAVE_LIBHILBERT
-template class Parallel::Histogram<Hilbert::HilbertIndices>;
+template class Parallel::Histogram<Hilbert::HilbertIndices, unsigned int>;
 #endif
 
 } // namespace libMesh

@@ -32,7 +32,7 @@ namespace libMesh
 
 namespace Parallel {
 
-template <typename KeyType>
+template <typename KeyType, typename IdxType=unsigned int>
   /**
    * Perform a parallel sort using a bin-sort method.
    */
@@ -50,12 +50,12 @@ public:
   // The actual function which sorts the data into
   // nbins.  Currently based on the global min and
   // max which you must provide e.g. by using MPI.
-  void binsort (const std::size_t nbins,
+  void binsort (const IdxType nbins,
 		KeyType max,
 		KeyType min);
 
   // Returns the size of bin b as an unsigned int.
-  std::size_t sizeof_bin (const std::size_t bin) const;
+  IdxType sizeof_bin (const IdxType bin) const;
 
 
 private:
@@ -68,15 +68,16 @@ private:
 
 
 //--------------------------------------------------------------------------
-template <typename KeyType>
+template <typename KeyType, typename IdxType>
 inline
-std::size_t BinSorter<KeyType>::sizeof_bin (const std::size_t bin) const
+IdxType BinSorter<KeyType,IdxType>::sizeof_bin (const IdxType bin) const
 {
   libmesh_assert_less ((bin+1), bin_iters.size());
 
   // The size of the bin is defined by the distance between
   // its bounding iterators
-  return std::distance (bin_iters[bin], bin_iters[bin+1]);
+  return libmesh_cast_int<IdxType>
+    (std::distance (bin_iters[bin], bin_iters[bin+1]));
 }
 
 }

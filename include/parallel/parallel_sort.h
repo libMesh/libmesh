@@ -43,7 +43,7 @@ namespace Parallel
    * all the processors.  We assume that a Sort
    * is instantiated on all processors.
    */
-template <typename KeyType>
+template <typename KeyType, typename IdxType=unsigned int>
 class Sort
 {
 public:
@@ -56,8 +56,8 @@ public:
    * where n is the length of the vector.
    */
   Sort (std::vector<KeyType>& d,
-	const unsigned int n_procs = libMesh::n_processors(),
-	const unsigned int proc_id = libMesh::processor_id());
+	const processor_id_type n_procs = libMesh::n_processors(),
+	const processor_id_type proc_id = libMesh::processor_id());
 
 
   /**
@@ -80,12 +80,12 @@ private:
   /**
    * The number of processors to work with.
    */
-  const unsigned int _n_procs;
+  const processor_id_type _n_procs;
 
   /**
    * The identity of this processor.
    */
-  const unsigned int _proc_id;
+  const processor_id_type _proc_id;
 
   /**
    * Flag which lets you know if sorting is complete
@@ -104,7 +104,7 @@ private:
    * bin on this processor.  It has
    * size equal to _n_procs.
    */
-  std::vector<unsigned int> _local_bin_sizes;
+  std::vector<IdxType> _local_bin_sizes;
 
   /**
    * The bin which will eventually be held
