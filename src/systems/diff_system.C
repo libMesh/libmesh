@@ -106,6 +106,8 @@ void DifferentiableSystem::init_data ()
 
   // Next initialize ImplicitSystem data
   Parent::init_data();
+
+  time_solver->init_data();
 }
 
 

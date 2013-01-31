@@ -52,13 +52,22 @@ void UnsteadySolver::init ()
 
 
 
-void UnsteadySolver::solve ()
+void UnsteadySolver::init_data()
 {
-  if (first_solve)
-    {
-      advance_timestep();
-      first_solve = false;
-    }
+#ifdef LIBMESH_ENABLE_GHOSTED
+  old_local_nonlinear_solution->init (_system.n_dofs(), _system.n_local_dofs(),
+                                      _system.get_dof_map().get_send_list(), false,
+                                      GHOSTED);
+#else
+  old_local_nonlinear_solution->init (_system.n_dofs(), false, SERIAL);
+#endif
+}
+
+
+
+void UnsteadySolver::reinit ()
+{
+  TimeSolver::reinit();
 
 #ifdef LIBMESH_ENABLE_GHOSTED
   old_local_nonlinear_solution->init (_system.n_dofs(), _system.n_local_dofs(),
@@ -68,9 +77,17 @@ void UnsteadySolver::solve ()
   old_local_nonlinear_solution->init (_system.n_dofs(), false, SERIAL);
 #endif
 
-  _system.get_vector("_old_nonlinear_solution").localize
-    (*old_local_nonlinear_solution,
-     _system.get_dof_map().get_send_list());
+}
+
+
+
+void UnsteadySolver::solve ()
+{
+  if (first_solve)
+    {
+      advance_timestep();
+      first_solve = false;
+    }
 
   unsigned int solve_result = _diff_solver->solve();
 
@@ -141,6 +158,10 @@ void UnsteadySolver::advance_timestep ()
     *(_system.solution);
 
   old_nonlinear_solution = nonlinear_solution;
+
+  old_nonlinear_solution.localize
+    (*old_local_nonlinear_solution,
+     _system.get_dof_map().get_send_list());
 }
 
 
@@ -164,12 +185,22 @@ void UnsteadySolver::adjoint_advance_timestep ()
   // Retrieve the primal solution vectors at this time using the
   // solution_history object
   solution_history->retrieve();
+
+  // Dont forget to localize the old_nonlinear_solution !
+  _system.get_vector("_old_nonlinear_solution").localize
+    (*old_local_nonlinear_solution,
+     _system.get_dof_map().get_send_list());
 }
 
   void UnsteadySolver::retrieve_timestep()
   {
     // Retrieve all the stored vectors at the current time
     solution_history->retrieve();
+
+    // Dont forget to localize the old_nonlinear_solution !
+    _system.get_vector("_old_nonlinear_solution").localize
+    (*old_local_nonlinear_solution,
+     _system.get_dof_map().get_send_list());
   }
 
 

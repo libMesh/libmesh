@@ -84,6 +84,13 @@ public:
   virtual void init ();
 
   /**
+   * The data initialization function.  This method is used to
+   * initialize internal data structures after the underlying System
+   * has been initialized
+   */
+  virtual void init_data ();
+
+  /**
    * The reinitialization function.  This method is used after
    * changes in the mesh
    */

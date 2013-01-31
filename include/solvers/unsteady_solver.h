@@ -72,6 +72,19 @@ public:
   virtual void init ();
 
   /**
+   * The data initialization function.  This method is used to
+   * initialize internal data structures after the underlying System
+   * has been initialized
+   */
+  virtual void init_data ();
+
+  /**
+   * The reinitialization function.  This method is used to
+   * resize internal data vectors after a mesh change.
+   */
+  virtual void reinit ();
+
+  /**
    * This method solves for the solution at the next timestep.
    * Usually we will only need to solve one (non)linear system per timestep,
    * but more complex subclasses may override this.
