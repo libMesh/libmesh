@@ -143,8 +143,8 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 
     // This will be exact when there is no refinement and all the
     // elements are of the same type.
-    unsigned int graph_size=0;
-    std::vector<std::vector<unsigned int> > graph(n_active_elem);
+    std::size_t graph_size=0;
+    std::vector<std::vector<dof_id_type> > graph(n_active_elem);
 
     for (; elem_it != elem_end; ++elem_it)
       {
@@ -241,7 +241,7 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
     for (std::size_t r=0; r<graph.size(); r++)
       {
 	xadj.push_back(adjncy.size());
-	std::vector<unsigned int> graph_row; // build this emtpy
+	std::vector<dof_id_type> graph_row; // build this emtpy
 	graph_row.swap(graph[r]); // this will deallocate at the end of scope
 	adjncy.insert(adjncy.end(),
 		      graph_row.begin(),

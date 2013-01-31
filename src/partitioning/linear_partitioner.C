@@ -47,10 +47,10 @@ void LinearPartitioner::_do_partition (MeshBase& mesh,
   {
     START_LOG ("partition()", "LinearPartitioner");
 
-    const unsigned int n_active_elem = mesh.n_active_elem();
-    const unsigned int blksize       = n_active_elem/n;
+    const dof_id_type n_active_elem = mesh.n_active_elem();
+    const dof_id_type blksize       = n_active_elem/n;
 
-    unsigned int e = 0;
+    dof_id_type e = 0;
 
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end();
@@ -60,7 +60,8 @@ void LinearPartitioner::_do_partition (MeshBase& mesh,
 	if ((e/blksize) < n)
           {
             Elem *elem = *elem_it;
-	    elem->processor_id() = e/blksize;
+	    elem->processor_id() =
+	      libmesh_cast_int<processor_id>(e/blksize);
           }
 	else
           {

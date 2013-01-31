@@ -44,10 +44,10 @@ void QClough::init_2D(const ElemType _type,
       {
 	std::vector<Point> &gausspoints = gauss_rule.get_points();
 	std::vector<Real> &gaussweights = gauss_rule.get_weights();
-	unsigned int numgausspts = gausspoints.size();
+	std::size_t numgausspts = gausspoints.size();
 	_points.resize(numgausspts*3);
 	_weights.resize(numgausspts*3);
-        for (unsigned int i = 0; i != numgausspts; ++i)
+        for (std::size_t i = 0; i != numgausspts; ++i)
           {
 	    _points[3*i](0) = gausspoints[i](0) +
 			    gausspoints[i](1) / 3.;

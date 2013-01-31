@@ -72,12 +72,12 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 
   START_LOG("sfc_partition()", "SFCPartitioner");
 
-  const unsigned int n_active_elem = mesh.n_active_elem();
-  const unsigned int n_elem        = mesh.n_elem();
+  const dof_id_type n_active_elem = mesh.n_active_elem();
+  const dof_id_type n_elem        = mesh.n_elem();
 
   // the forward_map maps the active element id
   // into a contiguous block of indices
-  std::vector<unsigned int>
+  std::vector<dof_id_type>
     forward_map (n_elem, libMesh::invalid_uint);
 
   // the reverse_map maps the contiguous ids back
@@ -100,7 +100,7 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
     MeshBase::element_iterator       elem_it  = mesh.active_elements_begin();
     const MeshBase::element_iterator elem_end = mesh.active_elements_end();
 
-    unsigned int el_num = 0;
+    dof_id_type el_num = 0;
 
     for (; elem_it != elem_end; ++elem_it)
       {
@@ -171,9 +171,9 @@ void SFCPartitioner::_do_partition (MeshBase& mesh,
 //  	    << z[i] << std::endl;
 //      }
 
-    const unsigned int blksize = (n_active_elem+n-1)/n;
+    const dof_id_type blksize = (n_active_elem+n-1)/n;
 
-    for (unsigned int i=0; i<n_active_elem; i++)
+    for (dof_id_type i=0; i<n_active_elem; i++)
       {
 	libmesh_assert_less (static_cast<unsigned int>(table[i]-1), reverse_map.size());
 

@@ -69,7 +69,7 @@ void QGrundmann_Moller::gm_rule(unsigned int s)
   std::vector<std::vector<unsigned int> > permutations;
 
   // Index into the vector where we should start adding the next round of points/weights
-  unsigned int offset=0;
+  std::size_t offset=0;
 
   // Implement the GM formula 4.1 on page 286 of the paper
   for (unsigned int i=0; i<=s; ++i)

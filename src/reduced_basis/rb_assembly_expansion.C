@@ -126,17 +126,20 @@ void RBAssemblyExpansion::perform_output_boundary_assembly(unsigned int output_i
 
 unsigned int RBAssemblyExpansion::get_n_A_terms() const
 {
-  return _A_assembly_vector.size();
+  return libmesh_cast_int<unsigned int>
+    (_A_assembly_vector.size());
 }
 
 unsigned int RBAssemblyExpansion::get_n_F_terms() const
 {
-  return _F_assembly_vector.size();
+  return libmesh_cast_int<unsigned int>
+    (_F_assembly_vector.size());
 }
 
 unsigned int RBAssemblyExpansion::get_n_outputs() const
 {
-  return _output_assembly_vector.size();
+  return libmesh_cast_int<unsigned int>
+    (_output_assembly_vector.size());
 }
 
 unsigned int RBAssemblyExpansion::get_n_output_terms(unsigned int index) const
@@ -147,7 +150,8 @@ unsigned int RBAssemblyExpansion::get_n_output_terms(unsigned int index) const
                  << std::endl;
     libmesh_error();
   }
-  return _output_assembly_vector[index].size();
+  return libmesh_cast_int<unsigned int>
+    (_output_assembly_vector[index].size());
 }
 
 void RBAssemblyExpansion::attach_A_assembly(ElemAssembly* Aq_assembly)

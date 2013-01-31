@@ -322,7 +322,8 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma)
   _svd_helper(JOBU, JOBVT, sigma_val, U_val, VT_val);
 
   // Load the singular values into sigma, ignore U_val and VT_val
-  const unsigned int n_sigma_vals = sigma_val.size();
+  const unsigned int n_sigma_vals =
+    libmesh_cast_int<unsigned int>(sigma_val.size());
   sigma.resize(n_sigma_vals);
   for(unsigned int i=0; i<n_sigma_vals; i++)
     sigma(i) = sigma_val[i];
@@ -366,7 +367,8 @@ void DenseMatrix<T>::_svd_lapack (DenseVector<T>& sigma, DenseMatrix<T>& U, Dens
   _svd_helper(JOBU, JOBVT, sigma_val, U_val, VT_val);
 
   // Load the singular values into sigma, ignore U_val and VT_val
-  const unsigned int n_sigma_vals = sigma_val.size();
+  const unsigned int n_sigma_vals =
+    libmesh_cast_int<unsigned int>(sigma_val.size());
   sigma.resize(n_sigma_vals);
   for(unsigned int i=0; i<n_sigma_vals; i++)
     sigma(i) = sigma_val[i];

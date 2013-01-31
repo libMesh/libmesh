@@ -97,19 +97,21 @@ void CentroidPartitioner::_do_partition (MeshBase& mesh,
   libmesh_assert_greater (n, 0);
 
   // the number of elements, e.g. 1000
-  const unsigned int n_elem      = mesh.n_elem();
+  const dof_id_type n_elem      = mesh.n_elem();
   // the number of elements per processor, e.g 400
-  const unsigned int target_size = n_elem / n;
+  const dof_id_type target_size = n_elem / n;
 
   // Make sure the mesh hasn't changed since the
   // last time we computed the centroids.
   libmesh_assert_equal_to (mesh.n_elem(), _elem_centroids.size());
 
-  for (unsigned int i=0; i<n_elem; i++)
+  for (dof_id_type i=0; i<n_elem; i++)
     {
       Elem* elem = _elem_centroids[i].second;
 
-      elem->processor_id() = std::min (i / target_size, n-1);
+      elem->processor_id() =
+        std::min (libmesh_cast_int<processor_id_type>(i / target_size),
+		  libmesh_cast_int<processor_id_type>(n-1));
     }
 }
 

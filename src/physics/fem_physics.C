@@ -216,7 +216,8 @@ bool FEMPhysics::mass_residual (bool request_jacobian,
       const std::vector<std::vector<Real> > &phi =
         context.element_fe_var[var]->get_phi();
 
-      const unsigned int n_dofs = context.dof_indices_var[var].size();
+      const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+	(context.dof_indices_var[var].size());
 
       DenseSubVector<Number> &Fu = *context.elem_subresiduals[var];
       DenseSubMatrix<Number> &Kuu = *context.elem_subjacobians[var][var];
