@@ -160,7 +160,7 @@ public:
    * Initializes the data structures to contain a quadrature rule
    * for an object of type \p type.
    */
-  void init (const ElemType _type=INVALID_ELEM,
+  void init (const ElemType type=INVALID_ELEM,
 	     unsigned int p_level=0);
 
   /**
@@ -222,7 +222,7 @@ protected:
    * weights vectors with the appropriate values.  Generally this
    * is just one point with weight 1.
    */
-  virtual void init_0D (const ElemType _type=INVALID_ELEM,
+  virtual void init_0D (const ElemType type=INVALID_ELEM,
 			unsigned int p_level=0);
 
   /**
@@ -232,7 +232,7 @@ protected:
    * It is assumed that derived quadrature rules will at least
    * define the init_1D function, therefore it is pure virtual.
    */
-  virtual void init_1D (const ElemType _type=INVALID_ELEM,
+  virtual void init_1D (const ElemType type=INVALID_ELEM,
 			unsigned int p_level=0) = 0;
 
   /**
