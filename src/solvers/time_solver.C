@@ -32,7 +32,8 @@ TimeSolver::TimeSolver (sys_type& s)
     _diff_solver (NULL),
     _linear_solver (NULL),
     _system (s),
-    solution_history(new NoSolutionHistory()) // Default setting for solution_history
+    solution_history(new NoSolutionHistory()), // Default setting for solution_history
+    _is_adjoint (false)
 {
 }
 
