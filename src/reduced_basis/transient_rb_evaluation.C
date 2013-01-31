@@ -249,6 +249,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
   RB_temporal_solution_data[0] = RB_solution;
 
   // Set outputs at initial time
+  {
   DenseVector<Number> RB_output_vector_N;
   for(unsigned int n=0; n<trans_theta_expansion.get_n_outputs(); n++)
   {
@@ -258,6 +259,7 @@ Real TransientRBEvaluation::rb_solve(unsigned int N)
       RB_output_vectors[n][q_l].get_principal_subvector(N, RB_output_vector_N);
       RB_outputs_all_k[n][0] += trans_theta_expansion.eval_output_theta(n,q_l,mu)*RB_output_vector_N.dot(RB_solution);
     }
+  }
   }
 
   // Initialize error bounds, if necessary
