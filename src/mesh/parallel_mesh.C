@@ -449,13 +449,13 @@ void ParallelMesh::delete_elem(Elem* e)
 void ParallelMesh::renumber_elem(const dof_id_type old_id,
                                  const dof_id_type new_id)
 {
-  Elem *elem = _elements[old_id];
-  libmesh_assert (elem);
-  libmesh_assert_equal_to (elem->id(), old_id);
+  Elem *el = _elements[old_id];
+  libmesh_assert (el);
+  libmesh_assert_equal_to (el->id(), old_id);
 
-  elem->set_id(new_id);
+  el->set_id(new_id);
   libmesh_assert (!_elements[new_id]);
-  _elements[new_id] = elem;
+  _elements[new_id] = el;
   _elements.erase(old_id);
 }
 
@@ -620,13 +620,13 @@ void ParallelMesh::delete_node(Node* n)
 void ParallelMesh::renumber_node(const dof_id_type old_id,
                                  const dof_id_type new_id)
 {
-  Node *node = _nodes[old_id];
-  libmesh_assert (node);
-  libmesh_assert_equal_to (node->id(), old_id);
+  Node *nd = _nodes[old_id];
+  libmesh_assert (nd);
+  libmesh_assert_equal_to (nd->id(), old_id);
 
-  node->set_id(new_id);
+  nd->set_id(new_id);
   libmesh_assert (!_nodes[new_id]);
-  _nodes[new_id] = node;
+  _nodes[new_id] = nd;
   _nodes.erase(old_id);
 }
 
@@ -788,25 +788,25 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
     {
-      Elem* elem = _elements[i]; // Returns NULL if there's no map entry
+      Elem* el = _elements[i]; // Returns NULL if there's no map entry
 
-      unsigned int refinement_flag   = elem ?
-        static_cast<unsigned int> (elem->refinement_flag()) : libMesh::invalid_uint;
+      unsigned int refinement_flag   = el ?
+        static_cast<unsigned int> (el->refinement_flag()) : libMesh::invalid_uint;
 #ifndef NDEBUG
-      unsigned int p_refinement_flag = elem ?
-        static_cast<unsigned int> (elem->p_refinement_flag()) : libMesh::invalid_uint;
+      unsigned int p_refinement_flag = el ?
+        static_cast<unsigned int> (el->p_refinement_flag()) : libMesh::invalid_uint;
 #endif
 
       unsigned int min_rflag = refinement_flag;
       CommWorld.min(min_rflag);
       // All processors with this element should agree on flag
-      libmesh_assert (!elem || min_rflag == refinement_flag);
+      libmesh_assert (!el || min_rflag == refinement_flag);
 
 #ifndef NDEBUG
       unsigned int min_pflag = p_refinement_flag;
 #endif
       // All processors with this element should agree on flag
-      libmesh_assert (!elem || min_pflag == p_refinement_flag);
+      libmesh_assert (!el || min_pflag == p_refinement_flag);
     }
 #endif // LIBMESH_ENABLE_AMR
 }
@@ -1026,10 +1026,10 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
     for (; it != end; ++it)
       {
-        Elem *elem = *it;
+        Elem *el = *it;
 
-        for (unsigned int n=0; n != elem->n_nodes(); ++n)
-          used_nodes.insert(elem->node(n));
+        for (unsigned int n=0; n != el->n_nodes(); ++n)
+          used_nodes.insert(el->node(n));
       }
   }
 
@@ -1041,17 +1041,17 @@ void ParallelMesh::renumber_nodes_and_elements ()
 
     for (; it != end;)
       {
-	Node *node = *it;
-        if (!node)
+	Node *nd = *it;
+        if (!nd)
           _nodes.erase(it++);
-        else if (!used_nodes.count(node->id()))
+        else if (!used_nodes.count(nd->id()))
           {
 	    // remove any boundary information associated with
 	    // this node
-	    this->boundary_info->remove (node);
+	    this->boundary_info->remove (nd);
 
 	    // delete the node
-	    delete node;
+	    delete nd;
 
             _nodes.erase(it++);
 	  }
@@ -1100,7 +1100,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
   // We need access to iterators for the underlying containers,
   // not the mapvector<> reimplementations.
   mapvector<Node*,dof_id_type>::maptype &nodes = this->_nodes;
-  mapvector<Elem*,dof_id_type>::maptype &elem  = this->_elements;
+  mapvector<Elem*,dof_id_type>::maptype &elems = this->_elements;
 
   // Nodes first
   {
@@ -1116,8 +1116,8 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
   // Elements next
   {
     mapvector<Elem*,dof_id_type>::maptype::iterator
-      it  = elem.begin(),
-      end = elem.end();
+      it  = elems.begin(),
+      end = elems.end();
 
     for (; it != end; ++it)
       if (it->second != NULL)
