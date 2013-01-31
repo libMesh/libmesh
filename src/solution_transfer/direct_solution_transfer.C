@@ -34,6 +34,8 @@ DirectSolutionTransfer::~DirectSolutionTransfer()
 void
 DirectSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var)
 {  
+  libmesh_experimental();
+
   System * from_sys = from_var.system();
   System * to_sys = to_var.system();
 
