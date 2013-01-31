@@ -261,7 +261,7 @@ void UCDIO::write_implementation (std::ostream& out)
 }
 
 void UCDIO::write_header(std::ostream& out, const MeshBase& mesh,
-			 int n_elems, unsigned int n_vars )
+			 dof_id_type n_elems, unsigned int n_vars )
 {
   libmesh_assert (out.good());
   // TODO: We used to print out the SVN revision here when we did keyword expansions...
@@ -388,16 +388,16 @@ void UCDIO::write_soln(std::ostream& out, const MeshBase& mesh,
     }
 
   // Now, for each node, write out the solution variables
-  unsigned int nv = names.size();
-  for( unsigned int n = 1; // 1-based node number for UCD
+  std::size_t nv = names.size();
+  for( std::size_t n = 1; // 1-based node number for UCD
        n <= mesh.n_nodes(); n++)
     {
       libmesh_assert (out.good());
       out << n;
 
-      for( unsigned int var = 0; var < names.size(); var++ )
+      for( std::size_t var = 0; var != nv; var++ )
 	{
-	  unsigned int idx = nv*(n-1) + var;
+	  std::size_t idx = nv*(n-1) + var;
 	  
 	  out << " " << soln[idx];
 	}

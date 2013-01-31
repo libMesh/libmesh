@@ -129,17 +129,17 @@ class TetGenIO : public MeshInput<MeshBase>,
   /**
    * stores new positions of nodes. Used when reading.
    */
-  std::map<unsigned int,unsigned int> _assign_nodes;
+  std::map<dof_id_type,dof_id_type> _assign_nodes;
 
   /**
    * total number of nodes. Primarily used when reading.
    */
-  unsigned int _num_nodes;
+  dof_id_type _num_nodes;
 
   /**
    * total number of elements. Primarily used when reading.
    */
-  unsigned int _num_elements;
+  dof_id_type _num_elements;
 
   /**
    * A pointer to the MeshData object you would like to use.

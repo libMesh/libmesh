@@ -159,7 +159,7 @@ private:
   /**
    * maps global node id to node id of partition
    */
-  std::map<unsigned int, unsigned int> _local_node_map;
+  std::map<dof_id_type, dof_id_type> _local_node_map;
 };
 
 

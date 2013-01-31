@@ -594,7 +594,7 @@ void UNVIO::node_in (std::istream& in_file)
       // ok, convert...
       std::string num_buf;
 
-      for(unsigned int i=0; i<this->_n_nodes; i++)
+      for(dof_id_type i=0; i<this->_n_nodes; i++)
         {
 	  libmesh_assert (!in_file.eof());
 
@@ -708,16 +708,16 @@ void UNVIO::element_in (std::istream& in_file)
 
   // Get the beginning and end of the _assign_nodes vector
   // to eliminate repeated function calls
-  const std::vector<unsigned int>::const_iterator it_begin =
+  const std::vector<dof_id_type>::const_iterator it_begin =
     this->_assign_nodes.begin();
 
-  const std::vector<unsigned int>::const_iterator it_end   =
+  const std::vector<dof_id_type>::const_iterator it_end   =
     this->_assign_nodes.end();
 
 
 
   // read from the virtual file
-  for (unsigned int i=0; i<this->_n_elements; i++)
+  for (dof_id_type i=0; i<this->_n_elements; i++)
     {
       in_file >> element_lab             // read element label
 	      >> fe_descriptor_id        // read FE descriptor id
@@ -927,11 +927,11 @@ void UNVIO::element_in (std::istream& in_file)
 	}
 
       // nodes are being stored in element
-      for (unsigned int j=1; j<=n_nodes; j++)
+      for (dof_id_type j=1; j<=n_nodes; j++)
 	{
 	  // Find the position of node_labels[j] in the _assign_nodes vector.
-	  const std::pair<std::vector<unsigned int>::const_iterator,
-	                  std::vector<unsigned int>::const_iterator>
+	  const std::pair<std::vector<dof_id_type>::const_iterator,
+	                  std::vector<dof_id_type>::const_iterator>
 	    it = std::equal_range (it_begin,
 				   it_end,
 				   node_labels[j]);
@@ -944,8 +944,9 @@ void UNVIO::element_in (std::istream& in_file)
 	  // the _assign_nodes vector will give us a unique id in the
 	  // range [0,n_nodes) that we can use for defining a contiguous
 	  // connectivity.
-	  const unsigned int assigned_node = std::distance (it_begin,
-							    it.first);
+	  const dof_id_type assigned_node =
+	    libmesh_cast_int<dof_id_type>
+	      (std::distance (it_begin, it.first));
 
 	  // Make sure we didn't get an out-of-bounds id
 	  libmesh_assert_less (assigned_node, this->_n_nodes);

@@ -104,7 +104,7 @@ class UCDIO : public MeshInput<MeshBase>,
    * Write UCD format header
    */
   void write_header(std::ostream& out, const MeshBase& mesh,
-		    int n_elems, unsigned int n_vars );
+		    dof_id_type n_elems, unsigned int n_vars );
 
   /**
    * Write node information

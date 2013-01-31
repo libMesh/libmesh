@@ -221,7 +221,7 @@ void Patch::build_around_element (const Elem* e0,
       // have access to the Mesh object here, the only way we can
       // detect this case is by detecting a "stagnant patch," i.e. a
       // patch whose size does not increase after adding face neighbors
-      const unsigned int old_patch_size = this->size();
+      const std::size_t old_patch_size = this->size();
 
       // We profile the patch-extending functions separately
       (this->*patchtype)();

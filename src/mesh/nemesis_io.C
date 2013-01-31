@@ -1041,7 +1041,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   // local number of boundary conditions (and is therefore cheap)
   // which should match elem_list.size().
   {
-    unsigned nbcs = mesh.boundary_info->n_boundary_conds();
+    std::size_t nbcs = mesh.boundary_info->n_boundary_conds();
     if (nbcs != elem_list.size())
       {
 	libMesh::err << "[" << libMesh::processor_id() << "] ";

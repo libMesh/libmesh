@@ -54,16 +54,16 @@ void TetGenIO::read (const std::string& name)
   //
   if (name.rfind(".node") < name.size())
     {
-      name_node = name;
-      dummy     = name;
-      int position = dummy.rfind(".node");
-      name_ele     = dummy.replace(position, 5, ".ele");
+      name_node            = name;
+      dummy                = name;
+      std::size_t position = dummy.rfind(".node");
+      name_ele             = dummy.replace(position, 5, ".ele");
     }
   else if (name.rfind(".ele") < name.size())
     {
       name_ele = name;
       dummy    = name;
-      int position = dummy.rfind(".ele");
+      std::size_t position = dummy.rfind(".ele");
       name_node    = dummy.replace(position, 4, ".node");
     }
   else
@@ -212,7 +212,7 @@ void TetGenIO::element_in (std::istream& ele_stream)
   for (unsigned i=0; i<nAttri; ++i)
     this->element_attributes[i].resize(_num_elements);
 
-  for (unsigned int i=0; i<_num_elements; i++)
+  for (dof_id_type i=0; i<_num_elements; i++)
     {
       libmesh_assert (ele_stream.good());
 
@@ -247,9 +247,9 @@ void TetGenIO::element_in (std::istream& ele_stream)
 	this->_mesh_data->add_foreign_elem_id (elem, element_lab);
 
       // Read node labels
-      for (unsigned int j=0; j<n_nodes; j++)
+      for (dof_id_type j=0; j<n_nodes; j++)
 	{
-	  unsigned long int node_label;
+	  dof_id_type node_label;
 	  ele_stream >> node_label;
 
 	  // Assign node to element
@@ -297,7 +297,7 @@ void TetGenIO::write (const std::string& fname)
 	<< mesh.n_nodes() << " 3 0 0\n";
 
     // write the nodes:
-    for (unsigned int v=0; v<mesh.n_nodes(); v++)
+    for (dof_id_type v=0; v<mesh.n_nodes(); v++)
       out << v << " "
 	  << mesh.point(v)(0) << " "
 	  << mesh.point(v)(1) << " "

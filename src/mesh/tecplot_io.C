@@ -239,10 +239,10 @@ void TecplotIO::write_ascii (const std::string& fname,
 
       if ((v != NULL) && (solution_names != NULL))
 	{
-	  const unsigned int n_vars = solution_names->size();
+	  const std::size_t n_vars = solution_names->size();
 
 
-	  for (unsigned int c=0; c<n_vars; c++)
+	  for (std::size_t c=0; c<n_vars; c++)
 	    {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 	      // Write real data

@@ -164,17 +164,17 @@ class XdrIO : public MeshInput<MeshBase>,
   /**
    * Write the connectivity for a parallel, distributed mesh
    */
-  void write_serialized_connectivity (Xdr &io, const unsigned int n_elem) const;
+  void write_serialized_connectivity (Xdr &io, const dof_id_type n_elem) const;
 
   /**
    * Write the nodal locations for a parallel, distributed mesh
    */
-  void write_serialized_nodes (Xdr &io, const unsigned int n_nodes) const;
+  void write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const;
 
   /**
    * Write the boundary conditions for a parallel, distributed mesh
    */
-  void write_serialized_bcs (Xdr &io, const unsigned int n_bcs) const;
+  void write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const;
 
 
 
@@ -183,12 +183,12 @@ class XdrIO : public MeshInput<MeshBase>,
   /**
    * Read the connectivity for a parallel, distributed mesh
    */
-  void read_serialized_connectivity (Xdr &io, const unsigned int n_elem);
+  void read_serialized_connectivity (Xdr &io, const dof_id_type n_elem);
 
   /**
    * Read the nodal locations for a parallel, distributed mesh
    */
-  void read_serialized_nodes (Xdr &io, const unsigned int n_nodes);
+  void read_serialized_nodes (Xdr &io, const dof_id_type n_nodes);
 
   /**
    * Read the boundary conditions for a parallel, distributed mesh
@@ -199,10 +199,10 @@ class XdrIO : public MeshInput<MeshBase>,
   /**
    * Pack an element into a transfer buffer for parallel communication.
    */
-  void pack_element (std::vector<unsigned int> &conn,
+  void pack_element (std::vector<dof_id_type> &conn,
 		     const Elem *elem,
-		     const unsigned int parent_id  = libMesh::invalid_uint,
-		     const unsigned int parent_pid = libMesh::invalid_uint) const;
+		     const dof_id_type parent_id  = DofObject::invalid_id,
+		     const dof_id_type parent_pid = DofObject::invalid_id) const;
 
   bool _binary;
   bool _legacy;
@@ -217,7 +217,7 @@ class XdrIO : public MeshInput<MeshBase>,
   /**
    * Define the block size to use for chunked IO.
    */
-  static const unsigned int io_blksize;
+  static const std::size_t io_blksize;
 };
 
 

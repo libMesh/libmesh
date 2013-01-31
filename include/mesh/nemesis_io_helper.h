@@ -121,8 +121,8 @@ public:
    * .) global number of node sets
    * .) global number of side sets
    */
-  void put_init_global(unsigned num_nodes_global,
-		       unsigned num_elems_global,
+  void put_init_global(dof_id_type num_nodes_global,
+		       dof_id_type num_elems_global,
 		       unsigned num_elem_blks_global,
 		       unsigned num_node_sets_global,
 		       unsigned num_side_sets_global);

@@ -191,7 +191,7 @@ class UNVIO : public MeshInput<MeshBase>,
   /**
    * maps node id's from UNV to internal.  Used when reading.
    */
-  std::vector<unsigned int> _assign_nodes;
+  std::vector<dof_id_type> _assign_nodes;
 
   /**
    * stores positions of relevant datasets in the file, should
@@ -203,13 +203,13 @@ class UNVIO : public MeshInput<MeshBase>,
    * total number of nodes, determined through \p count_nodes().
    * Primarily used when reading.
    */
-  unsigned int _n_nodes;
+  dof_id_type _n_nodes;
 
   /**
    * total number of elements, determined through
    * \p count_elements().  Primarily used when reading.
    */
-  unsigned int _n_elements;
+  dof_id_type _n_elements;
 
   /**
    * label for the node dataset

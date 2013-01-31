@@ -468,8 +468,8 @@ void Nemesis_IO_Helper::put_init_info(unsigned num_proc,
 
 
 
-void Nemesis_IO_Helper::put_init_global(unsigned num_nodes_global,
-					unsigned num_elems_global,
+void Nemesis_IO_Helper::put_init_global(dof_id_type num_nodes_global,
+					dof_id_type num_elems_global,
 					unsigned num_elem_blks_global,
 					unsigned num_node_sets_global,
 					unsigned num_side_sets_global)
@@ -719,8 +719,10 @@ void Nemesis_IO_Helper::create(std::string filename)
 {
   // Fall back on double precision when necessary since ExodusII
   // doesn't seem to support long double
-  comp_ws = std::min(sizeof(Real),sizeof(double));
-  io_ws = std::min(sizeof(Real),sizeof(double));
+  comp_ws = libmesh_cast_int<int>
+    (std::min(sizeof(Real),sizeof(double)));
+  io_ws = libmesh_cast_int<int>
+    (std::min(sizeof(Real),sizeof(double)));
 
   this->ex_id = exII::ex_create(filename.c_str(), EX_CLOBBER, &comp_ws, &io_ws);
 
@@ -920,8 +922,10 @@ void Nemesis_IO_Helper::write_exodus_initialization_info(const MeshBase& pmesh,
 
   // Exodus will also use *global* number of side and node sets,
   // though it will not write out entries for all of them...
-  this->num_side_sets = this->global_sideset_ids.size();
-  this->num_node_sets = this->global_nodeset_ids.size();
+  this->num_side_sets =
+    libmesh_cast_int<int>(this->global_sideset_ids.size());
+  this->num_node_sets =
+    libmesh_cast_int<int>(this->global_nodeset_ids.size());
 
   // We need to write the global number of blocks, even though this processor might not have
   // elements in some of them!
