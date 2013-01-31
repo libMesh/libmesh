@@ -138,44 +138,44 @@ void UnstructuredMesh::copy_nodes_and_elements
       Elem *newparent = old->parent() ?
           this->elem(old->parent()->id()) : NULL;
       AutoPtr<Elem> ap = Elem::build(old->type(), newparent);
-      Elem * elem = ap.release();
+      Elem * el = ap.release();
 
-      elem->subdomain_id() = old->subdomain_id();
+      el->subdomain_id() = old->subdomain_id();
 
       for (unsigned int s=0; s != old->n_sides(); ++s)
         if (old->neighbor(s) == remote_elem)
-          elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+          el->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
 
 #ifdef LIBMESH_ENABLE_AMR
       if (old->has_children())
         for (unsigned int c=0; c != old->n_children(); ++c)
           if (old->child(c) == remote_elem)
-            elem->add_child(const_cast<RemoteElem*>(remote_elem), c);
+            el->add_child(const_cast<RemoteElem*>(remote_elem), c);
 
       //Create the parent's child pointers if necessary
       if (newparent)
         {
           unsigned int oldc = old->parent()->which_child_am_i(old);
-          newparent->add_child(elem, oldc);
+          newparent->add_child(el, oldc);
         }
 
       // Copy the refinement flags
-      elem->set_refinement_flag(old->refinement_flag());
-      elem->set_p_refinement_flag(old->p_refinement_flag());
+      el->set_refinement_flag(old->refinement_flag());
+      el->set_p_refinement_flag(old->p_refinement_flag());
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
       //Assign all the nodes
-      for(unsigned int i=0;i<elem->n_nodes();i++)
-        elem->set_node(i) = &this->node(old->node(i));
+      for(unsigned int i=0;i<el->n_nodes();i++)
+        el->set_node(i) = &this->node(old->node(i));
 
       // And start it off in the same subdomain
-      elem->processor_id() = old->processor_id();
+      el->processor_id() = old->processor_id();
 
       // Give it the same id
-      elem->set_id(old->id());
+      el->set_id(old->id());
 
       //Hold onto it
-      this->add_elem(elem);
+      this->add_elem(el);
     }
   }
 
@@ -221,11 +221,11 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   if (reset_current_list)
     for (element_iterator el = this->elements_begin(); el != el_end; ++el)
       {
-	Elem* elem = *el;
-	for (unsigned int s=0; s<elem->n_neighbors(); s++)
-	  if (elem->neighbor(s) != remote_elem ||
+	Elem* e = *el;
+	for (unsigned int s=0; s<e->n_neighbors(); s++)
+	  if (e->neighbor(s) != remote_elem ||
 	      reset_remote_elements)
-	    elem->set_neighbor(s,NULL);
+	    e->set_neighbor(s,NULL);
       }
 
   // Find neighboring elements by first finding elements
@@ -376,16 +376,16 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
       for (element_iterator el = this->level_elements_begin(level);
            el != end; ++el)
         {
-          Elem* elem = *el;
-          libmesh_assert(elem);
-	  Elem* parent = elem->parent();
+          Elem* current_elem = *el;
+          libmesh_assert(current_elem);
+	  Elem* parent = current_elem->parent();
           libmesh_assert(parent);
-	  const unsigned int my_child_num = parent->which_child_am_i(elem);
+	  const unsigned int my_child_num = parent->which_child_am_i(current_elem);
 
-          for (unsigned int s=0; s < elem->n_neighbors(); s++)
+          for (unsigned int s=0; s < current_elem->n_neighbors(); s++)
             {
-              if (elem->neighbor(s) == NULL ||
-		  (elem->neighbor(s) == remote_elem &&
+              if (current_elem->neighbor(s) == NULL ||
+		  (current_elem->neighbor(s) == remote_elem &&
 		   parent->is_child_on_side(my_child_num, s)))
                 {
                   Elem *neigh = parent->neighbor(s);
@@ -394,7 +394,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 	          // made remote earlier, then a non-subactive elem should
 	          // actually have one of those remote children as a
 	          // neighbor
-                  if (neigh && (neigh->ancestor()) && (!elem->subactive()))
+                  if (neigh && (neigh->ancestor()) && (!current_elem->subactive()))
                     {
 #ifdef DEBUG
                       // Let's make sure that "had children made remote"
@@ -410,33 +410,33 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
 	              // And let's double-check that we don't have
 		      // a remote_elem neighboring a local element
-                      libmesh_assert_not_equal_to (elem->processor_id(),
+                      libmesh_assert_not_equal_to (current_elem->processor_id(),
 				                  libMesh::processor_id());
 #endif // DEBUG
                       neigh = const_cast<RemoteElem*>(remote_elem);
                     }
 
-                  elem->set_neighbor(s, neigh);
+                  current_elem->set_neighbor(s, neigh);
 #ifdef DEBUG
                   if (neigh != NULL && neigh != remote_elem)
                     // We ignore subactive elements here because
                     // we don't care about neighbors of subactive element.
-                    if ((!neigh->active()) && (!elem->subactive()))
+                    if ((!neigh->active()) && (!current_elem->subactive()))
                       {
                         libMesh::err << "On processor " << libMesh::processor_id()
                                       << std::endl;
-                        libMesh::err << "Bad element ID = " << elem->id()
+                        libMesh::err << "Bad element ID = " << current_elem->id()
                           << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
-                        libMesh::err << "Bad element proc_ID = " << elem->processor_id()
+                        libMesh::err << "Bad element proc_ID = " << current_elem->processor_id()
                           << ", Bad neighbor proc_ID = " << neigh->processor_id() << std::endl;
-                        libMesh::err << "Bad element size = " << elem->hmin()
+                        libMesh::err << "Bad element size = " << current_elem->hmin()
                           << ", Bad neighbor size = " << neigh->hmin() << std::endl;
-                        libMesh::err << "Bad element center = " << elem->centroid()
+                        libMesh::err << "Bad element center = " << current_elem->centroid()
                           << ", Bad neighbor center = " << neigh->centroid() << std::endl;
                         libMesh::err << "ERROR: "
-                          << (elem->active()?"Active":"Ancestor")
+                          << (current_elem->active()?"Active":"Ancestor")
                           << " Element at level "
-                          << elem->level() << std::endl;
+                          << current_elem->level() << std::endl;
                         libMesh::err << "with "
                           << (parent->active()?"active":
                               (parent->subactive()?"subactive":"ancestor"))
@@ -1069,15 +1069,14 @@ bool UnstructuredMesh::contract ()
   bool mesh_changed = false;
 
   element_iterator in        = elements_begin();
-  element_iterator out       = elements_begin();
   const element_iterator end = elements_end();
 
 #ifdef DEBUG
   for ( ; in != end; ++in)
     if (*in != NULL)
       {
-	Elem* elem = *in;
-	libmesh_assert(elem->active() || elem->subactive() || elem->ancestor());
+	Elem* el = *in;
+	libmesh_assert(el->active() || el->subactive() || el->ancestor());
       }
   in = elements_begin();
 #endif
@@ -1086,21 +1085,21 @@ bool UnstructuredMesh::contract ()
   for ( ; in != end; ++in)
     if (*in != NULL)
       {
-	Elem* elem = *in;
+	Elem* el = *in;
 
 	// Delete all the subactive ones
-	if (elem->subactive())
+	if (el->subactive())
 	  {
 	    // No level-0 element should be subactive.
 	    // Note that we CAN'T test elem->level(), as that
 	    // touches elem->parent()->dim(), and elem->parent()
 	    // might have already been deleted!
-	    libmesh_assert(elem->parent());
+	    libmesh_assert(el->parent());
 
 	    // Delete the element
 	    // This just sets a pointer to NULL, and doesn't
 	    // invalidate any iterators
-	    this->delete_elem(elem);
+	    this->delete_elem(el);
 
 	    // the mesh has certainly changed
 	    mesh_changed = true;
@@ -1108,10 +1107,10 @@ bool UnstructuredMesh::contract ()
 	else
 	  {
 	    // Compress all the active ones
-	    if (elem->active())
-	      elem->contract();
+	    if (el->active())
+	      el->contract();
 	    else
-	      libmesh_assert (elem->ancestor());
+	      libmesh_assert (el->ancestor());
 	  }
       }
 
