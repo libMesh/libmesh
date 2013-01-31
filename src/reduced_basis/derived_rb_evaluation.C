@@ -93,9 +93,9 @@ void DerivedRBEvaluation<Base>::write_out_basis_functions(System& ,
     {
       std::ofstream derived_bf_size_out;
       {
-        std::ostringstream file_name;
-        file_name << directory_name << "/derived_bf_size.dat";
-        derived_bf_size_out.open(file_name.str().c_str());
+        std::ostringstream bf_file_name;
+        bf_file_name << directory_name << "/derived_bf_size.dat";
+        derived_bf_size_out.open(bf_file_name.str().c_str());
       }
       if ( !derived_bf_size_out.good() )
       {
