@@ -511,12 +511,12 @@ void DistributedVector<T>::localize (const numeric_index_type first_local_idx,
   libmesh_assert_less_equal (send_list.size(), this->size());
   libmesh_assert_less (last_local_idx, this->size());
 
-  const numeric_index_type size       = this->size();
-  const numeric_index_type local_size = (last_local_idx - first_local_idx + 1);
+  const numeric_index_type my_size       = this->size();
+  const numeric_index_type my_local_size = (last_local_idx - first_local_idx + 1);
 
     // Don't bother for serial cases
   if ((first_local_idx == 0) &&
-      (local_size == size))
+      (my_local_size == my_size))
     return;
 
 
@@ -524,7 +524,7 @@ void DistributedVector<T>::localize (const numeric_index_type first_local_idx,
   // parts of (*this)
   DistributedVector<T> parallel_vec;
 
-  parallel_vec.init (size, local_size, true, PARALLEL);
+  parallel_vec.init (my_size, my_local_size, true, PARALLEL);
 
   // Copy part of *this into the parallel_vec
   for (numeric_index_type i=first_local_idx; i<=last_local_idx; i++)
