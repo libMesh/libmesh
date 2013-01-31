@@ -116,23 +116,23 @@ void QBase::scale(std::pair<Real, Real> old_range,
 void QBase::tensor_product_quad(const QBase& q1D)
 {
 
-  const unsigned int n_points = q1D.n_points();
+  const unsigned int np = q1D.n_points();
 
-  _points.resize(n_points * n_points);
+  _points.resize(np * np);
 
-  _weights.resize(n_points * n_points);
+  _weights.resize(np * np);
 
-  unsigned int qp=0;
+  unsigned int q=0;
 
-  for (unsigned int j=0; j<n_points; j++)
-    for (unsigned int i=0; i<n_points; i++)
+  for (unsigned int j=0; j<np; j++)
+    for (unsigned int i=0; i<np; i++)
       {
-	_points[qp](0) = q1D.qp(i)(0);
-	_points[qp](1) = q1D.qp(j)(0);
+	_points[q](0) = q1D.qp(i)(0);
+	_points[q](1) = q1D.qp(j)(0);
 
-	_weights[qp] = q1D.w(i)*q1D.w(j);
+	_weights[q] = q1D.w(i)*q1D.w(j);
 
-	qp++;
+	q++;
       }
 }
 
@@ -142,25 +142,25 @@ void QBase::tensor_product_quad(const QBase& q1D)
 
 void QBase::tensor_product_hex(const QBase& q1D)
 {
-  const unsigned int n_points = q1D.n_points();
+  const unsigned int np = q1D.n_points();
 
-  _points.resize(n_points * n_points * n_points);
+  _points.resize(np * np * np);
 
-  _weights.resize(n_points * n_points * n_points);
+  _weights.resize(np * np * np);
 
-  unsigned int qp=0;
+  unsigned int q=0;
 
-  for (unsigned int k=0; k<n_points; k++)
-    for (unsigned int j=0; j<n_points; j++)
-      for (unsigned int i=0; i<n_points; i++)
+  for (unsigned int k=0; k<np; k++)
+    for (unsigned int j=0; j<np; j++)
+      for (unsigned int i=0; i<np; i++)
 	{
-	  _points[qp](0) = q1D.qp(i)(0);
-	  _points[qp](1) = q1D.qp(j)(0);
-	  _points[qp](2) = q1D.qp(k)(0);
+	  _points[q](0) = q1D.qp(i)(0);
+	  _points[q](1) = q1D.qp(j)(0);
+	  _points[q](2) = q1D.qp(k)(0);
 
-	  _weights[qp] = q1D.w(i) * q1D.w(j) * q1D.w(k);
+	  _weights[q] = q1D.w(i) * q1D.w(j) * q1D.w(k);
 
-	  qp++;
+	  q++;
 	}
 }
 
@@ -175,18 +175,18 @@ void QBase::tensor_product_prism(const QBase& q1D, const QBase& q2D)
   _points.resize  (n_points1D * n_points2D);
   _weights.resize (n_points1D * n_points2D);
 
-  unsigned int qp=0;
+  unsigned int q=0;
 
   for (unsigned int j=0; j<n_points1D; j++)
     for (unsigned int i=0; i<n_points2D; i++)
       {
-	_points[qp](0) = q2D.qp(i)(0);
-	_points[qp](1) = q2D.qp(i)(1);
-	_points[qp](2) = q1D.qp(j)(0);
+	_points[q](0) = q2D.qp(i)(0);
+	_points[q](1) = q2D.qp(i)(1);
+	_points[q](2) = q1D.qp(j)(0);
 
-	_weights[qp] = q2D.w(i) * q1D.w(j);
+	_weights[q] = q2D.w(i) * q1D.w(j);
 
-	qp++;
+	q++;
       }
 
 }
