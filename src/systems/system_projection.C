@@ -2127,7 +2127,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	      const std::vector<Real>& JxW = edge_fe->get_JxW();
 
 	      const std::vector<std::vector<Real> >& phi = edge_fe->get_phi();
-	      const std::vector<std::vector<RealGradient> >* dphi;
+	      const std::vector<std::vector<RealGradient> >* dphi = NULL;
 	      if (cont == C_ONE)
 		dphi = &(edge_fe->get_dphi());
 	      
@@ -2234,7 +2234,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	      const std::vector<Real>& JxW = side_fe->get_JxW();
 
 	      const std::vector<std::vector<Real> >& phi = side_fe->get_phi();
-	      const std::vector<std::vector<RealGradient> >* dphi;
+	      const std::vector<std::vector<RealGradient> >* dphi = NULL;
 	      if (cont == C_ONE)
 		dphi = &(side_fe->get_dphi());
 
@@ -2352,7 +2352,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	      const std::vector<Real>& JxW = fe->get_JxW();
 
 	      const std::vector<std::vector<Real> >& phi = fe->get_phi();
-	      const std::vector<std::vector<RealGradient> >* dphi;
+	      const std::vector<std::vector<RealGradient> >* dphi = NULL;
 	      if (cont == C_ONE)
 		dphi = &(side_fe->get_dphi());
 

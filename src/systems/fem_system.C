@@ -706,6 +706,10 @@ void FEMSystem::postprocess ()
 
   this->update();
 
+  // Get the time solver object associated with the system, and tell it that
+  // we are not solving the adjoint problem
+  this->get_time_solver().set_is_adjoint(false);
+
   // Loop over every active mesh element on this processor
   Threads::parallel_for(elem_range.reset(mesh.active_local_elements_begin(),
                                          mesh.active_local_elements_end()),
