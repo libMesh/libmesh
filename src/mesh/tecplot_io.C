@@ -117,19 +117,21 @@ void TecplotMacros::set_n_cells (const unsigned int nc)
 
 // ------------------------------------------------------------
 // TecplotIO  members
-TecplotIO::TecplotIO (const MeshBase& mesh, const bool binary, const
-		      double time, const int strand_offset) :
-  MeshOutput<MeshBase> (mesh),
-  _binary (binary),
-  _time (time),
-  _strand_offset (strand_offset),
+TecplotIO::TecplotIO (const MeshBase& mesh_in,
+                      const bool binary_in,
+                      const double time_in,
+                      const int strand_offset_in) :
+  MeshOutput<MeshBase> (mesh_in),
+  _binary (binary_in),
+  _time (time_in),
+  _strand_offset (strand_offset_in),
   _zone_title ("zone")
 {
   // Gather a list of subdomain ids in the mesh.
   // We must do this now, while we have every
   // processor's attention
   // (some of the write methods only execute on processor 0).
-  mesh.subdomain_ids (_subdomain_ids);
+  mesh_in.subdomain_ids (_subdomain_ids);
 }
 
 
@@ -174,24 +176,24 @@ void TecplotIO::write_ascii (const std::string& fname,
   libmesh_assert_equal_to (libMesh::processor_id(), 0);
 
   // Create an output stream
-  std::ofstream out(fname.c_str());
+  std::ofstream out_stream(fname.c_str());
 
   // Make sure it opened correctly
-  if (!out.good())
+  if (!out_stream.good())
     libmesh_file_error(fname.c_str());
 
   // Get a constant reference to the mesh.
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
 
   // Write header to stream
   {
     {
       // TODO: We used to print out the SVN revision here when we did keyword expansions...
-      out << "# For a description of the Tecplot format see the Tecplot User's guide.\n"
+      out_stream << "# For a description of the Tecplot format see the Tecplot User's guide.\n"
 	  << "#\n";
     }
 
-    out << "Variables=x,y,z";
+    out_stream << "Variables=x,y,z";
 
     if (solution_names != NULL)
       for (unsigned int n=0; n<solution_names->size(); n++)
@@ -199,28 +201,28 @@ void TecplotIO::write_ascii (const std::string& fname,
 #ifdef LIBMESH_USE_REAL_NUMBERS
 
 	  // Write variable names for real variables
-	  out << "," << (*solution_names)[n];
+	  out_stream << "," << (*solution_names)[n];
 
 #else
 
 	  // Write variable names for complex variables
-	  out << "," << "r_"   << (*solution_names)[n]
+	  out_stream << "," << "r_"   << (*solution_names)[n]
 	      << "," << "i_"   << (*solution_names)[n]
 	      << "," << "a_"   << (*solution_names)[n];
 
 #endif
 	}
 
-    out << '\n';
+    out_stream << '\n';
 
-    out << "Zone f=fepoint, n=" << mesh.n_nodes() << ", e=" << mesh.n_active_sub_elem();
+    out_stream << "Zone f=fepoint, n=" << the_mesh.n_nodes() << ", e=" << the_mesh.n_active_sub_elem();
 
-    if (mesh.mesh_dimension() == 1)
-      out << ", et=lineseg";
-    else if (mesh.mesh_dimension() == 2)
-      out << ", et=quadrilateral";
-    else if (mesh.mesh_dimension() == 3)
-      out << ", et=brick";
+    if (the_mesh.mesh_dimension() == 1)
+      out_stream << ", et=lineseg";
+    else if (the_mesh.mesh_dimension() == 2)
+      out_stream << ", et=quadrilateral";
+    else if (the_mesh.mesh_dimension() == 3)
+      out_stream << ", et=brick";
     else
       {
 	// Dimension other than 1, 2, or 3?
@@ -228,14 +230,14 @@ void TecplotIO::write_ascii (const std::string& fname,
       }
 
     // Use default mesh color = black
-    out << ", c=black\n";
+    out_stream << ", c=black\n";
 
   } // finished writing header
 
-  for (unsigned int i=0; i<mesh.n_nodes(); i++)
+  for (unsigned int i=0; i<the_mesh.n_nodes(); i++)
     {
       // Print the point without a newline
-      mesh.point(i).write_unformatted(out, false);
+      the_mesh.point(i).write_unformatted(out_stream, false);
 
       if ((v != NULL) && (solution_names != NULL))
 	{
@@ -246,12 +248,12 @@ void TecplotIO::write_ascii (const std::string& fname,
 	    {
 #ifdef LIBMESH_USE_REAL_NUMBERS
 	      // Write real data
-	      out << std::setprecision(this->ascii_precision())
+	      out_stream << std::setprecision(this->ascii_precision())
 		  << (*v)[i*n_vars + c] << " ";
 
 #else
 	      // Write complex data
-	      out << std::setprecision(this->ascii_precision())
+	      out_stream << std::setprecision(this->ascii_precision())
 		  << (*v)[i*n_vars + c].real() << " "
 		  << (*v)[i*n_vars + c].imag() << " "
 		  << std::abs((*v)[i*n_vars + c]) << " ";
@@ -261,17 +263,14 @@ void TecplotIO::write_ascii (const std::string& fname,
 	}
 
       // Write a new line after the data for this node
-      out << '\n';
+      out_stream << '\n';
     }
 
-//   const_active_elem_iterator       it (mesh.elements_begin());
-//   const const_active_elem_iterator end(mesh.elements_end());
-
-  MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-  const MeshBase::const_element_iterator end = mesh.active_elements_end();
+  MeshBase::const_element_iterator       it  = the_mesh.active_elements_begin();
+  const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
 
   for ( ; it != end; ++it)
-    (*it)->write_connectivity(out, TECPLOT);
+    (*it)->write_connectivity(out_stream, TECPLOT);
 }
 
 
@@ -300,7 +299,7 @@ void TecplotIO::write_binary (const std::string& fname,
 #elif defined(LIBMESH_HAVE_TECPLOT_API_112)
   
   // Get a constant reference to the mesh.
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
     
   // Required variables
   std::string tecplot_variable_names;
@@ -316,7 +315,7 @@ void TecplotIO::write_binary (const std::string& fname,
     cell_type   = -1,
     nn_per_elem = -1;
 
-  switch (mesh.mesh_dimension())
+  switch (the_mesh.mesh_dimension())
     {
     case 1:
       cell_type   = 1;  // FELINESEG
@@ -371,13 +370,13 @@ void TecplotIO::write_binary (const std::string& fname,
   // face should be 4, in 3D it's 8.
 
 
-  TecplotMacros tm(mesh.n_nodes(),
+  TecplotMacros tm(the_mesh.n_nodes(),
 #ifdef LIBMESH_USE_REAL_NUMBERS
 		   (3 + ((solution_names == NULL) ? 0 : solution_names->size())),
 #else
 		   (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
 #endif
-		   mesh.n_active_sub_elem(),
+		   the_mesh.n_active_sub_elem(),
 		   nn_per_elem
 		   );
 
@@ -385,11 +384,11 @@ void TecplotIO::write_binary (const std::string& fname,
   // Copy the nodes and data to the TecplotMacros class. Note that we store
   // everything as a float here since the eye doesn't require a double to
   // understand what is going on
-  for (unsigned int v=0; v<mesh.n_nodes(); v++)
+  for (unsigned int v=0; v<the_mesh.n_nodes(); v++)
     {
-      tm.nd(0,v) = static_cast<float>(mesh.point(v)(0));
-      tm.nd(1,v) = static_cast<float>(mesh.point(v)(1));
-      tm.nd(2,v) = static_cast<float>(mesh.point(v)(2));
+      tm.nd(0,v) = static_cast<float>(the_mesh.point(v)(0));
+      tm.nd(1,v) = static_cast<float>(the_mesh.point(v)(1));
+      tm.nd(2,v) = static_cast<float>(the_mesh.point(v)(2));
 
       if ((vec != NULL) &&
 	  (solution_names != NULL))
@@ -429,8 +428,8 @@ void TecplotIO::write_binary (const std::string& fname,
     {      
       // Copy the connectivity for this subdomain
       {
-	MeshBase::const_element_iterator       it  = mesh.active_subdomain_elements_begin (*sbd_it);
-	const MeshBase::const_element_iterator end = mesh.active_subdomain_elements_end   (*sbd_it);
+	MeshBase::const_element_iterator       it  = the_mesh.active_subdomain_elements_begin (*sbd_it);
+	const MeshBase::const_element_iterator end = the_mesh.active_subdomain_elements_end   (*sbd_it);
 
 	unsigned int n_subcells_in_subdomain=0;
 
@@ -442,7 +441,7 @@ void TecplotIO::write_binary (const std::string& fname,
 
 	unsigned int te = 0;
 	  
-	for (it  = mesh.active_subdomain_elements_begin (*sbd_it);
+	for (it  = the_mesh.active_subdomain_elements_begin (*sbd_it);
 	     it != end; ++it)
 	  {
 	    std::vector<dof_id_type> conn;
@@ -462,7 +461,7 @@ void TecplotIO::write_binary (const std::string& fname,
       // Ready to call the Tecplot API for this subdomain
       {	
 	int
-	  num_nodes   = static_cast<int>(mesh.n_nodes()),
+	  num_nodes   = static_cast<int>(the_mesh.n_nodes()),
 	  num_cells   = static_cast<int>(tm.n_cells),
 	  num_faces   = 0,
 	  i_cell_max  = 0,
@@ -484,7 +483,7 @@ void TecplotIO::write_binary (const std::string& fname,
 	  	                              // zones will share from this one.
 
 	// get the subdomain name from libMesh, if there is one.
-	std::string subdomain_name = mesh.subdomain_name(*sbd_it);
+	std::string subdomain_name = the_mesh.subdomain_name(*sbd_it);
 	std::ostringstream zone_name;
 	zone_name << this->zone_title();
 	
@@ -567,10 +566,10 @@ void TecplotIO::write_binary (const std::string& fname,
 #else
 
   // Get a constant reference to the mesh.
-  const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
+  const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
 
   // Tecplot binary output only good for dim=2,3
-  if (mesh.mesh_dimension() == 1)
+  if (the_mesh.mesh_dimension() == 1)
     {
       this->write_ascii (fname, vec, solution_names);
 
@@ -581,7 +580,7 @@ void TecplotIO::write_binary (const std::string& fname,
   std::string tecplot_variable_names;
   int is_double =  0,
     tec_debug =  0,
-    cell_type = ((mesh.mesh_dimension()==2) ? (1) : (3));
+    cell_type = ((the_mesh.mesh_dimension()==2) ? (1) : (3));
 
   // Build a string containing all the variable names to pass to Tecplot
   {
@@ -617,25 +616,25 @@ void TecplotIO::write_binary (const std::string& fname,
   // face should be 4, in 3D it's 8.
 
 
-  TecplotMacros tm(mesh.n_nodes(),
+  TecplotMacros tm(the_mesh.n_nodes(),
 #ifdef LIBMESH_USE_REAL_NUMBERS
 		   (3 + ((solution_names == NULL) ? 0 : solution_names->size())),
 #else
 		   (3 + 3*((solution_names == NULL) ? 0 : solution_names->size())),
 #endif
-		   mesh.n_active_sub_elem(),
-		   ((mesh.mesh_dimension() == 2) ? 4 : 8)
+		   the_mesh.n_active_sub_elem(),
+		   ((the_mesh.mesh_dimension() == 2) ? 4 : 8)
 		   );
 
 
   // Copy the nodes and data to the TecplotMacros class. Note that we store
   // everything as a float here since the eye doesn't require a double to
   // understand what is going on
-  for (unsigned int v=0; v<mesh.n_nodes(); v++)
+  for (unsigned int v=0; v<the_mesh.n_nodes(); v++)
     {
-      tm.nd(0,v) = static_cast<float>(mesh.point(v)(0));
-      tm.nd(1,v) = static_cast<float>(mesh.point(v)(1));
-      tm.nd(2,v) = static_cast<float>(mesh.point(v)(2));
+      tm.nd(0,v) = static_cast<float>(the_mesh.point(v)(0));
+      tm.nd(1,v) = static_cast<float>(the_mesh.point(v)(1));
+      tm.nd(2,v) = static_cast<float>(the_mesh.point(v)(2));
 
       if ((vec != NULL) &&
 	  (solution_names != NULL))
@@ -661,11 +660,8 @@ void TecplotIO::write_binary (const std::string& fname,
   {
     unsigned int te = 0;
 
-//     const_active_elem_iterator       it (mesh.elements_begin());
-//     const const_active_elem_iterator end(mesh.elements_end());
-
-    MeshBase::const_element_iterator       it  = mesh.active_elements_begin();
-    const MeshBase::const_element_iterator end = mesh.active_elements_end();
+    MeshBase::const_element_iterator       it  = the_mesh.active_elements_begin();
+    const MeshBase::const_element_iterator end = the_mesh.active_elements_end();
 
     for ( ; it != end; ++it)
       {
@@ -686,8 +682,8 @@ void TecplotIO::write_binary (const std::string& fname,
   // Ready to call the Tecplot API
   {
     int ierr = 0,
-      num_nodes = static_cast<int>(mesh.n_nodes()),
-      num_cells = static_cast<int>(mesh.n_active_sub_elem());
+      num_nodes = static_cast<int>(the_mesh.n_nodes()),
+      num_cells = static_cast<int>(the_mesh.n_active_sub_elem());
 
 
     ierr = TECINI (NULL,

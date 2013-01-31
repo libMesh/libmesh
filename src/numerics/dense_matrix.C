@@ -78,21 +78,21 @@ void DenseMatrix<T>::left_multiply_transpose(const DenseMatrix<T>& A)
 
 	  // More efficient, but more code way
 	  // If A is mxn, the result will be a square matrix of Size n x n.
-	  const unsigned int m = A.m();
-	  const unsigned int n = A.n();
+	  const unsigned int n_rows = A.m();
+	  const unsigned int n_cols = A.n();
 
 	  // resize() *this and also zero out all entries.
-	  this->resize(n,n);
+	  this->resize(n_cols,n_cols);
 
 	  // Compute the lower-triangular part
-	  for (unsigned int i=0; i<n; ++i)
+	  for (unsigned int i=0; i<n_cols; ++i)
 	    for (unsigned int j=0; j<=i; ++j)
-	      for (unsigned int k=0; k<m; ++k) // inner products are over m
+	      for (unsigned int k=0; k<n_rows; ++k) // inner products are over n_rows
 		(*this)(i,j) += B(k,i)*B(k,j);
 
 	  // Copy lower-triangular part into upper-triangular part
-	  for (unsigned int i=0; i<n; ++i)
-	    for (unsigned int j=i+1; j<n; ++j)
+	  for (unsigned int i=0; i<n_cols; ++i)
+	    for (unsigned int j=i+1; j<n_cols; ++j)
 	      (*this)(i,j) = (*this)(j,i);
 	}
 
@@ -172,21 +172,21 @@ void DenseMatrix<T>::right_multiply_transpose (const DenseMatrix<T>& B)
 
 	  // More efficient, more code
 	  // If B is mxn, the result will be a square matrix of Size m x m.
-	  const unsigned int m = B.m();
-	  const unsigned int n = B.n();
+	  const unsigned int n_rows = B.m();
+	  const unsigned int n_cols = B.n();
 
 	  // resize() *this and also zero out all entries.
-	  this->resize(m,m);
+	  this->resize(n_rows,n_rows);
 
 	  // Compute the lower-triangular part
-	  for (unsigned int i=0; i<m; ++i)
+	  for (unsigned int i=0; i<n_rows; ++i)
 	    for (unsigned int j=0; j<=i; ++j)
-	      for (unsigned int k=0; k<n; ++k) // inner products are over n
+	      for (unsigned int k=0; k<n_cols; ++k) // inner products are over n_cols
 		(*this)(i,j) += A(i,k)*A(j,k);
 
 	  // Copy lower-triangular part into upper-triangular part
-	  for (unsigned int i=0; i<m; ++i)
-	    for (unsigned int j=i+1; j<m; ++j)
+	  for (unsigned int i=0; i<n_rows; ++i)
+	    for (unsigned int j=i+1; j<n_rows; ++j)
 	      (*this)(i,j) = (*this)(j,i);
 	}
 
@@ -414,12 +414,12 @@ void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T>& b,
 					  DenseVector<T>& x ) const
 {
   const unsigned int
-    n = this->n();
+    n_cols = this->n();
 
-  libmesh_assert_equal_to (this->m(), n);
+  libmesh_assert_equal_to (this->m(), n_cols);
   libmesh_assert_equal_to (this->m(), b.size());
 
-  x.resize (n);
+  x.resize (n_cols);
 
   // A convenient reference to *this
   const DenseMatrix<T>& A = *this;
@@ -429,7 +429,7 @@ void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T>& b,
   DenseVector<T> z = b;
 
   // Lower-triangular "top to bottom" solve step, taking into account pivots
-  for (unsigned int i=0; i<n; ++i)
+  for (unsigned int i=0; i<n_cols; ++i)
     {
       // Swap
       if (_pivots[i] != static_cast<int>(i))
@@ -444,11 +444,11 @@ void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T>& b,
     }
 
   // Upper-triangular "bottom to top" solve step
-  const unsigned int last_row = n-1;
+  const unsigned int last_row = n_cols-1;
 
   for (int i=last_row; i>=0; --i)
     {
-      for (int j=i+1; j<static_cast<int>(n); ++j)
+      for (int j=i+1; j<static_cast<int>(n_cols); ++j)
 	x(i) -= A(i,j)*x(j);
     }
 }
@@ -469,38 +469,38 @@ void DenseMatrix<T>::_lu_decompose ()
 
   // Get the matrix size and make sure it is square
   const unsigned int
-    m = this->m();
+    n_rows = this->m();
 
   // A convenient reference to *this
   DenseMatrix<T>& A = *this;
 
-  _pivots.resize(m);
+  _pivots.resize(n_rows);
 
-  for (unsigned int i=0; i<m; ++i)
+  for (unsigned int i=0; i<n_rows; ++i)
     {
       // Find the pivot row by searching down the i'th column
       _pivots[i] = i;
 
       // std::abs(complex) must return a Real!
-      Real max = std::abs( A(i,i) );
-      for (unsigned int j=i+1; j<m; ++j)
+      Real the_max = std::abs( A(i,i) );
+      for (unsigned int j=i+1; j<n_rows; ++j)
 	{
 	  Real candidate_max = std::abs( A(j,i) );
-	  if (max < candidate_max)
+	  if (the_max < candidate_max)
 	    {
-	      max = candidate_max;
+	      the_max = candidate_max;
 	      _pivots[i] = j;
 	    }
 	}
 
-      // libMesh::out << "max=" << max << " found at row " << _pivots[i] << std::endl;
+      // libMesh::out << "the_max=" << the_max << " found at row " << _pivots[i] << std::endl;
 
       // If the max was found in a different row, interchange rows.
       // Here we interchange the *entire* row, in Gaussian elimination
       // you would only interchange the subrows A(i,j) and A(p(i),j), for j>i
       if (_pivots[i] != static_cast<int>(i))
 	{
-	  for (unsigned int j=0; j<m; ++j)
+	  for (unsigned int j=0; j<n_rows; ++j)
 	    std::swap( A(i,j), A(_pivots[i], j) );
 	}
 
@@ -515,7 +515,7 @@ void DenseMatrix<T>::_lu_decompose ()
       // Scale upper triangle entries of row i by the diagonal entry
       // Note: don't scale the diagonal entry itself!
       const T diag_inv = 1. / A(i,i);
-      for (unsigned int j=i+1; j<m; ++j)
+      for (unsigned int j=i+1; j<n_rows; ++j)
 	A(i,j) *= diag_inv;
 
       // Update the remaining sub-matrix A[i+1:m][i+1:m]
@@ -529,8 +529,8 @@ void DenseMatrix<T>::_lu_decompose ()
       // If we were scaling the i'th column as well, like
       // in Gaussian elimination, this would 'zero' the
       // entry in the i'th column.
-      for (unsigned int row=i+1; row<m; ++row)
-	for (unsigned int col=i+1; col<m; ++col)
+      for (unsigned int row=i+1; row<n_rows; ++row)
+	for (unsigned int col=i+1; col<n_rows; ++col)
 	  A(row,col) -= A(row,i) * A(i,col);
 
     } // end i loop
@@ -670,18 +670,18 @@ void DenseMatrix<T>::_cholesky_decompose ()
 
   // Shorthand notation for number of rows and columns.
   const unsigned int
-    m = this->m(),
-    n = this->n();
+    n_rows = this->m(),
+    n_cols = this->n();
 
   // Just to be really sure...
-  libmesh_assert_equal_to (m, n);
+  libmesh_assert_equal_to (n_rows, n_cols);
 
   // A convenient reference to *this
   DenseMatrix<T>& A = *this;
 
-  for (unsigned int i=0; i<m; ++i)
+  for (unsigned int i=0; i<n_rows; ++i)
     {
-      for (unsigned int j=i; j<n; ++j)
+      for (unsigned int j=i; j<n_cols; ++j)
 	{
 	  for (unsigned int k=0; k<i; ++k)
 	    A(i,j) -= A(i,k) * A(j,k);
@@ -718,20 +718,20 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
 {
   // Shorthand notation for number of rows and columns.
   const unsigned int
-    m = this->m(),
-    n = this->n();
+    n_rows = this->m(),
+    n_cols = this->n();
 
   // Just to be really sure...
-  libmesh_assert_equal_to (m, n);
+  libmesh_assert_equal_to (n_rows, n_cols);
 
   // A convenient reference to *this
   const DenseMatrix<T>& A = *this;
 
   // Now compute the solution to Ax =b using the factorization.
-  x.resize(m);
+  x.resize(n_rows);
 
   // Solve for Ly=b
-  for (unsigned int i=0; i<n; ++i)
+  for (unsigned int i=0; i<n_cols; ++i)
     {
       T2 temp = b(i);
 
@@ -742,11 +742,11 @@ void DenseMatrix<T>::_cholesky_back_substitute (const DenseVector<T2>& b,
     }
 
   // Solve for L^T x = y
-  for (unsigned int i=0; i<n; ++i)
+  for (unsigned int i=0; i<n_cols; ++i)
     {
-      const unsigned int ib = (n-1)-i;
+      const unsigned int ib = (n_cols-1)-i;
 
-      for (unsigned int k=(ib+1); k<n; ++k)
+      for (unsigned int k=(ib+1); k<n_cols; ++k)
 	x(ib) -= A(k,ib) * x(k);
 
       x(ib) /= A(ib,ib);
