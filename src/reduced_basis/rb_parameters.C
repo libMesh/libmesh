@@ -60,7 +60,8 @@ void RBParameters::set_value(const std::string& param_name, Real value)
 
 unsigned int RBParameters::n_parameters() const
 {
-  return _parameters.size();
+  return libmesh_cast_int<unsigned int>
+    (_parameters.size());
 }
 
 void RBParameters::get_parameter_names(std::set<std::string>& param_names) const

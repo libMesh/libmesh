@@ -214,13 +214,13 @@ public:
    * @returns the total number of degrees of freedom
    * in all systems.
    */
-  unsigned int n_dofs () const;
+  std::size_t n_dofs () const;
 
   /**
    * Returns the number of active degrees of freedom
    * for the EquationSystems object.
    */
-  unsigned int n_active_dofs() const;
+  std::size_t n_active_dofs() const;
 
   /**
    * Call \p solve on all the individual equation systems.

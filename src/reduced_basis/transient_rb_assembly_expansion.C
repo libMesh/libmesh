@@ -62,7 +62,7 @@ void TransientRBAssemblyExpansion::perform_M_boundary_assembly(unsigned int q,
 
 unsigned int TransientRBAssemblyExpansion::get_n_M_terms() const
 {
-  return _M_assembly_vector.size();
+  return libmesh_cast_int<unsigned int>(_M_assembly_vector.size());
 }
 
 void TransientRBAssemblyExpansion::attach_M_assembly(ElemAssembly* M_q_assembly)

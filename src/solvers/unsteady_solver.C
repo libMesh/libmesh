@@ -173,7 +173,7 @@ void UnsteadySolver::adjoint_advance_timestep ()
   }
 
 
-Number UnsteadySolver::old_nonlinear_solution(const unsigned int global_dof_number)
+Number UnsteadySolver::old_nonlinear_solution(const dof_id_type global_dof_number)
 const
 {
   libmesh_assert_less (global_dof_number, _system.get_dof_map().n_dofs());

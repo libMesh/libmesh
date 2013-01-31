@@ -118,7 +118,7 @@ namespace {
                                << " detected in analytic jacobian on element "
                                << _femcontext.elem->id() << '!' << std::endl;
 
-                  unsigned int old_precision = libMesh::out.precision();
+		  std::streamsize old_precision = libMesh::out.precision();
                   libMesh::out.precision(16);
 	          libMesh::out << "J_analytic " << _femcontext.elem->id() << " = "
                                << _femcontext.elem_jacobian << std::endl;
@@ -214,7 +214,7 @@ namespace {
 			           << ", side "
                                    << static_cast<unsigned int>(_femcontext.side) << '!' << std::endl;
 
-                      unsigned int old_precision = libMesh::out.precision();
+		      std::streamsize old_precision = libMesh::out.precision();
                       libMesh::out.precision(16);
 	              libMesh::out << "J_analytic " << _femcontext.elem->id() << " = "
                                    << _femcontext.elem_jacobian << std::endl;
@@ -257,7 +257,7 @@ namespace {
 
           if (_get_jacobian && _sys.print_element_jacobians)
             {
-              unsigned int old_precision = libMesh::out.precision();
+	      std::streamsize old_precision = libMesh::out.precision();
               libMesh::out.precision(16);
 	      libMesh::out << "J_elem " << _femcontext.elem->id() << " = "
                         << _femcontext.elem_jacobian << std::endl;
@@ -557,7 +557,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
 //      this->get_vector("_nonlinear_solution").close();
       this->solution->close();
 
-      unsigned int old_precision = libMesh::out.precision();
+      std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
       libMesh::out << "|U| = "
 //                    << this->get_vector("_nonlinear_solution").l1_norm()
@@ -567,7 +567,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
     }
   if (print_solutions)
     {
-      unsigned int old_precision = libMesh::out.precision();
+      std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
 //      libMesh::out << "U = [" << this->get_vector("_nonlinear_solution")
       libMesh::out << "U = [" << *(this->solution)
@@ -608,14 +608,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
     this->rhs->close();
   if (get_residual && print_residual_norms)
     {
-      unsigned int old_precision = libMesh::out.precision();
+      std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
       libMesh::out << "|F| = " << this->rhs->l1_norm() << std::endl;
       libMesh::out.precision(old_precision);
     }
   if (get_residual && print_residuals)
     {
-      unsigned int old_precision = libMesh::out.precision();
+      std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
       libMesh::out << "F = [" << *(this->rhs) << "];" << std::endl;
       libMesh::out.precision(old_precision);
@@ -625,14 +625,14 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian)
     this->matrix->close();
   if (get_jacobian && print_jacobian_norms)
     {
-      unsigned int old_precision = libMesh::out.precision();
+      std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
       libMesh::out << "|J| = " << this->matrix->l1_norm() << std::endl;
       libMesh::out.precision(old_precision);
     }
   if (get_jacobian && print_jacobians)
     {
-      unsigned int old_precision = libMesh::out.precision();
+      std::streamsize old_precision = libMesh::out.precision();
       libMesh::out.precision(16);
       libMesh::out << "J = [" << *(this->matrix) << "];" << std::endl;
       libMesh::out.precision(old_precision);
@@ -726,7 +726,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
   // the quantity of interest is assumed to be a sum of element and
   // side terms
-  for (unsigned int i=0; i != qoi.size(); ++i)
+  for (std::size_t i=0; i != qoi.size(); ++i)
     if (qoi_indices.has_index(i))
       qoi[i] = 0;
 

@@ -659,7 +659,8 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector& parameters,
 
 void ImplicitSystem::assemble_residual_derivatives(const ParameterVector& parameters)
 {
-  const unsigned int Np = parameters.size();
+  const unsigned int Np = libmesh_cast_int<unsigned int>
+    (parameters.size());
   Real deltap = TOLERANCE;
 
   for (unsigned int p=0; p != Np; ++p)
@@ -696,8 +697,10 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity
    const ParameterVector& parameters,
    SensitivityData&       sensitivities)
 {
-  const unsigned int Np = parameters.size();
-  const unsigned int Nq = qoi.size();
+  const unsigned int Np = libmesh_cast_int<unsigned int>
+    (parameters.size());
+  const unsigned int Nq = libmesh_cast_int<unsigned int>
+    (qoi.size());
 
   // We currently get partial derivatives via central differencing
   const Real delta_p = TOLERANCE;
@@ -793,8 +796,10 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity
    const ParameterVector& parameters,
    SensitivityData&       sensitivities)
 {
-  const unsigned int Np = parameters.size();
-  const unsigned int Nq = qoi.size();
+  const unsigned int Np = libmesh_cast_int<unsigned int>
+    (parameters.size());
+  const unsigned int Nq = libmesh_cast_int<unsigned int>
+    (qoi.size());
 
   // We currently get partial derivatives via central differencing
   const Real delta_p = TOLERANCE;
@@ -883,8 +888,10 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product
   // We'll use a single temporary vector for matrix-vector-vector products
   AutoPtr<NumericVector<Number> > tempvec = this->solution->zero_clone();
 
-  const unsigned int Np = parameters.size();
-  const unsigned int Nq = qoi.size();
+  const unsigned int Np = libmesh_cast_int<unsigned int>
+    (parameters.size());
+  const unsigned int Nq = libmesh_cast_int<unsigned int>
+    (qoi.size());
 
   // For each quantity of interest q, the parameter sensitivity
   // Hessian is defined as q''_{kl} = {d^2 q}/{d p_k d p_l}.
@@ -1084,8 +1091,10 @@ void ImplicitSystem::qoi_parameter_hessian
   // so we can safely perturb this->solution.
   AutoPtr<NumericVector<Number> > oldsolution = this->solution->clone();
 
-  const unsigned int Np = parameters.size();
-  const unsigned int Nq = qoi.size();
+  const unsigned int Np = libmesh_cast_int<unsigned int>
+    (parameters.size());
+  const unsigned int Nq = libmesh_cast_int<unsigned int>
+    (qoi.size());
 
   // For each quantity of interest q, the parameter sensitivity
   // Hessian is defined as q''_{kl} = {d^2 q}/{d p_k d p_l}.

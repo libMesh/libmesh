@@ -536,7 +536,8 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
           context.element_fe_var[var]->get_xyz();
 
         unsigned int n_qpoints = context.element_qrule->n_points();
-        unsigned int n_var_dofs = context.dof_indices_var[var].size();
+        unsigned int n_var_dofs = libmesh_cast_int<unsigned int>
+	  (context.dof_indices_var[var].size());
 
         DenseSubVector<Number>& subresidual_var = *context.elem_subresiduals[var];
 

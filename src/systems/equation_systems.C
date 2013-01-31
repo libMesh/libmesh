@@ -681,7 +681,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
   libmesh_assert (this->n_systems());
 
   const unsigned int dim = _mesh.mesh_dimension();
-  const unsigned int nn  = _mesh.n_nodes();
+  const dof_id_type nn   = _mesh.n_nodes();
   const unsigned short int one = 1;
 
   // We'd better have a contiguous node numbering
@@ -890,7 +890,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
   libmesh_assert (this->n_systems());
 
-  const unsigned int ne  = _mesh.n_elem();
+  const dof_id_type ne  = _mesh.n_elem();
 
   libmesh_assert_equal_to (ne, _mesh.max_elem_id());
 
@@ -933,7 +933,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
         names.push_back( system.variable_name( var ) );
 
         // Record the offset for the first element for this variable.
-        const unsigned int offset( soln.size() );
+        const std::size_t offset = soln.size();
         // Increase size of soln for this variable.
         soln.resize( offset + ne );
 
@@ -1199,9 +1199,9 @@ unsigned int EquationSystems::n_vars () const
 
 
 
-unsigned int EquationSystems::n_dofs () const
+std::size_t EquationSystems::n_dofs () const
 {
-  unsigned int tot=0;
+  std::size_t tot=0;
 
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();
@@ -1215,9 +1215,9 @@ unsigned int EquationSystems::n_dofs () const
 
 
 
-unsigned int EquationSystems::n_active_dofs () const
+std::size_t EquationSystems::n_active_dofs () const
 {
-  unsigned int tot=0;
+  std::size_t tot=0;
 
   const_system_iterator       pos = _systems.begin();
   const const_system_iterator end = _systems.end();
