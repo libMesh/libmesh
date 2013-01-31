@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 
           for(unsigned int i=0; i<n_comp; i++)
             {
-              const dof_index_type
+              const dof_id_type
                 old_index = old_node->dof_number
                   (old_sys_num[pairnum], old_var_num[pairnum], i),
                 new_index = new_node->dof_number
@@ -169,7 +169,7 @@ int main(int argc, char** argv)
 
           for(unsigned int i=0; i<n_comp; i++)
             {
-              const dof_index_type
+              const dof_id_type
                 old_index = old_elem->dof_number
                   (old_sys_num[pairnum], old_var_num[pairnum], i),
                 new_index = new_elem->dof_number
