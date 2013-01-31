@@ -25,14 +25,14 @@ namespace libMesh
 
 
 
-void QSimpson::init_2D(const ElemType _type,
+void QSimpson::init_2D(const ElemType type_in,
                        unsigned int)
 {
 #if LIBMESH_DIM > 1
 
   //-----------------------------------------------------------------------
   // 2D quadrature rules
-  switch (_type)
+  switch (type_in)
     {
 
 
@@ -101,7 +101,7 @@ void QSimpson::init_2D(const ElemType _type,
       // Unsupported type
     default:
       {
-	libMesh::err << "Element type not supported!:" << _type << std::endl;
+	libMesh::err << "Element type not supported!:" << type_in << std::endl;
 	libmesh_error();
       }
     }
