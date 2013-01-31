@@ -28,9 +28,9 @@ namespace libMesh
 
 template <class Base>
 DerivedRBConstruction<Base>::DerivedRBConstruction (EquationSystems& es,
-		                                    const std::string& name,
-		                                    const unsigned int number)
-  : Base(es, name, number)
+		                                    const std::string& name_in,
+		                                    const unsigned int number_in)
+  : Base(es, name_in, number_in)
 {
   // We do not want to compute the output dual norms in
   // a derived system, we just copy them over from the
