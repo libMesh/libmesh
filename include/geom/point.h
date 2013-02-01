@@ -69,7 +69,7 @@ class Point : public TypeVector<Real>
 //   /**
 //    * @returns a key associated with this point.  Useful for sorting.
 //    */
-//   unsigned int key() const;
+//   dof_id_type key() const;
 
 
  protected:

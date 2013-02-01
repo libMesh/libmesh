@@ -143,7 +143,7 @@ bool Tri6::has_affine_map() const
 
 
 
-unsigned int Tri6::key (const unsigned int s) const
+dof_id_type Tri6::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

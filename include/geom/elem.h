@@ -169,7 +169,7 @@ class Elem : public ReferenceCountedObject<Elem>,
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  virtual unsigned int key (const unsigned int s) const = 0;
+  virtual dof_id_type key (const unsigned int s) const = 0;
 
   /**
    * @returns true if two elements are identical, false otherwise.
@@ -1148,28 +1148,28 @@ public:
   /**
    * Compute a key from the specified nodes.
    */
-  static unsigned int compute_key (unsigned int n0);
+  static dof_id_type compute_key (dof_id_type n0);
 
   /**
    * Compute a key from the specified nodes.
    */
-  static unsigned int compute_key (unsigned int n0,
-				   unsigned int n1);
+  static dof_id_type compute_key (dof_id_type n0,
+				  dof_id_type n1);
 
   /**
    * Compute a key from the specified nodes.
    */
-  static unsigned int compute_key (unsigned int n0,
-				   unsigned int n1,
-				   unsigned int n2);
+  static dof_id_type compute_key (dof_id_type n0,
+				  dof_id_type n1,
+				  dof_id_type n2);
 
   /**
    * Compute a key from the specified nodes.
    */
-  static unsigned int compute_key (unsigned int n0,
-				   unsigned int n1,
-				   unsigned int n2,
-				   unsigned int n3);
+  static dof_id_type compute_key (dof_id_type n0,
+				  dof_id_type n1,
+				  dof_id_type n2,
+				  dof_id_type n3);
   //-------------------------------------------------------
 
 
@@ -1924,7 +1924,7 @@ void Elem::hack_p_level(unsigned int p)
 
 
 inline
-unsigned int Elem::compute_key (unsigned int n0)
+dof_id_type Elem::compute_key (dof_id_type n0)
 {
   return n0;
 }
@@ -1932,46 +1932,22 @@ unsigned int Elem::compute_key (unsigned int n0)
 
 
 inline
-unsigned int Elem::compute_key (unsigned int n0,
-				unsigned int n1)
+dof_id_type Elem::compute_key (dof_id_type n0,
+			       dof_id_type n1)
 {
-  // Only use the hashword function if we have 32 bit unsigned ints
-#if (LIBMESH_SIZEOF_UNSIGNED_INT*CHAR_BIT == 32)
-  if (n0 > n1) std::swap (n0, n1);
-
-  // Use general function
-  //unsigned array[2] = {n0, n1};
-  //return Utility::hashword(array, 2);
-
-  // Use hard-coded hashword2 function
-  return Utility::hashword2(n0, n1);
-#else
-  // big prime number
-  const unsigned int bp = 65449;
-
   // Order the two so that n0 < n1
   if (n0 > n1) std::swap (n0, n1);
 
-  return (n0%bp + (n1<<5)%bp);
-#endif
+  return Utility::hashword2(n0, n1);
 }
 
 
 
 inline
-unsigned int Elem::compute_key (unsigned int n0,
-				unsigned int n1,
-				unsigned int n2)
+dof_id_type Elem::compute_key (dof_id_type n0,
+			       dof_id_type n1,
+			       dof_id_type n2)
 {
-  // Only use the hashword function if we have 32 bit unsigned ints
-#if (LIBMESH_SIZEOF_UNSIGNED_INT*CHAR_BIT == 32)
-  unsigned array[3] = {n0, n1, n2};
-  std::sort(array, array+3);
-  return Utility::hashword(array, 3);
-#else
-  // big prime number
-  const unsigned int bp = 65449;
-
   // Order the numbers such that n0 < n1 < n2.
   // We'll do it in 3 steps like this:
   //
@@ -1984,8 +1960,6 @@ unsigned int Elem::compute_key (unsigned int n0,
   //           | /  \|                  |
   //  gb min= min   max              gb max
 
-
-
   // Step 1
   if (n0 > n1) std::swap (n0, n1);
 
@@ -1997,28 +1971,19 @@ unsigned int Elem::compute_key (unsigned int n0,
 
   libmesh_assert ((n0 < n1) && (n1 < n2));
 
-
-  return (n0%bp + (n1<<5)%bp + (n2<<10)%bp);
-#endif
+  dof_id_type array[3] = {n0, n1, n2};
+  return Utility::hashword(array, 3);
 }
 
 
 
 inline
-unsigned int Elem::compute_key (unsigned int n0,
-				unsigned int n1,
-				unsigned int n2,
-				unsigned int n3)
+dof_id_type Elem::compute_key (dof_id_type n0,
+			       dof_id_type n1,
+			       dof_id_type n2,
+			       dof_id_type n3)
 {
-  // Only use the hashword function if we have 32 bit unsigned ints
-#if (LIBMESH_SIZEOF_UNSIGNED_INT*CHAR_BIT == 32)
-  unsigned array[4] = {n0, n1, n2, n3};
-  std::sort(array, array+4);
-  return Utility::hashword(array, 4);
-#else
-  // big prime number
-  const unsigned int bp = 65449;
-
+  // Sort first
   // Step 1
   if (n0 > n1) std::swap (n0, n1);
 
@@ -2031,13 +1996,13 @@ unsigned int Elem::compute_key (unsigned int n0,
   // Step 4
   if (n1 > n3) std::swap (n1, n3);
 
-  // Finally step 5
+  // Finally sort step 5
   if (n1 > n2) std::swap (n1, n2);
 
   libmesh_assert ((n0 < n1) && (n1 < n2) && (n2 < n3));
 
-  return (n0%bp + (n1<<5)%bp + (n2<<10)%bp + (n3<<15)%bp);
-#endif
+  dof_id_type array[4] = {n0, n1, n2, n3};
+  return Utility::hashword(array, 4);
 }
 
 

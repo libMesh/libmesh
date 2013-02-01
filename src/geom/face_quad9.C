@@ -165,7 +165,7 @@ bool Quad9::has_affine_map() const
 
 
 
-unsigned int Quad9::key (const unsigned int s) const
+dof_id_type Quad9::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

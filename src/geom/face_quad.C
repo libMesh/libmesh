@@ -27,7 +27,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Quad class member functions
-unsigned int Quad::key (const unsigned int s) const
+dof_id_type Quad::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

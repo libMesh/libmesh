@@ -30,7 +30,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Tet class member functions
-unsigned int Tet::key (const unsigned int s) const
+dof_id_type Tet::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

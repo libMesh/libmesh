@@ -30,7 +30,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Tri class member functions
-unsigned int Tri::key (const unsigned int s) const
+dof_id_type Tri::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

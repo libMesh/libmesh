@@ -37,7 +37,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // InfPrism class member functions
-unsigned int InfPrism::key (const unsigned int s) const
+dof_id_type InfPrism::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

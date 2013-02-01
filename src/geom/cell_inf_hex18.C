@@ -103,7 +103,7 @@ bool InfHex18::is_node_on_edge(const unsigned int n,
   return false;
 }
 
-unsigned int InfHex18::key (const unsigned int s) const
+dof_id_type InfHex18::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

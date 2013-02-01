@@ -30,7 +30,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Prism class member functions
-unsigned int Prism::key (const unsigned int s) const
+dof_id_type Prism::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

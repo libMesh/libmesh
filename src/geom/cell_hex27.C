@@ -155,7 +155,7 @@ bool Hex27::has_affine_map() const
 
 
 
-unsigned int Hex27::key (const unsigned int s) const
+dof_id_type Hex27::key (const unsigned int s) const
 {
  libmesh_assert_less (s, this->n_sides());
 

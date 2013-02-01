@@ -94,7 +94,7 @@ public:
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
    */
-  unsigned int key (const unsigned int s) const;
+  dof_id_type key (const unsigned int s) const;
 
   /**
    * @returns a primitive triangle or quad for

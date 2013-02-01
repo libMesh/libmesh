@@ -81,7 +81,7 @@ class RemoteElem : public Elem
   virtual Node* & set_node (const unsigned int i)
   { libmesh_error(); return Elem::set_node(i); }
 
-  virtual unsigned int key (const unsigned int) const
+  virtual dof_id_type key (const unsigned int) const
   { libmesh_error(); return 0; }
 
   virtual bool is_remote () const

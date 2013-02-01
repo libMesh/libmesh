@@ -136,7 +136,7 @@ bool Prism18::has_affine_map() const
 
 
 
-unsigned int Prism18::key (const unsigned int s) const
+dof_id_type Prism18::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

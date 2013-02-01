@@ -30,7 +30,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Pyramid class member functions
-unsigned int Pyramid::key (const unsigned int s) const
+dof_id_type Pyramid::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

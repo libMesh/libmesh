@@ -132,7 +132,7 @@ public:
    * use the center node of each edge to provide a perfect (unique)
    * key.
    */
-  unsigned int key (const unsigned int s) const;
+  dof_id_type key (const unsigned int s) const;
 
   AutoPtr<Elem> build_side (const unsigned int i,
 			    bool proxy) const;

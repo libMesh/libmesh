@@ -90,7 +90,7 @@ class NodeElem : public Elem
    * @returns an id associated with the \p s side of this element.
    * This should never be important for NodeElems
    */
-  unsigned int key (const unsigned int) const
+  dof_id_type key (const unsigned int) const
   { return 0; }
 
   /**

@@ -32,7 +32,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Hex class member functions
-unsigned int Hex::key (const unsigned int s) const
+dof_id_type Hex::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

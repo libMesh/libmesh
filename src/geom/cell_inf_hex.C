@@ -38,7 +38,7 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // InfHex class member functions
-unsigned int InfHex::key (const unsigned int s) const
+dof_id_type InfHex::key (const unsigned int s) const
 {
   libmesh_assert_less (s, this->n_sides());
 

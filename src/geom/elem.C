@@ -443,7 +443,7 @@ bool Elem::operator == (const Elem& rhs) const
       //
       // The vector will be no larger than 2*n_nodes(),
       // so we might as well reserve the space.
-      std::vector<unsigned int> common_nodes;
+      std::vector<dof_id_type> common_nodes;
       common_nodes.reserve (2*nn);
 
       // Add the global indices of the nodes
@@ -460,8 +460,8 @@ bool Elem::operator == (const Elem& rhs) const
       iterator new_end = std::unique (common_nodes.begin(),
 				      common_nodes.end());
 
-      const int new_size = std::distance (common_nodes.begin(),
-					  new_end);
+      const int new_size = libmesh_cast_int<int>
+        (std::distance (common_nodes.begin(), new_end));
 
       // If this passes the elements are connected
       // to the same global vertex nodes
