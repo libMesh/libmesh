@@ -11,6 +11,7 @@
  
 <div class="content">
 <a name="comments"></a> 
+<br><br><br> <h1> The source file systems_of_equations_ex5.C with comments: </h1> 
 <div class = "comment">
 <h1> Systems Example 5 - Linear Elastic Cantilever with Constraint </h1>
 By David Knezevic
@@ -44,28 +45,28 @@ libMesh includes
 
 <div class ="fragment">
 <pre>
-        #include "libmesh.h"
-        #include "mesh.h"
-        #include "mesh_generation.h"
-        #include "exodusII_io.h"
-        #include "linear_implicit_system.h"
-        #include "equation_systems.h"
-        #include "fe.h"
-        #include "quadrature_gauss.h"
-        #include "dof_map.h"
-        #include "sparse_matrix.h"
-        #include "numeric_vector.h"
-        #include "dense_matrix.h"
-        #include "dense_submatrix.h"
-        #include "dense_vector.h"
-        #include "dense_subvector.h"
-        #include "perf_log.h"
-        #include "elem.h"
-        #include "boundary_info.h"
-        #include "zero_function.h"
-        #include "dirichlet_boundaries.h"
-        #include "string_to_enum.h"
-        #include "getpot.h"
+        #include "libmesh/libmesh.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/linear_implicit_system.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/fe.h"
+        #include "libmesh/quadrature_gauss.h"
+        #include "libmesh/dof_map.h"
+        #include "libmesh/sparse_matrix.h"
+        #include "libmesh/numeric_vector.h"
+        #include "libmesh/dense_matrix.h"
+        #include "libmesh/dense_submatrix.h"
+        #include "libmesh/dense_vector.h"
+        #include "libmesh/dense_subvector.h"
+        #include "libmesh/perf_log.h"
+        #include "libmesh/elem.h"
+        #include "libmesh/boundary_info.h"
+        #include "libmesh/zero_function.h"
+        #include "libmesh/dirichlet_boundaries.h"
+        #include "libmesh/string_to_enum.h"
+        #include "libmesh/getpot.h"
         
 </pre>
 </div>
@@ -314,7 +315,7 @@ All done.
         void assemble_elasticity(EquationSystems& es,
                                  const std::string& system_name)
         {
-          libmesh_assert (system_name == "Elasticity");
+          libmesh_assert_equal_to (system_name, "Elasticity");
           
           const MeshBase& mesh = es.get_mesh();
         
@@ -351,10 +352,10 @@ All done.
             Fu(Fe),
             Fv(Fe);
         
-          std::vector&lt;unsigned int&gt; dof_indices;
-          std::vector&lt;unsigned int&gt; dof_indices_u;
-          std::vector&lt;unsigned int&gt; dof_indices_v;
-          std::vector&lt;unsigned int&gt; dof_indices_lambda;
+          std::vector&lt;dof_id_type&gt; dof_indices;
+          std::vector&lt;dof_id_type&gt; dof_indices_u;
+          std::vector&lt;dof_id_type&gt; dof_indices_v;
+          std::vector&lt;dof_id_type&gt; dof_indices_lambda;
         
           MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
           const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -517,17 +518,20 @@ Tensor indices
                 for (unsigned int side=0; side&lt;elem-&gt;n_sides(); side++)
                   if (elem-&gt;neighbor(side) == NULL)
                     {
-                      boundary_id_type bc_id = mesh.boundary_info-&gt;boundary_id (elem,side);
-                      if (bc_id==BoundaryInfo::invalid_id)
-                          libmesh_error();
+                      const std::vector&lt;boundary_id_type&gt; bc_ids =
+                        mesh.boundary_info-&gt;boundary_ids (elem,side);
         
                       const std::vector&lt;std::vector&lt;Real&gt; &gt;&  phi_face = fe_face-&gt;get_phi();
                       const std::vector&lt;Real&gt;& JxW_face = fe_face-&gt;get_JxW();
         
                       fe_face-&gt;reinit(elem, side);
         
-                      for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
-                      {
+                      for (std::vector&lt;boundary_id_type&gt;::const_iterator b =
+                           bc_ids.begin(); b != bc_ids.end(); ++b)
+                        {
+                          const boundary_id_type bc_id = *b;
+                          for (unsigned int qp=0; qp&lt;qface.n_points(); qp++)
+                            {
 </pre>
 </div>
 <div class = "comment">
@@ -536,13 +540,13 @@ Add the loading
 
 <div class ="fragment">
 <pre>
-                        if( bc_id == 2 )
-                        {
-                          for (unsigned int i=0; i&lt;n_v_dofs; i++)
-                          {
-                            Fv(i) += JxW_face[qp]* (-1.) * phi_face[i][qp];
-                          }
-                        }
+                              if( bc_id == 2 )
+                                {
+                                  for (unsigned int i=0; i&lt;n_v_dofs; i++)
+                                    {
+                                      Fv(i) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                                    }
+                                }
         
 </pre>
 </div>
@@ -552,21 +556,22 @@ Add the constraint contributions
 
 <div class ="fragment">
 <pre>
-                        if( bc_id == 1 )
-                        {
-                          for (unsigned int i=0; i&lt;n_v_dofs; i++)
-                            for (unsigned int j=0; j&lt;n_lambda_dofs; j++)
-                            {
-                              Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
-                            }
-                            
-                          for (unsigned int i=0; i&lt;n_lambda_dofs; i++)
-                            for (unsigned int j=0; j&lt;n_v_dofs; j++)
-                            {
-                              Klambda_v(i,j) += JxW_face[qp]* (-1.) * phi_face[j][qp];
+                              if( bc_id == 1 )
+                                {
+                                  for (unsigned int i=0; i&lt;n_v_dofs; i++)
+                                    for (unsigned int j=0; j&lt;n_lambda_dofs; j++)
+                                    {
+                                      Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                                    }
+                                
+                                  for (unsigned int i=0; i&lt;n_lambda_dofs; i++)
+                                    for (unsigned int j=0; j&lt;n_v_dofs; j++)
+                                      {
+                                        Klambda_v(i,j) += JxW_face[qp]* (-1.) * phi_face[j][qp];
+                                      }
+                                }
                             }
                         }
-                      }
                     }
               } 
         
@@ -624,35 +629,35 @@ Define the Kronecker delta functions that we need here
 </div>
 
 <a name="nocomments"></a> 
-<br><br><br> <h1> The program without comments: </h1> 
+<br><br><br> <h1> The source file systems_of_equations_ex5.C without comments: </h1> 
 <pre> 
   
   #include &lt;iostream&gt;
   #include &lt;algorithm&gt;
   #include &lt;math.h&gt;
   
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dense_submatrix.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dense_subvector.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;perf_log.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;boundary_info.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;zero_function.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dirichlet_boundaries.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;string_to_enum.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;getpot.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_submatrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_subvector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/perf_log.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/boundary_info.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/zero_function.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dirichlet_boundaries.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/string_to_enum.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
   
   using namespace libMesh;
   
@@ -728,7 +733,7 @@ Define the Kronecker delta functions that we need here
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_elasticity(EquationSystems&amp; es,
                            <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Elasticity&quot;</FONT></B>);
+    libmesh_assert_equal_to (system_name, <B><FONT COLOR="#BC8F8F">&quot;Elasticity&quot;</FONT></B>);
     
     <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
   
@@ -765,10 +770,10 @@ Define the Kronecker delta functions that we need here
       Fu(Fe),
       Fv(Fe);
   
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_u;
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_v;
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_lambda;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_u;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_v;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_lambda;
   
     <B><FONT COLOR="#5F9EA0">MeshBase</FONT></B>::const_element_iterator       el     = mesh.active_local_elements_begin();
     <B><FONT COLOR="#228B22">const</FONT></B> MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
@@ -891,40 +896,44 @@ Define the Kronecker delta functions that we need here
           <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> side=0; side&lt;elem-&gt;n_sides(); side++)
             <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(side) == NULL)
               {
-                boundary_id_type bc_id = mesh.boundary_info-&gt;boundary_id (elem,side);
-                <B><FONT COLOR="#A020F0">if</FONT></B> (bc_id==BoundaryInfo::invalid_id)
-                    libmesh_error();
+                <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;boundary_id_type&gt; bc_ids =
+                  mesh.boundary_info-&gt;boundary_ids (elem,side);
   
                 <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp;  phi_face = fe_face-&gt;get_phi();
                 <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt;&amp; JxW_face = fe_face-&gt;get_JxW();
   
                 fe_face-&gt;reinit(elem, side);
   
-                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
-                {
-                  <B><FONT COLOR="#A020F0">if</FONT></B>( bc_id == 2 )
+                <B><FONT COLOR="#A020F0">for</FONT></B> (std::vector&lt;boundary_id_type&gt;::const_iterator b =
+                     bc_ids.begin(); b != bc_ids.end(); ++b)
                   {
-                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
-                    {
-                      Fv(i) += JxW_face[qp]* (-1.) * phi_face[i][qp];
-                    }
-                  }
+                    <B><FONT COLOR="#228B22">const</FONT></B> boundary_id_type bc_id = *b;
+                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp&lt;qface.n_points(); qp++)
+                      {
+                        <B><FONT COLOR="#A020F0">if</FONT></B>( bc_id == 2 )
+                          {
+                            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+                              {
+                                Fv(i) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                              }
+                          }
   
-                  <B><FONT COLOR="#A020F0">if</FONT></B>( bc_id == 1 )
-                  {
-                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
-                      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_lambda_dofs; j++)
-                      {
-                        Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
-                      }
-                      
-                    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_lambda_dofs; i++)
-                      <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
-                      {
-                        Klambda_v(i,j) += JxW_face[qp]* (-1.) * phi_face[j][qp];
+                        <B><FONT COLOR="#A020F0">if</FONT></B>( bc_id == 1 )
+                          {
+                            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_v_dofs; i++)
+                              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_lambda_dofs; j++)
+                              {
+                                Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
+                              }
+                          
+                            <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i&lt;n_lambda_dofs; i++)
+                              <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j&lt;n_v_dofs; j++)
+                                {
+                                  Klambda_v(i,j) += JxW_face[qp]* (-1.) * phi_face[j][qp];
+                                }
+                          }
                       }
                   }
-                }
               }
         } 
   
@@ -958,22 +967,22 @@ Define the Kronecker delta functions that we need here
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Linking systems_of_equations_ex5-opt...
 ***************************************************************
-* Running  mpirun -np 6 ./systems_of_equations_ex5-opt -ksp_type cg
+* Running Example systems_of_equations_ex5:
+*  mpirun -np 12 example-devel -ksp_type cg -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
  
  Mesh Information:
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=2121
-    n_local_nodes()=371
+    n_local_nodes()=199
   n_elem()=500
-    n_local_elem()=83
+    n_local_elem()=42
     n_active_elem()=500
   n_subdomains()=1
-  n_partitions()=6
-  n_processors()=6
+  n_partitions()=12
+  n_processors()=12
   n_threads()=1
   processor_id()=0
 
@@ -981,41 +990,177 @@ Linking systems_of_equations_ex5-opt...
   n_systems()=1
    System #0, "Elasticity"
     Type "LinearImplicit"
-    Variables="u" "v" "lambda" 
-    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "SCALAR", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
-    Approximation Orders="SECOND", "THIRD" "SECOND", "THIRD" "FIRST", "THIRD" 
+    Variables={ "u" "v" } "lambda" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "SCALAR", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" "FIRST", "THIRD" 
     n_dofs()=4243
-    n_local_dofs()=742
-    n_constrained_dofs()=43
+    n_local_dofs()=398
+    n_constrained_dofs()=42
     n_local_constrained_dofs()=0
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 29.504
-      Average Off-Processor Bandwidth <= 1.91644
-      Maximum  On-Processor Bandwidth <= 50
-      Maximum Off-Processor Bandwidth <= 29
+      Average  On-Processor Bandwidth <= 28.3311
+      Average Off-Processor Bandwidth <= 5.28918
+      Maximum  On-Processor Bandwidth <= 329
+      Maximum Off-Processor Bandwidth <= 3914
     DofMap Constraints
       Number of DoF Constraints = 42
       Average DoF Constraint Length= 0
       Number of Node Constraints = 0
 
+************************************************************************************************************************
+***             WIDEN YOUR WINDOW TO 120 CHARACTERS.  Use 'enscript -r -fCourier9' to print this document            ***
+************************************************************************************************************************
 
--------------------------------------------------------------------
-| Processor id:   0                                                |
-| Num Processors: 6                                                |
-| Time:           Fri Aug 24 15:27:45 2012                         |
-| OS:             Linux                                            |
-| HostName:       daedalus                                         |
-| OS Release:     2.6.32-34-generic                                |
-| OS Version:     #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011      |
-| Machine:        x86_64                                           |
-| Username:       roystgnr                                         |
-| Configuration:  ./configure run on Wed Aug 22 12:44:06 CDT 2012  |
--------------------------------------------------------------------
+---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
+
+/workspace/libmesh/examples/systems_of_equations/systems_of_equations_ex5/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:15:13 2013
+Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
+
+                         Max       Max/Min        Avg      Total 
+Time (sec):           5.721e-01      1.01254   5.709e-01
+Objects:              3.300e+01      1.00000   3.300e+01
+Flops:                3.058e+06      2.95343   2.170e+06  2.604e+07
+Flops/sec:            5.344e+06      2.95342   3.803e+06  4.563e+07
+MPI Messages:         1.110e+02      5.69231   4.300e+01  5.160e+02
+MPI Message Lengths:  1.487e+05      5.72216   1.058e+03  5.457e+05
+MPI Reductions:       5.600e+01      1.00000
+
+Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
+                            e.g., VecAXPY() for real vectors of length N --> 2N flops
+                            and VecAXPY() for complex vectors of length N --> 8N flops
+
+Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
+                        Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
+ 0:      Main Stage: 5.7089e-01 100.0%  2.6045e+07 100.0%  5.160e+02 100.0%  1.058e+03      100.0%  5.500e+01  98.2% 
+
+------------------------------------------------------------------------------------------------------------------------
+See the 'Profiling' chapter of the users' manual for details on interpreting output.
+Phase summary info:
+   Count: number of times phase was executed
+   Time and Flops: Max - maximum over all processors
+                   Ratio - ratio of maximum to minimum over all processors
+   Mess: number of messages sent
+   Avg. len: average message length
+   Reduct: number of global reductions
+   Global: entire computation
+   Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
+      %T - percent time in this phase         %f - percent flops in this phase
+      %M - percent messages in this phase     %L - percent message lengths in this phase
+      %R - percent reductions in this phase
+   Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
+------------------------------------------------------------------------------------------------------------------------
+Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
+------------------------------------------------------------------------------------------------------------------------
+
+--- Event Stage 0: Main Stage
+
+VecTDot                5 1.0 1.0109e-04 2.1 3.98e+03 1.3 0.0e+00 0.0e+00 5.0e+00  0  0  0  0  9   0  0  0  0  9   419
+VecNorm                4 1.0 1.0784e-02 1.2 3.18e+03 1.3 0.0e+00 0.0e+00 4.0e+00  2  0  0  0  7   2  0  0  0  7     3
+VecCopy                2 1.0 4.0531e-06 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecSet                 9 1.0 1.0729e-05 2.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecAXPY                4 1.0 5.4121e-05 1.8 3.18e+03 1.3 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0   627
+VecAYPX                2 1.0 5.2452e-06 1.4 1.19e+03 1.3 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  2427
+VecAssemblyBegin       3 1.0 1.9360e-04 1.1 0.00e+00 0.0 5.6e+01 2.7e+02 9.0e+00  0  0 11  3 16   0  0 11  3 16     0
+VecAssemblyEnd         3 1.0 6.2227e-05 1.9 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecScatterBegin        4 1.0 8.1062e-05 1.4 0.00e+00 0.0 1.9e+02 7.8e+02 0.0e+00  0  0 37 27  0   0  0 37 27  0     0
+VecScatterEnd          4 1.0 4.4339e-03315.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatMult                3 1.0 4.6039e-0325.9 8.38e+04 1.5 1.5e+02 8.6e+02 0.0e+00  0  3 29 24  0   0  3 29 24  0   178
+MatSolve               4 1.0 3.0780e-04 1.7 3.36e+05 2.0 0.0e+00 0.0e+00 0.0e+00  0 13  0  0  0   0 13  0  0  0 10633
+MatLUFactorNum         1 1.0 2.5170e-03 2.9 2.64e+06 3.3 0.0e+00 0.0e+00 0.0e+00  0 84  0  0  0   0 84  0  0  0  8674
+MatILUFactorSym        1 1.0 7.8070e-03 2.4 0.00e+00 0.0 0.0e+00 0.0e+00 3.0e+00  1  0  0  0  5   1  0  0  0  5     0
+MatAssemblyBegin       2 1.0 1.5763e-0274.4 0.00e+00 0.0 8.4e+01 4.2e+03 4.0e+00  2  0 16 64  7   2  0 16 64  7     0
+MatAssemblyEnd         2 1.0 5.6047e-03 1.0 0.00e+00 0.0 1.0e+02 2.2e+02 8.0e+00  1  0 19  4 14   1  0 19  4 15     0
+MatGetRowIJ            1 1.0 1.5020e-05 2.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatGetOrdering         1 1.0 1.7309e-04 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 4.0e+00  0  0  0  0  7   0  0  0  0  7     0
+MatZeroEntries         3 1.0 7.7724e-05 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPSetUp               2 1.0 1.4210e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPSolve               1 1.0 2.1334e-02 1.0 3.06e+06 3.0 1.5e+02 8.6e+02 1.8e+01  4100 29 24 32   4100 29 24 33  1221
+PCSetUp                2 1.0 1.1165e-02 2.2 2.64e+06 3.3 0.0e+00 0.0e+00 9.0e+00  2 84  0  0 16   2 84  0  0 16  1955
+PCSetUpOnBlocks        1 1.0 1.0671e-02 2.4 2.64e+06 3.3 0.0e+00 0.0e+00 7.0e+00  1 84  0  0 12   1 84  0  0 13  2046
+PCApply                4 1.0 4.3583e-04 1.4 3.36e+05 2.0 0.0e+00 0.0e+00 0.0e+00  0 13  0  0  0   0 13  0  0  0  7510
+------------------------------------------------------------------------------------------------------------------------
+
+Memory usage is given in bytes:
+
+Object Type          Creations   Destructions     Memory  Descendants' Mem.
+Reports information only for process 0.
+
+--- Event Stage 0: Main Stage
+
+              Vector    12             12        42816     0
+      Vector Scatter     2              2         2072     0
+           Index Set     9              9        12008     0
+   IS L to G Mapping     1              1          564     0
+              Matrix     4              4       618248     0
+       Krylov Solver     2              2         2368     0
+      Preconditioner     2              2         1784     0
+              Viewer     1              0            0     0
+========================================================================================================================
+Average time to get PetscTime(): 9.53674e-08
+Average time for MPI_Barrier(): 4.00543e-06
+Average time for zero size MPI_Send(): 1.31726e-05
+#PETSc Option Table entries:
+-ksp_right_pc
+-ksp_type cg
+-log_summary
+-pc_type bjacobi
+-sub_pc_factor_levels 4
+-sub_pc_factor_zeropivot 0
+-sub_pc_type ilu
+#End of PETSc Option Table entries
+Compiled without FORTRAN kernels
+Compiled with full precision matrices (default)
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
+Configure run at: Thu Nov  8 11:21:02 2012
+Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
+-----------------------------------------
+Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
+Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
+Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
+Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
+-----------------------------------------
+
+Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
+Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
+-----------------------------------------
+
+Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
+-----------------------------------------
+
+Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
+Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
+Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
+-----------------------------------------
+
+
+ ----------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                    |
+| Num Processors: 12                                                                                                   |
+| Time:           Thu Jan 31 22:15:13 2013                                                                             |
+| OS:             Linux                                                                                                |
+| HostName:       hbar.ices.utexas.edu                                                                                 |
+| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
+| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
+| Machine:        x86_64                                                                                               |
+| Username:       benkirk                                                                                              |
+| Configuration:  ./configure  '--enable-everything'                                                                   |
+|  '--prefix=/workspace/libmesh/install'                                                                               |
+|  'CXX=icpc'                                                                                                          |
+|  'CC=icc'                                                                                                            |
+|  'FC=ifort'                                                                                                          |
+|  'F77=ifort'                                                                                                         |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
+|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
+ ----------------------------------------------------------------------------------------------------------------------
  ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.246352, Active time=0.078685                                                 |
+| libMesh Performance: Alive time=0.716958, Active time=0.547738                                                 |
  ----------------------------------------------------------------------------------------------------------------
 | Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -1023,84 +1168,86 @@ Linking systems_of_equations_ex5-opt...
 |                                                                                                                |
 |                                                                                                                |
 | DofMap                                                                                                         |
-|   SCALAR_dof_indices()             771       0.0002      0.000000    0.0002      0.000000    0.26     0.26     |
-|   add_neighbors_to_send_list()     1         0.0001      0.000080    0.0001      0.000121    0.10     0.15     |
-|   build_constraint_matrix()        83        0.0000      0.000000    0.0000      0.000000    0.05     0.05     |
-|   build_sparsity()                 1         0.0018      0.001760    0.0025      0.002533    2.24     3.22     |
-|   cnstrn_elem_mat_vec()            83        0.0000      0.000000    0.0000      0.000000    0.02     0.02     |
-|   create_dof_constraints()         1         0.0014      0.001403    0.0022      0.002193    1.78     2.79     |
-|   distribute_dofs()                1         0.0005      0.000523    0.0066      0.006635    0.66     8.43     |
-|   dof_indices()                    2103      0.0014      0.000001    0.0016      0.000001    1.75     2.07     |
-|   prepare_send_list()              1         0.0000      0.000009    0.0000      0.000009    0.01     0.01     |
-|   reinit()                         1         0.0010      0.001001    0.0010      0.001001    1.27     1.27     |
+|   SCALAR_dof_indices()             210       0.0015      0.000007    0.0015      0.000007    0.27     0.27     |
+|   add_neighbors_to_send_list()     1         0.0125      0.012467    0.0252      0.025231    2.28     4.61     |
+|   build_constraint_matrix()        42        0.0004      0.000010    0.0004      0.000010    0.07     0.07     |
+|   build_sparsity()                 1         0.0107      0.010685    0.0266      0.026630    1.95     4.86     |
+|   cnstrn_elem_mat_vec()            42        0.0001      0.000002    0.0001      0.000002    0.02     0.02     |
+|   create_dof_constraints()         1         0.0191      0.019139    0.1657      0.165707    3.49     30.25    |
+|   distribute_dofs()                1         0.0327      0.032680    0.0812      0.081181    5.97     14.82    |
+|   dof_indices()                    1378      0.2044      0.000148    0.2060      0.000149    37.32    37.60    |
+|   prepare_send_list()              1         0.0002      0.000203    0.0002      0.000203    0.04     0.04     |
+|   reinit()                         1         0.0468      0.046847    0.0468      0.046847    8.55     8.55     |
 |                                                                                                                |
 | EquationSystems                                                                                                |
-|   build_solution_vector()          1         0.0005      0.000486    0.0018      0.001767    0.62     2.25     |
+|   build_solution_vector()          1         0.0019      0.001936    0.0153      0.015340    0.35     2.80     |
 |                                                                                                                |
 | ExodusII_IO                                                                                                    |
-|   write_nodal_data()               1         0.0018      0.001841    0.0018      0.001841    2.34     2.34     |
+|   write_nodal_data()               1         0.0079      0.007866    0.0079      0.007866    1.44     1.44     |
 |                                                                                                                |
 | FE                                                                                                             |
-|   compute_shape_functions()        130       0.0002      0.000001    0.0002      0.000001    0.24     0.24     |
-|   init_shape_functions()           48        0.0000      0.000001    0.0000      0.000001    0.05     0.05     |
-|   inverse_map()                    141       0.0002      0.000002    0.0002      0.000002    0.29     0.29     |
+|   compute_shape_functions()        71        0.0014      0.000019    0.0014      0.000019    0.25     0.25     |
+|   init_shape_functions()           30        0.0003      0.000011    0.0003      0.000011    0.06     0.06     |
+|   inverse_map()                    87        0.0015      0.000017    0.0015      0.000017    0.27     0.27     |
 |                                                                                                                |
 | FEMap                                                                                                          |
-|   compute_affine_map()             130       0.0001      0.000001    0.0001      0.000001    0.18     0.18     |
-|   compute_face_map()               47        0.0002      0.000004    0.0004      0.000009    0.24     0.55     |
-|   init_face_shape_functions()      21        0.0000      0.000001    0.0000      0.000001    0.03     0.03     |
-|   init_reference_to_physical_map() 48        0.0002      0.000004    0.0002      0.000004    0.26     0.26     |
+|   compute_affine_map()             71        0.0012      0.000017    0.0012      0.000017    0.22     0.22     |
+|   compute_face_map()               29        0.0011      0.000039    0.0026      0.000090    0.21     0.48     |
+|   init_face_shape_functions()      21        0.0002      0.000011    0.0002      0.000011    0.04     0.04     |
+|   init_reference_to_physical_map() 30        0.0013      0.000044    0.0013      0.000044    0.24     0.24     |
 |                                                                                                                |
 | Mesh                                                                                                           |
-|   find_neighbors()                 1         0.0004      0.000375    0.0004      0.000408    0.48     0.52     |
-|   renumber_nodes_and_elem()        2         0.0001      0.000048    0.0001      0.000048    0.12     0.12     |
+|   find_neighbors()                 1         0.0106      0.010596    0.0115      0.011517    1.93     2.10     |
+|   renumber_nodes_and_elem()        2         0.0011      0.000561    0.0011      0.000561    0.20     0.20     |
 |                                                                                                                |
 | MeshCommunication                                                                                              |
-|   compute_hilbert_indices()        2         0.0028      0.001405    0.0028      0.001405    3.57     3.57     |
-|   find_global_indices()            2         0.0002      0.000111    0.0067      0.003355    0.28     8.53     |
-|   parallel_sort()                  2         0.0012      0.000592    0.0023      0.001138    1.50     2.89     |
+|   compute_hilbert_indices()        2         0.0085      0.004240    0.0085      0.004240    1.55     1.55     |
+|   find_global_indices()            2         0.0036      0.001781    0.0168      0.008404    0.65     3.07     |
+|   parallel_sort()                  2         0.0029      0.001459    0.0035      0.001733    0.53     0.63     |
 |                                                                                                                |
 | MeshOutput                                                                                                     |
-|   write_equation_systems()         1         0.0000      0.000031    0.0036      0.003639    0.04     4.62     |
+|   write_equation_systems()         1         0.0001      0.000127    0.0235      0.023461    0.02     4.28     |
 |                                                                                                                |
 | MeshTools::Generation                                                                                          |
-|   build_cube()                     1         0.0017      0.001721    0.0017      0.001721    2.19     2.19     |
+|   build_cube()                     1         0.0056      0.005557    0.0056      0.005557    1.01     1.01     |
 |                                                                                                                |
 | MetisPartitioner                                                                                               |
-|   partition()                      1         0.0012      0.001198    0.0042      0.004242    1.52     5.39     |
+|   partition()                      1         0.0360      0.035989    0.0436      0.043586    6.57     7.96     |
 |                                                                                                                |
 | Parallel                                                                                                       |
-|   allgather()                      8         0.0020      0.000245    0.0020      0.000245    2.49     2.49     |
-|   broadcast()                      1         0.0000      0.000010    0.0000      0.000010    0.01     0.01     |
-|   gather()                         1         0.0001      0.000068    0.0001      0.000068    0.09     0.09     |
-|   max(scalar)                      2         0.0000      0.000019    0.0000      0.000019    0.05     0.05     |
-|   max(vector)                      2         0.0002      0.000121    0.0002      0.000121    0.31     0.31     |
-|   min(vector)                      2         0.0000      0.000006    0.0000      0.000006    0.02     0.02     |
-|   probe()                          50        0.0054      0.000108    0.0054      0.000108    6.86     6.86     |
-|   receive()                        50        0.0001      0.000002    0.0055      0.000110    0.14     7.01     |
-|   send()                           50        0.0001      0.000001    0.0001      0.000001    0.09     0.09     |
-|   send_receive()                   54        0.0003      0.000005    0.0059      0.000109    0.33     7.49     |
-|   sum()                            10        0.0024      0.000245    0.0024      0.000245    3.11     3.11     |
+|   allgather()                      9         0.0006      0.000062    0.0006      0.000069    0.10     0.11     |
+|   max(bool)                        1         0.0000      0.000008    0.0000      0.000008    0.00     0.00     |
+|   max(scalar)                      105       0.0007      0.000007    0.0007      0.000007    0.14     0.14     |
+|   max(vector)                      24        0.0003      0.000013    0.0008      0.000032    0.06     0.14     |
+|   min(bool)                        121       0.0007      0.000006    0.0007      0.000006    0.14     0.14     |
+|   min(scalar)                      99        0.0122      0.000123    0.0122      0.000123    2.23     2.23     |
+|   min(vector)                      24        0.0004      0.000017    0.0010      0.000042    0.08     0.19     |
+|   probe()                          132       0.0014      0.000010    0.0014      0.000010    0.25     0.25     |
+|   receive()                        132       0.0009      0.000007    0.0023      0.000017    0.16     0.42     |
+|   send()                           132       0.0004      0.000003    0.0004      0.000003    0.08     0.08     |
+|   send_receive()                   136       0.0012      0.000009    0.0043      0.000032    0.22     0.79     |
+|   sum()                            20        0.0008      0.000042    0.0012      0.000060    0.15     0.22     |
 |                                                                                                                |
 | Parallel::Request                                                                                              |
-|   wait()                           50        0.0000      0.000001    0.0000      0.000001    0.04     0.04     |
+|   wait()                           132       0.0003      0.000002    0.0003      0.000002    0.05     0.05     |
 |                                                                                                                |
 | Partitioner                                                                                                    |
-|   set_node_processor_ids()         1         0.0001      0.000147    0.0015      0.001485    0.19     1.89     |
-|   set_parent_processor_ids()       1         0.0000      0.000032    0.0000      0.000032    0.04     0.04     |
+|   set_node_processor_ids()         1         0.0021      0.002110    0.0032      0.003235    0.39     0.59     |
+|   set_parent_processor_ids()       1         0.0010      0.000984    0.0010      0.000984    0.18     0.18     |
 |                                                                                                                |
 | PetscLinearSolver                                                                                              |
-|   solve()                          1         0.0414      0.041416    0.0414      0.041416    52.64    52.64    |
+|   solve()                          1         0.0405      0.040456    0.0405      0.040456    7.39     7.39     |
 |                                                                                                                |
 | System                                                                                                         |
-|   assemble()                       1         0.0090      0.009043    0.0101      0.010141    11.49    12.89    |
+|   assemble()                       1         0.0706      0.070553    0.1000      0.100046    12.88    18.27    |
  ----------------------------------------------------------------------------------------------------------------
-| Totals:                            3909      0.0787                                          100.00            |
+| Totals:                            3102      0.5477                                          100.00            |
  ----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
-* Done Running  mpirun -np 6 ./systems_of_equations_ex5-opt -ksp_type cg
+* Done Running Example systems_of_equations_ex5:
+*  mpirun -np 12 example-devel -ksp_type cg -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
 </pre>
 </div>

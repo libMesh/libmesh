@@ -11,6 +11,7 @@
  
 <div class="content">
 <a name="comments"></a> 
+<br><br><br> <h1> The source file systems_of_equations_ex2.C with comments: </h1> 
 <div class = "comment">
 <h1>Systems Example 2 - Unsteady Nonlinear Navier-Stokes</h1>
 
@@ -36,6 +37,7 @@ possible by changing the n_timesteps and dt variables below.
 <pre>
         #include &lt;iostream&gt;
         #include &lt;algorithm&gt;
+        #include &lt;sstream&gt;
         #include &lt;math.h&gt;
         
 </pre>
@@ -46,34 +48,23 @@ Basic include file needed for the mesh functionality.
 
 <div class ="fragment">
 <pre>
-        #include "libmesh.h"
-        #include "mesh.h"
-        #include "mesh_generation.h"
-        #include "exodusII_io.h"
-        #include "equation_systems.h"
-        #include "fe.h"
-        #include "quadrature_gauss.h"
-        #include "dof_map.h"
-        #include "sparse_matrix.h"
-        #include "numeric_vector.h"
-        #include "dense_matrix.h"
-        #include "dense_vector.h"
-        #include "linear_implicit_system.h"
-        #include "transient_system.h"
-        #include "perf_log.h"
-        #include "boundary_info.h"
-        #include "utility.h"
-        
-</pre>
-</div>
-<div class = "comment">
-Some (older) compilers do not offer full stream 
-functionality, OStringStream works around this.
-</div>
-
-<div class ="fragment">
-<pre>
-        #include "o_string_stream.h"
+        #include "libmesh/libmesh.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/fe.h"
+        #include "libmesh/quadrature_gauss.h"
+        #include "libmesh/dof_map.h"
+        #include "libmesh/sparse_matrix.h"
+        #include "libmesh/numeric_vector.h"
+        #include "libmesh/dense_matrix.h"
+        #include "libmesh/dense_vector.h"
+        #include "libmesh/linear_implicit_system.h"
+        #include "libmesh/transient_system.h"
+        #include "libmesh/perf_log.h"
+        #include "libmesh/boundary_info.h"
+        #include "libmesh/utility.h"
         
 </pre>
 </div>
@@ -86,8 +77,8 @@ component-by-component basis.
 
 <div class ="fragment">
 <pre>
-        #include "dense_submatrix.h"
-        #include "dense_subvector.h"
+        #include "libmesh/dense_submatrix.h"
+        #include "libmesh/dense_subvector.h"
         
 </pre>
 </div>
@@ -97,7 +88,7 @@ The definition of a geometric element
 
 <div class ="fragment">
 <pre>
-        #include "elem.h"
+        #include "libmesh/elem.h"
         
 </pre>
 </div>
@@ -565,7 +556,7 @@ Write out every nth timestep to file.
         #ifdef LIBMESH_HAVE_EXODUS_API
               if ((t_step+1)%write_interval == 0)
                 {
-                  OStringStream file_name;
+                  std::ostringstream file_name;
         
 </pre>
 </div>
@@ -575,9 +566,12 @@ We write the file in the ExodusII format.
 
 <div class ="fragment">
 <pre>
-                  file_name &lt;&lt; "out_";
-                  OSSRealzeroright(file_name,3,0, t_step + 1);
-                  file_name &lt;&lt; ".e";
+                  file_name &lt;&lt; "out_"
+                            &lt;&lt; std::setw(3)
+                            &lt;&lt; std::setfill('0')
+                            &lt;&lt; std::right
+                            &lt;&lt; t_step + 1
+                            &lt;&lt; ".e";
                   
                   ExodusII_IO(mesh).write_equation_systems (file_name.str(),
                                                       equation_systems);
@@ -622,7 +616,7 @@ the proper system.
 
 <div class ="fragment">
 <pre>
-          libmesh_assert (system_name == "Navier-Stokes");
+          libmesh_assert_equal_to (system_name, "Navier-Stokes");
           
 </pre>
 </div>
@@ -828,10 +822,10 @@ the element degrees of freedom get mapped.
 
 <div class ="fragment">
 <pre>
-          std::vector&lt;unsigned int&gt; dof_indices;
-          std::vector&lt;unsigned int&gt; dof_indices_u;
-          std::vector&lt;unsigned int&gt; dof_indices_v;
-          std::vector&lt;unsigned int&gt; dof_indices_p;
+          std::vector&lt;dof_id_type&gt; dof_indices;
+          std::vector&lt;dof_id_type&gt; dof_indices_u;
+          std::vector&lt;dof_id_type&gt; dof_indices_v;
+          std::vector&lt;dof_id_type&gt; dof_indices_p;
         
 </pre>
 </div>
@@ -1195,24 +1189,6 @@ side MUST live on a boundary of the domain.
                 for (unsigned int s=0; s&lt;elem-&gt;n_sides(); s++)
                   if (elem-&gt;neighbor(s) == NULL)
                     {
-</pre>
-</div>
-<div class = "comment">
-Get the boundary ID for side 's'.
-These are set internally by build_square().
-0=bottom
-1=right
-2=top
-3=left
-</div>
-
-<div class ="fragment">
-<pre>
-                      boundary_id_type bc_id = mesh.boundary_info-&gt;boundary_id (elem,s);
-                      if (bc_id==BoundaryInfo::invalid_id)
-                          libmesh_error();
-        
-                      
                       AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
                                     
 </pre>
@@ -1228,15 +1204,20 @@ Loop over the nodes on the side.
 </pre>
 </div>
 <div class = "comment">
-Get the boundary values.
-                   
+Boundary ids are set internally by
+build_square().
+0=bottom
+1=right
+2=top
+3=left
+
 
 <br><br>Set u = 1 on the top boundary, 0 everywhere else
 </div>
 
 <div class ="fragment">
 <pre>
-                          const Real u_value = (bc_id==2) ? 1. : 0.;
+                          const Real u_value = (mesh.boundary_info-&gt;has_boundary_id(elem,s,2)) ? 1. : 0.;
                           
 </pre>
 </div>
@@ -1350,37 +1331,36 @@ That's it.
 </div>
 
 <a name="nocomments"></a> 
-<br><br><br> <h1> The program without comments: </h1> 
+<br><br><br> <h1> The source file systems_of_equations_ex2.C without comments: </h1> 
 <pre> 
   
   #include &lt;iostream&gt;
   #include &lt;algorithm&gt;
+  #include &lt;sstream&gt;
   #include &lt;math.h&gt;
   
-  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;fe.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;quadrature_gauss.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dof_map.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;sparse_matrix.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;numeric_vector.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dense_matrix.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dense_vector.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;linear_implicit_system.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;transient_system.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;perf_log.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;boundary_info.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;utility.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/libmesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature_gauss.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/sparse_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/numeric_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_matrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/linear_implicit_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/transient_system.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/perf_log.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/boundary_info.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/utility.h&quot;</FONT></B>
   
-  #include <B><FONT COLOR="#BC8F8F">&quot;o_string_stream.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_submatrix.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dense_subvector.h&quot;</FONT></B>
   
-  #include <B><FONT COLOR="#BC8F8F">&quot;dense_submatrix.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;dense_subvector.h&quot;</FONT></B>
-  
-  #include <B><FONT COLOR="#BC8F8F">&quot;elem.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/elem.h&quot;</FONT></B>
   
   using namespace libMesh;
   
@@ -1506,11 +1486,14 @@ That's it.
   #ifdef LIBMESH_HAVE_EXODUS_API
         <B><FONT COLOR="#A020F0">if</FONT></B> ((t_step+1)%write_interval == 0)
           {
-            OStringStream file_name;
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::ostringstream file_name;
   
-            file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out_&quot;</FONT></B>;
-            OSSRealzeroright(file_name,3,0, t_step + 1);
-            file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;.e&quot;</FONT></B>;
+            file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out_&quot;</FONT></B>
+                      &lt;&lt; std::setw(3)
+                      &lt;&lt; std::setfill(<B><FONT COLOR="#BC8F8F">'0'</FONT></B>)
+                      &lt;&lt; std::right
+                      &lt;&lt; t_step + 1
+                      &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;.e&quot;</FONT></B>;
             
             ExodusII_IO(mesh).write_equation_systems (file_name.str(),
                                                 equation_systems);
@@ -1529,7 +1512,7 @@ That's it.
   <B><FONT COLOR="#228B22">void</FONT></B> assemble_stokes (EquationSystems&amp; es,
                         <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; system_name)
   {
-    libmesh_assert (system_name == <B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>);
+    libmesh_assert_equal_to (system_name, <B><FONT COLOR="#BC8F8F">&quot;Navier-Stokes&quot;</FONT></B>);
     
     <B><FONT COLOR="#228B22">const</FONT></B> MeshBase&amp; mesh = es.get_mesh();
     
@@ -1579,10 +1562,10 @@ That's it.
       Fv(Fe),
       Fp(Fe);
   
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices;
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_u;
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_v;
-    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; dof_indices_p;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_u;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_v;
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;dof_id_type&gt; dof_indices_p;
   
     <B><FONT COLOR="#228B22">const</FONT></B> Real dt    = es.parameters.get&lt;Real&gt;(<B><FONT COLOR="#BC8F8F">&quot;dt&quot;</FONT></B>);
     <B><FONT COLOR="#228B22">const</FONT></B> Real theta = 1.;
@@ -1717,17 +1700,12 @@ That's it.
           <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> s=0; s&lt;elem-&gt;n_sides(); s++)
             <B><FONT COLOR="#A020F0">if</FONT></B> (elem-&gt;neighbor(s) == NULL)
               {
-                boundary_id_type bc_id = mesh.boundary_info-&gt;boundary_id (elem,s);
-                <B><FONT COLOR="#A020F0">if</FONT></B> (bc_id==BoundaryInfo::invalid_id)
-                    libmesh_error();
-  
-                
                 AutoPtr&lt;Elem&gt; side (elem-&gt;build_side(s));
                               
                 <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> ns=0; ns&lt;side-&gt;n_nodes(); ns++)
                   {
-                     
-                    <B><FONT COLOR="#228B22">const</FONT></B> Real u_value = (bc_id==2) ? 1. : 0.;
+  
+                    <B><FONT COLOR="#228B22">const</FONT></B> Real u_value = (mesh.boundary_info-&gt;has_boundary_id(elem,s,2)) ? 1. : 0.;
                     
                     <B><FONT COLOR="#228B22">const</FONT></B> Real v_value = 0.;
                     
@@ -1769,22 +1747,22 @@ That's it.
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Linking systems_of_equations_ex2-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./systems_of_equations_ex2-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example systems_of_equations_ex2:
+*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
  
  Mesh Information:
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=1681
-    n_local_nodes()=305
+    n_local_nodes()=165
   n_elem()=400
-    n_local_elem()=67
+    n_local_elem()=34
     n_active_elem()=400
   n_subdomains()=1
-  n_partitions()=6
-  n_processors()=6
+  n_partitions()=12
+  n_processors()=12
   n_threads()=1
   processor_id()=0
 
@@ -1792,21 +1770,21 @@ Linking systems_of_equations_ex2-opt...
   n_systems()=1
    System #0, "Navier-Stokes"
     Type "TransientLinearImplicit"
-    Variables="u" "v" "p" 
-    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
-    Approximation Orders="SECOND", "THIRD" "SECOND", "THIRD" "FIRST", "THIRD" 
+    Variables={ "u" "v" } "p" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" "FIRST", "THIRD" 
     n_dofs()=3803
-    n_local_dofs()=696
+    n_local_dofs()=379
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
     n_vectors()=3
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 36.7155
-      Average Off-Processor Bandwidth <= 2.72557
-      Maximum  On-Processor Bandwidth <= 59
-      Maximum Off-Processor Bandwidth <= 37
+      Average  On-Processor Bandwidth <= 35.0636
+      Average Off-Processor Bandwidth <= 5.62608
+      Maximum  On-Processor Bandwidth <= 63
+      Maximum Off-Processor Bandwidth <= 47
     DofMap Constraints
       Number of DoF Constraints = 0
       Number of Node Constraints = 0
@@ -1814,296 +1792,162 @@ Linking systems_of_equations_ex2-opt...
 
 
 *** Solving time step 0, time = 0.01 ***
-Linear solver converged at step: 1, final residual: 0.0507375  Nonlinear convergence: ||u - u_old|| = 312.175
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.0507458  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 131, final residual: 0.000383967  Nonlinear convergence: ||u - u_old|| = 282.488
+Linear solver converged at step: 57, final residual: 4.89127e-05  Nonlinear convergence: ||u - u_old|| = 0.674822
+Linear solver converged at step: 60, final residual: 8.25878e-07  Nonlinear convergence: ||u - u_old|| = 0.0353187
+Linear solver converged at step: 120, final residual: 2.30849e-10  Nonlinear convergence: ||u - u_old|| = 0.00113645
+Linear solver converged at step: 250, final residual: 3.89153e-14  Nonlinear convergence: ||u - u_old|| = 2.77864e-08
+ Nonlinear solver converged at step 4
 
 
 *** Solving time step 1, time = 0.02 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 86, final residual: 0.000305154  Nonlinear convergence: ||u - u_old|| = 30.8304
+Linear solver converged at step: 70, final residual: 3.93564e-05  Nonlinear convergence: ||u - u_old|| = 0.182863
+Linear solver converged at step: 55, final residual: 5.64714e-07  Nonlinear convergence: ||u - u_old|| = 0.00318299
+Linear solver converged at step: 113, final residual: 1.13507e-10  Nonlinear convergence: ||u - u_old|| = 0.000711087
+ Nonlinear solver converged at step 3
 
 
 *** Solving time step 2, time = 0.03 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 120, final residual: 0.000402991  Nonlinear convergence: ||u - u_old|| = 6.11899
+Linear solver converged at step: 29, final residual: 6.41863e-05  Nonlinear convergence: ||u - u_old|| = 0.0167886
+Linear solver converged at step: 58, final residual: 1.59904e-06  Nonlinear convergence: ||u - u_old|| = 0.00460825
+Linear solver converged at step: 116, final residual: 1.05992e-09  Nonlinear convergence: ||u - u_old|| = 0.000282359
+ Nonlinear solver converged at step 3
 
 
 *** Solving time step 3, time = 0.04 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 81, final residual: 0.000412259  Nonlinear convergence: ||u - u_old|| = 2.40021
+Linear solver converged at step: 56, final residual: 6.45326e-05  Nonlinear convergence: ||u - u_old|| = 0.154327
+Linear solver converged at step: 60, final residual: 1.5952e-06  Nonlinear convergence: ||u - u_old|| = 0.0183529
+Linear solver converged at step: 138, final residual: 9.36064e-10  Nonlinear convergence: ||u - u_old|| = 0.00128442
+Linear solver converged at step: 250, final residual: 1.94773e-14  Nonlinear convergence: ||u - u_old|| = 1.02456e-06
+ Nonlinear solver converged at step 4
 
 
 *** Solving time step 4, time = 0.05 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 71, final residual: 0.000399741  Nonlinear convergence: ||u - u_old|| = 1.02976
+Linear solver converged at step: 44, final residual: 5.9602e-05  Nonlinear convergence: ||u - u_old|| = 0.0785789
+Linear solver converged at step: 55, final residual: 1.41041e-06  Nonlinear convergence: ||u - u_old|| = 0.0326349
+Linear solver converged at step: 120, final residual: 7.24877e-10  Nonlinear convergence: ||u - u_old|| = 0.00034573
+ Nonlinear solver converged at step 3
 
 
 *** Solving time step 5, time = 0.06 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 71, final residual: 0.00035162  Nonlinear convergence: ||u - u_old|| = 0.527914
+Linear solver converged at step: 41, final residual: 5.02796e-05  Nonlinear convergence: ||u - u_old|| = 0.063708
+Linear solver converged at step: 59, final residual: 1.06275e-06  Nonlinear convergence: ||u - u_old|| = 0.00755045
+Linear solver converged at step: 124, final residual: 4.95474e-10  Nonlinear convergence: ||u - u_old|| = 8.2366e-05
+ Nonlinear solver converged at step 3
 
 
 *** Solving time step 6, time = 0.07 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 63, final residual: 0.000420054  Nonlinear convergence: ||u - u_old|| = 0.288062
+Linear solver converged at step: 24, final residual: 6.83757e-05  Nonlinear convergence: ||u - u_old|| = 0.0102278
+Linear solver converged at step: 77, final residual: 2.05076e-06  Nonlinear convergence: ||u - u_old|| = 0.0512891
+Linear solver converged at step: 103, final residual: 1.79407e-09  Nonlinear convergence: ||u - u_old|| = 0.0023443
+Linear solver converged at step: 250, final residual: 4.40918e-14  Nonlinear convergence: ||u - u_old|| = 3.40336e-07
+ Nonlinear solver converged at step 4
 
 
 *** Solving time step 7, time = 0.08 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 59, final residual: 0.00038241  Nonlinear convergence: ||u - u_old|| = 0.15002
+Linear solver converged at step: 49, final residual: 6.28487e-05  Nonlinear convergence: ||u - u_old|| = 0.01008
+Linear solver converged at step: 45, final residual: 1.45652e-06  Nonlinear convergence: ||u - u_old|| = 0.0963712
+Linear solver converged at step: 117, final residual: 6.88349e-10  Nonlinear convergence: ||u - u_old|| = 0.000577978
+ Nonlinear solver converged at step 3
 
 
 *** Solving time step 8, time = 0.09 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 56, final residual: 0.000390563  Nonlinear convergence: ||u - u_old|| = 0.364502
+Linear solver converged at step: 47, final residual: 6.22516e-05  Nonlinear convergence: ||u - u_old|| = 0.364668
+Linear solver converged at step: 77, final residual: 1.65327e-06  Nonlinear convergence: ||u - u_old|| = 0.0610996
+Linear solver converged at step: 119, final residual: 1.20063e-09  Nonlinear convergence: ||u - u_old|| = 0.00145919
+Linear solver converged at step: 250, final residual: 3.44074e-14  Nonlinear convergence: ||u - u_old|| = 1.54541e-06
+ Nonlinear solver converged at step 4
 
 
 *** Solving time step 9, time = 0.1 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 51, final residual: 0.00043126  Nonlinear convergence: ||u - u_old|| = 0.677435
+Linear solver converged at step: 38, final residual: 8.1124e-05  Nonlinear convergence: ||u - u_old|| = 0.647714
+Linear solver converged at step: 26, final residual: 1.97292e-06  Nonlinear convergence: ||u - u_old|| = 0.00202718
+Linear solver converged at step: 97, final residual: 1.65372e-09  Nonlinear convergence: ||u - u_old|| = 0.00227984
+Linear solver converged at step: 205, final residual: 1.17826e-15  Nonlinear convergence: ||u - u_old|| = 3.8727e-07
+ Nonlinear solver converged at step 4
 
 
 *** Solving time step 10, time = 0.11 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 30, final residual: 0.000319849  Nonlinear convergence: ||u - u_old|| = 0.514759
+Linear solver converged at step: 40, final residual: 4.39468e-05  Nonlinear convergence: ||u - u_old|| = 0.493185
+Linear solver converged at step: 56, final residual: 7.19694e-07  Nonlinear convergence: ||u - u_old|| = 0.00563935
+Linear solver converged at step: 136, final residual: 1.45135e-10  Nonlinear convergence: ||u - u_old|| = 0.000315094
+ Nonlinear solver converged at step 3
 
 
 *** Solving time step 11, time = 0.12 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 29, final residual: 0.000312731  Nonlinear convergence: ||u - u_old|| = 0.356285
+Linear solver converged at step: 38, final residual: 4.11258e-05  Nonlinear convergence: ||u - u_old|| = 0.371528
+Linear solver converged at step: 79, final residual: 7.44687e-07  Nonlinear convergence: ||u - u_old|| = 0.0237656
+Linear solver converged at step: 142, final residual: 2.23081e-10  Nonlinear convergence: ||u - u_old|| = 0.000410121
+ Nonlinear solver converged at step 3
 
 
 *** Solving time step 12, time = 0.13 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 28, final residual: 0.000307539  Nonlinear convergence: ||u - u_old|| = 0.238309
+Linear solver converged at step: 36, final residual: 4.15311e-05  Nonlinear convergence: ||u - u_old|| = 0.250567
+Linear solver converged at step: 66, final residual: 7.57821e-07  Nonlinear convergence: ||u - u_old|| = 0.0174762
+Linear solver converged at step: 140, final residual: 2.52009e-10  Nonlinear convergence: ||u - u_old|| = 0.000277932
+ Nonlinear solver converged at step 3
 
 
 *** Solving time step 13, time = 0.14 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 27, final residual: 0.000297218  Nonlinear convergence: ||u - u_old|| = 0.163691
+Linear solver converged at step: 38, final residual: 3.66764e-05  Nonlinear convergence: ||u - u_old|| = 0.178132
+Linear solver converged at step: 60, final residual: 5.9163e-07  Nonlinear convergence: ||u - u_old|| = 0.0167035
+Linear solver converged at step: 132, final residual: 1.36433e-10  Nonlinear convergence: ||u - u_old|| = 0.000484823
+ Nonlinear solver converged at step 3
 
 
 *** Solving time step 14, time = 0.15 ***
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
-Linear solver converged at step: 0, final residual: 0.051332  Nonlinear convergence: ||u - u_old|| = 0
+Linear solver converged at step: 26, final residual: 0.000322093  Nonlinear convergence: ||u - u_old|| = 0.108014
+Linear solver converged at step: 33, final residual: 4.57501e-05  Nonlinear convergence: ||u - u_old|| = 0.104908
+Linear solver converged at step: 28, final residual: 9.0926e-07  Nonlinear convergence: ||u - u_old|| = 0.00292048
+Linear solver converged at step: 119, final residual: 3.50824e-10  Nonlinear convergence: ||u - u_old|| = 0.0013451
+Linear solver converged at step: 250, final residual: 7.75471e-14  Nonlinear convergence: ||u - u_old|| = 3.9946e-07
+ Nonlinear solver converged at step 4
 
--------------------------------------------------------------------
-| Processor id:   0                                                |
-| Num Processors: 6                                                |
-| Time:           Fri Aug 24 15:27:00 2012                         |
-| OS:             Linux                                            |
-| HostName:       daedalus                                         |
-| OS Release:     2.6.32-34-generic                                |
-| OS Version:     #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011      |
-| Machine:        x86_64                                           |
-| Username:       roystgnr                                         |
-| Configuration:  ./configure run on Wed Aug 22 12:44:06 CDT 2012  |
--------------------------------------------------------------------
+ ----------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                    |
+| Num Processors: 12                                                                                                   |
+| Time:           Thu Jan 31 22:13:36 2013                                                                             |
+| OS:             Linux                                                                                                |
+| HostName:       hbar.ices.utexas.edu                                                                                 |
+| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
+| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
+| Machine:        x86_64                                                                                               |
+| Username:       benkirk                                                                                              |
+| Configuration:  ./configure  '--enable-everything'                                                                   |
+|  '--prefix=/workspace/libmesh/install'                                                                               |
+|  'CXX=icpc'                                                                                                          |
+|  'CC=icc'                                                                                                            |
+|  'FC=ifort'                                                                                                          |
+|  'F77=ifort'                                                                                                         |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
+|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
+ ----------------------------------------------------------------------------------------------------------------------
  -----------------------------------------------------------------------------------------------------------
-| Systems Example 2 Performance: Alive time=36.3396, Active time=35.6202                                    |
+| Systems Example 2 Performance: Alive time=6.0392, Active time=5.71483                                     |
  -----------------------------------------------------------------------------------------------------------
 | Event                         nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                         w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
 |-----------------------------------------------------------------------------------------------------------|
 |                                                                                                           |
-| linear solve                  225       35.6202     0.158312    35.6202     0.158312    100.00   100.00   |
+| linear solve                  66        5.7148      0.086588    5.7148      0.086588    100.00   100.00   |
  -----------------------------------------------------------------------------------------------------------
-| Totals:                       225       35.6202                                         100.00            |
+| Totals:                       66        5.7148                                          100.00            |
  -----------------------------------------------------------------------------------------------------------
 
 ************************************************************************************************************************
@@ -2112,17 +1956,17 @@ Linear solver converged at step: 0, final residual: 0.051332  Nonlinear converge
 
 ---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
 
-./systems_of_equations_ex2-opt on a intel-11. named daedalus with 6 processors, by roystgnr Fri Aug 24 15:27:00 2012
-Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
+/workspace/libmesh/examples/systems_of_equations/systems_of_equations_ex2/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:13:36 2013
+Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
 
                          Max       Max/Min        Avg      Total 
-Time (sec):           3.638e+01      1.00195   3.632e+01
-Objects:              9.420e+02      1.00000   9.420e+02
-Flops:                8.594e+09      3.23269   4.749e+09  2.849e+10
-Flops/sec:            2.367e+08      3.23267   1.308e+08  7.846e+08
-MPI Messages:         4.269e+03      1.94399   3.192e+03  1.915e+04
-MPI Message Lengths:  1.116e+07      1.73569   2.586e+03  4.951e+07
-MPI Reductions:       5.959e+03      1.00000
+Time (sec):           6.393e+00      1.00072   6.392e+00
+Objects:              5.440e+02      1.00000   5.440e+02
+Flops:                1.110e+09      1.72830   9.091e+08  1.091e+10
+Flops/sec:            1.737e+08      1.72831   1.422e+08  1.707e+09
+MPI Messages:         3.716e+04      3.00000   2.376e+04  2.851e+05
+MPI Message Lengths:  1.222e+07      2.05374   3.813e+02  1.087e+08
+MPI Reductions:       1.341e+04      1.00000
 
 Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
                             e.g., VecAXPY() for real vectors of length N --> 2N flops
@@ -2130,7 +1974,7 @@ Flop counting convention: 1 flop = 1 real number operation of type (multiply/div
 
 Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
                         Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 3.6321e+01 100.0%  2.8495e+10 100.0%  1.915e+04 100.0%  2.586e+03      100.0%  5.489e+03  92.1% 
+ 0:      Main Stage: 6.3921e+00 100.0%  1.0910e+10 100.0%  2.851e+05 100.0%  3.813e+02      100.0%  1.341e+04 100.0% 
 
 ------------------------------------------------------------------------------------------------------------------------
 See the 'Profiling' chapter of the users' manual for details on interpreting output.
@@ -2143,44 +1987,44 @@ Phase summary info:
    Reduct: number of global reductions
    Global: entire computation
    Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %F - percent flops in this phase
+      %T - percent time in this phase         %f - percent flops in this phase
       %M - percent messages in this phase     %L - percent message lengths in this phase
       %R - percent reductions in this phase
    Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
 ------------------------------------------------------------------------------------------------------------------------
 Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
 ------------------------------------------------------------------------------------------------------------------------
 
 --- Event Stage 0: Main Stage
 
-VecMDot                1 1.0 8.6808e-0445.5 1.39e+03 1.2 0.0e+00 0.0e+00 1.0e+00  0  0  0  0  0   0  0  0  0  0     9
-VecNorm              676 1.0 6.3057e+00 3.1 9.41e+05 1.2 0.0e+00 0.0e+00 6.8e+02 10  0  0  0 11  10  0  0  0 12     1
-VecScale             226 1.0 3.7956e-04 1.7 1.57e+05 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  2264
-VecCopy              692 1.0 1.2591e-03 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet               460 1.0 4.0174e-04 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY              676 1.0 1.4250e-02 1.8 9.41e+05 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0   361
-VecMAXPY               2 1.0 2.1458e-06 2.2 2.78e+03 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  7089
-VecAssemblyBegin     916 1.0 1.6580e+00 6.4 0.00e+00 0.0 4.0e+03 4.3e+02 2.7e+03  3  0 21  3 46   3  0 21  3 50     0
-VecAssemblyEnd       916 1.0 1.4341e-03 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin      466 1.0 3.9847e-03 1.5 0.00e+00 0.0 8.9e+03 5.8e+02 0.0e+00  0  0 46 10  0   0  0 46 10  0     0
-VecScatterEnd        466 1.0 1.2920e+01 2.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00 23  0  0  0  0  23  0  0  0  0     0
-VecNormalize         226 1.0 5.4440e+00 5.1 4.72e+05 1.2 0.0e+00 0.0e+00 2.3e+02  8  0  0  0  4   8  0  0  0  4     0
-MatMult              226 1.0 1.2897e+01 2.4 1.23e+07 1.2 4.1e+03 4.5e+02 0.0e+00 23  0 21  4  0  23  0 21  4  0     5
-MatSolve               2 1.0 1.2450e-03 1.4 8.97e+05 1.3 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  3728
-MatLUFactorNum       225 1.0 8.5741e+00 2.9 8.58e+09 3.2 0.0e+00 0.0e+00 0.0e+00 13100  0  0  0  13100  0  0  0  3314
-MatILUFactorSym      225 1.0 1.8219e+01 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 2.2e+02 44  0  0  0  4  44  0  0  0  4     0
-MatAssemblyBegin     450 1.0 9.4196e-01 1.4 0.00e+00 0.0 6.1e+03 7.0e+03 9.0e+02  2  0 32 86 15   2  0 32 86 16     0
-MatAssemblyEnd       450 1.0 1.0122e-01 1.1 0.00e+00 0.0 3.6e+01 1.2e+02 4.6e+02  0  0  0  0  8   0  0  0  0  8     0
-MatGetRowIJ          225 1.0 6.8426e-05 2.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetOrdering       225 1.0 2.7695e-03 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 4.5e+02  0  0  0  0  8   0  0  0  0  8     0
-MatZeroEntries       227 1.0 7.5724e-03 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPGMRESOrthog         1 1.0 8.9788e-0420.0 2.78e+03 1.2 0.0e+00 0.0e+00 1.0e+00  0  0  0  0  0   0  0  0  0  0    17
-KSPSetup             450 1.0 1.0324e-04 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPSolve             225 1.0 3.3310e+01 1.0 8.59e+09 3.2 4.1e+03 4.5e+02 1.1e+03 90100 21  4 19  90100 21  4 21   855
-PCSetUp              450 1.0 2.4817e+01 1.4 8.58e+09 3.2 0.0e+00 0.0e+00 6.8e+02 57100  0  0 11  57100  0  0 12  1145
-PCSetUpOnBlocks      225 1.0 2.4816e+01 1.4 8.58e+09 3.2 0.0e+00 0.0e+00 6.8e+02 57100  0  0 11  57100  0  0 12  1145
-PCApply                2 1.0 1.3850e-03 1.3 8.97e+05 1.3 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  3351
+VecMDot             5721 1.0 2.5995e-01 4.0 6.39e+07 1.5 0.0e+00 0.0e+00 5.7e+03  2  6  0  0 43   2  6  0  0 43  2464
+VecNorm             6067 1.0 2.2704e-01 5.7 4.60e+06 1.5 0.0e+00 0.0e+00 6.1e+03  2  0  0  0 45   2  0  0  0 45   203
+VecScale            5935 1.0 4.4382e-03 1.5 2.25e+06 1.5 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  5086
+VecCopy              296 1.0 3.4308e-04 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecSet              6355 1.0 4.7181e-03 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecAXPY              560 1.0 1.8879e-02 2.4 4.24e+05 1.5 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0   226
+VecMAXPY            5935 1.0 3.9998e-02 1.5 6.83e+07 1.5 0.0e+00 0.0e+00 0.0e+00  1  6  0  0  0   1  6  0  0  0 17130
+VecAssemblyBegin     280 1.0 7.9293e-02 9.2 0.00e+00 0.0 3.0e+03 2.7e+02 8.4e+02  1  0  1  1  6   1  0  1  1  6     0
+VecAssemblyEnd       280 1.0 4.2963e-04 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecScatterBegin     6016 1.0 2.8266e-02 1.7 0.00e+00 0.0 2.8e+05 3.1e+02 0.0e+00  0  0 97 80  0   0  0 97 80  0     0
+VecScatterEnd       6016 1.0 5.7229e-0153.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  4  0  0  0  0   4  0  0  0  0     0
+VecNormalize        5935 1.0 2.3265e-01 4.9 6.75e+06 1.5 0.0e+00 0.0e+00 5.9e+03  2  1  0  0 44   2  1  0  0 44   291
+MatMult             5935 1.0 7.2604e-01 4.5 1.71e+08 1.5 2.7e+05 3.1e+02 0.0e+00  6 16 96 78  0   6 16 96 78  0  2392
+MatSolve            6001 1.0 4.1277e-01 1.7 5.76e+08 1.8 0.0e+00 0.0e+00 0.0e+00  5 51  0  0  0   5 51  0  0  0 13566
+MatLUFactorNum        66 1.0 2.4965e-01 2.4 2.57e+08 2.5 0.0e+00 0.0e+00 0.0e+00  3 20  0  0  0   3 20  0  0  0  8710
+MatILUFactorSym       66 1.0 7.5341e-01 2.1 0.00e+00 0.0 0.0e+00 0.0e+00 2.0e+02  9  0  0  0  1   9  0  0  0  1     0
+MatAssemblyBegin     132 1.0 3.3143e-01 6.1 0.00e+00 0.0 4.6e+03 4.7e+03 2.6e+02  3  0  2 19  2   3  0  2 19  2     0
+MatAssemblyEnd       132 1.0 1.8249e-02 3.7 0.00e+00 0.0 9.2e+01 7.9e+01 8.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatGetRowIJ           66 1.0 3.6001e-05 2.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatGetOrdering        66 1.0 4.9860e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 2.6e+02  0  0  0  0  2   0  0  0  0  2     0
+MatZeroEntries        68 1.0 1.2071e-03 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPGMRESOrthog      5721 1.0 2.9225e-01 2.8 1.28e+08 1.5 0.0e+00 0.0e+00 5.7e+03  3 12  0  0 43   3 12  0  0 43  4388
+KSPSetUp             132 1.0 6.9785e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPSolve              66 1.0 1.8455e+00 1.0 1.11e+09 1.7 2.7e+05 3.1e+02 1.2e+04 29100 96 78 91  29100 96 78 91  5911
+PCSetUp              132 1.0 1.0254e+00 2.2 2.57e+08 2.5 0.0e+00 0.0e+00 4.6e+02 12 20  0  0  3  12 20  0  0  3  2120
+PCSetUpOnBlocks       66 1.0 1.0245e+00 2.2 2.57e+08 2.5 0.0e+00 0.0e+00 4.6e+02 12 20  0  0  3  12 20  0  0  3  2122
+PCApply             6001 1.0 4.7290e-01 1.6 5.76e+08 1.8 0.0e+00 0.0e+00 0.0e+00  6 51  0  0  0   6 51  0  0  0 11842
 ------------------------------------------------------------------------------------------------------------------------
 
 Memory usage is given in bytes:
@@ -2190,17 +2034,18 @@ Reports information only for process 0.
 
 --- Event Stage 0: Main Stage
 
-                 Vec    20             20       105248     0
-         Vec Scatter     4              4         3472     0
-           Index Set   683            683      2237520     0
-   IS L to G Mapping     3              3        11952     0
-              Matrix   228            228    607385620     0
-       Krylov Solver     2              2        18880     0
-      Preconditioner     2              2         1408     0
+              Vector   117            117       508936     0
+      Vector Scatter     6              6         6216     0
+           Index Set   342            342       510264     0
+   IS L to G Mapping     5              5         2820     0
+              Matrix    69             69     35915388     0
+       Krylov Solver     2              2        19360     0
+      Preconditioner     2              2         1784     0
+              Viewer     1              0            0     0
 ========================================================================================================================
-Average time to get PetscTime(): 9.53674e-08
-Average time for MPI_Barrier(): 4.03881e-05
-Average time for zero size MPI_Send(): 3.9657e-05
+Average time to get PetscTime(): 0
+Average time for MPI_Barrier(): 3.24249e-06
+Average time for zero size MPI_Send(): 1.38283e-05
 #PETSc Option Table entries:
 -ksp_right_pc
 -log_summary
@@ -2211,26 +2056,30 @@ Average time for zero size MPI_Send(): 3.9657e-05
 #End of PETSc Option Table entries
 Compiled without FORTRAN kernels
 Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8
-Configure run at: Sat May 19 03:47:23 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared=1 --with-shared-libraries=1 --with-mpi-dir=/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid --with-mumps=true --download-mumps=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_intel_lp64.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_sequential.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_core.so]" --with-lapack-lib=/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_solver_lp64_sequential.a
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
+Configure run at: Thu Nov  8 11:21:02 2012
+Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
 -----------------------------------------
-Libraries compiled on Sat May 19 03:47:23 CDT 2012 on daedalus 
-Machine characteristics: Linux daedalus 2.6.32-34-generic #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011 x86_64 GNU/Linux 
-Using PETSc directory: /org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5
-Using PETSc arch: intel-11.1-lucid-mpich2-1.4.1-cxx-opt
+Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
+Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
+Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
+Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
 -----------------------------------------
-Using C compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3   -fPIC   
-Using Fortran compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3    
+
+Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
+Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
 -----------------------------------------
-Using include paths: -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/include  
-------------------------------------------
-Using C linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3 
-Using Fortran linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3  
-Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lpetsc       -lX11 -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lblacs -lsuperlu_dist_2.4 -lparmetis -lmetis -lsuperlu_4.0 -Wl,-rpath,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -L/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -lmkl_solver_lp64_sequential -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -ldl -Wl,-rpath,/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -L/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -lmpich -lopa -lmpl -lrt -lpthread -Wl,-rpath,/opt/intel/Compiler/11.1/073/lib/intel64 -L/opt/intel/Compiler/11.1/073/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -lstdc++ -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -ldl  
-------------------------------------------
+
+Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
+-----------------------------------------
+
+Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
+Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
+Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
+-----------------------------------------
+
  ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=36.5358, Active time=35.4971                                                   |
+| libMesh Performance: Alive time=6.51899, Active time=6.33436                                                   |
  ----------------------------------------------------------------------------------------------------------------
 | Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -2238,80 +2087,81 @@ Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/int
 |                                                                                                                |
 |                                                                                                                |
 | DofMap                                                                                                         |
-|   add_neighbors_to_send_list()     1         0.0001      0.000092    0.0001      0.000129    0.00     0.00     |
-|   build_sparsity()                 1         0.0020      0.002001    0.0025      0.002451    0.01     0.01     |
-|   create_dof_constraints()         1         0.0001      0.000099    0.0001      0.000099    0.00     0.00     |
-|   distribute_dofs()                1         0.0006      0.000581    0.0044      0.004434    0.00     0.01     |
-|   dof_indices()                    63756     0.0397      0.000001    0.0397      0.000001    0.11     0.11     |
-|   prepare_send_list()              1         0.0000      0.000019    0.0000      0.000019    0.00     0.00     |
-|   reinit()                         1         0.0010      0.000979    0.0010      0.000979    0.00     0.00     |
+|   add_neighbors_to_send_list()     1         0.0111      0.011065    0.0213      0.021350    0.17     0.34     |
+|   build_sparsity()                 1         0.0119      0.011858    0.0270      0.026966    0.19     0.43     |
+|   create_dof_constraints()         1         0.0013      0.001349    0.0013      0.001349    0.02     0.02     |
+|   distribute_dofs()                1         0.0291      0.029085    0.0807      0.080708    0.46     1.27     |
+|   dof_indices()                    10569     1.8107      0.000171    1.8107      0.000171    28.59    28.59    |
+|   prepare_send_list()              1         0.0002      0.000161    0.0002      0.000161    0.00     0.00     |
+|   reinit()                         1         0.0480      0.047985    0.0480      0.047985    0.76     0.76     |
 |                                                                                                                |
 | EquationSystems                                                                                                |
-|   build_solution_vector()          15        0.0044      0.000290    0.0166      0.001109    0.01     0.05     |
+|   build_solution_vector()          15        0.0230      0.001531    0.2176      0.014507    0.36     3.44     |
 |                                                                                                                |
 | ExodusII_IO                                                                                                    |
-|   write_nodal_data()               15        0.0151      0.001007    0.0151      0.001007    0.04     0.04     |
+|   write_nodal_data()               15        0.0793      0.005289    0.0793      0.005289    1.25     1.25     |
 |                                                                                                                |
 | FE                                                                                                             |
-|   compute_shape_functions()        30150     0.0839      0.000003    0.0839      0.000003    0.24     0.24     |
-|   init_shape_functions()           450       0.0027      0.000006    0.0027      0.000006    0.01     0.01     |
+|   compute_shape_functions()        4488      0.1501      0.000033    0.1501      0.000033    2.37     2.37     |
+|   init_shape_functions()           132       0.0074      0.000056    0.0074      0.000056    0.12     0.12     |
 |                                                                                                                |
 | FEMap                                                                                                          |
-|   compute_affine_map()             30150     0.0373      0.000001    0.0373      0.000001    0.11     0.11     |
-|   init_reference_to_physical_map() 450       0.0060      0.000013    0.0060      0.000013    0.02     0.02     |
+|   compute_affine_map()             4488      0.0802      0.000018    0.0802      0.000018    1.27     1.27     |
+|   init_reference_to_physical_map() 132       0.0175      0.000133    0.0175      0.000133    0.28     0.28     |
 |                                                                                                                |
 | Mesh                                                                                                           |
-|   all_second_order()               1         0.0026      0.002610    0.0026      0.002610    0.01     0.01     |
-|   find_neighbors()                 2         0.0006      0.000307    0.0008      0.000420    0.00     0.00     |
-|   renumber_nodes_and_elem()        4         0.0001      0.000037    0.0001      0.000037    0.00     0.00     |
+|   all_second_order()               1         0.0204      0.020400    0.0204      0.020400    0.32     0.32     |
+|   find_neighbors()                 2         0.0132      0.006597    0.0361      0.018063    0.21     0.57     |
+|   renumber_nodes_and_elem()        4         0.0011      0.000286    0.0011      0.000286    0.02     0.02     |
 |                                                                                                                |
 | MeshCommunication                                                                                              |
-|   compute_hilbert_indices()        3         0.0050      0.001652    0.0050      0.001652    0.01     0.01     |
-|   find_global_indices()            3         0.0004      0.000143    0.0100      0.003334    0.00     0.03     |
-|   parallel_sort()                  3         0.0014      0.000452    0.0043      0.001436    0.00     0.01     |
+|   compute_hilbert_indices()        3         0.0086      0.002876    0.0086      0.002876    0.14     0.14     |
+|   find_global_indices()            3         0.0043      0.001430    0.0242      0.008055    0.07     0.38     |
+|   parallel_sort()                  3         0.0036      0.001194    0.0095      0.003150    0.06     0.15     |
 |                                                                                                                |
 | MeshOutput                                                                                                     |
-|   write_equation_systems()         15        0.0002      0.000011    0.0319      0.002128    0.00     0.09     |
+|   write_equation_systems()         15        0.0012      0.000081    0.3001      0.020010    0.02     4.74     |
 |                                                                                                                |
 | MeshTools::Generation                                                                                          |
-|   build_cube()                     1         0.0002      0.000151    0.0002      0.000151    0.00     0.00     |
+|   build_cube()                     1         0.0013      0.001319    0.0013      0.001319    0.02     0.02     |
 |                                                                                                                |
 | MetisPartitioner                                                                                               |
-|   partition()                      2         0.0028      0.001416    0.0095      0.004742    0.01     0.03     |
+|   partition()                      2         0.0820      0.041000    0.0948      0.047382    1.29     1.50     |
 |                                                                                                                |
 | Parallel                                                                                                       |
-|   allgather()                      10        0.0026      0.000259    0.0026      0.000259    0.01     0.01     |
-|   broadcast()                      1         0.0000      0.000012    0.0000      0.000012    0.00     0.00     |
-|   gather()                         1         0.0000      0.000005    0.0000      0.000005    0.00     0.00     |
-|   max(bool)                        1         0.0000      0.000014    0.0000      0.000014    0.00     0.00     |
-|   max(scalar)                      3         0.0003      0.000092    0.0003      0.000092    0.00     0.00     |
-|   max(vector)                      3         0.0001      0.000028    0.0001      0.000028    0.00     0.00     |
-|   min(vector)                      3         0.0001      0.000049    0.0001      0.000049    0.00     0.00     |
-|   probe()                          70        0.0041      0.000059    0.0041      0.000059    0.01     0.01     |
-|   receive()                        70        0.0001      0.000002    0.0042      0.000060    0.00     0.01     |
-|   send()                           70        0.0001      0.000001    0.0001      0.000001    0.00     0.00     |
-|   send_receive()                   76        0.0001      0.000002    0.0045      0.000059    0.00     0.01     |
-|   sum()                            55        0.0139      0.000252    0.0139      0.000252    0.04     0.04     |
+|   allgather()                      11        0.0021      0.000191    0.0022      0.000196    0.03     0.03     |
+|   max(bool)                        2         0.0000      0.000014    0.0000      0.000014    0.00     0.00     |
+|   max(scalar)                      348       0.0042      0.000012    0.0042      0.000012    0.07     0.07     |
+|   max(vector)                      74        0.0013      0.000017    0.0037      0.000050    0.02     0.06     |
+|   min(bool)                        412       0.0044      0.000011    0.0044      0.000011    0.07     0.07     |
+|   min(scalar)                      341       0.0520      0.000152    0.0520      0.000152    0.82     0.82     |
+|   min(vector)                      74        0.0014      0.000019    0.0047      0.000064    0.02     0.07     |
+|   probe()                          176       0.0023      0.000013    0.0023      0.000013    0.04     0.04     |
+|   receive()                        176       0.0012      0.000007    0.0035      0.000020    0.02     0.05     |
+|   send()                           176       0.0006      0.000003    0.0006      0.000003    0.01     0.01     |
+|   send_receive()                   182       0.0015      0.000008    0.0061      0.000033    0.02     0.10     |
+|   sum()                            65        0.0098      0.000150    0.0140      0.000216    0.15     0.22     |
 |                                                                                                                |
 | Parallel::Request                                                                                              |
-|   wait()                           70        0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   wait()                           176       0.0004      0.000002    0.0004      0.000002    0.01     0.01     |
 |                                                                                                                |
 | Partitioner                                                                                                    |
-|   set_node_processor_ids()         2         0.0002      0.000106    0.0037      0.001857    0.00     0.01     |
-|   set_parent_processor_ids()       2         0.0001      0.000025    0.0001      0.000025    0.00     0.00     |
+|   set_node_processor_ids()         2         0.0035      0.001744    0.0059      0.002972    0.06     0.09     |
+|   set_parent_processor_ids()       2         0.0015      0.000772    0.0015      0.000772    0.02     0.02     |
 |                                                                                                                |
 | PetscLinearSolver                                                                                              |
-|   solve()                          225       34.4071     0.152921    34.4071     0.152921    96.93    96.93    |
+|   solve()                          66        2.0927      0.031707    2.0927      0.031707    33.04    33.04    |
 |                                                                                                                |
 | System                                                                                                         |
-|   assemble()                       225       0.8621      0.003832    1.0387      0.004616    2.43     2.93     |
+|   assemble()                       66        1.7501      0.026516    3.6157      0.054783    27.63    57.08    |
  ----------------------------------------------------------------------------------------------------------------
-| Totals:                            125913    35.4971                                         100.00            |
+| Totals:                            22228     6.3344                                          100.00            |
  ----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
-* Done Running Example  mpirun -np 6 ./systems_of_equations_ex2-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Done Running Example systems_of_equations_ex2:
+*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
 </pre>
 </div>

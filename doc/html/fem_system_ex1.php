@@ -11,6 +11,157 @@
  
 <div class="content">
 <a name="comments"></a> 
+<br><br><br> <h1> The source file naviersystem.h with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/fem_system.h"
+        
+        using namespace libMesh;
+        
+</pre>
+</div>
+<div class = "comment">
+The Navier-Stokes system class.
+FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
+but we must specify element residuals
+</div>
+
+<div class ="fragment">
+<pre>
+        class NavierSystem : public FEMSystem
+        {
+        public:
+</pre>
+</div>
+<div class = "comment">
+Constructor
+</div>
+
+<div class ="fragment">
+<pre>
+          NavierSystem(EquationSystems& es,
+                       const std::string& name,
+                       const unsigned int number)
+            : FEMSystem(es, name, number), Reynolds(1.), application(0) {}
+        
+</pre>
+</div>
+<div class = "comment">
+System initialization
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void init_data ();
+        
+</pre>
+</div>
+<div class = "comment">
+Context initialization
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void init_context(DiffContext &context);
+        
+</pre>
+</div>
+<div class = "comment">
+Element residual and jacobian calculations
+Time dependent parts
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual bool element_time_derivative (bool request_jacobian,
+                                                DiffContext& context);
+        
+</pre>
+</div>
+<div class = "comment">
+Constraint parts
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual bool element_constraint (bool request_jacobian,
+                                           DiffContext& context);
+          virtual bool side_constraint (bool request_jacobian,
+                                        DiffContext& context);
+        
+</pre>
+</div>
+<div class = "comment">
+Mass matrix part
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual bool mass_residual (bool request_jacobian,
+                                      DiffContext& context);
+        
+</pre>
+</div>
+<div class = "comment">
+Postprocessed output
+</div>
+
+<div class ="fragment">
+<pre>
+          virtual void postprocess ();
+        
+</pre>
+</div>
+<div class = "comment">
+Indices for each variable;
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int p_var, u_var, v_var, w_var;
+        
+</pre>
+</div>
+<div class = "comment">
+The Reynolds number to solve for
+</div>
+
+<div class ="fragment">
+<pre>
+          Real Reynolds;
+        
+</pre>
+</div>
+<div class = "comment">
+The application number controls what boundary conditions and/or
+forcing functions are applied.  Current options are:
+0 - discontinuous lid velociy driven cavity
+1 - homogeneous Dirichlet BC with smooth forcing
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int application;
+        
+</pre>
+</div>
+<div class = "comment">
+Returns the value of a forcing function at point p.  This value
+depends on which application is being used.
+</div>
+
+<div class ="fragment">
+<pre>
+          Point forcing(const Point& p);
+        };
+</pre>
+</div>
+
+<a name="comments"></a> 
+<br><br><br> <h1> The source file fem_system_ex1.C with comments: </h1> 
 <div class = "comment">
 <h1>FEMSystem Example 1 - Unsteady Navier-Stokes Equations with
 FEMSystem</h1>
@@ -20,31 +171,30 @@ example 13 can be solved using the
 DifferentiableSystem class framework
 
 
-<br><br>Basic include files
+<br><br>C++ includes
 </div>
 
 <div class ="fragment">
 <pre>
-        #include "equation_systems.h"
-        #include "error_vector.h"
-        #include "getpot.h"
-        #include "exodusII_io.h"
-        #include "kelly_error_estimator.h"
-        #include "mesh.h"
-        #include "mesh_generation.h"
-        #include "mesh_refinement.h"
-        #include "uniform_refinement_estimator.h"
+        #include &lt;iomanip&gt;
         
 </pre>
 </div>
 <div class = "comment">
-Some (older) compilers do not offer full stream
-functionality, OStringStream works around this.
+Basic include files
 </div>
 
 <div class ="fragment">
 <pre>
-        #include "o_string_stream.h"
+        #include "libmesh/equation_systems.h"
+        #include "libmesh/error_vector.h"
+        #include "libmesh/getpot.h"
+        #include "libmesh/exodusII_io.h"
+        #include "libmesh/kelly_error_estimator.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/mesh_generation.h"
+        #include "libmesh/mesh_refinement.h"
+        #include "libmesh/uniform_refinement_estimator.h"
         
 </pre>
 </div>
@@ -55,9 +205,9 @@ The systems and solvers we may use
 <div class ="fragment">
 <pre>
         #include "naviersystem.h"
-        #include "diff_solver.h"
-        #include "euler_solver.h"
-        #include "steady_solver.h"
+        #include "libmesh/diff_solver.h"
+        #include "libmesh/euler_solver.h"
+        #include "libmesh/steady_solver.h"
         
 </pre>
 </div>
@@ -116,7 +266,7 @@ We'll skip this example for now.
 <pre>
           if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
             {
-              std::cout &lt;&lt; "We skip example 18 when using the Trilinos solvers.\n"
+              std::cout &lt;&lt; "We skip fem_system_ex1 when using the Trilinos solvers.\n"
                         &lt;&lt; std::endl;
               return 0;
             }
@@ -273,7 +423,7 @@ Solve this as a time-dependent or steady system
             {
               system.time_solver =
                 AutoPtr&lt;TimeSolver&gt;(new SteadySolver(system));
-              libmesh_assert(n_timesteps == 1);
+              libmesh_assert_equal_to (n_timesteps, 1);
             }
         
 </pre>
@@ -400,7 +550,7 @@ size at once
 
 <div class ="fragment">
 <pre>
-                      libmesh_assert (nelem_target == 0);
+                      libmesh_assert_equal_to (nelem_target, 0);
         
                       UniformRefinementEstimator *u =
                         new UniformRefinementEstimator;
@@ -429,7 +579,7 @@ target mesh size
 
 <div class ="fragment">
 <pre>
-                      libmesh_assert (nelem_target &gt; 0);
+                      libmesh_assert_greater (nelem_target, 0);
         
 </pre>
 </div>
@@ -576,7 +726,7 @@ Write out this timestep if we're requested to
 <pre>
               if ((t_step+1)%write_interval == 0)
                 {
-                  OStringStream file_name;
+                  std::ostringstream file_name;
         
 </pre>
 </div>
@@ -586,9 +736,12 @@ We write the file in the ExodusII format.
 
 <div class ="fragment">
 <pre>
-                  file_name &lt;&lt; "out_";
-                  OSSRealzeroright(file_name,3,0, t_step + 1);
-                  file_name &lt;&lt; ".e";
+                  file_name &lt;&lt; "out_"
+                            &lt;&lt; std::setw(3)
+                            &lt;&lt; std::setfill('0')
+                            &lt;&lt; std::right
+                            &lt;&lt; t_step+1
+                            &lt;&lt; ".e";
         
                   ExodusII_IO(mesh).write_timestep(file_name.str(),
         					   equation_systems, 
@@ -613,26 +766,1132 @@ All done.
 </pre>
 </div>
 
+<a name="comments"></a> 
+<br><br><br> <h1> The source file naviersystem.C with comments: </h1> 
+<div class = "comment">
+</div>
+
+<div class ="fragment">
+<pre>
+        #include "libmesh/getpot.h"
+        
+        #include "naviersystem.h"
+        
+        #include "libmesh/boundary_info.h"
+        #include "libmesh/dirichlet_boundaries.h"
+        #include "libmesh/dof_map.h"
+        #include "libmesh/fe_base.h"
+        #include "libmesh/fe_interface.h"
+        #include "libmesh/fem_context.h"
+        #include "libmesh/mesh.h"
+        #include "libmesh/quadrature.h"
+        #include "libmesh/string_to_enum.h"
+        #include "libmesh/zero_function.h"
+        
+</pre>
+</div>
+<div class = "comment">
+Bring in everything from the libMesh namespace
+</div>
+
+<div class ="fragment">
+<pre>
+        using namespace libMesh;
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Boundary conditions for the 3D test case
+</div>
+
+<div class ="fragment">
+<pre>
+        class BdyFunction : public FunctionBase&lt;Number&gt;
+        {
+        public:
+          BdyFunction (unsigned int u_var,
+                       unsigned int v_var,
+                       unsigned int w_var,
+                       Real Reynolds)
+            : _u_var(u_var), _v_var(v_var), _w_var(w_var), _Re(Reynolds)
+            { this-&gt;_initialized = true; }
+        
+          virtual Number operator() (const Point&, const Real = 0)
+            { libmesh_not_implemented(); }
+        
+          virtual void operator() (const Point& p,
+                                   const Real,
+                                   DenseVector&lt;Number&gt;& output)
+            {
+              output.zero();
+              const Real x=p(0), y=p(1), z=p(2);
+              output(_u_var) = (_Re+1)*(y*y + z*z);
+              output(_v_var) = (_Re+1)*(x*x + z*z);
+              output(_w_var) = (_Re+1)*(x*x + y*y);
+            }
+        
+          virtual AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone() const
+            { return AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; (new BdyFunction(_u_var, _v_var, _w_var, _Re)); }
+        
+        private:
+          const unsigned int _u_var, _v_var, _w_var;
+          const Real _Re;
+        };
+        
+        
+        void NavierSystem::init_data ()
+        {
+          const unsigned int dim = this-&gt;get_mesh().mesh_dimension();
+        
+</pre>
+</div>
+<div class = "comment">
+Check the input file for Reynolds number, application type,
+approximation type
+</div>
+
+<div class ="fragment">
+<pre>
+          GetPot infile("navier.in");
+          Reynolds = infile("Reynolds", 1.);
+          application = infile("application", 0);
+          unsigned int pressure_p = infile("pressure_p", 1);
+          std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
+        
+</pre>
+</div>
+<div class = "comment">
+LBB needs better-than-quadratic velocities for better-than-linear
+pressures, and libMesh needs non-Lagrange elements for
+better-than-quadratic velocities.
+</div>
+
+<div class ="fragment">
+<pre>
+          libmesh_assert((pressure_p == 1) || (fe_family != "LAGRANGE"));
+        
+          FEFamily fefamily = Utility::string_to_enum&lt;FEFamily&gt;(fe_family);
+        
+</pre>
+</div>
+<div class = "comment">
+Add the velocity components "u" & "v".  They
+will be approximated using second-order approximation.
+</div>
+
+<div class ="fragment">
+<pre>
+          u_var = this-&gt;add_variable ("u", static_cast&lt;Order&gt;(pressure_p+1),
+        			      fefamily);
+          v_var = this-&gt;add_variable ("v",
+        			      static_cast&lt;Order&gt;(pressure_p+1),
+        			      fefamily);
+        
+          if (dim == 3)
+            w_var = this-&gt;add_variable ("w",
+        			        static_cast&lt;Order&gt;(pressure_p+1),
+        			        fefamily);
+          else
+            w_var = u_var;
+        
+</pre>
+</div>
+<div class = "comment">
+Add the pressure variable "p". This will
+be approximated with a first-order basis,
+providing an LBB-stable pressure-velocity pair.
+</div>
+
+<div class ="fragment">
+<pre>
+          p_var = this-&gt;add_variable ("p",
+        			      static_cast&lt;Order&gt;(pressure_p),
+        			      fefamily);
+        
+</pre>
+</div>
+<div class = "comment">
+Tell the system to march velocity forward in time, but 
+leave p as a constraint only
+</div>
+
+<div class ="fragment">
+<pre>
+          this-&gt;time_evolving(u_var);
+          this-&gt;time_evolving(v_var);
+          if (dim == 3)
+            this-&gt;time_evolving(w_var);
+        
+</pre>
+</div>
+<div class = "comment">
+Useful debugging options
+Set verify_analytic_jacobians to 1e-6 to use
+</div>
+
+<div class ="fragment">
+<pre>
+          this-&gt;verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
+          this-&gt;print_jacobians = infile("print_jacobians", false);
+          this-&gt;print_element_jacobians = infile("print_element_jacobians", false);
+        
+</pre>
+</div>
+<div class = "comment">
+Set Dirichlet boundary conditions
+</div>
+
+<div class ="fragment">
+<pre>
+          const boundary_id_type top_id = (dim==3) ? 5 : 2;
+          
+          std::set&lt;boundary_id_type&gt; top_bdys;
+          top_bdys.insert(top_id);
+        
+          const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
+          std::set&lt;boundary_id_type&gt; all_bdys(all_ids, all_ids+(dim*2));
+        
+          std::set&lt;boundary_id_type&gt; nontop_bdys = all_bdys;
+          nontop_bdys.erase(top_id);
+        
+          std::vector&lt;unsigned int&gt; u_only(1, u_var);
+          std::vector&lt;unsigned int&gt; vw(1, v_var), uvw(1, u_var);
+          uvw.push_back(v_var);
+          if (dim == 3)
+            {
+              vw.push_back(w_var);
+              uvw.push_back(w_var);
+            }
+        
+          ZeroFunction&lt;Number&gt; zero;
+          ConstFunction&lt;Number&gt; one(1);
+</pre>
+</div>
+<div class = "comment">
+For lid-driven cavity, set u=1,v=w=0 on the lid and u=v=w=0 elsewhere
+</div>
+
+<div class ="fragment">
+<pre>
+          if (application == 0)
+            {
+              this-&gt;get_dof_map().add_dirichlet_boundary
+                (DirichletBoundary (top_bdys, u_only, &one));
+              this-&gt;get_dof_map().add_dirichlet_boundary
+                (DirichletBoundary (top_bdys, vw, &zero));
+              this-&gt;get_dof_map().add_dirichlet_boundary
+                (DirichletBoundary (nontop_bdys, uvw, &zero));
+            }
+</pre>
+</div>
+<div class = "comment">
+For forcing with zero wall velocity, set homogeneous Dirichlet BCs
+</div>
+
+<div class ="fragment">
+<pre>
+          else if (application == 1)
+            {
+              this-&gt;get_dof_map().add_dirichlet_boundary
+                (DirichletBoundary (all_bdys, uvw, &zero));
+            }
+</pre>
+</div>
+<div class = "comment">
+For 3D test case with quadratic velocity field, set that field on walls
+</div>
+
+<div class ="fragment">
+<pre>
+          else if (application == 2)
+            {
+              BdyFunction bdy(u_var,v_var,w_var,Reynolds);
+              this-&gt;get_dof_map().add_dirichlet_boundary
+                (DirichletBoundary (all_bdys, uvw, &bdy));
+            }
+        
+</pre>
+</div>
+<div class = "comment">
+Do the parent's initialization after variables and boundary constraints are defined
+</div>
+
+<div class ="fragment">
+<pre>
+          FEMSystem::init_data();
+        }
+        
+        
+        
+        void NavierSystem::init_context(DiffContext &context)
+        {
+          FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
+        
+          FEBase* u_elem_fe;
+          FEBase* p_elem_fe;
+          FEBase* u_side_fe;
+        
+          c.get_element_fe( u_var, u_elem_fe );
+          c.get_element_fe( p_var, p_elem_fe );
+          c.get_side_fe( u_var, u_side_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+We should prerequest all the data
+we will need to build the linear system.
+</div>
+
+<div class ="fragment">
+<pre>
+          u_elem_fe-&gt;get_JxW();
+          u_elem_fe-&gt;get_phi();
+          u_elem_fe-&gt;get_dphi();
+          u_elem_fe-&gt;get_xyz();
+          
+          p_elem_fe-&gt;get_phi();
+        
+          u_side_fe-&gt;get_JxW();
+          u_side_fe-&gt;get_phi();
+          u_side_fe-&gt;get_xyz();
+        }
+        
+        
+        bool NavierSystem::element_time_derivative (bool request_jacobian,
+                                                    DiffContext &context)
+        {
+          FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
+        
+          FEBase* u_elem_fe;
+          FEBase* p_elem_fe;
+        
+          c.get_element_fe( u_var, u_elem_fe );
+          c.get_element_fe( p_var, p_elem_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+First we get some references to cell-specific data that
+will be used to assemble the linear system.
+
+
+<br><br>Element Jacobian * quadrature weights for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = u_elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape functions at interior quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = u_elem_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape function gradients at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = u_elem_fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+The pressure shape functions at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& psi = p_elem_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+Physical location of the quadrature points
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Point&gt;& qpoint = u_elem_fe-&gt;get_xyz();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_p_dofs = c.get_dof_indices( p_var ).size();
+          const unsigned int n_u_dofs = c.get_dof_indices( u_var ).size(); 
+          libmesh_assert_equal_to (n_u_dofs, c.get_dof_indices( v_var ).size()); 
+        
+</pre>
+</div>
+<div class = "comment">
+The subvectors and submatrices we need to fill:
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int dim = this-&gt;get_mesh().mesh_dimension();
+          DenseSubMatrix&lt;Number&gt; &Kuu = c.get_elem_jacobian( u_var, u_var );
+          DenseSubMatrix&lt;Number&gt; &Kvv = c.get_elem_jacobian( v_var, v_var );
+          DenseSubMatrix&lt;Number&gt; &Kww = c.get_elem_jacobian( w_var, w_var );
+          DenseSubMatrix&lt;Number&gt; &Kuv = c.get_elem_jacobian( u_var, v_var );
+          DenseSubMatrix&lt;Number&gt; &Kuw = c.get_elem_jacobian( u_var, w_var );
+          DenseSubMatrix&lt;Number&gt; &Kvu = c.get_elem_jacobian( v_var, u_var );
+          DenseSubMatrix&lt;Number&gt; &Kvw = c.get_elem_jacobian( v_var, w_var );
+          DenseSubMatrix&lt;Number&gt; &Kwu = c.get_elem_jacobian( w_var, u_var );
+          DenseSubMatrix&lt;Number&gt; &Kwv = c.get_elem_jacobian( w_var, v_var );
+          DenseSubMatrix&lt;Number&gt; &Kup = c.get_elem_jacobian( u_var, p_var );
+          DenseSubMatrix&lt;Number&gt; &Kvp = c.get_elem_jacobian( v_var, p_var );
+          DenseSubMatrix&lt;Number&gt; &Kwp = c.get_elem_jacobian( w_var, p_var );
+          DenseSubVector&lt;Number&gt; &Fu = c.get_elem_residual( u_var );
+          DenseSubVector&lt;Number&gt; &Fv = c.get_elem_residual( v_var );
+          DenseSubVector&lt;Number&gt; &Fw = c.get_elem_residual( w_var );
+              
+</pre>
+</div>
+<div class = "comment">
+Now we will build the element Jacobian and residual.
+Constructing the residual requires the solution and its
+gradient from the previous timestep.  This must be
+calculated at each quadrature point by summing the
+solution degree-of-freedom values by the appropriate
+weight functions.
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int n_qpoints = (c.get_element_qrule())-&gt;n_points();
+        
+          for (unsigned int qp=0; qp != n_qpoints; qp++)
+            {
+</pre>
+</div>
+<div class = "comment">
+Compute the solution & its gradient at the old Newton iterate
+</div>
+
+<div class ="fragment">
+<pre>
+              Number p = c.interior_value(p_var, qp),
+                     u = c.interior_value(u_var, qp),
+                     v = c.interior_value(v_var, qp),
+                     w = c.interior_value(w_var, qp);
+              Gradient grad_u = c.interior_gradient(u_var, qp),
+                       grad_v = c.interior_gradient(v_var, qp),
+                       grad_w = c.interior_gradient(w_var, qp);
+        
+</pre>
+</div>
+<div class = "comment">
+Definitions for convenience.  It is sometimes simpler to do a
+dot product if you have the full vector at your disposal.
+</div>
+
+<div class ="fragment">
+<pre>
+              NumberVectorValue U     (u,     v);
+              if (dim == 3)
+                U(2) = w;
+              const Number  u_x = grad_u(0);
+              const Number  u_y = grad_u(1);
+              const Number  u_z = (dim == 3)?grad_u(2):0;
+              const Number  v_x = grad_v(0);
+              const Number  v_y = grad_v(1);
+              const Number  v_z = (dim == 3)?grad_v(2):0;
+              const Number  w_x = (dim == 3)?grad_w(0):0;
+              const Number  w_y = (dim == 3)?grad_w(1):0;
+              const Number  w_z = (dim == 3)?grad_w(2):0;
+        
+</pre>
+</div>
+<div class = "comment">
+Value of the forcing function at this quadrature point
+</div>
+
+<div class ="fragment">
+<pre>
+              Point f = this-&gt;forcing(qpoint[qp]);
+        
+</pre>
+</div>
+<div class = "comment">
+First, an i-loop over the velocity degrees of freedom.
+We know that n_u_dofs == n_v_dofs so we can compute contributions
+for both at the same time.
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                {
+                  Fu(i) += JxW[qp] *
+                           (-Reynolds*(U*grad_u)*phi[i][qp] + // convection term
+                            p*dphi[i][qp](0) -                // pressure term
+        		    (grad_u*dphi[i][qp]) +            // diffusion term
+        		    f(0)*phi[i][qp]                   // forcing function
+        		    );
+        
+                    
+                  Fv(i) += JxW[qp] *
+                           (-Reynolds*(U*grad_v)*phi[i][qp] + // convection term
+                            p*dphi[i][qp](1) -                // pressure term
+        		    (grad_v*dphi[i][qp]) +            // diffusion term
+        		    f(1)*phi[i][qp]                   // forcing function
+        		    );
+        
+        
+                  if (dim == 3)
+                  Fw(i) += JxW[qp] *
+                           (-Reynolds*(U*grad_w)*phi[i][qp] + // convection term
+                            p*dphi[i][qp](2) -                // pressure term
+        		    (grad_w*dphi[i][qp]) +            // diffusion term
+        		    f(2)*phi[i][qp]                   // forcing function
+        		    );
+        
+        
+</pre>
+</div>
+<div class = "comment">
+Note that the Fp block is identically zero unless we are using
+some kind of artificial compressibility scheme...
+
+
+<br><br></div>
+
+<div class ="fragment">
+<pre>
+                  if (request_jacobian && c.elem_solution_derivative)
+                    {
+                      libmesh_assert_equal_to (c.elem_solution_derivative, 1.0);
+        
+</pre>
+</div>
+<div class = "comment">
+Matrix contributions for the uu and vv couplings.
+</div>
+
+<div class ="fragment">
+<pre>
+                      for (unsigned int j=0; j != n_u_dofs; j++)
+                        {
+                          Kuu(i,j) += JxW[qp] *
+           /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+           /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
+           /* Newton term     */       Reynolds*u_x*phi[i][qp]*phi[j][qp]);
+        
+                          Kuv(i,j) += JxW[qp] *
+           /* Newton term     */      -Reynolds*u_y*phi[i][qp]*phi[j][qp];
+        
+                          Kvv(i,j) += JxW[qp] *
+           /* convection term */      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+           /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
+           /* Newton term     */       Reynolds*v_y*phi[i][qp]*phi[j][qp]);
+        
+                          Kvu(i,j) += JxW[qp] * 
+           /* Newton term     */      -Reynolds*v_x*phi[i][qp]*phi[j][qp];
+                          if (dim == 3)
+                            {
+                              Kww(i,j) += JxW[qp] *
+           /* convection term */          (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+           /* diffusion term  */           (dphi[i][qp]*dphi[j][qp]) -
+           /* Newton term     */           Reynolds*w_z*phi[i][qp]*phi[j][qp]);
+                              Kuw(i,j) += JxW[qp] *
+           /* Newton term     */      -Reynolds*u_z*phi[i][qp]*phi[j][qp];
+                              Kvw(i,j) += JxW[qp] *
+           /* Newton term     */      -Reynolds*v_z*phi[i][qp]*phi[j][qp];
+                              Kwu(i,j) += JxW[qp] *
+           /* Newton term     */      -Reynolds*w_x*phi[i][qp]*phi[j][qp];
+                              Kwv(i,j) += JxW[qp] *
+           /* Newton term     */      -Reynolds*w_y*phi[i][qp]*phi[j][qp];
+                            }
+                        }
+        
+</pre>
+</div>
+<div class = "comment">
+Matrix contributions for the up and vp couplings.
+</div>
+
+<div class ="fragment">
+<pre>
+                      for (unsigned int j=0; j != n_p_dofs; j++)
+                        {
+                          Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
+                          Kvp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](1);
+                          if (dim == 3)
+                            Kwp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](2);
+                        }
+                    }
+                }
+            } // end of the quadrature point qp-loop
+          
+          return request_jacobian;
+        }
+        
+        
+        
+        bool NavierSystem::element_constraint (bool request_jacobian,
+                                               DiffContext &context)
+        {
+          FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
+        
+          FEBase* u_elem_fe;
+          FEBase* p_elem_fe;
+        
+          c.get_element_fe( u_var, u_elem_fe );
+          c.get_element_fe( p_var, p_elem_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+Here we define some references to cell-specific data that
+will be used to assemble the linear system.
+
+
+<br><br>Element Jacobian * quadrature weight for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = u_elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape function gradients at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;RealGradient&gt; &gt;& dphi = u_elem_fe-&gt;get_dphi();
+        
+</pre>
+</div>
+<div class = "comment">
+The pressure shape functions at interior
+quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& psi = p_elem_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in each variable
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_u_dofs = c.get_dof_indices( u_var ).size();
+          const unsigned int n_p_dofs = c.get_dof_indices( p_var ).size();
+        
+</pre>
+</div>
+<div class = "comment">
+The subvectors and submatrices we need to fill:
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int dim = this-&gt;get_mesh().mesh_dimension();
+          DenseSubMatrix&lt;Number&gt; &Kpu = c.get_elem_jacobian( p_var, u_var );
+          DenseSubMatrix&lt;Number&gt; &Kpv = c.get_elem_jacobian( p_var, v_var );
+          DenseSubMatrix&lt;Number&gt; &Kpw = c.get_elem_jacobian( p_var, w_var );
+          DenseSubVector&lt;Number&gt; &Fp = c.get_elem_residual( p_var );
+        
+</pre>
+</div>
+<div class = "comment">
+Add the constraint given by the continuity equation
+</div>
+
+<div class ="fragment">
+<pre>
+          unsigned int n_qpoints = (c.get_element_qrule())-&gt;n_points();
+          for (unsigned int qp=0; qp != n_qpoints; qp++)
+            {
+</pre>
+</div>
+<div class = "comment">
+Compute the velocity gradient at the old Newton iterate
+</div>
+
+<div class ="fragment">
+<pre>
+              Gradient grad_u = c.interior_gradient(u_var, qp),
+                       grad_v = c.interior_gradient(v_var, qp),
+                       grad_w = c.interior_gradient(w_var, qp);
+        
+</pre>
+</div>
+<div class = "comment">
+Now a loop over the pressure degrees of freedom.  This
+computes the contributions of the continuity equation.
+</div>
+
+<div class ="fragment">
+<pre>
+              for (unsigned int i=0; i != n_p_dofs; i++)
+                {
+                  Fp(i) += JxW[qp] * psi[i][qp] *
+                           (grad_u(0) + grad_v(1));
+                  if (dim == 3)
+                    Fp(i) += JxW[qp] * psi[i][qp] *
+                             (grad_w(2));
+        
+                  if (request_jacobian && c.get_elem_solution_derivative())
+                    {
+                      libmesh_assert_equal_to (c.get_elem_solution_derivative(), 1.0);
+        
+                      for (unsigned int j=0; j != n_u_dofs; j++)
+                        {
+                          Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+                          Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+                          if (dim == 3)
+                            Kpw(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](2);
+                        }
+                    }
+                }
+            } // end of the quadrature point qp-loop
+        
+          return request_jacobian;
+        }
+        
+              
+        
+        bool NavierSystem::side_constraint (bool request_jacobian,
+                                            DiffContext &context)
+        {
+          FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
+        
+          FEBase* p_elem_fe;
+        
+          c.get_element_fe( p_var, p_elem_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+Pin p = 0 at the origin
+</div>
+
+<div class ="fragment">
+<pre>
+          const Point zero(0.,0.);
+        
+          if (c.elem-&gt;contains_point(zero))
+            {
+</pre>
+</div>
+<div class = "comment">
+The pressure penalty value.  \f$ \frac{1}{\epsilon} \f$
+</div>
+
+<div class ="fragment">
+<pre>
+              const Real penalty = 1.e9;
+        
+              DenseSubMatrix&lt;Number&gt; &Kpp = c.get_elem_jacobian( p_var, p_var );
+              DenseSubVector&lt;Number&gt; &Fp = c.get_elem_residual( p_var );
+              const unsigned int n_p_dofs = c.get_dof_indices( p_var ).size(); 
+        
+              Number p = c.point_value(p_var, zero);
+              Number p_value = 0.;
+        
+              unsigned int dim = get_mesh().mesh_dimension();
+              FEType fe_type = p_elem_fe-&gt;get_fe_type();
+              Point p_master = FEInterface::inverse_map(dim, fe_type, c.elem, zero);
+        
+              std::vector&lt;Real&gt; point_phi(n_p_dofs);
+              for (unsigned int i=0; i != n_p_dofs; i++)
+                {
+                  point_phi[i] = FEInterface::shape(dim, fe_type, c.elem, i, p_master);
+                }
+        
+              for (unsigned int i=0; i != n_p_dofs; i++)
+                {
+                  Fp(i) += penalty * (p - p_value) * point_phi[i];
+                  if (request_jacobian && c.get_elem_solution_derivative())
+                    {
+                      libmesh_assert_equal_to (c.get_elem_solution_derivative(), 1.0);
+        
+                      for (unsigned int j=0; j != n_p_dofs; j++)
+        		Kpp(i,j) += penalty * point_phi[i] * point_phi[j];
+                    }
+                }
+            }
+        
+          return request_jacobian;
+        }
+        
+        
+</pre>
+</div>
+<div class = "comment">
+We override the default mass_residual function,
+because in the non-dimensionalized Navier-Stokes equations
+the time derivative of velocity has a Reynolds number coefficient.
+Alternatively we could divide the whole equation by
+Reynolds number (or choose a more complicated non-dimensionalization
+of time), but this gives us an opportunity to demonstrate overriding
+FEMSystem::mass_residual()
+</div>
+
+<div class ="fragment">
+<pre>
+        bool NavierSystem::mass_residual (bool request_jacobian,
+                                          DiffContext &context)
+        {
+          FEMContext &c = libmesh_cast_ref&lt;FEMContext&&gt;(context);
+        
+          FEBase* u_elem_fe;
+        
+          c.get_element_fe( u_var, u_elem_fe );
+        
+</pre>
+</div>
+<div class = "comment">
+The subvectors and submatrices we need to fill:
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int dim = this-&gt;get_mesh().mesh_dimension();
+        
+</pre>
+</div>
+<div class = "comment">
+Element Jacobian * quadrature weight for interior integration
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;Real&gt; &JxW = u_elem_fe-&gt;get_JxW();
+        
+</pre>
+</div>
+<div class = "comment">
+The velocity shape functions at interior quadrature points.
+</div>
+
+<div class ="fragment">
+<pre>
+          const std::vector&lt;std::vector&lt;Real&gt; &gt;& phi = u_elem_fe-&gt;get_phi();
+        
+</pre>
+</div>
+<div class = "comment">
+The subvectors and submatrices we need to fill:
+</div>
+
+<div class ="fragment">
+<pre>
+          DenseSubVector&lt;Number&gt; &Fu = c.get_elem_residual( u_var );
+          DenseSubVector&lt;Number&gt; &Fv = c.get_elem_residual( v_var );
+          DenseSubVector&lt;Number&gt; &Fw = c.get_elem_residual( w_var );
+          DenseSubMatrix&lt;Number&gt; &Kuu = c.get_elem_jacobian( u_var, u_var );
+          DenseSubMatrix&lt;Number&gt; &Kvv = c.get_elem_jacobian( v_var, v_var );
+          DenseSubMatrix&lt;Number&gt; &Kww = c.get_elem_jacobian( w_var, w_var );
+        
+</pre>
+</div>
+<div class = "comment">
+The number of local degrees of freedom in velocity
+</div>
+
+<div class ="fragment">
+<pre>
+          const unsigned int n_u_dofs = c.get_dof_indices( u_var ).size();
+        
+          unsigned int n_qpoints = (c.get_element_qrule())-&gt;n_points();
+        
+          for (unsigned int qp = 0; qp != n_qpoints; ++qp)
+            {
+              Number u = c.interior_value(u_var, qp),
+                     v = c.interior_value(v_var, qp),
+                     w = c.interior_value(w_var, qp);
+        
+</pre>
+</div>
+<div class = "comment">
+We pull as many calculations as possible outside of loops
+</div>
+
+<div class ="fragment">
+<pre>
+              Number JxWxRe   = JxW[qp] * Reynolds;
+              Number JxWxRexU = JxWxRe * u;
+              Number JxWxRexV = JxWxRe * v;
+              Number JxWxRexW = JxWxRe * w;
+        
+              for (unsigned int i = 0; i != n_u_dofs; ++i)
+                {
+                  Fu(i) += JxWxRexU * phi[i][qp];
+                  Fv(i) += JxWxRexV * phi[i][qp];
+                  if (dim == 3)
+                    Fw(i) += JxWxRexW * phi[i][qp];
+        
+                  if (request_jacobian && c.get_elem_solution_derivative())
+                    {
+                      libmesh_assert_equal_to (c.get_elem_solution_derivative(), 1.0);
+        
+                      Number JxWxRexPhiI = JxWxRe * phi[i][qp];
+                      Number JxWxRexPhiII = JxWxRexPhiI * phi[i][qp];
+                      Kuu(i,i) += JxWxRexPhiII;
+                      Kvv(i,i) += JxWxRexPhiII;
+                      if (dim == 3)
+                        Kww(i,i) += JxWxRexPhiII;
+        
+</pre>
+</div>
+<div class = "comment">
+The mass matrix is symmetric, so we calculate
+one triangle and add it to both upper and lower
+triangles
+</div>
+
+<div class ="fragment">
+<pre>
+                      for (unsigned int j = i+1; j != n_u_dofs; ++j)
+                        {
+                          Number Kij = JxWxRexPhiI * phi[j][qp];
+                          Kuu(i,j) += Kij;
+                          Kuu(j,i) += Kij;
+                          Kvv(i,j) += Kij;
+                          Kvv(j,i) += Kij;
+                          if (dim == 3)
+                            {
+                              Kww(i,j) += Kij;
+                              Kww(j,i) += Kij;
+                            }
+                        }
+                    }
+                }
+            }
+        
+          return request_jacobian;
+        }
+        
+        
+        
+        void NavierSystem::postprocess()
+        {  
+          const unsigned int dim = this-&gt;get_mesh().mesh_dimension();
+        
+          Point p(1./3., 1./3.);
+          Number u = point_value(u_var, p),
+                 v = point_value(v_var, p),
+                 w = (dim == 3) ? point_value(w_var, p) : 0;
+        
+          std::cout &lt;&lt; "u(1/3,1/3) = (" 
+                    &lt;&lt; u &lt;&lt; ", " 
+                    &lt;&lt; v &lt;&lt; ", " 
+                    &lt;&lt; w &lt;&lt; ")" &lt;&lt; std::endl;
+        }
+        
+        
+        
+        
+        Point NavierSystem::forcing(const Point& p)
+        {
+          switch (application)
+            {
+</pre>
+</div>
+<div class = "comment">
+lid driven cavity
+</div>
+
+<div class ="fragment">
+<pre>
+            case 0:
+              {
+</pre>
+</div>
+<div class = "comment">
+No forcing
+</div>
+
+<div class ="fragment">
+<pre>
+                return Point(0.,0.,0.);
+              }
+        
+</pre>
+</div>
+<div class = "comment">
+Homogeneous Dirichlet BCs + sinusoidal forcing
+</div>
+
+<div class ="fragment">
+<pre>
+            case 1:
+              {
+        	const unsigned int dim = this-&gt;get_mesh().mesh_dimension();
+        
+</pre>
+</div>
+<div class = "comment">
+This assumes your domain is defined on [0,1]^dim.
+</div>
+
+<div class ="fragment">
+<pre>
+                Point f;
+        
+</pre>
+</div>
+<div class = "comment">
+Counter-Clockwise vortex in x-y plane
+</div>
+
+<div class ="fragment">
+<pre>
+                if (dim==2)
+        	  {
+        	    f(0) =  std::sin(2.*libMesh::pi*p(1));
+        	    f(1) = -std::sin(2.*libMesh::pi*p(0));
+        	  }
+        
+</pre>
+</div>
+<div class = "comment">
+Counter-Clockwise vortex in x-z plane
+</div>
+
+<div class ="fragment">
+<pre>
+                else if (dim==3)
+        	  {
+        	    f(0) =  std::sin(2.*libMesh::pi*p(1));
+        	    f(1) = 0.;
+        	    f(2) = -std::sin(2.*libMesh::pi*p(0));
+        	  }
+        
+        	return f;
+              }
+        
+</pre>
+</div>
+<div class = "comment">
+3D test case with quadratic velocity and linear pressure field
+</div>
+
+<div class ="fragment">
+<pre>
+            case 2:
+              {
+</pre>
+</div>
+<div class = "comment">
+This problem doesn't make sense in 1D...
+</div>
+
+<div class ="fragment">
+<pre>
+                libmesh_assert_not_equal_to (1, this-&gt;get_mesh().mesh_dimension());
+        	const Real x=p(0), y=p(1), z=p(2);
+        	const Real
+        	  u=(Reynolds+1)*(y*y + z*z),
+        	  v=(Reynolds+1)*(x*x + z*z),
+        	  w=(Reynolds+1)*(x*x + y*y);
+        
+        	if (this-&gt;get_mesh().mesh_dimension() == 2)
+        	  return 2*Reynolds*(Reynolds+1)*Point(v*y,
+        					       u*x);
+        	else
+        	  return 2*Reynolds*(Reynolds+1)*Point(v*y + w*z,
+        					       u*x + w*z,
+        					       u*x + v*y);
+              }
+        
+            default:
+              {
+        	libmesh_error();
+              }
+            }
+        }
+</pre>
+</div>
+
 <a name="nocomments"></a> 
-<br><br><br> <h1> The program without comments: </h1> 
+<br><br><br> <h1> The source file naviersystem.h without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fem_system.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> NavierSystem : <B><FONT COLOR="#228B22">public</FONT></B> FEMSystem
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+    NavierSystem(EquationSystems&amp; es,
+                 <B><FONT COLOR="#228B22">const</FONT></B> std::string&amp; name,
+                 <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> number)
+      : FEMSystem(es, name, number), Reynolds(1.), application(0) {}
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_data ();
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> init_context(DiffContext &amp;context);
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> element_time_derivative (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                          DiffContext&amp; context);
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> element_constraint (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                     DiffContext&amp; context);
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> side_constraint (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                  DiffContext&amp; context);
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">bool</FONT></B> mass_residual (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                DiffContext&amp; context);
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> postprocess ();
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> p_var, u_var, v_var, w_var;
+  
+    Real Reynolds;
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> application;
+  
+    Point forcing(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p);
+  };
+</pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file fem_system_ex1.C without comments: </h1> 
 <pre> 
   
-  #include <B><FONT COLOR="#BC8F8F">&quot;equation_systems.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;error_vector.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;getpot.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;exodusII_io.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;kelly_error_estimator.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_generation.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;mesh_refinement.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;uniform_refinement_estimator.h&quot;</FONT></B>
+  #include &lt;iomanip&gt;
   
-  #include <B><FONT COLOR="#BC8F8F">&quot;o_string_stream.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/equation_systems.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/error_vector.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/exodusII_io.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/kelly_error_estimator.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_generation.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh_refinement.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/uniform_refinement_estimator.h&quot;</FONT></B>
   
   #include <B><FONT COLOR="#BC8F8F">&quot;naviersystem.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;diff_solver.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;euler_solver.h&quot;</FONT></B>
-  #include <B><FONT COLOR="#BC8F8F">&quot;steady_solver.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/diff_solver.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/euler_solver.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/steady_solver.h&quot;</FONT></B>
   
   using namespace libMesh;
   
@@ -650,7 +1909,7 @@ All done.
   
     <B><FONT COLOR="#A020F0">if</FONT></B> (libMesh::default_solver_package() == TRILINOS_SOLVERS)
       {
-        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;We skip example 18 when using the Trilinos solvers.\n&quot;</FONT></B>
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;We skip fem_system_ex1 when using the Trilinos solvers.\n&quot;</FONT></B>
                   &lt;&lt; std::endl;
         <B><FONT COLOR="#A020F0">return</FONT></B> 0;
       }
@@ -715,7 +1974,7 @@ All done.
       {
         system.time_solver =
           AutoPtr&lt;TimeSolver&gt;(<B><FONT COLOR="#A020F0">new</FONT></B> SteadySolver(system));
-        libmesh_assert(n_timesteps == 1);
+        libmesh_assert_equal_to (n_timesteps, 1);
       }
   
     equation_systems.init ();
@@ -759,7 +2018,7 @@ All done.
   
             <B><FONT COLOR="#A020F0">if</FONT></B> (global_tolerance != 0.)
               {
-                libmesh_assert (nelem_target == 0);
+                libmesh_assert_equal_to (nelem_target, 0);
   
                 UniformRefinementEstimator *u =
                   <B><FONT COLOR="#A020F0">new</FONT></B> UniformRefinementEstimator;
@@ -770,7 +2029,7 @@ All done.
               }
             <B><FONT COLOR="#A020F0">else</FONT></B>
               {
-                libmesh_assert (nelem_target &gt; 0);
+                libmesh_assert_greater (nelem_target, 0);
   
                 error_estimator.reset(<B><FONT COLOR="#A020F0">new</FONT></B> KellyErrorEstimator);
               }
@@ -832,11 +2091,14 @@ All done.
   #ifdef LIBMESH_HAVE_EXODUS_API
         <B><FONT COLOR="#A020F0">if</FONT></B> ((t_step+1)%write_interval == 0)
           {
-            OStringStream file_name;
+            <B><FONT COLOR="#5F9EA0">std</FONT></B>::ostringstream file_name;
   
-            file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out_&quot;</FONT></B>;
-            OSSRealzeroright(file_name,3,0, t_step + 1);
-            file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;.e&quot;</FONT></B>;
+            file_name &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;out_&quot;</FONT></B>
+                      &lt;&lt; std::setw(3)
+                      &lt;&lt; std::setfill(<B><FONT COLOR="#BC8F8F">'0'</FONT></B>)
+                      &lt;&lt; std::right
+                      &lt;&lt; t_step+1
+                      &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;.e&quot;</FONT></B>;
   
             ExodusII_IO(mesh).write_timestep(file_name.str(),
   					   equation_systems, 
@@ -851,25 +2113,606 @@ All done.
     <B><FONT COLOR="#A020F0">return</FONT></B> 0;
   }
 </pre> 
+<a name="nocomments"></a> 
+<br><br><br> <h1> The source file naviersystem.C without comments: </h1> 
+<pre> 
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/getpot.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;naviersystem.h&quot;</FONT></B>
+  
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/boundary_info.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dirichlet_boundaries.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/dof_map.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_base.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fe_interface.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/fem_context.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/mesh.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/quadrature.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/string_to_enum.h&quot;</FONT></B>
+  #include <B><FONT COLOR="#BC8F8F">&quot;libmesh/zero_function.h&quot;</FONT></B>
+  
+  using namespace libMesh;
+  
+  
+  <B><FONT COLOR="#228B22">class</FONT></B> BdyFunction : <B><FONT COLOR="#228B22">public</FONT></B> FunctionBase&lt;Number&gt;
+  {
+  <B><FONT COLOR="#228B22">public</FONT></B>:
+    BdyFunction (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> u_var,
+                 <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> v_var,
+                 <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> w_var,
+                 Real Reynolds)
+      : _u_var(u_var), _v_var(v_var), _w_var(w_var), _Re(Reynolds)
+      { <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;_initialized = true; }
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> Number <B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp;, <B><FONT COLOR="#228B22">const</FONT></B> Real = 0)
+      { libmesh_not_implemented(); }
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> <B><FONT COLOR="#228B22">void</FONT></B> <B><FONT COLOR="#A020F0">operator</FONT></B>() (<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p,
+                             <B><FONT COLOR="#228B22">const</FONT></B> Real,
+                             DenseVector&lt;Number&gt;&amp; output)
+      {
+        output.zero();
+        <B><FONT COLOR="#228B22">const</FONT></B> Real x=p(0), y=p(1), z=p(2);
+        output(_u_var) = (_Re+1)*(y*y + z*z);
+        output(_v_var) = (_Re+1)*(x*x + z*z);
+        output(_w_var) = (_Re+1)*(x*x + y*y);
+      }
+  
+    <B><FONT COLOR="#228B22">virtual</FONT></B> AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; clone() <B><FONT COLOR="#228B22">const</FONT></B>
+      { <B><FONT COLOR="#A020F0">return</FONT></B> AutoPtr&lt;FunctionBase&lt;Number&gt; &gt; (<B><FONT COLOR="#A020F0">new</FONT></B> BdyFunction(_u_var, _v_var, _w_var, _Re)); }
+  
+  <B><FONT COLOR="#228B22">private</FONT></B>:
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> _u_var, _v_var, _w_var;
+    <B><FONT COLOR="#228B22">const</FONT></B> Real _Re;
+  };
+  
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> NavierSystem::init_data ()
+  {
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_mesh().mesh_dimension();
+  
+    GetPot infile(<B><FONT COLOR="#BC8F8F">&quot;navier.in&quot;</FONT></B>);
+    Reynolds = infile(<B><FONT COLOR="#BC8F8F">&quot;Reynolds&quot;</FONT></B>, 1.);
+    application = infile(<B><FONT COLOR="#BC8F8F">&quot;application&quot;</FONT></B>, 0);
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> pressure_p = infile(<B><FONT COLOR="#BC8F8F">&quot;pressure_p&quot;</FONT></B>, 1);
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::string fe_family = infile(<B><FONT COLOR="#BC8F8F">&quot;fe_family&quot;</FONT></B>, std::string(<B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>));
+  
+    libmesh_assert((pressure_p == 1) || (fe_family != <B><FONT COLOR="#BC8F8F">&quot;LAGRANGE&quot;</FONT></B>));
+  
+    FEFamily fefamily = Utility::string_to_enum&lt;FEFamily&gt;(fe_family);
+  
+    u_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;u&quot;</FONT></B>, static_cast&lt;Order&gt;(pressure_p+1),
+  			      fefamily);
+    v_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;v&quot;</FONT></B>,
+  			      static_cast&lt;Order&gt;(pressure_p+1),
+  			      fefamily);
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+      w_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;w&quot;</FONT></B>,
+  			        static_cast&lt;Order&gt;(pressure_p+1),
+  			        fefamily);
+    <B><FONT COLOR="#A020F0">else</FONT></B>
+      w_var = u_var;
+  
+    p_var = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;add_variable (<B><FONT COLOR="#BC8F8F">&quot;p&quot;</FONT></B>,
+  			      static_cast&lt;Order&gt;(pressure_p),
+  			      fefamily);
+  
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_evolving(u_var);
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_evolving(v_var);
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+      <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;time_evolving(w_var);
+  
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;verify_analytic_jacobians = infile(<B><FONT COLOR="#BC8F8F">&quot;verify_analytic_jacobians&quot;</FONT></B>, 0.);
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;print_jacobians = infile(<B><FONT COLOR="#BC8F8F">&quot;print_jacobians&quot;</FONT></B>, false);
+    <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;print_element_jacobians = infile(<B><FONT COLOR="#BC8F8F">&quot;print_element_jacobians&quot;</FONT></B>, false);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> boundary_id_type top_id = (dim==3) ? 5 : 2;
+    
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;boundary_id_type&gt; top_bdys;
+    top_bdys.insert(top_id);
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;boundary_id_type&gt; all_bdys(all_ids, all_ids+(dim*2));
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::set&lt;boundary_id_type&gt; nontop_bdys = all_bdys;
+    nontop_bdys.erase(top_id);
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; u_only(1, u_var);
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B>&gt; vw(1, v_var), uvw(1, u_var);
+    uvw.push_back(v_var);
+    <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+      {
+        vw.push_back(w_var);
+        uvw.push_back(w_var);
+      }
+  
+    ZeroFunction&lt;Number&gt; zero;
+    ConstFunction&lt;Number&gt; one(1);
+    <B><FONT COLOR="#A020F0">if</FONT></B> (application == 0)
+      {
+        <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_dof_map().add_dirichlet_boundary
+          (DirichletBoundary (top_bdys, u_only, &amp;one));
+        <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_dof_map().add_dirichlet_boundary
+          (DirichletBoundary (top_bdys, vw, &amp;zero));
+        <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_dof_map().add_dirichlet_boundary
+          (DirichletBoundary (nontop_bdys, uvw, &amp;zero));
+      }
+    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (application == 1)
+      {
+        <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_dof_map().add_dirichlet_boundary
+          (DirichletBoundary (all_bdys, uvw, &amp;zero));
+      }
+    <B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (application == 2)
+      {
+        BdyFunction bdy(u_var,v_var,w_var,Reynolds);
+        <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_dof_map().add_dirichlet_boundary
+          (DirichletBoundary (all_bdys, uvw, &amp;bdy));
+      }
+  
+    <B><FONT COLOR="#5F9EA0">FEMSystem</FONT></B>::init_data();
+  }
+  
+  
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> NavierSystem::init_context(DiffContext &amp;context)
+  {
+    FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* u_elem_fe;
+    FEBase* p_elem_fe;
+    FEBase* u_side_fe;
+  
+    c.get_element_fe( u_var, u_elem_fe );
+    c.get_element_fe( p_var, p_elem_fe );
+    c.get_side_fe( u_var, u_side_fe );
+  
+    u_elem_fe-&gt;get_JxW();
+    u_elem_fe-&gt;get_phi();
+    u_elem_fe-&gt;get_dphi();
+    u_elem_fe-&gt;get_xyz();
+    
+    p_elem_fe-&gt;get_phi();
+  
+    u_side_fe-&gt;get_JxW();
+    u_side_fe-&gt;get_phi();
+    u_side_fe-&gt;get_xyz();
+  }
+  
+  
+  <B><FONT COLOR="#228B22">bool</FONT></B> NavierSystem::element_time_derivative (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                              DiffContext &amp;context)
+  {
+    FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* u_elem_fe;
+    FEBase* p_elem_fe;
+  
+    c.get_element_fe( u_var, u_elem_fe );
+    c.get_element_fe( p_var, p_elem_fe );
+  
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = u_elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = u_elem_fe-&gt;get_phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = u_elem_fe-&gt;get_dphi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = p_elem_fe-&gt;get_phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Point&gt;&amp; qpoint = u_elem_fe-&gt;get_xyz();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_p_dofs = c.get_dof_indices( p_var ).size();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices( u_var ).size(); 
+    libmesh_assert_equal_to (n_u_dofs, c.get_dof_indices( v_var ).size()); 
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_mesh().mesh_dimension();
+    DenseSubMatrix&lt;Number&gt; &amp;Kuu = c.get_elem_jacobian( u_var, u_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kvv = c.get_elem_jacobian( v_var, v_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kww = c.get_elem_jacobian( w_var, w_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kuv = c.get_elem_jacobian( u_var, v_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kuw = c.get_elem_jacobian( u_var, w_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kvu = c.get_elem_jacobian( v_var, u_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kvw = c.get_elem_jacobian( v_var, w_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kwu = c.get_elem_jacobian( w_var, u_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kwv = c.get_elem_jacobian( w_var, v_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kup = c.get_elem_jacobian( u_var, p_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kvp = c.get_elem_jacobian( v_var, p_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kwp = c.get_elem_jacobian( w_var, p_var );
+    DenseSubVector&lt;Number&gt; &amp;Fu = c.get_elem_residual( u_var );
+    DenseSubVector&lt;Number&gt; &amp;Fv = c.get_elem_residual( v_var );
+    DenseSubVector&lt;Number&gt; &amp;Fw = c.get_elem_residual( w_var );
+        
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_element_qrule())-&gt;n_points();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+      {
+        Number p = c.interior_value(p_var, qp),
+               u = c.interior_value(u_var, qp),
+               v = c.interior_value(v_var, qp),
+               w = c.interior_value(w_var, qp);
+        Gradient grad_u = c.interior_gradient(u_var, qp),
+                 grad_v = c.interior_gradient(v_var, qp),
+                 grad_w = c.interior_gradient(w_var, qp);
+  
+        NumberVectorValue U     (u,     v);
+        <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+          U(2) = w;
+        <B><FONT COLOR="#228B22">const</FONT></B> Number  u_x = grad_u(0);
+        <B><FONT COLOR="#228B22">const</FONT></B> Number  u_y = grad_u(1);
+        <B><FONT COLOR="#228B22">const</FONT></B> Number  u_z = (dim == 3)?grad_u(2):0;
+        <B><FONT COLOR="#228B22">const</FONT></B> Number  v_x = grad_v(0);
+        <B><FONT COLOR="#228B22">const</FONT></B> Number  v_y = grad_v(1);
+        <B><FONT COLOR="#228B22">const</FONT></B> Number  v_z = (dim == 3)?grad_v(2):0;
+        <B><FONT COLOR="#228B22">const</FONT></B> Number  w_x = (dim == 3)?grad_w(0):0;
+        <B><FONT COLOR="#228B22">const</FONT></B> Number  w_y = (dim == 3)?grad_w(1):0;
+        <B><FONT COLOR="#228B22">const</FONT></B> Number  w_z = (dim == 3)?grad_w(2):0;
+  
+        Point f = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;forcing(qpoint[qp]);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_u_dofs; i++)
+          {
+            Fu(i) += JxW[qp] *
+                     (-Reynolds*(U*grad_u)*phi[i][qp] + <I><FONT COLOR="#B22222">// convection term
+</FONT></I>                      p*dphi[i][qp](0) -                <I><FONT COLOR="#B22222">// pressure term
+</FONT></I>  		    (grad_u*dphi[i][qp]) +            <I><FONT COLOR="#B22222">// diffusion term
+</FONT></I>  		    f(0)*phi[i][qp]                   <I><FONT COLOR="#B22222">// forcing function
+</FONT></I>  		    );
+  
+              
+            Fv(i) += JxW[qp] *
+                     (-Reynolds*(U*grad_v)*phi[i][qp] + <I><FONT COLOR="#B22222">// convection term
+</FONT></I>                      p*dphi[i][qp](1) -                <I><FONT COLOR="#B22222">// pressure term
+</FONT></I>  		    (grad_v*dphi[i][qp]) +            <I><FONT COLOR="#B22222">// diffusion term
+</FONT></I>  		    f(1)*phi[i][qp]                   <I><FONT COLOR="#B22222">// forcing function
+</FONT></I>  		    );
+  
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+            Fw(i) += JxW[qp] *
+                     (-Reynolds*(U*grad_w)*phi[i][qp] + <I><FONT COLOR="#B22222">// convection term
+</FONT></I>                      p*dphi[i][qp](2) -                <I><FONT COLOR="#B22222">// pressure term
+</FONT></I>  		    (grad_w*dphi[i][qp]) +            <I><FONT COLOR="#B22222">// diffusion term
+</FONT></I>  		    f(2)*phi[i][qp]                   <I><FONT COLOR="#B22222">// forcing function
+</FONT></I>  		    );
+  
+  
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian &amp;&amp; c.elem_solution_derivative)
+              {
+                libmesh_assert_equal_to (c.elem_solution_derivative, 1.0);
+  
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_u_dofs; j++)
+                  {
+                    Kuu(i,j) += JxW[qp] *
+     <I><FONT COLOR="#B22222">/* convection term */</FONT></I>      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+     <I><FONT COLOR="#B22222">/* diffusion term  */</FONT></I>       (dphi[i][qp]*dphi[j][qp]) -
+     <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>       Reynolds*u_x*phi[i][qp]*phi[j][qp]);
+  
+                    Kuv(i,j) += JxW[qp] *
+     <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>      -Reynolds*u_y*phi[i][qp]*phi[j][qp];
+  
+                    Kvv(i,j) += JxW[qp] *
+     <I><FONT COLOR="#B22222">/* convection term */</FONT></I>      (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+     <I><FONT COLOR="#B22222">/* diffusion term  */</FONT></I>       (dphi[i][qp]*dphi[j][qp]) -
+     <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>       Reynolds*v_y*phi[i][qp]*phi[j][qp]);
+  
+                    Kvu(i,j) += JxW[qp] * 
+     <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>      -Reynolds*v_x*phi[i][qp]*phi[j][qp];
+                    <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+                      {
+                        Kww(i,j) += JxW[qp] *
+     <I><FONT COLOR="#B22222">/* convection term */</FONT></I>          (-Reynolds*(U*dphi[j][qp])*phi[i][qp] -
+     <I><FONT COLOR="#B22222">/* diffusion term  */</FONT></I>           (dphi[i][qp]*dphi[j][qp]) -
+     <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>           Reynolds*w_z*phi[i][qp]*phi[j][qp]);
+                        Kuw(i,j) += JxW[qp] *
+     <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>      -Reynolds*u_z*phi[i][qp]*phi[j][qp];
+                        Kvw(i,j) += JxW[qp] *
+     <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>      -Reynolds*v_z*phi[i][qp]*phi[j][qp];
+                        Kwu(i,j) += JxW[qp] *
+     <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>      -Reynolds*w_x*phi[i][qp]*phi[j][qp];
+                        Kwv(i,j) += JxW[qp] *
+     <I><FONT COLOR="#B22222">/* Newton term     */</FONT></I>      -Reynolds*w_y*phi[i][qp]*phi[j][qp];
+                      }
+                  }
+  
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_p_dofs; j++)
+                  {
+                    Kup(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](0);
+                    Kvp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](1);
+                    <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+                      Kwp(i,j) += JxW[qp]*psi[j][qp]*dphi[i][qp](2);
+                  }
+              }
+          }
+      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
+</FONT></I>    
+    <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
+  }
+  
+  
+  
+  <B><FONT COLOR="#228B22">bool</FONT></B> NavierSystem::element_constraint (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                         DiffContext &amp;context)
+  {
+    FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* u_elem_fe;
+    FEBase* p_elem_fe;
+  
+    c.get_element_fe( u_var, u_elem_fe );
+    c.get_element_fe( p_var, p_elem_fe );
+  
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = u_elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;RealGradient&gt; &gt;&amp; dphi = u_elem_fe-&gt;get_dphi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; psi = p_elem_fe-&gt;get_phi();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices( u_var ).size();
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_p_dofs = c.get_dof_indices( p_var ).size();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_mesh().mesh_dimension();
+    DenseSubMatrix&lt;Number&gt; &amp;Kpu = c.get_elem_jacobian( p_var, u_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kpv = c.get_elem_jacobian( p_var, v_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kpw = c.get_elem_jacobian( p_var, w_var );
+    DenseSubVector&lt;Number&gt; &amp;Fp = c.get_elem_residual( p_var );
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_element_qrule())-&gt;n_points();
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp=0; qp != n_qpoints; qp++)
+      {
+        Gradient grad_u = c.interior_gradient(u_var, qp),
+                 grad_v = c.interior_gradient(v_var, qp),
+                 grad_w = c.interior_gradient(w_var, qp);
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_p_dofs; i++)
+          {
+            Fp(i) += JxW[qp] * psi[i][qp] *
+                     (grad_u(0) + grad_v(1));
+            <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+              Fp(i) += JxW[qp] * psi[i][qp] *
+                       (grad_w(2));
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian &amp;&amp; c.get_elem_solution_derivative())
+              {
+                libmesh_assert_equal_to (c.get_elem_solution_derivative(), 1.0);
+  
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_u_dofs; j++)
+                  {
+                    Kpu(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](0);
+                    Kpv(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](1);
+                    <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+                      Kpw(i,j) += JxW[qp]*psi[i][qp]*dphi[j][qp](2);
+                  }
+              }
+          }
+      } <I><FONT COLOR="#B22222">// end of the quadrature point qp-loop
+</FONT></I>  
+    <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
+  }
+  
+        
+  
+  <B><FONT COLOR="#228B22">bool</FONT></B> NavierSystem::side_constraint (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                      DiffContext &amp;context)
+  {
+    FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* p_elem_fe;
+  
+    c.get_element_fe( p_var, p_elem_fe );
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> Point zero(0.,0.);
+  
+    <B><FONT COLOR="#A020F0">if</FONT></B> (c.elem-&gt;contains_point(zero))
+      {
+        <B><FONT COLOR="#228B22">const</FONT></B> Real penalty = 1.e9;
+  
+        DenseSubMatrix&lt;Number&gt; &amp;Kpp = c.get_elem_jacobian( p_var, p_var );
+        DenseSubVector&lt;Number&gt; &amp;Fp = c.get_elem_residual( p_var );
+        <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_p_dofs = c.get_dof_indices( p_var ).size(); 
+  
+        Number p = c.point_value(p_var, zero);
+        Number p_value = 0.;
+  
+        <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = get_mesh().mesh_dimension();
+        FEType fe_type = p_elem_fe-&gt;get_fe_type();
+        Point p_master = FEInterface::inverse_map(dim, fe_type, c.elem, zero);
+  
+        <B><FONT COLOR="#5F9EA0">std</FONT></B>::vector&lt;Real&gt; point_phi(n_p_dofs);
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_p_dofs; i++)
+          {
+            point_phi[i] = FEInterface::shape(dim, fe_type, c.elem, i, p_master);
+          }
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i=0; i != n_p_dofs; i++)
+          {
+            Fp(i) += penalty * (p - p_value) * point_phi[i];
+            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian &amp;&amp; c.get_elem_solution_derivative())
+              {
+                libmesh_assert_equal_to (c.get_elem_solution_derivative(), 1.0);
+  
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j=0; j != n_p_dofs; j++)
+  		Kpp(i,j) += penalty * point_phi[i] * point_phi[j];
+              }
+          }
+      }
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
+  }
+  
+  
+  <B><FONT COLOR="#228B22">bool</FONT></B> NavierSystem::mass_residual (<B><FONT COLOR="#228B22">bool</FONT></B> request_jacobian,
+                                    DiffContext &amp;context)
+  {
+    FEMContext &amp;c = libmesh_cast_ref&lt;FEMContext&amp;&gt;(context);
+  
+    FEBase* u_elem_fe;
+  
+    c.get_element_fe( u_var, u_elem_fe );
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_mesh().mesh_dimension();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;Real&gt; &amp;JxW = u_elem_fe-&gt;get_JxW();
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> std::vector&lt;std::vector&lt;Real&gt; &gt;&amp; phi = u_elem_fe-&gt;get_phi();
+  
+    DenseSubVector&lt;Number&gt; &amp;Fu = c.get_elem_residual( u_var );
+    DenseSubVector&lt;Number&gt; &amp;Fv = c.get_elem_residual( v_var );
+    DenseSubVector&lt;Number&gt; &amp;Fw = c.get_elem_residual( w_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kuu = c.get_elem_jacobian( u_var, u_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kvv = c.get_elem_jacobian( v_var, v_var );
+    DenseSubMatrix&lt;Number&gt; &amp;Kww = c.get_elem_jacobian( w_var, w_var );
+  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_u_dofs = c.get_dof_indices( u_var ).size();
+  
+    <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> n_qpoints = (c.get_element_qrule())-&gt;n_points();
+  
+    <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> qp = 0; qp != n_qpoints; ++qp)
+      {
+        Number u = c.interior_value(u_var, qp),
+               v = c.interior_value(v_var, qp),
+               w = c.interior_value(w_var, qp);
+  
+        Number JxWxRe   = JxW[qp] * Reynolds;
+        Number JxWxRexU = JxWxRe * u;
+        Number JxWxRexV = JxWxRe * v;
+        Number JxWxRexW = JxWxRe * w;
+  
+        <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> i = 0; i != n_u_dofs; ++i)
+          {
+            Fu(i) += JxWxRexU * phi[i][qp];
+            Fv(i) += JxWxRexV * phi[i][qp];
+            <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+              Fw(i) += JxWxRexW * phi[i][qp];
+  
+            <B><FONT COLOR="#A020F0">if</FONT></B> (request_jacobian &amp;&amp; c.get_elem_solution_derivative())
+              {
+                libmesh_assert_equal_to (c.get_elem_solution_derivative(), 1.0);
+  
+                Number JxWxRexPhiI = JxWxRe * phi[i][qp];
+                Number JxWxRexPhiII = JxWxRexPhiI * phi[i][qp];
+                Kuu(i,i) += JxWxRexPhiII;
+                Kvv(i,i) += JxWxRexPhiII;
+                <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+                  Kww(i,i) += JxWxRexPhiII;
+  
+                <B><FONT COLOR="#A020F0">for</FONT></B> (<B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> j = i+1; j != n_u_dofs; ++j)
+                  {
+                    Number Kij = JxWxRexPhiI * phi[j][qp];
+                    Kuu(i,j) += Kij;
+                    Kuu(j,i) += Kij;
+                    Kvv(i,j) += Kij;
+                    Kvv(j,i) += Kij;
+                    <B><FONT COLOR="#A020F0">if</FONT></B> (dim == 3)
+                      {
+                        Kww(i,j) += Kij;
+                        Kww(j,i) += Kij;
+                      }
+                  }
+              }
+          }
+      }
+  
+    <B><FONT COLOR="#A020F0">return</FONT></B> request_jacobian;
+  }
+  
+  
+  
+  <B><FONT COLOR="#228B22">void</FONT></B> NavierSystem::postprocess()
+  {  
+    <B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_mesh().mesh_dimension();
+  
+    Point p(1./3., 1./3.);
+    Number u = point_value(u_var, p),
+           v = point_value(v_var, p),
+           w = (dim == 3) ? point_value(w_var, p) : 0;
+  
+    <B><FONT COLOR="#5F9EA0">std</FONT></B>::cout &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;u(1/3,1/3) = (&quot;</FONT></B> 
+              &lt;&lt; u &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, &quot;</FONT></B> 
+              &lt;&lt; v &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;, &quot;</FONT></B> 
+              &lt;&lt; w &lt;&lt; <B><FONT COLOR="#BC8F8F">&quot;)&quot;</FONT></B> &lt;&lt; std::endl;
+  }
+  
+  
+  
+  
+  Point NavierSystem::forcing(<B><FONT COLOR="#228B22">const</FONT></B> Point&amp; p)
+  {
+    <B><FONT COLOR="#A020F0">switch</FONT></B> (application)
+      {
+      <B><FONT COLOR="#A020F0">case</FONT></B> <B><FONT COLOR="#5F9EA0">0</FONT></B>:
+        {
+  	<B><FONT COLOR="#A020F0">return</FONT></B> Point(0.,0.,0.);
+        }
+  
+      <B><FONT COLOR="#A020F0">case</FONT></B> <B><FONT COLOR="#5F9EA0">1</FONT></B>:
+        {
+  	<B><FONT COLOR="#228B22">const</FONT></B> <B><FONT COLOR="#228B22">unsigned</FONT></B> <B><FONT COLOR="#228B22">int</FONT></B> dim = <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_mesh().mesh_dimension();
+  
+  	Point f;
+  
+  	<B><FONT COLOR="#A020F0">if</FONT></B> (dim==2)
+  	  {
+  	    f(0) =  std::sin(2.*libMesh::pi*p(1));
+  	    f(1) = -std::sin(2.*libMesh::pi*p(0));
+  	  }
+  
+  	<B><FONT COLOR="#A020F0">else</FONT></B> <B><FONT COLOR="#A020F0">if</FONT></B> (dim==3)
+  	  {
+  	    f(0) =  std::sin(2.*libMesh::pi*p(1));
+  	    f(1) = 0.;
+  	    f(2) = -std::sin(2.*libMesh::pi*p(0));
+  	  }
+  
+  	<B><FONT COLOR="#A020F0">return</FONT></B> f;
+        }
+  
+      <B><FONT COLOR="#A020F0">case</FONT></B> <B><FONT COLOR="#5F9EA0">2</FONT></B>:
+        {
+  	libmesh_assert_not_equal_to (1, <B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_mesh().mesh_dimension());
+  	<B><FONT COLOR="#228B22">const</FONT></B> Real x=p(0), y=p(1), z=p(2);
+  	<B><FONT COLOR="#228B22">const</FONT></B> Real
+  	  u=(Reynolds+1)*(y*y + z*z),
+  	  v=(Reynolds+1)*(x*x + z*z),
+  	  w=(Reynolds+1)*(x*x + y*y);
+  
+  	<B><FONT COLOR="#A020F0">if</FONT></B> (<B><FONT COLOR="#A020F0">this</FONT></B>-&gt;get_mesh().mesh_dimension() == 2)
+  	  <B><FONT COLOR="#A020F0">return</FONT></B> 2*Reynolds*(Reynolds+1)*Point(v*y,
+  					       u*x);
+  	<B><FONT COLOR="#A020F0">else</FONT></B>
+  	  <B><FONT COLOR="#A020F0">return</FONT></B> 2*Reynolds*(Reynolds+1)*Point(v*y + w*z,
+  					       u*x + w*z,
+  					       u*x + v*y);
+        }
+  
+      <B><FONT COLOR="#5F9EA0">default</FONT></B>:
+        {
+  	libmesh_error();
+        }
+      }
+  }
+</pre> 
 <a name="output"></a> 
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
-Linking fem_system_ex1-opt...
 ***************************************************************
-* Running Example  mpirun -np 6 ./fem_system_ex1-opt -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
+* Running Example fem_system_ex1:
+*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
  
  Mesh Information:
   mesh_dimension()=2
   spatial_dimension()=3
   n_nodes()=1681
-    n_local_nodes()=305
+    n_local_nodes()=165
   n_elem()=400
-    n_local_elem()=67
+    n_local_elem()=34
     n_active_elem()=400
   n_subdomains()=1
-  n_partitions()=6
-  n_processors()=6
+  n_partitions()=12
+  n_processors()=12
   n_threads()=1
   processor_id()=0
 
@@ -877,21 +2720,21 @@ Linking fem_system_ex1-opt...
   n_systems()=1
    System #0, "Navier-Stokes"
     Type "Implicit"
-    Variables="u" "v" "p" 
-    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" "CARTESIAN" "CARTESIAN" 
-    Approximation Orders="SECOND", "THIRD" "SECOND", "THIRD" "FIRST", "THIRD" 
+    Variables={ "u" "v" } "p" 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" "LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" "CARTESIAN" 
+    Approximation Orders="SECOND", "THIRD" "FIRST", "THIRD" 
     n_dofs()=3803
-    n_local_dofs()=696
-    n_constrained_dofs()=321
-    n_local_constrained_dofs()=66
+    n_local_dofs()=379
+    n_constrained_dofs()=320
+    n_local_constrained_dofs()=58
     n_vectors()=2
     n_matrices()=1
     DofMap Sparsity
-      Average  On-Processor Bandwidth <= 36.7155
-      Average Off-Processor Bandwidth <= 2.72557
-      Maximum  On-Processor Bandwidth <= 59
-      Maximum Off-Processor Bandwidth <= 37
+      Average  On-Processor Bandwidth <= 35.0636
+      Average Off-Processor Bandwidth <= 5.62608
+      Maximum  On-Processor Bandwidth <= 63
+      Maximum Off-Processor Bandwidth <= 47
     DofMap Constraints
       Number of DoF Constraints = 320
       Number of Heterogenous Constraints= 41
@@ -964,17 +2807,17 @@ u(1/3,1/3) = (-0.115461, 0.0663945, 0)
 
 ---------------------------------------------- PETSc Performance Summary: ----------------------------------------------
 
-./fem_system_ex1-opt on a intel-11. named daedalus with 6 processors, by roystgnr Fri Aug 24 15:21:26 2012
-Using Petsc Release Version 3.1.0, Patch 5, Mon Sep 27 11:51:54 CDT 2010
+/workspace/libmesh/examples/fem_system/fem_system_ex1/.libs/lt-example-devel on a intel-12. named hbar.ices.utexas.edu with 12 processors, by benkirk Thu Jan 31 22:06:44 2013
+Using Petsc Release Version 3.3.0, Patch 2, Fri Jul 13 15:42:00 CDT 2012 
 
                          Max       Max/Min        Avg      Total 
-Time (sec):           9.592e+00      1.00013   9.592e+00
-Objects:              4.430e+02      1.00000   4.430e+02
-Flops:                2.525e+09      1.35781   2.136e+09  1.282e+10
-Flops/sec:            2.632e+08      1.35774   2.227e+08  1.336e+09
-MPI Messages:         1.244e+04      1.86142   9.541e+03  5.725e+04
-MPI Message Lengths:  8.619e+06      1.50071   7.289e+02  4.173e+07
-MPI Reductions:       7.208e+03      1.00000
+Time (sec):           8.065e+00      1.00016   8.065e+00
+Objects:              4.410e+02      1.00000   4.410e+02
+Flops:                9.132e+08      1.65732   7.630e+08  9.156e+09
+Flops/sec:            1.132e+08      1.65732   9.460e+07  1.135e+09
+MPI Messages:         3.716e+04      2.72423   2.444e+04  2.933e+05
+MPI Message Lengths:  1.276e+07      1.68914   4.146e+02  1.216e+08
+MPI Reductions:       1.305e+04      1.00000
 
 Flop counting convention: 1 flop = 1 real number operation of type (multiply/divide/add/subtract)
                             e.g., VecAXPY() for real vectors of length N --> 2N flops
@@ -982,7 +2825,7 @@ Flop counting convention: 1 flop = 1 real number operation of type (multiply/div
 
 Summary of Stages:   ----- Time ------  ----- Flops -----  --- Messages ---  -- Message Lengths --  -- Reductions --
                         Avg     %Total     Avg     %Total   counts   %Total     Avg         %Total   counts   %Total 
- 0:      Main Stage: 9.5915e+00 100.0%  1.2818e+10 100.0%  5.725e+04 100.0%  7.289e+02      100.0%  7.052e+03  97.8% 
+ 0:      Main Stage: 8.0650e+00 100.0%  9.1557e+09 100.0%  2.933e+05 100.0%  4.146e+02      100.0%  1.305e+04 100.0% 
 
 ------------------------------------------------------------------------------------------------------------------------
 See the 'Profiling' chapter of the users' manual for details on interpreting output.
@@ -995,44 +2838,44 @@ Phase summary info:
    Reduct: number of global reductions
    Global: entire computation
    Stage: stages of a computation. Set stages with PetscLogStagePush() and PetscLogStagePop().
-      %T - percent time in this phase         %F - percent flops in this phase
+      %T - percent time in this phase         %f - percent flops in this phase
       %M - percent messages in this phase     %L - percent message lengths in this phase
       %R - percent reductions in this phase
    Total Mflop/s: 10e-6 * (sum of flops over all processors)/(max time over all processors)
 ------------------------------------------------------------------------------------------------------------------------
 Event                Count      Time (sec)     Flops                             --- Global ---  --- Stage ---   Total
-                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %F %M %L %R  %T %F %M %L %R Mflop/s
+                   Max Ratio  Max     Ratio   Max  Ratio  Mess   Avg len Reduct  %T %f %M %L %R  %T %f %M %L %R Mflop/s
 ------------------------------------------------------------------------------------------------------------------------
 
 --- Event Stage 0: Main Stage
 
-KSPGMRESOrthog      2540 1.0 1.5597e+00 3.2 1.04e+08 1.2 0.0e+00 0.0e+00 2.5e+03  9  4  0  0 35   9  4  0  0 36   364
-KSPSetup              54 1.0 5.9843e-05 1.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-KSPSolve              27 1.0 8.1034e+00 1.0 2.52e+09 1.4 4.8e+04 4.5e+02 5.3e+03 84100 83 52 73  84100 83 52 75  1582
-PCSetUp               54 1.0 3.5936e+00 1.7 1.08e+09 1.5 0.0e+00 0.0e+00 8.1e+01 29 41  0  0  1  29 41  0  0  1  1474
-PCSetUpOnBlocks       27 1.0 3.5932e+00 1.7 1.08e+09 1.5 0.0e+00 0.0e+00 8.1e+01 29 41  0  0  1  29 41  0  0  1  1474
-PCApply             2640 1.0 1.2995e+00 1.4 1.18e+09 1.3 0.0e+00 0.0e+00 0.0e+00 11 48  0  0  0  11 48  0  0  0  4715
-VecMDot             2540 1.0 1.5364e+00 3.3 5.20e+07 1.2 0.0e+00 0.0e+00 2.5e+03  9  2  0  0 35   9  2  0  0 36   185
-VecNorm             2775 1.0 2.2043e+00 3.8 3.86e+06 1.2 0.0e+00 0.0e+00 2.8e+03 13  0  0  0 38  13  0  0  0 39    10
-VecScale            2640 1.0 3.7777e-03 1.7 1.84e+06 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  2658
-VecCopy              427 1.0 5.9485e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecSet              2855 1.0 3.7463e-03 1.5 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecAXPY              227 1.0 5.3239e-04 1.4 3.16e+05 1.2 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  3243
-VecMAXPY            2640 1.0 2.1785e-02 1.1 5.56e+07 1.2 0.0e+00 0.0e+00 0.0e+00  0  2  0  0  0   0  2  0  0  0 13940
-VecAssemblyBegin     421 1.0 7.3882e-01 1.7 0.00e+00 0.0 9.7e+02 4.3e+02 1.1e+03  6  0  2  1 15   6  0  2  1 15     0
-VecAssemblyEnd       421 1.0 4.3893e-04 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-VecScatterBegin     2808 1.0 2.2934e-02 1.8 0.00e+00 0.0 5.1e+04 6.2e+02 0.0e+00  0  0 90 76  0   0  0 90 76  0     0
-VecScatterEnd       2808 1.0 3.0482e+00 3.7 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00 19  0  0  0  0  19  0  0  0  0     0
-VecNormalize        2640 1.0 2.1417e+00 4.1 5.51e+06 1.2 0.0e+00 0.0e+00 2.6e+03 13  0  0  0 37  13  0  0  0 37    14
-MatMult             2640 1.0 3.1629e+00 3.1 1.43e+08 1.2 4.8e+04 4.5e+02 0.0e+00 20  6 83 52  0  20  6 83 52  0   244
-MatSolve            2640 1.0 1.2728e+00 1.4 1.18e+09 1.3 0.0e+00 0.0e+00 0.0e+00 11 48  0  0  0  11 48  0  0  0  4814
-MatLUFactorNum        27 1.0 1.1125e+00 1.7 1.08e+09 1.5 0.0e+00 0.0e+00 0.0e+00  9 41  0  0  0   9 41  0  0  0  4762
-MatILUFactorSym       27 1.0 2.4791e+00 1.7 0.00e+00 0.0 0.0e+00 0.0e+00 2.7e+01 20  0  0  0  0  20  0  0  0  0     0
-MatAssemblyBegin      54 1.0 1.2764e-02 1.7 0.00e+00 0.0 7.3e+02 7.0e+03 1.1e+02  0  0  1 12  1   0  0  1 12  2     0
-MatAssemblyEnd        54 1.0 1.5276e-02 1.3 0.00e+00 0.0 3.6e+01 1.2e+02 6.0e+01  0  0  0  0  1   0  0  0  0  1     0
-MatGetRowIJ           27 1.0 1.2398e-05 3.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
-MatGetOrdering        27 1.0 3.6716e-04 1.2 0.00e+00 0.0 0.0e+00 0.0e+00 5.4e+01  0  0  0  0  1   0  0  0  0  1     0
-MatZeroEntries        29 1.0 1.3266e-03 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPGMRESOrthog      5480 1.0 2.7111e-01 2.6 1.27e+08 1.5 0.0e+00 0.0e+00 5.5e+03  2 14  0  0 42   2 14  0  0 42  4686
+KSPSetUp              54 1.0 3.5214e-04 1.1 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+KSPSolve              27 1.0 1.1697e+00 1.0 9.13e+08 1.7 2.6e+05 3.1e+02 1.1e+04 15100 89 66 87  15100 89 66 87  7827
+PCSetUp               54 1.0 4.0116e-01 2.1 9.70e+07 2.4 0.0e+00 0.0e+00 1.9e+02  4  9  0  0  1   4  9  0  0  1  1999
+PCSetUpOnBlocks       27 1.0 4.0055e-01 2.1 9.70e+07 2.4 0.0e+00 0.0e+00 1.9e+02  4  9  0  0  1   4  9  0  0  1  2002
+PCApply             5695 1.0 4.3799e-01 1.6 5.46e+08 1.8 0.0e+00 0.0e+00 0.0e+00  4 58  0  0  0   4 58  0  0  0 12133
+VecMDot             5480 1.0 2.3888e-01 3.6 6.33e+07 1.5 0.0e+00 0.0e+00 5.5e+03  2  7  0  0 42   2  7  0  0 42  2657
+VecNorm             5803 1.0 1.1495e-01 2.3 4.40e+06 1.5 0.0e+00 0.0e+00 5.8e+03  1  0  0  0 44   1  0  0  0 44   384
+VecScale            5668 1.0 5.2457e-03 1.8 2.15e+06 1.5 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  4109
+VecCopy              316 1.0 4.0793e-04 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecSet              6042 1.0 4.6251e-03 1.4 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecAXPY              403 1.0 1.4262e-03 2.5 3.05e+05 1.5 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0  2149
+VecMAXPY            5668 1.0 4.0049e-02 1.5 6.75e+07 1.5 0.0e+00 0.0e+00 0.0e+00  0  7  0  0  0   0  7  0  0  0 16916
+VecAssemblyBegin     422 1.0 1.2846e+00121.4 0.00e+00 0.0 2.5e+03 2.7e+02 1.1e+03  9  0  1  1  8   9  0  1  1  8     0
+VecAssemblyEnd       422 1.0 1.3652e-03 3.9 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+VecScatterBegin     5837 1.0 2.9358e-02 1.7 0.00e+00 0.0 2.7e+05 3.8e+02 0.0e+00  0  0 93 84  0   0  0 93 84  0     0
+VecScatterEnd       5837 1.0 2.2865e-0121.9 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  1  0  0  0  0   1  0  0  0  0     0
+VecNormalize        5668 1.0 1.1199e-01 2.4 6.44e+06 1.5 0.0e+00 0.0e+00 5.7e+03  1  1  0  0 43   1  1  0  0 43   577
+MatMult             5668 1.0 3.7216e-01 2.5 1.63e+08 1.5 2.6e+05 3.1e+02 0.0e+00  3 18 89 66  0   3 18 89 66  0  4457
+MatSolve            5695 1.0 3.8024e-01 1.7 5.46e+08 1.8 0.0e+00 0.0e+00 0.0e+00  4 58  0  0  0   4 58  0  0  0 13976
+MatLUFactorNum        27 1.0 9.5048e-02 2.3 9.70e+07 2.4 0.0e+00 0.0e+00 0.0e+00  1  9  0  0  0   1  9  0  0  0  8436
+MatILUFactorSym       27 1.0 2.9901e-01 2.1 0.00e+00 0.0 0.0e+00 0.0e+00 8.1e+01  3  0  0  0  1   3  0  0  0  1     0
+MatAssemblyBegin      54 1.0 7.6935e-03 3.4 0.00e+00 0.0 1.9e+03 4.7e+03 1.1e+02  0  0  1  7  1   0  0  1  7  1     0
+MatAssemblyEnd        54 1.0 7.1695e-03 4.6 0.00e+00 0.0 9.2e+01 7.9e+01 8.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatGetRowIJ           27 1.0 2.1458e-05 2.6 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
+MatGetOrdering        27 1.0 1.9898e-03 1.0 0.00e+00 0.0 0.0e+00 0.0e+00 1.1e+02  0  0  0  0  1   0  0  0  0  1     0
+MatZeroEntries        29 1.0 1.1389e-03 1.3 0.00e+00 0.0 0.0e+00 0.0e+00 0.0e+00  0  0  0  0  0   0  0  0  0  0     0
 ------------------------------------------------------------------------------------------------------------------------
 
 Memory usage is given in bytes:
@@ -1042,17 +2885,18 @@ Reports information only for process 0.
 
 --- Event Stage 0: Main Stage
 
-       Krylov Solver     3              3        19872     0
-      Preconditioner     3              3         2048     0
-                 Vec   145            145      2329872     0
-         Vec Scatter    74             74        64232     0
-           Index Set   172            172       328348     0
-   IS L to G Mapping    16             16        63744     0
-              Matrix    30             30     73202212     0
+       Krylov Solver     3              3        20592     0
+      Preconditioner     3              3         2608     0
+              Vector   144            144      2194696     0
+      Vector Scatter    60             60        62160     0
+           Index Set   198            198       252276     0
+   IS L to G Mapping     2              2         1128     0
+              Matrix    30             30     14814048     0
+              Viewer     1              0            0     0
 ========================================================================================================================
 Average time to get PetscTime(): 9.53674e-08
-Average time for MPI_Barrier(): 0.000487232
-Average time for zero size MPI_Send(): 7.93139e-05
+Average time for MPI_Barrier(): 3.00407e-06
+Average time for zero size MPI_Send(): 1.39078e-05
 #PETSc Option Table entries:
 -ksp_right_pc
 -log_summary
@@ -1063,39 +2907,53 @@ Average time for zero size MPI_Send(): 7.93139e-05
 #End of PETSc Option Table entries
 Compiled without FORTRAN kernels
 Compiled with full precision matrices (default)
-sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8
-Configure run at: Sat May 19 03:47:23 2012
-Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared=1 --with-shared-libraries=1 --with-mpi-dir=/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid --with-mumps=true --download-mumps=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_intel_lp64.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_sequential.so,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_core.so]" --with-lapack-lib=/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t/libmkl_solver_lp64_sequential.a
+sizeof(short) 2 sizeof(int) 4 sizeof(long) 8 sizeof(void*) 8 sizeof(PetscScalar) 8 sizeof(PetscInt) 4
+Configure run at: Thu Nov  8 11:21:02 2012
+Configure options: --with-debugging=false --COPTFLAGS=-O3 --CXXOPTFLAGS=-O3 --FOPTFLAGS=-O3 --with-clanguage=C++ --with-shared-libraries=1 --with-mpi-dir=/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1 --with-mumps=true --download-mumps=1 --with-metis=true --download-metis=1 --with-parmetis=true --download-parmetis=1 --with-superlu=true --download-superlu=1 --with-superludir=true --download-superlu_dist=1 --with-blacs=true --download-blacs=1 --with-scalapack=true --download-scalapack=1 --with-hypre=true --download-hypre=1 --with-blas-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_intel_lp64.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_sequential.so,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_core.so]" --with-lapack-lib="[/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64/libmkl_lapack95_lp64.a]"
 -----------------------------------------
-Libraries compiled on Sat May 19 03:47:23 CDT 2012 on daedalus 
-Machine characteristics: Linux daedalus 2.6.32-34-generic #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011 x86_64 GNU/Linux 
-Using PETSc directory: /org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5
-Using PETSc arch: intel-11.1-lucid-mpich2-1.4.1-cxx-opt
+Libraries compiled on Thu Nov  8 11:21:02 2012 on daedalus.ices.utexas.edu 
+Machine characteristics: Linux-2.6.32-279.1.1.el6.x86_64-x86_64-with-redhat-6.3-Carbon
+Using PETSc directory: /opt/apps/ossw/libraries/petsc/petsc-3.3-p2
+Using PETSc arch: intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt
 -----------------------------------------
-Using C compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3   -fPIC   
-Using Fortran compiler: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3    
------------------------------------------
-Using include paths: -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/include -I/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/include -I/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/include  
-------------------------------------------
-Using C linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpicxx -O3 
-Using Fortran linker: /org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/bin/mpif90 -fPIC -O3  
-Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lpetsc       -lX11 -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -L/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/intel-11.1-lucid-mpich2-1.4.1-cxx-opt/lib -lHYPRE -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lscalapack -lblacs -lsuperlu_dist_2.4 -lparmetis -lmetis -lsuperlu_4.0 -Wl,-rpath,/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -L/org/centers/pecos/LIBRARIES/MKL/mkl-10.0.3.020-intel-11.1-lucid/lib/em64t -lmkl_solver_lp64_sequential -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -ldl -Wl,-rpath,/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -L/org/centers/pecos/LIBRARIES/MPICH2/mpich2-1.4.1-intel-11.1-lucid/lib -lmpich -lopa -lmpl -lrt -lpthread -Wl,-rpath,/opt/intel/Compiler/11.1/073/lib/intel64 -L/opt/intel/Compiler/11.1/073/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -L/usr/lib/gcc/x86_64-linux-gnu/4.4.3 -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -lstdc++ -lmpichcxx -lstdc++ -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lgcc_s -lirc -lirc_s -ldl  
-------------------------------------------
 
--------------------------------------------------------------------
-| Processor id:   0                                                |
-| Num Processors: 6                                                |
-| Time:           Fri Aug 24 15:21:26 2012                         |
-| OS:             Linux                                            |
-| HostName:       daedalus                                         |
-| OS Release:     2.6.32-34-generic                                |
-| OS Version:     #76-Ubuntu SMP Tue Aug 30 17:05:01 UTC 2011      |
-| Machine:        x86_64                                           |
-| Username:       roystgnr                                         |
-| Configuration:  ./configure run on Wed Aug 22 12:44:06 CDT 2012  |
--------------------------------------------------------------------
+Using C compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx  -wd1572 -O3   -fPIC   ${COPTFLAGS} ${CFLAGS}
+Using Fortran compiler: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90  -fPIC -O3   ${FOPTFLAGS} ${FFLAGS} 
+-----------------------------------------
+
+Using include paths: -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/include -I/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/include -I/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/include
+-----------------------------------------
+
+Using C linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpicxx
+Using Fortran linker: /opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/bin/mpif90
+Using libraries: -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lpetsc -lX11 -Wl,-rpath,/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -L/opt/apps/ossw/libraries/petsc/petsc-3.3-p2/intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt/lib -lcmumps -ldmumps -lsmumps -lzmumps -lmumps_common -lpord -lHYPRE -lpthread -lsuperlu_dist_3.0 -lparmetis -lmetis -lscalapack -lblacs -lsuperlu_4.3 -Wl,-rpath,/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -L/opt/apps/sysnet/intel/12.1/mkl/10.3.12.361/lib/intel64 -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -Wl,-rpath,/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -L/opt/apps/ossw/libraries/mpich2/mpich2-1.4.1p1/sl6/intel-12.1/lib -Wl,-rpath,/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -L/opt/apps/sysnet/intel/12.1/composer_xe_2011_sp1.7.256/compiler/lib/intel64 -Wl,-rpath,/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -L/usr/lib/gcc/x86_64-redhat-linux/4.4.6 -lmpichf90 -lifport -lifcore -lm -lm -lmpichcxx -ldl -lmpich -lopa -lmpl -lrt -lpthread -limf -lsvml -lipgo -ldecimal -lcilkrts -lstdc++ -lgcc_s -lirc -lirc_s -ldl 
+-----------------------------------------
+
+
+ ----------------------------------------------------------------------------------------------------------------------
+| Processor id:   0                                                                                                    |
+| Num Processors: 12                                                                                                   |
+| Time:           Thu Jan 31 22:06:44 2013                                                                             |
+| OS:             Linux                                                                                                |
+| HostName:       hbar.ices.utexas.edu                                                                                 |
+| OS Release:     2.6.32-279.1.1.el6.x86_64                                                                            |
+| OS Version:     #1 SMP Tue Jul 10 11:24:23 CDT 2012                                                                  |
+| Machine:        x86_64                                                                                               |
+| Username:       benkirk                                                                                              |
+| Configuration:  ./configure  '--enable-everything'                                                                   |
+|  '--prefix=/workspace/libmesh/install'                                                                               |
+|  'CXX=icpc'                                                                                                          |
+|  'CC=icc'                                                                                                            |
+|  'FC=ifort'                                                                                                          |
+|  'F77=ifort'                                                                                                         |
+|  'PETSC_DIR=/opt/apps/ossw/libraries/petsc/petsc-3.3-p2'                                                             |
+|  'PETSC_ARCH=intel-12.1-mkl-intel-10.3.12.361-mpich2-1.4.1p1-cxx-opt'                                                |
+|  'SLEPC_DIR=/opt/apps/ossw/libraries/slepc/slepc-3.3-p2-petsc-3.3-p2-cxx-opt'                                        |
+|  'TRILINOS_DIR=/opt/apps/ossw/libraries/trilinos/trilinos-10.12.2/sl6/intel-12.1/mpich2-1.4.1p1/mkl-intel-10.3.12.361'|
+|  'VTK_DIR=/opt/apps/ossw/libraries/vtk/vtk-5.10.0/sl6/intel-12.1'                                                    |
+ ----------------------------------------------------------------------------------------------------------------------
  ----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=9.87113, Active time=9.53144                                                   |
+| libMesh Performance: Alive time=8.10138, Active time=7.98728                                                   |
  ----------------------------------------------------------------------------------------------------------------
 | Event                              nCalls    Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
 |                                              w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
@@ -1103,94 +2961,96 @@ Using libraries: -Wl,-rpath,/org/centers/pecos/LIBRARIES/PETSC3/petsc-3.1-p5/int
 |                                                                                                                |
 |                                                                                                                |
 | DofMap                                                                                                         |
-|   add_neighbors_to_send_list()     1         0.0001      0.000088    0.0001      0.000125    0.00     0.00     |
-|   build_constraint_matrix()        3618      0.0118      0.000003    0.0118      0.000003    0.12     0.12     |
-|   build_sparsity()                 1         0.0022      0.002173    0.0025      0.002501    0.02     0.03     |
-|   cnstrn_elem_mat_vec()            1809      0.0147      0.000008    0.0147      0.000008    0.15     0.15     |
-|   constrain_elem_vector()          1809      0.0015      0.000001    0.0015      0.000001    0.02     0.02     |
-|   create_dof_constraints()         1         0.0038      0.003773    0.0071      0.007063    0.04     0.07     |
-|   distribute_dofs()                1         0.0005      0.000523    0.0025      0.002510    0.01     0.03     |
-|   dof_indices()                    19528     0.0106      0.000001    0.0106      0.000001    0.11     0.11     |
-|   enforce_constraints_exactly()    57        0.0470      0.000825    0.0470      0.000825    0.49     0.49     |
-|   prepare_send_list()              1         0.0000      0.000020    0.0000      0.000020    0.00     0.00     |
-|   reinit()                         1         0.0010      0.000959    0.0010      0.000959    0.01     0.01     |
+|   add_neighbors_to_send_list()     1         0.0111      0.011081    0.0214      0.021417    0.14     0.27     |
+|   build_constraint_matrix()        1836      0.0584      0.000032    0.0584      0.000032    0.73     0.73     |
+|   build_sparsity()                 1         0.0118      0.011789    0.0268      0.026807    0.15     0.34     |
+|   cnstrn_elem_mat_vec()            918       0.0329      0.000036    0.0329      0.000036    0.41     0.41     |
+|   constrain_elem_vector()          918       0.0087      0.000009    0.0087      0.000009    0.11     0.11     |
+|   create_dof_constraints()         1         0.0396      0.039590    0.2918      0.291789    0.50     3.65     |
+|   distribute_dofs()                1         0.0293      0.029259    0.0811      0.081118    0.37     1.02     |
+|   dof_indices()                    10537     1.7754      0.000168    1.7754      0.000168    22.23    22.23    |
+|   enforce_constraints_exactly()    57        0.0281      0.000493    0.0281      0.000493    0.35     0.35     |
+|   prepare_send_list()              1         0.0002      0.000167    0.0002      0.000167    0.00     0.00     |
+|   reinit()                         1         0.0473      0.047254    0.0473      0.047254    0.59     0.59     |
 |                                                                                                                |
 | EquationSystems                                                                                                |
-|   build_solution_vector()          15        0.0040      0.000263    0.0166      0.001109    0.04     0.17     |
+|   build_solution_vector()          15        0.0235      0.001565    0.2184      0.014563    0.29     2.73     |
 |                                                                                                                |
 | ExodusII_IO                                                                                                    |
-|   write_nodal_data()               15        0.0137      0.000915    0.0137      0.000915    0.14     0.14     |
+|   write_nodal_data()               15        0.0788      0.005253    0.0788      0.005253    0.99     0.99     |
 |                                                                                                                |
 | FE                                                                                                             |
-|   compute_shape_functions()        47032     0.1914      0.000004    0.1914      0.000004    2.01     2.01     |
-|   init_shape_functions()           3832      0.0166      0.000004    0.0166      0.000004    0.17     0.17     |
-|   inverse_map()                    12222     0.0195      0.000002    0.0195      0.000002    0.20     0.20     |
+|   compute_shape_functions()        25216     1.9246      0.000076    1.9246      0.000076    24.10    24.10    |
+|   init_shape_functions()           3400      0.1303      0.000038    0.1303      0.000038    1.63     1.63     |
+|   inverse_map()                    10818     0.1858      0.000017    0.1858      0.000017    2.33     2.33     |
 |                                                                                                                |
 | FEMSystem                                                                                                      |
-|   assembly()                       27        0.3269      0.012107    0.5188      0.019215    3.43     5.44     |
-|   assembly(get_residual)           27        0.1946      0.007209    0.3641      0.013486    2.04     3.82     |
+|   assembly()                       27        1.0468      0.038770    3.3068      0.122475    13.11    41.40    |
+|   assembly(get_residual)           27        0.4129      0.015293    2.5950      0.096111    5.17     32.49    |
 |                                                                                                                |
 | FEMap                                                                                                          |
-|   compute_affine_map()             47032     0.0558      0.000001    0.0558      0.000001    0.59     0.59     |
-|   compute_face_map()               3616      0.0142      0.000004    0.0320      0.000009    0.15     0.34     |
-|   init_face_shape_functions()      376       0.0007      0.000002    0.0007      0.000002    0.01     0.01     |
-|   init_reference_to_physical_map() 3832      0.0202      0.000005    0.0202      0.000005    0.21     0.21     |
+|   compute_affine_map()             25216     0.4592      0.000018    0.4592      0.000018    5.75     5.75     |
+|   compute_face_map()               3184      0.1122      0.000035    0.2791      0.000088    1.40     3.49     |
+|   init_face_shape_functions()      376       0.0051      0.000014    0.0051      0.000014    0.06     0.06     |
+|   init_reference_to_physical_map() 3400      0.1864      0.000055    0.1864      0.000055    2.33     2.33     |
 |                                                                                                                |
 | Mesh                                                                                                           |
-|   find_neighbors()                 1         0.0004      0.000393    0.0015      0.001469    0.00     0.02     |
-|   renumber_nodes_and_elem()        2         0.0001      0.000046    0.0001      0.000046    0.00     0.00     |
+|   find_neighbors()                 1         0.0096      0.009619    0.0098      0.009755    0.12     0.12     |
+|   renumber_nodes_and_elem()        2         0.0009      0.000438    0.0009      0.000438    0.01     0.01     |
 |                                                                                                                |
 | MeshCommunication                                                                                              |
-|   compute_hilbert_indices()        2         0.0015      0.000775    0.0015      0.000775    0.02     0.02     |
-|   find_global_indices()            2         0.0002      0.000096    0.0060      0.002980    0.00     0.06     |
-|   parallel_sort()                  2         0.0019      0.000956    0.0038      0.001896    0.02     0.04     |
+|   compute_hilbert_indices()        2         0.0072      0.003594    0.0072      0.003594    0.09     0.09     |
+|   find_global_indices()            2         0.0031      0.001527    0.0151      0.007573    0.04     0.19     |
+|   parallel_sort()                  2         0.0029      0.001431    0.0034      0.001685    0.04     0.04     |
 |                                                                                                                |
 | MeshOutput                                                                                                     |
-|   write_equation_systems()         15        0.0003      0.000022    0.0307      0.002047    0.00     0.32     |
+|   write_equation_systems()         15        0.0010      0.000065    0.3002      0.020013    0.01     3.76     |
 |                                                                                                                |
 | MeshTools::Generation                                                                                          |
-|   build_cube()                     1         0.0004      0.000396    0.0004      0.000396    0.00     0.00     |
+|   build_cube()                     1         0.0048      0.004849    0.0048      0.004849    0.06     0.06     |
 |                                                                                                                |
 | MetisPartitioner                                                                                               |
-|   partition()                      1         0.0014      0.001356    0.0044      0.004357    0.01     0.05     |
+|   partition()                      1         0.0424      0.042383    0.0491      0.049063    0.53     0.61     |
 |                                                                                                                |
 | NewtonSolver                                                                                                   |
-|   solve()                          15        0.4028      0.026852    9.4725      0.631500    4.23     99.38    |
+|   solve()                          15        0.0266      0.001776    7.1550      0.477000    0.33     89.58    |
 |                                                                                                                |
 | Parallel                                                                                                       |
-|   allgather()                      8         0.0007      0.000082    0.0007      0.000082    0.01     0.01     |
-|   broadcast()                      31        0.0042      0.000136    0.0042      0.000136    0.04     0.04     |
-|   gather()                         1         0.0001      0.000066    0.0001      0.000066    0.00     0.00     |
-|   max(scalar)                      2         0.0071      0.003541    0.0071      0.003541    0.07     0.07     |
-|   max(vector)                      4         0.0008      0.000190    0.0008      0.000190    0.01     0.01     |
-|   min(scalar)                      30        0.0027      0.000090    0.0027      0.000090    0.03     0.03     |
-|   min(vector)                      4         0.0003      0.000074    0.0003      0.000074    0.00     0.00     |
-|   probe()                          50        0.0005      0.000011    0.0005      0.000011    0.01     0.01     |
-|   receive()                        50        0.0001      0.000002    0.0006      0.000013    0.00     0.01     |
-|   send()                           50        0.0001      0.000001    0.0001      0.000001    0.00     0.00     |
-|   send_receive()                   54        0.0001      0.000002    0.0009      0.000016    0.00     0.01     |
-|   sum()                            109       0.0155      0.000142    0.0155      0.000142    0.16     0.16     |
+|   allgather()                      9         0.0027      0.000303    0.0028      0.000310    0.03     0.03     |
+|   broadcast()                      30        0.0002      0.000008    0.0002      0.000008    0.00     0.00     |
+|   max(bool)                        1         0.0000      0.000010    0.0000      0.000010    0.00     0.00     |
+|   max(scalar)                      903       0.0072      0.000008    0.0072      0.000008    0.09     0.09     |
+|   max(vector)                      214       0.0034      0.000016    0.0085      0.000040    0.04     0.11     |
+|   min(bool)                        1107      0.0085      0.000008    0.0085      0.000008    0.11     0.11     |
+|   min(scalar)                      927       0.0434      0.000047    0.0434      0.000047    0.54     0.54     |
+|   min(vector)                      214       0.0037      0.000017    0.0093      0.000043    0.05     0.12     |
+|   probe()                          132       0.0017      0.000013    0.0017      0.000013    0.02     0.02     |
+|   receive()                        132       0.0010      0.000008    0.0028      0.000021    0.01     0.03     |
+|   send()                           132       0.0005      0.000004    0.0005      0.000004    0.01     0.01     |
+|   send_receive()                   136       0.0015      0.000011    0.0053      0.000039    0.02     0.07     |
+|   sum()                            119       0.0046      0.000039    0.0071      0.000059    0.06     0.09     |
 |                                                                                                                |
 | Parallel::Request                                                                                              |
-|   wait()                           50        0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   wait()                           132       0.0004      0.000003    0.0004      0.000003    0.00     0.00     |
 |                                                                                                                |
 | Partitioner                                                                                                    |
-|   set_node_processor_ids()         1         0.0001      0.000122    0.0002      0.000170    0.00     0.00     |
-|   set_parent_processor_ids()       1         0.0000      0.000027    0.0000      0.000027    0.00     0.00     |
+|   set_node_processor_ids()         1         0.0020      0.001988    0.0027      0.002684    0.02     0.03     |
+|   set_parent_processor_ids()       1         0.0008      0.000816    0.0008      0.000816    0.01     0.01     |
 |                                                                                                                |
 | PetscLinearSolver                                                                                              |
-|   solve()                          27        8.1376      0.301391    8.1376      0.301391    85.38    85.38    |
+|   solve()                          27        1.1822      0.043786    1.1822      0.043786    14.80    14.80    |
 |                                                                                                                |
 | PointLocatorTree                                                                                               |
-|   init(no master)                  1         0.0014      0.001389    0.0017      0.001718    0.01     0.02     |
-|   operator()                       30        0.0005      0.000016    0.0014      0.000046    0.01     0.01     |
+|   init(no master)                  1         0.0129      0.012934    0.0134      0.013356    0.16     0.17     |
+|   operator()                       30        0.0037      0.000124    0.0123      0.000411    0.05     0.15     |
  ----------------------------------------------------------------------------------------------------------------
-| Totals:                            145397    9.5314                                          100.00            |
+| Totals:                            90255     7.9873                                          100.00            |
  ----------------------------------------------------------------------------------------------------------------
 
  
 ***************************************************************
-* Done Running Example  ./fem_system_ex1-opt
+* Done Running Example fem_system_ex1:
+*  mpirun -np 12 example-devel  -pc_type bjacobi -sub_pc_type ilu -sub_pc_factor_levels 4 -sub_pc_factor_zeropivot 0 -ksp_right_pc -log_summary
 ***************************************************************
 </pre>
 </div>
