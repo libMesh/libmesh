@@ -51,7 +51,7 @@ dev_table_entry("images/roystgnr.jpg",
                 "Dr. Roy Stogner",
                 "http://www.cfdlab.ae.utexas.edu/~roystgnr",
 		"",
-		"PhD Student, Chief Software Architect",
+		"Chief Software Architect",
 		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
 ?>
 

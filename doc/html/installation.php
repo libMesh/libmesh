@@ -16,13 +16,10 @@
 
 <a name="getsoftware"></a><h2>Getting the Software</h2>
 
-The <code>libMesh</code> source can be 
-<a href="http://github.com/libMesh/libmesh/downloads">downloaded from the project's GitHub homepage</a>.
+The <code>libMesh</code> source can be <a href="http://sourceforge.net/project/showfiles.php?group_id=71130">downloaded from our SourceForge release page</a>.
 Stable releases are located there as compressed tar archives. 
-Previous versions are also available from our SourceForge <a href="http://sourceforge.net/project/showfiles.php?group_id=71130">archive</a>.
 
-You may also
-access the Git source tree for the latest code. You can get read-only access
+You may also access the Git source tree for the latest code. You can get read-only access
 to the Git repository via:
 <br>
 
