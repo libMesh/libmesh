@@ -81,8 +81,9 @@ focus on the physics they are modeling.
 <code>libMesh</code> currently supports 1D, 2D, and 3D steady and transient simulations on
 a variety of popular geometric and finite element types.
 The library makes use of high-quality, <a href="externalsoftware.php">existing software</a> whenever possible.
-<a href="http://www-unix.mcs.anl.gov/petsc/petsc-2">PETSc</a> is
-used for the solution of linear systems on both serial and parallel platforms, and
+<a href="http://www.mcs.anl.gov/petsc">PETSc</a> or the
+<a href="http://trilinos.sandia.gov">Trilinos Project</a>
+are used for the solution of linear systems on both serial and parallel platforms, and
 <a href="http://www.mgnet.org/mgnet/Codes/laspack/html/laspack.html">LASPack</a>
 is included with the library to provide linear solver support on serial machines.
 An optional interface to <a href="http://www.grycap.upv.es/slepc">SLEPc</a> is also

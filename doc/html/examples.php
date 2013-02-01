@@ -101,6 +101,8 @@ library features they demonstrate.
 
 <li><L1><a href="fem_system_ex1.php">Unsteady Navier-Stokes Equations with FEMSystem</a></L1></li>
 
+<li><L1><a href="fem_system_ex2.php">Nonlinear Elasticity with FEMSystem</a></L1></li>
+
 </ol> </li>
 
 
@@ -126,6 +128,12 @@ library features they demonstrate.
 <li><L1><a href="adjoints_ex1.php">Adjoint-based Goal Oriented Refinement</a></L1></li>
 
 <li><L1><a href="adjoints_ex2.php">Adjoint-based Parameter Sensitivities</a></L1></li>
+
+<li><L1><a href="adjoints_ex3.php">Adjoint-based coupled coupled Stokes + Convection Diffusion Goal Oriented Refinement</a></L1></li>
+
+<li><L1><a href="adjoints_ex4.php">Adjoint-based Goal Oriented Refinement</a></L1></li>
+
+<li><L1><a href="adjoints_ex5.php">SolutionHistory, General Localized Vectors and Unsteady Adjoints</a></L1></li>
 
 </ol> </li>
 
