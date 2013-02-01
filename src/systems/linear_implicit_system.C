@@ -35,10 +35,10 @@ namespace libMesh
 // ------------------------------------------------------------
 // LinearImplicitSystem implementation
 LinearImplicitSystem::LinearImplicitSystem (EquationSystems& es,
-					    const std::string& name,
-					    const unsigned int number) :
+					    const std::string& name_in,
+					    const unsigned int number_in) :
 
-  Parent                 (es, name, number),
+  Parent                 (es, name_in, number_in),
   linear_solver          (LinearSolver<Number>::build()),
   _n_linear_iterations   (0),
   _final_linear_residual (1.e20),
