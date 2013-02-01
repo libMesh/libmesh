@@ -449,12 +449,12 @@ void EquationSystems::solve ()
 
 
 
-void EquationSystems::sensitivity_solve (const ParameterVector& parameters)
+void EquationSystems::sensitivity_solve (const ParameterVector& parameters_in)
 {
   libmesh_assert (this->n_systems());
 
   for (unsigned int i=0; i != this->n_systems(); ++i)
-    this->get_system(i).sensitivity_solve(parameters);
+    this->get_system(i).sensitivity_solve(parameters_in);
 }
 
 
@@ -513,15 +513,15 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
     // Here, we're assuming the number of vector components is the same
     // as the mesh dimension. Will break for mixed dimension meshes.
     unsigned int dim = this->get_mesh().mesh_dimension();
-    unsigned int n_vars = n_scalar_vars + dim*n_vector_vars;
+    unsigned int nv = n_scalar_vars + dim*n_vector_vars;
 
     // We'd better not have more than dim*his->n_vars() (all vector variables)
-    libmesh_assert_less_equal ( n_vars, dim*this->n_vars() );
+    libmesh_assert_less_equal ( nv, dim*this->n_vars() );
 
     // Here, we're assuming the number of vector components is the same
     // as the mesh dimension. Will break for mixed dimension meshes.
 
-    var_names.resize( n_vars );
+    var_names.resize( nv );
   }
 
   // reset
@@ -814,10 +814,10 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
 	  std::fill (repeat_count.begin(), repeat_count.end(), 0);
 
-	  MeshBase::element_iterator       it  = _mesh.active_local_elements_begin();
-	  const MeshBase::element_iterator end = _mesh.active_local_elements_end();
+	  MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
+	  const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
 
-	  for ( ; it != end; ++it)
+	  for ( ; it != end_elem; ++it)
 	    if (var_description.active_on_subdomain((*it)->subdomain_id()))
 	      {
 		const Elem* elem = *it;
@@ -940,10 +940,10 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
         const Variable & variable = system.variable(var);
         const DofMap & dof_map = system.get_dof_map();
 
-        MeshBase::element_iterator       it  = _mesh.active_local_elements_begin();
-        const MeshBase::element_iterator end = _mesh.active_local_elements_end();
+        MeshBase::element_iterator       it       = _mesh.active_local_elements_begin();
+        const MeshBase::element_iterator end_elem = _mesh.active_local_elements_end();
 
-        for ( ; it != end; ++it)
+        for ( ; it != end_elem; ++it)
         {
           if (variable.active_on_subdomain((*it)->subdomain_id()))
           {
@@ -1023,12 +1023,12 @@ void EquationSystems::build_discontinuous_solution_vector (std::vector<Number>& 
 	    {
 	      const FEType& fe_type    = system.variable_type(var);
 
-	      MeshBase::element_iterator       it  = _mesh.active_elements_begin();
-	      const MeshBase::element_iterator end = _mesh.active_elements_end();
+	      MeshBase::element_iterator       it       = _mesh.active_elements_begin();
+	      const MeshBase::element_iterator end_elem = _mesh.active_elements_end();
 
 	      unsigned int nn=0;
 
-	      for ( ; it != end; ++it)
+	      for ( ; it != end_elem; ++it)
 		{
 		  const Elem* elem = *it;
 		  system.get_dof_map().dof_indices (elem, dof_indices, var);
@@ -1132,9 +1132,9 @@ bool EquationSystems::compare (const EquationSystems& other_es,
 
 std::string EquationSystems::get_info () const
 {
-  std::ostringstream out;
+  std::ostringstream oss;
 
-  out << " EquationSystems\n"
+  oss << " EquationSystems\n"
       << "  n_systems()=" << this->n_systems() << '\n';
 
   // Print the info for the individual systems
@@ -1142,19 +1142,19 @@ std::string EquationSystems::get_info () const
   const const_system_iterator end = _systems.end();
 
   for (; pos != end; ++pos)
-    out << pos->second->get_info();
+    oss << pos->second->get_info();
 
 
 //   // Possibly print the parameters
 //   if (!this->parameters.empty())
 //     {
-//       out << "  n_parameters()=" << this->n_parameters() << '\n';
-//       out << "   Parameters:\n";
+//       oss << "  n_parameters()=" << this->n_parameters() << '\n';
+//       oss << "   Parameters:\n";
 
 //       for (std::map<std::string, Real>::const_iterator
 // 	     param = _parameters.begin(); param != _parameters.end();
 // 	   ++param)
-// 	out << "    "
+// 	oss << "    "
 // 	    << "\""
 // 	    << param->first
 // 	    << "\""
@@ -1163,7 +1163,7 @@ std::string EquationSystems::get_info () const
 // 	    << '\n';
 //     }
 
-  return out.str();
+  return oss.str();
 }
 
 
