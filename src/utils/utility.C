@@ -44,7 +44,7 @@ namespace libMesh
 // system without creating a perf_log object.
 std::string Utility::system_info()
 {
-  std::ostringstream out;
+  std::ostringstream oss;
 
   std::string date = Utility::get_timestamp();
 
@@ -58,7 +58,7 @@ std::string Utility::system_info()
 #endif
 
 
-  out << '\n'
+  oss << '\n'
       << " ---------------------------------------------------------------------\n"
       << "| Time:           " << date             << '\n'
       << "| OS:             " << sysInfo.sysname  << '\n'
@@ -73,7 +73,7 @@ std::string Utility::system_info()
 #endif
       << " ---------------------------------------------------------------------\n";
 
-  return out.str();
+  return oss.str();
 }
 
 
