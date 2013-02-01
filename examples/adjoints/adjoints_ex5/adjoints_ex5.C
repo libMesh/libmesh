@@ -226,6 +226,10 @@ void set_system_parameters(HeatSystem &system, FEMParameters &param)
 // The main program.
 int main (int argc, char** argv)
 {
+  // Skip adaptive examples on a non-adaptive libMesh build
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_assert(false, "--enable-amr");
+#else
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
@@ -512,4 +516,6 @@ int main (int argc, char** argv)
   
   // All done.  
   return 0;
+
+#endif // LIBMESH_ENABLE_AMR
 }
