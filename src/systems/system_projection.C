@@ -604,13 +604,13 @@ void System::project_vector (NumericVector<Number>& new_vector,
 	  Elem *el = const_cast<Elem *>(*(this->get_mesh().active_local_elements_begin()));
 	  context.pre_fe_reinit( *this, el );
 
-          std::vector<unsigned int> SCALAR_indices;
+          std::vector<dof_id_type> SCALAR_indices;
           dof_map.SCALAR_dof_indices (SCALAR_indices, var);
           const unsigned int n_SCALAR_dofs = SCALAR_indices.size();
 
           for (unsigned int i=0; i<n_SCALAR_dofs; i++)
           {
-            const unsigned int global_index = SCALAR_indices[i];
+            const dof_id_type global_index = SCALAR_indices[i];
             const unsigned int component_index =
               this->variable_scalar_number(var,i);
 	    
@@ -1923,7 +1923,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	  const unsigned int var_component =
 	    system.variable_scalar_number(var, 0);
 
-	  const std::vector< unsigned int >& dof_indices = 
+	  const std::vector<dof_id_type>& dof_indices = 
 	    context.get_dof_indices(var);
 
 	  // The number of DOFs on the element
