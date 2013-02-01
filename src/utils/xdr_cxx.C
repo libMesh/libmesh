@@ -629,7 +629,7 @@ void Xdr::do_write(std::vector<std::complex<T> >& a) {
 
 
 template <typename T>
-void Xdr::data (T& a, const char* comment)
+void Xdr::data (T& a, const char* comment_in)
 {
   switch (mode)
     {
@@ -672,7 +672,7 @@ void Xdr::data (T& a, const char* comment)
         libmesh_assert (out->good());
 
 	this->do_write(a);
-        *out << "\t " << comment << '\n';
+        *out << "\t " << comment_in << '\n';
 
 	return;
       }
@@ -1371,7 +1371,7 @@ void Xdr::data_stream (std::complex<long double> *val, const unsigned int len, c
 }
 #endif // # LIBMESH_USE_COMPLEX_NUMBERS
 
-void Xdr::comment (std::string &comment)
+void Xdr::comment (std::string &comment_in)
 {
   switch (mode)
     {
@@ -1393,7 +1393,7 @@ void Xdr::comment (std::string &comment)
       {
 	libmesh_assert(out.get());
         libmesh_assert (out->good());
-	*out << "\t " << comment << '\n';
+	*out << "\t " << comment_in << '\n';
 	return;
       }
 
