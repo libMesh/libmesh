@@ -773,14 +773,14 @@ static PetscErrorCode DMJacobian_libMesh(DM dm, Vec x, Mat jac, Mat pc, MatStruc
   ierr = DMLibMeshGetSystem(dm, _sys); CHKERRQ(ierr);
   NonlinearImplicitSystem& sys = *_sys;
 
-  PetscMatrix<Number>  PC(pc);
+  PetscMatrix<Number>  the_pc(pc);
   PetscMatrix<Number>  Jac(jac);
   PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
   PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
   PetscVector<Number>  X_global(x);
 
   // Set the dof maps
-  PC.attach_dof_map(sys.get_dof_map());
+  the_pc.attach_dof_map(sys.get_dof_map());
   Jac.attach_dof_map(sys.get_dof_map());
 
   // Use the systems update() to get a good local version of the parallel solution
@@ -793,7 +793,7 @@ static PetscErrorCode DMJacobian_libMesh(DM dm, Vec x, Mat jac, Mat pc, MatStruc
   X_global.swap(X_sys);
   Jac.swap(Jac_sys);
 
-  PC.zero();
+  the_pc.zero();
 
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
@@ -810,21 +810,21 @@ static PetscErrorCode DMJacobian_libMesh(DM dm, Vec x, Mat jac, Mat pc, MatStruc
     }
 
   if (sys.nonlinear_solver->jacobian != NULL)
-    sys.nonlinear_solver->jacobian(*(sys.current_local_solution.get()), PC, sys);
+    sys.nonlinear_solver->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
 
   else if (sys.nonlinear_solver->jacobian_object != NULL)
-    sys.nonlinear_solver->jacobian_object->jacobian(*(sys.current_local_solution.get()), PC, sys);
+    sys.nonlinear_solver->jacobian_object->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
 
   else if (sys.nonlinear_solver->matvec != NULL)
-    sys.nonlinear_solver->matvec(*(sys.current_local_solution.get()), NULL, &PC, sys);
+    sys.nonlinear_solver->matvec(*(sys.current_local_solution.get()), NULL, &the_pc, sys);
 
   else if (sys.nonlinear_solver->residual_and_jacobian_object != NULL)
-    sys.nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(sys.current_local_solution.get()), NULL, &PC, sys);
+    sys.nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(sys.current_local_solution.get()), NULL, &the_pc, sys);
 
   else
     libmesh_error();
 
-  PC.close();
+  the_pc.close();
   Jac.close();
   X_global.close();
 
