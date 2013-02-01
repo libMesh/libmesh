@@ -141,7 +141,7 @@ namespace libMesh
       return c;
     }
 
-    // Homegrown implementation if we don't have 32-bit unsigned ints
+    // Homegrown implementations if we don't have 32-bit unsigned ints
     inline
     uint64_t hashword2(const uint64_t first, const uint64_t second)
     {
@@ -149,6 +149,15 @@ namespace libMesh
       const unsigned int bp = 65449;
 
       return (first%bp + (second<<5)%bp);
+    }
+
+    inline
+    uint16_t hashword2(const uint16_t first, const uint16_t second)
+    {
+      // "big" prime number
+      const uint16_t bp = 257;
+
+      return static_cast<uint16_t>(first%bp + (second<<3)%bp);
     }
 
     // Another homegrown implementation for 64-bit unsigned ints
@@ -169,6 +178,23 @@ namespace libMesh
       return c;
     }
 
+    // Another homegrown implementation for 16-bit unsigned ints
+    inline
+    uint16_t hashword(const uint16_t *k, size_t length)
+    {
+      // "big" prime number
+      const uint16_t bp = 257;
+
+      uint16_t c = 0;
+      uint16_t shift=0;
+      for (std::size_t i=0; i != length; ++i)
+	{
+	  c += (k[i] << shift) % bp;
+	  shift += 5;
+        }
+
+      return c;
+    }
 
   } // end Utility namespace
 } // end libMesh namespace
