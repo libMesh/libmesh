@@ -33,10 +33,10 @@ namespace libMesh
 // ------------------------------------------------------------
 // NonlinearImplicitSystem implementation
 NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems& es,
-						  const std::string& name,
-						  const unsigned int number) :
+						  const std::string& name_in,
+						  const unsigned int number_in) :
 
-  Parent                    (es, name, number),
+  Parent                    (es, name_in, number_in),
   nonlinear_solver          (NonlinearSolver<Number>::build(*this)),
   diff_solver               (NULL),
   _n_nonlinear_iterations   (0),
