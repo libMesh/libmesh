@@ -475,9 +475,9 @@ namespace nanoflann
 		/**
 		    Default constructor. Initializes a new pool.
 		 */
-		PooledAllocator(const size_t blocksize = BLOCKSIZE)
+		PooledAllocator(const size_t blocksize_in = BLOCKSIZE)
 		{
-			this->blocksize = blocksize;
+			this->blocksize = blocksize_in;
 			remaining = 0;
 			base = NULL;
 
