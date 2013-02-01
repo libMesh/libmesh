@@ -89,18 +89,18 @@ void TypeVector<T>::print(std::ostream& os) const
 
 
 template <typename T>
-void TypeVector<T>::write_unformatted (std::ostream &out,
+void TypeVector<T>::write_unformatted (std::ostream &os,
 				       const bool newline) const
 {
-  libmesh_assert (out);
+  libmesh_assert (os);
 
-  out << std::setiosflags(std::ios::showpoint)
+  os << std::setiosflags(std::ios::showpoint)
       << (*this)(0) << " "
       << (*this)(1) << " "
       << (*this)(2) << " ";
 
   if (newline)
-    out << '\n';
+    os << '\n';
 }
 
 
