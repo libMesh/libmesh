@@ -27,14 +27,14 @@ namespace libMesh
 
 
 
-void QTrap::init_3D(const ElemType _type,
+void QTrap::init_3D(const ElemType type_in,
                     unsigned int)
 {
 #if LIBMESH_DIM == 3
 
   //-----------------------------------------------------------------------
   // 3D quadrature rules
-  switch (_type)
+  switch (type_in)
     {
       //---------------------------------------------
       // Hex quadrature rules
@@ -117,7 +117,7 @@ void QTrap::init_3D(const ElemType _type,
       // Unsupported type
     default:
       {
-	libMesh::err << "ERROR: Unsupported type: " << _type << std::endl;
+	libMesh::err << "ERROR: Unsupported type: " << type_in << std::endl;
 	libmesh_error();
       }
     }
