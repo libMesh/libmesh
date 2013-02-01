@@ -113,13 +113,13 @@ void UnsteadySolver::solve ()
 	      solve_result = _diff_solver->solve();
 
 	      // Check solve results with reduced timestep
-	      bool backtracking_failed =
+	      bool backtracking_still_failed =
 		solve_result & DiffSolver::DIVERGED_BACKTRACKING_FAILURE;
 
-	      bool max_iterations =
+	      bool backtracking_max_iterations =
 		solve_result & DiffSolver::DIVERGED_MAX_NONLINEAR_ITERATIONS;
 
-	      if (!backtracking_failed && !max_iterations)
+	      if (!backtracking_still_failed && !backtracking_max_iterations)
 		{
 		  if (!quiet)
 		    libMesh::out << "Reduced dt solve succeeded." << std::endl;
@@ -152,14 +152,14 @@ void UnsteadySolver::advance_timestep ()
       _system.time += _system.deltat;
     }
 
-  NumericVector<Number> &old_nonlinear_solution =
+  NumericVector<Number> &old_nonlinear_soln =
   _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> &nonlinear_solution =
     *(_system.solution);
 
-  old_nonlinear_solution = nonlinear_solution;
+  old_nonlinear_soln = nonlinear_solution;
 
-  old_nonlinear_solution.localize
+  old_nonlinear_soln.localize
     (*old_local_nonlinear_solution,
      _system.get_dof_map().get_send_list());
 }
