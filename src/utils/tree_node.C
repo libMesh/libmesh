@@ -469,7 +469,7 @@ void TreeNode<N>::transform_nodes_to_elements (std::vector<std::vector<const Ele
 	{
 	  // the actual global node number we are replacing
 	  // with the connected elements
-	  const unsigned int node_number = nodes[n]->id();
+	  const dof_id_type node_number = nodes[n]->id();
 
 	  libmesh_assert_less (node_number, mesh.n_nodes());
 	  libmesh_assert_less (node_number, nodes_to_elem.size());

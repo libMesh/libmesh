@@ -442,7 +442,7 @@ bool xdr_translate(XDR* x, std::string& s) {
   char* sptr = new char[xdr_MAX_STRING_LENGTH+1];
   std::copy(s.begin(), s.end(), sptr);
   sptr[s.size()] = 0;
-  unsigned int length = xdr_MAX_STRING_LENGTH;
+  std::size_t length = xdr_MAX_STRING_LENGTH;
   bool b = xdr_string(x, &sptr, length);
 
   // This is necessary when reading, but inefficient when writing...
@@ -465,7 +465,7 @@ bool xdr_translate(XDR* x, std::complex<T>& a) {
 
 template <typename T>
 bool xdr_translate(XDR* x, std::vector<T>& a) {
-  unsigned int length = a.size();
+  unsigned int length = libmesh_cast_int<unsigned int>(a.size());
   xdr_u_int(x, &length);
   if (length > 0)
   {
@@ -479,7 +479,7 @@ bool xdr_translate(XDR* x, std::vector<T>& a) {
 
 template <typename T>
 bool xdr_translate(XDR* x, std::vector<std::complex<T> >& a) {
-  unsigned int length = a.size();
+  unsigned int length = libmesh_cast_int<unsigned int>(a.size());
   bool b = xdr_u_int(x, &length);
   a.resize(length);
   typename std::vector<std::complex<T> >::iterator iter = a.begin();
@@ -600,10 +600,10 @@ void Xdr::do_write(std::complex<T>& a) {
 
 template <typename T>
 void Xdr::do_write(std::vector<T>& a) {
-  unsigned int length=a.size();
+  std::size_t length = a.size();
   data(length, "# vector length");
 
-  for (unsigned int i=0; i<a.size(); i++)
+  for (std::size_t i=0; i<a.size(); i++)
     {
       libmesh_assert(out.get());
       libmesh_assert (out->good());
@@ -614,10 +614,10 @@ void Xdr::do_write(std::vector<T>& a) {
 
 template <typename T>
 void Xdr::do_write(std::vector<std::complex<T> >& a) {
-  unsigned int length=a.size();
+  std::size_t length=a.size();
   data(length, "# vector length x 2 (complex)");
 
-  for (unsigned int i=0; i<a.size(); i++)
+  for (std::size_t i=0; i<a.size(); i++)
     {
       libmesh_assert(out.get());
       libmesh_assert (out->good());

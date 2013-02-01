@@ -182,12 +182,12 @@ const Elem* PointLocatorList::operator() (const Point& p) const
   {
     std::vector<std::pair<Point, const Elem *> >& my_list = *(this->_list);
 
-    Real               last_distance_sq = Point(my_list[0].first -p).size_sq();
-    const Elem *       last_elem        = NULL;
-    const unsigned int max_index        = my_list.size();
+    Real              last_distance_sq = Point(my_list[0].first -p).size_sq();
+    const Elem *      last_elem        = NULL;
+    const std::size_t max_index        = my_list.size();
 
 
-    for (unsigned int n=1; n<max_index; n++)
+    for (std::size_t n=1; n<max_index; n++)
       {
 	const Real current_distance_sq = Point(my_list[n].first -p).size_sq();
 

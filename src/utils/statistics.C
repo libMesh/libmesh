@@ -84,7 +84,8 @@ Real StatisticsVector<T>::mean() const
 
   for (dof_id_type i=0; i<n; i++)
     {
-      mean += ( static_cast<Real>((*this)[i]) - mean ) / (i + 1);
+      mean += ( static_cast<Real>((*this)[i]) - mean ) /
+                static_cast<Real>(i + 1);
     }
 
   STOP_LOG ("mean()", "StatisticsVector");
@@ -155,7 +156,8 @@ Real StatisticsVector<T>::variance(const Real mean) const
   for (dof_id_type i=0; i<n; i++)
     {
       const Real delta = ( static_cast<Real>((*this)[i]) - mean );
-      variance += (delta * delta - variance) / (i + 1);
+      variance += (delta * delta - variance) / 
+		    static_cast<Real>(i + 1);
     }
 
   if (n > 1)
