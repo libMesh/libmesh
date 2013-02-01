@@ -48,12 +48,12 @@ unsigned int QoISet::size (const System& sys) const
 
 void QoISet::add_indices(const std::vector<unsigned int> &indices)
 {
-  unsigned int size = 0;
+  unsigned int max_size = 0;
   for (std::vector<unsigned int>::const_iterator i = indices.begin();
        i != indices.end(); ++i)
-    size = std::max(size, *i + 1);
+    max_size = std::max(max_size, *i + 1);
 
-  _indices.resize(size);
+  _indices.resize(max_size);
 
   for (std::vector<unsigned int>::const_iterator i = indices.begin();
        i != indices.end(); ++i)
