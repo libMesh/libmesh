@@ -410,16 +410,16 @@ TreeNode<N>::create_bounding_box (const unsigned int c) const
 
 
 template <unsigned int N>
-void TreeNode<N>::print_nodes(std::ostream& out) const
+void TreeNode<N>::print_nodes(std::ostream& out_stream) const
 {
   if (this->active())
     {
-      out << "TreeNode Level: " << this->level() << std::endl;
+      out_stream << "TreeNode Level: " << this->level() << std::endl;
 
       for (unsigned int n=0; n<nodes.size(); n++)
-	out << " " << nodes[n]->id();
+	out_stream << " " << nodes[n]->id();
 
-      out << std::endl << std::endl;
+      out_stream << std::endl << std::endl;
 
     }
   else
@@ -432,17 +432,17 @@ void TreeNode<N>::print_nodes(std::ostream& out) const
 
 
 template <unsigned int N>
-void TreeNode<N>::print_elements(std::ostream& out) const
+void TreeNode<N>::print_elements(std::ostream& out_stream) const
 {
   if (this->active())
     {
-      out << "TreeNode Level: " << this->level() << std::endl;
+      out_stream << "TreeNode Level: " << this->level() << std::endl;
 
       for (std::vector<const Elem*>::const_iterator pos=elements.begin();
 	   pos != elements.end(); ++pos)
-	out << " " << *pos;
+	out_stream << " " << *pos;
 
-      out << std::endl << std::endl;
+      out_stream << std::endl << std::endl;
     }
   else
     {
