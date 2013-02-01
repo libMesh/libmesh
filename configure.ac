@@ -283,6 +283,7 @@ if (test "x$enableexamples" = "xyes"); then
   		examples/adjoints/adjoints_ex2/Makefile
   		examples/adjoints/adjoints_ex3/Makefile
   		examples/adjoints/adjoints_ex4/Makefile
+  		examples/adjoints/adjoints_ex5/Makefile
   		examples/eigenproblems/eigenproblems_ex1/Makefile
   		examples/eigenproblems/eigenproblems_ex2/Makefile
   		examples/eigenproblems/eigenproblems_ex3/Makefile
