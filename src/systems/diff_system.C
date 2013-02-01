@@ -27,9 +27,9 @@ namespace libMesh
 
 DifferentiableSystem::DifferentiableSystem
                       (EquationSystems& es,
-                       const std::string& name,
-                       const unsigned int number) :
-  Parent      (es, name, number),
+                       const std::string& name_in,
+                       const unsigned int number_in) :
+  Parent      (es, name_in, number_in),
   time_solver (NULL),
   deltat(1.),
   print_solution_norms(false),
