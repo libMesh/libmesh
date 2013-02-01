@@ -36,10 +36,10 @@ namespace libMesh
 // TransientSystem implementation
 template <class Base>
 TransientSystem<Base>::TransientSystem (EquationSystems& es,
-					const std::string& name,
-					const unsigned int number) :
+					const std::string& name_in,
+					const unsigned int number_in) :
 
-  Base                 (es, name, number)
+  Base                 (es, name_in, number_in)
 {
 #ifdef LIBMESH_ENABLE_GHOSTED
   old_local_solution =

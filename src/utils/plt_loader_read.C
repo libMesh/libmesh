@@ -254,25 +254,25 @@ void PltLoader::read_header (std::istream& in)
 		// Read in the block dimensions
 		{
 		  int
-		    imax=0,
-		    jmax=0,
-		    kmax=0;
+		    i_max=0,
+		    j_max=0,
+		    k_max=0;
 
 		  in.read (buf, LIBMESH_SIZEOF_INT);
-		  std::memcpy  (&imax, buf, LIBMESH_SIZEOF_INT);
-		  rb(imax);
+		  std::memcpy  (&i_max, buf, LIBMESH_SIZEOF_INT);
+		  rb(i_max);
 
 		  in.read (buf, LIBMESH_SIZEOF_INT);
-		  std::memcpy  (&jmax, buf, LIBMESH_SIZEOF_INT);
-		  rb(jmax);
+		  std::memcpy  (&j_max, buf, LIBMESH_SIZEOF_INT);
+		  rb(j_max);
 
 		  in.read (buf, LIBMESH_SIZEOF_INT);
-		  std::memcpy  (&kmax, buf, LIBMESH_SIZEOF_INT);
-		  rb(kmax);
+		  std::memcpy  (&k_max, buf, LIBMESH_SIZEOF_INT);
+		  rb(k_max);
 
-		  zimax.push_back (imax);
-		  zjmax.push_back (jmax);
-		  zkmax.push_back (kmax);
+		  zimax.push_back (i_max);
+		  zjmax.push_back (j_max);
+		  zkmax.push_back (k_max);
 		}
 	      } // else if (f == 299.)
 	  }
@@ -511,29 +511,29 @@ void PltLoader::read_header (std::istream& in)
 		    }
 
 		  int
-		    imax=0,
-		    jmax=0,
-		    kmax=0;
+		    i_max=0,
+		    j_max=0,
+		    k_max=0;
 
 		  in.read (buf, LIBMESH_SIZEOF_INT);
-		  std::memcpy  (&imax, buf, LIBMESH_SIZEOF_INT);
-		  rb(imax);
+		  std::memcpy  (&i_max, buf, LIBMESH_SIZEOF_INT);
+		  rb(i_max);
 
 		  in.read (buf, LIBMESH_SIZEOF_INT);
-		  std::memcpy  (&jmax, buf, LIBMESH_SIZEOF_INT);
-		  rb(jmax);
+		  std::memcpy  (&j_max, buf, LIBMESH_SIZEOF_INT);
+		  rb(j_max);
 
 		  in.read (buf, LIBMESH_SIZEOF_INT);
-		  std::memcpy  (&kmax, buf, LIBMESH_SIZEOF_INT);
-		  rb(kmax);
+		  std::memcpy  (&k_max, buf, LIBMESH_SIZEOF_INT);
+		  rb(k_max);
 
 		  // These are only useful for orderd data.  Otherwise
 		  // we grabbed the relevant values above.
 		  if (ztype.back() != ORDERED)
 		    {
-		      zimax.push_back (imax);
-		      zjmax.push_back (jmax);
-		      zkmax.push_back (kmax);
+		      zimax.push_back (i_max);
+		      zjmax.push_back (j_max);
+		      zkmax.push_back (k_max);
 		    }
 		}
 	      } // else if (f == 299.)

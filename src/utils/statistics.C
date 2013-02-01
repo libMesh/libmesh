@@ -80,17 +80,17 @@ Real StatisticsVector<T>::mean() const
 
   const dof_id_type n = this->size();
 
-  Real mean = 0;
+  Real the_mean = 0;
 
   for (dof_id_type i=0; i<n; i++)
     {
-      mean += ( static_cast<Real>((*this)[i]) - mean ) /
+      the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) /
                 static_cast<Real>(i + 1);
     }
 
   STOP_LOG ("mean()", "StatisticsVector");
 
-  return mean;
+  return the_mean;
 }
 
 
@@ -111,23 +111,23 @@ Real StatisticsVector<T>::median()
   const dof_id_type lhs = (n-1) / 2;
   const dof_id_type rhs = n / 2;
 
-  Real median = 0;
+  Real the_median = 0;
 
 
   if (lhs == rhs)
     {
-      median = static_cast<Real>((*this)[lhs]);
+      the_median = static_cast<Real>((*this)[lhs]);
     }
 
   else
     {
-      median = ( static_cast<Real>((*this)[lhs]) +
+      the_median = ( static_cast<Real>((*this)[lhs]) +
 		 static_cast<Real>((*this)[rhs]) ) / 2.0;
     }
 
   STOP_LOG ("median()", "StatisticsVector");
 
-  return median;
+  return the_median;
 }
 
 
@@ -145,27 +145,27 @@ Real StatisticsVector<T>::median() const
 
 
 template <typename T>
-Real StatisticsVector<T>::variance(const Real mean) const
+Real StatisticsVector<T>::variance(const Real mean_in) const
 {
   const dof_id_type n   = this->size();
 
   START_LOG ("variance()", "StatisticsVector");
 
-  Real variance = 0;
+  Real the_variance = 0;
 
   for (dof_id_type i=0; i<n; i++)
     {
-      const Real delta = ( static_cast<Real>((*this)[i]) - mean );
-      variance += (delta * delta - variance) / 
+      const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
+      the_variance += (delta * delta - the_variance) /
 		    static_cast<Real>(i + 1);
     }
 
   if (n > 1)
-    variance *= static_cast<Real>(n) / static_cast<Real>(n - 1);
+    the_variance *= static_cast<Real>(n) / static_cast<Real>(n - 1);
 
   STOP_LOG ("variance()", "StatisticsVector");
 
-  return variance;
+  return the_variance;
 }
 
 
@@ -297,27 +297,27 @@ void StatisticsVector<T>::plot_histogram(const std::string& filename,
   // On processor 0: Write histogram to file
   if (libMesh::processor_id()==0)
     {
-      std::ofstream out (filename.c_str());
+      std::ofstream out_stream (filename.c_str());
 
-      out << "clear all\n";
-      out << "clf\n";
-      //out << "x=linspace(" << min << "," << max << "," << n_bins+1 << ");\n";
+      out_stream << "clear all\n";
+      out_stream << "clf\n";
+      //out_stream << "x=linspace(" << min << "," << max << "," << n_bins+1 << ");\n";
 
       // abscissa values are located at the center of each bin.
-      out << "x=[";
+      out_stream << "x=[";
       for (unsigned int i=0; i<bin_members.size(); ++i)
 	{
-	  out << min + (i+0.5)*bin_size << " ";
+	  out_stream << min + (i+0.5)*bin_size << " ";
 	}
-      out << "];\n";
+      out_stream << "];\n";
 
-      out << "y=[";
+      out_stream << "y=[";
       for (unsigned int i=0; i<bin_members.size(); ++i)
 	{
-	  out << bin_members[i] << " ";
+	  out_stream << bin_members[i] << " ";
 	}
-      out << "];\n";
-      out << "bar(x,y);\n";
+      out_stream << "];\n";
+      out_stream << "bar(x,y);\n";
     }
 }
 

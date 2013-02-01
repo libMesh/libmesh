@@ -53,8 +53,8 @@ namespace libMesh
 // ------------------------------------------------------------
 // System implementation
 System::System (EquationSystems& es,
-		const std::string& name,
-		const unsigned int number) :
+		const std::string& name_in,
+		const unsigned int number_in) :
 
   assemble_before_solve             (true),
   use_fixed_solution                (false),
@@ -73,11 +73,11 @@ System::System (EquationSystems& es,
   _qoi_evaluate_object              (NULL),
   _qoi_evaluate_derivative_function (NULL),
   _qoi_evaluate_derivative_object   (NULL),
-  _dof_map                          (new DofMap(number)),
+  _dof_map                          (new DofMap(number_in)),
   _equation_systems                 (es),
   _mesh                             (es.get_mesh()),
-  _sys_name                         (name),
-  _sys_number                       (number),
+  _sys_name                         (name_in),
+  _sys_number                       (number_in),
   _active                           (true),
   _solution_projection              (true),
   _basic_system_only                (false),
@@ -1633,12 +1633,12 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 
 std::string System::get_info() const
 {
-  std::ostringstream out;
+  std::ostringstream oss;
 
 
   const std::string& sys_name = this->name();
 
-  out << "   System #"  << this->number() << ", \"" << sys_name << "\"\n"
+  oss << "   System #"  << this->number() << ", \"" << sys_name << "\"\n"
       << "    Type \""  << this->system_type() << "\"\n"
       << "    Variables=";
 
@@ -1646,48 +1646,48 @@ std::string System::get_info() const
     {
       const VariableGroup &vg_description (this->variable_group(vg));
 
-      if (vg_description.n_variables() > 1) out << "{ ";
+      if (vg_description.n_variables() > 1) oss << "{ ";
       for (unsigned int vn=0; vn<vg_description.n_variables(); vn++)
-	out << "\"" << vg_description.name(vn) << "\" ";
-      if (vg_description.n_variables() > 1) out << "} ";
+	oss << "\"" << vg_description.name(vn) << "\" ";
+      if (vg_description.n_variables() > 1) oss << "} ";
     }
 
-  out << '\n';
+  oss << '\n';
 
-  out << "    Finite Element Types=";
+  oss << "    Finite Element Types=";
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
   for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
-    out << "\""
+    oss << "\""
 	<< Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
 	<< "\" ";
 #else
   for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     {
-      out << "\""
+      oss << "\""
 	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().family)
 	  << "\", \""
 	  << Utility::enum_to_string<FEFamily>(this->get_dof_map().variable_group(vg).type().radial_family)
 	  << "\" ";
     }
 
-  out << '\n' << "    Infinite Element Mapping=";
+  oss << '\n' << "    Infinite Element Mapping=";
   for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
-    out << "\""
+    oss << "\""
 	<< Utility::enum_to_string<InfMapType>(this->get_dof_map().variable_group(vg).type().inf_map)
 	<< "\" ";
 #endif
 
-  out << '\n';
+  oss << '\n';
 
-  out << "    Approximation Orders=";
+  oss << "    Approximation Orders=";
   for (unsigned int vg=0; vg<this->n_variable_groups(); vg++)
     {
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
-      out << "\""
+      oss << "\""
 	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
 	  << "\" ";
 #else
-      out << "\""
+      oss << "\""
 	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().order)
 	  << "\", \""
 	  << Utility::enum_to_string<Order>(this->get_dof_map().variable_group(vg).type().radial_order)
@@ -1695,22 +1695,22 @@ std::string System::get_info() const
 #endif
     }
 
-  out << '\n';
+  oss << '\n';
 
-  out << "    n_dofs()="             << this->n_dofs()             << '\n';
-  out << "    n_local_dofs()="       << this->n_local_dofs()       << '\n';
+  oss << "    n_dofs()="             << this->n_dofs()             << '\n';
+  oss << "    n_local_dofs()="       << this->n_local_dofs()       << '\n';
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  out << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
-  out << "    n_local_constrained_dofs()=" << this->n_local_constrained_dofs() << '\n';
+  oss << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
+  oss << "    n_local_constrained_dofs()=" << this->n_local_constrained_dofs() << '\n';
 #endif
 
-  out << "    " << "n_vectors()="  << this->n_vectors()  << '\n';
-  out << "    " << "n_matrices()="  << this->n_matrices()  << '\n';
-//   out << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << '\n';
+  oss << "    " << "n_vectors()="  << this->n_vectors()  << '\n';
+  oss << "    " << "n_matrices()="  << this->n_matrices()  << '\n';
+//   oss << "    " << "n_additional_matrices()=" << this->n_additional_matrices() << '\n';
 
-  out << this->get_dof_map().get_info();
+  oss << this->get_dof_map().get_info();
 
-  return out.str();
+  return oss.str();
 }
 
 
@@ -1734,7 +1734,7 @@ void System::attach_init_function (void fptr(EquationSystems& es,
 
 
 
-void System::attach_init_object (System::Initialization& init)
+void System::attach_init_object (System::Initialization& init_in)
 {
   if (_init_system_function != NULL)
     {
@@ -1745,7 +1745,7 @@ void System::attach_init_object (System::Initialization& init)
       _init_system_function = NULL;
     }
 
-  _init_system_object = &init;
+  _init_system_object = &init_in;
 }
 
 
@@ -1769,7 +1769,7 @@ void System::attach_assemble_function (void fptr(EquationSystems& es,
 
 
 
-void System::attach_assemble_object (System::Assembly& assemble)
+void System::attach_assemble_object (System::Assembly& assemble_in)
 {
   if (_assemble_system_function != NULL)
     {
@@ -1780,7 +1780,7 @@ void System::attach_assemble_object (System::Assembly& assemble)
       _assemble_system_function = NULL;
     }
 
-  _assemble_system_object = &assemble;
+  _assemble_system_object = &assemble_in;
 }
 
 
@@ -1840,7 +1840,7 @@ void System::attach_QOI_function(void fptr(EquationSystems&,
 
 
 
-void System::attach_QOI_object (QOI& qoi)
+void System::attach_QOI_object (QOI& qoi_in)
 {
   if (_qoi_evaluate_function != NULL)
     {
@@ -1851,7 +1851,7 @@ void System::attach_QOI_object (QOI& qoi)
       _qoi_evaluate_function = NULL;
     }
 
-  _qoi_evaluate_object = &qoi;
+  _qoi_evaluate_object = &qoi_in;
 }
 
 
@@ -2028,7 +2028,7 @@ Number System::point_value(unsigned int var, const Point &p, const Elem &e) cons
   dof_map.dof_indices (&e, dof_indices, var);
 
   // Get the no of dofs assciated with this point
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int num_dofs = libmesh_cast_int<unsigned int>
     (dof_indices.size());
 
   FEType fe_type = dof_map.variable_type(0);
@@ -2049,7 +2049,7 @@ Number System::point_value(unsigned int var, const Point &p, const Elem &e) cons
   // Get ready to accumulate a value
   Number u = 0;
 
-  for (unsigned int l=0; l<n_dofs; l++)
+  for (unsigned int l=0; l<num_dofs; l++)
     {
       u += phi[l][0]*this->current_solution (dof_indices[l]);
     }
@@ -2126,7 +2126,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e)
   dof_map.dof_indices (&e, dof_indices, var);
 
   // Get the no of dofs assciated with this point
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int num_dofs = libmesh_cast_int<unsigned int>
     (dof_indices.size());
 
   FEType fe_type = dof_map.variable_type(0);
@@ -2147,7 +2147,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e)
   // Get ready to accumulate a gradient
   Gradient grad_u;
 
-  for (unsigned int l=0; l<n_dofs; l++)
+  for (unsigned int l=0; l<num_dofs; l++)
     {
       grad_u.add_scaled (dphi[l][0], this->current_solution (dof_indices[l]));
     }
@@ -2224,7 +2224,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) co
   dof_map.dof_indices (&e, dof_indices, var);
 
   // Get the no of dofs assciated with this point
-  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+  const unsigned int num_dofs = libmesh_cast_int<unsigned int>
     (dof_indices.size());
 
   FEType fe_type = dof_map.variable_type(0);
@@ -2245,7 +2245,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) co
   // Get ready to accumulate a hessian
   Tensor hess_u;
 
-  for (unsigned int l=0; l<n_dofs; l++)
+  for (unsigned int l=0; l<num_dofs; l++)
     {
       hess_u.add_scaled (d2phi[l][0], this->current_solution (dof_indices[l]));
     }

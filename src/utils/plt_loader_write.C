@@ -448,46 +448,46 @@ namespace libMesh
 
 
 void PltLoader::write_dat (const std::string& name,
-			   const unsigned int version) const
+			   const unsigned int version_in) const
 {
-  std::ofstream out (name.c_str());
+  std::ofstream out_stream (name.c_str());
 
-  out << "TITLE=\""
+  out_stream << "TITLE=\""
       << this->title()
       << "\""
       << '\n';
 
-  out << "VARIABLES = ";
+  out_stream << "VARIABLES = ";
 
   for (unsigned int v=0; v<this->n_vars(); v++)
-    out << "\"" << this->var_name(v) << "\"\n";
+    out_stream << "\"" << this->var_name(v) << "\"\n";
 
   for (unsigned int z=0; z<this->n_zones(); z++)
     {
-      out << "ZONE T=\"" << this->zone_name(z) << "\"\n";
-      out << " I="  << this->imax(z)
+      out_stream << "ZONE T=\"" << this->zone_name(z) << "\"\n";
+      out_stream << " I="  << this->imax(z)
 	  << ", J=" << this->jmax(z)
 	  << ", K=" << this->kmax(z);
 
       // Write BLOCK data for this zone
       if (this->zone_type(z) == BLOCK)
 	{
-	  if (version < 10)
+	  if (version_in < 10)
 	    {
-	      out << ", F=BLOCK\n";
+	      out_stream << ", F=BLOCK\n";
 	    }
 	  else
 	    {
-	      out << ", ZONETYPE=Ordered\n"
+	      out_stream << ", ZONETYPE=Ordered\n"
 		  << "DATAPACKING=BLOCK\n";
 	    }
 
-	  out << "DT=(";
+	  out_stream << "DT=(";
 	  for (unsigned int v=0; v<this->n_vars(); v++)
-	    out << "SINGLE ";
-	  out << ")\n";
+	    out_stream << "SINGLE ";
+	  out_stream << ")\n";
 
-	  out.precision(9);
+	  out_stream.precision(9);
 
 	  for (unsigned int v=0; v<this->n_vars(); v++)
 	    {
@@ -500,42 +500,42 @@ void PltLoader::write_dat (const std::string& name,
 		      // GCC 2.95.3 has scientific in the ios class instead
 		      // of in namespace std::
 #ifndef LIBMESH_BROKEN_IOSTREAM
-		      out << std::scientific
+		      out_stream << std::scientific
 			  << _data[z][v][l++] << " ";
 #else
-		      out << std::ios::scientific
+		      out_stream << std::ios::scientific
 			  << _data[z][v][l++] << " ";
 #endif
 		      // Throw in a newline every 5 entries to
 		      // avoid really long lines.
  		      if (l%5 == 0)
- 			out << '\n';
+                        out_stream << '\n';
 		    }
 
 	      if (l%5 != 0)
-		out << '\n';
+		out_stream << '\n';
 	    }
 	} // end if (this->zone_type(z) == BLOCK)
 
       // Write POINT data for this zone
       else if (this->zone_type(z) == POINT)
 	{
-	  if (version < 10)
+	  if (version_in < 10)
 	    {
-	      out << ", F=POINT\n";
+	      out_stream << ", F=POINT\n";
 	    }
 	  else
 	    {
-	      out << ", ZONETYPE=Ordered\n"
+	      out_stream << ", ZONETYPE=Ordered\n"
 		  << "DATAPACKING=POINT\n";
 	    }
 
-	  out << "DT=(";
+	  out_stream << "DT=(";
 	  for (unsigned int v=0; v<this->n_vars(); v++)
-	    out << "SINGLE ";
-	  out << ")\n";
+	    out_stream << "SINGLE ";
+	  out_stream << ")\n";
 
-	  out.precision(9);
+	  out_stream.precision(9);
 
 	  {
 	    unsigned int l=0;
@@ -549,13 +549,13 @@ void PltLoader::write_dat (const std::string& name,
 		      // GCC 2.95.3 has scientific in the ios class instead
 		      // of in namespace std::
 #ifndef LIBMESH_BROKEN_IOSTREAM
-		      out << std::scientific
+		      out_stream << std::scientific
 			  << _data[z][v][l] << " ";
 #else
-		      out << std::ios::scientific
+		      out_stream << std::ios::scientific
 			  << _data[z][v][l] << " ";
 #endif
-		    out << '\n';
+		    out_stream << '\n';
 
 		    l++;
 		  }

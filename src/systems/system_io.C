@@ -112,7 +112,7 @@ namespace libMesh
 // System class implementation
 void System::read_header (Xdr& io,
 			  const std::string &version,
-			  const bool read_header,
+			  const bool read_header_in,
 			  const bool read_additional_data,
 			  const bool read_legacy_format)
 {
@@ -150,7 +150,7 @@ void System::read_header (Xdr& io,
   libmesh_assert (io.reading());
 
   // Possibly clear data structures and start from scratch.
-  if (read_header)
+  if (read_header_in)
     this->clear ();
 
   // Figure out if we need to read infinite element information.
@@ -163,15 +163,15 @@ void System::read_header (Xdr& io,
   {
     // 5.)
     // Read the number of variables in the system
-    unsigned int n_vars=0;
+    unsigned int nv=0;
     if (libMesh::processor_id() == 0)
-      io.data (n_vars);
-    CommWorld.broadcast(n_vars);
+      io.data (nv);
+    CommWorld.broadcast(nv);
 
     _written_var_indices.clear();
-    _written_var_indices.resize(n_vars, 0);
+    _written_var_indices.resize(nv, 0);
 
-    for (unsigned int var=0; var<n_vars; var++)
+    for (unsigned int var=0; var<nv; var++)
       {
 	// 6.)
 	// Read the name of the var-th variable
@@ -258,7 +258,7 @@ void System::read_header (Xdr& io,
 
 #endif
 
-	if (read_header)
+	if (read_header_in)
 	{
 	  if (domains.empty())
 	    _written_var_indices[var] = this->add_variable (var_name, type);
@@ -272,18 +272,18 @@ void System::read_header (Xdr& io,
 
   // 8.)
   // Read the number of additional vectors.
-  unsigned int n_vectors=0;
+  unsigned int nvecs=0;
   if (libMesh::processor_id() == 0)
-    io.data (n_vectors);
-  CommWorld.broadcast(n_vectors);
+    io.data (nvecs);
+  CommWorld.broadcast(nvecs);
 
-  // If n_vectors > 0, this means that write_additional_data
+  // If nvecs > 0, this means that write_additional_data
   // was true when this file was written.  We will need to
   // make use of this fact later.
-  if (n_vectors > 0)
+  if (nvecs > 0)
     this->_additional_data_written = true;
 
-  for (unsigned int vec=0; vec<n_vectors; vec++)
+  for (unsigned int vec=0; vec<nvecs; vec++)
     {
       // 9.)
       // Read the name of the vec-th additional vector
@@ -347,11 +347,11 @@ void System::read_legacy_data (Xdr& io,
 
     dof_id_type cnt=0;
 
-    const unsigned int sys     = this->number();
-    const unsigned int n_vars  = this->_written_var_indices.size();
-    libmesh_assert_less_equal (n_vars, this->n_vars());
+    const unsigned int sys = this->number();
+    const unsigned int nv  = this->_written_var_indices.size();
+    libmesh_assert_less_equal (nv, this->n_vars());
 
-    for (unsigned int data_var=0; data_var<n_vars; data_var++)
+    for (unsigned int data_var=0; data_var<nv; data_var++)
       {
         const unsigned int var = _written_var_indices[data_var];
 
@@ -436,11 +436,11 @@ void System::read_legacy_data (Xdr& io,
 
 	      dof_id_type cnt=0;
 
-	      const unsigned int sys     = this->number();
-              const unsigned int n_vars  = this->_written_var_indices.size();
-              libmesh_assert_less_equal (n_vars, this->n_vars());
+	      const unsigned int sys = this->number();
+              const unsigned int nv  = this->_written_var_indices.size();
+              libmesh_assert_less_equal (nv, this->n_vars());
 
-              for (unsigned int data_var=0; data_var<n_vars; data_var++)
+              for (unsigned int data_var=0; data_var<nv; data_var++)
                 {
                   const unsigned int var = _written_var_indices[data_var];
 		  // First reorder the nodal DOF values
@@ -559,13 +559,13 @@ void System::read_parallel_data (Xdr &io,
   total_read_size += io_buffer.size();
 
   const unsigned int sys_num = this->number();
-  const unsigned int n_vars  = this->_written_var_indices.size();
-  libmesh_assert_less_equal (n_vars, this->n_vars());
+  const unsigned int nv      = this->_written_var_indices.size();
+  libmesh_assert_less_equal (nv, this->n_vars());
 
   dof_id_type cnt=0;
 
   // Loop over each non-SCALAR variable and each node, and read out the value.
-  for (unsigned int data_var=0; data_var<n_vars; data_var++)
+  for (unsigned int data_var=0; data_var<nv; data_var++)
     {
       const unsigned int var = _written_var_indices[data_var];
       if(this->variable(var).type().family != SCALAR)
@@ -595,7 +595,7 @@ void System::read_parallel_data (Xdr &io,
     }
 
   // Finally, read the SCALAR variables on the last processor
-  for (unsigned int data_var=0; data_var<n_vars; data_var++)
+  for (unsigned int data_var=0; data_var<nv; data_var++)
     {
       const unsigned int var = _written_var_indices[data_var];
       if(this->variable(var).type().family == SCALAR)
@@ -637,7 +637,7 @@ void System::read_parallel_data (Xdr &io,
 	  total_read_size += io_buffer.size();
 
 	  // Loop over each non-SCALAR variable and each node, and read out the value.
-          for (unsigned int data_var=0; data_var<n_vars; data_var++)
+          for (unsigned int data_var=0; data_var<nv; data_var++)
             {
               const unsigned int var = _written_var_indices[data_var];
 	      if(this->variable(var).type().family != SCALAR)
@@ -667,7 +667,7 @@ void System::read_parallel_data (Xdr &io,
 	    }
 
           // Finally, read the SCALAR variables on the last processor
-          for (unsigned int data_var=0; data_var<n_vars; data_var++)
+          for (unsigned int data_var=0; data_var<nv; data_var++)
             {
               const unsigned int var = _written_var_indices[data_var];
               if(this->variable(var).type().family == SCALAR)
@@ -769,7 +769,7 @@ void System::read_serialized_data (Xdr& io,
 
 
 template <typename iterator_type>
-dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_objects,
+dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_objs,
 							 const iterator_type begin,
 							 const iterator_type end,
 							 Xdr &io,
@@ -807,8 +807,8 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
     num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
     num_vars   = _written_var_indices.size(); // must be <= current number of variables! 
   const dof_id_type
-    io_blksize = std::min(max_io_blksize, n_objects),
-    num_blks   = std::ceil(static_cast<double>(n_objects)/static_cast<double>(io_blksize));
+    io_blksize = std::min(max_io_blksize, n_objs),
+    num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
 
   libmesh_assert_less_equal (num_vars, this->n_vars());
 
@@ -863,7 +863,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       const dof_id_type 
 	first_object = blk*io_blksize,
 	last_object  = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
-				n_objects);
+				n_objs);
 
       // convenience
       std::vector<dof_id_type> &ids  (xfer_ids[blk]);
@@ -921,7 +921,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       const dof_id_type 
 	first_object  = blk*io_blksize,
 	last_object   = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
-				 n_objects),
+				 n_objs),
 	n_objects_blk = last_object - first_object;
 
       // Processor 0 has a special job.  It needs to gather the requested indices
@@ -1150,12 +1150,12 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
   CommWorld.broadcast(vector_length);
 
   const unsigned int
-    n_vars  = this->_written_var_indices.size();
+    nv  = this->_written_var_indices.size();
   const dof_id_type
     n_nodes = this->get_mesh().n_nodes(),
     n_elem  = this->get_mesh().n_elem();
   
-  libmesh_assert_less_equal (n_vars, this->n_vars());
+  libmesh_assert_less_equal (nv, this->n_vars());
 
   // for newer versions, read variables node/elem major
   if (io.version() >= LIBMESH_VERSION_ID(0,7,4))
@@ -1184,7 +1184,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
   else
     {
       // Loop over each variable in the system, and then each node/element in the mesh.
-      for (unsigned int data_var=0; data_var<n_vars; data_var++)
+      for (unsigned int data_var=0; data_var<nv; data_var++)
 	{
 	  const unsigned int var = _written_var_indices[data_var];
 	  if(this->variable(var).type().family != SCALAR)
@@ -1215,7 +1215,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 
   //-------------------------------------------
   // Finally loop over all the SCALAR variables
-  for (unsigned int data_var=0; data_var<n_vars; data_var++)
+  for (unsigned int data_var=0; data_var<nv; data_var++)
     {
       const unsigned int var = _written_var_indices[data_var];
       if(this->variable(var).type().family == SCALAR)
@@ -1294,8 +1294,8 @@ void System::write_header (Xdr& io,
     comment += this->name();
     comment += "\"";
 
-    unsigned int n_vars = this->n_vars();
-    io.data (n_vars, comment.c_str());
+    unsigned int nv = this->n_vars();
+    io.data (nv, comment.c_str());
   }
 
 
@@ -1417,8 +1417,8 @@ void System::write_header (Xdr& io,
       comment += this->name();
       comment += "\"";
 
-      unsigned int n_vectors = write_additional_data ? this->n_vectors () : 0;
-      io.data (n_vectors, comment.c_str());
+      unsigned int nvecs = write_additional_data ? this->n_vectors () : 0;
+      io.data (nvecs, comment.c_str());
     }
 
     if (write_additional_data)
@@ -1506,10 +1506,10 @@ void System::write_parallel_data (Xdr &io,
   }
 
   const unsigned int sys_num = this->number();
-  const unsigned int n_vars  = this->n_vars();
+  const unsigned int nv      = this->n_vars();
 
   // Loop over each non-SCALAR variable and each node, and write out the value.
-  for (unsigned int var=0; var<n_vars; var++)
+  for (unsigned int var=0; var<nv; var++)
     if (this->variable(var).type().family != SCALAR)
     {
       // First write the node DOF values
@@ -1580,7 +1580,7 @@ void System::write_parallel_data (Xdr &io,
 	  io_buffer.clear(); io_buffer.reserve( pos->second->local_size());
 
 	  // Loop over each non-SCALAR variable and each node, and write out the value.
-	  for (unsigned int var=0; var<n_vars; var++)
+	  for (unsigned int var=0; var<nv; var++)
 	    if(this->variable(var).type().family != SCALAR)
 	    {
 	      // First write the node DOF values
@@ -1768,7 +1768,7 @@ void System::write_serialized_data (Xdr& io,
 
 template <typename iterator_type>
 dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<const NumericVector<Number>*> &vecs,
-							  const dof_id_type n_objects,
+							  const dof_id_type n_objs,
 							  const iterator_type begin,
 							  const iterator_type end,
 							  Xdr &io,
@@ -1802,15 +1802,15 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
     }
   
   const dof_id_type
-    io_blksize = std::min(max_io_blksize, n_objects);
+    io_blksize = std::min(max_io_blksize, n_objs);
 
   const unsigned int
     sys_num    = this->number(),
     num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
-    num_blks   = std::ceil(static_cast<double>(n_objects)/static_cast<double>(io_blksize));
+    num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
 
   // std::cout << "io_blksize = "    << io_blksize
-  // 	    << ", num_objects = " << n_objects
+  // 	    << ", num_objects = " << n_objs
   // 	    << ", num_blks = "    << num_blks
   // 	    << std::endl;
   
@@ -1860,7 +1860,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
       const dof_id_type
 	first_object = blk*io_blksize,
 	last_object  = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
-				n_objects);
+				n_objs);
 
       // convenience
       std::vector<dof_id_type> &ids  (xfer_ids[blk]);
@@ -1938,7 +1938,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	  const dof_id_type
 	    first_object  = blk*io_blksize,
 	    last_object   = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
-				     n_objects),
+				     n_objs),
 	    n_objects_blk = last_object - first_object;
 
 	  // offset array. this will define where each object's values
@@ -2074,10 +2074,10 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
       const DofMap& dof_map = this->get_dof_map();
       std::vector<dof_id_type> SCALAR_dofs;
       dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
-      const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+      const unsigned int n_scalar_dofs = libmesh_cast_int<unsigned int>
         (SCALAR_dofs.size());
 
-      for(unsigned int i=0; i<n_dofs; i++)
+      for(unsigned int i=0; i<n_scalar_dofs; i++)
         {
           vals.push_back( vec(SCALAR_dofs[i]) );
         }

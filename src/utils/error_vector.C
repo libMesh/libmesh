@@ -70,20 +70,20 @@ Real ErrorVector::mean() const
 
   const dof_id_type n = this->size();
 
-  Real mean  = 0;
+  Real the_mean  = 0;
   dof_id_type nnz = 0;
 
   for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
-	mean += ( static_cast<Real>((*this)[i]) - mean ) / (nnz + 1);
+	the_mean += ( static_cast<Real>((*this)[i]) - the_mean ) / (nnz + 1);
 
 	nnz++;
       }
 
   STOP_LOG ("mean()", "ErrorVector");
 
-  return mean;
+  return the_mean;
 }
 
 
@@ -123,27 +123,27 @@ Real ErrorVector::median() const
 
 
 
-Real ErrorVector::variance(const Real mean) const
+Real ErrorVector::variance(const Real mean_in) const
 {
   const dof_id_type n   = this->size();
 
   START_LOG ("variance()", "ErrorVector");
 
-  Real variance = 0;
+  Real the_variance = 0;
   dof_id_type nnz = 0;
 
   for (dof_id_type i=0; i<n; i++)
     if (this->is_active_elem(i))
       {
-	const Real delta = ( static_cast<Real>((*this)[i]) - mean );
-	variance += (delta * delta - variance) / (nnz + 1);
+	const Real delta = ( static_cast<Real>((*this)[i]) - mean_in );
+	the_variance += (delta * delta - the_variance) / (nnz + 1);
 
 	nnz++;
       }
 
   STOP_LOG ("variance()", "ErrorVector");
 
-  return variance;
+  return the_variance;
 }
 
 

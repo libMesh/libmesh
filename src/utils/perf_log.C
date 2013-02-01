@@ -95,7 +95,7 @@ void PerfLog::clear()
 
 std::string PerfLog::get_info_header() const
 {
-  std::ostringstream out;
+  std::ostringstream oss;
 
   if (log_events)
     {
@@ -118,7 +118,7 @@ std::string PerfLog::get_info_header() const
 #ifdef LIBMESH_HAVE_GETPWUID
       struct passwd* p = getpwuid(getuid());
 #endif
-      out << "\n";
+      oss << "\n";
 
       // Construct string stream objects for each of the outputs
       std::ostringstream
@@ -191,7 +191,7 @@ std::string PerfLog::get_info_header() const
 	    (parsed_libmesh_configure_info[i].size());
 
       // Print dashed line for the header
-      out << ' '
+      oss << ' '
           << std::string(max_length+1, '-')
           << '\n';
 
@@ -199,7 +199,7 @@ std::string PerfLog::get_info_header() const
       for (unsigned int i=0; i<v.size(); ++i)
 	{
 	  if (v[i]->str().size())
-            out << v[i]->str()
+            oss << v[i]->str()
                 << std::setw(max_length + 4 - v[i]->str().size())
                 << std::right
                 << "|\n";
@@ -208,7 +208,7 @@ std::string PerfLog::get_info_header() const
       // Print out configuration header plus first parsed string.  The
       // magic number 18 below accounts for the length of the word
       // 'Configuration'.
-      out << "| Configuration:  "
+      oss << "| Configuration:  "
           << parsed_libmesh_configure_info[0]
           << std::setw(max_length + 4 - parsed_libmesh_configure_info[0].size() - 18)
           << std::right
@@ -218,7 +218,7 @@ std::string PerfLog::get_info_header() const
       // number 3 below accounts for the leading 'pipe' character and indentation
       for (unsigned i=1; i<parsed_libmesh_configure_info.size(); ++i)
         {
-          out << "|  "
+          oss << "|  "
               << parsed_libmesh_configure_info[i]
               << std::setw(max_length + 4 - parsed_libmesh_configure_info[i].size() - 3)
               << std::right
@@ -227,12 +227,12 @@ std::string PerfLog::get_info_header() const
 
 
       // Print dashed line
-      out << ' '
+      oss << ' '
           << std::string(max_length+1, '-')
           << '\n';
     }
 
-  return out.str();
+  return oss.str();
 }
 
 
@@ -240,7 +240,7 @@ std::string PerfLog::get_info_header() const
 
 std::string PerfLog::get_perf_info() const
 {
-  std::ostringstream out;
+  std::ostringstream oss;
 
   if (log_events && !log.empty())
     {
@@ -285,7 +285,7 @@ std::string PerfLog::get_perf_info() const
 	pct_active_incl_sub_col_width+1;
 
       // Print dashed line
-      out << ' '
+      oss << ' '
           << std::string(total_col_width, '-')
           << '\n';
 
@@ -300,28 +300,28 @@ std::string PerfLog::get_perf_info() const
 	  (temp.str().size());
 
 	// Send the temporary message to the output
-	out << temp.str();
+	oss << temp.str();
 
 	// If this string is longer than the previously computed total
 	// column width, skip the additional formatting... this shouldn't
 	// happen often, hopefully.  Add two additional characters for a
 	// space and a "|" character at the end.
 	if (temp_size < total_col_width+2)
-          out << std::setw(total_col_width - temp_size + 2)
+          oss << std::setw(total_col_width - temp_size + 2)
               << std::right
               << "|";
 
-	out << '\n';
+	oss << '\n';
       }
 
       // Print dashed line
-      out << ' '
+      oss << ' '
           << std::string(total_col_width, '-')
           << '\n';
 
 
       // Write out the header for the events listing
-      out << "| "
+      oss << "| "
           << std::setw(event_col_width)
           << std::left
           << "Event"
@@ -402,7 +402,7 @@ std::string PerfLog::get_perf_info() const
 
 	      // Print the event name
 	      if (pos->first.first == "")
-                out << "| "
+                oss << "| "
                     << std::setw(event_col_width)
                     << std::left
                     << pos->first.second;
@@ -416,7 +416,7 @@ std::string PerfLog::get_perf_info() const
 		      // print blank line followed by header name
 		      // (account for additional space before the
 		      // header)
-		      out << "|"
+		      oss << "|"
                           << std::string(total_col_width, ' ')
                           << "|\n| "
                           << std::setw(total_col_width-1)
@@ -425,7 +425,7 @@ std::string PerfLog::get_perf_info() const
                           << "|\n";
 		    }
 
-		  out << "|   "
+		  oss << "|   "
                       << std::setw(event_col_width-2)
                       << std::left
                       << pos->first.second;
@@ -433,14 +433,14 @@ std::string PerfLog::get_perf_info() const
 
 
 	      // Print the number of calls to the event.
-              out << std::setw(ncalls_col_width)
+              oss << std::setw(ncalls_col_width)
                   << perf_count;
 
               // Save the original stream flags
-              std::ios_base::fmtflags out_flags = out.flags();
+              std::ios_base::fmtflags out_flags = oss.flags();
 
 	      // Print the total time spent in the event
-              out << std::fixed
+              oss << std::fixed
                   << std::setprecision(4)
                   << std::setw(tot_time_col_width)
                   << std::left
@@ -448,48 +448,48 @@ std::string PerfLog::get_perf_info() const
 
 
 	      // Print the average time per function call
-              out << std::fixed
+              oss << std::fixed
                   << std::setprecision(6)
                   << std::setw(avg_time_col_width)
                   << std::left
                   << perf_avg_time;
 
 	      // Print the total time spent in the event incl. sub-events
-              out << std::fixed
+              oss << std::fixed
                   << std::setprecision(4)
                   << std::setw(tot_time_incl_sub_col_width)
                   << std::left
                   << perf_time_incl_sub;
 
 	      // Print the average time per function call incl. sub-events
-              out << std::fixed
+              oss << std::fixed
                   << std::setprecision(6)
                   << std::setw(avg_time_incl_sub_col_width)
                   << std::left
                   << perf_avg_time_incl_sub;
 
 	      // Print the percentage of the time spent in the event
-              out << std::fixed
+              oss << std::fixed
                   << std::setprecision(2)
                   << std::setw(pct_active_col_width)
                   << std::left
                   << perf_percent;
 
 	      // Print the percentage of the time spent in the event incl. sub-events
-              out << std::fixed
+              oss << std::fixed
                   << std::setprecision(2)
                   << std::setw(pct_active_incl_sub_col_width)
                   << std::left
                   << perf_percent_incl_sub;
 
               // Reset the stream flags
-              out.flags(out_flags);
+              oss.flags(out_flags);
 
-	      out << "|\n";
+	      oss << "|\n";
 	    }
 	}
 
-      out << ' '
+      oss << ' '
           << std::string(total_col_width, '-')
           << "\n| "
           << std::setw(event_col_width)
@@ -500,43 +500,43 @@ std::string PerfLog::get_perf_info() const
       // For routines which are called many times, summed_function_calls may
       // exceed 7 digits.  If this happens use, scientific notation.
       if (summed_function_calls < 9999999)
-        out << std::setw(ncalls_col_width)
+        oss << std::setw(ncalls_col_width)
             << summed_function_calls;
 
       else
 	{
           // Save the original stream flags
-          std::ios_base::fmtflags out_flags = out.flags();
+          std::ios_base::fmtflags out_flags = oss.flags();
 
-          out << std::scientific
+          oss << std::scientific
               << std::setprecision(3)
               << std::setw(ncalls_col_width)
               << std::left
               << static_cast<Real>(summed_function_calls);
 
           // Reset the stream flags
-	  out.flags(out_flags);
+	  oss.flags(out_flags);
 	}
 
       // Print the total time spent in logged function calls.  Don't bother saving/restoring
       // the flags here since we are almost done with this stream anyway...
-      out << std::fixed
+      oss << std::fixed
           << std::setprecision(4)
           << std::setw(tot_time_col_width)
           << std::left
           << summed_total_time;
 
       // Null, the average time doesn't make sense as a total
-      out << std::setw(avg_time_col_width) << "";
+      oss << std::setw(avg_time_col_width) << "";
 
       // Same for times that include sub-events
-      out << std::setw(tot_time_incl_sub_col_width)
+      oss << std::setw(tot_time_incl_sub_col_width)
           << ""
           << std::setw(avg_time_incl_sub_col_width)
           << "";
 
       // Print the total percentage followed by dashed line
-      out << std::fixed
+      oss << std::fixed
           << std::setprecision(2)
           << std::setw(pct_active_col_width)
           << std::left
@@ -548,14 +548,14 @@ std::string PerfLog::get_perf_info() const
           << '\n';
     }
 
-  return out.str();
+  return oss.str();
 }
 
 
 
 std::string PerfLog::get_log() const
 {
-  std::ostringstream out;
+  std::ostringstream oss;
 
   if (log_events)
     {
@@ -568,13 +568,13 @@ std::string PerfLog::get_log() const
 	  if (!called)
 	    {
 	      called = true;
-	      out << get_info_header();
+	      oss << get_info_header();
 	    }
-	  out << get_perf_info();
+	  oss << get_perf_info();
 	}
     }
 
-  return out.str();
+  return oss.str();
 }
 
 
