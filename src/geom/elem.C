@@ -423,7 +423,7 @@ bool Elem::operator == (const Elem& rhs) const
 //   return false;
 
   // Useful typedefs
-  typedef std::vector<unsigned int>::iterator iterator;
+  typedef std::vector<dof_id_type>::iterator iterator;
 
 
   // Elements can only be equal if they
