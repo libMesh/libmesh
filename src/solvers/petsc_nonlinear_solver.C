@@ -239,8 +239,8 @@ extern "C"
 //---------------------------------------------------------------------
 // PetscNonlinearSolver<> methods
 template <typename T>
-PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system) :
-    NonlinearSolver<T>(system),
+PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type& system_in) :
+    NonlinearSolver<T>(system_in),
     _reason(SNES_CONVERGED_ITERATING/*==0*/), // Arbitrary initial value...
     _n_linear_iterations(0),
     _current_nonlinear_iteration_number(0)
