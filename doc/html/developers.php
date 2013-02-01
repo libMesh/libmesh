@@ -31,8 +31,8 @@
 <?php
 dev_table_entry("images/benkirk.jpg",
                 "Dr. Benjamin S. Kirk",
-                "http://www.cfdlab.ae.utexas.edu/~benkirk",
-		"<a href=\"http://www.cfdlab.ae.utexas.edu/~benkirk/vitae.pdf\">(curriculum vitae)</a>",
+                "",
+		"<a href=\"http://users.ices.utexas.edu/~benkirk/vitae.pdf\">(curriculum vitae)</a>",
                 "Project Manager",
 	        "<a href=\"http://www.nasa.gov/centers/johnson/home/index.html\">NASA Lyndon B. Johnson Space Center</a>");
 ?>
