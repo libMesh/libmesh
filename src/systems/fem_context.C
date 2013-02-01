@@ -48,12 +48,12 @@ FEMContext::FEMContext (const System &sys)
   // We need to know which of our variables has the hardest
   // shape functions to numerically integrate.
 
-  unsigned int n_vars = sys.n_vars();
+  unsigned int nv = sys.n_vars();
 
-  libmesh_assert (n_vars);
+  libmesh_assert (nv);
   FEType hardest_fe_type = sys.variable_type(0);
 
-  for (unsigned int i=0; i != n_vars; ++i)
+  for (unsigned int i=0; i != nv; ++i)
     {
       FEType fe_type = sys.variable_type(i);
 
@@ -77,17 +77,17 @@ FEMContext::FEMContext (const System &sys)
   // Next, create finite element objects
   // Preserving backward compatibility here for now
   // Should move to the protected/FEAbstract interface
-  element_fe_var.resize(n_vars);
-  side_fe_var.resize(n_vars);
+  element_fe_var.resize(nv);
+  side_fe_var.resize(nv);
   if (dim == 3)
-    edge_fe_var.resize(n_vars);
+    edge_fe_var.resize(nv);
 
-  _element_fe_var.resize(n_vars);
-  _side_fe_var.resize(n_vars);
+  _element_fe_var.resize(nv);
+  _side_fe_var.resize(nv);
   if (dim == 3)
-    _edge_fe_var.resize(n_vars);
+    _edge_fe_var.resize(nv);
 
-  for (unsigned int i=0; i != n_vars; ++i)
+  for (unsigned int i=0; i != nv; ++i)
     {
       FEType fe_type = sys.variable_type(i);
 
@@ -554,11 +554,11 @@ void FEMContext::side_value(unsigned int var, unsigned int qp,
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
-  FEGenericBase<OutputShape>* side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, side_fe );
+  FEGenericBase<OutputShape>* the_side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, the_side_fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<OutputShape> > &phi = side_fe->get_phi();
+  const std::vector<std::vector<OutputShape> > &phi = the_side_fe->get_phi();
 
   // Accumulate solution value
   u = 0.;
@@ -587,11 +587,11 @@ void FEMContext::side_values
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
       
   // Get the finite element object
-  FEGenericBase<OutputShape>* side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, side_fe );
+  FEGenericBase<OutputShape>* the_side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, the_side_fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<OutputShape> > &phi = side_fe->get_phi();
+  const std::vector<std::vector<OutputShape> > &phi = the_side_fe->get_phi();
     
   // Loop over all the q_points on this element
   for (unsigned int qp=0; qp != u_vals.size(); qp++)
@@ -637,11 +637,11 @@ void FEMContext::side_gradient(unsigned int var, unsigned int qp,
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
-  FEGenericBase<OutputShape>* side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, side_fe );
+  FEGenericBase<OutputShape>* the_side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, the_side_fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector< typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = side_fe->get_dphi();
+  const std::vector<std::vector< typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = the_side_fe->get_dphi();
 
   // Accumulate solution derivatives
   du = 0.;
@@ -673,11 +673,11 @@ void FEMContext::side_gradients
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
 
   // Get finite element object
-  FEGenericBase<OutputShape>* side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, side_fe );
+  FEGenericBase<OutputShape>* the_side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, the_side_fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = side_fe->get_dphi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = the_side_fe->get_dphi();
   
   // Loop over all the q_points in this finite element
   for (unsigned int qp=0; qp != du_vals.size(); qp++)
@@ -725,11 +725,11 @@ void FEMContext::side_hessian(unsigned int var, unsigned int qp,
   DenseSubVector<Number> &coef = *elem_subsolutions[var];
 
   // Get finite element object
-  FEGenericBase<OutputShape>* side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, side_fe );
+  FEGenericBase<OutputShape>* the_side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, the_side_fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &d2phi = side_fe->get_d2phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &d2phi = the_side_fe->get_d2phi();
 
   // Accumulate solution second derivatives
   d2u = 0.0;
@@ -762,11 +762,11 @@ void FEMContext::side_hessians
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
 
   // Get finite element object
-  FEGenericBase<OutputShape>* side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, side_fe );
+  FEGenericBase<OutputShape>* the_side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, the_side_fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &d2phi = side_fe->get_d2phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &d2phi = the_side_fe->get_d2phi();
   
   // Loop over all the q_points in this finite element
   for (unsigned int qp=0; qp != d2u_vals.size(); qp++)
@@ -1106,11 +1106,11 @@ void FEMContext::fixed_side_value(unsigned int var, unsigned int qp,
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
-  FEGenericBase<OutputShape>* side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, side_fe );
+  FEGenericBase<OutputShape>* the_side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, the_side_fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<OutputShape> > &phi = side_fe->get_phi();
+  const std::vector<std::vector<OutputShape> > &phi = the_side_fe->get_phi();
 
   // Accumulate solution value
   u = 0.0;
@@ -1152,11 +1152,11 @@ void FEMContext::fixed_side_gradient(unsigned int var, unsigned int qp,
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
-  FEGenericBase<OutputShape>* side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, side_fe );
+  FEGenericBase<OutputShape>* the_side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, the_side_fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = side_fe->get_dphi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> > &dphi = the_side_fe->get_dphi();
 
   // Accumulate solution derivatives
   du = 0.0;
@@ -1200,11 +1200,11 @@ void FEMContext::fixed_side_hessian(unsigned int var, unsigned int qp,
   DenseSubVector<Number> &coef = *elem_fixed_subsolutions[var];
 
   // Get finite element object
-  FEGenericBase<OutputShape>* side_fe = NULL;
-  this->get_side_fe<OutputShape>( var, side_fe );
+  FEGenericBase<OutputShape>* the_side_fe = NULL;
+  this->get_side_fe<OutputShape>( var, the_side_fe );
 
   // Get shape function values at quadrature point
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &d2phi = side_fe->get_d2phi();
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> > &d2phi = the_side_fe->get_d2phi();
 
   // Accumulate solution second derivatives
   d2u = 0.0;

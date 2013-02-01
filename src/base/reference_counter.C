@@ -48,9 +48,9 @@ std::string ReferenceCounter::get_info ()
 {
 #if defined(LIBMESH_ENABLE_REFERENCE_COUNTING) && defined(DEBUG)
 
-  std::ostringstream out;
+  std::ostringstream oss;
 
-  out << '\n'
+  oss << '\n'
       << " ---------------------------------------------------------------------------- \n"
       << "| Reference count information                                                |\n"
       << " ---------------------------------------------------------------------------- \n";
@@ -62,14 +62,14 @@ std::string ReferenceCounter::get_info ()
       const unsigned int creations    = it->second.first;
       const unsigned int destructions = it->second.second;
 
-      out << "| " << name << " reference count information:\n"
+      oss << "| " << name << " reference count information:\n"
 	  << "|  Creations:    " << creations    << '\n'
 	  << "|  Destructions: " << destructions << '\n';
     }
 
-  out << " ---------------------------------------------------------------------------- \n";
+  oss << " ---------------------------------------------------------------------------- \n";
 
-  return out.str();
+  return oss.str();
 
 #else
 

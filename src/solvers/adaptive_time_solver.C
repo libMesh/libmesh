@@ -85,13 +85,13 @@ void AdaptiveTimeSolver::reinit()
 
 void AdaptiveTimeSolver::advance_timestep ()
 {
-  NumericVector<Number> &old_nonlinear_solution =
+  NumericVector<Number> &old_nonlinear_soln =
   _system.get_vector("_old_nonlinear_solution");
   NumericVector<Number> &nonlinear_solution =
     *(_system.solution);
 //    _system.get_vector("_nonlinear_solution");
 
-  old_nonlinear_solution = nonlinear_solution;
+  old_nonlinear_soln = nonlinear_solution;
 
   if (!first_solve)
     _system.time += last_deltat;

@@ -35,13 +35,13 @@ DiffContext::DiffContext (const System& sys) :
   _is_adjoint(false)
 {
   // Finally initialize solution/residual/jacobian data structures
-  unsigned int n_vars = sys.n_vars();
+  unsigned int nv = sys.n_vars();
 
-  elem_subsolutions.reserve(n_vars);
-  elem_subresiduals.reserve(n_vars);
-  elem_subjacobians.resize(n_vars);
+  elem_subsolutions.reserve(nv);
+  elem_subresiduals.reserve(nv);
+  elem_subjacobians.resize(nv);
   if (sys.use_fixed_solution)
-    elem_fixed_subsolutions.reserve(n_vars);
+    elem_fixed_subsolutions.reserve(nv);
 
   // If the user resizes sys.qoi, it will invalidate us
   std::size_t n_qoi = sys.qoi.size();
@@ -49,21 +49,21 @@ DiffContext::DiffContext (const System& sys) :
   elem_qoi_derivative.resize(n_qoi);
   elem_qoi_subderivatives.resize(n_qoi);
   for (std::size_t q=0; q != n_qoi; ++q)
-    elem_qoi_subderivatives[q].reserve(n_vars);
+    elem_qoi_subderivatives[q].reserve(nv);
 
-  for (unsigned int i=0; i != n_vars; ++i)
+  for (unsigned int i=0; i != nv; ++i)
     {
       elem_subsolutions.push_back(new DenseSubVector<Number>(elem_solution));
       elem_subresiduals.push_back(new DenseSubVector<Number>(elem_residual));
       for (std::size_t q=0; q != n_qoi; ++q)
         elem_qoi_subderivatives[q].push_back(new DenseSubVector<Number>(elem_qoi_derivative[q]));
-      elem_subjacobians[i].reserve(n_vars);
+      elem_subjacobians[i].reserve(nv);
 
       if (sys.use_fixed_solution)
         elem_fixed_subsolutions.push_back
 	  (new DenseSubVector<Number>(elem_fixed_solution));
 
-      for (unsigned int j=0; j != n_vars; ++j)
+      for (unsigned int j=0; j != nv; ++j)
         {
           elem_subjacobians[i].push_back
             (new DenseSubMatrix<Number>(elem_jacobian));
@@ -127,12 +127,12 @@ void DiffContext::add_localized_vector (NumericVector<Number> & _localized_vecto
   // Make an empty pair keyed with a reference to this _localized_vector
   localized_vectors[&_localized_vector] = std::make_pair(DenseVector<Number>(), std::vector<DenseSubVector<Number>*>());
 
-  unsigned int n_vars = _sys.n_vars();
+  unsigned int nv = _sys.n_vars();
 
-  localized_vectors[&_localized_vector].second.reserve(n_vars);
+  localized_vectors[&_localized_vector].second.reserve(nv);
   
-  // Fill the DenseSubVector with n_vars copies of DenseVector
-  for(unsigned int i=0; i != n_vars; ++i)
+  // Fill the DenseSubVector with nv copies of DenseVector
+  for(unsigned int i=0; i != nv; ++i)
     localized_vectors[&_localized_vector].second.push_back(new DenseSubVector<Number>(localized_vectors[&_localized_vector].first));
 }
 

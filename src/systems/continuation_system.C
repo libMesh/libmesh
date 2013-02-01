@@ -26,9 +26,9 @@ namespace libMesh
 {
 
 ContinuationSystem::ContinuationSystem (EquationSystems& es,
-					const std::string& name,
-					const unsigned int number)
-  : Parent(es, name, number),
+					const std::string& name_in,
+					const unsigned int number_in)
+  : Parent(es, name_in, number_in),
     continuation_parameter(NULL),
     quiet(true),
     continuation_parameter_tolerance(1.e-6),

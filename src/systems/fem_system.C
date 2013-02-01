@@ -501,9 +501,9 @@ namespace libMesh
 
 
 FEMSystem::FEMSystem (EquationSystems& es,
-                      const std::string& name,
-                      const unsigned int number)
-  : Parent(es, name, number),
+                      const std::string& name_in,
+                      const unsigned int number_in)
+  : Parent(es, name_in, number_in),
     fe_reinit_during_postprocess(true),
     numerical_jacobian_h(TOLERANCE),
     verify_analytic_jacobians(0.0)
@@ -785,7 +785,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
 
   DenseVector<Number> original_residual(context.elem_residual);
   DenseVector<Number> backwards_residual(context.elem_residual);
-  DenseMatrix<Number> numerical_jacobian(context.elem_jacobian);
+  DenseMatrix<Number> numeric_jacobian(context.elem_jacobian);
 #ifdef DEBUG
   DenseMatrix<Number> old_jacobian(context.elem_jacobian);
 #endif
@@ -858,7 +858,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
           *coord = libmesh_real(context.elem_solution(j));
 	  for (unsigned int i = 0; i != context.dof_indices.size(); ++i)
             {
-              numerical_jacobian(i,j) =
+              numeric_jacobian(i,j) =
                 (context.elem_residual(i) - backwards_residual(i)) /
                 2. / numerical_point_h;
             }
@@ -867,7 +867,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
         {
           for (unsigned int i = 0; i != context.dof_indices.size(); ++i)
             {
-              numerical_jacobian(i,j) =
+              numeric_jacobian(i,j) =
                 (context.elem_residual(i) - backwards_residual(i)) /
                 2. / numerical_jacobian_h;
             }
@@ -875,7 +875,7 @@ void FEMSystem::numerical_jacobian (TimeSolverResPtr res,
     }
 
   context.elem_residual = original_residual;
-  context.elem_jacobian = numerical_jacobian;
+  context.elem_jacobian = numeric_jacobian;
 }
 
 

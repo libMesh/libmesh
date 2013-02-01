@@ -52,8 +52,8 @@ namespace libMesh {
 
 
   template <typename T>
-  PetscDMNonlinearSolver<T>::PetscDMNonlinearSolver(sys_type& system) :
-    PetscNonlinearSolver<T>(system)
+  PetscDMNonlinearSolver<T>::PetscDMNonlinearSolver(sys_type& system_in) :
+    PetscNonlinearSolver<T>(system_in)
   {
     PetscDMRegister();
   }

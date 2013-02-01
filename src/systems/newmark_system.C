@@ -43,9 +43,9 @@ const Real NewmarkSystem::_default_timestep = 1.;
 // ------------------------------------------------------------
 // NewmarkSystem implementation
 NewmarkSystem::NewmarkSystem (EquationSystems& es,
-			      const std::string& name,
-			      const unsigned int number) :
-  LinearImplicitSystem (es, name, number),
+			      const std::string& name_in,
+			      const unsigned int number_in) :
+  LinearImplicitSystem (es, name_in, number_in),
   _a_0                 (1./(_default_alpha*_default_timestep*_default_timestep)),
   _a_1                 (_default_delta/(_default_alpha*_default_timestep)),
   _a_2                 (1./(_default_alpha*_default_timestep)),
@@ -198,8 +198,8 @@ void NewmarkSystem::update_rhs ()
   START_LOG("update_rhs ()", "NewmarkSystem");
 
   // zero the rhs-vector
-  NumericVector<Number>& rhs = *this->rhs;
-  rhs.zero();
+  NumericVector<Number>& the_rhs = *this->rhs;
+  the_rhs.zero();
 
   // get writable references to some vectors
   NumericVector<Number>& rhs_m = this->get_vector("rhs_m");
@@ -220,9 +220,9 @@ void NewmarkSystem::update_rhs ()
   rhs_c.add(_a_5, this->get_vector("acceleration"));
 
   // compute rhs
-  rhs.add(this->get_vector("force"));
-  rhs.add_vector(rhs_m, this->get_matrix("mass"));
-  rhs.add_vector(rhs_c, this->get_matrix("damping"));
+  the_rhs.add(this->get_vector("force"));
+  the_rhs.add_vector(rhs_m, this->get_matrix("mass"));
+  the_rhs.add_vector(rhs_c, this->get_matrix("damping"));
 
   STOP_LOG("update_rhs ()", "NewmarkSystem");
 }
