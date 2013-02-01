@@ -109,7 +109,7 @@ void RBConstructionBase<Base>::get_global_max_error_pair(std::pair<unsigned int,
 }
 
 template <class Base>
-unsigned int RBConstructionBase<Base>::get_n_training_samples() const
+numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
 {
   libmesh_assert(training_parameters_initialized);
   
@@ -120,21 +120,21 @@ unsigned int RBConstructionBase<Base>::get_n_training_samples() const
 }
 
 template <class Base>
-unsigned int RBConstructionBase<Base>::get_local_n_training_samples() const
+numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() const
 {
   libmesh_assert(training_parameters_initialized);
   return training_parameters.begin()->second->local_size();
 }
 
 template <class Base>
-unsigned int RBConstructionBase<Base>::get_first_local_training_index() const
+numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() const
 {
   libmesh_assert(training_parameters_initialized);
   return training_parameters.begin()->second->first_local_index();
 }
 
 template <class Base>
-unsigned int RBConstructionBase<Base>::get_last_local_training_index() const
+numeric_index_type RBConstructionBase<Base>::get_last_local_training_index() const
 {
   libmesh_assert(training_parameters_initialized);
   return training_parameters.begin()->second->last_local_index();
@@ -286,8 +286,8 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
   }
 
   // Get the number of local and global training parameters
-  unsigned int n_local_training_samples  = new_training_set.begin()->second.size();
-  unsigned int n_global_training_samples = n_local_training_samples;
+  numeric_index_type n_local_training_samples  = new_training_set.begin()->second.size();
+  numeric_index_type n_global_training_samples = n_local_training_samples;
   CommWorld.sum(n_global_training_samples);
 
   it = training_parameters.begin();
@@ -303,10 +303,10 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
     std::string param_name = it->first;
     NumericVector<Number>* training_vector = it->second;
     
-    unsigned int first_index = training_vector->first_local_index();
-    for(unsigned int i=0; i<n_local_training_samples; i++)
+    numeric_index_type first_index = training_vector->first_local_index();
+    for(numeric_index_type i=0; i<n_local_training_samples; i++)
     {
-      unsigned int index = first_index + i;
+      numeric_index_type index = first_index + i;
       training_vector->set(index, new_training_set[param_name][i]);
     }
   }
@@ -417,10 +417,10 @@ void RBConstructionBase<Base>::generate_training_parameters_random(std::map<std:
       std::string param_name = it->first;
       NumericVector<Number>* training_vector = it->second;
 
-      unsigned int first_index = training_vector->first_local_index();
-      for(unsigned int i=0; i<training_vector->local_size(); i++)
+      numeric_index_type first_index = training_vector->first_local_index();
+      for(numeric_index_type i=0; i<training_vector->local_size(); i++)
       {
-        unsigned int index = first_index + i;
+        numeric_index_type index = first_index + i;
         Real random_number = ((double)std::rand())/RAND_MAX; // in range [0,1]
 
         // Generate log10 scaled training parameters
@@ -559,10 +559,10 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
         Real min_param = min_parameters.get_value(param_name);
         Real max_param = max_parameters.get_value(param_name);
     
-        unsigned int first_index = training_vector->first_local_index();
-        for(unsigned int i=0; i<training_vector->local_size(); i++)
+        numeric_index_type first_index = training_vector->first_local_index();
+        for(numeric_index_type i=0; i<training_vector->local_size(); i++)
         {
-          unsigned int index = first_index+i;
+          numeric_index_type index = first_index+i;
           if(use_log_scaling)
           {
             Real epsilon = 1.e-6; // Prevent rounding errors triggering asserts
@@ -594,10 +594,10 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
       }
       else // Otherwise, generate random parameters
       {
-        unsigned int first_index = training_vector->first_local_index();
-        for(unsigned int i=0; i<training_vector->local_size(); i++)
+        numeric_index_type first_index = training_vector->first_local_index();
+        for(numeric_index_type i=0; i<training_vector->local_size(); i++)
         {
-          unsigned int index = first_index + i;
+          numeric_index_type index = first_index + i;
           Real random_number = ((double)std::rand())/RAND_MAX; // in range [0,1]
 
           // Generate log10 scaled training parameters
@@ -701,10 +701,10 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::m
     Real min_param = min_parameters.begin()->second;
     Real max_param = max_parameters.begin()->second;
     
-    unsigned int first_index = training_vector->first_local_index();
-    for(unsigned int i=0; i<training_vector->local_size(); i++)
+    numeric_index_type first_index = training_vector->first_local_index();
+    for(numeric_index_type i=0; i<training_vector->local_size(); i++)
     {
-      unsigned int index = first_index+i;
+      numeric_index_type index = first_index+i;
       if(use_log_scaling)
       {
         Real epsilon = 1.e-6; // Prevent rounding errors triggering asserts

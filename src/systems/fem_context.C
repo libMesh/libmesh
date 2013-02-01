@@ -251,7 +251,8 @@ void FEMContext::interior_values (unsigned int var,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
+  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+    (dof_indices_var[var].size());
   
   // Get current local coefficients  
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -337,7 +338,8 @@ void FEMContext::interior_gradients
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
+  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+    (dof_indices_var[var].size());
 
   // Get current local coefficients  
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -425,7 +427,8 @@ void FEMContext::interior_hessians
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
+  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+    (dof_indices_var[var].size());
 
   // Get current local coefficients  
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -464,7 +467,8 @@ void FEMContext::interior_curl(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
+  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+    (dof_indices_var[var].size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -498,7 +502,8 @@ void FEMContext::interior_div(unsigned int var, unsigned int qp,
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
+  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+    (dof_indices_var[var].size());
 
   // Get current local coefficients
   libmesh_assert_greater (elem_subsolutions.size(), var);
@@ -575,7 +580,8 @@ void FEMContext::side_values
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
+  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+    (dof_indices_var[var].size());
   
   // Get current local coefficients  
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -660,7 +666,8 @@ void FEMContext::side_gradients
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
+  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+    (dof_indices_var[var].size());
 
   // Get current local coefficients  
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);
@@ -748,7 +755,8 @@ void FEMContext::side_hessians
 
   // Get local-to-global dof index lookup
   libmesh_assert_greater (dof_indices.size(), var);
-  const unsigned int n_dofs = dof_indices_var[var].size();
+  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+    (dof_indices_var[var].size());
 
   // Get current local coefficients  
   const DenseSubVector<Number> &coef = get_localized_subvector(_system_vector, var);

@@ -223,11 +223,12 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
       libmesh_assert_less (global_index, subdomain_bounds.back());
       libmesh_assert_less (global_index, n_unpartitioned_elements);
 
-      const unsigned int subdomain_id =
-	std::distance(subdomain_bounds.begin(),
-		      std::upper_bound(subdomain_bounds.begin(),
-				       subdomain_bounds.end(),
-				       global_index));
+      const processor_id_type subdomain_id =
+	libmesh_cast_int<processor_id_type>
+	(std::distance(subdomain_bounds.begin(),
+		       std::upper_bound(subdomain_bounds.begin(),
+				        subdomain_bounds.end(),
+				        global_index)));
       libmesh_assert_less (subdomain_id, n_subdomains);
 
       elem->processor_id() = subdomain_id;

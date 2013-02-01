@@ -728,9 +728,11 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
 
   this->update();
 
+  const unsigned int Nq = libmesh_cast_int<unsigned int>(qoi.size());
+
   // the quantity of interest is assumed to be a sum of element and
   // side terms
-  for (std::size_t i=0; i != qoi.size(); ++i)
+  for (unsigned int i=0; i != Nq; ++i)
     if (qoi_indices.has_index(i))
       qoi[i] = 0;
 

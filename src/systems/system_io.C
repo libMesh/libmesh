@@ -723,7 +723,7 @@ void System::read_serialized_data (Xdr& io,
 
   // PerfLog pl("IO Performance",false);
   // pl.push("read_serialized_data");
-  unsigned int total_read_size = 0;
+  std::size_t total_read_size = 0;
 
   // 10.)
   // Read the global solution vector
@@ -804,7 +804,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   
   const unsigned int
     sys_num    = this->number(),
-    num_vecs   = vecs.size(),
+    num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
     num_vars   = _written_var_indices.size(); // must be <= current number of variables! 
   const dof_id_type
     io_blksize = std::min(max_io_blksize, n_objects),
@@ -1056,7 +1056,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 		  
 		      for (unsigned int comp=0; comp<n_comp; comp++, ++val_it)
 			{
-			  const unsigned int dof_index = (*it)->dof_number (sys_num, *var_it, comp);
+			  const dof_id_type dof_index = (*it)->dof_number (sys_num, *var_it, comp);
 			  libmesh_assert (val_it != vals.end());
 			  libmesh_assert_greater_equal (dof_index, vec.first_local_index());
 			  libmesh_assert_less (dof_index, vec.last_local_index());
@@ -1150,7 +1150,8 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
   CommWorld.broadcast(vector_length);
 
   const unsigned int
-    n_vars  = this->_written_var_indices.size(),
+    n_vars  = this->_written_var_indices.size();
+  const dof_id_type
     n_nodes = this->get_mesh().n_nodes(),
     n_elem  = this->get_mesh().n_elem();
   
@@ -1468,7 +1469,7 @@ void System::write_parallel_data (Xdr &io,
    */
   // PerfLog pl("IO Performance",false);
   // pl.push("write_parallel_data");
-  unsigned int total_written_size = 0;
+  std::size_t total_written_size = 0;
   
   std::string comment;
 
@@ -1676,7 +1677,7 @@ void System::write_serialized_data (Xdr& io,
 
   // PerfLog pl("IO Performance",false);
   // pl.push("write_serialized_data");
-  unsigned int total_written_size = 0;
+  std::size_t total_written_size = 0;
   
   total_written_size +=
     this->write_serialized_vector(io, *this->solution);
@@ -1805,7 +1806,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 
   const unsigned int
     sys_num    = this->number(),
-    num_vecs   = vecs.size(),
+    num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
     num_blks   = std::ceil(static_cast<double>(n_objects)/static_cast<double>(io_blksize));
 
   // std::cout << "io_blksize = "    << io_blksize
@@ -2073,8 +2074,10 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
       const DofMap& dof_map = this->get_dof_map();
       std::vector<dof_id_type> SCALAR_dofs;
       dof_map.SCALAR_dof_indices(SCALAR_dofs, var);
+      const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+        (SCALAR_dofs.size());
 
-      for(unsigned int i=0; i<SCALAR_dofs.size(); i++)
+      for(unsigned int i=0; i<n_dofs; i++)
         {
           vals.push_back( vec(SCALAR_dofs[i]) );
         }
@@ -2104,7 +2107,7 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
   if (libMesh::processor_id() == 0)
     {
       io.data_stream (&vals[0], vals.size());
-      written_length += vals.size();
+      written_length += libmesh_cast_int<unsigned int>(vals.size());
     }
 
   return written_length;
@@ -2267,7 +2270,7 @@ dof_id_type System::write_serialized_vectors (Xdr &io,
   if (libMesh::processor_id() == 0) 
     {
       unsigned int
-	n_vec    = vectors.size();
+	n_vec    = libmesh_cast_int<unsigned int>(vectors.size());
       dof_id_type
 	vec_size = vectors.empty() ? 0 : vectors[0]->size();
       // Set the number of vectors

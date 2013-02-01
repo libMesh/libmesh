@@ -116,7 +116,7 @@ namespace libMesh
   {
     _dof_ids.clear();
 
-    std::vector<std::vector<unsigned int> > dof_ids_per_processor(libMesh::n_processors());
+    std::vector<std::vector<dof_id_type> > dof_ids_per_processor(libMesh::n_processors());
 
     const DofMap & dof_map = _system.get_dof_map();
     std::vector<dof_id_type> dof_indices;
@@ -136,7 +136,7 @@ namespace libMesh
 		dof_map.dof_indices (elem, dof_indices, *it);
 		for(size_t i=0; i<dof_indices.size(); i++)
 		  {
-		    const unsigned int dof = dof_indices[i];
+		    const dof_id_type dof = dof_indices[i];
 		    for(unsigned int proc=0; proc<libMesh::n_processors(); proc++)
 		      {
 			if((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
@@ -160,7 +160,7 @@ namespace libMesh
       }
     for(unsigned int proc=0; proc<libMesh::n_processors(); proc++)
       {
-	std::vector<unsigned int> received_dofs;
+	std::vector<dof_id_type> received_dofs;
 	if(proc==libMesh::processor_id())
 	  {
 	    received_dofs = dof_ids_per_processor[proc];

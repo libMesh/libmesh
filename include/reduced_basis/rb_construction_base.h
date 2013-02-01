@@ -90,22 +90,22 @@ public:
   /**
    * Get the total number of training samples.
    */
-  unsigned int get_n_training_samples() const;
+  numeric_index_type get_n_training_samples() const;
 
   /**
    * Get the total number of training samples local to this processor.
    */
-  unsigned int get_local_n_training_samples() const;
+  numeric_index_type get_local_n_training_samples() const;
 
   /**
    * Get the first local index of the training parameters.
    */
-  unsigned int get_first_local_training_index() const;
+  numeric_index_type get_first_local_training_index() const;
 
   /**
    * Get the last local index of the training parameters.
    */
-  unsigned int get_last_local_training_index() const;
+  numeric_index_type get_last_local_training_index() const;
 
   /**
    * Initialize the parameter ranges and indicate whether deterministic
