@@ -44,11 +44,11 @@ the library are:
 
 To select a set of methods, you can pass them to configure in one of two ways:
 
-$ ./configure --with-methods="opt dbg devel"
+    $ ./configure --with-methods="opt dbg devel"
 
 or
 
-$ ./configure METHODS="devel oprof"
+    $ ./configure METHODS="devel oprof"
 
 If unspecified, the three METHODS="opt dbg devel" are default.
 
@@ -67,5 +67,25 @@ the same source tree by creating a subdirectory for each compiler build:
     $ cd $LIBMESH_SRC && mkdir gcc-4.6 && cd gcc-4.6 && ../configure && make && make install
     $ module swap gcc intel/12.1
     $ cd $LIBMESH_SRC && mkdir intel-12.1 && cd intel-12.1 && ../configure && make && make install
+
+
+Dependencies
+============
+
+Requirements
+------------
+
+libMesh has no required dependencies other than a reasonably modern C
+& C++ compiler.  To run on distributed memory platforms in parallel
+you will also need MPI.
+
+Optional Packages
+-----------------
+
+We support a large number of optional packages, some of which are
+distributed inside the ./contrib directory and are compiler directly
+with libMesh, others can be used from third-party installation.  For a
+list of supported packages and optional dependencies see
+[here](http://libmesh.sourceforge.net/externalsoftware.php)
 
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/52c0727babae956821cca66c19c68908 "githalytics.com")](http://githalytics.com/libMesh/libmesh)
