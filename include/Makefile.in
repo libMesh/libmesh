@@ -768,6 +768,7 @@ include_HEADERS = \
         solution_transfer/dtk_solution_transfer.h \
         solution_transfer/meshfree_interpolation.h \
         solution_transfer/meshfree_solution_transfer.h \
+        solution_transfer/meshfunction_solution_transfer.h \
         solution_transfer/solution_transfer.h \
         solvers/adaptive_time_solver.h \
         solvers/diff_solver.h \
