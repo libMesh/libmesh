@@ -96,7 +96,7 @@ dev_table_entry("images/roystgnr.jpg",
 dev_table_entry("images/pbauman.jpg",
                 "Dr. Paul T. Bauman",
                 "http://pecos.ices.utexas.edu/faculty-staff/researchers",
-		"http://pecos.ices.utexas.edu/wp-content/uploads/2009/08/cv1.pdf",
+                "<a href=\"http://pecos.ices.utexas.edu/wp-content/uploads/2009/08/cv1.pdf\">(curriculum vitae)</a>",
 		"Developer",
 		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
 ?>
