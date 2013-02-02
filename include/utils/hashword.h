@@ -169,7 +169,7 @@ namespace libMesh
 
       uint64_t c = 0;
       unsigned int shift=0;
-      for (std::size_t i=0; i != length; ++i)
+      for (size_t i=0; i != length; ++i)
 	{
 	  c += (k[i] << shift) % bp;
 	  shift += 5;
@@ -187,7 +187,7 @@ namespace libMesh
 
       uint16_t c = 0;
       uint16_t shift=0;
-      for (std::size_t i=0; i != length; ++i)
+      for (size_t i=0; i != length; ++i)
 	{
 	  c = static_cast<uint16_t>
 	    (c + static_cast<uint16_t>(k[i] << shift) % bp);
