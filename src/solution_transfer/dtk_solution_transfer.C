@@ -64,16 +64,16 @@ DTKSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var
 {
   libmesh_experimental();
 
-  EquationSystems * from_es = &from_var.sys()->get_equation_systems();
-  EquationSystems * to_es = &to_var.sys()->get_equation_systems();
+  EquationSystems * from_es = &from_var.system()->get_equation_systems();
+  EquationSystems * to_es = &to_var.system()->get_equation_systems();
 
   // Possibly make an Adapter for from_es
   if(adapters.find(from_es) == adapters.end())
     adapters[from_es] = new DTKAdapter(comm_default, *from_es);
-  
+
   // Possibly make an Adapter for to_es
   if(adapters.find(to_es) == adapters.end())
-    adapters[to_es] = new DTKAdapter(comm_default, *to_es);  
+    adapters[to_es] = new DTKAdapter(comm_default, *to_es);
 
   DTKAdapter * from_adapter = adapters[from_es];
   DTKAdapter * to_adapter = adapters[to_es];
@@ -84,7 +84,7 @@ DTKSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var
   if(dtk_maps.find(from_to) == dtk_maps.end())
   {
     libmesh_assert(from_es->get_mesh().mesh_dimension() == to_es->get_mesh().mesh_dimension());
-    
+
     shared_domain_map_type * map = new shared_domain_map_type(comm_default, from_es->get_mesh().mesh_dimension(), true);
     dtk_maps[from_to] = map;
 
@@ -94,7 +94,7 @@ DTKSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var
 
   DTKAdapter::RCP_Evaluator from_evaluator = from_adapter->get_variable_evaluator(from_var.name());
   Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType> > to_values = to_adapter->get_values_to_fill(to_var.name());
-  
+
   dtk_maps[from_to]->apply(from_evaluator, to_values);
 
   if(dtk_maps[from_to]->getMissedTargetPoints().size())
