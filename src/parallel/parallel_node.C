@@ -247,7 +247,8 @@ void unpack (std::vector<int>::const_iterator in,
 
 #ifndef NDEBUG
   libmesh_assert (in - original_in == 
-		  Parallel::packed_size(node, original_in));
+		  static_cast<int>
+                    (Parallel::packed_size(node, original_in)));
 #endif
 }
 

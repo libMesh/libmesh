@@ -433,8 +433,14 @@ void VTKIO::read (const std::string& name)
 
 
 void VTKIO::write_nodal_data (const std::string& fname,
+#ifdef LIBMESH_HAVE_VTK
                               const std::vector<Number>& soln,
-                              const std::vector<std::string>& names)
+                              const std::vector<std::string>& names
+#else
+                              const std::vector<Number>&,
+                              const std::vector<std::string>&
+#endif
+)
 {
 #ifndef LIBMESH_HAVE_VTK
 

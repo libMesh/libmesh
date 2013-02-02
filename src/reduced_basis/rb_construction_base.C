@@ -836,7 +836,12 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::m
 
 template <class Base>
 std::pair<std::string,std::string>
-RBConstructionBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >& ls)
+RBConstructionBase<Base>::set_alternative_solver
+  (AutoPtr<LinearSolver<Number> >&
+#ifdef LIBMESH_HAVE_PETSC
+    ls
+#endif
+  )
 {
   // It seems that setting it this generic way has no effect...
   // PreconditionerType orig_pc = this->linear_solver->preconditioner_type();
@@ -919,8 +924,15 @@ RBConstructionBase<Base>::set_alternative_solver(AutoPtr<LinearSolver<Number> >&
 
 
 template <class Base>
-void RBConstructionBase<Base>::reset_alternative_solver(AutoPtr<LinearSolver<Number> >& ls,
-					                const std::pair<std::string,std::string>& orig)
+void RBConstructionBase<Base>::reset_alternative_solver(
+#ifdef LIBMESH_HAVE_PETSC
+  AutoPtr<LinearSolver<Number> >& ls,
+  const std::pair<std::string,std::string>& orig
+#else
+  AutoPtr<LinearSolver<Number> >&,
+  const std::pair<std::string,std::string>&
+#endif
+)
 {
 #ifdef LIBMESH_HAVE_PETSC
 
