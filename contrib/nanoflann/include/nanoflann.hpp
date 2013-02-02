@@ -234,11 +234,7 @@ namespace nanoflann
 	/** @addtogroup metric_grp Metric (distance) classes
 	  * @{ */
 
-	template<typename T> inline T abs(T x) { return (x<0) ? -x : x; }
-	template<> inline int abs<int>(int x) { return ::abs(x); }
-	template<> inline float abs<float>(float x) { return fabsf(x); }
-	template<> inline double abs<double>(double x) { return fabs(x); }
-	template<> inline long double abs<long double>(long double x) { return fabsl(x); }
+	template<typename T> inline T abs(T x) { return std::abs(x); }
 
 	/** Manhattan distance functor (generic version, optimized for high-dimensionality data sets).
 	  *  Corresponding distance traits: nanoflann::metric_L1
