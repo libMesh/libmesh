@@ -273,6 +273,9 @@ void VTKIO::system_vectors_to_vtk(const EquationSystems& es,vtkUnstructuredGrid*
 			for(unsigned int i=0;i<it->second.size();++i){
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+				libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n" 
+						              << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
+						              << std::endl);
 				data->SetValue(i,it->second[i].real());
 #else
 				data->SetValue(i,it->second[i]);
@@ -487,7 +490,15 @@ void VTKIO::write_nodal_data (const std::string& fname,
             {
               if (_local_node_map.find(k) == _local_node_map.end())
                 continue; // not a local node
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+	      libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n" 
+					    << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
+					    << std::endl);
+	      data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
+#else
               data->SetValue(_local_node_map[k], soln[k*num_vars + variable]);
+#endif
             }
           _vtk_grid->GetPointData()->AddArray(data);
           data->Delete();
@@ -516,7 +527,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
 #if !VTK_VERSION_LESS_THAN(5,6,0)
       writer->SetCompressorTypeToZLib();
 #else
-      libmesh_do_once(libMesh::out << "Compression not implemented with old VTK libs!" << std::endl;);
+      libmesh_do_once(libMesh::err << "Compression not implemented with old VTK libs!" << std::endl;);
 #endif
     }
 
