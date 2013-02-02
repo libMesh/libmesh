@@ -92,6 +92,16 @@ dev_table_entry("images/roystgnr.jpg",
  		"<a href=\"http://www.inl.gov\">Idaho National Laboratory</a>");
 ?>
 
+<?php
+dev_table_entry("images/pbauman.jpg",
+                "Dr. Paul T. Bauman",
+                "http://pecos.ices.utexas.edu/faculty-staff/researchers",
+		"http://pecos.ices.utexas.edu/wp-content/uploads/2009/08/cv1.pdf",
+		"Developer",
+		"<a href=\"http://www.utexas.edu\">University of Texas at Austin</a>");
+?>
+
+
 <br>
 <br>
 
