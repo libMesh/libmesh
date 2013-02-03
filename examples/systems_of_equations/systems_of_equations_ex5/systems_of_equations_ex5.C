@@ -1,4 +1,4 @@
-/* The Next Great Finite Element Library. */
+/* The libMesh Finite Element Library. */
 /* Copyright (C) 2003  Benjamin S. Kirk */
 
 /* This library is free software; you can redistribute it and/or */
