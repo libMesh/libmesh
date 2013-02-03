@@ -114,6 +114,13 @@ function check_autotool_prerequisites ()
 check_autotool_prerequisites
 build_autotools=$?
 
+#########################################################################################
+for arg in $@; do
+    if (test "x$arg" = "x--build-autotools"); then
+	echo "building autotools at user request"
+	build_autotools=1
+    fi
+done
 
 
 #########################################################################################
