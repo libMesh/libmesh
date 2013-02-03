@@ -66,7 +66,7 @@ void HeatSystem::element_qoi_derivative (DiffContext &context,
   
   std::vector<Number> old_adjoint (n_qpoints, 0);
   
-  c.interior_values<Real>(0, adjoint_solution, old_adjoint);
+  c.interior_values<Number>(0, adjoint_solution, old_adjoint);
 
   // Our QoI depends solely on the final time, so there are no QoI contributions.
   // However, there is a contribution from the adjoint solution timestep, for the 

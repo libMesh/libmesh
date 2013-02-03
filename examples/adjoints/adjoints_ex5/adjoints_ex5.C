@@ -249,6 +249,9 @@ int main (int argc, char** argv)
 #ifndef LIBMESH_ENABLE_AMR
   libmesh_example_assert(false, "--enable-amr");
 #else
+  // Skip this 2D example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+
   // Initialize libMesh.
   LibMeshInit init (argc, argv);
 
@@ -516,7 +519,7 @@ int main (int argc, char** argv)
 
     // Now that we computed the accumulated, perturbed residuals, we can compute the
     // approximate sensitivity
-    Real sensitivity_0_0 = (dynamic_cast<HeatSystem&>(system)).compute_final_sensitivity();
+    Number sensitivity_0_0 = (dynamic_cast<HeatSystem&>(system)).compute_final_sensitivity();
 
     // Print it out
     std::cout<<"Sensitivity of QoI 0 w.r.t parameter 0 is: " << sensitivity_0_0 << std::endl;

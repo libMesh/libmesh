@@ -121,13 +121,13 @@ protected:
   bool _analytic_jacobians;
 
   // Variables to hold the perturbed residuals
-  Real R_plus_dp;
-  Real R_minus_dp;
+  Number R_plus_dp;
+  Number R_minus_dp;
 
   // Perturbation parameter
   Real dp;
 
   // The final computed sensitivity
-  Real final_sensitivity;
+  Number final_sensitivity;
   
 };
