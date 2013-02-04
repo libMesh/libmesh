@@ -263,7 +263,6 @@ int main (int argc, char** argv)
       }
   }
   GetPot infile("general.in");
-  GetPot infile_l_shaped("l-shaped.in");
 
   // Read in parameters from the input file
   FEMParameters param;
@@ -364,12 +363,12 @@ int main (int argc, char** argv)
 	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
 	system.set_adjoint_already_solved(true);
 
-	GetPot infile("l-shaped.in");
+	GetPot infile_l_shaped("l-shaped.in");
 
 	Number sensitivity_QoI_0_0_computed = sensitivities[0][0];
-	Number sensitivity_QoI_0_0_exact = infile("sensitivity_0_0", 0.0);
+	Number sensitivity_QoI_0_0_exact = infile_l_shaped("sensitivity_0_0", 0.0);
 	Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
-	Number sensitivity_QoI_0_1_exact = infile("sensitivity_0_1", 0.0);
+	Number sensitivity_QoI_0_1_exact = infile_l_shaped("sensitivity_0_1", 0.0);
 		
 	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
                       << " active elements and "
@@ -482,12 +481,12 @@ int main (int argc, char** argv)
 	// Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, so we dont solve unneccesarily in the error estimator
 	system.set_adjoint_already_solved(true);
 
-	GetPot infile("l-shaped.in");
+	GetPot infile_l_shaped("l-shaped.in");
 
 	Number sensitivity_QoI_0_0_computed = sensitivities[0][0];
-	Number sensitivity_QoI_0_0_exact = infile("sensitivity_0_0", 0.0);
+	Number sensitivity_QoI_0_0_exact = infile_l_shaped("sensitivity_0_0", 0.0);
 	Number sensitivity_QoI_0_1_computed = sensitivities[0][1];
-	Number sensitivity_QoI_0_1_exact = infile("sensitivity_0_1", 0.0);
+	Number sensitivity_QoI_0_1_exact = infile_l_shaped("sensitivity_0_1", 0.0);
 		
 	std::cout << "Adaptive step " << a_step << ", we have " << mesh.n_active_elem()
 		  << " active elements and "
