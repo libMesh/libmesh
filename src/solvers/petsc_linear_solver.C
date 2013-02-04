@@ -46,7 +46,14 @@ extern "C"
   PetscErrorCode __libmesh_petsc_preconditioner_setup (void * ctx)
   {
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
-    preconditioner->init();
+
+    if(!preconditioner->initialized())
+    {
+      err<<"Preconditioner not initialized!  Make sure you call init() before solve!"<<std::endl;
+      libmesh_error();
+    }
+
+    preconditioner->setup();
 
     return 0;
   }
@@ -69,7 +76,14 @@ extern "C"
     void *ctx;
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
-    preconditioner->init();
+
+    if(!preconditioner->initialized())
+    {
+      err<<"Preconditioner not initialized!  Make sure you call init() before solve!"<<std::endl;
+      libmesh_error();
+    }
+
+    preconditioner->setup();
 
     return 0;
   }
@@ -249,6 +263,7 @@ void PetscLinearSolver<T>::init ()
       //If there is a preconditioner object we need to set the internal setup and apply routines
       if(this->_preconditioner)
       {
+        this->_preconditioner->init();
         PCShellSetContext(_pc,(void*)this->_preconditioner);
         PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
         PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
@@ -366,6 +381,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
       if(this->_preconditioner)
       {
         this->_preconditioner->set_matrix(*matrix);
+        this->_preconditioner->init();
         PCShellSetContext(_pc,(void*)this->_preconditioner);
         PCShellSetSetUp(_pc,__libmesh_petsc_preconditioner_setup);
         PCShellSetApply(_pc,__libmesh_petsc_preconditioner_apply);
@@ -648,6 +664,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 	{
 	  subprecond_matrix = new PetscMatrix<Number>(subprecond);
 	  this->_preconditioner->set_matrix(*subprecond_matrix);
+          this->_preconditioner->init();
 	}
     }
   else
@@ -657,7 +674,10 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       if(this->_preconditioner)
+      {
 	this->_preconditioner->set_matrix(matrix_in);
+        this->_preconditioner->init();
+      }
     }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
@@ -718,6 +738,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 	  /* Before we delete subprecond_matrix, we should give the
 	     _preconditioner a different matrix.  */
 	  this->_preconditioner->set_matrix(matrix_in);
+          this->_preconditioner->init();
 	  delete subprecond_matrix;
 	  subprecond_matrix = NULL;
 	}
@@ -980,6 +1001,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
 	{
 	  subprecond_matrix = new PetscMatrix<Number>(subprecond);
 	  this->_preconditioner->set_matrix(*subprecond_matrix);
+          this->_preconditioner->init();
 	}
     }
   else
@@ -989,7 +1011,10 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       if(this->_preconditioner)
+      {
 	this->_preconditioner->set_matrix(matrix_in);
+        this->_preconditioner->init();
+      }
     }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
@@ -1050,6 +1075,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
 	  /* Before we delete subprecond_matrix, we should give the
 	     _preconditioner a different matrix.  */
 	  this->_preconditioner->set_matrix(matrix_in);
+          this->_preconditioner->init();
 	  delete subprecond_matrix;
 	  subprecond_matrix = NULL;
 	}
@@ -1552,6 +1578,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 	{
 	  subprecond_matrix = new PetscMatrix<Number>(subprecond);
 	  this->_preconditioner->set_matrix(*subprecond_matrix);
+          this->_preconditioner->init();
 	}
     }
   else
@@ -1561,7 +1588,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
       if(this->_preconditioner)
+      {
 	this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
+        this->_preconditioner->init();
+      }
     }
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
@@ -1622,6 +1652,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 	  /* Before we delete subprecond_matrix, we should give the
 	     _preconditioner a different matrix.  */
 	  this->_preconditioner->set_matrix(const_cast<SparseMatrix<Number>&>(precond_matrix));
+          this->_preconditioner->init();
 	  delete subprecond_matrix;
 	  subprecond_matrix = NULL;
 	}
@@ -1760,7 +1791,7 @@ void PetscLinearSolver<T>::set_petsc_solver_type()
 #else
       ierr = KSPSetType (_ksp, (char*) KSPCHEBYSHEV);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
 #endif
-      
+
 
     default:
       libMesh::err << "ERROR:  Unsupported PETSC Solver: "

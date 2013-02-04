@@ -329,6 +329,8 @@ void PetscNonlinearSolver<T>::init ()
         ierr = KSPGetPC(ksp,&pc);
                CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
+        this->_preconditioner->init();
+
         PCSetType(pc, PCSHELL);
         PCShellSetContext(pc,(void*)this->_preconditioner);
 
@@ -462,11 +464,11 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
    {
      MatNullSpace msp = PETSC_NULL;
      this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, &msp);
-     
+
      if(msp) {
        ierr = MatSetNearNullSpace(jac->mat(), msp);
        CHKERRABORT(libMesh::COMM_WORLD,ierr);
-       
+
        ierr = MatNullSpaceDestroy(&msp);
        CHKERRABORT(libMesh::COMM_WORLD,ierr);
      }
@@ -497,7 +499,10 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
   //Set the preconditioning matrix
   if(this->_preconditioner)
+  {
     this->_preconditioner->set_matrix(jac_in);
+    this->_preconditioner->init();
+  }
 
 //    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
 //           CHKERRABORT(libMesh::COMM_WORLD,ierr);

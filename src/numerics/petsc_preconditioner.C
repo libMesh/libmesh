@@ -68,12 +68,15 @@ void PetscPreconditioner<T>::init ()
   // Clear the preconditioner in case it has been created in the past
   if (!this->_is_initialized)
   {
-    // Create the preconditioning object
-    if (!_pc)
+    // Should probably use PCReset(), but it's not working at the moment so we'll destroy instead
+    if (_pc)
     {
-      int ierr = PCCreate(libMesh::COMM_WORLD,&_pc);
+      int ierr = PCDestroy(&_pc);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
+
+    int ierr = PCCreate(libMesh::COMM_WORLD,&_pc);
+    CHKERRABORT(libMesh::COMM_WORLD,ierr);
 
     PetscMatrix<T> * pmatrix = libmesh_cast_ptr<PetscMatrix<T>*, SparseMatrix<T> >(this->_matrix);
 
