@@ -47,11 +47,11 @@ public:
     output(_u_var+2) = soln( 2, x, y, z );
   }
 
-  virtual Number component( unsigned int component, const Point& p,
+  virtual Number component( unsigned int component_in, const Point& p,
 			    const Real )
   {
     const Real x=p(0), y=p(1), z=p(2);
-    return soln( component, x, y, z );
+    return soln( component_in, x, y, z );
   }
 
   virtual AutoPtr<FunctionBase<Number> > clone() const
@@ -87,11 +87,11 @@ public:
     output(_u_var+2) = soln( 2, x, y, z );
   }
 
-  virtual Gradient component( unsigned int component, const Point& p,
+  virtual Gradient component( unsigned int component_in, const Point& p,
 			    const Real )
   {
     const Real x=p(0), y=p(1), z=p(2);
-    return soln( component, x, y, z );
+    return soln( component_in, x, y, z );
   }
 
   virtual AutoPtr<FunctionBase<Gradient> > clone() const
