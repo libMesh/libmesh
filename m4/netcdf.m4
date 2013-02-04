@@ -37,7 +37,7 @@ AC_DEFUN([CONFIGURE_NETCDF],
 	  fi
 
 	  #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+	  #libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
 
 	  AC_MSG_RESULT(<<< Configuring library with NetCDF version 4 support >>>)
 	  ;;

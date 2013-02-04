@@ -36,7 +36,14 @@ namespace libMesh
 // correctly extern C'd but it doesn't hurt :)
 namespace Nemesis {
   extern "C" {
-#include "ne_nemesisI.h"
+    // this include guard gets set by exodus, but we included it
+    // in a namespace, so nemesis will not properly resolve e.g.
+    // ex_entity_id in the global namespace.  undefine the guard
+    // to get ne_nemesisI.h to properly include the typedefs
+#  ifdef EXODUS_II_HDR
+#    undef EXODUS_II_HDR
+#  endif
+#  include "ne_nemesisI.h"
   }
 }
 

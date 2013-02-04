@@ -31719,7 +31719,7 @@ $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 	  fi
 
 	  #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+	  #libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
 
 	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
