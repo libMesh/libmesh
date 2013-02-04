@@ -43,9 +43,9 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-SolidSystem::SolidSystem(EquationSystems& es, const std::string& name,
-    const unsigned int number) :
-    FEMSystem(es, name, number) {
+SolidSystem::SolidSystem(EquationSystems& es, const std::string& name_in,
+    const unsigned int number_in) :
+    FEMSystem(es, name_in, number_in) {
 
   // Add a time solver. We are just looking at a steady state problem here.
   this->time_solver = AutoPtr<TimeSolver>(new SteadySolver(*this));

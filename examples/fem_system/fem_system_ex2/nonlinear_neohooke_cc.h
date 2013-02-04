@@ -37,8 +37,8 @@ using namespace libMesh;
 class NonlinearNeoHookeCurrentConfig {
 public:
   NonlinearNeoHookeCurrentConfig(
-      const std::vector<std::vector<RealGradient> >& dphi, GetPot& args) :
-      dphi(dphi) {
+      const std::vector<std::vector<RealGradient> >& dphi_in, GetPot& args) :
+      dphi(dphi_in) {
     E = args("material/neohooke/e_modulus", 10000.0);
     nu = args("material/neohooke/nu", 0.3);
   }
