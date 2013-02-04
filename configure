@@ -31687,8 +31687,6 @@ $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
-     subdirs="$subdirs contrib/netcdf/v4"
-
 
   else
      NETCDF_INCLUDE=""
@@ -31696,6 +31694,8 @@ $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
   fi
 
   ac_config_files="$ac_config_files contrib/netcdf/v3/Makefile"
+
+  subdirs="$subdirs contrib/netcdf/v4"
 
 
 
