@@ -107,7 +107,6 @@ if (test "x$enableoptional" = "xyes"); then
 #  fi
   echo '  'eigen............................ : $enableeigen
   echo '  'exodus........................... : $enableexodus
-  echo '  'netcdf........................... : $enablenetcdf
   if (test "x$exodusversion" != "xno"); then
   echo '     'version....................... : $exodusversion
   fi

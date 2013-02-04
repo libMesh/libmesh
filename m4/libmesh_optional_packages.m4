@@ -14,10 +14,13 @@ AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 # By contrast, libmesh_contrib_INCLUDES point inside the 
 # source tree for building contributed packages that do not 
 # need to be exported as part of the installation environment.
+# 
+# libmesh_subpackage_arguments is a list of configure arguments
+# that will be passed down to any subpackages that we are nesting.
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
 libmesh_contrib_INCLUDES=""
-
+libmesh_subpackage_arguments=""
 
 
 # --------------------------------------------------------------
@@ -26,8 +29,12 @@ libmesh_contrib_INCLUDES=""
 AC_ARG_ENABLE(optional,
               AC_HELP_STRING([--enable-optional],
                              [en/disable optional external libraries]),
-              enableoptional=$enableval,
-              enableoptional=yes)
+	      [case "${enableval}" in
+	      	  yes) enableoptional=yes ;;
+		   no) enableoptional=no ;;
+ 		    *) AC_MSG_ERROR(bad value ${enableval} for --enable-optional) ;;
+	       esac],
+              [enableoptional=yes])
 
 # Note that even when optional packages are disabled we need to
 # run their m4 macros to get proper AM_CONDITIONALs.  Just be
@@ -39,6 +46,18 @@ if test "$enableoptional" != no ; then
 fi
 
 
+# --------------------------------------------------------------
+# Allow for disable-nested
+# --------------------------------------------------------------
+AC_ARG_ENABLE(nested,
+              AC_HELP_STRING([--enable-nested],
+                             [en/disable nested autoconf subpackages]),
+	      [case "${enableval}" in
+	      	  yes) enablenested=yes ;;
+		   no) enablenested=no ;;
+ 		    *) AC_MSG_ERROR(bad value ${enableval} for --enable-nested) ;;
+	       esac],
+              [enablenested=$enableoptional])
 
 # -------------------------------------------------------------
 # Boost -- enabled by default

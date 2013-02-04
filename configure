@@ -1054,6 +1054,7 @@ enable_reference_counting
 enable_perflog
 enable_examples
 enable_optional
+enable_nested
 enable_boost
 with_boost
 with_boost_libdir
@@ -1811,6 +1812,7 @@ Optional Features:
   --enable-examples       support compilation, installation, & running example
                           suite
   --enable-optional       en/disable optional external libraries
+  --enable-nested         en/disable nested autoconf subpackages
   --enable-boost          build with either external or built-in BOOST support
   --enable-petsc          build with PETSc iterative solver suppport
   --enable-slepc          build with SLEPc eigen solver support
@@ -27014,10 +27016,13 @@ $as_echo "---------------------------------------------" >&6; }
 # By contrast, libmesh_contrib_INCLUDES point inside the
 # source tree for building contributed packages that do not
 # need to be exported as part of the installation environment.
+#
+# libmesh_subpackage_arguments is a list of configure arguments
+# that will be passed down to any subpackages that we are nesting.
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
 libmesh_contrib_INCLUDES=""
-
+libmesh_subpackage_arguments=""
 
 
 # --------------------------------------------------------------
@@ -27025,7 +27030,11 @@ libmesh_contrib_INCLUDES=""
 # --------------------------------------------------------------
 # Check whether --enable-optional was given.
 if test "${enable_optional+set}" = set; then :
-  enableval=$enable_optional; enableoptional=$enableval
+  enableval=$enable_optional; case "${enableval}" in
+	      	  yes) enableoptional=yes ;;
+		   no) enableoptional=no ;;
+ 		    *) as_fn_error $? "bad value ${enableval} for --enable-optional" "$LINENO" 5 ;;
+	       esac
 else
   enableoptional=yes
 fi
@@ -27043,6 +27052,20 @@ $as_echo "----- Configuring for optional packages -----" >&6; }
 $as_echo "---------------------------------------------" >&6; }
 fi
 
+
+# --------------------------------------------------------------
+# Allow for disable-nested
+# --------------------------------------------------------------
+# Check whether --enable-nested was given.
+if test "${enable_nested+set}" = set; then :
+  enableval=$enable_nested; case "${enableval}" in
+	      	  yes) enablenested=yes ;;
+		   no) enablenested=no ;;
+ 		    *) as_fn_error $? "bad value ${enableval} for --enable-nested" "$LINENO" 5 ;;
+	       esac
+else
+  enablenested=$enableoptional
+fi
 
 
 # -------------------------------------------------------------
@@ -31670,32 +31693,49 @@ fi
     netcdfversion=no
   fi
 
-  if (test "x$netcdfversion" = "x3"); then
-     # The NETCDF API is distributed with libmesh, so we don't have to guess
-     # where it might be installed...
-     NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v3"
+  case "${netcdfversion}" in
+      3)
+          # The NETCDF API is distributed with libmesh, so we don't have to guess
+          # where it might be installed...
+	  NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v3"
 
 $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 3 support >>>" >&5
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 3 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 3 support >>>" >&6; }
+	  ;;
 
-  elif (test "x$netcdfversion" = "x4"); then
-     NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
+      4)
+	  NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
 
 $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
-$as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
+	  # building netcdf-4 requires that we support nested subpackages
+	  if (test "x$enablenested" = "xno"); then
+	      as_fn_error $? "NetCDF v4 requres nested subpackages, try --enable-nested" "$LINENO" 5
+	  fi
 
-  else
-     NETCDF_INCLUDE=""
-     enablenetcdf=no
-  fi
+	  #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
+$as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
+	  ;;
+
+      *)
+	  NETCDF_INCLUDE=""
+	  enablenetcdf=no
+	  ;;
+  esac
 
   ac_config_files="$ac_config_files contrib/netcdf/v3/Makefile"
 
-  subdirs="$subdirs contrib/netcdf/v4"
+
+  # allow opt-out for nested subpackages
+  if (test "x$enablenested" = "xyes"); then
+      subdirs="$subdirs contrib/netcdf/v4"
+
+  fi
 
 
 
@@ -32558,7 +32598,17 @@ if (test "x$enableexamples" = "xyes"); then
 
 fi
 
-# Create output files
+
+# hackery.  If we are supporting nested autoconf packages and we want to specify
+# additional arguments to be passed to those packages, do that here.
+# Specifically, we append libmesh_subpackage_arguments to ac_configure_args
+# before AC_OUTPUT recurses into our subpackages
+if (test "x$enablenested" = "xyes"); then
+  ac_configure_args_SAVE="$ac_configure_args"
+  ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX=$CXX CC=$CC F77=$F77 FC=$FC"
+fi
+
+# Create output files. Also configures any subpackages
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -36176,7 +36226,10 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-
+# end hackery
+if (test "x$enablenested" = "xyes"); then
+  ac_configure_args="$ac_configure_args_SAVE"
+fi
 
 # Final summary
 
@@ -36272,7 +36325,6 @@ if (test "x$enableoptional" = "xyes"); then
 #  fi
   echo '  'eigen............................ : $enableeigen
   echo '  'exodus........................... : $enableexodus
-  echo '  'netcdf........................... : $enablenetcdf
   if (test "x$exodusversion" != "xno"); then
   echo '     'version....................... : $exodusversion
   fi
