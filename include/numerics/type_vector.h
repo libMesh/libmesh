@@ -651,19 +651,19 @@ typename boostcopy::enable_if_c<
   TypeVector<typename CompareTypes<T, Scalar>::supertype> >::type
 TypeVector<T>::operator * (const Scalar factor) const
 {
-  typedef typename CompareTypes<T, Scalar>::supertype TS;
+  typedef typename CompareTypes<T, Scalar>::supertype SuperType;
 
 #if LIBMESH_DIM == 1
-  return TypeVector<TS>(_coords[0]*factor);
+  return TypeVector<SuperType>(_coords[0]*factor);
 #endif
 
 #if LIBMESH_DIM == 2
-  return TypeVector<TS>(_coords[0]*factor,
+  return TypeVector<SuperType>(_coords[0]*factor,
 		        _coords[1]*factor);
 #endif
 
 #if LIBMESH_DIM == 3
-  return TypeVector<TS>(_coords[0]*factor,
+  return TypeVector<SuperType>(_coords[0]*factor,
 		        _coords[1]*factor,
 		        _coords[2]*factor);
 #endif
