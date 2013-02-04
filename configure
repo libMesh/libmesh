@@ -31791,28 +31791,33 @@ fi
     exodusversion=no
   fi
 
-  if (test "x$exodusversion" = "xv5.09"); then
-     # The EXODUS API is distributed with libmesh, so we don't have to guess
-     # where it might be installed...
-     EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/include"
+  case "${exodusversion}" in
+
+      "v5.09")
+          # The EXODUS API is distributed with libmesh, so we don't have to guess
+          # where it might be installed...
+	  EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/include"
 
 $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
 
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
 $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
+	  ;;
 
-  elif (test "x$exodusversion" = "xv5.22"); then
-     EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/cbind/include"
+      "v5.22")
+	  EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/cbind/include"
 
 $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
 
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
 $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
+	  ;;
 
-  else
-     EXODUS_INCLUDE=""
-     enableexodus=no
-  fi
+      *)
+	  EXODUS_INCLUDE=""
+	  enableexodus=no
+	  ;;
+  esac
 
   ac_config_files="$ac_config_files contrib/exodusii/v5.09/Makefile"
 
