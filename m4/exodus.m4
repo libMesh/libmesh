@@ -15,6 +15,10 @@ AC_DEFUN([CONFIGURE_EXODUS],
 		 [enableexodus=$enablenetcdf ; exodusversion="v5.09"]) # if unspecified, depend on netcdf
 
 
+  # fix for --disable-optional
+  if (test "x$enableexodus" = "xno"); then
+    exodusversion=no
+  fi   
 		
   if (test "x$exodusversion" = "xv5.09"); then
      # The EXODUS API is distributed with libmesh, so we don't have to guess

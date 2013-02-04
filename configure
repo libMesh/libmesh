@@ -31665,7 +31665,10 @@ else
 fi
 
 
-
+  # fix for --disable-optional
+  if (test "x$enablenetcdf" = "xno"); then
+    netcdfversion=no
+  fi
 
   if (test "x$netcdfversion" = "x3"); then
      # The NETCDF API is distributed with libmesh, so we don't have to guess
@@ -31743,6 +31746,10 @@ fi
  # if unspecified, depend on netcdf
 
 
+  # fix for --disable-optional
+  if (test "x$enableexodus" = "xno"); then
+    exodusversion=no
+  fi
 
   if (test "x$exodusversion" = "xv5.09"); then
      # The EXODUS API is distributed with libmesh, so we don't have to guess
@@ -31819,7 +31826,8 @@ fi
  # if unspecified, depend on exodus
 
 
-    if (test "x$enablempi" = xno); then
+  # Trump --enable-nemesis with --disable-mpi
+  if (test "x$enablempi" = xno); then
     enablenemesis=no
   fi
 

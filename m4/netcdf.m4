@@ -12,10 +12,13 @@ AC_DEFUN([CONFIGURE_NETCDF],
 		   no)    enablenetcdf=no;  netcdfversion=no ;;
  		    *)    AC_MSG_ERROR(bad value ${enableval} for --enable-netcdf) ;;
 		 esac],
-		 [enablenetcdf=$enableoptional; netcdfversion=3])
-
-
-				
+		 [enablenetcdf=$enableoptional; netcdfversion=3])				
+		 		
+  # fix for --disable-optional
+  if (test "x$enablenetcdf" = "xno"); then
+    netcdfversion=no
+  fi   
+		
   if (test "x$netcdfversion" = "x3"); then
      # The NETCDF API is distributed with libmesh, so we don't have to guess
      # where it might be installed...

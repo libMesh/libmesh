@@ -14,11 +14,11 @@ AC_DEFUN([CONFIGURE_NEMESIS],
 		 [enablenemesis=$enableexodus]) # if unspecified, depend on exodus
 
 
-  dnl Trump --enable-nemesis with --disable-mpi
+  # Trump --enable-nemesis with --disable-mpi
   if (test "x$enablempi" = xno); then
     enablenemesis=no
   fi	
-		 		
+
   dnl The NEMESIS API is distributed with libmesh, so we don't have to guess
   dnl where it might be installed...
   if (test $enablenemesis = yes); then
