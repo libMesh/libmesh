@@ -356,8 +356,6 @@ include_HEADERS =  \
         utils/mapvector.h \
         utils/null_output_iterator.h \
         utils/number_lookups.h \
-        utils/o_f_stream.h \
-        utils/o_string_stream.h \
         utils/ostream_proxy.h \
         utils/parameters.h \
         utils/perf_log.h \

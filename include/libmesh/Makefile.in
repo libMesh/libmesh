@@ -516,14 +516,13 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	system_subset_by_subdomain.h transient_system.h \
 	compare_types.h error_vector.h hashword.h ignore_warnings.h \
 	location_maps.h mapvector.h null_output_iterator.h \
-	number_lookups.h o_f_stream.h o_string_stream.h \
-	ostream_proxy.h parameters.h perf_log.h perfmon.h plt_loader.h \
-	point_locator_base.h point_locator_list.h point_locator_tree.h \
-	pool_allocator.h restore_warnings.h statistics.h \
-	string_to_enum.h timestamp.h tree.h tree_base.h tree_node.h \
-	utility.h xdr_cxx.h parallel_communicator_specializations \
-	$(am__append_1) $(am__append_3) $(am__append_5) \
-	libmesh_config.h
+	number_lookups.h ostream_proxy.h parameters.h perf_log.h \
+	perfmon.h plt_loader.h point_locator_base.h \
+	point_locator_list.h point_locator_tree.h pool_allocator.h \
+	restore_warnings.h statistics.h string_to_enum.h timestamp.h \
+	tree.h tree_base.h tree_node.h utility.h xdr_cxx.h \
+	parallel_communicator_specializations $(am__append_1) \
+	$(am__append_3) $(am__append_5) libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) libmesh_config.h
 all: $(BUILT_SOURCES)
@@ -1784,12 +1783,6 @@ null_output_iterator.h: $(top_srcdir)/include/utils/null_output_iterator.h
 	$(AM_V_GEN)$(LN_S) $< $@
 
 number_lookups.h: $(top_srcdir)/include/utils/number_lookups.h
-	$(AM_V_GEN)$(LN_S) $< $@
-
-o_f_stream.h: $(top_srcdir)/include/utils/o_f_stream.h
-	$(AM_V_GEN)$(LN_S) $< $@
-
-o_string_stream.h: $(top_srcdir)/include/utils/o_string_stream.h
 	$(AM_V_GEN)$(LN_S) $< $@
 
 ostream_proxy.h: $(top_srcdir)/include/utils/ostream_proxy.h
