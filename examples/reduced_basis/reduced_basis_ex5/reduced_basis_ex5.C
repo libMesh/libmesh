@@ -208,8 +208,6 @@ int main(int argc, char** argv) {
 
 void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std::string& filename)
 {
-  const Real x_scaling = mu.get_value("x_scaling");
-  
   // Loop over the mesh nodes and move them!
   MeshBase& mesh = es.get_mesh();
 
