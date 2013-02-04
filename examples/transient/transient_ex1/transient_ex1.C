@@ -218,9 +218,6 @@ int main (int argc, char** argv)
       // vector assignment.  Since only \p TransientSystems
       // (and systems derived from them) contain old solutions
       // we need to specify the system type when we ask for it.
-      TransientLinearImplicitSystem&  system =
-        equation_systems.get_system<TransientLinearImplicitSystem>("Convection-Diffusion");
-
       *system.old_local_solution = *system.current_local_solution;
       
       // Assemble & solve the linear system
