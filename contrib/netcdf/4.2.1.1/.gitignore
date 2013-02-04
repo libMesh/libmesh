@@ -1,0 +1,7 @@
+VERSION
+comps.txt
+config.h
+examples/C/.deps/
+nc-config
+netcdf.pc
+stamp-h1
