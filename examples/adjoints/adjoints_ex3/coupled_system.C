@@ -400,7 +400,7 @@ void CoupledSystem::postprocess()
 Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
 					const Real /* time */)
 { 
-  Real weight = 0.0;
+  Number weight = 0.0;
 
   switch(var)
     {
@@ -434,7 +434,7 @@ Number CoupledFEMFunctionsx::operator()(const FEMContext& c, const Point& p,
 Number CoupledFEMFunctionsy::operator()(const FEMContext& c, const Point& p,
 					const Real /* time */)
 {
-  Real weight = 0.0;
+  Number weight = 0.0;
 
   switch(var)
     {
