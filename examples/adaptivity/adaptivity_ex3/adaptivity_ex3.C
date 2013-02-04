@@ -578,7 +578,7 @@ void assemble_laplace(EquationSystems& es,
   const MeshBase& mesh = es.get_mesh();
 
   // The dimension that we are running
-  const unsigned int dim = mesh.mesh_dimension();
+  const unsigned int mesh_dim = mesh.mesh_dimension();
 
   // Get a reference to the LinearImplicitSystem we are solving
   LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Laplace");
@@ -597,12 +597,12 @@ void assemble_laplace(EquationSystems& es,
   // \p FEBase::build() member dynamically creates memory we will
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
-  AutoPtr<FEBase> fe      (FEBase::build(dim, fe_type));
-  AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  AutoPtr<FEBase> fe      (FEBase::build(mesh_dim, fe_type));
+  AutoPtr<FEBase> fe_face (FEBase::build(mesh_dim, fe_type));
   
   // Quadrature rules for numerical integration.
-  AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(dim));
-  AutoPtr<QBase> qface(fe_type.default_quadrature_rule(dim-1));
+  AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(mesh_dim));
+  AutoPtr<QBase> qface(fe_type.default_quadrature_rule(mesh_dim-1));
 
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule      (qrule.get());
@@ -709,7 +709,7 @@ void assemble_laplace(EquationSystems& es,
             Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
 
       // We need a forcing function to make the 1D case interesting
-      if (dim == 1)
+      if (mesh_dim == 1)
         for (unsigned int qp=0; qp<qrule->n_points(); qp++)
           {
             Real x = q_point[qp](0);
