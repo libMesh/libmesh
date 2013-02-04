@@ -13,9 +13,9 @@ class LaplaceSystem : public FEMSystem
 public:
   // Constructor
   LaplaceSystem(EquationSystems& es,
-               const std::string& name,
-               const unsigned int number)
-  : FEMSystem(es, name, number),
+               const std::string& name_in,
+               const unsigned int number_in)
+  : FEMSystem(es, name_in, number_in),
     _fe_family("LAGRANGE"), _fe_order(1),
     _analytic_jacobians(true) { qoi.resize(2); }
 
