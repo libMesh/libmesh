@@ -31661,7 +31661,7 @@ if test "${enable_netcdf+set}" = set; then :
  		    *)    as_fn_error $? "bad value ${enableval} for --enable-netcdf" "$LINENO" 5 ;;
 		 esac
 else
-  enablenetcdf=$enableoptional
+  enablenetcdf=$enableoptional; netcdfversion=3
 fi
 
 
@@ -31738,7 +31738,7 @@ if test "${enable_exodus+set}" = set; then :
  		    *)  as_fn_error $? "bad value ${enableval} for --enable-exodus" "$LINENO" 5 ;;
 		 esac
 else
-  enableexodus=$enablenetcdf
+  enableexodus=$enablenetcdf ; exodusversion="v5.09"
 fi
  # if unspecified, depend on netcdf
 

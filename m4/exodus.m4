@@ -12,7 +12,7 @@ AC_DEFUN([CONFIGURE_EXODUS],
 		   no)       enableexodus=no;  exodusversion=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-exodus) ;;
 		 esac],
-		 [enableexodus=$enablenetcdf]) # if unspecified, depend on netcdf
+		 [enableexodus=$enablenetcdf ; exodusversion="v5.09"]) # if unspecified, depend on netcdf
 
 
 		

@@ -12,7 +12,7 @@ AC_DEFUN([CONFIGURE_NETCDF],
 		   no)    enablenetcdf=no;  netcdfversion=no ;;
  		    *)    AC_MSG_ERROR(bad value ${enableval} for --enable-netcdf) ;;
 		 esac],
-		 [enablenetcdf=$enableoptional])
+		 [enablenetcdf=$enableoptional; netcdfversion=3])
 
 
 				
