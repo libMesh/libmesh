@@ -125,24 +125,49 @@ am_libdispatch_la_OBJECTS = libdispatch_la-dparallel.lo \
 	libdispatch_la-nctime.lo libdispatch_la-dsubstrate.lo \
 	$(am__objects_1)
 libdispatch_la_OBJECTS = $(am_libdispatch_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 libnetcdf2_la_LIBADD =
 am__libnetcdf2_la_SOURCES_DIST = dv2i.c
 @BUILD_V2_TRUE@am_libnetcdf2_la_OBJECTS = libnetcdf2_la-dv2i.lo
 libnetcdf2_la_OBJECTS = $(am_libnetcdf2_la_OBJECTS)
 @BUILD_V2_TRUE@am_libnetcdf2_la_rpath =
+AM_V_P = $(am__v_P_@AM_V@)
+am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
+am__v_P_0 = false
+am__v_P_1 = :
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN     " $@;
+am__v_GEN_1 = 
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
+am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = $(libdispatch_la_SOURCES) $(libnetcdf2_la_SOURCES)
 DIST_SOURCES = $(am__libdispatch_la_SOURCES_DIST) \
 	$(am__libnetcdf2_la_SOURCES_DIST)
@@ -157,6 +182,7 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -349,9 +375,9 @@ clean-noinstLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 libdispatch.la: $(libdispatch_la_OBJECTS) $(libdispatch_la_DEPENDENCIES) $(EXTRA_libdispatch_la_DEPENDENCIES) 
-	$(LINK)  $(libdispatch_la_OBJECTS) $(libdispatch_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK)  $(libdispatch_la_OBJECTS) $(libdispatch_la_LIBADD) $(LIBS)
 libnetcdf2.la: $(libnetcdf2_la_OBJECTS) $(libnetcdf2_la_DEPENDENCIES) $(EXTRA_libnetcdf2_la_DEPENDENCIES) 
-	$(LINK) $(am_libnetcdf2_la_rpath) $(libnetcdf2_la_OBJECTS) $(libnetcdf2_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(am_libnetcdf2_la_rpath) $(libnetcdf2_la_OBJECTS) $(libnetcdf2_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -392,245 +418,245 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnetcdf2_la-dv2i.Plo@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
 @am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
 libdispatch_la-dparallel.lo: dparallel.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dparallel.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dparallel.Tpo -c -o libdispatch_la-dparallel.lo `test -f 'dparallel.c' || echo '$(srcdir)/'`dparallel.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dparallel.Tpo $(DEPDIR)/libdispatch_la-dparallel.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dparallel.c' object='libdispatch_la-dparallel.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dparallel.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dparallel.Tpo -c -o libdispatch_la-dparallel.lo `test -f 'dparallel.c' || echo '$(srcdir)/'`dparallel.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dparallel.Tpo $(DEPDIR)/libdispatch_la-dparallel.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dparallel.c' object='libdispatch_la-dparallel.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dparallel.lo `test -f 'dparallel.c' || echo '$(srcdir)/'`dparallel.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dparallel.lo `test -f 'dparallel.c' || echo '$(srcdir)/'`dparallel.c
 
 libdispatch_la-dcopy.lo: dcopy.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dcopy.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dcopy.Tpo -c -o libdispatch_la-dcopy.lo `test -f 'dcopy.c' || echo '$(srcdir)/'`dcopy.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dcopy.Tpo $(DEPDIR)/libdispatch_la-dcopy.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dcopy.c' object='libdispatch_la-dcopy.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dcopy.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dcopy.Tpo -c -o libdispatch_la-dcopy.lo `test -f 'dcopy.c' || echo '$(srcdir)/'`dcopy.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dcopy.Tpo $(DEPDIR)/libdispatch_la-dcopy.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dcopy.c' object='libdispatch_la-dcopy.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dcopy.lo `test -f 'dcopy.c' || echo '$(srcdir)/'`dcopy.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dcopy.lo `test -f 'dcopy.c' || echo '$(srcdir)/'`dcopy.c
 
 libdispatch_la-dfile.lo: dfile.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dfile.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dfile.Tpo -c -o libdispatch_la-dfile.lo `test -f 'dfile.c' || echo '$(srcdir)/'`dfile.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dfile.Tpo $(DEPDIR)/libdispatch_la-dfile.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dfile.c' object='libdispatch_la-dfile.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dfile.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dfile.Tpo -c -o libdispatch_la-dfile.lo `test -f 'dfile.c' || echo '$(srcdir)/'`dfile.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dfile.Tpo $(DEPDIR)/libdispatch_la-dfile.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dfile.c' object='libdispatch_la-dfile.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dfile.lo `test -f 'dfile.c' || echo '$(srcdir)/'`dfile.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dfile.lo `test -f 'dfile.c' || echo '$(srcdir)/'`dfile.c
 
 libdispatch_la-ddim.lo: ddim.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-ddim.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-ddim.Tpo -c -o libdispatch_la-ddim.lo `test -f 'ddim.c' || echo '$(srcdir)/'`ddim.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-ddim.Tpo $(DEPDIR)/libdispatch_la-ddim.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ddim.c' object='libdispatch_la-ddim.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-ddim.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-ddim.Tpo -c -o libdispatch_la-ddim.lo `test -f 'ddim.c' || echo '$(srcdir)/'`ddim.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-ddim.Tpo $(DEPDIR)/libdispatch_la-ddim.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ddim.c' object='libdispatch_la-ddim.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-ddim.lo `test -f 'ddim.c' || echo '$(srcdir)/'`ddim.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-ddim.lo `test -f 'ddim.c' || echo '$(srcdir)/'`ddim.c
 
 libdispatch_la-datt.lo: datt.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-datt.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-datt.Tpo -c -o libdispatch_la-datt.lo `test -f 'datt.c' || echo '$(srcdir)/'`datt.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-datt.Tpo $(DEPDIR)/libdispatch_la-datt.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='datt.c' object='libdispatch_la-datt.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-datt.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-datt.Tpo -c -o libdispatch_la-datt.lo `test -f 'datt.c' || echo '$(srcdir)/'`datt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-datt.Tpo $(DEPDIR)/libdispatch_la-datt.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='datt.c' object='libdispatch_la-datt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-datt.lo `test -f 'datt.c' || echo '$(srcdir)/'`datt.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-datt.lo `test -f 'datt.c' || echo '$(srcdir)/'`datt.c
 
 libdispatch_la-dattinq.lo: dattinq.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dattinq.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dattinq.Tpo -c -o libdispatch_la-dattinq.lo `test -f 'dattinq.c' || echo '$(srcdir)/'`dattinq.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dattinq.Tpo $(DEPDIR)/libdispatch_la-dattinq.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dattinq.c' object='libdispatch_la-dattinq.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dattinq.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dattinq.Tpo -c -o libdispatch_la-dattinq.lo `test -f 'dattinq.c' || echo '$(srcdir)/'`dattinq.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dattinq.Tpo $(DEPDIR)/libdispatch_la-dattinq.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dattinq.c' object='libdispatch_la-dattinq.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dattinq.lo `test -f 'dattinq.c' || echo '$(srcdir)/'`dattinq.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dattinq.lo `test -f 'dattinq.c' || echo '$(srcdir)/'`dattinq.c
 
 libdispatch_la-dattput.lo: dattput.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dattput.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dattput.Tpo -c -o libdispatch_la-dattput.lo `test -f 'dattput.c' || echo '$(srcdir)/'`dattput.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dattput.Tpo $(DEPDIR)/libdispatch_la-dattput.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dattput.c' object='libdispatch_la-dattput.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dattput.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dattput.Tpo -c -o libdispatch_la-dattput.lo `test -f 'dattput.c' || echo '$(srcdir)/'`dattput.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dattput.Tpo $(DEPDIR)/libdispatch_la-dattput.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dattput.c' object='libdispatch_la-dattput.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dattput.lo `test -f 'dattput.c' || echo '$(srcdir)/'`dattput.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dattput.lo `test -f 'dattput.c' || echo '$(srcdir)/'`dattput.c
 
 libdispatch_la-dattget.lo: dattget.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dattget.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dattget.Tpo -c -o libdispatch_la-dattget.lo `test -f 'dattget.c' || echo '$(srcdir)/'`dattget.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dattget.Tpo $(DEPDIR)/libdispatch_la-dattget.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dattget.c' object='libdispatch_la-dattget.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dattget.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dattget.Tpo -c -o libdispatch_la-dattget.lo `test -f 'dattget.c' || echo '$(srcdir)/'`dattget.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dattget.Tpo $(DEPDIR)/libdispatch_la-dattget.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dattget.c' object='libdispatch_la-dattget.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dattget.lo `test -f 'dattget.c' || echo '$(srcdir)/'`dattget.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dattget.lo `test -f 'dattget.c' || echo '$(srcdir)/'`dattget.c
 
 libdispatch_la-derror.lo: derror.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-derror.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-derror.Tpo -c -o libdispatch_la-derror.lo `test -f 'derror.c' || echo '$(srcdir)/'`derror.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-derror.Tpo $(DEPDIR)/libdispatch_la-derror.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='derror.c' object='libdispatch_la-derror.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-derror.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-derror.Tpo -c -o libdispatch_la-derror.lo `test -f 'derror.c' || echo '$(srcdir)/'`derror.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-derror.Tpo $(DEPDIR)/libdispatch_la-derror.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='derror.c' object='libdispatch_la-derror.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-derror.lo `test -f 'derror.c' || echo '$(srcdir)/'`derror.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-derror.lo `test -f 'derror.c' || echo '$(srcdir)/'`derror.c
 
 libdispatch_la-dvar.lo: dvar.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvar.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvar.Tpo -c -o libdispatch_la-dvar.lo `test -f 'dvar.c' || echo '$(srcdir)/'`dvar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dvar.Tpo $(DEPDIR)/libdispatch_la-dvar.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dvar.c' object='libdispatch_la-dvar.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvar.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvar.Tpo -c -o libdispatch_la-dvar.lo `test -f 'dvar.c' || echo '$(srcdir)/'`dvar.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dvar.Tpo $(DEPDIR)/libdispatch_la-dvar.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dvar.c' object='libdispatch_la-dvar.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvar.lo `test -f 'dvar.c' || echo '$(srcdir)/'`dvar.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvar.lo `test -f 'dvar.c' || echo '$(srcdir)/'`dvar.c
 
 libdispatch_la-dvarget.lo: dvarget.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvarget.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvarget.Tpo -c -o libdispatch_la-dvarget.lo `test -f 'dvarget.c' || echo '$(srcdir)/'`dvarget.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dvarget.Tpo $(DEPDIR)/libdispatch_la-dvarget.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dvarget.c' object='libdispatch_la-dvarget.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvarget.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvarget.Tpo -c -o libdispatch_la-dvarget.lo `test -f 'dvarget.c' || echo '$(srcdir)/'`dvarget.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dvarget.Tpo $(DEPDIR)/libdispatch_la-dvarget.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dvarget.c' object='libdispatch_la-dvarget.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvarget.lo `test -f 'dvarget.c' || echo '$(srcdir)/'`dvarget.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvarget.lo `test -f 'dvarget.c' || echo '$(srcdir)/'`dvarget.c
 
 libdispatch_la-dvarput.lo: dvarput.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvarput.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvarput.Tpo -c -o libdispatch_la-dvarput.lo `test -f 'dvarput.c' || echo '$(srcdir)/'`dvarput.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dvarput.Tpo $(DEPDIR)/libdispatch_la-dvarput.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dvarput.c' object='libdispatch_la-dvarput.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvarput.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvarput.Tpo -c -o libdispatch_la-dvarput.lo `test -f 'dvarput.c' || echo '$(srcdir)/'`dvarput.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dvarput.Tpo $(DEPDIR)/libdispatch_la-dvarput.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dvarput.c' object='libdispatch_la-dvarput.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvarput.lo `test -f 'dvarput.c' || echo '$(srcdir)/'`dvarput.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvarput.lo `test -f 'dvarput.c' || echo '$(srcdir)/'`dvarput.c
 
 libdispatch_la-dvarinq.lo: dvarinq.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvarinq.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvarinq.Tpo -c -o libdispatch_la-dvarinq.lo `test -f 'dvarinq.c' || echo '$(srcdir)/'`dvarinq.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dvarinq.Tpo $(DEPDIR)/libdispatch_la-dvarinq.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dvarinq.c' object='libdispatch_la-dvarinq.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvarinq.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvarinq.Tpo -c -o libdispatch_la-dvarinq.lo `test -f 'dvarinq.c' || echo '$(srcdir)/'`dvarinq.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dvarinq.Tpo $(DEPDIR)/libdispatch_la-dvarinq.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dvarinq.c' object='libdispatch_la-dvarinq.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvarinq.lo `test -f 'dvarinq.c' || echo '$(srcdir)/'`dvarinq.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvarinq.lo `test -f 'dvarinq.c' || echo '$(srcdir)/'`dvarinq.c
 
 libdispatch_la-ddispatch.lo: ddispatch.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-ddispatch.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-ddispatch.Tpo -c -o libdispatch_la-ddispatch.lo `test -f 'ddispatch.c' || echo '$(srcdir)/'`ddispatch.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-ddispatch.Tpo $(DEPDIR)/libdispatch_la-ddispatch.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ddispatch.c' object='libdispatch_la-ddispatch.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-ddispatch.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-ddispatch.Tpo -c -o libdispatch_la-ddispatch.lo `test -f 'ddispatch.c' || echo '$(srcdir)/'`ddispatch.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-ddispatch.Tpo $(DEPDIR)/libdispatch_la-ddispatch.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ddispatch.c' object='libdispatch_la-ddispatch.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-ddispatch.lo `test -f 'ddispatch.c' || echo '$(srcdir)/'`ddispatch.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-ddispatch.lo `test -f 'ddispatch.c' || echo '$(srcdir)/'`ddispatch.c
 
 libdispatch_la-dnclog.lo: dnclog.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dnclog.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dnclog.Tpo -c -o libdispatch_la-dnclog.lo `test -f 'dnclog.c' || echo '$(srcdir)/'`dnclog.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dnclog.Tpo $(DEPDIR)/libdispatch_la-dnclog.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dnclog.c' object='libdispatch_la-dnclog.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dnclog.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dnclog.Tpo -c -o libdispatch_la-dnclog.lo `test -f 'dnclog.c' || echo '$(srcdir)/'`dnclog.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dnclog.Tpo $(DEPDIR)/libdispatch_la-dnclog.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dnclog.c' object='libdispatch_la-dnclog.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dnclog.lo `test -f 'dnclog.c' || echo '$(srcdir)/'`dnclog.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dnclog.lo `test -f 'dnclog.c' || echo '$(srcdir)/'`dnclog.c
 
 libdispatch_la-dstring.lo: dstring.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dstring.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dstring.Tpo -c -o libdispatch_la-dstring.lo `test -f 'dstring.c' || echo '$(srcdir)/'`dstring.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dstring.Tpo $(DEPDIR)/libdispatch_la-dstring.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dstring.c' object='libdispatch_la-dstring.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dstring.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dstring.Tpo -c -o libdispatch_la-dstring.lo `test -f 'dstring.c' || echo '$(srcdir)/'`dstring.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dstring.Tpo $(DEPDIR)/libdispatch_la-dstring.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dstring.c' object='libdispatch_la-dstring.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dstring.lo `test -f 'dstring.c' || echo '$(srcdir)/'`dstring.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dstring.lo `test -f 'dstring.c' || echo '$(srcdir)/'`dstring.c
 
 libdispatch_la-dutf8proc.lo: dutf8proc.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dutf8proc.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dutf8proc.Tpo -c -o libdispatch_la-dutf8proc.lo `test -f 'dutf8proc.c' || echo '$(srcdir)/'`dutf8proc.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dutf8proc.Tpo $(DEPDIR)/libdispatch_la-dutf8proc.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dutf8proc.c' object='libdispatch_la-dutf8proc.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dutf8proc.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dutf8proc.Tpo -c -o libdispatch_la-dutf8proc.lo `test -f 'dutf8proc.c' || echo '$(srcdir)/'`dutf8proc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dutf8proc.Tpo $(DEPDIR)/libdispatch_la-dutf8proc.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dutf8proc.c' object='libdispatch_la-dutf8proc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dutf8proc.lo `test -f 'dutf8proc.c' || echo '$(srcdir)/'`dutf8proc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dutf8proc.lo `test -f 'dutf8proc.c' || echo '$(srcdir)/'`dutf8proc.c
 
 libdispatch_la-nc_uri.lo: nc_uri.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-nc_uri.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-nc_uri.Tpo -c -o libdispatch_la-nc_uri.lo `test -f 'nc_uri.c' || echo '$(srcdir)/'`nc_uri.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-nc_uri.Tpo $(DEPDIR)/libdispatch_la-nc_uri.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nc_uri.c' object='libdispatch_la-nc_uri.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-nc_uri.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-nc_uri.Tpo -c -o libdispatch_la-nc_uri.lo `test -f 'nc_uri.c' || echo '$(srcdir)/'`nc_uri.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-nc_uri.Tpo $(DEPDIR)/libdispatch_la-nc_uri.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nc_uri.c' object='libdispatch_la-nc_uri.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-nc_uri.lo `test -f 'nc_uri.c' || echo '$(srcdir)/'`nc_uri.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-nc_uri.lo `test -f 'nc_uri.c' || echo '$(srcdir)/'`nc_uri.c
 
 libdispatch_la-nclist.lo: nclist.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-nclist.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-nclist.Tpo -c -o libdispatch_la-nclist.lo `test -f 'nclist.c' || echo '$(srcdir)/'`nclist.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-nclist.Tpo $(DEPDIR)/libdispatch_la-nclist.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nclist.c' object='libdispatch_la-nclist.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-nclist.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-nclist.Tpo -c -o libdispatch_la-nclist.lo `test -f 'nclist.c' || echo '$(srcdir)/'`nclist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-nclist.Tpo $(DEPDIR)/libdispatch_la-nclist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nclist.c' object='libdispatch_la-nclist.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-nclist.lo `test -f 'nclist.c' || echo '$(srcdir)/'`nclist.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-nclist.lo `test -f 'nclist.c' || echo '$(srcdir)/'`nclist.c
 
 libdispatch_la-ncbytes.lo: ncbytes.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-ncbytes.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-ncbytes.Tpo -c -o libdispatch_la-ncbytes.lo `test -f 'ncbytes.c' || echo '$(srcdir)/'`ncbytes.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-ncbytes.Tpo $(DEPDIR)/libdispatch_la-ncbytes.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ncbytes.c' object='libdispatch_la-ncbytes.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-ncbytes.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-ncbytes.Tpo -c -o libdispatch_la-ncbytes.lo `test -f 'ncbytes.c' || echo '$(srcdir)/'`ncbytes.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-ncbytes.Tpo $(DEPDIR)/libdispatch_la-ncbytes.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ncbytes.c' object='libdispatch_la-ncbytes.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-ncbytes.lo `test -f 'ncbytes.c' || echo '$(srcdir)/'`ncbytes.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-ncbytes.lo `test -f 'ncbytes.c' || echo '$(srcdir)/'`ncbytes.c
 
 libdispatch_la-nchashmap.lo: nchashmap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-nchashmap.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-nchashmap.Tpo -c -o libdispatch_la-nchashmap.lo `test -f 'nchashmap.c' || echo '$(srcdir)/'`nchashmap.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-nchashmap.Tpo $(DEPDIR)/libdispatch_la-nchashmap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nchashmap.c' object='libdispatch_la-nchashmap.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-nchashmap.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-nchashmap.Tpo -c -o libdispatch_la-nchashmap.lo `test -f 'nchashmap.c' || echo '$(srcdir)/'`nchashmap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-nchashmap.Tpo $(DEPDIR)/libdispatch_la-nchashmap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nchashmap.c' object='libdispatch_la-nchashmap.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-nchashmap.lo `test -f 'nchashmap.c' || echo '$(srcdir)/'`nchashmap.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-nchashmap.lo `test -f 'nchashmap.c' || echo '$(srcdir)/'`nchashmap.c
 
 libdispatch_la-nctime.lo: nctime.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-nctime.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-nctime.Tpo -c -o libdispatch_la-nctime.lo `test -f 'nctime.c' || echo '$(srcdir)/'`nctime.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-nctime.Tpo $(DEPDIR)/libdispatch_la-nctime.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nctime.c' object='libdispatch_la-nctime.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-nctime.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-nctime.Tpo -c -o libdispatch_la-nctime.lo `test -f 'nctime.c' || echo '$(srcdir)/'`nctime.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-nctime.Tpo $(DEPDIR)/libdispatch_la-nctime.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nctime.c' object='libdispatch_la-nctime.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-nctime.lo `test -f 'nctime.c' || echo '$(srcdir)/'`nctime.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-nctime.lo `test -f 'nctime.c' || echo '$(srcdir)/'`nctime.c
 
 libdispatch_la-dsubstrate.lo: dsubstrate.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dsubstrate.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dsubstrate.Tpo -c -o libdispatch_la-dsubstrate.lo `test -f 'dsubstrate.c' || echo '$(srcdir)/'`dsubstrate.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dsubstrate.Tpo $(DEPDIR)/libdispatch_la-dsubstrate.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dsubstrate.c' object='libdispatch_la-dsubstrate.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dsubstrate.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dsubstrate.Tpo -c -o libdispatch_la-dsubstrate.lo `test -f 'dsubstrate.c' || echo '$(srcdir)/'`dsubstrate.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dsubstrate.Tpo $(DEPDIR)/libdispatch_la-dsubstrate.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dsubstrate.c' object='libdispatch_la-dsubstrate.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dsubstrate.lo `test -f 'dsubstrate.c' || echo '$(srcdir)/'`dsubstrate.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dsubstrate.lo `test -f 'dsubstrate.c' || echo '$(srcdir)/'`dsubstrate.c
 
 libdispatch_la-dgroup.lo: dgroup.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dgroup.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dgroup.Tpo -c -o libdispatch_la-dgroup.lo `test -f 'dgroup.c' || echo '$(srcdir)/'`dgroup.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dgroup.Tpo $(DEPDIR)/libdispatch_la-dgroup.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dgroup.c' object='libdispatch_la-dgroup.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dgroup.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dgroup.Tpo -c -o libdispatch_la-dgroup.lo `test -f 'dgroup.c' || echo '$(srcdir)/'`dgroup.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dgroup.Tpo $(DEPDIR)/libdispatch_la-dgroup.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dgroup.c' object='libdispatch_la-dgroup.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dgroup.lo `test -f 'dgroup.c' || echo '$(srcdir)/'`dgroup.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dgroup.lo `test -f 'dgroup.c' || echo '$(srcdir)/'`dgroup.c
 
 libdispatch_la-dvlen.lo: dvlen.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvlen.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvlen.Tpo -c -o libdispatch_la-dvlen.lo `test -f 'dvlen.c' || echo '$(srcdir)/'`dvlen.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dvlen.Tpo $(DEPDIR)/libdispatch_la-dvlen.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dvlen.c' object='libdispatch_la-dvlen.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dvlen.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dvlen.Tpo -c -o libdispatch_la-dvlen.lo `test -f 'dvlen.c' || echo '$(srcdir)/'`dvlen.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dvlen.Tpo $(DEPDIR)/libdispatch_la-dvlen.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dvlen.c' object='libdispatch_la-dvlen.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvlen.lo `test -f 'dvlen.c' || echo '$(srcdir)/'`dvlen.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dvlen.lo `test -f 'dvlen.c' || echo '$(srcdir)/'`dvlen.c
 
 libdispatch_la-dcompound.lo: dcompound.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dcompound.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dcompound.Tpo -c -o libdispatch_la-dcompound.lo `test -f 'dcompound.c' || echo '$(srcdir)/'`dcompound.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dcompound.Tpo $(DEPDIR)/libdispatch_la-dcompound.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dcompound.c' object='libdispatch_la-dcompound.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dcompound.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dcompound.Tpo -c -o libdispatch_la-dcompound.lo `test -f 'dcompound.c' || echo '$(srcdir)/'`dcompound.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dcompound.Tpo $(DEPDIR)/libdispatch_la-dcompound.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dcompound.c' object='libdispatch_la-dcompound.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dcompound.lo `test -f 'dcompound.c' || echo '$(srcdir)/'`dcompound.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dcompound.lo `test -f 'dcompound.c' || echo '$(srcdir)/'`dcompound.c
 
 libdispatch_la-dtype.lo: dtype.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dtype.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dtype.Tpo -c -o libdispatch_la-dtype.lo `test -f 'dtype.c' || echo '$(srcdir)/'`dtype.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dtype.Tpo $(DEPDIR)/libdispatch_la-dtype.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dtype.c' object='libdispatch_la-dtype.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dtype.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dtype.Tpo -c -o libdispatch_la-dtype.lo `test -f 'dtype.c' || echo '$(srcdir)/'`dtype.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dtype.Tpo $(DEPDIR)/libdispatch_la-dtype.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dtype.c' object='libdispatch_la-dtype.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dtype.lo `test -f 'dtype.c' || echo '$(srcdir)/'`dtype.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dtype.lo `test -f 'dtype.c' || echo '$(srcdir)/'`dtype.c
 
 libdispatch_la-denum.lo: denum.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-denum.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-denum.Tpo -c -o libdispatch_la-denum.lo `test -f 'denum.c' || echo '$(srcdir)/'`denum.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-denum.Tpo $(DEPDIR)/libdispatch_la-denum.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='denum.c' object='libdispatch_la-denum.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-denum.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-denum.Tpo -c -o libdispatch_la-denum.lo `test -f 'denum.c' || echo '$(srcdir)/'`denum.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-denum.Tpo $(DEPDIR)/libdispatch_la-denum.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='denum.c' object='libdispatch_la-denum.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-denum.lo `test -f 'denum.c' || echo '$(srcdir)/'`denum.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-denum.lo `test -f 'denum.c' || echo '$(srcdir)/'`denum.c
 
 libdispatch_la-dopaque.lo: dopaque.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dopaque.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dopaque.Tpo -c -o libdispatch_la-dopaque.lo `test -f 'dopaque.c' || echo '$(srcdir)/'`dopaque.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-dopaque.Tpo $(DEPDIR)/libdispatch_la-dopaque.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dopaque.c' object='libdispatch_la-dopaque.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-dopaque.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-dopaque.Tpo -c -o libdispatch_la-dopaque.lo `test -f 'dopaque.c' || echo '$(srcdir)/'`dopaque.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-dopaque.Tpo $(DEPDIR)/libdispatch_la-dopaque.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dopaque.c' object='libdispatch_la-dopaque.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dopaque.lo `test -f 'dopaque.c' || echo '$(srcdir)/'`dopaque.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-dopaque.lo `test -f 'dopaque.c' || echo '$(srcdir)/'`dopaque.c
 
 libdispatch_la-ncaux.lo: ncaux.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-ncaux.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-ncaux.Tpo -c -o libdispatch_la-ncaux.lo `test -f 'ncaux.c' || echo '$(srcdir)/'`ncaux.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdispatch_la-ncaux.Tpo $(DEPDIR)/libdispatch_la-ncaux.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ncaux.c' object='libdispatch_la-ncaux.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdispatch_la-ncaux.lo -MD -MP -MF $(DEPDIR)/libdispatch_la-ncaux.Tpo -c -o libdispatch_la-ncaux.lo `test -f 'ncaux.c' || echo '$(srcdir)/'`ncaux.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdispatch_la-ncaux.Tpo $(DEPDIR)/libdispatch_la-ncaux.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ncaux.c' object='libdispatch_la-ncaux.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-ncaux.lo `test -f 'ncaux.c' || echo '$(srcdir)/'`ncaux.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdispatch_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdispatch_la-ncaux.lo `test -f 'ncaux.c' || echo '$(srcdir)/'`ncaux.c
 
 libnetcdf2_la-dv2i.lo: dv2i.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf2_la-dv2i.lo -MD -MP -MF $(DEPDIR)/libnetcdf2_la-dv2i.Tpo -c -o libnetcdf2_la-dv2i.lo `test -f 'dv2i.c' || echo '$(srcdir)/'`dv2i.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnetcdf2_la-dv2i.Tpo $(DEPDIR)/libnetcdf2_la-dv2i.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dv2i.c' object='libnetcdf2_la-dv2i.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnetcdf2_la-dv2i.lo -MD -MP -MF $(DEPDIR)/libnetcdf2_la-dv2i.Tpo -c -o libnetcdf2_la-dv2i.lo `test -f 'dv2i.c' || echo '$(srcdir)/'`dv2i.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnetcdf2_la-dv2i.Tpo $(DEPDIR)/libnetcdf2_la-dv2i.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dv2i.c' object='libnetcdf2_la-dv2i.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf2_la-dv2i.lo `test -f 'dv2i.c' || echo '$(srcdir)/'`dv2i.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnetcdf2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnetcdf2_la-dv2i.lo `test -f 'dv2i.c' || echo '$(srcdir)/'`dv2i.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

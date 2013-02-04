@@ -132,6 +132,10 @@ ctest_SOURCES = ctest.c
 ctest_OBJECTS = ctest.$(OBJEXT)
 ctest_LDADD = $(LDADD)
 ctest_DEPENDENCIES = ${top_builddir}/liblib/libnetcdf.la
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 ctest64_SOURCES = ctest64.c
 ctest64_OBJECTS = ctest64.$(OBJEXT)
 ctest64_LDADD = $(LDADD)
@@ -215,19 +219,40 @@ tst_vlen_data_SOURCES = tst_vlen_data.c
 tst_vlen_data_OBJECTS = tst_vlen_data.$(OBJEXT)
 tst_vlen_data_LDADD = $(LDADD)
 tst_vlen_data_DEPENDENCIES = ${top_builddir}/liblib/libnetcdf.la
+AM_V_P = $(am__v_P_@AM_V@)
+am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
+am__v_P_0 = false
+am__v_P_1 = :
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN     " $@;
+am__v_GEN_1 = 
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
+am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = ctest.c ctest64.c $(nccopy_SOURCES) $(ncdump_SOURCES) \
 	rewrite-scalar.c tst_chunking.c tst_comp.c tst_comp2.c \
 	tst_compress.c tst_create_files.c tst_enum_data.c \
@@ -292,7 +317,25 @@ CTAGS = ctags
 am__tty_colors_dummy = \
   mgn= red= grn= lgn= blu= brg= std=; \
   am__color_tests=no
-am__tty_colors = $(am__tty_colors_dummy)
+am__tty_colors = { \
+  $(am__tty_colors_dummy); \
+  if test "X$(AM_COLOR_TESTS)" = Xno; then \
+    am__color_tests=no; \
+  elif test "X$(AM_COLOR_TESTS)" = Xalways; then \
+    am__color_tests=yes; \
+  elif test "X$$TERM" != Xdumb && { test -t 1; } 2>/dev/null; then \
+    am__color_tests=yes; \
+  fi; \
+  if test $$am__color_tests = yes; then \
+    red='[0;31m'; \
+    grn='[0;32m'; \
+    lgn='[1;32m'; \
+    blu='[1;34m'; \
+    mgn='[0;35m'; \
+    brg='[1m'; \
+    std='[m'; \
+  fi; \
+}
 @BUILD_TESTSETS_TRUE@@USE_NETCDF4_TRUE@am__EXEEXT_2 = tst_create_files$(EXEEXT) \
 @BUILD_TESTSETS_TRUE@@USE_NETCDF4_TRUE@	tst_group_data$(EXEEXT) \
 @BUILD_TESTSETS_TRUE@@USE_NETCDF4_TRUE@	tst_enum_data$(EXEEXT) \
@@ -342,6 +385,7 @@ am__relativize = \
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -635,67 +679,67 @@ clean-checkPROGRAMS:
 	rm -f $$list
 ctest$(EXEEXT): $(ctest_OBJECTS) $(ctest_DEPENDENCIES) $(EXTRA_ctest_DEPENDENCIES) 
 	@rm -f ctest$(EXEEXT)
-	$(LINK) $(ctest_OBJECTS) $(ctest_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(ctest_OBJECTS) $(ctest_LDADD) $(LIBS)
 ctest64$(EXEEXT): $(ctest64_OBJECTS) $(ctest64_DEPENDENCIES) $(EXTRA_ctest64_DEPENDENCIES) 
 	@rm -f ctest64$(EXEEXT)
-	$(LINK) $(ctest64_OBJECTS) $(ctest64_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(ctest64_OBJECTS) $(ctest64_LDADD) $(LIBS)
 nccopy$(EXEEXT): $(nccopy_OBJECTS) $(nccopy_DEPENDENCIES) $(EXTRA_nccopy_DEPENDENCIES) 
 	@rm -f nccopy$(EXEEXT)
-	$(LINK) $(nccopy_OBJECTS) $(nccopy_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(nccopy_OBJECTS) $(nccopy_LDADD) $(LIBS)
 ncdump$(EXEEXT): $(ncdump_OBJECTS) $(ncdump_DEPENDENCIES) $(EXTRA_ncdump_DEPENDENCIES) 
 	@rm -f ncdump$(EXEEXT)
-	$(LINK) $(ncdump_OBJECTS) $(ncdump_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(ncdump_OBJECTS) $(ncdump_LDADD) $(LIBS)
 rewrite-scalar$(EXEEXT): $(rewrite_scalar_OBJECTS) $(rewrite_scalar_DEPENDENCIES) $(EXTRA_rewrite_scalar_DEPENDENCIES) 
 	@rm -f rewrite-scalar$(EXEEXT)
-	$(LINK) $(rewrite_scalar_OBJECTS) $(rewrite_scalar_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(rewrite_scalar_OBJECTS) $(rewrite_scalar_LDADD) $(LIBS)
 tst_chunking$(EXEEXT): $(tst_chunking_OBJECTS) $(tst_chunking_DEPENDENCIES) $(EXTRA_tst_chunking_DEPENDENCIES) 
 	@rm -f tst_chunking$(EXEEXT)
-	$(LINK) $(tst_chunking_OBJECTS) $(tst_chunking_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_chunking_OBJECTS) $(tst_chunking_LDADD) $(LIBS)
 tst_comp$(EXEEXT): $(tst_comp_OBJECTS) $(tst_comp_DEPENDENCIES) $(EXTRA_tst_comp_DEPENDENCIES) 
 	@rm -f tst_comp$(EXEEXT)
-	$(LINK) $(tst_comp_OBJECTS) $(tst_comp_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_comp_OBJECTS) $(tst_comp_LDADD) $(LIBS)
 tst_comp2$(EXEEXT): $(tst_comp2_OBJECTS) $(tst_comp2_DEPENDENCIES) $(EXTRA_tst_comp2_DEPENDENCIES) 
 	@rm -f tst_comp2$(EXEEXT)
-	$(LINK) $(tst_comp2_OBJECTS) $(tst_comp2_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_comp2_OBJECTS) $(tst_comp2_LDADD) $(LIBS)
 tst_compress$(EXEEXT): $(tst_compress_OBJECTS) $(tst_compress_DEPENDENCIES) $(EXTRA_tst_compress_DEPENDENCIES) 
 	@rm -f tst_compress$(EXEEXT)
-	$(LINK) $(tst_compress_OBJECTS) $(tst_compress_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_compress_OBJECTS) $(tst_compress_LDADD) $(LIBS)
 tst_create_files$(EXEEXT): $(tst_create_files_OBJECTS) $(tst_create_files_DEPENDENCIES) $(EXTRA_tst_create_files_DEPENDENCIES) 
 	@rm -f tst_create_files$(EXEEXT)
-	$(LINK) $(tst_create_files_OBJECTS) $(tst_create_files_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_create_files_OBJECTS) $(tst_create_files_LDADD) $(LIBS)
 tst_enum_data$(EXEEXT): $(tst_enum_data_OBJECTS) $(tst_enum_data_DEPENDENCIES) $(EXTRA_tst_enum_data_DEPENDENCIES) 
 	@rm -f tst_enum_data$(EXEEXT)
-	$(LINK) $(tst_enum_data_OBJECTS) $(tst_enum_data_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_enum_data_OBJECTS) $(tst_enum_data_LDADD) $(LIBS)
 tst_fillbug$(EXEEXT): $(tst_fillbug_OBJECTS) $(tst_fillbug_DEPENDENCIES) $(EXTRA_tst_fillbug_DEPENDENCIES) 
 	@rm -f tst_fillbug$(EXEEXT)
-	$(LINK) $(tst_fillbug_OBJECTS) $(tst_fillbug_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_fillbug_OBJECTS) $(tst_fillbug_LDADD) $(LIBS)
 tst_group_data$(EXEEXT): $(tst_group_data_OBJECTS) $(tst_group_data_DEPENDENCIES) $(EXTRA_tst_group_data_DEPENDENCIES) 
 	@rm -f tst_group_data$(EXEEXT)
-	$(LINK) $(tst_group_data_OBJECTS) $(tst_group_data_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_group_data_OBJECTS) $(tst_group_data_LDADD) $(LIBS)
 tst_h_rdc0$(EXEEXT): $(tst_h_rdc0_OBJECTS) $(tst_h_rdc0_DEPENDENCIES) $(EXTRA_tst_h_rdc0_DEPENDENCIES) 
 	@rm -f tst_h_rdc0$(EXEEXT)
-	$(LINK) $(tst_h_rdc0_OBJECTS) $(tst_h_rdc0_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_h_rdc0_OBJECTS) $(tst_h_rdc0_LDADD) $(LIBS)
 tst_nans$(EXEEXT): $(tst_nans_OBJECTS) $(tst_nans_DEPENDENCIES) $(EXTRA_tst_nans_DEPENDENCIES) 
 	@rm -f tst_nans$(EXEEXT)
-	$(LINK) $(tst_nans_OBJECTS) $(tst_nans_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_nans_OBJECTS) $(tst_nans_LDADD) $(LIBS)
 tst_opaque_data$(EXEEXT): $(tst_opaque_data_OBJECTS) $(tst_opaque_data_DEPENDENCIES) $(EXTRA_tst_opaque_data_DEPENDENCIES) 
 	@rm -f tst_opaque_data$(EXEEXT)
-	$(LINK) $(tst_opaque_data_OBJECTS) $(tst_opaque_data_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_opaque_data_OBJECTS) $(tst_opaque_data_LDADD) $(LIBS)
 tst_special_atts$(EXEEXT): $(tst_special_atts_OBJECTS) $(tst_special_atts_DEPENDENCIES) $(EXTRA_tst_special_atts_DEPENDENCIES) 
 	@rm -f tst_special_atts$(EXEEXT)
-	$(LINK) $(tst_special_atts_OBJECTS) $(tst_special_atts_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_special_atts_OBJECTS) $(tst_special_atts_LDADD) $(LIBS)
 tst_string_data$(EXEEXT): $(tst_string_data_OBJECTS) $(tst_string_data_DEPENDENCIES) $(EXTRA_tst_string_data_DEPENDENCIES) 
 	@rm -f tst_string_data$(EXEEXT)
-	$(LINK) $(tst_string_data_OBJECTS) $(tst_string_data_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_string_data_OBJECTS) $(tst_string_data_LDADD) $(LIBS)
 tst_unicode$(EXEEXT): $(tst_unicode_OBJECTS) $(tst_unicode_DEPENDENCIES) $(EXTRA_tst_unicode_DEPENDENCIES) 
 	@rm -f tst_unicode$(EXEEXT)
-	$(LINK) $(tst_unicode_OBJECTS) $(tst_unicode_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_unicode_OBJECTS) $(tst_unicode_LDADD) $(LIBS)
 tst_utf8$(EXEEXT): $(tst_utf8_OBJECTS) $(tst_utf8_DEPENDENCIES) $(EXTRA_tst_utf8_DEPENDENCIES) 
 	@rm -f tst_utf8$(EXEEXT)
-	$(LINK) $(tst_utf8_OBJECTS) $(tst_utf8_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_utf8_OBJECTS) $(tst_utf8_LDADD) $(LIBS)
 tst_vlen_data$(EXEEXT): $(tst_vlen_data_OBJECTS) $(tst_vlen_data_DEPENDENCIES) $(EXTRA_tst_vlen_data_DEPENDENCIES) 
 	@rm -f tst_vlen_data$(EXEEXT)
-	$(LINK) $(tst_vlen_data_OBJECTS) $(tst_vlen_data_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_vlen_data_OBJECTS) $(tst_vlen_data_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -734,42 +778,42 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vardata.Po@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
 @am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
 tst_h_rdc0-tst_h_rdc0.o: tst_h_rdc0.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tst_h_rdc0_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tst_h_rdc0-tst_h_rdc0.o -MD -MP -MF $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Tpo -c -o tst_h_rdc0-tst_h_rdc0.o `test -f 'tst_h_rdc0.c' || echo '$(srcdir)/'`tst_h_rdc0.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Tpo $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tst_h_rdc0.c' object='tst_h_rdc0-tst_h_rdc0.o' libtool=no @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tst_h_rdc0_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tst_h_rdc0-tst_h_rdc0.o -MD -MP -MF $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Tpo -c -o tst_h_rdc0-tst_h_rdc0.o `test -f 'tst_h_rdc0.c' || echo '$(srcdir)/'`tst_h_rdc0.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Tpo $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tst_h_rdc0.c' object='tst_h_rdc0-tst_h_rdc0.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tst_h_rdc0_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tst_h_rdc0-tst_h_rdc0.o `test -f 'tst_h_rdc0.c' || echo '$(srcdir)/'`tst_h_rdc0.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tst_h_rdc0_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tst_h_rdc0-tst_h_rdc0.o `test -f 'tst_h_rdc0.c' || echo '$(srcdir)/'`tst_h_rdc0.c
 
 tst_h_rdc0-tst_h_rdc0.obj: tst_h_rdc0.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tst_h_rdc0_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tst_h_rdc0-tst_h_rdc0.obj -MD -MP -MF $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Tpo -c -o tst_h_rdc0-tst_h_rdc0.obj `if test -f 'tst_h_rdc0.c'; then $(CYGPATH_W) 'tst_h_rdc0.c'; else $(CYGPATH_W) '$(srcdir)/tst_h_rdc0.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Tpo $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='tst_h_rdc0.c' object='tst_h_rdc0-tst_h_rdc0.obj' libtool=no @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tst_h_rdc0_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT tst_h_rdc0-tst_h_rdc0.obj -MD -MP -MF $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Tpo -c -o tst_h_rdc0-tst_h_rdc0.obj `if test -f 'tst_h_rdc0.c'; then $(CYGPATH_W) 'tst_h_rdc0.c'; else $(CYGPATH_W) '$(srcdir)/tst_h_rdc0.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Tpo $(DEPDIR)/tst_h_rdc0-tst_h_rdc0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='tst_h_rdc0.c' object='tst_h_rdc0-tst_h_rdc0.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tst_h_rdc0_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tst_h_rdc0-tst_h_rdc0.obj `if test -f 'tst_h_rdc0.c'; then $(CYGPATH_W) 'tst_h_rdc0.c'; else $(CYGPATH_W) '$(srcdir)/tst_h_rdc0.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(tst_h_rdc0_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o tst_h_rdc0-tst_h_rdc0.obj `if test -f 'tst_h_rdc0.c'; then $(CYGPATH_W) 'tst_h_rdc0.c'; else $(CYGPATH_W) '$(srcdir)/tst_h_rdc0.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -109,20 +109,45 @@ am__objects_2 =
 @BUILD_DAP_TRUE@am_libdap2_la_OBJECTS = $(am__objects_1) \
 @BUILD_DAP_TRUE@	$(am__objects_2)
 libdap2_la_OBJECTS = $(am_libdap2_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 @BUILD_DAP_TRUE@am_libdap2_la_rpath =
+AM_V_P = $(am__v_P_@AM_V@)
+am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
+am__v_P_0 = false
+am__v_P_1 = :
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN     " $@;
+am__v_GEN_1 = 
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
+am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = $(libdap2_la_SOURCES)
 DIST_SOURCES = $(am__libdap2_la_SOURCES_DIST)
 am__can_run_installinfo = \
@@ -136,6 +161,7 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -352,7 +378,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 libdap2.la: $(libdap2_la_OBJECTS) $(libdap2_la_DEPENDENCIES) $(EXTRA_libdap2_la_DEPENDENCIES) 
-	$(LINK) $(am_libdap2_la_rpath) $(libdap2_la_OBJECTS) $(libdap2_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(am_libdap2_la_rpath) $(libdap2_la_OBJECTS) $(libdap2_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -382,168 +408,168 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdap2_la-ncdaperr.Plo@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
 @am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
 libdap2_la-constraints3.lo: constraints3.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-constraints3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-constraints3.Tpo -c -o libdap2_la-constraints3.lo `test -f 'constraints3.c' || echo '$(srcdir)/'`constraints3.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-constraints3.Tpo $(DEPDIR)/libdap2_la-constraints3.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='constraints3.c' object='libdap2_la-constraints3.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-constraints3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-constraints3.Tpo -c -o libdap2_la-constraints3.lo `test -f 'constraints3.c' || echo '$(srcdir)/'`constraints3.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-constraints3.Tpo $(DEPDIR)/libdap2_la-constraints3.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='constraints3.c' object='libdap2_la-constraints3.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-constraints3.lo `test -f 'constraints3.c' || echo '$(srcdir)/'`constraints3.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-constraints3.lo `test -f 'constraints3.c' || echo '$(srcdir)/'`constraints3.c
 
 libdap2_la-common34.lo: common34.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-common34.lo -MD -MP -MF $(DEPDIR)/libdap2_la-common34.Tpo -c -o libdap2_la-common34.lo `test -f 'common34.c' || echo '$(srcdir)/'`common34.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-common34.Tpo $(DEPDIR)/libdap2_la-common34.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='common34.c' object='libdap2_la-common34.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-common34.lo -MD -MP -MF $(DEPDIR)/libdap2_la-common34.Tpo -c -o libdap2_la-common34.lo `test -f 'common34.c' || echo '$(srcdir)/'`common34.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-common34.Tpo $(DEPDIR)/libdap2_la-common34.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='common34.c' object='libdap2_la-common34.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-common34.lo `test -f 'common34.c' || echo '$(srcdir)/'`common34.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-common34.lo `test -f 'common34.c' || echo '$(srcdir)/'`common34.c
 
 libdap2_la-dapcvt.lo: dapcvt.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapcvt.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapcvt.Tpo -c -o libdap2_la-dapcvt.lo `test -f 'dapcvt.c' || echo '$(srcdir)/'`dapcvt.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dapcvt.Tpo $(DEPDIR)/libdap2_la-dapcvt.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dapcvt.c' object='libdap2_la-dapcvt.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapcvt.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapcvt.Tpo -c -o libdap2_la-dapcvt.lo `test -f 'dapcvt.c' || echo '$(srcdir)/'`dapcvt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dapcvt.Tpo $(DEPDIR)/libdap2_la-dapcvt.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dapcvt.c' object='libdap2_la-dapcvt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapcvt.lo `test -f 'dapcvt.c' || echo '$(srcdir)/'`dapcvt.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapcvt.lo `test -f 'dapcvt.c' || echo '$(srcdir)/'`dapcvt.c
 
 libdap2_la-dapalign.lo: dapalign.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapalign.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapalign.Tpo -c -o libdap2_la-dapalign.lo `test -f 'dapalign.c' || echo '$(srcdir)/'`dapalign.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dapalign.Tpo $(DEPDIR)/libdap2_la-dapalign.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dapalign.c' object='libdap2_la-dapalign.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapalign.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapalign.Tpo -c -o libdap2_la-dapalign.lo `test -f 'dapalign.c' || echo '$(srcdir)/'`dapalign.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dapalign.Tpo $(DEPDIR)/libdap2_la-dapalign.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dapalign.c' object='libdap2_la-dapalign.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapalign.lo `test -f 'dapalign.c' || echo '$(srcdir)/'`dapalign.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapalign.lo `test -f 'dapalign.c' || echo '$(srcdir)/'`dapalign.c
 
 libdap2_la-dapodom.lo: dapodom.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapodom.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapodom.Tpo -c -o libdap2_la-dapodom.lo `test -f 'dapodom.c' || echo '$(srcdir)/'`dapodom.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dapodom.Tpo $(DEPDIR)/libdap2_la-dapodom.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dapodom.c' object='libdap2_la-dapodom.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapodom.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapodom.Tpo -c -o libdap2_la-dapodom.lo `test -f 'dapodom.c' || echo '$(srcdir)/'`dapodom.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dapodom.Tpo $(DEPDIR)/libdap2_la-dapodom.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dapodom.c' object='libdap2_la-dapodom.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapodom.lo `test -f 'dapodom.c' || echo '$(srcdir)/'`dapodom.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapodom.lo `test -f 'dapodom.c' || echo '$(srcdir)/'`dapodom.c
 
 libdap2_la-daputil.lo: daputil.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-daputil.lo -MD -MP -MF $(DEPDIR)/libdap2_la-daputil.Tpo -c -o libdap2_la-daputil.lo `test -f 'daputil.c' || echo '$(srcdir)/'`daputil.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-daputil.Tpo $(DEPDIR)/libdap2_la-daputil.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='daputil.c' object='libdap2_la-daputil.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-daputil.lo -MD -MP -MF $(DEPDIR)/libdap2_la-daputil.Tpo -c -o libdap2_la-daputil.lo `test -f 'daputil.c' || echo '$(srcdir)/'`daputil.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-daputil.Tpo $(DEPDIR)/libdap2_la-daputil.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='daputil.c' object='libdap2_la-daputil.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-daputil.lo `test -f 'daputil.c' || echo '$(srcdir)/'`daputil.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-daputil.lo `test -f 'daputil.c' || echo '$(srcdir)/'`daputil.c
 
 libdap2_la-ncdaperr.lo: ncdaperr.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-ncdaperr.lo -MD -MP -MF $(DEPDIR)/libdap2_la-ncdaperr.Tpo -c -o libdap2_la-ncdaperr.lo `test -f 'ncdaperr.c' || echo '$(srcdir)/'`ncdaperr.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-ncdaperr.Tpo $(DEPDIR)/libdap2_la-ncdaperr.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ncdaperr.c' object='libdap2_la-ncdaperr.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-ncdaperr.lo -MD -MP -MF $(DEPDIR)/libdap2_la-ncdaperr.Tpo -c -o libdap2_la-ncdaperr.lo `test -f 'ncdaperr.c' || echo '$(srcdir)/'`ncdaperr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-ncdaperr.Tpo $(DEPDIR)/libdap2_la-ncdaperr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ncdaperr.c' object='libdap2_la-ncdaperr.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-ncdaperr.lo `test -f 'ncdaperr.c' || echo '$(srcdir)/'`ncdaperr.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-ncdaperr.lo `test -f 'ncdaperr.c' || echo '$(srcdir)/'`ncdaperr.c
 
 libdap2_la-cdf3.lo: cdf3.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-cdf3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-cdf3.Tpo -c -o libdap2_la-cdf3.lo `test -f 'cdf3.c' || echo '$(srcdir)/'`cdf3.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-cdf3.Tpo $(DEPDIR)/libdap2_la-cdf3.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cdf3.c' object='libdap2_la-cdf3.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-cdf3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-cdf3.Tpo -c -o libdap2_la-cdf3.lo `test -f 'cdf3.c' || echo '$(srcdir)/'`cdf3.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-cdf3.Tpo $(DEPDIR)/libdap2_la-cdf3.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cdf3.c' object='libdap2_la-cdf3.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-cdf3.lo `test -f 'cdf3.c' || echo '$(srcdir)/'`cdf3.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-cdf3.lo `test -f 'cdf3.c' || echo '$(srcdir)/'`cdf3.c
 
 libdap2_la-cache.lo: cache.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-cache.lo -MD -MP -MF $(DEPDIR)/libdap2_la-cache.Tpo -c -o libdap2_la-cache.lo `test -f 'cache.c' || echo '$(srcdir)/'`cache.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-cache.Tpo $(DEPDIR)/libdap2_la-cache.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cache.c' object='libdap2_la-cache.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-cache.lo -MD -MP -MF $(DEPDIR)/libdap2_la-cache.Tpo -c -o libdap2_la-cache.lo `test -f 'cache.c' || echo '$(srcdir)/'`cache.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-cache.Tpo $(DEPDIR)/libdap2_la-cache.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cache.c' object='libdap2_la-cache.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-cache.lo `test -f 'cache.c' || echo '$(srcdir)/'`cache.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-cache.lo `test -f 'cache.c' || echo '$(srcdir)/'`cache.c
 
 libdap2_la-dapdump.lo: dapdump.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapdump.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapdump.Tpo -c -o libdap2_la-dapdump.lo `test -f 'dapdump.c' || echo '$(srcdir)/'`dapdump.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dapdump.Tpo $(DEPDIR)/libdap2_la-dapdump.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dapdump.c' object='libdap2_la-dapdump.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapdump.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapdump.Tpo -c -o libdap2_la-dapdump.lo `test -f 'dapdump.c' || echo '$(srcdir)/'`dapdump.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dapdump.Tpo $(DEPDIR)/libdap2_la-dapdump.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dapdump.c' object='libdap2_la-dapdump.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapdump.lo `test -f 'dapdump.c' || echo '$(srcdir)/'`dapdump.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapdump.lo `test -f 'dapdump.c' || echo '$(srcdir)/'`dapdump.c
 
 libdap2_la-dapdebug.lo: dapdebug.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapdebug.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapdebug.Tpo -c -o libdap2_la-dapdebug.lo `test -f 'dapdebug.c' || echo '$(srcdir)/'`dapdebug.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dapdebug.Tpo $(DEPDIR)/libdap2_la-dapdebug.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dapdebug.c' object='libdap2_la-dapdebug.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapdebug.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapdebug.Tpo -c -o libdap2_la-dapdebug.lo `test -f 'dapdebug.c' || echo '$(srcdir)/'`dapdebug.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dapdebug.Tpo $(DEPDIR)/libdap2_la-dapdebug.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dapdebug.c' object='libdap2_la-dapdebug.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapdebug.lo `test -f 'dapdebug.c' || echo '$(srcdir)/'`dapdebug.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapdebug.lo `test -f 'dapdebug.c' || echo '$(srcdir)/'`dapdebug.c
 
 libdap2_la-dapattr3.lo: dapattr3.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapattr3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapattr3.Tpo -c -o libdap2_la-dapattr3.lo `test -f 'dapattr3.c' || echo '$(srcdir)/'`dapattr3.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dapattr3.Tpo $(DEPDIR)/libdap2_la-dapattr3.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dapattr3.c' object='libdap2_la-dapattr3.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dapattr3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dapattr3.Tpo -c -o libdap2_la-dapattr3.lo `test -f 'dapattr3.c' || echo '$(srcdir)/'`dapattr3.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dapattr3.Tpo $(DEPDIR)/libdap2_la-dapattr3.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dapattr3.c' object='libdap2_la-dapattr3.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapattr3.lo `test -f 'dapattr3.c' || echo '$(srcdir)/'`dapattr3.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dapattr3.lo `test -f 'dapattr3.c' || echo '$(srcdir)/'`dapattr3.c
 
 libdap2_la-ncd3dispatch.lo: ncd3dispatch.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-ncd3dispatch.lo -MD -MP -MF $(DEPDIR)/libdap2_la-ncd3dispatch.Tpo -c -o libdap2_la-ncd3dispatch.lo `test -f 'ncd3dispatch.c' || echo '$(srcdir)/'`ncd3dispatch.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-ncd3dispatch.Tpo $(DEPDIR)/libdap2_la-ncd3dispatch.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ncd3dispatch.c' object='libdap2_la-ncd3dispatch.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-ncd3dispatch.lo -MD -MP -MF $(DEPDIR)/libdap2_la-ncd3dispatch.Tpo -c -o libdap2_la-ncd3dispatch.lo `test -f 'ncd3dispatch.c' || echo '$(srcdir)/'`ncd3dispatch.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-ncd3dispatch.Tpo $(DEPDIR)/libdap2_la-ncd3dispatch.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ncd3dispatch.c' object='libdap2_la-ncd3dispatch.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-ncd3dispatch.lo `test -f 'ncd3dispatch.c' || echo '$(srcdir)/'`ncd3dispatch.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-ncd3dispatch.lo `test -f 'ncd3dispatch.c' || echo '$(srcdir)/'`ncd3dispatch.c
 
 libdap2_la-ncdap3.lo: ncdap3.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-ncdap3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-ncdap3.Tpo -c -o libdap2_la-ncdap3.lo `test -f 'ncdap3.c' || echo '$(srcdir)/'`ncdap3.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-ncdap3.Tpo $(DEPDIR)/libdap2_la-ncdap3.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ncdap3.c' object='libdap2_la-ncdap3.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-ncdap3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-ncdap3.Tpo -c -o libdap2_la-ncdap3.lo `test -f 'ncdap3.c' || echo '$(srcdir)/'`ncdap3.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-ncdap3.Tpo $(DEPDIR)/libdap2_la-ncdap3.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ncdap3.c' object='libdap2_la-ncdap3.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-ncdap3.lo `test -f 'ncdap3.c' || echo '$(srcdir)/'`ncdap3.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-ncdap3.lo `test -f 'ncdap3.c' || echo '$(srcdir)/'`ncdap3.c
 
 libdap2_la-ncdap3a.lo: ncdap3a.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-ncdap3a.lo -MD -MP -MF $(DEPDIR)/libdap2_la-ncdap3a.Tpo -c -o libdap2_la-ncdap3a.lo `test -f 'ncdap3a.c' || echo '$(srcdir)/'`ncdap3a.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-ncdap3a.Tpo $(DEPDIR)/libdap2_la-ncdap3a.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ncdap3a.c' object='libdap2_la-ncdap3a.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-ncdap3a.lo -MD -MP -MF $(DEPDIR)/libdap2_la-ncdap3a.Tpo -c -o libdap2_la-ncdap3a.lo `test -f 'ncdap3a.c' || echo '$(srcdir)/'`ncdap3a.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-ncdap3a.Tpo $(DEPDIR)/libdap2_la-ncdap3a.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ncdap3a.c' object='libdap2_la-ncdap3a.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-ncdap3a.lo `test -f 'ncdap3a.c' || echo '$(srcdir)/'`ncdap3a.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-ncdap3a.lo `test -f 'ncdap3a.c' || echo '$(srcdir)/'`ncdap3a.c
 
 libdap2_la-getvara3.lo: getvara3.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-getvara3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-getvara3.Tpo -c -o libdap2_la-getvara3.lo `test -f 'getvara3.c' || echo '$(srcdir)/'`getvara3.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-getvara3.Tpo $(DEPDIR)/libdap2_la-getvara3.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='getvara3.c' object='libdap2_la-getvara3.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-getvara3.lo -MD -MP -MF $(DEPDIR)/libdap2_la-getvara3.Tpo -c -o libdap2_la-getvara3.lo `test -f 'getvara3.c' || echo '$(srcdir)/'`getvara3.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-getvara3.Tpo $(DEPDIR)/libdap2_la-getvara3.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='getvara3.c' object='libdap2_la-getvara3.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-getvara3.lo `test -f 'getvara3.c' || echo '$(srcdir)/'`getvara3.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-getvara3.lo `test -f 'getvara3.c' || echo '$(srcdir)/'`getvara3.c
 
 libdap2_la-dceconstraints.lo: dceconstraints.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dceconstraints.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dceconstraints.Tpo -c -o libdap2_la-dceconstraints.lo `test -f 'dceconstraints.c' || echo '$(srcdir)/'`dceconstraints.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dceconstraints.Tpo $(DEPDIR)/libdap2_la-dceconstraints.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dceconstraints.c' object='libdap2_la-dceconstraints.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dceconstraints.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dceconstraints.Tpo -c -o libdap2_la-dceconstraints.lo `test -f 'dceconstraints.c' || echo '$(srcdir)/'`dceconstraints.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dceconstraints.Tpo $(DEPDIR)/libdap2_la-dceconstraints.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dceconstraints.c' object='libdap2_la-dceconstraints.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dceconstraints.lo `test -f 'dceconstraints.c' || echo '$(srcdir)/'`dceconstraints.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dceconstraints.lo `test -f 'dceconstraints.c' || echo '$(srcdir)/'`dceconstraints.c
 
 libdap2_la-dcetab.lo: dcetab.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dcetab.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dcetab.Tpo -c -o libdap2_la-dcetab.lo `test -f 'dcetab.c' || echo '$(srcdir)/'`dcetab.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dcetab.Tpo $(DEPDIR)/libdap2_la-dcetab.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dcetab.c' object='libdap2_la-dcetab.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dcetab.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dcetab.Tpo -c -o libdap2_la-dcetab.lo `test -f 'dcetab.c' || echo '$(srcdir)/'`dcetab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dcetab.Tpo $(DEPDIR)/libdap2_la-dcetab.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dcetab.c' object='libdap2_la-dcetab.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dcetab.lo `test -f 'dcetab.c' || echo '$(srcdir)/'`dcetab.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dcetab.lo `test -f 'dcetab.c' || echo '$(srcdir)/'`dcetab.c
 
 libdap2_la-dceparse.lo: dceparse.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dceparse.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dceparse.Tpo -c -o libdap2_la-dceparse.lo `test -f 'dceparse.c' || echo '$(srcdir)/'`dceparse.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dceparse.Tpo $(DEPDIR)/libdap2_la-dceparse.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dceparse.c' object='libdap2_la-dceparse.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dceparse.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dceparse.Tpo -c -o libdap2_la-dceparse.lo `test -f 'dceparse.c' || echo '$(srcdir)/'`dceparse.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dceparse.Tpo $(DEPDIR)/libdap2_la-dceparse.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dceparse.c' object='libdap2_la-dceparse.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dceparse.lo `test -f 'dceparse.c' || echo '$(srcdir)/'`dceparse.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dceparse.lo `test -f 'dceparse.c' || echo '$(srcdir)/'`dceparse.c
 
 libdap2_la-dcelex.lo: dcelex.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dcelex.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dcelex.Tpo -c -o libdap2_la-dcelex.lo `test -f 'dcelex.c' || echo '$(srcdir)/'`dcelex.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdap2_la-dcelex.Tpo $(DEPDIR)/libdap2_la-dcelex.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dcelex.c' object='libdap2_la-dcelex.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libdap2_la-dcelex.lo -MD -MP -MF $(DEPDIR)/libdap2_la-dcelex.Tpo -c -o libdap2_la-dcelex.lo `test -f 'dcelex.c' || echo '$(srcdir)/'`dcelex.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdap2_la-dcelex.Tpo $(DEPDIR)/libdap2_la-dcelex.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dcelex.c' object='libdap2_la-dcelex.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dcelex.lo `test -f 'dcelex.c' || echo '$(srcdir)/'`dcelex.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdap2_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libdap2_la-dcelex.lo `test -f 'dcelex.c' || echo '$(srcdir)/'`dcelex.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

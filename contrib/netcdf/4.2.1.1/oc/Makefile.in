@@ -96,20 +96,45 @@ am__objects_2 =
 @BUILD_DAP_TRUE@am_liboc_la_OBJECTS = $(am__objects_1) \
 @BUILD_DAP_TRUE@	$(am__objects_2)
 liboc_la_OBJECTS = $(am_liboc_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 @BUILD_DAP_TRUE@am_liboc_la_rpath =
+AM_V_P = $(am__v_P_@AM_V@)
+am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
+am__v_P_0 = false
+am__v_P_1 = :
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN     " $@;
+am__v_GEN_1 = 
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
+am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = $(liboc_la_SOURCES)
 DIST_SOURCES = $(am__liboc_la_SOURCES_DIST)
 am__can_run_installinfo = \
@@ -123,6 +148,7 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -316,7 +342,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 liboc.la: $(liboc_la_OBJECTS) $(liboc_la_DEPENDENCIES) $(EXTRA_liboc_la_DEPENDENCIES) 
-	$(LINK) $(am_liboc_la_rpath) $(liboc_la_OBJECTS) $(liboc_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(am_liboc_la_rpath) $(liboc_la_OBJECTS) $(liboc_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -347,175 +373,175 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboc_la-xxdr.Plo@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
 @am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
 liboc_la-occurlfunctions.lo: occurlfunctions.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-occurlfunctions.lo -MD -MP -MF $(DEPDIR)/liboc_la-occurlfunctions.Tpo -c -o liboc_la-occurlfunctions.lo `test -f 'occurlfunctions.c' || echo '$(srcdir)/'`occurlfunctions.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-occurlfunctions.Tpo $(DEPDIR)/liboc_la-occurlfunctions.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='occurlfunctions.c' object='liboc_la-occurlfunctions.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-occurlfunctions.lo -MD -MP -MF $(DEPDIR)/liboc_la-occurlfunctions.Tpo -c -o liboc_la-occurlfunctions.lo `test -f 'occurlfunctions.c' || echo '$(srcdir)/'`occurlfunctions.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-occurlfunctions.Tpo $(DEPDIR)/liboc_la-occurlfunctions.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='occurlfunctions.c' object='liboc_la-occurlfunctions.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-occurlfunctions.lo `test -f 'occurlfunctions.c' || echo '$(srcdir)/'`occurlfunctions.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-occurlfunctions.lo `test -f 'occurlfunctions.c' || echo '$(srcdir)/'`occurlfunctions.c
 
 liboc_la-dapparse.lo: dapparse.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-dapparse.lo -MD -MP -MF $(DEPDIR)/liboc_la-dapparse.Tpo -c -o liboc_la-dapparse.lo `test -f 'dapparse.c' || echo '$(srcdir)/'`dapparse.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-dapparse.Tpo $(DEPDIR)/liboc_la-dapparse.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dapparse.c' object='liboc_la-dapparse.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-dapparse.lo -MD -MP -MF $(DEPDIR)/liboc_la-dapparse.Tpo -c -o liboc_la-dapparse.lo `test -f 'dapparse.c' || echo '$(srcdir)/'`dapparse.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-dapparse.Tpo $(DEPDIR)/liboc_la-dapparse.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='dapparse.c' object='liboc_la-dapparse.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-dapparse.lo `test -f 'dapparse.c' || echo '$(srcdir)/'`dapparse.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-dapparse.lo `test -f 'dapparse.c' || echo '$(srcdir)/'`dapparse.c
 
 liboc_la-daplex.lo: daplex.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-daplex.lo -MD -MP -MF $(DEPDIR)/liboc_la-daplex.Tpo -c -o liboc_la-daplex.lo `test -f 'daplex.c' || echo '$(srcdir)/'`daplex.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-daplex.Tpo $(DEPDIR)/liboc_la-daplex.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='daplex.c' object='liboc_la-daplex.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-daplex.lo -MD -MP -MF $(DEPDIR)/liboc_la-daplex.Tpo -c -o liboc_la-daplex.lo `test -f 'daplex.c' || echo '$(srcdir)/'`daplex.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-daplex.Tpo $(DEPDIR)/liboc_la-daplex.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='daplex.c' object='liboc_la-daplex.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-daplex.lo `test -f 'daplex.c' || echo '$(srcdir)/'`daplex.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-daplex.lo `test -f 'daplex.c' || echo '$(srcdir)/'`daplex.c
 
 liboc_la-ocuri.lo: ocuri.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocuri.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocuri.Tpo -c -o liboc_la-ocuri.lo `test -f 'ocuri.c' || echo '$(srcdir)/'`ocuri.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocuri.Tpo $(DEPDIR)/liboc_la-ocuri.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocuri.c' object='liboc_la-ocuri.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocuri.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocuri.Tpo -c -o liboc_la-ocuri.lo `test -f 'ocuri.c' || echo '$(srcdir)/'`ocuri.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocuri.Tpo $(DEPDIR)/liboc_la-ocuri.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocuri.c' object='liboc_la-ocuri.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocuri.lo `test -f 'ocuri.c' || echo '$(srcdir)/'`ocuri.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocuri.lo `test -f 'ocuri.c' || echo '$(srcdir)/'`ocuri.c
 
 liboc_la-ochttp.lo: ochttp.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ochttp.lo -MD -MP -MF $(DEPDIR)/liboc_la-ochttp.Tpo -c -o liboc_la-ochttp.lo `test -f 'ochttp.c' || echo '$(srcdir)/'`ochttp.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ochttp.Tpo $(DEPDIR)/liboc_la-ochttp.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ochttp.c' object='liboc_la-ochttp.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ochttp.lo -MD -MP -MF $(DEPDIR)/liboc_la-ochttp.Tpo -c -o liboc_la-ochttp.lo `test -f 'ochttp.c' || echo '$(srcdir)/'`ochttp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ochttp.Tpo $(DEPDIR)/liboc_la-ochttp.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ochttp.c' object='liboc_la-ochttp.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ochttp.lo `test -f 'ochttp.c' || echo '$(srcdir)/'`ochttp.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ochttp.lo `test -f 'ochttp.c' || echo '$(srcdir)/'`ochttp.c
 
 liboc_la-ocbytes.lo: ocbytes.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocbytes.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocbytes.Tpo -c -o liboc_la-ocbytes.lo `test -f 'ocbytes.c' || echo '$(srcdir)/'`ocbytes.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocbytes.Tpo $(DEPDIR)/liboc_la-ocbytes.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocbytes.c' object='liboc_la-ocbytes.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocbytes.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocbytes.Tpo -c -o liboc_la-ocbytes.lo `test -f 'ocbytes.c' || echo '$(srcdir)/'`ocbytes.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocbytes.Tpo $(DEPDIR)/liboc_la-ocbytes.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocbytes.c' object='liboc_la-ocbytes.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocbytes.lo `test -f 'ocbytes.c' || echo '$(srcdir)/'`ocbytes.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocbytes.lo `test -f 'ocbytes.c' || echo '$(srcdir)/'`ocbytes.c
 
 liboc_la-oc.lo: oc.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-oc.lo -MD -MP -MF $(DEPDIR)/liboc_la-oc.Tpo -c -o liboc_la-oc.lo `test -f 'oc.c' || echo '$(srcdir)/'`oc.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-oc.Tpo $(DEPDIR)/liboc_la-oc.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oc.c' object='liboc_la-oc.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-oc.lo -MD -MP -MF $(DEPDIR)/liboc_la-oc.Tpo -c -o liboc_la-oc.lo `test -f 'oc.c' || echo '$(srcdir)/'`oc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-oc.Tpo $(DEPDIR)/liboc_la-oc.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='oc.c' object='liboc_la-oc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-oc.lo `test -f 'oc.c' || echo '$(srcdir)/'`oc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-oc.lo `test -f 'oc.c' || echo '$(srcdir)/'`oc.c
 
 liboc_la-occontent.lo: occontent.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-occontent.lo -MD -MP -MF $(DEPDIR)/liboc_la-occontent.Tpo -c -o liboc_la-occontent.lo `test -f 'occontent.c' || echo '$(srcdir)/'`occontent.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-occontent.Tpo $(DEPDIR)/liboc_la-occontent.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='occontent.c' object='liboc_la-occontent.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-occontent.lo -MD -MP -MF $(DEPDIR)/liboc_la-occontent.Tpo -c -o liboc_la-occontent.lo `test -f 'occontent.c' || echo '$(srcdir)/'`occontent.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-occontent.Tpo $(DEPDIR)/liboc_la-occontent.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='occontent.c' object='liboc_la-occontent.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-occontent.lo `test -f 'occontent.c' || echo '$(srcdir)/'`occontent.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-occontent.lo `test -f 'occontent.c' || echo '$(srcdir)/'`occontent.c
 
 liboc_la-ocdebug.lo: ocdebug.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocdebug.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocdebug.Tpo -c -o liboc_la-ocdebug.lo `test -f 'ocdebug.c' || echo '$(srcdir)/'`ocdebug.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocdebug.Tpo $(DEPDIR)/liboc_la-ocdebug.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocdebug.c' object='liboc_la-ocdebug.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocdebug.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocdebug.Tpo -c -o liboc_la-ocdebug.lo `test -f 'ocdebug.c' || echo '$(srcdir)/'`ocdebug.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocdebug.Tpo $(DEPDIR)/liboc_la-ocdebug.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocdebug.c' object='liboc_la-ocdebug.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocdebug.lo `test -f 'ocdebug.c' || echo '$(srcdir)/'`ocdebug.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocdebug.lo `test -f 'ocdebug.c' || echo '$(srcdir)/'`ocdebug.c
 
 liboc_la-ocdrno.lo: ocdrno.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocdrno.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocdrno.Tpo -c -o liboc_la-ocdrno.lo `test -f 'ocdrno.c' || echo '$(srcdir)/'`ocdrno.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocdrno.Tpo $(DEPDIR)/liboc_la-ocdrno.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocdrno.c' object='liboc_la-ocdrno.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocdrno.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocdrno.Tpo -c -o liboc_la-ocdrno.lo `test -f 'ocdrno.c' || echo '$(srcdir)/'`ocdrno.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocdrno.Tpo $(DEPDIR)/liboc_la-ocdrno.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocdrno.c' object='liboc_la-ocdrno.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocdrno.lo `test -f 'ocdrno.c' || echo '$(srcdir)/'`ocdrno.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocdrno.lo `test -f 'ocdrno.c' || echo '$(srcdir)/'`ocdrno.c
 
 liboc_la-ocdump.lo: ocdump.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocdump.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocdump.Tpo -c -o liboc_la-ocdump.lo `test -f 'ocdump.c' || echo '$(srcdir)/'`ocdump.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocdump.Tpo $(DEPDIR)/liboc_la-ocdump.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocdump.c' object='liboc_la-ocdump.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocdump.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocdump.Tpo -c -o liboc_la-ocdump.lo `test -f 'ocdump.c' || echo '$(srcdir)/'`ocdump.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocdump.Tpo $(DEPDIR)/liboc_la-ocdump.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocdump.c' object='liboc_la-ocdump.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocdump.lo `test -f 'ocdump.c' || echo '$(srcdir)/'`ocdump.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocdump.lo `test -f 'ocdump.c' || echo '$(srcdir)/'`ocdump.c
 
 liboc_la-ocinternal.lo: ocinternal.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocinternal.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocinternal.Tpo -c -o liboc_la-ocinternal.lo `test -f 'ocinternal.c' || echo '$(srcdir)/'`ocinternal.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocinternal.Tpo $(DEPDIR)/liboc_la-ocinternal.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocinternal.c' object='liboc_la-ocinternal.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocinternal.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocinternal.Tpo -c -o liboc_la-ocinternal.lo `test -f 'ocinternal.c' || echo '$(srcdir)/'`ocinternal.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocinternal.Tpo $(DEPDIR)/liboc_la-ocinternal.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocinternal.c' object='liboc_la-ocinternal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocinternal.lo `test -f 'ocinternal.c' || echo '$(srcdir)/'`ocinternal.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocinternal.lo `test -f 'ocinternal.c' || echo '$(srcdir)/'`ocinternal.c
 
 liboc_la-oclist.lo: oclist.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-oclist.lo -MD -MP -MF $(DEPDIR)/liboc_la-oclist.Tpo -c -o liboc_la-oclist.lo `test -f 'oclist.c' || echo '$(srcdir)/'`oclist.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-oclist.Tpo $(DEPDIR)/liboc_la-oclist.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oclist.c' object='liboc_la-oclist.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-oclist.lo -MD -MP -MF $(DEPDIR)/liboc_la-oclist.Tpo -c -o liboc_la-oclist.lo `test -f 'oclist.c' || echo '$(srcdir)/'`oclist.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-oclist.Tpo $(DEPDIR)/liboc_la-oclist.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='oclist.c' object='liboc_la-oclist.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-oclist.lo `test -f 'oclist.c' || echo '$(srcdir)/'`oclist.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-oclist.lo `test -f 'oclist.c' || echo '$(srcdir)/'`oclist.c
 
 liboc_la-oclog.lo: oclog.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-oclog.lo -MD -MP -MF $(DEPDIR)/liboc_la-oclog.Tpo -c -o liboc_la-oclog.lo `test -f 'oclog.c' || echo '$(srcdir)/'`oclog.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-oclog.Tpo $(DEPDIR)/liboc_la-oclog.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='oclog.c' object='liboc_la-oclog.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-oclog.lo -MD -MP -MF $(DEPDIR)/liboc_la-oclog.Tpo -c -o liboc_la-oclog.lo `test -f 'oclog.c' || echo '$(srcdir)/'`oclog.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-oclog.Tpo $(DEPDIR)/liboc_la-oclog.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='oclog.c' object='liboc_la-oclog.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-oclog.lo `test -f 'oclog.c' || echo '$(srcdir)/'`oclog.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-oclog.lo `test -f 'oclog.c' || echo '$(srcdir)/'`oclog.c
 
 liboc_la-ocnode.lo: ocnode.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocnode.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocnode.Tpo -c -o liboc_la-ocnode.lo `test -f 'ocnode.c' || echo '$(srcdir)/'`ocnode.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocnode.Tpo $(DEPDIR)/liboc_la-ocnode.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocnode.c' object='liboc_la-ocnode.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocnode.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocnode.Tpo -c -o liboc_la-ocnode.lo `test -f 'ocnode.c' || echo '$(srcdir)/'`ocnode.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocnode.Tpo $(DEPDIR)/liboc_la-ocnode.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocnode.c' object='liboc_la-ocnode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocnode.lo `test -f 'ocnode.c' || echo '$(srcdir)/'`ocnode.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocnode.lo `test -f 'ocnode.c' || echo '$(srcdir)/'`ocnode.c
 
 liboc_la-ocutil.lo: ocutil.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocutil.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocutil.Tpo -c -o liboc_la-ocutil.lo `test -f 'ocutil.c' || echo '$(srcdir)/'`ocutil.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocutil.Tpo $(DEPDIR)/liboc_la-ocutil.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocutil.c' object='liboc_la-ocutil.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocutil.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocutil.Tpo -c -o liboc_la-ocutil.lo `test -f 'ocutil.c' || echo '$(srcdir)/'`ocutil.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocutil.Tpo $(DEPDIR)/liboc_la-ocutil.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocutil.c' object='liboc_la-ocutil.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocutil.lo `test -f 'ocutil.c' || echo '$(srcdir)/'`ocutil.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocutil.lo `test -f 'ocutil.c' || echo '$(srcdir)/'`ocutil.c
 
 liboc_la-occlientparams.lo: occlientparams.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-occlientparams.lo -MD -MP -MF $(DEPDIR)/liboc_la-occlientparams.Tpo -c -o liboc_la-occlientparams.lo `test -f 'occlientparams.c' || echo '$(srcdir)/'`occlientparams.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-occlientparams.Tpo $(DEPDIR)/liboc_la-occlientparams.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='occlientparams.c' object='liboc_la-occlientparams.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-occlientparams.lo -MD -MP -MF $(DEPDIR)/liboc_la-occlientparams.Tpo -c -o liboc_la-occlientparams.lo `test -f 'occlientparams.c' || echo '$(srcdir)/'`occlientparams.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-occlientparams.Tpo $(DEPDIR)/liboc_la-occlientparams.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='occlientparams.c' object='liboc_la-occlientparams.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-occlientparams.lo `test -f 'occlientparams.c' || echo '$(srcdir)/'`occlientparams.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-occlientparams.lo `test -f 'occlientparams.c' || echo '$(srcdir)/'`occlientparams.c
 
 liboc_la-ocrc.lo: ocrc.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocrc.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocrc.Tpo -c -o liboc_la-ocrc.lo `test -f 'ocrc.c' || echo '$(srcdir)/'`ocrc.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocrc.Tpo $(DEPDIR)/liboc_la-ocrc.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocrc.c' object='liboc_la-ocrc.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocrc.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocrc.Tpo -c -o liboc_la-ocrc.lo `test -f 'ocrc.c' || echo '$(srcdir)/'`ocrc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocrc.Tpo $(DEPDIR)/liboc_la-ocrc.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocrc.c' object='liboc_la-ocrc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocrc.lo `test -f 'ocrc.c' || echo '$(srcdir)/'`ocrc.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocrc.lo `test -f 'ocrc.c' || echo '$(srcdir)/'`ocrc.c
 
 liboc_la-ocread.lo: ocread.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocread.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocread.Tpo -c -o liboc_la-ocread.lo `test -f 'ocread.c' || echo '$(srcdir)/'`ocread.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-ocread.Tpo $(DEPDIR)/liboc_la-ocread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ocread.c' object='liboc_la-ocread.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-ocread.lo -MD -MP -MF $(DEPDIR)/liboc_la-ocread.Tpo -c -o liboc_la-ocread.lo `test -f 'ocread.c' || echo '$(srcdir)/'`ocread.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-ocread.Tpo $(DEPDIR)/liboc_la-ocread.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ocread.c' object='liboc_la-ocread.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocread.lo `test -f 'ocread.c' || echo '$(srcdir)/'`ocread.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-ocread.lo `test -f 'ocread.c' || echo '$(srcdir)/'`ocread.c
 
 liboc_la-xxdr.lo: xxdr.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-xxdr.lo -MD -MP -MF $(DEPDIR)/liboc_la-xxdr.Tpo -c -o liboc_la-xxdr.lo `test -f 'xxdr.c' || echo '$(srcdir)/'`xxdr.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-xxdr.Tpo $(DEPDIR)/liboc_la-xxdr.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xxdr.c' object='liboc_la-xxdr.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-xxdr.lo -MD -MP -MF $(DEPDIR)/liboc_la-xxdr.Tpo -c -o liboc_la-xxdr.lo `test -f 'xxdr.c' || echo '$(srcdir)/'`xxdr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-xxdr.Tpo $(DEPDIR)/liboc_la-xxdr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='xxdr.c' object='liboc_la-xxdr.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-xxdr.lo `test -f 'xxdr.c' || echo '$(srcdir)/'`xxdr.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-xxdr.lo `test -f 'xxdr.c' || echo '$(srcdir)/'`xxdr.c
 
 liboc_la-daptab.lo: daptab.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-daptab.lo -MD -MP -MF $(DEPDIR)/liboc_la-daptab.Tpo -c -o liboc_la-daptab.lo `test -f 'daptab.c' || echo '$(srcdir)/'`daptab.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/liboc_la-daptab.Tpo $(DEPDIR)/liboc_la-daptab.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='daptab.c' object='liboc_la-daptab.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT liboc_la-daptab.lo -MD -MP -MF $(DEPDIR)/liboc_la-daptab.Tpo -c -o liboc_la-daptab.lo `test -f 'daptab.c' || echo '$(srcdir)/'`daptab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboc_la-daptab.Tpo $(DEPDIR)/liboc_la-daptab.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='daptab.c' object='liboc_la-daptab.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-daptab.lo `test -f 'daptab.c' || echo '$(srcdir)/'`daptab.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboc_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o liboc_la-daptab.lo `test -f 'daptab.c' || echo '$(srcdir)/'`daptab.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

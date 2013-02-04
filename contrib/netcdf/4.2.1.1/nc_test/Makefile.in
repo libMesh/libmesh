@@ -122,6 +122,10 @@ large_files_SOURCES = large_files.c
 large_files_OBJECTS = large_files.$(OBJEXT)
 large_files_LDADD = $(LDADD)
 large_files_DEPENDENCIES = ${top_builddir}/liblib/libnetcdf.la
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 am_nc_test_OBJECTS = nc_test.$(OBJEXT) error.$(OBJEXT) \
 	test_get.$(OBJEXT) test_put.$(OBJEXT) test_read.$(OBJEXT) \
 	test_write.$(OBJEXT) util.$(OBJEXT)
@@ -213,19 +217,40 @@ tst_small_SOURCES = tst_small.c
 tst_small_OBJECTS = tst_small.$(OBJEXT)
 tst_small_LDADD = $(LDADD)
 tst_small_DEPENDENCIES = ${top_builddir}/liblib/libnetcdf.la
+AM_V_P = $(am__v_P_@AM_V@)
+am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
+am__v_P_0 = false
+am__v_P_1 = :
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN     " $@;
+am__v_GEN_1 = 
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
+am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = large_files.c $(nc_test_SOURCES) quick_large_files.c t_nc.c \
 	$(testnc3perf_SOURCES) tst_atts.c tst_atts3.c tst_big_rvar.c \
 	tst_big_var.c tst_big_var2.c tst_big_var6.c tst_diskless.c \
@@ -248,11 +273,30 @@ CTAGS = ctags
 am__tty_colors_dummy = \
   mgn= red= grn= lgn= blu= brg= std=; \
   am__color_tests=no
-am__tty_colors = $(am__tty_colors_dummy)
+am__tty_colors = { \
+  $(am__tty_colors_dummy); \
+  if test "X$(AM_COLOR_TESTS)" = Xno; then \
+    am__color_tests=no; \
+  elif test "X$(AM_COLOR_TESTS)" = Xalways; then \
+    am__color_tests=yes; \
+  elif test "X$$TERM" != Xdumb && { test -t 1; } 2>/dev/null; then \
+    am__color_tests=yes; \
+  fi; \
+  if test $$am__color_tests = yes; then \
+    red='[0;31m'; \
+    grn='[0;32m'; \
+    lgn='[1;32m'; \
+    blu='[1;34m'; \
+    mgn='[0;35m'; \
+    brg='[1m'; \
+    std='[m'; \
+  fi; \
+}
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -473,73 +517,73 @@ clean-checkPROGRAMS:
 	rm -f $$list
 large_files$(EXEEXT): $(large_files_OBJECTS) $(large_files_DEPENDENCIES) $(EXTRA_large_files_DEPENDENCIES) 
 	@rm -f large_files$(EXEEXT)
-	$(LINK) $(large_files_OBJECTS) $(large_files_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(large_files_OBJECTS) $(large_files_LDADD) $(LIBS)
 nc_test$(EXEEXT): $(nc_test_OBJECTS) $(nc_test_DEPENDENCIES) $(EXTRA_nc_test_DEPENDENCIES) 
 	@rm -f nc_test$(EXEEXT)
-	$(LINK) $(nc_test_OBJECTS) $(nc_test_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(nc_test_OBJECTS) $(nc_test_LDADD) $(LIBS)
 quick_large_files$(EXEEXT): $(quick_large_files_OBJECTS) $(quick_large_files_DEPENDENCIES) $(EXTRA_quick_large_files_DEPENDENCIES) 
 	@rm -f quick_large_files$(EXEEXT)
-	$(LINK) $(quick_large_files_OBJECTS) $(quick_large_files_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(quick_large_files_OBJECTS) $(quick_large_files_LDADD) $(LIBS)
 t_nc$(EXEEXT): $(t_nc_OBJECTS) $(t_nc_DEPENDENCIES) $(EXTRA_t_nc_DEPENDENCIES) 
 	@rm -f t_nc$(EXEEXT)
-	$(LINK) $(t_nc_OBJECTS) $(t_nc_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(t_nc_OBJECTS) $(t_nc_LDADD) $(LIBS)
 testnc3perf$(EXEEXT): $(testnc3perf_OBJECTS) $(testnc3perf_DEPENDENCIES) $(EXTRA_testnc3perf_DEPENDENCIES) 
 	@rm -f testnc3perf$(EXEEXT)
-	$(LINK) $(testnc3perf_OBJECTS) $(testnc3perf_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(testnc3perf_OBJECTS) $(testnc3perf_LDADD) $(LIBS)
 tst_atts$(EXEEXT): $(tst_atts_OBJECTS) $(tst_atts_DEPENDENCIES) $(EXTRA_tst_atts_DEPENDENCIES) 
 	@rm -f tst_atts$(EXEEXT)
-	$(LINK) $(tst_atts_OBJECTS) $(tst_atts_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_atts_OBJECTS) $(tst_atts_LDADD) $(LIBS)
 tst_atts3$(EXEEXT): $(tst_atts3_OBJECTS) $(tst_atts3_DEPENDENCIES) $(EXTRA_tst_atts3_DEPENDENCIES) 
 	@rm -f tst_atts3$(EXEEXT)
-	$(LINK) $(tst_atts3_OBJECTS) $(tst_atts3_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_atts3_OBJECTS) $(tst_atts3_LDADD) $(LIBS)
 tst_big_rvar$(EXEEXT): $(tst_big_rvar_OBJECTS) $(tst_big_rvar_DEPENDENCIES) $(EXTRA_tst_big_rvar_DEPENDENCIES) 
 	@rm -f tst_big_rvar$(EXEEXT)
-	$(LINK) $(tst_big_rvar_OBJECTS) $(tst_big_rvar_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_big_rvar_OBJECTS) $(tst_big_rvar_LDADD) $(LIBS)
 tst_big_var$(EXEEXT): $(tst_big_var_OBJECTS) $(tst_big_var_DEPENDENCIES) $(EXTRA_tst_big_var_DEPENDENCIES) 
 	@rm -f tst_big_var$(EXEEXT)
-	$(LINK) $(tst_big_var_OBJECTS) $(tst_big_var_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_big_var_OBJECTS) $(tst_big_var_LDADD) $(LIBS)
 tst_big_var2$(EXEEXT): $(tst_big_var2_OBJECTS) $(tst_big_var2_DEPENDENCIES) $(EXTRA_tst_big_var2_DEPENDENCIES) 
 	@rm -f tst_big_var2$(EXEEXT)
-	$(LINK) $(tst_big_var2_OBJECTS) $(tst_big_var2_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_big_var2_OBJECTS) $(tst_big_var2_LDADD) $(LIBS)
 tst_big_var6$(EXEEXT): $(tst_big_var6_OBJECTS) $(tst_big_var6_DEPENDENCIES) $(EXTRA_tst_big_var6_DEPENDENCIES) 
 	@rm -f tst_big_var6$(EXEEXT)
-	$(LINK) $(tst_big_var6_OBJECTS) $(tst_big_var6_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_big_var6_OBJECTS) $(tst_big_var6_LDADD) $(LIBS)
 tst_diskless$(EXEEXT): $(tst_diskless_OBJECTS) $(tst_diskless_DEPENDENCIES) $(EXTRA_tst_diskless_DEPENDENCIES) 
 	@rm -f tst_diskless$(EXEEXT)
-	$(LINK) $(tst_diskless_OBJECTS) $(tst_diskless_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_diskless_OBJECTS) $(tst_diskless_LDADD) $(LIBS)
 tst_diskless2$(EXEEXT): $(tst_diskless2_OBJECTS) $(tst_diskless2_DEPENDENCIES) $(EXTRA_tst_diskless2_DEPENDENCIES) 
 	@rm -f tst_diskless2$(EXEEXT)
-	$(LINK) $(tst_diskless2_OBJECTS) $(tst_diskless2_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_diskless2_OBJECTS) $(tst_diskless2_LDADD) $(LIBS)
 tst_diskless3$(EXEEXT): $(tst_diskless3_OBJECTS) $(tst_diskless3_DEPENDENCIES) $(EXTRA_tst_diskless3_DEPENDENCIES) 
 	@rm -f tst_diskless3$(EXEEXT)
-	$(LINK) $(tst_diskless3_OBJECTS) $(tst_diskless3_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_diskless3_OBJECTS) $(tst_diskless3_LDADD) $(LIBS)
 tst_diskless4$(EXEEXT): $(tst_diskless4_OBJECTS) $(tst_diskless4_DEPENDENCIES) $(EXTRA_tst_diskless4_DEPENDENCIES) 
 	@rm -f tst_diskless4$(EXEEXT)
-	$(LINK) $(tst_diskless4_OBJECTS) $(tst_diskless4_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_diskless4_OBJECTS) $(tst_diskless4_LDADD) $(LIBS)
 tst_large$(EXEEXT): $(tst_large_OBJECTS) $(tst_large_DEPENDENCIES) $(EXTRA_tst_large_DEPENDENCIES) 
 	@rm -f tst_large$(EXEEXT)
-	$(LINK) $(tst_large_OBJECTS) $(tst_large_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_large_OBJECTS) $(tst_large_LDADD) $(LIBS)
 tst_misc$(EXEEXT): $(tst_misc_OBJECTS) $(tst_misc_DEPENDENCIES) $(EXTRA_tst_misc_DEPENDENCIES) 
 	@rm -f tst_misc$(EXEEXT)
-	$(LINK) $(tst_misc_OBJECTS) $(tst_misc_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_misc_OBJECTS) $(tst_misc_LDADD) $(LIBS)
 tst_names$(EXEEXT): $(tst_names_OBJECTS) $(tst_names_DEPENDENCIES) $(EXTRA_tst_names_DEPENDENCIES) 
 	@rm -f tst_names$(EXEEXT)
-	$(LINK) $(tst_names_OBJECTS) $(tst_names_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_names_OBJECTS) $(tst_names_LDADD) $(LIBS)
 tst_nofill$(EXEEXT): $(tst_nofill_OBJECTS) $(tst_nofill_DEPENDENCIES) $(EXTRA_tst_nofill_DEPENDENCIES) 
 	@rm -f tst_nofill$(EXEEXT)
-	$(LINK) $(tst_nofill_OBJECTS) $(tst_nofill_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_nofill_OBJECTS) $(tst_nofill_LDADD) $(LIBS)
 tst_nofill2$(EXEEXT): $(tst_nofill2_OBJECTS) $(tst_nofill2_DEPENDENCIES) $(EXTRA_tst_nofill2_DEPENDENCIES) 
 	@rm -f tst_nofill2$(EXEEXT)
-	$(LINK) $(tst_nofill2_OBJECTS) $(tst_nofill2_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_nofill2_OBJECTS) $(tst_nofill2_LDADD) $(LIBS)
 tst_nofill3$(EXEEXT): $(tst_nofill3_OBJECTS) $(tst_nofill3_DEPENDENCIES) $(EXTRA_tst_nofill3_DEPENDENCIES) 
 	@rm -f tst_nofill3$(EXEEXT)
-	$(LINK) $(tst_nofill3_OBJECTS) $(tst_nofill3_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_nofill3_OBJECTS) $(tst_nofill3_LDADD) $(LIBS)
 tst_norm$(EXEEXT): $(tst_norm_OBJECTS) $(tst_norm_DEPENDENCIES) $(EXTRA_tst_norm_DEPENDENCIES) 
 	@rm -f tst_norm$(EXEEXT)
-	$(LINK) $(tst_norm_OBJECTS) $(tst_norm_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_norm_OBJECTS) $(tst_norm_LDADD) $(LIBS)
 tst_small$(EXEEXT): $(tst_small_OBJECTS) $(tst_small_DEPENDENCIES) $(EXTRA_tst_small_DEPENDENCIES) 
 	@rm -f tst_small$(EXEEXT)
-	$(LINK) $(tst_small_OBJECTS) $(tst_small_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(tst_small_OBJECTS) $(tst_small_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -578,28 +622,28 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
 @am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo

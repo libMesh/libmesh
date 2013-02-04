@@ -134,20 +134,45 @@ am__objects_2 =
 @BUILD_CDMREMOTE_TRUE@am_libnccr_la_OBJECTS = $(am__objects_1) \
 @BUILD_CDMREMOTE_TRUE@	$(am__objects_2)
 libnccr_la_OBJECTS = $(am_libnccr_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
 @BUILD_CDMREMOTE_TRUE@am_libnccr_la_rpath =
+AM_V_P = $(am__v_P_@AM_V@)
+am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
+am__v_P_0 = false
+am__v_P_1 = :
+AM_V_GEN = $(am__v_GEN_@AM_V@)
+am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
+am__v_GEN_0 = @echo "  GEN     " $@;
+am__v_GEN_1 = 
+AM_V_at = $(am__v_at_@AM_V@)
+am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
+am__v_at_0 = @
+am__v_at_1 = 
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
 CCLD = $(CC)
-LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
-	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = $(libnccr_la_SOURCES)
 DIST_SOURCES = $(am__libnccr_la_SOURCES_DIST)
 am__can_run_installinfo = \
@@ -161,6 +186,7 @@ DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
+AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -373,7 +399,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 libnccr.la: $(libnccr_la_OBJECTS) $(libnccr_la_DEPENDENCIES) $(EXTRA_libnccr_la_DEPENDENCIES) 
-	$(LINK) $(am_libnccr_la_rpath) $(libnccr_la_OBJECTS) $(libnccr_la_LIBADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(am_libnccr_la_rpath) $(libnccr_la_OBJECTS) $(libnccr_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -402,161 +428,161 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnccr_la-nccrproto.Plo@am__quote@
 
 .c.o:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
 @am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
 @am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
 libnccr_la-nccrcvt.lo: nccrcvt.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrcvt.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrcvt.Tpo -c -o libnccr_la-nccrcvt.lo `test -f 'nccrcvt.c' || echo '$(srcdir)/'`nccrcvt.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-nccrcvt.Tpo $(DEPDIR)/libnccr_la-nccrcvt.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nccrcvt.c' object='libnccr_la-nccrcvt.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrcvt.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrcvt.Tpo -c -o libnccr_la-nccrcvt.lo `test -f 'nccrcvt.c' || echo '$(srcdir)/'`nccrcvt.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-nccrcvt.Tpo $(DEPDIR)/libnccr_la-nccrcvt.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nccrcvt.c' object='libnccr_la-nccrcvt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrcvt.lo `test -f 'nccrcvt.c' || echo '$(srcdir)/'`nccrcvt.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrcvt.lo `test -f 'nccrcvt.c' || echo '$(srcdir)/'`nccrcvt.c
 
 libnccr_la-nccr.lo: nccr.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccr.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccr.Tpo -c -o libnccr_la-nccr.lo `test -f 'nccr.c' || echo '$(srcdir)/'`nccr.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-nccr.Tpo $(DEPDIR)/libnccr_la-nccr.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nccr.c' object='libnccr_la-nccr.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccr.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccr.Tpo -c -o libnccr_la-nccr.lo `test -f 'nccr.c' || echo '$(srcdir)/'`nccr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-nccr.Tpo $(DEPDIR)/libnccr_la-nccr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nccr.c' object='libnccr_la-nccr.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccr.lo `test -f 'nccr.c' || echo '$(srcdir)/'`nccr.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccr.lo `test -f 'nccr.c' || echo '$(srcdir)/'`nccr.c
 
 libnccr_la-nccrdispatch.lo: nccrdispatch.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrdispatch.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrdispatch.Tpo -c -o libnccr_la-nccrdispatch.lo `test -f 'nccrdispatch.c' || echo '$(srcdir)/'`nccrdispatch.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-nccrdispatch.Tpo $(DEPDIR)/libnccr_la-nccrdispatch.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nccrdispatch.c' object='libnccr_la-nccrdispatch.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrdispatch.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrdispatch.Tpo -c -o libnccr_la-nccrdispatch.lo `test -f 'nccrdispatch.c' || echo '$(srcdir)/'`nccrdispatch.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-nccrdispatch.Tpo $(DEPDIR)/libnccr_la-nccrdispatch.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nccrdispatch.c' object='libnccr_la-nccrdispatch.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrdispatch.lo `test -f 'nccrdispatch.c' || echo '$(srcdir)/'`nccrdispatch.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrdispatch.lo `test -f 'nccrdispatch.c' || echo '$(srcdir)/'`nccrdispatch.c
 
 libnccr_la-crmeta.lo: crmeta.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-crmeta.lo -MD -MP -MF $(DEPDIR)/libnccr_la-crmeta.Tpo -c -o libnccr_la-crmeta.lo `test -f 'crmeta.c' || echo '$(srcdir)/'`crmeta.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-crmeta.Tpo $(DEPDIR)/libnccr_la-crmeta.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crmeta.c' object='libnccr_la-crmeta.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-crmeta.lo -MD -MP -MF $(DEPDIR)/libnccr_la-crmeta.Tpo -c -o libnccr_la-crmeta.lo `test -f 'crmeta.c' || echo '$(srcdir)/'`crmeta.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-crmeta.Tpo $(DEPDIR)/libnccr_la-crmeta.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='crmeta.c' object='libnccr_la-crmeta.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-crmeta.lo `test -f 'crmeta.c' || echo '$(srcdir)/'`crmeta.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-crmeta.lo `test -f 'crmeta.c' || echo '$(srcdir)/'`crmeta.c
 
 libnccr_la-nccrproto.lo: nccrproto.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrproto.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrproto.Tpo -c -o libnccr_la-nccrproto.lo `test -f 'nccrproto.c' || echo '$(srcdir)/'`nccrproto.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-nccrproto.Tpo $(DEPDIR)/libnccr_la-nccrproto.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nccrproto.c' object='libnccr_la-nccrproto.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrproto.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrproto.Tpo -c -o libnccr_la-nccrproto.lo `test -f 'nccrproto.c' || echo '$(srcdir)/'`nccrproto.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-nccrproto.Tpo $(DEPDIR)/libnccr_la-nccrproto.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nccrproto.c' object='libnccr_la-nccrproto.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrproto.lo `test -f 'nccrproto.c' || echo '$(srcdir)/'`nccrproto.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrproto.lo `test -f 'nccrproto.c' || echo '$(srcdir)/'`nccrproto.c
 
 libnccr_la-nccrgetvarx.lo: nccrgetvarx.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrgetvarx.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrgetvarx.Tpo -c -o libnccr_la-nccrgetvarx.lo `test -f 'nccrgetvarx.c' || echo '$(srcdir)/'`nccrgetvarx.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-nccrgetvarx.Tpo $(DEPDIR)/libnccr_la-nccrgetvarx.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nccrgetvarx.c' object='libnccr_la-nccrgetvarx.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrgetvarx.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrgetvarx.Tpo -c -o libnccr_la-nccrgetvarx.lo `test -f 'nccrgetvarx.c' || echo '$(srcdir)/'`nccrgetvarx.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-nccrgetvarx.Tpo $(DEPDIR)/libnccr_la-nccrgetvarx.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nccrgetvarx.c' object='libnccr_la-nccrgetvarx.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrgetvarx.lo `test -f 'nccrgetvarx.c' || echo '$(srcdir)/'`nccrgetvarx.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrgetvarx.lo `test -f 'nccrgetvarx.c' || echo '$(srcdir)/'`nccrgetvarx.c
 
 libnccr_la-crdebug.lo: crdebug.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-crdebug.lo -MD -MP -MF $(DEPDIR)/libnccr_la-crdebug.Tpo -c -o libnccr_la-crdebug.lo `test -f 'crdebug.c' || echo '$(srcdir)/'`crdebug.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-crdebug.Tpo $(DEPDIR)/libnccr_la-crdebug.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crdebug.c' object='libnccr_la-crdebug.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-crdebug.lo -MD -MP -MF $(DEPDIR)/libnccr_la-crdebug.Tpo -c -o libnccr_la-crdebug.lo `test -f 'crdebug.c' || echo '$(srcdir)/'`crdebug.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-crdebug.Tpo $(DEPDIR)/libnccr_la-crdebug.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='crdebug.c' object='libnccr_la-crdebug.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-crdebug.lo `test -f 'crdebug.c' || echo '$(srcdir)/'`crdebug.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-crdebug.lo `test -f 'crdebug.c' || echo '$(srcdir)/'`crdebug.c
 
 libnccr_la-crutil.lo: crutil.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-crutil.lo -MD -MP -MF $(DEPDIR)/libnccr_la-crutil.Tpo -c -o libnccr_la-crutil.lo `test -f 'crutil.c' || echo '$(srcdir)/'`crutil.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-crutil.Tpo $(DEPDIR)/libnccr_la-crutil.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='crutil.c' object='libnccr_la-crutil.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-crutil.lo -MD -MP -MF $(DEPDIR)/libnccr_la-crutil.Tpo -c -o libnccr_la-crutil.lo `test -f 'crutil.c' || echo '$(srcdir)/'`crutil.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-crutil.Tpo $(DEPDIR)/libnccr_la-crutil.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='crutil.c' object='libnccr_la-crutil.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-crutil.lo `test -f 'crutil.c' || echo '$(srcdir)/'`crutil.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-crutil.lo `test -f 'crutil.c' || echo '$(srcdir)/'`crutil.c
 
 libnccr_la-nccrdump.lo: nccrdump.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrdump.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrdump.Tpo -c -o libnccr_la-nccrdump.lo `test -f 'nccrdump.c' || echo '$(srcdir)/'`nccrdump.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-nccrdump.Tpo $(DEPDIR)/libnccr_la-nccrdump.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nccrdump.c' object='libnccr_la-nccrdump.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-nccrdump.lo -MD -MP -MF $(DEPDIR)/libnccr_la-nccrdump.Tpo -c -o libnccr_la-nccrdump.lo `test -f 'nccrdump.c' || echo '$(srcdir)/'`nccrdump.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-nccrdump.Tpo $(DEPDIR)/libnccr_la-nccrdump.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='nccrdump.c' object='libnccr_la-nccrdump.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrdump.lo `test -f 'nccrdump.c' || echo '$(srcdir)/'`nccrdump.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-nccrdump.lo `test -f 'nccrdump.c' || echo '$(srcdir)/'`nccrdump.c
 
 libnccr_la-ncStreamx.lo: ncStreamx.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ncStreamx.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ncStreamx.Tpo -c -o libnccr_la-ncStreamx.lo `test -f 'ncStreamx.c' || echo '$(srcdir)/'`ncStreamx.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-ncStreamx.Tpo $(DEPDIR)/libnccr_la-ncStreamx.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ncStreamx.c' object='libnccr_la-ncStreamx.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ncStreamx.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ncStreamx.Tpo -c -o libnccr_la-ncStreamx.lo `test -f 'ncStreamx.c' || echo '$(srcdir)/'`ncStreamx.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-ncStreamx.Tpo $(DEPDIR)/libnccr_la-ncStreamx.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ncStreamx.c' object='libnccr_la-ncStreamx.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ncStreamx.lo `test -f 'ncStreamx.c' || echo '$(srcdir)/'`ncStreamx.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ncStreamx.lo `test -f 'ncStreamx.c' || echo '$(srcdir)/'`ncStreamx.c
 
 libnccr_la-curlwrap.lo: curlwrap.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-curlwrap.lo -MD -MP -MF $(DEPDIR)/libnccr_la-curlwrap.Tpo -c -o libnccr_la-curlwrap.lo `test -f 'curlwrap.c' || echo '$(srcdir)/'`curlwrap.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-curlwrap.Tpo $(DEPDIR)/libnccr_la-curlwrap.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='curlwrap.c' object='libnccr_la-curlwrap.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-curlwrap.lo -MD -MP -MF $(DEPDIR)/libnccr_la-curlwrap.Tpo -c -o libnccr_la-curlwrap.lo `test -f 'curlwrap.c' || echo '$(srcdir)/'`curlwrap.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-curlwrap.Tpo $(DEPDIR)/libnccr_la-curlwrap.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='curlwrap.c' object='libnccr_la-curlwrap.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-curlwrap.lo `test -f 'curlwrap.c' || echo '$(srcdir)/'`curlwrap.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-curlwrap.lo `test -f 'curlwrap.c' || echo '$(srcdir)/'`curlwrap.c
 
 libnccr_la-ast_byteio.lo: ast_byteio.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_byteio.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_byteio.Tpo -c -o libnccr_la-ast_byteio.lo `test -f 'ast_byteio.c' || echo '$(srcdir)/'`ast_byteio.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-ast_byteio.Tpo $(DEPDIR)/libnccr_la-ast_byteio.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ast_byteio.c' object='libnccr_la-ast_byteio.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_byteio.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_byteio.Tpo -c -o libnccr_la-ast_byteio.lo `test -f 'ast_byteio.c' || echo '$(srcdir)/'`ast_byteio.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-ast_byteio.Tpo $(DEPDIR)/libnccr_la-ast_byteio.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ast_byteio.c' object='libnccr_la-ast_byteio.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_byteio.lo `test -f 'ast_byteio.c' || echo '$(srcdir)/'`ast_byteio.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_byteio.lo `test -f 'ast_byteio.c' || echo '$(srcdir)/'`ast_byteio.c
 
 libnccr_la-ast_curl.lo: ast_curl.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_curl.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_curl.Tpo -c -o libnccr_la-ast_curl.lo `test -f 'ast_curl.c' || echo '$(srcdir)/'`ast_curl.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-ast_curl.Tpo $(DEPDIR)/libnccr_la-ast_curl.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ast_curl.c' object='libnccr_la-ast_curl.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_curl.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_curl.Tpo -c -o libnccr_la-ast_curl.lo `test -f 'ast_curl.c' || echo '$(srcdir)/'`ast_curl.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-ast_curl.Tpo $(DEPDIR)/libnccr_la-ast_curl.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ast_curl.c' object='libnccr_la-ast_curl.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_curl.lo `test -f 'ast_curl.c' || echo '$(srcdir)/'`ast_curl.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_curl.lo `test -f 'ast_curl.c' || echo '$(srcdir)/'`ast_curl.c
 
 libnccr_la-ast_internal.lo: ast_internal.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_internal.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_internal.Tpo -c -o libnccr_la-ast_internal.lo `test -f 'ast_internal.c' || echo '$(srcdir)/'`ast_internal.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-ast_internal.Tpo $(DEPDIR)/libnccr_la-ast_internal.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ast_internal.c' object='libnccr_la-ast_internal.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_internal.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_internal.Tpo -c -o libnccr_la-ast_internal.lo `test -f 'ast_internal.c' || echo '$(srcdir)/'`ast_internal.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-ast_internal.Tpo $(DEPDIR)/libnccr_la-ast_internal.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ast_internal.c' object='libnccr_la-ast_internal.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_internal.lo `test -f 'ast_internal.c' || echo '$(srcdir)/'`ast_internal.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_internal.lo `test -f 'ast_internal.c' || echo '$(srcdir)/'`ast_internal.c
 
 libnccr_la-ast_runtime.lo: ast_runtime.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_runtime.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_runtime.Tpo -c -o libnccr_la-ast_runtime.lo `test -f 'ast_runtime.c' || echo '$(srcdir)/'`ast_runtime.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-ast_runtime.Tpo $(DEPDIR)/libnccr_la-ast_runtime.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ast_runtime.c' object='libnccr_la-ast_runtime.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_runtime.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_runtime.Tpo -c -o libnccr_la-ast_runtime.lo `test -f 'ast_runtime.c' || echo '$(srcdir)/'`ast_runtime.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-ast_runtime.Tpo $(DEPDIR)/libnccr_la-ast_runtime.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ast_runtime.c' object='libnccr_la-ast_runtime.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_runtime.lo `test -f 'ast_runtime.c' || echo '$(srcdir)/'`ast_runtime.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_runtime.lo `test -f 'ast_runtime.c' || echo '$(srcdir)/'`ast_runtime.c
 
 libnccr_la-ast_util.lo: ast_util.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_util.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_util.Tpo -c -o libnccr_la-ast_util.lo `test -f 'ast_util.c' || echo '$(srcdir)/'`ast_util.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-ast_util.Tpo $(DEPDIR)/libnccr_la-ast_util.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ast_util.c' object='libnccr_la-ast_util.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_util.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_util.Tpo -c -o libnccr_la-ast_util.lo `test -f 'ast_util.c' || echo '$(srcdir)/'`ast_util.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-ast_util.Tpo $(DEPDIR)/libnccr_la-ast_util.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ast_util.c' object='libnccr_la-ast_util.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_util.lo `test -f 'ast_util.c' || echo '$(srcdir)/'`ast_util.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_util.lo `test -f 'ast_util.c' || echo '$(srcdir)/'`ast_util.c
 
 libnccr_la-ast_debug.lo: ast_debug.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_debug.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_debug.Tpo -c -o libnccr_la-ast_debug.lo `test -f 'ast_debug.c' || echo '$(srcdir)/'`ast_debug.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-ast_debug.Tpo $(DEPDIR)/libnccr_la-ast_debug.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ast_debug.c' object='libnccr_la-ast_debug.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-ast_debug.lo -MD -MP -MF $(DEPDIR)/libnccr_la-ast_debug.Tpo -c -o libnccr_la-ast_debug.lo `test -f 'ast_debug.c' || echo '$(srcdir)/'`ast_debug.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-ast_debug.Tpo $(DEPDIR)/libnccr_la-ast_debug.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ast_debug.c' object='libnccr_la-ast_debug.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_debug.lo `test -f 'ast_debug.c' || echo '$(srcdir)/'`ast_debug.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-ast_debug.lo `test -f 'ast_debug.c' || echo '$(srcdir)/'`ast_debug.c
 
 libnccr_la-cceparse.lo: cceparse.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-cceparse.lo -MD -MP -MF $(DEPDIR)/libnccr_la-cceparse.Tpo -c -o libnccr_la-cceparse.lo `test -f 'cceparse.c' || echo '$(srcdir)/'`cceparse.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-cceparse.Tpo $(DEPDIR)/libnccr_la-cceparse.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cceparse.c' object='libnccr_la-cceparse.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-cceparse.lo -MD -MP -MF $(DEPDIR)/libnccr_la-cceparse.Tpo -c -o libnccr_la-cceparse.lo `test -f 'cceparse.c' || echo '$(srcdir)/'`cceparse.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-cceparse.Tpo $(DEPDIR)/libnccr_la-cceparse.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cceparse.c' object='libnccr_la-cceparse.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-cceparse.lo `test -f 'cceparse.c' || echo '$(srcdir)/'`cceparse.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-cceparse.lo `test -f 'cceparse.c' || echo '$(srcdir)/'`cceparse.c
 
 libnccr_la-cceconstraints.lo: cceconstraints.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-cceconstraints.lo -MD -MP -MF $(DEPDIR)/libnccr_la-cceconstraints.Tpo -c -o libnccr_la-cceconstraints.lo `test -f 'cceconstraints.c' || echo '$(srcdir)/'`cceconstraints.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnccr_la-cceconstraints.Tpo $(DEPDIR)/libnccr_la-cceconstraints.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cceconstraints.c' object='libnccr_la-cceconstraints.lo' libtool=yes @AMDEPBACKSLASH@
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libnccr_la-cceconstraints.lo -MD -MP -MF $(DEPDIR)/libnccr_la-cceconstraints.Tpo -c -o libnccr_la-cceconstraints.lo `test -f 'cceconstraints.c' || echo '$(srcdir)/'`cceconstraints.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libnccr_la-cceconstraints.Tpo $(DEPDIR)/libnccr_la-cceconstraints.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cceconstraints.c' object='libnccr_la-cceconstraints.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-cceconstraints.lo `test -f 'cceconstraints.c' || echo '$(srcdir)/'`cceconstraints.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnccr_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libnccr_la-cceconstraints.lo `test -f 'cceconstraints.c' || echo '$(srcdir)/'`cceconstraints.c
 
 mostlyclean-libtool:
 	-rm -f *.lo

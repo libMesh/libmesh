@@ -36,7 +36,10 @@ AC_CANONICAL_TARGET
 AC_CONFIG_HEADERS([config.h])
 
 # This call is required by automake.
-AM_INIT_AUTOMAKE([foreign dist-zip subdir-objects])
+AM_INIT_AUTOMAKE([foreign dist-xz dist-bzip2 color-tests subdir-objects 1.11])
+
+# use silent rules - automake 1.11
+AM_SILENT_RULES(yes)
 
 # Check for the existence of this file before proceeding.
 AC_CONFIG_SRCDIR([libsrc/nc.c])
