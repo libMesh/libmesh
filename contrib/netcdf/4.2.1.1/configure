@@ -4915,13 +4915,15 @@ fi
 fi
 
 # Default is now to always do the short remote tests
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether dap remote testing should be enabled (default on)" >&5
-$as_echo_n "checking whether dap remote testing should be enabled (default on)... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether dap remote testing should be enabled (default off)" >&5
+$as_echo_n "checking whether dap remote testing should be enabled (default off)... " >&6; }
 # Check whether --enable-dap-remote-tests was given.
 if test "${enable_dap_remote_tests+set}" = set; then :
   enableval=$enable_dap_remote_tests;
+else
+  enable_dap_remote_tests=no
 fi
-
+ # BSK - disabled by default
 test "x$enable_dap_remote_tests" = xno || enable_dap_remote_tests=yes
 if test "x$enable_dap" = "xno" ; then
   enable_dap_remote_tests=no

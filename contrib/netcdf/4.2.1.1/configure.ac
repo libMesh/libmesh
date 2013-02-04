@@ -282,10 +282,11 @@ if test $require_curl = yes ; then
 fi
 
 # Default is now to always do the short remote tests
-AC_MSG_CHECKING([whether dap remote testing should be enabled (default on)])
+AC_MSG_CHECKING([whether dap remote testing should be enabled (default off)])
 AC_ARG_ENABLE([dap-remote-tests],
               [AS_HELP_STRING([--disable-dap-remote-tests],
-                                 [disable dap remote tests])])
+                                 [disable dap remote tests])],
+	      [],[enable_dap_remote_tests=no]) # BSK - disabled by default
 test "x$enable_dap_remote_tests" = xno || enable_dap_remote_tests=yes
 if test "x$enable_dap" = "xno" ; then
   enable_dap_remote_tests=no
