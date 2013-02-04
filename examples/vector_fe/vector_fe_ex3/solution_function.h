@@ -46,11 +46,11 @@ public:
     output(_u_var+1) = soln( x, y )(1);
   }
 
-  virtual Number component( unsigned int component, const Point& p,
+  virtual Number component( unsigned int component_in, const Point& p,
 			    const Real )
   {
     const Real x=p(0), y=p(1);
-    return soln( x, y )(component);
+    return soln( x, y )(component_in);
   }
 
   virtual AutoPtr<FunctionBase<Number> > clone() const
@@ -82,11 +82,11 @@ public:
     output(_u_var+1) = soln.grad( x, y ).row(1);
   }
 
-  virtual Gradient component( unsigned int component, const Point& p,
+  virtual Gradient component( unsigned int component_in, const Point& p,
 			    const Real )
   {
     const Real x=p(0), y=p(1);
-    return soln.grad( x, y ).row(component);
+    return soln.grad( x, y ).row(component_in);
   }
 
   virtual AutoPtr<FunctionBase<Gradient> > clone() const

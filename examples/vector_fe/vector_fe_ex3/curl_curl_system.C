@@ -33,9 +33,9 @@
 using namespace libMesh;
 
 CurlCurlSystem::CurlCurlSystem( EquationSystems& es,
-			      const std::string& name,
-			      const unsigned int number)
-  : FEMSystem(es, name, number)
+			      const std::string& name_in,
+			      const unsigned int number_in)
+  : FEMSystem(es, name_in, number_in)
 {
   return;
 }
