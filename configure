@@ -31894,7 +31894,12 @@ $as_echo "<<< Configuring library with Nemesis version $nemesisversion support >
 	  ;;
 
       "v5.22")
-	  exit 1
+	  NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion/nemesis"
+
+$as_echo "#define HAVE_NEMESIS_API 1" >>confdefs.h
+
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nemesis version $nemesisversion support >>>" >&5
+$as_echo "<<< Configuring library with Nemesis version $nemesisversion support >>>" >&6; }
 	  ;;
 
       *)
@@ -31904,6 +31909,8 @@ $as_echo "<<< Configuring library with Nemesis version $nemesisversion support >
   esac
 
   ac_config_files="$ac_config_files contrib/nemesis/v3.09/Makefile"
+
+  ac_config_files="$ac_config_files contrib/nemesis/v5.22/nemesis/Makefile"
 
 
 
@@ -34142,6 +34149,7 @@ do
     "contrib/exodusii/v5.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.09/Makefile" ;;
     "contrib/exodusii/v5.22/exodus/cbind/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/cbind/Makefile" ;;
     "contrib/nemesis/v3.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/v3.09/Makefile" ;;
+    "contrib/nemesis/v5.22/nemesis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/v5.22/nemesis/Makefile" ;;
     "contrib/libHilbert/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/libHilbert/Makefile" ;;
     "contrib/fparser/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/fparser/Makefile" ;;
     "contrib/fparser/extrasrc/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/fparser/extrasrc/Makefile" ;;

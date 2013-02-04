@@ -85,6 +85,15 @@ if LIBMESH_ENABLE_NEMESIS_V309
   prof_libs  += nemesis/v3.09/libprof.la 
   oprof_libs += nemesis/v3.09/liboprof.la 
 endif
+
+if LIBMESH_ENABLE_NEMESIS_V522
+  SUBDIRS    += nemesis/v5.22/nemesis
+  opt_libs   += nemesis/v5.22/nemesis/libopt.la 
+  dbg_libs   += nemesis/v5.22/nemesis/libdbg.la 
+  devel_libs += nemesis/v5.22/nemesis/libdevel.la 
+  prof_libs  += nemesis/v5.22/nemesis/libprof.la 
+  oprof_libs += nemesis/v5.22/nemesis/liboprof.la 
+endif
 endif
 
 

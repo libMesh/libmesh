@@ -31,7 +31,9 @@ AC_DEFUN([CONFIGURE_NEMESIS],
 	  ;;
 
       "v5.22")
-	  exit 1
+	  NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion/nemesis"
+	  AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
+	  AC_MSG_RESULT(<<< Configuring library with Nemesis version $nemesisversion support >>>)
 	  ;;
 	  
       *)
@@ -41,5 +43,6 @@ AC_DEFUN([CONFIGURE_NEMESIS],
   esac
 
   AC_CONFIG_FILES([contrib/nemesis/v3.09/Makefile])
+  AC_CONFIG_FILES([contrib/nemesis/v5.22/nemesis/Makefile])
   AC_SUBST(NEMESIS_INCLUDE)
 ])
