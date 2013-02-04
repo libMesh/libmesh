@@ -75,14 +75,18 @@ if LIBMESH_ENABLE_EXODUS_V522
 endif
 endif
 
+
 if LIBMESH_ENABLE_NEMESIS
-  SUBDIRS    += nemesis/Lib
-  opt_libs   += nemesis/Lib/libopt.la 
-  dbg_libs   += nemesis/Lib/libdbg.la 
-  devel_libs += nemesis/Lib/libdevel.la 
-  prof_libs  += nemesis/Lib/libprof.la 
-  oprof_libs += nemesis/Lib/liboprof.la 
+if LIBMESH_ENABLE_NEMESIS_V309
+  SUBDIRS    += nemesis/v3.09
+  opt_libs   += nemesis/v3.09/libopt.la 
+  dbg_libs   += nemesis/v3.09/libdbg.la 
+  devel_libs += nemesis/v3.09/libdevel.la 
+  prof_libs  += nemesis/v3.09/libprof.la 
+  oprof_libs += nemesis/v3.09/liboprof.la 
 endif
+endif
+
 
 if LIBMESH_ENABLE_TECIO
   SUBDIRS    += tecplot/tecio

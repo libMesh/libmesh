@@ -92,12 +92,12 @@ target_triplet = @target@
 @LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_35 = exodusii/v5.22/exodus/cbind/libdevel.la
 @LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_36 = exodusii/v5.22/exodus/cbind/libprof.la
 @LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_37 = exodusii/v5.22/exodus/cbind/liboprof.la
-@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_38 = nemesis/Lib
-@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_39 = nemesis/Lib/libopt.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_40 = nemesis/Lib/libdbg.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_41 = nemesis/Lib/libdevel.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_42 = nemesis/Lib/libprof.la 
-@LIBMESH_ENABLE_NEMESIS_TRUE@am__append_43 = nemesis/Lib/liboprof.la 
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_38 = nemesis/v3.09
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_39 = nemesis/v3.09/libopt.la 
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_40 = nemesis/v3.09/libdbg.la 
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_41 = nemesis/v3.09/libdevel.la 
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_42 = nemesis/v3.09/libprof.la 
+@LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_43 = nemesis/v3.09/liboprof.la 
 @LIBMESH_ENABLE_TECIO_TRUE@am__append_44 = tecplot/tecio
 @LIBMESH_ENABLE_TECIO_TRUE@am__append_45 = tecplot/tecio/libopt.la
 @LIBMESH_ENABLE_TECIO_TRUE@am__append_46 = tecplot/tecio/libdbg.la
@@ -363,7 +363,7 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = boost/include gmv gzstream netcdf/v3 netcdf/v4 \
-	exodusii/v5.09 exodusii/v5.22/exodus/cbind nemesis/Lib \
+	exodusii/v5.09 exodusii/v5.22/exodus/cbind nemesis/v3.09 \
 	tecplot/tecio triangle tetgen libHilbert laspack metis \
 	parmetis sfcurves fparser nanoflann
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -517,7 +517,6 @@ MPI_LIBS_PATH = @MPI_LIBS_PATH@
 MPI_LIBS_PATHS = @MPI_LIBS_PATHS@
 NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
-NEMESIS_LIBRARY = @NEMESIS_LIBRARY@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
 NM = @NM@
 NMEDIT = @NMEDIT@

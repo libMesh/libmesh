@@ -675,9 +675,12 @@ LIBMESH_ENABLE_LIBHILBERT_FALSE
 LIBMESH_ENABLE_LIBHILBERT_TRUE
 LIBHILBERT_LIBRARY
 LIBHILBERT_INCLUDE
+LIBMESH_ENABLE_NEMESIS_V522_FALSE
+LIBMESH_ENABLE_NEMESIS_V522_TRUE
+LIBMESH_ENABLE_NEMESIS_V309_FALSE
+LIBMESH_ENABLE_NEMESIS_V309_TRUE
 LIBMESH_ENABLE_NEMESIS_FALSE
 LIBMESH_ENABLE_NEMESIS_TRUE
-NEMESIS_LIBRARY
 NEMESIS_INCLUDE
 LIBMESH_ENABLE_EXODUS_V522_FALSE
 LIBMESH_ENABLE_EXODUS_V522_TRUE
@@ -31861,44 +31864,53 @@ fi
   # Check whether --enable-nemesis was given.
 if test "${enable_nemesis+set}" = set; then :
   enableval=$enable_nemesis; case "${enableval}" in
-		  yes)  enablenemesis=yes ;;
-		   no)  enablenemesis=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-nemesis" "$LINENO" 5 ;;
+		  yes|v309) enablenemesis=yes ; nemesisversion="v3.09" ;;
+		  new|v522) enablenemesis=yes ; nemesisversion="v5.22" ;;
+		        no) enablenemesis=no  ; nemesisversion=no ;;
+ 		         *) as_fn_error $? "bad value ${enableval} for --enable-nemesis" "$LINENO" 5 ;;
 		 esac
 else
-  enablenemesis=$enableexodus
+  enablenemesis=$enableexodus ; nemesisversion="v3.09"
 fi
  # if unspecified, depend on exodus
 
 
   # Trump --enable-nemesis with --disable-mpi
   if (test "x$enablempi" = xno); then
-    enablenemesis=no
+    nemesisversion=no
   fi
 
-      if (test $enablenemesis = yes); then
-     NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/Lib"
-     NEMESIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libnemesis\$(libext)"
+  case "${nemesisversion}" in
+
+      "v3.09")
+	  # The NEMESIS API is distributed with libmesh, so we don't have to guess
+	  # where it might be installed...
+	  NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion"
 
 $as_echo "#define HAVE_NEMESIS_API 1" >>confdefs.h
 
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nemesis support >>>" >&5
-$as_echo "<<< Configuring library with Nemesis support >>>" >&6; }
-     have_nemesis=yes
-  else
-     NEMESIS_INCLUDE=""
-     NEMESIS_LIBRARY=""
-     enablenemesis=no
-     have_nemesis=no
-  fi
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Nemesis version $nemesisversion support >>>" >&5
+$as_echo "<<< Configuring library with Nemesis version $nemesisversion support >>>" >&6; }
+	  ;;
 
+      "v5.22")
+	  exit 1
+	  ;;
+
+      *)
+	  NEMESIS_INCLUDE=""
+	  enablenemesis=no
+	  ;;
+  esac
+
+  ac_config_files="$ac_config_files contrib/nemesis/v3.09/Makefile"
 
 
 
       if (test $enablenemesis = yes); then
          libmesh_contrib_INCLUDES="$NEMESIS_INCLUDE $libmesh_contrib_INCLUDES"
       fi
-       if test x$enablenemesis = xyes; then
+       if test x$enablenemesis  = xyes; then
   LIBMESH_ENABLE_NEMESIS_TRUE=
   LIBMESH_ENABLE_NEMESIS_FALSE='#'
 else
@@ -31906,7 +31918,21 @@ else
   LIBMESH_ENABLE_NEMESIS_FALSE=
 fi
 
-      ac_config_files="$ac_config_files contrib/nemesis/Lib/Makefile"
+       if test x$nemesisversion = xv3.09; then
+  LIBMESH_ENABLE_NEMESIS_V309_TRUE=
+  LIBMESH_ENABLE_NEMESIS_V309_FALSE='#'
+else
+  LIBMESH_ENABLE_NEMESIS_V309_TRUE='#'
+  LIBMESH_ENABLE_NEMESIS_V309_FALSE=
+fi
+
+       if test x$nemesisversion = xv5.22; then
+  LIBMESH_ENABLE_NEMESIS_V522_TRUE=
+  LIBMESH_ENABLE_NEMESIS_V522_FALSE='#'
+else
+  LIBMESH_ENABLE_NEMESIS_V522_TRUE='#'
+  LIBMESH_ENABLE_NEMESIS_V522_FALSE=
+fi
 
       # -------------------------------------------------------------
    # -------------------------------------------------------------
@@ -32893,6 +32919,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_NEMESIS_TRUE}" && test -z "${LIBMESH_ENABLE_NEMESIS_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NEMESIS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_NEMESIS_V309_TRUE}" && test -z "${LIBMESH_ENABLE_NEMESIS_V309_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_NEMESIS_V309\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_NEMESIS_V522_TRUE}" && test -z "${LIBMESH_ENABLE_NEMESIS_V522_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_NEMESIS_V522\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_LIBHILBERT_TRUE}" && test -z "${LIBMESH_ENABLE_LIBHILBERT_FALSE}"; then
@@ -34107,7 +34141,7 @@ do
     "contrib/netcdf/v3/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netcdf/v3/Makefile" ;;
     "contrib/exodusii/v5.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.09/Makefile" ;;
     "contrib/exodusii/v5.22/exodus/cbind/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/cbind/Makefile" ;;
-    "contrib/nemesis/Lib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/Lib/Makefile" ;;
+    "contrib/nemesis/v3.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/v3.09/Makefile" ;;
     "contrib/libHilbert/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/libHilbert/Makefile" ;;
     "contrib/fparser/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/fparser/Makefile" ;;
     "contrib/fparser/extrasrc/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/fparser/extrasrc/Makefile" ;;
@@ -36349,6 +36383,9 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'mpi.............................. : $enablempi
   echo '  'nanoflann........................ : $enablenanoflann
   echo '  'nemesis.......................... : $enablenemesis
+  if (test "x$nemesisversion" != "xno"); then
+  echo '     'version....................... : $nemesisversion
+  fi
   echo '  'netcdf........................... : $enablenetcdf
   if (test "x$netcdfversion" != "xno"); then
   echo '     'version....................... : $netcdfversion

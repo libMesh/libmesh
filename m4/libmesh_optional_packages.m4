@@ -407,8 +407,9 @@ AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V4, test x$netcdfversion = x4)
       if (test $enablenemesis = yes); then
          libmesh_contrib_INCLUDES="$NEMESIS_INCLUDE $libmesh_contrib_INCLUDES"
       fi
-      AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS, test x$enablenemesis = xyes)
-      AC_CONFIG_FILES([contrib/nemesis/Lib/Makefile])
+      AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS,      test x$enablenemesis  = xyes)
+      AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS_V309, test x$nemesisversion = xv3.09)
+      AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS_V522, test x$nemesisversion = xv5.22)
       # -------------------------------------------------------------
    # -------------------------------------------------------------
 # -------------------------------------------------------------

@@ -59,7 +59,7 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 @LIBMESH_OPT_MODE_TRUE@am__append_3 = libopt.la
 @LIBMESH_PROF_MODE_TRUE@am__append_4 = libprof.la
 @LIBMESH_OPROF_MODE_TRUE@am__append_5 = liboprof.la
-subdir = contrib/nemesis/Lib
+subdir = contrib/nemesis/v3.09
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -485,7 +485,6 @@ MPI_LIBS_PATH = @MPI_LIBS_PATH@
 MPI_LIBS_PATHS = @MPI_LIBS_PATHS@
 NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
-NEMESIS_LIBRARY = @NEMESIS_LIBRARY@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
 NM = @NM@
 NMEDIT = @NMEDIT@
@@ -742,9 +741,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/nemesis/Lib/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/nemesis/v3.09/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu contrib/nemesis/Lib/Makefile
+	  $(AUTOMAKE) --gnu contrib/nemesis/v3.09/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
