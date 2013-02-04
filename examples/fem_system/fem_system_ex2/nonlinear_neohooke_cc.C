@@ -56,9 +56,13 @@ void NonlinearNeoHookeCurrentConfig::init_for_qp(VectorValue<Gradient> & grad_u,
 	  invF.zero();
 	  for (unsigned int i = 0; i < 3; ++i)
 	    for (unsigned int j = 0; j < 3; ++j) {
+#if LIBMESH_USE_COMPLEX_NUMBERS
+	      invF(i, j) += grad_u(i)(j).real();
+#else
 	      invF(i, j) += grad_u(i)(j);
+#endif
 	    }
-    F.add(inv(invF));
+	  F.add(inv(invF));
 	}
 
 	if (F.det() < -TOLERANCE) {

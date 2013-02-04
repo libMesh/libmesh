@@ -67,7 +67,7 @@ void SolidSystem::save_initial_mesh() {
       unsigned int source_dof = node->dof_number(this->number(), var[d], 0);
       unsigned int dest_dof = node->dof_number(aux_sys.number(), undefo_var[d],
           0);
-      Real value = this->current_local_solution->el(source_dof);
+      Number value = this->current_local_solution->el(source_dof);
       aux_sys.current_local_solution->set(dest_dof, value);
     }
   }
@@ -330,8 +330,13 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
       Point orig_point;
       for (unsigned int i = 0; i < n_x_dofs; ++i) {
         for (unsigned int d = 0; d < c.dim; ++d) {
-          Real orig_val = auxsys.current_solution(undefo_dofs[d][i]);
+          Number orig_val = auxsys.current_solution(undefo_dofs[d][i]);
+
+#if LIBMESH_USE_COMPLEX_NUMBERS
+          orig_point(d) += phi[i][qp] * orig_val.real();
+#else
           orig_point(d) += phi[i][qp] * orig_val;
+#endif
         }
       }
 
