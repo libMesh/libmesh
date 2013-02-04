@@ -16,9 +16,9 @@
 using namespace libMesh;
 
 Biharmonic::JR::JR(EquationSystems& eqSys,
-		   const std::string& name,
-		   const unsigned int number) :
-  TransientNonlinearImplicitSystem(eqSys,name,number),
+		   const std::string& name_in,
+		   const unsigned int number_in) :
+  TransientNonlinearImplicitSystem(eqSys,name_in,number_in),
   _biharmonic(dynamic_cast<Biharmonic&>(eqSys))
 {
   // Check that we can actually compute second derivatives
