@@ -96,13 +96,10 @@
 #include "libmesh/solution_history.h"
 #include "libmesh/memory_solution_history.h"
 
-// Some (older) compilers do not offer full stream
-// functionality, OStringStream works around this.
-#include "libmesh/o_string_stream.h"
-
 // C++ includes
 #include <iostream>
 #include <sys/time.h>
+#include <iomanip>
 
 void write_output(EquationSystems &es,		                   
 		  unsigned int a_step,       // The adaptive step count
