@@ -110,7 +110,6 @@ int main (int argc, char** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  MeshRefinement mesh_refinement (mesh);
 
   MeshTools::Generation::build_square (mesh,
 				       16,
