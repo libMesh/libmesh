@@ -83,7 +83,7 @@ const Real sigma = 0.2;
 // This function computes the Jacobian K(x)
 void compute_jacobian (const NumericVector<Number>& soln,
                        SparseMatrix<Number>&  jacobian,
-                       NonlinearImplicitSystem& sys)
+                       NonlinearImplicitSystem& /*sys*/)
 {
   // Get a reference to the equation system.
   EquationSystems &es = *_equation_system;
@@ -213,7 +213,7 @@ void compute_jacobian (const NumericVector<Number>& soln,
 // x is passed in the soln vector
 void compute_residual (const NumericVector<Number>& soln,
                        NumericVector<Number>& residual,
-                       NonlinearImplicitSystem& sys)
+                       NonlinearImplicitSystem& /*sys*/)
 {
   EquationSystems &es = *_equation_system;
 
