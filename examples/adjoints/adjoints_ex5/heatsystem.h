@@ -28,9 +28,9 @@ class HeatSystem : public FEMSystem
 public:
   // Constructor
   HeatSystem(EquationSystems& es,
-               const std::string& name,
-               const unsigned int number)
-  : FEMSystem(es, name, number),
+               const std::string& name_in,
+               const unsigned int number_in)
+  : FEMSystem(es, name_in, number_in),
     _k(1.0),
     _fe_family("LAGRANGE"), _fe_order(1),
     _analytic_jacobians(true), R_plus_dp(0.0), R_minus_dp(0.0), dp(1.e-6) { qoi.resize(1); }

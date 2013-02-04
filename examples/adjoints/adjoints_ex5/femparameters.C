@@ -389,11 +389,11 @@ void FEMParameters::read(GetPot &input)
         const std::string variable_set =
           input("dirichlet_condition_variables", empty_string, i);
 
-        for (unsigned int i=0; i != variable_set.size(); ++i)
+        for (unsigned int j=0; j != variable_set.size(); ++j)
           {
-            if (variable_set[i] == '1')
-              dirichlet_condition_variables[func_boundary].push_back(i);
-            else if (variable_set[i] != '0')
+            if (variable_set[j] == '1')
+              dirichlet_condition_variables[func_boundary].push_back(j);
+            else if (variable_set[j] != '0')
               {
                 libMesh::out << "Unable to understand Dirichlet variable set" 
                              << variable_set << std::endl;
@@ -460,11 +460,11 @@ void FEMParameters::read(GetPot &input)
         const std::string variable_set =
           input("neumann_condition_variables", empty_string, i);
 
-        for (unsigned int i=0; i != variable_set.size(); ++i)
+        for (unsigned int j=0; j != variable_set.size(); ++j)
           {
-            if (variable_set[i] == '1')
-              neumann_condition_variables[func_boundary].push_back(i);
-            else if (variable_set[i] != '0')
+            if (variable_set[j] == '1')
+              neumann_condition_variables[func_boundary].push_back(j);
+            else if (variable_set[j] != '0')
               {
                 libMesh::out << "Unable to understand Neumann variable set" 
                              << variable_set << std::endl;

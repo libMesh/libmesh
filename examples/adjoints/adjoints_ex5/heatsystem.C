@@ -157,15 +157,15 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 }
 
 // Perturb and accumulate dual weighted residuals
-void HeatSystem::perturb_accumulate_residuals(const ParameterVector& parameters)
+void HeatSystem::perturb_accumulate_residuals(const ParameterVector& parameters_in)
 {
-  const unsigned int Np = parameters.size();
+  const unsigned int Np = parameters_in.size();
   
   for (unsigned int j=0; j != Np; ++j)
     {
-      Number old_parameter = *parameters[j];
+      Number old_parameter = *parameters_in[j];
             
-      *parameters[j] = old_parameter - dp;
+      *parameters_in[j] = old_parameter - dp;
 
       this->assembly(true, false);
 
@@ -177,7 +177,7 @@ void HeatSystem::perturb_accumulate_residuals(const ParameterVector& parameters)
       // But since we compute the residual already scaled by dt, there is no need for the * dt 
       R_minus_dp += -R_minus->dot(this->get_adjoint_solution(0));
             
-      *parameters[j] = old_parameter + dp;
+      *parameters_in[j] = old_parameter + dp;
 
       this->assembly(true, false);
 
@@ -187,7 +187,7 @@ void HeatSystem::perturb_accumulate_residuals(const ParameterVector& parameters)
             
       R_plus_dp += -R_plus->dot(this->get_adjoint_solution(0));
             
-      *parameters[j] = old_parameter;
+      *parameters_in[j] = old_parameter;
 
     }
 }
