@@ -1,5 +1,4 @@
-pkg_cppflags = -I$(top_srcdir)/contrib/exodusii/Lib/include \
-               $(NETCDF_INCLUDE)
+pkg_cppflags = $(EXODUS_INCLUDE) $(NETCDF_INCLUDE)
 
 pkg_sources = \
 	ne_nemesisI.h \

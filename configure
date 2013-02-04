@@ -679,9 +679,12 @@ LIBMESH_ENABLE_NEMESIS_FALSE
 LIBMESH_ENABLE_NEMESIS_TRUE
 NEMESIS_LIBRARY
 NEMESIS_INCLUDE
+LIBMESH_ENABLE_EXODUS_V522_FALSE
+LIBMESH_ENABLE_EXODUS_V522_TRUE
+LIBMESH_ENABLE_EXODUS_V509_FALSE
+LIBMESH_ENABLE_EXODUS_V509_TRUE
 LIBMESH_ENABLE_EXODUS_FALSE
 LIBMESH_ENABLE_EXODUS_TRUE
-EXODUS_LIBRARY
 EXODUS_INCLUDE
 LIBMESH_ENABLE_NETCDF_V4_FALSE
 LIBMESH_ENABLE_NETCDF_V4_TRUE
@@ -31673,8 +31676,6 @@ $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
      { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 3 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 3 support >>>" >&6; }
-     ac_config_files="$ac_config_files contrib/netcdf/v3/Makefile"
-
 
   elif (test "x$netcdfversion" = "x4"); then
      NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
@@ -31690,6 +31691,8 @@ $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
      NETCDF_INCLUDE=""
      enablenetcdf=no
   fi
+
+  ac_config_files="$ac_config_files contrib/netcdf/v3/Makefile"
 
 
 
@@ -31729,8 +31732,9 @@ fi
   # Check whether --enable-exodus was given.
 if test "${enable_exodus+set}" = set; then :
   enableval=$enable_exodus; case "${enableval}" in
-		  yes)  enableexodus=yes ;;
-		   no)  enableexodus=no ;;
+		  yes|v509)  enableexodus=yes; exodusversion="v5.09" ;;
+		  new|v522)  enableexodus=yes; exodusversion="v5.22" ;;
+		   no)       enableexodus=no;  exodusversion=no ;;
  		    *)  as_fn_error $? "bad value ${enableval} for --enable-exodus" "$LINENO" 5 ;;
 		 esac
 else
@@ -31740,29 +31744,39 @@ fi
 
 
 
-      if (test $enableexodus = yes); then
-     EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/Lib/include"
-     EXODUS_LIBRARY="\$(EXTERNAL_LIBDIR)/libexodusii\$(libext)"
+  if (test "x$exodusversion" = "xv5.09"); then
+     # The EXODUS API is distributed with libmesh, so we don't have to guess
+     # where it might be installed...
+     EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/include"
 
 $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
 
-     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus support >>>" >&5
-$as_echo "<<< Configuring library with Exodus support >>>" >&6; }
-     have_exodus=yes
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
+$as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
+
+  elif (test "x$exodusversion" = "xv5.22"); then
+     EXODUS_INCLUDE="-I\$(top_srcdir)/contrib/exodusii/$exodusversion/exodus/cbind/include"
+
+$as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
+
+     { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
+$as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
+
   else
      EXODUS_INCLUDE=""
-     EXODUS_LIBRARY=""
      enableexodus=no
-     have_exodus=no
   fi
 
+  ac_config_files="$ac_config_files contrib/exodusii/v5.09/Makefile"
+
+  ac_config_files="$ac_config_files contrib/exodusii/v5.22/exodus/cbind/Makefile"
 
 
 
    if (test $enableexodus = yes); then
      libmesh_contrib_INCLUDES="$EXODUS_INCLUDE $libmesh_contrib_INCLUDES"
    fi
-    if test x$enableexodus = xyes; then
+    if test x$enableexodus  = xyes; then
   LIBMESH_ENABLE_EXODUS_TRUE=
   LIBMESH_ENABLE_EXODUS_FALSE='#'
 else
@@ -31770,7 +31784,21 @@ else
   LIBMESH_ENABLE_EXODUS_FALSE=
 fi
 
-   ac_config_files="$ac_config_files contrib/exodusii/Lib/Makefile"
+    if test x$exodusversion = xv5.09; then
+  LIBMESH_ENABLE_EXODUS_V509_TRUE=
+  LIBMESH_ENABLE_EXODUS_V509_FALSE='#'
+else
+  LIBMESH_ENABLE_EXODUS_V509_TRUE='#'
+  LIBMESH_ENABLE_EXODUS_V509_FALSE=
+fi
+
+    if test x$exodusversion = xv5.22; then
+  LIBMESH_ENABLE_EXODUS_V522_TRUE=
+  LIBMESH_ENABLE_EXODUS_V522_FALSE='#'
+else
+  LIBMESH_ENABLE_EXODUS_V522_TRUE='#'
+  LIBMESH_ENABLE_EXODUS_V522_FALSE=
+fi
 
 
       # -------------------------------------------------------------
@@ -32790,6 +32818,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_EXODUS_TRUE}" && test -z "${LIBMESH_ENABLE_EXODUS_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_EXODUS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_EXODUS_V509_TRUE}" && test -z "${LIBMESH_ENABLE_EXODUS_V509_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_EXODUS_V509\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_EXODUS_V522_TRUE}" && test -z "${LIBMESH_ENABLE_EXODUS_V522_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_EXODUS_V522\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_NEMESIS_TRUE}" && test -z "${LIBMESH_ENABLE_NEMESIS_FALSE}"; then
@@ -34006,7 +34042,8 @@ do
     "contrib/triangle/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/triangle/Makefile" ;;
     "contrib/gmv/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gmv/Makefile" ;;
     "contrib/netcdf/v3/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netcdf/v3/Makefile" ;;
-    "contrib/exodusii/Lib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/Lib/Makefile" ;;
+    "contrib/exodusii/v5.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.09/Makefile" ;;
+    "contrib/exodusii/v5.22/exodus/cbind/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/cbind/Makefile" ;;
     "contrib/nemesis/Lib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/Lib/Makefile" ;;
     "contrib/libHilbert/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/libHilbert/Makefile" ;;
     "contrib/fparser/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/fparser/Makefile" ;;
@@ -36227,6 +36264,10 @@ if (test "x$enableoptional" = "xyes"); then
 #  fi
   echo '  'eigen............................ : $enableeigen
   echo '  'exodus........................... : $enableexodus
+  echo '  'netcdf........................... : $enablenetcdf
+  if (test "x$exodusversion" != "xno"); then
+  echo '     'version....................... : $exodusversion
+  fi
   echo '  'fparser.......................... : $enablefparser
   if (test "x$enablefparser" = "xyes" -a "x$enablefparserdevel" = "xno"); then
   echo '     'build from version............ : release

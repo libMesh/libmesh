@@ -427,7 +427,6 @@ EGREP = @EGREP@
 EIGEN_INCLUDE = @EIGEN_INCLUDE@
 EXEEXT = @EXEEXT@
 EXODUS_INCLUDE = @EXODUS_INCLUDE@
-EXODUS_LIBRARY = @EXODUS_LIBRARY@
 F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
@@ -633,9 +632,7 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-pkg_cppflags = -I$(top_srcdir)/contrib/exodusii/Lib/include \
-               $(NETCDF_INCLUDE)
-
+pkg_cppflags = $(EXODUS_INCLUDE) $(NETCDF_INCLUDE)
 pkg_sources = \
 	ne_nemesisI.h \
 	ne_nemesisI_int.h \

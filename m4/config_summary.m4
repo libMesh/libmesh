@@ -107,6 +107,10 @@ if (test "x$enableoptional" = "xyes"); then
 #  fi
   echo '  'eigen............................ : $enableeigen
   echo '  'exodus........................... : $enableexodus
+  echo '  'netcdf........................... : $enablenetcdf
+  if (test "x$exodusversion" != "xno"); then
+  echo '     'version....................... : $exodusversion
+  fi
   echo '  'fparser.......................... : $enablefparser
   if (test "x$enablefparser" = "xyes" -a "x$enablefparserdevel" = "xno"); then
   echo '     'build from version............ : release

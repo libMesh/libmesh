@@ -22,7 +22,6 @@ AC_DEFUN([CONFIGURE_NETCDF],
      NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v3"
      AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
      AC_MSG_RESULT(<<< Configuring library with NetCDF version 3 support >>>)
-     AC_CONFIG_FILES([contrib/netcdf/v3/Makefile])
 
   elif (test "x$netcdfversion" = "x4"); then
      NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v4/include"
@@ -35,5 +34,6 @@ AC_DEFUN([CONFIGURE_NETCDF],
      enablenetcdf=no
   fi
  
+  AC_CONFIG_FILES([contrib/netcdf/v3/Makefile])
   AC_SUBST(NETCDF_INCLUDE)
 ])

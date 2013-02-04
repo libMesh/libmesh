@@ -57,12 +57,16 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@am__append_2 = fparser.hh
 @LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_3 = nanoflann.hpp
 @LIBMESH_ENABLE_NANOFLANN_TRUE@am__append_4 = nanoflann.hpp
-@LIBMESH_ENABLE_EXODUS_TRUE@am__append_5 = exodusII.h exodusII_ext.h
-@LIBMESH_ENABLE_EXODUS_TRUE@am__append_6 = exodusII.h exodusII_ext.h
-@LIBMESH_ENABLE_NETCDF_V3_TRUE@am__append_7 = netcdf.h
-@LIBMESH_ENABLE_NETCDF_V3_TRUE@am__append_8 = netcdf.h
-@LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_9 = netcdf.h
-@LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_10 = netcdf.h
+@LIBMESH_ENABLE_EXODUS_V509_TRUE@am__append_5 = exodusII.h \
+@LIBMESH_ENABLE_EXODUS_V509_TRUE@	exodusII_ext.h
+@LIBMESH_ENABLE_EXODUS_V509_TRUE@am__append_6 = exodusII.h \
+@LIBMESH_ENABLE_EXODUS_V509_TRUE@	exodusII_ext.h
+@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_7 = exodusII.h
+@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_8 = exodusII.h
+@LIBMESH_ENABLE_NETCDF_V3_TRUE@am__append_9 = netcdf.h
+@LIBMESH_ENABLE_NETCDF_V3_TRUE@am__append_10 = netcdf.h
+@LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_11 = netcdf.h
+@LIBMESH_ENABLE_NETCDF_V4_TRUE@am__append_12 = netcdf.h
 subdir = include/libmesh
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -193,7 +197,6 @@ EGREP = @EGREP@
 EIGEN_INCLUDE = @EIGEN_INCLUDE@
 EXEEXT = @EXEEXT@
 EXODUS_INCLUDE = @EXODUS_INCLUDE@
-EXODUS_LIBRARY = @EXODUS_LIBRARY@
 F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
@@ -534,11 +537,16 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	string_to_enum.h timestamp.h tree.h tree_base.h tree_node.h \
 	utility.h xdr_cxx.h parallel_communicator_specializations \
 	$(am__append_1) $(am__append_3) $(am__append_5) \
+<<<<<<< HEAD
 	$(am__append_7) $(am__append_9) libmesh_config.h
 >>>>>>> support building legacy netcdf (v3) and new (v4) from source
+=======
+	$(am__append_7) $(am__append_9) $(am__append_11) \
+	libmesh_config.h
+>>>>>>> allow for old (v5.09) and new (v5.22) exodus trees
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
-	libmesh_config.h
+	$(am__append_12) libmesh_config.h
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -745,11 +753,14 @@ uninstall-am:
 @LIBMESH_ENABLE_NANOFLANN_TRUE@nanoflann.hpp: $(top_srcdir)/contrib/nanoflann/include/nanoflann.hpp
 @LIBMESH_ENABLE_NANOFLANN_TRUE@	$(AM_V_GEN)$(LN_S) $< $@
 
-@LIBMESH_ENABLE_EXODUS_TRUE@exodusII.h: $(top_srcdir)/contrib/exodusii/Lib/include/exodusII.h
-@LIBMESH_ENABLE_EXODUS_TRUE@	$(AM_V_GEN)$(LN_S) $< $@
+@LIBMESH_ENABLE_EXODUS_V509_TRUE@exodusII.h: $(top_srcdir)/contrib/exodusii/v5.09/include/exodusII.h
+@LIBMESH_ENABLE_EXODUS_V509_TRUE@	$(AM_V_GEN)$(LN_S) $< $@
 
-@LIBMESH_ENABLE_EXODUS_TRUE@exodusII_ext.h: $(top_srcdir)/contrib/exodusii/Lib/include/exodusII_ext.h
-@LIBMESH_ENABLE_EXODUS_TRUE@	$(AM_V_GEN)$(LN_S) $< $@
+@LIBMESH_ENABLE_EXODUS_V509_TRUE@exodusII_ext.h: $(top_srcdir)/contrib/exodusii/v5.09/include/exodusII_ext.h
+@LIBMESH_ENABLE_EXODUS_V509_TRUE@	$(AM_V_GEN)$(LN_S) $< $@
+
+@LIBMESH_ENABLE_EXODUS_V522_TRUE@exodusII.h: $(top_srcdir)/contrib/exodusii/v5.22/exodus/cbind/include/exodusII.h
+@LIBMESH_ENABLE_EXODUS_V522_TRUE@	$(AM_V_GEN)$(LN_S) $< $@
 
 @LIBMESH_ENABLE_NETCDF_V3_TRUE@netcdf.h: $(top_srcdir)/contrib/netcdf/v3/netcdf.h
 @LIBMESH_ENABLE_NETCDF_V3_TRUE@	$(AM_V_GEN)$(LN_S) $< $@
