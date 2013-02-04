@@ -415,9 +415,6 @@ int main (int argc, char** argv)
       // vector assignment.  Since only \p TransientLinearImplicitSystems
       // (and systems derived from them) contain old solutions
       // we need to specify the system type when we ask for it.
-      TransientLinearImplicitSystem &  system =
-        equation_systems.get_system<TransientLinearImplicitSystem>("Convection-Diffusion");
-
       *system.old_local_solution = *system.current_local_solution;
       
       // The number of refinement steps per time step.
@@ -432,8 +429,7 @@ int main (int argc, char** argv)
           system.solve();
 
           // Print out the H1 norm, for verification purposes:
-          Real H1norm = system.calculate_norm(*system.solution, SystemNorm(H1));
-
+          H1norm = system.calculate_norm(*system.solution, SystemNorm(H1));
           std::cout << "H1 norm = " << H1norm << std::endl;
           
           // Possibly refine the mesh
@@ -515,10 +511,7 @@ int main (int argc, char** argv)
   if(!read_solution)
     {
       // Print out the H1 norm of the saved solution, for verification purposes:
-      TransientLinearImplicitSystem& system =
-	equation_systems.get_system<TransientLinearImplicitSystem>
-          ("Convection-Diffusion");
-      Real H1norm = system.calculate_norm(*system.solution, SystemNorm(H1));
+      H1norm = system.calculate_norm(*system.solution, SystemNorm(H1));
 
       std::cout << "Final H1 norm = " << H1norm << std::endl << std::endl;
 
