@@ -28,9 +28,9 @@ class NavierSystem : public FEMSystem
 public:
   // Constructor
   NavierSystem(EquationSystems& es,
-               const std::string& name,
-               const unsigned int number)
-    : FEMSystem(es, name, number), Reynolds(1.), application(0) {}
+               const std::string& name_in,
+               const unsigned int number_in)
+    : FEMSystem(es, name_in, number_in), Reynolds(1.), application(0) {}
 
   // System initialization
   virtual void init_data ();
