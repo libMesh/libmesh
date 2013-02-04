@@ -34,9 +34,9 @@ class CoupledSystem : public FEMSystem
 public:
   // Constructor
   CoupledSystem(EquationSystems& es,
-               const std::string& name,
-               const unsigned int number)
-    : FEMSystem(es, name, number), Peclet(1.) {qoi.resize(1);}
+               const std::string& name_in,
+               const unsigned int number_in)
+    : FEMSystem(es, name_in, number_in), Peclet(1.) {qoi.resize(1);}
  
   // Function to get computed QoI values
 
