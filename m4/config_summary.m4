@@ -124,6 +124,9 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'nanoflann........................ : $enablenanoflann
   echo '  'nemesis.......................... : $enablenemesis
   echo '  'netcdf........................... : $enablenetcdf
+  if (test "x$netcdfversion" != "xno"); then
+  echo '     'version....................... : $netcdfversion
+  fi
   echo '  'openmp........................... : $enableopenmp
   echo '  'parmetis......................... : $enableparmetis
   echo '  'petsc............................ : $enablepetsc

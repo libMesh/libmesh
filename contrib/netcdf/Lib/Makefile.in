@@ -60,7 +60,7 @@ DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
 @LIBMESH_OPT_MODE_TRUE@am__append_3 = libopt.la
 @LIBMESH_PROF_MODE_TRUE@am__append_4 = libprof.la
 @LIBMESH_OPROF_MODE_TRUE@am__append_5 = liboprof.la
-subdir = contrib/netcdf/Lib
+subdir = contrib/netcdf/v3
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -391,7 +391,6 @@ NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
 NEMESIS_LIBRARY = @NEMESIS_LIBRARY@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
-NETCDF_LIBRARY = @NETCDF_LIBRARY@
 NM = @NM@
 NMEDIT = @NMEDIT@
 NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
@@ -530,6 +529,7 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
+subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target = @target@
 target_alias = @target_alias@
@@ -603,9 +603,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/netcdf/Lib/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/netcdf/v3/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu contrib/netcdf/Lib/Makefile
+	  $(AUTOMAKE) --gnu contrib/netcdf/v3/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

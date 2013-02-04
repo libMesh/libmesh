@@ -76,7 +76,21 @@ exodusII_ext.h: \$(top_srcdir)/contrib/exodusii/Lib/include/exodusII_ext.h
   BUILT_SOURCES  += exodusII_ext.h
   DISTCLEANFILES += exodusII_ext.h
 
-netcdf.h: \$(top_srcdir)/contrib/netcdf/Lib/netcdf.h
+endif
+
+if LIBMESH_ENABLE_NETCDF_V3
+
+netcdf.h: \$(top_srcdir)/contrib/netcdf/v3/netcdf.h
+	\$(AM_V_GEN)\$(LN_S) \$< \$@
+
+  BUILT_SOURCES  += netcdf.h
+  DISTCLEANFILES += netcdf.h
+
+endif
+
+if LIBMESH_ENABLE_NETCDF_V4
+
+netcdf.h: \$(top_srcdir)/contrib/netcdf/v4/include/netcdf.h
 	\$(AM_V_GEN)\$(LN_S) \$< \$@
 
   BUILT_SOURCES  += netcdf.h

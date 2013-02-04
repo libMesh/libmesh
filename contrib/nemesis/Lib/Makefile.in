@@ -488,7 +488,6 @@ NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
 NEMESIS_LIBRARY = @NEMESIS_LIBRARY@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
-NETCDF_LIBRARY = @NETCDF_LIBRARY@
 NM = @NM@
 NMEDIT = @NMEDIT@
 NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
@@ -621,6 +620,7 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
+subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target = @target@
 target_alias = @target_alias@
@@ -634,7 +634,7 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 pkg_cppflags = -I$(top_srcdir)/contrib/exodusii/Lib/include \
-               -I$(top_srcdir)/contrib/netcdf/Lib
+               $(NETCDF_INCLUDE)
 
 pkg_sources = \
 	ne_nemesisI.h \

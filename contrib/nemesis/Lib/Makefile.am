@@ -1,5 +1,5 @@
 pkg_cppflags = -I$(top_srcdir)/contrib/exodusii/Lib/include \
-               -I$(top_srcdir)/contrib/netcdf/Lib
+               $(NETCDF_INCLUDE)
 
 pkg_sources = \
 	ne_nemesisI.h \

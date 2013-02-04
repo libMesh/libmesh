@@ -364,8 +364,9 @@ CONFIGURE_NETCDF
 if (test $enablenetcdf = yes); then
   libmesh_contrib_INCLUDES="$NETCDF_INCLUDE $libmesh_contrib_INCLUDES"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF, test x$enablenetcdf = xyes)
-AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
+AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF,    test x$enablenetcdf  = xyes)
+AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V3, test x$netcdfversion = x3)
+AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V4, test x$netcdfversion = x4)
 
    # -------------------------------------------------------------
    # ExodusII -- enabled by default (it is distributed in contrib)

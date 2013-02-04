@@ -33,13 +33,27 @@ if LIBMESH_ENABLE_GZSTREAMS
 endif
 
 if LIBMESH_ENABLE_NETCDF
-  SUBDIRS    += netcdf/Lib
-  opt_libs   += netcdf/Lib/libopt.la
-  dbg_libs   += netcdf/Lib/libdbg.la
-  devel_libs += netcdf/Lib/libdevel.la
-  prof_libs  += netcdf/Lib/libprof.la
-  oprof_libs += netcdf/Lib/liboprof.la
+# NetCDF version 3, build minimal subset
+if LIBMESH_ENABLE_NETCDF_V3
+  SUBDIRS    += netcdf/v3
+  opt_libs   += netcdf/v3/libopt.la
+  dbg_libs   += netcdf/v3/libdbg.la
+  devel_libs += netcdf/v3/libdevel.la
+  prof_libs  += netcdf/v3/libprof.la
+  oprof_libs += netcdf/v3/liboprof.la
 endif
+
+# NetCDF version 4, use their autotools package
+if LIBMESH_ENABLE_NETCDF_V4
+  SUBDIRS    += netcdf/v4
+  opt_libs   += netcdf/v4/liblib/libnetcdf.la
+  dbg_libs   += netcdf/v4/liblib/libnetcdf.la
+  devel_libs += netcdf/v4/liblib/libnetcdf.la
+  prof_libs  += netcdf/v4/liblib/libnetcdf.la
+  oprof_libs += netcdf/v4/liblib/libnetcdf.la
+endif
+endif
+
 
 if LIBMESH_ENABLE_EXODUS
   SUBDIRS    += exodusii/Lib
