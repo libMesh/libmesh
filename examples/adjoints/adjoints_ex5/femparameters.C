@@ -282,17 +282,17 @@ void FEMParameters::read(GetPot &input)
           {
             unsigned int myboundary =
               input("periodic_boundaries", -1, i);
-            unsigned int pairedboundary = 0;
+            // unsigned int pairedboundary = 0;
             RealVectorValue translation_vector;
             if (dimension == 2)
               switch (myboundary)
               {
               case 0:
-                pairedboundary = 2;
+                // pairedboundary = 2;
                 translation_vector = RealVectorValue(0., domain_edge_length);
                 break;
               case 1:
-                pairedboundary = 3;
+                // pairedboundary = 3;
                 translation_vector = RealVectorValue(-domain_edge_width, 0);
                 break;
               default:
@@ -304,15 +304,15 @@ void FEMParameters::read(GetPot &input)
               switch (myboundary)
               {
               case 0:
-                pairedboundary = 5;
+                // pairedboundary = 5;
                 translation_vector = RealVectorValue(0., 0., domain_edge_height);
                 break;
               case 1:
-                pairedboundary = 3;
+                // pairedboundary = 3;
                 translation_vector = RealVectorValue(0., domain_edge_length, 0.);
                 break;
               case 2:
-                pairedboundary = 4;
+                // pairedboundary = 4;
                 translation_vector = RealVectorValue(-domain_edge_width, 0., 0.);
                 break;
               default:

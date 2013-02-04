@@ -28,14 +28,14 @@ using namespace libMesh;
 
 class ExampleOneFunction : public FunctionBase<Number>
 {
-  virtual Number operator() (const Point& p,
-                             const Real time = 0)
+  virtual Number operator() (const Point&  /*p*/,
+                             const Real /*time*/)
     {
       return 1;
     }
 
-  virtual void operator() (const Point& p,
-                           const Real time,
+  virtual void operator() (const Point&  /*p*/,
+                           const Real /*time*/,
                            DenseVector<Number>& output)
     {
       for (unsigned int i=0; i != output.size(); ++i)
