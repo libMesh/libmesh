@@ -9,7 +9,6 @@
     When adding a soure file,
       1.) svn add the file
       2.) cd src ; ./rebuild_libmesh_la_SOURCES.sh
-
     General notes:
       o make install && make installcheck
         installs the built library & performs sanity checking
@@ -30,8 +29,12 @@
          id size (dofs)................... : 4 bytes
          id size (processors)............. : 2 bytes
          id size (subdomains)............. : 2 bytes
+  * Reduced memory footprint for Node objects.
+  * Fix for using specified preconditioners with adaptivity and PETSc-3.3.
   * New Examples:
-     o fem_system_ex2: Nonlinear elasticity, courtesy Robert Weidlich
+     o fem_system_ex2: Nonlinear elasticity, courtesy Robert Weidlich.
+     o adjoints_ex5: Unsteady Adjoints.
+     o miscellaneous_ex8: meshfree, inverse distance interpolation.
        
     
 0.7.3 -> 0.8.0
