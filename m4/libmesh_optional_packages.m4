@@ -377,6 +377,17 @@ AM_CONDITIONAL(LIBMESH_ENABLE_GLPK, test x$enableglpk = xyes)
 
 
 # --------------------------------------------------------------
+# HDF5 -- enabled by default
+# --------------------------------------------------------------
+CONFIGURE_HDF5
+if (test $enablehdf5 = yes); then
+  libmesh_optional_INCLUDES="$HDF5_CPPFLAGS $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$HDF5_LIBS $libmesh_optional_LIBS"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_HDF5, test x$enablehdf5 = xyes)
+
+
+# --------------------------------------------------------------
 # netCDF -- enabled by default (it is distributed in contrib)
 # --------------------------------------------------------------
 CONFIGURE_NETCDF

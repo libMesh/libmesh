@@ -120,6 +120,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'glpk............................. : $enableglpk
   echo '  'gmv.............................. : $enablegmv
   echo '  'gzstream......................... : $enablegz
+  echo '  'hdf5............................. : $enablehdf5
   echo '  'laspack.......................... : $enablelaspack
   echo '  'libhilbert....................... : $enablelibhilbert
   echo '  'metis............................ : $enablemetis

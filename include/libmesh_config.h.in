@@ -222,6 +222,9 @@
 /* define if the compiler supports std::hash_set */
 #undef HAVE_HASH_SET
 
+/* Define if HDF5 is available */
+#undef HAVE_HDF5
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

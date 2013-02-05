@@ -697,6 +697,15 @@ LIBMESH_ENABLE_NETCDF_FALSE
 LIBMESH_ENABLE_NETCDF_TRUE
 NETCDF_INCLUDE
 subdirs
+LIBMESH_ENABLE_HDF5_FALSE
+LIBMESH_ENABLE_HDF5_TRUE
+HDF5_PREFIX
+HDF5_CXXLIBS
+HDF5_FLIBS
+HDF5_LIBS
+HDF5_CPPFLAGS
+HDF5_CFLAGS
+HDF5_DIR
 LIBMESH_ENABLE_GLPK_FALSE
 LIBMESH_ENABLE_GLPK_TRUE
 GLPK_LIBRARY
@@ -1097,6 +1106,8 @@ with_eigen_include
 enable_glpk
 with_glpk_include
 with_glpk_lib
+enable_hdf5
+with_hdf5
 enable_netcdf
 enable_exodus
 enable_nemesis
@@ -1136,6 +1147,7 @@ SLEPC_DIR
 TRILINOS_DIR
 VTK_INCLUDE
 VTK_DIR
+HDF5_DIR
 YACC
 YFLAGS'
 ac_subdirs_all='contrib/netcdf/v4'
@@ -1841,6 +1853,7 @@ Optional Features:
   --enable-vtk            build with VTK file I/O support
   --enable-eigen          build with Eigen linear algebra support
   --enable-glpk           build with GLPK support
+  --enable-hdf5           build with HDF5 support
   --enable-netcdf         build with netCDF binary I/O
   --enable-exodus         build with ExodusII API support
   --enable-nemesis        build with NemesisII API support
@@ -1905,6 +1918,8 @@ Optional Packages:
   --with-glpk-include=PATH
                           Specify the path for GLPK header files
   --with-glpk-lib=PATH    Specify the path for GLPK libs
+  --with-hdf5=DIR         root directory of HDF5 installation (default =
+                          HDF5_DIR)
   --with-fparser=<release|none|devel>
                           Determine which version of the C++ function parser
                           to use
@@ -1942,6 +1957,7 @@ Some influential environment variables:
               path to Trilinos installation
   VTK_INCLUDE path to VTK header files
   VTK_DIR     path to VTK installation
+  HDF5_DIR    root directory of HDF5 installation
   YACC        The `Yet Another Compiler Compiler' implementation to use.
               Defaults to the first program found out of: `bison -y', `byacc',
               `yacc'.
@@ -31675,6 +31691,299 @@ fi
 
 
 # --------------------------------------------------------------
+# HDF5 -- enabled by default
+# --------------------------------------------------------------
+
+  # Check whether --enable-hdf5 was given.
+if test "${enable_hdf5+set}" = set; then :
+  enableval=$enable_hdf5; case "${enableval}" in
+		  yes)  enablehdf5=yes ;;
+		   no)  enablehdf5=no ;;
+ 		    *)  as_fn_error $? "bad value ${enableval} for --enable-hdf5" "$LINENO" 5 ;;
+		 esac
+else
+  enablehdf5=$enableoptional
+fi
+
+
+
+
+  # The TRIANGLE API is distributed with libmesh, so we don't have to guess
+  # where it might be installed...
+  if (test $enablehdf5 = yes); then
+
+
+HAVE_HDF5=0
+
+
+
+
+# Check whether --with-hdf5 was given.
+if test "${with_hdf5+set}" = set; then :
+  withval=$with_hdf5; with_hdf5=$withval
+if test "${with_hdf5}" != yes; then
+    HDF5_PREFIX=$withval
+fi
+
+else
+
+with_hdf5=$withval
+if test "x${HDF5_DIR}" != "x"; then
+   HDF5_PREFIX=${HDF5_DIR}
+fi
+
+fi
+
+
+# package requirement; if not specified, the default is to assume that
+# the package is optional
+
+is_package_required=no
+
+if test "${with_hdf5}" != no ; then
+
+    if test -d "${HDF5_PREFIX}/lib" ; then
+       HDF5_LIBS="-L${HDF5_PREFIX}/lib -lhdf5 -Wl,-rpath,${HDF5_PREFIX}/lib"
+       HDF5_FLIBS="-L${HDF5_PREFIX}/lib -lhdf5_fortran -Wl,-rpath,${HDF5_PREFIX}/lib"
+       HDF5_CXXLIBS="-L${HDF5_PREFIX}/lib -lhdf5_cpp -Wl,-rpath,${HDF5_PREFIX}/lib"
+    fi
+
+    if test -d "${HDF5_PREFIX}/include" ; then
+        HDF5_CFLAGS="-I${HDF5_PREFIX}/include"
+    fi
+
+    ac_HDF5_save_CFLAGS="$CFLAGS"
+    ac_HDF5_save_CPPFLAGS="$CPPFLAGS"
+    ac_HDF5_save_LDFLAGS="$LDFLAGS"
+    ac_HDF5_save_LIBS="$LIBS"
+
+    CFLAGS="${HDF5_CFLAGS} ${CFLAGS}"
+    CPPFLAGS="${HDF5_CFLAGS} ${CPPFLAGS}"
+    LDFLAGS="${HDF5_LIBS} ${LDFLAGS}"
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    ac_fn_c_check_header_mongrel "$LINENO" "hdf5.h" "ac_cv_header_hdf5_h" "$ac_includes_default"
+if test "x$ac_cv_header_hdf5_h" = xyes; then :
+  found_header=yes
+else
+  found_header=no
+fi
+
+
+
+    #-----------------------
+    # Minimum version check
+    #----------------------
+
+    min_hdf5_version=1.8.0
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for hdf5 - version >= $min_hdf5_version" >&5
+$as_echo_n "checking for hdf5 - version >= $min_hdf5_version... " >&6; }
+
+    # looking for major.minor.micro style versioning
+
+    MAJOR_VER=`echo $min_hdf5_version | sed 's/^\([0-9]*\).*/\1/'`
+    if test "x${MAJOR_VER}" = "x" ; then
+       MAJOR_VER=0
+    fi
+
+    MINOR_VER=`echo $min_hdf5_version | sed 's/^\([0-9]*\)\.\{0,1\}\([0-9]*\).*/\2/'`
+    if test "x${MINOR_VER}" = "x" ; then
+       MINOR_VER=0
+    fi
+
+    MICRO_VER=`echo $min_hdf5_version | sed 's/^\([0-9]*\)\.\{0,1\}\([0-9]*\)\.\{0,1\}\([0-9]*\).*/\3/'`
+    if test "x${MICRO_VER}" = "x" ; then
+       MICRO_VER=0
+    fi
+
+    # begin additional test(s) if header if available
+
+    succeeded=no
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test "x${found_header}" = "xyes" ; then
+        version_succeeded=no
+
+    	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+       	#include <hdf5.h>
+
+int
+main ()
+{
+
+            #if H5_VERS_MAJOR > $MAJOR_VER
+            /* Sweet nibblets */
+            #elif (H5_VERS_MAJOR >= $MAJOR_VER) && (H5_VERS_MINOR >= $MINOR_VER) && (H5_VERS_RELEASE >= $MICRO_VER)
+            /* Winner winner, chicken dinner */
+            #else
+            #  error HDF5 version is too old
+            #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+            version_succeeded=yes
+
+else
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+    	ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    	if test "$version_succeeded" != "yes";then
+       	   if test "$is_package_required" = yes; then
+              as_fn_error $? "
+
+   Your HDF5 library version does not meet the minimum versioning
+   requirements ($min_hdf5_version).  Please use --with-hdf5 to specify the location
+   of an updated installation or consider upgrading the system version.
+
+       	 	 " "$LINENO" 5
+           fi
+        fi
+
+    # Library availability
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for H5Fopen in -lhdf5" >&5
+$as_echo_n "checking for H5Fopen in -lhdf5... " >&6; }
+if ${ac_cv_lib_hdf5_H5Fopen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lhdf5  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char H5Fopen ();
+int
+main ()
+{
+return H5Fopen ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_hdf5_H5Fopen=yes
+else
+  ac_cv_lib_hdf5_H5Fopen=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_hdf5_H5Fopen" >&5
+$as_echo "$ac_cv_lib_hdf5_H5Fopen" >&6; }
+if test "x$ac_cv_lib_hdf5_H5Fopen" = xyes; then :
+  found_library=yes
+else
+  found_library=no
+fi
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    succeeded=no
+    if test "$found_header" = yes; then
+        if test "$version_succeeded" = yes; then
+	   if test "$found_library" = yes; then
+              succeeded=yes
+	   fi
+        fi
+    fi
+
+    fi
+    CFLAGS="$ac_HDF5_save_CFLAGS"
+    CPPFLAGS="$ac_HDF5_save_CPPFLAGS"
+    LDFLAGS="$ac_HDF5_save_LDFLAGS"
+    LIBS="$ac_HDF5_save_LIBS"
+
+    if test "$succeeded" = no; then
+       if test "$is_package_required" = yes; then
+          as_fn_error $? "HDF5 not found.  Try either --with-hdf5 or setting HDF5_DIR." "$LINENO" 5
+       else
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: optional HDF5 library not found, or does not meet version requirements" >&5
+$as_echo "$as_me: optional HDF5 library not found, or does not meet version requirements" >&6;}
+       fi
+    else
+        HAVE_HDF5=1
+
+$as_echo "#define HAVE_HDF5 1" >>confdefs.h
+
+
+
+
+
+
+
+    fi
+
+    #AC_SUBST(HAVE_HDF5)
+
+fi
+
+#AM_CONDITIONAL(HDF5_ENABLED,test x$HAVE_HDF5 = x1)
+
+
+    if (test "x$HAVE_HDF5" = "x0"); then
+      enablehdf5=no
+    else
+       { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with HDF5 support >>>" >&5
+$as_echo "<<< Configuring library with HDF5 support >>>" >&6; }
+    fi
+  fi
+
+if (test $enablehdf5 = yes); then
+  libmesh_optional_INCLUDES="$HDF5_CPPFLAGS $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$HDF5_LIBS $libmesh_optional_LIBS"
+fi
+ if test x$enablehdf5 = xyes; then
+  LIBMESH_ENABLE_HDF5_TRUE=
+  LIBMESH_ENABLE_HDF5_FALSE='#'
+else
+  LIBMESH_ENABLE_HDF5_TRUE='#'
+  LIBMESH_ENABLE_HDF5_FALSE=
+fi
+
+
+
+# --------------------------------------------------------------
 # netCDF -- enabled by default (it is distributed in contrib)
 # --------------------------------------------------------------
 
@@ -31718,8 +32027,10 @@ $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 	      as_fn_error $? "NetCDF v4 requres nested subpackages, try --enable-nested" "$LINENO" 5
 	  fi
 
-	  #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-	  #libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+	  if (test "x$enablehdf5" = "xno"); then
+  	    #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+	    libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+	  fi
 
 	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
@@ -32898,6 +33209,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_GLPK_TRUE}" && test -z "${LIBMESH_ENABLE_GLPK_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_GLPK\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${LIBMESH_ENABLE_HDF5_TRUE}" && test -z "${LIBMESH_ENABLE_HDF5_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_ENABLE_HDF5\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_NETCDF_TRUE}" && test -z "${LIBMESH_ENABLE_NETCDF_FALSE}"; then
@@ -36385,6 +36700,7 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'glpk............................. : $enableglpk
   echo '  'gmv.............................. : $enablegmv
   echo '  'gzstream......................... : $enablegz
+  echo '  'hdf5............................. : $enablehdf5
   echo '  'laspack.......................... : $enablelaspack
   echo '  'libhilbert....................... : $enablelibhilbert
   echo '  'metis............................ : $enablemetis

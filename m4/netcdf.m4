@@ -36,9 +36,11 @@ AC_DEFUN([CONFIGURE_NETCDF],
 	      AC_MSG_ERROR([NetCDF v4 requres nested subpackages, try --enable-nested])
 	  fi
 
-	  #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-	  #libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
-
+	  if (test "x$enablehdf5" = "xno"); then	    
+  	    #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+	    libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+	  fi
+								
 	  AC_MSG_RESULT(<<< Configuring library with NetCDF version 4 support >>>)
 	  ;;
 
