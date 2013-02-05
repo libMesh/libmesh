@@ -58,7 +58,34 @@ B.&nbsp;S. Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Rossa_thesis">1</a>]
+[<a name="Garg_thesis">1</a>]
+</td>
+<td class="bibtexitem">
+V.&nbsp;V. Garg.
+ <em>Coupled flow systems, adjoint techniques and uncertainty quantification</em>.
+ PhD thesis, Institute for Computational Engineering and Sciences
+ (ICES), The University of Texas at Austin, August 2012.
+ 
+  <a href="http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2012-08-6034">http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2012-08-6034</a>.
+<a name="Rossa_thesis"></a><pre>
+@phdthesis{Garg_thesis,
+  author = {V.~V.~Garg},
+  school = {Institute for Computational Engineering and Sciences (ICES), The University of Texas at Austin},
+  title = {{Coupled flow systems, adjoint techniques and uncertainty quantification}},
+  note = {\url{http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2012-08-6034}},
+  month = aug,
+  year = {2012}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Rossa_thesis">2</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;L. Rossa.
@@ -85,7 +112,7 @@ A.&nbsp;L. Rossa.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Bornia_thesis">2</a>]
+[<a name="Bornia_thesis">3</a>]
 </td>
 <td class="bibtexitem">
 G.&nbsp;Bornia.
@@ -111,7 +138,7 @@ G.&nbsp;Bornia.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Lee_dissertation">3</a>]
+[<a name="Lee_dissertation">4</a>]
 </td>
 <td class="bibtexitem">
 K.&nbsp;Lee.
@@ -134,9 +161,39 @@ K.&nbsp;Lee.
 </tr>
 
 
+
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nagler_dissertation">4</a>]
+[<a name="HawkinsDaarud_thesis">5</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;J. Hawkins-Daarud.
+ <em>Toward a predictive model of tumor growth
+</em>.
+ PhD thesis, Institute for Computational Engineering and Sciences
+ (ICES), The University of Texas at Austin, May 2011.
+ 
+  <a href="http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2011-05-3395">http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2011-05-3395</a>.
+<a name="HawkinsDaarud_thesis"></a><pre>
+@phdthesis{HawkinsDaarud_thesis,
+  author = {A.~J.~Hawkins-Daarud},
+  school = {Institute for Computational Engineering and Sciences (ICES), The University of Texas at Austin},
+  title = {{Toward a predictive model of tumor growth}},
+  note = {\url{http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2011-05-3395}},
+  month = may,
+  year = {2011}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Nagler_dissertation">6</a>]
 </td>
 <td class="bibtexitem">
 L.&nbsp;Nagler.
@@ -164,7 +221,7 @@ L.&nbsp;Nagler.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Brown_thesis">5</a>]
+[<a name="Brown_thesis">7</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;A. Kallen-Brown.
@@ -188,7 +245,7 @@ J.&nbsp;A. Kallen-Brown.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Nenning_Dissertation">6</a>]
+[<a name="Nenning_Dissertation">8</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Nenning.
@@ -215,7 +272,7 @@ M.&nbsp;Nenning.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Petrolati_Dissertation">7</a>]
+[<a name="Petrolati_Dissertation">9</a>]
 </td>
 <td class="bibtexitem">
 E.&nbsp;Petrolati.
@@ -241,7 +298,7 @@ E.&nbsp;Petrolati.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Stogner_Dissertation">8</a>]
+[<a name="Stogner_Dissertation">10</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;H. Stogner.
@@ -269,7 +326,7 @@ R.&nbsp;H. Stogner.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Wang_Dissertation">9</a>]
+[<a name="Wang_Dissertation">11</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Wang.
@@ -295,7 +352,7 @@ S.&nbsp;Wang.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Dissertation">10</a>]
+[<a name="Peterson_Dissertation">12</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
@@ -322,7 +379,7 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Knezevic_Dissertation">11</a>]
+[<a name="Knezevic_Dissertation">13</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;J. Knezevic.
@@ -349,7 +406,7 @@ D.&nbsp;J. Knezevic.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Kirk_Dissertation">12</a>]
+[<a name="Kirk_Dissertation">14</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;S. Kirk.
@@ -376,7 +433,7 @@ B.&nbsp;S. Kirk.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Peterson_Thesis">13</a>]
+[<a name="Peterson_Thesis">15</a>]
 </td>
 <td class="bibtexitem">
 J.&nbsp;W. Peterson.
