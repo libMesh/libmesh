@@ -71,11 +71,7 @@ void PetscPreconditioner<T>::init ()
     // Should probably use PCReset(), but it's not working at the moment so we'll destroy instead
     if (_pc)
     {
-#if PETSC_VERSION_LESS_THAN(3,2,0)
-      int ierr = PCDestroy(_pc);
-#else
-      int ierr = PCDestroy(&_pc);
-#endif
+      int ierr = LibMeshPCDestroy(&_pc);
       CHKERRABORT(libMesh::COMM_WORLD,ierr);
     }
 

@@ -93,6 +93,7 @@ typedef PetscTruth PetscBool;
 #  define LibMeshKSPDestroy(x)         KSPDestroy(*(x))
 #  define LibMeshSNESDestroy(x)        SNESDestroy(*(x))
 #  define LibMeshPetscViewerDestroy(x) PetscViewerDestroy(*(x))
+#  define LibMeshPCDestroy(x)          PCDestroy(*(x))
 #else
 #  define LibMeshVecDestroy(x)         VecDestroy(x)
 #  define LibMeshVecScatterDestroy(x)  VecScatterDestroy(x)
@@ -101,6 +102,7 @@ typedef PetscTruth PetscBool;
 #  define LibMeshKSPDestroy(x)         KSPDestroy(x)
 #  define LibMeshSNESDestroy(x)        SNESDestroy(x)
 #  define LibMeshPetscViewerDestroy(x) PetscViewerDestroy(x)
+#  define LibMeshPCDestroy(x)          PCDestroy(x)
 #endif
 
 #if PETSC_VERSION_LESS_THAN(2,2,1)
