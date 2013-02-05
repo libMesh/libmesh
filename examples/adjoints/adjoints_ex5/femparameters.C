@@ -305,15 +305,15 @@ void FEMParameters::read(GetPot &input)
               {
               case 0:
                 // pairedboundary = 5;
-                translation_vector = RealVectorValue(0., 0., domain_edge_height);
+                translation_vector = RealVectorValue((Real) 0., (Real) 0., domain_edge_height);
                 break;
               case 1:
                 // pairedboundary = 3;
-                translation_vector = RealVectorValue(0., domain_edge_length, 0.);
+                translation_vector = RealVectorValue((Real) 0., domain_edge_length, (Real) 0.);
                 break;
               case 2:
                 // pairedboundary = 4;
-                translation_vector = RealVectorValue(-domain_edge_width, 0., 0.);
+                translation_vector = RealVectorValue(-domain_edge_width, (Real) 0., (Real) 0.);
                 break;
               default:
                 libMesh::out << "Unrecognized periodic boundary id " <<
