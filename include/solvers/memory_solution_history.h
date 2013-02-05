@@ -37,7 +37,8 @@ namespace libMesh
     
     // Constructor, reference to system to be passed by user, set the  
     // stored_sols iterator to some initial value
-  MemorySolutionHistory(System & system_) : stored_sols(stored_solutions.end()), _system(system_) {} ;
+  MemorySolutionHistory(System & system_) : stored_sols(stored_solutions.end()), _system(system_)
+  { libmesh_experimental(); } ;
 
     // Destructor
     ~MemorySolutionHistory();
