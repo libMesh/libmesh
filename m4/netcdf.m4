@@ -26,6 +26,12 @@ AC_DEFUN([CONFIGURE_NETCDF],
 	  NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/v3"
 	  AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
 	  AC_MSG_RESULT(<<< Configuring library with NetCDF version 3 support >>>)
+
+  	  # pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+          # note this is maddness - we will run configure in the subdirectory v4, but not use it,
+          # so this is nothing more than a hedge against that failing.  we need it to work for
+          # 'make dist' to work' 
+	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
 	  ;;
 
       4)
@@ -34,7 +40,13 @@ AC_DEFUN([CONFIGURE_NETCDF],
 	  # building netcdf-4 requires that we support nested subpackages
 	  if (test "x$enablenested" = "xno"); then
 	      AC_MSG_ERROR([NetCDF v4 requres nested subpackages, try --enable-nested])
-	  fi								
+	  fi
+
+	  if (test "x$enablehdf5" = "xno"); then	    
+  	    #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+	    libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+	  fi
+								
 	  AC_MSG_RESULT(<<< Configuring library with NetCDF version 4 support >>>)
 	  ;;
 
@@ -49,11 +61,6 @@ AC_DEFUN([CONFIGURE_NETCDF],
   # allow opt-out for nested subpackages
   if (test "x$enablenested" = "xyes"); then
       AC_CONFIG_SUBDIRS([contrib/netcdf/v4])
-
-      if (test "x$enablehdf5" = "xno"); then	    
-  	  #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
-      fi
   fi
 
   AC_SUBST(NETCDF_INCLUDE)

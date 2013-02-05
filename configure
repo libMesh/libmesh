@@ -32015,6 +32015,12 @@ $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 
 	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 3 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 3 support >>>" >&6; }
+
+  	  # pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+          # note this is maddness - we will run configure in the subdirectory v4, but not use it,
+          # so this is nothing more than a hedge against that failing.  we need it to work for
+          # 'make dist' to work'
+	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
 	  ;;
 
       4)
@@ -32026,6 +32032,12 @@ $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
 	  if (test "x$enablenested" = "xno"); then
 	      as_fn_error $? "NetCDF v4 requres nested subpackages, try --enable-nested" "$LINENO" 5
 	  fi
+
+	  if (test "x$enablehdf5" = "xno"); then
+  	    #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
+	    libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
+	  fi
+
 	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
 	  ;;
@@ -32043,11 +32055,6 @@ $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
   if (test "x$enablenested" = "xyes"); then
       subdirs="$subdirs contrib/netcdf/v4"
 
-
-      if (test "x$enablehdf5" = "xno"); then
-  	  #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
-	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
-      fi
   fi
 
 
