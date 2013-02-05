@@ -98,8 +98,17 @@ public:
 
   /**
    * Initialize data structures if not done so already.
+   *
+   * This MUST be called before the preconditioning object is used.
    */
   virtual void init () {}
+
+  /**
+   * This is called every time the "operator might have changed".
+   *
+   * This is essentially where you need to fill in your preconditioning matrix.
+   */
+  virtual void setup () {}
 
   /**
    * Sets the matrix P to be preconditioned.
