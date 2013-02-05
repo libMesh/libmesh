@@ -377,7 +377,6 @@ void System::prolong_vectors ()
 
 void System::reinit ()
 {
-#ifdef LIBMESH_ENABLE_AMR
   //If no variables have been added to this system
   //don't do anything
   if(!this->n_vars())
@@ -402,7 +401,6 @@ void System::reinit ()
 		  (*current_local_solution)(i+first_local_dof));
 
   solution->close();
-#endif
 }
 
 
