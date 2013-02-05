@@ -62,12 +62,13 @@ B.&nbsp;S. Kirk, J.&nbsp;W. Peterson, R.&nbsp;H. Stogner, and G.&nbsp;F. Carey.
 </td>
 <td class="bibtexitem">
 V.&nbsp;V. Garg.
- <em>Coupled flow systems, adjoint techniques and uncertainty quantification</em>.
+ <em>Coupled flow systems, adjoint techniques and uncertainty
+  quantification</em>.
  PhD thesis, Institute for Computational Engineering and Sciences
- (ICES), The University of Texas at Austin, August 2012.
+  (ICES), The University of Texas at Austin, August 2012.
  
   <a href="http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2012-08-6034">http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2012-08-6034</a>.
-<a name="Rossa_thesis"></a><pre>
+<a name="Garg_thesis"></a><pre>
 @phdthesis{Garg_thesis,
   author = {V.~V.~Garg},
   school = {Institute for Computational Engineering and Sciences (ICES), The University of Texas at Austin},
@@ -161,17 +162,15 @@ K.&nbsp;Lee.
 </tr>
 
 
-
 <tr valign="top">
 <td align="right" class="bibtexnumber">
 [<a name="HawkinsDaarud_thesis">5</a>]
 </td>
 <td class="bibtexitem">
 A.&nbsp;J. Hawkins-Daarud.
- <em>Toward a predictive model of tumor growth
-</em>.
+ <em>Toward a predictive model of tumor growth</em>.
  PhD thesis, Institute for Computational Engineering and Sciences
- (ICES), The University of Texas at Austin, May 2011.
+  (ICES), The University of Texas at Austin, May 2011.
  
   <a href="http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2011-05-3395">http://repositories.lib.utexas.edu/handle/2152/ETD-UT-2011-05-3395</a>.
 <a name="HawkinsDaarud_thesis"></a><pre>
@@ -188,7 +187,6 @@ A.&nbsp;J. Hawkins-Daarud.
 
 </td>
 </tr>
-
 
 
 <tr valign="top">
@@ -470,7 +468,85 @@ J.&nbsp;W. Peterson.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Gonzalez_2012">1</a>]
+[<a name="Fuentes_2013">1</a>]
+</td>
+<td class="bibtexitem">
+D.&nbsp;Fuentes, J.&nbsp;T. Oden, K.&nbsp;R. Diller, A.&nbsp;Elliot, Y.&nbsp;Feng, J.&nbsp;D. Hazle,
+  A.&nbsp;Shetty, and R.&nbsp;J. Stafford.
+ Computational and MR-guided patient-specific laser induced thermal
+  therapy of cancer.
+ Book Chapter, 2013.
+ 
+  <a href="http://dddas.ices.utexas.edu/fuentes/mediaDir/dddas_book_apr09.pdf">http://dddas.ices.utexas.edu/fuentes/mediaDir/dddas_book_apr09.pdf</a>.
+<a name="Fuentes_2013"></a><pre>
+@misc{Fuentes_2013,
+  author = {D.~Fuentes and J.~T.~Oden and K.~R.~Diller and A.~Elliot and Y.~Feng and J.~D.~Hazle and A.~Shetty and R.~J.~Stafford},
+  title = {{Computational and MR-guided patient-specific laser induced thermal therapy of cancer}},
+  year = 2013,
+  howpublished = {Book Chapter},
+  note = {\url{http://dddas.ices.utexas.edu/fuentes/mediaDir/dddas_book_apr09.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bhalla_2013b">2</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;P.&nbsp;S. Bhalla, R.&nbsp;Bale, B.&nbsp;E. Griffith, and N.&nbsp;A. Patankar.
+ Fully resolved immersed electrohydrodynamics for particle motion,
+  electrolocation, and self-propulsion.
+ <em>PREPRINT, Submitted to Elsevier Science</em>, 2013.
+ <a href="http://www.cims.nyu.edu/~griffith/docs/bhalla_EHD.pdf">http://www.cims.nyu.edu/~griffith/docs/bhalla_EHD.pdf</a>.
+<a name="Bhalla_2013b"></a><pre>
+@article{Bhalla_2013b,
+  author = {A.~P.~S.~Bhalla and R.~Bale and B.~E.~Griffith and N.~A.~Patankar},
+  title = {{Fully resolved immersed electrohydrodynamics for particle motion, electrolocation, and self-propulsion}},
+  journal = {PREPRINT, Submitted to Elsevier Science},
+  year = 2013,
+  note = {\url{http://www.cims.nyu.edu/~griffith/docs/bhalla_EHD.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Bhalla_2013">3</a>]
+</td>
+<td class="bibtexitem">
+A.&nbsp;P.&nbsp;S. Bhalla, R.&nbsp;Bale, B.&nbsp;E. Griffith, and N.&nbsp;A. Patankar.
+ A unified mathematical framework and an adaptive numerical method
+  for fluid-structure interaction with rigid, deforming, and elastic bodies.
+ <em>PREPRINT, Submitted to Elsevier Science</em>, 2013.
+ 
+  <a href="http://www.math.nyu.edu/~griffith/docs/bhalla_constraint_ib.pdf">http://www.math.nyu.edu/~griffith/docs/bhalla_constraint_ib.pdf</a>.
+<a name="Bhalla_2013"></a><pre>
+@article{Bhalla_2013,
+  author = {A.~P.~S.~Bhalla and R.~Bale and B.~E.~Griffith and N.~A.~Patankar},
+  title = {{A unified mathematical framework and an adaptive numerical method for fluid-structure interaction with rigid, deforming, and elastic bodies}},
+  journal = {PREPRINT, Submitted to Elsevier Science},
+  year = 2013,
+  note = {\url{http://www.math.nyu.edu/~griffith/docs/bhalla_constraint_ib.pdf}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Gonzalez_2012">4</a>]
 </td>
 <td class="bibtexitem">
 F.&nbsp;G. Gonz&aacute;lez and J.&nbsp;R.&nbsp;R. Galv&aacute;n.
@@ -498,33 +574,7 @@ F.&nbsp;G. Gonz&aacute;lez and J.&nbsp;R.&nbsp;R. Galv&aacute;n.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhang_2012">2</a>]
-</td>
-<td class="bibtexitem">
-L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;Andrs, P.&nbsp;C. Millett, and
-  B.&nbsp;S. Biner.
- A quantitative comparison between <em>C</em><sup>0</sup> and <em>C</em><sup>1</sup> elements for
-  solving the Cahn-Hilliard equation.
- <em>Journal of Computational Physics</em>, 2012.
- <a href="http://dx.doi.org/10.1016/j.jcp.2012.12.001">http://dx.doi.org/10.1016/j.jcp.2012.12.001</a>.
-<a name="Zhang_2012"></a><pre>
-@article{Zhang_2012,
-  author = {L.~Zhang and M.~R.~Tonks and D.~Gaston and J.~W.~Peterson and D.~Andrs and P.~C.~Millett and B.~S.~Biner},
-  title = {{A quantitative comparison between $C^0$ and $C^1$ elements for solving the Cahn-Hilliard equation}},
-  journal = {Journal of Computational Physics},
-  year = 2012,
-  note = {\url{http://dx.doi.org/10.1016/j.jcp.2012.12.001}}
-}
-</pre>
-
-
-</td>
-</tr>
-
-
-<tr valign="top">
-<td align="right" class="bibtexnumber">
-[<a name="Bittl_2012">3</a>]
+[<a name="Bittl_2012">5</a>]
 </td>
 <td class="bibtexitem">
 M.&nbsp;Bittl and D.&nbsp;Kuzmin.
@@ -549,7 +599,7 @@ M.&nbsp;Bittl and D.&nbsp;Kuzmin.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2012">4</a>]
+[<a name="Vavourakis_2012">6</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekaterinaris.
@@ -575,7 +625,7 @@ V.&nbsp;Vavourakis, A.&nbsp;Kazakidi, D.&nbsp;P. Tsakiris, and J.&nbsp;A. Ekater
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vallaghe_2012">5</a>]
+[<a name="Vallaghe_2012">7</a>]
 </td>
 <td class="bibtexitem">
 S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
@@ -601,7 +651,7 @@ S.&nbsp;Vallagh&eacute; and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2012">6</a>]
+[<a name="Griffith_2012">8</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -627,7 +677,7 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Sopeju_2011">7</a>]
+[<a name="Sopeju_2011">9</a>]
 </td>
 <td class="bibtexitem">
 O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
@@ -658,7 +708,7 @@ O.&nbsp;A. Sopeju, M.&nbsp;Burtscher, A.&nbsp;Rane, and J.&nbsp;Browne.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Griffith_2010">8</a>]
+[<a name="Griffith_2010">10</a>]
 </td>
 <td class="bibtexitem">
 B.&nbsp;E. Griffith and X.&nbsp;Luo.
@@ -692,7 +742,36 @@ B.&nbsp;E. Griffith and X.&nbsp;Luo.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Fuentes_2013">1</a>]
+[<a name="Zhang_2013">1</a>]
+</td>
+<td class="bibtexitem">
+L.&nbsp;Zhang, M.&nbsp;R. Tonks, D.&nbsp;Gaston, J.&nbsp;W. Peterson, D.&nbsp;Andrs, P.&nbsp;C. Millett, and
+  B.&nbsp;S. Biner.
+ A quantitative comparison between <em>C</em><sup>0</sup> and <em>C</em><sup>1</sup> elements for
+  solving the Cahn-Hilliard equation.
+ <em>Journal of Computational Physics</em>, 236:74-80, March 2013.
+ <a href="http://dx.doi.org/10.1016/j.jcp.2012.12.001">http://dx.doi.org/10.1016/j.jcp.2012.12.001</a>.
+<a name="Zhang_2013"></a><pre>
+@article{Zhang_2013,
+  author = {L.~Zhang and M.~R.~Tonks and D.~Gaston and J.~W.~Peterson and D.~Andrs and P.~C.~Millett and B.~S.~Biner},
+  title = {{A quantitative comparison between $C^0$ and $C^1$ elements for solving the Cahn-Hilliard equation}},
+  journal = {Journal of Computational Physics},
+  month = mar,
+  year = 2013,
+  volume = 236,
+  pages = {74--80},
+  note = {\url{http://dx.doi.org/10.1016/j.jcp.2012.12.001}}
+}
+</pre>
+
+
+</td>
+</tr>
+
+
+<tr valign="top">
+<td align="right" class="bibtexnumber">
+[<a name="Fuentes_2013">2</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D. Hazle, and R.&nbsp;J.
@@ -724,7 +803,7 @@ D.&nbsp;Fuentes, A.&nbsp;Elliott, J.&nbsp;S. Weinberg, A.&nbsp;Shetty, J.&nbsp;D
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Huynh_2013">2</a>]
+[<a name="Huynh_2013">3</a>]
 </td>
 <td class="bibtexitem">
 D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
@@ -755,7 +834,7 @@ D.&nbsp;B.&nbsp;P. Huynh, D.&nbsp;J. Knezevic, and A.&nbsp;T. Patera.
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vavourakis_2013">3</a>]
+[<a name="Vavourakis_2013">4</a>]
 </td>
 <td class="bibtexitem">
 V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanastasiou.
@@ -783,7 +862,7 @@ V.&nbsp;Vavourakis, D.&nbsp;Loukidis, D.&nbsp;C. Charmpis, and P.&nbsp;Papanasta
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Zhu_2013">4</a>]
+[<a name="Zhu_2013">5</a>]
 </td>
 <td class="bibtexitem">
 Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berry.
@@ -811,7 +890,7 @@ Y.&nbsp;Zhu, X.&nbsp;Y. Luo, H.&nbsp;M. Wang, R.&nbsp;W. Ogden, and C.&nbsp;Berr
 
 <tr valign="top">
 <td align="right" class="bibtexnumber">
-[<a name="Vetter_2013">5</a>]
+[<a name="Vetter_2013">6</a>]
 </td>
 <td class="bibtexitem">
 R.&nbsp;Vetter, F.&nbsp;K. Wittel, N.&nbsp;Stoop, and H.&nbsp;J. Herrmann.
