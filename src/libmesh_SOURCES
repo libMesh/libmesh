@@ -377,7 +377,6 @@ libmesh_SOURCES =  \
         src/utils/libmesh_version.C \
         src/utils/location_maps.C \
         src/utils/number_lookups.C \
-        src/utils/o_f_stream.C \
         src/utils/perf_log.C \
         src/utils/plt_loader.C \
         src/utils/plt_loader_read.C \

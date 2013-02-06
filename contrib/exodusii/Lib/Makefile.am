@@ -5,7 +5,7 @@
 includedir      = $(prefix)/include/libmesh
 include_HEADERS = include/exodusII.h include/exodusII_ext.h
 
-pkg_cppflags = -I$(srcdir)/include -I$(top_srcdir)/contrib/netcdf/Lib
+pkg_cppflags = -I$(srcdir)/include $(NETCDF_INCLUDE)
 pkg_sources  = \
 	include/exodusII_int.h \
 	include/exodusII.h \

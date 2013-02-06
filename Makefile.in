@@ -110,7 +110,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/exodus.m4 $(top_srcdir)/m4/feexcept.m4 \
 	$(top_srcdir)/m4/fparser.m4 $(top_srcdir)/m4/glpk.m4 \
 	$(top_srcdir)/m4/gmv.m4 $(top_srcdir)/m4/gz.m4 \
-	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
+	$(top_srcdir)/m4/hdf5.m4 $(top_srcdir)/m4/laspack.m4 \
+	$(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
 	$(top_srcdir)/m4/libmesh_method.m4 \
@@ -432,13 +433,13 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
 	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/base/libmesh_dbg_la-dof_map_constraints.lo \
@@ -817,7 +818,6 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/utils/libmesh_dbg_la-libmesh_version.lo \
 	src/utils/libmesh_dbg_la-location_maps.lo \
 	src/utils/libmesh_dbg_la-number_lookups.lo \
-	src/utils/libmesh_dbg_la-o_f_stream.lo \
 	src/utils/libmesh_dbg_la-perf_log.lo \
 	src/utils/libmesh_dbg_la-plt_loader.lo \
 	src/utils/libmesh_dbg_la-plt_loader_read.lo \
@@ -1097,13 +1097,13 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
 	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/base/libmesh_devel_la-dof_map_constraints.lo \
 	src/base/libmesh_devel_la-dof_object.lo \
@@ -1481,7 +1481,6 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/utils/libmesh_devel_la-libmesh_version.lo \
 	src/utils/libmesh_devel_la-location_maps.lo \
 	src/utils/libmesh_devel_la-number_lookups.lo \
-	src/utils/libmesh_devel_la-o_f_stream.lo \
 	src/utils/libmesh_devel_la-perf_log.lo \
 	src/utils/libmesh_devel_la-plt_loader.lo \
 	src/utils/libmesh_devel_la-plt_loader_read.lo \
@@ -1758,13 +1757,13 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
 	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/base/libmesh_oprof_la-dof_map_constraints.lo \
 	src/base/libmesh_oprof_la-dof_object.lo \
@@ -2142,7 +2141,6 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/utils/libmesh_oprof_la-libmesh_version.lo \
 	src/utils/libmesh_oprof_la-location_maps.lo \
 	src/utils/libmesh_oprof_la-number_lookups.lo \
-	src/utils/libmesh_oprof_la-o_f_stream.lo \
 	src/utils/libmesh_oprof_la-perf_log.lo \
 	src/utils/libmesh_oprof_la-plt_loader.lo \
 	src/utils/libmesh_oprof_la-plt_loader_read.lo \
@@ -2419,13 +2417,13 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
 	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/base/libmesh_opt_la-dof_map_constraints.lo \
 	src/base/libmesh_opt_la-dof_object.lo \
@@ -2803,7 +2801,6 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/utils/libmesh_opt_la-libmesh_version.lo \
 	src/utils/libmesh_opt_la-location_maps.lo \
 	src/utils/libmesh_opt_la-number_lookups.lo \
-	src/utils/libmesh_opt_la-o_f_stream.lo \
 	src/utils/libmesh_opt_la-perf_log.lo \
 	src/utils/libmesh_opt_la-plt_loader.lo \
 	src/utils/libmesh_opt_la-plt_loader_read.lo \
@@ -3079,13 +3076,13 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/systems/transient_system.C src/utils/error_vector.C \
 	src/utils/hashword.C src/utils/libmesh_version.C \
 	src/utils/location_maps.C src/utils/number_lookups.C \
-	src/utils/o_f_stream.C src/utils/perf_log.C \
-	src/utils/plt_loader.C src/utils/plt_loader_read.C \
-	src/utils/plt_loader_write.C src/utils/point_locator_base.C \
-	src/utils/point_locator_list.C src/utils/point_locator_tree.C \
-	src/utils/statistics.C src/utils/string_to_enum.C \
-	src/utils/timestamp.C src/utils/tree.C src/utils/tree_node.C \
-	src/utils/utility.C src/utils/xdr_cxx.C
+	src/utils/perf_log.C src/utils/plt_loader.C \
+	src/utils/plt_loader_read.C src/utils/plt_loader_write.C \
+	src/utils/point_locator_base.C src/utils/point_locator_list.C \
+	src/utils/point_locator_tree.C src/utils/statistics.C \
+	src/utils/string_to_enum.C src/utils/timestamp.C \
+	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
+	src/utils/xdr_cxx.C
 am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/base/libmesh_prof_la-dof_map_constraints.lo \
 	src/base/libmesh_prof_la-dof_object.lo \
@@ -3463,7 +3460,6 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/utils/libmesh_prof_la-libmesh_version.lo \
 	src/utils/libmesh_prof_la-location_maps.lo \
 	src/utils/libmesh_prof_la-number_lookups.lo \
-	src/utils/libmesh_prof_la-o_f_stream.lo \
 	src/utils/libmesh_prof_la-perf_log.lo \
 	src/utils/libmesh_prof_la-plt_loader.lo \
 	src/utils/libmesh_prof_la-plt_loader_read.lo \
@@ -3945,7 +3941,6 @@ EGREP = @EGREP@
 EIGEN_INCLUDE = @EIGEN_INCLUDE@
 EXEEXT = @EXEEXT@
 EXODUS_INCLUDE = @EXODUS_INCLUDE@
-EXODUS_LIBRARY = @EXODUS_LIBRARY@
 F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
@@ -3966,6 +3961,13 @@ GZSTREAM_INCLUDE = @GZSTREAM_INCLUDE@
 GZSTREAM_LIB = @GZSTREAM_LIB@
 HAVE_DOT = @HAVE_DOT@
 HAVE_GCOV_TOOLS = @HAVE_GCOV_TOOLS@
+HDF5_CFLAGS = @HDF5_CFLAGS@
+HDF5_CPPFLAGS = @HDF5_CPPFLAGS@
+HDF5_CXXLIBS = @HDF5_CXXLIBS@
+HDF5_DIR = @HDF5_DIR@
+HDF5_FLIBS = @HDF5_FLIBS@
+HDF5_LIBS = @HDF5_LIBS@
+HDF5_PREFIX = @HDF5_PREFIX@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -4004,9 +4006,7 @@ MPI_LIBS_PATH = @MPI_LIBS_PATH@
 MPI_LIBS_PATHS = @MPI_LIBS_PATHS@
 NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
-NEMESIS_LIBRARY = @NEMESIS_LIBRARY@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
-NETCDF_LIBRARY = @NETCDF_LIBRARY@
 NM = @NM@
 NMEDIT = @NMEDIT@
 NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
@@ -4139,6 +4139,7 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
+subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target = @target@
 target_alias = @target_alias@
@@ -4629,7 +4630,6 @@ libmesh_SOURCES = \
         src/utils/libmesh_version.C \
         src/utils/location_maps.C \
         src/utils/number_lookups.C \
-        src/utils/o_f_stream.C \
         src/utils/perf_log.C \
         src/utils/plt_loader.C \
         src/utils/plt_loader_read.C \
@@ -5948,8 +5948,6 @@ src/utils/libmesh_dbg_la-location_maps.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-number_lookups.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_dbg_la-o_f_stream.lo: src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-perf_log.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_dbg_la-plt_loader.lo: src/utils/$(am__dirstamp) \
@@ -6901,8 +6899,6 @@ src/utils/libmesh_devel_la-location_maps.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_devel_la-number_lookups.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_devel_la-o_f_stream.lo: src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_devel_la-perf_log.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_devel_la-plt_loader.lo: src/utils/$(am__dirstamp) \
@@ -7854,8 +7850,6 @@ src/utils/libmesh_oprof_la-location_maps.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-number_lookups.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_oprof_la-o_f_stream.lo: src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-perf_log.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_oprof_la-plt_loader.lo: src/utils/$(am__dirstamp) \
@@ -8803,8 +8797,6 @@ src/utils/libmesh_opt_la-libmesh_version.lo:  \
 src/utils/libmesh_opt_la-location_maps.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_opt_la-number_lookups.lo: src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_opt_la-o_f_stream.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_opt_la-perf_log.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
@@ -9755,8 +9747,6 @@ src/utils/libmesh_prof_la-location_maps.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-number_lookups.lo:  \
 	src/utils/$(am__dirstamp) src/utils/$(DEPDIR)/$(am__dirstamp)
-src/utils/libmesh_prof_la-o_f_stream.lo: src/utils/$(am__dirstamp) \
-	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-perf_log.lo: src/utils/$(am__dirstamp) \
 	src/utils/$(DEPDIR)/$(am__dirstamp)
 src/utils/libmesh_prof_la-plt_loader.lo: src/utils/$(am__dirstamp) \
@@ -12027,7 +12017,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-location_maps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-number_lookups.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-perf_log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-plt_loader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_dbg_la-plt_loader_read.Plo@am__quote@
@@ -12047,7 +12036,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-location_maps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-number_lookups.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-perf_log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-plt_loader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_devel_la-plt_loader_read.Plo@am__quote@
@@ -12067,7 +12055,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-location_maps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-number_lookups.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-perf_log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-plt_loader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_oprof_la-plt_loader_read.Plo@am__quote@
@@ -12087,7 +12074,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-location_maps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-number_lookups.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-perf_log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-plt_loader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_opt_la-plt_loader_read.Plo@am__quote@
@@ -12107,7 +12093,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-libmesh_version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-location_maps.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-number_lookups.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-o_f_stream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-perf_log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-plt_loader.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/utils/$(DEPDIR)/libmesh_prof_la-plt_loader_read.Plo@am__quote@
@@ -14778,13 +14763,6 @@ src/utils/libmesh_dbg_la-number_lookups.lo: src/utils/number_lookups.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/number_lookups.C' object='src/utils/libmesh_dbg_la-number_lookups.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_dbg_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C
-
-src/utils/libmesh_dbg_la-o_f_stream.lo: src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_dbg_la-o_f_stream.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_dbg_la-o_f_stream.Tpo -c -o src/utils/libmesh_dbg_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_dbg_la-o_f_stream.Tpo src/utils/$(DEPDIR)/libmesh_dbg_la-o_f_stream.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/o_f_stream.C' object='src/utils/libmesh_dbg_la-o_f_stream.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_dbg_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
 
 src/utils/libmesh_dbg_la-perf_log.lo: src/utils/perf_log.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_dbg_la-perf_log.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_dbg_la-perf_log.Tpo -c -o src/utils/libmesh_dbg_la-perf_log.lo `test -f 'src/utils/perf_log.C' || echo '$(srcdir)/'`src/utils/perf_log.C
@@ -17516,13 +17494,6 @@ src/utils/libmesh_devel_la-number_lookups.lo: src/utils/number_lookups.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_devel_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C
 
-src/utils/libmesh_devel_la-o_f_stream.lo: src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_devel_la-o_f_stream.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_devel_la-o_f_stream.Tpo -c -o src/utils/libmesh_devel_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_devel_la-o_f_stream.Tpo src/utils/$(DEPDIR)/libmesh_devel_la-o_f_stream.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/o_f_stream.C' object='src/utils/libmesh_devel_la-o_f_stream.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_devel_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
-
 src/utils/libmesh_devel_la-perf_log.lo: src/utils/perf_log.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_devel_la-perf_log.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_devel_la-perf_log.Tpo -c -o src/utils/libmesh_devel_la-perf_log.lo `test -f 'src/utils/perf_log.C' || echo '$(srcdir)/'`src/utils/perf_log.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_devel_la-perf_log.Tpo src/utils/$(DEPDIR)/libmesh_devel_la-perf_log.Plo
@@ -20252,13 +20223,6 @@ src/utils/libmesh_oprof_la-number_lookups.lo: src/utils/number_lookups.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/number_lookups.C' object='src/utils/libmesh_oprof_la-number_lookups.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_oprof_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C
-
-src/utils/libmesh_oprof_la-o_f_stream.lo: src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_oprof_la-o_f_stream.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_oprof_la-o_f_stream.Tpo -c -o src/utils/libmesh_oprof_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_oprof_la-o_f_stream.Tpo src/utils/$(DEPDIR)/libmesh_oprof_la-o_f_stream.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/o_f_stream.C' object='src/utils/libmesh_oprof_la-o_f_stream.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_oprof_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
 
 src/utils/libmesh_oprof_la-perf_log.lo: src/utils/perf_log.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_oprof_la-perf_log.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_oprof_la-perf_log.Tpo -c -o src/utils/libmesh_oprof_la-perf_log.lo `test -f 'src/utils/perf_log.C' || echo '$(srcdir)/'`src/utils/perf_log.C
@@ -22990,13 +22954,6 @@ src/utils/libmesh_opt_la-number_lookups.lo: src/utils/number_lookups.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_opt_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C
 
-src/utils/libmesh_opt_la-o_f_stream.lo: src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_opt_la-o_f_stream.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_opt_la-o_f_stream.Tpo -c -o src/utils/libmesh_opt_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_opt_la-o_f_stream.Tpo src/utils/$(DEPDIR)/libmesh_opt_la-o_f_stream.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/o_f_stream.C' object='src/utils/libmesh_opt_la-o_f_stream.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_opt_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
-
 src/utils/libmesh_opt_la-perf_log.lo: src/utils/perf_log.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_opt_la-perf_log.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_opt_la-perf_log.Tpo -c -o src/utils/libmesh_opt_la-perf_log.lo `test -f 'src/utils/perf_log.C' || echo '$(srcdir)/'`src/utils/perf_log.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_opt_la-perf_log.Tpo src/utils/$(DEPDIR)/libmesh_opt_la-perf_log.Plo
@@ -25726,13 +25683,6 @@ src/utils/libmesh_prof_la-number_lookups.lo: src/utils/number_lookups.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/number_lookups.C' object='src/utils/libmesh_prof_la-number_lookups.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_prof_la-number_lookups.lo `test -f 'src/utils/number_lookups.C' || echo '$(srcdir)/'`src/utils/number_lookups.C
-
-src/utils/libmesh_prof_la-o_f_stream.lo: src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_prof_la-o_f_stream.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_prof_la-o_f_stream.Tpo -c -o src/utils/libmesh_prof_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/utils/$(DEPDIR)/libmesh_prof_la-o_f_stream.Tpo src/utils/$(DEPDIR)/libmesh_prof_la-o_f_stream.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/o_f_stream.C' object='src/utils/libmesh_prof_la-o_f_stream.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_prof_la-o_f_stream.lo `test -f 'src/utils/o_f_stream.C' || echo '$(srcdir)/'`src/utils/o_f_stream.C
 
 src/utils/libmesh_prof_la-perf_log.lo: src/utils/perf_log.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/utils/libmesh_prof_la-perf_log.lo -MD -MP -MF src/utils/$(DEPDIR)/libmesh_prof_la-perf_log.Tpo -c -o src/utils/libmesh_prof_la-perf_log.lo `test -f 'src/utils/perf_log.C' || echo '$(srcdir)/'`src/utils/perf_log.C
