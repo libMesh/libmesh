@@ -1125,15 +1125,6 @@ null_output_iterator.h: $(top_srcdir)/include/utils/null_output_iterator.h
 number_lookups.h: $(top_srcdir)/include/utils/number_lookups.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
-<<<<<<< HEAD
-=======
-o_f_stream.h: $(top_srcdir)/include/utils/o_f_stream.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
-
-o_string_stream.h: $(top_srcdir)/include/utils/o_string_stream.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
-
->>>>>>> build new version of nemesis
 ostream_proxy.h: $(top_srcdir)/include/utils/ostream_proxy.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
