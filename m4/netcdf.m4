@@ -60,6 +60,8 @@ AC_DEFUN([CONFIGURE_NETCDF],
 
   # allow opt-out for nested subpackages
   if (test "x$enablenested" = "xyes"); then
+      #  pass --disable-testsets to the netcdf subpackage to disable the most rigorous tests
+      libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-testsets"
       AC_CONFIG_SUBDIRS([contrib/netcdf/v4])
   fi
 

@@ -32053,6 +32053,8 @@ $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
 
   # allow opt-out for nested subpackages
   if (test "x$enablenested" = "xyes"); then
+      #  pass --disable-testsets to the netcdf subpackage to disable the most rigorous tests
+      libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-testsets"
       subdirs="$subdirs contrib/netcdf/v4"
 
   fi
