@@ -51,7 +51,7 @@ require_residual_reduction = true
 max_linear_iterations = 10000
 
 # How many iterations before the nonlinear solver gives up?
-max_nonlinear_iterations = 100
+max_nonlinear_iterations = 2
 
 # How much step size reduction should indicate convergence?
 relative_step_tolerance = 1.e-8
