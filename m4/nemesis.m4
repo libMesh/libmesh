@@ -7,33 +7,42 @@ AC_DEFUN([CONFIGURE_NEMESIS],
                 AC_HELP_STRING([--enable-nemesis],
                                [build with NemesisII API support]),
 		[case "${enableval}" in
-		  yes)  enablenemesis=yes ;;
-		   no)  enablenemesis=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-nemesis) ;;
+		  yes|v309) enablenemesis=yes ; nemesisversion="v3.09" ;;
+		  new|v522) enablenemesis=yes ; nemesisversion="v5.22" ;;
+		        no) enablenemesis=no  ; nemesisversion=no ;;
+ 		         *) AC_MSG_ERROR(bad value ${enableval} for --enable-nemesis) ;;
 		 esac],
-		 [enablenemesis=$enableexodus]) # if unspecified, depend on exodus
+		 [enablenemesis=$enableexodus ; nemesisversion="v3.09"]) # if unspecified, depend on exodus
 
 
-  dnl Trump --enable-nemesis with --disable-mpi
+  # Trump --enable-nemesis with --disable-mpi
   if (test "x$enablempi" = xno); then
-    enablenemesis=no
+    nemesisversion=no
   fi	
-		 		
-  dnl The NEMESIS API is distributed with libmesh, so we don't have to guess
-  dnl where it might be installed...
-  if (test $enablenemesis = yes); then
-     NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/Lib"
-     NEMESIS_LIBRARY="\$(EXTERNAL_LIBDIR)/libnemesis\$(libext)"
-     AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
-     AC_MSG_RESULT(<<< Configuring library with Nemesis support >>>)
-     have_nemesis=yes
-  else
-     NEMESIS_INCLUDE=""
-     NEMESIS_LIBRARY=""
-     enablenemesis=no
-     have_nemesis=no
-  fi
 
+  case "${nemesisversion}" in
+
+      "v3.09")
+	  # The NEMESIS API is distributed with libmesh, so we don't have to guess
+	  # where it might be installed...
+	  NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion"
+	  AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
+	  AC_MSG_RESULT(<<< Configuring library with Nemesis version $nemesisversion support >>>)
+	  ;;
+
+      "v5.22")
+	  NEMESIS_INCLUDE="-I\$(top_srcdir)/contrib/nemesis/$nemesisversion/nemesis"
+	  AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
+	  AC_MSG_RESULT(<<< Configuring library with Nemesis version $nemesisversion support >>>)
+	  ;;
+	  
+      *)
+	  NEMESIS_INCLUDE=""
+	  enablenemesis=no
+	  ;;
+  esac
+
+  AC_CONFIG_FILES([contrib/nemesis/v3.09/Makefile])
+  AC_CONFIG_FILES([contrib/nemesis/v5.22/nemesis/Makefile])
   AC_SUBST(NEMESIS_INCLUDE)
-  AC_SUBST(NEMESIS_LIBRARY)
 ])

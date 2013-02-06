@@ -33,31 +33,69 @@ if LIBMESH_ENABLE_GZSTREAMS
 endif
 
 if LIBMESH_ENABLE_NETCDF
-  SUBDIRS    += netcdf/Lib
-  opt_libs   += netcdf/Lib/libopt.la
-  dbg_libs   += netcdf/Lib/libdbg.la
-  devel_libs += netcdf/Lib/libdevel.la
-  prof_libs  += netcdf/Lib/libprof.la
-  oprof_libs += netcdf/Lib/liboprof.la
+# NetCDF version 3, build minimal subset
+if LIBMESH_ENABLE_NETCDF_V3
+  SUBDIRS    += netcdf/v3
+  opt_libs   += netcdf/v3/libopt.la
+  dbg_libs   += netcdf/v3/libdbg.la
+  devel_libs += netcdf/v3/libdevel.la
+  prof_libs  += netcdf/v3/libprof.la
+  oprof_libs += netcdf/v3/liboprof.la
 endif
+
+# NetCDF version 4, use their autotools package
+if LIBMESH_ENABLE_NETCDF_V4
+  SUBDIRS    += netcdf/v4
+  opt_libs   += netcdf/v4/liblib/libnetcdf.la
+  dbg_libs   += netcdf/v4/liblib/libnetcdf.la
+  devel_libs += netcdf/v4/liblib/libnetcdf.la
+  prof_libs  += netcdf/v4/liblib/libnetcdf.la
+  oprof_libs += netcdf/v4/liblib/libnetcdf.la
+endif
+endif
+
 
 if LIBMESH_ENABLE_EXODUS
-  SUBDIRS    += exodusii/Lib
-  opt_libs   += exodusii/Lib/libopt.la
-  dbg_libs   += exodusii/Lib/libdbg.la
-  devel_libs += exodusii/Lib/libdevel.la
-  prof_libs  += exodusii/Lib/libprof.la
-  oprof_libs += exodusii/Lib/liboprof.la
+if LIBMESH_ENABLE_EXODUS_V509
+  SUBDIRS    += exodusii/v5.09
+  opt_libs   += exodusii/v5.09/libopt.la
+  dbg_libs   += exodusii/v5.09/libdbg.la
+  devel_libs += exodusii/v5.09/libdevel.la
+  prof_libs  += exodusii/v5.09/libprof.la
+  oprof_libs += exodusii/v5.09/liboprof.la
 endif
 
-if LIBMESH_ENABLE_NEMESIS
-  SUBDIRS    += nemesis/Lib
-  opt_libs   += nemesis/Lib/libopt.la 
-  dbg_libs   += nemesis/Lib/libdbg.la 
-  devel_libs += nemesis/Lib/libdevel.la 
-  prof_libs  += nemesis/Lib/libprof.la 
-  oprof_libs += nemesis/Lib/liboprof.la 
+if LIBMESH_ENABLE_EXODUS_V522
+  SUBDIRS    += exodusii/v5.22/exodus/cbind
+  opt_libs   += exodusii/v5.22/exodus/cbind/libopt.la
+  dbg_libs   += exodusii/v5.22/exodus/cbind/libdbg.la
+  devel_libs += exodusii/v5.22/exodus/cbind/libdevel.la
+  prof_libs  += exodusii/v5.22/exodus/cbind/libprof.la
+  oprof_libs += exodusii/v5.22/exodus/cbind/liboprof.la
 endif
+endif
+
+
+if LIBMESH_ENABLE_NEMESIS
+if LIBMESH_ENABLE_NEMESIS_V309
+  SUBDIRS    += nemesis/v3.09
+  opt_libs   += nemesis/v3.09/libopt.la 
+  dbg_libs   += nemesis/v3.09/libdbg.la 
+  devel_libs += nemesis/v3.09/libdevel.la 
+  prof_libs  += nemesis/v3.09/libprof.la 
+  oprof_libs += nemesis/v3.09/liboprof.la 
+endif
+
+if LIBMESH_ENABLE_NEMESIS_V522
+  SUBDIRS    += nemesis/v5.22/nemesis
+  opt_libs   += nemesis/v5.22/nemesis/libopt.la 
+  dbg_libs   += nemesis/v5.22/nemesis/libdbg.la 
+  devel_libs += nemesis/v5.22/nemesis/libdevel.la 
+  prof_libs  += nemesis/v5.22/nemesis/libprof.la 
+  oprof_libs += nemesis/v5.22/nemesis/liboprof.la 
+endif
+endif
+
 
 if LIBMESH_ENABLE_TECIO
   SUBDIRS    += tecplot/tecio
