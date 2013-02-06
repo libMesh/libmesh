@@ -14,10 +14,13 @@ AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 # By contrast, libmesh_contrib_INCLUDES point inside the 
 # source tree for building contributed packages that do not 
 # need to be exported as part of the installation environment.
+# 
+# libmesh_subpackage_arguments is a list of configure arguments
+# that will be passed down to any subpackages that we are nesting.
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
 libmesh_contrib_INCLUDES=""
-
+libmesh_subpackage_arguments=""
 
 
 # --------------------------------------------------------------
@@ -26,8 +29,12 @@ libmesh_contrib_INCLUDES=""
 AC_ARG_ENABLE(optional,
               AC_HELP_STRING([--enable-optional],
                              [en/disable optional external libraries]),
-              enableoptional=$enableval,
-              enableoptional=yes)
+	      [case "${enableval}" in
+	      	  yes) enableoptional=yes ;;
+		   no) enableoptional=no ;;
+ 		    *) AC_MSG_ERROR(bad value ${enableval} for --enable-optional) ;;
+	       esac],
+              [enableoptional=yes])
 
 # Note that even when optional packages are disabled we need to
 # run their m4 macros to get proper AM_CONDITIONALs.  Just be
@@ -39,6 +46,18 @@ if test "$enableoptional" != no ; then
 fi
 
 
+# --------------------------------------------------------------
+# Allow for disable-nested
+# --------------------------------------------------------------
+AC_ARG_ENABLE(nested,
+              AC_HELP_STRING([--enable-nested],
+                             [en/disable nested autoconf subpackages]),
+	      [case "${enableval}" in
+	      	  yes) enablenested=yes ;;
+		   no) enablenested=no ;;
+ 		    *) AC_MSG_ERROR(bad value ${enableval} for --enable-nested) ;;
+	       esac],
+              [enablenested=$enableoptional])
 
 # -------------------------------------------------------------
 # Boost -- enabled by default
@@ -358,14 +377,26 @@ AM_CONDITIONAL(LIBMESH_ENABLE_GLPK, test x$enableglpk = xyes)
 
 
 # --------------------------------------------------------------
+# HDF5 -- enabled by default
+# --------------------------------------------------------------
+CONFIGURE_HDF5
+if (test $enablehdf5 = yes); then
+  libmesh_optional_INCLUDES="$HDF5_CPPFLAGS $libmesh_optional_INCLUDES"
+  libmesh_optional_LIBS="$HDF5_LIBS $libmesh_optional_LIBS"
+fi
+AM_CONDITIONAL(LIBMESH_ENABLE_HDF5, test x$enablehdf5 = xyes)
+
+
+# --------------------------------------------------------------
 # netCDF -- enabled by default (it is distributed in contrib)
 # --------------------------------------------------------------
 CONFIGURE_NETCDF
 if (test $enablenetcdf = yes); then
   libmesh_contrib_INCLUDES="$NETCDF_INCLUDE $libmesh_contrib_INCLUDES"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF, test x$enablenetcdf = xyes)
-AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
+AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF,    test x$enablenetcdf  = xyes)
+AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V3, test x$netcdfversion = x3)
+AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V4, test x$netcdfversion = x4)
 
    # -------------------------------------------------------------
    # ExodusII -- enabled by default (it is distributed in contrib)
@@ -375,8 +406,9 @@ AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
    if (test $enableexodus = yes); then
      libmesh_contrib_INCLUDES="$EXODUS_INCLUDE $libmesh_contrib_INCLUDES"
    fi
-   AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS, test x$enableexodus = xyes)
-   AC_CONFIG_FILES([contrib/exodusii/Lib/Makefile])
+   AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS,      test x$enableexodus  = xyes)
+   AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS_V509, test x$exodusversion = xv5.09)
+   AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS_V522, test x$exodusversion = xv5.22)
 
       # -------------------------------------------------------------
       # Nemesis -- enabled by default (it is distributed in contrib)
@@ -386,8 +418,9 @@ AC_CONFIG_FILES([contrib/netcdf/Lib/Makefile])
       if (test $enablenemesis = yes); then
          libmesh_contrib_INCLUDES="$NEMESIS_INCLUDE $libmesh_contrib_INCLUDES"
       fi
-      AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS, test x$enablenemesis = xyes)
-      AC_CONFIG_FILES([contrib/nemesis/Lib/Makefile])
+      AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS,      test x$enablenemesis  = xyes)
+      AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS_V309, test x$nemesisversion = xv3.09)
+      AM_CONDITIONAL(LIBMESH_ENABLE_NEMESIS_V522, test x$nemesisversion = xv5.22)
       # -------------------------------------------------------------
    # -------------------------------------------------------------
 # -------------------------------------------------------------

@@ -77,7 +77,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/exodus.m4 $(top_srcdir)/m4/feexcept.m4 \
 	$(top_srcdir)/m4/fparser.m4 $(top_srcdir)/m4/glpk.m4 \
 	$(top_srcdir)/m4/gmv.m4 $(top_srcdir)/m4/gz.m4 \
-	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
+	$(top_srcdir)/m4/hdf5.m4 $(top_srcdir)/m4/laspack.m4 \
+	$(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
 	$(top_srcdir)/m4/libmesh_method.m4 \
@@ -356,7 +357,6 @@ EGREP = @EGREP@
 EIGEN_INCLUDE = @EIGEN_INCLUDE@
 EXEEXT = @EXEEXT@
 EXODUS_INCLUDE = @EXODUS_INCLUDE@
-EXODUS_LIBRARY = @EXODUS_LIBRARY@
 F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
@@ -377,6 +377,13 @@ GZSTREAM_INCLUDE = @GZSTREAM_INCLUDE@
 GZSTREAM_LIB = @GZSTREAM_LIB@
 HAVE_DOT = @HAVE_DOT@
 HAVE_GCOV_TOOLS = @HAVE_GCOV_TOOLS@
+HDF5_CFLAGS = @HDF5_CFLAGS@
+HDF5_CPPFLAGS = @HDF5_CPPFLAGS@
+HDF5_CXXLIBS = @HDF5_CXXLIBS@
+HDF5_DIR = @HDF5_DIR@
+HDF5_FLIBS = @HDF5_FLIBS@
+HDF5_LIBS = @HDF5_LIBS@
+HDF5_PREFIX = @HDF5_PREFIX@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -415,9 +422,7 @@ MPI_LIBS_PATH = @MPI_LIBS_PATH@
 MPI_LIBS_PATHS = @MPI_LIBS_PATHS@
 NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
-NEMESIS_LIBRARY = @NEMESIS_LIBRARY@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
-NETCDF_LIBRARY = @NETCDF_LIBRARY@
 NM = @NM@
 NMEDIT = @NMEDIT@
 NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
@@ -550,6 +555,7 @@ psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
+subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target = @target@
 target_alias = @target_alias@

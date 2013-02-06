@@ -107,6 +107,9 @@ if (test "x$enableoptional" = "xyes"); then
 #  fi
   echo '  'eigen............................ : $enableeigen
   echo '  'exodus........................... : $enableexodus
+  if (test "x$exodusversion" != "xno"); then
+  echo '     'version....................... : $exodusversion
+  fi
   echo '  'fparser.......................... : $enablefparser
   if (test "x$enablefparser" = "xyes" -a "x$enablefparserdevel" = "xno"); then
   echo '     'build from version............ : release
@@ -117,13 +120,20 @@ if (test "x$enableoptional" = "xyes"); then
   echo '  'glpk............................. : $enableglpk
   echo '  'gmv.............................. : $enablegmv
   echo '  'gzstream......................... : $enablegz
+  echo '  'hdf5............................. : $enablehdf5
   echo '  'laspack.......................... : $enablelaspack
   echo '  'libhilbert....................... : $enablelibhilbert
   echo '  'metis............................ : $enablemetis
   echo '  'mpi.............................. : $enablempi
   echo '  'nanoflann........................ : $enablenanoflann
   echo '  'nemesis.......................... : $enablenemesis
+  if (test "x$nemesisversion" != "xno"); then
+  echo '     'version....................... : $nemesisversion
+  fi
   echo '  'netcdf........................... : $enablenetcdf
+  if (test "x$netcdfversion" != "xno"); then
+  echo '     'version....................... : $netcdfversion
+  fi
   echo '  'openmp........................... : $enableopenmp
   echo '  'parmetis......................... : $enableparmetis
   echo '  'petsc............................ : $enablepetsc

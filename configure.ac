@@ -322,10 +322,23 @@ if (test "x$enableexamples" = "xyes"); then
   		])		
 fi		
 
-# Create output files
+
+# hackery.  If we are supporting nested autoconf packages and we want to specify 
+# additional arguments to be passed to those packages, do that here.  
+# Specifically, we append libmesh_subpackage_arguments to ac_configure_args
+# before AC_OUTPUT recurses into our subpackages
+if (test "x$enablenested" = "xyes"); then
+  ac_configure_args_SAVE="$ac_configure_args"
+  ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX=$CXX CC=$CC F77=$F77 FC=$FC"
+fi
+
+# Create output files. Also configures any subpackages
 AC_OUTPUT
 
-
+# end hackery
+if (test "x$enablenested" = "xyes"); then
+  ac_configure_args="$ac_configure_args_SAVE"
+fi
 
 # Final summary
 AX_SUMMARIZE_CONFIG
