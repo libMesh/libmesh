@@ -217,18 +217,38 @@ void VTKIO::cells_to_vtk()
 
       for (unsigned int i=0; i<conn.size(); ++i)
         {
+          // If the node ID is not found in the _local_node_map, we'll
+          // add it to the _vtk_grid.  NOTE[JWP]: none of the examples
+          // I have actually enters this section of code...
           if (_local_node_map.find(conn[i]) == _local_node_map.end())
             {
-              // Ghost node
-              // FIXME[JWP]: Single precision?
-              float pt[LIBMESH_DIM];
-              dof_id_type node = elem->node(i);
-              for (unsigned int d=0; d<LIBMESH_DIM; ++d)
-                pt[d] = mesh.node(node)(d);
+              dof_id_type global_node_id = elem->node(i);
 
+              const Node* the_node = mesh.node_ptr(global_node_id);
+
+              // Error checking...
+              if (the_node == NULL)
+                {
+                  libMesh::err << "Error getting pointer to node "
+                               << global_node_id
+                               << "!" << std::endl;
+                  libmesh_error();
+                }
+
+              // InsertNextPoint accepts either a double or float array of length 3.
+              Real pt[3] = {0., 0., 0.};
+              for (unsigned int d=0; d<LIBMESH_DIM; ++d)
+                pt[d] = (*the_node)(d);
+
+              // Insert the point into the _vtk_grid
               vtkIdType local = _vtk_grid->GetPoints()->InsertNextPoint(pt);
-              _local_node_map[node] = local;
+
+              // Update the _local_node_map with the ID returned by VTK
+              _local_node_map[global_node_id] = local;
             }
+
+          // Otherwise, the node ID was found in the _local_node_map, so
+          // insert it into the vtkIdList.
           pts->InsertId(i, _local_node_map[conn[i]]);
         }
 
