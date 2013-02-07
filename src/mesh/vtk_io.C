@@ -396,9 +396,12 @@ void VTKIO::read (const std::string& name)
   // Clear out any pre-existing data from the Mesh
   mesh.clear();
 
+  // Get the number of points from the _vtk_grid object
+  const unsigned int vtk_num_points = static_cast<unsigned int>(_vtk_grid->GetNumberOfPoints());
+
   // always numbered nicely??, so we can loop like this
   // I'm pretty sure it is numbered nicely
-  for (unsigned int i=0; i<static_cast<unsigned int>(_vtk_grid->GetNumberOfPoints()); ++i)
+  for (unsigned int i=0; i<vtk_num_points; ++i)
     {
       // add to the id map
       // and add the actual point
@@ -412,7 +415,10 @@ void VTKIO::read (const std::string& name)
 	this->_mesh_data->add_foreign_node_id (newnode, i);
     }
 
-  for (unsigned int i=0; i<static_cast<unsigned int>(_vtk_grid->GetNumberOfCells()); ++i)
+  // Get the number of cells from the _vtk_grid object
+  const unsigned int vtk_num_cells = static_cast<unsigned int>(_vtk_grid->GetNumberOfCells());
+
+  for (unsigned int i=0; i<vtk_num_cells; ++i)
     {
       vtkCell* cell = _vtk_grid->GetCell(i);
       Elem* elem = NULL;
