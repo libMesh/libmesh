@@ -36,22 +36,8 @@
 
 #ifdef LIBMESH_HAVE_VTK
 
-#include "libmesh/ignore_warnings.h"
-
-// Hack to avoid warnings coming from stupid VTK files that include
-// deprecated headers.  We only do this for GCC >= 4.2, but it may
-// work for other compilers as well.  Note: technically it is
-// illegal to mess with identifiers that have double leading
-// underscores... but it is also technically super annoying to see
-// this warning all the time.
-#if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
-#if __GNUC__ > 3 && __GNUC_MINOR__ > 1
-#ifdef __DEPRECATED
-  #undef __DEPRECATED
-  #define LIBMESH_REDEFINE_DEPRECATED
-#endif // if __DEPRECATED
-#endif // if version
-#endif // if gnu
+// Tell VTK not to use old header files
+#define VTK_LEGACY_REMOVE
 
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
@@ -64,12 +50,6 @@
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkSmartPointer.h"
-
-#ifdef LIBMESH_REDEFINE_DEPRECATED
-  #define __DEPRECATED
-#endif
-
-#include "libmesh/restore_warnings.h"
 
 // A convenient macro for comparing VTK versions.  Returns 1 if the
 // current VTK version is < major.minor.subminor and zero otherwise.
