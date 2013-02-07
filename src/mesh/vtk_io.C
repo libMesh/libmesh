@@ -24,12 +24,22 @@
 #include "libmesh/vtk_io.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/edge_edge2.h"
+#include "libmesh/edge_edge3.h"
+#include "libmesh/face_tri3.h"
+#include "libmesh/face_tri6.h"
+#include "libmesh/face_quad4.h"
+#include "libmesh/face_quad8.h"
+#include "libmesh/face_quad9.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_tet10.h"
 #include "libmesh/cell_prism6.h"
+#include "libmesh/cell_prism15.h"
+#include "libmesh/cell_prism18.h"
 #include "libmesh/cell_pyramid5.h"
 #include "libmesh/cell_hex8.h"
 #include "libmesh/cell_hex20.h"
+#include "libmesh/cell_hex27.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/system.h"
 #include "libmesh/mesh_data.h"
@@ -395,19 +405,19 @@ void VTKIO::read (const std::string& name)
   libmesh_error();
 
 #else
-  // libMesh::out<<"read "<<name <<std::endl;
-  vtkXMLUnstructuredGridReader *reader = vtkXMLUnstructuredGridReader::New();
+  // Use a typedef, because these names are just crazy
+  typedef vtkSmartPointer<vtkXMLUnstructuredGridReader> MyReader;
+  MyReader reader = MyReader::New();
+
+  // Pass the filename along to the reader
   reader->SetFileName( name.c_str() );
-  // libMesh::out<<"force read"<<std::endl;
 
   // Force reading
   reader->Update();
 
   // read in the grid
-  // vtkUnstructuredGrid *grid = reader->GetOutput();
   _vtk_grid = reader->GetOutput();
-  _vtk_grid->Update();
-  reader->Delete();
+  // _vtk_grid->Update(); // FIXME: Necessary?
 
   // Get a reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -441,26 +451,57 @@ void VTKIO::read (const std::string& name)
     {
       vtkCell* cell = _vtk_grid->GetCell(i);
       Elem* elem = NULL;
-      switch(cell->GetCellType())
+      switch (cell->GetCellType())
 	{
-          // FIXME - we're not supporting 2D VTK input yet!? [RHS]
+        case VTK_LINE:
+          elem = new Edge2;
+          break;
+        case VTK_QUADRATIC_EDGE:
+          elem = new Edge3;
+          break;
+        case VTK_TRIANGLE:
+          elem = new Tri3();
+          break;
+        case VTK_QUADRATIC_TRIANGLE:
+          elem = new Tri6();
+          break;
+        case VTK_QUAD:
+          elem = new Quad4();
+          break;
+        case VTK_QUADRATIC_QUAD:
+          elem = new Quad8();
+          break;
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+        case VTK_BIQUADRATIC_QUAD:
+          elem = new Quad9();
+          break;
+#endif
 	case VTK_TETRA:
 	  elem = new Tet4();
+	  break;
+        case VTK_QUADRATIC_TETRA:
+	  elem = new Tet10();
 	  break;
 	case VTK_WEDGE:
 	  elem = new Prism6();
 	  break;
+        case VTK_QUADRATIC_WEDGE:
+	  elem = new Prism15();
+	  break;
+        case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
+	  elem = new Prism18();
+	  break;
 	case VTK_HEXAHEDRON:
 	  elem = new Hex8();
-	  break;
-	case VTK_PYRAMID:
-	  elem = new Pyramid5();
 	  break;
 	case VTK_QUADRATIC_HEXAHEDRON:
   	  elem = new Hex20();
 	  break;
-	case VTK_QUADRATIC_TETRA:
-	  elem = new Tet10();
+        case VTK_TRIQUADRATIC_HEXAHEDRON:
+	  elem = new Hex27();
+	  break;
+	case VTK_PYRAMID:
+	  elem = new Pyramid5();
 	  break;
 	default:
 	  libMesh::err << "element type not implemented in vtkinterface " << cell->GetCellType() << std::endl;
@@ -487,8 +528,6 @@ void VTKIO::read (const std::string& name)
 
       mesh.add_elem(elem);
     } // end loop over VTK cells
-
-  _vtk_grid->Delete();
 
   // Set the mesh dimension to the largest encountered for an element
   for (unsigned int i=0; i!=4; ++i)
@@ -533,8 +572,8 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
   const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
 
-  // check if the filename extension is pvtu
-  libmesh_assert(fname.substr(fname.rfind("."), fname.size()) == ".pvtu");
+  // Is this really important?  If so, it should be more than an assert...
+  // libmesh_assert(fname.substr(fname.rfind("."), fname.size()) == ".pvtu");
  
   // we only use Unstructured grids
   _vtk_grid = vtkUnstructuredGrid::New();

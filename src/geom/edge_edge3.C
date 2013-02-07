@@ -125,6 +125,13 @@ void Edge3::connectivity(const unsigned int sc,
 
     case VTK:
       {
+        conn.resize(3);
+        conn[0] = this->node(0);
+        conn[1] = this->node(1);
+        conn[2] = this->node(2);
+        return;
+
+        /*
 	switch (sc)
 	  {
 	  case 0:
@@ -141,7 +148,8 @@ void Edge3::connectivity(const unsigned int sc,
 
 	  default:
 	    libmesh_error();
-	  }
+          }
+        */
       }
 
     default:
