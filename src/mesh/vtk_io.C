@@ -171,8 +171,7 @@ void VTKIO::nodes_to_vtk()
     {
       Node* node = (*nd);
 
-      // FIXME[JWP]: Single precision?
-      float pnt[LIBMESH_DIM];
+      double pnt[LIBMESH_DIM];
       for (unsigned int i=0; i<LIBMESH_DIM; ++i)
         pnt[i] = (*node)(i);
 
@@ -180,7 +179,7 @@ void VTKIO::nodes_to_vtk()
       _local_node_map[node->id()] = local_node_counter;
 
       // add point
-      pcoords->InsertNextTuple(pnt); // SetTuple(node->id(),pnt);
+      pcoords->InsertNextTupleValue(pnt);
     }
 
   // add coordinates to points
