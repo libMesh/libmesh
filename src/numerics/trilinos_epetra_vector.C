@@ -403,6 +403,8 @@ EpetraVector<T>::operator = (const EpetraVector<T>& v)
 {
   (*_vec) = *v._vec;
 
+  // FIXME - what about our communications data?
+
   return *this;
 }
 
@@ -482,89 +484,38 @@ void EpetraVector<T>::localize (NumericVector<T>& v_local_in,
 
 
 template <typename T>
-void EpetraVector<T>::localize (const unsigned int /* first_local_idx */,
-				const unsigned int /* last_local_idx */,
-				const std::vector<unsigned int>& /* send_list */)
+void EpetraVector<T>::localize (const unsigned int first_local_idx,
+				const unsigned int last_local_idx,
+				const std::vector<unsigned int>& send_list)
 {
-  libmesh_not_implemented();
+  // Only good for serial vectors.
+  libmesh_assert_equal_to (this->size(), this->local_size());
+  libmesh_assert_greater (last_local_idx, first_local_idx);
+  libmesh_assert_less_equal (send_list.size(), this->size());
+  libmesh_assert_less (last_local_idx, this->size());
 
-//   // Only good for serial vectors.
-//   libmesh_assert_equal_to (this->size(), this->local_size());
-//   libmesh_assert_greater (last_local_idx, first_local_idx);
-//   libmesh_assert_less_equal (send_list.size(), this->size());
-//   libmesh_assert_less (last_local_idx, this->size());
+  const unsigned int my_size       = this->size();
+  const unsigned int my_local_size = (last_local_idx - first_local_idx + 1);
 
-//   const unsigned int size       = this->size();
-//   const unsigned int local_size = (last_local_idx - first_local_idx + 1);
-//   int ierr=0;
+  // Don't bother for serial cases
+  if ((first_local_idx == 0) &&
+      (my_local_size == my_size))
+    return;
 
-//   // Don't bother for serial cases
-//   if ((first_local_idx == 0) &&
-//       (local_size == size))
-//     return;
+  // Build a parallel vector, initialize it with the local
+  // parts of (*this)
+  EpetraVector<T> parallel_vec;
 
+  parallel_vec.init (my_size, my_local_size, true, PARALLEL);
 
-//   // Build a parallel vector, initialize it with the local
-//   // parts of (*this)
-//   EpetraVector<T> parallel_vec;
+  // Copy part of *this into the parallel_vec
+  for (numeric_index_type i=first_local_idx; i<=last_local_idx; i++)
+    parallel_vec.set(i,this->el(i));
 
-//   parallel_vec.init (size, local_size, true, PARALLEL);
-
-
-//   // Copy part of *this into the parallel_vec
-//   {
-//     IS is;
-//     VecScatter scatter;
-
-//     // Create idx, idx[i] = i+first_local_idx;
-//     std::vector<int> idx(local_size);
-//     Utility::iota (idx.begin(), idx.end(), first_local_idx);
-
-//     // Create the index set & scatter object
-//     ierr = ISCreateGeneral(libMesh::COMM_WORLD, local_size, &idx[0], &is);
-//            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//     ierr = VecScatterCreate(_vec,              is,
-// 			    parallel_vec._vec, is,
-// 			    &scatter);
-//            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//     // Perform the scatter
-// #if EPETRA_VERSION_LESS_THAN(2,3,3)
-
-//     ierr = VecScatterBegin(_vec, parallel_vec._vec, INSERT_VALUES,
-// 			   SCATTER_FORWARD, scatter);
-//            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//     ierr = VecScatterEnd  (_vec, parallel_vec._vec, INSERT_VALUES,
-// 			   SCATTER_FORWARD, scatter);
-//            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// #else
-
-//       // API argument order change in Epetra 2.3.3
-//     ierr = VecScatterBegin(scatter, _vec, parallel_vec._vec,
-// 			   INSERT_VALUES, SCATTER_FORWARD);
-//            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//     ierr = VecScatterEnd  (scatter, _vec, parallel_vec._vec,
-// 			   INSERT_VALUES, SCATTER_FORWARD);
-//            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-// #endif
-
-//     // Clean up
-//     ierr = LibMeshISDestroy (is);
-//            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//     ierr = LibMeshVecScatterDestroy(scatter);
-//            CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//   }
-
-//   // localize like normal
-//   parallel_vec.close();
-//   parallel_vec.localize (*this, send_list);
-//   this->close();
+  // localize like normal
+  parallel_vec.close();
+  parallel_vec.localize (*this, send_list);
+  this->close();
 }
 
 
@@ -844,6 +795,14 @@ int EpetraVector<T>::inputValues(int numIDs,
                                  const double* values,
                                  bool accumulate)
 {
+  if (accumulate) {
+    libmesh_assert(last_edit == 0 || last_edit == 2);
+    last_edit = 2;
+  } else {
+    libmesh_assert(last_edit == 0 || last_edit == 1);
+    last_edit = 1;
+  }
+
  //Important note!! This method assumes that there is only 1 point
  //associated with each element.
 
@@ -874,6 +833,14 @@ int EpetraVector<T>::inputValues(int numIDs,
                                  const double* values,
                                  bool accumulate)
 {
+  if (accumulate) {
+    libmesh_assert(last_edit == 0 || last_edit == 2);
+    last_edit = 2;
+  } else {
+    libmesh_assert(last_edit == 0 || last_edit == 1);
+    last_edit = 1;
+  }
+
   int offset=0;
   for(int i=0; i<numIDs; ++i) {
     int numValues = numValuesPerID[i];

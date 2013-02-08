@@ -26,6 +26,7 @@
 
 // Local includes
 #include "libmesh/numeric_vector.h"
+#include "libmesh/parallel.h"
 
 // Trilinos includes
 #include <Epetra_CombineMode.h>
@@ -602,6 +603,13 @@ private:
   int allocatedNonlocalLength_;
   double** nonlocalCoefs_;
 
+  /**
+   * Keep track of whether the last write operation on this vector was
+   * nothing (0) or a sum (1) or an add (2), so we can decide how to
+   * do the GlobalAssemble()
+   */
+  unsigned char last_edit;
+
   bool ignoreNonLocalEntries_;
 };
 
@@ -622,6 +630,7 @@ EpetraVector<T>::EpetraVector (const ParallelType type)
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
   nonlocalCoefs_(NULL),
+  last_edit(0),
   ignoreNonLocalEntries_(false)
 {
   this->_type = type;
@@ -642,6 +651,7 @@ EpetraVector<T>::EpetraVector (const numeric_index_type n,
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
   nonlocalCoefs_(NULL),
+  last_edit(0),
   ignoreNonLocalEntries_(false)
 
 {
@@ -664,6 +674,7 @@ EpetraVector<T>::EpetraVector (const numeric_index_type n,
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
   nonlocalCoefs_(NULL),
+  last_edit(0),
   ignoreNonLocalEntries_(false)
 {
   this->init(n, n_local, false, type);
@@ -684,6 +695,7 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v)
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
   nonlocalCoefs_(NULL),
+  last_edit(0),
   ignoreNonLocalEntries_(false)
 {
   _vec = &v;
@@ -719,6 +731,7 @@ EpetraVector<T>::EpetraVector (const numeric_index_type n,
   numNonlocalIDs_(0),
   allocatedNonlocalLength_(0),
   nonlocalCoefs_(NULL),
+  last_edit(0),
   ignoreNonLocalEntries_(false)
 {
   this->init(n, n_local, ghost, false, type);
@@ -794,6 +807,7 @@ void EpetraVector<T>::init (const numeric_index_type n,
 
   this->_is_initialized = true;
   this->_is_closed = true;
+  this->last_edit = 0;
 
   if (fast == false)
     this->zero ();
@@ -831,9 +845,20 @@ void EpetraVector<T>::close ()
 {
   libmesh_assert (this->initialized());
 
-  this->GlobalAssemble();
+  // Are we adding or inserting?
+  unsigned char global_last_edit = last_edit;
+  CommWorld.max(global_last_edit);
+  libmesh_assert(!last_edit || last_edit == global_last_edit);
+
+  if (global_last_edit == 1)
+    this->GlobalAssemble(Insert);
+  else if (global_last_edit == 2)
+    this->GlobalAssemble(Add);
+  else
+    libmesh_assert(!global_last_edit);
 
   this->_is_closed = true;
+  this->last_edit = 0;
 }
 
 
@@ -986,7 +1011,18 @@ void EpetraVector<T>::swap (NumericVector<T> &other)
   EpetraVector<T>& v = libmesh_cast_ref<EpetraVector<T>&>(other);
 
   std::swap(_vec, v._vec);
+  std::swap(_map, v._map);
   std::swap(_destroy_vec_on_exit, v._destroy_vec_on_exit);
+  std::swap(myFirstID_, v.myFirstID_);
+  std::swap(myNumIDs_, v.myNumIDs_);
+  std::swap(myCoefs_, v.myCoefs_);
+  std::swap(nonlocalIDs_, v.nonlocalIDs_);
+  std::swap(nonlocalElementSize_, v.nonlocalElementSize_);
+  std::swap(numNonlocalIDs_, v.numNonlocalIDs_);
+  std::swap(allocatedNonlocalLength_, v.allocatedNonlocalLength_);
+  std::swap(nonlocalCoefs_, v.nonlocalCoefs_);
+  std::swap(last_edit, v.last_edit);
+  std::swap(ignoreNonLocalEntries_, v.ignoreNonLocalEntries_);
 }
 
 } // namespace libMesh
