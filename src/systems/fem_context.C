@@ -1857,6 +1857,8 @@ template void FEMContext::point_hessian<Tensor>(unsigned int, const Point&, Tens
 //template void FEMContext::point_hessian<??>(unsigned int, const Point&, ??&) const;
 #endif
 
+template void FEMContext::point_curl<Gradient>(unsigned int, const Point&, Gradient&) const;
+
 template void FEMContext::fixed_interior_value<Number>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::fixed_interior_value<Gradient>(unsigned int, unsigned int, Gradient&) const;
 
