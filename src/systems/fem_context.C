@@ -936,6 +936,40 @@ void FEMContext::point_hessian(unsigned int var, const Point &p,
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
+template<typename OutputType>
+void FEMContext::point_curl(unsigned int var, const Point &p,
+			    OutputType& curl_u) const
+{
+  typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
+
+  // Get local-to-global dof index lookup
+  libmesh_assert_greater (dof_indices.size(), var);
+  const unsigned int n_dofs = libmesh_cast_int<unsigned int>
+    (dof_indices_var[var].size());
+
+  // Get current local coefficients
+  libmesh_assert_greater (elem_subsolutions.size(), var);
+  libmesh_assert(elem_subsolutions[var]);
+  DenseSubVector<Number> &coef = *elem_subsolutions[var];
+
+  // Get finite element object
+  FEGenericBase<OutputShape>* fe = NULL;
+  this->get_element_fe<OutputShape>( var, fe );
+
+  // Build a FE for calculating u(p)
+  AutoPtr<FEGenericBase<OutputShape> > fe_new = this->build_new_fe( fe, p );
+
+  // Get the values of the shape function derivatives
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape> >&  curl_phi = fe_new->get_curl_phi();
+
+  curl_u = 0.0;
+
+  for (unsigned int l=0; l != n_dofs; l++)
+    curl_u.add_scaled(curl_phi[l][0], coef(l));
+
+  return;
+}
+
 
 
 Number FEMContext::fixed_interior_value(unsigned int var, unsigned int qp) const
@@ -1822,6 +1856,8 @@ template void FEMContext::point_hessian<Tensor>(unsigned int, const Point&, Tens
 //FIXME: Not everything is implemented yet for second derivatives of RealGradients
 //template void FEMContext::point_hessian<??>(unsigned int, const Point&, ??&) const;
 #endif
+
+template void FEMContext::point_curl<Gradient>(unsigned int, const Point&, Gradient&) const;
 
 template void FEMContext::fixed_interior_value<Number>(unsigned int, unsigned int, Number&) const;
 template void FEMContext::fixed_interior_value<Gradient>(unsigned int, unsigned int, Gradient&) const;

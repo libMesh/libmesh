@@ -445,6 +445,14 @@ public:
 		     OutputType& curl_u) const;
 
   /**
+   * Returns the curl of the solution variable \p var at the physical
+   * point \p p on the current element.
+   */
+  template<typename OutputType>
+  void point_curl(unsigned int var, const Point &p, 
+		  OutputType& curl_u) const;
+
+  /**
    * Returns the divergence of the solution variable \p var at the physical
    * point \p p on the current element.
    */
