@@ -65,7 +65,7 @@ void NonlinearNeoHookeCurrentConfig::init_for_qp(VectorValue<Gradient> & grad_u,
 	  F.add(inv(invF));
 	}
 
-	libmesh_assert_less (F.det(), -TOLERANCE);
+	libmesh_assert_greater (F.det(), -TOLERANCE);
 
 	if (this->calculate_linearized_stiffness) {
 		this->calculate_tangent();
