@@ -56,16 +56,12 @@ void NonlinearNeoHookeCurrentConfig::init_for_qp(VectorValue<Gradient> & grad_u,
 	  invF.zero();
 	  for (unsigned int i = 0; i < 3; ++i)
 	    for (unsigned int j = 0; j < 3; ++j) {
-#if LIBMESH_USE_COMPLEX_NUMBERS
-	      invF(i, j) += grad_u(i)(j).real();
-#else
-	      invF(i, j) += grad_u(i)(j);
-#endif
+	      invF(i, j) += libmesh_real(grad_u(i)(j));
 	    }
 	  F.add(inv(invF));
-	}
 
-	libmesh_assert_greater (F.det(), -TOLERANCE);
+	  libmesh_assert_greater (F.det(), -TOLERANCE);
+	}
 
 	if (this->calculate_linearized_stiffness) {
 		this->calculate_tangent();
