@@ -1660,12 +1660,10 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
     (dof_indices.size());
   const std::size_t n_qoi = sys.qoi.size();
 
-  elem_solution.resize(n_dofs);
   if (sys.use_fixed_solution)
     elem_fixed_solution.resize(n_dofs);
 
-  for (unsigned int i=0; i != n_dofs; ++i)
-    elem_solution(i) = sys.current_solution(dof_indices[i]);
+  sys.current_local_solution->get(dof_indices, elem_solution.get_values());
 
   // These resize calls also zero out the residual and jacobian
   elem_residual.resize(n_dofs);
@@ -1728,15 +1726,11 @@ void FEMContext::pre_fe_reinit(const System &sys, const Elem *e)
   
   for(; localized_vec_it != localized_vec_end; ++localized_vec_it)
     {
-      const NumericVector<Number> * current_localized_vector = localized_vec_it->first;
-
+      const NumericVector<Number>& current_localized_vector = *localized_vec_it->first;
       DenseVector<Number>& target_vector = localized_vec_it->second.first;
       
-      target_vector.resize(n_dofs);
+      current_localized_vector.get(dof_indices, target_vector.get_values());
 	  
-      for (unsigned int i=0; i != n_dofs; ++i)
-        target_vector(i) = (*current_localized_vector)(dof_indices[i]);
-	  	  	  
       // Initialize the per-variable data for elem.
       unsigned int sub_dofs = 0;
       for (unsigned int i=0; i != sys.n_vars(); ++i)
