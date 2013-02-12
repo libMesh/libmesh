@@ -31749,7 +31749,7 @@ if test "${with_hdf5}" != no ; then
     fi
 
     if test -d "${HDF5_PREFIX}/include" ; then
-        HDF5_CFLAGS="-I${HDF5_PREFIX}/include"
+        HDF5_CPPFLAGS="-I${HDF5_PREFIX}/include"
     fi
 
     ac_HDF5_save_CFLAGS="$CFLAGS"
@@ -31757,8 +31757,8 @@ if test "${with_hdf5}" != no ; then
     ac_HDF5_save_LDFLAGS="$LDFLAGS"
     ac_HDF5_save_LIBS="$LIBS"
 
-    CFLAGS="${HDF5_CFLAGS} ${CFLAGS}"
-    CPPFLAGS="${HDF5_CFLAGS} ${CPPFLAGS}"
+    CFLAGS="${HDF5_CPPFLAGS} ${CFLAGS}"
+    CPPFLAGS="${HDF5_CPPFLAGS} ${CPPFLAGS}"
     LDFLAGS="${HDF5_LIBS} ${LDFLAGS}"
     ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -31990,13 +31990,13 @@ fi
   # Check whether --enable-netcdf was given.
 if test "${enable_netcdf+set}" = set; then :
   enableval=$enable_netcdf; case "${enableval}" in
-		  yes|v3) enablenetcdf=yes; netcdfversion=3  ;;
-                  new|v4) enablenetcdf=yes; netcdfversion=4  ;;
-		   no)    enablenetcdf=no;  netcdfversion=no ;;
- 		    *)    as_fn_error $? "bad value ${enableval} for --enable-netcdf" "$LINENO" 5 ;;
+                  yes|new|v4) enablenetcdf=yes; netcdfversion=4  ;;
+		      old|v3) enablenetcdf=yes; netcdfversion=3  ;;
+		          no) enablenetcdf=no;  netcdfversion=no ;;
+ 		           *) as_fn_error $? "bad value ${enableval} for --enable-netcdf" "$LINENO" 5 ;;
 		 esac
 else
-  enablenetcdf=$enableoptional; netcdfversion=3
+  enablenetcdf=$enableoptional; netcdfversion=4
 fi
 
 
@@ -32097,13 +32097,13 @@ fi
   # Check whether --enable-exodus was given.
 if test "${enable_exodus+set}" = set; then :
   enableval=$enable_exodus; case "${enableval}" in
-		  yes|v509)  enableexodus=yes; exodusversion="v5.09" ;;
-		  new|v522)  enableexodus=yes; exodusversion="v5.22" ;;
-		   no)       enableexodus=no;  exodusversion=no ;;
- 		    *)  as_fn_error $? "bad value ${enableval} for --enable-exodus" "$LINENO" 5 ;;
+		  yes|new|v522)  enableexodus=yes; exodusversion="v5.22" ;;
+		      old|v509)  enableexodus=yes; exodusversion="v5.09" ;;
+		            no)  enableexodus=no;  exodusversion=no ;;
+ 		             *)  as_fn_error $? "bad value ${enableval} for --enable-exodus" "$LINENO" 5 ;;
 		 esac
 else
-  enableexodus=$enablenetcdf ; exodusversion="v5.09"
+  enableexodus=$enablenetcdf ; exodusversion="v5.22"
 fi
  # if unspecified, depend on netcdf
 
@@ -32183,13 +32183,13 @@ fi
   # Check whether --enable-nemesis was given.
 if test "${enable_nemesis+set}" = set; then :
   enableval=$enable_nemesis; case "${enableval}" in
-		  yes|v309) enablenemesis=yes ; nemesisversion="v3.09" ;;
-		  new|v522) enablenemesis=yes ; nemesisversion="v5.22" ;;
-		        no) enablenemesis=no  ; nemesisversion=no ;;
- 		         *) as_fn_error $? "bad value ${enableval} for --enable-nemesis" "$LINENO" 5 ;;
+		  yes|new|v522) enablenemesis=yes ; nemesisversion="v5.22" ;;
+		      old|v309) enablenemesis=yes ; nemesisversion="v3.09" ;;
+		            no) enablenemesis=no  ; nemesisversion=no ;;
+ 		             *) as_fn_error $? "bad value ${enableval} for --enable-nemesis" "$LINENO" 5 ;;
 		 esac
 else
-  enablenemesis=$enableexodus ; nemesisversion="v3.09"
+  enablenemesis=$enableexodus ; nemesisversion="v5.22"
 fi
  # if unspecified, depend on exodus
 
@@ -32962,7 +32962,7 @@ fi
 # before AC_OUTPUT recurses into our subpackages
 if (test "x$enablenested" = "xyes"); then
   ac_configure_args_SAVE="$ac_configure_args"
-  ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC'"
+  ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$libmesh_optional_INCLUDES $CPPFLAGS' LIBS='$libmesh_optional_LIBS $LIBS'"
 fi
 
 # Create output files. Also configures any subpackages
