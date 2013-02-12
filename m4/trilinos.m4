@@ -92,9 +92,9 @@ AC_DEFUN([CONFIGURE_TRILINOS_10],
        dnl ------------------------------------------------------
        dnl TPetra
        dnl ------------------------------------------------------
-       AC_CHECK_HEADER([$withtrilinosdir/include/Tpetra_include.h],
+       AC_CHECK_HEADER([$withtrilinosdir/include/Tpetra_config.h],
                        [enabletpetra=yes],
-                       [AC_CHECK_HEADER([$withtrilinosdir/Tpetra_include.h],
+                       [AC_CHECK_HEADER([$withtrilinosdir/Tpetra_config.h],
                                         [enabletpetra=yes],
                                         [AC_CHECK_HEADER([$withtrilinosdir/packages/tpetra/src/Tpetra_config.h],
                                                          [enabletpetra=yes],
