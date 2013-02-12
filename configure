@@ -688,6 +688,7 @@ LIBMESH_ENABLE_EXODUS_V509_FALSE
 LIBMESH_ENABLE_EXODUS_V509_TRUE
 LIBMESH_ENABLE_EXODUS_FALSE
 LIBMESH_ENABLE_EXODUS_TRUE
+EXODUS_NOT_NETCDF4_FLAG
 EXODUS_INCLUDE
 LIBMESH_ENABLE_NETCDF_V4_FALSE
 LIBMESH_ENABLE_NETCDF_V4_TRUE
@@ -29343,13 +29344,13 @@ $as_echo "#define HAVE_ML 1" >>confdefs.h
 $as_echo "<<< Configuring library with ML support >>>" >&6; }
        fi
 
-                            as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/Tpetra_include.h" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/Tpetra_include.h" "$as_ac_Header" "$ac_includes_default"
+                            as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/include/Tpetra_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/include/Tpetra_config.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enabletpetra=yes
 else
-  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/Tpetra_include.h" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/Tpetra_include.h" "$as_ac_Header" "$ac_includes_default"
+  as_ac_Header=`$as_echo "ac_cv_header_$withtrilinosdir/Tpetra_config.h" | $as_tr_sh`
+ac_fn_cxx_check_header_mongrel "$LINENO" "$withtrilinosdir/Tpetra_config.h" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   enabletpetra=yes
 else
@@ -32113,6 +32114,12 @@ fi
     exodusversion=no
   fi
 
+  # no HDF5 &/or no NETCDF4
+  EXODUS_NOT_NETCDF4_FLAG=""
+  if (test "x$enablehdf5" = "xno" -o "x$netcdfversion" = "x3"); then
+    EXODUS_NOT_NETCDF4_FLAG="-DNOT_NETCDF4"
+  fi
+
   case "${exodusversion}" in
 
       "v5.09")
@@ -32144,6 +32151,7 @@ $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>
   ac_config_files="$ac_config_files contrib/exodusii/v5.09/Makefile"
 
   ac_config_files="$ac_config_files contrib/exodusii/v5.22/exodus/cbind/Makefile"
+
 
 
 

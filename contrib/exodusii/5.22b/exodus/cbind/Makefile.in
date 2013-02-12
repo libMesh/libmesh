@@ -1834,6 +1834,7 @@ EGREP = @EGREP@
 EIGEN_INCLUDE = @EIGEN_INCLUDE@
 EXEEXT = @EXEEXT@
 EXODUS_INCLUDE = @EXODUS_INCLUDE@
+EXODUS_NOT_NETCDF4_FLAG = @EXODUS_NOT_NETCDF4_FLAG@
 F77 = @F77@
 FC = @FC@
 FCFLAGS = @FCFLAGS@
@@ -2051,7 +2052,7 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 include_HEADERS = include/exodusII.h
-pkg_cppflags = -I$(srcdir)/include $(NETCDF_INCLUDE)
+pkg_cppflags = -I$(srcdir)/include $(NETCDF_INCLUDE) $(EXODUS_NOT_NETCDF4_FLAG)
 pkg_sources = \
 	include/doxygen.h \
 	include/exodusII.h \
