@@ -20,8 +20,8 @@ AC_DEFUN([CONFIGURE_EXODUS],
     exodusversion=no
   fi   
 
+  # no HDF5 &/or no NETCDF4
   EXODUS_NOT_NETCDF4_FLAG=""
-  # no HDF5, no NETCDF4
   if (test "x$enablehdf5" = "xno" -o "x$netcdfversion" = "x3"); then
     EXODUS_NOT_NETCDF4_FLAG="-DNOT_NETCDF4"
   fi
@@ -51,5 +51,4 @@ AC_DEFUN([CONFIGURE_EXODUS],
   AC_CONFIG_FILES([contrib/exodusii/v5.09/Makefile])
   AC_CONFIG_FILES([contrib/exodusii/v5.22/exodus/cbind/Makefile])
   AC_SUBST(EXODUS_INCLUDE)
-  AC_SUBST(EXODUS_NOT_NETCDF4_FLAG)
 ])
