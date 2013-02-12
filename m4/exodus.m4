@@ -24,6 +24,7 @@ AC_DEFUN([CONFIGURE_EXODUS],
   EXODUS_NOT_NETCDF4_FLAG=""
   if (test "x$enablehdf5" = "xno" -o "x$netcdfversion" = "x3"); then
     EXODUS_NOT_NETCDF4_FLAG="-DNOT_NETCDF4"
+    AC_MSG_RESULT([defining -DNOT_NETCDF4 for our Exodus build])
   fi
   
   case "${exodusversion}" in

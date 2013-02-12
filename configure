@@ -32118,6 +32118,8 @@ fi
   EXODUS_NOT_NETCDF4_FLAG=""
   if (test "x$enablehdf5" = "xno" -o "x$netcdfversion" = "x3"); then
     EXODUS_NOT_NETCDF4_FLAG="-DNOT_NETCDF4"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: defining -DNOT_NETCDF4 for our Exodus build" >&5
+$as_echo "defining -DNOT_NETCDF4 for our Exodus build" >&6; }
   fi
 
   case "${exodusversion}" in
