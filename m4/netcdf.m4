@@ -7,12 +7,12 @@ AC_DEFUN([CONFIGURE_NETCDF],
                 AC_HELP_STRING([--enable-netcdf],
                                [build with netCDF binary I/O]),
 		[case "${enableval}" in
-		  yes|v3) enablenetcdf=yes; netcdfversion=3  ;;
-                  new|v4) enablenetcdf=yes; netcdfversion=4  ;;
-		   no)    enablenetcdf=no;  netcdfversion=no ;;
- 		    *)    AC_MSG_ERROR(bad value ${enableval} for --enable-netcdf) ;;
+                  yes|new|v4) enablenetcdf=yes; netcdfversion=4  ;;
+		      old|v3) enablenetcdf=yes; netcdfversion=3  ;;
+		          no) enablenetcdf=no;  netcdfversion=no ;;
+ 		           *) AC_MSG_ERROR(bad value ${enableval} for --enable-netcdf) ;;
 		 esac],
-		 [enablenetcdf=$enableoptional; netcdfversion=3])				
+		 [enablenetcdf=$enableoptional; netcdfversion=4])				
 		 		
   # fix for --disable-optional
   if (test "x$enablenetcdf" = "xno"); then

@@ -7,12 +7,12 @@ AC_DEFUN([CONFIGURE_EXODUS],
                 AC_HELP_STRING([--enable-exodus],
                                [build with ExodusII API support]),
 		[case "${enableval}" in
-		  yes|v509)  enableexodus=yes; exodusversion="v5.09" ;;
-		  new|v522)  enableexodus=yes; exodusversion="v5.22" ;;
-		   no)       enableexodus=no;  exodusversion=no ;;
- 		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-exodus) ;;
+		  yes|new|v522)  enableexodus=yes; exodusversion="v5.22" ;;
+		      old|v509)  enableexodus=yes; exodusversion="v5.09" ;;
+		            no)  enableexodus=no;  exodusversion=no ;;
+ 		             *)  AC_MSG_ERROR(bad value ${enableval} for --enable-exodus) ;;
 		 esac],
-		 [enableexodus=$enablenetcdf ; exodusversion="v5.09"]) # if unspecified, depend on netcdf
+		 [enableexodus=$enablenetcdf ; exodusversion="v5.22"]) # if unspecified, depend on netcdf
 
 
   # fix for --disable-optional

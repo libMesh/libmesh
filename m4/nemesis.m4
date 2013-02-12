@@ -7,12 +7,12 @@ AC_DEFUN([CONFIGURE_NEMESIS],
                 AC_HELP_STRING([--enable-nemesis],
                                [build with NemesisII API support]),
 		[case "${enableval}" in
-		  yes|v309) enablenemesis=yes ; nemesisversion="v3.09" ;;
-		  new|v522) enablenemesis=yes ; nemesisversion="v5.22" ;;
-		        no) enablenemesis=no  ; nemesisversion=no ;;
- 		         *) AC_MSG_ERROR(bad value ${enableval} for --enable-nemesis) ;;
+		  yes|new|v522) enablenemesis=yes ; nemesisversion="v5.22" ;;
+		      old|v309) enablenemesis=yes ; nemesisversion="v3.09" ;;
+		            no) enablenemesis=no  ; nemesisversion=no ;;
+ 		             *) AC_MSG_ERROR(bad value ${enableval} for --enable-nemesis) ;;
 		 esac],
-		 [enablenemesis=$enableexodus ; nemesisversion="v3.09"]) # if unspecified, depend on exodus
+		 [enablenemesis=$enableexodus ; nemesisversion="v5.22"]) # if unspecified, depend on exodus
 
 
   # Trump --enable-nemesis with --disable-mpi
