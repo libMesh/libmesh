@@ -96,7 +96,7 @@ if test "${with_hdf5}" != no ; then
     fi
 
     if test -d "${HDF5_PREFIX}/include" ; then
-        HDF5_CFLAGS="-I${HDF5_PREFIX}/include"
+        HDF5_CPPFLAGS="-I${HDF5_PREFIX}/include"
     fi
 
     ac_HDF5_save_CFLAGS="$CFLAGS"
@@ -104,8 +104,8 @@ if test "${with_hdf5}" != no ; then
     ac_HDF5_save_LDFLAGS="$LDFLAGS"
     ac_HDF5_save_LIBS="$LIBS"
 
-    CFLAGS="${HDF5_CFLAGS} ${CFLAGS}"
-    CPPFLAGS="${HDF5_CFLAGS} ${CPPFLAGS}"
+    CFLAGS="${HDF5_CPPFLAGS} ${CFLAGS}"
+    CPPFLAGS="${HDF5_CPPFLAGS} ${CPPFLAGS}"
     LDFLAGS="${HDF5_LIBS} ${LDFLAGS}"
     AC_LANG_PUSH([C])
     AC_CHECK_HEADER([hdf5.h],[found_header=yes],[found_header=no])
