@@ -189,9 +189,9 @@ created with the ::NC_CLASSIC_MODEL flag.
 As a rule, NC_MAX_VAR_DIMS <= NC_MAX_DIMS.
 */
 /**@{*/
-#define NC_MAX_DIMS	1024	
+#define NC_MAX_DIMS	65536  /* BSK changed from 1024 */
 #define NC_MAX_ATTRS	8192	
-#define NC_MAX_VARS	8192	
+#define NC_MAX_VARS	524288 /* BSK changed from 8192	*/
 #define NC_MAX_NAME	256	
 #define NC_MAX_VAR_DIMS	1024 /**< max per variable dimensions */
 /**@}*/
