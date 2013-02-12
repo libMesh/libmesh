@@ -329,7 +329,7 @@ fi
 # before AC_OUTPUT recurses into our subpackages
 if (test "x$enablenested" = "xyes"); then
   ac_configure_args_SAVE="$ac_configure_args"
-  ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC'"
+  ac_configure_args="$ac_configure_args $libmesh_subpackage_arguments CXX='$CXX' CC='$CC' F77='$F77' FC='$FC' CPPFLAGS='$libmesh_optional_INCLUDES $CPPFLAGS' LIBS='$libmesh_optional_LIBS $LIBS'"
 fi
 
 # Create output files. Also configures any subpackages
