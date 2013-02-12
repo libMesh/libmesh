@@ -286,7 +286,11 @@ nc4_create_file(const char *path, int cmode, MPI_Comm comm, MPI_Info info,
    LOG((4, "nc4_create_file: set HDF raw chunk cache to size %d nelems %d preemption %f", 
 	nc4_chunk_cache_size, nc4_chunk_cache_nelems, nc4_chunk_cache_preemption));
 #endif /* USE_PARALLEL */
-   
+
+   /* BSK - compatibility fix for at least hdf5-1.8.5.patch1-5.el6.x86_64 */
+   #ifndef H5F_LIBVER_18
+   #  define H5F_LIBVER_18 H5F_LIBVER_LATEST
+   #endif
    if (H5Pset_libver_bounds(fapl_id, H5F_LIBVER_18, H5F_LIBVER_18) < 0)
       BAIL(NC_EHDFERR);
 
