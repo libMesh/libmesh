@@ -536,7 +536,6 @@ man_MANS = ncdump.1 nccopy.1
 
 # Can't run ncgen to generate ctest.c and ctest64.c on cross-compiles.
 @BUILD_TESTSETS_TRUE@BUILT_SOURCES = ctest.c ctest64.c
-#endif
 CLEANFILES = test0.nc test1.cdl test1.nc test2.cdl ctest1.cdl ctest.c \
 	ctest64.c ctest0.nc ctest0_64.nc c1.cdl ctest1_64.cdl c0.nc \
 	small.nc small2.nc c0tmp.nc c1.ncml utf8.cdl utf8_64.cdl \
@@ -1300,6 +1299,13 @@ uninstall-man: uninstall-man1
 
 @BUILD_TESTSETS_TRUE@@EXTRA_TESTS_FALSE@ctest64.c:
 @BUILD_TESTSETS_TRUE@@EXTRA_TESTS_FALSE@	cp $(top_srcdir)/ncdump/ref_ctest64.c $(top_srcdir)/ncdump/ctest64.c
+#endif
+
+@BUILD_TESTSETS_FALSE@ctest.c:
+@BUILD_TESTSETS_FALSE@	cp $(top_srcdir)/ncdump/ref_ctest.c $(top_srcdir)/ncdump/ctest.c
+
+@BUILD_TESTSETS_FALSE@ctest64.c:
+@BUILD_TESTSETS_FALSE@	cp $(top_srcdir)/ncdump/ref_ctest64.c $(top_srcdir)/ncdump/ctest64.c
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -82,7 +82,14 @@ TESTS += tst_ncgen4.sh
 endif
 #endif
 
-endif BUILD_TESTSETS
+else # when BUILD_TESTSETS is false, we still need this rule
+ctest.c:
+	cp $(top_srcdir)/ncdump/ref_ctest.c $(top_srcdir)/ncdump/ctest.c
+
+ctest64.c:
+	cp $(top_srcdir)/ncdump/ref_ctest64.c $(top_srcdir)/ncdump/ctest64.c
+
+endif BUILD_TESTSETS_FALSE
 
 CLEANFILES = test0.nc test1.cdl test1.nc test2.cdl ctest1.cdl ctest.c	\
 ctest64.c ctest0.nc ctest0_64.nc c1.cdl ctest1_64.cdl c0.nc small.nc	\
