@@ -469,16 +469,20 @@ namespace {
           // to do this more efficiently
           std::vector<dof_id_type> original_dofs = _femcontext.dof_indices;
 
-          for (unsigned int i=0; i != _sys.qoi.size(); ++i)
-            if (_qoi_indices.has_index(i))
-              {
-                _femcontext.dof_indices = original_dofs;
-                _sys.get_dof_map().constrain_element_vector
-                  (_femcontext.elem_qoi_derivative[i], _femcontext.dof_indices, false);
+          { // A lock is necessary around access to the global system
+            femsystem_mutex::scoped_lock lock(assembly_mutex);
 
-                _sys.get_adjoint_rhs(i).add_vector
-                  (_femcontext.elem_qoi_derivative[i], _femcontext.dof_indices);
-              }
+            for (unsigned int i=0; i != _sys.qoi.size(); ++i)
+              if (_qoi_indices.has_index(i))
+                {
+                  _femcontext.dof_indices = original_dofs;
+                  _sys.get_dof_map().constrain_element_vector
+                    (_femcontext.elem_qoi_derivative[i], _femcontext.dof_indices, false);
+
+                  _sys.get_adjoint_rhs(i).add_vector
+                    (_femcontext.elem_qoi_derivative[i], _femcontext.dof_indices);
+                }
+          }
         }
     }
 
