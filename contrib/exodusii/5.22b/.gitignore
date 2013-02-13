@@ -4,6 +4,10 @@
 *.dylib
 *.o
 *.exo
+exodus/cbind/src/.deps
+exodus/cbind/src/.dirstamp
+exodus/cbind/src/lib*.lo
+
 testcp
 testcp_ln
 testcp_nl
