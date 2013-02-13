@@ -35,7 +35,7 @@ function check_autotool_prerequisites ()
 {
     # prerequisite versions
     automake_major=1
-    automake_minor=11
+    automake_minor=12
     
     autoconf_major=2
     autoconf_minor=61
