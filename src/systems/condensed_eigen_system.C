@@ -199,10 +199,10 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
 
   // Now map temp to solution. Loop over local entries of local_non_condensed_dofs_vector
   this->solution->zero();
-  for(unsigned int i=0; i<local_non_condensed_dofs_vector.size(); i++)
+  for (unsigned int j=0; j<local_non_condensed_dofs_vector.size(); j++)
   {
-    unsigned int index = local_non_condensed_dofs_vector[i];
-    solution->set(index,(*temp)(temp->first_local_index()+i));
+    unsigned int index = local_non_condensed_dofs_vector[j];
+    solution->set(index,(*temp)(temp->first_local_index()+j));
   }
 
   solution->close();
