@@ -109,11 +109,12 @@ endif
 # I don't think this actually copies any symbols into
 # libcontrib.la because we aren't using them here...
 if LIBMESH_ENABLE_TECPLOT
-  opt_libs   += @TECPLOT_LIBRARY@
-  dbg_libs   += @TECPLOT_LIBRARY@
-  devel_libs += @TECPLOT_LIBRARY@
-  prof_libs  += @TECPLOT_LIBRARY@
-  oprof_libs += @TECPLOT_LIBRARY@
+  SUBDIRS    += tecplot/binary
+  opt_libs   += tecplot/binary/libtecio.la
+  dbg_libs   += tecplot/binary/libtecio.la
+  devel_libs += tecplot/binary/libtecio.la
+  prof_libs  += tecplot/binary/libtecio.la
+  oprof_libs += tecplot/binary/libtecio.la
 endif
 
 if LIBMESH_ENABLE_TRIANGLE

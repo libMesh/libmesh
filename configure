@@ -646,6 +646,7 @@ GIT_CHECKOUT_TRUE
 BUILD_DEVSTATUS
 GIT_REVISION
 gitquery
+libmesh_installed_LIBS
 libmesh_pkgconfig_requires
 libmesh_contrib_INCLUDES
 libmesh_optional_LIBS
@@ -751,8 +752,6 @@ BUILD_METIS_FALSE
 BUILD_METIS_TRUE
 LIBMESH_ENABLE_TECPLOT_FALSE
 LIBMESH_ENABLE_TECPLOT_TRUE
-TECPLOT_INCLUDE
-TECPLOT_LIBRARY
 LIBMESH_ENABLE_TECIO_FALSE
 LIBMESH_ENABLE_TECIO_TRUE
 TECIO_CPPFLAGS
@@ -1093,7 +1092,6 @@ enable_bzip2
 enable_xz
 enable_tecio
 enable_tecplot
-with_tecplot
 enable_metis
 with_metis
 enable_parmetis
@@ -1909,7 +1907,6 @@ Optional Packages:
                           installed
   --with-tbb-lib=PATH     Specify the path to Threading Building Blocks
                           libraries
-  --with-tecplot=PATH     Specify the path where Tecplot is installed
   --with-metis=<internal,PETSc>
                           metis to use. interal: build from contrib. PETSc:
                           rely on PETSc
@@ -27043,11 +27040,16 @@ $as_echo "---------------------------------------------" >&6; }
 #
 # libmesh_pkgconfig_requires is a list of pkgconfig requirements
 # we will add
+#
+# libmesh_installed_LIBS are libraries that we install and need to
+# link with, usually not needed.  presently only for Tecplot's binary
+# library blob
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
 libmesh_contrib_INCLUDES=""
 libmesh_subpackage_arguments=""
 libmesh_pkgconfig_requires=""
+libmesh_installed_LIBS=""
 
 # --------------------------------------------------------------
 # Allow for disable-optional
@@ -30528,38 +30530,27 @@ $as_echo ">>> Not using vendor provided tecio libraries, deferring to source bui
   fi
 
 
-  # The Tecplot API is distributed with libmesh, but we want to support external installations
-  # on platforms we may not have the binaries for...
+  # The Tecplot API is distributed with libmesh.
   if (test $enabletecplot = yes); then
 
-# Check whether --with-tecplot was given.
-if test "${with_tecplot+set}" = set; then :
-  withval=$with_tecplot; withtecplot=$withval
-else
-  withtecplot=no
-fi
-
-
-    # unspecified - look in contrib
-    if test "$withtecplot" = no ; then
       # We will check to see if we can actually link against the Tecplot library momentarily,
       # now we just see if the file exists, without using AC_CHECK_FILE!
       TECPLOT_LIBRARY_PATH=""
-      if (test -r $top_srcdir/contrib/tecplot/lib/$host/tecio.a) ; then
-        TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/lib/$host
+      if (test -r $top_srcdir/contrib/tecplot/binary/lib/$host/tecio.a) ; then
+	  TECPLOT_LIBRARY_PATH=$top_srcdir/contrib/tecplot/binary/lib/$host
       fi
 
       # Note: AC_CHECK_HEADER seems to fail if the path to the header
       # is a relative one, i.e containing ".."  in it.  We'll work around this
       # by setting the relevant path in $CPPFLAGS.
       old_CPPFLAGS="$CPPFLAGS"
-      CPPFLAGS="$CPPFLAGS -I$top_srcdir/contrib/tecplot/include"
+      CPPFLAGS="$CPPFLAGS -I$top_srcdir/contrib/tecplot/binary/include"
 
       ac_fn_cxx_check_header_mongrel "$LINENO" "TECIO.h" "ac_cv_header_TECIO_h" "$ac_includes_default"
 if test "x$ac_cv_header_TECIO_h" = xyes; then :
 
-      TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/include
-      TECPLOT_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/include"
+	      TECPLOT_INCLUDE_PATH=$top_srcdir/contrib/tecplot/binary/include
+	      TECPLOT_INCLUDE="-I\$(top_srcdir)/contrib/tecplot/binary/include"
 
 fi
 
@@ -30570,37 +30561,9 @@ fi
 
       # And don't step on anybody's toes
       unset old_CPPFLAGS
+  fi
 
-    # specified - look there
-    else
-      TECPLOT_LIBRARY_PATH=""
-      if (test -r $withtecplot/lib/tecio.a) ; then
-        TECPLOT_LIBRARY_PATH=$withtecplot/lib
-      fi
-
-      # To check for TECIO.h, use the CPPFLAGS trick, just in case the
-      # user specified a relative path for $withtecplot.
-      old_CPPFLAGS="$CPPFLAGS"
-      CPPFLAGS="$CPPFLAGS -I$withtecplot/include"
-
-      ac_fn_cxx_check_header_mongrel "$LINENO" "TECIO.h" "ac_cv_header_TECIO_h" "$ac_includes_default"
-if test "x$ac_cv_header_TECIO_h" = xyes; then :
-
-                      TECPLOT_INCLUDE_PATH=$withtecplot/include
-                      TECPLOT_INCLUDE="-I$withtecplot/include"
-
-fi
-
-
-
-      # Reset CPPFLAGS
-      CPPFLAGS="$old_CPPFLAGS"
-
-      # And don't step on anybody's toes
-      unset old_CPPFLAGS
-    fi
-
-    if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
+  if (test -r $TECPLOT_LIBRARY_PATH/tecio.a -a -r $TECPLOT_INCLUDE_PATH/TECIO.h) ; then
 
       #--------------------------------------------------------------------------
       # OK, the library and header are there, how about linking with the library?
@@ -30625,9 +30588,6 @@ int ierr = TECEND112 ();
 
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
-
-                     TECPLOT_LIBRARY="\$(top_srcdir)/contrib/tecplot/lib/$host/tecio.a"
-
 
 
 $as_echo "#define HAVE_TECPLOT_API 1" >>confdefs.h
@@ -30655,10 +30615,6 @@ int ierr = TECEND ();
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"; then :
 
-                                    TECPLOT_LIBRARY="\$(top_srcdir)/contrib/tecplot/lib/$host/tecio.a"
-                                    TECPLOT_INCLUDE=-I$TECPLOT_INCLUDE_PATH
-
-
 
 $as_echo "#define HAVE_TECPLOT_API 1" >>confdefs.h
 
@@ -30683,11 +30639,11 @@ rm -f core conftest.err conftest.$ac_objext \
       CPPFLAGS=$save_CPPFLAGS
     else
       enabletecplot=no
-    fi
   fi
 
 if (test $enabletecplot = yes); then
   libmesh_contrib_INCLUDES="$TECPLOT_INCLUDE $libmesh_contrib_INCLUDES"
+  libmesh_installed_LIBS="$libmesh_installed_LIBS -ltecio_vendor"
 fi
  if test x$enabletecplot = xyes; then
   LIBMESH_ENABLE_TECPLOT_TRUE=
@@ -30696,6 +30652,8 @@ else
   LIBMESH_ENABLE_TECPLOT_TRUE='#'
   LIBMESH_ENABLE_TECPLOT_FALSE=
 fi
+
+ac_config_files="$ac_config_files contrib/tecplot/binary/Makefile"
 
 # -------------------------------------------------------------
 
@@ -32845,6 +32803,7 @@ fi
 
 
 
+
 # Query configuration environment
 
 
@@ -34481,6 +34440,7 @@ do
     "contrib/sfcurves/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/sfcurves/Makefile" ;;
     "contrib/gzstream/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gzstream/Makefile" ;;
     "contrib/tecplot/tecio/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tecplot/tecio/Makefile" ;;
+    "contrib/tecplot/binary/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tecplot/binary/Makefile" ;;
     "contrib/metis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/metis/Makefile" ;;
     "contrib/parmetis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/parmetis/Makefile" ;;
     "contrib/tetgen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tetgen/Makefile" ;;

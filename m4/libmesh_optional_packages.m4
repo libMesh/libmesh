@@ -20,11 +20,16 @@ AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 #
 # libmesh_pkgconfig_requires is a list of pkgconfig requirements
 # we will add
+#
+# libmesh_installed_LIBS are libraries that we install and need to
+# link with, usually not needed.  presently only for Tecplot's binary
+# library blob
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
 libmesh_contrib_INCLUDES=""
 libmesh_subpackage_arguments=""
 libmesh_pkgconfig_requires=""
+libmesh_installed_LIBS=""
 
 # --------------------------------------------------------------
 # Allow for disable-optional
@@ -246,8 +251,10 @@ AC_CONFIG_FILES([contrib/tecplot/tecio/Makefile])
 CONFIGURE_TECPLOT
 if (test $enabletecplot = yes); then
   libmesh_contrib_INCLUDES="$TECPLOT_INCLUDE $libmesh_contrib_INCLUDES"
+  libmesh_installed_LIBS="$libmesh_installed_LIBS -ltecio_vendor"
 fi
 AM_CONDITIONAL(LIBMESH_ENABLE_TECPLOT, test x$enabletecplot = xyes)		 
+AC_CONFIG_FILES([contrib/tecplot/binary/Makefile])
 # -------------------------------------------------------------
 
 
@@ -518,4 +525,5 @@ AC_SUBST(libmesh_optional_INCLUDES)
 AC_SUBST(libmesh_optional_LIBS)
 AC_SUBST(libmesh_contrib_INCLUDES)
 AC_SUBST(libmesh_pkgconfig_requires)
+AC_SUBST(libmesh_installed_LIBS)
 ])

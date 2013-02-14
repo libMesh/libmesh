@@ -52,15 +52,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-DIST_COMMON = README $(include_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/build-aux/depcomp \
-	$(top_srcdir)/contrib/Make.common
-@LIBMESH_DBG_MODE_TRUE@am__append_1 = libdbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_2 = libdevel.la
-@LIBMESH_OPT_MODE_TRUE@am__append_3 = libopt.la
-@LIBMESH_PROF_MODE_TRUE@am__append_4 = libprof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_5 = liboprof.la
-subdir = contrib/tetgen
+subdir = contrib/tecplot/binary
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/build-aux/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
 	$(top_srcdir)/m4/ax_boost_base.m4 \
@@ -104,55 +98,13 @@ CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libdbg_la_DEPENDENCIES =
-am__libdbg_la_SOURCES_DIST = tetgen.C predicates.C
-am__objects_1 = libdbg_la-tetgen.lo libdbg_la-predicates.lo
-@LIBMESH_DBG_MODE_TRUE@am_libdbg_la_OBJECTS = $(am__objects_1)
-libdbg_la_OBJECTS = $(am_libdbg_la_OBJECTS)
+libtecio_la_DEPENDENCIES =
+am_libtecio_la_OBJECTS = stub.lo
+libtecio_la_OBJECTS = $(am_libtecio_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libdbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdbg_la_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_DBG_MODE_TRUE@am_libdbg_la_rpath =
-libdevel_la_DEPENDENCIES =
-am__libdevel_la_SOURCES_DIST = tetgen.C predicates.C
-am__objects_2 = libdevel_la-tetgen.lo libdevel_la-predicates.lo
-@LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_OBJECTS = $(am__objects_2)
-libdevel_la_OBJECTS = $(am_libdevel_la_OBJECTS)
-libdevel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libdevel_la_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_DEVEL_MODE_TRUE@am_libdevel_la_rpath =
-liboprof_la_DEPENDENCIES =
-am__liboprof_la_SOURCES_DIST = tetgen.C predicates.C
-am__objects_3 = liboprof_la-tetgen.lo liboprof_la-predicates.lo
-@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_OBJECTS = $(am__objects_3)
-liboprof_la_OBJECTS = $(am_liboprof_la_OBJECTS)
-liboprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(liboprof_la_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_OPROF_MODE_TRUE@am_liboprof_la_rpath =
-libopt_la_DEPENDENCIES =
-am__libopt_la_SOURCES_DIST = tetgen.C predicates.C
-am__objects_4 = libopt_la-tetgen.lo libopt_la-predicates.lo
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_OBJECTS = $(am__objects_4)
-libopt_la_OBJECTS = $(am_libopt_la_OBJECTS)
-libopt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libopt_la_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_OPT_MODE_TRUE@am_libopt_la_rpath =
-libprof_la_DEPENDENCIES =
-am__libprof_la_SOURCES_DIST = tetgen.C predicates.C
-am__objects_5 = libprof_la-tetgen.lo libprof_la-predicates.lo
-@LIBMESH_PROF_MODE_TRUE@am_libprof_la_OBJECTS = $(am__objects_5)
-libprof_la_OBJECTS = $(am_libprof_la_OBJECTS)
-libprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libprof_la_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-@LIBMESH_PROF_MODE_TRUE@am_libprof_la_rpath =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -187,13 +139,26 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(libdbg_la_SOURCES) $(libdevel_la_SOURCES) \
-	$(liboprof_la_SOURCES) $(libopt_la_SOURCES) \
-	$(libprof_la_SOURCES)
-DIST_SOURCES = $(am__libdbg_la_SOURCES_DIST) \
-	$(am__libdevel_la_SOURCES_DIST) \
-	$(am__liboprof_la_SOURCES_DIST) $(am__libopt_la_SOURCES_DIST) \
-	$(am__libprof_la_SOURCES_DIST)
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+CCLD = $(CC)
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
+SOURCES = $(libtecio_la_SOURCES)
+DIST_SOURCES = $(libtecio_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -226,8 +191,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(includedir)"
-HEADERS = $(include_HEADERS)
+am__installdirs = "$(DESTDIR)$(libtecio_vendordir)"
+DATA = $(libtecio_vendor_DATA)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -469,11 +434,7 @@ host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
 htmldir = @htmldir@
-
-# generally we do not install contributed headers, but for tetgen we
-# must because it can optionally be included directly by our
-# mesh_tetgen_wrapper.h
-includedir = $(prefix)/include/libmesh
+includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
@@ -514,58 +475,23 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-include_HEADERS = tetgen.h
-pkg_sources = tetgen.C predicates.C
-pkg_cppflags = -DTETLIBRARY -DLIBMESH_IS_COMPILING_TETGEN
-
-######################################################################
-#
-# Common environment for all contribued packages
-# 
-# If we are careful, common rules can be defined here, 
-# once and for all.
-# 
-AUTOMAKE_OPTIONS = subdir-objects 
-AM_CPPFLAGS = $(pkg_cppflags) # any defined package-specific include paths
+AM_CPPFLAGS = -I$(srcdir)/include
 AM_CFLAGS = 
 AM_CXXFLAGS = 
-
-######################################################################
-#
-# Building the flavors
-#
-noinst_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4) $(am__append_5)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_SOURCES = $(pkg_sources)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_CFLAGS = $(CFLAGS_DBG)
-@LIBMESH_DBG_MODE_TRUE@libdbg_la_LIBADD = $(pkg_libs) # any defined package-specific libs
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_SOURCES = $(pkg_sources)
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_CFLAGS = $(CFLAGS_DEVEL)
-@LIBMESH_DEVEL_MODE_TRUE@libdevel_la_LIBADD = $(pkg_libs) # any defined package-specific libs
-@LIBMESH_OPT_MODE_TRUE@libopt_la_SOURCES = $(pkg_sources)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_CXXFLAGS = $(CXXFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_CFLAGS = $(CFLAGS_OPT)
-@LIBMESH_OPT_MODE_TRUE@libopt_la_LIBADD = $(pkg_libs) # any defined package-specific libs
-@LIBMESH_PROF_MODE_TRUE@libprof_la_SOURCES = $(pkg_sources)
-@LIBMESH_PROF_MODE_TRUE@libprof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
-@LIBMESH_PROF_MODE_TRUE@libprof_la_CXXFLAGS = $(CXXFLAGS_PROF)
-@LIBMESH_PROF_MODE_TRUE@libprof_la_CFLAGS = $(CFLAGS_PROF)
-@LIBMESH_PROF_MODE_TRUE@libprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_SOURCES = $(pkg_sources)
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_CFLAGS = $(CFLAGS_OPROF)
-@LIBMESH_OPROF_MODE_TRUE@liboprof_la_LIBADD = $(pkg_libs) # any defined package-specific libs
-all: all-am
+noinst_LTLIBRARIES = libtecio.la
+libtecio_la_SOURCES = stub.C include/TECIO.h include/TECXXX.h
+libtecio_la_LIBADD = -L$(abs_builddir) -ltecio_vendor
+BUILT_SOURCES = libtecio_vendor.a
+EXTRA_DIST = lib
+libtecio_vendordir = $(libdir)
+libtecio_vendor_DATA = libtecio_vendor.a
+DISTCLEANFILES = $(BUILT_SOURCES)
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .C .lo .o .obj
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/contrib/Make.common $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -574,9 +500,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/tetgen/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/tecplot/binary/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu contrib/tetgen/Makefile
+	  $(AUTOMAKE) --gnu contrib/tecplot/binary/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -586,7 +512,6 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/contrib/Make.common:
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
@@ -607,16 +532,8 @@ clean-noinstLTLIBRARIES:
 	  echo rm -f $${locs}; \
 	  rm -f $${locs}; \
 	}
-libdbg.la: $(libdbg_la_OBJECTS) $(libdbg_la_DEPENDENCIES) $(EXTRA_libdbg_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libdbg_la_LINK) $(am_libdbg_la_rpath) $(libdbg_la_OBJECTS) $(libdbg_la_LIBADD) $(LIBS)
-libdevel.la: $(libdevel_la_OBJECTS) $(libdevel_la_DEPENDENCIES) $(EXTRA_libdevel_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libdevel_la_LINK) $(am_libdevel_la_rpath) $(libdevel_la_OBJECTS) $(libdevel_la_LIBADD) $(LIBS)
-liboprof.la: $(liboprof_la_OBJECTS) $(liboprof_la_DEPENDENCIES) $(EXTRA_liboprof_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(liboprof_la_LINK) $(am_liboprof_la_rpath) $(liboprof_la_OBJECTS) $(liboprof_la_LIBADD) $(LIBS)
-libopt.la: $(libopt_la_OBJECTS) $(libopt_la_DEPENDENCIES) $(EXTRA_libopt_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libopt_la_LINK) $(am_libopt_la_rpath) $(libopt_la_OBJECTS) $(libopt_la_LIBADD) $(LIBS)
-libprof.la: $(libprof_la_OBJECTS) $(libprof_la_DEPENDENCIES) $(EXTRA_libprof_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libprof_la_LINK) $(am_libprof_la_rpath) $(libprof_la_OBJECTS) $(libprof_la_LIBADD) $(LIBS)
+libtecio.la: $(libtecio_la_OBJECTS) $(libtecio_la_DEPENDENCIES) $(EXTRA_libtecio_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(CXXLINK)  $(libtecio_la_OBJECTS) $(libtecio_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -624,137 +541,55 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdbg_la-predicates.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdbg_la-tetgen.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-predicates.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdevel_la-tetgen.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-predicates.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/liboprof_la-tetgen.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-predicates.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libopt_la-tetgen.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-predicates.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libprof_la-tetgen.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stub.Plo@am__quote@
 
 .C.o:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
 
 .C.obj:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
-@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .C.lo:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
-@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
-
-libdbg_la-tetgen.lo: tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT libdbg_la-tetgen.lo -MD -MP -MF $(DEPDIR)/libdbg_la-tetgen.Tpo -c -o libdbg_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdbg_la-tetgen.Tpo $(DEPDIR)/libdbg_la-tetgen.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tetgen.C' object='libdbg_la-tetgen.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libdbg_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-
-libdbg_la-predicates.lo: predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -MT libdbg_la-predicates.lo -MD -MP -MF $(DEPDIR)/libdbg_la-predicates.Tpo -c -o libdbg_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdbg_la-predicates.Tpo $(DEPDIR)/libdbg_la-predicates.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='predicates.C' object='libdbg_la-predicates.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdbg_la_CPPFLAGS) $(CPPFLAGS) $(libdbg_la_CXXFLAGS) $(CXXFLAGS) -c -o libdbg_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
-
-libdevel_la-tetgen.lo: tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT libdevel_la-tetgen.lo -MD -MP -MF $(DEPDIR)/libdevel_la-tetgen.Tpo -c -o libdevel_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdevel_la-tetgen.Tpo $(DEPDIR)/libdevel_la-tetgen.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tetgen.C' object='libdevel_la-tetgen.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o libdevel_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-
-libdevel_la-predicates.lo: predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -MT libdevel_la-predicates.lo -MD -MP -MF $(DEPDIR)/libdevel_la-predicates.Tpo -c -o libdevel_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libdevel_la-predicates.Tpo $(DEPDIR)/libdevel_la-predicates.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='predicates.C' object='libdevel_la-predicates.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libdevel_la_CPPFLAGS) $(CPPFLAGS) $(libdevel_la_CXXFLAGS) $(CXXFLAGS) -c -o libdevel_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
-
-liboprof_la-tetgen.lo: tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT liboprof_la-tetgen.lo -MD -MP -MF $(DEPDIR)/liboprof_la-tetgen.Tpo -c -o liboprof_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboprof_la-tetgen.Tpo $(DEPDIR)/liboprof_la-tetgen.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tetgen.C' object='liboprof_la-tetgen.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o liboprof_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-
-liboprof_la-predicates.lo: predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -MT liboprof_la-predicates.lo -MD -MP -MF $(DEPDIR)/liboprof_la-predicates.Tpo -c -o liboprof_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/liboprof_la-predicates.Tpo $(DEPDIR)/liboprof_la-predicates.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='predicates.C' object='liboprof_la-predicates.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(liboprof_la_CPPFLAGS) $(CPPFLAGS) $(liboprof_la_CXXFLAGS) $(CXXFLAGS) -c -o liboprof_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
-
-libopt_la-tetgen.lo: tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT libopt_la-tetgen.lo -MD -MP -MF $(DEPDIR)/libopt_la-tetgen.Tpo -c -o libopt_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libopt_la-tetgen.Tpo $(DEPDIR)/libopt_la-tetgen.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tetgen.C' object='libopt_la-tetgen.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o libopt_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-
-libopt_la-predicates.lo: predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -MT libopt_la-predicates.lo -MD -MP -MF $(DEPDIR)/libopt_la-predicates.Tpo -c -o libopt_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libopt_la-predicates.Tpo $(DEPDIR)/libopt_la-predicates.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='predicates.C' object='libopt_la-predicates.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libopt_la_CPPFLAGS) $(CPPFLAGS) $(libopt_la_CXXFLAGS) $(CXXFLAGS) -c -o libopt_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
-
-libprof_la-tetgen.lo: tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT libprof_la-tetgen.lo -MD -MP -MF $(DEPDIR)/libprof_la-tetgen.Tpo -c -o libprof_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libprof_la-tetgen.Tpo $(DEPDIR)/libprof_la-tetgen.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='tetgen.C' object='libprof_la-tetgen.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o libprof_la-tetgen.lo `test -f 'tetgen.C' || echo '$(srcdir)/'`tetgen.C
-
-libprof_la-predicates.lo: predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -MT libprof_la-predicates.lo -MD -MP -MF $(DEPDIR)/libprof_la-predicates.Tpo -c -o libprof_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libprof_la-predicates.Tpo $(DEPDIR)/libprof_la-predicates.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='predicates.C' object='libprof_la-predicates.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libprof_la_CPPFLAGS) $(CPPFLAGS) $(libprof_la_CXXFLAGS) $(CXXFLAGS) -c -o libprof_la-predicates.lo `test -f 'predicates.C' || echo '$(srcdir)/'`predicates.C
 
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-includeHEADERS: $(include_HEADERS)
+install-libtecio_vendorDATA: $(libtecio_vendor_DATA)
 	@$(NORMAL_INSTALL)
-	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(libtecio_vendor_DATA)'; test -n "$(libtecio_vendordir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(libtecio_vendordir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(libtecio_vendordir)" || exit 1; \
 	fi; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  echo "$$d$$p"; \
 	done | $(am__base_list) | \
 	while read files; do \
-	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(includedir)'"; \
-	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(libtecio_vendordir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(libtecio_vendordir)" || exit $$?; \
 	done
 
-uninstall-includeHEADERS:
+uninstall-libtecio_vendorDATA:
 	@$(NORMAL_UNINSTALL)
-	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(libtecio_vendor_DATA)'; test -n "$(libtecio_vendordir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
+	dir='$(DESTDIR)$(libtecio_vendordir)'; $(am__uninstall_files_from_dir)
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -853,13 +688,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
-all-am: Makefile $(LTLIBRARIES) $(HEADERS)
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
+all-am: Makefile $(LTLIBRARIES) $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(libtecio_vendordir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -885,10 +722,12 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
@@ -912,7 +751,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-includeHEADERS
+install-data-am: install-libtecio_vendorDATA
 
 install-dvi: install-dvi-am
 
@@ -958,9 +797,9 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS
+uninstall-am: uninstall-libtecio_vendorDATA
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
 	clean-libtool clean-noinstLTLIBRARIES cscopelist ctags \
@@ -968,21 +807,18 @@ uninstall-am: uninstall-includeHEADERS
 	distclean-libtool distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am \
-	install-includeHEADERS install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-includeHEADERS
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-libtecio_vendorDATA install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	uninstall-libtecio_vendorDATA
 
 
-# Local Variables:
-# mode: makefile
-# End:
-
-# import as much commonality as possible
+libtecio_vendor.a: $(srcdir)/lib/@host@/tecio.a
+	$(AM_V_GEN)cp $< $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

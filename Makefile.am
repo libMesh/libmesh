@@ -18,18 +18,12 @@ AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
 
 LIBS             = $(libmesh_optional_LIBS)
 
-if LIBMESH_ENABLE_TECPLOT
-  LIBS += @TECPLOT_LIBRARY@
-endif
-
 # additional files which must be included in 'make dist'
 EXTRA_DIST = reference_elements \
              include/include_HEADERS \
 	     include/rebuild_include_HEADERS.sh \
 	     src/libmesh_SOURCES \
 	     src/rebuild_libmesh_SOURCES.sh \
-	     contrib/tecplot/include \
-             contrib/tecplot/lib \
              contrib/tecplot/README \
 	     contrib/bin/strip_dup_incl_paths.pl \
 	     contrib/bin/strip_dup_libs.pl

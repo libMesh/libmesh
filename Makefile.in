@@ -57,7 +57,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@LIBMESH_ENABLE_TECPLOT_TRUE@am__append_1 = @TECPLOT_LIBRARY@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/src/libmesh_SOURCES \
 	$(top_srcdir)/build-aux/config.guess \
@@ -80,21 +79,21 @@ DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	COPYING ChangeLog INSTALL NEWS build-aux/config.guess \
 	build-aux/config.sub build-aux/depcomp build-aux/install-sh \
 	build-aux/ltmain.sh build-aux/missing build-aux/ylwrap
-@LIBMESH_DBG_MODE_TRUE@am__append_2 = libmesh_dbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_3 = libmesh_devel.la
-@LIBMESH_OPT_MODE_TRUE@am__append_4 = libmesh_opt.la
-@LIBMESH_PROF_MODE_TRUE@am__append_5 = libmesh_prof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_6 = libmesh_oprof.la
-@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_7 = tests
+@LIBMESH_DBG_MODE_TRUE@am__append_1 = libmesh_dbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_2 = libmesh_devel.la
+@LIBMESH_OPT_MODE_TRUE@am__append_3 = libmesh_opt.la
+@LIBMESH_PROF_MODE_TRUE@am__append_4 = libmesh_prof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_5 = libmesh_oprof.la
+@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_6 = tests
 bin_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_4) $(am__EXEEXT_6)
-@LIBMESH_OPT_MODE_TRUE@am__append_8 = $(opt_programs)
-@LIBMESH_DEVEL_MODE_TRUE@am__append_9 = $(devel_programs)
-@LIBMESH_DBG_MODE_TRUE@am__append_10 = $(dbg_programs)
+@LIBMESH_OPT_MODE_TRUE@am__append_7 = $(opt_programs)
+@LIBMESH_DEVEL_MODE_TRUE@am__append_8 = $(devel_programs)
+@LIBMESH_DBG_MODE_TRUE@am__append_9 = $(dbg_programs)
 
 ###########################################################
 # Examples
-@LIBMESH_ENABLE_EXAMPLES_TRUE@am__append_11 = examples
-@CODE_COVERAGE_ENABLED_TRUE@am__append_12 = src/apps/*.gcda src/apps/*.gcno
+@LIBMESH_ENABLE_EXAMPLES_TRUE@am__append_10 = examples
+@CODE_COVERAGE_ENABLED_TRUE@am__append_11 = src/apps/*.gcda src/apps/*.gcno
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -178,7 +177,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(datadir)" "$(DESTDIR)$(pkgconfigdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 @LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_DEPENDENCIES =  \
 @LIBMESH_DBG_MODE_TRUE@	contrib/libcontrib_dbg.la \
 @LIBMESH_DBG_MODE_TRUE@	$(am__DEPENDENCIES_2)
@@ -3981,7 +3980,7 @@ LDFLAGS = @LDFLAGS@
 LIBHILBERT_INCLUDE = @LIBHILBERT_INCLUDE@
 LIBHILBERT_LIBRARY = @LIBHILBERT_LIBRARY@
 LIBOBJS = @LIBOBJS@
-LIBS = $(libmesh_optional_LIBS) $(am__append_1)
+LIBS = $(libmesh_optional_LIBS)
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -4058,8 +4057,6 @@ TBB_INCLUDE = @TBB_INCLUDE@
 TBB_LIBRARY = @TBB_LIBRARY@
 TECIO_CPPFLAGS = @TECIO_CPPFLAGS@
 TECIO_INCLUDE = @TECIO_INCLUDE@
-TECPLOT_INCLUDE = @TECPLOT_INCLUDE@
-TECPLOT_LIBRARY = @TECPLOT_LIBRARY@
 TETGEN_INCLUDE = @TETGEN_INCLUDE@
 TETGEN_LIBRARY = @TETGEN_LIBRARY@
 TPETRA_INCLUDES = @TPETRA_INCLUDES@
@@ -4123,6 +4120,7 @@ libmesh_CFLAGS = @libmesh_CFLAGS@
 libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
 libmesh_CXXFLAGS = @libmesh_CXXFLAGS@
 libmesh_contrib_INCLUDES = @libmesh_contrib_INCLUDES@
+libmesh_installed_LIBS = @libmesh_installed_LIBS@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
 libmesh_optional_LIBS = @libmesh_optional_LIBS@
 libmesh_pkgconfig_requires = @libmesh_pkgconfig_requires@
@@ -4175,7 +4173,7 @@ vtkversion = @vtkversion@
 # 	   test/common/Makefile.in 		    \
 # 	   test/comp_ns/Makefile.in		    \
 # 	   test/unit/Makefile.in                    
-SUBDIRS = include contrib $(am__append_7) $(am__append_11)
+SUBDIRS = include contrib $(am__append_6) $(am__append_10)
 AUTOMAKE_OPTIONS = subdir-objects 
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(libmesh_CFLAGS)
@@ -4193,8 +4191,7 @@ AM_CPPFLAGS = -DLIBMESH_IS_COMPILING_ITSELF \
 # additional files which must be included in 'make dist'
 EXTRA_DIST = reference_elements include/include_HEADERS \
 	include/rebuild_include_HEADERS.sh src/libmesh_SOURCES \
-	src/rebuild_libmesh_SOURCES.sh contrib/tecplot/include \
-	contrib/tecplot/lib contrib/tecplot/README \
+	src/rebuild_libmesh_SOURCES.sh contrib/tecplot/README \
 	contrib/bin/strip_dup_incl_paths.pl \
 	contrib/bin/strip_dup_libs.pl contrib/bin/make_dependencies.pl
 nobase_data_DATA = \
@@ -4651,8 +4648,8 @@ libmesh_SOURCES = \
 # A convenience library to hold proper libMesh 
 # objects.  This will get appended with any contributed 
 # sources to create the final library.
-lib_LTLIBRARIES = $(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5) $(am__append_6)
+lib_LTLIBRARIES = $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5)
 @LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_SOURCES = $(libmesh_SOURCES)
 @LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS) 
 @LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
@@ -4679,7 +4676,7 @@ lib_LTLIBRARIES = $(am__append_2) $(am__append_3) $(am__append_4) \
 @LIBMESH_OPROF_MODE_TRUE@libmesh_oprof_la_CFLAGS = $(CFLAGS_OPROF)
 @LIBMESH_OPROF_MODE_TRUE@libmesh_oprof_la_LIBADD = contrib/libcontrib_oprof.la $(LIBS)
 bin_SCRIPTS = # empty, append below
-CLEANFILES = $(am__append_12)
+CLEANFILES = $(am__append_11)
 
 ###########################################################
 # Utility programs

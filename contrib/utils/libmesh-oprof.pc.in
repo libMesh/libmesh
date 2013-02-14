@@ -8,7 +8,7 @@ Description: The libMesh Finite Element Library
 Requires: @libmesh_pkgconfig_requires@
 Version: @VERSION@
 Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_oprof \
-      @libmesh_optional_LIBS@
+      @libmesh_installed_LIBS@ @libmesh_optional_LIBS@
 Libs.private: 
 Cflags: @CPPFLAGS_OPROF@ @CXXFLAGS_OPROF@ \
         -I${includedir} -I${includedir}/contrib \
