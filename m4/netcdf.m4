@@ -30,7 +30,7 @@ AC_DEFUN([CONFIGURE_NETCDF],
   	  # pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
           # note this is maddness - we will run configure in the subdirectory v4, but not use it,
           # so this is nothing more than a hedge against that failing.  we need it to work for
-          # 'make dist' to work' 
+          # 'make dist' to work 
 	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
 	  ;;
 
@@ -46,7 +46,10 @@ AC_DEFUN([CONFIGURE_NETCDF],
   	    #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
 	    libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
 	  fi
-								
+	
+	  # netcdf will install its own pkgconfig script, use this to get proper static linking
+	  libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
+
 	  AC_MSG_RESULT(<<< Configuring library with NetCDF version 4 support >>>)
 	  ;;
 

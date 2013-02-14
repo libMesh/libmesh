@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: libmesh
 Description: The libMesh Finite Element Library
-Requires:
+Requires: @libmesh_pkgconfig_requires@
 Version: @VERSION@
 Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_dbg \
       @libmesh_optional_LIBS@      

@@ -646,6 +646,7 @@ GIT_CHECKOUT_TRUE
 BUILD_DEVSTATUS
 GIT_REVISION
 gitquery
+libmesh_pkgconfig_requires
 libmesh_contrib_INCLUDES
 libmesh_optional_LIBS
 libmesh_optional_INCLUDES
@@ -27039,11 +27040,14 @@ $as_echo "---------------------------------------------" >&6; }
 #
 # libmesh_subpackage_arguments is a list of configure arguments
 # that will be passed down to any subpackages that we are nesting.
+#
+# libmesh_pkgconfig_requires is a list of pkgconfig requirements
+# we will add
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
 libmesh_contrib_INCLUDES=""
 libmesh_subpackage_arguments=""
-
+libmesh_pkgconfig_requires=""
 
 # --------------------------------------------------------------
 # Allow for disable-optional
@@ -32020,7 +32024,7 @@ $as_echo "<<< Configuring library with NetCDF version 3 support >>>" >&6; }
   	  # pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
           # note this is maddness - we will run configure in the subdirectory v4, but not use it,
           # so this is nothing more than a hedge against that failing.  we need it to work for
-          # 'make dist' to work'
+          # 'make dist' to work
 	  libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
 	  ;;
 
@@ -32038,6 +32042,9 @@ $as_echo "#define HAVE_NETCDF 1" >>confdefs.h
   	    #  pass --disable-netcdf-4 to the subpackage so that we do not require HDF-5
 	    libmesh_subpackage_arguments="$libmesh_subpackage_arguments --disable-netcdf-4"
 	  fi
+
+	  # netcdf will install its own pkgconfig script, use this to get proper static linking
+	  libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
 
 	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4 support >>>" >&5
 $as_echo "<<< Configuring library with NetCDF version 4 support >>>" >&6; }
@@ -32831,6 +32838,7 @@ $as_echo "removing duplicate libraries..." >&6; }
   fi
 fi
 # substitute values
+
 
 
 

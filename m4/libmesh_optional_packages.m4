@@ -17,11 +17,14 @@ AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 # 
 # libmesh_subpackage_arguments is a list of configure arguments
 # that will be passed down to any subpackages that we are nesting.
+#
+# libmesh_pkgconfig_requires is a list of pkgconfig requirements
+# we will add
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
 libmesh_contrib_INCLUDES=""
 libmesh_subpackage_arguments=""
-
+libmesh_pkgconfig_requires=""
 
 # --------------------------------------------------------------
 # Allow for disable-optional
@@ -514,4 +517,5 @@ fi
 AC_SUBST(libmesh_optional_INCLUDES)
 AC_SUBST(libmesh_optional_LIBS)
 AC_SUBST(libmesh_contrib_INCLUDES)
+AC_SUBST(libmesh_pkgconfig_requires)
 ])

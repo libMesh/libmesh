@@ -1148,6 +1148,7 @@ libmesh_CXXFLAGS = @libmesh_CXXFLAGS@
 libmesh_contrib_INCLUDES = @libmesh_contrib_INCLUDES@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
 libmesh_optional_LIBS = @libmesh_optional_LIBS@
+libmesh_pkgconfig_requires = @libmesh_pkgconfig_requires@
 localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
