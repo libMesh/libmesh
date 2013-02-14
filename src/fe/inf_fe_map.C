@@ -536,7 +536,7 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
       // the order of the radial mapping
       const Order radial_mapping_order (Radial::mapping_order());
 
-      unsigned int cnt = 0;
+      unsigned int cnt2 = 0;
       inverse_map_error = 0.;
 
       // Newton iteration in 1-D
@@ -570,8 +570,8 @@ Point InfFE<Dim,T_radial,T_map>::inverse_map (const Elem* inf_elem,
 	  inverse_map_error = std::fabs(dp);
 
 	  // increment iteration count
-	  cnt ++;
-	  if (cnt > 20)
+	  cnt2 ++;
+	  if (cnt2 > 20)
 	    {
 
 	      libMesh::err << "ERROR: 1D Newton scheme FAILED to converge"
