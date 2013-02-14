@@ -12,6 +12,8 @@ ncdump/nccopy
 ncdump/ncdump
 ncgen/ncgen
 ncgen3/ncgen3
+ncdump/ctest.c
+ncdump/ctest64.c
 
 # 'make check' produces these
 h5_test/tst_h_atts
