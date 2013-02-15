@@ -17,11 +17,6 @@ AC_DEFUN([CONFIGURE_PETSC],
   AC_ARG_VAR([PETSC_DIR],  [path to PETSc installation])
   AC_ARG_VAR([PETSC_ARCH], [PETSc build architecture])
 
-  # turn off PETSc with --disable-mpi
-  if (test "$enablempi" = no); then
-    enablepetsc=no
-  fi
-
   if (test "$enablepetsc" !=  no) ; then
     # AC_REQUIRE:
     # If the M4 macro AC_PROG_F77 has not already been called, call
@@ -83,7 +78,6 @@ AC_DEFUN([CONFIGURE_PETSC],
           enablepetsc=no
           AC_MSG_RESULT([<<< PETSc 2.x detected and "\$PETSC_ARCH" not set.  PETSc disabled. >>>])
           # PETSc config failed.  We will try MPI at the end of this function.
-          # ACX_MPI
         fi
       fi
   
@@ -196,9 +190,11 @@ EOF
         fi
     
     else 
-        # PETSc config failed.  Try MPI.
-        AC_MSG_RESULT(<<< PETSc disabled.  Will try configuring MPI now... >>>)
-        ACX_MPI
+        # PETSc config failed.  Try MPI, unless directed otherwise
+	if (test "$enablempi" != no); then
+          AC_MSG_RESULT(<<< PETSc disabled.  Will try configuring MPI now... >>>)
+          ACX_MPI
+	fi
     fi
 
 

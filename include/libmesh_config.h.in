@@ -286,6 +286,9 @@
 /* Define to 1 if you have the <rpc/rpc.h> header file. */
 #undef HAVE_RPC_RPC_H
 
+/* Define to 1 if you have the <rpc/xdr.h> header file. */
+#undef HAVE_RPC_XDR_H
+
 /* define if the compiler supports Run-Time Type Identification */
 #undef HAVE_RTTI
 

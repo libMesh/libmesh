@@ -26876,7 +26876,35 @@ fi
 
 
 else
+
+                      for ac_header in rpc/xdr.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "rpc/xdr.h" "ac_cv_header_rpc_xdr_h" "$ac_includes_default"
+if test "x$ac_cv_header_rpc_xdr_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_RPC_XDR_H 1
+_ACEOF
+
+                                        ac_fn_cxx_check_func "$LINENO" "xdrstdio_create" "ac_cv_func_xdrstdio_create"
+if test "x$ac_cv_func_xdrstdio_create" = xyes; then :
+
+
+$as_echo "#define HAVE_XDR 1" >>confdefs.h
+
+                                                        echo "<<< Configuring library with XDR support >>>"
+
+else
   enablexdr=no
+fi
+
+
+else
+  enablexdr=no
+fi
+
+done
+
+
 fi
 
 done
@@ -27721,7 +27749,6 @@ fi
 
 
 
-
   if (test "$enablepetsc" !=  no) ; then
     # AC_REQUIRE:
     # If the M4 macro AC_PROG_F77 has not already been called, call
@@ -27850,7 +27877,6 @@ _ACEOF
           { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc 2.x detected and \"\$PETSC_ARCH\" not set.  PETSc disabled. >>>" >&5
 $as_echo "<<< PETSc 2.x detected and \"\$PETSC_ARCH\" not set.  PETSc disabled. >>>" >&6; }
           # PETSc config failed.  We will try MPI at the end of this function.
-          # ACX_MPI
         fi
       fi
 
@@ -27971,8 +27997,9 @@ $as_echo "<<< Configuring library with Hypre support >>>" >&6; }
         fi
 
     else
-        # PETSc config failed.  Try MPI.
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc disabled.  Will try configuring MPI now... >>>" >&5
+        # PETSc config failed.  Try MPI, unless directed otherwise
+	if (test "$enablempi" != no); then
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< PETSc disabled.  Will try configuring MPI now... >>>" >&5
 $as_echo "<<< PETSc disabled.  Will try configuring MPI now... >>>" >&6; }
 
 
@@ -28487,6 +28514,7 @@ fi
 
 
 
+	fi
     fi
 
 
