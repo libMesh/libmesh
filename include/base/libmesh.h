@@ -64,10 +64,10 @@ public:
    * of the library functionality.  This method may take an optional
    * parameter to use a user-specified MPI communicator.
    */
-  LibMeshInit(int & argc, char** & argv,
+  LibMeshInit(int argc, const char* const* argv,
 	      MPI_Comm COMM_WORLD_IN=MPI_COMM_WORLD);
 #else
-  LibMeshInit(int & argc, char** & argv);
+  LibMeshInit(int argc, const char* const* argv);
 #endif
 
   virtual ~LibMeshInit();
@@ -84,7 +84,7 @@ public:
    * library functionality, but libMesh::init() is a deprecated
    * way to do so.  Create a LibMeshInit object instead.
    */
-  void init (int & argc, char** & argv);
+  void init (int argc, const char* const* argv);
 
 #else
 
@@ -97,7 +97,7 @@ public:
    * library functionality, but libMesh::init() is a deprecated
    * way to do so.  Create a LibMeshInit object instead.
    */
-  void init (int & argc, char** & argv,
+  void init (int argc, const char* const* argv,
 	     MPI_Comm COMM_WORLD_IN=MPI_COMM_WORLD);
 
 #endif

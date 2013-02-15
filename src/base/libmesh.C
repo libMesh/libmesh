@@ -307,9 +307,9 @@ void libmesh_terminate_handler()
 
 
 #ifndef LIBMESH_HAVE_MPI
-void _init (int &argc, char** & argv)
+void _init (int argc, const char* const* argv)
 #else
-void _init (int &argc, char** & argv,
+void _init (int argc, const char* const* argv,
 	    MPI_Comm COMM_WORLD_IN)
 #endif
 {
@@ -358,7 +358,7 @@ void _init (int &argc, char** & argv,
 
       if (!flag)
 	{
-	  MPI_Init (&argc, &argv);
+	  MPI_Init (&argc, const_cast<char***>(&argv));
 	  libmesh_initialized_mpi = true;
 	}
 
@@ -433,14 +433,14 @@ void _init (int &argc, char** & argv,
       if (!SlepcInitializeCalled)
 #  endif
         {
-          ierr = SlepcInitialize  (&argc, &argv, NULL, NULL);
+          ierr = SlepcInitialize  (&argc, const_cast<char***>(&argv), NULL, NULL);
 	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
           libmesh_initialized_slepc = true;
         }
 # else
       if (libmesh_initialized_petsc)
         {
-          ierr = PetscInitialize (&argc, &argv, NULL, NULL);
+          ierr = PetscInitialize (&argc, const_cast<char***>(&argv), NULL, NULL);
 	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
         }
 # endif
@@ -671,13 +671,13 @@ int _close ()
 
 
 #ifndef LIBMESH_HAVE_MPI
-void init (int &argc, char** & argv)
+void init (int argc, const char* const * argv)
 {
   libmesh_deprecated();  // Use LibMeshInit instead
   libMesh::_init(argc, argv);
 }
 #else
-void init (int &argc, char** & argv,
+void init (int argc, const char* const * argv,
 		    MPI_Comm COMM_WORLD_IN)
 {
   libmesh_deprecated();  // Use LibMeshInit instead
@@ -697,12 +697,12 @@ int close ()
 
 
 #ifndef LIBMESH_HAVE_MPI
-LibMeshInit::LibMeshInit (int &argc, char** & argv)
+LibMeshInit::LibMeshInit (int argc, const char* const* argv)
 {
   libMesh::_init(argc, argv);
 }
 #else
-LibMeshInit::LibMeshInit (int &argc, char** & argv,
+LibMeshInit::LibMeshInit (int argc, const char* const* argv,
 		          MPI_Comm COMM_WORLD_IN)
 {
   libMesh::_init(argc, argv, COMM_WORLD_IN);
