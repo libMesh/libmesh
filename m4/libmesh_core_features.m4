@@ -446,7 +446,19 @@ if test "$enablexdr" != no ; then
                                    ],
                                    [enablexdr=no])
                     ],
-                    [enablexdr=no])
+                    [
+                      AC_CHECK_HEADERS(rpc/xdr.h,
+                                       [
+                                        AC_CHECK_FUNC(xdrstdio_create,
+                                                      [
+                                                        AC_DEFINE(HAVE_XDR, 1,
+                                                                  [Flag indicating headers and libraries for XDR IO are available])
+                                                        echo "<<< Configuring library with XDR support >>>"
+                                                      ],
+                                                      [enablexdr=no])
+                                       ],
+                                       [enablexdr=no])
+                     ])
 fi
 # -------------------------------------------------------------
 
