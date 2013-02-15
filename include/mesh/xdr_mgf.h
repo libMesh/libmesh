@@ -32,7 +32,11 @@
 // Forward Declarations
 
 #ifdef LIBMESH_HAVE_XDR
-#  include <rpc/rpc.h>
+#  ifdef LIBMESH_HAVE_RPC_RPC_H
+#    include <rpc/rpc.h>
+#  elif  LIBMESH_HAVE_RPC_XDR_H
+#    include <rpc/xdr.h>
+#  endif
 #  ifndef LIBMESH_DEFAULT_SINGLE_PRECISION
 #    ifdef LIBMESH_DEFAULT_TRIPLE_PRECISION
 // #      define xdr_REAL xdr_quadruple
