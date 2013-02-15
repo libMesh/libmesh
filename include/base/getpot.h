@@ -110,7 +110,7 @@ public:
     // (*) constructors, destructor, assignment operator -----------------------
     inline GetPot();
     inline GetPot(const GetPot&);
-    inline GetPot(const int argc_, char** argv_,
+    inline GetPot(const int argc_, const char* const* argv_,
 		  const char* FieldSeparator=0x0);
     inline GetPot(const char* FileName,
 		  const char* CommentStart=0x0, const char* CommentEnd=0x0,
@@ -123,7 +123,7 @@ public:
     inline GetPot& operator=(const GetPot&);
 
     // Re-initialization methods
-    inline void parse_command_line(const int argc_, char ** argv_,
+    inline void parse_command_line(const int argc_, const char * const* argv_,
                                    const char* FieldSeparator =0x0);
     inline void parse_input_file(const std::string& FileName,
                                  const std::string& CommentStart=std::string("#"),
@@ -505,7 +505,7 @@ GetPot::GetPot() :
 }
 
 inline
-GetPot::GetPot(const int argc_, char ** argv_,
+GetPot::GetPot(const int argc_, const char * const * argv_,
 	       const char* FieldSeparator /* =0x0 */) :
     // leave 'char**' non-const to honor less capable compilers ...
   prefix(),
@@ -533,7 +533,7 @@ GetPot::GetPot(const int argc_, char ** argv_,
 
 
 inline void
-GetPot::parse_command_line(const int argc_, char ** argv_,
+GetPot::parse_command_line(const int argc_, const char * const * argv_,
                            const char* FieldSeparator /* =0x0 */)
     // leave 'char**' non-const to honor less capable compilers ...
 {
