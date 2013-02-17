@@ -25,6 +25,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
 		 [enableeigen=$enableoptional])
 
 
+  install_internal_eigen=no
   if (test $enableeigen = yes); then
   
     # User-specific include path
@@ -35,48 +36,47 @@ AC_DEFUN([CONFIGURE_EIGEN],
   
     # Fall back on default paths to Eigen's include files
     if (test $witheigeninc != no); then
-      EIGEN_INC="$witheigeninc"
-
+	EIGEN_INC="$witheigeninc"
+	
     elif test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen/Eigen; then
-      echo "Environment EIGEN_INC=$EIGEN_INC"
-
+	echo "Environment EIGEN_INC=$EIGEN_INC"
+	
     elif test "x$EIGEN3_INCLUDE" != x -a -f $EIGEN3_INCLUDE/Eigen/Eigen; then
-      EIGEN_INC=$EIGEN3_INCLUDE
-      echo "Environment EIGEN_INC=$EIGEN_INC"
-      
+	EIGEN_INC=$EIGEN3_INCLUDE
+	echo "Environment EIGEN_INC=$EIGEN_INC"
+	
 
     elif test -f /usr/include/eigen3/Eigen/Eigen ; then
-      EIGEN_INC="/usr/include/eigen3"
-
+	EIGEN_INC="/usr/include/eigen3"
+	
     else
-      EIGEN_INC="/usr/include"
+	EIGEN_INC="/usr/include"
     fi
   
     # Initialize Makefile/config.h substitution variables
     EIGEN_INCLUDE=""
   
-    # Properly let the substitution variables
-    if (test $enableeigen = yes); then
+    # Check for existence of a header file in the specified location.  Note: here
+    # we are checking for the header file "Eigen" in the Eigen directory.
+    eigenincFound=no;
+    AC_CHECK_HEADERS($EIGEN_INC/Eigen/Eigen, eigenincFound=yes)
+  
+    if (test x$eigenincFound = xyes); then
+        EIGEN_INCLUDE="-I$EIGEN_INC"
+    elif (test -d $srcdir/contrib/eigen/eigen); then
+        AC_MSG_RESULT([<<< external Eigen header files not found, using libmesh-provided Eigen in ./contrib >>>])
+	EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
+	install_internal_eigen=yes
+    else
+	enableeigen=no
+    fi
     
-       # Check for existence of a header file in the specified location.  Note: here
-       # we are checking for the header file "Eigen" in the Eigen directory.
-       eigenincFound=no;
-       AC_CHECK_HEADERS($EIGEN_INC/Eigen/Eigen, eigenincFound=yes)
-  
-       if (test x$eigenincFound = xno); then
-         AC_MSG_RESULT(Eigen header files not found!)
-         enableeigen=no;
-       fi
-  
-       # If the Eigen headers were found, continue.
-       if (test x$enableeigen = xyes); then
-         EIGEN_INCLUDE="-I$EIGEN_INC"
-         AC_DEFINE(HAVE_EIGEN, 1, [Flag indicating whether the library will be compiled with Eigen support])
-         AC_MSG_RESULT(<<< Configuring library with Eigen support >>>)
-       fi
+    if (test x$enableeigen = xyes); then
+	AC_DEFINE(HAVE_EIGEN, 1, [Flag indicating whether the library will be compiled with Eigen support])
+	AC_MSG_RESULT(<<< Configuring library with Eigen support >>>)
     fi
   fi
-  
+
   # Substitute the substitution variables
   AC_SUBST(EIGEN_INCLUDE)
 ])

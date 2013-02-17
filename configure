@@ -713,6 +713,8 @@ LIBMESH_ENABLE_GLPK_FALSE
 LIBMESH_ENABLE_GLPK_TRUE
 GLPK_LIBRARY
 GLPK_INCLUDE
+LIBMESH_INSTALL_INTERNAL_EIGEN_FALSE
+LIBMESH_INSTALL_INTERNAL_EIGEN_TRUE
 LIBMESH_ENABLE_EIGEN_FALSE
 LIBMESH_ENABLE_EIGEN_TRUE
 EIGEN_INCLUDE
@@ -31385,6 +31387,7 @@ fi
 
 
 
+  install_internal_eigen=no
   if (test $enableeigen = yes); then
 
     # User-specific include path
@@ -31399,33 +31402,30 @@ fi
 
     # Fall back on default paths to Eigen's include files
     if (test $witheigeninc != no); then
-      EIGEN_INC="$witheigeninc"
+	EIGEN_INC="$witheigeninc"
 
     elif test "x$EIGEN_INC" != x -a -f $EIGEN_INC/Eigen/Eigen; then
-      echo "Environment EIGEN_INC=$EIGEN_INC"
+	echo "Environment EIGEN_INC=$EIGEN_INC"
 
     elif test "x$EIGEN3_INCLUDE" != x -a -f $EIGEN3_INCLUDE/Eigen/Eigen; then
-      EIGEN_INC=$EIGEN3_INCLUDE
-      echo "Environment EIGEN_INC=$EIGEN_INC"
+	EIGEN_INC=$EIGEN3_INCLUDE
+	echo "Environment EIGEN_INC=$EIGEN_INC"
 
 
     elif test -f /usr/include/eigen3/Eigen/Eigen ; then
-      EIGEN_INC="/usr/include/eigen3"
+	EIGEN_INC="/usr/include/eigen3"
 
     else
-      EIGEN_INC="/usr/include"
+	EIGEN_INC="/usr/include"
     fi
 
     # Initialize Makefile/config.h substitution variables
     EIGEN_INCLUDE=""
 
-    # Properly let the substitution variables
-    if (test $enableeigen = yes); then
-
-       # Check for existence of a header file in the specified location.  Note: here
-       # we are checking for the header file "Eigen" in the Eigen directory.
-       eigenincFound=no;
-       for ac_header in $EIGEN_INC/Eigen/Eigen
+    # Check for existence of a header file in the specified location.  Note: here
+    # we are checking for the header file "Eigen" in the Eigen directory.
+    eigenincFound=no;
+    for ac_header in $EIGEN_INC/Eigen/Eigen
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -31439,21 +31439,23 @@ fi
 done
 
 
-       if (test x$eigenincFound = xno); then
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: Eigen header files not found!" >&5
-$as_echo "Eigen header files not found!" >&6; }
-         enableeigen=no;
-       fi
+    if (test x$eigenincFound = xyes); then
+        EIGEN_INCLUDE="-I$EIGEN_INC"
+    elif (test -d $srcdir/contrib/eigen/eigen); then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< external Eigen header files not found, using libmesh-provided Eigen in ./contrib >>>" >&5
+$as_echo "<<< external Eigen header files not found, using libmesh-provided Eigen in ./contrib >>>" >&6; }
+	EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
+	install_internal_eigen=yes
+    else
+	enableeigen=no
+    fi
 
-       # If the Eigen headers were found, continue.
-       if (test x$enableeigen = xyes); then
-         EIGEN_INCLUDE="-I$EIGEN_INC"
+    if (test x$enableeigen = xyes); then
 
 $as_echo "#define HAVE_EIGEN 1" >>confdefs.h
 
-         { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Eigen support >>>" >&5
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Eigen support >>>" >&5
 $as_echo "<<< Configuring library with Eigen support >>>" >&6; }
-       fi
     fi
   fi
 
@@ -31461,8 +31463,18 @@ $as_echo "<<< Configuring library with Eigen support >>>" >&6; }
 
 
 if (test x$enableeigen = xyes); then
-  libmesh_optional_INCLUDES="$EIGEN_INCLUDE $libmesh_optional_INCLUDES"
+  # if we are installing our own Eigen, add it to the contrib search path
+  # which is not exported during install
+  if (test x$install_internal_eigen = xyes); then
+    libmesh_contrib_INCLUDES="$EIGEN_INCLUDE $libmesh_contrib_INCLUDES"
+  # if we are depending on an external Eigen, add it to the optional search
+  # path, which gets exported during install
+  else
+    libmesh_optional_INCLUDES="$EIGEN_INCLUDE $libmesh_optional_INCLUDES"
+  fi
 fi
+ac_config_files="$ac_config_files contrib/eigen/eigen/Makefile"
+
  if test x$enableeigen = xyes; then
   LIBMESH_ENABLE_EIGEN_TRUE=
   LIBMESH_ENABLE_EIGEN_FALSE='#'
@@ -31471,7 +31483,15 @@ else
   LIBMESH_ENABLE_EIGEN_FALSE=
 fi
 
-# -------------------------------------------------------------
+ if test x$install_internal_eigen = xyes; then
+  LIBMESH_INSTALL_INTERNAL_EIGEN_TRUE=
+  LIBMESH_INSTALL_INTERNAL_EIGEN_FALSE='#'
+else
+  LIBMESH_INSTALL_INTERNAL_EIGEN_TRUE='#'
+  LIBMESH_INSTALL_INTERNAL_EIGEN_FALSE=
+fi
+
+#--------------------------------------------------------------
 
 
 
@@ -33220,6 +33240,10 @@ if test -z "${LIBMESH_ENABLE_EIGEN_TRUE}" && test -z "${LIBMESH_ENABLE_EIGEN_FAL
   as_fn_error $? "conditional \"LIBMESH_ENABLE_EIGEN\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${LIBMESH_INSTALL_INTERNAL_EIGEN_TRUE}" && test -z "${LIBMESH_INSTALL_INTERNAL_EIGEN_FALSE}"; then
+  as_fn_error $? "conditional \"LIBMESH_INSTALL_INTERNAL_EIGEN\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${LIBMESH_ENABLE_GLPK_TRUE}" && test -z "${LIBMESH_ENABLE_GLPK_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_GLPK\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
@@ -34474,6 +34498,7 @@ do
     "contrib/tetgen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tetgen/Makefile" ;;
     "contrib/triangle/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/triangle/Makefile" ;;
     "contrib/gmv/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gmv/Makefile" ;;
+    "contrib/eigen/eigen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/eigen/eigen/Makefile" ;;
     "contrib/netcdf/v3/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netcdf/v3/Makefile" ;;
     "contrib/exodusii/v5.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.09/Makefile" ;;
     "contrib/exodusii/v5.22/exodus/cbind/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/cbind/Makefile" ;;
