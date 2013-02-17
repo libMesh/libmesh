@@ -365,10 +365,20 @@ AM_CONDITIONAL(LIBMESH_ENABLE_VTK, test x$enablevtk = xyes)
 # -------------------------------------------------------------
 CONFIGURE_EIGEN
 if (test x$enableeigen = xyes); then
-  libmesh_optional_INCLUDES="$EIGEN_INCLUDE $libmesh_optional_INCLUDES"
+  # if we are installing our own Eigen, add it to the contrib search path
+  # which is not exported during install
+  if (test x$install_internal_eigen = xyes); then
+    libmesh_contrib_INCLUDES="$EIGEN_INCLUDE $libmesh_contrib_INCLUDES"
+  # if we are depending on an external Eigen, add it to the optional search
+  # path, which gets exported during install
+  else
+    libmesh_optional_INCLUDES="$EIGEN_INCLUDE $libmesh_optional_INCLUDES"
+  fi  
 fi
+AC_CONFIG_FILES([contrib/eigen/eigen/Makefile])		
 AM_CONDITIONAL(LIBMESH_ENABLE_EIGEN, test x$enableeigen = xyes)
-# -------------------------------------------------------------
+AM_CONDITIONAL(LIBMESH_INSTALL_INTERNAL_EIGEN, test x$install_internal_eigen = xyes)
+#--------------------------------------------------------------
 
 
 

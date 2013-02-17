@@ -13,6 +13,9 @@ if LIBMESH_INSTALL_INTERNAL_BOOST
    SUBDIRS += boost/include
 endif
 
+if LIBMESH_INSTALL_INTERNAL_EIGEN
+   SUBDIRS += eigen/eigen
+endif
 
 if LIBMESH_ENABLE_GMV
   SUBDIRS    += gmv
