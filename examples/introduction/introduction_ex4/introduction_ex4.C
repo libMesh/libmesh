@@ -31,8 +31,7 @@
  // for bottlenecks where we should focus optimization efforts.
  //
  // This example also shows how to extend example 3 to run in
- // parallel.  Notice how little has changed!  The significant
- // differences are marked with "PARALLEL CHANGE".
+ // parallel.  Notice how little has changed!
 
 
 // C++ include files that we need
