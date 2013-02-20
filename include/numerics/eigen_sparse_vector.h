@@ -444,6 +444,11 @@ class EigenSparseVector : public NumericVector<T>
  private:
 
   /**
+   * Actual Eigen::SparseVector<> we are wrapping.
+   */
+  AutoPtr<EigenSV> _vec;
+  
+  /**
    * Make other Eigen datatypes friends
    */
   friend class EigenSparseLinearSolver<T>;
@@ -511,33 +516,27 @@ void EigenSparseVector<T>::init (const numeric_index_type n,
 				 const bool fast,
 				 const ParallelType)
 {
-  libmesh_not_implemented();
-//   // Eigen vectors only for serial cases,
-//   // but can provide a "parallel" vector on one processor.
-//   libmesh_assert_equal_to (n, n_local);
+  // Eigen vectors only for serial cases,
+  // but can provide a "parallel" vector on one processor.
+  libmesh_assert_equal_to (n, n_local);
 
-//   this->_type = SERIAL;
+  this->_type = SERIAL;
 
-//   // Clear initialized vectors
-//   if (this->initialized())
-//     this->clear();
+  // Clear initialized vectors
+  if (this->initialized())
+    this->clear();
+  
+  // create a sequential vector
+  _vec.reset (new EigenSV (n));
+  
+  this->_is_initialized = true;
+#ifndef NDEBUG
+  this->_is_closed = true;
+#endif
 
-//   // create a sequential vector
-
-//   static int cnt = 0;
-//   char foo[80];
-//   std::sprintf(foo,  "Vec-%d", cnt++);
-
-//   V_Constr(&_vec, const_cast<char*>(foo), n, Normal, _LPTrue);
-
-//   this->_is_initialized = true;
-// #ifndef NDEBUG
-//   this->_is_closed = true;
-// #endif
-
-//   // Optionally zero out all components
-//   if (fast == false)
-//     this->zero ();
+  // Optionally zero out all components
+  if (fast == false)
+    this->zero ();
 
   return;
 }
@@ -596,16 +595,12 @@ template <typename T>
 inline
 void EigenSparseVector<T>::clear ()
 {
-  libmesh_not_implemented();
-//   if (this->initialized())
-//     {
-//       V_Destr (&_vec);
-//     }
-
-//   this->_is_initialized = false;
-// #ifndef NDEBUG
-//   this->_is_closed = false;
-// #endif
+  _vec.reset(NULL);
+  
+  this->_is_initialized = false;
+#ifndef NDEBUG
+  this->_is_closed = false;
+#endif
 }
 
 
@@ -613,11 +608,10 @@ void EigenSparseVector<T>::clear ()
 template <typename T> inline
 void EigenSparseVector<T>::zero ()
 {
-  libmesh_not_implemented();
-  // libmesh_assert (this->initialized());
-  // libmesh_assert (this->closed());
+  libmesh_assert (this->initialized());
+  libmesh_assert (this->closed());
 
-  // V_SetAllCmp (&_vec, 0.);
+  _vec->setZero();
 }
 
 
@@ -654,10 +648,9 @@ template <typename T>
 inline
 numeric_index_type EigenSparseVector<T>::size () const
 {
-  libmesh_not_implemented();
-  // libmesh_assert (this->initialized());
-
-  // return static_cast<numeric_index_type>(V_GetDim(const_cast<QVector*>(&_vec)));
+  libmesh_assert (this->initialized());
+  
+  return static_cast<numeric_index_type>(_vec->size());
 }
 
 
@@ -699,16 +692,16 @@ template <typename T>
 inline
 void EigenSparseVector<T>::set (const numeric_index_type i, const T value)
 {
+  libmesh_assert (this->initialized());
+  libmesh_assert_less (i, this->size());
+
   libmesh_not_implemented();
   
-//   libmesh_assert (this->initialized());
-//   libmesh_assert_less (i, this->size());
-
-//   V_SetCmp (&_vec, i+1, value);
-
-// #ifndef NDEBUG
-//   this->_is_closed = false;
-// #endif
+  // _vec->coeffRef(static_cast<eigen_idx_type>(i),0) = value;
+  
+#ifndef NDEBUG
+  this->_is_closed = false;
+#endif
 }
 
 
@@ -717,16 +710,16 @@ template <typename T>
 inline
 void EigenSparseVector<T>::add (const numeric_index_type i, const T value)
 {
+  libmesh_assert (this->initialized());
+  libmesh_assert_less (i, this->size());
+
   libmesh_not_implemented();
   
-//   libmesh_assert (this->initialized());
-//   libmesh_assert_less (i, this->size());
+  // _vec->coeffRef(i,0) += value;
 
-//   V_AddCmp (&_vec, i+1, value);
-
-// #ifndef NDEBUG
-//   this->_is_closed = false;
-// #endif
+#ifndef NDEBUG
+  this->_is_closed = false;
+#endif
 }
 
 
@@ -735,14 +728,15 @@ template <typename T>
 inline
 T EigenSparseVector<T>::operator() (const numeric_index_type i) const
 {
+  libmesh_assert (this->initialized());
+  libmesh_assert ( ((i >= this->first_local_index()) &&
+		    (i <  this->last_local_index())) );
+
+
   libmesh_not_implemented();
   
-  // libmesh_assert (this->initialized());
-  // libmesh_assert ( ((i >= this->first_local_index()) &&
-  // 	    (i <  this->last_local_index())) );
-
-
-  // return static_cast<T>(V_GetCmp(const_cast<QVector*>(&_vec), i+1));
+  // return static_cast<T>(_vec->coeff(i,0));
+  return 0;
 }
 
 
@@ -753,20 +747,17 @@ void EigenSparseVector<T>::swap (NumericVector<T> &other)
 {
   EigenSparseVector<T>& v = libmesh_cast_ref<EigenSparseVector<T>&>(other);
 
-  libmesh_not_implemented();
-  // // This is all grossly dependent on Eigen version...
+  {
+    AutoPtr<EigenSV> them(v._vec);
+    AutoPtr<EigenSV> me(this->_vec);
 
-  // std::swap(_vec.Name, v._vec.Name);
-  // std::swap(_vec.Dim, v._vec.Dim);
-  // std::swap(_vec.Instance, v._vec.Instance);
-  // std::swap(_vec.LockLevel, v._vec.LockLevel);
-  // std::swap(_vec.Multipl, v._vec.Multipl);
-  // std::swap(_vec.OwnData, v._vec.OwnData);
-
-  // // This should still be O(1), since _vec.Cmp is just a pointer to
-  // // data on the heap
-
-  // std::swap(_vec.Cmp, v._vec.Cmp);
+    this->_vec = them;
+    v._vec     = me;
+  }
+  
+  std::swap (this->_is_closed,      v._is_closed);
+  std::swap (this->_is_initialized, v._is_initialized);
+  std::swap (this->_type,           v._type);
 }
 
 
