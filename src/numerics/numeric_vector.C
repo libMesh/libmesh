@@ -26,6 +26,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/distributed_vector.h"
 #include "libmesh/laspack_vector.h"
+#include "libmesh/eigen_sparse_vector.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/trilinos_epetra_vector.h"
 #include "libmesh/shell_matrix.h"
@@ -71,6 +72,15 @@ NumericVector<T>::build(const SolverPackage solver_package)
     case TRILINOS_SOLVERS:
       {
 	AutoPtr<NumericVector<T> > ap(new EpetraVector<T>);
+	return ap;
+      }
+#endif
+
+
+#ifdef LIBMESH_HAVE_EIGEN
+    case EIGEN_SOLVERS:
+      {
+	AutoPtr<NumericVector<T> > ap(new EigenSparseVector<T>);
 	return ap;
       }
 #endif

@@ -17,36 +17,29 @@
 
 
 
-#ifndef LIBMESH_ENUM_SOLVER_PACKAGE_H
-#define LIBMESH_ENUM_SOLVER_PACKAGE_H
 
-/*
- * The \p libMeshEnums namespace is the namespace all \p enum definitions
- * should be put into.
- */
-
-// ------------------------------------------------------------
-// enum SolverType definition
-namespace libMeshEnums {
-
-  /**
-   * Defines an \p enum for various linear solver packages.
-   * This allows for run-time switching between solver packages
-   *
-   */
-  enum SolverPackage
-    {
-      PETSC_SOLVERS=0,
-      TRILINOS_SOLVERS,
-      LASPACK_SOLVERS,
-      SLEPC_SOLVERS,
-      EIGEN_SOLVERS,
-
-      INVALID_SOLVER_PACKAGE
-    };
-}
-
-using namespace libMeshEnums;
+#ifndef LIBMESH_EIGEN_SPARSE_CORE_H
+#define LIBMESH_EIGEN_SPARSE_CORE_H
 
 
-#endif // LIBMESH_ENUM_SOLVER_PACKAGE_H
+
+#include "libmesh/libmesh_common.h"
+
+#ifdef LIBMESH_HAVE_EIGEN
+
+// Local includes
+
+// C++ includes
+
+// Eigen includes
+
+namespace libMesh
+{
+
+
+  
+} // namespace libMesh
+
+
+#endif // #ifdef LIBMESH_HAVE_EIGEN
+#endif // LIBMESH_EIGEN_SPARSE_CORE_H

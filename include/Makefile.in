@@ -688,6 +688,10 @@ include_HEADERS = \
         numerics/dense_vector.h \
         numerics/dense_vector_base.h \
         numerics/distributed_vector.h \
+        numerics/eigen_preconditioner.h \
+        numerics/eigen_sparse_core.h \
+        numerics/eigen_sparse_matrix.h \
+        numerics/eigen_sparse_vector.h \
         numerics/fem_function_base.h \
         numerics/function_base.h \
         numerics/numeric_vector.h \
@@ -780,6 +784,7 @@ include_HEADERS = \
         solvers/adaptive_time_solver.h \
         solvers/diff_solver.h \
         solvers/eigen_solver.h \
+        solvers/eigen_sparse_linear_solver.h \
         solvers/eigen_time_solver.h \
         solvers/euler2_solver.h \
         solvers/euler_solver.h \

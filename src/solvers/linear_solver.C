@@ -24,6 +24,7 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/laspack_linear_solver.h"
+#include "libmesh/eigen_sparse_linear_solver.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/trilinos_aztec_linear_solver.h"
 #include "libmesh/preconditioner.h"
@@ -65,6 +66,15 @@ LinearSolver<T>::build(const SolverPackage solver_package)
     case TRILINOS_SOLVERS:
       {
 	AutoPtr<LinearSolver<T> > ap(new AztecLinearSolver<T>);
+	return ap;
+      }
+#endif
+
+
+#ifdef LIBMESH_HAVE_EIGEN
+    case EIGEN_SOLVERS:
+      {
+	AutoPtr<LinearSolver<T> > ap(new EigenSparseLinearSolver<T>);
 	return ap;
       }
 #endif
