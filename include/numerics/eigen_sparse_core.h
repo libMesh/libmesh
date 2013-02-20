@@ -28,15 +28,31 @@
 #ifdef LIBMESH_HAVE_EIGEN
 
 // Local includes
+#include "libmesh/id_types.h"
 
 // C++ includes
 
 // Eigen includes
+#include <Eigen/SparseCore>
+
+
 
 namespace libMesh
 {
 
+  // must be a signed type!!
+#if LIBMESH_DOF_ID_BYTES == 1
+  typedef int8_t eigen_idx_type;
+#elif LIBMESH_DOF_ID_BYTES == 2
+  typedef int16_t eigen_idx_type;
+#elif LIBMESH_DOF_ID_BYTES == 8
+  typedef int64_t eigen_idx_type;
+#else // LIBMESH_DOF_ID_BYTES = 4 (default)
+  typedef int32_t eigen_idx_type;
+#endif
 
+  typedef Eigen::SparseMatrix<Number, Eigen::ColMajor, eigen_idx_type> EigenSM;
+  typedef Eigen::SparseVector<Number, Eigen::ColMajor, eigen_idx_type> EigenSV;
   
 } // namespace libMesh
 

@@ -287,6 +287,11 @@ private:
   std::vector<std::vector<numeric_index_type>::const_iterator> _row_start;
 
   /**
+   * Actual Eigen::SparseMatrix<> we are wrapping.
+   */
+  EigenSM _mat;
+  
+  /**
    * Flag indicating if the matrix has been closed yet.
    */
   bool _closed;
