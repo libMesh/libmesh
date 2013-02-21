@@ -69,171 +69,75 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   START_LOG("solve()", "EigenSparseLinearSolver");
   this->init ();
 
-  // Make sure the data passed in are really in Laspack types
-  EigenSparseMatrix<T>* matrix   = libmesh_cast_ptr<EigenSparseMatrix<T>*>(&matrix_in);
-  EigenSparseVector<T>* solution = libmesh_cast_ptr<EigenSparseVector<T>*>(&solution_in);
-  EigenSparseVector<T>* rhs      = libmesh_cast_ptr<EigenSparseVector<T>*>(&rhs_in);
-
-  libmesh_not_implemented();
-
-  return std::make_pair(0,0.);
+  // Make sure the data passed in are really Eigen types
+  EigenSparseMatrix<T>& matrix   = libmesh_cast_ref<EigenSparseMatrix<T>&>(matrix_in);
+  EigenSparseVector<T>& solution = libmesh_cast_ref<EigenSparseVector<T>&>(solution_in);
+  EigenSparseVector<T>& rhs      = libmesh_cast_ref<EigenSparseVector<T>&>(rhs_in);
   
-  // // Zero-out the solution to prevent the solver from exiting in 0
-  // // iterations (?)
-  // //TODO:[BSK] Why does Laspack do this?  Comment out this and try ex13...
-  // solution->zero();
+  // Close the matrix and vectors in case this wasn't already done.
+  matrix.close();
+  solution.close();
+  rhs.close();
 
-  // // Close the matrix and vectors in case this wasn't already done.
-  // matrix->close ();
-  // solution->close ();
-  // rhs->close ();
+  std::pair<unsigned int, Real> retval(0,0.);
+  
+  // Solve the linear system
+  switch (this->_solver_type)
+    {
+      // Conjugate-Gradient
+    case CG:
+      {
+	Eigen::ConjugateGradient<EigenSM> solver (matrix._mat);
+	solver.setMaxIterations(m_its);
+	solver.setTolerance(tol);
+	solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
+	std::cout << "#iterations: " << solver.iterations() << std::endl;
+	std::cout << "estimated error: " << solver.error() << std::endl;
+	retval = std::make_pair(solver.iterations(), solver.error());
+  	break;
+      }
 
-  // // Set the preconditioner type
-  // this->set_laspack_preconditioner_type ();
+      // Bi-Conjugate Gradient Stabilized
+    case BICGSTAB:
+      {
+	Eigen::BiCGSTAB<EigenSM> solver (matrix._mat);
+	solver.setMaxIterations(m_its);
+	solver.setTolerance(tol);
+	solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
+	std::cout << "#iterations: " << solver.iterations() << std::endl;
+	std::cout << "estimated error: " << solver.error() << std::endl;
+	retval = std::make_pair(solver.iterations(), solver.error());
+  	break;
+      }
 
-  // // Set the solver tolerance
-  // SetRTCAccuracy (tol);
+    //   // Generalized Minimum Residual
+    // case GMRES:
+    //   {
+    // 	libmesh_not_implemented();
+    // 	break;
+    //   }
 
-  // // Solve the linear system
-  // switch (this->_solver_type)
-  //   {
-  //     // Conjugate-Gradient
-  //   case CG:
-  //     {
-  // 	CGIter (&matrix->_QMat,
-  // 		&solution->_vec,
-  // 		&rhs->_vec,
-  // 		m_its,
-  // 		_precond_type,
-  // 		1.);
-  // 	break;
-  //     }
+      // Unknown solver, use BICGSTAB
+    default:
+      {
+  	libMesh::err << "ERROR:  Unsupported Eigen Solver: "
+		     << this->_solver_type         << std::endl
+		     << "Continuing with BICGSTAB" << std::endl;
 
-  //     // Conjugate-Gradient Normalized
-  //   case CGN:
-  //     {
-  // 	CGNIter (&matrix->_QMat,
-  // 		 &solution->_vec,
-  // 		 &rhs->_vec,
-  // 		 m_its,
-  // 		 _precond_type,
-  // 		 1.);
-  // 	break;
-  //     }
+  	this->_solver_type = BICGSTAB;
 
-  //     // Conjugate-Gradient Squared
-  //   case CGS:
-  //     {
-  // 	CGSIter (&matrix->_QMat,
-  // 		 &solution->_vec,
-  // 		 &rhs->_vec,
-  // 		 m_its,
-  // 		 _precond_type,
-  // 		 1.);
-  // 	break;
-  //     }
-
-  //     // Bi-Conjugate Gradient
-  //   case BICG:
-  //     {
-  // 	BiCGIter (&matrix->_QMat,
-  // 		  &solution->_vec,
-  // 		  &rhs->_vec,
-  // 		  m_its,
-  // 		  _precond_type,
-  // 		  1.);
-  // 	break;
-  //     }
-
-  //     // Bi-Conjugate Gradient Stabilized
-  //   case BICGSTAB:
-  //     {
-  // 	BiCGSTABIter (&matrix->_QMat,
-  // 		      &solution->_vec,
-  // 		      &rhs->_vec,
-  // 		      m_its,
-  // 		      _precond_type,
-  // 		      1.);
-  // 	break;
-  //     }
-
-  //     // Quasi-Minimum Residual
-  //   case QMR:
-  //     {
-  // 	QMRIter (&matrix->_QMat,
-  // 		 &solution->_vec,
-  // 		 &rhs->_vec,
-  // 		 m_its,
-  // 		 _precond_type,
-  // 		 1.);
-  // 	break;
-  //     }
-
-  //     // Symmetric over-relaxation
-  //   case SSOR:
-  //     {
-  // 	SSORIter (&matrix->_QMat,
-  // 		  &solution->_vec,
-  // 		  &rhs->_vec,
-  // 		  m_its,
-  // 		  _precond_type,
-  // 		  1.);
-  // 	break;
-  //     }
-
-  //     // Jacobi Relaxation
-  //   case JACOBI:
-  //     {
-  // 	JacobiIter (&matrix->_QMat,
-  // 		    &solution->_vec,
-  // 		    &rhs->_vec,
-  // 		    m_its,
-  // 		    _precond_type,
-  // 		    1.);
-  // 	break;
-  //     }
-
-  //     // Generalized Minimum Residual
-  //   case GMRES:
-  //     {
-  // 	SetGMRESRestart (30);
-  // 	GMRESIter (&matrix->_QMat,
-  // 		   &solution->_vec,
-  // 		   &rhs->_vec,
-  // 		   m_its,
-  // 		   _precond_type,
-  // 		   1.);
-  // 	break;
-  //     }
-
-  //     // Unknown solver, use GMRES
-  //   default:
-  //     {
-  // 	libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
-  // 		      << this->_solver_type      << std::endl
-  // 		      << "Continuing with GMRES" << std::endl;
-
-  // 	this->_solver_type = GMRES;
-
-  // 	return this->solve (*matrix,
-  // 			    *solution,
-  // 			    *rhs,
-  // 			    tol,
-  // 			    m_its);
-  //     }
-  //   }
-
-  // // Check for an error
-  // if (LASResult() != LASOK)
-  //   {
-  //     libMesh::err << "ERROR:  LASPACK Error: " << std::endl;
-  //     WriteLASErrDescr(stdout);
-  //     libmesh_error();
-  //   }
-
-  // STOP_LOG("solve()", "EigenSparseLinearSolver");
-  // // Get the convergence step # and residual
-  // return std::make_pair(GetLastNoIter(), GetLastAccuracy());
+	STOP_LOG("solve()", "EigenSparseLinearSolver");
+	
+  	return this->solve (matrix,
+  			    solution,
+  			    rhs,
+  			    tol,
+  			    m_its);
+      }
+    }
+  
+  STOP_LOG("solve()", "EigenSparseLinearSolver");
+  return retval;
 }
 
 
@@ -246,173 +150,22 @@ EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
 					   const double tol,
 					   const unsigned int m_its)
 {
-  START_LOG("adjoint_solve()", "EigenSparseLinearSolver");
-  this->init ();
-
-  // Make sure the data passed in are really in Laspack types
-  EigenSparseMatrix<T>* matrix   = libmesh_cast_ptr<EigenSparseMatrix<T>*>(&matrix_in);
-  EigenSparseVector<T>* solution = libmesh_cast_ptr<EigenSparseVector<T>*>(&solution_in);
-  EigenSparseVector<T>* rhs      = libmesh_cast_ptr<EigenSparseVector<T>*>(&rhs_in);
-
-  libmesh_not_implemented();
-  return std::make_pair(0,0.);
   
-  // // Zero-out the solution to prevent the solver from exiting in 0
-  // // iterations (?)
-  // //TODO:[BSK] Why does Laspack do this?  Comment out this and try ex13...
-  // solution->zero();
+  START_LOG("adjoint_solve()", "EigenSparseLinearSolver");
 
-  // // Close the matrix and vectors in case this wasn't already done.
-  // matrix->close ();
-  // solution->close ();
-  // rhs->close ();
+  libmesh_experimental();
+  EigenSparseMatrix<T> mat_trans;
+  matrix_in.get_transpose(mat_trans);
+  
+  std::pair<unsigned int, Real> retval = this->solve (mat_trans,
+						      solution_in,
+						      rhs_in,
+						      tol,
+						      m_its);
+  
+  STOP_LOG("adjoint_solve()", "EigenSparseLinearSolver");
 
-  // // Set the preconditioner type
-  // this->set_laspack_preconditioner_type ();
-
-  // // Set the solver tolerance
-  // SetRTCAccuracy (tol);
-
-  // // Solve the linear system
-  // switch (this->_solver_type)
-  //   {
-  //     // Conjugate-Gradient
-  //   case CG:
-  //     {
-  // 	CGIter (Transp_Q(&matrix->_QMat),
-  // 		&solution->_vec,
-  // 		&rhs->_vec,
-  // 		m_its,
-  // 		_precond_type,
-  // 		1.);
-  // 	break;
-  //     }
-
-  //     // Conjugate-Gradient Normalized
-  //   case CGN:
-  //     {
-  // 	CGNIter (Transp_Q(&matrix->_QMat),
-  // 		 &solution->_vec,
-  // 		 &rhs->_vec,
-  // 		 m_its,
-  // 		 _precond_type,
-  // 		 1.);
-  // 	break;
-  //     }
-
-  //     // Conjugate-Gradient Squared
-  //   case CGS:
-  //     {
-  // 	CGSIter (Transp_Q(&matrix->_QMat),
-  // 		 &solution->_vec,
-  // 		 &rhs->_vec,
-  // 		 m_its,
-  // 		 _precond_type,
-  // 		 1.);
-  // 	break;
-  //     }
-
-  //     // Bi-Conjugate Gradient
-  //   case BICG:
-  //     {
-  // 	BiCGIter (Transp_Q(&matrix->_QMat),
-  // 		  &solution->_vec,
-  // 		  &rhs->_vec,
-  // 		  m_its,
-  // 		  _precond_type,
-  // 		  1.);
-  // 	break;
-  //     }
-
-  //     // Bi-Conjugate Gradient Stabilized
-  //   case BICGSTAB:
-  //     {
-  // 	BiCGSTABIter (Transp_Q(&matrix->_QMat),
-  // 		      &solution->_vec,
-  // 		      &rhs->_vec,
-  // 		      m_its,
-  // 		      _precond_type,
-  // 		      1.);
-  // 	break;
-  //     }
-
-  //     // Quasi-Minimum Residual
-  //   case QMR:
-  //     {
-  // 	QMRIter (Transp_Q(&matrix->_QMat),
-  // 		 &solution->_vec,
-  // 		 &rhs->_vec,
-  // 		 m_its,
-  // 		 _precond_type,
-  // 		 1.);
-  // 	break;
-  //     }
-
-  //     // Symmetric over-relaxation
-  //   case SSOR:
-  //     {
-  // 	SSORIter (Transp_Q(&matrix->_QMat),
-  // 		  &solution->_vec,
-  // 		  &rhs->_vec,
-  // 		  m_its,
-  // 		  _precond_type,
-  // 		  1.);
-  // 	break;
-  //     }
-
-  //     // Jacobi Relaxation
-  //   case JACOBI:
-  //     {
-  // 	JacobiIter (Transp_Q(&matrix->_QMat),
-  // 		    &solution->_vec,
-  // 		    &rhs->_vec,
-  // 		    m_its,
-  // 		    _precond_type,
-  // 		    1.);
-  // 	break;
-  //     }
-
-  //     // Generalized Minimum Residual
-  //   case GMRES:
-  //     {
-  // 	SetGMRESRestart (30);
-  // 	GMRESIter (Transp_Q(&matrix->_QMat),
-  // 		   &solution->_vec,
-  // 		   &rhs->_vec,
-  // 		   m_its,
-  // 		   _precond_type,
-  // 		   1.);
-  // 	break;
-  //     }
-
-  //     // Unknown solver, use GMRES
-  //   default:
-  //     {
-  // 	libMesh::err << "ERROR:  Unsupported LASPACK Solver: "
-  // 		      << this->_solver_type      << std::endl
-  // 		      << "Continuing with GMRES" << std::endl;
-
-  // 	this->_solver_type = GMRES;
-
-  // 	return this->solve (*matrix,
-  // 			    *solution,
-  // 			    *rhs,
-  // 			    tol,
-  // 			    m_its);
-  //     }
-  //   }
-
-  // // Check for an error
-  // if (LASResult() != LASOK)
-  //   {
-  //     libMesh::err << "ERROR:  LASPACK Error: " << std::endl;
-  //     WriteLASErrDescr(stdout);
-  //     libmesh_error();
-  //   }
-
-  // STOP_LOG("adjoint_solve()", "EigenSparseLinearSolver");
-  // // Get the convergence step # and residual
-  // return std::make_pair(GetLastNoIter(), GetLastAccuracy());
+  return retval;
 }
 
 
