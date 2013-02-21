@@ -431,7 +431,6 @@ vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 
 # TODO: Automate maintenance of this list.
-# Note: this list is valid for eigen 3.1.0.
 # for file in `find Eigen -type f | grep -v CMakeLists.txt` ; do echo "        $file \\" ; done
 nobase_include_HEADERS = \
         Eigen/Array \
@@ -956,7 +955,7 @@ uninstall-am: uninstall-nobase_includeHEADERS
 	tags uninstall uninstall-am uninstall-nobase_includeHEADERS
 
 
-# definition of include_HEADERS - get from auto-maint# omit from 'make TAGS'
+# omit from 'make TAGS'
 TAGS:
 tags:
 

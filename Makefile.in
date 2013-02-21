@@ -309,9 +309,13 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/numerics/dense_matrix_blas_lapack.C \
 	src/numerics/dense_submatrix.C src/numerics/dense_subvector.C \
 	src/numerics/dense_vector.C src/numerics/dense_vector_base.C \
-	src/numerics/distributed_vector.C src/numerics/function_base.C \
-	src/numerics/laspack_matrix.C src/numerics/laspack_vector.C \
-	src/numerics/numeric_vector.C src/numerics/petsc_matrix.C \
+	src/numerics/distributed_vector.C \
+	src/numerics/eigen_preconditioner.C \
+	src/numerics/eigen_sparse_matrix.C \
+	src/numerics/eigen_sparse_vector.C \
+	src/numerics/function_base.C src/numerics/laspack_matrix.C \
+	src/numerics/laspack_vector.C src/numerics/numeric_vector.C \
+	src/numerics/petsc_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_vector.C src/numerics/preconditioner.C \
 	src/numerics/sparse_matrix.C \
@@ -397,9 +401,10 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solution_transfer/meshfunction_solution_transfer.C \
 	src/solution_transfer/solution_transfer.C \
 	src/solvers/adaptive_time_solver.C src/solvers/diff_solver.C \
-	src/solvers/eigen_solver.C src/solvers/eigen_time_solver.C \
-	src/solvers/euler2_solver.C src/solvers/euler_solver.C \
-	src/solvers/laspack_linear_solver.C \
+	src/solvers/eigen_solver.C \
+	src/solvers/eigen_sparse_linear_solver.C \
+	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
+	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
@@ -667,6 +672,9 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/numerics/libmesh_dbg_la-dense_vector.lo \
 	src/numerics/libmesh_dbg_la-dense_vector_base.lo \
 	src/numerics/libmesh_dbg_la-distributed_vector.lo \
+	src/numerics/libmesh_dbg_la-eigen_preconditioner.lo \
+	src/numerics/libmesh_dbg_la-eigen_sparse_matrix.lo \
+	src/numerics/libmesh_dbg_la-eigen_sparse_vector.lo \
 	src/numerics/libmesh_dbg_la-function_base.lo \
 	src/numerics/libmesh_dbg_la-laspack_matrix.lo \
 	src/numerics/libmesh_dbg_la-laspack_vector.lo \
@@ -767,6 +775,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/solvers/libmesh_dbg_la-adaptive_time_solver.lo \
 	src/solvers/libmesh_dbg_la-diff_solver.lo \
 	src/solvers/libmesh_dbg_la-eigen_solver.lo \
+	src/solvers/libmesh_dbg_la-eigen_sparse_linear_solver.lo \
 	src/solvers/libmesh_dbg_la-eigen_time_solver.lo \
 	src/solvers/libmesh_dbg_la-euler2_solver.lo \
 	src/solvers/libmesh_dbg_la-euler_solver.lo \
@@ -973,9 +982,13 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/numerics/dense_matrix_blas_lapack.C \
 	src/numerics/dense_submatrix.C src/numerics/dense_subvector.C \
 	src/numerics/dense_vector.C src/numerics/dense_vector_base.C \
-	src/numerics/distributed_vector.C src/numerics/function_base.C \
-	src/numerics/laspack_matrix.C src/numerics/laspack_vector.C \
-	src/numerics/numeric_vector.C src/numerics/petsc_matrix.C \
+	src/numerics/distributed_vector.C \
+	src/numerics/eigen_preconditioner.C \
+	src/numerics/eigen_sparse_matrix.C \
+	src/numerics/eigen_sparse_vector.C \
+	src/numerics/function_base.C src/numerics/laspack_matrix.C \
+	src/numerics/laspack_vector.C src/numerics/numeric_vector.C \
+	src/numerics/petsc_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_vector.C src/numerics/preconditioner.C \
 	src/numerics/sparse_matrix.C \
@@ -1061,9 +1074,10 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solution_transfer/meshfunction_solution_transfer.C \
 	src/solution_transfer/solution_transfer.C \
 	src/solvers/adaptive_time_solver.C src/solvers/diff_solver.C \
-	src/solvers/eigen_solver.C src/solvers/eigen_time_solver.C \
-	src/solvers/euler2_solver.C src/solvers/euler_solver.C \
-	src/solvers/laspack_linear_solver.C \
+	src/solvers/eigen_solver.C \
+	src/solvers/eigen_sparse_linear_solver.C \
+	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
+	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
@@ -1330,6 +1344,9 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/numerics/libmesh_devel_la-dense_vector.lo \
 	src/numerics/libmesh_devel_la-dense_vector_base.lo \
 	src/numerics/libmesh_devel_la-distributed_vector.lo \
+	src/numerics/libmesh_devel_la-eigen_preconditioner.lo \
+	src/numerics/libmesh_devel_la-eigen_sparse_matrix.lo \
+	src/numerics/libmesh_devel_la-eigen_sparse_vector.lo \
 	src/numerics/libmesh_devel_la-function_base.lo \
 	src/numerics/libmesh_devel_la-laspack_matrix.lo \
 	src/numerics/libmesh_devel_la-laspack_vector.lo \
@@ -1430,6 +1447,7 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/solvers/libmesh_devel_la-adaptive_time_solver.lo \
 	src/solvers/libmesh_devel_la-diff_solver.lo \
 	src/solvers/libmesh_devel_la-eigen_solver.lo \
+	src/solvers/libmesh_devel_la-eigen_sparse_linear_solver.lo \
 	src/solvers/libmesh_devel_la-eigen_time_solver.lo \
 	src/solvers/libmesh_devel_la-euler2_solver.lo \
 	src/solvers/libmesh_devel_la-euler_solver.lo \
@@ -1633,9 +1651,13 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/numerics/dense_matrix_blas_lapack.C \
 	src/numerics/dense_submatrix.C src/numerics/dense_subvector.C \
 	src/numerics/dense_vector.C src/numerics/dense_vector_base.C \
-	src/numerics/distributed_vector.C src/numerics/function_base.C \
-	src/numerics/laspack_matrix.C src/numerics/laspack_vector.C \
-	src/numerics/numeric_vector.C src/numerics/petsc_matrix.C \
+	src/numerics/distributed_vector.C \
+	src/numerics/eigen_preconditioner.C \
+	src/numerics/eigen_sparse_matrix.C \
+	src/numerics/eigen_sparse_vector.C \
+	src/numerics/function_base.C src/numerics/laspack_matrix.C \
+	src/numerics/laspack_vector.C src/numerics/numeric_vector.C \
+	src/numerics/petsc_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_vector.C src/numerics/preconditioner.C \
 	src/numerics/sparse_matrix.C \
@@ -1721,9 +1743,10 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solution_transfer/meshfunction_solution_transfer.C \
 	src/solution_transfer/solution_transfer.C \
 	src/solvers/adaptive_time_solver.C src/solvers/diff_solver.C \
-	src/solvers/eigen_solver.C src/solvers/eigen_time_solver.C \
-	src/solvers/euler2_solver.C src/solvers/euler_solver.C \
-	src/solvers/laspack_linear_solver.C \
+	src/solvers/eigen_solver.C \
+	src/solvers/eigen_sparse_linear_solver.C \
+	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
+	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
@@ -1990,6 +2013,9 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/numerics/libmesh_oprof_la-dense_vector.lo \
 	src/numerics/libmesh_oprof_la-dense_vector_base.lo \
 	src/numerics/libmesh_oprof_la-distributed_vector.lo \
+	src/numerics/libmesh_oprof_la-eigen_preconditioner.lo \
+	src/numerics/libmesh_oprof_la-eigen_sparse_matrix.lo \
+	src/numerics/libmesh_oprof_la-eigen_sparse_vector.lo \
 	src/numerics/libmesh_oprof_la-function_base.lo \
 	src/numerics/libmesh_oprof_la-laspack_matrix.lo \
 	src/numerics/libmesh_oprof_la-laspack_vector.lo \
@@ -2090,6 +2116,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/solvers/libmesh_oprof_la-adaptive_time_solver.lo \
 	src/solvers/libmesh_oprof_la-diff_solver.lo \
 	src/solvers/libmesh_oprof_la-eigen_solver.lo \
+	src/solvers/libmesh_oprof_la-eigen_sparse_linear_solver.lo \
 	src/solvers/libmesh_oprof_la-eigen_time_solver.lo \
 	src/solvers/libmesh_oprof_la-euler2_solver.lo \
 	src/solvers/libmesh_oprof_la-euler_solver.lo \
@@ -2293,9 +2320,13 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/numerics/dense_matrix_blas_lapack.C \
 	src/numerics/dense_submatrix.C src/numerics/dense_subvector.C \
 	src/numerics/dense_vector.C src/numerics/dense_vector_base.C \
-	src/numerics/distributed_vector.C src/numerics/function_base.C \
-	src/numerics/laspack_matrix.C src/numerics/laspack_vector.C \
-	src/numerics/numeric_vector.C src/numerics/petsc_matrix.C \
+	src/numerics/distributed_vector.C \
+	src/numerics/eigen_preconditioner.C \
+	src/numerics/eigen_sparse_matrix.C \
+	src/numerics/eigen_sparse_vector.C \
+	src/numerics/function_base.C src/numerics/laspack_matrix.C \
+	src/numerics/laspack_vector.C src/numerics/numeric_vector.C \
+	src/numerics/petsc_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_vector.C src/numerics/preconditioner.C \
 	src/numerics/sparse_matrix.C \
@@ -2381,9 +2412,10 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solution_transfer/meshfunction_solution_transfer.C \
 	src/solution_transfer/solution_transfer.C \
 	src/solvers/adaptive_time_solver.C src/solvers/diff_solver.C \
-	src/solvers/eigen_solver.C src/solvers/eigen_time_solver.C \
-	src/solvers/euler2_solver.C src/solvers/euler_solver.C \
-	src/solvers/laspack_linear_solver.C \
+	src/solvers/eigen_solver.C \
+	src/solvers/eigen_sparse_linear_solver.C \
+	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
+	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
@@ -2650,6 +2682,9 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/numerics/libmesh_opt_la-dense_vector.lo \
 	src/numerics/libmesh_opt_la-dense_vector_base.lo \
 	src/numerics/libmesh_opt_la-distributed_vector.lo \
+	src/numerics/libmesh_opt_la-eigen_preconditioner.lo \
+	src/numerics/libmesh_opt_la-eigen_sparse_matrix.lo \
+	src/numerics/libmesh_opt_la-eigen_sparse_vector.lo \
 	src/numerics/libmesh_opt_la-function_base.lo \
 	src/numerics/libmesh_opt_la-laspack_matrix.lo \
 	src/numerics/libmesh_opt_la-laspack_vector.lo \
@@ -2750,6 +2785,7 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/solvers/libmesh_opt_la-adaptive_time_solver.lo \
 	src/solvers/libmesh_opt_la-diff_solver.lo \
 	src/solvers/libmesh_opt_la-eigen_solver.lo \
+	src/solvers/libmesh_opt_la-eigen_sparse_linear_solver.lo \
 	src/solvers/libmesh_opt_la-eigen_time_solver.lo \
 	src/solvers/libmesh_opt_la-euler2_solver.lo \
 	src/solvers/libmesh_opt_la-euler_solver.lo \
@@ -2952,9 +2988,13 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/numerics/dense_matrix_blas_lapack.C \
 	src/numerics/dense_submatrix.C src/numerics/dense_subvector.C \
 	src/numerics/dense_vector.C src/numerics/dense_vector_base.C \
-	src/numerics/distributed_vector.C src/numerics/function_base.C \
-	src/numerics/laspack_matrix.C src/numerics/laspack_vector.C \
-	src/numerics/numeric_vector.C src/numerics/petsc_matrix.C \
+	src/numerics/distributed_vector.C \
+	src/numerics/eigen_preconditioner.C \
+	src/numerics/eigen_sparse_matrix.C \
+	src/numerics/eigen_sparse_vector.C \
+	src/numerics/function_base.C src/numerics/laspack_matrix.C \
+	src/numerics/laspack_vector.C src/numerics/numeric_vector.C \
+	src/numerics/petsc_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_vector.C src/numerics/preconditioner.C \
 	src/numerics/sparse_matrix.C \
@@ -3040,9 +3080,10 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/solution_transfer/meshfunction_solution_transfer.C \
 	src/solution_transfer/solution_transfer.C \
 	src/solvers/adaptive_time_solver.C src/solvers/diff_solver.C \
-	src/solvers/eigen_solver.C src/solvers/eigen_time_solver.C \
-	src/solvers/euler2_solver.C src/solvers/euler_solver.C \
-	src/solvers/laspack_linear_solver.C \
+	src/solvers/eigen_solver.C \
+	src/solvers/eigen_sparse_linear_solver.C \
+	src/solvers/eigen_time_solver.C src/solvers/euler2_solver.C \
+	src/solvers/euler_solver.C src/solvers/laspack_linear_solver.C \
 	src/solvers/linear_solver.C \
 	src/solvers/memory_solution_history.C \
 	src/solvers/newton_solver.C src/solvers/no_solution_history.C \
@@ -3309,6 +3350,9 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/numerics/libmesh_prof_la-dense_vector.lo \
 	src/numerics/libmesh_prof_la-dense_vector_base.lo \
 	src/numerics/libmesh_prof_la-distributed_vector.lo \
+	src/numerics/libmesh_prof_la-eigen_preconditioner.lo \
+	src/numerics/libmesh_prof_la-eigen_sparse_matrix.lo \
+	src/numerics/libmesh_prof_la-eigen_sparse_vector.lo \
 	src/numerics/libmesh_prof_la-function_base.lo \
 	src/numerics/libmesh_prof_la-laspack_matrix.lo \
 	src/numerics/libmesh_prof_la-laspack_vector.lo \
@@ -3409,6 +3453,7 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/solvers/libmesh_prof_la-adaptive_time_solver.lo \
 	src/solvers/libmesh_prof_la-diff_solver.lo \
 	src/solvers/libmesh_prof_la-eigen_solver.lo \
+	src/solvers/libmesh_prof_la-eigen_sparse_linear_solver.lo \
 	src/solvers/libmesh_prof_la-eigen_time_solver.lo \
 	src/solvers/libmesh_prof_la-euler2_solver.lo \
 	src/solvers/libmesh_prof_la-euler_solver.lo \
@@ -4479,6 +4524,9 @@ libmesh_SOURCES = \
         src/numerics/dense_vector.C \
         src/numerics/dense_vector_base.C \
         src/numerics/distributed_vector.C \
+        src/numerics/eigen_preconditioner.C \
+        src/numerics/eigen_sparse_matrix.C \
+        src/numerics/eigen_sparse_vector.C \
         src/numerics/function_base.C \
         src/numerics/laspack_matrix.C \
         src/numerics/laspack_vector.C \
@@ -4579,6 +4627,7 @@ libmesh_SOURCES = \
         src/solvers/adaptive_time_solver.C \
         src/solvers/diff_solver.C \
         src/solvers/eigen_solver.C \
+        src/solvers/eigen_sparse_linear_solver.C \
         src/solvers/eigen_time_solver.C \
         src/solvers/euler2_solver.C \
         src/solvers/euler_solver.C \
@@ -5454,6 +5503,15 @@ src/numerics/libmesh_dbg_la-dense_vector_base.lo:  \
 src/numerics/libmesh_dbg_la-distributed_vector.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_dbg_la-eigen_preconditioner.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_dbg_la-eigen_sparse_matrix.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_dbg_la-eigen_sparse_vector.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_dbg_la-function_base.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -5792,6 +5850,9 @@ src/solvers/libmesh_dbg_la-diff_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-eigen_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_dbg_la-eigen_sparse_linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_dbg_la-eigen_time_solver.lo:  \
@@ -6456,6 +6517,15 @@ src/numerics/libmesh_devel_la-dense_vector_base.lo:  \
 src/numerics/libmesh_devel_la-distributed_vector.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_devel_la-eigen_preconditioner.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_devel_la-eigen_sparse_matrix.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_devel_la-eigen_sparse_vector.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_devel_la-function_base.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -6753,6 +6823,9 @@ src/solvers/libmesh_devel_la-diff_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-eigen_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_devel_la-eigen_sparse_linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_devel_la-eigen_time_solver.lo:  \
@@ -7407,6 +7480,15 @@ src/numerics/libmesh_oprof_la-dense_vector_base.lo:  \
 src/numerics/libmesh_oprof_la-distributed_vector.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_oprof_la-eigen_preconditioner.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_oprof_la-eigen_sparse_matrix.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_oprof_la-eigen_sparse_vector.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_oprof_la-function_base.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -7704,6 +7786,9 @@ src/solvers/libmesh_oprof_la-diff_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_oprof_la-eigen_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_oprof_la-eigen_sparse_linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_oprof_la-eigen_time_solver.lo:  \
@@ -8358,6 +8443,15 @@ src/numerics/libmesh_opt_la-dense_vector_base.lo:  \
 src/numerics/libmesh_opt_la-distributed_vector.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_opt_la-eigen_preconditioner.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_opt_la-eigen_sparse_matrix.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_opt_la-eigen_sparse_vector.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_opt_la-function_base.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -8654,6 +8748,9 @@ src/solvers/libmesh_opt_la-diff_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-eigen_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_opt_la-eigen_sparse_linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_opt_la-eigen_time_solver.lo:  \
@@ -9306,6 +9403,15 @@ src/numerics/libmesh_prof_la-dense_vector_base.lo:  \
 src/numerics/libmesh_prof_la-distributed_vector.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_prof_la-eigen_preconditioner.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_prof_la-eigen_sparse_matrix.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_prof_la-eigen_sparse_vector.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_prof_la-function_base.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -9602,6 +9708,9 @@ src/solvers/libmesh_prof_la-diff_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_prof_la-eigen_solver.lo:  \
+	src/solvers/$(am__dirstamp) \
+	src/solvers/$(DEPDIR)/$(am__dirstamp)
+src/solvers/libmesh_prof_la-eigen_sparse_linear_solver.lo:  \
 	src/solvers/$(am__dirstamp) \
 	src/solvers/$(DEPDIR)/$(am__dirstamp)
 src/solvers/libmesh_prof_la-eigen_time_solver.lo:  \
@@ -11246,6 +11355,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-dense_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-dense_vector_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-distributed_vector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_preconditioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_matrix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-function_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-laspack_matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-laspack_vector.Plo@am__quote@
@@ -11274,6 +11386,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-dense_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-dense_vector_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-distributed_vector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_preconditioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_sparse_matrix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_sparse_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-function_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-laspack_matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-laspack_vector.Plo@am__quote@
@@ -11302,6 +11417,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-dense_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-dense_vector_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-distributed_vector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_preconditioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_matrix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-function_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-laspack_matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-laspack_vector.Plo@am__quote@
@@ -11330,6 +11448,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-dense_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-dense_vector_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-distributed_vector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_preconditioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_sparse_matrix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_sparse_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-function_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-laspack_matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-laspack_vector.Plo@am__quote@
@@ -11358,6 +11479,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-dense_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-dense_vector_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-distributed_vector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_preconditioner.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_sparse_matrix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_sparse_vector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-function_base.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-laspack_matrix.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-laspack_vector.Plo@am__quote@
@@ -11774,6 +11898,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-adaptive_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-eigen_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_dbg_la-euler_solver.Plo@am__quote@
@@ -11798,6 +11923,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-adaptive_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-eigen_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-eigen_sparse_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_devel_la-euler_solver.Plo@am__quote@
@@ -11822,6 +11948,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-adaptive_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-eigen_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_oprof_la-euler_solver.Plo@am__quote@
@@ -11846,6 +11973,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-adaptive_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-eigen_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-eigen_sparse_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_opt_la-euler_solver.Plo@am__quote@
@@ -11870,6 +11998,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-adaptive_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-diff_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-eigen_solver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-eigen_sparse_linear_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-eigen_time_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-euler2_solver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/solvers/$(DEPDIR)/libmesh_prof_la-euler_solver.Plo@am__quote@
@@ -13713,6 +13842,27 @@ src/numerics/libmesh_dbg_la-distributed_vector.lo: src/numerics/distributed_vect
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_dbg_la-distributed_vector.lo `test -f 'src/numerics/distributed_vector.C' || echo '$(srcdir)/'`src/numerics/distributed_vector.C
 
+src/numerics/libmesh_dbg_la-eigen_preconditioner.lo: src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_dbg_la-eigen_preconditioner.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_preconditioner.Tpo -c -o src/numerics/libmesh_dbg_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_preconditioner.Tpo src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_preconditioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_preconditioner.C' object='src/numerics/libmesh_dbg_la-eigen_preconditioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_dbg_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+
+src/numerics/libmesh_dbg_la-eigen_sparse_matrix.lo: src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_dbg_la-eigen_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_matrix.Tpo -c -o src/numerics/libmesh_dbg_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_matrix.C' object='src/numerics/libmesh_dbg_la-eigen_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_dbg_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+
+src/numerics/libmesh_dbg_la-eigen_sparse_vector.lo: src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_dbg_la-eigen_sparse_vector.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_vector.Tpo -c -o src/numerics/libmesh_dbg_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_vector.Tpo src/numerics/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_vector.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_vector.C' object='src/numerics/libmesh_dbg_la-eigen_sparse_vector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_dbg_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+
 src/numerics/libmesh_dbg_la-function_base.lo: src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_dbg_la-function_base.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_dbg_la-function_base.Tpo -c -o src/numerics/libmesh_dbg_la-function_base.lo `test -f 'src/numerics/function_base.C' || echo '$(srcdir)/'`src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_dbg_la-function_base.Tpo src/numerics/$(DEPDIR)/libmesh_dbg_la-function_base.Plo
@@ -14412,6 +14562,13 @@ src/solvers/libmesh_dbg_la-eigen_solver.lo: src/solvers/eigen_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_solver.C' object='src/solvers/libmesh_dbg_la-eigen_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-eigen_solver.lo `test -f 'src/solvers/eigen_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_solver.C
+
+src/solvers/libmesh_dbg_la-eigen_sparse_linear_solver.lo: src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-eigen_sparse_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_linear_solver.Tpo -c -o src/solvers/libmesh_dbg_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_linear_solver.Tpo src/solvers/$(DEPDIR)/libmesh_dbg_la-eigen_sparse_linear_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_sparse_linear_solver.C' object='src/solvers/libmesh_dbg_la-eigen_sparse_linear_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_dbg_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
 
 src/solvers/libmesh_dbg_la-eigen_time_solver.lo: src/solvers/eigen_time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_dbg_la-eigen_time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_dbg_la-eigen_time_solver.Tpo -c -o src/solvers/libmesh_dbg_la-eigen_time_solver.lo `test -f 'src/solvers/eigen_time_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_time_solver.C
@@ -16443,6 +16600,27 @@ src/numerics/libmesh_devel_la-distributed_vector.lo: src/numerics/distributed_ve
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_devel_la-distributed_vector.lo `test -f 'src/numerics/distributed_vector.C' || echo '$(srcdir)/'`src/numerics/distributed_vector.C
 
+src/numerics/libmesh_devel_la-eigen_preconditioner.lo: src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_devel_la-eigen_preconditioner.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_preconditioner.Tpo -c -o src/numerics/libmesh_devel_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_preconditioner.Tpo src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_preconditioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_preconditioner.C' object='src/numerics/libmesh_devel_la-eigen_preconditioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_devel_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+
+src/numerics/libmesh_devel_la-eigen_sparse_matrix.lo: src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_devel_la-eigen_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_sparse_matrix.Tpo -c -o src/numerics/libmesh_devel_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_matrix.C' object='src/numerics/libmesh_devel_la-eigen_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_devel_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+
+src/numerics/libmesh_devel_la-eigen_sparse_vector.lo: src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_devel_la-eigen_sparse_vector.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_sparse_vector.Tpo -c -o src/numerics/libmesh_devel_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_sparse_vector.Tpo src/numerics/$(DEPDIR)/libmesh_devel_la-eigen_sparse_vector.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_vector.C' object='src/numerics/libmesh_devel_la-eigen_sparse_vector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_devel_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+
 src/numerics/libmesh_devel_la-function_base.lo: src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_devel_la-function_base.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_devel_la-function_base.Tpo -c -o src/numerics/libmesh_devel_la-function_base.lo `test -f 'src/numerics/function_base.C' || echo '$(srcdir)/'`src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_devel_la-function_base.Tpo src/numerics/$(DEPDIR)/libmesh_devel_la-function_base.Plo
@@ -17142,6 +17320,13 @@ src/solvers/libmesh_devel_la-eigen_solver.lo: src/solvers/eigen_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_solver.C' object='src/solvers/libmesh_devel_la-eigen_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-eigen_solver.lo `test -f 'src/solvers/eigen_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_solver.C
+
+src/solvers/libmesh_devel_la-eigen_sparse_linear_solver.lo: src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-eigen_sparse_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-eigen_sparse_linear_solver.Tpo -c -o src/solvers/libmesh_devel_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_devel_la-eigen_sparse_linear_solver.Tpo src/solvers/$(DEPDIR)/libmesh_devel_la-eigen_sparse_linear_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_sparse_linear_solver.C' object='src/solvers/libmesh_devel_la-eigen_sparse_linear_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_devel_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
 
 src/solvers/libmesh_devel_la-eigen_time_solver.lo: src/solvers/eigen_time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_devel_la-eigen_time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_devel_la-eigen_time_solver.Tpo -c -o src/solvers/libmesh_devel_la-eigen_time_solver.lo `test -f 'src/solvers/eigen_time_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_time_solver.C
@@ -19173,6 +19358,27 @@ src/numerics/libmesh_oprof_la-distributed_vector.lo: src/numerics/distributed_ve
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_oprof_la-distributed_vector.lo `test -f 'src/numerics/distributed_vector.C' || echo '$(srcdir)/'`src/numerics/distributed_vector.C
 
+src/numerics/libmesh_oprof_la-eigen_preconditioner.lo: src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_oprof_la-eigen_preconditioner.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_preconditioner.Tpo -c -o src/numerics/libmesh_oprof_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_preconditioner.Tpo src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_preconditioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_preconditioner.C' object='src/numerics/libmesh_oprof_la-eigen_preconditioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_oprof_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+
+src/numerics/libmesh_oprof_la-eigen_sparse_matrix.lo: src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_oprof_la-eigen_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_matrix.Tpo -c -o src/numerics/libmesh_oprof_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_matrix.C' object='src/numerics/libmesh_oprof_la-eigen_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_oprof_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+
+src/numerics/libmesh_oprof_la-eigen_sparse_vector.lo: src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_oprof_la-eigen_sparse_vector.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_vector.Tpo -c -o src/numerics/libmesh_oprof_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_vector.Tpo src/numerics/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_vector.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_vector.C' object='src/numerics/libmesh_oprof_la-eigen_sparse_vector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_oprof_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+
 src/numerics/libmesh_oprof_la-function_base.lo: src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_oprof_la-function_base.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_oprof_la-function_base.Tpo -c -o src/numerics/libmesh_oprof_la-function_base.lo `test -f 'src/numerics/function_base.C' || echo '$(srcdir)/'`src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_oprof_la-function_base.Tpo src/numerics/$(DEPDIR)/libmesh_oprof_la-function_base.Plo
@@ -19872,6 +20078,13 @@ src/solvers/libmesh_oprof_la-eigen_solver.lo: src/solvers/eigen_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_solver.C' object='src/solvers/libmesh_oprof_la-eigen_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-eigen_solver.lo `test -f 'src/solvers/eigen_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_solver.C
+
+src/solvers/libmesh_oprof_la-eigen_sparse_linear_solver.lo: src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-eigen_sparse_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_linear_solver.Tpo -c -o src/solvers/libmesh_oprof_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_linear_solver.Tpo src/solvers/$(DEPDIR)/libmesh_oprof_la-eigen_sparse_linear_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_sparse_linear_solver.C' object='src/solvers/libmesh_oprof_la-eigen_sparse_linear_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_oprof_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
 
 src/solvers/libmesh_oprof_la-eigen_time_solver.lo: src/solvers/eigen_time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_oprof_la-eigen_time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_oprof_la-eigen_time_solver.Tpo -c -o src/solvers/libmesh_oprof_la-eigen_time_solver.lo `test -f 'src/solvers/eigen_time_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_time_solver.C
@@ -21903,6 +22116,27 @@ src/numerics/libmesh_opt_la-distributed_vector.lo: src/numerics/distributed_vect
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_opt_la-distributed_vector.lo `test -f 'src/numerics/distributed_vector.C' || echo '$(srcdir)/'`src/numerics/distributed_vector.C
 
+src/numerics/libmesh_opt_la-eigen_preconditioner.lo: src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_opt_la-eigen_preconditioner.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_preconditioner.Tpo -c -o src/numerics/libmesh_opt_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_preconditioner.Tpo src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_preconditioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_preconditioner.C' object='src/numerics/libmesh_opt_la-eigen_preconditioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_opt_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+
+src/numerics/libmesh_opt_la-eigen_sparse_matrix.lo: src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_opt_la-eigen_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_sparse_matrix.Tpo -c -o src/numerics/libmesh_opt_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_matrix.C' object='src/numerics/libmesh_opt_la-eigen_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_opt_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+
+src/numerics/libmesh_opt_la-eigen_sparse_vector.lo: src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_opt_la-eigen_sparse_vector.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_sparse_vector.Tpo -c -o src/numerics/libmesh_opt_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_sparse_vector.Tpo src/numerics/$(DEPDIR)/libmesh_opt_la-eigen_sparse_vector.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_vector.C' object='src/numerics/libmesh_opt_la-eigen_sparse_vector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_opt_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+
 src/numerics/libmesh_opt_la-function_base.lo: src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_opt_la-function_base.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_opt_la-function_base.Tpo -c -o src/numerics/libmesh_opt_la-function_base.lo `test -f 'src/numerics/function_base.C' || echo '$(srcdir)/'`src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_opt_la-function_base.Tpo src/numerics/$(DEPDIR)/libmesh_opt_la-function_base.Plo
@@ -22602,6 +22836,13 @@ src/solvers/libmesh_opt_la-eigen_solver.lo: src/solvers/eigen_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_solver.C' object='src/solvers/libmesh_opt_la-eigen_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-eigen_solver.lo `test -f 'src/solvers/eigen_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_solver.C
+
+src/solvers/libmesh_opt_la-eigen_sparse_linear_solver.lo: src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-eigen_sparse_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-eigen_sparse_linear_solver.Tpo -c -o src/solvers/libmesh_opt_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_opt_la-eigen_sparse_linear_solver.Tpo src/solvers/$(DEPDIR)/libmesh_opt_la-eigen_sparse_linear_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_sparse_linear_solver.C' object='src/solvers/libmesh_opt_la-eigen_sparse_linear_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_opt_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
 
 src/solvers/libmesh_opt_la-eigen_time_solver.lo: src/solvers/eigen_time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_opt_la-eigen_time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_opt_la-eigen_time_solver.Tpo -c -o src/solvers/libmesh_opt_la-eigen_time_solver.lo `test -f 'src/solvers/eigen_time_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_time_solver.C
@@ -24633,6 +24874,27 @@ src/numerics/libmesh_prof_la-distributed_vector.lo: src/numerics/distributed_vec
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_prof_la-distributed_vector.lo `test -f 'src/numerics/distributed_vector.C' || echo '$(srcdir)/'`src/numerics/distributed_vector.C
 
+src/numerics/libmesh_prof_la-eigen_preconditioner.lo: src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_prof_la-eigen_preconditioner.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_preconditioner.Tpo -c -o src/numerics/libmesh_prof_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_preconditioner.Tpo src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_preconditioner.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_preconditioner.C' object='src/numerics/libmesh_prof_la-eigen_preconditioner.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_prof_la-eigen_preconditioner.lo `test -f 'src/numerics/eigen_preconditioner.C' || echo '$(srcdir)/'`src/numerics/eigen_preconditioner.C
+
+src/numerics/libmesh_prof_la-eigen_sparse_matrix.lo: src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_prof_la-eigen_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_sparse_matrix.Tpo -c -o src/numerics/libmesh_prof_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_matrix.C' object='src/numerics/libmesh_prof_la-eigen_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_prof_la-eigen_sparse_matrix.lo `test -f 'src/numerics/eigen_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_matrix.C
+
+src/numerics/libmesh_prof_la-eigen_sparse_vector.lo: src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_prof_la-eigen_sparse_vector.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_sparse_vector.Tpo -c -o src/numerics/libmesh_prof_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_sparse_vector.Tpo src/numerics/$(DEPDIR)/libmesh_prof_la-eigen_sparse_vector.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/eigen_sparse_vector.C' object='src/numerics/libmesh_prof_la-eigen_sparse_vector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_prof_la-eigen_sparse_vector.lo `test -f 'src/numerics/eigen_sparse_vector.C' || echo '$(srcdir)/'`src/numerics/eigen_sparse_vector.C
+
 src/numerics/libmesh_prof_la-function_base.lo: src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_prof_la-function_base.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_prof_la-function_base.Tpo -c -o src/numerics/libmesh_prof_la-function_base.lo `test -f 'src/numerics/function_base.C' || echo '$(srcdir)/'`src/numerics/function_base.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_prof_la-function_base.Tpo src/numerics/$(DEPDIR)/libmesh_prof_la-function_base.Plo
@@ -25332,6 +25594,13 @@ src/solvers/libmesh_prof_la-eigen_solver.lo: src/solvers/eigen_solver.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_solver.C' object='src/solvers/libmesh_prof_la-eigen_solver.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-eigen_solver.lo `test -f 'src/solvers/eigen_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_solver.C
+
+src/solvers/libmesh_prof_la-eigen_sparse_linear_solver.lo: src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-eigen_sparse_linear_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-eigen_sparse_linear_solver.Tpo -c -o src/solvers/libmesh_prof_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/solvers/$(DEPDIR)/libmesh_prof_la-eigen_sparse_linear_solver.Tpo src/solvers/$(DEPDIR)/libmesh_prof_la-eigen_sparse_linear_solver.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/solvers/eigen_sparse_linear_solver.C' object='src/solvers/libmesh_prof_la-eigen_sparse_linear_solver.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/solvers/libmesh_prof_la-eigen_sparse_linear_solver.lo `test -f 'src/solvers/eigen_sparse_linear_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_sparse_linear_solver.C
 
 src/solvers/libmesh_prof_la-eigen_time_solver.lo: src/solvers/eigen_time_solver.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/solvers/libmesh_prof_la-eigen_time_solver.lo -MD -MP -MF src/solvers/$(DEPDIR)/libmesh_prof_la-eigen_time_solver.Tpo -c -o src/solvers/libmesh_prof_la-eigen_time_solver.lo `test -f 'src/solvers/eigen_time_solver.C' || echo '$(srcdir)/'`src/solvers/eigen_time_solver.C

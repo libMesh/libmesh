@@ -22,6 +22,7 @@
 // Local Includes
 #include "libmesh/dof_map.h"
 #include "libmesh/laspack_matrix.h"
+#include "libmesh/eigen_sparse_matrix.h"
 #include "libmesh/parallel.h"
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/sparse_matrix.h"
@@ -117,6 +118,15 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
     case TRILINOS_SOLVERS:
       {
 	AutoPtr<SparseMatrix<T> > ap(new EpetraMatrix<T>);
+	return ap;
+      }
+#endif
+
+
+#ifdef LIBMESH_HAVE_EIGEN
+    case EIGEN_SOLVERS:
+      {
+	AutoPtr<SparseMatrix<T> > ap(new EigenSparseMatrix<T>);
 	return ap;
       }
 #endif

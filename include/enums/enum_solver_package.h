@@ -40,6 +40,7 @@ namespace libMeshEnums {
       TRILINOS_SOLVERS,
       LASPACK_SOLVERS,
       SLEPC_SOLVERS,
+      EIGEN_SOLVERS,
 
       INVALID_SOLVER_PACKAGE
     };
