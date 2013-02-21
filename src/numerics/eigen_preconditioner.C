@@ -31,13 +31,13 @@ namespace libMesh
 {
 
 template <typename T>
-void EigenPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> & y)
+void EigenPreconditioner<T>::apply(const NumericVector<T> & /* x */, NumericVector<T> & /* y */)
 {
-  EigenSparseVector<T> & x_pvec = libmesh_cast_ref<EigenSparseVector<T>&>(const_cast<NumericVector<T>&>(x));
-  EigenSparseVector<T> & y_pvec = libmesh_cast_ref<EigenSparseVector<T>&>(const_cast<NumericVector<T>&>(y));
-
   libmesh_not_implemented();
   
+  // EigenSparseVector<T> & x_pvec = libmesh_cast_ref<EigenSparseVector<T>&>(const_cast<NumericVector<T>&>(x));
+  // EigenSparseVector<T> & y_pvec = libmesh_cast_ref<EigenSparseVector<T>&>(const_cast<NumericVector<T>&>(y));
+
   // Vec x_vec = x_pvec.vec();
   // Vec y_vec = y_pvec.vec();
 
