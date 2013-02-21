@@ -40,6 +40,7 @@ namespace libMesh
 
 
 // Forward declarations
+template <typename T> class EigenSparseMatrix;
 template <typename T> class EigenSparseLinearSolver;
 template <typename T> class SparseMatrix;
 
@@ -93,6 +94,11 @@ class EigenSparseVector : public NumericVector<T>
    */
   ~EigenSparseVector ();
 
+  /**
+   * Convenient typedefs
+   */
+  typedef EigenSV DataType;
+  
   /**
    * Call the assemble functions
    */
@@ -437,20 +443,28 @@ class EigenSparseVector : public NumericVector<T>
 			       const NumericVector<T>& vec2);
 
   /**
-   * Swaps the raw QVector contents.
+   * Swaps the contents.
    */
   virtual void swap (NumericVector<T> &v);
 
+  /**
+   * References to the underlying Eigen data types. Note this is generally
+   * not required in user-level code.
+   */
+  DataType &       vec ()        { return _vec; }
+  const DataType & vec () const  { return _vec; }
+  
  private:
 
   /**
    * Actual Eigen::SparseVector<> we are wrapping.
    */
-  EigenSV _vec;
+  DataType _vec;
   
   /**
    * Make other Eigen datatypes friends
    */
+  friend class EigenSparseMatrix<T>;
   friend class EigenSparseLinearSolver<T>;
 };
 

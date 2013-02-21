@@ -83,18 +83,11 @@ public:
   ~EigenSparseMatrix ();
 
   /**
-   * The \p EigenSparseMatrix needs the full sparsity pattern.
+   * Convenient typedefs
    */
-  bool need_full_sparsity_pattern() const
-  { return true; }
-
-  /**
-   * Updates the matrix sparsity pattern.  This will
-   * tell the underlying matrix storage scheme how
-   * to map the \f$ (i,j) \f$ elements.
-   */
-  void update_sparsity_pattern (const SparsityPattern::Graph &);
-
+  typedef EigenSM DataType;
+  typedef Eigen::Triplet<T,eigen_idx_type> TripletType;
+  
   /**
    * Initialize a Eigen matrix that is of global
    * dimension \f$ m \times  n \f$ with local dimensions
@@ -269,27 +262,9 @@ public:
 private:
 
   /**
-   * @returns the position in the compressed row
-   * storage scheme of the \f$ (i,j) \f$ element.
-   */
-  numeric_index_type pos (const numeric_index_type i,
-		          const numeric_index_type j) const;
-
-  /**
-   * The compressed row indices.
-   */
-  std::vector<numeric_index_type> _csr;
-
-  /**
-   * The start of each row in the compressed
-   * row index data structure.
-   */
-  std::vector<std::vector<numeric_index_type>::const_iterator> _row_start;
-
-  /**
    * Actual Eigen::SparseMatrix<> we are wrapping.
    */
-  EigenSM _mat;
+  DataType _mat;
   
   /**
    * Flag indicating if the matrix has been closed yet.

@@ -52,8 +52,8 @@ namespace libMesh
   typedef int32_t eigen_idx_type;
 #endif
 
-  typedef Eigen::SparseMatrix<Number, Eigen::ColMajor, eigen_idx_type> EigenSM;
-  //typedef Eigen::SparseVector<Number, Eigen::ColMajor, eigen_idx_type> EigenSV;
+  // We have to use RowMajor SparseMatrix storage for our preallocation to work
+  typedef Eigen::SparseMatrix<Number, Eigen::RowMajor, eigen_idx_type> EigenSM;
   typedef Eigen::Matrix<Number, Eigen::Dynamic, 1> EigenSV;
 } // namespace libMesh
 
