@@ -591,7 +591,10 @@ void PerfLog::print_log() const
     }
 }
 
-
+PerfData PerfLog::get_perf_data(const std::string &label, const std::string &header)
+{
+  return log[std::make_pair(header, label)];
+}
 
 void PerfLog::start_event(const std::string &label,
 			  const std::string &header)
@@ -664,6 +667,5 @@ void PerfLog::split_on_whitespace(const std::string& input, std::vector<std::str
         }
     }
 }
-
 
 } // namespace libMesh
