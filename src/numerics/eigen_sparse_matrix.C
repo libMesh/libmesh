@@ -51,7 +51,7 @@ void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
   libmesh_assert_greater  (nnz, 0);
 
   _mat.resize(m_in, n_in);
-  _mat.reserve(EigenSV::Constant(m_in,nnz));
+  _mat.reserve(Eigen::Matrix<numeric_index_type, Eigen::Dynamic, 1>::Constant(m_in,nnz));
     
   this->_is_initialized = true;
 }

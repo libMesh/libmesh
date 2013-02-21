@@ -470,7 +470,18 @@ Real EigenSparseVector<T>::max() const
   if (!this->size())
     return -std::numeric_limits<Real>::max();
 
-  return _vec.maxCoeff();
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  Real the_max = libmesh_real((*this)(0));
+
+  const numeric_index_type n = this->size();
+
+  for (numeric_index_type i=1; i<n; i++)
+    the_max = std::max (the_max, libmesh_real((*this)(i)));
+
+  return the_max;
+#else
+  return libmesh_real(_vec.maxCoeff());
+#endif
 }
 
 
@@ -482,7 +493,18 @@ Real EigenSparseVector<T>::min () const
   if (!this->size())
     return std::numeric_limits<Real>::max();
 
-  return _vec.minCoeff();
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  Real the_min = libmesh_real((*this)(0));
+
+  const numeric_index_type n = this->size();
+
+  for (numeric_index_type i=1; i<n; i++)
+    the_min = std::min (the_min, libmesh_real((*this)(i)));
+
+  return the_min;
+#else
+  return libmesh_real(_vec.minCoeff());
+#endif
 }
 
 
