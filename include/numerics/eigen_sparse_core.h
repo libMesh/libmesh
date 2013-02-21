@@ -33,6 +33,7 @@
 // C++ includes
 
 // Eigen includes
+#include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
 
@@ -52,8 +53,8 @@ namespace libMesh
 #endif
 
   typedef Eigen::SparseMatrix<Number, Eigen::ColMajor, eigen_idx_type> EigenSM;
-  typedef Eigen::SparseVector<Number, Eigen::ColMajor, eigen_idx_type> EigenSV;
-  
+  //typedef Eigen::SparseVector<Number, Eigen::ColMajor, eigen_idx_type> EigenSV;
+  typedef Eigen::Matrix<Number, Eigen::Dynamic, 1> EigenSV;
 } // namespace libMesh
 
 

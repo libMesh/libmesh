@@ -37,15 +37,9 @@ template <typename T>
 T EigenSparseVector<T>::sum () const
 {
   libmesh_assert (this->closed());
+  libmesh_assert (this->initialized());
 
-  T _sum = 0;
-
-  const numeric_index_type n = this->size();
-
-  for (numeric_index_type i=0; i!=n; ++i)
-    _sum += (*this)(i);
-
-  return _sum;
+  return _vec->sum();
 }
 
 
@@ -54,11 +48,9 @@ template <typename T>
 Real EigenSparseVector<T>::l1_norm () const
 {
   libmesh_assert (this->closed());
+  libmesh_assert (this->initialized());
 
-  libmesh_not_implemented();
-  return 0.;
-
-  // return static_cast<Real>(l1Norm_V(const_cast<QVector*>(&_vec)));
+  return _vec->lpNorm<1>();
 }
 
 
@@ -67,11 +59,9 @@ template <typename T>
 Real EigenSparseVector<T>::l2_norm () const
 {
   libmesh_assert (this->closed());
+  libmesh_assert (this->initialized());
 
-  libmesh_not_implemented();
-  return 0.;
-
-  // return static_cast<Real>(l2Norm_V(const_cast<QVector*>(&_vec)));
+  return _vec->lpNorm<2>();
 }
 
 
@@ -80,11 +70,9 @@ template <typename T>
 Real EigenSparseVector<T>::linfty_norm () const
 {
   libmesh_assert (this->closed());
+  libmesh_assert (this->initialized());
 
-  libmesh_not_implemented();
-  return 0.;
-  
-  // return static_cast<Real>(MaxNorm_V(const_cast<QVector*>(&_vec)));
+  return _vec->lpNorm<Eigen::Infinity>();
 }
 
 
@@ -154,9 +142,13 @@ void EigenSparseVector<T>::add (const T v)
 
 
 template <typename T>
-void EigenSparseVector<T>::add (const NumericVector<T>& v)
+void EigenSparseVector<T>::add (const NumericVector<T>& v_in)
 {
-  this->add (1., v);
+  libmesh_assert (this->initialized());
+
+  const EigenSparseVector<T>& v = libmesh_cast_ref<const EigenSparseVector<T>&>(v_in);
+
+  (*_vec) += *(v._vec);
 }
 
 
@@ -164,24 +156,11 @@ void EigenSparseVector<T>::add (const NumericVector<T>& v)
 template <typename T>
 void EigenSparseVector<T>::add (const T a, const NumericVector<T>& v_in)
 {
-  libmesh_not_implemented();
-  
-//   // Make sure the vector passed in is really a EigenSparseVector
-//   const EigenSparseVector* v = libmesh_cast_ptr<const EigenSparseVector*>(&v_in);
+  libmesh_assert (this->initialized());
 
-// #ifndef NDEBUG
-//   const bool was_closed = this->_is_closed;
-// #endif
+  const EigenSparseVector<T>& v = libmesh_cast_ref<const EigenSparseVector<T>&>(v_in);
 
-//   libmesh_assert(v);
-//   libmesh_assert_equal_to (this->size(), v->size());
-
-//   for (numeric_index_type i=0; i<v->size(); i++)
-//     this->add (i, a*(*v)(i));
-
-// #ifndef NDEBUG
-//   this->_is_closed = was_closed;
-// #endif
+  (*_vec) += *(v._vec)*a;
 }
 
 
@@ -201,7 +180,7 @@ void EigenSparseVector<T>::add_vector (const std::vector<T>& v,
 
 template <typename T>
 void EigenSparseVector<T>::add_vector (const NumericVector<T>& V,
-				   const std::vector<numeric_index_type>& dof_indices)
+				       const std::vector<numeric_index_type>& dof_indices)
 {
   libmesh_assert_equal_to (V.size(), dof_indices.size());
 
@@ -282,12 +261,8 @@ void EigenSparseVector<T>::add_vector (const NumericVector<T> &vec_in,
 
   libmesh_assert(vec);
   libmesh_assert(mat);
-
-  libmesh_not_implemented();
   
-  // // += mat*vec
-  // AddAsgn_VV (&_vec, Mul_QV(const_cast<QMatrix*>(&mat->_QMat),
-  // 			    const_cast<QVector*>(&vec->_vec)));
+  // *_vec += (*(mat->_mat))*(*(vec->_vec)); 
 }
 
 
@@ -305,9 +280,7 @@ void EigenSparseVector<T>::scale (const T factor)
 {
   libmesh_assert (this->initialized());
 
-  libmesh_not_implemented();
-
-  // Asgn_VV(&_vec, Mul_SV (factor, &_vec));
+  (*_vec) *= factor;
 }
 
 
@@ -334,9 +307,7 @@ T EigenSparseVector<T>::dot (const NumericVector<T>& V) const
   const EigenSparseVector<T>* v = libmesh_cast_ptr<const EigenSparseVector<T>*>(&V);
   libmesh_assert(v);
 
-  libmesh_not_implemented();
-  // return Mul_VV (const_cast<QVector*>(&(this->_vec)),
-  // 		 const_cast<QVector*>(&(v->_vec)));
+  return _vec->dot(*v->_vec);
 }
 
 
@@ -350,7 +321,7 @@ EigenSparseVector<T>::operator = (const T s)
 
   libmesh_not_implemented();
   
-  // V_SetAllCmp (&_vec, s);
+  _vec->fill(s);
 
   return *this;
 }
@@ -382,12 +353,7 @@ EigenSparseVector<T>::operator = (const EigenSparseVector<T>& v)
   libmesh_assert (v.closed());
   libmesh_assert_equal_to (this->size(), v.size());
 
-  libmesh_not_implemented();
-  
-  // if (v.size() != 0)
-  //   Asgn_VV (const_cast<QVector*>(&_vec),
-  // 	     const_cast<QVector*>(&v._vec)
-  // 	     );
+  (*_vec) = (*v._vec);
 
 #ifndef NDEBUG
   this->_is_closed = true;

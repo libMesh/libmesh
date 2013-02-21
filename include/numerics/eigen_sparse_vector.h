@@ -94,6 +94,12 @@ class EigenSparseVector : public NumericVector<T>
   ~EigenSparseVector ();
 
   /**
+   * @returns true if the vector has been initialized,
+   * false otherwise.
+   */
+  virtual bool initialized() const;
+
+  /**
    * Call the assemble functions
    */
   void close ();
@@ -511,6 +517,15 @@ EigenSparseVector<T>::~EigenSparseVector ()
 
 template <typename T>
 inline
+bool EigenSparseVector<T>::initialized () const
+{
+  return (_vec.get() != NULL) && NumericVector<T>::initialized();
+}
+
+
+
+template <typename T>
+inline
 void EigenSparseVector<T>::init (const numeric_index_type n,
 				 const numeric_index_type libmesh_dbg_var(n_local),
 				 const bool fast,
@@ -527,7 +542,10 @@ void EigenSparseVector<T>::init (const numeric_index_type n,
     this->clear();
   
   // create a sequential vector
-  _vec.reset (new EigenSV (n));
+  if (_vec.get() == NULL)
+    _vec.reset (new EigenSV);
+
+  _vec->resize(n);
   
   this->_is_initialized = true;
 #ifndef NDEBUG
@@ -595,7 +613,11 @@ template <typename T>
 inline
 void EigenSparseVector<T>::clear ()
 {
-  _vec.reset(NULL);
+  // why??
+  // _vec.reset(NULL);
+
+  if (_vec.get())
+    _vec->resize(0);
   
   this->_is_initialized = false;
 #ifndef NDEBUG
@@ -695,9 +717,7 @@ void EigenSparseVector<T>::set (const numeric_index_type i, const T value)
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->size());
 
-  libmesh_not_implemented();
-  
-  // _vec->coeffRef(static_cast<eigen_idx_type>(i),0) = value;
+  (*_vec)[static_cast<eigen_idx_type>(i)] = value;
   
 #ifndef NDEBUG
   this->_is_closed = false;
@@ -712,10 +732,8 @@ void EigenSparseVector<T>::add (const numeric_index_type i, const T value)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->size());
-
-  libmesh_not_implemented();
   
-  // _vec->coeffRef(i,0) += value;
+  (*_vec)[static_cast<eigen_idx_type>(i)] += value;
 
 #ifndef NDEBUG
   this->_is_closed = false;
@@ -732,11 +750,9 @@ T EigenSparseVector<T>::operator() (const numeric_index_type i) const
   libmesh_assert ( ((i >= this->first_local_index()) &&
 		    (i <  this->last_local_index())) );
 
-
   libmesh_not_implemented();
   
-  // return static_cast<T>(_vec->coeff(i,0));
-  return 0;
+  return (*_vec)[static_cast<eigen_idx_type>(i)];
 }
 
 
