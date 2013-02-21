@@ -32,10 +32,22 @@
 
 // C++ includes
 
+
+// hack to avoid MatType collision...
+#undef libMeshSaveMatType
+#ifdef MatType
+#  define MatType libMeshSaveMatType
+#  undef  MatType
+#endif
+
 // Eigen includes
 #include <Eigen/Dense>
-#include <Eigen/SparseCore>
+#include <Eigen/Sparse>
 
+#ifdef libMeshSaveMatType
+#  define libMeshSaveMatType MatType
+#  undef  libMeshSaveMatType
+#endif
 
 
 namespace libMesh
