@@ -264,10 +264,10 @@ SolverPackage libMesh::libMeshPrivateData::_solver_package =
                                                        PETSC_SOLVERS;
 #elif defined(LIBMESH_HAVE_TRILINOS) // Use Trilinos if PETSc isn't there
                                                        TRILINOS_SOLVERS;
-#elif defined(LIBMESH_HAVE_EIGEN)    // Use Eigen if neither are there
+#elif defined(LIBMESH_HAVE_LASPACK)  // Use LASPACK if neither are there
                                                        LASPACK_SOLVERS;
-#elif defined(LIBMESH_HAVE_LASPACK)  // Use LASPACK as a last resort
-                                                       LASPACK_SOLVERS;
+#elif defined(LIBMESH_HAVE_EIGEN)    // Use Eigen as a last resort
+                                                       EIGEN_SOLVERS;
 #else                        // No valid linear solver package at compile time
                                                        INVALID_SOLVER_PACKAGE;
 #endif
