@@ -24,6 +24,9 @@
 #include "libmesh/preconditioner.h"
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/trilinos_preconditioner.h"
+#include "libmesh/eigen_preconditioner.h"
+
+
 
 namespace libMesh
 {
@@ -58,6 +61,11 @@ Preconditioner<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       return new TrilinosPreconditioner<T>();
+#endif
+
+#ifdef LIBMESH_HAVE_EIGEN
+    case EIGEN_SOLVERS:
+      return new EigenPreconditioner<T>();
 #endif
 
     default:

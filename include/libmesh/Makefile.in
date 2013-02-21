@@ -473,7 +473,9 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	const_fem_function.h const_function.h coupling_matrix.h \
 	dense_matrix.h dense_matrix_base.h dense_submatrix.h \
 	dense_subvector.h dense_vector.h dense_vector_base.h \
-	distributed_vector.h fem_function_base.h function_base.h \
+	distributed_vector.h eigen_core_support.h \
+	eigen_preconditioner.h eigen_sparse_matrix.h \
+	eigen_sparse_vector.h fem_function_base.h function_base.h \
 	laspack_matrix.h laspack_vector.h numeric_vector.h \
 	parsed_function.h petsc_macro.h petsc_matrix.h \
 	petsc_preconditioner.h petsc_vector.h preconditioner.h \
@@ -509,34 +511,35 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	meshfree_interpolation.h meshfree_solution_transfer.h \
 	meshfunction_solution_transfer.h solution_transfer.h \
 	adaptive_time_solver.h diff_solver.h eigen_solver.h \
-	eigen_time_solver.h euler2_solver.h euler_solver.h \
-	laspack_linear_solver.h linear.h linear_solver.h \
-	memory_solution_history.h newton_solver.h \
-	no_solution_history.h nonlinear_solver.h petsc_diff_solver.h \
-	petsc_dm_nonlinear_solver.h petsc_linear_solver.h \
-	petsc_nonlinear_solver.h petscdmlibmesh.h slepc_eigen_solver.h \
-	slepc_macro.h solution_history.h solver.h steady_solver.h \
-	time_solver.h trilinos_aztec_linear_solver.h \
-	trilinos_nox_nonlinear_solver.h twostep_time_solver.h \
-	unsteady_solver.h condensed_eigen_system.h \
-	continuation_system.h diff_context.h diff_system.h \
-	eigen_system.h elem_assembly.h equation_systems.h \
-	explicit_system.h fem_context.h fem_system.h \
-	frequency_system.h implicit_system.h linear_implicit_system.h \
-	newmark_system.h nonlinear_implicit_system.h \
-	parameter_vector.h qoi_set.h sensitivity_data.h \
-	steady_system.h system.h system_norm.h system_subset.h \
-	system_subset_by_subdomain.h transient_system.h \
-	compare_types.h error_vector.h hashword.h ignore_warnings.h \
-	location_maps.h mapvector.h null_output_iterator.h \
-	number_lookups.h ostream_proxy.h parameters.h perf_log.h \
-	perfmon.h plt_loader.h point_locator_base.h \
-	point_locator_list.h point_locator_tree.h pool_allocator.h \
-	restore_warnings.h statistics.h string_to_enum.h timestamp.h \
-	tree.h tree_base.h tree_node.h utility.h xdr_cxx.h \
-	parallel_communicator_specializations $(am__append_1) \
-	$(am__append_3) $(am__append_5) $(am__append_7) \
-	$(am__append_9) $(am__append_11) libmesh_config.h
+	eigen_sparse_linear_solver.h eigen_time_solver.h \
+	euler2_solver.h euler_solver.h laspack_linear_solver.h \
+	linear.h linear_solver.h memory_solution_history.h \
+	newton_solver.h no_solution_history.h nonlinear_solver.h \
+	petsc_diff_solver.h petsc_dm_nonlinear_solver.h \
+	petsc_linear_solver.h petsc_nonlinear_solver.h \
+	petscdmlibmesh.h slepc_eigen_solver.h slepc_macro.h \
+	solution_history.h solver.h steady_solver.h time_solver.h \
+	trilinos_aztec_linear_solver.h trilinos_nox_nonlinear_solver.h \
+	twostep_time_solver.h unsteady_solver.h \
+	condensed_eigen_system.h continuation_system.h diff_context.h \
+	diff_system.h eigen_system.h elem_assembly.h \
+	equation_systems.h explicit_system.h fem_context.h \
+	fem_system.h frequency_system.h implicit_system.h \
+	linear_implicit_system.h newmark_system.h \
+	nonlinear_implicit_system.h parameter_vector.h qoi_set.h \
+	sensitivity_data.h steady_system.h system.h system_norm.h \
+	system_subset.h system_subset_by_subdomain.h \
+	transient_system.h compare_types.h error_vector.h hashword.h \
+	ignore_warnings.h location_maps.h mapvector.h \
+	null_output_iterator.h number_lookups.h ostream_proxy.h \
+	parameters.h perf_log.h perfmon.h plt_loader.h \
+	point_locator_base.h point_locator_list.h point_locator_tree.h \
+	pool_allocator.h restore_warnings.h statistics.h \
+	string_to_enum.h timestamp.h tree.h tree_base.h tree_node.h \
+	utility.h xdr_cxx.h parallel_communicator_specializations \
+	$(am__append_1) $(am__append_3) $(am__append_5) \
+	$(am__append_7) $(am__append_9) $(am__append_11) \
+	libmesh_config.h
 DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2) $(am__append_4) \
 	$(am__append_6) $(am__append_8) $(am__append_10) \
 	$(am__append_12) libmesh_config.h
@@ -1350,6 +1353,18 @@ dense_vector_base.h: $(top_srcdir)/include/numerics/dense_vector_base.h
 distributed_vector.h: $(top_srcdir)/include/numerics/distributed_vector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
+eigen_core_support.h: $(top_srcdir)/include/numerics/eigen_core_support.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+eigen_preconditioner.h: $(top_srcdir)/include/numerics/eigen_preconditioner.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+eigen_sparse_matrix.h: $(top_srcdir)/include/numerics/eigen_sparse_matrix.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+eigen_sparse_vector.h: $(top_srcdir)/include/numerics/eigen_sparse_vector.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
 fem_function_base.h: $(top_srcdir)/include/numerics/fem_function_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
@@ -1633,6 +1648,9 @@ diff_solver.h: $(top_srcdir)/include/solvers/diff_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 eigen_solver.h: $(top_srcdir)/include/solvers/eigen_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+eigen_sparse_linear_solver.h: $(top_srcdir)/include/solvers/eigen_sparse_linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 eigen_time_solver.h: $(top_srcdir)/include/solvers/eigen_time_solver.h

@@ -264,7 +264,9 @@ SolverPackage libMesh::libMeshPrivateData::_solver_package =
                                                        PETSC_SOLVERS;
 #elif defined(LIBMESH_HAVE_TRILINOS) // Use Trilinos if PETSc isn't there
                                                        TRILINOS_SOLVERS;
-#elif defined(LIBMESH_HAVE_LASPACK)  // Use LASPACK if neither are there
+#elif defined(LIBMESH_HAVE_EIGEN)    // Use Eigen if neither are there
+                                                       LASPACK_SOLVERS;
+#elif defined(LIBMESH_HAVE_LASPACK)  // Use LASPACK as a last resort
                                                        LASPACK_SOLVERS;
 #else                        // No valid linear solver package at compile time
                                                        INVALID_SOLVER_PACKAGE;
@@ -801,6 +803,17 @@ SolverPackage default_solver_package ()
 	libMeshPrivateData::_solver_package = TRILINOS_SOLVERS;
 #endif
 
+#ifdef LIBMESH_HAVE_EIGEN
+      if (libMesh::on_command_line ("--use-eigen"  ) ||
+#if defined(LIBMESH_HAVE_MPI)
+	  // If the user bypassed MPI, we disable PETSc and Trilinos
+	  // too
+          libMesh::on_command_line ("--disable-mpi") ||
+#endif
+	  libMesh::on_command_line ("--disable-petsc"))
+	libMeshPrivateData::_solver_package = EIGEN_SOLVERS;
+#endif
+
 #ifdef LIBMESH_HAVE_LASPACK
       if (libMesh::on_command_line ("--use-laspack"  ) ||
 #if defined(LIBMESH_HAVE_MPI)
@@ -814,6 +827,7 @@ SolverPackage default_solver_package ()
 
       if (libMesh::on_command_line ("--disable-laspack") &&
 	  libMesh::on_command_line ("--disable-trilinos") &&
+	  libMesh::on_command_line ("--disable-eigen") &&
           (
 #if defined(LIBMESH_HAVE_MPI)
            // If the user bypassed MPI, we disable PETSc too

@@ -227,6 +227,9 @@ libmesh_SOURCES =  \
         src/numerics/dense_vector.C \
         src/numerics/dense_vector_base.C \
         src/numerics/distributed_vector.C \
+        src/numerics/eigen_preconditioner.C \
+        src/numerics/eigen_sparse_matrix.C \
+        src/numerics/eigen_sparse_vector.C \
         src/numerics/function_base.C \
         src/numerics/laspack_matrix.C \
         src/numerics/laspack_vector.C \
@@ -327,6 +330,7 @@ libmesh_SOURCES =  \
         src/solvers/adaptive_time_solver.C \
         src/solvers/diff_solver.C \
         src/solvers/eigen_solver.C \
+        src/solvers/eigen_sparse_linear_solver.C \
         src/solvers/eigen_time_solver.C \
         src/solvers/euler2_solver.C \
         src/solvers/euler_solver.C \

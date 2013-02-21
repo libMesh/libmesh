@@ -1,12 +1,11 @@
 # where to install our headers
 #includedir=$(prefix)/include/libmesh
 
-# definition of include_HEADERS - get from auto-maint# omit from 'make TAGS'
+# omit from 'make TAGS'
 TAGS:
 tags:
 
 # TODO: Automate maintenance of this list.
-# Note: this list is valid for eigen 3.1.0.
 # for file in `find Eigen -type f | grep -v CMakeLists.txt` ; do echo "        $file \\" ; done
 nobase_include_HEADERS = \
         Eigen/Array \
