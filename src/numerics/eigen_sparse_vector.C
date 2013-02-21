@@ -39,7 +39,7 @@ T EigenSparseVector<T>::sum () const
   libmesh_assert (this->closed());
   libmesh_assert (this->initialized());
 
-  return _vec->sum();
+  return _vec.sum();
 }
 
 
@@ -50,7 +50,7 @@ Real EigenSparseVector<T>::l1_norm () const
   libmesh_assert (this->closed());
   libmesh_assert (this->initialized());
 
-  return _vec->lpNorm<1>();
+  return _vec.lpNorm<1>();
 }
 
 
@@ -61,7 +61,7 @@ Real EigenSparseVector<T>::l2_norm () const
   libmesh_assert (this->closed());
   libmesh_assert (this->initialized());
 
-  return _vec->lpNorm<2>();
+  return _vec.lpNorm<2>();
 }
 
 
@@ -72,18 +72,20 @@ Real EigenSparseVector<T>::linfty_norm () const
   libmesh_assert (this->closed());
   libmesh_assert (this->initialized());
 
-  return _vec->lpNorm<Eigen::Infinity>();
+  return _vec.lpNorm<Eigen::Infinity>();
 }
 
 
 
 template <typename T>
-NumericVector<T>& EigenSparseVector<T>::operator += (const NumericVector<T>& v)
+NumericVector<T>& EigenSparseVector<T>::operator += (const NumericVector<T>& v_in)
 {
   libmesh_assert (this->closed());
 
-  this->add(1., v);
+  const EigenSparseVector<T>& v = libmesh_cast_ref<const EigenSparseVector<T>&>(v_in);
 
+  _vec += v._vec;
+  
   return *this;
 }
 
@@ -91,12 +93,14 @@ NumericVector<T>& EigenSparseVector<T>::operator += (const NumericVector<T>& v)
 
 
 template <typename T>
-NumericVector<T>& EigenSparseVector<T>::operator -= (const NumericVector<T>& v)
+NumericVector<T>& EigenSparseVector<T>::operator -= (const NumericVector<T>& v_in)
 {
   libmesh_assert (this->closed());
 
-  this->add(-1., v);
+  const EigenSparseVector<T>& v = libmesh_cast_ref<const EigenSparseVector<T>&>(v_in);
 
+  _vec -= v._vec;
+  
   return *this;
 }
 
@@ -105,19 +109,15 @@ NumericVector<T>& EigenSparseVector<T>::operator -= (const NumericVector<T>& v)
 template <typename T>
 void EigenSparseVector<T>::reciprocal()
 {
-  libmesh_not_implemented();
+#ifndef NDEBUG
+  const numeric_index_type n = this->size();
 
-  // const numeric_index_type n = this->size();
+  for (numeric_index_type i=0; i<n; i++)
+    // Don't divide by zero!
+    libmesh_assert_not_equal_to ((*this)(i), T(0));
+#endif
 
-  // for (numeric_index_type i=0; i<n; i++)
-  //   {
-  //     T v = (*this)(i);
-
-  //     // Don't divide by zero!
-  //     libmesh_assert_not_equal_to (v, T(0));
-
-  //     this->set(i, 1. / v);
-  //   }
+  _vec = _vec.cwiseInverse();  
 }
 
 
@@ -126,16 +126,11 @@ void EigenSparseVector<T>::reciprocal()
 template <typename T>
 void EigenSparseVector<T>::add (const T v)
 {
-  libmesh_not_implemented();
-  
-//   const numeric_index_type n = this->size();
+  _vec += EigenSV::Constant(this->size(), v);
 
-//   for (numeric_index_type i=0; i<n; i++)
-//     this->add (i, v);
-
-// #ifndef NDEBUG
-//   this->_is_closed = false;
-// #endif
+#ifndef NDEBUG
+  this->_is_closed = false;
+#endif
 }
 
 
@@ -148,7 +143,7 @@ void EigenSparseVector<T>::add (const NumericVector<T>& v_in)
 
   const EigenSparseVector<T>& v = libmesh_cast_ref<const EigenSparseVector<T>&>(v_in);
 
-  (*_vec) += *(v._vec);
+  _vec += v._vec;
 }
 
 
@@ -160,7 +155,7 @@ void EigenSparseVector<T>::add (const T a, const NumericVector<T>& v_in)
 
   const EigenSparseVector<T>& v = libmesh_cast_ref<const EigenSparseVector<T>&>(v_in);
 
-  (*_vec) += *(v._vec)*a;
+  _vec += v._vec*a;
 }
 
 
@@ -253,7 +248,7 @@ void EigenSparseVector<T>::insert (const DenseSubVector<T>& V,
 
 template <typename T>
 void EigenSparseVector<T>::add_vector (const NumericVector<T> &vec_in,
-				       const SparseMatrix<T> &mat_in)
+				       const SparseMatrix<T>  &mat_in)
 {
   // Make sure the data passed in are really in Eigen types
   const EigenSparseVector<T>* vec = libmesh_cast_ptr<const EigenSparseVector<T>*>(&vec_in);
@@ -262,15 +257,23 @@ void EigenSparseVector<T>::add_vector (const NumericVector<T> &vec_in,
   libmesh_assert(vec);
   libmesh_assert(mat);
   
-  // *_vec += (*(mat->_mat))*(*(vec->_vec)); 
+  _vec += mat->_mat*vec->_vec; 
 }
 
 
+
 template <typename T>
-void EigenSparseVector<T>::add_vector_transpose (const NumericVector<T> &,
-						 const SparseMatrix<T> &)
+void EigenSparseVector<T>::add_vector_transpose (const NumericVector<T> &vec_in,
+						 const SparseMatrix<T>  &mat_in)
 {
-  libmesh_not_implemented();
+  // Make sure the data passed in are really in Eigen types
+  const EigenSparseVector<T>* vec = libmesh_cast_ptr<const EigenSparseVector<T>*>(&vec_in);
+  const EigenSparseMatrix<T>* mat = libmesh_cast_ptr<const EigenSparseMatrix<T>*>(&mat_in);
+
+  libmesh_assert(vec);
+  libmesh_assert(mat);
+  
+  _vec += mat->_mat.transpose()*vec->_vec; 
 }
 
 
@@ -280,7 +283,7 @@ void EigenSparseVector<T>::scale (const T factor)
 {
   libmesh_assert (this->initialized());
 
-  (*_vec) *= factor;
+  _vec *= factor;
 }
 
 
@@ -307,7 +310,7 @@ T EigenSparseVector<T>::dot (const NumericVector<T>& V) const
   const EigenSparseVector<T>* v = libmesh_cast_ptr<const EigenSparseVector<T>*>(&V);
   libmesh_assert(v);
 
-  return _vec->dot(*v->_vec);
+  return _vec.dot(v->_vec);
 }
 
 
@@ -318,10 +321,8 @@ EigenSparseVector<T>::operator = (const T s)
 {
   libmesh_assert (this->initialized());
   libmesh_assert (this->closed());
-
-  libmesh_not_implemented();
   
-  _vec->fill(s);
+  _vec.fill(s);
 
   return *this;
 }
@@ -353,7 +354,7 @@ EigenSparseVector<T>::operator = (const EigenSparseVector<T>& v)
   libmesh_assert (v.closed());
   libmesh_assert_equal_to (this->size(), v.size());
 
-  (*_vec) = (*v._vec);
+  _vec = v._vec;
 
 #ifndef NDEBUG
   this->_is_closed = true;
@@ -368,19 +369,17 @@ template <typename T>
 NumericVector<T>&
 EigenSparseVector<T>::operator = (const std::vector<T>& v)
 {
-  libmesh_not_implemented();
+  /**
+   * Case 1:  The vector is the same size of
+   * The global vector.  Only add the local components.
+   */
+  if (this->size() == v.size())
+    for (numeric_index_type i=0; i<v.size(); i++)
+      this->set (i, v[i]);
+
+  else
+    libmesh_error();
   
-  // /**
-  //  * Case 1:  The vector is the same size of
-  //  * The global vector.  Only add the local components.
-  //  */
-  // if (this->size() == v.size())
-  //   for (numeric_index_type i=0; i<v.size(); i++)
-  //     this->set (i, v[i]);
-
-  // else
-  //   libmesh_error();
-
   return *this;
 }
 
@@ -471,17 +470,7 @@ Real EigenSparseVector<T>::max() const
   if (!this->size())
     return -std::numeric_limits<Real>::max();
 
-  libmesh_not_implemented();
-  return 0;
-  
-  // Real the_max = libmesh_real((*this)(0));
-
-  // const numeric_index_type n = this->size();
-
-  // for (numeric_index_type i=1; i<n; i++)
-  //   the_max = std::max (the_max, libmesh_real((*this)(i)));
-
-  // return the_max;
+  return _vec.maxCoeff();
 }
 
 
@@ -493,16 +482,7 @@ Real EigenSparseVector<T>::min () const
   if (!this->size())
     return std::numeric_limits<Real>::max();
 
-  libmesh_not_implemented();
-  return 0;
-  // Real the_min = libmesh_real((*this)(0));
-
-  // const numeric_index_type n = this->size();
-
-  // for (numeric_index_type i=1; i<n; i++)
-  //   the_min = std::min (the_min, libmesh_real((*this)(i)));
-
-  // return the_min;
+  return _vec.minCoeff();
 }
 
 

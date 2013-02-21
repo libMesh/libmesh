@@ -25,7 +25,7 @@
 #ifdef LIBMESH_HAVE_EIGEN
 
 // Local includes
-#include "libmesh/eigen_sparse_core.h"
+#include "libmesh/eigen_core_support.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/enum_solver_package.h"

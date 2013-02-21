@@ -208,8 +208,8 @@ include_HEADERS =  \
         numerics/dense_vector.h \
         numerics/dense_vector_base.h \
         numerics/distributed_vector.h \
+        numerics/eigen_core_support.h \
         numerics/eigen_preconditioner.h \
-        numerics/eigen_sparse_core.h \
         numerics/eigen_sparse_matrix.h \
         numerics/eigen_sparse_vector.h \
         numerics/fem_function_base.h \

@@ -26,7 +26,7 @@
 
 // Local includes
 #include "libmesh/sparse_matrix.h"
-#include "libmesh/eigen_sparse_core.h"
+#include "libmesh/eigen_core_support.h"
 
 // Eigen includes
 

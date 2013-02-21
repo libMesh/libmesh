@@ -28,7 +28,7 @@
 #ifdef LIBMESH_HAVE_EIGEN
 
 // Local includes
-#include "libmesh/eigen_sparse_core.h"
+#include "libmesh/eigen_core_support.h"
 #include "libmesh/numeric_vector.h"
 
 // C++ includes
@@ -92,12 +92,6 @@ class EigenSparseVector : public NumericVector<T>
    * for derived classes to behave properly.
    */
   ~EigenSparseVector ();
-
-  /**
-   * @returns true if the vector has been initialized,
-   * false otherwise.
-   */
-  virtual bool initialized() const;
 
   /**
    * Call the assemble functions
@@ -452,7 +446,7 @@ class EigenSparseVector : public NumericVector<T>
   /**
    * Actual Eigen::SparseVector<> we are wrapping.
    */
-  AutoPtr<EigenSV> _vec;
+  EigenSV _vec;
   
   /**
    * Make other Eigen datatypes friends
@@ -517,15 +511,6 @@ EigenSparseVector<T>::~EigenSparseVector ()
 
 template <typename T>
 inline
-bool EigenSparseVector<T>::initialized () const
-{
-  return (_vec.get() != NULL) && NumericVector<T>::initialized();
-}
-
-
-
-template <typename T>
-inline
 void EigenSparseVector<T>::init (const numeric_index_type n,
 				 const numeric_index_type libmesh_dbg_var(n_local),
 				 const bool fast,
@@ -541,11 +526,7 @@ void EigenSparseVector<T>::init (const numeric_index_type n,
   if (this->initialized())
     this->clear();
   
-  // create a sequential vector
-  if (_vec.get() == NULL)
-    _vec.reset (new EigenSV);
-
-  _vec->resize(n);
+  _vec.resize(n);
   
   this->_is_initialized = true;
 #ifndef NDEBUG
@@ -613,11 +594,7 @@ template <typename T>
 inline
 void EigenSparseVector<T>::clear ()
 {
-  // why??
-  // _vec.reset(NULL);
-
-  if (_vec.get())
-    _vec->resize(0);
+  _vec.resize(0);
   
   this->_is_initialized = false;
 #ifndef NDEBUG
@@ -633,7 +610,7 @@ void EigenSparseVector<T>::zero ()
   libmesh_assert (this->initialized());
   libmesh_assert (this->closed());
 
-  _vec->setZero();
+  _vec.setZero();
 }
 
 
@@ -672,7 +649,7 @@ numeric_index_type EigenSparseVector<T>::size () const
 {
   libmesh_assert (this->initialized());
   
-  return static_cast<numeric_index_type>(_vec->size());
+  return static_cast<numeric_index_type>(_vec.size());
 }
 
 
@@ -717,7 +694,7 @@ void EigenSparseVector<T>::set (const numeric_index_type i, const T value)
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->size());
 
-  (*_vec)[static_cast<eigen_idx_type>(i)] = value;
+  _vec[static_cast<eigen_idx_type>(i)] = value;
   
 #ifndef NDEBUG
   this->_is_closed = false;
@@ -733,7 +710,7 @@ void EigenSparseVector<T>::add (const numeric_index_type i, const T value)
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->size());
   
-  (*_vec)[static_cast<eigen_idx_type>(i)] += value;
+  _vec[static_cast<eigen_idx_type>(i)] += value;
 
 #ifndef NDEBUG
   this->_is_closed = false;
@@ -752,7 +729,7 @@ T EigenSparseVector<T>::operator() (const numeric_index_type i) const
 
   libmesh_not_implemented();
   
-  return (*_vec)[static_cast<eigen_idx_type>(i)];
+  return _vec[static_cast<eigen_idx_type>(i)];
 }
 
 
@@ -763,13 +740,7 @@ void EigenSparseVector<T>::swap (NumericVector<T> &other)
 {
   EigenSparseVector<T>& v = libmesh_cast_ref<EigenSparseVector<T>&>(other);
 
-  {
-    AutoPtr<EigenSV> them(v._vec);
-    AutoPtr<EigenSV> me(this->_vec);
-
-    this->_vec = them;
-    v._vec     = me;
-  }
+  _vec.swap(v._vec);
   
   std::swap (this->_is_closed,      v._is_closed);
   std::swap (this->_is_initialized, v._is_initialized);
