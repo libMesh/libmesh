@@ -227,6 +227,15 @@ class PerfLog
    */
   double get_elapsed_time() const;
 
+  /**
+   * @returns the active time
+   */
+  double get_active_time() const;
+
+  /**
+   * Return the PerfData object associated with a label and header.
+   */
+  PerfData get_perf_data(const std::string &label, const std::string &header="");
 
  private:
 
@@ -419,6 +428,11 @@ double PerfLog::get_elapsed_time () const
   return elapsed_time;
 }
 
+inline
+double PerfLog::get_active_time() const
+{
+  return total_time;
+}
 
 } // namespace libMesh
 
