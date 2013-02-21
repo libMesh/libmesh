@@ -741,8 +741,6 @@ T EigenSparseVector<T>::operator() (const numeric_index_type i) const
   libmesh_assert ( ((i >= this->first_local_index()) &&
 		    (i <  this->last_local_index())) );
 
-  libmesh_not_implemented();
-  
   return _vec[static_cast<eigen_idx_type>(i)];
 }
 
