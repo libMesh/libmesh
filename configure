@@ -31464,6 +31464,14 @@ fi
 
     # Check for existence of a header file in the specified location.  Note: here
     # we are checking for the header file "Eigen" in the Eigen directory.
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
     externaleigenincFound=no;
     for ac_header in $EIGEN_INC/Eigen/Eigen
 do :
@@ -31525,6 +31533,13 @@ $as_echo "#define HAVE_EIGEN 1" >>confdefs.h
 $as_echo "<<< Configuring library with Eigen support >>>" >&6; }
 	 fi
     fi
+
+    ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
   fi
 
   # Substitute the substitution variables

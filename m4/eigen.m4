@@ -57,6 +57,9 @@ AC_DEFUN([CONFIGURE_EIGEN],
   
     # Check for existence of a header file in the specified location.  Note: here
     # we are checking for the header file "Eigen" in the Eigen directory.
+    AC_LANG_SAVE
+    AC_LANG_CPLUSPLUS
+
     externaleigenincFound=no;
     AC_CHECK_HEADERS($EIGEN_INC/Eigen/Eigen, externaleigenincFound=yes)
   
@@ -88,6 +91,8 @@ AC_DEFUN([CONFIGURE_EIGEN],
 	   AC_MSG_RESULT(<<< Configuring library with Eigen support >>>)
 	 fi
     fi
+
+    AC_LANG_RESTORE
   fi
 
   # Substitute the substitution variables
