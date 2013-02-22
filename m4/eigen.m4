@@ -63,7 +63,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
     if (test x$externaleigenincFound = xyes); then
         EIGEN_INCLUDE="-I$EIGEN_INC"
     elif (test -d $top_srcdir/contrib/eigen/eigen); then
-        AC_MSG_RESULT([<<< external Eigen header files not found, using libmesh-provided Eigen in ./contrib >>>])
+        AC_MSG_RESULT([<<< external Eigen header files not found, using Eigen from ./contrib >>>])
 	EIGEN_INC=$top_srcdir/contrib/eigen/eigen
 	EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
 	install_internal_eigen=yes

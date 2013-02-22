@@ -31482,8 +31482,8 @@ done
     if (test x$externaleigenincFound = xyes); then
         EIGEN_INCLUDE="-I$EIGEN_INC"
     elif (test -d $top_srcdir/contrib/eigen/eigen); then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< external Eigen header files not found, using libmesh-provided Eigen in ./contrib >>>" >&5
-$as_echo "<<< external Eigen header files not found, using libmesh-provided Eigen in ./contrib >>>" >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< external Eigen header files not found, using Eigen from ./contrib >>>" >&5
+$as_echo "<<< external Eigen header files not found, using Eigen from ./contrib >>>" >&6; }
 	EIGEN_INC=$top_srcdir/contrib/eigen/eigen
 	EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
 	install_internal_eigen=yes
