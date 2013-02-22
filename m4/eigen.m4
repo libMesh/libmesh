@@ -26,7 +26,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
 
 
   install_internal_eigen=no
-  if (test $enableeigen = yes); then
+  if (test x$enableeigen = xyes); then
   
     # User-specific include path
     AC_ARG_WITH(eigen-include,
