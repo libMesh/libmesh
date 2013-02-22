@@ -164,6 +164,12 @@
 /* Flag indicating whether the library will be compiled with Eigen support */
 #undef HAVE_EIGEN
 
+/* Define to 1 if you have the <Eigen/Dense> header file. */
+#undef HAVE_EIGEN_DENSE
+
+/* Define to 1 if you have the <Eigen/Sparse> header file. */
+#undef HAVE_EIGEN_SPARSE
+
 /* Flag indicating whether the library will be compiled with Exodus support */
 #undef HAVE_EXODUS_API
 
