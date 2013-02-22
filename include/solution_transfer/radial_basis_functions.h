@@ -24,7 +24,8 @@
 #include <limits>
 
 // Local includes
-#include "libmesh_common.h"
+#include "libmesh/libmesh_common.h"
+#include "libmesh/utility.h"
 
 
 
@@ -41,16 +42,65 @@ namespace libMesh
     const Real _rcut;
 
   public:
+    
     /**
      * Constructor.
      */
     WendlandRBF (const Real r_cut = std::numeric_limits<Real>::max()) :
       _rcut (r_cut)
     {}
+
+    /**
+     * Evaluate the radial basis function at the reqested location.
+     */
+    Real operator()(const Real rad) const { libmesh_not_implemented(); return 0.; }
+  };
+
+
+    
+  //-------------------------------------------------------
+  // Explicit specializations
+  template<>
+  inline
+  Real WendlandRBF<3,0>::operator()(const Real rad) const
+  {
+    return
+      (rad > _rcut) ?
+      0.:
+      Utility::pow<2>(1.-rad);
   }
 
-  //-------------------------------------------------------
-  // Explicit instantiations
+  template<>
+  inline
+  Real WendlandRBF<3,2>::operator()(const Real rad) const
+  {
+    return
+      (rad > _rcut) ?
+      0.:
+      Utility::pow<4>(1.-rad)*(4.*rad + 1.);      
+  }
+
+  template<>
+  inline
+  Real WendlandRBF<3,4>::operator()(const Real rad) const
+  {
+    return
+      (rad > _rcut) ?
+      0.:
+      Utility::pow<6>(1.-rad)*((35.*rad + 18.)*rad + 3.);
+  }
+
+  template<>
+  inline
+  Real WendlandRBF<3,8>::operator()(const Real rad) const
+  {
+    return
+      (rad > _rcut) ?
+      0.:
+      Utility::pow<8>(1.-rad)*(((32.*rad + 25.)*rad + 8.)*rad + 1.);
+  }
+
+    
 } // namespace libMesh
 
 

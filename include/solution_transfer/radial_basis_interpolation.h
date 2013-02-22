@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/meshfree_interpolation.h"
+#include "libmesh/radial_basis_functions.h"
 
 
 
@@ -32,9 +33,10 @@ namespace libMesh
 /**
  * Radial Basis Function interplation.
  */
-template <unsigned int KDDim>
+template <unsigned int KDDim, class RBF = WendlandRBF<KDDim, 2> >
 class RadialBasisInterpolation : public InverseDistanceInterpolation<KDDim>
 {
+protected:
   
 public:
 
@@ -51,6 +53,11 @@ public:
    */
   virtual void clear();
 
+  /**
+   * Prepares data structures for use. 
+   */
+  virtual void prepare_for_use ();
+  
   /**
    * Interpolate source data at target points.
    * Pure virtual, must be overriden in derived classes.

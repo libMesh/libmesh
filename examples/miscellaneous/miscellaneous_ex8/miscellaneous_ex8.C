@@ -25,6 +25,7 @@
 // Example include files
 #include "libmesh/libmesh.h"
 #include "libmesh/meshfree_interpolation.h"
+#include "libmesh/radial_basis_interpolation.h"
 #include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
@@ -135,18 +136,22 @@ int main(int argc, char** argv)
       
       InverseDistanceInterpolation<3> idi (/* n_interp_pts = */ 8,
 					   /* power =        */ 2);
+
+      RadialBasisInterpolation<3> rbi;
       
       idi.set_field_variables (field_vars);
+      rbi.set_field_variables (field_vars);
       
       create_random_point_cloud (1e5,
 				 idi.get_source_points());
+
       
       // Explicitly set the data values we will interpolate from
       {
 	const std::vector<Point> &src_pts  (idi.get_source_points());
 	std::vector<Number>      &src_vals (idi.get_source_vals());
 	
-	src_vals.clear(); src_vals.reserve(src_pts.size());
+	src_vals.clear(); src_vals.reserve(2*src_pts.size());
 	
 	for (std::vector<Point>::const_iterator pt_it=src_pts.begin();
 	     pt_it != src_pts.end(); ++pt_it)
@@ -156,6 +161,13 @@ int main(int argc, char** argv)
 	  }	  
       }
 
+      // give rbi the same info as idi
+      rbi.get_source_points() = idi.get_source_points();
+      rbi.get_source_vals()   = idi.get_source_vals();
+
+      idi.prepare_for_use();
+      rbi.prepare_for_use();
+      
       std::cout << idi;
       
       // Interpolate to some other random points, and evaluate the result
