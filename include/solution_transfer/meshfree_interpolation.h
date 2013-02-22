@@ -170,7 +170,7 @@ protected:
 template <unsigned int KDDim>
 class InverseDistanceInterpolation : public MeshfreeInterpolation
 {
-private:
+protected:
 
 #ifdef LIBMESH_HAVE_NANOFLANN  
   /**
@@ -292,16 +292,16 @@ private:
   /**
    * Build & initialize the KD tree, if needed.
    */
-  void construct_kd_tree ();
+  virtual void construct_kd_tree ();
 
   /**
    * Performs inverse distance interpolation at the input point from
    * the specified points.
    */
-  void interpolate (const Point               &pt,
-		    const std::vector<size_t> &src_indices,
-		    const std::vector<Real>   &src_dist_sqr,
-		    std::vector<Number>::iterator &out_it) const;
+  virtual void interpolate (const Point               &pt,
+			    const std::vector<size_t> &src_indices,
+			    const std::vector<Real>   &src_dist_sqr,
+			    std::vector<Number>::iterator &out_it) const;
   
   const Real         _half_power;
   const unsigned int _n_interp_pts;
