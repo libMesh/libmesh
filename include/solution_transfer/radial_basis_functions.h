@@ -20,12 +20,37 @@
 #ifndef LIBMESH_RADIAL_BASIS_FUNCTIONS_H
 #define LIBMESH_RADIAL_BASIS_FUNCTIONS_H
 
+// C++ includes
+#include <limits>
+
 // Local includes
+#include "libmesh_common.h"
 
 
 
 namespace libMesh
 {
+
+  /**
+   * Wendland's compactly supported Radial Basis Functions.
+   */
+  template <unsigned int SpaceDim, unsigned int Continuity>
+  class WendlandRBF
+  {
+  private:
+    const Real _rcut;
+
+  public:
+    /**
+     * Constructor.
+     */
+    WendlandRBF (const Real r_cut = std::numeric_limits<Real>::max()) :
+      _rcut (r_cut)
+    {}
+  }
+
+  //-------------------------------------------------------
+  // Explicit instantiations
 } // namespace libMesh
 
 
