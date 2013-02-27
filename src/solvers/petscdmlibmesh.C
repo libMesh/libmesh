@@ -279,7 +279,11 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
       ierr = ISCreateGeneral(((PetscObject)dm)->comm, dindices.size(),darray, PETSC_OWN_POINTER, &dis); CHKERRQ(ierr);
       if(dlm->embedding) {
 	/* Create a relative embedding into the parent's index space. */
+#if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
 	ierr = ISMapFactorRight(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
+#else
+	ierr = ISEmbed(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
+#endif
 	PetscInt elen, dlen;
 	ierr = ISGetLocalSize(emb, &elen); CHKERRQ(ierr);
 	ierr = ISGetLocalSize(dis, &dlen); CHKERRQ(ierr);
@@ -379,7 +383,11 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
       ierr = ISCreateGeneral(((PetscObject)dm)->comm, dindices.size(),darray, PETSC_OWN_POINTER, &dis); CHKERRQ(ierr);
       if(dlm->embedding) {
 	/* Create a relative embedding into the parent's index space. */
+#if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
 	ierr = ISMapFactorRight(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
+#else
+	ierr = ISEmbed(dis,dlm->embedding, PETSC_TRUE, &emb); CHKERRQ(ierr);
+#endif
 	PetscInt elen, dlen;
 	ierr = ISGetLocalSize(emb, &elen); CHKERRQ(ierr);
 	ierr = ISGetLocalSize(dis, &dlen);  CHKERRQ(ierr);
@@ -699,8 +707,8 @@ static PetscErrorCode  DMCreateDomainDecompositionDM_libMesh(DM dm, const char* 
 }
 
 #undef __FUNCT__
-#define __FUNCT__ "DMFunction_libMesh"
-static PetscErrorCode DMFunction_libMesh(DM dm, Vec x, Vec r)
+#define __FUNCT__ "DMlibMeshFunction"
+static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
 {
   PetscErrorCode ierr;
   PetscFunctionBegin;
@@ -760,12 +768,23 @@ static PetscErrorCode DMFunction_libMesh(DM dm, Vec x, Vec r)
   PetscFunctionReturn(0);
 }
 
-
+#if !PETSC_VERSION_LE(3,3,0) || !PETSC_VERSION_RELEASE
+#undef __FUNCT__
+#define __FUNCT__ "SNESFunction_DMlibMesh"
+static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void *ctx)
+{
+  DM dm = (DM)ctx;
+  PetscErrorCode ierr;
+  PetscFunctionBegin;
+  ierr = DMlibMeshFunction(dm,x,r);CHKERRQ(ierr);
+  PetscFunctionReturn(0);
+}
+#endif
 
 
 #undef __FUNCT__
-#define __FUNCT__ "DMJacobian_libMesh"
-static PetscErrorCode DMJacobian_libMesh(DM dm, Vec x, Mat jac, Mat pc, MatStructure *msflag)
+#define __FUNCT__ "DMlibMeshJacobian"
+static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc, MatStructure *msflag)
 {
   PetscErrorCode ierr;
   PetscFunctionBegin;
@@ -832,6 +851,18 @@ static PetscErrorCode DMJacobian_libMesh(DM dm, Vec x, Mat jac, Mat pc, MatStruc
   PetscFunctionReturn(0);
 }
 
+#if !PETSC_VERSION_LE(3,3,0) || !PETSC_VERSION_RELEASE
+#undef  __FUNCT__
+#define __FUNCT__ "SNESJacobian_DMlibMesh"
+static PetscErrorCode SNESJacobian_DMlibMesh(SNES,Vec x,Mat *jac,Mat *pc, MatStructure* flag, void* ctx)
+{
+  DM dm = (DM)ctx;
+  PetscErrorCode ierr;
+  PetscFunctionBegin;
+  ierr = DMlibMeshJacobian(dm,x,*jac,*pc,flag); CHKERRQ(ierr);
+  PetscFunctionReturn(0);
+}
+#endif
 
 #undef __FUNCT__
 #define __FUNCT__ "DMVariableBounds_libMesh"
@@ -1001,11 +1032,15 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
      Do not evaluate function, Jacobian or bounds for an embedded DM -- the subproblem might not have enough information for that. 
   */
   if(!dlm->embedding) {
-    ierr = DMSetFunction(dm, DMFunction_libMesh); CHKERRQ(ierr);
-    ierr = DMSetJacobian(dm, DMJacobian_libMesh); CHKERRQ(ierr);
+#if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
+    ierr = DMSetFunction(dm, DMlibMeshFunction); CHKERRQ(ierr);
+    ierr = DMSetJacobian(dm, DMlibMeshJacobian); CHKERRQ(ierr);
+#else
+    ierr = DMSNESSetFunction(dm, SNESFunction_DMlibMesh, (void*)dm); CHKERRQ(ierr);
+    ierr = DMSNESSetJacobian(dm, SNESJacobian_DMlibMesh, (void*)dm); CHKERRQ(ierr);
+#endif
     if (dlm->sys->nonlinear_solver->bounds || dlm->sys->nonlinear_solver->bounds_object)
       ierr = DMSetVariableBounds(dm, DMVariableBounds_libMesh); CHKERRQ(ierr);
-    
   }
   else {
     /* 
@@ -1084,9 +1119,11 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
   dm->ops->getinjection       = 0; // DMGetInjection_libMesh;
   dm->ops->getaggregates      = 0; // DMGetAggregates_libMesh;
   
+#if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
   dm->ops->createfielddecompositiondm  = DMCreateFieldDecompositionDM_libMesh;
-  dm->ops->createfielddecomposition    = DMCreateFieldDecomposition_libMesh;
   dm->ops->createdomaindecompositiondm = DMCreateDomainDecompositionDM_libMesh;
+#endif
+  dm->ops->createfielddecomposition    = DMCreateFieldDecomposition_libMesh;
   dm->ops->createdomaindecomposition   = DMCreateDomainDecomposition_libMesh;
 
   dm->ops->destroy            = DMDestroy_libMesh;

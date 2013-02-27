@@ -124,8 +124,8 @@ namespace libMesh {
     int ierr=0;
     int n_iterations =0;
 
-    // Should actually be a PetscReal, but I don't know which version of PETSc first introduced PetscReal
-    Real final_residual_norm=0.;
+
+    PetscReal final_residual_norm=0.;
 
     if (this->user_presolve)
       this->user_presolve(this->system());
