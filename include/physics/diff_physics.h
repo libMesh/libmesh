@@ -97,9 +97,10 @@ public:
    * return false.
    *
    * Users need to reimplement this for their particular PDE.
+   *
    * To implement the physics model du/dt = F(u), the user should
-   * examine u = elem_solution and add (F(u), phi_i) to 
-   * elem_residual.
+   * examine u = elem_solution and add (F(u), phi_i) to elem_residual
+   * in elem_time_derivative().
    */
   virtual bool element_time_derivative (bool request_jacobian,
                                         DiffContext &) {
@@ -114,9 +115,10 @@ public:
    * return false.
    *
    * Users may need to reimplement this for their particular PDE.
+   *
    * To implement the constraint 0 = G(u), the user should
-   * examine u = elem_solution and add (G(u), phi_i) to 
-   * elem_residual.
+   * examine u = elem_solution and add (G(u), phi_i) to elem_residual
+   * in elem_constraint().
    */
   virtual bool element_constraint (bool request_jacobian,
                                    DiffContext &) {
@@ -141,6 +143,11 @@ public:
    *
    * Users may need to reimplement this for their particular PDE
    * depending on the boundary conditions.
+   *
+   * To implement a weak form of the source term du/dt = F(u) on
+   * sides, such as might arise in a flux boundary condition, the user
+   * should examine u = elem_solution and add (F(u), phi_i) boundary
+   * integral contributions to elem_residual in side_constraint().
    */
   virtual bool side_time_derivative (bool request_jacobian,
                                      DiffContext &) {
@@ -157,6 +164,10 @@ public:
    *
    * Users may need to reimplement this for their particular PDE
    * depending on the boundary conditions.
+   *
+   * To implement a weak form of the constraint 0 = G(u), the user
+   * should examine u = elem_solution and add (G(u), phi_i) boundary
+   * integral contributions to elem_residual in side_constraint().
    */
   virtual bool side_constraint (bool request_jacobian,
                                 DiffContext &) {
