@@ -288,10 +288,12 @@ extern OStreamProxy err;
 // without failure otherwise.
 //
 // This macro only works in main(), because we have no better way than
-// "return 0" from main to immediately exit successfully - std::exit(0)
+// "return" from main to immediately exit successfully - std::exit()
 // gets seen by at least some MPI stacks as failure.
+//
+// We now return 77, the automake code for a skipped test.
 
-#define libmesh_example_assert(asserted, requirement)   do { if (!(asserted)) { libMesh::out << "Assertion `" #asserted "' failed.  Configuring libMesh with " requirement " may be required to run this code." << std::endl; return 0; } } while(0)
+#define libmesh_example_assert(asserted, requirement)   do { if (!(asserted)) { libMesh::out << "Assertion `" #asserted "' failed.  Configuring libMesh with " requirement " may be required to run this code." << std::endl; return 77; } } while(0)
 
 // libmesh_cast_ref and libmesh_cast_ptr do a dynamic cast and assert
 // the result, if we have RTTI enabled and we're in debug or
