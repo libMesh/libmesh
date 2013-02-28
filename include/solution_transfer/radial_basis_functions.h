@@ -32,6 +32,38 @@
 namespace libMesh
 {
 
+  // /**
+  //  * Simple radial basis function.
+  //  */
+  // class SimpleRBF
+  // {
+  // private:
+  //   const Real _rcut;
+
+  // public:
+    
+  //   /**
+  //    * Constructor.
+  //    */
+  //   SimpleRBF (const Real r_cut = 1.) :
+  //     _rcut (r_cut)
+  //   {}
+
+  //   /**
+  //    * Evaluate the radial basis function at the reqested location.
+  //    */
+  //   Real operator()(Real rad) const
+  //   {
+  //     if (rad > _rcut) return 0.;
+      
+  //     rad /= _rcut;
+     
+  //     return std::sqrt( 1+ rad*rad );
+  //   }
+  // };
+
+
+    
   /**
    * Wendland's compactly supported Radial Basis Functions.
    */
@@ -46,14 +78,14 @@ namespace libMesh
     /**
      * Constructor.
      */
-    WendlandRBF (const Real r_cut = std::numeric_limits<Real>::max()) :
+    WendlandRBF (const Real r_cut = 1.) :
       _rcut (r_cut)
     {}
 
     /**
      * Evaluate the radial basis function at the reqested location.
      */
-    Real operator()(const Real rad) const { libmesh_not_implemented(); return 0.; }
+    Real operator()(Real rad) const { libmesh_not_implemented(); return 0.; }
   };
 
 
@@ -62,42 +94,46 @@ namespace libMesh
   // Explicit specializations
   template<>
   inline
-  Real WendlandRBF<3,0>::operator()(const Real rad) const
+  Real WendlandRBF<3,0>::operator()(Real rad) const
   {
-    return
-      (rad > _rcut) ?
-      0.:
-      Utility::pow<2>(1.-rad);
+    if (rad > _rcut) return 0.;
+
+    rad /= _rcut;
+
+    return Utility::pow<2>(1.-rad);
   }
 
   template<>
   inline
-  Real WendlandRBF<3,2>::operator()(const Real rad) const
+  Real WendlandRBF<3,2>::operator()(Real rad) const
   {
-    return
-      (rad > _rcut) ?
-      0.:
-      Utility::pow<4>(1.-rad)*(4.*rad + 1.);      
+    if (rad > _rcut) return 0.;
+
+    rad /= _rcut;
+
+    return Utility::pow<4>(1.-rad)*(4.*rad + 1.);      
   }
 
   template<>
   inline
-  Real WendlandRBF<3,4>::operator()(const Real rad) const
+  Real WendlandRBF<3,4>::operator()(Real rad) const
   {
-    return
-      (rad > _rcut) ?
-      0.:
-      Utility::pow<6>(1.-rad)*((35.*rad + 18.)*rad + 3.);
+    if (rad > _rcut) return 0.;
+
+    rad /= _rcut;
+
+    return Utility::pow<6>(1.-rad)*((35.*rad + 18.)*rad + 3.);
   }
 
   template<>
   inline
-  Real WendlandRBF<3,8>::operator()(const Real rad) const
+  Real WendlandRBF<3,8>::operator()(Real rad) const
   {
-    return
-      (rad > _rcut) ?
-      0.:
-      Utility::pow<8>(1.-rad)*(((32.*rad + 25.)*rad + 8.)*rad + 1.);
+    if (rad > _rcut) return 0.;
+
+    rad /= _rcut;
+
+    return Utility::pow<8>(1.-rad)*(((32.*rad + 25.)*rad + 8.)*rad + 1.);
   }
 
     
