@@ -416,10 +416,10 @@ unsigned int NewtonSolver::solve()
         }
 
       // since we're not converged, backtrack if necessary
-      Real steplength = 1;
-      this->line_search(std::sqrt(TOLERANCE),
-                        last_residual, current_residual,
-                        newton_iterate, linear_solution);
+      Real steplength =
+        this->line_search(std::sqrt(TOLERANCE),
+                          last_residual, current_residual,
+                          newton_iterate, linear_solution);
       norm_delta *= steplength;
 
       // Check to see if backtracking failed,
