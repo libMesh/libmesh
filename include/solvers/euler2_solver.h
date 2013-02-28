@@ -34,8 +34,8 @@ namespace libMesh
  * time integration of DifferentiableSystems.
  * The "Euler2" solver differs from Euler in how it evaluates
  * residuals at intermediate theta values:
- * Euler solves u' = f(theta*u_new + (1-theta)*u_old),
- * Euler2 solves u' = theta*f(u_new) + (1-theta)*f(u_old)
+ * Euler solves m(u,u') = f(theta*u_new + (1-theta)*u_old),
+ * Euler2 solves m(u') = theta*f(u_new) + (1-theta)*f(u_old)
  * i.e. the trapezoidal rule for theta = 0.5
  *
  * This class is part of the new DifferentiableSystem framework,
