@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/meshfree_interpolation.h"
 #include "libmesh/radial_basis_functions.h"
+#include "libmesh/mesh_tools.h"
 
 
 
@@ -36,15 +37,38 @@ namespace libMesh
 template <unsigned int KDDim, class RBF = WendlandRBF<KDDim, 2> >
 class RadialBasisInterpolation : public InverseDistanceInterpolation<KDDim>
 {
+  /**
+   * Bring base class data into our namespace.
+   */
+  using MeshfreeInterpolation::_src_pts;
+  using MeshfreeInterpolation::_src_vals;
+  using MeshfreeInterpolation::_names;
+
 protected:
   
+  /**
+   * Bounding box for our source points.
+   */
+  MeshTools::BoundingBox _src_bbox;
+  
+  /**
+   * basis coefficients.
+   */
+  std::vector<Number> _weights;
+
+  /**
+   * Diagonal of the bounding box.
+   */
+  Real _r_bbox;
+
 public:
 
   /**
    * Constructor. 
    */
   RadialBasisInterpolation () :
-    InverseDistanceInterpolation<KDDim> ()
+    InverseDistanceInterpolation<KDDim> (),
+    _r_bbox(0.)
   {}
 
   /**
