@@ -23942,6 +23942,10 @@ $as_echo "------- Configuring compiler features -------" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ---------------------------------------------" >&5
 $as_echo "---------------------------------------------" >&6; }
 
+# Test using any user-specified flags
+libmesh_compiler_features_save_CXXFLAGS="$CXXFLAGS"
+CXXFLAGS="$libmesh_CXXFLAGS $CXXFLAGS"
+
 # --------------------------------------------------------------
 # Real precision - double by default
 # --------------------------------------------------------------
@@ -26165,7 +26169,8 @@ $as_echo "<<< Configuring library with OpenMP support >>>" >&6; }
 fi
 # -------------------------------------------------------------
 
-
+# Restore original CXXFLAGS for now
+CXXFLAGS="$libmesh_compiler_features_save_CXXFLAGS"
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ---------------------------------------------" >&5
 $as_echo "---------------------------------------------" >&6; }
@@ -36849,6 +36854,7 @@ if (test "x$enableoptional" = "xyes"); then
   if (test "x$enablecppthreads" = "xyes"); then
   echo '     'flavor........................ : $cppthreadflavor
   fi
+  echo '  'c++ rtti ........................ : $ac_cv_cxx_rtti
   echo '  'tecio............................ : $enabletecio
   echo '  'tecplot...\(vendor binaries\)...... : $enabletecplot
   echo '  'tetgen........................... : $enabletetgen

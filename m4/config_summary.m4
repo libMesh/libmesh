@@ -147,6 +147,7 @@ if (test "x$enableoptional" = "xyes"); then
   if (test "x$enablecppthreads" = "xyes"); then
   echo '     'flavor........................ : $cppthreadflavor
   fi
+  echo '  'c++ rtti ........................ : $ac_cv_cxx_rtti
   echo '  'tecio............................ : $enabletecio
   echo '  'tecplot...\(vendor binaries\)...... : $enabletecplot
   echo '  'tetgen........................... : $enabletetgen

@@ -6,6 +6,10 @@ AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(------- Configuring compiler features -------)
 AC_MSG_RESULT(---------------------------------------------)
 
+# Test using any user-specified flags
+libmesh_compiler_features_save_CXXFLAGS="$CXXFLAGS"
+CXXFLAGS="$libmesh_CXXFLAGS $CXXFLAGS"
+
 # --------------------------------------------------------------
 # Real precision - double by default
 # --------------------------------------------------------------
@@ -188,7 +192,8 @@ if (test "$enableopenmp" != no) ; then
 fi
 # -------------------------------------------------------------
 
-
+# Restore original CXXFLAGS for now
+CXXFLAGS="$libmesh_compiler_features_save_CXXFLAGS"
 
 AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(----- Done configuring compiler features ----)
