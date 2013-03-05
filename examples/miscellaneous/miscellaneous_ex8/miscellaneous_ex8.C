@@ -128,7 +128,7 @@ int main(int argc, char** argv)
     // Demonstration case 1
     {
       std::vector<Point>       tgt_pts;
-      std::vector<Number>      tgt_data;
+      std::vector<Number>      tgt_data_idi, tgt_data_rbi;
       std::vector<std::string> field_vars;
       
       field_vars.push_back("u");
@@ -142,7 +142,7 @@ int main(int argc, char** argv)
       idi.set_field_variables (field_vars);
       rbi.set_field_variables (field_vars);
       
-      create_random_point_cloud (1e5,
+      create_random_point_cloud (100,
 				 idi.get_source_points());
 
       
@@ -174,25 +174,36 @@ int main(int argc, char** argv)
       {
 	create_random_point_cloud (10,
 				   tgt_pts);
-	
+
+	//tgt_pts = rbi.get_source_points();
+
 	idi.interpolate_field_data (field_vars,
 				    tgt_pts,
-				    tgt_data);
+				    tgt_data_idi);
 	
-      
-	std::vector<Number>::const_iterator v_it=tgt_data.begin();
+	rbi.interpolate_field_data (field_vars,
+				    tgt_pts,
+				    tgt_data_rbi);
+	
+      	std::vector<Number>::const_iterator 
+	  v_idi=tgt_data_idi.begin(),
+	  v_rbi=tgt_data_rbi.begin();
 	
 	for (std::vector<Point>::const_iterator  p_it=tgt_pts.begin();
 	     p_it!=tgt_pts.end(); ++p_it)
 	  {
 	    std::cout << "\nAt target point " << *p_it
-		      << "\n u_interp=" << *v_it
-		      << ", u_exact="  << exact_solution_u(*p_it);
-	    ++v_it;
-	    std::cout << "\n v_interp=" << *v_it
-		      << ", v_exact="  << exact_solution_v(*p_it)
+		      << "\n u_interp_idi="   << *v_idi
+		      << ", u_interp_rbi="    << *v_rbi
+		      << ", u_exact="         << exact_solution_u(*p_it);
+	    ++v_idi;
+	    ++v_rbi;
+	    std::cout << "\n v_interp_idi=" << *v_idi
+		      << ", v_interp_rbi="  << *v_rbi
+		      << ", v_exact="       << exact_solution_v(*p_it)
 		      << std::endl;
-	    ++v_it;
+	    ++v_idi;
+	    ++v_rbi;
 	  }
       }
     }
@@ -224,6 +235,7 @@ int main(int argc, char** argv)
 
       InverseDistanceInterpolation<3> idi (/* n_interp_pts = */ 4,
 					   /* power =        */ 2);
+      RadialBasisInterpolation<3> rbi;
 
       std::vector<Point>  &src_pts  (idi.get_source_points());
       std::vector<Number> &src_vals (idi.get_source_vals());
@@ -243,24 +255,46 @@ int main(int argc, char** argv)
 	    src_pts.push_back(*node);
 	    src_vals.push_back(sys_a.current_solution(node->dof_number(0,0,0)));
 	  }	  	
+	
+	rbi.set_field_variables(field_vars);
+	rbi.get_source_points() = idi.get_source_points();
+	rbi.get_source_vals()   = idi.get_source_vals();
       }
 
       // We have only set local values - prepare for use by gathering remote gata
       idi.prepare_for_use();
+      rbi.prepare_for_use();
 
       // Create a MeshlessInterpolationFunction that uses our InverseDistanceInterpolation
       // object.  Since each MeshlessInterpolationFunction shares the same InverseDistanceInterpolation
       // object in a threaded environment we must also provide a locking mechanism.
-      Threads::spin_mutex mutex;
-      MeshlessInterpolationFunction mif(idi, mutex);
-
-      // project the solution onto system b
-      es_b.init();
-      sys_b.project_solution (&mif);
+      {
+	Threads::spin_mutex mutex;
+	MeshlessInterpolationFunction mif(idi, mutex);
+	
+	// project the solution onto system b
+	es_b.init();
+	sys_b.project_solution (&mif);
       
-      // Write the result
-      TecplotIO(mesh_b).write_equation_systems ("dest.dat",
-						es_b);
+	// Write the result
+	TecplotIO(mesh_b).write_equation_systems ("dest_idi.dat",
+						  es_b);
+      }
+
+      // Create a MeshlessInterpolationFunction that uses our RadialBasisInterpolation
+      // object.  Since each MeshlessInterpolationFunction shares the same RadialBasisInterpolation
+      // object in a threaded environment we must also provide a locking mechanism.
+      {
+	Threads::spin_mutex mutex;
+	MeshlessInterpolationFunction mif(rbi, mutex);
+	
+	// project the solution onto system b
+	sys_b.project_solution (&mif);
+      
+	// Write the result
+	TecplotIO(mesh_b).write_equation_systems ("dest_rbi.dat",
+						  es_b);
+      }
     }
 
 
