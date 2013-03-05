@@ -34,11 +34,11 @@ cell_data = {
     {'''08', 22}
     {'''09', 28}
     {'''10', 23}
-    {'''11', 31}
-    {'''12', 30}
+    {'''11', 32}
+    {'''12', 35}
     {'''13', 6}
-    {'P', 9} % Preprints
-    {'T', 13} % Theses
+    {'P', 12} % Preprints
+    {'T', 15} % Theses
     };
 
 % Strip numerical data from cell_data

@@ -16,6 +16,7 @@ hold on
 
 %               "Other"   "SF Logo"
 cell_data = {
+{'Feb', '2013',  2107   , 24913}
 {'Jan', '2013',  2552   , 31993}
 {'Dec', '2012',  3439   , 24706} % libmesh switched to github Dec 10, 2012
 {'Nov', '2012',  6104   , 39650}
