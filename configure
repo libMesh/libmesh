@@ -31807,8 +31807,6 @@ fi
 
 
 
-  # The TRIANGLE API is distributed with libmesh, so we don't have to guess
-  # where it might be installed...
   if (test $enablehdf5 = yes); then
 
 
@@ -32040,6 +32038,13 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 	  { $as_echo "$as_me:${as_lineno-$LINENO}: optional HDF5 library not found, or does not meet version requirements" >&5
 $as_echo "$as_me: optional HDF5 library not found, or does not meet version requirements" >&6;}
        fi
+
+       HDF5_CFLAGS=""
+       HDF5_CPPFLAGS=""
+       HDF5_LIBS=""
+       HDF5_FLIBS=""
+       HDF5_CXXLIBS=""
+       HDF5_PREFIX=""
     else
         HAVE_HDF5=1
 

@@ -15,8 +15,6 @@ AC_DEFUN([CONFIGURE_HDF5],
   
 
 
-  # The TRIANGLE API is distributed with libmesh, so we don't have to guess
-  # where it might be installed...
   if (test $enablehdf5 = yes); then
     AX_PATH_HDF5(1.8.0,no)
     if (test "x$HAVE_HDF5" = "x0"); then	    
@@ -51,6 +49,7 @@ AC_DEFUN([CONFIGURE_HDF5],
 #
 # COPYLEFT
 #
+#   Copyright (c) 2013 Roy H. Stogner <roystgnr@ices.utexas.edu>
 #   Copyright (c) 2010 Karl W. Schulz <karl@ices.utexas.edu>
 #   Copyright (c) 2009 Rhys Ulerich <rhys.ulerich@gmail.com>
 #   Copyright (c) 2008 Thomas Porschberg <thomas@randspringer.de>
@@ -201,6 +200,13 @@ if test "${with_hdf5}" != no ; then
        else		             
 	  AC_MSG_NOTICE([optional HDF5 library not found, or does not meet version requirements])
        fi
+
+       HDF5_CFLAGS=""
+       HDF5_CPPFLAGS=""
+       HDF5_LIBS=""
+       HDF5_FLIBS=""
+       HDF5_CXXLIBS=""
+       HDF5_PREFIX=""
     else
         HAVE_HDF5=1
         AC_DEFINE(HAVE_HDF5,1,[Define if HDF5 is available])
