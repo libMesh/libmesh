@@ -48,7 +48,7 @@ for method in ${METHODS}; do
     $LIBMESH_RUN ./$executable -n_timesteps $n_timesteps -n_refinements $n_refinements \
         -output_freq $output_freq -init_timestep 0 \
         -exact_solution '10*exp(-(pow(x-0.8*t-0.2,2) + pow(y-0.8*t-0.2,2))/(0.01*(4*t+1)))/(4*t+1)' \
-        $LIBMESH_OPTIONS || exit 1
+        $LIBMESH_OPTIONS || exit $?
     
     message_done_running $example_name $executable $options
 done
