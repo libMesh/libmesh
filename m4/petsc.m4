@@ -203,5 +203,7 @@ EOF
       ACX_MPI
     fi	
   fi
+
+  AC_SUBST(enablepetsc)
 ])
 
