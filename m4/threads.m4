@@ -47,6 +47,12 @@ ac_cv_tbb_cxx_thread,
 ]
 CXXFLAGS="$saveCXXFLAGS"
 )
+
+# if we don't have functioning TBB avoid a false positive
+if test "x$enabletbb" = "xno"; then
+  ac_cv_tbb_cxx_thread=no
+fi
+
 if test "$ac_cv_tbb_cxx_thread" = yes; then
   AC_DEFINE(HAVE_TBB_CXX_THREAD,1,
             [define if the compiler supports std::thread])

@@ -799,6 +799,7 @@ SLEPC_INCLUDE
 SLEPC_DIR
 LIBMESH_ENABLE_PETSC_FALSE
 LIBMESH_ENABLE_PETSC_TRUE
+enablepetsc
 MPI_INCLUDES_PATHS
 MPI_INCLUDES_PATH
 MPI_LIBS_PATHS
@@ -29074,6 +29075,8 @@ fi
     fi
   fi
 
+
+
 if (test $enablempi != no) ; then
   libmesh_optional_INCLUDES="$MPI_INCLUDES_PATHS $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$MPI_LIBS_PATHS $MPI_LIBS $libmesh_optional_LIBS"
@@ -30071,6 +30074,12 @@ CXXFLAGS="$saveCXXFLAGS"
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_tbb_cxx_thread" >&5
 $as_echo "$ac_cv_tbb_cxx_thread" >&6; }
+
+# if we don't have functioning TBB avoid a false positive
+if test "x$enabletbb" = "xno"; then
+  ac_cv_tbb_cxx_thread=no
+fi
+
 if test "$ac_cv_tbb_cxx_thread" = yes; then
 
 $as_echo "#define HAVE_TBB_CXX_THREAD 1" >>confdefs.h

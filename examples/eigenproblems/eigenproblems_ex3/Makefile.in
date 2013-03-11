@@ -501,6 +501,7 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 enablelegacyincludepaths = @enablelegacyincludepaths@
+enablepetsc = @enablepetsc@
 exec_prefix = @exec_prefix@
 gitquery = @gitquery@
 have_gcov = @have_gcov@
