@@ -27,7 +27,7 @@ DTKEvaluator::DTKEvaluator(System & in_sys, std::string var_name):
 DTKEvaluator::FieldContainerType
 DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int>& elements, const Teuchos::ArrayRCP<double>& coords)
 {
-  int num_values = elements.size();
+  unsigned int num_values = elements.size();
 
   Teuchos::ArrayRCP<Number> values(num_values);
   DataTransferKit::FieldContainer<Number> evaluations(values, 1);
