@@ -69,7 +69,7 @@ public:
   RadialBasisInterpolation () :
     InverseDistanceInterpolation<KDDim> (),
     _r_bbox(0.)
-  {}
+  { libmesh_experimental(); }
 
   /**
    * Clears all internal data structures and restores to a

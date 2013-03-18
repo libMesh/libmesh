@@ -80,7 +80,7 @@ namespace libMesh
      */
     WendlandRBF (const Real r_cut = 1.) :
       _rcut (r_cut)
-    {}
+    { libmesh_experimental(); }
 
     /**
      * Evaluate the radial basis function at the reqested location.
