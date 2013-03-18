@@ -8,7 +8,7 @@ if LIBMESH_ENABLE_NANOFLANN
   check_SCRIPTS = run.sh
 endif
 
-CLEANFILES = src.dat dest.dat
+CLEANFILES = src.dat dest*.dat
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD

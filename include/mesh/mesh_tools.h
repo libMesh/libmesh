@@ -33,6 +33,7 @@
 // C++ Includes   -----------------------------------
 #include <vector>
 #include <set>
+#include <limits>
 
 namespace libMesh
 {
@@ -74,6 +75,23 @@ namespace MeshTools
     BoundingBox (const std::pair<Point, Point> &bbox) :
       std::pair<Point, Point> (bbox)
     {}
+
+    /**
+     * Default constructor sets invalid bounds.
+     */
+    BoundingBox ()
+    {
+      this->invalidate();
+    }
+
+    void invalidate ()
+    {
+      for (unsigned int i=0; i<LIBMESH_DIM; i++)
+	{
+	  this->first(i)  = std::numeric_limits<Real>::max();
+	  this->second(i) = std::numeric_limits<Real>::lowest();
+	}
+    }
 
     const Point & min() const
     { return this->first; }

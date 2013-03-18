@@ -510,7 +510,8 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	transient_rb_theta_expansion.h direct_solution_transfer.h \
 	dtk_adapter.h dtk_evaluator.h dtk_solution_transfer.h \
 	meshfree_interpolation.h meshfree_solution_transfer.h \
-	meshfunction_solution_transfer.h solution_transfer.h \
+	meshfunction_solution_transfer.h radial_basis_functions.h \
+	radial_basis_interpolation.h solution_transfer.h \
 	adaptive_time_solver.h diff_solver.h eigen_solver.h \
 	eigen_sparse_linear_solver.h eigen_time_solver.h \
 	euler2_solver.h euler_solver.h laspack_linear_solver.h \
@@ -1637,6 +1638,12 @@ meshfree_solution_transfer.h: $(top_srcdir)/include/solution_transfer/meshfree_s
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 meshfunction_solution_transfer.h: $(top_srcdir)/include/solution_transfer/meshfunction_solution_transfer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+radial_basis_functions.h: $(top_srcdir)/include/solution_transfer/radial_basis_functions.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+radial_basis_interpolation.h: $(top_srcdir)/include/solution_transfer/radial_basis_interpolation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 solution_transfer.h: $(top_srcdir)/include/solution_transfer/solution_transfer.h
