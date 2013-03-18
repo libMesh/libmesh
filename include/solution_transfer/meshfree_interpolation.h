@@ -303,7 +303,7 @@ private:
 		    const std::vector<Real>   &src_dist_sqr,
 		    std::vector<Number>::iterator &out_it) const;
   
-  const int          _half_power;
+  const Real         _half_power;
   const unsigned int _n_interp_pts;
 
   /**
@@ -318,16 +318,14 @@ public:
    * which defaults to 2. 
    */
   InverseDistanceInterpolation (const unsigned int n_interp_pts = 8,
-				const unsigned int power        = 2) :
+				                const Real  power               = 2) :
     MeshfreeInterpolation(),
 #if LIBMESH_HAVE_NANOFLANN
     _point_list_adaptor(_src_pts),
 #endif
-    _half_power(power/2),
+    _half_power(power/2.0),
     _n_interp_pts(n_interp_pts)
-  {
-    libmesh_assert_greater_equal (power, 2);
-  }
+  {}
 
   /**
    * Clears all internal data structures and restores to a
