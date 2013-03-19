@@ -113,13 +113,12 @@ void init_sys(EquationSystems& es,
 int main(int argc, char** argv)
 {
   // Skip this example if we do not meet certain requirements
-#if LIBMESH_DIM != 3
-  std::cout << "This example requires 3D support - skipping.\n";
-  return 77;
+  libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
+#ifndef LIBMESH_HAVE_EIGEN
+  libmesh_example_assert(false, "--enable-eigen");
 #endif
 #ifndef LIBMESH_HAVE_ZLIB_H
-  std::cout << "This example requires zlib support - skipping.\n";
-  return 77;
+  libmesh_example_assert(false, "--enable-zlib");
 #endif
 
   // Initialize libMesh.
