@@ -40,9 +40,9 @@ class RadialBasisInterpolation : public InverseDistanceInterpolation<KDDim>
   /**
    * Bring base class data into our namespace.
    */
-  using MeshfreeInterpolation::_src_pts;
-  using MeshfreeInterpolation::_src_vals;
-  using MeshfreeInterpolation::_names;
+  using InverseDistanceInterpolation<KDDim>::_src_pts;
+  using InverseDistanceInterpolation<KDDim>::_src_vals;
+  using InverseDistanceInterpolation<KDDim>::_names;
 
 protected:
   
