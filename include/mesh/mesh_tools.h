@@ -88,8 +88,8 @@ namespace MeshTools
     {
       for (unsigned int i=0; i<LIBMESH_DIM; i++)
 	{
-	  this->first(i)  = std::numeric_limits<Real>::max();
-	  this->second(i) = std::numeric_limits<Real>::lowest();
+	  this->first(i)  =  std::numeric_limits<Real>::max();
+	  this->second(i) = -std::numeric_limits<Real>::max();
 	}
     }
 
