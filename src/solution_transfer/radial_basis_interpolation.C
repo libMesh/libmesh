@@ -51,7 +51,7 @@ namespace libMesh
 
 #ifndef LIBMESH_HAVE_EIGEN
     
-    std::err << "ERROR: this functionality presently requires Eigen!\n";
+    libMesh::err << "ERROR: this functionality presently requires Eigen!\n";
     libmesh_error();
     
 #else
