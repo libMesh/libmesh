@@ -587,7 +587,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = src.dat dest.dat $(am__append_1) $(example_name).php \
+CLEANFILES = src.dat dest*.dat $(am__append_1) $(example_name).php \
 	stdout.log
 
 # also need to link files for VPATH builds

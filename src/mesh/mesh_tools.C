@@ -97,8 +97,8 @@ namespace {
   {
   public:
     FindBBox () :
-      _vmin(LIBMESH_DIM,  std::numeric_limits<Real>::max()),
-      _vmax(LIBMESH_DIM, -std::numeric_limits<Real>::max())
+      _vmin(LIBMESH_DIM, std::numeric_limits<Real>::max()),
+      _vmax(LIBMESH_DIM, std::numeric_limits<Real>::lowest())
     {}
 
     FindBBox (FindBBox &other, Threads::split) :
