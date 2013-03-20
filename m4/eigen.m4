@@ -95,6 +95,7 @@ AC_DEFUN([CONFIGURE_EIGEN],
 
 	 # if we survived, we really have Eigen
  	 if (test x$enableeigen = xyes); then				    
+           HAVE_EIGEN=1
 	   AC_DEFINE(HAVE_EIGEN, 1, [Flag indicating whether the library will be compiled with Eigen support])
 	   AC_MSG_RESULT(<<< Configuring library with Eigen support >>>)
 	 fi

@@ -31563,6 +31563,7 @@ done
 
 	 # if we survived, we really have Eigen
  	 if (test x$enableeigen = xyes); then
+           HAVE_EIGEN=1
 
 $as_echo "#define HAVE_EIGEN 1" >>confdefs.h
 
