@@ -31429,6 +31429,9 @@ fi
 # Eigen -- Optimized linear algebra routines, enabled by default
 # -------------------------------------------------------------
 
+# we require Eigen/Sparse support
+enableeigensparse=yes
+
   # Check whether --enable-eigen was given.
 if test "${enable_eigen+set}" = set; then :
   enableval=$enable_eigen; case "${enableval}" in
@@ -31464,6 +31467,10 @@ fi
 
     elif (test "x$EIGEN3_INCLUDE" != x -a -f $EIGEN3_INCLUDE/Eigen/Eigen); then
 	EIGEN_INC=$EIGEN3_INCLUDE
+	echo "Environment EIGEN_INC=$EIGEN_INC"
+
+    elif (test "x$EIGEN_INCLUDE" != x -a -f $EIGEN_INCLUDE/Eigen/Eigen); then
+	EIGEN_INC=$EIGEN_INCLUDE
 	echo "Environment EIGEN_INC=$EIGEN_INC"
 
     elif (test -f /usr/include/eigen3/Eigen/Eigen); then
@@ -31520,13 +31527,12 @@ $as_echo "<<< external Eigen header files not found, using Eigen from ./contrib 
 	 ac_eigen_save_CPPFLAGS="$CPPFLAGS"
 	 CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
 
-	 for ac_header in Eigen/Dense Eigen/Sparse
+	 for ac_header in Eigen/Dense
 do :
-  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "Eigen/Dense" "ac_cv_header_Eigen_Dense" "$ac_includes_default"
+if test "x$ac_cv_header_Eigen_Dense" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+#define HAVE_EIGEN_DENSE 1
 _ACEOF
 
 else
@@ -31535,6 +31541,23 @@ fi
 
 done
 
+
+         if (test x$enableeigensparse = xyes); then
+	     for ac_header in Eigen/Sparse
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "Eigen/Sparse" "ac_cv_header_Eigen_Sparse" "$ac_includes_default"
+if test "x$ac_cv_header_Eigen_Sparse" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_EIGEN_SPARSE 1
+_ACEOF
+
+else
+  enableeigen=no
+fi
+
+done
+
+         fi
 
 	 CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
 

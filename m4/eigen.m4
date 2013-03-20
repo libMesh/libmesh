@@ -45,6 +45,10 @@ AC_DEFUN([CONFIGURE_EIGEN],
 	EIGEN_INC=$EIGEN3_INCLUDE
 	echo "Environment EIGEN_INC=$EIGEN_INC"
 	
+    elif (test "x$EIGEN_INCLUDE" != x -a -f $EIGEN_INCLUDE/Eigen/Eigen); then
+	EIGEN_INC=$EIGEN_INCLUDE
+	echo "Environment EIGEN_INC=$EIGEN_INC"
+	
     elif (test -f /usr/include/eigen3/Eigen/Eigen); then
 	EIGEN_INC="/usr/include/eigen3"
 	
@@ -81,7 +85,11 @@ AC_DEFUN([CONFIGURE_EIGEN],
 	 ac_eigen_save_CPPFLAGS="$CPPFLAGS"
 	 CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
 
-	 AC_CHECK_HEADERS([Eigen/Dense Eigen/Sparse],[],[enableeigen=no])
+	 AC_CHECK_HEADERS([Eigen/Dense],[],[enableeigen=no])
+
+         if (test x$enableeigensparse = xyes); then
+	     AC_CHECK_HEADERS([Eigen/Sparse],[],[enableeigen=no])
+         fi
 			  
 	 CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
 
