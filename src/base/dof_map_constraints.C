@@ -1904,9 +1904,6 @@ void DofMap::build_constraint_matrix_and_vector
       elem_dofs.insert(elem_dofs.end(),
 		       dof_set.begin(), dof_set.end());
 
-      elem_dofs.insert(elem_dofs.end(),
-		       dof_set.begin(), dof_set.end());
-
       // Now we can build the constraint matrix and vector.
       // Note that resize also zeros for a DenseMatrix and DenseVector
       C.resize (old_size,
