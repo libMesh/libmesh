@@ -652,10 +652,9 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 
 
 
-void MeshRefinement::flag_elements_by_user_selection (ElementFlagging &element_flagging)
+void MeshRefinement::flag_elements_by (ElementFlagging &element_flagging)
 {
   element_flagging.flag_elements();
-  this->make_flags_parallel_consistent();
 }
 
 

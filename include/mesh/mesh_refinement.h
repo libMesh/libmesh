@@ -83,7 +83,7 @@ public:
    * augment traditional error indicator based refinement.
    * This simply provides a base class that can be derived
    * from and then passed to the 
-   * \p flag_elements_by_user_selection() method.
+   * \p flag_elements_by () method.
    */
   class ElementFlagging
   {
@@ -198,12 +198,10 @@ public:
 				     const unsigned int max_level = libMesh::invalid_uint);
 
   /**
-   * Flag elements based on direct user selection.  The class \p ElementFlagging
-   * defines a mechanism for the user to direcly mark the refinement flags for
-   * specific elements.
+   * Flag elements based on a function object.  The class \p ElementFlagging
+   * defines a mechanism for implementing refinement strategies.
    */
-  void flag_elements_by_user_selection (ElementFlagging &element_flagging);
-    
+  void flag_elements_by (ElementFlagging &element_flagging);    
     
   /**
    * Takes a mesh whose elements are flagged for h refinement and coarsening,
