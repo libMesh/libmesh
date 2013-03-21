@@ -484,8 +484,7 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   // Parallel consistency has to come first, or coarsening
   // along processor boundaries might occasionally be falsely
   // prevented
-  if (!_mesh.is_serial())
-    this->make_flags_parallel_consistent();
+  this->make_flags_parallel_consistent();
 
   // Repeat until flag changes match on every processor
   do
