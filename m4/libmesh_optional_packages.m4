@@ -364,9 +364,11 @@ AM_CONDITIONAL(LIBMESH_ENABLE_VTK, test x$enablevtk = xyes)
 # Eigen -- Optimized linear algebra routines, enabled by default
 # -------------------------------------------------------------
 
-# we require Eigen/Sparse support
+# we require Eigen/Sparse support if we're going to enable Eigen
 enableeigensparse=yes
-CONFIGURE_EIGEN
+# we test with Eigen 3.1.2, so if the user has their own Eigen it
+# should be at least that new.
+CONFIGURE_EIGEN(3.1.2,no)
 if (test x$enableeigen = xyes); then
   # if we are installing our own Eigen, add it to the contrib search path
   # which is not exported during install

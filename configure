@@ -31429,8 +31429,10 @@ fi
 # Eigen -- Optimized linear algebra routines, enabled by default
 # -------------------------------------------------------------
 
-# we require Eigen/Sparse support
+# we require Eigen/Sparse support if we're going to enable Eigen
 enableeigensparse=yes
+# we test with Eigen 3.1.2, so if the user has their own Eigen it
+# should be at least that new.
 
   # Check whether --enable-eigen was given.
 if test "${enable_eigen+set}" = set; then :
@@ -31444,6 +31446,10 @@ else
 fi
 
 
+  # package requirement; if not specified, the default is to assume that
+  # the package is optional
+
+  is_package_required=no
 
   install_internal_eigen=no
   if (test x$enableeigen = xyes); then
@@ -31524,10 +31530,10 @@ $as_echo "<<< external Eigen header files not found, using Eigen from ./contrib 
     # OK, we have a usable eigen path, make sure the headers we want are good.
     if (test x$enableeigen = xyes); then
 
-	 ac_eigen_save_CPPFLAGS="$CPPFLAGS"
-	 CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
+        ac_eigen_save_CPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="-I${EIGEN_INC} ${CPPFLAGS}"
 
-	 for ac_header in Eigen/Dense
+	for ac_header in Eigen/Dense
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "Eigen/Dense" "ac_cv_header_Eigen_Dense" "$ac_includes_default"
 if test "x$ac_cv_header_Eigen_Dense" = xyes; then :
@@ -31542,8 +31548,8 @@ fi
 done
 
 
-         if (test x$enableeigensparse = xyes); then
-	     for ac_header in Eigen/Sparse
+        if (test x$enableeigensparse = xyes); then
+	    for ac_header in Eigen/Sparse
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "Eigen/Sparse" "ac_cv_header_Eigen_Sparse" "$ac_includes_default"
 if test "x$ac_cv_header_Eigen_Sparse" = xyes; then :
@@ -31557,19 +31563,100 @@ fi
 
 done
 
-         fi
+        fi
 
-	 CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
+        #-----------------------
+        # Minimum version check
+        #----------------------
 
-	 # if we survived, we really have Eigen
- 	 if (test x$enableeigen = xyes); then
-           HAVE_EIGEN=1
+        min_eigen_version=3.1.2
+
+        # looking for major.minor.micro (which Eigen calls world.major.minor) style versioning
+
+        MAJOR_VER=`echo $min_eigen_version | sed 's/^\([0-9]*\).*/\1/'`
+        if test "x${MAJOR_VER}" = "x" ; then
+           MAJOR_VER=0
+        fi
+
+        MINOR_VER=`echo $min_eigen_version | sed 's/^\([0-9]*\)\.\{0,1\}\([0-9]*\).*/\2/'`
+        if test "x${MINOR_VER}" = "x" ; then
+           MINOR_VER=0
+        fi
+
+        MICRO_VER=`echo $min_eigen_version | sed 's/^\([0-9]*\)\.\{0,1\}\([0-9]*\)\.\{0,1\}\([0-9]*\).*/\3/'`
+        if test "x${MICRO_VER}" = "x" ; then
+           MICRO_VER=0
+        fi
+
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for eigen - version >= $min_eigen_version" >&5
+$as_echo_n "checking for eigen - version >= $min_eigen_version... " >&6; }
+
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #include "Eigen/Core"
+
+int
+main ()
+{
+
+            #if EIGEN_WORLD_VERSION > $MAJOR_VER
+            #elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION > $MINOR_VER)
+            #elif (EIGEN_WORLD_VERSION >= $MAJOR_VER) && (EIGEN_MAJOR_VERSION >= $MINOR_VER) && (EIGEN_MINOR_VERSION >= $MICRO_VER)
+            #else
+            #  error version is too old
+            #endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+else
+
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+            enableeigen=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+	CPPFLAGS="${ac_eigen_save_CPPFLAGS}"
+
+	# if we survived, we really have Eigen
+ 	if (test x$enableeigen = xyes); then
+            HAVE_EIGEN=1
 
 $as_echo "#define HAVE_EIGEN 1" >>confdefs.h
 
-	   { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Eigen support >>>" >&5
+	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Eigen support >>>" >&5
 $as_echo "<<< Configuring library with Eigen support >>>" >&6; }
-	 fi
+        elif test "$is_package_required" = yes; then
+            as_fn_error $? "
+
+   Your EIGEN version ($EIGEN_INC) does not meet the minimum versioning
+   requirements ($min_eigen_version).  Please use --with-eigen-include to
+   specify the location of an updated installation.
+
+                " "$LINENO" 5
+	fi
     fi
 
     ac_ext=cpp
