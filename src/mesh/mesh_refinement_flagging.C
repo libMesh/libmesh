@@ -652,6 +652,13 @@ void MeshRefinement::flag_elements_by_mean_stddev (const ErrorVector& error_per_
 
 
 
+void MeshRefinement::flag_elements_by (ElementFlagging &element_flagging)
+{
+  element_flagging.flag_elements();
+}
+
+
+
 void MeshRefinement::switch_h_to_p_refinement ()
 {
   MeshBase::element_iterator       elem_it  = _mesh.elements_begin();

@@ -77,6 +77,31 @@ private:
 
 public:
 
+  /**
+   * Abstract base class to be used for user-specified
+   * element flagging.  This can be used instead of or to
+   * augment traditional error indicator based refinement.
+   * This simply provides a base class that can be derived
+   * from and then passed to the 
+   * \p flag_elements_by () method.
+   */
+  class ElementFlagging
+  {
+  public:
+    /**
+     * Destructor.  Virtual because we will have virtual functions.
+     */
+    virtual ~ElementFlagging () {}
+
+    /**
+     * Callback function to be used for marking elements for refinement.
+     */
+    virtual void flag_elements () = 0;
+  };
+
+  /**
+   * Sets the \p PeriodicBoundaries pointer.
+   */
   void set_periodic_boundaries_ptr(PeriodicBoundaries * pb_ptr);
 
   /**
@@ -172,6 +197,12 @@ public:
 				     const Real coarsen_fraction = 0.0,
 				     const unsigned int max_level = libMesh::invalid_uint);
 
+  /**
+   * Flag elements based on a function object.  The class \p ElementFlagging
+   * defines a mechanism for implementing refinement strategies.
+   */
+  void flag_elements_by (ElementFlagging &element_flagging);    
+    
   /**
    * Takes a mesh whose elements are flagged for h refinement and coarsening,
    * and switches those flags to request p refinement and coarsening instead.
