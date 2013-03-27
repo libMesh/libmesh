@@ -911,11 +911,50 @@ void DofMap::distribute_dofs (MeshBase& mesh)
       this->set_nonlocal_dof_objects(mesh.elements_begin(),
                                      mesh.elements_end(),
                                      mesh, &DofMap::elem_ptr);
+    }
 
 #ifdef DEBUG
-      MeshTools::libmesh_assert_valid_dof_ids(mesh);
+  {
+    const unsigned int
+      sys_num = this->sys_number();
+
+    // Processors should all agree on DoF ids
+    MeshTools::libmesh_assert_valid_dof_ids(mesh);
+
+    // DoF processor ids should match DofObject processor ids
+    MeshBase::const_node_iterator       node_it  = mesh.nodes_begin();
+    const MeshBase::const_node_iterator node_end = mesh.nodes_end();
+    for ( ; node_it != node_end; ++node_it)
+      {
+	DofObject const * const dofobj = *node_it;
+	const processor_id_type proc_id = dofobj->processor_id();
+
+	for (unsigned int v=0; v != dofobj->n_vars(sys_num); ++v)
+          for (unsigned int c=0; c != dofobj->n_comp(sys_num,v); ++c)
+	    {
+	      const dof_id_type dofid = dofobj->dof_number(sys_num,v,c);
+	      libmesh_assert_greater_equal (dofid, this->first_dof(proc_id));
+	      libmesh_assert_less (dofid, this->end_dof(proc_id));
+	    }
+      }
+
+    MeshBase::const_element_iterator       elem_it  = mesh.elements_begin();
+    const MeshBase::const_element_iterator elem_end = mesh.elements_end();
+    for ( ; elem_it != elem_end; ++elem_it)
+      {
+	DofObject const * const dofobj = *elem_it;
+	const processor_id_type proc_id = dofobj->processor_id();
+
+	for (unsigned int v=0; v != dofobj->n_vars(sys_num); ++v)
+          for (unsigned int c=0; c != dofobj->n_comp(sys_num,v); ++c)
+	    {
+	      const dof_id_type dofid = dofobj->dof_number(sys_num,v,c);
+	      libmesh_assert_greater_equal (dofid, this->first_dof(proc_id));
+	      libmesh_assert_less (dofid, this->end_dof(proc_id));
+	    }
+      }
+  }
 #endif
-    }
 
   // Set the total number of degrees of freedom
 #ifdef LIBMESH_ENABLE_AMR
