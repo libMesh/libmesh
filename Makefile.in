@@ -347,6 +347,7 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
 	src/quadrature/quadrature_clough_3D.C \
+	src/quadrature/quadrature_composite.C \
 	src/quadrature/quadrature_conical.C \
 	src/quadrature/quadrature_conical_2D.C \
 	src/quadrature/quadrature_conical_3D.C \
@@ -726,6 +727,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_clough_1D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_clough_2D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_clough_3D.lo \
+	src/quadrature/libmesh_dbg_la-quadrature_composite.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_conical.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_conical_2D.lo \
 	src/quadrature/libmesh_dbg_la-quadrature_conical_3D.lo \
@@ -1031,6 +1033,7 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
 	src/quadrature/quadrature_clough_3D.C \
+	src/quadrature/quadrature_composite.C \
 	src/quadrature/quadrature_conical.C \
 	src/quadrature/quadrature_conical_2D.C \
 	src/quadrature/quadrature_conical_3D.C \
@@ -1409,6 +1412,7 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/quadrature/libmesh_devel_la-quadrature_clough_1D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_clough_2D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_clough_3D.lo \
+	src/quadrature/libmesh_devel_la-quadrature_composite.lo \
 	src/quadrature/libmesh_devel_la-quadrature_conical.lo \
 	src/quadrature/libmesh_devel_la-quadrature_conical_2D.lo \
 	src/quadrature/libmesh_devel_la-quadrature_conical_3D.lo \
@@ -1711,6 +1715,7 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
 	src/quadrature/quadrature_clough_3D.C \
+	src/quadrature/quadrature_composite.C \
 	src/quadrature/quadrature_conical.C \
 	src/quadrature/quadrature_conical_2D.C \
 	src/quadrature/quadrature_conical_3D.C \
@@ -2089,6 +2094,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_clough_1D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_clough_2D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_clough_3D.lo \
+	src/quadrature/libmesh_oprof_la-quadrature_composite.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_conical.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_conical_2D.lo \
 	src/quadrature/libmesh_oprof_la-quadrature_conical_3D.lo \
@@ -2391,6 +2397,7 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
 	src/quadrature/quadrature_clough_3D.C \
+	src/quadrature/quadrature_composite.C \
 	src/quadrature/quadrature_conical.C \
 	src/quadrature/quadrature_conical_2D.C \
 	src/quadrature/quadrature_conical_3D.C \
@@ -2769,6 +2776,7 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/quadrature/libmesh_opt_la-quadrature_clough_1D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_clough_2D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_clough_3D.lo \
+	src/quadrature/libmesh_opt_la-quadrature_composite.lo \
 	src/quadrature/libmesh_opt_la-quadrature_conical.lo \
 	src/quadrature/libmesh_opt_la-quadrature_conical_2D.lo \
 	src/quadrature/libmesh_opt_la-quadrature_conical_3D.lo \
@@ -3070,6 +3078,7 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/quadrature/quadrature_clough_1D.C \
 	src/quadrature/quadrature_clough_2D.C \
 	src/quadrature/quadrature_clough_3D.C \
+	src/quadrature/quadrature_composite.C \
 	src/quadrature/quadrature_conical.C \
 	src/quadrature/quadrature_conical_2D.C \
 	src/quadrature/quadrature_conical_3D.C \
@@ -3448,6 +3457,7 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/quadrature/libmesh_prof_la-quadrature_clough_1D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_clough_2D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_clough_3D.lo \
+	src/quadrature/libmesh_prof_la-quadrature_composite.lo \
 	src/quadrature/libmesh_prof_la-quadrature_conical.lo \
 	src/quadrature/libmesh_prof_la-quadrature_conical_2D.lo \
 	src/quadrature/libmesh_prof_la-quadrature_conical_3D.lo \
@@ -4664,6 +4674,7 @@ libmesh_SOURCES = \
         src/quadrature/quadrature_clough_1D.C \
         src/quadrature/quadrature_clough_2D.C \
         src/quadrature/quadrature_clough_3D.C \
+        src/quadrature/quadrature_composite.C \
         src/quadrature/quadrature_conical.C \
         src/quadrature/quadrature_conical_2D.C \
         src/quadrature/quadrature_conical_3D.C \
@@ -5781,6 +5792,9 @@ src/quadrature/libmesh_dbg_la-quadrature_clough_2D.lo:  \
 src/quadrature/libmesh_dbg_la-quadrature_clough_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_dbg_la-quadrature_composite.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_dbg_la-quadrature_conical.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -6790,6 +6804,9 @@ src/quadrature/libmesh_devel_la-quadrature_clough_2D.lo:  \
 src/quadrature/libmesh_devel_la-quadrature_clough_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_devel_la-quadrature_composite.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_devel_la-quadrature_conical.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -7769,6 +7786,9 @@ src/quadrature/libmesh_oprof_la-quadrature_clough_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_oprof_la-quadrature_clough_3D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_oprof_la-quadrature_composite.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_oprof_la-quadrature_conical.lo:  \
@@ -8751,6 +8771,9 @@ src/quadrature/libmesh_opt_la-quadrature_clough_2D.lo:  \
 src/quadrature/libmesh_opt_la-quadrature_clough_3D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_opt_la-quadrature_composite.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_opt_la-quadrature_conical.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
@@ -9727,6 +9750,9 @@ src/quadrature/libmesh_prof_la-quadrature_clough_2D.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_prof_la-quadrature_clough_3D.lo:  \
+	src/quadrature/$(am__dirstamp) \
+	src/quadrature/$(DEPDIR)/$(am__dirstamp)
+src/quadrature/libmesh_prof_la-quadrature_composite.lo:  \
 	src/quadrature/$(am__dirstamp) \
 	src/quadrature/$(DEPDIR)/$(am__dirstamp)
 src/quadrature/libmesh_prof_la-quadrature_conical.lo:  \
@@ -11841,6 +11867,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_clough_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_clough_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_clough_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_composite.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_conical.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_conical_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_conical_3D.Plo@am__quote@
@@ -11874,6 +11901,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_clough_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_clough_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_clough_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_composite.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_conical.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_conical_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_conical_3D.Plo@am__quote@
@@ -11907,6 +11935,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_clough_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_clough_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_clough_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_composite.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_conical.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_conical_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_conical_3D.Plo@am__quote@
@@ -11940,6 +11969,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_clough_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_clough_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_clough_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_composite.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_conical.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_conical_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_conical_3D.Plo@am__quote@
@@ -11973,6 +12003,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_clough_1D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_clough_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_clough_3D.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_composite.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_conical.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_conical_2D.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_conical_3D.Plo@am__quote@
@@ -14451,6 +14482,13 @@ src/quadrature/libmesh_dbg_la-quadrature_clough_3D.lo: src/quadrature/quadrature
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_clough_3D.C' object='src/quadrature/libmesh_dbg_la-quadrature_clough_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_clough_3D.lo `test -f 'src/quadrature/quadrature_clough_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_clough_3D.C
+
+src/quadrature/libmesh_dbg_la-quadrature_composite.lo: src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_dbg_la-quadrature_composite.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_composite.Tpo -c -o src/quadrature/libmesh_dbg_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_composite.Tpo src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_composite.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_composite.C' object='src/quadrature/libmesh_dbg_la-quadrature_composite.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_dbg_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
 
 src/quadrature/libmesh_dbg_la-quadrature_conical.lo: src/quadrature/quadrature_conical.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_dbg_la-quadrature_conical.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_dbg_la-quadrature_conical.Tpo -c -o src/quadrature/libmesh_dbg_la-quadrature_conical.lo `test -f 'src/quadrature/quadrature_conical.C' || echo '$(srcdir)/'`src/quadrature/quadrature_conical.C
@@ -17266,6 +17304,13 @@ src/quadrature/libmesh_devel_la-quadrature_clough_3D.lo: src/quadrature/quadratu
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_clough_3D.lo `test -f 'src/quadrature/quadrature_clough_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_clough_3D.C
 
+src/quadrature/libmesh_devel_la-quadrature_composite.lo: src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_devel_la-quadrature_composite.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_composite.Tpo -c -o src/quadrature/libmesh_devel_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_composite.Tpo src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_composite.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_composite.C' object='src/quadrature/libmesh_devel_la-quadrature_composite.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_devel_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
+
 src/quadrature/libmesh_devel_la-quadrature_conical.lo: src/quadrature/quadrature_conical.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_devel_la-quadrature_conical.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_conical.Tpo -c -o src/quadrature/libmesh_devel_la-quadrature_conical.lo `test -f 'src/quadrature/quadrature_conical.C' || echo '$(srcdir)/'`src/quadrature/quadrature_conical.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_conical.Tpo src/quadrature/$(DEPDIR)/libmesh_devel_la-quadrature_conical.Plo
@@ -20079,6 +20124,13 @@ src/quadrature/libmesh_oprof_la-quadrature_clough_3D.lo: src/quadrature/quadratu
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_clough_3D.C' object='src/quadrature/libmesh_oprof_la-quadrature_clough_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_clough_3D.lo `test -f 'src/quadrature/quadrature_clough_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_clough_3D.C
+
+src/quadrature/libmesh_oprof_la-quadrature_composite.lo: src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_oprof_la-quadrature_composite.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_composite.Tpo -c -o src/quadrature/libmesh_oprof_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_composite.Tpo src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_composite.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_composite.C' object='src/quadrature/libmesh_oprof_la-quadrature_composite.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_oprof_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
 
 src/quadrature/libmesh_oprof_la-quadrature_conical.lo: src/quadrature/quadrature_conical.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_oprof_la-quadrature_conical.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_oprof_la-quadrature_conical.Tpo -c -o src/quadrature/libmesh_oprof_la-quadrature_conical.lo `test -f 'src/quadrature/quadrature_conical.C' || echo '$(srcdir)/'`src/quadrature/quadrature_conical.C
@@ -22894,6 +22946,13 @@ src/quadrature/libmesh_opt_la-quadrature_clough_3D.lo: src/quadrature/quadrature
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_clough_3D.lo `test -f 'src/quadrature/quadrature_clough_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_clough_3D.C
 
+src/quadrature/libmesh_opt_la-quadrature_composite.lo: src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_opt_la-quadrature_composite.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_composite.Tpo -c -o src/quadrature/libmesh_opt_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_composite.Tpo src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_composite.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_composite.C' object='src/quadrature/libmesh_opt_la-quadrature_composite.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_opt_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
+
 src/quadrature/libmesh_opt_la-quadrature_conical.lo: src/quadrature/quadrature_conical.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_opt_la-quadrature_conical.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_conical.Tpo -c -o src/quadrature/libmesh_opt_la-quadrature_conical.lo `test -f 'src/quadrature/quadrature_conical.C' || echo '$(srcdir)/'`src/quadrature/quadrature_conical.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_conical.Tpo src/quadrature/$(DEPDIR)/libmesh_opt_la-quadrature_conical.Plo
@@ -25707,6 +25766,13 @@ src/quadrature/libmesh_prof_la-quadrature_clough_3D.lo: src/quadrature/quadratur
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_clough_3D.C' object='src/quadrature/libmesh_prof_la-quadrature_clough_3D.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_clough_3D.lo `test -f 'src/quadrature/quadrature_clough_3D.C' || echo '$(srcdir)/'`src/quadrature/quadrature_clough_3D.C
+
+src/quadrature/libmesh_prof_la-quadrature_composite.lo: src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_prof_la-quadrature_composite.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_composite.Tpo -c -o src/quadrature/libmesh_prof_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_composite.Tpo src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_composite.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/quadrature/quadrature_composite.C' object='src/quadrature/libmesh_prof_la-quadrature_composite.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/quadrature/libmesh_prof_la-quadrature_composite.lo `test -f 'src/quadrature/quadrature_composite.C' || echo '$(srcdir)/'`src/quadrature/quadrature_composite.C
 
 src/quadrature/libmesh_prof_la-quadrature_conical.lo: src/quadrature/quadrature_conical.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/quadrature/libmesh_prof_la-quadrature_conical.lo -MD -MP -MF src/quadrature/$(DEPDIR)/libmesh_prof_la-quadrature_conical.Tpo -c -o src/quadrature/libmesh_prof_la-quadrature_conical.lo `test -f 'src/quadrature/quadrature_conical.C' || echo '$(srcdir)/'`src/quadrature/quadrature_conical.C

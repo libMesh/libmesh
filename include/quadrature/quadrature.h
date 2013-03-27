@@ -38,6 +38,8 @@ namespace libMesh
 {
 
 
+  // forward declarations
+  class Elem;
 
 /**
  * This is the \p QBase class.  It provides the basic functionality
@@ -160,8 +162,20 @@ public:
    * Initializes the data structures to contain a quadrature rule
    * for an object of type \p type.
    */
-  void init (const ElemType type=INVALID_ELEM,
-             unsigned int p_level=0);
+  virtual void init (const ElemType type=INVALID_ELEM,
+                     unsigned int p_level=0);
+
+  /**
+   * Initializes the data structures for a specific, potentially cut
+   * element.  The array \p vertex_distance_func contains vertex
+   * values of a signed distance function that cuts the element.  This
+   * interface is indended to be extended by derived classes that can
+   * cut the element into subelements, for example, and constuct a
+   * composite quadrature rule for the cut element.
+   */
+  virtual void init (const Elem &elem,
+                     const std::vector<Real> &vertex_distance_func,
+                     unsigned int p_level=0);
 
   /**
    * @returns the order of the quadrature rule.
