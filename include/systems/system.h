@@ -1181,7 +1181,7 @@ public:
    * Reads additional data, namely vectors, for this System.
    * This method may safely be called on a distributed-memory mesh.
    */
-    template <typename ValType>
+    template <typename ValType=Number>
   void read_serialized_data (Xdr& io,
 			     const bool read_additional_data=true);
 
@@ -1190,7 +1190,7 @@ public:
    * allows for optimization for the multiple vector case by only communicating
    * the metadata once.
    */
-    template <typename InValType>
+    template <typename InValType=Number>
   dof_id_type read_serialized_vectors (Xdr &io,
 				       const std::vector<NumericVector<Number>*> &vectors) const;
   /**
@@ -1199,7 +1199,7 @@ public:
    * This method will read an individual file for each processor in the simulation
    * where the local solution components for that processor are stored.
    */
-    template <typename InValType>
+    template <typename InValType=Number>
   void read_parallel_data (Xdr &io,
 			   const bool read_additional_data);
   /**
@@ -1602,7 +1602,7 @@ private:
    *
    * Returns the length of the vector read.
    */
-    template <typename InValType>
+    template <typename InValType=Number>
   numeric_index_type read_serialized_vector (Xdr& io,
 				             NumericVector<Number> &vec);
 
