@@ -615,6 +615,7 @@ include_HEADERS = \
         geom/edge_edge4.h \
         geom/edge_inf_edge2.h \
         geom/elem.h \
+        geom/elem_cutter.h \
         geom/elem_quality.h \
         geom/elem_range.h \
         geom/elem_type.h \

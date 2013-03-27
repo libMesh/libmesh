@@ -462,7 +462,7 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	cell_prism6.h cell_pyramid.h cell_pyramid13.h cell_pyramid14.h \
 	cell_pyramid5.h cell_tet.h cell_tet10.h cell_tet4.h edge.h \
 	edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
-	elem_quality.h elem_range.h elem_type.h face.h face_inf_quad.h \
+	elem_cutter.h elem_quality.h elem_range.h elem_type.h face.h face_inf_quad.h \
 	face_inf_quad4.h face_inf_quad6.h face_quad.h face_quad4.h \
 	face_quad8.h face_quad9.h face_tri.h face_tri3.h \
 	face_tri3_subdivision.h face_tri6.h node.h node_elem.h \
@@ -1112,6 +1112,9 @@ edge_inf_edge2.h: $(top_srcdir)/include/geom/edge_inf_edge2.h
 
 elem.h: $(top_srcdir)/include/geom/elem.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+elem_cutter.h: $(top_srcdir)/include/geom/elem_cutter.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 elem_quality.h: $(top_srcdir)/include/geom/elem_quality.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@

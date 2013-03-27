@@ -143,6 +143,7 @@ libmesh_SOURCES =  \
         src/geom/edge_edge4.C \
         src/geom/edge_inf_edge2.C \
         src/geom/elem.C \
+        src/geom/elem_cutter.C \
         src/geom/elem_quality.C \
         src/geom/elem_refinement.C \
         src/geom/elem_type.C \
