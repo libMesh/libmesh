@@ -68,7 +68,7 @@ public:
    */
   virtual ~DenseMatrix() {}
 
-
+   
   /**
    * Set every element in the matrix to 0.
    */
@@ -144,6 +144,16 @@ public:
   DenseMatrix<T>& operator = (const DenseMatrix<T>& other_matrix);
 
   /**
+   * Assignment-from-other-matrix-type operator
+   *
+   * Copies the dense matrix of type T2 into the present matrix.  This
+   * is useful for copying real matrices into complex ones for further
+   * operations
+   */
+  template <typename T2>
+  DenseMatrix<T>& operator = (const DenseMatrix<T2>& other_matrix);
+ 
+  /**
    * STL-like swap method
    */
   void swap(DenseMatrix<T>& other_matrix);
@@ -160,6 +170,12 @@ public:
    */
   void scale (const T factor);
 
+    
+    /**
+     * Multiplies every element in the column \p col matrix by \p factor.
+     */
+    void scale_column (const unsigned int col, const T factor);
+
   /**
    * Multiplies every element in the matrix by \p factor.
    */
@@ -168,8 +184,10 @@ public:
   /**
    * Adds \p factor times \p mat to this matrix.
    */
-  void add (const T factor,
-            const DenseMatrix<T>& mat);
+    template<typename T2, typename T3>
+    typename boostcopy::enable_if_c<
+    ScalarTraits<T2>::value, void >::type add (const T2 factor,
+                                               const DenseMatrix<T3>& mat);
 
   /**
    * Tests if \p mat is exactly equal to this matrix.
@@ -584,6 +602,22 @@ void DenseMatrix<T>::swap(DenseMatrix<T>& other_matrix)
 }
 
 
+template <typename T>
+template <typename T2>
+inline
+DenseMatrix<T>&
+DenseMatrix<T>::operator=(const DenseMatrix<T2>& mat)
+{
+  unsigned int mat_m = mat.m(), mat_n = mat.n();
+  this->resize(mat_m, mat_n);
+  for (unsigned int i=0; i<mat_m; i++)
+    for (unsigned int j=0; j<mat_n; j++)
+      (*this)(i,j) = mat(i,j);
+
+  return *this;
+}
+
+    
 
 template<typename T>
 inline
@@ -674,6 +708,15 @@ void DenseMatrix<T>::scale (const T factor)
     _val[i] *= factor;
 }
 
+    
+template<typename T>
+inline
+void DenseMatrix<T>::scale_column (const unsigned int col, const T factor)
+{
+    for (unsigned int i=0; i<this->m(); i++)
+        (*this)(i, col) *= factor;
+}
+
 
 
 template<typename T>
@@ -687,11 +730,19 @@ DenseMatrix<T>& DenseMatrix<T>::operator *= (const T factor)
 
 
 template<typename T>
+template<typename T2, typename T3>
 inline
-void DenseMatrix<T>::add (const T factor, const DenseMatrix<T>& mat)
+typename boostcopy::enable_if_c<
+ScalarTraits<T2>::value, void >::type
+DenseMatrix<T>::add (const T2 factor,
+                     const DenseMatrix<T3>& mat)
 {
-  for (unsigned int i=0; i<_val.size(); i++)
-    _val[i] += factor * mat._val[i];
+    libmesh_assert_equal_to (this->m(), mat.m());
+    libmesh_assert_equal_to (this->n(), mat.n());
+    
+    for (unsigned int i=0; i<this->m(); i++)
+        for (unsigned int j=0; j<this->n(); j++)
+            (*this)(i,j) += factor * mat(i,j);
 }
 
 
