@@ -68,6 +68,7 @@ namespace libMesh
       // completely outside?
       if (nmin >= 0.)
 	{
+	  std::cout << "element completely outside\n";
 	  _outside_elem.push_back(&elem);
 	  return;
 	}
@@ -75,6 +76,7 @@ namespace libMesh
       // completely inside?
       else if (nmax <= 0.)
 	{
+	  std::cout << "element completely inside\n";
 	  _inside_elem.push_back(&elem);
 	  return;
 	}
@@ -134,6 +136,8 @@ namespace libMesh
 	   
 	    const Point x_star = (edge->point(0)*(1.-d_star) +
 				  edge->point(1)*d_star);
+
+	    std::cout << "adding cut point " << x_star << std::endl;
 	    
 	    _intersection_pts.push_back (x_star);
 	  }
@@ -152,7 +156,8 @@ namespace libMesh
 
   void ElemCutter::cut_2D ()
   {
-    libmesh_not_implemented();
+    //libmesh_not_implemented();
+    std::cout << "Inside cut element!\n";
   }
 
   
