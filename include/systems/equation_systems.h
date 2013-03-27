@@ -314,10 +314,12 @@ public:
    * If XdrMODE is omitted, it will be inferred as READ for filenames
    * containing .xda or as DECODE for filenames containing .xdr
    */
+    template <typename InValType = Number>
   void read (const std::string& name,
 	     const libMeshEnums::XdrMODE,
              const unsigned int read_flags=(READ_HEADER | READ_DATA));
 
+    template <typename InValType = Number>
   void read (const std::string& name,
              const unsigned int read_flags=(READ_HEADER | READ_DATA));
 
@@ -444,6 +446,7 @@ private:
    * Actual read implementation.  This can be called repeatedly
    * inside a try-catch block in an attempt to read broken files.
    */
+    template <typename InValType>
   void _read_impl (const std::string& name,
 		   const libMeshEnums::XdrMODE,
 		   const unsigned int read_flags);
