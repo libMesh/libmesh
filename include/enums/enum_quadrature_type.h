@@ -22,7 +22,7 @@
 
 // ------------------------------------------------------------
 // enum QuadratureType definition
-namespace libMesh {
+namespace libMeshEnums {
 
 /**
  * Defines an \p enum for currently available quadrature rules.
@@ -41,6 +41,8 @@ enum QuadratureType {QGAUSS            = 0,
                      QGAUSS_LOBATTO    = 9,
 
                      QCLOUGH           = 21,
+
+                     QCOMPOSITE        = 31,
 
                      INVALID_Q_RULE    = 127};
 }

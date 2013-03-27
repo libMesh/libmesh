@@ -767,6 +767,7 @@ include_HEADERS = \
         physics/fem_physics.h \
         quadrature/quadrature.h \
         quadrature/quadrature_clough.h \
+        quadrature/quadrature_composite.h \
         quadrature/quadrature_conical.h \
         quadrature/quadrature_gauss.h \
         quadrature/quadrature_gauss_lobatto.h \

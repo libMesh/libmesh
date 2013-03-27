@@ -282,6 +282,7 @@ libmesh_SOURCES =  \
         src/quadrature/quadrature_clough_1D.C \
         src/quadrature/quadrature_clough_2D.C \
         src/quadrature/quadrature_clough_3D.C \
+        src/quadrature/quadrature_composite.C \
         src/quadrature/quadrature_conical.C \
         src/quadrature/quadrature_conical_2D.C \
         src/quadrature/quadrature_conical_3D.C \
