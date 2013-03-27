@@ -29,7 +29,7 @@ namespace libMesh
 template <class QSubCell>
 void QComposite<QSubCell>::init (const Elem &elem,		     
 				 const std::vector<Real> &vertex_distance_func,
-				 unsigned int p_level)
+				 unsigned int /* p_level */)
 {
   libmesh_assert_equal_to (vertex_distance_func.size(), elem.n_vertices());
   
