@@ -16,12 +16,31 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
+#include "libmesh/quadrature_gauss.h"
 #include "libmesh/quadrature_composite.h"
+#include "libmesh/elem.h"
+
+
 
 namespace libMesh
 {
 
 
+template <class QSubCell>
+void QComposite<QSubCell>::init (const Elem &elem,		     
+				 const std::vector<Real> &vertex_distance_func,
+				 unsigned int p_level)
+{
+  libmesh_assert_equal_to (vertex_distance_func.size(), elem.n_vertices());
+  
+  libmesh_error();
+}
+  
+
+//--------------------------------------------------------------
+// Explicit instantiations
+template class QComposite<QGauss>;
+  
 } // namespace libMesh
 
 
