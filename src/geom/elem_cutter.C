@@ -20,10 +20,15 @@
 #include "libmesh/elem_cutter.h"
 #include "libmesh/elem.h"
 #include "libmesh/serial_mesh.h"
+#include "libmesh/mesh_triangle_interface.h"
+#include "libmesh/mesh_tetgen_interface.h"
 
 // C++ includes
 
-
+namespace
+{
+  unsigned int cut_cntr;
+}
 namespace libMesh
 {
 
@@ -32,8 +37,13 @@ namespace libMesh
   // ElemCutter implementation
   ElemCutter::ElemCutter()
   {
-    _working_mesh_2D.reset (new SerialMesh);
-    _working_mesh_3D.reset (new SerialMesh);
+    _inside_mesh_2D.reset  (new SerialMesh); /**/ _triangle_inside.reset  (new TriangleInterface (*_inside_mesh_2D));   
+    _outside_mesh_2D.reset (new SerialMesh); /**/ _triangle_outside.reset (new TriangleInterface (*_outside_mesh_2D));
+    
+    _inside_mesh_3D.reset  (new SerialMesh); /**/ _tetgen_inside.reset  (new TetGenMeshInterface (*_inside_mesh_3D));   
+    _outside_mesh_3D.reset (new SerialMesh); /**/ _tetgen_outside.reset (new TetGenMeshInterface (*_outside_mesh_3D));
+
+    cut_cntr = 0;
   }
 
 
@@ -68,7 +78,7 @@ namespace libMesh
       // completely outside?
       if (nmin >= 0.)
 	{
-	  std::cout << "element completely outside\n";
+	  //std::cout << "element completely outside\n";
 	  _outside_elem.push_back(&elem);
 	  return;
 	}
@@ -76,7 +86,7 @@ namespace libMesh
       // completely inside?
       else if (nmax <= 0.)
 	{
-	  std::cout << "element completely inside\n";
+	  //std::cout << "element completely inside\n";
 	  _inside_elem.push_back(&elem);
 	  return;
 	}
@@ -94,7 +104,7 @@ namespace libMesh
     switch (elem.dim())
       {
       case 1: this->cut_1D(); break;
-      case 2: this->cut_2D(); break;
+      case 2: this->cut_2D(elem, vertex_distance_func); break;
       case 3: this->cut_3D(); break;
       default: libmesh_error();
       }
@@ -133,13 +143,23 @@ namespace libMesh
 	    // then find d_star in [0,1], the
 	    // distance from el0 to el1 where the 0 lives.
 	    const Real d_star = d0 / (d0 - d1);
-	   
-	    const Point x_star = (edge->point(0)*(1.-d_star) +
-				  edge->point(1)*d_star);
 
-	    std::cout << "adding cut point " << x_star << std::endl;
+
+	    // Prevent adding nodes trivially close to existing
+	    // nodes.
+	    const Real endpoint_tol = 0.01;
 	    
-	    _intersection_pts.push_back (x_star);
+	    if ( (d_star > endpoint_tol) &&
+		 (d_star < (1.-endpoint_tol)) )
+	      {
+		const Point x_star = (edge->point(0)*(1.-d_star) +
+				      edge->point(1)*d_star);
+		
+		std::cout << "adding cut point (d_star, x_star) = "
+			  << d_star << " , " << x_star << std::endl;
+		
+		_intersection_pts.push_back (x_star);
+	      }
 	  }
       }
   }
@@ -154,10 +174,57 @@ namespace libMesh
 
   
 
-  void ElemCutter::cut_2D ()
+  void ElemCutter::cut_2D (const Elem &elem,
+			   const std::vector<Real> &vertex_distance_func)
   {
     //libmesh_not_implemented();
     std::cout << "Inside cut element!\n";
+
+#ifdef LIBMESH_HAVE_TRIANGLE
+    
+    libmesh_assert (_inside_mesh_2D.get() != NULL);
+    
+    _inside_mesh_2D->clear();
+    _outside_mesh_2D->clear();
+
+    for (unsigned int v=0; v<elem.n_vertices(); v++)
+      {
+	if (vertex_distance_func[v] >= 0.)
+	  _outside_mesh_2D->add_point (elem.point(v));
+	
+	if (vertex_distance_func[v] <= 0.)
+	  _inside_mesh_2D->add_point (elem.point(v));
+      }
+
+    for (std::vector<Point>::const_iterator it=_intersection_pts.begin();
+	 it != _intersection_pts.end(); ++it)
+      {	
+	_inside_mesh_2D->add_point(*it);
+	_outside_mesh_2D->add_point(*it);
+      }
+
+    
+    // Customize the variables for the triangulation
+    _triangle_inside->desired_area()  = 100.;
+    _triangle_outside->desired_area() = 100.;
+    
+    // Turn on/off Laplacian mesh smoothing after generation.
+    // By default this is on.
+    _triangle_inside->smooth_after_generating()  = false;
+    _triangle_outside->smooth_after_generating() = false;
+    
+    // Triangulate!
+    _triangle_inside->triangulate();
+    _triangle_outside->triangulate();
+
+    std::ostringstream name;
+    
+    name << "cut_face_"
+	 << cut_cntr++
+	 << ".dat";
+    _inside_mesh_2D->write  ("in_"  + name.str());
+    _outside_mesh_2D->write ("out_" + name.str());
+#endif
   }
 
   

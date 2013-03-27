@@ -36,6 +36,8 @@ namespace libMesh
 // Forward declarations
 class Elem;
 class SerialMesh;
+class TriangleInterface;
+class TetGenMeshInterface;
   
 /**
  * This class implements cutting a single element into a collection
@@ -107,7 +109,8 @@ protected:
   /**
    * cutting algoritm in 2D.
    */
-  void cut_2D();
+  void cut_2D(const Elem &elem,
+	      const std::vector<Real> &vertex_distance_func);
   
   /**
    * cutting algoritm in 3D.
@@ -117,8 +120,15 @@ protected:
   std::vector<Elem const*> _inside_elem;
   std::vector<Elem const*> _outside_elem;
 
-  AutoPtr<SerialMesh> _working_mesh_2D;
-  AutoPtr<SerialMesh> _working_mesh_3D;
+  AutoPtr<SerialMesh> _inside_mesh_2D;
+  AutoPtr<SerialMesh> _outside_mesh_2D;
+  AutoPtr<SerialMesh> _inside_mesh_3D;
+  AutoPtr<SerialMesh> _outside_mesh_3D;
+
+  AutoPtr<TriangleInterface>   _triangle_inside;
+  AutoPtr<TriangleInterface>   _triangle_outside;
+  AutoPtr<TetGenMeshInterface> _tetgen_inside;
+  AutoPtr<TetGenMeshInterface> _tetgen_outside;
 
   std::vector<Point> _intersection_pts;
 };
@@ -128,3 +138,4 @@ protected:
 
 
 #endif // LIBMESH_ELEM_CUTTER_H
+
