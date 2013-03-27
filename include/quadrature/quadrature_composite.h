@@ -49,6 +49,7 @@ class QComposite : public QSubCell
    * Import base class data into namespace scope.
    */
   using QSubCell::_dim;
+  using QSubCell::init;
   
   /**
    * Constructor.  Declares the order of the quadrature rule.
@@ -66,7 +67,18 @@ class QComposite : public QSubCell
    */
   QuadratureType type() const { return QCOMPOSITE; }
 
-
+  /**
+   * Initializes the data structures for a specific, potentially cut
+   * element.  The array \p vertex_distance_func contains vertex
+   * values of a signed distance function that cuts the element.  This
+   * interface is indended to be extended by derived classes that can
+   * cut the element into subelements, for example, and constuct a
+   * composite quadrature rule for the cut element.
+   */
+  virtual void init (const Elem &elem,		     
+		     const std::vector<Real> &vertex_distance_func,
+		     unsigned int p_level=0);
+  
  private:
   
   /**
@@ -93,7 +105,7 @@ QComposite<QSubCell>::QComposite(const unsigned int d,
   // if we called the function with INVALID_ELEM it would try to
   // be smart and return, thinking it had already done the work.
   if (_dim == 1)
-    this->init(EDGE2);
+    QSubCell::init(EDGE2);
 }
 
 
