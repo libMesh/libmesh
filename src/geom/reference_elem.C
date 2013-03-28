@@ -26,9 +26,16 @@
 
 
 
-// anonymous namespace for implelemntation details
+// anonymous namespace for implementation details
 namespace
 {
+
+  namespace ElemDataStrings
+  {
+#include "reference_elem.data"
+  }
+
+  
   using namespace libMesh;
   
   typedef Threads::spin_mutex InitMutex;
@@ -40,7 +47,7 @@ namespace
   bool initialized = false;
 
   // map from ElemType to reference element file system object name
-  typedef std::map<ElemType, std::string> FileMapType;
+  typedef std::map<ElemType, const char*> FileMapType;
   FileMapType ref_elem_file;
   Elem* ref_elem_map[INVALID_ELEM];
 
@@ -76,81 +83,82 @@ namespace
 
 
   
-  void find_input_file (const std::string &file_name_in,
-			std::ifstream &ref_elem_stream)
-  {
-    std::cout << "--> Reading reference element from \""
-	      << file_name_in << "\"\n";
+  // void find_input_file (const std::string &file_name_in,
+  // 			std::ifstream &ref_elem_stream)
+  // {
+  //   std::cout << "--> Reading reference element from \""
+  // 	      << file_name_in << "\"\n";
     
-    if (ref_elem_stream.is_open())
-      ref_elem_stream.close();
+  //   if (ref_elem_stream.is_open())
+  //     ref_elem_stream.close();
 
-    std::string file_name (file_name_in);
+  //   std::string file_name (file_name_in);
 
-    // Try the naked filename
-    ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;
+  //   // Try the naked filename
+  //   ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;
     
 
-    // LIBMESH_ROOT?
-    const char *LIBMESH_ROOT = std::getenv("LIBMESH_ROOT");
+  //   // LIBMESH_ROOT?
+  //   const char *LIBMESH_ROOT = std::getenv("LIBMESH_ROOT");
     
-    if (LIBMESH_ROOT)
-      {
-	// $LIBMESH_ROOT/$filename
-	ref_elem_stream.close();
+  //   if (LIBMESH_ROOT)
+  //     {
+  // 	// $LIBMESH_ROOT/$filename
+  // 	ref_elem_stream.close();
 
-	file_name  = LIBMESH_ROOT;
-	file_name += "/";
-	file_name += file_name_in;
+  // 	file_name  = LIBMESH_ROOT;
+  // 	file_name += "/";
+  // 	file_name += file_name_in;
 
-	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;
+  // 	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;
 
-	// $LIBMESH_ROOT/share/$filename
-	ref_elem_stream.close();
+  // 	// $LIBMESH_ROOT/share/$filename
+  // 	ref_elem_stream.close();
 
-	file_name  = LIBMESH_ROOT;
-	file_name += "/share/";
-	file_name += file_name_in;
+  // 	file_name  = LIBMESH_ROOT;
+  // 	file_name += "/share/";
+  // 	file_name += file_name_in;
 
-	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;	
-      }
+  // 	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;	
+  //     }
 
     
-    // LIBMESH_DATA?
-    const char *LIBMESH_DATA = std::getenv("LIBMESH_DATA");
+  //   // LIBMESH_DATA?
+  //   const char *LIBMESH_DATA = std::getenv("LIBMESH_DATA");
     
-    if (LIBMESH_DATA)
-      {
-	// $LIBMESH_DATA/$filename
-	ref_elem_stream.close();
+  //   if (LIBMESH_DATA)
+  //     {
+  // 	// $LIBMESH_DATA/$filename
+  // 	ref_elem_stream.close();
 
-	file_name  = LIBMESH_DATA;
-	file_name += "/";
-	file_name += file_name_in;
+  // 	file_name  = LIBMESH_DATA;
+  // 	file_name += "/";
+  // 	file_name += file_name_in;
 
-	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;
+  // 	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;
 
-	// $LIBMESH_DATA/share/$filename
-	ref_elem_stream.close();
+  // 	// $LIBMESH_DATA/share/$filename
+  // 	ref_elem_stream.close();
 
-	file_name  = LIBMESH_DATA;
-	file_name += "/share/";
-	file_name += file_name_in;
+  // 	file_name  = LIBMESH_DATA;
+  // 	file_name += "/share/";
+  // 	file_name += file_name_in;
 
-	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;	
-      }
+  // 	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;	
+  //     }
 
 
-    libMesh::err << "ERROR reading file name: "
-		 << file_name_in
-		 << std::endl;
+  //   libMesh::err << "ERROR reading file name: "
+  // 		 << file_name_in
+  // 		 << std::endl;
     
-    libmesh_file_error(file_name_in);
-  }
+  //   libmesh_file_error(file_name_in);
+  // }
 
 
 
-  Elem* read_ref_elem (std::istream &in)
+  Elem* read_ref_elem (const ElemType Type,
+		       std::istream &in)
   {
     static const unsigned int comm_len = 1024;
     char comm[comm_len];
@@ -199,6 +207,7 @@ namespace
     in >> elem_type;
 
     libmesh_assert_less (elem_type, INVALID_ELEM);
+    libmesh_assert_equal_to (elem_type, Type);
     libmesh_assert_equal_to (n_nodes, Elem::type_to_n_nodes_map[elem_type]);
     
     // Construct the elem
@@ -234,26 +243,28 @@ namespace
 
     else
       singleton_cache.elem_list.push_back (elem);
-
+    
+    ref_elem_map[Type] = elem;
+    
     return elem;
   }
 
-  
-  
-  void read_ref_elem (const ElemType Type,
-		      const std::string &fname)
-  {
-    std::ifstream in;
+ 
+   
+  // void read_ref_elem (const ElemType Type,
+  // 		      const std::string &fname)
+  // {
+  //   std::ifstream in;
 
-    find_input_file(fname, in); 
+  //   find_input_file(fname, in); 
 				      
-    if (!in.good())
-      libmesh_file_error("error reading reference element file!");
+  //   if (!in.good())
+  //     libmesh_file_error("error reading reference element file!");
 
-    libmesh_assert_less (Type, INVALID_ELEM);
+  //   libmesh_assert_less (Type, INVALID_ELEM);
 
-    ref_elem_map[Type] = read_ref_elem(in);
-  }
+  //   ref_elem_map[Type] = read_ref_elem(in);
+  // }
 
 
   
@@ -275,6 +286,37 @@ namespace
     // initialized.  populate singletons.
     singleton_cache.clear();
     
+    // // initialize the reference file table
+    // {
+    //   ref_elem_file.clear();
+      
+    //   // // 1D elements
+    //   // ref_elem_file[EDGE2]   = "not_implemented";
+    //   // ref_elem_file[EDGE3]   = "not_implemented";
+    //   // ref_elem_file[EDGE4]   = "not_implemented";
+      
+    //   // 2D elements
+    //   ref_elem_file[TRI3]    = "reference_elements/2D/one_tri.xda";
+    //   ref_elem_file[TRI6]    = "reference_elements/2D/one_tri6.xda";
+      
+    //   ref_elem_file[QUAD4]   = "reference_elements/2D/one_quad.xda";
+    //   ref_elem_file[QUAD8]   = "reference_elements/2D/one_quad8.xda";
+    //   ref_elem_file[QUAD9]   = "reference_elements/2D/one_quad9.xda";
+      
+    //   // 3D elements
+    //   ref_elem_file[HEX8]    = "reference_elements/3D/one_hex.xda";
+    //   ref_elem_file[HEX20]   = "reference_elements/3D/one_hex20.xda";
+    //   ref_elem_file[HEX27]   = "reference_elements/3D/one_hex27.xda";
+      
+    //   ref_elem_file[TET4]    = "reference_elements/3D/one_tet.xda";
+    //   ref_elem_file[TET10]   = "reference_elements/3D/one_tet10.xda";
+      
+    //   ref_elem_file[PRISM6]  = "reference_elements/3D/one_prism.xda";
+    //   ref_elem_file[PRISM15] = "reference_elements/3D/one_prism15.xda";
+    //   ref_elem_file[PRISM18] = "reference_elements/3D/one_prism18.xda";
+    // }
+
+    
     // initialize the reference file table
     {
       ref_elem_file.clear();
@@ -285,31 +327,35 @@ namespace
       // ref_elem_file[EDGE4]   = "not_implemented";
       
       // 2D elements
-      ref_elem_file[TRI3]    = "reference_elements/2D/one_tri.xda";
-      ref_elem_file[TRI6]    = "reference_elements/2D/one_tri6.xda";
+      ref_elem_file[TRI3]    = ElemDataStrings::one_tri;
+      ref_elem_file[TRI6]    = ElemDataStrings::one_tri6;
       
-      ref_elem_file[QUAD4]   = "reference_elements/2D/one_quad.xda";
-      ref_elem_file[QUAD8]   = "reference_elements/2D/one_quad8.xda";
-      ref_elem_file[QUAD9]   = "reference_elements/2D/one_quad9.xda";
+      ref_elem_file[QUAD4]   = ElemDataStrings::one_quad;
+      ref_elem_file[QUAD8]   = ElemDataStrings::one_quad8;
+      ref_elem_file[QUAD9]   = ElemDataStrings::one_quad9;
       
       // 3D elements
-      ref_elem_file[HEX8]    = "reference_elements/3D/one_hex.xda";
-      ref_elem_file[HEX20]   = "reference_elements/3D/one_hex20.xda";
-      ref_elem_file[HEX27]   = "reference_elements/3D/one_hex27.xda";
+      ref_elem_file[HEX8]    = ElemDataStrings::one_hex;
+      ref_elem_file[HEX20]   = ElemDataStrings::one_hex20;
+      ref_elem_file[HEX27]   = ElemDataStrings::one_hex27;
       
-      ref_elem_file[TET4]    = "reference_elements/3D/one_tet.xda";
-      ref_elem_file[TET10]   = "reference_elements/3D/one_tet10.xda";
+      ref_elem_file[TET4]    = ElemDataStrings::one_tet;
+      ref_elem_file[TET10]   = ElemDataStrings::one_tet10;
       
-      ref_elem_file[PRISM6]  = "reference_elements/3D/one_prism.xda";
-      ref_elem_file[PRISM15] = "reference_elements/3D/one_prism15.xda";
-      ref_elem_file[PRISM18] = "reference_elements/3D/one_prism18.xda";
+      ref_elem_file[PRISM6]  = ElemDataStrings::one_prism;
+      ref_elem_file[PRISM15] = ElemDataStrings::one_prism15;
+      ref_elem_file[PRISM18] = ElemDataStrings::one_prism18;
     }
 
     // Read'em
     for (FileMapType::const_iterator it=ref_elem_file.begin();
 	 it != ref_elem_file.end(); ++it)
-      read_ref_elem(it->first,
-		    it->second);
+      {
+	std::istringstream stream(it->second);
+	
+	read_ref_elem(it->first,
+		      stream);
+      }
 
     // set the initialized flag.
     initialized = true;
