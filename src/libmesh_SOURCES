@@ -157,6 +157,7 @@ libmesh_SOURCES =  \
         src/geom/plane.C \
         src/geom/point.C \
         src/geom/reference_elem.C \
+        src/geom/reference_elem.data \
         src/geom/remote_elem.C \
         src/geom/sphere.C \
         src/geom/surface.C \

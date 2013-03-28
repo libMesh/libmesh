@@ -270,14 +270,15 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
-	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
-	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
-	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
-	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/reference_elem.data src/geom/remote_elem.C \
+	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
+	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
+	src/mesh/diva_io.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
+	src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -947,14 +948,15 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
-	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
-	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
-	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
-	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/reference_elem.data src/geom/remote_elem.C \
+	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
+	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
+	src/mesh/diva_io.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
+	src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -1620,14 +1622,15 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
-	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
-	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
-	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
-	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/reference_elem.data src/geom/remote_elem.C \
+	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
+	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
+	src/mesh/diva_io.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
+	src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -2293,14 +2296,15 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
-	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
-	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
-	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
-	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/reference_elem.data src/geom/remote_elem.C \
+	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
+	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
+	src/mesh/diva_io.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
+	src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -2965,14 +2969,15 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
 	src/geom/point.C src/geom/reference_elem.C \
-	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
-	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
-	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
-	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
-	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
-	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
-	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
-	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/reference_elem.data src/geom/remote_elem.C \
+	src/geom/sphere.C src/geom/surface.C src/mesh/abaqus_io.C \
+	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
+	src/mesh/diva_io.C src/mesh/ensight_io.C \
+	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
+	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
+	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
+	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
+	src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -4475,6 +4480,7 @@ libmesh_SOURCES = \
         src/geom/plane.C \
         src/geom/point.C \
         src/geom/reference_elem.C \
+        src/geom/reference_elem.data \
         src/geom/remote_elem.C \
         src/geom/sphere.C \
         src/geom/surface.C \
