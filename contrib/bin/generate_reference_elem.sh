@@ -33,6 +33,10 @@ cat <<EOF > $genfile
 // $0 $@
 // in directory `pwd`
 
+  typedef std::map<ElemType, std::string> FileMapType;
+  FileMapType ref_elem_file;
+
+
 EOF
 
 for file in $filelist; do
