@@ -269,15 +269,15 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_quad8.C src/geom/face_quad9.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
-	src/geom/point.C src/geom/remote_elem.C src/geom/sphere.C \
-	src/geom/surface.C src/mesh/abaqus_io.C \
-	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/diva_io.C src/mesh/ensight_io.C \
-	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
-	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
-	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
-	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/point.C src/geom/reference_elem.C \
+	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
+	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
+	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
+	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
+	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
+	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
+	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -602,6 +602,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/geom/libmesh_dbg_la-node_elem.lo \
 	src/geom/libmesh_dbg_la-plane.lo \
 	src/geom/libmesh_dbg_la-point.lo \
+	src/geom/libmesh_dbg_la-reference_elem.lo \
 	src/geom/libmesh_dbg_la-remote_elem.lo \
 	src/geom/libmesh_dbg_la-sphere.lo \
 	src/geom/libmesh_dbg_la-surface.lo \
@@ -945,15 +946,15 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_quad8.C src/geom/face_quad9.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
-	src/geom/point.C src/geom/remote_elem.C src/geom/sphere.C \
-	src/geom/surface.C src/mesh/abaqus_io.C \
-	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/diva_io.C src/mesh/ensight_io.C \
-	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
-	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
-	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
-	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/point.C src/geom/reference_elem.C \
+	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
+	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
+	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
+	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
+	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
+	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
+	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -1277,6 +1278,7 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/geom/libmesh_devel_la-node_elem.lo \
 	src/geom/libmesh_devel_la-plane.lo \
 	src/geom/libmesh_devel_la-point.lo \
+	src/geom/libmesh_devel_la-reference_elem.lo \
 	src/geom/libmesh_devel_la-remote_elem.lo \
 	src/geom/libmesh_devel_la-sphere.lo \
 	src/geom/libmesh_devel_la-surface.lo \
@@ -1617,15 +1619,15 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_quad8.C src/geom/face_quad9.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
-	src/geom/point.C src/geom/remote_elem.C src/geom/sphere.C \
-	src/geom/surface.C src/mesh/abaqus_io.C \
-	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/diva_io.C src/mesh/ensight_io.C \
-	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
-	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
-	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
-	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/point.C src/geom/reference_elem.C \
+	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
+	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
+	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
+	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
+	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
+	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
+	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -1949,6 +1951,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/geom/libmesh_oprof_la-node_elem.lo \
 	src/geom/libmesh_oprof_la-plane.lo \
 	src/geom/libmesh_oprof_la-point.lo \
+	src/geom/libmesh_oprof_la-reference_elem.lo \
 	src/geom/libmesh_oprof_la-remote_elem.lo \
 	src/geom/libmesh_oprof_la-sphere.lo \
 	src/geom/libmesh_oprof_la-surface.lo \
@@ -2289,15 +2292,15 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_quad8.C src/geom/face_quad9.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
-	src/geom/point.C src/geom/remote_elem.C src/geom/sphere.C \
-	src/geom/surface.C src/mesh/abaqus_io.C \
-	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/diva_io.C src/mesh/ensight_io.C \
-	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
-	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
-	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
-	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/point.C src/geom/reference_elem.C \
+	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
+	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
+	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
+	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
+	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
+	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
+	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -2621,6 +2624,7 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/geom/libmesh_opt_la-node_elem.lo \
 	src/geom/libmesh_opt_la-plane.lo \
 	src/geom/libmesh_opt_la-point.lo \
+	src/geom/libmesh_opt_la-reference_elem.lo \
 	src/geom/libmesh_opt_la-remote_elem.lo \
 	src/geom/libmesh_opt_la-sphere.lo \
 	src/geom/libmesh_opt_la-surface.lo \
@@ -2960,15 +2964,15 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/geom/face_quad8.C src/geom/face_quad9.C \
 	src/geom/face_tri.C src/geom/face_tri3.C src/geom/face_tri6.C \
 	src/geom/node.C src/geom/node_elem.C src/geom/plane.C \
-	src/geom/point.C src/geom/remote_elem.C src/geom/sphere.C \
-	src/geom/surface.C src/mesh/abaqus_io.C \
-	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
-	src/mesh/diva_io.C src/mesh/ensight_io.C \
-	src/mesh/exodusII_io.C src/mesh/exodusII_io_helper.C \
-	src/mesh/fro_io.C src/mesh/gmsh_io.C src/mesh/gmv_io.C \
-	src/mesh/gnuplot_io.C src/mesh/inf_elem_builder.C \
-	src/mesh/legacy_xdr_io.C src/mesh/matlab_io.C \
-	src/mesh/medit_io.C src/mesh/mesh_base.C \
+	src/geom/point.C src/geom/reference_elem.C \
+	src/geom/remote_elem.C src/geom/sphere.C src/geom/surface.C \
+	src/mesh/abaqus_io.C src/mesh/boundary_info.C \
+	src/mesh/boundary_mesh.C src/mesh/diva_io.C \
+	src/mesh/ensight_io.C src/mesh/exodusII_io.C \
+	src/mesh/exodusII_io_helper.C src/mesh/fro_io.C \
+	src/mesh/gmsh_io.C src/mesh/gmv_io.C src/mesh/gnuplot_io.C \
+	src/mesh/inf_elem_builder.C src/mesh/legacy_xdr_io.C \
+	src/mesh/matlab_io.C src/mesh/medit_io.C src/mesh/mesh_base.C \
 	src/mesh/mesh_communication.C \
 	src/mesh/mesh_communication_global_indices.C \
 	src/mesh/mesh_data.C src/mesh/mesh_data_tetgen_support.C \
@@ -3292,6 +3296,7 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/geom/libmesh_prof_la-node_elem.lo \
 	src/geom/libmesh_prof_la-plane.lo \
 	src/geom/libmesh_prof_la-point.lo \
+	src/geom/libmesh_prof_la-reference_elem.lo \
 	src/geom/libmesh_prof_la-remote_elem.lo \
 	src/geom/libmesh_prof_la-sphere.lo \
 	src/geom/libmesh_prof_la-surface.lo \
@@ -4469,6 +4474,7 @@ libmesh_SOURCES = \
         src/geom/node_elem.C \
         src/geom/plane.C \
         src/geom/point.C \
+        src/geom/reference_elem.C \
         src/geom/remote_elem.C \
         src/geom/sphere.C \
         src/geom/surface.C \
@@ -5356,6 +5362,8 @@ src/geom/libmesh_dbg_la-node_elem.lo: src/geom/$(am__dirstamp) \
 src/geom/libmesh_dbg_la-plane.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_dbg_la-point.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_dbg_la-reference_elem.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_dbg_la-remote_elem.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -6388,6 +6396,8 @@ src/geom/libmesh_devel_la-plane.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-point.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_devel_la-reference_elem.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-remote_elem.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-sphere.lo: src/geom/$(am__dirstamp) \
@@ -7355,6 +7365,8 @@ src/geom/libmesh_oprof_la-node_elem.lo: src/geom/$(am__dirstamp) \
 src/geom/libmesh_oprof_la-plane.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-point.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_oprof_la-reference_elem.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-remote_elem.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -8324,6 +8336,8 @@ src/geom/libmesh_opt_la-plane.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-point.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_opt_la-reference_elem.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-remote_elem.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-sphere.lo: src/geom/$(am__dirstamp) \
@@ -9288,6 +9302,8 @@ src/geom/libmesh_prof_la-node_elem.lo: src/geom/$(am__dirstamp) \
 src/geom/libmesh_prof_la-plane.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-point.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_prof_la-reference_elem.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-remote_elem.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -10899,6 +10915,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-node_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-plane.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-point.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-reference_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-remote_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-sphere.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-surface.Plo@am__quote@
@@ -10948,6 +10965,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-node_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-plane.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-point.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-reference_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-remote_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-sphere.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-surface.Plo@am__quote@
@@ -10997,6 +11015,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-node_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-plane.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-point.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-reference_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-remote_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-sphere.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-surface.Plo@am__quote@
@@ -11046,6 +11065,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-node_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-plane.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-point.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-reference_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-remote_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-sphere.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-surface.Plo@am__quote@
@@ -11095,6 +11115,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-node_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-plane.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-point.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-reference_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-remote_elem.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-sphere.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-surface.Plo@am__quote@
@@ -13397,6 +13418,13 @@ src/geom/libmesh_dbg_la-point.lo: src/geom/point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/point.C' object='src/geom/libmesh_dbg_la-point.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_dbg_la-point.lo `test -f 'src/geom/point.C' || echo '$(srcdir)/'`src/geom/point.C
+
+src/geom/libmesh_dbg_la-reference_elem.lo: src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_dbg_la-reference_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_dbg_la-reference_elem.Tpo -c -o src/geom/libmesh_dbg_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_dbg_la-reference_elem.Tpo src/geom/$(DEPDIR)/libmesh_dbg_la-reference_elem.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/reference_elem.C' object='src/geom/libmesh_dbg_la-reference_elem.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_dbg_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
 
 src/geom/libmesh_dbg_la-remote_elem.lo: src/geom/remote_elem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_dbg_la-remote_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_dbg_la-remote_elem.Tpo -c -o src/geom/libmesh_dbg_la-remote_elem.lo `test -f 'src/geom/remote_elem.C' || echo '$(srcdir)/'`src/geom/remote_elem.C
@@ -16170,6 +16198,13 @@ src/geom/libmesh_devel_la-point.lo: src/geom/point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_devel_la-point.lo `test -f 'src/geom/point.C' || echo '$(srcdir)/'`src/geom/point.C
 
+src/geom/libmesh_devel_la-reference_elem.lo: src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_devel_la-reference_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_devel_la-reference_elem.Tpo -c -o src/geom/libmesh_devel_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_devel_la-reference_elem.Tpo src/geom/$(DEPDIR)/libmesh_devel_la-reference_elem.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/reference_elem.C' object='src/geom/libmesh_devel_la-reference_elem.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_devel_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
+
 src/geom/libmesh_devel_la-remote_elem.lo: src/geom/remote_elem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_devel_la-remote_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_devel_la-remote_elem.Tpo -c -o src/geom/libmesh_devel_la-remote_elem.lo `test -f 'src/geom/remote_elem.C' || echo '$(srcdir)/'`src/geom/remote_elem.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_devel_la-remote_elem.Tpo src/geom/$(DEPDIR)/libmesh_devel_la-remote_elem.Plo
@@ -18941,6 +18976,13 @@ src/geom/libmesh_oprof_la-point.lo: src/geom/point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/point.C' object='src/geom/libmesh_oprof_la-point.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_oprof_la-point.lo `test -f 'src/geom/point.C' || echo '$(srcdir)/'`src/geom/point.C
+
+src/geom/libmesh_oprof_la-reference_elem.lo: src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_oprof_la-reference_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_oprof_la-reference_elem.Tpo -c -o src/geom/libmesh_oprof_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_oprof_la-reference_elem.Tpo src/geom/$(DEPDIR)/libmesh_oprof_la-reference_elem.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/reference_elem.C' object='src/geom/libmesh_oprof_la-reference_elem.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_oprof_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
 
 src/geom/libmesh_oprof_la-remote_elem.lo: src/geom/remote_elem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_oprof_la-remote_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_oprof_la-remote_elem.Tpo -c -o src/geom/libmesh_oprof_la-remote_elem.lo `test -f 'src/geom/remote_elem.C' || echo '$(srcdir)/'`src/geom/remote_elem.C
@@ -21714,6 +21756,13 @@ src/geom/libmesh_opt_la-point.lo: src/geom/point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_opt_la-point.lo `test -f 'src/geom/point.C' || echo '$(srcdir)/'`src/geom/point.C
 
+src/geom/libmesh_opt_la-reference_elem.lo: src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_opt_la-reference_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_opt_la-reference_elem.Tpo -c -o src/geom/libmesh_opt_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_opt_la-reference_elem.Tpo src/geom/$(DEPDIR)/libmesh_opt_la-reference_elem.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/reference_elem.C' object='src/geom/libmesh_opt_la-reference_elem.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_opt_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
+
 src/geom/libmesh_opt_la-remote_elem.lo: src/geom/remote_elem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_opt_la-remote_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_opt_la-remote_elem.Tpo -c -o src/geom/libmesh_opt_la-remote_elem.lo `test -f 'src/geom/remote_elem.C' || echo '$(srcdir)/'`src/geom/remote_elem.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_opt_la-remote_elem.Tpo src/geom/$(DEPDIR)/libmesh_opt_la-remote_elem.Plo
@@ -24485,6 +24534,13 @@ src/geom/libmesh_prof_la-point.lo: src/geom/point.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/point.C' object='src/geom/libmesh_prof_la-point.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_prof_la-point.lo `test -f 'src/geom/point.C' || echo '$(srcdir)/'`src/geom/point.C
+
+src/geom/libmesh_prof_la-reference_elem.lo: src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_prof_la-reference_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_prof_la-reference_elem.Tpo -c -o src/geom/libmesh_prof_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_prof_la-reference_elem.Tpo src/geom/$(DEPDIR)/libmesh_prof_la-reference_elem.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/reference_elem.C' object='src/geom/libmesh_prof_la-reference_elem.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_prof_la-reference_elem.lo `test -f 'src/geom/reference_elem.C' || echo '$(srcdir)/'`src/geom/reference_elem.C
 
 src/geom/libmesh_prof_la-remote_elem.lo: src/geom/remote_elem.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_prof_la-remote_elem.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_prof_la-remote_elem.Tpo -c -o src/geom/libmesh_prof_la-remote_elem.lo `test -f 'src/geom/remote_elem.C' || echo '$(srcdir)/'`src/geom/remote_elem.C
