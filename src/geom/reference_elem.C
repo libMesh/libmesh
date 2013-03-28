@@ -15,6 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+
+
 // Local includes
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
@@ -25,7 +27,7 @@
 #include <map>
 
 
-
+//-----------------------------------------------
 // anonymous namespace for implementation details
 namespace
 {
@@ -82,115 +84,12 @@ namespace
 
 
 
-  
-  // void find_input_file (const std::string &file_name_in,
-  // 			std::ifstream &ref_elem_stream)
-  // {
-  //   std::cout << "--> Reading reference element from \""
-  // 	      << file_name_in << "\"\n";
-    
-  //   if (ref_elem_stream.is_open())
-  //     ref_elem_stream.close();
-
-  //   std::string file_name (file_name_in);
-
-  //   // Try the naked filename
-  //   ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;
-    
-
-  //   // LIBMESH_ROOT?
-  //   const char *LIBMESH_ROOT = std::getenv("LIBMESH_ROOT");
-    
-  //   if (LIBMESH_ROOT)
-  //     {
-  // 	// $LIBMESH_ROOT/$filename
-  // 	ref_elem_stream.close();
-
-  // 	file_name  = LIBMESH_ROOT;
-  // 	file_name += "/";
-  // 	file_name += file_name_in;
-
-  // 	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;
-
-  // 	// $LIBMESH_ROOT/share/$filename
-  // 	ref_elem_stream.close();
-
-  // 	file_name  = LIBMESH_ROOT;
-  // 	file_name += "/share/";
-  // 	file_name += file_name_in;
-
-  // 	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;	
-  //     }
-
-    
-  //   // LIBMESH_DATA?
-  //   const char *LIBMESH_DATA = std::getenv("LIBMESH_DATA");
-    
-  //   if (LIBMESH_DATA)
-  //     {
-  // 	// $LIBMESH_DATA/$filename
-  // 	ref_elem_stream.close();
-
-  // 	file_name  = LIBMESH_DATA;
-  // 	file_name += "/";
-  // 	file_name += file_name_in;
-
-  // 	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;
-
-  // 	// $LIBMESH_DATA/share/$filename
-  // 	ref_elem_stream.close();
-
-  // 	file_name  = LIBMESH_DATA;
-  // 	file_name += "/share/";
-  // 	file_name += file_name_in;
-
-  // 	ref_elem_stream.open(file_name.c_str()); if (ref_elem_stream.good()) return;	
-  //     }
-
-
-  //   libMesh::err << "ERROR reading file name: "
-  // 		 << file_name_in
-  // 		 << std::endl;
-    
-  //   libmesh_file_error(file_name_in);
-  // }
-
-
-
   Elem* read_ref_elem (const ElemType Type,
 		       std::istream &in)
   {
     static const unsigned int comm_len = 1024;
     char comm[comm_len];
     
-    // For reference:
-    // reference_elements/3D/one_hex.xda:
-    
-    //     libMesh-0.7.0+	 
-    // 1	 # number of elements
-    // 8	 # number of nodes
-    // .	 # boundary condition specification file
-    // n/a	 # subdomain id specification file
-    // n/a	 # processor id specification file
-    // n/a	 # p-level specification file
-    // 1	 # n_elem at level 0, [ type (n0 ... nN-1) ]
-    // 10 0 1 2 3 4 5 6 7 
-    // -1.00000000000000000e+00 -1.00000000000000000e+00 -1.00000000000000000e+00 
-    // 1.00000000000000000e+00 -1.00000000000000000e+00 -1.00000000000000000e+00 
-    // 1.00000000000000000e+00 1.00000000000000000e+00 -1.00000000000000000e+00 
-    // -1.00000000000000000e+00 1.00000000000000000e+00 -1.00000000000000000e+00 
-    // -1.00000000000000000e+00 -1.00000000000000000e+00 1.00000000000000000e+00 
-    // 1.00000000000000000e+00 -1.00000000000000000e+00 1.00000000000000000e+00 
-    // 1.00000000000000000e+00 1.00000000000000000e+00 1.00000000000000000e+00 
-    // -1.00000000000000000e+00 1.00000000000000000e+00 1.00000000000000000e+00 
-    // 6	 # number of boundary conditions
-    // 0 0 1 
-    // 0 1 2 
-    // 0 2 3 
-    // 0 3 4 
-    // 0 4 5 
-    // 0 5 6
-
     std::string foo;
     unsigned int n_elem, n_nodes, elem_type, nn;
     double x, y, z;
@@ -251,23 +150,6 @@ namespace
 
  
    
-  // void read_ref_elem (const ElemType Type,
-  // 		      const std::string &fname)
-  // {
-  //   std::ifstream in;
-
-  //   find_input_file(fname, in); 
-				      
-  //   if (!in.good())
-  //     libmesh_file_error("error reading reference element file!");
-
-  //   libmesh_assert_less (Type, INVALID_ELEM);
-
-  //   ref_elem_map[Type] = read_ref_elem(in);
-  // }
-
-
-  
   void init_ref_elem_table()
   {
     // ouside mutex - if this flag is set, we can
@@ -285,37 +167,6 @@ namespace
     // OK, if we get here we have the lock and we are not
     // initialized.  populate singletons.
     singleton_cache.clear();
-    
-    // // initialize the reference file table
-    // {
-    //   ref_elem_file.clear();
-      
-    //   // // 1D elements
-    //   // ref_elem_file[EDGE2]   = "not_implemented";
-    //   // ref_elem_file[EDGE3]   = "not_implemented";
-    //   // ref_elem_file[EDGE4]   = "not_implemented";
-      
-    //   // 2D elements
-    //   ref_elem_file[TRI3]    = "reference_elements/2D/one_tri.xda";
-    //   ref_elem_file[TRI6]    = "reference_elements/2D/one_tri6.xda";
-      
-    //   ref_elem_file[QUAD4]   = "reference_elements/2D/one_quad.xda";
-    //   ref_elem_file[QUAD8]   = "reference_elements/2D/one_quad8.xda";
-    //   ref_elem_file[QUAD9]   = "reference_elements/2D/one_quad9.xda";
-      
-    //   // 3D elements
-    //   ref_elem_file[HEX8]    = "reference_elements/3D/one_hex.xda";
-    //   ref_elem_file[HEX20]   = "reference_elements/3D/one_hex20.xda";
-    //   ref_elem_file[HEX27]   = "reference_elements/3D/one_hex27.xda";
-      
-    //   ref_elem_file[TET4]    = "reference_elements/3D/one_tet.xda";
-    //   ref_elem_file[TET10]   = "reference_elements/3D/one_tet10.xda";
-      
-    //   ref_elem_file[PRISM6]  = "reference_elements/3D/one_prism.xda";
-    //   ref_elem_file[PRISM15] = "reference_elements/3D/one_prism15.xda";
-    //   ref_elem_file[PRISM18] = "reference_elements/3D/one_prism18.xda";
-    // }
-
     
     // initialize the reference file table
     {
