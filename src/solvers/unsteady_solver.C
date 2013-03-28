@@ -77,16 +77,11 @@ void UnsteadySolver::reinit ()
   old_local_nonlinear_solution->init (_system.n_dofs(), false, SERIAL);
 #endif
 
-    // copy the system solution to the current vector
-    // this assumes that the syste vector has already been resized and projected
-    NumericVector<Number> &old_nonlinear_soln =
+  // localize the old solution
+  NumericVector<Number> &old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
-    NumericVector<Number> &nonlinear_solution =
-    *(_system.solution);
-    
-    old_nonlinear_soln = nonlinear_solution;
-    
-    old_nonlinear_soln.localize
+  
+  old_nonlinear_soln.localize
     (*old_local_nonlinear_solution,
      _system.get_dof_map().get_send_list());
 }
