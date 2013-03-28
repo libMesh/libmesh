@@ -1906,6 +1906,33 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
+                                T &buf,
+                                const MessageTag &tag) const
+{
+  START_LOG("send()", "Parallel");
+
+  T* dataptr = &buf;
+
+#ifndef NDEBUG
+  // Only catch the return value when asserts are active.
+  const int ierr =
+#endif
+    MPI_Send (dataptr,
+              1,
+              StandardType<T>(dataptr),
+              dest_processor_id,
+              tag.value(),
+              this->get());
+
+  libmesh_assert (ierr == MPI_SUCCESS);
+
+  STOP_LOG("send()", "Parallel");
+}
+
+
+
+template <typename T>
+inline void Communicator::send (const unsigned int dest_processor_id,
                                 std::set<T> &buf,
                                 const MessageTag &tag) const
 {
@@ -2125,6 +2152,37 @@ inline void Communicator::receive (const unsigned int src_processor_id,
     (new Parallel::PostWaitDeleteBuffer<std::vector<T> >(tempbuf));
 
   this->receive(src_processor_id, tempbuf, req, tag);
+}
+
+
+
+template <typename T>
+inline Status Communicator::receive (const unsigned int src_processor_id,
+                         T &buf,
+                         const MessageTag &tag) const
+{
+  START_LOG("receive()", "Parallel");
+
+  // Get the status of the message, explicitly provide the
+  // datatype so we can later query the size
+  Status stat(this->probe(src_processor_id, tag), StandardType<T>(&buf));
+
+#ifndef NDEBUG
+  // Only catch the return value when asserts are active.
+  const int ierr =
+#endif
+    MPI_Recv (&buf,
+              1,
+              StandardType<T>(&buf),
+              src_processor_id,
+              tag.value(),
+              this->get(),
+              stat.get());
+  libmesh_assert (ierr == MPI_SUCCESS);
+
+  STOP_LOG("receive()", "Parallel");
+
+  return stat;
 }
 
 
