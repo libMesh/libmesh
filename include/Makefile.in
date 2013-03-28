@@ -573,7 +573,6 @@ include_HEADERS = \
         fe/inf_fe_instantiate_2D.h \
         fe/inf_fe_instantiate_3D.h \
         fe/inf_fe_macro.h \
-        geom/.#reference_elem.h \
         geom/cell.h \
         geom/cell_hex.h \
         geom/cell_hex20.h \
