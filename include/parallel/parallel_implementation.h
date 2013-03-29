@@ -1933,6 +1933,35 @@ inline void Communicator::send (const unsigned int dest_processor_id,
 
 template <typename T>
 inline void Communicator::send (const unsigned int dest_processor_id,
+                                T &buf,
+                                Request &req,
+                                const MessageTag &tag) const
+{
+  START_LOG("send()", "Parallel");
+
+  T* dataptr = &buf;
+
+#ifndef NDEBUG
+  // Only catch the return value when asserts are active.
+  const int ierr =
+#endif
+    MPI_Isend (dataptr,
+              1,
+              StandardType<T>(dataptr),
+              dest_processor_id,
+              tag.value(),
+              this->get(),
+              req.get());
+
+  libmesh_assert (ierr == MPI_SUCCESS);
+
+  STOP_LOG("send()", "Parallel");
+}
+
+
+
+template <typename T>
+inline void Communicator::send (const unsigned int dest_processor_id,
                                 std::set<T> &buf,
                                 const MessageTag &tag) const
 {
@@ -2158,8 +2187,8 @@ inline void Communicator::receive (const unsigned int src_processor_id,
 
 template <typename T>
 inline Status Communicator::receive (const unsigned int src_processor_id,
-                         T &buf,
-                         const MessageTag &tag) const
+                                     T &buf,
+                                     const MessageTag &tag) const
 {
   START_LOG("receive()", "Parallel");
 
@@ -2183,6 +2212,32 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
   STOP_LOG("receive()", "Parallel");
 
   return stat;
+}
+
+
+
+template <typename T>
+inline void Communicator::receive (const unsigned int src_processor_id,
+                                     T &buf,
+                                     Request &req,
+                                     const MessageTag &tag) const
+{
+  START_LOG("receive()", "Parallel");
+
+#ifndef NDEBUG
+  // Only catch the return value when asserts are active.
+  const int ierr =
+#endif
+    MPI_Irecv (&buf,
+               1,
+               StandardType<T>(&buf),
+               src_processor_id,
+               tag.value(),
+               this->get(),
+               req.get());
+  libmesh_assert (ierr == MPI_SUCCESS);
+
+  STOP_LOG("receive()", "Parallel");
 }
 
 
