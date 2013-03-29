@@ -58,11 +58,13 @@ class RemoteElem : public Elem,
   static const dof_id_type remote_elem_id = static_cast<dof_id_type>(-2);
 
   /**
-   * Constructor.
+   * Constructor. Private to force use of the \p create() member.
    */
+private:
   RemoteElem () : Elem(0,0,NULL,_elemlinks_data,NULL) 
   { this->set_id(remote_elem_id); }
 
+public:
   /**
    * Destructor.
    */
