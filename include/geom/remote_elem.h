@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/elem.h"
+#include "libmesh/libmesh_singleton.h"
 
 // C++ includes
 #include <cstddef>
@@ -46,7 +47,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // RemoteElem class definition
-class RemoteElem : public Elem
+class RemoteElem : public Elem,
+		   public Singleton
 {
  public:
 
@@ -64,7 +66,13 @@ class RemoteElem : public Elem
   /**
    * Destructor.
    */
-  virtual ~RemoteElem() {}
+  virtual ~RemoteElem();
+
+  /**
+   * Return a reference to the global \p RemoteElem
+   * sigleton object.
+   */
+  static const Elem & create ();
 
   virtual const Point & point (const unsigned int i) const
   { libmesh_error(); return Elem::point(i); }

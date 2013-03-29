@@ -39,7 +39,7 @@ namespace libMesh {
     /**
      * Destructor. 
      */
-    virtual ~Singleton();
+    virtual ~Singleton() {};
 
   public:
 

@@ -23,6 +23,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/reference_counter.h"
 #include "libmesh/remote_elem.h"
+#include "libmesh/libmesh_singleton.h"
 #include "libmesh/threads.h"
 
 
@@ -346,7 +347,7 @@ void _init (int argc, const char* const* argv,
   // "static initialization order fiasco"
   //
   // RemoteElem depends on static reference counting data
-  remote_elem = new RemoteElem();
+  RemoteElem::create();
 
 #if defined(LIBMESH_HAVE_MPI)
 
@@ -535,7 +536,7 @@ int _close ()
   libmesh_assert(!libMesh::closed());
 
   // Delete reference counted singleton(s)
-  delete remote_elem;
+  Singleton::cleanup();
 
   // Clear the thread task manager we started
   task_scheduler.reset();

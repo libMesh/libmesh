@@ -58,12 +58,6 @@ namespace libMesh
 
 
 
-  Singleton::~Singleton ()
-  {
-  }
-
-
-
   void Singleton::cleanup ()
   {
     SingletonMutex::scoped_lock lock(singleton_mtx);
