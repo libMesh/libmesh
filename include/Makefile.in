@@ -512,6 +512,7 @@ include_HEADERS = \
         base/libmesh_documentation.h \
         base/libmesh_exceptions.h \
         base/libmesh_logging.h \
+        base/libmesh_singleton.h \
         base/libmesh_version.h \
         base/multi_predicates.h \
         base/periodic_boundaries.h \

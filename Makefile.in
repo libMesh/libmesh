@@ -184,9 +184,9 @@ am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 am__libmesh_dbg_la_SOURCES_DIST = src/base/dof_map.C \
 	src/base/dof_map_constraints.C src/base/dof_object.C \
 	src/base/libmesh.C src/base/libmesh_isnan.c \
-	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
-	src/base/periodic_boundary_base.C src/base/print_trace.C \
-	src/base/reference_counted_object.C \
+	src/base/libmesh_singleton.C src/base/periodic_boundaries.C \
+	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
+	src/base/print_trace.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
 	src/error_estimation/adjoint_residual_error_estimator.C \
@@ -451,6 +451,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dof_map.lo \
 	src/base/libmesh_dbg_la-dof_object.lo \
 	src/base/libmesh_dbg_la-libmesh.lo \
 	src/base/libmesh_dbg_la-libmesh_isnan.lo \
+	src/base/libmesh_dbg_la-libmesh_singleton.lo \
 	src/base/libmesh_dbg_la-periodic_boundaries.lo \
 	src/base/libmesh_dbg_la-periodic_boundary.lo \
 	src/base/libmesh_dbg_la-periodic_boundary_base.lo \
@@ -859,9 +860,9 @@ libmesh_dbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__libmesh_devel_la_SOURCES_DIST = src/base/dof_map.C \
 	src/base/dof_map_constraints.C src/base/dof_object.C \
 	src/base/libmesh.C src/base/libmesh_isnan.c \
-	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
-	src/base/periodic_boundary_base.C src/base/print_trace.C \
-	src/base/reference_counted_object.C \
+	src/base/libmesh_singleton.C src/base/periodic_boundaries.C \
+	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
+	src/base/print_trace.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
 	src/error_estimation/adjoint_residual_error_estimator.C \
@@ -1125,6 +1126,7 @@ am__objects_2 = src/base/libmesh_devel_la-dof_map.lo \
 	src/base/libmesh_devel_la-dof_object.lo \
 	src/base/libmesh_devel_la-libmesh.lo \
 	src/base/libmesh_devel_la-libmesh_isnan.lo \
+	src/base/libmesh_devel_la-libmesh_singleton.lo \
 	src/base/libmesh_devel_la-periodic_boundaries.lo \
 	src/base/libmesh_devel_la-periodic_boundary.lo \
 	src/base/libmesh_devel_la-periodic_boundary_base.lo \
@@ -1530,9 +1532,9 @@ libmesh_devel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__libmesh_oprof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/base/dof_map_constraints.C src/base/dof_object.C \
 	src/base/libmesh.C src/base/libmesh_isnan.c \
-	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
-	src/base/periodic_boundary_base.C src/base/print_trace.C \
-	src/base/reference_counted_object.C \
+	src/base/libmesh_singleton.C src/base/periodic_boundaries.C \
+	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
+	src/base/print_trace.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
 	src/error_estimation/adjoint_residual_error_estimator.C \
@@ -1796,6 +1798,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dof_map.lo \
 	src/base/libmesh_oprof_la-dof_object.lo \
 	src/base/libmesh_oprof_la-libmesh.lo \
 	src/base/libmesh_oprof_la-libmesh_isnan.lo \
+	src/base/libmesh_oprof_la-libmesh_singleton.lo \
 	src/base/libmesh_oprof_la-periodic_boundaries.lo \
 	src/base/libmesh_oprof_la-periodic_boundary.lo \
 	src/base/libmesh_oprof_la-periodic_boundary_base.lo \
@@ -2201,9 +2204,9 @@ libmesh_oprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__libmesh_opt_la_SOURCES_DIST = src/base/dof_map.C \
 	src/base/dof_map_constraints.C src/base/dof_object.C \
 	src/base/libmesh.C src/base/libmesh_isnan.c \
-	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
-	src/base/periodic_boundary_base.C src/base/print_trace.C \
-	src/base/reference_counted_object.C \
+	src/base/libmesh_singleton.C src/base/periodic_boundaries.C \
+	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
+	src/base/print_trace.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
 	src/error_estimation/adjoint_residual_error_estimator.C \
@@ -2467,6 +2470,7 @@ am__objects_4 = src/base/libmesh_opt_la-dof_map.lo \
 	src/base/libmesh_opt_la-dof_object.lo \
 	src/base/libmesh_opt_la-libmesh.lo \
 	src/base/libmesh_opt_la-libmesh_isnan.lo \
+	src/base/libmesh_opt_la-libmesh_singleton.lo \
 	src/base/libmesh_opt_la-periodic_boundaries.lo \
 	src/base/libmesh_opt_la-periodic_boundary.lo \
 	src/base/libmesh_opt_la-periodic_boundary_base.lo \
@@ -2871,9 +2875,9 @@ libmesh_opt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 am__libmesh_prof_la_SOURCES_DIST = src/base/dof_map.C \
 	src/base/dof_map_constraints.C src/base/dof_object.C \
 	src/base/libmesh.C src/base/libmesh_isnan.c \
-	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
-	src/base/periodic_boundary_base.C src/base/print_trace.C \
-	src/base/reference_counted_object.C \
+	src/base/libmesh_singleton.C src/base/periodic_boundaries.C \
+	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
+	src/base/print_trace.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
 	src/error_estimation/adjoint_residual_error_estimator.C \
@@ -3137,6 +3141,7 @@ am__objects_5 = src/base/libmesh_prof_la-dof_map.lo \
 	src/base/libmesh_prof_la-dof_object.lo \
 	src/base/libmesh_prof_la-libmesh.lo \
 	src/base/libmesh_prof_la-libmesh_isnan.lo \
+	src/base/libmesh_prof_la-libmesh_singleton.lo \
 	src/base/libmesh_prof_la-periodic_boundaries.lo \
 	src/base/libmesh_prof_la-periodic_boundary.lo \
 	src/base/libmesh_prof_la-periodic_boundary_base.lo \
@@ -4313,6 +4318,7 @@ libmesh_SOURCES = \
         src/base/dof_object.C \
         src/base/libmesh.C \
         src/base/libmesh_isnan.c \
+        src/base/libmesh_singleton.C \
         src/base/periodic_boundaries.C \
         src/base/periodic_boundary.C \
         src/base/periodic_boundary_base.C \
@@ -5016,6 +5022,8 @@ src/base/libmesh_dbg_la-libmesh.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_dbg_la-libmesh_isnan.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_dbg_la-libmesh_singleton.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_dbg_la-periodic_boundaries.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_dbg_la-periodic_boundary.lo:  \
@@ -6063,6 +6071,8 @@ src/base/libmesh_devel_la-libmesh.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_devel_la-libmesh_isnan.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_devel_la-libmesh_singleton.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_devel_la-periodic_boundaries.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_devel_la-periodic_boundary.lo:  \
@@ -7029,6 +7039,8 @@ src/base/libmesh_oprof_la-libmesh.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_oprof_la-libmesh_isnan.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_oprof_la-libmesh_singleton.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_oprof_la-periodic_boundaries.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_oprof_la-periodic_boundary.lo:  \
@@ -7995,6 +8007,8 @@ src/base/libmesh_opt_la-libmesh.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_opt_la-libmesh_isnan.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_opt_la-libmesh_singleton.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_opt_la-periodic_boundaries.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_opt_la-periodic_boundary.lo:  \
@@ -8958,6 +8972,8 @@ src/base/libmesh_prof_la-libmesh.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_prof_la-libmesh_isnan.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_prof_la-libmesh_singleton.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_prof_la-periodic_boundaries.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_prof_la-periodic_boundary.lo:  \
@@ -10292,6 +10308,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-dof_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-libmesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-libmesh_isnan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-libmesh_singleton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundaries.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary_base.Plo@am__quote@
@@ -10303,6 +10320,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-dof_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-libmesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-libmesh_isnan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-libmesh_singleton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundaries.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary_base.Plo@am__quote@
@@ -10314,6 +10332,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-dof_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-libmesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-libmesh_isnan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-libmesh_singleton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundaries.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary_base.Plo@am__quote@
@@ -10325,6 +10344,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-dof_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-libmesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-libmesh_isnan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-libmesh_singleton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundaries.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary_base.Plo@am__quote@
@@ -10336,6 +10356,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-dof_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-libmesh.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-libmesh_isnan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-libmesh_singleton.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundaries.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary_base.Plo@am__quote@
@@ -12319,6 +12340,13 @@ src/base/libmesh_dbg_la-libmesh.lo: src/base/libmesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/libmesh.C' object='src/base/libmesh_dbg_la-libmesh.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_dbg_la-libmesh.lo `test -f 'src/base/libmesh.C' || echo '$(srcdir)/'`src/base/libmesh.C
+
+src/base/libmesh_dbg_la-libmesh_singleton.lo: src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_dbg_la-libmesh_singleton.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_dbg_la-libmesh_singleton.Tpo -c -o src/base/libmesh_dbg_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_dbg_la-libmesh_singleton.Tpo src/base/$(DEPDIR)/libmesh_dbg_la-libmesh_singleton.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/libmesh_singleton.C' object='src/base/libmesh_dbg_la-libmesh_singleton.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_dbg_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
 
 src/base/libmesh_dbg_la-periodic_boundaries.lo: src/base/periodic_boundaries.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_dbg_la-periodic_boundaries.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundaries.Tpo -c -o src/base/libmesh_dbg_la-periodic_boundaries.lo `test -f 'src/base/periodic_boundaries.C' || echo '$(srcdir)/'`src/base/periodic_boundaries.C
@@ -15085,6 +15113,13 @@ src/base/libmesh_devel_la-libmesh.lo: src/base/libmesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_devel_la-libmesh.lo `test -f 'src/base/libmesh.C' || echo '$(srcdir)/'`src/base/libmesh.C
 
+src/base/libmesh_devel_la-libmesh_singleton.lo: src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_devel_la-libmesh_singleton.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_devel_la-libmesh_singleton.Tpo -c -o src/base/libmesh_devel_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_devel_la-libmesh_singleton.Tpo src/base/$(DEPDIR)/libmesh_devel_la-libmesh_singleton.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/libmesh_singleton.C' object='src/base/libmesh_devel_la-libmesh_singleton.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_devel_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
+
 src/base/libmesh_devel_la-periodic_boundaries.lo: src/base/periodic_boundaries.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_devel_la-periodic_boundaries.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundaries.Tpo -c -o src/base/libmesh_devel_la-periodic_boundaries.lo `test -f 'src/base/periodic_boundaries.C' || echo '$(srcdir)/'`src/base/periodic_boundaries.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundaries.Tpo src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundaries.Plo
@@ -17849,6 +17884,13 @@ src/base/libmesh_oprof_la-libmesh.lo: src/base/libmesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/libmesh.C' object='src/base/libmesh_oprof_la-libmesh.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_oprof_la-libmesh.lo `test -f 'src/base/libmesh.C' || echo '$(srcdir)/'`src/base/libmesh.C
+
+src/base/libmesh_oprof_la-libmesh_singleton.lo: src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_oprof_la-libmesh_singleton.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_oprof_la-libmesh_singleton.Tpo -c -o src/base/libmesh_oprof_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_oprof_la-libmesh_singleton.Tpo src/base/$(DEPDIR)/libmesh_oprof_la-libmesh_singleton.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/libmesh_singleton.C' object='src/base/libmesh_oprof_la-libmesh_singleton.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_oprof_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
 
 src/base/libmesh_oprof_la-periodic_boundaries.lo: src/base/periodic_boundaries.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_oprof_la-periodic_boundaries.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundaries.Tpo -c -o src/base/libmesh_oprof_la-periodic_boundaries.lo `test -f 'src/base/periodic_boundaries.C' || echo '$(srcdir)/'`src/base/periodic_boundaries.C
@@ -20615,6 +20657,13 @@ src/base/libmesh_opt_la-libmesh.lo: src/base/libmesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_opt_la-libmesh.lo `test -f 'src/base/libmesh.C' || echo '$(srcdir)/'`src/base/libmesh.C
 
+src/base/libmesh_opt_la-libmesh_singleton.lo: src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_opt_la-libmesh_singleton.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_opt_la-libmesh_singleton.Tpo -c -o src/base/libmesh_opt_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_opt_la-libmesh_singleton.Tpo src/base/$(DEPDIR)/libmesh_opt_la-libmesh_singleton.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/libmesh_singleton.C' object='src/base/libmesh_opt_la-libmesh_singleton.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_opt_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
+
 src/base/libmesh_opt_la-periodic_boundaries.lo: src/base/periodic_boundaries.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_opt_la-periodic_boundaries.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundaries.Tpo -c -o src/base/libmesh_opt_la-periodic_boundaries.lo `test -f 'src/base/periodic_boundaries.C' || echo '$(srcdir)/'`src/base/periodic_boundaries.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundaries.Tpo src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundaries.Plo
@@ -23379,6 +23428,13 @@ src/base/libmesh_prof_la-libmesh.lo: src/base/libmesh.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/libmesh.C' object='src/base/libmesh_prof_la-libmesh.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_prof_la-libmesh.lo `test -f 'src/base/libmesh.C' || echo '$(srcdir)/'`src/base/libmesh.C
+
+src/base/libmesh_prof_la-libmesh_singleton.lo: src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_prof_la-libmesh_singleton.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_prof_la-libmesh_singleton.Tpo -c -o src/base/libmesh_prof_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_prof_la-libmesh_singleton.Tpo src/base/$(DEPDIR)/libmesh_prof_la-libmesh_singleton.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/libmesh_singleton.C' object='src/base/libmesh_prof_la-libmesh_singleton.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_prof_la-libmesh_singleton.lo `test -f 'src/base/libmesh_singleton.C' || echo '$(srcdir)/'`src/base/libmesh_singleton.C
 
 src/base/libmesh_prof_la-periodic_boundaries.lo: src/base/periodic_boundaries.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_prof_la-periodic_boundaries.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundaries.Tpo -c -o src/base/libmesh_prof_la-periodic_boundaries.lo `test -f 'src/base/periodic_boundaries.C' || echo '$(srcdir)/'`src/base/periodic_boundaries.C
