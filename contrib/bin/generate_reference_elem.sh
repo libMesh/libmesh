@@ -14,7 +14,7 @@ if (test $# -gt 2); then
 fi
   
 
-filelist=`find $1 -type f -name "*.xda"`
+filelist=`find $1 -type f -name "*.xda" | LC_COLLATE=POSIX sort`
 
 genfile="genfile.C"
 
