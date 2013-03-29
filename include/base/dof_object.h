@@ -158,12 +158,16 @@ public:
   bool valid_id () const;
 
   /**
-   * @returns the processor that this element belongs to.
+   * @returns the processor that this DofObject belongs to.
+   *
+   * When partitioning and DoF numbering have been performed by
+   * libMesh, every current DoF on this DofObject will belong to its
+   * processor.
    */
   processor_id_type processor_id () const;
 
   /**
-   * @returns the processor that this element belongs to as a
+   * @returns the processor that this DofObject belongs to as a
    * writeable reference.
    */
   processor_id_type& processor_id ();
@@ -228,9 +232,9 @@ public:
    * @returns the number of components for variable \p var
    * of system \p s associated with this \p DofObject.
    * For example, the \p HIERARCHIC shape functions may
-   * have @e multiple dof's associated with @e one node.  Another
+   * have @e multiple DoFs associated with @e one node.  Another
    * example is the \p MONOMIALs, where only the elements
-   * hold the dof's, but for the different spatial directions,
+   * hold the DoFs.  For the different spatial directions,
    * and orders, see \p FE.
    */
   unsigned int n_comp(const unsigned int s,
@@ -240,9 +244,9 @@ public:
    * @returns the number of components for \p VariableGroup \p vg
    * of system \p s associated with this \p DofObject.
    * For example, the \p HIERARCHIC shape functions may
-   * have @e multiple dof's associated with @e one node.  Another
+   * have @e multiple DoFs associated with @e one node.  Another
    * example is the \p MONOMIALs, where only the elements
-   * hold the dof's, but for the different spatial directions,
+   * hold the DoFs.  For the different spatial directions,
    * and orders, see \p FE.
    */
   unsigned int n_comp_group(const unsigned int s,
@@ -267,6 +271,11 @@ public:
   /**
    * @returns the global degree of freedom number for variable \p var,
    * component \p comp for system \p s associated with this \p DofObject
+   *
+   *
+   * When partitioning and DoF numbering have been performed by
+   * libMesh, every current DoF on this DofObject will belong to its
+   * processor.
    */
   dof_id_type dof_number(const unsigned int s,
 			 const unsigned int var,
@@ -288,7 +297,7 @@ public:
   bool has_dofs(const unsigned int s=libMesh::invalid_uint) const;
 
   /**
-   * \p VariableGroup DOF indices are indexed as
+   * \p VariableGroup DoF indices are indexed as
    * id = base + var_in_vg*ncomp + comp
    * This method allows for direct access to the base.
    */
@@ -297,7 +306,7 @@ public:
 		       const dof_id_type db);
 
   /**
-   * \p VariableGroup DOF indices are indexed as
+   * \p VariableGroup DoF indices are indexed as
    * id = base + var_in_vg*ncomp + comp
    * This method allows for direct access to the base.
    */
@@ -310,7 +319,7 @@ public:
   static const dof_id_type invalid_id = static_cast<dof_id_type>(-1);
 
   /**
-   * An invalid \p processor_id to distinguish DOFs that have
+   * An invalid \p processor_id to distinguish DoFs that have
    * not been assigned to a processor.
    */
   static const processor_id_type invalid_processor_id = static_cast<processor_id_type>(-1);
@@ -380,7 +389,7 @@ private:
   processor_id_type _processor_id;
 
   /**
-   * DOF index information.  This is packed into a contiguous buffer of the following format:
+   * DoF index information.  This is packed into a contiguous buffer of the following format:
    *
    * [ns end_0 end_1 ... end_{ns-1} (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_0 (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_1 ... (ncv_0 idx_0 ncv_1 idx_1 ... ncv_nv idx_nv)_ns ]
    *
@@ -411,7 +420,7 @@ private:
    * ncv_# = n_vars*ncv_magic + n_comp      for variable group #
    * idx_# = base_offset                    for variable group #
    *
-   * the DOF index for a particular component c of variable v within that group is then given by
+   * the DoF index for a particular component c of variable v within that group is then given by
    *
    *  idx_var = idx_# + n_comp*v + c
    *
