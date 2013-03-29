@@ -173,29 +173,31 @@ namespace
       ref_elem_file.clear();
       
       // // 1D elements
-      // ref_elem_file[EDGE2]   = "not_implemented";
-      // ref_elem_file[EDGE3]   = "not_implemented";
-      // ref_elem_file[EDGE4]   = "not_implemented";
-      
-      // 2D elements
-      ref_elem_file[TRI3]    = ElemDataStrings::one_tri;
-      ref_elem_file[TRI6]    = ElemDataStrings::one_tri6;
-      
-      ref_elem_file[QUAD4]   = ElemDataStrings::one_quad;
-      ref_elem_file[QUAD8]   = ElemDataStrings::one_quad8;
-      ref_elem_file[QUAD9]   = ElemDataStrings::one_quad9;
-      
-      // 3D elements
-      ref_elem_file[HEX8]    = ElemDataStrings::one_hex;
-      ref_elem_file[HEX20]   = ElemDataStrings::one_hex20;
-      ref_elem_file[HEX27]   = ElemDataStrings::one_hex27;
-      
-      ref_elem_file[TET4]    = ElemDataStrings::one_tet;
-      ref_elem_file[TET10]   = ElemDataStrings::one_tet10;
-      
-      ref_elem_file[PRISM6]  = ElemDataStrings::one_prism;
-      ref_elem_file[PRISM15] = ElemDataStrings::one_prism15;
-      ref_elem_file[PRISM18] = ElemDataStrings::one_prism18;
+      ref_elem_file[EDGE2]    = ElemDataStrings::one_edge;
+      ref_elem_file[EDGE3]    = ElemDataStrings::one_edge3;
+      ref_elem_file[EDGE4]    = ElemDataStrings::one_edge4;
+      			      
+      // 2D elements	      
+      ref_elem_file[TRI3]     = ElemDataStrings::one_tri;
+      ref_elem_file[TRI6]     = ElemDataStrings::one_tri6;
+      			      
+      ref_elem_file[QUAD4]    = ElemDataStrings::one_quad;
+      ref_elem_file[QUAD8]    = ElemDataStrings::one_quad8;
+      ref_elem_file[QUAD9]    = ElemDataStrings::one_quad9;
+      			      
+      // 3D elements	      
+      ref_elem_file[HEX8]     = ElemDataStrings::one_hex;
+      ref_elem_file[HEX20]    = ElemDataStrings::one_hex20;
+      ref_elem_file[HEX27]    = ElemDataStrings::one_hex27;
+      			      
+      ref_elem_file[TET4]     = ElemDataStrings::one_tet;
+      ref_elem_file[TET10]    = ElemDataStrings::one_tet10;
+      			      
+      ref_elem_file[PRISM6]   = ElemDataStrings::one_prism;
+      ref_elem_file[PRISM15]  = ElemDataStrings::one_prism15;
+      ref_elem_file[PRISM18]  = ElemDataStrings::one_prism18;
+
+      ref_elem_file[PYRAMID5] = ElemDataStrings::one_pyramid;
     }
 
     // Read'em
