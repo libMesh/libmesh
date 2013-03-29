@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/elem.h"
+#include "libmesh/libmesh_singleton.h"
 
 // C++ includes
 #include <cstddef>
@@ -46,7 +47,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // RemoteElem class definition
-class RemoteElem : public Elem
+class RemoteElem : public Elem,
+		   public Singleton
 {
  public:
 
@@ -56,15 +58,23 @@ class RemoteElem : public Elem
   static const dof_id_type remote_elem_id = static_cast<dof_id_type>(-2);
 
   /**
-   * Constructor.
+   * Constructor. Private to force use of the \p create() member.
    */
+private:
   RemoteElem () : Elem(0,0,NULL,_elemlinks_data,NULL) 
   { this->set_id(remote_elem_id); }
 
+public:
   /**
    * Destructor.
    */
-  virtual ~RemoteElem() {}
+  virtual ~RemoteElem();
+
+  /**
+   * Return a reference to the global \p RemoteElem
+   * sigleton object.
+   */
+  static const Elem & create ();
 
   virtual const Point & point (const unsigned int i) const
   { libmesh_error(); return Elem::point(i); }

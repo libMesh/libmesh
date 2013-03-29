@@ -19,12 +19,51 @@
 
 // Local includes
 #include "libmesh/remote_elem.h"
+#include "libmesh/threads.h"
+
+
+
+namespace
+{
+  using namespace libMesh;
+
+  typedef Threads::spin_mutex RemoteElemMutex;
+  RemoteElemMutex remote_elem_mtx;
+}
+
+
 
 namespace libMesh
 {
 
-// Pointer to singleton Remote Element (to be created in
-// libMesh::init()
-const RemoteElem* remote_elem;
+  // Pointer to singleton Remote Element (to be created in
+  // libMesh::init()
+  const RemoteElem* remote_elem;
+
+
+  RemoteElem::~RemoteElem()
+  {
+    RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
+    
+    remote_elem = NULL;
+  }
+
+
+
+  const Elem & RemoteElem::create ()
+  {
+    if (remote_elem != NULL)
+      return *remote_elem;
+
+    RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
+    
+    // check again - object could have been created while waiting
+    // for the lock to acquire!
+    if (remote_elem == NULL)
+      remote_elem = new RemoteElem;
+
+    return *remote_elem;    
+  }
+
 
 } // namespace libMesh
