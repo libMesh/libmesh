@@ -44,7 +44,7 @@ namespace libMesh
      * @returns a constant reference to the reference element of
      * the user-requested type.
      */
-    Elem const* get (const ElemType Type);
+    const Elem & get (const ElemType Type);
 
     /**
      * Cleans up static singleton data.

@@ -223,7 +223,7 @@ namespace libMesh
   {
 
 
-    Elem const* get (const ElemType Type)
+    const Elem & get (const ElemType Type)
     {
       libmesh_assert_less (Type, INVALID_ELEM);
       
@@ -231,7 +231,7 @@ namespace libMesh
       
       libmesh_assert (ref_elem_map[Type] != NULL);
 
-      return ref_elem_map[Type];
+      return *ref_elem_map[Type];
     }
 
 
