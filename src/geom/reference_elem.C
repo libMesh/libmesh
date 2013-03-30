@@ -155,8 +155,7 @@ namespace
    
   void init_ref_elem_table()
   {
-    // ouside mutex - if this flag is set, we can
-    // trust it.
+    // ouside mutex - if this pointer is set, we can trust it.
     if (singleton_cache != NULL) return;
     
     // playing with fire here - lock before touching shared
