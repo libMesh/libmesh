@@ -83,14 +83,15 @@ namespace {
   /**
    *
    */
+    template <typename InValType>
   class ThreadedIO
   {
   private:
     libMesh::Xdr &_io;
-    std::vector<Number> &_data;
+    std::vector<InValType> &_data;
     
   public:
-    ThreadedIO (libMesh::Xdr &io, std::vector<Number> &data) :
+    ThreadedIO (libMesh::Xdr &io, std::vector<InValType> &data) :
       _io(io),
       _data(data)      
     {}
@@ -491,6 +492,7 @@ void System::read_legacy_data (Xdr& io,
 
 
 
+template <typename InValType>
 void System::read_parallel_data (Xdr &io,
 				 const bool read_additional_data)
 {
@@ -548,7 +550,8 @@ void System::read_parallel_data (Xdr &io,
 			      ordered_elements_set.end());
   }
 
-  std::vector<Number> io_buffer;
+//  std::vector<Number> io_buffer;
+    std::vector<InValType> io_buffer;
 
   // 9.)
   //
@@ -703,7 +706,7 @@ void System::read_parallel_data (Xdr &io,
 }
 
 
-
+  template <typename InValType>
 void System::read_serialized_data (Xdr& io,
 				   const bool read_additional_data)
 {
@@ -729,7 +732,7 @@ void System::read_serialized_data (Xdr& io,
   // Read the global solution vector
   {
     total_read_size +=
-      this->read_serialized_vector(io, *this->solution);
+      this->read_serialized_vector<InValType>(io, *this->solution);
 
     // get the comment
     if (libMesh::processor_id() == 0)
@@ -746,7 +749,7 @@ void System::read_serialized_data (Xdr& io,
       for(; pos != this->_vectors.end(); ++pos)
         {
 	  total_read_size +=
-	    this->read_serialized_vector(io, *pos->second);
+	    this->read_serialized_vector<InValType>(io, *pos->second);
 
 	  // get the comment
 	  if (libMesh::processor_id() == 0)
@@ -768,10 +771,11 @@ void System::read_serialized_data (Xdr& io,
 
 
 
-template <typename iterator_type>
+template <typename iterator_type, typename InValType>
 dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_objs,
 							 const iterator_type begin,
 							 const iterator_type end,
+                             const InValType ,
 							 Xdr &io,
 							 const std::vector<NumericVector<Number>*> &vecs,
 							 const unsigned int var_to_read) const
@@ -913,6 +917,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   std::vector<Parallel::Request>         reply_requests (libMesh::n_processors());
   std::vector<unsigned int>              obj_val_offsets;          // map to traverse entry-wise rather than processor-wise
   std::vector<Number>                    input_vals;               // The input buffer for the current block
+  std::vector<InValType>                 input_vals_tmp;               // The input buffer for the current block
   
   for (dof_id_type blk=0; blk<num_blks; blk++)
     {
@@ -931,9 +936,10 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	{
 	  // we know the input buffer size for this block and can begin reading it now
 	  input_vals.resize(tot_vals_size[blk]);
-	  
+	  input_vals_tmp.resize(tot_vals_size[blk]);
+        
 	  // a ThreadedIO object to perform asychronous file IO
-	  ThreadedIO threaded_io(io, input_vals);
+	  ThreadedIO<InValType> threaded_io(io, input_vals_tmp);
 	  Threads::Thread async_io(threaded_io);
 	  
 	  Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
@@ -993,7 +999,10 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	  
 	  // Wait for read completion
 	  async_io.join();
-
+      // now copy the values back to the main vector for transfer
+      for (unsigned int i_val=0; i_val<input_vals.size(); i_val++)
+          input_vals[i_val] = input_vals_tmp[i_val];
+          
 	  n_read_values +=
 	    libmesh_cast_int<dof_id_type>(input_vals.size());
 	  
@@ -1124,7 +1133,7 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 }
 
 
-
+template <typename InValType>
 numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
 {
   parallel_only();
@@ -1156,16 +1165,17 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
     n_elem  = this->get_mesh().n_elem();
   
   libmesh_assert_less_equal (nv, this->n_vars());
-
+    
   // for newer versions, read variables node/elem major
   if (io.version() >= LIBMESH_VERSION_ID(0,7,4))
     {
       //---------------------------------
       // Collect the values for all nodes
       n_assigned_vals +=
-	this->read_serialized_blocked_dof_objects (n_nodes,
+        this->read_serialized_blocked_dof_objects (n_nodes,
 						   this->get_mesh().local_nodes_begin(),
 						   this->get_mesh().local_nodes_end(),
+                           InValType(),
 						   io,
 						   std::vector<NumericVector<Number>*> (1,&vec));
 
@@ -1176,6 +1186,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 	this->read_serialized_blocked_dof_objects (n_elem,
 						   this->get_mesh().local_elements_begin(),
 						   this->get_mesh().local_elements_end(),
+                           InValType(),
 						   io,
 						   std::vector<NumericVector<Number>*> (1,&vec));
     }
@@ -1195,6 +1206,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 		this->read_serialized_blocked_dof_objects (n_nodes,
 							   this->get_mesh().local_nodes_begin(),
 							   this->get_mesh().local_nodes_end(),
+                               InValType(),
 							   io,
 							   std::vector<NumericVector<Number>*> (1,&vec),
 							   var);
@@ -1206,6 +1218,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 		this->read_serialized_blocked_dof_objects (n_elem,
 							   this->get_mesh().local_elements_begin(),
 							   this->get_mesh().local_elements_end(),
+                               InValType(),
 							   io,
 							   std::vector<NumericVector<Number>*> (1,&vec),
 							   var);
@@ -1928,7 +1941,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
       std::vector<Number>       output_vals;              // The output buffer for the current block
 
       // a ThreadedIO object to perform asychronous file IO
-      ThreadedIO threaded_io(io, output_vals);
+      ThreadedIO<Number> threaded_io(io, output_vals);
       AutoPtr<Threads::Thread> async_io;
       
       for (unsigned int blk=0; blk<num_blks; blk++)
@@ -2160,7 +2173,7 @@ dof_id_type System::write_serialized_vector (Xdr& io, const NumericVector<Number
 }
 
 
-
+template <typename InValType>
 dof_id_type System::read_serialized_vectors (Xdr &io,
 					     const std::vector<NumericVector<Number>*> &vectors) const
 {
@@ -2216,6 +2229,7 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
     this->read_serialized_blocked_dof_objects (n_nodes,
 					       this->get_mesh().local_nodes_begin(),
 					       this->get_mesh().local_nodes_end(),
+                           InValType(),
 					       io,
 					       vectors);
 
@@ -2225,6 +2239,7 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
     this->read_serialized_blocked_dof_objects (n_elem,
 					       this->get_mesh().local_elements_begin(),
 					       this->get_mesh().local_elements_end(),
+                           InValType(),
 					       io,
 					       vectors);
 
@@ -2314,4 +2329,16 @@ dof_id_type System::write_serialized_vectors (Xdr &io,
 
 } // namespace libMesh
 
+
+
+template void System::read_parallel_data<Number> (Xdr &io, const bool read_additional_data);
+template void System::read_serialized_data<Number> (Xdr& io, const bool read_additional_data);
+template numeric_index_type System::read_serialized_vector<Number> (Xdr& io, NumericVector<Number>& vec);
+template dof_id_type System::read_serialized_vectors<Number> (Xdr &io, const std::vector<NumericVector<Number>*> &vectors) const;
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+template void System::read_parallel_data<Real> (Xdr &io, const bool read_additional_data);
+template void System::read_serialized_data<Real> (Xdr& io, const bool read_additional_data);
+template numeric_index_type System::read_serialized_vector<Real> (Xdr& io, NumericVector<Number>& vec);
+template dof_id_type System::read_serialized_vectors<Real> (Xdr &io, const std::vector<NumericVector<Number>*> &vectors) const;
+#endif
 

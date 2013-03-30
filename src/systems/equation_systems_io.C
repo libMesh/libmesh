@@ -69,6 +69,7 @@ namespace {
 
 // ------------------------------------------------------------
 // EquationSystem class implementation
+    template <typename InValType>
 void EquationSystems::read (const std::string& name,
                             const unsigned int read_flags)
 {
@@ -84,7 +85,8 @@ void EquationSystems::read (const std::string& name,
 }
 
 
-
+    
+template <typename InValType>
 void EquationSystems::read (const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
                             const unsigned int read_flags)
@@ -99,7 +101,7 @@ void EquationSystems::read (const std::string& name,
   // First try the read the user requested
   try
     {
-      this->_read_impl (name, mode, read_flags);
+      this->_read_impl<InValType> (name, mode, read_flags);
     }
 
   // If that fails, try it again but explicitly request we look for infinite element info
@@ -115,7 +117,7 @@ void EquationSystems::read (const std::string& name,
 
       try
 	{
-	  this->_read_impl (name, mode, read_flags | EquationSystems::TRY_READ_IFEMS);
+	  this->_read_impl<InValType> (name, mode, read_flags | EquationSystems::TRY_READ_IFEMS);
 	}
 
       // If all that failed, we are out of ideas here...
@@ -133,7 +135,7 @@ void EquationSystems::read (const std::string& name,
 #else
 
   // no exceptions - cross your fingers...
-  this->_read_impl (name, mode, read_flags);
+  this->_read_impl<InValType> (name, mode, read_flags);
 
 #endif // #ifdef LIBMESH_ENABLE_EXCEPTIONS
 
@@ -145,6 +147,7 @@ void EquationSystems::read (const std::string& name,
 
 
 
+    template <typename InValType>
 void EquationSystems::_read_impl (const std::string& name,
 				  const libMeshEnums::XdrMODE mode,
 				  const unsigned int read_flags)
@@ -349,9 +352,9 @@ void EquationSystems::_read_impl (const std::string& name,
 	  }
 	else
 	  if (read_parallel_files)
-	    pos->second->read_parallel_data   (local_io, read_additional_data);
+	    pos->second->read_parallel_data<InValType>   (local_io, read_additional_data);
 	  else
-	    pos->second->read_serialized_data (io, read_additional_data);
+	    pos->second->read_serialized_data<InValType> (io, read_additional_data);
 
 
       // Undo the temporary numbering.
@@ -566,5 +569,18 @@ void EquationSystems::write(const std::string& name,
   // and elements in the mesh, which requires that we abuse const_cast
   const_cast<MeshBase&>(_mesh).fix_broken_node_and_element_numbering();
 }
+
+
+ 
+// template specialization
+
+template void EquationSystems::read<Number> (const std::string& name, const unsigned int read_flags);
+template void EquationSystems::read<Number> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags);
+template void EquationSystems::_read_impl<Number> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags);
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+template void EquationSystems::read<Real> (const std::string& name, const unsigned int read_flags);
+template void EquationSystems::read<Real> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags);
+template void EquationSystems::_read_impl<Real> (const std::string& name, const libMeshEnums::XdrMODE mode, const unsigned int read_flags);
+#endif
 
 } // namespace libMesh
