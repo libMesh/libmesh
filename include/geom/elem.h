@@ -165,6 +165,16 @@ class Elem : public ReferenceCountedObject<Elem>,
   subdomain_id_type & subdomain_id ();
 
   /**
+   * @returns a pointer to the "reference element" associated
+   * with this element.  The reference element is the image of this
+   * element in reference parametric space. Importantly, it is *not*
+   * an actual element in the mesh, but rather a Singleton-type 
+   * object, so for example all \p Quad4 elements share the same 
+   * \p reference_elem().
+   */
+  const Elem* reference_elem () const;
+
+  /**
    * @returns an id associated with the \p s side of this element.
    * The id is not necessariy unique, but should be close.  This is
    * particularly useful in the \p MeshBase::find_neighbors() routine.
