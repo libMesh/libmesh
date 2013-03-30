@@ -21,6 +21,7 @@
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
 #include "libmesh/reference_elem.h"
+#include "libmesh/libmesh_singleton.h"
 #include "libmesh/threads.h"
 
 // C++ includes
@@ -45,9 +46,6 @@ namespace
   // Mutex for thread safety.
   InitMutex init_mtx;
 
-  // simple flag denoting if we are intitialized
-  bool initialized = false;
-
   // map from ElemType to reference element file system object name
   typedef std::map<ElemType, const char*> FileMapType;
   FileMapType ref_elem_file;
@@ -55,11 +53,12 @@ namespace
 
 
   
-  class SingletonCache
+  class SingletonCache : public libMesh::Singleton
   {
   public:
-    void clear()
+    ~SingletonCache()
     {
+      libmesh_here();
       for (unsigned int e=0; e<elem_list.size(); e++)
 	if (elem_list[e])
 	  {
@@ -67,26 +66,33 @@ namespace
 	    elem_list[e] = NULL;
 	  }
       
+      elem_list.clear();
+
       for (unsigned int n=0; n<node_list.size(); n++)
 	if (node_list[n])
 	  {
 	    delete node_list[n];
 	    node_list[n] = NULL;
 	  }
-    }
 
-    ~SingletonCache()
-    { this->clear(); }
+      node_list.clear();
+    }
       
     std::vector<Node*> node_list;
     std::vector<Elem*> elem_list;
-  } singleton_cache;
+  };
+
+  // singleton object, dynamically created and then
+  // removed at program exit
+  SingletonCache *singleton_cache = NULL;
 
 
 
   Elem* read_ref_elem (const ElemType Type,
 		       std::istream &in)
   {
+    libmesh_assert (singleton_cache != NULL);
+
     static const unsigned int comm_len = 1024;
     char comm[comm_len];
     
@@ -124,7 +130,7 @@ namespace
 	in >> x >> y >> z;
 
 	Node *node = new Node(x,y,z,n);
-	singleton_cache.node_list.push_back(node);
+	singleton_cache->node_list.push_back(node);
 
 	elem->set_node(n) = node;
       }
@@ -141,10 +147,10 @@ namespace
       }
 
     else
-      singleton_cache.elem_list.push_back (elem);
+      singleton_cache->elem_list.push_back (elem);
     
     ref_elem_map[Type] = elem;
-    
+    libmesh_here();
     return elem;
   }
 
@@ -154,7 +160,7 @@ namespace
   {
     // ouside mutex - if this flag is set, we can
     // trust it.
-    if (initialized) return;
+    if (singleton_cache != NULL) return;
     
     // playing with fire here - lock before touching shared
     // data structures
@@ -162,11 +168,12 @@ namespace
 
     // inside mutex - flag may have changed while waiting
     // for the lock to acquire, check it again.
-    if (initialized) return;
+    if (singleton_cache != NULL) return;
 
     // OK, if we get here we have the lock and we are not
     // initialized.  populate singletons.
-    singleton_cache.clear();
+    if (singleton_cache == NULL)
+      singleton_cache = new SingletonCache;
     
     // initialize the reference file table
     {
@@ -209,9 +216,6 @@ namespace
 	read_ref_elem(it->first,
 		      stream);
       }
-
-    // set the initialized flag.
-    initialized = true;
   }
 }
 
@@ -234,13 +238,6 @@ namespace libMesh
       libmesh_assert (ref_elem_map[Type] != NULL);
 
       return *ref_elem_map[Type];
-    }
-
-
-
-    void clear ()
-    {
-      singleton_cache.clear();
     }
 
     

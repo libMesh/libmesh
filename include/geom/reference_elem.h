@@ -46,11 +46,6 @@ namespace libMesh
      */
     const Elem & get (const ElemType Type);
 
-    /**
-     * Cleans up static singleton data.
-     */
-    void clear();
-    
   } // namespace ReferenceElem
 
 
