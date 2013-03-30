@@ -32,14 +32,12 @@
 // anonymous namespace for implementation details
 namespace
 {
-
+  using namespace libMesh;
+  
   namespace ElemDataStrings
   {
 #include "reference_elem.data"
   }
-
-  
-  using namespace libMesh;
   
   typedef Threads::spin_mutex InitMutex;
   
@@ -58,7 +56,6 @@ namespace
   public:
     ~SingletonCache()
     {
-      libmesh_here();
       for (unsigned int e=0; e<elem_list.size(); e++)
 	if (elem_list[e])
 	  {
@@ -85,7 +82,7 @@ namespace
   // singleton object, dynamically created and then
   // removed at program exit
   SingletonCache *singleton_cache = NULL;
-
+    
 
 
   Elem* read_ref_elem (const ElemType Type,
@@ -216,7 +213,19 @@ namespace
 		      stream);
       }
   }
-}
+
+
+
+  // Class to setup singleton data
+  class ReferenceElemSetup : public Singleton::Setup
+  {
+    void setup ()
+    {
+      init_ref_elem_table();
+    }
+  } reference_elem_setup;
+
+} // anonymous namespace
 
 
 
@@ -226,8 +235,6 @@ namespace libMesh
 {
   namespace ReferenceElem
   {
-
-
     const Elem & get (const ElemType Type)
     {
       libmesh_assert_less (Type, INVALID_ELEM);
@@ -238,7 +245,5 @@ namespace libMesh
 
       return *ref_elem_map[Type];
     }
-
-    
   } // namespace ReferenceElem
 } // namespace libMesh
