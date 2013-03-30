@@ -215,15 +215,17 @@ namespace
   }
 
 
-
-  // Class to setup singleton data
-  class ReferenceElemSetup : public Singleton::Setup
-  {
-    void setup ()
-    {
-      init_ref_elem_table();
-    }
-  } reference_elem_setup;
+  // no reason to do this at startup - 
+  // data structures will get initialized *if*
+  // ReferenceElem::get() is ever called.
+  // // Class to setup singleton data
+  // class ReferenceElemSetup : public Singleton::Setup
+  // {
+  //   void setup ()
+  //   {
+  //     init_ref_elem_table();
+  //   }
+  // } reference_elem_setup;
 
 } // anonymous namespace
 
