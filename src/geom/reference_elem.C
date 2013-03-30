@@ -166,14 +166,13 @@ namespace
     // data structures
     InitMutex::scoped_lock lock(init_mtx);
 
-    // inside mutex - flag may have changed while waiting
+    // inside mutex - pointer may have changed while waiting
     // for the lock to acquire, check it again.
     if (singleton_cache != NULL) return;
 
     // OK, if we get here we have the lock and we are not
-    // initialized.  populate singletons.
-    if (singleton_cache == NULL)
-      singleton_cache = new SingletonCache;
+    // initialized.  populate singleton.
+    singleton_cache = new SingletonCache;
     
     // initialize the reference file table
     {
