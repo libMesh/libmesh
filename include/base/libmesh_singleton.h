@@ -44,6 +44,37 @@ namespace libMesh {
   public:
 
     /**
+     * Abstract base class for runtime singleton setup.
+     * This will be called from the \p LibMeshInit constructor.
+     */
+    class Setup
+    {
+    protected:
+      /**
+       * Constructor.  Adds the derived object to the setup cache list.
+       */
+      Setup ();
+      
+    public:
+      /**
+       * Destructor.
+       */
+      virtual ~Setup() {};
+
+      /**
+       * Setup method.  Importantly, this is called *after main()* from the
+       * \p LibMeshInit constructor.
+       */
+      virtual void setup () = 0;
+    };
+
+    /**
+     * Setup function.  Initializes any derived \p Singleton::Setup objects.
+     * objects.
+     */
+    static void setup();
+
+    /**
      * Cleanup function.  Removes all dynamically created \p Singleton
      * objects.
      */

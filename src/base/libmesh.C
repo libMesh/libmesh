@@ -22,7 +22,6 @@
 #include "libmesh/getpot.h"
 #include "libmesh/parallel.h"
 #include "libmesh/reference_counter.h"
-#include "libmesh/remote_elem.h"
 #include "libmesh/libmesh_singleton.h"
 #include "libmesh/threads.h"
 
@@ -345,9 +344,7 @@ void _init (int argc, const char* const* argv,
 
   // Construct singletons who may be at risk of the
   // "static initialization order fiasco"
-  //
-  // RemoteElem depends on static reference counting data
-  RemoteElem::create();
+  Singleton::setup();
 
 #if defined(LIBMESH_HAVE_MPI)
 
