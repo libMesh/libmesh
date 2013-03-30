@@ -150,7 +150,7 @@ namespace
       singleton_cache->elem_list.push_back (elem);
     
     ref_elem_map[Type] = elem;
-    libmesh_here();
+
     return elem;
   }
 
