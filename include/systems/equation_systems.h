@@ -314,14 +314,24 @@ public:
    * If XdrMODE is omitted, it will be inferred as READ for filenames
    * containing .xda or as DECODE for filenames containing .xdr
    */
-    template <typename InValType = Number>
+    template <typename InValType>
   void read (const std::string& name,
 	     const libMeshEnums::XdrMODE,
              const unsigned int read_flags=(READ_HEADER | READ_DATA));
 
-    template <typename InValType = Number>
+  void read (const std::string& name,
+	     const libMeshEnums::XdrMODE mode,
+             const unsigned int read_flags=(READ_HEADER | READ_DATA))
+    { read<Number>(name, mode, read_flags); }
+
+    template <typename InValType>
   void read (const std::string& name,
              const unsigned int read_flags=(READ_HEADER | READ_DATA));
+
+  void read (const std::string& name,
+             const unsigned int read_flags=(READ_HEADER | READ_DATA))
+    { read<Number>(name, read_flags); }
+
 
   /**
    * Write the systems to disk using the XDR data format.
