@@ -19,6 +19,7 @@
 
 // Local includes
 #include "libmesh/remote_elem.h"
+#include "libmesh/libmesh_singleton.h"
 #include "libmesh/threads.h"
 
 
@@ -29,6 +30,21 @@ namespace
 
   typedef Threads::spin_mutex RemoteElemMutex;
   RemoteElemMutex remote_elem_mtx;
+
+
+  // Class to be dispatched by Singleton::setup() 
+  // to create the \p RemoteElem singleton.
+  // While this actual object has file-level static
+  // scope and will be initialized before main(),
+  // importantly the setup() method will not be invoked
+  // until after main().
+  class RemoteElemSetup : public Singleton::Setup
+  {
+    void setup ()
+    {
+      RemoteElem::create();
+    }
+  } remote_elem_setup;
 }
 
 
