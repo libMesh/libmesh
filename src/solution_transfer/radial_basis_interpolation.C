@@ -87,7 +87,10 @@ namespace libMesh
 
 
     // Construct the Radial Basis Function, giving it the size of the domain
-    _r_bbox = (_src_bbox.max() - _src_bbox.min()).size();
+    if(_r_override < 0)
+      _r_bbox = (_src_bbox.max() - _src_bbox.min()).size();
+    else
+      _r_bbox = _r_override;
 
     RBF rbf(_r_bbox);
 

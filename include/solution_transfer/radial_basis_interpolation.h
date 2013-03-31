@@ -61,14 +61,20 @@ protected:
    */
   Real _r_bbox;
 
+  /**
+   * Diagonal override
+   */
+  Real _r_override;
+
 public:
 
   /**
    * Constructor. 
    */
-  RadialBasisInterpolation () :
+  RadialBasisInterpolation (Real radius=-1) :
     InverseDistanceInterpolation<KDDim> (),
-    _r_bbox(0.)
+    _r_bbox(0.),
+    _r_override(radius)
   { libmesh_experimental(); }
 
   /**
