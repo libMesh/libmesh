@@ -2,7 +2,7 @@
 //  GetPot Version libMeshHPCT_fork-1.2                        Apr/14/2010
 //  Based on "getpot-1.1.1.tgz" version from SourceForge
 //
-//  New code (C) 2009-2010 Roy Stogner, Karl Schulz
+//  New code (C) 2009-2013 Roy Stogner, Karl Schulz
 //
 //  GetPot Version 1.0                                        Sept/13/2002
 //
@@ -41,6 +41,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 #include <cmath>
@@ -82,7 +83,7 @@ extern "C" {
 #define SCOPED_MUTEX
 
 #define getpot_cerr std::cerr
-#define getpot_error() throw std::runtime_error
+#define getpot_error() throw std::runtime_error(std::string("GetPot Error"))
 #define getpot_cast_int static_cast
 
 #endif
@@ -494,7 +495,9 @@ GetPot::GetPot() :
   _comment_start(),
   _comment_end(),
   _field_separator(),
+#if !defined(GETPOT_DISABLE_MUTEX)
   _getpot_mtx(),
+#endif
   _internal_string_container(),
   _requested_arguments(),
   _requested_variables(),
@@ -521,7 +524,9 @@ GetPot::GetPot(const int argc_, const char * const * argv_,
   _comment_start(),
   _comment_end(),
   _field_separator(),
+#if !defined(GETPOT_DISABLE_MUTEX)
   _getpot_mtx(),
+#endif
   _internal_string_container(),
   _requested_arguments(),
   _requested_variables(),
@@ -577,7 +582,9 @@ GetPot::GetPot(const char* FileName,
   _comment_start(),
   _comment_end(),
   _field_separator(),
+#if !defined(GETPOT_DISABLE_MUTEX)
   _getpot_mtx(),
+#endif
   _internal_string_container(),
   _requested_arguments(),
   _requested_variables(),
@@ -610,7 +617,9 @@ GetPot::GetPot(const std::string& FileName,
   _comment_start(),
   _comment_end(),
   _field_separator(),
+#if !defined(GETPOT_DISABLE_MUTEX)
   _getpot_mtx(),
+#endif
   _internal_string_container(),
   _requested_arguments(),
   _requested_variables(),
@@ -665,7 +674,9 @@ GetPot::GetPot(const GetPot& Other) :
   _comment_start(Other._comment_start),
   _comment_end(Other._comment_end),
   _field_separator(Other._field_separator),
+#if !defined(GETPOT_DISABLE_MUTEX)
   _getpot_mtx(Other._getpot_mtx),
+#endif
   _internal_string_container(),
   _requested_arguments(Other._requested_arguments),
   _requested_variables(Other._requested_variables),
@@ -715,7 +726,9 @@ GetPot::operator=(const GetPot& Other)
     _comment_start       = Other._comment_start;
     _comment_end         = Other._comment_end;
     _field_separator     = Other._field_separator;
+#if !defined(GETPOT_DISABLE_MUTEX)
     _getpot_mtx          = Other._getpot_mtx;
+#endif
     _requested_arguments = Other._requested_arguments;
     _requested_variables = Other._requested_variables;
     _requested_sections  = Other._requested_sections;
