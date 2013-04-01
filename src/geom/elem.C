@@ -56,6 +56,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/remote_elem.h"
+#include "libmesh/reference_elem.h"
 #include "libmesh/string_to_enum.h"
 
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -318,6 +319,13 @@ AutoPtr<Elem> Elem::build(const ElemType type,
 
   AutoPtr<Elem> ap(elem);
   return ap;
+}
+
+
+
+const Elem* Elem::reference_elem () const
+{
+  return &(ReferenceElem::get(this->type()));
 }
 
 

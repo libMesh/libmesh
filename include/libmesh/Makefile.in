@@ -454,41 +454,42 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	elem_range.h elem_type.h face.h face_inf_quad.h \
 	face_inf_quad4.h face_inf_quad6.h face_quad.h face_quad4.h \
 	face_quad8.h face_quad9.h face_tri.h face_tri3.h face_tri6.h \
-	node.h node_elem.h node_range.h plane.h point.h remote_elem.h \
-	side.h sphere.h stored_range.h surface.h abaqus_io.h \
-	boundary_info.h boundary_mesh.h diva_io.h ensight_io.h \
-	exodusII_io.h exodusII_io_helper.h fro_io.h gmsh_io.h gmv_io.h \
-	gnuplot_io.h inf_elem_builder.h legacy_xdr_io.h matlab_io.h \
-	medit_io.h mesh.h mesh_base.h mesh_communication.h mesh_data.h \
-	mesh_function.h mesh_generation.h mesh_input.h \
-	mesh_inserter_iterator.h mesh_modification.h mesh_output.h \
-	mesh_refinement.h mesh_serializer.h mesh_smoother.h \
-	mesh_smoother_laplace.h mesh_smoother_vsmoother.h \
-	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
-	mesh_triangle_holes.h mesh_triangle_interface.h \
-	mesh_triangle_wrapper.h nemesis_io.h nemesis_io_helper.h \
-	off_io.h parallel_mesh.h patch.h postscript_io.h serial_mesh.h \
-	tecplot_io.h tetgen_io.h ucd_io.h unstructured_mesh.h unv_io.h \
-	vtk_io.h xdr_head.h xdr_io.h xdr_mesh.h xdr_mgf.h xdr_mhead.h \
-	xdr_shead.h xdr_soln.h analytic_function.h \
-	const_fem_function.h const_function.h coupling_matrix.h \
-	dense_matrix.h dense_matrix_base.h dense_submatrix.h \
-	dense_subvector.h dense_vector.h dense_vector_base.h \
-	distributed_vector.h eigen_core_support.h \
-	eigen_preconditioner.h eigen_sparse_matrix.h \
-	eigen_sparse_vector.h fem_function_base.h function_base.h \
-	laspack_matrix.h laspack_vector.h numeric_vector.h \
-	parsed_function.h petsc_macro.h petsc_matrix.h \
-	petsc_preconditioner.h petsc_vector.h preconditioner.h \
-	raw_accessor.h refinement_selector.h shell_matrix.h \
-	sparse_matrix.h sparse_shell_matrix.h sum_shell_matrix.h \
-	tensor_shell_matrix.h tensor_tools.h tensor_value.h \
-	trilinos_epetra_matrix.h trilinos_epetra_vector.h \
-	trilinos_preconditioner.h type_n_tensor.h type_tensor.h \
-	type_vector.h vector_value.h wrapped_function.h \
-	zero_function.h parallel.h parallel_algebra.h \
-	parallel_bin_sorter.h parallel_conversion_utils.h \
-	parallel_ghost_sync.h parallel_hilbert.h parallel_histogram.h \
+	node.h node_elem.h node_range.h plane.h point.h \
+	reference_elem.h remote_elem.h side.h sphere.h stored_range.h \
+	surface.h abaqus_io.h boundary_info.h boundary_mesh.h \
+	diva_io.h ensight_io.h exodusII_io.h exodusII_io_helper.h \
+	fro_io.h gmsh_io.h gmv_io.h gnuplot_io.h inf_elem_builder.h \
+	legacy_xdr_io.h matlab_io.h medit_io.h mesh.h mesh_base.h \
+	mesh_communication.h mesh_data.h mesh_function.h \
+	mesh_generation.h mesh_input.h mesh_inserter_iterator.h \
+	mesh_modification.h mesh_output.h mesh_refinement.h \
+	mesh_serializer.h mesh_smoother.h mesh_smoother_laplace.h \
+	mesh_smoother_vsmoother.h mesh_tetgen_interface.h \
+	mesh_tetgen_wrapper.h mesh_tools.h mesh_triangle_holes.h \
+	mesh_triangle_interface.h mesh_triangle_wrapper.h nemesis_io.h \
+	nemesis_io_helper.h off_io.h parallel_mesh.h patch.h \
+	postscript_io.h serial_mesh.h tecplot_io.h tetgen_io.h \
+	ucd_io.h unstructured_mesh.h unv_io.h vtk_io.h xdr_head.h \
+	xdr_io.h xdr_mesh.h xdr_mgf.h xdr_mhead.h xdr_shead.h \
+	xdr_soln.h analytic_function.h const_fem_function.h \
+	const_function.h coupling_matrix.h dense_matrix.h \
+	dense_matrix_base.h dense_submatrix.h dense_subvector.h \
+	dense_vector.h dense_vector_base.h distributed_vector.h \
+	eigen_core_support.h eigen_preconditioner.h \
+	eigen_sparse_matrix.h eigen_sparse_vector.h \
+	fem_function_base.h function_base.h laspack_matrix.h \
+	laspack_vector.h numeric_vector.h parsed_function.h \
+	petsc_macro.h petsc_matrix.h petsc_preconditioner.h \
+	petsc_vector.h preconditioner.h raw_accessor.h \
+	refinement_selector.h shell_matrix.h sparse_matrix.h \
+	sparse_shell_matrix.h sum_shell_matrix.h tensor_shell_matrix.h \
+	tensor_tools.h tensor_value.h trilinos_epetra_matrix.h \
+	trilinos_epetra_vector.h trilinos_preconditioner.h \
+	type_n_tensor.h type_tensor.h type_vector.h vector_value.h \
+	wrapped_function.h zero_function.h parallel.h \
+	parallel_algebra.h parallel_bin_sorter.h \
+	parallel_conversion_utils.h parallel_ghost_sync.h \
+	parallel_hilbert.h parallel_histogram.h \
 	parallel_implementation.h parallel_sort.h threads.h \
 	threads_allocators.h centroid_partitioner.h \
 	hilbert_sfc_partitioner.h linear_partitioner.h \
@@ -1140,6 +1141,9 @@ plane.h: $(top_srcdir)/include/geom/plane.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 point.h: $(top_srcdir)/include/geom/point.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
+
+reference_elem.h: $(top_srcdir)/include/geom/reference_elem.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) $< $@
 
 remote_elem.h: $(top_srcdir)/include/geom/remote_elem.h

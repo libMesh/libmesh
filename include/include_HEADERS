@@ -139,6 +139,7 @@ include_HEADERS =  \
         geom/node_range.h \
         geom/plane.h \
         geom/point.h \
+        geom/reference_elem.h \
         geom/remote_elem.h \
         geom/side.h \
         geom/sphere.h \
