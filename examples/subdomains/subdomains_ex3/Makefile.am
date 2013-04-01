@@ -11,7 +11,7 @@ install_dir   = $(examples_install_path)/subdomains/ex3
 data          = subdomains_ex3.C ../../adaptivity/adaptivity_ex2/mesh.xda run.sh
 sources       = $(data) run.sh
 
-CLEANFILES =
+CLEANFILES = in_*.dat out_*.dat
 
 ##############################################
 # include common example environment

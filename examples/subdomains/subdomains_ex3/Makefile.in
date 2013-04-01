@@ -571,7 +571,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = $(example_name).php stdout.log
+CLEANFILES = in_*.dat out_*.dat $(example_name).php stdout.log
 
 ######################################################################
 #
