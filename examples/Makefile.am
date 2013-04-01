@@ -33,6 +33,7 @@ SUBDIRS = \
 	miscellaneous/miscellaneous_ex11 \
 	subdomains/subdomains_ex1 \
 	subdomains/subdomains_ex2 \
+	subdomains/subdomains_ex3 \
 	systems_of_equations/systems_of_equations_ex1 \
 	systems_of_equations/systems_of_equations_ex2 \
 	systems_of_equations/systems_of_equations_ex3 \
