@@ -380,7 +380,7 @@ void QBase::print_info(std::ostream& os) const
       os << " Point " << qpoint << ":\n"
          << "  "
          << _points[qpoint]
-         << " Weight:\n "
+         << "\n Weight:\n "
          << "  w=" << _weights[qpoint] << "\n" << std::endl;
     }
 }
