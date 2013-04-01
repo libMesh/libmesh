@@ -1,5 +1,5 @@
 /* The libMesh Finite Element Library. */
-/* Copyright (C) 2003  Benjamin S. Kirk */
+/* Copyright (C) 2013  Benjamin S. Kirk */
 
 /* This library is free software; you can redistribute it and/or */
 /* modify it under the terms of the GNU Lesser General Public */
@@ -30,41 +30,26 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
-#include "libmesh/exodusII_io.h"
-#include "libmesh/gnuplot_io.h"
-#include "libmesh/linear_implicit_system.h"
-#include "libmesh/equation_systems.h"
-
-// Define the Finite Element object.
-#include "libmesh/fe.h"
-
-// Define Gauss quadrature rules.
-#include "libmesh/quadrature_gauss.h"
-
-// Define the DofMap, which handles degree of freedom
-// indexing.
-#include "libmesh/dof_map.h"
-
-// Define useful datatypes for finite element
-// matrix and vector components.
-#include "libmesh/sparse_matrix.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/dense_matrix.h"
-#include "libmesh/dense_vector.h"
-
-// Define the PerfLog, a performance logging utility.
-// It is useful for timing events in a code and giving
-// you an idea where bottlenecks lie.
-#include "libmesh/perf_log.h"
-
-// The definition of a geometric element
-#include "libmesh/elem.h"
-
-#include "libmesh/string_to_enum.h"
-#include "libmesh/getpot.h"
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/elem_cutter.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
+
+// declare the functions we will use
+void integrate_function (const MeshBase &mesh);
+
+// signed distance function
+const Real diam = 1.;
+Real distance (const Point &p)
+{
+  return (p.size() - diam);
+}
+
+Real integrand (const Point &p)
+{
+  return (p.size() < diam) ? 1. : 2.;
+}
 
 
 
@@ -74,7 +59,65 @@ int main (int argc, char** argv)
   // Initialize libMesh and any dependent libaries, like in example 2.
   LibMeshInit init (argc, argv);
 
+  // This example requires Adaptive Mesh Refinement support - although
+  // it only refines uniformly, the refinement code used is the same
+  // underneath
+#ifndef LIBMESH_ENABLE_AMR
+  libmesh_example_assert(false, "--enable-amr");
+#else
+
+  // Skip this 2D example if libMesh was compiled as 1D-only.
+  libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
+
+  // Read the mesh from file.  This is the coarse mesh that will be used
+  // in example 10 to demonstrate adaptive mesh refinement.  Here we will
+  // simply read it in and uniformly refine it 5 times before we compute
+  // with it.
+  Mesh mesh;
+
+  mesh.read ("mesh.xda");
+
+  // Create a MeshRefinement object to handle refinement of our mesh.
+  // This class handles all the details of mesh refinement and coarsening.
+  MeshRefinement mesh_refinement (mesh);
+
+  // Uniformly refine the mesh 5 times.  This is the
+  // first time we use the mesh refinement capabilities
+  // of the library.
+  mesh_refinement.uniformly_refine (5);
+
+  // Print information about the mesh to the screen.
+  mesh.print_info();
+
+  // integrate the desired function
+  integrate_function (mesh);
 
   // All done.
   return 0;
+#endif
+}
+
+
+
+void integrate_function (const MeshBase &mesh)
+{
+  MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
+  std::vector<Real> vertex_distance;
+
+  ElemCutter elem_cutter;
+
+  for (; el!=end_el; ++el)
+    {
+      const Elem *elem = *el;
+
+      vertex_distance.clear();
+
+      for (unsigned int v=0; v<elem->n_vertices(); v++)
+	vertex_distance.push_back (distance(elem->point(v)));
+
+      // cut the element
+      elem_cutter(*elem, vertex_distance);
+    }
 }
