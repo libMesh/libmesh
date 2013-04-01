@@ -564,7 +564,7 @@ vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 BUILT_SOURCES = mesh.xda $(am__append_1)
-DISTCLEANFILES = $(BUILT_SOURCES)
+DISTCLEANFILES = $(BUILT_SOURCES) $(am__append_2)
 example_name = subdomains_ex3
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/subdomains/ex3
@@ -575,8 +575,7 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = in_*.dat out_*.dat $(am__append_2) $(example_name).php \
-	stdout.log
+CLEANFILES = in_*.dat out_*.dat $(example_name).php stdout.log
 
 ######################################################################
 #

@@ -20,7 +20,7 @@ if LIBMESH_VPATH_BUILD
 	-rm -f hybrid_3d.xda && $(LN_S) $(srcdir)/hybrid_3d.xda .
 	$(AM_V_GEN)touch .linkstamp
 
-  CLEANFILES += hybrid_3d.xda .linkstamp
+  DISTCLEANFILES += hybrid_3d.xda .linkstamp
 endif
 
 ##############################################
