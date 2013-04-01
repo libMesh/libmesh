@@ -41,11 +41,11 @@ using namespace libMesh;
 void integrate_function (const MeshBase &mesh);
 
 // signed distance function
-const Real diam = 0.5;
+const Real radius = 0.5;
 Real distance (const Point &p)
 {
   Point cent(0.8, 0.9);
-  return ((p-cent).size() - diam);
+  return ((p-cent).size() - radius);
 }
 
 Real integrand (const Point &p)
