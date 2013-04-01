@@ -205,11 +205,18 @@ namespace libMesh
 
     
     // Customize the variables for the triangulation
+    // we will be cutting reference cell, and want as few triangles
+    // as possible, so jack this up larger than the area we will be
+    // triangulating so we are governed only by accurately defining
+    // the boundaries.
     _triangle_inside->desired_area()  = 100.;
     _triangle_outside->desired_area() = 100.;
+
+    // allow for small angles
+    _triangle_inside->minimum_angle()  = 5.;
+    _triangle_outside->minimum_angle() = 5.;
     
-    // Turn on/off Laplacian mesh smoothing after generation.
-    // By default this is on.
+    // Turn off Laplacian mesh smoothing after generation.
     _triangle_inside->smooth_after_generating()  = false;
     _triangle_outside->smooth_after_generating() = false;
     
