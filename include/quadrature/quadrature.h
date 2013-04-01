@@ -374,6 +374,7 @@ void QBase::print_info(std::ostream& os) const
   libmesh_assert(!_points.empty());
   libmesh_assert(!_weights.empty());
 
+  Real summed_weights=0;
   os << "N_Q_Points=" << this->n_points() << std::endl << std::endl;
   for (unsigned int qpoint=0; qpoint<this->n_points(); qpoint++)
     {
@@ -382,7 +383,10 @@ void QBase::print_info(std::ostream& os) const
          << _points[qpoint]
          << "\n Weight:\n "
          << "  w=" << _weights[qpoint] << "\n" << std::endl;
+
+      summed_weights += _weights[qpoint];
     }
+  os << "Summed Weights: " << summed_weights << std::endl;
 }
 
 } // namespace libMesh
