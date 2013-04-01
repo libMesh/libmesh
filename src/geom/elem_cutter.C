@@ -37,11 +37,11 @@ namespace libMesh
   // ElemCutter implementation
   ElemCutter::ElemCutter()
   {
-    _inside_mesh_2D.reset  (new SerialMesh); /**/ _triangle_inside.reset  (new TriangleInterface (*_inside_mesh_2D));
-    _outside_mesh_2D.reset (new SerialMesh); /**/ _triangle_outside.reset (new TriangleInterface (*_outside_mesh_2D));
+    _inside_mesh_2D.reset  (new SerialMesh(2)); /**/ _triangle_inside.reset  (new TriangleInterface (*_inside_mesh_2D));
+    _outside_mesh_2D.reset (new SerialMesh(2)); /**/ _triangle_outside.reset (new TriangleInterface (*_outside_mesh_2D));
 
-    _inside_mesh_3D.reset  (new SerialMesh); /**/ _tetgen_inside.reset  (new TetGenMeshInterface (*_inside_mesh_3D));
-    _outside_mesh_3D.reset (new SerialMesh); /**/ _tetgen_outside.reset (new TetGenMeshInterface (*_outside_mesh_3D));
+    _inside_mesh_3D.reset  (new SerialMesh(3)); /**/ _tetgen_inside.reset  (new TetGenMeshInterface (*_inside_mesh_3D));
+    _outside_mesh_3D.reset (new SerialMesh(3)); /**/ _tetgen_outside.reset (new TetGenMeshInterface (*_outside_mesh_3D));
 
     cut_cntr = 0;
   }
