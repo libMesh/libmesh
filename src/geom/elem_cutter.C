@@ -37,17 +37,17 @@ namespace libMesh
   // ElemCutter implementation
   ElemCutter::ElemCutter()
   {
-    _inside_mesh_2D.reset  (new SerialMesh); /**/ _triangle_inside.reset  (new TriangleInterface (*_inside_mesh_2D));   
+    _inside_mesh_2D.reset  (new SerialMesh); /**/ _triangle_inside.reset  (new TriangleInterface (*_inside_mesh_2D));
     _outside_mesh_2D.reset (new SerialMesh); /**/ _triangle_outside.reset (new TriangleInterface (*_outside_mesh_2D));
-    
-    _inside_mesh_3D.reset  (new SerialMesh); /**/ _tetgen_inside.reset  (new TetGenMeshInterface (*_inside_mesh_3D));   
+
+    _inside_mesh_3D.reset  (new SerialMesh); /**/ _tetgen_inside.reset  (new TetGenMeshInterface (*_inside_mesh_3D));
     _outside_mesh_3D.reset (new SerialMesh); /**/ _tetgen_outside.reset (new TetGenMeshInterface (*_outside_mesh_3D));
 
     cut_cntr = 0;
   }
 
 
-  
+
   ElemCutter::~ElemCutter()
   {}
 
@@ -57,7 +57,7 @@ namespace libMesh
 			      const std::vector<Real> &vertex_distance_func) const
   {
     libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
-    
+
     for (std::vector<Real>::const_iterator it=vertex_distance_func.begin();
 	 it!=vertex_distance_func.end(); ++it)
       if (*it > 0.) return false;
@@ -87,7 +87,7 @@ namespace libMesh
 			   const std::vector<Real> &vertex_distance_func) const
   {
     libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
-    
+
     Real
       vmin = vertex_distance_func.front(),
       vmax = vmin;
@@ -95,16 +95,16 @@ namespace libMesh
     for (std::vector<Real>::const_iterator it=vertex_distance_func.begin();
 	 it!=vertex_distance_func.end(); ++it)
       {
-	vmin = std::min (vmin, *it);      
-	vmax = std::max (vmax, *it);      
+	vmin = std::min (vmin, *it);
+	vmax = std::max (vmax, *it);
       }
-    
+
     // if the distance function changes sign, we're cut.
     return (vmin*vmax < 0.);
   }
 
 
-  
+
   void ElemCutter::operator()(const Elem &elem,
 			      const std::vector<Real> &vertex_distance_func)
 
@@ -113,7 +113,7 @@ namespace libMesh
 
     _inside_elem.clear();
     _outside_elem.clear();
-  
+
     // check for quick return?
     {
       // completely outside?
@@ -123,7 +123,7 @@ namespace libMesh
 	  _outside_elem.push_back(&elem);
 	  return;
 	}
-      
+
       // completely inside?
       else if (this->is_inside(elem, vertex_distance_func))
 	{
@@ -134,10 +134,10 @@ namespace libMesh
 
       libmesh_assert (this->is_cut (elem, vertex_distance_func));
     }
-    
+
     // we now know we are in a cut element, find the intersecting points.
     this->find_intersection_points (elem, vertex_distance_func);
-    
+
     // and then dispatch the proper method
     switch (elem.dim())
       {
@@ -148,7 +148,7 @@ namespace libMesh
       }
   }
 
-  
+
 
   void ElemCutter::find_intersection_points(const Elem &elem,
 					    const std::vector<Real> &vertex_distance_func)
@@ -177,7 +177,7 @@ namespace libMesh
 	if (d0*d1 < 0.)
 	  {
 	    libmesh_assert_not_equal_to (d0, d1);
-	    
+
 	    // then find d_star in [0,1], the
 	    // distance from el0 to el1 where the 0 lives.
 	    const Real d_star = d0 / (d0 - d1);
@@ -186,16 +186,16 @@ namespace libMesh
 	    // Prevent adding nodes trivially close to existing
 	    // nodes.
 	    const Real endpoint_tol = 0.01;
-	    
+
 	    if ( (d_star > endpoint_tol) &&
 		 (d_star < (1.-endpoint_tol)) )
 	      {
 		const Point x_star = (edge->point(0)*(1.-d_star) +
 				      edge->point(1)*d_star);
-		
+
 		std::cout << "adding cut point (d_star, x_star) = "
 			  << d_star << " , " << x_star << std::endl;
-		
+
 		_intersection_pts.push_back (x_star);
 	      }
 	  }
@@ -204,13 +204,13 @@ namespace libMesh
 
 
 
-  
+
   void ElemCutter::cut_1D ()
   {
     libmesh_not_implemented();
   }
 
-  
+
 
   void ElemCutter::cut_2D (const Elem &elem,
 			   const std::vector<Real> &vertex_distance_func)
@@ -224,11 +224,11 @@ namespace libMesh
     libmesh_not_implemented();
 
 #else // OK, LIBMESH_HAVE_TRIANGLE
-    
+
     std::cout << "Inside cut element!\n";
 
     libmesh_assert (_inside_mesh_2D.get() != NULL);
-    
+
     _inside_mesh_2D->clear();
     _outside_mesh_2D->clear();
 
@@ -236,19 +236,19 @@ namespace libMesh
       {
 	if (vertex_distance_func[v] >= 0.)
 	  _outside_mesh_2D->add_point (elem.point(v));
-	
+
 	if (vertex_distance_func[v] <= 0.)
 	  _inside_mesh_2D->add_point (elem.point(v));
       }
 
     for (std::vector<Point>::const_iterator it=_intersection_pts.begin();
 	 it != _intersection_pts.end(); ++it)
-      {	
+      {
 	_inside_mesh_2D->add_point(*it);
 	_outside_mesh_2D->add_point(*it);
       }
 
-    
+
     // Customize the variables for the triangulation
     // we will be cutting reference cell, and want as few triangles
     // as possible, so jack this up larger than the area we will be
@@ -260,17 +260,17 @@ namespace libMesh
     // allow for small angles
     _triangle_inside->minimum_angle()  = 5.;
     _triangle_outside->minimum_angle() = 5.;
-    
+
     // Turn off Laplacian mesh smoothing after generation.
     _triangle_inside->smooth_after_generating()  = false;
     _triangle_outside->smooth_after_generating() = false;
-    
+
     // Triangulate!
     _triangle_inside->triangulate();
     _triangle_outside->triangulate();
 
     std::ostringstream name;
-    
+
     name << "cut_face_"
 	 << cut_cntr++
 	 << ".dat";
@@ -280,13 +280,13 @@ namespace libMesh
 #endif
   }
 
-  
+
 
   void ElemCutter::cut_3D ()
   {
     libmesh_not_implemented();
   }
 
-  
+
 
 } // namespace libMesh
