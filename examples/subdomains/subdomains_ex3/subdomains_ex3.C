@@ -79,7 +79,17 @@ int main (int argc, char** argv)
   // with it.
   Mesh mesh;
 
-  mesh.read ("mesh.xda");
+  {
+    unsigned int dim=2;
+
+    if (argc == 3 && std::atoi(argv[2]) == 3)
+      {
+	libmesh_here();
+	dim=3;
+      }
+
+    mesh.read ((dim==2) ? "mesh.xda" : "hybrid_3d.xda");
+  }
 
   // Create a MeshRefinement object to handle refinement of our mesh.
   // This class handles all the details of mesh refinement and coarsening.
