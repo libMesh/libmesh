@@ -269,13 +269,13 @@ namespace libMesh
     _triangle_inside->triangulate();
     _triangle_outside->triangulate();
 
-    std::ostringstream name;
+    // std::ostringstream name;
 
-    name << "cut_face_"
-	 << cut_cntr++
-	 << ".dat";
-    _inside_mesh_2D->write  ("in_"  + name.str());
-    _outside_mesh_2D->write ("out_" + name.str());
+    // name << "cut_face_"
+    // 	 << cut_cntr++
+    // 	 << ".dat";
+    // _inside_mesh_2D->write  ("in_"  + name.str());
+    // _outside_mesh_2D->write ("out_" + name.str());
 
     // finally, add the elements to our lists.
     {
