@@ -74,15 +74,20 @@ void QComposite<QSubCell>::init (const Elem &elem,
       return;
     }
 
-  libmesh_here();
+  // Get a pointer to the element's reference element.  We want to
+  // perform cutting on the reference element such that the quadrature
+  // point locations of the subelements live in the reference
+  // coordinate system, thereby eliminating the need for inverse
+  // mapping.
+  const Elem *reference_elem = elem.reference_elem();
 
-  _elem_cutter(elem, vertex_distance_func);
+  libmesh_assert (reference_elem != NULL);
 
+  _elem_cutter(*reference_elem, vertex_distance_func);
 
   // clear our state & accumulate points from subelements
   _points.clear();
   _weights.clear();
-
 
   const std::vector<Real>  &subelem_weights = _lagrange_fe->get_JxW();
   const std::vector<Point> &subelem_points  = _lagrange_fe->get_xyz();
@@ -125,6 +130,7 @@ void QComposite<QSubCell>::init (const Elem &elem,
 
   this->print_info();
 }
+
 
 
 //--------------------------------------------------------------
