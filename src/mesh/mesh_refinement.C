@@ -484,7 +484,20 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
   // Parallel consistency has to come first, or coarsening
   // along processor boundaries might occasionally be falsely
   // prevented
-  this->make_flags_parallel_consistent();
+  bool flags_were_consistent = this->make_flags_parallel_consistent();
+
+  // In theory, we should be able to remove the above call, which can
+  // be expensive and should be unnecessary.  In practice, doing
+  // consistent flagging in parallel is hard, it's impossible to
+  // verify at the library level if it's being done by user code, and
+  // we don't want to abort large parallel runs in opt mode... but we
+  // do want to warn that they should be fixed.
+  libmesh_assert(flags_were_consistent);
+  if (!flags_were_consistent)
+    {
+      libMesh::out << "Refinement flags were not consistent between processors!\n"
+                   << "Correcting and continuing.";
+    }
 
   // Repeat until flag changes match on every processor
   do
@@ -641,8 +654,20 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
   // Parallel consistency has to come first, or coarsening
   // along processor boundaries might occasionally be falsely
   // prevented
-  if (!_mesh.is_serial())
-    this->make_flags_parallel_consistent();
+  bool flags_were_consistent = this->make_flags_parallel_consistent();
+
+  // In theory, we should be able to remove the above call, which can
+  // be expensive and should be unnecessary.  In practice, doing
+  // consistent flagging in parallel is hard, it's impossible to
+  // verify at the library level if it's being done by user code, and
+  // we don't want to abort large parallel runs in opt mode... but we
+  // do want to warn that they should be fixed.
+  libmesh_assert(flags_were_consistent);
+  if (!flags_were_consistent)
+    {
+      libMesh::out << "Refinement flags were not consistent between processors!\n"
+                   << "Correcting and continuing.";
+    }
 
   // Repeat until flag changes match on every processor
   do
@@ -755,8 +780,20 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
   // Parallel consistency has to come first, or coarsening
   // along processor boundaries might occasionally be falsely
   // prevented
-  if (!_mesh.is_serial())
-    this->make_flags_parallel_consistent();
+  bool flags_were_consistent = this->make_flags_parallel_consistent();
+
+  // In theory, we should be able to remove the above call, which can
+  // be expensive and should be unnecessary.  In practice, doing
+  // consistent flagging in parallel is hard, it's impossible to
+  // verify at the library level if it's being done by user code, and
+  // we don't want to abort large parallel runs in opt mode... but we
+  // do want to warn that they should be fixed.
+  libmesh_assert(flags_were_consistent);
+  if (!flags_were_consistent)
+    {
+      libMesh::out << "Refinement flags were not consistent between processors!\n"
+                   << "Correcting and continuing.";
+    }
 
   // Repeat until flag changes match on every processor
   do
