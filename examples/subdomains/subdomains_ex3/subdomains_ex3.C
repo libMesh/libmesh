@@ -135,6 +135,11 @@ void integrate_function (const MeshBase &mesh)
 		  &(qrule.get_points()),
 		  &(qrule.get_weights()));
 
+
+      // TODO:  would it be valuable to have the composite quadrature rule sort
+      // from smallest to largest JxW value to help prevent
+      // ... large + small + large + large + small ...
+      // type truncation errors?
       for (unsigned int qp=0; qp<q_points.size(); qp++)
 	int_val += JxW[qp] * integrand(q_points[qp]);
     }
