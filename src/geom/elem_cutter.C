@@ -277,6 +277,24 @@ namespace libMesh
     _inside_mesh_2D->write  ("in_"  + name.str());
     _outside_mesh_2D->write ("out_" + name.str());
 
+    // finally, add the elements to our lists.
+    {
+      _inside_elem.clear(); /**/ _outside_elem.clear();
+
+      MeshBase::const_element_iterator
+	it  = _inside_mesh_2D->elements_begin(),
+	end = _inside_mesh_2D->elements_end();
+
+      for (; it!=end; ++it)
+	_inside_elem.push_back (*it);
+
+      it  = _outside_mesh_2D->elements_begin();
+      end = _outside_mesh_2D->elements_end();
+
+      for (; it!=end; ++it)
+	_outside_elem.push_back (*it);
+    }
+
 #endif
   }
 
