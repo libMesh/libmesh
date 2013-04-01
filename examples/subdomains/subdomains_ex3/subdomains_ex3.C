@@ -33,6 +33,7 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/quadrature_composite.h"
+#include "libmesh/fe.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -42,6 +43,7 @@ void integrate_function (const MeshBase &mesh);
 
 // signed distance function
 const Real radius = 0.5;
+
 Real distance (const Point &p)
 {
   Point cent(0.8, 0.9);
@@ -50,7 +52,7 @@ Real distance (const Point &p)
 
 Real integrand (const Point &p)
 {
-  return (distance(p) < 0) ? 1. : 2.;
+  return (distance(p) < 0) ? 10. : 1.;
 }
 
 
@@ -108,7 +110,15 @@ void integrate_function (const MeshBase &mesh)
 
   std::vector<Real> vertex_distance;
 
-  QComposite<QGauss> qrule (mesh.mesh_dimension(), THIRD);
+  QComposite<QGauss> qrule (mesh.mesh_dimension(), FIRST);
+  //QGauss qrule (mesh.mesh_dimension(), FIRST);
+
+  AutoPtr<FEBase> fe (FEBase::build (mesh.mesh_dimension(), FEType (FIRST, LAGRANGE)));
+
+  Real int_val=0.;
+
+  const std::vector<Point> &q_points = fe->get_xyz();
+  const std::vector<Real>  &JxW      = fe->get_JxW();
 
   for (; el!=end_el; ++el)
     {
@@ -120,5 +130,18 @@ void integrate_function (const MeshBase &mesh)
 	vertex_distance.push_back (distance(elem->point(v)));
 
       qrule.init (*elem, vertex_distance);
+
+      fe->reinit (elem,
+		  &(qrule.get_points()),
+		  &(qrule.get_weights()));
+
+      for (unsigned int qp=0; qp<q_points.size(); qp++)
+	int_val += JxW[qp] * integrand(q_points[qp]);
     }
+
+  std::cout  << "\n***********************************\n"
+	     << " int_val   = " << int_val << std::endl
+	     << " exact_val = "<<  1*(2*2 - radius*radius*pi) + 10.*(radius*radius*pi)
+	     << "\n***********************************\n"
+	     << std::endl;
 }
