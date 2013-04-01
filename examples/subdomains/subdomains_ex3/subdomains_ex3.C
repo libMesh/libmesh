@@ -31,7 +31,8 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_refinement.h"
-#include "libmesh/elem_cutter.h"
+#include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_composite.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -40,15 +41,16 @@ using namespace libMesh;
 void integrate_function (const MeshBase &mesh);
 
 // signed distance function
-const Real diam = 1.;
+const Real diam = 0.5;
 Real distance (const Point &p)
 {
-  return (p.size() - diam);
+  Point cent(0.8, 0.9);
+  return ((p-cent).size() - diam);
 }
 
 Real integrand (const Point &p)
 {
-  return (p.size() < diam) ? 1. : 2.;
+  return (distance(p) < 0) ? 1. : 2.;
 }
 
 
@@ -84,7 +86,7 @@ int main (int argc, char** argv)
   // Uniformly refine the mesh 5 times.  This is the
   // first time we use the mesh refinement capabilities
   // of the library.
-  mesh_refinement.uniformly_refine (5);
+  mesh_refinement.uniformly_refine (3);
 
   // Print information about the mesh to the screen.
   mesh.print_info();
@@ -106,7 +108,7 @@ void integrate_function (const MeshBase &mesh)
 
   std::vector<Real> vertex_distance;
 
-  ElemCutter elem_cutter;
+  QComposite<QGauss> qrule (mesh.mesh_dimension(), THIRD);
 
   for (; el!=end_el; ++el)
     {
@@ -117,7 +119,6 @@ void integrate_function (const MeshBase &mesh)
       for (unsigned int v=0; v<elem->n_vertices(); v++)
 	vertex_distance.push_back (distance(elem->point(v)));
 
-      // cut the element
-      elem_cutter(*elem, vertex_distance);
+      qrule.init (*elem, vertex_distance);
     }
 }
