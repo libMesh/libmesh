@@ -51,16 +51,20 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
+
+# also need to link hybrid_3d.xda for VPATH builds
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = .linkstamp
+@LIBMESH_VPATH_BUILD_TRUE@am__append_2 = hybrid_3d.xda .linkstamp
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/examples/Make.common
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
-@LIBMESH_DBG_MODE_TRUE@am__append_1 = example-dbg
-@LIBMESH_DEVEL_MODE_TRUE@am__append_2 = example-devel
-@LIBMESH_OPT_MODE_TRUE@am__append_3 = example-opt
-@LIBMESH_PROF_MODE_TRUE@am__append_4 = example-prof
-@LIBMESH_OPROF_MODE_TRUE@am__append_5 = example-oprof
+@LIBMESH_DBG_MODE_TRUE@am__append_3 = example-dbg
+@LIBMESH_DEVEL_MODE_TRUE@am__append_4 = example-devel
+@LIBMESH_OPT_MODE_TRUE@am__append_5 = example-opt
+@LIBMESH_PROF_MODE_TRUE@am__append_6 = example-prof
+@LIBMESH_OPROF_MODE_TRUE@am__append_7 = example-oprof
 subdir = examples/subdomains/subdomains_ex3
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -111,7 +115,7 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = example-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
 am__example_dbg_SOURCES_DIST = subdomains_ex3.C \
-	../../adaptivity/adaptivity_ex2/mesh.xda run.sh
+	../../adaptivity/adaptivity_ex2/mesh.xda hybrid_3d.xda run.sh
 am__objects_1 = example_dbg-subdomains_ex3.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
 @LIBMESH_DBG_MODE_TRUE@am_example_dbg_OBJECTS = $(am__objects_2)
@@ -126,7 +130,7 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_devel_SOURCES_DIST = subdomains_ex3.C \
-	../../adaptivity/adaptivity_ex2/mesh.xda run.sh
+	../../adaptivity/adaptivity_ex2/mesh.xda hybrid_3d.xda run.sh
 am__objects_3 = example_devel-subdomains_ex3.$(OBJEXT)
 am__objects_4 = $(am__objects_3)
 @LIBMESH_DEVEL_MODE_TRUE@am_example_devel_OBJECTS = $(am__objects_4)
@@ -138,7 +142,7 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_oprof_SOURCES_DIST = subdomains_ex3.C \
-	../../adaptivity/adaptivity_ex2/mesh.xda run.sh
+	../../adaptivity/adaptivity_ex2/mesh.xda hybrid_3d.xda run.sh
 am__objects_5 = example_oprof-subdomains_ex3.$(OBJEXT)
 am__objects_6 = $(am__objects_5)
 @LIBMESH_OPROF_MODE_TRUE@am_example_oprof_OBJECTS = $(am__objects_6)
@@ -150,7 +154,7 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_opt_SOURCES_DIST = subdomains_ex3.C \
-	../../adaptivity/adaptivity_ex2/mesh.xda run.sh
+	../../adaptivity/adaptivity_ex2/mesh.xda hybrid_3d.xda run.sh
 am__objects_7 = example_opt-subdomains_ex3.$(OBJEXT)
 am__objects_8 = $(am__objects_7)
 @LIBMESH_OPT_MODE_TRUE@am_example_opt_OBJECTS = $(am__objects_8)
@@ -161,7 +165,7 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_prof_SOURCES_DIST = subdomains_ex3.C \
-	../../adaptivity/adaptivity_ex2/mesh.xda run.sh
+	../../adaptivity/adaptivity_ex2/mesh.xda hybrid_3d.xda run.sh
 am__objects_9 = example_prof-subdomains_ex3.$(OBJEXT)
 am__objects_10 = $(am__objects_9)
 @LIBMESH_PROF_MODE_TRUE@am_example_prof_OBJECTS = $(am__objects_10)
@@ -559,19 +563,20 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-BUILT_SOURCES = mesh.xda
+BUILT_SOURCES = mesh.xda $(am__append_1)
 DISTCLEANFILES = $(BUILT_SOURCES)
 example_name = subdomains_ex3
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/subdomains/ex3
-data = subdomains_ex3.C ../../adaptivity/adaptivity_ex2/mesh.xda run.sh
+data = subdomains_ex3.C ../../adaptivity/adaptivity_ex2/mesh.xda hybrid_3d.xda run.sh
 sources = $(data) run.sh
 
 ######################################################################
 #
 # how to make documentation
 #
-CLEANFILES = in_*.dat out_*.dat $(example_name).php stdout.log
+CLEANFILES = in_*.dat out_*.dat $(am__append_2) $(example_name).php \
+	stdout.log
 
 ######################################################################
 #
@@ -1146,6 +1151,9 @@ uninstall-am: uninstall-dataDATA
 
 mesh.xda: $(top_srcdir)/examples/adaptivity/adaptivity_ex2/mesh.xda
 	$(AM_V_GEN)$(LN_S) $< $@
+@LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f hybrid_3d.xda && $(LN_S) $(srcdir)/hybrid_3d.xda .
+@LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)

@@ -141,9 +141,9 @@ namespace libMesh
     // and then dispatch the proper method
     switch (elem.dim())
       {
-      case 1: this->cut_1D(); break;
+      case 1: this->cut_1D(elem, vertex_distance_func); break;
       case 2: this->cut_2D(elem, vertex_distance_func); break;
-      case 3: this->cut_3D(); break;
+      case 3: this->cut_3D(elem, vertex_distance_func); break;
       default: libmesh_error();
       }
   }
@@ -205,7 +205,8 @@ namespace libMesh
 
 
 
-  void ElemCutter::cut_1D ()
+  void ElemCutter::cut_1D (const Elem & /*elem*/,
+			   const std::vector<Real> &/*vertex_distance_func*/)
   {
     libmesh_not_implemented();
   }
@@ -225,9 +226,10 @@ namespace libMesh
 
 #else // OK, LIBMESH_HAVE_TRIANGLE
 
-    std::cout << "Inside cut element!\n";
+    std::cout << "Inside cut face element!\n";
 
-    libmesh_assert (_inside_mesh_2D.get() != NULL);
+    libmesh_assert (_inside_mesh_2D.get()  != NULL);
+    libmesh_assert (_outside_mesh_2D.get() != NULL);
 
     _inside_mesh_2D->clear();
     _outside_mesh_2D->clear();
@@ -300,9 +302,91 @@ namespace libMesh
 
 
 
-  void ElemCutter::cut_3D ()
+  void ElemCutter::cut_3D (const Elem &elem,
+			   const std::vector<Real> &vertex_distance_func)
   {
+#ifndef LIBMESH_HAVE_TETGEN
+
+    // current implementation requires tetgen!
+    libMesh::err << "ERROR: current libMesh ElemCutter 3D implementation requires\n"
+		 << "       the \"tetgen\" library!\n"
+		 << std::endl;
     libmesh_not_implemented();
+
+#else // OK, LIBMESH_HAVE_TETGEN
+
+    std::cout << "Inside cut cell element!\n";
+
+    libmesh_assert (_inside_mesh_3D.get()  != NULL);
+    libmesh_assert (_outside_mesh_3D.get() != NULL);
+
+    _inside_mesh_3D->clear();
+    _outside_mesh_3D->clear();
+
+    for (unsigned int v=0; v<elem.n_vertices(); v++)
+      {
+	if (vertex_distance_func[v] >= 0.)
+	  _outside_mesh_3D->add_point (elem.point(v));
+
+	if (vertex_distance_func[v] <= 0.)
+	  _inside_mesh_3D->add_point (elem.point(v));
+      }
+
+    for (std::vector<Point>::const_iterator it=_intersection_pts.begin();
+	 it != _intersection_pts.end(); ++it)
+      {
+	_inside_mesh_3D->add_point(*it);
+	_outside_mesh_3D->add_point(*it);
+      }
+
+
+    // // Customize the variables for the triangulation
+    // // we will be cutting reference cell, and want as few triangles
+    // // as possible, so jack this up larger than the area we will be
+    // // triangulating so we are governed only by accurately defining
+    // // the boundaries.
+    // _tetgen_inside->desired_area()  = 100.;
+    // _tetgen_outside->desired_area() = 100.;
+
+    // // allow for small angles
+    // _tetgen_inside->minimum_angle()  = 5.;
+    // _tetgen_outside->minimum_angle() = 5.;
+
+    // // Turn off Laplacian mesh smoothing after generation.
+    // _tetgen_inside->smooth_after_generating()  = false;
+    // _tetgen_outside->smooth_after_generating() = false;
+
+    // Triangulate!
+    _tetgen_inside->triangulate_pointset();
+    _tetgen_outside->triangulate_pointset();
+
+    std::ostringstream name;
+
+    name << "cut_cell_"
+    	 << cut_cntr++
+    	 << ".dat";
+    _inside_mesh_3D->write  ("in_"  + name.str());
+    _outside_mesh_3D->write ("out_" + name.str());
+
+    // finally, add the elements to our lists.
+    {
+      _inside_elem.clear(); /**/ _outside_elem.clear();
+
+      MeshBase::const_element_iterator
+	it  = _inside_mesh_3D->elements_begin(),
+	end = _inside_mesh_3D->elements_end();
+
+      for (; it!=end; ++it)
+	_inside_elem.push_back (*it);
+
+      it  = _outside_mesh_3D->elements_begin();
+      end = _outside_mesh_3D->elements_end();
+
+      for (; it!=end; ++it)
+	_outside_elem.push_back (*it);
+    }
+
+#endif
   }
 
 
