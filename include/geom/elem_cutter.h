@@ -64,6 +64,30 @@ public:
   ~ElemCutter();
 
   /**
+   * @returns \p true if the element is completely inside the
+   * interface defined implicitly by the vertex values of the signed
+   * \p vertex_distance_func.
+   */
+  bool is_inside (const Elem &elem,
+		  const std::vector<Real> &vertex_distance_func) const;
+
+  /**
+   * @returns \p true if the element is completely outside the
+   * interface defined implicitly by the vertex values of the signed
+   * \p vertex_distance_func.
+   */
+  bool is_outside (const Elem &elem,
+		   const std::vector<Real> &vertex_distance_func) const;
+
+  /**
+   * @returns \p true if the element is cut by the interface defined
+   * implicitly by the vertex values of the signed 
+   * \p vertex_distance_func.
+   */
+  bool is_cut (const Elem &elem,
+	       const std::vector<Real> &vertex_distance_func) const;
+
+  /**
    * This function implements cutting an element by a signed distance
    * function. The input array \p vertex_distance_func contains the
    * vertex values of a signed distance function, from which the cutting
@@ -74,7 +98,6 @@ public:
    */
   void operator()(const Elem &elem_in,
 		  const std::vector<Real> &vertex_distance_func);
-
 
   /**
    * Returns a list of in general element pieces considered inside the

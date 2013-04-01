@@ -52,6 +52,58 @@ namespace libMesh
   {}
 
 
+
+  bool ElemCutter::is_inside (const Elem &elem,
+			      const std::vector<Real> &vertex_distance_func) const
+  {
+    libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
+    
+    for (std::vector<Real>::const_iterator it=vertex_distance_func.begin();
+	 it!=vertex_distance_func.end(); ++it)
+      if (*it > 0.) return false;
+
+    // if the distance function is nonpositive, we are outside
+    return true;
+  }
+
+
+
+  bool ElemCutter::is_outside (const Elem &elem,
+			       const std::vector<Real> &vertex_distance_func) const
+  {
+    libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
+
+    for (std::vector<Real>::const_iterator it=vertex_distance_func.begin();
+	 it!=vertex_distance_func.end(); ++it)
+      if (*it < 0.) return false;
+
+    // if the distance function is nonnegative, we are outside
+    return true;
+  }
+
+
+
+  bool ElemCutter::is_cut (const Elem &elem,
+			   const std::vector<Real> &vertex_distance_func) const
+  {
+    libmesh_assert_equal_to (elem.n_vertices(), vertex_distance_func.size());
+    
+    Real
+      vmin = vertex_distance_func.front(),
+      vmax = vmin;
+
+    for (std::vector<Real>::const_iterator it=vertex_distance_func.begin();
+	 it!=vertex_distance_func.end(); ++it)
+      {
+	vmin = std::min (vmin, *it);      
+	vmax = std::max (vmax, *it);      
+      }
+    
+    // if the distance function changes sign, we're cut.
+    return (vmin*vmax < 0.);
+  }
+
+
   
   void ElemCutter::operator()(const Elem &elem,
 			      const std::vector<Real> &vertex_distance_func)
@@ -64,38 +116,24 @@ namespace libMesh
   
     // check for quick return?
     {
-      Real
-	nmin = vertex_distance_func.front(),
-	nmax = nmin;
-
-      for (std::vector<Real>::const_iterator it=vertex_distance_func.begin();
-	   it!=vertex_distance_func.end(); ++it)
-	{
-	  nmin = std::min (nmin, *it);
-	  nmax = std::max (nmax, *it);
-	}
-
       // completely outside?
-      if (nmin >= 0.)
+      if (this->is_outside(elem, vertex_distance_func))
 	{
 	  //std::cout << "element completely outside\n";
 	  _outside_elem.push_back(&elem);
 	  return;
 	}
-
+      
       // completely inside?
-      else if (nmax <= 0.)
+      else if (this->is_inside(elem, vertex_distance_func))
 	{
 	  //std::cout << "element completely inside\n";
-	  _inside_elem.push_back(&elem);
-	  return;
+	_inside_elem.push_back(&elem);
+	return;
 	}
 
-      libmesh_assert_greater (nmax, 0.);
-      libmesh_assert_less    (nmin, 0.);
+      libmesh_assert (this->is_cut (elem, vertex_distance_func));
     }
-
-
     
     // we now know we are in a cut element, find the intersecting points.
     this->find_intersection_points (elem, vertex_distance_func);
@@ -177,11 +215,18 @@ namespace libMesh
   void ElemCutter::cut_2D (const Elem &elem,
 			   const std::vector<Real> &vertex_distance_func)
   {
-    //libmesh_not_implemented();
+#ifndef LIBMESH_HAVE_TRIANGLE
+
+    // current implementation requires triangle!
+    libMesh::err << "ERROR: current libMesh ElemCutter 2D implementation requires\n"
+		 << "       the \"triangle\" library!\n"
+		 << std::endl;
+    libmesh_not_implemented();
+
+#else // OK, LIBMESH_HAVE_TRIANGLE
+    
     std::cout << "Inside cut element!\n";
 
-#ifdef LIBMESH_HAVE_TRIANGLE
-    
     libmesh_assert (_inside_mesh_2D.get() != NULL);
     
     _inside_mesh_2D->clear();
@@ -231,6 +276,7 @@ namespace libMesh
 	 << ".dat";
     _inside_mesh_2D->write  ("in_"  + name.str());
     _outside_mesh_2D->write ("out_" + name.str());
+
 #endif
   }
 
