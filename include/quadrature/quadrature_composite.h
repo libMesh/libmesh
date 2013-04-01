@@ -22,15 +22,14 @@
 
 // Local includes
 #include "libmesh/quadrature.h"
+#include "libmesh/elem_cutter.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/auto_ptr.h"
 
 // C++ includes
 
 namespace libMesh
 {
-
-
-
-
 /**
  * This class implements generic composite quadrature rules.
  * Composite quadrature rules are constructed from any of the
@@ -42,15 +41,17 @@ namespace libMesh
 // QComposite class definition
 template <class QSubCell>
 class QComposite : public QSubCell
-{  
+{
  public:
 
   /**
    * Import base class data into namespace scope.
    */
   using QSubCell::_dim;
+  using QSubCell::_points;
+  using QSubCell::_weights;
   using QSubCell::init;
-  
+
   /**
    * Constructor.  Declares the order of the quadrature rule.
    */
@@ -75,47 +76,27 @@ class QComposite : public QSubCell
    * cut the element into subelements, for example, and constuct a
    * composite quadrature rule for the cut element.
    */
-  virtual void init (const Elem &elem,		     
+  virtual void init (const Elem &elem,
 		     const std::vector<Real> &vertex_distance_func,
 		     unsigned int p_level=0);
-  
+
  private:
-  
+
   /**
    * Subcell quadrature object.
    */
   QSubCell _q_subcell;
 
+  /**
+   * ElemCutter object.
+   */
+  ElemCutter _elem_cutter;
+
+  /**
+   * Lagrange FE to use for subcell mapping.
+   */
+  AutoPtr<FEBase> _lagrange_fe;
 };
-
-
-
-// ------------------------------------------------------------
-// QComposite class members
-template <class QSubCell>
-inline
-QComposite<QSubCell>::QComposite(const unsigned int d,
-				 const Order o) :
-  QSubCell(d,o), // explicitly call base class constructor
-  _q_subcell(d,o)
-{
-  // explicitly call the init function in 1D since the
-  // other tensor-product rules require this one.
-  // note that EDGE will not be used internally, however
-  // if we called the function with INVALID_ELEM it would try to
-  // be smart and return, thinking it had already done the work.
-  if (_dim == 1)
-    QSubCell::init(EDGE2);
-}
-
-
-
-
-template <class QSubCell>
-inline
-QComposite<QSubCell>::~QComposite()
-{
-}
 
 
 } // namespace libMesh
