@@ -234,6 +234,7 @@ pkg_sources  = \
 
 # additional sources required for Fortran API
 if EXODUS_FORTRAN_API
+  include_HEADERS += forbind/include/exodusII.inc
   pkg_sources += \
 	forbind/include/exodusII.inc \
 	forbind/include/exodusII_int.inc \

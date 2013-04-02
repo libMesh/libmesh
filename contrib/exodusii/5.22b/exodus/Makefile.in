@@ -54,20 +54,21 @@ host_triplet = @host@
 target_triplet = @target@
 
 # additional sources required for Fortran API
-@EXODUS_FORTRAN_API_TRUE@am__append_1 = \
+@EXODUS_FORTRAN_API_TRUE@am__append_1 = forbind/include/exodusII.inc
+@EXODUS_FORTRAN_API_TRUE@am__append_2 = \
 @EXODUS_FORTRAN_API_TRUE@	forbind/include/exodusII.inc \
 @EXODUS_FORTRAN_API_TRUE@	forbind/include/exodusII_int.inc \
 @EXODUS_FORTRAN_API_TRUE@	forbind/src/addrwrap.F \
 @EXODUS_FORTRAN_API_TRUE@	forbind/src/exo_jack.c
 
-DIST_COMMON = README $(include_HEADERS) $(srcdir)/Makefile.am \
+DIST_COMMON = README $(am__include_HEADERS_DIST) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/build-aux/depcomp \
 	$(top_srcdir)/contrib/Make.common
-@LIBMESH_DBG_MODE_TRUE@am__append_2 = libdbg.la
-@LIBMESH_DEVEL_MODE_TRUE@am__append_3 = libdevel.la
-@LIBMESH_OPT_MODE_TRUE@am__append_4 = libopt.la
-@LIBMESH_PROF_MODE_TRUE@am__append_5 = libprof.la
-@LIBMESH_OPROF_MODE_TRUE@am__append_6 = liboprof.la
+@LIBMESH_DBG_MODE_TRUE@am__append_3 = libdbg.la
+@LIBMESH_DEVEL_MODE_TRUE@am__append_4 = libdevel.la
+@LIBMESH_OPT_MODE_TRUE@am__append_5 = libopt.la
+@LIBMESH_PROF_MODE_TRUE@am__append_6 = libprof.la
+@LIBMESH_OPROF_MODE_TRUE@am__append_7 = liboprof.la
 subdir = contrib/exodusii/v5.22/exodus
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_cxx_rtti.m4 \
@@ -2002,6 +2003,8 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+am__include_HEADERS_DIST = cbind/include/exodusII.h \
+	forbind/include/exodusII.inc
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -2319,7 +2322,7 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-include_HEADERS = cbind/include/exodusII.h
+include_HEADERS = cbind/include/exodusII.h $(am__append_1)
 pkg_cppflags = -I$(srcdir)/cbind/include $(NETCDF_INCLUDE) $(EXODUS_NOT_NETCDF4_FLAG)
 pkg_sources = cbind/include/doxygen.h cbind/include/exodusII.h \
 	cbind/include/exodusII_cfg.h cbind/include/exodusII_int.h \
@@ -2457,7 +2460,7 @@ pkg_sources = cbind/include/doxygen.h cbind/include/exodusII.h \
 	cbind/src/ex_put_variable_name.c \
 	cbind/src/ex_put_variable_names.c \
 	cbind/src/ex_put_variable_param.c cbind/src/ex_update.c \
-	cbind/src/ex_utils.c $(am__append_1)
+	cbind/src/ex_utils.c $(am__append_2)
 
 ######################################################################
 #
@@ -2475,8 +2478,8 @@ AM_CXXFLAGS =
 #
 # Building the flavors
 #
-noinst_LTLIBRARIES = $(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5) $(am__append_6)
+noinst_LTLIBRARIES = $(am__append_3) $(am__append_4) $(am__append_5) \
+	$(am__append_6) $(am__append_7)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_SOURCES = $(pkg_sources)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@libdbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
