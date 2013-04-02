@@ -340,25 +340,26 @@ namespace libMesh
       }
 
 
-    // // Customize the variables for the triangulation
-    // // we will be cutting reference cell, and want as few triangles
-    // // as possible, so jack this up larger than the area we will be
-    // // triangulating so we are governed only by accurately defining
-    // // the boundaries.
-    // _tetgen_inside->desired_area()  = 100.;
-    // _tetgen_outside->desired_area() = 100.;
-
-    // // allow for small angles
-    // _tetgen_inside->minimum_angle()  = 5.;
-    // _tetgen_outside->minimum_angle() = 5.;
-
-    // // Turn off Laplacian mesh smoothing after generation.
-    // _tetgen_inside->smooth_after_generating()  = false;
-    // _tetgen_outside->smooth_after_generating() = false;
-
     // Triangulate!
     _tetgen_inside->triangulate_pointset();
+    //_inside_mesh_3D->print_info();
     _tetgen_outside->triangulate_pointset();
+    //_outside_mesh_3D->print_info();
+
+
+    // (below generates some horribly expensive meshes,
+    //  but seems immune to the 0 volume problem).
+    // _tetgen_inside->pointset_convexhull();
+    // _inside_mesh_3D->find_neighbors();
+    // _inside_mesh_3D->print_info();
+    // _tetgen_inside->triangulate_conformingDelaunayMesh (1.e3, 100.);
+    // _inside_mesh_3D->print_info();
+
+    // _tetgen_outside->pointset_convexhull();
+    // _outside_mesh_3D->find_neighbors();
+    // _outside_mesh_3D->print_info();
+    // _tetgen_outside->triangulate_conformingDelaunayMesh (1.e3, 100.);
+    // _outside_mesh_3D->print_info();
 
     std::ostringstream name;
 
@@ -377,13 +378,15 @@ namespace libMesh
 	end = _inside_mesh_3D->elements_end();
 
       for (; it!=end; ++it)
-	_inside_elem.push_back (*it);
+	if ((*it)->volume() > std::numeric_limits<Real>::epsilon())
+	  _inside_elem.push_back (*it);
 
       it  = _outside_mesh_3D->elements_begin();
       end = _outside_mesh_3D->elements_end();
 
       for (; it!=end; ++it)
-	_outside_elem.push_back (*it);
+	if ((*it)->volume() > std::numeric_limits<Real>::epsilon())
+	  _outside_elem.push_back (*it);
     }
 
 #endif
