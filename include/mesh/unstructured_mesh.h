@@ -58,7 +58,7 @@ class UnstructuredMesh : public MeshBase
    * changed by mesh generation/loading) later.
    */
   explicit
-  UnstructuredMesh (unsigned int dim=1);
+  UnstructuredMesh (unsigned int dim=1, const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Destructor.

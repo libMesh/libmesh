@@ -32,6 +32,7 @@
 #include "libmesh/partitioner.h" // AutoPtr needs a real declaration
 #include "libmesh/point_locator_base.h"
 #include "libmesh/variant_filter_iterator.h"
+#include "libmesh/parallel.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>
@@ -74,7 +75,7 @@ public:
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
-  MeshBase (unsigned int dim=1);
+  MeshBase (unsigned int dim=1, const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Copy-constructor.
@@ -91,6 +92,12 @@ public:
    */
   virtual ~MeshBase ();
 
+  /**
+   * @returns a reference to the \p Parallel::Communicator object
+   * used by this mesh.
+   */
+  const Parallel::Communicator & communicator () const { return _communicator; }
+        
   /**
    * This class holds the boundary information.  It can store nodes, edges,
    * and faces with a corresponding id that facilitates setting boundary
@@ -830,6 +837,11 @@ protected:
   unsigned int& set_n_partitions ()
   { return _n_parts; }
 
+  /**
+   * The \p Parallel::Communicator object used by the mesh.
+   */
+  const Parallel::Communicator &_communicator;
+  
   /**
    * The number of partitions the mesh has.  This is set by
    * the partitioners, and may not be changed directly by

@@ -31,14 +31,16 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // ParallelMesh class member functions
-ParallelMesh::ParallelMesh (unsigned int d) :
-  UnstructuredMesh (d), _is_serial(true),
+ParallelMesh::ParallelMesh (unsigned int d,
+			    const Parallel::Communicator &comm) :
+  UnstructuredMesh (d,comm), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
   _next_free_local_node_id(libMesh::processor_id()),
   _next_free_local_elem_id(libMesh::processor_id()),
   _next_free_unpartitioned_node_id(libMesh::n_processors()),
   _next_free_unpartitioned_elem_id(libMesh::n_processors())
 {
+  // FIXME: give parmetis the communicator!
   _partitioner = AutoPtr<Partitioner>(new ParmetisPartitioner());
 }
 

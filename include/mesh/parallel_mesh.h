@@ -56,7 +56,7 @@ class ParallelMesh : public UnstructuredMesh
    * changed by mesh generation/loading) later.
    */
   explicit
-  ParallelMesh (unsigned int dim=1);
+  ParallelMesh (unsigned int dim=1, const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Copy-constructor.  This should be able to take a
