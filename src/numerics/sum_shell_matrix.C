@@ -93,4 +93,3 @@ void SumShellMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 template class SumShellMatrix<Number>;
 
 } // namespace libMesh
-

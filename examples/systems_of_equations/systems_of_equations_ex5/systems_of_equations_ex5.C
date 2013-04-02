@@ -93,24 +93,24 @@ int main (int argc, char** argv)
                                        0., 0.2,
                                        QUAD9);
 
-  
+
   // Print information about the mesh to the screen.
   mesh.print_info();
-  
-  
+
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  
+
   // Declare the system and its variables.
   // Create a system named "Elasticity"
   LinearImplicitSystem& system =
     equation_systems.add_system<LinearImplicitSystem> ("Elasticity");
 
-  
+
   // Add two displacement variables, u and v, to the system
   unsigned int u_var      = system.add_variable("u", SECOND, LAGRANGE);
   unsigned int v_var      = system.add_variable("v", SECOND, LAGRANGE);
-  
+
   // Add a SCALAR variable for the Lagrange multiplier to enforce our constraint
   unsigned int lambda_var = system.add_variable("lambda", FIRST, SCALAR);
 
@@ -126,18 +126,18 @@ int main (int argc, char** argv)
   // Create a vector storing the variable numbers which the BC applies to
   std::vector<unsigned int> variables(2);
   variables[0] = u_var; variables[1] = v_var;
-  
+
   // Create a ZeroFunction to initialize dirichlet_bc
   ZeroFunction<> zf;
-  
+
   DirichletBoundary dirichlet_bc(boundary_ids,
                                  variables,
                                  &zf);
 
-  // We must add the Dirichlet boundary condition _before_ 
+  // We must add the Dirichlet boundary condition _before_
   // we call equation_systems.init()
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
-  
+
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
@@ -152,7 +152,7 @@ int main (int argc, char** argv)
   ExodusII_IO (mesh).write_equation_systems("displacement.e",equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
-  // All done.  
+  // All done.
   return 0;
 }
 
@@ -161,7 +161,7 @@ void assemble_elasticity(EquationSystems& es,
                          const std::string& system_name)
 {
   libmesh_assert_equal_to (system_name, "Elasticity");
-  
+
   const MeshBase& mesh = es.get_mesh();
 
   const unsigned int dim = mesh.mesh_dimension();
@@ -215,7 +215,7 @@ void assemble_elasticity(EquationSystems& es,
       dof_map.dof_indices (elem, dof_indices_lambda, lambda_var);
 
       const unsigned int n_dofs   = dof_indices.size();
-      const unsigned int n_u_dofs = dof_indices_u.size(); 
+      const unsigned int n_u_dofs = dof_indices_u.size();
       const unsigned int n_v_dofs = dof_indices_v.size();
       const unsigned int n_lambda_dofs = dof_indices_lambda.size();
 
@@ -226,7 +226,7 @@ void assemble_elasticity(EquationSystems& es,
 
       Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
       Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
-      
+
       Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
       Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
 
@@ -249,7 +249,7 @@ void assemble_elasticity(EquationSystems& es,
 
               C_j=0, C_l=0;
               Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-              
+
               C_j=1, C_l=0;
               Kuu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
@@ -270,7 +270,7 @@ void assemble_elasticity(EquationSystems& es,
 
               C_j=0, C_l=0;
               Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-              
+
               C_j=1, C_l=0;
               Kuv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
@@ -291,7 +291,7 @@ void assemble_elasticity(EquationSystems& es,
 
               C_j=0, C_l=0;
               Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-              
+
               C_j=1, C_l=0;
               Kvu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
@@ -312,7 +312,7 @@ void assemble_elasticity(EquationSystems& es,
 
               C_j=0, C_l=0;
               Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
-              
+
               C_j=1, C_l=0;
               Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
 
@@ -359,7 +359,7 @@ void assemble_elasticity(EquationSystems& es,
                             {
                               Kv_lambda(i,j) += JxW_face[qp]* (-1.) * phi_face[i][qp];
                             }
-                        
+
                           for (unsigned int i=0; i<n_lambda_dofs; i++)
                             for (unsigned int j=0; j<n_v_dofs; j++)
                               {
@@ -369,10 +369,10 @@ void assemble_elasticity(EquationSystems& es,
                     }
                 }
             }
-      } 
+      }
 
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-      
+
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
@@ -385,7 +385,7 @@ Real eval_elasticity_tensor(unsigned int i,
 {
   // Define the Poisson ratio
   const Real nu = 0.3;
-  
+
   // Define the Lame constants (lambda_1 and lambda_2) based on Poisson ratio
   const Real lambda_1 = nu / ( (1. + nu) * (1. - 2.*nu) );
   const Real lambda_2 = 0.5 / (1 + nu);
@@ -397,6 +397,6 @@ Real eval_elasticity_tensor(unsigned int i,
   Real delta_jl = (j == l) ? 1. : 0.;
   Real delta_jk = (j == k) ? 1. : 0.;
   Real delta_kl = (k == l) ? 1. : 0.;
-  
+
   return lambda_1 * delta_ij * delta_kl + lambda_2 * (delta_ik * delta_jl + delta_il * delta_jk);
 }

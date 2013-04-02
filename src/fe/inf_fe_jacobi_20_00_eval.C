@@ -483,4 +483,3 @@ namespace libMesh
 } // namespace libMesh
 
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
-

@@ -6,18 +6,18 @@
 /* modify it under the terms of the GNU Lesser General Public */
 /* License as published by the Free Software Foundation; either */
 /* version 2.1 of the License, or (at your option) any later version. */
-  
+
 /* rbOOmit is distributed in the hope that it will be useful, */
 /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
 /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
 /* Lesser General Public License for more details. */
-  
+
 /* You should have received a copy of the GNU Lesser General Public */
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 // <h1>Reduced Basis Example 7 - Acoustic Horn</h1>
- 
+
 // In this example problem we use the Certified Reduced Basis method
 // to solve a complex-valued Helmholtz problem for acoustics. There is only
 // one parameter in this problem: the forcing frequency at the horn inlet.
@@ -72,13 +72,13 @@ int main (int argc, char** argv)
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  
+
   // Parse the input file (reduced_basis_ex7.in) using GetPot
   std::string parameters_filename = "reduced_basis_ex7.in";
   GetPot infile(parameters_filename);
 
   const unsigned int dim = 2;                      // The number of spatial dimensions
-  
+
   bool store_basis_functions = infile("store_basis_functions", true); // Do we write the RB basis functions to disk?
 
   // Read the "online_mode" flag from the command line
@@ -110,7 +110,7 @@ int main (int argc, char** argv)
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
   SimpleRBEvaluation rb_eval;
-  
+
   // We need to give the RBConstruction object a pointer to
   // our RBEvaluation object
   rb_con.set_rb_evaluation(rb_eval);
@@ -132,10 +132,10 @@ int main (int argc, char** argv)
     // "truth" solves, at well-chosen parameter values and employing
     // these snapshots as basis functions.
     rb_con.train_reduced_basis();
-    
+
     // Write out the data that will subsequently be required for the Evaluation stage
     rb_con.get_rb_evaluation().write_offline_data_to_files();
-    
+
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
@@ -147,7 +147,7 @@ int main (int argc, char** argv)
   {
     // Read in the reduced basis data
     rb_eval.read_offline_data_from_files();
-    
+
     // Read in online_N and initialize online parameters
     Real online_frequency = infile("online_frequency", 0.);
     RBParameters online_mu;
@@ -162,16 +162,16 @@ int main (int argc, char** argv)
     {
       // Read in the basis functions
       rb_eval.read_in_basis_functions(rb_con);
-      
+
       // Plot the solution
       rb_con.load_rb_solution();
-      
+
       GMVIO(mesh).write_equation_systems ("RB_sol.gmv",equation_systems);
     }
-    
+
     // Now do a sweep over frequencies and write out the reflection coefficient for each frequency
     std::ofstream reflection_coeffs_out("reflection_coefficients.dat");
-    
+
     Real n_frequencies = infile("n_frequencies", 0.);
     Real delta_f = (rb_eval.get_parameter_max("frequency") - rb_eval.get_parameter_min("frequency")) / (n_frequencies-1);
     for(unsigned int freq_i=0; freq_i<n_frequencies; freq_i++)
@@ -180,7 +180,7 @@ int main (int argc, char** argv)
       online_mu.set_value("frequency", frequency);
       rb_eval.set_parameters(online_mu);
       rb_eval.rb_solve(rb_eval.get_n_basis_functions());
-      
+
       Number complex_one(1., 0.);
       reflection_coeffs_out << frequency << " " << std::abs(rb_eval.RB_outputs[0] - complex_one) << std::endl;
     }
@@ -192,4 +192,3 @@ int main (int argc, char** argv)
 
   return 0;
 }
-

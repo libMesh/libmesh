@@ -23,7 +23,7 @@ int main(int argc, char** argv)
   std::ostream *my_out;
   std::ofstream fout;
   fout.exceptions ( std::ofstream::failbit | std::ofstream::badbit );
-  
+
   if (argc < 3)
     my_out = &std::cout;
   else

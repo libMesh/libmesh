@@ -88,4 +88,3 @@ IdxType BinSorter<KeyType,IdxType>::sizeof_bin (const IdxType bin) const
 } // namespace libMesh
 
 #endif // LIBMESH_PARALLEL_BIN_SORTER_H
-

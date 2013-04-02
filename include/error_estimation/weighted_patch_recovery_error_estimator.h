@@ -72,7 +72,7 @@ public:
 			       ErrorVector& error_per_cell,
 			       const NumericVector<Number>* solution_vector = NULL,
 			       bool estimate_parent_error = false);
-  
+
   /**
      Vector of fem function base pointers, the user will fill this in
      with pointers to the appropriate weight functions
@@ -80,7 +80,7 @@ public:
   std::vector<FEMFunctionBase<Number>*> weight_functions;
 
  private:
-  
+
   /**
    * Class to compute the error contribution for a range
    * of elements. May be executed in parallel on separate threads.

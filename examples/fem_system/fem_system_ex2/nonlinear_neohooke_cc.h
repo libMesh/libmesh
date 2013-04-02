@@ -83,4 +83,3 @@ private:
 };
 
 #endif /* NONLINEAR_NEOHOOKE_CC_H_ */
-

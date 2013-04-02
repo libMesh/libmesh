@@ -52,7 +52,7 @@ void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
 
   _mat.resize(m_in, n_in);
   _mat.reserve(Eigen::Matrix<numeric_index_type, Eigen::Dynamic, 1>::Constant(m_in,nnz));
-    
+
   this->_is_initialized = true;
 }
 
@@ -71,10 +71,10 @@ void EigenSparseMatrix<T>::init ()
   // Clear intialized matrices
   if (this->initialized())
     this->clear();
-  
+
   const numeric_index_type n_rows   = this->_dof_map->n_dofs();
   const numeric_index_type n_cols   = n_rows;
-  
+
 #ifndef NDEBUG
   // The following variables are only used for assertions,
   // so avoid declaring them when asserts are inactive.
@@ -86,9 +86,9 @@ void EigenSparseMatrix<T>::init ()
   libmesh_assert_equal_to (n_rows, n_cols);
   libmesh_assert_equal_to (m_l, n_rows);
   libmesh_assert_equal_to (n_l, n_cols);
-  
+
   const std::vector<numeric_index_type>& n_nz = this->_dof_map->get_n_nz();
-  
+
 #ifndef NDEBUG
   // The following variables are only used for assertions,
   // so avoid declaring them when asserts are inactive.
@@ -107,7 +107,7 @@ void EigenSparseMatrix<T>::init ()
 
   _mat.resize(n_rows,n_cols);
   _mat.reserve(n_nz);
-  
+
   this->_is_initialized = true;
 
   libmesh_assert_equal_to (n_rows, this->m());
@@ -176,7 +176,7 @@ template <typename T>
 void EigenSparseMatrix<T>::clear ()
 {
   _mat.resize(0,0);
-  
+
   _closed = false;
   this->_is_initialized = false;
 }

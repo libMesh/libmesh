@@ -4,7 +4,7 @@ install_dir   = $(examples_install_path)/adaptivity/ex1
 data          = adaptivity_ex1.C run.sh
 sources       = $(data) run.sh
 
-CLEANFILES = gnuplot_script_data gnuplot_script 
+CLEANFILES = gnuplot_script_data gnuplot_script
 
 ##############################################
 # include common example environment

@@ -63,7 +63,7 @@ namespace
 
     if(!old_elem_id_exists)
       old_elem_id = libMesh::invalid_uint;
-    
+
     // Coefficients are cached from old elements
     // ... except that we can't be sure that a renumbering didn't
     // cause the first element id in a new assembly to match the
@@ -264,7 +264,7 @@ Real FE<2,HERMITE>::shape(const Elem* elem,
 
   hermite_compute_coefs(elem);
 
-#ifdef LIBMESH_HAVE_TBB_API  
+#ifdef LIBMESH_HAVE_TBB_API
   std::vector<std::vector<Real> > & dxdxi = dxdxi_tls.local();
 #endif // LIBMESH_HAVE_TBB_API
 
@@ -328,7 +328,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem* elem,
 
   hermite_compute_coefs(elem);
 
-#ifdef LIBMESH_HAVE_TBB_API  
+#ifdef LIBMESH_HAVE_TBB_API
   std::vector<std::vector<Real> > & dxdxi = dxdxi_tls.local();
 #endif // LIBMESH_HAVE_TBB_API
 
@@ -386,7 +386,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem* elem,
 
   hermite_compute_coefs(elem);
 
-#ifdef LIBMESH_HAVE_TBB_API  
+#ifdef LIBMESH_HAVE_TBB_API
   std::vector<std::vector<Real> > & dxdxi = dxdxi_tls.local();
 #endif // LIBMESH_HAVE_TBB_API
 

@@ -67,10 +67,10 @@ int main (int argc, char** argv)
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-    
+
   // Create a mesh.
   Mesh mesh;
-    
+
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
   // to build a mesh of 8x8 \p Quad9 elements.  Building these
@@ -81,18 +81,18 @@ int main (int argc, char** argv)
                                        0., 1.,
                                        0., 1.,
                                        QUAD9);
-  
+
   // Print information about the mesh to the screen.
   mesh.print_info();
-  
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  
+
   // Declare the system and its variables.
   // Create a transient system named "Convection-Diffusion"
-  LinearImplicitSystem & system = 
+  LinearImplicitSystem & system =
     equation_systems.add_system<LinearImplicitSystem> ("Stokes");
-  
+
   // Add the variables "u" & "v" to "Stokes".  They
   // will be approximated using second-order approximation.
   system.add_variable ("u", SECOND);
@@ -106,16 +106,16 @@ int main (int argc, char** argv)
   // Give the system a pointer to the matrix assembly
   // function.
   system.attach_assemble_function (assemble_stokes);
-  
+
   // Initialize the data structures for the equation system.
   equation_systems.init ();
 
   equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
   equation_systems.parameters.set<Real>        ("linear solver tolerance") = TOLERANCE;
-      
+
   // Prints information about the system to the screen.
   equation_systems.print_info();
-    
+
   // Assemble & solve the linear system,
   // then write the solution.
   equation_systems.get_system("Stokes").solve();
@@ -125,7 +125,7 @@ int main (int argc, char** argv)
                                       equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
-  // All done.  
+  // All done.
   return 0;
 }
 
@@ -135,13 +135,13 @@ void assemble_stokes (EquationSystems& es,
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Stokes");
-  
+
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
-  
+
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // Get a reference to the Convection-Diffusion system object.
   LinearImplicitSystem & system =
     es.get_system<LinearImplicitSystem> ("Stokes");
@@ -150,22 +150,22 @@ void assemble_stokes (EquationSystems& es,
   const unsigned int u_var = system.variable_number ("u");
   const unsigned int v_var = system.variable_number ("v");
   const unsigned int p_var = system.variable_number ("p");
-  
+
   // Get the Finite Element type for "u".  Note this will be
   // the same as the type for "v".
   FEType fe_vel_type = system.variable_type(u_var);
-  
+
   // Get the Finite Element type for "p".
   FEType fe_pres_type = system.variable_type(p_var);
 
   // Build a Finite Element object of the specified type for
   // the velocity variables.
   AutoPtr<FEBase> fe_vel  (FEBase::build(dim, fe_vel_type));
-    
+
   // Build a Finite Element object of the specified type for
   // the pressure variables.
   AutoPtr<FEBase> fe_pres (FEBase::build(dim, fe_pres_type));
-  
+
   // A Gauss quadrature rule for numerical integration.
   // Let the \p FEType object decide what order rule is appropriate.
   QGauss qrule (dim, fe_vel_type.default_quadrature_order());
@@ -173,13 +173,13 @@ void assemble_stokes (EquationSystems& es,
   // Tell the finite element objects to use our quadrature rule.
   fe_vel->attach_quadrature_rule (&qrule);
   fe_pres->attach_quadrature_rule (&qrule);
-  
+
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   //
-  // The element Jacobian * quadrature weight at each integration point.   
+  // The element Jacobian * quadrature weight at each integration point.
   const std::vector<Real>& JxW = fe_vel->get_JxW();
-  
+
   // The element shape function gradients for the velocity
   // variables evaluated at the quadrature points.
   const std::vector<std::vector<RealGradient> >& dphi = fe_vel->get_dphi();
@@ -187,7 +187,7 @@ void assemble_stokes (EquationSystems& es,
   // The element shape functions for the pressure variable
   // evaluated at the quadrature points.
   const std::vector<std::vector<Real> >& psi = fe_pres->get_phi();
-  
+
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
@@ -218,7 +218,7 @@ void assemble_stokes (EquationSystems& es,
   std::vector<dof_id_type> dof_indices_u;
   std::vector<dof_id_type> dof_indices_v;
   std::vector<dof_id_type> dof_indices_p;
-  
+
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
   // matrix and right-hand-side contribution.  In case users later
@@ -227,14 +227,14 @@ void assemble_stokes (EquationSystems& es,
   // the \p active_elem_iterator.
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
-  
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
   for ( ; el != end_el; ++el)
-    {    
+    {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
       const Elem* elem = *el;
-      
+
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
@@ -245,10 +245,10 @@ void assemble_stokes (EquationSystems& es,
       dof_map.dof_indices (elem, dof_indices_p, p_var);
 
       const unsigned int n_dofs   = dof_indices.size();
-      const unsigned int n_u_dofs = dof_indices_u.size(); 
-      const unsigned int n_v_dofs = dof_indices_v.size(); 
+      const unsigned int n_u_dofs = dof_indices_u.size();
+      const unsigned int n_v_dofs = dof_indices_v.size();
       const unsigned int n_p_dofs = dof_indices_p.size();
-      
+
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
       // quadrature points (q_point) and the shape functions
@@ -275,17 +275,17 @@ void assemble_stokes (EquationSystems& es,
       //
       // The \p DenseSubMatrix.repostition () member takes the
       // (row_offset, column_offset, row_size, column_size).
-      // 
+      //
       // Similarly, the \p DenseSubVector.reposition () member
       // takes the (row_offset, row_size)
       Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
       Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
       Kup.reposition (u_var*n_u_dofs, p_var*n_u_dofs, n_u_dofs, n_p_dofs);
-      
+
       Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
       Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
       Kvp.reposition (v_var*n_v_dofs, p_var*n_v_dofs, n_v_dofs, n_p_dofs);
-      
+
       Kpu.reposition (p_var*n_u_dofs, u_var*n_u_dofs, n_p_dofs, n_u_dofs);
       Kpv.reposition (p_var*n_u_dofs, v_var*n_u_dofs, n_p_dofs, n_v_dofs);
       Kpp.reposition (p_var*n_u_dofs, p_var*n_u_dofs, n_p_dofs, n_p_dofs);
@@ -293,7 +293,7 @@ void assemble_stokes (EquationSystems& es,
       Fu.reposition (u_var*n_u_dofs, n_u_dofs);
       Fv.reposition (v_var*n_u_dofs, n_v_dofs);
       Fp.reposition (p_var*n_u_dofs, n_p_dofs);
-      
+
       // Now we will build the element matrix.
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
@@ -320,7 +320,7 @@ void assemble_stokes (EquationSystems& es,
             for (unsigned int j=0; j<n_p_dofs; j++)
               Kvp(i,j) += -JxW[qp]*psi[j][qp]*dphi[i][qp](1);
 
-          
+
           // Assemble the pressure row
           // pu coupling
           for (unsigned int i=0; i<n_p_dofs; i++)
@@ -331,7 +331,7 @@ void assemble_stokes (EquationSystems& es,
           for (unsigned int i=0; i<n_p_dofs; i++)
             for (unsigned int j=0; j<n_v_dofs; j++)
               Kpv(i,j) += -JxW[qp]*psi[i][qp]*dphi[j][qp](1);
-          
+
         } // end of the quadrature point qp-loop
 
       // At this point the interior element integration has
@@ -350,27 +350,27 @@ void assemble_stokes (EquationSystems& es,
           if (elem->neighbor(s) == NULL)
             {
               AutoPtr<Elem> side (elem->build_side(s));
-                            
+
               // Loop over the nodes on the side.
               for (unsigned int ns=0; ns<side->n_nodes(); ns++)
                 {
                   // The location on the boundary of the current
                   // node.
-                   
+
                   // const Real xf = side->point(ns)(0);
                   const Real yf = side->point(ns)(1);
-                  
+
                   // The penalty value.  \f$ \frac{1}{\epsilon \f$
                   const Real penalty = 1.e10;
-                  
+
                   // The boundary values.
-                   
+
                   // Set u = 1 on the top boundary, 0 everywhere else
                   const Real u_value = (yf > .99) ? 1. : 0.;
-                  
+
                   // Set v = 0 everywhere
                   const Real v_value = 0.;
-                  
+
                   // Find the node on the element matching this node on
                   // the side.  That defined where in the element matrix
                   // the boundary condition will be applied.
@@ -380,15 +380,15 @@ void assemble_stokes (EquationSystems& es,
                         // Matrix contribution.
                         Kuu(n,n) += penalty;
                         Kvv(n,n) += penalty;
-                                    
+
                         // Right-hand-side contribution.
                         Fu(n) += penalty*u_value;
                         Fv(n) += penalty*v_value;
                       }
-                } // end face node loop          
+                } // end face node loop
             } // end if (elem->neighbor(side) == NULL)
-      } // end boundary condition section          
-      
+      } // end boundary condition section
+
       // If this assembly program were to be used on an adaptive mesh,
       // we would have to apply any hanging node constraint equations.
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
@@ -400,7 +400,7 @@ void assemble_stokes (EquationSystems& es,
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     } // end of element loop
-  
+
   // That's it.
   return;
 }

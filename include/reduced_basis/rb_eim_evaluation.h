@@ -29,7 +29,7 @@
 
 namespace libMesh
 {
-  
+
 class RBParameters;
 class RBParametrizedFunction;
 
@@ -119,7 +119,7 @@ public:
    * Store these objects in the member vector rb_theta_objects.
    */
   void initialize_eim_theta_objects();
-  
+
   /**
    * @return the vector of theta objects that point to this RBEIMEvaluation.
    */
@@ -206,13 +206,13 @@ private:
    * an unnecessary repeat solve).
    */
   RBParameters _previous_parameters;
-  
+
   /**
    * Store the number of basis functions used for the previous solve (so we can avoid
    * an unnecessary repeat solve).
    */
   unsigned int _previous_N;
-  
+
   /**
    * Store the previous error bound returned by rb_solve (so we can return it if we
    * are avoiding an unnecessary repeat solve).

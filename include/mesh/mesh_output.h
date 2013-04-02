@@ -181,7 +181,7 @@ MeshOutput<MT>::MeshOutput (const MT& obj, const bool is_parallel_format) :
       if (libMesh::processor_id() == 0)
 	{
           libmesh_do_once(libMesh::out <<
-            "Warning:  This MeshOutput subclass only supports meshes which have been serialized!" 
+            "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"
             << std::endl;);
         }
 //      libmesh_error();
@@ -220,7 +220,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string& fname,
       libmesh_assert(!my_mesh.allow_renumbering());
 
       libmesh_do_once(libMesh::out <<
-        "Warning:  This MeshOutput subclass only supports meshes which are contiguously renumbered!" 
+        "Warning:  This MeshOutput subclass only supports meshes which are contiguously renumbered!"
         << std::endl;);
 
       my_mesh.allow_renumbering(true);

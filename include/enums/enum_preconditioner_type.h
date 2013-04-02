@@ -53,7 +53,3 @@ namespace libMeshEnums {
 using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_PRECONDITIONER_TYPE_H
-
-
-
-

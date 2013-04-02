@@ -693,7 +693,7 @@ void FEXYZ<Dim>::init_shape_functions(const std::vector<Point>& qp,
 
  }
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
- 
+
   // Stop logging the shape function initialization
   STOP_LOG("init_shape_functions()", "FE");
 }

@@ -120,7 +120,3 @@ private:
 
 
 #endif // LIBMESH_REFERENCE_COUNTED_OBJECT_H
-
-
-
-

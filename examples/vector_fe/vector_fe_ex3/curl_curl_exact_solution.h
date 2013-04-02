@@ -29,12 +29,12 @@ public:
   CurlCurlExactSolution(){}
 
   ~CurlCurlExactSolution(){}
-  
+
   RealGradient operator()( Real x, Real y )
   {
     const Real ux =  cos(pi*x)*sin(pi*y);
     const Real uy = -sin(pi*x)*cos(pi*y);
-    
+
     return RealGradient( ux, uy );
   }
 
@@ -60,7 +60,7 @@ public:
   {
     const Real fx =  (2*pi*pi + 1)*cos(pi*x)*sin(pi*y);
     const Real fy = -(2*pi*pi + 1)*sin(pi*x)*cos(pi*y);
-    
+
     return RealGradient( fx, fy );
   }
 

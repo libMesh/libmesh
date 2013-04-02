@@ -155,5 +155,3 @@ bool PointLocatorBase::initialized () const
 } // namespace libMesh
 
 #endif // LIBMESH_POINT_LOCATOR_BASE_H
-
-

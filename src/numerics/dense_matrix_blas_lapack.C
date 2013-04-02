@@ -788,4 +788,3 @@ template void DenseMatrix<Number>::_svd_helper (char, char, std::vector<Number>&
 #endif
 
 } // namespace libMesh
-

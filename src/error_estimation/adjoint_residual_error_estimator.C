@@ -37,7 +37,7 @@ namespace libMesh
 
 //-----------------------------------------------------------------
 // AdjointResidualErrorEstimator implementations
-AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :  
+AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
   error_plot_suffix(),
   _primal_error_estimator(new PatchRecoveryErrorEstimator()),
   _dual_error_estimator(new PatchRecoveryErrorEstimator()),
@@ -178,7 +178,7 @@ void AdjointResidualErrorEstimator::estimate_error (const System& _system,
 		      // Now fill in total_dual_error ErrorMap with the weight
 		      (*total_dual_errors_per_cell[std::make_pair(&_system, v)])[e] +=
 			static_cast<ErrorVectorReal>
-			(error_weight * 
+			(error_weight *
 			 (*dual_errors_per_cell[std::make_pair(&_system, v)])[e]);
 		    }
 		}

@@ -384,7 +384,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
           std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
           dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
           dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
-          const unsigned int new_n_dofs = 
+          const unsigned int new_n_dofs =
 	    libmesh_cast_int<unsigned int>(new_SCALAR_indices.size());
 
           for (unsigned int i=0; i<new_n_dofs; i++)
@@ -549,7 +549,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
 
           std::vector<dof_id_type> SCALAR_indices;
           dof_map.SCALAR_dof_indices (SCALAR_indices, var);
-          const unsigned int n_SCALAR_dofs = 
+          const unsigned int n_SCALAR_dofs =
 	    libmesh_cast_int<unsigned int>(SCALAR_indices.size());
 
           for (unsigned int i=0; i<n_SCALAR_dofs; i++)
@@ -616,7 +616,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
             const dof_id_type global_index = SCALAR_indices[i];
             const unsigned int component_index =
               this->variable_scalar_number(var,i);
-	    
+
             new_vector.set(global_index, f->component(context, component_index, Point(), this->time));
           }
         }
@@ -703,7 +703,7 @@ void System::boundary_project_vector
  * This method projects an arbitrary function via L2 projections and
  * nodal interpolations on each element.
  */
-void System::boundary_project_vector 
+void System::boundary_project_vector
   (const std::set<boundary_id_type> &b,
    const std::vector<unsigned int> &variables,
    NumericVector<Number>& new_vector,
@@ -1347,7 +1347,7 @@ void ProjectSolution::operator()(const ConstElemRange &range) const
 	  dof_map.dof_indices (elem, dof_indices, var);
 
 	  // The number of DOFs on the element
-	  const unsigned int n_dofs = 
+	  const unsigned int n_dofs =
 	    libmesh_cast_int<unsigned int>(dof_indices.size());
 
           // Fixed vs. free DoFs on edge/face projections
@@ -1859,7 +1859,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
   DenseVector<Number> Fe;
   // The new element coefficients
   DenseVector<Number> Ue;
-  
+
   // FIXME: Need to generalize this to vector-valued elements. [PB]
   FEBase* fe = NULL;
   FEBase* side_fe = NULL;
@@ -1929,7 +1929,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	  const unsigned int var_component =
 	    system.variable_scalar_number(var, 0);
 
-	  const std::vector<dof_id_type>& dof_indices = 
+	  const std::vector<dof_id_type>& dof_indices =
 	    context.get_dof_indices(var);
 
 	  // The number of DOFs on the element
@@ -2137,7 +2137,7 @@ void ProjectFEMSolution::operator()(const ConstElemRange &range) const
 	      const std::vector<std::vector<RealGradient> >* dphi = NULL;
 	      if (cont == C_ONE)
 		dphi = &(edge_fe->get_dphi());
-	      
+
 	      for (unsigned int e=0; e != elem->n_edges(); ++e)
 		{
 		  context.edge = e;

@@ -293,4 +293,3 @@ void ErrorVector::plot_error(const std::string& filename,
 }
 
 } // namespace libMesh
-

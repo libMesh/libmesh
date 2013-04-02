@@ -28,14 +28,14 @@
 
 // Helper functions in anonymous namespace
 
-namespace 
+namespace
 {
   using namespace libMesh;
 
   static const unsigned int header_size = 2;
 
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real = 
+  static const unsigned int ints_per_Real =
     (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
 
   static const int node_magic_header = 1234567890;
@@ -68,13 +68,13 @@ template <>
 unsigned int packed_size (const Node*,
 			  std::vector<int>::const_iterator in)
 {
-  const unsigned int pre_indexing_size = 
+  const unsigned int pre_indexing_size =
 #ifndef NDEBUG
     1 + // add an int for the magic header when testing
 #endif
     header_size + LIBMESH_DIM*ints_per_Real;
 
-  const unsigned int indexing_size = 
+  const unsigned int indexing_size =
     DofObject::unpackable_indexing_size(in+pre_indexing_size);
 
   const int n_bcs =
@@ -112,7 +112,7 @@ void pack (const Node* node,
   data.push_back (static_cast<int>(node->id()));
 
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real = 
+  static const unsigned int ints_per_Real =
     (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
 
   for (unsigned int i=0; i != LIBMESH_DIM; ++i)
@@ -130,7 +130,7 @@ void pack (const Node* node,
   // Add any DofObject indices
   node->pack_indexing(std::back_inserter(data));
 
-  libmesh_assert(node->packed_indexing_size() == 
+  libmesh_assert(node->packed_indexing_size() ==
 		 DofObject::unpackable_indexing_size(data.begin() +
 						     start_indices));
 
@@ -246,7 +246,7 @@ void unpack (std::vector<int>::const_iterator in,
   *out = node;
 
 #ifndef NDEBUG
-  libmesh_assert (in - original_in == 
+  libmesh_assert (in - original_in ==
 		  static_cast<int>
                     (Parallel::packed_size(node, original_in)));
 #endif
@@ -261,7 +261,7 @@ void unpack (std::vector<int>::const_iterator in,
 {
   unpack(in, out, static_cast<MeshBase*>(mesh));
 }
-  
+
 } // namespace Parallel
 
 #endif // #ifdef LIBMESH_HAVE_MPI

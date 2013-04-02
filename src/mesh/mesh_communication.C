@@ -432,7 +432,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
       adjacent_processors.push_back (pid);
 
 
-  const processor_id_type n_adjacent_processors = 
+  const processor_id_type n_adjacent_processors =
     libmesh_cast_int<processor_id_type>(adjacent_processors.size());
 
   //-------------------------------------------------------------------------
@@ -571,7 +571,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	  // Now we need to see which of our elements touch the nodes in the list.
 	  // We will certainly send all the active elements which intersect source_pid_idx,
 	  // but we will also ship off the other elements in the same family tree
-	  // as the active ones for data structure consistency.  
+	  // as the active ones for data structure consistency.
           //
           // FIXME - shipping full family trees is unnecessary and inefficient.
           //
@@ -743,7 +743,7 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
   // Explicitly clear the mesh on all but processor 0.
   if (libMesh::processor_id() != 0)
     mesh.clear();
-  
+
   // Broadcast nodes
   CommWorld.broadcast_packed_range(&mesh,
                                    mesh.nodes_begin(),

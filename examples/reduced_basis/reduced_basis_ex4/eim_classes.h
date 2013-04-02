@@ -23,7 +23,7 @@ public:
     attach_parametrized_function(&sg);
   }
 
-  /** 
+  /**
    * Parametrized function that we approximate with EIM
    */
   ShiftedGaussian sg;
@@ -44,12 +44,12 @@ public:
   : Parent(es, name_in, number_in)
   {
   }
-  
+
   /**
    * The type of the parent.
    */
   typedef RBEIMConstruction Parent;
-  
+
   /**
    * Provide an implementation of build_eim_assembly
    */
@@ -57,7 +57,7 @@ public:
   {
     return AutoPtr<ElemAssembly>(new EIM_F(*this, index));
   }
-  
+
   /**
    * Initialize data structures.
    */
@@ -79,7 +79,7 @@ public:
    * Inner product assembly object
    */
   EIM_IP_assembly ip;
-  
+
 };
 
 #endif

@@ -243,7 +243,7 @@ void MeshFunction::operator() (const Point& p,
   // If we have an element, but it's not a local element, then we
   // either need to have a serialized vector or we need to find a
   // local element sharing the same point.
-  if (element && 
+  if (element &&
      (element->processor_id() != libMesh::processor_id()) &&
      _vector.type() != SERIAL)
     {
@@ -366,7 +366,7 @@ void MeshFunction::gradient (const Point& p,
   // If we have an element, but it's not a local element, then we
   // either need to have a serialized vector or we need to find a
   // local element sharing the same point.
-  if (element && 
+  if (element &&
      (element->processor_id() != libMesh::processor_id()) &&
      _vector.type() != SERIAL)
     {
@@ -479,7 +479,7 @@ void MeshFunction::hessian (const Point& p,
   // If we have an element, but it's not a local element, then we
   // either need to have a serialized vector or we need to find a
   // local element sharing the same point.
-  if (element && 
+  if (element &&
      (element->processor_id() != libMesh::processor_id()) &&
      _vector.type() != SERIAL)
     {
@@ -592,4 +592,3 @@ void MeshFunction::disable_out_of_mesh_mode(void)
 }
 
 } // namespace libMesh
-

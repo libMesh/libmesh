@@ -134,4 +134,3 @@ protected:
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif // LIBMESH_UNIFORM_REFINEMENT_ESTIMATOR_H
-

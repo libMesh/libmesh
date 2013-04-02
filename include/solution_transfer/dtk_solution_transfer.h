@@ -46,10 +46,10 @@ class DTKSolutionTransfer : public SolutionTransfer
 public:
   DTKSolutionTransfer();
   virtual ~DTKSolutionTransfer();
-  
+
   /**
    * Transfer the values of a variable to another.
-   * 
+   *
    * This is meant for transferring values from one EquationSystems to another
    * even in the case of having different meshes.
    *
@@ -64,7 +64,7 @@ protected:
 
   /// COMM_WORLD for now
   Teuchos::RCP<const Teuchos::Comm<int> > comm_default;
-  
+
   /// The DTKAdapter associated with each EquationSystems
   std::map<EquationSystems *, DTKAdapter *> adapters;
 

@@ -168,8 +168,8 @@ class Elem : public ReferenceCountedObject<Elem>,
    * @returns a pointer to the "reference element" associated
    * with this element.  The reference element is the image of this
    * element in reference parametric space. Importantly, it is *not*
-   * an actual element in the mesh, but rather a Singleton-type 
-   * object, so for example all \p Quad4 elements share the same 
+   * an actual element in the mesh, but rather a Singleton-type
+   * object, so for example all \p Quad4 elements share the same
    * \p reference_elem().
    */
   const Elem* reference_elem () const;
@@ -317,8 +317,8 @@ class Elem : public ReferenceCountedObject<Elem>,
    * active element along the specified edge defined by the two points
    * \p p1 and \p p2
    */
-  void find_edge_neighbors(const Point& p1, 
-                           const Point& p2, 
+  void find_edge_neighbors(const Point& p1,
+                           const Point& p2,
 			   std::set<const Elem *> &neighbor_set) const;
 
   /**
@@ -2184,7 +2184,7 @@ public:
   }
 
   /**
-   * \p return the global index of the packed element's nth neighbor 
+   * \p return the global index of the packed element's nth neighbor
    */
   unsigned int neighbor (const unsigned int n) const
   {

@@ -23,6 +23,3 @@
 // quadrature_clough_3D.C
 
 // for implementation.
-
-
-

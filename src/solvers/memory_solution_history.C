@@ -23,9 +23,9 @@ namespace libMesh
 
 	// Loop over all the saved vectors
 	for (; vec != vec_end; ++vec)
-	  {		    	
+	  {
 	    // Delete this saved vector
-	    delete vec->second;	    
+	    delete vec->second;
 	  }
       }
   }
@@ -68,7 +68,7 @@ namespace libMesh
   // This functions saves all the 'projection-worthy' system vectors for
   // future use
   void MemorySolutionHistory::store()
-  {    
+  {
     this->find_stored_entry();
 
     // In an empty history we create the first entry
@@ -109,10 +109,10 @@ namespace libMesh
 
     // Map of stored vectors for this solution step
     std::map<std::string, NumericVector<Number> *>& saved_vectors = stored_sols->second;
-    
+
     // Loop over all the system vectors
     for (System::vectors_iterator vec = _system.vectors_begin(); vec != _system.vectors_end(); ++vec)
-      {	
+      {
 	// The name of this vector
 	const std::string& vec_name = vec->first;
 
@@ -127,9 +127,9 @@ namespace libMesh
 	    saved_vectors[vec_name] = vec->second->clone().release();
 	  }
       }
-    
+
     // Of course, we will usually save the actual solution
-    std::string _solution("_solution");    
+    std::string _solution("_solution");
     if ((overwrite_previously_stored ||
         !saved_vectors.count(_solution)) &&
       // and if we think it's worth preserving
@@ -138,7 +138,7 @@ namespace libMesh
   }
 
   void MemorySolutionHistory::retrieve()
-  {    
+  {
     this->find_stored_entry();
 
     // Get the time at which we are recovering the solution vectors
@@ -148,7 +148,7 @@ namespace libMesh
 //    std::cout << "Recovering solution vectors at time: " <<
 //                 recovery_time << std::endl;
 
-    // Do we not have a solution for this time?  Then 
+    // Do we not have a solution for this time?  Then
     // there's nothing to do.
     if(stored_sols == stored_solutions.end() ||
        std::abs(recovery_time - _system.time) > TOLERANCE)
@@ -166,10 +166,10 @@ namespace libMesh
 
     // Loop over all the saved vectors
     for (; vec != vec_end; ++vec)
-      {	
+      {
   	// The name of this vector
   	const std::string& vec_name = vec->first;
-	
+
         // Get the vec_name entry in the saved vectors map and set the
         // current system vec[vec_name] entry to it
         if (vec_name != "_solution")

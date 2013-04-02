@@ -61,7 +61,7 @@ class RemoteElem : public Elem,
    * Constructor. Private to force use of the \p create() member.
    */
 private:
-  RemoteElem () : Elem(0,0,NULL,_elemlinks_data,NULL) 
+  RemoteElem () : Elem(0,0,NULL,_elemlinks_data,NULL)
   { this->set_id(remote_elem_id); }
 
 public:

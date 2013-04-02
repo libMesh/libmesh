@@ -16,15 +16,15 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
  // <h1>Adaptivity Example 1 - Solving 1D PDE Using Adaptive Mesh Refinement</h1>
- // 
+ //
  // This example demonstrates how to solve a simple 1D problem
  // using adaptive mesh refinement. The PDE that is solved is:
- // -epsilon*u''(x) + u(x) = 1, on the domain [0,1] with boundary conditions 
+ // -epsilon*u''(x) + u(x) = 1, on the domain [0,1] with boundary conditions
  // u(0) = u(1) = 0 and where epsilon << 1.
  //
  // The approach used to solve 1D problems in libMesh is virtually identical to
  // solving 2D or 3D problems, so in this sense this example represents a good
- // starting point for new users. Note that many concepts are used in this 
+ // starting point for new users. Note that many concepts are used in this
  // example which are explained more fully in subsequent examples.
 
 // Libmesh includes
@@ -52,7 +52,7 @@ using namespace libMesh;
 void assemble_1D(EquationSystems& es, const std::string& system_name);
 
 int main(int argc, char** argv)
-{   
+{
   // Initialize the library.  This is necessary because the library
   // may depend on a number of other libraries (i.e. MPI and PETSc)
   // that require initialization before use.  When the LibMeshInit
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
   if ( command_line.search(1, "-n") )
     n = command_line.next(n);
 
-  // Build a 1D mesh with 4 elements from x=0 to x=1, using 
+  // Build a 1D mesh with 4 elements from x=0 to x=1, using
   // EDGE3 (i.e. quadratic) 1D elements. They are called EDGE3 elements
   // because a quadratic element contains 3 nodes.
   MeshTools::Generation::build_line(mesh,n,0.,1.,EDGE3);
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
   // Add a variable "u" to the system, using second-order approximation
   system.add_variable("u",SECOND);
 
-  // Give the system a pointer to the matrix assembly function. This 
+  // Give the system a pointer to the matrix assembly function. This
   // will be called when needed by the library.
   system.attach_assemble_function(assemble_1D);
 
@@ -97,8 +97,8 @@ int main(int argc, char** argv)
   MeshRefinement mesh_refinement(mesh);
 
   // These parameters determine the proportion of elements that will
-  // be refined and coarsened. Any element within 30% of the maximum 
-  // error on any element will be refined, and any element within 30% 
+  // be refined and coarsened. Any element within 30% of the maximum
+  // error on any element will be refined, and any element within 30%
   // of the minimum error on any element might be coarsened
   mesh_refinement.refine_fraction()  = 0.7;
   mesh_refinement.coarsen_fraction() = 0.3;
@@ -140,7 +140,7 @@ int main(int argc, char** argv)
           mesh_refinement.refine_and_coarsen_elements();
 
           // Reinitialize the equation_systems object for the newly refined
-          // mesh. One of the steps in this is project the solution onto the 
+          // mesh. One of the steps in this is project the solution onto the
           // new mesh
           equation_systems.reinit();
         }
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
   // Load gnuplot, then type "call 'gnuplot_script'" from gnuplot prompt
   plot.write_equation_systems("gnuplot_script",equation_systems);
 #endif // #ifndef LIBMESH_ENABLE_AMR
-  
+
   // All done.  libMesh objects are destroyed here.  Because the
   // LibMeshInit object was created first, its destruction occurs
   // last, and it's destructor finalizes any external libraries and
@@ -189,7 +189,7 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
   // freedom numbers. DofMap's are discussed in more detail in future examples.
   const DofMap& dof_map = system.get_dof_map();
 
-  // Get a constant reference to the Finite Element type for the first 
+  // Get a constant reference to the Finite Element type for the first
   // (and only) variable in the system.
   FEType fe_type = dof_map.variable_type(0);
 
@@ -203,7 +203,7 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
   QGauss qrule(dim,FIFTH);
   fe->attach_quadrature_rule(&qrule);
 
-  // Here we define some references to cell-specific data that will be used to 
+  // Here we define some references to cell-specific data that will be used to
   // assemble the linear system.
 
   // The element Jacobian * quadrature weight at each integration point.
@@ -238,13 +238,13 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
     // It is convenient to store a pointer to the current element
     const Elem* elem = *el;
 
-    // Get the degree of freedom indices for the current element. 
-    // These define where in the global matrix and right-hand-side this 
+    // Get the degree of freedom indices for the current element.
+    // These define where in the global matrix and right-hand-side this
     // element will contribute to.
     dof_map.dof_indices(elem, dof_indices);
 
-    // Compute the element-specific data for the current element. This 
-    // involves computing the location of the quadrature points (q_point) 
+    // Compute the element-specific data for the current element. This
+    // involves computing the location of the quadrature points (q_point)
     // and the shape functions (phi, dphi) for the current element.
     fe->reinit(elem);
 
@@ -252,7 +252,7 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
     const int n_dofs = dof_indices.size();
 
     // We resize and zero out Ke and Fe (resize() also clears the matrix and
-    // vector). In this example, all elements in the mesh are EDGE3's, so 
+    // vector). In this example, all elements in the mesh are EDGE3's, so
     // Ke will always be 3x3, and Fe will always be 3x1. If the mesh contained
     // different element types, then the size of Ke and Fe would change.
     Ke.resize(n_dofs, n_dofs);
@@ -270,7 +270,7 @@ void assemble_1D(EquationSystems& es, const std::string& system_name)
 
         for(unsigned int j=0; j<phi.size(); j++)
         {
-          Ke(i,j) += JxW[qp]*(1.e-3*dphi[i][qp]*dphi[j][qp] + 
+          Ke(i,j) += JxW[qp]*(1.e-3*dphi[i][qp]*dphi[j][qp] +
                                      phi[i][qp]*phi[j][qp]);
         }
       }

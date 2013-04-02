@@ -80,7 +80,7 @@ protected:
    * nodes connected to local elements.
    */
   void get_semi_local_nodes(std::set<unsigned int> & semi_local_nodes);
-  
+
   Teuchos::RCP<const Teuchos::Comm<int> > comm;
   EquationSystems & es;
   const MeshBase & mesh;
@@ -88,7 +88,7 @@ protected:
 
   unsigned int num_local_nodes;
   Teuchos::ArrayRCP<int> vertices;
-  
+
   Teuchos::RCP<DataTransferKit::MeshManager<MeshContainerType> > mesh_manager;
   RCP_Evaluator field_evaluator;
   Teuchos::RCP<DataTransferKit::FieldManager<MeshContainerType> > target_coords;

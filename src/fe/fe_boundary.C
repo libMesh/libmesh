@@ -318,7 +318,7 @@ void FE<Dim,T>::edge_reinit(const Elem* elem,
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp; 
+  std::vector<Point> qp;
   this->inverse_map (elem, this->_fe_map->get_xyz(), qp, tolerance);
 
   // compute the shape function and derivative values

@@ -73,14 +73,14 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   EigenSparseMatrix<T>& matrix   = libmesh_cast_ref<EigenSparseMatrix<T>&>(matrix_in);
   EigenSparseVector<T>& solution = libmesh_cast_ref<EigenSparseVector<T>&>(solution_in);
   EigenSparseVector<T>& rhs      = libmesh_cast_ref<EigenSparseVector<T>&>(rhs_in);
-  
+
   // Close the matrix and vectors in case this wasn't already done.
   matrix.close();
   solution.close();
   rhs.close();
 
   std::pair<unsigned int, Real> retval(0,0.);
-  
+
   // Solve the linear system
   switch (this->_solver_type)
     {
@@ -127,7 +127,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   	this->_solver_type = BICGSTAB;
 
 	STOP_LOG("solve()", "EigenSparseLinearSolver");
-	
+
   	return this->solve (matrix,
   			    solution,
   			    rhs,
@@ -135,7 +135,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
   			    m_its);
       }
     }
-  
+
   STOP_LOG("solve()", "EigenSparseLinearSolver");
   return retval;
 }
@@ -150,19 +150,19 @@ EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
 					   const double tol,
 					   const unsigned int m_its)
 {
-  
+
   START_LOG("adjoint_solve()", "EigenSparseLinearSolver");
 
   libmesh_experimental();
   EigenSparseMatrix<T> mat_trans;
   matrix_in.get_transpose(mat_trans);
-  
+
   std::pair<unsigned int, Real> retval = this->solve (mat_trans,
 						      solution_in,
 						      rhs_in,
 						      tol,
 						      m_its);
-  
+
   STOP_LOG("adjoint_solve()", "EigenSparseLinearSolver");
 
   return retval;
@@ -204,7 +204,7 @@ template <typename T>
 void EigenSparseLinearSolver<T>::set_eigen_preconditioner_type ()
 {
   libmesh_not_implemented();
-  
+
   // switch (this->_preconditioner_type)
   //   {
   //   case IDENTITY_PRECOND:
@@ -230,7 +230,7 @@ void EigenSparseLinearSolver<T>::set_eigen_preconditioner_type ()
 }
 
 
-  
+
 template <typename T>
 void EigenSparseLinearSolver<T>::print_converged_reason()
 {

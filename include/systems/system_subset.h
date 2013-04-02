@@ -99,4 +99,3 @@ private:
 } // namespace libMesh
 
 #endif // LIBMESH_SYSTEM_SUBSET_H
-

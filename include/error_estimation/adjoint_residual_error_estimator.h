@@ -89,7 +89,7 @@ public:
    * when computing errors
    */
   const QoISet &qoi_set() const { return _qoi_set; }
-  
+
   /**
    * To aid in investigating error estimator behavior, set this string
    * to a suffix with which to plot (prefixed by "primal_" or "dual_")
@@ -134,4 +134,3 @@ protected:
 } // namespace libMesh
 
 #endif // LIBMESH_ADJOINT_RESIDUAL_ERROR_ESTIMATOR_H
-

@@ -232,7 +232,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
 	  case HEX27:
 	    {
 	      libmesh_assert_less (i, 12);
-	      
+
 	      libmesh_not_implemented();
 	      return RealGradient();
 	    }

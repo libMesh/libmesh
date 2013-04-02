@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 		<< " not found in coarse solution!" << std::endl;
 
   if (!es1.n_systems() && !es2.n_systems())
-    std::cout << "No systems found in fine or coarse solution!" 
+    std::cout << "No systems found in fine or coarse solution!"
               << std::endl;
 
   for (unsigned int i = 0; i != sysnames.size(); ++i)
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 
           if (!sys2.has_variable(varname))
             {
-              std::cout << "Fine solution system " << sysname 
+              std::cout << "Fine solution system " << sysname
                         << " variable " << varname
 		        << " not found in coarse solution!" << std::endl;
               continue;
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
           exact_sol.compute_error(sysname, varname);
 
           std::cout << "Errors in system " << sysname << ", variable " << varname << ":" << std::endl;
-          std::cout << "L2 error: " << exact_sol.l2_error(sysname, varname) 
+          std::cout << "L2 error: " << exact_sol.l2_error(sysname, varname)
                     << ", fine norm: " << sys1.calculate_norm(*sys1.solution, j, L2)
                     << ", coarse norm: " << sys2.calculate_norm(*sys2.solution, j2, L2) << std::endl;
           std::cout << "H1 error: " << exact_sol.h1_error(sysname, varname)
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 
           if (!sys1.has_variable(varname))
             {
-              std::cout << "Coarse solution system " << sysname 
+              std::cout << "Coarse solution system " << sysname
                         << " variable " << varname
 		        << " not found in fine solution!" << std::endl;
               continue;

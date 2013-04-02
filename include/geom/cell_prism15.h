@@ -229,4 +229,3 @@ Prism15::Prism15(Elem* p) :
 } // namespace libMesh
 
 #endif // LIBMESH_CELL_PRISM15_H
-

@@ -26,7 +26,7 @@
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-parameter"
-#endif 
+#endif
 
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER) && !defined(__clang__)
 #if __GNUC__ > 3 && __GNUC_MINOR__ > 1

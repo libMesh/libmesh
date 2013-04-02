@@ -41,7 +41,7 @@ namespace {
 
   using libMesh::DofObject;
   using libMesh::Number;
-  
+
   // Comments:
   // ---------
   // - The max_io_blksize governs how many nodes or elements will be
@@ -89,18 +89,18 @@ namespace {
   private:
     libMesh::Xdr &_io;
     std::vector<InValType> &_data;
-    
+
   public:
     ThreadedIO (libMesh::Xdr &io, std::vector<InValType> &data) :
       _io(io),
-      _data(data)      
+      _data(data)
     {}
-    
+
     void operator()()
     {
       if (_data.empty()) return;
       _io.data_stream (&_data[0], _data.size());
-    }        
+    }
   };
 }
 
@@ -518,7 +518,7 @@ void System::read_parallel_data (Xdr &io,
   // PerfLog pl("IO Performance",false);
   // pl.push("read_parallel_data");
   dof_id_type total_read_size = 0;
-  
+
   libmesh_assert (io.reading());
   libmesh_assert (io.is_open());
 
@@ -694,9 +694,9 @@ void System::read_parallel_data (Xdr &io,
 	}
     }
 
-  // const Real 
+  // const Real
   //   dt   = pl.get_elapsed_time(),
-  //   rate = total_read_size*sizeof(Number)/dt; 
+  //   rate = total_read_size*sizeof(Number)/dt;
 
   // std::cerr << "Read " << total_read_size << " \"Number\" values\n"
   // 	    << " Elapsed time = " << dt << '\n'
@@ -757,10 +757,10 @@ void System::read_serialized_data (Xdr& io,
 
 	}
     }
-  
-  // const Real 
+
+  // const Real
   //   dt   = pl.get_elapsed_time(),
-  //   rate = total_read_size*sizeof(Number)/dt; 
+  //   rate = total_read_size*sizeof(Number)/dt;
 
   // std::cout << "Read " << total_read_size << " \"Number\" values\n"
   // 	    << " Elapsed time = " << dt << '\n'
@@ -794,9 +794,9 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   // coefficient vectors, vars are one or more variables
   // to write, and comps are all the components for said
   // vars on the object.
-  
+
   typedef std::vector<NumericVector<Number>*>::const_iterator vec_iterator_type;
-  
+
   // variables to read.  Unless specified otherwise, defaults to _written_var_indices.
   std::vector<unsigned int> vars_to_read (_written_var_indices);
 
@@ -805,11 +805,11 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       vars_to_read.clear();
       vars_to_read.push_back(var_to_read);
     }
-  
+
   const unsigned int
     sys_num    = this->number(),
     num_vecs   = libmesh_cast_int<unsigned int>(vecs.size()),
-    num_vars   = _written_var_indices.size(); // must be <= current number of variables! 
+    num_vars   = _written_var_indices.size(); // must be <= current number of variables!
   const dof_id_type
     io_blksize = std::min(max_io_blksize, n_objs),
     num_blks   = std::ceil(static_cast<double>(n_objs)/static_cast<double>(io_blksize));
@@ -817,10 +817,10 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   libmesh_assert_less_equal (num_vars, this->n_vars());
 
   unsigned int n_read_values=0;
-  
+
   std::vector<std::vector<dof_id_type> > xfer_ids(num_blks);  // The global IDs and # of components for the local objects in all blocks
   std::vector<std::vector<Number> >      recv_vals(num_blks); // The raw values for the local objects in all blocks
-  std::vector<Parallel::Request>       
+  std::vector<Parallel::Request>
     id_requests(num_blks), val_requests(num_blks);
 
   // ------------------------------------------------------
@@ -830,16 +830,16 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   std::vector<std::size_t>
     xfer_ids_size  (num_blks,0),
     recv_vals_size (num_blks,0);
-    
-  
+
+
   for (iterator_type it=begin; it!=end; ++it)
     {
       const dof_id_type
 	id    = (*it)->id(),
 	block = id/io_blksize;
-      
+
       libmesh_assert_less (block, num_blks);
-      
+
       xfer_ids_size[block] += 2; // for each object, we send its id, as well as the total number of components for all variables
 
       dof_id_type n_comp_tot=0;
@@ -858,13 +858,13 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
   //------------------------------------------
   // Collect the ids & number of values needed
-  // for all local objects, binning them into 
+  // for all local objects, binning them into
   // 'blocks' that will be sent to processor 0
   for (dof_id_type blk=0; blk<num_blks; blk++)
     {
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).
-      const dof_id_type 
+      const dof_id_type
 	first_object = blk*io_blksize,
 	last_object  = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
 				n_objs);
@@ -884,23 +884,23 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	      ((*it)->id() <   last_object))
 	    {
 	      ids.push_back((*it)->id());
-	      
+
 	      unsigned int n_comp_tot=0;
-	      
+
 	      for (std::vector<unsigned int>::const_iterator var_it=vars_to_read.begin();
 		   var_it!=vars_to_read.end(); ++var_it)
 		n_comp_tot += (*it)->n_comp(sys_num,*var_it);
-	      
+
 	      ids.push_back (n_comp_tot*num_vecs);
 	    }
-      
+
 #ifdef LIBMESH_HAVE_MPI
       Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
       Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
-      
+
       // nonblocking send the data for this block
       CommWorld.send (0, ids,  id_requests[blk],  id_tag);
-      
+
       // Go ahead and post the receive too
       CommWorld.receive (0, vals, val_requests[blk], val_tag);
 #endif
@@ -908,9 +908,9 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
   //---------------------------------------------------
   // Here processor 0 will read and distribute the data.
-  // We have to do this block-wise to ensure that we 
+  // We have to do this block-wise to ensure that we
   // do not exhaust memory on processor 0.
-  
+
   // give these variables scope outside the block to avoid reallocation
   std::vector<std::vector<dof_id_type> > recv_ids       (libMesh::n_processors());
   std::vector<std::vector<Number> >      send_vals      (libMesh::n_processors());
@@ -918,12 +918,12 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   std::vector<unsigned int>              obj_val_offsets;          // map to traverse entry-wise rather than processor-wise
   std::vector<Number>                    input_vals;               // The input buffer for the current block
   std::vector<InValType>                 input_vals_tmp;               // The input buffer for the current block
-  
+
   for (dof_id_type blk=0; blk<num_blks; blk++)
     {
       // Each processor should build up its transfer buffers for its
       // local objects in [first_object,last_object).
-      const dof_id_type 
+      const dof_id_type
 	first_object  = blk*io_blksize,
 	last_object   = std::min(static_cast<dof_id_type>((blk+1)*io_blksize),
 				 n_objs),
@@ -931,17 +931,17 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
       // Processor 0 has a special job.  It needs to gather the requested indices
       // in [first_object,last_object) from all processors, read the data from
-      // disk, and reply 
+      // disk, and reply
       if (libMesh::processor_id() == 0)
 	{
 	  // we know the input buffer size for this block and can begin reading it now
 	  input_vals.resize(tot_vals_size[blk]);
 	  input_vals_tmp.resize(tot_vals_size[blk]);
-        
+
 	  // a ThreadedIO object to perform asychronous file IO
 	  ThreadedIO<InValType> threaded_io(io, input_vals_tmp);
 	  Threads::Thread async_io(threaded_io);
-	  
+
 	  Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
 	  Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
 
@@ -952,7 +952,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	  recv_vals_size.resize(libMesh::n_processors()); // reuse this to count how many values are going to each processor
 
 	  unsigned int n_vals_blk = 0;
-	  
+
 	  // loop over all processors and process their index request
 	  for (unsigned int comm_step=0; comm_step<libMesh::n_processors(); comm_step++)
 	    {
@@ -968,19 +968,19 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	      std::size_t &n_vals_proc (recv_vals_size[0]);
 	      ids = xfer_ids[blk];
 #endif
-	      
+
 	      n_vals_proc = 0;
 
 	      // note its possible we didn't receive values for objects in
 	      // this block if they have no components allocated.
 	      for (std::size_t idx=0; idx<ids.size(); idx+=2)
 		{
-		  const dof_id_type 
+		  const dof_id_type
 		    local_idx          = ids[idx+0]-first_object,
 		    n_vals_tot_allvecs = ids[idx+1];
-		  
+
 		  libmesh_assert_less (local_idx, n_objects_blk);
-		  
+
 		  obj_val_offsets[local_idx] = n_vals_tot_allvecs;
 		  n_vals_proc += n_vals_tot_allvecs;
 		}
@@ -989,35 +989,35 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	    }
 
 	  // We need the offests into the input_vals vector for each object.
-	  // fortunately, this is simply the partial sum of the total number 
+	  // fortunately, this is simply the partial sum of the total number
 	  // of components for each object
 	  std::partial_sum(obj_val_offsets.begin(), obj_val_offsets.end(),
 			   obj_val_offsets.begin());
 
 	  libmesh_assert_equal_to (n_vals_blk, obj_val_offsets.back());
 	  libmesh_assert_equal_to (n_vals_blk, tot_vals_size[blk]);
-	  
+
 	  // Wait for read completion
 	  async_io.join();
       // now copy the values back to the main vector for transfer
       for (unsigned int i_val=0; i_val<input_vals.size(); i_val++)
           input_vals[i_val] = input_vals_tmp[i_val];
-          
+
 	  n_read_values +=
 	    libmesh_cast_int<dof_id_type>(input_vals.size());
-	  
+
 	  // pack data replies for each processor
  	  for (processor_id_type proc=0; proc<libMesh::n_processors(); proc++)
 	    {
 	      const std::vector<dof_id_type> &ids (recv_ids[proc]);
 	      std::vector<Number> &vals (send_vals[proc]);
 	      const std::size_t &n_vals_proc (recv_vals_size[proc]);
-	      
+
 	      vals.clear(); /**/ vals.reserve(n_vals_proc);
 
 	      for (std::size_t idx=0; idx<ids.size(); idx+=2)
 		{
-		  const dof_id_type 
+		  const dof_id_type
 		    local_idx          = ids[idx+0]-first_object,
 		    n_vals_tot_allvecs = ids[idx+1];
 
@@ -1032,23 +1032,23 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 		      vals.push_back(*in_vals);
 		    }
 		}
-	      
+
 #ifdef LIBMESH_HAVE_MPI
 	      // send the relevant values to this processor
 	      CommWorld.send (proc, vals, reply_requests[proc], val_tag);
 #else
 	      recv_vals[blk] = vals;
 #endif
-	    }	  
+	    }
 	} // end processor 0 read/reply
-      
+
       // all processors complete the (already posted) read for this block
       {
 	Parallel::wait (val_requests[blk]);
 
 	const std::vector<Number> &vals (recv_vals[blk]);
 	std::vector<Number>::const_iterator val_it(vals.begin());
-	
+
 	if (!recv_vals[blk].empty()) // nonzero values to receive
 	  for (iterator_type it=begin; it!=end; ++it)
 	    if (((*it)->id() >= first_object) && // object in [first_object,last_object)
@@ -1057,12 +1057,12 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	      for (vec_iterator_type vec_it=vecs.begin(); vec_it!=vecs.end(); ++vec_it)
 		{
 		  NumericVector<Number> &vec(**vec_it);
-		  
+
 		  for (std::vector<unsigned int>::const_iterator var_it=vars_to_read.begin();
 		       var_it!=vars_to_read.end(); ++var_it)
 		    {
 		      const unsigned int n_comp = (*it)->n_comp(sys_num,*var_it);
-		  
+
 		      for (unsigned int comp=0; comp<n_comp; comp++, ++val_it)
 			{
 			  const dof_id_type dof_index = (*it)->dof_number (sys_num, *var_it, comp);
@@ -1078,7 +1078,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
       // processor 0 needs to make sure all replies have been handed off
       if (libMesh::processor_id () == 0)
-	Parallel::wait(reply_requests);	  
+	Parallel::wait(reply_requests);
     }
 
   return n_read_values;
@@ -1163,9 +1163,9 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
   const dof_id_type
     n_nodes = this->get_mesh().n_nodes(),
     n_elem  = this->get_mesh().n_elem();
-  
+
   libmesh_assert_less_equal (nv, this->n_vars());
-    
+
   // for newer versions, read variables node/elem major
   if (io.version() >= LIBMESH_VERSION_ID(0,7,4))
     {
@@ -1190,7 +1190,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 						   io,
 						   std::vector<NumericVector<Number>*> (1,&vec));
     }
-  
+
   // for older versions, read variables var-major
   else
     {
@@ -1210,8 +1210,8 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 							   io,
 							   std::vector<NumericVector<Number>*> (1,&vec),
 							   var);
-	      
-	      
+
+
 	      //------------------------------------
 	      // Collect the values for all elements
 	      n_assigned_vals +=
@@ -1483,7 +1483,7 @@ void System::write_parallel_data (Xdr &io,
   // PerfLog pl("IO Performance",false);
   // pl.push("write_parallel_data");
   std::size_t total_written_size = 0;
-  
+
   std::string comment;
 
   libmesh_assert (io.writing());
@@ -1656,14 +1656,14 @@ void System::write_parallel_data (Xdr &io,
 	}
     }
 
-  // const Real 
+  // const Real
   //   dt   = pl.get_elapsed_time(),
-  //   rate = total_written_size*sizeof(Number)/dt; 
+  //   rate = total_written_size*sizeof(Number)/dt;
 
   // std::cerr << "Write " << total_written_size << " \"Number\" values\n"
   // 	    << " Elapsed time = " << dt << '\n'
   // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
-  
+
   // pl.pop("write_parallel_data");
 }
 
@@ -1691,7 +1691,7 @@ void System::write_serialized_data (Xdr& io,
   // PerfLog pl("IO Performance",false);
   // pl.push("write_serialized_data");
   std::size_t total_written_size = 0;
-  
+
   total_written_size +=
     this->write_serialized_vector(io, *this->solution);
 
@@ -1729,19 +1729,19 @@ void System::write_serialized_data (Xdr& io,
 	}
     }
 
-  // const Real 
+  // const Real
   //   dt   = pl.get_elapsed_time(),
-  //   rate = total_written_size*sizeof(Number)/dt; 
+  //   rate = total_written_size*sizeof(Number)/dt;
 
   // std::cout << "Write " << total_written_size << " \"Number\" values\n"
   // 	    << " Elapsed time = " << dt << '\n'
   // 	    << " Rate = " << rate/1.e6 << "(MB/sec)\n\n";
-  
+
   // pl.pop("write_serialized_data");
 
-  
 
-  
+
+
   // // test the new method
   // {
   //   std::vector<std::string> names;
@@ -1749,13 +1749,13 @@ void System::write_serialized_data (Xdr& io,
 
   //   names.push_back("Solution Vector");
   //   vectors_to_write.push_back(this->solution.get());
-    
+
   //   // Only write additional vectors if wanted
   //   if (write_additional_data)
   //     {
   // 	std::map<std::string, NumericVector<Number>* >::const_iterator
   // 	  pos = _vectors.begin();
-	
+
   // 	for(; pos != this->_vectors.end(); ++pos)
   // 	  {
   // 	    names.push_back("Additional Vector " + pos->first);
@@ -1766,10 +1766,10 @@ void System::write_serialized_data (Xdr& io,
   //   total_written_size =
   //     this->write_serialized_vectors (io, names, vectors_to_write);
 
-  //   const Real 
+  //   const Real
   //     dt2   = pl.get_elapsed_time(),
   //     rate2 = total_written_size*sizeof(Number)/(dt2-dt);
-    
+
   //   std::cout << "Write (new) " << total_written_size << " \"Number\" values\n"
   // 	      << " Elapsed time = " << (dt2-dt) << '\n'
   // 	      << " Rate = " << rate2/1.e6 << "(MB/sec)\n\n";
@@ -1801,7 +1801,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
   // coefficient vectors, vars are one or more variables
   // to write, and comps are all the components for said
   // vars on the object.
-  
+
   typedef std::vector<const NumericVector<Number>*>::const_iterator vec_iterator_type;
 
   // We will write all variables unless requested otherwise.
@@ -1813,7 +1813,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
       for (unsigned int var=0; var<this->n_vars(); var++)
 	vars_to_write.push_back(var);
     }
-  
+
   const dof_id_type
     io_blksize = std::min(max_io_blksize, n_objs);
 
@@ -1826,13 +1826,13 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
   // 	    << ", num_objects = " << n_objs
   // 	    << ", num_blks = "    << num_blks
   // 	    << std::endl;
-  
+
   dof_id_type written_length=0;                                   // The numer of values written.  This will be returned
   std::vector<std::vector<dof_id_type> > xfer_ids(num_blks);      // The global IDs and # of components for the local objects in all blocks
   std::vector<std::vector<Number> >       send_vals(num_blks);     // The raw values for the local objects in all blocks
   std::vector<Parallel::Request>
     id_requests(num_blks), val_requests(num_blks);                 // send request handle for each block
-  
+
   // ------------------------------------------------------
   // First pass - count the number of objects in each block
   // traverse all the objects and figure out which block they
@@ -1840,23 +1840,23 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
   std::vector<unsigned int>
     xfer_ids_size  (num_blks,0),
     send_vals_size (num_blks,0);
-  
+
   for (iterator_type it=begin; it!=end; ++it)
     {
       const dof_id_type
 	id    = (*it)->id(),
 	block = id/io_blksize;
-      
+
       libmesh_assert_less (block, num_blks);
-      
+
       xfer_ids_size[block] += 2; // for each object, we store its id, as well as the total number of components for all variables
 
       unsigned int n_comp_tot=0;
-      
+
       for (std::vector<unsigned int>::const_iterator var_it=vars_to_write.begin();
 	   var_it!=vars_to_write.end(); ++var_it)
 	n_comp_tot += (*it)->n_comp(sys_num, *var_it); // for each variable, we will store the nonzero components
-      
+
       send_vals_size[block] += n_comp_tot*num_vecs;
     }
 
@@ -1884,29 +1884,29 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
       ids.clear();  /**/ ids.reserve  (xfer_ids_size[blk]);
       vals.clear(); /**/ vals.reserve (send_vals_size[blk]);
 
-      if (send_vals_size[blk] != 0) // only send if we have nonzero components to write 
+      if (send_vals_size[blk] != 0) // only send if we have nonzero components to write
 	for (iterator_type it=begin; it!=end; ++it)
 	  if (((*it)->id() >= first_object) && // object in [first_object,last_object)
 	      ((*it)->id() <   last_object))
 	    {
 	      ids.push_back((*it)->id());
-	      
+
 	      // count the total number of nonzeros transferred for this object
 	      {
 		unsigned int n_comp_tot=0;
-		
+
 		for (std::vector<unsigned int>::const_iterator var_it=vars_to_write.begin();
 		     var_it!=vars_to_write.end(); ++var_it)
 		  n_comp_tot += (*it)->n_comp(sys_num,*var_it);
-	      
-		ids.push_back (n_comp_tot*num_vecs); // even if 0 - processor 0 has no way of knowing otherwise...		  
+
+		ids.push_back (n_comp_tot*num_vecs); // even if 0 - processor 0 has no way of knowing otherwise...
 	      }
 
 	      // pack the values to send
 	      for (vec_iterator_type vec_it=vecs.begin(); vec_it!=vecs.end(); ++vec_it)
 		{
 		  const NumericVector<Number> &vec(**vec_it);
-		  
+
 		  for (std::vector<unsigned int>::const_iterator var_it=vars_to_write.begin();
 		       var_it!=vars_to_write.end(); ++var_it)
 		    {
@@ -1925,7 +1925,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 #ifdef LIBMESH_HAVE_MPI
       Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
       Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
-      
+
       // nonblocking send the data for this block
       CommWorld.send (0, ids,  id_requests[blk],  id_tag);
       CommWorld.send (0, vals, val_requests[blk], val_tag);
@@ -1943,7 +1943,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
       // a ThreadedIO object to perform asychronous file IO
       ThreadedIO<Number> threaded_io(io, output_vals);
       AutoPtr<Threads::Thread> async_io;
-      
+
       for (unsigned int blk=0; blk<num_blks; blk++)
 	{
 	  // Each processor should build up its transfer buffers for its
@@ -1958,13 +1958,13 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	  // map into the actual output_vals buffer.  this must get
 	  // 0-initialized because 0-component objects are not actually sent
 	  obj_val_offsets.resize (n_objects_blk); /**/ std::fill (obj_val_offsets.begin(), obj_val_offsets.end(), 0);
-	  
+
 	  dof_id_type n_val_recvd_blk=0;
-	  
+
 	  // tags to select data received
 	  Parallel::MessageTag id_tag  (Parallel::Communicator_World.get_unique_tag(100*num_blks + blk));
-	  Parallel::MessageTag val_tag (Parallel::Communicator_World.get_unique_tag(200*num_blks + blk));	      
-	  
+	  Parallel::MessageTag val_tag (Parallel::Communicator_World.get_unique_tag(200*num_blks + blk));
+
 	  // receive this block of data from all processors.
  	  for (unsigned int comm_step=0; comm_step<libMesh::n_processors(); comm_step++)
 	    {
@@ -1976,7 +1976,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 #else
 	      std::vector<dof_id_type> &ids (recv_ids[0]);
 #endif
-	      
+
 	      // note its possible we didn't receive values for objects in
 	      // this block if they have no components allocated.
 	      for (dof_id_type idx=0; idx<ids.size(); idx+=2)
@@ -1987,7 +1987,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 
 		  libmesh_assert_less (local_idx, n_objects_blk);
 		  libmesh_assert_less (local_idx, obj_val_offsets.size());
-		  
+
 		  obj_val_offsets[local_idx] = n_vals_tot_allvecs;
 		}
 
@@ -2001,12 +2001,12 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	      std::vector<Number> &vals (recv_vals[0]);
 	      vals = send_vals[blk];
 #endif
-	      
-	      n_val_recvd_blk += vals.size();	      
+
+	      n_val_recvd_blk += vals.size();
 	    }
 
 	  // We need the offests into the output_vals vector for each object.
-	  // fortunately, this is simply the partial sum of the total number 
+	  // fortunately, this is simply the partial sum of the total number
 	  // of components for each object
 	  std::partial_sum(obj_val_offsets.begin(), obj_val_offsets.end(),
 			   obj_val_offsets.begin());
@@ -2014,30 +2014,30 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	  // wait on any previous asynchronous IO - this *must* complete before
 	  // we start messing with the output_vals buffer!
 	  if (async_io.get()) async_io->join();
-	  
+
 	  // this is the actual output buffer that will be written to disk.
 	  // at ths point we finally know wha size it will be.
 	  output_vals.resize(n_val_recvd_blk);
-	  
+
 	  // pack data from all processors into output values
  	  for (unsigned int proc=0; proc<libMesh::n_processors(); proc++)
 	    {
 	      const std::vector<dof_id_type> &ids (recv_ids [proc]);
 	      const std::vector<Number>      &vals(recv_vals[proc]);
 	      std::vector<Number>::const_iterator proc_vals(vals.begin());
-	      
+
 	      for (dof_id_type idx=0; idx<ids.size(); idx+=2)
 		{
 		  const dof_id_type
 		    local_idx          = ids[idx+0]-first_object,
 		    n_vals_tot_allvecs = ids[idx+1];
-		  
+
 		  // put this object's data into the proper location
 		  // in  the output buffer
 		  std::vector<Number>::iterator out_vals(output_vals.begin());
 		  if (local_idx != 0)
 		    std::advance (out_vals, obj_val_offsets[local_idx-1]);
-		  
+
 		  for (unsigned int val=0; val<n_vals_tot_allvecs; val++, ++out_vals, ++proc_vals)
 		    {
 		      libmesh_assert (out_vals  != output_vals.end());
@@ -2046,7 +2046,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 		    }
 		}
 	    }
-	  
+
 	  // output_vals buffer is now filled for this block.
 	  // write it to disk
 	  async_io.reset(new Threads::Thread(threaded_io));
@@ -2055,7 +2055,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 
       // wait on any previous asynchronous IO - this *must* complete before
       // our stuff goes out of scope
-      async_io->join();	  
+      async_io->join();
     }
 
   Parallel::wait(id_requests);
@@ -2066,7 +2066,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
   // we need some mechanism to prevent processors from racing past
   // to the next range and overtaking ongoing communication.  one
   // approach would be to figure out unique tags for each range,
-  // but for now we just impose a barrier here.  And might as 
+  // but for now we just impose a barrier here.  And might as
   // well have it do some useful work.
   CommWorld.broadcast(written_length);
 
@@ -2138,7 +2138,7 @@ dof_id_type System::write_serialized_vector (Xdr& io, const NumericVector<Number
   if (libMesh::processor_id() == 0) io.data (vec_length, "# vector length");
 
   dof_id_type written_length = 0;
-  
+
   //---------------------------------
   // Collect the values for all nodes
   written_length +=
@@ -2156,7 +2156,7 @@ dof_id_type System::write_serialized_vector (Xdr& io, const NumericVector<Number
 						this->get_mesh().local_elements_begin(),
 						this->get_mesh().local_elements_end(),
 						io);
-  
+
   //-------------------------------------------
   // Finally loop over all the SCALAR variables
   for (unsigned int var=0; var<this->n_vars(); var++)
@@ -2196,7 +2196,7 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
   unsigned int num_vecs=0;
   dof_id_type vector_length=0;
 
-  if (libMesh::processor_id() == 0) 
+  if (libMesh::processor_id() == 0)
     {
       // Get the number of vectors
       io.data(num_vecs);
@@ -2204,7 +2204,7 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
       io.data(vector_length);
 
       libmesh_assert_equal_to (num_vecs, vectors.size());
-      
+
       if (num_vecs != 0)
   	{
   	  libmesh_assert_not_equal_to (vectors[0], 0);
@@ -2215,14 +2215,14 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
   // no need to actually communicate these.
   // CommWorld.broadcast(num_vecs);
   // CommWorld.broadcast(vector_length);
-  
+
   // Cache these - they are not free!
   const dof_id_type
     n_nodes = this->get_mesh().n_nodes(),
-    n_elem  = this->get_mesh().n_elem();  
+    n_elem  = this->get_mesh().n_elem();
 
   dof_id_type read_length = 0.;
-  
+
   //---------------------------------
   // Collect the values for all nodes
   read_length +=
@@ -2250,7 +2250,7 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
       if(this->variable(var).type().family == SCALAR)
 	{
 	  libmesh_assert_not_equal_to (vectors[vec], 0);
-	  
+
 	  read_length +=
 	    this->read_SCALAR_dofs (var, io, *vectors[vec]);
 	}
@@ -2259,10 +2259,10 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
   // last step - must close all the vectors
   for (unsigned int vec=0; vec<vectors.size(); vec++)
     {
-      libmesh_assert_not_equal_to (vectors[vec], 0);      
+      libmesh_assert_not_equal_to (vectors[vec], 0);
       vectors[vec]->close();
     }
-      
+
   return read_length;
 }
 
@@ -2278,11 +2278,11 @@ dof_id_type System::write_serialized_vectors (Xdr &io,
   // Cache these - they are not free!
   const dof_id_type
     n_nodes       = this->get_mesh().n_nodes(),
-    n_elem        = this->get_mesh().n_elem();  
+    n_elem        = this->get_mesh().n_elem();
 
   dof_id_type written_length = 0.;
-  
-  if (libMesh::processor_id() == 0) 
+
+  if (libMesh::processor_id() == 0)
     {
       unsigned int
 	n_vec    = libmesh_cast_int<unsigned int>(vectors.size());
@@ -2319,11 +2319,11 @@ dof_id_type System::write_serialized_vectors (Xdr &io,
       if(this->variable(var).type().family == SCALAR)
 	{
 	  libmesh_assert_not_equal_to (vectors[vec], 0);
-	  
+
 	  written_length +=
 	    this->write_SCALAR_dofs (*vectors[vec], var, io);
 	}
-      
+
   return written_length;
 }
 
@@ -2341,4 +2341,3 @@ template void System::read_serialized_data<Real> (Xdr& io, const bool read_addit
 template numeric_index_type System::read_serialized_vector<Real> (Xdr& io, NumericVector<Number>& vec);
 template dof_id_type System::read_serialized_vectors<Real> (Xdr &io, const std::vector<NumericVector<Number>*> &vectors) const;
 #endif
-

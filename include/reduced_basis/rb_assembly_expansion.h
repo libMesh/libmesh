@@ -152,7 +152,7 @@ public:
    * do not need to use a vector in this case.
    */
   virtual void attach_output_assembly(ElemAssembly* output_assembly);
-  
+
   /**
    * Return a reference to the specified A_assembly object.
    */
@@ -162,7 +162,7 @@ public:
    * Return a reference to the specified F_assembly object.
    */
   ElemAssembly& get_F_assembly(unsigned int q);
-  
+
   /**
    * Return a reference to the specified output assembly object.
    */

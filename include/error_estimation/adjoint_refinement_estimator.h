@@ -120,7 +120,7 @@ protected:
 
   /* A vector to hold the computed global QoI error estimate */
   std::vector<Number> computed_global_QoI_errors;
-     
+
   /* /\** */
   /*  * The code for estimate_error and both estimate_errors versions is very */
   /*  * similar, so we use the same function for all three */
@@ -143,4 +143,3 @@ protected:
  #endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif // LIBMESH_ADJOINT_REFINEMENT_ESTIMATOR_H
-

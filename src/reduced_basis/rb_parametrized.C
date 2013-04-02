@@ -39,7 +39,7 @@ RBParametrized::RBParametrized()
   parameters_initialized(false)
 {
   libmesh_experimental();
-  
+
   parameters.clear();
   parameters_min.clear();
   parameters_max.clear();
@@ -84,7 +84,7 @@ void RBParametrized::initialize_parameters(const RBParameters& mu_min_in,
       }
     }
   }
-  
+
   parameters_min = mu_min_in;
   parameters_max = mu_max_in;
 
@@ -111,7 +111,7 @@ void RBParametrized::initialize_parameters (const std::string& parameters_filena
   {
     // Read in the parameter names
     std::string param_name = infile("parameter_names", "NONE", i);
-    
+
     for(unsigned int j=0; j<3; j++)
     {
       if(j==0)
@@ -143,7 +143,7 @@ unsigned int RBParametrized::get_n_params() const
     libMesh::err << "Error: parameters not initialized in RBParametrized::get_n_params" << std::endl;
     libmesh_error();
   }
-  
+
   libmesh_assert_equal_to ( parameters_min.n_parameters(), parameters_max.n_parameters() );
 
   return parameters_min.n_parameters();
@@ -225,7 +225,7 @@ void RBParametrized::print_parameters() const
     libMesh::err << "Error: parameters not initialized in RBParametrized::print_current_parameters" << std::endl;
     libmesh_error();
   }
-  
+
   get_parameters().print();
 }
 
@@ -234,12 +234,12 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string& file_name
 {
   // The writing mode: ENCODE for binary, WRITE for ASCII
   XdrMODE mode = write_binary_data ? ENCODE : WRITE;
-  
+
   // Write out the parameter ranges
   Xdr parameter_ranges_out(file_name, mode);
   unsigned int n_params = get_n_params();
   parameter_ranges_out << n_params;
-  
+
   RBParameters::const_iterator it;
   RBParameters::const_iterator it_end;
   it = get_parameters_min().begin();
@@ -248,7 +248,7 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string& file_name
   {
     std::string param_name = it->first;
     Real param_value = it->second;
-    
+
     parameter_ranges_out << param_name << param_value;
   }
   it     = get_parameters_max().begin();
@@ -257,7 +257,7 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string& file_name
   {
     std::string param_name = it->first;
     Real param_value = it->second;
-    
+
     parameter_ranges_out << param_name << param_value;
   }
   parameter_ranges_out.close();
@@ -268,7 +268,7 @@ void RBParametrized::read_parameter_ranges_from_file(const std::string& file_nam
 {
   // The reading mode: DECODE for binary, READ for ASCII
   XdrMODE mode = read_binary_data ? DECODE : READ;
-  
+
   // Read in the parameter ranges
   Xdr parameter_ranges_in(file_name, mode);
   unsigned int n_params;
@@ -278,10 +278,10 @@ void RBParametrized::read_parameter_ranges_from_file(const std::string& file_nam
   {
     std::string param_name;
     Real param_value;
-    
+
     parameter_ranges_in >> param_name;
     parameter_ranges_in >> param_value;
-    
+
     param_min.set_value(param_name, param_value);
   }
   RBParameters param_max;
@@ -289,14 +289,14 @@ void RBParametrized::read_parameter_ranges_from_file(const std::string& file_nam
   {
     std::string param_name;
     Real param_value;
-    
+
     parameter_ranges_in >> param_name;
     parameter_ranges_in >> param_value;
-    
+
     param_max.set_value(param_name, param_value);
   }
   parameter_ranges_in.close();
-  
+
   initialize_parameters(param_min, param_max, param_min);
 }
 
@@ -319,10 +319,10 @@ bool RBParametrized::valid_params(const RBParameters& params)
       valid = valid && ( (get_parameter_min(param_name) <= params.get_value(param_name)) &&
                          (params.get_value(param_name) <= get_parameter_max(param_name)) );
     }
-    
+
     if(!valid && verbose_mode)
     {
-      libMesh::out << "Warning: parameter is outside parameter range" << std::endl;      
+      libMesh::out << "Warning: parameter is outside parameter range" << std::endl;
     }
 
     return valid;

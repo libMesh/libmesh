@@ -247,7 +247,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
   // If the user forgot to request anything, we'll be safe and
   // calculate everything:
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi 
+  if (!this->calculate_phi && !this->calculate_dphi && !this->calculate_d2phi
       && !this->calculate_curl_phi && !this->calculate_div_phi)
     {
       this->calculate_phi = this->calculate_dphi = this->calculate_d2phi = this->calculate_dphiref = true;
@@ -307,7 +307,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
       if (Dim > 2)
         this->dphidzeta.resize     (n_approx_shape_functions);
     }
-  
+
   if( this->calculate_curl_phi && (FEInterface::field_type(T) == TYPE_VECTOR) )
     this->curl_phi.resize(n_approx_shape_functions);
 
@@ -353,7 +353,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
           this->dphidy[i].resize      (n_qp);
           this->dphidz[i].resize      (n_qp);
         }
-      
+
       if(this->calculate_dphiref)
 	{
 	  if (Dim > 0)
@@ -476,7 +476,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point>& qp,
 	      }
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
-	
+
        	break;
       }
 

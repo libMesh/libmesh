@@ -91,7 +91,7 @@ namespace Threads
    * Fall back to tbb::tbb_thread when available.
    */
   typedef tbb::tbb_thread Thread;
-  
+
 #else
   //--------------------------------------------------------------------
   /**
@@ -119,7 +119,7 @@ namespace Threads
      */
     bool joinable() const { return true; }
   };
-  
+
 #endif
 
 

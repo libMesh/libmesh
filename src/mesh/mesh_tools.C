@@ -192,7 +192,7 @@ namespace {
       if (d)
         {
           const unsigned int n_sys = d->n_systems();
-         
+
           std::vector<unsigned int> n_vars (n_sys, 0);
           for (unsigned int s = 0; s != n_sys; ++s)
             n_vars[s] = d->n_vars(s);
@@ -202,7 +202,7 @@ namespace {
 
           std::vector<unsigned int> n_comp (tot_n_vars, 0);
           std::vector<dof_id_type> first_dof (tot_n_vars, 0);
-         
+
           for (unsigned int s = 0, i=0; s != n_sys; ++s)
             for (unsigned int v = 0; v != n_vars[s]; ++v, ++i)
               {

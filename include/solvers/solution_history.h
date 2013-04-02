@@ -31,11 +31,11 @@ namespace libMesh
   class SolutionHistory
   {
   public:
-    
+
     // Constructor
     SolutionHistory() :
       overwrite_previously_stored(false) {};
-    
+
     // Destructor
     virtual ~SolutionHistory () {};
 
@@ -45,7 +45,7 @@ namespace libMesh
     // Function to retrieve a solution, pure virtual
     virtual void retrieve() = 0;
 
-    // Cloning function for an AutoPtr, pure virtual, used in the 
+    // Cloning function for an AutoPtr, pure virtual, used in the
     // setter function in time_solver.C
     virtual AutoPtr<SolutionHistory > clone() const = 0;
 
@@ -56,10 +56,10 @@ namespace libMesh
 
   protected:
 
-    // Flag to specify whether we want to overwrite previously stored 
+    // Flag to specify whether we want to overwrite previously stored
     // vectors at a given time or not
     bool overwrite_previously_stored;
-    
+
   }; // end SolutionHistory class definition
 
 } // end namespace libMesh

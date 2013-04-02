@@ -47,7 +47,7 @@ void WeightedPatchRecoveryErrorEstimator::estimate_error (const System& system,
 					          bool)
 {
   START_LOG("estimate_error()", "WeightedPatchRecoveryErrorEstimator");
-  
+
   // The current mesh
   const MeshBase& mesh = system.get_mesh();
 
@@ -133,9 +133,9 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
       // next element
       if(this->error_estimator.patch_reuse && error_per_cell[e_id] != 0)
 	continue;
-    
+
       // If we are not reusing patches or havent built one containing this element, we build one
-    
+
       // Use user specified patch size and growth strategy
       patch.build_around_element (elem, error_estimator.target_patch_size,
 				  error_estimator.patch_growth_strategy);
@@ -316,7 +316,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 	  // contribution to the patch gradient projection.
 	  Patch::const_iterator        patch_it  = patch.begin();
 	  const Patch::const_iterator  patch_end = patch.end();
-	  	  	      
+
 	  for (; patch_it != patch_end; ++patch_it)
 	    {
 	      // The pth element in the patch
@@ -324,7 +324,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
 	      // Reinitialize the finite element data for this element
 	      fe->reinit (e_p);
-	      	      
+
 	      // Get the global DOF indices for the current variable
 	      // in the current element
 	      dof_map.dof_indices (e_p, dof_indices, var);
@@ -333,7 +333,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 	      const unsigned int n_dofs =
 		libmesh_cast_int<unsigned int>(dof_indices.size());
 	      const unsigned int n_qp   = qrule->n_points();
-	      	      
+
 	      // Compute the weighted projection components from this cell.
 	      // \int_{Omega_e} \psi_i \psi_j = \int_{Omega_e} w * du_h/dx_k \psi_i
 	      for (unsigned int qp=0; qp<n_qp; qp++)
@@ -345,7 +345,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		  for (unsigned int i=0; i<Kp.m(); i++)
 		    for (unsigned int j=0; j<Kp.n(); j++)
 		      Kp(i,j) += JxW[qp]*psi[i]*psi[j];
-		  		  
+
 		  if (error_estimator.error_norm.type(var) == L2 ||
 		      error_estimator.error_norm.type(var) == L_INF)
 		    {
@@ -355,7 +355,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
 		      for (unsigned int i=0; i<n_dofs; i++)
 			u_h += (*phi)[i][qp]*system.current_solution (dof_indices[i]);
-		      
+
 		      // Patch RHS contributions
 		      for (unsigned int i=0; i<psi.size(); i++)
 			  F(i) = JxW[qp]*u_h*psi[i];
@@ -372,7 +372,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		        grad_u_h.add_scaled ((*dphi)[i][qp],
 					     system.current_solution(dof_indices[i]));
 
-		      
+
 
 		      // Patch RHS contributions
 		      for (unsigned int i=0; i<psi.size(); i++)
@@ -396,7 +396,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		        grad_u_h.add_scaled ((*dphi)[i][qp],
 					     system.current_solution(dof_indices[i]));
 
-		      
+
 
 		      // Patch RHS contributions
 		      for (unsigned int i=0; i<psi.size(); i++)
@@ -414,7 +414,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		        grad_u_h.add_scaled ((*dphi)[i][qp],
 					     system.current_solution(dof_indices[i]));
 
-		      
+
 
 		      // Patch RHS contributions
 		      for (unsigned int i=0; i<psi.size(); i++)
@@ -431,8 +431,8 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		      for (unsigned int i=0; i<n_dofs; i++)
 		        grad_u_h.add_scaled ((*dphi)[i][qp],
 					     system.current_solution(dof_indices[i]));
-		      
-		      
+
+
 
 		      // Patch RHS contributions
 		      for (unsigned int i=0; i<psi.size(); i++)
@@ -452,7 +452,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		        hess_u_h.add_scaled ((*d2phi)[i][qp],
 					     system.current_solution(dof_indices[i]));
 
-		      
+
 
 		      // Patch RHS contributions
 		      for (unsigned int i=0; i<psi.size(); i++)
@@ -566,7 +566,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 	  // obtaining the weights from the user code
 	  FEMContext femcontext(system);
 	  error_estimator.weight_functions[var]->init_context(femcontext);
-	  
+
 	  // Loop over every element in the patch
 	  for (unsigned int e = 0 ; patch_re_it != patch_re_end; patch_re_it++, ++e)
 	    {
@@ -574,14 +574,14 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
 	      // The pth element in the patch
 	      const Elem* e_p = *patch_re_it;
-	    
+
 	      // We'll need an index into the error vector for this element
 	      const dof_id_type e_p_id = e_p->id();
-	      
+
 	      // Get a pointer to the element, we need it to initialize
 	      // the FEMContext
 	      Elem *e_p_cast = const_cast<Elem *>(*patch_re_it);
-	      
+
 	      // Initialize the FEMContext
 	      femcontext.pre_fe_reinit(system, e_p_cast);
 
@@ -619,7 +619,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		fe->attach_quadrature_rule (&samprule);
 
 	      // The number of points we will sample over
-	      const unsigned int n_sp = 
+	      const unsigned int n_sp =
 		libmesh_cast_int<unsigned int>(JxW.size());
 
 	      // Loop over every sample point for the current element
@@ -775,14 +775,14 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 		      libmesh_error();
 #endif
 		    }
-		  
+
 		  // Get the weight from the user code
-		  Number weight = (*error_estimator.weight_functions[var])(femcontext, q_point[sp], system.time);	
+		  Number weight = (*error_estimator.weight_functions[var])(femcontext, q_point[sp], system.time);
 
 		  // Add up relevant terms.  We can easily optimize the
 		  // LIBMESH_DIM < 3 cases a little bit with the exception
 		  // of the W2 cases
-		  
+
 		  if (error_estimator.error_norm.type(var) == L_INF)
 		    element_error = std::max(element_error, std::abs(weight*temperr[0]));
 		  else if (error_estimator.error_norm.type(var) == W1_INF_SEMINORM)
@@ -895,10 +895,9 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
 
         } // End loop over every element in patch
 
-      
+
     } // end element loop
 
 } // End () operator definition
 
 } // namespace libMesh
-

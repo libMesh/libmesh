@@ -4,7 +4,7 @@ data          = biharmonic.C biharmonic.h biharmonic_jr.C biharmonic_jr.h miscel
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 
-CLEANFILES = bih.1.e 
+CLEANFILES = bih.1.e
 
 ##############################################
 # include common example environment

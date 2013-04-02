@@ -78,7 +78,3 @@ namespace libMeshEnums {
 using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_ELEM_TYPE_H
-
-
-
-

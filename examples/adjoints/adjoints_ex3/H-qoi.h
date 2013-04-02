@@ -16,17 +16,17 @@ class CoupledSystemQoI : public DifferentiableQoI
 {
 public:
   CoupledSystemQoI(){}
-  virtual ~CoupledSystemQoI(){} 
+  virtual ~CoupledSystemQoI(){}
 
   virtual void init_qoi( std::vector<Number>& sys_qoi);
-  virtual void postprocess( ){} 
-  
-  virtual void side_qoi_derivative(DiffContext &context, const QoISet & qois);   
+  virtual void postprocess( ){}
+
+  virtual void side_qoi_derivative(DiffContext &context, const QoISet & qois);
 
   virtual void side_qoi(DiffContext &context, const QoISet & qois);
 
   virtual AutoPtr<DifferentiableQoI> clone( )
-  { AutoPtr<DifferentiableQoI> my_clone( new CoupledSystemQoI ); 
+  { AutoPtr<DifferentiableQoI> my_clone( new CoupledSystemQoI );
     *my_clone = *this;
     return my_clone;
   }

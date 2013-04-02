@@ -1370,4 +1370,3 @@ void ImplicitSystem::release_linear_solver(LinearSolver<Number>* s) const
 }
 
 } // namespace libMesh
-

@@ -159,4 +159,3 @@ protected:
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif // LIBMESH_HP_COARSENTEST_H
-

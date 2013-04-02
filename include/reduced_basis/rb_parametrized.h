@@ -31,7 +31,7 @@
 
 namespace libMesh
 {
-    
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -73,7 +73,7 @@ public:
    * Initialize the parameter ranges and set current_parameters.
    */
   void initialize_parameters(const RBParametrized& rb_parametrized);
-  
+
   /**
    * Initialize the parameter ranges and set current_parameters by
    * reading in data from the file \p input_filename
@@ -121,13 +121,13 @@ public:
    * Print the current parameters.
    */
   void print_parameters() const;
-  
+
   /**
    * Write out the parameter ranges to file.
    */
   void write_parameter_ranges_to_file(const std::string& file_name,
                                       const bool write_binary);
-  
+
   /**
    * Read in the parameter ranges from file. Initialize parameters
    * to the "minimum" parameter values.

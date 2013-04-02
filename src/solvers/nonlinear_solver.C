@@ -105,6 +105,3 @@ NonlinearSolver<T>::attach_preconditioner(Preconditioner<T> * preconditioner)
 template class NonlinearSolver<Number>;
 
 } // namespace libMesh
-
-
-

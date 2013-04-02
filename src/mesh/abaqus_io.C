@@ -766,7 +766,7 @@ namespace libMesh
     std::vector<std::pair<dof_id_type, unsigned> >& id_storage = container[sideset_name];
 
     // Variables for storing values read in from file
-    dof_id_type elem_id=0; 
+    dof_id_type elem_id=0;
     unsigned side_id=0;
     char c;
     std::string dummy;

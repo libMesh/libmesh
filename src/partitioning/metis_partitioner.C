@@ -305,5 +305,3 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
 }
 
 } // namespace libMesh
-
-

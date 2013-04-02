@@ -83,7 +83,7 @@ class TecplotIO : public MeshOutput<MeshBase>
    * Written to newer binary formats that are time-aware.
    */
   double & time ();
-  
+
   /**
    * Strand offset for this file.  Each mesh block will
    * be written to (strand_id=block_id+1+strand_offset).
@@ -96,7 +96,7 @@ class TecplotIO : public MeshOutput<MeshBase>
    *  The zone title to write.
    */
   std::string & zone_title ();
-  
+
  private:
 
   /**

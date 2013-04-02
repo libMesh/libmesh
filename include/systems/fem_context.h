@@ -240,7 +240,7 @@ public:
    * Returns the value of the solution variable \p var at the quadrature
    * point \p qp on the current element interior. This is the preferred API.
    */
-  template<typename OutputType> 
+  template<typename OutputType>
   void interior_value(unsigned int var, unsigned int qp,
                       OutputType& u) const;
 
@@ -248,7 +248,7 @@ public:
    * Fills a vector of values of the _system_vector at the all the quadrature
    * points in the current element interior.
    */
-  template<typename OutputType> 
+  template<typename OutputType>
   void interior_values(unsigned int var, const NumericVector<Number> & _system_vector,
 		       std::vector<OutputType>& interior_values_vector) const;
 
@@ -256,7 +256,7 @@ public:
    * Returns the value of the solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
    */
-  template<typename OutputType> 
+  template<typename OutputType>
   void side_value(unsigned int var, unsigned int qp,
                   OutputType& u) const;
 
@@ -264,7 +264,7 @@ public:
    * Fills a vector of values of the _system_vector at the all the quadrature
    * points on the current element side.
    */
-  template<typename OutputType> 
+  template<typename OutputType>
   void side_values(unsigned int var, const NumericVector<Number> & _system_vector,
 		   std::vector<OutputType>& side_values_vector) const;
 
@@ -281,7 +281,7 @@ public:
    * point \p qp on the current element interior. This is the preferred API.
    */
   template<typename OutputType>
-  void interior_gradient(unsigned int var, unsigned int qp, 
+  void interior_gradient(unsigned int var, unsigned int qp,
 			 OutputType& du) const;
 
   /**
@@ -289,7 +289,7 @@ public:
    * points in the current element interior. This is the preferred API.
    */
   template<typename OutputType>
-  void interior_gradients(unsigned int var, const NumericVector<Number> & _system_vector, 
+  void interior_gradients(unsigned int var, const NumericVector<Number> & _system_vector,
 			  std::vector<OutputType>& interior_gradients_vector) const;
 
   /**
@@ -297,7 +297,7 @@ public:
    * point \p qp on the current element side. This is the preferred API.
    */
   template<typename OutputType>
-  void side_gradient(unsigned int var, unsigned int qp, 
+  void side_gradient(unsigned int var, unsigned int qp,
 		     OutputType & du) const;
 
   /**
@@ -305,7 +305,7 @@ public:
    * points on the current element side. This is the preferred API.
    */
   template<typename OutputType>
-  void side_gradients(unsigned int var, const NumericVector<Number> & _system_vector, 
+  void side_gradients(unsigned int var, const NumericVector<Number> & _system_vector,
 		      std::vector<OutputType>& side_gradients_vector) const;
 
    /**
@@ -313,9 +313,9 @@ public:
    * point \p p on the current element. This is the preferred API.
    */
   template<typename OutputType>
-  void point_gradient(unsigned int var, const Point &p, 
+  void point_gradient(unsigned int var, const Point &p,
 		      OutputType& grad_u) const;
-  
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the solution variable \p var at the quadrature
@@ -339,7 +339,7 @@ public:
    * point \p qp on the current element side. This is the preferred API.
    */
   template<typename OutputType>
-  void side_hessian(unsigned int var, unsigned int qp, 
+  void side_hessian(unsigned int var, unsigned int qp,
 		    OutputType& d2u) const;
 
   /**
@@ -348,7 +348,7 @@ public:
    * preferred API.
    */
   template<typename OutputType>
-  void side_hessians(unsigned int var, const NumericVector<Number> & _system_vector, 
+  void side_hessians(unsigned int var, const NumericVector<Number> & _system_vector,
 		     std::vector<OutputType>& d2u_vals) const;
 
   /**
@@ -356,7 +356,7 @@ public:
    * point \p p on the current element. This is the preferred API.
    */
   template<typename OutputType>
-  void point_hessian(unsigned int var, const Point &p, 
+  void point_hessian(unsigned int var, const Point &p,
 		     OutputType& hess_u) const;
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -408,7 +408,7 @@ public:
   template<typename OutputType>
   void fixed_point_gradient(unsigned int var, const Point &p,
 			    OutputType& grad_u) const;
-  
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
@@ -417,7 +417,7 @@ public:
   template<typename OutputType>
   void fixed_interior_hessian(unsigned int var, unsigned int qp,
 			      OutputType& hess_u) const;
-  
+
   /**
    * Returns the hessian of the fixed_solution variable \p var at the quadrature
    * point \p qp on the current element side. This is the preferred API.
@@ -425,7 +425,7 @@ public:
   template<typename OutputType>
   void fixed_side_hessian(unsigned int var, unsigned int qp,
 			  OutputType& hess_u) const;
-  
+
   /**
    * Returns the hessian of the fixed_solution variable \p var at the physical
    * point \p p on the current element. This is the preferred API.
@@ -449,7 +449,7 @@ public:
    * point \p p on the current element.
    */
   template<typename OutputType>
-  void point_curl(unsigned int var, const Point &p, 
+  void point_curl(unsigned int var, const Point &p,
 		  OutputType& curl_u) const;
 
   /**
@@ -525,7 +525,7 @@ public:
    */
   const QBase* get_edge_qrule() const
   { return this->edge_qrule; }
- 
+
   /**
    * Tells the FEMContext that system \p sys contains the
    * isoparametric Lagrangian variables which correspond to the
@@ -709,7 +709,7 @@ protected:
   std::map<FEType, FEAbstract*> _element_fe;
   std::map<FEType, FEAbstract*> _side_fe;
   std::map<FEType, FEAbstract*> _edge_fe;
-  
+
 
   /**
    * Pointers to the same finite element objects, but indexed
@@ -775,7 +775,7 @@ void FEMContext::get_side_fe( unsigned int var, FEGenericBase<OutputShape> *& fe
 template<typename OutputShape>
 inline
 void FEMContext::get_edge_fe( unsigned int var, FEGenericBase<OutputShape> *& fe ) const
-{ 
+{
   libmesh_assert_less ( var, _edge_fe_var.size() );
   fe = libmesh_cast_ptr<FEGenericBase<OutputShape>*>( _edge_fe_var[var] );
 }

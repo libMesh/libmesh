@@ -349,11 +349,3 @@ namespace libMesh
 
 
 #endif // LIBMESH_HAVE_TRIANGLE
-
-
-
-
-
-
-
-

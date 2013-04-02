@@ -516,21 +516,21 @@ void SerialMesh::renumber_nodes_and_elements ()
             for (unsigned int n=0; n<el->n_nodes(); n++)
               if (el->node(n) == next_free_node)     // don't need to process
                 next_free_node++;                      // [(src == dst) below]
-            
+
               else if (el->node(n) > next_free_node) // need to process
 	      {
 		// The source and destination indices
 		// for this node
 		const dof_id_type src_idx = el->node(n);
 		const dof_id_type dst_idx = next_free_node++;
-                
+
 		// ensure we want to swap a valid nodes
 		libmesh_assert(_nodes[src_idx]);
-                
+
 		// Swap the source and destination nodes
                 std::swap(_nodes[src_idx],
                           _nodes[dst_idx] );
-                
+
 		// Set proper indices where that makes sense
 		if (_nodes[src_idx] != NULL)
 		  _nodes[src_idx]->set_id (src_idx);
@@ -544,7 +544,7 @@ void SerialMesh::renumber_nodes_and_elements ()
     // thus repeated and unnecessary.
     _elements.erase (out_iter, end);
   }
-  
+
 
   if(_skip_renumber_nodes_and_elements)
   {
@@ -552,7 +552,7 @@ void SerialMesh::renumber_nodes_and_elements ()
     // be NULLs in the _nodes vector from the coarsening
     // process.  Pack the nodes in to a contiguous array
     // and then trim any excess.
-    
+
     std::vector<Node*>::iterator in        = _nodes.begin();
     std::vector<Node*>::iterator out_iter  = _nodes.begin();
     const std::vector<Node*>::iterator end = _nodes.end();
@@ -562,7 +562,7 @@ void SerialMesh::renumber_nodes_and_elements ()
       {
         // This is a reference so that if we change the pointer it will change in the vector
         Node* & nd = *in;
-        
+
         // If this node is still connected to an elem, put it in the list
         if(connected_nodes.find(nd) != connected_nodes.end())
         {
@@ -579,7 +579,7 @@ void SerialMesh::renumber_nodes_and_elements ()
           // delete the node
           delete nd;
           nd = NULL;
-        }  
+        }
       }
 
     // Erase any additional storage.  Whatever was
@@ -651,7 +651,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
 {
   std::map<dof_id_type, dof_id_type> node_to_node_map;
   std::map<dof_id_type, std::vector<dof_id_type> > node_to_elems_map;
-  
+
   if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
       (other_mesh_boundary_id != BoundaryInfo::invalid_id) )
   {
@@ -661,13 +661,13 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     for ( ; elem_it != elem_end; ++elem_it)
     {
       Elem *el = *elem_it;
-      
+
       // Now check whether elem has a face on the specified boundary
       for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
         if (el->neighbor(side_id) == NULL)
         {
           boundary_id_type bc_id = this->boundary_info->boundary_id (el, side_id);
-          
+
           if(bc_id == this_mesh_boundary_id)
           {
             AutoPtr<Elem> side (el->build_side(side_id));
@@ -685,13 +685,13 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     for ( ; elem_it != elem_end; ++elem_it)
     {
       Elem *el = *elem_it;
-      
+
       // Now check whether elem has a face on the specified boundary
       for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
         if (el->neighbor(side_id) == NULL)
         {
           boundary_id_type bc_id = other_mesh.boundary_info->boundary_id (el, side_id);
-          
+
           if(bc_id == other_mesh_boundary_id)
           {
             AutoPtr<Elem> side (el->build_side(side_id));
@@ -702,25 +702,25 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
           }
         }
     }
-    
+
     std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
     std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
     for( ; set_it != set_it_end; ++set_it)
     {
       dof_id_type this_node_id = *set_it;
       Node& this_node = this->node(this_node_id);
-      
+
       bool found_matching_nodes = false;
-      
+
       std::set<dof_id_type>::iterator other_set_it     = other_boundary_node_ids.begin();
       std::set<dof_id_type>::iterator other_set_it_end = other_boundary_node_ids.end();
       for( ; other_set_it != other_set_it_end; ++other_set_it)
       {
         dof_id_type other_node_id = *other_set_it;
         Node& other_node = other_mesh.node(other_node_id);
-        
+
         Real node_distance = (this_node - other_node).size();
-        
+
         if(node_distance < tol)
         {
           // Make sure we didn't already find a matching node!
@@ -729,9 +729,9 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
             libMesh::out << "Error: Found multiple matching nodes in stitch_meshes" << std::endl;
             libmesh_error();
           }
-          
+
           node_to_node_map[this_node_id] = other_node_id;
-          
+
           // Build a vector of all the elements in other_mesh that contain other_node
           std::vector<dof_id_type> other_elem_ids;
           MeshBase::element_iterator other_elem_it  = other_mesh.elements_begin();
@@ -739,22 +739,22 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
           for (; other_elem_it != other_elem_end; ++other_elem_it)
           {
             Elem *el = *other_elem_it;
-            
+
             if(el->contains_point(other_node))
               other_elem_ids.push_back(el->id());
           }
-          
+
           node_to_elems_map[this_node_id] = other_elem_ids;
-          
+
           found_matching_nodes = true;
         }
       }
     }
-    
+
     if(verbose)
     {
       libMesh::out << "In SerialMesh::stitch_meshes:" << std::endl
-                   << "This mesh has " << this_boundary_node_ids.size() << " nodes on specified boundary" << std::endl 
+                   << "This mesh has " << this_boundary_node_ids.size() << " nodes on specified boundary" << std::endl
                    << "Other mesh has " << other_boundary_node_ids.size() << " nodes on specified boundary" << std::endl
                    << "Found " << node_to_node_map.size() << " matching nodes." << std::endl << std::endl;
     }
@@ -766,12 +766,12 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
       libMesh::out << "Skip node merging in SerialMesh::stitch_meshes:" << std::endl;
     }
   }
-  
 
-  
+
+
   dof_id_type node_delta = this->n_nodes();
   dof_id_type elem_delta = this->n_elem();
-  
+
   // need to increment node and element IDs of other_mesh before copying to this mesh
   MeshBase::node_iterator node_it  = other_mesh.nodes_begin();
   MeshBase::node_iterator node_end = other_mesh.nodes_end();
@@ -781,7 +781,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     dof_id_type new_id = nd->id() + node_delta;
     nd->set_id(new_id);
   }
-  
+
   MeshBase::element_iterator elem_it  = other_mesh.elements_begin();
   MeshBase::element_iterator elem_end = other_mesh.elements_end();
   for (; elem_it != elem_end; ++elem_it)
@@ -790,7 +790,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     dof_id_type new_id = el->id() + elem_delta;
     el->set_id(new_id);
   }
-  
+
   // Also, increment the node_to_node_map and node_to_elems_map
   std::map<dof_id_type, dof_id_type>::iterator node_map_it     = node_to_node_map.begin();
   std::map<dof_id_type, dof_id_type>::iterator node_map_it_end = node_to_node_map.end();
@@ -808,10 +808,10 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
       (elem_map_it->second)[i] += elem_delta;
     }
   }
-  
+
   // Copy mesh data
   this->copy_nodes_and_elements(other_mesh);
-  
+
   // then decrement node and element IDs of mesh_i to return to original state
   node_it  = other_mesh.nodes_begin();
   node_end = other_mesh.nodes_end();
@@ -821,30 +821,30 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     dof_id_type new_id = nd->id() - node_delta;
     nd->set_id(new_id);
   }
-  
+
   elem_it  = other_mesh.elements_begin();
   elem_end = other_mesh.elements_end();
   for (; elem_it != elem_end; ++elem_it)
   {
     Elem *el = *elem_it;
-    
+
     // First copy boundary info to the stitched mesh
     for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
       if (el->neighbor(side_id) == NULL)
       {
         boundary_id_type bc_id = other_mesh.boundary_info->boundary_id (el, side_id);
-        
+
         if(bc_id != BoundaryInfo::invalid_id)
         {
           this->boundary_info->add_side(el->id(), side_id, bc_id);
         }
       }
-    
+
     // Then decrement
     dof_id_type new_id = el->id() - elem_delta;
     el->set_id(new_id);
   }
-  
+
   // Finally, we need to "merge" the overlapping nodes
   // We do this by iterating over node_to_elems_map and updating
   // the elements so that they "point" to the nodes that came
@@ -858,20 +858,20 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     dof_id_type target_node_id = elem_map_it->first;
     dof_id_type other_node_id = node_to_node_map[target_node_id];
     Node& target_node = this->node(target_node_id);
-    
+
     dof_id_type n_elems = elem_map_it->second.size();
     for(unsigned int i=0; i<n_elems; i++)
     {
       dof_id_type elem_id = elem_map_it->second[i];
       Elem* el = this->elem(elem_id);
-      
+
       // find the local node index that we want to update
       unsigned int local_node_index = el->local_node(other_node_id);
-      
+
       el->set_node(local_node_index) = &target_node;
     }
   }
-  
+
   node_map_it     = node_to_node_map.begin();
   node_map_it_end = node_to_node_map.end();
   for( ; node_map_it != node_map_it_end; ++node_map_it)
@@ -879,7 +879,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     dof_id_type node_id = node_map_it->second;
     this->delete_node( this->node_ptr(node_id) );
   }
-  
+
   this->prepare_for_use( /*skip_renumber_nodes_and_elements= */ false);
 
   // After the stitching, we may want to clear boundary IDs from element
@@ -891,13 +891,13 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     for (; elem_it != elem_end; ++elem_it)
     {
       Elem *el = *elem_it;
-      
+
       for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
       {
         if (el->neighbor(side_id) != NULL)
         {
           boundary_id_type bc_id = this->boundary_info->boundary_id (el, side_id);
-          
+
           if( (bc_id == this_mesh_boundary_id)  ||
               (bc_id == other_mesh_boundary_id) )
           {

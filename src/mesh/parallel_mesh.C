@@ -65,13 +65,13 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
   _n_elem  = other_mesh.n_elem();
   _max_node_id = other_mesh.max_node_id();
   _max_elem_id = other_mesh.max_elem_id();
-  _next_free_local_node_id = 
+  _next_free_local_node_id =
     other_mesh._next_free_local_node_id;
-  _next_free_local_elem_id = 
+  _next_free_local_elem_id =
     other_mesh._next_free_local_elem_id;
-  _next_free_unpartitioned_node_id = 
+  _next_free_unpartitioned_node_id =
     other_mesh._next_free_unpartitioned_node_id;
-  _next_free_unpartitioned_elem_id = 
+  _next_free_unpartitioned_elem_id =
     other_mesh._next_free_unpartitioned_elem_id;
   *this->boundary_info = *other_mesh.boundary_info;
 

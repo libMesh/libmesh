@@ -58,7 +58,7 @@ void RBEIMAssembly::evaluate_basis_function(unsigned int var,
                                             std::vector<Number>& values)
 {
   DofMap& dof_map = _rb_eim_con.get_dof_map();
-  
+
   // Get local coordinates to feed these into compute_data().
   // Note that the fe_type can safely be used from the 0-variable,
   // since the inverse mapping is the same for all FEFamilies

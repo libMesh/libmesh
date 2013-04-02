@@ -162,5 +162,3 @@ protected:
 } // namespace libMesh
 
 #endif // LIBMESH_POINT_LOCATOR_TREE_H
-
-

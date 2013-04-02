@@ -39,7 +39,7 @@ namespace libMesh
       const Number duz_dx = grad(2,0);
       const Number duy_dx = grad(1,0);
       const Number dux_dy = grad(0,1);
-      
+
       return VectorValue<Number>( duz_dy - duy_dz, dux_dz - duz_dx, duy_dx - dux_dy);
     }
 

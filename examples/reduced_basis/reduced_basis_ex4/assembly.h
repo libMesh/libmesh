@@ -115,7 +115,7 @@ struct EIM_F : RBEIMAssembly
   {
     // PDE variable number
     const unsigned int u_var = 0;
-    
+
     // EIM variable number
     const unsigned int eim_var = 0;
 
@@ -124,7 +124,7 @@ struct EIM_F : RBEIMAssembly
 
     const std::vector<std::vector<Real> >& phi =
       c.element_fe_var[u_var]->get_phi();
-    
+
     const std::vector<Point>& qpoints =
       c.element_fe_var[u_var]->get_xyz();
 

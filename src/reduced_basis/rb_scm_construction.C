@@ -83,7 +83,7 @@ RBSCMEvaluation& RBSCMConstruction::get_rb_scm_evaluation()
     libMesh::out << "Error: RBSCMEvaluation object hasn't been initialized yet" << std::endl;
     libmesh_error();
   }
-  
+
   return *rb_scm_eval;
 }
 
@@ -124,7 +124,7 @@ void RBSCMConstruction::process_parameters_file(const std::string& parameters_fi
     // Read vector-based log scaling values.  Note the intermediate conversion to
     // int... this implies log_scaling = '1 1 1...' in the input file.
 //    log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
-    
+
     std::string param_name = it->first;
     log_scaling[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
     i++;
@@ -159,7 +159,7 @@ void RBSCMConstruction::print_info()
     std::string param_name = it->first;
     libMesh::out <<   "Parameter " << param_name
                  << ": Min = " << get_parameter_min(param_name)
-                 << ", Max = " << get_parameter_max(param_name) 
+                 << ", Max = " << get_parameter_max(param_name)
                  << ", value = " << get_parameters().get_value(param_name) << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
@@ -214,7 +214,7 @@ void RBSCMConstruction::perform_SCM_greedy()
   std::set<unsigned int> constrained_dofs_set;
   EquationSystems& es = this->get_equation_systems();
   RBConstruction& rb_system = es.get_system<RBConstruction>(RB_system_name);
-  
+
   for(unsigned int i=0; i<rb_system.n_dofs(); i++)
   {
     if( rb_system.get_dof_map().is_constrained_dof(i) )

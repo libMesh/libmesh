@@ -367,4 +367,3 @@ bool SolidSystem::side_time_derivative(bool request_jacobian,
 
   return request_jacobian;
 }
-

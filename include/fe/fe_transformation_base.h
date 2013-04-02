@@ -41,15 +41,15 @@ namespace libMesh
   class FETransformationBase
   {
   public:
-    
+
     FETransformationBase(){};
     virtual ~FETransformationBase(){};
-    
+
     /**
      * Builds an FETransformation object based on the finite element type
      */
     static AutoPtr<FETransformationBase<OutputShape> > build( const FEType& type );
-    
+
     /**
      * Evaluates shape functions in physical coordinates based on proper
      * finite element transformation.
@@ -57,9 +57,9 @@ namespace libMesh
     virtual void map_phi( const unsigned int dim,
 			  const Elem* const elem,
 			  const std::vector<Point>& qp,
-			  const FEGenericBase<OutputShape>& fe, 
+			  const FEGenericBase<OutputShape>& fe,
 			  std::vector<std::vector<OutputShape> >& phi ) const = 0;
- 
+
     /**
      * Evaluates shape function gradients in physical coordinates based on proper
      * finite element transformation.
@@ -70,7 +70,7 @@ namespace libMesh
 			   const FEGenericBase<OutputShape>& fe,
 			   std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >& dphi,
 			   std::vector<std::vector<OutputShape> >& dphidx,
-			   std::vector<std::vector<OutputShape> >& dphidy, 
+			   std::vector<std::vector<OutputShape> >& dphidy,
 			   std::vector<std::vector<OutputShape> >& dphidz  ) const = 0;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -84,10 +84,10 @@ namespace libMesh
 			    const FEGenericBase<OutputShape>& fe,
 			    std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >& d2phi,
 			    std::vector<std::vector<OutputShape> >& d2phidx2,
-			    std::vector<std::vector<OutputShape> >& d2phidxdy, 
+			    std::vector<std::vector<OutputShape> >& d2phidxdy,
 			    std::vector<std::vector<OutputShape> >& d2phidxdz,
 			    std::vector<std::vector<OutputShape> >& d2phidy2,
-			    std::vector<std::vector<OutputShape> >& d2phidydz, 
+			    std::vector<std::vector<OutputShape> >& d2phidydz,
 			    std::vector<std::vector<OutputShape> >& d2phidz2  ) const = 0;
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
@@ -113,7 +113,7 @@ namespace libMesh
 			  std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >& div_phi ) const = 0;
 
   }; // class FETransformationBase
-  
+
 }
 
 #endif // LIBMESH_FE_TRANSFORMATION_BASE_H

@@ -21,6 +21,3 @@
 // quadrature_jacobi_1D.C
 
 // for implementation.
-
-
-

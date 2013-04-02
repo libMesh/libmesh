@@ -73,7 +73,7 @@ int main (int argc, char** argv)
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  
+
   // Trilinos solver NaNs by default on the zero pressure block.
   // We'll skip this example for now.
   if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
@@ -85,7 +85,7 @@ int main (int argc, char** argv)
 
   // Create a mesh.
   Mesh mesh;
-  
+
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
   // to build a mesh of 8x8 \p Quad9 elements in 2D.  Building these
@@ -96,18 +96,18 @@ int main (int argc, char** argv)
                                        0., 1.,
                                        0., 1.,
                                        QUAD9);
-  
+
   // Print information about the mesh to the screen.
   mesh.print_info();
-  
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  
+
   // Declare the system and its variables.
   // Creates a transient system named "Navier-Stokes"
-  TransientLinearImplicitSystem & system = 
+  TransientLinearImplicitSystem & system =
     equation_systems.add_system<TransientLinearImplicitSystem> ("Navier-Stokes");
-  
+
   // Add the variables "u" & "v" to "Navier-Stokes".  They
   // will be approximated using second-order approximation.
   system.add_variable ("u", SECOND);
@@ -125,7 +125,7 @@ int main (int argc, char** argv)
   // Give the system a pointer to the matrix assembly
   // function.
   system.attach_assemble_function (assemble_stokes);
-  
+
   // Initialize the data structures for the equation system.
   equation_systems.init ();
 
@@ -134,7 +134,7 @@ int main (int argc, char** argv)
 
   // Create a performance-logging object for this example
   PerfLog perf_log("Systems Example 3");
-  
+
   // Get a reference to the Stokes system to use later.
   TransientLinearImplicitSystem&  navier_stokes_system =
         equation_systems.get_system<TransientLinearImplicitSystem>("Navier-Stokes");
@@ -153,7 +153,7 @@ int main (int argc, char** argv)
   // We also set a standard linear solver flag in the EquationSystems object
   // which controls the maxiumum number of linear solver iterations allowed.
   equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 250;
-  
+
   // Tell the system of equations what the timestep is by using
   // the set_parameter function.  The matrix assembly routine can
   // then reference this parameter.
@@ -172,7 +172,7 @@ int main (int argc, char** argv)
       navier_stokes_system.time += dt;
 
       // A pretty update message
-      std::cout << "\n\n*** Solving time step " << t_step << 
+      std::cout << "\n\n*** Solving time step " << t_step <<
                    ", time = " << navier_stokes_system.time <<
                    " ***" << std::endl;
 
@@ -192,7 +192,7 @@ int main (int argc, char** argv)
           // Update the nonlinear solution.
           last_nonlinear_soln->zero();
           last_nonlinear_soln->add(*navier_stokes_system.solution);
-          
+
           // Assemble & solve the linear system.
           perf_log.push("linear solve");
           equation_systems.get_system("Navier-Stokes").solve();
@@ -210,10 +210,10 @@ int main (int argc, char** argv)
 
           // How many iterations were required to solve the linear system?
           const unsigned int n_linear_iterations = navier_stokes_system.n_linear_iterations();
-          
+
           // What was the final residual of the linear system?
           const Real final_linear_residual = navier_stokes_system.final_linear_residual();
-          
+
           // Print out convergence information for the linear and
           // nonlinear iterations.
           std::cout << "Linear solver converged at step: "
@@ -235,7 +235,7 @@ int main (int argc, char** argv)
                         << std::endl;
               break;
             }
-          
+
           // Otherwise, decrease the linear system tolerance.  For the inexact Newton
           // method, the linear solver tolerance needs to decrease as we get closer to
           // the solution to ensure quadratic convergence.  The new linear solver tolerance
@@ -245,10 +245,10 @@ int main (int argc, char** argv)
             std::min(Utility::pow<2>(final_linear_residual), initial_linear_solver_tol);
 
         } // end nonlinear loop
-      
+
       // Write out every nth timestep to file.
       const unsigned int write_interval = 1;
-      
+
 #ifdef LIBMESH_HAVE_EXODUS_API
       if ((t_step+1)%write_interval == 0)
         {
@@ -261,14 +261,14 @@ int main (int argc, char** argv)
                     << std::right
                     << t_step + 1
                     << ".e";
-          
+
           ExodusII_IO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     } // end timestep loop.
-  
-  // All done.  
+
+  // All done.
   return 0;
 }
 
@@ -285,13 +285,13 @@ void assemble_stokes (EquationSystems& es,
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Navier-Stokes");
-  
+
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
-  
+
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // Get a reference to the Stokes system object.
   TransientLinearImplicitSystem & navier_stokes_system =
     es.get_system<TransientLinearImplicitSystem> ("Navier-Stokes");
@@ -301,22 +301,22 @@ void assemble_stokes (EquationSystems& es,
   const unsigned int v_var = navier_stokes_system.variable_number ("v");
   const unsigned int p_var = navier_stokes_system.variable_number ("p");
   const unsigned int alpha_var = navier_stokes_system.variable_number ("alpha");
-  
+
   // Get the Finite Element type for "u".  Note this will be
   // the same as the type for "v".
   FEType fe_vel_type = navier_stokes_system.variable_type(u_var);
-  
+
   // Get the Finite Element type for "p".
   FEType fe_pres_type = navier_stokes_system.variable_type(p_var);
 
   // Build a Finite Element object of the specified type for
   // the velocity variables.
   AutoPtr<FEBase> fe_vel  (FEBase::build(dim, fe_vel_type));
-    
+
   // Build a Finite Element object of the specified type for
   // the pressure variables.
   AutoPtr<FEBase> fe_pres (FEBase::build(dim, fe_pres_type));
-  
+
   // A Gauss quadrature rule for numerical integration.
   // Let the \p FEType object decide what order rule is appropriate.
   QGauss qrule (dim, fe_vel_type.default_quadrature_order());
@@ -324,11 +324,11 @@ void assemble_stokes (EquationSystems& es,
   // Tell the finite element objects to use our quadrature rule.
   fe_vel->attach_quadrature_rule (&qrule);
   fe_pres->attach_quadrature_rule (&qrule);
-  
+
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   //
-  // The element Jacobian * quadrature weight at each integration point.   
+  // The element Jacobian * quadrature weight at each integration point.
   const std::vector<Real>& JxW = fe_vel->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
@@ -344,7 +344,7 @@ void assemble_stokes (EquationSystems& es,
 
   // The value of the linear shape function gradients at the quadrature points
   // const std::vector<std::vector<RealGradient> >& dpsi = fe_pres->get_dphi();
-  
+
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
@@ -391,21 +391,21 @@ void assemble_stokes (EquationSystems& es,
   const Real dt    = es.parameters.get<Real>("dt");
   // const Real time  = es.parameters.get<Real>("time");
   const Real theta = 1.;
-    
+
   // Now we will loop over all the elements in the mesh that
   // live on the local processor. We will compute the element
   // matrix and right-hand-side contribution.  Since the mesh
   // will be refined we want to only consider the ACTIVE elements,
   // hence we use a variant of the \p active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
-  
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
   for ( ; el != end_el; ++el)
-    {    
+    {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
       const Elem* elem = *el;
-      
+
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
@@ -417,10 +417,10 @@ void assemble_stokes (EquationSystems& es,
       dof_map.dof_indices (elem, dof_indices_alpha, alpha_var);
 
       const unsigned int n_dofs   = dof_indices.size();
-      const unsigned int n_u_dofs = dof_indices_u.size(); 
-      const unsigned int n_v_dofs = dof_indices_v.size(); 
+      const unsigned int n_u_dofs = dof_indices_u.size();
+      const unsigned int n_v_dofs = dof_indices_v.size();
       const unsigned int n_p_dofs = dof_indices_p.size();
-      
+
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
       // quadrature points (q_point) and the shape functions
@@ -447,17 +447,17 @@ void assemble_stokes (EquationSystems& es,
       //
       // The \p DenseSubMatrix.repostition () member takes the
       // (row_offset, column_offset, row_size, column_size).
-      // 
+      //
       // Similarly, the \p DenseSubVector.reposition () member
       // takes the (row_offset, row_size)
       Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
       Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
       Kup.reposition (u_var*n_u_dofs, p_var*n_u_dofs, n_u_dofs, n_p_dofs);
-      
+
       Kvu.reposition (v_var*n_v_dofs, u_var*n_v_dofs, n_v_dofs, n_u_dofs);
       Kvv.reposition (v_var*n_v_dofs, v_var*n_v_dofs, n_v_dofs, n_v_dofs);
       Kvp.reposition (v_var*n_v_dofs, p_var*n_v_dofs, n_v_dofs, n_p_dofs);
-      
+
       Kpu.reposition (p_var*n_u_dofs, u_var*n_u_dofs, n_p_dofs, n_u_dofs);
       Kpv.reposition (p_var*n_u_dofs, v_var*n_u_dofs, n_p_dofs, n_v_dofs);
       Kpp.reposition (p_var*n_u_dofs, p_var*n_u_dofs, n_p_dofs, n_p_dofs);
@@ -485,7 +485,7 @@ void assemble_stokes (EquationSystems& es,
           Number   p_old = 0.;
           Gradient grad_u, grad_u_old;
           Gradient grad_v, grad_v_old;
-          
+
           // Compute the velocity & its gradient from the previous timestep
           // and the old Newton iterate.
           for (unsigned int l=0; l<n_u_dofs; l++)
@@ -497,7 +497,7 @@ void assemble_stokes (EquationSystems& es,
               grad_v_old.add_scaled (dphi[l][qp],navier_stokes_system.old_solution (dof_indices_v[l]));
 
               // From the previous Newton iterate:
-              u += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_u[l]); 
+              u += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_u[l]);
               v += phi[l][qp]*navier_stokes_system.current_solution (dof_indices_v[l]);
               grad_u.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_u[l]));
               grad_v.add_scaled (dphi[l][qp],navier_stokes_system.current_solution (dof_indices_v[l]));
@@ -517,25 +517,25 @@ void assemble_stokes (EquationSystems& es,
           const Number  u_y = grad_u(1);
           const Number  v_x = grad_v(0);
           const Number  v_y = grad_v(1);
-          
+
           // First, an i-loop over the velocity degrees of freedom.
           // We know that n_u_dofs == n_v_dofs so we can compute contributions
           // for both at the same time.
           for (unsigned int i=0; i<n_u_dofs; i++)
             {
-              Fu(i) += JxW[qp]*(u_old*phi[i][qp] -                            // mass-matrix term 
+              Fu(i) += JxW[qp]*(u_old*phi[i][qp] -                            // mass-matrix term
                                 (1.-theta)*dt*(U_old*grad_u_old)*phi[i][qp] + // convection term
                                 (1.-theta)*dt*p_old*dphi[i][qp](0)  -         // pressure term on rhs
                                 (1.-theta)*dt*(grad_u_old*dphi[i][qp]) +      // diffusion term on rhs
                                 theta*dt*(U*grad_u)*phi[i][qp]);              // Newton term
 
-                
+
               Fv(i) += JxW[qp]*(v_old*phi[i][qp] -                             // mass-matrix term
                                 (1.-theta)*dt*(U_old*grad_v_old)*phi[i][qp] +  // convection term
                                 (1.-theta)*dt*p_old*dphi[i][qp](1) -           // pressure term on rhs
                                 (1.-theta)*dt*(grad_v_old*dphi[i][qp]) +       // diffusion term on rhs
                                 theta*dt*(U*grad_v)*phi[i][qp]);               // Newton term
-            
+
 
               // Note that the Fp block is identically zero unless we are using
               // some kind of artificial compressibility scheme...
@@ -549,7 +549,7 @@ void assemble_stokes (EquationSystems& es,
                                        theta*dt*u_x*phi[i][qp]*phi[j][qp]);   // Newton term
 
                   Kuv(i,j) += JxW[qp]*theta*dt*u_y*phi[i][qp]*phi[j][qp];     // Newton term
-                  
+
                   Kvv(i,j) += JxW[qp]*(phi[i][qp]*phi[j][qp] +                // mass matrix term
                                        theta*dt*(dphi[i][qp]*dphi[j][qp]) +   // diffusion term
                                        theta*dt*(U*dphi[j][qp])*phi[i][qp] +  // convection term
@@ -582,7 +582,7 @@ void assemble_stokes (EquationSystems& es,
             }
         } // end of the quadrature point qp-loop
 
-      
+
       // At this point the interior element integration has
       // been completed.  However, we have not yet addressed
       // boundary conditions.  For this example we will only
@@ -594,7 +594,7 @@ void assemble_stokes (EquationSystems& es,
       {
         // The penalty value.  \f$ \frac{1}{\epsilon} \f$
         const Real penalty = 1.e10;
-                  
+
         // The following loops over the sides of the element.
         // If the element has no neighbor on a side then that
         // side MUST live on a boundary of the domain.
@@ -602,7 +602,7 @@ void assemble_stokes (EquationSystems& es,
           if (elem->neighbor(s) == NULL)
             {
               AutoPtr<Elem> side (elem->build_side(s));
-                            
+
               // Loop over the nodes on the side.
               for (unsigned int ns=0; ns<side->n_nodes(); ns++)
                 {
@@ -612,13 +612,13 @@ void assemble_stokes (EquationSystems& es,
                   // 1=right
                   // 2=top
                   // 3=left
-                   
+
                   // Set u = 1 on the top boundary, 0 everywhere else
                   const Real u_value = (mesh.boundary_info->has_boundary_id(elem,s,2)) ? 1. : 0.;
-                  
+
                   // Set v = 0 everywhere
                   const Real v_value = 0.;
-                  
+
                   // Find the node on the element matching this node on
                   // the side.  That defined where in the element matrix
                   // the boundary condition will be applied.
@@ -628,14 +628,14 @@ void assemble_stokes (EquationSystems& es,
                         // Matrix contribution.
                         Kuu(n,n) += penalty;
                         Kvv(n,n) += penalty;
-                                    
+
                         // Right-hand-side contribution.
                         Fu(n) += penalty*u_value;
                         Fv(n) += penalty*v_value;
                       }
-                } // end face node loop          
+                } // end face node loop
             } // end if (elem->neighbor(side) == NULL)
-      } // end boundary condition section          
+      } // end boundary condition section
 
       // If this assembly program were to be used on an adaptive mesh,
       // we would have to apply any hanging node constraint equations

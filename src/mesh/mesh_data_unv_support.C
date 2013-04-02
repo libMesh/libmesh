@@ -935,7 +935,3 @@ bool MeshDataUnvHeader::operator == (const MeshDataUnvHeader& omduh) const
 }
 
 } // namespace libMesh
-
-
-
-

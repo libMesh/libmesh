@@ -80,12 +80,12 @@ public:
    * Set the RBEvaluation object.
    */
   void set_rb_evaluation(RBEvaluation& rb_eval_in);
-  
+
   /**
    * Get a reference to the RBEvaluation object.
    */
   RBEvaluation& get_rb_evaluation();
-  
+
   /**
    * @return true if rb_eval is initialized. False, otherwise.
    */
@@ -457,7 +457,7 @@ public:
    * a Reduced Basis.
    */
   bool use_relative_bound_in_greedy;
-  
+
   /**
    * Boolean flag to indicate whether we exit the greedy if
    * we select the same parameters twice in a row. In some

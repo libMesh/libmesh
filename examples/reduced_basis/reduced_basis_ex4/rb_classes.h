@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -85,7 +85,7 @@ public:
 
     // Generate a DirichletBoundary object
     dirichlet_bc = build_zero_dirichlet_boundary_object();
-    
+
     // Set the Dirichet boundary IDs
     // and the Dirichlet boundary variable numbers
     dirichlet_bc->b.insert(0);
@@ -93,7 +93,7 @@ public:
     dirichlet_bc->b.insert(2);
     dirichlet_bc->b.insert(3);
     dirichlet_bc->variables.push_back(u_var);
-    
+
     // Attach dirichlet_bc (must do this _before_ Parent::init_data)
     get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
 
@@ -129,7 +129,7 @@ public:
    * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
    */
   EimTestRBThetaExpansion eim_test_rb_theta_expansion;
-  
+
   /**
    * The object that stores the "assembly" expansion of the parameter dependent PDE,
    * i.e. the objects that define how to assemble the set of parameter-independent

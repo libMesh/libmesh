@@ -112,10 +112,10 @@ template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
 {
   libmesh_assert(training_parameters_initialized);
-  
+
   if(training_parameters.empty())
     return 0;
-  
+
   return training_parameters.begin()->second->size();
 }
 
@@ -153,7 +153,7 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
 
   libmesh_assert( (this->get_first_local_training_index() <= index) &&
                   (index < this->get_last_local_training_index()) );
-  
+
   RBParameters params;
   std::map< std::string, NumericVector<Number>* >::const_iterator it     = training_parameters.begin();
   std::map< std::string, NumericVector<Number>* >::const_iterator it_end = training_parameters.end();
@@ -161,10 +161,10 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
   {
     std::string param_name = it->first;
     Real param_value = libmesh_real( ( *(it->second) )(index) );
-    
+
     params.set_value(param_name, param_value);
   }
-  
+
   return params;
 }
 
@@ -179,11 +179,11 @@ void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsign
   {
     // Set parameters on only one processor
     set_params_from_training_set(index);
-    
+
     // set root_id, only non-zero on one processor
     root_id = libMesh::processor_id();
   }
-  
+
   // broadcast
   CommWorld.max(root_id);
   broadcast_parameters(root_id);
@@ -200,7 +200,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
   libMesh::out << "Initializing training parameters with "
                << (deterministic ? "deterministic " : "random " )
                << "training set..." << std::endl;
-  
+
   std::map<std::string,bool>::iterator it           = log_param_scale.begin();
   std::map<std::string,bool>::const_iterator it_end = log_param_scale.end();
   for(; it != it_end; ++it)
@@ -302,7 +302,7 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
   {
     std::string param_name = it->first;
     NumericVector<Number>* training_vector = it->second;
-    
+
     numeric_index_type first_index = training_vector->first_local_index();
     for(numeric_index_type i=0; i<n_local_training_samples; i++)
     {
@@ -386,7 +386,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(std::map<std:
     {
       std::string param_name = it->first;
       training_parameters_in[param_name] = NumericVector<Number>::build().release();
-      
+
       if(!serial_training_set)
       {
         // Calculate the number of training parameters local to this processor
@@ -518,7 +518,7 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
     {
       std::string param_name = it->first;
       training_parameters_in[param_name] = NumericVector<Number>::build().release();
-      
+
       if(!serial_training_set)
       {
         // Calculate the number of training parameters local to this processor
@@ -549,16 +549,16 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
     {
       std::string param_name = it->first;
       NumericVector<Number>* training_vector = it->second;
-      
+
       if(param_name == deterministic_training_parameter_name)
       {
         found_deterministic_parameter = true;
-        
+
         // Copy code from deterministic training
         bool use_log_scaling = log_param_scale[param_name];
         Real min_param = min_parameters.get_value(param_name);
         Real max_param = max_parameters.get_value(param_name);
-    
+
         numeric_index_type first_index = training_vector->first_local_index();
         for(numeric_index_type i=0; i<training_vector->local_size(); i++)
         {
@@ -590,7 +590,7 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
             training_vector->set(index, (index % n_deterministic_training_samples_in)*step_size + min_param);
           }
         }
-        
+
       }
       else // Otherwise, generate random parameters
       {
@@ -619,7 +619,7 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
 
     }
   }
-  
+
   if(!found_deterministic_parameter)
   {
     libMesh::out << "Error: The deterministic parameter " << deterministic_training_parameter_name
@@ -673,7 +673,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::m
     {
       std::string param_name = it->first;
       training_parameters_in[param_name] = NumericVector<Number>::build().release();
-      
+
       if(!serial_training_set)
       {
         // Calculate the number of training parameters local to this processor
@@ -700,7 +700,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::m
     bool use_log_scaling = log_param_scale.begin()->second;
     Real min_param = min_parameters.begin()->second;
     Real max_param = max_parameters.begin()->second;
-    
+
     numeric_index_type first_index = training_vector->first_local_index();
     for(numeric_index_type i=0; i<training_vector->local_size(); i++)
     {
@@ -799,7 +799,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::m
 
     // now load into training_samples_in:
     std::map<std::string, NumericVector<Number>*>::iterator new_it = training_parameters_in.begin();
-    
+
     NumericVector<Number>* training_vector_0 = new_it->second;
     new_it++;
     NumericVector<Number>* training_vector_1 = new_it->second;
@@ -969,21 +969,21 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
 
   // create a copy of the current parameters
   RBParameters current_parameters = get_parameters();
-  
+
   // copy current_parameters to current_parameters_vector in order to broadcast
   std::vector<Real> current_parameters_vector;
-  
+
   RBParameters::const_iterator it           = current_parameters.begin();
   RBParameters::const_iterator it_end = current_parameters.end();
-  
+
   for( ; it != it_end; ++it)
   {
     current_parameters_vector.push_back(it->second);
   }
-  
+
   // do the broadcast
   CommWorld.broadcast(current_parameters_vector, proc_id);
-  
+
   // update the copy of the RBParameters object
   it = current_parameters.begin();
   unsigned int count = 0;
@@ -993,7 +993,7 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
     current_parameters.set_value(param_name, current_parameters_vector[count]);
     count++;
   }
-  
+
   // set the parameters globally
   set_parameters(current_parameters);
 }

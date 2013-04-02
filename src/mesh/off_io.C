@@ -115,7 +115,7 @@ void OFFIO::read_stream(std::istream& in)
         case 3: elem = new Tri3 ; break;
         default: libmesh_error();
       }
-      
+
       elem->set_id(e);
       the_mesh.add_elem (elem);
 

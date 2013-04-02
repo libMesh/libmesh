@@ -57,7 +57,7 @@ struct AcousticsInnerProduct : ElemAssembly
 
     const std::vector<std::vector<Real> >& phi =
       c.element_fe_var[p_var]->get_phi();
-      
+
     const std::vector<std::vector<RealGradient> >& dphi =
       c.element_fe_var[p_var]->get_dphi();
 
@@ -71,7 +71,7 @@ struct AcousticsInnerProduct : ElemAssembly
       for (unsigned int i=0; i != n_p_dofs; i++)
         for (unsigned int j=0; j != n_p_dofs; j++)
           c.elem_jacobian(i,j) += JxW[qp] * (dphi[j][qp](0)*libmesh_conj(dphi[i][qp](0)) +
-                                             dphi[j][qp](1)*libmesh_conj(dphi[i][qp](1)) + 
+                                             dphi[j][qp](1)*libmesh_conj(dphi[i][qp](1)) +
                                              (phi[j][qp]*libmesh_conj(phi[i][qp])) );
   }
 };
@@ -156,7 +156,7 @@ struct A2 : ElemAssembly
             c.elem_jacobian(i,j) += JxW_face[qp] * phi_face[j][qp] * libmesh_conj(phi_face[i][qp]);
     }
   }
-  
+
   MeshBase* mesh;
 };
 
@@ -186,7 +186,7 @@ struct A3 : ElemAssembly
             c.elem_jacobian(i,j) += JxW_face[qp] * phi_face[j][qp] * libmesh_conj(phi_face[i][qp]);
     }
   }
-  
+
   MeshBase* mesh;
 };
 
@@ -215,7 +215,7 @@ struct F0 : ElemAssembly
             c.elem_residual(i) += JxW_face[qp] * libmesh_conj(phi_face[i][qp]);
     }
   }
-  
+
   MeshBase* mesh;
 };
 
@@ -244,7 +244,7 @@ struct Output0 : ElemAssembly
             c.elem_residual(i) += JxW_face[qp] * libmesh_conj(phi_face[i][qp]);
     }
   }
-  
+
   MeshBase* mesh;
 };
 
@@ -263,7 +263,7 @@ struct AcousticsRBThetaExpansion : RBThetaExpansion
     attach_A_theta(&theta_a_3);
 
     attach_F_theta(&theta_f_0);    // Attach the rhs theta
-    
+
     attach_output_theta(&theta_output_0);
   }
 
@@ -289,15 +289,15 @@ struct AcousticsRBAssemblyExpansion : RBAssemblyExpansion
     A3_assembly.mesh = &mesh_in;
     F0_assembly.mesh = &mesh_in;
     Output0_assembly.mesh = &mesh_in;
-    
+
     // And set up the RBAssemblyExpansion object
     attach_A_assembly(&A0_assembly); // Attach the lhs assembly
     attach_A_assembly(&A1_assembly);
     attach_A_assembly(&A2_assembly);
     attach_A_assembly(&A3_assembly);
-    
+
     attach_F_assembly(&F0_assembly); // Attach the rhs assembly
-    
+
     attach_output_assembly(&Output0_assembly);
   }
 

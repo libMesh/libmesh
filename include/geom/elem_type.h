@@ -68,7 +68,3 @@ namespace ElementTypes
 } // namespace libMesh
 
 #endif // LIBMESH_ELEM_TYPE_H
-
-
-
-

@@ -569,7 +569,7 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const Elem* inf_elem)
       dphidzeta.resize     (n_total_approx_shape_functions);
 
 
-    
+
     std::vector<std::vector<Real> >& phi_map = this->_fe_map->get_phi_map();
     std::vector<std::vector<Real> >& dphidxi_map = this->_fe_map->get_dphidxi_map();
 
@@ -940,11 +940,11 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem*, const std::
 	const std::vector<Real>& dxidx_map = this->_fe_map->get_dxidx();
 	const std::vector<Real>& dxidy_map = this->_fe_map->get_dxidy();
 	const std::vector<Real>& dxidz_map = this->_fe_map->get_dxidz();
-	
+
 	const std::vector<Real>& detadx_map = this->_fe_map->get_detadx();
 	const std::vector<Real>& detady_map = this->_fe_map->get_detady();
 	const std::vector<Real>& detadz_map = this->_fe_map->get_detadz();
-	
+
 	const std::vector<Real>& dzetadx_map = this->_fe_map->get_dzetadx();
 	const std::vector<Real>& dzetady_map = this->_fe_map->get_dzetady();
 	const std::vector<Real>& dzetadz_map = this->_fe_map->get_dzetadz();
@@ -1037,4 +1037,3 @@ bool InfFE<Dim,T_radial,T_map>::shapes_need_reinit() const
 
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-

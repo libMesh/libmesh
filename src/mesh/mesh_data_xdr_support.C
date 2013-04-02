@@ -495,5 +495,3 @@ better_you_choke_this...
 }
 
 } // namespace libMesh
-
-

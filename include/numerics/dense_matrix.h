@@ -68,7 +68,7 @@ public:
    */
   virtual ~DenseMatrix() {}
 
-   
+
   /**
    * Set every element in the matrix to 0.
    */
@@ -152,7 +152,7 @@ public:
    */
   template <typename T2>
   DenseMatrix<T>& operator = (const DenseMatrix<T2>& other_matrix);
- 
+
   /**
    * STL-like swap method
    */
@@ -170,7 +170,7 @@ public:
    */
   void scale (const T factor);
 
-    
+
     /**
      * Multiplies every element in the column \p col matrix by \p factor.
      */
@@ -617,7 +617,7 @@ DenseMatrix<T>::operator=(const DenseMatrix<T2>& mat)
   return *this;
 }
 
-    
+
 
 template<typename T>
 inline
@@ -708,7 +708,7 @@ void DenseMatrix<T>::scale (const T factor)
     _val[i] *= factor;
 }
 
-    
+
 template<typename T>
 inline
 void DenseMatrix<T>::scale_column (const unsigned int col, const T factor)
@@ -739,7 +739,7 @@ DenseMatrix<T>::add (const T2 factor,
 {
     libmesh_assert_equal_to (this->m(), mat.m());
     libmesh_assert_equal_to (this->n(), mat.n());
-    
+
     for (unsigned int i=0; i<this->m(); i++)
         for (unsigned int j=0; j<this->n(); j++)
             (*this)(i,j) += factor * mat(i,j);
@@ -943,4 +943,3 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 
 
 #endif // LIBMESH_DENSE_MATRIX_H
-

@@ -41,7 +41,7 @@ AutoPtr<FEMap> FEMap::build( FEType fe_type )
       {
 	AutoPtr<FEMap> ap( new FEXYZMap );
 	return ap;
-      } 
+      }
     default:
       {
 	AutoPtr<FEMap> ap( new FEMap );
@@ -74,7 +74,7 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
   const unsigned int n_mapping_shape_functions =
     FE<Dim,LAGRANGE>::n_shape_functions (mapping_elem_type,
 					 mapping_order);
-  
+
   this->phi_map.resize         (n_mapping_shape_functions);
   if (Dim > 0)
     {
@@ -292,10 +292,10 @@ void FEMap::init_reference_to_physical_map( const std::vector<Point>& qp,
                 this->d2phidzeta2_map[i][p] = FE<Dim,LAGRANGE>::shape_second_deriv (mapping_elem_type, mapping_order, i, 5, qp[p]);
 #endif // ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 	      }
-	
+
 	break;
       }
-      
+
     default:
       libmesh_error();
     }

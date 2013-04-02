@@ -643,10 +643,3 @@ template class TreeNode<4>;
 template class TreeNode<8>;
 
 } // namespace libMesh
-
-
-
-
-
-
-

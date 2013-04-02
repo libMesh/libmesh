@@ -650,7 +650,7 @@ namespace Parallel
     template <typename T>
     void maxloc(T &r,
                 unsigned int &max_id) const;
-  
+
     /**
      * Take a vector of local variables and replace each entry with the maximum
      * of it's values on all processors.  Set each \p min_id entry to
@@ -808,7 +808,7 @@ namespace Parallel
      * objects whose contents match the objects pointed to by the
      * sender.
      *
-     * The objects will be of type 
+     * The objects will be of type
      * T = iterator_traits<OutputIter>::value_type.
      *
      * Using std::back_inserter as the output iterator allows receive to
@@ -840,7 +840,7 @@ namespace Parallel
      * objects whose contents match the objects pointed to by the
      * sender.
      *
-     * The objects will be of type 
+     * The objects will be of type
      * T = iterator_traits<OutputIter>::value_type.
      *
      * Using std::back_inserter as the output iterator allows receive to
@@ -886,12 +886,12 @@ namespace Parallel
      * new objects at each receiver whose contents match the objects
      * pointed to by the sender.
      *
-     * The objects being sent will be of type 
+     * The objects being sent will be of type
      * T1 = iterator_traits<RangeIter>::value_type, and the objects
      * being received will be of type
      * T2 = iterator_traits<OutputIter>::value_type
      *
-     * void Parallel::pack(const T1*, vector<int>& data, const Context1*) 
+     * void Parallel::pack(const T1*, vector<int>& data, const Context1*)
      * is used to serialize type T1 onto the end of a data vector.
      *
      * Using std::back_inserter as the output iterator allows
@@ -1085,7 +1085,7 @@ namespace Parallel
   // output containers
   template <typename Container, typename OutputIter>
   struct PostWaitCopyBuffer : public PostWaitWork {
-    PostWaitCopyBuffer(const Container& buffer, const OutputIter out) 
+    PostWaitCopyBuffer(const Container& buffer, const OutputIter out)
       : _buf(buffer), _out(out) {}
 
     virtual void run() { std::copy(_buf.begin(), _buf.end(), _out); }

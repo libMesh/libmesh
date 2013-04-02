@@ -61,8 +61,8 @@ namespace libMesh {
     PeriodicBoundary(const RealVectorValue& vector);
 
     /**
-     * This function should be overloaded by derived classes to 
-     * define how one finds corresponding nodes on the periodic 
+     * This function should be overloaded by derived classes to
+     * define how one finds corresponding nodes on the periodic
      * boundary pair.
      */
     virtual Point get_corresponding_pos(const Point& pt) const;

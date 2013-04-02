@@ -731,27 +731,27 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
 
   // The writing mode: ENCODE for binary, WRITE for ASCII
   XdrMODE mode = write_binary_data ? ENCODE : WRITE;
-  
+
   // The suffix to use for all the files that are written out
   const std::string suffix = write_binary_data ? ".xdr" : ".dat";
 
   if(libMesh::processor_id() == 0)
   {
     std::ostringstream file_name;
-    
+
     // Write out the temporal discretization data
     file_name.str("");
     file_name << directory_name << "/temporal_discretization_data" << suffix;
     Xdr temporal_discretization_data_out(file_name.str(), mode);
-    
+
     Real real_value; unsigned int int_value;
     real_value = get_delta_t(); temporal_discretization_data_out << real_value;
     real_value = get_euler_theta(); temporal_discretization_data_out << real_value;
     int_value = get_n_time_steps(); temporal_discretization_data_out << int_value;
     int_value = get_time_step(); temporal_discretization_data_out << int_value;
     temporal_discretization_data_out.close();
-    
-    
+
+
     // Write out the L2 matrix
     file_name.str("");
     file_name << directory_name << "/RB_L2_matrix" << suffix;
@@ -813,7 +813,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
     file_name.str("");
     file_name << directory_name << "/Fq_Mq_terms" << suffix;
     Xdr RB_Fq_Mq_terms_out(file_name.str(), mode);
-    
+
     for(unsigned int q_f=0; q_f<Q_f; q_f++)
     {
       for(unsigned int q_m=0; q_m<Q_m; q_m++)
@@ -830,7 +830,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
     file_name.str("");
     file_name << directory_name << "/Mq_Mq_terms" << suffix;
     Xdr RB_Mq_Mq_terms_out(file_name.str(), mode);
-      
+
     unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
     for(unsigned int q=0; q<Q_m_hat; q++)
     {
@@ -848,7 +848,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
     file_name.str("");
     file_name << directory_name << "/Aq_Mq_terms" << suffix;
     Xdr RB_Aq_Mq_terms_out(file_name.str(), mode);
-    
+
     for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
       for(unsigned int q_m=0; q_m<Q_m; q_m++)
@@ -885,32 +885,32 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   // First, find out how many basis functions we had when Greedy terminated
   // This was set in RBSystem::read_offline_data_from_files
   unsigned int n_bfs = this->get_n_basis_functions();
-  
+
   // The reading mode: DECODE for binary, READ for ASCII
   XdrMODE mode = read_binary_data ? DECODE : READ;
-  
+
   // The suffix to use for all the files that are written out
   const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
   // The string stream we'll use to make the file names
   std::ostringstream file_name;
-  
+
   // Write out the temporal discretization data
   file_name.str("");
   file_name << directory_name << "/temporal_discretization_data" << suffix;
   Xdr temporal_discretization_data_in(file_name.str(), mode);
-  
+
   Real real_value; unsigned int int_value;
   temporal_discretization_data_in >> real_value; set_delta_t(real_value);
   temporal_discretization_data_in >> real_value; set_euler_theta(real_value);
   temporal_discretization_data_in >> int_value; set_n_time_steps(int_value);
   temporal_discretization_data_in >> int_value; set_time_step(int_value);
   temporal_discretization_data_in.close();
-  
+
   file_name.str("");
   file_name << directory_name << "/RB_L2_matrix" << suffix;
   Xdr RB_L2_matrix_in(file_name.str(), mode);
-  
+
   for(unsigned int i=0; i<n_bfs; i++)
   {
     for(unsigned int j=0; j<n_bfs; j++)
@@ -954,7 +954,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
   file_name.str("");
   file_name << directory_name << "/initial_conditions" << suffix;
   Xdr initial_conditions_in(file_name.str(), mode);
-  
+
   file_name.str("");
   file_name << directory_name << "/initial_L2_error" << suffix;
   Xdr initial_L2_error_in(file_name.str(), mode);
@@ -977,7 +977,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
     file_name.str("");
     file_name << directory_name << "/Fq_Mq_terms" << suffix;
     Xdr RB_Fq_Mq_terms_in(file_name.str(), mode);
-    
+
     for(unsigned int q_f=0; q_f<Q_f; q_f++)
     {
       for(unsigned int q_m=0; q_m<Q_m; q_m++)
@@ -994,7 +994,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
     file_name.str("");
     file_name << directory_name << "/Mq_Mq_terms" << suffix;
     Xdr RB_Mq_Mq_terms_in(file_name.str(), mode);
-    
+
     unsigned int Q_m_hat = Q_m*(Q_m+1)/2;
     for(unsigned int q=0; q<Q_m_hat; q++)
     {
@@ -1012,7 +1012,7 @@ void TransientRBEvaluation::read_offline_data_from_files(const std::string& dire
     file_name.str("");
     file_name << directory_name << "/Aq_Mq_terms" << suffix;
     Xdr RB_Aq_Mq_terms_in(file_name.str(), mode);
-    
+
     for(unsigned int q_a=0; q_a<Q_a; q_a++)
     {
       for(unsigned int q_m=0; q_m<Q_m; q_m++)

@@ -109,4 +109,3 @@ protected:
 } // namespace libMesh
 
 #endif // LIBMESH_DISCONTINUITY_MEASURE_H
-

@@ -35,12 +35,12 @@ DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int>& elements, const Teuchos::Ar
   for(unsigned int i=0; i<num_values; i++)
   {
     Elem * elem = mesh.elem(elements[i]);
-    
+
     Point p;
 
     for(unsigned int j=0; j<dim; j++)
       p(j) = coords[(j*num_values)+i];
-    
+
     const Point mapped_point(FEInterface::inverse_map(dim, dof_map.variable_type(0), elem, p));
 
     FEComputeData data (es, mapped_point);
@@ -53,7 +53,7 @@ DTKEvaluator::evaluate(const Teuchos::ArrayRCP<int>& elements, const Teuchos::Ar
 
     for (unsigned int j=0; j<dof_indices.size(); j++)
       value += current_local_solution(dof_indices[j]) * data.shape[j];
-    
+
     values[i] = value;
   }
 

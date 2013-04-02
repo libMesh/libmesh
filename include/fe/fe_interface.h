@@ -336,19 +336,19 @@ public:
 
   /**
    * Returns the number of components of a vector-valued element.
-   * Scalar-valued elements return 1. 
+   * Scalar-valued elements return 1.
    */
   static FEFieldType field_type( const FEType& fe_type );
 
   /**
    * Returns the number of components of a vector-valued element.
-   * Scalar-valued elements return 1. 
+   * Scalar-valued elements return 1.
    */
   static FEFieldType field_type( const FEFamily& fe_family );
 
   /**
    * Returns the number of components of a vector-valued element.
-   * Scalar-valued elements return 1. 
+   * Scalar-valued elements return 1.
    */
   static unsigned int n_vec_dim( const MeshBase& mesh, const FEType& fe_type );
 

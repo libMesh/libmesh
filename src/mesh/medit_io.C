@@ -216,7 +216,3 @@ void MEDITIO::write_ascii (const std::string& fname,
 }
 
 } // namespace libMesh
-
-
-
-

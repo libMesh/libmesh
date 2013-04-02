@@ -56,7 +56,7 @@ int main (int argc, char** argv)
 
   // Create a mesh.
   Mesh mesh;
-  
+
   // Use the MeshTools::Generation mesh generator to create a uniform
   // grid on the square [-1,1]^D.  We instruct the mesh generator
   // to build a mesh of 8x8 \p Quad9 elements in 2D, or \p Hex27
@@ -78,7 +78,7 @@ int main (int argc, char** argv)
   EquationSystems equation_systems (mesh);
 
   // Declare the system "Navier-Stokes" and its variables.
-  LaplaceSystem & system = 
+  LaplaceSystem & system =
     equation_systems.add_system<LaplaceSystem> ("Laplace");
 
   // This example only implements the steady-state problem
@@ -100,7 +100,7 @@ int main (int argc, char** argv)
     infile("relative_residual_tolerance", 0.0);
   solver.absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
-    
+
   // And the linear solver options
   solver.max_linear_iterations =
     infile("max_linear_iterations", 50000);
@@ -113,7 +113,7 @@ int main (int argc, char** argv)
   system.solve();
 
   ExactSolution exact_sol( equation_systems );
-  
+
   std::vector<FunctionBase<Number>* > sols;
   std::vector<FunctionBase<Gradient>* > grads;
 
@@ -122,14 +122,14 @@ int main (int argc, char** argv)
 
   exact_sol.attach_exact_values(sols);
   exact_sol.attach_exact_derivs(grads);
-  
+
   // Use higher quadrature order for more accurate error results
   int extra_error_quadrature = infile("extra_error_quadrature",2);
   exact_sol.extra_quadrature_order(extra_error_quadrature);
 
   // Compute the error.
   exact_sol.compute_error("Laplace", "u");
-  
+
   // Print out the error values
   std::cout << "L2-Error is: "
 	    << exact_sol.l2_error("Laplace", "u")
@@ -137,16 +137,16 @@ int main (int argc, char** argv)
   std::cout << "H1-Error is: "
 	    << exact_sol.h1_error("Laplace", "u")
 	    << std::endl;
-  
+
 #ifdef LIBMESH_HAVE_EXODUS_API
-  
+
   // We write the file in the ExodusII format.
   ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
-  
+
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   UCDIO(mesh).write_equation_systems("out.inp", equation_systems);
 
-  // All done.  
+  // All done.
   return 0;
 }

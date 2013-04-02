@@ -22,21 +22,21 @@
  // This example shows how to use the NonlinearImplicitSystem class
  // to efficiently solve nonlinear problems in parallel.
  //
- // In nonlinear systems, we aim at finding x that satisfy R(x) = 0. 
- // In nonlinear finite element analysis, the residual is typically 
- // of the form R(x) = K(x)*x - f, with K(x) the system matrix and f 
- // the "right-hand-side". The NonlinearImplicitSystem class expects  
- // two callback functions to compute the residual R and its Jacobian 
- // for the Newton iterations. Here, we just approximate 
+ // In nonlinear systems, we aim at finding x that satisfy R(x) = 0.
+ // In nonlinear finite element analysis, the residual is typically
+ // of the form R(x) = K(x)*x - f, with K(x) the system matrix and f
+ // the "right-hand-side". The NonlinearImplicitSystem class expects
+ // two callback functions to compute the residual R and its Jacobian
+ // for the Newton iterations. Here, we just approximate
  // the true Jacobian by K(x).
  //
  // You can turn on preconditining of the matrix free system using the
  // jacobian by passing "-pre" on the command line.  Currently this only
  // work with Petsc so this isn't used by using "make run"
  //
- // This example also runs with the experimental Trilinos NOX solvers by specifying 
+ // This example also runs with the experimental Trilinos NOX solvers by specifying
  // the --use-trilinos command line argument.
- 
+
 
 // C++ include files that we need
 #include <iostream>
@@ -95,9 +95,9 @@ void compute_jacobian (const NumericVector<Number>& soln,
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the NonlinearImplicitSystem we are solving
-  NonlinearImplicitSystem& system = 
+  NonlinearImplicitSystem& system =
     es.get_system<NonlinearImplicitSystem>("Laplace-Young");
-  
+
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
@@ -113,7 +113,7 @@ void compute_jacobian (const NumericVector<Number>& soln,
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  
+
   // A 5th order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, FIFTH);
 
@@ -123,12 +123,12 @@ void compute_jacobian (const NumericVector<Number>& soln,
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
-  // integration point.   
+  // integration point.
   const std::vector<Real>& JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  
+
   // The element shape function gradients evaluated at the quadrature
   // points.
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
@@ -175,7 +175,7 @@ void compute_jacobian (const NumericVector<Number>& soln,
       // triangle, now we are on a quadrilateral).
       Ke.resize (dof_indices.size(),
                  dof_indices.size());
-           
+
       // Now we will build the element Jacobian.  This involves
       // a double loop to integrate the test funcions (i) against
       // the trial functions (j). Note that the Jacobian depends
@@ -185,12 +185,12 @@ void compute_jacobian (const NumericVector<Number>& soln,
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           Gradient grad_u;
-    
+
           for (unsigned int i=0; i<phi.size(); i++)
             grad_u += dphi[i][qp]*soln(dof_indices[i]);
-          
+
           const Number K = 1./std::sqrt(1. + grad_u*grad_u);
-          
+
           for (unsigned int i=0; i<phi.size(); i++)
             for (unsigned int j=0; j<phi.size(); j++)
               Ke(i,j) += JxW[qp]*(
@@ -198,9 +198,9 @@ void compute_jacobian (const NumericVector<Number>& soln,
                                   kappa*phi[i][qp]*phi[j][qp]
                                   );
         }
-      
+
       dof_map.constrain_element_matrix (Ke, dof_indices);
-      
+
       // Add the element matrix to the system Jacobian.
       jacobian.add_matrix (Ke, dof_indices);
     }
@@ -225,9 +225,9 @@ void compute_residual (const NumericVector<Number>& soln,
   libmesh_assert_equal_to (dim, 2);
 
   // Get a reference to the NonlinearImplicitSystem we are solving
-  NonlinearImplicitSystem& system = 
+  NonlinearImplicitSystem& system =
     es.get_system<NonlinearImplicitSystem>("Laplace-Young");
-  
+
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
@@ -243,7 +243,7 @@ void compute_residual (const NumericVector<Number>& soln,
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  
+
   // A 5th order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, FIFTH);
 
@@ -253,12 +253,12 @@ void compute_residual (const NumericVector<Number>& soln,
   // Declare a special finite element object for
   // boundary integration.
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-              
+
   // Boundary integration requires one quadraure rule,
   // with dimensionality one less than the dimensionality
   // of the element.
   QGauss qface(dim-1, FIFTH);
-  
+
   // Tell the finte element object to use our
   // quadrature rule.
   fe_face->attach_quadrature_rule (&qface);
@@ -266,12 +266,12 @@ void compute_residual (const NumericVector<Number>& soln,
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
-  // integration point.   
+  // integration point.
   const std::vector<Real>& JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
-  
+
   // The element shape function gradients evaluated at the quadrature
   // points.
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
@@ -316,11 +316,11 @@ void compute_residual (const NumericVector<Number>& soln,
       // element type is different (i.e. the last element was a
       // triangle, now we are on a quadrilateral).
       Re.resize (dof_indices.size());
-      
+
       // Now we will build the residual. This involves
       // the construction of the matrix K and multiplication of it
-      // with the current solution x. We rearrange this into two loops: 
-      // In the first, we calculate only the contribution of  
+      // with the current solution x. We rearrange this into two loops:
+      // In the first, we calculate only the contribution of
       // K_ij*x_j which is independent of the row i. In the second loops,
       // we multiply with the row-dependent part and add it to the element
       // residual.
@@ -329,15 +329,15 @@ void compute_residual (const NumericVector<Number>& soln,
         {
           Number u = 0;
           Gradient grad_u;
-          
+
           for (unsigned int j=0; j<phi.size(); j++)
             {
               u      += phi[j][qp]*soln(dof_indices[j]);
               grad_u += dphi[j][qp]*soln(dof_indices[j]);
             }
-          
+
           const Number K = 1./std::sqrt(1. + grad_u*grad_u);
-          
+
           for (unsigned int i=0; i<phi.size(); i++)
             Re(i) += JxW[qp]*(
                               K*(dphi[i][qp]*grad_u) +
@@ -348,7 +348,7 @@ void compute_residual (const NumericVector<Number>& soln,
       // At this point the interior element integration has
       // been completed.  However, we have not yet addressed
       // boundary conditions.
-      
+
       // The following loops over the sides of the element.
       // If the element has no neighbor on a side then that
       // side MUST live on a boundary of the domain.
@@ -373,14 +373,14 @@ void compute_residual (const NumericVector<Number>& soln,
                 // which has to be subtracted from the current residual
                 for (unsigned int i=0; i<phi_face.size(); i++)
                   Re(i) -= JxW_face[qp]*sigma*phi_face[i][qp];
-              } 
+              }
           }
-      
+
       dof_map.constrain_element_vector (Re, dof_indices);
       residual.add_vector (Re, dof_indices);
     }
 
-  // That's it.  
+  // That's it.
 }
 
 
@@ -410,7 +410,7 @@ int main (int argc, char** argv)
 
   // Create a GetPot object to parse the command line
   GetPot command_line (argc, argv);
-  
+
   // Check for proper calling arguments.
   if (argc < 3)
     {
@@ -423,35 +423,35 @@ int main (int argc, char** argv)
       // and then abort.
       libmesh_error();
     }
-  
+
   // Brief message to the user regarding the program name
   // and command line arguments.
-  else 
+  else
     {
       std::cout << "Running " << argv[0];
-      
+
       for (int i=1; i<argc; i++)
         std::cout << " " << argv[i];
-      
+
       std::cout << std::endl << std::endl;
     }
-  
 
-  // Read number of refinements 
+
+  // Read number of refinements
   int nr = 2;
   if ( command_line.search(1, "-r") )
     nr = command_line.next(nr);
-  
+
   // Read FE order from command line
-  std::string order = "FIRST"; 
+  std::string order = "FIRST";
   if ( command_line.search(2, "-Order", "-o") )
     order = command_line.next(order);
 
   // Read FE Family from command line
-  std::string family = "LAGRANGE"; 
+  std::string family = "LAGRANGE";
   if ( command_line.search(2, "-FEFamily", "-f") )
     family = command_line.next(family);
-  
+
   // Cannot use dicontinuous basis.
   if ((family == "MONOMIAL") || (family == "XYZ"))
     {
@@ -470,13 +470,13 @@ int main (int argc, char** argv)
       //returning zero so that "make run" won't fail if we ever enable this capability there.
       return 0;
 #endif //LIBMESH_HAVE_PETSC
-    }  
-    
+    }
+
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  
+
   // Create a mesh from file.
-  Mesh mesh;    
+  Mesh mesh;
   mesh.read ("lshaped.xda");
 
   if (order != "FIRST")
@@ -485,32 +485,32 @@ int main (int argc, char** argv)
   MeshRefinement(mesh).uniformly_refine(nr);
 
   // Print information about the mesh to the screen.
-  mesh.print_info();    
-  
+  mesh.print_info();
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
   _equation_system = &equation_systems;
-  
+
   // Declare the system and its variables.
-  
+
   // Creates a system named "Laplace-Young"
   NonlinearImplicitSystem& system =
     equation_systems.add_system<NonlinearImplicitSystem> ("Laplace-Young");
 
 
-  // Here we specify the tolerance for the nonlinear solver and 
-  // the maximum of nonlinear iterations. 
+  // Here we specify the tolerance for the nonlinear solver and
+  // the maximum of nonlinear iterations.
   equation_systems.parameters.set<Real>         ("nonlinear solver tolerance")          = 1.e-12;
   equation_systems.parameters.set<unsigned int> ("nonlinear solver maximum iterations") = 50;
 
-    
+
   // Adds the variable "u" to "Laplace-Young".  "u"
   // will be approximated using second-order approximation.
   system.add_variable("u",
 		      Utility::string_to_enum<Order>   (order),
 		      Utility::string_to_enum<FEFamily>(family));
 
-  // Give the system a pointer to the functions that update 
+  // Give the system a pointer to the functions that update
   // the residual and Jacobian.
   system.nonlinear_solver->residual = compute_residual;
   system.nonlinear_solver->jacobian = compute_jacobian;
@@ -520,7 +520,7 @@ int main (int argc, char** argv)
 
   // Prints information about the system to the screen.
   equation_systems.print_info();
-  
+
   // Solve the system "Laplace-Young", print the number of iterations
   // and final residual
   equation_systems.get_system("Laplace-Young").solve();
@@ -536,11 +536,11 @@ int main (int argc, char** argv)
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // After solving the system write the solution
-  ExodusII_IO (mesh).write_equation_systems ("out.e", 
+  ExodusII_IO (mesh).write_equation_systems ("out.e",
                                        equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 #endif // #ifndef LIBMESH_ENABLE_AMR
 
-  // All done. 
-  return 0; 
+  // All done.
+  return 0;
 }

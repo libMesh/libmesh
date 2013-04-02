@@ -16,7 +16,7 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
  // <h1>Introduction Example 1 - Creation of a Mesh Object</h1>
- // 
+ //
  // This is the first example program.  It simply demonstrates
  // how to create a mesh object.  A mesh is read from file,
  // information is printed to the screen, and the mesh is then
@@ -51,28 +51,28 @@ int main (int argc, char** argv)
       if (libMesh::processor_id() == 0)
         std::cerr << "Usage: " << argv[0] << " -d 2 in.mesh [-o out.mesh]"
                   << std::endl;
-      
+
       // This handy function will print the file name, line number,
       // and then abort.  Currently the library does not use C++
       // exception handling.
       libmesh_error();
     }
-  
+
   // Get the dimensionality of the mesh from argv[2]
   const unsigned int dim = std::atoi(argv[2]);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
-  
+
   // Create a mesh
   Mesh mesh;
-  
+
   // Read the input mesh.
   mesh.read (argv[3]);
-  
+
   // Print information about the mesh to the screen.
   mesh.print_info();
-  
+
   // Write the output mesh if the user specified an
   // output file name.
   if (argc >= 6 && std::string("-o") == argv[4])

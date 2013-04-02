@@ -260,4 +260,3 @@ T & DenseSubMatrix<T>::operator () (const unsigned int i,
 
 
 #endif // LIBMESH_DENSE_SUBMATRIX_H
-

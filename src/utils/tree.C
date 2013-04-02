@@ -94,12 +94,3 @@ template class Tree<4>;
 template class Tree<8>;
 
 } // namespace libMesh
-
-
-
-
-
-
-
-
-

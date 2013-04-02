@@ -22,7 +22,7 @@ void LaplaceSystem::init_data ()
   GetPot infile("l-shaped.in");
   exact_QoI[0] = infile("QoI_0", 0.0);
   exact_QoI[1] = infile("QoI_1", 0.0);
-  
+
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();
 
@@ -63,9 +63,9 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
 
   // Element basis functions
   const std::vector<std::vector<RealGradient> > &dphi = c.element_fe_var[0]->get_dphi();
-  
+
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.dof_indices_var[0].size(); 
+  const unsigned int n_T_dofs = c.dof_indices_var[0].size();
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> &K = *c.elem_subjacobians[0][0];
@@ -80,7 +80,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   unsigned int n_qpoints = (c.get_element_qrule())->n_points();
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
-    {     	
+    {
       // Compute the solution gradient at the Newton iterate
       Gradient grad_T = c.interior_gradient(0, qp);
 
@@ -93,7 +93,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
 	    // The analytic jacobian
             K(i,j) += JxW[qp] * ( dphi[i][qp] * dphi[j][qp] );
     } // end of the quadrature point qp-loop
-  
+
   return compute_jacobian;
 }
 
@@ -101,11 +101,11 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
 bool LaplaceSystem::side_constraint (bool request_jacobian,
 				  DiffContext &context)
 {
-  // Are the jacobians specified analytically ? 
+  // Are the jacobians specified analytically ?
   bool compute_jacobian = request_jacobian && _analytic_jacobians;
 
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
-  
+
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
 
@@ -119,12 +119,12 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
   const std::vector<Point > &qside_point = c.side_fe_var[0]->get_xyz();
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_T_dofs = c.dof_indices_var[0].size(); 
+  const unsigned int n_T_dofs = c.dof_indices_var[0].size();
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> &K = *c.elem_subjacobians[0][0];
   DenseSubVector<Number> &F = *c.elem_subresiduals[0];
-      
+
   unsigned int n_qpoints = (c.get_side_qrule())->n_points();
 
   const Real penalty = 1./(TOLERANCE*TOLERANCE);
@@ -133,7 +133,7 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
     {
       // Compute the solution at the old Newton iterate
       Number T = c.side_value(0, qp);
-            
+
       // We get the Dirichlet bcs from the exact solution
       Number u_dirichlet = exact_solution (qside_point[qp]);
 
@@ -144,17 +144,17 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
 	for (unsigned int i=0; i != n_T_dofs; i++)
 	  for (unsigned int j=0; j != n_T_dofs; ++j)
 	    // The analytic jacobian
-	    K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];    
-	
+	    K(i,j) += JxW[qp] * penalty * phi[i][qp] * phi[j][qp];
+
     } // end of the quadrature point qp-loop
-  
+
   return compute_jacobian;
 }
 
-// Override the default DiffSystem postprocess function to compute the 
-// approximations to the QoIs 
+// Override the default DiffSystem postprocess function to compute the
+// approximations to the QoIs
 void LaplaceSystem::postprocess()
-{  
+{
   // Reset the array holding the computed QoIs
   computed_QoI[0] = 0.0;
   computed_QoI[1] = 0.0;
@@ -164,12 +164,12 @@ void LaplaceSystem::postprocess()
   CommWorld.sum(computed_QoI[0]);
 
   CommWorld.sum(computed_QoI[1]);
-     
+
 }
 
 // The exact solution to the singular problem,
 // u_exact = r^(2/3)*sin(2*theta/3). We use this to set the Dirichlet boundary conditions
-Number LaplaceSystem::exact_solution(const Point& p)// xyz location   
+Number LaplaceSystem::exact_solution(const Point& p)// xyz location
 {
   const Real x1 = p(0);
   const Real x2 = p(1);
@@ -179,7 +179,7 @@ Number LaplaceSystem::exact_solution(const Point& p)// xyz location
   // Make sure 0 <= theta <= 2*pi
   if (theta < 0)
     theta += 2. * libMesh::pi;
-    
+
   return pow(x1*x1 + x2*x2, 1./3.)*sin(2./3.*theta);
-           
+
 }

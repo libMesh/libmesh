@@ -457,7 +457,7 @@ public:
 
   /**
    * Prints the value of each shape function's derivative
-   * at each quadrature point. Implement in derived class since this 
+   * at each quadrature point. Implement in derived class since this
    * depends on whether the element is vector-valued or not.
    */
   virtual void print_dphi(std::ostream& os) const =0;
@@ -466,7 +466,7 @@ public:
 
   /**
    * Prints the value of each shape function's second derivatives
-   * at each quadrature point. Implement in derived class since this 
+   * at each quadrature point. Implement in derived class since this
    * depends on whether the element is vector-valued or not.
    */
   virtual void print_d2phi(std::ostream& os) const =0;
@@ -505,7 +505,7 @@ protected:
    * the shape functions are vector-valued or not.
    */
   virtual void compute_shape_functions(const Elem*, const std::vector<Point>& ) =0;
-  
+
   AutoPtr<FEMap> _fe_map;
 
 
@@ -549,7 +549,7 @@ protected:
    * Should we calculate reference shape function gradients?
    */
   mutable bool calculate_dphiref;
-  
+
 
   /**
    * The finite element type for this object.  Note that this

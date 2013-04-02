@@ -146,4 +146,3 @@ template class Parallel::BinSorter<Hilbert::HilbertIndices, unsigned int>;
 #endif
 
 } // namespace libMesh
-

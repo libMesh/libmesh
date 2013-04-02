@@ -23,4 +23,3 @@
 
 //-----------------------------------------------------------------
 // No implementations necessary for abstract class HPSelector
-

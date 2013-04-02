@@ -259,4 +259,3 @@ private:
 } // namespace libMesh
 
 #endif // LIBMESH_EXACT_ERROR_ESTIMATOR_H
-

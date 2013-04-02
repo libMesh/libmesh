@@ -37,7 +37,7 @@ namespace libMesh {
     Singleton();
 
     /**
-     * Destructor. 
+     * Destructor.
      */
     virtual ~Singleton() {};
 
@@ -54,7 +54,7 @@ namespace libMesh {
        * Constructor.  Adds the derived object to the setup cache list.
        */
       Setup ();
-      
+
     public:
       /**
        * Destructor.

@@ -43,11 +43,11 @@ void libMesh::libmesh_version_stdout()
 int libMesh::get_libmesh_version()
 {
   /* Note: return format follows the versioning convention xx.yy.zz where
-   
+
      xx = major version number
      yy = minor version number
      zz = micro version number
-     
+
      For example:
      v.   0.23  -> 002300 = 2300
      v   0.23.1 -> 002301 = 2301

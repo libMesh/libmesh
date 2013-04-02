@@ -6,12 +6,12 @@
 /* modify it under the terms of the GNU Lesser General Public */
 /* License as published by the Free Software Foundation; either */
 /* version 2.1 of the License, or (at your option) any later version. */
-  
+
 /* rbOOmit is distributed in the hope that it will be useful, */
 /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
 /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
 /* Lesser General Public License for more details. */
-  
+
 /* You should have received a copy of the GNU Lesser General Public */
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
@@ -46,7 +46,7 @@
 //  \partial\Omega_hat_Biot3 = [0.2] x [-0.2,0.2] x [0,3]
 
 // The term
-//  \kappa \int_\Omega_hat 1/(1+mu*x_hat) v_z w_z 
+//  \kappa \int_\Omega_hat 1/(1+mu*x_hat) v_z w_z
 // is "non-affine" (in the Reduced Basis sense), since we can't express it
 // in the form \sum theta_q(kappa,mu) a(v,w). As a result, (as in
 // reduced_basis_ex4) we must employ the Empirical Interpolation Method (EIM)
@@ -104,7 +104,7 @@ int main (int argc, char** argv)
 
   // This is a 3D example
   libmesh_example_assert(3 == LIBMESH_DIM, "3D support");
-  
+
   // Parse the input file using GetPot
   std::string eim_parameters = "eim.in";
   std::string rb_parameters  = "rb.in";
@@ -113,7 +113,7 @@ int main (int argc, char** argv)
 
   unsigned int n_elem_xy = infile("n_elem_xy", 1);
   unsigned int n_elem_z  = infile("n_elem_z", 1);
-  
+
   // Do we write the RB basis functions to disk?
   bool store_basis_functions = infile("store_basis_functions", true);
 
@@ -152,7 +152,7 @@ int main (int argc, char** argv)
 
   // Initialize the EIM RBEvaluation object
   SimpleEIMEvaluation eim_rb_eval;
-  
+
   // Set the rb_eval objects for the RBConstructions
   eim_construction.set_rb_evaluation(eim_rb_eval);
   rb_construction.set_rb_evaluation(rb_eval);
@@ -162,20 +162,20 @@ int main (int argc, char** argv)
     // Read data from input file and print state
     eim_construction.process_parameters_file(eim_parameters);
     eim_construction.print_info();
-  
+
     // Perform the EIM Greedy and write out the data
     eim_construction.initialize_rb_construction();
-    
+
     eim_construction.train_reduced_basis();
     eim_construction.get_rb_evaluation().write_offline_data_to_files("eim_data");
-    
+
     // Read data from input file and print state
     rb_construction.process_parameters_file(rb_parameters);
 
     // attach the EIM theta objects to the RBEvaluation
     eim_rb_eval.initialize_eim_theta_objects();
     rb_eval.get_rb_theta_expansion().attach_multiple_A_theta(eim_rb_eval.get_eim_theta_objects());
-    
+
     // attach the EIM assembly objects to the RBConstruction
     eim_construction.initialize_eim_assembly_objects();
     rb_construction.get_rb_assembly_expansion().attach_multiple_A_assembly(eim_construction.get_eim_assembly_objects());
@@ -204,7 +204,7 @@ int main (int argc, char** argv)
     // attach the EIM theta objects to rb_eval objects
     eim_rb_eval.initialize_eim_theta_objects();
     rb_eval.get_rb_theta_expansion().attach_multiple_A_theta(eim_rb_eval.get_eim_theta_objects());
-    
+
     // Read in the offline data for rb_eval
     rb_eval.read_offline_data_from_files("rb_data");
 
@@ -244,11 +244,11 @@ void transform_mesh_and_plot(EquationSystems& es, Real curvature, const std::str
 
   MeshBase::node_iterator       node_it  = mesh.nodes_begin();
   const MeshBase::node_iterator node_end = mesh.nodes_end();
-  
+
   for( ; node_it != node_end; node_it++)
   {
     Node* node = *node_it;
-    
+
     Real x = (*node)(0);
     Real z = (*node)(2);
 
@@ -260,4 +260,3 @@ void transform_mesh_and_plot(EquationSystems& es, Real curvature, const std::str
   ExodusII_IO(mesh).write_equation_systems(filename, es);
 #endif
 }
-

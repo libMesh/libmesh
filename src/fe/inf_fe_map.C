@@ -679,4 +679,3 @@ INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,inverse_map(const Elem*,const std::vect
 
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-

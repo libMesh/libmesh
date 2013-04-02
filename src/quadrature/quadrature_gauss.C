@@ -364,5 +364,3 @@ void QGauss::dunavant_rule(const Real rule_data[][4],
 }
 
 } // namespace libMesh
-
-

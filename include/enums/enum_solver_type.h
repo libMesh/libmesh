@@ -59,7 +59,3 @@ using namespace libMeshEnums;
 
 
 #endif // LIBMESH_ENUM_SOLVER_TYPE_H
-
-
-
-

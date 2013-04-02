@@ -242,7 +242,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 
                               error_per_cell[fine_elem->id()] +=
 				static_cast<ErrorVectorReal>(fine_error);
-                              error_per_cell[coarse_elem->id()] += 
+                              error_per_cell[coarse_elem->id()] +=
 				static_cast<ErrorVectorReal>(coarse_error);
 
                               // Keep track of the number of internal flux
@@ -296,7 +296,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
 		      dof_map.dof_indices (coarse_elem, dof_indices_coarse, var);
 
 		      // The number of DOFS on each element
-		      const unsigned int n_dofs_fine = 
+		      const unsigned int n_dofs_fine =
 			libmesh_cast_int<unsigned int>(dof_indices_fine.size());
 		      const unsigned int n_dofs_coarse =
 			libmesh_cast_int<unsigned int>(dof_indices_coarse.size());

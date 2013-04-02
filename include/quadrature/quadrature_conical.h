@@ -103,4 +103,3 @@ class QConical : public QBase
 } // namespace libMesh
 
 #endif // LIBMESH_QUADRATURE_CONICAL_H
-

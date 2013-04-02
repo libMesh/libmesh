@@ -1417,4 +1417,3 @@ Real FE<2,SZABAB>::shape_second_deriv(const Elem*,
 
 
 #endif	// LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-

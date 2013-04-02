@@ -86,7 +86,7 @@ void CurlCurlSystem::init_context(DiffContext &context)
   // Get finite element object
   FEGenericBase<RealGradient>* fe;
   c.get_element_fe<RealGradient>( u_var, fe );
-  
+
   // We should prerequest all the data
   // we will need to build the linear system.
   fe->get_JxW();
@@ -113,7 +113,7 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
   // Get finite element object
   FEGenericBase<RealGradient>* fe = NULL;
   c.get_element_fe<RealGradient>( u_var, fe );
-  
+
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
 
@@ -126,7 +126,7 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
   // The velocity shape function gradients at interior
   // quadrature points.
   const std::vector<std::vector<RealGradient> >& curl_phi = fe->get_curl_phi();
- 
+
   const std::vector<Point>& qpoint = fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
@@ -135,7 +135,7 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
   DenseSubMatrix<Number> &Kuu = *c.elem_subjacobians[u_var][u_var];
 
   DenseSubVector<Number> &Fu = *c.elem_subresiduals[u_var];
-      
+
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
   // gradient from the previous timestep.  This must be
@@ -149,13 +149,13 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
     {
       Gradient u;
       Gradient curl_u;
-      
+
       c.interior_value( u_var, qp, u );
 
       c.interior_curl( u_var, qp, curl_u );
 
       // Value of the forcing function at this quadrature point
-      RealGradient f = this->forcing(qpoint[qp]);     
+      RealGradient f = this->forcing(qpoint[qp]);
 
       // First, an i-loop over the degrees of freedom.
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -169,13 +169,13 @@ bool CurlCurlSystem::element_time_derivative (bool request_jacobian,
                 {
                   Kuu(i,j) += ( curl_phi[j][qp]*curl_phi[i][qp] +
 			        phi[j][qp]*phi[i][qp] )*JxW[qp];
-                 
+
 		}
 	    }
-	  
+
         }
     } // end of the quadrature point qp-loop
-  
+
   return request_jacobian;
 }
 
@@ -188,7 +188,7 @@ bool CurlCurlSystem::side_time_derivative (bool request_jacobian,
   // Get finite element object
   FEGenericBase<RealGradient>* side_fe = NULL;
   c.get_side_fe<RealGradient>( u_var, side_fe );
-  
+
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
 
@@ -224,7 +224,7 @@ bool CurlCurlSystem::side_time_derivative (bool request_jacobian,
       Gradient u_exact = this->exact_solution( qpoint[qp] ) ;
 
       Gradient Ncu = (u - u_exact).cross(N);
-      
+
       for (unsigned int i=0; i != n_u_dofs; i++)
         {
 	  Fu(i) += penalty*Ncu*(phi[i][qp].cross(N))*JxW[qp];
@@ -251,6 +251,6 @@ RealGradient CurlCurlSystem::forcing( const Point& p )
 RealGradient CurlCurlSystem::exact_solution( const Point& p )
 {
   Real x = p(0); Real y = p(1);
-  
+
   return soln(x,y);
 }

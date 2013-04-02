@@ -92,7 +92,7 @@ public:
   /**
    * Number of variables in solution.
    */
-  unsigned int n_vars() const 
+  unsigned int n_vars() const
   { return libmesh_cast_int<unsigned int>(dof_indices_var.size()); }
 
   /**
@@ -241,7 +241,7 @@ public:
    */
   Real get_time() const
   { return time; }
-  
+
   /**
    * Set the time for which the current nonlinear_solution is defined.
    */
@@ -368,10 +368,10 @@ public:
   /**
    * Typedef for the localized_vectors iterator
    */
-  typedef std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > >::iterator localized_vectors_iterator;  
+  typedef std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > >::iterator localized_vectors_iterator;
 
   /**
-   * Return a reference to DenseVector localization of _localized_vector 
+   * Return a reference to DenseVector localization of _localized_vector
    * contained in the localized_vectors map
    */
   DenseVector<Number> & get_localized_vector (const NumericVector<Number> & _localized_vector);
@@ -390,7 +390,7 @@ public:
   /**
    * const accessible version of get_localized_subvector function
    */
-  const DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var) const; 
+  const DenseSubVector<Number> & get_localized_subvector (const NumericVector<Number> & _localized_vector, unsigned int _var) const;
 
  private:
 
@@ -418,14 +418,14 @@ public:
   bool _is_adjoint;
 
  protected:
- 
+
   /**
    * Contains pointers to vectors the user has asked to be localized, keyed with
    * pairs of element localized versions of that vector and per variable views
    */
 
-  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > > localized_vectors;  
-  
+  std::map<const NumericVector<Number>*, std::pair<DenseVector<Number>, std::vector<DenseSubVector<Number>*> > > localized_vectors;
+
 };
 
 } // namespace libMesh

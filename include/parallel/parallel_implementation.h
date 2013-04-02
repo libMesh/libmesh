@@ -379,9 +379,9 @@ inline void pack_range (const Context *context,
       Parallel::pack(*range_begin, buffer, context);
 
 #ifndef NDEBUG
-      unsigned int my_packable_size = 
+      unsigned int my_packable_size =
         Parallel::packable_size(*range_begin, context);
-      unsigned int my_packed_size = 
+      unsigned int my_packed_size =
         Parallel::packed_size (*range_begin, buffer.begin() +
                                old_size);
       libmesh_assert_equal_to (my_packable_size, my_packed_size);
@@ -2247,7 +2247,7 @@ inline Status Communicator::receive (const unsigned int src_processor_id,
                                      std::set<T> &buf,
                                      const MessageTag &tag) const
 {
-  return this->receive 
+  return this->receive
     (src_processor_id, buf,
      StandardType<T>(buf.empty() ? NULL : &buf.front()), tag);
 }
@@ -3061,7 +3061,7 @@ inline bool Communicator::verify(const T &) const { return true; }
 
 template <typename T>
 inline bool Communicator::semiverify(const T *) const { return true; }
-  
+
 template <typename T>
 inline void Communicator::min(T &) const {}
 
@@ -3124,7 +3124,7 @@ inline void Communicator::send (const unsigned int, T&, const DataType&, Request
 { libmesh_error(); }
 
 template <typename Context, typename Iter>
-inline void Communicator::send_packed_range 
+inline void Communicator::send_packed_range
   (const unsigned int, const Context*, Iter, const Iter, const MessageTag&) const
 { libmesh_error(); }
 

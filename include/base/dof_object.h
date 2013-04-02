@@ -312,7 +312,7 @@ public:
    */
   dof_id_type vg_dof_base(const unsigned int s,
 			  const unsigned int vg) const;
-  
+
   /**
    * An invaild \p id to distinguish an uninitialized \p DofObject
    */
@@ -371,7 +371,7 @@ private:
   unsigned int system_var_to_vg_var (const unsigned int s,
 				     const unsigned int vg,
 				     const unsigned int var) const;
-  
+
   /**
    * The \p id of the \p DofObject
    */
@@ -416,7 +416,7 @@ private:
    * that means is that each \p Variable in the \p VariableGroup will have the same number
    * of nonzero components, and they can all be indexed from the same base number.  We use this
    * information in the ncv_# and idx_# entries as follows:
-   * 
+   *
    * ncv_# = n_vars*ncv_magic + n_comp      for variable group #
    * idx_# = base_offset                    for variable group #
    *
@@ -435,7 +435,7 @@ private:
   index_buffer_t _idx_buf;
 
   /**
-   * Above we introduced the chimera ncv, which is a hybrid of the form   
+   * Above we introduced the chimera ncv, which is a hybrid of the form
    * ncv = ncv_magic*nv + nc
    * where nv are the number of identical variables of a given type,
    * and nc is the number of components for this set of variables.
@@ -444,7 +444,7 @@ private:
    * will recgnize later that  #/ncv_magic is simply a bitshift
    */
   static const index_t ncv_magic = 256; // = 2^8, in case we want to manually bitshift
-  
+
   /**
    * The starting index for system \p s.
    */
@@ -633,7 +633,7 @@ bool DofObject::valid_processor_id () const
 inline
 unsigned int DofObject::n_systems () const
 {
-  return _idx_buf.empty() ? 
+  return _idx_buf.empty() ?
     0 : libmesh_cast_int<unsigned int>(_idx_buf[0]);
 }
 
@@ -655,9 +655,9 @@ unsigned int DofObject::n_vars(const unsigned int s,
 {
   libmesh_assert_less (s,  this->n_systems());
   libmesh_assert_less (vg, this->n_var_groups(s));
-  
+
   const unsigned int start_idx_sys = this->start_idx(s);
-  
+
   libmesh_assert_less ((start_idx_sys + 2*vg), _idx_buf.size());
 
   return (libmesh_cast_int<unsigned int>
@@ -672,7 +672,7 @@ unsigned int DofObject::n_vars(const unsigned int s) const
   libmesh_assert_less (s, this->n_systems());
 
   const unsigned int nvg = this->n_var_groups(s);
-    
+
   unsigned int val=0;
 
   for (unsigned int vg=0; vg<nvg; vg++)
@@ -799,8 +799,8 @@ unsigned int DofObject::end_idx (const unsigned int s) const
   libmesh_assert_less (s, this->n_systems());
   libmesh_assert_less (s, _idx_buf.size());
 
-  return ((s+1) == this->n_systems()) ? 
-          libmesh_cast_int<unsigned int>(_idx_buf.size()) : 
+  return ((s+1) == this->n_systems()) ?
+          libmesh_cast_int<unsigned int>(_idx_buf.size()) :
 	  libmesh_cast_int<unsigned int>(_idx_buf[s+1]);
 }
 
@@ -876,12 +876,12 @@ unsigned int DofObject::system_var_to_vg_var (const unsigned int s,
 					      const unsigned int var) const
 {
   unsigned int accumulated_sum=0;
-  
+
   for (unsigned int vgc=0; vgc<vg; vgc++)
     accumulated_sum += this->n_vars(s,vgc);
-  
+
   libmesh_assert_less_equal (accumulated_sum, var);
-  
+
   return (var - accumulated_sum);
 }
 

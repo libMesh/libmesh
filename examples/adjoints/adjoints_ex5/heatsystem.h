@@ -63,13 +63,13 @@ public:
 	{
 	  parameter_vector[i] = &parameters[i];
 	}
-      
+
       return parameter_vector;
     }
 
   Number &get_QoI_value(unsigned int QoI_index)
     {
-      return computed_QoI[QoI_index];	
+      return computed_QoI[QoI_index];
     }
 
 protected:
@@ -92,11 +92,11 @@ protected:
   virtual void element_qoi_derivative (DiffContext &context,
 				       const QoISet & /* qois */);
 
-  //virtual void element_qoi (DiffContext &context, const QoISet & qois); 
+  //virtual void element_qoi (DiffContext &context, const QoISet & qois);
 
   // Parameters associated with the system
   std::vector<Number> parameters;
-  
+
   // The ParameterVector object that will contain pointers to
   // the system parameters
   ParameterVector parameter_vector;
@@ -129,5 +129,5 @@ protected:
 
   // The final computed sensitivity
   Number final_sensitivity;
-  
+
 };

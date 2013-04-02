@@ -56,7 +56,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 
-// Define matrix and vector data types for the global 
+// Define matrix and vector data types for the global
 // equation system.  These are base classes,
 // from which specific implementations, like
 // the PETSc or LASPACK implementations, are derived.
@@ -110,18 +110,18 @@ int main (int argc, char** argv)
       if (libMesh::processor_id() == 0)
         std::cerr << "Usage: " << argv[0] << " [meshfile]"
                   << std::endl;
-      
+
       libmesh_error();
     }
-  
+
   // Tell the user what we are doing.
-  else 
+  else
     {
       std::cout << "Running " << argv[0];
-      
+
       for (int i=1; i<argc; i++)
         std::cout << " " << argv[i];
-      
+
       std::cout << std::endl << std::endl;
 
     }
@@ -147,7 +147,7 @@ int main (int argc, char** argv)
                 << std::endl;
       return 0;
     }
-  
+
   // Get the name of the mesh file
   // from the command line.
   std::string mesh_file = argv[1];
@@ -155,19 +155,19 @@ int main (int argc, char** argv)
 
   // Skip this 3D example if libMesh was compiled as 1D or 2D-only.
   libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
-  
+
   // Create a mesh.
   // This example directly references all mesh nodes and is
   // incompatible with ParallelMesh use.
 
   SerialMesh mesh;
   MeshData mesh_data(mesh);
-  
+
   // Read the meshfile specified in the command line or
   // use the internal mesh generator to create a uniform
   // grid on an elongated cube.
   mesh.read(mesh_file, &mesh_data);
-   
+
   // mesh.build_cube (10, 10, 40,
   //                       -1., 1.,
   //                       -1., 1.,
@@ -180,7 +180,7 @@ int main (int argc, char** argv)
   // The node that should be monitored.
   const unsigned int result_node = 274;
 
-  
+
   // Time stepping issues
   //
   // Note that the total current time is stored as a parameter
@@ -191,7 +191,7 @@ int main (int argc, char** argv)
 
   // The number of time steps.
   unsigned int n_time_steps = 300;
-  
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
@@ -201,7 +201,7 @@ int main (int argc, char** argv)
 
   // Use a handy reference to this system
   NewmarkSystem & t_system = equation_systems.get_system<NewmarkSystem> ("Wave");
-  
+
   // Add the variable "p" to "Wave".   "p"
   // will be approximated using first-order approximation.
   t_system.add_variable("p", FIRST);
@@ -213,9 +213,9 @@ int main (int argc, char** argv)
   t_system.attach_init_function      (apply_initial);
 
   // Set the time step size, and optionally the
-  // Newmark parameters, so that \p NewmarkSystem can 
-  // compute integration constants.  Here we simply use 
-  // pass only the time step and use default values 
+  // Newmark parameters, so that \p NewmarkSystem can
+  // compute integration constants.  Here we simply use
+  // pass only the time step and use default values
   // for \p alpha=.25  and \p delta=.5.
   t_system.set_newmark_parameters(delta_t);
 
@@ -246,11 +246,11 @@ int main (int argc, char** argv)
   // Assemble the time independent system matrices and rhs.
   // This function will also compute the effective system matrix
   // K~=K+a_0*M+a_1*C and apply user specified initial
-  // conditions. 
+  // conditions.
   t_system.assemble();
 
   // Now solve for each time step.
-  // For convenience, use a local buffer of the 
+  // For convenience, use a local buffer of the
   // current time.  But once this time is updated,
   // also update the \p EquationSystems parameter
   // Start with t_time = 0 and write a short header
@@ -274,7 +274,7 @@ int main (int argc, char** argv)
       // the penalty parameter should be added to the matrix
       // only in the first time step.  The applied
       // boundary conditions may be time-dependent and hence
-      // the rhs vector is considered in each time step. 
+      // the rhs vector is considered in each time step.
       if (time_step == 0)
         {
           // The local function \p fill_dirichlet_bc()
@@ -335,8 +335,8 @@ int main (int argc, char** argv)
               << global_displacement[dof_no]
               << std::endl;
     }
-  
-  // All done.  
+
+  // All done.
   return 0;
 }
 
@@ -344,7 +344,7 @@ int main (int argc, char** argv)
 // for our wave equation.
 void assemble_wave(EquationSystems& es,
                    const std::string& system_name)
-{  
+{
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Wave");
@@ -369,7 +369,7 @@ void assemble_wave(EquationSystems& es,
 
   // In here, we will add the element matrices to the
   // @e additional matrices "stiffness_mass" and "damping"
-  // and the additional vector "force", not to the members 
+  // and the additional vector "force", not to the members
   // "matrix" and "rhs".  Therefore, get writable
   // references to them.
   SparseMatrix<Number>&   stiffness = t_system.get_matrix("stiffness");
@@ -393,14 +393,14 @@ void assemble_wave(EquationSystems& es,
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  
+
   // A 2nd order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, SECOND);
 
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (&qrule);
 
-  // The element Jacobian * quadrature weight at each integration point.   
+  // The element Jacobian * quadrature weight at each integration point.
   const std::vector<Real>& JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
@@ -430,7 +430,7 @@ void assemble_wave(EquationSystems& es,
   // contribution.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
-  
+
   for ( ; el != end_el; ++el)
     {
       // Store a pointer to the element we are currently
@@ -478,17 +478,17 @@ void assemble_wave(EquationSystems& es,
                 Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
                 Me(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp]
                            *1./(speed*speed);
-              } // end of the matrix summation loop          
+              } // end of the matrix summation loop
         } // end of quadrature point loop
 
       // Now compute the contribution to the element matrix and the
       // right-hand-side vector if the current element lies on the
-      // boundary. 
+      // boundary.
       {
         // In this example no natural boundary conditions will
         // be considered.  The code is left here so it can easily
         // be extended.
-        // 
+        //
         // don't do this for any side
         for (unsigned int side=0; side<elem->n_sides(); side++)
           if (!true)
@@ -497,24 +497,24 @@ void assemble_wave(EquationSystems& es,
               // Declare a special finite element object for
               // boundary integration.
               AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-              
+
               // Boundary integration requires one quadraure rule,
               // with dimensionality one less than the dimensionality
               // of the element.
               QGauss qface(dim-1, SECOND);
-              
+
               // Tell the finte element object to use our
               // quadrature rule.
               fe_face->attach_quadrature_rule (&qface);
-              
+
               // The value of the shape functions at the quadrature
               // points.
               const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
-              
+
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.
               const std::vector<Real>& JxW_face = fe_face->get_JxW();
-              
+
               // Compute the shape function values on the element
               // face.
               fe_face->reinit(elem, side);
@@ -522,7 +522,7 @@ void assemble_wave(EquationSystems& es,
               // Here we consider a normal acceleration acc_n=1 applied to
               // the whole boundary of our mesh.
               const Real acc_n_value = 1.0;
-              
+
               // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
@@ -533,14 +533,14 @@ void assemble_wave(EquationSystems& es,
                       Fe(i) += acc_n_value*rho
                         *phi_face[i][qp]*JxW_face[qp];
                     }
-                } // end face quadrature point loop          
+                } // end face quadrature point loop
             } // end if (elem->neighbor(side) == NULL)
-        
-        // In this example the Dirichlet boundary conditions will be 
+
+        // In this example the Dirichlet boundary conditions will be
         // imposed via panalty method after the
         // system is assembled.
-        
-      } // end boundary condition section          
+
+      } // end boundary condition section
 
       // If this assembly program were to be used on an adaptive mesh,
       // we would have to apply any hanging node constraint equations
@@ -556,16 +556,16 @@ void assemble_wave(EquationSystems& es,
       stiffness.add_matrix (Ke, dof_indices);
       damping.add_matrix   (Ce, dof_indices);
       mass.add_matrix      (Me, dof_indices);
-      
+
       force.add_vector     (Fe, dof_indices);
-    
+
       // For the overall matrix, explicitly zero the entries where
-      // we added values in the other ones, so that we have 
+      // we added values in the other ones, so that we have
       // identical sparsity footprints.
       matrix.add_matrix(zero_matrix, dof_indices);
-    
+
     } // end of element loop
-  
+
   // All done!
   return;
 }
@@ -576,7 +576,7 @@ void apply_initial(EquationSystems& es,
 {
   // Get a reference to our system, as before
   NewmarkSystem & t_system = es.get_system<NewmarkSystem> (system_name);
-  
+
   // Numeric vectors for the pressure, velocity and acceleration
   // values.
   NumericVector<Number>&  pres_vec       = t_system.get_vector("displacement");

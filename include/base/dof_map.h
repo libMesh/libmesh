@@ -186,14 +186,14 @@ public:
      */
     virtual void augment_send_list (std::vector<dof_id_type> & send_list) = 0;
   };
-   
+
   /**
    * Additional matrices may be handled with this \p DofMap.
    * They are initialized to the same sparsity structure as
    * the major matrix.
    */
   void attach_matrix (SparseMatrix<Number>& matrix);
-   
+
   /**
    * Matrices should not be attached more than once.  We can test for
    * an already-attached matrix if necessary using \p is_attached
@@ -253,7 +253,7 @@ public:
 
   /**
    * Attach an object to populate the send_list with extra entries.
-   * This should only add to the send list, but no checking is done 
+   * This should only add to the send list, but no checking is done
    * to enforce this behavior.
    *
    * This is an advanced function... use at your own peril!
@@ -269,7 +269,7 @@ public:
    */
   void attach_extra_send_list_function(void (*func)(std::vector<dof_id_type> &, void *), void * context = NULL)
   { _extra_send_list_function = func; _extra_send_list_context = context; }
-  
+
   /**
    * Takes the \p _send_list vector (which may have duplicate entries)
    * and sorts it.  The duplicate entries are then removed, resulting in
@@ -371,7 +371,7 @@ public:
    * @returns the total number of degrees of freedom in the problem.
    */
   dof_id_type n_dofs() const { return _n_dfs; }
-  
+
   /**
    * @returns the number of SCALAR dofs.
    */
@@ -503,7 +503,7 @@ public:
    * @returns the total number of constrained Nodes
    * in the mesh.
    */
-  dof_id_type n_constrained_nodes() const 
+  dof_id_type n_constrained_nodes() const
   { return libmesh_cast_int<dof_id_type>(_node_constraints.size()); }
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
@@ -993,7 +993,7 @@ private:
   void add_constraints_to_send_list();
 
 #endif // LIBMESH_ENABLE_CONSTRAINTS
-  
+
   /**
    * The finite element type for each variable.
    */

@@ -17,7 +17,7 @@ class MeshFunctionSolutionTransfer : public SolutionTransfer
 public:
   MeshFunctionSolutionTransfer();
   virtual ~MeshFunctionSolutionTransfer();
-  
+
   /**
    * Transfer the values of a variable to another.
    */

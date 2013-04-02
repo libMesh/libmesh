@@ -41,7 +41,7 @@ namespace libMesh
   //   const Real _rcut;
 
   // public:
-    
+
   //   /**
   //    * Constructor.
   //    */
@@ -55,15 +55,15 @@ namespace libMesh
   //   Real operator()(Real rad) const
   //   {
   //     if (rad > _rcut) return 0.;
-      
+
   //     rad /= _rcut;
-     
+
   //     return std::sqrt( 1+ rad*rad );
   //   }
   // };
 
 
-    
+
   /**
    * Wendland's compactly supported Radial Basis Functions.
    */
@@ -74,7 +74,7 @@ namespace libMesh
     const Real _rcut;
 
   public:
-    
+
     /**
      * Constructor.
      */
@@ -89,7 +89,7 @@ namespace libMesh
   };
 
 
-    
+
   //-------------------------------------------------------
   // Explicit specializations
   template<>
@@ -111,7 +111,7 @@ namespace libMesh
 
     rad /= _rcut;
 
-    return Utility::pow<4>(1.-rad)*(4.*rad + 1.);      
+    return Utility::pow<4>(1.-rad)*(4.*rad + 1.);
   }
 
   template<>
@@ -136,7 +136,7 @@ namespace libMesh
     return Utility::pow<8>(1.-rad)*(((32.*rad + 25.)*rad + 8.)*rad + 1.);
   }
 
-    
+
 } // namespace libMesh
 
 

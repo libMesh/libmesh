@@ -990,4 +990,3 @@ void FEInterface::ifem_compute_data(const unsigned int dim,
 } // namespace libMesh
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-

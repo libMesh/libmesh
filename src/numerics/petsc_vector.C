@@ -275,7 +275,7 @@ template <typename T>
 void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>&,
 				                     const SparseMatrix<T>&)
 {
-  
+
   libMesh::out << "MatMultHermitianTranspose was introduced in PETSc 3.1.0,"
 	       << "No one has made it backwards compatible with older "
 	       << "versions of PETSc so far." << std::endl;
@@ -298,12 +298,12 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T>& V_i
   // Store a temporary copy since MatMultHermitianTransposeAdd doesn't seem to work
   // TODO: Find out why MatMultHermitianTransposeAdd doesn't work, might be a PETSc bug?
   AutoPtr< NumericVector<Number> > this_clone = this->clone();
- 
+
   // The const_cast<> is not elegant, but it is required since PETSc
   // is not const-correct.
   PetscErrorCode ierr = MatMultHermitianTranspose(const_cast<PetscMatrix<T>*>(A)->mat(), V->_vec, _vec);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   // Add the temporary copy to the matvec result
   this->add(1., *this_clone);
 }

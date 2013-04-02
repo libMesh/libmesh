@@ -334,7 +334,7 @@ AutoPtr<FEAbstract> FEAbstract::build( const unsigned int dim,
 	      AutoPtr<FEAbstract> ap(new FE<3,LAGRANGE>(fet));
 	      return ap;
 	    }
-	    
+
 	  case LAGRANGE_VEC:
 	    {
 	      AutoPtr<FEAbstract> ap(new FE<3,LAGRANGE_VEC>(fet));

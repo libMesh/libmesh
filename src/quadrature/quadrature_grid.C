@@ -23,6 +23,3 @@
 // quadrature_grid_3D.C
 
 // for implementation.
-
-
-

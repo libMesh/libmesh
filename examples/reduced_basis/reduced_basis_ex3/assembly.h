@@ -202,7 +202,7 @@ struct OutputAssembly : ElemAssembly
 
     // Now we will build the affine operator
     unsigned int n_qpoints = (c.get_element_qrule())->n_points();
-    
+
     Real output_area = (max_x-min_x) * (max_y-min_y);
 
     Point centroid = c.elem->centroid();
@@ -212,7 +212,7 @@ struct OutputAssembly : ElemAssembly
         for (unsigned int i=0; i != n_u_dofs; i++)
           c.get_elem_residual()(i) += JxW[qp] * ( 1.*phi[i][qp] ) / output_area;
   }
-  
+
   // Member variables that define the output region in 2D
   Real min_x, max_x, min_y, max_y;
 };
@@ -267,9 +267,9 @@ struct CDRBAssemblyExpansion : TransientRBAssemblyExpansion
     attach_A_assembly(&A0_assembly); // Attach the lhs assembly
     attach_A_assembly(&A1_assembly);
     attach_A_assembly(&A2_assembly);
-    
+
     attach_F_assembly(&F0_assembly); // Attach the rhs assembly
-    
+
     attach_output_assembly(&L0);       // Attach output 0 assembly
     attach_output_assembly(&L1);       // Attach output 1 assembly
     attach_output_assembly(&L2);       // Attach output 2 assembly

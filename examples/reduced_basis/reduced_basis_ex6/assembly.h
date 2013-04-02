@@ -205,7 +205,7 @@ struct AssemblyA2 : ElemAssemblyWithConstruction
               c.get_elem_jacobian()(i,j) += JxW_side[qp] * phi_side[j][qp]*phi_side[i][qp];
             }
           }
-      
+
           if(*b==4)
           {
             for (unsigned int qp=0; qp != n_sidepoints; qp++)
@@ -244,7 +244,7 @@ struct AssemblyEIM : RBEIMAssembly
   {
     // PDE variable numbers
     const unsigned int u_var = 0;
-    
+
     // EIM variable numbers
     const unsigned int Gx_var = 0;
     const unsigned int Gy_var = 1;
@@ -288,8 +288,8 @@ struct AssemblyEIM : RBEIMAssembly
       for (unsigned int i=0; i != n_u_dofs; i++)
         for (unsigned int j=0; j != n_u_dofs; j++)
         {
-          c.get_elem_jacobian()(i,j) += JxW[qp] * ( eim_values_Gx[qp]*dphi[i][qp](0)*dphi[j][qp](0) + 
-                                                    eim_values_Gy[qp]*dphi[i][qp](1)*dphi[j][qp](1) + 
+          c.get_elem_jacobian()(i,j) += JxW[qp] * ( eim_values_Gx[qp]*dphi[i][qp](0)*dphi[j][qp](0) +
+                                                    eim_values_Gy[qp]*dphi[i][qp](1)*dphi[j][qp](1) +
                                                     eim_values_Gz[qp]*dphi[i][qp](2)*dphi[j][qp](2) );
         }
     }
@@ -337,7 +337,7 @@ struct AssemblyF1 : ElemAssembly
 
     const std::vector<std::vector<Real> >& phi =
       c.element_fe_var[u_var]->get_phi();
-    
+
     const std::vector<Point>& xyz =
       c.element_fe_var[u_var]->get_xyz();
 
@@ -350,7 +350,7 @@ struct AssemblyF1 : ElemAssembly
     for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       Real x_hat = xyz[qp](0);
-      
+
       for (unsigned int i=0; i != n_u_dofs; i++)
         c.get_elem_residual()(i) += JxW[qp] * ( 1.*x_hat*phi[i][qp] );
     }
@@ -404,7 +404,7 @@ struct Ex6EIMInnerProduct : ElemAssembly
     const unsigned int n_u_dofs = c.dof_indices_var[Gx_var].size();
 
     unsigned int n_qpoints = (c.get_element_qrule())->n_points();
-    
+
     DenseSubMatrix<Number>& Kxx = c.get_elem_jacobian(Gx_var,Gx_var);
     DenseSubMatrix<Number>& Kyy = c.get_elem_jacobian(Gy_var,Gy_var);
     DenseSubMatrix<Number>& Kzz = c.get_elem_jacobian(Gz_var,Gz_var);
@@ -459,7 +459,7 @@ struct Ex6AssemblyExpansion : RBAssemblyExpansion
     assembly_a0.rb_con = &rb_con;
     assembly_a1.rb_con = &rb_con;
     assembly_a2.rb_con = &rb_con;
-    
+
     attach_A_assembly(&assembly_a0);
     attach_A_assembly(&assembly_a1);
     attach_A_assembly(&assembly_a2);
@@ -476,5 +476,3 @@ struct Ex6AssemblyExpansion : RBAssemblyExpansion
 };
 
 #endif
-
-

@@ -63,7 +63,7 @@ public:
    * Set the RBThetaExpansion object.
    */
   void set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in);
-  
+
   /**
    * Get a reference to the rb_theta_expansion.
    */

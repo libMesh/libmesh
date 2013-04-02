@@ -78,7 +78,7 @@ ElemAssembly& TransientRBAssemblyExpansion::get_M_assembly(unsigned int q)
                  << std::endl;
     libmesh_error();
   }
-  
+
   return *_M_assembly_vector[q];
 }
 

@@ -4,7 +4,7 @@ install_dir   = $(examples_install_path)/vector_fe/ex3
 data          = curl_curl_exact_solution.h vector_fe_ex3.in curl_curl_system.C solution_function.h curl_curl_system.h vector_fe_ex3.C run.sh
 sources       = $(data) run.sh
 
-CLEANFILES = 
+CLEANFILES =
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD

@@ -168,4 +168,3 @@ double Histogram<KeyType,IdxType>::upper_bound (const IdxType bin) const
 } // namespace libMesh
 
 #endif // LIBMESH_PARALLEL_HISTOGRAM_H
-

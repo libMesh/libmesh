@@ -3025,5 +3025,3 @@ GetPot::variable::operator=(const GetPot::variable& Other)
 #undef victorate
 
 #endif // LIBMESH_GETPOT_H
-
-

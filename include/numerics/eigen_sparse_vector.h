@@ -77,7 +77,7 @@ class EigenSparseVector : public NumericVector<T>
   EigenSparseVector (const numeric_index_type n,
 		     const numeric_index_type n_local,
 		     const ParallelType = AUTOMATIC);
-  
+
   /**
    * Constructor. Set local dimension to \p n_local, the global
    * dimension to \p n, but additionally reserve memory for the
@@ -98,7 +98,7 @@ class EigenSparseVector : public NumericVector<T>
    * Convenient typedefs
    */
   typedef EigenSV DataType;
-  
+
   /**
    * Call the assemble functions
    */
@@ -453,14 +453,14 @@ class EigenSparseVector : public NumericVector<T>
    */
   DataType &       vec ()        { return _vec; }
   const DataType & vec () const  { return _vec; }
-  
+
  private:
 
   /**
    * Actual Eigen::SparseVector<> we are wrapping.
    */
   DataType _vec;
-  
+
   /**
    * Make other Eigen datatypes friends
    */
@@ -539,9 +539,9 @@ void EigenSparseVector<T>::init (const numeric_index_type n,
   // Clear initialized vectors
   if (this->initialized())
     this->clear();
-  
+
   _vec.resize(n);
-  
+
   this->_is_initialized = true;
 #ifndef NDEBUG
   this->_is_closed = true;
@@ -609,7 +609,7 @@ inline
 void EigenSparseVector<T>::clear ()
 {
   _vec.resize(0);
-  
+
   this->_is_initialized = false;
 #ifndef NDEBUG
   this->_is_closed = false;
@@ -662,7 +662,7 @@ inline
 numeric_index_type EigenSparseVector<T>::size () const
 {
   libmesh_assert (this->initialized());
-  
+
   return static_cast<numeric_index_type>(_vec.size());
 }
 
@@ -709,7 +709,7 @@ void EigenSparseVector<T>::set (const numeric_index_type i, const T value)
   libmesh_assert_less (i, this->size());
 
   _vec[static_cast<eigen_idx_type>(i)] = value;
-  
+
 #ifndef NDEBUG
   this->_is_closed = false;
 #endif
@@ -723,7 +723,7 @@ void EigenSparseVector<T>::add (const numeric_index_type i, const T value)
 {
   libmesh_assert (this->initialized());
   libmesh_assert_less (i, this->size());
-  
+
   _vec[static_cast<eigen_idx_type>(i)] += value;
 
 #ifndef NDEBUG
@@ -753,7 +753,7 @@ void EigenSparseVector<T>::swap (NumericVector<T> &other)
   EigenSparseVector<T>& v = libmesh_cast_ref<EigenSparseVector<T>&>(other);
 
   _vec.swap(v._vec);
-  
+
   std::swap (this->_is_closed,      v._is_closed);
   std::swap (this->_is_initialized, v._is_initialized);
   std::swap (this->_type,           v._type);

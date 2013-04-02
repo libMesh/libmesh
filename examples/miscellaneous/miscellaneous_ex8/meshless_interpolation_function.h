@@ -48,7 +48,7 @@ private:
   mutable std::vector<Point> _pts;
   mutable std::vector<Number> _vals;
   Threads::spin_mutex &_mutex;
-  
+
 public:
 
   /**
@@ -59,7 +59,7 @@ public:
   _mfi (mfi),
   _mutex(mutex)
   {}
-  
+
 
   /**
    * The actual initialization process.
@@ -144,7 +144,7 @@ void MeshlessInterpolationFunction::clear ()
 inline
 AutoPtr<FunctionBase<Number> >
 MeshlessInterpolationFunction::clone () const
-{ 
+{
   return AutoPtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi, _mutex) );
 }
 
@@ -153,4 +153,3 @@ MeshlessInterpolationFunction::clone () const
 
 
 #endif // LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
-

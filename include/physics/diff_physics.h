@@ -1,17 +1,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -61,7 +61,7 @@ public:
    * Constructor.  Optionally initializes required
    * data structures.
    */
-  DifferentiablePhysics () : 
+  DifferentiablePhysics () :
     compute_internal_sides (false),
     _mesh_sys              (NULL),
     _mesh_x_var            (libMesh::invalid_uint),
@@ -80,12 +80,12 @@ public:
   virtual AutoPtr<DifferentiablePhysics> clone_physics() = 0;
 
   /**
-   * Clear any data structures associated with the physics. 
+   * Clear any data structures associated with the physics.
    */
   virtual void clear_physics ();
 
   /**
-   * Initialize any data structures associated with the physics. 
+   * Initialize any data structures associated with the physics.
    */
   virtual void init_physics (const System& sys);
 
@@ -239,7 +239,7 @@ public:
    * elem_jacobian has not been computed then the method should
    * return false.
    *
-   * For most problems, the default implementation of "do nothing" 
+   * For most problems, the default implementation of "do nothing"
    * is correct; users with boundary conditions including time
    * derivatives may need to reimplement this themselves.
    */
@@ -250,12 +250,12 @@ public:
 
   /*
    * Prepares the result of a build_context() call for use.
-   * 
+   *
    * Most FEMSystem-based problems will need to reimplement this in order to
    * call FE::get_*() as their particular physics requires.
    */
   virtual void init_context(DiffContext &) {}
- 
+
   /**
    * Tells the DifferentiablePhysics that system \p sys contains the
    * isoparametric Lagrangian variables which correspond to the

@@ -78,7 +78,7 @@ RBEIMConstruction::~RBEIMConstruction ()
 void RBEIMConstruction::clear()
 {
   Parent::clear();
-  
+
   // clear the mesh function
   delete _mesh_function;
   _mesh_function = NULL;
@@ -155,9 +155,9 @@ void RBEIMConstruction::init_data()
       unsigned char value = (var1==var2) ? 1 : 0;
       _coupling_matrix(var1,var2) = value;
     }
-    
+
   this->get_dof_map()._dof_coupling = &_coupling_matrix;
-  
+
   Parent::init_data();
 }
 
@@ -202,7 +202,7 @@ Real RBEIMConstruction::train_reduced_basis(const std::string& directory_name,
 {
   // precompute all the parametrized functions that we'll use in the greedy
   initialize_parametrized_functions_in_training_set();
-  
+
   return Parent::train_reduced_basis(directory_name, resize_rb_eval_data);
 }
 
@@ -224,11 +224,11 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
     root_id = libMesh::processor_id();
     value = values(var_number);
   }
-  
+
   // root_id may be non-zero on more than one processor due to ghost elements
   // so use CommWorld.max to get just one proc id
   CommWorld.max(root_id);
-  
+
   // Then broadcast the result
   CommWorld.broadcast(value, root_id);
 
@@ -383,14 +383,14 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
   {
     set_params_from_training_set(i);
     truth_solve(-1);
-    
+
     _parametrized_functions_in_training_set[i] = solution->clone().release();
-    
+
     libMesh::out << "Completed solve for training sample " << (i+1) << " of " << get_n_training_samples() << std::endl;
   }
-  
+
   _parametrized_functions_in_training_set_initialized = true;
-  
+
   libMesh::out << "Parametrized functions in training set initialized" << std::endl << std::endl;
 }
 
@@ -400,7 +400,7 @@ Real RBEIMConstruction::compute_best_fit_error()
   START_LOG("compute_best_fit_error()", "RBEIMConstruction");
 
   const unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
-  
+
   // load up the parametrized function for the current parameters
   truth_solve(-1);
 
@@ -483,7 +483,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   {
     // Check if parameters are in the training set. If so, we can just load the
     // solution from _parametrized_functions_in_training_set
-    
+
     for(unsigned int i=0; i<get_n_training_samples(); i++)
     {
       if(get_parameters() == get_params_from_training_set(i))
@@ -493,7 +493,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
       }
     }
   }
-  
+
   // If the parameters are in the training set, just copy the solution vector
   if(training_parameters_found_index >= 0)
   {
@@ -505,7 +505,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
   {
     RBEIMEvaluation& eim_eval = libmesh_cast_ref<RBEIMEvaluation&>(get_rb_evaluation());
     eim_eval.set_parameters( get_parameters() );
-    
+
     // Compute truth representation via projection
     const MeshBase& mesh = this->get_mesh();
 
@@ -556,7 +556,7 @@ Real RBEIMConstruction::truth_solve(int plot_solution)
     // Solve to find the best fit, then solution stores the truth representation
     // of the function to be approximated
     solve();
-    
+
     // Make sure we didn't max out the number of iterations
     if( (this->n_linear_iterations() >=
          this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations")) &&
@@ -679,4 +679,3 @@ bool RBEIMConstruction::greedy_termination_test(Real training_greedy_error, int)
 }
 
 } // namespace libMesh
-

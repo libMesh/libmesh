@@ -71,7 +71,7 @@ static tbb::enumerable_thread_specific< std::vector<Real> > dzdxi_tls, dxdeta_tl
 
     if(!old_elem_id_exists)
       old_elem_id = libMesh::invalid_uint;
-    
+
     // Coefficients are cached from old elements
     // ... except that we can't be sure that a renumbering didn't
     // cause the first element id in a new assembly to match the
@@ -91,14 +91,14 @@ static tbb::enumerable_thread_specific< std::vector<Real> > dzdxi_tls, dxdeta_tl
       for(unsigned int i=0; i<3; i++)
         dxdxi[i].resize(2);
     }
-      
+
 #ifdef DEBUG
 
     // We will just reuse dxdxi_exists, because if it didn't exist then neither did these!
     std::vector<Real> & dydxi   = dydxi_tls.local();
     std::vector<Real> & dzdeta  = dzdeta_tls.local();
     std::vector<Real> & dxdzeta = dxdzeta_tls.local();
-    
+
     std::vector<Real> & dzdxi   = dzdxi_tls.local();
     std::vector<Real> & dxdeta  = dxdeta_tls.local();
     std::vector<Real> & dydzeta = dydzeta_tls.local();
@@ -472,7 +472,7 @@ Real FE<3,HERMITE>::shape(const Elem* elem,
 
   hermite_compute_coefs(elem);
 
-#ifdef LIBMESH_HAVE_TBB_API  
+#ifdef LIBMESH_HAVE_TBB_API
   std::vector<std::vector<Real> > & dxdxi = dxdxi_tls.local();
 #endif // LIBMESH_HAVE_TBB_API
 

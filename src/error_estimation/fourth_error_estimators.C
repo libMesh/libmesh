@@ -143,5 +143,3 @@ LaplacianErrorEstimator::internal_side_integration ()
 } // namespace libMesh
 
 #endif // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)
-
-

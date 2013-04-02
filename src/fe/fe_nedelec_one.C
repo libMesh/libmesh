@@ -94,7 +94,7 @@ namespace libMesh
 		    libmesh_assert_equal_to (nodal_soln.size(), 27*3);
 
 		  libmesh_not_implemented();
-		  
+
 		  break;
 		}
 
@@ -109,20 +109,20 @@ namespace libMesh
 
 	    const unsigned int n_sf =
 	      FEInterface::n_shape_functions(dim, fe_type, elem_type);
-	    
+
 	    std::vector<Point> refspace_nodes;
 	    FEVectorBase::get_refspace_nodes(elem_type,refspace_nodes);
 	    libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
-	    
-	    
+
+
 	    // Need to create new fe object so the shape function as the FETransformation
 	    // applied to it.
 	    AutoPtr<FEVectorBase> vis_fe = FEVectorBase::build(dim,fe_type);
-	    
+
 	    const std::vector<std::vector<RealGradient> >& vis_phi = vis_fe->get_phi();
-	    
+
 	    vis_fe->reinit(elem,&refspace_nodes);
-	    
+
 	    for( unsigned int n = 0; n < n_nodes; n++ )
 	      {
 		libmesh_assert_equal_to (elem_soln.size(), n_sf);
@@ -130,14 +130,14 @@ namespace libMesh
 		// Zero before summation
 		nodal_soln[2*n] = 0;
 		nodal_soln[2*n+1] = 0;
-		
-		// u = Sum (u_i phi_i)		      
+
+		// u = Sum (u_i phi_i)
 		for (unsigned int i=0; i<n_sf; i++)
-		  {     
+		  {
 		    nodal_soln[2*n]   += elem_soln[i]*(vis_phi[i][n](0));
 		    nodal_soln[2*n+1] += elem_soln[i]*(vis_phi[i][n](1));
 		  }
-	      }	 
+	      }
 
 	    return;
 	  } // case FIRST
@@ -145,7 +145,7 @@ namespace libMesh
 	default:
 	  {
 	    libmesh_error();
-	  } 
+	  }
 
 	}//switch (totalorder)
 
@@ -598,7 +598,7 @@ namespace libMesh
 					       const unsigned int variable_number,
 					       const Elem* elem)
   { nedelec_one_compute_constraints(constraints, dof_map, variable_number, elem, /*Dim=*/2); }
-  
+
   template <>
   void FE<3,NEDELEC_ONE>::compute_constraints (DofConstraints &constraints,
 					       DofMap &dof_map,

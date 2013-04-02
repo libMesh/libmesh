@@ -12,11 +12,11 @@ void output_norms(const System &sys, const NumericVector<Number>&vec, const std:
 {
   for (unsigned int k = 0; k != sys.n_vars(); ++k)
     {
-      std::cout << "Norms in system " << sys.name() << 
+      std::cout << "Norms in system " << sys.name() <<
                    ", vector " << vecname <<
                    ", variable " << sys.variable_name(k) << ":" << std::endl;
       Real l1_vecnorm = sys.calculate_norm(vec, k, DISCRETE_L1);
-      std::cout << "l1     norm: " << l1_vecnorm << std::endl; 
+      std::cout << "l1     norm: " << l1_vecnorm << std::endl;
       if (l1_vecnorm)
         {
           std::cout << "l2     norm: " << sys.calculate_norm(vec, k, DISCRETE_L2) << std::endl;
@@ -47,8 +47,8 @@ int main(int argc, char** argv)
   std::cout << "Loaded mesh " << argv[1] << std::endl;
   mesh.print_info();
 
-  es.read(argv[2], EquationSystems::READ_HEADER | 
-                   EquationSystems::READ_DATA | 
+  es.read(argv[2], EquationSystems::READ_HEADER |
+                   EquationSystems::READ_DATA |
                    EquationSystems::READ_ADDITIONAL_DATA |
                    EquationSystems::READ_BASIC_ONLY);
   std::cout << "Loaded solution " << argv[2] << std::endl;

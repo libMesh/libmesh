@@ -49,7 +49,7 @@ SUBDIRS = \
 	vector_fe/vector_fe_ex2 \
 	vector_fe/vector_fe_ex3
 
-AUTOMAKE_OPTIONS = subdir-objects 
+AUTOMAKE_OPTIONS = subdir-objects
 
 AM_CPPFLAGS  = $(libmesh_CPPFLAGS)
 AM_CFLAGS    = $(libmesh_CFLAGS)
@@ -106,4 +106,3 @@ doc:
 if CODE_COVERAGE_ENABLED
   CLEANFILES = */*/*.gcda */*/*.gcno
 endif
-

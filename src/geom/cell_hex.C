@@ -238,7 +238,7 @@ unsigned int Hex::opposite_node(const unsigned int node_in,
     {3, 2, 1, 0, 7, 6, 5, 4, 10, 255, 8, 255, 15, 14, 13, 12, 18, 255, 16, 255, 255, 23, 255, 21, 255, 255};
   static const unsigned char side24_nodes_map[] =
     {1, 0, 3, 2, 5, 4, 7, 6, 255, 11, 255, 9, 13, 12, 15, 14, 255, 19, 255, 17, 255, 255, 24, 255, 22, 255};
-  
+
   switch (side_in)
   {
   case 0:

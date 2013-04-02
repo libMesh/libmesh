@@ -16,11 +16,11 @@ using namespace libMesh;
 void build_domain (Mesh &mesh, FEMParameters &param)
 {
   mesh.read(param.domainfile);
-      
+
   std::cout<<"Making elements 2nd order"<<std::endl;
-  
+
   // Right now we are setting approximation orders in the code, rather than reading them in
-  // That needs to be fixed and the second ordering should be done only if one of the 
+  // That needs to be fixed and the second ordering should be done only if one of the
   // approximation orders is greater than 1
   mesh.all_second_order();
 

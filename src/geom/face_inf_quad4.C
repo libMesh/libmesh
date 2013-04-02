@@ -240,5 +240,3 @@ void InfQuad4::connectivity(const unsigned int libmesh_dbg_var(sf),
 
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-
-

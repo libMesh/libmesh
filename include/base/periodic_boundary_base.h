@@ -59,7 +59,7 @@ public:
 
   /**
    * Copy constructor
-   */ 
+   */
   PeriodicBoundaryBase(const PeriodicBoundaryBase& other);
 
   /**
@@ -68,8 +68,8 @@ public:
   virtual ~PeriodicBoundaryBase() {}
 
   /**
-   * This function should be overloaded by derived classes to 
-   * define how one finds corresponding nodes on the periodic 
+   * This function should be overloaded by derived classes to
+   * define how one finds corresponding nodes on the periodic
    * boundary pair.
    */
   virtual Point get_corresponding_pos(const Point & pt) const = 0;
@@ -82,7 +82,7 @@ public:
    * from a forward transformation.  Note that not every transformation
    * needs to provide an automatic way to clone an inverse: you can simply
    * add a pair of PeriodicBoundaryBase objects using the appropriate
-   * DofMap interface instead.  The simplest way to implement a clone 
+   * DofMap interface instead.  The simplest way to implement a clone
    * function like this is in terms of a copy constructor, see periodic_boundary.h.
    */
   virtual AutoPtr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const = 0;

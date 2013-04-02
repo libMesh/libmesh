@@ -304,7 +304,7 @@ void ExactSolution::compute_error(const std::string& sys_name,
 
   libmesh_assert( _equation_systems.has_system(sys_name) );
   const System& sys = _equation_systems.get_system<System>( sys_name );
-  
+
   libmesh_assert( sys.has_variable( unknown_name ) );
   switch( FEInterface::field_type(sys.variable_type( unknown_name )) )
     {
@@ -402,7 +402,7 @@ Real ExactSolution::error_norm(const std::string& sys_name,
       return error_vals[3];
     case L_INF:
       return error_vals[4];
-    
+
     // Currently only Sobolev norms/seminorms are supported
     default:
       libmesh_error();
@@ -639,7 +639,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   const std::vector<std::vector<OutputShape> >&  phi_values         = fe->get_phi();
 
   // The value of the shape function gradients at the quadrature points
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >& 
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >&
 		    dphi_values = fe->get_dphi();
 
   // The value of the shape function curls at the quadrature points
@@ -658,8 +658,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   // The value of the shape function second derivatives at the quadrature points
-  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >& 
-		    d2phi_values = fe->get_d2phi(); 
+  const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >&
+		    d2phi_values = fe->get_d2phi();
 #endif
 
   // The XYZ locations (in physical space) of the quadrature points
@@ -696,7 +696,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
       const unsigned int n_qp = qrule->n_points();
 
       // The number of shape functions
-      const unsigned int n_sf = 
+      const unsigned int n_sf =
 	libmesh_cast_int<unsigned int>(dof_indices.size());
 
       //
@@ -780,7 +780,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	    }
 
 	  const typename FEGenericBase<OutputShape>::OutputNumberGradient grad_error = grad_u_h - exact_grad;
-	  
+
 	  error_vals[1] += JxW[qp]*grad_error.size_sq();
 
 
@@ -800,7 +800,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 		}
 
 	      const typename FEGenericBase<OutputShape>::OutputNumber curl_error = curl_u_h - exact_curl;
-	      
+
 	      error_vals[5] += JxW[qp]*TensorTools::norm_sq(curl_error);
 
 	      // Compute the value of the error in the divergence at this
@@ -815,9 +815,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 		  // FIXME: Need to implement div for MeshFunction and support reference
 		  //        solution for vector-valued elements
 		}
-	      
+
 	      const typename FEGenericBase<OutputShape>::OutputNumberDivergence div_error = div_u_h - exact_div;
-	      
+
 	      error_vals[6] += JxW[qp]*TensorTools::norm_sq(div_error);
 	    }
 
@@ -828,7 +828,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	  RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberTensor> exact_hess_accessor( exact_hess, dim );
 	  if (_exact_hessians.size() > sys_num && _exact_hessians[sys_num])
 	    {
-	      //FIXME: This needs to be implemented to support rank 3 tensors 
+	      //FIXME: This needs to be implemented to support rank 3 tensors
 	      //       which can't happen until type_n_tensor is fully implemented
 	      //       and a RawAccessor<TypeNTensor> is fully implemented
 	      if( FEInterface::field_type(fe_type) == TYPE_VECTOR )
@@ -846,9 +846,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 	      // FIXME: Needs to be updated for vector-valued elements
 	      exact_hess = coarse_values->hessian(q_point[qp]);
 	    }
-	  
+
 	  const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
-	  
+
 	  // FIXME: PB: Is this what we want for rank 3 tensors?
 	  error_vals[2] += JxW[qp]*grad2_error.size_sq();
 #endif

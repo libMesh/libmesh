@@ -196,4 +196,3 @@ DenseMatrixBase<T>::add (const T2 factor,
 } // namespace libMesh
 
 #endif // LIBMESH_DENSE_MATRIX_BASE_H
-

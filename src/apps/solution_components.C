@@ -53,7 +53,7 @@ int main(int argc, char** argv)
   Mesh mesh2(mesh1);
   EquationSystems es2(mesh2);
 
-  es1.read(argv[2], 
+  es1.read(argv[2],
            EquationSystems::READ_HEADER |
            EquationSystems::READ_DATA |
            EquationSystems::READ_ADDITIONAL_DATA |
@@ -116,14 +116,14 @@ int main(int argc, char** argv)
 
       // Mesh::operator= hopefully preserved elem/node orderings...
       libmesh_assert (*old_node == *new_node);
-       
+
       for (int argi = 4; argi < argc; argi += 2)
         {
           const unsigned int pairnum = (argi-4)/2;
 
           const System &old_sys = *old_system[pairnum];
           System &new_sys = *new_system[pairnum];
- 
+
           const unsigned int n_comp =
             old_node->n_comp(old_sys_num[pairnum],old_var_num[pairnum]);
           libmesh_assert_equal_to(n_comp,
@@ -155,14 +155,14 @@ int main(int argc, char** argv)
 
       // Mesh::operator= hopefully preserved elem/node orderings...
       libmesh_assert (*old_elem == *new_elem);
-       
+
       for (int argi = 4; argi < argc; argi += 2)
         {
           const unsigned int pairnum = (argi-4)/2;
 
           const System &old_sys = *old_system[pairnum];
           System &new_sys = *new_system[pairnum];
- 
+
           const unsigned int n_comp =
             old_elem->n_comp(old_sys_num[pairnum],old_var_num[pairnum]);
           libmesh_assert_equal_to(n_comp,

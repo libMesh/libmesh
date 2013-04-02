@@ -85,6 +85,3 @@ Preconditioner<T>::build(const SolverPackage solver_package)
 template class Preconditioner<Number>;
 
 } // namespace libMesh
-
-
-

@@ -45,7 +45,3 @@ using namespace libMeshEnums;
 
 
 #endif // LIBMESH_ENUM_PARALLEL_TYPE_H
-
-
-
-

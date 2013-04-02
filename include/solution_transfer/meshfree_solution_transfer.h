@@ -34,7 +34,7 @@ class MeshfreeSolutionTransfer : public SolutionTransfer
 public:
   MeshfreeSolutionTransfer() {}
   virtual ~MeshfreeSolutionTransfer() {}
-  
+
   /**
    * Transfer the values of a variable to another.
    */

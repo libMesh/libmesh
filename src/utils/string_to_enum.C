@@ -679,6 +679,3 @@ namespace Utility {
 } // namespace Utility
 
 } // namespace libMesh
-
-
-

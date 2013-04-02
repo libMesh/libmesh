@@ -69,7 +69,7 @@ public:
    * Read in and initialize parameters from \p parameters_filename.
    */
   void process_temporal_parameters_file (const std::string& parameters_filename);
-  
+
   /**
    * Pull the temporal discretization data from \p other.
    */

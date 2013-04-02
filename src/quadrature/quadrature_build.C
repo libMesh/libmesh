@@ -168,4 +168,3 @@ AutoPtr<QBase> QBase::build(const QuadratureType _qt,
 }
 
 } // namespace libMesh
-

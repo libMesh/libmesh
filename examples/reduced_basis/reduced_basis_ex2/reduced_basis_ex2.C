@@ -6,12 +6,12 @@
 /* modify it under the terms of the GNU Lesser General Public */
 /* License as published by the Free Software Foundation; either */
 /* version 2.1 of the License, or (at your option) any later version. */
-  
+
 /* rbOOmit is distributed in the hope that it will be useful, */
 /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
 /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
 /* Lesser General Public License for more details. */
-  
+
 /* You should have received a copy of the GNU Lesser General Public */
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
@@ -85,7 +85,7 @@ int main (int argc, char** argv)
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  
+
   // Parse the input file (reduced_basis_ex2.in) using GetPot
   std::string parameters_filename = "reduced_basis_ex2.in";
   GetPot infile(parameters_filename);
@@ -151,11 +151,11 @@ int main (int argc, char** argv)
 
   // Tell rb_eval about rb_scm_eval
   rb_eval.rb_scm_eval = &rb_scm_eval;
-  
+
   // Finally, need to give rb_scm_con and rb_eval a pointer to the
   // SCM evaluation object, rb_scm_eval
   rb_scm_con.set_rb_scm_evaluation(rb_scm_eval);
-  
+
   if(!online_mode) // Perform the Offline stage of the RB method
   {
     // Read in the data that defines this problem from the specified text file
@@ -170,7 +170,7 @@ int main (int argc, char** argv)
     // This sets up the necessary data structures and performs
     // initial assembly of the "truth" affine expansion of the PDE.
     rb_con.initialize_rb_construction();
-    
+
     // Perform the SCM Greedy algorithm to derive the data required
     // for rb_scm_eval to provide a coercivity lower bound.
     rb_scm_con.perform_SCM_greedy();
@@ -179,11 +179,11 @@ int main (int argc, char** argv)
     // "truth" solves, at well-chosen parameter values and employing
     // these snapshots as basis functions.
     rb_con.train_reduced_basis();
-    
+
     // Write out the data that will subsequently be required for the Evaluation stage
     rb_con.get_rb_evaluation().write_offline_data_to_files("rb_data");
     rb_scm_con.get_rb_scm_evaluation().write_offline_data_to_files("scm_data");
-    
+
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
@@ -209,7 +209,7 @@ int main (int argc, char** argv)
     online_mu.set_value("mu_2", online_mu_2);
     rb_eval.set_parameters(online_mu);
     rb_eval.print_parameters();
- 
+
     // Now do the Online solve using the precomputed reduced basis
     rb_eval.rb_solve(online_N);
 
@@ -231,13 +231,13 @@ int main (int argc, char** argv)
     {
       // Read in the basis functions
       rb_eval.read_in_basis_functions(rb_con,"rb_data");
-      
+
       // Plot the solution
       rb_con.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
 #endif
-      
+
       // Plot the first basis function that was generated from the train_reduced_basis
       // call in the Offline stage
       rb_con.load_basis_function(0);
@@ -251,4 +251,3 @@ int main (int argc, char** argv)
 
 #endif // LIBMESH_HAVE_SLEPC && LIBMESH_HAVE_GLPK
 }
-

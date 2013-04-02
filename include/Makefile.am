@@ -2,7 +2,7 @@ SUBDIRS = libmesh
 
 # special handholding for prefix_config.m4 generated files
 # so that 'make clean ; make' works as does 'make distcheck'
-# libmesh_config.h is made by ./configure, so it should get 
+# libmesh_config.h is made by ./configure, so it should get
 # cleaned by 'make distclean'
 DISTCLEANFILES = libmesh_config.h
 
@@ -34,7 +34,7 @@ if LIBMESH_ENABLE_EXODUS
 endif
 if LIBMESH_ENABLE_FPARSER
   headers_to_test += contrib/fparser.hh
-endif 
+endif
 
 test_headers:
 	@echo " "
@@ -55,4 +55,3 @@ installcheck-local:
 	  PKG_CONFIG_PATH=$(pkgconfigdir) \
 	  LIBMESH_CONFIG_PATH=$(bindir) \
 	  $(top_srcdir)/contrib/bin/test_installed_headers.sh
-

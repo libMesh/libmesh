@@ -72,7 +72,7 @@ TransientRBConstruction::TransientRBConstruction (EquationSystems& es,
   compute_RB_inner_product = true;
 
   temporal_data.resize(0);
-  
+
   // We should not necessarily exit the greedy due to repeated parameters in
   // the transient case
   exit_on_repeated_greedy_parameters = false;
@@ -137,7 +137,7 @@ void TransientRBConstruction::initialize_rb_construction()
 #endif
   // This assert only gets called if DEBUG is on
   libmesh_assert_equal_to (trans_theta_expansion.get_n_M_terms(), trans_assembly_expansion.get_n_M_terms());
-  
+
   Parent::initialize_rb_construction();
 }
 
@@ -162,7 +162,7 @@ void TransientRBConstruction::process_parameters_file (const std::string& parame
   set_POD_tol(POD_tol_in);
   set_max_truth_solves(max_truth_solves_in);
   set_delta_N(delta_N_in);
-  
+
   // Pass the temporal discretization data to the RBEvaluation
   TransientRBEvaluation& trans_rb_eval = libmesh_cast_ref<TransientRBEvaluation&>(get_rb_evaluation());
   trans_rb_eval.pull_temporal_discretization_data( *this );
@@ -246,7 +246,7 @@ void TransientRBConstruction::allocate_data_structures()
       dof_map.attach_matrix(*non_dirichlet_L2_matrix);
       non_dirichlet_L2_matrix->init();
       non_dirichlet_L2_matrix->zero();
-      
+
       non_dirichlet_M_q_vector.resize(Q_m);
       for(unsigned int q=0; q<Q_m; q++)
       {

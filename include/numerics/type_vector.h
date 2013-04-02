@@ -362,11 +362,11 @@ TypeVector<T>::TypeVector ()
 
 #if LIBMESH_DIM > 1
   _coords[1] = 0;
-#endif 
+#endif
 
 #if LIBMESH_DIM > 2
   _coords[2] = 0;
-#endif 
+#endif
 }
 
 

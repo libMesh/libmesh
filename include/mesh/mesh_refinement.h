@@ -82,7 +82,7 @@ public:
    * element flagging.  This can be used instead of or to
    * augment traditional error indicator based refinement.
    * This simply provides a base class that can be derived
-   * from and then passed to the 
+   * from and then passed to the
    * \p flag_elements_by () method.
    */
   class ElementFlagging
@@ -201,8 +201,8 @@ public:
    * Flag elements based on a function object.  The class \p ElementFlagging
    * defines a mechanism for implementing refinement strategies.
    */
-  void flag_elements_by (ElementFlagging &element_flagging);    
-    
+  void flag_elements_by (ElementFlagging &element_flagging);
+
   /**
    * Takes a mesh whose elements are flagged for h refinement and coarsening,
    * and switches those flags to request p refinement and coarsening instead.

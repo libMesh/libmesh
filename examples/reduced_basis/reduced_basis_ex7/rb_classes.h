@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -104,7 +104,7 @@ public:
     p_var = this->add_variable ("p", SECOND);
 
     Parent::init_data();
-    
+
     acoustics_rb_assembly_expansion = new AcousticsRBAssemblyExpansion(get_mesh());
 
     // Set the rb_assembly_expansion for this Construction object.
@@ -132,7 +132,7 @@ public:
    * Variable number for pd.
    */
   unsigned int p_var;
-  
+
   /**
    * The object that stores the "assembly" expansion of the parameter dependent PDE,
    * i.e. the objects that define how to assemble the set of parameter-independent

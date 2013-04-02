@@ -116,7 +116,7 @@ double VariationalMeshSmoother::smooth(unsigned int)
     }
   if(me>1) vms_err=readmetr(metr,H,ncells,n,sout);
   if(vms_err<0)
-    { 
+    {
       fprintf(sout,"Error reading metric file\n");
       fclose(sout);
       return _dist_norm;

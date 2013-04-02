@@ -40,11 +40,11 @@ namespace libMesh
 
 /**
  * Base class to support various mesh-free interpolation methods.
- * Such methods can be useful for example to pass data between 
+ * Such methods can be useful for example to pass data between
  * two different domains which share a physical boundary, where
  * that boundary may be discretized differently in each domain.
  * This is the case for conjugate heat transfer applications where
- * the common interface has overlapping but distinct boundary 
+ * the common interface has overlapping but distinct boundary
  * discretizations.
  */
 class MeshfreeInterpolation
@@ -56,15 +56,15 @@ public:
    *
    * SYNC_SOURCES assumes that the data added on each processor are
    * independent and relatively small.  Calling the \p prepare_for_use()
-   * method with this \p ParallelizationStrategy will copy remote data 
-   * from other processors, so all interpolation can be performed 
+   * method with this \p ParallelizationStrategy will copy remote data
+   * from other processors, so all interpolation can be performed
    * locally.
    *
    * Other \p ParallelizationStrategy techniques will be implemented
    * as needed.
    */
   enum ParallelizationStrategy { SYNC_SOURCES     = 0,
-				 INVALID_STRATEGY}; 
+				 INVALID_STRATEGY};
   /**
    * Constructor.
    */
@@ -81,7 +81,7 @@ public:
   /**
    * Same as above, but allows you to also use stream syntax.
    */
-  friend std::ostream& operator << (std::ostream& os, 
+  friend std::ostream& operator << (std::ostream& os,
 				    const MeshfreeInterpolation& mfi);
 
   /**
@@ -93,9 +93,9 @@ public:
   /**
    * The number of field variables.
    */
-  unsigned int n_field_variables () const 
+  unsigned int n_field_variables () const
   { return libmesh_cast_int<unsigned int>(_names.size()); }
-  
+
   /**
    * Defines the field variable(s) we are responsible for,
    * and importantly their assumed ordering.
@@ -108,13 +108,13 @@ public:
    */
   const std::vector<std::string> & field_variables() const
   { return _names; }
-  
+
   /**
    * @returns a writeable reference to the point list.
    */
   std::vector<Point> & get_source_points ()
   { return _src_pts; }
-  
+
   /**
    * @returns a writeable reference to the point list.
    */
@@ -123,13 +123,13 @@ public:
 
   /**
    * Sets source data at specified points.
-   */     
+   */
   virtual void add_field_data (const std::vector<std::string> &field_names,
 			       const std::vector<Point>  &pts,
 			       const std::vector<Number> &vals);
 
   /**
-   * Prepares data structures for use. 
+   * Prepares data structures for use.
    *
    * This method is virtual so that it can be overwritten or extended as required
    * in derived classes.
@@ -155,7 +155,7 @@ protected:
    * in derived classes.
    */
   virtual void gather_remote_data ();
-  
+
   ParallelizationStrategy  _parallelization_strategy;
   std::vector<std::string> _names;
   std::vector<Point>       _src_pts;
@@ -172,16 +172,16 @@ class InverseDistanceInterpolation : public MeshfreeInterpolation
 {
 protected:
 
-#ifdef LIBMESH_HAVE_NANOFLANN  
+#ifdef LIBMESH_HAVE_NANOFLANN
   /**
    * This class adapts list of libMesh \p Point types
-   * for use in a nanoflann KD-Tree. For more on the 
+   * for use in a nanoflann KD-Tree. For more on the
    * basic idea see examples/pointcloud_adaptor_example.cpp
    * in the nanoflann source tree.
    */
   template <unsigned int PLDim>
   class PointListAdaptor
-  {    
+  {
   private:
     const std::vector<Point> &_pts;
 
@@ -199,9 +199,9 @@ protected:
      * Must return the number of data points
      */
     inline size_t kdtree_get_point_count() const { return _pts.size(); }
-    
+
     /**
-     * Returns the distance between the vector "p1[0:size-1]" 
+     * Returns the distance between the vector "p1[0:size-1]"
      * and the data point with index "idx_p2" stored in the class
      */
     inline coord_t kdtree_distance(const coord_t *p1, const size_t idx_p2, size_t size) const
@@ -221,7 +221,7 @@ protected:
 
 	    return d0*d0 + d1*d1 + d2*d2;
 	  }
-	 
+
 	case 2:
 	  {
 	    const coord_t d0=p1[0] - p2(0);
@@ -229,14 +229,14 @@ protected:
 
 	    return d0*d0 + d1*d1;
 	  }
-	 
+
 	case 1:
 	  {
 	    const coord_t d0=p1[0] - p2(0);
 
 	    return d0*d0;
 	  }
-	 
+
 	default:
 	  libMesh::err << "ERROR: unknown size " << size << std::endl;
 	  libmesh_error();
@@ -244,7 +244,7 @@ protected:
 
       return -1.;
     }
-    
+
     /**
      * Returns the dim'th component of the idx'th point in the class:
      * Since this is inlined and the "dim" argument is typically an immediate value, the
@@ -262,11 +262,11 @@ protected:
       if (dim==1) return p(1);
       return p(2);
     }
-    
+
     /**
      * Optional bounding-box computation: return false to default to a standard bbox computation loop.
-     * Return true if the BBOX was already computed by the class and returned in "bb" so it can be 
-     * avoided to redo it again. Look at bb.size() to find out the expected dimensionality 
+     * Return true if the BBOX was already computed by the class and returned in "bb" so it can be
+     * avoided to redo it again. Look at bb.size() to find out the expected dimensionality
      * (e.g. 2 or 3 for point clouds)
      */
     template <class BBOX>
@@ -302,20 +302,20 @@ protected:
 			    const std::vector<size_t> &src_indices,
 			    const std::vector<Real>   &src_dist_sqr,
 			    std::vector<Number>::iterator &out_it) const;
-  
+
   const Real         _half_power;
   const unsigned int _n_interp_pts;
 
   /**
    * Temporary work array.  Object level scope to avoid cache thrashing.
-   */  
+   */
   mutable std::vector<Number> _vals;
-  
+
 public:
 
   /**
-   * Constructor. Takes the inverse distance power, 
-   * which defaults to 2. 
+   * Constructor. Takes the inverse distance power,
+   * which defaults to 2.
    */
   InverseDistanceInterpolation (const unsigned int n_interp_pts = 8,
 				                const Real  power               = 2) :

@@ -35,7 +35,7 @@
  // to see what PETSc is doing behind the scenes or
  //
  // ./introduction_ex2 -log_summary
- // 
+ //
  // to get a summary of what PETSc did.
  // Among other things, libMesh::init() initializes the MPI
  // communications library and PETSc numeric library on your system if
@@ -66,17 +66,17 @@ int main (int argc, char** argv)
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  
+
   // A brief message to the user to inform her of the
   // exact name of the program being run, and its command line.
   std::cout << "Running " << argv[0];
   for (int i=1; i<argc; i++)
     std::cout << " " << argv[i];
   std::cout << std::endl << std::endl;
-  
+
   // Create a mesh.
   Mesh mesh;
-  
+
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the unit square.  By default a mesh of QUAD4
   // elements will be created.  We instruct the mesh generator
@@ -84,33 +84,33 @@ int main (int argc, char** argv)
   MeshTools::Generation::build_square (mesh, 5, 5);
 
   // Create an equation systems object. This object can
-  // contain multiple systems of different 
-  // flavors for solving loosely coupled physics.  Each system can 
-  // contain multiple variables of different approximation orders.  
-  // Here we will simply create a single system with one variable.  
-  // Later on, other flavors of systems will be introduced.  For the 
+  // contain multiple systems of different
+  // flavors for solving loosely coupled physics.  Each system can
+  // contain multiple variables of different approximation orders.
+  // Here we will simply create a single system with one variable.
+  // Later on, other flavors of systems will be introduced.  For the
   // moment, we use the general system.
   // The EquationSystems object needs a reference to the mesh
   // object, so the order of construction here is important.
   EquationSystems equation_systems (mesh);
-  
+
   // Add a flag "test" that is visible for all systems.  This
   // helps in inter-system communication.
   equation_systems.parameters.set<bool> ("test") = true;
-    
+
   // Set a simulation-specific parameter visible for all systems.
   // This helps in inter-system-communication.
   equation_systems.parameters.set<Real> ("dummy") = 42.;
-    
-  // Set another simulation-specific parameter 
+
+  // Set another simulation-specific parameter
   equation_systems.parameters.set<Real> ("nobody") = 0.;
-  
+
   // Now we declare the system and its variables.
   // We begin by adding a "TransientLinearImplicitSystem" to the
   // EquationSystems object, and we give it the name
   // "Simple System".
   equation_systems.add_system<TransientLinearImplicitSystem> ("Simple System");
-    
+
   // Adds the variable "u" to "Simple System".  "u"
   // will be approximated using first-order approximation.
   equation_systems.get_system("Simple System").add_variable("u", FIRST);
@@ -121,16 +121,16 @@ int main (int argc, char** argv)
   equation_systems.add_system<ExplicitSystem> ("Complex System");
 
   // Give "Complex System" three variables -- each with a different approximation
-  // order.  Variables "c" and "T" will use first-order Lagrange approximation, 
+  // order.  Variables "c" and "T" will use first-order Lagrange approximation,
   // while variable "dv" will use a second-order discontinuous
   // approximation space.
   equation_systems.get_system("Complex System").add_variable("c", FIRST);
   equation_systems.get_system("Complex System").add_variable("T", FIRST);
   equation_systems.get_system("Complex System").add_variable("dv", SECOND, MONOMIAL);
-    
+
   // Initialize the data structures for the equation system.
   equation_systems.init();
-        
+
   // Print information about the mesh to the screen.
   mesh.print_info();
   // Prints information about the system to the screen.
@@ -152,16 +152,16 @@ int main (int argc, char** argv)
       {
         std::cout << "<<< Writing system to file " << argv[1]
                   << std::endl;
-        
+
         // Write the system.
         equation_systems.write (argv[1], libMeshEnums::WRITE);
-        
+
         // Clear the equation systems data structure.
         equation_systems.clear ();
 
         std::cout << ">>> Reading system from file " << argv[1]
                   << std::endl << std::endl;
-        
+
         // Read the file we just wrote.  This better
         // work!
         equation_systems.read (argv[1], libMeshEnums::READ);
@@ -169,7 +169,7 @@ int main (int argc, char** argv)
         // Print the information again.
         equation_systems.print_info();
       }
-  
+
   // All done.  libMesh objects are destroyed here.  Because the
   // LibMeshInit object was created first, its destruction occurs
   // last, and it's destructor finalizes any external libraries and

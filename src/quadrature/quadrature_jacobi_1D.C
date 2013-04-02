@@ -1023,5 +1023,3 @@ void QJacobi::init_1D(const ElemType,
 }
 
 } // namespace libMesh
-
-

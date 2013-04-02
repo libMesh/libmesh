@@ -4,7 +4,7 @@ data          = miscellaneous_ex6.C run.sh
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 
-CLEANFILES = hole_3D.e delaunay_l_shaped_hole.e 
+CLEANFILES = hole_3D.e delaunay_l_shaped_hole.e
 
 ##############################################
 # include common example environment

@@ -63,7 +63,7 @@ namespace
     //int*   connData;
 
     void set_n_cells (const unsigned int nc);
-    
+
     const unsigned int n_nodes;
     const unsigned int n_vars;
     unsigned int n_cells;
@@ -287,20 +287,20 @@ void TecplotIO::write_binary (const std::string& fname,
   libMesh::err << "WARNING: Tecplot Binary files require the Tecplot API." << std::endl
 	       << "Continuing with ASCII output."
 	       << std::endl;
-  
+
   if (libMesh::processor_id() == 0)
     this->write_ascii (fname, vec, solution_names);
   return;
 
 
-  
+
   //------------------------------------------------------------
   // New binary formats, time aware and whatnot
 #elif defined(LIBMESH_HAVE_TECPLOT_API_112)
-  
+
   // Get a constant reference to the mesh.
   const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
-    
+
   // Required variables
   std::string tecplot_variable_names;
   int
@@ -321,12 +321,12 @@ void TecplotIO::write_binary (const std::string& fname,
       cell_type   = 1;  // FELINESEG
       nn_per_elem = 2;
       break;
-      
+
     case 2:
       cell_type   = 3; // FEQUADRILATERAL
       nn_per_elem = 4;
       break;
-      
+
     case 3:
       cell_type   = 5; // FEBRICK
       nn_per_elem = 8;
@@ -418,14 +418,14 @@ void TecplotIO::write_binary (const std::string& fname,
 		    &file_type,
 		    &tec_debug,
 		    &is_double);
-  
+
   libmesh_assert_equal_to (ierr, 0);
 
   // A zone for each subdomain
   bool firstzone=true;
   for (std::set<subdomain_id_type>::const_iterator sbd_it=_subdomain_ids.begin();
        sbd_it!=_subdomain_ids.end(); ++sbd_it)
-    {      
+    {
       // Copy the connectivity for this subdomain
       {
 	MeshBase::const_element_iterator       it  = the_mesh.active_subdomain_elements_begin (*sbd_it);
@@ -435,12 +435,12 @@ void TecplotIO::write_binary (const std::string& fname,
 
 	for (; it != end; ++it)
 	  n_subcells_in_subdomain += (*it)->n_sub_elem();
-	
+
 	// update the connectivty array to include only the elements in this subdomain
 	tm.set_n_cells (n_subcells_in_subdomain);
 
 	unsigned int te = 0;
-	  
+
 	for (it  = the_mesh.active_subdomain_elements_begin (*sbd_it);
 	     it != end; ++it)
 	  {
@@ -448,18 +448,18 @@ void TecplotIO::write_binary (const std::string& fname,
 	    for (unsigned int se=0; se<(*it)->n_sub_elem(); se++)
 	      {
 		(*it)->connectivity(se, TECPLOT, conn);
-		  
+
 		for (unsigned int node=0; node<conn.size(); node++)
 		  tm.cd(node,te) = conn[node];
-		  
+
 		te++;
 	      }
 	  }
       }
-	
-	
+
+
       // Ready to call the Tecplot API for this subdomain
-      {	
+      {
 	int
 	  num_nodes   = static_cast<int>(the_mesh.n_nodes()),
 	  num_cells   = static_cast<int>(tm.n_cells),
@@ -476,7 +476,7 @@ void TecplotIO::write_binary (const std::string& fname,
 	  num_connect_boundary_faces = 0,
 	  tot_num_boundary_connect   = 0,
 	  share_connect_from_zone=0;
-	  
+
 	std::vector<int>
 	  passive_var_list    (tm.n_vars, 0),
 	  share_var_from_zone (tm.n_vars, 1); // We only write data for the first zone, all other
@@ -486,12 +486,12 @@ void TecplotIO::write_binary (const std::string& fname,
 	std::string subdomain_name = the_mesh.subdomain_name(*sbd_it);
 	std::ostringstream zone_name;
 	zone_name << this->zone_title();
-	
+
 	// We will title this
 	// "{zone_title()}_{subdomain_name}", or
 	// "{zone_title()}_{subdomain_id}", or
 	// "{zone_title()}"
-	if (subdomain_name.size())	
+	if (subdomain_name.size())
 	  {
 	    zone_name << "_";
 	    zone_name << subdomain_name;
@@ -501,7 +501,7 @@ void TecplotIO::write_binary (const std::string& fname,
 	    zone_name << "_";
 	    zone_name << *sbd_it;
 	  }
-	    
+
 	ierr = TECZNE112 ((char*) zone_name.str().c_str(),
 			  &cell_type,
 			  &num_nodes,
@@ -523,9 +523,9 @@ void TecplotIO::write_binary (const std::string& fname,
 			  NULL, // = all are node centered
 			  (firstzone) ? NULL : &share_var_from_zone[0],
 			  &share_connect_from_zone);
-	  
+
 	libmesh_assert_equal_to (ierr, 0);
-	  	  
+
 	// Write *all* the data for the first zone, then share it with the others
 	if (firstzone)
 	  {
@@ -535,18 +535,18 @@ void TecplotIO::write_binary (const std::string& fname,
 #else
  	      ((3 + 3*((solution_names == NULL) ? 0 : solution_names->size()))*num_nodes);
 #endif
-	    
-	  
+
+
 	    ierr = TECDAT112 (&total,
 			      &tm.nodalData[0],
 			      &is_double);
-	      
+
 	    libmesh_assert_equal_to (ierr, 0);
 	  }
 
 	// Write the connectivity
 	ierr = TECNOD112 (&tm.connData[0]);
-	  
+
 	libmesh_assert_equal_to (ierr, 0);
       }
 
@@ -555,12 +555,12 @@ void TecplotIO::write_binary (const std::string& fname,
 
   // Done, close the file.
   ierr = TECEND112 ();
-    
+
   libmesh_assert_equal_to (ierr, 0);
-  
 
 
-  
+
+
   //------------------------------------------------------------
   // Legacy binary format
 #else
@@ -732,4 +732,3 @@ void TecplotIO::write_binary (const std::string& fname,
 }
 
 } // namespace libMesh
-

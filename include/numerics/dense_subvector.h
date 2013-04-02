@@ -304,4 +304,3 @@ Real DenseSubVector<T>::linfty_norm () const
 
 
 #endif // LIBMESH_DENSE_SUBVECTOR_H
-

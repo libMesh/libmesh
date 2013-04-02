@@ -53,7 +53,7 @@ namespace libMesh
     typename CompareTypes<T, T2>::supertype
     inner_product(const TypeVector<T>& a, const TypeVector<T2>& b)
     { return a * b; }
-    
+
     template <typename T, typename T2>
     inline
     typename CompareTypes<T, T2>::supertype
@@ -66,12 +66,12 @@ namespace libMesh
     inner_product(const TypeNTensor<N,T>& a, const TypeNTensor<N,T2>& b)
     { return a.contract(b); }
 
-    template<typename T> 
-    inline 
+    template<typename T>
+    inline
     T norm_sq(T a) { return a*a; }
 
     template<typename T>
-    inline 
+    inline
     T norm_sq(std::complex<T> a) { return std::norm(a); }
 
     template <typename T>
@@ -95,27 +95,27 @@ namespace libMesh
     {
       typedef VectorValue<T> type;
     };
-    
+
     template <typename T>
     struct IncrementRank<VectorValue<T> >
     {
       typedef TensorValue<T> type;
     };
-    
-    
+
+
     template <typename T>
     struct IncrementRank<TypeVector<T> >
     {
       typedef TensorValue<T> type;
     };
-   
+
     template <typename T>
     struct IncrementRank<TypeTensor<T> >
     {
       typedef TypeNTensor<3,T> type;
     };
-    
-    
+
+
     template <typename T>
     struct IncrementRank<TensorValue<T> >
     {
@@ -128,7 +128,7 @@ namespace libMesh
       typedef TypeNTensor<N+1,T> type;
     };
 
-    
+
     // Also need rank-decreasing case
     template <typename T>
     struct DecrementRank
@@ -138,25 +138,25 @@ namespace libMesh
       // operations...
       typedef T type;
     };
-    
+
     template <typename T>
     struct DecrementRank<VectorValue<T> >
     {
       typedef T type;
     };
-    
+
     template <typename T>
     struct DecrementRank<TypeVector<T> >
     {
       typedef T type;
     };
-    
+
     template <typename T>
     struct DecrementRank<TensorValue<T> >
     {
       typedef VectorValue<T> type;
     };
-    
+
     template <typename T>
     struct DecrementRank<TypeTensor<T> >
     {
@@ -179,7 +179,7 @@ namespace libMesh
       typedef T type;
 #endif
     };
-    
+
     template <typename T>
     struct MakeNumber<std::complex<T> >
     {
@@ -187,8 +187,8 @@ namespace libMesh
       // numbers
       //typedef std::complex<T> type;
     };
-    
-    
+
+
     template <typename T>
     struct MakeNumber<TypeVector<T> >
     {
@@ -230,13 +230,13 @@ namespace libMesh
     {
       typedef T type;
     };
-    
+
     template <typename T>
     struct MakeReal<std::complex<T> >
     {
       typedef T type;
     };
-    
+
     template <typename T>
     struct MakeReal<TypeVector<T> >
     {
@@ -269,20 +269,20 @@ namespace libMesh
 
     // Needed for ExactSolution to compile
     Number curl_from_grad( const VectorValue<Number>& );
-    
+
     //! Computes the curl of a vector given the gradient of that vector
     VectorValue<Number> curl_from_grad( const TensorValue<Number>& grad );
-    
+
     /*! Place holder needed for ExactSolution to compile. Will compute the
         curl of a tensor given the gradient of that tensor. */
     TensorValue<Number> curl_from_grad( const TypeNTensor<3,Number>& grad );
-    
+
     //! Dummy. Divgerence of a scalar not defined, but is needed for ExactSolution to compile
     Number div_from_grad( const VectorValue<Number>& grad );
-    
+
     //! Computes the divergence of a vector given the gradient of that vector
     Number div_from_grad( const TensorValue<Number>& grad );
-    
+
     /*! Place holder needed for ExactSolution to compile. Will compute the
         divergence of a tensor given the gradient of that tensor. */
     VectorValue<Number> div_from_grad( const TypeNTensor<3,Number>& grad );

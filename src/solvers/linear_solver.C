@@ -180,6 +180,3 @@ template class LinearSolver<Number>;
 
 
 } // namespace libMesh
-
-
-

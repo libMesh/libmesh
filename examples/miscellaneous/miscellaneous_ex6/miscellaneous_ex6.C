@@ -19,7 +19,7 @@
 
  // <h1>Miscellaneous Example 6 - Meshing with LibMesh's TetGen and Triangle Interfaces</h1>
  //
- // LibMesh provides interfaces to both Triangle and TetGen for generating 
+ // LibMesh provides interfaces to both Triangle and TetGen for generating
  // Delaunay triangulations and tetrahedralizations in two and three dimensions
  // (respectively).
 
@@ -60,14 +60,14 @@ int main (int argc, char** argv)
 
   // 1.) 2D triangulation of L-shaped domain with three holes of different shape
   triangulate_domain();
-  
+
   libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
 
   std::cout << "Tetrahedralizing a prismatic domain with a hole" << std::endl;
 
   // 2.) 3D tetrahedralization of rectangular domain with hole.
   tetrahedralize_domain();
-  
+
   return 0;
 }
 
@@ -84,7 +84,7 @@ void triangulate_domain()
 
   // Libmesh mesh that will eventually be created.
   Mesh mesh(2);
-    
+
   // The points which make up the L-shape:
   mesh.add_point(Point( 0. ,  0.));
   mesh.add_point(Point( 0. , -1.));
@@ -114,7 +114,7 @@ void triangulate_domain()
   t.smooth_after_generating() = true;
 
   // Define holes...
-    
+
   // hole_1 is a circle (discretized by 50 points)
   PolygonHole hole_1(Point(-0.5,  0.5), // center
 		     0.25,              // radius
@@ -137,15 +137,15 @@ void triangulate_domain()
   for (unsigned int i=0; i<n_ellipse_points; ++i)
     ellipse_points[i]= Point(ellipse_center(0)+a*cos(i*dtheta),
 			     ellipse_center(1)+b*sin(i*dtheta));
-    
+
   ArbitraryHole hole_3(ellipse_center, ellipse_points);
-	
+
   // Create the vector of Hole*'s ...
   std::vector<Hole*> holes;
   holes.push_back(&hole_1);
   holes.push_back(&hole_2);
   holes.push_back(&hole_3);
-	
+
   // ... and attach it to the triangulator object
   t.attach_hole_list(&holes);
 
@@ -163,13 +163,13 @@ void triangulate_domain()
 void tetrahedralize_domain()
 {
 #ifdef LIBMESH_HAVE_TETGEN
-  // The algorithm is broken up into several steps: 
+  // The algorithm is broken up into several steps:
   // 1.) A convex hull is constructed for a rectangular hole.
   // 2.) A convex hull is constructed for the domain exterior.
   // 3.) Neighbor information is updated so TetGen knows there is a convex hull
   // 4.) A vector of hole points is created.
   // 5.) The domain is tetrahedralized, the mesh is written out, etc.
-  
+
   // The mesh we will eventually generate
   SerialMesh mesh(3);
 
@@ -179,7 +179,7 @@ void tetrahedralize_domain()
 
   // 1.) Construct a convex hull for the hole
   add_cube_convex_hull_to_mesh(mesh, hole_lower_limit, hole_upper_limit);
-  
+
   // 2.) Generate elements comprising the outer boundary of the domain.
   add_cube_convex_hull_to_mesh(mesh, Point(0.,0.,0.), Point(1., 1., 1.));
 
@@ -191,7 +191,7 @@ void tetrahedralize_domain()
   hole[0] = Point( 0.5*(hole_lower_limit + hole_upper_limit) );
 
   // 5.) Set parameters and tetrahedralize the domain
-  
+
   // 0 means "use TetGen default value"
   Real quality_constraint = 2.0;
 
@@ -199,13 +199,13 @@ void tetrahedralize_domain()
   // volume in the Mesh.  TetGen will split cells which are larger than
   // this size
   Real volume_constraint = 0.001;
-  
+
   // Construct the Delaunay tetrahedralization
   TetGenMeshInterface t(mesh);
-  t.triangulate_conformingDelaunayMesh_carvehole(hole, 
-						 quality_constraint, 
+  t.triangulate_conformingDelaunayMesh_carvehole(hole,
+						 quality_constraint,
 						 volume_constraint);
- 
+
   // Find neighbors, etc in preparation for writing out the Mesh
   mesh.prepare_for_use();
 
@@ -239,13 +239,13 @@ void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper
 				    lower_limit(1), upper_limit(1),
 				    lower_limit(2), upper_limit(2),
 				    HEX8);
-  
+
   // The pointset_convexhull() algorithm will ignore the Hex8s
   // in the Mesh, and just construct the triangulation
   // of the convex hull.
   TetGenMeshInterface t(cube_mesh);
-  t.pointset_convexhull(); 
-  
+  t.pointset_convexhull();
+
   // Now add all nodes from the boundary of the cube_mesh to the input mesh.
 
   // Map from "node id in cube_mesh" -> "node id in mesh".  Initially inserted
@@ -256,23 +256,23 @@ void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper
   {
     MeshBase::element_iterator it = cube_mesh.elements_begin();
     const MeshBase::element_iterator end = cube_mesh.elements_end();
-    for ( ; it != end; ++it) 
+    for ( ; it != end; ++it)
       {
 	Elem* elem = *it;
-	  
+
 	for (unsigned s=0; s<elem->n_sides(); ++s)
 	  if (elem->neighbor(s) == NULL)
 	    {
 	      // Add the node IDs of this side to the set
 	      AutoPtr<Elem> side = elem->side(s);
-		
+
 	      for (unsigned n=0; n<side->n_nodes(); ++n)
 		node_id_map.insert( std::make_pair(side->node(n), /*dummy_value=*/0) );
 	    }
       }
   }
 
-  // For each node in the map, insert it into the input mesh and keep 
+  // For each node in the map, insert it into the input mesh and keep
   // track of the ID assigned.
   for (iterator it=node_id_map.begin(); it != node_id_map.end(); ++it)
     {
@@ -288,14 +288,14 @@ void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper
       // Track ID value of new_node in map
       (*it).second = new_node->id();
     }
-  
+
   // With the points added and the map data structure in place, we are
-  // ready to add each TRI3 element of the cube_mesh to the input Mesh 
+  // ready to add each TRI3 element of the cube_mesh to the input Mesh
   // with proper node assignments
   {
     MeshBase::element_iterator       el     = cube_mesh.elements_begin();
     const MeshBase::element_iterator end_el = cube_mesh.elements_end();
-    
+
     for (; el != end_el; ++el)
       {
 	Elem* old_elem = *el;

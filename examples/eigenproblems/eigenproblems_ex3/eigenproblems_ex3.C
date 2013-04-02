@@ -114,10 +114,10 @@ int main (int argc, char** argv)
   // Tell the user what we are doing.
   {
     std::cout << "Running " << argv[0];
-      
+
     for (int i=1; i<argc; i++)
       std::cout << " " << argv[i];
-      
+
     std::cout << std::endl << std::endl;
   }
 
@@ -131,7 +131,7 @@ int main (int argc, char** argv)
   std::string mesh_name = "";
   if ( command_line.search(1, "-mesh_name") )
     mesh_name = command_line.next(mesh_name);
-    
+
   // Also, read in the index of the eigenvector that we should plot
   // (zero-based indexing, as usual!)
   unsigned int plotting_index = 0;
@@ -152,7 +152,7 @@ int main (int argc, char** argv)
 
   // Print information about the mesh to the screen.
   mesh.print_info();
-  
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
@@ -175,7 +175,7 @@ int main (int argc, char** argv)
   equation_systems.parameters.set<unsigned int>("eigenpairs")    = n_evals;
   equation_systems.parameters.set<unsigned int>("basis vectors") = n_evals*3;
 
-  // Set the solver tolerance and the maximum number of iterations. 
+  // Set the solver tolerance and the maximum number of iterations.
   equation_systems.parameters.set<Real>("linear solver tolerance") = pow(TOLERANCE, 5./3.);
   equation_systems.parameters.set<unsigned int>
     ("linear solver maximum iterations") = 1000;
@@ -220,11 +220,11 @@ int main (int argc, char** argv)
   for(unsigned int i=0; i<nconv; i++)
   {
     std::pair<Real,Real> eval = eigen_system.get_eigenpair(i);
-    
+
     // The eigenvalues should be real!
     libmesh_assert_less (eval.second, TOLERANCE);
     evals_file << eval.first << std::endl;
-    
+
     // plot the specified eigenvector
     if(i == plotting_index)
     {
@@ -236,12 +236,12 @@ int main (int argc, char** argv)
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }
   }
-  
+
   evals_file.close();
 
 #endif // LIBMESH_HAVE_SLEPC
 
-  // All done.  
+  // All done.
   return 0;
 }
 
@@ -250,7 +250,7 @@ int main (int argc, char** argv)
 void assemble_matrices(EquationSystems& es,
                        const std::string& system_name)
 {
-  
+
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Eigensystem");
@@ -279,7 +279,7 @@ void assemble_matrices(EquationSystems& es,
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  
+
   // A  Gauss quadrature rule for numerical integration.
   // Use the default quadrature order.
   QGauss qrule (dim, fe_type.default_quadrature_order());
@@ -287,7 +287,7 @@ void assemble_matrices(EquationSystems& es,
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (&qrule);
 
-  // The element Jacobian * quadrature weight at each integration point.   
+  // The element Jacobian * quadrature weight at each integration point.
   const std::vector<Real>& JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
@@ -320,7 +320,7 @@ void assemble_matrices(EquationSystems& es,
   // hence we use a variant of the \p active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
- 
+
   for ( ; el != end_el; ++el)
     {
       // Store a pointer to the element we are currently
@@ -350,7 +350,7 @@ void assemble_matrices(EquationSystems& es,
 
       // Now loop over the quadrature points.  This handles
       // the numeric integration.
-      // 
+      //
       // We will build the element matrix.  This involves
       // a double loop to integrate the test funcions (i) against
       // the trial functions (j).
@@ -415,7 +415,7 @@ void get_dirichlet_dofs(EquationSystems& es,
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
   FEType fe_type = eigen_system.get_dof_map().variable_type(0);
-  
+
   const DofMap& dof_map = eigen_system.get_dof_map();
 
   // This vector will hold the degree of freedom indices for
@@ -432,7 +432,7 @@ void get_dirichlet_dofs(EquationSystems& es,
   // hence we use a variant of the \p active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
- 
+
   for ( ; el != end_el; ++el)
     {
       // Store a pointer to the element we are currently
@@ -469,4 +469,3 @@ void get_dirichlet_dofs(EquationSystems& es,
   return;
 
 }
-

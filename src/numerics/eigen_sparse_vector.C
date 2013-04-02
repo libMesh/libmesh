@@ -85,7 +85,7 @@ NumericVector<T>& EigenSparseVector<T>::operator += (const NumericVector<T>& v_i
   const EigenSparseVector<T>& v = libmesh_cast_ref<const EigenSparseVector<T>&>(v_in);
 
   _vec += v._vec;
-  
+
   return *this;
 }
 
@@ -100,7 +100,7 @@ NumericVector<T>& EigenSparseVector<T>::operator -= (const NumericVector<T>& v_i
   const EigenSparseVector<T>& v = libmesh_cast_ref<const EigenSparseVector<T>&>(v_in);
 
   _vec -= v._vec;
-  
+
   return *this;
 }
 
@@ -117,7 +117,7 @@ void EigenSparseVector<T>::reciprocal()
     libmesh_assert_not_equal_to ((*this)(i), T(0));
 #endif
 
-  _vec = _vec.cwiseInverse();  
+  _vec = _vec.cwiseInverse();
 }
 
 
@@ -256,8 +256,8 @@ void EigenSparseVector<T>::add_vector (const NumericVector<T> &vec_in,
 
   libmesh_assert(vec);
   libmesh_assert(mat);
-  
-  _vec += mat->_mat*vec->_vec; 
+
+  _vec += mat->_mat*vec->_vec;
 }
 
 
@@ -272,8 +272,8 @@ void EigenSparseVector<T>::add_vector_transpose (const NumericVector<T> &vec_in,
 
   libmesh_assert(vec);
   libmesh_assert(mat);
-  
-  _vec += mat->_mat.transpose()*vec->_vec; 
+
+  _vec += mat->_mat.transpose()*vec->_vec;
 }
 
 
@@ -287,7 +287,7 @@ void EigenSparseVector<T>::scale (const T factor)
 }
 
 
-  
+
 template <typename T>
 void EigenSparseVector<T>::abs()
 {
@@ -300,7 +300,7 @@ void EigenSparseVector<T>::abs()
 }
 
 
-  
+
 template <typename T>
 T EigenSparseVector<T>::dot (const NumericVector<T>& V) const
 {
@@ -321,7 +321,7 @@ EigenSparseVector<T>::operator = (const T s)
 {
   libmesh_assert (this->initialized());
   libmesh_assert (this->closed());
-  
+
   _vec.fill(s);
 
   return *this;
@@ -379,7 +379,7 @@ EigenSparseVector<T>::operator = (const std::vector<T>& v)
 
   else
     libmesh_error();
-  
+
   return *this;
 }
 
@@ -436,7 +436,7 @@ void EigenSparseVector<T>::localize (std::vector<T>& v_local) const
 
 {
   v_local.resize(this->size());
-  
+
   for (numeric_index_type i=0; i<v_local.size(); i++)
     v_local[i] = (*this)(i);
 }

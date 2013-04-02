@@ -49,12 +49,12 @@ struct mesh_inserter_iterator
 
   void operator=(Point* p) { mesh.add_point(*p); }
 
-  mesh_inserter_iterator& operator++() { 
-    return *this; 
+  mesh_inserter_iterator& operator++() {
+    return *this;
   }
 
-  mesh_inserter_iterator operator++(int) { 
-    return mesh_inserter_iterator(*this); 
+  mesh_inserter_iterator operator++(int) {
+    return mesh_inserter_iterator(*this);
   }
 
   // We don't return a reference-to-T here because we don't want to

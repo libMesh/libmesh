@@ -37,7 +37,7 @@ class DirectSolutionTransfer : public SolutionTransfer
 public:
   DirectSolutionTransfer();
   virtual ~DirectSolutionTransfer();
-  
+
   /**
    * Transfer the values of a variable to another.
    */

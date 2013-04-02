@@ -86,4 +86,3 @@ AutoPtr<PointLocatorBase> PointLocatorBase::build (const PointLocatorType t,
 }
 
 } // namespace libMesh
-

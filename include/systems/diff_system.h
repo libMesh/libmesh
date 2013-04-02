@@ -1,16 +1,16 @@
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -81,10 +81,10 @@ public:
    * The type of the parent.
    */
   typedef ImplicitSystem Parent;
-  
+
   /**
    * Clear all the data structures associated with
-   * the system. 
+   * the system.
    */
   virtual void clear ();
 
@@ -93,7 +93,7 @@ public:
    * the system, so that, e.g., \p assemble() may be used.
    */
   virtual void reinit ();
-   
+
   /**
    * Prepares \p matrix and \p rhs for matrix assembly.
    * Users should not reimplement this
@@ -115,7 +115,7 @@ public:
     get_linear_solve_parameters() const;
 
   /**
-   * Releases a pointer to a linear solver acquired by 
+   * Releases a pointer to a linear solver acquired by
    * \p this->get_linear_solver()
    */
   virtual void release_linear_solver(LinearSolver<Number> *) const;
@@ -143,7 +143,7 @@ public:
    * We don't allow systems to be attached to each other
    */
   virtual AutoPtr<DifferentiablePhysics> clone_physics()
-  { libmesh_error(); 
+  { libmesh_error();
     // dummy
     return AutoPtr<DifferentiablePhysics>(this); }
 
@@ -151,7 +151,7 @@ public:
    * We don't allow systems to be attached to each other
    */
   virtual AutoPtr<DifferentiableQoI> clone()
-  { libmesh_error(); 
+  { libmesh_error();
     // dummy
     return AutoPtr<DifferentiableQoI>(this); }
 
@@ -198,7 +198,7 @@ public:
   { this->diff_qoi = (qoi_in->clone()).release();
     // User needs to resize qoi system qoi accordingly
     this->diff_qoi->init_qoi( this->qoi );}
- 
+
   /**
    * A pointer to the solver object we're going to use.
    * This must be instantiated by the user before solving!
@@ -249,7 +249,7 @@ public:
    * Does any work that needs to be done on \p elem in a postprocessing loop.
    */
   virtual void element_postprocess (DiffContext &) {}
-  
+
   /**
    * Does any work that needs to be done on \p side of \p elem in a
    * postprocessing loop.
@@ -307,7 +307,7 @@ protected:
    * users should create separate physics objects.
    */
   DifferentiablePhysics *_diff_physics;
- 
+
   /**
    * Pointer to object to use for quantity of interest assembly
    * evaluations.  Defaults to \p this for backwards compatibility; in
@@ -325,7 +325,7 @@ protected:
 // --------------------------------------------------------------
 // DifferentiableSystem inline methods
 inline
-  TimeSolver& DifferentiableSystem::get_time_solver() 
+  TimeSolver& DifferentiableSystem::get_time_solver()
 {
   libmesh_assert(time_solver.get());
   libmesh_assert_equal_to (&(time_solver->system()), this);

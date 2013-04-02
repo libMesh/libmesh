@@ -499,7 +499,7 @@ void EquationSystems::build_variable_names (std::vector<std::string>& var_names,
       {
         continue;
       }
-      
+
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
 	{
 	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
@@ -714,7 +714,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
       {
         continue;
       }
-      
+
       for (unsigned int vn=0; vn<pos->second->n_vars(); vn++)
 	{
 	  if( FEInterface::field_type(pos->second->variable_type(vn)) ==
@@ -778,7 +778,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
       {
         continue;
       }
-      
+
       const System& system  = *(pos->second);
       const unsigned int nv_sys = system.n_vars();
 

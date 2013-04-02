@@ -256,4 +256,3 @@ Prism18::Prism18(Elem* p) :
 } // namespace libMesh
 
 #endif // LIBMESH_CELL_PRISM18_H
-

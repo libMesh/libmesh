@@ -35,7 +35,7 @@ public:
   /**
    * The object that stores the "theta" expansion of the parameter dependent PDE,
    * i.e. the set of parameter-dependent functions in the affine expansion of the PDE.
-   */ 
+   */
   ElasticityThetaExpansion elasticity_theta_expansion;
 };
 
@@ -75,7 +75,7 @@ public:
     u_var = this->add_variable("u", FIRST);
     v_var = this->add_variable("v", FIRST);
     w_var = this->add_variable("w", FIRST);
-    
+
     // Generate a DirichletBoundary object
     dirichlet_bc = build_zero_dirichlet_boundary_object();
 
@@ -84,7 +84,7 @@ public:
     dirichlet_bc->variables.push_back(u_var);
     dirichlet_bc->variables.push_back(v_var);
     dirichlet_bc->variables.push_back(w_var);
-    
+
     // Attach dirichlet_bc (must do this _before_ Parent::init_data)
     get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
 

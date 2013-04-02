@@ -1,6 +1,6 @@
 BUILT_SOURCES = exact_solution.C
 DISTCLEANFILES = $(BUILT_SOURCES)
-exact_solution.C: $(top_srcdir)/examples/transient/transient_ex1/exact_solution.C 
+exact_solution.C: $(top_srcdir)/examples/transient/transient_ex1/exact_solution.C
 	$(AM_V_GEN)$(LN_S) $< $@
 
 example_name  = adaptivity_ex5

@@ -19,7 +19,7 @@
 
 // <h1>Miscellaneous Example 8 - Meshfree Interpolation Utilities.</h1>
 //
-// LibMesh provides some utilities for pointcloud-type interpolation, as 
+// LibMesh provides some utilities for pointcloud-type interpolation, as
 // demonstrated in this example.
 
 // Example include files
@@ -65,7 +65,7 @@ Real exact_solution_u (const Point &p)
     x = p(0),
     y = p(1),
     z = p(2);
-  
+
   return (x*x*x   +
 	  y*y*y*y +
 	  z*z*z*z*z);
@@ -79,7 +79,7 @@ Real exact_solution_v (const Point &p)
     x = p(0),
     y = p(1),
     z = p(2);
-  
+
   return (x*x   +
 	  y*y +
 	  z*z*z);
@@ -103,7 +103,7 @@ void init_sys(EquationSystems& es,
   // Get a reference to the Convection-Diffusion system object.
   System & system =
     es.get_system<System>(system_name);
-  
+
   system.project_solution(exact_value, NULL, es.parameters);
 }
 
@@ -129,35 +129,35 @@ int main(int argc, char** argv)
       std::vector<Point>       tgt_pts;
       std::vector<Number>      tgt_data_idi, tgt_data_rbi;
       std::vector<std::string> field_vars;
-      
+
       field_vars.push_back("u");
       field_vars.push_back("v");
-      
+
       InverseDistanceInterpolation<3> idi (/* n_interp_pts = */ 8,
 					   /* power =        */ 2);
 
       RadialBasisInterpolation<3> rbi;
-      
+
       idi.set_field_variables (field_vars);
       rbi.set_field_variables (field_vars);
-      
+
       create_random_point_cloud (100,
 				 idi.get_source_points());
 
-      
+
       // Explicitly set the data values we will interpolate from
       {
 	const std::vector<Point> &src_pts  (idi.get_source_points());
 	std::vector<Number>      &src_vals (idi.get_source_vals());
-	
+
 	src_vals.clear(); src_vals.reserve(2*src_pts.size());
-	
+
 	for (std::vector<Point>::const_iterator pt_it=src_pts.begin();
 	     pt_it != src_pts.end(); ++pt_it)
 	  {
 	    src_vals.push_back (exact_solution_u (*pt_it));
 	    src_vals.push_back (exact_solution_v (*pt_it));
-	  }	  
+	  }
       }
 
       // give rbi the same info as idi
@@ -166,9 +166,9 @@ int main(int argc, char** argv)
 
       idi.prepare_for_use();
       rbi.prepare_for_use();
-      
+
       std::cout << idi;
-      
+
       // Interpolate to some other random points, and evaluate the result
       {
 	create_random_point_cloud (10,
@@ -179,15 +179,15 @@ int main(int argc, char** argv)
 	idi.interpolate_field_data (field_vars,
 				    tgt_pts,
 				    tgt_data_idi);
-	
+
 	rbi.interpolate_field_data (field_vars,
 				    tgt_pts,
 				    tgt_data_rbi);
-	
-      	std::vector<Number>::const_iterator 
+
+      	std::vector<Number>::const_iterator
 	  v_idi=tgt_data_idi.begin(),
 	  v_rbi=tgt_data_rbi.begin();
-	
+
 	for (std::vector<Point>::const_iterator  p_it=tgt_pts.begin();
 	     p_it!=tgt_pts.end(); ++p_it)
 	  {
@@ -227,7 +227,7 @@ int main(int argc, char** argv)
 
       sys_a.attach_init_function (init_sys);
       es_a.init();
-      
+
       // Write out the initial conditions.
       TecplotIO(mesh_a).write_equation_systems ("src.dat",
 						es_a);
@@ -238,7 +238,7 @@ int main(int argc, char** argv)
 
       std::vector<Point>  &src_pts  (idi.get_source_points());
       std::vector<Number> &src_vals (idi.get_source_vals());
-      std::vector<std::string> field_vars;      
+      std::vector<std::string> field_vars;
       field_vars.push_back("Cp");
       idi.set_field_variables(field_vars);
 
@@ -253,8 +253,8 @@ int main(int argc, char** argv)
 	    const Node *node(*nd);
 	    src_pts.push_back(*node);
 	    src_vals.push_back(sys_a.current_solution(node->dof_number(0,0,0)));
-	  }	  	
-	
+	  }
+
 	rbi.set_field_variables(field_vars);
 	rbi.get_source_points() = idi.get_source_points();
 	rbi.get_source_vals()   = idi.get_source_vals();
@@ -270,11 +270,11 @@ int main(int argc, char** argv)
       {
 	Threads::spin_mutex mutex;
 	MeshlessInterpolationFunction mif(idi, mutex);
-	
+
 	// project the solution onto system b
 	es_b.init();
 	sys_b.project_solution (&mif);
-      
+
 	// Write the result
 	TecplotIO(mesh_b).write_equation_systems ("dest_idi.dat",
 						  es_b);
@@ -286,10 +286,10 @@ int main(int argc, char** argv)
       {
 	Threads::spin_mutex mutex;
 	MeshlessInterpolationFunction mif(rbi, mutex);
-	
+
 	// project the solution onto system b
 	sys_b.project_solution (&mif);
-      
+
 	// Write the result
 	TecplotIO(mesh_b).write_equation_systems ("dest_rbi.dat",
 						  es_b);
@@ -297,7 +297,7 @@ int main(int argc, char** argv)
     }
 
 
-    
+
   }
   return 0;
 }

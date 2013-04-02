@@ -37,7 +37,3 @@ namespace libMeshEnums {
 using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_POINT_LOCATOR_TYPE_H
-
-
-
-

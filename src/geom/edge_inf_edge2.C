@@ -100,5 +100,3 @@ void InfEdge2::connectivity(const unsigned int libmesh_dbg_var(se),
 
 
 #endif
-
-

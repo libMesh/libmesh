@@ -49,5 +49,3 @@ void SyncNodalPositions::act_on_data (const std::vector<dof_id_type>& ids, std::
       *node = data[i];
     } // end for
 } // act_on_data()
-
-

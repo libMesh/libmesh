@@ -30,7 +30,7 @@ namespace libMesh
 
   class RBParameters;
   class Point;
-  
+
 /**
  * A simple functor class that provides a RBParameter-dependent function.
  */

@@ -58,7 +58,3 @@ namespace Utility {
 
 
 #endif // LIBMESH_STRING_TO_ENUM_H
-
-
-
-

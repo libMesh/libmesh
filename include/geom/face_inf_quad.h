@@ -213,7 +213,3 @@ Point InfQuad::origin () const
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 #endif // LIBMESH_FACE_INF_QUAD_H
-
-
-
-

@@ -86,7 +86,7 @@ void LaplaceSystem::init_context(DiffContext &context)
   // Get finite element object
   FEGenericBase<RealGradient>* fe;
   c.get_element_fe<RealGradient>( u_var, fe );
-  
+
   // We should prerequest all the data
   // we will need to build the linear system.
   fe->get_JxW();
@@ -110,7 +110,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   // Get finite element object
   FEGenericBase<RealGradient>* fe = NULL;
   c.get_element_fe<RealGradient>( u_var, fe );
-  
+
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
 
@@ -123,7 +123,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   // The velocity shape function gradients at interior
   // quadrature points.
   const std::vector<std::vector<RealTensor> >& grad_phi = fe->get_dphi();
- 
+
   const std::vector<Point>& qpoint = fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
@@ -132,7 +132,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   DenseSubMatrix<Number> &Kuu = *c.elem_subjacobians[u_var][u_var];
 
   DenseSubVector<Number> &Fu = *c.elem_subresiduals[u_var];
-      
+
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
   // gradient from the previous timestep.  This must be
@@ -144,7 +144,7 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       Tensor grad_u;
-      
+
       c.interior_gradient( u_var, qp, grad_u );
 
 
@@ -164,12 +164,12 @@ bool LaplaceSystem::element_time_derivative (bool request_jacobian,
               for (unsigned int j=0; j != n_u_dofs; j++)
                 {
                   Kuu(i,j) += grad_phi[j][qp].contract(grad_phi[i][qp])*JxW[qp];
-                 
+
 		}
 	    }
         }
     } // end of the quadrature point qp-loop
-  
+
   return request_jacobian;
 }
 
@@ -182,7 +182,7 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
   // Get finite element object
   FEGenericBase<RealGradient>* side_fe = NULL;
   c.get_side_fe<RealGradient>( u_var, side_fe );
-  
+
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
 
@@ -210,14 +210,14 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
     {
       Gradient u;
       c.side_value( u_var, qp, u );
- 
+
       Gradient u_exact( this->exact_solution( 0, qpoint[qp](0), qpoint[qp](1) ),
 			this->exact_solution( 1, qpoint[qp](0), qpoint[qp](1) ));
 
       for (unsigned int i=0; i != n_u_dofs; i++)
 	{
 	  Fu(i) += penalty*(u - u_exact)*phi[i][qp]*JxW[qp];
-	  
+
 	  if (request_jacobian)
 	    {
 	      for (unsigned int j=0; j != n_u_dofs; j++)
@@ -233,7 +233,7 @@ bool LaplaceSystem::side_constraint (bool request_jacobian,
 RealGradient LaplaceSystem::forcing( const Point& p )
 {
   Real x = p(0); Real y = p(1); Real z = p(2);
-  
+
   const Real eps = 1.e-3;
 
   const Real fx = -(exact_solution(0,x,y,z-eps) +
@@ -243,7 +243,7 @@ RealGradient LaplaceSystem::forcing( const Point& p )
 		    exact_solution(0,x-eps,y,z) +
 		    exact_solution(0,x+eps,y,z) -
 		    6.*exact_solution(0,x,y,z))/eps/eps;
-  
+
   const Real fy = -(exact_solution(1,x,y,z-eps) +
 		    exact_solution(1,x,y,z+eps) +
 		    exact_solution(1,x,y-eps,z) +
@@ -259,6 +259,6 @@ RealGradient LaplaceSystem::forcing( const Point& p )
 		    exact_solution(2,x-eps,y,z) +
 		    exact_solution(2,x+eps,y,z) -
 		    6.*exact_solution(2,x,y,z))/eps/eps;
-  
+
   return RealGradient( fx, fy, fz );
 }

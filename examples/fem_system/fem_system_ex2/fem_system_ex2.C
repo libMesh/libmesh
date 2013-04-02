@@ -46,7 +46,7 @@ void setup(EquationSystems& systems, Mesh& mesh, GetPot& args)
 {
   const unsigned int dim = mesh.mesh_dimension();
   // We currently invert tensors with the assumption that they're 3x3
-  libmesh_assert (dim == 3); 
+  libmesh_assert (dim == 3);
 
   // Generating Mesh
   ElemType eltype = Utility::string_to_enum<ElemType>(args("mesh/generation/element_type", "hex8"));
@@ -175,4 +175,3 @@ int main(int argc, char** argv)
   out << "Finished calculations" << std::endl;
   return 0;
 }
-

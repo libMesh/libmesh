@@ -75,7 +75,7 @@ class InfFE;
   struct TypesEqual {
     static const bool value = false;
   };
-  
+
   template <typename T>
   struct TypesEqual<T,T> {
     static const bool value = true;
@@ -154,7 +154,7 @@ public:
   typedef typename TensorTools::IncrementRank<OutputNumberGradient>::type OutputNumberTensor;
   typedef typename TensorTools::DecrementRank<OutputNumber>::type         OutputNumberDivergence;
 
-  
+
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

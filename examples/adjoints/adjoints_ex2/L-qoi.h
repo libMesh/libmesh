@@ -17,15 +17,15 @@ class LaplaceQoI : public DifferentiableQoI
 {
 public:
   LaplaceQoI(){}
-  virtual ~LaplaceQoI(){} 
+  virtual ~LaplaceQoI(){}
 
   virtual void init_qoi( std::vector<Number>& sys_qoi );
 
-  virtual void postprocess( ){} 
-  
-  virtual void element_qoi_derivative(DiffContext &context, const QoISet & qois);  
+  virtual void postprocess( ){}
 
-  virtual void element_qoi (DiffContext &context, const QoISet & qois); 
+  virtual void element_qoi_derivative(DiffContext &context, const QoISet & qois);
+
+  virtual void element_qoi (DiffContext &context, const QoISet & qois);
 
   virtual AutoPtr<DifferentiableQoI> clone( ) {
     return AutoPtr<DifferentiableQoI> ( new LaplaceQoI(*this) );

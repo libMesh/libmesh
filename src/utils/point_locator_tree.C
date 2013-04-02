@@ -273,4 +273,3 @@ void PointLocatorTree::disable_out_of_mesh_mode (void)
 }
 
 } // namespace libMesh
-

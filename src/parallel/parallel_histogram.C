@@ -113,4 +113,3 @@ template class Parallel::Histogram<Hilbert::HilbertIndices, unsigned int>;
 #endif
 
 } // namespace libMesh
-

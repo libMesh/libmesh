@@ -149,7 +149,7 @@ unsigned int Quad::opposite_node(const unsigned int node_in,
   libmesh_assert(this->is_node_on_side(node_in, side_in));
 
   //unsigned int opposite;
-  
+
   static const unsigned char side02_nodes_map[] =
     {3, 2, 1, 0, 6, 255, 4, 255};
   static const unsigned char side13_nodes_map[] =

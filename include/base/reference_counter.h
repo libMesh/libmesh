@@ -187,7 +187,3 @@ void ReferenceCounter::increment_destructor_count (const std::string& name)
 
 
 #endif // LIBMESH_REFERENCE_COUNTER_H
-
-
-
-

@@ -575,5 +575,5 @@ void Biharmonic::JR::bounds(NumericVector<Number> &XL, NumericVector<Number>& XU
       // the bounds are always -1.0 and 1.0.
       XL.insert(XLe, dof_indices);
       XU.insert(XUe, dof_indices);
-    } 
+    }
 }

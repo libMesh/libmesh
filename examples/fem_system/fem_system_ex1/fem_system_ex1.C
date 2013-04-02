@@ -86,13 +86,13 @@ int main (int argc, char** argv)
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
-  
+
   // We have only defined 2 and 3 dimensional problems
   libmesh_assert (dim == 2 || dim == 3);
 
   // Create a mesh.
   Mesh mesh;
-  
+
   // And an object to refine it
   MeshRefinement mesh_refinement(mesh);
   mesh_refinement.coarsen_by_parents() = true;
@@ -133,7 +133,7 @@ int main (int argc, char** argv)
   EquationSystems equation_systems (mesh);
 
   // Declare the system "Navier-Stokes" and its variables.
-  NavierSystem & system = 
+  NavierSystem & system =
     equation_systems.add_system<NavierSystem> ("Navier-Stokes");
 
   // Solve this as a time-dependent or steady system
@@ -165,7 +165,7 @@ int main (int argc, char** argv)
     infile("relative_residual_tolerance", 0.0);
   solver.absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
-    
+
   // And the linear solver options
   solver.max_linear_iterations =
     infile("max_linear_iterations", 50000);
@@ -241,7 +241,7 @@ int main (int argc, char** argv)
           Real global_error = error.l2_norm();
           std::cout << "Adaptive step " << a_step << ": " << std::endl;
           if (global_tolerance != 0.)
-            std::cout << "Global_error = " << global_error 
+            std::cout << "Global_error = " << global_error
                       << std::endl;
           if (global_tolerance != 0.)
             std::cout << "Worst element error = " << error.maximum()
@@ -304,15 +304,15 @@ int main (int argc, char** argv)
                     << ".e";
 
           ExodusII_IO(mesh).write_timestep(file_name.str(),
-					   equation_systems, 
-					   1, /* This number indicates how many time steps 
+					   equation_systems,
+					   1, /* This number indicates how many time steps
 						 are being written to the file */
 					   system.time);
         }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }
 #endif // #ifndef LIBMESH_ENABLE_AMR
-  
-  // All done.  
+
+  // All done.
   return 0;
 }

@@ -27,10 +27,10 @@
 
 // --------------------------------------------------------
 // Local anonymous namespace to hold miscelaneous bits
-namespace 
+namespace
 {
   using namespace libMesh;
-  
+
   // Mutex object for required locking
   typedef Threads::spin_mutex SingletonMutex;
   SingletonMutex singleton_mtx, setup_mtx;
@@ -93,7 +93,7 @@ namespace libMesh
       {
 	libmesh_assert (*it != NULL);
 	delete *it;
-	*it = NULL;	
+	*it = NULL;
       }
 
     singleton_cache.clear();

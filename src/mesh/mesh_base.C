@@ -174,7 +174,7 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
   parallel_only();
 
   ids.clear();
-  
+
   const_element_iterator       el  = this->active_elements_begin();
   const const_element_iterator end = this->active_elements_end();
 
@@ -200,7 +200,7 @@ subdomain_id_type MeshBase::n_subdomains() const
 }
 
 
-  
+
 
 dof_id_type MeshBase::n_nodes_on_proc (const processor_id_type proc_id) const
 {
@@ -309,8 +309,8 @@ void MeshBase::partition (const unsigned int n_parts)
 {
   // NULL partitioner means don't partition
   // Non-serial meshes aren't ready for partitioning yet.
-  if(!skip_partitioning() && 
-     partitioner().get() && 
+  if(!skip_partitioning() &&
+     partitioner().get() &&
      this->is_serial())
   {
     partitioner()->partition (*this, n_parts);
@@ -423,4 +423,3 @@ subdomain_id_type MeshBase::get_id_by_name(const std::string& name) const
 
 
 } // namespace libMesh
-

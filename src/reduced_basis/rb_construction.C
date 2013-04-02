@@ -186,7 +186,7 @@ RBEvaluation& RBConstruction::get_rb_evaluation()
     libMesh::out << "Error: RBEvaluation object hasn't been initialized yet" << std::endl;
     libmesh_error();
   }
-  
+
   return *rb_eval;
 }
 
@@ -207,11 +207,11 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
 
   const unsigned int n_training_samples = infile("n_training_samples",0);
   const bool deterministic_training = infile("deterministic_training",false);
-  
+
   // Also, even if deterministic_training==false, we may specify one deterministic parameter
   std::string deterministic_training_parameter_name_in = infile("deterministic_training_parameter_name","NONE");
   set_deterministic_training_parameter_name(deterministic_training_parameter_name_in);
-  
+
   // We also need to specify how many times each sample of the deterministic parameter is "repeated"
   const unsigned int deterministic_training_parameter_repeats_in = infile("deterministic_training_parameter_repeats",1);
   set_deterministic_training_parameter_repeats(deterministic_training_parameter_repeats_in);
@@ -281,7 +281,7 @@ void RBConstruction::process_parameters_file (const std::string& parameters_file
     // Read vector-based log scaling values.  Note the intermediate conversion to
     // int... this implies log_scaling = '1 1 1...' in the input file.
 //    log_scaling[i] = static_cast<bool>(infile("log_scaling", static_cast<int>(log_scaling[i]), i));
-    
+
     std::string param_name = it->first;
     log_scaling[param_name] = static_cast<bool>(infile("log_scaling", 0, i));
     i++;
@@ -323,7 +323,7 @@ void RBConstruction::print_info()
     std::string param_name = it->first;
     libMesh::out <<   "Parameter " << param_name
                  << ": Min = " << get_parameter_min(param_name)
-                 << ", Max = " << get_parameter_max(param_name) 
+                 << ", Max = " << get_parameter_max(param_name)
                  << ", value = " << get_parameters().get_value(param_name) << std::endl;
   }
   libMesh::out << "n_training_samples: " << get_n_training_samples() << std::endl;
@@ -390,7 +390,7 @@ ElemAssembly& RBConstruction::get_constraint_assembly()
 void RBConstruction::zero_constrained_dofs_on_vector(NumericVector<Number>& vector)
 {
   const DofMap& dof_map = get_dof_map();
-  
+
   for(dof_id_type i=dof_map.first_dof(); i<dof_map.end_dof(); i++)
   {
     if(get_dof_map().is_constrained_dof(i))
@@ -625,14 +625,14 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
 
     if(assemble_matrix)
     {
-      
+
       CouplingMatrix* coupling_matrix = get_dof_map()._dof_coupling;
       if(!coupling_matrix)
       {
         // If we haven't defined a _dof_coupling matrix then just add
         // the whole matrix
         input_matrix->add_matrix (context.get_elem_jacobian(),
-                                  context.dof_indices);        
+                                  context.dof_indices);
       }
       else
       {
@@ -658,7 +658,7 @@ void RBConstruction::add_scaled_matrix_and_vector(Number scalar,
       }
 
     }
-    
+
     if(assemble_vector)
       input_vector->add_vector (context.get_elem_residual(),
                                 context.dof_indices);
@@ -1081,7 +1081,7 @@ Real RBConstruction::train_reduced_basis(const std::string& directory_name,
   START_LOG("train_reduced_basis()", "RBConstruction");
 
   int count = 0;
-  
+
   // initialize rb_eval's parameters
   get_rb_evaluation().initialize_parameters(*this);
 
@@ -1186,7 +1186,7 @@ bool RBConstruction::greedy_termination_test(Real training_greedy_error, int)
                  << get_Nmax() << std::endl;
     return true;
   }
-  
+
   if(exit_on_repeated_greedy_parameters)
   {
     for(unsigned int i=0; i<get_rb_evaluation().greedy_param_list.size(); i++)
@@ -1430,7 +1430,7 @@ Real RBConstruction::compute_max_error_bound()
     {
       max_val = std::numeric_limits<Real>::max();
     }
-    
+
     STOP_LOG("compute_max_error_bound()", "RBConstruction");
 
     // Make sure we do at least one solve, but otherwise return a zero error bound
@@ -2271,10 +2271,10 @@ NumericVector<Number>* RBConstruction::get_non_dirichlet_output_vector(unsigned 
 AutoPtr<DirichletBoundary> RBConstruction::build_zero_dirichlet_boundary_object()
 {
   ZeroFunction<> zf;
-  
+
   std::set<boundary_id_type> dirichlet_ids;
   std::vector<unsigned int> variables;
-  
+
   // The DirichletBoundary constructor clones zf, so it's OK that zf is only in local scope
   return AutoPtr<DirichletBoundary> (new DirichletBoundary(dirichlet_ids, variables, &zf));
 }
@@ -2501,6 +2501,3 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
 
 
 } // namespace libMesh
-
-
-

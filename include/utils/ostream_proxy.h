@@ -241,4 +241,3 @@ typedef BasicOStreamProxy<> OStreamProxy;
 } // namespace libMesh
 
 #endif // LIBMESH_OSTREAM_PROXY_H
-

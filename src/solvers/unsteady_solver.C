@@ -80,7 +80,7 @@ void UnsteadySolver::reinit ()
   // localize the old solution
   NumericVector<Number> &old_nonlinear_soln =
     _system.get_vector("_old_nonlinear_solution");
-  
+
   old_nonlinear_soln.localize
     (*old_local_nonlinear_solution,
      _system.get_dof_map().get_send_list());

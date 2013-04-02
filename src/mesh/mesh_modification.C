@@ -628,7 +628,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
        * should be transfered to the second-order element.  The old
        * boundary conditions will be removed from the BoundaryInfo
        * data structure by insert_elem.
-       * 
+       *
        * Also, prepare_for_use() will reconstruct most of our neighbor
        * links, but if we have any remote_elem links in a distributed
        * mesh, they need to be preserved.  We do that in the same loop
@@ -1505,7 +1505,3 @@ void MeshTools::Modification::change_subdomain_id (MeshBase& mesh,
 
 
 } // namespace libMesh
-
-
-
-

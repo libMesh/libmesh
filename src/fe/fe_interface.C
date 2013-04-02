@@ -754,7 +754,7 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
       fe_vector_scalar_error_switch(3, shape(t,o,i,p), phi = , ; break;);
       break;
     }
-  
+
   return;
 }
 
@@ -882,7 +882,7 @@ void FEInterface::compute_constraints (DofConstraints &constraints,
 						     variable_number,
 						     elem); return;
 
-	  
+
 	  default:
 	    return;
 	  }

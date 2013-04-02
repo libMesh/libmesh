@@ -61,7 +61,7 @@ std::string Node::get_info () const
   else
     oss << "invalid";
 
-  oss << ", processor_id()=" << this->processor_id() << 
+  oss << ", processor_id()=" << this->processor_id() <<
          ", Point=" << *static_cast<const Point*>(this) << '\n';
 
   oss << "    DoFs=";
@@ -113,7 +113,7 @@ void Node::PackedNode::pack (std::vector<int> &conn, const Node* node)
   conn.push_back (static_cast<int>(node->id()));
 
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real = 
+  static const unsigned int ints_per_Real =
     (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
 
   for (unsigned int i=0; i != LIBMESH_DIM; ++i)
@@ -138,7 +138,7 @@ void Node::PackedNode::unpack (std::vector<int>::const_iterator start, Node& nod
   unsigned int id = static_cast<unsigned int>(*start++);
 
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real = 
+  static const unsigned int ints_per_Real =
     (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
 
   std::vector<Real> xyz(3,0.);

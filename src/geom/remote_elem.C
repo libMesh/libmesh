@@ -32,7 +32,7 @@ namespace
   RemoteElemMutex remote_elem_mtx;
 
 
-  // Class to be dispatched by Singleton::setup() 
+  // Class to be dispatched by Singleton::setup()
   // to create the \p RemoteElem singleton.
   // While this actual object has file-level static
   // scope and will be initialized before main(),
@@ -60,7 +60,7 @@ namespace libMesh
   RemoteElem::~RemoteElem()
   {
     RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
-    
+
     remote_elem = NULL;
   }
 
@@ -72,13 +72,13 @@ namespace libMesh
       return *remote_elem;
 
     RemoteElemMutex::scoped_lock lock(remote_elem_mtx);
-    
+
     // check again - object could have been created while waiting
     // for the lock to acquire!
     if (remote_elem == NULL)
       remote_elem = new RemoteElem;
 
-    return *remote_elem;    
+    return *remote_elem;
   }
 
 

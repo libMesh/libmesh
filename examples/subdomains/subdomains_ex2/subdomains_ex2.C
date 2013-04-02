@@ -68,7 +68,7 @@
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
- 
+
 
 
 // Function prototype.  This is the function that will assemble
@@ -93,10 +93,10 @@ int main (int argc, char** argv)
 
   // Declare a performance log for the main program
   // PerfLog perf_main("Main Program");
-  
+
   // Create a GetPot object to parse the command line
   GetPot command_line (argc, argv);
-  
+
   // Check for proper calling arguments.
   if (argc < 3)
     {
@@ -110,19 +110,19 @@ int main (int argc, char** argv)
       // exception handling.
       libmesh_error();
     }
-  
+
   // Brief message to the user regarding the program name
   // and command line arguments.
-  else 
+  else
     {
       std::cout << "Running " << argv[0];
-      
+
       for (int i=1; i<argc; i++)
         std::cout << " " << argv[i];
-      
+
       std::cout << std::endl << std::endl;
     }
-  
+
 
   // Read problem dimension from command line.  Use int
   // instead of unsigned since the GetPot overload is ambiguous
@@ -130,28 +130,28 @@ int main (int argc, char** argv)
   int dim = 2;
   if ( command_line.search(1, "-d") )
     dim = command_line.next(dim);
-  
+
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
-    
+
   // Create a mesh with user-defined dimension.
   Mesh mesh (dim);
-  
+
   // Read number of elements from command line
   int ps = 15;
   if ( command_line.search(1, "-n") )
     ps = command_line.next(ps);
-  
+
   // Read FE order from command line
-  std::string order = "SECOND"; 
+  std::string order = "SECOND";
   if ( command_line.search(2, "-Order", "-o") )
     order = command_line.next(order);
 
   // Read FE Family from command line
-  std::string family = "LAGRANGE"; 
+  std::string family = "LAGRANGE";
   if ( command_line.search(2, "-FEFamily", "-f") )
     family = command_line.next(family);
-  
+
   // Cannot use discontinuous basis.
   if ((family == "MONOMIAL") || (family == "XYZ"))
     {
@@ -180,10 +180,10 @@ int main (int argc, char** argv)
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
-                                         (dim==1)    ? EDGE2 : 
+                                         (dim==1)    ? EDGE2 :
                                          ((dim == 2) ? QUAD4 : HEX8));
     }
-  
+
   else
     {
       MeshTools::Generation::build_cube (mesh,
@@ -193,14 +193,14 @@ int main (int argc, char** argv)
                                          -1., 1.,
                                          -halfwidth, halfwidth,
                                          -halfheight, halfheight,
-                                         (dim==1)    ? EDGE3 : 
+                                         (dim==1)    ? EDGE3 :
                                          ((dim == 2) ? QUAD9 : HEX27));
     }
 
   {
     MeshBase::element_iterator       el     = mesh.elements_begin();
     const MeshBase::element_iterator end_el = mesh.elements_end();
-    
+
     for ( ; el != end_el; ++el)
       {
 	Elem* elem = *el;
@@ -208,31 +208,31 @@ int main (int argc, char** argv)
         if (dim > 1)
           {
 	    if ((cent(0) > 0) == (cent(1) > 0))
-	      elem->subdomain_id() = 1;	
+	      elem->subdomain_id() = 1;
           }
         else
           {
 	    if (cent(0) > 0)
-	      elem->subdomain_id() = 1;	
+	      elem->subdomain_id() = 1;
           }
       }
   }
 
   // Print information about the mesh to the screen.
   mesh.print_info();
-    
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  
+
   // Declare the system and its variables.
   // Create a system named "Poisson"
   LinearImplicitSystem& system =
     equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
-  
+
   std::set<subdomain_id_type> active_subdomains;
 
-  
+
   // Add the variable "u" to "Poisson".  "u"
   // will be approximated using second-order approximation.
   active_subdomains.clear(); active_subdomains.insert(0);
@@ -252,7 +252,7 @@ int main (int argc, char** argv)
   // Give the system a pointer to the matrix assembly
   // function.
   system.attach_assemble_function (assemble_poisson);
-  
+
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
@@ -266,19 +266,19 @@ int main (int argc, char** argv)
   // After solving the system write the solution
   // to a GMV-formatted plot file.
   if(dim == 1)
-  {        
+  {
     GnuPlotIO plot(mesh,"Subdomains Example 2, 1D",GnuPlotIO::GRID_ON);
     plot.write_equation_systems("gnuplot_script",equation_systems);
   }
   else
   {
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh).write_equation_systems ((dim == 3) ? 
+    ExodusII_IO (mesh).write_equation_systems ((dim == 3) ?
       "out_3.e" : "out_2.e",equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }
-  
-  // All done.  
+
+  // All done.
   return 0;
 }
 
@@ -305,7 +305,7 @@ void assemble_poisson(EquationSystems& es,
   // logging, since there may be many PerfLogs in an
   // application.
   PerfLog perf_log ("Matrix Assembly");
-  
+
     // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
@@ -314,7 +314,7 @@ void assemble_poisson(EquationSystems& es,
 
   // Get a reference to the LinearImplicitSystem we are solving
   LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Poisson");
-  
+
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
@@ -330,7 +330,7 @@ void assemble_poisson(EquationSystems& es,
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  
+
   // A 5th order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, FIFTH);
 
@@ -340,12 +340,12 @@ void assemble_poisson(EquationSystems& es,
   // Declare a special finite element object for
   // boundary integration.
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-              
+
   // Boundary integration requires one quadraure rule,
   // with dimensionality one less than the dimensionality
   // of the element.
   QGauss qface(dim-1, FIFTH);
-  
+
   // Tell the finte element object to use our
   // quadrature rule.
   fe_face->attach_quadrature_rule (&qface);
@@ -353,7 +353,7 @@ void assemble_poisson(EquationSystems& es,
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
-  // integration point.   
+  // integration point.
   const std::vector<Real>& JxW = fe->get_JxW();
 
   // The physical XY locations of the quadrature points on the element.
@@ -397,7 +397,7 @@ void assemble_poisson(EquationSystems& es,
       // Start logging the shape function initialization.
       // This is done through a simple function call with
       // the name of the event to log.
-      perf_log.push("elem init");      
+      perf_log.push("elem init");
 
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
@@ -411,7 +411,7 @@ void assemble_poisson(EquationSystems& es,
       dof_map.dof_indices (elem, dof_indices2,1);
 
 //       std::cout << "dof_indices.size()="
-// 		<< dof_indices.size() 
+// 		<< dof_indices.size()
 // 		<< ", dof_indices2.size()="
 // 		<< dof_indices2.size()
 // 		<< std::endl;
@@ -436,7 +436,7 @@ void assemble_poisson(EquationSystems& es,
       // Stop logging the shape function initialization.
       // If you forget to stop logging an event the PerfLog
       // object will probably catch the error and abort.
-      perf_log.pop("elem init");      
+      perf_log.pop("elem init");
 
       // Now we will build the element matrix.  This involves
       // a double loop to integrate the test funcions (i) against
@@ -453,7 +453,7 @@ void assemble_poisson(EquationSystems& es,
         for (unsigned int i=0; i<phi.size(); i++)
           for (unsigned int j=0; j<phi.size(); j++)
             Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-            
+
 
       // Stop logging the matrix computation
       perf_log.pop ("Ke");
@@ -464,7 +464,7 @@ void assemble_poisson(EquationSystems& es,
       //
       // Start logging the right-hand-side computation
       perf_log.push ("Fe");
-      
+
       for (unsigned int qp=0; qp<qrule.n_points(); qp++)
         {
           // fxy is the forcing function for the Poisson equation.
@@ -480,7 +480,7 @@ void assemble_poisson(EquationSystems& es,
           //
           // Since the value of the forcing function depends only
           // on the location of the quadrature point (q_point[qp])
-          // we will compute it here, outside of the i-loop          
+          // we will compute it here, outside of the i-loop
           const Real x = q_point[qp](0);
 #if LIBMESH_DIM > 1
           const Real y = q_point[qp](1);
@@ -497,11 +497,11 @@ void assemble_poisson(EquationSystems& es,
           const Real uxx = (exact_solution(x-eps,y,z) +
                             exact_solution(x+eps,y,z) +
                             -2.*exact_solution(x,y,z))/eps/eps;
-              
+
           const Real uyy = (exact_solution(x,y-eps,z) +
                             exact_solution(x,y+eps,z) +
                             -2.*exact_solution(x,y,z))/eps/eps;
-          
+
           const Real uzz = (exact_solution(x,y,z-eps) +
                             exact_solution(x,y,z+eps) +
                             -2.*exact_solution(x,y,z))/eps/eps;
@@ -517,13 +517,13 @@ void assemble_poisson(EquationSystems& es,
           else
           {
             fxy = - (uxx + uyy + ((dim==2) ? 0. : uzz));
-          } 
+          }
 
           // Add the RHS contribution
           for (unsigned int i=0; i<phi.size(); i++)
-            Fe(i) += JxW[qp]*fxy*phi[i][qp];          
+            Fe(i) += JxW[qp]*fxy*phi[i][qp];
         }
-      
+
       // Stop logging the right-hand-side computation
       perf_log.pop ("Fe");
 
@@ -534,7 +534,7 @@ void assemble_poisson(EquationSystems& es,
       // via the penalty method. This is discussed at length in
       // example 3.
       {
-        
+
         // Start logging the boundary condition computation
         perf_log.push ("BCs");
 
@@ -545,7 +545,7 @@ void assemble_poisson(EquationSystems& es,
           if ((elem->neighbor(side) == NULL) ||
 	      (elem->neighbor(side)->subdomain_id() != elem->subdomain_id()))
             {
-            
+
               // The penalty value.  \frac{1}{\epsilon}
               // in the discussion above.
               const Real penalty = 1.e10;
@@ -588,7 +588,7 @@ void assemble_poisson(EquationSystems& es,
                 // The boundary value.
                 const Real value = exact_solution(xf, yf, zf);
 
-                // Matrix contribution of the L2 projection. 
+                // Matrix contribution of the L2 projection.
                 for (unsigned int i=0; i<phi_face.size(); i++)
                   for (unsigned int j=0; j<phi_face.size(); j++)
                     Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
@@ -597,14 +597,14 @@ void assemble_poisson(EquationSystems& es,
                 // projection.
                 for (unsigned int i=0; i<phi_face.size(); i++)
                   Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-              } 
+              }
             }
-            
-        
+
+
         // Stop logging the boundary condition computation
         perf_log.pop ("BCs");
-      } 
-      
+      }
+
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
@@ -613,13 +613,13 @@ void assemble_poisson(EquationSystems& es,
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector
       perf_log.push ("matrix insertion");
-      
+
       if (dof_indices.size())
 	{
 	  system.matrix->add_matrix (Ke, dof_indices);
 	  system.rhs->add_vector    (Fe, dof_indices);
 	}
-      
+
       if (dof_indices2.size())
 	{
 	  system.matrix->add_matrix (Ke, dof_indices2);

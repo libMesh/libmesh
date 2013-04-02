@@ -9,7 +9,7 @@ data          = miscellaneous_ex3.C ../../adjoints/adjoints_ex1/lshaped.xda run.
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 
-CLEANFILES = lshaped.xda out.e 
+CLEANFILES = lshaped.xda out.e
 
 ##############################################
 # include common example environment

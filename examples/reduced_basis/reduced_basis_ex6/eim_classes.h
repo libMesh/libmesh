@@ -19,7 +19,7 @@ public:
     attach_parametrized_function(&g_y);
     attach_parametrized_function(&g_z);
   }
-  
+
   /**
    * Build a ThetaEIM rather than an RBEIMTheta.
    */
@@ -28,7 +28,7 @@ public:
     return AutoPtr<RBTheta>(new ThetaEIM(*this, index));
   }
 
-  /** 
+  /**
    * Parametrized functions that we approximate with EIM
    */
   Gx g_x;
@@ -51,7 +51,7 @@ public:
   : Parent(es, name_in, number_in)
   {
   }
-  
+
   /**
    * The type of the parent.
    */
@@ -64,7 +64,7 @@ public:
   {
     return AutoPtr<ElemAssembly>(new AssemblyEIM(*this, index));
   }
-  
+
   /**
    * Initialize data structures.
    */
@@ -90,7 +90,7 @@ public:
    * Inner product assembly object
    */
   Ex6EIMInnerProduct eim_ip;
-  
+
 };
 
 #endif

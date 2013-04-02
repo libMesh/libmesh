@@ -78,7 +78,7 @@ Number exact_2D_solution(const Point& p,
 Number exact_3D_solution(const Point& p,
   const Parameters&, const std::string&, const std::string&);
 
-// Prototypes for calculation of the gradient of the exact solution.  
+// Prototypes for calculation of the gradient of the exact solution.
 // Necessary for setting boundary conditions in H^2_0 and testing
 // H^1 convergence of the solution
 Gradient exact_2D_derivative(const Point& p,
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
-  
+
   // We have only defined 2 and 3 dimensional problems
   libmesh_assert (dim == 2 || dim == 3);
 
@@ -159,8 +159,8 @@ int main(int argc, char** argv)
 
   // Create a mesh.
   Mesh mesh;
-  
-  // Output file for plotting the error 
+
+  // Output file for plotting the error
   std::string output_file = "";
 
   if (dim == 2)
@@ -187,9 +187,9 @@ int main(int argc, char** argv)
   std::ofstream out (output_file.c_str());
   out << "% dofs     L2-error     H1-error      H2-error\n"
       << "e = [\n";
-  
+
   // Set up the dimension-dependent coarse mesh and solution
-  // We build more than one cell so as to avoid bugs on fewer than 
+  // We build more than one cell so as to avoid bugs on fewer than
   // 4 processors in 2D or 8 in 3D.
   if (dim == 2)
     {
@@ -209,7 +209,7 @@ int main(int argc, char** argv)
     }
 
   // Convert the mesh to second order: necessary for computing with
-  // Clough-Tocher elements, useful for getting slightly less 
+  // Clough-Tocher elements, useful for getting slightly less
   // broken visualization output with Hermite elements
   mesh.all_second_order();
 
@@ -246,7 +246,7 @@ int main(int argc, char** argv)
   // Give the system a pointer to the matrix assembly
   // function.
   system.attach_assemble_function (assemble_biharmonic);
-      
+
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
@@ -257,7 +257,7 @@ int main(int argc, char** argv)
   // Linear solver tolerance.
   equation_systems.parameters.set<Real>
     ("linear solver tolerance") = TOLERANCE * TOLERANCE;
-      
+
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
@@ -278,7 +278,7 @@ int main(int argc, char** argv)
       equation_systems.print_info();
 
       std::cout << "Beginning Solve " << r_step << std::endl;
-      
+
       // Solve the system "Biharmonic", just like example 2.
       system.solve();
 
@@ -345,7 +345,7 @@ int main(int argc, char** argv)
             {
               mesh_refinement.uniformly_refine(1);
             }
-              
+
           // This call reinitializes the \p EquationSystems object for
           // the newly refined mesh.  One of the steps in the
           // reinitialization is projecting the \p solution,
@@ -353,8 +353,8 @@ int main(int argc, char** argv)
           // the current one.
           equation_systems.reinit ();
         }
-    }            
-  
+    }
+
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Write out the solution
   // After solving the system write the solution
@@ -373,8 +373,8 @@ int main(int argc, char** argv)
       << "ylabel('log(error)');\n"
       << "title('C1 " << approx_type << " elements');\n"
       << "legend('L2-error', 'H1-error', 'H2-error');\n";
-  
-  // All done.  
+
+  // All done.
   return 0;
 #endif // #ifndef LIBMESH_ENABLE_SECOND_DERIVATIVES
 #endif // #ifndef LIBMESH_ENABLE_AMR
@@ -424,7 +424,7 @@ Tensor exact_2D_hessian(const Point& p,
 {
   // Second derivatives to be returned.
   Tensor hessu;
-  
+
   // x and y coordinates in space
   const Real x = p(0);
   const Real y = p(1);
@@ -462,7 +462,7 @@ Number exact_3D_solution(const Point& p,
   const Real x = p(0);
   const Real y = p(1);
   const Real z = p(2);
-  
+
   // analytic solution value
   return 4096.*(x-x*x)*(x-x*x)*(y-y*y)*(y-y*y)*(z-z*z)*(z-z*z);
 }
@@ -475,7 +475,7 @@ Gradient exact_3D_derivative(const Point& p,
 {
   // First derivatives to be returned.
   Gradient gradu;
-  
+
   // xyz coordinates in space
   const Real x = p(0);
   const Real y = p(1);
@@ -497,7 +497,7 @@ Tensor exact_3D_hessian(const Point& p,
 {
   // Second derivatives to be returned.
   Tensor hessu;
-  
+
   // xyz coordinates in space
   const Real x = p(0);
   const Real y = p(1);
@@ -558,7 +558,7 @@ void assemble_biharmonic(EquationSystems& es,
   // logging, since there may be many PerfLogs in an
   // application.
   PerfLog perf_log ("Matrix Assembly",false);
-  
+
     // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
@@ -567,7 +567,7 @@ void assemble_biharmonic(EquationSystems& es,
 
   // Get a reference to the LinearImplicitSystem we are solving
   LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Biharmonic");
-  
+
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
@@ -583,7 +583,7 @@ void assemble_biharmonic(EquationSystems& es,
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  
+
   // Quadrature rule for numerical integration.
   // With 2D triangles, the Clough quadrature rule puts a Gaussian
   // quadrature rule on each of the 3 subelements
@@ -595,7 +595,7 @@ void assemble_biharmonic(EquationSystems& es,
   // Declare a special finite element object for
   // boundary integration.
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-              
+
   // Boundary integration requires another quadraure rule,
   // with dimensionality one less than the dimensionality
   // of the element.
@@ -609,7 +609,7 @@ void assemble_biharmonic(EquationSystems& es,
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
-  // integration point.   
+  // integration point.
   const std::vector<Real>& JxW = fe->get_JxW();
 
   // The physical XY locations of the quadrature points on the element.
@@ -646,14 +646,14 @@ void assemble_biharmonic(EquationSystems& es,
   // example 3 for a discussion of the element iterators.
 
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
-  
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
   for ( ; el != end_el; ++el)
     {
       // Start logging the shape function initialization.
       // This is done through a simple function call with
       // the name of the event to log.
-      perf_log.push("elem init");      
+      perf_log.push("elem init");
 
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
@@ -684,7 +684,7 @@ void assemble_biharmonic(EquationSystems& es,
       // Stop logging the shape function initialization.
       // If you forget to stop logging an event the PerfLog
       // object will probably catch the error and abort.
-      perf_log.pop("elem init");      
+      perf_log.pop("elem init");
 
       // Now we will build the element matrix.  This involves
       // a double loop to integrate laplacians of the test funcions
@@ -726,7 +726,7 @@ void assemble_biharmonic(EquationSystems& es,
         // Start logging the boundary condition computation
         perf_log.push ("BCs");
 
-        // The penalty values, for solution boundary trace and flux.  
+        // The penalty values, for solution boundary trace and flux.
         const Real penalty = 1e10;
         const Real penalty2 = 1e10;
 
@@ -749,7 +749,7 @@ void assemble_biharmonic(EquationSystems& es,
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.
               const std::vector<Real>& JxW_face = fe_face->get_JxW();
-                                                                               
+
               // The XYZ locations (in physical space) of the
               // quadrature points on the face.  This is where
               // we will interpolate the boundary value function.
@@ -761,7 +761,7 @@ void assemble_biharmonic(EquationSystems& es,
               // Compute the shape function values on the element
               // face.
               fe_face->reinit(elem, s);
-                                                                                
+
               // Loop over the face quagrature points for integration.
               for (unsigned int qp=0; qp<qface->n_points(); qp++)
                 {
@@ -793,17 +793,17 @@ void assemble_biharmonic(EquationSystems& es,
                   for (unsigned int i=0; i<phi_face.size(); i++)
                     Fe(i) += JxW_face[qp] *
                                     (penalty * value * phi_face[i][qp]
-                                     + penalty2 * 
+                                     + penalty2 *
                                      (flux * face_normals[qp])
                                     * (dphi_face[i][qp]
                                        * face_normals[qp]));
 
                 }
-            } 
-        
+            }
+
         // Stop logging the boundary condition computation
         perf_log.pop ("BCs");
-      } 
+      }
 
       for (unsigned int qp=0; qp<qrule->n_points(); qp++)
         for (unsigned int i=0; i<phi.size(); i++)

@@ -127,7 +127,3 @@ public:
 } // namespace libMesh
 
 #endif // LIBMESH_FE_COMPUTE_DATA_H
-
-
-
-

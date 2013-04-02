@@ -43,7 +43,3 @@ namespace libMeshEnums {
 using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_XDR_MODE_H
-
-
-
-

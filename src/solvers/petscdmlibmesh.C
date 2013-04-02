@@ -34,7 +34,7 @@ struct DM_libMesh
   std::map<unsigned int, std::string>  *varnames;
   std::map<std::string, unsigned int>  *blockids;
   std::map<unsigned int, std::string>  *blocknames;
-  unsigned int                          decomposition_type; 
+  unsigned int                          decomposition_type;
   std::vector<std::set<unsigned int> > *decomposition;
   unsigned int                          embedding_type;
   IS                                    embedding;
@@ -147,11 +147,11 @@ PetscErrorCode DMLibMeshSetSystem(DM dm, NonlinearImplicitSystem& sys)
   PetscBool islibmesh;
   ierr = PetscObjectTypeCompare((PetscObject)dm, DMLIBMESH,&islibmesh);
   if(!islibmesh) SETERRQ2(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Got DM oftype %s, not of type %s", ((PetscObject)dm)->type_name, DMLIBMESH);
-  
+
   if(dm->setupcalled) SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONGSTATE, "Cannot reset the libMesh system after DM has been set up.");
   DM_libMesh *dlm = (DM_libMesh *)(dm->data);
   dlm->sys =&sys;
-  /* Initially populate the sets of active blockids and varids using all of the 
+  /* Initially populate the sets of active blockids and varids using all of the
      existing blocks/variables (only variables are supported at the moment). */
   DofMap& dofmap = dlm->sys->get_dof_map();
   dlm->varids->clear();
@@ -183,9 +183,9 @@ PetscErrorCode DMLibMeshSetSystem(DM dm, NonlinearImplicitSystem& sys)
     subdomain_id_type bid = *bit;
     std::string bname = mesh.subdomain_name(bid);
     if(!bname.length()) {
-      /* Block names are currently implemented for Exodus II meshes 
-	 only, so we might have to make up our own block names and 
-	 maintain our own mapping of block ids to names. 
+      /* Block names are currently implemented for Exodus II meshes
+	 only, so we might have to make up our own block names and
+	 maintain our own mapping of block ids to names.
       */
       std::ostringstream ss;
       ss << "dm" << bid;
@@ -254,7 +254,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
 	  const Elem* elem = *el;
 	  //unsigned int e_subdomain = elem->subdomain_id();
 	  std::vector<unsigned int> evindices;
-	  // Get the degree of freedom indices for the given variable off the current element.  
+	  // Get the degree of freedom indices for the given variable off the current element.
 	  dofmap.dof_indices(elem, evindices, v);
 	  for(unsigned int i = 0; i < evindices.size(); ++i) {
 	    unsigned int dof = evindices[i];
@@ -303,11 +303,11 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt *len, 
       DM_libMesh *ddlm = (DM_libMesh*)(ddm->data);
       ddlm->sys = dlm->sys;
       /* copy over the block ids and names */
-      *ddlm->blockids = *dlm->blockids; 
+      *ddlm->blockids = *dlm->blockids;
       *ddlm->blocknames = *dlm->blocknames;
       /* set the vars from the d-th part of the decomposition. */
-      *ddlm->varids     = dvarids;        
-      *ddlm->varnames   = dvarnames;        
+      *ddlm->varids     = dvarids;
+      *ddlm->varnames   = dvarnames;
       ierr = PetscObjectReference((PetscObject)emb); CHKERRQ(ierr);
       ddlm->embedding = emb;
       ddlm->embedding_type = DMLIBMESH_FIELD_EMBEDDING;
@@ -358,7 +358,7 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
 	/* Iterate only over this DM's variables. */
 	for(std::map<std::string, unsigned int>::const_iterator vit = dlm->varids->begin(); vit != dlm->varids->end(); ++vit) {
 	  unsigned int v = vit->second;
-	  // Get the degree of freedom indices for the given variable off the current element.  
+	  // Get the degree of freedom indices for the given variable off the current element.
 	  sys->get_dof_map().dof_indices(elem, evindices, v);
 	  for(unsigned int i = 0; i < evindices.size(); ++i) {
 	    unsigned int dof = evindices[i];
@@ -411,11 +411,11 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt *len,
       DM_libMesh *ddlm = (DM_libMesh*)(ddm->data);
       ddlm->sys = dlm->sys;
       /* copy over the varids and varnames */
-      *ddlm->varids    = *dlm->varids; 
-      *ddlm->varnames  = *dlm->varnames; 
+      *ddlm->varids    = *dlm->varids;
+      *ddlm->varnames  = *dlm->varnames;
       /* set the blocks from the d-th part of the decomposition. */
-      *ddlm->blockids    = dblockids;    
-      *ddlm->blocknames  = dblocknames;    
+      *ddlm->blockids    = dblockids;
+      *ddlm->blocknames  = dblocknames;
       ierr = PetscObjectReference((PetscObject)emb); CHKERRQ(ierr);
       ddlm->embedding = emb;
       ddlm->embedding_type = DMLIBMESH_DOMAIN_EMBEDDING;
@@ -446,8 +446,8 @@ PetscErrorCode DMLibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
   ierr = DMSetType(*ddm, DMLIBMESH);             CHKERRQ(ierr);
   DM_libMesh *ddlm = (DM_libMesh *)((*ddm)->data);
   ddlm->sys = dlm->sys;
-  ddlm->varids = dlm->varids; 
-  ddlm->varnames = dlm->varnames; 
+  ddlm->varids = dlm->varids;
+  ddlm->varnames = dlm->varnames;
   ddlm->blockids = dlm->blockids;
   ddlm->blocknames = dlm->blocknames;
   ddlm->decomposition = new(std::vector<std::set<unsigned int> >);
@@ -459,7 +459,7 @@ PetscErrorCode DMLibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
       for(PetscInt v = 0; v < dsizes[d]; ++v) {
 	std::string vname(dvarlists[d][v]);
 	std::map<std::string, unsigned int>::const_iterator vit = dlm->varids->find(vname);
-	if(vit == dlm->varids->end()) 
+	if(vit == dlm->varids->end())
 	  SETERRQ3(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Variable %D on the %D-th list with name %s is not owned by this DM", v, d, dvarlists[d][v]);
 	unsigned int vid = vit->second;
 	(*ddlm->decomposition)[d].insert(vid);
@@ -499,10 +499,10 @@ PetscErrorCode DMLibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
   ierr = DMSetType(*ddm, DMLIBMESH);             CHKERRQ(ierr);
   DM_libMesh *ddlm = (DM_libMesh *)((*ddm)->data);
   ddlm->sys = dlm->sys;
-  ddlm->varids   = dlm->varids; 
-  ddlm->varnames = dlm->varnames; 
-  ddlm->blockids   = dlm->blockids; 
-  ddlm->blocknames = dlm->blocknames; 
+  ddlm->varids   = dlm->varids;
+  ddlm->varnames = dlm->varnames;
+  ddlm->blockids   = dlm->blockids;
+  ddlm->blocknames = dlm->blocknames;
   ddlm->decomposition = new(std::vector<std::set<unsigned int> >);
   ddlm->decomposition_type = DMLIBMESH_DOMAIN_DECOMPOSITION;
   if(dnumber) {
@@ -512,7 +512,7 @@ PetscErrorCode DMLibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
       for(PetscInt b = 0; b < dsizes[d]; ++b) {
 	std::string bname(dblocklists[d][b]);
 	std::map<std::string, unsigned int>::const_iterator bit = dlm->blockids->find(bname);
-	if(bit == dlm->blockids->end()) 
+	if(bit == dlm->blockids->end())
 	  SETERRQ3(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Block %D on the %D-th list with name %s is not owned by this DM", b, d, dblocklists[d][b]);
 	unsigned int bid = bit->second;
 	(*ddlm->decomposition)[d].insert(bid);
@@ -550,13 +550,13 @@ static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, cons
   struct token *llfirst = PETSC_NULL, *lllast = PETSC_NULL, *tok;
   PetscInt stcount = 0, brcount = 0, d, i;
   size_t len0, count;
-  
-  /* 
-     Parse the decomposition descriptor. 
+
+  /*
+     Parse the decomposition descriptor.
      Decomposition names could be of one of two forms:
      var:v1,v2;v3,v4;v4,v5;
      block:b1,b2;b3,b4;b4,b5;
-     resulting in an overlapping decomposition that groups 
+     resulting in an overlapping decomposition that groups
      variables (v1,v2), (v3,v4), (v4,v5) or
      blocks    (b1,b2), (b3,b4), (b4,b5).
   */
@@ -576,24 +576,24 @@ static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, cons
   }
   else {
     ierr = PetscStrcmp(s0,"block",&eq);CHKERRQ(ierr);
-    if(!eq)   
+    if(!eq)
       SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "Could not determine decomposition type from descriptor: %s\n", ddesc); CHKERRQ(ierr);
     *dtype=DMLIBMESH_DOMAIN_DECOMPOSITION;
   }
   ierr = PetscStrlen(s0,&count);       CHKERRQ(ierr);
   while(count < len0) {
     struct token *st, *br;
-    ++ss; ++count; 
+    ++ss; ++count;
     s=ss;
     while(*ss && *ss != ',' && *ss != ';') {
       ++ss; ++count;
     }
     st = PETSC_NULL; br = PETSC_NULL;
     if(*ss) {
-      /* 
+      /*
 	 Found a separator, or a break.
 	 Add an appropriate token to the list.
-	 A token separator ',' produces no token. 
+	 A token separator ',' produces no token.
       */
       if(*ss == ';') {
 	/* Create a break token: a token with a null string. */
@@ -623,14 +623,14 @@ static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, cons
 	}
       }
     }
-  } 
+  }
   /* The result of parsing is in the linked list ll. */
   /* Count up the strings and the breaks. */
   tok = llfirst;
   while(tok) {
-    if(tok->s) 
+    if(tok->s)
       ++stcount;
-    else 
+    else
       ++brcount;
     tok = tok->next;
   }
@@ -641,9 +641,9 @@ static PetscErrorCode  DMLibMeshParseDecompositionDescriptor_Private(DM dm, cons
   for(d = 0; d < *dcount; ++d) (*dsizes)[d] = 0;
   tok = llfirst; d = 0;
   while(tok) {
-    if(tok->s) 
+    if(tok->s)
       ++(*dsizes)[d];
-    else 
+    else
       ++d;
     tok = tok->next;
   }
@@ -681,7 +681,7 @@ static PetscErrorCode  DMCreateFieldDecompositionDM_libMesh(DM dm, const char* d
   PetscFunctionBegin;
   *ddm = PETSC_NULL;
   ierr = DMLibMeshParseDecompositionDescriptor_Private(dm,ddesc,&dtype,&dcount,&dsizes,&dlists); CHKERRQ(ierr);
-  if(dtype == DMLIBMESH_FIELD_DECOMPOSITION){ 
+  if(dtype == DMLIBMESH_FIELD_DECOMPOSITION){
     ierr = DMLibMeshCreateFieldDecompositionDM(dm,dcount,dsizes,dlists,ddm); CHKERRQ(ierr);
   }
   else SETERRQ1(((PetscObject)dm)->comm, PETSC_ERR_PLIB, "Uexpected unknown decomposition type for field decomposition descriptor %s", ddesc);
@@ -996,7 +996,7 @@ static PetscErrorCode  DMView_libMesh(DM dm, PetscViewer viewer)
       for(unsigned int d = 0; d < dlm->decomposition->size(); ++d) {
 	std::set<unsigned int>::iterator dbegin  = (*dlm->decomposition)[d].begin();
 	std::set<unsigned int>::iterator dit     = (*dlm->decomposition)[d].begin();
-	std::set<unsigned int>::iterator dend    = (*dlm->decomposition)[d].end();	
+	std::set<unsigned int>::iterator dend    = (*dlm->decomposition)[d].end();
 	for(; dit != dend; ++dit) {
 	  if(dit != dbegin) {
 	    ierr = PetscViewerASCIIPrintf(viewer, ","); CHKERRQ(ierr);
@@ -1028,8 +1028,8 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
 
   if (!dlm->sys)
     SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE, "No libMesh system set for DM_libMesh");
-  /* 
-     Do not evaluate function, Jacobian or bounds for an embedded DM -- the subproblem might not have enough information for that. 
+  /*
+     Do not evaluate function, Jacobian or bounds for an embedded DM -- the subproblem might not have enough information for that.
   */
   if(!dlm->embedding) {
 #if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
@@ -1043,7 +1043,7 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
       ierr = DMSetVariableBounds(dm, DMVariableBounds_libMesh); CHKERRQ(ierr);
   }
   else {
-    /* 
+    /*
        Fow now we don't implement even these, although a linear "Dirichlet" subproblem is well-defined.
        Creating the submatrix, however, might require extracting the submatrix preallocation from an unassembled matrix.
     */
@@ -1067,7 +1067,7 @@ static PetscErrorCode  DMDestroy_libMesh(DM dm)
   delete dlm->varnames;
   delete dlm->blockids;
   delete dlm->blocknames;
-  if(dlm->decomposition) 
+  if(dlm->decomposition)
     delete dlm->decomposition;
   ierr = ISDestroy(&dlm->embedding); CHKERRQ(ierr);
   ierr = PetscFree(dm->data); CHKERRQ(ierr);
@@ -1118,7 +1118,7 @@ PetscErrorCode  DMCreate_libMesh(DM dm)
   dm->ops->coarsen            = 0; // DMCoarsen_libMesh;
   dm->ops->getinjection       = 0; // DMGetInjection_libMesh;
   dm->ops->getaggregates      = 0; // DMGetAggregates_libMesh;
-  
+
 #if PETSC_VERSION_LE(3,3,0) && PETSC_VERSION_RELEASE
   dm->ops->createfielddecompositiondm  = DMCreateFieldDecompositionDM_libMesh;
   dm->ops->createdomaindecompositiondm = DMCreateDomainDecompositionDM_libMesh;

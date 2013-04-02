@@ -144,12 +144,12 @@ public:
    * we want to use assembly functions based on this EIM approximation.
    */
   virtual void initialize_eim_assembly_objects();
-  
+
   /**
    * @return the vector of assembly objects that point to this RBEIMConstruction.
    */
   std::vector<ElemAssembly*> get_eim_assembly_objects();
-  
+
   /**
    * Build an element assembly object that will access basis function
    * \p bf_index.
@@ -170,8 +170,8 @@ public:
    * norm induced by inner_product_matrix.
    */
   BEST_FIT_TYPE best_fit_type_flag;
-  
-  
+
+
   /**
    * The matrix associated with this system should be block diagonal
    * hence we use a CouplingMatrix to "decouple" all variables to
@@ -216,19 +216,19 @@ protected:
    * basis training. Overload in subclasses to specialize.
    */
   virtual bool greedy_termination_test(Real training_greedy_error, int count);
-  
+
   /**
    * Loop over the training set and compute the parametrized function for each
    * training index.
    */
   void initialize_parametrized_functions_in_training_set();
-  
+
   /**
    * Boolean flag to indicate whether or not we have called
    * compute_parametrized_functions_in_training_set() yet.
    */
   bool _parametrized_functions_in_training_set_initialized;
-  
+
   /**
    * The libMesh vectors storing the finite element coefficients
    * of the RB basis functions.
@@ -261,7 +261,7 @@ private:
    * because this isn't used at all in the EIM.
    */
   RBAssemblyExpansion _empty_rb_assembly_expansion;
-  
+
   /**
    * The vector of assembly objects that are created to point to
    * this RBEIMConstruction.

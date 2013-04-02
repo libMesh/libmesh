@@ -62,7 +62,7 @@ namespace libMesh
 	  AutoPtr<FETransformationBase<OutputShape> > ap( new H1FETransformation<OutputShape> );
 	  return ap;
 	}
-	
+
       default:
 	libmesh_error();
       }

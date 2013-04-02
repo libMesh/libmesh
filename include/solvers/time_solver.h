@@ -205,7 +205,7 @@ public:
   unsigned int reduce_deltat_on_diffsolver_failure;
 
   /**
-   * A setter function users will employ if they need to do something 
+   * A setter function users will employ if they need to do something
    * other than save no solution history
    */
   void set_solution_history(const SolutionHistory & _solution_history);
@@ -223,7 +223,7 @@ public:
    */
   void set_is_adjoint(bool _is_adjoint_value)
   { _is_adjoint = _is_adjoint_value; }
-  
+
 protected:
 
   /**

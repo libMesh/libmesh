@@ -92,4 +92,3 @@ namespace libMesh
 #endif // LIBMESH_HAVE_TRIANGLE
 
 #endif // LIBMESH_MESH_TRIANGLE_WRAPPER_H
-

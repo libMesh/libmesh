@@ -994,4 +994,3 @@ INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,nodal_soln(const FEType&,const Elem*,co
 } // namespace libMesh
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-

@@ -6,23 +6,23 @@
 /* modify it under the terms of the GNU Lesser General Public */
 /* License as published by the Free Software Foundation; either */
 /* version 2.1 of the License, or (at your option) any later version. */
-  
+
 /* rbOOmit is distributed in the hope that it will be useful, */
 /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
 /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
 /* Lesser General Public License for more details. */
-  
+
 /* You should have received a copy of the GNU Lesser General Public */
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 // <h1>Reduced Basis Example 1 - Certified Reduced Basis Method</h1>
- 
+
 // In this example problem we use the Certified Reduced Basis method
 // to solve a steady convection-diffusion problem on the unit square.
 // The reduced basis method relies on an expansion of the PDE in the
 // form \sum_q=1^Q_a theta_a^q(\mu) * a^q(u,v) = \sum_q=1^Q_f theta_f^q(\mu) f^q(v)
-// where theta_a, theta_f are parameter dependent functions and 
+// where theta_a, theta_f are parameter dependent functions and
 // a^q, f^q are parameter independent operators (\mu denotes a parameter).
 
 // We first attach the parameter dependent functions and paramater
@@ -79,14 +79,14 @@ int main (int argc, char** argv)
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  
+
   // Parse the input file (reduced_basis_ex1.in) using GetPot
   std::string parameters_filename = "reduced_basis_ex1.in";
   GetPot infile(parameters_filename);
 
   unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh
   const unsigned int dim = 2;                      // The number of spatial dimensions
-  
+
   bool store_basis_functions = infile("store_basis_functions", true); // Do we write the RB basis functions to disk?
 
   // Read the "online_mode" flag from the command line
@@ -122,7 +122,7 @@ int main (int argc, char** argv)
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
   SimpleRBEvaluation rb_eval;
-  
+
   // We need to give the RBConstruction object a pointer to
   // our RBEvaluation object
   rb_con.set_rb_evaluation(rb_eval);
@@ -144,10 +144,10 @@ int main (int argc, char** argv)
     // "truth" solves, at well-chosen parameter values and employing
     // these snapshots as basis functions.
     rb_con.train_reduced_basis();
-    
+
     // Write out the data that will subsequently be required for the Evaluation stage
     rb_con.get_rb_evaluation().write_offline_data_to_files();
-    
+
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
@@ -159,7 +159,7 @@ int main (int argc, char** argv)
   {
     // Read in the reduced basis data
     rb_eval.read_offline_data_from_files();
-    
+
     // Read in online_N and initialize online parameters
     unsigned int online_N = infile("online_N",1);
     Real online_x_vel = infile("online_x_vel", 0.);
@@ -191,13 +191,13 @@ int main (int argc, char** argv)
     {
       // Read in the basis functions
       rb_eval.read_in_basis_functions(rb_con);
-      
+
       // Plot the solution
       rb_con.load_rb_solution();
 #ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
 #endif
-      
+
       // Plot the first basis function that was generated from the train_reduced_basis
       // call in the Offline stage
       rb_con.load_basis_function(0);
@@ -209,4 +209,3 @@ int main (int argc, char** argv)
 
   return 0;
 }
-

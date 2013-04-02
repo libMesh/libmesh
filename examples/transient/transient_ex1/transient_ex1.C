@@ -117,62 +117,62 @@ int main (int argc, char** argv)
   // simply read it in and uniformly refine it 5 times before we compute
   // with it.
   Mesh mesh;
-      
+
   mesh.read ("mesh.xda");
-  
+
   // Create a MeshRefinement object to handle refinement of our mesh.
   // This class handles all the details of mesh refinement and coarsening.
   MeshRefinement mesh_refinement (mesh);
-  
+
   // Uniformly refine the mesh 5 times.  This is the
   // first time we use the mesh refinement capabilities
   // of the library.
   mesh_refinement.uniformly_refine (5);
-  
+
   // Print information about the mesh to the screen.
   mesh.print_info();
-  
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  
+
   // Add a transient system to the EquationSystems
   // object named "Convection-Diffusion".
-  TransientLinearImplicitSystem & system = 
+  TransientLinearImplicitSystem & system =
     equation_systems.add_system<TransientLinearImplicitSystem> ("Convection-Diffusion");
-    
+
   // Adds the variable "u" to "Convection-Diffusion".  "u"
   // will be approximated using first-order approximation.
   system.add_variable ("u", FIRST);
-    
+
   // Give the system a pointer to the matrix assembly
   // and initialization functions.
   system.attach_assemble_function (assemble_cd);
   system.attach_init_function (init_cd);
-    
+
   // Initialize the data structures for the equation system.
   equation_systems.init ();
-    
+
   // Prints information about the system to the screen.
   equation_systems.print_info();
-    
+
   // Write out the initial conditions.
   GMVIO(mesh).write_equation_systems ("out_000.gmv",
                                       equation_systems);
-  
+
   // The Convection-Diffusion system requires that we specify
   // the flow velocity.  We will specify it as a RealVectorValue
   // data type and then use the Parameters object to pass it to
   // the assemble function.
-  equation_systems.parameters.set<RealVectorValue>("velocity") = 
+  equation_systems.parameters.set<RealVectorValue>("velocity") =
     RealVectorValue (0.8, 0.8);
-  
+
   // Solve the system "Convection-Diffusion".  This will be done by
   // looping over the specified time interval and calling the
   // solve() member at each time step.  This will assemble the
   // system and call the linear solver.
   const Real dt = 0.025;
   system.time   = 0.;
-  
+
   for (unsigned int t_step = 0; t_step < 50; t_step++)
     {
       // Incremenet the time counter, set the time and the
@@ -184,7 +184,7 @@ int main (int argc, char** argv)
 
       // A pretty update message
       std::cout << " Solving time step ";
-      
+
       // Since some compilers fail to offer full stream
       // functionality, libMesh offers a string stream
       // to work around this.  Note that for other compilers,
@@ -209,7 +209,7 @@ int main (int argc, char** argv)
 
         std::cout << out.str() << std::endl;
       }
-      
+
       // At this point we need to update the old
       // solution vector.  The old solution vector
       // will be the current solution vector from the
@@ -219,10 +219,10 @@ int main (int argc, char** argv)
       // (and systems derived from them) contain old solutions
       // we need to specify the system type when we ask for it.
       *system.old_local_solution = *system.current_local_solution;
-      
+
       // Assemble & solve the linear system
       equation_systems.get_system("Convection-Diffusion").solve();
-      
+
       // Output evey 10 timesteps to file.
       if ( (t_step+1)%10 == 0)
         {
@@ -241,7 +241,7 @@ int main (int argc, char** argv)
     }
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
-  // All done.  
+  // All done.
   return 0;
 }
 
@@ -262,7 +262,7 @@ void init_cd (EquationSystems& es,
 
   // Project initial conditions at time 0
   es.parameters.set<Real> ("time") = system.time = 0;
-  
+
   system.project_solution(exact_value, NULL, es.parameters);
 }
 
@@ -278,28 +278,28 @@ void assemble_cd (EquationSystems& es,
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Convection-Diffusion");
-  
+
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
-  
+
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // Get a reference to the Convection-Diffusion system object.
   TransientLinearImplicitSystem & system =
     es.get_system<TransientLinearImplicitSystem> ("Convection-Diffusion");
-  
+
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
   FEType fe_type = system.variable_type(0);
-  
+
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe      (FEBase::build(dim, fe_type));
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-  
+
   // A Gauss quadrature rule for numerical integration.
   // Let the \p FEType object decide what order rule is appropriate.
   QGauss qrule (dim,   fe_type.default_quadrature_order());
@@ -311,10 +311,10 @@ void assemble_cd (EquationSystems& es,
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.  We will start
-  // with the element Jacobian * quadrature weight at each integration point.   
+  // with the element Jacobian * quadrature weight at each integration point.
   const std::vector<Real>& JxW      = fe->get_JxW();
   const std::vector<Real>& JxW_face = fe_face->get_JxW();
-  
+
   // The element shape functions evaluated at the quadrature points.
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
@@ -325,7 +325,7 @@ void assemble_cd (EquationSystems& es,
 
   // The XY locations of the quadrature points used for face integration
   const std::vector<Point>& qface_points = fe_face->get_xyz();
-  
+
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
@@ -338,7 +338,7 @@ void assemble_cd (EquationSystems& es,
   // "Ke" and "Fe".
   DenseMatrix<Number> Ke;
   DenseVector<Number> Fe;
-  
+
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
@@ -357,26 +357,26 @@ void assemble_cd (EquationSystems& es,
   // will be refined we want to only consider the ACTIVE elements,
   // hence we use a variant of the \p active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
 
   for ( ; el != end_el; ++el)
-    {    
+    {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
       const Elem* elem = *el;
-      
+
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
       // contribute to.
       dof_map.dof_indices (elem, dof_indices);
-      
+
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
       // quadrature points (q_point) and the shape functions
       // (phi, dphi) for the current element.
       fe->reinit (elem);
-      
+
       // Zero the element matrix and right-hand side before
       // summing them.  We use the resize member here because
       // the number of degrees of freedom might have changed from
@@ -387,7 +387,7 @@ void assemble_cd (EquationSystems& es,
                  dof_indices.size());
 
       Fe.resize (dof_indices.size());
-      
+
       // Now we will build the element matrix and right-hand-side.
       // Constructing the RHS requires the solution and its
       // gradient from the previous timestep.  This myst be
@@ -399,18 +399,18 @@ void assemble_cd (EquationSystems& es,
           // Values to hold the old solution & its gradient.
           Number   u_old = 0.;
           Gradient grad_u_old;
-          
+
           // Compute the old solution & its gradient.
           for (unsigned int l=0; l<phi.size(); l++)
             {
               u_old      += phi[l][qp]*system.old_solution  (dof_indices[l]);
-              
+
               // This will work,
               // grad_u_old += dphi[l][qp]*system.old_solution (dof_indices[l]);
               // but we can do it without creating a temporary like this:
               grad_u_old.add_scaled (dphi[l][qp],system.old_solution (dof_indices[l]));
             }
-          
+
           // Now compute the element matrix and RHS contributions.
           for (unsigned int i=0; i<phi.size(); i++)
             {
@@ -423,40 +423,40 @@ void assemble_cd (EquationSystems& es,
                                         // (grad_u_old may be complex, so the
                                         // order here is important!)
                                         (grad_u_old*velocity)*phi[i][qp] +
-                                        
+
                                         // Diffusion term
-                                        0.01*(grad_u_old*dphi[i][qp]))     
+                                        0.01*(grad_u_old*dphi[i][qp]))
                                 );
-              
+
               for (unsigned int j=0; j<phi.size(); j++)
                 {
                   // The matrix contribution
                   Ke(i,j) += JxW[qp]*(
                                       // Mass-matrix
-                                      phi[i][qp]*phi[j][qp] + 
+                                      phi[i][qp]*phi[j][qp] +
 
                                       .5*dt*(
                                              // Convection term
                                              (velocity*dphi[j][qp])*phi[i][qp] +
-                                             
+
                                              // Diffusion term
-                                             0.01*(dphi[i][qp]*dphi[j][qp]))      
+                                             0.01*(dphi[i][qp]*dphi[j][qp]))
                                       );
-                } 
-            } 
-        } 
+                }
+            }
+        }
 
       // At this point the interior element integration has
       // been completed.  However, we have not yet addressed
       // boundary conditions.  For this example we will only
       // consider simple Dirichlet boundary conditions imposed
-      // via the penalty method. 
-      //        
+      // via the penalty method.
+      //
       // The following loops over the sides of the element.
       // If the element has no neighbor on a side then that
       // side MUST live on a boundary of the domain.
       {
-        // The penalty value.  
+        // The penalty value.
         const Real penalty = 1.e10;
 
         // The following loops over the sides of the element.
@@ -466,13 +466,13 @@ void assemble_cd (EquationSystems& es,
           if (elem->neighbor(s) == NULL)
             {
               fe_face->reinit(elem,s);
-              
+
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
                   const Number value = exact_solution (qface_points[qp](0),
                                                        qface_points[qp](1),
                                                        system.time);
-                                                       
+
                   // RHS contribution
                   for (unsigned int i=0; i<psi.size(); i++)
                     Fe(i) += penalty*JxW_face[qp]*value*psi[i][qp];
@@ -482,8 +482,8 @@ void assemble_cd (EquationSystems& es,
                     for (unsigned int j=0; j<psi.size(); j++)
                       Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                 }
-            } 
-      } 
+            }
+      }
 
       // If this assembly program were to be used on an adaptive mesh,
       // we would have to apply any hanging node constraint equations
@@ -496,7 +496,7 @@ void assemble_cd (EquationSystems& es,
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
-  
+
   // That concludes the system matrix assembly routine.
 #endif // #ifdef LIBMESH_ENABLE_AMR
 }

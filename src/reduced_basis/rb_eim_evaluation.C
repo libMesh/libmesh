@@ -105,16 +105,16 @@ Number RBEIMEvaluation::evaluate_parametrized_function(unsigned int var_index, c
 Real RBEIMEvaluation::rb_solve(unsigned int N)
 {
   // Short-circuit if we are using the same parameters and value of N
-  if( (_previous_parameters == get_parameters()) && 
+  if( (_previous_parameters == get_parameters()) &&
       (_previous_N == N) )
   {
     return _previous_error_bound;
   }
-  
+
   // Otherwise, update _previous parameters, _previous_N
   _previous_parameters = get_parameters();
   _previous_N = N;
-  
+
   START_LOG("rb_solve()", "RBEIMEvaluation");
 
   if(N > get_n_basis_functions())
@@ -249,12 +249,12 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
   if(libMesh::processor_id() == 0)
   {
     std::ostringstream file_name;
-    
+
     // Next write out the interpolation_matrix
     file_name.str("");
     file_name << directory_name << "/interpolation_matrix" << suffix;
     Xdr interpolation_matrix_out(file_name.str(), mode);
-    
+
     for(unsigned int i=0; i<n_bfs; i++)
     {
       for(unsigned int j=0; j<=i; j++)
@@ -267,7 +267,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
     file_name.str("");
     file_name << directory_name << "/extra_interpolation_matrix_row" << suffix;
     Xdr extra_interpolation_matrix_row_out(file_name.str(), mode);
-    
+
     for(unsigned int j=0; j<n_bfs; j++)
     {
       extra_interpolation_matrix_row_out << extra_interpolation_matrix_row(j);
@@ -278,7 +278,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
     file_name.str("");
     file_name << directory_name << "/interpolation_points" << suffix;
     Xdr interpolation_points_out(file_name.str(), mode);
-    
+
     for(unsigned int i=0; i<n_bfs; i++)
     {
       interpolation_points_out << interpolation_points[i](0);
@@ -295,7 +295,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
     file_name.str("");
     file_name << directory_name << "/extra_interpolation_point" << suffix;
     Xdr extra_interpolation_point_out(file_name.str(), mode);
-    
+
     extra_interpolation_point_out << extra_interpolation_point(0);
 
     if(LIBMESH_DIM >= 2)
@@ -321,7 +321,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
     file_name.str("");
     file_name << directory_name << "/extra_interpolation_point_var" << suffix;
     Xdr extra_interpolation_point_var_out(file_name.str(), mode);
-    
+
     extra_interpolation_point_var_out << extra_interpolation_point_var;
     extra_interpolation_point_var_out.close();
   }
@@ -370,7 +370,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   file_name.str("");
   file_name << directory_name << "/extra_interpolation_matrix_row" << suffix;
   Xdr extra_interpolation_matrix_row_in(file_name.str(), mode);
-  
+
   for(unsigned int j=0; j<n_bfs; j++)
   {
     Number value;
@@ -383,12 +383,12 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   file_name.str("");
   file_name << directory_name << "/interpolation_points" << suffix;
   Xdr interpolation_points_in(file_name.str(), mode);
-  
+
   for(unsigned int i=0; i<n_bfs; i++)
   {
     Real x_val, y_val, z_val = 0.;
     interpolation_points_in >> x_val;
-    
+
     if(LIBMESH_DIM >= 2)
       interpolation_points_in >> y_val;
 
@@ -404,7 +404,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   file_name.str("");
   file_name << directory_name << "/extra_interpolation_point" << suffix;
   Xdr extra_interpolation_point_in(file_name.str(), mode);
-  
+
   for(unsigned int i=0; i<n_bfs; i++)
   {
     Real x_val, y_val, z_val = 0.;
@@ -426,7 +426,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   file_name.str("");
   file_name << directory_name << "/interpolation_points_var" << suffix;
   Xdr interpolation_points_var_in(file_name.str(), mode);
-  
+
   for(unsigned int i=0; i<=n_bfs; i++)
   {
     unsigned int var;
@@ -439,7 +439,7 @@ void RBEIMEvaluation::read_offline_data_from_files(const std::string& directory_
   file_name.str("");
   file_name << directory_name << "/extra_interpolation_point_var" << suffix;
   Xdr extra_interpolation_point_var_in(file_name.str(), mode);
-  
+
   for(unsigned int i=0; i<=n_bfs; i++)
   {
     unsigned int var;

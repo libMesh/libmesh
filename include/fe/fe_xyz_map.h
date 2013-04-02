@@ -30,7 +30,7 @@ namespace libMesh
   class FEXYZMap : public FEMap
   {
   public:
-    
+
     FEXYZMap()
       : FEMap(){};
 

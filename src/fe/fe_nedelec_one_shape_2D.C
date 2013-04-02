@@ -109,7 +109,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem* elem,
 		  libmesh_error();
 
 		}
-	      
+
 	      return RealGradient();
 	    }
 
@@ -220,7 +220,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
 	  case QUAD9:
 	    {
 	      libmesh_assert_less (i, 4);
-	      
+
 	      switch (j)
 		{
 		  // d()/dxi
@@ -287,7 +287,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem* elem,
 	  case TRI6:
 	    {
 	      libmesh_assert_less (i, 3);
-	      
+
 	      // Account for edge flipping
 	      Real f = 1.0;
 
@@ -370,7 +370,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const ElemType,
 	       << std::endl;
   libmesh_error();
 #endif // LIBMESH_DIM > 1
-  
+
   libmesh_error();
   return RealGradient();
 }
@@ -437,7 +437,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem* elem,
     } // end switch (order)
 
 #endif // LIBMESH_DIM > 1
-  
+
   libmesh_error();
   return RealGradient();
 }

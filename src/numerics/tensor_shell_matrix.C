@@ -55,4 +55,3 @@ void TensorShellMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 template class TensorShellMatrix<Number>;
 
 } // namespace libMesh
-

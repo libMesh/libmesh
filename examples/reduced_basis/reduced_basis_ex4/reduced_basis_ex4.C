@@ -6,12 +6,12 @@
 /* modify it under the terms of the GNU Lesser General Public */
 /* License as published by the Free Software Foundation; either */
 /* version 2.1 of the License, or (at your option) any later version. */
-  
+
 /* rbOOmit is distributed in the hope that it will be useful, */
 /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
 /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
 /* Lesser General Public License for more details. */
-  
+
 /* You should have received a copy of the GNU Lesser General Public */
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
@@ -91,7 +91,7 @@ int main (int argc, char** argv)
     equation_systems.add_system<SimpleEIMConstruction> ("EIM");
   SimpleRBConstruction & rb_construction =
     equation_systems.add_system<SimpleRBConstruction> ("RB");
-  
+
   // Initialize the data structures for the equation system.
   equation_systems.init ();
 
@@ -104,7 +104,7 @@ int main (int argc, char** argv)
 
   // Initialize the EIM RBEvaluation object
   SimpleEIMEvaluation eim_rb_eval;
-  
+
   // Set the rb_eval objects for the RBConstructions
   eim_construction.set_rb_evaluation(eim_rb_eval);
   rb_construction.set_rb_evaluation(rb_eval);
@@ -114,7 +114,7 @@ int main (int argc, char** argv)
     // Read data from input file and print state
     eim_construction.process_parameters_file(eim_parameters);
     eim_construction.print_info();
-  
+
     // Perform the EIM Greedy and write out the data
     eim_construction.initialize_rb_construction();
     eim_construction.train_reduced_basis();
@@ -126,7 +126,7 @@ int main (int argc, char** argv)
     // attach the EIM theta objects to the RBConstruction and RBEvaluation objects
     eim_rb_eval.initialize_eim_theta_objects();
     rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
-    
+
     // attach the EIM assembly objects to the RBConstruction object
     eim_construction.initialize_eim_assembly_objects();
     rb_construction.get_rb_assembly_expansion().attach_multiple_F_assembly(eim_construction.get_eim_assembly_objects());
@@ -155,7 +155,7 @@ int main (int argc, char** argv)
     // attach the EIM theta objects to rb_eval objects
     eim_rb_eval.initialize_eim_theta_objects();
     rb_eval.get_rb_theta_expansion().attach_multiple_F_theta(eim_rb_eval.get_eim_theta_objects());
-    
+
     // Read in the offline data for rb_eval
     rb_eval.read_offline_data_from_files("rb_data");
 

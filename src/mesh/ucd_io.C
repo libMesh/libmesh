@@ -280,14 +280,14 @@ void UCDIO::write_nodes(std::ostream& out_stream, const MeshBase& mesh)
 {
   MeshBase::const_node_iterator       it  = mesh.nodes_begin();
   const MeshBase::const_node_iterator end = mesh.nodes_end();
-  
+
   unsigned int n=1; // 1-based node number for UCD
-  
+
   // Write the node coordinates
   for (; it != end; ++it)
     {
       libmesh_assert (out_stream.good());
-      
+
       out_stream << n++ << "\t";
       (*it)->write_unformatted(out_stream);
     }
@@ -308,14 +308,14 @@ void UCDIO::write_interior_elems(std::ostream& out_stream, const MeshBase& mesh)
 
   MeshBase::const_element_iterator it  = mesh.elements_begin();
   const MeshBase::const_element_iterator end = mesh.elements_end();
-  
+
   unsigned int e=1; // 1-based element number for UCD
-  
+
   // Write element information
   for (; it != end; ++it)
     {
       libmesh_assert (out_stream.good());
-      
+
       // PB: I believe these are the only supported ElemTypes.
       const ElemType etype = (*it)->type();
       if( (etype != TRI3) && (etype != QUAD4) &&
@@ -335,12 +335,12 @@ void UCDIO::write_interior_elems(std::ostream& out_stream, const MeshBase& mesh)
   return;
 }
 
-void UCDIO::write_nodal_data(const std::string& fname, 
-			     const std::vector<Number>&soln, 
+void UCDIO::write_nodal_data(const std::string& fname,
+			     const std::vector<Number>&soln,
 			     const std::vector<std::string>& names)
 {
   std::ofstream out_stream(fname.c_str());
-  
+
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   // UCD doesn't work in 1D
@@ -398,7 +398,7 @@ void UCDIO::write_soln(std::ostream& out_stream, const MeshBase& mesh,
       for( std::size_t var = 0; var != nv; var++ )
 	{
 	  std::size_t idx = nv*(n-1) + var;
-	  
+
 	  out_stream << " " << soln[idx];
 	}
       out_stream << std::endl;

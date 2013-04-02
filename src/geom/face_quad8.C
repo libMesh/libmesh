@@ -431,4 +431,3 @@ Quad8::second_order_child_vertex (const unsigned int n) const
 }
 
 } // namespace libMesh
-

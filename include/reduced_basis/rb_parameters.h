@@ -30,7 +30,7 @@
 
 namespace libMesh
 {
-    
+
 /**
  * This class is part of the rbOOmit framework.
  *
@@ -56,38 +56,38 @@ public:
    * Clear this object.
    */
   void clear();
-  
+
   /**
    * Get the value of the specific parameter.
    */
   Real get_value(const std::string& param_name) const;
-  
+
   /**
    * Set the value of the specified parameter. If param_name
    * doesn't already exist, it is added to the RBParameters object.
    */
   void set_value(const std::string& param_name, Real value);
-  
+
   /**
    * Get the number of parameters that have been added.
    */
   unsigned int n_parameters() const;
-  
+
   /**
    * Fill \p param_names with the names of the parameters.
    */
   void get_parameter_names(std::set<std::string>& param_names) const;
-  
+
   /**
    * Get a constant iterator to beginning of this RBParameters object.
    */
   const_iterator begin() const;
-  
+
   /**
    * Get a constant iterator to the end of this RBParameters object.
    */
   const_iterator end() const;
-  
+
   /**
    * Two RBParameters are equal if they have the same _parameters map.
    */
@@ -97,14 +97,14 @@ public:
    * @return !(*this == rhs).
    */
   bool operator!= (const RBParameters& node) const;
-  
+
   /**
    * Get a string that specifies the contents of this RBParameters object.
    * \p precision specifies the number of digits of precision we use
    * in scientific notation in the string.
    */
   std::string get_string(unsigned int precision=6) const;
-  
+
   /**
    * Print the parameters.
    */

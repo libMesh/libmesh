@@ -37,7 +37,7 @@ class DenseVector;
 
 // Helper function for doing the projection
 class MeshlessInterpolationFunction : public FunctionBase<Number>
-{  
+{
 public:
   MeshlessInterpolationFunction (const MeshfreeInterpolation &mfi,
 				 Threads::spin_mutex &mutex) :
@@ -49,7 +49,7 @@ public:
   void clear () {}
 
   virtual AutoPtr<FunctionBase<Number> > clone () const
-  { 
+  {
     return AutoPtr<FunctionBase<Number> > (new MeshlessInterpolationFunction (_mfi, _mutex) );
   }
 
@@ -61,7 +61,7 @@ public:
     _vals.resize(1);
 
     Threads::spin_mutex::scoped_lock lock(_mutex);
-    
+
     _mfi.interpolate_field_data(_mfi.field_variables(), _pts, _vals);
 
     return _vals.front();
@@ -86,7 +86,7 @@ private:
 
 void
 MeshfreeSolutionTransfer::transfer(const Variable & from_var, const Variable & to_var)
-{  
+{
   libmesh_experimental();
 
   System * from_sys = from_var.system();
@@ -95,13 +95,13 @@ MeshfreeSolutionTransfer::transfer(const Variable & from_var, const Variable & t
   EquationSystems & from_es = from_sys->get_equation_systems();
 
   MeshBase & from_mesh = from_es.get_mesh();
-   
+
   InverseDistanceInterpolation<LIBMESH_DIM> idi (4, 2);
 
   std::vector<Point>  &src_pts  (idi.get_source_points());
   std::vector<Number> &src_vals (idi.get_source_vals());
-  
-  std::vector<std::string> field_vars;      
+
+  std::vector<std::string> field_vars;
   field_vars.push_back(from_var.name());
   idi.set_field_variables(field_vars);
 
@@ -116,7 +116,7 @@ MeshfreeSolutionTransfer::transfer(const Variable & from_var, const Variable & t
       const Node *node(*nd);
       src_pts.push_back(*node);
       src_vals.push_back((*from_sys->solution)(node->dof_number(from_sys->number(),from_var.number(),0)));
-    }	  	
+    }
   }
 
   // We have only set local values - prepare for use by gathering remote gata
@@ -129,7 +129,7 @@ MeshfreeSolutionTransfer::transfer(const Variable & from_var, const Variable & t
   MeshlessInterpolationFunction mif(idi, mutex);
 
   // project the solution
-  to_sys->project_solution(&mif);      
+  to_sys->project_solution(&mif);
 }
 
 } // namespace libMesh

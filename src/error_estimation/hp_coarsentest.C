@@ -291,7 +291,7 @@ void HPCoarsenTest::select_refinement (System &system)
           const unsigned int n_qp = qrule->n_points();
 
           // The number of DOFS on the fine element
-          const unsigned int n_dofs = 
+          const unsigned int n_dofs =
 	    libmesh_cast_int<unsigned int>(dof_indices.size());
 
           // The number of nodes on the fine element
@@ -573,7 +573,7 @@ libMesh::err << "Cell " << e_id << ": h = " << elem->hmax()
               << "     new_h_dofs = " << new_h_dofs
               << ", new_p_dofs = " << new_p_dofs << std::endl;
 */
-      const Real p_value = 
+      const Real p_value =
         std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs;
       const Real h_value =
         std::sqrt(h_error_per_cell[e_id]) /

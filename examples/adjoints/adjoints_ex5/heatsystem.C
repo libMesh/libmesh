@@ -44,9 +44,9 @@ void HeatSystem::init_data ()
     std::ifstream i("heat.in");
     if (!i)
       {
-        std::cerr << '[' << libMesh::processor_id() 
-                  << "] Can't find heat.in; exiting early." 
-                  << std::endl; 
+        std::cerr << '[' << libMesh::processor_id()
+                  << "] Can't find heat.in; exiting early."
+                  << std::endl;
         libmesh_error();
       }
   }
@@ -70,7 +70,7 @@ void HeatSystem::init_data ()
 
   this->get_dof_map().add_dirichlet_boundary
         (DirichletBoundary (all_bdys, T_only, &zero));
-  
+
   FEMSystem::init_data();
 }
 
@@ -82,7 +82,7 @@ void HeatSystem::init_context(DiffContext &context)
 
   // Now make sure we have requested all the data
   // we need to build the linear system.
-  c.element_fe_var[0]->get_JxW();  
+  c.element_fe_var[0]->get_JxW();
   c.element_fe_var[0]->get_dphi();
 
   // We'll have a more automatic solution to preparing adjoint
@@ -91,12 +91,12 @@ void HeatSystem::init_context(DiffContext &context)
     {
       // A reference to the system context is built with
       const System & sys = c.get_system();
-  
+
       // Get a pointer to the adjoint solution vector
       NumericVector<Number> &adjoint_solution =
         const_cast<System &>(sys).get_adjoint_solution(0);
 
-      // Add this adjoint solution to the vectors that diff context should localize 
+      // Add this adjoint solution to the vectors that diff context should localize
       c.add_localized_vector(adjoint_solution, sys);
     }
 
@@ -126,7 +126,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
   optassert(c.dof_indices_var.size() > 0);
 
   // The number of local degrees of freedom in each variable
-  const unsigned int n_u_dofs = c.dof_indices_var[0].size(); 
+  const unsigned int n_u_dofs = c.dof_indices_var[0].size();
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> &K = *c.elem_subjacobians[0][0];
@@ -152,7 +152,7 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
           for (unsigned int j=0; j != n_u_dofs; ++j)
             K(i,j) += JxW[qp] * -parameters[0] * (dphi[i][qp] * dphi[j][qp]);
     } // end of the quadrature point qp-loop
-  
+
   return compute_jacobian;
 }
 
@@ -160,33 +160,33 @@ bool HeatSystem::element_time_derivative (bool request_jacobian,
 void HeatSystem::perturb_accumulate_residuals(const ParameterVector& parameters_in)
 {
   const unsigned int Np = parameters_in.size();
-  
+
   for (unsigned int j=0; j != Np; ++j)
     {
       Number old_parameter = *parameters_in[j];
-            
+
       *parameters_in[j] = old_parameter - dp;
 
       this->assembly(true, false);
 
-      this->rhs->close();      
-      
-      AutoPtr<NumericVector<Number> > R_minus = this->rhs->clone();            
+      this->rhs->close();
+
+      AutoPtr<NumericVector<Number> > R_minus = this->rhs->clone();
 
       // The contribution at a single time step would be [f(z;p+dp) - <partialu/partialt, z>(p+dp) - <g(u),z>(p+dp)] * dt
-      // But since we compute the residual already scaled by dt, there is no need for the * dt 
+      // But since we compute the residual already scaled by dt, there is no need for the * dt
       R_minus_dp += -R_minus->dot(this->get_adjoint_solution(0));
-            
+
       *parameters_in[j] = old_parameter + dp;
 
       this->assembly(true, false);
 
       this->rhs->close();
 
-      AutoPtr<NumericVector<Number> > R_plus = this->rhs->clone();            
-            
+      AutoPtr<NumericVector<Number> > R_plus = this->rhs->clone();
+
       R_plus_dp += -R_plus->dot(this->get_adjoint_solution(0));
-            
+
       *parameters_in[j] = old_parameter;
 
     }

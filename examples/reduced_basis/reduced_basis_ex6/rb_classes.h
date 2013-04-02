@@ -7,12 +7,12 @@
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // rbOOmit is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -102,16 +102,16 @@ public:
   virtual void init_data()
   {
     u_var = this->add_variable ("u", FIRST);
-    
+
     // Generate a DirichletBoundary object
     dirichlet_bc = build_zero_dirichlet_boundary_object();
-    
+
     // Set the Dirichet boundary IDs
     // and the Dirichlet boundary variable numbers
     dirichlet_bc->b.insert(0);
     dirichlet_bc->b.insert(5);
     dirichlet_bc->variables.push_back(u_var);
-    
+
     // Attach dirichlet_bc (must do this _before_ Parent::init_data)
     get_dof_map().add_dirichlet_boundary(*dirichlet_bc);
 
@@ -142,14 +142,14 @@ public:
    * Variable number for u.
    */
   unsigned int u_var;
-  
+
   /**
    * The object that stores the "assembly" expansion of the parameter dependent PDE,
    * i.e. the objects that define how to assemble the set of parameter-independent
    * operators in the affine expansion of the PDE.
    */
   Ex6AssemblyExpansion ex6_assembly_expansion;
-  
+
   /**
    * The inner product assembly object
    */

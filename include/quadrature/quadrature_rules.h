@@ -71,7 +71,3 @@ namespace QuadratureRules
 } // namespace libMesh
 
 #endif // LIBMESH_QUADRATURE_RULES_H
-
-
-
-

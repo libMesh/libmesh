@@ -37,14 +37,14 @@ public:
                const std::string& name_in,
                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in), Peclet(1.) {qoi.resize(1);}
- 
+
   // Function to get computed QoI values
 
   Number &get_QoI_value()
     {
-      return computed_QoI;       
+      return computed_QoI;
     }
-    
+
   Number &get_parameter_value(unsigned int parameter_index)
     {
       return parameters[parameter_index];
@@ -57,13 +57,13 @@ public:
 	{
 	  parameter_vector[i] = &parameters[i];
 	}
-      
+
       return parameter_vector;
     }
 
   Real &get_Pe()
     {
-      return Peclet;       
+      return Peclet;
     }
 
  protected:
@@ -113,7 +113,7 @@ public:
 
   // Destructor
   virtual ~CoupledFEMFunctionsx () {}
-        
+
   virtual AutoPtr<FEMFunctionBase<Number> > clone () const
   {return AutoPtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsx(*this) ); }
 
@@ -125,9 +125,9 @@ public:
 			     const Real time = 0.);
 
  private:
-  
+
   unsigned int var;
-     
+
 };
 
 
@@ -139,7 +139,7 @@ public:
 
   // Destructor
   virtual ~CoupledFEMFunctionsy () {}
-    
+
   virtual AutoPtr<FEMFunctionBase<Number> > clone () const
   {return AutoPtr<FEMFunctionBase<Number> >( new CoupledFEMFunctionsy(*this) ); }
 
@@ -150,9 +150,9 @@ public:
 
   virtual Number operator() (const FEMContext&, const Point& p,
 			     const Real time = 0.);
-  
+
  private:
-  
+
   unsigned int var;
 
 };

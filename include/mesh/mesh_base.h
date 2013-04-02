@@ -524,7 +524,7 @@ public:
    * mapping is independent from the parallel decomposition.
    */
   void subdomain_ids (std::set<subdomain_id_type> &ids) const;
-  
+
   /**
    * Returns the number of subdomains in the global mesh. Subdomains correspond
    * to separate subsets of the mesh which could correspond e.g. to different

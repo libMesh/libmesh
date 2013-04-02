@@ -99,7 +99,3 @@ public:
 } // namespace libMesh
 
 #endif // LIBMESH_FACE_H
-
-
-
-

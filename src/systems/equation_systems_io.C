@@ -85,7 +85,7 @@ void EquationSystems::read (const std::string& name,
 }
 
 
-    
+
 template <typename InValType>
 void EquationSystems::read (const std::string& name,
 			    const libMeshEnums::XdrMODE mode,
@@ -489,7 +489,7 @@ void EquationSystems::write(const std::string& name,
     io.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
 				      LIBMESH_MINOR_VERSION,
 				      LIBMESH_MICRO_VERSION));
-    
+
     // Only write the header information
     // if we are processor 0.
     if (proc_id == 0)
@@ -571,7 +571,7 @@ void EquationSystems::write(const std::string& name,
 }
 
 
- 
+
 // template specialization
 
 template void EquationSystems::read<Number> (const std::string& name, const unsigned int read_flags);

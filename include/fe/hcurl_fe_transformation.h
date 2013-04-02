@@ -25,7 +25,7 @@ namespace libMesh
 
   /**
    * This class handles the computation of the shape functions in the physical domain
-   * for HCurl conforming elements. This class assumes the \p FEGenericBase object has been 
+   * for HCurl conforming elements. This class assumes the \p FEGenericBase object has been
    * initialized in the reference domain (i.e. \p init_shape_functions has been called).
    *
    * @author Paul T. Bauman, 2012
@@ -51,9 +51,9 @@ namespace libMesh
 			  const std::vector<Point>& qp,
 			  const FEGenericBase<OutputShape>& fe,
 			  std::vector<std::vector<OutputShape> >& phi ) const;
-    
+
     /**
-     * Evaluates shape function gradients in physical coordinates for HCurl conforming 
+     * Evaluates shape function gradients in physical coordinates for HCurl conforming
      * elements.
      */
     virtual void map_dphi( const unsigned int /*dim*/,
@@ -62,12 +62,12 @@ namespace libMesh
 			   const FEGenericBase<OutputShape>& /*fe*/,
 			   std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >& /*dphi*/,
 			   std::vector<std::vector<OutputShape> >& /*dphidx*/,
-			   std::vector<std::vector<OutputShape> >& /*dphidy*/, 
+			   std::vector<std::vector<OutputShape> >& /*dphidy*/,
 			   std::vector<std::vector<OutputShape> >& /*dphidz*/) const
     { libmesh_do_once( libMesh::err << "WARNING: Shape function gradients for HCurl elements are not currently "
 		       << "being computed!" << std::endl; ); return; }
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES    
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
     /**
      * Evaluates shape function Hessians in physical coordinates based on HCurl conforming
      * finite element transformation.
@@ -78,10 +78,10 @@ namespace libMesh
 			    const FEGenericBase<OutputShape>& /*fe*/,
 			    std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >& /*d2phi*/,
 			    std::vector<std::vector<OutputShape> >& /*d2phidx2*/,
-			    std::vector<std::vector<OutputShape> >& /*d2phidxdy*/, 
+			    std::vector<std::vector<OutputShape> >& /*d2phidxdy*/,
 			    std::vector<std::vector<OutputShape> >& /*d2phidxdz*/,
 			    std::vector<std::vector<OutputShape> >& /*d2phidy2*/,
-			    std::vector<std::vector<OutputShape> >& /*d2phidydz*/, 
+			    std::vector<std::vector<OutputShape> >& /*d2phidydz*/,
 			    std::vector<std::vector<OutputShape> >& /*d2phidz2*/  ) const
     { libmesh_do_once( libMesh::err << "WARNING: Shape function Hessians for HCurl elements are not currently "
 		       << "being computed!" << std::endl; ); return; }
@@ -92,7 +92,7 @@ namespace libMesh
      * finite element transformation.
      * In 2-D, the transformation is \f$ \nabla \times \phi = J^{-1} * \nabla \times \hat{\phi} \f$ where
      * \f$ J = \det( dx/d\xi ) \f$
-     * In 3-D, the transformation is \f$ \nabla \times \phi = J^{-1} dx/d\xi \nabla \times \hat{\phi} \f$ 
+     * In 3-D, the transformation is \f$ \nabla \times \phi = J^{-1} dx/d\xi \nabla \times \hat{\phi} \f$
      */
     virtual void map_curl( const unsigned int dim,
 			   const Elem* const elem,

@@ -115,4 +115,3 @@ public:
 
 
 #endif // LIBMESH_DENSE_VECTOR_BASE_H
-

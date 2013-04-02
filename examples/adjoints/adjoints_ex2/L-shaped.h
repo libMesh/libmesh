@@ -36,10 +36,10 @@ public:
 	{
 	  parameter_vector[i] = &parameters[i];
 	}
-      
+
       return parameter_vector;
     }
- 
+
   protected:
   // System initialization
   virtual void init_data ();
@@ -55,16 +55,16 @@ public:
   // Constraint parts
   virtual bool side_constraint (bool request_jacobian,
 				DiffContext &context);
- 
+
   Number exact_solution (const Point&);
 
   // Parameters associated with the system
   std::vector<Number> parameters;
-  
+
   // The ParameterVector object that will contain pointers to
   // the system parameters
   ParameterVector parameter_vector;
-  
+
   // The FE type to use
   std::string _fe_family;
   unsigned int _fe_order;

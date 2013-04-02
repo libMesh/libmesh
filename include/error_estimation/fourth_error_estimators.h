@@ -79,4 +79,3 @@ protected:
 } // namespace libMesh
 
 #endif // LIBMESH_FOURTH_ERROR_ESTIMATORS_H
-

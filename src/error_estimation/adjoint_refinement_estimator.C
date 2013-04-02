@@ -158,15 +158,15 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   system.solution->localize(*projected_solution,
 			    system.get_dof_map().get_send_list());
 
-  // Rebuild the rhs with the projected primal solution 
+  // Rebuild the rhs with the projected primal solution
   (dynamic_cast<ImplicitSystem&>(system)).assembly(true, false);
   NumericVector<Number> & projected_residual = (dynamic_cast<ExplicitSystem&>(system)).get_vector("RHS Vector");
   projected_residual.close();
 
   // Solve the adjoint problem on the refined FE space
-  system.adjoint_solve();	      
+  system.adjoint_solve();
 
-  // Now that we have the refined adjoint solution and the projected primal solution, 
+  // Now that we have the refined adjoint solution and the projected primal solution,
   // we first compute the global QoI error estimate
 
   // Resize the computed_global_QoI_errors vector to hold the error estimates for each QoI
@@ -176,10 +176,10 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // contributions from all of them
   for (unsigned int j=0; j != system.qoi.size(); j++)
     {
-      computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));      
+      computed_global_QoI_errors[j] = projected_residual.dot(system.get_adjoint_solution(j));
     }
-      
-  // Done with the global error estimates, now construct the element wise error indicators 
+
+  // Done with the global error estimates, now construct the element wise error indicators
 
   // We ought to account for 'spill-over' effects while computing the
   // element error indicators This happens because the same dof is
@@ -189,7 +189,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // belongs to
 
   bool split_shared_dofs = false;
-  
+
   if (split_shared_dofs) {
 
   // A map that relates a node id to an int that will tell us how many elements it is a node of
@@ -198,8 +198,8 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // To fill this map, we will loop over elements, and then in each element, we will loop
   // over the nodes each element contains, and then query it for the number of coarse
   // grid elements it was a node of
-  
-  // We will be iterating over all the active elements in the fine mesh that live on 
+
+  // We will be iterating over all the active elements in the fine mesh that live on
   // this processor
   MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
@@ -212,7 +212,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
     {
       // Pointer to this element
       const Elem* elem = *elem_it;
-                  
+
       // Loop over the nodes in the element
       for(unsigned int n=0; n != elem->n_nodes(); ++n)
 	{
@@ -225,7 +225,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	  // A processed node flag
 	  bool processed_node = false;
 
-	  // Loop over existing processed nodes and see if 
+	  // Loop over existing processed nodes and see if
 	  // we have already done this one
 	  for(std::size_t i = 0; i != processed_node_ids.size(); i++)
 	    {
@@ -234,38 +234,38 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 		  processed_node = true;
 		}
 	    }
-	  
+
 	  // If we havent already processed this node, do so now
 	  if(!processed_node)
-	    {	      
+	    {
 	      // Declare a neighbor_set to be filled by the find_point_neighbors
 	      std::set<const Elem *> fine_grid_neighbor_set;
-	      
+
 	      // Call find_point_neighbors to fill the neighbor_set
 	      elem->find_point_neighbors(*node, fine_grid_neighbor_set);
-	      
+
 	      // A vector to hold the coarse grid parents neighbors
 	      std::vector<dof_id_type> coarse_grid_neighbors;
-	  
+
 	      // Iterators over the fine grid neighbors set
 	      std::set<const Elem*>::iterator fine_neighbor_it = fine_grid_neighbor_set.begin();
 	      const std::set<const Elem*>::iterator fine_neighbor_end = fine_grid_neighbor_set.end();
-	      
+
 	      // Loop over all the fine neighbors of this node
 	      for(; fine_neighbor_it != fine_neighbor_end ; ++fine_neighbor_it)
 		{
 		  // Pointer to the current fine neighbor element
 		  const Elem* fine_elem = *fine_neighbor_it;
-	  
+
 		  // Find the element id for the corresponding coarse grid element
 		  const Elem* coarse_elem = fine_elem;
 		  for (unsigned int j = 0; j != number_h_refinements; ++j)
-		    {		  
+		    {
 		      libmesh_assert (coarse_elem->parent());
 
 		      coarse_elem = coarse_elem->parent();
 		    }
-	      
+
 		  // Loop over the existing coarse neighbors and check if this one is
 		  // already in there
                   const dof_id_type coarse_id = coarse_elem->id();
@@ -277,7 +277,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 			{
 			  break;
 			}
-		    }	  
+		    }
 
 		  // If we didn't leave the loop even at the last element,
 		  // this is a new neighbour, put in the coarse_grid_neighbor_set
@@ -287,7 +287,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 		    }
 
 		} // End loop over fine neighbors
-	  
+
 	      // Set the shared_neighbour index for this node to the
 	      // size of the coarse grid neighbor set
 	      shared_element_count[node_id] =
@@ -295,22 +295,22 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
 	      // Add this node to processed_node_ids vector
 	      processed_node_ids.push_back(node_id);
-	      
+
 	    } // End if processed node
-	  
+
 	} // End loop over nodes
-      
+
     }  // End loop over elems
 
   } // if (split_shared_dofs)
 
   // Get a DoF map, will be used to get the nodal dof_indices for each element
   DofMap &dof_map = system.get_dof_map();
-  
+
   // The global DOF indices, we will use these later on when we compute the element wise indicators
   std::vector<dof_id_type> dof_indices;
 
-  // Localize the global rhs and adjoint solution vectors (which might be shared on multiple processsors) onto a 
+  // Localize the global rhs and adjoint solution vectors (which might be shared on multiple processsors) onto a
   // local ghosted vector, this ensures each processor has all the dof_indices to compute an error indicator for
   // an element it owns
   AutoPtr<NumericVector<Number> > localized_projected_residual = NumericVector<Number>::build();
@@ -330,9 +330,9 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	{
 	  // Get the weight for the current QoI
 	  Real error_weight = _qoi_set.weight(i);
-	  
+
 	  (system.get_adjoint_solution(i)).localize(*localized_adjoint_solution, system.get_dof_map().get_send_list());
-           
+
 	  // Loop over elements
           MeshBase::const_element_iterator elem_it = mesh.active_local_elements_begin();
           const MeshBase::const_element_iterator elem_end = mesh.active_local_elements_end();
@@ -341,12 +341,12 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	    {
 	      // Pointer to the element
 	      const Elem* elem = *elem_it;
-	      
+
 	      // Go up number_h_refinements levels up to find the coarse parent
 	      const Elem* coarse = elem;
 
 	      for (unsigned int j = 0; j != number_h_refinements; ++j)
-	        {		  		      
+	        {
 		  libmesh_assert (coarse->parent());
 
 		  coarse = coarse->parent();
@@ -356,7 +356,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
 	      // Get the local to global degree of freedom maps for this element
 	      dof_map.dof_indices (elem, dof_indices);
-	      
+
 	      // We will have to manually do the dot products.
               Number local_contribution = 0.;
 
@@ -365,7 +365,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 		  // The contribution to the error indicator for this element from the current QoI
 		  local_contribution += (*localized_projected_residual)(dof_indices[j]) * (*localized_adjoint_solution)(dof_indices[j]);
 		}
-	      
+
 	      // Multiply by the error weight for this QoI
               local_contribution *= error_weight;
 
@@ -377,9 +377,9 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 	    } // End loop over elements
 
 	} // End if belong to QoI set
-      
+
     } // End loop over QoIs
-  
+
   // Don't bother projecting the solution; we'll restore from backup
   // after coarsening
   system.project_solution_on_reinit() = false;
@@ -403,16 +403,16 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // We should be back where we started
   libmesh_assert_equal_to (n_coarse_elem, mesh.n_elem());
 
-  // Restore old solutions and clean up the heap  
+  // Restore old solutions and clean up the heap
   system.project_solution_on_reinit() = old_projection_setting;
-  
+
   // Restore the coarse solution vectors and delete their copies
   *system.solution = *coarse_solution;
   delete coarse_solution;
   *system.current_local_solution = *coarse_local_solution;
   delete coarse_local_solution;
   delete projected_solution;
-  
+
   for (System::vectors_iterator vec = system.vectors_begin(); vec !=
 	 system.vectors_end(); ++vec)
     {
@@ -420,7 +420,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
       const std::string& var_name = vec->first;
 
       system.get_vector(var_name) = *coarse_vectors[var_name];
-      
+
       coarse_vectors[var_name]->clear();
       delete coarse_vectors[var_name];
     }
@@ -430,7 +430,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   mesh.allow_renumbering(old_renumbering_setting);
 
 } // end estimate_error function
-  
+
 }// namespace libMesh
 
 #endif // #ifdef LIBMESH_ENABLE_AMR

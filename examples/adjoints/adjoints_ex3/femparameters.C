@@ -105,7 +105,7 @@ void FEMParameters::read(GetPot &input)
     GETPOT_INPUT(component_wise_error);
     GETPOT_INPUT(compute_sensitivities);
     GETPOT_INPUT(compare_to_fine_solution_primal);
-    GETPOT_INPUT(compare_to_fine_solution_adjoint);    
+    GETPOT_INPUT(compare_to_fine_solution_adjoint);
     GETPOT_INPUT(do_forward_sensitivity);
     GETPOT_INPUT(do_adjoint_sensitivity);
     GETPOT_INPUT(postprocess_adjoint);
@@ -166,7 +166,7 @@ void FEMParameters::read(GetPot &input)
     GETPOT_INPUT(print_residuals);
     GETPOT_INPUT(print_jacobian_norms);
     GETPOT_INPUT(print_jacobians);
-        
+
 
   // std::vector<std::string> bad_variables =
   //   input.unidentified_arguments(variable_names);

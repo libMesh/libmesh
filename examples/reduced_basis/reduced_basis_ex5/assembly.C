@@ -54,10 +54,10 @@ Real elasticity_tensor(unsigned int i,
 void AssemblyA0::interior_assembly(FEMContext &c)
 {
   const unsigned int n_components = rb_sys.n_vars();
-  
+
   // make sure we have three components
   libmesh_assert_equal_to (n_components, 3);
-  
+
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;
   const unsigned int w_var = rb_sys.w_var;
@@ -69,7 +69,7 @@ void AssemblyA0::interior_assembly(FEMContext &c)
   // quadrature points.
   const std::vector<std::vector<RealGradient> >& dphi =
     c.element_fe_var[u_var]->get_dphi();
-  
+
   // Now we will build the affine operator
   unsigned int n_qpoints = c.element_qrule->n_points();
 
@@ -77,7 +77,7 @@ void AssemblyA0::interior_assembly(FEMContext &c)
   n_var_dofs[u_var] = c.dof_indices_var[u_var].size();
   n_var_dofs[v_var] = c.dof_indices_var[v_var].size();
   n_var_dofs[w_var] = c.dof_indices_var[w_var].size();
-  
+
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
   {
     unsigned int C_j = 0;
@@ -85,7 +85,7 @@ void AssemblyA0::interior_assembly(FEMContext &c)
     {
       for (unsigned int C_l = 1; C_l < n_components; C_l++)
       {
-        
+
         Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
         for (unsigned int qp=0; qp<n_qpoints; qp++)
         {
@@ -93,16 +93,16 @@ void AssemblyA0::interior_assembly(FEMContext &c)
           {
             for (unsigned int j=0; j<n_var_dofs[C_k]; j++)
             {
-              (c.get_elem_jacobian(C_i,C_k))(i,j) += 
+              (c.get_elem_jacobian(C_i,C_k))(i,j) +=
                 JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
             }
           }
         }
-        
+
       }
     }
   }
-  
+
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
   {
     for (unsigned int C_j = 1; C_j < n_components; C_j++)
@@ -110,7 +110,7 @@ void AssemblyA0::interior_assembly(FEMContext &c)
       for (unsigned int C_k = 0; C_k < n_components; C_k++)
       {
         unsigned int C_l = 0;
-          
+
         Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
         for (unsigned int qp=0; qp<n_qpoints; qp++)
         {
@@ -118,25 +118,25 @@ void AssemblyA0::interior_assembly(FEMContext &c)
           {
             for (unsigned int j=0; j<n_var_dofs[C_k]; j++)
             {
-              (c.get_elem_jacobian(C_i,C_k))(i,j) += 
+              (c.get_elem_jacobian(C_i,C_k))(i,j) +=
                 JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
             }
           }
         }
-          
+
       }
     }
   }
-  
+
 }
 
 void AssemblyA1::interior_assembly(FEMContext &c)
 {
   const unsigned int n_components = rb_sys.n_vars();
-  
+
   // make sure we have three components
   libmesh_assert_equal_to (n_components, 3);
-  
+
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;
   const unsigned int w_var = rb_sys.w_var;
@@ -148,7 +148,7 @@ void AssemblyA1::interior_assembly(FEMContext &c)
   // quadrature points.
   const std::vector<std::vector<RealGradient> >& dphi =
     c.element_fe_var[u_var]->get_dphi();
-  
+
   // Now we will build the affine operator
   unsigned int n_qpoints = c.element_qrule->n_points();
 
@@ -156,7 +156,7 @@ void AssemblyA1::interior_assembly(FEMContext &c)
   n_var_dofs[u_var] = c.dof_indices_var[u_var].size();
   n_var_dofs[v_var] = c.dof_indices_var[v_var].size();
   n_var_dofs[w_var] = c.dof_indices_var[w_var].size();
-  
+
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
   {
     for (unsigned int C_j = 1; C_j < n_components; C_j++)
@@ -165,7 +165,7 @@ void AssemblyA1::interior_assembly(FEMContext &c)
       {
         for (unsigned int C_l = 1; C_l < n_components; C_l++)
         {
-          
+
           Real C_ijkl = elasticity_tensor(C_i,C_j,C_k,C_l);
           for (unsigned int qp=0; qp<n_qpoints; qp++)
           {
@@ -173,12 +173,12 @@ void AssemblyA1::interior_assembly(FEMContext &c)
             {
               for (unsigned int j=0; j<n_var_dofs[C_k]; j++)
               {
-                (c.get_elem_jacobian(C_i,C_k))(i,j) += 
+                (c.get_elem_jacobian(C_i,C_k))(i,j) +=
                   JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
               }
             }
           }
-          
+
         }
       }
     }
@@ -188,10 +188,10 @@ void AssemblyA1::interior_assembly(FEMContext &c)
 void AssemblyA2::interior_assembly(FEMContext &c)
 {
   const unsigned int n_components = rb_sys.n_vars();
-  
+
   // make sure we have three components
   libmesh_assert_equal_to (n_components, 3);
-  
+
   const unsigned int u_var = rb_sys.u_var;
   const unsigned int v_var = rb_sys.v_var;
   const unsigned int w_var = rb_sys.w_var;
@@ -203,7 +203,7 @@ void AssemblyA2::interior_assembly(FEMContext &c)
   // quadrature points.
   const std::vector<std::vector<RealGradient> >& dphi =
     c.element_fe_var[u_var]->get_dphi();
-  
+
   // Now we will build the affine operator
   unsigned int n_qpoints = c.element_qrule->n_points();
 
@@ -211,11 +211,11 @@ void AssemblyA2::interior_assembly(FEMContext &c)
   n_var_dofs[u_var] = c.dof_indices_var[u_var].size();
   n_var_dofs[v_var] = c.dof_indices_var[v_var].size();
   n_var_dofs[w_var] = c.dof_indices_var[w_var].size();
-  
+
   for (unsigned int C_i = 0; C_i < n_components; C_i++)
   {
     unsigned int C_j = 0;
-    
+
     for (unsigned int C_k = 0; C_k < n_components; C_k++)
     {
       unsigned int C_l = 0;
@@ -227,7 +227,7 @@ void AssemblyA2::interior_assembly(FEMContext &c)
         {
           for (unsigned int j=0; j<n_var_dofs[C_k]; j++)
           {
-            (c.get_elem_jacobian(C_i,C_k))(i,j) += 
+            (c.get_elem_jacobian(C_i,C_k))(i,j) +=
               JxW[qp]*(C_ijkl * dphi[i][qp](C_j)*dphi[j][qp](C_l));
           }
         }
@@ -341,11 +341,11 @@ void InnerProductAssembly::interior_assembly(FEMContext &c)
 
   // Now we will build the affine operator
   unsigned int n_qpoints = (c.get_element_qrule())->n_points();
-      
+
   DenseSubMatrix<Number>& Kuu = c.get_elem_jacobian(u_var,u_var);
   DenseSubMatrix<Number>& Kvv = c.get_elem_jacobian(v_var,v_var);
   DenseSubMatrix<Number>& Kww = c.get_elem_jacobian(w_var,w_var);
-  
+
   for (unsigned int qp=0; qp<n_qpoints; qp++)
   {
       for (unsigned int i=0; i<n_u_dofs; i++)
@@ -353,7 +353,7 @@ void InnerProductAssembly::interior_assembly(FEMContext &c)
         {
           Kuu(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
         }
-      
+
       for (unsigned int i=0; i<n_v_dofs; i++)
         for (unsigned int j=0; j<n_v_dofs; j++)
         {

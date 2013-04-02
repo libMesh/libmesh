@@ -994,7 +994,7 @@ void Elem::make_links_to_me_local(unsigned int n)
   // pointed to instead.
   libmesh_assert(neigh->level() == this->level() ||
                  neigh->active());
-     
+
   // If neigh is at our level, then its family might have
   // remote_elem neighbor links which need to point to us
   // instead, but if not, then we're done.
@@ -1007,7 +1007,7 @@ void Elem::make_links_to_me_local(unsigned int n)
   // restriction/prolongation projections.
   if (neigh->subactive())
     return;
-      
+
   // What side of neigh are we on?  We can't use the usual Elem
   // method because we're in the middle of restoring topology
   const AutoPtr<Elem> my_side = this->side(n);
@@ -2299,7 +2299,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
       // pointed to instead.
       libmesh_assert(neigh->level() == elem->level() ||
                      neigh->active());
-     
+
       elem->set_neighbor(n, neigh);
 
       // If neigh is at elem's level, then its family might have
@@ -2307,7 +2307,7 @@ Elem * Elem::PackedElem::unpack (MeshBase &mesh, Elem *parent) const
       // instead, but if not, then we're done.
       if (neigh->level() != elem->level())
 	continue;
-      
+
       // What side of neigh is elem on?  We can't use the usual Elem
       // method because we haven't finished restoring topology
       const AutoPtr<Elem> my_side = elem->side(n);

@@ -85,7 +85,7 @@ namespace libMesh
 						  const FEGenericBase<OutputShape>& fe,
 						  std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient> >& dphi,
 						  std::vector<std::vector<OutputShape> >& dphidx,
-						  std::vector<std::vector<OutputShape> >& dphidy, 
+						  std::vector<std::vector<OutputShape> >& dphidy,
 						  std::vector<std::vector<OutputShape> >& dphidz ) const
   {
     switch(dim)
@@ -111,13 +111,13 @@ namespace libMesh
 #if LIBMESH_DIM>2
 	  const std::vector<Real>& dxidz_map = fe.get_fe_map().get_dxidz();
 #endif
-	  
+
 	  for (unsigned int i=0; i<dphi.size(); i++)
 	    for (unsigned int p=0; p<dphi[i].size(); p++)
 	      {
 		// dphi/dx    = (dphi/dxi)*(dxi/dx)
 		dphi[i][p].slice(0) = dphidx[i][p] = dphidxi[i][p]*dxidx_map[p];
-		
+
 #if LIBMESH_DIM>1
 		dphi[i][p].slice(1)  = dphidy[i][p] = dphidxi[i][p]*dxidy_map[p];
 #endif
@@ -125,10 +125,10 @@ namespace libMesh
 		dphi[i][p].slice(2) = dphidz[i][p] = dphidxi[i][p]*dxidz_map[p];
 #endif
 	      }
-	  
+
 	  break;
 	}
-	
+
       case 2:
 	{
 	  const std::vector<std::vector<OutputShape> >& dphidxi = fe.get_dphidxi();
@@ -152,7 +152,7 @@ namespace libMesh
 		// dphi/dx    = (dphi/dxi)*(dxi/dx) + (dphi/deta)*(deta/dx)
 		dphi[i][p].slice(0) = dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
 						      dphideta[i][p]*detadx_map[p]);
-		
+
 		// dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy)
 		dphi[i][p].slice(1) = dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
 						      dphideta[i][p]*detady_map[p]);
@@ -167,7 +167,7 @@ namespace libMesh
 	  break;
 	}
 
-      case 3: 
+      case 3:
 	{
 	  const std::vector<std::vector<OutputShape> >& dphidxi = fe.get_dphidxi();
 	  const std::vector<std::vector<OutputShape> >& dphideta = fe.get_dphideta();
@@ -176,15 +176,15 @@ namespace libMesh
 	  const std::vector<Real>& dxidx_map = fe.get_fe_map().get_dxidx();
 	  const std::vector<Real>& dxidy_map = fe.get_fe_map().get_dxidy();
 	  const std::vector<Real>& dxidz_map = fe.get_fe_map().get_dxidz();
-	  
+
 	  const std::vector<Real>& detadx_map = fe.get_fe_map().get_detadx();
 	  const std::vector<Real>& detady_map = fe.get_fe_map().get_detady();
 	  const std::vector<Real>& detadz_map = fe.get_fe_map().get_detadz();
-	  
+
 	  const std::vector<Real>& dzetadx_map = fe.get_fe_map().get_dzetadx();
 	  const std::vector<Real>& dzetady_map = fe.get_fe_map().get_dzetady();
 	  const std::vector<Real>& dzetadz_map = fe.get_fe_map().get_dzetadz();
-	  
+
 	  for (unsigned int i=0; i<dphi.size(); i++)
 	    for (unsigned int p=0; p<dphi[i].size(); p++)
 	      {
@@ -192,12 +192,12 @@ namespace libMesh
 		dphi[i][p].slice(0) = dphidx[i][p] = (dphidxi[i][p]*dxidx_map[p] +
 						      dphideta[i][p]*detadx_map[p] +
 						      dphidzeta[i][p]*dzetadx_map[p]);
-		  
+
 		// dphi/dy    = (dphi/dxi)*(dxi/dy) + (dphi/deta)*(deta/dy) + (dphi/dzeta)*(dzeta/dy);
 		dphi[i][p].slice(1) = dphidy[i][p] = (dphidxi[i][p]*dxidy_map[p] +
 						      dphideta[i][p]*detady_map[p] +
 						      dphidzeta[i][p]*dzetady_map[p]);
-		
+
 		// dphi/dz    = (dphi/dxi)*(dxi/dz) + (dphi/deta)*(deta/dz) + (dphi/dzeta)*(dzeta/dz);
 		dphi[i][p].slice(2) = dphidz[i][p] = (dphidxi[i][p]*dxidz_map[p] +
 						      dphideta[i][p]*detadz_map[p] +
@@ -222,10 +222,10 @@ namespace libMesh
 						   const FEGenericBase<OutputShape>& fe,
 						   std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor> >& d2phi,
 						   std::vector<std::vector<OutputShape> >& d2phidx2,
-						   std::vector<std::vector<OutputShape> >& d2phidxdy, 
+						   std::vector<std::vector<OutputShape> >& d2phidxdy,
 						   std::vector<std::vector<OutputShape> >& d2phidxdz,
 						   std::vector<std::vector<OutputShape> >& d2phidy2,
-						   std::vector<std::vector<OutputShape> >& d2phidydz, 
+						   std::vector<std::vector<OutputShape> >& d2phidydz,
 						   std::vector<std::vector<OutputShape> >& d2phidz2  ) const
   {
     libmesh_do_once(
@@ -236,7 +236,7 @@ namespace libMesh
 				     << std::endl;
 		      }
 		    );
-      
+
 
     switch(dim)
       {
@@ -262,14 +262,14 @@ namespace libMesh
 #if LIBMESH_DIM>2
 	  const std::vector<Real>& dxidz_map = fe.get_fe_map().get_dxidz();
 #endif
-	  
+
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
 		d2phi[i][p].slice(0).slice(0) = d2phidx2[i][p] =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidx_map[p];
 #if LIBMESH_DIM>1
-		d2phi[i][p].slice(0).slice(1) = 
+		d2phi[i][p].slice(0).slice(1) =
 		  d2phi[i][p].slice(1).slice(0) = d2phidxdy[i][p] =
 		  d2phidxi2[i][p]*dxidx_map[p]*dxidy_map[p];
 
@@ -303,13 +303,13 @@ namespace libMesh
 #if LIBMESH_DIM > 2
 	  const std::vector<Real>& dxidz_map = fe.get_fe_map().get_dxidz();
 #endif
-	  
+
 	  const std::vector<Real>& detadx_map = fe.get_fe_map().get_detadx();
 	  const std::vector<Real>& detady_map = fe.get_fe_map().get_detady();
 #if LIBMESH_DIM > 2
 	  const std::vector<Real>& detadz_map = fe.get_fe_map().get_detadz();
 #endif
-	  
+
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
@@ -351,7 +351,7 @@ namespace libMesh
 		  d2phideta2[i][p]*detadz_map[p]*detadz_map[p];
 #endif
 	      }
-	  
+
 	  break;
 	}
 
@@ -367,15 +367,15 @@ namespace libMesh
 	  const std::vector<Real>& dxidx_map = fe.get_fe_map().get_dxidx();
 	  const std::vector<Real>& dxidy_map = fe.get_fe_map().get_dxidy();
 	  const std::vector<Real>& dxidz_map = fe.get_fe_map().get_dxidz();
-	  
+
 	  const std::vector<Real>& detadx_map = fe.get_fe_map().get_detadx();
 	  const std::vector<Real>& detady_map = fe.get_fe_map().get_detady();
 	  const std::vector<Real>& detadz_map = fe.get_fe_map().get_detadz();
-	  
+
 	  const std::vector<Real>& dzetadx_map = fe.get_fe_map().get_dzetadx();
 	  const std::vector<Real>& dzetady_map = fe.get_fe_map().get_dzetady();
 	  const std::vector<Real>& dzetadz_map = fe.get_fe_map().get_dzetadz();
-	  
+
 	  for (unsigned int i=0; i<d2phi.size(); i++)
 	    for (unsigned int p=0; p<d2phi[i].size(); p++)
 	      {
@@ -474,7 +474,7 @@ namespace libMesh
     switch(dim)
       {
 	// The curl only make sense in 2D and 3D
-      case 0: 
+      case 0:
       case 1:
 	{
 	  libmesh_error();
@@ -519,7 +519,7 @@ namespace libMesh
 
 		Real dphix_dz = (dphidxi[i][p].slice(0))*dxidz_map[p]
 		                + (dphideta[i][p].slice(0))*detadz_map[p];
-		
+
 		curl_phi[i][p].slice(0) = -dphiy_dz;
 		curl_phi[i][p].slice(1) = dphix_dz;
 #endif
@@ -536,11 +536,11 @@ namespace libMesh
 	  const std::vector<Real>& dxidx_map = fe.get_fe_map().get_dxidx();
 	  const std::vector<Real>& dxidy_map = fe.get_fe_map().get_dxidy();
 	  const std::vector<Real>& dxidz_map = fe.get_fe_map().get_dxidz();
-	  
+
 	  const std::vector<Real>& detadx_map = fe.get_fe_map().get_detadx();
 	  const std::vector<Real>& detady_map = fe.get_fe_map().get_detady();
 	  const std::vector<Real>& detadz_map = fe.get_fe_map().get_detadz();
-	  
+
 	  const std::vector<Real>& dzetadx_map = fe.get_fe_map().get_dzetadx();
 	  const std::vector<Real>& dzetady_map = fe.get_fe_map().get_dzetady();
 	  const std::vector<Real>& dzetadz_map = fe.get_fe_map().get_dzetadz();
@@ -566,7 +566,7 @@ namespace libMesh
 		Real dphiz_dx = (dphidxi[i][p].slice(2))*dxidx_map[p]
 		                + (dphideta[i][p].slice(2))*detadx_map[p]
 		                + (dphidzeta[i][p].slice(2))*dzetadx_map[p];
-		
+
 		Real dphiy_dx = (dphidxi[i][p].slice(1))*dxidx_map[p]
 		                + (dphideta[i][p].slice(1))*detadx_map[p]
 		                + (dphidzeta[i][p].slice(1))*dzetadx_map[p];
@@ -591,7 +591,7 @@ namespace libMesh
     return;
   }
 
-  
+
   template< >
   void H1FETransformation<Real>::map_div
     (const unsigned int,
@@ -604,7 +604,7 @@ namespace libMesh
 		 << "makes sense for vector-valued elements." << std::endl;
     libmesh_error();
   }
-  
+
 
   template<>
   void H1FETransformation<RealGradient>::map_div
@@ -617,7 +617,7 @@ namespace libMesh
     switch(dim)
       {
 	// The divergence only make sense in 2D and 3D
-      case 0: 
+      case 0:
       case 1:
 	{
 	  libmesh_error();
@@ -626,7 +626,7 @@ namespace libMesh
 	{
 	  const std::vector<std::vector<RealGradient> >& dphidxi = fe.get_dphidxi();
 	  const std::vector<std::vector<RealGradient> >& dphideta = fe.get_dphideta();
-	  
+
 	  const std::vector<Real>& dxidx_map = fe.get_fe_map().get_dxidx();
 	  const std::vector<Real>& dxidy_map = fe.get_fe_map().get_dxidy();
 
@@ -659,11 +659,11 @@ namespace libMesh
 	  const std::vector<Real>& dxidx_map = fe.get_fe_map().get_dxidx();
 	  const std::vector<Real>& dxidy_map = fe.get_fe_map().get_dxidy();
 	  const std::vector<Real>& dxidz_map = fe.get_fe_map().get_dxidz();
-	  
+
 	  const std::vector<Real>& detadx_map = fe.get_fe_map().get_detadx();
 	  const std::vector<Real>& detady_map = fe.get_fe_map().get_detady();
 	  const std::vector<Real>& detadz_map = fe.get_fe_map().get_detadz();
-	  
+
 	  const std::vector<Real>& dzetadx_map = fe.get_fe_map().get_dzetadx();
 	  const std::vector<Real>& dzetady_map = fe.get_fe_map().get_dzetady();
 	  const std::vector<Real>& dzetadz_map = fe.get_fe_map().get_dzetadz();

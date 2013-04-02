@@ -167,4 +167,3 @@ INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,unsigned int,Radial::n_dofs_at_node (const O
 } // namespace libMesh
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-

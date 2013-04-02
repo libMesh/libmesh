@@ -39,13 +39,13 @@ public:
   CurlCurlSystem( EquationSystems& es,
 		 const std::string& name,
 		 const unsigned int number );
-  
+
   // System initialization
   virtual void init_data ();
-  
+
   // Context initialization
   virtual void init_context(DiffContext &context);
-  
+
   // Element residual and jacobian calculations
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
@@ -59,7 +59,7 @@ protected:
   unsigned int u_var;
 
   void init_dirichlet_bcs();
-  
+
   // Returns the value of a forcing function at point p.
   RealGradient forcing(const Point& p);
 

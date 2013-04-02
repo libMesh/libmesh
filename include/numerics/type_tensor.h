@@ -377,7 +377,7 @@ public:
    * Assign values to this column of the tensor.
    */
   TypeTensorColumn<T>& operator = (const TypeVector<T>& rhs)
-    { 
+    {
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         (*this)(i) = rhs(i);
       return *this;
@@ -622,7 +622,7 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 
 template <typename T>
 inline
-ConstTypeTensorColumn<T> 
+ConstTypeTensorColumn<T>
 TypeTensor<T>::slice (const unsigned int i) const
 {
   libmesh_assert_less (i, LIBMESH_DIM);
@@ -632,7 +632,7 @@ TypeTensor<T>::slice (const unsigned int i) const
 
 template <typename T>
 inline
-TypeTensorColumn<T> 
+TypeTensorColumn<T>
 TypeTensor<T>::slice (const unsigned int i)
 {
   libmesh_assert_less (i, LIBMESH_DIM);

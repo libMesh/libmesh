@@ -86,4 +86,3 @@ bool SteadySolver::side_residual(bool request_jacobian,
 }
 
 } // namespace libMesh
-

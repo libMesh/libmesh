@@ -70,4 +70,3 @@ FactoryImp<ExampleOneFunction, FunctionBase<Number> > example_one_factory ("exam
 #ifdef LIBMESH_USE_SEPARATE_NAMESPACE
 } // namespace libMesh
 #endif
-

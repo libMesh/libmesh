@@ -19,9 +19,9 @@
 
 // <h1>Eigenproblems Example 2 - Solving a generalized Eigen Problem</h1>
 //
-// This example shows how the previous EigenSolver example 
+// This example shows how the previous EigenSolver example
 // can be adapted to solve generailzed eigenvalue problems.
-// 
+//
 // For solving eigen problems, libMesh interfaces
 // SLEPc (www.grycap.upv.es/slepc/) which again is based on PETSc.
 // Hence, this example will only work if the library is compiled
@@ -86,15 +86,15 @@ int main (int argc, char** argv)
                   << std::endl;
       libmesh_error();
     }
-  
+
   // Tell the user what we are doing.
-  else 
+  else
     {
       std::cout << "Running " << argv[0];
-      
+
       for (int i=1; i<argc; i++)
         std::cout << " " << argv[i];
-      
+
       std::cout << std::endl << std::endl;
     }
 
@@ -103,13 +103,13 @@ int main (int argc, char** argv)
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
-  
+
   // Create a mesh.
   Mesh mesh;
 
   // Use the internal mesh generator to create a uniform
   // 2D grid on a square.
-  MeshTools::Generation::build_square (mesh, 
+  MeshTools::Generation::build_square (mesh,
                                        20, 20,
                                        -1., 1.,
                                        -1., 1.,
@@ -117,7 +117,7 @@ int main (int argc, char** argv)
 
   // Print information about the mesh to the screen.
   mesh.print_info();
-  
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
@@ -142,15 +142,15 @@ int main (int argc, char** argv)
   equation_systems.parameters.set<unsigned int>("eigenpairs")    = nev;
   equation_systems.parameters.set<unsigned int>("basis vectors") = nev*3;
 
-  // You may optionally change the default eigensolver used by SLEPc. 
+  // You may optionally change the default eigensolver used by SLEPc.
   // The Krylov-Schur method is mathematically equivalent to implicitly
   // restarted Arnoldi, the method of Arpack, so there is currently no
   // point in using SLEPc with Arpack.
   // ARNOLDI     = default in SLEPc 2.3.1 and earlier
   // KRYLOVSCHUR default in SLEPc 2.3.2 and later
-  // eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR); 
+  // eigen_system.eigen_solver->set_eigensolver_type(KRYLOVSCHUR);
 
-  // Set the solver tolerance and the maximum number of iterations. 
+  // Set the solver tolerance and the maximum number of iterations.
   equation_systems.parameters.set<Real>("linear solver tolerance") = pow(TOLERANCE, 5./3.);
   equation_systems.parameters.set<unsigned int>
     ("linear solver maximum iterations") = 1000;
@@ -168,7 +168,7 @@ int main (int argc, char** argv)
 
   // Prints information about the system to the screen.
   equation_systems.print_info();
-     
+
   // Solve the system "Eigensystem".
   eigen_system.solve();
 
@@ -182,7 +182,7 @@ int main (int argc, char** argv)
   if (nconv != 0)
     {
       eigen_system.get_eigenpair(nconv-1);
-      
+
 #ifdef LIBMESH_HAVE_EXODUS_API
       // Write the eigen vector to file.
       ExodusII_IO (mesh).write_equation_systems ("out.e", equation_systems);
@@ -195,7 +195,7 @@ int main (int argc, char** argv)
 
 #endif // LIBMESH_HAVE_SLEPC
 
-  // All done.  
+  // All done.
   return 0;
 }
 
@@ -204,7 +204,7 @@ int main (int argc, char** argv)
 void assemble_mass(EquationSystems& es,
                    const std::string& system_name)
 {
-  
+
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Eigensystem");
@@ -233,7 +233,7 @@ void assemble_mass(EquationSystems& es,
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  
+
   // A  Gauss quadrature rule for numerical integration.
   // Use the default quadrature order.
   QGauss qrule (dim, fe_type.default_quadrature_order());
@@ -241,7 +241,7 @@ void assemble_mass(EquationSystems& es,
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (&qrule);
 
-  // The element Jacobian * quadrature weight at each integration point.   
+  // The element Jacobian * quadrature weight at each integration point.
   const std::vector<Real>& JxW = fe->get_JxW();
 
   // The element shape functions evaluated at the quadrature points.
@@ -274,7 +274,7 @@ void assemble_mass(EquationSystems& es,
   // hence we use a variant of the \p active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
- 
+
   for ( ; el != end_el; ++el)
     {
       // Store a pointer to the element we are currently
@@ -304,7 +304,7 @@ void assemble_mass(EquationSystems& es,
 
       // Now loop over the quadrature points.  This handles
       // the numeric integration.
-      // 
+      //
       // We will build the element matrix.  This involves
       // a double loop to integrate the test funcions (i) against
       // the trial functions (j).
@@ -344,27 +344,3 @@ void assemble_mass(EquationSystems& es,
   return;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

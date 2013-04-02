@@ -65,16 +65,16 @@ unsigned int packed_size (const Elem*,
   const ElemType type =
     static_cast<ElemType>(typeint);
 
-  const unsigned int n_nodes = 
+  const unsigned int n_nodes =
     Elem::type_to_n_nodes_map[type];
 
-  const unsigned int n_sides = 
+  const unsigned int n_sides =
     Elem::type_to_n_sides_map[type];
 
-  const unsigned int pre_indexing_size = 
+  const unsigned int pre_indexing_size =
     header_size + n_nodes + n_sides;
 
-  const unsigned int indexing_size = 
+  const unsigned int indexing_size =
     DofObject::unpackable_indexing_size(in+pre_indexing_size);
 
   unsigned int total_packed_bc_data = 0;
@@ -82,7 +82,7 @@ unsigned int packed_size (const Elem*,
     {
       for (unsigned int s = 0; s != n_sides; ++s)
         {
-	  const int n_bcs = 
+	  const int n_bcs =
 	    *(in + pre_indexing_size + indexing_size +
 	      total_packed_bc_data++);
 	  libmesh_assert_greater_equal (n_bcs, 0);
@@ -90,7 +90,7 @@ unsigned int packed_size (const Elem*,
         }
     }
 
-  return 
+  return
 #ifndef NDEBUG
     1 + // Account for magic header
 #endif
@@ -194,7 +194,7 @@ void pack (const Elem* elem,
   // Add any DofObject indices
   elem->pack_indexing(std::back_inserter(data));
 
-  libmesh_assert(elem->packed_indexing_size() == 
+  libmesh_assert(elem->packed_indexing_size() ==
 		 DofObject::unpackable_indexing_size(data.begin() +
 						     start_indices));
 
@@ -275,33 +275,33 @@ void unpack(std::vector<int>::const_iterator in,
   const ElemType type =
     static_cast<ElemType>(typeint);
 
-  const unsigned int n_nodes = 
+  const unsigned int n_nodes =
     Elem::type_to_n_nodes_map[type];
 
   // int 5: processor id
-  const unsigned int processor_id = 
+  const unsigned int processor_id =
     static_cast<unsigned int>(*in++);
   libmesh_assert (processor_id < libMesh::n_processors() ||
                   processor_id == DofObject::invalid_processor_id);
 
   // int 6: subdomain id
-  const unsigned int subdomain_id = 
+  const unsigned int subdomain_id =
     static_cast<unsigned int>(*in++);
 
   // int 7: dof object id
-  const dof_id_type id = 
+  const dof_id_type id =
     static_cast<dof_id_type>(*in++);
   libmesh_assert_not_equal_to (id, DofObject::invalid_id);
 
 #ifdef LIBMESH_ENABLE_AMR
   // int 8: parent dof object id
-  const dof_id_type parent_id = 
+  const dof_id_type parent_id =
     static_cast<dof_id_type>(*in++);
   libmesh_assert (level == 0 || parent_id != DofObject::invalid_id);
   libmesh_assert (level != 0 || parent_id == DofObject::invalid_id);
 
   // int 9: local child id
-  const unsigned int which_child_am_i = 
+  const unsigned int which_child_am_i =
     static_cast<unsigned int>(*in++);
 #else
   in += 2;
@@ -316,7 +316,7 @@ void unpack(std::vector<int>::const_iterator in,
   // if we already have this element, make sure its
   // properties match, and update any missing neighbor
   // links, but then go on
-  if (elem) 
+  if (elem)
     {
       libmesh_assert_equal_to (elem->level(), level);
       libmesh_assert_equal_to (elem->id(), id);
@@ -328,7 +328,7 @@ void unpack(std::vector<int>::const_iterator in,
 #ifndef NDEBUG
       // All our nodes should be correct
       for (unsigned int i=0; i != n_nodes; ++i)
-        libmesh_assert(elem->node(i) == 
+        libmesh_assert(elem->node(i) ==
                        static_cast<unsigned int>(*in++));
 #else
       in += n_nodes;
@@ -392,9 +392,9 @@ void unpack(std::vector<int>::const_iterator in,
 	  // back to us.
 	  if (elem->neighbor(n) == remote_elem)
             {
-              elem->set_neighbor(n, neigh); 
+              elem->set_neighbor(n, neigh);
 
-              elem->make_links_to_me_local(n); 
+              elem->make_links_to_me_local(n);
 	    }
 	}
 

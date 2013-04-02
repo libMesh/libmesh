@@ -83,12 +83,12 @@ public:
    * the system.
    */
   virtual void clear ();
-  
+
   /**
    * Set the RBSCMEvaluation object.
    */
   void set_rb_scm_evaluation(RBSCMEvaluation& rb_scm_eval_in);
-  
+
   /**
    * Get a reference to the RBSCMEvaluation object.
    */

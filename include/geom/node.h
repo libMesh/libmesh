@@ -209,7 +209,7 @@ public:
 unsigned int packed_size() const
 {
   // use "(a+b-1)/b" trick to get a/b to round up
-  static const unsigned int ints_per_Real = 
+  static const unsigned int ints_per_Real =
     (sizeof(Real) + sizeof(int) - 1) / sizeof(int);
 
   return PackedNode::header_size + LIBMESH_DIM*ints_per_Real +

@@ -9,7 +9,7 @@ data          = miscellaneous_ex5.C ../../adjoints/adjoints_ex1/lshaped.xda lsha
 sources       = $(data) run.sh
 check_SCRIPTS = run.sh
 
-CLEANFILES = lshaped.xda lshaped_dg.e 
+CLEANFILES = lshaped.xda lshaped_dg.e
 
 # also need to link files for VPATH builds
 if LIBMESH_VPATH_BUILD

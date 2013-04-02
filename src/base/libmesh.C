@@ -92,7 +92,7 @@ namespace {
   bool libmesh_initialized_slepc = false;
 #endif
 
-  
+
 
   /**
    * Floating point exception handler -- courtesy of Cody Permann & MOOSE team
@@ -114,19 +114,19 @@ namespace {
       default:         std::cerr << "unrecognized"; break;
       }
     std::cout << ")!" << std::endl;
-    
+
     std::cout << std::endl;
     std::cout << "To track this down, compile debug version, start debugger, set breakpoint for 'libmesh_handleFPE' and run" << std::endl;
     std::cout << "In gdb do:" << std::endl;
     std::cout << "  break libmesh_handleFPE" << std::endl;
     std::cout << "  run ..." << std::endl;
     std::cout << "  bt" << std::endl;
-    
+
     libmesh_error();
   }
-  
 
-  
+
+
   /**
    * Toggle floating point exceptions -- courtesy of Cody Permann & MOOSE team
    */
@@ -135,26 +135,26 @@ namespace {
 #if !defined(LIBMESH_HAVE_FEENABLEEXCEPT) && defined(LIBMESH_HAVE_XMMINTRIN_H)
     static int flags = 0;
 #endif
-    
+
     if (on)
       {
 	struct sigaction new_action, old_action;
-	
+
 #ifdef LIBMESH_HAVE_FEENABLEEXCEPT
 	feenableexcept(FE_DIVBYZERO | FE_INVALID);
 #elif  LIBMESH_HAVE_XMMINTRIN_H
-#  ifndef __SUNPRO_CC	
+#  ifndef __SUNPRO_CC
 	flags = _MM_GET_EXCEPTION_MASK();           // store the flags
 	_MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
 #  endif
 #endif
-	
+
 
 	// Set up the structure to specify the new action.
 	new_action.sa_sigaction = libmesh_handleFPE;
 	sigemptyset (&new_action.sa_mask);
 	new_action.sa_flags = SA_SIGINFO;
-	
+
 	sigaction (SIGFPE, NULL, &old_action);
 	if (old_action.sa_handler != SIG_IGN)
 	  sigaction (SIGFPE, &new_action, NULL);
@@ -164,15 +164,15 @@ namespace {
 #ifdef LIBMESH_HAVE_FEDISABLEEXCEPT
 	fedisableexcept(FE_DIVBYZERO | FE_INVALID);
 #elif  LIBMESH_HAVE_XMMINTRIN_H
-#  ifndef __SUNPRO_CC	
+#  ifndef __SUNPRO_CC
 	_MM_SET_EXCEPTION_MASK(flags);
-#  endif	
+#  endif
 #endif
 	signal(SIGFPE, 0);
       }
   }
-  
-} 
+
+}
 
 
 
@@ -512,7 +512,7 @@ void _init (int argc, const char* const* argv,
 
   if (libMesh::on_command_line("--enable-fpe"))
     enableFPE(true);
-  
+
   // The library is now ready for use
   libMeshPrivateData::_is_initialized = true;
 
@@ -659,7 +659,7 @@ int _close ()
 
   if (libMesh::on_command_line("--enable-fpe"))
     enableFPE(false);
-  
+
 
   // Return the number of outstanding objects.
   // This is equivalent to return 0 if all of

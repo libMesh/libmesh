@@ -19,6 +19,3 @@
 
 // C++ includes
 // The base class does not implement any functions
-
-
-

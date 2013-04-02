@@ -110,4 +110,3 @@ Real FE<3,SZABAB>::shape_second_deriv(const Elem*,
 } // namespace libMesh
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-

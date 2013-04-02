@@ -130,7 +130,7 @@ void DiffContext::add_localized_vector (NumericVector<Number> & _localized_vecto
   unsigned int nv = _sys.n_vars();
 
   localized_vectors[&_localized_vector].second.reserve(nv);
-  
+
   // Fill the DenseSubVector with nv copies of DenseVector
   for(unsigned int i=0; i != nv; ++i)
     localized_vectors[&_localized_vector].second.push_back(new DenseSubVector<Number>(localized_vectors[&_localized_vector].first));
@@ -167,6 +167,3 @@ const DenseSubVector<Number>& DiffContext::get_localized_subvector (const Numeri
 }
 
 } // namespace libMesh
-
-
-

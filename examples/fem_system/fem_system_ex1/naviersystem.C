@@ -109,7 +109,7 @@ void NavierSystem::init_data ()
 			      static_cast<Order>(pressure_p),
 			      fefamily);
 
-  // Tell the system to march velocity forward in time, but 
+  // Tell the system to march velocity forward in time, but
   // leave p as a constraint only
   this->time_evolving(u_var);
   this->time_evolving(v_var);
@@ -124,7 +124,7 @@ void NavierSystem::init_data ()
 
   // Set Dirichlet boundary conditions
   const boundary_id_type top_id = (dim==3) ? 5 : 2;
-  
+
   std::set<boundary_id_type> top_bdys;
   top_bdys.insert(top_id);
 
@@ -193,7 +193,7 @@ void NavierSystem::init_context(DiffContext &context)
   u_elem_fe->get_phi();
   u_elem_fe->get_dphi();
   u_elem_fe->get_xyz();
-  
+
   p_elem_fe->get_phi();
 
   u_side_fe->get_JxW();
@@ -235,8 +235,8 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
 
   // The number of local degrees of freedom in each variable
   const unsigned int n_p_dofs = c.get_dof_indices( p_var ).size();
-  const unsigned int n_u_dofs = c.get_dof_indices( u_var ).size(); 
-  libmesh_assert_equal_to (n_u_dofs, c.get_dof_indices( v_var ).size()); 
+  const unsigned int n_u_dofs = c.get_dof_indices( u_var ).size();
+  libmesh_assert_equal_to (n_u_dofs, c.get_dof_indices( v_var ).size());
 
   // The subvectors and submatrices we need to fill:
   const unsigned int dim = this->get_mesh().mesh_dimension();
@@ -255,7 +255,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
   DenseSubVector<Number> &Fu = c.get_elem_residual( u_var );
   DenseSubVector<Number> &Fv = c.get_elem_residual( v_var );
   DenseSubVector<Number> &Fw = c.get_elem_residual( w_var );
-      
+
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
   // gradient from the previous timestep.  This must be
@@ -305,7 +305,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
 		    f(0)*phi[i][qp]                   // forcing function
 		    );
 
-            
+
           Fv(i) += JxW[qp] *
                    (-Reynolds*(U*grad_v)*phi[i][qp] + // convection term
                     p*dphi[i][qp](1) -                // pressure term
@@ -346,7 +346,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
    /* diffusion term  */       (dphi[i][qp]*dphi[j][qp]) -
    /* Newton term     */       Reynolds*v_y*phi[i][qp]*phi[j][qp]);
 
-                  Kvu(i,j) += JxW[qp] * 
+                  Kvu(i,j) += JxW[qp] *
    /* Newton term     */      -Reynolds*v_x*phi[i][qp]*phi[j][qp];
                   if (dim == 3)
                     {
@@ -376,7 +376,7 @@ bool NavierSystem::element_time_derivative (bool request_jacobian,
             }
         }
     } // end of the quadrature point qp-loop
-  
+
   return request_jacobian;
 }
 
@@ -455,7 +455,7 @@ bool NavierSystem::element_constraint (bool request_jacobian,
   return request_jacobian;
 }
 
-      
+
 
 bool NavierSystem::side_constraint (bool request_jacobian,
                                     DiffContext &context)
@@ -476,7 +476,7 @@ bool NavierSystem::side_constraint (bool request_jacobian,
 
       DenseSubMatrix<Number> &Kpp = c.get_elem_jacobian( p_var, p_var );
       DenseSubVector<Number> &Fp = c.get_elem_residual( p_var );
-      const unsigned int n_p_dofs = c.get_dof_indices( p_var ).size(); 
+      const unsigned int n_p_dofs = c.get_dof_indices( p_var ).size();
 
       Number p = c.point_value(p_var, zero);
       Number p_value = 0.;
@@ -602,7 +602,7 @@ bool NavierSystem::mass_residual (bool request_jacobian,
 
 
 void NavierSystem::postprocess()
-{  
+{
   const unsigned int dim = this->get_mesh().mesh_dimension();
 
   Point p(1./3., 1./3.);
@@ -610,9 +610,9 @@ void NavierSystem::postprocess()
          v = point_value(v_var, p),
          w = (dim == 3) ? point_value(w_var, p) : 0;
 
-  std::cout << "u(1/3,1/3) = (" 
-            << u << ", " 
-            << v << ", " 
+  std::cout << "u(1/3,1/3) = ("
+            << u << ", "
+            << v << ", "
             << w << ")" << std::endl;
 }
 

@@ -395,7 +395,7 @@ namespace {
               _diff_qoi.side_qoi(_femcontext, _qoi_indices);
             }
         }
-      
+
       this->_diff_qoi.thread_join( this->qoi, _femcontext.elem_qoi, _qoi_indices );
     }
 

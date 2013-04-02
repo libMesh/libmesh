@@ -958,4 +958,3 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 } // End () operator definition
 
 } // namespace libMesh
-

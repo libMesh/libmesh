@@ -123,4 +123,3 @@ protected:
 } // namespace libMesh
 
 #endif // LIBMESH_KELLY_ERROR_ESTIMATOR_H
-

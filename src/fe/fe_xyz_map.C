@@ -32,7 +32,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
     {
     case 2:
       {
-	
+
 	// Resize the vectors to hold data at the quadrature points
 	{
 	  this->xyz.resize(n_qp);
@@ -103,7 +103,7 @@ void FEXYZMap::compute_face_map(int dim, const std::vector<Real>& qw, const Elem
 
 	    this->JxW[p] = the_jac*qw[p];
 	  }
-	
+
 	break;
       }
 

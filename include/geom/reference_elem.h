@@ -31,7 +31,7 @@ namespace libMesh
 
   // forward declarations
   class Elem;
-  
+
   /**
    * This namespace implements singleton reference elements for each
    * fundamental element type supported by \p libMesh.

@@ -267,7 +267,7 @@ extern OStreamProxy err;
 // The libmesh_file_error(const std::string& filename) macro prints a message
 // and throws a FileError exception
 //
-// The libmesh_convergence_failure() macro 
+// The libmesh_convergence_failure() macro
 // throws a ConvergenceFailure exception
 //
 // These macros no longer write traceout files themselves, but if the

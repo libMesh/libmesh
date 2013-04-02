@@ -684,7 +684,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
 	      tot_coord_size += recv_coords[pid].size();
 	    }
 
-	  libmesh_assert_less_equal 
+	  libmesh_assert_less_equal
 	    (tot_id_size, std::min(io_blksize, std::size_t(n_nodes)));
 	  libmesh_assert_equal_to (tot_coord_size, LIBMESH_DIM*tot_id_size);
 

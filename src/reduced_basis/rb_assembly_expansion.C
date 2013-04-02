@@ -103,7 +103,7 @@ void RBAssemblyExpansion::perform_output_interior_assembly(unsigned int output_i
   }
 
   libmesh_assert(_output_assembly_vector[output_index][q_l]);
-  
+
   return _output_assembly_vector[output_index][q_l]->interior_assembly(context);
 }
 
@@ -120,7 +120,7 @@ void RBAssemblyExpansion::perform_output_boundary_assembly(unsigned int output_i
   }
 
   libmesh_assert(_output_assembly_vector[output_index][q_l]);
-  
+
   return _output_assembly_vector[output_index][q_l]->boundary_assembly(context);
 }
 
@@ -200,7 +200,7 @@ ElemAssembly& RBAssemblyExpansion::get_A_assembly(unsigned int q)
                  << std::endl;
     libmesh_error();
   }
-  
+
   return *_A_assembly_vector[q];
 }
 
@@ -212,7 +212,7 @@ ElemAssembly& RBAssemblyExpansion::get_F_assembly(unsigned int q)
                  << std::endl;
     libmesh_error();
   }
-  
+
   return *_F_assembly_vector[q];
 }
 
@@ -226,7 +226,7 @@ ElemAssembly& RBAssemblyExpansion::get_output_assembly(unsigned int output_index
                  << std::endl;
     libmesh_error();
   }
-  
+
   return *_output_assembly_vector[output_index][q_l];
 }
 

@@ -62,7 +62,7 @@ int main(int argc, char** argv)
     ExodusII_IO(mesh).write_equation_systems (outputname, es);
   else if (outputname.find(".n") != std::string::npos)
     Nemesis_IO(mesh).write_equation_systems (outputname, es);
-    
+
   STOP_LOG("write_equation_systems()", "main");
   std::cout << "Wrote output " << argv[3] << std::endl;
 }

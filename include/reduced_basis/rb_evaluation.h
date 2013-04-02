@@ -68,17 +68,17 @@ public:
    * and clear and extra data in subclasses.
    */
   virtual void clear();
-  
+
   /**
    * Set the RBThetaExpansion object.
    */
   void set_rb_theta_expansion(RBThetaExpansion& rb_theta_expansion_in);
-  
+
   /**
    * Get a reference to the rb_theta_expansion.
    */
   RBThetaExpansion& get_rb_theta_expansion();
-  
+
   /**
    * @return true if the theta expansion has been initialized.
    */

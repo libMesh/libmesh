@@ -224,4 +224,3 @@ AnalyticFunction<Output>::clone () const
 
 
 #endif // LIBMESH_ANALYTIC_FUNCTION_H
-

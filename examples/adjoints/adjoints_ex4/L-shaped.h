@@ -57,7 +57,7 @@ public:
 
   // Overloading the postprocess function
 
-  virtual void element_postprocess(DiffContext &context);  
+  virtual void element_postprocess(DiffContext &context);
 
   virtual void side_postprocess(DiffContext &context);
 
@@ -65,24 +65,24 @@ public:
 
   virtual void element_qoi_derivative
     (DiffContext &context,
-     const QoISet & qois);  
+     const QoISet & qois);
 
   // Overloading the qoi function on sides
 
   virtual void side_qoi_derivative
     (DiffContext &context,
-     const QoISet & qois);  
+     const QoISet & qois);
 
   Number exact_solution (const Point&);
 
   // Variables to hold the computed QoIs
-  
+
   Number computed_QoI[2];
 
   // Variables to read in the exact QoIs from l-shaped.in
- 
+
   Number exact_QoI[2];
-  
+
   // The FE type to use
   std::string _fe_family;
   unsigned int _fe_order;

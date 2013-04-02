@@ -1333,11 +1333,3 @@ void PetscVector<T>::_restore_array(void) const
 
 #endif // #ifdef LIBMESH_HAVE_PETSC
 #endif // LIBMESH_PETSC_VECTOR_H
-
-
-
-
-
-
-
-

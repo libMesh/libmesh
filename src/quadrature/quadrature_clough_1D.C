@@ -41,5 +41,3 @@ void QClough::init_1D(const ElemType _elemtype,
 }
 
 } // namespace libMesh
-
-

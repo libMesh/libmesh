@@ -789,5 +789,3 @@ void QGauss::init_1D(const ElemType,
 }
 
 } // namespace libMesh
-
-

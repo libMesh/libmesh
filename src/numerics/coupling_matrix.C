@@ -17,4 +17,3 @@
 
 
 // CouplingMatrix does not implement any non-inline functions.
-

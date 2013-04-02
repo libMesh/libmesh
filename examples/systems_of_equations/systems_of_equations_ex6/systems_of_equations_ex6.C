@@ -73,7 +73,7 @@ using namespace libMesh;
 // Matrix and right-hand side assembly
 void assemble_elasticity(EquationSystems& es,
                          const std::string& system_name);
-                         
+
 // Post-process the solution to compute stresses
 void compute_stresses(EquationSystems& es);
 
@@ -110,19 +110,19 @@ int main (int argc, char** argv)
                                      0., 0.1,
                                      HEX8);
 
-  
+
   // Print information about the mesh to the screen.
   mesh.print_info();
-  
-  
+
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  
+
   // Declare the system and its variables.
   // Create a system named "Elasticity"
   LinearImplicitSystem& system =
     equation_systems.add_system<LinearImplicitSystem> ("Elasticity");
-  
+
   // Add three displacement variables, u and v, to the system
   unsigned int u_var = system.add_variable("u", FIRST, LAGRANGE);
   unsigned int v_var = system.add_variable("v", FIRST, LAGRANGE);
@@ -139,22 +139,22 @@ int main (int argc, char** argv)
   variables.push_back(u_var);
   variables.push_back(v_var);
   variables.push_back(w_var);
-  
+
   // Create a ZeroFunction to initialize dirichlet_bc
   ZeroFunction<> zf;
-  
+
   DirichletBoundary dirichlet_bc(boundary_ids,
                                  variables,
                                  &zf);
 
-  // We must add the Dirichlet boundary condition _before_ 
+  // We must add the Dirichlet boundary condition _before_
   // we call equation_systems.init()
   system.get_dof_map().add_dirichlet_boundary(dirichlet_bc);
-  
+
   // Also, initialize an ExplicitSystem to store stresses
   ExplicitSystem& stress_system =
     equation_systems.add_system<ExplicitSystem> ("StressSystem");
-  
+
   stress_system.add_variable("sigma_00", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_01", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_02", CONSTANT, MONOMIAL);
@@ -165,7 +165,7 @@ int main (int argc, char** argv)
   stress_system.add_variable("sigma_21", CONSTANT, MONOMIAL);
   stress_system.add_variable("sigma_22", CONSTANT, MONOMIAL);
   stress_system.add_variable("vonMises", CONSTANT, MONOMIAL);
-  
+
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
@@ -174,7 +174,7 @@ int main (int argc, char** argv)
 
   // Solve the system
   system.solve();
-  
+
   // Post-process the solution to compute the stresses
   compute_stresses(equation_systems);
 
@@ -183,7 +183,7 @@ int main (int argc, char** argv)
   ExodusII_IO (mesh).write_equation_systems("displacement.e",equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
-  // All done.  
+  // All done.
   return 0;
 }
 
@@ -192,7 +192,7 @@ void assemble_elasticity(EquationSystems& es,
                          const std::string& system_name)
 {
   libmesh_assert_equal_to (system_name, "Elasticity");
-  
+
   const MeshBase& mesh = es.get_mesh();
 
   const unsigned int dim = mesh.mesh_dimension();
@@ -248,7 +248,7 @@ void assemble_elasticity(EquationSystems& es,
       dof_map.dof_indices (elem, dof_indices_w, w_var);
 
       const unsigned int n_dofs   = dof_indices.size();
-      const unsigned int n_u_dofs = dof_indices_u.size(); 
+      const unsigned int n_u_dofs = dof_indices_u.size();
       const unsigned int n_v_dofs = dof_indices_v.size();
       const unsigned int n_w_dofs = dof_indices_w.size();
 
@@ -260,7 +260,7 @@ void assemble_elasticity(EquationSystems& es,
       Kuu.reposition (u_var*n_u_dofs, u_var*n_u_dofs, n_u_dofs, n_u_dofs);
       Kuv.reposition (u_var*n_u_dofs, v_var*n_u_dofs, n_u_dofs, n_v_dofs);
       Kuw.reposition (u_var*n_u_dofs, w_var*n_u_dofs, n_u_dofs, n_w_dofs);
-      
+
       Kvu.reposition (v_var*n_u_dofs, u_var*n_u_dofs, n_v_dofs, n_u_dofs);
       Kvv.reposition (v_var*n_u_dofs, v_var*n_u_dofs, n_v_dofs, n_v_dofs);
       Kvw.reposition (v_var*n_u_dofs, w_var*n_u_dofs, n_v_dofs, n_w_dofs);
@@ -268,7 +268,7 @@ void assemble_elasticity(EquationSystems& es,
       Kwu.reposition (w_var*n_u_dofs, u_var*n_u_dofs, n_w_dofs, n_u_dofs);
       Kwv.reposition (w_var*n_u_dofs, v_var*n_u_dofs, n_w_dofs, n_v_dofs);
       Kww.reposition (w_var*n_u_dofs, w_var*n_u_dofs, n_w_dofs, n_w_dofs);
-      
+
       Fu.reposition (u_var*n_u_dofs, n_u_dofs);
       Fv.reposition (v_var*n_u_dofs, n_v_dofs);
       Fw.reposition (w_var*n_u_dofs, n_w_dofs);
@@ -339,7 +339,7 @@ void assemble_elasticity(EquationSystems& es,
                   Kvv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
                 }
             }
-            
+
           for (unsigned int i=0; i<n_v_dofs; i++)
             for (unsigned int j=0; j<n_w_dofs; j++)
             {
@@ -352,7 +352,7 @@ void assemble_elasticity(EquationSystems& es,
                   Kvw(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
                 }
             }
-            
+
           for (unsigned int i=0; i<n_w_dofs; i++)
             for (unsigned int j=0; j<n_u_dofs; j++)
             {
@@ -365,7 +365,7 @@ void assemble_elasticity(EquationSystems& es,
                   Kwu(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
                 }
             }
-            
+
           for (unsigned int i=0; i<n_w_dofs; i++)
             for (unsigned int j=0; j<n_v_dofs; j++)
             {
@@ -378,7 +378,7 @@ void assemble_elasticity(EquationSystems& es,
                   Kwv(i,j) += JxW[qp]*(eval_elasticity_tensor(C_i,C_j,C_k,C_l) * dphi[i][qp](C_j)*dphi[j][qp](C_l));
                 }
             }
-            
+
           for (unsigned int i=0; i<n_w_dofs; i++)
             for (unsigned int j=0; j<n_w_dofs; j++)
             {
@@ -422,10 +422,10 @@ void assemble_elasticity(EquationSystems& es,
                 }
               }
             }
-      } 
+      }
 
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-      
+
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
@@ -450,10 +450,10 @@ void compute_stresses(EquationSystems& es)
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
-  
+
   const std::vector<Real>& JxW = fe->get_JxW();
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-  
+
   // Also, get a reference to the ExplicitSystem
   ExplicitSystem& stress_system = es.get_system<ExplicitSystem>("StressSystem");
   const DofMap& stress_dof_map = stress_system.get_dof_map();
@@ -491,7 +491,7 @@ void compute_stresses(EquationSystems& es)
     fe->reinit (elem);
 
     elem_sigma.resize(3,3);
-    
+
     for (unsigned int qp=0; qp<qrule.n_points(); qp++)
     {
       for(unsigned int C_i=0; C_i<3; C_i++)
@@ -514,7 +514,7 @@ void compute_stresses(EquationSystems& es)
 
           }
     }
-    
+
     // Get the average stresses by dividing by the element volume
     elem_sigma.scale(1./elem->volume());
 
@@ -527,7 +527,7 @@ void compute_stresses(EquationSystems& es)
         // We are using CONSTANT MONOMIAL basis functions, hence we only need to get
         // one dof index per variable
         dof_id_type dof_index = stress_dof_indices_var[0];
-        
+
         if( (stress_system.solution->first_local_index() <= dof_index) &&
             (dof_index < stress_system.solution->last_local_index()) )
         {
@@ -535,10 +535,10 @@ void compute_stresses(EquationSystems& es)
         }
 
       }
-    
+
     // Also, the von Mises stress
-    Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) + 
-                                             pow(elem_sigma(1,1) - elem_sigma(2,2),2.) + 
+    Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
+                                             pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
                                              pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
                                              6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
                                            ) );
@@ -549,7 +549,7 @@ void compute_stresses(EquationSystems& es)
     {
       stress_system.solution->set(dof_index, vonMises_value);
     }
-    
+
   }
 
   // Should call close and update when we set vector entries directly

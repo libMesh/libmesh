@@ -231,4 +231,3 @@ void Elem::contract()
 
 
 } // namespace libMesh
-

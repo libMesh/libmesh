@@ -60,7 +60,7 @@ DofObject::DofObject (const DofObject& dof_obj) :
 
       for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
 	libmesh_assert_equal_to (this->n_vars(s,vg), dof_obj.n_vars(s,vg));
-      
+
       for (unsigned int v=0; v<this->n_vars(s); v++)
 	{
 	  libmesh_assert_equal_to (this->n_comp(s,v), dof_obj.n_comp(s,v));
@@ -100,7 +100,7 @@ DofObject& DofObject::operator= (const DofObject& dof_obj)
 
       for (unsigned int vg=0; vg<this->n_var_groups(s); vg++)
 	libmesh_assert_equal_to (this->n_vars(s,vg), dof_obj.n_vars(s,vg));
-      
+
       for (unsigned int v=0; v<this->n_vars(s); v++)
 	{
 	  libmesh_assert_equal_to (this->n_comp(s,v), dof_obj.n_comp(s,v));
@@ -173,7 +173,7 @@ void DofObject::set_n_systems (const unsigned int ns)
       libmesh_assert_equal_to (this->n_vars(s),       0);
       libmesh_assert_equal_to (this->n_var_groups(s), 0);
     }
-  
+
 #endif
 }
 
@@ -214,12 +214,12 @@ void DofObject::add_system()
 void DofObject::set_n_vars_per_group(const unsigned int s,
 				     const std::vector<unsigned int> &nvpg)
 {
-  
+
   libmesh_assert_less (s, this->n_systems());
 
   // number of varaible groups for this system - inferred
   const unsigned int nvg = libmesh_cast_int<unsigned int>(nvpg.size());
-  
+
   // BSK - note that for compatibility with the previous implementation
   // calling this method when (nvars == this->n_vars()) requires that
   // we invalidate the DOF indices and set the number of components to 0.
@@ -283,7 +283,7 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
     // array to hold new indices
     DofObject::index_buffer_t var_idxs(2*nvg);
     for (unsigned int vg=0; vg<nvg; vg++)
-      {	
+      {
 	var_idxs[2*vg    ] = ncv_magic*nvpg[vg] + 0;
 	var_idxs[2*vg + 1] = invalid_id - 1;
       }
@@ -301,7 +301,7 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
 
   // that better had worked.  Assert stuff.
   libmesh_assert_equal_to (nvg, this->n_var_groups(s));
-  
+
 #ifdef DEBUG
 
   // std::cout << " [ ";
@@ -319,7 +319,7 @@ void DofObject::set_n_vars_per_group(const unsigned int s,
 
   for (unsigned int v=0; v<this->n_vars(s); v++)
     libmesh_assert_equal_to (this->n_comp(s,v), 0);
-  
+
   // again, all other system sizes shoudl be unchanged!
   for (unsigned int s_ctr=0; s_ctr<this->n_systems(); s_ctr++)
     if (s_ctr != s)
@@ -348,7 +348,7 @@ void DofObject::set_n_comp_group(const unsigned int s,
 {
   libmesh_assert_less (s,  this->n_systems());
   libmesh_assert_less (vg, this->n_var_groups(s));
-  
+
   // Check for trivial return
   if (ncomp == this->n_comp_group(s,vg)) return;
 
@@ -362,7 +362,7 @@ void DofObject::set_n_comp_group(const unsigned int s,
       libmesh_error();
     }
 #endif
-  
+
   const unsigned int
     start_idx_sys = this->start_idx(s),
     n_vars_group  = this->n_vars(s,vg),
@@ -371,7 +371,7 @@ void DofObject::set_n_comp_group(const unsigned int s,
   libmesh_assert_less ((base_offset + 1), _idx_buf.size());
 
   // if (ncomp)
-  //   std::cout << "s,vg,ncomp=" 
+  //   std::cout << "s,vg,ncomp="
   // 	      << s  << ","
   // 	      << vg << ","
   // 	      << ncomp << '\n';
@@ -383,7 +383,7 @@ void DofObject::set_n_comp_group(const unsigned int s,
   // We use (invalid_id - 1) to signify no
   // components for this object
   _idx_buf[base_offset + 1] = (ncomp == 0) ? invalid_id - 1 : invalid_id;
-  
+
   // this->debug_buffer();
   // std::cout << "s,vg = " << s << "," << vg << '\n'
   // 	    << "base_offset=" << base_offset << '\n'
@@ -420,7 +420,7 @@ void DofObject::set_dof_number(const unsigned int s,
   if (comp || vig)
     libmesh_assert ((dn == invalid_id && base_idx == invalid_id) ||
 		    (dn == base_idx + vig*ncg + comp));
-  
+
   // only explicitly store the base index for vig==0, comp==0
   else
     base_idx = dn;
@@ -435,12 +435,12 @@ void DofObject::set_dof_number(const unsigned int s,
   libmesh_assert_equal_to (this->dof_number(s, var, comp), dn);
 }
 
-  
+
 
 // FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
 unsigned int DofObject::packed_indexing_size() const
 {
-  return 
+  return
 #ifdef LIBMESH_ENABLE_AMR
     ((old_dof_object == NULL) ? 0 : old_dof_object->packed_indexing_size()) + 2 +
 #else
@@ -450,7 +450,7 @@ unsigned int DofObject::packed_indexing_size() const
 }
 
 
-  
+
 // FIXME: it'll be tricky getting this to work with 64-bit dof_id_type
 unsigned int DofObject::unpackable_indexing_size(std::vector<int>::const_iterator begin)
 {

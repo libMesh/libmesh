@@ -82,23 +82,23 @@ int main (int argc, char** argv)
   // Brief message to the user regarding the program name
   // and command line arguments.
   std::cout << "Running " << argv[0];
-  
+
   for (int i=1; i<argc; i++)
     std::cout << " " << argv[i];
-  
+
   std::cout << std::endl << std::endl;
-  
+
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
   Mesh mesh;
-  
-  
+
+
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the square [-1,1]^2.  We instruct the mesh generator
   // to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
   // elements instead of the default QUAD4's we used in example 2
   // allow us to use higher-order approximation.
-  MeshTools::Generation::build_square (mesh, 
+  MeshTools::Generation::build_square (mesh,
                                        15, 15,
                                        -1., 1.,
                                        -1., 1.,
@@ -108,10 +108,10 @@ int main (int argc, char** argv)
   // Note that 5x5 QUAD9 elements actually has 11x11 nodes,
   // so this mesh is significantly larger than the one in example 2.
   mesh.print_info();
-  
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  
+
   // Declare the Poisson system and its variables.
   // The Poisson system is another example of a steady system.
   equation_systems.add_system<LinearImplicitSystem> ("Poisson");
@@ -124,10 +124,10 @@ int main (int argc, char** argv)
   // function.  This will be called when needed by the
   // library.
   equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
-  
+
   // Initialize the data structures for the equation system.
   equation_systems.init();
-  
+
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
@@ -156,7 +156,7 @@ int main (int argc, char** argv)
 
 #endif // #ifdef LIBMESH_HAVE_VTK
 
-  // All done.  
+  // All done.
   return 0;
 }
 
@@ -170,12 +170,12 @@ int main (int argc, char** argv)
 void assemble_poisson(EquationSystems& es,
                       const std::string& system_name)
 {
-  
+
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Poisson");
 
-  
+
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
@@ -190,11 +190,11 @@ void assemble_poisson(EquationSystems& es,
   // to degree of freedom numbers.  We will talk more about the  DofMap
   // in future examples.
   const DofMap& dof_map = system.get_dof_map();
-  
+
   // Get a constant reference to the Finite Element type
   // for the first (and only) variable in the system.
   FEType fe_type = dof_map.variable_type(0);
-  
+
   // Build a Finite Element object of the specified type.  Since the
   // FEBase::build() member dynamically creates memory we will
   // store the object as an AutoPtr<FEBase>.  This can be thought
@@ -202,22 +202,22 @@ void assemble_poisson(EquationSystems& es,
   // describes some advantages of  AutoPtr's in the context of
   // quadrature rules.
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
-  
+
   // A 5th order Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, FIFTH);
-  
+
   // Tell the finite element object to use our quadrature rule.
   fe->attach_quadrature_rule (&qrule);
-  
+
   // Declare a special finite element object for
   // boundary integration.
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-  
+
   // Boundary integration requires one quadraure rule,
   // with dimensionality one less than the dimensionality
   // of the element.
   QGauss qface(dim-1, FIFTH);
-  
+
   // Tell the finite element object to use our
   // quadrature rule.
   fe_face->attach_quadrature_rule (&qface);
@@ -225,7 +225,7 @@ void assemble_poisson(EquationSystems& es,
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   //
-  // The element Jacobian * quadrature weight at each integration point.   
+  // The element Jacobian * quadrature weight at each integration point.
   const std::vector<Real>& JxW = fe->get_JxW();
 
   // The physical XY locations of the quadrature points on the element.
@@ -269,7 +269,7 @@ void assemble_poisson(EquationSystems& es,
   // elements; hence we use a variant of the \p active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
   const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
- 
+
   // Loop over the elements.  Note that  ++el is preferred to
   // el++ since the latter requires an unnecessary temporary
   // object.
@@ -319,7 +319,7 @@ void assemble_poisson(EquationSystems& es,
               {
                 Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
               }
-          
+
           // This is the end of the matrix summation loop
           // Now we build the element right-hand-side contribution.
           // This involves a single loop in which we integrate the
@@ -328,7 +328,7 @@ void assemble_poisson(EquationSystems& es,
             const Real x = q_point[qp](0);
             const Real y = q_point[qp](1);
             const Real eps = 1.e-3;
-            
+
 
             // "fxy" is the forcing function for the Poisson equation.
             // In this case we set fxy to be a finite difference
@@ -349,12 +349,12 @@ void assemble_poisson(EquationSystems& es,
                                exact_solution(x-eps,y) +
                                exact_solution(x+eps,y) -
                                4.*exact_solution(x,y))/eps/eps;
-            
+
             for (unsigned int i=0; i<phi.size(); i++)
               Fe(i) += JxW[qp]*fxy*phi[i][qp];
-          } 
-        } 
-      
+          }
+        }
+
       // We have now reached the end of the RHS summation,
       // and the end of quadrature point loop, so
       // the interior element integration has
@@ -396,20 +396,20 @@ void assemble_poisson(EquationSystems& es,
               // The value of the shape functions at the quadrature
               // points.
               const std::vector<std::vector<Real> >&  phi_face = fe_face->get_phi();
-              
+
               // The Jacobian * Quadrature Weight at the quadrature
               // points on the face.
               const std::vector<Real>& JxW_face = fe_face->get_JxW();
-              
+
               // The XYZ locations (in physical space) of the
               // quadrature points on the face.  This is where
               // we will interpolate the boundary value function.
               const std::vector<Point >& qface_point = fe_face->get_xyz();
-              
+
               // Compute the shape function values on the element
               // face.
               fe_face->reinit(elem, side);
-              
+
               // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
@@ -425,8 +425,8 @@ void assemble_poisson(EquationSystems& es,
 
                   // The boundary value.
                   const Real value = exact_solution(xf, yf);
-                  
-                  // Matrix contribution of the L2 projection. 
+
+                  // Matrix contribution of the L2 projection.
                   for (unsigned int i=0; i<phi_face.size(); i++)
                     for (unsigned int j=0; j<phi_face.size(); j++)
                       Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
@@ -435,10 +435,10 @@ void assemble_poisson(EquationSystems& es,
                   // projection.
                   for (unsigned int i=0; i<phi_face.size(); i++)
                     Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                } 
+                }
             }
       }
-      
+
       // We have now finished the quadrature point loop,
       // and have therefore applied all the boundary conditions.
 
@@ -453,6 +453,6 @@ void assemble_poisson(EquationSystems& es,
       system.matrix->add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
-  
+
   // All done!
 }

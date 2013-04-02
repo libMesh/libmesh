@@ -562,4 +562,3 @@ const float InfHex18::_embedding_matrix[4][18][18] =
 } // namespace libMesh
 
 #endif // ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-

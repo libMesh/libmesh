@@ -43,7 +43,7 @@ namespace libMeshEnums {
 		    H2_SEMINORM     = 11,
 
 		    HCURL_SEMINORM  = 12,
-		    
+
 		    HDIV_SEMINORM   = 13,
 
                     W1_INF_SEMINORM = 15,
@@ -66,7 +66,3 @@ namespace libMeshEnums {
 using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_NORM_TYPE_H
-
-
-
-

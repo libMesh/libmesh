@@ -148,18 +148,18 @@ public:
    * to all processors.
    */
   void broadcast_parameters(unsigned int proc_id);
-  
+
   /**
    * Set the seed that is used to randomly generate training parameters.
    */
   void set_training_random_seed(unsigned int seed);
-  
+
   /**
    * Set the name of the parameter that we will generate deterministic training parameters for.
    * Defaults to "NONE".
    */
   void set_deterministic_training_parameter_name(const std::string name);
-  
+
   /**
    * Get the name of the parameter that we will generate deterministic training parameters for.
    */
@@ -169,7 +169,7 @@ public:
    * Set the number of times each sample of the deterministic training parameter is repeated.
    */
   void set_deterministic_training_parameter_repeats(unsigned int repeats);
-  
+
   /**
    * Get the number of times each sample of the deterministic training parameter is repeated.
    */
@@ -295,14 +295,14 @@ private:
    * number generator seed.
    */
   int training_parameters_random_seed;
-  
+
   /**
    * The name of the parameter that we will generate a deterministic
    * training parameters for in the case of a "partially random" training
    * set.
    */
   std::string _deterministic_training_parameter_name;
-  
+
   /**
    * The number of times each sample of the deterministic training parameter
    * is repeated in generating the training set.

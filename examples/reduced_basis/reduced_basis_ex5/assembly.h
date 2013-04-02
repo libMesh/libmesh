@@ -31,7 +31,7 @@ class ElasticityRBConstruction;
 // Kronecker delta function
 inline Real kronecker_delta(unsigned int i,
                             unsigned int j);
-                            
+
 // Rank-4 tensor for elasticity
 Real elasticity_tensor(unsigned int i,
                        unsigned int j,
@@ -42,10 +42,10 @@ struct ElasticityAssembly : ElemAssembly
 {
 
 	ElasticityAssembly(ElasticityRBConstruction& rb_sys_in)
-	: 
+	:
   rb_sys(rb_sys_in)
   {}
-	
+
 	/**
 	 * The ElasticityRBConstruction object that will use this assembly.
 	 */
@@ -60,7 +60,7 @@ struct AssemblyA0 : ElasticityAssembly
   :
   ElasticityAssembly(rb_sys_in)
   {}
-  
+
   // The interior assembly operator
 	virtual void interior_assembly(FEMContext &c);
 
@@ -74,7 +74,7 @@ struct AssemblyA1 : ElasticityAssembly
   :
   ElasticityAssembly(rb_sys_in)
   {}
-  
+
   // The interior assembly operator
 	virtual void interior_assembly(FEMContext &c);
 
@@ -88,7 +88,7 @@ struct AssemblyA2 : ElasticityAssembly
   :
   ElasticityAssembly(rb_sys_in)
   {}
-  
+
   // The interior assembly operator
 	virtual void interior_assembly(FEMContext &c);
 
@@ -102,7 +102,7 @@ struct AssemblyF0 : ElasticityAssembly
   ElasticityAssembly(rb_sys_in)
   {}
 
-  // Apply a traction 
+  // Apply a traction
   virtual void boundary_assembly(FEMContext &c);
 
 };
@@ -114,8 +114,8 @@ struct AssemblyF1 : ElasticityAssembly
   :
   ElasticityAssembly(rb_sys_in)
   {}
-  
-  // Apply a traction 
+
+  // Apply a traction
   virtual void boundary_assembly(FEMContext &c);
 };
 
@@ -126,8 +126,8 @@ struct AssemblyF2 : ElasticityAssembly
   :
   ElasticityAssembly(rb_sys_in)
   {}
-  
-  // Apply a traction 
+
+  // Apply a traction
   virtual void boundary_assembly(FEMContext &c);
 };
 
@@ -138,7 +138,7 @@ struct InnerProductAssembly : ElasticityAssembly
   :
   ElasticityAssembly(rb_sys_in)
   {}
-  
+
   // The interior assembly operator
 	virtual void interior_assembly(FEMContext &c);
 

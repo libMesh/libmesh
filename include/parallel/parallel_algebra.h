@@ -262,4 +262,3 @@ namespace Parallel {
 } // namespace libMesh
 
 #endif // LIBMESH_PARALLEL_ALGEBRA_H
-

@@ -82,4 +82,3 @@ public:
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 #endif // LIBMESH_HP_SELECTOR_H
-

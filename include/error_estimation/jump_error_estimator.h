@@ -161,4 +161,3 @@ protected:
 } // namespace libMesh
 
 #endif // LIBMESH_JUMP_ERROR_ESTIMATOR_H
-

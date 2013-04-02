@@ -203,5 +203,3 @@ int XdrSOLN::header(XdrSHEAD *hd)
 }
 
 } // namespace libMesh
-
-

@@ -87,7 +87,7 @@ public:
    */
   typedef EigenSM DataType;
   typedef Eigen::Triplet<T,eigen_idx_type> TripletType;
-  
+
   /**
    * Initialize a Eigen matrix that is of global
    * dimension \f$ m \times  n \f$ with local dimensions
@@ -265,7 +265,7 @@ private:
    * Actual Eigen::SparseMatrix<> we are wrapping.
    */
   DataType _mat;
-  
+
   /**
    * Flag indicating if the matrix has been closed yet.
    */

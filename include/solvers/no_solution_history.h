@@ -30,7 +30,7 @@ namespace libMesh
   class NoSolutionHistory : public SolutionHistory
   {
   public:
-    
+
     // Constructor
   NoSolutionHistory() : SolutionHistory() {};
 
@@ -43,11 +43,11 @@ namespace libMesh
     // Virtual function retrieve which we will be overriding
     virtual void retrieve();
 
-    // Definition of the clone function needed for the setter function 
+    // Definition of the clone function needed for the setter function
     virtual AutoPtr<SolutionHistory > clone() const {
-    return AutoPtr<SolutionHistory > 
+    return AutoPtr<SolutionHistory >
       (new NoSolutionHistory());}
-    
+
   }; // end NoSolutionHistory class definition
 
 } // end namespace libMesh

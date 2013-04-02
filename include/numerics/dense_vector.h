@@ -579,4 +579,3 @@ void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
 } // namespace libMesh
 
 #endif // LIBMESH_DENSE_VECTOR_H
-

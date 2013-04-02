@@ -79,10 +79,10 @@ class UCDIO : public MeshInput<MeshBase>,
    * This method implements writing a mesh and solution to a specified file
    * in UCD format. This is internally called by MeshOutput::write_equation_systems
    */
-  virtual void write_nodal_data(const std::string& fname, 
-				const std::vector<Number>&soln, 
+  virtual void write_nodal_data(const std::string& fname,
+				const std::vector<Number>&soln,
 				const std::vector<std::string>& names);
-  
+
 
  private:
 

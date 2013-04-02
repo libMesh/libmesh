@@ -45,12 +45,12 @@ class RadialBasisInterpolation : public InverseDistanceInterpolation<KDDim>
   using InverseDistanceInterpolation<KDDim>::_names;
 
 protected:
-  
+
   /**
    * Bounding box for our source points.
    */
   MeshTools::BoundingBox _src_bbox;
-  
+
   /**
    * basis coefficients.
    */
@@ -69,7 +69,7 @@ protected:
 public:
 
   /**
-   * Constructor. 
+   * Constructor.
    */
   RadialBasisInterpolation (Real radius=-1) :
     InverseDistanceInterpolation<KDDim> (),
@@ -84,10 +84,10 @@ public:
   virtual void clear();
 
   /**
-   * Prepares data structures for use. 
+   * Prepares data structures for use.
    */
   virtual void prepare_for_use ();
-  
+
   /**
    * Interpolate source data at target points.
    * Pure virtual, must be overriden in derived classes.

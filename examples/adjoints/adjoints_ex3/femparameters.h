@@ -27,9 +27,9 @@ public:
       steadystate_tolerance(0.),
       timesolver_norm(0,L2),
       dimension(2),
-	domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),	
+	domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),
 	fine_mesh_file_primal("fine_mesh.xda"), fine_mesh_soln_primal("fine_mesh_soln.xda"),
-	fine_mesh_file_adjoint("fine_mesh.xda"), fine_mesh_soln_adjoint("fine_mesh_soln.xda"),	      
+	fine_mesh_file_adjoint("fine_mesh.xda"), fine_mesh_soln_adjoint("fine_mesh_soln.xda"),
       elementorder(2),
       domain_xmin(0.0), domain_ymin(0.0), domain_zmin(0.0),
       domain_edge_width(1.0), domain_edge_length(1.0), domain_edge_height(1.0),
@@ -60,7 +60,7 @@ public:
       output_gmv(false), output_tecplot(false),
       run_simulation(true), run_postprocess(false),
       fe_family(1, "LAGRANGE"), fe_order(1, 1),
-      extra_quadrature_order(0),	
+      extra_quadrature_order(0),
       analytic_jacobians(true), verify_analytic_jacobians(0.0),
       print_solution_norms(false), print_solutions(false),
       print_residual_norms(false), print_residuals(false),
@@ -107,7 +107,7 @@ public:
     std::string indicator_type;
     bool patch_reuse;
     unsigned int sobolev_order;
-    std::string adjoint_residual_type;   
+    std::string adjoint_residual_type;
     bool alternate_with_uniform_steps;
     unsigned int alternate_step_number;
     bool component_wise_error;
@@ -127,7 +127,7 @@ public:
     std::vector<std::string> fe_family;
     std::vector<unsigned int> fe_order;
     int extra_quadrature_order;
-    
+
     bool analytic_jacobians;
     Real verify_analytic_jacobians;
 

@@ -37,7 +37,7 @@ namespace libMesh
 // PetscMatrix members
 
 
-// Constructor 
+// Constructor
 template <typename T>
 PetscMatrix<T>::PetscMatrix()
   : _destroy_mat_on_exit(true)
@@ -213,7 +213,7 @@ void PetscMatrix<T>::init ()
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatSetFromOptions(_mat);
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  
+
   ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
   CHKERRABORT(libMesh::COMM_WORLD,ierr);
   ierr = MatMPIAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),

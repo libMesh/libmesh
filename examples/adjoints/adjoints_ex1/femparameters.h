@@ -13,9 +13,9 @@ using namespace libMesh;
 class FEMParameters
 {
 public:
-    FEMParameters() :  
+    FEMParameters() :
       domainfile("lshaped.xda"),
-      coarserefinements(0),            
+      coarserefinements(0),
       solver_quiet(true),
 	reuse_preconditioner(false),
       require_residual_reduction(true),
@@ -27,19 +27,19 @@ public:
       nelem_target(30000), global_tolerance(0.0),
       refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
       refine_uniformly(false),
-      max_adaptivesteps(1),      
+      max_adaptivesteps(1),
 	indicator_type("kelly"), patch_reuse(true),
-      fe_family(1, "LAGRANGE"), fe_order(1, 1),	
+      fe_family(1, "LAGRANGE"), fe_order(1, 1),
       analytic_jacobians(true), verify_analytic_jacobians(0.0),
       print_solution_norms(false), print_solutions(false),
       print_residual_norms(false), print_residuals(false),
       print_jacobian_norms(false), print_jacobians(false) {}
 
     void read(GetPot &input);
-   
+
     std::string domainfile;
     unsigned int coarserefinements;
-            
+
     bool solver_quiet, reuse_preconditioner, require_residual_reduction;
     Real min_step_length;
     unsigned int max_linear_iterations, max_nonlinear_iterations;
@@ -52,8 +52,8 @@ public:
     Real refine_fraction, coarsen_fraction, coarsen_threshold;
     bool refine_uniformly;
     unsigned int max_adaptivesteps;
-    
-    std::string indicator_type;    
+
+    std::string indicator_type;
     bool patch_reuse;
 
     std::vector<std::string> fe_family;

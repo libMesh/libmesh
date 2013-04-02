@@ -168,4 +168,3 @@ protected:
 } // namespace libMesh
 
 #endif // LIBMESH_ERROR_VECTOR_H
-

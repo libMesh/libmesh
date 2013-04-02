@@ -1,17 +1,17 @@
 
 // The libMesh Finite Element Library.
 // Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
-  
+
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
 // version 2.1 of the License, or (at your option) any later version.
-  
+
 // This library is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
-  
+
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -70,7 +70,7 @@ public:
 
   /**
    * Clear all the data structures associated with
-   * the QoI. 
+   * the QoI.
    */
   virtual void clear_qoi () {}
 
@@ -81,7 +81,7 @@ public:
    * also set assemble_qoi_internal_sides to true.
    */
   bool assemble_qoi_sides;
- 
+
   /**
    * If \p assemble_qoi_internal_sides is true (it is false by
    * default), the assembly loop for a quantity of interest or its
@@ -89,7 +89,7 @@ public:
    * domain boundaries.
    */
   bool assemble_qoi_internal_sides;
- 
+
   /**
    * If \p assemble_qoi_elements is false (it is true by default), the
    * assembly loop for a quantity of interest or its derivatives will
@@ -105,10 +105,10 @@ public:
    * Only qois included in the supplied \p QoISet need to be
    * assembled.
    */
-  virtual void element_qoi (DiffContext&, 
+  virtual void element_qoi (DiffContext&,
                             const QoISet&)
     {}
- 
+
   /**
    * Does any work that needs to be done on \p elem in a quantity of
    * interest derivative assembly loop, outputting to
@@ -120,7 +120,7 @@ public:
   virtual void element_qoi_derivative (DiffContext&,
                                        const QoISet&)
     {}
- 
+
   /**
    * Does any work that needs to be done on \p side of \p elem in a
    * quantity of interest assembly loop, outputting to elem_qoi.
@@ -131,7 +131,7 @@ public:
   virtual void side_qoi (DiffContext&,
                          const QoISet&)
     {}
- 
+
   /**
    * Does any work that needs to be done on \p side of \p elem in a
    * quantity of interest derivative assembly loop, outputting to
@@ -143,10 +143,10 @@ public:
   virtual void side_qoi_derivative (DiffContext&,
                                     const QoISet&)
     {}
- 
+
   /**
    * Prepares the result of a build_context() call for use.
-   * 
+   *
    * Most FEMSystem-based problems will need to reimplement this in order to
    * call FE::get_*() as their particular QoI requires.
    */

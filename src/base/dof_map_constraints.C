@@ -193,10 +193,10 @@ using namespace libMesh;
     const DirichletBoundary  dirichlet;
 
     template<typename OutputType>
-    void apply_dirichlet_impl( const ConstElemRange &range, FunctionBase<Number> *f, FunctionBase<Gradient> *g, 
-			       const std::set<boundary_id_type> &b, DenseMatrix<Real>& Ke, 
-			       DenseVector<Number>& Fe, DenseVector<Number>& Ue, 
-			       const unsigned int var, const Variable&variable, 
+    void apply_dirichlet_impl( const ConstElemRange &range, FunctionBase<Number> *f, FunctionBase<Gradient> *g,
+			       const std::set<boundary_id_type> &b, DenseMatrix<Real>& Ke,
+			       DenseVector<Number>& Fe, DenseVector<Number>& Ue,
+			       const unsigned int var, const Variable&variable,
 			       const FEType& fe_type ) const
     {
       typedef OutputType                                                      OutputShape;
@@ -213,60 +213,60 @@ using namespace libMesh;
       const BoundaryInfo& boundary_info = *mesh.boundary_info;
 
       unsigned int n_vec_dim = FEInterface::n_vec_dim(mesh, fe_type);
-      
+
       const unsigned int var_component =
 	variable.first_scalar_number();
-      
+
       // Get FE objects of the appropriate type
       AutoPtr<FEGenericBase<OutputType> > fe = FEGenericBase<OutputType>::build(dim, fe_type);
-      
+
       // Prepare variables for projection
       AutoPtr<QBase> qedgerule (fe_type.default_quadrature_rule(1));
       AutoPtr<QBase> qsiderule (fe_type.default_quadrature_rule(dim-1));
-      
+
       // The values of the shape functions at the quadrature
       // points
       const std::vector<std::vector<OutputShape> >& phi = fe->get_phi();
-      
+
       // The gradients of the shape functions at the quadrature
       // points on the child element.
       const std::vector<std::vector<OutputGradient> > *dphi = NULL;
-      
+
       const FEContinuity cont = fe->get_continuity();
-      
+
       if (cont == C_ONE)
 	{
 	  // We'll need gradient data for a C1 projection
 	  libmesh_assert(g);
-	  
+
 	  const std::vector<std::vector<OutputGradient> >&
 	    ref_dphi = fe->get_dphi();
 	  dphi = &ref_dphi;
 	}
-      
+
       // The Jacobian * quadrature weight at the quadrature points
       const std::vector<Real>& JxW =
 	fe->get_JxW();
-      
+
       // The XYZ locations of the quadrature points
       const std::vector<Point>& xyz_values =
 	fe->get_xyz();
-      
+
       // The global DOF indices
       std::vector<dof_id_type> dof_indices;
       // Side/edge local DOF indices
       std::vector<unsigned int> side_dofs;
-      
+
       // Iterate over all the elements in the range
       for (ConstElemRange::const_iterator elem_it=range.begin(); elem_it != range.end(); ++elem_it)
 	{
 	  const Elem* elem = *elem_it;
-	  
+
 	  // Per-subdomain variables don't need to be projected on
 	  // elements where they're not active
 	  if (!variable.active_on_subdomain(elem->subdomain_id()))
 	    continue;
-	  
+
 	  // Find out which nodes, edges and sides are on a requested
 	  // boundary:
 	  std::vector<bool> is_boundary_node(elem->n_nodes(), false),
@@ -286,9 +286,9 @@ using namespace libMesh;
 		  }
 	      if (!do_this_side)
 		continue;
-	      
+
 	      is_boundary_side[s] = true;
-	      
+
 	      // Then see what nodes and what edges are on it
 	      for (unsigned int n=0; n != elem->n_nodes(); ++n)
 		if (elem->is_node_on_side(n,s))
@@ -297,34 +297,34 @@ using namespace libMesh;
 		if (elem->is_edge_on_side(e,s))
 		  is_boundary_edge[e] = true;
 	    }
-	  
+
 	  // Update the DOF indices for this element based on
 	  // the current mesh
 	  dof_map.dof_indices (elem, dof_indices, var);
-	  
+
 	  // The number of DOFs on the element
 	  const unsigned int n_dofs =
 	    libmesh_cast_int<unsigned int>(dof_indices.size());
-	  
+
 	  // Fixed vs. free DoFs on edge/face projections
 	  std::vector<char> dof_is_fixed(n_dofs, false); // bools
 	  std::vector<int> free_dof(n_dofs, 0);
-	  
+
 	  // The element type
 	  const ElemType elem_type = elem->type();
-	  
+
 	  // The number of nodes on the new element
 	  const unsigned int n_nodes = elem->n_nodes();
-	  
+
 	  // Zero the interpolated values
 	  Ue.resize (n_dofs); Ue.zero();
-	  
+
 	  // In general, we need a series of
 	  // projections to ensure a unique and continuous
 	  // solution.  We start by interpolating boundary nodes, then
 	  // hold those fixed and project boundary edges, then hold
 	  // those fixed and project boundary faces,
-	  
+
 	  // Interpolate node values first
 	  unsigned int current_dof = 0;
 	  for (unsigned int n=0; n!= n_nodes; ++n)
@@ -394,7 +394,7 @@ using namespace libMesh;
 			/ 2. / TOLERANCE;
 		      dof_is_fixed[current_dof] = true;
 		      current_dof++;
-		      
+
 		      if (dim > 2)
 			{
 			  // z derivative
@@ -483,33 +483,33 @@ using namespace libMesh;
 	      else
 		libmesh_error();
 	    }
-	  
+
 	  // In 3D, project any edge values next
 	  if (dim > 2 && cont != DISCONTINUOUS)
 	    for (unsigned int e=0; e != elem->n_edges(); ++e)
 	      {
 		if (!is_boundary_edge[e])
 		  continue;
-		
+
 		FEInterface::dofs_on_edge(elem, dim, fe_type, e,
 					  side_dofs);
-		
+
 		// Some edge dofs are on nodes and already
 		// fixed, others are free to calculate
 		unsigned int free_dofs = 0;
 		for (unsigned int i=0; i != side_dofs.size(); ++i)
 		  if (!dof_is_fixed[side_dofs[i]])
 		    free_dof[free_dofs++] = i;
-		
+
 		// There may be nothing to project
 		if (!free_dofs)
 		  continue;
-		
+
 		Ke.resize (free_dofs, free_dofs); Ke.zero();
 		Fe.resize (free_dofs); Fe.zero();
 		// The new edge coefficients
 		DenseVector<Number> Uedge(free_dofs);
-		
+
 		// Initialize FE data on the edge
 		fe->attach_quadrature_rule (qedgerule.get());
 		fe->edge_reinit (elem, e);
@@ -552,7 +552,7 @@ using namespace libMesh;
 			  g_accessor(c + d*dim ) =
 			  g->component(var_component,
 				       xyz_values[qp], time)(c);
-		    
+
 		    // Form edge projection matrix
 		    for (unsigned int sidei=0, freei=0;
 			 sidei != side_dofs.size(); ++sidei)
@@ -590,9 +590,9 @@ using namespace libMesh;
 			freei++;
 		      }
 		  }
-		
+
 		Ke.cholesky_solve(Fe, Uedge);
-		
+
 		// Transfer new edge solutions to element
 		for (unsigned int i=0; i != free_dofs; ++i)
 		  {
@@ -610,21 +610,21 @@ using namespace libMesh;
 	      {
 		if (!is_boundary_side[s])
 		  continue;
-		
+
 		FEInterface::dofs_on_side(elem, dim, fe_type, s,
 					  side_dofs);
-		
+
 		// Some side dofs are on nodes/edges and already
 		// fixed, others are free to calculate
 		unsigned int free_dofs = 0;
 		for (unsigned int i=0; i != side_dofs.size(); ++i)
 		  if (!dof_is_fixed[side_dofs[i]])
 		    free_dof[free_dofs++] = i;
-		
+
 		// There may be nothing to project
 		if (!free_dofs)
 		  continue;
-		
+
 		Ke.resize (free_dofs, free_dofs); Ke.zero();
 		Fe.resize (free_dofs); Fe.zero();
 		// The new side coefficients
@@ -634,7 +634,7 @@ using namespace libMesh;
 		fe->attach_quadrature_rule (qsiderule.get());
 		fe->reinit (elem, s);
 		const unsigned int n_qp = qsiderule->n_points();
-		
+
 		// Loop over the quadrature points
 		for (unsigned int qp=0; qp<n_qp; qp++)
 		  {
@@ -672,7 +672,7 @@ using namespace libMesh;
 			  g_accessor(c + d*dim ) =
 			  g->component(var_component,
 				       xyz_values[qp], time)(c);
-		    
+
 		    // Form side projection matrix
 		    for (unsigned int sidei=0, freei=0;
 			 sidei != side_dofs.size(); ++sidei)
@@ -710,9 +710,9 @@ using namespace libMesh;
 			freei++;
 		      }
 		  }
-		
+
 		Ke.cholesky_solve(Fe, Uside);
-		
+
 		// Transfer new side solutions to element
 		for (unsigned int i=0; i != free_dofs; ++i)
 		  {
@@ -723,25 +723,25 @@ using namespace libMesh;
 		    dof_is_fixed[side_dofs[free_dof[i]]] = true;
 		  }
 	      }
-	  
+
 	  // Lock the DofConstraints since it is shared among threads.
 	  {
 	    Threads::spin_mutex::scoped_lock lock(Threads::spin_mtx);
-	    
+
 	    for (unsigned int i = 0; i < n_dofs; i++)
 	      {
 		DofConstraintRow empty_row;
 		if (dof_is_fixed[i] &&
 		    !dof_map.is_constrained_dof(dof_indices[i]))
 		  dof_map.add_constraint_row
-		    (dof_indices[i], empty_row, 
+		    (dof_indices[i], empty_row,
 		     Ue(i), /* forbid_constraint_overwrite = */ true);
 	      }
 	  }
-	} 
-      
+	}
+
     } // apply_dirichlet_impl
-    
+
   public:
     ConstrainDirichlet (DofMap &dof_map_in,
 		        const MeshBase &mesh_in,
@@ -786,11 +786,11 @@ using namespace libMesh;
       for (unsigned int v=0; v!=dirichlet.variables.size(); v++)
 	{
 	  const unsigned int var = dirichlet.variables[v];
-	  
+
 	  const Variable& variable = dof_map.variable(var);
-	  
+
 	  const FEType& fe_type = variable.type();
-	  
+
 	  if (fe_type.family == SCALAR)
 	    continue;
 
@@ -815,7 +815,7 @@ using namespace libMesh;
 
   }; // class ConstrainDirichlet
 
-  
+
 #endif // LIBMESH_ENABLE_DIRICHLET
 
 
@@ -867,7 +867,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   // or from boundary conditions in any dimension
   const bool possible_local_constraints = false
 #ifdef LIBMESH_ENABLE_AMR
-    || dim > 1 
+    || dim > 1
 #endif
 #ifdef LIBMESH_ENABLE_PERIODIC
     || !_periodic_boundaries->empty()
@@ -961,7 +961,7 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 					       variable_number));
 
 #ifdef LIBMESH_ENABLE_DIRICHLET
-  for (DirichletBoundaries::iterator 
+  for (DirichletBoundaries::iterator
          i = _dirichlet_boundaries->begin();
        i != _dirichlet_boundaries->end(); ++i, range.reset())
     {
@@ -1256,7 +1256,7 @@ void DofMap::constrain_element_matrix_and_vector (DenseMatrix<Number>& matrix,
 
 
 
-void DofMap::heterogenously_constrain_element_matrix_and_vector 
+void DofMap::heterogenously_constrain_element_matrix_and_vector
   (DenseMatrix<Number>& matrix,
    DenseVector<Number>& rhs,
    std::vector<dof_id_type>& elem_dofs,
@@ -1460,7 +1460,7 @@ void DofMap::constrain_element_vector (DenseVector<Number>&       rhs,
 	    // If the DOF is constrained
             DofConstraints::const_iterator
                   pos = _dof_constraints.find(row_dofs[i]);
-          
+
             libmesh_assert (pos != _dof_constraints.end());
 
 	    rhs(i) = 0;
@@ -1514,7 +1514,7 @@ void DofMap::constrain_element_dyad_matrix (DenseVector<Number>& v,
 	    // If the DOF is constrained
             DofConstraints::const_iterator
                   pos = _dof_constraints.find(row_dofs[i]);
-          
+
             libmesh_assert (pos != _dof_constraints.end());
 
 	    v(i) = 0;
@@ -2691,7 +2691,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
            it != pushed_node_ids[procup].end(); ++push_i, ++it)
         {
           const Node *constrained = mesh.node_ptr(*it);
-              
+
           if (constrained->processor_id() != procdown)
             pushed_nodes.insert(constrained);
 
@@ -2706,7 +2706,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 
               pushed_node_keys[push_i].push_back(constraining->id());
               pushed_node_vals[push_i].push_back(j->second);
-              
+
               if (constraining->processor_id() != procup)
                 pushed_nodes.insert(constraining);
             }
@@ -2865,7 +2865,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
                    mti != dcmi->second.end(); ++mti)
                 {
                   const dof_id_type constrained = *mti;
-                  
+
                   dof_id_type the_constrained_proc_id = 0;
                   while (constrained >= _end_df[the_constrained_proc_id])
                     the_constrained_proc_id++;
@@ -3127,7 +3127,7 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase& periodic_boundar
   {
     // ...otherwise, merge this object's variable IDs with the existing boundary object's.
     existing_boundary->merge(periodic_boundary);
-    
+
     // Do the same merging process for the inverse boundary.  Note: the inverse better already exist!
     PeriodicBoundaryBase* inverse_boundary = _periodic_boundaries->boundary(periodic_boundary.pairedboundary);
     libmesh_assert(inverse_boundary);
@@ -3156,7 +3156,7 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase& boundary, const 
   PeriodicBoundaryBase* p_boundary = boundary.clone().release();
   PeriodicBoundaryBase* p_inverse_boundary = inverse_boundary.clone().release();
 
-  // Add the periodic boundary and its inverse to the PeriodicBoundaries data structure.  The 
+  // Add the periodic boundary and its inverse to the PeriodicBoundaries data structure.  The
   // PeriodicBoundaries data structure takes ownership of the pointers.
   _periodic_boundaries->insert(std::make_pair(p_boundary->myboundary, p_boundary));
   _periodic_boundaries->insert(std::make_pair(p_inverse_boundary->myboundary, p_inverse_boundary));

@@ -142,5 +142,3 @@ void print_help(int, char** argv)
 	       << "Add --use-petsc-dm -snes_type virs to run the variational inequality version that ensures the solution is between -1.0 and 1.0 at all times.\n\n"
 	       << std::endl;
 }
-
-

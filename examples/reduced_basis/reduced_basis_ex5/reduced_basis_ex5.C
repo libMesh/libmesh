@@ -6,12 +6,12 @@
 /* modify it under the terms of the GNU Lesser General Public */
 /* License as published by the Free Software Foundation; either */
 /* version 2.1 of the License, or (at your option) any later version. */
-  
+
 /* rbOOmit is distributed in the hope that it will be useful, */
 /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
 /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
 /* Lesser General Public License for more details. */
-  
+
 /* You should have received a copy of the GNU Lesser General Public */
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
 	GetPot command_line(argc, argv);
 	int online_mode = 0;
 	if ( command_line.search(1, "-online_mode") ) {
-		online_mode = command_line.next(online_mode);		
+		online_mode = command_line.next(online_mode);
 	}
 
 
@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
 
 		// Write out the data that will subsequently be required for the Evaluation stage
 		rb_con.get_rb_evaluation().write_offline_data_to_files();
-		
+
 		// If requested, write out the RB basis functions for visualization purposes
 		if(store_basis_functions)
 		{
@@ -186,7 +186,7 @@ int main(int argc, char** argv) {
 		online_mu.set_value("load_Fz",   online_load_Fz);
 		rb_eval.set_parameters(online_mu);
 		rb_eval.print_parameters();
-		
+
 		// Now do the Online solve using the precomputed reduced basis
 		rb_eval.rb_solve( rb_eval.get_n_basis_functions() );
 
@@ -220,7 +220,7 @@ void scale_mesh_and_plot(EquationSystems& es, const RBParameters& mu, const std:
 
     (*node)(0) *= mu.get_value("x_scaling");
   }
-  
+
   // Post-process the solution to compute the stresses
   compute_stresses(es);
 
@@ -260,10 +260,10 @@ void compute_stresses(EquationSystems& es)
   AutoPtr<FEBase> fe (FEBase::build(dim, fe_type));
   QGauss qrule (dim, fe_type.default_quadrature_order());
   fe->attach_quadrature_rule (&qrule);
-  
+
   const std::vector<Real>& JxW = fe->get_JxW();
   const std::vector<std::vector<RealGradient> >& dphi = fe->get_dphi();
-  
+
   // Also, get a reference to the ExplicitSystem
   ExplicitSystem& stress_system = es.get_system<ExplicitSystem>("StressSystem");
   const DofMap& stress_dof_map = stress_system.get_dof_map();
@@ -301,7 +301,7 @@ void compute_stresses(EquationSystems& es)
     fe->reinit (elem);
 
     elem_sigma.resize(3,3);
-    
+
     for (unsigned int qp=0; qp<qrule.n_points(); qp++)
     {
       for(unsigned int C_i=0; C_i<3; C_i++)
@@ -324,7 +324,7 @@ void compute_stresses(EquationSystems& es)
 
           }
     }
-    
+
     // Get the average stresses by dividing by the element volume
     elem_sigma.scale(1./elem->volume());
 
@@ -337,7 +337,7 @@ void compute_stresses(EquationSystems& es)
         // We are using CONSTANT MONOMIAL basis functions, hence we only need to get
         // one dof index per variable
         dof_id_type dof_index = stress_dof_indices_var[0];
-        
+
         if( (stress_system.solution->first_local_index() <= dof_index) &&
             (dof_index < stress_system.solution->last_local_index()) )
         {
@@ -345,10 +345,10 @@ void compute_stresses(EquationSystems& es)
         }
 
       }
-    
+
     // Also, the von Mises stress
-    Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) + 
-                                             pow(elem_sigma(1,1) - elem_sigma(2,2),2.) + 
+    Number vonMises_value = std::sqrt( 0.5*( pow(elem_sigma(0,0) - elem_sigma(1,1),2.) +
+                                             pow(elem_sigma(1,1) - elem_sigma(2,2),2.) +
                                              pow(elem_sigma(2,2) - elem_sigma(0,0),2.) +
                                              6.*(pow(elem_sigma(0,1),2.) + pow(elem_sigma(1,2),2.) + pow(elem_sigma(2,0),2.))
                                            ) );
@@ -359,7 +359,7 @@ void compute_stresses(EquationSystems& es)
     {
       stress_system.solution->set(dof_index, vonMises_value);
     }
-    
+
   }
 
   // Should call close and update when we set vector entries directly

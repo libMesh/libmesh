@@ -206,7 +206,3 @@ Order FEType::default_quadrature_order () const
 
 
 #endif // LIBMESH_FE_TYPE_H
-
-
-
-

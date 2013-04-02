@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
 
   Mesh from_mesh;
   MeshTools::Generation::build_cube(from_mesh, 4, 4, 4, 0, 1, 0, 1, 0, 1, HEX8);
-  from_mesh.print_info();  
-  EquationSystems from_es(from_mesh);  
+  from_mesh.print_info();
+  EquationSystems from_es(from_mesh);
   System & from_sys = from_es.add_system<ExplicitSystem>("From");
   unsigned int from_var = from_sys.add_variable("from");
   from_sys.attach_init_function(initialize);
@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
 
   Mesh to_mesh;
   MeshTools::Generation::build_cube(to_mesh, 5, 5, 5, 0, 1, 0, 1, 0, 1, TET4);
-  to_mesh.print_info();  
-  EquationSystems to_es(to_mesh);  
+  to_mesh.print_info();
+  EquationSystems to_es(to_mesh);
   System & to_sys = to_es.add_system<ExplicitSystem>("To");
   unsigned int to_var = to_sys.add_variable("to");
   to_es.init();
@@ -59,11 +59,11 @@ int main(int argc, char* argv[])
   DTKSolutionTransfer dtk_transfer;
 
   dtk_transfer.transfer(from_sys.variable(from_var), to_sys.variable(to_var));
-  
+
   to_es.update();
   ExodusII_IO(to_mesh).write_equation_systems("to.e", to_es);
-  
+
 #endif
-  
+
   return 0;
 }

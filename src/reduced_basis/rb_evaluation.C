@@ -91,7 +91,7 @@ RBThetaExpansion& RBEvaluation::get_rb_theta_expansion()
     libMesh::out << "Error: rb_theta_expansion hasn't been initialized yet" << std::endl;
     libmesh_error();
   }
-  
+
   return *rb_theta_expansion;
 }
 
@@ -172,7 +172,7 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
         Fq_Aq_representor_innerprods[i][j].resize(Nmax, 0.);
       }
     }
-    
+
     unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
     Aq_Aq_representor_innerprods.resize(Q_a_hat);
     for(unsigned int i=0; i<Q_a_hat; i++)
@@ -183,7 +183,7 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
         Aq_Aq_representor_innerprods[i][j].resize(Nmax, 0.);
       }
     }
-    
+
     RB_output_error_bounds.resize(rb_theta_expansion->get_n_outputs(), 0.);
 
     // Resize the output dual norm vectors
@@ -193,7 +193,7 @@ void RBEvaluation::resize_data_structures(const unsigned int Nmax,
       unsigned int Q_l_hat = rb_theta_expansion->get_n_output_terms(n)*(rb_theta_expansion->get_n_output_terms(n)+1)/2;
       output_dual_innerprods[n].resize(Q_l_hat);
     }
-    
+
     // Clear and resize the vector of Aq_representors
     clear_riesz_representors();
 
@@ -446,10 +446,10 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
 
   // Get the number of basis functions
   unsigned int n_bfs = get_n_basis_functions();
-  
+
   // The writing mode: ENCODE for binary, WRITE for ASCII
   XdrMODE mode = write_binary_data ? ENCODE : WRITE;
-  
+
   // The suffix to use for all the files that are written out
   const std::string suffix = write_binary_data ? ".xdr" : ".dat";
 
@@ -472,7 +472,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       n_bfs_out << n_bfs;
       n_bfs_out.close();
     }
-    
+
     // Write out the parameter ranges
     file_name.str("");
     file_name << directory_name << "/parameter_ranges" << suffix;
@@ -604,7 +604,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     file_name.str("");
     file_name << directory_name << "/Fq_Aq_innerprods" << suffix;
     Xdr RB_Fq_Aq_innerprods_out(file_name.str(), mode);
-    
+
     for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
     {
       for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
@@ -621,7 +621,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
     file_name.str("");
     file_name << directory_name << "/Aq_Aq_innerprods" << suffix;
     Xdr RB_Aq_Aq_innerprods_out(file_name.str(), mode);
-    
+
     unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
     for(unsigned int i=0; i<Q_a_hat; i++)
     {
@@ -640,7 +640,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
       file_name.str("");
       file_name << directory_name << "/greedy_params" << suffix;
       Xdr greedy_params_out(file_name.str(), mode);
-      
+
       for(unsigned int i=0; i<greedy_param_list.size(); i++)
       {
         RBParameters::const_iterator it     = greedy_param_list[i].begin();
@@ -669,7 +669,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
 
   // The reading mode: DECODE for binary, READ for ASCII
   XdrMODE mode = read_binary_data ? DECODE : READ;
-  
+
   // The suffix to use for all the files that are written out
   const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
@@ -687,7 +687,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
   }
 
   resize_data_structures(n_bfs, read_error_bound_data);
-  
+
   // Read in the parameter ranges
   file_name.str("");
   file_name << directory_name << "/parameter_ranges" << suffix;
@@ -730,7 +730,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     file_name.str("");
     file_name << directory_name << "/RB_inner_product_matrix" << suffix;
     Xdr RB_inner_product_matrix_in(file_name.str(), mode);
-    
+
     for(unsigned int i=0; i<n_bfs; i++)
     {
       for(unsigned int j=0; j<n_bfs; j++)
@@ -797,7 +797,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     file_name.str("");
     file_name << directory_name << "/Fq_innerprods" << suffix;
     Xdr RB_Fq_innerprods_in(file_name.str(), mode);
-    
+
     unsigned int Q_f_hat = rb_theta_expansion->get_n_F_terms()*(rb_theta_expansion->get_n_F_terms()+1)/2;
     for(unsigned int i=0; i<Q_f_hat; i++)
     {
@@ -817,7 +817,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
                 << n;
       file_name << "_dual_innerprods" << suffix;
       Xdr output_dual_innerprods_in(file_name.str(), mode);
-      
+
       unsigned int Q_l_hat = rb_theta_expansion->get_n_output_terms(n)*(rb_theta_expansion->get_n_output_terms(n)+1)/2;
       for(unsigned int q=0; q<Q_l_hat; q++)
       {
@@ -831,7 +831,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     file_name.str("");
     file_name << directory_name << "/Fq_Aq_innerprods" << suffix;
     Xdr RB_Fq_Aq_innerprods_in(file_name.str(), mode);
-    
+
     for(unsigned int q_f=0; q_f<rb_theta_expansion->get_n_F_terms(); q_f++)
     {
       for(unsigned int q_a=0; q_a<rb_theta_expansion->get_n_A_terms(); q_a++)
@@ -848,7 +848,7 @@ void RBEvaluation::read_offline_data_from_files(const std::string& directory_nam
     file_name.str("");
     file_name << directory_name << "/Aq_Aq_innerprods" << suffix;
     Xdr RB_Aq_Aq_innerprods_in(file_name.str(), mode);
-    
+
     unsigned int Q_a_hat = rb_theta_expansion->get_n_A_terms()*(rb_theta_expansion->get_n_A_terms()+1)/2;
     for(unsigned int i=0; i<Q_a_hat; i++)
     {
@@ -885,13 +885,13 @@ void RBEvaluation::write_out_basis_functions(System& sys,
                                              const bool write_binary_basis_functions)
 {
   START_LOG("write_out_basis_functions()", "RBEvaluation");
-  
+
   write_out_vectors(sys,
                     basis_functions,
                     directory_name,
                     "bf",
                     write_binary_basis_functions);
-  
+
   STOP_LOG("write_out_basis_functions()", "RBEvaluation");
 }
 
@@ -940,7 +940,7 @@ void RBEvaluation::write_out_vectors(System& sys,
   //   bf_data.set_version(LIBMESH_VERSION_ID(LIBMESH_MAJOR_VERSION,
   // 					   LIBMESH_MINOR_VERSION,
   // 					   LIBMESH_MICRO_VERSION));
-    
+
   //   sys.write_serialized_data(bf_data, false);
 
   //   // Synchronize before moving on
@@ -954,7 +954,7 @@ void RBEvaluation::write_out_vectors(System& sys,
 
   Xdr bf_data(file_name.str(),
 	      write_binary_vectors ? ENCODE : WRITE);
-  
+
   // Write all vectors at once.
   {
     // Note the API wants pointers to constant vectors, hence this...
@@ -983,7 +983,7 @@ void RBEvaluation::read_in_basis_functions(System& sys,
                                            const bool read_binary_basis_functions)
 {
   START_LOG("read_in_basis_functions()", "RBEvaluation");
-  
+
   read_in_vectors(sys,
                   basis_functions,
                   directory_name,
@@ -1000,7 +1000,7 @@ void RBEvaluation::read_in_vectors(System& sys,
                                    const bool read_binary_vectors)
 {
   START_LOG("read_in_vectors()", "RBEvaluation");
-  
+
   //libMesh::out << "Reading in the basis functions..." << std::endl;
 
   // Make sure processors are synced up before we begin
@@ -1023,7 +1023,7 @@ void RBEvaluation::read_in_vectors(System& sys,
   char dot;
   iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
   header_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
-  
+
   // We need to call sys.read_header (e.g. to set _written_var_indices properly),
   // but by setting the read_header argument to false, it doesn't reinitialize the system
   sys.read_header(header_data, io_version_string, /*read_header=*/false, /*read_additional_data=*/false);
@@ -1043,27 +1043,27 @@ void RBEvaluation::read_in_vectors(System& sys,
 	{
 	  file_name.str(""); // reset the string
 	  file_name << directory_name << "/" << data_name << i << basis_function_suffix;
-	  
+
 	  // On processor zero check to be sure the file exists
 	  if (libMesh::processor_id() == 0)
 	    {
 	      int stat_result = stat(file_name.str().c_str(), &stat_info);
-	      
+
 	      if (stat_result != 0)
 		{
 		  libMesh::out << "File does not exist: " << file_name.str() << std::endl;
 		  libmesh_error();
 		}
 	    }
-	  
+
 	  Xdr vector_data(file_name.str(),
 		          read_binary_vectors ? DECODE : READ);
-	  
+
 	  // The bf_data needs to know which version to read.
 	  vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
-    
+
 	  sys.read_serialized_data(vector_data, false);
-	  
+
 	  vectors[i] = NumericVector<Number>::build().release();
 	  vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 
@@ -1091,7 +1091,7 @@ void RBEvaluation::read_in_vectors(System& sys,
       if (libMesh::processor_id() == 0)
 	{
 	  int stat_result = stat(file_name.str().c_str(), &stat_info);
-	  
+
 	  if (stat_result != 0)
 	    {
 	      libMesh::out << "File does not exist: " << file_name.str() << std::endl;
@@ -1103,7 +1103,7 @@ void RBEvaluation::read_in_vectors(System& sys,
 		      read_binary_vectors ? DECODE : READ);
 
       // The vector_data needs to know which version to read.
-      vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));    
+      vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
 
       sys.read_serialized_vectors (vector_data, vectors);
     }
@@ -1113,7 +1113,7 @@ void RBEvaluation::read_in_vectors(System& sys,
   sys.get_mesh().fix_broken_node_and_element_numbering();
 
   //libMesh::out << "Finished reading in the basis functions..." << std::endl;
-  
+
   STOP_LOG("read_in_vectors()", "RBEvaluation");
 }
 

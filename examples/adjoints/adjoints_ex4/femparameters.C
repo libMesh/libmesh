@@ -14,9 +14,9 @@
 void FEMParameters::read(GetPot &input)
 {
     std::vector<std::string> variable_names;
-   
-    
-    GETPOT_INT_INPUT(coarserefinements);  
+
+
+    GETPOT_INT_INPUT(coarserefinements);
     GETPOT_INPUT(domainfile);
 
     GETPOT_INPUT(solver_quiet);
@@ -35,7 +35,7 @@ void FEMParameters::read(GetPot &input)
     GETPOT_INPUT(refine_fraction);
     GETPOT_INPUT(coarsen_fraction);
     GETPOT_INPUT(coarsen_threshold);
-    GETPOT_INT_INPUT(max_adaptivesteps);   
+    GETPOT_INT_INPUT(max_adaptivesteps);
     GETPOT_INPUT(refine_uniformly);
     GETPOT_INPUT(indicator_type);
     GETPOT_INPUT(patch_reuse);

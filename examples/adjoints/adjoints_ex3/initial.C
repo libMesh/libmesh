@@ -20,9 +20,9 @@ Number initial_value(const Point& /* p */,
                      const std::string&,
                      const std::string&)
 {
-  
+
   return 1.;
-      
+
 }
 
 

@@ -16,11 +16,11 @@
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
   // <h1>Miscellaneous Example 4 - Using a shell matrix</h1>
-  // 
+  //
   // This example solves the equation
   //
   // \f$-\Delta u+\int u = 1\f$
-  // 
+  //
   // with homogeneous Dirichlet boundary conditions.  This system has
   // a full system matrix which can be written as the sum of of sparse
   // matrix and a rank 1 matrix.  The shell matrix concept is used to
@@ -32,7 +32,7 @@
   // used, so that the example remains simple.
   //
   // The example is 2d; extension to 3d is straight forward.
- 
+
 // C++ include files that we need
 #include <iostream>
 #include <algorithm>
@@ -117,9 +117,9 @@ int main (int argc, char** argv)
 				       -1., 1.,
 				       -1., 1.,
 				       QUAD4);
-  
-  LinearImplicitSystem & system = 
-    equation_systems.add_system<LinearImplicitSystem> 
+
+  LinearImplicitSystem & system =
+    equation_systems.add_system<LinearImplicitSystem>
     ("System");
 
   // Adds the variable "u" to "System".  "u"
@@ -143,7 +143,7 @@ int main (int argc, char** argv)
 
   // Prints information about the system to the screen.
   equation_systems.print_info();
-    
+
   equation_systems.parameters.set<unsigned int>
     ("linear solver maximum iterations") = 250;
   equation_systems.parameters.set<Real>
@@ -154,7 +154,7 @@ int main (int argc, char** argv)
     {
       MeshRefinement mesh_refinement(mesh);
       MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-      const MeshBase::element_iterator elem_end = mesh.elements_end(); 
+      const MeshBase::element_iterator elem_end = mesh.elements_end();
       for (; elem_it != elem_end; ++elem_it)
 	{
 	  Elem* elem = *elem_it;
@@ -180,7 +180,7 @@ int main (int argc, char** argv)
 
   // Prints information about the system to the screen.
   equation_systems.print_info();
-    
+
   // Before the assemblation of the matrix, we have to clear the two
   // vectors that form the tensor matrix (since this is not performed
   // automatically).
@@ -212,14 +212,14 @@ int main (int argc, char** argv)
 
   // Print a nice message.
   std::cout << "Solved linear system in " << system.n_linear_iterations() << " iterations, residual norm is " << system.final_linear_residual() << "." << std::endl;
-  
+
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
   // Write result to file.
   VTKIO(mesh).write_equation_systems ("out.pvtu", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_VTK
 
 #endif // #ifndef LIBMESH_ENABLE_AMR
-  
+
   return 0;
 }
 
@@ -235,28 +235,28 @@ void assemble (EquationSystems& es,
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "System");
-  
+
   // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
-  
+
   // The dimension that we are running
   const unsigned int dim = mesh.mesh_dimension();
-  
+
   // Get a reference to the Convection-Diffusion system object.
   LinearImplicitSystem & system =
     es.get_system<LinearImplicitSystem> ("System");
-  
-  // Get the Finite Element type for the first (and only) 
+
+  // Get the Finite Element type for the first (and only)
   // variable in the system.
   FEType fe_type = system.variable_type(0);
-  
+
   // Build a Finite Element object of the specified type.  Since the
   // \p FEBase::build() member dynamically creates memory we will
   // store the object as an \p AutoPtr<FEBase>.  This can be thought
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe      (FEBase::build(dim, fe_type));
   AutoPtr<FEBase> fe_face (FEBase::build(dim, fe_type));
-  
+
   // A Gauss quadrature rule for numerical integration.
   // Let the \p FEType object decide what order rule is appropriate.
   QGauss qrule (dim,   fe_type.default_quadrature_order());
@@ -271,7 +271,7 @@ void assemble (EquationSystems& es,
   // with the element Jacobian * quadrature weight at each integration point.
   const std::vector<Real>& JxW      = fe->get_JxW();
   const std::vector<Real>& JxW_face = fe_face->get_JxW();
-  
+
   // The element shape functions evaluated at the quadrature points.
   const std::vector<std::vector<Real> >& phi = fe->get_phi();
   const std::vector<std::vector<Real> >& psi = fe_face->get_phi();
@@ -282,13 +282,13 @@ void assemble (EquationSystems& es,
 
   // The XY locations of the quadrature points used for face integration
   //const std::vector<Point>& qface_points = fe_face->get_xyz();
-    
+
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
   // in future examples.
   const DofMap& dof_map = system.get_dof_map();
-  
+
   // Define data structures to contain the element matrix
   // and right-hand-side vector contribution.  Following
   // basic finite element terminology we will denote these
@@ -300,7 +300,7 @@ void assemble (EquationSystems& es,
   // the tensor shell matrix.
   DenseVector<Number> Ve;
   DenseVector<Number> We;
-  
+
   // This vector will hold the degree of freedom indices for
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
@@ -312,14 +312,14 @@ void assemble (EquationSystems& es,
   // will be refined we want to only consider the ACTIVE elements,
   // hence we use a variant of the \p active_elem_iterator.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
-  
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
   for ( ; el != end_el; ++el)
-    {    
+    {
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
       const Elem* elem = *el;
-      
+
       // Get the degree of freedom indices for the
       // current element.  These define where in the global
       // matrix and right-hand-side this element will
@@ -331,7 +331,7 @@ void assemble (EquationSystems& es,
       // quadrature points (q_point) and the shape functions
       // (phi, dphi) for the current element.
       fe->reinit (elem);
-      
+
       // Zero the element matrix and right-hand side before
       // summing them.  We use the resize member here because
       // the number of degrees of freedom might have changed from
@@ -344,7 +344,7 @@ void assemble (EquationSystems& es,
       Fe.resize (dof_indices.size());
       Ve.resize (dof_indices.size());
       We.resize (dof_indices.size());
-      
+
       // Now we will build the element matrix and right-hand-side.
       // Constructing the RHS requires the solution and its
       // gradient from the previous timestep.  This myst be
@@ -360,13 +360,13 @@ void assemble (EquationSystems& es,
               Fe(i) += JxW[qp]*(
                                 phi[i][qp]
                                 );
-              
+
               for (unsigned int j=0; j<phi.size(); j++)
                 {
                   // The matrix contribution
                   Ke(i,j) += JxW[qp]*(
                                       // Stiffness matrix
-				      (dphi[i][qp]*dphi[j][qp])      
+				      (dphi[i][qp]*dphi[j][qp])
                                       );
                 }
 
@@ -377,20 +377,20 @@ void assemble (EquationSystems& es,
               We(i) += JxW[qp]*(
                                 phi[i][qp]
                                 );
-            } 
-        } 
+            }
+        }
 
       // At this point the interior element integration has
       // been completed.  However, we have not yet addressed
       // boundary conditions.  For this example we will only
       // consider simple Dirichlet boundary conditions imposed
-      // via the penalty method. 
-      //        
+      // via the penalty method.
+      //
       // The following loops over the sides of the element.
       // If the element has no neighbor on a side then that
       // side MUST live on a boundary of the domain.
       {
-        // The penalty value.  
+        // The penalty value.
         const Real penalty = 1.e10;
 
         // The following loops over the sides of the element.
@@ -400,7 +400,7 @@ void assemble (EquationSystems& es,
           if (elem->neighbor(s) == NULL)
             {
               fe_face->reinit(elem,s);
-              
+
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
                   // Matrix contribution
@@ -408,10 +408,10 @@ void assemble (EquationSystems& es,
                     for (unsigned int j=0; j<psi.size(); j++)
                       Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                 }
-            } 
-      } 
+            }
+      }
 
-      
+
       // We have now built the element matrix and RHS vector in terms
       // of the element degrees of freedom.  However, it is possible
       // that some of the element DOFs are constrained to enforce
@@ -430,7 +430,7 @@ void assemble (EquationSystems& es,
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
       dof_indices = dof_indices_backup;
       dof_map.constrain_element_dyad_matrix(Ve,We,dof_indices);
-      
+
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The \p SparseMatrix::add_matrix()
@@ -454,4 +454,3 @@ void assemble (EquationSystems& es,
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 }
-

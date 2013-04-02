@@ -1030,11 +1030,3 @@ void EpetraVector<T>::swap (NumericVector<T> &other)
 
 #endif // #ifdef HAVE_EPETRA
 #endif // LIBMESH_TRILINOS_EPETRA_VECTOR_H
-
-
-
-
-
-
-
-

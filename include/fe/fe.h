@@ -98,7 +98,7 @@ public:
   explicit
   FE(const FEType& fet);
 
-  typedef typename 
+  typedef typename
     FEGenericBase<typename FEOutputType<T>::type>::OutputShape
     OutputShape;
 

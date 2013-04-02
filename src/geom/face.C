@@ -21,7 +21,3 @@
 
 
 // The Face class does not implement any functions.
-
-
-
-

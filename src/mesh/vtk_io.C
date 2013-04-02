@@ -172,7 +172,7 @@ void VTKIO::nodes_to_vtk()
   vtkSmartPointer<vtkDoubleArray> pcoords = vtkDoubleArray::New();
   pcoords->SetNumberOfComponents(LIBMESH_DIM);
   points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault
- 
+
   unsigned int local_node_counter = 0;
 
   MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
@@ -574,7 +574,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
   // Is this really important?  If so, it should be more than an assert...
   // libmesh_assert(fname.substr(fname.rfind("."), fname.size()) == ".pvtu");
- 
+
   // we only use Unstructured grids
   _vtk_grid = vtkUnstructuredGrid::New();
   vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkXMLPUnstructuredGridWriter::New();
@@ -608,7 +608,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
                 continue; // not a local node
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-	      libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n" 
+	      libmesh_do_once (libMesh::err << "Only writing the real part for complex numbers!\n"
 					    << "if you need this support contact " << LIBMESH_PACKAGE_BUGREPORT
 					    << std::endl);
 	      data->SetValue(_local_node_map[k], soln[k*num_vars + variable].real());
@@ -626,7 +626,7 @@ void VTKIO::write_nodal_data (const std::string& fname,
   writer->SetNumberOfPieces(libMesh::n_processors());
   writer->SetStartPiece(libMesh::processor_id());
   writer->SetEndPiece(libMesh::processor_id());
- 
+
   // partitions overlap by one node
   // FIXME: According to this document
   // http://paraview.org/Wiki/images/5/51/SC07_tut107_ParaView_Handouts.pdf

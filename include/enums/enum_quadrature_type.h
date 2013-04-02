@@ -47,7 +47,3 @@ namespace libMeshEnums {
 using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_QUADRATURE_TYPE_H
-
-
-
-

@@ -97,7 +97,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem* inf_elem,
 
   // Find where the integration points are located on the
   // full element.
-  std::vector<Point> qp; this->inverse_map (inf_elem, this->_fe_map->get_xyz(), 
+  std::vector<Point> qp; this->inverse_map (inf_elem, this->_fe_map->get_xyz(),
 					    qp, tolerance);
 
   // compute the shape function and derivative values
@@ -327,4 +327,3 @@ INSTANTIATE_INF_FE_MBRF(3,CARTESIAN,void,init_face_shape_functions(const std::ve
 } // namespace libMesh
 
 #endif //ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-

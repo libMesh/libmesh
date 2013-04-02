@@ -46,5 +46,3 @@ void QGrid::init_1D(const ElemType,
 }
 
 } // namespace libMesh
-
-

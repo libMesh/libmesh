@@ -79,13 +79,9 @@ namespace libMeshEnums {
    */
   enum FEFieldType {TYPE_SCALAR = 0,
 		    TYPE_VECTOR};
-  
+
 }
 
 using namespace libMeshEnums;
 
 #endif // LIBMESH_ENUM_FE_FAMILY_H
-
-
-
-

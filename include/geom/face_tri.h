@@ -141,5 +141,3 @@ protected:
 } // namespace libMesh
 
 #endif // LIBMESH_FACE_TRI_H
-
-

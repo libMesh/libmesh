@@ -67,8 +67,3 @@ std::string QuadratureRules::name (const QuadratureType q)
 }
 
 } // namespace libMesh
-
-
-
-
-

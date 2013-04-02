@@ -30,7 +30,7 @@
 
 namespace libMesh
 {
-  
+
   //--------------------------------------------------------------------------------
   // MeshfreeInterpolation methods
   void MeshfreeInterpolation::print_info (std::ostream& os) const
@@ -47,11 +47,11 @@ namespace libMesh
 	  os << _names[v] << " ";
 	os << std::endl;
       }
-      
+
   }
 
 
-  
+
   std::ostream& operator << (std::ostream& os, const MeshfreeInterpolation& mfi)
   {
     mfi.print_info(os);
@@ -84,36 +84,36 @@ namespace libMesh
 	  {
 	    libMesh::err << "ERROR:  when adding field data to an existing list the\n"
 			 << "varaible list must be the same!\n";
-	    libmesh_error();	      	      
+	    libmesh_error();
 	  }
 	for (unsigned int v=0; v<_names.size(); v++)
 	  if (_names[v] != field_names[v])
 	    {
 	      libMesh::err << "ERROR:  when adding field data to an existing list the\n"
 			   << "varaible list must be the same!\n";
-	      libmesh_error();	      	      
-	    }	    
+	      libmesh_error();
+	    }
       }
-    
+
     // otherwise copy the names
     else
       _names = field_names;
 
     // append the data
     _src_pts.insert (_src_pts.end(),
-		     pts.begin(), 
+		     pts.begin(),
 		     pts.end());
 
     _src_vals.insert (_src_vals.end(),
 		      vals.begin(),
 		      vals.end());
 
-    libmesh_assert_equal_to (_src_vals.size(), 
+    libmesh_assert_equal_to (_src_vals.size(),
 			     _src_pts.size()*this->n_field_variables());
   }
 
 
-  
+
   void MeshfreeInterpolation::prepare_for_use ()
   {
     switch (_parallelization_strategy)
@@ -137,7 +137,7 @@ namespace libMesh
   void MeshfreeInterpolation::gather_remote_data ()
   {
 #ifndef LIBMESH_HAVE_MPI
-    
+
     // no MPI -- no-op
     return;
 
@@ -149,17 +149,17 @@ namespace libMesh
     START_LOG ("gather_remote_data()", "MeshfreeInterpolation");
 
     std::vector<Real> send_buf, recv_buf;
-    
+
     libmesh_assert_equal_to (_src_vals.size(),
 			     _src_pts.size()*this->n_field_variables());
-    
+
     send_buf.reserve (_src_pts.size()*(3 + this->n_field_variables()));
 
     // Everyone packs their data at the same time
     for (unsigned int p_idx=0, v_idx=0; p_idx<_src_pts.size(); p_idx++)
       {
 	const Point &pt(_src_pts[p_idx]);
-	
+
 	send_buf.push_back(pt(0));
 	send_buf.push_back(pt(1));
 	send_buf.push_back(pt(2));
@@ -168,21 +168,21 @@ namespace libMesh
 	  {
 	    libmesh_assert_less (v_idx, _src_vals.size());
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-	    send_buf.push_back (_src_vals[v_idx].real()); 
-	    send_buf.push_back (_src_vals[v_idx].imag()); 
+	    send_buf.push_back (_src_vals[v_idx].real());
+	    send_buf.push_back (_src_vals[v_idx].imag());
 	    v_idx++;
-	    
+
 #else
-	    send_buf.push_back (_src_vals[v_idx++]); 
+	    send_buf.push_back (_src_vals[v_idx++]);
 #endif
   	  }
       }
 
-    // Send our data to everyone else.  Note that MPI-1 said you could not 
-    // use the same buffer in nonblocking sends, but that restriction has 
+    // Send our data to everyone else.  Note that MPI-1 said you could not
+    // use the same buffer in nonblocking sends, but that restriction has
     // recently been removed.
     std::vector<Parallel::Request> send_request(libMesh::n_processors()-1);
-    
+
     // Use a tag for best practices.  In debug mode parallel_only() blocks above
     // so we can be sure there is no other shenanigarry going on, but in optimized
     // mode there is no such guarantee - other prcoessors could be somewhere else
@@ -192,7 +192,7 @@ namespace libMesh
     for (unsigned int proc=0, cnt=0; proc<libMesh::n_processors(); proc++)
       if (proc != libMesh::processor_id())
 	CommWorld.send (proc, send_buf, send_request[cnt++], tag);
-	  
+
     // All data has been sent.  Receive remote data in any order
     for (processor_id_type comm_step=0; comm_step<(libMesh::n_processors()-1); comm_step++)
       {
@@ -210,7 +210,7 @@ namespace libMesh
 	    pt(2) = *it, ++it;
 
 	    _src_pts.push_back(pt);
-	    
+
 	    for (unsigned int var=0; var<this->n_field_variables(); var++)
 	      {
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
@@ -249,9 +249,9 @@ namespace libMesh
       _kd_tree.reset (new kd_tree_t (KDDim,
 				     _point_list_adaptor,
 				     nanoflann::KDTreeSingleIndexAdaptorParams(10 /* max leaf */)));
-    
+
     libmesh_assert (_kd_tree.get() != NULL);
-    
+
     _kd_tree->buildIndex();
 
     STOP_LOG ("construct_kd_tree()", "InverseDistanceInterpolation<>");
@@ -268,7 +268,7 @@ namespace libMesh
     if (_kd_tree.get())
       _kd_tree.reset (NULL);
 #endif
-    
+
     // Call  base class clear method
     MeshfreeInterpolation::clear();
   }
@@ -298,18 +298,18 @@ namespace libMesh
       {
 	libMesh::err << "ERROR:  when adding field data to an existing list the\n"
 		     << "varaible list must be the same!\n";
-	libmesh_error();	      	      
+	libmesh_error();
       }
     for (unsigned int v=0; v<_names.size(); v++)
       if (_names[v] != field_names[v])
 	{
 	  libMesh::err << "ERROR:  when adding field data to an existing list the\n"
 		       << "varaible list must be the same!\n";
-	  libmesh_error();	      	      
-	}	    
-    
+	  libmesh_error();
+	}
+
     tgt_vals.resize (tgt_pts.size()*this->n_field_variables());
-    
+
     std::vector<Number>::iterator out_it = tgt_vals.begin();
 
 #ifdef LIBMESH_HAVE_NANOFLANN
@@ -319,7 +319,7 @@ namespace libMesh
       std::vector<size_t> ret_index(num_results);
       std::vector<Real>   ret_dist_sqr(num_results);
 
-      for (std::vector<Point>::const_iterator tgt_it=tgt_pts.begin(); 
+      for (std::vector<Point>::const_iterator tgt_it=tgt_pts.begin();
 	   tgt_it != tgt_pts.end(); ++tgt_it)
 	{
 	  const Point &tgt(*tgt_it);
@@ -331,18 +331,18 @@ namespace libMesh
 
 	  // std::cout << "knnSearch(): num_results=" << num_results << "\n";
 	  // for (size_t i=0;i<num_results;i++)
-	  //   std::cout << "idx[" << i << "]=" 
-	  // 	      << std::setw(6) << ret_index[i] 
-	  // 	      << "\t dist["<< i << "]=" << ret_dist_sqr[i] 
+	  //   std::cout << "idx[" << i << "]="
+	  // 	      << std::setw(6) << ret_index[i]
+	  // 	      << "\t dist["<< i << "]=" << ret_dist_sqr[i]
 	  // 	      << "\t val[" << std::setw(6) << ret_index[i] << "]=" << _src_vals[ret_index[i]]
 	  // 	      << std::endl;
 	  // std::cout << "\n";
 
 	  // std::cout << "ival=" << _vals[0] << '\n';
 	}
-    }    
+    }
 #else
-    
+
     libMesh::err << "ERROR:  This functionality requires the library to be configured\n"
 		 << "with nanoflann KD-Tree approximate nearest neighbor support!\n"
 		 << std::endl;
@@ -372,7 +372,7 @@ namespace libMesh
 	    if (*it < min_dist) libmesh_error();
 	    min_dist = *it;
 	  }
-      }    
+      }
 #endif
 
 
@@ -382,7 +382,7 @@ namespace libMesh
     // Compute the interpolation weights & interpolated value
     const unsigned int n_fv = this->n_field_variables();
     _vals.resize(n_fv); /**/ std::fill (_vals.begin(), _vals.end(), Number(0.));
-    
+
     Real tot_weight = 0.;
 
     std::vector<Real>::const_iterator src_dist_sqr_it=src_dist_sqr.begin();
@@ -393,7 +393,7 @@ namespace libMesh
 	   (src_idx_it      != src_indices.end()))
       {
 	libmesh_assert_greater_equal (*src_dist_sqr_it, 0.);
-	
+
 	const Real
 	  dist_sq = std::max(*src_dist_sqr_it, std::numeric_limits<Real>::epsilon()),
 	  weight = 1./std::pow(dist_sq, _half_power);
@@ -415,15 +415,15 @@ namespace libMesh
 
     // don't forget normalizing term & set the output buffer!
     for (unsigned int v=0; v<n_fv; v++, ++out_it)
-      {	
+      {
 	_vals[v] /= tot_weight;
-	
+
 	*out_it = _vals[v];
-      }	
+      }
   }
 
 
-  
+
 // ------------------------------------------------------------
 // Explicit Instantiations
   template class InverseDistanceInterpolation<1>;
@@ -431,4 +431,3 @@ namespace libMesh
   template class InverseDistanceInterpolation<3>;
 
 } // namespace libMesh
-

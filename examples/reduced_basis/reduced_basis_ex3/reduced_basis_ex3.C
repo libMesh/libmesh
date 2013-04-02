@@ -6,12 +6,12 @@
 /* modify it under the terms of the GNU Lesser General Public */
 /* License as published by the Free Software Foundation; either */
 /* version 2.1 of the License, or (at your option) any later version. */
-  
+
 /* rbOOmit is distributed in the hope that it will be useful, */
 /* but WITHOUT ANY WARRANTY; without even the implied warranty of */
 /* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU */
 /* Lesser General Public License for more details. */
-  
+
 /* You should have received a copy of the GNU Lesser General Public */
 /* License along with this library; if not, write to the Free Software */
 /* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
@@ -89,7 +89,7 @@ int main (int argc, char** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  
+
   // We override RBConstruction with SimpleRBConstruction in order to
   // specialize a few functions for this particular problem.
   SimpleRBConstruction & rb_con =
@@ -129,10 +129,10 @@ int main (int argc, char** argv)
     // "truth" solves, at well-chosen parameter values and employing
     // these snapshots as basis functions.
     rb_con.train_reduced_basis();
-    
+
     // Write out the data that will subsequently be required for the Evaluation stage
     rb_con.get_rb_evaluation().write_offline_data_to_files();
-    
+
     // If requested, write out the RB basis functions for visualization purposes
     if(store_basis_functions)
     {
@@ -144,7 +144,7 @@ int main (int argc, char** argv)
   {
     // Read in the reduced basis data
     rb_eval.read_offline_data_from_files();
-    
+
     // Read in online_N and initialize online parameters
     unsigned int online_N = infile("online_N",1);
     Real online_x_vel = infile("online_x_vel", 0.);
@@ -157,7 +157,7 @@ int main (int argc, char** argv)
 
     // Now do the Online solve using the precomputed reduced basis
     Real error_bound_final_time = rb_eval.rb_solve(online_N);
-    
+
     libMesh::out << "Error bound (absolute) at the final time is "
                  << error_bound_final_time << std::endl << std::endl;
 
@@ -165,7 +165,7 @@ int main (int argc, char** argv)
     {
       // Read in the basis functions
       rb_eval.read_in_basis_functions(rb_con);
-      
+
       // Plot the solution at the final time level
       rb_con.pull_temporal_discretization_data( rb_eval );
       rb_con.set_time_step(rb_con.get_n_time_steps());
@@ -173,7 +173,7 @@ int main (int argc, char** argv)
 #ifdef LIBMESH_HAVE_EXODUS_API
       ExodusII_IO(mesh).write_equation_systems ("RB_sol.e",equation_systems);
 #endif
-      
+
       // Plot the first basis function that was generated from the train_reduced_basis
       // call in the Offline stage
       rb_con.load_basis_function(0);
@@ -187,4 +187,3 @@ int main (int argc, char** argv)
 
 #endif // LIBMESH_HAVE_SLEPC
 }
-

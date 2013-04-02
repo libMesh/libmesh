@@ -52,7 +52,7 @@ FEMParameters::FEMParameters() :
       steadystate_tolerance(0.),
       timesolver_norm(0,L2),
 
-      dimension(2), 
+      dimension(2),
       domaintype("square"), domainfile("mesh.xda"), elementtype("quad"),
       elementorder(2),
       domain_xmin(0.0), domain_ymin(0.0), domain_zmin(0.0),
@@ -63,7 +63,7 @@ FEMParameters::FEMParameters() :
       nelem_target(8000), global_tolerance(0.0),
       refine_fraction(0.3), coarsen_fraction(0.3), coarsen_threshold(10),
       max_adaptivesteps(1),
-      initial_adaptivesteps(0), 
+      initial_adaptivesteps(0),
 
       write_interval(10),
       write_gmv_error(false), write_tecplot_error(false),
@@ -270,9 +270,9 @@ void FEMParameters::read(GetPot &input)
 
     if (n_periodic_bcs)
       {
-        if (domaintype != "square" && 
-            domaintype != "cylinder" && 
-            domaintype != "file" && 
+        if (domaintype != "square" &&
+            domaintype != "cylinder" &&
+            domaintype != "file" &&
             domaintype != "od2")
           {
             libMesh::out << "Periodic boundaries need rectilinear domains" << std::endl;;
@@ -346,7 +346,7 @@ void FEMParameters::read(GetPot &input)
                      << " Dirichlet condition types does not match "
                      << input.vector_variable_size("dirichlet_condition_values")
                      << " Dirichlet condition values." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -357,7 +357,7 @@ void FEMParameters::read(GetPot &input)
                      << " Dirichlet condition types does not match "
                      << input.vector_variable_size("dirichlet_condition_boundaries")
                      << " Dirichlet condition boundaries." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -368,7 +368,7 @@ void FEMParameters::read(GetPot &input)
                      << " Dirichlet condition types does not match "
                      << input.vector_variable_size("dirichlet_condition_variables")
                      << " Dirichlet condition variables sets." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -395,7 +395,7 @@ void FEMParameters::read(GetPot &input)
               dirichlet_condition_variables[func_boundary].push_back(j);
             else if (variable_set[j] != '0')
               {
-                libMesh::out << "Unable to understand Dirichlet variable set" 
+                libMesh::out << "Unable to understand Dirichlet variable set"
                              << variable_set << std::endl;
                 libmesh_error();
               }
@@ -417,7 +417,7 @@ void FEMParameters::read(GetPot &input)
                      << " Neumann condition types does not match "
                      << input.vector_variable_size("neumann_condition_values")
                      << " Neumann condition values." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -428,7 +428,7 @@ void FEMParameters::read(GetPot &input)
                      << " Neumann condition types does not match "
                      << input.vector_variable_size("neumann_condition_boundaries")
                      << " Neumann condition boundaries." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -439,7 +439,7 @@ void FEMParameters::read(GetPot &input)
                      << " Neumann condition types does not match "
                      << input.vector_variable_size("neumann_condition_variables")
                      << " Neumann condition variables sets." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -466,7 +466,7 @@ void FEMParameters::read(GetPot &input)
               neumann_condition_variables[func_boundary].push_back(j);
             else if (variable_set[j] != '0')
               {
-                libMesh::out << "Unable to understand Neumann variable set" 
+                libMesh::out << "Unable to understand Neumann variable set"
                              << variable_set << std::endl;
                 libmesh_error();
               }
@@ -487,7 +487,7 @@ void FEMParameters::read(GetPot &input)
                      << " initial condition types does not match "
                      << input.vector_variable_size("initial_condition_values")
                      << " initial condition values." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -498,7 +498,7 @@ void FEMParameters::read(GetPot &input)
                      << " initial condition types does not match "
                      << input.vector_variable_size("initial_condition_subdomains")
                      << " initial condition subdomains." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -532,7 +532,7 @@ void FEMParameters::read(GetPot &input)
                      << " other interior function types does not match "
                      << input.vector_variable_size("other_interior_function_values")
                      << " other interior function values." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -543,7 +543,7 @@ void FEMParameters::read(GetPot &input)
                      << " other interior function types does not match "
                      << input.vector_variable_size("other_interior_function_subdomains")
                      << " other interior function subdomains." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -554,7 +554,7 @@ void FEMParameters::read(GetPot &input)
                      << " other interior function types does not match "
                      << input.vector_variable_size("other_interior_function_ids")
                      << " other interior function ids." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -591,7 +591,7 @@ void FEMParameters::read(GetPot &input)
                      << " other boundary function types does not match "
                      << input.vector_variable_size("other_boundary_function_values")
                      << " other boundary function values." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -602,7 +602,7 @@ void FEMParameters::read(GetPot &input)
                      << " other boundary function types does not match "
                      << input.vector_variable_size("other_boundary_function_boundaries")
                      << " other boundary function boundaries." << std::endl;
-        
+
         libmesh_error();
       }
 
@@ -613,7 +613,7 @@ void FEMParameters::read(GetPot &input)
                      << " other boundary function types does not match "
                      << input.vector_variable_size("other_boundary_function_ids")
                      << " other boundary function ids." << std::endl;
-        
+
         libmesh_error();
       }
 

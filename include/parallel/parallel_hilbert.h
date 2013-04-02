@@ -64,4 +64,3 @@ namespace Parallel {
 #endif // LIBMESH_HAVE_LIBHILBERT && LIBMESH_HAVE_MPI
 
 #endif // LIBMESH_PARALLEL_HILBERT_H
-

@@ -50,7 +50,7 @@ public:
     }
 
   virtual AutoPtr<FunctionBase<Output> > clone() const {
-    return AutoPtr<FunctionBase<Output> > 
+    return AutoPtr<FunctionBase<Output> >
       (new ConstFunction<Output>(_c));
   }
 

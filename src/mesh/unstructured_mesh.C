@@ -1128,6 +1128,3 @@ bool UnstructuredMesh::contract ()
 #endif // #ifdef LIBMESH_ENABLE_AMR
 
 } // namespace libMesh
-
-
-

@@ -90,7 +90,7 @@ Number exact_solution(const Point& p,
                       const std::string&,  // sys_name, not needed
                       const std::string&); // unk_name, not needed);
 
-// Prototype for calculation of the gradient of the exact solution.  
+// Prototype for calculation of the gradient of the exact solution.
 Gradient exact_derivative(const Point& p,
                           const Parameters&,   // EquationSystems parameters, not needed
                           const std::string&,  // sys_name, not needed
@@ -136,10 +136,10 @@ int main(int argc, char** argv)
   dim = input_file("dimension", 2);
   const std::string indicator_type = input_file("indicator_type", "kelly");
   singularity = input_file("singularity", true);
-  
+
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
-  
+
   // Output file for plotting the error as a function of
   // the number of degrees of freedom.
   std::string approx_name = "";
@@ -161,14 +161,14 @@ int main(int argc, char** argv)
     output_file += "_adaptive.m";
   else
     output_file += "_uniform.m";
-  
+
   std::ofstream out (output_file.c_str());
   out << "% dofs     L2-error     H1-error" << std::endl;
   out << "e = [" << std::endl;
-  
+
   // Create a mesh.
   Mesh mesh;
-  
+
   // Read in the mesh
   if (dim == 1)
     MeshTools::Generation::build_line(mesh,1,-1.,0.);
@@ -200,8 +200,8 @@ int main(int argc, char** argv)
   // Creates a system named "Laplace"
   LinearImplicitSystem& system =
     equation_systems.add_system<LinearImplicitSystem> ("Laplace");
-  
-  // Adds the variable "u" to "Laplace", using 
+
+  // Adds the variable "u" to "Laplace", using
   // the finite element type and order specified
   // in the config file
   system.add_variable("u", static_cast<Order>(approx_order),
@@ -221,7 +221,7 @@ int main(int argc, char** argv)
   // Linear solver tolerance.
   equation_systems.parameters.set<Real>("linear solver tolerance") =
     std::pow(TOLERANCE, 2.5);
-  
+
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
@@ -237,7 +237,7 @@ int main(int argc, char** argv)
   for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
     {
       std::cout << "Beginning Solve " << r_step << std::endl;
-      
+
       // Solve the system "Laplace", just like example 2.
       system.solve();
 
@@ -250,7 +250,7 @@ int main(int argc, char** argv)
                 << ", final residual: "
                 << system.final_linear_residual()
                 << std::endl;
-      
+
 #ifdef LIBMESH_HAVE_EXODUS_API
       // After solving the system write the solution
       // to a ExodusII-formatted plot file.
@@ -290,7 +290,7 @@ int main(int argc, char** argv)
               // The \p ErrorVector is a particular \p StatisticsVector
               // for computing error information on a finite element mesh.
               ErrorVector error;
-              
+
               if (indicator_type == "exact")
                 {
                   // The \p ErrorEstimator class interrogates a
@@ -339,7 +339,7 @@ int main(int argc, char** argv)
                 {
                   libmesh_assert_equal_to (indicator_type, "kelly");
 
-                  // The Kelly error estimator is based on 
+                  // The Kelly error estimator is based on
                   // an error bound for the Poisson problem
                   // on linear elements, but is useful for
                   // driving adaptive refinement in many problems
@@ -357,7 +357,7 @@ int main(int argc, char** argv)
 	      std::string error_output = "error_"+ss.str()+".gmv";
 #endif
               error.plot_error( error_output, mesh );
- 
+
               // This takes the error in \p error and decides which elements
               // will be coarsened or refined.  Any element within 20% of the
               // maximum error on any element will be refined, and any
@@ -375,14 +375,14 @@ int main(int argc, char** argv)
               // flag elements for both h and p
               if (refine_type == "matchedhp")
                 mesh_refinement.add_p_to_h_refinement();
-              // If we are doing hp refinement, we 
+              // If we are doing hp refinement, we
               // try switching some elements from h to p
               if (refine_type == "hp")
                 {
                   HPCoarsenTest hpselector;
                   hpselector.select_refinement(system);
                 }
-              // If we are doing "singular hp" refinement, we 
+              // If we are doing "singular hp" refinement, we
               // try switching most elements from h to p
               if (refine_type == "singularhp")
                 {
@@ -394,7 +394,7 @@ int main(int argc, char** argv)
                   hpselector.singular_points.push_back(Point());
                   hpselector.select_refinement(system);
                 }
-              
+
               // This call actually refines and coarsens the flagged
               // elements.
               mesh_refinement.refine_and_coarsen_elements();
@@ -409,7 +409,7 @@ int main(int argc, char** argv)
                   refine_type == "matchedhp")
                 mesh_refinement.uniformly_p_refine(1);
             }
-        
+
           // This call reinitializes the \p EquationSystems object for
           // the newly refined mesh.  One of the steps in the
           // reinitialization is projecting the \p solution,
@@ -417,8 +417,8 @@ int main(int argc, char** argv)
           // the current one.
           equation_systems.reinit ();
         }
-    }            
-  
+    }
+
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Write out the solution
   // After solving the system write the solution
@@ -442,8 +442,8 @@ int main(int argc, char** argv)
   //     out << "disp('H1-error linear fit');" << std::endl;
   //     out << "polyfit(log10(e(:,1)), log10(e(:,3)), 1)" << std::endl;
 #endif // #ifndef LIBMESH_ENABLE_AMR
-  
-  // All done.  
+
+  // All done.
   return 0;
 }
 
@@ -460,7 +460,7 @@ Number exact_solution(const Point& p,
 {
   const Real x = p(0);
   const Real y = (dim > 1) ? p(1) : 0.;
-  
+
   if (singularity)
     {
       // The exact solution to the singular problem,
@@ -473,7 +473,7 @@ Number exact_solution(const Point& p,
 
       // Make the 3D solution similar
       const Real z = (dim > 2) ? p(2) : 0;
-                  
+
       return pow(x*x + y*y, 1./3.)*sin(2./3.*theta) + z;
     }
   else
@@ -500,7 +500,7 @@ Gradient exact_derivative(const Point& p,
 {
   // Gradient value to be returned.
   Gradient gradu;
-  
+
   // x and y coordinates in space
   const Real x = p(0);
   const Real y = dim > 1 ? p(1) : 0.;
@@ -513,14 +513,14 @@ Gradient exact_derivative(const Point& p,
       // For convenience...
       const Real tt = 2./3.;
       const Real ot = 1./3.;
-  
+
       // The value of the radius, squared
       const Real r2 = x*x + y*y;
 
       // The boundary value, given by the exact solution,
       // u_exact = r^(2/3)*sin(2*theta/3).
       Real theta = atan2(y,x);
-  
+
       // Make sure 0 <= theta <= 2*pi
       if (theta < 0)
         theta += 2. * libMesh::pi;
@@ -573,7 +573,7 @@ void assemble_laplace(EquationSystems& es,
   // logging, since there may be many PerfLogs in an
   // application.
   PerfLog perf_log ("Matrix Assembly",false);
-  
+
     // Get a constant reference to the mesh object.
   const MeshBase& mesh = es.get_mesh();
 
@@ -582,7 +582,7 @@ void assemble_laplace(EquationSystems& es,
 
   // Get a reference to the LinearImplicitSystem we are solving
   LinearImplicitSystem& system = es.get_system<LinearImplicitSystem>("Laplace");
-  
+
   // A reference to the \p DofMap object for this system.  The \p DofMap
   // object handles the index translation from node and element numbers
   // to degree of freedom numbers.  We will talk more about the \p DofMap
@@ -599,7 +599,7 @@ void assemble_laplace(EquationSystems& es,
   // of as a pointer that will clean up after itself.
   AutoPtr<FEBase> fe      (FEBase::build(mesh_dim, fe_type));
   AutoPtr<FEBase> fe_face (FEBase::build(mesh_dim, fe_type));
-  
+
   // Quadrature rules for numerical integration.
   AutoPtr<QBase> qrule(fe_type.default_quadrature_rule(mesh_dim));
   AutoPtr<QBase> qface(fe_type.default_quadrature_rule(mesh_dim-1));
@@ -611,7 +611,7 @@ void assemble_laplace(EquationSystems& es,
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
   // We begin with the element Jacobian * quadrature weight at each
-  // integration point.   
+  // integration point.
   const std::vector<Real>& JxW      = fe->get_JxW();
   const std::vector<Real>& JxW_face = fe_face->get_JxW();
 
@@ -655,14 +655,14 @@ void assemble_laplace(EquationSystems& es,
   // active elements while ignoring parent elements which have been
   // refined.
   MeshBase::const_element_iterator       el     = mesh.active_local_elements_begin();
-  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end(); 
-  
+  const MeshBase::const_element_iterator end_el = mesh.active_local_elements_end();
+
   for ( ; el != end_el; ++el)
     {
       // Start logging the shape function initialization.
       // This is done through a simple function call with
       // the name of the event to log.
-      perf_log.push("elem init");      
+      perf_log.push("elem init");
 
       // Store a pointer to the element we are currently
       // working on.  This allows for nicer syntax later.
@@ -694,7 +694,7 @@ void assemble_laplace(EquationSystems& es,
       // Stop logging the shape function initialization.
       // If you forget to stop logging an event the PerfLog
       // object will probably catch the error and abort.
-      perf_log.pop("elem init");      
+      perf_log.pop("elem init");
 
       // Now we will build the element matrix.  This involves
       // a double loop to integrate the test funcions (i) against
@@ -738,7 +738,7 @@ void assemble_laplace(EquationSystems& es,
         // Start logging the boundary condition computation
         perf_log.push ("BCs");
 
-        // The penalty value.  
+        // The penalty value.
         const Real penalty = 1.e10;
 
         // The following loops over the sides of the element.
@@ -748,7 +748,7 @@ void assemble_laplace(EquationSystems& es,
           if (elem->neighbor(s) == NULL)
             {
               fe_face->reinit(elem,s);
-              
+
               for (unsigned int qp=0; qp<qface->n_points(); qp++)
                 {
                   const Number value = exact_solution (qface_points[qp],
@@ -765,12 +765,12 @@ void assemble_laplace(EquationSystems& es,
                     for (unsigned int j=0; j<psi.size(); j++)
                       Ke(i,j) += penalty*JxW_face[qp]*psi[i][qp]*psi[j][qp];
                 }
-            } 
-        
+            }
+
         // Stop logging the boundary condition computation
         perf_log.pop ("BCs");
-      } 
-      
+      }
+
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
