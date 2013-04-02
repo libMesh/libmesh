@@ -83,6 +83,11 @@ class QComposite : public QSubCell
  private:
 
   /**
+   *
+   */
+  void add_subelem_values (const std::vector<Elem const*> &subelem);
+
+  /**
    * Subcell quadrature object.
    */
   QSubCell _q_subcell;

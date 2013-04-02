@@ -18,6 +18,8 @@
 
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_trap.h"
+#include "libmesh/quadrature_simpson.h"
 #include "libmesh/quadrature_composite.h"
 #include "libmesh/elem.h"
 
@@ -84,30 +86,18 @@ void QComposite<QSubCell>::init (const Elem &elem,
   libmesh_assert (reference_elem != NULL);
 
   _elem_cutter(*reference_elem, vertex_distance_func);
+  //_elem_cutter(elem, vertex_distance_func);
 
   // clear our state & accumulate points from subelements
   _points.clear();
   _weights.clear();
-
-  const std::vector<Real>  &subelem_weights = _lagrange_fe->get_JxW();
-  const std::vector<Point> &subelem_points  = _lagrange_fe->get_xyz();
 
   // inside subelem
   {
     const std::vector<Elem const*> &inside_elem (_elem_cutter.inside_elements());
     std::cout << inside_elem.size() << " elements inside\n";
 
-    for (std::vector<Elem const*>::const_iterator it = inside_elem.begin();
-	 it!=inside_elem.end(); ++it)
-      {
-	_lagrange_fe->reinit(*it);
-
-	_weights.insert(_weights.end(),
-			subelem_weights.begin(), subelem_weights.end());
-
-	_points.insert(_points.end(),
-		       subelem_points.begin(), subelem_points.end());
-      }
+    this->add_subelem_values(inside_elem);
   }
 
   // outside subelem
@@ -115,17 +105,7 @@ void QComposite<QSubCell>::init (const Elem &elem,
     const std::vector<Elem const*> &outside_elem (_elem_cutter.outside_elements());
     std::cout << outside_elem.size() << " elements outside\n";
 
-    for (std::vector<Elem const*>::const_iterator it = outside_elem.begin();
-	 it!=outside_elem.end(); ++it)
-      {
-	_lagrange_fe->reinit(*it);
-
-	_weights.insert(_weights.end(),
-			subelem_weights.begin(), subelem_weights.end());
-
-	_points.insert(_points.end(),
-		       subelem_points.begin(), subelem_points.end());
-      }
+    this->add_subelem_values(outside_elem);
   }
 
   this->print_info();
@@ -133,8 +113,47 @@ void QComposite<QSubCell>::init (const Elem &elem,
 
 
 
+template <class QSubCell>
+void QComposite<QSubCell>::add_subelem_values (const std::vector<Elem const*> &subelem)
+
+{
+  const std::vector<Real>  &subelem_weights = _lagrange_fe->get_JxW();
+  const std::vector<Point> &subelem_points  = _lagrange_fe->get_xyz();
+
+  for (std::vector<Elem const*>::const_iterator it = subelem.begin();
+       it!=subelem.end(); ++it)
+    {
+      // tetgen seems to create 0-volume cells on occasion, but we *should*
+      // be catching that appropriately now inside the ElemCutter class.
+      // Just in case trap here, describe the error, and abort.
+      try
+	{
+	  _lagrange_fe->reinit(*it);
+	  _weights.insert(_weights.end(),
+			  subelem_weights.begin(), subelem_weights.end());
+
+	  _points.insert(_points.end(),
+			 subelem_points.begin(), subelem_points.end());
+	}
+      catch (...)
+	{
+	  libMesh::err << "ERROR: found a bad cut cell!\n";
+	  libmesh_here();
+
+	  for (unsigned int n=0; n<(*it)->n_nodes(); n++)
+	    libMesh::err << (*it)->point(n) << std::endl;
+
+	  libmesh_error();
+	}
+    }
+}
+
+
+
 //--------------------------------------------------------------
 // Explicit instantiations
 template class QComposite<QGauss>;
+template class QComposite<QTrap>;
+template class QComposite<QSimpson>;
 
 } // namespace libMesh
