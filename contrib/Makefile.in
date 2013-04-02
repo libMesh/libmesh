@@ -87,12 +87,12 @@ target_triplet = @target@
 @LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V509_TRUE@am__append_30 = exodusii/v5.09/libdevel.la
 @LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V509_TRUE@am__append_31 = exodusii/v5.09/libprof.la
 @LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V509_TRUE@am__append_32 = exodusii/v5.09/liboprof.la
-@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_33 = exodusii/v5.22/exodus/cbind
-@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_34 = exodusii/v5.22/exodus/cbind/libopt.la
-@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_35 = exodusii/v5.22/exodus/cbind/libdbg.la
-@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_36 = exodusii/v5.22/exodus/cbind/libdevel.la
-@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_37 = exodusii/v5.22/exodus/cbind/libprof.la
-@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_38 = exodusii/v5.22/exodus/cbind/liboprof.la
+@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_33 = exodusii/v5.22/exodus
+@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_34 = exodusii/v5.22/exodus/libopt.la
+@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_35 = exodusii/v5.22/exodus/libdbg.la
+@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_36 = exodusii/v5.22/exodus/libdevel.la
+@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_37 = exodusii/v5.22/exodus/libprof.la
+@LIBMESH_ENABLE_EXODUS_TRUE@@LIBMESH_ENABLE_EXODUS_V522_TRUE@am__append_38 = exodusii/v5.22/exodus/liboprof.la
 @LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_39 = nemesis/v3.09
 @LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_40 = nemesis/v3.09/libopt.la 
 @LIBMESH_ENABLE_NEMESIS_TRUE@@LIBMESH_ENABLE_NEMESIS_V309_TRUE@am__append_41 = nemesis/v3.09/libdbg.la 
@@ -339,10 +339,10 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = boost/include eigen/eigen gmv gzstream netcdf/v3 \
-	netcdf/v4 exodusii/v5.09 exodusii/v5.22/exodus/cbind \
-	nemesis/v3.09 nemesis/v5.22/nemesis tecplot/tecio \
-	tecplot/binary triangle tetgen libHilbert laspack metis \
-	parmetis sfcurves fparser nanoflann
+	netcdf/v4 exodusii/v5.09 exodusii/v5.22/exodus nemesis/v3.09 \
+	nemesis/v5.22/nemesis tecplot/tecio tecplot/binary triangle \
+	tetgen libHilbert laspack metis parmetis sfcurves fparser \
+	nanoflann
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
   dir0=`pwd`; \
