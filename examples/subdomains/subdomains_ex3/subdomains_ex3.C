@@ -95,10 +95,10 @@ int main (int argc, char** argv)
   // This class handles all the details of mesh refinement and coarsening.
   MeshRefinement mesh_refinement (mesh);
 
-  // Uniformly refine the mesh 5 times.  This is the
+  // Uniformly refine the mesh 4 times.  This is the
   // first time we use the mesh refinement capabilities
   // of the library.
-  mesh_refinement.uniformly_refine (3);
+  mesh_refinement.uniformly_refine (4);
 
   // Print information about the mesh to the screen.
   mesh.print_info();
