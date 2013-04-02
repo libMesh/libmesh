@@ -518,7 +518,7 @@ SUBDIRS = \
 	vector_fe/vector_fe_ex2 \
 	vector_fe/vector_fe_ex3
 
-AUTOMAKE_OPTIONS = subdir-objects 
+AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_optional_INCLUDES) \
 	-I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)

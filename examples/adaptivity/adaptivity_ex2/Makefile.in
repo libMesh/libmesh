@@ -1205,7 +1205,7 @@ uninstall-am: uninstall-dataDATA
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-dataDATA
 
-exact_solution.C: $(top_srcdir)/examples/transient/transient_ex1/exact_solution.C 
+exact_solution.C: $(top_srcdir)/examples/transient/transient_ex1/exact_solution.C
 	$(AM_V_GEN)$(LN_S) $< $@
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f mesh.xda && $(LN_S) $(srcdir)/mesh.xda .

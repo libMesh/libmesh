@@ -1199,7 +1199,7 @@ uninstall-am: uninstall-dataDATA
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-dataDATA
 
-exact_solution.C: $(top_srcdir)/examples/introduction/introduction_ex3/exact_solution.C 
+exact_solution.C: $(top_srcdir)/examples/introduction/introduction_ex3/exact_solution.C
 	$(AM_V_GEN)$(LN_S) $< $@
 
 # Convenience method: 'make run'

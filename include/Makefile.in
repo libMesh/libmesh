@@ -474,7 +474,7 @@ SUBDIRS = libmesh
 
 # special handholding for prefix_config.m4 generated files
 # so that 'make clean ; make' works as does 'make distcheck'
-# libmesh_config.h is made by ./configure, so it should get 
+# libmesh_config.h is made by ./configure, so it should get
 # cleaned by 'make distclean'
 DISTCLEANFILES = libmesh_config.h
 
