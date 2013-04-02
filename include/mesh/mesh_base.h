@@ -97,7 +97,7 @@ public:
    * used by this mesh.
    */
   const Parallel::Communicator & communicator () const { return _communicator; }
-        
+
   /**
    * This class holds the boundary information.  It can store nodes, edges,
    * and faces with a corresponding id that facilitates setting boundary
@@ -841,7 +841,7 @@ protected:
    * The \p Parallel::Communicator object used by the mesh.
    */
   const Parallel::Communicator &_communicator;
-  
+
   /**
    * The number of partitions the mesh has.  This is set by
    * the partitioners, and may not be changed directly by
