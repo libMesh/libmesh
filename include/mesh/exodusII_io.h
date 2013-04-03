@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 
@@ -49,7 +50,8 @@ class System;
 // ------------------------------------------------------------
 // ExodusII_IO class definition
 class ExodusII_IO : public MeshInput<MeshBase>,
-		    public MeshOutput<MeshBase>
+		    public MeshOutput<MeshBase>,
+		    public ParallelObject
 {
 
  public:

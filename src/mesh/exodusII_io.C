@@ -44,8 +44,9 @@ namespace libMesh
 ExodusII_IO::ExodusII_IO (MeshBase& mesh) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase> (mesh),
+  ParallelObject(mesh),
 #ifdef LIBMESH_HAVE_EXODUS_API
-  exio_helper(new ExodusII_IO_Helper),
+  exio_helper(new ExodusII_IO_Helper(*this)),
 #endif
   _timestep(1),
   _verbose (false)
@@ -100,7 +101,7 @@ void ExodusII_IO::read (const std::string& fname)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-//  libmesh_assert_equal_to (libMesh::processor_id(), 0);
+//  libmesh_assert_equal_to (this->processor_id(), 0);
 
 #ifndef LIBMESH_HAVE_EXODUS_API
 
@@ -467,7 +468,7 @@ void ExodusII_IO::write_nodal_data_discontinuous (const std::string& fname,
       exio_helper->initialize_nodal_variables(names);
     }
 
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     for (int c=0; c<num_vars; c++)
       {
         //Copy out this variable's solution
