@@ -23,6 +23,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/reference_counter.h"
 #include "libmesh/libmesh_singleton.h"
+#include "lbmesh/remote_elem.h"
 #include "libmesh/threads.h"
 
 
@@ -345,6 +346,13 @@ void _init (int argc, const char* const* argv,
   // Construct singletons who may be at risk of the
   // "static initialization order fiasco"
   Singleton::setup();
+  if (remote_elem == NULL)
+    {
+      libmesh_here();
+      libMesh::err << "WARNING: Singleton::setup() failed to properly create\n"
+		   << "         a remote_elem singleton!!\n";
+      RemoteElem::create();
+    }
 
 #if defined(LIBMESH_HAVE_MPI)
 
