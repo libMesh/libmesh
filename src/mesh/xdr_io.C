@@ -119,6 +119,7 @@ const std::size_t XdrIO::io_blksize = 128000;
 XdrIO::XdrIO (MeshBase& mesh, const bool binary_in) :
   MeshInput<MeshBase> (mesh,/* is_parallel_format = */ true),
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
+  ParallelObject      (mesh),
   _binary             (binary_in),
   _legacy             (false),
   _write_serial       (false),
@@ -135,6 +136,7 @@ XdrIO::XdrIO (MeshBase& mesh, const bool binary_in) :
 
 XdrIO::XdrIO (const MeshBase& mesh, const bool binary_in) :
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
+  ParallelObject      (mesh),
   _binary (binary_in)
 {
 }
@@ -160,7 +162,7 @@ void XdrIO::write (const std::string& name)
       return;
     }
 
-  Xdr io ((libMesh::processor_id() == 0) ? name : "", this->binary() ? ENCODE : WRITE);
+  Xdr io ((this->processor_id() == 0) ? name : "", this->binary() ? ENCODE : WRITE);
 
   START_LOG("write()","XdrIO");
 
@@ -202,7 +204,7 @@ void XdrIO::write (const std::string& name)
     this->polynomial_level_file_name() = ".";
 
   // write the header
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       std::string full_ver = this->version() + (write_parallel_files ?  " parallel" : "");
       io.data (full_ver);
@@ -251,7 +253,7 @@ void XdrIO::write (const std::string& name)
   // followed immediately by a read.  The write must be
   // guaranteed to complete first.
   io.close();
-  CommWorld.barrier();
+  this->communicator().barrier();
 }
 
 
@@ -288,7 +290,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 
       n_local_elem_at_level[level] = n_global_elem_at_level[level] = MeshTools::n_elem(it, end);
 
-      CommWorld.sum(n_global_elem_at_level[level]);
+      this->communicator().sum(n_global_elem_at_level[level]);
 #ifndef NDEBUG
       tot_n_elem += n_global_elem_at_level[level];
 #endif
@@ -298,10 +300,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 
   std::vector<dof_id_type>
     xfer_conn, recv_conn, output_buffer,
-    n_elem_on_proc(libMesh::n_processors()),
-    processor_offsets(libMesh::n_processors());
+    n_elem_on_proc(this->n_processors()),
+    processor_offsets(this->n_processors());
   std::vector<std::size_t>
-    xfer_buf_sizes(libMesh::n_processors());
+    xfer_buf_sizes(this->n_processors());
 
   typedef std::map<dof_id_type, std::pair<processor_id_type, dof_id_type> > id_map_type;
   id_map_type parent_id_map, child_id_map;
@@ -315,22 +317,22 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
   for (; it != end; ++it)
     {
       pack_element (xfer_conn, *it);
-      parent_id_map[(*it)->id()] = std::make_pair(libMesh::processor_id(),
+      parent_id_map[(*it)->id()] = std::make_pair(this->processor_id(),
 						  my_next_elem++);
     }
   xfer_conn.push_back(my_next_elem); // toss in the number of elements transferred.
 
   std::size_t my_size = xfer_conn.size();
-  CommWorld.gather (0, my_next_elem, n_elem_on_proc);
-  CommWorld.gather (0, my_size,      xfer_buf_sizes);
+  this->communicator().gather (0, my_next_elem, n_elem_on_proc);
+  this->communicator().gather (0, my_size,      xfer_buf_sizes);
 
   processor_offsets[0] = 0;
-  for (unsigned int pid=1; pid<libMesh::n_processors(); pid++)
+  for (unsigned int pid=1; pid<this->n_processors(); pid++)
     processor_offsets[pid] = processor_offsets[pid-1] + n_elem_on_proc[pid-1];
 
   // All processors send their xfer buffers to processor 0.
   // Processor 0 will receive the data and write out the elements.
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       // Write the number of elements at this level.
       {
@@ -346,13 +348,13 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	io.data (n_global_elem_at_level[0], comment.c_str());
       }
 
-      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+      for (unsigned int pid=0; pid<this->n_processors(); pid++)
 	{
 	  recv_conn.resize(xfer_buf_sizes[pid]);
           if (pid == 0)
 	    recv_conn = xfer_conn;
           else
-	    CommWorld.receive (pid, recv_conn);
+	    this->communicator().receive (pid, recv_conn);
 
 	  // at a minimum, the buffer should contain the number of elements,
 	  // which could be 0.
@@ -388,7 +390,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	}
     }
   else
-    CommWorld.send (0, xfer_conn);
+    this->communicator().send (0, xfer_conn);
 
 #ifdef LIBMESH_ENABLE_AMR
   //--------------------------------------------------------------------
@@ -427,10 +429,10 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	  }
       xfer_conn.push_back(my_n_elem_written_at_level);
       my_size = xfer_conn.size();
-      CommWorld.gather (0, my_size,   xfer_buf_sizes);
+      this->communicator().gather (0, my_size,   xfer_buf_sizes);
 
       // Processor 0 will receive the data and write the elements.
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
 	{
 	  // Write the number of elements at this level.
 	  {
@@ -449,13 +451,13 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	    io.data (n_global_elem_at_level[level], comment.c_str());
 	  }
 
-	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	  for (unsigned int pid=0; pid<this->n_processors(); pid++)
 	    {
 	      recv_conn.resize(xfer_buf_sizes[pid]);
               if (pid == 0)
 	        recv_conn = xfer_conn;
               else
-	        CommWorld.receive (pid, recv_conn);
+	        this->communicator().receive (pid, recv_conn);
 
 	      // at a minimum, the buffer should contain the number of elements,
 	      // which could be 0.
@@ -495,19 +497,19 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	    }
 	}
       else
-        CommWorld.send  (0, xfer_conn);
+        this->communicator().send  (0, xfer_conn);
 
       // update the processor_offsets
       processor_offsets[0] = processor_offsets.back() + n_elem_on_proc.back();
-      CommWorld.gather (0, my_n_elem_written_at_level, n_elem_on_proc);
-      for (unsigned int pid=1; pid<libMesh::n_processors(); pid++)
+      this->communicator().gather (0, my_n_elem_written_at_level, n_elem_on_proc);
+      for (unsigned int pid=1; pid<this->n_processors(); pid++)
 	processor_offsets[pid] = processor_offsets[pid-1] + n_elem_on_proc[pid-1];
 
       // Now, at the next level we will again iterate over local parents.  However,
       // those parents may have been written by other processors (at this step),
       // so we need to gather them into our *_id_maps.
       {
-	std::vector<std::vector<dof_id_type> > requested_ids(libMesh::n_processors());
+	std::vector<std::vector<dof_id_type> > requested_ids(this->n_processors());
 	std::vector<dof_id_type> request_to_fill;
 
 	it  = mesh.local_level_elements_begin(level);
@@ -516,22 +518,22 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 	for (; it!=end; ++it)
 	  if (!child_id_map.count((*it)->id()))
 	    {
-	      libmesh_assert_not_equal_to ((*it)->parent()->processor_id(), libMesh::processor_id());
+	      libmesh_assert_not_equal_to ((*it)->parent()->processor_id(), this->processor_id());
 	      requested_ids[(*it)->parent()->processor_id()].push_back((*it)->id());
 	    }
 
 	// Next set the child_ids
-	for (unsigned int p=1; p != libMesh::n_processors(); ++p)
+	for (unsigned int p=1; p != this->n_processors(); ++p)
 	  {
 	    // Trade my requests with processor procup and procdown
-	    unsigned int procup = (libMesh::processor_id() + p) %
-                                   libMesh::n_processors();
-	    unsigned int procdown = (libMesh::n_processors() +
-                                     libMesh::processor_id() - p) %
-	                             libMesh::n_processors();
+	    unsigned int procup = (this->processor_id() + p) %
+                                   this->n_processors();
+	    unsigned int procdown = (this->n_processors() +
+                                     this->processor_id() - p) %
+	                             this->n_processors();
 
-	    CommWorld.send_receive(procup, requested_ids[procup],
-				   procdown, request_to_fill);
+	    this->communicator().send_receive(procup, requested_ids[procup],
+					      procdown, request_to_fill);
 
 	    // Fill those requests by overwriting the requested ids
 	    for (std::size_t i=0; i<request_to_fill.size(); i++)
@@ -544,8 +546,8 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
 
 	    // Trade back the results
 	    std::vector<dof_id_type> filled_request;
-	    CommWorld.send_receive(procdown, request_to_fill,
-				   procup, filled_request);
+	    this->communicator().send_receive(procdown, request_to_fill,
+					      procup, filled_request);
 
 	    libmesh_assert_equal_to (filled_request.size(), requested_ids[procup].size());
 
@@ -560,7 +562,7 @@ void XdrIO::write_serialized_connectivity (Xdr &io, const dof_id_type libmesh_db
       }
     }
 #endif // LIBMESH_ENABLE_AMR
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     libmesh_assert_equal_to (next_global_elem, n_elem);
 
 }
@@ -576,8 +578,8 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
   std::vector<dof_id_type> xfer_ids;
   std::vector<Real>         xfer_coords, &coords=xfer_coords;
 
-  std::vector<std::vector<dof_id_type> > recv_ids   (libMesh::n_processors());;
-  std::vector<std::vector<Real> >         recv_coords(libMesh::n_processors());
+  std::vector<std::vector<dof_id_type> > recv_ids   (this->n_processors());;
+  std::vector<std::vector<Real> >         recv_coords(this->n_processors());
 
   std::size_t n_written=0;
 
@@ -615,12 +617,12 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
       const std::size_t my_ids_size = xfer_ids.size();
 
       // explicitly gather ids_size
-      CommWorld.gather (0, my_ids_size, ids_size);
+      this->communicator().gather (0, my_ids_size, ids_size);
 
       // infer coords_size on processor 0
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
 	{
-	  coords_size.reserve(libMesh::n_processors());
+	  coords_size.reserve(this->n_processors());
 	  for (std::size_t p=0; p<ids_size.size(); p++)
 	    coords_size.push_back(LIBMESH_DIM*ids_size[p]);
 	}
@@ -628,17 +630,17 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
       // We will have lots of simultaneous receives if we are
       // processor 0, so let's use nonblocking receives.
       std::vector<Parallel::Request>
-        id_request_handles(libMesh::n_processors()-1),
-        coord_request_handles(libMesh::n_processors()-1);
+        id_request_handles(this->n_processors()-1),
+        coord_request_handles(this->n_processors()-1);
 
       Parallel::MessageTag
         id_tag    = Parallel::Communicator_World.get_unique_tag(1234),
         coord_tag = Parallel::Communicator_World.get_unique_tag(1235);
 
       // Post the receives -- do this on processor 0 only.
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
         {
-          for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+          for (unsigned int pid=0; pid<this->n_processors(); pid++)
             {
               recv_ids[pid].resize(ids_size[pid]);
               recv_coords[pid].resize(coords_size[pid]);
@@ -650,25 +652,25 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
                 }
               else
                 {
-	          CommWorld.receive (pid, recv_ids[pid],
-				     id_request_handles[pid-1],
-                                     id_tag);
-	          CommWorld.receive (pid, recv_coords[pid],
-				     coord_request_handles[pid-1],
-                                     coord_tag);
+	          this->communicator().receive (pid, recv_ids[pid],
+						id_request_handles[pid-1],
+						id_tag);
+	          this->communicator().receive (pid, recv_coords[pid],
+						coord_request_handles[pid-1],
+						coord_tag);
                 }
             }
         }
       else
         {
           // Send -- do this on all other processors.
-          CommWorld.send(0, xfer_ids,    id_tag);
-          CommWorld.send(0, xfer_coords, coord_tag);
+          this->communicator().send(0, xfer_ids,    id_tag);
+          this->communicator().send(0, xfer_coords, coord_tag);
         }
 
       // -------------------------------------------------------
       // Receive the messages and write the output on processor 0.
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
         {
           // Wait for all the receives to complete. We have no
           // need for the statuses since we already know the
@@ -678,7 +680,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
 
           // Write the coordinates in this block.
 	  std::size_t tot_id_size=0, tot_coord_size=0;
-	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	  for (unsigned int pid=0; pid<this->n_processors(); pid++)
 	    {
 	      tot_id_size    += recv_ids[pid].size();
 	      tot_coord_size += recv_coords[pid].size();
@@ -689,7 +691,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
 	  libmesh_assert_equal_to (tot_coord_size, LIBMESH_DIM*tot_id_size);
 
 	  coords.resize (3*tot_id_size);
-	  for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	  for (unsigned int pid=0; pid<this->n_processors(); pid++)
 	    for (std::size_t idx=0; idx<recv_ids[pid].size(); idx++)
 	      {
 		const std::size_t local_idx = recv_ids[pid][idx] - first_node;
@@ -714,7 +716,7 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
 	  io.data_stream (coords.empty() ? NULL : &coords[0], coords.size(), 3);
 	}
     }
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     libmesh_assert_equal_to (n_written, n_nodes);
 }
 
@@ -733,12 +735,12 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
   const BoundaryInfo &boundary_info = *mesh.boundary_info;
 
   std::size_t n_bcs_out = n_bcs;
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     io.data (n_bcs_out, "# number of boundary conditions");
   n_bcs_out = 0;
 
   std::vector<dof_id_type> xfer_bcs, recv_bcs;
-  std::vector<std::size_t> bc_sizes(libMesh::n_processors());;
+  std::vector<std::size_t> bc_sizes(this->n_processors());;
 
   // Boundary conditions are only specified for level-0 elements
   MeshBase::const_element_iterator
@@ -771,20 +773,20 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
 
   xfer_bcs.push_back(n_local_level_0_elem);
   std::size_t my_size = xfer_bcs.size();
-  CommWorld.gather (0, my_size, bc_sizes);
+  this->communicator().gather (0, my_size, bc_sizes);
 
   // All processors send their xfer buffers to processor 0
   // Processor 0 will receive all buffers and write out the bcs
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       dof_id_type elem_offset = 0;
-      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+      for (unsigned int pid=0; pid<this->n_processors(); pid++)
 	{
 	  recv_bcs.resize(bc_sizes[pid]);
           if (pid == 0)
 	    recv_bcs = xfer_bcs;
           else
-	    CommWorld.receive (pid, recv_bcs);
+	    this->communicator().receive (pid, recv_bcs);
 
 	  const dof_id_type my_n_local_level_0_elem
 	    = recv_bcs.back(); recv_bcs.pop_back();
@@ -798,7 +800,7 @@ void XdrIO::write_serialized_bcs (Xdr &io, const std::size_t n_bcs) const
       libmesh_assert_equal_to (n_bcs, n_bcs_out);
     }
   else
-    CommWorld.send (0, xfer_bcs);
+    this->communicator().send (0, xfer_bcs);
 }
 
 
@@ -808,15 +810,15 @@ void XdrIO::read (const std::string& name)
   // Only open the file on processor 0 -- this is especially important because
   // there may be an underlying bzip/bunzip going on, and multiple simultaneous
   // calls will produce a race condition.
-  Xdr io (libMesh::processor_id() == 0 ? name : "", this->binary() ? DECODE : READ);
+  Xdr io (this->processor_id() == 0 ? name : "", this->binary() ? DECODE : READ);
 
   // convenient reference to our mesh
   MeshBase &mesh = MeshInput<MeshBase>::mesh();
 
   // get the version string.
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     io.data (this->version());
-  CommWorld.broadcast (this->version());
+  this->communicator().broadcast (this->version());
 
   // note that for "legacy" files the first entry is an
   // integer -- not a string at all.
@@ -833,7 +835,7 @@ void XdrIO::read (const std::string& name)
   START_LOG("read()","XdrIO");
 
   unsigned int n_elem, n_nodes;
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       io.data (n_elem);
       io.data (n_nodes);
@@ -844,12 +846,12 @@ void XdrIO::read (const std::string& name)
     }
 
   //TODO:[BSK] a little extra effort here could change this to two broadcasts...
-  CommWorld.broadcast (n_elem);
-  CommWorld.broadcast (n_nodes);
-  CommWorld.broadcast (this->boundary_condition_file_name());
-  CommWorld.broadcast (this->subdomain_map_file_name());
-  CommWorld.broadcast (this->partition_map_file_name());
-  CommWorld.broadcast (this->polynomial_level_file_name());
+  this->communicator().broadcast (n_elem);
+  this->communicator().broadcast (n_nodes);
+  this->communicator().broadcast (this->boundary_condition_file_name());
+  this->communicator().broadcast (this->subdomain_map_file_name());
+  this->communicator().broadcast (this->partition_map_file_name());
+  this->communicator().broadcast (this->polynomial_level_file_name());
 
   // Tell the mesh how many nodes/elements to expect. Depending on the mesh type,
   // this may allow for efficient adding of nodes/elements.
@@ -903,7 +905,7 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
 
       conn.clear();
 
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
 	for (dof_id_type e=first_elem; e<last_elem; e++, n_processed_at_level++)
 	  {
 	    if (n_processed_at_level == n_elem_at_level)
@@ -950,9 +952,9 @@ void XdrIO::read_serialized_connectivity (Xdr &io, const dof_id_type n_elem)
 	  }
 
       std::size_t conn_size = conn.size();
-      CommWorld.broadcast(conn_size);
+      this->communicator().broadcast(conn_size);
       conn.resize (conn_size);
-      CommWorld.broadcast (conn);
+      this->communicator().broadcast (conn);
 
       // All processors now have the connectivity for this block.
       std::vector<dof_id_type>::const_iterator it = conn.begin();
@@ -1062,13 +1064,13 @@ void XdrIO::read_serialized_nodes (Xdr &io, const dof_id_type n_nodes)
 
       coords.resize(3*(last_node - first_node));
 
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
 	io.data_stream (coords.empty() ? NULL : &coords[0], coords.size());
 
       // For large numbers of processors the majority of processors at any given
       // block may not actually need these data.  It may be worth profiling this,
       // although it is expected that disk IO will be the bottleneck
-      CommWorld.broadcast (coords);
+      this->communicator().broadcast (coords);
 
       for (std::size_t n=first_node, idx=0; n<last_node; n++, idx+=3)
 	{
@@ -1108,9 +1110,9 @@ void XdrIO::read_serialized_bcs (Xdr &io)
   std::vector<int> input_buffer;
 
   std::size_t n_bcs=0;
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     io.data (n_bcs);
-  CommWorld.broadcast (n_bcs);
+  this->communicator().broadcast (n_bcs);
 
   for (std::size_t blk=0, first_bc=0, last_bc=0; last_bc<n_bcs; blk++)
     {
@@ -1119,10 +1121,10 @@ void XdrIO::read_serialized_bcs (Xdr &io)
 
       input_buffer.resize (3*(last_bc - first_bc));
 
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
 	io.data_stream (input_buffer.empty() ? NULL : &input_buffer[0], input_buffer.size());
 
-      CommWorld.broadcast (input_buffer);
+      this->communicator().broadcast (input_buffer);
       elem_bc_data.clear(); /**/ elem_bc_data.reserve (input_buffer.size()/3);
 
       // convert the input_buffer to ElemBCData to facilitate searching
