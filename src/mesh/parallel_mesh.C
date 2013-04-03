@@ -35,10 +35,10 @@ ParallelMesh::ParallelMesh (unsigned int d,
 			    const Parallel::Communicator &comm) :
   UnstructuredMesh (d,comm), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
-  _next_free_local_node_id(libMesh::processor_id()),
-  _next_free_local_elem_id(libMesh::processor_id()),
-  _next_free_unpartitioned_node_id(libMesh::n_processors()),
-  _next_free_unpartitioned_elem_id(libMesh::n_processors())
+  _next_free_local_node_id(_communicator.rank()),
+  _next_free_local_elem_id(_communicator.rank()),
+  _next_free_unpartitioned_node_id(_communicator.size()),
+  _next_free_unpartitioned_elem_id(_communicator.size())
 {
   // FIXME: give parmetis the communicator!
   _partitioner = AutoPtr<Partitioner>(new ParmetisPartitioner());
@@ -57,10 +57,10 @@ ParallelMesh::~ParallelMesh ()
 ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
-  _next_free_local_node_id(libMesh::processor_id()),
-  _next_free_local_elem_id(libMesh::processor_id()),
-  _next_free_unpartitioned_node_id(libMesh::n_processors()),
-  _next_free_unpartitioned_elem_id(libMesh::n_processors())
+  _next_free_local_node_id(_communicator.rank()),
+  _next_free_local_elem_id(_communicator.rank()),
+  _next_free_unpartitioned_node_id(_communicator.size()),
+  _next_free_unpartitioned_elem_id(_communicator.size())
 {
   this->copy_nodes_and_elements(other_mesh);
   _n_nodes = other_mesh.n_nodes();
@@ -89,10 +89,10 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
 ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
-  _next_free_local_node_id(libMesh::processor_id()),
-  _next_free_local_elem_id(libMesh::processor_id()),
-  _next_free_unpartitioned_node_id(libMesh::n_processors()),
-  _next_free_unpartitioned_elem_id(libMesh::n_processors())
+  _next_free_local_node_id(_communicator.rank()),
+  _next_free_local_elem_id(_communicator.rank()),
+  _next_free_unpartitioned_node_id(_communicator.size()),
+  _next_free_unpartitioned_elem_id(_communicator.size())
 {
   this->copy_nodes_and_elements(other_mesh);
   *this->boundary_info = *other_mesh.boundary_info;
@@ -117,21 +117,21 @@ void ParallelMesh::update_parallel_id_counts()
 
   if (_next_free_unpartitioned_elem_id < _max_elem_id)
     _next_free_unpartitioned_elem_id =
-      ((_max_elem_id-1) / (libMesh::n_processors() + 1) + 1) *
-        (libMesh::n_processors() + 1) + libMesh::n_processors();
+      ((_max_elem_id-1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->n_processors();
   if (_next_free_local_elem_id < _max_elem_id)
     _next_free_local_elem_id =
-      ((_max_elem_id + libMesh::n_processors() - 1) / (libMesh::n_processors() + 1) + 1) *
-        (libMesh::n_processors() + 1) + libMesh::processor_id();
+      ((_max_elem_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
 
   if (_next_free_unpartitioned_node_id < _max_node_id)
     _next_free_unpartitioned_node_id =
-      ((_max_node_id-1) / (libMesh::n_processors() + 1) + 1) *
-        (libMesh::n_processors() + 1) + libMesh::n_processors();
+      ((_max_node_id-1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->n_processors();
   if (_next_free_local_node_id < _max_node_id)
     _next_free_local_node_id =
-      ((_max_node_id + libMesh::n_processors() - 1) / (libMesh::n_processors() + 1) + 1) *
-        (libMesh::n_processors() + 1) + libMesh::processor_id();
+      ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+        (this->n_processors() + 1) + this->processor_id();
 }
 
 
@@ -353,7 +353,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
       // Use the unpartitioned ids for unpartitioned elems,
       // in serial, and temporarily for ghost elems
       dof_id_type *next_id = &_next_free_unpartitioned_elem_id;
-      if (elem_procid == libMesh::processor_id() &&
+      if (elem_procid == this->processor_id() &&
           !this->is_serial())
         next_id = &_next_free_local_elem_id;
       e->set_id (*next_id);
@@ -368,12 +368,12 @@ Elem* ParallelMesh::add_elem (Elem *e)
 
       if (_next_free_unpartitioned_elem_id < _max_elem_id)
         _next_free_unpartitioned_elem_id =
-          ((_max_elem_id-1) / (libMesh::n_processors() + 1) + 1) *
-            (libMesh::n_processors() + 1) + libMesh::n_processors();
+          ((_max_elem_id-1) / (this->n_processors() + 1) + 1) *
+            (this->n_processors() + 1) + this->n_processors();
       if (_next_free_local_elem_id < _max_elem_id)
         _next_free_local_elem_id =
-          ((_max_elem_id + libMesh::n_processors() - 1) / (libMesh::n_processors() + 1) + 1) *
-            (libMesh::n_processors() + 1) + libMesh::processor_id();
+          ((_max_elem_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+            (this->n_processors() + 1) + this->processor_id();
 
 #ifndef NDEBUG
       // We need a const mapvector so we don't inadvertently create
@@ -390,7 +390,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
   _elements[e->id()] = e;
 
   // Try to make the cached elem data more accurate
-  if (elem_procid == libMesh::processor_id() ||
+  if (elem_procid == this->processor_id() ||
       elem_procid == DofObject::invalid_processor_id)
     _n_elem++;
 
@@ -509,7 +509,7 @@ Node* ParallelMesh::add_node (Node *n)
       // Use the unpartitioned ids for unpartitioned nodes,
       // in serial, and temporarily for ghost nodes
       dof_id_type *next_id = &_next_free_unpartitioned_node_id;
-      if (node_procid == libMesh::processor_id() &&
+      if (node_procid == this->processor_id() &&
           !this->is_serial())
         next_id = &_next_free_local_node_id;
       n->set_id (*next_id);
@@ -524,12 +524,12 @@ Node* ParallelMesh::add_node (Node *n)
 
       if (_next_free_unpartitioned_node_id < _max_node_id)
         _next_free_unpartitioned_node_id =
-          ((_max_node_id-1) / (libMesh::n_processors() + 1) + 1) *
-            (libMesh::n_processors() + 1) + libMesh::n_processors();
+          ((_max_node_id-1) / (this->n_processors() + 1) + 1) *
+            (this->n_processors() + 1) + this->n_processors();
       if (_next_free_local_node_id < _max_node_id)
         _next_free_local_node_id =
-          ((_max_node_id + libMesh::n_processors() - 1) / (libMesh::n_processors() + 1) + 1) *
-            (libMesh::n_processors() + 1) + libMesh::processor_id();
+          ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+            (this->n_processors() + 1) + this->processor_id();
 
 #ifndef NDEBUG
       // We need a const mapvector so we don't inadvertently create
@@ -546,7 +546,7 @@ Node* ParallelMesh::add_node (Node *n)
   _nodes[n->id()] = n;
 
   // Try to make the cached node data more accurate
-  if (node_procid == libMesh::processor_id() ||
+  if (node_procid == this->processor_id() ||
       node_procid == DofObject::invalid_processor_id)
     _n_nodes++;
 
@@ -676,10 +676,10 @@ void ParallelMesh::clear ()
   _n_elem = 0;
   _max_node_id = 0;
   _max_elem_id = 0;
-  _next_free_local_node_id = libMesh::processor_id();
-  _next_free_local_elem_id = libMesh::processor_id();
-  _next_free_unpartitioned_node_id = libMesh::n_processors();
-  _next_free_unpartitioned_elem_id = libMesh::n_processors();
+  _next_free_local_node_id = this->processor_id();
+  _next_free_local_elem_id = this->processor_id();
+  _next_free_unpartitioned_node_id = this->n_processors();
+  _next_free_unpartitioned_elem_id = this->n_processors();
 }
 
 
@@ -754,18 +754,18 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
       libmesh_assert (!obj || procid == min_procid);
 
       // Either:
-      // 1.) I own this elem (min_procid == libMesh::processor_id()) *and* I have a valid pointer to it (obj != NULL)
+      // 1.) I own this elem (min_procid == this->processor_id()) *and* I have a valid pointer to it (obj != NULL)
       // or
-      // 2.) I don't own this elem (min_procid != libMesh::processor_id()).  (In this case I may or may not have a valid pointer to it.)
+      // 2.) I don't own this elem (min_procid != this->processor_id()).  (In this case I may or may not have a valid pointer to it.)
 
       // Original assert logic
-      // libmesh_assert (min_procid != libMesh::processor_id() || obj);
+      // libmesh_assert (min_procid != this->processor_id() || obj);
 
       // More human-understandable logic...
       libmesh_assert (
-		      ((min_procid == libMesh::processor_id()) && obj)
+		      ((min_procid == this->processor_id()) && obj)
 		      ||
-		      (min_procid != libMesh::processor_id())
+		      (min_procid != this->processor_id())
 		       );
     }
 }
@@ -829,7 +829,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
   dof_id_type unpartitioned_objects = 0;
 
   std::vector<dof_id_type>
-    ghost_objects_from_proc(libMesh::n_processors(), 0);
+    ghost_objects_from_proc(this->n_processors(), 0);
 
   object_iterator it  = objects.begin();
   object_iterator end = objects.end();
@@ -853,25 +853,25 @@ dof_id_type ParallelMesh::renumber_dof_objects
         }
     }
 
-  std::vector<dof_id_type> objects_on_proc(libMesh::n_processors(), 0);
-  CommWorld.allgather(ghost_objects_from_proc[libMesh::processor_id()],
+  std::vector<dof_id_type> objects_on_proc(this->n_processors(), 0);
+  CommWorld.allgather(ghost_objects_from_proc[this->processor_id()],
                       objects_on_proc);
 
 #ifndef NDEBUG
   libmesh_assert(CommWorld.verify(unpartitioned_objects));
-  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=0; p != this->n_processors(); ++p)
     libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
 #endif
 
   // We'll renumber objects in blocks by processor id
-  std::vector<dof_id_type> first_object_on_proc(libMesh::n_processors());
-  for (processor_id_type i=1; i != libMesh::n_processors(); ++i)
+  std::vector<dof_id_type> first_object_on_proc(this->n_processors());
+  for (processor_id_type i=1; i != this->n_processors(); ++i)
     first_object_on_proc[i] = first_object_on_proc[i-1] +
                               objects_on_proc[i-1];
-  dof_id_type next_id = first_object_on_proc[libMesh::processor_id()];
+  dof_id_type next_id = first_object_on_proc[this->processor_id()];
   dof_id_type first_free_id =
-    first_object_on_proc[libMesh::n_processors()-1] +
-    objects_on_proc[libMesh::n_processors()-1] +
+    first_object_on_proc[this->n_processors()-1] +
+    objects_on_proc[this->n_processors()-1] +
     unpartitioned_objects;
 
   // First set new local object ids and build request sets
@@ -879,35 +879,35 @@ dof_id_type ParallelMesh::renumber_dof_objects
 
   // Request sets to send to each processor
   std::vector<std::vector<dof_id_type> >
-    requested_ids(libMesh::n_processors());
+    requested_ids(this->n_processors());
 
   // We know how many objects live on each processor, so reseve() space for
   // each.
-  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
-    if (p != libMesh::processor_id())
+  for (processor_id_type p=0; p != this->n_processors(); ++p)
+    if (p != this->processor_id())
       requested_ids[p].reserve(ghost_objects_from_proc[p]);
 
   end = objects.end();
   for (it = objects.begin(); it != end; ++it)
     {
       T *obj = *it;
-      if (obj->processor_id() == libMesh::processor_id())
+      if (obj->processor_id() == this->processor_id())
         obj->set_id(next_id++);
       else if (obj->processor_id() != DofObject::invalid_processor_id)
         requested_ids[obj->processor_id()].push_back(obj->id());
     }
 
   // Next set ghost object ids from other processors
-  if (libMesh::n_processors() > 1)
+  if (this->n_processors() > 1)
     {
-      for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
+      for (processor_id_type p=1; p != this->n_processors(); ++p)
         {
           // Trade my requests with processor procup and procdown
-          processor_id_type procup = (libMesh::processor_id() + p) %
-                                      libMesh::n_processors();
-          processor_id_type procdown = (libMesh::n_processors() +
-                                        libMesh::processor_id() - p) %
-                                        libMesh::n_processors();
+          processor_id_type procup = (this->processor_id() + p) %
+                                      this->n_processors();
+          processor_id_type procdown = (this->n_processors() +
+                                        this->processor_id() - p) %
+                                        this->n_processors();
           std::vector<dof_id_type> request_to_fill;
           CommWorld.send_receive(procup, requested_ids[procup],
                                  procdown, request_to_fill);
@@ -918,13 +918,13 @@ dof_id_type ParallelMesh::renumber_dof_objects
             {
               T *obj = objects[request_to_fill[i]];
               libmesh_assert(obj);
-              libmesh_assert_equal_to (obj->processor_id(), libMesh::processor_id());
+              libmesh_assert_equal_to (obj->processor_id(), this->processor_id());
               new_ids[i] = obj->id();
               libmesh_assert_greater_equal (new_ids[i],
-                     first_object_on_proc[libMesh::processor_id()]);
+                     first_object_on_proc[this->processor_id()]);
               libmesh_assert_less (new_ids[i],
-                     first_object_on_proc[libMesh::processor_id()] +
-                     objects_on_proc[libMesh::processor_id()]);
+                     first_object_on_proc[this->processor_id()] +
+                     objects_on_proc[this->processor_id()]);
             }
 
           // Trade back the results
@@ -950,7 +950,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
 
   // Next set unpartitioned object ids
   next_id = 0;
-  for (processor_id_type i=0; i != libMesh::n_processors(); ++i)
+  for (processor_id_type i=0; i != this->n_processors(); ++i)
     next_id += objects_on_proc[i];
   for (it = objects.begin(); it != end; ++it)
     {

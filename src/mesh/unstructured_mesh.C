@@ -412,7 +412,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 	              // And let's double-check that we don't have
 		      // a remote_elem neighboring a local element
                       libmesh_assert_not_equal_to (current_elem->processor_id(),
-				                  libMesh::processor_id());
+				                  this->processor_id());
 #endif // DEBUG
                       neigh = const_cast<RemoteElem*>(remote_elem);
                     }
@@ -424,7 +424,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                     // we don't care about neighbors of subactive element.
                     if ((!neigh->active()) && (!current_elem->subactive()))
                       {
-                        libMesh::err << "On processor " << libMesh::processor_id()
+                        libMesh::err << "On processor " << this->processor_id()
                                       << std::endl;
                         libMesh::err << "Bad element ID = " << current_elem->id()
                           << ", Side " << s << ", Bad neighbor ID = " << neigh->id() << std::endl;
@@ -480,7 +480,7 @@ void UnstructuredMesh::read (const std::string& name,
       name.rfind(".n") + 2 == name.size())
     {
       std::ostringstream full_name;
-      full_name << name << '.' << libMesh::n_processors() << '.' << libMesh::processor_id();
+      full_name << name << '.' << this->n_processors() << '.' << this->processor_id();
 
       std::ifstream in (full_name.str().c_str());
 
@@ -576,7 +576,7 @@ void UnstructuredMesh::read (const std::string& name,
       // Read the file based on extension.  Only processor 0
       // needs to read the mesh.  It will then broadcast it and
       // the other processors will pick it up
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
 	{
           std::ostringstream pid_suffix;
           pid_suffix << '_' << getpid();
@@ -744,7 +744,7 @@ void UnstructuredMesh::write (const std::string& name,
       // Nasty hack for reading/writing zipped files
       std::string new_name = name;
       processor_id_type pid_0 = 0;
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
         pid_0 = getpid();
       CommWorld.broadcast(pid_0);
       std::ostringstream pid_suffix;
@@ -849,7 +849,7 @@ void UnstructuredMesh::write (const std::string& name,
       if (name.size() - name.rfind(".bz2") == 4)
 	{
 	  START_LOG("system(bzip2)", "Mesh");
-	  if (libMesh::processor_id() == 0)
+	  if (this->processor_id() == 0)
 	    {
 	      std::string system_string = "bzip2 -f -c ";
 	      system_string += new_name + " > " + name;
@@ -863,7 +863,7 @@ void UnstructuredMesh::write (const std::string& name,
       if (name.size() - name.rfind(".xz") == 3)
 	{
 	  START_LOG("system(xz)", "Mesh");
-	  if (libMesh::processor_id() == 0)
+	  if (this->processor_id() == 0)
 	    {
 	      std::string system_string = "xz -f -c ";
 	      system_string += new_name + " > " + name;
@@ -946,7 +946,7 @@ void UnstructuredMesh::create_pid_mesh(UnstructuredMesh& pid_mesh,
 		    << ") greater than "
 		    << "the number of processors available for "
 		    << "the calculation. (="
-		    << libMesh::n_processors()
+		    << this->n_processors()
 		    << ")."
 		    << std::endl;
     }

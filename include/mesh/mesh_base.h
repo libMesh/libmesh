@@ -191,7 +191,7 @@ public:
    * Returns the number of nodes on the local processor.
    */
   dof_id_type n_local_nodes () const
-  { return this->n_nodes_on_proc (libMesh::processor_id()); }
+  { return this->n_nodes_on_proc (this->processor_id()); }
 
   /**
    * Returns the number of nodes owned by no processor.
@@ -265,7 +265,7 @@ public:
    * Returns the number of elements on the local processor.
    */
   dof_id_type n_local_elem () const
-  { return this->n_elem_on_proc (libMesh::processor_id()); }
+  { return this->n_elem_on_proc (this->processor_id()); }
 
   /**
    * Returns the number of elements owned by no processor.
@@ -282,7 +282,7 @@ public:
    * Returns the number of active elements on the local processor.
    */
   dof_id_type n_active_local_elem () const
-  { return this->n_active_elem_on_proc (libMesh::processor_id()); }
+  { return this->n_active_elem_on_proc (this->processor_id()); }
 
   /**
    * This function returns the number of elements that will be written
@@ -372,7 +372,7 @@ public:
    * Add a new \p Node at \p Point \p p to the end of the vertex array,
    * with processor_id \p procid.
    * Use DofObject::invalid_processor_id (default) to add a node to all
-   * processors, or libMesh::processor_id() to add a node to the local
+   * processors, or this->processor_id() to add a node to the local
    * processor only.
    * If adding a node locally, passing an \p id other than
    * DofObject::invalid_id will set that specific node id.  Only
@@ -555,13 +555,13 @@ public:
    * current simulation.
    */
   processor_id_type n_processors () const
-  { return libmesh_cast_int<processor_id_type>(libMesh::n_processors()); }
+  { return libmesh_cast_int<processor_id_type>(_communicator.size()); }
 
   /**
    * @returns the subdomain id for this processor.
    */
   processor_id_type processor_id () const
-  { return libmesh_cast_int<processor_id_type>(libMesh::processor_id()); }
+  { return libmesh_cast_int<processor_id_type>(_communicator.rank()); }
 
   /**
    * @returns a string containing relevant information
@@ -847,7 +847,7 @@ protected:
    * the partitioners, and may not be changed directly by
    * the user.
    * **NOTE** The number of partitions *need not* equal
-   * libMesh::n_processors(), consider for example the case
+   * this->n_processors(), consider for example the case
    * where you simply want to partition a mesh on one
    * processor and view the result in GMV.
    */
