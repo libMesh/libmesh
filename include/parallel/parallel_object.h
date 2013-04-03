@@ -79,14 +79,13 @@ namespace libMesh
     { return _communicator; }
 
     /**
-     * @returns the number of processors used in the
-     * current simulation.
+     * @returns the number of processors in the group.
      */
     processor_id_type n_processors () const
     { return libmesh_cast_int<processor_id_type>(_communicator.size()); }
 
     /**
-     * @returns the subdomain id for this processor.
+     * @returns the rank of this processor in the group.
      */
     processor_id_type processor_id () const
     { return libmesh_cast_int<processor_id_type>(_communicator.rank()); }
