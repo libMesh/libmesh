@@ -219,6 +219,8 @@ int                COMM_WORLD = 0;
 
 Parallel::Communicator CommWorld;
 Parallel::Communicator& Parallel::Communicator_World = CommWorld;
+  //Parallel::Communicator CommWorldDefault;
+  //Parallel::Communicator& Parallel::Communicator_World = CommWorldDefault;
 
 
 OStreamProxy out(std::cout);

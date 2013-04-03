@@ -46,7 +46,7 @@ class BoundaryMesh : public Mesh
   /**
    * Constructor. Initializes dimenstion and processor id.
    */
-  BoundaryMesh (unsigned int d);
+  BoundaryMesh (unsigned int d, const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Destructor.

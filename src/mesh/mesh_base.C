@@ -45,8 +45,8 @@ namespace libMesh
 // MeshBase class member functions
 MeshBase::MeshBase (unsigned int d,
 		    const Parallel::Communicator &comm) :
+  ParallelObject (comm),
   boundary_info  (new BoundaryInfo(*this)),
-  _communicator  (comm),
   _n_parts       (1),
   _dim           (d),
   _is_prepared   (false),
@@ -63,8 +63,8 @@ MeshBase::MeshBase (unsigned int d,
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
+  ParallelObject (other_mesh.communicator()),
   boundary_info  (new BoundaryInfo(*this)),
-  _communicator  (other_mesh._communicator),
   _n_parts       (other_mesh._n_parts),
   _dim           (other_mesh._dim),
   _is_prepared   (other_mesh._is_prepared),

@@ -32,7 +32,7 @@
 #include "libmesh/partitioner.h" // AutoPtr needs a real declaration
 #include "libmesh/point_locator_base.h"
 #include "libmesh/variant_filter_iterator.h"
-#include "libmesh/parallel.h"
+#include "libmesh/parallel_object.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>
@@ -66,7 +66,7 @@ class MeshData;
 
 // ------------------------------------------------------------
 // MeshBase class definition
-class MeshBase
+class MeshBase : public ParallelObject
 {
 public:
 
@@ -91,12 +91,6 @@ public:
    * Destructor.
    */
   virtual ~MeshBase ();
-
-  /**
-   * @returns a reference to the \p Parallel::Communicator object
-   * used by this mesh.
-   */
-  const Parallel::Communicator & communicator () const { return _communicator; }
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,
@@ -551,19 +545,6 @@ public:
   { return _n_parts; }
 
   /**
-   * @returns the number of processors used in the
-   * current simulation.
-   */
-  processor_id_type n_processors () const
-  { return libmesh_cast_int<processor_id_type>(_communicator.size()); }
-
-  /**
-   * @returns the subdomain id for this processor.
-   */
-  processor_id_type processor_id () const
-  { return libmesh_cast_int<processor_id_type>(_communicator.rank()); }
-
-  /**
    * @returns a string containing relevant information
    * about the mesh.
    */
@@ -836,11 +817,6 @@ protected:
    */
   unsigned int& set_n_partitions ()
   { return _n_parts; }
-
-  /**
-   * The \p Parallel::Communicator object used by the mesh.
-   */
-  const Parallel::Communicator &_communicator;
 
   /**
    * The number of partitions the mesh has.  This is set by

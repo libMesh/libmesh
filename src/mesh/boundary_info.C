@@ -44,6 +44,7 @@ const boundary_id_type BoundaryInfo::invalid_id = -123;
 //------------------------------------------------------
 // BoundaryInfo functions
 BoundaryInfo::BoundaryInfo(const MeshBase& m) :
+  ParallelObject(m.communicator()),
   _mesh (m)
 {
 }
@@ -168,8 +169,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
 
   // We'll do the same modulus trick that ParallelMesh uses to avoid
   // id conflicts between different processors
-  dof_id_type next_node_id = libMesh::processor_id(),
-              next_elem_id = libMesh::processor_id();
+  dof_id_type next_node_id = this->processor_id(),
+              next_elem_id = this->processor_id();
 
   // We'll pass through the mesh once first to build
   // the maps and count boundary nodes and elements
@@ -228,7 +229,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                 std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
                 libmesh_assert (!side_id_map.count(side_pair));
                 side_id_map[side_pair] = next_elem_id;
-                next_elem_id += libMesh::n_processors() + 1;
+                next_elem_id += this->n_processors() + 1;
 
                 // Use a proxy element for the side to query nodes
                 AutoPtr<Elem> side (elem->build_side(s));
@@ -238,14 +239,14 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                     libmesh_assert(node);
 
                     // In parallel we only know enough to number our own nodes.
-                    if (node->processor_id() != libMesh::processor_id())
+                    if (node->processor_id() != this->processor_id())
                       continue;
 
                     dof_id_type node_id = node->id();
                     if (!node_id_map.count(node_id))
                       {
                         node_id_map[node_id] = next_node_id;
-                        next_node_id += libMesh::n_processors() + 1;
+                        next_node_id += this->n_processors() + 1;
                       }
                   }
               }
@@ -258,8 +259,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
 
   // Finally we'll pass through any unpartitioned elements to add them
   // to the maps and counts.
-  next_node_id = libMesh::n_processors();
-  next_elem_id = libMesh::n_processors();
+  next_node_id = this->n_processors();
+  next_elem_id = this->n_processors();
 
   const MeshBase::const_element_iterator end_unpartitioned_el =
     _mesh.pid_elements_end(DofObject::invalid_processor_id);
@@ -313,7 +314,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                 std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
                 libmesh_assert (!side_id_map.count(side_pair));
                 side_id_map[side_pair] = next_elem_id;
-                next_elem_id += libMesh::n_processors() + 1;
+                next_elem_id += this->n_processors() + 1;
 
                 // Use a proxy element for the side to query nodes
                 AutoPtr<Elem> side (elem->build_side(s));
@@ -325,7 +326,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> &requested_boundary_id
                     if (!node_id_map.count(node_id))
                       {
                         node_id_map[node_id] = next_node_id;
-                        next_node_id += libMesh::n_processors() + 1;
+                        next_node_id += this->n_processors() + 1;
                       }
                   }
               }
@@ -1135,7 +1136,7 @@ std::size_t BoundaryInfo::n_boundary_conds () const
                           boundary_id_type> >::const_iterator pos;
 
   for (pos=_boundary_side_id.begin(); pos != _boundary_side_id.end(); ++pos)
-    if (pos->first->processor_id() == libMesh::processor_id())
+    if (pos->first->processor_id() == this->processor_id())
       nbcs++;
 
   CommWorld.sum (nbcs);
