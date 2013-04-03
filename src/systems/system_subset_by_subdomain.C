@@ -61,6 +61,7 @@ namespace libMesh
 			   const SubdomainSelection& subdomain_selection,
 			   const std::set<unsigned int>* const var_nums):
     SystemSubset(system),
+    ParallelObject(system),
     _var_nums(),
     _dof_ids()
   {
@@ -73,6 +74,7 @@ namespace libMesh
 			   const std::set<subdomain_id_type>& subdomain_ids,
 			   const std::set<unsigned int>* const var_nums):
     SystemSubset(system),
+    ParallelObject(system),
     _var_nums(),
     _dof_ids()
   {
@@ -116,7 +118,7 @@ namespace libMesh
   {
     _dof_ids.clear();
 
-    std::vector<std::vector<dof_id_type> > dof_ids_per_processor(libMesh::n_processors());
+    std::vector<std::vector<dof_id_type> > dof_ids_per_processor(this->n_processors());
 
     const DofMap & dof_map = _system.get_dof_map();
     std::vector<dof_id_type> dof_indices;
@@ -137,7 +139,7 @@ namespace libMesh
 		for(size_t i=0; i<dof_indices.size(); i++)
 		  {
 		    const dof_id_type dof = dof_indices[i];
-		    for(unsigned int proc=0; proc<libMesh::n_processors(); proc++)
+		    for(unsigned int proc=0; proc<this->n_processors(); proc++)
 		      {
 			if((dof>=dof_map.first_dof(proc)) && (dof<dof_map.end_dof(proc)))
 			  {
@@ -150,24 +152,24 @@ namespace libMesh
       }
 
     /* Distribute information among processors.  */
-    std::vector<Parallel::Request> request_per_processor(libMesh::n_processors());
-    for(unsigned int proc=0; proc<libMesh::n_processors(); proc++)
+    std::vector<Parallel::Request> request_per_processor(this->n_processors());
+    for(unsigned int proc=0; proc<this->n_processors(); proc++)
       {
-	if(proc!=libMesh::processor_id())
+	if(proc!=this->processor_id())
 	  {
-	    CommWorld.send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
+	    this->communicator().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
 	  }
       }
-    for(unsigned int proc=0; proc<libMesh::n_processors(); proc++)
+    for(unsigned int proc=0; proc<this->n_processors(); proc++)
       {
 	std::vector<dof_id_type> received_dofs;
-	if(proc==libMesh::processor_id())
+	if(proc==this->processor_id())
 	  {
 	    received_dofs = dof_ids_per_processor[proc];
 	  }
 	else
 	  {
-	    CommWorld.receive(proc,received_dofs);
+	    this->communicator().receive(proc,received_dofs);
 	  }
 	for(unsigned int i=0; i<received_dofs.size(); i++)
 	  {
@@ -182,9 +184,9 @@ namespace libMesh
     std::vector<unsigned int> (_dof_ids.begin(), new_end).swap (_dof_ids);
 
     /* Wait for sends to be complete.  */
-    for(unsigned int proc=0; proc<libMesh::n_processors(); proc++)
+    for(unsigned int proc=0; proc<this->n_processors(); proc++)
       {
-	if(proc!=libMesh::processor_id())
+	if(proc!=this->processor_id())
 	  {
 	    request_per_processor[proc].wait();
 	  }

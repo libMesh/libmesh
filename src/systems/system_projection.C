@@ -374,7 +374,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
   // Copy the SCALAR dofs from old_vector to new_vector
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
-  if(libMesh::processor_id() == (libMesh::n_processors()-1))
+  if(this->processor_id() == (this->n_processors()-1))
   {
     const DofMap& dof_map = this->get_dof_map();
     for (unsigned int var=0; var<this->n_vars(); var++)
@@ -530,7 +530,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
-  if(libMesh::processor_id() == (libMesh::n_processors()-1))
+  if(this->processor_id() == (this->n_processors()-1))
   {
     // We get different scalars as different
     // components from a new-style f functor.
@@ -591,7 +591,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
-  if(libMesh::processor_id() == (libMesh::n_processors()-1))
+  if(this->processor_id() == (this->n_processors()-1))
   {
     // FIXME: Do we want to first check for SCALAR vars before building this? [PB]
     FEMContext context( *this );

@@ -165,9 +165,9 @@ void System::read_header (Xdr& io,
     // 5.)
     // Read the number of variables in the system
     unsigned int nv=0;
-    if (libMesh::processor_id() == 0)
+    if (this->processor_id() == 0)
       io.data (nv);
-    CommWorld.broadcast(nv);
+    this->communicator().broadcast(nv);
 
     _written_var_indices.clear();
     _written_var_indices.resize(nv, 0);
@@ -177,45 +177,45 @@ void System::read_header (Xdr& io,
 	// 6.)
 	// Read the name of the var-th variable
 	std::string var_name;
-	if (libMesh::processor_id() == 0)
+	if (this->processor_id() == 0)
           io.data (var_name);
-	CommWorld.broadcast(var_name);
+	this->communicator().broadcast(var_name);
 
 	// 6.1.)
 	std::set<subdomain_id_type> domains;
 	if (io.version() >= LIBMESH_VERSION_ID(0,7,2))
 	{
 	  std::vector<subdomain_id_type> domain_array;
-	  if (libMesh::processor_id() == 0)
+	  if (this->processor_id() == 0)
             io.data (domain_array);
 	  for (std::vector<subdomain_id_type>::iterator it = domain_array.begin(); it != domain_array.end(); ++it)
 		  domains.insert(*it);
 	}
-	CommWorld.broadcast(domains);
+	this->communicator().broadcast(domains);
 
 	// 7.)
 	// Read the approximation order(s) of the var-th variable
 	int order=0;
-	if (libMesh::processor_id() == 0)
+	if (this->processor_id() == 0)
           io.data (order);
-	CommWorld.broadcast(order);
+	this->communicator().broadcast(order);
 
 
 	// do the same for infinite element radial_order
 	int rad_order=0;
 	if (read_ifem_info)
 	  {
-	    if (libMesh::processor_id() == 0)
+	    if (this->processor_id() == 0)
               io.data(rad_order);
-	    CommWorld.broadcast(rad_order);
+	    this->communicator().broadcast(rad_order);
 	  }
 
 
 	// Read the finite element type of the var-th variable
 	int fam=0;
-	if (libMesh::processor_id() == 0)
+	if (this->processor_id() == 0)
           io.data (fam);
-	CommWorld.broadcast(fam);
+	this->communicator().broadcast(fam);
 	FEType type;
 	type.order  = static_cast<Order>(order);
 	type.family = static_cast<FEFamily>(fam);
@@ -243,12 +243,12 @@ void System::read_header (Xdr& io,
 	int i_map=0;
 	if (read_ifem_info)
 	  {
-	    if (libMesh::processor_id() == 0)
+	    if (this->processor_id() == 0)
               io.data (radial_fam);
-	    CommWorld.broadcast(radial_fam);
-	    if (libMesh::processor_id() == 0)
+	    this->communicator().broadcast(radial_fam);
+	    if (this->processor_id() == 0)
               io.data (i_map);
-	    CommWorld.broadcast(i_map);
+	    this->communicator().broadcast(i_map);
 	  }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -274,9 +274,9 @@ void System::read_header (Xdr& io,
   // 8.)
   // Read the number of additional vectors.
   unsigned int nvecs=0;
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     io.data (nvecs);
-  CommWorld.broadcast(nvecs);
+  this->communicator().broadcast(nvecs);
 
   // If nvecs > 0, this means that write_additional_data
   // was true when this file was written.  We will need to
@@ -289,9 +289,9 @@ void System::read_header (Xdr& io,
       // 9.)
       // Read the name of the vec-th additional vector
       std::string vec_name;
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
         io.data (vec_name);
-      CommWorld.broadcast(vec_name);
+      this->communicator().broadcast(vec_name);
 
       if (read_additional_data)
 	{
@@ -332,9 +332,9 @@ void System::read_legacy_data (Xdr& io,
   // 10.)
   // Read and set the solution vector
   {
-    if (libMesh::processor_id() == 0)
+    if (this->processor_id() == 0)
       io.data (global_vector);
-    CommWorld.broadcast(global_vector);
+    this->communicator().broadcast(global_vector);
 
     // Remember that the stored vector is node-major.
     // We need to put it into whatever application-specific
@@ -416,9 +416,9 @@ void System::read_legacy_data (Xdr& io,
 	  // as the solution vector
 	  std::fill (global_vector.begin(), global_vector.end(), libMesh::zero);
 
-	  if (libMesh::processor_id() == 0)
+	  if (this->processor_id() == 0)
             io.data (global_vector);
-	  CommWorld.broadcast(global_vector);
+	  this->communicator().broadcast(global_vector);
 
 	  // If read_additional_data==true, then we will keep this vector, otherwise
 	  // we are going to throw it away.
@@ -603,7 +603,7 @@ void System::read_parallel_data (Xdr &io,
       const unsigned int var = _written_var_indices[data_var];
       if(this->variable(var).type().family == SCALAR)
         {
-          if (libMesh::processor_id() == (libMesh::n_processors()-1))
+          if (this->processor_id() == (this->n_processors()-1))
             {
               const DofMap& dof_map = this->get_dof_map();
               std::vector<dof_id_type> SCALAR_dofs;
@@ -675,7 +675,7 @@ void System::read_parallel_data (Xdr &io,
               const unsigned int var = _written_var_indices[data_var];
               if(this->variable(var).type().family == SCALAR)
                 {
-                  if (libMesh::processor_id() == (libMesh::n_processors()-1))
+                  if (this->processor_id() == (this->n_processors()-1))
                     {
                       const DofMap& dof_map = this->get_dof_map();
                       std::vector<dof_id_type> SCALAR_dofs;
@@ -735,7 +735,7 @@ void System::read_serialized_data (Xdr& io,
       this->read_serialized_vector<InValType>(io, *this->solution);
 
     // get the comment
-    if (libMesh::processor_id() == 0)
+    if (this->processor_id() == 0)
       io.comment (comment);
   }
 
@@ -752,7 +752,7 @@ void System::read_serialized_data (Xdr& io,
 	    this->read_serialized_vector<InValType>(io, *pos->second);
 
 	  // get the comment
-	  if (libMesh::processor_id() == 0)
+	  if (this->processor_id() == 0)
 	    io.comment (comment);
 
 	}
@@ -853,7 +853,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   // knowing the recv_vals_size[block] for each processor allows
   // us to sum them and find the global size for each block.
   std::vector<std::size_t> tot_vals_size(recv_vals_size);
-  CommWorld.sum (tot_vals_size);
+  this->communicator().sum (tot_vals_size);
 
 
   //------------------------------------------
@@ -899,10 +899,10 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
 
       // nonblocking send the data for this block
-      CommWorld.send (0, ids,  id_requests[blk],  id_tag);
+      this->communicator().send (0, ids,  id_requests[blk],  id_tag);
 
       // Go ahead and post the receive too
-      CommWorld.receive (0, vals, val_requests[blk], val_tag);
+      this->communicator().receive (0, vals, val_requests[blk], val_tag);
 #endif
     }
 
@@ -912,9 +912,9 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   // do not exhaust memory on processor 0.
 
   // give these variables scope outside the block to avoid reallocation
-  std::vector<std::vector<dof_id_type> > recv_ids       (libMesh::n_processors());
-  std::vector<std::vector<Number> >      send_vals      (libMesh::n_processors());
-  std::vector<Parallel::Request>         reply_requests (libMesh::n_processors());
+  std::vector<std::vector<dof_id_type> > recv_ids       (this->n_processors());
+  std::vector<std::vector<Number> >      send_vals      (this->n_processors());
+  std::vector<Parallel::Request>         reply_requests (this->n_processors());
   std::vector<unsigned int>              obj_val_offsets;          // map to traverse entry-wise rather than processor-wise
   std::vector<Number>                    input_vals;               // The input buffer for the current block
   std::vector<InValType>                 input_vals_tmp;               // The input buffer for the current block
@@ -932,7 +932,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       // Processor 0 has a special job.  It needs to gather the requested indices
       // in [first_object,last_object) from all processors, read the data from
       // disk, and reply
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
 	{
 	  // we know the input buffer size for this block and can begin reading it now
 	  input_vals.resize(tot_vals_size[blk]);
@@ -949,19 +949,19 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	  // map into the actual input_vals buffer.  this must get
 	  // 0-initialized because 0-component objects are not actually sent
 	  obj_val_offsets.resize (n_objects_blk); /**/ std::fill (obj_val_offsets.begin(), obj_val_offsets.end(), 0);
-	  recv_vals_size.resize(libMesh::n_processors()); // reuse this to count how many values are going to each processor
+	  recv_vals_size.resize(this->n_processors()); // reuse this to count how many values are going to each processor
 
 	  unsigned int n_vals_blk = 0;
 
 	  // loop over all processors and process their index request
-	  for (unsigned int comm_step=0; comm_step<libMesh::n_processors(); comm_step++)
+	  for (unsigned int comm_step=0; comm_step<this->n_processors(); comm_step++)
 	    {
 #ifdef LIBMESH_HAVE_MPI
 	      // blocking receive indices for this block, imposing no particular order on processor
-	      Parallel::Status id_status (CommWorld.probe (Parallel::any_source, id_tag));
+	      Parallel::Status id_status (this->communicator().probe (Parallel::any_source, id_tag));
 	      std::vector<dof_id_type> &ids (recv_ids[id_status.source()]);
 	      std::size_t &n_vals_proc (recv_vals_size[id_status.source()]);
-	      CommWorld.receive (id_status.source(), ids,  id_tag);
+	      this->communicator().receive (id_status.source(), ids,  id_tag);
 #else
 	      // straight copy without MPI
 	      std::vector<dof_id_type> &ids (recv_ids[0]);
@@ -1007,7 +1007,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	    libmesh_cast_int<dof_id_type>(input_vals.size());
 
 	  // pack data replies for each processor
- 	  for (processor_id_type proc=0; proc<libMesh::n_processors(); proc++)
+ 	  for (processor_id_type proc=0; proc<this->n_processors(); proc++)
 	    {
 	      const std::vector<dof_id_type> &ids (recv_ids[proc]);
 	      std::vector<Number> &vals (send_vals[proc]);
@@ -1035,7 +1035,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 
 #ifdef LIBMESH_HAVE_MPI
 	      // send the relevant values to this processor
-	      CommWorld.send (proc, vals, reply_requests[proc], val_tag);
+	      this->communicator().send (proc, vals, reply_requests[proc], val_tag);
 #else
 	      recv_vals[blk] = vals;
 #endif
@@ -1077,7 +1077,7 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
       }
 
       // processor 0 needs to make sure all replies have been handed off
-      if (libMesh::processor_id () == 0)
+      if (this->processor_id () == 0)
 	Parallel::wait(reply_requests);
     }
 
@@ -1095,28 +1095,28 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
   // Processor 0 will read the block from the buffer stream and send it to the last processor
   const unsigned int n_SCALAR_dofs = this->variable(var).type().order;
   std::vector<Number> input_buffer(n_SCALAR_dofs);
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       io.data_stream(&input_buffer[0], n_SCALAR_dofs);
     }
 
 #ifdef LIBMESH_HAVE_MPI
-  if ( libMesh::n_processors() > 1 )
+  if ( this->n_processors() > 1 )
     {
       const Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(321);
 
       // Post the receive on the last processor
-      if (libMesh::processor_id() == (libMesh::n_processors()-1))
-        CommWorld.receive(0, input_buffer, val_tag);
+      if (this->processor_id() == (this->n_processors()-1))
+        this->communicator().receive(0, input_buffer, val_tag);
 
       // Send the data to processor 0
-      if (libMesh::processor_id() == 0)
-        CommWorld.send(libMesh::n_processors()-1, input_buffer, val_tag);
+      if (this->processor_id() == 0)
+        this->communicator().send(this->n_processors()-1, input_buffer, val_tag);
     }
 #endif
 
   // Finally, set the SCALAR values
-  if (libMesh::processor_id() == (libMesh::n_processors()-1))
+  if (this->processor_id() == (this->n_processors()-1))
     {
       const DofMap& dof_map = this->get_dof_map();
       std::vector<dof_id_type> SCALAR_dofs;
@@ -1141,7 +1141,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
 #ifndef NDEBUG
   // In parallel we better be reading a parallel vector -- if not
   // we will not set all of its components below!!
-  if (libMesh::n_processors() > 1)
+  if (this->n_processors() > 1)
     {
       libmesh_assert (vec.type() == PARALLEL ||
 		      vec.type() == GHOSTED);
@@ -1154,9 +1154,9 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
   unsigned int vector_length=0, n_assigned_vals=0;
 
   // Get the buffer size
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     io.data(vector_length, "# vector length");
-  CommWorld.broadcast(vector_length);
+  this->communicator().broadcast(vector_length);
 
   const unsigned int
     nv  = this->_written_var_indices.size();
@@ -1241,7 +1241,7 @@ numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number
   vec.close();
 
 #ifndef NDEBUG
-  CommWorld.sum (n_assigned_vals);
+  this->communicator().sum (n_assigned_vals);
   libmesh_assert_equal_to (n_assigned_vals, vector_length);
 #endif
 
@@ -1553,7 +1553,7 @@ void System::write_parallel_data (Xdr &io,
   for (unsigned int var=0; var<this->n_vars(); var++)
     if(this->variable(var).type().family == SCALAR)
       {
-        if (libMesh::processor_id() == (libMesh::n_processors()-1))
+        if (this->processor_id() == (this->n_processors()-1))
           {
             const DofMap& dof_map = this->get_dof_map();
             std::vector<dof_id_type> SCALAR_dofs;
@@ -1623,7 +1623,7 @@ void System::write_parallel_data (Xdr &io,
             for (unsigned int var=0; var<this->n_vars(); var++)
               if(this->variable(var).type().family == SCALAR)
                 {
-                  if (libMesh::processor_id() == (libMesh::n_processors()-1))
+                  if (this->processor_id() == (this->n_processors()-1))
                     {
                       const DofMap& dof_map = this->get_dof_map();
                       std::vector<dof_id_type> SCALAR_dofs;
@@ -1696,7 +1696,7 @@ void System::write_serialized_data (Xdr& io,
     this->write_serialized_vector(io, *this->solution);
 
   // set up the comment
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       comment = "# System \"";
       comment += this->name();
@@ -1717,7 +1717,7 @@ void System::write_serialized_data (Xdr& io,
 	    this->write_serialized_vector(io, *pos->second);
 
 	  // set up the comment
-	  if (libMesh::processor_id() == 0)
+	  if (this->processor_id() == 0)
 	    {
 	      comment = "# System \"";
 	      comment += this->name();
@@ -1927,16 +1927,16 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
       Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
 
       // nonblocking send the data for this block
-      CommWorld.send (0, ids,  id_requests[blk],  id_tag);
-      CommWorld.send (0, vals, val_requests[blk], val_tag);
+      this->communicator().send (0, ids,  id_requests[blk],  id_tag);
+      this->communicator().send (0, vals, val_requests[blk], val_tag);
 #endif
     }
 
 
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
-      std::vector<std::vector<dof_id_type> > recv_ids  (libMesh::n_processors());
-      std::vector<std::vector<Number> >      recv_vals (libMesh::n_processors());
+      std::vector<std::vector<dof_id_type> > recv_ids  (this->n_processors());
+      std::vector<std::vector<Number> >      recv_vals (this->n_processors());
       std::vector<unsigned int> obj_val_offsets;          // map to traverse entry-wise rather than processor-wise
       std::vector<Number>       output_vals;              // The output buffer for the current block
 
@@ -1966,13 +1966,13 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	  Parallel::MessageTag val_tag (Parallel::Communicator_World.get_unique_tag(200*num_blks + blk));
 
 	  // receive this block of data from all processors.
- 	  for (unsigned int comm_step=0; comm_step<libMesh::n_processors(); comm_step++)
+ 	  for (unsigned int comm_step=0; comm_step<this->n_processors(); comm_step++)
 	    {
 #ifdef LIBMESH_HAVE_MPI
 	      // blocking receive indices for this block, imposing no particular order on processor
-	      Parallel::Status id_status (CommWorld.probe (Parallel::any_source, id_tag));
+	      Parallel::Status id_status (this->communicator().probe (Parallel::any_source, id_tag));
 	      std::vector<dof_id_type> &ids (recv_ids[id_status.source()]);
-	      CommWorld.receive (id_status.source(), ids,  id_tag);
+	      this->communicator().receive (id_status.source(), ids,  id_tag);
 #else
 	      std::vector<dof_id_type> &ids (recv_ids[0]);
 #endif
@@ -1993,9 +1993,9 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 
 #ifdef LIBMESH_HAVE_MPI
 	      // blocking receive values for this block, imposing no particular order on processor
-	      Parallel::Status val_status  (CommWorld.probe (Parallel::any_source, val_tag));
+	      Parallel::Status val_status  (this->communicator().probe (Parallel::any_source, val_tag));
 	      std::vector<Number> &vals    (recv_vals[val_status.source()]);
-	      CommWorld.receive (val_status.source(), vals, val_tag);
+	      this->communicator().receive (val_status.source(), vals, val_tag);
 #else
 	      // straight copy without MPI
 	      std::vector<Number> &vals (recv_vals[0]);
@@ -2020,7 +2020,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	  output_vals.resize(n_val_recvd_blk);
 
 	  // pack data from all processors into output values
- 	  for (unsigned int proc=0; proc<libMesh::n_processors(); proc++)
+ 	  for (unsigned int proc=0; proc<this->n_processors(); proc++)
 	    {
 	      const std::vector<dof_id_type> &ids (recv_ids [proc]);
 	      const std::vector<Number>      &vals(recv_vals[proc]);
@@ -2068,7 +2068,7 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
   // approach would be to figure out unique tags for each range,
   // but for now we just impose a barrier here.  And might as
   // well have it do some useful work.
-  CommWorld.broadcast(written_length);
+  this->communicator().broadcast(written_length);
 
   return written_length;
 }
@@ -2082,7 +2082,7 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
   unsigned int written_length=0;
   std::vector<Number> vals; // The raw values for the local objects in the current block
   // Collect the SCALARs for the current variable
-  if (libMesh::processor_id() == (libMesh::n_processors()-1))
+  if (this->processor_id() == (this->n_processors()-1))
     {
       const DofMap& dof_map = this->get_dof_map();
       std::vector<dof_id_type> SCALAR_dofs;
@@ -2097,27 +2097,27 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
     }
 
 #ifdef LIBMESH_HAVE_MPI
-  if ( libMesh::n_processors() > 1 )
+  if ( this->n_processors() > 1 )
     {
       const Parallel::MessageTag val_tag(1);
 
       // Post the receive on processor 0
-      if ( libMesh::processor_id() == 0 )
+      if ( this->processor_id() == 0 )
         {
-          CommWorld.receive(libMesh::n_processors()-1, vals, val_tag);
+          this->communicator().receive(this->n_processors()-1, vals, val_tag);
         }
 
       // Send the data to processor 0
-      if (libMesh::processor_id() == (libMesh::n_processors()-1))
+      if (this->processor_id() == (this->n_processors()-1))
         {
-          CommWorld.send(0, vals, val_tag);
+          this->communicator().send(0, vals, val_tag);
         }
     }
 #endif
 
   // -------------------------------------------------------
   // Write the output on processor 0.
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       io.data_stream (&vals[0], vals.size());
       written_length += libmesh_cast_int<unsigned int>(vals.size());
@@ -2135,7 +2135,7 @@ dof_id_type System::write_serialized_vector (Xdr& io, const NumericVector<Number
   libmesh_assert (io.writing());
 
   dof_id_type vec_length = vec.size();
-  if (libMesh::processor_id() == 0) io.data (vec_length, "# vector length");
+  if (this->processor_id() == 0) io.data (vec_length, "# vector length");
 
   dof_id_type written_length = 0;
 
@@ -2166,7 +2166,7 @@ dof_id_type System::write_serialized_vector (Xdr& io, const NumericVector<Number
           this->write_SCALAR_dofs (vec, var, io);
       }
 
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     libmesh_assert_equal_to (written_length, vec_length);
 
   return written_length;
@@ -2183,7 +2183,7 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
 // #ifndef NDEBUG
 //   // In parallel we better be reading a parallel vector -- if not
 //   // we will not set all of its components below!!
-//   if (libMesh::n_processors() > 1)
+//   if (this->n_processors() > 1)
 //     {
 //       libmesh_assert (vec.type() == PARALLEL ||
 // 		      vec.type() == GHOSTED);
@@ -2196,7 +2196,7 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
   unsigned int num_vecs=0;
   dof_id_type vector_length=0;
 
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       // Get the number of vectors
       io.data(num_vecs);
@@ -2213,8 +2213,8 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
     }
 
   // no need to actually communicate these.
-  // CommWorld.broadcast(num_vecs);
-  // CommWorld.broadcast(vector_length);
+  // this->communicator().broadcast(num_vecs);
+  // this->communicator().broadcast(vector_length);
 
   // Cache these - they are not free!
   const dof_id_type
@@ -2282,7 +2282,7 @@ dof_id_type System::write_serialized_vectors (Xdr &io,
 
   dof_id_type written_length = 0.;
 
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       unsigned int
 	n_vec    = libmesh_cast_int<unsigned int>(vectors.size());

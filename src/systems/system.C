@@ -175,7 +175,7 @@ dof_id_type System::n_local_constrained_dofs() const
 
 dof_id_type System::n_local_dofs() const
 {
-  return _dof_map->n_dofs_on_processor (libMesh::processor_id());
+  return _dof_map->n_dofs_on_processor (this->processor_id());
 }
 
 
@@ -1616,12 +1616,12 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 
   if (using_hilbert_norm)
     {
-      CommWorld.sum(v_norm);
+      this->communicator().sum(v_norm);
       v_norm = std::sqrt(v_norm);
     }
   else
     {
-      CommWorld.max(v_norm);
+      this->communicator().max(v_norm);
     }
 
   STOP_LOG ("calculate_norm()", "System");
@@ -1971,7 +1971,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  CommWorld.verify(p);
+  this->communicator().verify(p);
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -1989,20 +1989,20 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
 
   Number u = 0;
 
-  if (e && e->processor_id() == libMesh::processor_id())
+  if (e && e->processor_id() == this->processor_id())
     u = point_value(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
   processor_id_type lowest_owner =
-    (e && (e->processor_id() == libMesh::processor_id())) ?
-    libMesh::processor_id() : libMesh::n_processors();
-  CommWorld.min(lowest_owner);
+    (e && (e->processor_id() == this->processor_id())) ?
+    this->processor_id() : this->n_processors();
+  this->communicator().min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
   // If nobody admits owning the point, we have a problem.
-  if (lowest_owner != libMesh::n_processors())
-    CommWorld.broadcast(u, lowest_owner);
+  if (lowest_owner != this->n_processors())
+    this->communicator().broadcast(u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 
@@ -2011,7 +2011,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
 
 Number System::point_value(unsigned int var, const Point &p, const Elem &e) const
 {
-  libmesh_assert_equal_to (e.processor_id(), libMesh::processor_id());
+  libmesh_assert_equal_to (e.processor_id(), this->processor_id());
 
   // Ensuring that the given point is really in the element is an
   // expensive assert, but as long as debugging is turned on we might
@@ -2068,7 +2068,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  CommWorld.verify(p);
+  this->communicator().verify(p);
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -2086,20 +2086,20 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
 
   Gradient grad_u;
 
-  if (e && e->processor_id() == libMesh::processor_id())
+  if (e && e->processor_id() == this->processor_id())
     grad_u = point_gradient(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
   processor_id_type lowest_owner =
-    (e && (e->processor_id() == libMesh::processor_id())) ?
-    libMesh::processor_id() : libMesh::n_processors();
-  CommWorld.min(lowest_owner);
+    (e && (e->processor_id() == this->processor_id())) ?
+    this->processor_id() : this->n_processors();
+  this->communicator().min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
   // If nobody admits owning the point, we may have a problem.
-  if (lowest_owner != libMesh::n_processors())
-    CommWorld.broadcast(grad_u, lowest_owner);
+  if (lowest_owner != this->n_processors())
+    this->communicator().broadcast(grad_u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 
@@ -2109,7 +2109,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
 
 Gradient System::point_gradient(unsigned int var, const Point &p, const Elem &e) const
 {
-  libmesh_assert_equal_to (e.processor_id(), libMesh::processor_id());
+  libmesh_assert_equal_to (e.processor_id(), this->processor_id());
 
   // Ensuring that the given point is really in the element is an
   // expensive assert, but as long as debugging is turned on we might
@@ -2167,7 +2167,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  CommWorld.verify(p);
+  this->communicator().verify(p);
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -2185,20 +2185,20 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 
   Tensor hess_u;
 
-  if (e && e->processor_id() == libMesh::processor_id())
+  if (e && e->processor_id() == this->processor_id())
     hess_u = point_hessian(var, p, *e);
 
   // If I have an element containing p, then let's let everyone know
   processor_id_type lowest_owner =
-    (e && (e->processor_id() == libMesh::processor_id())) ?
-    libMesh::processor_id() : libMesh::n_processors();
-  CommWorld.min(lowest_owner);
+    (e && (e->processor_id() == this->processor_id())) ?
+    this->processor_id() : this->n_processors();
+  this->communicator().min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
   // If nobody admits owning the point, we may have a problem.
-  if (lowest_owner != libMesh::n_processors())
-    CommWorld.broadcast(hess_u, lowest_owner);
+  if (lowest_owner != this->n_processors())
+    this->communicator().broadcast(hess_u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 
@@ -2207,7 +2207,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 
 Tensor System::point_hessian(unsigned int var, const Point &p, const Elem &e) const
 {
-  libmesh_assert_equal_to (e.processor_id(), libMesh::processor_id());
+  libmesh_assert_equal_to (e.processor_id(), this->processor_id());
 
   // Ensuring that the given point is really in the element is an
   // expensive assert, but as long as debugging is turned on we might
