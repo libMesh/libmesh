@@ -1461,7 +1461,7 @@ Real RBConstruction::compute_max_error_bound()
   }
 
   std::pair<unsigned int,Real> error_pair(first_index+max_err_index, max_err);
-  get_global_max_error_pair(error_pair);
+  get_global_max_error_pair(this->communicator(),error_pair);
 
   // If we have a serial training set (i.e. a training set that is the same on all processors)
   // just set the parameters on all processors
@@ -1477,10 +1477,10 @@ Real RBConstruction::compute_max_error_bound()
         (error_pair.first < get_last_local_training_index()) )
     {
       set_params_from_training_set( error_pair.first );
-      root_id = libMesh::processor_id();
+      root_id = this->processor_id();
     }
 
-    CommWorld.sum(root_id); // root_id is only non-zero on one processor
+    this->communicator().sum(root_id); // root_id is only non-zero on one processor
     broadcast_parameters(root_id);
   }
 
@@ -2295,7 +2295,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
   struct stat stat_info;
 
   // Residual representors written out to their own separate directory
-  if ( libMesh::processor_id() == 0)
+  if ( this->processor_id() == 0)
     if ( mkdir(riesz_representors_dir.c_str(), 0755) != 0)
       libMesh::out << "Skipping creating residual_representors directory: " << strerror(errno) << std::endl;
 
@@ -2335,7 +2335,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
 	  write_serialized_data(fqr_data, false);
 
 	  // Synchronize before moving on
-	  CommWorld.barrier();
+	  this->communicator().barrier();
 
 	  // Swap back.
 	  Fq_representor[i]->swap(*solution);
@@ -2373,7 +2373,7 @@ void RBConstruction::write_riesz_representors_to_files(const std::string& riesz_
         write_serialized_data(aqr_data, false);
 
         // Synchronize before moving on
-        CommWorld.barrier();
+        this->communicator().barrier();
 
         // Swap back.
         get_rb_evaluation().Aq_representor[i][j]->swap(*solution);
@@ -2418,7 +2418,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
               << "/Fq_representor" << i << riesz_representor_suffix;
 
     // On processor zero check to be sure the file exists
-    if (libMesh::processor_id() == 0)
+    if (this->processor_id() == 0)
     {
       int stat_result = stat(file_name.str().c_str(), &stat_info);
 
@@ -2472,7 +2472,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
                 << "/Aq_representor" << i << "_" << j << riesz_representor_suffix;
 
       // On processor zero check to be sure the file exists
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
       {
         int stat_result = stat(file_name.str().c_str(), &stat_info);
 

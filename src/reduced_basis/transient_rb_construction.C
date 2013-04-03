@@ -1825,7 +1825,7 @@ void TransientRBConstruction::write_riesz_representors_to_files(const std::strin
         write_serialized_data(mr_data, false);
 
 	// Synchronize before moving on
-	CommWorld.barrier();
+	this->communicator().barrier();
 
 	// Swap back.
 	trans_rb_eval.M_q_representor[q][i]->swap(*solution);
@@ -1876,7 +1876,7 @@ void TransientRBConstruction::read_riesz_representors_from_files(const std::stri
 		  << "/M_q_representor" << i << "_" << j << riesz_representor_suffix;
 
         // On processor zero check to be sure the file exists
-        if (libMesh::processor_id() == 0)
+        if (this->processor_id() == 0)
         {
           int stat_result = stat(file_name.str().c_str(), &stat_info);
 
