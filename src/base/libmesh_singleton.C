@@ -38,10 +38,19 @@ namespace
   // global list of runtime Singleton objects - created dynamically,
   // cleaned up in reverse order.
   typedef std::vector<Singleton*> SingletonList;
-  SingletonList singleton_cache;
+
+  SingletonList& get_singleton_cache()
+  {
+    static SingletonList singleton_cache;
+    return singleton_cache;
+  }
 
   typedef std::vector<Singleton::Setup*> SetupList;
-  SetupList setup_cache;
+  SetupList& get_setup_cache()
+  {
+    static SetupList setup_cache;
+    return setup_cache;
+  }
 
 } // end anonymous namespace
 
@@ -56,7 +65,7 @@ namespace libMesh
   {
     SingletonMutex::scoped_lock lock(singleton_mtx);
 
-    singleton_cache.push_back (this);
+    get_singleton_cache().push_back (this);
   }
 
 
@@ -65,7 +74,7 @@ namespace libMesh
   {
     SingletonMutex::scoped_lock lock(setup_mtx);
 
-    setup_cache.push_back (this);
+    get_setup_cache().push_back (this);
   }
 
 
@@ -73,6 +82,8 @@ namespace libMesh
   void Singleton::setup ()
   {
     SingletonMutex::scoped_lock lock(setup_mtx);
+
+    SetupList& setup_cache = get_setup_cache();
 
     for (SetupList::iterator it = setup_cache.begin();
 	 it!=setup_cache.end(); ++it)
@@ -87,6 +98,8 @@ namespace libMesh
   void Singleton::cleanup ()
   {
     SingletonMutex::scoped_lock lock(singleton_mtx);
+
+    SingletonList& singleton_cache = get_singleton_cache();
 
     for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
 	 it!=singleton_cache.rend(); ++it)
