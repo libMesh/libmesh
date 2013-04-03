@@ -417,7 +417,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   if (this->elements_begin() != this->elements_end() &&
       (*(this->elements_begin()))->default_order() != FIRST)
     already_second_order = true;
-  CommWorld.max(already_second_order);
+  this->communicator().max(already_second_order);
   if (already_second_order)
     return;
 

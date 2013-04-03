@@ -77,7 +77,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
 
 	    if (node == NULL)
 	      {
-		libMesh::err << "[" << libMesh::processor_id() << "]: Node iterator returned NULL pointer." << std::endl;
+		libMesh::err << "[" << _mesh.processor_id() << "]: Node iterator returned NULL pointer." << std::endl;
 		libmesh_error();
 	      }
 
@@ -337,7 +337,7 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
     // std::vector<unsigned> copy_of_flat_graph(flat_graph);
 
     // Use the allgather routine to combine all the flat graphs on all processors
-    CommWorld.allgather(flat_graph);
+    _mesh.communicator().allgather(flat_graph);
 
     // Now reconstruct _graph from the allgathered flat_graph.
 
@@ -352,7 +352,7 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
     std::size_t cursor=0;
 
     // There are n_nodes * n_processors vectors to read in total
-    for (processor_id_type p=0; p<libMesh::n_processors(); ++p)
+    for (processor_id_type p=0; p<_mesh.n_processors(); ++p)
       for (dof_id_type node_ctr=0; node_ctr<_mesh.n_nodes(); ++node_ctr)
 	{
 	  // Read the number of entries for this node, move cursor
@@ -372,7 +372,7 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
 //    {
 //      // Generate unique filename for this processor
 //      std::ostringstream oss;
-//      oss << "graph_filename_" << libMesh::processor_id() << ".txt";
+//      oss << "graph_filename_" << _mesh.processor_id() << ".txt";
 //      std::ofstream graph_stream(oss.str().c_str());
 //
 //      // Print the local non-flat graph
