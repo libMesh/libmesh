@@ -23,7 +23,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/reference_counter.h"
 #include "libmesh/libmesh_singleton.h"
-#include "lbmesh/remote_elem.h"
+#include "libmesh/remote_elem.h"
 #include "libmesh/threads.h"
 
 
