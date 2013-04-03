@@ -99,7 +99,7 @@ namespace libMesh
   {
     SingletonMutex::scoped_lock lock(singleton_mtx);
 
-    SetupList& singleton_cache = get_singleton_cache();
+    SingletonList& singleton_cache = get_singleton_cache();
 
     for (SingletonList::reverse_iterator it = singleton_cache.rbegin();
 	 it!=singleton_cache.rend(); ++it)
