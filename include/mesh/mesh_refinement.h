@@ -32,6 +32,7 @@
 #include "libmesh/location_maps.h"
 #include "libmesh/elem.h"
 #include "libmesh/point_locator_base.h"
+#include "libmesh/parallel_object.h"
 
 // C++ Includes   -----------------------------------
 #include <vector>
@@ -58,7 +59,7 @@ class PeriodicBoundaries;
 
 // ------------------------------------------------------------
 // MeshRefinement class definition
-class MeshRefinement
+  class MeshRefinement : public ParallelObject
 {
 public:
 
