@@ -100,7 +100,7 @@ void LegacyXdrIO::read (const std::string& name)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  if (libMesh::processor_id() != 0)
+  if (MeshOutput<MeshBase>::mesh().processor_id() != 0)
     return;
 
   if (this->binary())
@@ -273,7 +273,7 @@ void LegacyXdrIO::read_mesh (const std::string& name,
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert_equal_to (libMesh::processor_id(), 0);
+  libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().processor_id(), 0);
 
   // get a writeable reference to the mesh
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
@@ -678,7 +678,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
   libmesh_assert (mesh.is_serial());
 
   // In which case only processor 0 needs to do any writing
-  if (libMesh::processor_id() != 0)
+  if (MeshOutput<MeshBase>::mesh().processor_id() != 0)
     return;
 
   // Create an XdrMESH object.

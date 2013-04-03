@@ -138,7 +138,7 @@ TecplotIO::TecplotIO (const MeshBase& mesh_in,
 
 void TecplotIO::write (const std::string& fname)
 {
-  if (libMesh::processor_id() == 0)
+  if (this->mesh().processor_id() == 0)
     {
       if (this->binary())
 	this->write_binary (fname);
@@ -155,7 +155,7 @@ void TecplotIO::write_nodal_data (const std::string& fname,
 {
   START_LOG("write_nodal_data()", "TecplotIO");
 
-  if (libMesh::processor_id() == 0)
+  if (this->mesh().processor_id() == 0)
     {
       if (this->binary())
 	this->write_binary (fname, &soln, &names);
@@ -173,7 +173,7 @@ void TecplotIO::write_ascii (const std::string& fname,
 			     const std::vector<std::string>* solution_names)
 {
   // Should only do this on processor 0!
-  libmesh_assert_equal_to (libMesh::processor_id(), 0);
+  libmesh_assert_equal_to (this->mesh().processor_id(), 0);
 
   // Create an output stream
   std::ofstream out_stream(fname.c_str());
@@ -288,7 +288,7 @@ void TecplotIO::write_binary (const std::string& fname,
 	       << "Continuing with ASCII output."
 	       << std::endl;
 
-  if (libMesh::processor_id() == 0)
+  if (this->mesh().processor_id() == 0)
     this->write_ascii (fname, vec, solution_names);
   return;
 

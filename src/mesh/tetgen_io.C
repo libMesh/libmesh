@@ -36,7 +36,7 @@ void TetGenIO::read (const std::string& name)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert_equal_to (libMesh::processor_id(), 0);
+  libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().processor_id(), 0);
 
   std::string name_node, name_ele, dummy;
 

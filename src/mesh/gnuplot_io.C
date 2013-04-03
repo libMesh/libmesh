@@ -65,13 +65,13 @@ void GnuPlotIO::write_solution(const std::string& fname,
 {
   // Even when writing on a serialized ParallelMesh, we expect
   // non-proc-0 help with calls like n_active_elem
-  // libmesh_assert_equal_to (libMesh::processor_id(), 0);
+  // libmesh_assert_equal_to (this->mesh().processor_id(), 0);
 
   const MeshBase& the_mesh = MeshOutput<MeshBase>::mesh();
 
   dof_id_type n_active_elem = the_mesh.n_active_elem();
 
-  if (libMesh::processor_id() == 0)
+  if (this->mesh().processor_id() == 0)
   {
   std::stringstream data_stream_name;
   data_stream_name << fname << "_data";

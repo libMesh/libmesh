@@ -249,7 +249,7 @@ void GMVIO::write_ascii_new_impl (const std::string& fname,
   // This is a parallel_only function
   const unsigned int n_active_elem = mesh.n_active_elem();
 
-  if (libMesh::processor_id() != 0)
+  if (MeshOutput<MeshBase>::mesh().processor_id() != 0)
     return;
 
   // Open the output file stream
@@ -544,7 +544,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   const dof_id_type n_active_elem = mesh.n_active_elem(),
                     n_active_sub_elem = mesh.n_active_sub_elem();
 
-  if (libMesh::processor_id() != 0)
+  if (MeshOutput<MeshBase>::mesh().processor_id() != 0)
     return;
 
   // Open the output file stream
@@ -563,7 +563,7 @@ void GMVIO::write_ascii_old_impl (const std::string& fname,
   // libmesh_assert (mesh.is_serial());
   // if (!mesh.is_serial())
   //   {
-  //     if (libMesh::processor_id() == 0)
+  //     if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
   //       libMesh::err << "Error: GMVIO cannot yet write a ParallelMesh solution"
   //                     << std::endl;
   //     return;
@@ -1203,7 +1203,7 @@ void GMVIO::write_binary (const std::string& fname,
   // This is a parallel_only function
   const dof_id_type n_active_elem = mesh.n_active_elem();
 
-  if (libMesh::processor_id() != 0)
+  if (MeshOutput<MeshBase>::mesh().processor_id() != 0)
     return;
 
   std::ofstream out_stream (fname.c_str());
@@ -1985,7 +1985,7 @@ void GMVIO::read (const std::string& name)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert_equal_to (libMesh::processor_id(), 0);
+  libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().processor_id(), 0);
 
   _next_elem_id = 0;
 
