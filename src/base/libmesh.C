@@ -346,13 +346,9 @@ void _init (int argc, const char* const* argv,
   // Construct singletons who may be at risk of the
   // "static initialization order fiasco"
   Singleton::setup();
-  if (remote_elem == NULL)
-    {
-      libmesh_here();
-      libMesh::err << "WARNING: Singleton::setup() failed to properly create\n"
-		   << "         a remote_elem singleton!!\n";
-      RemoteElem::create();
-    }
+
+  // Make sure the construction worked
+  libmesh_assert(remote_elem);
 
 #if defined(LIBMESH_HAVE_MPI)
 
