@@ -279,7 +279,7 @@ void VTKIO::cells_to_vtk()
  */
 void VTKIO::system_vectors_to_vtk(const EquationSystems& es, vtkUnstructuredGrid*& grid)
 {
-  if (this->mesh().processor_id() == 0)
+  if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
     {
       std::map<std::string, std::vector<Number> > vecs;
       for (unsigned int i=0; i<es.n_systems(); ++i)
@@ -623,9 +623,9 @@ void VTKIO::write_nodal_data (const std::string& fname,
 
   // Tell the writer how many partitions exist and on which processor
   // we are currently
-  writer->SetNumberOfPieces(this->mesh().n_processors());
-  writer->SetStartPiece(this->mesh().processor_id());
-  writer->SetEndPiece(this->mesh().processor_id());
+  writer->SetNumberOfPieces(MeshOutput<MeshBase>::mesh().n_processors());
+  writer->SetStartPiece(MeshOutput<MeshBase>::mesh().processor_id());
+  writer->SetEndPiece(MeshOutput<MeshBase>::mesh().processor_id());
 
   // partitions overlap by one node
   // FIXME: According to this document
