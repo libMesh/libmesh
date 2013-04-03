@@ -35,10 +35,10 @@ ParallelMesh::ParallelMesh (unsigned int d,
 			    const Parallel::Communicator &comm) :
   UnstructuredMesh (d,comm), _is_serial(true),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
-  _next_free_local_node_id(_communicator.rank()),
-  _next_free_local_elem_id(_communicator.rank()),
-  _next_free_unpartitioned_node_id(_communicator.size()),
-  _next_free_unpartitioned_elem_id(_communicator.size())
+  _next_free_local_node_id(this->processor_id()),
+  _next_free_local_elem_id(this->processor_id()),
+  _next_free_unpartitioned_node_id(this->n_processors()),
+  _next_free_unpartitioned_elem_id(this->n_processors())
 {
   // FIXME: give parmetis the communicator!
   _partitioner = AutoPtr<Partitioner>(new ParmetisPartitioner());
@@ -57,10 +57,10 @@ ParallelMesh::~ParallelMesh ()
 ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
-  _next_free_local_node_id(_communicator.rank()),
-  _next_free_local_elem_id(_communicator.rank()),
-  _next_free_unpartitioned_node_id(_communicator.size()),
-  _next_free_unpartitioned_elem_id(_communicator.size())
+  _next_free_local_node_id(this->processor_id()),
+  _next_free_local_elem_id(this->processor_id()),
+  _next_free_unpartitioned_node_id(this->n_processors()),
+  _next_free_unpartitioned_elem_id(this->n_processors())
 {
   this->copy_nodes_and_elements(other_mesh);
   _n_nodes = other_mesh.n_nodes();
@@ -89,10 +89,10 @@ ParallelMesh::ParallelMesh (const ParallelMesh &other_mesh) :
 ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
   _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
-  _next_free_local_node_id(_communicator.rank()),
-  _next_free_local_elem_id(_communicator.rank()),
-  _next_free_unpartitioned_node_id(_communicator.size()),
-  _next_free_unpartitioned_elem_id(_communicator.size())
+  _next_free_local_node_id(this->processor_id()),
+  _next_free_local_elem_id(this->processor_id()),
+  _next_free_unpartitioned_node_id(this->n_processors()),
+  _next_free_unpartitioned_elem_id(this->n_processors())
 {
   this->copy_nodes_and_elements(other_mesh);
   *this->boundary_info = *other_mesh.boundary_info;
@@ -143,7 +143,7 @@ dof_id_type ParallelMesh::parallel_n_elem() const
   parallel_only();
 
   dof_id_type n_local = this->n_local_elem();
-  CommWorld.sum(n_local);
+  this->communicator().sum(n_local);
   n_local += this->n_unpartitioned_elem();
   return n_local;
 }
@@ -157,7 +157,7 @@ dof_id_type ParallelMesh::parallel_max_elem_id() const
 
   dof_id_type max_local = _elements.empty() ?
     0 : _elements.rbegin()->first + 1;
-  CommWorld.max(max_local);
+  this->communicator().max(max_local);
   return max_local;
 }
 
@@ -169,7 +169,7 @@ dof_id_type ParallelMesh::parallel_n_nodes() const
   parallel_only();
 
   dof_id_type n_local = this->n_local_nodes();
-  CommWorld.sum(n_local);
+  this->communicator().sum(n_local);
   n_local += this->n_unpartitioned_nodes();
   return n_local;
 }
@@ -183,7 +183,7 @@ dof_id_type ParallelMesh::parallel_max_node_id() const
 
   dof_id_type max_local = _nodes.empty() ?
     0 : _nodes.rbegin()->first + 1;
-  CommWorld.max(max_local);
+  this->communicator().max(max_local);
   return max_local;
 }
 
@@ -403,7 +403,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
   if (elem_procid == DofObject::invalid_processor_id)
     {
       dof_id_type elem_id = e->id();
-      CommWorld.max(elem_id);
+      this->communicator().max(elem_id);
       libmesh_assert_equal_to (elem_id, e->id());
     }
 #endif
@@ -559,7 +559,7 @@ Node* ParallelMesh::add_node (Node *n)
   if (node_procid == DofObject::invalid_processor_id)
     {
       dof_id_type node_id = n->id();
-      CommWorld.max(node_id);
+      this->communicator().max(node_id);
       libmesh_assert_equal_to (node_id, n->id());
     }
 #endif
@@ -740,7 +740,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
       libmesh_assert(!obj || obj->id() == i);
 
       dof_id_type min_dofid = dofid;
-      CommWorld.min(min_dofid);
+      this->communicator().min(min_dofid);
       // All processors with an object should agree on id
       libmesh_assert (!obj || dofid == min_dofid);
 
@@ -748,7 +748,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
         obj->processor_id() : DofObject::invalid_processor_id;
 
       dof_id_type min_procid = procid;
-      CommWorld.min(min_procid);
+      this->communicator().min(min_procid);
 
       // All processors with an object should agree on processor id
       libmesh_assert (!obj || procid == min_procid);
@@ -800,7 +800,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 #endif
 
       unsigned int min_rflag = refinement_flag;
-      CommWorld.min(min_rflag);
+      this->communicator().min(min_rflag);
       // All processors with this element should agree on flag
       libmesh_assert (!el || min_rflag == refinement_flag);
 
@@ -854,11 +854,11 @@ dof_id_type ParallelMesh::renumber_dof_objects
     }
 
   std::vector<dof_id_type> objects_on_proc(this->n_processors(), 0);
-  CommWorld.allgather(ghost_objects_from_proc[this->processor_id()],
-                      objects_on_proc);
+  this->communicator().allgather(ghost_objects_from_proc[this->processor_id()],
+				 objects_on_proc);
 
 #ifndef NDEBUG
-  libmesh_assert(CommWorld.verify(unpartitioned_objects));
+  libmesh_assert(this->communicator().verify(unpartitioned_objects));
   for (processor_id_type p=0; p != this->n_processors(); ++p)
     libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
 #endif
@@ -909,8 +909,8 @@ dof_id_type ParallelMesh::renumber_dof_objects
                                         this->processor_id() - p) %
                                         this->n_processors();
           std::vector<dof_id_type> request_to_fill;
-          CommWorld.send_receive(procup, requested_ids[procup],
-                                 procdown, request_to_fill);
+          this->communicator().send_receive(procup, requested_ids[procup],
+					    procdown, request_to_fill);
 
           // Fill those requests
           std::vector<dof_id_type> new_ids(request_to_fill.size());
@@ -929,8 +929,8 @@ dof_id_type ParallelMesh::renumber_dof_objects
 
           // Trade back the results
           std::vector<dof_id_type> filled_request;
-          CommWorld.send_receive(procdown, new_ids,
-                                 procup, filled_request);
+          this->communicator().send_receive(procdown, new_ids,
+					    procup, filled_request);
 
           // And copy the id changes we've now been informed of
           for (std::size_t i=0; i != filled_request.size(); ++i)
@@ -1137,7 +1137,7 @@ dof_id_type ParallelMesh::n_active_elem () const
   dof_id_type active_elements =
     static_cast<dof_id_type>(std::distance (this->active_local_elements_begin(),
 					    this->active_local_elements_end()));
-  CommWorld.sum(active_elements);
+  this->communicator().sum(active_elements);
 
   // Then add unpartitioned active elements, which should exist on
   // every processor
