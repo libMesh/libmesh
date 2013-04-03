@@ -119,7 +119,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   }
 
   // If flags changed on any processor then they changed globally
-  CommWorld.max(flags_changed);
+  this->communicator().max(flags_changed);
 
   return flags_changed;
 }
@@ -255,7 +255,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
   }
 
   // If flags changed on any processor then they changed globally
-  CommWorld.max(flags_changed);
+  this->communicator().max(flags_changed);
 
   return flags_changed;
 }
@@ -419,7 +419,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
     }
 
   // If flags changed on any processor then they changed globally
-  CommWorld.max(flags_changed);
+  this->communicator().max(flags_changed);
 
   return flags_changed;
 }
