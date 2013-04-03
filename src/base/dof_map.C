@@ -232,7 +232,7 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
   bool computed_sparsity_already =
     ((_n_nz && !_n_nz->empty()) ||
      (_n_oz && !_n_oz->empty()));
-  CommWorld.max(computed_sparsity_already);
+  this->communicator().max(computed_sparsity_already);
   if (computed_sparsity_already &&
       matrix.need_full_sparsity_pattern())
     {
@@ -284,7 +284,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
   // First, iterate over local objects to find out how many
   // are on each processor
   std::vector<dof_id_type>
-    ghost_objects_from_proc(libMesh::n_processors(), 0);
+    ghost_objects_from_proc(this->n_processors(), 0);
 
   iterator_type it  = objects_begin;
 
@@ -301,23 +301,23 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         }
     }
 
-  std::vector<dof_id_type> objects_on_proc(libMesh::n_processors(), 0);
-  CommWorld.allgather(ghost_objects_from_proc[libMesh::processor_id()],
-                      objects_on_proc);
+  std::vector<dof_id_type> objects_on_proc(this->n_processors(), 0);
+  this->communicator().allgather(ghost_objects_from_proc[this->processor_id()],
+				 objects_on_proc);
 
 #ifdef DEBUG
-  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=0; p != this->n_processors(); ++p)
     libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
 #endif
 
   // Request sets to send to each processor
   std::vector<std::vector<dof_id_type> >
-    requested_ids(libMesh::n_processors());
+    requested_ids(this->n_processors());
 
   // We know how many of our objects live on each processor, so
   // reserve() space for requests from each.
-  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
-    if (p != libMesh::processor_id())
+  for (processor_id_type p=0; p != this->n_processors(); ++p)
+    if (p != this->processor_id())
       requested_ids[p].reserve(ghost_objects_from_proc[p]);
 
   for (it = objects_begin; it != objects_end; ++it)
@@ -327,22 +327,22 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         requested_ids[obj->processor_id()].push_back(obj->id());
     }
 #ifdef DEBUG
-  for (processor_id_type p=0; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=0; p != this->n_processors(); ++p)
     libmesh_assert_equal_to (requested_ids[p].size(), ghost_objects_from_proc[p]);
 #endif
 
   // Next set ghost object n_comps from other processors
-  for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=1; p != this->n_processors(); ++p)
     {
       // Trade my requests with processor procup and procdown
-      processor_id_type procup = (libMesh::processor_id() + p) %
-                                  libMesh::n_processors();
-      processor_id_type procdown = (libMesh::n_processors() +
-                                    libMesh::processor_id() - p) %
-                                    libMesh::n_processors();
+      processor_id_type procup = (this->processor_id() + p) %
+                                  this->n_processors();
+      processor_id_type procdown = (this->n_processors() +
+                                    this->processor_id() - p) %
+                                    this->n_processors();
       std::vector<dof_id_type> request_to_fill;
-      CommWorld.send_receive(procup, requested_ids[procup],
-                             procdown, request_to_fill);
+      this->communicator().send_receive(procup, requested_ids[procup],
+					procdown, request_to_fill);
 
       // Fill those requests
       const unsigned int
@@ -356,7 +356,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
         {
           DofObject *requested = (this->*objects)(mesh, request_to_fill[i]);
           libmesh_assert(requested);
-          libmesh_assert_equal_to (requested->processor_id(), libMesh::processor_id());
+          libmesh_assert_equal_to (requested->processor_id(), this->processor_id());
           libmesh_assert_equal_to (requested->n_var_groups(sys_num), n_var_groups);
           for (unsigned int vg=0; vg != n_var_groups; ++vg)
             {
@@ -372,8 +372,8 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
       // Trade back the results
       std::vector<dof_id_type> filled_request;
-      CommWorld.send_receive(procdown, ghost_data,
-                             procup, filled_request);
+      this->communicator().send_receive(procdown, ghost_data,
+					procup, filled_request);
 
       // And copy the id changes we've now been informed of
       libmesh_assert_equal_to (filled_request.size(),
@@ -838,8 +838,8 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   libmesh_assert (mesh.is_prepared());
 
-  const processor_id_type proc_id = libMesh::processor_id();
-  const processor_id_type n_proc  = libMesh::n_processors();
+  const processor_id_type proc_id = this->processor_id();
+  const processor_id_type n_proc  = this->n_processors();
 
 //  libmesh_assert_greater (this->n_variables(), 0);
   libmesh_assert_less (proc_id, n_proc);
@@ -867,7 +867,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   // Get DOF counts on all processors
   std::vector<dof_id_type> dofs_on_proc(n_proc, 0);
-  CommWorld.allgather(next_free_dof, dofs_on_proc);
+  this->communicator().allgather(next_free_dof, dofs_on_proc);
 
   // Resize and fill the _first_df and _end_df arrays
 #ifdef LIBMESH_ENABLE_AMR
@@ -904,7 +904,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
   // incorrect values on non-local DofObjects.  Let's request the
   // correct values from each other processor.
 
-  if (libMesh::n_processors() > 1)
+  if (this->n_processors() > 1)
     {
       this->set_nonlocal_dof_objects(mesh.nodes_begin(),
                                      mesh.nodes_end(),
@@ -1011,7 +1011,7 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type &next_free_dof,
 		  // assign dof numbers (all at once) if this is
 		  // our node and if they aren't already there
 		  if ((node->n_comp_group(sys_num,vg) > 0) &&
-		      (node->processor_id() == libMesh::processor_id()) &&
+		      (node->processor_id() == this->processor_id()) &&
 		      (node->vg_dof_base(sys_num,vg) ==
 		       DofObject::invalid_id))
 		    {
@@ -1100,7 +1100,7 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type &next_free_dof,
 
   // Only increment next_free_dof if we're on the processor
   // that holds this SCALAR variable
-  if ( libMesh::processor_id() == (libMesh::n_processors()-1) )
+  if ( this->processor_id() == (this->n_processors()-1) )
     next_free_dof += _n_SCALAR_dofs;
 
 #ifdef DEBUG
@@ -1175,7 +1175,7 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type &next_free_dof,
               // assign dof numbers (all at once) if this is
               // our node and if they aren't already there
               if ((node->n_comp_group(sys_num,vg) > 0) &&
-                  (node->processor_id() == libMesh::processor_id()) &&
+                  (node->processor_id() == this->processor_id()) &&
                   (node->vg_dof_base(sys_num,vg) ==
                    DofObject::invalid_id))
                 {
@@ -1250,7 +1250,7 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type &next_free_dof,
 
   // Only increment next_free_dof if we're on the processor
   // that holds this SCALAR variable
-  if ( libMesh::processor_id() == (libMesh::n_processors()-1) )
+  if ( this->processor_id() == (this->n_processors()-1) )
     next_free_dof += _n_SCALAR_dofs;
 
 #ifdef DEBUG
@@ -1355,7 +1355,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
 
             for (dof_id_type i=0; i!=family.size(); ++i)
 	      // If the neighbor lives on a different processor
-	      if (family[i]->processor_id() != libMesh::processor_id())
+	      if (family[i]->processor_id() != this->processor_id())
 		{
 		  // Get the DOF indices for this neighboring element
 		  this->dof_indices (family[i], di);
@@ -1383,7 +1383,7 @@ void DofMap::add_neighbors_to_send_list(MeshBase& mesh)
       const Elem* elem = *elem_it;
 
       // If this is one of our elements, we've already added it
-      if (elem->processor_id() == libMesh::processor_id())
+      if (elem->processor_id() == this->processor_id())
         continue;
 
       // Do we need to add the element DOFs?
@@ -2649,7 +2649,7 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
       processor_id_type dbg_proc_id = 0;
       while (dof_id >= dof_map.end_dof(dbg_proc_id))
         dbg_proc_id++;
-      libmesh_assert (dbg_proc_id != libMesh::processor_id());
+      libmesh_assert (dbg_proc_id != this->processor_id());
 #endif
 
       const SparsityPattern::Row &their_row = it->second;
@@ -2686,22 +2686,22 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 void SparsityPattern::Build::parallel_sync ()
 {
   parallel_only();
-  CommWorld.verify(need_full_sparsity_pattern);
+  this->communicator().verify(need_full_sparsity_pattern);
 
   const dof_id_type n_global_dofs   = dof_map.n_dofs();
-  const dof_id_type n_dofs_on_proc  = dof_map.n_dofs_on_processor(libMesh::processor_id());
+  const dof_id_type n_dofs_on_proc  = dof_map.n_dofs_on_processor(this->processor_id());
   const dof_id_type local_first_dof = dof_map.first_dof();
   const dof_id_type local_end_dof   = dof_map.end_dof();
 
   // Trade sparsity rows with other processors
-  for (processor_id_type p=1; p != libMesh::n_processors(); ++p)
+  for (processor_id_type p=1; p != this->n_processors(); ++p)
     {
       // Push to processor procup while receiving from procdown
-      processor_id_type procup = (libMesh::processor_id() + p) %
-                                  libMesh::n_processors();
-      processor_id_type procdown = (libMesh::n_processors() +
-                                    libMesh::processor_id() - p) %
-                                    libMesh::n_processors();
+      processor_id_type procup = (this->processor_id() + p) %
+                                  this->n_processors();
+      processor_id_type procdown = (this->n_processors() +
+                                    this->processor_id() - p) %
+                                    this->n_processors();
 
       // Pack the sparsity pattern rows to push to procup
       std::vector<dof_id_type> pushed_row_ids,
@@ -2719,7 +2719,7 @@ void SparsityPattern::Build::parallel_sync ()
           while (dof_id >= dof_map.end_dof(proc_id))
             proc_id++;
 
-          libmesh_assert (proc_id != libMesh::processor_id());
+          libmesh_assert (proc_id != this->processor_id());
 
           if (proc_id == procup)
             {
@@ -2737,10 +2737,10 @@ void SparsityPattern::Build::parallel_sync ()
             ++it;
         }
 
-      CommWorld.send_receive(procup, pushed_row_ids,
-                             procdown, pushed_row_ids_to_me);
-      CommWorld.send_receive(procup, pushed_rows,
-                             procdown, pushed_rows_to_me);
+      this->communicator().send_receive(procup, pushed_row_ids,
+					procdown, pushed_row_ids_to_me);
+      this->communicator().send_receive(procup, pushed_rows,
+					procdown, pushed_rows_to_me);
       pushed_row_ids.clear();
       pushed_rows.clear();
 
@@ -2850,9 +2850,9 @@ std::string DofMap::get_info() const
 
       std::size_t n_nz_size = _n_nz->size();
 
-      CommWorld.max(max_n_nz);
-      CommWorld.sum(avg_n_nz);
-      CommWorld.sum(n_nz_size);
+      this->communicator().max(max_n_nz);
+      this->communicator().sum(avg_n_nz);
+      this->communicator().sum(n_nz_size);
 
       avg_n_nz /= std::max(n_nz_size,std::size_t(1));
 
@@ -2866,9 +2866,9 @@ std::string DofMap::get_info() const
 
       std::size_t n_oz_size = _n_oz->size();
 
-      CommWorld.max(max_n_oz);
-      CommWorld.sum(avg_n_oz);
-      CommWorld.sum(n_oz_size);
+      this->communicator().max(max_n_oz);
+      this->communicator().sum(avg_n_oz);
+      this->communicator().sum(n_oz_size);
 
       avg_n_oz /= std::max(n_oz_size,std::size_t(1));
     }
@@ -2912,10 +2912,10 @@ std::string DofMap::get_info() const
         n_rhss++;
     }
 
-  CommWorld.sum(n_constraints);
-  CommWorld.sum(n_rhss);
-  CommWorld.sum(avg_constraint_length);
-  CommWorld.max(max_constraint_length);
+  this->communicator().sum(n_constraints);
+  this->communicator().sum(n_rhss);
+  this->communicator().sum(avg_constraint_length);
+  this->communicator().max(max_constraint_length);
 
   os << "    DofMap Constraints\n      Number of DoF Constraints = "
      << n_constraints;
@@ -2940,7 +2940,7 @@ std::string DofMap::get_info() const
     {
       // Only count local constraints, then sum later
       const Node *node = it->first;
-      if (node->processor_id() != libMesh::processor_id())
+      if (node->processor_id() != this->processor_id())
         continue;
 
       const NodeConstraintRow& row = it->second.first;
@@ -2955,10 +2955,10 @@ std::string DofMap::get_info() const
         n_node_rhss++;
     }
 
-  CommWorld.sum(n_node_constraints);
-  CommWorld.sum(n_node_rhss);
-  CommWorld.sum(avg_node_constraint_length);
-  CommWorld.max(max_node_constraint_length);
+  this->communicator().sum(n_node_constraints);
+  this->communicator().sum(n_node_rhss);
+  this->communicator().sum(avg_node_constraint_length);
+  this->communicator().max(max_node_constraint_length);
 
   os << "\n      Number of Node Constraints = " << n_node_constraints;
   if (n_node_rhss)
