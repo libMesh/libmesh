@@ -193,7 +193,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
   // Partition the graph
   std::vector<int> vsize(_vwgt.size(), 1);
   float itr = 1000000.0;
-  MPI_Comm mpi_comm = libMesh::COMM_WORLD;
+  MPI_Comm mpi_comm = mesh.communicator().get();
 
   // Call the ParMETIS adaptive repartitioning method.  This respects the
   // original partitioning when computing the new partitioning so as to
@@ -317,7 +317,8 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 	// note that we may not have all (or any!) the active elements which belong on this processor,
 	// but by calling this on all processors a unique range in [0,_n_active_elem_on_proc[pid])
 	// is constructed.  Only the indices for the elements we pass in are returned in the array.
- 	MeshCommunication().find_global_indices (bbox, it, end,
+ 	MeshCommunication().find_global_indices (mesh.communicator(),
+						 bbox, it, end,
 						 global_index);
 
 	for (dof_id_type cnt=0; it != end; ++it)
@@ -340,7 +341,8 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 
       // Calling this on all processors a unique range in [0,n_active_elem) is constructed.
       // Only the indices for the elements we pass in are returned in the array.
-      MeshCommunication().find_global_indices (bbox, it, end,
+      MeshCommunication().find_global_indices (mesh.communicator(),
+					       bbox, it, end,
 					       global_index);
 
       for (dof_id_type cnt=0; it != end; ++it)

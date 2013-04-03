@@ -194,6 +194,8 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
   // (4) determine the position in the global ranking for
   //     each local object
 
+  const Parallel::Communicator &communicator (mesh.communicator());
+
   // Global bounding box
   MeshTools::BoundingBox bbox =
     MeshTools::bounding_box (mesh);
@@ -309,28 +311,28 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
   //-------------------------------------------------------------
   // (3) get the max value on each processor
   std::vector<Hilbert::HilbertIndices>
-    node_upper_bounds(libMesh::n_processors()),
-    elem_upper_bounds(libMesh::n_processors());
+    node_upper_bounds(communicator.size()),
+    elem_upper_bounds(communicator.size());
 
   { // limit scope of temporaries
-    std::vector<Hilbert::HilbertIndices> recvbuf(2*libMesh::n_processors());
+    std::vector<Hilbert::HilbertIndices> recvbuf(2*communicator.size());
     std::vector<unsigned short int> /* do not use a vector of bools here since it is not always so! */
-      empty_nodes (libMesh::n_processors()),
-      empty_elem  (libMesh::n_processors());
+      empty_nodes (communicator.size()),
+      empty_elem  (communicator.size());
     std::vector<Hilbert::HilbertIndices> my_max(2);
 
-    CommWorld.allgather (static_cast<unsigned short int>(my_node_bin.empty()), empty_nodes);
-    CommWorld.allgather (static_cast<unsigned short int>(my_elem_bin.empty()),  empty_elem);
+    communicator.allgather (static_cast<unsigned short int>(my_node_bin.empty()), empty_nodes);
+    communicator.allgather (static_cast<unsigned short int>(my_elem_bin.empty()),  empty_elem);
 
     if (!my_node_bin.empty()) my_max[0] = my_node_bin.back();
     if (!my_elem_bin.empty()) my_max[1] = my_elem_bin.back();
 
-    CommWorld.allgather (my_max, /* identical_buffer_sizes = */ true);
+    communicator.allgather (my_max, /* identical_buffer_sizes = */ true);
 
     // Be cereful here.  The *_upper_bounds will be used to find the processor
     // a given object belongs to.  So, if a processor contains no objects (possible!)
     // then copy the bound from the lower processor id.
-    for (processor_id_type p=0; p<libMesh::n_processors(); p++)
+    for (processor_id_type p=0; p<communicator.size(); p++)
       {
 	node_upper_bounds[p] = my_max[2*p+0];
 	elem_upper_bounds[p] = my_max[2*p+1];
@@ -354,10 +356,10 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
     {
       // Request sets to send to each processor
       std::vector<std::vector<Hilbert::HilbertIndices> >
-	requested_ids (libMesh::n_processors());
+	requested_ids (communicator.size());
       // Results to gather from each processor
       std::vector<std::vector<dof_id_type> >
-	filled_request (libMesh::n_processors());
+	filled_request (communicator.size());
 
       {
       MeshBase::const_node_iterator       it  = mesh.nodes_begin();
@@ -377,41 +379,41 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 					     node_upper_bounds.end(),
 					     hi)));
 
-	  libmesh_assert_less (pid, libMesh::n_processors());
+	  libmesh_assert_less (pid, communicator.size());
 
 	  requested_ids[pid].push_back(hi);
 	}
       }
 
       // The number of objects in my_node_bin on each processor
-      std::vector<dof_id_type> node_bin_sizes(libMesh::n_processors());
-      CommWorld.allgather (static_cast<dof_id_type>(my_node_bin.size()), node_bin_sizes);
+      std::vector<dof_id_type> node_bin_sizes(communicator.size());
+      communicator.allgather (static_cast<dof_id_type>(my_node_bin.size()), node_bin_sizes);
 
       // The offset of my first global index
       dof_id_type my_offset = 0;
-      for (processor_id_type pid=0; pid<libMesh::processor_id(); pid++)
+      for (processor_id_type pid=0; pid<communicator.rank(); pid++)
 	my_offset += node_bin_sizes[pid];
 
       // start with pid=0, so that we will trade with ourself
-      for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
+      for (processor_id_type pid=0; pid<communicator.size(); pid++)
 	{
           // Trade my requests with processor procup and procdown
-          const processor_id_type procup = (libMesh::processor_id() + pid) %
-                                            libMesh::n_processors();
-          const processor_id_type procdown = (libMesh::n_processors() +
-                                              libMesh::processor_id() - pid) %
-                                              libMesh::n_processors();
+          const processor_id_type procup = (communicator.rank() + pid) %
+                                            communicator.size();
+          const processor_id_type procdown = (communicator.size() +
+                                              communicator.rank() - pid) %
+                                              communicator.size();
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
-          CommWorld.send_receive(procup, requested_ids[procup],
-                                 procdown, request_to_fill);
+          communicator.send_receive(procup, requested_ids[procup],
+				    procdown, request_to_fill);
 
 	  // Fill the requests
 	  std::vector<dof_id_type> global_ids; /**/ global_ids.reserve(request_to_fill.size());
 	  for (std::size_t idx=0; idx<request_to_fill.size(); idx++)
 	    {
 	      const Hilbert::HilbertIndices &hi = request_to_fill[idx];
-	      libmesh_assert_less_equal (hi, node_upper_bounds[libMesh::processor_id()]);
+	      libmesh_assert_less_equal (hi, node_upper_bounds[communicator.rank()]);
 
 	      // find the requested index in my node bin
 	      std::vector<Hilbert::HilbertIndices>::const_iterator pos =
@@ -425,16 +427,16 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	    }
 
 	  // and trade back
-	  CommWorld.send_receive (procdown, global_ids,
-				  procup,   filled_request[procup]);
+	  communicator.send_receive (procdown, global_ids,
+				     procup,   filled_request[procup]);
 	}
 
       // We now have all the filled requests, so we can loop through our
       // nodes once and assign the global index to each one.
       {
 	std::vector<std::vector<dof_id_type>::const_iterator>
-	  next_obj_on_proc; next_obj_on_proc.reserve(libMesh::n_processors());
-	for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
+	  next_obj_on_proc; next_obj_on_proc.reserve(communicator.size());
+	for (processor_id_type pid=0; pid<communicator.size(); pid++)
 	  next_obj_on_proc.push_back(filled_request[pid].begin());
 
         {
@@ -454,7 +456,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 					       node_upper_bounds.end(),
 					       hi)));
 
-	    libmesh_assert_less (pid, libMesh::n_processors());
+	    libmesh_assert_less (pid, communicator.size());
 	    libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
 	    const dof_id_type global_index = *next_obj_on_proc[pid];
@@ -472,10 +474,10 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
     {
       // Request sets to send to each processor
       std::vector<std::vector<Hilbert::HilbertIndices> >
-	requested_ids (libMesh::n_processors());
+	requested_ids (communicator.size());
       // Results to gather from each processor
       std::vector<std::vector<dof_id_type> >
-	filled_request (libMesh::n_processors());
+	filled_request (communicator.size());
 
       {
       MeshBase::const_element_iterator       it  = mesh.elements_begin();
@@ -494,41 +496,41 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 					     elem_upper_bounds.end(),
 					     hi)));
 
-	  libmesh_assert_less (pid, libMesh::n_processors());
+	  libmesh_assert_less (pid, communicator.size());
 
 	  requested_ids[pid].push_back(hi);
 	}
       }
 
       // The number of objects in my_elem_bin on each processor
-      std::vector<dof_id_type> elem_bin_sizes(libMesh::n_processors());
-      CommWorld.allgather (static_cast<dof_id_type>(my_elem_bin.size()), elem_bin_sizes);
+      std::vector<dof_id_type> elem_bin_sizes(communicator.size());
+      communicator.allgather (static_cast<dof_id_type>(my_elem_bin.size()), elem_bin_sizes);
 
       // The offset of my first global index
       dof_id_type my_offset = 0;
-      for (processor_id_type pid=0; pid<libMesh::processor_id(); pid++)
+      for (processor_id_type pid=0; pid<communicator.rank(); pid++)
 	my_offset += elem_bin_sizes[pid];
 
       // start with pid=0, so that we will trade with ourself
-      for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
+      for (processor_id_type pid=0; pid<communicator.size(); pid++)
 	{
           // Trade my requests with processor procup and procdown
-          const processor_id_type procup = (libMesh::processor_id() + pid) %
-                                            libMesh::n_processors();
-          const processor_id_type procdown = (libMesh::n_processors() +
-                                              libMesh::processor_id() - pid) %
-                                              libMesh::n_processors();
+          const processor_id_type procup = (communicator.rank() + pid) %
+                                            communicator.size();
+          const processor_id_type procdown = (communicator.size() +
+                                              communicator.rank() - pid) %
+                                              communicator.size();
 
           std::vector<Hilbert::HilbertIndices> request_to_fill;
-          CommWorld.send_receive(procup, requested_ids[procup],
-                                 procdown, request_to_fill);
+          communicator.send_receive(procup, requested_ids[procup],
+				    procdown, request_to_fill);
 
 	  // Fill the requests
 	  std::vector<dof_id_type> global_ids; /**/ global_ids.reserve(request_to_fill.size());
 	  for (std::size_t idx=0; idx<request_to_fill.size(); idx++)
 	    {
 	      const Hilbert::HilbertIndices &hi = request_to_fill[idx];
-	      libmesh_assert_less_equal (hi, elem_upper_bounds[libMesh::processor_id()]);
+	      libmesh_assert_less_equal (hi, elem_upper_bounds[communicator.rank()]);
 
 	      // find the requested index in my elem bin
 	      std::vector<Hilbert::HilbertIndices>::const_iterator pos =
@@ -542,16 +544,16 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 	    }
 
 	  // and trade back
-	  CommWorld.send_receive (procdown, global_ids,
-				  procup,   filled_request[procup]);
+	  communicator.send_receive (procdown, global_ids,
+				     procup,   filled_request[procup]);
 	}
 
       // We now have all the filled requests, so we can loop through our
       // elements once and assign the global index to each one.
       {
 	std::vector<std::vector<dof_id_type>::const_iterator>
-	  next_obj_on_proc; next_obj_on_proc.reserve(libMesh::n_processors());
-	for (processor_id_type pid=0; pid<libMesh::n_processors(); pid++)
+	  next_obj_on_proc; next_obj_on_proc.reserve(communicator.size());
+	for (processor_id_type pid=0; pid<communicator.size(); pid++)
 	  next_obj_on_proc.push_back(filled_request[pid].begin());
 
         {
@@ -571,7 +573,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 					       elem_upper_bounds.end(),
 					       hi)));
 
-	    libmesh_assert_less (pid, libMesh::n_processors());
+	    libmesh_assert_less (pid, communicator.size());
 	    libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
 	    const dof_id_type global_index = *next_obj_on_proc[pid];
@@ -597,7 +599,8 @@ void MeshCommunication::assign_global_indices (MeshBase&) const
 
 #if defined(LIBMESH_HAVE_LIBHILBERT) && defined(LIBMESH_HAVE_MPI)
 template <typename ForwardIterator>
-void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
+void MeshCommunication::find_global_indices (const Parallel::Communicator &communicator,
+					     const MeshTools::BoundingBox &bbox,
 					     const ForwardIterator &begin,
 					     const ForwardIterator &end,
 					     std::vector<dof_id_type> &index_map) const
@@ -633,11 +636,11 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	const Hilbert::HilbertIndices hi(get_hilbert_index (*it, bbox));
 	hilbert_keys.push_back(hi);
 
-	if ((*it)->processor_id() == libMesh::processor_id())
+	if ((*it)->processor_id() == communicator.rank())
 	  sorted_hilbert_keys.push_back(hi);
 
 	// someone needs to take care of unpartitioned objects!
-	if ((libMesh::processor_id() == 0) &&
+	if ((communicator.rank() == 0) &&
 	    ((*it)->processor_id() == DofObject::invalid_processor_id))
 	  sorted_hilbert_keys.push_back(hi);
       }
@@ -653,12 +656,12 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
   const std::vector<Hilbert::HilbertIndices> &my_bin = sorter.bin();
 
   // The number of objects in my_bin on each processor
-  std::vector<unsigned int> bin_sizes(libMesh::n_processors());
-  CommWorld.allgather (static_cast<unsigned int>(my_bin.size()), bin_sizes);
+  std::vector<unsigned int> bin_sizes(communicator.size());
+  communicator.allgather (static_cast<unsigned int>(my_bin.size()), bin_sizes);
 
   // The offset of my first global index
   unsigned int my_offset = 0;
-  for (unsigned int pid=0; pid<libMesh::processor_id(); pid++)
+  for (unsigned int pid=0; pid<communicator.rank(); pid++)
     my_offset += bin_sizes[pid];
 
   //-------------------------------------------------------------
@@ -669,12 +672,12 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
   if (!my_bin.empty())
     upper_bounds[0] = my_bin.back();
 
-  CommWorld.allgather (upper_bounds, /* identical_buffer_sizes = */ true);
+  communicator.allgather (upper_bounds, /* identical_buffer_sizes = */ true);
 
   // Be cereful here.  The *_upper_bounds will be used to find the processor
   // a given object belongs to.  So, if a processor contains no objects (possible!)
   // then copy the bound from the lower processor id.
-  for (unsigned int p=1; p<libMesh::n_processors(); p++)
+  for (unsigned int p=1; p<communicator.size(); p++)
     if (!bin_sizes[p]) upper_bounds[p] = upper_bounds[p-1];
 
 
@@ -687,10 +690,10 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 
     // Request sets to send to each processor
     std::vector<std::vector<Hilbert::HilbertIndices> >
-      requested_ids (libMesh::n_processors());
+      requested_ids (communicator.size());
     // Results to gather from each processor
     std::vector<std::vector<unsigned int> >
-      filled_request (libMesh::n_processors());
+      filled_request (communicator.size());
 
     // build up list of requests
     std::vector<Hilbert::HilbertIndices>::const_iterator hi =
@@ -706,7 +709,7 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 					   upper_bounds.end(),
 					   *hi)));
 
-	libmesh_assert_less (pid, libMesh::n_processors());
+	libmesh_assert_less (pid, communicator.size());
 
 	requested_ids[pid].push_back(*hi);
 
@@ -719,24 +722,24 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
     // start with pid=0, so that we will trade with ourself
     std::vector<Hilbert::HilbertIndices> request_to_fill;
     std::vector<unsigned int> global_ids;
-    for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+    for (unsigned int pid=0; pid<communicator.size(); pid++)
       {
 	// Trade my requests with processor procup and procdown
-	const unsigned int procup = (libMesh::processor_id() + pid) %
-                                     libMesh::n_processors();
-	const unsigned int procdown = (libMesh::n_processors() +
-                                       libMesh::processor_id() - pid) %
-                                       libMesh::n_processors();
+	const unsigned int procup = (communicator.rank() + pid) %
+                                     communicator.size();
+	const unsigned int procdown = (communicator.size() +
+                                       communicator.rank() - pid) %
+                                       communicator.size();
 
-	CommWorld.send_receive(procup, requested_ids[procup],
-			       procdown, request_to_fill);
+	communicator.send_receive(procup, requested_ids[procup],
+				  procdown, request_to_fill);
 
 	// Fill the requests
 	global_ids.clear(); /**/ global_ids.reserve(request_to_fill.size());
 	for (unsigned int idx=0; idx<request_to_fill.size(); idx++)
 	  {
 	    const Hilbert::HilbertIndices &hilbert_indices = request_to_fill[idx];
-	    libmesh_assert_less_equal (hilbert_indices, upper_bounds[libMesh::processor_id()]);
+	    libmesh_assert_less_equal (hilbert_indices, upper_bounds[communicator.rank()]);
 
 	    // find the requested index in my node bin
 	    std::vector<Hilbert::HilbertIndices>::const_iterator pos =
@@ -750,16 +753,16 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	  }
 
 	// and trade back
-	CommWorld.send_receive (procdown, global_ids,
-				procup,   filled_request[procup]);
+	communicator.send_receive (procdown, global_ids,
+				   procup,   filled_request[procup]);
       }
 
     // We now have all the filled requests, so we can loop through our
     // nodes once and assign the global index to each one.
     {
       std::vector<std::vector<unsigned int>::const_iterator>
-	next_obj_on_proc; next_obj_on_proc.reserve(libMesh::n_processors());
-      for (unsigned int pid=0; pid<libMesh::n_processors(); pid++)
+	next_obj_on_proc; next_obj_on_proc.reserve(communicator.size());
+      for (unsigned int pid=0; pid<communicator.size(); pid++)
 	next_obj_on_proc.push_back(filled_request[pid].begin());
 
       unsigned int cnt=0;
@@ -767,7 +770,7 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &bbox,
 	{
 	  const unsigned int pid = index_map[cnt];
 
-	  libmesh_assert_less (pid, libMesh::n_processors());
+	  libmesh_assert_less (pid, communicator.size());
 	  libmesh_assert (next_obj_on_proc[pid] != filled_request[pid].end());
 
 	  const unsigned int global_index = *next_obj_on_proc[pid];
@@ -798,23 +801,27 @@ void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &,
 
 
 //------------------------------------------------------------------
-template void MeshCommunication::find_global_indices<MeshBase::const_node_iterator> (const MeshTools::BoundingBox &,
+template void MeshCommunication::find_global_indices<MeshBase::const_node_iterator> (const Parallel::Communicator &,
+										     const MeshTools::BoundingBox &,
 										     const MeshBase::const_node_iterator &,
 										     const MeshBase::const_node_iterator &,
 										     std::vector<dof_id_type> &) const;
 
-template void MeshCommunication::find_global_indices<MeshBase::const_element_iterator> (const MeshTools::BoundingBox &,
+template void MeshCommunication::find_global_indices<MeshBase::const_element_iterator> (const Parallel::Communicator &,
+											const MeshTools::BoundingBox &,
 											const MeshBase::const_element_iterator &,
 											const MeshBase::const_element_iterator &,
 											std::vector<dof_id_type> &) const;
-template void MeshCommunication::find_global_indices<MeshBase::node_iterator> (const MeshTools::BoundingBox &,
-										     const MeshBase::node_iterator &,
-										     const MeshBase::node_iterator &,
-										     std::vector<dof_id_type> &) const;
+template void MeshCommunication::find_global_indices<MeshBase::node_iterator> (const Parallel::Communicator &,
+									       const MeshTools::BoundingBox &,
+									       const MeshBase::node_iterator &,
+									       const MeshBase::node_iterator &,
+									       std::vector<dof_id_type> &) const;
 
-template void MeshCommunication::find_global_indices<MeshBase::element_iterator> (const MeshTools::BoundingBox &,
-											const MeshBase::element_iterator &,
-											const MeshBase::element_iterator &,
-											std::vector<dof_id_type> &) const;
+template void MeshCommunication::find_global_indices<MeshBase::element_iterator> (const Parallel::Communicator &,
+										  const MeshTools::BoundingBox &,
+										  const MeshBase::element_iterator &,
+										  const MeshBase::element_iterator &,
+										  std::vector<dof_id_type> &) const;
 
 } // namespace libMesh
