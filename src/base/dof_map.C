@@ -125,7 +125,9 @@ AutoPtr<SparsityPattern::Build> DofMap::build_sparsity
 
 
 
-DofMap::DofMap(const unsigned int number) :
+DofMap::DofMap(const unsigned int number,
+	       const ParallelObject &parent_decomp) :
+  ParallelObject (parent_decomp),
   _dof_coupling(NULL),
   _variables(),
   _variable_groups(),

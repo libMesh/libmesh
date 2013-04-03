@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2012 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2013 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -44,6 +44,8 @@ namespace libMesh
    * that are expected to be implemented in paralel. Each
    * \p ParalelObject *requires* a \p Parallel::Communicator object
    * for construction.
+   *
+   * \author Benjamin S. Kirk, 2013.
    */
   class ParallelObject
   {
@@ -55,6 +57,13 @@ namespace libMesh
      */
     ParallelObject (const Parallel::Communicator &comm) :
       _communicator(comm)
+    {}
+
+    /**
+     * Copy Constructor.
+     */
+    ParallelObject (const ParallelObject &other) :
+      _communicator(other._communicator)
     {}
 
     /**

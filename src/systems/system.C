@@ -56,6 +56,7 @@ System::System (EquationSystems& es,
 		const std::string& name_in,
 		const unsigned int number_in) :
 
+  ParallelObject                    (es),
   assemble_before_solve             (true),
   use_fixed_solution                (false),
   extra_quadrature_order            (0),
@@ -73,7 +74,7 @@ System::System (EquationSystems& es,
   _qoi_evaluate_object              (NULL),
   _qoi_evaluate_derivative_function (NULL),
   _qoi_evaluate_derivative_object   (NULL),
-  _dof_map                          (new DofMap(number_in)),
+  _dof_map                          (new DofMap(number_in, *this)),
   _equation_systems                 (es),
   _mesh                             (es.get_mesh()),
   _sys_name                         (name_in),
@@ -92,6 +93,7 @@ System::System (EquationSystems& es,
 // No copy construction of System objects!
 System::System (const System& other) :
   ReferenceCountedObject<System>(),
+  ParallelObject(other),
   _equation_systems(other._equation_systems),
   _mesh(other._mesh),
   _sys_number(other._sys_number)

@@ -31,6 +31,7 @@
 #include "libmesh/threads_allocators.h"
 #include "libmesh/elem_range.h"
 #include "libmesh/sparsity_pattern.h"
+#include "libmesh/parallel_object.h"
 
 // C++ Includes   -----------------------------------
 #include <algorithm>
@@ -139,16 +140,19 @@ class NodeConstraints : public std::map<const Node *,
  *
  * @author Benjamin S. Kirk, 2002-2007
  */
-class DofMap : public ReferenceCountedObject<DofMap>
+  class DofMap : public ReferenceCountedObject<DofMap>,
+		 public ParallelObject
 {
 public:
 
   /**
    * Constructor.  Requires the number of the system for which we
-   * will be numbering degrees of freedom.
+   * will be numbering degrees of freedom & the parent object
+   * we are contained in, which defines our communication space.
    */
   explicit
-  DofMap(const unsigned int sys_number);
+  DofMap(const unsigned int sys_number,
+	 const ParallelObject &parent_decomp);
 
   /**
    * Destructor.

@@ -63,7 +63,7 @@ MeshBase::MeshBase (unsigned int d,
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
-  ParallelObject (other_mesh.communicator()),
+  ParallelObject (other_mesh),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (other_mesh._n_parts),
   _dim           (other_mesh._dim),
