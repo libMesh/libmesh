@@ -294,13 +294,15 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
 
   //-------------------------------------------------------------
   // (2) parallel sort the Hilbert keys
-  Parallel::Sort<Hilbert::HilbertIndices> node_sorter (node_keys);
+  Parallel::Sort<Hilbert::HilbertIndices> node_sorter (communicator,
+						       node_keys);
   node_sorter.sort(); /* done with node_keys */ //node_keys.clear();
 
   const std::vector<Hilbert::HilbertIndices> &my_node_bin =
     node_sorter.bin();
 
-  Parallel::Sort<Hilbert::HilbertIndices> elem_sorter (elem_keys);
+  Parallel::Sort<Hilbert::HilbertIndices> elem_sorter (communicator,
+						       elem_keys);
   elem_sorter.sort(); /* done with elem_keys */ //elem_keys.clear();
 
   const std::vector<Hilbert::HilbertIndices> &my_elem_bin =
@@ -650,7 +652,8 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
   //-------------------------------------------------------------
   // (2) parallel sort the Hilbert keys
   START_LOG ("parallel_sort()", "MeshCommunication");
-  Parallel::Sort<Hilbert::HilbertIndices> sorter (sorted_hilbert_keys);
+  Parallel::Sort<Hilbert::HilbertIndices> sorter (communicator,
+						  sorted_hilbert_keys);
   sorter.sort();
   STOP_LOG ("parallel_sort()", "MeshCommunication");
   const std::vector<Hilbert::HilbertIndices> &my_bin = sorter.bin();

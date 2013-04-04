@@ -877,10 +877,10 @@ RBConstructionBase<Base>::set_alternative_solver
   if (petsc_linear_solver)
     {
       PC pc = petsc_linear_solver->pc();
-      ierr = PCGetType(pc, &orig_petsc_pc_type); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = PCGetType(pc, &orig_petsc_pc_type); LIBMESH_CHKERRABORT(ierr);
 
       KSP ksp = petsc_linear_solver->ksp();
-      ierr = KSPGetType(ksp, &orig_petsc_ksp_type); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = KSPGetType(ksp, &orig_petsc_ksp_type); LIBMESH_CHKERRABORT(ierr);
 
       // libMesh::out << "orig_petsc_pc_type (before)=" << orig_petsc_pc_type << std::endl;
       // Make actual copies of the original PC and KSP types
@@ -892,8 +892,8 @@ RBConstructionBase<Base>::set_alternative_solver
       if (this->alternative_solver == "amg")
 	{
 	  // Set HYPRE and boomeramg PC types
-	  ierr = PCSetType(pc, PCHYPRE); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = PCHYPRESetType(pc, "boomeramg"); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PCSetType(pc, PCHYPRE); LIBMESH_CHKERRABORT(ierr);
+	  ierr = PCHYPRESetType(pc, "boomeramg"); LIBMESH_CHKERRABORT(ierr);
 	}
 #endif // LIBMESH_HAVE_PETSC_HYPRE
       if (this->alternative_solver == "mumps")
@@ -906,13 +906,13 @@ RBConstructionBase<Base>::set_alternative_solver
 	  // converge in 1 iteration.  Otherwise, to use KSPPREONLY,
 	  // you may need to do:
 	  // KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
-	  // ierr = KSPSetType(ksp, KSPPREONLY); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  // ierr = KSPSetType(ksp, KSPPREONLY); LIBMESH_CHKERRABORT(ierr);
 
 	  // Need to call the equivalent for the command line options:
 	  // -ksp_type preonly -pc_type lu -pc_factor_mat_solver_package mumps
-	  ierr = PCSetType(pc, PCLU); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PCSetType(pc, PCLU); LIBMESH_CHKERRABORT(ierr);
 #if !(PETSC_VERSION_LESS_THAN(3,0,0))
-	  ierr = PCFactorSetMatSolverPackage(pc,"mumps"); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PCFactorSetMatSolverPackage(pc,"mumps"); LIBMESH_CHKERRABORT(ierr);
 #endif
 	}
     }
@@ -958,10 +958,10 @@ void RBConstructionBase<Base>::reset_alternative_solver(
       if (petsc_linear_solver)
 	{
 	  pc = petsc_linear_solver->pc();
-	  ierr = PCSetType(pc, orig.first.c_str()); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PCSetType(pc, orig.first.c_str()); LIBMESH_CHKERRABORT(ierr);
 
 	  ksp = petsc_linear_solver->ksp();
-	  ierr = KSPSetType(ksp, orig.second.c_str()); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = KSPSetType(ksp, orig.second.c_str()); LIBMESH_CHKERRABORT(ierr);
 	}
     }
 

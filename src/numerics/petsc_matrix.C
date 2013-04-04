@@ -95,8 +95,8 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   PetscInt n_nz     = static_cast<PetscInt>(nnz);
   PetscInt n_oz     = static_cast<PetscInt>(noz);
 
-  ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatCreate(this->communicator().get(), &_mat);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
@@ -148,7 +148,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   PetscInt m_local  = static_cast<PetscInt>(m_l);
   PetscInt n_local  = static_cast<PetscInt>(n_l);
 
-  ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
+  ierr = MatCreate(this->communicator().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERRABORT(ierr);
@@ -205,7 +205,7 @@ void PetscMatrix<T>::init ()
   PetscInt m_local  = static_cast<PetscInt>(m_l);
   PetscInt n_local  = static_cast<PetscInt>(n_l);
 
-  ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
+  ierr = MatCreate(this->communicator().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERRABORT(ierr);
@@ -355,7 +355,7 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
   PetscViewer petsc_viewer;
 
 
-  ierr = PetscViewerCreate (libMesh::COMM_WORLD,
+  ierr = PetscViewerCreate (this->communicator().get(),
 			    &petsc_viewer);
          LIBMESH_CHKERRABORT(ierr);
 
@@ -365,7 +365,7 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
    */
   if (name != "NULL")
     {
-      ierr = PetscViewerASCIIOpen( libMesh::COMM_WORLD,
+      ierr = PetscViewerASCIIOpen( this->communicator().get(),
 				   name.c_str(),
 				   &petsc_viewer);
              LIBMESH_CHKERRABORT(ierr);
@@ -470,7 +470,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
       // of the file internally.  Since print_personal() takes a reference to
       // an ostream, we have to do an extra step...  print_personal() should probably
       // have a version that takes a string to get rid of this problem.
-      ierr = PetscViewerASCIIOpen( libMesh::COMM_WORLD,
+      ierr = PetscViewerASCIIOpen( this->communicator().get(),
 				   temp_filename.c_str(),
 				   &petsc_viewer);
       LIBMESH_CHKERRABORT(ierr);
@@ -553,13 +553,13 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   PetscErrorCode ierr=0;
   IS isrow, iscol;
 
-  ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
+  ierr = ISCreateLibMesh(this->communicator().get(),
 			 rows.size(),
 			 (PetscInt*) &rows[0],
 			 PETSC_USE_POINTER,
 			 &isrow); LIBMESH_CHKERRABORT(ierr);
 
-  ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
+  ierr = ISCreateLibMesh(this->communicator().get(),
 			 cols.size(),
 			 (PetscInt*) &cols[0],
 			 PETSC_USE_POINTER,

@@ -75,7 +75,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
   _map = new Epetra_Map (static_cast<int>(m),
                          m_l,
                          0,
-                         Epetra_MpiComm (libMesh::COMM_WORLD));
+                         Epetra_MpiComm (this->communicator().get()));
 
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);
@@ -159,7 +159,7 @@ void EpetraMatrix<T>::init (const numeric_index_type m,
   _map = new Epetra_Map (static_cast<int>(m),
                          m_l,
                          0,
-                         Epetra_MpiComm (libMesh::COMM_WORLD));
+                         Epetra_MpiComm (this->communicator().get()));
 
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);

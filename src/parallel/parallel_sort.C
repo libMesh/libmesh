@@ -41,11 +41,11 @@ namespace Parallel {
 // a Parallel::Sort object takes O(nlogn) time,
 // where n is the length of _data.
 template <typename KeyType, typename IdxType>
-Sort<KeyType,IdxType>::Sort(std::vector<KeyType>& d,
-		            const processor_id_type n_procs,
-		            const processor_id_type proc_id) :
-  _n_procs(n_procs),
-  _proc_id(proc_id),
+Sort<KeyType,IdxType>::Sort(const Parallel::Communicator &comm,
+			    std::vector<KeyType>& d) :
+  ParallelObject(comm),
+  _n_procs(comm.size()),
+  _proc_id(comm.rank()),
   _bin_is_sorted(false),
   _data(d)
 {
@@ -65,7 +65,7 @@ void Sort<KeyType,IdxType>::sort()
   // work with, so catch the degenerate cases here
   IdxType global_data_size = libmesh_cast_int<IdxType>(_data.size());
 
-  CommWorld.sum (global_data_size);
+  this->communicator().sum (global_data_size);
 
   if (global_data_size < 2)
     {
@@ -73,12 +73,12 @@ void Sort<KeyType,IdxType>::sort()
       // or contains only one element
       _my_bin = _data;
 
-      CommWorld.allgather (static_cast<IdxType>(_my_bin.size()),
-			   _local_bin_sizes);
+      this->communicator().allgather (static_cast<IdxType>(_my_bin.size()),
+				      _local_bin_sizes);
     }
   else
     {
-      if (libMesh::n_processors() > 1)
+      if (this->n_processors() > 1)
         {
           this->binsort();
           this->communicate_bins();
@@ -108,13 +108,13 @@ void Sort<KeyType,IdxType>::binsort()
 
   // Communicate to determine the global
   // min and max for all processors.
-  CommWorld.max(global_min_max);
+  this->communicator().max(global_min_max);
 
   // Multiply the min by -1 to obtain the true min
   global_min_max[0] *= -1;
 
   // Bin-Sort based on the global min and max
-  Parallel::BinSorter<KeyType> bs(_data);
+  Parallel::BinSorter<KeyType> bs(this->communicator(), _data);
   bs.binsort(_n_procs, global_min_max[1], global_min_max[0]);
 
   // Now save the local bin sizes in a vector so
@@ -161,20 +161,20 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::binsort()
 		1,
 		Parallel::StandardType<Hilbert::HilbertIndices>(),
 		hilbert_min,
-		libMesh::COMM_WORLD);
+		this->communicator().get());
 
   MPI_Allreduce(&local_max,
 		&global_max,
 		1,
 		Parallel::StandardType<Hilbert::HilbertIndices>(),
 		hilbert_max,
-		libMesh::COMM_WORLD);
+		this->communicator().get());
 
   MPI_Op_free   (&hilbert_max);
   MPI_Op_free   (&hilbert_min);
 
   // Bin-Sort based on the global min and max
-  Parallel::BinSorter<Hilbert::HilbertIndices> bs(_data);
+  Parallel::BinSorter<Hilbert::HilbertIndices> bs(this->communicator(),_data);
   bs.binsort(_n_procs, global_max, global_min);
 
   // Now save the local bin sizes in a vector so
@@ -196,7 +196,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
   std::vector<IdxType> global_bin_sizes = _local_bin_sizes;
 
   // Sum to find the total number of entries in each bin.
-  CommWorld.sum(global_bin_sizes);
+  this->communicator().sum(global_bin_sizes);
 
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which
@@ -239,7 +239,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
 	          (int*) &displacements[0],          // Offsets into the receive buffer
 		  Parallel::StandardType<KeyType>(), // The data type we are sorting
 		  i,                                 // The root process (we do this once for each proc)
-		  libMesh::COMM_WORLD);
+		  this->communicator().get());
 
       // Copy the destination buffer if it
       // corresponds to the bin for this processor
@@ -276,7 +276,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
 		_n_procs,
 		MPI_UNSIGNED,
 		MPI_SUM,
-		libMesh::COMM_WORLD);
+		this->communicator().get());
 
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which
@@ -303,7 +303,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
 		    &proc_bin_size[0],    // Destination: Total # of entries in bin i
 		    1,
 		    MPI_UNSIGNED,
-		    libMesh::COMM_WORLD);
+		    this->communicator().get());
 
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
@@ -327,7 +327,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
 		  (int*) &displacements[0], // Offsets into the receive buffer
 		  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
 		  i,                        // The root process (we do this once for each proc)
-		  libMesh::COMM_WORLD);
+		  this->communicator().get());
 
       // Copy the destination buffer if it
       // corresponds to the bin for this processor

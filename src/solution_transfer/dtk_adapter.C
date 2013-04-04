@@ -102,7 +102,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
     permutation_list[i] = i;
 
   /*
-  if(libMesh::processor_id() == 1)
+  if(this->processor_id() == 1)
     sleep(1);
 
   std::cout<<"n_nodes_per_elem: "<<n_nodes_per_elem<<std::endl;
@@ -111,7 +111,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
 
   std::cerr<<"Vertices size: "<<vertices.size()<<std::endl;
   {
-    std::cerr<<libMesh::processor_id()<<" Vertices: ";
+    std::cerr<<this->processor_id()<<" Vertices: ";
 
     for(unsigned int i=0; i<vertices.size(); i++)
       std::cerr<<vertices[i]<<" ";
@@ -121,7 +121,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
 
   std::cerr<<"Coordinates size: "<<coordinates.size()<<std::endl;
   {
-    std::cerr<<libMesh::processor_id()<<" Coordinates: ";
+    std::cerr<<this->processor_id()<<" Coordinates: ";
 
     for(unsigned int i=0; i<coordinates.size(); i++)
       std::cerr<<coordinates[i]<<" ";
@@ -131,7 +131,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
 
   std::cerr<<"Connectivity size: "<<connectivity.size()<<std::endl;
   {
-    std::cerr<<libMesh::processor_id()<<" Connectivity: ";
+    std::cerr<<this->processor_id()<<" Connectivity: ";
 
     for(unsigned int i=0; i<connectivity.size(); i++)
       std::cerr<<connectivity[i]<<" ";
@@ -141,7 +141,7 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int> > in_comm, Equation
 
   std::cerr<<"Permutation_List size: "<<permutation_list.size()<<std::endl;
   {
-    std::cerr<<libMesh::processor_id()<<" Permutation_List: ";
+    std::cerr<<this->processor_id()<<" Permutation_List: ";
 
     for(unsigned int i=0; i<permutation_list.size(); i++)
       std::cerr<<permutation_list[i]<<" ";
@@ -208,7 +208,7 @@ DTKAdapter::update_variable_values(std::string var_name)
     unsigned int node_num = vertices[i];
     const Node & node = mesh.node(node_num);
 
-    if(node.processor_id() == libMesh::processor_id())
+    if(node.processor_id() == this->processor_id())
     {
       // The 0 is for the component... this only works for LAGRANGE!
       dof_id_type dof = node.dof_number(sys->number(), var_num, 0);

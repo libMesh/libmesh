@@ -58,61 +58,6 @@ void ParmetisPartitioner::_do_partition (MeshBase& mesh,
 					 const unsigned int n_sbdmns)
 {
   this->_do_repartition (mesh, n_sbdmns);
-
-//   libmesh_assert_greater (n_sbdmns, 0);
-
-//   // Check for an easy return
-//   if (n_sbdmns == 1)
-//     {
-//       this->single_partition (mesh);
-//       return;
-//     }
-
-//   // This function must be run on all processors at once
-//   parallel_only();
-
-// // What to do if the Parmetis library IS NOT present
-// #ifndef LIBMESH_HAVE_PARMETIS
-
-//   libmesh_here();
-//   libMesh::err << "ERROR: The library has been built without"  << std::endl
-// 	    << "Parmetis support.  Using a Metis"           << std::endl
-// 	    << "partitioner instead!"                       << std::endl;
-
-//   MetisPartitioner mp;
-
-//   mp.partition (mesh, n_sbdmns);
-
-// // What to do if the Parmetis library IS present
-// #else
-
-//   START_LOG("partition()", "ParmetisPartitioner");
-
-//   // Initialize the data structures required by ParMETIS
-//   this->initialize (mesh, n_sbdmns);
-
-//   // build the graph corresponding to the mesh
-//   this->build_graph (mesh);
-
-
-//   // Partition the graph
-//   MPI_Comm mpi_comm = libMesh::COMM_WORLD;
-
-//   // Call the ParMETIS k-way partitioning algorithm.
-//   Parmetis::ParMETIS_V3_PartKway(&_vtxdist[0], &_xadj[0], &_adjncy[0], &_vwgt[0], NULL,
-// 				 &_wgtflag, &_numflag, &_ncon, &_nparts, &_tpwgts[0],
-// 				 &_ubvec[0], &_options[0], &_edgecut,
-// 				 &_part[0],
-// 				 &mpi_comm);
-
-//   // Assign the returned processor ids
-//   this->assign_partitioning (mesh);
-
-
-//   STOP_LOG ("partition()", "ParmetisPartitioner");
-
-// #endif // #ifndef LIBMESH_HAVE_PARMETIS ... else ...
-
 }
 
 

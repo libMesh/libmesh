@@ -22,6 +22,7 @@
 // Local Includes
 #include "libmesh/parallel.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/parallel_object.h"
 
 // C++ Includes
 #include <vector>
@@ -44,7 +45,7 @@ namespace Parallel
    * is instantiated on all processors.
    */
 template <typename KeyType, typename IdxType=unsigned int>
-class Sort
+class Sort : public ParallelObject
 {
 public:
   /**
@@ -55,9 +56,8 @@ public:
    * a Sort object takes O(nlogn) time,
    * where n is the length of the vector.
    */
-  Sort (std::vector<KeyType>& d,
-	const processor_id_type n_procs = libMesh::n_processors(),
-	const processor_id_type proc_id = libMesh::processor_id());
+  Sort (const Parallel::Communicator &comm,
+	std::vector<KeyType>& d);
 
 
   /**

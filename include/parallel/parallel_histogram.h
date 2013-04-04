@@ -26,6 +26,7 @@
 
 // C++ includes
 #include "libmesh/libmesh_common.h" // for libmesh_assert()
+#include "libmesh/parallel_object.h"
 
 // Local includes
 #include <vector>
@@ -41,7 +42,7 @@ namespace Parallel {
    * a \p BinSorter.
    */
 template <typename KeyType, typename IdxType=unsigned int>
-class Histogram
+class Histogram : public ParallelObject
 {
   // The type of iterator we will be using is inferred from KeyType
   typedef typename std::vector<KeyType>::const_iterator IterType;
@@ -50,7 +51,8 @@ public:
 
   // Constructor
   explicit
-  Histogram (const std::vector<KeyType>& d);
+  Histogram (const Parallel::Communicator &comm,
+	     const std::vector<KeyType>& d);
 
   // The actual function which sorts the data into
   // nbins.  Currently based on the global min and
