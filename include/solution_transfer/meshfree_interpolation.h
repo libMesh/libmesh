@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/auto_ptr.h"
 #include "libmesh/point.h"
+#include "libmesh/parallel_object.h"
 #ifdef LIBMESH_HAVE_NANOFLANN
 #  include "libmesh/nanoflann.hpp"
 #endif
@@ -47,7 +48,7 @@ namespace libMesh
  * the common interface has overlapping but distinct boundary
  * discretizations.
  */
-class MeshfreeInterpolation
+class MeshfreeInterpolation : public ParallelObject
 {
 public:
 
@@ -68,7 +69,8 @@ public:
   /**
    * Constructor.
    */
-  MeshfreeInterpolation () :
+  MeshfreeInterpolation (const libMesh::Parallel::Communicator &comm /* = libMesh::CommWorld */ ) :
+    ParallelObject(comm),
     _parallelization_strategy (SYNC_SOURCES)
   {}
 
@@ -318,8 +320,9 @@ public:
    * which defaults to 2.
    */
   InverseDistanceInterpolation (const unsigned int n_interp_pts = 8,
-				                const Real  power               = 2) :
-    MeshfreeInterpolation(),
+				const Real  power               = 2,
+				const libMesh::Parallel::Communicator &comm = libMesh::CommWorld) :
+    MeshfreeInterpolation(comm),
 #if LIBMESH_HAVE_NANOFLANN
     _point_list_adaptor(_src_pts),
 #endif

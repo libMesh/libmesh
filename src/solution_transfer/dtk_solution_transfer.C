@@ -41,9 +41,11 @@
 
 namespace libMesh {
 
-DTKSolutionTransfer::DTKSolutionTransfer()
+DTKSolutionTransfer::DTKSolutionTransfer(const libMesh::Parallel::Communicator &comm) :
+  SolutionTransfer(comm)
 {
-  comm_default = Teuchos::DefaultComm<int>::getComm();
+  //comm_default = Teuchos::DefaultComm<int>::getComm();
+  comm_default = comm.get();
 }
 
 DTKSolutionTransfer::~DTKSolutionTransfer()

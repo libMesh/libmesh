@@ -35,7 +35,7 @@ namespace libMesh {
 class DirectSolutionTransfer : public SolutionTransfer
 {
 public:
-  DirectSolutionTransfer();
+  DirectSolutionTransfer(const libMesh::Parallel::Communicator &comm = libMesh::CommWorld);
   virtual ~DirectSolutionTransfer();
 
   /**

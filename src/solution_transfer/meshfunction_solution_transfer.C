@@ -25,7 +25,8 @@
 
 namespace libMesh {
 
-MeshFunctionSolutionTransfer::MeshFunctionSolutionTransfer()
+MeshFunctionSolutionTransfer::MeshFunctionSolutionTransfer(const libMesh::Parallel::Communicator &comm) :
+  SolutionTransfer(comm)
 {}
 
 MeshFunctionSolutionTransfer::~MeshFunctionSolutionTransfer()

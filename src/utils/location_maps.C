@@ -85,8 +85,8 @@ void LocationMap<T>::init(MeshBase& mesh)
   // On a parallel mesh we might not yet have a full bounding box
   if (!mesh.is_serial())
     {
-      CommWorld.min(_lower_bound);
-      CommWorld.max(_upper_bound);
+      mesh.communicator().min(_lower_bound);
+      mesh.communicator().max(_upper_bound);
     }
 
   this->fill(mesh);
