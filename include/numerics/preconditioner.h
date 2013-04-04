@@ -28,6 +28,7 @@
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -58,14 +59,15 @@ template <typename T> class ShellMatrix;
  */
 
 template <typename T>
-class Preconditioner : public ReferenceCountedObject<Preconditioner<T> >
+class Preconditioner : public ReferenceCountedObject<Preconditioner<T> >,
+                       public ParallelObject
 {
 public:
 
   /**
    *  Constructor. Initializes Preconditioner data structures
    */
-  Preconditioner ();
+  Preconditioner (const libMesh::Parallel::Communicator& /*= libMesh::CommWorld*/);
 
   /**
    * Destructor.
@@ -151,7 +153,8 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-Preconditioner<T>::Preconditioner () :
+Preconditioner<T>::Preconditioner (const libMesh::Parallel::Communicator &comm) :
+  ParallelObject(comm),
   _matrix(NULL),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized      (false)
