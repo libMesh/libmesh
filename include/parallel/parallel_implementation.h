@@ -758,7 +758,7 @@ inline void barrier (const Communicator &comm = Communicator_World)
 #ifdef LIBMESH_HAVE_MPI
 inline void Communicator::barrier () const
 {
-  if (libMesh::n_processors() > 1)
+  if (this->size() > 1)
     {
       START_LOG("barrier()", "Parallel");
 
