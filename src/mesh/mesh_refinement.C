@@ -934,12 +934,12 @@ bool MeshRefinement::make_flags_parallel_consistent()
   SyncRefinementFlags hsync(_mesh, &Elem::refinement_flag,
                             &Elem::set_refinement_flag);
   Parallel::sync_dofobject_data_by_id
-    (_mesh.elements_begin(), _mesh.elements_end(), hsync);
+    (this->communicator(), _mesh.elements_begin(), _mesh.elements_end(), hsync);
 
   SyncRefinementFlags psync(_mesh, &Elem::p_refinement_flag,
                             &Elem::set_p_refinement_flag);
   Parallel::sync_dofobject_data_by_id
-    (_mesh.elements_begin(), _mesh.elements_end(), psync);
+    (this->communicator(), _mesh.elements_begin(), _mesh.elements_end(), psync);
 
   // If we weren't consistent in both h and p on every processor then
   // we weren't globally consistent

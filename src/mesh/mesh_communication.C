@@ -827,7 +827,8 @@ void MeshCommunication::make_node_ids_parallel_consistent
 
   SyncIds syncids(mesh, &MeshBase::renumber_node);
   Parallel::sync_dofobject_data_by_xyz
-    (mesh.nodes_begin(), mesh.nodes_end(),
+    (mesh.communicator(),
+     mesh.nodes_begin(), mesh.nodes_end(),
      loc_map, syncids);
 
   STOP_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
@@ -924,7 +925,7 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
 
   SyncProcIds sync(mesh);
   Parallel::sync_dofobject_data_by_xyz
-    (mesh.nodes_begin(), mesh.nodes_end(), loc_map, sync);
+    (mesh.communicator(), mesh.nodes_begin(), mesh.nodes_end(), loc_map, sync);
 
   STOP_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 }

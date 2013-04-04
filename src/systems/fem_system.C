@@ -697,7 +697,7 @@ void FEMSystem::mesh_position_set()
 
   SyncNodalPositions sync_object(mesh);
   Parallel::sync_dofobject_data_by_id
-    (mesh.nodes_begin(), mesh.nodes_end(), sync_object);
+    (this->communicator(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
 }
 
 

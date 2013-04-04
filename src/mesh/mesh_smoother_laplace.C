@@ -133,7 +133,8 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
       // the processors which own them.  So we need to synchronize with our neighbors
       // and get the most up-to-date positions for the ghosts.
       SyncNodalPositions sync_object(_mesh);
-      Parallel::sync_dofobject_data_by_id(_mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
+      Parallel::sync_dofobject_data_by_id
+	(_mesh.communicator(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
 
     } // end for n_iterations
 
