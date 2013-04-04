@@ -43,7 +43,7 @@ namespace libMesh
 // Full specialization for Real datatypes
 template <typename T>
 AutoPtr<NumericVector<T> >
-NumericVector<T>::build(const SolverPackage solver_package)
+NumericVector<T>::build(const SolverPackage solver_package, const Parallel::Communicator &comm)
 {
   // Build the appropriate vector
   switch (solver_package)
@@ -53,7 +53,7 @@ NumericVector<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<NumericVector<T> > ap(new LaspackVector<T>);
+	AutoPtr<NumericVector<T> > ap(new LaspackVector<T>(AUTOMATIC, comm));
 	return ap;
       }
 #endif
@@ -62,16 +62,16 @@ NumericVector<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<NumericVector<T> > ap(new PetscVector<T>);
+	AutoPtr<NumericVector<T> > ap(new PetscVector<T>(AUTOMATIC, comm));
 	return ap;
       }
 #endif
 
-
+/*
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       {
-	AutoPtr<NumericVector<T> > ap(new EpetraVector<T>);
+	AutoPtr<NumericVector<T> > ap(new EpetraVector<T>(comm));
 	return ap;
       }
 #endif
@@ -80,15 +80,16 @@ NumericVector<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
       {
-	AutoPtr<NumericVector<T> > ap(new EigenSparseVector<T>);
+	AutoPtr<NumericVector<T> > ap(new EigenSparseVector<T>(comm));
 	return ap;
       }
 #endif
 
 
     default:
-      AutoPtr<NumericVector<T> > ap(new DistributedVector<T>);
+      AutoPtr<NumericVector<T> > ap(new DistributedVector<T>(comm));
       return ap;
+*/
     }
 
   AutoPtr<NumericVector<T> > ap(NULL);
@@ -119,7 +120,7 @@ int NumericVector<T>::compare (const NumericVector<T> &other_vector,
          && i<last_local_index());
 
   // Find the correct first differing index in parallel
-  CommWorld.min(first_different_i);
+  this->communicator().min(first_different_i);
 
   if (first_different_i == std::numeric_limits<int>::max())
     return -1;
@@ -152,7 +153,7 @@ int NumericVector<T>::local_relative_compare (const NumericVector<T> &other_vect
          && i<last_local_index());
 
   // Find the correct first differing index in parallel
-  CommWorld.min(first_different_i);
+  this->communicator().min(first_different_i);
 
   if (first_different_i == std::numeric_limits<int>::max())
     return -1;
@@ -188,7 +189,7 @@ int NumericVector<T>::global_relative_compare (const NumericVector<T> &other_vec
          && i<last_local_index());
 
   // Find the correct first differing index in parallel
-  CommWorld.min(first_different_i);
+  this->communicator().min(first_different_i);
 
   if (first_different_i == std::numeric_limits<int>::max())
     return -1;
@@ -317,7 +318,7 @@ Real NumericVector<T>::subset_l1_norm (const std::set<numeric_index_type> & indi
   for(; it!=it_end; ++it)
     norm += std::abs(v(*it));
 
-  CommWorld.sum(norm);
+  this->communicator().sum(norm);
 
   return norm;
 }
@@ -335,7 +336,7 @@ Real NumericVector<T>::subset_l2_norm (const std::set<numeric_index_type> & indi
   for(; it!=it_end; ++it)
     norm += TensorTools::norm_sq(v(*it));
 
-  CommWorld.sum(norm);
+  this->communicator().sum(norm);
 
   return std::sqrt(norm);
 }
@@ -357,7 +358,7 @@ Real NumericVector<T>::subset_linfty_norm (const std::set<numeric_index_type> & 
         norm = value;
     }
 
-  CommWorld.max(norm);
+  this->communicator().max(norm);
 
   return norm;
 }

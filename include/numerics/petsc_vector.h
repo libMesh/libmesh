@@ -66,14 +66,16 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  PetscVector (const ParallelType type = AUTOMATIC);
+  PetscVector (const ParallelType type = AUTOMATIC,
+               const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   PetscVector (const numeric_index_type n,
-               const ParallelType type = AUTOMATIC);
+               const ParallelType type = AUTOMATIC,
+               const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -81,7 +83,8 @@ public:
    */
   PetscVector (const numeric_index_type n,
 	       const numeric_index_type n_local,
-               const ParallelType type = AUTOMATIC);
+               const ParallelType type = AUTOMATIC,
+               const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -91,7 +94,8 @@ public:
   PetscVector (const numeric_index_type N,
 	       const numeric_index_type n_local,
 	       const std::vector<numeric_index_type>& ghost,
-               const ParallelType type = AUTOMATIC);
+               const ParallelType type = AUTOMATIC,
+               const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor.  Creates a PetscVector assuming you already have a
@@ -100,7 +104,7 @@ public:
    * This allows ownership of \p v to remain with the original creator,
    * and to simply provide additional functionality with the PetscVector.
    */
-  PetscVector(Vec v);
+  PetscVector(Vec v, const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -598,12 +602,13 @@ private:
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const ParallelType ptype)
-  : _array_is_present(false),
-    _local_form(NULL),
-    _values(NULL),
-    _global_to_local_map(),
-    _destroy_vec_on_exit(true)
+PetscVector<T>::PetscVector (const ParallelType ptype, const Parallel::Communicator &comm)
+    : NumericVector<T>(ptype, comm),
+      _array_is_present(false),
+      _local_form(NULL),
+      _values(NULL),
+      _global_to_local_map(),
+      _destroy_vec_on_exit(true)
 {
   this->_type = ptype;
 }
@@ -613,8 +618,10 @@ PetscVector<T>::PetscVector (const ParallelType ptype)
 template <typename T>
 inline
 PetscVector<T>::PetscVector (const numeric_index_type n,
-                             const ParallelType ptype)
-  : _array_is_present(false),
+                             const ParallelType ptype,
+                             const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm),
+    _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
@@ -629,8 +636,10 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const numeric_index_type n,
 			     const numeric_index_type n_local,
-                             const ParallelType ptype)
-  : _array_is_present(false),
+                             const ParallelType ptype,
+                             const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm),
+    _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
@@ -646,8 +655,10 @@ inline
 PetscVector<T>::PetscVector (const numeric_index_type n,
 			     const numeric_index_type n_local,
 			     const std::vector<numeric_index_type>& ghost,
-                             const ParallelType ptype)
-  : _array_is_present(false),
+                             const ParallelType ptype,
+                             const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm),
+    _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
@@ -662,8 +673,9 @@ PetscVector<T>::PetscVector (const numeric_index_type n,
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (Vec v)
-  : _array_is_present(false),
+PetscVector<T>::PetscVector (Vec v, const Parallel::Communicator &comm)
+  : NumericVector<T>(AUTOMATIC, comm),
+    _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),

@@ -28,6 +28,7 @@
 #include "libmesh/id_types.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -54,7 +55,8 @@ template <typename T> class ShellMatrix;
  * @author Benjamin S. Kirk, 2003
  */
 template <typename T>
-class NumericVector : public ReferenceCountedObject<NumericVector<T> >
+class NumericVector : public ReferenceCountedObject<NumericVector<T> >,
+                      public ParallelObject
 {
 public:
 
@@ -62,14 +64,16 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  NumericVector (const ParallelType ptype = AUTOMATIC);
+  NumericVector (const ParallelType ptype = AUTOMATIC,
+                 const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   NumericVector (const numeric_index_type n,
-                 const ParallelType ptype = AUTOMATIC);
+                 const ParallelType ptype = AUTOMATIC,
+                 const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -77,7 +81,8 @@ public:
    */
   NumericVector (const numeric_index_type n,
 		 const numeric_index_type n_local,
-                 const ParallelType ptype = AUTOMATIC);
+                 const ParallelType ptype = AUTOMATIC,
+                 const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -87,7 +92,8 @@ public:
   NumericVector (const numeric_index_type N,
 		 const numeric_index_type n_local,
 		 const std::vector<numeric_index_type>& ghost,
-                 const ParallelType ptype = AUTOMATIC);
+                 const ParallelType ptype = AUTOMATIC,
+                 const Parallel::Communicator &comm=libMesh::CommWorld);
 
 public:
 
@@ -102,7 +108,8 @@ public:
    * \p solver_package
    */
   static AutoPtr<NumericVector<T> >
-  build(const SolverPackage solver_package = libMesh::default_solver_package());
+  build(const SolverPackage solver_package = libMesh::default_solver_package(),
+        const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * @returns true if the vector has been initialized,
@@ -646,7 +653,8 @@ protected:
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const ParallelType ptype) :
+NumericVector<T>::NumericVector (const ParallelType ptype, const Parallel::Communicator &comm) :
+  ParallelObject(comm),
   _is_closed(false),
   _is_initialized(false),
   _type(ptype)
@@ -658,7 +666,9 @@ NumericVector<T>::NumericVector (const ParallelType ptype) :
 template <typename T>
 inline
 NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
-                                 const ParallelType ptype) :
+                                 const ParallelType ptype,
+                                 const Parallel::Communicator &comm) :
+  ParallelObject(comm),
   _is_closed(false),
   _is_initialized(false),
   _type(ptype)
@@ -673,7 +683,9 @@ template <typename T>
 inline
 NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
 				 const numeric_index_type /*n_local*/,
-                                 const ParallelType ptype) :
+                                 const ParallelType ptype,
+                                 const Parallel::Communicator &comm) :
+  ParallelObject(comm),
   _is_closed(false),
   _is_initialized(false),
   _type(ptype)
@@ -689,7 +701,9 @@ inline
 NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
 				 const numeric_index_type /*n_local*/,
 				 const std::vector<numeric_index_type>& /*ghost*/,
-                                 const ParallelType ptype) :
+                                 const ParallelType ptype,
+                                 const Parallel::Communicator &comm) :
+  ParallelObject(comm),
   _is_closed(false),
   _is_initialized(false),
   _type(ptype)
