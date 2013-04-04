@@ -895,8 +895,8 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	    }
 
 #ifdef LIBMESH_HAVE_MPI
-      Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
-      Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
+      Parallel::MessageTag id_tag  = this->communicator().get_unique_tag(100*num_blks + blk);
+      Parallel::MessageTag val_tag = this->communicator().get_unique_tag(200*num_blks + blk);
 
       // nonblocking send the data for this block
       this->communicator().send (0, ids,  id_requests[blk],  id_tag);
@@ -942,8 +942,8 @@ dof_id_type System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
 	  ThreadedIO<InValType> threaded_io(io, input_vals_tmp);
 	  Threads::Thread async_io(threaded_io);
 
-	  Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
-	  Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
+	  Parallel::MessageTag id_tag  = this->communicator().get_unique_tag(100*num_blks + blk);
+	  Parallel::MessageTag val_tag = this->communicator().get_unique_tag(200*num_blks + blk);
 
 	  // offset array. this will define where each object's values
 	  // map into the actual input_vals buffer.  this must get
@@ -1103,7 +1103,7 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 #ifdef LIBMESH_HAVE_MPI
   if ( this->n_processors() > 1 )
     {
-      const Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(321);
+      const Parallel::MessageTag val_tag = this->communicator().get_unique_tag(321);
 
       // Post the receive on the last processor
       if (this->processor_id() == (this->n_processors()-1))
@@ -1923,8 +1923,8 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	    }
 
 #ifdef LIBMESH_HAVE_MPI
-      Parallel::MessageTag id_tag  = Parallel::Communicator_World.get_unique_tag(100*num_blks + blk);
-      Parallel::MessageTag val_tag = Parallel::Communicator_World.get_unique_tag(200*num_blks + blk);
+      Parallel::MessageTag id_tag  = this->communicator().get_unique_tag(100*num_blks + blk);
+      Parallel::MessageTag val_tag = this->communicator().get_unique_tag(200*num_blks + blk);
 
       // nonblocking send the data for this block
       this->communicator().send (0, ids,  id_requests[blk],  id_tag);
@@ -1962,8 +1962,8 @@ dof_id_type System::write_serialized_blocked_dof_objects (const std::vector<cons
 	  dof_id_type n_val_recvd_blk=0;
 
 	  // tags to select data received
-	  Parallel::MessageTag id_tag  (Parallel::Communicator_World.get_unique_tag(100*num_blks + blk));
-	  Parallel::MessageTag val_tag (Parallel::Communicator_World.get_unique_tag(200*num_blks + blk));
+	  Parallel::MessageTag id_tag  (this->communicator().get_unique_tag(100*num_blks + blk));
+	  Parallel::MessageTag val_tag (this->communicator().get_unique_tag(200*num_blks + blk));
 
 	  // receive this block of data from all processors.
  	  for (unsigned int comm_step=0; comm_step<this->n_processors(); comm_step++)

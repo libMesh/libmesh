@@ -634,8 +634,8 @@ void XdrIO::write_serialized_nodes (Xdr &io, const dof_id_type n_nodes) const
         coord_request_handles(this->n_processors()-1);
 
       Parallel::MessageTag
-        id_tag    = Parallel::Communicator_World.get_unique_tag(1234),
-        coord_tag = Parallel::Communicator_World.get_unique_tag(1235);
+        id_tag    = mesh.communicator().get_unique_tag(1234),
+        coord_tag = mesh.communicator().get_unique_tag(1235);
 
       // Post the receives -- do this on processor 0 only.
       if (this->processor_id() == 0)
