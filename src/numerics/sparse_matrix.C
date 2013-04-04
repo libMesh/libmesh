@@ -191,7 +191,7 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
 
   // We'll print the matrix from processor 0 to make sure
   // it's serialized properly
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       libmesh_assert_equal_to (this->_dof_map->first_dof(), 0);
       for (numeric_index_type i=this->_dof_map->first_dof();
