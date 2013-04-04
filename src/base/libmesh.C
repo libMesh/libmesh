@@ -372,13 +372,14 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
 	}
 
       // Duplicate the input communicator for internal use
-      MPI_Comm_dup (COMM_WORLD_IN, &libMesh::COMM_WORLD);
-
       // And get a Parallel::Communicator copy too, to use
       // as a default for that API
       this->comm = COMM_WORLD_IN;
+
+      libMesh::COMM_WORLD = this->comm.get();
+
 #ifndef LIBMESH_DISABLE_COMMWORLD
-      Parallel::Communicator_World.duplicate(this->comm);
+      Parallel::Communicator_World = COMM_WORLD_IN;
 #endif
 
       //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
