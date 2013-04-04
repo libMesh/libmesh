@@ -723,6 +723,7 @@ include_HEADERS = \
         numerics/vector_value.h \
         numerics/wrapped_function.h \
         numerics/zero_function.h \
+        parallel/fake_communicator.h \
         parallel/parallel.h \
         parallel/parallel_algebra.h \
         parallel/parallel_bin_sorter.h \
