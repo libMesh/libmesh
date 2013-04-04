@@ -65,14 +65,16 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  EpetraVector (const ParallelType type = AUTOMATIC);
+  EpetraVector (const ParallelType type = AUTOMATIC,
+                const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   EpetraVector (const numeric_index_type n,
-                const ParallelType type = AUTOMATIC);
+                const ParallelType type = AUTOMATIC,
+                const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -80,7 +82,8 @@ public:
    */
   EpetraVector (const numeric_index_type n,
 	        const numeric_index_type n_local,
-                const ParallelType type = AUTOMATIC);
+                const ParallelType type = AUTOMATIC,
+                const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -90,7 +93,8 @@ public:
   EpetraVector (const numeric_index_type N,
 		const numeric_index_type n_local,
 		const std::vector<numeric_index_type>& ghost,
-                const ParallelType type = AUTOMATIC);
+                const ParallelType type = AUTOMATIC,
+                const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor.  Creates a EpetraVector assuming you already have a
@@ -99,7 +103,8 @@ public:
    * This allows ownership of v to remain with the original creator,
    * and to simply provide additional functionality with the EpetraVector.
    */
-  EpetraVector(Epetra_Vector & v);
+  EpetraVector(Epetra_Vector & v,
+               const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -620,8 +625,10 @@ private:
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (const ParallelType type)
-: _destroy_vec_on_exit(true),
+EpetraVector<T>::EpetraVector (const ParallelType type,
+                               const Parallel::Communicator &comm)
+: NumericVector<T>(type, comm),
+  _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
   myCoefs_(NULL),
@@ -641,8 +648,10 @@ EpetraVector<T>::EpetraVector (const ParallelType type)
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const numeric_index_type n,
-                               const ParallelType type)
-: _destroy_vec_on_exit(true),
+                               const ParallelType type,
+                               const Parallel::Communicator &comm)
+: NumericVector<T>(type, comm),
+  _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
   myCoefs_(NULL),
@@ -664,8 +673,10 @@ template <typename T>
 inline
 EpetraVector<T>::EpetraVector (const numeric_index_type n,
 			       const numeric_index_type n_local,
-                               const ParallelType type)
-: _destroy_vec_on_exit(true),
+                               const ParallelType type,
+                               const Parallel::Communicator &comm)
+: NumericVector<T>(type, comm),
+  _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
   myCoefs_(NULL),
@@ -685,18 +696,20 @@ EpetraVector<T>::EpetraVector (const numeric_index_type n,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector(Epetra_Vector & v)
-: _destroy_vec_on_exit(false),
-  myFirstID_(0),
-  myNumIDs_(0),
-  myCoefs_(NULL),
-  nonlocalIDs_(NULL),
-  nonlocalElementSize_(NULL),
-  numNonlocalIDs_(0),
-  allocatedNonlocalLength_(0),
-  nonlocalCoefs_(NULL),
-  last_edit(0),
-  ignoreNonLocalEntries_(false)
+EpetraVector<T>::EpetraVector(Epetra_Vector & v,
+                              const Parallel::Communicator &comm)
+  : NumericVector<T>(AUTOMATIC, comm),
+    _destroy_vec_on_exit(false),
+    myFirstID_(0),
+    myNumIDs_(0),
+    myCoefs_(NULL),
+    nonlocalIDs_(NULL),
+    nonlocalElementSize_(NULL),
+    numNonlocalIDs_(0),
+    allocatedNonlocalLength_(0),
+    nonlocalCoefs_(NULL),
+    last_edit(0),
+    ignoreNonLocalEntries_(false)
 {
   _vec = &v;
 
@@ -721,8 +734,10 @@ inline
 EpetraVector<T>::EpetraVector (const numeric_index_type n,
 			       const numeric_index_type n_local,
 		               const std::vector<numeric_index_type>& ghost,
-                               const ParallelType type)
-: _destroy_vec_on_exit(true),
+                               const ParallelType type,
+                               const Parallel::Communicator &comm)
+: NumericVector<T>(AUTOMATIC, comm),
+  _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
   myCoefs_(NULL),

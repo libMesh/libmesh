@@ -67,16 +67,16 @@ NumericVector<T>::build(const SolverPackage solver_package, const Parallel::Comm
       }
 #endif
 
-/*
+
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       {
-	AutoPtr<NumericVector<T> > ap(new EpetraVector<T>(comm));
+	AutoPtr<NumericVector<T> > ap(new EpetraVector<T>(AUTOMATIC, comm));
 	return ap;
       }
 #endif
 
-
+/*
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
       {
