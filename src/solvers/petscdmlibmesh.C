@@ -141,6 +141,8 @@ PetscErrorCode DMLibMeshSetUpName_Private(DM dm)
 #define __FUNCT__ "DMLibMeshSetSystem"
 PetscErrorCode DMLibMeshSetSystem(DM dm, NonlinearImplicitSystem& sys)
 {
+  const Parallel::Communicator &communicator(sys.communicator());
+
   PetscErrorCode ierr;
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
@@ -173,7 +175,7 @@ PetscErrorCode DMLibMeshSetSystem(DM dm, NonlinearImplicitSystem& sys)
   for (; el!=end; ++el)
     blocks.insert((*el)->subdomain_id());
   // Some subdomains may only live on other processors
-  CommWorld.set_union(blocks);
+  communicator.set_union(blocks);
 
   std::set<subdomain_id_type>::iterator bit = blocks.begin();
   std::set<subdomain_id_type>::iterator bend = blocks.end();
