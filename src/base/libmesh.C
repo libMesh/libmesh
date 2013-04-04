@@ -315,10 +315,10 @@ void libmesh_terminate_handler()
 
 
 #ifndef LIBMESH_HAVE_MPI
-void _init (int argc, const char* const* argv)
+LibMeshInit::LibMeshInit (int argc, const char* const* argv)
 #else
-void _init (int argc, const char* const* argv,
-	    MPI_Comm COMM_WORLD_IN)
+LibMeshInit::LibMeshInit (int argc, const char* const* argv,
+		          MPI_Comm COMM_WORLD_IN)
 #endif
 {
   // should _not_ be initialized already.
@@ -376,15 +376,18 @@ void _init (int argc, const char* const* argv,
 
       // And get a Parallel::Communicator copy too, to use
       // as a default for that API
-      Parallel::Communicator_World = libMesh::COMM_WORLD;
+      this->comm = COMM_WORLD_IN;
+#ifndef LIBMESH_DISABLE_COMMWORLD
+      Parallel::Communicator_World.duplicate(this->comm);
+#endif
 
       //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
       //MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
 
       libMeshPrivateData::_processor_id =
-        libmesh_cast_int<processor_id_type>(Parallel::Communicator_World.rank());
+        libmesh_cast_int<processor_id_type>(this->comm.rank());
       libMeshPrivateData::_n_processors =
-        libmesh_cast_int<processor_id_type>(Parallel::Communicator_World.size());
+        libmesh_cast_int<processor_id_type>(this->comm.size());
 
       // Set up an MPI error handler if requested.  This helps us get
       // into a debugger with a proper stack when an MPI error occurs.
@@ -535,7 +538,7 @@ void _init (int argc, const char* const* argv,
 
 
 
-int _close ()
+LibMeshInit::~LibMeshInit()
 {
   // We can't delete, finalize, etc. more than once without
   // reinitializing in between
@@ -591,7 +594,10 @@ int _close ()
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
+      this->comm.clear();
+#ifndef LIBMESH_DISABLE_COMMWORLD
       Parallel::Communicator_World.clear();
+#endif
       MPI_Comm_free (&libMesh::COMM_WORLD);
 
       if (libmesh_initialized_mpi)
@@ -668,61 +674,7 @@ int _close ()
 
   if (libMesh::on_command_line("--enable-fpe"))
     enableFPE(false);
-
-
-  // Return the number of outstanding objects.
-  // This is equivalent to return 0 if all of
-  // the reference counted objects have been
-  // deleted.
-  return static_cast<int>(ReferenceCounter::n_objects());
 }
-
-
-
-#ifndef LIBMESH_HAVE_MPI
-void init (int argc, const char* const * argv)
-{
-  libmesh_deprecated();  // Use LibMeshInit instead
-  libMesh::_init(argc, argv);
-}
-#else
-void init (int argc, const char* const * argv,
-		    MPI_Comm COMM_WORLD_IN)
-{
-  libmesh_deprecated();  // Use LibMeshInit instead
-  libMesh::_init(argc, argv, COMM_WORLD_IN);
-}
-#endif
-
-
-
-
-int close ()
-{
-  libmesh_deprecated();  // Use LibMeshInit instead
-  return libMesh::_close();
-}
-
-
-
-#ifndef LIBMESH_HAVE_MPI
-LibMeshInit::LibMeshInit (int argc, const char* const* argv)
-{
-  libMesh::_init(argc, argv);
-}
-#else
-LibMeshInit::LibMeshInit (int argc, const char* const* argv,
-		          MPI_Comm COMM_WORLD_IN)
-{
-  libMesh::_init(argc, argv, COMM_WORLD_IN);
-}
-#endif
-
-LibMeshInit::~LibMeshInit()
-{
-  libMesh::_close();
-}
-
 
 
 
