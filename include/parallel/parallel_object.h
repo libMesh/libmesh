@@ -67,6 +67,17 @@ namespace libMesh
     {}
 
     /**
+     * "Assignment" operator.  Simply asserts our references
+     * are identical because this is the only thing that makes
+     * sense
+     */
+     ParallelObject & operator= (const ParallelObject &other)
+     {
+       libmesh_assert_equal_to (&_communicator, &other._communicator);
+       return *this;
+     }
+
+    /**
      * Destructor.  Virtual because we are a base class.
      */
     virtual ~ParallelObject () {};
