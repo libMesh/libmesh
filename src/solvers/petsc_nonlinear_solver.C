@@ -102,7 +102,7 @@ extern "C"
 
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscVector<Number>& R_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
-    PetscVector<Number> X_global(x), R(r);
+    PetscVector<Number> X_global(x, sys.communicator()), R(r, sys.communicator());
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
@@ -180,7 +180,7 @@ extern "C"
     PetscMatrix<Number> Jac(*jac);
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
-    PetscVector<Number> X_global(x);
+    PetscVector<Number> X_global(x, sys.communicator());
 
     // Set the dof maps
     PC.attach_dof_map(sys.get_dof_map());

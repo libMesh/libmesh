@@ -80,7 +80,7 @@ __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
   PetscVector<Number>& R_system =
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
-  PetscVector<Number> X_input(x), R_input(r);
+  PetscVector<Number> X_input(x, sys.communicator()), R_input(r, sys.communicator());
 
   // DiffSystem assembles from the solution and into the rhs, so swap
   // those with our input vectors before assembling.  They'll probably
@@ -126,7 +126,7 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *libmesh_dbg_var(j), Mat 
 
   PetscVector<Number>& X_system =
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
-  PetscVector<Number> X_input(x);
+  PetscVector<Number> X_input(x, sys.communicator());
 
   PetscMatrix<Number> J_input(*pc);
   PetscMatrix<Number>& J_system =

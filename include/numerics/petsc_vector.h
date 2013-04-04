@@ -1037,7 +1037,7 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > PetscVector<T>::zero_clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>(this->type(), this->communicator()));
 
   cloned_vector->init(*this);
 
@@ -1050,7 +1050,7 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > PetscVector<T>::clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>(this->type(), this->communicator()));
 
   cloned_vector->init(*this, true);
 
