@@ -39,7 +39,7 @@ void ErrorEstimator::reduce_error (std::vector<ErrorVectorReal>& error_per_cell)
   // for its local elements.  We may need to sum the vector to
   // recover the error for each element.
 
-  CommWorld.sum(error_per_cell);
+  this->communicator().sum(error_per_cell);
 }
 
 

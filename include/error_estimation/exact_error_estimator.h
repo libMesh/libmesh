@@ -70,10 +70,12 @@ public:
    * Constructor.  Responsible for initializing the _bc_function function
    * pointer to NULL, and defaulting the norm type to H1.
    */
-  ExactErrorEstimator() : _exact_value(NULL),
-                          _exact_deriv(NULL),
-                          _exact_hessian(NULL),
-			  _extra_order(0)
+  ExactErrorEstimator(const Parallel::Communicator &comm = libMesh::CommWorld) :
+    ErrorEstimator(comm),
+    _exact_value(NULL),
+    _exact_deriv(NULL),
+    _exact_hessian(NULL),
+    _extra_order(0)
   { error_norm = H1; }
 
   /**

@@ -540,6 +540,9 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // Make sure we aren't "overconfigured"
   libmesh_assert (!(_exact_values.size() && _equation_systems_fine));
 
+  // We need a commmunicator.
+  const Parallel::Communicator &communicator (_equation_systems.communicator());
+
   // Get a reference to the system whose error is being computed.
   // If we have a fine grid, however, we'll integrate on that instead
   // for more accuracy.
@@ -859,8 +862,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // Add up the error values on all processors, except for the L-infty
   // norm, for which the maximum is computed.
   Real l_infty_norm = error_vals[4];
-  CommWorld.max(l_infty_norm);
-  CommWorld.sum(error_vals);
+  communicator.max(l_infty_norm);
+  communicator.sum(error_vals);
   error_vals[4] = l_infty_norm;
 }
 
