@@ -21,6 +21,7 @@
 
 // Local includes
 #include "parallel.h"
+#include "libmesh_logging.h"
 
 
 // First declare StandardType specializations so we can use them in anonymous
