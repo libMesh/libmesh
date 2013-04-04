@@ -504,7 +504,7 @@ void EpetraVector<T>::localize (const unsigned int first_local_idx,
 
   // Build a parallel vector, initialize it with the local
   // parts of (*this)
-  EpetraVector<T> parallel_vec;
+  EpetraVector<T> parallel_vec(PARALLEL, this->communicator());
 
   parallel_vec.init (my_size, my_local_size, true, PARALLEL);
 

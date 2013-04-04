@@ -909,7 +909,7 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new EpetraVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector (new EpetraVector<T>(AUTOMATIC, this->communicator()));
 
   cloned_vector->init(*this);
 
@@ -922,7 +922,7 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > EpetraVector<T>::clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new EpetraVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector (new EpetraVector<T>(AUTOMATIC, this->communicator()));
 
   cloned_vector->init(*this, true);
 
