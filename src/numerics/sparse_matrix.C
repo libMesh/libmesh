@@ -219,11 +219,11 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
       std::vector<numeric_index_type> ibuf, jbuf;
       std::vector<T> cbuf;
       numeric_index_type currenti = this->_dof_map->end_dof();
-      for (processor_id_type p=1; p < libMesh::n_processors(); ++p)
+      for (processor_id_type p=1; p < this->n_processors(); ++p)
         {
-          CommWorld.receive(p, ibuf);
-          CommWorld.receive(p, jbuf);
-          CommWorld.receive(p, cbuf);
+          this->communicator().receive(p, ibuf);
+          this->communicator().receive(p, jbuf);
+          this->communicator().receive(p, cbuf);
           libmesh_assert_equal_to (ibuf.size(), jbuf.size());
           libmesh_assert_equal_to (ibuf.size(), cbuf.size());
 
@@ -297,9 +297,9 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
                 }
 	    }
         }
-      CommWorld.send(0,ibuf);
-      CommWorld.send(0,jbuf);
-      CommWorld.send(0,cbuf);
+      this->communicator().send(0,ibuf);
+      this->communicator().send(0,jbuf);
+      this->communicator().send(0,cbuf);
     }
 }
 

@@ -553,7 +553,7 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
   const unsigned int n  = this->size();
   const unsigned int nl = this->local_size();
 
-  libmesh_assert_less (pid, libMesh::n_processors());
+  libmesh_assert_less (pid, this->n_processors());
   libmesh_assert(this->_vec);
 
   v_local.clear();
@@ -654,7 +654,7 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 //       // init() function (where we let Epetra decide the number of local
 //       // entries) is not currently offered by the EpetraVector
 //       // class.  Should we differentiate here between sequential and
-//       // parallel vector creation based on libMesh::n_processors() ?
+//       // parallel vector creation based on this->n_processors() ?
 //       ierr = VecCreateMPI(libMesh::COMM_WORLD,
 // 			  EPETRA_DECIDE,          // n_local
 // 			  rows.size(),           // n_global

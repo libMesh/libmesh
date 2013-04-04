@@ -951,7 +951,7 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
 //  if ((first_local_idx == 0) &&
 //      (my_local_size == my_size))
   // But we do need to stay in sync for degenerate cases
-  if (libMesh::n_processors() == 1)
+  if (this->n_processors() == 1)
     return;
 
 
@@ -1339,7 +1339,7 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
       // init() function (where we let PETSc decide the number of local
       // entries) is not currently offered by the PetscVector
       // class.  Should we differentiate here between sequential and
-      // parallel vector creation based on libMesh::n_processors() ?
+      // parallel vector creation based on this->n_processors() ?
       ierr = VecCreateMPI(this->communicator().get(),
 			  PETSC_DECIDE,          // n_local
 			  rows.size(),           // n_global
