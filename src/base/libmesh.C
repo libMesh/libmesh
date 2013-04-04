@@ -371,7 +371,7 @@ void _init (int argc, const char* const* argv,
 
       // And get a Parallel::Communicator copy too, to use
       // as a default for that API
-      Parallel::Communicator_World = COMM_WORLD_IN;
+      Parallel::Communicator_World = libMesh::COMM_WORLD;
 
       //MPI_Comm_set_name not supported in at least SGI MPT's MPI implementation
       //MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
