@@ -749,7 +749,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
                                             mesh.active_local_elements_end()),
                            qoi_contributions);
 
-  this->diff_qoi->parallel_op( this->qoi, qoi_contributions.qoi, qoi_indices );
+  this->diff_qoi->parallel_op( this->communicator(), this->qoi, qoi_contributions.qoi, qoi_indices );
 
   STOP_LOG("assemble_qoi()", "FEMSystem");
 }
