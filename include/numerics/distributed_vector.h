@@ -57,14 +57,16 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  DistributedVector (const ParallelType = AUTOMATIC);
+  DistributedVector (const ParallelType = AUTOMATIC,
+                     const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   DistributedVector (const numeric_index_type n,
-                     const ParallelType ptype = AUTOMATIC);
+                     const ParallelType ptype = AUTOMATIC,
+                     const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -72,7 +74,8 @@ public:
    */
   DistributedVector (const numeric_index_type n,
 		     const numeric_index_type n_local,
-                     const ParallelType ptype = AUTOMATIC);
+                     const ParallelType ptype = AUTOMATIC,
+                     const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -82,7 +85,8 @@ public:
   DistributedVector (const numeric_index_type N,
 		     const numeric_index_type n_local,
 		     const std::vector<numeric_index_type>& ghost,
-                     const ParallelType ptype = AUTOMATIC);
+                     const ParallelType ptype = AUTOMATIC,
+                     const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -476,7 +480,8 @@ private:
 // DistributedVector inline methods
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const ParallelType ptype) :
+DistributedVector<T>::DistributedVector (const ParallelType ptype, const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm),
   _global_size      (0),
   _local_size       (0),
   _first_local_index(0),
@@ -490,7 +495,9 @@ DistributedVector<T>::DistributedVector (const ParallelType ptype) :
 template <typename T>
 inline
 DistributedVector<T>::DistributedVector (const numeric_index_type n,
-                                         const ParallelType ptype)
+                                         const ParallelType ptype,
+                                         const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm)
 {
   this->init(n, n, false, ptype);
 }
@@ -501,7 +508,9 @@ template <typename T>
 inline
 DistributedVector<T>::DistributedVector (const numeric_index_type n,
 					 const numeric_index_type n_local,
-                                         const ParallelType ptype)
+                                         const ParallelType ptype,
+                                         const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm)
 {
   this->init(n, n_local, false, ptype);
 }
@@ -513,7 +522,9 @@ inline
 DistributedVector<T>::DistributedVector (const numeric_index_type n,
 					 const numeric_index_type n_local,
 		                         const std::vector<numeric_index_type>& ghost,
-                                         const ParallelType ptype)
+                                         const ParallelType ptype,
+                                         const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm)
 {
   this->init(n, n_local, ghost, false, ptype);
 }
@@ -571,7 +582,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 
   local_sizes[libMesh::processor_id()] = n_local;
 
-  CommWorld.sum(local_sizes);
+  this->communicator().sum(local_sizes);
 
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
@@ -834,7 +845,7 @@ Real DistributedVector<T>::min () const
   for (numeric_index_type i = 1; i < _values.size(); ++i)
     local_min = std::min(libmesh_real(_values[i]), local_min);
 
-  CommWorld.min(local_min);
+  this->communicator().min(local_min);
 
   return local_min;
 }
@@ -857,7 +868,7 @@ Real DistributedVector<T>::max() const
   for (numeric_index_type i = 1; i < _values.size(); ++i)
     local_max = std::max(libmesh_real(_values[i]), local_max);
 
-  CommWorld.max(local_max);
+  this->communicator().max(local_max);
 
   return local_max;
 }

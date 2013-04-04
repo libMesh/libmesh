@@ -53,7 +53,7 @@ T DistributedVector<T>::sum () const
   for (numeric_index_type i=0; i<local_size(); i++)
     local_sum += _values[i];
 
-  CommWorld.sum(local_sum);
+  this->communicator().sum(local_sum);
 
   return local_sum;
 }
@@ -75,7 +75,7 @@ Real DistributedVector<T>::l1_norm () const
   for (numeric_index_type i=0; i<local_size(); i++)
     local_l1 += std::abs(_values[i]);
 
-  CommWorld.sum(local_l1);
+  this->communicator().sum(local_l1);
 
   return local_l1;
 }
@@ -97,7 +97,7 @@ Real DistributedVector<T>::l2_norm () const
   for (numeric_index_type i=0; i<local_size(); i++)
     local_l2 += TensorTools::norm_sq(_values[i]);
 
-  CommWorld.sum(local_l2);
+  this->communicator().sum(local_l2);
 
   return std::sqrt(local_l2);
 }
@@ -123,7 +123,7 @@ Real DistributedVector<T>::linfty_norm () const
                                 // types are the same, as required
                                 // by std::max
 
-  CommWorld.max(local_linfty);
+  this->communicator().max(local_linfty);
 
   return local_linfty;
 }
@@ -365,7 +365,7 @@ T DistributedVector<T>::dot (const NumericVector<T>& V) const
     local_dot += this->_values[i] * v->_values[i];
 
   // The local dot products are now summed via MPI
-  CommWorld.sum(local_dot);
+  this->communicator().sum(local_dot);
 
   return local_dot;
 }
@@ -548,7 +548,7 @@ void DistributedVector<T>::localize (std::vector<T>& v_local) const
 
   v_local = this->_values;
 
-  CommWorld.allgather (v_local);
+  this->communicator().allgather (v_local);
 
 #ifndef LIBMESH_HAVE_MPI
   libmesh_assert_equal_to (local_size(), size());
@@ -570,7 +570,7 @@ void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
 
   v_local = this->_values;
 
-  CommWorld.gather (pid, v_local);
+  this->communicator().gather (pid, v_local);
 
 #ifndef LIBMESH_HAVE_MPI
   libmesh_assert_equal_to (local_size(), size());
