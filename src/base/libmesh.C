@@ -217,10 +217,13 @@ MPI_Comm           COMM_WORLD = MPI_COMM_NULL;
 int                COMM_WORLD = 0;
 #endif
 
+#ifdef LIBMESH_DISABLE_COMMWORLD
+Parallel::FakeCommunicator CommWorld;
+Parallel::FakeCommunicator& Parallel::Communicator_World = CommWorld;
+#else
 Parallel::Communicator CommWorld;
 Parallel::Communicator& Parallel::Communicator_World = CommWorld;
-  //Parallel::Communicator CommWorldDefault;
-  //Parallel::Communicator& Parallel::Communicator_World = CommWorldDefault;
+#endif
 
 
 OStreamProxy out(std::cout);

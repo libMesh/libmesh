@@ -1082,6 +1082,16 @@ namespace Parallel
 
   }; // class Communicator
 
+  // FakeCommunicator for debugging inappropriate CommWorld uses
+  class FakeCommunicator
+  {
+    operator Communicator& () {
+      libmesh_error();
+      static Communicator temp;
+      return temp;
+    }
+  };
+
   // PostWaitWork specialization for copying from temporary to
   // output containers
   template <typename Container, typename OutputIter>
@@ -1127,8 +1137,11 @@ namespace Parallel
   /**
    * The default libMesh communicator
    */
+#ifdef LIBMESH_DISABLE_COMMWORLD
+  extern Parallel::FakeCommunicator CommWorld;
+#else
   extern Parallel::Communicator CommWorld;
-  //extern Parallel::Communicator CommWorldDefault;
+#endif
 
 } // namespace libMesh
 

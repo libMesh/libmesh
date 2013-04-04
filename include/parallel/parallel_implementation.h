@@ -347,7 +347,11 @@ namespace Parallel
  * deprecated - instead of libMesh::Parallel::Communicator_World use
  * libMesh::CommWorld
  */
+#ifdef LIBMESH_DISABLE_COMMWORLD
+extern FakeCommunicator& Communicator_World;
+#else
 extern Communicator& Communicator_World;
+#endif
 
 
 /**
