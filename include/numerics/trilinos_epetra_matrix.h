@@ -72,7 +72,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
-  EpetraMatrix ();
+  EpetraMatrix (const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Constructor.  Creates a EpetraMatrix assuming you already
@@ -81,7 +81,8 @@ public:
    * This allows ownership of m to remain with the original creator,
    * and to simply provide additional functionality with the EpetraMatrix.
    */
-  EpetraMatrix (Epetra_FECrsMatrix * m);
+  EpetraMatrix (Epetra_FECrsMatrix * m,
+		const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Destructor. Free all memory, but do not

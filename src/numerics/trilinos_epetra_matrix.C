@@ -50,7 +50,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
 
   const numeric_index_type m   = this->_dof_map->n_dofs();
   const numeric_index_type n   = m;
-  const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(libMesh::processor_id());
+  const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(this->processor_id());
   const numeric_index_type m_l = n_l;
 
   // error checking
@@ -63,8 +63,8 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
       summed_m_l = m_l,
       summed_n_l = n_l;
 
-    CommWorld.sum (summed_m_l);
-    CommWorld.sum (summed_n_l);
+    this->communicator().sum (summed_m_l);
+    this->communicator().sum (summed_n_l);
 
     libmesh_assert_equal_to (m, summed_m_l);
     libmesh_assert_equal_to (n, summed_n_l);
@@ -147,8 +147,8 @@ void EpetraMatrix<T>::init (const numeric_index_type m,
       summed_m_l = m_l,
       summed_n_l = n_l;
 
-    CommWorld.sum (summed_m_l);
-    CommWorld.sum (summed_n_l);
+    this->communicator().sum (summed_m_l);
+    this->communicator().sum (summed_n_l);
 
     libmesh_assert_equal_to (m, summed_m_l);
     libmesh_assert_equal_to (n, summed_n_l);
@@ -300,8 +300,9 @@ void EpetraMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
 
 
 template <typename T>
-EpetraMatrix<T>::EpetraMatrix()
-  : _destroy_mat_on_exit(true),
+EpetraMatrix<T>::EpetraMatrix(const Parallel::Communicator &comm)
+  : SparseMatrix<T>(comm),
+    _destroy_mat_on_exit(true),
     _use_transpose(false)
 {}
 
@@ -309,8 +310,10 @@ EpetraMatrix<T>::EpetraMatrix()
 
 
 template <typename T>
-EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m)
- : _destroy_mat_on_exit(false),
+EpetraMatrix<T>::EpetraMatrix(Epetra_FECrsMatrix * m,
+			      const Parallel::Communicator &comm)
+ : SparseMatrix<T>(comm),
+   _destroy_mat_on_exit(false),
    _use_transpose(false) // dumb guess is the best we can do...
 {
   this->_mat = m;

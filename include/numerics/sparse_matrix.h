@@ -27,6 +27,7 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/id_types.h"
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -61,7 +62,8 @@ std::ostream& operator << (std::ostream& os, const SparseMatrix<T>& m);
  */
 
 template <typename T>
-class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >
+class SparseMatrix : public ReferenceCountedObject<SparseMatrix<T> >,
+		     public ParallelObject
 {
 public:
   /**
@@ -79,7 +81,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
-  SparseMatrix ();
+  SparseMatrix (const Parallel::Communicator &comm=libMesh::CommWorld);
 
   /**
    * Destructor. Free all memory, but do not
@@ -93,7 +95,8 @@ public:
    * \p solver_package
    */
   static AutoPtr<SparseMatrix<T> >
-  build(const SolverPackage solver_package = libMesh::default_solver_package());
+  build(const SolverPackage solver_package = libMesh::default_solver_package(),
+	const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * @returns true if the matrix has been initialized,

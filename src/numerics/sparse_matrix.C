@@ -39,7 +39,8 @@ namespace libMesh
 
 // Constructor
 template <typename T>
-SparseMatrix<T>::SparseMatrix () :
+SparseMatrix<T>::SparseMatrix (const Parallel::Communicator &comm) :
+  ParallelObject(comm),
   _dof_map(NULL),
   _is_initialized(false)
 {}
@@ -89,7 +90,8 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
 // Full specialization for Real datatypes
 template <typename T>
 AutoPtr<SparseMatrix<T> >
-SparseMatrix<T>::build(const SolverPackage solver_package)
+SparseMatrix<T>::build(const SolverPackage solver_package,
+		       const Parallel::Communicator &comm)
 {
   // Build the appropriate vector
   switch (solver_package)
@@ -99,7 +101,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<T>);
+	AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<T>(comm));
 	return ap;
       }
 #endif
@@ -108,7 +110,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<T>);
+	AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<T>(comm));
 	return ap;
       }
 #endif
@@ -117,7 +119,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new EpetraMatrix<T>);
+	AutoPtr<SparseMatrix<T> > ap(new EpetraMatrix<T>(comm));
 	return ap;
       }
 #endif
@@ -126,7 +128,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new EigenSparseMatrix<T>);
+	AutoPtr<SparseMatrix<T> > ap(new EigenSparseMatrix<T>(comm));
 	return ap;
       }
 #endif

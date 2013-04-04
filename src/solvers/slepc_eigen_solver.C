@@ -745,14 +745,12 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   PetscObjectGetComm((PetscObject)mat,&comm);
   CHKERRABORT(comm,ierr);
 
-  Parallel::Communicator communicator (comm);
-
   /* Get user shell matrix object.  */
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
 
   /* Make \p NumericVector instances around the vectors.  */
-  PetscVector<T> arg_global(arg,   communicator);
-  PetscVector<T> dest_global(dest, communicator);
+  PetscVector<T> arg_global(arg,   shell_matrix.communicator());
+  PetscVector<T> dest_global(dest, shell_matrix.communicator());
 
   /* Call the user function.  */
   shell_matrix.vector_mult(dest_global,arg_global);
@@ -772,13 +770,11 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   PetscObjectGetComm((PetscObject)mat,&comm);
   CHKERRABORT(comm,ierr);
 
-  Parallel::Communicator communicator (comm);
-
   /* Get user shell matrix object.  */
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
 
   /* Make \p NumericVector instances around the vector.  */
-  PetscVector<T> dest_global(dest, communicator);
+  PetscVector<T> dest_global(dest, shell_matrix.communicator());
 
   /* Call the user function.  */
   shell_matrix.get_diagonal(dest_global);

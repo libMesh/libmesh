@@ -26,6 +26,7 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/id_types.h"
+#include "libmesh/parallel_object.h"
 
 namespace libMesh
 {
@@ -43,13 +44,14 @@ template <typename T> class NumericVector;
  */
 
 template <typename T>
-class ShellMatrix : public ReferenceCountedObject<ShellMatrix<T> >
+class ShellMatrix : public ReferenceCountedObject<ShellMatrix<T> >,
+                    public ParallelObject
 {
 public:
   /**
    * Constructor; does nothing.
    */
-  ShellMatrix ();
+  ShellMatrix (const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.
@@ -94,7 +96,8 @@ public:
 // ShellMatrix inline members
 template <typename T>
 inline
-ShellMatrix<T>::ShellMatrix ()
+ShellMatrix<T>::ShellMatrix (const Parallel::Communicator &comm) :
+  ParallelObject(comm)
 {}
 
 
