@@ -48,9 +48,9 @@
 namespace libMesh
 {
 
-RBSCMEvaluation::RBSCMEvaluation ()
+RBSCMEvaluation::RBSCMEvaluation (const Parallel::Communicator &comm) :
+  ParallelObject(comm)
 {
-
   // Clear SCM data vectors
   B_min.clear();
   B_max.clear();
@@ -375,7 +375,7 @@ void RBSCMEvaluation::write_offline_data_to_files(const std::string& directory_n
 {
   START_LOG("write_offline_data_to_files()", "RBSCMEvaluation");
 
-  if(libMesh::processor_id() == 0)
+  if(this->processor_id() == 0)
   {
     // Make a directory to store all the data files
     if( mkdir(directory_name.c_str(), 0777) == -1)

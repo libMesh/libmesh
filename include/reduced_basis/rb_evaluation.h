@@ -28,6 +28,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 
@@ -48,15 +49,15 @@ template <typename T> class NumericVector;
 
 // ------------------------------------------------------------
 // RBEvaluation class definition
-
-class RBEvaluation : public RBParametrized
+class RBEvaluation : public RBParametrized,
+		     public ParallelObject
 {
 public:
 
   /**
    * Constructor.
    */
-  RBEvaluation ();
+  RBEvaluation (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor.

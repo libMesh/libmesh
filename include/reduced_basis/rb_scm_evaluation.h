@@ -26,6 +26,7 @@
 #include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 
@@ -45,14 +46,15 @@ namespace libMesh
 // ------------------------------------------------------------
 // RBSCMEvaluation class definition
 
-class RBSCMEvaluation : public RBParametrized
+class RBSCMEvaluation : public RBParametrized,
+			public ParallelObject
 {
 public:
 
   /**
    * Constructor.
    */
-  RBSCMEvaluation ();
+  RBSCMEvaluation (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor.
