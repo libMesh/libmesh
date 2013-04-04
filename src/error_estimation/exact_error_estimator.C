@@ -260,7 +260,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
       // Prepare a global solution and a MeshFunction of the fine system if we need one
       AutoPtr<MeshFunction> fine_values;
-      AutoPtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build();
+      AutoPtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build(libMesh::default_solver_package(), mesh.communicator());
       if (_equation_systems_fine)
       {
 	const System& fine_system = _equation_systems_fine->get_system(system.name());

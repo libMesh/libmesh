@@ -1559,7 +1559,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
   AutoPtr<NumericVector<Number> > v_built;
   if (v->type() == SERIAL)
     {
-      v_built = NumericVector<Number>::build();
+      v_built = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator());
       v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
       v_built->close();
 
@@ -1574,7 +1574,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
     }
   else if (v->type() == PARALLEL)
     {
-      v_built = NumericVector<Number>::build();
+      v_built = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator());
       v_built->init (v->size(), v->size(), true, SERIAL);
       v->localize(*v_built);
       v_built->close();

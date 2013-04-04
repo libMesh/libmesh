@@ -36,7 +36,7 @@ RBEIMAssembly::RBEIMAssembly(RBEIMConstruction& rb_eim_con_in,
                              unsigned int basis_function_index_in)
 : _rb_eim_con(rb_eim_con_in),
   _basis_function_index(basis_function_index_in),
-  _ghosted_basis_function(NumericVector<Number>::build())
+  _ghosted_basis_function(NumericVector<Number>::build(libMesh::default_solver_package(), rb_eim_con_in.system().communicator()))
 {
   // localize the vector that stores the basis function for this assembly object,
   // i.e. the vector that is used in evaluate_basis_function_at_quad_pts

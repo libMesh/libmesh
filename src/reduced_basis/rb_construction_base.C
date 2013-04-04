@@ -92,7 +92,7 @@ void RBConstructionBase<Base>::init_data ()
 
   // Initialize the inner product storage vector, which is useful for
   // storing intermediate results when evaluating inner products
-  inner_product_storage_vector = NumericVector<Number>::build();
+  inner_product_storage_vector = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator());
   inner_product_storage_vector->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 }
 
@@ -297,7 +297,7 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
   it = training_parameters.begin();
   for( ; it != it_end; ++it)
   {
-    it->second = NumericVector<Number>::build().release();
+    it->second = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release();
     it->second->init(n_global_training_samples, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 
@@ -390,7 +390,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
     for( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
-      training_parameters_in[param_name] = NumericVector<Number>::build().release();
+      training_parameters_in[param_name] = NumericVector<Number>::build(libMesh::default_solver_package(), communicator).release();
 
       if(!serial_training_set)
       {
@@ -523,7 +523,7 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
     for( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
-      training_parameters_in[param_name] = NumericVector<Number>::build().release();
+      training_parameters_in[param_name] = NumericVector<Number>::build(libMesh::default_solver_package(), communicator).release();
 
       if(!serial_training_set)
       {
@@ -679,7 +679,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
     for( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
-      training_parameters_in[param_name] = NumericVector<Number>::build().release();
+      training_parameters_in[param_name] = NumericVector<Number>::build(libMesh::default_solver_package(), communicator).release();
 
       if(!serial_training_set)
       {

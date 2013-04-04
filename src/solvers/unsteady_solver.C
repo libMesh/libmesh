@@ -29,7 +29,7 @@ namespace libMesh
 
 UnsteadySolver::UnsteadySolver (sys_type& s)
   : TimeSolver(s),
-    old_local_nonlinear_solution (NumericVector<Number>::build()),
+    old_local_nonlinear_solution (NumericVector<Number>::build(libMesh::default_solver_package(), s.communicator())),
     first_solve                  (true),
     first_adjoint_step (true)
 {

@@ -166,7 +166,7 @@ void RBEIMConstruction::initialize_rb_construction()
   Parent::initialize_rb_construction();
 
   // initialize a serial vector that we will use for MeshFunction evaluations
-  _ghosted_meshfunction_vector = NumericVector<Number>::build();
+  _ghosted_meshfunction_vector = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator());
   _ghosted_meshfunction_vector->init (this->n_dofs(), this->n_local_dofs(),
                                       this->get_dof_map().get_send_list(), false,
                                       GHOSTED);
@@ -350,7 +350,7 @@ void RBEIMConstruction::enrich_RB_space()
     eim_eval.interpolation_points.push_back(optimal_point);
     eim_eval.interpolation_points_var.push_back(optimal_var);
 
-    NumericVector<Number>* new_bf = NumericVector<Number>::build().release();
+    NumericVector<Number>* new_bf = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release();
     new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     *new_bf = *solution;
     get_rb_evaluation().basis_functions.push_back( new_bf );

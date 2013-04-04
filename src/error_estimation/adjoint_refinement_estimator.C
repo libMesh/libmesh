@@ -153,7 +153,7 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
 
   // Copy the projected coarse grid solutions, which will be
   // overwritten by solve()
-  projected_solution = NumericVector<Number>::build().release();
+  projected_solution = NumericVector<Number>::build(libMesh::default_solver_package(), mesh.communicator()).release();
   projected_solution->init(system.solution->size(), true, SERIAL);
   system.solution->localize(*projected_solution,
 			    system.get_dof_map().get_send_list());
@@ -313,12 +313,12 @@ void AdjointRefinementEstimator::estimate_error (const System& _system,
   // Localize the global rhs and adjoint solution vectors (which might be shared on multiple processsors) onto a
   // local ghosted vector, this ensures each processor has all the dof_indices to compute an error indicator for
   // an element it owns
-  AutoPtr<NumericVector<Number> > localized_projected_residual = NumericVector<Number>::build();
+  AutoPtr<NumericVector<Number> > localized_projected_residual = NumericVector<Number>::build(libMesh::default_solver_package(), system.communicator());
   localized_projected_residual->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
   projected_residual.localize(*localized_projected_residual, system.get_dof_map().get_send_list());
 
   // Each adjoint solution will also require ghosting; for efficiency we'll reuse the same memory
-  AutoPtr<NumericVector<Number> > localized_adjoint_solution = NumericVector<Number>::build();
+  AutoPtr<NumericVector<Number> > localized_adjoint_solution = NumericVector<Number>::build(libMesh::default_solver_package(), system.communicator());
   localized_adjoint_solution->init(system.n_dofs(), system.n_local_dofs(), system.get_dof_map().get_send_list(), false, GHOSTED);
 
   // We will loop over each adjoint solution, localize that adjoint

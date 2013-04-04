@@ -60,8 +60,8 @@ System::System (EquationSystems& es,
   assemble_before_solve             (true),
   use_fixed_solution                (false),
   extra_quadrature_order            (0),
-  solution                          (NumericVector<Number>::build()),
-  current_local_solution            (NumericVector<Number>::build()),
+  solution                          (NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator())),
+  current_local_solution            (NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator())),
   time                              (0.),
   qoi                               (0),
   _init_system_function             (NULL),
@@ -681,7 +681,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
     return *(_vectors[vec_name]);
 
   // Otherwise build the vector
-  NumericVector<Number>* buf = NumericVector<Number>::build().release();
+  NumericVector<Number>* buf = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release();
   _vectors.insert (std::make_pair (vec_name, buf));
   _vector_projections.insert (std::make_pair (vec_name, projections));
 
@@ -1444,7 +1444,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
     }
 
   // Localize the potentially parallel vector
-  AutoPtr<NumericVector<Number> > local_v = NumericVector<Number>::build();
+  AutoPtr<NumericVector<Number> > local_v = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator());
   local_v->init(v.size(), true, SERIAL);
   v.localize (*local_v, _dof_map->get_send_list());
 
