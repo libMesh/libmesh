@@ -829,7 +829,7 @@ void NumericVector<Complex>::print_global(std::ostream& os) const
   this->localize(v);
 
   // Right now we only want one copy of the output
-  if (libMesh::processor_id())
+  if (this->processor_id())
     return;
 
   os << "Size\tglobal =  " << this->size() << std::endl;
@@ -851,7 +851,7 @@ void NumericVector<T>::print_global(std::ostream& os) const
   this->localize(v);
 
   // Right now we only want one copy of the output
-  if (libMesh::processor_id())
+  if (this->processor_id())
     return;
 
   os << "Size\tglobal =  " << this->size() << std::endl;

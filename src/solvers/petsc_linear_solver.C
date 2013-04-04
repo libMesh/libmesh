@@ -150,7 +150,7 @@ void PetscLinearSolver<T>::clear ()
 
       if(!this->_preconditioner)
       {
-        if (libMesh::n_processors() == 1)
+        if (this->n_processors() == 1)
           this->_preconditioner_type = ILU_PRECOND;
         else
           this->_preconditioner_type = BLOCK_JACOBI_PRECOND;

@@ -37,7 +37,8 @@ namespace libMesh
 // LinearSolver members
 template <typename T>
 AutoPtr<LinearSolver<T> >
-LinearSolver<T>::build(const SolverPackage solver_package)
+LinearSolver<T>::build(const SolverPackage solver_package,
+		       const libMesh::Parallel::Communicator &comm)
 {
   // Build the appropriate solver
   switch (solver_package)
@@ -47,7 +48,7 @@ LinearSolver<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<LinearSolver<T> > ap(new LaspackLinearSolver<T>);
+	AutoPtr<LinearSolver<T> > ap(new LaspackLinearSolver<T>(comm));
 	return ap;
       }
 #endif
@@ -56,7 +57,7 @@ LinearSolver<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<LinearSolver<T> > ap(new PetscLinearSolver<T>);
+	AutoPtr<LinearSolver<T> > ap(new PetscLinearSolver<T>(comm));
 	return ap;
       }
 #endif
@@ -65,7 +66,7 @@ LinearSolver<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       {
-	AutoPtr<LinearSolver<T> > ap(new AztecLinearSolver<T>);
+	AutoPtr<LinearSolver<T> > ap(new AztecLinearSolver<T>(comm));
 	return ap;
       }
 #endif
@@ -74,7 +75,7 @@ LinearSolver<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
       {
-	AutoPtr<LinearSolver<T> > ap(new EigenSparseLinearSolver<T>);
+	AutoPtr<LinearSolver<T> > ap(new EigenSparseLinearSolver<T>(comm));
 	return ap;
       }
 #endif

@@ -862,7 +862,7 @@ void EpetraVector<T>::close ()
 
   // Are we adding or inserting?
   unsigned char global_last_edit = last_edit;
-  CommWorld.max(global_last_edit);
+  this->communicator().max(global_last_edit);
   libmesh_assert(!last_edit || last_edit == global_last_edit);
 
   if (global_last_edit == 1)

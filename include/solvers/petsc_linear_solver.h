@@ -101,7 +101,7 @@ public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
-  PetscLinearSolver ();
+  PetscLinearSolver (const libMesh::Parallel::Communicator& /*= libMesh::CommWorld */);
 
   /**
    * Destructor.
@@ -321,12 +321,13 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-  PetscLinearSolver<T>::PetscLinearSolver ():
+  PetscLinearSolver<T>::PetscLinearSolver (const libMesh::Parallel::Communicator&comm):
+    LinearSolver<T>(comm),
     _restrict_solve_to_is(NULL),
     _restrict_solve_to_is_complement(NULL),
     _subset_solve_mode(SUBSET_ZERO)
 {
-  if (libMesh::n_processors() == 1)
+  if (this->n_processors() == 1)
     this->_preconditioner_type = ILU_PRECOND;
   else
     this->_preconditioner_type = BLOCK_JACOBI_PRECOND;

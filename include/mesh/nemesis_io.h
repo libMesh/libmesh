@@ -72,7 +72,7 @@ class Nemesis_IO_Helper;
   /**
    * Implements reading the mesh from several different files.
    * You provide the basename, then LibMesh appends the ".size.rank"
-   * depending on libMesh::n_processors() and libMesh::processor_id().
+   * depending on this->n_processors() and this->processor_id().
    */
   virtual void read (const std::string& base_filename);
 

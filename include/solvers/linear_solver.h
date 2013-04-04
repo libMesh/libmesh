@@ -28,6 +28,7 @@
 #include "libmesh/enum_subset_solve_mode.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -53,14 +54,15 @@ template <typename T> class Preconditioner;
  */
 
 template <typename T>
-class LinearSolver : public ReferenceCountedObject<LinearSolver<T> >
+class LinearSolver : public ReferenceCountedObject<LinearSolver<T> >,
+                     public ParallelObject
 {
 public:
 
   /**
    *  Constructor. Initializes Solver data structures
    */
-  LinearSolver ();
+  LinearSolver (const libMesh::Parallel::Communicator& /*= libMesh::CommWorld */);
 
   /**
    * Destructor.
@@ -72,7 +74,8 @@ public:
    * \p solver_package
    */
   static AutoPtr<LinearSolver<T> > build(const SolverPackage solver_package =
-						  libMesh::default_solver_package());
+					 libMesh::default_solver_package(),
+					 const libMesh::Parallel::Communicator& = libMesh::CommWorld);
 
   /**
    * @returns true if the data structures are
@@ -262,7 +265,8 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-LinearSolver<T>::LinearSolver () :
+LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator &comm) :
+  ParallelObject       (comm),
   _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized      (false),
