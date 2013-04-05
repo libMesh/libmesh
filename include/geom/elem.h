@@ -264,10 +264,10 @@ class Elem : public ReferenceCountedObject<Elem>,
   bool on_boundary () const;
 
   /**
-   * @returns \p true if this element shares a vertex and/or a side
-   * with a local element.
+   * @returns \p true if this element is semilocal to the calling
+   * processor, which must specify its rank.
    */
-  bool is_semilocal () const;
+  bool is_semilocal (const processor_id_type my_pid) const;
 
   /**
    * This function tells you which neighbor you \p (e) are.

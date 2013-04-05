@@ -117,7 +117,7 @@ void Patch::add_semilocal_face_neighbors()
   for (; it != end_it; ++it)
     {
       const Elem* neighbor = *it;
-      if (neighbor->is_semilocal())
+      if (neighbor->is_semilocal(_my_procid))
 	this->insert (neighbor);
     }
 }
@@ -187,7 +187,7 @@ void Patch::add_semilocal_point_neighbors()
   for (; it != end_it; ++it)
     {
       const Elem* neighbor = *it;
-      if (neighbor->is_semilocal())
+      if (neighbor->is_semilocal(_my_procid))
 	this->insert (neighbor);
     }
 }

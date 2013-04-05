@@ -281,7 +281,7 @@ void unpack(std::vector<int>::const_iterator in,
   // int 5: processor id
   const unsigned int processor_id =
     static_cast<unsigned int>(*in++);
-  libmesh_assert (processor_id < libMesh::n_processors() ||
+  libmesh_assert (processor_id < mesh->n_processors() ||
                   processor_id == DofObject::invalid_processor_id);
 
   // int 6: subdomain id
