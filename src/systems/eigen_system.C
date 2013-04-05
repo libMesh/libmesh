@@ -45,7 +45,7 @@ EigenSystem::EigenSystem (EquationSystems& es,
   Parent           (es, name, number),
   matrix_A         (NULL),
   matrix_B         (NULL),
-  eigen_solver     (EigenSolver<Number>::build()),
+  eigen_solver     (EigenSolver<Number>::build(es.communicator())),
   _n_converged_eigenpairs (0),
   _n_iterations           (0),
   _is_generalized_eigenproblem (false),
@@ -124,7 +124,7 @@ void EigenSystem::init_data ()
     _is_generalized_eigenproblem = true;
 
   // build the system matrix
-  matrix_A = SparseMatrix<Number>::build().release();
+  matrix_A = SparseMatrix<Number>::build(this->communicator()).release();
 
   this->init_matrices();
 }
@@ -141,7 +141,7 @@ void EigenSystem::init_matrices ()
   // generalized problem
   if (_is_generalized_eigenproblem)
     {
-      matrix_B = SparseMatrix<Number>::build().release();
+      matrix_B = SparseMatrix<Number>::build(this->communicator()).release();
       dof_map.attach_matrix(*matrix_B);
     }
 

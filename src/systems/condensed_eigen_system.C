@@ -35,8 +35,8 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems& es,
                                             const std::string& name,
                                             const unsigned int number)
   : Parent(es, name, number),
-    condensed_matrix_A(SparseMatrix<Number>::build()),
-    condensed_matrix_B(SparseMatrix<Number>::build()),
+    condensed_matrix_A(SparseMatrix<Number>::build(es.communicator())),
+    condensed_matrix_B(SparseMatrix<Number>::build(es.communicator())),
     condensed_dofs_initialized(false)
 {
 }

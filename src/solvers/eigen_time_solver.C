@@ -31,7 +31,7 @@ namespace libMesh
 // Constructor
 EigenTimeSolver::EigenTimeSolver (sys_type& s)
   : Parent(s),
-    eigen_solver     (EigenSolver<Number>::build()),
+    eigen_solver     (EigenSolver<Number>::build(s.communicator())),
     tol(pow(TOLERANCE, 5./3.)),
     maxits(1000),
     n_eigenpairs_to_compute(5),

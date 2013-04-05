@@ -34,8 +34,8 @@ namespace libMesh
 // EigenSolver members
 template <typename T>
 AutoPtr<EigenSolver<T> >
-EigenSolver<T>::build(const SolverPackage solver_package,
-		      const Parallel::Communicator &comm)
+EigenSolver<T>::build(const Parallel::Communicator &comm,
+		      const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
