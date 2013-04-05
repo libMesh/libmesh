@@ -305,7 +305,7 @@ class LaspackVector : public NumericVector<T>
   void add (const T a, const NumericVector<T>& v);
 
   /**
-   * \f$ U+=v \f$ where v is a std::vector<T>
+   * \f$ U+=v \f$ where v is a \p std::vector<T>
    * and you
    * want to specify WHERE to add it
    */
@@ -345,7 +345,7 @@ class LaspackVector : public NumericVector<T>
 		             const SparseMatrix<T> &);
 
   /**
-   * \f$ U=v \f$ where v is a DenseVector<T>
+   * \f$ U=v \f$ where v is a \p std::vector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,

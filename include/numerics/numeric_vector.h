@@ -392,7 +392,7 @@ public:
   virtual void add (const T a, const NumericVector<T>& v) = 0;
 
   /**
-   * \f$ U+=v \f$ where v is a DenseVector<T>
+   * \f$ U+=v \f$ where v is a \p std::vector<T>
    * and you
    * want to specify WHERE to add it
    */
@@ -439,7 +439,7 @@ public:
 			             const SparseMatrix<T>&) = 0;
 
   /**
-   * \f$ U=v \f$ where v is a std::vector<T>
+   * \f$ U=v \f$ where v is a \p std::vector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
