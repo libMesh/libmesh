@@ -398,42 +398,59 @@ public:
   /**
    * Returns the first dof index that is local to partition \p proc.
    */
-  dof_id_type first_dof(const processor_id_type proc = libMesh::processor_id()) const
+  dof_id_type first_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _first_df.size()); return _first_df[proc]; }
+
+  dof_id_type first_dof() const
+  { return this->first_dof(this->processor_id()); }
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Returns the first old dof index that is local to partition \p proc.
    */
-  dof_id_type first_old_dof(const processor_id_type proc = libMesh::processor_id()) const
+  dof_id_type first_old_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _first_old_df.size()); return _first_old_df[proc]; }
+
+  dof_id_type first_old_dof() const
+  { return this->first_old_dof(this->processor_id()); }
+
 #endif //LIBMESH_ENABLE_AMR
 
   /**
-   * Returns the last dof index that is local to subdomain \p proc.
+   * Returns the last dof index that is local to processor \p proc.
    * This function is now deprecated, because it returns nonsense in the rare
    * case where \p proc has no local dof indices.  Use end_dof() instead.
    */
-  dof_id_type last_dof(const processor_id_type proc = libMesh::processor_id()) const {
+  dof_id_type last_dof(const processor_id_type proc) const {
     libmesh_deprecated();
     libmesh_assert_less (proc, _end_df.size());
     return libmesh_cast_int<dof_id_type>(_end_df[proc] - 1);
   }
 
+  dof_id_type last_dof() const
+  { return this->last_dof(this->processor_id()); }
+
   /**
    * Returns the first dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
    */
-  dof_id_type end_dof(const processor_id_type proc = libMesh::processor_id()) const
+  dof_id_type end_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _end_df.size()); return _end_df[proc]; }
+
+  dof_id_type end_dof() const
+  { return this->end_dof(this->processor_id()); }
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Returns the first old dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
    */
-  dof_id_type end_old_dof(const processor_id_type proc = libMesh::processor_id()) const
+  dof_id_type end_old_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _end_old_df.size()); return _end_old_df[proc]; }
+
+  dof_id_type end_old_dof() const
+  { return this->end_old_dof(this->processor_id()); }
+
 #endif //LIBMESH_ENABLE_AMR
 
   /**

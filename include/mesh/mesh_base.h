@@ -478,7 +478,10 @@ public:
   /**
    * Call the default partitioner (currently \p metis_partition()).
    */
-  virtual void partition (const unsigned int n_parts=libMesh::n_processors());
+  virtual void partition (const unsigned int n_parts);
+
+  void partition ()
+  { this->partition(this->n_processors()); }
 
   /**
    * Redistribute elements between processors.  This gets called

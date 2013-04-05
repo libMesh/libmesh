@@ -45,6 +45,13 @@ const dof_id_type Partitioner::communication_blocksize = 1000000;
 
 // ------------------------------------------------------------
 // Partitioner implementation
+void Partitioner::partition (MeshBase& mesh)
+{
+  this->partition(mesh,mesh.n_processors());
+}
+
+
+
 void Partitioner::partition (MeshBase& mesh,
 			     const unsigned int n)
 {
@@ -105,6 +112,11 @@ void Partitioner::partition (MeshBase& mesh,
 
 
 
+void Partitioner::repartition (MeshBase& mesh)
+{
+  this->repartition(mesh,mesh.n_processors());
+}
+
 
 
 void Partitioner::repartition (MeshBase& mesh,
@@ -161,6 +173,13 @@ void Partitioner::single_partition (MeshBase& mesh)
     (*node_it)->processor_id() = 0;
 
   STOP_LOG("single_partition()","Partitioner");
+}
+
+
+
+void Partitioner::partition_unpartitioned_elements (MeshBase &mesh)
+{
+  Partitioner::partition_unpartitioned_elements(mesh, mesh.n_processors());
 }
 
 
