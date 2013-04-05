@@ -67,7 +67,7 @@ public:
    * pointer to NULL.  Defaults to H1 seminorm; changes to system norm
    * are ignored.
    */
-  KellyErrorEstimator(const Parallel::Communicator &comm /* = libMesh::CommWorld */) :
+  KellyErrorEstimator(const Parallel::Communicator &comm = libMesh::CommWorld) :
     JumpErrorEstimator(comm),
     _bc_function(NULL)
   { error_norm = H1_SEMINORM; }

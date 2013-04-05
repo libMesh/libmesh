@@ -75,7 +75,7 @@ public:
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
-  MeshBase (unsigned int dim=1, const Parallel::Communicator &comm=libMesh::CommWorld);
+  MeshBase (unsigned int dim=1, const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Copy-constructor.
