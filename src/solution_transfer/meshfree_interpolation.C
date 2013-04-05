@@ -187,7 +187,7 @@ namespace libMesh
     // so we can be sure there is no other shenanigarry going on, but in optimized
     // mode there is no such guarantee - other prcoessors could be somewhere else
     // completing some other communication, and we don't want to intercept that.
-    Parallel::MessageTag tag = Parallel::Communicator_World.get_unique_tag ( 6000 );
+    Parallel::MessageTag tag = this->communicator().get_unique_tag ( 6000 );
 
     for (unsigned int proc=0, cnt=0; proc<this->n_processors(); proc++)
       if (proc != this->processor_id())
