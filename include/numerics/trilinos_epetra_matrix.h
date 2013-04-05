@@ -72,7 +72,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
-  EpetraMatrix (const Parallel::Communicator &comm = libMesh::CommWorld);
+  EpetraMatrix (const Parallel::Communicator &comm /* = libMesh::CommWorld*/);
 
   /**
    * Constructor.  Creates a EpetraMatrix assuming you already

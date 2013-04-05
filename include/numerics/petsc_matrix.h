@@ -92,7 +92,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
-  PetscMatrix (const Parallel::Communicator &comm = libMesh::CommWorld);
+  PetscMatrix (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Constructor.  Creates a PetscMatrix assuming you already
