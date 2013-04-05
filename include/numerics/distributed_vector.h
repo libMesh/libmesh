@@ -345,7 +345,7 @@ public:
   { libmesh_error(); }
 
   /**
-   * \f$ U=v \f$ where v is a DenseVector<T>
+   * \f$ U=v \f$ where v is a \p std::vector<T>
    * and you want to specify WHERE to insert it
    */
   virtual void insert (const std::vector<T>& v,
