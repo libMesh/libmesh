@@ -385,7 +385,7 @@ public:
    * @returns the number of degrees of freedom on this processor.
    */
   dof_id_type n_local_dofs () const
-  { return this->n_dofs_on_processor (libMesh::processor_id()); }
+  { return this->n_dofs_on_processor (this->processor_id()); }
 
   /**
    * Returns the number of degrees of freedom on partition \p proc.
