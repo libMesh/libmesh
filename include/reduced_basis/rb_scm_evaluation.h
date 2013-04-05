@@ -54,7 +54,7 @@ public:
   /**
    * Constructor.
    */
-  RBSCMEvaluation (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
+  RBSCMEvaluation (const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.
