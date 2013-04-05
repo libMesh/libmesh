@@ -559,7 +559,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
   // Prepare a global solution and a MeshFunction of the coarse system if we need one
   AutoPtr<MeshFunction> coarse_values;
-  AutoPtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build(libMesh::default_solver_package(), _equation_systems.communicator());
+  AutoPtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build(_equation_systems.communicator());
   if (_equation_systems_fine)
     {
       const System& comparison_system

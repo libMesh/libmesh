@@ -96,7 +96,7 @@ public:
   /**
    * Build a new DerivedRBEvaluation object.
    */
-  virtual AutoPtr<RBEvaluation> build_rb_evaluation();
+  virtual AutoPtr<RBEvaluation> build_rb_evaluation(const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Load the RB solution from the most recent solve

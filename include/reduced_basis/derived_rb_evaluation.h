@@ -53,7 +53,7 @@ public:
   /**
    * Constructor.
    */
-  DerivedRBEvaluation (const Parallel::Communicator &comm = libMesh::CommWorld);
+  DerivedRBEvaluation (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Clear this object. Overload to also reset residual_type_flag.

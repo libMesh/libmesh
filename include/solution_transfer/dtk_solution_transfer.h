@@ -44,7 +44,7 @@ namespace libMesh {
 class DTKSolutionTransfer : public SolutionTransfer
 {
 public:
-  DTKSolutionTransfer(const libMesh::Parallel::Communicator &comm = libMesh::CommWorld);
+  DTKSolutionTransfer(const libMesh::Parallel::Communicator &comm /* = libMesh::CommWorld */);
   virtual ~DTKSolutionTransfer();
 
   /**

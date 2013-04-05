@@ -56,7 +56,7 @@ public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
-  SlepcEigenSolver(const Parallel::Communicator &comm = libMesh::CommWorld);
+  SlepcEigenSolver(const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
 
   /**

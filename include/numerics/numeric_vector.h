@@ -108,8 +108,8 @@ public:
    * \p solver_package
    */
   static AutoPtr<NumericVector<T> >
-  build(const SolverPackage solver_package = libMesh::default_solver_package(),
-        const Parallel::Communicator &comm = libMesh::CommWorld);
+  build(const Parallel::Communicator &comm,
+	const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * @returns true if the vector has been initialized,

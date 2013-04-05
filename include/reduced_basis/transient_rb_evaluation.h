@@ -55,7 +55,7 @@ public:
   /**
    * Constructor.
    */
-  TransientRBEvaluation (const Parallel::Communicator &comm = libMesh::CommWorld);
+  TransientRBEvaluation (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor.

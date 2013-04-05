@@ -90,8 +90,8 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
 // Full specialization for Real datatypes
 template <typename T>
 AutoPtr<SparseMatrix<T> >
-SparseMatrix<T>::build(const SolverPackage solver_package,
-		       const Parallel::Communicator &comm)
+SparseMatrix<T>::build(const Parallel::Communicator &comm,
+		       const SolverPackage solver_package)
 {
   // Build the appropriate vector
   switch (solver_package)

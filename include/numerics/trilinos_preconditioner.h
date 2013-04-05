@@ -66,7 +66,7 @@ public:
   /**
    *  Constructor. Initializes PetscPreconditioner data structures
    */
-  TrilinosPreconditioner (const libMesh::Parallel::Communicator &comm = libMesh::CommWorld);
+  TrilinosPreconditioner (const libMesh::Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor.

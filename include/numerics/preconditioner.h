@@ -78,8 +78,8 @@ public:
    * Builds a \p Preconditioner using the linear solver package specified by
    * \p solver_package
    */
-  static Preconditioner<T> * build(const SolverPackage solver_package =
-                                   libMesh::default_solver_package());
+  static Preconditioner<T> * build(const libMesh::Parallel::Communicator& /* = libMesh::CommWorld */,
+				   const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * @returns true if the data structures are

@@ -51,13 +51,14 @@ public:
    * in an error.  However, an empty sum is allowed to be multiplied
    * with a vector and will give the expected result.
    */
-  SumShellMatrix (void);
+  SumShellMatrix (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Constructor that passes a vector of shell matrices.
    */
   explicit
-  SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat);
+  SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
+		  const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor.
@@ -107,8 +108,8 @@ public:
 // SumShellMatrix inline members
 template <typename T>
 inline
-SumShellMatrix<T>::SumShellMatrix (void):
-  ShellMatrix<T>(),
+SumShellMatrix<T>::SumShellMatrix (const Parallel::Communicator &comm):
+  ShellMatrix<T>(comm),
   matrices()
 {}
 
@@ -116,8 +117,9 @@ SumShellMatrix<T>::SumShellMatrix (void):
 
 template <typename T>
 inline
-SumShellMatrix<T>::SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat):
-  ShellMatrix<T>(),
+SumShellMatrix<T>::SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
+				   const Parallel::Communicator &comm):
+  ShellMatrix<T>(comm),
   matrices(mat)
 {}
 

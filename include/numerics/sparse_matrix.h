@@ -81,7 +81,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
-  SparseMatrix (const Parallel::Communicator &comm=libMesh::CommWorld);
+  SparseMatrix (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor. Free all memory, but do not
@@ -95,8 +95,8 @@ public:
    * \p solver_package
    */
   static AutoPtr<SparseMatrix<T> >
-  build(const SolverPackage solver_package = libMesh::default_solver_package(),
-	const Parallel::Communicator &comm = libMesh::CommWorld);
+  build(const Parallel::Communicator &comm,
+	const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
    * @returns true if the matrix has been initialized,

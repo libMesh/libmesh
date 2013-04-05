@@ -43,7 +43,7 @@ namespace libMesh
 // Full specialization for Real datatypes
 template <typename T>
 AutoPtr<NumericVector<T> >
-NumericVector<T>::build(const SolverPackage solver_package, const Parallel::Communicator &comm)
+NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage solver_package)
 {
   // Build the appropriate vector
   switch (solver_package)

@@ -94,8 +94,8 @@ extern "C"
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
 
-    PetscVector<Number> x_vec(x/*, preconditioner->communicator()*/);
-    PetscVector<Number> y_vec(y/*, preconditioner->communicator()*/);
+    PetscVector<Number> x_vec(x, preconditioner->communicator());
+    PetscVector<Number> y_vec(y, preconditioner->communicator());
 
     preconditioner->apply(x_vec,y_vec);
 

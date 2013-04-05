@@ -37,8 +37,8 @@ namespace libMesh
 // LinearSolver members
 template <typename T>
 AutoPtr<LinearSolver<T> >
-LinearSolver<T>::build(const SolverPackage solver_package,
-		       const libMesh::Parallel::Communicator &comm)
+LinearSolver<T>::build(const libMesh::Parallel::Communicator &comm,
+		       const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)

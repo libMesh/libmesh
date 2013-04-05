@@ -104,7 +104,7 @@ public:
    * This allows ownership of \p v to remain with the original creator,
    * and to simply provide additional functionality with the PetscVector.
    */
-  PetscVector(Vec v, const Parallel::Communicator &comm = libMesh::CommWorld);
+  PetscVector(Vec v, const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow

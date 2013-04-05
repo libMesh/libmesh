@@ -51,7 +51,9 @@ public:
    * Constructor.  Defaults to H2 seminorm; changes to error_norm are
    * ignored.
    */
-  LaplacianErrorEstimator() { error_norm = H2_SEMINORM; }
+  LaplacianErrorEstimator(const Parallel::Communicator &comm) :
+    JumpErrorEstimator(comm)
+  { error_norm = H2_SEMINORM; }
 
   /**
    * Destructor.

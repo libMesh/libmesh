@@ -70,8 +70,8 @@ public:
    * Builds an \p EigenSolver using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<EigenSolver<T> > build(const SolverPackage solver_package = SLEPC_SOLVERS,
-					const Parallel::Communicator &comm = libMesh::CommWorld);
+  static AutoPtr<EigenSolver<T> > build(const Parallel::Communicator &comm /* = libMesh::CommWorld */,
+					const SolverPackage solver_package = SLEPC_SOLVERS);
 
   /**
    * @returns true if the data structures are

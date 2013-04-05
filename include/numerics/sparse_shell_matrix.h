@@ -99,7 +99,7 @@ protected:
 template <typename T>
 inline
 SparseShellMatrix<T>::SparseShellMatrix (const SparseMatrix<T>& new_m):
-  ShellMatrix<T>(),
+  ShellMatrix<T>(new_m.communicator()),
   _m(new_m)
 {}
 

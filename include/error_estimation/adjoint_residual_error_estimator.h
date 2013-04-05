@@ -59,7 +59,7 @@ public:
   /**
    * Constructor.  Responsible for picking default subestimators.
    */
-  AdjointResidualErrorEstimator(const Parallel::Communicator &comm = libMesh::CommWorld);
+  AdjointResidualErrorEstimator(const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor.

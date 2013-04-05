@@ -64,7 +64,7 @@ public:
   /**
    *  Constructor. Initializes PetscPreconditioner data structures
    */
-  PetscPreconditioner (const libMesh::Parallel::Communicator &comm = libMesh::CommWorld);
+  PetscPreconditioner (const libMesh::Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor.

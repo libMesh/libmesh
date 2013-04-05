@@ -55,9 +55,9 @@ RBConstruction::RBConstruction (EquationSystems& es,
 		                const std::string& name_in,
 		                const unsigned int number_in)
   : Parent(es, name_in, number_in),
-    inner_product_matrix(SparseMatrix<Number>::build()),
-    non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build()),
-    constraint_matrix(SparseMatrix<Number>::build()),
+    inner_product_matrix(SparseMatrix<Number>::build(es.communicator())),
+    non_dirichlet_inner_product_matrix(SparseMatrix<Number>::build(es.communicator())),
+    constraint_matrix(SparseMatrix<Number>::build(es.communicator())),
     constrained_problem(false),
     single_matrix_mode(false),
     reuse_preconditioner(true),
@@ -481,7 +481,7 @@ void RBConstruction::allocate_data_structures()
     for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
     {
       // Initialize the memory for the matrices
-      Aq_vector[q] = SparseMatrix<Number>::build().release();
+      Aq_vector[q] = SparseMatrix<Number>::build(this->communicator()).release();
       dof_map.attach_matrix(*Aq_vector[q]);
       Aq_vector[q]->init();
       Aq_vector[q]->zero();
@@ -498,7 +498,7 @@ void RBConstruction::allocate_data_structures()
       for(unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
       {
         // Initialize the memory for the matrices
-        non_dirichlet_Aq_vector[q] = SparseMatrix<Number>::build().release();
+        non_dirichlet_Aq_vector[q] = SparseMatrix<Number>::build(this->communicator()).release();
         dof_map.attach_matrix(*non_dirichlet_Aq_vector[q]);
         non_dirichlet_Aq_vector[q]->init();
         non_dirichlet_Aq_vector[q]->zero();
@@ -510,7 +510,7 @@ void RBConstruction::allocate_data_structures()
   for(unsigned int q=0; q<get_rb_theta_expansion().get_n_F_terms(); q++)
   {
     // Initialize the memory for the vectors
-    Fq_vector[q] = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release();
+    Fq_vector[q] = NumericVector<Number>::build(this->communicator()).release();
     Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   }
 
@@ -521,7 +521,7 @@ void RBConstruction::allocate_data_structures()
     for(unsigned int q=0; q<get_rb_theta_expansion().get_n_F_terms(); q++)
     {
       // Initialize the memory for the vectors
-      non_dirichlet_Fq_vector[q] = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release();
+      non_dirichlet_Fq_vector[q] = NumericVector<Number>::build(this->communicator()).release();
       non_dirichlet_Fq_vector[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     }
   }
@@ -530,7 +530,7 @@ void RBConstruction::allocate_data_structures()
     for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
     {
       // Initialize the memory for the truth output vectors
-      outputs_vector[n][q_l] = (NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release());
+      outputs_vector[n][q_l] = (NumericVector<Number>::build(this->communicator()).release());
       outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     }
 
@@ -543,7 +543,7 @@ void RBConstruction::allocate_data_structures()
       for(unsigned int q_l=0; q_l<get_rb_theta_expansion().get_n_output_terms(n); q_l++)
       {
         // Initialize the memory for the truth output vectors
-        non_dirichlet_outputs_vector[n][q_l] = (NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release());
+        non_dirichlet_outputs_vector[n][q_l] = (NumericVector<Number>::build(this->communicator()).release());
         non_dirichlet_outputs_vector[n][q_l]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
     }
@@ -764,7 +764,7 @@ void RBConstruction::truth_assembly()
       matrix->add(get_rb_theta_expansion().eval_A_theta(q_a, mu), *get_Aq(q_a));
     }
 
-    AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator());
+    AutoPtr< NumericVector<Number> > temp_vec = NumericVector<Number>::build(this->communicator());
     temp_vec->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
     {
@@ -1302,12 +1302,12 @@ void RBConstruction::enrich_RB_space()
 {
   START_LOG("enrich_RB_space()", "RBConstruction");
 
-  NumericVector<Number>* new_bf = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release();
+  NumericVector<Number>* new_bf = NumericVector<Number>::build(this->communicator()).release();
   new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
   *new_bf = *solution;
 
   // compute orthogonalization
-  AutoPtr< NumericVector<Number> > proj_index = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator());
+  AutoPtr< NumericVector<Number> > proj_index = NumericVector<Number>::build(this->communicator());
   proj_index->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
   if(single_matrix_mode)
@@ -1495,7 +1495,7 @@ void RBConstruction::update_RB_system_matrices()
 
   unsigned int RB_size = get_rb_evaluation().get_n_basis_functions();
 
-  AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator());
+  AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->communicator());
   temp->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
   for(unsigned int q_f=0; q_f<get_rb_theta_expansion().get_n_F_terms(); q_f++)
@@ -1617,7 +1617,7 @@ void RBConstruction::update_residual_terms(bool compute_inner_products)
       // Initialize the vector in which we'll store the representor
       if(!get_rb_evaluation().Aq_representor[q_a][i])
       {
-        get_rb_evaluation().Aq_representor[q_a][i] = (NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release());
+        get_rb_evaluation().Aq_representor[q_a][i] = (NumericVector<Number>::build(this->communicator()).release());
         get_rb_evaluation().Aq_representor[q_a][i]->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
 
@@ -1802,7 +1802,7 @@ void RBConstruction::compute_output_dual_innerprods()
     std::vector< NumericVector<Number>* > L_q_representor(max_Q_l);
     for(unsigned int q=0; q<max_Q_l; q++)
     {
-      L_q_representor[q] = (NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release());
+      L_q_representor[q] = (NumericVector<Number>::build(this->communicator()).release());
       L_q_representor[q]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     }
 
@@ -1963,7 +1963,7 @@ void RBConstruction::compute_Fq_representor_innerprods(bool compute_inner_produc
     {
       if(!Fq_representor[q_f])
       {
-        Fq_representor[q_f] = (NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release());
+        Fq_representor[q_f] = (NumericVector<Number>::build(this->communicator()).release());
         Fq_representor[q_f]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
       }
 
@@ -2434,7 +2434,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
 
     read_serialized_data(fqr_data, false);
 
-    Fq_representor[i] = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release();
+    Fq_representor[i] = NumericVector<Number>::build(this->communicator()).release();
     Fq_representor[i]->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 
     // No need to copy, just swap
@@ -2487,7 +2487,7 @@ void RBConstruction::read_riesz_representors_from_files(const std::string& riesz
 
       read_serialized_data(aqr_data, false);
 
-      get_rb_evaluation().Aq_representor[i][j] = NumericVector<Number>::build(libMesh::default_solver_package(), this->communicator()).release();
+      get_rb_evaluation().Aq_representor[i][j] = NumericVector<Number>::build(this->communicator()).release();
       get_rb_evaluation().Aq_representor[i][j]->init (n_dofs(), n_local_dofs(),
                                             false, libMeshEnums::PARALLEL);
 

@@ -104,7 +104,7 @@ public:
    * and to simply provide additional functionality with the EpetraVector.
    */
   EpetraVector(Epetra_Vector & v,
-               const Parallel::Communicator &comm = libMesh::CommWorld);
+               const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow

@@ -55,7 +55,9 @@ public:
    * seminorms should be supported now.  W1,p and W2,p norms would
    * be natural to support if any contributors make the effort.
    */
- WeightedPatchRecoveryErrorEstimator() : PatchRecoveryErrorEstimator() {}
+ WeightedPatchRecoveryErrorEstimator(const Parallel::Communicator &comm) :
+   PatchRecoveryErrorEstimator(comm)
+  {}
 
   /**
    * Destructor.

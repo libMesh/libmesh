@@ -221,7 +221,7 @@ SparseMatrix<Number> & ImplicitSystem::add_matrix (const std::string& mat_name)
     return *(_matrices[mat_name]);
 
   // Otherwise build the matrix and return it.
-  SparseMatrix<Number>* buf = SparseMatrix<Number>::build().release();
+  SparseMatrix<Number>* buf = SparseMatrix<Number>::build(this->communicator()).release();
   _matrices.insert (std::make_pair (mat_name, buf));
 
   return *buf;
@@ -1351,7 +1351,7 @@ void ImplicitSystem::qoi_parameter_hessian
 
 LinearSolver<Number>* ImplicitSystem::get_linear_solver() const
 {
-  return LinearSolver<Number>::build().release();
+  return LinearSolver<Number>::build(this->communicator()).release();
 }
 
 
