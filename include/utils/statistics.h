@@ -199,7 +199,8 @@ class StatisticsVector : public std::vector<T>
    * WARNING: The histogram(...) function is non-const, and changes
    * the order of the vector.
    */
-  void plot_histogram(const std::string& filename,
+  void plot_histogram(const processor_id_type my_procid,
+		      const std::string& filename,
 		      unsigned int n_bins);
 
   /**

@@ -808,7 +808,7 @@ void EpetraVector<T>::init (const numeric_index_type n,
   _map = new Epetra_Map(static_cast<int>(n),
                         my_n_local,
                         0,
-                        Epetra_MpiComm (libMesh::COMM_WORLD));
+                        Epetra_MpiComm (this->communicator().get()));
 
   _vec = new Epetra_Vector(*_map);
 
