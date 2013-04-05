@@ -260,15 +260,6 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
 template <typename T>
 void NoxNonlinearSolver<T>::clear ()
 {
-//  if (this->initialized())
-//     {
-//       this->_is_initialized = false;
-
-//       int ierr=0;
-
-//       ierr = LibMeshSNESDestroy(_snes);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
 }
 
 template <typename T>

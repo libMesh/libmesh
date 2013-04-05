@@ -181,32 +181,6 @@ template <typename T>
 void AztecLinearSolver<T>::get_residual_history(std::vector<double>& /* hist */)
 {
   libmesh_not_implemented();
-
-//   int ierr = 0;
-//   int its  = 0;
-
-//   // Fill the residual history vector with the residual norms
-//   // Note that GetResidualHistory() does not copy any values, it
-//   // simply sets the pointer p.  Note that for some Krylov subspace
-//   // methods, the number of residuals returned in the history
-//   // vector may be different from what you are expecting.  For
-//   // example, TFQMR returns two residual values per iteration step.
-//   PetscReal* p;
-//   ierr = KSPGetResidualHistory(_ksp, &p, &its);
-//   CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   // Check for early return
-//   if (its == 0) return;
-
-//   // Create space to store the result
-//   hist.resize(its);
-
-//   // Copy history into the vector provided by the user.
-//   for (int i=0; i<its; ++i)
-//     {
-//       hist[i] = *p;
-//       p++;
-//     }
 }
 
 
@@ -224,63 +198,6 @@ template <typename T>
 void AztecLinearSolver<T>::print_converged_reason()
 {
   libmesh_not_implemented();
-
-// #if PETSC_VERSION_LESS_THAN(2,3,1)
-//   libMesh::out << "This method is currently not supported "
-// 	    << "(but may work!) for Petsc 2.3.0 and earlier." << std::endl;
-// #else
-//   KSPConvergedReason reason;
-//   KSPGetConvergedReason(_ksp, &reason);
-
-//   //  KSP_CONVERGED_RTOL (residual 2-norm decreased by a factor of rtol, from 2-norm of right hand side)
-//   //  KSP_CONVERGED_ATOL (residual 2-norm less than abstol)
-//   //  KSP_CONVERGED_ITS (used by the preonly preconditioner that always uses ONE iteration)
-//   //  KSP_CONVERGED_STEP_LENGTH
-//   //  KSP_DIVERGED_ITS  (required more than its to reach convergence)
-//   //  KSP_DIVERGED_DTOL (residual norm increased by a factor of divtol)
-//   //  KSP_DIVERGED_NAN (residual norm became Not-a-number likely do to 0/0)
-//   //  KSP_DIVERGED_BREAKDOWN (generic breakdown in method)
-
-//   switch (reason)
-//     {
-//     case KSP_CONVERGED_RTOL:
-//        {
-// 	libMesh::out << "Linear solver converged, relative tolerance reached." << std::endl;
-// 	break;
-//        }
-//     case KSP_CONVERGED_ATOL:
-//        {
-// 	 libMesh::out << "Linear solver converged, absolute tolerance reached." << std::endl;
-// 	 break;
-//        }
-
-//       // Divergence
-//     case KSP_DIVERGED_ITS:
-//        {
-// 	 libMesh::out << "Linear solver diverged, max no. of iterations reached." << std::endl;
-// 	 break;
-//        }
-//     case KSP_DIVERGED_DTOL:
-//        {
-// 	 libMesh::out << "Linear solver diverged, residual norm increase by dtol (default 1.e5)." << std::endl;
-// 	 break;
-//        }
-//     case KSP_DIVERGED_NAN:
-//        {
-// 	 libMesh::out << "Linear solver diverged, residual norm is NaN." << std::endl;
-// 	 break;
-//        }
-//     case KSP_DIVERGED_BREAKDOWN:
-//        {
-// 	 libMesh::out << "Linear solver diverged, generic breakdown in the method." << std::endl;
-// 	 break;
-//        }
-//     default:
-//       {
-// 	libMesh::out << "Unknown/unsupported con(di)vergence reason: " << reason << std::endl;
-//       }
-//     }
-// #endif
 }
 
 template <typename T>

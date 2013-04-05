@@ -26,6 +26,7 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/libmesh.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -51,7 +52,8 @@ template <typename T> class Preconditioner;
  */
 
 template <typename T>
-class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >
+class NonlinearSolver : public ReferenceCountedObject<NonlinearSolver<T> >,
+			public ParallelObject
 {
 public:
   /**
@@ -310,6 +312,7 @@ protected:
 template <typename T>
 inline
 NonlinearSolver<T>::NonlinearSolver (sys_type& s) :
+  ParallelObject               (s),
   residual                     (NULL),
   residual_object              (NULL),
   jacobian                     (NULL),

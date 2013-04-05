@@ -46,7 +46,7 @@ namespace libMesh {
       return;
 
     PetscErrorCode ierr;
-    ierr = DMRegister(DMLIBMESH, PETSC_NULL, "DMCreate_libMesh", DMCreate_libMesh); CHKERRABORT(libMesh::COMM_WORLD, ierr);
+    ierr = DMRegister(DMLIBMESH, PETSC_NULL, "DMCreate_libMesh", DMCreate_libMesh); CHKERRABORT(libMesh::COMM_WORLD,ierr);
     PetscDMRegistered = PETSC_TRUE;
   }
 
@@ -75,18 +75,18 @@ namespace libMesh {
     this->PetscNonlinearSolver<T>::init();
 
     // Attaching a DM with the function and Jacobian callbacks to SNES.
-    ierr = DMCreateLibMesh(libMesh::COMM_WORLD, this->system(), &dm); CHKERRABORT(libMesh::COMM_WORLD, ierr);
-    ierr = DMSetFromOptions(dm);               CHKERRABORT(libMesh::COMM_WORLD, ierr);
-    ierr = DMSetUp(dm);                        CHKERRABORT(libMesh::COMM_WORLD, ierr);
-    ierr = SNESSetDM(this->_snes, dm);         CHKERRABORT(libMesh::COMM_WORLD, ierr);
+    ierr = DMCreateLibMesh(this->communicator().get(), this->system(), &dm); LIBMESH_CHKERRABORT(ierr);
+    ierr = DMSetFromOptions(dm);               LIBMESH_CHKERRABORT(ierr);
+    ierr = DMSetUp(dm);                        LIBMESH_CHKERRABORT(ierr);
+    ierr = SNESSetDM(this->_snes, dm);         LIBMESH_CHKERRABORT(ierr);
     // SNES now owns the reference to dm.
-    ierr = DMDestroy(&dm);                     CHKERRABORT(libMesh::COMM_WORLD, ierr);
+    ierr = DMDestroy(&dm);                     LIBMESH_CHKERRABORT(ierr);
     KSP ksp;
-    ierr = SNESGetKSP (this->_snes, &ksp);     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    ierr = SNESGetKSP (this->_snes, &ksp);     LIBMESH_CHKERRABORT(ierr);
 
     // Set the tolerances for the iterative solver.  Use the user-supplied
     // tolerance for the relative residual & leave the others at default values
-    ierr = KSPSetTolerances (ksp, this->initial_linear_tolerance, PETSC_DEFAULT,PETSC_DEFAULT, this->max_linear_iterations); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    ierr = KSPSetTolerances (ksp, this->initial_linear_tolerance, PETSC_DEFAULT,PETSC_DEFAULT, this->max_linear_iterations); LIBMESH_CHKERRABORT(ierr);
 
     // Set the tolerances for the non-linear solver.
     ierr = SNESSetTolerances(this->_snes,
@@ -95,7 +95,7 @@ namespace libMesh {
 			     this->absolute_step_tolerance,
 			     this->max_nonlinear_iterations,
 			     this->max_function_evaluations);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    LIBMESH_CHKERRABORT(ierr);
 
     //Pull in command-line options
     KSPSetFromOptions(ksp);
@@ -135,16 +135,16 @@ namespace libMesh {
       this->_preconditioner->set_matrix(jac_in);
 
     ierr = SNESSolve (this->_snes, PETSC_NULL, x->vec());
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    LIBMESH_CHKERRABORT(ierr);
 
     ierr = SNESGetIterationNumber(this->_snes,&n_iterations);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    LIBMESH_CHKERRABORT(ierr);
 
     ierr = SNESGetLinearSolveIterations(this->_snes, &this->_n_linear_iterations);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    LIBMESH_CHKERRABORT(ierr);
 
     ierr = SNESGetFunctionNorm(this->_snes,&final_residual_norm);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    LIBMESH_CHKERRABORT(ierr);
 
     // Get and store the reason for convergence
     SNESGetConvergedReason(this->_snes, &this->_reason);
