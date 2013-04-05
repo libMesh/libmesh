@@ -106,7 +106,7 @@ ParallelMesh::not_subactive_elements_begin ()
 ParallelMesh::element_iterator
 ParallelMesh::local_elements_begin ()
 {
-  Predicates::Local<elem_iterator_imp> p;
+  Predicates::Local<elem_iterator_imp> p(this->processor_id());
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -116,7 +116,7 @@ ParallelMesh::local_elements_begin ()
 ParallelMesh::element_iterator
 ParallelMesh::not_local_elements_begin ()
 {
-  Predicates::NotLocal<elem_iterator_imp> p;
+  Predicates::NotLocal<elem_iterator_imp> p(this->processor_id());
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -126,7 +126,7 @@ ParallelMesh::not_local_elements_begin ()
 ParallelMesh::element_iterator
 ParallelMesh::active_local_elements_begin ()
 {
-  Predicates::ActiveLocal<elem_iterator_imp> p;
+  Predicates::ActiveLocal<elem_iterator_imp> p(this->processor_id());
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -136,7 +136,7 @@ ParallelMesh::active_local_elements_begin ()
 ParallelMesh::element_iterator
 ParallelMesh::active_not_local_elements_begin ()
 {
-  Predicates::ActiveNotLocal<elem_iterator_imp> p;
+  Predicates::ActiveNotLocal<elem_iterator_imp> p(this->processor_id());
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -166,7 +166,7 @@ ParallelMesh::not_level_elements_begin (const unsigned int level)
 ParallelMesh::element_iterator
 ParallelMesh::local_level_elements_begin (const unsigned int level)
 {
-  Predicates::LocalLevel<elem_iterator_imp> p(level);
+  Predicates::LocalLevel<elem_iterator_imp> p(this->processor_id(),level);
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -176,7 +176,7 @@ ParallelMesh::local_level_elements_begin (const unsigned int level)
 ParallelMesh::element_iterator
 ParallelMesh::local_not_level_elements_begin (const unsigned int level)
 {
-  Predicates::LocalNotLevel<elem_iterator_imp> p(level);
+  Predicates::LocalNotLevel<elem_iterator_imp> p(this->processor_id(),level);
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -235,7 +235,7 @@ ParallelMesh::unpartitioned_elements_begin ()
 ParallelMesh::element_iterator
 ParallelMesh::active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id)
 {
-  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(subdomain_id);
+  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(this->processor_id(),subdomain_id);
   return element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -330,7 +330,7 @@ ParallelMesh::not_subactive_elements_begin () const
 ParallelMesh::const_element_iterator
 ParallelMesh::local_elements_begin () const
 {
-  Predicates::Local<const_elem_iterator_imp> p;
+  Predicates::Local<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -340,7 +340,7 @@ ParallelMesh::local_elements_begin () const
 ParallelMesh::const_element_iterator
 ParallelMesh::not_local_elements_begin () const
 {
-  Predicates::NotLocal<const_elem_iterator_imp> p;
+  Predicates::NotLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -350,7 +350,7 @@ ParallelMesh::not_local_elements_begin () const
 ParallelMesh::const_element_iterator
 ParallelMesh::active_local_elements_begin () const
 {
-  Predicates::ActiveLocal<const_elem_iterator_imp> p;
+  Predicates::ActiveLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -360,7 +360,7 @@ ParallelMesh::active_local_elements_begin () const
 ParallelMesh::const_element_iterator
 ParallelMesh::active_not_local_elements_begin () const
 {
-  Predicates::ActiveNotLocal<const_elem_iterator_imp> p;
+  Predicates::ActiveNotLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -390,7 +390,7 @@ ParallelMesh::not_level_elements_begin (const unsigned int level) const
 ParallelMesh::const_element_iterator
 ParallelMesh::local_level_elements_begin (const unsigned int level) const
 {
-  Predicates::LocalLevel<const_elem_iterator_imp> p(level);
+  Predicates::LocalLevel<const_elem_iterator_imp> p(this->processor_id(),level);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -400,7 +400,7 @@ ParallelMesh::local_level_elements_begin (const unsigned int level) const
 ParallelMesh::const_element_iterator
 ParallelMesh::local_not_level_elements_begin (const unsigned int level) const
 {
-  Predicates::LocalNotLevel<const_elem_iterator_imp> p(level);
+  Predicates::LocalNotLevel<const_elem_iterator_imp> p(this->processor_id(),level);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -459,7 +459,7 @@ ParallelMesh::unpartitioned_elements_begin () const
 ParallelMesh::const_element_iterator
 ParallelMesh::active_local_subdomain_elements_begin (const subdomain_id_type subdomain_id) const
 {
-  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
+  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(this->processor_id(),subdomain_id);
   return const_element_iterator(_elements.begin(), _elements.end(), p);
 }
 
@@ -553,7 +553,7 @@ ParallelMesh::not_subactive_elements_end ()
 ParallelMesh::element_iterator
 ParallelMesh::local_elements_end ()
 {
-  Predicates::Local<elem_iterator_imp> p;
+  Predicates::Local<elem_iterator_imp> p(this->processor_id());
   return element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -563,7 +563,7 @@ ParallelMesh::local_elements_end ()
 ParallelMesh::element_iterator
 ParallelMesh::not_local_elements_end ()
 {
-  Predicates::NotLocal<elem_iterator_imp> p;
+  Predicates::NotLocal<elem_iterator_imp> p(this->processor_id());
   return element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -573,7 +573,7 @@ ParallelMesh::not_local_elements_end ()
 ParallelMesh::element_iterator
 ParallelMesh::active_local_elements_end ()
 {
-  Predicates::ActiveLocal<elem_iterator_imp> p;
+  Predicates::ActiveLocal<elem_iterator_imp> p(this->processor_id());
   return element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -583,7 +583,7 @@ ParallelMesh::active_local_elements_end ()
 ParallelMesh::element_iterator
 ParallelMesh::active_not_local_elements_end ()
 {
-  Predicates::ActiveNotLocal<elem_iterator_imp> p;
+  Predicates::ActiveNotLocal<elem_iterator_imp> p(this->processor_id());
   return element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -613,7 +613,7 @@ ParallelMesh::not_level_elements_end (const unsigned int level)
 ParallelMesh::element_iterator
 ParallelMesh::local_level_elements_end (const unsigned int level)
 {
-  Predicates::LocalLevel<elem_iterator_imp> p(level);
+  Predicates::LocalLevel<elem_iterator_imp> p(this->processor_id(),level);
   return element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -623,7 +623,7 @@ ParallelMesh::local_level_elements_end (const unsigned int level)
 ParallelMesh::element_iterator
 ParallelMesh::local_not_level_elements_end (const unsigned int level)
 {
-  Predicates::LocalNotLevel<elem_iterator_imp> p(level);
+  Predicates::LocalNotLevel<elem_iterator_imp> p(this->processor_id(),level);
   return element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -682,7 +682,7 @@ ParallelMesh::unpartitioned_elements_end ()
 ParallelMesh::element_iterator
 ParallelMesh::active_local_subdomain_elements_end (const subdomain_id_type subdomain_id)
 {
-  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(subdomain_id);
+  Predicates::ActiveLocalSubdomain<elem_iterator_imp> p(this->processor_id(),subdomain_id);
   return element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -778,7 +778,7 @@ ParallelMesh::not_subactive_elements_end () const
 ParallelMesh::const_element_iterator
 ParallelMesh::local_elements_end () const
 {
-  Predicates::Local<const_elem_iterator_imp> p;
+  Predicates::Local<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -788,7 +788,7 @@ ParallelMesh::local_elements_end () const
 ParallelMesh::const_element_iterator
 ParallelMesh::not_local_elements_end () const
 {
-  Predicates::NotLocal<const_elem_iterator_imp> p;
+  Predicates::NotLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -798,7 +798,7 @@ ParallelMesh::not_local_elements_end () const
 ParallelMesh::const_element_iterator
 ParallelMesh::active_local_elements_end () const
 {
-  Predicates::ActiveLocal<const_elem_iterator_imp> p;
+  Predicates::ActiveLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -808,7 +808,7 @@ ParallelMesh::active_local_elements_end () const
 ParallelMesh::const_element_iterator
 ParallelMesh::active_not_local_elements_end () const
 {
-  Predicates::ActiveNotLocal<const_elem_iterator_imp> p;
+  Predicates::ActiveNotLocal<const_elem_iterator_imp> p(this->processor_id());
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -838,7 +838,7 @@ ParallelMesh::not_level_elements_end (const unsigned int level) const
 ParallelMesh::const_element_iterator
 ParallelMesh::local_level_elements_end (const unsigned int level) const
 {
-  Predicates::LocalLevel<const_elem_iterator_imp> p(level);
+  Predicates::LocalLevel<const_elem_iterator_imp> p(this->processor_id(),level);
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -848,7 +848,7 @@ ParallelMesh::local_level_elements_end (const unsigned int level) const
 ParallelMesh::const_element_iterator
 ParallelMesh::local_not_level_elements_end (const unsigned int level) const
 {
-  Predicates::LocalNotLevel<const_elem_iterator_imp> p(level);
+  Predicates::LocalNotLevel<const_elem_iterator_imp> p(this->processor_id(),level);
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -906,7 +906,7 @@ ParallelMesh::unpartitioned_elements_end () const
 ParallelMesh::const_element_iterator
 ParallelMesh::active_local_subdomain_elements_end (const subdomain_id_type subdomain_id) const
 {
-  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(subdomain_id);
+  Predicates::ActiveLocalSubdomain<const_elem_iterator_imp> p(this->processor_id(),subdomain_id);
   return const_element_iterator(_elements.end(), _elements.end(), p);
 }
 
@@ -950,7 +950,7 @@ ParallelMesh::active_nodes_begin ()
 ParallelMesh::node_iterator
 ParallelMesh::local_nodes_begin ()
 {
-  Predicates::Local<node_iterator_imp> p;
+  Predicates::Local<node_iterator_imp> p(this->processor_id());
   return node_iterator(_nodes.begin(), _nodes.end(), p);
 }
 
@@ -990,7 +990,7 @@ ParallelMesh::active_nodes_begin () const
 ParallelMesh::const_node_iterator
 ParallelMesh::local_nodes_begin () const
 {
-  Predicates::Local<const_node_iterator_imp> p;
+  Predicates::Local<const_node_iterator_imp> p(this->processor_id());
   return const_node_iterator(_nodes.begin(), _nodes.end(), p);
 }
 
@@ -1030,7 +1030,7 @@ ParallelMesh::active_nodes_end ()
 ParallelMesh::node_iterator
 ParallelMesh::local_nodes_end ()
 {
-  Predicates::Local<node_iterator_imp> p;
+  Predicates::Local<node_iterator_imp> p(this->processor_id());
   return node_iterator(_nodes.end(), _nodes.end(), p);
 }
 
@@ -1070,7 +1070,7 @@ ParallelMesh::active_nodes_end () const
 ParallelMesh::const_node_iterator
 ParallelMesh::local_nodes_end () const
 {
-  Predicates::Local<const_node_iterator_imp> p;
+  Predicates::Local<const_node_iterator_imp> p(this->processor_id());
   return const_node_iterator(_nodes.end(), _nodes.end(), p);
 }
 
