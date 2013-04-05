@@ -126,9 +126,13 @@ void CondensedEigenSystem::solve()
                              local_non_condensed_dofs_vector,
                              local_non_condensed_dofs_vector);
 
-  matrix_B->create_submatrix(*condensed_matrix_B,
-                             local_non_condensed_dofs_vector,
-                             local_non_condensed_dofs_vector);
+  if(generalized())
+  {
+    matrix_B->create_submatrix(*condensed_matrix_B,
+                               local_non_condensed_dofs_vector,
+                               local_non_condensed_dofs_vector);
+  }
+
 
   // Get the tolerance for the solver and the maximum
   // number of iterations. Here, we simply adopt the linear solver
