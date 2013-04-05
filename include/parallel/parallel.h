@@ -43,11 +43,22 @@ namespace libMesh
 #undef parallel_only
 #ifndef NDEBUG
   #define parallel_only() do { \
+    libmesh_deprecated(); \
     libmesh_assert(CommWorld.verify(std::string(__FILE__).size())); \
     libmesh_assert(CommWorld.verify(std::string(__FILE__))); \
     libmesh_assert(CommWorld.verify(__LINE__)); } while (0)
 #else
   #define parallel_only()  ((void) 0)
+#endif
+
+#undef libmesh_parallel_only
+#ifndef NDEBUG
+  #define libmesh_parallel_only(comm_obj) do { \
+    libmesh_assert(comm_obj.verify(std::string(__FILE__).size())); \
+    libmesh_assert(comm_obj.verify(std::string(__FILE__))); \
+    libmesh_assert(comm_obj.verify(__LINE__)); } while (0)
+#else
+  #define libmesh_parallel_only()  ((void) 0)
 #endif
 
 // Macro to identify and debug functions which should only be called in
@@ -56,11 +67,22 @@ namespace libMesh
 #undef parallel_only_on
 #ifndef NDEBUG
   #define parallel_only_on(comm_arg) do { \
+    libmesh_deprecated(); \
     libmesh_assert(CommWorld.verify(std::string(__FILE__).size(), comm_arg)); \
     libmesh_assert(CommWorld.verify(std::string(__FILE__), comm_arg)); \
     libmesh_assert(CommWorld.verify(__LINE__), comm_arg); } while (0)
 #else
   #define parallel_only_on(comm_arg)  ((void) 0)
+#endif
+
+#undef libmesh_parallel_only_on
+#ifndef NDEBUG
+  #define libmesh_parallel_only_on(comm_obj,comm_arg) do {	\
+    libmesh_assert(comm_obj.verify(std::string(__FILE__).size(), comm_arg)); \
+    libmesh_assert(comm_obj.verify(std::string(__FILE__), comm_arg)); \
+    libmesh_assert(comm_obj.verify(__LINE__), comm_arg); } while (0)
+#else
+  #define libmesh_parallel_only_on(comm_arg)  ((void) 0)
 #endif
 
 /**
