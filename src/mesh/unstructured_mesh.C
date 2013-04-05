@@ -212,7 +212,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   // libmesh_assert_not_equal_to (this->n_elem(), 0);
 
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   START_LOG("find_neighbors()", "Mesh");
 

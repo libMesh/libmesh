@@ -48,7 +48,7 @@ const dof_id_type Partitioner::communication_blocksize = 1000000;
 void Partitioner::partition (MeshBase& mesh,
 			     const unsigned int n)
 {
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   // BSK - temporary fix while redistribution is integrated 6/26/2008
   // Uncomment this to not repartition in parallel
@@ -329,7 +329,7 @@ mesh
       // A global reduction is then performed to make sure the true minimum is found.
       // As noted, this is required because we cannot guarantee that a parent has
       // access to all its children on any single processor.
-      parallel_only();
+      libmesh_parallel_only(mesh.communicator());
       libmesh_assert(MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
 			       mesh.unpartitioned_elements_end()) == 0);
 
@@ -422,7 +422,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   START_LOG("set_node_processor_ids()","Partitioner");
 
   // This function must be run on all processors at once
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   // If we have any unpartitioned elements at this
   // stage there is a problem

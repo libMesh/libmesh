@@ -28,10 +28,7 @@
 // parallel on every processor at once
 #undef parallel_object_only
 #ifndef NDEBUG
-  #define parallel_object_only() do { \
-    libmesh_assert(this->communicator().verify(std::string(__FILE__).size())); \
-    libmesh_assert(this->communicator().verify(std::string(__FILE__))); \
-    libmesh_assert(this->communicator().verify(__LINE__)); } while (0)
+  #define parallel_object_only() libmesh_parallel_only(this->communicator())
 #else
   #define parallel_object_only()  ((void) 0)
 #endif

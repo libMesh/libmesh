@@ -430,7 +430,7 @@ void System::update ()
 
 void System::re_update ()
 {
-  parallel_only();
+  parallel_object_only();
 
   // If this system is empty... don't do anything!
   if(!this->n_vars())
@@ -1401,7 +1401,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
                             const SystemNorm &norm) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   START_LOG ("calculate_norm()", "System");
 
@@ -1966,7 +1966,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
-  parallel_only();
+  parallel_object_only();
 
   // And every processor had better agree about which point we're
   // looking for
@@ -2063,7 +2063,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
-  parallel_only();
+  parallel_object_only();
 
   // And every processor had better agree about which point we're
   // looking for
@@ -2162,7 +2162,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
 {
   // This function must be called on every processor; there's no
   // telling where in the partition p falls.
-  parallel_only();
+  parallel_object_only();
 
   // And every processor had better agree about which point we're
   // looking for

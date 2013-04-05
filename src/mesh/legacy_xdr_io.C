@@ -671,7 +671,7 @@ void LegacyXdrIO::write_mesh (const std::string& name,
   const MeshBase& mesh = MeshOutput<MeshBase>::mesh();
 
   // n_levels is a parallel-only method
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
   const unsigned int          n_levels = MeshTools::n_levels(mesh);
 
   // The Legacy Xdr IO code only works if we have a serialized mesh

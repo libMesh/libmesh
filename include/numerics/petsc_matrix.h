@@ -43,7 +43,7 @@
   #define semiparallel_only() do { if (this->initialized()) { const char *mytype; \
     MatGetType(_mat,&mytype); \
     if (!strcmp(mytype, MATSEQAIJ)) \
-      parallel_only(); } } while (0)
+      parallel_object_only(); } } while (0)
 #else
   #define semiparallel_only()
 #endif

@@ -834,7 +834,7 @@ namespace libMesh
 
 dof_id_type DofMap::n_constrained_dofs() const
 {
-  parallel_only();
+  parallel_object_only();
 
   dof_id_type nc_dofs = this->n_local_constrained_dofs();
   this->communicator().sum(nc_dofs);
@@ -855,7 +855,7 @@ dof_id_type DofMap::n_local_constrained_dofs() const
 
 void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
 {
-  parallel_only();
+  parallel_object_only();
 
   START_LOG("create_dof_constraints()", "DofMap");
 
@@ -1001,7 +1001,7 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
 void DofMap::print_dof_constraints(std::ostream& os,
                                    bool print_nonlocal) const
 {
-  parallel_only();
+  parallel_object_only();
 
   std::string local_constraints =
     this->get_local_constraints(print_nonlocal);
@@ -1544,7 +1544,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
                                           NumericVector<Number> *v,
                                           bool homogeneous) const
 {
-  parallel_only();
+  parallel_object_only();
 
   if (!this->n_constrained_dofs())
     return;
@@ -1968,7 +1968,7 @@ void DofMap::build_constraint_matrix_and_vector
 void DofMap::allgather_recursive_constraints(MeshBase& mesh)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // Return immediately if there's nothing to gather
   if (this->n_processors() == 1)
@@ -2203,7 +2203,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
   while (unexpanded_set_nonempty)
     {
       // Let's make sure we don't lose sync in this loop.
-      parallel_only();
+      parallel_object_only();
 
       // Request sets
       DoF_RCSet   dof_request_set;
@@ -2570,7 +2570,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
   // with a constrainer node to know the corresponding row(s).
 
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // Return immediately if there's nothing to gather
   if (this->n_processors() == 1)
@@ -2958,7 +2958,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
 void DofMap::add_constraints_to_send_list()
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // Return immediately if there's nothing to gather
   if (this->n_processors() == 1)

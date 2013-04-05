@@ -179,7 +179,7 @@ void SparseMatrix<T>::zero_rows (std::vector<numeric_index_type> &, T)
 template <typename T>
 void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
 {
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
 

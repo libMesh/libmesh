@@ -315,7 +315,7 @@ dof_id_type MeshTools::total_weight(const MeshBase& mesh)
 {
   if (!mesh.is_serial())
     {
-      parallel_only();
+      libmesh_parallel_only(mesh.communicator());
       dof_id_type weight = MeshTools::weight (mesh, mesh.processor_id());
       mesh.communicator().sum(weight);
       dof_id_type unpartitioned_weight =
@@ -416,7 +416,7 @@ MeshTools::BoundingBox
 MeshTools::bounding_box(const MeshBase& mesh)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   FindBBox find_bbox;
 
@@ -588,7 +588,7 @@ unsigned int MeshTools::n_active_local_levels(const MeshBase& mesh)
 
 unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
 {
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   unsigned int nl = MeshTools::n_active_local_levels(mesh);
 
@@ -624,7 +624,7 @@ unsigned int MeshTools::n_local_levels(const MeshBase& mesh)
 
 unsigned int MeshTools::n_levels(const MeshBase& mesh)
 {
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   unsigned int nl = MeshTools::n_local_levels(mesh);
 
@@ -676,7 +676,7 @@ dof_id_type MeshTools::n_nodes (const MeshBase::const_node_iterator &begin,
 
 unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
 {
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   unsigned int max_p_level = 0;
 
@@ -890,7 +890,7 @@ void MeshTools::correct_node_proc_ids
    LocationMap<Node> &loc_map)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   // We'll need the new_nodes_map to answer other processors'
   // requests.  It should never be empty unless we don't have any
@@ -1160,7 +1160,7 @@ void libmesh_assert_valid_dof_ids(const MeshBase &mesh)
   if (mesh.n_processors() == 1)
     return;
 
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   dof_id_type pmax_elem_id = mesh.max_elem_id();
   mesh.communicator().max(pmax_elem_id);
@@ -1183,7 +1183,7 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
   if (mesh.n_processors() == 1)
     return;
 
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   // We want this test to be valid even when called even after nodes
   // have been added asynchonously but before they're renumbered
@@ -1268,7 +1268,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
   if (mesh.n_processors() == 1)
     return;
 
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   // We want this test to be valid even when called even after nodes
   // have been added asynchonously but before they're renumbered
@@ -1341,7 +1341,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
 {
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
   if (mesh.n_processors() == 1)
     return;
 

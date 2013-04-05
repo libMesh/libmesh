@@ -42,7 +42,7 @@ template <typename T>
 T DistributedVector<T>::sum () const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -64,7 +64,7 @@ template <typename T>
 Real DistributedVector<T>::l1_norm () const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -86,7 +86,7 @@ template <typename T>
 Real DistributedVector<T>::l2_norm () const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -108,7 +108,7 @@ template <typename T>
 Real DistributedVector<T>::linfty_norm () const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -349,7 +349,7 @@ template <typename T>
 T DistributedVector<T>::dot (const NumericVector<T>& V) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // Make sure the NumericVector passed in is really a DistributedVector
   const DistributedVector<T>* v = libmesh_cast_ptr<const DistributedVector<T>*>(&V);
@@ -540,7 +540,7 @@ template <typename T>
 void DistributedVector<T>::localize (std::vector<T>& v_local) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -562,7 +562,7 @@ void DistributedVector<T>::localize_to_one (std::vector<T>& v_local,
 					    const processor_id_type pid) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);

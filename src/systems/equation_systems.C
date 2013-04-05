@@ -130,7 +130,7 @@ void EquationSystems::init ()
 
 void EquationSystems::reinit ()
 {
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert_not_equal_to (this->n_systems(), 0);
 
@@ -677,7 +677,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
   START_LOG("build_solution_vector()", "EquationSystems");
 
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->n_systems());
 
@@ -887,7 +887,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
                                     std::vector<std::string> & names ) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->n_systems());
 

@@ -132,7 +132,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   START_LOG ("read()","Nemesis_IO");
 
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   if (_verbose)
     {

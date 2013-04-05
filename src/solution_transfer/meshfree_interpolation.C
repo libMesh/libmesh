@@ -144,7 +144,7 @@ namespace libMesh
 #else
 
     // This function must be run on all processors at once
-    parallel_only();
+    parallel_object_only();
 
     START_LOG ("gather_remote_data()", "MeshfreeInterpolation");
 

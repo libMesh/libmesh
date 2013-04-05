@@ -52,7 +52,7 @@ void LocationMap<T>::init(MeshBase& mesh)
   // This function must be run on all processors at once
   // for non-serial meshes
   if (!mesh.is_serial())
-    parallel_only();
+    libmesh_parallel_only(mesh.communicator());
 
   START_LOG("init()", "LocationMap");
 

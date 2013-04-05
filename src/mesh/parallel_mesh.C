@@ -108,7 +108,7 @@ ParallelMesh::ParallelMesh (const UnstructuredMesh &other_mesh) :
 void ParallelMesh::update_parallel_id_counts()
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   _n_elem  = this->parallel_n_elem();
   _n_nodes = this->parallel_n_nodes();
@@ -140,7 +140,7 @@ void ParallelMesh::update_parallel_id_counts()
 dof_id_type ParallelMesh::parallel_n_elem() const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   dof_id_type n_local = this->n_local_elem();
   this->communicator().sum(n_local);
@@ -153,7 +153,7 @@ dof_id_type ParallelMesh::parallel_n_elem() const
 dof_id_type ParallelMesh::parallel_max_elem_id() const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   dof_id_type max_local = _elements.empty() ?
     0 : _elements.rbegin()->first + 1;
@@ -166,7 +166,7 @@ dof_id_type ParallelMesh::parallel_max_elem_id() const
 dof_id_type ParallelMesh::parallel_n_nodes() const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   dof_id_type n_local = this->n_local_nodes();
   this->communicator().sum(n_local);
@@ -179,7 +179,7 @@ dof_id_type ParallelMesh::parallel_n_nodes() const
 dof_id_type ParallelMesh::parallel_max_node_id() const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   dof_id_type max_local = _nodes.empty() ?
     0 : _nodes.rbegin()->first + 1;
@@ -724,7 +724,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
   (const mapvector<T*,dof_id_type> &objects) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   const dof_id_type pmax_node_id = this->parallel_max_node_id();
   const dof_id_type pmax_elem_id = this->parallel_max_elem_id();
@@ -784,7 +784,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 {
 #ifdef LIBMESH_ENABLE_AMR
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   dof_id_type pmax_elem_id = this->parallel_max_elem_id();
 
@@ -820,7 +820,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
   (mapvector<T*,dof_id_type> &objects)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   typedef typename mapvector<T*,dof_id_type>::veclike_iterator object_iterator;
 
@@ -1003,7 +1003,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
 
 void ParallelMesh::renumber_nodes_and_elements ()
 {
-  parallel_only();
+  parallel_object_only();
 
   if (_skip_renumber_nodes_and_elements)
     {
@@ -1131,7 +1131,7 @@ void ParallelMesh::fix_broken_node_and_element_numbering ()
 
 dof_id_type ParallelMesh::n_active_elem () const
 {
-  parallel_only();
+  parallel_object_only();
 
   // Get local active elements first
   dof_id_type active_elements =

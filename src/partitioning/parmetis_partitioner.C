@@ -75,7 +75,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
     }
 
   // This function must be run on all processors at once
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
 // What to do if the Parmetis library IS NOT present
 #ifndef LIBMESH_HAVE_PARMETIS
@@ -516,7 +516,7 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
 
   const dof_id_type
     first_local_elem = _vtxdist[mesh.processor_id()];

@@ -524,7 +524,7 @@ template <typename T>
 void EpetraVector<T>::localize (std::vector<T>& v_local) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   const unsigned int n  = this->size();
   const unsigned int nl = this->local_size();
@@ -548,7 +548,7 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
 				       const processor_id_type pid) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   const unsigned int n  = this->size();
   const unsigned int nl = this->local_size();

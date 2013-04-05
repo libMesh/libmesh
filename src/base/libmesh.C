@@ -407,7 +407,8 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
   // libmesh_assert_greater_equal (libMeshPrivateData::_processor_id, 0);
 
   // Let's be sure we properly initialize on every processor at once:
-  parallel_only();
+  Parallel::Communicator communicator(libMesh::COMM_WORLD);
+  libmesh_parallel_only(communicator);
 
 #endif
 
@@ -552,7 +553,8 @@ LibMeshInit::~LibMeshInit()
   task_scheduler.reset();
 
   // Let's be sure we properly close on every processor at once:
-  parallel_only();
+  Parallel::Communicator communicator(libMesh::COMM_WORLD);
+  libmesh_parallel_only(communicator);
 
 #if defined(LIBMESH_HAVE_MPI)
   // We may be here in only one process,

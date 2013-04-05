@@ -388,7 +388,7 @@ void UnstructuredMesh::all_first_order ()
 void UnstructuredMesh::all_second_order (const bool full_ordered)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   /*
    * when the mesh is not prepared,

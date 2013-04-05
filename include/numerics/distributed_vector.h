@@ -548,7 +548,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
                                  const ParallelType ptype)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert_less_equal (n_local, n);
 
@@ -834,7 +834,7 @@ inline
 Real DistributedVector<T>::min () const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
@@ -857,7 +857,7 @@ inline
 Real DistributedVector<T>::max() const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);

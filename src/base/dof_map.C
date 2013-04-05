@@ -216,7 +216,7 @@ void DofMap::add_variable_group (const VariableGroup &var_group)
 
 void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
 {
-  parallel_only();
+  parallel_object_only();
 
   // We shouldn't be trying to re-attach the same matrices repeatedly
   libmesh_assert (std::find(_matrices.begin(), _matrices.end(),
@@ -279,7 +279,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                                       dofobject_accessor objects)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // First, iterate over local objects to find out how many
   // are on each processor
@@ -831,7 +831,7 @@ void DofMap::clear()
 void DofMap::distribute_dofs (MeshBase& mesh)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // Log how long it takes to distribute the degrees of freedom
   START_LOG("distribute_dofs()", "DofMap");
@@ -2685,7 +2685,7 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 
 void SparsityPattern::Build::parallel_sync ()
 {
-  parallel_only();
+  parallel_object_only();
   this->communicator().verify(need_full_sparsity_pattern);
 
   const dof_id_type n_global_dofs   = dof_map.n_dofs();

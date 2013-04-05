@@ -721,7 +721,7 @@ void System::read_serialized_data (Xdr& io,
   //
   //      11.) The global additional vector, re-ordered to be
   //          node-major (More on this later.)
-  parallel_only();
+  parallel_object_only();
   std::string comment;
 
   // PerfLog pl("IO Performance",false);
@@ -1136,7 +1136,7 @@ unsigned int System::read_SCALAR_dofs (const unsigned int var,
 template <typename InValType>
 numeric_index_type System::read_serialized_vector (Xdr& io, NumericVector<Number>& vec)
 {
-  parallel_only();
+  parallel_object_only();
 
 #ifndef NDEBUG
   // In parallel we better be reading a parallel vector -- if not
@@ -1685,7 +1685,7 @@ void System::write_serialized_data (Xdr& io,
    *      10.) The global additional vector, re-ordered to be
    *          node-major (More on this later.)
    */
-  parallel_only();
+  parallel_object_only();
   std::string comment;
 
   // PerfLog pl("IO Performance",false);
@@ -2130,7 +2130,7 @@ unsigned int System::write_SCALAR_dofs (const NumericVector<Number> &vec,
 
 dof_id_type System::write_serialized_vector (Xdr& io, const NumericVector<Number>& vec) const
 {
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (io.writing());
 
@@ -2177,7 +2177,7 @@ template <typename InValType>
 dof_id_type System::read_serialized_vectors (Xdr &io,
 					     const std::vector<NumericVector<Number>*> &vectors) const
 {
-  parallel_only();
+  parallel_object_only();
 
   // Error checking
 // #ifndef NDEBUG
@@ -2271,7 +2271,7 @@ dof_id_type System::read_serialized_vectors (Xdr &io,
 dof_id_type System::write_serialized_vectors (Xdr &io,
 					      const std::vector<const NumericVector<Number>*> &vectors) const
 {
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (io.writing());
 

@@ -534,14 +534,14 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 				   const std::string& unknown_name,
 				   std::vector<Real>& error_vals)
 {
-  // This function must be run on all processors at once
-  parallel_only();
-
   // Make sure we aren't "overconfigured"
   libmesh_assert (!(_exact_values.size() && _equation_systems_fine));
 
   // We need a commmunicator.
   const Parallel::Communicator &communicator (_equation_systems.communicator());
+
+  // This function must be run on all processors at once
+  libmesh_parallel_only(communicator);
 
   // Get a reference to the system whose error is being computed.
   // If we have a fine grid, however, we'll integrate on that instead

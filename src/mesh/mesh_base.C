@@ -92,7 +92,7 @@ MeshBase::~MeshBase()
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 {
-  parallel_only();
+  parallel_object_only();
 
   // A distributed mesh may have processors with no elements (or
   // processors with no elements of higher dimension, if we ever
@@ -174,7 +174,7 @@ void MeshBase::clear ()
 void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
 {
   // This requires an inspection on every processor
-  parallel_only();
+  parallel_object_only();
 
   ids.clear();
 
@@ -193,7 +193,7 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
 subdomain_id_type MeshBase::n_subdomains() const
 {
   // This requires an inspection on every processor
-  parallel_only();
+  parallel_object_only();
 
   std::set<subdomain_id_type> ids;
 

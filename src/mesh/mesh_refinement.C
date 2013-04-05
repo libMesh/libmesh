@@ -164,7 +164,7 @@ void MeshRefinement::create_parent_error_vector
    Real& parent_error_max)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // Make sure the input error vector is valid
 #ifdef DEBUG
@@ -303,7 +303,7 @@ void MeshRefinement::update_nodes_map ()
 bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
@@ -386,7 +386,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
 bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   bool found_flag = false;
 
@@ -442,7 +442,7 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
 bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   bool _maintain_level_one = maintain_level_one;
 
@@ -612,7 +612,7 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   bool _maintain_level_one = maintain_level_one;
 
@@ -737,7 +737,7 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 bool MeshRefinement::refine_elements (const bool maintain_level_one)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   bool _maintain_level_one = maintain_level_one;
 
@@ -927,7 +927,7 @@ void act_on_data (const std::vector<dof_id_type>& ids,
 bool MeshRefinement::make_flags_parallel_consistent()
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   START_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
 
@@ -957,7 +957,7 @@ bool MeshRefinement::make_flags_parallel_consistent()
 bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
@@ -1306,7 +1306,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
@@ -1513,7 +1513,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 bool MeshRefinement::_coarsen_elements ()
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   START_LOG ("_coarsen_elements()", "MeshRefinement");
 
@@ -1626,7 +1626,7 @@ bool MeshRefinement::_coarsen_elements ()
 bool MeshRefinement::_refine_elements ()
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   // Update the _new_nodes_map so that elements can
   // find nodes to connect to.

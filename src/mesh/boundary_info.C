@@ -1127,7 +1127,7 @@ std::size_t BoundaryInfo::n_boundary_conds () const
     return _boundary_side_id.size();
 
   // in parallel we need to sum the number of local bcs
-  parallel_only();
+  parallel_object_only();
 
   std::size_t nbcs=0;
 

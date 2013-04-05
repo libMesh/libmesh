@@ -117,7 +117,7 @@ void sync_dofobject_data_by_xyz(const Communicator&      communicator,
                                 SyncFunctor&             sync)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  libmesh_parallel_only(communicator);
 
   // We need a valid location_map
 #ifdef DEBUG
@@ -239,7 +239,7 @@ void sync_dofobject_data_by_id(const Communicator& communicator,
                                SyncFunctor&    sync)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  libmesh_parallel_only(communicator);
 
   // Count the objects to ask each processor about
   std::vector<dof_id_type>
@@ -321,7 +321,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
   const Communicator &communicator (mesh.communicator());
 
   // This function must be run on all processors at once
-  parallel_only();
+  libmesh_parallel_only(communicator);
 
   // Count the objects to ask each processor about
   std::vector<dof_id_type>
