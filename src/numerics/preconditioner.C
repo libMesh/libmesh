@@ -35,7 +35,7 @@ namespace libMesh
 // Preconditioner members
 template <typename T>
 Preconditioner<T> *
-Preconditioner<T>::build(const libMesh::Parallel::Communicator& comm,
+Preconditioner<T>::build(const libMesh::Parallel::Communicator &comm,
 			 const SolverPackage solver_package)
 {
   // Build the appropriate solver

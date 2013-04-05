@@ -62,7 +62,7 @@ public:
   /**
    *  Constructor. Initializes Solver data structures
    */
-  LinearSolver (const libMesh::Parallel::Communicator& /*= libMesh::CommWorld */);
+  LinearSolver (const libMesh::Parallel::Communicator &comm /*= libMesh::CommWorld */);
 
   /**
    * Destructor.

@@ -101,7 +101,7 @@ public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
-  PetscLinearSolver (const libMesh::Parallel::Communicator& /*= libMesh::CommWorld */);
+  PetscLinearSolver (const libMesh::Parallel::Communicator &comm /*= libMesh::CommWorld */);
 
   /**
    * Destructor.
@@ -321,7 +321,7 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-  PetscLinearSolver<T>::PetscLinearSolver (const libMesh::Parallel::Communicator&comm):
+  PetscLinearSolver<T>::PetscLinearSolver (const libMesh::Parallel::Communicator &comm):
     LinearSolver<T>(comm),
     _restrict_solve_to_is(NULL),
     _restrict_solve_to_is_complement(NULL),

@@ -32,7 +32,7 @@
 namespace libMesh
 {
 
-  RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator& comm)
+  RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator &comm)
   :
     RBEvaluation(comm),
     _previous_N(0),

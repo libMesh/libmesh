@@ -53,12 +53,12 @@ public:
    * seminorms should be supported now.  W1,p and W2,p norms would
    * be natural to support if any contributors make the effort.
    */
-  PatchRecoveryErrorEstimator(const Parallel::Communicator &comm /* = libMesh::CommWorld */) :
+  PatchRecoveryErrorEstimator(const Parallel::Communicator &comm = libMesh::CommWorld) :
     ErrorEstimator(comm),
     target_patch_size(20),
     patch_growth_strategy(&Patch::add_local_face_neighbors),
     patch_reuse(true)
-      { error_norm = H1_SEMINORM; }
+  { error_norm = H1_SEMINORM; }
 
   /**
    * Destructor.
