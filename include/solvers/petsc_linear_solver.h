@@ -101,7 +101,7 @@ public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
-  PetscLinearSolver (const libMesh::Parallel::Communicator &comm /*= libMesh::CommWorld */);
+  PetscLinearSolver (const libMesh::Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.
