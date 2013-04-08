@@ -208,7 +208,7 @@ DTKAdapter::update_variable_values(std::string var_name)
     unsigned int node_num = vertices[i];
     const Node & node = mesh.node(node_num);
 
-    if(node.processor_id() == this->processor_id())
+    if(node.processor_id() == sys->processor_id())
     {
       // The 0 is for the component... this only works for LAGRANGE!
       dof_id_type dof = node.dof_number(sys->number(), var_num, 0);
