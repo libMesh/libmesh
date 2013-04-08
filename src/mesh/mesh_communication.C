@@ -768,6 +768,11 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
   CommWorld.broadcast(mesh_dimension);
   mesh.set_mesh_dimension(mesh_dimension);
 
+  // Broadcast all of the named entity information
+  CommWorld.broadcast(mesh.set_subdomain_name_map());
+  CommWorld.broadcast(mesh.boundary_info->set_sideset_name_map());
+  CommWorld.broadcast(mesh.boundary_info->set_nodeset_name_map());
+
   libmesh_assert (CommWorld.verify(mesh.n_elem()));
   libmesh_assert (CommWorld.verify(mesh.n_nodes()));
 

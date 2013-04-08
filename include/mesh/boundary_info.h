@@ -363,6 +363,18 @@ public:
   boundary_id_type get_id_by_name(const std::string& name) const;
 
   /**
+   * Return a writeable reference to the whole sideset name map
+   */
+  std::map<boundary_id_type, std::string>& set_sideset_name_map ()
+  { return _ss_id_to_name; }
+
+  /**
+   * Return a writeable reference to the whole nodeset name map
+   */
+  std::map<boundary_id_type, std::string>& set_nodeset_name_map ()
+  { return _ns_id_to_name; }
+
+  /**
    * Number used for internal use. This is the return value
    * if a boundary condition is not specified.
    */
