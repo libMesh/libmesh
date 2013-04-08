@@ -123,8 +123,10 @@ int main (int argc, char** argv)
   if ( command_line.search(1, "-online_mode") )
     online_mode = command_line.next(online_mode);
 
-  // Build a mesh.
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden by build_cube, on
+  // the default MPI communicator.
+  Mesh mesh(0,init.comm);
+
   MeshTools::Generation::build_cube (mesh,
                                      n_elem_xy, n_elem_xy, n_elem_z,
                                      -0.2, 0.2,

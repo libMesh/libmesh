@@ -166,8 +166,9 @@ int main(int argc, char** argv)
   out << "% dofs     L2-error     H1-error" << std::endl;
   out << "e = [" << std::endl;
 
-  // Create a mesh.
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden later, on the
+  // default MPI communicator.
+  Mesh mesh(0,init.comm);
 
   // Read in the mesh
   if (dim == 1)

@@ -475,8 +475,10 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
-  // Create a mesh from file.
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden by the file,
+  // distributed across the default MPI communicator.
+  Mesh mesh(0,init.comm);
+
   mesh.read ("lshaped.xda");
 
   if (order != "FIRST")

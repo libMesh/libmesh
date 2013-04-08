@@ -100,7 +100,8 @@ int main (int argc, char** argv)
   // Make sure libMesh was compiled for 3D
   libmesh_example_assert(dim == LIBMESH_DIM, "3D support");
 
-  Mesh mesh(dim);
+  // Create a 3D mesh distributed across the default MPI communicator.
+  Mesh mesh(dim, init.comm);
   MeshTools::Generation::build_cube (mesh,
                                      40,
                                      8,

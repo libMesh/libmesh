@@ -90,8 +90,9 @@ int main (int argc, char** argv)
   // We have only defined 2 and 3 dimensional problems
   libmesh_assert (dim == 2 || dim == 3);
 
-  // Create a mesh.
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden later, distributed
+  // across the default MPI communicator.
+  Mesh mesh(0,init.comm);
 
   // And an object to refine it
   MeshRefinement mesh_refinement(mesh);

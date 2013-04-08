@@ -95,11 +95,12 @@ int main (int argc, char** argv)
   // Tell the user what we are doing.
   std::cout << "Running ex6 with dim = 3" << std::endl << std::endl;
 
-  // Create a serialized mesh.
+  // Create a serialized mesh, distributed across the default MPI
+  // communicator.
   // InfElemBuilder still requires some updates to be ParallelMesh
   // compatible
 
-  SerialMesh mesh;
+  SerialMesh mesh(0, init.comm);
 
   // Use the internal mesh generator to create elements
   // on the square [-1,1]^3, of type Hex8.

@@ -477,8 +477,9 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-amr");
 #else
 
-  // Create or read the mesh
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden later, distributed
+  // across the default MPI communicator.
+  Mesh mesh(0,init.comm);
 
   if (dim == 1)
     MeshTools::Generation::build_line(mesh,1,-1.,0.);

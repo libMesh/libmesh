@@ -74,8 +74,9 @@ int main (int argc, char** argv)
     std::cout << " " << argv[i];
   std::cout << std::endl << std::endl;
 
-  // Create a mesh.
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden later, distributed
+  // across the default MPI communicator.
+  Mesh mesh(0,init.comm);
 
   // Use the MeshTools::Generation mesh generator to create a uniform
   // 2D grid on the unit square.  By default a mesh of QUAD4

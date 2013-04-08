@@ -116,7 +116,10 @@ int main (int argc, char** argv)
   // in example 10 to demonstrate adaptive mesh refinement.  Here we will
   // simply read it in and uniformly refine it 5 times before we compute
   // with it.
-  Mesh mesh;
+  //
+  // Create a mesh object, with dimension to be overridden later,
+  // distributed across the default MPI communicator.
+  Mesh mesh(0,init.comm);
 
   mesh.read ("mesh.xda");
 

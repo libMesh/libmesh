@@ -728,8 +728,9 @@ int main (int argc, char** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
-  // Create a mesh.
-  Mesh mesh (param.dimension);
+  // Create a mesh with the given dimension, distributed
+  // across the default MPI communicator.
+  Mesh mesh(param.dimension, init.comm);
 
   // And an object to refine it
   AutoPtr<MeshRefinement> mesh_refinement =

@@ -190,10 +190,10 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
-  // Create a new mesh.
+  // Create a new mesh on the default MPI communicator.
   // We still need some work on automatic parallel restarts with
   // ParallelMesh
-  SerialMesh mesh;
+  SerialMesh mesh(0,init.comm);
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);

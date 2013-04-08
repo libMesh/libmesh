@@ -271,7 +271,9 @@ int main (int argc, char** argv)
   FEMParameters param;
   param.read(infile);
 
-  Mesh mesh (param.dimension);
+  // Create a mesh with the given dimension, distributed
+  // across the default MPI communicator.
+  Mesh mesh(param.dimension, init.comm);
 
   // And an object to refine it
   AutoPtr<MeshRefinement> mesh_refinement(new MeshRefinement(mesh));

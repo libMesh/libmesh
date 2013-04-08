@@ -159,8 +159,10 @@ int main (int argc, char** argv)
   // Create a mesh.
   // This example directly references all mesh nodes and is
   // incompatible with ParallelMesh use.
-
-  SerialMesh mesh;
+  //
+  // Create a SerialMesh object, with dimension to be overridden
+  // later, distributed across the default MPI communicator.
+  SerialMesh mesh(0,init.comm);
   MeshData mesh_data(mesh);
 
   // Read the meshfile specified in the command line or

@@ -75,8 +75,9 @@ int main (int argc, char** argv)
   if ( command_line.search(1, "-online_mode") )
     online_mode = command_line.next(online_mode);
 
-  // Create a mesh (just a simple square)
-  Mesh mesh (dim);
+  // Create a mesh (just a simple square) on the default MPI
+  // communicator
+  Mesh mesh (dim, init.comm);
   MeshTools::Generation::build_square (mesh,
                                        n_elem, n_elem,
                                        -1., 1.,

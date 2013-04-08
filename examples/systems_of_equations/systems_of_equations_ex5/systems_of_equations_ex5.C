@@ -86,7 +86,8 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D support");
 
-  Mesh mesh(dim);
+  // Create a 2D mesh distributed across the default MPI communicator.
+  Mesh mesh(dim, init.comm);
   MeshTools::Generation::build_square (mesh,
                                        50, 10,
                                        0., 1.,

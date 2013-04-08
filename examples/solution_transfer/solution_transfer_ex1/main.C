@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
 #ifdef LIBMESH_HAVE_DTK
 
-  Mesh from_mesh;
+  Mesh from_mesh(0,init.comm);
   MeshTools::Generation::build_cube(from_mesh, 4, 4, 4, 0, 1, 0, 1, 0, 1, HEX8);
   from_mesh.print_info();
   EquationSystems from_es(from_mesh);

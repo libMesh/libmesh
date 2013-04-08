@@ -95,8 +95,8 @@ int main (int argc, char** argv)
   if ( command_line.search(1, "-online_mode") )
     online_mode = command_line.next(online_mode);
 
-  // Build a mesh.
-  Mesh mesh (dim);
+  // Build a mesh on the default MPI communicator.
+  Mesh mesh (dim, init.comm);
   MeshTools::Generation::build_square (mesh,
                                        n_elem, n_elem,
                                        0., 1.,
