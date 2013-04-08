@@ -1040,7 +1040,8 @@ namespace Parallel
      * Optionally takes the \p root_id processor, which specifies
      * the processor initiating the broadcast.
      * If \p data is a vector, the user is responsible for resizing it
-     * on all processors.
+     * on all processors, except in the case when \p data is a vector
+     * of strings.
      */
     template <typename T>
     inline void broadcast(T &data, const unsigned int root_id=0) const;

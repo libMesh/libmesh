@@ -2989,6 +2989,70 @@ inline void Communicator::broadcast (std::vector<T> &data,
 
 
 template <typename T>
+inline void Communicator::broadcast (std::vector<std::basic_string<T> > &data,
+                                     const unsigned int root_id) const
+{
+  if (this->size() == 1)
+    {
+      libmesh_assert (!this->rank());
+      libmesh_assert (!root_id);
+      return;
+    }
+
+  libmesh_assert_less (root_id, this->size());
+
+  START_LOG("broadcast()", "Parallel");
+
+  std::size_t bufsize=0;
+  if (root_id == this->rank())
+    {
+      for (std::size_t i=0; i<data.size(); ++i)
+        bufsize += data[i].size() + 1;  // Add one for the string length word
+    }
+  this->broadcast(bufsize, root_id);
+
+  // Here we use unsigned int to store up to 32-bit characters
+  std::vector<unsigned int> temp; temp.reserve(bufsize);
+  // Pack the strings
+  if (root_id == this->rank())
+    {
+      for (unsigned int i=0; i<data.size(); ++i)
+        {
+          temp.push_back(data[i].size());
+          for (std::size_t j=0; j != data[i].size(); ++j)
+            /**
+             * The strings will be packed in one long array with the size of each
+             * string preceeding the actual characters
+             */
+            temp.push_back(data[i][j]);
+        }
+    }
+  else
+    temp.resize(bufsize);
+
+  // broad cast the packed strings
+  this->broadcast(temp, root_id);
+
+  // Unpack the strings
+  if (root_id != this->rank())
+    {
+      data.clear();
+      std::vector<unsigned int>::const_iterator iter = temp.begin();
+      while (iter != temp.end())
+        {
+          std::size_t curr_len = *iter++;
+          data.push_back(std::string(iter, iter+curr_len));
+          iter += curr_len;
+        }
+    }
+
+  STOP_LOG("broadcast()", "Parallel");
+}
+
+
+
+
+template <typename T>
 inline void Communicator::broadcast (std::set<T> &data,
                                      const unsigned int root_id) const
 {
@@ -3021,6 +3085,59 @@ inline void Communicator::broadcast (std::set<T> &data,
 
   STOP_LOG("broadcast()", "Parallel");
 }
+
+
+
+template <typename T1, typename T2>
+inline void Communicator::broadcast(std::map<T1, T2> &data,
+                                    const unsigned int root_id) const
+{
+  if (this->size() == 1)
+    {
+      libmesh_assert (!this->rank());
+      libmesh_assert (!root_id);
+      return;
+    }
+
+  libmesh_assert_less (root_id, this->size());
+
+  START_LOG("broadcast()", "Parallel");
+
+  std::size_t data_size=data.size();
+  this->broadcast(data_size, root_id);
+
+  std::vector<T1> pair_first; pair_first.reserve(data_size);
+  std::vector<T2> pair_second; pair_first.reserve(data_size);
+
+  if (root_id == this->rank())
+    {
+      for (typename std::map<T1, T2>::const_iterator it = data.begin();
+           it != data.end(); ++it)
+        {
+          pair_first.push_back(it->first);
+          pair_second.push_back(it->second);
+        }
+    }
+  else
+    {
+      pair_first.resize(data_size);
+      pair_second.resize(data_size);
+    }
+
+  this->broadcast(pair_first, root_id);
+  this->broadcast(pair_second, root_id);
+
+  libmesh_assert(pair_first.size() == pair_first.size());
+
+  if (this->rank() != root_id)
+    {
+      data.clear();
+      for (std::size_t i=0; i<pair_first.size(); ++i)
+        data[pair_first[i]] = pair_second[i];
+    }
+  STOP_LOG("broadcast()", "Parallel");
+}
+
 
 
 template <typename Context, typename OutputContext,
