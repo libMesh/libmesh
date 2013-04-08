@@ -48,7 +48,7 @@ const Point InfElemBuilder::build_inf_elem(bool be_verbose)
   const MeshTools::BoundingBox b_box = MeshTools::bounding_box(_mesh);
   Point origin = (b_box.first + b_box.second) / 2;
 
-  if (be_verbose && libMesh::processor_id() == 0)
+  if (be_verbose && _mesh.processor_id() == 0)
     {
 #ifdef DEBUG
       libMesh::out << " Determined origin for Infinite Elements:"

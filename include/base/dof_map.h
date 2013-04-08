@@ -31,6 +31,7 @@
 #include "libmesh/threads_allocators.h"
 #include "libmesh/elem_range.h"
 #include "libmesh/sparsity_pattern.h"
+#include "libmesh/parallel_object.h"
 
 // C++ Includes   -----------------------------------
 #include <algorithm>
@@ -139,16 +140,19 @@ class NodeConstraints : public std::map<const Node *,
  *
  * @author Benjamin S. Kirk, 2002-2007
  */
-class DofMap : public ReferenceCountedObject<DofMap>
+  class DofMap : public ReferenceCountedObject<DofMap>,
+		 public ParallelObject
 {
 public:
 
   /**
    * Constructor.  Requires the number of the system for which we
-   * will be numbering degrees of freedom.
+   * will be numbering degrees of freedom & the parent object
+   * we are contained in, which defines our communication space.
    */
   explicit
-  DofMap(const unsigned int sys_number);
+  DofMap(const unsigned int sys_number,
+	 const ParallelObject &parent_decomp);
 
   /**
    * Destructor.
@@ -381,7 +385,7 @@ public:
    * @returns the number of degrees of freedom on this processor.
    */
   dof_id_type n_local_dofs () const
-  { return this->n_dofs_on_processor (libMesh::processor_id()); }
+  { return this->n_dofs_on_processor (this->processor_id()); }
 
   /**
    * Returns the number of degrees of freedom on partition \p proc.
@@ -394,42 +398,59 @@ public:
   /**
    * Returns the first dof index that is local to partition \p proc.
    */
-  dof_id_type first_dof(const processor_id_type proc = libMesh::processor_id()) const
+  dof_id_type first_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _first_df.size()); return _first_df[proc]; }
+
+  dof_id_type first_dof() const
+  { return this->first_dof(this->processor_id()); }
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Returns the first old dof index that is local to partition \p proc.
    */
-  dof_id_type first_old_dof(const processor_id_type proc = libMesh::processor_id()) const
+  dof_id_type first_old_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _first_old_df.size()); return _first_old_df[proc]; }
+
+  dof_id_type first_old_dof() const
+  { return this->first_old_dof(this->processor_id()); }
+
 #endif //LIBMESH_ENABLE_AMR
 
   /**
-   * Returns the last dof index that is local to subdomain \p proc.
+   * Returns the last dof index that is local to processor \p proc.
    * This function is now deprecated, because it returns nonsense in the rare
    * case where \p proc has no local dof indices.  Use end_dof() instead.
    */
-  dof_id_type last_dof(const processor_id_type proc = libMesh::processor_id()) const {
+  dof_id_type last_dof(const processor_id_type proc) const {
     libmesh_deprecated();
     libmesh_assert_less (proc, _end_df.size());
     return libmesh_cast_int<dof_id_type>(_end_df[proc] - 1);
   }
 
+  dof_id_type last_dof() const
+  { return this->last_dof(this->processor_id()); }
+
   /**
    * Returns the first dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
    */
-  dof_id_type end_dof(const processor_id_type proc = libMesh::processor_id()) const
+  dof_id_type end_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _end_df.size()); return _end_df[proc]; }
+
+  dof_id_type end_dof() const
+  { return this->end_dof(this->processor_id()); }
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Returns the first old dof index that is after all indices local to subdomain \p proc.
    * Analogous to the end() member function of STL containers.
    */
-  dof_id_type end_old_dof(const processor_id_type proc = libMesh::processor_id()) const
+  dof_id_type end_old_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _end_old_df.size()); return _end_old_df[proc]; }
+
+  dof_id_type end_old_dof() const
+  { return this->end_old_dof(this->processor_id()); }
+
 #endif //LIBMESH_ENABLE_AMR
 
   /**

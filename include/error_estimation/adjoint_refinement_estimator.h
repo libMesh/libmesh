@@ -50,9 +50,11 @@ public:
   /**
    * Constructor.  Sets the most common default parameter values.
    */
-  AdjointRefinementEstimator() : number_h_refinements(1),
-                                 number_p_refinements(0),
-                                 _qoi_set(QoISet())
+  AdjointRefinementEstimator(const Parallel::Communicator &comm = libMesh::CommWorld) :
+    ErrorEstimator(comm),
+    number_h_refinements(1),
+    number_p_refinements(0),
+    _qoi_set(QoISet())
   {
     // We're not actually going to use error_norm; our norms are
     // absolute values of QoI error.

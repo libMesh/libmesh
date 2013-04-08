@@ -46,7 +46,7 @@ void SlepcEigenSolver<T>::clear ()
       int ierr=0;
 
       ierr = LibMeshEPSDestroy(&_eps);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
       // SLEPc default eigenproblem solver
 #if SLEPC_VERSION_LESS_THAN(2,3,2)
@@ -72,8 +72,8 @@ void SlepcEigenSolver<T>::init ()
       this->_is_initialized = true;
 
       // Create the eigenproblem solver context
-      ierr = EPSCreate (libMesh::COMM_WORLD, &_eps);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = EPSCreate (this->communicator().get(), &_eps);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Set user-specified  solver
       set_slepc_solver_type();
@@ -103,10 +103,10 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
   // just for debugging, remove this
 //   char mat_file[] = "matA.petsc";
 //   PetscViewer petsc_viewer;
-//   ierr = PetscViewerBinaryOpen(libMesh::COMM_WORLD, mat_file, PETSC_FILE_CREATE, &petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+//   ierr = PetscViewerBinaryOpen(this->communicator().get(), mat_file, PETSC_FILE_CREATE, &petsc_viewer);
+//          LIBMESH_CHKERRABORT(ierr);
 //   ierr = MatView(matrix_A->mat(),petsc_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+//          LIBMESH_CHKERRABORT(ierr);
 
   return _solve_standard_helper(matrix_A->mat(), nev, ncv, tol, m_its);
 }
@@ -126,7 +126,7 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
 
   // Prepare the matrix.
   Mat mat;
-  ierr = MatCreateShell(libMesh::COMM_WORLD,
+  ierr = MatCreateShell(this->communicator().get(),
             shell_matrix.m(), // Specify the number of local rows
             shell_matrix.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -139,10 +139,10 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
      _petsc_shell_matrix() below, the pointer is casted back to a
      const ShellMatrix<T>*.  */
 
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   ierr = MatShellSetOperation(mat,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
 
   return _solve_standard_helper(mat, nev, ncv, tol, m_its);
@@ -175,7 +175,7 @@ SlepcEigenSolver<T>::_solve_standard_helper
 
   // Set operators.
   ierr = EPSSetOperators (_eps, mat, PETSC_NULL);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   //set the problem type and the position of the spectrum
   set_slepc_problem_type();
@@ -187,10 +187,10 @@ SlepcEigenSolver<T>::_solve_standard_helper
 #else
   ierr = EPSSetDimensions (_eps, nev, ncv, PETSC_DECIDE);
 #endif
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
   // Set the tolerance and maximum iterations.
   ierr = EPSSetTolerances (_eps, tol, m_its);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Set runtime options, e.g.,
   //      -eps_type <type>, -eps_nev <nev>, -eps_ncv <ncv>
@@ -198,39 +198,39 @@ SlepcEigenSolver<T>::_solve_standard_helper
   // above as long as EPSSetFromOptions() is called _after_ any
   // other customization routines.
   ierr = EPSSetFromOptions (_eps);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Solve the eigenproblem.
   ierr = EPSSolve (_eps);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Get the number of iterations.
   ierr = EPSGetIterationNumber (_eps, &its);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Get number of converged eigenpairs.
   ierr = EPSGetConverged(_eps,&nconv);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
 
 #ifdef DEBUG
-	 // ierr = PetscPrintf(libMesh::COMM_WORLD,
+	 // ierr = PetscPrintf(this->communicator().get(),
 	 //         "\n Number of iterations: %d\n"
 	 //         " Number of converged eigenpairs: %d\n\n", its, nconv);
 
   // Display eigenvalues and relative errors.
-  ierr = PetscPrintf(libMesh::COMM_WORLD,
+  ierr = PetscPrintf(this->communicator().get(),
 		     "           k           ||Ax-kx||/|kx|\n"
 		     "   ----------------- -----------------\n" );
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   for(int i=0; i<nconv; i++ )
     {
       ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
       ierr = EPSComputeRelativeError(_eps, i, &error);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
       re = PetscRealPart(kr);
@@ -242,18 +242,18 @@ SlepcEigenSolver<T>::_solve_standard_helper
 
       if (im != .0)
 	{
-	  ierr = PetscPrintf(libMesh::COMM_WORLD," %9f%+9f i %12f\n", re, im, error);
-	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PetscPrintf(this->communicator().get()," %9f%+9f i %12f\n", re, im, error);
+	         LIBMESH_CHKERRABORT(ierr);
 	}
       else
 	{
-	  ierr = PetscPrintf(libMesh::COMM_WORLD,"   %12f       %12f\n", re, error);
-	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PetscPrintf(this->communicator().get(),"   %12f       %12f\n", re, error);
+	         LIBMESH_CHKERRABORT(ierr);
 	}
     }
 
-  ierr = PetscPrintf(libMesh::COMM_WORLD,"\n" );
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = PetscPrintf(this->communicator().get(),"\n" );
+         LIBMESH_CHKERRABORT(ierr);
 #endif // DEBUG
 
 
@@ -307,7 +307,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 
   // Prepare the matrix.
   Mat mat_A;
-  ierr = MatCreateShell(libMesh::COMM_WORLD,
+  ierr = MatCreateShell(this->communicator().get(),
             shell_matrix_A.m(), // Specify the number of local rows
             shell_matrix_A.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -325,10 +325,10 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
      _petsc_shell_matrix() below, the pointer is casted back to a
      const ShellMatrix<T>*.  */
 
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   ierr = MatShellSetOperation(mat_A,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   return _solve_generalized_helper (mat_A, matrix_B->mat(), nev, ncv, tol, m_its);
 }
@@ -353,7 +353,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 
   // Prepare the matrix.
   Mat mat_B;
-  ierr = MatCreateShell(libMesh::COMM_WORLD,
+  ierr = MatCreateShell(this->communicator().get(),
             shell_matrix_B.m(), // Specify the number of local rows
             shell_matrix_B.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -367,10 +367,10 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
      _petsc_shell_matrix() below, the pointer is casted back to a
      const ShellMatrix<T>*.  */
 
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_B,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   ierr = MatShellSetOperation(mat_B,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   return _solve_generalized_helper (matrix_A->mat(), mat_B, nev, ncv, tol, m_its);
 }
@@ -390,7 +390,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 
   // Prepare the matrix.
   Mat mat_A;
-  ierr = MatCreateShell(libMesh::COMM_WORLD,
+  ierr = MatCreateShell(this->communicator().get(),
             shell_matrix_A.m(), // Specify the number of local rows
             shell_matrix_A.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -399,7 +399,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
             &mat_A);
 
   Mat mat_B;
-  ierr = MatCreateShell(libMesh::COMM_WORLD,
+  ierr = MatCreateShell(this->communicator().get(),
             shell_matrix_B.m(), // Specify the number of local rows
             shell_matrix_B.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -412,15 +412,15 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
      _petsc_shell_matrix() below, the pointer is casted back to a
      const ShellMatrix<T>*.  */
 
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_A,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   ierr = MatShellSetOperation(mat_A,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatShellSetOperation(mat_B,MATOP_MULT,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
   ierr = MatShellSetOperation(mat_B,MATOP_GET_DIAGONAL,reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   return _solve_generalized_helper (mat_A, mat_B, nev, ncv, tol, m_its);
 }
@@ -454,7 +454,7 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 
   // Set operators.
   ierr = EPSSetOperators (_eps, mat_A, mat_B);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   //set the problem type and the position of the spectrum
   set_slepc_problem_type();
@@ -466,12 +466,12 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 #else
   ierr = EPSSetDimensions (_eps, nev, ncv, PETSC_DECIDE);
 #endif
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
 
   // Set the tolerance and maximum iterations.
   ierr = EPSSetTolerances (_eps, tol, m_its);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Set runtime options, e.g.,
   //      -eps_type <type>, -eps_nev <nev>, -eps_ncv <ncv>
@@ -479,39 +479,39 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
   // above as long as EPSSetFromOptions() is called _after_ any
   // other customization routines.
   ierr = EPSSetFromOptions (_eps);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Solve the eigenproblem.
   ierr = EPSSolve (_eps);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Get the number of iterations.
   ierr = EPSGetIterationNumber (_eps, &its);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Get number of converged eigenpairs.
   ierr = EPSGetConverged(_eps,&nconv);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
 
 #ifdef DEBUG
-	 // ierr = PetscPrintf(libMesh::COMM_WORLD,
+	 // ierr = PetscPrintf(this->communicator().get(),
 	 //         "\n Number of iterations: %d\n"
 	 //         " Number of converged eigenpairs: %d\n\n", its, nconv);
 
   // Display eigenvalues and relative errors.
-  ierr = PetscPrintf(libMesh::COMM_WORLD,
+  ierr = PetscPrintf(this->communicator().get(),
 		     "           k           ||Ax-kx||/|kx|\n"
 		     "   ----------------- -----------------\n" );
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   for(int i=0; i<nconv; i++ )
     {
       ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
       ierr = EPSComputeRelativeError(_eps, i, &error);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
       re = PetscRealPart(kr);
@@ -523,18 +523,18 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 
       if (im != .0)
 	{
-	  ierr = PetscPrintf(libMesh::COMM_WORLD," %9f%+9f i %12f\n", re, im, error);
-	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PetscPrintf(this->communicator().get()," %9f%+9f i %12f\n", re, im, error);
+	         LIBMESH_CHKERRABORT(ierr);
 	}
       else
 	{
-	  ierr = PetscPrintf(libMesh::COMM_WORLD,"   %12f       %12f\n", re, error);
-	         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PetscPrintf(this->communicator().get(),"   %12f       %12f\n", re, error);
+	         LIBMESH_CHKERRABORT(ierr);
 	}
     }
 
-  ierr = PetscPrintf(libMesh::COMM_WORLD,"\n" );
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = PetscPrintf(this->communicator().get(),"\n" );
+         LIBMESH_CHKERRABORT(ierr);
 #endif // DEBUG
 
   STOP_LOG("solve_generalized()", "SlepcEigenSolver");
@@ -563,22 +563,22 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
   switch (this->_eigen_solver_type)
     {
     case POWER:
-      ierr = EPSSetType (_eps, (char*) EPSPOWER);    CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetType (_eps, (char*) EPSPOWER);    LIBMESH_CHKERRABORT(ierr); return;
     case SUBSPACE:
-      ierr = EPSSetType (_eps, (char*) EPSSUBSPACE); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetType (_eps, (char*) EPSSUBSPACE); LIBMESH_CHKERRABORT(ierr); return;
     case LAPACK:
-      ierr = EPSSetType (_eps, (char*) EPSLAPACK);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetType (_eps, (char*) EPSLAPACK);   LIBMESH_CHKERRABORT(ierr); return;
     case ARNOLDI:
-      ierr = EPSSetType (_eps, (char*) EPSARNOLDI);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetType (_eps, (char*) EPSARNOLDI);  LIBMESH_CHKERRABORT(ierr); return;
     case LANCZOS:
-      ierr = EPSSetType (_eps, (char*) EPSLANCZOS);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetType (_eps, (char*) EPSLANCZOS);  LIBMESH_CHKERRABORT(ierr); return;
 #if !SLEPC_VERSION_LESS_THAN(2,3,2)
       // EPSKRYLOVSCHUR added in 2.3.2
     case KRYLOVSCHUR:
-      ierr = EPSSetType (_eps, (char*) EPSKRYLOVSCHUR);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetType (_eps, (char*) EPSKRYLOVSCHUR);  LIBMESH_CHKERRABORT(ierr); return;
 #endif
       // case ARPACK:
-      // ierr = EPSSetType (_eps, (char*) EPSARPACK);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      // ierr = EPSSetType (_eps, (char*) EPSARPACK);   LIBMESH_CHKERRABORT(ierr); return;
 
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc Eigen Solver: "
@@ -598,13 +598,13 @@ void SlepcEigenSolver<T>:: set_slepc_problem_type()
   switch (this->_eigen_problem_type)
     {
     case NHEP:
-      ierr = EPSSetProblemType (_eps, EPS_NHEP);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetProblemType (_eps, EPS_NHEP);  LIBMESH_CHKERRABORT(ierr); return;
     case GNHEP:
-      ierr = EPSSetProblemType (_eps, EPS_GNHEP); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetProblemType (_eps, EPS_GNHEP); LIBMESH_CHKERRABORT(ierr); return;
     case HEP:
-      ierr = EPSSetProblemType (_eps, EPS_HEP);   CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetProblemType (_eps, EPS_HEP);   LIBMESH_CHKERRABORT(ierr); return;
     case GHEP:
-      ierr = EPSSetProblemType (_eps, EPS_GHEP);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetProblemType (_eps, EPS_GHEP);  LIBMESH_CHKERRABORT(ierr); return;
 
     default:
       libMesh::err << "ERROR:  Unsupported SLEPc Eigen Problem: "
@@ -623,17 +623,17 @@ void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
   switch (this->_position_of_spectrum)
     {
     case LARGEST_MAGNITUDE:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_MAGNITUDE);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_MAGNITUDE);  LIBMESH_CHKERRABORT(ierr); return;
     case SMALLEST_MAGNITUDE:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_MAGNITUDE); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_MAGNITUDE); LIBMESH_CHKERRABORT(ierr); return;
     case LARGEST_REAL:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_REAL);       CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_REAL);       LIBMESH_CHKERRABORT(ierr); return;
     case SMALLEST_REAL:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_REAL);      CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_REAL);      LIBMESH_CHKERRABORT(ierr); return;
     case LARGEST_IMAGINARY:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_IMAGINARY);  CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetWhichEigenpairs (_eps, EPS_LARGEST_IMAGINARY);  LIBMESH_CHKERRABORT(ierr); return;
     case SMALLEST_IMAGINARY:
-      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_IMAGINARY); CHKERRABORT(libMesh::COMM_WORLD,ierr); return;
+      ierr = EPSSetWhichEigenpairs (_eps, EPS_SMALLEST_IMAGINARY); LIBMESH_CHKERRABORT(ierr); return;
 
 
     default:
@@ -665,7 +665,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(unsigned int i,
   solution->close();
 
   ierr = EPSGetEigenpair(_eps, i, &kr, &ki, solution->vec(), PETSC_NULL);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   re = PetscRealPart(kr);
@@ -690,7 +690,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenvalue(unsigned int i)
   PetscScalar kr, ki;
 
   ierr = EPSGetEigenvalue(_eps, i, &kr, &ki);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
   re = PetscRealPart(kr);
@@ -711,7 +711,7 @@ Real SlepcEigenSolver<T>::get_relative_error(unsigned int i)
   PetscReal error;
 
   ierr = EPSComputeRelativeError(_eps, i, &error);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return error;
 }
@@ -730,7 +730,7 @@ void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T>& deflation_vec
 #else
   ierr = EPSSetDeflationSpace(_eps, 1, deflation_space);
 #endif
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 }
 
 template <typename T>
@@ -740,14 +740,17 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   int ierr=0;
   void* ctx;
   ierr = MatShellGetContext(mat,&ctx);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  Parallel::communicator comm;
+  PetscObjectGetComm((PetscObject)mat,&comm);
+  CHKERRABORT(comm,ierr);
 
   /* Get user shell matrix object.  */
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
 
   /* Make \p NumericVector instances around the vectors.  */
-  PetscVector<T> arg_global(arg);
-  PetscVector<T> dest_global(dest);
+  PetscVector<T> arg_global(arg,   shell_matrix.communicator());
+  PetscVector<T> dest_global(dest, shell_matrix.communicator());
 
   /* Call the user function.  */
   shell_matrix.vector_mult(dest_global,arg_global);
@@ -762,13 +765,16 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   int ierr=0;
   void* ctx;
   ierr = MatShellGetContext(mat,&ctx);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+
+  Parallel::communicator comm;
+  PetscObjectGetComm((PetscObject)mat,&comm);
+  CHKERRABORT(comm,ierr);
 
   /* Get user shell matrix object.  */
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
 
   /* Make \p NumericVector instances around the vector.  */
-  PetscVector<T> dest_global(dest);
+  PetscVector<T> dest_global(dest, shell_matrix.communicator());
 
   /* Call the user function.  */
   shell_matrix.get_diagonal(dest_global);

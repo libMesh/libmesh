@@ -28,7 +28,7 @@ namespace libMesh
     _mesh(mesh),
     reparallelize(false)
   {
-    parallel_only();
+    libmesh_parallel_only(mesh.communicator());
     if (need_serial && !_mesh.is_serial()) {
       reparallelize = true;
       _mesh.allgather();

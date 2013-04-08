@@ -255,33 +255,30 @@ void MeshData::read (const std::string& name)
   // have it and we're too lazy to code up a proper parallel read or
   // read+broadcast right now.
 
-  //if (libMesh::processor_id() == 0)
-  //  {
-      if (name.rfind(".xta") < name.size())
-	this->read_xdr (name, READ);
+  if (name.rfind(".xta") < name.size())
+    this->read_xdr (name, READ);
 
-      else if (name.rfind(".xtr")  < name.size())
-	this->read_xdr (name, DECODE);
+  else if (name.rfind(".xtr")  < name.size())
+    this->read_xdr (name, DECODE);
 
-      else if (name.rfind(".unv") < name.size())
-	this->read_unv (name);
+  else if (name.rfind(".unv") < name.size())
+    this->read_unv (name);
 
-      else if ((name.rfind(".node") < name.size()) ||
-	       (name.rfind(".ele") < name.size()))
-	this->read_tetgen (name);
+  else if ((name.rfind(".node") < name.size()) ||
+	   (name.rfind(".ele") < name.size()))
+    this->read_tetgen (name);
 
-      else
-	{
-	  libMesh::err << " ERROR: Unrecognized file extension: " << name
-		        << "\n   I understand the following:\n\n"
-		        << "     *.xta  -- Internal ASCII data format\n"
-		        << "     *.xtr  -- Internal binary data format\n"
-		        << "     *.unv  -- I-deas format\n"
-		        << std::endl;
-	  libmesh_error();
+  else
+    {
+      libMesh::err << " ERROR: Unrecognized file extension: " << name
+		   << "\n   I understand the following:\n\n"
+		   << "     *.xta  -- Internal ASCII data format\n"
+		   << "     *.xtr  -- Internal binary data format\n"
+		   << "     *.unv  -- I-deas format\n"
+		   << std::endl;
+      libmesh_error();
 
-	}
-    //}
+    }
   STOP_LOG("read()", "MeshData");
 }
 

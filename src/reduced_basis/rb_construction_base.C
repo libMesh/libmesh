@@ -92,20 +92,21 @@ void RBConstructionBase<Base>::init_data ()
 
   // Initialize the inner product storage vector, which is useful for
   // storing intermediate results when evaluating inner products
-  inner_product_storage_vector = NumericVector<Number>::build();
+  inner_product_storage_vector = NumericVector<Number>::build(this->communicator());
   inner_product_storage_vector->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 }
 
 template <class Base>
-void RBConstructionBase<Base>::get_global_max_error_pair(std::pair<unsigned int, Real>& error_pair)
+void RBConstructionBase<Base>::get_global_max_error_pair(const Parallel::Communicator &communicator,
+							 std::pair<unsigned int, Real>& error_pair)
 {
   // Set error_pair.second to the maximum global value and also
   // find which processor contains the maximum value
   unsigned int proc_ID_index;
-  CommWorld.maxloc(error_pair.second, proc_ID_index);
+  communicator.maxloc(error_pair.second, proc_ID_index);
 
   // Then broadcast error_pair.first from proc_ID_index
-  CommWorld.broadcast(error_pair.first, proc_ID_index);
+  communicator.broadcast(error_pair.first, proc_ID_index);
 }
 
 template <class Base>
@@ -181,11 +182,11 @@ void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsign
     set_params_from_training_set(index);
 
     // set root_id, only non-zero on one processor
-    root_id = libMesh::processor_id();
+    root_id = this->processor_id();
   }
 
   // broadcast
-  CommWorld.max(root_id);
+  this->communicator().max(root_id);
   broadcast_parameters(root_id);
 }
 
@@ -212,7 +213,8 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
 
   if(deterministic)
   {
-    generate_training_parameters_deterministic(log_param_scale,
+    generate_training_parameters_deterministic(this->communicator(),
+					       log_param_scale,
                                                training_parameters,
                                                n_training_samples,
                                                mu_min,
@@ -224,7 +226,8 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
     if(get_deterministic_training_parameter_name() == "NONE")
     {
       // Generate random training samples for all parameters
-      generate_training_parameters_random(log_param_scale,
+      generate_training_parameters_random(this->communicator(),
+					  log_param_scale,
                                           training_parameters,
                                           n_training_samples,
                                           mu_min,
@@ -236,7 +239,8 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
     {
       // Here we generate a "partially random" training set.
       // Generate deterministic training samples for specified parameter, random for the rest.
-      generate_training_parameters_partially_random(get_deterministic_training_parameter_name(),
+      generate_training_parameters_partially_random(this->communicator(),
+						    get_deterministic_training_parameter_name(),
                                                     get_deterministic_training_parameter_repeats(),
                                                     log_param_scale,
                                                     training_parameters,
@@ -288,12 +292,12 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
   // Get the number of local and global training parameters
   numeric_index_type n_local_training_samples  = new_training_set.begin()->second.size();
   numeric_index_type n_global_training_samples = n_local_training_samples;
-  CommWorld.sum(n_global_training_samples);
+  this->communicator().sum(n_global_training_samples);
 
   it = training_parameters.begin();
   for( ; it != it_end; ++it)
   {
-    it->second = NumericVector<Number>::build().release();
+    it->second = NumericVector<Number>::build(this->communicator()).release();
     it->second->init(n_global_training_samples, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 
@@ -314,7 +318,8 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
 
 
 template <class Base>
-void RBConstructionBase<Base>::generate_training_parameters_random(std::map<std::string, bool> log_param_scale,
+void RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Communicator &communicator,
+								   std::map<std::string, bool> log_param_scale,
                                                                    std::map< std::string, NumericVector<Number>* >& training_parameters_in,
                                                                    unsigned int n_training_samples_in,
                                                                    const RBParameters& min_parameters,
@@ -352,7 +357,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(std::map<std:
       // seed the random number generator with the system time
       // and the processor ID so that the seed is different
       // on different processors
-      std::srand( static_cast<unsigned>( std::time(0)*(1+libMesh::processor_id()) ));
+      std::srand( static_cast<unsigned>( std::time(0)*(1+communicator.rank()) ));
     }
     else
     {
@@ -368,7 +373,7 @@ void RBConstructionBase<Base>::generate_training_parameters_random(std::map<std:
       // seed the random number generator with the provided value
       // and the processor ID so that the seed is different
       // on different processors
-      std::srand( static_cast<unsigned>( training_parameters_random_seed*(1+libMesh::processor_id()) ));
+      std::srand( static_cast<unsigned>( training_parameters_random_seed*(1+communicator.rank()) ));
     }
     else
     {
@@ -385,15 +390,15 @@ void RBConstructionBase<Base>::generate_training_parameters_random(std::map<std:
     for( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
-      training_parameters_in[param_name] = NumericVector<Number>::build().release();
+      training_parameters_in[param_name] = NumericVector<Number>::build(communicator).release();
 
       if(!serial_training_set)
       {
         // Calculate the number of training parameters local to this processor
         unsigned int n_local_training_samples;
-        unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
-        unsigned int remainder = n_training_samples_in%libMesh::n_processors();
-        if(libMesh::processor_id() < remainder)
+        unsigned int quotient  = n_training_samples_in/communicator.size();
+        unsigned int remainder = n_training_samples_in%communicator.size();
+        if(communicator.rank() < remainder)
           n_local_training_samples = (quotient + 1);
         else
           n_local_training_samples = quotient;
@@ -443,7 +448,8 @@ void RBConstructionBase<Base>::generate_training_parameters_random(std::map<std:
 }
 
 template <class Base>
-void RBConstructionBase<Base>::generate_training_parameters_partially_random(const std::string& deterministic_training_parameter_name,
+void RBConstructionBase<Base>::generate_training_parameters_partially_random(const Parallel::Communicator &communicator,
+									     const std::string& deterministic_training_parameter_name,
                                                                              const unsigned int deterministic_training_parameter_repeats,
                                                                              std::map<std::string, bool> log_param_scale,
                                                                              std::map< std::string, NumericVector<Number>* >& training_parameters_in,
@@ -483,7 +489,7 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
       // seed the random number generator with the system time
       // and the processor ID so that the seed is different
       // on different processors
-      std::srand( static_cast<unsigned>( std::time(0)*(1+libMesh::processor_id()) ));
+      std::srand( static_cast<unsigned>( std::time(0)*(1+communicator.rank()) ));
     }
     else
     {
@@ -499,7 +505,7 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
       // seed the random number generator with the provided value
       // and the processor ID so that the seed is different
       // on different processors
-      std::srand( static_cast<unsigned>( training_parameters_random_seed*(1+libMesh::processor_id()) ));
+      std::srand( static_cast<unsigned>( training_parameters_random_seed*(1+communicator.rank()) ));
     }
     else
     {
@@ -517,15 +523,15 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
     for( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
-      training_parameters_in[param_name] = NumericVector<Number>::build().release();
+      training_parameters_in[param_name] = NumericVector<Number>::build(communicator).release();
 
       if(!serial_training_set)
       {
         // Calculate the number of training parameters local to this processor
         unsigned int n_local_training_samples;
-        unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
-        unsigned int remainder = n_training_samples_in%libMesh::n_processors();
-        if(libMesh::processor_id() < remainder)
+        unsigned int quotient  = n_training_samples_in/communicator.size();
+        unsigned int remainder = n_training_samples_in%communicator.size();
+        if(communicator.rank() < remainder)
           n_local_training_samples = (quotient + 1);
         else
           n_local_training_samples = quotient;
@@ -629,7 +635,8 @@ void RBConstructionBase<Base>::generate_training_parameters_partially_random(con
 }
 
 template <class Base>
-void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::map<std::string, bool> log_param_scale,
+void RBConstructionBase<Base>::generate_training_parameters_deterministic(const Parallel::Communicator &communicator,
+									  std::map<std::string, bool> log_param_scale,
                                                                           std::map< std::string, NumericVector<Number>* >& training_parameters_in,
                                                                           unsigned int n_training_samples_in,
                                                                           const RBParameters& min_parameters,
@@ -672,15 +679,15 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(std::m
     for( ; it != it_end; ++it)
     {
       std::string param_name = it->first;
-      training_parameters_in[param_name] = NumericVector<Number>::build().release();
+      training_parameters_in[param_name] = NumericVector<Number>::build(communicator).release();
 
       if(!serial_training_set)
       {
         // Calculate the number of training parameters local to this processor
         unsigned int n_local_training_samples;
-        unsigned int quotient  = n_training_samples_in/libMesh::n_processors();
-        unsigned int remainder = n_training_samples_in%libMesh::n_processors();
-        if(libMesh::processor_id() < remainder)
+        unsigned int quotient  = n_training_samples_in/communicator.size();
+        unsigned int remainder = n_training_samples_in%communicator.size();
+        if(communicator.rank() < remainder)
           n_local_training_samples = (quotient + 1);
         else
           n_local_training_samples = quotient;
@@ -870,10 +877,10 @@ RBConstructionBase<Base>::set_alternative_solver
   if (petsc_linear_solver)
     {
       PC pc = petsc_linear_solver->pc();
-      ierr = PCGetType(pc, &orig_petsc_pc_type); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = PCGetType(pc, &orig_petsc_pc_type); LIBMESH_CHKERRABORT(ierr);
 
       KSP ksp = petsc_linear_solver->ksp();
-      ierr = KSPGetType(ksp, &orig_petsc_ksp_type); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = KSPGetType(ksp, &orig_petsc_ksp_type); LIBMESH_CHKERRABORT(ierr);
 
       // libMesh::out << "orig_petsc_pc_type (before)=" << orig_petsc_pc_type << std::endl;
       // Make actual copies of the original PC and KSP types
@@ -885,8 +892,8 @@ RBConstructionBase<Base>::set_alternative_solver
       if (this->alternative_solver == "amg")
 	{
 	  // Set HYPRE and boomeramg PC types
-	  ierr = PCSetType(pc, PCHYPRE); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-	  ierr = PCHYPRESetType(pc, "boomeramg"); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PCSetType(pc, PCHYPRE); LIBMESH_CHKERRABORT(ierr);
+	  ierr = PCHYPRESetType(pc, "boomeramg"); LIBMESH_CHKERRABORT(ierr);
 	}
 #endif // LIBMESH_HAVE_PETSC_HYPRE
       if (this->alternative_solver == "mumps")
@@ -899,13 +906,13 @@ RBConstructionBase<Base>::set_alternative_solver
 	  // converge in 1 iteration.  Otherwise, to use KSPPREONLY,
 	  // you may need to do:
 	  // KSPSetInitialGuessNonzero(ksp, PETSC_FALSE);
-	  // ierr = KSPSetType(ksp, KSPPREONLY); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  // ierr = KSPSetType(ksp, KSPPREONLY); LIBMESH_CHKERRABORT(ierr);
 
 	  // Need to call the equivalent for the command line options:
 	  // -ksp_type preonly -pc_type lu -pc_factor_mat_solver_package mumps
-	  ierr = PCSetType(pc, PCLU); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PCSetType(pc, PCLU); LIBMESH_CHKERRABORT(ierr);
 #if !(PETSC_VERSION_LESS_THAN(3,0,0))
-	  ierr = PCFactorSetMatSolverPackage(pc,"mumps"); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PCFactorSetMatSolverPackage(pc,"mumps"); LIBMESH_CHKERRABORT(ierr);
 #endif
 	}
     }
@@ -951,10 +958,10 @@ void RBConstructionBase<Base>::reset_alternative_solver(
       if (petsc_linear_solver)
 	{
 	  pc = petsc_linear_solver->pc();
-	  ierr = PCSetType(pc, orig.first.c_str()); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = PCSetType(pc, orig.first.c_str()); LIBMESH_CHKERRABORT(ierr);
 
 	  ksp = petsc_linear_solver->ksp();
-	  ierr = KSPSetType(ksp, orig.second.c_str()); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  ierr = KSPSetType(ksp, orig.second.c_str()); LIBMESH_CHKERRABORT(ierr);
 	}
     }
 
@@ -965,7 +972,7 @@ void RBConstructionBase<Base>::reset_alternative_solver(
 template <class Base>
 void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
 {
-  libmesh_assert_less (proc_id, libMesh::n_processors());
+  libmesh_assert_less (proc_id, this->n_processors());
 
   // create a copy of the current parameters
   RBParameters current_parameters = get_parameters();
@@ -982,7 +989,7 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
   }
 
   // do the broadcast
-  CommWorld.broadcast(current_parameters_vector, proc_id);
+  this->communicator().broadcast(current_parameters_vector, proc_id);
 
   // update the copy of the RBParameters object
   it = current_parameters.begin();

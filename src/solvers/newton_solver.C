@@ -236,7 +236,7 @@ NewtonSolver::NewtonSolver (sys_type& s)
     brent_line_search(true),
     minsteplength(1e-5),
     linear_tolerance_multiplier(1e-3),
-    linear_solver(LinearSolver<Number>::build())
+    linear_solver(LinearSolver<Number>::build(s.communicator()))
 {
 }
 

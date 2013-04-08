@@ -39,8 +39,9 @@ namespace libMesh
 
 // Constructor
 template <typename T>
-PetscMatrix<T>::PetscMatrix()
-  : _destroy_mat_on_exit(true)
+PetscMatrix<T>::PetscMatrix(const Parallel::Communicator &comm)
+  : SparseMatrix<T>(comm),
+    _destroy_mat_on_exit(true)
 {}
 
 
@@ -48,8 +49,10 @@ PetscMatrix<T>::PetscMatrix()
 // Constructor taking an existing Mat but not the responsibility
 // for destroying it
 template <typename T>
-PetscMatrix<T>::PetscMatrix(Mat mat_in)
-  : _destroy_mat_on_exit(false)
+PetscMatrix<T>::PetscMatrix(Mat mat_in,
+			    const Parallel::Communicator &comm)
+  : SparseMatrix<T>(comm),
+    _destroy_mat_on_exit(false)
 {
   this->_mat = mat_in;
   this->_is_initialized = true;
@@ -92,12 +95,12 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   PetscInt n_nz     = static_cast<PetscInt>(nnz);
   PetscInt n_oz     = static_cast<PetscInt>(noz);
 
-  ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatCreate(this->communicator().get(), &_mat);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
 #if PETSC_VERSION_LESS_THAN(3,0,0)
@@ -105,17 +108,17 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 #else
   ierr = MatSetOption(_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
 #endif
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Is prefix information available somewhere? Perhaps pass in the system name?
   ierr = MatSetOptionsPrefix(_mat, "");
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetFromOptions(_mat);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSeqAIJSetPreallocation(_mat, n_nz, PETSC_NULL);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatMPIAIJSetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   this->zero ();
 }
@@ -145,23 +148,23 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   PetscInt m_local  = static_cast<PetscInt>(m_l);
   PetscInt n_local  = static_cast<PetscInt>(n_l);
 
-  ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatCreate(this->communicator().get(), &_mat);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   // Is prefix information available somewhere? Perhaps pass in the system name?
   ierr = MatSetOptionsPrefix(_mat, "");
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetFromOptions(_mat);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatMPIAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
                                          0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   this->zero();
 }
@@ -181,7 +184,7 @@ void PetscMatrix<T>::init ()
 
   const numeric_index_type my_m = this->_dof_map->n_dofs();
   const numeric_index_type my_n = my_m;
-  const numeric_index_type n_l  = this->_dof_map->n_dofs_on_processor(libMesh::processor_id());
+  const numeric_index_type n_l  = this->_dof_map->n_dofs_on_processor(this->processor_id());
   const numeric_index_type m_l  = n_l;
 
 
@@ -202,23 +205,23 @@ void PetscMatrix<T>::init ()
   PetscInt m_local  = static_cast<PetscInt>(m_l);
   PetscInt n_local  = static_cast<PetscInt>(n_l);
 
-  ierr = MatCreate(libMesh::COMM_WORLD, &_mat);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = MatCreate(this->communicator().get(), &_mat);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   // Is prefix information available somewhere? Perhaps pass in the system name?
   ierr = MatSetOptionsPrefix(_mat, "");
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetFromOptions(_mat);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = MatMPIAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
                                          0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   this->zero();
 }
@@ -237,12 +240,12 @@ void PetscMatrix<T>::zero ()
   PetscInt m_l, n_l;
 
   ierr = MatGetLocalSize(_mat,&m_l,&n_l);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   if (n_l)
     {
       ierr = MatZeroEntries(_mat);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
     }
 }
 
@@ -271,7 +274,7 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
     ierr = MatZeroRows(_mat, 0, PETSC_NULL, diag_value, PETSC_NULL, PETSC_NULL);
 #endif
 
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 }
 
 template <typename T>
@@ -284,7 +287,7 @@ void PetscMatrix<T>::clear ()
       semiparallel_only();
 
       ierr = LibMeshMatDestroy (&_mat);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
       this->_is_initialized = false;
     }
@@ -306,7 +309,7 @@ Real PetscMatrix<T>::l1_norm () const
   libmesh_assert (this->closed());
 
   ierr = MatNorm(_mat, NORM_1, &petsc_value);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   value = static_cast<Real>(petsc_value);
 
@@ -329,7 +332,7 @@ Real PetscMatrix<T>::linfty_norm () const
   libmesh_assert (this->closed());
 
   ierr = MatNorm(_mat, NORM_INFINITY, &petsc_value);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   value = static_cast<Real>(petsc_value);
 
@@ -352,9 +355,9 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
   PetscViewer petsc_viewer;
 
 
-  ierr = PetscViewerCreate (libMesh::COMM_WORLD,
+  ierr = PetscViewerCreate (this->communicator().get(),
 			    &petsc_viewer);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   /**
    * Create an ASCII file containing the matrix
@@ -362,17 +365,17 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
    */
   if (name != "NULL")
     {
-      ierr = PetscViewerASCIIOpen( libMesh::COMM_WORLD,
+      ierr = PetscViewerASCIIOpen( this->communicator().get(),
 				   name.c_str(),
 				   &petsc_viewer);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
       ierr = PetscViewerSetFormat (petsc_viewer,
 				   PETSC_VIEWER_ASCII_MATLAB);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
       ierr = MatView (_mat, petsc_viewer);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
     }
 
   /**
@@ -382,10 +385,10 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
     {
       ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
 				   PETSC_VIEWER_ASCII_MATLAB);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
       ierr = MatView (_mat, PETSC_VIEWER_STDOUT_WORLD);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
     }
 
 
@@ -393,7 +396,7 @@ void PetscMatrix<T>::print_matlab (const std::string name) const
    * Destroy the viewer.
    */
   ierr = LibMeshPetscViewerDestroy (&petsc_viewer);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 }
 
 
@@ -423,7 +426,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
   if (os == std::cout)
     {
       ierr = MatView(_mat, PETSC_VIEWER_STDOUT_SELF);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
     }
 
   // Otherwise, print to the requested file, in a roundabout way...
@@ -440,7 +443,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
 	// Generate temporary, unique filename only on processor 0.  We will
 	// use this filename for PetscViewerASCIIOpen, before copying it into
 	// the user's stream
-	if (libMesh::processor_id() == 0)
+	if (this->processor_id() == 0)
 	  {
 	    int fd = mkstemp(c);
 
@@ -458,7 +461,7 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
       }
 
       // Now broadcast the filename from processor 0 to all processors.
-      CommWorld.broadcast(temp_filename);
+      this->communicator().broadcast(temp_filename);
 
       // PetscViewer object for passing to MatView
       PetscViewer petsc_viewer;
@@ -467,21 +470,21 @@ void PetscMatrix<T>::print_personal(std::ostream& os) const
       // of the file internally.  Since print_personal() takes a reference to
       // an ostream, we have to do an extra step...  print_personal() should probably
       // have a version that takes a string to get rid of this problem.
-      ierr = PetscViewerASCIIOpen( libMesh::COMM_WORLD,
+      ierr = PetscViewerASCIIOpen( this->communicator().get(),
 				   temp_filename.c_str(),
 				   &petsc_viewer);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       // Probably don't need to set the format if it's default...
       //      ierr = PetscViewerSetFormat (petsc_viewer,
       //				   PETSC_VIEWER_DEFAULT);
-      //      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      //      LIBMESH_CHKERRABORT(ierr);
 
       // Finally print the matrix using the viewer
       ierr = MatView (_mat, petsc_viewer);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
 	{
 	  // Now the inefficient bit: open temp_filename as an ostream and copy the contents
 	  // into the user's desired ostream.  We can't just do a direct file copy, we don't even have the filename!
@@ -522,7 +525,7 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 		      n_cols, (PetscInt*) &cols[0],
 		      (PetscScalar*) &dm.get_values()[0],
 		      ADD_VALUES);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 }
 
 
@@ -550,17 +553,17 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   PetscErrorCode ierr=0;
   IS isrow, iscol;
 
-  ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
+  ierr = ISCreateLibMesh(this->communicator().get(),
 			 rows.size(),
 			 (PetscInt*) &rows[0],
 			 PETSC_USE_POINTER,
-			 &isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+			 &isrow); LIBMESH_CHKERRABORT(ierr);
 
-  ierr = ISCreateLibMesh(libMesh::COMM_WORLD,
+  ierr = ISCreateLibMesh(this->communicator().get(),
 			 cols.size(),
 			 (PetscInt*) &cols[0],
 			 PETSC_USE_POINTER,
-			 &iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+			 &iscol); LIBMESH_CHKERRABORT(ierr);
 
   // Extract submatrix
 #if !PETSC_VERSION_LESS_THAN(3,0,1) || !PETSC_VERSION_RELEASE
@@ -568,14 +571,14 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
 			 isrow,
 			 iscol,
 			 (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
-			 &(petsc_submatrix->_mat));  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+			 &(petsc_submatrix->_mat));  LIBMESH_CHKERRABORT(ierr);
 #else
   ierr = MatGetSubMatrix(_mat,
 			 isrow,
 			 iscol,
 			 PETSC_DECIDE,
 			 (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
-			 &(petsc_submatrix->_mat));  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+			 &(petsc_submatrix->_mat));  LIBMESH_CHKERRABORT(ierr);
 #endif
 
   // Specify that the new submatrix is initialized and close it.
@@ -583,8 +586,8 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T>& submatrix,
   petsc_submatrix->close();
 
   // Clean up PETSc data structures
-  ierr = LibMeshISDestroy(&isrow); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-  ierr = LibMeshISDestroy(&iscol); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  ierr = LibMeshISDestroy(&isrow); LIBMESH_CHKERRABORT(ierr);
+  ierr = LibMeshISDestroy(&iscol); LIBMESH_CHKERRABORT(ierr);
 }
 
 
@@ -609,7 +612,7 @@ void PetscMatrix<T>::get_diagonal (NumericVector<T>& dest) const
 
   // Needs a const_cast since PETSc does not work with const.
   PetscErrorCode ierr =
-    MatGetDiagonal(const_cast<PetscMatrix<T>*>(this)->mat(),petsc_dest.vec()); CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    MatGetDiagonal(const_cast<PetscMatrix<T>*>(this)->mat(),petsc_dest.vec()); LIBMESH_CHKERRABORT(ierr);
 
 #endif
 
@@ -634,14 +637,14 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T>& dest) const
     ierr = MatTranspose(_mat,PETSC_NULL);
   else
     ierr = MatTranspose(_mat,&petsc_dest._mat);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 #else
   // FIXME - we can probably use MAT_REUSE_MATRIX in more situations
   if (&petsc_dest == this)
     ierr = MatTranspose(_mat,MAT_REUSE_MATRIX,&petsc_dest._mat);
   else
     ierr = MatTranspose(_mat,MAT_INITIAL_MATRIX,&petsc_dest._mat);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 #endif
 
   // Specify that the transposed matrix is initialized and close it.
@@ -668,9 +671,9 @@ void PetscMatrix<T>::close () const
   PetscErrorCode ierr=0;
 
   ierr = MatAssemblyBegin (_mat, MAT_FINAL_ASSEMBLY);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
   ierr = MatAssemblyEnd   (_mat, MAT_FINAL_ASSEMBLY);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 }
 
 
@@ -684,7 +687,7 @@ numeric_index_type PetscMatrix<T>::m () const
   PetscErrorCode ierr=0;
 
   ierr = MatGetSize (_mat, &petsc_m, &petsc_n);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(petsc_m);
 }
@@ -700,7 +703,7 @@ numeric_index_type PetscMatrix<T>::n () const
   PetscErrorCode ierr=0;
 
   ierr = MatGetSize (_mat, &petsc_m, &petsc_n);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(petsc_n);
 }
@@ -716,7 +719,7 @@ numeric_index_type PetscMatrix<T>::row_start () const
   PetscErrorCode ierr=0;
 
   ierr = MatGetOwnershipRange(_mat, &start, &stop);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(start);
 }
@@ -732,7 +735,7 @@ numeric_index_type PetscMatrix<T>::row_stop () const
   PetscErrorCode ierr=0;
 
   ierr = MatGetOwnershipRange(_mat, &start, &stop);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(stop);
 }
@@ -752,7 +755,7 @@ void PetscMatrix<T>::set (const numeric_index_type i,
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
   ierr = MatSetValues(_mat, 1, &i_val, 1, &j_val,
 		      &petsc_value, INSERT_VALUES);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 }
 
 
@@ -770,7 +773,7 @@ void PetscMatrix<T>::add (const numeric_index_type i,
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
   ierr = MatSetValues(_mat, 1, &i_val, 1, &j_val,
 		      &petsc_value, ADD_VALUES);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 }
 
 
@@ -815,13 +818,13 @@ void PetscMatrix<T>::add (const T a_in, SparseMatrix<T> &X_in)
 #if PETSC_VERSION_LESS_THAN(2,3,0)
 
   ierr = MatAXPY(&a,  X->_mat, _mat, SAME_NONZERO_PATTERN);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
 // 2.3.x & newer
 #else
 
   ierr = MatAXPY(_mat, a, X->_mat, DIFFERENT_NONZERO_PATTERN);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
 #endif
 }
@@ -868,7 +871,7 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
   libmesh_assert(this->closed());
 
   ierr = MatGetRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Perform a binary search to find the contiguous index in
   // petsc_cols (resp. petsc_row) corresponding to global index j_val
@@ -892,7 +895,7 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
 
   ierr  = MatRestoreRow(_mat, i_val,
 			&ncols, &petsc_cols, &petsc_row);
-          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          LIBMESH_CHKERRABORT(ierr);
 
   return value;
 }
@@ -909,7 +912,7 @@ bool PetscMatrix<T>::closed() const
   PetscBool assembled;
 
   ierr = MatAssembled(_mat, &assembled);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return (assembled == PETSC_TRUE);
 }

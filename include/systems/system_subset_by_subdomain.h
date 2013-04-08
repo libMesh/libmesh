@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/system_subset.h"
 #include "libmesh/id_types.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -43,7 +44,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // SystemSubset class definition
-class SystemSubsetBySubdomain : public SystemSubset
+class SystemSubsetBySubdomain : public SystemSubset,
+				public ParallelObject
 {
 public:
 

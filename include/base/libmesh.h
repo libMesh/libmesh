@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_base.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/parallel.h"
 
 // C++ includes
 #include <string>
@@ -71,36 +72,9 @@ public:
 #endif
 
   virtual ~LibMeshInit();
+
+  Parallel::Communicator comm;
 };
-
-
-#ifndef LIBMESH_HAVE_MPI
-
-  /**
-   * Initialize the library for use.  This will call
-   * PetscInitialize if PETSC is available.
-   *
-   * You must perform an initialization before using any of the
-   * library functionality, but libMesh::init() is a deprecated
-   * way to do so.  Create a LibMeshInit object instead.
-   */
-  void init (int argc, const char* const* argv);
-
-#else
-
-  /**
-   * Initialize the library for use.  This will call
-   * PetscInitialize if PETSC is available.
-   * This method takes an optional parameter
-   *
-   * You must perform an initialization before using any of the
-   * library functionality, but libMesh::init() is a deprecated
-   * way to do so.  Create a LibMeshInit object instead.
-   */
-  void init (int argc, const char* const* argv,
-	     MPI_Comm COMM_WORLD_IN=MPI_COMM_WORLD);
-
-#endif
 
   /**
    * Checks that library initialization has been done.  If it
@@ -109,20 +83,6 @@ public:
    * object constructors.
    */
   bool initialized ();
-
-  /**
-   * Stop using the mesh library.  This will call PetscFinalize()
-   * if PETSC is available.  This method should be called after
-   * all other library objects have gone out of scope, as it
-   * interrogates the \p ReferenceCounter object to look for memory
-   * leaks.
-   *
-   * libMesh::init() and libMesh::close() are a deprecated method
-   * of library initialization.  Create a LibMeshInit object to
-   * begin using the library; when the LibMeshInit object is
-   * destroyed the library will be closed.
-   */
-  int close ();
 
   /**
    * Checks that the library has been closed.  This should

@@ -75,7 +75,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
-  LaspackMatrix ();
+  LaspackMatrix (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor. Free all memory, but do not

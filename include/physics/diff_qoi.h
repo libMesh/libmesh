@@ -167,8 +167,9 @@ public:
    * Method to populate system qoi data structure with process-local qoi. By default, simply
    * sums process qois into system qoi.
    */
-  virtual void parallel_op( std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
-			    const QoISet& qoi_indices );
+  virtual void parallel_op(const Parallel::Communicator &communicator,
+			   std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
+			   const QoISet& qoi_indices );
 };
 
 } // namespace libMesh

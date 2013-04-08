@@ -64,7 +64,8 @@ public:
    * Constructor.
    */
   explicit
-  Nemesis_IO_Helper(bool verbose=false);
+  Nemesis_IO_Helper(const ParallelObject &parent,
+		    bool verbose=false);
 
   /**
    * Destructor.

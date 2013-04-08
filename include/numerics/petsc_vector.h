@@ -66,14 +66,16 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  PetscVector (const ParallelType type = AUTOMATIC);
+  PetscVector (const ParallelType type = AUTOMATIC,
+               const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   PetscVector (const numeric_index_type n,
-               const ParallelType type = AUTOMATIC);
+               const ParallelType type = AUTOMATIC,
+               const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -81,7 +83,8 @@ public:
    */
   PetscVector (const numeric_index_type n,
 	       const numeric_index_type n_local,
-               const ParallelType type = AUTOMATIC);
+               const ParallelType type = AUTOMATIC,
+               const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -91,7 +94,8 @@ public:
   PetscVector (const numeric_index_type N,
 	       const numeric_index_type n_local,
 	       const std::vector<numeric_index_type>& ghost,
-               const ParallelType type = AUTOMATIC);
+               const ParallelType type = AUTOMATIC,
+               const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor.  Creates a PetscVector assuming you already have a
@@ -100,7 +104,7 @@ public:
    * This allows ownership of \p v to remain with the original creator,
    * and to simply provide additional functionality with the PetscVector.
    */
-  PetscVector(Vec v);
+  PetscVector(Vec v, const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -598,12 +602,13 @@ private:
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (const ParallelType ptype)
-  : _array_is_present(false),
-    _local_form(NULL),
-    _values(NULL),
-    _global_to_local_map(),
-    _destroy_vec_on_exit(true)
+PetscVector<T>::PetscVector (const ParallelType ptype, const Parallel::Communicator &comm)
+    : NumericVector<T>(ptype, comm),
+      _array_is_present(false),
+      _local_form(NULL),
+      _values(NULL),
+      _global_to_local_map(),
+      _destroy_vec_on_exit(true)
 {
   this->_type = ptype;
 }
@@ -613,8 +618,10 @@ PetscVector<T>::PetscVector (const ParallelType ptype)
 template <typename T>
 inline
 PetscVector<T>::PetscVector (const numeric_index_type n,
-                             const ParallelType ptype)
-  : _array_is_present(false),
+                             const ParallelType ptype,
+                             const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm),
+    _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
@@ -629,8 +636,10 @@ template <typename T>
 inline
 PetscVector<T>::PetscVector (const numeric_index_type n,
 			     const numeric_index_type n_local,
-                             const ParallelType ptype)
-  : _array_is_present(false),
+                             const ParallelType ptype,
+                             const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm),
+    _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
@@ -646,8 +655,10 @@ inline
 PetscVector<T>::PetscVector (const numeric_index_type n,
 			     const numeric_index_type n_local,
 			     const std::vector<numeric_index_type>& ghost,
-                             const ParallelType ptype)
-  : _array_is_present(false),
+                             const ParallelType ptype,
+                             const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm),
+    _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
@@ -662,8 +673,9 @@ PetscVector<T>::PetscVector (const numeric_index_type n,
 
 template <typename T>
 inline
-PetscVector<T>::PetscVector (Vec v)
-  : _array_is_present(false),
+PetscVector<T>::PetscVector (Vec v, const Parallel::Communicator &comm)
+  : NumericVector<T>(AUTOMATIC, comm),
+    _array_is_present(false),
     _local_form(NULL),
     _values(NULL),
     _global_to_local_map(),
@@ -678,7 +690,7 @@ PetscVector<T>::PetscVector (Vec v)
   PetscErrorCode ierr=0;
   PetscInt petsc_local_size=0;
   ierr = VecGetLocalSize(_vec, &petsc_local_size);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   // Get the vector type from PETSc.
   // As of Petsc 3.0.0, the VecType #define lost its const-ness, so we
@@ -690,7 +702,7 @@ PetscVector<T>::PetscVector (Vec v)
   const VecType ptype;
 #endif
   ierr = VecGetType(_vec, &ptype);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   if((std::strcmp(ptype,VECSHARED) == 0) || (std::strcmp(ptype,VECMPI) == 0))
   {
@@ -699,7 +711,7 @@ PetscVector<T>::PetscVector (Vec v)
 #else
     ISLocalToGlobalMapping mapping;
     ierr = VecGetLocalToGlobalMapping(_vec, &mapping);
-    CHKERRABORT(libMesh::COMM_WORLD,ierr);
+    LIBMESH_CHKERRABORT(ierr);
 #endif
 
     // If is a sparsely stored vector, set up our new mapping
@@ -712,7 +724,7 @@ PetscVector<T>::PetscVector (Vec v)
 #else
       PetscInt n;
       ierr = ISLocalToGlobalMappingGetSize(mapping, &n);
-      CHKERRABORT(libMesh::COMM_WORLD, ierr);
+      LIBMESH_CHKERRABORT(ierr);
       const numeric_index_type ghost_end = static_cast<numeric_index_type>(n);
 #endif
 #if PETSC_VERSION_RELEASE && PETSC_VERSION_LESS_THAN(3,1,1)
@@ -720,14 +732,14 @@ PetscVector<T>::PetscVector (Vec v)
 #else
       const PetscInt *indices;
       ierr = ISLocalToGlobalMappingGetIndices(mapping,&indices);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 #endif
       for(numeric_index_type i=ghost_begin; i<ghost_end; i++)
         _global_to_local_map[indices[i]] = i-my_local_size;
       this->_type = GHOSTED;
 #if !PETSC_VERSION_RELEASE || !PETSC_VERSION_LESS_THAN(3,1,1)
       ierr = ISLocalToGlobalMappingRestoreIndices(mapping, &indices);
-      CHKERRABORT(libMesh::COMM_WORLD, ierr);
+      LIBMESH_CHKERRABORT(ierr);
 #endif
     }
     else
@@ -794,9 +806,9 @@ void PetscVector<T>::init (const numeric_index_type n,
     {
 #ifdef LIBMESH_HAVE_MPI
       libmesh_assert_less_equal (n_local, n);
-      ierr = VecCreateMPI (libMesh::COMM_WORLD, petsc_n_local, petsc_n,
+      ierr = VecCreateMPI (this->communicator().get(), petsc_n_local, petsc_n,
 			   &_vec);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 #else
       libmesh_assert_equal_to (n_local, n);
       ierr = VecCreateSeq (PETSC_COMM_SELF, petsc_n, &_vec);
@@ -804,7 +816,7 @@ void PetscVector<T>::init (const numeric_index_type n,
 #endif
 
       ierr = VecSetFromOptions (_vec);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
     }
   else
     libmesh_error();
@@ -873,13 +885,13 @@ void PetscVector<T>::init (const numeric_index_type n,
     }
 
   /* Create vector.  */
-  ierr = VecCreateGhost (libMesh::COMM_WORLD, petsc_n_local, petsc_n,
+  ierr = VecCreateGhost (this->communicator().get(), petsc_n_local, petsc_n,
 			 petsc_n_ghost, petsc_ghost,
 			 &_vec);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   ierr = VecSetFromOptions (_vec);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   this->_is_initialized = true;
   this->_is_closed = true;
@@ -917,7 +929,7 @@ void PetscVector<T>::init (const NumericVector<T>& other,
       PetscErrorCode ierr = 0;
 
       ierr = VecDuplicate (v._vec, &this->_vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
     }
 
   if (fast == false)
@@ -935,16 +947,16 @@ void PetscVector<T>::close ()
   PetscErrorCode ierr=0;
 
   ierr = VecAssemblyBegin(_vec);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   ierr = VecAssemblyEnd(_vec);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   if(this->type() == GHOSTED)
     {
       ierr = VecGhostUpdateBegin(_vec,INSERT_VALUES,SCATTER_FORWARD);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
       ierr = VecGhostUpdateEnd(_vec,INSERT_VALUES,SCATTER_FORWARD);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
     }
 
   this->_is_closed = true;
@@ -964,7 +976,7 @@ void PetscVector<T>::clear ()
       PetscErrorCode ierr=0;
 
       ierr = LibMeshVecDestroy(&_vec);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
     }
 
   this->_is_closed = this->_is_initialized = false;
@@ -991,11 +1003,11 @@ void PetscVector<T>::zero ()
 #if PETSC_VERSION_LESS_THAN(2,3,0)
       // 2.2.x & earlier style
       ierr = VecSet (&z, _vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 #else
       // 2.3.x & newer
       ierr = VecSet (_vec, z);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 #endif
     }
   else
@@ -1004,18 +1016,18 @@ void PetscVector<T>::zero ()
 	 handling.  */
       Vec loc_vec;
       ierr = VecGhostGetLocalForm (_vec,&loc_vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 #if PETSC_VERSION_LESS_THAN(2,3,0)
       // 2.2.x & earlier style
       ierr = VecSet (&z, loc_vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 #else
       // 2.3.x & newer
       ierr = VecSet (loc_vec, z);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 #endif
       ierr = VecGhostRestoreLocalForm (_vec,&loc_vec);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
     }
 }
 
@@ -1025,7 +1037,7 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > PetscVector<T>::zero_clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>(this->type(), this->communicator()));
 
   cloned_vector->init(*this);
 
@@ -1038,7 +1050,7 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > PetscVector<T>::clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector (new PetscVector<T>(this->type(), this->communicator()));
 
   cloned_vector->init(*this, true);
 
@@ -1061,7 +1073,7 @@ numeric_index_type PetscVector<T>::size () const
     return 0;
 
   ierr = VecGetSize(_vec, &petsc_size);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(petsc_size);
 }
@@ -1077,7 +1089,7 @@ numeric_index_type PetscVector<T>::local_size () const
   PetscErrorCode ierr=0, petsc_size=0;
 
   ierr = VecGetLocalSize(_vec, &petsc_size);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(petsc_size);
 }
@@ -1093,7 +1105,7 @@ numeric_index_type PetscVector<T>::first_local_index () const
   PetscErrorCode ierr=0, petsc_first=0, petsc_last=0;
 
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(petsc_first);
 }
@@ -1109,7 +1121,7 @@ numeric_index_type PetscVector<T>::last_local_index () const
   PetscErrorCode ierr=0, petsc_first=0, petsc_last=0;
 
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<numeric_index_type>(petsc_last);
 }
@@ -1124,7 +1136,7 @@ numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_inde
 
   PetscErrorCode ierr=0, petsc_first=0, petsc_last=0;
   ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
   const numeric_index_type first = static_cast<numeric_index_type>(petsc_first);
   const numeric_index_type last = static_cast<numeric_index_type>(petsc_last);
 
@@ -1220,7 +1232,7 @@ Real PetscVector<T>::min () const
   PetscReal returnval=0.;
 
   ierr = VecMin (_vec, &index, &returnval);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // this return value is correct: VecMin returns a PetscReal
   return static_cast<Real>(returnval);
@@ -1239,7 +1251,7 @@ Real PetscVector<T>::max() const
   PetscReal returnval=0.;
 
   ierr = VecMax (_vec, &index, &returnval);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // this return value is correct: VecMax returns a PetscReal
   return static_cast<Real>(returnval);
@@ -1276,18 +1288,18 @@ void PetscVector<T>::_get_array(void) const
       if(this->type() != GHOSTED)
 	{
 	  ierr = VecGetArray(_vec, &_values);
-	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  LIBMESH_CHKERRABORT(ierr);
 	}
       else
 	{
 	  ierr = VecGhostGetLocalForm (_vec,&_local_form);
-	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  LIBMESH_CHKERRABORT(ierr);
 	  ierr = VecGetArray(_local_form, &_values);
-	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  LIBMESH_CHKERRABORT(ierr);
 #ifndef NDEBUG
 	  PetscInt my_local_size = 0;
 	  ierr = VecGetLocalSize(_local_form, &my_local_size);
-	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  LIBMESH_CHKERRABORT(ierr);
 	  _local_size = static_cast<numeric_index_type>(my_local_size);
 #endif
 	}
@@ -1308,16 +1320,16 @@ void PetscVector<T>::_restore_array(void) const
       if(this->type() != GHOSTED)
 	{
 	  ierr = VecRestoreArray (_vec, &_values);
-	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  LIBMESH_CHKERRABORT(ierr);
 	  _values = NULL;
 	}
       else
 	{
 	  ierr = VecRestoreArray (_local_form, &_values);
-	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  LIBMESH_CHKERRABORT(ierr);
 	  _values = NULL;
 	  ierr = VecGhostRestoreLocalForm (_vec,&_local_form);
-	  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	  LIBMESH_CHKERRABORT(ierr);
 	  _local_form = NULL;
 #ifndef NDEBUG
 	  _local_size = 0;

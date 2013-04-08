@@ -486,7 +486,7 @@ bool Elem::operator == (const Elem& rhs) const
 
 
 
-bool Elem::is_semilocal() const
+bool Elem::is_semilocal(const processor_id_type my_pid) const
 {
   std::set<const Elem *> point_neighbors;
 
@@ -498,7 +498,7 @@ bool Elem::is_semilocal() const
   for (; it != end; ++it)
     {
       const Elem* elem = *it;
-      if (elem->processor_id() == libMesh::processor_id())
+      if (elem->processor_id() == my_pid)
         return true;
     }
 

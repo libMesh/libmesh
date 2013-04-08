@@ -52,8 +52,9 @@ namespace libMesh
 // ------------------------------------------------------------
 // EquationSystems class implementation
 EquationSystems::EquationSystems (MeshBase& m, MeshData* mesh_data) :
-  _mesh      (m),
-  _mesh_data (mesh_data)
+  ParallelObject (m),
+  _mesh          (m),
+  _mesh_data     (mesh_data)
 {
   // Set default parameters
   this->parameters.set<Real>        ("linear solver tolerance") = TOLERANCE * TOLERANCE;
@@ -97,7 +98,7 @@ void EquationSystems::init ()
   libmesh_assert_not_equal_to (n_sys, 0);
 
   // Distribute the mesh if possible
-  if (libMesh::n_processors() > 1)
+  if (this->n_processors() > 1)
     _mesh.delete_remote_elements();
 
   // Tell all the \p DofObject entities how many systems
@@ -129,7 +130,7 @@ void EquationSystems::init ()
 
 void EquationSystems::reinit ()
 {
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert_not_equal_to (this->n_systems(), 0);
 
@@ -676,7 +677,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
   START_LOG("build_solution_vector()", "EquationSystems");
 
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->n_systems());
 
@@ -754,7 +755,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
   // Gather the distributed node_conn arrays in the case of
   // multiple processors.
-  CommWorld.sum(node_conn);
+  this->communicator().sum(node_conn);
 
   unsigned int var_num=0;
 
@@ -862,7 +863,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 	    repeat_count = node_conn;
 
 	  else
-	    CommWorld.sum (repeat_count);
+	    this->communicator().sum (repeat_count);
 
 	    for (unsigned int n=0; n<nn; n++)
 	      for( unsigned int d=0; d < n_vec_dim; d++ )
@@ -876,7 +877,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
   // Now each processor has computed contriburions to the
   // soln vector.  Gather them all up.
-  CommWorld.sum(soln);
+  this->communicator().sum(soln);
 
   STOP_LOG("build_solution_vector()", "EquationSystems");
 }
@@ -886,7 +887,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
                                     std::vector<std::string> & names ) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->n_systems());
 
@@ -963,7 +964,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
   // Now each processor has computed contributions to the
   // soln vector.  Gather them all up.
-  CommWorld.sum(soln);
+  this->communicator().sum(soln);
 }
 
 

@@ -42,7 +42,8 @@ namespace libMesh
 
 // Anonymous namespace for implementation details.
 namespace {
-  std::string local_file_name (const std::string &name)
+  std::string local_file_name (const unsigned int processor_id,
+			       const std::string &name)
   {
     std::string basename(name);
     char buf[256];
@@ -50,15 +51,15 @@ namespace {
     if (basename.size() - basename.rfind(".bz2") == 4)
       {
 	basename.erase(basename.end()-4, basename.end());
-	std::sprintf(buf, "%s.%04d.bz2", basename.c_str(), libMesh::processor_id());
+	std::sprintf(buf, "%s.%04d.bz2", basename.c_str(), processor_id);
       }
     else if (basename.size() - basename.rfind(".gz") == 3)
       {
 	basename.erase(basename.end()-3, basename.end());
-	std::sprintf(buf, "%s.%04d.gz", basename.c_str(), libMesh::processor_id());
+	std::sprintf(buf, "%s.%04d.gz", basename.c_str(), processor_id);
       }
     else
-      std::sprintf(buf, "%s.%04d", basename.c_str(), libMesh::processor_id());
+      std::sprintf(buf, "%s.%04d", basename.c_str(), processor_id);
 
     return std::string(buf);
   }
@@ -228,7 +229,7 @@ void EquationSystems::_read_impl (const std::string& name,
 
   // This will unzip a file with .bz2 as the extension, otherwise it
   // simply returns the name if the file need not be unzipped.
-  Xdr io ((libMesh::processor_id() == 0) ? name : "", mode);
+  Xdr io ((this->processor_id() == 0) ? name : "", mode);
   libmesh_assert (io.reading());
 
   {
@@ -237,8 +238,8 @@ void EquationSystems::_read_impl (const std::string& name,
     std::string version = "legacy";
     if (!read_legacy_format)
       {
-	if (libMesh::processor_id() == 0) io.data(version);
-	CommWorld.broadcast(version);
+	if (this->processor_id() == 0) io.data(version);
+	this->communicator().broadcast(version);
 
 	// All processors have the version header, if it does not contain
 	// "libMesh" something then it is a legacy file.
@@ -280,22 +281,22 @@ void EquationSystems::_read_impl (const std::string& name,
     // 2.)
     // Read the number of equation systems
     unsigned int n_sys=0;
-    if (libMesh::processor_id() == 0) io.data (n_sys);
-    CommWorld.broadcast(n_sys);
+    if (this->processor_id() == 0) io.data (n_sys);
+    this->communicator().broadcast(n_sys);
 
     for (unsigned int sys=0; sys<n_sys; sys++)
       {
 	// 3.)
 	// Read the name of the sys-th equation system
 	std::string sys_name;
-	if (libMesh::processor_id() == 0) io.data (sys_name);
-	CommWorld.broadcast(sys_name);
+	if (this->processor_id() == 0) io.data (sys_name);
+	this->communicator().broadcast(sys_name);
 
 	// 4.)
 	// Read the type of the sys-th equation system
 	std::string sys_type;
-	if (libMesh::processor_id() == 0) io.data (sys_type);
-	CommWorld.broadcast(sys_type);
+	if (this->processor_id() == 0) io.data (sys_type);
+	this->communicator().broadcast(sys_type);
 
 	if (read_header)
 	  this->add_system (sys_type, sys_name);
@@ -339,7 +340,7 @@ void EquationSystems::_read_impl (const std::string& name,
 	  MeshTools::Private::globally_renumber_nodes_and_elements(mesh);
 	}
 
-      Xdr local_io (read_parallel_files ? local_file_name(name) : "", mode);
+      Xdr local_io (read_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
       std::map<std::string, System*>::iterator
 	pos = xda_systems.begin();
@@ -471,12 +472,12 @@ void EquationSystems::write(const std::string& name,
 
   // New scope so that io will close before we try to zip the file
   {
-    Xdr io((libMesh::processor_id()==0) ? name : "", mode);
+    Xdr io((this->processor_id()==0) ? name : "", mode);
     libmesh_assert (io.writing());
 
     START_LOG("write()","EquationSystems");
 
-    const unsigned int proc_id = libMesh::processor_id();
+    const unsigned int proc_id = this->processor_id();
     unsigned int n_sys         = this->n_systems();
 
     std::map<std::string, System*>::const_iterator
@@ -549,7 +550,7 @@ void EquationSystems::write(const std::string& name,
     if (write_data)
       {
 	// open a parallel buffer if warranted.
-	Xdr local_io (write_parallel_files ? local_file_name(name) : "", mode);
+	Xdr local_io (write_parallel_files ? local_file_name(this->processor_id(),name) : "", mode);
 
 	for (pos = _systems.begin(); pos != _systems.end(); ++pos)
 	  {

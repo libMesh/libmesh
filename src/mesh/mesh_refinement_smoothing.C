@@ -39,7 +39,7 @@ namespace libMesh
 bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismatch)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   bool flags_changed = false;
 
@@ -119,7 +119,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
   }
 
   // If flags changed on any processor then they changed globally
-  CommWorld.max(flags_changed);
+  this->communicator().max(flags_changed);
 
   return flags_changed;
 }
@@ -131,7 +131,7 @@ bool MeshRefinement::limit_level_mismatch_at_node (const unsigned int max_mismat
 bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismatch)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   bool flags_changed = false;
 
@@ -255,7 +255,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
   }
 
   // If flags changed on any processor then they changed globally
-  CommWorld.max(flags_changed);
+  this->communicator().max(flags_changed);
 
   return flags_changed;
 }
@@ -266,7 +266,7 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
 bool MeshRefinement::eliminate_unrefined_patches ()
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   bool flags_changed = false;
 
@@ -419,7 +419,7 @@ bool MeshRefinement::eliminate_unrefined_patches ()
     }
 
   // If flags changed on any processor then they changed globally
-  CommWorld.max(flags_changed);
+  this->communicator().max(flags_changed);
 
   return flags_changed;
 }

@@ -333,7 +333,7 @@ void ExodusII_IO_Helper::read_node_num_map ()
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] node_num_map[i] = ";
+      libMesh::out << "[" << this->processor_id() << "] node_num_map[i] = ";
       for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_nodes-1)); ++i)
         libMesh::out << node_num_map[i] << ", ";
       libMesh::out << "... " << node_num_map.back() << std::endl;
@@ -484,7 +484,7 @@ void ExodusII_IO_Helper::read_elem_num_map ()
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] elem_num_map[i] = ";
+      libMesh::out << "[" << this->processor_id() << "] elem_num_map[i] = ";
       for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_elem-1)); ++i)
         libMesh::out << elem_num_map[i] << ", ";
       libMesh::out << "... " << elem_num_map.back() << std::endl;
@@ -651,7 +651,7 @@ void ExodusII_IO_Helper::close()
   // Always call close on processor 0.
   // If we're running on multiple processors, i.e. as one of several Nemesis files,
   // we call close on all processors...
-  if ((libMesh::processor_id() == 0) || (!_run_only_on_proc0))
+  if ((this->processor_id() == 0) || (!_run_only_on_proc0))
     {
       ex_err = exII::ex_close(ex_id);
       check_err(ex_err, "Error closing Exodus file.");
@@ -768,7 +768,7 @@ void ExodusII_IO_Helper::create(std::string filename)
   // If we're processor 0, always create the file.
   // If we running on all procs, e.g. as one of several Nemesis files, also
   // call create there.
-  if ((libMesh::processor_id() == 0) || (!_run_only_on_proc0))
+  if ((this->processor_id() == 0) || (!_run_only_on_proc0))
     {
       //Fall back on double precision when necessary since ExodusII
       //doesn't seem to support long double
@@ -791,7 +791,7 @@ void ExodusII_IO_Helper::create(std::string filename)
 
 void ExodusII_IO_Helper::initialize_discontinuous(std::string str_title, const MeshBase & mesh)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   if (_use_mesh_dimension_instead_of_spatial_dimension)
@@ -855,7 +855,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   // n_active_elem() is a parallel_only function
   unsigned int n_active_elem = mesh.n_active_elem();
 
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   if (_use_mesh_dimension_instead_of_spatial_dimension)
@@ -914,7 +914,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
 void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   x.resize(num_nodes);
@@ -957,7 +957,7 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::write_nodal_coordinates_discontinuous(const MeshBase & mesh)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   x.resize(num_nodes);
@@ -1000,7 +1000,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
   // n_active_elem() is a parallel_only function
   unsigned int n_active_elem = mesh.n_active_elem();
 
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
@@ -1106,7 +1106,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   std::map<unsigned int, std::vector<unsigned int>  > subdomain_map;
@@ -1189,7 +1189,7 @@ void ExodusII_IO_Helper::write_elements_discontinuous(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   ExodusII_IO_Helper::ElementMaps em;
@@ -1257,7 +1257,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
 
 void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   // FIXME: This is not used, should it be?
@@ -1304,7 +1304,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
 void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh */,
                                                       std::vector<std::string> names)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   num_elem_vars = names.size();
@@ -1373,7 +1373,7 @@ void ExodusII_IO_Helper::initialize_element_variables(const MeshBase & /* mesh *
 
 void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> names)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   num_nodal_vars = names.size();
@@ -1418,7 +1418,7 @@ void ExodusII_IO_Helper::initialize_nodal_variables(std::vector<std::string> nam
 
 void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::string> & names)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   if (_global_vars_initialized)
@@ -1469,7 +1469,7 @@ void ExodusII_IO_Helper::initialize_global_variables(const std::vector<std::stri
 
 void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   ex_err = exII::ex_put_time(ex_id, timestep, &time);
@@ -1483,7 +1483,7 @@ void ExodusII_IO_Helper::write_timestep(int timestep, Real time)
 
 void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::vector<Number> & values, int timestep)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   // Loop over the element blocks and write the data one block at a time
@@ -1536,7 +1536,7 @@ void ExodusII_IO_Helper::write_element_values(const MeshBase & mesh, const std::
 
 void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number> & values, int timestep)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   ex_err = exII::ex_put_nodal_var(ex_id, timestep, var_id, num_nodes, &values[0]);
@@ -1550,7 +1550,7 @@ void ExodusII_IO_Helper::write_nodal_values(int var_id, const std::vector<Number
 
 void ExodusII_IO_Helper::write_information_records(const std::vector<std::string>& records)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   int num_records = records.size();
@@ -1581,7 +1581,7 @@ void ExodusII_IO_Helper::write_information_records(const std::vector<std::string
 
 void ExodusII_IO_Helper::write_global_values(const std::vector<Number> & values, int timestep)
 {
-  if ((_run_only_on_proc0) && (libMesh::processor_id() != 0))
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
 
   ex_err = exII::ex_put_glob_vars(ex_id, timestep, num_globals, &values[0]);

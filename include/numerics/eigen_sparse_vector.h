@@ -61,14 +61,16 @@ class EigenSparseVector : public NumericVector<T>
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  EigenSparseVector (const ParallelType = AUTOMATIC);
+  EigenSparseVector (const ParallelType = AUTOMATIC,
+                     const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
   EigenSparseVector (const numeric_index_type n,
-                 const ParallelType = AUTOMATIC);
+                     const ParallelType = AUTOMATIC,
+                     const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -76,7 +78,8 @@ class EigenSparseVector : public NumericVector<T>
    */
   EigenSparseVector (const numeric_index_type n,
 		     const numeric_index_type n_local,
-		     const ParallelType = AUTOMATIC);
+		     const ParallelType = AUTOMATIC,
+                     const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -86,7 +89,8 @@ class EigenSparseVector : public NumericVector<T>
   EigenSparseVector (const numeric_index_type N,
 		     const numeric_index_type n_local,
 		     const std::vector<numeric_index_type>& ghost,
-		     const ParallelType = AUTOMATIC);
+		     const ParallelType = AUTOMATIC,
+                     const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -474,7 +478,8 @@ class EigenSparseVector : public NumericVector<T>
 // EigenSparseVector inline methods
 template <typename T>
 inline
-EigenSparseVector<T>::EigenSparseVector (const ParallelType ptype)
+EigenSparseVector<T>::EigenSparseVector (const ParallelType ptype, const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm)
 {
   this->_type = ptype;
 }
@@ -484,7 +489,9 @@ EigenSparseVector<T>::EigenSparseVector (const ParallelType ptype)
 template <typename T>
 inline
 EigenSparseVector<T>::EigenSparseVector (const numeric_index_type n,
-					 const ParallelType ptype)
+					 const ParallelType ptype,
+                                         const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm)
 {
   this->init(n, n, false, ptype);
 }
@@ -495,7 +502,9 @@ template <typename T>
 inline
 EigenSparseVector<T>::EigenSparseVector (const numeric_index_type n,
 					 const numeric_index_type n_local,
-					 const ParallelType ptype)
+					 const ParallelType ptype,
+                                         const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm)
 {
   this->init(n, n_local, false, ptype);
 }
@@ -507,7 +516,9 @@ inline
 EigenSparseVector<T>::EigenSparseVector (const numeric_index_type N,
 					 const numeric_index_type n_local,
 					 const std::vector<numeric_index_type>& ghost,
-					 const ParallelType ptype)
+					 const ParallelType ptype,
+                                         const Parallel::Communicator &comm)
+  : NumericVector<T>(ptype, comm)
 {
   this->init(N, n_local, ghost, false, ptype);
 }

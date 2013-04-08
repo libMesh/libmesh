@@ -86,6 +86,9 @@
    */
 #undef DIM
 
+/* Flag indicating if the library should disable libMesh::CommWorld */
+#undef DISABLE_COMMWORLD
+
 /* size of dof_id */
 #undef DOF_ID_BYTES
 

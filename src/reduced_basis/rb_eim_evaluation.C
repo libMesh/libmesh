@@ -32,10 +32,11 @@
 namespace libMesh
 {
 
-RBEIMEvaluation::RBEIMEvaluation()
+  RBEIMEvaluation::RBEIMEvaluation(const libMesh::Parallel::Communicator &comm)
   :
-  _previous_N(0),
-  _previous_error_bound(-1)
+    RBEvaluation(comm),
+    _previous_N(0),
+    _previous_error_bound(-1)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case
@@ -246,7 +247,7 @@ void RBEIMEvaluation::write_offline_data_to_files(const std::string& directory_n
   // The suffix to use for all the files that are written out
   const std::string suffix = read_binary_data ? ".xdr" : ".dat";
 
-  if(libMesh::processor_id() == 0)
+  if(this->processor_id() == 0)
   {
     std::ostringstream file_name;
 

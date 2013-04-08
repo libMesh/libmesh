@@ -39,8 +39,9 @@
 namespace libMesh
 {
 
-RBEvaluation::RBEvaluation ()
+RBEvaluation::RBEvaluation (const Parallel::Communicator &comm)
   :
+  ParallelObject(comm),
   evaluate_RB_error_bound(true),
   compute_RB_inner_product(false),
   rb_theta_expansion(NULL)
@@ -453,7 +454,7 @@ void RBEvaluation::write_offline_data_to_files(const std::string& directory_name
   // The suffix to use for all the files that are written out
   const std::string suffix = write_binary_data ? ".xdr" : ".dat";
 
-  if(libMesh::processor_id() == 0)
+  if(this->processor_id() == 0)
   {
 
     // Make a directory to store all the data files
@@ -904,14 +905,14 @@ void RBEvaluation::write_out_vectors(System& sys,
   START_LOG("write_out_vectors()", "RBEvaluation");
   //libMesh::out << "Writing out the basis functions..." << std::endl;
 
-  if(libMesh::processor_id() == 0)
+  if(this->processor_id() == 0)
   {
     // Make a directory to store all the data files
     mkdir(directory_name.c_str(), 0777);
   }
 
   // Make sure processors are synced up before we begin
-  CommWorld.barrier();
+  this->communicator().barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (write_binary_vectors ? ".xdr" : ".dat");
@@ -944,7 +945,7 @@ void RBEvaluation::write_out_vectors(System& sys,
   //   sys.write_serialized_data(bf_data, false);
 
   //   // Synchronize before moving on
-  //   CommWorld.barrier();
+  //   this->communicator().barrier();
   //   // Swap back
   //   vectors[i]->swap(*sys.solution);
   // }
@@ -1004,7 +1005,7 @@ void RBEvaluation::read_in_vectors(System& sys,
   //libMesh::out << "Reading in the basis functions..." << std::endl;
 
   // Make sure processors are synced up before we begin
-  CommWorld.barrier();
+  this->communicator().barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (read_binary_vectors ? ".xdr" : ".dat");
@@ -1045,7 +1046,7 @@ void RBEvaluation::read_in_vectors(System& sys,
 	  file_name << directory_name << "/" << data_name << i << basis_function_suffix;
 
 	  // On processor zero check to be sure the file exists
-	  if (libMesh::processor_id() == 0)
+	  if (this->processor_id() == 0)
 	    {
 	      int stat_result = stat(file_name.str().c_str(), &stat_info);
 
@@ -1064,7 +1065,7 @@ void RBEvaluation::read_in_vectors(System& sys,
 
 	  sys.read_serialized_data(vector_data, false);
 
-	  vectors[i] = NumericVector<Number>::build().release();
+	  vectors[i] = NumericVector<Number>::build(sys.communicator()).release();
 	  vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 
 	  // No need to copy, just swap
@@ -1080,7 +1081,7 @@ void RBEvaluation::read_in_vectors(System& sys,
       // Allocate storage for each vector
       for(unsigned int i=0; i<vectors.size(); i++)
 	{
-	  vectors[i] = NumericVector<Number>::build().release();
+	  vectors[i] = NumericVector<Number>::build(sys.communicator()).release();
 	  vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 	}
 
@@ -1088,7 +1089,7 @@ void RBEvaluation::read_in_vectors(System& sys,
       file_name << directory_name << "/" << data_name << "_data" << basis_function_suffix;
 
       // On processor zero check to be sure the file exists
-      if (libMesh::processor_id() == 0)
+      if (this->processor_id() == 0)
 	{
 	  int stat_result = stat(file_name.str().c_str(), &stat_info);
 

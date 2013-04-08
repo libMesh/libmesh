@@ -141,7 +141,7 @@ MeshInput<MT>::MeshInput (MT& obj, const bool is_parallel_format) :
 {
   if (!_is_parallel_format && !this->mesh().is_serial())
     {
-      if (libMesh::processor_id() == 0)
+      if (this->mesh().processor_id() == 0)
 	{
 	  libmesh_do_once(libMesh::out <<
             "Warning:  This MeshOutput subclass only supports meshes which have been serialized!"

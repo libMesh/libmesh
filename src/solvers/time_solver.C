@@ -66,7 +66,7 @@ void TimeSolver::init ()
     _diff_solver = DiffSolver::build(_system);
 
   if (_linear_solver.get() == NULL)
-    _linear_solver = LinearSolver<Number>::build();
+    _linear_solver = LinearSolver<Number>::build(_system.communicator());
 
   _diff_solver->init();
   _linear_solver->init();

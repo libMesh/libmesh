@@ -203,12 +203,14 @@ protected:
    * that is corresponds to the largest error on all
    * processors.
    */
-  static void get_global_max_error_pair(std::pair<unsigned int, Real>& error_pair);
+  static void get_global_max_error_pair(const Parallel::Communicator &communicator,
+					std::pair<unsigned int, Real>& error_pair);
 
   /**
    * Static helper function for generating a randomized set of parameters.
    */
-  static void generate_training_parameters_random(std::map<std::string, bool> log_param_scale,
+  static void generate_training_parameters_random(const Parallel::Communicator &communicator,
+						  std::map<std::string, bool> log_param_scale,
                                                   std::map< std::string, NumericVector<Number>* >& training_parameters_in,
                                                   unsigned int n_training_samples_in,
                                                   const RBParameters& min_parameters,
@@ -221,7 +223,8 @@ protected:
    * the parameter indicated by this->get_deterministic_training_parameter() will be
    * deterministic.
    */
-  static void generate_training_parameters_partially_random(const std::string& deterministic_parameter_name,
+  static void generate_training_parameters_partially_random(const Parallel::Communicator &communicator,
+							    const std::string& deterministic_parameter_name,
                                                             const unsigned int deterministic_parameter_repeats,
                                                             std::map<std::string, bool> log_param_scale,
                                                             std::map< std::string, NumericVector<Number>* >& training_parameters_in,
@@ -235,7 +238,8 @@ protected:
    * Static helper function for generating a deterministic set of parameters. Only works with 1 or 2
    * parameters (as defined by the lengths of min/max parameters vectors), otherwise throws an error.
    */
-  static void generate_training_parameters_deterministic(std::map<std::string, bool> log_param_scale,
+  static void generate_training_parameters_deterministic(const Parallel::Communicator &communicator,
+							 std::map<std::string, bool> log_param_scale,
                                                          std::map< std::string, NumericVector<Number>* >& training_parameters_in,
                                                          unsigned int n_training_samples_in,
                                                          const RBParameters& min_parameters,

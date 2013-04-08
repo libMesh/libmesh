@@ -45,6 +45,7 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const std::vector<unsigned int>& vars,
 			    const FunctionBase<Number>* master) :
   FunctionBase<Number> (master),
+  ParallelObject       (eqn_systems),
   _eqn_systems         (eqn_systems),
   _vector              (vec),
   _dof_map             (dof_map),
@@ -63,6 +64,7 @@ MeshFunction::MeshFunction (const EquationSystems& eqn_systems,
 			    const unsigned int var,
 			    const FunctionBase<Number>* master) :
   FunctionBase<Number> (master),
+  ParallelObject       (eqn_systems),
   _eqn_systems         (eqn_systems),
   _vector              (vec),
   _dof_map             (dof_map),
@@ -244,7 +246,7 @@ void MeshFunction::operator() (const Point& p,
   // either need to have a serialized vector or we need to find a
   // local element sharing the same point.
   if (element &&
-     (element->processor_id() != libMesh::processor_id()) &&
+     (element->processor_id() != this->processor_id()) &&
      _vector.type() != SERIAL)
     {
       // look for a local element containing the point
@@ -256,7 +258,7 @@ void MeshFunction::operator() (const Point& p,
       for (; it != end; ++it)
         {
           const Elem* elem = *it;
-          if (elem->processor_id() == libMesh::processor_id())
+          if (elem->processor_id() == this->processor_id())
             {
               element = elem;
               break;
@@ -367,7 +369,7 @@ void MeshFunction::gradient (const Point& p,
   // either need to have a serialized vector or we need to find a
   // local element sharing the same point.
   if (element &&
-     (element->processor_id() != libMesh::processor_id()) &&
+     (element->processor_id() != this->processor_id()) &&
      _vector.type() != SERIAL)
     {
       // look for a local element containing the point
@@ -379,7 +381,7 @@ void MeshFunction::gradient (const Point& p,
       for (; it != end; ++it)
         {
           const Elem* elem = *it;
-          if (elem->processor_id() == libMesh::processor_id())
+          if (elem->processor_id() == this->processor_id())
             {
               element = elem;
               break;
@@ -480,7 +482,7 @@ void MeshFunction::hessian (const Point& p,
   // either need to have a serialized vector or we need to find a
   // local element sharing the same point.
   if (element &&
-     (element->processor_id() != libMesh::processor_id()) &&
+     (element->processor_id() != this->processor_id()) &&
      _vector.type() != SERIAL)
     {
       // look for a local element containing the point
@@ -492,7 +494,7 @@ void MeshFunction::hessian (const Point& p,
       for (; it != end; ++it)
         {
           const Elem* elem = *it;
-          if (elem->processor_id() == libMesh::processor_id())
+          if (elem->processor_id() == this->processor_id())
             {
               element = elem;
               break;

@@ -416,6 +416,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
+enabledefaultcommworld = @enabledefaultcommworld@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 enablepetsc = @enablepetsc@
 exec_prefix = @exec_prefix@
@@ -729,6 +730,7 @@ include_HEADERS = \
         parallel/parallel_ghost_sync.h \
         parallel/parallel_histogram.h \
         parallel/parallel_implementation.h \
+        parallel/parallel_object.h \
         parallel/parallel_sort.h \
         parallel/threads.h \
         parallel/threads_allocators.h \

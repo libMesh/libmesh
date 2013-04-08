@@ -129,7 +129,11 @@ namespace MeshTools
    * A feasible load balancing scheme is to keep the weight per processor as
    * uniform as possible.
    */
-  dof_id_type weight (const MeshBase &mesh, const processor_id_type pid=libMesh::processor_id());
+  dof_id_type weight (const MeshBase &mesh, const processor_id_type pid);
+
+  inline
+  dof_id_type weight (const MeshBase &mesh)
+  { return MeshTools::weight (mesh, mesh.processor_id()); }
 
   /**
    * After calling this function the input vector \p nodes_to_elem_map

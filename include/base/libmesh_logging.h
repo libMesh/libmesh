@@ -55,8 +55,6 @@ class PerfLog;
 // is disabled.
 #ifdef LIBMESH_ENABLE_PERFORMANCE_LOGGING
 
-// Note the log is in libMesh, so we need to include it.
-#  include "libmesh/libmesh.h"
 #  define START_LOG(a,b)   { libMesh::perflog.push(a,b); }
 #  define STOP_LOG(a,b)    { libMesh::perflog.pop(a,b); }
 #  define PALIBMESH_USE_LOG(a,b)   { libmesh_deprecated(); }

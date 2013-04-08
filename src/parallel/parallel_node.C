@@ -172,7 +172,7 @@ void unpack (std::vector<int>::const_iterator in,
 
   const unsigned int processor_id = static_cast<unsigned int>(*in++);
   libmesh_assert(processor_id == DofObject::invalid_processor_id ||
-                 processor_id < libMesh::n_processors());
+                 processor_id < mesh->n_processors());
 
   const unsigned int id = static_cast<unsigned int>(*in++);
 

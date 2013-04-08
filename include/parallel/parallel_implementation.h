@@ -21,6 +21,7 @@
 
 // Local includes
 #include "parallel.h"
+#include "libmesh_logging.h"
 
 
 // First declare StandardType specializations so we can use them in anonymous
@@ -347,7 +348,11 @@ namespace Parallel
  * deprecated - instead of libMesh::Parallel::Communicator_World use
  * libMesh::CommWorld
  */
+#ifdef LIBMESH_DISABLE_COMMWORLD
+extern FakeCommunicator& Communicator_World;
+#else
 extern Communicator& Communicator_World;
+#endif
 
 
 /**
@@ -758,7 +763,7 @@ inline void barrier (const Communicator &comm = Communicator_World)
 #ifdef LIBMESH_HAVE_MPI
 inline void Communicator::barrier () const
 {
-  if (libMesh::n_processors() > 1)
+  if (this->size() > 1)
     {
       START_LOG("barrier()", "Parallel");
 

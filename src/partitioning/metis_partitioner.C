@@ -115,7 +115,8 @@ void MetisPartitioner::_do_partition (MeshBase& mesh,
     MeshBase::element_iterator       it  = mesh.active_elements_begin();
     const MeshBase::element_iterator end = mesh.active_elements_end();
 
-    MeshCommunication().find_global_indices (MeshTools::bounding_box(mesh),
+    MeshCommunication().find_global_indices (mesh.communicator(),
+					     MeshTools::bounding_box(mesh),
 					     it, end, global_index);
 
     libmesh_assert_equal_to (global_index.size(), n_active_elem);

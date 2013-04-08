@@ -39,8 +39,9 @@ namespace libMesh
 // The parent ExodusII_IO_Helper is created with the run_only_on_proc0
 // flag set to false, so that we can make use of its functionality
 // on multiple processors.
-Nemesis_IO_Helper::Nemesis_IO_Helper(bool verbose_in) :
-  ExodusII_IO_Helper(verbose_in, /*run_only_on_proc0=*/false),
+  Nemesis_IO_Helper::Nemesis_IO_Helper(const ParallelObject &parent,
+				       bool verbose_in) :
+  ExodusII_IO_Helper(parent, verbose_in, /*run_only_on_proc0=*/false),
   nemesis_err_flag(0),
   num_nodes_global(0),
   num_elems_global(0),
@@ -97,11 +98,11 @@ void Nemesis_IO_Helper::get_init_global()
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_nodes_global=" << num_nodes_global << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_elems_global=" << num_elems_global << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_elem_blks_global=" << num_elem_blks_global << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_node_sets_global=" << num_node_sets_global << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_side_sets_global=" << num_side_sets_global << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_nodes_global=" << num_nodes_global << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_elems_global=" << num_elems_global << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_elem_blks_global=" << num_elem_blks_global << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_node_sets_global=" << num_node_sets_global << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_side_sets_global=" << num_side_sets_global << std::endl;
     }
 }
 
@@ -127,10 +128,10 @@ void Nemesis_IO_Helper::get_ss_param_global()
 
       if (_verbose)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] " << "Global Sideset IDs, Side Counts, and DF counts:" << std::endl;
+	  libMesh::out << "[" << this->processor_id() << "] " << "Global Sideset IDs, Side Counts, and DF counts:" << std::endl;
 	  for (unsigned int bn=0; bn<global_sideset_ids.size(); ++bn)
 	    {
-	      libMesh::out << "  [" << libMesh::processor_id() << "] "
+	      libMesh::out << "  [" << this->processor_id() << "] "
 			<< "global_sideset_ids["<<bn<<"]=" << global_sideset_ids[bn]
 			<< ", num_global_side_counts["<<bn<<"]=" << num_global_side_counts[bn]
 			<< ", num_global_side_df_counts["<<bn<<"]=" << num_global_side_df_counts[bn]
@@ -160,10 +161,10 @@ void Nemesis_IO_Helper::get_ns_param_global()
 
       if (_verbose)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] " << "Global Nodeset IDs, Node Counts, and DF counts:" << std::endl;
+	  libMesh::out << "[" << this->processor_id() << "] " << "Global Nodeset IDs, Node Counts, and DF counts:" << std::endl;
 	  for (unsigned int bn=0; bn<global_nodeset_ids.size(); ++bn)
 	    {
-	      libMesh::out << "  [" << libMesh::processor_id() << "] "
+	      libMesh::out << "  [" << this->processor_id() << "] "
 			    << "global_nodeset_ids["<<bn<<"]=" << global_nodeset_ids[bn]
 			    << ", num_global_node_counts["<<bn<<"]=" << num_global_node_counts[bn]
 			    << ", num_global_node_df_counts["<<bn<<"]=" << num_global_node_df_counts[bn]
@@ -188,10 +189,10 @@ void Nemesis_IO_Helper::get_eb_info_global()
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "Global Element Block IDs and Counts:" << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "Global Element Block IDs and Counts:" << std::endl;
       for (unsigned int bn=0; bn<global_elem_blk_ids.size(); ++bn)
 	{
-	  libMesh::out << "  [" << libMesh::processor_id() << "] "
+	  libMesh::out << "  [" << this->processor_id() << "] "
 		        << "global_elem_blk_ids["<<bn<<"]=" << global_elem_blk_ids[bn]
 		        << ", global_elem_blk_cnts["<<bn<<"]=" << global_elem_blk_cnts[bn]
 		        << std::endl;
@@ -212,9 +213,9 @@ void Nemesis_IO_Helper::get_init_info()
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_proc=" << num_proc << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_proc_in_file=" << num_proc_in_file << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "ftype=" << ftype << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_proc=" << num_proc << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_proc_in_file=" << num_proc_in_file << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "ftype=" << ftype << std::endl;
     }
 }
 
@@ -231,20 +232,20 @@ void Nemesis_IO_Helper::get_loadbal_param()
 				  &num_border_elems,
 				  &num_node_cmaps,
 				  &num_elem_cmaps,
-				  libMesh::processor_id() // The ID of the processor for which info is to be read
+				  this->processor_id() // The ID of the processor for which info is to be read
 				  );
   this->check_err(nemesis_err_flag, "Error reading load balance parameters!");
 
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_internal_nodes=" << num_internal_nodes << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_border_nodes=" << num_border_nodes << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_external_nodes=" << num_external_nodes << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_internal_elems=" << num_internal_elems << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_border_elems=" << num_border_elems << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_node_cmaps=" << num_node_cmaps << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "num_elem_cmaps=" << num_elem_cmaps << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_internal_nodes=" << num_internal_nodes << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_border_nodes=" << num_border_nodes << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_external_nodes=" << num_external_nodes << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_internal_elems=" << num_internal_elems << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_border_elems=" << num_border_elems << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_node_cmaps=" << num_node_cmaps << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "num_elem_cmaps=" << num_elem_cmaps << std::endl;
     }
 }
 
@@ -259,7 +260,7 @@ void Nemesis_IO_Helper::get_elem_map()
     Nemesis::ne_get_elem_map(ex_id,
 			     elem_mapi.empty() ? NULL : &elem_mapi[0],
 			     elem_mapb.empty() ? NULL : &elem_mapb[0],
-			     libMesh::processor_id()
+			     this->processor_id()
 			     );
   this->check_err(nemesis_err_flag, "Error reading element maps!");
 
@@ -267,16 +268,16 @@ void Nemesis_IO_Helper::get_elem_map()
   if (_verbose)
     {
       // These are not contiguous ranges....
-      //libMesh::out << "[" << libMesh::processor_id() << "] " << "first interior elem id=" << elem_mapi[0] << std::endl;
-      //libMesh::out << "[" << libMesh::processor_id() << "] " << "last interior elem id=" << elem_mapi.back() << std::endl;
-      //libMesh::out << "[" << libMesh::processor_id() << "] " << "first boundary elem id=" << elem_mapb[0] << std::endl;
-      //libMesh::out << "[" << libMesh::processor_id() << "] " << "last boundary elem id=" << elem_mapb.back() << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] elem_mapi[i] = ";
+      //libMesh::out << "[" << this->processor_id() << "] " << "first interior elem id=" << elem_mapi[0] << std::endl;
+      //libMesh::out << "[" << this->processor_id() << "] " << "last interior elem id=" << elem_mapi.back() << std::endl;
+      //libMesh::out << "[" << this->processor_id() << "] " << "first boundary elem id=" << elem_mapb[0] << std::endl;
+      //libMesh::out << "[" << this->processor_id() << "] " << "last boundary elem id=" << elem_mapb.back() << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] elem_mapi[i] = ";
       for (unsigned int i=0; i< static_cast<unsigned int>(num_internal_elems-1); ++i)
 	libMesh::out << elem_mapi[i] << ", ";
       libMesh::out << "... " << elem_mapi.back() << std::endl;
 
-      libMesh::out << "[" << libMesh::processor_id() << "] elem_mapb[i] = ";
+      libMesh::out << "[" << this->processor_id() << "] elem_mapb[i] = ";
       for (unsigned int i=0; i< static_cast<unsigned int>(std::min(10, num_border_elems-1)); ++i)
 	libMesh::out << elem_mapb[i] << ", ";
       libMesh::out << "... " << elem_mapb.back() << std::endl;
@@ -297,7 +298,7 @@ void Nemesis_IO_Helper::get_node_map()
 			     node_mapi.empty() ? NULL : &node_mapi[0],
 			     node_mapb.empty() ? NULL : &node_mapb[0],
 			     node_mape.empty() ? NULL : &node_mape[0],
-			     libMesh::processor_id()
+			     this->processor_id()
 			     );
   this->check_err(nemesis_err_flag, "Error reading node maps!");
 
@@ -305,18 +306,18 @@ void Nemesis_IO_Helper::get_node_map()
     {
       // Remark: The Exodus/Nemesis node numbring is always (?) 1-based!  This means the first interior node id will
       // always be == 1.
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "first interior node id=" << node_mapi[0] << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "last interior node id=" << node_mapi.back() << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "first interior node id=" << node_mapi[0] << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "last interior node id=" << node_mapi.back() << std::endl;
 
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "first boundary node id=" << node_mapb[0] << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] " << "last boundary node id=" << node_mapb.back() << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "first boundary node id=" << node_mapb[0] << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] " << "last boundary node id=" << node_mapb.back() << std::endl;
 
       // The number of external nodes is sometimes zero, don't try to access
       // node_mape.back() in this case!
       if (num_external_nodes > 0)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] " << "first external node id=" << node_mape[0] << std::endl;
-	  libMesh::out << "[" << libMesh::processor_id() << "] " << "last external node id=" << node_mape.back() << std::endl;
+	  libMesh::out << "[" << this->processor_id() << "] " << "first external node id=" << node_mape[0] << std::endl;
+	  libMesh::out << "[" << this->processor_id() << "] " << "last external node id=" << node_mape.back() << std::endl;
 	}
     }
 }
@@ -336,28 +337,28 @@ void Nemesis_IO_Helper::get_cmap_params()
 				node_cmap_node_cnts.empty() ? NULL : &node_cmap_node_cnts[0],
 				elem_cmap_ids.empty()       ? NULL : &elem_cmap_ids[0],
 				elem_cmap_elem_cnts.empty() ? NULL : &elem_cmap_elem_cnts[0],
-				libMesh::processor_id());
+				this->processor_id());
   this->check_err(nemesis_err_flag, "Error reading cmap parameters!");
 
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "[" << this->processor_id() << "] ";
       for (unsigned int i=0; i<node_cmap_ids.size(); ++i)
 	libMesh::out << "node_cmap_ids["<<i<<"]=" << node_cmap_ids[i] << " ";
       libMesh::out << std::endl;
 
-      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "[" << this->processor_id() << "] ";
       for (unsigned int i=0; i<node_cmap_node_cnts.size(); ++i)
 	libMesh::out << "node_cmap_node_cnts["<<i<<"]=" << node_cmap_node_cnts[i] << " ";
       libMesh::out << std::endl;
 
-      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "[" << this->processor_id() << "] ";
       for (unsigned int i=0; i<elem_cmap_ids.size(); ++i)
 	libMesh::out << "elem_cmap_ids["<<i<<"]=" << elem_cmap_ids[i] << " ";
       libMesh::out << std::endl;
 
-      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "[" << this->processor_id() << "] ";
       for (unsigned int i=0; i<elem_cmap_elem_cnts.size(); ++i)
 	libMesh::out << "elem_cmap_elem_cnts["<<i<<"]=" << elem_cmap_elem_cnts[i] << " ";
       libMesh::out << std::endl;
@@ -381,19 +382,19 @@ void Nemesis_IO_Helper::get_node_cmap()
 				  node_cmap_ids.empty()         ? 0    : node_cmap_ids[i],
 				  node_cmap_node_ids[i].empty() ? NULL : &node_cmap_node_ids[i][0],
 				  node_cmap_proc_ids[i].empty() ? NULL : &node_cmap_proc_ids[i][0],
-				  libMesh::processor_id());
+				  this->processor_id());
       this->check_err(nemesis_err_flag, "Error reading node cmap node and processor ids!");
 
       if (_verbose)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] node_cmap_node_ids["<<i<<"]=";
+	  libMesh::out << "[" << this->processor_id() << "] node_cmap_node_ids["<<i<<"]=";
 	  for (unsigned int j=0; j<node_cmap_node_ids[i].size(); ++j)
 	    libMesh::out << node_cmap_node_ids[i][j] << " ";
 	  libMesh::out << std::endl;
 
 	  // This is basically a vector, all entries of which are = node_cmap_ids[i]
 	  // Not sure if it's always guaranteed to be that or what...
-	  libMesh::out << "[" << libMesh::processor_id() << "] node_cmap_proc_ids["<<i<<"]=";
+	  libMesh::out << "[" << this->processor_id() << "] node_cmap_proc_ids["<<i<<"]=";
 	  for (unsigned int j=0; j<node_cmap_proc_ids[i].size(); ++j)
 	    libMesh::out << node_cmap_proc_ids[i][j] << " ";
 	  libMesh::out << std::endl;
@@ -421,27 +422,27 @@ void Nemesis_IO_Helper::get_elem_cmap()
 				  elem_cmap_elem_ids[i].empty() ? NULL : &elem_cmap_elem_ids[i][0],
 				  elem_cmap_side_ids[i].empty() ? NULL : &elem_cmap_side_ids[i][0],
 				  elem_cmap_proc_ids[i].empty() ? NULL : &elem_cmap_proc_ids[i][0],
-				  libMesh::processor_id());
+				  this->processor_id());
       this->check_err(nemesis_err_flag, "Error reading elem cmap elem, side, and processor ids!");
 
 
       if (_verbose)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] elem_cmap_elem_ids["<<i<<"]=";
+	  libMesh::out << "[" << this->processor_id() << "] elem_cmap_elem_ids["<<i<<"]=";
 	  for (unsigned int j=0; j<elem_cmap_elem_ids[i].size(); ++j)
 	    libMesh::out << elem_cmap_elem_ids[i][j] << " ";
 	  libMesh::out << std::endl;
 
 	  // These must be the (local) side IDs (in the ExodusII face numbering scheme)
 	  // of the sides shared across processors.
-	  libMesh::out << "[" << libMesh::processor_id() << "] elem_cmap_side_ids["<<i<<"]=";
+	  libMesh::out << "[" << this->processor_id() << "] elem_cmap_side_ids["<<i<<"]=";
 	  for (unsigned int j=0; j<elem_cmap_side_ids[i].size(); ++j)
 	    libMesh::out << elem_cmap_side_ids[i][j] << " ";
 	  libMesh::out << std::endl;
 
 	  // This is basically a vector, all entries of which are = elem_cmap_ids[i]
 	  // Not sure if it's always guaranteed to be that or what...
-	  libMesh::out << "[" << libMesh::processor_id() << "] elem_cmap_proc_ids["<<i<<"]=";
+	  libMesh::out << "[" << this->processor_id() << "] elem_cmap_proc_ids["<<i<<"]=";
 	  for (unsigned int j=0; j<elem_cmap_proc_ids[i].size(); ++j)
 	    libMesh::out << elem_cmap_proc_ids[i][j] << " ";
 	  libMesh::out << std::endl;
@@ -558,7 +559,7 @@ void Nemesis_IO_Helper::put_loadbal_param(unsigned num_internal_nodes_in,
 				  num_border_elems_in,
 				  num_node_cmaps_in,
 				  num_elem_cmaps_in,
-				  libMesh::processor_id());
+				  this->processor_id());
 
   this->check_err(nemesis_err_flag, "Error writing loadbal parameters!");
 }
@@ -582,7 +583,7 @@ void Nemesis_IO_Helper::put_cmap_params(std::vector<int>& node_cmap_ids_in,
 				    &node_cmap_node_cnts_in[0],
 				    &elem_cmap_ids_in[0],
 				    &elem_cmap_elem_cnts_in[0],
-				    libMesh::processor_id());
+				    this->processor_id());
     }
 
   this->check_err(nemesis_err_flag, "Error writing cmap parameters!");
@@ -600,7 +601,7 @@ void Nemesis_IO_Helper::put_node_cmap(std::vector<std::vector<int> >& node_cmap_
     {
       for (unsigned i=0; i<node_cmap_node_ids_in.size(); ++i)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] put_node_cmap() : nodes communicated to proc "
+	  libMesh::out << "[" << this->processor_id() << "] put_node_cmap() : nodes communicated to proc "
 		       << this->node_cmap_ids[i]
 		       << " = ";
 	  for (unsigned j=0; j<node_cmap_node_ids_in[i].size(); ++j)
@@ -610,7 +611,7 @@ void Nemesis_IO_Helper::put_node_cmap(std::vector<std::vector<int> >& node_cmap_
 
       for (unsigned i=0; i<node_cmap_node_ids_in.size(); ++i)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] put_node_cmap() : processor IDs = ";
+	  libMesh::out << "[" << this->processor_id() << "] put_node_cmap() : processor IDs = ";
 	  for (unsigned j=0; j<node_cmap_proc_ids_in[i].size(); ++j)
 	    libMesh::out << node_cmap_proc_ids_in[i][j] << " ";
 	  libMesh::out << std::endl;
@@ -624,7 +625,7 @@ void Nemesis_IO_Helper::put_node_cmap(std::vector<std::vector<int> >& node_cmap_
 				  this->node_cmap_ids[i],
 				  &node_cmap_node_ids_in[i][0],
 				  &node_cmap_proc_ids_in[i][0],
-				  libMesh::processor_id());
+				  this->processor_id());
 
       this->check_err(nemesis_err_flag, "Error writing node communication map to file!");
     }
@@ -642,7 +643,7 @@ void Nemesis_IO_Helper::put_node_map(std::vector<int>& node_mapi_in,
 			     node_mapi_in.empty() ? NULL : &node_mapi_in[0],
 			     node_mapb_in.empty() ? NULL : &node_mapb_in[0],
 			     node_mape_in.empty() ? NULL : &node_mape_in[0], // Don't take address of empty vector...
-			     libMesh::processor_id());
+			     this->processor_id());
 
   this->check_err(nemesis_err_flag, "Error writing Nemesis internal and border node maps to file!");
 }
@@ -662,7 +663,7 @@ void Nemesis_IO_Helper::put_elem_cmap(std::vector<std::vector<int> >& elem_cmap_
 				  &elem_cmap_elem_ids_in[i][0],
 				  &elem_cmap_side_ids_in[i][0],
 				  &elem_cmap_proc_ids_in[i][0],
-				  libMesh::processor_id());
+				  this->processor_id());
 
       this->check_err(nemesis_err_flag, "Error writing elem communication map to file!");
     }
@@ -678,7 +679,7 @@ void Nemesis_IO_Helper::put_elem_map(std::vector<int>& elem_mapi_in,
     Nemesis::ne_put_elem_map(ex_id,
 			     elem_mapi_in.empty() ? NULL : &elem_mapi_in[0],
 			     elem_mapb_in.empty() ? NULL : &elem_mapb_in[0],
-			     libMesh::processor_id());
+			     this->processor_id());
 
   this->check_err(nemesis_err_flag, "Error writing Nemesis internal and border element maps to file!");
 }
@@ -750,7 +751,7 @@ void Nemesis_IO_Helper::initialize(std::string title_in, const MeshBase & mesh)
   // According to Nemesis documentation, first call when writing should be to
   // ne_put_init_info().  Our reader doesn't actually call this, but we should
   // strive to be as close to a normal nemesis file as possible...
-  this->put_init_info(libMesh::n_processors(), 1, "p");
+  this->put_init_info(this->n_processors(), 1, "p");
 
 
   // Gather global "initial" information for Nemesis.  This consists of
@@ -1081,7 +1082,7 @@ void Nemesis_IO_Helper::compute_node_communication_maps()
 	// Get reference to the set of IDs to be packed into the vector.
 	std::set<unsigned>& node_set = (*it).second;
 
-	//std::cout << "[" << libMesh::processor_id() << "] node_set.size()=" << node_set.size() << std::endl;
+	//std::cout << "[" << this->processor_id() << "] node_set.size()=" << node_set.size() << std::endl;
 
 	// Resize the vectors to receive their payload
 	this->node_cmap_node_ids[cnt].resize(node_set.size());
@@ -1108,7 +1109,7 @@ void Nemesis_IO_Helper::compute_node_communication_maps()
     {
       for (unsigned i=0; i<this->node_cmap_node_ids.size(); ++i)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] nodes communicated to proc "
+	  libMesh::out << "[" << this->processor_id() << "] nodes communicated to proc "
 		       << this->node_cmap_ids[i]
 		       << " = ";
 	  for (unsigned j=0; j<this->node_cmap_node_ids[i].size(); ++j)
@@ -1118,7 +1119,7 @@ void Nemesis_IO_Helper::compute_node_communication_maps()
 
       for (unsigned i=0; i<this->node_cmap_node_ids.size(); ++i)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] processor ID node communicated to = ";
+	  libMesh::out << "[" << this->processor_id() << "] processor ID node communicated to = ";
 	  for (unsigned j=0; j<this->node_cmap_proc_ids[i].size(); ++j)
 	    libMesh::out << this->node_cmap_proc_ids[i][j] << " ";
 	  libMesh::out << std::endl;
@@ -1154,12 +1155,12 @@ void Nemesis_IO_Helper::compute_communication_map_parameters()
   // Print the packed vectors we just filled
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] node_cmap_node_cnts = ";
+      libMesh::out << "[" << this->processor_id() << "] node_cmap_node_cnts = ";
       for (unsigned i=0; i<node_cmap_node_cnts.size(); ++i)
 	libMesh::out << node_cmap_node_cnts[i] << ", ";
       libMesh::out << std::endl;
 
-      libMesh::out << "[" << libMesh::processor_id() << "] node_cmap_ids = ";
+      libMesh::out << "[" << this->processor_id() << "] node_cmap_ids = ";
       for (unsigned i=0; i<node_cmap_ids.size(); ++i)
 	libMesh::out << node_cmap_ids[i] << ", ";
       libMesh::out << std::endl;
@@ -1187,12 +1188,12 @@ void Nemesis_IO_Helper::compute_communication_map_parameters()
   // Print the packed vectors we just filled
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] elem_cmap_elem_cnts = ";
+      libMesh::out << "[" << this->processor_id() << "] elem_cmap_elem_cnts = ";
       for (unsigned i=0; i<elem_cmap_elem_cnts.size(); ++i)
 	libMesh::out << elem_cmap_elem_cnts[i] << ", ";
       libMesh::out << std::endl;
 
-      libMesh::out << "[" << libMesh::processor_id() << "] elem_cmap_ids = ";
+      libMesh::out << "[" << this->processor_id() << "] elem_cmap_ids = ";
       for (unsigned i=0; i<elem_cmap_ids.size(); ++i)
 	libMesh::out << elem_cmap_ids[i] << ", ";
       libMesh::out << std::endl;
@@ -1262,7 +1263,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
 
 	      // If my neighbor has a different processor ID, I must be a border element.
 	      // Also track the neighboring processor ID if it is are different from our processor ID
-	      if (neighbor_proc_id != libMesh::processor_id())
+	      if (neighbor_proc_id != this->processor_id())
 		{
 		  is_border_elem = true;
 		  neighboring_processor_ids.insert(neighbor_proc_id);
@@ -1271,7 +1272,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
 		  unsigned nemesis_side_id = conv.get_inverse_side_map(n);
 
 		  if (_verbose)
-		    libMesh::out << "[" << libMesh::processor_id() << "] LibMesh side "
+		    libMesh::out << "[" << this->processor_id() << "] LibMesh side "
 				 << n
 				 << " mapped to (1-based) Exodus side "
 				 << nemesis_side_id
@@ -1304,7 +1305,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] neighboring_processor_ids = ";
+      libMesh::out << "[" << this->processor_id() << "] neighboring_processor_ids = ";
       for (std::set<unsigned>::iterator it = neighboring_processor_ids.begin();
 	   it != neighboring_processor_ids.end();
 	   ++it)
@@ -1318,7 +1319,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
   this->num_elem_cmaps = neighboring_processor_ids.size();
 
   if (_verbose)
-    libMesh::out << "[" << libMesh::processor_id() << "] "
+    libMesh::out << "[" << this->processor_id() << "] "
 		 << "Number of neighboring processor IDs="
 		 << this->num_elem_cmaps
 		 << std::endl;
@@ -1329,7 +1330,7 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
       for (proc_border_elem_sets_iterator it=this->proc_border_elem_sets.begin();
 	   it != this->proc_border_elem_sets.end(); ++it)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] "
+	  libMesh::out << "[" << this->processor_id() << "] "
 		       << "Proc "
 		       << (*it).first << " communicates "
 		       << (*it).second.size() << " elements." << std::endl;
@@ -1344,10 +1345,10 @@ Nemesis_IO_Helper::compute_internal_and_border_elems_and_internal_nodes(const Me
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] num_internal_nodes=" << this->num_internal_nodes << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] num_border_nodes=" << this->num_border_nodes << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] num_border_elems=" << this->num_border_elems << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] num_internal_elems=" << this->num_internal_elems << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] num_internal_nodes=" << this->num_internal_nodes << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] num_border_nodes=" << this->num_border_nodes << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] num_border_elems=" << this->num_border_elems << std::endl;
+      libMesh::out << "[" << this->processor_id() << "] num_internal_elems=" << this->num_internal_elems << std::endl;
     }
 }
 
@@ -1366,7 +1367,7 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
   local_side_boundary_ids = global_side_boundary_ids;
 
   // 2.) Gather boundary side IDs from other processors
-  CommWorld.set_union(global_side_boundary_ids);
+  this->communicator().set_union(global_side_boundary_ids);
 
   // 3.) Now global_side_boundary_ids actually contains a global list of all side boundary IDs
   this->num_side_sets_global = global_side_boundary_ids.size();
@@ -1379,7 +1380,7 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] global_sideset_ids = ";
+      libMesh::out << "[" << this->processor_id() << "] global_sideset_ids = ";
       for (unsigned i=0; i<this->global_sideset_ids.size(); ++i)
 	libMesh::out << this->global_sideset_ids[i] << ", ";
       libMesh::out << std::endl;
@@ -1398,7 +1399,7 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
   std::vector<boundary_id_type>::iterator it_id=bndry_id_list.begin();
   for ( ; it_elem != bndry_elem_list.end(); )
     {
-      if (pmesh.elem( *it_elem )->processor_id() != libMesh::processor_id())
+      if (pmesh.elem( *it_elem )->processor_id() != this->processor_id())
 	{
 	  // Get rid of this elem, but do it efficiently for a vector, by popping
 	  // it off the back.
@@ -1431,18 +1432,18 @@ void Nemesis_IO_Helper::compute_num_global_sidesets(const MeshBase& pmesh)
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] num_global_side_counts = ";
+      libMesh::out << "[" << this->processor_id() << "] num_global_side_counts = ";
       for (unsigned i=0; i<this->num_global_side_counts.size(); ++i)
 	libMesh::out << this->num_global_side_counts[i] << ", ";
       libMesh::out << std::endl;
     }
 
   // Finally sum up the result
-  CommWorld.sum(this->num_global_side_counts);
+  this->communicator().sum(this->num_global_side_counts);
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] num_global_side_counts = ";
+      libMesh::out << "[" << this->processor_id() << "] num_global_side_counts = ";
       for (unsigned i=0; i<this->num_global_side_counts.size(); ++i)
 	libMesh::out << this->num_global_side_counts[i] << ", ";
       libMesh::out << std::endl;
@@ -1467,7 +1468,7 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
   local_node_boundary_ids = global_node_boundary_ids;
 
   // 2.) Gather boundary node IDs from other processors
-  CommWorld.set_union(global_node_boundary_ids);
+  this->communicator().set_union(global_node_boundary_ids);
 
   // 3.) Now global_node_boundary_ids actually contains a global list of all node boundary IDs
   this->num_node_sets_global = global_node_boundary_ids.size();
@@ -1480,12 +1481,12 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] global_nodeset_ids = ";
+      libMesh::out << "[" << this->processor_id() << "] global_nodeset_ids = ";
       for (unsigned i=0; i<global_nodeset_ids.size(); ++i)
 	libMesh::out << global_nodeset_ids[i] << ", ";
       libMesh::out << std::endl;
 
-      libMesh::out << "[" << libMesh::processor_id() << "] local_node_boundary_ids = ";
+      libMesh::out << "[" << this->processor_id() << "] local_node_boundary_ids = ";
       for (std::set<boundary_id_type>::iterator it = local_node_boundary_ids.begin();
 	   it != local_node_boundary_ids.end();
 	   ++it)
@@ -1501,9 +1502,9 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] boundary_node_list.size()="
+      libMesh::out << "[" << this->processor_id() << "] boundary_node_list.size()="
 		   << boundary_node_list.size() << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] (boundary_node_id, boundary_id) = ";
+      libMesh::out << "[" << this->processor_id() << "] (boundary_node_id, boundary_id) = ";
       for (unsigned i=0; i<boundary_node_list.size(); ++i)
 	{
 	  libMesh::out << "(" << boundary_node_list[i] << ", " << boundary_node_boundary_id_list[i] << ") ";
@@ -1526,7 +1527,7 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
   std::vector<boundary_id_type>::iterator it_id=boundary_node_boundary_id_list.begin();
   for ( ; it_node != boundary_node_list.end(); )
     {
-      if (pmesh.node_ptr( *it_node )->processor_id() != libMesh::processor_id())
+      if (pmesh.node_ptr( *it_node )->processor_id() != this->processor_id())
 	{
 	  // Get rid of this node, but do it efficiently for a vector, by popping
 	  // it off the back.
@@ -1552,11 +1553,11 @@ void Nemesis_IO_Helper::compute_num_global_nodesets(const MeshBase& pmesh)
     }
 
   // And finally we can sum them up
-  CommWorld.sum(this->num_global_node_counts);
+  this->communicator().sum(this->num_global_node_counts);
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] num_global_node_counts = ";
+      libMesh::out << "[" << this->processor_id() << "] num_global_node_counts = ";
       for (unsigned i=0; i<num_global_node_counts.size(); ++i)
 	libMesh::out << num_global_node_counts[i] << ", ";
       libMesh::out << std::endl;
@@ -1596,7 +1597,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
       global_subdomain_counts[cur_subdomain]++;
     }
 
-  // We're next going to CommWorld.sum the subdomain counts, so save the local counts
+  // We're next going to this->communicator().sum the subdomain counts, so save the local counts
   this->local_subdomain_counts = global_subdomain_counts;
 
   {
@@ -1605,7 +1606,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
 							       global_subdomain_ids.end());
 
     // 3.) Gather them into an enlarged vector
-    CommWorld.allgather(global_subdomain_ids_vector);
+    this->communicator().allgather(global_subdomain_ids_vector);
 
     // 4.) Insert any new IDs into the set (any duplicates will be dropped)
     global_subdomain_ids.insert(global_subdomain_ids_vector.begin(),
@@ -1618,7 +1619,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
   // Print the number of elements found locally in each subdomain
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] ";
+      libMesh::out << "[" << this->processor_id() << "] ";
       for (std::map<subdomain_id_type, unsigned>::iterator it=global_subdomain_counts.begin();
 	   it != global_subdomain_counts.end();
 	   ++it)
@@ -1630,7 +1631,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
       libMesh::out << std::endl;
     }
 
-  // 6.) CommWorld.sum up the number of elements in each block.  We know the global
+  // 6.) this->communicator().sum up the number of elements in each block.  We know the global
   // subdomain IDs, so pack them into a vector one by one.  Use a vector of int since
   // that is what Nemesis wants
   this->global_elem_blk_cnts.resize(global_subdomain_ids.size());
@@ -1644,11 +1645,11 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
     }
 
   // Sum up subdomain counts from all processors
-  CommWorld.sum(this->global_elem_blk_cnts);
+  this->communicator().sum(this->global_elem_blk_cnts);
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] global_elem_blk_cnts = ";
+      libMesh::out << "[" << this->processor_id() << "] global_elem_blk_cnts = ";
       for (unsigned i=0; i<this->global_elem_blk_cnts.size(); ++i)
 	libMesh::out << this->global_elem_blk_cnts[i] << ", ";
       libMesh::out << std::endl;
@@ -1662,7 +1663,7 @@ void Nemesis_IO_Helper::compute_num_global_elem_blocks(const MeshBase& pmesh)
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] global_elem_blk_ids = ";
+      libMesh::out << "[" << this->processor_id() << "] global_elem_blk_ids = ";
       for (unsigned i=0; i<this->global_elem_blk_ids.size(); ++i)
 	libMesh::out << this->global_elem_blk_ids[i] << ", ";
       libMesh::out << std::endl;
@@ -1711,7 +1712,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase& pmesh)
 
       if (_verbose)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] "
+	  libMesh::out << "[" << this->processor_id() << "] "
 		       << "local_subdomain_counts [" << static_cast<unsigned>(cur_subdomain) << "]= "
 		       << (*it).second
 		       << std::endl;
@@ -1897,11 +1898,11 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase& pmesh)
 
     // We can't be connecting to more processors than exist outside
     // ourselves
-    libmesh_assert_less (static_cast<unsigned>(this->num_node_cmaps), libMesh::n_processors());
+    libmesh_assert_less (static_cast<unsigned>(this->num_node_cmaps), this->n_processors());
 
     if (_verbose)
       {
-	libMesh::out << "[" << libMesh::processor_id()
+	libMesh::out << "[" << this->processor_id()
 		     << "] proc_nodes_touched contains "
 		     << proc_nodes_touched.size()
 		     << " sets of nodes."
@@ -1911,7 +1912,7 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase& pmesh)
 	     it != proc_nodes_touched.end();
 	     ++it)
 	  {
-	    libMesh::out << "[" << libMesh::processor_id()
+	    libMesh::out << "[" << this->processor_id()
 			 << "] proc_nodes_touched[" << (*it).first << "] has "
 			 << (*it).second.size()
 			 << " entries."
@@ -1927,11 +1928,11 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase& pmesh)
 	 ++it)
       {
 	// Don't compute intersections with ourself
-	if ((*it).first == libMesh::processor_id())
+	if ((*it).first == this->processor_id())
 	  continue;
 
 	// Otherwise, compute intersection with other processor and ourself
-	std::set<unsigned>& my_set = proc_nodes_touched[libMesh::processor_id()];
+	std::set<unsigned>& my_set = proc_nodes_touched[this->processor_id()];
 	std::set<unsigned>& other_set = (*it).second;
 	std::set<unsigned>& result_set = this->proc_nodes_touched_intersections[ (*it).first ]; // created if does not exist
 
@@ -1946,7 +1947,7 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase& pmesh)
 	     it != this->proc_nodes_touched_intersections.end();
 	     ++it)
 	  {
-	    libMesh::out << "[" << libMesh::processor_id()
+	    libMesh::out << "[" << this->processor_id()
 			 << "] this->proc_nodes_touched_intersections[" << (*it).first << "] has "
 			 << (*it).second.size()
 			 << " entries."
@@ -1973,7 +1974,7 @@ void Nemesis_IO_Helper::compute_border_node_ids(const MeshBase& pmesh)
 
     if (_verbose)
       {
-	libMesh::out << "[" << libMesh::processor_id()
+	libMesh::out << "[" << this->processor_id()
 		     << "] border_node_ids.size()=" << this->border_node_ids.size()
 		     << std::endl;
       }
@@ -2007,9 +2008,9 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
 
   if (_verbose)
     {
-      libMesh::out << "[" << libMesh::processor_id() << "] boundary_node_list.size()="
+      libMesh::out << "[" << this->processor_id() << "] boundary_node_list.size()="
 		   << boundary_node_list.size() << std::endl;
-      libMesh::out << "[" << libMesh::processor_id() << "] (boundary_node_id, boundary_id) = ";
+      libMesh::out << "[" << this->processor_id() << "] (boundary_node_id, boundary_id) = ";
       for (unsigned i=0; i<boundary_node_list.size(); ++i)
 	{
 	  libMesh::out << "(" << boundary_node_list[i] << ", " << boundary_node_boundary_id_list[i] << ") ";
@@ -2045,7 +2046,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
 	  it != local_node_boundary_id_lists.end();
 	  ++it)
 	{
-	  libMesh::out << "[" << libMesh::processor_id() << "] ID: " << (*it).first << ", ";
+	  libMesh::out << "[" << this->processor_id() << "] ID: " << (*it).first << ", ";
 
 	  std::vector<int>& current_id_set = (*it).second;
 
@@ -2064,7 +2065,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
     {
       if (_verbose)
 	{
-	  libMesh::out << "[" << libMesh::processor_id()
+	  libMesh::out << "[" << this->processor_id()
 		       << "] Writing out Exodus nodeset info for ID: " << global_nodeset_ids[i] << std::endl;
 	}
 
@@ -2086,7 +2087,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
       if (it == local_node_boundary_id_lists.end())
 	{
 	  if (_verbose)
-	    libMesh::out << "[" << libMesh::processor_id()
+	    libMesh::out << "[" << this->processor_id()
 			 << "] No nodeset data for ID: " << global_nodeset_ids[i]
 			 << " on this processor." << std::endl;
 
@@ -2155,7 +2156,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
       const Elem* elem = mesh.elem(bndry_elem_list[i]);
 
       // If element is local, process it
-      if (elem->processor_id() == libMesh::processor_id())
+      if (elem->processor_id() == this->processor_id())
 	{
 	  std::vector<const Elem*> family;
 #ifdef LIBMESH_ENABLE_AMR
@@ -2191,7 +2192,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
 		  libMesh::err << "Error, no Exodus mapping for Elem "
 			       << family[j]->id()
 			       << " on processor "
-			       << libMesh::processor_id()
+			       << this->processor_id()
 			       << std::endl;
 		  libmesh_error();
 		}
@@ -2206,7 +2207,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
     {
       if (_verbose)
 	{
-	  libMesh::out << "[" << libMesh::processor_id()
+	  libMesh::out << "[" << this->processor_id()
 		       << "] Writing out Exodus sideset info for ID: " << global_sideset_ids[i] << std::endl;
 	}
 
@@ -2228,7 +2229,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
       if (it == local_elem_boundary_id_lists.end())
 	{
 	  if (_verbose)
-	    libMesh::out << "[" << libMesh::processor_id()
+	    libMesh::out << "[" << this->processor_id()
 			 << "] No sideset data for ID: " << global_sideset_ids[i]
 			 << " on this processor." << std::endl;
 
@@ -2427,7 +2428,7 @@ std::string Nemesis_IO_Helper::construct_nemesis_filename(const std::string& bas
   // mesh.e.128.099
 
   // Find the length of the highest processor ID
-  file_oss << (libMesh::n_processors());
+  file_oss << (this->n_processors());
   unsigned field_width = file_oss.str().size();
 
   if (_verbose)
@@ -2435,8 +2436,8 @@ std::string Nemesis_IO_Helper::construct_nemesis_filename(const std::string& bas
 
   file_oss.str(""); // reset the string stream
   file_oss << base_filename
-	   << '.' << libMesh::n_processors()
-	   << '.' << std::setfill('0') << std::setw(field_width) << libMesh::processor_id();
+	   << '.' << this->n_processors()
+	   << '.' << std::setfill('0') << std::setw(field_width) << this->processor_id();
 
   // Return the resulting string
   return file_oss.str();

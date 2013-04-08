@@ -37,7 +37,9 @@ namespace libMesh
 namespace Parallel {
 
 template <typename KeyType, typename IdxType>
-BinSorter<KeyType,IdxType>::BinSorter (const std::vector<KeyType>& d) :
+BinSorter<KeyType,IdxType>::BinSorter (const Parallel::Communicator &comm,
+				       const std::vector<KeyType>& d) :
+  ParallelObject(comm),
   data(d)
 {
   // Assume (& libmesh_assert) we are working with a sorted range
@@ -60,7 +62,7 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
 
   // Build a histogram in parallel from our data.
   // Use this to create quasi-uniform bins.
-  Parallel::Histogram<KeyType,IdxType> phist (data);
+  Parallel::Histogram<KeyType,IdxType> phist (this->communicator(), data);
   phist.make_histogram (nbins*50, max, min);
   phist.build_histogram ();
 
@@ -75,7 +77,7 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
     IdxType local_data_size = libmesh_cast_int<IdxType>(data.size());
     IdxType global_data_size = libmesh_cast_int<IdxType>(local_data_size);
 
-    CommWorld.sum(global_data_size);
+    this->communicator().sum(global_data_size);
 
     std::vector<IdxType> target_bin_size (nbins, global_data_size / nbins);
 

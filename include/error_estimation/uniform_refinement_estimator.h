@@ -48,8 +48,10 @@ public:
   /**
    * Constructor.  Sets the most common default parameter values.
    */
-  UniformRefinementEstimator() : number_h_refinements(1),
-                                 number_p_refinements(0)
+  UniformRefinementEstimator(const Parallel::Communicator &comm = libMesh::CommWorld) :
+    ErrorEstimator(comm),
+    number_h_refinements(1),
+    number_p_refinements(0)
   { error_norm = H1; }
 
   /**

@@ -101,7 +101,7 @@ public:
   /**
    *  Constructor. Initializes Petsc data structures
    */
-  PetscLinearSolver ();
+  PetscLinearSolver (const libMesh::Parallel::Communicator &comm /*= libMesh::CommWorld */);
 
   /**
    * Destructor.
@@ -321,12 +321,13 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-  PetscLinearSolver<T>::PetscLinearSolver ():
+  PetscLinearSolver<T>::PetscLinearSolver (const libMesh::Parallel::Communicator &comm):
+    LinearSolver<T>(comm),
     _restrict_solve_to_is(NULL),
     _restrict_solve_to_is_complement(NULL),
     _subset_solve_mode(SUBSET_ZERO)
 {
-  if (libMesh::n_processors() == 1)
+  if (this->n_processors() == 1)
     this->_preconditioner_type = ILU_PRECOND;
   else
     this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
@@ -352,7 +353,7 @@ _restrict_solve_to_is_local_size(void)const
 
   PetscInt s;
   int ierr = ISGetLocalSize(_restrict_solve_to_is,&s);
-  CHKERRABORT(libMesh::COMM_WORLD,ierr);
+  LIBMESH_CHKERRABORT(ierr);
 
   return static_cast<size_t>(s);
 }
@@ -380,7 +381,7 @@ PetscLinearSolver<T>::_create_complement_is (const NumericVector<T> &
 			      vec_in.first_local_index(),
 			      vec_in.last_local_index(),
 			      &_restrict_solve_to_is_complement);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
     }
 #endif
 }

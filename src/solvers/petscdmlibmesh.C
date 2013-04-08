@@ -141,6 +141,8 @@ PetscErrorCode DMLibMeshSetUpName_Private(DM dm)
 #define __FUNCT__ "DMLibMeshSetSystem"
 PetscErrorCode DMLibMeshSetSystem(DM dm, NonlinearImplicitSystem& sys)
 {
+  const Parallel::Communicator &communicator(sys.communicator());
+
   PetscErrorCode ierr;
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
@@ -167,13 +169,13 @@ PetscErrorCode DMLibMeshSetSystem(DM dm, NonlinearImplicitSystem& sys)
   std::set<subdomain_id_type> blocks;
   /* The following effectively is a verbatim copy of MeshBase::n_subdomains(). */
   // This requires an inspection on every processor
-  parallel_only();
+  libmesh_parallel_only(mesh.communicator());
   MeshBase::const_element_iterator       el  = mesh.active_elements_begin();
   const MeshBase::const_element_iterator end = mesh.active_elements_end();
   for (; el!=end; ++el)
     blocks.insert((*el)->subdomain_id());
   // Some subdomains may only live on other processors
-  CommWorld.set_union(blocks);
+  communicator.set_union(blocks);
 
   std::set<subdomain_id_type>::iterator bit = blocks.begin();
   std::set<subdomain_id_type>::iterator bend = blocks.end();
@@ -720,7 +722,7 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   NonlinearImplicitSystem& sys = *_sys;
   PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>* >(sys.solution.get());
   PetscVector<Number>& R_sys = *libmesh_cast_ptr<PetscVector<Number>* >(sys.rhs);
-  PetscVector<Number> X_global(x), R(r);
+  PetscVector<Number> X_global(x, _sys->communicator()), R(r, _sys->communicator());
 
   // Use the systems update() to get a good local version of the parallel solution
   X_global.swap(X_sys);
@@ -796,7 +798,7 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc, MatStruct
   PetscMatrix<Number>  Jac(jac);
   PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
   PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
-  PetscVector<Number>  X_global(x);
+  PetscVector<Number>  X_global(x, sys.communicator());
 
   // Set the dof maps
   the_pc.attach_dof_map(sys.get_dof_map());
@@ -872,8 +874,8 @@ static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
   NonlinearImplicitSystem* _sys;
   ierr = DMLibMeshGetSystem(dm, _sys); CHKERRQ(ierr);
   NonlinearImplicitSystem& sys = *_sys;
-  PetscVector<Number> XL(xl);
-  PetscVector<Number> XU(xu);
+  PetscVector<Number> XL(xl, sys.communicator());
+  PetscVector<Number> XU(xu, sys.communicator());
   PetscFunctionBegin;
 
   ierr = VecSet(xl, SNES_VI_NINF); CHKERRQ(ierr);

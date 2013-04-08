@@ -317,8 +317,8 @@ void System::project_vector (const NumericVector<Number>& old_v,
       projection_list.unique();
 
       new_v.init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
-      new_vector_built = NumericVector<Number>::build();
-      local_old_vector_built = NumericVector<Number>::build();
+      new_vector_built = NumericVector<Number>::build(this->communicator());
+      local_old_vector_built = NumericVector<Number>::build(this->communicator());
       new_vector_ptr = new_vector_built.get();
       local_old_vector = local_old_vector_built.get();
       new_vector_ptr->init(this->n_dofs(), false, SERIAL);
@@ -340,7 +340,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
       new_v.init (this->n_dofs(), this->n_local_dofs(),
                   this->get_dof_map().get_send_list(), false, GHOSTED);
 
-      local_old_vector_built = NumericVector<Number>::build();
+      local_old_vector_built = NumericVector<Number>::build(this->communicator());
       new_vector_ptr = &new_v;
       local_old_vector = local_old_vector_built.get();
       local_old_vector->init(old_v.size(), old_v.local_size(),
@@ -374,7 +374,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
   // Copy the SCALAR dofs from old_vector to new_vector
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
-  if(libMesh::processor_id() == (libMesh::n_processors()-1))
+  if(this->processor_id() == (this->n_processors()-1))
   {
     const DofMap& dof_map = this->get_dof_map();
     for (unsigned int var=0; var<this->n_vars(); var++)
@@ -403,7 +403,7 @@ void System::project_vector (const NumericVector<Number>& old_v,
   // creating a temporary parallel vector to use localize! - RHS
   if (old_v.type() == SERIAL)
     {
-      AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build();
+      AutoPtr<NumericVector<Number> > dist_v = NumericVector<Number>::build(this->communicator());
       dist_v->init(this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
       dist_v->close();
 
@@ -530,7 +530,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
-  if(libMesh::processor_id() == (libMesh::n_processors()-1))
+  if(this->processor_id() == (this->n_processors()-1))
   {
     // We get different scalars as different
     // components from a new-style f functor.
@@ -591,7 +591,7 @@ void System::project_vector (NumericVector<Number>& new_vector,
   // Also, load values into the SCALAR dofs
   // Note: We assume that all SCALAR dofs are on the
   // processor with highest ID
-  if(libMesh::processor_id() == (libMesh::n_processors()-1))
+  if(this->processor_id() == (this->n_processors()-1))
   {
     // FIXME: Do we want to first check for SCALAR vars before building this? [PB]
     FEMContext context( *this );

@@ -105,7 +105,7 @@ template <typename T>
 inline
 TensorShellMatrix<T>::TensorShellMatrix (const NumericVector<T>& v,
 					 const NumericVector<T>& w):
-  ShellMatrix<T>(),
+  ShellMatrix<T>(v.communicator()),
   _v(v),
   _w(w)
 {}

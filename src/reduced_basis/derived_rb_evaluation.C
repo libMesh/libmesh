@@ -29,8 +29,9 @@ namespace libMesh
 {
 
 template <class Base>
-DerivedRBEvaluation<Base>::DerivedRBEvaluation()
+DerivedRBEvaluation<Base>::DerivedRBEvaluation(const Parallel::Communicator &comm)
   :
+  Base(comm),
   residual_type_flag(RESIDUAL_WRT_UBER)
 {}
 
@@ -61,7 +62,7 @@ void DerivedRBEvaluation<Base>::write_out_basis_functions(System& ,
                                                           const std::string& directory_name,
                                                           const bool )
 {
-  if( libMesh::processor_id() == 0 ) // Only write out on proc 0
+  if( this->processor_id() == 0 ) // Only write out on proc 0
   {
     libMesh::out << "Writing out the basis functions..." << std::endl;
 
@@ -141,7 +142,7 @@ void DerivedRBEvaluation<Base>::read_in_basis_functions(System& ,
     file_name << directory_name << "/derived_bf" << i << ".dat";
 
     // On processor zero check to be sure the file exists
-    if (libMesh::processor_id() == 0)
+    if (this->processor_id() == 0)
     {
       int stat_result = stat(file_name.str().c_str(), &stat_info);
 

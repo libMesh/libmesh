@@ -24,6 +24,7 @@
 
 // Local includes
 #include "libmesh/mesh_base.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <iostream>
@@ -48,7 +49,7 @@ namespace exII {
  *
  * @author Johw W. Peterson, 2002.
  */
-class ExodusII_IO_Helper
+  class ExodusII_IO_Helper : public ParallelObject
 {
 public:
 
@@ -59,7 +60,9 @@ public:
    * perform its actions if running on processor zero.  If you initialize this
    * to false, the writing methods will run on all processors instead.
    */
-  ExodusII_IO_Helper(bool v=false, bool run_only_on_proc0=true) :
+  ExodusII_IO_Helper(const ParallelObject &parent,
+		     bool v=false, bool run_only_on_proc0=true) :
+    ParallelObject(parent),
     comp_ws(sizeof(Real)),
     io_ws(0),
     ex_id(0),

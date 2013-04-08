@@ -124,6 +124,8 @@ typedef enum { PETSC_COPY_VALUES, PETSC_OWN_POINTER, PETSC_USE_POINTER} PetscCop
 #  define ISCreateLibMesh(comm,n,idx,mode,is) ISCreateGeneral((comm),(n),(idx),(mode),(is))
 #endif
 
+#define LIBMESH_CHKERRABORT(ierr) CHKERRABORT(this->communicator().get(), ierr);
+
 #else // LIBMESH_HAVE_PETSC
 
 #define PETSC_VERSION_LESS_THAN(major,minor,subminor) 1

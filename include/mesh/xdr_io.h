@@ -25,6 +25,7 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <string>
@@ -48,7 +49,8 @@ class Elem;
 // ------------------------------------------------------------
 // XdrIO class definition
 class XdrIO : public MeshInput<MeshBase>,
-	      public MeshOutput<MeshBase>
+	      public MeshOutput<MeshBase>,
+	      public ParallelObject
 {
 
  public:

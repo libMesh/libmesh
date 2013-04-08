@@ -37,11 +37,12 @@ void DifferentiableQoI::thread_join( std::vector<Number>& qoi, const std::vector
   return;
 }
 
-void DifferentiableQoI::parallel_op( std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
+  void DifferentiableQoI::parallel_op(const Parallel::Communicator &communicator,
+				    std::vector<Number>& sys_qoi, std::vector<Number>& local_qoi,
 				     const QoISet& )
 {
   // Sum everything into local_qoi
-  CommWorld.sum(local_qoi);
+  communicator.sum(local_qoi);
 
   // Now put into system qoi
   sys_qoi = local_qoi;

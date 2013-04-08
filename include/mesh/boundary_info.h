@@ -23,6 +23,7 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/id_types.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -55,7 +56,7 @@ class MeshData;
 
 //------------------------------------------------------
 // BoundaryInfo class definition
-class BoundaryInfo
+  class BoundaryInfo : public ParallelObject
 {
 protected:
   friend class MeshBase;

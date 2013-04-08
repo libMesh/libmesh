@@ -36,7 +36,7 @@ namespace libMesh
 // MEDITIO  members
 void MEDITIO::write (const std::string& fname)
 {
-  if (libMesh::processor_id() == 0)
+  if (this->mesh().processor_id() == 0)
     if (!this->binary())
       this->write_ascii  (fname);
 }
@@ -49,7 +49,7 @@ void MEDITIO::write_nodal_data (const std::string& fname,
 {
   START_LOG("write_nodal_data()", "MEDITIO");
 
-  if (libMesh::processor_id() == 0)
+  if (this->mesh().processor_id() == 0)
     if (!this->binary())
       this->write_ascii  (fname, &soln, &names);
 

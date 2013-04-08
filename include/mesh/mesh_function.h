@@ -26,6 +26,7 @@
 #include "libmesh/vector_value.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/tree_base.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -53,7 +54,8 @@ class PointLocatorBase;
 
 // ------------------------------------------------------------
 // MeshFunction class definition
-class MeshFunction : public FunctionBase<Number>
+class MeshFunction : public FunctionBase<Number>,
+		     public ParallelObject
 {
 public:
 

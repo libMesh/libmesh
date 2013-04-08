@@ -44,7 +44,7 @@ void FroIO::write (const std::string& fname)
   // const qualifier in our constructor a dirty lie
   MeshSerializer serialize(const_cast<MeshBase&>(this->mesh()), !_is_parallel_format);
 
-  if (libMesh::processor_id() == 0)
+  if (this->mesh().processor_id() == 0)
     {
       // Open the output file stream
       std::ofstream out_stream (fname.c_str());

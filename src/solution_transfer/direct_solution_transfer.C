@@ -25,7 +25,8 @@
 
 namespace libMesh {
 
-DirectSolutionTransfer::DirectSolutionTransfer()
+DirectSolutionTransfer::DirectSolutionTransfer(const libMesh::Parallel::Communicator &comm) :
+  SolutionTransfer(comm)
 {}
 
 DirectSolutionTransfer::~DirectSolutionTransfer()

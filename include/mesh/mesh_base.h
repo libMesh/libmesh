@@ -32,6 +32,7 @@
 #include "libmesh/partitioner.h" // AutoPtr needs a real declaration
 #include "libmesh/point_locator_base.h"
 #include "libmesh/variant_filter_iterator.h"
+#include "libmesh/parallel_object.h"
 
 // C++ Includes   -----------------------------------
 #include <cstddef>
@@ -65,7 +66,7 @@ class MeshData;
 
 // ------------------------------------------------------------
 // MeshBase class definition
-class MeshBase
+class MeshBase : public ParallelObject
 {
 public:
 
@@ -74,7 +75,7 @@ public:
    * The mesh dimension can be changed (and may automatically be
    * changed by mesh generation/loading) later.
    */
-  MeshBase (unsigned int dim=1);
+  MeshBase (unsigned int dim=1, const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Copy-constructor.
@@ -184,7 +185,7 @@ public:
    * Returns the number of nodes on the local processor.
    */
   dof_id_type n_local_nodes () const
-  { return this->n_nodes_on_proc (libMesh::processor_id()); }
+  { return this->n_nodes_on_proc (this->processor_id()); }
 
   /**
    * Returns the number of nodes owned by no processor.
@@ -258,7 +259,7 @@ public:
    * Returns the number of elements on the local processor.
    */
   dof_id_type n_local_elem () const
-  { return this->n_elem_on_proc (libMesh::processor_id()); }
+  { return this->n_elem_on_proc (this->processor_id()); }
 
   /**
    * Returns the number of elements owned by no processor.
@@ -275,7 +276,7 @@ public:
    * Returns the number of active elements on the local processor.
    */
   dof_id_type n_active_local_elem () const
-  { return this->n_active_elem_on_proc (libMesh::processor_id()); }
+  { return this->n_active_elem_on_proc (this->processor_id()); }
 
   /**
    * This function returns the number of elements that will be written
@@ -365,7 +366,7 @@ public:
    * Add a new \p Node at \p Point \p p to the end of the vertex array,
    * with processor_id \p procid.
    * Use DofObject::invalid_processor_id (default) to add a node to all
-   * processors, or libMesh::processor_id() to add a node to the local
+   * processors, or this->processor_id() to add a node to the local
    * processor only.
    * If adding a node locally, passing an \p id other than
    * DofObject::invalid_id will set that specific node id.  Only
@@ -477,7 +478,10 @@ public:
   /**
    * Call the default partitioner (currently \p metis_partition()).
    */
-  virtual void partition (const unsigned int n_parts=libMesh::n_processors());
+  virtual void partition (const unsigned int n_parts);
+
+  void partition ()
+  { this->partition(this->n_processors()); }
 
   /**
    * Redistribute elements between processors.  This gets called
@@ -542,19 +546,6 @@ public:
    */
   unsigned int n_partitions () const
   { return _n_parts; }
-
-  /**
-   * @returns the number of processors used in the
-   * current simulation.
-   */
-  processor_id_type n_processors () const
-  { return libmesh_cast_int<processor_id_type>(libMesh::n_processors()); }
-
-  /**
-   * @returns the subdomain id for this processor.
-   */
-  processor_id_type processor_id () const
-  { return libmesh_cast_int<processor_id_type>(libMesh::processor_id()); }
 
   /**
    * @returns a string containing relevant information
@@ -835,7 +826,7 @@ protected:
    * the partitioners, and may not be changed directly by
    * the user.
    * **NOTE** The number of partitions *need not* equal
-   * libMesh::n_processors(), consider for example the case
+   * this->n_processors(), consider for example the case
    * where you simply want to partition a mesh on one
    * processor and view the result in GMV.
    */
