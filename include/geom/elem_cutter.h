@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/point.h"
 #include "libmesh/auto_ptr.h"
+#include "libmesh/parallel.h"
 
 // C++ includes
 #include <vector>
@@ -149,6 +150,8 @@ protected:
   AutoPtr<SerialMesh> _outside_mesh_2D;
   AutoPtr<SerialMesh> _inside_mesh_3D;
   AutoPtr<SerialMesh> _outside_mesh_3D;
+
+  AutoPtr<Parallel::Communicator> _comm_self;
 
   AutoPtr<TriangleInterface>   _triangle_inside;
   AutoPtr<TriangleInterface>   _triangle_outside;
