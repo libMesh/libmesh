@@ -813,6 +813,11 @@ public:
   virtual const_node_iterator pid_nodes_end      (const processor_id_type proc_id) const = 0;
 
 
+  /**
+   * Return a writeable reference to the whole subdomain name map
+   */
+  std::map<subdomain_id_type, std::string>& set_subdomain_name_map ()
+  { return _block_id_to_name; }
 
 protected:
 
