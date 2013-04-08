@@ -39,7 +39,8 @@ namespace libMesh
 
 // Constructor
 template <typename T>
-SparseMatrix<T>::SparseMatrix () :
+SparseMatrix<T>::SparseMatrix (const Parallel::Communicator &comm) :
+  ParallelObject(comm),
   _dof_map(NULL),
   _is_initialized(false)
 {}
@@ -89,7 +90,8 @@ void SparseMatrix<Complex>::print(std::ostream& os, const bool sparse) const
 // Full specialization for Real datatypes
 template <typename T>
 AutoPtr<SparseMatrix<T> >
-SparseMatrix<T>::build(const SolverPackage solver_package)
+SparseMatrix<T>::build(const Parallel::Communicator &comm,
+		       const SolverPackage solver_package)
 {
   // Build the appropriate vector
   switch (solver_package)
@@ -99,7 +101,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<T>);
+	AutoPtr<SparseMatrix<T> > ap(new LaspackMatrix<T>(comm));
 	return ap;
       }
 #endif
@@ -108,7 +110,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<T>);
+	AutoPtr<SparseMatrix<T> > ap(new PetscMatrix<T>(comm));
 	return ap;
       }
 #endif
@@ -117,7 +119,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new EpetraMatrix<T>);
+	AutoPtr<SparseMatrix<T> > ap(new EpetraMatrix<T>(comm));
 	return ap;
       }
 #endif
@@ -126,7 +128,7 @@ SparseMatrix<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
       {
-	AutoPtr<SparseMatrix<T> > ap(new EigenSparseMatrix<T>);
+	AutoPtr<SparseMatrix<T> > ap(new EigenSparseMatrix<T>(comm));
 	return ap;
       }
 #endif
@@ -177,7 +179,7 @@ void SparseMatrix<T>::zero_rows (std::vector<numeric_index_type> &, T)
 template <typename T>
 void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
 {
-  parallel_only();
+  parallel_object_only();
 
   libmesh_assert (this->initialized());
 
@@ -189,7 +191,7 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
 
   // We'll print the matrix from processor 0 to make sure
   // it's serialized properly
-  if (libMesh::processor_id() == 0)
+  if (this->processor_id() == 0)
     {
       libmesh_assert_equal_to (this->_dof_map->first_dof(), 0);
       for (numeric_index_type i=this->_dof_map->first_dof();
@@ -217,11 +219,11 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
       std::vector<numeric_index_type> ibuf, jbuf;
       std::vector<T> cbuf;
       numeric_index_type currenti = this->_dof_map->end_dof();
-      for (processor_id_type p=1; p < libMesh::n_processors(); ++p)
+      for (processor_id_type p=1; p < this->n_processors(); ++p)
         {
-          CommWorld.receive(p, ibuf);
-          CommWorld.receive(p, jbuf);
-          CommWorld.receive(p, cbuf);
+          this->communicator().receive(p, ibuf);
+          this->communicator().receive(p, jbuf);
+          this->communicator().receive(p, cbuf);
           libmesh_assert_equal_to (ibuf.size(), jbuf.size());
           libmesh_assert_equal_to (ibuf.size(), cbuf.size());
 
@@ -295,9 +297,9 @@ void SparseMatrix<T>::print(std::ostream& os, const bool sparse) const
                 }
 	    }
         }
-      CommWorld.send(0,ibuf);
-      CommWorld.send(0,jbuf);
-      CommWorld.send(0,cbuf);
+      this->communicator().send(0,ibuf);
+      this->communicator().send(0,jbuf);
+      this->communicator().send(0,cbuf);
     }
 }
 

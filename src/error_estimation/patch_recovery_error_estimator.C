@@ -211,7 +211,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 
       // We are going to build a patch containing the current element
       // and its neighbors on the local processor
-      Patch patch;
+      Patch patch(mesh.processor_id());
 
       // If we are reusing patches and the current element
       // already has an estimate associated with it, move on the
@@ -610,7 +610,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
 	  Patch::const_iterator patch_re_end;
 
 	  // Declare a new patch
-	  Patch patch_re;
+	  Patch patch_re(mesh.processor_id());
 
 	  if(this->error_estimator.patch_reuse)
 	    {
@@ -898,7 +898,7 @@ void PatchRecoveryErrorEstimator::EstimateError::operator()(const ConstElemRange
       Patch::const_iterator patch_re_end;
 
       // Build a new patch if necessary
-      Patch current_elem_patch;
+      Patch current_elem_patch(mesh.processor_id());
 
       if(this->error_estimator.patch_reuse)
         {

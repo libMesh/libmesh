@@ -30,6 +30,8 @@
 #include "libmesh/enum_eigen_solver_type.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/libmesh.h"
+#include "libmesh/parallel_object.h"
+
 
 // C++ includes
 
@@ -49,14 +51,15 @@ template <typename T> class NumericVector;
  */
 
 template <typename T>
-class EigenSolver : public ReferenceCountedObject<EigenSolver<T> >
+class EigenSolver : public ReferenceCountedObject<EigenSolver<T> >,
+                    public ParallelObject
 {
 public:
 
   /**
    *  Constructor. Initializes Solver data structures
    */
-  EigenSolver ();
+  EigenSolver (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
 
   /**
    * Destructor.
@@ -67,8 +70,8 @@ public:
    * Builds an \p EigenSolver using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<EigenSolver<T> > build(const SolverPackage solver_package =
-					SLEPC_SOLVERS);
+  static AutoPtr<EigenSolver<T> > build(const Parallel::Communicator &comm /* = libMesh::CommWorld */,
+					const SolverPackage solver_package = SLEPC_SOLVERS);
 
   /**
    * @returns true if the data structures are
@@ -239,8 +242,8 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-EigenSolver<T>::EigenSolver () :
-
+EigenSolver<T>::EigenSolver (const Parallel::Communicator &comm) :
+  ParallelObject(comm),
   _eigen_solver_type    (ARNOLDI),
   _eigen_problem_type   (NHEP),
   _position_of_spectrum (LARGEST_MAGNITUDE),

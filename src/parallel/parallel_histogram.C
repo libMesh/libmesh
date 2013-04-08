@@ -34,7 +34,9 @@ namespace libMesh
 
 namespace Parallel {
 template <typename KeyType, typename IdxType>
-Histogram<KeyType,IdxType>::Histogram (const std::vector<KeyType>& d) :
+Histogram<KeyType,IdxType>::Histogram (const Parallel::Communicator &comm,
+				       const std::vector<KeyType>& d) :
+  ParallelObject(comm),
   data(d)
 {
   libmesh_assert (Parallel::Utils::is_sorted (data));
@@ -97,7 +99,7 @@ void Histogram<KeyType,IdxType>::build_histogram ()
 
   // Add all the local histograms to get the global histogram
   hist = local_hist;
-  CommWorld.sum(hist);
+  this->communicator().sum(hist);
 
   // All done!
 }

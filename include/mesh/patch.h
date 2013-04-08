@@ -22,6 +22,7 @@
 #define LIBMESH_PATCH_H
 
 // Local includes
+#include "libmesh/id_types.h"
 
 // C++ includes
 #include <vector>
@@ -48,9 +49,11 @@ class Patch : public std::set<const Elem *>
 public:
 
   /**
-   * Constructor.
+   * Constructor. Requires the processor ID to be interpreted as "local".
    */
-  Patch() {}
+  Patch(const processor_id_type my_procid = static_cast<processor_id_type>(-1)) :
+    _my_procid(my_procid)
+  {}
 
   /**
    * Destructor.
@@ -124,6 +127,8 @@ protected:
    * touch the current patch at any point
    */
   void find_point_neighbors(std::set<const Elem *> &neighbor_set);
+
+  const processor_id_type _my_procid;
 };
 
 } // namespace libMesh

@@ -16,6 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // LibMesh includes
+#include "libmesh/equation_systems.h"
 #include "libmesh/continuation_system.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/time_solver.h"
@@ -47,7 +48,7 @@ ContinuationSystem::ContinuationSystem (EquationSystems& es,
     newton_stepgrowth_aggressiveness(1.),
     newton_progress_check(true),
     rhs_mode(Residual),
-    linear_solver(LinearSolver<Number>::build()),
+    linear_solver(LinearSolver<Number>::build(es.communicator())),
     tangent_initialized(false),
     newton_solver(NULL),
     dlambda_ds(0.707),

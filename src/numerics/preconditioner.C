@@ -35,7 +35,8 @@ namespace libMesh
 // Preconditioner members
 template <typename T>
 Preconditioner<T> *
-Preconditioner<T>::build(const SolverPackage solver_package)
+Preconditioner<T>::build(const libMesh::Parallel::Communicator &comm,
+			 const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
@@ -45,7 +46,7 @@ Preconditioner<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<Preconditioner<T> > ap(new LaspackPreconditioner<T>);
+	AutoPtr<Preconditioner<T> > ap(new LaspackPreconditioner<T>(comm));
 	return ap;
       }
 #endif
@@ -54,18 +55,18 @@ Preconditioner<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	return new PetscPreconditioner<T>();
+	return new PetscPreconditioner<T>(comm);
       }
 #endif
 
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
-      return new TrilinosPreconditioner<T>();
+      return new TrilinosPreconditioner<T>(comm);
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return new EigenPreconditioner<T>();
+      return new EigenPreconditioner<T>(comm);
 #endif
 
     default:

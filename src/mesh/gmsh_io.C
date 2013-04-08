@@ -324,7 +324,7 @@ void GmshIO::read_mesh(std::istream& in)
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
   // broadcast later
-  libmesh_assert_equal_to (libMesh::processor_id(), 0);
+  libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().processor_id(), 0);
 
   libmesh_assert(in.good());
 
@@ -617,7 +617,7 @@ void GmshIO::read_mesh(std::istream& in)
 
 void GmshIO::write (const std::string& name)
 {
-  if (libMesh::processor_id() == 0)
+  if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
     {
       // Open the output file stream
       std::ofstream out_stream (name.c_str());
@@ -638,7 +638,7 @@ void GmshIO::write_nodal_data (const std::string& fname,
   START_LOG("write_nodal_data()", "GmshIO");
 
   //this->_binary = true;
-  if (libMesh::processor_id() == 0)
+  if (MeshOutput<MeshBase>::mesh().processor_id() == 0)
     this->write_post  (fname, &soln, &names);
 
   STOP_LOG("write_nodal_data()", "GmshIO");
@@ -736,7 +736,7 @@ void GmshIO::write_post (const std::string& fname,
 {
 
   // Should only do this on processor 0!
-  libmesh_assert_equal_to (libMesh::processor_id(), 0);
+  libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().processor_id(), 0);
 
   // Create an output stream
   std::ofstream out_stream(fname.c_str());

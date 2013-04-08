@@ -29,6 +29,9 @@
 #include <Teuchos_RCP.hpp>
 #include <Teuchos_GlobalMPISession.hpp>
 #include <Teuchos_Ptr.hpp>
+#include <Teuchos_DefaultMpiComm.hpp>
+#include <Teuchos_OpaqueWrapper.hpp>
+
 
 // DTK Includes
 #include <DTK_MeshManager.hpp>
@@ -41,9 +44,11 @@
 
 namespace libMesh {
 
-DTKSolutionTransfer::DTKSolutionTransfer()
+DTKSolutionTransfer::DTKSolutionTransfer(const libMesh::Parallel::Communicator &comm) :
+  SolutionTransfer(comm)
 {
-  comm_default = Teuchos::DefaultComm<int>::getComm();
+  //comm_default = Teuchos::DefaultComm<int>::getComm();
+  comm_default = Teuchos::rcp(new Teuchos::MpiComm<int>(Teuchos::rcp(new Teuchos::OpaqueWrapper<MPI_Comm>(comm.get()))));
 }
 
 DTKSolutionTransfer::~DTKSolutionTransfer()

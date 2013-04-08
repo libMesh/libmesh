@@ -22,6 +22,7 @@
 
 #include "libmesh/libmesh_common.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/parallel_object.h"
 
 #include <string>
 #include <map>
@@ -31,10 +32,14 @@ namespace libMesh {
 /**
  * Base class for objects that allow transfering variable values between different systems with different meshes.
  */
-class SolutionTransfer
+class SolutionTransfer : public ParallelObject
 {
 public:
-  SolutionTransfer() {};
+
+  SolutionTransfer(const libMesh::Parallel::Communicator &comm /* = libMesh::CommWorld */ ) :
+    ParallelObject(comm)
+  {};
+
   virtual ~SolutionTransfer() {};
 
   /**

@@ -534,11 +534,14 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 				   const std::string& unknown_name,
 				   std::vector<Real>& error_vals)
 {
-  // This function must be run on all processors at once
-  parallel_only();
-
   // Make sure we aren't "overconfigured"
   libmesh_assert (!(_exact_values.size() && _equation_systems_fine));
+
+  // We need a commmunicator.
+  const Parallel::Communicator &communicator (_equation_systems.communicator());
+
+  // This function must be run on all processors at once
+  libmesh_parallel_only(communicator);
 
   // Get a reference to the system whose error is being computed.
   // If we have a fine grid, however, we'll integrate on that instead
@@ -556,7 +559,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
   // Prepare a global solution and a MeshFunction of the coarse system if we need one
   AutoPtr<MeshFunction> coarse_values;
-  AutoPtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build();
+  AutoPtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build(_equation_systems.communicator());
   if (_equation_systems_fine)
     {
       const System& comparison_system
@@ -859,8 +862,8 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   // Add up the error values on all processors, except for the L-infty
   // norm, for which the maximum is computed.
   Real l_infty_norm = error_vals[4];
-  CommWorld.max(l_infty_norm);
-  CommWorld.sum(error_vals);
+  communicator.max(l_infty_norm);
+  communicator.sum(error_vals);
   error_vals[4] = l_infty_norm;
 }
 

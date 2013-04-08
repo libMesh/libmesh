@@ -24,6 +24,7 @@
 #include "libmesh/auto_ptr.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/reference_counted_object.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <vector>
@@ -51,7 +52,8 @@ class ParameterVector;
 
 // ------------------------------------------------------------
 // Solver class definition
-class DiffSolver : public ReferenceCountedObject<DiffSolver>
+class DiffSolver : public ReferenceCountedObject<DiffSolver>,
+		   public ParallelObject
 {
 public:
   /**

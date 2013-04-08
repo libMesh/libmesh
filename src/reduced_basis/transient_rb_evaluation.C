@@ -36,7 +36,8 @@
 namespace libMesh
 {
 
-TransientRBEvaluation::TransientRBEvaluation ()
+TransientRBEvaluation::TransientRBEvaluation (const Parallel::Communicator &comm) :
+    RBEvaluation(comm)
 {
   // Indicate that we need to compute the RB
   // inner product matrix in this case
@@ -735,7 +736,7 @@ void TransientRBEvaluation::write_offline_data_to_files(const std::string& direc
   // The suffix to use for all the files that are written out
   const std::string suffix = write_binary_data ? ".xdr" : ".dat";
 
-  if(libMesh::processor_id() == 0)
+  if(this->processor_id() == 0)
   {
     std::ostringstream file_name;
 

@@ -436,7 +436,7 @@ std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_s
 
   unsigned int global_index = first_index + new_C_J_index;
   std::pair<unsigned int,Real> error_pair(global_index, max_SCM_error);
-  get_global_max_error_pair(error_pair);
+  get_global_max_error_pair(this->communicator(),error_pair);
 
   STOP_LOG("compute_SCM_bounds_on_training_set()", "RBSCMConstruction");
 

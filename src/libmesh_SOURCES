@@ -12,6 +12,7 @@ libmesh_SOURCES =  \
         src/base/print_trace.C \
         src/base/reference_counted_object.C \
         src/base/reference_counter.C \
+        src/base/sparsity_pattern.C \
         src/error_estimation/adjoint_refinement_estimator.C \
         src/error_estimation/adjoint_residual_error_estimator.C \
         src/error_estimation/discontinuity_measure.C \

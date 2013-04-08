@@ -388,7 +388,7 @@ void UnstructuredMesh::all_first_order ()
 void UnstructuredMesh::all_second_order (const bool full_ordered)
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   /*
    * when the mesh is not prepared,
@@ -417,7 +417,7 @@ void UnstructuredMesh::all_second_order (const bool full_ordered)
   if (this->elements_begin() != this->elements_end() &&
       (*(this->elements_begin()))->default_order() != FIRST)
     already_second_order = true;
-  CommWorld.max(already_second_order);
+  this->communicator().max(already_second_order);
   if (already_second_order)
     return;
 

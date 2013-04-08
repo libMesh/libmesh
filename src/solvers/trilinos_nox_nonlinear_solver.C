@@ -92,7 +92,7 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
 
   NonlinearImplicitSystem &sys = _solver->system();
 
-  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x)), R(r);
+  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.communicator()), R(r, sys.communicator());
   EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
   EpetraVector<Number>& R_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.rhs);
 
@@ -149,7 +149,7 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
 
   EpetraMatrix<Number> Jac(&dynamic_cast<Epetra_FECrsMatrix &>(jac));
   EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
-  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x));
+  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.communicator());
 
   // Set the dof maps
   Jac.attach_dof_map(sys.get_dof_map());
@@ -209,7 +209,7 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
 
   EpetraMatrix<Number> Jac(dynamic_cast<Epetra_FECrsMatrix *>(tpc.mat()));
   EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
-  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x));
+  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.communicator());
 
   // Set the dof maps
   Jac.attach_dof_map(sys.get_dof_map());
@@ -260,15 +260,6 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
 template <typename T>
 void NoxNonlinearSolver<T>::clear ()
 {
-//  if (this->initialized())
-//     {
-//       this->_is_initialized = false;
-
-//       int ierr=0;
-
-//       ierr = LibMeshSNESDestroy(_snes);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
 }
 
 template <typename T>

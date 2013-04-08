@@ -34,6 +34,7 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/variable.h"
 #include "libmesh/fem_function_base.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -75,7 +76,8 @@ class SystemSubset;
 
 // ------------------------------------------------------------
 // System class definition
-class System : public ReferenceCountedObject<System>
+class System : public ReferenceCountedObject<System>,
+	       public ParallelObject
 {
 public:
 

@@ -69,32 +69,45 @@ class Partitioner
 
 
   /**
-   * Partition the \p MeshBase into \p n parts.  If the
-   * user does not specify a number of pieces into which the
-   * mesh should be partitioned, then the default behavior
-   * of the partitioner is to partition according to the number
-   * of processors defined in libMesh::n_processors().
+   * Partition the \p MeshBase into \p n parts.
    * The partitioner currently does not modify the subdomain_id
    * of each element.  This number is reserved for things like
    * material properties, etc.
    */
   void partition (MeshBase& mesh,
-		  const unsigned int n=libMesh::n_processors());
+		  const unsigned int n);
+
+  /**
+   * Partition the \p MeshBase into \p mesh.n_processors() parts.
+   * The partitioner currently does not modify the subdomain_id
+   * of each element.  This number is reserved for things like
+   * material properties, etc.
+   */
+  void partition (MeshBase& mesh);
 
   /**
    * Repartitions the \p MeshBase into \p n parts.  This
    * is required since some partitoning algorithms can repartition
    * more efficiently than computing a new partitioning from scratch.
-   * The default behavior is to simply call this->partition(n)
-  */
+   * The default behavior is to simply call this->partition(mesh,n)
+   */
   void repartition (MeshBase& mesh,
-		    const unsigned int n=libMesh::n_processors());
+		    const unsigned int n);
+
+  /**
+   * Repartitions the \p MeshBase into \p mesh.n_processors() parts.  This
+   * is required since some partitoning algorithms can repartition
+   * more efficiently than computing a new partitioning from scratch.
+   */
+  void repartition (MeshBase& mesh);
 
   /**
    * This function
    */
+  static void partition_unpartitioned_elements (MeshBase &mesh);
+
   static void partition_unpartitioned_elements (MeshBase &mesh,
-						const unsigned int n=libMesh::n_processors());
+						const unsigned int n);
 
   /**
    * This function is called after partitioning to set the processor IDs

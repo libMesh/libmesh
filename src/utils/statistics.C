@@ -282,7 +282,8 @@ void StatisticsVector<T>::histogram(std::vector<dof_id_type>& bin_members,
 
 
 template <typename T>
-void StatisticsVector<T>::plot_histogram(const std::string& filename,
+void StatisticsVector<T>::plot_histogram(const processor_id_type my_procid,
+					 const std::string& filename,
 					 unsigned int n_bins)
 {
   // First generate the histogram with the desired number of bins
@@ -295,7 +296,7 @@ void StatisticsVector<T>::plot_histogram(const std::string& filename,
   T bin_size = (max - min) / static_cast<T>(n_bins);
 
   // On processor 0: Write histogram to file
-  if (libMesh::processor_id()==0)
+  if (my_procid==0)
     {
       std::ofstream out_stream (filename.c_str());
 

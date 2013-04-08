@@ -43,7 +43,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // MeshBase class member functions
-MeshBase::MeshBase (unsigned int d) :
+MeshBase::MeshBase (unsigned int d,
+		    const Parallel::Communicator &comm) :
+  ParallelObject (comm),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
   _dim           (d),
@@ -61,6 +63,7 @@ MeshBase::MeshBase (unsigned int d) :
 
 
 MeshBase::MeshBase (const MeshBase& other_mesh) :
+  ParallelObject (other_mesh),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (other_mesh._n_parts),
   _dim           (other_mesh._dim),
@@ -89,18 +92,18 @@ MeshBase::~MeshBase()
 
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 {
-  parallel_only();
+  parallel_object_only();
 
   // A distributed mesh may have processors with no elements (or
   // processors with no elements of higher dimension, if we ever
   // support mixed-dimension meshes), but we want consistent
   // mesh_dimension anyways.
-  libmesh_assert(CommWorld.verify(this->is_serial()));
+  libmesh_assert(this->communicator().verify(this->is_serial()));
 
   if (!this->is_serial())
     {
       unsigned int dim = this->mesh_dimension();
-      CommWorld.max(dim);
+      this->communicator().max(dim);
       this->set_mesh_dimension(dim);
     }
 
@@ -171,7 +174,7 @@ void MeshBase::clear ()
 void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
 {
   // This requires an inspection on every processor
-  parallel_only();
+  parallel_object_only();
 
   ids.clear();
 
@@ -182,7 +185,7 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
     ids.insert((*el)->subdomain_id());
 
   // Some subdomains may only live on other processors
-  CommWorld.set_union(ids);
+  this->communicator().set_union(ids);
 }
 
 
@@ -190,7 +193,7 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
 subdomain_id_type MeshBase::n_subdomains() const
 {
   // This requires an inspection on every processor
-  parallel_only();
+  parallel_object_only();
 
   std::set<subdomain_id_type> ids;
 
@@ -206,8 +209,8 @@ dof_id_type MeshBase::n_nodes_on_proc (const processor_id_type proc_id) const
 {
   // We're either counting a processor's nodes or unpartitioned
   // nodes
-  libmesh_assert (proc_id < libMesh::n_processors() ||
-	  proc_id == DofObject::invalid_processor_id);
+  libmesh_assert (proc_id < this->n_processors() ||
+		  proc_id == DofObject::invalid_processor_id);
 
   return static_cast<dof_id_type>(std::distance (this->pid_nodes_begin(proc_id),
 						 this->pid_nodes_end  (proc_id)));
@@ -219,8 +222,8 @@ dof_id_type MeshBase::n_elem_on_proc (const processor_id_type proc_id) const
 {
   // We're either counting a processor's elements or unpartitioned
   // elements
-  libmesh_assert (proc_id < libMesh::n_processors() ||
-	  proc_id == DofObject::invalid_processor_id);
+  libmesh_assert (proc_id < this->n_processors() ||
+		  proc_id == DofObject::invalid_processor_id);
 
   return static_cast<dof_id_type>(std::distance (this->pid_elements_begin(proc_id),
 						 this->pid_elements_end  (proc_id)));
@@ -230,7 +233,7 @@ dof_id_type MeshBase::n_elem_on_proc (const processor_id_type proc_id) const
 
 dof_id_type MeshBase::n_active_elem_on_proc (const processor_id_type proc_id) const
 {
-  libmesh_assert_less (proc_id, libMesh::n_processors());
+  libmesh_assert_less (proc_id, this->n_processors());
   return static_cast<dof_id_type>(std::distance (this->active_pid_elements_begin(proc_id),
 						 this->active_pid_elements_end  (proc_id)));
 }
@@ -283,7 +286,7 @@ std::string MeshBase::get_info() const
 #endif
       << "  n_subdomains()="      << this->n_subdomains()      << '\n'
       << "  n_partitions()="      << this->n_partitions()      << '\n'
-      << "  n_processors()="      << libMesh::n_processors()   << '\n'
+      << "  n_processors()="      << this->n_processors()      << '\n'
       << "  n_threads()="         << libMesh::n_threads()      << '\n'
       << "  processor_id()="      << this->processor_id()      << '\n';
 
@@ -338,7 +341,7 @@ unsigned int MeshBase::recalculate_n_partitions()
   // The number of partitions is one more than the max processor ID.
   _n_parts = max_proc_id+1;
 
-  CommWorld.max(_n_parts);
+  this->communicator().max(_n_parts);
 
   return _n_parts;
 }

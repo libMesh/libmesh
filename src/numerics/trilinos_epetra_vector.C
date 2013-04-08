@@ -58,7 +58,7 @@ T EpetraVector<T>::sum () const
   for (unsigned int i=0; i<nl; i++)
     sum += values[i];
 
-  CommWorld.sum<T>(sum);
+  this->communicator().sum(sum);
 
   return sum;
 }
@@ -504,7 +504,7 @@ void EpetraVector<T>::localize (const unsigned int first_local_idx,
 
   // Build a parallel vector, initialize it with the local
   // parts of (*this)
-  EpetraVector<T> parallel_vec;
+  EpetraVector<T> parallel_vec(PARALLEL, this->communicator());
 
   parallel_vec.init (my_size, my_local_size, true, PARALLEL);
 
@@ -524,7 +524,7 @@ template <typename T>
 void EpetraVector<T>::localize (std::vector<T>& v_local) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   const unsigned int n  = this->size();
   const unsigned int nl = this->local_size();
@@ -538,7 +538,7 @@ void EpetraVector<T>::localize (std::vector<T>& v_local) const
   for (unsigned int i=0; i<nl; i++)
     v_local.push_back((*this->_vec)[i]);
 
-  CommWorld.allgather (v_local);
+  this->communicator().allgather (v_local);
 }
 
 
@@ -548,12 +548,12 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
 				       const processor_id_type pid) const
 {
   // This function must be run on all processors at once
-  parallel_only();
+  parallel_object_only();
 
   const unsigned int n  = this->size();
   const unsigned int nl = this->local_size();
 
-  libmesh_assert_less (pid, libMesh::n_processors());
+  libmesh_assert_less (pid, this->n_processors());
   libmesh_assert(this->_vec);
 
   v_local.clear();
@@ -564,7 +564,7 @@ void EpetraVector<T>::localize_to_one (std::vector<T>&  v_local,
   for (unsigned int i=0; i<nl; i++)
     v_local.push_back((*this->_vec)[i]);
 
-  CommWorld.gather (pid, v_local);
+  this->communicator().gather (pid, v_local);
 }
 
 
@@ -573,56 +573,6 @@ template <typename T>
 void EpetraVector<T>::print_matlab (const std::string /* name */) const
 {
   libmesh_not_implemented();
-
-//   libmesh_assert (this->initialized());
-//   libmesh_assert (this->closed());
-
-//   int ierr=0;
-//   EpetraViewer epetra_viewer;
-
-
-//   ierr = EpetraViewerCreate (libMesh::COMM_WORLD,
-// 			    &epetra_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   /**
-//    * Create an ASCII file containing the matrix
-//    * if a filename was provided.
-//    */
-//   if (name != "NULL")
-//     {
-//       ierr = EpetraViewerASCIIOpen( libMesh::COMM_WORLD,
-// 				   name.c_str(),
-// 				   &epetra_viewer);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = EpetraViewerSetFormat (epetra_viewer,
-// 				   EPETRA_VIEWER_ASCII_MATLAB);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = VecView (_vec, epetra_viewer);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
-
-//   /**
-//    * Otherwise the matrix will be dumped to the screen.
-//    */
-//   else
-//     {
-//       ierr = EpetraViewerSetFormat (EPETRA_VIEWER_STDOUT_WORLD,
-// 				   EPETRA_VIEWER_ASCII_MATLAB);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = VecView (_vec, EPETRA_VIEWER_STDOUT_WORLD);
-//              CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//     }
-
-
-//   /**
-//    * Destroy the viewer.
-//    */
-//   ierr = EpetraViewerDestroy (epetra_viewer);
-//          CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 
@@ -634,92 +584,6 @@ void EpetraVector<T>::create_subvector(NumericVector<T>& /* subvector */,
 				       const std::vector<unsigned int>& /* rows */) const
 {
   libmesh_not_implemented();
-
-//   // Epetra data structures
-//   IS parent_is, subvector_is;
-//   VecScatter scatter;
-//   int ierr = 0;
-
-//   // Make sure the passed int subvector is really a EpetraVector
-//   EpetraVector<T>* epetra_subvector = libmesh_cast_ptr<EpetraVector<T>*>(&subvector);
-//   libmesh_assert(epetra_subvector);
-
-//   // If the epetra_subvector is already initialized, we assume that the
-//   // user has already allocated the *correct* amount of space for it.
-//   // If not, we use the appropriate Epetra routines to initialize it.
-//   if (!epetra_subvector->initialized())
-//     {
-//       // Initialize the epetra_subvector to have enough space to hold
-//       // the entries which will be scattered into it.  Note: such an
-//       // init() function (where we let Epetra decide the number of local
-//       // entries) is not currently offered by the EpetraVector
-//       // class.  Should we differentiate here between sequential and
-//       // parallel vector creation based on libMesh::n_processors() ?
-//       ierr = VecCreateMPI(libMesh::COMM_WORLD,
-// 			  EPETRA_DECIDE,          // n_local
-// 			  rows.size(),           // n_global
-// 			  &(epetra_subvector->_vec)); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       ierr = VecSetFromOptions (epetra_subvector->_vec); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//       // Mark the subvector as initialized
-//       epetra_subvector->_is_initialized = true;
-//     }
-
-//   // Use iota to fill an array with entries [0,1,2,3,4,...rows.size()]
-//   std::vector<int> idx(rows.size());
-//   Utility::iota (idx.begin(), idx.end(), 0);
-
-//   // Construct index sets
-//   ierr = ISCreateGeneral(libMesh::COMM_WORLD,
-// 			 rows.size(),
-// 			 (int*) &rows[0],
-// 			 &parent_is); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   ierr = ISCreateGeneral(libMesh::COMM_WORLD,
-// 			 rows.size(),
-// 			 (int*) &idx[0],
-// 			 &subvector_is); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   // Construct the scatter object
-//   ierr = VecScatterCreate(this->_vec,
-// 			  parent_is,
-// 			  epetra_subvector->_vec,
-// 			  subvector_is,
-// 			  &scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   // Actually perform the scatter
-// #if EPETRA_VERSION_LESS_THAN(2,3,3)
-//   ierr = VecScatterBegin(this->_vec,
-// 			 epetra_subvector->_vec,
-// 			 INSERT_VALUES,
-// 			 SCATTER_FORWARD,
-// 			 scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   ierr = VecScatterEnd(this->_vec,
-// 		       epetra_subvector->_vec,
-// 		       INSERT_VALUES,
-// 		       SCATTER_FORWARD,
-// 		       scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-// #else
-//   // API argument order change in Epetra 2.3.3
-//   ierr = VecScatterBegin(scatter,
-// 			 this->_vec,
-// 			 epetra_subvector->_vec,
-// 			 INSERT_VALUES,
-// 			 SCATTER_FORWARD); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-
-//   ierr = VecScatterEnd(scatter,
-// 		       this->_vec,
-// 		       epetra_subvector->_vec,
-// 		       INSERT_VALUES,
-// 		       SCATTER_FORWARD); CHKERRABORT(libMesh::COMM_WORLD,ierr);
-// #endif
-
-//   // Clean up
-//   ierr = LibMeshISDestroy(parent_is);       CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//   ierr = LibMeshISDestroy(subvector_is);    CHKERRABORT(libMesh::COMM_WORLD,ierr);
-//   ierr = LibMeshVecScatterDestroy(scatter); CHKERRABORT(libMesh::COMM_WORLD,ierr);
 }
 
 

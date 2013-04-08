@@ -94,7 +94,7 @@ extern "C"
     {
       int n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      CHKERRABORT(solver->communicator().get(),ierr);
       solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
     }
 
@@ -102,7 +102,7 @@ extern "C"
 
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscVector<Number>& R_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
-    PetscVector<Number> X_global(x), R(r);
+    PetscVector<Number> X_global(x, sys.communicator()), R(r, sys.communicator());
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
@@ -170,7 +170,7 @@ extern "C"
     {
       int n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      CHKERRABORT(solver->communicator().get(),ierr);
       solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
     }
 
@@ -180,7 +180,7 @@ extern "C"
     PetscMatrix<Number> Jac(*jac);
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
-    PetscVector<Number> X_global(x);
+    PetscVector<Number> X_global(x, sys.communicator());
 
     // Set the dof maps
     PC.attach_dof_map(sys.get_dof_map());
@@ -267,7 +267,7 @@ void PetscNonlinearSolver<T>::clear ()
       int ierr=0;
 
       ierr = LibMeshSNESDestroy(&_snes);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 
       // Reset the nonlinear iteration counter.  This information is only relevant
       // *during* the solve().  After the solve is completed it should return to
@@ -292,13 +292,13 @@ void PetscNonlinearSolver<T>::init ()
       // At least until Petsc 2.1.1, the SNESCreate had a different calling syntax.
       // The second argument was of type SNESProblemType, and could have a value of
       // either SNES_NONLINEAR_EQUATIONS or SNES_UNCONSTRAINED_MINIMIZATION.
-      ierr = SNESCreate(libMesh::COMM_WORLD, SNES_NONLINEAR_EQUATIONS, &_snes);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = SNESCreate(this->communicator().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
+             LIBMESH_CHKERRABORT(ierr);
 
 #else
 
-      ierr = SNESCreate(libMesh::COMM_WORLD,&_snes);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = SNESCreate(this->communicator().get(),&_snes);
+             LIBMESH_CHKERRABORT(ierr);
 
 #endif
 
@@ -311,23 +311,23 @@ void PetscNonlinearSolver<T>::init ()
       ierr = SNESMonitorSet (_snes, __libmesh_petsc_snes_monitor,
 			     this, PETSC_NULL);
 #endif
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
 #if PETSC_VERSION_LESS_THAN(3,1,0)
       // Cannot call SNESSetOptions before SNESSetFunction when using
       // any matrix free options with PETSc 3.1.0+
       ierr = SNESSetFromOptions(_snes);
-             CHKERRABORT(libMesh::COMM_WORLD,ierr);
+             LIBMESH_CHKERRABORT(ierr);
 #endif
 
       if(this->_preconditioner)
       {
         KSP ksp;
         ierr = SNESGetKSP (_snes, &ksp);
-               CHKERRABORT(libMesh::COMM_WORLD,ierr);
+               LIBMESH_CHKERRABORT(ierr);
         PC pc;
         ierr = KSPGetPC(ksp,&pc);
-               CHKERRABORT(libMesh::COMM_WORLD,ierr);
+               LIBMESH_CHKERRABORT(ierr);
 
         this->_preconditioner->init();
 
@@ -363,7 +363,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
       PetscInt nmodes = sp.size();
 
       ierr = PetscMalloc2(nmodes,Vec,&modes,nmodes,PetscScalar,&dots);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       for (PetscInt i=0; i<nmodes; ++i)
         {
@@ -371,43 +371,43 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
           Vec v = pv->vec();
 
           ierr = VecDuplicate(v, modes+i);
-          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          LIBMESH_CHKERRABORT(ierr);
 
           ierr = VecCopy(v,modes[i]);
-          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          LIBMESH_CHKERRABORT(ierr);
         }
 
       // Normalize.
       ierr = VecNormalize(modes[0],PETSC_NULL);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
 
       for (PetscInt i=1; i<nmodes; i++)
         {
           // Orthonormalize vec[i] against vec[0:i-1]
           ierr = VecMDot(modes[i],i,modes,dots);
-          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          LIBMESH_CHKERRABORT(ierr);
 
           for (PetscInt j=0; j<i; j++)
             dots[j] *= -1.;
 
           ierr = VecMAXPY(modes[i],i,dots,modes);
-          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          LIBMESH_CHKERRABORT(ierr);
 
           ierr = VecNormalize(modes[i],PETSC_NULL);
-          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          LIBMESH_CHKERRABORT(ierr);
         }
 
-      ierr = MatNullSpaceCreate(libMesh::COMM_WORLD, PETSC_FALSE, nmodes, modes, msp);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      ierr = MatNullSpaceCreate(this->communicator().get(), PETSC_FALSE, nmodes, modes, msp);
+      LIBMESH_CHKERRABORT(ierr);
 
       for (PetscInt i=0; i<nmodes; ++i)
         {
           ierr = VecDestroy(modes+i);
-          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          LIBMESH_CHKERRABORT(ierr);
         }
 
       ierr = PetscFree2(modes,dots);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
     }
 }
 #endif
@@ -434,14 +434,14 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   Real final_residual_norm=0.;
 
   ierr = SNESSetFunction (_snes, r->vec(), __libmesh_petsc_snes_residual, this);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
    // Only set the jacobian function if we've been provided with something to call.
    // This allows a user to set their own jacobian function if they want to
    if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
    {
      ierr = SNESSetJacobian (_snes, jac->mat(), jac->mat(), __libmesh_petsc_snes_jacobian, this);
-     CHKERRABORT(libMesh::COMM_WORLD,ierr);
+     LIBMESH_CHKERRABORT(ierr);
    }
 #if !PETSC_VERSION_LESS_THAN(3,3,0)
    // Only set the nullspace if we have a way of computing it and the result is non-empty.
@@ -452,10 +452,10 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
      if (msp)
        {
          ierr = MatSetNullSpace(jac->mat(), msp);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
          ierr = MatNullSpaceDestroy(&msp);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
        }
    }
 
@@ -467,28 +467,28 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
 
      if(msp) {
        ierr = MatSetNearNullSpace(jac->mat(), msp);
-       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+       LIBMESH_CHKERRABORT(ierr);
 
        ierr = MatNullSpaceDestroy(&msp);
-       CHKERRABORT(libMesh::COMM_WORLD,ierr);
+       LIBMESH_CHKERRABORT(ierr);
      }
    }
 #endif
    // Have the Krylov subspace method use our good initial guess rather than 0
    KSP ksp;
    ierr = SNESGetKSP (_snes, &ksp);
-          CHKERRABORT(libMesh::COMM_WORLD,ierr);
+          LIBMESH_CHKERRABORT(ierr);
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values
   ierr = KSPSetTolerances (ksp, this->initial_linear_tolerance, PETSC_DEFAULT,
                            PETSC_DEFAULT, this->max_linear_iterations);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   // Set the tolerances for the non-linear solver.
   ierr = SNESSetTolerances(_snes, this->absolute_residual_tolerance, this->relative_residual_tolerance,
                            this->relative_step_tolerance, this->max_nonlinear_iterations, this->max_function_evaluations);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   //Pull in command-line options
   KSPSetFromOptions(ksp);
@@ -505,35 +505,35 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T>&  jac_in,  // System Jacobian Ma
   }
 
 //    ierr = KSPSetInitialGuessNonzero (ksp, PETSC_TRUE);
-//           CHKERRABORT(libMesh::COMM_WORLD,ierr);
+//           LIBMESH_CHKERRABORT(ierr);
 
 // Older versions (at least up to 2.1.5) of SNESSolve took 3 arguments,
 // the last one being a pointer to an int to hold the number of iterations required.
 # if PETSC_VERSION_LESS_THAN(2,2,0)
 
  ierr = SNESSolve (_snes, x->vec(), &n_iterations);
-        CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        LIBMESH_CHKERRABORT(ierr);
 
 // 2.2.x style
 #elif PETSC_VERSION_LESS_THAN(2,3,0)
 
  ierr = SNESSolve (_snes, x->vec());
-        CHKERRABORT(libMesh::COMM_WORLD,ierr);
+        LIBMESH_CHKERRABORT(ierr);
 
 // 2.3.x & newer style
 #else
 
   ierr = SNESSolve (_snes, PETSC_NULL, x->vec());
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   ierr = SNESGetIterationNumber(_snes,&n_iterations);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);
-         CHKERRABORT(libMesh::COMM_WORLD,ierr);
+         LIBMESH_CHKERRABORT(ierr);
 
   ierr = SNESGetFunctionNorm(_snes,&final_residual_norm);
-	 CHKERRABORT(libMesh::COMM_WORLD,ierr);
+	 LIBMESH_CHKERRABORT(ierr);
 
 #endif
 
@@ -571,7 +571,7 @@ SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
   if (this->initialized())
     {
       ierr = SNESGetConvergedReason(_snes, &_reason);
-      CHKERRABORT(libMesh::COMM_WORLD,ierr);
+      LIBMESH_CHKERRABORT(ierr);
     }
 
   return _reason;

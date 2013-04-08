@@ -98,7 +98,7 @@ void Patch::add_local_face_neighbors()
     {
       const Elem* neighbor = *it;
       if (neighbor->processor_id() ==
-	  libMesh::processor_id()) // ... if the neighbor belongs to this processor
+	  _my_procid) // ... if the neighbor belongs to this processor
 	this->insert (neighbor);   // ... then add it to the patch
     }
 }
@@ -117,7 +117,7 @@ void Patch::add_semilocal_face_neighbors()
   for (; it != end_it; ++it)
     {
       const Elem* neighbor = *it;
-      if (neighbor->is_semilocal())
+      if (neighbor->is_semilocal(_my_procid))
 	this->insert (neighbor);
     }
 }
@@ -168,7 +168,7 @@ void Patch::add_local_point_neighbors()
     {
       const Elem* neighbor = *it;
       if (neighbor->processor_id() ==
-	  libMesh::processor_id()) // ... if the neighbor belongs to this processor
+	  _my_procid) // ... if the neighbor belongs to this processor
 	this->insert (neighbor);   // ... then add it to the patch
     }
 }
@@ -187,7 +187,7 @@ void Patch::add_semilocal_point_neighbors()
   for (; it != end_it; ++it)
     {
       const Elem* neighbor = *it;
-      if (neighbor->is_semilocal())
+      if (neighbor->is_semilocal(_my_procid))
 	this->insert (neighbor);
     }
 }
@@ -206,7 +206,7 @@ void Patch::build_around_element (const Elem* e0,
   // requesting a nonlocal patch
   libmesh_assert ((patchtype != &Patch::add_local_face_neighbors &&
            patchtype != &Patch::add_local_point_neighbors) ||
-           e0->processor_id() == libMesh::processor_id());
+           e0->processor_id() == _my_procid);
 
   // First clear the current set, then add the element of interest.
   this->clear();
@@ -255,7 +255,7 @@ void Patch::build_around_element (const Elem* e0,
 	libmesh_assert (elem->active());
         if ((patchtype == &Patch::add_local_face_neighbors ||
              patchtype == &Patch::add_local_point_neighbors))
-	  libmesh_assert_equal_to (elem->processor_id(), libMesh::processor_id());
+	  libmesh_assert_equal_to (elem->processor_id(), _my_procid);
       }
   }
 #endif

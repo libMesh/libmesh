@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_input.h"
 #include "libmesh/mesh_output.h"
+#include "libmesh/parallel_object.h"
 
 // C++ includes
 
@@ -50,7 +51,8 @@ class Nemesis_IO_Helper;
 // ------------------------------------------------------------
 // Nemesis_IO class definition
   class Nemesis_IO : public MeshInput<MeshBase>,
-		     public MeshOutput<MeshBase>
+		     public MeshOutput<MeshBase>,
+		     public ParallelObject
 {
 
  public:
@@ -70,7 +72,7 @@ class Nemesis_IO_Helper;
   /**
    * Implements reading the mesh from several different files.
    * You provide the basename, then LibMesh appends the ".size.rank"
-   * depending on libMesh::n_processors() and libMesh::processor_id().
+   * depending on this->n_processors() and this->processor_id().
    */
   virtual void read (const std::string& base_filename);
 

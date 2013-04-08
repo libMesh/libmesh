@@ -39,7 +39,7 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems& es,
 					    const unsigned int number_in) :
 
   Parent                 (es, name_in, number_in),
-  linear_solver          (LinearSolver<Number>::build()),
+  linear_solver          (LinearSolver<Number>::build(es.communicator())),
   _n_linear_iterations   (0),
   _final_linear_residual (1.e20),
   _shell_matrix(NULL),

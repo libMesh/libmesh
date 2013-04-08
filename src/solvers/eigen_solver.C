@@ -34,7 +34,8 @@ namespace libMesh
 // EigenSolver members
 template <typename T>
 AutoPtr<EigenSolver<T> >
-EigenSolver<T>::build(const SolverPackage solver_package)
+EigenSolver<T>::build(const Parallel::Communicator &comm,
+		      const SolverPackage solver_package)
 {
   // Build the appropriate solver
   switch (solver_package)
@@ -45,7 +46,7 @@ EigenSolver<T>::build(const SolverPackage solver_package)
 #ifdef LIBMESH_HAVE_SLEPC
 	case SLEPC_SOLVERS:
       {
-	AutoPtr<EigenSolver<T> > ap(new SlepcEigenSolver<T>);
+	AutoPtr<EigenSolver<T> > ap(new SlepcEigenSolver<T>(comm));
 	return ap;
       }
 #endif

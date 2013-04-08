@@ -41,12 +41,12 @@ EnsightIO::EnsightIO (const std::string &filename, const EquationSystems &eq) :
   _equation_systems(eq)
 {
 
-  if (libMesh::n_processors() == 1)
+  if (_equation_systems.n_processors() == 1)
     _ensight_file_name = filename;
   else
     {
       std::stringstream tmp_file;
-      tmp_file << filename << "_rank" << libMesh::processor_id();
+      tmp_file << filename << "_rank" << _equation_systems.processor_id();
       _ensight_file_name = tmp_file.str();
     }
 }

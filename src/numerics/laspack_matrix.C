@@ -235,7 +235,8 @@ void LaspackMatrix<T>::get_transpose (SparseMatrix<T>& /*dest*/) const
 
 
 template <typename T>
-LaspackMatrix<T>::LaspackMatrix () :
+LaspackMatrix<T>::LaspackMatrix (const Parallel::Communicator &comm) :
+  SparseMatrix<T>(comm),
   _closed (false)
 {
 }

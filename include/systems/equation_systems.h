@@ -25,6 +25,7 @@
 #include "libmesh/parameters.h"
 #include "libmesh/system.h"
 #include "libmesh/enum_xdr_mode.h"
+#include "libmesh/parallel_object.h"
 
 // HP aCC needs these for some reason
 #ifdef __HP_aCC
@@ -64,7 +65,9 @@ class MeshBase;
 
 // ------------------------------------------------------------
 // EquationSystems class definition
-class EquationSystems : public ReferenceCountedObject<EquationSystems>
+  class EquationSystems : public ReferenceCountedObject<EquationSystems>,
+			  public ParallelObject
+
 {
 public:
 

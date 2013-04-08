@@ -19,7 +19,6 @@
 #define LIBMESH_MULTI_PREDICATES_H
 
 // Local includes
-#include "libmesh/libmesh_base.h" // for libMesh::processor_id()
 #include "libmesh/single_predicates.h"
 
 // C++ includes
@@ -234,10 +233,10 @@ namespace Predicates
   struct Local : abstract_multi_predicate<T>
   {
     // Constructor, pushes back two single predicates
-    Local()
+    Local(const processor_id_type my_pid)
     {
       this->_predicates.push_back(new not_null<T>);
-      this->_predicates.push_back(new pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new pid<T>(my_pid));
     }
 
   };
@@ -248,10 +247,10 @@ namespace Predicates
   struct NotLocal : abstract_multi_predicate<T>
   {
     // Constructor, pushes back two single predicates
-    NotLocal()
+    NotLocal(const processor_id_type my_pid)
     {
       this->_predicates.push_back(new not_null<T>);
-      this->_predicates.push_back(new not_pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new not_pid<T>(my_pid));
     }
 
   };
@@ -262,11 +261,11 @@ namespace Predicates
   struct ActiveNotLocal : abstract_multi_predicate<T>
   {
     // Constructor, pushes back two single predicates
-    ActiveNotLocal()
+    ActiveNotLocal(const processor_id_type my_pid)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new active<T>);
-      this->_predicates.push_back(new not_pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new not_pid<T>(my_pid));
     }
 
   };
@@ -303,7 +302,7 @@ namespace Predicates
   template <typename T>
   struct ActivePID : abstract_multi_predicate<T>
   {
-    ActivePID(const unsigned int proc_id)
+    ActivePID(const processor_id_type proc_id)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new active<T>);
@@ -319,11 +318,11 @@ namespace Predicates
   template <typename T>
   struct ActiveLocal : abstract_multi_predicate<T>
   {
-    ActiveLocal()
+    ActiveLocal(const processor_id_type my_pid)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new active<T>);
-      this->_predicates.push_back(new pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new pid<T>(my_pid));
     }
   };
 
@@ -335,7 +334,7 @@ namespace Predicates
   template <typename T>
   struct PID : abstract_multi_predicate<T>
   {
-    PID(const unsigned int proc_id)
+    PID(const processor_id_type proc_id)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new pid<T>(proc_id));
@@ -348,7 +347,7 @@ namespace Predicates
   template <typename T>
   struct NotPID : abstract_multi_predicate<T>
   {
-    NotPID(const unsigned int proc_id)
+    NotPID(const processor_id_type proc_id)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new not_pid<T>(proc_id));
@@ -390,10 +389,11 @@ namespace Predicates
   template <typename T>
   struct LocalLevel : abstract_multi_predicate<T>
   {
-    LocalLevel(const unsigned int l)
+    LocalLevel(const processor_id_type my_pid,
+	       const unsigned int l)
     {
       this->_predicates.push_back(new not_null<T>);
-      this->_predicates.push_back(new pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new pid<T>(my_pid));
       this->_predicates.push_back(new level<T>(l));
     }
   };
@@ -405,10 +405,11 @@ namespace Predicates
   template <typename T>
   struct LocalNotLevel : abstract_multi_predicate<T>
   {
-    LocalNotLevel(const unsigned int l)
+    LocalNotLevel(const processor_id_type my_pid,
+		  const unsigned int l)
     {
       this->_predicates.push_back(new not_null<T>);
-      this->_predicates.push_back(new pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new pid<T>(my_pid));
       this->_predicates.push_back(new not_level<T>(l));
     }
   };
@@ -445,11 +446,12 @@ namespace Predicates
   template <typename T>
   struct ActiveLocalSubdomain : abstract_multi_predicate<T>
   {
-    ActiveLocalSubdomain(const subdomain_id_type subdomain_id)
+    ActiveLocalSubdomain(const processor_id_type my_pid,
+			 const subdomain_id_type subdomain_id)
     {
       this->_predicates.push_back(new not_null<T>);
       this->_predicates.push_back(new active<T>);
-      this->_predicates.push_back(new pid<T>(libMesh::processor_id()));
+      this->_predicates.push_back(new pid<T>(my_pid));
       this->_predicates.push_back(new subdomain<T>(subdomain_id));
     }
   };

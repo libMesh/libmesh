@@ -157,7 +157,8 @@ void EigenSparseMatrix<T>::get_transpose (SparseMatrix<T>& dest_in) const
 
 
 template <typename T>
-EigenSparseMatrix<T>::EigenSparseMatrix () :
+EigenSparseMatrix<T>::EigenSparseMatrix (const Parallel::Communicator &comm) :
+  SparseMatrix<T>(comm),
   _closed (false)
 {
 }

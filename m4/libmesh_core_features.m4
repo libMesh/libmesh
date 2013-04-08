@@ -8,6 +8,26 @@ AC_MSG_RESULT(---------------------------------------------)
 
 
 # --------------------------------------------------------------
+# default comm_world - enabled by default
+# --------------------------------------------------------------
+AC_ARG_ENABLE(default-comm-world,
+              [AC_HELP_STRING([--enable-default-comm-world],[Provide global libMesh::CommWorld])],
+              enabledefaultcommworld=$enableval,
+              enabledefaultcommworld=yes)
+                
+AC_SUBST(enabledefaultcommworld)
+if test "$enabledefaultcommworld" != no ; then
+  AC_MSG_RESULT([>>> WARNING: using a legacy option <<<])
+  AC_MSG_RESULT([>>> Configuring library to enable a default libMesh::CommWorld <<<])
+else
+  AC_MSG_RESULT([<<< Configuring library to disable libMesh::CommWorld >>>])
+  AC_DEFINE(DISABLE_COMMWORLD, 1,
+           [Flag indicating if the library should disable libMesh::CommWorld])
+fi
+# --------------------------------------------------------------
+
+
+# --------------------------------------------------------------
 # legacy include paths - disabled by default
 # --------------------------------------------------------------
 AC_ARG_ENABLE(legacy-include-paths,
