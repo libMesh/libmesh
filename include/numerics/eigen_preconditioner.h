@@ -61,7 +61,7 @@ public:
   /**
    *  Constructor. Initializes EigenPreconditioner data structures
    */
-  EigenPreconditioner (const libMesh::Parallel::Communicator &comm = libMesh::CommWorld);
+  EigenPreconditioner (const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.
@@ -93,7 +93,7 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-EigenPreconditioner<T>::EigenPreconditioner (const libMesh::Parallel::Communicator &comm) :
+EigenPreconditioner<T>::EigenPreconditioner (const Parallel::Communicator &comm) :
   Preconditioner<T>(comm)
 {
 }

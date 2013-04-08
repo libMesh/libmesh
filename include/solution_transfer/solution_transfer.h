@@ -36,7 +36,7 @@ class SolutionTransfer : public ParallelObject
 {
 public:
 
-  SolutionTransfer(const libMesh::Parallel::Communicator &comm = libMesh::CommWorld) :
+  SolutionTransfer(const Parallel::Communicator &comm = libMesh::CommWorld) :
     ParallelObject(comm)
   {};
 

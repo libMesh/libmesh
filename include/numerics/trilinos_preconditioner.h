@@ -66,7 +66,7 @@ public:
   /**
    *  Constructor. Initializes PetscPreconditioner data structures
    */
-  TrilinosPreconditioner (const libMesh::Parallel::Communicator &comm = libMesh::CommWorld);
+  TrilinosPreconditioner (const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.
@@ -141,7 +141,7 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-TrilinosPreconditioner<T>::TrilinosPreconditioner (const libMesh::Parallel::Communicator &comm) :
+TrilinosPreconditioner<T>::TrilinosPreconditioner (const Parallel::Communicator &comm) :
   Preconditioner<T>(comm),
   _prec(NULL),
   _mat(NULL)

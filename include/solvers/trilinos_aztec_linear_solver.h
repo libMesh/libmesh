@@ -54,7 +54,7 @@ public:
   /**
    *  Constructor. Initializes Aztec data structures
    */
-  AztecLinearSolver (const libMesh::Parallel::Communicator &comm = libMesh::CommWorld);
+  AztecLinearSolver (const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.
@@ -165,7 +165,7 @@ private:
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-AztecLinearSolver<T>::AztecLinearSolver (const libMesh::Parallel::Communicator &comm) :
+AztecLinearSolver<T>::AztecLinearSolver (const Parallel::Communicator &comm) :
   LinearSolver<T>(comm)
 {
   if (this->n_processors() == 1)
