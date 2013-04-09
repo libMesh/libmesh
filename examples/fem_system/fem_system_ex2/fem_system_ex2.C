@@ -163,9 +163,8 @@ int main(int argc, char** argv)
   int dim = args("mesh/generation/dimension", 3);
   libmesh_example_assert(dim <= LIBMESH_DIM, "3D support");
 
-  // Create a mesh, with dimension to be overridden later, distributed
-  // across the default MPI communicator.
-  Mesh mesh(0,init.comm);
+  // Create a mesh distributed across the default MPI communicator.
+  Mesh mesh(dim,init.comm);
 
   EquationSystems systems(mesh);
 
