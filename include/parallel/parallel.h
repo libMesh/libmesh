@@ -533,6 +533,16 @@ namespace Parallel
      */
     explicit Communicator (const communicator &comm);
 
+#ifndef LIBMESH_HAVE_MPI
+    /*
+     * Constructor from int - we need this for the no MPI
+     * case since the constructor above is marked explicit,
+     * clang++ in particular will not call it with a dummy int
+     * argument.
+     */
+    explicit Communicator (const int);
+#endif
+
     /*
      * NON-VIRTUAL destructor
      */
