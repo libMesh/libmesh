@@ -50,7 +50,8 @@ public:
   /**
    * Constructor. Just set the theta expansion.
    */
-  SimpleRBEvaluation()
+  SimpleRBEvaluation(const Parallel::Communicator& comm)
+    : RBEvaluation(comm)
   {
     set_rb_theta_expansion(acoustics_rb_theta_expansion);
   }

@@ -134,8 +134,9 @@ int main (int argc, char** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
 
-  // Create a mesh with user-defined dimension.
-  Mesh mesh (dim);
+  // Create a mesh with user-defined dimension on the default MPI
+  // communicator.
+  Mesh mesh (dim, init.communicator());
 
   // Read number of elements from command line
   int ps = 15;

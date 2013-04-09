@@ -72,7 +72,7 @@ public:
    * Static creation/destruction routines.  FIXME - this looks like
    * object-oriented C, can we get rid of it?
    */
-  static void Create(Biharmonic** b);
+  static void Create(Biharmonic** b, const Parallel::Communicator &comm);
   static void Destroy(Biharmonic** b);
 
 

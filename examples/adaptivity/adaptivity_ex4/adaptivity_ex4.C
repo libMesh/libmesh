@@ -157,8 +157,9 @@ int main(int argc, char** argv)
   // Currently only the Hermite cubics give a 3D C^1 basis
   libmesh_assert (dim == 2 || approx_type == "HERMITE");
 
-  // Create a mesh.
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden later, on the
+  // default MPI communicator.
+  Mesh mesh(0,init.communicator());
 
   // Output file for plotting the error
   std::string output_file = "";

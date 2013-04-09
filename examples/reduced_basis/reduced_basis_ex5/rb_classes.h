@@ -21,7 +21,8 @@ public:
   /**
    * Constructor. Just set the theta expansion.
    */
-  ElasticityRBEvaluation()
+  ElasticityRBEvaluation(const Parallel::Communicator& comm)
+    : RBEvaluation(comm)
   {
     set_rb_theta_expansion(elasticity_theta_expansion);
   }

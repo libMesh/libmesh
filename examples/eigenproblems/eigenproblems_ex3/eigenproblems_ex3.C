@@ -147,7 +147,10 @@ int main (int argc, char** argv)
   std::ostringstream mesh_name_exodus;
   mesh_name_exodus << mesh_name << "_mesh.e";
 
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden by the file, on
+  // the default MPI communicator.
+  Mesh mesh(0,init.communicator());
+
   mesh.read(mesh_name_exodus.str());
 
   // Print information about the mesh to the screen.

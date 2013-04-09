@@ -37,7 +37,8 @@ public:
   /**
    * Constructor. Just set the theta expansion.
    */
-  SimpleRBEvaluation()
+  SimpleRBEvaluation(const Parallel::Communicator& comm)
+    : RBEvaluation(comm)
   {
     set_rb_theta_expansion(eim_test_rb_theta_expansion);
   }

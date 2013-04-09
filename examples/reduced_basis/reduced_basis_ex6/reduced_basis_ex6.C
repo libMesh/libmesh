@@ -123,8 +123,10 @@ int main (int argc, char** argv)
   if ( command_line.search(1, "-online_mode") )
     online_mode = command_line.next(online_mode);
 
-  // Build a mesh.
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden by build_cube, on
+  // the default MPI communicator.
+  Mesh mesh(0,init.communicator());
+
   MeshTools::Generation::build_cube (mesh,
                                      n_elem_xy, n_elem_xy, n_elem_z,
                                      -0.2, 0.2,
@@ -148,10 +150,10 @@ int main (int argc, char** argv)
   mesh.print_info();
 
   // Initialize the standard RBEvaluation object
-  SimpleRBEvaluation rb_eval;
+  SimpleRBEvaluation rb_eval(mesh.communicator());
 
   // Initialize the EIM RBEvaluation object
-  SimpleEIMEvaluation eim_rb_eval;
+  SimpleEIMEvaluation eim_rb_eval(mesh.communicator());
 
   // Set the rb_eval objects for the RBConstructions
   eim_construction.set_rb_evaluation(eim_rb_eval);

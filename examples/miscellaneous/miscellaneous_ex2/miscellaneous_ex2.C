@@ -158,8 +158,9 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
-  // Create a mesh.
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden later, distributed
+  // across the default MPI communicator.
+  Mesh mesh(0,init.communicator());
 
   // Create a corresponding MeshData
   // and activate it. For more information on this object
