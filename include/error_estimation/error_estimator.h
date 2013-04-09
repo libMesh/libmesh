@@ -50,7 +50,7 @@ template <typename T> class NumericVector;
  *
  * @author Benjamin S. Kirk, 2003.
  */
-  class ErrorEstimator : public ParallelObject
+  class ErrorEstimator
 {
 public:
 
@@ -58,9 +58,9 @@ public:
    * Constructor.  Empty.  Derived classes should reset error_norm as
    * appropriate.
    */
-  ErrorEstimator(const Parallel::Communicator &comm /* = libMesh::CommWorld */) :
-    ParallelObject(comm),
-    error_norm()
+  ErrorEstimator() :
+    error_norm(),
+    _cached_comm(NULL)
   {}
 
   /**
@@ -149,7 +149,8 @@ protected:
    * \p error_per_cell from each processor and combines
    * them to get the global error vector.
    */
-  void reduce_error (std::vector<float>& error_per_cell) const;
+  void reduce_error (std::vector<float>& error_per_cell,
+		     const Parallel::Communicator &comm = libMesh::CommWorld) const;
 };
 
 

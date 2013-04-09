@@ -260,7 +260,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
 
       // Prepare a global solution and a MeshFunction of the fine system if we need one
       AutoPtr<MeshFunction> fine_values;
-      AutoPtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build(this->communicator());
+      AutoPtr<NumericVector<Number> > fine_soln = NumericVector<Number>::build(system.communicator());
       if (_equation_systems_fine)
       {
 	const System& fine_system = _equation_systems_fine->get_system(system.name());
@@ -393,7 +393,7 @@ void ExactErrorEstimator::estimate_error (const System& system,
   // zeros for the inactive elements.
 
   // First sum the vector of estimated error values
-  this->reduce_error(error_per_cell);
+  this->reduce_error(error_per_cell, system.communicator());
 
   // Compute the square-root of each component.
   START_LOG("std::sqrt()", "ExactErrorEstimator");

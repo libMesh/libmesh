@@ -659,7 +659,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   if (error_per_cell)
     {
       // First sum the vector of estimated error values
-      this->reduce_error(*error_per_cell);
+      this->reduce_error(*error_per_cell, es.communicator());
 
       // Compute the square-root of each component.
       START_LOG("std::sqrt()", "UniformRefinementEstimator");
@@ -675,7 +675,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         {
           ErrorVector *e = it->second;
           // First sum the vector of estimated error values
-          this->reduce_error(*e);
+          this->reduce_error(*e, es.communicator());
 
           // Compute the square-root of each component.
           START_LOG("std::sqrt()", "UniformRefinementEstimator");

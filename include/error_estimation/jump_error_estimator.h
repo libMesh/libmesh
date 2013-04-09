@@ -55,8 +55,8 @@ public:
   /**
    * Constructor.
    */
-  JumpErrorEstimator(const Parallel::Communicator &comm /* = libMesh::CommWorld */)
-    : ErrorEstimator(comm),
+  JumpErrorEstimator()
+    : ErrorEstimator(),
       scale_by_n_flux_faces(false),
       integrate_boundary_sides(false),
       fe_fine(NULL), fe_coarse(NULL) {}

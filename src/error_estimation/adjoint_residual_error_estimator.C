@@ -37,11 +37,11 @@ namespace libMesh
 
 //-----------------------------------------------------------------
 // AdjointResidualErrorEstimator implementations
-AdjointResidualErrorEstimator::AdjointResidualErrorEstimator (const Parallel::Communicator &comm) :
-  ErrorEstimator(comm),
+AdjointResidualErrorEstimator::AdjointResidualErrorEstimator () :
+  ErrorEstimator(),
   error_plot_suffix(),
-  _primal_error_estimator(new PatchRecoveryErrorEstimator(comm)),
-  _dual_error_estimator(new PatchRecoveryErrorEstimator(comm)),
+  _primal_error_estimator(new PatchRecoveryErrorEstimator()),
+  _dual_error_estimator(new PatchRecoveryErrorEstimator()),
   _qoi_set(QoISet())
 {
 }

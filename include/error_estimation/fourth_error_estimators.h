@@ -51,8 +51,8 @@ public:
    * Constructor.  Defaults to H2 seminorm; changes to error_norm are
    * ignored.
    */
-  LaplacianErrorEstimator(const Parallel::Communicator &comm = libMesh::CommWorld) :
-    JumpErrorEstimator(comm)
+  LaplacianErrorEstimator() :
+    JumpErrorEstimator()
   { error_norm = H2_SEMINORM; }
 
   /**
