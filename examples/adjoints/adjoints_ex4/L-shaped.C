@@ -161,9 +161,9 @@ void LaplaceSystem::postprocess()
 
   FEMSystem::postprocess();
 
-  CommWorld.sum(computed_QoI[0]);
+  this->communicator().sum(computed_QoI[0]);
 
-  CommWorld.sum(computed_QoI[1]);
+  this->communicator().sum(computed_QoI[1]);
 
 }
 
