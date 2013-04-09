@@ -185,7 +185,7 @@ int main (int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
-  Mesh mesh(0,init.comm);
+  Mesh mesh(0,init.communicator());
 
   // Use the MeshTools::Generation mesh generator to create a uniform
   // grid on the square [-1,1]^D.  We instruct the mesh generator

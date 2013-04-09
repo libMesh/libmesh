@@ -92,7 +92,7 @@ int main (int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
-  Mesh mesh(0,init.comm);
+  Mesh mesh(0,init.communicator());
 
   // And an object to refine it
   MeshRefinement mesh_refinement(mesh);

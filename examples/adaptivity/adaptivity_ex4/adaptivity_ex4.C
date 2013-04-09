@@ -159,7 +159,7 @@ int main(int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden later, on the
   // default MPI communicator.
-  Mesh mesh(0,init.comm);
+  Mesh mesh(0,init.communicator());
 
   // Output file for plotting the error
   std::string output_file = "";

@@ -136,7 +136,7 @@ int main (int argc, char** argv)
 
   // Create a mesh with user-defined dimension on the default MPI
   // communicator.
-  Mesh mesh (dim, init.comm);
+  Mesh mesh (dim, init.communicator());
 
   // Read number of elements from command line
   int ps = 15;

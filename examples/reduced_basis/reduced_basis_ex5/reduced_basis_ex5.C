@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
 	}
 
 
-  Mesh mesh (dim, init.comm);
+  Mesh mesh (dim, init.communicator());
   MeshTools::Generation::build_cube (mesh,
                                      n_elem_x,
                                      n_elem_y,

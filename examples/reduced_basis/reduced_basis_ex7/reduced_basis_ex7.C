@@ -88,7 +88,7 @@ int main (int argc, char** argv)
     online_mode = command_line.next(online_mode);
 
   // Create a mesh on the default MPI communicator.
-  Mesh mesh(dim,init.comm);
+  Mesh mesh(dim,init.communicator());
   mesh.read("horn.msh");
 
   // Create an equation systems object.

@@ -125,7 +125,7 @@ int main (int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden by build_cube, on
   // the default MPI communicator.
-  Mesh mesh(0,init.comm);
+  Mesh mesh(0,init.communicator());
 
   MeshTools::Generation::build_cube (mesh,
                                      n_elem_xy, n_elem_xy, n_elem_z,

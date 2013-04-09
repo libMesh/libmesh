@@ -160,7 +160,7 @@ int main (int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
-  Mesh mesh(0,init.comm);
+  Mesh mesh(0,init.communicator());
 
   // Create a corresponding MeshData
   // and activate it. For more information on this object

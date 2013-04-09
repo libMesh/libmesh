@@ -100,7 +100,7 @@ int main (int argc, char** argv)
   // InfElemBuilder still requires some updates to be ParallelMesh
   // compatible
 
-  SerialMesh mesh(0, init.comm);
+  SerialMesh mesh(0, init.communicator());
 
   // Use the internal mesh generator to create elements
   // on the square [-1,1]^3, of type Hex8.

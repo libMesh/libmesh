@@ -59,14 +59,14 @@ int main (int argc, char** argv)
   std::cout << "Triangulating an L-shaped domain with holes" << std::endl;
 
   // 1.) 2D triangulation of L-shaped domain with three holes of different shape
-  triangulate_domain(init.comm);
+  triangulate_domain(init.communicator());
 
   libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
 
   std::cout << "Tetrahedralizing a prismatic domain with a hole" << std::endl;
 
   // 2.) 3D tetrahedralization of rectangular domain with hole.
-  tetrahedralize_domain(init.comm);
+  tetrahedralize_domain(init.communicator());
 
   return 0;
 }

@@ -210,7 +210,7 @@ int main(int argc, char** argv)
 
     // Demonstration case 2
     {
-      Mesh mesh_a(0,init.comm), mesh_b(0,init.comm);
+      Mesh mesh_a(0,init.communicator()), mesh_b(0,init.communicator());
 
       mesh_a.read("struct.ucd.gz"); mesh_b.read("unstruct.ucd.gz");
 
