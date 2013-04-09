@@ -56,7 +56,7 @@ int main(int argc, char** argv)
       libmesh_example_assert(dim <= LIBMESH_DIM, "2D/3D support");
 
       Biharmonic* biharmonic;
-      Biharmonic::Create(&biharmonic);
+      Biharmonic::Create(&biharmonic,init.comm);
       biharmonic->viewParameters();
       biharmonic->init();
       biharmonic->run();

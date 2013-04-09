@@ -9,10 +9,10 @@
 
 using namespace libMesh;
 
-void Biharmonic::Create(Biharmonic** b)
+void Biharmonic::Create(Biharmonic** b, Parallel::Communicator &comm)
 {
   // ParallelMesh doesn't yet understand periodic BCs
-  SerialMesh* mesh = new SerialMesh();
+  SerialMesh* mesh = new SerialMesh(0,comm);
   Biharmonic *biharmonic = new Biharmonic(mesh);
   *b = biharmonic;
 }
