@@ -54,8 +54,8 @@ public:
    * pointer to NULL.  Defaults to L2 norm; changes to system norm are
    * ignored.
    */
-  DiscontinuityMeasure(const Parallel::Communicator &comm = libMesh::CommWorld) :
-    JumpErrorEstimator(comm),
+  DiscontinuityMeasure() :
+    JumpErrorEstimator(),
     _bc_function(NULL)
   { error_norm = L2; }
 
