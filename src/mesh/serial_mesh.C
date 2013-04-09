@@ -32,12 +32,22 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // SerialMesh class member functions
-SerialMesh::SerialMesh (unsigned int d,
-			const Parallel::Communicator &comm) :
-  UnstructuredMesh (d,comm)
+SerialMesh::SerialMesh (const Parallel::Communicator &comm,
+			unsigned int d) :
+  UnstructuredMesh (comm,d)
 {
   _partitioner = AutoPtr<Partitioner>(new MetisPartitioner());
 }
+
+
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+SerialMesh::SerialMesh (unsigned int d) :
+  UnstructuredMesh (d)
+{
+  _partitioner = AutoPtr<Partitioner>(new MetisPartitioner());
+}
+#endif
 
 
 SerialMesh::~SerialMesh ()

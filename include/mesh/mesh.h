@@ -57,10 +57,20 @@ class Mesh : public DefaultMesh
    * changed by mesh generation/loading) later.
    */
   explicit
-  Mesh (unsigned int dim=1,
-	const Parallel::Communicator &comm
-	LIBMESH_CAN_DEFAULT_TO_COMMWORLD)
-    : DefaultMesh(dim,comm) {}
+  Mesh (const Parallel::Communicator &comm,
+	unsigned int dim=1)
+    : DefaultMesh(comm,dim) {}
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+  /**
+   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
+   * The mesh dimension can be changed (and may automatically be
+   * changed by mesh generation/loading) later.
+   */
+  explicit
+  Mesh (unsigned int dim=1)
+    : DefaultMesh(dim) {}
+#endif
 
   /**
    * Copy-constructor.  This should be able to take a

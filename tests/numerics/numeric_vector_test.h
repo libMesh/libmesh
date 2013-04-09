@@ -25,6 +25,8 @@ public:
   template <class Base, class Derived>
   void Localize(bool to_one=false)
   {
+    libMesh::Parallel::Communicator CommTest(libMesh::COMM_WORLD);
+
     const processor_id_type root_pid = 0;
     unsigned int block_size  = 10;
 
@@ -37,7 +39,7 @@ public:
       global_size += (block_size + static_cast<unsigned int>(p));
     
     {
-      Base & v = *(new Derived(global_size, local_size));
+      Base & v = *(new Derived(CommTest, global_size, local_size));
       std::vector<Number> l(global_size);
       
       const dof_id_type 

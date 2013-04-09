@@ -46,8 +46,20 @@ class BoundaryMesh : public Mesh
   /**
    * Constructor. Initializes dimenstion and processor id.
    */
-  BoundaryMesh (unsigned int d, const Parallel::Communicator &comm
-		LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
+  explicit
+  BoundaryMesh (const Parallel::Communicator &comm,
+		unsigned int dim=1);
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+  /**
+   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
+   * The mesh dimension can be changed (and may automatically be
+   * changed by mesh generation/loading) later.
+   */
+  explicit
+  BoundaryMesh (unsigned int dim=1);
+#endif
+
 
   /**
    * Destructor.

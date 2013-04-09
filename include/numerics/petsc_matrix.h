@@ -92,6 +92,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
+  explicit
   PetscMatrix (const Parallel::Communicator &comm
 	       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
@@ -102,6 +103,7 @@ public:
    * This allows ownership of m to remain with the original creator,
    * and to simply provide additional functionality with the PetscMatrix.
    */
+  explicit
   PetscMatrix (Mat m,
 	       const Parallel::Communicator &comm
 	       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);

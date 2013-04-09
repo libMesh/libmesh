@@ -81,6 +81,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
+  explicit
   SparseMatrix (const Parallel::Communicator &comm
 		LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 

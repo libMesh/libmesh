@@ -78,12 +78,22 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // UnstructuredMesh class member functions
-UnstructuredMesh::UnstructuredMesh (unsigned int d,
-				    const Parallel::Communicator &comm) :
-  MeshBase (d,comm)
+UnstructuredMesh::UnstructuredMesh (const Parallel::Communicator &comm,
+				    unsigned int d) :
+  MeshBase (comm,d)
 {
   libmesh_assert (libMesh::initialized());
 }
+
+
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+UnstructuredMesh::UnstructuredMesh (unsigned int d) :
+  MeshBase (d)
+{
+  libmesh_assert (libMesh::initialized());
+}
+#endif
 
 
 
