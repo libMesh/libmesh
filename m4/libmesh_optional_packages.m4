@@ -434,7 +434,7 @@ AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V4, test x$netcdfversion = x4)
    AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS,      test x$enableexodus  = xyes)
    AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS_V509, test x$exodusversion = xv5.09)
    AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS_V522, test x$exodusversion = xv5.22)
-
+   
       # -------------------------------------------------------------
       # Nemesis -- enabled by default (it is distributed in contrib)
       # (note that Nemesis requires netCDF and exodus)

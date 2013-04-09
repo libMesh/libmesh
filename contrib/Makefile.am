@@ -69,12 +69,12 @@ if LIBMESH_ENABLE_EXODUS_V509
 endif
 
 if LIBMESH_ENABLE_EXODUS_V522
-  SUBDIRS    += exodusii/v5.22/exodus/cbind
-  opt_libs   += exodusii/v5.22/exodus/cbind/libopt.la
-  dbg_libs   += exodusii/v5.22/exodus/cbind/libdbg.la
-  devel_libs += exodusii/v5.22/exodus/cbind/libdevel.la
-  prof_libs  += exodusii/v5.22/exodus/cbind/libprof.la
-  oprof_libs += exodusii/v5.22/exodus/cbind/liboprof.la
+  SUBDIRS    += exodusii/v5.22/exodus
+  opt_libs   += exodusii/v5.22/exodus/libopt.la
+  dbg_libs   += exodusii/v5.22/exodus/libdbg.la
+  devel_libs += exodusii/v5.22/exodus/libdevel.la
+  prof_libs  += exodusii/v5.22/exodus/libprof.la
+  oprof_libs += exodusii/v5.22/exodus/liboprof.la
 endif
 endif
 
