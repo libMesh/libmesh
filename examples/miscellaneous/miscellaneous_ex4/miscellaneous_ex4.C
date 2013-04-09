@@ -191,7 +191,7 @@ int main (int argc, char** argv)
   // We need a shell matrix to solve.  There is currently no way to
   // store the shell matrix in the system.  We just create it locally
   // here (a shell matrix does not occupy much memory).
-  SumShellMatrix<Number> shellMatrix;
+  SumShellMatrix<Number> shellMatrix(system.communicator());
   TensorShellMatrix<Number> shellMatrix0(system.get_vector("v"),system.get_vector("w"));
   shellMatrix.matrices.push_back(&shellMatrix0);
   SparseShellMatrix<Number> shellMatrix1(*system.matrix);
