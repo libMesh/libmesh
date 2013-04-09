@@ -63,7 +63,8 @@ class LaspackVector : public NumericVector<T>
    */
   explicit
   LaspackVector (const ParallelType = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+                 const Parallel::Communicator &comm
+		 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.

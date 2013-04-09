@@ -62,7 +62,8 @@ class EigenSparseVector : public NumericVector<T>
    */
   explicit
   EigenSparseVector (const ParallelType = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const Parallel::Communicator &comm
+		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
@@ -70,7 +71,8 @@ class EigenSparseVector : public NumericVector<T>
   explicit
   EigenSparseVector (const numeric_index_type n,
                      const ParallelType = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const Parallel::Communicator &comm
+		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -79,7 +81,8 @@ class EigenSparseVector : public NumericVector<T>
   EigenSparseVector (const numeric_index_type n,
 		     const numeric_index_type n_local,
 		     const ParallelType = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const Parallel::Communicator &comm
+		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -90,7 +93,8 @@ class EigenSparseVector : public NumericVector<T>
 		     const numeric_index_type n_local,
 		     const std::vector<numeric_index_type>& ghost,
 		     const ParallelType = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const Parallel::Communicator &comm
+		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow

@@ -1167,12 +1167,24 @@ namespace Parallel
 } // namespace Parallel
 
   /**
-   * The default libMesh communicator
+   * The default libMesh communicator.
+   *
+   * If this communicator is disabled, we also disable it as a default
+   * argument to functions which accept a default communicator
+   * argument.  This should expose implicit uses of the default
+   * communicator as compile-time rather than run-time errors.
+   *
+   * The macro LIBMESH_CAN_DEFAULT_TO_COMMWORLD effects this
+   * functionality; it is empty (and so leaves arguments with no
+   * default value) if the default is disabled, and it sets something
+   * equal to the default otherwise.
    */
 #ifdef LIBMESH_DISABLE_COMMWORLD
   extern Parallel::FakeCommunicator CommWorld;
+  #define LIBMESH_CAN_DEFAULT_TO_COMMWORLD
 #else
   extern Parallel::Communicator CommWorld;
+  #define LIBMESH_CAN_DEFAULT_TO_COMMWORLD = libMesh::CommWorld
 #endif
 
 } // namespace libMesh

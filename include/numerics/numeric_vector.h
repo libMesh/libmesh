@@ -65,7 +65,8 @@ public:
    */
   explicit
   NumericVector (const ParallelType ptype = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+                 const Parallel::Communicator &comm
+		 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
@@ -73,7 +74,8 @@ public:
   explicit
   NumericVector (const numeric_index_type n,
                  const ParallelType ptype = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+                 const Parallel::Communicator &comm
+		 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -82,7 +84,8 @@ public:
   NumericVector (const numeric_index_type n,
 		 const numeric_index_type n_local,
                  const ParallelType ptype = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+                 const Parallel::Communicator &comm
+		 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -93,7 +96,8 @@ public:
 		 const numeric_index_type n_local,
 		 const std::vector<numeric_index_type>& ghost,
                  const ParallelType ptype = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+                 const Parallel::Communicator &comm
+		 LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
 public:
 
@@ -108,7 +112,7 @@ public:
    * \p solver_package
    */
   static AutoPtr<NumericVector<T> >
-  build(const Parallel::Communicator &comm = libMesh::CommWorld,
+  build(const Parallel::Communicator &comm LIBMESH_CAN_DEFAULT_TO_COMMWORLD,
 	const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**

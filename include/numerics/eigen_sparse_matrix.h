@@ -73,7 +73,8 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
-  EigenSparseMatrix (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
+  EigenSparseMatrix (const Parallel::Communicator &comm
+		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor. Free all memory, but do not

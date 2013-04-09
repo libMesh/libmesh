@@ -66,7 +66,8 @@ public:
    */
   explicit
   EpetraVector (const ParallelType type = AUTOMATIC,
-                const Parallel::Communicator &comm = libMesh::CommWorld);
+                const Parallel::Communicator &comm
+		LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
@@ -74,7 +75,8 @@ public:
   explicit
   EpetraVector (const numeric_index_type n,
                 const ParallelType type = AUTOMATIC,
-                const Parallel::Communicator &comm = libMesh::CommWorld);
+                const Parallel::Communicator &comm
+		LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -83,7 +85,8 @@ public:
   EpetraVector (const numeric_index_type n,
 	        const numeric_index_type n_local,
                 const ParallelType type = AUTOMATIC,
-                const Parallel::Communicator &comm = libMesh::CommWorld);
+                const Parallel::Communicator &comm
+		LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -94,7 +97,8 @@ public:
 		const numeric_index_type n_local,
 		const std::vector<numeric_index_type>& ghost,
                 const ParallelType type = AUTOMATIC,
-                const Parallel::Communicator &comm = libMesh::CommWorld);
+                const Parallel::Communicator &comm
+		LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor.  Creates a EpetraVector assuming you already have a
@@ -104,7 +108,8 @@ public:
    * and to simply provide additional functionality with the EpetraVector.
    */
   EpetraVector(Epetra_Vector & v,
-               const Parallel::Communicator &comm /* = libMesh::CommWorld */);
+               const Parallel::Communicator &comm
+	       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow

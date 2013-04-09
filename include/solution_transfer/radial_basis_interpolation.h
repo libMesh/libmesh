@@ -72,7 +72,8 @@ public:
    * Constructor.
    */
   RadialBasisInterpolation (Real radius=-1,
-			    const libMesh::Parallel::Communicator &comm = libMesh::CommWorld) :
+			    const libMesh::Parallel::Communicator &comm 
+			    LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
     InverseDistanceInterpolation<KDDim> (8,2,comm),
     _r_bbox(0.),
     _r_override(radius)

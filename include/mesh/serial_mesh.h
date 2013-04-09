@@ -54,7 +54,9 @@ class SerialMesh : public UnstructuredMesh
    * changed by mesh generation/loading) later.
    */
   explicit
-  SerialMesh (unsigned int dim=1, const Parallel::Communicator &comm = libMesh::CommWorld);
+  SerialMesh (unsigned int dim=1,
+	      const Parallel::Communicator &comm
+	      LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Copy-constructor.  This should be able to take a

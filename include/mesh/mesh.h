@@ -57,7 +57,10 @@ class Mesh : public DefaultMesh
    * changed by mesh generation/loading) later.
    */
   explicit
-  Mesh (unsigned int dim=1, const Parallel::Communicator &comm = libMesh::CommWorld) : DefaultMesh(dim,comm) {}
+  Mesh (unsigned int dim=1,
+	const Parallel::Communicator &comm
+	LIBMESH_CAN_DEFAULT_TO_COMMWORLD)
+    : DefaultMesh(dim,comm) {}
 
   /**
    * Copy-constructor.  This should be able to take a

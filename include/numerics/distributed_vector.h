@@ -58,7 +58,8 @@ public:
    */
   explicit
   DistributedVector (const ParallelType = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const Parallel::Communicator &comm
+		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
@@ -66,7 +67,8 @@ public:
   explicit
   DistributedVector (const numeric_index_type n,
                      const ParallelType ptype = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const Parallel::Communicator &comm
+		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
@@ -75,7 +77,8 @@ public:
   DistributedVector (const numeric_index_type n,
 		     const numeric_index_type n_local,
                      const ParallelType ptype = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const Parallel::Communicator &comm
+		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
@@ -86,7 +89,8 @@ public:
 		     const numeric_index_type n_local,
 		     const std::vector<numeric_index_type>& ghost,
                      const ParallelType ptype = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const Parallel::Communicator &comm
+		     LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
