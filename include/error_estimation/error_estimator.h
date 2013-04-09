@@ -23,7 +23,6 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/system_norm.h"
-#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
