@@ -91,6 +91,16 @@ ifeq ($(METHOD),dbg)
   mode       := "debug"
 endif
 
+#
+# If METHOD=oprof, compile in profile mode.
+ifeq ($(METHOD),oprofile)
+  METHOD := oprof
+endif
+ifeq ($(METHOD),oprof)
+  oprof-mode := on
+  mode       := "oprofile"
+endif
+
 # If the user had a METHOD variable we didn't
 # recognize, there's been some mistake.  Let's
 # yell at them.
