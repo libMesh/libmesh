@@ -161,9 +161,9 @@ void LaplaceSystem::postprocess()
 
   FEMSystem::postprocess();
 
-  Parallel::sum(computed_QoI[0]);
+  this->communicator().sum(computed_QoI[0]);
 
-  Parallel::sum(computed_QoI[1]);
+  this->communicator().sum(computed_QoI[1]);
 
 }
 
