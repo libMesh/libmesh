@@ -59,8 +59,7 @@ public:
    * appropriate.
    */
   ErrorEstimator() :
-    error_norm(),
-    _cached_comm(NULL)
+    error_norm()
   {}
 
   /**
