@@ -229,7 +229,7 @@ void tetrahedralize_domain(const Parallel::Communicator& comm)
 void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper_limit)
 {
 #ifdef LIBMESH_HAVE_TETGEN
-  SerialMesh cube_mesh(3);
+  SerialMesh cube_mesh(3,mesh.communicator());
 
   unsigned n_elem = 1;
 
