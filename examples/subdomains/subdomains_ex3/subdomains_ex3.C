@@ -154,6 +154,8 @@ void integrate_function (const MeshBase &mesh)
 	int_val += JxW[qp] * integrand(q_points[qp]);
     }
 
+  Parallel::sum (int_val);
+
   std::cout  << "\n***********************************\n"
 	     << " int_val   = " << int_val << std::endl
 	     << " exact_val = "<<  1*(2*2 - radius*radius*pi) + 10.*(radius*radius*pi)
