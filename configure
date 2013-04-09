@@ -690,6 +690,8 @@ LIBMESH_ENABLE_EXODUS_V509_FALSE
 LIBMESH_ENABLE_EXODUS_V509_TRUE
 LIBMESH_ENABLE_EXODUS_FALSE
 LIBMESH_ENABLE_EXODUS_TRUE
+EXODUS_FORTRAN_API_FALSE
+EXODUS_FORTRAN_API_TRUE
 EXODUS_NOT_NETCDF4_FLAG
 EXODUS_INCLUDE
 LIBMESH_ENABLE_NETCDF_V4_FALSE
@@ -1115,6 +1117,7 @@ enable_hdf5
 with_hdf5
 enable_netcdf
 enable_exodus
+enable_exodus_fortran
 enable_nemesis
 enable_libHilbert
 enable_fparser
@@ -1863,6 +1866,7 @@ Optional Features:
   --enable-hdf5           build with HDF5 support
   --enable-netcdf         build with netCDF binary I/O
   --enable-exodus         build with ExodusII API support
+  --enable-exodus-fortran build with ExodusII Fortran API support
   --enable-nemesis        build with NemesisII API support
   --enable-libHilbert     build with libHilbert, from Chris Hamilton
   --enable-fparser        build with C++ function parser support
@@ -32390,6 +32394,8 @@ $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
 
 	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
 $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
+	  # Exodus Fortran API requires new version
+	  enableexodusfortran=no
 	  ;;
 
       "v5.22")
@@ -32399,19 +32405,46 @@ $as_echo "#define HAVE_EXODUS_API 1" >>confdefs.h
 
 	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus version $exodusversion support >>>" >&5
 $as_echo "<<< Configuring library with Exodus version $exodusversion support >>>" >&6; }
+	  # Check whether --enable-exodus-fortran was given.
+if test "${enable_exodus_fortran+set}" = set; then :
+  enableval=$enable_exodus_fortran; case "${enableval}" in
+			    yes)  enableexodusfortran=yes; ;;
+                             no)  enableexodusfortran=no;  ;;
+                              *)  as_fn_error $? "bad value ${enableval} for --enable-exodus-fortran" "$LINENO" 5 ;;
+                         esac
+else
+  enableexodusfortran=$enablefortran
+fi
+
+
+	  if (test "x$enableexodusfortran" = "xyes"); then
+	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Exodus Fortran API >>>" >&5
+$as_echo "<<< Configuring library with Exodus Fortran API >>>" >&6; }
+	  fi
 	  ;;
 
       *)
 	  EXODUS_INCLUDE=""
 	  enableexodus=no
+	  enableexodusfortran=no
 	  ;;
   esac
 
+
+
   ac_config_files="$ac_config_files contrib/exodusii/v5.09/Makefile"
 
-  ac_config_files="$ac_config_files contrib/exodusii/v5.22/exodus/cbind/Makefile"
+  ac_config_files="$ac_config_files contrib/exodusii/v5.22/exodus/Makefile"
 
 
+
+   if test x$enableexodusfortran = xyes; then
+  EXODUS_FORTRAN_API_TRUE=
+  EXODUS_FORTRAN_API_FALSE='#'
+else
+  EXODUS_FORTRAN_API_TRUE='#'
+  EXODUS_FORTRAN_API_FALSE=
+fi
 
 
    if (test $enableexodus = yes); then
@@ -33506,6 +33539,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_NETCDF_V4_TRUE}" && test -z "${LIBMESH_ENABLE_NETCDF_V4_FALSE}"; then
   as_fn_error $? "conditional \"LIBMESH_ENABLE_NETCDF_V4\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${EXODUS_FORTRAN_API_TRUE}" && test -z "${EXODUS_FORTRAN_API_FALSE}"; then
+  as_fn_error $? "conditional \"EXODUS_FORTRAN_API\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${LIBMESH_ENABLE_EXODUS_TRUE}" && test -z "${LIBMESH_ENABLE_EXODUS_FALSE}"; then
@@ -34745,7 +34782,7 @@ do
     "contrib/eigen/eigen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/eigen/eigen/Makefile" ;;
     "contrib/netcdf/v3/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netcdf/v3/Makefile" ;;
     "contrib/exodusii/v5.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.09/Makefile" ;;
-    "contrib/exodusii/v5.22/exodus/cbind/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/cbind/Makefile" ;;
+    "contrib/exodusii/v5.22/exodus/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/exodusii/v5.22/exodus/Makefile" ;;
     "contrib/nemesis/v3.09/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/v3.09/Makefile" ;;
     "contrib/nemesis/v5.22/nemesis/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/nemesis/v5.22/nemesis/Makefile" ;;
     "contrib/libHilbert/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/libHilbert/Makefile" ;;
