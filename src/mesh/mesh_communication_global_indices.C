@@ -788,7 +788,8 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator &commu
 }
 #else // LIBMESH_HAVE_LIBHILBERT, LIBMESH_HAVE_MPI
 template <typename ForwardIterator>
-void MeshCommunication::find_global_indices (const MeshTools::BoundingBox &,
+void MeshCommunication::find_global_indices (const Parallel::Communicator &,
+					     const MeshTools::BoundingBox &,
 					     const ForwardIterator &begin,
 					     const ForwardIterator &end,
 					     std::vector<unsigned int> &index_map) const
