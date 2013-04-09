@@ -23,7 +23,6 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/system_norm.h"
-#include "libmesh/parallel_object.h"
 
 // C++ includes
 #include <cstddef>
@@ -50,7 +49,7 @@ template <typename T> class NumericVector;
  *
  * @author Benjamin S. Kirk, 2003.
  */
-  class ErrorEstimator : public ParallelObject
+  class ErrorEstimator
 {
 public:
 
@@ -58,8 +57,7 @@ public:
    * Constructor.  Empty.  Derived classes should reset error_norm as
    * appropriate.
    */
-  ErrorEstimator(const Parallel::Communicator &comm /* = libMesh::CommWorld */) :
-    ParallelObject(comm),
+  ErrorEstimator() :
     error_norm()
   {}
 
@@ -149,7 +147,8 @@ protected:
    * \p error_per_cell from each processor and combines
    * them to get the global error vector.
    */
-  void reduce_error (std::vector<float>& error_per_cell) const;
+  void reduce_error (std::vector<float>& error_per_cell,
+		     const Parallel::Communicator &comm = libMesh::CommWorld) const;
 };
 
 
