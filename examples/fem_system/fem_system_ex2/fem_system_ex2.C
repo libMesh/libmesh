@@ -163,7 +163,9 @@ int main(int argc, char** argv)
   int dim = args("mesh/generation/dimension", 3);
   libmesh_example_assert(dim <= LIBMESH_DIM, "3D support");
 
-  Mesh mesh(dim);
+  // Create a mesh distributed across the default MPI communicator.
+  Mesh mesh(dim,init.communicator());
+
   EquationSystems systems(mesh);
 
   // Create and set systems up

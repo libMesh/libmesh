@@ -105,8 +105,9 @@ int main (int argc, char** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_assert(2 <= LIBMESH_DIM, "2D support");
 
-  // Create a mesh
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden later, distributed
+  // across the default MPI communicator.
+  Mesh mesh(0,init.communicator());
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
@@ -190,7 +191,7 @@ int main (int argc, char** argv)
   // We need a shell matrix to solve.  There is currently no way to
   // store the shell matrix in the system.  We just create it locally
   // here (a shell matrix does not occupy much memory).
-  SumShellMatrix<Number> shellMatrix;
+  SumShellMatrix<Number> shellMatrix(system.communicator());
   TensorShellMatrix<Number> shellMatrix0(system.get_vector("v"),system.get_vector("w"));
   shellMatrix.matrices.push_back(&shellMatrix0);
   SparseShellMatrix<Number> shellMatrix1(*system.matrix);

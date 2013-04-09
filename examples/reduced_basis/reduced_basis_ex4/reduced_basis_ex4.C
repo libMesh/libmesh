@@ -75,8 +75,9 @@ int main (int argc, char** argv)
   if ( command_line.search(1, "-online_mode") )
     online_mode = command_line.next(online_mode);
 
-  // Create a mesh (just a simple square)
-  Mesh mesh (dim);
+  // Create a mesh (just a simple square) on the default MPI
+  // communicator
+  Mesh mesh (dim, init.communicator());
   MeshTools::Generation::build_square (mesh,
                                        n_elem, n_elem,
                                        -1., 1.,
@@ -100,10 +101,10 @@ int main (int argc, char** argv)
   equation_systems.print_info();
 
   // Initialize the standard RBEvaluation object
-  SimpleRBEvaluation rb_eval;
+  SimpleRBEvaluation rb_eval(mesh.communicator());
 
   // Initialize the EIM RBEvaluation object
-  SimpleEIMEvaluation eim_rb_eval;
+  SimpleEIMEvaluation eim_rb_eval(mesh.communicator());
 
   // Set the rb_eval objects for the RBConstructions
   eim_construction.set_rb_evaluation(eim_rb_eval);

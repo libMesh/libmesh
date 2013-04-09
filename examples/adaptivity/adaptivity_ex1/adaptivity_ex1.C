@@ -65,8 +65,9 @@ int main(int argc, char** argv)
   libmesh_example_assert(false, "--enable-amr");
 #else
 
-  // Create a new mesh
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden later, on the
+  // default MPI communicator.
+  Mesh mesh(0,init.communicator());
 
   GetPot command_line (argc, argv);
 

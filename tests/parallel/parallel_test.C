@@ -9,6 +9,7 @@ class ParallelTest : public CppUnit::TestCase {
 public: 
   CPPUNIT_TEST_SUITE( ParallelTest );
 
+#ifndef LIBMESH_DISABLE_COMMWORLD
   CPPUNIT_TEST( testGather );
   CPPUNIT_TEST( testAllGather );
   CPPUNIT_TEST( testBroadcast );
@@ -17,6 +18,7 @@ public:
   CPPUNIT_TEST( testMax );
   CPPUNIT_TEST( testIsendRecv );
   CPPUNIT_TEST( testIrecvSend );
+#endif // !LIBMESH_DISABLE_COMMWORLD
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -31,6 +33,7 @@ public:
 
 
 
+#ifndef LIBMESH_DISABLE_COMMWORLD
   void testGather()
   {
     std::vector<processor_id_type> vals;
@@ -172,6 +175,8 @@ public:
           CPPUNIT_ASSERT_EQUAL( src_val[i] , recv_val[i] );
       }
   }
+#endif // !LIBMESH_DISABLE_COMMWORLD
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( ParallelTest );

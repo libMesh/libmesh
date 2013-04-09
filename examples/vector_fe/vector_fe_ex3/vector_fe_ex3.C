@@ -54,8 +54,9 @@ int main (int argc, char** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
   libmesh_example_assert(3 <= LIBMESH_DIM, "2D/3D support");
 
-  // Create a mesh.
-  Mesh mesh;
+  // Create a mesh, with dimension to be overridden later, on the
+  // default MPI communicator.
+  Mesh mesh(0,init.communicator());
 
   // Use the MeshTools::Generation mesh generator to create a uniform
   // grid on the square [-1,1]^D. We must use TRI6 elements for the
