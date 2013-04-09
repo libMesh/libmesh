@@ -139,14 +139,14 @@ int main (int argc, char** argv)
   // Build a new RBEvaluation object which will be used to perform
   // Reduced Basis calculations. This is required in both the
   // "Offline" and "Online" stages.
-  SimpleRBEvaluation rb_eval;
+  SimpleRBEvaluation rb_eval(mesh.communicator());
 
   // We need to give the RBConstruction object a pointer to
   // our RBEvaluation object
   rb_con.set_rb_evaluation(rb_eval);
 
   // We also need a SCM evaluation object to perform SCM calculations
-  RBSCMEvaluation rb_scm_eval;
+  RBSCMEvaluation rb_scm_eval(mesh.communicator());
   rb_scm_eval.set_rb_theta_expansion( rb_eval.get_rb_theta_expansion() );
 
   // Tell rb_eval about rb_scm_eval

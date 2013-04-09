@@ -13,7 +13,8 @@ class SimpleEIMEvaluation : public RBEIMEvaluation
 {
 public:
 
-  SimpleEIMEvaluation()
+  SimpleEIMEvaluation(const Parallel::Communicator& comm)
+    : RBEIMEvaluation(comm)
   {
     attach_parametrized_function(&g_x);
     attach_parametrized_function(&g_y);

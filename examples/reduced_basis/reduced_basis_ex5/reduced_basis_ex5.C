@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 	// Build a new RBEvaluation object which will be used to perform
 	// Reduced Basis calculations. This is required in both the
 	// "Offline" and "Online" stages.
-	ElasticityRBEvaluation rb_eval;
+	ElasticityRBEvaluation rb_eval(mesh.communicator());
 
 	// We need to give the RBConstruction object a pointer to
 	// our RBEvaluation object

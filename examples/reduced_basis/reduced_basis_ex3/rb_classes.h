@@ -48,7 +48,8 @@ public:
   /**
    * Constructor. Just set the theta expansion.
    */
-  SimpleRBEvaluation()
+  SimpleRBEvaluation(const Parallel::Communicator& comm)
+    : TransientRBEvaluation(comm)
   {
     set_rb_theta_expansion(cd_rb_theta_expansion);
   }

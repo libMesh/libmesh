@@ -101,10 +101,10 @@ int main (int argc, char** argv)
   equation_systems.print_info();
 
   // Initialize the standard RBEvaluation object
-  SimpleRBEvaluation rb_eval;
+  SimpleRBEvaluation rb_eval(mesh.communicator());
 
   // Initialize the EIM RBEvaluation object
-  SimpleEIMEvaluation eim_rb_eval;
+  SimpleEIMEvaluation eim_rb_eval(mesh.communicator());
 
   // Set the rb_eval objects for the RBConstructions
   eim_construction.set_rb_evaluation(eim_rb_eval);
