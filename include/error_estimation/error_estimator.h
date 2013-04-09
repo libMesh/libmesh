@@ -58,7 +58,7 @@ public:
    * Constructor.  Empty.  Derived classes should reset error_norm as
    * appropriate.
    */
-  ErrorEstimator(const Parallel::Communicator &comm /* = libMesh::CommWorld */) :
+  ErrorEstimator(const Parallel::Communicator &comm = libMesh::CommWorld) :
     ParallelObject(comm),
     error_norm()
   {}

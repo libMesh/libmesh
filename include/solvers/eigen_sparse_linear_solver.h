@@ -52,7 +52,7 @@ class EigenSparseLinearSolver : public LinearSolver<T>
   /**
    *  Constructor. Initializes Eigen data structures
    */
-  EigenSparseLinearSolver (const libMesh::Parallel::Communicator &comm /*= libMesh::CommWorld */);
+  EigenSparseLinearSolver (const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.
@@ -143,7 +143,7 @@ class EigenSparseLinearSolver : public LinearSolver<T>
 /*----------------------- functions ----------------------------------*/
 template <typename T>
 inline
-EigenSparseLinearSolver<T>::EigenSparseLinearSolver (const libMesh::Parallel::Communicator &comm) :
+EigenSparseLinearSolver<T>::EigenSparseLinearSolver (const Parallel::Communicator &comm) :
   LinearSolver<T>(comm)
 {
 }

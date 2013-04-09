@@ -69,7 +69,7 @@ public:
   /**
    * Constructor.
    */
-  MeshfreeInterpolation (const libMesh::Parallel::Communicator &comm /* = libMesh::CommWorld */ ) :
+  MeshfreeInterpolation (const Parallel::Communicator &comm = libMesh::CommWorld) :
     ParallelObject(comm),
     _parallelization_strategy (SYNC_SOURCES)
   {}
@@ -321,7 +321,7 @@ public:
    */
   InverseDistanceInterpolation (const unsigned int n_interp_pts = 8,
 				const Real  power               = 2,
-				const libMesh::Parallel::Communicator &comm = libMesh::CommWorld) :
+				const Parallel::Communicator &comm = libMesh::CommWorld) :
     MeshfreeInterpolation(comm),
 #if LIBMESH_HAVE_NANOFLANN
     _point_list_adaptor(_src_pts),

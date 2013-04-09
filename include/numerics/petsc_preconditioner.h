@@ -64,7 +64,7 @@ public:
   /**
    *  Constructor. Initializes PetscPreconditioner data structures
    */
-  PetscPreconditioner (const libMesh::Parallel::Communicator &comm /* = libMesh::CommWorld */);
+  PetscPreconditioner (const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.
@@ -134,7 +134,7 @@ private:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-PetscPreconditioner<T>::PetscPreconditioner (const libMesh::Parallel::Communicator &comm) :
+PetscPreconditioner<T>::PetscPreconditioner (const Parallel::Communicator &comm) :
   Preconditioner<T>(comm),
   _pc(PETSC_NULL)
 {

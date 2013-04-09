@@ -62,7 +62,7 @@ public:
   /**
    *  Constructor. Initializes Solver data structures
    */
-  LinearSolver (const libMesh::Parallel::Communicator &comm /*= libMesh::CommWorld */);
+  LinearSolver (const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.
@@ -73,7 +73,7 @@ public:
    * Builds a \p LinearSolver using the linear solver package specified by
    * \p solver_package
    */
-  static AutoPtr<LinearSolver<T> > build(const libMesh::Parallel::Communicator &comm,
+  static AutoPtr<LinearSolver<T> > build(const Parallel::Communicator &comm,
 					 const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
@@ -264,7 +264,7 @@ protected:
 /*----------------------- inline functions ----------------------------------*/
 template <typename T>
 inline
-LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator &comm) :
+LinearSolver<T>::LinearSolver (const Parallel::Communicator &comm) :
   ParallelObject       (comm),
   _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),

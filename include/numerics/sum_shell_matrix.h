@@ -58,7 +58,7 @@ public:
    */
   explicit
   SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
-		  const Parallel::Communicator &comm /* = libMesh::CommWorld */);
+		  const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor.

@@ -81,7 +81,7 @@ public:
    * the matrix before usage with
    * \p init(...).
    */
-  SparseMatrix (const Parallel::Communicator &comm /* = libMesh::CommWorld */);
+  SparseMatrix (const Parallel::Communicator &comm = libMesh::CommWorld);
 
   /**
    * Destructor. Free all memory, but do not
