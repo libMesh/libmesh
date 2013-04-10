@@ -63,7 +63,7 @@ namespace libMesh
     /**
      * Empty destructor.
      */
-    ~TetGenMeshInterface() {};
+    ~TetGenMeshInterface() {}
 
     /**
      * Method invokes TetGen library to compute a Delaunay tetrahedrization

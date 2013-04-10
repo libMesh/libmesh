@@ -36,9 +36,9 @@ namespace libMesh
   public:
 
     HCurlFETransformation()
-      : FETransformationBase<OutputShape>(){};
+      : FETransformationBase<OutputShape>(){}
 
-    virtual ~HCurlFETransformation(){};
+    virtual ~HCurlFETransformation(){}
 
     /**
      * Evaluates shape functions in physical coordinates for HCurl conforming elements.
@@ -110,7 +110,7 @@ namespace libMesh
 			  const FEGenericBase<OutputShape>& /*fe*/,
 			  std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence> >& /*div_phi*/ ) const
     { libmesh_do_once( libMesh::err << "WARNING: Shape function divergences for HCurl elements are not currently "
-		       << "being computed!" << std::endl; ); return; };
+		       << "being computed!" << std::endl; ); return; }
 
   }; // class HCurlFETransformation
 

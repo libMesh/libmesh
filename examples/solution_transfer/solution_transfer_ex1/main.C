@@ -16,7 +16,7 @@ using namespace libMesh;
 
 
 Number initial_value(const Point& p,
-                     const Parameters& parameters,
+                     const Parameters& /* parameters */,
                      const std::string&,
                      const std::string&)
 {

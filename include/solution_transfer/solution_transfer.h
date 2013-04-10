@@ -39,9 +39,9 @@ public:
   SolutionTransfer(const libMesh::Parallel::Communicator &comm
 		   LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
     ParallelObject(comm)
-  {};
+  {}
 
-  virtual ~SolutionTransfer() {};
+  virtual ~SolutionTransfer() {}
 
   /**
    * Transfer the values of a variable to another.

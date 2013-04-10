@@ -3325,9 +3325,10 @@ inline void Communicator::send_receive (const unsigned int send_tgt,
 template <typename Context1, typename RangeIter,
           typename Context2, typename OutputIter>
 inline void Communicator::send_receive_packed_range
-  (const unsigned int dest_processor_id, const Context1*, RangeIter send_begin,
-   const RangeIter send_end, const unsigned int source_processor_id, Context2*,
-   OutputIter out, const MessageTag &, const MessageTag &) const
+  (const unsigned int /* dest_processor_id */, const Context1*,
+   RangeIter /* send_begin */, const RangeIter /* send_end */,
+   const unsigned int /* source_processor_id */, Context2*,
+   OutputIter /* out */, const MessageTag &, const MessageTag &) const
 { libmesh_error(); }
 
 /**

@@ -32,9 +32,9 @@ namespace libMesh
   public:
 
     FEXYZMap()
-      : FEMap(){};
+      : FEMap(){}
 
-    virtual ~FEXYZMap(){};
+    virtual ~FEXYZMap(){}
 
     /**
      * Special implementation for XYZ finite elements

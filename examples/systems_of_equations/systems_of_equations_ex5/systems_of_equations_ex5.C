@@ -113,7 +113,7 @@ int main (int argc, char** argv)
   unsigned int v_var      = system.add_variable("v", SECOND, LAGRANGE);
 
   // Add a SCALAR variable for the Lagrange multiplier to enforce our constraint
-  unsigned int lambda_var = system.add_variable("lambda", FIRST, SCALAR);
+  system.add_variable("lambda", FIRST, SCALAR);
 
 
   system.attach_assemble_function (assemble_elasticity);

@@ -34,10 +34,10 @@ namespace libMesh
 
     // Constructor
     SolutionHistory() :
-      overwrite_previously_stored(false) {};
+      overwrite_previously_stored(false) {}
 
     // Destructor
-    virtual ~SolutionHistory () {};
+    virtual ~SolutionHistory () {}
 
     // Function to store a solution, pure virtual
     virtual void store() = 0;

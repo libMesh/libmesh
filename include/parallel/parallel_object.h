@@ -77,7 +77,7 @@ namespace libMesh
     /**
      * Destructor.  Virtual because we are a base class.
      */
-    virtual ~ParallelObject () {};
+    virtual ~ParallelObject () {}
 
     /**
      * @returns a reference to the \p Parallel::Communicator object

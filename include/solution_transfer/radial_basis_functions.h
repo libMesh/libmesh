@@ -85,7 +85,7 @@ namespace libMesh
     /**
      * Evaluate the radial basis function at the reqested location.
      */
-    Real operator()(Real rad) const { libmesh_not_implemented(); return 0.; }
+    Real operator()(Real /* rad */) const { libmesh_not_implemented(); return 0.; }
   };
 
 

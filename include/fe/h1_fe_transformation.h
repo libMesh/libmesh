@@ -37,9 +37,9 @@ namespace libMesh
   public:
 
     H1FETransformation()
-      : FETransformationBase<OutputShape>(){};
+      : FETransformationBase<OutputShape>(){}
 
-    virtual ~H1FETransformation(){};
+    virtual ~H1FETransformation(){}
 
     /**
      * Evaluates shape functions in physical coordinates for H1 conforming elements.

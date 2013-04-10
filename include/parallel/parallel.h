@@ -382,9 +382,9 @@ namespace Parallel
    * perform work after a MPI_Wait succeeds
    */
   struct PostWaitWork {
-    virtual ~PostWaitWork() {};
+    virtual ~PostWaitWork() {}
 
-    virtual void run() {};
+    virtual void run() {}
   };
 
 
@@ -1144,7 +1144,7 @@ namespace Parallel
     PostWaitUnpackBuffer(const Container& buffer, Context *context, OutputIter out) :
       _buf(buffer), _context(context), _out(out) {}
 
-    virtual void run() { Parallel::unpack_range(_buf, _context, _out); };
+    virtual void run() { Parallel::unpack_range(_buf, _context, _out); }
 
     private:
     const Container& _buf;
@@ -1158,7 +1158,7 @@ namespace Parallel
   struct PostWaitDeleteBuffer : public PostWaitWork {
     PostWaitDeleteBuffer(Container* buffer) : _buf(buffer) {}
 
-    virtual void run() { delete _buf; };
+    virtual void run() { delete _buf; }
 
     private:
     Container* _buf;

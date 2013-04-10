@@ -39,7 +39,7 @@ namespace libMesh {
     /**
      * Destructor.
      */
-    virtual ~Singleton() {};
+    virtual ~Singleton() {}
 
   public:
 
@@ -59,7 +59,7 @@ namespace libMesh {
       /**
        * Destructor.
        */
-      virtual ~Setup() {};
+      virtual ~Setup() {}
 
       /**
        * Setup method.  Importantly, this is called *after main()* from the

@@ -38,7 +38,7 @@ class Elem;
   public:
 
     FEMap();
-    virtual ~FEMap(){};
+    virtual ~FEMap(){}
 
     static AutoPtr<FEMap> build( FEType fe_type );
 

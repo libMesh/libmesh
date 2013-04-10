@@ -98,7 +98,7 @@ public:
    * The actual initialization process.
    * specifies the method to use when building a \p PointLocator
    */
-  void init () { this->init(Trees::NODES); };
+  void init () { this->init(Trees::NODES); }
 
 
   /**

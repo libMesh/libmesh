@@ -42,8 +42,8 @@ namespace libMesh
   {
   public:
 
-    FETransformationBase(){};
-    virtual ~FETransformationBase(){};
+    FETransformationBase(){}
+    virtual ~FETransformationBase(){}
 
     /**
      * Builds an FETransformation object based on the finite element type

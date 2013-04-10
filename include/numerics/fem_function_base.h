@@ -49,14 +49,14 @@ protected:
   /**
    * Constructor.
    */
-  FEMFunctionBase () {};
+  FEMFunctionBase () {}
 
 public:
 
   /**
    * Destructor.
    */
-  virtual ~FEMFunctionBase () {};
+  virtual ~FEMFunctionBase () {}
 
 
   /**

@@ -66,7 +66,7 @@ public:
    * Initialize system qoi. By default, does nothing in order to maintain backward
    * compatibility for FEMSystem applications that control qoi.
    */
-  virtual void init_qoi( std::vector<Number>& /*sys_qoi*/){};
+  virtual void init_qoi( std::vector<Number>& /*sys_qoi*/){}
 
   /**
    * Clear all the data structures associated with

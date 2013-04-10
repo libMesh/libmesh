@@ -92,7 +92,7 @@ public:
   ~Biharmonic()
   {
     // delete _meshRefinement;
-  };
+  }
 
 
   // Misc. getters

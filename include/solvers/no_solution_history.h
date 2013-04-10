@@ -32,10 +32,10 @@ namespace libMesh
   public:
 
     // Constructor
-  NoSolutionHistory() : SolutionHistory() {};
+  NoSolutionHistory() : SolutionHistory() {}
 
     // Destructor
-    virtual ~NoSolutionHistory() {};
+    virtual ~NoSolutionHistory() {}
 
     // Virtual function store which we will be overriding
     virtual void store();
