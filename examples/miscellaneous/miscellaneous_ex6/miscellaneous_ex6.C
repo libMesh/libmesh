@@ -83,7 +83,7 @@ void triangulate_domain(const Parallel::Communicator& comm)
   typedef TriangleInterface::ArbitraryHole ArbitraryHole;
 
   // Libmesh mesh that will eventually be created.
-  Mesh mesh(2, comm);
+  Mesh mesh(comm, 2);
 
   // The points which make up the L-shape:
   mesh.add_point(Point( 0. ,  0.));
