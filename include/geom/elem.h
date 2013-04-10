@@ -154,7 +154,6 @@ class Elem : public ReferenceCountedObject<Elem>,
 
   /**
    * @returns the subdomain that this element belongs to.
-   * To conserve space this is stored as an unsigned char.
    */
   subdomain_id_type subdomain_id () const;
 
