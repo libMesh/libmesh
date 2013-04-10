@@ -666,53 +666,37 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
       (other_mesh_boundary_id != BoundaryInfo::invalid_id) )
   {
-    std::set<dof_id_type> this_boundary_node_ids;
-    MeshBase::element_iterator elem_it  = this->elements_begin();
-    MeshBase::element_iterator elem_end = this->elements_end();
-    for ( ; elem_it != elem_end; ++elem_it)
+    // Loop below fills in these arrays for the two meshes.
+    std::set<dof_id_type> this_boundary_node_ids, other_boundary_node_ids;
     {
-      Elem *el = *elem_it;
+      // Make temporary fixed-size arrays for loop
+      boundary_id_type id_array[2]        = {this_mesh_boundary_id, other_mesh_boundary_id};
+      std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
+      SerialMesh* mesh_array[2]           = {this, &other_mesh};
 
-      // Now check whether elem has a face on the specified boundary
-      for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
-        if (el->neighbor(side_id) == NULL)
+      for (unsigned i=0; i<2; ++i)
         {
-          // Get *all* boundary IDs, not just the first one!
-          std::vector<boundary_id_type> bc_ids = this->boundary_info->boundary_ids (el, side_id);
-
-          if (std::count(bc_ids.begin(), bc_ids.end(), this_mesh_boundary_id))
-          {
-            AutoPtr<Elem> side (el->build_side(side_id));
-            for (unsigned int node_id=0; node_id<side->n_nodes(); node_id++)
+          MeshBase::element_iterator elem_it  = mesh_array[i]->elements_begin();
+          MeshBase::element_iterator elem_end = mesh_array[i]->elements_end();
+          for ( ; elem_it != elem_end; ++elem_it)
             {
-              this_boundary_node_ids.insert( side->node(node_id) );
+              Elem *el = *elem_it;
+
+              // Now check whether elem has a face on the specified boundary
+              for (unsigned int side_id=0; side_id<el->n_sides(); ++side_id)
+                if (el->neighbor(side_id) == NULL)
+                  {
+                    // Get *all* boundary IDs, not just the first one!
+                    std::vector<boundary_id_type> bc_ids = mesh_array[i]->boundary_info->boundary_ids (el, side_id);
+
+                    if (std::count(bc_ids.begin(), bc_ids.end(), id_array[i]))
+                      {
+                        AutoPtr<Elem> side (el->build_side(side_id));
+                        for (unsigned int node_id=0; node_id<side->n_nodes(); ++node_id)
+                          set_array[i]->insert( side->node(node_id) );
+                      }
+                  }
             }
-          }
-        }
-    }
-
-    std::set<dof_id_type> other_boundary_node_ids;
-    elem_it  = other_mesh.elements_begin();
-    elem_end = other_mesh.elements_end();
-    for ( ; elem_it != elem_end; ++elem_it)
-    {
-      Elem *el = *elem_it;
-
-      // Now check whether elem has a face on the specified boundary
-      for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
-        if (el->neighbor(side_id) == NULL)
-        {
-          // Get *all* boundary IDs, not just the first one!
-          std::vector<boundary_id_type> bc_ids = other_mesh.boundary_info->boundary_ids (el, side_id);
-
-          if (std::count(bc_ids.begin(), bc_ids.end(), other_mesh_boundary_id))
-          {
-            AutoPtr<Elem> side (el->build_side(side_id));
-            for (unsigned int node_id=0; node_id<side->n_nodes(); node_id++)
-            {
-              other_boundary_node_ids.insert( side->node(node_id) );
-            }
-          }
         }
     }
 
