@@ -794,8 +794,8 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc, MatStruct
   ierr = DMLibMeshGetSystem(dm, _sys); CHKERRQ(ierr);
   NonlinearImplicitSystem& sys = *_sys;
 
-  PetscMatrix<Number>  the_pc(pc);
-  PetscMatrix<Number>  Jac(jac);
+  PetscMatrix<Number>  the_pc(pc,sys.communicator());
+  PetscMatrix<Number>  Jac(jac,sys.communicator());
   PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
   PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
   PetscVector<Number>  X_global(x, sys.communicator());
