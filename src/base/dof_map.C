@@ -232,7 +232,7 @@ void DofMap::attach_matrix (SparseMatrix<Number>& matrix)
   bool computed_sparsity_already =
     ((_n_nz && !_n_nz->empty()) ||
      (_n_oz && !_n_oz->empty()));
-  this->communicator().max(computed_sparsity_already);
+  this->comm().max(computed_sparsity_already);
   if (computed_sparsity_already &&
       matrix.need_full_sparsity_pattern())
     {
@@ -302,7 +302,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
     }
 
   std::vector<dof_id_type> objects_on_proc(this->n_processors(), 0);
-  this->communicator().allgather(ghost_objects_from_proc[this->processor_id()],
+  this->comm().allgather(ghost_objects_from_proc[this->processor_id()],
 				 objects_on_proc);
 
 #ifdef DEBUG
@@ -341,7 +341,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
                                     this->processor_id() - p) %
                                     this->n_processors();
       std::vector<dof_id_type> request_to_fill;
-      this->communicator().send_receive(procup, requested_ids[procup],
+      this->comm().send_receive(procup, requested_ids[procup],
 					procdown, request_to_fill);
 
       // Fill those requests
@@ -372,7 +372,7 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
       // Trade back the results
       std::vector<dof_id_type> filled_request;
-      this->communicator().send_receive(procdown, ghost_data,
+      this->comm().send_receive(procdown, ghost_data,
 					procup, filled_request);
 
       // And copy the id changes we've now been informed of
@@ -867,7 +867,7 @@ void DofMap::distribute_dofs (MeshBase& mesh)
 
   // Get DOF counts on all processors
   std::vector<dof_id_type> dofs_on_proc(n_proc, 0);
-  this->communicator().allgather(next_free_dof, dofs_on_proc);
+  this->comm().allgather(next_free_dof, dofs_on_proc);
 
   // Resize and fill the _first_df and _end_df arrays
 #ifdef LIBMESH_ENABLE_AMR
@@ -2686,7 +2686,7 @@ void SparsityPattern::Build::join (const SparsityPattern::Build &other)
 void SparsityPattern::Build::parallel_sync ()
 {
   parallel_object_only();
-  this->communicator().verify(need_full_sparsity_pattern);
+  this->comm().verify(need_full_sparsity_pattern);
 
   const dof_id_type n_global_dofs   = dof_map.n_dofs();
   const dof_id_type n_dofs_on_proc  = dof_map.n_dofs_on_processor(this->processor_id());
@@ -2737,9 +2737,9 @@ void SparsityPattern::Build::parallel_sync ()
             ++it;
         }
 
-      this->communicator().send_receive(procup, pushed_row_ids,
+      this->comm().send_receive(procup, pushed_row_ids,
 					procdown, pushed_row_ids_to_me);
-      this->communicator().send_receive(procup, pushed_rows,
+      this->comm().send_receive(procup, pushed_rows,
 					procdown, pushed_rows_to_me);
       pushed_row_ids.clear();
       pushed_rows.clear();
@@ -2850,9 +2850,9 @@ std::string DofMap::get_info() const
 
       std::size_t n_nz_size = _n_nz->size();
 
-      this->communicator().max(max_n_nz);
-      this->communicator().sum(avg_n_nz);
-      this->communicator().sum(n_nz_size);
+      this->comm().max(max_n_nz);
+      this->comm().sum(avg_n_nz);
+      this->comm().sum(n_nz_size);
 
       avg_n_nz /= std::max(n_nz_size,std::size_t(1));
 
@@ -2866,9 +2866,9 @@ std::string DofMap::get_info() const
 
       std::size_t n_oz_size = _n_oz->size();
 
-      this->communicator().max(max_n_oz);
-      this->communicator().sum(avg_n_oz);
-      this->communicator().sum(n_oz_size);
+      this->comm().max(max_n_oz);
+      this->comm().sum(avg_n_oz);
+      this->comm().sum(n_oz_size);
 
       avg_n_oz /= std::max(n_oz_size,std::size_t(1));
     }
@@ -2912,10 +2912,10 @@ std::string DofMap::get_info() const
         n_rhss++;
     }
 
-  this->communicator().sum(n_constraints);
-  this->communicator().sum(n_rhss);
-  this->communicator().sum(avg_constraint_length);
-  this->communicator().max(max_constraint_length);
+  this->comm().sum(n_constraints);
+  this->comm().sum(n_rhss);
+  this->comm().sum(avg_constraint_length);
+  this->comm().max(max_constraint_length);
 
   os << "    DofMap Constraints\n      Number of DoF Constraints = "
      << n_constraints;
@@ -2955,10 +2955,10 @@ std::string DofMap::get_info() const
         n_node_rhss++;
     }
 
-  this->communicator().sum(n_node_constraints);
-  this->communicator().sum(n_node_rhss);
-  this->communicator().sum(avg_node_constraint_length);
-  this->communicator().max(max_node_constraint_length);
+  this->comm().sum(n_node_constraints);
+  this->comm().sum(n_node_rhss);
+  this->comm().sum(avg_node_constraint_length);
+  this->comm().max(max_node_constraint_length);
 
   os << "\n      Number of Node Constraints = " << n_node_constraints;
   if (n_node_rhss)

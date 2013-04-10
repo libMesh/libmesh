@@ -65,7 +65,7 @@ void Sort<KeyType,IdxType>::sort()
   // work with, so catch the degenerate cases here
   IdxType global_data_size = libmesh_cast_int<IdxType>(_data.size());
 
-  this->communicator().sum (global_data_size);
+  this->comm().sum (global_data_size);
 
   if (global_data_size < 2)
     {
@@ -73,7 +73,7 @@ void Sort<KeyType,IdxType>::sort()
       // or contains only one element
       _my_bin = _data;
 
-      this->communicator().allgather (static_cast<IdxType>(_my_bin.size()),
+      this->comm().allgather (static_cast<IdxType>(_my_bin.size()),
 				      _local_bin_sizes);
     }
   else
@@ -108,13 +108,13 @@ void Sort<KeyType,IdxType>::binsort()
 
   // Communicate to determine the global
   // min and max for all processors.
-  this->communicator().max(global_min_max);
+  this->comm().max(global_min_max);
 
   // Multiply the min by -1 to obtain the true min
   global_min_max[0] *= -1;
 
   // Bin-Sort based on the global min and max
-  Parallel::BinSorter<KeyType> bs(this->communicator(), _data);
+  Parallel::BinSorter<KeyType> bs(this->comm(), _data);
   bs.binsort(_n_procs, global_min_max[1], global_min_max[0]);
 
   // Now save the local bin sizes in a vector so
@@ -161,20 +161,20 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::binsort()
 		1,
 		Parallel::StandardType<Hilbert::HilbertIndices>(),
 		hilbert_min,
-		this->communicator().get());
+		this->comm().get());
 
   MPI_Allreduce(&local_max,
 		&global_max,
 		1,
 		Parallel::StandardType<Hilbert::HilbertIndices>(),
 		hilbert_max,
-		this->communicator().get());
+		this->comm().get());
 
   MPI_Op_free   (&hilbert_max);
   MPI_Op_free   (&hilbert_min);
 
   // Bin-Sort based on the global min and max
-  Parallel::BinSorter<Hilbert::HilbertIndices> bs(this->communicator(),_data);
+  Parallel::BinSorter<Hilbert::HilbertIndices> bs(this->comm(),_data);
   bs.binsort(_n_procs, global_max, global_min);
 
   // Now save the local bin sizes in a vector so
@@ -196,7 +196,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
   std::vector<IdxType> global_bin_sizes = _local_bin_sizes;
 
   // Sum to find the total number of entries in each bin.
-  this->communicator().sum(global_bin_sizes);
+  this->comm().sum(global_bin_sizes);
 
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which
@@ -215,7 +215,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
       // Find the number of contributions coming from each
       // processor for this bin.  Note: allgather combines
       // the MPI_Gather and MPI_Bcast operations into one.
-      this->communicator().allgather(_local_bin_sizes[i], proc_bin_size);
+      this->comm().allgather(_local_bin_sizes[i], proc_bin_size);
 
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
@@ -239,7 +239,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
 	          (int*) &displacements[0],          // Offsets into the receive buffer
 		  Parallel::StandardType<KeyType>(), // The data type we are sorting
 		  i,                                 // The root process (we do this once for each proc)
-		  this->communicator().get());
+		  this->comm().get());
 
       // Copy the destination buffer if it
       // corresponds to the bin for this processor
@@ -276,7 +276,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
 		_n_procs,
 		MPI_UNSIGNED,
 		MPI_SUM,
-		this->communicator().get());
+		this->comm().get());
 
   // Create a vector to temporarily hold the results of MPI_Gatherv
   // calls.  The vector dest  may be saved away to _my_bin depending on which
@@ -303,7 +303,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
 		    &proc_bin_size[0],    // Destination: Total # of entries in bin i
 		    1,
 		    MPI_UNSIGNED,
-		    this->communicator().get());
+		    this->comm().get());
 
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
@@ -327,7 +327,7 @@ void Sort<Hilbert::HilbertIndices,unsigned int>::communicate_bins()
 		  (int*) &displacements[0], // Offsets into the receive buffer
 		  Parallel::StandardType<Hilbert::HilbertIndices>(), // The data type we are sorting
 		  i,                        // The root process (we do this once for each proc)
-		  this->communicator().get());
+		  this->comm().get());
 
       // Copy the destination buffer if it
       // corresponds to the bin for this processor

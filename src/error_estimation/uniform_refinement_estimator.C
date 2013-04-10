@@ -280,7 +280,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
       // Copy the projected coarse grid solutions, which will be
       // overwritten by solve()
 //      projected_solutions[i] = system.solution->clone().release();
-      projected_solutions[i] = NumericVector<Number>::build(system.communicator()).release();
+      projected_solutions[i] = NumericVector<Number>::build(system.comm()).release();
       projected_solutions[i]->init(system.solution->size(), true, SERIAL);
       system.solution->localize(*projected_solutions[i],
                                 system.get_dof_map().get_send_list());
@@ -659,7 +659,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
   if (error_per_cell)
     {
       // First sum the vector of estimated error values
-      this->reduce_error(*error_per_cell, es.communicator());
+      this->reduce_error(*error_per_cell, es.comm());
 
       // Compute the square-root of each component.
       START_LOG("std::sqrt()", "UniformRefinementEstimator");
@@ -675,7 +675,7 @@ void UniformRefinementEstimator::_estimate_error (const EquationSystems* _es,
         {
           ErrorVector *e = it->second;
           // First sum the vector of estimated error values
-          this->reduce_error(*e, es.communicator());
+          this->reduce_error(*e, es.comm());
 
           // Compute the square-root of each component.
           START_LOG("std::sqrt()", "UniformRefinementEstimator");

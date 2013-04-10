@@ -168,7 +168,7 @@ int main(int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden later, on the
   // default MPI communicator.
-  Mesh mesh(init.communicator());
+  Mesh mesh(init.comm());
 
   // Read in the mesh
   if (dim == 1)

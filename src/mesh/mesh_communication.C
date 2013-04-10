@@ -109,7 +109,7 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   // (2) receive elements from all processors, watching for duplicates
   // (3) deleting all nonlocal elements elements
   // (4) obtaining required ghost elements from neighboring processors
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
   libmesh_assert (!mesh.is_serial());
   libmesh_assert (MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
 				    mesh.unpartitioned_elements_end()) == 0);
@@ -119,8 +119,8 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   // Get a few unique message tags to use in communications; we'll
   // default to some numbers around pi*1000
   Parallel::MessageTag
-    nodestag   = mesh.communicator().get_unique_tag(3141),
-    elemstag   = mesh.communicator().get_unique_tag(3142);
+    nodestag   = mesh.comm().get_unique_tag(3141),
+    elemstag   = mesh.comm().get_unique_tag(3142);
 
   // Figure out how many nodes and elements we have which are assigned to each
   // processor.  send_n_nodes_and_elem_per_proc contains the number of nodes/elements
@@ -193,12 +193,12 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	  {
 	    node_send_requests.push_back(Parallel::request());
 
-	    mesh.communicator().send_packed_range (pid,
-						   &mesh,
-						   connected_nodes.begin(),
-						   connected_nodes.end(),
-						   node_send_requests.back(),
-						   nodestag);
+	    mesh.comm().send_packed_range (pid,
+					   &mesh,
+					   connected_nodes.begin(),
+					   connected_nodes.end(),
+					   node_send_requests.back(),
+					   nodestag);
 	  }
 
 	// the number of elements we will send to this processor
@@ -209,18 +209,18 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
 	    // send the elements off to the destination processor
 	    element_send_requests.push_back(Parallel::request());
 
-	    mesh.communicator().send_packed_range (pid,
-						   &mesh,
-						   elements_to_send.begin(),
-						   elements_to_send.end(),
-						   element_send_requests.back(),
-						   elemstag);
+	    mesh.comm().send_packed_range (pid,
+					   &mesh,
+					   elements_to_send.begin(),
+					   elements_to_send.end(),
+					   element_send_requests.back(),
+					   elemstag);
 	  }
       }
 
   std::vector<dof_id_type> recv_n_nodes_and_elem_per_proc(send_n_nodes_and_elem_per_proc);
 
-  mesh.communicator().alltoall (recv_n_nodes_and_elem_per_proc);
+  mesh.comm().alltoall (recv_n_nodes_and_elem_per_proc);
 
   // In general we will only need to communicate with a subset of the other processors.
   // I can't immediately think of a case where we will send elements but not nodes, but
@@ -267,19 +267,19 @@ void MeshCommunication::redistribute (ParallelMesh &mesh) const
   for (unsigned int node_comm_step=0; node_comm_step<n_recv_node_pairs; node_comm_step++)
     // but we don't necessarily want to impose an ordering, so
     // just process whatever message is available next.
-    mesh.communicator().receive_packed_range (Parallel::any_source,
-					      &mesh,
-					      mesh_inserter_iterator<Node>(mesh),
-					      nodestag);
+    mesh.comm().receive_packed_range (Parallel::any_source,
+				      &mesh,
+				      mesh_inserter_iterator<Node>(mesh),
+				      nodestag);
 
   // Receive elements.
   // Similarly we know how many processors are sending us elements,
   // but we don't really care in what order we receive them.
   for (unsigned int elem_comm_step=0; elem_comm_step<n_recv_elem_pairs; elem_comm_step++)
-    mesh.communicator().receive_packed_range (Parallel::any_source,
-					      &mesh,
-					      mesh_inserter_iterator<Elem>(mesh),
-					      elemstag);
+    mesh.comm().receive_packed_range (Parallel::any_source,
+				      &mesh,
+				      mesh_inserter_iterator<Elem>(mesh),
+				      elemstag);
 
   // Wait for all sends to complete
   Parallel::wait (node_send_requests);
@@ -315,7 +315,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
     return;
 
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   START_LOG("gather_neighboring_elements()","MeshCommunication");
 
@@ -353,7 +353,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   // Get a unique message tag to use in communications; we'll default
   // to some numbers around pi*10000
   Parallel::MessageTag
-    element_neighbors_tag = mesh.communicator().get_unique_tag(31416);
+    element_neighbors_tag = mesh.comm().get_unique_tag(31416);
 
   // Now any element with a NULL neighbor either
   // (i) lives on the physical domain boundary, or
@@ -429,10 +429,10 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
   for (unsigned int comm_step=0; comm_step<n_adjacent_processors; comm_step++)
     {
       n_comm_steps[adjacent_processors[comm_step]]=1;
-      mesh.communicator().send (adjacent_processors[comm_step],
-				my_interface_node_xfer_buffers[comm_step],
-				send_requests[current_request++],
-				element_neighbors_tag);
+      mesh.comm().send (adjacent_processors[comm_step],
+			my_interface_node_xfer_buffers[comm_step],
+			send_requests[current_request++],
+			element_neighbors_tag);
     }
 
   //-------------------------------------------------------------------------
@@ -465,8 +465,8 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
       //------------------------------------------------------------------
       // catch incoming node list
       Parallel::Status
-	status(mesh.communicator().probe (Parallel::any_source,
-					  element_neighbors_tag));
+	status(mesh.comm().probe (Parallel::any_source,
+				  element_neighbors_tag));
       const processor_id_type
 	source_pid_idx = status.source(),
 	dest_pid_idx   = source_pid_idx;
@@ -477,7 +477,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	{
 	  n_comm_steps[source_pid_idx]++;
 
-	  mesh.communicator().receive (source_pid_idx,
+	  mesh.comm().receive (source_pid_idx,
 				       common_interface_node_list,
 				       element_neighbors_tag);
 	  const std::size_t
@@ -528,14 +528,14 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	      // note that even though these are nonblocking sends
 	      // they should complete essentially instantly, because
 	      // in all cases the send buffers are empty
-	      mesh.communicator().send_packed_range (dest_pid_idx,
+	      mesh.comm().send_packed_range (dest_pid_idx,
 						     &mesh,
 						     connected_nodes.begin(),
 						     connected_nodes.end(),
 						     send_requests[current_request++],
 						     element_neighbors_tag);
 
-	      mesh.communicator().send_packed_range (dest_pid_idx,
+	      mesh.comm().send_packed_range (dest_pid_idx,
 						     &mesh,
 						     elements_to_send.begin(),
 						     elements_to_send.end(),
@@ -601,7 +601,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	    libmesh_assert (!connected_nodes.empty() || elements_to_send.empty());
 
 	    // send the nodes off to the destination processor
-	    mesh.communicator().send_packed_range (dest_pid_idx,
+	    mesh.comm().send_packed_range (dest_pid_idx,
 						   &mesh,
 						   connected_nodes.begin(),
 						   connected_nodes.end(),
@@ -609,7 +609,7 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 						   element_neighbors_tag);
 
 	    // send the elements off to the destination processor
-	    mesh.communicator().send_packed_range (dest_pid_idx,
+	    mesh.comm().send_packed_range (dest_pid_idx,
 						   &mesh,
 						   elements_to_send.begin(),
 						   elements_to_send.end(),
@@ -623,10 +623,10 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	{
 	  n_comm_steps[source_pid_idx]++;
 
-	  mesh.communicator().receive_packed_range (source_pid_idx,
-						    &mesh,
-						    mesh_inserter_iterator<Node>(mesh),
-						    element_neighbors_tag);
+	  mesh.comm().receive_packed_range (source_pid_idx,
+					    &mesh,
+					    mesh_inserter_iterator<Node>(mesh),
+					    element_neighbors_tag);
 	}
       //------------------------------------------------------------------
       // third time - reply of elements
@@ -634,10 +634,10 @@ void MeshCommunication::gather_neighboring_elements (ParallelMesh &mesh) const
 	{
 	  n_comm_steps[source_pid_idx]++;
 
-	  mesh.communicator().receive_packed_range (source_pid_idx,
-						    &mesh,
-						    mesh_inserter_iterator<Elem>(mesh),
-						    element_neighbors_tag);
+	  mesh.comm().receive_packed_range (source_pid_idx,
+					    &mesh,
+					    mesh_inserter_iterator<Elem>(mesh),
+					    element_neighbors_tag);
 	}
       //------------------------------------------------------------------
       // fourth time - shouldn't happen
@@ -674,7 +674,7 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
     return;
 
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   START_LOG("broadcast()","MeshCommunication");
 
@@ -683,7 +683,7 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
     mesh.clear();
 
   // Broadcast nodes
-  mesh.communicator().broadcast_packed_range(&mesh,
+  mesh.comm().broadcast_packed_range(&mesh,
 					     mesh.nodes_begin(),
 					     mesh.nodes_end(),
 					     &mesh,
@@ -692,10 +692,10 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
   // Broadcast elements from coarsest to finest, so that child
   // elements will see their parents already in place.
   unsigned int n_levels = MeshTools::n_levels(mesh);
-  mesh.communicator().broadcast(n_levels);
+  mesh.comm().broadcast(n_levels);
 
   for (unsigned int l=0; l != n_levels; ++l)
-    mesh.communicator().broadcast_packed_range(&mesh,
+    mesh.comm().broadcast_packed_range(&mesh,
 					       mesh.level_elements_begin(l),
 					       mesh.level_elements_end(l),
 					       &mesh,
@@ -703,16 +703,16 @@ void MeshCommunication::broadcast (MeshBase& mesh) const
 
   // Make sure mesh dimension is consistent
   unsigned int mesh_dimension = mesh.mesh_dimension();
-  mesh.communicator().broadcast(mesh_dimension);
+  mesh.comm().broadcast(mesh_dimension);
   mesh.set_mesh_dimension(mesh_dimension);
 
   // Broadcast all of the named entity information
-  mesh.communicator().broadcast(mesh.set_subdomain_name_map());
-  mesh.communicator().broadcast(mesh.boundary_info->set_sideset_name_map());
-  mesh.communicator().broadcast(mesh.boundary_info->set_nodeset_name_map());
+  mesh.comm().broadcast(mesh.set_subdomain_name_map());
+  mesh.comm().broadcast(mesh.boundary_info->set_sideset_name_map());
+  mesh.comm().broadcast(mesh.boundary_info->set_nodeset_name_map());
 
-  libmesh_assert (mesh.communicator().verify(mesh.n_elem()));
-  libmesh_assert (mesh.communicator().verify(mesh.n_nodes()));
+  libmesh_assert (mesh.comm().verify(mesh.n_elem()));
+  libmesh_assert (mesh.comm().verify(mesh.n_nodes()));
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_procids<Elem>(mesh);
@@ -744,11 +744,11 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
     return;
 
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   START_LOG("allgather()","MeshCommunication");
 
-  mesh.communicator().allgather_packed_range (&mesh,
+  mesh.comm().allgather_packed_range (&mesh,
 					      mesh.nodes_begin(),
 					      mesh.nodes_end(),
 					      mesh_inserter_iterator<Node>(mesh));
@@ -756,16 +756,16 @@ void MeshCommunication::allgather (ParallelMesh& mesh) const
   // Gather elements from coarsest to finest, so that child
   // elements will see their parents already in place.
   unsigned int n_levels = MeshTools::n_levels(mesh);
-  mesh.communicator().broadcast(n_levels);
+  mesh.comm().broadcast(n_levels);
 
   for (unsigned int l=0; l != n_levels; ++l)
-    mesh.communicator().allgather_packed_range (&mesh,
+    mesh.comm().allgather_packed_range (&mesh,
 						mesh.level_elements_begin(l),
 						mesh.level_elements_end(l),
 						mesh_inserter_iterator<Elem>(mesh));
 
-  libmesh_assert (mesh.communicator().verify(mesh.n_elem()));
-  libmesh_assert (mesh.communicator().verify(mesh.n_nodes()));
+  libmesh_assert (mesh.comm().verify(mesh.n_elem()));
+  libmesh_assert (mesh.comm().verify(mesh.n_nodes()));
 
   // Inform new elements of their neighbors,
   // while resetting all remote_elem links
@@ -821,13 +821,13 @@ void MeshCommunication::make_node_ids_parallel_consistent
    LocationMap<Node> &loc_map)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   START_LOG ("make_node_ids_parallel_consistent()", "MeshCommunication");
 
   SyncIds syncids(mesh, &MeshBase::renumber_node);
   Parallel::sync_dofobject_data_by_xyz
-    (mesh.communicator(),
+    (mesh.comm(),
      mesh.nodes_begin(), mesh.nodes_end(),
      loc_map, syncids);
 
@@ -840,7 +840,7 @@ void MeshCommunication::make_node_ids_parallel_consistent
 void MeshCommunication::make_elems_parallel_consistent(MeshBase &mesh)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   START_LOG ("make_elems_parallel_consistent()", "MeshCommunication");
 
@@ -907,7 +907,7 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
   START_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   // When this function is called, each section of a parallelized mesh
   // should be in the following state:
@@ -925,7 +925,7 @@ void MeshCommunication::make_node_proc_ids_parallel_consistent
 
   SyncProcIds sync(mesh);
   Parallel::sync_dofobject_data_by_xyz
-    (mesh.communicator(), mesh.nodes_begin(), mesh.nodes_end(), loc_map, sync);
+    (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), loc_map, sync);
 
   STOP_LOG ("make_node_proc_ids_parallel_consistent()", "MeshCommunication");
 }
@@ -938,12 +938,12 @@ void MeshCommunication::make_nodes_parallel_consistent
    LocationMap<Node> &loc_map)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   // Create the loc_map if it hasn't been done already
   bool need_map_update = (mesh.nodes_begin() != mesh.nodes_end() &&
                           loc_map.empty());
-  mesh.communicator().max(need_map_update);
+  mesh.comm().max(need_map_update);
 
   if (need_map_update)
     loc_map.init(mesh);
@@ -991,8 +991,8 @@ void MeshCommunication::delete_remote_elements(ParallelMesh& mesh, const std::se
 #ifdef DEBUG
   // We expect maximum ids to be in sync so we can use them to size
   // vectors
-  mesh.communicator().verify(mesh.max_node_id());
-  mesh.communicator().verify(mesh.max_elem_id());
+  mesh.comm().verify(mesh.max_node_id());
+  mesh.comm().verify(mesh.max_elem_id());
   const dof_id_type par_max_node_id = mesh.parallel_max_node_id();
   const dof_id_type par_max_elem_id = mesh.parallel_max_elem_id();
   libmesh_assert_equal_to (par_max_node_id, mesh.max_node_id());

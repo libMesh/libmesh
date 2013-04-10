@@ -134,7 +134,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
       // and get the most up-to-date positions for the ghosts.
       SyncNodalPositions sync_object(_mesh);
       Parallel::sync_dofobject_data_by_id
-	(_mesh.communicator(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
+	(_mesh.comm(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
 
     } // end for n_iterations
 
@@ -338,7 +338,7 @@ void LaplaceMeshSmoother::print_graph(std::ostream& out_stream) const
     // std::vector<unsigned> copy_of_flat_graph(flat_graph);
 
     // Use the allgather routine to combine all the flat graphs on all processors
-    _mesh.communicator().allgather(flat_graph);
+    _mesh.comm().allgather(flat_graph);
 
     // Now reconstruct _graph from the allgathered flat_graph.
 

@@ -809,7 +809,7 @@ void EpetraVector<T>::init (const numeric_index_type n,
   _map = new Epetra_Map(static_cast<int>(n),
                         my_n_local,
                         0,
-                        Epetra_MpiComm (this->communicator().get()));
+                        Epetra_MpiComm (this->comm().get()));
 
   _vec = new Epetra_Vector(*_map);
 
@@ -863,7 +863,7 @@ void EpetraVector<T>::close ()
 
   // Are we adding or inserting?
   unsigned char global_last_edit = last_edit;
-  this->communicator().max(global_last_edit);
+  this->comm().max(global_last_edit);
   libmesh_assert(!last_edit || last_edit == global_last_edit);
 
   if (global_last_edit == 1)
@@ -911,7 +911,7 @@ inline
 AutoPtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new EpetraVector<T>(this->communicator(), AUTOMATIC));
+    (new EpetraVector<T>(this->comm(), AUTOMATIC));
 
   cloned_vector->init(*this);
 
@@ -925,7 +925,7 @@ inline
 AutoPtr<NumericVector<T> > EpetraVector<T>::clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new EpetraVector<T>(this->communicator(), AUTOMATIC));
+    (new EpetraVector<T>(this->comm(), AUTOMATIC));
 
   cloned_vector->init(*this, true);
 

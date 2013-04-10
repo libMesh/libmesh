@@ -62,7 +62,7 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
 
   // Build a histogram in parallel from our data.
   // Use this to create quasi-uniform bins.
-  Parallel::Histogram<KeyType,IdxType> phist (this->communicator(), data);
+  Parallel::Histogram<KeyType,IdxType> phist (this->comm(), data);
   phist.make_histogram (nbins*50, max, min);
   phist.build_histogram ();
 
@@ -77,7 +77,7 @@ void BinSorter<KeyType,IdxType>::binsort (const IdxType nbins,
     IdxType local_data_size = libmesh_cast_int<IdxType>(data.size());
     IdxType global_data_size = libmesh_cast_int<IdxType>(local_data_size);
 
-    this->communicator().sum(global_data_size);
+    this->comm().sum(global_data_size);
 
     std::vector<IdxType> target_bin_size (nbins, global_data_size / nbins);
 

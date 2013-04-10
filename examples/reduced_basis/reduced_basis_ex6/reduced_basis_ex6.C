@@ -125,7 +125,7 @@ int main (int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden by build_cube, on
   // the default MPI communicator.
-  Mesh mesh(init.communicator());
+  Mesh mesh(init.comm());
 
   MeshTools::Generation::build_cube (mesh,
                                      n_elem_xy, n_elem_xy, n_elem_z,
@@ -150,10 +150,10 @@ int main (int argc, char** argv)
   mesh.print_info();
 
   // Initialize the standard RBEvaluation object
-  SimpleRBEvaluation rb_eval(mesh.communicator());
+  SimpleRBEvaluation rb_eval(mesh.comm());
 
   // Initialize the EIM RBEvaluation object
-  SimpleEIMEvaluation eim_rb_eval(mesh.communicator());
+  SimpleEIMEvaluation eim_rb_eval(mesh.comm());
 
   // Set the rb_eval objects for the RBConstructions
   eim_construction.set_rb_evaluation(eim_rb_eval);

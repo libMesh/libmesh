@@ -837,7 +837,7 @@ dof_id_type DofMap::n_constrained_dofs() const
   parallel_object_only();
 
   dof_id_type nc_dofs = this->n_local_constrained_dofs();
-  this->communicator().sum(nc_dofs);
+  this->comm().sum(nc_dofs);
   return nc_dofs;
 }
 
@@ -880,10 +880,10 @@ void DofMap::create_dof_constraints(const MeshBase& mesh, Real time)
   // Even if we don't have constraints, another processor might.
   bool possible_global_constraints = possible_local_constraints;
 #if defined(LIBMESH_ENABLE_PERIODIC) || defined(LIBMESH_ENABLE_DIRICHLET) || defined(LIBMESH_ENABLE_AMR)
-  libmesh_assert(this->communicator().verify(mesh.is_serial()));
+  libmesh_assert(this->comm().verify(mesh.is_serial()));
 
   if (!mesh.is_serial())
-    this->communicator().max(possible_global_constraints);
+    this->comm().max(possible_global_constraints);
 #endif
 
   if (!possible_global_constraints)
@@ -1008,7 +1008,7 @@ void DofMap::print_dof_constraints(std::ostream& os,
 
   if (this->processor_id())
     {
-      this->communicator().send(0, local_constraints);
+      this->comm().send(0, local_constraints);
     }
   else
     {
@@ -1017,7 +1017,7 @@ void DofMap::print_dof_constraints(std::ostream& os,
 
       for (processor_id_type i=1; i<this->n_processors(); ++i)
         {
-          this->communicator().receive(i, local_constraints);
+          this->comm().receive(i, local_constraints);
           os << "Processor " << i << ":\n";
           os << local_constraints;
         }
@@ -1559,7 +1559,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
   AutoPtr<NumericVector<Number> > v_built;
   if (v->type() == SERIAL)
     {
-      v_built = NumericVector<Number>::build(this->communicator());
+      v_built = NumericVector<Number>::build(this->comm());
       v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
       v_built->close();
 
@@ -1574,7 +1574,7 @@ void DofMap::enforce_constraints_exactly (const System &system,
     }
   else if (v->type() == PARALLEL)
     {
-      v_built = NumericVector<Number>::build(this->communicator());
+      v_built = NumericVector<Number>::build(this->comm());
       v_built->init (v->size(), v->size(), true, SERIAL);
       v->localize(*v_built);
       v_built->close();
@@ -1981,7 +1981,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                                  || !_node_constraints.empty()
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
                                  ;
-  this->communicator().max(has_constraints);
+  this->comm().max(has_constraints);
   if (!has_constraints)
     return;
 
@@ -2083,13 +2083,13 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
       std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
-      this->communicator().send_receive(procup, pushed_ids_from_me,
+      this->comm().send_receive(procup, pushed_ids_from_me,
 					procdown, pushed_ids_to_me);
-      this->communicator().send_receive(procup, pushed_keys,
+      this->comm().send_receive(procup, pushed_keys,
 					procdown, pushed_keys_to_me);
-      this->communicator().send_receive(procup, pushed_vals,
+      this->comm().send_receive(procup, pushed_vals,
 					procdown, pushed_vals_to_me);
-      this->communicator().send_receive(procup, pushed_rhss,
+      this->comm().send_receive(procup, pushed_rhss,
 					procdown, pushed_rhss_to_me);
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
@@ -2103,13 +2103,13 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
       std::vector<std::vector<dof_id_type> > pushed_node_keys_to_me;
       std::vector<std::vector<Real> > pushed_node_vals_to_me;
       std::vector<Point> pushed_node_offsets_to_me;
-      this->communicator().send_receive(procup, pushed_node_ids_from_me,
+      this->comm().send_receive(procup, pushed_node_ids_from_me,
 					procdown, pushed_node_ids_to_me);
-      this->communicator().send_receive(procup, pushed_node_keys,
+      this->comm().send_receive(procup, pushed_node_keys,
 					procdown, pushed_node_keys_to_me);
-      this->communicator().send_receive(procup, pushed_node_vals,
+      this->comm().send_receive(procup, pushed_node_vals,
 					procdown, pushed_node_vals_to_me);
-      this->communicator().send_receive(procup, pushed_node_offsets,
+      this->comm().send_receive(procup, pushed_node_offsets,
 					procdown, pushed_node_offsets_to_me);
 
       // Note that we aren't doing a send_receive on the Nodes
@@ -2198,7 +2198,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
   // nonempty on *any* processor
   bool unexpanded_set_nonempty = !unexpanded_dofs.empty() ||
                                  !unexpanded_nodes.empty();
-  this->communicator().max(unexpanded_set_nonempty);
+  this->comm().max(unexpanded_set_nonempty);
 
   while (unexpanded_set_nonempty)
     {
@@ -2314,9 +2314,9 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                                         this->n_processors();
           std::vector<dof_id_type> dof_request_to_fill,
                                    node_request_to_fill;
-          this->communicator().send_receive(procup, requested_dof_ids[procup],
+          this->comm().send_receive(procup, requested_dof_ids[procup],
 					    procdown, dof_request_to_fill);
-          this->communicator().send_receive(procup, requested_node_ids[procup],
+          this->comm().send_receive(procup, requested_node_ids[procup],
 					    procdown, node_request_to_fill);
 
           // Fill those requests
@@ -2397,23 +2397,23 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
                                           node_filled_vals;
           std::vector<Number> dof_filled_rhss;
           std::vector<Point> node_filled_rhss;
-          this->communicator().send_receive(procdown, dof_row_keys,
+          this->comm().send_receive(procdown, dof_row_keys,
 					    procup, dof_filled_keys);
-          this->communicator().send_receive(procdown, dof_row_vals,
+          this->comm().send_receive(procdown, dof_row_vals,
 					    procup, dof_filled_vals);
-          this->communicator().send_receive(procdown, dof_row_rhss,
+          this->comm().send_receive(procdown, dof_row_rhss,
 					    procup, dof_filled_rhss);
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-          this->communicator().send_receive(procdown, node_row_keys,
+          this->comm().send_receive(procdown, node_row_keys,
 					    procup, node_filled_keys);
-          this->communicator().send_receive(procdown, node_row_vals,
+          this->comm().send_receive(procdown, node_row_vals,
 					    procup, node_filled_vals);
-          this->communicator().send_receive(procdown, node_row_rhss,
+          this->comm().send_receive(procdown, node_row_rhss,
 					    procup, node_filled_rhss);
 
           // Constraining nodes might not even exist on our subset of
           // a distributed mesh, so let's make them exist.
-          this->communicator().send_receive_packed_range
+          this->comm().send_receive_packed_range
             (procdown, &mesh, nodes_requested.begin(), nodes_requested.end(),
              procup,   &mesh, mesh_inserter_iterator<Node>(mesh));
 
@@ -2472,7 +2472,7 @@ void DofMap::allgather_recursive_constraints(MeshBase& mesh)
       // nonempty on *any* processor
       unexpanded_set_nonempty = !unexpanded_dofs.empty() ||
                                 !unexpanded_nodes.empty();
-      this->communicator().max(unexpanded_set_nonempty);
+      this->comm().max(unexpanded_set_nonempty);
     }
 }
 
@@ -2583,7 +2583,7 @@ void DofMap::scatter_constraints(MeshBase& mesh)
                                  || !_node_constraints.empty()
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
                                  ;
-  this->communicator().max(has_constraints);
+  this->comm().max(has_constraints);
   if (!has_constraints)
     return;
 
@@ -2721,13 +2721,13 @@ void DofMap::scatter_constraints(MeshBase& mesh)
       std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
-      this->communicator().send_receive(procup, pushed_ids_from_me,
+      this->comm().send_receive(procup, pushed_ids_from_me,
 					procdown, pushed_ids_to_me);
-      this->communicator().send_receive(procup, pushed_keys,
+      this->comm().send_receive(procup, pushed_keys,
 					procdown, pushed_keys_to_me);
-      this->communicator().send_receive(procup, pushed_vals,
+      this->comm().send_receive(procup, pushed_vals,
 					procdown, pushed_vals_to_me);
-      this->communicator().send_receive(procup, pushed_rhss,
+      this->comm().send_receive(procup, pushed_rhss,
 					procdown, pushed_rhss_to_me);
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
@@ -2741,18 +2741,18 @@ void DofMap::scatter_constraints(MeshBase& mesh)
       std::vector<std::vector<dof_id_type> > pushed_node_keys_to_me;
       std::vector<std::vector<Real> > pushed_node_vals_to_me;
       std::vector<Point> pushed_node_offsets_to_me;
-      this->communicator().send_receive(procup, pushed_node_ids_from_me,
+      this->comm().send_receive(procup, pushed_node_ids_from_me,
 					procdown, pushed_node_ids_to_me);
-      this->communicator().send_receive(procup, pushed_node_keys,
+      this->comm().send_receive(procup, pushed_node_keys,
 					procdown, pushed_node_keys_to_me);
-      this->communicator().send_receive(procup, pushed_node_vals,
+      this->comm().send_receive(procup, pushed_node_vals,
 					procdown, pushed_node_vals_to_me);
-      this->communicator().send_receive(procup, pushed_node_offsets,
+      this->comm().send_receive(procup, pushed_node_offsets,
 					procdown, pushed_node_offsets_to_me);
 
       // Constraining nodes might not even exist on our subset of
       // a distributed mesh, so let's make them exist.
-      this->communicator().send_receive_packed_range
+      this->comm().send_receive_packed_range
         (procup, &mesh, pushed_nodes.begin(), pushed_nodes.end(),
          procdown, &mesh, mesh_inserter_iterator<Node>(mesh));
 
@@ -2920,13 +2920,13 @@ void DofMap::scatter_constraints(MeshBase& mesh)
       std::vector<std::vector<dof_id_type> > pushed_keys_to_me;
       std::vector<std::vector<Real> > pushed_vals_to_me;
       std::vector<Number> pushed_rhss_to_me;
-      this->communicator().send_receive(procup, pushed_ids_from_me,
+      this->comm().send_receive(procup, pushed_ids_from_me,
 					procdown, pushed_ids_to_me);
-      this->communicator().send_receive(procup, pushed_keys,
+      this->comm().send_receive(procup, pushed_keys,
 					procdown, pushed_keys_to_me);
-      this->communicator().send_receive(procup, pushed_vals,
+      this->comm().send_receive(procup, pushed_vals,
 					procdown, pushed_vals_to_me);
-      this->communicator().send_receive(procup, pushed_rhss,
+      this->comm().send_receive(procup, pushed_rhss,
 					procdown, pushed_rhss_to_me);
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_keys_to_me.size());
       libmesh_assert_equal_to (pushed_ids_to_me.size(), pushed_vals_to_me.size());
@@ -2967,7 +2967,7 @@ void DofMap::add_constraints_to_send_list()
   // We might get to return immediately if none of the processors
   // found any constraints
   unsigned int has_constraints = !_dof_constraints.empty();
-  this->communicator().max(has_constraints);
+  this->comm().max(has_constraints);
   if (!has_constraints)
     return;
 

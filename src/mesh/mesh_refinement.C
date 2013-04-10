@@ -178,9 +178,9 @@ void MeshRefinement::create_parent_error_vector
     }
 
   // Use a reference to std::vector to avoid confusing
-  // this->communicator().verify
+  // this->comm().verify
   std::vector<ErrorVectorReal> &epc = error_per_parent;
-  libmesh_assert(this->communicator().verify(epc));
+  libmesh_assert(this->comm().verify(epc));
 #endif // #ifdef DEBUG
 
   // error values on uncoarsenable elements will be left at -1
@@ -214,9 +214,9 @@ void MeshRefinement::create_parent_error_vector
 
   // Sync between processors.
   // Use a reference to std::vector to avoid confusing
-  // this->communicator().min
+  // this->comm().min
   std::vector<ErrorVectorReal> &epp = error_per_parent;
-  this->communicator().min(epp);
+  this->comm().min(epp);
   }
 
   // The parent's error is defined as the square root of the
@@ -253,7 +253,7 @@ void MeshRefinement::create_parent_error_vector
   }
 
   // Sum the vector across all processors
-  this->communicator().sum(static_cast<std::vector<ErrorVectorReal>&>(error_per_parent));
+  this->comm().sum(static_cast<std::vector<ErrorVectorReal>&>(error_per_parent));
 
   // Calculate the min and max as we loop
   parent_error_min = std::numeric_limits<double>::max();
@@ -263,7 +263,7 @@ void MeshRefinement::create_parent_error_vector
     {
       // If this element isn't a coarsenable parent with error, we
       // have nothing to do.  Just flag it as -1 and move on
-      // Note that this->communicator().sum might have left uncoarsenable
+      // Note that this->comm().sum might have left uncoarsenable
       // elements with error_per_parent=-n_proc, so reset it to
       // error_per_parent=-1
       if (error_per_parent[i] < 0.)
@@ -313,7 +313,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
     _periodic_boundaries && !_periodic_boundaries->empty();
-  libmesh_assert(this->communicator().verify(has_periodic_boundaries));
+  libmesh_assert(this->comm().verify(has_periodic_boundaries));
 
   if (has_periodic_boundaries)
     point_locator = _mesh.sub_point_locator();
@@ -358,7 +358,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass))
     }
 
   // If any processor failed, we failed globally
-  this->communicator().max(failure);
+  this->comm().max(failure);
 
   if (failure)
     {
@@ -417,7 +417,7 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass))
     }
 
   // If we found a flag on any processor, it counts
-  this->communicator().max(found_flag);
+  this->comm().max(found_flag);
 
   if (found_flag)
     {
@@ -530,8 +530,8 @@ bool MeshRefinement::refine_and_coarsen_elements (const bool maintain_level_one)
 #ifdef DEBUG
           bool max_satisfied = satisfied,
                min_satisfied = satisfied;
-          this->communicator().max(max_satisfied);
-          this->communicator().min(min_satisfied);
+          this->comm().max(max_satisfied);
+          this->comm().min(min_satisfied);
           libmesh_assert_equal_to (satisfied, max_satisfied);
           libmesh_assert_equal_to (satisfied, min_satisfied);
 #endif
@@ -696,8 +696,8 @@ bool MeshRefinement::coarsen_elements (const bool maintain_level_one)
 #ifdef DEBUG
           bool max_satisfied = satisfied,
                min_satisfied = satisfied;
-          this->communicator().max(max_satisfied);
-          this->communicator().min(min_satisfied);
+          this->comm().max(max_satisfied);
+          this->comm().min(min_satisfied);
           libmesh_assert_equal_to (satisfied, max_satisfied);
           libmesh_assert_equal_to (satisfied, min_satisfied);
 #endif
@@ -822,8 +822,8 @@ bool MeshRefinement::refine_elements (const bool maintain_level_one)
 #ifdef DEBUG
           bool max_satisfied = satisfied,
                min_satisfied = satisfied;
-          this->communicator().max(max_satisfied);
-          this->communicator().min(min_satisfied);
+          this->comm().max(max_satisfied);
+          this->comm().min(min_satisfied);
           libmesh_assert_equal_to (satisfied, max_satisfied);
           libmesh_assert_equal_to (satisfied, min_satisfied);
 #endif
@@ -934,18 +934,18 @@ bool MeshRefinement::make_flags_parallel_consistent()
   SyncRefinementFlags hsync(_mesh, &Elem::refinement_flag,
                             &Elem::set_refinement_flag);
   Parallel::sync_dofobject_data_by_id
-    (this->communicator(), _mesh.elements_begin(), _mesh.elements_end(), hsync);
+    (this->comm(), _mesh.elements_begin(), _mesh.elements_end(), hsync);
 
   SyncRefinementFlags psync(_mesh, &Elem::p_refinement_flag,
                             &Elem::set_p_refinement_flag);
   Parallel::sync_dofobject_data_by_id
-    (this->communicator(), _mesh.elements_begin(), _mesh.elements_end(), psync);
+    (this->comm(), _mesh.elements_begin(), _mesh.elements_end(), psync);
 
   // If we weren't consistent in both h and p on every processor then
   // we weren't globally consistent
   bool parallel_consistent = hsync.parallel_consistent &&
                              psync.parallel_consistent;
-  this->communicator().min(parallel_consistent);
+  this->comm().min(parallel_consistent);
 
   STOP_LOG ("make_flags_parallel_consistent()", "MeshRefinement");
 
@@ -967,7 +967,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
     _periodic_boundaries && !_periodic_boundaries->empty();
-  libmesh_assert(this->communicator().verify(has_periodic_boundaries));
+  libmesh_assert(this->comm().verify(has_periodic_boundaries));
 
   if (has_periodic_boundaries)
     point_locator = _mesh.sub_point_locator();
@@ -1033,7 +1033,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
       STOP_LOG ("make_coarsening_compatible()", "MeshRefinement");
 
       // But we still have to check with other processors
-      this->communicator().min(compatible_with_refinement);
+      this->comm().min(compatible_with_refinement);
 
       return compatible_with_refinement;
     }
@@ -1291,7 +1291,7 @@ bool MeshRefinement::make_coarsening_compatible(const bool maintain_level_one)
 
   // If one processor finds an incompatibility, we're globally
   // incompatible
-  this->communicator().min(compatible_with_refinement);
+  this->comm().min(compatible_with_refinement);
 
   return compatible_with_refinement;
 }
@@ -1316,7 +1316,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool has_periodic_boundaries =
     _periodic_boundaries && !_periodic_boundaries->empty();
-  libmesh_assert(this->communicator().verify(has_periodic_boundaries));
+  libmesh_assert(this->comm().verify(has_periodic_boundaries));
 
   if (has_periodic_boundaries)
     point_locator = _mesh.sub_point_locator();
@@ -1500,7 +1500,7 @@ bool MeshRefinement::make_refinement_compatible(const bool maintain_level_one)
 
   // If we're not compatible on one processor, we're globally not
   // compatible
-  this->communicator().min(compatible_with_coarsening);
+  this->comm().min(compatible_with_coarsening);
 
   STOP_LOG ("make_refinement_compatible()", "MeshRefinement");
 
@@ -1592,7 +1592,7 @@ bool MeshRefinement::_coarsen_elements ()
     }
 
   // If the mesh changed on any processor, it changed globally
-  this->communicator().max(mesh_changed);
+  this->comm().max(mesh_changed);
   // And we may need to update ParallelMesh values reflecting the changes
   if (mesh_changed)
     _mesh.update_parallel_id_counts();
@@ -1680,7 +1680,7 @@ bool MeshRefinement::_refine_elements ()
   bool mesh_changed = !local_copy_of_elements.empty();
 
   // If the mesh changed on any processor, it changed globally
-  this->communicator().max(mesh_changed);
+  this->comm().max(mesh_changed);
 
   // And we may need to update ParallelMesh values reflecting the changes
   if (mesh_changed)

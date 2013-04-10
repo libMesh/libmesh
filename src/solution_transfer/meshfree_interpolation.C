@@ -187,17 +187,17 @@ namespace libMesh
     // so we can be sure there is no other shenanigarry going on, but in optimized
     // mode there is no such guarantee - other prcoessors could be somewhere else
     // completing some other communication, and we don't want to intercept that.
-    Parallel::MessageTag tag = this->communicator().get_unique_tag ( 6000 );
+    Parallel::MessageTag tag = this->comm().get_unique_tag ( 6000 );
 
     for (unsigned int proc=0, cnt=0; proc<this->n_processors(); proc++)
       if (proc != this->processor_id())
-	this->communicator().send (proc, send_buf, send_request[cnt++], tag);
+	this->comm().send (proc, send_buf, send_request[cnt++], tag);
 
     // All data has been sent.  Receive remote data in any order
     for (processor_id_type comm_step=0; comm_step<(this->n_processors()-1); comm_step++)
       {
 	// blocking receive
-	this->communicator().receive (Parallel::any_source, recv_buf, tag);
+	this->comm().receive (Parallel::any_source, recv_buf, tag);
 
 	// Add their data to our list
 	Point  pt;

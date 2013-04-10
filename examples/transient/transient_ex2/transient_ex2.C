@@ -162,7 +162,7 @@ int main (int argc, char** argv)
   //
   // Create a SerialMesh object, with dimension to be overridden
   // later, distributed across the default MPI communicator.
-  SerialMesh mesh(init.communicator());
+  SerialMesh mesh(init.comm());
   MeshData mesh_data(mesh);
 
   // Read the meshfile specified in the command line or

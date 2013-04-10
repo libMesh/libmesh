@@ -52,7 +52,7 @@ void LocationMap<T>::init(MeshBase& mesh)
   // This function must be run on all processors at once
   // for non-serial meshes
   if (!mesh.is_serial())
-    libmesh_parallel_only(mesh.communicator());
+    libmesh_parallel_only(mesh.comm());
 
   START_LOG("init()", "LocationMap");
 
@@ -85,8 +85,8 @@ void LocationMap<T>::init(MeshBase& mesh)
   // On a parallel mesh we might not yet have a full bounding box
   if (!mesh.is_serial())
     {
-      mesh.communicator().min(_lower_bound);
-      mesh.communicator().max(_upper_bound);
+      mesh.comm().min(_lower_bound);
+      mesh.comm().max(_upper_bound);
     }
 
   this->fill(mesh);

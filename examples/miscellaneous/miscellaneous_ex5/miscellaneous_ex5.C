@@ -479,7 +479,7 @@ int main (int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
-  Mesh mesh(init.communicator());
+  Mesh mesh(init.comm());
 
   if (dim == 1)
     MeshTools::Generation::build_line(mesh,1,-1.,0.);

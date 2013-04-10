@@ -94,7 +94,7 @@ extern "C"
     {
       int n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(solver->communicator().get(),ierr);
+      CHKERRABORT(solver->comm().get(),ierr);
       solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
     }
 
@@ -102,7 +102,7 @@ extern "C"
 
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscVector<Number>& R_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
-    PetscVector<Number> X_global(x, sys.communicator()), R(r, sys.communicator());
+    PetscVector<Number> X_global(x, sys.comm()), R(r, sys.comm());
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
@@ -170,17 +170,17 @@ extern "C"
     {
       int n_iterations = 0;
       ierr = SNESGetIterationNumber(snes, &n_iterations);
-      CHKERRABORT(solver->communicator().get(),ierr);
+      CHKERRABORT(solver->comm().get(),ierr);
       solver->set_current_nonlinear_iteration_number( static_cast<unsigned>(n_iterations) );
     }
 
     NonlinearImplicitSystem &sys = solver->system();
 
-    PetscMatrix<Number> PC(*pc, sys.communicator());
-    PetscMatrix<Number> Jac(*jac, sys.communicator());
+    PetscMatrix<Number> PC(*pc, sys.comm());
+    PetscMatrix<Number> Jac(*jac, sys.comm());
     PetscVector<Number>& X_sys = *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
     PetscMatrix<Number>& Jac_sys = *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
-    PetscVector<Number> X_global(x, sys.communicator());
+    PetscVector<Number> X_global(x, sys.comm());
 
     // Set the dof maps
     PC.attach_dof_map(sys.get_dof_map());
@@ -292,12 +292,12 @@ void PetscNonlinearSolver<T>::init ()
       // At least until Petsc 2.1.1, the SNESCreate had a different calling syntax.
       // The second argument was of type SNESProblemType, and could have a value of
       // either SNES_NONLINEAR_EQUATIONS or SNES_UNCONSTRAINED_MINIMIZATION.
-      ierr = SNESCreate(this->communicator().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
+      ierr = SNESCreate(this->comm().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
              LIBMESH_CHKERRABORT(ierr);
 
 #else
 
-      ierr = SNESCreate(this->communicator().get(),&_snes);
+      ierr = SNESCreate(this->comm().get(),&_snes);
              LIBMESH_CHKERRABORT(ierr);
 
 #endif
@@ -397,7 +397,7 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
           LIBMESH_CHKERRABORT(ierr);
         }
 
-      ierr = MatNullSpaceCreate(this->communicator().get(), PETSC_FALSE, nmodes, modes, msp);
+      ierr = MatNullSpaceCreate(this->comm().get(), PETSC_FALSE, nmodes, modes, msp);
       LIBMESH_CHKERRABORT(ierr);
 
       for (PetscInt i=0; i<nmodes; ++i)

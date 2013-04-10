@@ -51,7 +51,7 @@ MeshFunctionSolutionTransfer::transfer(const Variable & from_var, const Variable
   EquationSystems & from_es = from_sys->get_equation_systems();
 
   //Create a serialized version of the solution vector
-  NumericVector<Number> * serialized_solution = NumericVector<Number>::build(from_sys->get_mesh().communicator()).release();
+  NumericVector<Number> * serialized_solution = NumericVector<Number>::build(from_sys->get_mesh().comm()).release();
   serialized_solution->init(from_sys->n_dofs(), false, SERIAL);
 
   // Need to pull down a full copy of this vector on every processor so we can get values in parallel

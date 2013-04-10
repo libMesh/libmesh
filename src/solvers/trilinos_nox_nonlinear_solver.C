@@ -92,7 +92,7 @@ bool Problem_Interface::computeF(const Epetra_Vector& x, Epetra_Vector& r,
 
   NonlinearImplicitSystem &sys = _solver->system();
 
-  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.communicator()), R(r, sys.communicator());
+  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.comm()), R(r, sys.comm());
   EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
   EpetraVector<Number>& R_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.rhs);
 
@@ -147,9 +147,9 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
 
   NonlinearImplicitSystem &sys = _solver->system();
 
-  EpetraMatrix<Number> Jac(&dynamic_cast<Epetra_FECrsMatrix &>(jac), sys.communicator());
+  EpetraMatrix<Number> Jac(&dynamic_cast<Epetra_FECrsMatrix &>(jac), sys.comm());
   EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
-  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.communicator());
+  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.comm());
 
   // Set the dof maps
   Jac.attach_dof_map(sys.get_dof_map());
@@ -207,9 +207,9 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
   NonlinearImplicitSystem &sys = _solver->system();
   TrilinosPreconditioner<Number> & tpc = dynamic_cast<TrilinosPreconditioner<Number> &>(prec);
 
-  EpetraMatrix<Number> Jac(dynamic_cast<Epetra_FECrsMatrix *>(tpc.mat()),sys.communicator());
+  EpetraMatrix<Number> Jac(dynamic_cast<Epetra_FECrsMatrix *>(tpc.mat()),sys.comm());
   EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
-  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.communicator());
+  EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.comm());
 
   // Set the dof maps
   Jac.attach_dof_map(sys.get_dof_map());

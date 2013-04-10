@@ -583,7 +583,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 
   local_sizes[this->processor_id()] = n_local;
 
-  this->communicator().sum(local_sizes);
+  this->comm().sum(local_sizes);
 
   // _first_local_index is the sum of _local_size
   // for all processor ids less than ours
@@ -710,7 +710,7 @@ inline
 AutoPtr<NumericVector<T> > DistributedVector<T>::zero_clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new DistributedVector<T>(this->communicator()));
+    (new DistributedVector<T>(this->comm()));
 
   cloned_vector->init(*this);
 
@@ -724,7 +724,7 @@ inline
 AutoPtr<NumericVector<T> > DistributedVector<T>::clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new DistributedVector<T>(this->communicator()));
+    (new DistributedVector<T>(this->comm()));
 
   cloned_vector->init(*this, true);
 
@@ -848,7 +848,7 @@ Real DistributedVector<T>::min () const
   for (numeric_index_type i = 1; i < _values.size(); ++i)
     local_min = std::min(libmesh_real(_values[i]), local_min);
 
-  this->communicator().min(local_min);
+  this->comm().min(local_min);
 
   return local_min;
 }
@@ -871,7 +871,7 @@ Real DistributedVector<T>::max() const
   for (numeric_index_type i = 1; i < _values.size(); ++i)
     local_max = std::max(libmesh_real(_values[i]), local_max);
 
-  this->communicator().max(local_max);
+  this->comm().max(local_max);
 
   return local_max;
 }

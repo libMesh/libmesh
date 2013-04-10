@@ -154,7 +154,7 @@ EigenSparseLinearSolver<T>::adjoint_solve (SparseMatrix<T> &matrix_in,
   START_LOG("adjoint_solve()", "EigenSparseLinearSolver");
 
   libmesh_experimental();
-  EigenSparseMatrix<T> mat_trans(this->communicator());
+  EigenSparseMatrix<T> mat_trans(this->comm());
   matrix_in.get_transpose(mat_trans);
 
   std::pair<unsigned int, Real> retval = this->solve (mat_trans,
