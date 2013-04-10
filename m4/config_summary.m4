@@ -30,34 +30,34 @@ echo Build Methods...................... : $METHODS
 echo " "
 for method in ${METHODS}; do
      case "${method}" in
-         opt)   
+         opt)
 echo CPPFLAGS...\(opt\)................... : $CPPFLAGS_OPT
 echo CXXFLAGS...\(opt\)................... : $CXXFLAGS_OPT
 echo CFLAGS.....\(opt\)................... : $CFLAGS_OPT
-     ;;					 
-         devel)   
+     ;;
+         devel)
 echo CPPFLAGS...\(devel\)................. : $CPPFLAGS_DEVEL
 echo CXXFLAGS...\(devel\)................. : $CXXFLAGS_DEVEL
 echo CFLAGS.....\(devel\)................. : $CFLAGS_DEVEL
-     ;;					 
-         dbg)   
+     ;;
+         dbg)
 echo CPPFLAGS...\(dbg\)................... : $CPPFLAGS_DBG
 echo CXXFLAGS...\(dbg\)................... : $CXXFLAGS_DBG
 echo CFLAGS.....\(dbg\)................... : $CFLAGS_DBG
-     ;;					 
-         prof)   
+     ;;
+         prof)
 echo CPPFLAGS...\(prof\).................. : $CPPFLAGS_PROF
 echo CXXFLAGS...\(prof\).................. : $CXXFLAGS_PROF
 echo CFLAGS.....\(prof\).................. : $CFLAGS_PROF
-     ;;					 
-         oprof)   
+     ;;
+         oprof)
 echo CPPFLAGS...\(oprof\)................. : $CPPFLAGS_OPROF
 echo CXXFLAGS...\(oprof\)................. : $CXXFLAGS_OPROF
 echo CFLAGS.....\(oprof\)................. : $CFLAGS_OPROF
      esac
      echo " "
 done
-echo Install dir........................ : $prefix 
+echo Install dir........................ : $prefix
 echo Build user......................... : $USER
 echo Build host......................... : $BUILD_HOST
 echo Build architecture................. : $BUILD_ARCH
@@ -92,9 +92,12 @@ fi
 if (test "x$enablelegacyusingnamespace" = "xyes"); then
 echo '  adding using namespace libMesh... :' $enablelegacyusingnamespace ***LEGACY FEATURE***
 fi
+if (test "x$enabledefaultcommworld" = "xyes"); then
+echo '  providing libMesh::CommWorld..... :' $enabledefaultcommworld ***LEGACY FEATURE***
+fi
 
 
-		   
+
 ######################################################################################
 if (test "x$enableoptional" = "xyes"); then
   echo
@@ -172,8 +175,8 @@ if (test "x$enableoptional" = "xyes"); then
   if (test "x$libmesh_optional_LIBS" != "x"); then
   echo '  'libmesh_optional_LIBS............ : $libmesh_optional_LIBS
   echo
-  fi	
-fi		   
+  fi
+fi
 echo '-------------------------------------------------------------------------------'
 
 echo Configure complete, now type \'make\' and then \'make install\'.

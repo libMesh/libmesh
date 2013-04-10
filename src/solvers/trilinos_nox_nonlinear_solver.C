@@ -147,7 +147,7 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
 
   NonlinearImplicitSystem &sys = _solver->system();
 
-  EpetraMatrix<Number> Jac(&dynamic_cast<Epetra_FECrsMatrix &>(jac));
+  EpetraMatrix<Number> Jac(&dynamic_cast<Epetra_FECrsMatrix &>(jac), sys.communicator());
   EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
   EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.communicator());
 
@@ -207,7 +207,7 @@ bool Problem_Interface::computePreconditioner(const Epetra_Vector & x,
   NonlinearImplicitSystem &sys = _solver->system();
   TrilinosPreconditioner<Number> & tpc = dynamic_cast<TrilinosPreconditioner<Number> &>(prec);
 
-  EpetraMatrix<Number> Jac(dynamic_cast<Epetra_FECrsMatrix *>(tpc.mat()));
+  EpetraMatrix<Number> Jac(dynamic_cast<Epetra_FECrsMatrix *>(tpc.mat()),sys.communicator());
   EpetraVector<Number>& X_sys = *libmesh_cast_ptr<EpetraVector<Number>*>(sys.solution.get());
   EpetraVector<Number> X_global(*const_cast<Epetra_Vector *>(&x), sys.communicator());
 
