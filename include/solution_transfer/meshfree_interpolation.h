@@ -320,10 +320,9 @@ public:
    * Constructor. Takes the inverse distance power,
    * which defaults to 2.
    */
-  InverseDistanceInterpolation (const unsigned int n_interp_pts = 8,
-				const Real  power               = 2,
-				const libMesh::Parallel::Communicator &comm
-				LIBMESH_CAN_DEFAULT_TO_COMMWORLD) :
+  InverseDistanceInterpolation (const libMesh::Parallel::Communicator &comm,
+				const unsigned int n_interp_pts = 8,
+				const Real  power               = 2) :
     MeshfreeInterpolation(comm),
 #if LIBMESH_HAVE_NANOFLANN
     _point_list_adaptor(_src_pts),
