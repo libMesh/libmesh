@@ -760,11 +760,6 @@ inline void Request::add_post_wait_work(PostWaitWork* work)
 
 
 
-inline void barrier (const Communicator &comm = Communicator_World)
-{
-  comm.barrier();
-}
-
 /**
  * Pause execution until all processors reach a certain point.
  */
@@ -783,6 +778,15 @@ inline void Communicator::barrier () const
 #else
 inline void Communicator::barrier () const {}
 #endif
+
+
+// legacy e.g. Paralell::send() methods, requires
+// Communicator_World
+#ifndef LIBMESH_DISABLE_COMMWORLD
+inline void barrier (const Communicator &comm = Communicator_World)
+{
+  comm.barrier();
+}
 
 template <typename T>
 inline bool verify(const T &r,
@@ -1059,6 +1063,7 @@ inline void broadcast_packed_range (const Context *context1,
                                     const Communicator &comm = Communicator_World)
 { comm.broadcast_packed_range(context1, range_begin, range_end, context2, out, root_id); }
 
+#endif // #ifndef LIBMESH_DISABLE_COMMWORLD
 
 //-----------------------------------------------------------------------
 // Parallel members

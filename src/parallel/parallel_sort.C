@@ -215,7 +215,7 @@ void Sort<KeyType,IdxType>::communicate_bins()
       // Find the number of contributions coming from each
       // processor for this bin.  Note: allgather combines
       // the MPI_Gather and MPI_Bcast operations into one.
-      Parallel::allgather(_local_bin_sizes[i], proc_bin_size);
+      this->communicator().allgather(_local_bin_sizes[i], proc_bin_size);
 
       // Compute the offsets into my_bin for each processor's
       // portion of the bin.  These are basically partial sums
