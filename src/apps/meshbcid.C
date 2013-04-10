@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     }
   dim = cl.next(dim);
 
-  Mesh mesh(dim);
+  Mesh mesh(init.communicator(), dim);
 
   if(!cl.search("--input"))
     {
