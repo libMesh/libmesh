@@ -62,36 +62,36 @@ class LaspackVector : public NumericVector<T>
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  LaspackVector (const ParallelType = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+  LaspackVector (const Parallel::Communicator &comm,
+		 const ParallelType = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  LaspackVector (const numeric_index_type n,
-                 const ParallelType = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+  LaspackVector (const Parallel::Communicator &comm,
+		 const numeric_index_type n,
+                 const ParallelType = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  LaspackVector (const numeric_index_type n,
+  LaspackVector (const Parallel::Communicator &comm,
+		 const numeric_index_type n,
 		 const numeric_index_type n_local,
-                 const ParallelType = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+                 const ParallelType = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  LaspackVector (const numeric_index_type N,
+  LaspackVector (const Parallel::Communicator &comm,
+		 const numeric_index_type N,
 		 const numeric_index_type n_local,
 		 const std::vector<numeric_index_type>& ghost,
-                 const ParallelType = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+                 const ParallelType = AUTOMATIC);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -467,9 +467,9 @@ class LaspackVector : public NumericVector<T>
 // LaspackVector inline methods
 template <typename T>
 inline
-LaspackVector<T>::LaspackVector (const ParallelType ptype,
-                                 const Parallel::Communicator &comm)
-  : NumericVector<T>(ptype, comm)
+LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
+				 const ParallelType ptype)
+  : NumericVector<T>(comm, ptype)
 {
   this->_type = ptype;
 }
@@ -478,10 +478,10 @@ LaspackVector<T>::LaspackVector (const ParallelType ptype,
 
 template <typename T>
 inline
-LaspackVector<T>::LaspackVector (const numeric_index_type n,
-                                 const ParallelType ptype,
-                                 const Parallel::Communicator &comm)
-  : NumericVector<T>(ptype, comm)
+LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
+				 const numeric_index_type n,
+                                 const ParallelType ptype)
+  : NumericVector<T>(comm, ptype)
 {
   this->init(n, n, false, ptype);
 }
@@ -490,11 +490,11 @@ LaspackVector<T>::LaspackVector (const numeric_index_type n,
 
 template <typename T>
 inline
-LaspackVector<T>::LaspackVector (const numeric_index_type n,
+LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
+				 const numeric_index_type n,
 				 const numeric_index_type n_local,
-                                 const ParallelType ptype,
-                                 const Parallel::Communicator &comm)
-  : NumericVector<T>(ptype, comm)
+                                 const ParallelType ptype)
+  : NumericVector<T>(comm, ptype)
 {
   this->init(n, n_local, false, ptype);
 }
@@ -503,12 +503,12 @@ LaspackVector<T>::LaspackVector (const numeric_index_type n,
 
 template <typename T>
 inline
-LaspackVector<T>::LaspackVector (const numeric_index_type N,
+LaspackVector<T>::LaspackVector (const Parallel::Communicator &comm,
+				 const numeric_index_type N,
 	                         const numeric_index_type n_local,
 	                         const std::vector<numeric_index_type>& ghost,
-                                 const ParallelType ptype,
-                                 const Parallel::Communicator &comm)
-  : NumericVector<T>(ptype, comm)
+                                 const ParallelType ptype)
+  : NumericVector<T>(comm, ptype)
 {
   this->init(N, n_local, ghost, false, ptype);
 }
@@ -643,7 +643,8 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > LaspackVector<T>::zero_clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new LaspackVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector
+    (new LaspackVector<T>(this->communicator()));
 
   cloned_vector->init(*this);
 
@@ -656,7 +657,8 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > LaspackVector<T>::clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new LaspackVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector
+    (new LaspackVector<T>(this->communicator()));
 
   cloned_vector->init(*this, true);
 

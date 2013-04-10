@@ -51,14 +51,16 @@ public:
    * in an error.  However, an empty sum is allowed to be multiplied
    * with a vector and will give the expected result.
    */
-  SumShellMatrix (const Parallel::Communicator &comm = libMesh::CommWorld);
+  SumShellMatrix (const Parallel::Communicator &comm
+		  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Constructor that passes a vector of shell matrices.
    */
   explicit
   SumShellMatrix (const std::vector<ShellMatrix<T>*>& mat,
-		  const Parallel::Communicator &comm /* = libMesh::CommWorld */);
+		  const Parallel::Communicator &comm
+		  LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.

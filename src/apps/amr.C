@@ -56,7 +56,7 @@ int main (int argc, char** argv)
   std::string meshname  (argv[3]);
 
   // declare a mesh...
-  Mesh mesh(dim);
+  Mesh mesh(init.communicator(), dim);
 
   // Read a mesh
   mesh.read(meshname);

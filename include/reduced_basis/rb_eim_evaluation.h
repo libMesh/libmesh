@@ -54,7 +54,8 @@ public:
   /**
    * Constructor.
    */
-  RBEIMEvaluation (const libMesh::Parallel::Communicator &comm = libMesh::CommWorld );
+  RBEIMEvaluation (const libMesh::Parallel::Communicator &comm 
+		   LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.

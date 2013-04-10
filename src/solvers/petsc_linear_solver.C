@@ -662,7 +662,8 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 
       if(this->_preconditioner)
 	{
-	  subprecond_matrix = new PetscMatrix<Number>(subprecond);
+	  subprecond_matrix = new PetscMatrix<Number>(subprecond,
+						      this->communicator());
 	  this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
 	}
@@ -999,7 +1000,8 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
 
       if(this->_preconditioner)
 	{
-	  subprecond_matrix = new PetscMatrix<Number>(subprecond);
+	  subprecond_matrix = new PetscMatrix<Number>(subprecond,
+						      this->communicator());
 	  this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
 	}
@@ -1576,7 +1578,8 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
       if(this->_preconditioner)
 	{
-	  subprecond_matrix = new PetscMatrix<Number>(subprecond);
+	  subprecond_matrix = new PetscMatrix<Number>(subprecond,
+						      this->communicator());
 	  this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
 	}

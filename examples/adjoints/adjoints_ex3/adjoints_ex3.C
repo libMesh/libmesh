@@ -730,7 +730,7 @@ int main (int argc, char** argv)
 
   // Create a mesh with the given dimension, distributed
   // across the default MPI communicator.
-  Mesh mesh(param.dimension, init.communicator());
+  Mesh mesh(init.communicator(), param.dimension);
 
   // And an object to refine it
   AutoPtr<MeshRefinement> mesh_refinement =

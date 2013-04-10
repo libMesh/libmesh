@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 
   LibMeshInit init(argc, argv);
 
-  Mesh mesh1(dim);
+  Mesh mesh1(init.communicator(), dim);
   EquationSystems es1(mesh1);
 
   std::cout << "Usage: " << argv[0]

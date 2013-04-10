@@ -128,7 +128,7 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *libmesh_dbg_var(j), Mat 
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
   PetscVector<Number> X_input(x, sys.communicator());
 
-  PetscMatrix<Number> J_input(*pc);
+  PetscMatrix<Number> J_input(*pc, sys.communicator());
   PetscMatrix<Number>& J_system =
     *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
 

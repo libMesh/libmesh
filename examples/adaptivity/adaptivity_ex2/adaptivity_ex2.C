@@ -193,7 +193,7 @@ int main (int argc, char** argv)
   // Create a new mesh on the default MPI communicator.
   // We still need some work on automatic parallel restarts with
   // ParallelMesh
-  SerialMesh mesh(0,init.communicator());
+  SerialMesh mesh(init.communicator());
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);

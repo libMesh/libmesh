@@ -522,7 +522,7 @@ void DistributedVector<T>::localize (const numeric_index_type first_local_idx,
 
   // Build a parallel vector, initialize it with the local
   // parts of (*this)
-  DistributedVector<T> parallel_vec;
+  DistributedVector<T> parallel_vec(this->communicator());
 
   parallel_vec.init (my_size, my_local_size, true, PARALLEL);
 
