@@ -171,7 +171,7 @@ void tetrahedralize_domain(const Parallel::Communicator& comm)
   // 5.) The domain is tetrahedralized, the mesh is written out, etc.
 
   // The mesh we will eventually generate
-  SerialMesh mesh(3,comm);
+  SerialMesh mesh(comm,3);
 
   // Lower and Upper bounding box limits for a rectangular hole within the unit cube.
   Point hole_lower_limit(0.2, 0.2, 0.4);
@@ -229,7 +229,7 @@ void tetrahedralize_domain(const Parallel::Communicator& comm)
 void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper_limit)
 {
 #ifdef LIBMESH_HAVE_TETGEN
-  SerialMesh cube_mesh(3,mesh.communicator());
+  SerialMesh cube_mesh(mesh.communicator(),3);
 
   unsigned n_elem = 1;
 
