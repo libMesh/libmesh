@@ -294,7 +294,7 @@ void AssemblyF1::boundary_assembly(FEMContext &c)
 
 void AssemblyF2::boundary_assembly(FEMContext &c)
 {
-  if(rb_sys.get_mesh().boundary_info->boundary_id(c.elem, c.side) == BOUNDARY_ID_MAX_X)
+  if(rb_sys.get_mesh().boundary_info->has_boundary_id(c.elem, c.side, BOUNDARY_ID_MAX_X) )
   {
     const unsigned int u_var = 0;
     const unsigned int w_var = 2;
