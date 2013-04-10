@@ -37,10 +37,10 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 
-// Wrap everything in a GMV namespace and
+// Wrap everything in a GMVLib namespace and
 // use extern "C" to avoid name mangling.
 #ifdef LIBMESH_HAVE_GMV
-namespace GMV
+namespace GMVLib
 {
   extern "C"
   {
@@ -2013,10 +2013,10 @@ void GMVIO::read (const std::string& name)
   // a "fromfile" directive (?) But we currently don't make
   // any use of this feature in LibMesh.  Nonzero return val
   // from any function usually means an error has occurred.
-  int ierr = GMV::gmvread_open_fromfileskip(const_cast<char*>(name.c_str()));
+  int ierr = GMVLib::gmvread_open_fromfileskip(const_cast<char*>(name.c_str()));
   if (ierr != 0)
     {
-      libMesh::err << "GMV::gmvread_open_fromfileskip failed!" << std::endl;
+      libMesh::err << "GMVLib::gmvread_open_fromfileskip failed!" << std::endl;
       libmesh_error();
     }
 
@@ -2025,34 +2025,34 @@ void GMVIO::read (const std::string& name)
   int iend = 0;
   while (iend == 0)
     {
-      GMV::gmvread_data();
+      GMVLib::gmvread_data();
 
       /*  Check for GMVEND.  */
-      if (GMV::gmv_data.keyword == GMVEND)
+      if (GMVLib::gmv_data.keyword == GMVEND)
         {
 	  iend = 1;
-	  GMV::gmvread_close();
+	  GMVLib::gmvread_close();
 	  break;
         }
 
       /*  Check for GMVERROR.  */
-      if (GMV::gmv_data.keyword == GMVERROR)
+      if (GMVLib::gmv_data.keyword == GMVERROR)
         {
 	  libMesh::err << "Encountered GMVERROR while reading!" << std::endl;
 	  libmesh_error();
         }
 
       /*  Process the data.  */
-      switch (GMV::gmv_data.keyword)
+      switch (GMVLib::gmv_data.keyword)
         {
 	case NODES:
 	  {
 	    //libMesh::out << "Reading nodes." << std::endl;
 
-	    if (GMV::gmv_data.num2 == NODES)
+	    if (GMVLib::gmv_data.num2 == NODES)
 	      this->_read_nodes();
 
-	    else if (GMV::gmv_data.num2 == NODE_V)
+	    else if (GMVLib::gmv_data.num2 == NODE_V)
 	      {
 		libMesh::err << "Unsupported GMV data type NODE_V!" << std::endl;
 		libmesh_error();
@@ -2083,16 +2083,16 @@ void GMVIO::read (const std::string& name)
 	    // This is a field variable.
 
 	    // Check to see if we're done reading variables and break out.
-	    if (GMV::gmv_data.datatype == ENDKEYWORD)
+	    if (GMVLib::gmv_data.datatype == ENDKEYWORD)
 	      {
 		// libMesh::out << "Done reading GMV variables." << std::endl;
 		break;
 	      }
 
-	    if (GMV::gmv_data.datatype == NODE)
+	    if (GMVLib::gmv_data.datatype == NODE)
 	      {
 		// libMesh::out << "Reading node field data for variable "
-		// 	  << GMV::gmv_data.name1 << std::endl;
+		// 	  << GMVLib::gmv_data.name1 << std::endl;
 		this->_read_var();
 		break;
 	      }
@@ -2100,9 +2100,9 @@ void GMVIO::read (const std::string& name)
 	    else
 	      {
 		libMesh::err << "Warning: Skipping variable: "
-			      << GMV::gmv_data.name1
+			      << GMVLib::gmv_data.name1
 			      << " which is of unsupported GMV datatype "
-			      << GMV::gmv_data.datatype
+			      << GMVLib::gmv_data.datatype
 			      << ".  Nodal field data is currently the only type currently supported."
 			      << std::endl;
 		break;
@@ -2113,7 +2113,7 @@ void GMVIO::read (const std::string& name)
 	default:
 	  {
 	    libMesh::err << "Encountered unknown GMV keyword "
-		          << GMV::gmv_data.keyword
+		          << GMVLib::gmv_data.keyword
 		          << std::endl;
 	    libmesh_error();
 	  }
@@ -2153,8 +2153,8 @@ void GMVIO::_read_var()
 #ifdef LIBMESH_HAVE_GMV
 
   // Copy all the variable's values into a local storage vector.
-  _nodal_data.insert ( std::make_pair(std::string(GMV::gmv_data.name1),
-				      std::vector<Number>(GMV::gmv_data.doubledata1, GMV::gmv_data.doubledata1+GMV::gmv_data.num) ) );
+  _nodal_data.insert ( std::make_pair(std::string(GMVLib::gmv_data.name1),
+				      std::vector<Number>(GMVLib::gmv_data.doubledata1, GMVLib::gmv_data.doubledata1+GMVLib::gmv_data.num) ) );
 #endif
 }
 
@@ -2165,17 +2165,17 @@ void GMVIO::_read_materials()
 #ifdef LIBMESH_HAVE_GMV
 
   // LibMesh assigns materials on a per-cell basis
-  libmesh_assert_equal_to (GMV::gmv_data.datatype, CELL);
+  libmesh_assert_equal_to (GMVLib::gmv_data.datatype, CELL);
 
   //   // Material names: LibMesh has no use for these currently...
   //   libMesh::out << "Number of material names="
-  // 	    << GMV::gmv_data.num
+  // 	    << GMVLib::gmv_data.num
   // 	    << std::endl;
 
-  //   for (int i = 0; i < GMV::gmv_data.num; i++)
+  //   for (int i = 0; i < GMVLib::gmv_data.num; i++)
   //     {
   //       // Build a 32-char string from the appropriate entries
-  //       std::string mat_string(&GMV::gmv_data.chardata1[i*33], 32);
+  //       std::string mat_string(&GMVLib::gmv_data.chardata1[i*33], 32);
 
   //       libMesh::out << "Material name " << i << ": " << mat_string << std::endl;
   //     }
@@ -2183,18 +2183,18 @@ void GMVIO::_read_materials()
   //   // Material labels: These correspond to (1-based) CPU IDs, and
   //   // there should be 1 of these for each element.
   //   libMesh::out << "Number of material labels = "
-  // 	    << GMV::gmv_data.nlongdata1
+  // 	    << GMVLib::gmv_data.nlongdata1
   // 	    << std::endl;
 
-  for (int i = 0; i < GMV::gmv_data.nlongdata1; i++)
+  for (int i = 0; i < GMVLib::gmv_data.nlongdata1; i++)
     {
       // Debugging Info
       // libMesh::out << "Material ID " << i << ": "
-      // << GMV::gmv_data.longdata1[i]
+      // << GMVLib::gmv_data.longdata1[i]
       // << std::endl;
 
       MeshInput<MeshBase>::mesh().elem(i)->processor_id() =
-	GMV::gmv_data.longdata1[i]-1;
+	GMVLib::gmv_data.longdata1[i]-1;
     }
 
 #endif
@@ -2208,31 +2208,31 @@ void GMVIO::_read_nodes()
 #ifdef LIBMESH_HAVE_GMV
   //   // Debug Info
   //   libMesh::out << "gmv_data.datatype="
-  // 	    <<  GMV::gmv_data.datatype
+  // 	    <<  GMVLib::gmv_data.datatype
   // 	    << std::endl;
 
   // LibMesh writes UNSTRUCT=100 node data
-  libmesh_assert_equal_to (GMV::gmv_data.datatype, UNSTRUCT);
+  libmesh_assert_equal_to (GMVLib::gmv_data.datatype, UNSTRUCT);
 
   // The nodal data is stored in gmv_data.doubledata{1,2,3}
   // and is nnodes long
-  for (int i = 0; i < GMV::gmv_data.num; i++)
+  for (int i = 0; i < GMVLib::gmv_data.num; i++)
     {
       //       libMesh::out << "(x,y,z)="
       // 		<< "("
-      // 		<< GMV::gmv_data.doubledata1[i]
+      // 		<< GMVLib::gmv_data.doubledata1[i]
       // 		<< ","
-      // 		<< GMV::gmv_data.doubledata2[i]
+      // 		<< GMVLib::gmv_data.doubledata2[i]
       // 		<< ","
-      // 		<< GMV::gmv_data.doubledata3[i]
+      // 		<< GMVLib::gmv_data.doubledata3[i]
       // 		<< ")"
       // 		<< std::endl;
 
       // Add the point to the Mesh
       MeshInput<MeshBase>::mesh().add_point
-                     ( Point(GMV::gmv_data.doubledata1[i],
-			     GMV::gmv_data.doubledata2[i],
-			     GMV::gmv_data.doubledata3[i]), i);
+                     ( Point(GMVLib::gmv_data.doubledata1[i],
+			     GMVLib::gmv_data.doubledata2[i],
+			     GMVLib::gmv_data.doubledata3[i]), i);
     }
 #endif
 }
@@ -2243,28 +2243,28 @@ void GMVIO::_read_one_cell()
 #ifdef LIBMESH_HAVE_GMV
   //   // Debug Info
   //   libMesh::out << "gmv_data.datatype="
-  // 	    <<  GMV::gmv_data.datatype
+  // 	    <<  GMVLib::gmv_data.datatype
   // 	    << std::endl;
 
   // This is either a REGULAR=111 cell or
   // the ENDKEYWORD=207 of the cells
 #ifndef NDEBUG
     bool recognized =
-      (GMV::gmv_data.datatype==REGULAR) ||
-      (GMV::gmv_data.datatype==ENDKEYWORD);
+      (GMVLib::gmv_data.datatype==REGULAR) ||
+      (GMVLib::gmv_data.datatype==ENDKEYWORD);
 #endif
     libmesh_assert (recognized);
 
   MeshBase& mesh = MeshInput<MeshBase>::mesh();
 
-  if (GMV::gmv_data.datatype == REGULAR)
+  if (GMVLib::gmv_data.datatype == REGULAR)
     {
       //       libMesh::out << "Name of the cell is: "
-      // 		<< GMV::gmv_data.name1
+      // 		<< GMVLib::gmv_data.name1
       // 		<< std::endl;
 
       //       libMesh::out << "Cell has "
-      // 		<< GMV::gmv_data.num2
+      // 		<< GMVLib::gmv_data.num2
       // 		<< " vertices."
       // 		<< std::endl;
 
@@ -2275,7 +2275,7 @@ void GMVIO::_read_one_cell()
       // FIXME: Since Quad9's apparently don't exist for GMV, and since
       // In general we write linear sub-elements to GMV files, we need
       // to be careful to read back in exactly what we wrote out...
-      ElemType type = this->_gmv_elem_to_libmesh_elem(GMV::gmv_data.name1);
+      ElemType type = this->_gmv_elem_to_libmesh_elem(GMVLib::gmv_data.name1);
 
       Elem* elem = Elem::build(type).release();
       elem->set_id(_next_elem_id++);
@@ -2285,18 +2285,18 @@ void GMVIO::_read_one_cell()
 
       // Print out the connectivity information for
       // this cell.
-      for (int i=0; i<GMV::gmv_data.num2; i++)
+      for (int i=0; i<GMVLib::gmv_data.num2; i++)
 	{
 	  // 	  // Debugging info
 	  // 	  libMesh::out << "Vertex " << i << " is node "
-	  // 		    << GMV::gmv_data.longdata1[i]
+	  // 		    << GMVLib::gmv_data.longdata1[i]
 	  // 		    << std::endl;
 
 	  // Map index i to GMV's numbering scheme
 	  unsigned mapped_i = eledef.node_map[i];
 
 	  // Note: Node numbers (as stored in libmesh) are 1-based
-	  elem->set_node(i) = mesh.node_ptr(GMV::gmv_data.longdata1[mapped_i]-1);
+	  elem->set_node(i) = mesh.node_ptr(GMVLib::gmv_data.longdata1[mapped_i]-1);
 	}
 
       elems_of_dimension[elem->dim()] = true;
@@ -2306,7 +2306,7 @@ void GMVIO::_read_one_cell()
     }
 
 
-  if (GMV::gmv_data.datatype == ENDKEYWORD)
+  if (GMVLib::gmv_data.datatype == ENDKEYWORD)
     {
       // There isn't a cell to read, so we just return
       return;
