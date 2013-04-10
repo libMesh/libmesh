@@ -116,7 +116,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
     
     # --------------------------------------------------------------
     # look for a decent F77 compiler or honor --with-77=...
-    FC_TRY_LIST="gfortran g77 ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
+    F77_TRY_LIST="gfortran g77 ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
     if  (test "$enablempi" != no) ; then
       F77_TRY_LIST="mpif77 $F77_TRY_LIST"
     fi
