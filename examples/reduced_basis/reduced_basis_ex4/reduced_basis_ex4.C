@@ -77,7 +77,7 @@ int main (int argc, char** argv)
 
   // Create a mesh (just a simple square) on the default MPI
   // communicator
-  Mesh mesh (dim, init.communicator());
+  Mesh mesh (init.communicator(), dim);
   MeshTools::Generation::build_square (mesh,
                                        n_elem, n_elem,
                                        -1., 1.,

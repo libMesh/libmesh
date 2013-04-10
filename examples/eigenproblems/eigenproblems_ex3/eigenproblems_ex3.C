@@ -149,7 +149,7 @@ int main (int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden by the file, on
   // the default MPI communicator.
-  Mesh mesh(0,init.communicator());
+  Mesh mesh(init.communicator());
 
   mesh.read(mesh_name_exodus.str());
 

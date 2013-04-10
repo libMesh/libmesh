@@ -64,36 +64,36 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  NumericVector (const ParallelType ptype = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+  NumericVector (const Parallel::Communicator &comm,
+		 const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  NumericVector (const numeric_index_type n,
-                 const ParallelType ptype = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+  NumericVector (const Parallel::Communicator &comm,
+		 const numeric_index_type n,
+                 const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  NumericVector (const numeric_index_type n,
+  NumericVector (const Parallel::Communicator &comm,
+		 const numeric_index_type n,
 		 const numeric_index_type n_local,
-                 const ParallelType ptype = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+                 const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  NumericVector (const numeric_index_type N,
+  NumericVector (const Parallel::Communicator &comm,
+		 const numeric_index_type N,
 		 const numeric_index_type n_local,
 		 const std::vector<numeric_index_type>& ghost,
-                 const ParallelType ptype = AUTOMATIC,
-                 const Parallel::Communicator &comm = libMesh::CommWorld);
+                 const ParallelType ptype = AUTOMATIC);
 
 public:
 
@@ -104,12 +104,23 @@ public:
   virtual ~NumericVector ();
 
   /**
-   * Builds a \p NumericVector using the linear solver package specified by
+   * Builds a \p NumericVector on the processors in communicator
+   * \p comm using the linear solver package specified by
    * \p solver_package
    */
   static AutoPtr<NumericVector<T> >
-  build(const Parallel::Communicator &comm = libMesh::CommWorld,
+  build(const Parallel::Communicator &comm,
 	const SolverPackage solver_package = libMesh::default_solver_package());
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+  /**
+   * Builds a \p NumericVector on the processors in communicator
+   * CommWorld using the linear solver package specified by \p
+   * solver_package.  Deprecated.
+   */
+  static AutoPtr<NumericVector<T> >
+  build(const SolverPackage solver_package = libMesh::default_solver_package());
+#endif
 
   /**
    * @returns true if the vector has been initialized,
@@ -653,7 +664,8 @@ protected:
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const ParallelType ptype, const Parallel::Communicator &comm) :
+NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
+				 const ParallelType ptype) :
   ParallelObject(comm),
   _is_closed(false),
   _is_initialized(false),
@@ -665,9 +677,9 @@ NumericVector<T>::NumericVector (const ParallelType ptype, const Parallel::Commu
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
-                                 const ParallelType ptype,
-                                 const Parallel::Communicator &comm) :
+NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
+				 const numeric_index_type /*n*/,
+                                 const ParallelType ptype) :
   ParallelObject(comm),
   _is_closed(false),
   _is_initialized(false),
@@ -681,10 +693,10 @@ NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
+NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
+				 const numeric_index_type /*n*/,
 				 const numeric_index_type /*n_local*/,
-                                 const ParallelType ptype,
-                                 const Parallel::Communicator &comm) :
+                                 const ParallelType ptype) :
   ParallelObject(comm),
   _is_closed(false),
   _is_initialized(false),
@@ -698,11 +710,11 @@ NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
 
 template <typename T>
 inline
-NumericVector<T>::NumericVector (const numeric_index_type /*n*/,
+NumericVector<T>::NumericVector (const Parallel::Communicator &comm,
+				 const numeric_index_type /*n*/,
 				 const numeric_index_type /*n_local*/,
 				 const std::vector<numeric_index_type>& /*ghost*/,
-                                 const ParallelType ptype,
-                                 const Parallel::Communicator &comm) :
+                                 const ParallelType ptype) :
   ParallelObject(comm),
   _is_closed(false),
   _is_initialized(false),

@@ -54,7 +54,19 @@ class SerialMesh : public UnstructuredMesh
    * changed by mesh generation/loading) later.
    */
   explicit
-  SerialMesh (unsigned int dim=1, const Parallel::Communicator &comm = libMesh::CommWorld);
+  SerialMesh (const Parallel::Communicator &comm,
+	      unsigned int dim=1);
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+  /**
+   * Deprecated constructor.  Takes \p dim, the dimension of the mesh.
+   * The mesh dimension can be changed (and may automatically be
+   * changed by mesh generation/loading) later.
+   */
+  explicit
+  SerialMesh (unsigned int dim=1);
+#endif
+
 
   /**
    * Copy-constructor.  This should be able to take a

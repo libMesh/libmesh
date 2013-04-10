@@ -115,7 +115,7 @@ int main(int argc, char** argv)
   const unsigned int requested_dim = cl.follow(3, "--dim");
 
   // Load the old mesh from --inmesh filename
-  Mesh old_mesh(requested_dim);
+  Mesh old_mesh(init.communicator(), requested_dim);
 
   const std::string meshname =
     assert_argument(cl, "--inmesh", argv[0], std::string("mesh.xda"));
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
   old_mesh.print_info();
 
   // Load the new mesh from --outmesh filename
-  Mesh new_mesh(requested_dim);
+  Mesh new_mesh(init.communicator(), requested_dim);
 
   const std::string outmeshname = cl.follow(std::string("out_"+meshname), "--outmesh");
 
@@ -183,7 +183,7 @@ int main(int argc, char** argv)
       libmesh_assert_equal_to (new_sys.n_vars(), n_vars);
 
       AutoPtr<NumericVector<Number> > comparison_soln =
-        NumericVector<Number>::build();
+        NumericVector<Number>::build(old_sys.communicator());
       std::vector<Number> global_soln;
       old_sys.update_global_solution(global_soln);
       comparison_soln->init(old_sys.solution->size(), true, SERIAL);

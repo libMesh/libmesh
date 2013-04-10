@@ -106,7 +106,7 @@ int main (int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden later, on the
   // default MPI communicator.
-  Mesh mesh(0,init.communicator());
+  Mesh mesh(init.communicator());
 
   // Use the internal mesh generator to create a uniform
   // 2D grid on a square.

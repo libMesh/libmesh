@@ -65,36 +65,36 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  EpetraVector (const ParallelType type = AUTOMATIC,
-                const Parallel::Communicator &comm = libMesh::CommWorld);
+  EpetraVector (const Parallel::Communicator &comm,
+		const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  EpetraVector (const numeric_index_type n,
-                const ParallelType type = AUTOMATIC,
-                const Parallel::Communicator &comm = libMesh::CommWorld);
+  EpetraVector (const Parallel::Communicator &comm,
+		const numeric_index_type n,
+                const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  EpetraVector (const numeric_index_type n,
+  EpetraVector (const Parallel::Communicator &comm,
+		const numeric_index_type n,
 	        const numeric_index_type n_local,
-                const ParallelType type = AUTOMATIC,
-                const Parallel::Communicator &comm = libMesh::CommWorld);
+                const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  EpetraVector (const numeric_index_type N,
+  EpetraVector (const Parallel::Communicator &comm,
+		const numeric_index_type N,
 		const numeric_index_type n_local,
 		const std::vector<numeric_index_type>& ghost,
-                const ParallelType type = AUTOMATIC,
-                const Parallel::Communicator &comm = libMesh::CommWorld);
+                const ParallelType type = AUTOMATIC);
 
   /**
    * Constructor.  Creates a EpetraVector assuming you already have a
@@ -104,7 +104,8 @@ public:
    * and to simply provide additional functionality with the EpetraVector.
    */
   EpetraVector(Epetra_Vector & v,
-               const Parallel::Communicator &comm /* = libMesh::CommWorld */);
+	       const Parallel::Communicator &comm
+	       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -625,9 +626,9 @@ private:
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (const ParallelType type,
-                               const Parallel::Communicator &comm)
-: NumericVector<T>(type, comm),
+EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
+			       const ParallelType type)
+: NumericVector<T>(comm, type),
   _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
@@ -647,10 +648,10 @@ EpetraVector<T>::EpetraVector (const ParallelType type,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (const numeric_index_type n,
-                               const ParallelType type,
-                               const Parallel::Communicator &comm)
-: NumericVector<T>(type, comm),
+EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
+			       const numeric_index_type n,
+                               const ParallelType type)
+: NumericVector<T>(comm, type),
   _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
@@ -671,11 +672,11 @@ EpetraVector<T>::EpetraVector (const numeric_index_type n,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (const numeric_index_type n,
+EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
+			       const numeric_index_type n,
 			       const numeric_index_type n_local,
-                               const ParallelType type,
-                               const Parallel::Communicator &comm)
-: NumericVector<T>(type, comm),
+                               const ParallelType type)
+: NumericVector<T>(comm, type),
   _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
@@ -697,8 +698,8 @@ EpetraVector<T>::EpetraVector (const numeric_index_type n,
 template <typename T>
 inline
 EpetraVector<T>::EpetraVector(Epetra_Vector & v,
-                              const Parallel::Communicator &comm)
-  : NumericVector<T>(AUTOMATIC, comm),
+			      const Parallel::Communicator &comm)
+  : NumericVector<T>(comm, AUTOMATIC),
     _destroy_vec_on_exit(false),
     myFirstID_(0),
     myNumIDs_(0),
@@ -731,12 +732,12 @@ EpetraVector<T>::EpetraVector(Epetra_Vector & v,
 
 template <typename T>
 inline
-EpetraVector<T>::EpetraVector (const numeric_index_type n,
+EpetraVector<T>::EpetraVector (const Parallel::Communicator &comm,
+			       const numeric_index_type n,
 			       const numeric_index_type n_local,
 		               const std::vector<numeric_index_type>& ghost,
-                               const ParallelType type,
-                               const Parallel::Communicator &comm)
-: NumericVector<T>(AUTOMATIC, comm),
+                               const ParallelType type)
+: NumericVector<T>(comm, AUTOMATIC),
   _destroy_vec_on_exit(true),
   myFirstID_(0),
   myNumIDs_(0),
@@ -909,7 +910,8 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > EpetraVector<T>::zero_clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new EpetraVector<T>(AUTOMATIC, this->communicator()));
+  AutoPtr<NumericVector<T> > cloned_vector
+    (new EpetraVector<T>(this->communicator(), AUTOMATIC));
 
   cloned_vector->init(*this);
 
@@ -922,7 +924,8 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > EpetraVector<T>::clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new EpetraVector<T>(AUTOMATIC, this->communicator()));
+  AutoPtr<NumericVector<T> > cloned_vector
+    (new EpetraVector<T>(this->communicator(), AUTOMATIC));
 
   cloned_vector->init(*this, true);
 

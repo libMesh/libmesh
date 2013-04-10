@@ -57,36 +57,36 @@ public:
    *  Dummy-Constructor. Dimension=0
    */
   explicit
-  DistributedVector (const ParallelType = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+  DistributedVector (const Parallel::Communicator &comm,
+		     const ParallelType = AUTOMATIC);
 
   /**
    * Constructor. Set dimension to \p n and initialize all elements with zero.
    */
   explicit
-  DistributedVector (const numeric_index_type n,
-                     const ParallelType ptype = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+  DistributedVector (const Parallel::Communicator &comm,
+		     const numeric_index_type n,
+                     const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global dimension
    * to \p n, and initialize all elements with zero.
    */
-  DistributedVector (const numeric_index_type n,
+  DistributedVector (const Parallel::Communicator &comm,
+		     const numeric_index_type n,
 		     const numeric_index_type n_local,
-                     const ParallelType ptype = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const ParallelType ptype = AUTOMATIC);
 
   /**
    * Constructor. Set local dimension to \p n_local, the global
    * dimension to \p n, but additionally reserve memory for the
    * indices specified by the \p ghost argument.
    */
-  DistributedVector (const numeric_index_type N,
+  DistributedVector (const Parallel::Communicator &comm,
+		     const numeric_index_type N,
 		     const numeric_index_type n_local,
 		     const std::vector<numeric_index_type>& ghost,
-                     const ParallelType ptype = AUTOMATIC,
-                     const Parallel::Communicator &comm = libMesh::CommWorld);
+                     const ParallelType ptype = AUTOMATIC);
 
   /**
    * Destructor, deallocates memory. Made virtual to allow
@@ -480,8 +480,9 @@ private:
 // DistributedVector inline methods
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const ParallelType ptype, const Parallel::Communicator &comm)
-  : NumericVector<T>(ptype, comm),
+DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
+					 const ParallelType ptype)
+  : NumericVector<T>(comm, ptype),
   _global_size      (0),
   _local_size       (0),
   _first_local_index(0),
@@ -494,10 +495,10 @@ DistributedVector<T>::DistributedVector (const ParallelType ptype, const Paralle
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const numeric_index_type n,
-                                         const ParallelType ptype,
-                                         const Parallel::Communicator &comm)
-  : NumericVector<T>(ptype, comm)
+DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
+					 const numeric_index_type n,
+                                         const ParallelType ptype)
+  : NumericVector<T>(comm, ptype)
 {
   this->init(n, n, false, ptype);
 }
@@ -506,11 +507,11 @@ DistributedVector<T>::DistributedVector (const numeric_index_type n,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const numeric_index_type n,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
+					 const numeric_index_type n,
 					 const numeric_index_type n_local,
-                                         const ParallelType ptype,
-                                         const Parallel::Communicator &comm)
-  : NumericVector<T>(ptype, comm)
+                                         const ParallelType ptype)
+  : NumericVector<T>(comm, ptype)
 {
   this->init(n, n_local, false, ptype);
 }
@@ -519,12 +520,12 @@ DistributedVector<T>::DistributedVector (const numeric_index_type n,
 
 template <typename T>
 inline
-DistributedVector<T>::DistributedVector (const numeric_index_type n,
+DistributedVector<T>::DistributedVector (const Parallel::Communicator &comm,
+					 const numeric_index_type n,
 					 const numeric_index_type n_local,
 		                         const std::vector<numeric_index_type>& ghost,
-                                         const ParallelType ptype,
-                                         const Parallel::Communicator &comm)
-  : NumericVector<T>(ptype, comm)
+                                         const ParallelType ptype)
+  : NumericVector<T>(comm, ptype)
 {
   this->init(n, n_local, ghost, false, ptype);
 }
@@ -708,7 +709,8 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > DistributedVector<T>::zero_clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new DistributedVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector
+    (new DistributedVector<T>(this->communicator()));
 
   cloned_vector->init(*this);
 
@@ -721,7 +723,8 @@ template <typename T>
 inline
 AutoPtr<NumericVector<T> > DistributedVector<T>::clone () const
 {
-  AutoPtr<NumericVector<T> > cloned_vector (new DistributedVector<T>);
+  AutoPtr<NumericVector<T> > cloned_vector
+    (new DistributedVector<T>(this->communicator()));
 
   cloned_vector->init(*this, true);
 

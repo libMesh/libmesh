@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden later, on the
   // default MPI communicator.
-  Mesh mesh(0,init.communicator());
+  Mesh mesh(init.communicator());
 
   GetPot command_line (argc, argv);
 

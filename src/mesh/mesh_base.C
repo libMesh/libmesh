@@ -43,8 +43,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // MeshBase class member functions
-MeshBase::MeshBase (unsigned int d,
-		    const Parallel::Communicator &comm) :
+MeshBase::MeshBase (const Parallel::Communicator &comm,
+		    unsigned int d) :
   ParallelObject (comm),
   boundary_info  (new BoundaryInfo(*this)),
   _n_parts       (1),
@@ -59,6 +59,25 @@ MeshBase::MeshBase (unsigned int d,
   libmesh_assert_greater_equal (LIBMESH_DIM, _dim);
   libmesh_assert (libMesh::initialized());
 }
+
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+MeshBase::MeshBase (unsigned int d) :
+  ParallelObject (CommWorld),
+  boundary_info  (new BoundaryInfo(*this)),
+  _n_parts       (1),
+  _dim           (d),
+  _is_prepared   (false),
+  _point_locator (NULL),
+  _partitioner   (NULL),
+  _skip_partitioning(false),
+  _skip_renumber_nodes_and_elements(false)
+{
+  libmesh_assert_less_equal (LIBMESH_DIM, 3);
+  libmesh_assert_greater_equal (LIBMESH_DIM, _dim);
+  libmesh_assert (libMesh::initialized());
+}
+#endif // !LIBMESH_DISABLE_COMMWORLD
 
 
 

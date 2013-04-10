@@ -53,7 +53,7 @@ NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage 
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
       {
-	AutoPtr<NumericVector<T> > ap(new LaspackVector<T>(AUTOMATIC, comm));
+	AutoPtr<NumericVector<T> > ap(new LaspackVector<T>(comm, AUTOMATIC));
 	return ap;
       }
 #endif
@@ -62,7 +62,7 @@ NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
       {
-	AutoPtr<NumericVector<T> > ap(new PetscVector<T>(AUTOMATIC, comm));
+	AutoPtr<NumericVector<T> > ap(new PetscVector<T>(comm, AUTOMATIC));
 	return ap;
       }
 #endif
@@ -71,7 +71,7 @@ NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage 
 #ifdef LIBMESH_HAVE_TRILINOS
     case TRILINOS_SOLVERS:
       {
-	AutoPtr<NumericVector<T> > ap(new EpetraVector<T>(AUTOMATIC, comm));
+	AutoPtr<NumericVector<T> > ap(new EpetraVector<T>(comm, AUTOMATIC));
 	return ap;
       }
 #endif
@@ -80,14 +80,14 @@ NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
       {
-	AutoPtr<NumericVector<T> > ap(new EigenSparseVector<T>(AUTOMATIC, comm));
+	AutoPtr<NumericVector<T> > ap(new EigenSparseVector<T>(comm, AUTOMATIC));
 	return ap;
       }
 #endif
 
 
     default:
-      AutoPtr<NumericVector<T> > ap(new DistributedVector<T>(AUTOMATIC, comm));
+      AutoPtr<NumericVector<T> > ap(new DistributedVector<T>(comm, AUTOMATIC));
       return ap;
 
     }
@@ -95,6 +95,17 @@ NumericVector<T>::build(const Parallel::Communicator &comm, const SolverPackage 
   AutoPtr<NumericVector<T> > ap(NULL);
   return ap;
 }
+
+
+#ifndef LIBMESH_DISABLE_COMMWORLD
+template <typename T>
+AutoPtr<NumericVector<T> >
+NumericVector<T>::build(const SolverPackage solver_package)
+{
+  libmesh_deprecated();
+  return NumericVector<T>::build(CommWorld, solver_package);
+}
+#endif
 
 
 template <typename T>

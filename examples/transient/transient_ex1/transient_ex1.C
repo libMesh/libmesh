@@ -119,7 +119,7 @@ int main (int argc, char** argv)
   //
   // Create a mesh object, with dimension to be overridden later,
   // distributed across the default MPI communicator.
-  Mesh mesh(0,init.communicator());
+  Mesh mesh(init.communicator());
 
   mesh.read ("mesh.xda");
 

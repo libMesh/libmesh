@@ -56,7 +56,8 @@ class LaspackLinearSolver : public LinearSolver<T>
   /**
    *  Constructor. Initializes Laspack data structures
    */
-  LaspackLinearSolver (const libMesh::Parallel::Communicator &comm /*= libMesh::CommWorld */);
+  LaspackLinearSolver (const libMesh::Parallel::Communicator &comm
+		       LIBMESH_CAN_DEFAULT_TO_COMMWORLD);
 
   /**
    * Destructor.
