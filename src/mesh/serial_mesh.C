@@ -714,6 +714,14 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
         }
     }
 
+    if (verbose)
+      {
+        libMesh::out << "In SerialMesh::stitch_meshes:\n"
+                     << "This mesh has "  << this_boundary_node_ids.size()  << " nodes on boundary " << this_mesh_boundary_id  << ".\n"
+                     << "Other mesh has " << other_boundary_node_ids.size() << " nodes on boundary " << other_mesh_boundary_id << ".\n"
+                     << std::endl;
+      }
+
     std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
     std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
     for( ; set_it != set_it_end; ++set_it)
@@ -764,10 +772,10 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
 
     if(verbose)
     {
-      libMesh::out << "In SerialMesh::stitch_meshes:" << std::endl
-                   << "This mesh has " << this_boundary_node_ids.size() << " nodes on specified boundary" << std::endl
-                   << "Other mesh has " << other_boundary_node_ids.size() << " nodes on specified boundary" << std::endl
-                   << "Found " << node_to_node_map.size() << " matching nodes." << std::endl << std::endl;
+      libMesh::out << "In SerialMesh::stitch_meshes:\n"
+                   << "Found " << node_to_node_map.size()
+                   << " matching nodes.\n"
+                   << std::endl;
     }
   }
   else
