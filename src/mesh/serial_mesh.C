@@ -677,9 +677,10 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
       for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
         if (el->neighbor(side_id) == NULL)
         {
-          boundary_id_type bc_id = this->boundary_info->boundary_id (el, side_id);
+          // Get *all* boundary IDs, not just the first one!
+          std::vector<boundary_id_type> bc_ids = this->boundary_info->boundary_ids (el, side_id);
 
-          if(bc_id == this_mesh_boundary_id)
+          if (std::count(bc_ids.begin(), bc_ids.end(), this_mesh_boundary_id))
           {
             AutoPtr<Elem> side (el->build_side(side_id));
             for (unsigned int node_id=0; node_id<side->n_nodes(); node_id++)
@@ -701,9 +702,10 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
       for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
         if (el->neighbor(side_id) == NULL)
         {
-          boundary_id_type bc_id = other_mesh.boundary_info->boundary_id (el, side_id);
+          // Get *all* boundary IDs, not just the first one!
+          std::vector<boundary_id_type> bc_ids = other_mesh.boundary_info->boundary_ids (el, side_id);
 
-          if(bc_id == other_mesh_boundary_id)
+          if (std::count(bc_ids.begin(), bc_ids.end(), other_mesh_boundary_id))
           {
             AutoPtr<Elem> side (el->build_side(side_id));
             for (unsigned int node_id=0; node_id<side->n_nodes(); node_id++)
@@ -721,6 +723,9 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                      << "Other mesh has " << other_boundary_node_ids.size() << " nodes on boundary " << other_mesh_boundary_id << ".\n"
                      << std::endl;
       }
+
+    // Begin geometric search for matching nodes
+    libMesh::out << "Beginning geometric search for matching nodes..." << std::endl;
 
     std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
     std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
@@ -851,12 +856,13 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
     for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
       if (el->neighbor(side_id) == NULL)
       {
-        boundary_id_type bc_id = other_mesh.boundary_info->boundary_id (el, side_id);
-
-        if(bc_id != BoundaryInfo::invalid_id)
-        {
-          this->boundary_info->add_side(el->id(), side_id, bc_id);
-        }
+        // There could be multiple boundary IDs on this side, so add them all.
+        std::vector<boundary_id_type> bc_ids = other_mesh.boundary_info->boundary_ids (el, side_id);
+        for (unsigned i=0; i<bc_ids.size(); ++i)
+          {
+            if (bc_ids[i] != BoundaryInfo::invalid_id)
+              this->boundary_info->add_side(el->id(), side_id, bc_ids[i]);
+          }
       }
 
     // Then decrement
@@ -915,13 +921,13 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
       {
         if (el->neighbor(side_id) != NULL)
         {
-          boundary_id_type bc_id = this->boundary_info->boundary_id (el, side_id);
+          // Completely remove the side from the boundary_info object if it has either
+          // this_mesh_boundary_id or other_mesh_boundary_id.
+          std::vector<boundary_id_type> bc_ids = this->boundary_info->boundary_ids (el, side_id);
 
-          if( (bc_id == this_mesh_boundary_id)  ||
-              (bc_id == other_mesh_boundary_id) )
-          {
+          if (std::count(bc_ids.begin(), bc_ids.end(), this_mesh_boundary_id) ||
+              std::count(bc_ids.begin(), bc_ids.end(), other_mesh_boundary_id))
             this->boundary_info->remove_side(el, side_id);
-          }
         }
       }
     }
