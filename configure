@@ -36992,6 +36992,9 @@ fi
 if (test "x$enablelegacyusingnamespace" = "xyes"); then
 echo '  adding using namespace libMesh... :' $enablelegacyusingnamespace ***LEGACY FEATURE***
 fi
+if (test "x$enabledefaultcommworld" = "xyes"); then
+echo '  providing libMesh::CommWorld..... :' $enabledefaultcommworld ***LEGACY FEATURE***
+fi
 
 
 
