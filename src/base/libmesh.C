@@ -601,7 +601,6 @@ LibMeshInit::~LibMeshInit()
 #ifndef LIBMESH_DISABLE_COMMWORLD
       Parallel::Communicator_World.clear();
 #endif
-      MPI_Comm_free (&libMesh::COMM_WORLD);
 
       if (libmesh_initialized_mpi)
 	MPI_Finalize();
