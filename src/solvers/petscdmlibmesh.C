@@ -175,7 +175,7 @@ PetscErrorCode DMLibMeshSetSystem(DM dm, NonlinearImplicitSystem& sys)
   for (; el!=end; ++el)
     blocks.insert((*el)->subdomain_id());
   // Some subdomains may only live on other processors
-  communicator.set_union(blocks);
+  comm.set_union(blocks);
 
   std::set<subdomain_id_type>::iterator bit = blocks.begin();
   std::set<subdomain_id_type>::iterator bend = blocks.end();
