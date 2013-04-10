@@ -35,8 +35,8 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems& es,
                                             const std::string& name,
                                             const unsigned int number)
   : Parent(es, name, number),
-    condensed_matrix_A(SparseMatrix<Number>::build(es.communicator())),
-    condensed_matrix_B(SparseMatrix<Number>::build(es.communicator())),
+    condensed_matrix_A(SparseMatrix<Number>::build(es.comm())),
+    condensed_matrix_B(SparseMatrix<Number>::build(es.comm())),
     condensed_dofs_initialized(false)
 {
 }
@@ -87,7 +87,7 @@ unsigned int CondensedEigenSystem::n_global_non_condensed_dofs() const
   else
   {
     unsigned int n_global_non_condensed_dofs = local_non_condensed_dofs_vector.size();
-    this->communicator().sum(n_global_non_condensed_dofs);
+    this->comm().sum(n_global_non_condensed_dofs);
 
     return n_global_non_condensed_dofs;
   }
@@ -192,10 +192,10 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(unsigned int i)
 
   // This function assumes that condensed_solve has just been called.
   // If this is not the case, then we will trip an asset in get_eigenpair
-  AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->communicator());
+  AutoPtr< NumericVector<Number> > temp = NumericVector<Number>::build(this->comm());
   unsigned int n_local = local_non_condensed_dofs_vector.size();
   unsigned int n       = n_local;
-  this->communicator().sum(n);
+  this->comm().sum(n);
 
   temp->init (n, n_local, false, libMeshEnums::PARALLEL);
 

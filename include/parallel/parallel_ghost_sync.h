@@ -318,7 +318,7 @@ void sync_element_data_by_parent_id(MeshBase&       mesh,
                                     const Iterator& range_end,
                                     SyncFunctor&    sync)
 {
-  const Communicator &communicator (mesh.communicator());
+  const Communicator &communicator (mesh.comm());
 
   // This function must be run on all processors at once
   libmesh_parallel_only(communicator);

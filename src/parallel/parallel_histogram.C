@@ -99,7 +99,7 @@ void Histogram<KeyType,IdxType>::build_histogram ()
 
   // Add all the local histograms to get the global histogram
   hist = local_hist;
-  this->communicator().sum(hist);
+  this->comm().sum(hist);
 
   // All done!
 }

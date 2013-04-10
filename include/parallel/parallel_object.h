@@ -28,7 +28,7 @@
 // parallel on every processor at once
 #undef parallel_object_only
 #ifndef NDEBUG
-  #define parallel_object_only() libmesh_parallel_only(this->communicator())
+  #define parallel_object_only() libmesh_parallel_only(this->comm())
 #else
   #define parallel_object_only()  ((void) 0)
 #endif
@@ -83,7 +83,7 @@ namespace libMesh
      * @returns a reference to the \p Parallel::Communicator object
      * used by this mesh.
      */
-    const Parallel::Communicator & communicator () const
+    const Parallel::Communicator & comm () const
     { return _communicator; }
 
     /**

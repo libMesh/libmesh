@@ -72,7 +72,7 @@ void SlepcEigenSolver<T>::init ()
       this->_is_initialized = true;
 
       // Create the eigenproblem solver context
-      ierr = EPSCreate (this->communicator().get(), &_eps);
+      ierr = EPSCreate (this->comm().get(), &_eps);
       LIBMESH_CHKERRABORT(ierr);
 
       // Set user-specified  solver
@@ -103,7 +103,7 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> &matrix_A_in,
   // just for debugging, remove this
 //   char mat_file[] = "matA.petsc";
 //   PetscViewer petsc_viewer;
-//   ierr = PetscViewerBinaryOpen(this->communicator().get(), mat_file, PETSC_FILE_CREATE, &petsc_viewer);
+//   ierr = PetscViewerBinaryOpen(this->comm().get(), mat_file, PETSC_FILE_CREATE, &petsc_viewer);
 //          LIBMESH_CHKERRABORT(ierr);
 //   ierr = MatView(matrix_A->mat(),petsc_viewer);
 //          LIBMESH_CHKERRABORT(ierr);
@@ -126,7 +126,7 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> &shell_matrix,
 
   // Prepare the matrix.
   Mat mat;
-  ierr = MatCreateShell(this->communicator().get(),
+  ierr = MatCreateShell(this->comm().get(),
             shell_matrix.m(), // Specify the number of local rows
             shell_matrix.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -214,12 +214,12 @@ SlepcEigenSolver<T>::_solve_standard_helper
 
 
 #ifdef DEBUG
-	 // ierr = PetscPrintf(this->communicator().get(),
+	 // ierr = PetscPrintf(this->comm().get(),
 	 //         "\n Number of iterations: %d\n"
 	 //         " Number of converged eigenpairs: %d\n\n", its, nconv);
 
   // Display eigenvalues and relative errors.
-  ierr = PetscPrintf(this->communicator().get(),
+  ierr = PetscPrintf(this->comm().get(),
 		     "           k           ||Ax-kx||/|kx|\n"
 		     "   ----------------- -----------------\n" );
          LIBMESH_CHKERRABORT(ierr);
@@ -242,17 +242,17 @@ SlepcEigenSolver<T>::_solve_standard_helper
 
       if (im != .0)
 	{
-	  ierr = PetscPrintf(this->communicator().get()," %9f%+9f i %12f\n", re, im, error);
+	  ierr = PetscPrintf(this->comm().get()," %9f%+9f i %12f\n", re, im, error);
 	         LIBMESH_CHKERRABORT(ierr);
 	}
       else
 	{
-	  ierr = PetscPrintf(this->communicator().get(),"   %12f       %12f\n", re, error);
+	  ierr = PetscPrintf(this->comm().get(),"   %12f       %12f\n", re, error);
 	         LIBMESH_CHKERRABORT(ierr);
 	}
     }
 
-  ierr = PetscPrintf(this->communicator().get(),"\n" );
+  ierr = PetscPrintf(this->comm().get(),"\n" );
          LIBMESH_CHKERRABORT(ierr);
 #endif // DEBUG
 
@@ -307,7 +307,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 
   // Prepare the matrix.
   Mat mat_A;
-  ierr = MatCreateShell(this->communicator().get(),
+  ierr = MatCreateShell(this->comm().get(),
             shell_matrix_A.m(), // Specify the number of local rows
             shell_matrix_A.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -353,7 +353,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> &matrix_A_in,
 
   // Prepare the matrix.
   Mat mat_B;
-  ierr = MatCreateShell(this->communicator().get(),
+  ierr = MatCreateShell(this->comm().get(),
             shell_matrix_B.m(), // Specify the number of local rows
             shell_matrix_B.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -390,7 +390,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
 
   // Prepare the matrix.
   Mat mat_A;
-  ierr = MatCreateShell(this->communicator().get(),
+  ierr = MatCreateShell(this->comm().get(),
             shell_matrix_A.m(), // Specify the number of local rows
             shell_matrix_A.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -399,7 +399,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> &shell_matrix_A,
             &mat_A);
 
   Mat mat_B;
-  ierr = MatCreateShell(this->communicator().get(),
+  ierr = MatCreateShell(this->comm().get(),
             shell_matrix_B.m(), // Specify the number of local rows
             shell_matrix_B.n(), // Specify the number of local columns
             PETSC_DETERMINE,
@@ -495,12 +495,12 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 
 
 #ifdef DEBUG
-	 // ierr = PetscPrintf(this->communicator().get(),
+	 // ierr = PetscPrintf(this->comm().get(),
 	 //         "\n Number of iterations: %d\n"
 	 //         " Number of converged eigenpairs: %d\n\n", its, nconv);
 
   // Display eigenvalues and relative errors.
-  ierr = PetscPrintf(this->communicator().get(),
+  ierr = PetscPrintf(this->comm().get(),
 		     "           k           ||Ax-kx||/|kx|\n"
 		     "   ----------------- -----------------\n" );
          LIBMESH_CHKERRABORT(ierr);
@@ -523,17 +523,17 @@ SlepcEigenSolver<T>::_solve_generalized_helper (Mat mat_A,
 
       if (im != .0)
 	{
-	  ierr = PetscPrintf(this->communicator().get()," %9f%+9f i %12f\n", re, im, error);
+	  ierr = PetscPrintf(this->comm().get()," %9f%+9f i %12f\n", re, im, error);
 	         LIBMESH_CHKERRABORT(ierr);
 	}
       else
 	{
-	  ierr = PetscPrintf(this->communicator().get(),"   %12f       %12f\n", re, error);
+	  ierr = PetscPrintf(this->comm().get(),"   %12f       %12f\n", re, error);
 	         LIBMESH_CHKERRABORT(ierr);
 	}
     }
 
-  ierr = PetscPrintf(this->communicator().get(),"\n" );
+  ierr = PetscPrintf(this->comm().get(),"\n" );
          LIBMESH_CHKERRABORT(ierr);
 #endif // DEBUG
 
@@ -749,8 +749,8 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
 
   /* Make \p NumericVector instances around the vectors.  */
-  PetscVector<T> arg_global(arg,   shell_matrix.communicator());
-  PetscVector<T> dest_global(dest, shell_matrix.communicator());
+  PetscVector<T> arg_global(arg,   shell_matrix.comm());
+  PetscVector<T> dest_global(dest, shell_matrix.comm());
 
   /* Call the user function.  */
   shell_matrix.vector_mult(dest_global,arg_global);
@@ -774,7 +774,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
 
   /* Make \p NumericVector instances around the vector.  */
-  PetscVector<T> dest_global(dest, shell_matrix.communicator());
+  PetscVector<T> dest_global(dest, shell_matrix.comm());
 
   /* Call the user function.  */
   shell_matrix.get_diagonal(dest_global);

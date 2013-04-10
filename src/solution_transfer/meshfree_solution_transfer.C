@@ -97,7 +97,7 @@ MeshfreeSolutionTransfer::transfer(const Variable & from_var, const Variable & t
   MeshBase & from_mesh = from_es.get_mesh();
 
   InverseDistanceInterpolation<LIBMESH_DIM> idi
-    (from_mesh.communicator(), 4, 2);
+    (from_mesh.comm(), 4, 2);
 
   std::vector<Point>  &src_pts  (idi.get_source_points());
   std::vector<Number> &src_vals (idi.get_source_vals());

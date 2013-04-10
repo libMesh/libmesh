@@ -60,8 +60,8 @@ System::System (EquationSystems& es,
   assemble_before_solve             (true),
   use_fixed_solution                (false),
   extra_quadrature_order            (0),
-  solution                          (NumericVector<Number>::build(this->communicator())),
-  current_local_solution            (NumericVector<Number>::build(this->communicator())),
+  solution                          (NumericVector<Number>::build(this->comm())),
+  current_local_solution            (NumericVector<Number>::build(this->comm())),
   time                              (0.),
   qoi                               (0),
   _init_system_function             (NULL),
@@ -681,7 +681,7 @@ NumericVector<Number> & System::add_vector (const std::string& vec_name,
     return *(_vectors[vec_name]);
 
   // Otherwise build the vector
-  NumericVector<Number>* buf = NumericVector<Number>::build(this->communicator()).release();
+  NumericVector<Number>* buf = NumericVector<Number>::build(this->comm()).release();
   _vectors.insert (std::make_pair (vec_name, buf));
   _vector_projections.insert (std::make_pair (vec_name, projections));
 
@@ -1444,7 +1444,7 @@ Real System::calculate_norm(const NumericVector<Number>& v,
     }
 
   // Localize the potentially parallel vector
-  AutoPtr<NumericVector<Number> > local_v = NumericVector<Number>::build(this->communicator());
+  AutoPtr<NumericVector<Number> > local_v = NumericVector<Number>::build(this->comm());
   local_v->init(v.size(), true, SERIAL);
   v.localize (*local_v, _dof_map->get_send_list());
 
@@ -1616,12 +1616,12 @@ Real System::calculate_norm(const NumericVector<Number>& v,
 
   if (using_hilbert_norm)
     {
-      this->communicator().sum(v_norm);
+      this->comm().sum(v_norm);
       v_norm = std::sqrt(v_norm);
     }
   else
     {
-      this->communicator().max(v_norm);
+      this->comm().max(v_norm);
     }
 
   STOP_LOG ("calculate_norm()", "System");
@@ -1971,7 +1971,7 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  this->communicator().verify(p);
+  this->comm().verify(p);
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -1996,13 +1996,13 @@ Number System::point_value(unsigned int var, const Point &p, const bool insist_o
   processor_id_type lowest_owner =
     (e && (e->processor_id() == this->processor_id())) ?
     this->processor_id() : this->n_processors();
-  this->communicator().min(lowest_owner);
+  this->comm().min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
   // If nobody admits owning the point, we have a problem.
   if (lowest_owner != this->n_processors())
-    this->communicator().broadcast(u, lowest_owner);
+    this->comm().broadcast(u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 
@@ -2068,7 +2068,7 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  this->communicator().verify(p);
+  this->comm().verify(p);
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -2093,13 +2093,13 @@ Gradient System::point_gradient(unsigned int var, const Point &p, const bool ins
   processor_id_type lowest_owner =
     (e && (e->processor_id() == this->processor_id())) ?
     this->processor_id() : this->n_processors();
-  this->communicator().min(lowest_owner);
+  this->comm().min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
   // If nobody admits owning the point, we may have a problem.
   if (lowest_owner != this->n_processors())
-    this->communicator().broadcast(grad_u, lowest_owner);
+    this->comm().broadcast(grad_u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 
@@ -2167,7 +2167,7 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   // And every processor had better agree about which point we're
   // looking for
 #ifndef NDEBUG
-  this->communicator().verify(p);
+  this->comm().verify(p);
 #endif // NDEBUG
 
   // Get a reference to the mesh object associated with the system object that calls this function
@@ -2192,13 +2192,13 @@ Tensor System::point_hessian(unsigned int var, const Point &p, const bool insist
   processor_id_type lowest_owner =
     (e && (e->processor_id() == this->processor_id())) ?
     this->processor_id() : this->n_processors();
-  this->communicator().min(lowest_owner);
+  this->comm().min(lowest_owner);
 
   // Everybody should get their value from a processor that was able
   // to compute it.
   // If nobody admits owning the point, we may have a problem.
   if (lowest_owner != this->n_processors())
-    this->communicator().broadcast(hess_u, lowest_owner);
+    this->comm().broadcast(hess_u, lowest_owner);
   else
     libmesh_assert(!insist_on_success);
 

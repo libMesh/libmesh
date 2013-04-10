@@ -373,7 +373,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
   // zeros for the inactive elements.
 
   // First sum the vector of estimated error values
-  this->reduce_error(error_per_cell, system.communicator());
+  this->reduce_error(error_per_cell, system.comm());
 
   // Compute the square-root of each component.
   for (std::size_t i=0; i<error_per_cell.size(); i++)
@@ -384,7 +384,7 @@ void JumpErrorEstimator::estimate_error (const System& system,
   if (this->scale_by_n_flux_faces)
     {
       // Sum the vector of flux face counts
-      this->reduce_error(n_flux_faces, system.communicator());
+      this->reduce_error(n_flux_faces, system.comm());
 
       // Sanity check: Make sure the number of flux faces is
       // always an integer value

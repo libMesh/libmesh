@@ -156,7 +156,7 @@ int main (int argc, char** argv)
 
   // The following is identical to example 4, and therefore
   // not commented.  Differences are mentioned when present.
-  Mesh mesh(init.communicator());
+  Mesh mesh(init.comm());
 
   // We will use a linear approximation space in this example,
   // hence 8-noded hexahedral elements are sufficient.  This

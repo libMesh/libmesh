@@ -912,7 +912,7 @@ void RBEvaluation::write_out_vectors(System& sys,
   }
 
   // Make sure processors are synced up before we begin
-  this->communicator().barrier();
+  this->comm().barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (write_binary_vectors ? ".xdr" : ".dat");
@@ -945,7 +945,7 @@ void RBEvaluation::write_out_vectors(System& sys,
   //   sys.write_serialized_data(bf_data, false);
 
   //   // Synchronize before moving on
-  //   this->communicator().barrier();
+  //   this->comm().barrier();
   //   // Swap back
   //   vectors[i]->swap(*sys.solution);
   // }
@@ -1005,7 +1005,7 @@ void RBEvaluation::read_in_vectors(System& sys,
   //libMesh::out << "Reading in the basis functions..." << std::endl;
 
   // Make sure processors are synced up before we begin
-  this->communicator().barrier();
+  this->comm().barrier();
 
   std::ostringstream file_name;
   const std::string basis_function_suffix = (read_binary_vectors ? ".xdr" : ".dat");
@@ -1065,7 +1065,7 @@ void RBEvaluation::read_in_vectors(System& sys,
 
 	  sys.read_serialized_data(vector_data, false);
 
-	  vectors[i] = NumericVector<Number>::build(sys.communicator()).release();
+	  vectors[i] = NumericVector<Number>::build(sys.comm()).release();
 	  vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 
 	  // No need to copy, just swap
@@ -1081,7 +1081,7 @@ void RBEvaluation::read_in_vectors(System& sys,
       // Allocate storage for each vector
       for(unsigned int i=0; i<vectors.size(); i++)
 	{
-	  vectors[i] = NumericVector<Number>::build(sys.communicator()).release();
+	  vectors[i] = NumericVector<Number>::build(sys.comm()).release();
 	  vectors[i]->init (sys.n_dofs(), sys.n_local_dofs(), false, libMeshEnums::PARALLEL);
 	}
 

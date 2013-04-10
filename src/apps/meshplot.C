@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 
   LibMeshInit init(argc, argv);
 
-  Mesh mesh(init.communicator());
+  Mesh mesh(init.comm());
   EquationSystems es(mesh);
 
   std::cout << "Usage: " << argv[0]

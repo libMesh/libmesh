@@ -755,7 +755,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
   // Gather the distributed node_conn arrays in the case of
   // multiple processors.
-  this->communicator().sum(node_conn);
+  this->comm().sum(node_conn);
 
   unsigned int var_num=0;
 
@@ -863,7 +863,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 	    repeat_count = node_conn;
 
 	  else
-	    this->communicator().sum (repeat_count);
+	    this->comm().sum (repeat_count);
 
 	    for (unsigned int n=0; n<nn; n++)
 	      for( unsigned int d=0; d < n_vec_dim; d++ )
@@ -877,7 +877,7 @@ void EquationSystems::build_solution_vector (std::vector<Number>& soln,
 
   // Now each processor has computed contriburions to the
   // soln vector.  Gather them all up.
-  this->communicator().sum(soln);
+  this->comm().sum(soln);
 
   STOP_LOG("build_solution_vector()", "EquationSystems");
 }
@@ -964,7 +964,7 @@ void EquationSystems::get_solution (std::vector<Number>& soln,
 
   // Now each processor has computed contributions to the
   // soln vector.  Gather them all up.
-  this->communicator().sum(soln);
+  this->comm().sum(soln);
 }
 
 

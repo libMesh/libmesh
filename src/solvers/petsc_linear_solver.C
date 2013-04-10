@@ -63,8 +63,8 @@ extern "C"
   {
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
 
-    PetscVector<Number> x_vec(x, preconditioner->communicator());
-    PetscVector<Number> y_vec(y, preconditioner->communicator());
+    PetscVector<Number> x_vec(x, preconditioner->comm());
+    PetscVector<Number> y_vec(y, preconditioner->comm());
 
     preconditioner->apply(x_vec,y_vec);
 
@@ -94,8 +94,8 @@ extern "C"
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number>*>(ctx);
 
-    PetscVector<Number> x_vec(x, preconditioner->communicator());
-    PetscVector<Number> y_vec(y, preconditioner->communicator());
+    PetscVector<Number> x_vec(x, preconditioner->comm());
+    PetscVector<Number> y_vec(y, preconditioner->comm());
 
     preconditioner->apply(x_vec,y_vec);
 
@@ -174,7 +174,7 @@ void PetscLinearSolver<T>::init ()
 #if PETSC_VERSION_LESS_THAN(2,2,0)
 
       // Create the linear solver context
-      ierr = SLESCreate (this->communicator().get(), &_sles);
+      ierr = SLESCreate (this->comm().get(), &_sles);
              LIBMESH_CHKERRABORT(ierr);
 
       // Create the Krylov subspace & preconditioner contexts
@@ -200,7 +200,7 @@ void PetscLinearSolver<T>::init ()
 #else
 
       // Create the linear solver context
-      ierr = KSPCreate (this->communicator().get(), &_ksp);
+      ierr = KSPCreate (this->comm().get(), &_ksp);
              LIBMESH_CHKERRABORT(ierr);
 
       // Create the preconditioner context
@@ -286,7 +286,7 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
 #if PETSC_VERSION_LESS_THAN(2,2,0)
 
       // Create the linear solver context
-      ierr = SLESCreate (this->communicator().get(), &_sles);
+      ierr = SLESCreate (this->comm().get(), &_sles);
              LIBMESH_CHKERRABORT(ierr);
 
       // Create the Krylov subspace & preconditioner contexts
@@ -312,11 +312,11 @@ void PetscLinearSolver<T>::init ( PetscMatrix<T>* matrix )
 #else
 
       // Create the linear solver context
-      ierr = KSPCreate (this->communicator().get(), &_ksp);
+      ierr = KSPCreate (this->comm().get(), &_ksp);
              LIBMESH_CHKERRABORT(ierr);
 
 
-      //ierr = PCCreate (this->communicator().get(), &_pc);
+      //ierr = PCCreate (this->comm().get(), &_pc);
       //     LIBMESH_CHKERRABORT(ierr);
 
       // Create the preconditioner context
@@ -417,7 +417,7 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int>* const 
 	  petsc_dofs[i] = (*dofs)[i];
 	}
 
-      ierr = ISCreateLibMesh(this->communicator().get(),dofs->size(),petsc_dofs,PETSC_OWN_POINTER,&_restrict_solve_to_is);
+      ierr = ISCreateLibMesh(this->comm().get(),dofs->size(),petsc_dofs,PETSC_OWN_POINTER,&_restrict_solve_to_is);
       LIBMESH_CHKERRABORT(ierr);
     }
 }
@@ -555,14 +555,14 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
     {
       size_t is_local_size = this->_restrict_solve_to_is_local_size();
 
-      ierr = VecCreate(this->communicator().get(),&subrhs);
+      ierr = VecCreate(this->comm().get(),&subrhs);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetSizes(subrhs,is_local_size,PETSC_DECIDE);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetFromOptions(subrhs);
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = VecCreate(this->communicator().get(),&subsolution);
+      ierr = VecCreate(this->comm().get(),&subsolution);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetSizes(subsolution,is_local_size,PETSC_DECIDE);
       LIBMESH_CHKERRABORT(ierr);
@@ -615,7 +615,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
 	  Mat submat1 = NULL;
 	  VecScatter scatter1 = NULL;
 
-	  ierr = VecCreate(this->communicator().get(),&subvec1);
+	  ierr = VecCreate(this->comm().get(),&subvec1);
 	  LIBMESH_CHKERRABORT(ierr);
 	  ierr = VecSetSizes(subvec1,is_complement_local_size,PETSC_DECIDE);
 	  LIBMESH_CHKERRABORT(ierr);
@@ -663,7 +663,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T>&  matrix_in,
       if(this->_preconditioner)
 	{
 	  subprecond_matrix = new PetscMatrix<Number>(subprecond,
-						      this->communicator());
+						      this->comm());
 	  this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
 	}
@@ -809,7 +809,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
   // Based on http://wolfgang.math.tamu.edu/svn/public/deal.II/branches/MATH676/2008/deal.II/lac/source/petsc_solver.cc, http://tccc.iesl.forth.gr/AMS_EPEAEK/Elements/doc/in_html/petsc/SLES/index.html
 
   SLES sles;
-  ierr = SLESCreate (this->communicator().get(), &sles);
+  ierr = SLESCreate (this->comm().get(), &sles);
   LIBMESH_CHKERRABORT(ierr);
 
   ierr = SLESSetOperators (sles, matrix->mat(), precond->mat(), this->same_preconditioner ? SAME_PRECONDITIONER : DIFFERENT_NONZERO_PATTERN);
@@ -893,14 +893,14 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
     {
       size_t is_local_size = this->_restrict_solve_to_is_local_size();
 
-      ierr = VecCreate(this->communicator().get(),&subrhs);
+      ierr = VecCreate(this->comm().get(),&subrhs);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetSizes(subrhs,is_local_size,PETSC_DECIDE);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetFromOptions(subrhs);
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = VecCreate(this->communicator().get(),&subsolution);
+      ierr = VecCreate(this->comm().get(),&subsolution);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetSizes(subsolution,is_local_size,PETSC_DECIDE);
       LIBMESH_CHKERRABORT(ierr);
@@ -953,7 +953,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
 	  Mat submat1 = NULL;
 	  VecScatter scatter1 = NULL;
 
-	  ierr = VecCreate(this->communicator().get(),&subvec1);
+	  ierr = VecCreate(this->comm().get(),&subvec1);
 	  LIBMESH_CHKERRABORT(ierr);
 	  ierr = VecSetSizes(subvec1,is_complement_local_size,PETSC_DECIDE);
 	  LIBMESH_CHKERRABORT(ierr);
@@ -1001,7 +1001,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T>&  matrix_in,
       if(this->_preconditioner)
 	{
 	  subprecond_matrix = new PetscMatrix<Number>(subprecond,
-						      this->communicator());
+						      this->comm());
 	  this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
 	}
@@ -1156,7 +1156,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
   // Prepare the matrix.
   Mat mat;
-  ierr = MatCreateShell(this->communicator().get(),
+  ierr = MatCreateShell(this->comm().get(),
 			rhs_in.local_size(),
 			solution_in.local_size(),
 			rhs_in.size(),
@@ -1182,14 +1182,14 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
     {
       size_t is_local_size = this->_restrict_solve_to_is_local_size();
 
-      ierr = VecCreate(this->communicator().get(),&subrhs);
+      ierr = VecCreate(this->comm().get(),&subrhs);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetSizes(subrhs,is_local_size,PETSC_DECIDE);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetFromOptions(subrhs);
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = VecCreate(this->communicator().get(),&subsolution);
+      ierr = VecCreate(this->comm().get(),&subsolution);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetSizes(subsolution,is_local_size,PETSC_DECIDE);
       LIBMESH_CHKERRABORT(ierr);
@@ -1232,7 +1232,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 	  Mat submat1 = NULL;
 	  VecScatter scatter1 = NULL;
 
-	  ierr = VecCreate(this->communicator().get(),&subvec1);
+	  ierr = VecCreate(this->comm().get(),&subvec1);
 	  LIBMESH_CHKERRABORT(ierr);
 	  ierr = VecSetSizes(subvec1,is_complement_local_size,PETSC_DECIDE);
 	  LIBMESH_CHKERRABORT(ierr);
@@ -1271,7 +1271,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 	  // fix in PETsc 3.1.0-p6 uses a temporary vector internally,
 	  // so this is no effective performance loss.
 	  Vec subvec2 = NULL;
-	  ierr = VecCreate(this->communicator().get(),&subvec2);
+	  ierr = VecCreate(this->comm().get(),&subvec2);
 	  LIBMESH_CHKERRABORT(ierr);
 	  ierr = VecSetSizes(subvec2,is_local_size,PETSC_DECIDE);
 	  LIBMESH_CHKERRABORT(ierr);
@@ -1435,7 +1435,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 
   // Prepare the matrix.
   Mat mat;
-  ierr = MatCreateShell(this->communicator().get(),
+  ierr = MatCreateShell(this->comm().get(),
 			rhs_in.local_size(),
 			solution_in.local_size(),
 			rhs_in.size(),
@@ -1461,14 +1461,14 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
     {
       size_t is_local_size = this->_restrict_solve_to_is_local_size();
 
-      ierr = VecCreate(this->communicator().get(),&subrhs);
+      ierr = VecCreate(this->comm().get(),&subrhs);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetSizes(subrhs,is_local_size,PETSC_DECIDE);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetFromOptions(subrhs);
       LIBMESH_CHKERRABORT(ierr);
 
-      ierr = VecCreate(this->communicator().get(),&subsolution);
+      ierr = VecCreate(this->comm().get(),&subsolution);
       LIBMESH_CHKERRABORT(ierr);
       ierr = VecSetSizes(subsolution,is_local_size,PETSC_DECIDE);
       LIBMESH_CHKERRABORT(ierr);
@@ -1515,7 +1515,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 	  Mat submat1 = NULL;
 	  VecScatter scatter1 = NULL;
 
-	  ierr = VecCreate(this->communicator().get(),&subvec1);
+	  ierr = VecCreate(this->comm().get(),&subvec1);
 	  LIBMESH_CHKERRABORT(ierr);
 	  ierr = VecSetSizes(subvec1,is_complement_local_size,PETSC_DECIDE);
 	  LIBMESH_CHKERRABORT(ierr);
@@ -1554,7 +1554,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
 	  // fix in PETsc 3.1.0-p6 uses a temporary vector internally,
 	  // so this is no effective performance loss.
 	  Vec subvec2 = NULL;
-	  ierr = VecCreate(this->communicator().get(),&subvec2);
+	  ierr = VecCreate(this->comm().get(),&subvec2);
 	  LIBMESH_CHKERRABORT(ierr);
 	  ierr = VecSetSizes(subvec2,is_local_size,PETSC_DECIDE);
 	  LIBMESH_CHKERRABORT(ierr);
@@ -1579,7 +1579,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T>& shell_matrix,
       if(this->_preconditioner)
 	{
 	  subprecond_matrix = new PetscMatrix<Number>(subprecond,
-						      this->communicator());
+						      this->comm());
 	  this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
 	}
@@ -1823,11 +1823,11 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, 
 
   /* Get user shell matrix object.  */
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
-  CHKERRABORT(shell_matrix.communicator().get(), ierr);
+  CHKERRABORT(shell_matrix.comm().get(), ierr);
 
   /* Make \p NumericVector instances around the vectors.  */
-  PetscVector<T> arg_global(arg, shell_matrix.communicator());
-  PetscVector<T> dest_global(dest, shell_matrix.communicator());
+  PetscVector<T> arg_global(arg, shell_matrix.comm());
+  PetscVector<T> dest_global(dest, shell_matrix.comm());
 
   /* Call the user function.  */
   shell_matrix.vector_mult(dest_global,arg_global);
@@ -1847,12 +1847,12 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec a
 
   /* Get user shell matrix object.  */
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
-  CHKERRABORT(shell_matrix.communicator().get(), ierr);
+  CHKERRABORT(shell_matrix.comm().get(), ierr);
 
   /* Make \p NumericVector instances around the vectors.  */
-  PetscVector<T> arg_global(arg, shell_matrix.communicator());
-  PetscVector<T> dest_global(dest, shell_matrix.communicator());
-  PetscVector<T> add_global(add, shell_matrix.communicator());
+  PetscVector<T> arg_global(arg, shell_matrix.comm());
+  PetscVector<T> dest_global(dest, shell_matrix.comm());
+  PetscVector<T> add_global(add, shell_matrix.comm());
 
   if(add!=arg)
     {
@@ -1877,10 +1877,10 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, V
 
   /* Get user shell matrix object.  */
   const ShellMatrix<T>& shell_matrix = *static_cast<const ShellMatrix<T>*>(ctx);
-  CHKERRABORT(shell_matrix.communicator().get(), ierr);
+  CHKERRABORT(shell_matrix.comm().get(), ierr);
 
   /* Make \p NumericVector instances around the vector.  */
-  PetscVector<T> dest_global(dest, shell_matrix.communicator());
+  PetscVector<T> dest_global(dest, shell_matrix.comm());
 
   /* Call the user function.  */
   shell_matrix.get_diagonal(dest_global);

@@ -239,7 +239,7 @@ void EquationSystems::_read_impl (const std::string& name,
     if (!read_legacy_format)
       {
 	if (this->processor_id() == 0) io.data(version);
-	this->communicator().broadcast(version);
+	this->comm().broadcast(version);
 
 	// All processors have the version header, if it does not contain
 	// "libMesh" something then it is a legacy file.
@@ -282,7 +282,7 @@ void EquationSystems::_read_impl (const std::string& name,
     // Read the number of equation systems
     unsigned int n_sys=0;
     if (this->processor_id() == 0) io.data (n_sys);
-    this->communicator().broadcast(n_sys);
+    this->comm().broadcast(n_sys);
 
     for (unsigned int sys=0; sys<n_sys; sys++)
       {
@@ -290,13 +290,13 @@ void EquationSystems::_read_impl (const std::string& name,
 	// Read the name of the sys-th equation system
 	std::string sys_name;
 	if (this->processor_id() == 0) io.data (sys_name);
-	this->communicator().broadcast(sys_name);
+	this->comm().broadcast(sys_name);
 
 	// 4.)
 	// Read the type of the sys-th equation system
 	std::string sys_type;
 	if (this->processor_id() == 0) io.data (sys_type);
-	this->communicator().broadcast(sys_type);
+	this->comm().broadcast(sys_type);
 
 	if (read_header)
 	  this->add_system (sys_type, sys_name);

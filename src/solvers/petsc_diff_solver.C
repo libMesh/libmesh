@@ -80,7 +80,7 @@ __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void *ctx)
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
   PetscVector<Number>& R_system =
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.rhs);
-  PetscVector<Number> X_input(x, sys.communicator()), R_input(r, sys.communicator());
+  PetscVector<Number> X_input(x, sys.comm()), R_input(r, sys.comm());
 
   // DiffSystem assembles from the solution and into the rhs, so swap
   // those with our input vectors before assembling.  They'll probably
@@ -126,9 +126,9 @@ __libmesh_petsc_diff_solver_jacobian (SNES, Vec x, Mat *libmesh_dbg_var(j), Mat 
 
   PetscVector<Number>& X_system =
     *libmesh_cast_ptr<PetscVector<Number>*>(sys.solution.get());
-  PetscVector<Number> X_input(x, sys.communicator());
+  PetscVector<Number> X_input(x, sys.comm());
 
-  PetscMatrix<Number> J_input(*pc, sys.communicator());
+  PetscMatrix<Number> J_input(*pc, sys.comm());
   PetscMatrix<Number>& J_system =
     *libmesh_cast_ptr<PetscMatrix<Number>*>(sys.matrix);
 
@@ -181,10 +181,10 @@ void PetscDiffSolver::init ()
   // calling syntax.  The second argument was of type SNESProblemType,
   // and could have a value of either SNES_NONLINEAR_EQUATIONS or
   // SNES_UNCONSTRAINED_MINIMIZATION.
-  ierr = SNESCreate(this->communicator().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
+  ierr = SNESCreate(this->comm().get(), SNES_NONLINEAR_EQUATIONS, &_snes);
   LIBMESH_CHKERRABORT(ierr);
 #else
-  ierr = SNESCreate(this->communicator().get(),&_snes);
+  ierr = SNESCreate(this->comm().get(),&_snes);
   LIBMESH_CHKERRABORT(ierr);
 #endif
 

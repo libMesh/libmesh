@@ -194,7 +194,7 @@ void MeshCommunication::assign_global_indices (MeshBase& mesh) const
   // (4) determine the position in the global ranking for
   //     each local object
 
-  const Parallel::Communicator &communicator (mesh.communicator());
+  const Parallel::Communicator &communicator (mesh.comm());
 
   // Global bounding box
   MeshTools::BoundingBox bbox =

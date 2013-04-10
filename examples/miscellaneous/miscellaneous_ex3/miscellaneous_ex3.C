@@ -477,7 +477,7 @@ int main (int argc, char** argv)
 
   // Create a mesh, with dimension to be overridden by the file,
   // distributed across the default MPI communicator.
-  Mesh mesh(init.communicator());
+  Mesh mesh(init.comm());
 
   mesh.read ("lshaped.xda");
 

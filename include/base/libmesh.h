@@ -73,10 +73,10 @@ public:
 
   virtual ~LibMeshInit();
 
-  const Parallel::Communicator& communicator() const { return comm; }
+  const Parallel::Communicator& comm() const { return _comm; }
 
 private:
-  Parallel::Communicator comm;
+  Parallel::Communicator _comm;
 };
 
   /**

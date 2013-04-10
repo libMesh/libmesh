@@ -358,8 +358,8 @@ int main (int argc, char** argv)
   /**
    * build the left and right mesh for left, inut them
    */
-  Mesh left_mesh  (init.communicator(), dim);
-  Mesh right_mesh (init.communicator(), dim);
+  Mesh left_mesh  (init.comm(), dim);
+  Mesh right_mesh (init.comm(), dim);
 
 
   if (!names.empty())

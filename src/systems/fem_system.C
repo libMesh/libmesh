@@ -697,7 +697,7 @@ void FEMSystem::mesh_position_set()
 
   SyncNodalPositions sync_object(mesh);
   Parallel::sync_dofobject_data_by_id
-    (this->communicator(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
+    (this->comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
 }
 
 
@@ -749,7 +749,7 @@ void FEMSystem::assemble_qoi (const QoISet &qoi_indices)
                                             mesh.active_local_elements_end()),
                            qoi_contributions);
 
-  this->diff_qoi->parallel_op( this->communicator(), this->qoi, qoi_contributions.qoi, qoi_indices );
+  this->diff_qoi->parallel_op( this->comm(), this->qoi, qoi_contributions.qoi, qoi_indices );
 
   STOP_LOG("assemble_qoi()", "FEMSystem");
 }

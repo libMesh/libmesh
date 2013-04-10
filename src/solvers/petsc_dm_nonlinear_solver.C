@@ -75,7 +75,7 @@ namespace libMesh {
     this->PetscNonlinearSolver<T>::init();
 
     // Attaching a DM with the function and Jacobian callbacks to SNES.
-    ierr = DMCreateLibMesh(this->communicator().get(), this->system(), &dm); LIBMESH_CHKERRABORT(ierr);
+    ierr = DMCreateLibMesh(this->comm().get(), this->system(), &dm); LIBMESH_CHKERRABORT(ierr);
     ierr = DMSetFromOptions(dm);               LIBMESH_CHKERRABORT(ierr);
     ierr = DMSetUp(dm);                        LIBMESH_CHKERRABORT(ierr);
     ierr = SNESSetDM(this->_snes, dm);         LIBMESH_CHKERRABORT(ierr);

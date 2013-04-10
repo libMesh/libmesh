@@ -157,7 +157,7 @@ namespace libMesh
       {
 	if(proc!=this->processor_id())
 	  {
-	    this->communicator().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
+	    this->comm().send(proc,dof_ids_per_processor[proc],request_per_processor[proc]);
 	  }
       }
     for(unsigned int proc=0; proc<this->n_processors(); proc++)
@@ -169,7 +169,7 @@ namespace libMesh
 	  }
 	else
 	  {
-	    this->communicator().receive(proc,received_dofs);
+	    this->comm().receive(proc,received_dofs);
 	  }
 	for(unsigned int i=0; i<received_dofs.size(); i++)
 	  {
