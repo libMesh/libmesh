@@ -77,7 +77,7 @@ int main (int argc, char** argv)
   // in example 10 to demonstrate adaptive mesh refinement.  Here we will
   // simply read it in and uniformly refine it 5 times before we compute
   // with it.
-  Mesh mesh;
+  Mesh mesh(init.comm());
 
   {
     unsigned int dim=2;
@@ -154,11 +154,11 @@ void integrate_function (const MeshBase &mesh)
 	int_val += JxW[qp] * integrand(q_points[qp]);
     }
 
-  Parallel::sum (int_val);
+  mesh.comm().sum (int_val);
 
   std::cout  << "\n***********************************\n"
 	     << " int_val   = " << int_val << std::endl
-	     << " exact_val = "<<  1*(2*2 - radius*radius*pi) + 10.*(radius*radius*pi)
+	     << " exact_val = " <<  1*(2*2 - radius*radius*pi) + 10.*(radius*radius*pi)
 	     << "\n***********************************\n"
 	     << std::endl;
 }
