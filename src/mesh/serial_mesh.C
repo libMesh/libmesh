@@ -27,6 +27,108 @@
 #include LIBMESH_INCLUDE_UNORDERED_SET
 LIBMESH_DEFINE_HASH_POINTERS
 
+
+namespace
+{
+  // A custom comparison function, based on Point::operator<,
+  // that tries to ignore floating point differences in components
+  // of the point
+  class FuzzyPointCompare
+  {
+   public:
+
+    // This is inspired directly by Point::operator<
+    bool operator()(const Point& lhs, const Point& rhs)
+    {
+      for (unsigned i=0; i<LIBMESH_DIM; ++i)
+        {
+          // If the current components are within some tolerance
+          // of one another, then don't attempt the less-than comparison.
+          // Note that this may cause something strange to happen, as Roy
+          // believes he can prove it is not a total ordering...
+          Real rel_size = std::max(std::abs(lhs(i)), std::abs(rhs(i)));
+
+          // Don't use relative tolerance if both numbers are already small.
+          // How small?  Some possible options are:
+          // * std::numeric_limits<Real>::epsilon()
+          // * TOLERANCE
+          // * 1.0
+          // If we use std::numeric_limits<Real>::epsilon(), we'll
+          // will do more relative comparisons for small numbers, but
+          // increase the chance for false positives?  If we pick 1.0,
+          // we'll never "increase" the difference between small numbers
+          // in the test below.
+          if (rel_size < 1.)
+            rel_size = 1.;
+
+          // Don't attempt the comparison if lhs(i) and rhs(i) are too close
+          // together.  Again, here you could use some other custom tolerance.
+          if ( std::abs(lhs(i) - rhs(i)) / rel_size < TOLERANCE)
+            continue;
+
+          if (lhs(i) < rhs(i))
+            return true;
+          if (lhs(i) > rhs(i))
+            return false;
+        }
+
+      // We compared all the components without returning yet, so
+      // each component was neither greater than nor less than they other.
+      // They might be equal, so return false.
+      return false;
+    }
+
+    // Help for the vector< pair<Point,id> > case
+    bool operator()(const std::pair<Point, dof_id_type>& lhs,
+                    const std::pair<Point, dof_id_type>& rhs)
+    {
+      return (*this)(lhs.first, rhs.first);
+    }
+  };
+
+
+  typedef std::vector< std::pair<Point, dof_id_type> > PointVector;
+
+  PointVector::iterator fuzzy_binary_find(PointVector::iterator first,
+                                          PointVector::iterator last,
+                                          Point val)
+  {
+    PointVector::iterator it;
+    std::iterator_traits<PointVector::iterator>::difference_type count, step;
+    count = std::distance(first, last);
+
+    // Object we'll use to make comparisons
+    FuzzyPointCompare comp;
+
+    while (count>0)
+      {
+        it = first;
+        step = count/2;
+        std::advance (it, step);
+
+        // Grab the point out of 'it'
+        Point p = it->first;
+
+        // If p relative_fuzzy_equals val, return 'it'
+        if (p.relative_fuzzy_equals(val))
+          return it;
+
+        // Otherwise, continue binary searching
+        if ( comp(p,val) )
+          {
+            first = ++it;
+            count -= step+1;
+          }
+        else
+          count = step;
+      }
+    return first;
+  }
+
+}
+
+
+
 namespace libMesh
 {
 
@@ -708,56 +810,153 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                      << std::endl;
       }
 
-    // Begin geometric search for matching nodes
-    libMesh::out << "Beginning geometric search for matching nodes..." << std::endl;
+    // Store points from both stitched faces in sorted vectors for faster
+    // searching later.
+    typedef std::vector< std::pair<Point, dof_id_type> > PointVector;
+    PointVector
+      this_sorted_bndry_nodes(this_boundary_node_ids.size()),
+      other_sorted_bndry_nodes(other_boundary_node_ids.size());
 
-    std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
-    std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
-    for( ; set_it != set_it_end; ++set_it)
+    // Create and sort the vectors we will use to do the geometric searching
     {
-      dof_id_type this_node_id = *set_it;
-      Node& this_node = this->node(this_node_id);
+      std::set<dof_id_type>* set_array[2] = {&this_boundary_node_ids, &other_boundary_node_ids};
+      SerialMesh* mesh_array[2]           = {this, &other_mesh};
+      PointVector* vec_array[2]           = {&this_sorted_bndry_nodes, &other_sorted_bndry_nodes};
 
-      bool found_matching_nodes = false;
-
-      std::set<dof_id_type>::iterator other_set_it     = other_boundary_node_ids.begin();
-      std::set<dof_id_type>::iterator other_set_it_end = other_boundary_node_ids.end();
-      for( ; other_set_it != other_set_it_end; ++other_set_it)
-      {
-        dof_id_type other_node_id = *other_set_it;
-        Node& other_node = other_mesh.node(other_node_id);
-
-        Real node_distance = (this_node - other_node).size();
-
-        if(node_distance < tol)
+      for (unsigned i=0; i<2; ++i)
         {
-          // Make sure we didn't already find a matching node!
-          if(found_matching_nodes)
+          std::set<dof_id_type>::iterator
+            set_it     = set_array[i]->begin(),
+            set_it_end = set_array[i]->end();
+
+          // Fill up the vector with the contents of the set...
+          for (unsigned ctr=0; set_it != set_it_end; ++set_it, ++ctr)
+            {
+              (*vec_array[i])[ctr] = std::make_pair( mesh_array[i]->point(*set_it), // The geometric point
+                                                     *set_it );                     // It's ID
+            }
+
+          // Sort the vectors based on the FuzzyPointCompare struct op()
+          std::sort(vec_array[i]->begin(), vec_array[i]->end(), FuzzyPointCompare());
+
+          // Print out the contents (debugging only)
+          std::cout << "stitch_meshes: mesh " << i << std::endl;
+          for (unsigned j=0; j<vec_array[i]->size(); ++j)
+            libMesh::out << (*vec_array[i])[j].first << ", id= " << (*vec_array[i])[j].second << std::endl;
+        }
+    }
+
+
+
+    // Build up the node_to_node_map and node_to_elems_map using the sorted vectors of Points.
+    for (unsigned i=0; i<this_sorted_bndry_nodes.size(); ++i)
+      {
+        // Current point we're working on
+        Point this_point = this_sorted_bndry_nodes[i].first;
+
+        // fuzzy_binary_find does a fuzzy equality comparison internally to handle
+        // slight differences between the list of nodes on each mesh.
+        PointVector::iterator other_iter = fuzzy_binary_find(other_sorted_bndry_nodes.begin(),
+                                                             other_sorted_bndry_nodes.end(),
+                                                             this_point);
+
+        if (other_iter == other_sorted_bndry_nodes.end())
           {
-            libMesh::out << "Error: Found multiple matching nodes in stitch_meshes" << std::endl;
+            libMesh::err << "Error: Matching point could not be found in other_mesh!" << std::endl;
             libmesh_error();
           }
 
-          node_to_node_map[this_node_id] = other_node_id;
+        // Check that the points do indeed match - should not be necessary unless something
+        // is wrong with fuzzy_binary_find.  To be on the safe side, we'll check.
+        {
+          // Grab the other point from the iterator
+          Point other_point = other_iter->first;
+          Real dist = (this_point - other_point).size();
 
-          // Build a vector of all the elements in other_mesh that contain other_node
-          std::vector<dof_id_type> other_elem_ids;
-          MeshBase::element_iterator other_elem_it  = other_mesh.elements_begin();
-          MeshBase::element_iterator other_elem_end = other_mesh.elements_end();
-          for (; other_elem_it != other_elem_end; ++other_elem_it)
+          if (dist >= tol)
+            {
+              libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
+              libmesh_error();
+            }
+
+          // Print status message
+          libMesh::out << "Found matching points: " << this_point << " and " << other_point << std::endl;
+        }
+
+
+        // Associate these two nodes in the node_to_node_map
+        dof_id_type
+          this_node_id = this_sorted_bndry_nodes[i].second,
+          other_node_id = other_iter->second;
+        node_to_node_map[this_node_id] = other_node_id;
+
+        // Build a vector of all the elements in other_mesh that contain other_node.  TODO: This does a full
+        // iteration over the mesh for every node on the stitched surface -- could that be optimized?
+        std::vector<dof_id_type> other_elem_ids;
+        MeshBase::element_iterator other_elem_it  = other_mesh.elements_begin();
+        MeshBase::element_iterator other_elem_end = other_mesh.elements_end();
+        for (; other_elem_it != other_elem_end; ++other_elem_it)
           {
             Elem *el = *other_elem_it;
 
-            if(el->contains_point(other_node))
+            // TODO: contains_point does an expensive Newton iteration, is there
+            // something faster?
+            if (el->contains_point(other_iter->first))
               other_elem_ids.push_back(el->id());
           }
 
-          node_to_elems_map[this_node_id] = other_elem_ids;
-
-          found_matching_nodes = true;
-        }
+        node_to_elems_map[this_node_id] = other_elem_ids;
       }
-    }
+
+
+//   // Orig code is here
+//    std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
+//    std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
+//    for( ; set_it != set_it_end; ++set_it)
+//    {
+//      dof_id_type this_node_id = *set_it;
+//      Node& this_node = this->node(this_node_id);
+//
+//      bool found_matching_nodes = false;
+//
+//      std::set<dof_id_type>::iterator other_set_it     = other_boundary_node_ids.begin();
+//      std::set<dof_id_type>::iterator other_set_it_end = other_boundary_node_ids.end();
+//      for( ; other_set_it != other_set_it_end; ++other_set_it)
+//      {
+//        dof_id_type other_node_id = *other_set_it;
+//        Node& other_node = other_mesh.node(other_node_id);
+//
+//        Real node_distance = (this_node - other_node).size();
+//
+//        if(node_distance < tol)
+//        {
+//          // Make sure we didn't already find a matching node!
+//          if(found_matching_nodes)
+//          {
+//            libMesh::out << "Error: Found multiple matching nodes in stitch_meshes" << std::endl;
+//            libmesh_error();
+//          }
+//
+//          node_to_node_map[this_node_id] = other_node_id;
+//
+//          // Build a vector of all the elements in other_mesh that contain other_node
+//          std::vector<dof_id_type> other_elem_ids;
+//          MeshBase::element_iterator other_elem_it  = other_mesh.elements_begin();
+//          MeshBase::element_iterator other_elem_end = other_mesh.elements_end();
+//          for (; other_elem_it != other_elem_end; ++other_elem_it)
+//          {
+//            Elem *el = *other_elem_it;
+//
+//            if(el->contains_point(other_node))
+//              other_elem_ids.push_back(el->id());
+//          }
+//
+//          node_to_elems_map[this_node_id] = other_elem_ids;
+//
+//          found_matching_nodes = true;
+//        }
+//      }
+//    }
 
     if(verbose)
     {
