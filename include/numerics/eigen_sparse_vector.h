@@ -646,7 +646,7 @@ inline
 AutoPtr<NumericVector<T> > EigenSparseVector<T>::zero_clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new EigenSparseVector<T>(this->communicator()));
+    (new EigenSparseVector<T>(this->comm()));
 
   cloned_vector->init(*this);
 
@@ -660,7 +660,7 @@ inline
 AutoPtr<NumericVector<T> > EigenSparseVector<T>::clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new EigenSparseVector<T>(this->communicator()));
+    (new EigenSparseVector<T>(this->comm()));
 
   cloned_vector->init(*this, true);
 

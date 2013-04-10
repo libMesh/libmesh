@@ -82,7 +82,7 @@ void WeightedPatchRecoveryErrorEstimator::estimate_error (const System& system,
   // for its local elements, and error_per_cell contains 0 for all the
   // non-local elements.  Summing the vector will provide the true
   // value for each element, local or remote
-  this->reduce_error(error_per_cell, system.communicator());
+  this->reduce_error(error_per_cell, system.comm());
 
   // If we used a non-standard solution before, now is the time to fix
   // the current_local_solution

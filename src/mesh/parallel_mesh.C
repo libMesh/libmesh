@@ -160,7 +160,7 @@ dof_id_type ParallelMesh::parallel_n_elem() const
   parallel_object_only();
 
   dof_id_type n_local = this->n_local_elem();
-  this->communicator().sum(n_local);
+  this->comm().sum(n_local);
   n_local += this->n_unpartitioned_elem();
   return n_local;
 }
@@ -174,7 +174,7 @@ dof_id_type ParallelMesh::parallel_max_elem_id() const
 
   dof_id_type max_local = _elements.empty() ?
     0 : _elements.rbegin()->first + 1;
-  this->communicator().max(max_local);
+  this->comm().max(max_local);
   return max_local;
 }
 
@@ -186,7 +186,7 @@ dof_id_type ParallelMesh::parallel_n_nodes() const
   parallel_object_only();
 
   dof_id_type n_local = this->n_local_nodes();
-  this->communicator().sum(n_local);
+  this->comm().sum(n_local);
   n_local += this->n_unpartitioned_nodes();
   return n_local;
 }
@@ -200,7 +200,7 @@ dof_id_type ParallelMesh::parallel_max_node_id() const
 
   dof_id_type max_local = _nodes.empty() ?
     0 : _nodes.rbegin()->first + 1;
-  this->communicator().max(max_local);
+  this->comm().max(max_local);
   return max_local;
 }
 
@@ -420,7 +420,7 @@ Elem* ParallelMesh::add_elem (Elem *e)
   if (elem_procid == DofObject::invalid_processor_id)
     {
       dof_id_type elem_id = e->id();
-      this->communicator().max(elem_id);
+      this->comm().max(elem_id);
       libmesh_assert_equal_to (elem_id, e->id());
     }
 #endif
@@ -576,7 +576,7 @@ Node* ParallelMesh::add_node (Node *n)
   if (node_procid == DofObject::invalid_processor_id)
     {
       dof_id_type node_id = n->id();
-      this->communicator().max(node_id);
+      this->comm().max(node_id);
       libmesh_assert_equal_to (node_id, n->id());
     }
 #endif
@@ -757,7 +757,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
       libmesh_assert(!obj || obj->id() == i);
 
       dof_id_type min_dofid = dofid;
-      this->communicator().min(min_dofid);
+      this->comm().min(min_dofid);
       // All processors with an object should agree on id
       libmesh_assert (!obj || dofid == min_dofid);
 
@@ -765,7 +765,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_object_ids
         obj->processor_id() : DofObject::invalid_processor_id;
 
       dof_id_type min_procid = procid;
-      this->communicator().min(min_procid);
+      this->comm().min(min_procid);
 
       // All processors with an object should agree on processor id
       libmesh_assert (!obj || procid == min_procid);
@@ -817,7 +817,7 @@ void ParallelMesh::libmesh_assert_valid_parallel_flags () const
 #endif
 
       unsigned int min_rflag = refinement_flag;
-      this->communicator().min(min_rflag);
+      this->comm().min(min_rflag);
       // All processors with this element should agree on flag
       libmesh_assert (!el || min_rflag == refinement_flag);
 
@@ -871,11 +871,11 @@ dof_id_type ParallelMesh::renumber_dof_objects
     }
 
   std::vector<dof_id_type> objects_on_proc(this->n_processors(), 0);
-  this->communicator().allgather(ghost_objects_from_proc[this->processor_id()],
+  this->comm().allgather(ghost_objects_from_proc[this->processor_id()],
 				 objects_on_proc);
 
 #ifndef NDEBUG
-  libmesh_assert(this->communicator().verify(unpartitioned_objects));
+  libmesh_assert(this->comm().verify(unpartitioned_objects));
   for (processor_id_type p=0; p != this->n_processors(); ++p)
     libmesh_assert_less_equal (ghost_objects_from_proc[p], objects_on_proc[p]);
 #endif
@@ -926,7 +926,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
                                         this->processor_id() - p) %
                                         this->n_processors();
           std::vector<dof_id_type> request_to_fill;
-          this->communicator().send_receive(procup, requested_ids[procup],
+          this->comm().send_receive(procup, requested_ids[procup],
 					    procdown, request_to_fill);
 
           // Fill those requests
@@ -946,7 +946,7 @@ dof_id_type ParallelMesh::renumber_dof_objects
 
           // Trade back the results
           std::vector<dof_id_type> filled_request;
-          this->communicator().send_receive(procdown, new_ids,
+          this->comm().send_receive(procdown, new_ids,
 					    procup, filled_request);
 
           // And copy the id changes we've now been informed of
@@ -1154,7 +1154,7 @@ dof_id_type ParallelMesh::n_active_elem () const
   dof_id_type active_elements =
     static_cast<dof_id_type>(std::distance (this->active_local_elements_begin(),
 					    this->active_local_elements_end()));
-  this->communicator().sum(active_elements);
+  this->comm().sum(active_elements);
 
   // Then add unpartitioned active elements, which should exist on
   // every processor

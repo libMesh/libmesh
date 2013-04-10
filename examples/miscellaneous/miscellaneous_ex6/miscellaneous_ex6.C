@@ -59,14 +59,14 @@ int main (int argc, char** argv)
   std::cout << "Triangulating an L-shaped domain with holes" << std::endl;
 
   // 1.) 2D triangulation of L-shaped domain with three holes of different shape
-  triangulate_domain(init.communicator());
+  triangulate_domain(init.comm());
 
   libmesh_example_assert(3 <= LIBMESH_DIM, "3D support");
 
   std::cout << "Tetrahedralizing a prismatic domain with a hole" << std::endl;
 
   // 2.) 3D tetrahedralization of rectangular domain with hole.
-  tetrahedralize_domain(init.communicator());
+  tetrahedralize_domain(init.comm());
 
   return 0;
 }
@@ -229,7 +229,7 @@ void tetrahedralize_domain(const Parallel::Communicator& comm)
 void add_cube_convex_hull_to_mesh(MeshBase& mesh, Point lower_limit, Point upper_limit)
 {
 #ifdef LIBMESH_HAVE_TETGEN
-  SerialMesh cube_mesh(mesh.communicator(),3);
+  SerialMesh cube_mesh(mesh.comm(),3);
 
   unsigned n_elem = 1;
 

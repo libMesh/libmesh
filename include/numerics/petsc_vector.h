@@ -809,7 +809,7 @@ void PetscVector<T>::init (const numeric_index_type n,
     {
 #ifdef LIBMESH_HAVE_MPI
       libmesh_assert_less_equal (n_local, n);
-      ierr = VecCreateMPI (this->communicator().get(), petsc_n_local, petsc_n,
+      ierr = VecCreateMPI (this->comm().get(), petsc_n_local, petsc_n,
 			   &_vec);
              LIBMESH_CHKERRABORT(ierr);
 #else
@@ -888,7 +888,7 @@ void PetscVector<T>::init (const numeric_index_type n,
     }
 
   /* Create vector.  */
-  ierr = VecCreateGhost (this->communicator().get(), petsc_n_local, petsc_n,
+  ierr = VecCreateGhost (this->comm().get(), petsc_n_local, petsc_n,
 			 petsc_n_ghost, petsc_ghost,
 			 &_vec);
   LIBMESH_CHKERRABORT(ierr);
@@ -1041,7 +1041,7 @@ inline
 AutoPtr<NumericVector<T> > PetscVector<T>::zero_clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new PetscVector<T>(this->communicator(), this->type()));
+    (new PetscVector<T>(this->comm(), this->type()));
 
   cloned_vector->init(*this);
 
@@ -1055,7 +1055,7 @@ inline
 AutoPtr<NumericVector<T> > PetscVector<T>::clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new PetscVector<T>(this->communicator(), this->type()));
+    (new PetscVector<T>(this->comm(), this->type()));
 
   cloned_vector->init(*this, true);
 

@@ -133,11 +133,11 @@ int main(int argc, char** argv)
       field_vars.push_back("u");
       field_vars.push_back("v");
 
-      InverseDistanceInterpolation<3> idi (init.communicator(),
+      InverseDistanceInterpolation<3> idi (init.comm(),
 					   /* n_interp_pts = */ 8,
 					   /* power =        */ 2);
 
-      RadialBasisInterpolation<3> rbi (init.communicator());
+      RadialBasisInterpolation<3> rbi (init.comm());
 
       idi.set_field_variables (field_vars);
       rbi.set_field_variables (field_vars);
@@ -211,7 +211,7 @@ int main(int argc, char** argv)
 
     // Demonstration case 2
     {
-      Mesh mesh_a(init.communicator()), mesh_b(init.communicator());
+      Mesh mesh_a(init.comm()), mesh_b(init.comm());
 
       mesh_a.read("struct.ucd.gz"); mesh_b.read("unstruct.ucd.gz");
 
@@ -233,10 +233,10 @@ int main(int argc, char** argv)
       TecplotIO(mesh_a).write_equation_systems ("src.dat",
 						es_a);
 
-      InverseDistanceInterpolation<3> idi (init.communicator(),
+      InverseDistanceInterpolation<3> idi (init.comm(),
 					   /* n_interp_pts = */ 4,
 					   /* power =        */ 2);
-      RadialBasisInterpolation<3> rbi (init.communicator());
+      RadialBasisInterpolation<3> rbi (init.comm());
 
       std::vector<Point>  &src_pts  (idi.get_source_points());
       std::vector<Number> &src_vals (idi.get_source_vals());

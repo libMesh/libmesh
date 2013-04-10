@@ -644,7 +644,7 @@ inline
 AutoPtr<NumericVector<T> > LaspackVector<T>::zero_clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new LaspackVector<T>(this->communicator()));
+    (new LaspackVector<T>(this->comm()));
 
   cloned_vector->init(*this);
 
@@ -658,7 +658,7 @@ inline
 AutoPtr<NumericVector<T> > LaspackVector<T>::clone () const
 {
   AutoPtr<NumericVector<T> > cloned_vector
-    (new LaspackVector<T>(this->communicator()));
+    (new LaspackVector<T>(this->comm()));
 
   cloned_vector->init(*this, true);
 

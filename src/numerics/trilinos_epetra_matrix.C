@@ -63,8 +63,8 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
       summed_m_l = m_l,
       summed_n_l = n_l;
 
-    this->communicator().sum (summed_m_l);
-    this->communicator().sum (summed_n_l);
+    this->comm().sum (summed_m_l);
+    this->comm().sum (summed_n_l);
 
     libmesh_assert_equal_to (m, summed_m_l);
     libmesh_assert_equal_to (n, summed_n_l);
@@ -75,7 +75,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph &spa
   _map = new Epetra_Map (static_cast<int>(m),
                          m_l,
                          0,
-                         Epetra_MpiComm (this->communicator().get()));
+                         Epetra_MpiComm (this->comm().get()));
 
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);
@@ -147,8 +147,8 @@ void EpetraMatrix<T>::init (const numeric_index_type m,
       summed_m_l = m_l,
       summed_n_l = n_l;
 
-    this->communicator().sum (summed_m_l);
-    this->communicator().sum (summed_n_l);
+    this->comm().sum (summed_m_l);
+    this->comm().sum (summed_n_l);
 
     libmesh_assert_equal_to (m, summed_m_l);
     libmesh_assert_equal_to (n, summed_n_l);
@@ -159,7 +159,7 @@ void EpetraMatrix<T>::init (const numeric_index_type m,
   _map = new Epetra_Map (static_cast<int>(m),
                          m_l,
                          0,
-                         Epetra_MpiComm (this->communicator().get()));
+                         Epetra_MpiComm (this->comm().get()));
 
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->NumGlobalPoints()), m);
   libmesh_assert_equal_to (static_cast<numeric_index_type>(_map->MaxAllGID()+1), m);

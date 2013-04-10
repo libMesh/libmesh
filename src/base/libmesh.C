@@ -374,9 +374,9 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
       // Duplicate the input communicator for internal use
       // And get a Parallel::Communicator copy too, to use
       // as a default for that API
-      this->comm = COMM_WORLD_IN;
+      this->_comm = COMM_WORLD_IN;
 
-      libMesh::COMM_WORLD = this->comm.get();
+      libMesh::COMM_WORLD = COMM_WORLD_IN;
 
 #ifndef LIBMESH_DISABLE_COMMWORLD
       Parallel::Communicator_World = COMM_WORLD_IN;
@@ -386,9 +386,9 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
       //MPI_Comm_set_name (libMesh::COMM_WORLD, "libMesh::COMM_WORLD");
 
       libMeshPrivateData::_processor_id =
-        libmesh_cast_int<processor_id_type>(this->comm.rank());
+        libmesh_cast_int<processor_id_type>(this->comm().rank());
       libMeshPrivateData::_n_processors =
-        libmesh_cast_int<processor_id_type>(this->comm.size());
+        libmesh_cast_int<processor_id_type>(this->comm().size());
 
       // Set up an MPI error handler if requested.  This helps us get
       // into a debugger with a proper stack when an MPI error occurs.
@@ -407,8 +407,7 @@ LibMeshInit::LibMeshInit (int argc, const char* const* argv,
   // libmesh_assert_greater_equal (libMeshPrivateData::_processor_id, 0);
 
   // Let's be sure we properly initialize on every processor at once:
-  Parallel::Communicator communicator(libMesh::COMM_WORLD);
-  libmesh_parallel_only(communicator);
+  libmesh_parallel_only(this->comm());
 
 #endif
 
@@ -553,8 +552,7 @@ LibMeshInit::~LibMeshInit()
   task_scheduler.reset();
 
   // Let's be sure we properly close on every processor at once:
-  Parallel::Communicator communicator(libMesh::COMM_WORLD);
-  libmesh_parallel_only(communicator);
+  libmesh_parallel_only(this->comm());
 
 #if defined(LIBMESH_HAVE_MPI)
   // We may be here in only one process,
@@ -597,7 +595,7 @@ LibMeshInit::~LibMeshInit()
   // Allow the user to bypass MPI finalization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
-      this->comm.clear();
+      this->_comm.clear();
 #ifndef LIBMESH_DISABLE_COMMWORLD
       Parallel::Communicator_World.clear();
 #endif

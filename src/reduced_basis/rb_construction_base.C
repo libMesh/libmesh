@@ -92,7 +92,7 @@ void RBConstructionBase<Base>::init_data ()
 
   // Initialize the inner product storage vector, which is useful for
   // storing intermediate results when evaluating inner products
-  inner_product_storage_vector = NumericVector<Number>::build(this->communicator());
+  inner_product_storage_vector = NumericVector<Number>::build(this->comm());
   inner_product_storage_vector->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
 }
 
@@ -186,7 +186,7 @@ void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsign
   }
 
   // broadcast
-  this->communicator().max(root_id);
+  this->comm().max(root_id);
   broadcast_parameters(root_id);
 }
 
@@ -213,7 +213,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
 
   if(deterministic)
   {
-    generate_training_parameters_deterministic(this->communicator(),
+    generate_training_parameters_deterministic(this->comm(),
 					       log_param_scale,
                                                training_parameters,
                                                n_training_samples,
@@ -226,7 +226,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
     if(get_deterministic_training_parameter_name() == "NONE")
     {
       // Generate random training samples for all parameters
-      generate_training_parameters_random(this->communicator(),
+      generate_training_parameters_random(this->comm(),
 					  log_param_scale,
                                           training_parameters,
                                           n_training_samples,
@@ -239,7 +239,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
     {
       // Here we generate a "partially random" training set.
       // Generate deterministic training samples for specified parameter, random for the rest.
-      generate_training_parameters_partially_random(this->communicator(),
+      generate_training_parameters_partially_random(this->comm(),
 						    get_deterministic_training_parameter_name(),
                                                     get_deterministic_training_parameter_repeats(),
                                                     log_param_scale,
@@ -292,12 +292,12 @@ void RBConstructionBase<Base>::load_training_set(std::map< std::string, std::vec
   // Get the number of local and global training parameters
   numeric_index_type n_local_training_samples  = new_training_set.begin()->second.size();
   numeric_index_type n_global_training_samples = n_local_training_samples;
-  this->communicator().sum(n_global_training_samples);
+  this->comm().sum(n_global_training_samples);
 
   it = training_parameters.begin();
   for( ; it != it_end; ++it)
   {
-    it->second = NumericVector<Number>::build(this->communicator()).release();
+    it->second = NumericVector<Number>::build(this->comm()).release();
     it->second->init(n_global_training_samples, n_local_training_samples, false, libMeshEnums::PARALLEL);
   }
 
@@ -989,7 +989,7 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
   }
 
   // do the broadcast
-  this->communicator().broadcast(current_parameters_vector, proc_id);
+  this->comm().broadcast(current_parameters_vector, proc_id);
 
   // update the copy of the RBParameters object
   it = current_parameters.begin();

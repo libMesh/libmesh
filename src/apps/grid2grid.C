@@ -55,8 +55,8 @@ int main (int argc, char** argv)
     }
 
   // declare the coarse and fine meshes.
-  Mesh mesh_coarse(init.communicator(), dim);
-  Mesh mesh_fine(init.communicator(), dim);
+  Mesh mesh_coarse(init.comm(), dim);
+  Mesh mesh_fine(init.comm(), dim);
 
   // Read the coarse mesh
   std::cout << "Reading Mesh " << argv[2] << std::endl;

@@ -55,7 +55,7 @@ void Partitioner::partition (MeshBase& mesh)
 void Partitioner::partition (MeshBase& mesh,
 			     const unsigned int n)
 {
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   // BSK - temporary fix while redistribution is integrated 6/26/2008
   // Uncomment this to not repartition in parallel
@@ -228,7 +228,7 @@ void Partitioner::partition_unpartitioned_elements (MeshBase &mesh,
 
   // Calling this on all processors a unique range in [0,n_unpartitioned_elements) is constructed.
   // Only the indices for the elements we pass in are returned in the array.
-  MeshCommunication().find_global_indices (mesh.communicator(),
+  MeshCommunication().find_global_indices (mesh.comm(),
 					   MeshTools::bounding_box(mesh), it, end,
 					   global_indices);
 
@@ -348,9 +348,9 @@ mesh
       // A global reduction is then performed to make sure the true minimum is found.
       // As noted, this is required because we cannot guarantee that a parent has
       // access to all its children on any single processor.
-      libmesh_parallel_only(mesh.communicator());
+      libmesh_parallel_only(mesh.comm());
       libmesh_assert(MeshTools::n_elem(mesh.unpartitioned_elements_begin(),
-			       mesh.unpartitioned_elements_end()) == 0);
+			               mesh.unpartitioned_elements_end()) == 0);
 
       const dof_id_type max_elem_id = mesh.max_elem_id();
 
@@ -401,7 +401,7 @@ mesh
 	    }
 
 	  // then find the global minimum
-	  mesh.communicator().min (parent_processor_ids);
+	  mesh.comm().min (parent_processor_ids);
 
 	  // and assign the ids, if we have a parent in this block.
 	  if (have_parent_in_block)
@@ -441,7 +441,7 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
   START_LOG("set_node_processor_ids()","Partitioner");
 
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   // If we have any unpartitioned elements at this
   // stage there is a problem
@@ -588,8 +588,8 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
                                     mesh.processor_id() - p) %
                                     mesh.n_processors();
       std::vector<dof_id_type> request_to_fill;
-      mesh.communicator().send_receive(procup, requested_node_ids[procup],
-				       procdown, request_to_fill);
+      mesh.comm().send_receive(procup, requested_node_ids[procup],
+			       procdown, request_to_fill);
 
       // Fill those requests in-place
       for (std::size_t i=0; i != request_to_fill.size(); ++i)
@@ -604,8 +604,8 @@ void Partitioner::set_node_processor_ids(MeshBase& mesh)
 
       // Trade back the results
       std::vector<dof_id_type> filled_request;
-      mesh.communicator().send_receive(procdown, request_to_fill,
-				       procup,   filled_request);
+      mesh.comm().send_receive(procdown, request_to_fill,
+			       procup,   filled_request);
       libmesh_assert_equal_to (filled_request.size(), requested_node_ids[procup].size());
 
       // And copy the id changes we've now been informed of

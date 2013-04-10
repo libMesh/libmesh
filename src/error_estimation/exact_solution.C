@@ -538,7 +538,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
   libmesh_assert (!(_exact_values.size() && _equation_systems_fine));
 
   // We need a commmunicator.
-  const Parallel::Communicator &communicator (_equation_systems.communicator());
+  const Parallel::Communicator &communicator(_equation_systems.comm());
 
   // This function must be run on all processors at once
   libmesh_parallel_only(communicator);
@@ -559,7 +559,7 @@ void ExactSolution::_compute_error(const std::string& sys_name,
 
   // Prepare a global solution and a MeshFunction of the coarse system if we need one
   AutoPtr<MeshFunction> coarse_values;
-  AutoPtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build(_equation_systems.communicator());
+  AutoPtr<NumericVector<Number> > comparison_soln = NumericVector<Number>::build(_equation_systems.comm());
   if (_equation_systems_fine)
     {
       const System& comparison_system

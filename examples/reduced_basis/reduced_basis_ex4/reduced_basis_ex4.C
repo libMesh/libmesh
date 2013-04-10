@@ -77,7 +77,7 @@ int main (int argc, char** argv)
 
   // Create a mesh (just a simple square) on the default MPI
   // communicator
-  Mesh mesh (init.communicator(), dim);
+  Mesh mesh (init.comm(), dim);
   MeshTools::Generation::build_square (mesh,
                                        n_elem, n_elem,
                                        -1., 1.,
@@ -101,10 +101,10 @@ int main (int argc, char** argv)
   equation_systems.print_info();
 
   // Initialize the standard RBEvaluation object
-  SimpleRBEvaluation rb_eval(mesh.communicator());
+  SimpleRBEvaluation rb_eval(mesh.comm());
 
   // Initialize the EIM RBEvaluation object
-  SimpleEIMEvaluation eim_rb_eval(mesh.communicator());
+  SimpleEIMEvaluation eim_rb_eval(mesh.comm());
 
   // Set the rb_eval objects for the RBConstructions
   eim_construction.set_rb_evaluation(eim_rb_eval);

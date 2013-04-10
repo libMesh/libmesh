@@ -539,11 +539,11 @@ int main (int argc, char** argv)
   AutoPtr<Mesh> mesh_ptr;
   if (dim == static_cast<unsigned int>(-1))
     {
-      mesh_ptr.reset(new Mesh(init.communicator()));
+      mesh_ptr.reset(new Mesh(init.comm()));
     }
   else
     {
-      mesh_ptr.reset(new Mesh(init.communicator(),dim));
+      mesh_ptr.reset(new Mesh(init.comm(),dim));
     }
 
   Mesh& mesh = *mesh_ptr;
@@ -903,7 +903,7 @@ int main (int argc, char** argv)
             if (verbose)
                 std::cout << " Mesh got refined, will write only _active_ elements." << std::endl;
 
-            Mesh new_mesh (init.communicator(), mesh.mesh_dimension());
+            Mesh new_mesh (init.comm(), mesh.mesh_dimension());
 
             construct_mesh_of_active_elements(new_mesh, mesh);
 
@@ -932,7 +932,7 @@ int main (int argc, char** argv)
          */
         if (write_bndry != BM_DISABLED)
           {
-            BoundaryMesh boundary_mesh (mesh.communicator(),
+            BoundaryMesh boundary_mesh (mesh.comm(),
 					mesh.mesh_dimension()-1);
             MeshData boundary_mesh_data (boundary_mesh);
 

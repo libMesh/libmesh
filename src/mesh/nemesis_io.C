@@ -246,7 +246,7 @@ void Nemesis_IO::read (const std::string& base_filename)
     // test for equality
     const std::vector<unsigned char> pid_recv_partner (pid_send_partner);
 
-    this->communicator().alltoall (pid_send_partner);
+    this->comm().alltoall (pid_send_partner);
 
     libmesh_assert (pid_send_partner == pid_recv_partner);
   }
@@ -335,13 +335,13 @@ void Nemesis_IO::read (const std::string& base_filename)
   all_loadbal_data[6] = nemhelper->num_elem_cmaps;
   all_loadbal_data[7] = num_nodes_i_must_number;
 
-  this->communicator().allgather (all_loadbal_data, /* identical_buffer_sizes = */ true);
+  this->comm().allgather (all_loadbal_data, /* identical_buffer_sizes = */ true);
 
   // OK, we are now in a position to request new global indices for all the nodes
   // we do not own
 
   // Let's get a unique message tag to use for send()/receive()
-  Parallel::MessageTag nodes_tag = mesh.communicator().get_unique_tag(12345);
+  Parallel::MessageTag nodes_tag = mesh.comm().get_unique_tag(12345);
 
   std::vector<std::vector<int> >
     needed_node_idxs (nemhelper->num_node_cmaps); // the indices we will ask for
@@ -375,7 +375,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	    }
 	}
       // now post the send for this cmap
-      this->communicator().send (adjcnt_pid_idx,              // destination
+      this->comm().send (adjcnt_pid_idx,              // destination
 				 needed_node_idxs[cmap],      // send buffer
 				 needed_nodes_requests[cmap], // request
 				 nodes_tag);
@@ -526,7 +526,7 @@ void Nemesis_IO::read (const std::string& base_filename)
     {
       // query the first message which is available
       const Parallel::Status
-	status (this->communicator().probe (Parallel::any_source,
+	status (this->comm().probe (Parallel::any_source,
 					    nodes_tag));
       const unsigned int
 	requesting_pid_idx = status.source(),
@@ -550,7 +550,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  std::vector<int> &xfer_buf (requested_node_idxs[requesting_pid_idx]);
 
 	  // actually receive the message.
-	  this->communicator().receive (requesting_pid_idx, xfer_buf, nodes_tag);
+	  this->comm().receive (requesting_pid_idx, xfer_buf, nodes_tag);
 
 	  // Fill the request
 	  for (unsigned int i=0; i<xfer_buf.size(); i++)
@@ -577,7 +577,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	    }
 
 	  // and send the new global indices back to the processor which asked for them
-	  this->communicator().send (requesting_pid_idx,
+	  this->comm().send (requesting_pid_idx,
 				     xfer_buf,
 				     requested_nodes_requests[cmap],
 				     nodes_tag);
@@ -598,7 +598,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 	  libmesh_assert_equal_to (to_uint(nemhelper->node_cmap_ids[cmap]), source_pid_idx);
 
 	  // now post the receive for this cmap
-	  this->communicator().receive (source_pid_idx,
+	  this->comm().receive (source_pid_idx,
 					needed_node_idxs[cmap],
 					nodes_tag);
 
@@ -876,7 +876,7 @@ void Nemesis_IO::read (const std::string& base_filename)
   // Do a global max to determine the max dimension seen by all processors.
   // It should match -- I don't think we even support calculations on meshes
   // with elements of different dimension...
-  this->communicator().max(max_dim_seen);
+  this->comm().max(max_dim_seen);
 
   if (_verbose)
     {
@@ -946,7 +946,7 @@ void Nemesis_IO::read (const std::string& base_filename)
 
     // MPI sum up the local files contributions
     int sum_num_elem_all_sidesets = nemhelper->num_elem_all_sidesets;
-    this->communicator().sum(sum_num_elem_all_sidesets);
+    this->comm().sum(sum_num_elem_all_sidesets);
 
     if (sum_num_global_side_counts != sum_num_elem_all_sidesets)
       {

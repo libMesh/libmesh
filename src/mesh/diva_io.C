@@ -96,7 +96,7 @@ void DivaIO::write_stream (std::ostream& out_file)
 
 
 
-  BoundaryMesh boundary_mesh (the_mesh.communicator(),
+  BoundaryMesh boundary_mesh (the_mesh.comm(),
 			      the_mesh.mesh_dimension()-1);
   the_mesh.boundary_info->sync(boundary_mesh);
 

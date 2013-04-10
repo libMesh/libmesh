@@ -75,7 +75,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
     }
 
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
 // What to do if the Parmetis library IS NOT present
 #ifndef LIBMESH_HAVE_PARMETIS
@@ -138,7 +138,7 @@ void ParmetisPartitioner::_do_repartition (MeshBase& mesh,
   // Partition the graph
   std::vector<int> vsize(_vwgt.size(), 1);
   float itr = 1000000.0;
-  MPI_Comm mpi_comm = mesh.communicator().get();
+  MPI_Comm mpi_comm = mesh.comm().get();
 
   // Call the ParMETIS adaptive repartitioning method.  This respects the
   // original partitioning when computing the new partitioning so as to
@@ -209,7 +209,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
   // processor. This will not in general be correct for parallel meshes
   // when (pid!=mesh.processor_id()).
   _n_active_elem_on_proc.resize(mesh.n_processors());
-  mesh.communicator().allgather(n_active_local_elem, _n_active_elem_on_proc);
+  mesh.comm().allgather(n_active_local_elem, _n_active_elem_on_proc);
 
   // count the total number of active elements in the mesh.  Note we cannot
   // use mesh.n_active_elem() in general since this only returns the number
@@ -262,7 +262,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 	// note that we may not have all (or any!) the active elements which belong on this processor,
 	// but by calling this on all processors a unique range in [0,_n_active_elem_on_proc[pid])
 	// is constructed.  Only the indices for the elements we pass in are returned in the array.
- 	MeshCommunication().find_global_indices (mesh.communicator(),
+ 	MeshCommunication().find_global_indices (mesh.comm(),
 						 bbox, it, end,
 						 global_index);
 
@@ -286,7 +286,7 @@ void ParmetisPartitioner::initialize (const MeshBase& mesh,
 
       // Calling this on all processors a unique range in [0,n_active_elem) is constructed.
       // Only the indices for the elements we pass in are returned in the array.
-      MeshCommunication().find_global_indices (mesh.communicator(),
+      MeshCommunication().find_global_indices (mesh.comm(),
 					       bbox, it, end,
 					       global_index);
 
@@ -516,7 +516,7 @@ void ParmetisPartitioner::build_graph (const MeshBase& mesh)
 void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   const dof_id_type
     first_local_elem = _vtxdist[mesh.processor_id()];
@@ -549,8 +549,8 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 				          mesh.processor_id() - pid) %
 	                                  mesh.n_processors();
 
-      mesh.communicator().send_receive (procup,   requested_ids[procup],
-					procdown, requests_to_fill[procdown]);
+      mesh.comm().send_receive (procup,   requested_ids[procup],
+				procdown, requests_to_fill[procdown]);
 
       // we can overwrite these requested ids in-place.
       for (std::size_t i=0; i<requests_to_fill[procdown].size(); i++)
@@ -578,8 +578,8 @@ void ParmetisPartitioner::assign_partitioning (MeshBase& mesh)
 	}
 
       // Trade back
-      mesh.communicator().send_receive (procdown, requests_to_fill[procdown],
-					procup,   requested_ids[procup]);
+      mesh.comm().send_receive (procdown, requests_to_fill[procdown],
+				procup,   requested_ids[procup]);
     }
 
    // and finally assign the partitioning.

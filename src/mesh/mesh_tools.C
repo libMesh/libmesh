@@ -315,9 +315,9 @@ dof_id_type MeshTools::total_weight(const MeshBase& mesh)
 {
   if (!mesh.is_serial())
     {
-      libmesh_parallel_only(mesh.communicator());
+      libmesh_parallel_only(mesh.comm());
       dof_id_type weight = MeshTools::weight (mesh, mesh.processor_id());
-      mesh.communicator().sum(weight);
+      mesh.comm().sum(weight);
       dof_id_type unpartitioned_weight =
         MeshTools::weight (mesh, DofObject::invalid_processor_id);
       return weight + unpartitioned_weight;
@@ -416,7 +416,7 @@ MeshTools::BoundingBox
 MeshTools::bounding_box(const MeshBase& mesh)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   FindBBox find_bbox;
 
@@ -430,8 +430,8 @@ MeshTools::bounding_box(const MeshBase& mesh)
 			    find_bbox);
 
   // Compare the bounding boxes across processors
-  mesh.communicator().min(find_bbox.min());
-  mesh.communicator().max(find_bbox.max());
+  mesh.comm().min(find_bbox.min());
+  mesh.comm().max(find_bbox.max());
 
   return find_bbox.bbox();
 }
@@ -588,7 +588,7 @@ unsigned int MeshTools::n_active_local_levels(const MeshBase& mesh)
 
 unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
 {
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   unsigned int nl = MeshTools::n_active_local_levels(mesh);
 
@@ -601,7 +601,7 @@ unsigned int MeshTools::n_active_levels(const MeshBase& mesh)
     if ((*el)->active())
       nl = std::max((*el)->level() + 1, nl);
 
-  mesh.communicator().max(nl);
+  mesh.comm().max(nl);
   return nl;
 }
 
@@ -624,7 +624,7 @@ unsigned int MeshTools::n_local_levels(const MeshBase& mesh)
 
 unsigned int MeshTools::n_levels(const MeshBase& mesh)
 {
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   unsigned int nl = MeshTools::n_local_levels(mesh);
 
@@ -636,7 +636,7 @@ unsigned int MeshTools::n_levels(const MeshBase& mesh)
   for( ; el != end_el; ++el)
     nl = std::max((*el)->level() + 1, nl);
 
-  mesh.communicator().max(nl);
+  mesh.comm().max(nl);
   return nl;
 }
 
@@ -676,7 +676,7 @@ dof_id_type MeshTools::n_nodes (const MeshBase::const_node_iterator &begin,
 
 unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
 {
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   unsigned int max_p_level = 0;
 
@@ -695,7 +695,7 @@ unsigned int MeshTools::n_p_levels (const MeshBase& mesh)
   for( ; el != end_el; ++el)
     max_p_level = std::max((*el)->p_level(), max_p_level);
 
-  mesh.communicator().max(max_p_level);
+  mesh.comm().max(max_p_level);
   return max_p_level + 1;
 }
 
@@ -890,7 +890,7 @@ void MeshTools::correct_node_proc_ids
    LocationMap<Node> &loc_map)
 {
   // This function must be run on all processors at once
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   // We'll need the new_nodes_map to answer other processors'
   // requests.  It should never be empty unless we don't have any
@@ -1160,20 +1160,20 @@ void libmesh_assert_valid_dof_ids(const MeshBase &mesh)
   if (mesh.n_processors() == 1)
     return;
 
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   dof_id_type pmax_elem_id = mesh.max_elem_id();
-  mesh.communicator().max(pmax_elem_id);
+  mesh.comm().max(pmax_elem_id);
 
   for (dof_id_type i=0; i != pmax_elem_id; ++i)
-    assert_semiverify_dofobj(mesh.communicator(),
+    assert_semiverify_dofobj(mesh.comm(),
 			     mesh.query_elem(i));
 
   dof_id_type pmax_node_id = mesh.max_node_id();
-  mesh.communicator().max(pmax_node_id);
+  mesh.comm().max(pmax_node_id);
 
   for (dof_id_type i=0; i != pmax_node_id; ++i)
-    assert_semiverify_dofobj(mesh.communicator(),
+    assert_semiverify_dofobj(mesh.comm(),
 			     mesh.query_node_ptr(i));
 }
 
@@ -1183,12 +1183,12 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
   if (mesh.n_processors() == 1)
     return;
 
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   // We want this test to be valid even when called even after nodes
   // have been added asynchonously but before they're renumbered
   dof_id_type parallel_max_elem_id = mesh.max_elem_id();
-  mesh.communicator().max(parallel_max_elem_id);
+  mesh.comm().max(parallel_max_elem_id);
 
   // Check processor ids for consistency between processors
 
@@ -1199,12 +1199,12 @@ void libmesh_assert_valid_procids<Elem>(const MeshBase& mesh)
       processor_id_type min_id =
         elem ? elem->processor_id() :
                std::numeric_limits<processor_id_type>::max();
-      mesh.communicator().min(min_id);
+      mesh.comm().min(min_id);
 
       processor_id_type max_id =
         elem ? elem->processor_id() :
                std::numeric_limits<processor_id_type>::min();
-      mesh.communicator().max(max_id);
+      mesh.comm().max(max_id);
 
       if (elem)
         {
@@ -1268,12 +1268,12 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
   if (mesh.n_processors() == 1)
     return;
 
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
 
   // We want this test to be valid even when called even after nodes
   // have been added asynchonously but before they're renumbered
   dof_id_type parallel_max_node_id = mesh.max_node_id();
-  mesh.communicator().max(parallel_max_node_id);
+  mesh.comm().max(parallel_max_node_id);
 
   // Check processor ids for consistency between processors
 
@@ -1284,12 +1284,12 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
       processor_id_type min_id =
         node ? node->processor_id() :
                std::numeric_limits<processor_id_type>::max();
-      mesh.communicator().min(min_id);
+      mesh.comm().min(min_id);
 
       processor_id_type max_id =
         node ? node->processor_id() :
                std::numeric_limits<processor_id_type>::min();
-      mesh.communicator().max(max_id);
+      mesh.comm().max(max_id);
 
       if (node)
         {
@@ -1319,7 +1319,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
         }
     }
   std::vector<bool> node_touched_by_anyone(node_touched_by_me);
-  mesh.communicator().max(node_touched_by_anyone);
+  mesh.comm().max(node_touched_by_anyone);
 
   const MeshBase::const_node_iterator nd_end = mesh.local_nodes_end();
   for (MeshBase::const_node_iterator nd = mesh.local_nodes_begin();
@@ -1341,7 +1341,7 @@ void libmesh_assert_valid_procids<Node>(const MeshBase& mesh)
 #ifdef LIBMESH_ENABLE_AMR
 void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
 {
-  libmesh_parallel_only(mesh.communicator());
+  libmesh_parallel_only(mesh.comm());
   if (mesh.n_processors() == 1)
     return;
 
@@ -1364,10 +1364,10 @@ void MeshTools::libmesh_assert_valid_refinement_flags(const MeshBase &mesh)
         static_cast<unsigned char>(elem->p_refinement_flag());
     }
   std::vector<unsigned char> min_elem_h_state(my_elem_h_state);
-  mesh.communicator().min(min_elem_h_state);
+  mesh.comm().min(min_elem_h_state);
 
   std::vector<unsigned char> min_elem_p_state(my_elem_p_state);
-  mesh.communicator().min(min_elem_p_state);
+  mesh.comm().min(min_elem_p_state);
 
   for (dof_id_type i=0; i!= mesh.max_elem_id(); ++i)
     {

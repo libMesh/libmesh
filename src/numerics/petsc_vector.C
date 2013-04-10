@@ -799,7 +799,7 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in) const
   std::vector<PetscInt> idx(n); Utility::iota (idx.begin(), idx.end(), 0);
 
   // Create the index set & scatter object
-  ierr = ISCreateLibMesh(this->communicator().get(), n, &idx[0], PETSC_USE_POINTER, &is);
+  ierr = ISCreateLibMesh(this->comm().get(), n, &idx[0], PETSC_USE_POINTER, &is);
          LIBMESH_CHKERRABORT(ierr);
 
   ierr = VecScatterCreate(_vec,          is,
@@ -882,10 +882,10 @@ void PetscVector<T>::localize (NumericVector<T>& v_local_in,
 
   // Create the index set & scatter object
   if (idx.empty())
-    ierr = ISCreateLibMesh(this->communicator().get(),
+    ierr = ISCreateLibMesh(this->comm().get(),
                            n_sl+this->local_size(), PETSC_NULL, PETSC_USE_POINTER, &is);
   else
-    ierr = ISCreateLibMesh(this->communicator().get(),
+    ierr = ISCreateLibMesh(this->comm().get(),
 			   n_sl+this->local_size(), &idx[0], PETSC_USE_POINTER, &is);
            LIBMESH_CHKERRABORT(ierr);
 
@@ -957,7 +957,7 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
 
   // Build a parallel vector, initialize it with the local
   // parts of (*this)
-  PetscVector<T> parallel_vec(this->communicator(), PARALLEL);
+  PetscVector<T> parallel_vec(this->comm(), PARALLEL);
 
   parallel_vec.init (my_size, my_local_size, true, PARALLEL);
 
@@ -972,7 +972,7 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
     Utility::iota (idx.begin(), idx.end(), first_local_idx);
 
     // Create the index set & scatter object
-    ierr = ISCreateLibMesh(this->communicator().get(), my_local_size,
+    ierr = ISCreateLibMesh(this->comm().get(), my_local_size,
                            my_local_size ? &idx[0] : NULL, PETSC_USE_POINTER, &is);
            LIBMESH_CHKERRABORT(ierr);
 
@@ -1048,7 +1048,7 @@ void PetscVector<T>::localize (std::vector<T>& v_local) const
   ierr = VecRestoreArray (_vec, &values);
 	 LIBMESH_CHKERRABORT(ierr);
 
-  this->communicator().sum(v_local);
+  this->comm().sum(v_local);
 }
 
 
@@ -1103,7 +1103,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real>& v_local,
 
 
       MPI_Reduce (&local_values[0], &v_local[0], n, MPI_REAL, MPI_SUM,
-		  pid, this->communicator().get());
+		  pid, this->comm().get());
     }
 }
 
@@ -1181,11 +1181,11 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex>& v_local,
       // collect entries from other proc's in real_v_local, imag_v_local
       MPI_Reduce (&real_local_values[0], &real_v_local[0], n,
 		  MPI_REAL, MPI_SUM,
-		  pid, this->communicator().get());
+		  pid, this->comm().get());
 
       MPI_Reduce (&imag_local_values[0], &imag_v_local[0], n,
 		  MPI_REAL, MPI_SUM,
-		  pid, this->communicator().get());
+		  pid, this->comm().get());
 
       // copy real_v_local and imag_v_local to v_local
       for (PetscInt i=0; i<n; i++)
@@ -1267,7 +1267,7 @@ void PetscVector<T>::print_matlab (const std::string name) const
   PetscViewer petsc_viewer;
 
 
-  ierr = PetscViewerCreate (this->communicator().get(),
+  ierr = PetscViewerCreate (this->comm().get(),
 			    &petsc_viewer);
          LIBMESH_CHKERRABORT(ierr);
 
@@ -1277,7 +1277,7 @@ void PetscVector<T>::print_matlab (const std::string name) const
    */
   if (name != "NULL")
     {
-      ierr = PetscViewerASCIIOpen( this->communicator().get(),
+      ierr = PetscViewerASCIIOpen( this->comm().get(),
 				   name.c_str(),
 				   &petsc_viewer);
              LIBMESH_CHKERRABORT(ierr);
@@ -1340,7 +1340,7 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
       // entries) is not currently offered by the PetscVector
       // class.  Should we differentiate here between sequential and
       // parallel vector creation based on this->n_processors() ?
-      ierr = VecCreateMPI(this->communicator().get(),
+      ierr = VecCreateMPI(this->comm().get(),
 			  PETSC_DECIDE,          // n_local
 			  rows.size(),           // n_global
 			  &(petsc_subvector->_vec)); LIBMESH_CHKERRABORT(ierr);
@@ -1360,13 +1360,13 @@ void PetscVector<T>::create_subvector(NumericVector<T>& subvector,
   Utility::iota (idx.begin(), idx.end(), 0);
 
   // Construct index sets
-  ierr = ISCreateLibMesh(this->communicator().get(),
+  ierr = ISCreateLibMesh(this->comm().get(),
 			 rows.size(),
 			 (PetscInt*) &rows[0],
 			 PETSC_USE_POINTER,
 			 &parent_is); LIBMESH_CHKERRABORT(ierr);
 
-  ierr = ISCreateLibMesh(this->communicator().get(),
+  ierr = ISCreateLibMesh(this->comm().get(),
 			 rows.size(),
 			 (PetscInt*) &idx[0],
 			 PETSC_USE_POINTER,

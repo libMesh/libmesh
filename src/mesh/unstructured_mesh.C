@@ -756,7 +756,7 @@ void UnstructuredMesh::write (const std::string& name,
       processor_id_type pid_0 = 0;
       if (this->processor_id() == 0)
         pid_0 = getpid();
-      this->communicator().broadcast(pid_0);
+      this->comm().broadcast(pid_0);
       std::ostringstream pid_suffix;
       pid_suffix << '_' << pid_0;
 
@@ -867,7 +867,7 @@ void UnstructuredMesh::write (const std::string& name,
 		libmesh_file_error(system_string);
 	      std::remove(new_name.c_str());
 	    }
-	  this->communicator().barrier();
+	  this->comm().barrier();
 	  STOP_LOG("system(bzip2)", "Mesh");
 	}
       if (name.size() - name.rfind(".xz") == 3)
@@ -881,7 +881,7 @@ void UnstructuredMesh::write (const std::string& name,
 		libmesh_file_error(system_string);
 	      std::remove(new_name.c_str());
 	    }
-	  this->communicator().barrier();
+	  this->comm().barrier();
 	  STOP_LOG("system(xz)", "Mesh");
 	}
 

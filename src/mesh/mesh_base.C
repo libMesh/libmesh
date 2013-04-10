@@ -117,12 +117,12 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
   // processors with no elements of higher dimension, if we ever
   // support mixed-dimension meshes), but we want consistent
   // mesh_dimension anyways.
-  libmesh_assert(this->communicator().verify(this->is_serial()));
+  libmesh_assert(this->comm().verify(this->is_serial()));
 
   if (!this->is_serial())
     {
       unsigned int dim = this->mesh_dimension();
-      this->communicator().max(dim);
+      this->comm().max(dim);
       this->set_mesh_dimension(dim);
     }
 
@@ -204,7 +204,7 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> &ids) const
     ids.insert((*el)->subdomain_id());
 
   // Some subdomains may only live on other processors
-  this->communicator().set_union(ids);
+  this->comm().set_union(ids);
 }
 
 
@@ -360,7 +360,7 @@ unsigned int MeshBase::recalculate_n_partitions()
   // The number of partitions is one more than the max processor ID.
   _n_parts = max_proc_id+1;
 
-  this->communicator().max(_n_parts);
+  this->comm().max(_n_parts);
 
   return _n_parts;
 }

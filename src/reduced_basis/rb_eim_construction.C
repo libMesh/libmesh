@@ -166,7 +166,7 @@ void RBEIMConstruction::initialize_rb_construction()
   Parent::initialize_rb_construction();
 
   // initialize a serial vector that we will use for MeshFunction evaluations
-  _ghosted_meshfunction_vector = NumericVector<Number>::build(this->communicator());
+  _ghosted_meshfunction_vector = NumericVector<Number>::build(this->comm());
   _ghosted_meshfunction_vector->init (this->n_dofs(), this->n_local_dofs(),
                                       this->get_dof_map().get_send_list(), false,
                                       GHOSTED);
@@ -226,11 +226,11 @@ Number RBEIMConstruction::evaluate_mesh_function(unsigned int var_number,
   }
 
   // root_id may be non-zero on more than one processor due to ghost elements
-  // so use this->communicator().max to get just one proc id
-  this->communicator().max(root_id);
+  // so use this->comm().max to get just one proc id
+  this->comm().max(root_id);
 
   // Then broadcast the result
-  this->communicator().broadcast(value, root_id);
+  this->comm().broadcast(value, root_id);
 
   return value;
 }
@@ -332,14 +332,14 @@ void RBEIMConstruction::enrich_RB_space()
 
   Real global_abs_value = std::abs(optimal_value);
   unsigned int proc_ID_index;
-  this->communicator().maxloc(global_abs_value, proc_ID_index);
+  this->comm().maxloc(global_abs_value, proc_ID_index);
 
   // Broadcast the optimal point from proc_ID_index
-  this->communicator().broadcast(optimal_point, proc_ID_index);
+  this->comm().broadcast(optimal_point, proc_ID_index);
 
   // Also broadcast the corresponding optimal_var and optimal_value
-  this->communicator().broadcast(optimal_var, proc_ID_index);
-  this->communicator().broadcast(optimal_value, proc_ID_index);
+  this->comm().broadcast(optimal_var, proc_ID_index);
+  this->comm().broadcast(optimal_value, proc_ID_index);
 
   // Scale the solution
   solution->scale(1./optimal_value);
@@ -350,7 +350,7 @@ void RBEIMConstruction::enrich_RB_space()
     eim_eval.interpolation_points.push_back(optimal_point);
     eim_eval.interpolation_points_var.push_back(optimal_var);
 
-    NumericVector<Number>* new_bf = NumericVector<Number>::build(this->communicator()).release();
+    NumericVector<Number>* new_bf = NumericVector<Number>::build(this->comm()).release();
     new_bf->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
     *new_bf = *solution;
     get_rb_evaluation().basis_functions.push_back( new_bf );
