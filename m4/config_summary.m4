@@ -31,29 +31,29 @@ echo " "
 for method in ${METHODS}; do
      case "${method}" in
          opt)
-echo CPPFLAGS...\(opt\)................... : $CPPFLAGS_OPT
-echo CXXFLAGS...\(opt\)................... : $CXXFLAGS_OPT
-echo CFLAGS.....\(opt\)................... : $CFLAGS_OPT
+echo CPPFLAGS...\(opt\)................... : $CPPFLAGS_OPT $CPFLAGS
+echo CXXFLAGS...\(opt\)................... : $CXXFLAGS_OPT $CXXFLAGS
+echo CFLAGS.....\(opt\)................... : $CFLAGS_OPT $CFLAGS
      ;;
          devel)
-echo CPPFLAGS...\(devel\)................. : $CPPFLAGS_DEVEL
-echo CXXFLAGS...\(devel\)................. : $CXXFLAGS_DEVEL
-echo CFLAGS.....\(devel\)................. : $CFLAGS_DEVEL
+echo CPPFLAGS...\(devel\)................. : $CPPFLAGS_DEVEL $CPFLAGS
+echo CXXFLAGS...\(devel\)................. : $CXXFLAGS_DEVEL $CXXFLAGS
+echo CFLAGS.....\(devel\)................. : $CFLAGS_DEVEL $CFLAGS
      ;;
          dbg)
-echo CPPFLAGS...\(dbg\)................... : $CPPFLAGS_DBG
-echo CXXFLAGS...\(dbg\)................... : $CXXFLAGS_DBG
-echo CFLAGS.....\(dbg\)................... : $CFLAGS_DBG
+echo CPPFLAGS...\(dbg\)................... : $CPPFLAGS_DBG $CPFLAGS
+echo CXXFLAGS...\(dbg\)................... : $CXXFLAGS_DBG $CXXFLAGS
+echo CFLAGS.....\(dbg\)................... : $CFLAGS_DBG $CFLAGS
      ;;
          prof)
-echo CPPFLAGS...\(prof\).................. : $CPPFLAGS_PROF
-echo CXXFLAGS...\(prof\).................. : $CXXFLAGS_PROF
-echo CFLAGS.....\(prof\).................. : $CFLAGS_PROF
+echo CPPFLAGS...\(prof\).................. : $CPPFLAGS_PROF $CPFLAGS
+echo CXXFLAGS...\(prof\).................. : $CXXFLAGS_PROF $CXXFLAGS
+echo CFLAGS.....\(prof\).................. : $CFLAGS_PROF $CFLAGS
      ;;
          oprof)
-echo CPPFLAGS...\(oprof\)................. : $CPPFLAGS_OPROF
-echo CXXFLAGS...\(oprof\)................. : $CXXFLAGS_OPROF
-echo CFLAGS.....\(oprof\)................. : $CFLAGS_OPROF
+echo CPPFLAGS...\(oprof\)................. : $CPPFLAGS_OPROF $CPFLAGS
+echo CXXFLAGS...\(oprof\)................. : $CXXFLAGS_OPROF $CXXFLAGS
+echo CFLAGS.....\(oprof\)................. : $CFLAGS_OPROF $CFLAGS
      esac
      echo " "
 done
