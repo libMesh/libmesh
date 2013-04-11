@@ -30533,8 +30533,21 @@ fi
 
 
 
+  # The TECIO APU requires some header files...
+  if (test $enabletecio = yes); then
+    ac_fn_cxx_check_header_mongrel "$LINENO" "X11/Intrinsic.h" "ac_cv_header_X11_Intrinsic_h" "$ac_includes_default"
+if test "x$ac_cv_header_X11_Intrinsic_h" = xyes; then :
 
-      if (test $enabletecio = yes); then
+else
+  enabletecio=no
+fi
+
+
+  fi
+
+  # The TECIO API is distributed with libmesh, so we don't have to guess
+  # where it might be installed...
+  if (test $enabletecio = yes); then
 
     # tecio platform-specific compiler flags
     TECIO_CPPFLAGS=""
