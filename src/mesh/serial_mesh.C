@@ -762,7 +762,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
                                 bool clear_stitched_boundary_ids,
                                 bool verbose)
 {
-  std::map<dof_id_type, dof_id_type> node_to_node_map;
+  std::map<dof_id_type, dof_id_type> node_to_node_map, other_to_this_node_map; // The second is the inverse map of the first
   std::map<dof_id_type, std::vector<dof_id_type> > node_to_elems_map;
 
   if( (this_mesh_boundary_id  != BoundaryInfo::invalid_id) &&
@@ -838,11 +838,6 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
 
           // Sort the vectors based on the FuzzyPointCompare struct op()
           std::sort(vec_array[i]->begin(), vec_array[i]->end(), FuzzyPointCompare());
-
-          // Print out the contents (debugging only)
-          std::cout << "stitch_meshes: mesh " << i << std::endl;
-          for (unsigned j=0; j<vec_array[i]->size(); ++j)
-            libMesh::out << (*vec_array[i])[j].first << ", id= " << (*vec_array[i])[j].second << std::endl;
         }
     }
 
@@ -878,85 +873,44 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
               libMesh::out << "Error: mismatched points: " << this_point << " and " << other_point << std::endl;
               libmesh_error();
             }
-
-          // Print status message
-          libMesh::out << "Found matching points: " << this_point << " and " << other_point << std::endl;
         }
 
 
-        // Associate these two nodes in the node_to_node_map
+        // Associate these two nodes in both the node_to_node_map and the other_to_this_node_map
         dof_id_type
           this_node_id = this_sorted_bndry_nodes[i].second,
           other_node_id = other_iter->second;
         node_to_node_map[this_node_id] = other_node_id;
-
-        // Build a vector of all the elements in other_mesh that contain other_node.  TODO: This does a full
-        // iteration over the mesh for every node on the stitched surface -- could that be optimized?
-        std::vector<dof_id_type> other_elem_ids;
-        MeshBase::element_iterator other_elem_it  = other_mesh.elements_begin();
-        MeshBase::element_iterator other_elem_end = other_mesh.elements_end();
-        for (; other_elem_it != other_elem_end; ++other_elem_it)
-          {
-            Elem *el = *other_elem_it;
-
-            // TODO: contains_point does an expensive Newton iteration, is there
-            // something faster?
-            if (el->contains_point(other_iter->first))
-              other_elem_ids.push_back(el->id());
-          }
-
-        node_to_elems_map[this_node_id] = other_elem_ids;
+        other_to_this_node_map[other_node_id] = this_node_id;
       }
 
 
-//   // Orig code is here
-//    std::set<dof_id_type>::iterator set_it     = this_boundary_node_ids.begin();
-//    std::set<dof_id_type>::iterator set_it_end = this_boundary_node_ids.end();
-//    for( ; set_it != set_it_end; ++set_it)
-//    {
-//      dof_id_type this_node_id = *set_it;
-//      Node& this_node = this->node(this_node_id);
-//
-//      bool found_matching_nodes = false;
-//
-//      std::set<dof_id_type>::iterator other_set_it     = other_boundary_node_ids.begin();
-//      std::set<dof_id_type>::iterator other_set_it_end = other_boundary_node_ids.end();
-//      for( ; other_set_it != other_set_it_end; ++other_set_it)
-//      {
-//        dof_id_type other_node_id = *other_set_it;
-//        Node& other_node = other_mesh.node(other_node_id);
-//
-//        Real node_distance = (this_node - other_node).size();
-//
-//        if(node_distance < tol)
-//        {
-//          // Make sure we didn't already find a matching node!
-//          if(found_matching_nodes)
-//          {
-//            libMesh::out << "Error: Found multiple matching nodes in stitch_meshes" << std::endl;
-//            libmesh_error();
-//          }
-//
-//          node_to_node_map[this_node_id] = other_node_id;
-//
-//          // Build a vector of all the elements in other_mesh that contain other_node
-//          std::vector<dof_id_type> other_elem_ids;
-//          MeshBase::element_iterator other_elem_it  = other_mesh.elements_begin();
-//          MeshBase::element_iterator other_elem_end = other_mesh.elements_end();
-//          for (; other_elem_it != other_elem_end; ++other_elem_it)
-//          {
-//            Elem *el = *other_elem_it;
-//
-//            if(el->contains_point(other_node))
-//              other_elem_ids.push_back(el->id());
-//          }
-//
-//          node_to_elems_map[this_node_id] = other_elem_ids;
-//
-//          found_matching_nodes = true;
-//        }
-//      }
-//    }
+    // Build up the node_to_elems_map, using only one loop over other_mesh
+    {
+      MeshBase::element_iterator other_elem_it  = other_mesh.elements_begin();
+      MeshBase::element_iterator other_elem_end = other_mesh.elements_end();
+      for (; other_elem_it != other_elem_end; ++other_elem_it)
+        {
+          Elem *el = *other_elem_it;
+
+          // For each node on the element, find the corresponding node
+          // on "this" Mesh, 'this_node_id', if it exists, and push
+          // the current element ID back onto node_to_elems_map[this_node_id].
+          // For that we will use the reverse mapping we created at
+          // the same time as the forward mapping.
+          for (unsigned n=0; n<el->n_nodes(); ++n)
+            {
+              dof_id_type other_node_id = el->node(n);
+              std::map<dof_id_type, dof_id_type>::iterator it = other_to_this_node_map.find(other_node_id);
+
+              if (it != other_to_this_node_map.end())
+                {
+                  dof_id_type this_node_id = it->second;
+                  node_to_elems_map[this_node_id].push_back( el->id() );
+                }
+            }
+        }
+    }
 
     if(verbose)
     {
