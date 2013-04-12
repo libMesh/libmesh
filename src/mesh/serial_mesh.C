@@ -54,7 +54,7 @@ namespace
           // * TOLERANCE
           // * 1.0
           // If we use std::numeric_limits<Real>::epsilon(), we'll
-          // will do more relative comparisons for small numbers, but
+          // do more relative comparisons for small numbers, but
           // increase the chance for false positives?  If we pick 1.0,
           // we'll never "increase" the difference between small numbers
           // in the test below.
@@ -989,9 +989,10 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   {
     Elem *el = *elem_it;
 
-    // First copy boundary info to the stitched mesh
+    // First copy boundary info to the stitched mesh.  Note that other_mesh may
+    // contain interior sidesets as well, so don't *just* copy boundary info for
+    // elements on the boundary, copy it for all elements!
     for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
-      if (el->neighbor(side_id) == NULL)
       {
         // There could be multiple boundary IDs on this side, so add them all.
         std::vector<boundary_id_type> bc_ids = other_mesh.boundary_info->boundary_ids (el, side_id);
