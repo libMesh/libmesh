@@ -35,7 +35,12 @@ namespace
   // of the point
   class FuzzyPointCompare
   {
-   public:
+  private:
+    Real _tol;
+
+  public:
+    // Constructor takes the tolerance to be used in fuzzy comparisons
+    FuzzyPointCompare(Real tol) : _tol(tol) {}
 
     // This is inspired directly by Point::operator<
     bool operator()(const Point& lhs, const Point& rhs)
@@ -54,7 +59,7 @@ namespace
           // * TOLERANCE
           // * 1.0
           // If we use std::numeric_limits<Real>::epsilon(), we'll
-          // will do more relative comparisons for small numbers, but
+          // do more relative comparisons for small numbers, but
           // increase the chance for false positives?  If we pick 1.0,
           // we'll never "increase" the difference between small numbers
           // in the test below.
@@ -62,8 +67,8 @@ namespace
             rel_size = 1.;
 
           // Don't attempt the comparison if lhs(i) and rhs(i) are too close
-          // together.  Again, here you could use some other custom tolerance.
-          if ( std::abs(lhs(i) - rhs(i)) / rel_size < TOLERANCE)
+          // together.
+          if ( std::abs(lhs(i) - rhs(i)) / rel_size < _tol)
             continue;
 
           if (lhs(i) < rhs(i))
@@ -91,14 +96,15 @@ namespace
 
   PointVector::iterator fuzzy_binary_find(PointVector::iterator first,
                                           PointVector::iterator last,
-                                          Point val)
+                                          Point val,
+                                          Real tol)
   {
     PointVector::iterator it;
     std::iterator_traits<PointVector::iterator>::difference_type count, step;
     count = std::distance(first, last);
 
     // Object we'll use to make comparisons
-    FuzzyPointCompare comp;
+    FuzzyPointCompare comp(tol);
 
     while (count>0)
       {
@@ -110,7 +116,7 @@ namespace
         Point p = it->first;
 
         // If p relative_fuzzy_equals val, return 'it'
-        if (p.relative_fuzzy_equals(val))
+        if (p.relative_fuzzy_equals(val, tol))
           return it;
 
         // Otherwise, continue binary searching
@@ -837,7 +843,7 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
             }
 
           // Sort the vectors based on the FuzzyPointCompare struct op()
-          std::sort(vec_array[i]->begin(), vec_array[i]->end(), FuzzyPointCompare());
+          std::sort(vec_array[i]->begin(), vec_array[i]->end(), FuzzyPointCompare(tol));
         }
     }
 
@@ -853,7 +859,8 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
         // slight differences between the list of nodes on each mesh.
         PointVector::iterator other_iter = fuzzy_binary_find(other_sorted_bndry_nodes.begin(),
                                                              other_sorted_bndry_nodes.end(),
-                                                             this_point);
+                                                             this_point,
+                                                             tol);
 
         if (other_iter == other_sorted_bndry_nodes.end())
           {
@@ -989,9 +996,10 @@ void SerialMesh::stitch_meshes (SerialMesh& other_mesh,
   {
     Elem *el = *elem_it;
 
-    // First copy boundary info to the stitched mesh
+    // First copy boundary info to the stitched mesh.  Note that other_mesh may
+    // contain interior sidesets as well, so don't *just* copy boundary info for
+    // elements on the boundary, copy it for all elements!
     for (unsigned int side_id=0; side_id<el->n_sides(); side_id++)
-      if (el->neighbor(side_id) == NULL)
       {
         // There could be multiple boundary IDs on this side, so add them all.
         std::vector<boundary_id_type> bc_ids = other_mesh.boundary_info->boundary_ids (el, side_id);
