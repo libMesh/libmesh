@@ -930,15 +930,15 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh)
       {
 	const Node* node = *it;
 
-	x[i] = (*node)(0);
+	x[i] = (*node)(0) + _coordinate_offset(0);
 
 #if LIBMESH_DIM > 1
-	y[i]=(*node)(1);
+	y[i]=(*node)(1) + _coordinate_offset(1);
 #else
 	y[i]=0.;
 #endif
 #if LIBMESH_DIM > 2
-	z[i]=(*node)(2);
+	z[i]=(*node)(2) + _coordinate_offset(2);
 #else
 	z[i]=0.;
 #endif
@@ -1598,7 +1598,10 @@ void ExodusII_IO_Helper::use_mesh_dimension_instead_of_spatial_dimension(bool va
   _use_mesh_dimension_instead_of_spatial_dimension = val;
 }
 
-
+void ExodusII_IO_Helper::set_coordinate_offset(Point p)
+{
+  _coordinate_offset = p;
+}
 
 
 bool ExodusII_IO_Helper::created()

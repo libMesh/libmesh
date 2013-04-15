@@ -94,6 +94,12 @@ void ExodusII_IO::verbose (bool set_verbosity)
 #endif
   }
 
+void ExodusII_IO::set_coordinate_offset(Point p)
+{
+#ifdef LIBMESH_HAVE_EXODUS_API
+  exio_helper->set_coordinate_offset(p);
+#endif
+}
 
 
 void ExodusII_IO::read (const std::string& fname)
