@@ -199,14 +199,12 @@ void PetscMatrix<T>::init ()
   //if (my_m==0)
   //  return;
 
-  PetscErrorCode ierr     = 0;
-  PetscInt m_global = static_cast<PetscInt>(my_m);
-  PetscInt n_global = static_cast<PetscInt>(my_n);
-  PetscInt m_local  = static_cast<PetscInt>(m_l);
-  PetscInt n_local  = static_cast<PetscInt>(n_l);
-
-
-  PetscInt blocksize = this->_dof_map->block_size();
+  PetscErrorCode ierr = 0;
+  PetscInt m_global   = static_cast<PetscInt>(my_m);
+  PetscInt n_global   = static_cast<PetscInt>(my_n);
+  PetscInt m_local    = static_cast<PetscInt>(m_l);
+  PetscInt n_local    = static_cast<PetscInt>(n_l);
+  PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
 
   ierr = MatCreate(this->comm().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
