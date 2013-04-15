@@ -205,22 +205,75 @@ void PetscMatrix<T>::init ()
   PetscInt m_local  = static_cast<PetscInt>(m_l);
   PetscInt n_local  = static_cast<PetscInt>(n_l);
 
+
+  PetscInt blocksize = this->_dof_map->block_size();
+
   ierr = MatCreate(this->comm().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
+
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERRABORT(ierr);
-  ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-  LIBMESH_CHKERRABORT(ierr);
+
+#ifdef  LIBMESH_ENABLE_BLOCKED_STORAGE
+
+  // BSK - I believe these need to survive the if-scope.
+  std::vector<numeric_index_type>
+    b_n_nz, b_n_oz;
+
+  if (blocksize > 1)
+    {
+      // specified blocksize, bs>1.
+      // double check sizes.
+      libmesh_assert_equal_to (m_local  % blocksize, 0);
+      libmesh_assert_equal_to (n_local  % blocksize, 0);
+      libmesh_assert_equal_to (m_global % blocksize, 0);
+      libmesh_assert_equal_to (n_global % blocksize, 0);
+
+      ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
+      LIBMESH_CHKERRABORT(ierr);
+
+      ierr = MatSetBlockSize(_mat,blocksize);
+      LIBMESH_CHKERRABORT(ierr);
+
+      // transform the per-entry n_nz and n_oz arrays into their block counterparts.
+      b_n_nz.reserve(n_nz.size()/blocksize); /**/ b_n_oz.reserve(n_oz.size()/blocksize);
+
+      libmesh_assert_equal_to (n_nz.size(), n_oz.size());
+
+      for (unsigned int nn=0; nn<n_nz.size(); nn += blocksize)
+	{
+	  b_n_nz.push_back (n_nz[nn]/blocksize);
+	  b_n_oz.push_back (n_oz[nn]/blocksize);
+	}
+
+      ierr = MatSeqBAIJSetPreallocation(_mat, blocksize,
+					0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]));
+      LIBMESH_CHKERRABORT(ierr);
+
+      ierr = MatMPIBAIJSetPreallocation(_mat, blocksize,
+					0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]),
+					0, (PetscInt*)(b_n_oz.empty()?NULL:&b_n_oz[0]));
+      LIBMESH_CHKERRABORT(ierr);
+    }
+  else
+#endif
+    {
+      // no block storage case
+      ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
+      LIBMESH_CHKERRABORT(ierr);
+
+      ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
+      LIBMESH_CHKERRABORT(ierr);
+      ierr = MatMPIAIJSetPreallocation(_mat,
+				       0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
+				       0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
+      LIBMESH_CHKERRABORT(ierr);
+    }
+
   // Is prefix information available somewhere? Perhaps pass in the system name?
   ierr = MatSetOptionsPrefix(_mat, "");
   LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetFromOptions(_mat);
-  LIBMESH_CHKERRABORT(ierr);
-
-  ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
-  LIBMESH_CHKERRABORT(ierr);
-  ierr = MatMPIAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
-                                         0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
   LIBMESH_CHKERRABORT(ierr);
 
   this->zero();
