@@ -62,16 +62,16 @@ AC_CONFIG_HEADER(include/libmesh_config.h.tmp:include/libmesh_config.h.in)
 AX_PREFIX_CONFIG_H(include/libmesh_config.h,LIBMESH,include/libmesh_config.h.tmp)
 
 # Print configuration info to the header file
-AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 $ac_configure_args"], [Configuration information.])	
+AC_DEFINE_UNQUOTED(CONFIGURE_INFO, ["$0 $ac_configure_args"], [Configuration information.])
 
 # require automake 1.11 - color tests
 AM_INIT_AUTOMAKE([dist-xz dist-bzip2 tar-ustar color-tests 1.11])
 
 # use silent rules - automake 1.11
-AM_SILENT_RULES(yes) 
+AM_SILENT_RULES(yes)
 
 # by default we want 'maintainer mode', which means automake will generate rules to recreate e.g. Makefile.in from
-# Makefile.am. But this adds support for --disable-maintainer-mode, which may be useful for forcing configure to 
+# Makefile.am. But this adds support for --disable-maintainer-mode, which may be useful for forcing configure to
 # work on systems with no autotools
 AM_MAINTAINER_MODE([enable])
 
@@ -84,7 +84,7 @@ AM_MAINTAINER_MODE([enable])
 AC_CHECK_FILE(src/base/libmesh.C, [libmesh_vpath_build=no], [libmesh_vpath_build=yes])
 if (test $libmesh_vpath_build = yes); then
     AC_MSG_RESULT(<<< Configuring build directory for VPATH build >>>)
-fi	 
+fi
 AM_CONDITIONAL(LIBMESH_VPATH_BUILD, test x$libmesh_vpath_build = xyes)
 
 # --------------------------------------------------------------
@@ -214,12 +214,12 @@ AC_SUBST(PROFILING_FLAGS)
 AC_SUBST(OPROFILE_FLAGS)
 AC_SUBST(FLIBS)
 AC_SUBST(METHOD)
- 
+
 
 
 # --------------------------------------------------------------
 # This is a special test for the mpCC (IBM) compiler.
-# mpCC fails the AC_LANG tests. Set the compiler to 
+# mpCC fails the AC_LANG tests. Set the compiler to
 # mpCC if it is there instead of xlC, but only do this
 # _after_ configure is finished using CXX!
 # --------------------------------------------------------------
@@ -319,12 +319,12 @@ if (test "x$enableexamples" = "xyes"); then
   		examples/vector_fe/vector_fe_ex2/Makefile
   		examples/vector_fe/vector_fe_ex3/Makefile
   		examples/Makefile
-  		])		
-fi		
+  		])
+fi
 
 
-# hackery.  If we are supporting nested autoconf packages and we want to specify 
-# additional arguments to be passed to those packages, do that here.  
+# hackery.  If we are supporting nested autoconf packages and we want to specify
+# additional arguments to be passed to those packages, do that here.
 # Specifically, we append libmesh_subpackage_arguments to ac_configure_args
 # before AC_OUTPUT recurses into our subpackages
 if (test "x$enablenested" = "xyes"); then

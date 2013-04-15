@@ -5,7 +5,7 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
   # --------------------------------------------------------------
   # look for a decent C++ compiler or honor --with-cxx=...
   CXX_TRY_LIST="g++ icpc icc pgCC c++"
-  
+
      # -------------------------------------------------------------------
      # MPI -- enabled by default.  Check for it now so we can be somewhat
      #                             smart about which compilers to look for
@@ -19,37 +19,37 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
     		       *)  AC_MSG_ERROR(bad value ${enableval} for --enable-mpi) ;;
    		    esac],
    		    [enablempi=yes])
-     
+
   if  (test "$enablempi" != no) ; then
     CXX_TRY_LIST="mpicxx mpiCC mpicc $CXX_TRY_LIST"
   else
     AC_MSG_RESULT(>>> Disabling MPI per user request <<<)
   fi
-  
+
   AC_ARG_WITH([cxx],
   	    AC_HELP_STRING([--with-cxx=CXX],
                              [C++ compiler to use]),
   	    [CXX="$withval"],
   	    [])
-  
+
   # --------------------------------------------------------------
   # Determines a C++ compiler to use.  First checks if the variable CXX is
   # already set.  If not, then searches under g++, c++, and other names.
   # --------------------------------------------------------------
   AC_PROG_CXX([$CXX_TRY_LIST])
   # --------------------------------------------------------------
-  
-  
-  
+
+
+
   # --------------------------------------------------------------
   # See aclocal.m4 for the definition of this function.  It can
   # figure out which version of a particular compiler, e.g. GCC 4.0,
   # you are using.
   # --------------------------------------------------------------
   DETERMINE_CXX_BRAND
-  
-  
-  
+
+
+
   # --------------------------------------------------------------
   # look for a decent C compiler or honor --with-cc=...
   CC_TRY_LIST="gcc icc pgcc cc"
@@ -61,25 +61,25 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
                              [C compiler to use]),
   	    [CC="$withval"],
   	    [])
-  
+
   # --------------------------------------------------------------
   # Determine a C compiler to use.  If CC is not already set, checks for
   # gcc, cc, and other C compilers.  Then sets the CC variable to the result.
   # --------------------------------------------------------------
   AC_PROG_CC([$CC_TRY_LIST])
   # --------------------------------------------------------------
-  
-  
+
+
   # --------------------------------------------------------------
   # libMesh itself is not written in any Fortran and does not need
-  # a Fortran compiler.  Many optional packages however are and 
+  # a Fortran compiler.  Many optional packages however are and
   # we need the compiler to figure out how to link those libraries
-  # 
+  #
   # note though than on OSX for example the XCode tools provide
-  # a 'mpif77' which will be detected below but is actually an 
+  # a 'mpif77' which will be detected below but is actually an
   # emtpy shell script wrapper.  Then the compiler will fail to
   # make executables and we will wind up with static libraries
-  # due to a bizarre chain of events.  So, add support for 
+  # due to a bizarre chain of events.  So, add support for
   # --disable-fortran
   # --------------------------------------------------------------
   AC_ARG_ENABLE(fortran,
@@ -92,9 +92,9 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
 		 esac],
 		 [enablefortran=yes])
 
-  
+
   if (test "x$enablefortran" = xyes); then
-  
+
     # look for a decent F90+ compiler or honor --with-fc=...
     FC_TRY_LIST="gfortran ifort pgf90 xlf95"
     if  (test "$enablempi" != no) ; then
@@ -105,15 +105,15 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
                                [Fortran compiler to use]),
     	    [FC="$withval"],
     	    [])
-    
+
     # --------------------------------------------------------------
     # Determine a F90+ compiler to use.
     # --------------------------------------------------------------
     AC_PROG_FC([$FC_TRY_LIST])
     # --------------------------------------------------------------
-    
-    
-    
+
+
+
     # --------------------------------------------------------------
     # look for a decent F77 compiler or honor --with-77=...
     F77_TRY_LIST="gfortran g77 ifort f77 xlf frt pgf77 fort77 fl32 af77 f90 xlf90 pgf90 epcf90 f95 fort xlf95 ifc efc pgf95 lf95"
@@ -125,19 +125,19 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
                                [Fortran compiler to use]),
     	    [F77="$withval"],
     	    [])
-    
+
     # --------------------------------------------------------------
     # Determine a F77 compiler to use.
     # --------------------------------------------------------------
     AC_PROG_F77([$F77_TRY_LIST])
     # --------------------------------------------------------------
-  else 
+  else
       # when --disable-fortran is specified, explicitly set these
       # to "no" to instruct libtool not to bother with them.
       AC_MSG_RESULT(>>> Disabling Fortran language support per user request <<<)
       FC=no
       F77=no
-  fi # end enablefortran   
+  fi # end enablefortran
 ])
 
 
@@ -162,8 +162,8 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
   if test "x$is_intel_icc" != "x" ; then
     REAL_GXX=""
-  fi	
-  
+  fi
+
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     # find out the right version
     GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
@@ -271,7 +271,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
     esac
   else
     # Check other (non-gcc) compilers
-  
+
     # Check for IBM xlC. For some reasons, depending on some environment
     # variables, moon position, and other reasons unknown to me, the
     # compiler displays different names in the first line of output, so
@@ -284,7 +284,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
       AC_MSG_RESULT(<<< C++ compiler is IBM xlC >>>)
       GXX_VERSION=ibm_xlc
     else
-  
+
       # Check whether we are dealing with the MIPSpro C++ compiler
       is_mips_pro="`($CXX -version 2>&1) | grep MIPSpro`"
       if test "x$is_mips_pro" != "x" ; then
@@ -332,7 +332,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
               AC_MSG_RESULT(<<< C++ compiler is Intel Itanium ICC 7.0 >>>)
   	      GXX_VERSION=intel_itanium_icc_v7.0
               ;;
-          esac  
+          esac
         else
 
           # Intel's ICC C++ compiler?
@@ -390,42 +390,42 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
                 ;;
             esac
           else
-  	
+
             # Or Compaq's cxx compiler?
             is_dec_cxx="`($CXX -V 2>&1) | grep 'Compaq C++'`"
             if test "x$is_dec_cxx" != "x" ; then
               AC_MSG_RESULT(<<< C++ compiler is Compaq cxx >>>)
               GXX_VERSION=compaq_cxx
             else
-  	
+
   	      # Sun Studio?
               is_sun_cc="`($CXX -V 2>&1) | grep 'Sun C++'`"
               if test "x$is_sun_cc" != "x" ; then
                 AC_MSG_RESULT(<<< C++ compiler is Sun Studio compiler >>>)
                 GXX_VERSION=sun_studio
               else
-  	
+
   	        # Sun Forte?
                 is_sun_forte_cc="`($CXX -V 2>&1) | grep 'Forte'`"
                 if test "x$is_sun_forte_cc" != "x" ; then
                   AC_MSG_RESULT(<<< C++ compiler is Sun Forte compiler >>>)
                   GXX_VERSION=sun_forte
                 else
-  	
+
   	          # Cray C++?
   	          is_cray_cc="`($CXX -V 2>&1) | grep 'Cray '`"
   	          if test "x$is_cray_cc" != "x" ; then
   	            AC_MSG_RESULT(<<< C++ compiler is Cray C++ >>>)
   	            GXX_VERSION=cray_cc
   	          else
-  	
+
   	            # Portland Group C++?
   	            is_pgcc="`($CXX -V 2>&1) | grep 'Portland Group'`"
   	            if test "x$is_pgcc" != "x" ; then
   	              AC_MSG_RESULT(<<< C++ compiler is Portland Group C++ >>>)
   	              GXX_VERSION=portland_group
   	            else
-	
+
                       # HP-UX 11.11 aCC?
                       is_hpux_acc="`($CXX -V 2>&1) | grep 'aCC: HP ANSI C++'`"
   	              if test "x$is_hpux_acc" != "x" ; then
@@ -434,7 +434,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
   	              else
 
 		        # Clang LLVM C++?
-			is_clang="`($CXX --version 2>&1) | grep 'clang'`" 
+			is_clang="`($CXX --version 2>&1) | grep 'clang'`"
   	                if test "x$is_clang" != "x" ; then
                           AC_MSG_RESULT(<<< C++ compiler is LLVM Clang C++ >>>)
 	                  GXX_VERSION=clang
@@ -467,7 +467,7 @@ AC_DEFUN([DETERMINE_CXX_BRAND],
 
 
 # -------------------------------------------------------------
-# Set C++ compiler flags to their default values. They will be 
+# Set C++ compiler flags to their default values. They will be
 # modified according to other options in later steps of
 # configuration
 #
@@ -491,7 +491,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   CPPFLAGS_OPT="-DNDEBUG"
   CPPFLAGS_DBG="-DDEBUG"
   CPPFLAGS_DEVEL=""
-  
+
   # Flag to add directories to the dynamic library search path; can
   # be changed at a later stage
   RPATHFLAG="-Wl,-rpath,"
@@ -507,8 +507,8 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   # interferes with OProfile callgraphs
   OPROFILE_FLAGS="-g -fno-omit-frame-pointer"
 
-  
-  
+
+
   # in the case blocks below we may add GLIBCXX-specific pedantic debugging preprocessor
   # definitions. however, allow the knowing user to preclude that if they need to.
   AC_ARG_ENABLE(glibcxx-debugging,
@@ -525,10 +525,10 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
   if (test `uname` = "Darwin"); then
     AC_MSG_RESULT(<< Disabling GLIBCXX debugging on Darwin >>>)
     enableglibcxxdebugging=no
-  fi   
+  fi
   AM_CONDITIONAL(LIBMESH_ENABLE_GLIBCXX_DEBUGGING, test x$enableglibcxxdebugging = xyes)
 
-	
+
   # First the flags for gcc compilers
   if (test "$GXX" = yes -a "x$REAL_GXX" != "x" ) ; then
     CXXFLAGS_OPT="$CXXFLAGS_OPT -O2 -felide-constructors"
@@ -546,12 +546,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
     # - egcs1.1 yielded incorrect code with some loop unrolling
     # - after egcs1.1, the optimization flag -fstrict-aliasing was
     #   introduced, which enables better optimizations for
-    #   well-written C++ code. (Your code *is* well-written, right?) 
-  
+    #   well-written C++ code. (Your code *is* well-written, right?)
+
     case "$GXX_VERSION" in
       egcs1.1)
           ;;
-  
+
       # All other gcc versions
       *)
           CXXFLAGS_OPT="$CXXFLAGS_OPT -funroll-loops -fstrict-aliasing"
@@ -561,8 +561,8 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           CFLAGS_DEVEL="$CFLAGS_DEVEL -funroll-loops -fstrict-aliasing"
           ;;
     esac
-  
-    
+
+
     case "$GXX_VERSION" in
       # - after gcc2.95, some flags were deemed obsolete for C++
       #   (and are only supported for C any more), so only define them for
@@ -573,14 +573,14 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
          ;;
 
       # - define additional debug flags for newer versions of gcc which support them.
-      # 
+      #
       # Note:  do not use -Wold-style-cast...  creates a lot of unavoidable warnings
       #        when dealing with C APIs that take void* pointers.
       gcc4.4 | gcc4.5 | gcc4.6)
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -std=c++0x -Wdisabled-optimization"
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -std=c++0x -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -std=c++0x -Woverloaded-virtual"
-	 
+
          if (test "x$enableglibcxxdebugging" = "xyes"); then
            CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
          fi
@@ -590,9 +590,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
 	 CXXFLAGS_OPT="$CXXFLAGS_OPT -Wdisabled-optimization"
          CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -Woverloaded-virtual -Wdisabled-optimization"
 	 CXXFLAGS_DBG="$CXXFLAGS_DBG -Woverloaded-virtual"
-         
+
          if (test "x$enableglibcxxdebugging" = "xyes"); then
-	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"	
+	   CPPFLAGS_DBG="$CPPFLAGS_DBG -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"
 	 fi
   	 ;;
       *)
@@ -609,15 +609,15 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           RPATHFLAG="-Wl,-R,"
           LIBS="-lrpcsvc $LIBS"
           ;;
-  
+
       *)
           ;;
     esac
-  
-  
+
+
   else
     # Non-gcc compilers
-  
+
     case "$GXX_VERSION" in
       ibm_xlc)
           CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
@@ -628,7 +628,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           CFLAGS_DBG="-qansialias -g"
           CFLAGS_DEVEL="$CFLAGS_DBG"
           ;;
-  
+
       MIPSpro)
           CXXFLAGS_OPT="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -O2 -w"
           CXXFLAGS_DBG="-LANG:std -LANG:libc_in_namespace_std -no_auto_include -ansi -g -woff 1460"
@@ -714,9 +714,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               CFLAGS_OPT="$CFLAGS_OPT -O3 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
-	      
-          # Intel ICC >= 10.0	          
-          intel_icc_v10.0)		
+
+          # Intel ICC >= 10.0
+          intel_icc_v10.0)
               # Disable some warning messages:
               # #266: 'function declared implicitly'
               #       Metis function "GKfree" caused this error
@@ -741,9 +741,9 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               CFLAGS_OPT="$CFLAGS_OPT -O2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
-          
-          # Intel ICC >= 8.1	
-          intel_icc_v8.1 | intel_icc_v9.0 | intel_icc_v9.1 | intel_icc_v10.0)	
+
+          # Intel ICC >= 8.1
+          intel_icc_v8.1 | intel_icc_v9.0 | intel_icc_v9.1 | intel_icc_v10.0)
               # Disable some warning messages:
               # #266: 'function declared implicitly'
               #       Metis function "GKfree" caused this error
@@ -767,7 +767,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               CFLAGS_OPT="$CFLAGS_OPT -O2 -Ob2 $INTEL_AX_FLAG -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
-          
+
           # Intel ICC < v8.1
           intel_icc*)
               # Disable some warning messages:
@@ -781,7 +781,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               CFLAGS_OPT="-O2 -Ob2 -tpp6 -axiMK -unroll -w0 -vec_report0 -par_report0 -openmp_report0"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
-          
+
           # Intel Itanium ICC >= v10.1
           intel_itanium_icc_v10.1)
               # Disable some warning messages:
@@ -802,7 +802,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               CFLAGS_OPT="$CFLAGS_OPT -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
-          
+
           intel_itanium_icc_v8.1 | intel_itanium_icc_v9.0 | intel_itanium_icc_v9.1 | intel_itanium_icc_v10.0)
               # Disable some warning messages:
               # #266: 'function declared implicitly'
@@ -822,7 +822,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               CFLAGS_OPT="$CFLAGS_OPT -O2 -unroll -w0 -ftz -par_report0 -openmp_report0"
               CFLAGS_DEVEL="$CFLAGS_DBG"
               ;;
-          
+
           # Intel Itanium ICC < v8.1
           intel_itanium_icc*)
               # Disable some warning messages:
@@ -842,7 +842,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
               ;;
         esac
       ;;
-  
+
       compaq_cxx)
           # Disable some warning messages:
           # #175: `subscript out of range' (detected when instantiating a
@@ -878,14 +878,14 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           # instantiations of template with the `weak' link flag) since
           # otherwise not all templates are instantiated (also some from the
           # standards library are missing).
-  
+
           CXXFLAGS_DBG="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w1 -msg_display_number -timplicit_local"
           CXXFLAGS_OPT="-nousing_std -nocurrent_include -model ansi -std strict_ansi -w2 -msg_display_number -timplicit_local -O2 -fast"
 	  CXXFLAGS_DEVEL="$CXXFLAGS_DBG"
           CFLAGS_DBG="-w1 -msg_display_number -timplicit_local"
           CFLAGS_OPT="-w2 -msg_display_number -timplicit_local -O2 -fast"
   	  CFLAGS_DEVEL="$CFLAGS_DBG"
-        
+
           NODEPRECATEDFLAG=""
 
           for i in 175 236 237 487 1136 1156 111 1182 265 ; do
@@ -893,12 +893,12 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
             CXXFLAGS_OPT="$CXXFLAGS_OPT -msg_disable $i"
             CXXFLAGS_DEVEL="$CXXFLAGS_DEVEL -msg_disable $i"
           done
-  
+
           # For some reason, cxx also forgets to add the math lib to the
           # linker line, so we do that ourselves
           LDFLAGS="$LDFLAGS -lm"
           ;;
-  
+
       sun_studio | sun_forte)
           CXXFLAGS_DBG="-library=stlport4 -g"
           CXXFLAGS_OPT="-library=stlport4 -fast -xO4"
@@ -907,11 +907,11 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           CFLAGS_DBG="-g"
           CFLAGS_OPT="-xO4"
           CFLAGS_DEVEL="$CFLAGS_DBG"
-	  
+
           # librpcsvc for XDR
           LIBS="-lrpcsvc $LIBS"
           ;;
-  
+
       portland_group)
 	  CXXFLAGS_DBG="-g --no_using_std"
           CXXFLAGS_OPT="-O2 --no_using_std -fast -Minform=severe"
@@ -941,7 +941,7 @@ AC_DEFUN([LIBMESH_SET_CXX_FLAGS],
           #  However, currently only static lib seems to work.
           # for aCC:
           #  -Aa turns on  newly supported ANSI C++ Standard features
-          #  -AA turns on full new ANSI C++ (this includes -Aa) 
+          #  -AA turns on full new ANSI C++ (this includes -Aa)
           # for cc:
           #  -Aa compiles under true ANSI mode
           #  -Ae turns on ANSI C with some HP extensions

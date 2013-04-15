@@ -1,7 +1,7 @@
 dnl -------------------------------------------------------------
 dnl LASPACK Iterative Solvers
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_LASPACK], 
+AC_DEFUN([CONFIGURE_LASPACK],
 [
   AC_ARG_ENABLE(laspack,
                 AC_HELP_STRING([--enable-laspack],
@@ -29,11 +29,11 @@ AC_DEFUN([CONFIGURE_LASPACK],
   fi
 
   AC_SUBST(LASPACK_INCLUDE)
-  AC_SUBST(LASPACK_LIB)	
+  AC_SUBST(LASPACK_LIB)
 ])
 
 
-# AC_DEFUN([CONFIGURE_LASPACK], 
+# AC_DEFUN([CONFIGURE_LASPACK],
 # [
 
 # dnl Initialize variables
@@ -57,7 +57,7 @@ AC_DEFUN([CONFIGURE_LASPACK],
 # fi
 
 # AC_SUBST(LASPACK_INCLUDE)
-# AC_SUBST(LASPACK_LIB)	
+# AC_SUBST(LASPACK_LIB)
 # AC_SUBST(enablelaspack)
 
 # ])

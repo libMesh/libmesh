@@ -47,13 +47,13 @@ AC_ARG_WITH(cppunit-exec-prefix,[  --with-cppunit-exec-prefix=PFX  Exec prefix w
     if test "x${cppunit_major_min}" = "x" ; then
        cppunit_major_min=0
     fi
-    
+
     cppunit_minor_min=`echo $cppunit_version_min | \
            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
     if test "x${cppunit_minor_min}" = "x" ; then
        cppunit_minor_min=0
     fi
-    
+
     cppunit_micro_min=`echo $cppunit_version_min | \
            sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
     if test "x${cppunit_micro_min}" = "x" ; then
@@ -77,7 +77,7 @@ AC_ARG_WITH(cppunit-exec-prefix,[  --with-cppunit-exec-prefix=PFX  Exec prefix w
   fi
 
   if test "x$no_cppunit" = x ; then
-     ifelse([$2], , :, [$2])     
+     ifelse([$2], , :, [$2])
   else
      CPPUNIT_CFLAGS=""
      CPPUNIT_LIBS=""

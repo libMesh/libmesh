@@ -1,7 +1,7 @@
 dnl -------------------------------------------------------------
 dnl Triangle Delaunay triangulation library by J.R. Shewchuk
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_TRIANGLE], 
+AC_DEFUN([CONFIGURE_TRIANGLE],
 [
   AC_ARG_ENABLE(triangle,
                 AC_HELP_STRING([--enable-triangle],
@@ -11,8 +11,8 @@ AC_DEFUN([CONFIGURE_TRIANGLE],
 		   no)  enabletriangle=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-triangle) ;;
 		 esac],
-		 [enabletriangle=$enableoptional])			 
-  
+		 [enabletriangle=$enableoptional])
+
 
 
   dnl The TRIANGLE API is distributed with libmesh, so we don't have to guess
@@ -29,5 +29,5 @@ AC_DEFUN([CONFIGURE_TRIANGLE],
   fi
 
   AC_SUBST(TRIANGLE_INCLUDE)
-  AC_SUBST(TRIANGLE_LIBRARY)	
+  AC_SUBST(TRIANGLE_LIBRARY)
 ])

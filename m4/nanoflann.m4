@@ -1,7 +1,7 @@
 # -------------------------------------------------------------
 # nanoflann - a C++ header-only library for building KD-Trees
 # -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_NANOFLANN], 
+AC_DEFUN([CONFIGURE_NANOFLANN],
 [
   AC_ARG_ENABLE(nanoflann,
                 AC_HELP_STRING([--enable-nanoflann],

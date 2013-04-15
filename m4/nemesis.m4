@@ -1,7 +1,7 @@
 dnl -------------------------------------------------------------
 dnl nemesis
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_NEMESIS], 
+AC_DEFUN([CONFIGURE_NEMESIS],
 [
   AC_ARG_ENABLE(nemesis,
                 AC_HELP_STRING([--enable-nemesis],
@@ -18,7 +18,7 @@ AC_DEFUN([CONFIGURE_NEMESIS],
   # Trump --enable-nemesis with --disable-mpi
   if (test "x$enablempi" = xno); then
     nemesisversion=no
-  fi	
+  fi
 
   case "${nemesisversion}" in
 
@@ -35,7 +35,7 @@ AC_DEFUN([CONFIGURE_NEMESIS],
 	  AC_DEFINE(HAVE_NEMESIS_API, 1, [Flag indicating whether the library will be compiled with Nemesis support])
 	  AC_MSG_RESULT(<<< Configuring library with Nemesis version $nemesisversion support >>>)
 	  ;;
-	  
+
       *)
 	  NEMESIS_INCLUDE=""
 	  enablenemesis=no

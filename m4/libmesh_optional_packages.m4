@@ -5,16 +5,16 @@ AC_DEFUN([LIBMESH_CONFIGURE_OPTIONAL_PACKAGES],
 
 
 # initialize these empty - append below
-# note that 
-# libmesh_optional_INCLUDES and 
+# note that
+# libmesh_optional_INCLUDES and
 # libmesh_optional_LIBS should point to third party packages
 # outside the libMesh source and installation tree, and will
-# be exported to the installation environment.  
+# be exported to the installation environment.
 #
-# By contrast, libmesh_contrib_INCLUDES point inside the 
-# source tree for building contributed packages that do not 
+# By contrast, libmesh_contrib_INCLUDES point inside the
+# source tree for building contributed packages that do not
 # need to be exported as part of the installation environment.
-# 
+#
 # libmesh_subpackage_arguments is a list of configure arguments
 # that will be passed down to any subpackages that we are nesting.
 #
@@ -71,7 +71,7 @@ AC_ARG_ENABLE(nested,
 # Boost -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_BOOST
-AC_CONFIG_FILES([contrib/boost/include/Makefile])		
+AC_CONFIG_FILES([contrib/boost/include/Makefile])
 # --------------------------------------------------------------
 
 
@@ -88,7 +88,7 @@ if (test $enablepetsc != no) ; then
   libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_PETSC, test x$enablepetsc = xyes)		 
+AM_CONDITIONAL(LIBMESH_ENABLE_PETSC, test x$enablepetsc = xyes)
 # -------------------------------------------------------------
 
 
@@ -101,7 +101,7 @@ if (test $enableslepc = yes ) ; then
   libmesh_optional_INCLUDES="$SLEPC_INCLUDE $libmesh_optional_INCLUDES"
   libmesh_optional_LIBS="$SLEPC_LIBS $libmesh_optional_LIBS"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_SLEPC, test x$enableslepc = xyes)  
+AM_CONDITIONAL(LIBMESH_ENABLE_SLEPC, test x$enableslepc = xyes)
 # -------------------------------------------------------------
 
 
@@ -153,7 +153,7 @@ CONFIGURE_LASPACK
 if (test $enablelaspack = yes); then
   libmesh_contrib_INCLUDES="$LASPACK_INCLUDE $libmesh_contrib_INCLUDES"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_LASPACK, test x$enablelaspack = xyes)		 
+AM_CONDITIONAL(LIBMESH_ENABLE_LASPACK, test x$enablelaspack = xyes)
 AC_CONFIG_FILES([contrib/laspack/Makefile])
 # -------------------------------------------------------------
 
@@ -166,7 +166,7 @@ CONFIGURE_SFC
 if (test $enablesfc = yes); then
   libmesh_contrib_INCLUDES="$SFC_INCLUDE $libmesh_contrib_INCLUDES"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_SFC, test x$enablesfc = xyes)		 
+AM_CONDITIONAL(LIBMESH_ENABLE_SFC, test x$enablesfc = xyes)
 AC_CONFIG_FILES([contrib/sfcurves/Makefile])
 # -------------------------------------------------------------
 
@@ -253,7 +253,7 @@ if (test $enabletecplot = yes); then
   libmesh_contrib_INCLUDES="$TECPLOT_INCLUDE $libmesh_contrib_INCLUDES"
   libmesh_installed_LIBS="$libmesh_installed_LIBS -ltecio_vendor"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_TECPLOT, test x$enabletecplot = xyes)		 
+AM_CONDITIONAL(LIBMESH_ENABLE_TECPLOT, test x$enabletecplot = xyes)
 AC_CONFIG_FILES([contrib/tecplot/binary/Makefile])
 # -------------------------------------------------------------
 
@@ -266,7 +266,7 @@ CONFIGURE_METIS
 if (test $enablemetis = yes); then
   libmesh_contrib_INCLUDES="$METIS_INCLUDE $libmesh_contrib_INCLUDES"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_METIS, test x$enablemetis = xyes)		 
+AM_CONDITIONAL(LIBMESH_ENABLE_METIS, test x$enablemetis = xyes)
 AC_CONFIG_FILES([contrib/metis/Makefile])
 # -------------------------------------------------------------
 
@@ -279,7 +279,7 @@ CONFIGURE_PARMETIS
 if (test $enableparmetis = yes); then
   libmesh_contrib_INCLUDES="$PARMETIS_INCLUDE $libmesh_contrib_INCLUDES"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_PARMETIS, test x$enableparmetis = xyes)		 
+AM_CONDITIONAL(LIBMESH_ENABLE_PARMETIS, test x$enableparmetis = xyes)
 AC_CONFIG_FILES([contrib/parmetis/Makefile])
 # -------------------------------------------------------------
 
@@ -341,7 +341,7 @@ CONFIGURE_GMV
 if (test x$enablegmv = xyes); then
   libmesh_contrib_INCLUDES="$GMV_INCLUDE $libmesh_contrib_INCLUDES"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_GMV, test x$enablegmv = xyes)		 
+AM_CONDITIONAL(LIBMESH_ENABLE_GMV, test x$enablegmv = xyes)
 AC_CONFIG_FILES([contrib/gmv/Makefile])
 # -------------------------------------------------------------
 
@@ -378,9 +378,9 @@ if (test x$enableeigen = xyes); then
   # path, which gets exported during install
   else
     libmesh_optional_INCLUDES="$EIGEN_INCLUDE $libmesh_optional_INCLUDES"
-  fi  
+  fi
 fi
-AC_CONFIG_FILES([contrib/eigen/eigen/Makefile])		
+AC_CONFIG_FILES([contrib/eigen/eigen/Makefile])
 AM_CONDITIONAL(LIBMESH_ENABLE_EIGEN, test x$enableeigen = xyes)
 AM_CONDITIONAL(LIBMESH_INSTALL_INTERNAL_EIGEN, test x$install_internal_eigen = xyes)
 #--------------------------------------------------------------
@@ -434,7 +434,7 @@ AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V4, test x$netcdfversion = x4)
    AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS,      test x$enableexodus  = xyes)
    AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS_V509, test x$exodusversion = xv5.09)
    AM_CONDITIONAL(LIBMESH_ENABLE_EXODUS_V522, test x$exodusversion = xv5.22)
-   
+
       # -------------------------------------------------------------
       # Nemesis -- enabled by default (it is distributed in contrib)
       # (note that Nemesis requires netCDF and exodus)
@@ -451,7 +451,7 @@ AM_CONDITIONAL(LIBMESH_ENABLE_NETCDF_V4, test x$netcdfversion = x4)
 # -------------------------------------------------------------
 
 
-   
+
 # -------------------------------------------------------------
 # libHilbert -- distributed in ./contrib,
 #               enabled by default
@@ -496,7 +496,7 @@ AC_ARG_ENABLE(cppunit,
 if (test "$enablecppunit" = yes) ; then
   AM_PATH_CPPUNIT([1.10.0],[enablecppunit=yes],[enablecppunit=no])
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_CPPUNIT, test x$enablecppunit = xyes)		 
+AM_CONDITIONAL(LIBMESH_ENABLE_CPPUNIT, test x$enablecppunit = xyes)
 # -------------------------------------------------------------
 
 
@@ -508,7 +508,7 @@ CONFIGURE_NANOFLANN
 if (test $enablenanoflann = yes); then
   libmesh_contrib_INCLUDES="$NANOFLANN_INCLUDE $libmesh_contrib_INCLUDES"
 fi
-AM_CONDITIONAL(LIBMESH_ENABLE_NANOFLANN, test x$enablenanoflann = xyes)		 
+AM_CONDITIONAL(LIBMESH_ENABLE_NANOFLANN, test x$enablenanoflann = xyes)
 AC_CONFIG_FILES([contrib/nanoflann/Makefile])
 # -------------------------------------------------------------
 
@@ -529,11 +529,11 @@ if (test -x $PERL); then
   if (test -f $srcdir/contrib/bin/strip_dup_incl_paths.pl); then
      AC_MSG_RESULT(removing duplicate include paths...)
      libmesh_optional_INCLUDES=`$PERL $srcdir/contrib/bin/strip_dup_incl_paths.pl $libmesh_optional_INCLUDES`
-  fi   
+  fi
   if (test -f $srcdir/contrib/bin/strip_dup_libs.pl); then
      AC_MSG_RESULT(removing duplicate libraries...)
      libmesh_optional_LIBS=`$PERL $srcdir/contrib/bin/strip_dup_libs.pl $libmesh_optional_LIBS`
-  fi   
+  fi
 fi
 # substitute values
 AC_SUBST(libmesh_optional_INCLUDES)

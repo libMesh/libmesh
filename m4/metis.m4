@@ -1,7 +1,7 @@
 dnl -------------------------------------------------------------
 dnl Metis
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_METIS], 
+AC_DEFUN([CONFIGURE_METIS],
 [
   AC_ARG_ENABLE(metis,
                 AC_HELP_STRING([--enable-metis],
@@ -38,7 +38,7 @@ AC_DEFUN([CONFIGURE_METIS],
      enablemetis=no
   fi
   AM_CONDITIONAL(BUILD_METIS, test x$build_metis = xyes)
-  
+
   AC_SUBST(METIS_INCLUDE)
-  AC_SUBST(METIS_LIB)	
+  AC_SUBST(METIS_LIB)
 ])

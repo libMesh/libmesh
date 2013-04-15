@@ -1,7 +1,7 @@
 dnl -------------------------------------------------------------
 dnl Parmetis
 dnl -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_PARMETIS], 
+AC_DEFUN([CONFIGURE_PARMETIS],
 [
   AC_ARG_ENABLE(parmetis,
                 AC_HELP_STRING([--enable-parmetis],
@@ -16,7 +16,7 @@ AC_DEFUN([CONFIGURE_PARMETIS],
   dnl Trump --enable-parmetis with --disable-mpi
   if (test "x$enablempi" = xno); then
     enableparmetis=no
-  fi	
+  fi
 
 
   dnl The PARMETIS API is distributed with libmesh, so we don't have to guess
@@ -33,14 +33,14 @@ AC_DEFUN([CONFIGURE_PARMETIS],
   fi
 
   AC_SUBST(PARMETIS_INCLUDE)
-  AC_SUBST(PARMETIS_LIB)	
+  AC_SUBST(PARMETIS_LIB)
 ])
 
 
-# AC_DEFUN([CONFIGURE_PARMETIS], 
+# AC_DEFUN([CONFIGURE_PARMETIS],
 # [
 #   AC_REQUIRE([ACX_MPI])
-	
+
 #   dnl We require a valid MPI installation for Parmetis
 #   if (test "x$MPI_IMPL" != x) ; then
 
@@ -50,7 +50,7 @@ AC_DEFUN([CONFIGURE_PARMETIS],
 #     if (test $enablemetis = yes) ; then
 #       AC_CHECK_HEADER(./contrib/parmetis/Lib/parmetis.h,
 #       	        [
-      		  
+
 #       	          PARMETIS_INCLUDE_PATH=$PWD/contrib/parmetis/Lib
 #                       PARMETIS_INCLUDE=-I$PARMETIS_INCLUDE_PATH
 #                       PARMETIS_LIB="\$(EXTERNAL_LIBDIR)/libparmetis\$(libext)"
@@ -64,7 +64,7 @@ AC_DEFUN([CONFIGURE_PARMETIS],
 #                     [enableparmetis=no])
 #     else
 #       enableparmetis=no
-#     fi  
+#     fi
 #   else
 #     enableparmetis=no
 #   fi

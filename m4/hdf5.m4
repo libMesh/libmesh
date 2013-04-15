@@ -1,7 +1,7 @@
 # -------------------------------------------------------------
 # Hdf5 library
 # -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_HDF5], 
+AC_DEFUN([CONFIGURE_HDF5],
 [
   AC_ARG_ENABLE(hdf5,
                 AC_HELP_STRING([--enable-hdf5],
@@ -11,13 +11,13 @@ AC_DEFUN([CONFIGURE_HDF5],
 		   no)  enablehdf5=no ;;
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-hdf5) ;;
 		 esac],
-		 [enablehdf5=$enableoptional])			 
-  
+		 [enablehdf5=$enableoptional])
+
 
 
   if (test $enablehdf5 = yes); then
     AX_PATH_HDF5(1.8.0,no)
-    if (test "x$HAVE_HDF5" = "x0"); then	    
+    if (test "x$HAVE_HDF5" = "x0"); then
       enablehdf5=no
     else
        AC_MSG_RESULT(<<< Configuring library with HDF5 support >>>)
@@ -68,7 +68,7 @@ HAVE_HDF5=0
 
 AC_ARG_VAR(HDF5_DIR,[root directory of HDF5 installation])
 
-AC_ARG_WITH(hdf5, 
+AC_ARG_WITH(hdf5,
   [AS_HELP_STRING([--with-hdf5[=DIR]],[root directory of HDF5 installation (default = HDF5_DIR)])],
   [with_hdf5=$withval
 if test "${with_hdf5}" != yes; then
@@ -113,7 +113,7 @@ if test "${with_hdf5}" != no ; then
     # Minimum version check
     #----------------------
 
-    min_hdf5_version=ifelse([$1], ,1.8.0, $1)	
+    min_hdf5_version=ifelse([$1], ,1.8.0, $1)
 
     AC_MSG_CHECKING(for hdf5 - version >= $min_hdf5_version)
 
@@ -162,15 +162,15 @@ if test "${with_hdf5}" != no ; then
     	AC_LANG_POP([C])
 
     	if test "$version_succeeded" != "yes";then
-       	   if test "$is_package_required" = yes; then	
+       	   if test "$is_package_required" = yes; then
               AC_MSG_ERROR([
 
    Your HDF5 library version does not meet the minimum versioning
    requirements ($min_hdf5_version).  Please use --with-hdf5 to specify the location
    of an updated installation or consider upgrading the system version.
 
-       	 	 ]) 
-           fi     
+       	 	 ])
+           fi
         fi
 
     # Library availability
@@ -197,7 +197,7 @@ if test "${with_hdf5}" != no ; then
     if test "$succeeded" = no; then
        if test "$is_package_required" = yes; then
           AC_MSG_ERROR([HDF5 not found.  Try either --with-hdf5 or setting HDF5_DIR.])
-       else		             
+       else
 	  AC_MSG_NOTICE([optional HDF5 library not found, or does not meet version requirements])
        fi
 

@@ -48,7 +48,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
                      [
                        LIBS="-llam $LIBS"
                        MPI_LIBS="-llam $MPI_LIBS"
-                     ],	
+                     ],
                      [])
 
 	# Quadricss MPI requires the elan library to be included too
@@ -64,7 +64,7 @@ if (test -e $MPI_LIBS_PATH/libmpi.a || test -e $MPI_LIBS_PATH/libmpi.so) ; then
 	fi
 
 	AC_CHECK_LIB([mpi],
-                     [MPI_Init],                     
+                     [MPI_Init],
                      [
 		       MPI_LIBS="-lmpi $MPI_LIBS"
 	               MPI_LIBS_PATHS="-L$MPI_LIBS_PATH"
@@ -92,7 +92,7 @@ if (test -e $MPI_LIBS_PATH/libmpich.a || test -e $MPI_LIBS_PATH/libmpich.so) ; t
 
           if (test "x$GMHOME" = x) ; then
             GMHOME="/usr"
-          fi 
+          fi
           AC_ARG_WITH([gm],
 	              AC_HELP_STRING([--with-gm=PATH],
                                      [Prefix where GM is installed (GMHOME)]),
@@ -181,7 +181,7 @@ if (test "x$MPI_IMPL" != x) ; then
                 enablempi=no
 	fi
 else
-   
+
 	# no MPI install found, see if the compiler supports it
       	AC_TRY_COMPILE([#include <mpi.h>],
 	  	       [int np; MPI_Comm_size (MPI_COMM_WORLD, &np);],
@@ -190,8 +190,8 @@ else
                          AC_MSG_RESULT( [$CXX Compiler Supports MPI] )
                          AC_DEFINE(HAVE_MPI, 1, [Flag indicating whether or not MPI is available])
                        ],
-                       [AC_MSG_RESULT([$CXX Compiler Does NOT Support MPI...]); enablempi=no] )                     	
-fi 
+                       [AC_MSG_RESULT([$CXX Compiler Does NOT Support MPI...]); enablempi=no] )
+fi
 
 # Save variables...
 AC_SUBST(MPI)

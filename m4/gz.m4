@@ -1,7 +1,7 @@
 # -------------------------------------------------------------
 # Read/Write Compressed Streams with gzstream
 # -------------------------------------------------------------
-AC_DEFUN([CONFIGURE_GZ], 
+AC_DEFUN([CONFIGURE_GZ],
 [
   AC_ARG_ENABLE(gzstreams,
                 AC_HELP_STRING([--enable-gzstreams],
@@ -12,8 +12,8 @@ AC_DEFUN([CONFIGURE_GZ],
  		    *)  AC_MSG_ERROR(bad value ${enableval} for --enable-gz) ;;
 		 esac],
 		 [enablegz=$enableoptional])
-		 
-	  
+
+
 
 if (test $enablegz = yes); then
   # First check for the required system headers and libraries
@@ -30,7 +30,7 @@ if (test "$enablegz" = yes) ; then
   GZSTREAM_INCLUDE="-I\$(top_srcdir)/contrib/gzstream"
   GZSTREAM_LIB="\$(EXTERNAL_LIBDIR)/libgzstream\$(libext) -lz"
   AC_DEFINE(HAVE_GZSTREAM, 1, [Flag indicating whether or not gzstreams are available])
-  AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)     
+  AC_MSG_RESULT(<<< Configuring library with gzstreams support >>>)
 # Otherwise do not enable gzstreams
 else
   GZSTREAM_INCLUDE=""
@@ -38,5 +38,5 @@ else
 fi
 
 AC_SUBST(GZSTREAM_INCLUDE)
-AC_SUBST(GZSTREAM_LIB)	
+AC_SUBST(GZSTREAM_LIB)
 ])

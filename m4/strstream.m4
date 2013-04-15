@@ -16,6 +16,6 @@ using namespace std;
 ])
 if test "$ac_cv_cxx_have_strstream" = yes; then
   AC_DEFINE(HAVE_STRSTREAM,,[define if the compiler has the strstream header])
-  AC_DEFINE(HAVE_STRINGSTREAM,,[define if the compiler has stringstream functionality])  
+  AC_DEFINE(HAVE_STRINGSTREAM,,[define if the compiler has stringstream functionality])
 fi
 ])
