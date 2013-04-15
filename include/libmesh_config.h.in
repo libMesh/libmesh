@@ -95,6 +95,9 @@
 /* Flag indicating if the library should be built with AMR support */
 #undef ENABLE_AMR
 
+/* Flag indicating if the library should use blocked matrix/vector storage */
+#undef ENABLE_BLOCKED_STORAGE
+
 /* Flag indicating if the library should be built with Dirichlet boundary
    constraint support */
 #undef ENABLE_DIRICHLET

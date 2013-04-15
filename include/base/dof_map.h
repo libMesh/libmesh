@@ -377,14 +377,26 @@ public:
    * and that the group has more than one variable.
    */
   bool has_blocked_representation() const
-  { return ((this->n_variable_groups() == 1) && (this->n_variables() > 1)); }
+  {
+#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+    return ((this->n_variable_groups() == 1) && (this->n_variables() > 1));
+#else
+    return false;
+#endif
+  }
 
   /**
    * @returns the block size, if the variables are amenable to block storage.
    * Otherwise 1.
    */
   unsigned int block_size() const
-  { return (this->has_blocked_representation() ? this->n_variables() : 1); }
+  {
+#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+    return (this->has_blocked_representation() ? this->n_variables() : 1);
+#else
+    return 1;
+#endif
+  }
 
   /**
    * @returns the total number of degrees of freedom in the problem.
