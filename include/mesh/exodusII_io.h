@@ -170,6 +170,12 @@ class ExodusII_IO : public MeshInput<MeshBase>,
    */
   void use_mesh_dimension_instead_of_spatial_dimension(bool val);
 
+  /**
+   * Allows you to set a vector that is added to the coordinates of all
+   * of the nodes.  Effectively, this "moves" the mesh to a particular position
+   */
+  void set_coordinate_offset(Point p);
+
  private:
   /**
    * Only attempt to instantiate an ExodusII helper class
