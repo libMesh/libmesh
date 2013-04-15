@@ -356,7 +356,7 @@ public:
   const FEType& variable_group_type (const unsigned int vg) const;
 
   /**
-   * Returns the number of variables in the global solution vector. Defaults
+   * @returns the number of variables in the global solution vector. Defaults
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
    */
@@ -364,12 +364,27 @@ public:
   { return libmesh_cast_int<unsigned int>(_variable_groups.size()); }
 
   /**
-   * Returns the number of variables in the global solution vector. Defaults
+   * @returns the number of variables in the global solution vector. Defaults
    * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
    * Stokes (u,v,p), etc...
    */
   unsigned int n_variables() const
   { return libmesh_cast_int<unsigned int>(_variables.size()); }
+
+  /**
+   * @returns true if the variables are capable of being stored in a blocked
+   * form.  Presently, this means that there can only be one variable group,
+   * and that the group has more than one variable.
+   */
+  bool has_blocked_representation() const
+  { return ((this->n_variable_groups() == 1) && (this->n_variables() > 1)); }
+
+  /**
+   * @returns the block size, if the variables are amenable to block storage.
+   * Otherwise 1.
+   */
+  unsigned int block_size() const
+  { return (this->has_blocked_representation() ? this->n_variables() : 1); }
 
   /**
    * @returns the total number of degrees of freedom in the problem.
