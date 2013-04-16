@@ -6,9 +6,12 @@ AC_MSG_RESULT(---------------------------------------------)
 AC_MSG_RESULT(------- Configuring compiler features -------)
 AC_MSG_RESULT(---------------------------------------------)
 
-# Test using any user-specified flags
+# Test using the devel mode flags, which should include any
+# user-specified flags
 libmesh_compiler_features_save_CXXFLAGS="$CXXFLAGS"
-CXXFLAGS="$libmesh_CXXFLAGS $CXXFLAGS"
+CXXFLAGS="$CXXFLAGS_DEVEL"
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
 
 # --------------------------------------------------------------
 # Real precision - double by default
@@ -193,6 +196,7 @@ fi
 # -------------------------------------------------------------
 
 # Restore original CXXFLAGS for now
+AC_LANG_RESTORE
 CXXFLAGS="$libmesh_compiler_features_save_CXXFLAGS"
 
 AC_MSG_RESULT(---------------------------------------------)
