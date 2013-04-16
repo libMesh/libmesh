@@ -136,13 +136,16 @@ public:
    * nonzeros per row (defaults to 30).
    * \p noz is the number of on-processor
    * nonzeros per row (defaults to 10).
+   * Optionally supports a block size, which indicates dense coupled blocks
+   * for systems with multiple variables all of the same type.
    */
   virtual void init (const numeric_index_type m,
 		     const numeric_index_type n,
 		     const numeric_index_type m_l,
 		     const numeric_index_type n_l,
 		     const numeric_index_type nnz=30,
-		     const numeric_index_type noz=10) = 0;
+		     const numeric_index_type noz=10,
+		     const numeric_index_type blocksize=1) = 0;
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.

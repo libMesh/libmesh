@@ -122,13 +122,16 @@ public:
    * nonzeros per row (defaults to 30).
    * \p noz is the number of on-processor
    * nonzeros per row (defaults to 30).
+   * Optionally supports a block size, which indicates dense coupled blocks
+   * for systems with multiple variables all of the same type.
    */
   void init (const numeric_index_type m,
 	     const numeric_index_type n,
 	     const numeric_index_type m_l,
 	     const numeric_index_type n_l,
 	     const numeric_index_type nnz=30,
-	     const numeric_index_type noz=10);
+	     const numeric_index_type noz=10,
+	     const numeric_index_type blocksize=1);
 
   /**
    * Initialize a Petsc matrix that is of global
@@ -137,13 +140,16 @@ public:
    * nonzeros per row.
    * \p noz is the number of off-processor
    * nonzeros per row.
+   * Optionally supports a block size, which indicates dense coupled blocks
+   * for systems with multiple variables all of the same type.
    */
   void init (const numeric_index_type m,
 	     const numeric_index_type n,
 	     const numeric_index_type m_l,
 	     const numeric_index_type n_l,
 	     const std::vector<numeric_index_type>& n_nz,
-	     const std::vector<numeric_index_type>& n_oz);
+	     const std::vector<numeric_index_type>& n_oz,
+	     const numeric_index_type blocksize=1);
 
   /**
    * Initialize using sparsity structure computed by \p dof_map.

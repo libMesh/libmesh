@@ -29,6 +29,37 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/petsc_vector.h"
 
+
+namespace
+{
+  using namespace libMesh;
+
+  // historic libMesh n_nz & n_oz arrays are set up for PETSc's AIJ format.
+  // however, when the blocksize is >1, we need to transform these into
+  // their BAIJ counterparts.
+  inline
+  void transform_preallocation_arrays (const PetscInt blocksize,
+				       const std::vector<numeric_index_type> &n_nz,
+				       const std::vector<numeric_index_type> &n_oz,
+				       std::vector<numeric_index_type>       &b_n_nz,
+				       std::vector<numeric_index_type>       &b_n_oz)
+  {
+    libmesh_assert_equal_to (n_nz.size(), n_oz.size());
+    libmesh_assert_equal_to (n_nz.size()%blocksize, 0);
+
+    b_n_nz.clear(); /**/ b_n_nz.reserve(n_nz.size()/blocksize);
+    b_n_oz.clear(); /**/ b_n_oz.reserve(n_oz.size()/blocksize);
+
+    for (unsigned int nn=0; nn<n_nz.size(); nn += blocksize)
+      {
+	b_n_nz.push_back (n_nz[nn]/blocksize);
+	b_n_oz.push_back (n_oz[nn]/blocksize);
+      }
+  }
+}
+
+
+
 namespace libMesh
 {
 
@@ -74,12 +105,9 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 			   const numeric_index_type m_l,
 			   const numeric_index_type n_l,
 			   const numeric_index_type nnz,
-			   const numeric_index_type noz)
+			   const numeric_index_type noz,
+			   const numeric_index_type blocksize_in)
 {
-  // We allow 0x0 matrices now
-  //if ((m_in==0) || (n_in==0))
-  //  return;
-
   // Clear initialized matrices
   if (this->initialized())
     this->clear();
@@ -87,20 +115,53 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   this->_is_initialized = true;
 
 
-  PetscErrorCode ierr     = 0;
-  PetscInt m_global = static_cast<PetscInt>(m_in);
-  PetscInt n_global = static_cast<PetscInt>(n_in);
-  PetscInt m_local  = static_cast<PetscInt>(m_l);
-  PetscInt n_local  = static_cast<PetscInt>(n_l);
-  PetscInt n_nz     = static_cast<PetscInt>(nnz);
-  PetscInt n_oz     = static_cast<PetscInt>(noz);
+  PetscErrorCode ierr = 0;
+  PetscInt m_global   = static_cast<PetscInt>(m_in);
+  PetscInt n_global   = static_cast<PetscInt>(n_in);
+  PetscInt m_local    = static_cast<PetscInt>(m_l);
+  PetscInt n_local    = static_cast<PetscInt>(n_l);
+  PetscInt n_nz       = static_cast<PetscInt>(nnz);
+  PetscInt n_oz       = static_cast<PetscInt>(noz);
+  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
 
   ierr = MatCreate(this->comm().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERRABORT(ierr);
-  ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-  LIBMESH_CHKERRABORT(ierr);
+
+#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+  if (blocksize > 1)
+    {
+      // specified blocksize, bs>1.
+      // double check sizes.
+      libmesh_assert_equal_to (m_local  % blocksize, 0);
+      libmesh_assert_equal_to (n_local  % blocksize, 0);
+      libmesh_assert_equal_to (m_global % blocksize, 0);
+      libmesh_assert_equal_to (n_global % blocksize, 0);
+      libmesh_assert_equal_to (n_nz     % blocksize, 0);
+      libmesh_assert_equal_to (n_oz     % blocksize, 0);
+
+      ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
+      LIBMESH_CHKERRABORT(ierr);
+      ierr = MatSetBlockSize(_mat, blocksize);
+      LIBMESH_CHKERRABORT(ierr);
+      ierr = MatSeqBAIJSetPreallocation(_mat, blocksize, n_nz/blocksize, PETSC_NULL);
+      LIBMESH_CHKERRABORT(ierr);
+      ierr = MatMPIBAIJSetPreallocation(_mat, blocksize,
+					n_nz/blocksize, PETSC_NULL,
+					n_oz/blocksize, PETSC_NULL);
+      LIBMESH_CHKERRABORT(ierr);
+    }
+  else
+#endif
+    {
+      ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
+      LIBMESH_CHKERRABORT(ierr);
+      ierr = MatSeqAIJSetPreallocation(_mat, n_nz, PETSC_NULL);
+      LIBMESH_CHKERRABORT(ierr);
+      ierr = MatMPIAIJSetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
+      LIBMESH_CHKERRABORT(ierr);
+    }
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
 #if PETSC_VERSION_LESS_THAN(3,0,0)
@@ -115,10 +176,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetFromOptions(_mat);
   LIBMESH_CHKERRABORT(ierr);
-  ierr = MatSeqAIJSetPreallocation(_mat, n_nz, PETSC_NULL);
-  LIBMESH_CHKERRABORT(ierr);
-  ierr = MatMPIAIJSetPreallocation(_mat, n_nz, PETSC_NULL, n_oz, PETSC_NULL);
-  LIBMESH_CHKERRABORT(ierr);
 
   this->zero ();
 }
@@ -130,7 +187,8 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 			   const numeric_index_type m_l,
 			   const numeric_index_type n_l,
 			   const std::vector<numeric_index_type>& n_nz,
-			   const std::vector<numeric_index_type>& n_oz)
+			   const std::vector<numeric_index_type>& n_oz,
+			   const numeric_index_type blocksize_in)
 {
   // Clear initialized matrices
   if (this->initialized())
@@ -142,29 +200,67 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   libmesh_assert_equal_to (n_nz.size(), m_l);
   libmesh_assert_equal_to (n_oz.size(), m_l);
 
-  PetscErrorCode ierr     = 0;
-  PetscInt m_global = static_cast<PetscInt>(m_in);
-  PetscInt n_global = static_cast<PetscInt>(n_in);
-  PetscInt m_local  = static_cast<PetscInt>(m_l);
-  PetscInt n_local  = static_cast<PetscInt>(n_l);
+  PetscErrorCode ierr = 0;
+  PetscInt m_global   = static_cast<PetscInt>(m_in);
+  PetscInt n_global   = static_cast<PetscInt>(n_in);
+  PetscInt m_local    = static_cast<PetscInt>(m_l);
+  PetscInt n_local    = static_cast<PetscInt>(n_l);
+  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
 
   ierr = MatCreate(this->comm().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERRABORT(ierr);
-  ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-  LIBMESH_CHKERRABORT(ierr);
+
+#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+  if (blocksize > 1)
+    {
+      // specified blocksize, bs>1.
+      // double check sizes.
+      libmesh_assert_equal_to (m_local  % blocksize, 0);
+      libmesh_assert_equal_to (n_local  % blocksize, 0);
+      libmesh_assert_equal_to (m_global % blocksize, 0);
+      libmesh_assert_equal_to (n_global % blocksize, 0);
+
+       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
+      LIBMESH_CHKERRABORT(ierr);
+      ierr = MatSetBlockSize(_mat, blocksize);
+      LIBMESH_CHKERRABORT(ierr);
+
+      // transform the per-entry n_nz and n_oz arrays into their block counterparts.
+      std::vector<numeric_index_type> b_n_nz, b_n_oz;
+
+      transform_preallocation_arrays (blocksize,
+				      n_nz, n_oz,
+				      b_n_nz, b_n_oz);
+
+      ierr = MatSeqBAIJSetPreallocation(_mat, blocksize, 0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]));
+      LIBMESH_CHKERRABORT(ierr);
+
+      ierr = MatMPIBAIJSetPreallocation(_mat, blocksize,
+					0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]),
+					0, (PetscInt*)(b_n_oz.empty()?NULL:&b_n_oz[0]));
+      LIBMESH_CHKERRABORT(ierr);
+    }
+  else
+#endif
+    {
+      ierr = MatSetType(_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
+      LIBMESH_CHKERRABORT(ierr);
+      ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
+      LIBMESH_CHKERRABORT(ierr);
+      ierr = MatMPIAIJSetPreallocation(_mat,
+				       0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
+				       0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
+      LIBMESH_CHKERRABORT(ierr);
+    }
+
   // Is prefix information available somewhere? Perhaps pass in the system name?
   ierr = MatSetOptionsPrefix(_mat, "");
   LIBMESH_CHKERRABORT(ierr);
   ierr = MatSetFromOptions(_mat);
   LIBMESH_CHKERRABORT(ierr);
 
-  ierr = MatSeqAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]));
-  LIBMESH_CHKERRABORT(ierr);
-  ierr = MatMPIAIJSetPreallocation(_mat, 0, (PetscInt*)(n_nz.empty()?NULL:&n_nz[0]),
-                                         0, (PetscInt*)(n_oz.empty()?NULL:&n_oz[0]));
-  LIBMESH_CHKERRABORT(ierr);
 
   this->zero();
 }
@@ -195,10 +291,6 @@ void PetscMatrix<T>::init ()
   libmesh_assert_equal_to (n_nz.size(), m_l);
   libmesh_assert_equal_to (n_oz.size(), m_l);
 
-  // We allow 0x0 matrices now
-  //if (my_m==0)
-  //  return;
-
   PetscErrorCode ierr = 0;
   PetscInt m_global   = static_cast<PetscInt>(my_m);
   PetscInt n_global   = static_cast<PetscInt>(my_n);
@@ -208,16 +300,10 @@ void PetscMatrix<T>::init ()
 
   ierr = MatCreate(this->comm().get(), &_mat);
   LIBMESH_CHKERRABORT(ierr);
-
   ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
   LIBMESH_CHKERRABORT(ierr);
 
-#ifdef  LIBMESH_ENABLE_BLOCKED_STORAGE
-
-  // BSK - I believe these need to survive the if-scope.
-  std::vector<numeric_index_type>
-    b_n_nz, b_n_oz;
-
+#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
   if (blocksize > 1)
     {
       // specified blocksize, bs>1.
@@ -229,23 +315,17 @@ void PetscMatrix<T>::init ()
 
       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
       LIBMESH_CHKERRABORT(ierr);
-
-      ierr = MatSetBlockSize(_mat,blocksize);
+      ierr = MatSetBlockSize(_mat, blocksize);
       LIBMESH_CHKERRABORT(ierr);
 
       // transform the per-entry n_nz and n_oz arrays into their block counterparts.
-      b_n_nz.reserve(n_nz.size()/blocksize); /**/ b_n_oz.reserve(n_oz.size()/blocksize);
+      std::vector<numeric_index_type> b_n_nz, b_n_oz;
 
-      libmesh_assert_equal_to (n_nz.size(), n_oz.size());
+      transform_preallocation_arrays (blocksize,
+				      n_nz, n_oz,
+				      b_n_nz, b_n_oz);
 
-      for (unsigned int nn=0; nn<n_nz.size(); nn += blocksize)
-	{
-	  b_n_nz.push_back (n_nz[nn]/blocksize);
-	  b_n_oz.push_back (n_oz[nn]/blocksize);
-	}
-
-      ierr = MatSeqBAIJSetPreallocation(_mat, blocksize,
-					0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]));
+      ierr = MatSeqBAIJSetPreallocation(_mat, blocksize, 0, (PetscInt*)(b_n_nz.empty()?NULL:&b_n_nz[0]));
       LIBMESH_CHKERRABORT(ierr);
 
       ierr = MatMPIBAIJSetPreallocation(_mat, blocksize,
