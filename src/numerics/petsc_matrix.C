@@ -222,7 +222,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       libmesh_assert_equal_to (m_global % blocksize, 0);
       libmesh_assert_equal_to (n_global % blocksize, 0);
 
-       ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
+      ierr = MatSetType(_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
       LIBMESH_CHKERRABORT(ierr);
       ierr = MatSetBlockSize(_mat, blocksize);
       LIBMESH_CHKERRABORT(ierr);
@@ -657,6 +657,46 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T>& dm,
 		      (PetscScalar*) &dm.get_values()[0],
 		      ADD_VALUES);
          LIBMESH_CHKERRABORT(ierr);
+}
+
+
+
+
+
+
+template <typename T>
+void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T>& dm,
+				      const std::vector<numeric_index_type>& brows,
+				      const std::vector<numeric_index_type>& bcols)
+{
+  libmesh_assert (this->initialized());
+
+  const numeric_index_type n_rows    = dm.m();
+  const numeric_index_type n_cols    = dm.n();
+  const numeric_index_type n_brows   = brows.size();
+  const numeric_index_type n_bcols   = bcols.size();
+  const numeric_index_type blocksize = n_rows / n_brows;
+
+  libmesh_assert_equal_to (n_cols / n_bcols, blocksize);
+  libmesh_assert_equal_to (blocksize*n_brows, n_rows);
+  libmesh_assert_equal_to (blocksize*n_bcols, n_cols);
+
+  PetscErrorCode ierr=0;
+
+#ifndef NDEBUG
+  PetscInt petsc_blocksize;
+  ierr = MatGetBlockSize(_mat, &petsc_blocksize);
+  LIBMESH_CHKERRABORT(ierr);
+  libmesh_assert_equal_to (blocksize, petsc_blocksize);
+#endif
+
+  // These casts are required for PETSc <= 2.1.5
+  ierr = MatSetValuesBlocked(_mat,
+			     n_brows, (PetscInt*) &brows[0],
+			     n_bcols, (PetscInt*) &bcols[0],
+			     (PetscScalar*) &dm.get_values()[0],
+			     ADD_VALUES);
+  LIBMESH_CHKERRABORT(ierr);
 }
 
 

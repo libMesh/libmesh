@@ -240,11 +240,22 @@ public:
 		   const std::vector<numeric_index_type> &cols);
 
   /**
-   * Same, but assumes the row and column maps are the same.
+   * Same as \p add_matrix, but assumes the row and column maps are the same.
    * Thus the matrix \p dm must be square.
    */
   void add_matrix (const DenseMatrix<T> &dm,
 		   const std::vector<numeric_index_type> &dof_indices);
+
+  /**
+   * Add the full matrix \p dm to the
+   * Sparse matrix.  This is useful
+   * for adding an element matrix
+   * at assembly time.  The matrix is assumed blocked, and \p brow, \p bcol
+   * correspond to the *block* row, columm indices.
+   */
+  virtual void add_block_matrix (const DenseMatrix<T> &dm,
+				 const std::vector<numeric_index_type> &brows,
+				 const std::vector<numeric_index_type> &bcols);
 
   /**
    * Add a Sparse matrix \p X, scaled with \p a, to \p this,
