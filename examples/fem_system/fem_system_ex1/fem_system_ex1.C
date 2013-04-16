@@ -60,14 +60,10 @@ int main (int argc, char** argv)
   libmesh_example_assert(false, "--enable-amr");
 #else
 
-  // Trilinos solver NaNs by default on the zero pressure block.
+  // Trilinos and Eigen solvers NaN by default here.
   // We'll skip this example for now.
-  if (libMesh::default_solver_package() == TRILINOS_SOLVERS)
-    {
-      std::cout << "We skip fem_system_ex1 when using the Trilinos solvers.\n"
-                << std::endl;
-      return 0;
-    }
+  libmesh_example_assert(libMesh::default_solver_package() != EIGEN_SOLVERS, "--enable-petsc");
+  libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
 
   // Parse the input file
   GetPot infile("fem_system_ex1.in");

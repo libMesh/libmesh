@@ -143,6 +143,9 @@ int main(int argc, char** argv)
   libmesh_example_assert(false, "--enable-vtk");
 #endif
 
+  // Trilinos gives us an inverted element on this one...
+  libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
+
   // Initialize libMesh and any dependent libraries
   LibMeshInit init(argc, argv);
 
