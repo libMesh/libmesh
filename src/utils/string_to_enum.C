@@ -30,6 +30,7 @@
 #include "libmesh/enum_inf_map_type.h"
 #include "libmesh/enum_quadrature_type.h"
 #include "libmesh/enum_preconditioner_type.h"
+#include "libmesh/enum_solver_type.h"
 #include "libmesh/elem.h"
 
 namespace libMesh
@@ -448,6 +449,56 @@ namespace {
   }
 #endif // LIBMESH_ENABLE_AMR
 
+
+  //---------------------------------------------------
+  std::map<std::string, SolverType> solvertype_to_enum;
+
+  // Initialize solvertype_to_enum on first call
+  void init_solvertype_to_enum ()
+  {
+    if (solvertype_to_enum.empty())
+      {
+	solvertype_to_enum["CG"            ]=CG;
+	solvertype_to_enum["CGN"           ]=CGN;
+	solvertype_to_enum["CGS"           ]=CGS;
+	solvertype_to_enum["CR"            ]=CR;
+	solvertype_to_enum["QMR"           ]=QMR;
+	solvertype_to_enum["TCQMR"         ]=TCQMR;
+	solvertype_to_enum["TFQMR"         ]=TFQMR;
+	solvertype_to_enum["BICG"          ]=BICG;
+	solvertype_to_enum["MINRES"        ]=MINRES;
+	solvertype_to_enum["GMRES"         ]=GMRES;
+	solvertype_to_enum["LSQR"          ]=LSQR;
+	solvertype_to_enum["JACOBI"        ]=JACOBI;
+	solvertype_to_enum["SOR_FORWARD"   ]=SOR_FORWARD;
+	solvertype_to_enum["SOR_BACKWARD"  ]=SOR_BACKWARD;
+	solvertype_to_enum["SSOR"          ]=SSOR;
+	solvertype_to_enum["RICHARDSON"    ]=RICHARDSON;
+	solvertype_to_enum["CHEBYSHEV"     ]=CHEBYSHEV;
+	solvertype_to_enum["INVALID_SOLVER"]=INVALID_SOLVER;
+      }
+  }
+
+
+  std::map<SolverType, std::string> enum_to_solvertype;
+
+  // Initialize the enum_to_solvertype on first call
+  void init_enum_to_solvertype ()
+  {
+    // Build reverse map
+    if (enum_to_solvertype.empty())
+      {
+	// Initialize solvertype_to_enum on first call
+	init_solvertype_to_enum();
+
+	build_reverse_map (solvertype_to_enum.begin(),
+			   solvertype_to_enum.end(),
+			   enum_to_solvertype);
+      }
+  }
+
+
+
 } // end anonymous namespace
 
 
@@ -675,6 +726,35 @@ namespace Utility {
   }
 #endif // LIBMESH_ENABLE_AMR
 
+
+  //------------------------------------------------------
+  // SolverType specialization
+  template <>
+  SolverType string_to_enum<SolverType> (const std::string& s)
+  {
+    init_solvertype_to_enum();
+
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+
+    if (!solvertype_to_enum.count(upper))
+      libmesh_error();
+
+    return solvertype_to_enum[upper];
+  }
+
+
+
+  template <>
+  std::string enum_to_string<SolverType> (const SolverType i)
+  {
+    init_enum_to_solvertype();
+
+    if (!enum_to_solvertype.count(i))
+      libmesh_error();
+
+    return enum_to_solvertype[i];
+  }
 
 } // namespace Utility
 
