@@ -26,6 +26,7 @@
 
 // Local Includes
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/string_to_enum.h"
 #include "libmesh/trilinos_aztec_linear_solver.h"
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/trilinos_epetra_vector.h"
@@ -222,7 +223,7 @@ void AztecLinearSolver<T>::set_solver_type()
 
     default:
       libMesh::err << "ERROR:  Unsupported AztecOO Solver: "
-                    << this->_solver_type                 << std::endl
+                    << Utility::enum_to_string(this->_solver_type) << std::endl
                     << "Continuing with AztecOO defaults" << std::endl;
   }
 }
