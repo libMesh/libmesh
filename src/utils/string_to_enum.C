@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_eigen_solver_type.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/enum_fe_family.h"
 #include "libmesh/enum_inf_map_type.h"
