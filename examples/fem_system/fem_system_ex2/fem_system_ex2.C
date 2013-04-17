@@ -138,6 +138,9 @@ void run_timestepping(EquationSystems& systems, GetPot& args)
 
 int main(int argc, char** argv)
 {
+  // Initialize libMesh and any dependent libraries
+  LibMeshInit init(argc, argv);
+
   // Skip this example if we do not meet certain requirements
 #ifndef LIBMESH_HAVE_VTK
   libmesh_example_assert(false, "--enable-vtk");
@@ -145,9 +148,6 @@ int main(int argc, char** argv)
 
   // Trilinos gives us an inverted element on this one...
   libmesh_example_assert(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
-
-  // Initialize libMesh and any dependent libraries
-  LibMeshInit init(argc, argv);
 
   // Threaded assembly doesn't currently work with the moving mesh
   // code.
