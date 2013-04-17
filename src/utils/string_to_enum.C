@@ -451,6 +451,43 @@ namespace {
 
 
   //---------------------------------------------------
+  std::map<std::string, EigenSolverType> eigensolvertype_to_enum;
+
+  // Initialize eigensolvertype_to_enum on first call
+  void init_eigensolvertype_to_enum ()
+  {
+    if (eigensolvertype_to_enum.empty())
+      {
+	eigensolvertype_to_enum["POWER"              ]=POWER;
+	eigensolvertype_to_enum["LAPACK"             ]=LAPACK;
+	eigensolvertype_to_enum["SUBSPACE"           ]=SUBSPACE;
+	eigensolvertype_to_enum["ARNOLDI"            ]=ARNOLDI;
+	eigensolvertype_to_enum["LANCZOS"            ]=LANCZOS;
+	eigensolvertype_to_enum["KRYLOVSCHUR"        ]=KRYLOVSCHUR;
+	eigensolvertype_to_enum["INVALID_EIGENSOLVER"]=INVALID_EIGENSOLVER;
+      }
+  }
+
+
+  std::map<EigenSolverType, std::string> enum_to_eigensolvertype;
+
+  // Initialize the enum_to_eigensolvertype on first call
+  void init_enum_to_eigensolvertype ()
+  {
+    // Build reverse map
+    if (enum_to_eigensolvertype.empty())
+      {
+	// Initialize eigensolvertype_to_enum on first call
+	init_eigensolvertype_to_enum();
+
+	build_reverse_map (eigensolvertype_to_enum.begin(),
+			   eigensolvertype_to_enum.end(),
+			   enum_to_eigensolvertype);
+      }
+  }
+
+
+  //---------------------------------------------------
   std::map<std::string, SolverType> solvertype_to_enum;
 
   // Initialize solvertype_to_enum on first call
@@ -755,6 +792,19 @@ namespace Utility {
 
     return enum_to_solvertype[i];
   }
+
+
+  template <>
+  std::string enum_to_string<EigenSolverType> (const EigenSolverType i)
+  {
+    init_enum_to_eigensolvertype();
+
+    if (!enum_to_eigensolvertype.count(i))
+      libmesh_error();
+
+    return enum_to_eigensolvertype[i];
+  }
+
 
 } // namespace Utility
 
