@@ -794,6 +794,25 @@ namespace Utility {
   }
 
 
+
+  //------------------------------------------------------
+  // EigenSolverType specialization
+  template <>
+  EigenSolverType string_to_enum<EigenSolverType> (const std::string& s)
+  {
+    init_eigensolvertype_to_enum();
+
+    std::string upper(s);
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+
+    if (!eigensolvertype_to_enum.count(upper))
+      libmesh_error();
+
+    return eigensolvertype_to_enum[upper];
+  }
+
+
+
   template <>
   std::string enum_to_string<EigenSolverType> (const EigenSolverType i)
   {
