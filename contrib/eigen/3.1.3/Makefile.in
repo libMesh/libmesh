@@ -691,7 +691,73 @@ nobase_include_HEADERS = \
 	Eigen/StdVector \
 	Eigen/SuperLUSupport \
 	Eigen/SVD \
-	Eigen/UmfPackSupport
+	Eigen/UmfPackSupport \
+	unsupported/Eigen/AdolcForward \
+	unsupported/Eigen/AlignedVector3 \
+	unsupported/Eigen/AutoDiff \
+	unsupported/Eigen/BVH \
+	unsupported/Eigen/FFT \
+	unsupported/Eigen/IterativeSolvers \
+	unsupported/Eigen/KroneckerProduct \
+	unsupported/Eigen/MatrixFunctions \
+	unsupported/Eigen/MoreVectorization \
+	unsupported/Eigen/MPRealSupport \
+	unsupported/Eigen/NonLinearOptimization \
+	unsupported/Eigen/NumericalDiff \
+	unsupported/Eigen/OpenGLSupport \
+	unsupported/Eigen/Polynomials \
+	unsupported/Eigen/Skyline \
+	unsupported/Eigen/SparseExtra \
+	unsupported/Eigen/Splines \
+	unsupported/Eigen/src/AutoDiff/AutoDiffJacobian.h \
+	unsupported/Eigen/src/AutoDiff/AutoDiffScalar.h \
+	unsupported/Eigen/src/AutoDiff/AutoDiffVector.h \
+	unsupported/Eigen/src/BVH/BVAlgorithms.h \
+	unsupported/Eigen/src/BVH/KdBVH.h \
+	unsupported/Eigen/src/FFT/ei_fftw_impl.h \
+	unsupported/Eigen/src/FFT/ei_kissfft_impl.h \
+	unsupported/Eigen/src/IterativeSolvers/ConstrainedConjGrad.h \
+	unsupported/Eigen/src/IterativeSolvers/GMRES.h \
+	unsupported/Eigen/src/IterativeSolvers/IncompleteLU.h \
+	unsupported/Eigen/src/IterativeSolvers/IterationController.h \
+	unsupported/Eigen/src/IterativeSolvers/Scaling.h \
+	unsupported/Eigen/src/KroneckerProduct/KroneckerTensorProduct.h \
+	unsupported/Eigen/src/MatrixFunctions/MatrixExponential.h \
+	unsupported/Eigen/src/MatrixFunctions/MatrixFunction.h \
+	unsupported/Eigen/src/MatrixFunctions/MatrixFunctionAtomic.h \
+	unsupported/Eigen/src/MatrixFunctions/MatrixLogarithm.h \
+	unsupported/Eigen/src/MatrixFunctions/MatrixSquareRoot.h \
+	unsupported/Eigen/src/MatrixFunctions/StemFunction.h \
+	unsupported/Eigen/src/MoreVectorization/MathFunctions.h \
+	unsupported/Eigen/src/NonLinearOptimization/chkder.h \
+	unsupported/Eigen/src/NonLinearOptimization/covar.h \
+	unsupported/Eigen/src/NonLinearOptimization/dogleg.h \
+	unsupported/Eigen/src/NonLinearOptimization/fdjac1.h \
+	unsupported/Eigen/src/NonLinearOptimization/HybridNonLinearSolver.h \
+	unsupported/Eigen/src/NonLinearOptimization/LevenbergMarquardt.h \
+	unsupported/Eigen/src/NonLinearOptimization/lmpar.h \
+	unsupported/Eigen/src/NonLinearOptimization/qrsolv.h \
+	unsupported/Eigen/src/NonLinearOptimization/r1mpyq.h \
+	unsupported/Eigen/src/NonLinearOptimization/r1updt.h \
+	unsupported/Eigen/src/NonLinearOptimization/rwupdt.h \
+	unsupported/Eigen/src/NumericalDiff/NumericalDiff.h \
+	unsupported/Eigen/src/Polynomials/Companion.h \
+	unsupported/Eigen/src/Polynomials/PolynomialSolver.h \
+	unsupported/Eigen/src/Polynomials/PolynomialUtils.h \
+	unsupported/Eigen/src/Skyline/SkylineInplaceLU.h \
+	unsupported/Eigen/src/Skyline/SkylineMatrix.h \
+	unsupported/Eigen/src/Skyline/SkylineMatrixBase.h \
+	unsupported/Eigen/src/Skyline/SkylineProduct.h \
+	unsupported/Eigen/src/Skyline/SkylineStorage.h \
+	unsupported/Eigen/src/Skyline/SkylineUtil.h \
+	unsupported/Eigen/src/SparseExtra/BlockOfDynamicSparseMatrix.h \
+	unsupported/Eigen/src/SparseExtra/DynamicSparseMatrix.h \
+	unsupported/Eigen/src/SparseExtra/MarketIO.h \
+	unsupported/Eigen/src/SparseExtra/MatrixMarketIterator.h \
+	unsupported/Eigen/src/SparseExtra/RandomSetter.h \
+	unsupported/Eigen/src/Splines/Spline.h \
+	unsupported/Eigen/src/Splines/SplineFitting.h \
+	unsupported/Eigen/src/Splines/SplineFwd.h
 
 EXTRA_DIST = \
         COPYING.BSD \
