@@ -329,16 +329,16 @@ namespace libMesh
 
 	  this->interpolate (tgt, ret_index, ret_dist_sqr, out_it);
 
-	  // std::cout << "knnSearch(): num_results=" << num_results << "\n";
+	  // libMesh::out << "knnSearch(): num_results=" << num_results << "\n";
 	  // for (size_t i=0;i<num_results;i++)
-	  //   std::cout << "idx[" << i << "]="
+	  //   libMesh::out << "idx[" << i << "]="
 	  // 	      << std::setw(6) << ret_index[i]
 	  // 	      << "\t dist["<< i << "]=" << ret_dist_sqr[i]
 	  // 	      << "\t val[" << std::setw(6) << ret_index[i] << "]=" << _src_vals[ret_index[i]]
 	  // 	      << std::endl;
-	  // std::cout << "\n";
+	  // libMesh::out << "\n";
 
-	  // std::cout << "ival=" << _vals[0] << '\n';
+	  // libMesh::out << "ival=" << _vals[0] << '\n';
 	}
     }
 #else

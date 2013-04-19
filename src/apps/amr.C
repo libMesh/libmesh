@@ -48,7 +48,7 @@ int main (int argc, char** argv)
   LibMeshInit init(argc, argv);
 
   if (argc < 4)
-    std::cout << "Usage: ./prog -d DIM filename" << std::endl;
+    libMesh::out << "Usage: ./prog -d DIM filename" << std::endl;
 
   // Variables to get us started
   const unsigned int dim = atoi(argv[2]);
@@ -259,8 +259,8 @@ void assemble(EquationSystems& es,
       system.matrix->add_matrix(Kvv, dof_indices_V);
     }
 
-  std::cout << "Vol="  << vol << std::endl;
+  libMesh::out << "Vol="  << vol << std::endl;
 
   if (dim == 3)
-    std::cout << "Area=" << area << std::endl;
+    libMesh::out << "Area=" << area << std::endl;
 }

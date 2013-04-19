@@ -82,12 +82,12 @@ namespace libMesh
     // Bounds checking...
     if (i >= static_cast<unsigned>(tetgen_output->numberofpoints))
       {
-	std::cerr << "Error, requested point "
-		  << i
-		  << ", but there are only "
-		  << tetgen_output->numberofpoints
-		  << " points available."
-		  << std::endl;
+	libMesh::err << "Error, requested point "
+		     << i
+		     << ", but there are only "
+		     << tetgen_output->numberofpoints
+		     << " points available."
+		     << std::endl;
 	libmesh_error();
       }
 

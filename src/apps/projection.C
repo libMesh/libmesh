@@ -40,7 +40,7 @@ using namespace libMesh;
 // If there's a missing input argument, then print a help message
 void usage_error(const char *progname)
 {
-  std::cout << "Options: " << progname << '\n'
+  libMesh::out << "Options: " << progname << '\n'
   << " --dim d               mesh dimension           [default: autodetect]\n"
   << " --inmesh filename     input mesh file\n"
   << " --insoln filename     input solution file\n"
@@ -60,7 +60,7 @@ T assert_argument (GetPot &cl,
 {
   if(!cl.search(argname))
     {
-      std::cerr << ("No " + argname + " argument found!") << std::endl;
+      libMesh::err << ("No " + argname + " argument found!") << std::endl;
       usage_error(progname);
     }
   return cl.next(defaultarg);
@@ -148,7 +148,7 @@ int main(int argc, char** argv)
     read_mode = READ;
   else
     {
-      std::cerr << "Unrecognized file extension on " << solnname << std::endl;
+      libMesh::err << "Unrecognized file extension on " << solnname << std::endl;
       libmesh_error();
     }
 
@@ -174,7 +174,7 @@ int main(int argc, char** argv)
       System &old_sys = old_es.get_system(i);
       current_sys_name = old_sys.name();
 
-      std::cout << "Projecting system " << current_sys_name << std::endl;
+      libMesh::out << "Projecting system " << current_sys_name << std::endl;
 
       libmesh_assert (new_es.has_system(current_sys_name));
 
@@ -193,7 +193,7 @@ int main(int argc, char** argv)
       // variable's value
       for (unsigned int j = 0; j != n_vars; ++j)
         {
-          std::cout << " with variable " << old_sys.variable_name(j) << std::endl;
+          libMesh::out << " with variable " << old_sys.variable_name(j) << std::endl;
 
           MeshFunction *mesh_func =
             new MeshFunction(old_es, *comparison_soln,
@@ -216,7 +216,7 @@ int main(int argc, char** argv)
   new_es.write(outsolnname.c_str(),
                EquationSystems::WRITE_DATA |
                EquationSystems::WRITE_ADDITIONAL_DATA);
-  std::cout << "Wrote solution " << outsolnname << std::endl;
+  libMesh::out << "Wrote solution " << outsolnname << std::endl;
 
   return 0;
 }

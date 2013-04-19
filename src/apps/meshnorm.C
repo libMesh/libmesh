@@ -12,21 +12,21 @@ void output_norms(const System &sys, const NumericVector<Number>&vec, const std:
 {
   for (unsigned int k = 0; k != sys.n_vars(); ++k)
     {
-      std::cout << "Norms in system " << sys.name() <<
+      libMesh::out << "Norms in system " << sys.name() <<
                    ", vector " << vecname <<
                    ", variable " << sys.variable_name(k) << ":" << std::endl;
       Real l1_vecnorm = sys.calculate_norm(vec, k, DISCRETE_L1);
-      std::cout << "l1     norm: " << l1_vecnorm << std::endl;
+      libMesh::out << "l1     norm: " << l1_vecnorm << std::endl;
       if (l1_vecnorm)
         {
-          std::cout << "l2     norm: " << sys.calculate_norm(vec, k, DISCRETE_L2) << std::endl;
-          std::cout << "linf   norm: " << sys.calculate_norm(vec, k, DISCRETE_L_INF) << std::endl;
-          std::cout << "H1     norm: " << sys.calculate_norm(vec, k, H1) << std::endl;
-          std::cout << "L1     norm: " << sys.calculate_norm(vec, k, L1) << std::endl;
-          std::cout << "L2     norm: " << sys.calculate_norm(vec, k, L2) << std::endl;
-          std::cout << "Linf   norm: " << sys.calculate_norm(vec, k, L_INF) << std::endl;
-          std::cout << "H1 seminorm: " << sys.calculate_norm(vec, k, H1_SEMINORM) << std::endl;
-          std::cout << "H1     norm: " << sys.calculate_norm(vec, k, H1) << std::endl;
+          libMesh::out << "l2     norm: " << sys.calculate_norm(vec, k, DISCRETE_L2) << std::endl;
+          libMesh::out << "linf   norm: " << sys.calculate_norm(vec, k, DISCRETE_L_INF) << std::endl;
+          libMesh::out << "H1     norm: " << sys.calculate_norm(vec, k, H1) << std::endl;
+          libMesh::out << "L1     norm: " << sys.calculate_norm(vec, k, L1) << std::endl;
+          libMesh::out << "L2     norm: " << sys.calculate_norm(vec, k, L2) << std::endl;
+          libMesh::out << "Linf   norm: " << sys.calculate_norm(vec, k, L_INF) << std::endl;
+          libMesh::out << "H1 seminorm: " << sys.calculate_norm(vec, k, H1_SEMINORM) << std::endl;
+          libMesh::out << "H1     norm: " << sys.calculate_norm(vec, k, H1) << std::endl;
         }
     }
 }
@@ -38,23 +38,23 @@ int main(int argc, char** argv)
   Mesh mesh(init.comm());
   EquationSystems es(mesh);
 
-  std::cout << "Usage: " << argv[0]
-            << " mesh solution" << std::endl;
+  libMesh::out << "Usage: " << argv[0]
+               << " mesh solution" << std::endl;
 
-  std::cout << "Loading..." << std::endl;
+  libMesh::out << "Loading..." << std::endl;
 
   mesh.read(argv[1]);
-  std::cout << "Loaded mesh " << argv[1] << std::endl;
+  libMesh::out << "Loaded mesh " << argv[1] << std::endl;
   mesh.print_info();
 
   es.read(argv[2], EquationSystems::READ_HEADER |
                    EquationSystems::READ_DATA |
                    EquationSystems::READ_ADDITIONAL_DATA |
                    EquationSystems::READ_BASIC_ONLY);
-  std::cout << "Loaded solution " << argv[2] << std::endl;
+  libMesh::out << "Loaded solution " << argv[2] << std::endl;
   es.print_info();
 
-  std::cout.precision(16);
+  libMesh::out.precision(16);
 
   for (unsigned int i = 0; i != es.n_systems(); ++i)
     {

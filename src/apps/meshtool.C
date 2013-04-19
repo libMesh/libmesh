@@ -253,8 +253,8 @@ void process_cmd_line(int argc, char **argv,
               names.push_back(optarg);
             else
               {
-                std::cout << "ERROR: Input name must preceed output name!"
-                          << std::endl;
+                libMesh::out << "ERROR: Input name must preceed output name!"
+                             << std::endl;
                 exit(1);
               }
             break;
@@ -269,8 +269,8 @@ void process_cmd_line(int argc, char **argv,
               names.push_back(optarg);
             else
               {
-                std::cout << "ERROR: Input name must preceed output name!"
-                          << std::endl;
+                libMesh::out << "ERROR: Input name must preceed output name!"
+                             << std::endl;
                 exit(1);
               }
             break;
@@ -285,8 +285,8 @@ void process_cmd_line(int argc, char **argv,
               names.push_back(optarg);
             else
               {
-                std::cout << "ERROR: Input and output names must preceed solution name!"
-                          << std::endl;
+                libMesh::out << "ERROR: Input and output names must preceed solution name!"
+                             << std::endl;
                 exit(1);
               }
             break;
@@ -354,8 +354,8 @@ void process_cmd_line(int argc, char **argv,
           {
             if (b_mesh_B_given)
               {
-                std::cout << "ERROR: Do not use -b and -B concurrently!"
-                          << std::endl;
+                libMesh::out << "ERROR: Do not use -b and -B concurrently!"
+                             << std::endl;
                 exit(1);
               }
 
@@ -372,8 +372,8 @@ void process_cmd_line(int argc, char **argv,
           {
             if (b_mesh_b_given)
               {
-                std::cout << "ERROR: Do not use -b and -B concurrently!"
-                          << std::endl;
+                libMesh::out << "ERROR: Do not use -b and -B concurrently!"
+                             << std::endl;
                 exit(1);
               }
 
@@ -580,7 +580,7 @@ int main (int argc, char** argv)
 
   else
     {
-      std::cout << "No input specified." << std::endl;
+      libMesh::out << "No input specified." << std::endl;
       return 1;
     }
 
@@ -592,15 +592,15 @@ int main (int argc, char** argv)
     {
       if (names.size() == 3)
         {
-          std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
-                    << "not compatible with solution import." << std::endl;
+          libMesh::out << "ERROR: Invalid combination: Building infinite elements " << std::endl
+                       << "not compatible with solution import." << std::endl;
           exit(1);
         }
 
       if (write_bndry != BM_DISABLED)
         {
-          std::cout << "ERROR: Invalid combination: Building infinite elements " << std::endl
-                    << "not compatible with writing boundary conditions." << std::endl;
+          libMesh::out << "ERROR: Invalid combination: Building infinite elements " << std::endl
+                       << "not compatible with writing boundary conditions." << std::endl;
           exit(1);
         }
 
@@ -612,9 +612,9 @@ int main (int argc, char** argv)
           (y_sym && !origin_y.first) ||     // the same for y
           (z_sym && !origin_z.first))       // the same for z
         {
-          std::cout << "ERROR: When x-symmetry is requested using -X, then" << std::endl
-                    << "the option -x <coord> also has to be given." << std::endl
-                    << "This holds obviously for y and z, too." << std::endl;
+          libMesh::out << "ERROR: When x-symmetry is requested using -X, then" << std::endl
+                       << "the option -x <coord> also has to be given." << std::endl
+                       << "This holds obviously for y and z, too." << std::endl;
           exit(1);
         }
 
@@ -637,8 +637,8 @@ int main (int argc, char** argv)
   else if((origin_x.first ||  origin_y.first || origin_z.first) ||
           (x_sym          ||  y_sym          || z_sym))
     {
-      std::cout << "ERROR:  -x/-y/-z/-X/-Y/-Z is only to be used when" << std::endl
-                << "the option -a is also specified!" << std::endl;
+      libMesh::out << "ERROR:  -x/-y/-z/-X/-Y/-Z is only to be used when" << std::endl
+                   << "the option -a is also specified!" << std::endl;
       exit(1);
     }
 
@@ -661,7 +661,8 @@ int main (int argc, char** argv)
 //  if (dim == 2 && triangulate)
   if (triangulate)
     {
-      if (verbose) std::cout << "...Converting to all simplices...\n";
+      if (verbose)
+	 libMesh::out << "...Converting to all simplices...\n";
 
       MeshTools::Modification::all_tri(mesh);
     }
@@ -678,13 +679,13 @@ int main (int argc, char** argv)
 
       const ElemQuality q = DIAGONAL;
 
-      std::cout << "Quality type is: " << Quality::name(q) << std::endl;
+      libMesh::out << "Quality type is: " << Quality::name(q) << std::endl;
 
       // What are the quality bounds for this element?
       std::pair<Real, Real> bounds = mesh.elem(0)->qual_bounds(q);
-      std::cout << "Quality bounds for this element type are: (" << bounds.first
-                << ", " << bounds.second << ") "
-                << std::endl;
+      libMesh::out << "Quality bounds for this element type are: (" << bounds.first
+                   << ", " << bounds.second << ") "
+                   << std::endl;
 
       for (unsigned int e=0; e<mesh.n_elem(); e++)
         {
@@ -692,19 +693,19 @@ int main (int argc, char** argv)
         }
 
       const unsigned int n_bins = 10;
-      std::cout << "Avg. shape quality: " << sv.mean() << std::endl;
+      libMesh::out << "Avg. shape quality: " << sv.mean() << std::endl;
 
       // Find element indices below the specified cutoff.
       // These might be considered "bad" elements which need refinement.
       std::vector<dof_id_type> bad_elts  = sv.cut_below(0.8);
-      std::cout << "Found " << bad_elts.size()
-                << " of " << mesh.n_elem()
-                << " elements below the cutoff." << std::endl;
+      libMesh::out << "Found " << bad_elts.size()
+                   << " of " << mesh.n_elem()
+                   << " elements below the cutoff." << std::endl;
 
       /*
       for (unsigned int i=0; i<bad_elts.size(); i++)
-        std::cout << bad_elts[i] << " ";
-      std::cout << std::endl;
+        libMesh::out << bad_elts[i] << " ";
+      libMesh::out << std::endl;
       */
 
       // Compute the histogram for this distribution
@@ -778,7 +779,7 @@ int main (int argc, char** argv)
           libmesh_error();
 
       if (verbose)
-        std::cout << message << std::endl;
+        libMesh::out << message << std::endl;
 
       mesh.all_second_order(second_order_mode);
 
@@ -798,9 +799,9 @@ int main (int argc, char** argv)
   if (n_rsteps > 0)
     {
       if (verbose)
-        std::cout << "Refining the mesh "
-                  << n_rsteps << " times"
-                  << std::endl;
+        libMesh::out << "Refining the mesh "
+                     << n_rsteps << " times"
+                     << std::endl;
 
       MeshRefinement mesh_refinement (mesh);
       mesh_refinement.uniformly_refine(n_rsteps);
@@ -818,9 +819,9 @@ int main (int argc, char** argv)
    */
   if (dist_fact > 0.)
     {
-      std::cout << "Distoring the mesh by a factor of "
-                << dist_fact
-                << std::endl;
+      libMesh::out << "Distoring the mesh by a factor of "
+                   << dist_fact
+                   << std::endl;
 
       MeshTools::Modification::distort(mesh,dist_fact);
     };
@@ -901,7 +902,7 @@ int main (int argc, char** argv)
         if (n_rsteps > 0)
           {
             if (verbose)
-                std::cout << " Mesh got refined, will write only _active_ elements." << std::endl;
+                libMesh::out << " Mesh got refined, will write only _active_ elements." << std::endl;
 
             Mesh new_mesh (init.comm(), mesh.mesh_dimension());
 
@@ -957,7 +958,7 @@ int main (int argc, char** argv)
   };
 
   /*
-  std::cout << "Infinite loop, look at memory footprint" << std::endl;
+  libMesh::out << "Infinite loop, look at memory footprint" << std::endl;
   for (;;)
     ;
   */

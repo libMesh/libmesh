@@ -1082,7 +1082,7 @@ void Nemesis_IO_Helper::compute_node_communication_maps()
 	// Get reference to the set of IDs to be packed into the vector.
 	std::set<unsigned>& node_set = (*it).second;
 
-	//std::cout << "[" << this->processor_id() << "] node_set.size()=" << node_set.size() << std::endl;
+	//libMesh::out << "[" << this->processor_id() << "] node_set.size()=" << node_set.size() << std::endl;
 
 	// Resize the vectors to receive their payload
 	this->node_cmap_node_ids[cnt].resize(node_set.size());

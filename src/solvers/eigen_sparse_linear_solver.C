@@ -92,8 +92,8 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 	solver.setMaxIterations(m_its);
 	solver.setTolerance(tol);
 	solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
-	std::cout << "#iterations: " << solver.iterations() << std::endl;
-	std::cout << "estimated error: " << solver.error() << std::endl;
+	libMesh::out << "#iterations: " << solver.iterations() << std::endl;
+	libMesh::out << "estimated error: " << solver.error() << std::endl;
 	retval = std::make_pair(solver.iterations(), solver.error());
   	break;
       }
@@ -105,8 +105,8 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> &matrix_in,
 	solver.setMaxIterations(m_its);
 	solver.setTolerance(tol);
 	solution._vec = solver.solveWithGuess(rhs._vec,solution._vec);
-	std::cout << "#iterations: " << solver.iterations() << std::endl;
-	std::cout << "estimated error: " << solver.error() << std::endl;
+	libMesh::out << "#iterations: " << solver.iterations() << std::endl;
+	libMesh::out << "estimated error: " << solver.error() << std::endl;
 	retval = std::make_pair(solver.iterations(), solver.error());
   	break;
       }

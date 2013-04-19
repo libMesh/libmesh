@@ -194,7 +194,7 @@ bool Problem_Interface::computeJacobian(const Epetra_Vector & x,
 
 bool Problem_Interface::computePrecMatrix(const Epetra_Vector & /*x*/, Epetra_RowMatrix & /*M*/)
 {
-//   cout << "ERROR: Problem_Interface::preconditionVector() - Use Explicit Jacobian only for this test problem!" << endl;
+//   libMesh::out << "ERROR: Problem_Interface::preconditionVector() - Use Explicit Jacobian only for this test problem!" << endl;
    throw 1;
 }
 

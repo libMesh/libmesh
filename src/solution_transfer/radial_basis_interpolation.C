@@ -81,9 +81,9 @@ namespace libMesh
 	}
     }
 
-    std::cout << "bounding box is \n"
-	      << _src_bbox.min() << '\n'
-	      << _src_bbox.max() << std::endl;
+    libMesh::out << "bounding box is \n"
+	         << _src_bbox.min() << '\n'
+	         << _src_bbox.max() << std::endl;
 
 
     // Construct the Radial Basis Function, giving it the size of the domain
@@ -94,11 +94,11 @@ namespace libMesh
 
     RBF rbf(_r_bbox);
 
-    std::cout << "bounding box is \n"
-	      << _src_bbox.min() << '\n'
-	      << _src_bbox.max() << '\n'
-	      << "r_bbox = " << _r_bbox << '\n'
-	      << "rbf(r_bbox/2) = " << rbf(_r_bbox/2) << std::endl;
+    libMesh::out << "bounding box is \n"
+	         << _src_bbox.min() << '\n'
+	         << _src_bbox.max() << '\n'
+	         << "r_bbox = " << _r_bbox << '\n'
+	         << "rbf(r_bbox/2) = " << rbf(_r_bbox/2) << std::endl;
 
 
     // Construct the projection Matrix

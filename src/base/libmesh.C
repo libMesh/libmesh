@@ -100,28 +100,28 @@ namespace {
    */
   void libmesh_handleFPE(int /*signo*/, siginfo_t *info, void * /*context*/)
   {
-    std::cout << std::endl;
-    std::cout << "Floating point exception signaled (";
+    libMesh::err << std::endl;
+    libMesh::err << "Floating point exception signaled (";
     switch (info->si_code)
       {
-      case FPE_INTDIV: std::cerr << "integer divide by zero"; break;
-      case FPE_INTOVF: std::cerr << "integer overflow"; break;
-      case FPE_FLTDIV: std::cerr << "floating point divide by zero"; break;
-      case FPE_FLTOVF: std::cerr << "floating point overflow"; break;
-      case FPE_FLTUND: std::cerr << "floating point underflow"; break;
-      case FPE_FLTRES: std::cerr << "floating point inexact result"; break;
-      case FPE_FLTINV: std::cerr << "invalid floating point operation"; break;
-      case FPE_FLTSUB: std::cerr << "subscript out of range"; break;
-      default:         std::cerr << "unrecognized"; break;
+      case FPE_INTDIV: libMesh::err << "integer divide by zero"; break;
+      case FPE_INTOVF: libMesh::err << "integer overflow"; break;
+      case FPE_FLTDIV: libMesh::err << "floating point divide by zero"; break;
+      case FPE_FLTOVF: libMesh::err << "floating point overflow"; break;
+      case FPE_FLTUND: libMesh::err << "floating point underflow"; break;
+      case FPE_FLTRES: libMesh::err << "floating point inexact result"; break;
+      case FPE_FLTINV: libMesh::err << "invalid floating point operation"; break;
+      case FPE_FLTSUB: libMesh::err << "subscript out of range"; break;
+      default:         libMesh::err << "unrecognized"; break;
       }
-    std::cout << ")!" << std::endl;
+    libMesh::err << ")!" << std::endl;
 
-    std::cout << std::endl;
-    std::cout << "To track this down, compile debug version, start debugger, set breakpoint for 'libmesh_handleFPE' and run" << std::endl;
-    std::cout << "In gdb do:" << std::endl;
-    std::cout << "  break libmesh_handleFPE" << std::endl;
-    std::cout << "  run ..." << std::endl;
-    std::cout << "  bt" << std::endl;
+    libMesh::err << std::endl;
+    libMesh::err << "To track this down, compile debug version, start debugger, set breakpoint for 'libmesh_handleFPE' and run" << std::endl;
+    libMesh::err << "In gdb do:" << std::endl;
+    libMesh::err << "  break libmesh_handleFPE" << std::endl;
+    libMesh::err << "  run ..." << std::endl;
+    libMesh::err << "  bt" << std::endl;
 
     libmesh_error();
   }
