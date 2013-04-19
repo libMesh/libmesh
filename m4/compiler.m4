@@ -110,6 +110,12 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
     # Determine a F90+ compiler to use.
     # --------------------------------------------------------------
     AC_PROG_FC([$FC_TRY_LIST])
+
+    if (test "x$FC" = "x"); then
+      AC_MSG_RESULT(>>> No valid Fortran compiler <<<)
+      FC=no
+      enablefortran=no
+    fi
     # --------------------------------------------------------------
 
 
@@ -130,6 +136,13 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
     # Determine a F77 compiler to use.
     # --------------------------------------------------------------
     AC_PROG_F77([$F77_TRY_LIST])
+
+    if (test "x$F77" = "x"); then
+      AC_MSG_RESULT(>>> No valid Fortran 77 compiler <<<)
+      F77=no
+      enablefortran=no
+    fi
+
     # --------------------------------------------------------------
   else
       # when --disable-fortran is specified, explicitly set these

@@ -6222,6 +6222,13 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
+
+    if (test "x$FC" = "x"); then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> No valid Fortran compiler <<<" >&5
+$as_echo ">>> No valid Fortran compiler <<<" >&6; }
+      FC=no
+      enablefortran=no
+    fi
     # --------------------------------------------------------------
 
 
@@ -6452,6 +6459,14 @@ ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+    if (test "x$F77" = "x"); then
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: >>> No valid Fortran 77 compiler <<<" >&5
+$as_echo ">>> No valid Fortran 77 compiler <<<" >&6; }
+      F77=no
+      enablefortran=no
+    fi
 
     # --------------------------------------------------------------
   else
